@@ -89,7 +89,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
             "Copyright: 16; Collection/album: 32; Rating: 256." )
 
 #define ERROR_TEXT N_("Show unimportant error and warnings dialogs" )
-/* FIXME - longtext*/
+#define MINIMAL_TEXT N_("Start in minimal view (menus hidden)." )
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
@@ -105,28 +105,35 @@ vlc_module_begin();
     add_submodule();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
+
         add_bool( "qt-always-video", VLC_FALSE, NULL, ALWAYS_VIDEO_TEXT,
                 ALWAYS_VIDEO_LONGTEXT, VLC_TRUE );
-        add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
-                ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
                 SYSTRAY_LONGTEXT, VLC_FALSE);
         add_bool( "qt-start-minimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
                 MINIMIZED_LONGTEXT, VLC_TRUE);
+        add_bool( "qt-minimal-view", VLC_FALSE, NULL, MINIMAL_TEXT,
+                MINIMAL_TEXT, VLC_TRUE );
+
         add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, VLC_FALSE );
-        add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
-                ERROR_TEXT, VLC_FALSE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_TEXT, VLC_TRUE);
             change_autosave();
             change_internal();
+
         add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
                   NOTIFICATION_LONGTEXT, VLC_FALSE );
         add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
                   OPACITY_LONGTEXT, VLC_FALSE );
+
         add_bool( "qt-adv-options", VLC_FALSE, NULL, ADVANCED_OPTIONS_TEXT,
                   ADVANCED_OPTIONS_LONGTEXT, VLC_TRUE );
+        add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
+                ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
+                ERROR_TEXT, VLC_FALSE );
+
         add_integer( "qt-pl-showflags",
                 VLC_META_ENGINE_ARTIST|VLC_META_ENGINE_TITLE|
                 VLC_META_ENGINE_DURATION|VLC_META_ENGINE_COLLECTION,
