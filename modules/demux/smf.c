@@ -138,6 +138,7 @@ static int Open (vlc_object_t * p_this)
 
     /* SMF expresses tempo in Beats-Per-Minute, default is 120 */
     date_Init (&p_sys->pts, ppqn * 120, 60);
+    date_Set (&p_sys->pts, 1);
     p_sys->pulse        = 0;
     p_sys->ppqn         = ppqn;
 
