@@ -51,7 +51,6 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track);
 
 struct demux_sys_t
 {
-    es_format_t  fmt;
     es_out_id_t *es;
     date_t       pts;
     uint64_t     pulse; /* Pulses counter */
@@ -137,8 +136,6 @@ static int Open (vlc_object_t * p_this)
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
 
-    es_format_Init (&p_sys->fmt, AUDIO_ES, VLC_FOURCC('M', 'I', 'D', 'I'));
-    p_sys->es           = NULL;
     /* SMF expresses tempo in Beats-Per-Minute, default is 120 */
     date_Init (&p_sys->pts, ppqn * 120, 60);
     p_sys->pulse        = 0;
@@ -183,6 +180,10 @@ static int Open (vlc_object_t * p_this)
          * Because it has zero bytes of data, so the parser will detect the
          * error if the first event uses running status. */
     }
+
+    es_format_t  fmt;
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC('M', 'I', 'D', 'I'));
+    p_sys->es = es_out_Add (p_demux->out, &fmt);
 
     return VLC_SUCCESS;
 
@@ -358,11 +359,8 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
             stream_Read (s, block->p_buffer + 2, datalen - 1);
     }
 
-#if 0
+    block->i_dts = block->i_pts = date_Get (&p_demux->p_sys->pts);
     es_out_Send (p_demux->out, p_demux->p_sys->es, block);
-#else
-    block_Release (block);
-#endif
 
 skip:
     if (event < 0xF8)
@@ -387,11 +385,7 @@ static int Demux (demux_t *p_demux)
     if (pulse == UINT64_MAX)
         return 0; /* all tracks are done */
 
-    /*p_block->i_dts = p_block->i_pts =
-        date_Increment( &p_sys->pts, p_sys->fmt.audio.i_frame_length );
-
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );*/
-
+    es_out_Control (p_demux->out, ES_OUT_SET_PCR, date_Get (&p_sys->pts));
 
     msg_Dbg (p_demux, "pulse %llu", pulse);
     for (unsigned i = 0; i < p_sys->trackc; i++)
@@ -412,6 +406,9 @@ static int Demux (demux_t *p_demux)
         if (track->next < next_pulse)
             next_pulse = track->next;
     }
+
+    if (next_pulse != UINT64_MAX)
+        date_Increment (&p_sys->pts, next_pulse - pulse);
     p_sys->pulse = next_pulse;
 
     return 1;
@@ -423,10 +420,5 @@ static int Demux (demux_t *p_demux)
  *****************************************************************************/
 static int Control (demux_t *p_demux, int i_query, va_list args)
 {
-    demux_sys_t *p_sys  = p_demux->p_sys;
-
-    return demux2_vaControlHelper (p_demux->s, 0, -1,
-                                   p_sys->fmt.i_bitrate,
-                                   p_sys->fmt.audio.i_blockalign,
-                                   i_query, args);
+    return demux2_vaControlHelper (p_demux->s, 0, -1, 0, 1, i_query, args);
 }
