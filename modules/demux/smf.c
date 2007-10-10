@@ -172,8 +172,6 @@ static int Open (vlc_object_t * p_this)
 
         p_sys->trackv[i].offset = stream_Tell (stream);
         p_sys->trackv[i].end = p_sys->trackv[i].offset + GetDWBE (head + 4);
-        msg_Dbg (p_this, "track %u: 0x"I64Fx"-0x"I64Fx, i,
-                 p_sys->trackv[i].offset, p_sys->trackv[i].end);
         p_sys->trackv[i].next = 0;
         ReadDeltaTime (stream, p_sys->trackv + i);
         p_sys->trackv[i].running_event = 0xF6;
