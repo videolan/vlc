@@ -164,15 +164,11 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
  * Main Menu Bar Creation
  **/
 void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
-        bool playlist,
         bool visual_selector_enabled )
 {
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr( "&Media" ) );
-    if( playlist )
-    {
-        BAR_ADD( PlaylistMenu( mi,p_intf ), qtr( "&Playlist" ) );
-    }
+    BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
     BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ), qtr( "&Tools" ) );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 2 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 1 );
@@ -213,8 +209,7 @@ QMenu *QVLCMenu::FileMenu()
     return menu;
 }
 
-/* Playlist Menu, undocked when playlist is undocked */
-QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
+QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
 {
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
@@ -264,13 +259,15 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         QAction *action=menu->addAction( qtr( "Minimal View..." ), mi,
                 SLOT( toggleMenus() ), qtr( "Ctrl+H" ) );
         action->setCheckable( true );
-        if( mi->getControlsVisibilityStatus() & 0x2 ) action->setChecked( true );
+        if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE ) 
+            action->setChecked( true );
 
         /* Advanced Controls */
         action = menu->addAction( qtr( "Advanced controls" ), mi,
                 SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
-        if( mi->getControlsVisibilityStatus() & 0x1 ) action->setChecked( true );
+        if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
+            action->setChecked( true );
      #if 0 /* For Visualisations. Not yet working */
         adv = menu->addAction( qtr( "Visualizations selector" ),
                 mi, SLOT( visual() ) );

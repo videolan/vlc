@@ -27,7 +27,7 @@
 #include "components/interface_widgets.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"
-
+#include "menus.hpp"
 #include "util/input_slider.hpp"
 #include <vlc_vout.h>
 
@@ -40,7 +40,8 @@
 #include <QPalette>
 #include <QResizeEvent>
 
-#define ICON_SIZE 300
+#define ICON_SIZE 128
+#define MAX_BG_SIZE 300
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -120,7 +121,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
 
-    label = new QLabel( "" );
+    label = new QLabel;
     label->setMaximumHeight( ICON_SIZE );
     label->setMaximumWidth( ICON_SIZE );
     label->setScaledContents( true );
@@ -157,6 +158,10 @@ void BackgroundWidget::resizeEvent( QResizeEvent *e )
         label->setMaximumWidth( ICON_SIZE );
 }
 
+void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
+{
+    QVLCMenu::PopupMenu( p_intf, true );
+}
 /**********************************************************************
  * Visualization selector panel
  **********************************************************************/
@@ -249,7 +254,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     recordButton->setMaximumSize( QSize( 26, 26 ) );
     recordButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( recordButton );
-    BUTTON_SET_ACT_I( recordButton, "", vlc_record_16px.png,
+    BUTTON_SET_ACT_I( recordButton, "", record_16px.png,
             qtr( "Record" ), record() );
 
     normalButton = new QPushButton( "N" );
@@ -300,6 +305,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     //QSize size( 500, 200 );
     //resize( size );
     controlLayout = new QGridLayout( this );
+    controlLayout->setSpacing( 0 );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 
 #if DEBUG_COLOR
     QPalette palette2;
@@ -382,14 +389,15 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
      **/
 
     /** Play Buttons **/
-    QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
+    QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
 
     /* Play */
     playButton = new QPushButton;
     playButton->setSizePolicy( sizePolicy );
-    playButton->setMaximumSize( QSize( 45, 45 ) );
+    playButton->setMaximumSize( QSize( 38, 38 ) );
+    playButton->setMinimumSize( QSize( 45, 45 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
@@ -449,6 +457,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     playlistButton = new QPushButton;
     setupSmallButton( playlistButton );
     controlLayout->addWidget( playlistButton, 3, 11 );
+    BUTTON_SET_IMG( playlistButton, "" , playlist.png, qtr( "Show playlist" ) );
 
     /** extended Settings **/
     QPushButton *extSettingsButton = new QPushButton( "F" );
@@ -487,6 +496,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
+    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
 }
 ControlsWidget::~ControlsWidget()
 {

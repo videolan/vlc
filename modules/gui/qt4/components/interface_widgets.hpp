@@ -84,10 +84,11 @@ private:
     QLabel *label;
     QHBoxLayout *backgroundLayout;
     virtual void resizeEvent( QResizeEvent *e );
+    virtual void contextMenuEvent( QContextMenuEvent *event );
     int DrawBackground();
     int CleanBackground();
     intf_thread_t *p_intf;
-private slots:
+public slots:
     void setArt( QString );
 };
 

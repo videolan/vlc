@@ -47,6 +47,13 @@ class ControlsWidget;
 class SpeedControlWidget;
 class QMenu;
 class QSize;
+class QDockWidet;
+
+enum{
+    CONTROLS_HIDDEN = 0x0,
+    CONTROLS_VISIBLE = 0x1,
+    CONTROLS_ADVANCED = 0x2
+};
 
 class MainInterface : public QVLCMW
 {
@@ -104,8 +111,8 @@ private:
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
+    QDockWidget         *dockPL;
 
-    bool                 playlistEmbeddedFlag;
     bool                 videoEmbeddedFlag;
     bool                 alwaysVideoFlag;
     bool                 visualSelectorEnabled;
@@ -114,11 +121,12 @@ private:
     InputManager        *main_input_manager;
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
+    /* Status Bar */
     QLabel              *timeLabel;
     QLabel              *speedLabel;
     QLabel              *nameLabel;
 
-    bool                 b_remainingTime;
+    bool                 b_remainingTime; /* showing elapsed or remaining time */
 
     void customEvent( QEvent *);
 public slots:
@@ -128,6 +136,7 @@ public slots:
     void toggleUpdateSystrayMenu();
     void toggleAdvanced();
 private slots:
+    void debug();
     void updateOnTimer();
 
     void setStatus( int );
@@ -140,7 +149,6 @@ private slots:
     void visual();
 #endif
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
-    void updateSystrayMenu( int );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
     void showSpeedMenu( QPoint );

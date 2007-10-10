@@ -117,7 +117,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         alwaysVideoFlag = true;
 
     /* Set the other interface settings */
-    playlistEmbeddedFlag = settings->value( "playlist-embedded", true).toBool();
     visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
     notificationEnabled = config_GetInt( p_intf, "qt-notification" )
                           ? true : false;
@@ -127,45 +126,51 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setVLCWindowsTitle();
     handleMainUi( settings );
 
-#if 0 /* dock part */
-    QDockWidget *dock = new QDockWidget( this );
-    PlaylistWidget *plw = new PlaylistWidget( p_intf );
-    dock->setWidget( plw );
-    addDockWidget( Qt::RightDockWidgetArea, dock );
-
-    QToolBar *tb = new QToolBar(this);
-    tb->addAction( "playlist", dock, SLOT( hide() ) );
-    addToolBar(Qt::RightToolBarArea, tb);
-#endif
+    /* Create a Dock to get the playlist */
+    dockPL = new QDockWidget( qtr("Playlist"), this );
+    dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
+                           | Qt::RightDockWidgetArea
+                           | Qt::BottomDockWidgetArea );
+    dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
 
     /* Menu Bar */
-    QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
-                             visualSelectorEnabled );
+    QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
 
-    /* Status Bar */
-    /**
-     * TODO: clicking on the elapsed time should switch to the remaining time
-     **/
-    /**
-     * TODO: do we add a label for the current Volume ?
-     **/
+    /****************
+     *  Status Bar  *
+     ****************/
+
+    /* Widgets Creation*/
     b_remainingTime = false;
     timeLabel = new TimeLabel;
     nameLabel = new QLabel;
     speedLabel = new QLabel( "1.00x" );
+    speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+    timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+
+    /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
+
+    /* and adding those */
     statusBar()->addWidget( nameLabel, 8 );
     statusBar()->addPermanentWidget( speedLabel, 0 );
     statusBar()->addPermanentWidget( timeLabel, 2 );
-    speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
-    timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+
+    /* timeLabel behaviour:
+       - double clicking opens the goto time dialog 
+       - right-clicking and clicking just toggle between remaining and
+         elapsed time.*/
     CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
-    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
-    CONNECT( speedLabel, customContextMenuRequested( QPoint ),
-             this, showSpeedMenu( QPoint ) );
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
              this, toggleTimeDisplay() );
+    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+
+    /* Speed Label behaviour:
+       - right click gives the vertical speed slider */
+    CONNECT( speedLabel, customContextMenuRequested( QPoint ),
+             this, showSpeedMenu( QPoint ) );
 
     /**********************
      * Systray Management *
@@ -177,7 +182,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     {
         if( b_systrayAvailable ){
             b_createSystray = true;
-            hide(); //FIXME
+            hide(); //FIXME BUG HERE
         }
         else msg_Warn( p_intf, "You can't minize if you haven't a system "
                 "tray bar" );
@@ -188,13 +193,18 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( b_systrayAvailable && b_createSystray )
             createSystray();
 
+    if( config_GetInt( p_intf, "qt-minimal-view" ) )
+        toggleMenus();
+
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
     ON_TIMEOUT( updateOnTimer() );
+    ON_TIMEOUT( debug() );
 
-    /**
-     * Various CONNECTs
-     **/
+
+    /********************
+     * Various CONNECTs *
+     ********************/
 
     /* Connect the input manager to the GUI elements it manages */
     /* It is also connected to the control->slider, see the ControlsWidget */
@@ -203,7 +213,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
-    /** Connects on nameChanged() */
+    /**
+     * Connects on nameChanged()
+     */
     /* Naming in the controller statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
@@ -246,6 +258,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
+    // DEBUG FIXME
+    hide();
 }
 
 MainInterface::~MainInterface()
@@ -260,8 +274,8 @@ MainInterface::~MainInterface()
         vlc_object_release( p_playlist );
     }
 
-    settings->setValue( "playlist-embedded", playlistEmbeddedFlag );
-    settings->setValue( "adv-controls", getControlsVisibilityStatus() & 0x1 );
+    settings->setValue( "playlist-embedded", !dockPL->isFloating() );
+    settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
     settings->endGroup();
     delete settings;
@@ -309,10 +323,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool() );
 
-    /* Configure the Controls */
-    BUTTON_SET_IMG( controls->playlistButton, "" , playlist_icon.png,
-                    playlistEmbeddedFlag ?  qtr( "Show playlist" ) :
-                                            qtr( "Open playlist" ) );
+    /* Configure the Controls, the playlist button doesn't trigger THEDP
+       but the toggle from this MainInterface */
     BUTTONACT( controls->playlistButton, togglePlaylist() );
 
     /* Add the controls Widget to the main Widget */
@@ -361,6 +373,11 @@ void MainInterface::handleMainUi( QSettings *settings )
     setMinimumSize( PREF_W, addSize.height() );
 }
 
+void MainInterface::debug()
+{
+    msg_Dbg( p_intf, "size: %i - %i", controls->size().height(), controls->size().width() );
+    msg_Dbg( p_intf, "sizeHint: %i - %i", controls->sizeHint().height(), controls->sizeHint().width() );
+}
 /**********************************************************************
  * Handling of sizing of the components
  **********************************************************************/
@@ -371,7 +388,7 @@ void MainInterface::calculateInterfaceSize()
     {
         width = bgWidget->widgetSize.width();
         height = bgWidget->widgetSize.height();
-        assert( !(playlistWidget && playlistWidget->isVisible() ) );
+//        assert( !(playlistWidget));// && playlistWidget->isVisible() ) );
     }
     else if( VISIBLE( playlistWidget ) )
     {
@@ -540,14 +557,45 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
  **/
 void MainInterface::togglePlaylist()
 {
-    // Toggle the playlist dialog if not embedded and return
+    /* If no playlist exist, then create one and attach it to the DockPL*/
+    if( !playlistWidget )
+    {
+        msg_Dbg( p_intf, "Creating a new playlist" );
+        playlistWidget = new PlaylistWidget( p_intf );
+        if(bgWidget)
+            CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
+
+        playlistWidget->widgetSize = settings->value( "playlistSize",
+                                               QSize( 650, 310 ) ).toSize();
+        /* Add it to the parent DockWidget */
+        dockPL->setWidget( playlistWidget );
+
+        /* Add the dock to the main Interface */
+        addDockWidget( Qt::BottomDockWidgetArea, dockPL );
+
+        msg_Dbg( p_intf, "Creating a new playlist" );
+
+        /* Make the playlist floating is requested. Default is not. */
+        if( !settings->value( "playlist-embedded", true ).toBool() );
+        {
+            msg_Dbg( p_intf, "we don't want it inside");
+            dockPL->setFloating( true );
+        }
+
+    }
+    else
+    {
+    /* toggle the display */
+       TOGGLEV( dockPL );
+    }
+
+#if 0  // Toggle the playlist dialog if not embedded and return
     if( !playlistEmbeddedFlag )
     {
         if( playlistWidget )
         {
             /// \todo Destroy it
         }
-        THEDP->playlistDialog();
         return;
     }
 
@@ -555,13 +603,8 @@ void MainInterface::togglePlaylist()
     if( !playlistWidget )
     {
         PlaylistDialog::killInstance();
-        playlistWidget = new PlaylistWidget( p_intf );
         mainLayout->insertWidget( 0, playlistWidget );
-        playlistWidget->widgetSize = settings->value( "playlistSize",
-                                               QSize( 650, 310 ) ).toSize();
         playlistWidget->hide();
-        if(bgWidget)
-        CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
     }
 
     // And toggle visibility
@@ -589,12 +632,14 @@ void MainInterface::togglePlaylist()
         }
         if( VISIBLE( bgWidget ) ) bgWidget->hide();
     }
-
+#endif
     doComponentsUpdate();
 }
 
 void MainInterface::undockPlaylist()
 {
+    dockPL->setFloating( true );
+#if 0
     if( playlistWidget )
     {
         playlistWidget->hide();
@@ -616,6 +661,7 @@ void MainInterface::undockPlaylist()
         doComponentsUpdate();
         THEDP->playlistDialog();
     }
+#endif
 }
 
 #if 0
@@ -662,8 +708,8 @@ void MainInterface::toggleAdvanced()
 
 int MainInterface::getControlsVisibilityStatus()
 {
-    return( (controls->isVisible() ? 0x2 : 0x0 )
-                + controls->b_advancedVisible );
+    return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
+                + CONTROLS_ADVANCED * controls->b_advancedVisible );
 }
 
 /************************************************************************
@@ -674,7 +720,9 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, b_remainingTime ? length - time : time );
+
     QString title; title.sprintf( "%s/%s", psz_time, psz_length );
+    /* Add a minus to remaining time*/
     if( b_remainingTime ) timeLabel->setText( " -"+title+" " );
     else timeLabel->setText( " "+title+" " );
 }
@@ -686,15 +734,20 @@ void MainInterface::toggleTimeDisplay()
 
 void MainInterface::setName( QString name )
 {
-    input_name = name;
-    nameLabel->setText( " " + name+" " );
+    input_name = name; /* store it for the QSystray use */
+    /* Display it in the status bar, but also as a Tooltip in case it doesn't
+       fit in the label */
+    nameLabel->setText( " " + name + " " );
+    nameLabel->setToolTip( " " + name +" " );
 }
 
 void MainInterface::setStatus( int status )
 {
+    /* Forward the status to the controls to toggle Play/Pause */
     controls->setStatus( status );
+    /* And in the systray for the menu */
     if( sysTray )
-        updateSystrayMenu( status );
+        QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
 void MainInterface::setRate( int rate )
@@ -745,16 +798,6 @@ void MainInterface::createSystray()
 
     CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
             this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
-}
-
-/**
- * Update the menu of the Systray Icon.
- * May be unneedded, since it just calls QVLCMenu::update
- * FIXME !!!
- **/
-void MainInterface::updateSystrayMenu( int status )
-{
-    QVLCMenu::updateSystrayMenu( this, p_intf ) ;
 }
 
 /**
@@ -818,7 +861,6 @@ void MainInterface::handleSystrayClick(
 /**
  * Updates the name of the systray Icon tooltip.
  * Doesn't check if the systray exists, check before you call it.
- * FIXME !!! Fusion with next function ?
  **/
 void MainInterface::updateSystrayTooltipName( QString name )
 {
@@ -853,7 +895,6 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
         case PLAYING_S:
             {
                 sysTray->setToolTip( input_name );
-                //+ " - " + qtr( "Playing" ) );
                 break;
             }
         case PAUSE_S:
@@ -916,6 +957,7 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
  ************************************************************************/
 void MainInterface::customEvent( QEvent *event )
 {
+#if 0
     if( event->type() == PLDockEvent_Type )
     {
         PlaylistDialog::killInstance();
@@ -924,7 +966,9 @@ void MainInterface::customEvent( QEvent *event )
         QVLCMenu::createMenuBar(this, p_intf, true, visualSelectorEnabled);
         togglePlaylist();
     }
-    else if ( event->type() == SetVideoOnTopEvent_Type )
+#endif
+    /*else */
+    if ( event->type() == SetVideoOnTopEvent_Type )
     {
         SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
         if( p_event->OnTop() )

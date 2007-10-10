@@ -6,19 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>462</width>
-    <height>407</height>
+    <width>700</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="QGroupBox" name="diskGroupBox" >
@@ -26,10 +35,22 @@
       <string>_("Disc selection")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="0" column="7" >
@@ -142,7 +163,7 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" colspan="2" >
+      <item row="1" column="1" colspan="3" >
        <widget class="QCheckBox" name="dvdsimple" >
         <property name="toolTip" >
          <string>_("Disable DVD Menus (for compatibility)")</string>
@@ -157,22 +178,26 @@
    </item>
    <item>
     <widget class="QGroupBox" name="diskOptionBox" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="title" >
       <string>_("Starting position")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="1" column="0" >
@@ -217,7 +242,7 @@
          <set>Qt::AlignRight</set>
         </property>
         <property name="suffix" >
-<string/>
+         <string/>
         </property>
         <property name="minimum" >
          <number>0</number>
@@ -232,22 +257,26 @@
    </item>
    <item>
     <widget class="QGroupBox" name="diskOptionBox_2" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="title" >
-<string>_("Audio and Subtitles")</string>
+      <string>_("Audio and Subtitles")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="1" column="0" >
@@ -268,11 +297,11 @@
         <property name="prefix" >
          <string/>
         </property>
-        <property name="maximum" >
-         <number>7</number>
-        </property>
         <property name="minimum" >
          <number>-1</number>
+        </property>
+        <property name="maximum" >
+         <number>7</number>
         </property>
         <property name="value" >
          <number>-1</number>
@@ -297,11 +326,11 @@
         <property name="suffix" >
          <string/>
         </property>
-        <property name="maximum" >
-         <number>31</number>
-        </property>
         <property name="minimum" >
          <number>-1</number>
+        </property>
+        <property name="maximum" >
+         <number>31</number>
         </property>
         <property name="value" >
          <number>-1</number>
