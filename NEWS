@@ -60,6 +60,7 @@ Input/Demuxers:
   * Improved ID3v2 tags support
   * Improved Ogg/Vorbis tags support
   * Raw video support
+  * Standard MIDI File (types 0 & 1) support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -70,6 +71,7 @@ Decoders:
  * DosBox Capture support
  * Karl Morton's Video support
  * limited atrac3 support
+ * Fluidsynth MIDI software synthesis (with external sound fonts)
  * New codec FOURCCs to support more specific files:
    Avid, FCP, Sony, Samsung, ...
 

@@ -3780,6 +3780,23 @@ if test "${enable_x264}" != "no"; then
 fi
 
 dnl
+dnl libfluidsynth (MIDI synthetizer) plugin
+dnl
+AC_ARG_ENABLE(fluidsynth,
+  [  --enable-fluidsynth     MIDI synthesisr with libfluidsynth (default auto)])
+AS_IF([test "x${enable_fluidsynth}" != "xno"], [
+  PKG_CHECK_MODULES(FLUIDSYNTH, fluidsynth, [
+    VLC_ADD_PLUGINS(fluidsynth)
+    VLC_ADD_CFLAGS(fluidsynth, [${FLUIDSYNTH_CFLAGS}])
+    VLC_ADD_LDFLAGS(fluidsynth, [${FLUIDSYNTH_LIBS}])
+  ], [
+    AS_IF([test "x${enable_fluidsynth}" != "x"], [
+      AC_MSG_ERROR([${FLUIDSYNTH_PKG_ERRORS}])
+    ])
+  ])
+])
+
+dnl
 dnl Teletext Modules
 dnl vbi decoder plugin (using libzbvi)
 dnl telx module
