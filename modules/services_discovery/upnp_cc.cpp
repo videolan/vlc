@@ -63,17 +63,6 @@ vlc_module_begin();
 
 vlc_module_end();
 
-
-/*****************************************************************************
- * Local structures
- *****************************************************************************/
-
-struct services_discovery_sys_t
-{
-    playlist_item_t *p_node_one;
-    playlist_item_t *p_node_cat;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -87,15 +76,11 @@ struct services_discovery_sys_t
 static int Open( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)
-                                malloc( sizeof( services_discovery_sys_t ) );
 
     p_sd->pf_run = Run;
-    p_sd->p_sys  = p_sys;
 
-    playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
-                              &p_sys->p_node_cat, &p_sys->p_node_one,
-                              VLC_TRUE );
+    services_discovery_SetLocalizedName( p_sd, _("Devices") );
+
     return VLC_SUCCESS;
 }
 
@@ -105,15 +90,6 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-    playlist_t *p_playlist = pl_Yield( p_sd );
-    playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE,
-                         VLC_TRUE );
-    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE,
-                         VLC_TRUE );
-    pl_Release();
-    free( p_sys );
 }
 
 /*****************************************************************************
@@ -126,7 +102,6 @@ class UPnPHandler : public MediaPlayer, public DeviceChangeListener,
 {
     private:
         services_discovery_t *p_sd;
-        services_discovery_sys_t *p_sys;
 
         Device *GetDeviceFromUSN( const string& usn )
         {
@@ -135,7 +110,7 @@ class UPnPHandler : public MediaPlayer, public DeviceChangeListener,
 
         playlist_item_t *FindDeviceNode( Device *dev )
         {
-            return playlist_ChildSearchName( p_sys->p_node, dev->getFriendlyName() );
+            return playlist_ChildSearchName( p_sd->p_cat, dev->getFriendlyName() );
         }
 
         playlist_item_t *FindDeviceNode( const string &usn )
@@ -159,7 +134,7 @@ class UPnPHandler : public MediaPlayer, public DeviceChangeListener,
 
     public:
         UPnPHandler( services_discovery_t *p_this )
-            : p_sd( p_this ), p_sys( p_this->p_sys )
+            : p_sd( p_this )
         {
             addDeviceChangeListener( this );
             addSearchResponseListener( this );
@@ -205,7 +180,7 @@ playlist_item_t *UPnPHandler::AddDevice( Device *dev )
      */
     char *str = strdup( dev->getFriendlyName( ) );
 
-    p_item = playlist_NodeCreate( p_sys->p_playlist, str, p_sys->p_node_cat,0 );
+    p_item = playlist_NodeCreate( p_playlist, str, p_sd->p_cat,0 );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     msg_Dbg( p_sd, "device %s added", str );
     free( str );
@@ -238,7 +213,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
     {
         ItemNode *iNode = (ItemNode *)node;
         input_item_t *p_input = input_ItemNew( p_sd, iNode->getResource(), title );
-        playlist_BothAddInput( p_sys->p_playlist, p_input, p_parent,
+        playlist_BothAddInput( p_playlist, p_input, p_parent,
                                PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
                                VLC_FALSE );
     } else if ( node->isContainerNode() )
@@ -246,7 +221,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
         ContainerNode *conNode = (ContainerNode *)node;
 
         char* p_name = strdup(title); /* See other comment on strdup */
-        playlist_item_t* p_node = playlist_NodeCreate( p_sys->p_playlist,
+        playlist_item_t* p_node = playlist_NodeCreate( p_playlist,
                                                        p_name, p_parent, 0 );
         free(p_name);
 
@@ -263,7 +238,7 @@ void UPnPHandler::RemoveDevice( Device *dev )
     playlist_item_t *p_item = FindDeviceNode( dev );
 
     if( p_item != NULL )
-        playlist_NodeDelete( p_sys->p_playlist, p_item, VLC_TRUE, VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_TRUE );
 }
 
 

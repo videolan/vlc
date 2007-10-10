@@ -2,7 +2,7 @@
  * hal.c :  HAL interface module
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
- * Copyright (C) 2006 Rafaël Carré
+ * Copyright © 2006-2007 Rafaël Carré
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -48,16 +48,14 @@
 /* store relation between item id and udi for ejection */
 struct udi_input_id_t
 {
-    char    *psz_udi;
-    int     i_id;
+    char            *psz_udi;
+    input_item_t    *p_item;
 };
 #endif
 
 struct services_discovery_sys_t
 {
     LibHalContext           *p_ctx;
-    playlist_item_t         *p_node_cat;
-    playlist_item_t         *p_node_one;
 #ifdef HAVE_HAL_1
     DBusConnection          *p_connection;
     int                     i_devices_number;
@@ -99,8 +97,6 @@ static int Open( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
-
-    playlist_t          *p_playlist;
 
 #ifdef HAVE_HAL_1
     DBusError           dbus_error;
@@ -160,19 +156,7 @@ static int Open( vlc_object_t *p_this )
         }
 #endif
 
-    /* Create our playlist node */
-    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Warn( p_sd, "unable to find playlist, cancelling HAL listening");
-        return VLC_EGENERIC;
-    }
-
-    playlist_NodesPairCreate( p_playlist, _("Devices"),
-                              &p_sys->p_node_cat, &p_sys->p_node_one,
-                              VLC_TRUE );
-    vlc_object_release( p_playlist );
+    services_discovery_SetLocalizedName( p_sd, _("Devices") );
 
     return VLC_SUCCESS;
 }
@@ -184,17 +168,8 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
-    playlist_t *p_playlist =  (playlist_t *) vlc_object_find( p_sd,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE,VLC_TRUE );
-        playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE,VLC_TRUE );
-        vlc_object_release( p_playlist );
-    }
 #ifdef HAVE_HAL_1
     dbus_connection_unref( p_sys->p_connection );
-
     struct udi_input_id_t *p_udi_entry;
 
     while( p_sys->i_devices_number > 0 )
@@ -216,25 +191,8 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
 #endif
                     )
 {
-    playlist_item_t *p_item_cat, *p_item_one;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_sd, "playlist not found" );
-        return;
-    }
-    p_item_cat = playlist_NodeAddInput( p_playlist,
-            p_input,p_sd->p_sys->p_node_cat, PLAYLIST_APPEND, PLAYLIST_END,
-            VLC_FALSE );
-    p_item_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_item_one = playlist_NodeAddInput( p_playlist,
-            p_input,p_sd->p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END,
-            VLC_FALSE );
-    p_item_one->i_flags &= ~PLAYLIST_SKIP_FLAG;
-
-    vlc_object_release( p_playlist );
+    services_discovery_AddItem( p_sd, p_input, NULL /* no category */ );
 
 #ifdef HAVE_HAL_1
     struct udi_input_id_t *p_udi_entry;
@@ -243,7 +201,7 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
     {
         return;
     }
-    p_udi_entry->i_id = p_item_cat->i_id;
+    p_udi_entry->p_item = p_input;
     p_udi_entry->psz_udi = strdup( psz_device );
     TAB_APPEND( p_sys->i_devices_number, p_sys->pp_devices, p_udi_entry );
 #endif
@@ -266,7 +224,8 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
     psz_blockdevice = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                  psz_device, "block.device" );
 #endif
-    asprintf( &psz_uri, "dvd://%s", psz_blockdevice );
+    if( asprintf( &psz_uri, "dvd://%s", psz_blockdevice ) == -1 )
+        return;
     /* Create the playlist item here */
     p_input = input_ItemNew( p_sd, psz_uri, psz_name );
     free( psz_uri );
@@ -285,41 +244,35 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 static void DelItem( services_discovery_t *p_sd, char* psz_udi )
 {
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-    int                         i,j;
     playlist_item_t             *p_pl_item;
 
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
-                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = pl_Yield( p_sd );
     if( !p_playlist )
     {
         msg_Err( p_sd, "playlist not found" );
         return;
     }
 
+    int i;
     for( i = 0; i < p_sys->i_devices_number; i++ )
     { /*  looks for a matching udi */
         if( strcmp( psz_udi, p_sys->pp_devices[i]->psz_udi ) == 0 )
         { /* delete the corresponding item */
-            p_pl_item = playlist_ItemGetById( p_playlist,
-                p_sys->pp_devices[i]->i_id, VLC_FALSE );
+            p_pl_item = playlist_ItemGetByInputId( p_playlist,
+                p_sys->pp_devices[i]->p_item->i_id, p_sd->p_cat );
             if( p_pl_item )
             {
-                j = 0;
                 while( p_pl_item->i_children > 0 )
                 { /* delete all childs */
                     playlist_DeleteFromInput( p_playlist,
-                        p_pl_item->pp_children[j]->p_input->i_id, VLC_FALSE );
+                        p_pl_item->pp_children[0]->p_input->i_id, VLC_FALSE );
                 }
-                /* delete parent item */
-
                 /* HACK: if i_children == 0 the item won't be deleted
                  * That means that it _had_ children but they were deleted */
                 if( p_pl_item->i_children == 0 )
                     p_pl_item->i_children = -1;
-
-                playlist_DeleteFromInput( p_playlist,
-                    p_pl_item->p_input->i_id, VLC_FALSE );
             }
+            services_discovery_RemoveItem( p_sd, p_sys->pp_devices[i]->p_item );
 
             if( p_sys->pp_devices[i]->psz_udi )
                 free( p_sys->pp_devices[i]->psz_udi );
@@ -328,7 +281,7 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
         }
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_playlist );
 }
 #endif
 
@@ -344,7 +297,8 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
     psz_blockdevice = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                  psz_device, "block.device" );
 #endif
-    asprintf( &psz_uri, "cdda://%s", psz_blockdevice );
+    if( asprintf( &psz_uri, "cdda://%s", psz_blockdevice ) == -1 )
+        return;
     /* Create the playlist item here */
     p_input = input_ItemNew( p_sd, psz_uri, "Audio CD" );
     free( psz_uri );

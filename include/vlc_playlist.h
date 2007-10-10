@@ -168,6 +168,10 @@ struct services_discovery_t
     char *              psz_localized_name; /* Accessed through Setters for non class function */
     vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
 
+    /* the playlist items for category and onelevel */
+    playlist_item_t*    p_cat;
+    playlist_item_t*    p_one;
+
     services_discovery_sys_t *p_sys;
     void (*pf_run) ( services_discovery_t *);
 };

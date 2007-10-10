@@ -278,6 +278,8 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
             p_one = p_playlist->p_root_onelevel;
             PL_UNLOCK;
         }
+        p_sd->p_cat = p_cat;
+        p_sd->p_one = p_one;
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
                           vlc_ServicesDiscoveryItemAdded,
