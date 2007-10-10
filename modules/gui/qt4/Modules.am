@@ -185,7 +185,6 @@ EXTRA_DIST += \
 	pixmaps/type_playlist.png \
 	pixmaps/type_unknown.xpm \
 	pixmaps/type_file.png \
-	pixmaps/type_card.png \
 	pixmaps/cdda_16px.png \
 	pixmaps/type_directory.png \
 	pixmaps/type_node.png \
