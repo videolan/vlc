@@ -244,44 +244,19 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 static void DelItem( services_discovery_t *p_sd, char* psz_udi )
 {
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
-    playlist_item_t             *p_pl_item;
-
-    playlist_t *p_playlist = pl_Yield( p_sd );
-    if( !p_playlist )
-    {
-        msg_Err( p_sd, "playlist not found" );
-        return;
-    }
 
     int i;
     for( i = 0; i < p_sys->i_devices_number; i++ )
     { /*  looks for a matching udi */
         if( strcmp( psz_udi, p_sys->pp_devices[i]->psz_udi ) == 0 )
-        { /* delete the corresponding item */
-            p_pl_item = playlist_ItemGetByInputId( p_playlist,
-                p_sys->pp_devices[i]->p_item->i_id, p_sd->p_cat );
-            if( p_pl_item )
-            {
-                while( p_pl_item->i_children > 0 )
-                { /* delete all childs */
-                    playlist_DeleteFromInput( p_playlist,
-                        p_pl_item->pp_children[0]->p_input->i_id, VLC_FALSE );
-                }
-                /* HACK: if i_children == 0 the item won't be deleted
-                 * That means that it _had_ children but they were deleted */
-                if( p_pl_item->i_children == 0 )
-                    p_pl_item->i_children = -1;
-            }
+        { /* delete the corresponding item */    
             services_discovery_RemoveItem( p_sd, p_sys->pp_devices[i]->p_item );
-
             if( p_sys->pp_devices[i]->psz_udi )
                 free( p_sys->pp_devices[i]->psz_udi );
             TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
                     p_sys->pp_devices[i] );
         }
     }
-
-    pl_Release( p_playlist );
 }
 #endif
 
@@ -299,7 +274,7 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
 #endif
     if( asprintf( &psz_uri, "cdda://%s", psz_blockdevice ) == -1 )
         return;
-    /* Create the playlist item here */
+    /* Create the item here */
     p_input = input_ItemNew( p_sd, psz_uri, "Audio CD" );
     free( psz_uri );
     if( !p_input )
