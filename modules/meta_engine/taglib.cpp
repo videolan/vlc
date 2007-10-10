@@ -231,7 +231,7 @@ static int ReadMeta( vlc_object_t *p_this )
 {
     demux_t         *p_demux = (demux_t *)p_this;
     demux_meta_t    *p_demux_meta = (demux_meta_t*)p_demux->p_private;
-    vlc_meta_t      *p_meta = p_demux_meta->p_meta;
+    vlc_meta_t      *p_meta;
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
     p_demux_meta->p_meta = NULL;

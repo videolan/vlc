@@ -65,14 +65,13 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
     vlc_meta_t       *p_meta;
     int i;
 
-    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
-    p_demux_meta->p_meta = NULL;
-
     p_id3_tag = id3_tag_parse( p_data, i_size );
     if( !p_id3_tag )
         return;
 
-    p_demux_meta->p_meta = p_meta = vlc_meta_New();
+    if( !p_demux_meta->p_meta )
+        p_demux_meta->p_meta = vlc_meta_New();
+    p_meta = p_demux_meta->p_meta;
 
 #define ID_IS( a ) (!strcmp(  p_frame->id, a ))
 #define DESCR_IS( a) strstr( (char*)p_frame->description, a )
@@ -265,7 +264,8 @@ static int GetAPEvXSize( const uint8_t *p_data, int i_data )
 }
 static void ParseAPEvXTag( demux_t *p_demux, uint8_t *p_data, int i_data )
 {
-    vlc_meta_t *p_meta = (vlc_meta_t *)p_demux->p_private;
+    demux_meta_t     *p_demux_meta = (demux_meta_t*)p_demux->p_private;
+    vlc_meta_t       *p_meta;
     vlc_bool_t b_start;
     vlc_bool_t b_end;
     uint8_t *p_header = NULL;
@@ -278,6 +278,10 @@ static void ParseAPEvXTag( demux_t *p_demux, uint8_t *p_data, int i_data )
     b_end = !strncmp( (char*)&p_data[i_data-APE_TAG_HEADERSIZE], "APETAGEX", 8 );
     if( !b_end && !b_start )
         return;
+
+    if( !p_demux_meta->p_meta )
+        p_demux_meta->p_meta = vlc_meta_New();
+    p_meta = p_demux_meta->p_meta;
 
     if( b_start )
     {
@@ -296,9 +300,6 @@ static void ParseAPEvXTag( demux_t *p_demux, uint8_t *p_data, int i_data )
     i_entry = GetDWLE( &p_header[8+4+4] );
     if( i_entry <= 0 )
         return;
-
-    if( !p_meta )
-        p_demux->p_private = p_meta = vlc_meta_New();
 
     while( i_entry > 0 && i_data >= 10 )
     {
@@ -481,17 +482,20 @@ static void CheckHeader( demux_t *p_demux )
  ****************************************************************************/
 static int ParseTags( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    vlc_bool_t b_seekable;
-    int64_t i_init;
+    demux_t      *p_demux = (demux_t *)p_this;
+    demux_meta_t *p_demux_meta = (demux_meta_t*)p_demux->p_private;
+    vlc_bool_t    b_seekable;
+    int64_t       i_init;
 
     msg_Dbg( p_demux, "checking for ID3v1/2 and APEv1/2 tags" );
-
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
     if( !b_seekable )
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
 
     i_init = stream_Tell( p_demux->s );
+
+    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
+    p_demux_meta->p_meta = NULL;
 
     /* */
     CheckFooter( p_demux );
@@ -504,5 +508,8 @@ static int ParseTags( vlc_object_t *p_this )
      *  for them
      */
     stream_Seek( p_demux->s, i_init );
+    if( !p_demux_meta->p_meta && p_demux_meta->i_attachments <= 0 )
+        return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
+
