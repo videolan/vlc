@@ -263,6 +263,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
     uint8_t *payload;
     uint8_t type;
     int32_t length;
+    int ret = 0;
 
     if (stream_Read (s, &type, 1) != 1)
         return -1;
@@ -333,17 +334,21 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
             if (tr->end != stream_Tell (s))
             {
                 msg_Err (p_demux, "misplaced end of track");
-                stream_Seek (s, tr->end);
+                ret = -1;
             }
             break;
 
         case 0x51: /* Tempo */
-        {
-            uint32_t tempo = (payload[0] << 16) | (payload[1] << 8) | payload[2];
-            /* FIXME: change date */
-            msg_Dbg (p_demux, "new tempo: %u", (unsigned)tempo);
+            if (length == 3)
+            {
+                uint32_t tempo = (payload[0] << 16)
+                               | (payload[1] << 8) | payload[2];
+                /* FIXME: change date */
+                msg_Dbg (p_demux, "new tempo: %u", (unsigned)tempo);
+            }
+            else
+                ret = -1;
             break;
-        }
 
         case 0x54: /* SMPTE offset */
         case 0x58: /* Time signature */
