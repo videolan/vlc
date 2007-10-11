@@ -317,7 +317,7 @@ vlc_array_object_at_index( vlc_array_t * p_array, int i_index )
 static inline void
 vlc_array_insert( vlc_array_t * p_array, void * p_elem, int i_index )
 {
-    TAB_INSERT( p_array->i_count, p_array->pp_elems, p_elem, i_index );
+    TAB_INSERT_CAST( (void **), p_array->i_count, p_array->pp_elems, p_elem, i_index );
 }
 
 static inline void
