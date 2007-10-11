@@ -586,6 +586,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     p_item = p_parent =
                             p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
 
+                    if( !p_parent )
+                        p_parent = p_sys->p_playlist->p_root_onelevel;
                     while( p_parent->p_parent )
                         p_parent = p_parent->p_parent;
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
@@ -659,7 +661,10 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
 
                     playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
-                    while( p_parent && p_parent->p_parent )
+                    if( !p_parent )
+                        p_parent = p_sys->p_playlist->p_root_onelevel;
+
+                    while( p_parent->p_parent )
                         p_parent = p_parent->p_parent;
 
                     playlist_Add( p_sys->p_playlist, psz_uri, NULL,
@@ -821,7 +826,10 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_playlist && i_chain_len > 0 )
                 {
                     playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
-                    while( p_parent && p_parent->p_parent )
+                    if( !p_parent )
+                        p_parent = p_sys->p_playlist->p_root_onelevel;
+
+                    while( p_parent->p_parent )
                         p_parent = p_parent->p_parent;
 
                     playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
