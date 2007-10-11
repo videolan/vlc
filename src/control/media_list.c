@@ -156,6 +156,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
         libvlc_media_descriptor_release( p_md );
     }
 
+    vlc_mutex_destroy( &p_mlist->object_lock );
     vlc_array_clear( &p_mlist->items );
 
     free( p_mlist );
