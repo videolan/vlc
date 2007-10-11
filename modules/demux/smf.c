@@ -537,8 +537,24 @@ static int Demux (demux_t *p_demux)
             next_pulse = track->next;
     }
 
+    mtime_t cur_tick = (date_Get (&p_sys->pts) + 9999) / 10000, last_tick;
     if (next_pulse != UINT64_MAX)
-        date_Increment (&p_sys->pts, next_pulse - pulse);
+        last_tick = date_Increment (&p_sys->pts, next_pulse - pulse) / 10000;
+    else
+        last_tick = cur_tick + 1;
+
+    /* MIDI Tick emulation (ping the decider every 10ms) */
+    while (cur_tick < last_tick)
+    {
+        block_t *tick = block_New (p_demux, 1);
+        if (tick == NULL)
+            break;
+
+        tick->p_buffer[0] = 0xF9;
+        tick->i_dts = tick->i_pts = cur_tick++ * 10000;
+        es_out_Send (p_demux->out, p_sys->es, tick);
+    }
+
     p_sys->pulse = next_pulse;
 
     return 1;
