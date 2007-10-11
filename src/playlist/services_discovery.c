@@ -225,12 +225,12 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     input_item_t * p_input = p_event->u.services_discovery_item_removed.p_item;
     playlist_item_t * p_parent = user_data;
     playlist_item_t * p_pl_item;
-    
+
     /* First make sure that if item is a node it will be deleted.
      * XXX: Why don't we have a function to ensure that in the playlist code ? */
     vlc_object_lock( p_parent->p_playlist );
     p_pl_item = playlist_ItemFindFromInputAndRoot( p_parent->p_playlist,
-            p_input->i_id, p_parent, VLC_TRUE );
+            p_input->i_id, p_parent, VLC_FALSE );
 
     if( p_pl_item && p_pl_item->i_children > -1 )
     {
@@ -317,16 +317,16 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
         services_discovery_Start( p_sd );
 
-        /* Free in playlist_ServicesDiscoveryRemove */ 
+        /* Free in playlist_ServicesDiscoveryRemove */
         p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
         if( !p_sds )
         {
             msg_Err( p_playlist, "No more memory" );
             return VLC_ENOMEM;
         }
-        p_sds->p_sd = p_sd; 
-        p_sds->p_one = p_one; 
-        p_sds->p_cat = p_cat; 
+        p_sds->p_sd = p_sd;
+        p_sds->p_one = p_one;
+        p_sds->p_cat = p_cat;
 
         PL_LOCK;
         TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sds );
