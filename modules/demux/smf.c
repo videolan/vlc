@@ -137,8 +137,8 @@ static int Open (vlc_object_t * p_this)
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
 
-    /* SMF expresses tempo in Beats-Per-Minute, default is 120 */
-    date_Init (&p_sys->pts, ppqn * 120, 60);
+    /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
+    date_Init (&p_sys->pts, ppqn * 2, 1);
     date_Set (&p_sys->pts, 1);
     p_sys->pulse        = 0;
     p_sys->ppqn         = ppqn;
@@ -260,6 +260,7 @@ static
 int HandleMeta (demux_t *p_demux, mtrk_t *tr)
 {
     stream_t *s = p_demux->s;
+    demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t *payload;
     uint8_t type;
     int32_t length;
@@ -341,10 +342,24 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
         case 0x51: /* Tempo */
             if (length == 3)
             {
-                uint32_t tempo = (payload[0] << 16)
+                uint32_t uspqn = (payload[0] << 16)
                                | (payload[1] << 8) | payload[2];
-                /* FIXME: change date */
-                msg_Dbg (p_demux, "new tempo: %u", (unsigned)tempo);
+                unsigned tempo = 60 * 1000000 / (uspqn ? uspqn : 1);
+                msg_Dbg (p_demux, "tempo: %uus/qn -> %u BPM",
+                         (unsigned)uspqn, tempo);
+
+                if (tempo < 20)
+                {
+                    msg_Warn (p_demux, "tempo too slow -> 20 BPM");
+                    tempo = 20;
+                }
+                else
+                if (tempo > 240)
+                {
+                    msg_Warn (p_demux, "tempo too fast -> 240 BPM");
+                    tempo = 240;
+                }
+                date_Change (&p_sys->pts, p_sys->ppqn * tempo, 60);
             }
             else
                 ret = -1;
