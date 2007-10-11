@@ -252,7 +252,6 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
     for (;;)
     {
-        struct playlist_archived_services_discovery_t * p_asd;
         playlist_item_t * p_cat;
         playlist_item_t * p_one;
 
