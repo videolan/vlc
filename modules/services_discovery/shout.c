@@ -27,7 +27,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <vlc_playlist.h>
+#include <vlc_services_discovery.h>
 #include <vlc_interface.h>
 
 #include <vlc_network.h>
@@ -147,7 +147,7 @@ static void Run( services_discovery_t *p_sd )
     p_sd->p_sys->p_input->b_prefers_tree = VLC_TRUE;
     services_discovery_AddItem( p_sd, p_sd->p_sys->p_input, NULL /* no category */ );
 
-    input_Read( pl_Yield(p_sd), p_sd->p_sys->p_input, VLC_FALSE );
+    input_Read( p_sd, p_sd->p_sys->p_input, VLC_FALSE );
 }
 
 /*****************************************************************************
