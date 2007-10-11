@@ -691,7 +691,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     sysMenu->addSeparator();
     DP_SADD( sysMenu, qtr( "&Open Media" ), "",
             ":/pixmaps/file-wide_16px.png", openFileDialog(), "" );
-    DP_SADD( sysMenu, qtr( "&Quit" ) , "", ":/pixmaps/quit_16px.png",
+    DP_SADD( sysMenu, qtr( "&Quit" ) , "", ":/pixmaps/menus_quit_16px.png",
              quit(), "" );
 
     /* Set the menu */
