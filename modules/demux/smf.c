@@ -23,6 +23,7 @@
 #include <vlc_demux.h>
 #include <vlc_aout.h>
 #include <vlc_codecs.h>
+#include <vlc_charset.h>
 #include <limits.h>
 
 static int  Open  (vlc_object_t *);
@@ -278,8 +279,6 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
         return -1;
     }
 
-    for (int32_t i = 0; i < length; i++)
-        payload[i] &= 0x7f;
     payload[length] = '\0';
 
     switch (type)
@@ -288,36 +287,45 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
             break;
 
         case 0x01: /* Test (comment) */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Text      : %s", (char *)payload);
             break;
 
         case 0x02: /* Copyright */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Copyright : %s", (char *)payload);
             break;
 
         case 0x03: /* Track name */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Track name: %s", (char *)payload);
             break;
 
         case 0x04: /* Instrument name */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Instrument: %s", (char *)payload);
             break;
 
         case 0x05: /* Lyric (one syllable) */
+            /*EnsureUTF8 ((char *)payload);*/
             break;
 
         case 0x06: /* Marker text */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Marker    : %s", (char *)payload);
 
         case 0x07: /* Cue point (WAVE filename) */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Cue point : %s", (char *)payload);
             break;
 
         case 0x08: /* Program/Patch name */
+            EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Patch name: %s", (char *)payload);
             break;
 
         case 0x09: /* MIDI port name */
+            EnsureUTF8 ((char *)payload);
             msg_Dbg (p_demux, "MIDI port : %s", (char *)payload);
             break;
 
@@ -331,7 +339,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
 
         case 0x51: /* Tempo */
         {
-            uint32_t tempo = (payload[0] << 14) | (payload[1] << 7) | payload[2];
+            uint32_t tempo = (payload[0] << 16) | (payload[1] << 8) | payload[2];
             /* FIXME: change date */
             msg_Dbg (p_demux, "new tempo: %u", (unsigned)tempo);
             break;
