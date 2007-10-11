@@ -26,6 +26,9 @@
 #include <vlc_charset.h>
 #include <limits.h>
 
+#define TEMPO_MIN  20
+#define TEMPO_MAX 250 /* Beats per minute */
+
 static int  Open  (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -348,16 +351,16 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
                 msg_Dbg (p_demux, "tempo: %uus/qn -> %u BPM",
                          (unsigned)uspqn, tempo);
 
-                if (tempo < 20)
+                if (tempo < TEMPO_MIN)
                 {
-                    msg_Warn (p_demux, "tempo too slow -> 20 BPM");
-                    tempo = 20;
+                    msg_Warn (p_demux, "tempo too slow -> %u BPM", TEMPO_MIN);
+                    tempo = TEMPO_MIN;
                 }
                 else
-                if (tempo > 240)
+                if (tempo > TEMPO_MAX)
                 {
-                    msg_Warn (p_demux, "tempo too fast -> 240 BPM");
-                    tempo = 240;
+                    msg_Warn (p_demux, "tempo too fast -> %u BPM", TEMPO_MAX);
+                    tempo = TEMPO_MAX;
                 }
                 date_Change (&p_sys->pts, p_sys->ppqn * tempo, 60);
             }
