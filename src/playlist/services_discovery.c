@@ -232,7 +232,7 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     p_pl_item = playlist_ItemFindFromInputAndRoot( p_parent->p_playlist,
             p_input->i_id, p_parent, VLC_TRUE );
 
-    if( p_pl_item->i_children > -1 )
+    if( p_pl_item && p_pl_item->i_children > -1 )
     {
         playlist_NodeDelete( p_parent->p_playlist, p_pl_item, VLC_TRUE, VLC_FALSE );
         vlc_object_unlock( p_parent->p_playlist );
