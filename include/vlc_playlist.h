@@ -35,6 +35,7 @@ extern "C" {
 #include <assert.h>
 #include <vlc_input.h>
 #include <vlc_events.h>
+#include <vlc_services_discovery.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -158,32 +159,18 @@ struct playlist_item_t
 typedef enum
 { PLAYLIST_STOPPED,PLAYLIST_RUNNING,PLAYLIST_PAUSED } playlist_status_t;
 
-
-struct services_discovery_t
-{
-    VLC_COMMON_MEMBERS
-    char *              psz_module;
-    module_t *          p_module;
-
-    char *              psz_localized_name; /* Accessed through Setters for non class function */
-    vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
-
-    /* the playlist items for category and onelevel */
-    playlist_item_t*    p_cat;
-    playlist_item_t*    p_one;
-
-    services_discovery_sys_t *p_sys;
-    void (*pf_run) ( services_discovery_t *);
-};
-
 /** Structure containing information about the playlist */
 struct playlist_t
 {
     VLC_COMMON_MEMBERS
 
-    /* pp_sd & i_sd are for internal use ONLY. Understood ? it's PRIVATE ! */
-    services_discovery_t **pp_sd; /**< Loaded service discovery modules */
-    int                   i_sd;   /**< Number of service discovery modules */
+    struct playlist_services_discovery_support_t {
+        /* the playlist items for category and onelevel */
+        playlist_item_t*    p_cat;
+        playlist_item_t*    p_one;
+        services_discovery_t * p_sd; /**< Loaded service discovery modules */
+    } ** pp_sds;
+    int                   i_sds;   /**< Number of service discovery modules */
 
     int                   i_enabled; /**< How many items are enabled ? */
 
@@ -416,33 +403,6 @@ VLC_EXPORT( playlist_item_t *, playlist_GetPreferredNode, ( playlist_t *p_playli
 VLC_EXPORT( playlist_item_t *, playlist_GetNextLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, vlc_bool_t b_ena, vlc_bool_t b_unplayed ) );
 VLC_EXPORT( playlist_item_t *, playlist_GetPrevLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, vlc_bool_t b_ena, vlc_bool_t b_unplayed ) );
 VLC_EXPORT( playlist_item_t *, playlist_GetLastLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root ) );
-
-/***********************************************************************
- * Service Discovery
- ***********************************************************************/
-
-/* Get the services discovery modules names to use in Create(), in a null
- * terminated string array. Array and string must be freed after use. */
-VLC_EXPORT( char **, services_discovery_GetServicesNames, ( vlc_object_t * p_super ) );
-
-/* Creation of a service_discovery object */
-VLC_EXPORT( services_discovery_t *, services_discovery_Create, ( vlc_object_t * p_super, const char * psz_service_name ) );
-VLC_EXPORT( void,                   services_discovery_Destroy, ( services_discovery_t * p_this ) );
-VLC_EXPORT( int,                    services_discovery_Start, ( services_discovery_t * p_this ) );
-VLC_EXPORT( void,                   services_discovery_Stop, ( services_discovery_t * p_this ) );
-
-/* Read info from discovery object */
-VLC_EXPORT( char *,                 services_discovery_GetLocalizedName, ( services_discovery_t * p_this ) );
-
-/* Receive event notification (prefered way to get new items) */
-VLC_EXPORT( vlc_event_manager_t *,  services_discovery_EventManager, ( services_discovery_t * p_this ) );
-
-/* Used by services_discovery to post update about their items */
-VLC_EXPORT( void,                   services_discovery_SetLocalizedName, ( services_discovery_t * p_this, const char * ) );
-    /* About the psz_category, it is a legacy way to add info to the item,
-     * for more options, directly set the (meta) data on the input item */
-VLC_EXPORT( void,                   services_discovery_AddItem, ( services_discovery_t * p_this, input_item_t * p_item, const char * psz_category ) );
-VLC_EXPORT( void,                   services_discovery_RemoveItem, ( services_discovery_t * p_this, input_item_t * p_item ) );
 
 /***********************************************************************
  * Inline functions

@@ -66,7 +66,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         return NULL;
     }
 
-    TAB_INIT( p_playlist->i_sd, p_playlist->pp_sd );
+    TAB_INIT( p_playlist->i_sds, p_playlist->pp_sds );
 
     p_parent->p_libvlc->p_playlist = p_playlist;
 
@@ -437,10 +437,10 @@ void playlist_LastLoop( playlist_t *p_playlist )
         vout_Destroy( (vout_thread_t *)p_obj );
     }
 
-    while( p_playlist->i_sd )
+    while( p_playlist->i_sds )
     {
         playlist_ServicesDiscoveryRemove( p_playlist,
-                                          p_playlist->pp_sd[0]->psz_module );
+                                          p_playlist->pp_sds[0]->p_sd->psz_module );
     }
 
     playlist_MLDump( p_playlist );

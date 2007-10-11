@@ -252,6 +252,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
     for (;;)
     {
+        struct playlist_services_discovery_support_t * p_sds;
         playlist_item_t * p_cat;
         playlist_item_t * p_one;
 
@@ -293,8 +294,6 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
             p_one = p_playlist->p_root_onelevel;
             PL_UNLOCK;
         }
-        p_sd->p_cat = p_cat;
-        p_sd->p_one = p_one;
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
                           vlc_ServicesDiscoveryItemAdded,
@@ -318,8 +317,19 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
         services_discovery_Start( p_sd );
 
+        /* Free in playlist_ServicesDiscoveryRemove */ 
+        p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
+        if( !p_sds )
+        {
+            msg_Err( p_playlist, "No more memory" );
+            return VLC_ENOMEM;
+        }
+        p_sds->p_sd = p_sd; 
+        p_sds->p_one = p_one; 
+        p_sds->p_cat = p_cat; 
+
         PL_LOCK;
-        TAB_APPEND( p_playlist->i_sd, p_playlist->pp_sd, p_sd );
+        TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sds );
         PL_UNLOCK;
     }
 
@@ -329,60 +339,60 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
                                        const char *psz_module )
 {
+    struct playlist_services_discovery_support_t * p_sds = NULL;
     int i;
-    struct services_discovery_t *p_sd = NULL;
 
     PL_LOCK;
-    for( i = 0 ; i< p_playlist->i_sd ; i ++ )
+    for( i = 0 ; i< p_playlist->i_sds ; i ++ )
     {
-        if( !strcmp( psz_module, p_playlist->pp_sd[i]->psz_module ) )
+        if( !strcmp( psz_module, p_playlist->pp_sds[i]->p_sd->psz_module ) )
         {
-            p_sd = p_playlist->pp_sd[i];
-            REMOVE_ELEM( p_playlist->pp_sd, p_playlist->i_sd, i );
+            p_sds = p_playlist->pp_sds[i];
+            REMOVE_ELEM( p_playlist->pp_sds, p_playlist->i_sds, i );
             break;
         }
     }
     PL_UNLOCK;
 
-    if( p_sd == NULL )
+    if( !p_sds || !p_sds->p_sd )
     {
         msg_Warn( p_playlist, "module %s is not loaded", psz_module );
         return VLC_EGENERIC;
     }
 
-    services_discovery_Stop( p_sd );
+    services_discovery_Stop( p_sds->p_sd );
 
-    vlc_event_detach( services_discovery_EventManager( p_sd ),
+    vlc_event_detach( services_discovery_EventManager( p_sds->p_sd ),
                         vlc_ServicesDiscoveryItemAdded,
                         playlist_sd_item_added,
-                        p_sd->p_one );
+                        p_sds->p_one );
 
-    vlc_event_detach( services_discovery_EventManager( p_sd ),
+    vlc_event_detach( services_discovery_EventManager( p_sds->p_sd ),
                         vlc_ServicesDiscoveryItemAdded,
                         playlist_sd_item_added,
-                        p_sd->p_cat );
+                        p_sds->p_cat );
 
-    vlc_event_detach( services_discovery_EventManager( p_sd ),
+    vlc_event_detach( services_discovery_EventManager( p_sds->p_sd ),
                         vlc_ServicesDiscoveryItemRemoved,
                         playlist_sd_item_removed,
-                        p_sd->p_one );
+                        p_sds->p_one );
 
-    vlc_event_detach( services_discovery_EventManager( p_sd ),
+    vlc_event_detach( services_discovery_EventManager( p_sds->p_sd ),
                         vlc_ServicesDiscoveryItemRemoved,
                         playlist_sd_item_removed,
-                        p_sd->p_cat );
+                        p_sds->p_cat );
 
     /* Remove the sd playlist node if it exists */
     PL_LOCK;
-    if( p_sd->p_cat != p_playlist->p_root_category &&
-        p_sd->p_one != p_playlist->p_root_onelevel )
+    if( p_sds->p_cat != p_playlist->p_root_category &&
+        p_sds->p_one != p_playlist->p_root_onelevel )
     {
-        playlist_NodeDelete( p_playlist, p_sd->p_cat, VLC_TRUE, VLC_FALSE );
-        playlist_NodeDelete( p_playlist, p_sd->p_one, VLC_TRUE, VLC_FALSE );
+        playlist_NodeDelete( p_playlist, p_sds->p_cat, VLC_TRUE, VLC_FALSE );
+        playlist_NodeDelete( p_playlist, p_sds->p_one, VLC_TRUE, VLC_FALSE );
     }
     PL_UNLOCK;
 
-    services_discovery_Destroy( p_sd );
+    services_discovery_Destroy( p_sds->p_sd );
 
     return VLC_SUCCESS;
 }
@@ -393,9 +403,9 @@ vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
     int i;
     PL_LOCK;
 
-    for( i = 0 ; i< p_playlist->i_sd ; i ++ )
+    for( i = 0 ; i< p_playlist->i_sds ; i ++ )
     {
-        if( !strcmp( psz_module, p_playlist->pp_sd[i]->psz_module ) )
+        if( !strcmp( psz_module, p_playlist->pp_sds[i]->p_sd->psz_module ) )
         {
             PL_UNLOCK;
             return VLC_TRUE;
