@@ -657,11 +657,15 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
 
                     sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
-                    /* XXX
-                    playlist_Add( p_sys->p_playlist, psz_uri,
-                                  psz_uri,
-                                  PLAYLIST_APPEND, PLAYLIST_END );
-                    */
+
+                    playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
+                    while( p_parent && p_parent->p_parent )
+                        p_parent = p_parent->p_parent;
+
+                    playlist_Add( p_sys->p_playlist, psz_uri, NULL,
+                                  PLAYLIST_APPEND, PLAYLIST_END,
+                                  p_parent == p_sys->p_playlist->p_root_onelevel
+                                  , VLC_FALSE );
                     p_sys->i_box_type = BOX_PLAYLIST;
                     free( psz_uri );
                 }
@@ -816,11 +820,14 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case 0x0d:
                 if( p_playlist && i_chain_len > 0 )
                 {
-                    /*
-                    playlist_Add( p_playlist, p_sys->psz_open_chain,
-                                  p_sys->psz_open_chain,
-                                  PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
-                    */
+                    playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
+                    while( p_parent && p_parent->p_parent )
+                        p_parent = p_parent->p_parent;
+
+                    playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
+                                  PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
+                                  p_parent == p_sys->p_playlist->p_root_onelevel
+                                  , VLC_FALSE );
                     p_sys->b_box_plidx_follow = VLC_TRUE;
                 }
                 p_sys->i_box_type = BOX_PLAYLIST;
@@ -1143,7 +1150,8 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 #endif
 
     va_start( vl_args, p_fmt );
-    vasprintf( &p_buf, p_fmt, vl_args );
+    if( vasprintf( &p_buf, p_fmt, vl_args ) == -1 )
+        return;
     va_end( vl_args );
 
     if( ( p_buf == NULL ) || ( w <= 0 ) )
@@ -1217,7 +1225,8 @@ static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt
     }
 
     va_start( vl_args, p_fmt );
-    vasprintf( &p_buf, p_fmt, vl_args );
+    if( vasprintf( &p_buf, p_fmt, vl_args ) == -1 )
+        return;
     va_end( vl_args );
 
     if( p_buf == NULL )
