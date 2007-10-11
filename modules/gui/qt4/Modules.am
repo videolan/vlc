@@ -191,7 +191,7 @@ EXTRA_DIST += \
 	pixmaps/go-next.png \
 	pixmaps/next.png \
 	pixmaps/noart.png \
-	pixmaps/playlist_icon.png \
+	pixmaps/playlist.png \
 	pixmaps/play.png \
 	pixmaps/pause.png \
 	pixmaps/previous.png \
@@ -224,7 +224,6 @@ EXTRA_DIST += \
 	pixmaps/tape_16px.png \
 	pixmaps/file-asym_16px.png \
 	pixmaps/file-wide_16px.png \
-	pixmaps/info_16px.png \
 	pixmaps/previous_16px.png \
 	pixmaps/next_16px.png \
 	pixmaps/record_16px.png \
