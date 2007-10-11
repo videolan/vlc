@@ -117,6 +117,7 @@
         }                                       \
   } while(0)
 
+
 #define TAB_REMOVE( count, tab, p )             \
   do {                                          \
         int _i_index_;                          \
@@ -277,6 +278,74 @@
         item = array.p_elems[fe_idx];
 
 #define FOREACH_END() } }
+
+
+/************************************************************************
+ * Dynamic arrays with progressive allocation (Prefered API)
+ ************************************************************************/
+typedef struct vlc_array_t
+{
+    int i_count;
+    void ** pp_elems;
+} vlc_array_t;
+
+static inline void vlc_array_init( vlc_array_t * p_array )
+{
+    memset( p_array, 0, sizeof(vlc_array_t) );
+}
+
+static inline void vlc_array_clear( vlc_array_t * p_array )
+{
+    free( p_array->pp_elems );
+    memset( p_array, 0, sizeof(vlc_array_t) );
+}
+
+/* Read */
+static inline int
+vlc_array_count( vlc_array_t * p_array )
+{
+    return p_array->i_count;
+}
+
+static inline void *
+vlc_array_object_at_index( vlc_array_t * p_array, int i_index )
+{
+    return p_array->pp_elems[i_index];
+}
+
+/* Write */
+static inline void
+vlc_array_insert( vlc_array_t * p_array, void * p_elem, int i_index )
+{
+    TAB_INSERT( p_array->i_count, p_array->pp_elems, p_elem, i_index );
+}
+
+static inline void
+vlc_array_append( vlc_array_t * p_array, void * p_elem )
+{
+    vlc_array_insert( p_array, p_elem, p_array->i_count );
+}
+
+static inline void
+vlc_array_remove( vlc_array_t * p_array, int i_index )
+{
+    if( i_index >= 0 )
+    {
+        if( p_array->i_count > 1 )
+        {
+            memmove( p_array->pp_elems + i_index,
+                     p_array->pp_elems + i_index+1,
+                     ( p_array->i_count - i_index - 1 ) * sizeof( void* ) );
+        }
+        p_array->i_count--;
+        if( p_array->i_count == 0 )
+        {
+            free( p_array->pp_elems );
+            p_array->pp_elems = NULL;
+        }
+    }
+}
+
 
 /************************************************************************
  * Dictionaries
