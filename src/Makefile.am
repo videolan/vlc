@@ -70,6 +70,7 @@ HEADERS_include = \
 	../include/vlc_osd.h \
 	../include/vlc_playlist.h \
 	../include/vlc_rand.h \
+	../include/vlc_services_discovery.h \
 	../include/vlc_sout.h \
 	../include/vlc_stream.h \
 	../include/vlc_streaming.h \
