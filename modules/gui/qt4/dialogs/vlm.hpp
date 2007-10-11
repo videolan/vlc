@@ -87,9 +87,6 @@ private:
     QDateEdit *date;
     QLabel *schetimelabel, *schedatelabel, *schetimerepeat;
     QSpinBox *scherepeatnumber;
-
-private slots:
-    void close();
 };
 
 #endif

@@ -82,7 +82,9 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
     ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    connect( mediatype, SIGNAL( currentIndexChanged( int ) ), slayout, SLOT( setCurrentIndex( int ) ) );
+    CONNECT( mediatype, currentIndexChanged( int ), slayout,
+            setCurrentIndex( int ) );
+    CONNECT( closeButton, clicked(), this, hide() );
 
 }
 
