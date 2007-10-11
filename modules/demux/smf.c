@@ -366,13 +366,29 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
             break;
 
         case 0x54: /* SMPTE offset */
+            if (length == 5)
+                msg_Warn (p_demux, "SMPTE offset not implemented");
+            else
+                ret = -1;
+            break;
+
         case 0x58: /* Time signature */
+            if (length == 4)
+                ;
+            else
+                ret = -1;
+            break;
+
         case 0x59: /* Key signature */
-            msg_Warn (p_demux, "unimplemented SMF Meta Event type 0x%02X (%d bytes)",
-                      type, length);
+            if (length == 2)
+                ;
+            else
+                ret = -1;
             break;
 
         case 0x7f: /* Proprietary event */
+            msg_Dbg (p_demux, "ignored proprietary SMF Meta Event (%d bytes)",
+                     length);
             break;
 
         default:
