@@ -252,6 +252,112 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
 }
 
 
+/**
+ * Non-MIDI Meta events handler
+ */
+static
+int HandleMeta (demux_t *p_demux, mtrk_t *tr)
+{
+    stream_t *s = p_demux->s;
+    uint8_t *payload;
+    uint8_t type;
+    int32_t length;
+
+    if (stream_Read (s, &type, 1) != 1)
+        return -1;
+
+    length = ReadVarInt (s);
+    if (length < 0)
+        return -1;
+
+    payload = malloc (length + 1);
+    if ((payload == NULL)
+     || (stream_Read (s, payload, length) != length))
+    {
+        free (payload);
+        return -1;
+    }
+
+    for (int32_t i = 0; i < length; i++)
+        payload[i] &= 0x7f;
+    payload[length] = '\0';
+
+    switch (type)
+    {
+        case 0x00: /* Sequence Number */
+            break;
+
+        case 0x01: /* Test (comment) */
+            msg_Info (p_demux, "Text      : %s", (char *)payload);
+            break;
+
+        case 0x02: /* Copyright */
+            msg_Info (p_demux, "Copyright : %s", (char *)payload);
+            break;
+
+        case 0x03: /* Track name */
+            msg_Info (p_demux, "Track name: %s", (char *)payload);
+            break;
+
+        case 0x04: /* Instrument name */
+            msg_Info (p_demux, "Instrument: %s", (char *)payload);
+            break;
+
+        case 0x05: /* Lyric (one syllable) */
+            break;
+
+        case 0x06: /* Marker text */
+            msg_Info (p_demux, "Marker    : %s", (char *)payload);
+
+        case 0x07: /* Cue point (WAVE filename) */
+            msg_Info (p_demux, "Cue point : %s", (char *)payload);
+            break;
+
+        case 0x08: /* Program/Patch name */
+            msg_Info (p_demux, "Patch name: %s", (char *)payload);
+            break;
+
+        case 0x09: /* MIDI port name */
+            msg_Dbg (p_demux, "MIDI port : %s", (char *)payload);
+            break;
+
+        case 0x2F: /* End of track */
+            if (tr->end != stream_Tell (s))
+            {
+                msg_Err (p_demux, "misplaced end of track");
+                stream_Seek (s, tr->end);
+            }
+            break;
+
+        case 0x51: /* Tempo */
+        {
+            uint32_t tempo = (payload[0] << 14) | (payload[1] << 7) | payload[2];
+            /* FIXME: change date */
+            msg_Dbg (p_demux, "new tempo: %u", (unsigned)tempo);
+            break;
+        }
+
+        case 0x54: /* SMPTE offset */
+        case 0x58: /* Time signature */
+        case 0x59: /* Key signature */
+            msg_Warn (p_demux, "unimplemented SMF Meta Event type 0x%02X (%d bytes)",
+                      type, length);
+            break;
+
+        case 0x7f: /* Proprietary event */
+            break;
+
+        default:
+            msg_Warn (p_demux, "unknown SMF Meta Event type 0x%02X (%d bytes)",
+                      type, length);
+    }
+
+    free (payload);
+    return 0;
+}
+
+
+
 static
 int HandleMessage (demux_t *p_demux, mtrk_t *tr)
 {
@@ -285,27 +391,11 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
                     }
                 }
                 case 0xFF: /* SMF Meta Event */
-                {
-                    uint8_t type;
-                    int32_t length;
-
-                    if (stream_Read (s, &type, 1) != 1)
+                    if (HandleMeta (p_demux, tr))
                         return -1;
-                    length = ReadVarInt (s);
-                    if (length < 0)
-                        return -1;
-
-                    msg_Warn (p_demux,
-                              "unknown SMF Meta Event type 0x%02X (%d bytes)",
-                              type, length);
-                    /* TODO: parse these */
-                    if (stream_Read (s, NULL, length) != length)
-                        return -1;
-
                     /* We MUST NOT pass this event to forward. It would be
                      * confused as a MIDI Reset real-time event. */
                     goto skip;
-                }
                 case 0xF1:
                 case 0xF3:
                     datalen = 1;
