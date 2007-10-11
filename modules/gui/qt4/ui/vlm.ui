@@ -8,111 +8,116 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>632</width>
-    <height>602</height>
+    <width>640</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy>
-    <hsizetype>5</hsizetype>
-    <vsizetype>5</vsizetype>
+   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>Form</string>
+   <string>_("VLM configurator")</string>
   </property>
-  <widget class="QGroupBox" name="groupBox" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>611</width>
-     <height>351</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Media configuration</string>
-   </property>
-  </widget>
-  <widget class="QTableWidget" name="mediasDB" >
-   <property name="windowModality" >
-    <enum>Qt::NonModal</enum>
-   </property>
-   <property name="enabled" >
-    <bool>true</bool>
-   </property>
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>370</y>
-     <width>611</width>
-     <height>221</height>
-    </rect>
-   </property>
-   <property name="sizePolicy" >
-    <sizepolicy>
-     <hsizetype>0</hsizetype>
-     <vsizetype>7</vsizetype>
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="sizeIncrement" >
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="baseSize" >
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="autoFillBackground" >
-    <bool>false</bool>
-   </property>
-   <property name="horizontalScrollBarPolicy" >
-    <enum>Qt::ScrollBarAlwaysOff</enum>
-   </property>
-   <property name="selectionMode" >
-    <enum>QAbstractItemView::MultiSelection</enum>
-   </property>
-   <property name="showGrid" >
-    <bool>true</bool>
-   </property>
-   <property name="sortingEnabled" >
-    <bool>true</bool>
-   </property>
-   <row/>
-   <column>
-    <property name="text" >
-     <string>Type</string>
-    </property>
-   </column>
-   <column>
-    <property name="text" >
-     <string>Media Name</string>
-    </property>
-   </column>
-   <column>
-    <property name="text" >
-     <string>Input</string>
-    </property>
-   </column>
-   <column>
-    <property name="text" >
-     <string>Output</string>
-    </property>
-   </column>
-   <column>
-    <property name="text" >
-     <string>State</string>
-    </property>
-   </column>
-  </widget>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>300</height>
+      </size>
+     </property>
+     <property name="title" >
+      <string>Media configuration</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QTableWidget" name="mediasDB" >
+     <property name="windowModality" >
+      <enum>Qt::NonModal</enum>
+     </property>
+     <property name="enabled" >
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>220</height>
+      </size>
+     </property>
+     <property name="sizeIncrement" >
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="baseSize" >
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="autoFillBackground" >
+      <bool>false</bool>
+     </property>
+     <property name="horizontalScrollBarPolicy" >
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="showGrid" >
+      <bool>true</bool>
+     </property>
+     <property name="sortingEnabled" >
+      <bool>true</bool>
+     </property>
+     <row/>
+     <column>
+      <property name="text" >
+       <string>Type</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Media Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Input</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Output</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>State</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QDialogButtonBox" name="buttonBox" >
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::NoButton</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

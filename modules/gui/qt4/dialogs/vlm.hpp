@@ -42,6 +42,9 @@ class QToolButton;
 class QGroupBox;
 class QPushButton;
 class QHBoxLayout;
+class QDateEdit;
+class QTimeEdit;
+class QSpinBox;
 
 class VLMDialog : public QVLCFrame
 {
@@ -66,10 +69,10 @@ private:
 
     QComboBox *mediatype;
     QVBoxLayout *layout;
-    QHBoxLayout *bcastgbox;
+    QHBoxLayout *bcastgbox, ;
     QStackedWidget *slayout;
     QWidget *pBcast, *pVod, *pSchedule;
-    QGridLayout *bcastlayout, *vodlayout, *schelayout;
+    QGridLayout *bcastlayout, *vodlayout, *schelayout, *schetimelayout;
     QLabel *bcastname, *vodname, *schename,*bcastinput, *vodinput, *scheinput;
     QLabel *bcastoutput, *vodoutput, *scheoutput;
     QCheckBox *bcastenable, *vodenable, *scheenable;
@@ -80,6 +83,10 @@ private:
     QGroupBox *bcastcontrol, *schecontrol;
     QPushButton *bcastplay, *bcastpause, *bcaststop;
     QPushButton *bcastadd, *vodadd, *scheadd, *bcastremove, *vodremove, *scheremove;
+    QTimeEdit *time;
+    QDateEdit *date;
+    QLabel *schetimelabel, *schedatelabel, *schetimerepeat;
+    QSpinBox *scherepeatnumber;
 
 private slots:
     void close();
