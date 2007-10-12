@@ -158,7 +158,7 @@ static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame );
 static block_t* GrabAudio( demux_t *p_demux );
 
 vlc_bool_t IsChromaSupported( demux_t *p_demux, unsigned int i_v4l2 );
-unsigned int GetChromaFromFourcc( char *psz_fourcc );
+unsigned int GetFourccFromString( char *psz_fourcc );
 
 static int OpenVideoDev( demux_t *, char *psz_device );
 static int OpenAudioDev( demux_t *, char *psz_device );
@@ -192,6 +192,7 @@ struct buffer_t
 {
     void *  start;
     size_t  length;
+    void *  orig_userp;
 };
 
 struct demux_sys_t
@@ -297,7 +298,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sample_rate = val.i_int;
 
     psz = var_CreateGetString( p_demux, "v4l2-chroma" );
-    p_sys->i_fourcc = GetChromaFromFourcc( psz );
+    p_sys->i_fourcc = GetFourccFromString( psz );
     free( psz );
 
     var_Create( p_demux, "v4l2-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -489,7 +490,7 @@ static void ParseMRL( demux_t *p_demux )
                 }
 
                 char* chroma = strndup( psz_parser, i_len );
-                p_sys->i_fourcc = GetChromaFromFourcc( chroma );
+                p_sys->i_fourcc = GetFourccFromString( chroma );
                 free( chroma );
 
                 psz_parser += i_len;
@@ -614,10 +615,6 @@ static void Close( vlc_object_t *p_this )
         }
     }
 
-    /* Close */
-    if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
-    if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
-
     /* Free Video Buffers */
     if( p_sys->p_buffers ) {
         switch( p_sys->io )
@@ -639,12 +636,16 @@ static void Close( vlc_object_t *p_this )
         case IO_METHOD_USERPTR:
             for( i = 0; i < p_sys->i_nbuffers; ++i )
             {
-               free( p_sys->p_buffers[i].start );
+               free( p_sys->p_buffers[i].orig_userp );
             }
             break;
         }
         free( p_sys->p_buffers );
     }
+
+    /* Close */
+    if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
+    if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
 
     if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
     if( p_sys->psz_device ) free( p_sys->psz_device );
@@ -1031,6 +1032,10 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     struct v4l2_requestbuffers req;
+    unsigned int i_page_size;
+
+    i_page_size = getpagesize();
+    i_buffer_size = ( i_buffer_size + i_page_size - 1 ) & ~( i_page_size - 1);
 
     memset( &req, 0, sizeof(req) );
     req.count = 4;
@@ -1053,7 +1058,9 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < 4; ++p_sys->i_nbuffers )
     {
         p_sys->p_buffers[p_sys->i_nbuffers].length = i_buffer_size;
-        p_sys->p_buffers[p_sys->i_nbuffers].start = malloc( i_buffer_size );
+        p_sys->p_buffers[p_sys->i_nbuffers].start =
+            vlc_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].orig_userp,
+                /* boundary */ i_page_size, i_buffer_size );
 
         if( !p_sys->p_buffers[p_sys->i_nbuffers].start )
         {
@@ -1070,9 +1077,9 @@ open_failed:
 }
 
 /*****************************************************************************
- * GetChromaFromFourcc: Returns the fourcc code from the given string
+ * GetFourccFromString: Returns the fourcc code from the given string
  *****************************************************************************/
-unsigned int GetChromaFromFourcc( char *psz_fourcc )
+unsigned int GetFourccFromString( char *psz_fourcc )
 {
     if( strlen( psz_fourcc ) >= 4 )
     {
@@ -1487,8 +1494,6 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
     int i_fd;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-/*    msg_Dbg( p_demux, "main device='%s'", p_sys->psz_device ); */
-
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_demux, "cannot open video device (%m)" );
@@ -1602,7 +1607,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
         {
             if( ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
             {
-                msg_Err( p_demux, "cannot get video input characteristics (%m)" );
+                msg_Err( p_demux, "cannot get audio input characteristics (%m)" );
                 goto open_failed;
             }
 
