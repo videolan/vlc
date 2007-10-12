@@ -199,7 +199,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
     ON_TIMEOUT( updateOnTimer() );
-    ON_TIMEOUT( debug() );
+//    ON_TIMEOUT( debug() );
 
 
     /********************
@@ -367,6 +367,8 @@ void MainInterface::handleMainUi( QSettings *settings )
         p_intf->pf_request_window  = ::DoRequest;
         p_intf->pf_release_window  = ::DoRelease;
         p_intf->pf_control_window  = ::DoControl;
+
+        CONNECT( this, askVideoToHide(), videoWidget, hide() );
     }
 
     /* Finish the sizing */
@@ -443,10 +445,29 @@ void MainInterface::showSpeedMenu( QPoint pos )
 /****************************************************************************
  * Video Handling
  ****************************************************************************/
+class SetVideoOnTopQtEvent : public QEvent
+{
+public:
+    SetVideoOnTopQtEvent( bool _onTop ) :
+      QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
+    {
+    }
+
+    bool OnTop() const
+    {
+        return onTop;
+    }
+
+private:
+    bool onTop;
+};
+
+
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
 {
+    msg_Dbg( p_intf, "I was here" );
     void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
     if( ret )
     {
@@ -482,38 +503,19 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 void MainInterface::releaseVideo( void *p_win )
 {
     videoWidget->release( p_win );
-    videoWidget->widgetSize = QSize( 0, 0 );
-    videoWidget->resize( videoWidget->widgetSize );
+    emit askVideoToHide();
 
-    if( embeddedPlaylistWasActive )
-        playlistWidget->show();
-    else if( bgWidget )
+    if( bgWidget )
         bgWidget->show();
 
     videoIsActive = false;
     need_components_update = true;
 }
 
-class SetVideoOnTopQtEvent : public QEvent
-{
-public:
-    SetVideoOnTopQtEvent( bool _onTop ) :
-      QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
-    {
-    }
-
-    bool OnTop() const
-    {
-        return onTop;
-    }
-
-private:
-    bool onTop;
-};
-
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
 {
     int i_ret = VLC_EGENERIC;
+    msg_Dbg( p_intf, "I was there" );
     switch( i_query )
     {
         case VOUT_GET_SIZE:
@@ -530,7 +532,7 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
             unsigned int i_width  = va_arg( args, unsigned int );
             unsigned int i_height = va_arg( args, unsigned int );
             videoWidget->widgetSize = QSize( i_width, i_height );
-            // videoWidget->updateGeometry();
+            videoWidget->updateGeometry();
             need_components_update = true;
             i_ret = VLC_SUCCESS;
             break;

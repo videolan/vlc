@@ -88,6 +88,7 @@ QSize VideoWidget::sizeHint() const
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
+    show();
     if( p_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
@@ -326,25 +327,26 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     /** Slower and faster Buttons **/
     slowerButton = new QPushButton( "S" );
+    slowerButton->setFlat( true );
+
     BUTTON_SET_ACT( slowerButton, "S", qtr( "Slower" ), slower() );
     controlLayout->addWidget( slowerButton, 0, 0 );
     slowerButton->setMaximumSize( QSize( 26, 20 ) );
 
     fasterButton = new QPushButton( "F" );
+    fasterButton->setFlat( true );
+
     BUTTON_SET_ACT( fasterButton, "F", qtr( "Faster" ), faster() );
     controlLayout->addWidget( fasterButton, 0, 17 );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
-    /** TODO: Insert here the AdvControls Widget
-     * Then fix all the size issues in main_interface.cpp
-     **/
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 
     advControls = new AdvControlsWidget( p_intf );
     controlLayout->addWidget( advControls, 1, 3, 2, 5, Qt::AlignBottom );
     if( !b_advancedVisible ) advControls->hide();
-    //THIS should be removed.    need_components_update = true;
+    // FIXME THIS should be removed.    need_components_update = true;
 
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
@@ -400,7 +402,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     playButton->setMinimumSize( QSize( 45, 45 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
-    controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
+    controlLayout->addWidget( playButton, 2, 0, 2, 2 );
 
     controlLayout->setColumnMinimumWidth( 2, 20 );
     controlLayout->setColumnStretch( 2, 0 );

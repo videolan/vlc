@@ -152,6 +152,8 @@ private slots:
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
     void showSpeedMenu( QPoint );
+signals:
+    void askVideoToHide();
 };
 
 #endif
