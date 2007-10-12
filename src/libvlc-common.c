@@ -1132,7 +1132,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     /* Try to run the interface */
     p_intf->b_play = b_play;
     i_err = intf_RunThread( p_intf );
-    if( i_err )
+    if( i_err || p_intf->b_should_run_on_first_thread )
     {
         vlc_object_detach( p_intf );
         intf_Destroy( p_intf );
