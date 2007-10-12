@@ -261,6 +261,11 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
      * by a mutex. This will prevent another thread from stealing the signal */
     if( !p_condvar->semaphore )
     {
+        /*
+        ** PulseEvent() only works if none of the waiting threads is suspended.
+        ** this is particularily problematic under a debug session. 
+        ** as documented in http://support.microsoft.com/kb/q173260/
+        */
         PulseEvent( p_condvar->event );
     }
     else if( p_condvar->i_win9x_cv == 1 )
@@ -570,7 +575,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
     DWORD result;
     if( delay_ms < 0 )
-	delay_ms = 0;
+        delay_ms = 0;
 
     p_condvar->i_waiting_threads++;
     LeaveCriticalSection( &p_mutex->csection );
@@ -587,7 +592,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
     mtime_t delay_ms = (deadline - mdate())/1000;
     if( delay_ms < 0 )
-	delay_ms = 0;
+        delay_ms = 0;
 
     if( !p_condvar->semaphore )
     {
@@ -618,17 +623,19 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
         /* Wait for the gate to be open */
         result = WaitForSingleObject( p_condvar->event, delay_ms );
 
-        /* recaculate remaining delay */
-        delay_ms = (deadline - mdate())/1000;
-        if( delay_ms < 0 )
-            delay_ms = 0;
-
         /* Increase our wait count */
         p_condvar->i_waiting_threads++;
 
         LeaveCriticalSection( &p_mutex->csection );
-	if( !result )
-	    result = WaitForSingleObject( p_condvar->semaphore, delay_ms );
+        if( !result )
+        {
+            /* recaculate remaining delay */
+            delay_ms = (deadline - mdate())/1000;
+            if( delay_ms < 0 )
+                delay_ms = 0;
+
+            result = WaitForSingleObject( p_condvar->semaphore, delay_ms );
+        }
 
         /* Decrement and test must be atomic */
         EnterCriticalSection( &p_condvar->csection );
