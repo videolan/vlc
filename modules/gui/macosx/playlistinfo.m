@@ -480,7 +480,7 @@ static VLCInfoTreeItem *o_root_item = nil;
                     initWithName: [NSString stringWithUTF8String:
                             p_item->p_input->pp_categories[i_object_id]->pp_infos[i]->psz_name]
                         value: [NSString stringWithUTF8String:
-                            p_item->p_input->pp_categories[i_object_id]->pp_infos[i]->psz_value]
+                            p_item->p_input->pp_categories[i_object_id]->pp_infos[i]->psz_value ? : ""]
                         ID: i
                         parent: self]];
                 }
