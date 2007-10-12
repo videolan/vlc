@@ -66,6 +66,7 @@ private:
     vlc_mutex_t lock;
 signals:
     void askResize();
+    void askVideoToShow();
 private slots:
     void SetMinSize();
 };

@@ -57,6 +57,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
     CONNECT( this, askResize(), this, SetMinSize() );
+    CONNECT( this, askVideoToShow(), this, show() );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
@@ -88,7 +89,7 @@ QSize VideoWidget::sizeHint() const
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
-    show();
+    emit askVideoToShow();
     if( p_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
