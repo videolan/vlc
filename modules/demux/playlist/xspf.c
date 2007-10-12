@@ -636,7 +636,9 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     }
     else if( !strcmp( psz_name, "image" ) )
     {
-        input_item_SetArtURL( p_input, psz_value );
+        const char *psz_uri = decode_URI_duplicate( psz_value );
+        input_item_SetArtURL( p_input, psz_uri );
+        free( psz_uri );
     }
     return VLC_TRUE;
 }

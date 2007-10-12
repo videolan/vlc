@@ -84,7 +84,7 @@ int E_(xspf_export_playlist)( vlc_object_t *p_this )
     fprintf( p_export->p_file, "\t</trackList>\n" );
 
     /* export the tree structure in <extension> */
-    fprintf( p_export->p_file, "\t<extension>\n" );
+    fprintf( p_export->p_file, "\t<extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" );
     i_count = 0;
     for( i = 0; i < p_node->i_children; i++ )
     {
@@ -191,12 +191,11 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     /* -> the track number */
     psz = input_item_GetTrackNum( p_item->p_input );
     if( psz == NULL ) psz = strdup( "" );
-    if( psz )
+    if( psz && *psz )
     {
-        if( *psz )
-        {
-            fprintf( p_file, "\t\t\t<trackNum>%i</trackNum>\n", atoi( psz ) );
-        }
+        int i_tracknum = atoi( psz );
+        if( i_tracknum > 0 )
+            fprintf( p_file, "\t\t\t<trackNum>%i</trackNum>\n", i_tracknum );
     }
     free( psz );
 
@@ -213,13 +212,13 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 
     psz = input_item_GetArtURL( p_item->p_input );
     if( psz == NULL ) psz = strdup( "" );
-    psz_temp = convert_xml_special_chars( psz );
-    free( psz );
-    if( !EMPTY_STR( psz_temp ) )
+    if( !EMPTY_STR( psz ) )
     {
-        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz_temp );
+        psz_uri = assertUTF8URI( psz );
+        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz_uri );
+        free( psz_uri );
     }
-    free( psz_temp );
+    free( psz );
 
 xspfexportitem_end:
     /* -> the duration */
