@@ -844,6 +844,11 @@ static const char *ppsz_clock_descriptions[] =
     "multiple playlist item (automatically insert the gather stream output " \
     "if not specified)" )
 
+#define SOUT_MUX_CACHING_TEXT N_("Stream output muxer caching (ms)")
+#define SOUT_MUX_CACHING_LONGTEXT N_( \
+    "This allow you to configure the initial caching amount for stream output " \
+    " muxer. This value should be set in milliseconds." )
+
 #define PACKETIZER_TEXT N_("Preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
     "This allows you to select the order in which VLC will choose its " \
@@ -1686,6 +1691,8 @@ vlc_module_begin();
                                 SOUT_VIDEO_LONGTEXT, VLC_TRUE );
     add_bool( "sout-spu", 1, NULL, SOUT_SPU_TEXT,
                                 SOUT_SPU_LONGTEXT, VLC_TRUE );
+    add_integer( "sout-mux-caching", 1500, NULL, SOUT_MUX_CACHING_TEXT,
+                                SOUT_MUX_CACHING_LONGTEXT, VLC_TRUE );
 
     set_section( N_("VLM"), NULL );
     add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,

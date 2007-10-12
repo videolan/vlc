@@ -103,8 +103,11 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     /* attach it for inherit */
     vlc_object_attach( p_sout, p_parent );
 
-    p_sout->p_stream = sout_StreamNew( p_sout, p_sout->psz_chain );
+    /* */
+    var_Create( p_sout, "sout-mux-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    /* */
+    p_sout->p_stream = sout_StreamNew( p_sout, p_sout->psz_chain );
     if( p_sout->p_stream == NULL )
     {
         msg_Err( p_sout, "stream chain failed for `%s'", p_sout->psz_chain );
@@ -470,7 +473,7 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
     if( !p_mux->b_add_stream_any_time && !p_mux->b_waiting_stream )
     {
         msg_Err( p_mux, "cannot add a new stream (unsupported while muxing "
-                        "to this format)" );
+                        "to this format). You can try increasing sout-mux-caching value" );
         return NULL;
     }
 
@@ -551,22 +554,16 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 
     if( p_mux->b_waiting_stream )
     {
-        if( p_mux->i_add_stream_start < 0 )
-        {
-            p_mux->i_add_stream_start = p_buffer->i_dts;
-        }
+        const int64_t i_caching = var_GetInteger( p_mux->p_sout, "sout-mux-caching" ) * I64C(1000);
 
-        if( p_mux->i_add_stream_start >= 0 &&
-            p_mux->i_add_stream_start + I64C(1500000) < p_buffer->i_dts )
-        {
-            /* Wait until we have more than 1.5 seconds worth of data
-             * before start muxing */
-            p_mux->b_waiting_stream = VLC_FALSE;
-        }
-        else
-        {
+        if( p_mux->i_add_stream_start < 0 )
+            p_mux->i_add_stream_start = p_buffer->i_dts;
+
+        /* Wait until we have enought data before muxing */
+        if( p_mux->i_add_stream_start < 0 ||
+            p_buffer->i_dts < p_mux->i_add_stream_start + i_caching )
             return;
-        }
+        p_mux->b_waiting_stream = VLC_FALSE;
     }
     p_mux->pf_mux( p_mux );
 }
