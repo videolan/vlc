@@ -530,16 +530,16 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
         case DEINTERLACE_BOB:
-            RenderBob( p_vout, pp_outpic[0], p_pic, 0 );
+            RenderBob( p_vout, pp_outpic[0], p_pic, p_pic->b_top_field_first ? 0 : 1 );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
-            RenderBob( p_vout, pp_outpic[1], p_pic, 1 );
+            RenderBob( p_vout, pp_outpic[1], p_pic, p_pic->b_top_field_first ? 1 : 0 );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[1] );
             break;
 
         case DEINTERLACE_LINEAR:
-            RenderLinear( p_vout, pp_outpic[0], p_pic, 0 );
+            RenderLinear( p_vout, pp_outpic[0], p_pic, p_pic->b_top_field_first ? 0 : 1 );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
-            RenderLinear( p_vout, pp_outpic[1], p_pic, 1 );
+            RenderLinear( p_vout, pp_outpic[1], p_pic, p_pic->b_top_field_first ? 1 : 0 );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[1] );
             break;
 
