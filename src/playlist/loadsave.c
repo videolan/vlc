@@ -119,7 +119,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
 
-    if( asprintf( &psz_uri, "%s" DIR_SEP "ml.xsp", psz_datadir ) == -1 )
+    if( asprintf( &psz_uri, "%s" DIR_SEP "ml.xspf", psz_datadir ) == -1 )
     {
         psz_uri = NULL;
         goto error;
@@ -133,7 +133,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     }
     free( psz_uri );
 
-    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xsp",
+    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xspf",
                   psz_datadir ) == -1 )
     {
         psz_uri = NULL;
@@ -181,14 +181,14 @@ int playlist_MLDump( playlist_t *p_playlist )
     }
 
     char psz_dirname[ strlen( psz_datadir )
-                      + sizeof( DIR_SEP "ml.xsl")];
+                      + sizeof( DIR_SEP "ml.xspf")];
     sprintf( psz_dirname, "%s", psz_datadir );
     if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
     {
         return VLC_EGENERIC;
     }
 
-    strcat( psz_dirname, DIR_SEP "ml.xsp" );
+    strcat( psz_dirname, DIR_SEP "ml.xspf" );
 
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
     playlist_Export( p_playlist, psz_dirname, p_playlist->p_ml_category,
