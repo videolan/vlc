@@ -762,7 +762,7 @@ package-win32-base-exe: package-win32-base
 	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis /DVERSION=${VERSION}"; \
 	elif [ -x "${PROGRAMFILES}/NSIS/makensis" ]; then \
 	    MAKENSIS="${PROGRAMFILES}/NSIS/makensis -DVERSION=${VERSION}"; \
-	elif wine --version >dev/null 2>&1; then \
+	elif wine --version >/dev/null 2>&1; then \
 	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe /DVERSION=${VERSION}"; \
 	else \
 	    echo 'Error: cannot locate makensis tool'; exit 1; \
