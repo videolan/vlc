@@ -94,9 +94,16 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     buttons->addWidget( addButton );
 
     randomButton = new QPushButton( this );
-    randomButton->setIcon( model->hasRandom() ?
-                            QIcon( ":/pixmaps/playlist_shuffle_on.png" ) :
-                            QIcon( ":/pixmaps/playlist_shuffle_off.png" ) );
+    if( model->hasRandom() )
+    {
+        randomButton->setIcon( QIcon( ":/pixmaps/playlist_shuffle_on.png" ));
+        randomButton->setToolTip( qtr( I_PL_RANDOM ));
+    }
+    else
+    {
+         randomButton->setIcon( QIcon( ":/pixmaps/playlist_shuffle_off.png" ) );
+         randomButton->setToolTip( qtr( I_PL_NORANDOM ));
+    }
     BUTTONACT( randomButton, toggleRandom() );
     buttons->addWidget( randomButton );
 
@@ -104,12 +111,21 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     buttons->addItem( spacer );
 
     repeatButton = new QPushButton( this );
-    if( model->hasRepeat() ) repeatButton->setIcon(
-                        QIcon( ":/pixmaps/playlist_repeat_one.png" ) );
-    else if( model->hasLoop() ) repeatButton->setIcon(
-                        QIcon( ":/pixmaps/playlist_repeat_all.png" ) );
-    else repeatButton->setIcon(
-                        QIcon( ":/pixmaps/playlist_repeat_off.png" ) );
+    if( model->hasRepeat() ) 
+    {
+        repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_one.png" ) );
+        repeatButton->setToolTip( qtr( I_PL_REPEAT ));
+    }
+    else if( model->hasLoop() )
+    {
+        repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_all.png" ) );
+        repeatButton->setToolTip( qtr( I_PL_LOOP ));
+    }   
+    else
+    {
+        repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_off.png" ) );
+        repeatButton->setToolTip( qtr( I_PL_NOREPEAT ));
+    }   
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
 
@@ -122,6 +138,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     QPushButton *clear = new QPushButton( qfu( "CL") );
     clear->setMaximumWidth( 30 );
+    clear->setToolTip( qtr( "Clear" ));
     BUTTONACT( clear, clearFilter() );
     buttons->addWidget( clear );
 
@@ -137,16 +154,19 @@ void StandardPLPanel::toggleRepeat()
     {
         model->setRepeat( false ); model->setLoop( true );
         repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_all.png" ) );
+        repeatButton->setToolTip( qtr( I_PL_LOOP ));
     }
     else if( model->hasLoop() )
     {
         model->setRepeat( false ) ; model->setLoop( false );
         repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_off.png" ) );
+        repeatButton->setToolTip( qtr( I_PL_NOREPEAT ));
     }
     else
     {
         model->setRepeat( true );
         repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_one.png" ) );
+        repeatButton->setToolTip( qtr( I_PL_REPEAT ));
     }
 }
 
@@ -157,6 +177,7 @@ void StandardPLPanel::toggleRandom()
     randomButton->setIcon( prev ?
                 QIcon( ":/pixmaps/playlist_shuffle_off.png" ) :
                 QIcon( ":/pixmaps/playlist_shuffle_on.png" ) );
+    randomButton->setToolTip( prev ? qtr( I_PL_NORANDOM ) : qtr(I_PL_RANDOM ) );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex &index )

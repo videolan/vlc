@@ -66,7 +66,7 @@
 #define I_PL_NOREPEAT   N_("No repeat")
 
 #define I_PL_RANDOM     N_("Random")
-#define I_PL_NORANDOM   N_("No random")
+#define I_PL_NORANDOM   N_("Random off")
 
 #define I_PL_ADDPL      N_("Add to playlist")
 #define I_PL_ADDML      N_("Add to media library")
