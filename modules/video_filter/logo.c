@@ -322,13 +322,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
-
     config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
                        p_vout->p_cfg );
 
@@ -337,8 +330,15 @@ static int Create( vlc_object_t *p_this )
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
         msg_Err( p_vout, "logo file not specified" );
-        return 0;
+        return VLC_EGENERIC;
     }
+
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = NULL;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = NULL;
+    p_vout->pf_control = Control;
 
     p_sys->pos = var_CreateGetIntegerCommand( p_vout, "logo-position" );
     p_sys->posx = var_CreateGetIntegerCommand( p_vout, "logo-x" );
