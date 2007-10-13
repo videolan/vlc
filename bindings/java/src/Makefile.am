@@ -19,14 +19,14 @@ lib_LTLIBRARIES = libjvlc.la
 
 if HAVE_WIN32
 DATA_noinst_libjvlc = jvlc$(LIBEXT) libjvlc$(LIBEXT).a
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
+LIBRARIES_libvlc = $(top_builddir)/src/.libs/libvlc.dll.a $(abs_top_srcdir)/src/.libs/libvlc-control.dll.a
 LDFLAGS_jvlc = `$(VLC_CONFIG) --libs libvlc`
-libjvlc_DATA = jvlc$(LIBEXT)
+libjvlc_DATA = libjvlc.def libjvlc.dll.a jvlc$(LIBEXT) 
 
 libjvlcdir=$(srcdir)
 
 libjvlc.dll.a libjvlc.def:
-	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D $< $(libjvlc_a_OBJECTS)
+	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D jvlc.dll $< $(libjvlc_a_OBJECTS)
 
 jvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
                       $(libjvlc_a_DEPENDENCIES)
