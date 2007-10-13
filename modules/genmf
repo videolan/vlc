@@ -46,7 +46,7 @@ EXTRA_LTLIBRARIES = ${extra_ltlibs}
 include Modules.am
 
 if HAVE_PLUGINS
-LTLIBVLC = -L\$(top_builddir)/src -lvlc
+LTLIBVLC = \$(top_builddir)/src/libvlc.la
 
 AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
 	-module -no-undefined -shrext \$(LIBEXT) 
