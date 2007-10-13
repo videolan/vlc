@@ -106,12 +106,23 @@ struct libvlc_media_list_t
     vlc_mutex_t                 object_lock;
     libvlc_media_descriptor_t * p_md; /* The media_descriptor from which the
                                        * mlist comes, if any. */
-    DECL_ARRAY(void *)          items;
+    vlc_array_t                items;
  
     /* Other way to see that media list */
     /* Used in flat_media_list.c */
     libvlc_media_list_t *       p_flat_mlist;
 };
+
+typedef int (*libvlc_media_list_view_release_func_t)( libvlc_media_list_view_t * p_mlv ) ;
+
+typedef int (*libvlc_media_list_view_count_func_t)( struct libvlc_media_list_view_t * p_mlv,
+        libvlc_exception_t * ) ;
+
+typedef libvlc_media_descriptor_t *
+        (*libvlc_media_list_view_item_at_index_func_t)(
+                struct libvlc_media_list_view_t * p_mlv,
+                int index,
+                libvlc_exception_t * ) ;
 
 /* A way to see a media list */
 struct libvlc_media_list_view_t
@@ -126,28 +137,14 @@ struct libvlc_media_list_view_t
     void *                      this_view_data;
 
     /* Accessors */
-    int (*pf_count)( struct libvlc_media_list_view_t * p_mlv,
-                      libvlc_exception_t * );
-    libvlc_media_descriptor_t *
-        (*pf_item_at_index)( struct libvlc_media_list_view_t * p_mlv,
-                              int index,
-                              libvlc_exception_t * );
-    int  (*pf_index_of_item)( struct libvlc_media_list_view_t * p_mlv,
-                              libvlc_media_descriptor_t * p_md,
-                              libvlc_exception_t * );
+    libvlc_media_list_view_count_func_t         pf_count;
+    libvlc_media_list_view_item_at_index_func_t pf_item_at_index;
 
-    /* Setters */
-    void (*pf_insert_at_index)( struct libvlc_media_list_view_t * p_mlv,
-                                     libvlc_media_descriptor_t * p_md,
-                                     int index,
-                                     libvlc_exception_t * );
-    void (*pf_remove_at_index)( struct libvlc_media_list_view_t * p_mlv,
-                                     int index,
-                                     libvlc_exception_t * );
-    void (*pf_add_item)( struct libvlc_media_list_view_t * p_mlv,
-                         libvlc_media_descriptor_t * p_md,
-                         libvlc_exception_t * );
-        
+    libvlc_media_list_view_release_func_t       pf_release;
+
+    /* Notification callback */
+    void (*pf_ml_item_added)(const libvlc_event_t *, void *);
+    void (*pf_ml_item_removed)(const libvlc_event_t *, void *);
 };
 
 struct libvlc_dynamic_media_list_t
@@ -288,6 +285,20 @@ VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
 
 /* Media List */
 VLC_EXPORT ( void, libvlc_media_list_flat_media_list_release, ( libvlc_media_list_t * ) );
+
+/* Media List View */
+VLC_EXPORT ( libvlc_media_list_view_t *, libvlc_media_list_view_new,
+                          ( libvlc_media_list_t * p_mlist,
+                            libvlc_media_list_view_count_func_t pf_count,
+                            libvlc_media_list_view_item_at_index_func_t pf_item_at_index,
+                            libvlc_media_list_view_release_func_t pf_release,
+                            void * this_view_data,
+                            libvlc_exception_t * p_e ) );
+
+VLC_EXPORT ( void, libvlc_media_list_view_set_ml_notification_callback, (
+                libvlc_media_list_view_t * p_mlv,
+                void (*item_added)(const libvlc_event_t *, void *),
+                void (*item_removed)(const libvlc_event_t *, void *) ));
 
 /* Events */
 VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );

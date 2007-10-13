@@ -509,6 +509,9 @@ VLC_PUBLIC_API libvlc_event_manager_t *
  * LibVLC Media List View
  * @{ */
 
+VLC_PUBLIC_API void
+    libvlc_media_list_view_retain( libvlc_media_list_view_t * p_mlv );
+
 VLC_PUBLIC_API int
     libvlc_media_list_view_count(  libvlc_media_list_view_t * p_mlv,
                                    libvlc_exception_t * p_e );

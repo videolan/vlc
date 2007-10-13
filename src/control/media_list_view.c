@@ -38,10 +38,143 @@
 /*
  * Private functions
  */
+static void
+media_list_item_removed( const libvlc_event_t * p_event, void * p_user_data );
+
+static void
+media_list_item_added( const libvlc_event_t * p_event, void * p_user_data )
+{
+    libvlc_media_list_view_t * p_mlv = p_user_data;
+    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
+    libvlc_media_list_t * p_mlist;
+    if((p_mlist = libvlc_media_descriptor_subitems( p_md, NULL )))
+    {
+        libvlc_event_attach( p_mlist->p_event_manager,
+                             libvlc_MediaListItemAdded,
+                             media_list_item_added, p_mlv, NULL );
+        libvlc_event_attach( p_mlist->p_event_manager,
+                             libvlc_MediaListItemDeleted,
+                             media_list_item_removed, p_mlv, NULL );
+    }
+    if( p_mlv->pf_ml_item_added ) p_mlv->pf_ml_item_added( p_event, p_user_data );
+}
+
+static void
+media_list_item_removed( const libvlc_event_t * p_event, void * p_user_data )
+{
+    libvlc_media_list_view_t * p_mlv = p_user_data;
+    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
+    libvlc_media_list_t * p_mlist;
+    if((p_mlist = libvlc_media_descriptor_subitems( p_md, NULL )))
+    {
+        libvlc_event_attach( p_mlist->p_event_manager,
+                             libvlc_MediaListItemAdded,
+                             media_list_item_added, p_mlv, NULL );
+        libvlc_event_attach( p_mlist->p_event_manager,
+                             libvlc_MediaListItemDeleted,
+                             media_list_item_removed, p_mlv, NULL );
+    }
+    if( p_mlv->pf_ml_item_removed ) p_mlv->pf_ml_item_removed( p_event, p_user_data );
+}
+
+
+/*
+ * LibVLC Internal functions
+ */
+void
+libvlc_media_list_view_set_ml_notification_callback(
+                libvlc_media_list_view_t * p_mlv,
+                void (*item_added)(const libvlc_event_t *, void *),
+                void (*item_removed)(const libvlc_event_t *, void *) )
+{
+    p_mlv->pf_ml_item_added = item_added;
+    p_mlv->pf_ml_item_removed = item_removed;
+    libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListItemAdded,
+                         media_list_item_added, p_mlv, NULL );
+    libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListItemDeleted,
+                         media_list_item_removed, p_mlv, NULL );
+}
+
+/**************************************************************************
+ *       libvlc_media_list_view_new (Internal)
+ **************************************************************************/
+libvlc_media_list_view_t *
+libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
+                            libvlc_media_list_view_count_func_t pf_count,
+                            libvlc_media_list_view_item_at_index_func_t pf_item_at_index,
+                            libvlc_media_list_view_release_func_t pf_release,
+                            void * this_view_data,
+                            libvlc_exception_t * p_e )
+{
+    libvlc_media_list_view_t * p_mlv;
+    p_mlv = calloc( 1, sizeof(libvlc_media_list_view_t) );
+    if( !p_mlv )
+        return NULL;
+
+    p_mlv->p_libvlc_instance = p_mlist->p_libvlc_instance;
+    p_mlv->p_event_manager = libvlc_event_manager_new( p_mlist,
+                                    p_mlv->p_libvlc_instance, p_e );
+
+    libvlc_media_list_retain( p_mlist );
+    p_mlv->p_mlist = p_mlist;
+
+    p_mlv->pf_count         = pf_count;
+    p_mlv->pf_item_at_index = pf_item_at_index;
+    p_mlv->pf_release       = pf_release;
+
+    p_mlv->this_view_data = this_view_data;
+
+    vlc_mutex_init( p_mlv->p_libvlc_instance->p_libvlc_int, &p_mlv->object_lock );
+    p_mlv->i_refcount = 1;
+
+    return p_mlv;
+}
+
 
 /*
  * Public libvlc functions
  */
+
+/**************************************************************************
+ *       libvlc_media_list_view_release (Public)
+ **************************************************************************/
+void
+libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
+{
+    vlc_mutex_lock( &p_mlv->object_lock );
+    p_mlv->i_refcount--;
+    if( p_mlv->i_refcount > 0 )
+    {
+        vlc_mutex_unlock( &p_mlv->object_lock );
+        return;
+    }
+    vlc_mutex_unlock( &p_mlv->object_lock );
+
+    /* Refcount null, time to free */
+
+    if( p_mlv->pf_ml_item_added )
+    {
+        libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
+                            libvlc_MediaListItemAdded,
+                            p_mlv->pf_ml_item_added, p_mlv, NULL );
+        /* XXX: descend the whole tree and remove observer */
+    }
+    if( p_mlv->pf_ml_item_removed )
+    {
+        libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
+                            libvlc_MediaListItemDeleted,
+                            p_mlv->pf_ml_item_removed, p_mlv, NULL );
+        /* XXX: descend the whole tree and remove observer */
+    }
+
+    libvlc_event_manager_release( p_mlv->p_event_manager );
+
+    if( p_mlv->pf_release ) p_mlv->pf_release( p_mlv );
+    libvlc_media_list_release( p_mlv->p_mlist );
+    vlc_mutex_destroy( &p_mlv->object_lock );
+}
 
 /* Limited to four args, because it should be enough */
 
@@ -81,9 +214,4 @@
 
 MEDIA_LIST_VIEW_FUNCTION( count, int, 0 )
 MEDIA_LIST_VIEW_FUNCTION( item_at_index, libvlc_media_descriptor_t *, NULL, int arg1 )
-MEDIA_LIST_VIEW_FUNCTION( index_of_item, int, -1, libvlc_media_descriptor_t * arg1 )
-
-MEDIA_LIST_VIEW_FUNCTION_VOID_RET( insert_at_index, libvlc_media_descriptor_t * arg1, int arg2 )
-MEDIA_LIST_VIEW_FUNCTION_VOID_RET( remove_at_index, int arg1 )
-MEDIA_LIST_VIEW_FUNCTION_VOID_RET( add_item, libvlc_media_descriptor_t * arg1 )
 
