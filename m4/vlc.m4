@@ -50,6 +50,13 @@ AC_DEFUN([VLC_ADD_LDFLAGS], [
   done
 ])
 
+AC_DEFUN([VLC_ADD_LIBS], [
+  for element in [$1]; do
+    eval "LIBS_${element}="'"'"$2 "'$'"{LIBS_${element}} "'"'
+    am_modules_with_libs="${am_modules_with_libs} ${element}"
+  done
+])
+
 dnl ===========================================================================
 dnl  Macros to save and restore default flags
 
@@ -59,6 +66,7 @@ AC_DEFUN([VLC_SAVE_FLAGS], [
   CXXFLAGS_save="${CXXFLAGS}"
   OBJCFLAGS_save="${OBJCFLAGS}"
   LDFLAGS_save="${LDFLAGS}"
+  LIBS_save="${LIBS}"
 ])
 
 AC_DEFUN([VLC_RESTORE_FLAGS], [
@@ -67,6 +75,7 @@ AC_DEFUN([VLC_RESTORE_FLAGS], [
   CXXFLAGS="${CXXFLAGS_save}"
   OBJCFLAGS="${OBJCFLAGS_save}"
   LDFLAGS="${LDFLAGS_save}"
+  LIBS="${LIBS_save}"
 ])
 
 dnl ===========================================================================
@@ -76,7 +85,7 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
 
   AC_MSG_RESULT(configure: creating ./vlc-config.in)
 
-  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags}; do echo $x; done | sort | uniq`"
+  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags} ${am_modules_with_libs}; do echo $x; done | sort | uniq`"
 
   rm -f vlc-config.in
   sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
@@ -118,6 +127,9 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
     fi
     if test "`eval echo @'$'LDFLAGS_${x}@`" != "@@"; then
       echo "      ldflags=\"\${ldflags} `eval echo '$'LDFLAGS_${x}`\"" >> vlc-config.in
+    fi
+    if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
+      echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\"" >> vlc-config.in
     fi
     echo "    ;;" >> vlc-config.in
   ] done
