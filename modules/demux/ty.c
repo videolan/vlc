@@ -192,6 +192,12 @@ static int probe_stream(demux_t *p_demux);
 static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk);
 static void parse_master(demux_t *p_demux);
 
+static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
+static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
+static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
+static int DemuxRecXds( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
+
+
 /*
  * Open: check file and initialize demux structures
  *
@@ -279,6 +285,188 @@ static int Open(vlc_object_t *p_this)
 #endif
 
     return VLC_SUCCESS;
+}
+
+/* =========================================================================== */
+/* Demux: Read & Demux one record from the chunk
+ *
+ * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
+ *
+ * NOTE: I think we can return the number of packets sent instead of just 1.
+ * that means we can demux an entire chunk and shoot it back (may be more efficient)
+ * -- should try that some day :) --
+ */
+static int Demux( demux_t *p_demux )
+{
+    demux_sys_t  *p_sys = p_demux->p_sys;
+    ty_rec_hdr_t *p_rec;
+    block_t      *p_block_in = NULL;
+
+    /*msg_Dbg(p_demux, "ty demux processing" );*/
+   
+    /* did we hit EOF earlier? */
+    if( p_sys->eof )
+        return 0;
+
+    /*
+     * what we do (1 record now.. maybe more later):
+    * - use stream_Read() to read the chunk header & record headers
+    * - discard entire chunk if it is a PART header chunk
+    * - parse all the headers into record header array
+    * - keep a pointer of which record we're on
+    * - use stream_Block() to fetch each record
+    * - parse out PTS from PES headers
+    * - set PTS for data packets
+    * - pass the data on to the proper codec via es_out_Send()
+
+    * if this is the first time or  
+    * if we're at the end of this chunk, start a new one
+    */
+    /* parse the next chunk's record headers */
+    if( p_sys->b_first_chunk || p_sys->i_cur_rec >= p_sys->i_num_recs )
+    {
+        if( get_chunk_header(p_demux) == 0 )
+            return 0;
+    }
+
+    /*======================================================================
+     * parse & send one record of the chunk
+     *====================================================================== */
+    p_rec = &p_sys->rec_hdrs[p_sys->i_cur_rec];
+
+    if( !p_rec->b_ext )
+    {
+        const long l_rec_size = p_rec->l_rec_size;
+        /*msg_Dbg(p_demux, "Record Type 0x%x/%02x %ld bytes",
+                    subrec_type, p_rec->rec_type, l_rec_size );*/
+  
+        /* some normal records are 0 length, so check for that... */
+        if( l_rec_size <= 0 )
+        {
+            /* no data in payload; we're done */
+            p_sys->i_cur_rec++;
+            return 1;
+        }
+
+        /* read in this record's payload */
+        if( !( p_block_in = stream_Block( p_demux->s, l_rec_size ) ) )
+            return 0;
+
+        /* set these as 'unknown' for now */
+        p_block_in->i_pts =
+        p_block_in->i_dts = 0;
+    }
+    /*else
+    {
+        -- don't read any data from the stream, data was in the record header --
+        msg_Dbg(p_demux,
+               "Record Type 0x%02x/%02x, ext data = %02x, %02x", subrec_type,
+                p_rec->rec_type, p_rec->ex1, p_rec->ex2);
+    }*/
+
+    if( p_rec->rec_type == 0xe0 )
+    {
+        /* Video */
+        DemuxRecVideo( p_demux, p_rec, p_block_in );
+    }
+    else if ( p_rec->rec_type == 0xc0 )
+    {
+        /* Audio */
+        DemuxRecAudio( p_demux, p_rec, p_block_in );
+    }
+    else if ( p_rec->rec_type == 0x01 )
+    {
+        /* Closed Captions */
+        DemuxRecCc( p_demux, p_rec, p_block_in );
+    }
+    else if ( p_rec->rec_type == 0x02 )
+    {
+        /* XDS */
+        DemuxRecXds( p_demux, p_rec, p_block_in );
+    }
+    else if ( p_rec->rec_type == 0x03 )
+    {
+        /* Tivo data services (e.g. "thumbs-up to record!")  useless for us */
+        if( p_block_in )
+            block_Release(p_block_in);
+    }
+    else if ( p_rec->rec_type == 0x05 )
+    {
+        /* Unknown, but seen regularly */
+        if( p_block_in )
+            block_Release(p_block_in);
+    }
+    else
+    {
+        msg_Dbg(p_demux, "Invalid record type 0x%02x", p_rec->rec_type );
+        if( p_block_in )
+            block_Release(p_block_in);
+    }
+
+    /* */
+    p_sys->i_cur_rec++;
+    return 1;
+}
+
+/* Control */
+static int Control(demux_t *p_demux, int i_query, va_list args)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    double f, *pf;
+    int64_t i64, *p_i64;
+
+    /*msg_Info(p_demux, "control cmd %d", i_query);*/
+    switch( i_query )
+    {
+    case DEMUX_GET_POSITION:
+        /* arg is 0.0 - 1.0 percent of overall file position */
+        if( ( i64 = p_sys->i_stream_size ) > 0 )
+        {
+            pf = (double*) va_arg( args, double* );
+            *pf = (double)stream_Tell( p_demux->s ) / (double) i64;
+            return VLC_SUCCESS;
+        }
+        return VLC_EGENERIC;
+
+    case DEMUX_SET_POSITION:
+        /* arg is 0.0 - 1.0 percent of overall file position */
+        f = (double) va_arg( args, double );
+        /* msg_Dbg(p_demux, "Control - set position to %2.3f", f); */
+        if ((i64 = p_sys->i_stream_size) > 0)
+            return ty_stream_seek_pct(p_demux, f);
+        return VLC_EGENERIC;
+    case DEMUX_GET_TIME:
+        /* return TiVo timestamp */
+        p_i64 = (int64_t *) va_arg(args, int64_t *);
+        //*p_i64 = p_sys->lastAudioPTS - p_sys->firstAudioPTS;
+        //*p_i64 = (p_sys->l_last_ty_pts / 1000) + (p_sys->lastAudioPTS -
+        //    p_sys->l_last_ty_pts_sync);
+        *p_i64 = (p_sys->l_last_ty_pts / 1000);
+        return VLC_SUCCESS;
+    case DEMUX_GET_LENGTH:    /* length of program in microseconds, 0 if unk */
+        /* size / bitrate */
+        p_i64 = (int64_t *) va_arg(args, int64_t *);
+        *p_i64 = 0;
+        return VLC_SUCCESS;
+    case DEMUX_SET_TIME:      /* arg is time in microsecs */
+        i64 = (int64_t) va_arg( args, int64_t );
+        return ty_stream_seek_time(p_demux, i64 * 1000);
+    case DEMUX_GET_FPS:
+    default:
+        return VLC_EGENERIC;
+    }
+}
+
+/* Close */
+static void Close( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    free( p_sys->rec_hdrs );
+    if( p_sys->seq_table )
+        free( p_sys->seq_table );
+    free(p_sys);
 }
 
 
@@ -383,207 +571,123 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block,
     return 0;
 }
 
-
-/* =========================================================================== */
-/* Demux: Read & Demux one record from the chunk
- *
- * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
- *
- * NOTE: I think we can return the number of packets sent instead of just 1.
- * that means we can demux an entire chunk and shoot it back (may be more efficient)
- * -- should try that some day :) --
- */
-static int Demux( demux_t *p_demux )
+static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
 {
-    demux_sys_t      *p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    const int subrec_type = rec_hdr->subrec_type;
+    const long l_rec_size = rec_hdr->l_rec_size;    // p_block_in->i_buffer might be better
+    int esOffset1;
 
-    int              invalidType = 0;
-    int              recordsDecoded = 0;
+    assert( rec_hdr->rec_type == 0xe0 );
+    if( !p_block_in )
+        return -1;
 
-    int              rec_type;
-    long             l_rec_size;
-    int              i_cur_rec;
-    int              subrec_type;
-    ty_rec_hdr_t     *rec_hdr;
-
-    block_t          *p_block_in = NULL;
-    int              esOffset1;
-
-    uint8_t          lastCC[ 16 ];
-    uint8_t          lastXDS[ 16 ];
-
-    /*msg_Dbg(p_demux, "ty demux processing" );*/
-   
-    /* did we hit EOF earlier? */
-    if (p_sys->eof) return 0;
-
-    /*
-     * what we do (1 record now.. maybe more later):
-    * - use stream_Read() to read the chunk header & record headers
-    * - discard entire chunk if it is a PART header chunk
-    * - parse all the headers into record header array
-    * - keep a pointer of which record we're on
-    * - use stream_Block() to fetch each record
-    * - parse out PTS from PES headers
-    * - set PTS for data packets
-    * - pass the data on to the proper codec via es_out_Send()
-
-    * if this is the first time or  
-    * if we're at the end of this chunk, start a new one
-    */
-    /* parse the next chunk's record headers */
-    if (p_sys->b_first_chunk || p_sys->i_cur_rec >= p_sys->i_num_recs)
-        if (get_chunk_header(p_demux) == 0)
-            return 0;
-
-    /*======================================================================
-     * parse & send one record of the chunk
-     *====================================================================== */
-    i_cur_rec = p_sys->i_cur_rec;
-    recordsDecoded++;
-    rec_hdr = &p_sys->rec_hdrs[ i_cur_rec ];
-    subrec_type = rec_hdr->subrec_type;
-    rec_type = rec_hdr->rec_type;
-    l_rec_size = rec_hdr->l_rec_size;
-
-    if (!rec_hdr->b_ext)
+#if 0
+    msg_Dbg(p_demux, "packet buffer has "
+            "%02x %02x %02x %02x %02x %02x %02x %02x "
+            "%02x %02x %02x %02x %02x %02x %02x %02x",
+            p_block_in->p_buffer[0], p_block_in->p_buffer[1],
+            p_block_in->p_buffer[2], p_block_in->p_buffer[3],
+            p_block_in->p_buffer[4], p_block_in->p_buffer[5],
+            p_block_in->p_buffer[6], p_block_in->p_buffer[7],
+            p_block_in->p_buffer[8], p_block_in->p_buffer[9],
+            p_block_in->p_buffer[10], p_block_in->p_buffer[11],
+            p_block_in->p_buffer[12], p_block_in->p_buffer[13],
+            p_block_in->p_buffer[14], p_block_in->p_buffer[15]);
+#endif
+    //if( subrec_type == 0x06 || subrec_type == 0x07 )
+    if( subrec_type != 0x02 && subrec_type != 0x0c &&
+        subrec_type != 0x08 && l_rec_size > 4 )
     {
-        /*msg_Dbg(p_demux, "Record Type 0x%x/%02x %ld bytes",
-                    subrec_type, rec_type, l_rec_size );*/
-  
-        /* some normal records are 0 length, so check for that... */
-        if (l_rec_size > 0)
+        /* get the PTS from this packet if it has one.
+         * on S1, only 0x06 has PES.  On S2, however, most all do.
+         * Do NOT Pass the PES Header to the MPEG2 codec */
+        esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer, 5 );
+        if( esOffset1 != -1 )
         {
-            /* read in this record's payload */
-            if( !( p_block_in = stream_Block( p_demux->s, l_rec_size ) ) )
-            {
-                /* EOF */
-                p_sys->eof = 1;
-                return 0;
+            //msg_Dbg(p_demux, "Video PES hdr in pkt type 0x%02x at offset %d",
+                //subrec_type, esOffset1);
+            p_sys->lastVideoPTS = get_pts(
+                    &p_block_in->p_buffer[ esOffset1 + VIDEO_PTS_OFFSET ] );
+            /*msg_Dbg(p_demux, "Video rec %d PTS "I64Fd, p_sys->i_cur_rec,
+                        p_sys->lastVideoPTS );*/
+            if (subrec_type != 0x06) {
+                /* if we found a PES, and it's not type 6, then we're S2 */
+                /* The packet will have video data (& other headers) so we
+                 * chop out the PES header and send the rest */
+                if (l_rec_size >= VIDEO_PES_LENGTH) {
+                    p_block_in->p_buffer += VIDEO_PES_LENGTH + esOffset1;
+                    p_block_in->i_buffer -= VIDEO_PES_LENGTH + esOffset1;
+                } else {
+                    msg_Dbg(p_demux, "video rec type 0x%02x has short PES"
+                        " (%ld bytes)", subrec_type, l_rec_size);
+                    /* nuke this block; it's too short, but has PES marker */
+                    p_block_in->i_buffer = 0;
+                }
             }
-            /* set these as 'unknown' for now */
-            p_block_in->i_pts = p_block_in->i_dts = 0;
+        }/* else
+            msg_Dbg(p_demux, "No Video PES hdr in pkt type 0x%02x",
+                subrec_type); */
+    }
+
+    if(subrec_type == 0x06 )
+    {
+        /* type 6 (S1 DTivo) has no data, so we're done */
+        block_Release(p_block_in);
+        return 0;
+    }
+
+    /* if it's not a continue blk, then set PTS */
+    if( subrec_type != 0x02 )
+    {
+        /*msg_Dbg(p_demux, "Video rec %d type 0x%02X", p_sys->i_cur_rec,
+                   subrec_type);*/
+        /* if it's a GOP header, make sure it's legal
+         * (if we have enough data) */
+        /* Some ty files don't have this bit set
+         * and it causes problems */
+        if (subrec_type == 0x0c && l_rec_size >= 6)
+            p_block_in->p_buffer[5] |= 0x08;
+        /* store the TY PTS if there is one */
+        if (subrec_type == 0x07) {
+            p_sys->l_last_ty_pts = rec_hdr->l_ty_pts;
+            /* should we use audio or video PTS? */
+            //p_sys->l_last_ty_pts_sync = p_sys->lastAudioPTS;
+        } else {
+            /* yes I know this is a cheap hack.  It's the timestamp
+               used for display and skipping fwd/back, so it
+               doesn't have to be accurate to the millisecond.
+               I adjust it here by roughly one 1/30 sec.  Yes it
+               will be slightly off for UK streams, but it's OK.
+             */
+            p_sys->l_last_ty_pts += 35000000;
+            //p_sys->l_last_ty_pts += 33366667;
         }
-        else
+        /* set PTS for this block before we send */
+        if (p_sys->lastVideoPTS > 0)
         {
-            /* no data in payload; we're done */
-            p_sys->i_cur_rec++;
-            return 1;
+            p_block_in->i_pts = p_sys->lastVideoPTS;
+            /* PTS gets used ONCE. 
+             * Any subsequent frames we get BEFORE next PES
+             * header will have their PTS computed in the codec */
+            p_sys->lastVideoPTS = 0;
         }
     }
-    /*else
-    {
-        -- don't read any data from the stream, data was in the record header --
-        msg_Dbg(p_demux,
-               "Record Type 0x%02x/%02x, ext data = %02x, %02x", subrec_type,
-                rec_type, rec_hdr->ex1, rec_hdr->ex2);
-    }*/
+    //msg_Dbg(p_demux, "sending rec %d as video type 0x%02x",
+            //p_sys->i_cur_rec, subrec_type);
+    es_out_Send(p_demux->out, p_sys->p_video, p_block_in);
+    return 0;
+}
+static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    const int subrec_type = rec_hdr->subrec_type;
+    const long l_rec_size = rec_hdr->l_rec_size;
+    int esOffset1;
 
-    /*================================================================*
-     * Video Parsing
-     *================================================================*/
-    if ( rec_type == 0xe0 )
-    {
-#if 0
-        msg_Dbg(p_demux, "packet buffer has "
-                "%02x %02x %02x %02x %02x %02x %02x %02x "
-                "%02x %02x %02x %02x %02x %02x %02x %02x",
-                p_block_in->p_buffer[0], p_block_in->p_buffer[1],
-                p_block_in->p_buffer[2], p_block_in->p_buffer[3],
-                p_block_in->p_buffer[4], p_block_in->p_buffer[5],
-                p_block_in->p_buffer[6], p_block_in->p_buffer[7],
-                p_block_in->p_buffer[8], p_block_in->p_buffer[9],
-                p_block_in->p_buffer[10], p_block_in->p_buffer[11],
-                p_block_in->p_buffer[12], p_block_in->p_buffer[13],
-                p_block_in->p_buffer[14], p_block_in->p_buffer[15]);
-#endif
-        //if( subrec_type == 0x06 || subrec_type == 0x07 )
-        if( subrec_type != 0x02 && subrec_type != 0x0c
-            && subrec_type != 0x08 && l_rec_size > 4 )
-        {
-            /* get the PTS from this packet if it has one.
-             * on S1, only 0x06 has PES.  On S2, however, most all do.
-             * Do NOT Pass the PES Header to the MPEG2 codec */
-            esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer,
-                    5 );
-            if ( esOffset1 != -1 )
-            {
-                //msg_Dbg(p_demux, "Video PES hdr in pkt type 0x%02x at offset %d",
-                    //subrec_type, esOffset1);
-                p_sys->lastVideoPTS = get_pts(
-                        &p_block_in->p_buffer[ esOffset1 + VIDEO_PTS_OFFSET ] );
-                /*msg_Dbg(p_demux, "Video rec %d PTS "I64Fd, p_sys->i_cur_rec,
-                            p_sys->lastVideoPTS );*/
-                if (subrec_type != 0x06) {
-                    /* if we found a PES, and it's not type 6, then we're S2 */
-                    /* The packet will have video data (& other headers) so we
-                     * chop out the PES header and send the rest */
-                    if (l_rec_size >= VIDEO_PES_LENGTH) {
-                        p_block_in->p_buffer += VIDEO_PES_LENGTH + esOffset1;
-                        p_block_in->i_buffer -= VIDEO_PES_LENGTH + esOffset1;
-                    } else {
-                        msg_Dbg(p_demux, "video rec type 0x%02x has short PES"
-                            " (%ld bytes)", subrec_type, l_rec_size);
-                        /* nuke this block; it's too short, but has PES marker */
-                        p_block_in->i_buffer = 0;
-                    }
-                }
-            }/* else
-                msg_Dbg(p_demux, "No Video PES hdr in pkt type 0x%02x",
-                    subrec_type); */
-        }
-        if (subrec_type == 0x06) {
-            /* type 6 (S1 DTivo) has no data, so we're done */
-            block_Release(p_block_in);
-        } else {
-            /* if it's not a continue blk, then set PTS */
-            if (subrec_type != 0x02)
-            {
-                /*msg_Dbg(p_demux, "Video rec %d type 0x%02X", p_sys->i_cur_rec,
-                           subrec_type);*/
-                /* if it's a GOP header, make sure it's legal
-                 * (if we have enough data) */
-                /* Some ty files don't have this bit set
-                 * and it causes problems */
-                if (subrec_type == 0x0c && l_rec_size >= 6)
-                    p_block_in->p_buffer[5] |= 0x08;
-                /* store the TY PTS if there is one */
-                if (subrec_type == 0x07) {
-                    p_sys->l_last_ty_pts = rec_hdr->l_ty_pts;
-                    /* should we use audio or video PTS? */
-                    //p_sys->l_last_ty_pts_sync = p_sys->lastAudioPTS;
-                } else {
-                    /* yes I know this is a cheap hack.  It's the timestamp
-                       used for display and skipping fwd/back, so it
-                       doesn't have to be accurate to the millisecond.
-                       I adjust it here by roughly one 1/30 sec.  Yes it
-                       will be slightly off for UK streams, but it's OK.
-                     */
-                    p_sys->l_last_ty_pts += 35000000;
-                    //p_sys->l_last_ty_pts += 33366667;
-                }
-                /* set PTS for this block before we send */
-                if (p_sys->lastVideoPTS > 0)
-                {
-                    p_block_in->i_pts = p_sys->lastVideoPTS;
-                    /* PTS gets used ONCE. 
-                     * Any subsequent frames we get BEFORE next PES
-                     * header will have their PTS computed in the codec */
-                    p_sys->lastVideoPTS = 0;
-                }
-            }
-            //msg_Dbg(p_demux, "sending rec %d as video type 0x%02x",
-                    //p_sys->i_cur_rec, subrec_type);
-            es_out_Send(p_demux->out, p_sys->p_video, p_block_in);
-        }
-    } /* end if video rec type */
-    /* ================================================================
-     * Audio Parsing
-     * ================================================================
-     * parse PES headers and send the rest to the codec
-     */
-    else if ( rec_type == 0xc0 )
-    {
+    assert( rec_hdr->rec_type == 0xc0 );
+    if( !p_block_in )
+        return -1;
 #if 0
         int i;
         printf( "Audio Packet Header " );
@@ -592,261 +696,241 @@ static int Demux( demux_t *p_demux )
         printf( "\n" );
 #endif
 
+    if( subrec_type == 2 )
+    {
         /* SA or DTiVo Audio Data, no PES (continued block)
          * ================================================
          */
-        if ( subrec_type == 2 )
+
+        /* continue PES if previous was incomplete */
+        if (p_sys->i_pes_buf_cnt > 0)
         {
-            /* continue PES if previous was incomplete */
-            if (p_sys->i_pes_buf_cnt > 0)
+            const int i_need = p_sys->i_Pes_Length - p_sys->i_pes_buf_cnt;
+
+            msg_Dbg(p_demux, "continuing PES header");
+            /* do we have enough data to complete? */
+            if (i_need >= l_rec_size)
             {
-                int i_need = p_sys->i_Pes_Length - p_sys->i_pes_buf_cnt;
-
-                msg_Dbg(p_demux, "continuing PES header");
-                /* do we have enough data to complete? */
-                if (i_need < l_rec_size)
-                {
-                    /* we have enough; reconstruct this p_frame with the new hdr */
-                    memcpy(&p_sys->pes_buffer[p_sys->i_pes_buf_cnt],
-                           p_block_in->p_buffer, i_need);
-                    /* advance the block past the PES header (don't want to send it) */
-                    p_block_in->p_buffer += i_need;
-                    p_block_in->i_buffer -= i_need;
-                    /* get the PTS out of this PES header (MPEG or AC3) */
-                    if (p_sys->audio_type == TIVO_AUDIO_MPEG)
-                        esOffset1 = find_es_header(ty_MPEGAudioPacket,
-                                p_sys->pes_buffer, 5);
-                    else
-                        esOffset1 = find_es_header(ty_AC3AudioPacket,
-                                p_sys->pes_buffer, 5);
-                    if (esOffset1 < 0)
-                    {
-                        /* god help us; something's really wrong */
-                        msg_Err(p_demux, "can't find audio PES header in packet");
-                    }
-                    else
-                    {
-                        p_sys->lastAudioPTS = get_pts( 
-                            &p_sys->pes_buffer[ esOffset1 + p_sys->i_Pts_Offset ] );
-                        p_block_in->i_pts = p_sys->lastAudioPTS;
-                    }
-                    p_sys->i_pes_buf_cnt = 0;
-                }
-                else
-                {
-                    /* don't have complete PES hdr; save what we have and return */
-                    memcpy(&p_sys->pes_buffer[p_sys->i_pes_buf_cnt],
-                            p_block_in->p_buffer, l_rec_size);
-                    p_sys->i_pes_buf_cnt += l_rec_size;
-                    p_sys->i_cur_rec++;
-                    block_Release(p_block_in);
-                    return 1;
-                }
-            }
-            /* S2 DTivo has AC3 packets with 2 padding bytes at end.  This is
-             * not allowed in the AC3 spec and will cause problems.  So here
-             * we try to trim things. */
-            /* Also, S1 DTivo has alternating short / long AC3 packets.  That
-             * is, one packet is short (incomplete) and the next packet has
-             * the first one's missing data, plus all of its own.  Strange. */
-            if (p_sys->audio_type == TIVO_AUDIO_AC3 &&
-                    p_sys->tivo_series == TIVO_SERIES2) {
-                if (p_sys->l_ac3_pkt_size + p_block_in->i_buffer >
-                        AC3_PKT_LENGTH) {
-                    p_block_in->i_buffer -= 2;
-                    p_sys->l_ac3_pkt_size = 0;
-                } else {
-                    p_sys->l_ac3_pkt_size += p_block_in->i_buffer;
-                }
-            }
-            es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
-        } /* subrec == 2 */
-
-        /* MPEG Audio with PES Header, either SA or DTiVo   */
-        /* ================================================ */
-        if ( subrec_type == 0x03 )
-        {
-            esOffset1 = find_es_header( ty_MPEGAudioPacket,
-                    p_block_in->p_buffer, 5 );
-
-            /*msg_Dbg(p_demux, "buffer has %#02x %#02x %#02x %#02x",
-               p_block_in->p_buffer[0], p_block_in->p_buffer[1],
-               p_block_in->p_buffer[2], p_block_in->p_buffer[3]);
-            msg_Dbg(p_demux, "audio ES hdr at offset %d", esOffset1);*/
-
-            /* SA PES Header, No Audio Data                     */
-            /* ================================================ */
-            if ( ( esOffset1 == 0 ) && ( l_rec_size == 16 ) )
-            {
-                p_sys->lastAudioPTS = get_pts( &p_block_in->p_buffer[
-                            SA_PTS_OFFSET ] );
-                if (p_sys->firstAudioPTS < 0)
-                    p_sys->firstAudioPTS = p_sys->lastAudioPTS;
+                /* don't have complete PES hdr; save what we have and return */
+                memcpy(&p_sys->pes_buffer[p_sys->i_pes_buf_cnt],
+                        p_block_in->p_buffer, l_rec_size);
+                p_sys->i_pes_buf_cnt += l_rec_size;
+                /* */
                 block_Release(p_block_in);
-                /*msg_Dbg(p_demux, "SA Audio PTS %lld",
-                           p_sys->lastAudioPTS );*/
+                return 0;
+            }
+
+            /* we have enough; reconstruct this p_frame with the new hdr */
+            memcpy(&p_sys->pes_buffer[p_sys->i_pes_buf_cnt],
+                   p_block_in->p_buffer, i_need);
+            /* advance the block past the PES header (don't want to send it) */
+            p_block_in->p_buffer += i_need;
+            p_block_in->i_buffer -= i_need;
+            /* get the PTS out of this PES header (MPEG or AC3) */
+            if (p_sys->audio_type == TIVO_AUDIO_MPEG)
+                esOffset1 = find_es_header(ty_MPEGAudioPacket,
+                        p_sys->pes_buffer, 5);
+            else
+                esOffset1 = find_es_header(ty_AC3AudioPacket,
+                        p_sys->pes_buffer, 5);
+            if (esOffset1 < 0)
+            {
+                /* god help us; something's really wrong */
+                msg_Err(p_demux, "can't find audio PES header in packet");
             }
             else
-            /* DTiVo Audio with PES Header                      */
-            /* ================================================ */
             {
-                /* Check for complete PES */
-                if (check_sync_pes(p_demux, p_block_in, esOffset1,
-                                    l_rec_size) == -1)
-                {
-                    /* partial PES header found, nothing else. 
-                     * we're done. */
-                    p_sys->i_cur_rec++;
-                    block_Release(p_block_in);
-                    return 1;
-                }
-#if 0
-                msg_Dbg(p_demux, "packet buffer has "
-                         "%02x %02x %02x %02x %02x %02x %02x %02x "
-                         "%02x %02x %02x %02x %02x %02x %02x %02x",
-                         p_block_in->p_buffer[0], p_block_in->p_buffer[1],
-                         p_block_in->p_buffer[2], p_block_in->p_buffer[3],
-                         p_block_in->p_buffer[4], p_block_in->p_buffer[5],
-                         p_block_in->p_buffer[6], p_block_in->p_buffer[7],
-                         p_block_in->p_buffer[8], p_block_in->p_buffer[9],
-                         p_block_in->p_buffer[10], p_block_in->p_buffer[11],
-                         p_block_in->p_buffer[12], p_block_in->p_buffer[13],
-                         p_block_in->p_buffer[14], p_block_in->p_buffer[15]);
-#endif
-                /* set PCR before we send */
-                if( p_block_in->i_pts > 0 )
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                    p_block_in->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
-            }   /* if DTiVo */
-        }   /* if subrec == 0x03 */
+                p_sys->lastAudioPTS = get_pts( 
+                    &p_sys->pes_buffer[ esOffset1 + p_sys->i_Pts_Offset ] );
+                p_block_in->i_pts = p_sys->lastAudioPTS;
+            }
+            p_sys->i_pes_buf_cnt = 0;
+        }
+        /* S2 DTivo has AC3 packets with 2 padding bytes at end.  This is
+         * not allowed in the AC3 spec and will cause problems.  So here
+         * we try to trim things. */
+        /* Also, S1 DTivo has alternating short / long AC3 packets.  That
+         * is, one packet is short (incomplete) and the next packet has
+         * the first one's missing data, plus all of its own.  Strange. */
+        if (p_sys->audio_type == TIVO_AUDIO_AC3 &&
+                p_sys->tivo_series == TIVO_SERIES2) {
+            if (p_sys->l_ac3_pkt_size + p_block_in->i_buffer >
+                    AC3_PKT_LENGTH) {
+                p_block_in->i_buffer -= 2;
+                p_sys->l_ac3_pkt_size = 0;
+            } else {
+                p_sys->l_ac3_pkt_size += p_block_in->i_buffer;
+            }
+        }
+    }
+    else if( subrec_type == 0x03 )
+    {
+        /* MPEG Audio with PES Header, either SA or DTiVo   */
+        /* ================================================ */
+        esOffset1 = find_es_header( ty_MPEGAudioPacket,
+                p_block_in->p_buffer, 5 );
 
+        /*msg_Dbg(p_demux, "buffer has %#02x %#02x %#02x %#02x",
+           p_block_in->p_buffer[0], p_block_in->p_buffer[1],
+           p_block_in->p_buffer[2], p_block_in->p_buffer[3]);
+        msg_Dbg(p_demux, "audio ES hdr at offset %d", esOffset1);*/
+
+        /* SA PES Header, No Audio Data                     */
+        /* ================================================ */
+        if ( ( esOffset1 == 0 ) && ( l_rec_size == 16 ) )
+        {
+            p_sys->lastAudioPTS = get_pts( &p_block_in->p_buffer[
+                        SA_PTS_OFFSET ] );
+            if (p_sys->firstAudioPTS < 0)
+                p_sys->firstAudioPTS = p_sys->lastAudioPTS;
+
+            block_Release(p_block_in);
+            return 0;
+            /*msg_Dbg(p_demux, "SA Audio PTS %lld",
+                       p_sys->lastAudioPTS );*/
+        }
+        /* DTiVo Audio with PES Header                      */
+        /* ================================================ */
+
+        /* Check for complete PES */
+        if (check_sync_pes(p_demux, p_block_in, esOffset1,
+                            l_rec_size) == -1)
+        {
+            /* partial PES header found, nothing else. 
+             * we're done. */
+            block_Release(p_block_in);
+            return 0;
+        }
+#if 0
+        msg_Dbg(p_demux, "packet buffer has "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x",
+                 p_block_in->p_buffer[0], p_block_in->p_buffer[1],
+                 p_block_in->p_buffer[2], p_block_in->p_buffer[3],
+                 p_block_in->p_buffer[4], p_block_in->p_buffer[5],
+                 p_block_in->p_buffer[6], p_block_in->p_buffer[7],
+                 p_block_in->p_buffer[8], p_block_in->p_buffer[9],
+                 p_block_in->p_buffer[10], p_block_in->p_buffer[11],
+                 p_block_in->p_buffer[12], p_block_in->p_buffer[13],
+                 p_block_in->p_buffer[14], p_block_in->p_buffer[15]);
+#endif
+    }
+    else if( subrec_type == 0x04 )
+    {
         /* SA Audio with no PES Header                      */
         /* ================================================ */
-        if ( subrec_type == 0x04 )
-        {
-            /*msg_Dbg(p_demux,
-                    "Adding SA Audio Packet Size %ld", l_rec_size ); */
+        /*msg_Dbg(p_demux,
+                "Adding SA Audio Packet Size %ld", l_rec_size ); */
 
-            /* set PCR before we send */
-            if (p_sys->lastAudioPTS > 0)
-            {
-                p_block_in->i_pts = p_sys->lastAudioPTS;
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                p_block_in->i_pts );
-            }
-            es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
-        }
-
+        if (p_sys->lastAudioPTS > 0)
+            p_block_in->i_pts = p_sys->lastAudioPTS;
+    }
+    else if( subrec_type == 0x09 )
+    {
         /* DTiVo AC3 Audio Data with PES Header             */
         /* ================================================ */
-        if ( subrec_type == 0x09 )
-        {
-            esOffset1 = find_es_header( ty_AC3AudioPacket,
-                    p_block_in->p_buffer, 5 );
+        esOffset1 = find_es_header( ty_AC3AudioPacket,
+                p_block_in->p_buffer, 5 );
 
 #if 0
-            msg_Dbg(p_demux, "buffer has "
-                     "%02x %02x %02x %02x %02x %02x %02x %02x "
-                     "%02x %02x %02x %02x %02x %02x %02x %02x",
-                     p_block_in->p_buffer[0], p_block_in->p_buffer[1],
-                     p_block_in->p_buffer[2], p_block_in->p_buffer[3],
-                     p_block_in->p_buffer[4], p_block_in->p_buffer[5],
-                     p_block_in->p_buffer[6], p_block_in->p_buffer[7],
-                     p_block_in->p_buffer[8], p_block_in->p_buffer[9],
-                     p_block_in->p_buffer[10], p_block_in->p_buffer[11],
-                     p_block_in->p_buffer[12], p_block_in->p_buffer[13],
-                     p_block_in->p_buffer[14], p_block_in->p_buffer[15]);
-            msg_Dbg(p_demux, "audio ES AC3 hdr at offset %d", esOffset1);
+        msg_Dbg(p_demux, "buffer has "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x",
+                 p_block_in->p_buffer[0], p_block_in->p_buffer[1],
+                 p_block_in->p_buffer[2], p_block_in->p_buffer[3],
+                 p_block_in->p_buffer[4], p_block_in->p_buffer[5],
+                 p_block_in->p_buffer[6], p_block_in->p_buffer[7],
+                 p_block_in->p_buffer[8], p_block_in->p_buffer[9],
+                 p_block_in->p_buffer[10], p_block_in->p_buffer[11],
+                 p_block_in->p_buffer[12], p_block_in->p_buffer[13],
+                 p_block_in->p_buffer[14], p_block_in->p_buffer[15]);
+        msg_Dbg(p_demux, "audio ES AC3 hdr at offset %d", esOffset1);
 #endif
 
-            /* Check for complete PES */
-            if (check_sync_pes(p_demux, p_block_in, esOffset1,
-                                l_rec_size) == -1)
-            {
-                /* partial PES header found, nothing else.  we're done. */
-                p_sys->i_cur_rec++;
-                return 1;
-            }
-            /* set PCR before we send (if PTS found) */
-            if( p_block_in->i_pts > 0 )
-            {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                p_block_in->i_pts );
-            }
-            /* S2 DTivo has invalid long AC3 packets */
-            if (p_sys->tivo_series == TIVO_SERIES2) {
-                if (p_block_in->i_buffer > AC3_PKT_LENGTH) {
-                    p_block_in->i_buffer -= 2;
-                    p_sys->l_ac3_pkt_size = 0;
-                } else {
-                    p_sys->l_ac3_pkt_size = p_block_in->i_buffer;
-                }
-            }
-            es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
+        /* Check for complete PES */
+        if (check_sync_pes(p_demux, p_block_in, esOffset1,
+                            l_rec_size) == -1)
+        {
+            /* partial PES header found, nothing else.  we're done. */
+            block_Release(p_block_in);
+            return 0;
         }
-    } /* end "if audio" */
-    /* ================================================================ */
-    /* Closed Caption                                                   */
-    /* ================================================================ */
-    else if ( rec_type == 0x01 )
-    {
-        /*msg_Dbg(p_demux, "CC1 %02x %02x [%c%c]", rec_hdr->ex1,
-                   rec_hdr->ex2, rec_hdr->ex1, rec_hdr->ex2 );*/
-
-        /* construct a 'user-data' MPEG packet */
-        lastCC[ 0x00 ] = 0x00;
-        lastCC[ 0x01 ] = 0x00;
-        lastCC[ 0x02 ] = 0x01;
-        lastCC[ 0x03 ] = 0xb2;
-        lastCC[ 0x04 ] = 'T';    /* vcdimager code says this byte should be 0x11 */
-        lastCC[ 0x05 ] = 'Y';    /* (no other notes there) */
-        lastCC[ 0x06 ] = 0x01;
-        lastCC[ 0x07 ] = rec_hdr->ex1;
-        lastCC[ 0x08 ] = rec_hdr->ex2;
-        /* not sure what to send, because VLC doesn't yet support
-         * teletext type of subtitles (only supports the full-sentence type) */
-        /*p_block_in = block_NewEmpty(); ????
-        es_out_Send( p_demux->out, p_sys->p_subt_es, p_block_in );*/
-    }
-    else if ( rec_type == 0x02 )
-    {
-        /*msg_Dbg(p_demux, "CC2 %02x %02x", rec_hdr->ex1, rec_hdr->ex2 );*/
-
-        /* construct a 'user-data' MPEG packet */
-        lastXDS[ 0x00 ] = 0x00;
-        lastXDS[ 0x01 ] = 0x00;
-        lastXDS[ 0x02 ] = 0x01;
-        lastXDS[ 0x03 ] = 0xb2;
-        lastXDS[ 0x04 ] = 'T';    /* vcdimager code says this byte should be 0x11 */
-        lastXDS[ 0x05 ] = 'Y';    /* (no other notes there) */
-        lastXDS[ 0x06 ] = 0x02;
-        lastXDS[ 0x07 ] = rec_hdr->ex1;
-        lastXDS[ 0x08 ] = rec_hdr->ex2;
-        /* not sure what to send, because VLC doesn't support this?? */
-        /*p_block_in = block_NewEmpty(); ????
-        es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );*/
-    }
-    /* ================================================================ */
-    /* Tivo data services (e.g. "thumbs-up to record!")  useless for us */
-    /* ================================================================ */
-    else if ( rec_type == 0x03 )
-    {
-    }
-    /* ================================================================ */
-    /* Unknown, but seen regularly */
-    /* ================================================================ */
-    else if ( rec_type == 0x05 )
-    {
+        /* S2 DTivo has invalid long AC3 packets */
+        if (p_sys->tivo_series == TIVO_SERIES2) {
+            if (p_block_in->i_buffer > AC3_PKT_LENGTH) {
+                p_block_in->i_buffer -= 2;
+                p_sys->l_ac3_pkt_size = 0;
+            } else {
+                p_sys->l_ac3_pkt_size = p_block_in->i_buffer;
+            }
+        }
     }
     else
     {
-        msg_Dbg(p_demux, "Invalid record type 0x%02x", rec_type );
-        if (p_block_in) block_Release(p_block_in);
-            invalidType++;
+        /* Unsupported/Unknown */
+        block_Release(p_block_in);
+        return 0;
     }
-    p_sys->i_cur_rec++;
-    return 1;
+
+    /* set PCR before we send (if PTS found) */
+    if( p_block_in->i_pts > 0 )
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                        p_block_in->i_pts );
+    /* Send data */
+    es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
+    return 0;
+}
+
+static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
+{
+    uint8_t lastCC[ 16 ];
+
+    if( p_block_in )
+        block_Release(p_block_in);
+
+    /*msg_Dbg(p_demux, "CC1 %02x %02x [%c%c]", rec_hdr->ex1,
+               rec_hdr->ex2, rec_hdr->ex1, rec_hdr->ex2 );*/
+
+    /* construct a 'user-data' MPEG packet */
+    lastCC[ 0x00 ] = 0x00;
+    lastCC[ 0x01 ] = 0x00;
+    lastCC[ 0x02 ] = 0x01;
+    lastCC[ 0x03 ] = 0xb2;
+    lastCC[ 0x04 ] = 'T';    /* vcdimager code says this byte should be 0x11 */
+    lastCC[ 0x05 ] = 'Y';    /* (no other notes there) */
+    lastCC[ 0x06 ] = 0x01;
+    lastCC[ 0x07 ] = rec_hdr->ex1;
+    lastCC[ 0x08 ] = rec_hdr->ex2;
+    /* not sure what to send, because VLC doesn't yet support
+     * teletext type of subtitles (only supports the full-sentence type) */
+    /*p_block_in = block_NewEmpty(); ????
+    es_out_Send( p_demux->out, p_sys->p_subt_es, p_block_in );*/
+    return 0;
+}
+
+static int DemuxRecXds( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
+{
+    uint8_t lastXDS[ 16 ];
+
+    if( p_block_in )
+        block_Release(p_block_in);
+
+    /*msg_Dbg(p_demux, "CC2 %02x %02x", rec_hdr->ex1, rec_hdr->ex2 );*/
+
+    /* construct a 'user-data' MPEG packet */
+    lastXDS[ 0x00 ] = 0x00;
+    lastXDS[ 0x01 ] = 0x00;
+    lastXDS[ 0x02 ] = 0x01;
+    lastXDS[ 0x03 ] = 0xb2;
+    lastXDS[ 0x04 ] = 'T';    /* vcdimager code says this byte should be 0x11 */
+    lastXDS[ 0x05 ] = 'Y';    /* (no other notes there) */
+    lastXDS[ 0x06 ] = 0x02;
+    lastXDS[ 0x07 ] = rec_hdr->ex1;
+    lastXDS[ 0x08 ] = rec_hdr->ex2;
+    /* not sure what to send, because VLC doesn't support this?? */
+    /*p_block_in = block_NewEmpty(); ????
+    es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );*/
+    return 0;
 }
 
 
@@ -1108,65 +1192,6 @@ static void parse_master(demux_t *p_demux)
 }
 
 
-static int Control(demux_t *p_demux, int i_query, va_list args)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    double f, *pf;
-    int64_t i64, *p_i64;
-
-    /*msg_Info(p_demux, "control cmd %d", i_query);*/
-    switch( i_query )
-    {
-    case DEMUX_GET_POSITION:
-        /* arg is 0.0 - 1.0 percent of overall file position */
-        if( ( i64 = p_sys->i_stream_size ) > 0 )
-        {
-            pf = (double*) va_arg( args, double* );
-            *pf = (double)stream_Tell( p_demux->s ) / (double) i64;
-            return VLC_SUCCESS;
-        }
-        return VLC_EGENERIC;
-
-    case DEMUX_SET_POSITION:
-        /* arg is 0.0 - 1.0 percent of overall file position */
-        f = (double) va_arg( args, double );
-        /* msg_Dbg(p_demux, "Control - set position to %2.3f", f); */
-        if ((i64 = p_sys->i_stream_size) > 0)
-            return ty_stream_seek_pct(p_demux, f);
-        return VLC_EGENERIC;
-    case DEMUX_GET_TIME:
-        /* return TiVo timestamp */
-        p_i64 = (int64_t *) va_arg(args, int64_t *);
-        //*p_i64 = p_sys->lastAudioPTS - p_sys->firstAudioPTS;
-        //*p_i64 = (p_sys->l_last_ty_pts / 1000) + (p_sys->lastAudioPTS -
-        //    p_sys->l_last_ty_pts_sync);
-        *p_i64 = (p_sys->l_last_ty_pts / 1000);
-        return VLC_SUCCESS;
-    case DEMUX_GET_LENGTH:    /* length of program in microseconds, 0 if unk */
-        /* size / bitrate */
-        p_i64 = (int64_t *) va_arg(args, int64_t *);
-        *p_i64 = 0;
-        return VLC_SUCCESS;
-    case DEMUX_SET_TIME:      /* arg is time in microsecs */
-        i64 = (int64_t) va_arg( args, int64_t );
-        return ty_stream_seek_time(p_demux, i64 * 1000);
-    case DEMUX_GET_FPS:
-    default:
-        return VLC_EGENERIC;
-    }
-}
-
-
-/* ======================================================================== */
-static void Close( vlc_object_t *p_this )
-{
-    demux_sys_t *p_sys = ((demux_t *) p_this)->p_sys;
-
-    free(p_sys->rec_hdrs);
-    free(p_sys);
-}
-
-
 /* ======================================================================== */
 /* "Peek" at some chunks.  Skip over the Part header if we find it.
  * We parse the peeked data and determine audio type,
@@ -1394,6 +1419,7 @@ static int get_chunk_header(demux_t *p_demux)
     /* read the record headers into a temp buffer */
     p_hdr_buf = malloc(i_num_recs * 16);
     if (stream_Read(p_demux->s, p_hdr_buf, i_num_recs * 16) < i_num_recs * 16) {
+        free( p_hdr_buf );
         p_sys->eof = VLC_TRUE;
         return 0;
     }
