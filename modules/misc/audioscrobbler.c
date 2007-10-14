@@ -464,15 +464,9 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
 
     if( newval.i_int == END_S || newval.i_int == ERROR_S )
     {
-        playlist_t *p_playlist = pl_Yield( p_intf );
-        PL_LOCK;
-        if( p_playlist->request.i_status == PLAYLIST_STOPPED )
-        {
-            /* if we stopped, we won't submit playing song */
-            p_sys->b_submit = VLC_FALSE;
-        }
-        PL_UNLOCK;
-        pl_Release( p_playlist );
+        /* We'll try to add the previously playing song in the queue */
+        if( AddToQueue( p_intf ) == VLC_ENOMEM )
+            return VLC_ENOMEM;
     }
     else if( oldval.i_int == PLAYING_S && newval.i_int == PAUSE_S )
         time( &p_sys->time_pause );
@@ -503,10 +497,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     p_sys->b_state_cb       = VLC_FALSE;
     p_sys->b_meta_read      = VLC_FALSE;
-
-    /* We'll try to add the previously playing song in the queue */
-    if( AddToQueue( p_intf ) == VLC_ENOMEM )
-        return VLC_ENOMEM;
+    p_sys->b_submit         = VLC_FALSE;
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -516,7 +507,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         PL_UNLOCK;
         pl_Release( p_playlist );
-        p_sys->b_submit = VLC_FALSE;
         return VLC_SUCCESS;
     }
 
@@ -528,7 +518,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( !p_item )
     {
         vlc_object_release( p_input );
-        p_sys->b_submit = VLC_FALSE;
         return VLC_SUCCESS;
     }
 
@@ -537,11 +526,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         msg_Dbg( p_this, "Not an audio local file, not submitting");
         vlc_object_release( p_input );
-        p_sys->b_submit = VLC_FALSE;
         return VLC_SUCCESS;
     }
 
-    p_sys->b_submit = VLC_TRUE;
     p_sys->time_total_pauses = 0;
     time( &p_sys->p_current_song.date );
 
@@ -991,6 +978,9 @@ static int ReadMetaData( intf_thread_t *p_this )
         free( psz_meta );
         return VLC_EGENERIC;
     }
+
+    /* Now we have read the mandatory meta data, so we can submit that info */
+    p_sys->b_submit = VLC_TRUE;
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_b, Album )
     else
