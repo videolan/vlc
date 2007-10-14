@@ -42,6 +42,15 @@
 #include "vlc_strings.h"
 
 
+// VLC handle
+
+struct services_discovery_sys_t
+{
+    playlist_item_t *p_node_cat;
+    playlist_item_t *p_node_one;
+};
+
+
 // Constants
 
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
@@ -268,16 +277,31 @@ IXML_Document* parseBrowseResult( IXML_Document* doc );
 static int Open( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
+    services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
+    malloc( sizeof( services_discovery_sys_t ) );
+
     p_sd->pf_run = Run;
+    p_sd->p_sys = p_sys;
 
     /* Create our playlist node */
-    services_discovery_SetLocalizedName( p_sd, _("Devices") );
+    playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
+                              &p_sys->p_node_cat, &p_sys->p_node_one,
+                              VLC_TRUE );
 
     return VLC_SUCCESS;
 }
 
 static void Close( vlc_object_t *p_this )
 {
+    services_discovery_t *p_sd = ( services_discovery_t* )p_this;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, VLC_TRUE,
+                         VLC_TRUE );
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, VLC_TRUE,
+                         VLC_TRUE );
+
+    free( p_sys );
 }
 
 static void Run( services_discovery_t* p_sd )
@@ -892,7 +916,7 @@ bool MediaServerList::addServer( MediaServer* s )
     char* name = strdup( s->getFriendlyName() );
     playlist_item_t* node = playlist_NodeCreate( pl_Get( _cookie->serviceDiscovery ),
                                                  name,
-                                          _cookie->serviceDiscovery->p_cat, 0 );
+                                          _cookie->serviceDiscovery->p_sys->p_node_cat, 0 );
     free( name );
     s->setPlaylistNode( node );
 
