@@ -334,14 +334,14 @@ check_input:
              if( p_item == NULL )
              {
                 msg_Dbg( p_playlist, "nothing to play" );
+                p_playlist->status.i_status = PLAYLIST_STOPPED;
+                PL_UNLOCK
+
                 if( b_playexit == VLC_TRUE )
                 {
                     msg_Info( p_playlist, "end of playlist, exiting" );
                     vlc_object_kill( p_playlist->p_libvlc );
                 }
-                p_playlist->status.i_status = PLAYLIST_STOPPED;
-                PL_UNLOCK
-
                 ObjectGarbageCollector( p_playlist, VLC_TRUE );
                 return;
              }

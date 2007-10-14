@@ -138,7 +138,6 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
 {
     // Tell playlist to go to last loop
     vlc_object_kill( p_playlist );
-    playlist_Signal( p_playlist );
 
     // Kill preparser
     if( p_playlist->p_preparse )
