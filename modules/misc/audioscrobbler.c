@@ -96,8 +96,9 @@ struct intf_sys_t
 
     vlc_bool_t              b_state_cb;         /**< if we registered the
                                                  * "state" callback         */
-    vlc_bool_t              b_preparsed_cb;     /**< if we registered the
-                                                 * "meta-preparsed" callback*/
+
+    vlc_bool_t              b_meta_read;        /**< if we read the song's
+                                                 * metadata already         */
 };
 
 static int  Open            ( vlc_object_t * );
@@ -108,8 +109,6 @@ static void Run             ( intf_thread_t * );
 static int ItemChange       ( vlc_object_t *, const char *, vlc_value_t,
                                 vlc_value_t, void * );
 static int PlayingChange    ( vlc_object_t *, const char *, vlc_value_t,
-                                vlc_value_t, void * );
-static int MetaPreparsed    ( vlc_object_t *, const char *, vlc_value_t,
                                 vlc_value_t, void * );
 
 static int AddToQueue       ( intf_thread_t * );
@@ -209,8 +208,6 @@ static void Close( vlc_object_t *p_this )
 
         if( p_sys->b_state_cb )
             var_DelCallback( p_input, "state", PlayingChange, p_intf );
-        if( p_sys->b_preparsed_cb )
-            var_DelCallback( p_input, "meta-preparsed", MetaPreparsed, p_intf );
 
         vlc_object_release( p_input );
     }
@@ -462,6 +459,9 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
+    if( p_sys->b_meta_read == VLC_FALSE && newval.i_int != INIT_S )
+        ReadMetaData( p_intf );
+
     if( newval.i_int == END_S || newval.i_int == ERROR_S )
     {
         playlist_t *p_playlist = pl_Yield( p_intf );
@@ -479,21 +479,6 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     else if( oldval.i_int == PAUSE_S && newval.i_int == PLAYING_S )
         p_sys->time_total_pauses += time( NULL ) - p_sys->time_pause;
 
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * MetaPreparsed: Meta data reading callback
- *****************************************************************************/
-static int MetaPreparsed( vlc_object_t *p_this, const char *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
-
-    if( p_intf->b_dead )
-        return VLC_SUCCESS;
-
-    ReadMetaData( p_intf );
     return VLC_SUCCESS;
 }
 
@@ -516,8 +501,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    p_sys->b_preparsed_cb   = VLC_FALSE;
     p_sys->b_state_cb       = VLC_FALSE;
+    p_sys->b_meta_read      = VLC_FALSE;
 
     /* We'll try to add the previously playing song in the queue */
     if( AddToQueue( p_intf ) == VLC_ENOMEM )
@@ -564,23 +549,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->b_state_cb = VLC_TRUE;
 
     if( input_item_IsPreparsed( p_item ) )
-    {
         ReadMetaData( p_intf );
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
-    }
-    else
-    {
-#if 0
-        /* XXX this won't work. One way would be to monitor p_input "state",
-         * once it is no more INIT_S, meta should be parsed */
-        /* We'll read the meta data when it will be preparsed */
-        var_AddCallback( p_input, "meta-preparsed", MetaPreparsed, p_intf );
-        p_sys->b_preparsed_cb = VLC_TRUE;
-#endif
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
-    }
+    /* if the input item was not preparsed, we'll do it in PlayingChange()
+     * callback, when "state" != INIT_S */
+
+    vlc_object_release( p_input );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -994,6 +968,8 @@ static int ReadMetaData( intf_thread_t *p_this )
     }
 
     vlc_mutex_lock( &p_sys->lock );
+
+    p_sys->b_meta_read = VLC_TRUE;
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_a, Artist )
     else
