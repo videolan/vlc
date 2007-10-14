@@ -341,7 +341,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->pf_decode_sub = 0;
     p_dec->pf_packetize = 0;
 
-   /* Initialize the decoder fifo */
+    /* Initialize the decoder fifo */
     p_dec->p_module = NULL;
 
     memset( &null_es_format, 0, sizeof(es_format_t) );
@@ -679,7 +679,8 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     }
     else if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+        if( p_block )
+            DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
 
         if( p_dec->p_owner->p_packetizer )
         {
@@ -687,7 +688,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             decoder_t *p_packetizer = p_dec->p_owner->p_packetizer;
 
             while( (p_packetized_block =
-                    p_packetizer->pf_packetize( p_packetizer, &p_block )) )
+                    p_packetizer->pf_packetize( p_packetizer, p_block ? &p_block : NULL )) )
             {
                 if( p_packetizer->fmt_out.i_extra && !p_dec->fmt_in.i_extra )
                 {
@@ -707,14 +708,15 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 }
             }
         }
-        else
+        else if( p_block )
         {
             DecoderDecodeAudio( p_dec, p_block );
         }
     }
     else if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
-        DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+        if( p_block )
+            DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
 
         if( p_dec->p_owner->p_packetizer )
         {
@@ -722,7 +724,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             decoder_t *p_packetizer = p_dec->p_owner->p_packetizer;
 
             while( (p_packetized_block =
-                    p_packetizer->pf_packetize( p_packetizer, &p_block )) )
+                    p_packetizer->pf_packetize( p_packetizer, p_block ? &p_block : NULL )) )
             {
                 if( p_packetizer->fmt_out.i_extra && !p_dec->fmt_in.i_extra )
                 {
@@ -742,7 +744,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 }
             }
         }
-        else
+        else if( p_block )
         {
             DecoderDecodeVideo( p_dec, p_block );
         }
@@ -753,9 +755,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         vout_thread_t *p_vout;
         subpicture_t *p_spu;
 
-        DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+        if( p_block )
+            DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
 
-        while( (p_spu = p_dec->pf_decode_sub( p_dec, &p_block ) ) )
+        while( (p_spu = p_dec->pf_decode_sub( p_dec, p_block ? &p_block : NULL ) ) )
         {
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
             stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_sub, 1, NULL );
