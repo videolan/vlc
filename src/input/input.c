@@ -199,12 +199,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
 
-    vlc_mutex_lock( &p_item->lock );
-    if( p_item->p_meta && (p_item->p_meta->i_status & ITEM_PREPARSED ) )
-        var_SetBool( p_input, "meta-preparsed", VLC_TRUE );
-    vlc_mutex_unlock( &p_item->lock );
-
-
     /* Create Objects variables for public Get and Set */
     input_ControlVarInit( p_input );
 
@@ -2649,6 +2643,19 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
 {
     vlc_bool_t b_bool;
     module_t *p_id3;
+
+
+#if 0
+    /* XXX I am not sure it is a great idea, besides, there is more than that
+     * if we want to do it right */
+    vlc_mutex_lock( &p_item->lock );
+    if( p_item->p_meta && (p_item->p_meta->i_status & ITEM_PREPARSED ) )
+    {
+        vlc_mutex_unlock( &p_item->lock );
+        return;
+    }
+    vlc_mutex_unlock( &p_item->lock );
+#endif
 
     demux2_Control( p_demux, DEMUX_GET_META, p_meta );
     if( demux2_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )

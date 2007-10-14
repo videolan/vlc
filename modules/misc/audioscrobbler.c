@@ -571,9 +571,13 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
     else
     {
+#if 0
+        /* XXX this won't work. One way would be to monitor p_input "state",
+         * once it is no more INIT_S, meta should be parsed */
         /* We'll read the meta data when it will be preparsed */
         var_AddCallback( p_input, "meta-preparsed", MetaPreparsed, p_intf );
         p_sys->b_preparsed_cb = VLC_TRUE;
+#endif
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
