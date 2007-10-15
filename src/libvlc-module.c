@@ -1414,6 +1414,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
                 VLC_TRUE );
+        change_short('A');
     set_subcategory( SUBCAT_AUDIO_AFILTER );
     add_module_list_cat( "audio-filter", SUBCAT_AUDIO_AFILTER, 0,
                          NULL, AUDIO_FILTER_TEXT,
@@ -1753,7 +1754,6 @@ vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
-        change_short('A');
         change_need_restart();
 
     set_section( N_("Plugins" ), NULL );
