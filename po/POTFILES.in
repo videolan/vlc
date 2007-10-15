@@ -48,6 +48,7 @@ include/vlc_osd.h
 include/vlc_os_specific.h
 include/vlc_playlist.h
 include/vlc_rand.h
+include/vlc_services_discovery.h
 include/vlc_sout.h
 include/vlc_stream.h
 include/vlc_streaming.h
@@ -75,7 +76,7 @@ src/control/audio.c
 src/control/core.c
 src/control/dynamic_media_list.c
 src/control/event.c
-src/control/flat_media_list.c
+src/control/flat_media_list_view.c
 src/control/libvlc_internal.h
 src/control/log.c
 src/control/mediacontrol_audio_video.c
@@ -381,6 +382,7 @@ modules/codec/ffmpeg/scale.c
 modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
 modules/codec/flac.c
+modules/codec/fluidsynth.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mash.cpp
