@@ -35,7 +35,7 @@
 #elif defined( __APPLE__ )
 /* Nothing at the moment, create darwin_specific.h when needed */
 #elif defined( WIN32 ) || defined( UNDER_CE )
-/* Nothing at the moment, create win32_specific.h when needed */
+VLC_EXPORT( const char * , system_VLCPath, (void));
 #else
 #   undef _NEED_OS_SPECIFIC_H
 #endif

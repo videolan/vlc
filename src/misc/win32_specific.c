@@ -368,3 +368,12 @@ void system_End( libvlc_int_t *p_this )
 
     WSACleanup();
 }
+
+/*****************************************************************************
+ *  system_VLCPath
+ *  **************************************************************************/
+const char* system_VLCPath( void )
+{
+    libvlc_global_data_t* libvlc_global = vlc_global();
+    return libvlc_global->psz_vlcpath;
+}
