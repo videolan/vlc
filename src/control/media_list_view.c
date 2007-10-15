@@ -124,7 +124,7 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
     p_mlv->pf_item_at_index = pf_item_at_index;
     p_mlv->pf_release       = pf_release;
 
-    p_mlv->this_view_data = this_view_data;
+    p_mlv->p_this_view_data = this_view_data;
 
     vlc_mutex_init( p_mlv->p_libvlc_instance->p_libvlc_int, &p_mlv->object_lock );
     p_mlv->i_refcount = 1;
@@ -136,6 +136,17 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
 /*
  * Public libvlc functions
  */
+
+/**************************************************************************
+ *       libvlc_media_list_view_retain (Public)
+ **************************************************************************/
+void
+libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
+{
+    vlc_mutex_lock( &p_mlv->object_lock );
+    p_mlv->i_refcount++;
+    vlc_mutex_unlock( &p_mlv->object_lock );
+}
 
 /**************************************************************************
  *       libvlc_media_list_view_release (Public)
