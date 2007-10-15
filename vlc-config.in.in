@@ -19,6 +19,7 @@ cflags=""
 cxxflags=""
 objcflags=""
 ldflags=""
+libs="-L@libdir@"
 
 cflags_tuning="@CFLAGS_TUNING@"
 cflags_optim_size="@CFLAGS_OPTIM_SIZE@"
@@ -234,8 +235,6 @@ while test $# -gt 0; do
 
   shift
 done
-
-libs="-L@libdir@"
 
 #
 #  If a module was requested, use its name
