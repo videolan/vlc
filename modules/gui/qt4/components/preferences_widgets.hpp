@@ -367,8 +367,8 @@ public:
                              QComboBox*, bool );
     virtual ~StringListConfigControl() {};
     virtual QString getValue();
-    virtual void hide() { if( combo ) combo->hide(); if( label ) label->hide(); }
-    virtual void show() { if( combo ) combo->show(); if( label ) label->show(); }
+    virtual void hide() { combo->hide(); if( label ) label->hide(); }
+    virtual void show() { combo->show(); if( label ) label->show(); }
 private:
     void finish( bool );
     QLabel *label;
