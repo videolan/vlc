@@ -92,7 +92,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
 
     if( ( p_vout->render.i_height != p_vout->output.i_height ||
           p_vout->render.i_width != p_vout->output.i_width ) &&
-        ( p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('I','4','2','0')  ||
+        ( p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('I','4','2','0') ||
           p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('Y','V','1','2') ))
     {
         msg_Dbg( p_vout, "preparing to resample picture" );
