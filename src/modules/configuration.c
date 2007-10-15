@@ -1843,25 +1843,23 @@ static char *GetDir( vlc_bool_t b_appdata )
         return FromWide( whomedir );
 #endif
 
-#if defined(HAVE_GETPWUID)
-    struct passwd *p_pw;
-    (void)b_appdata;
-
-    if( ( p_pw = getpwuid( getuid() ) ) == NULL )
-#endif
+    psz_localhome = getenv( "HOME" );
+    if( psz_localhome == NULL )
     {
-        psz_localhome = getenv( "HOME" );
-        if( psz_localhome == NULL )
+#if defined(HAVE_GETPWUID)
+        struct passwd *p_pw;
+        (void)b_appdata;
+
+        if( ( p_pw = getpwuid( getuid() ) ) != NULL )
+            psz_localhome = p_pw->pw_dir;
+        else
+#endif
         {
             psz_localhome = getenv( "TMP" );
             if( psz_localhome == NULL )
                 psz_localhome = "/tmp";
         }
     }
-#if defined(HAVE_GETPWUID)
-    else
-        psz_localhome = p_pw->pw_dir;
-#endif
 
     return FromLocaleDup( psz_localhome );
 }
