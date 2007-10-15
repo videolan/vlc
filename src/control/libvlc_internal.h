@@ -134,7 +134,7 @@ struct libvlc_media_list_view_t
     
     libvlc_media_list_t *       p_mlist;
 
-    void *                      this_view_data;
+    struct libvlc_media_list_view_private_t * p_this_view_data;
 
     /* Accessors */
     libvlc_media_list_view_count_func_t         pf_count;
