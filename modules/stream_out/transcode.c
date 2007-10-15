@@ -2780,7 +2780,6 @@ static int transcode_spu_process( sout_stream_t *p_stream,
 
         p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
         spu_del_buffer( id->p_decoder, p_subpic );
-
         if( p_block )
         {
             block_ChainAppend( out, p_block );
