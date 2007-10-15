@@ -564,5 +564,3 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
 #endif
     return NULL;
 }
-
-
