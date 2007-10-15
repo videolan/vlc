@@ -22,8 +22,11 @@
  *****************************************************************************/
 
 #include <QApplication>
+#include <QLocale>
+#include <QTranslator>
 
 #include "qt4.hpp"
+#include <vlc_os_specific.h>
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
 #include "main_interface.hpp"
@@ -245,6 +248,23 @@ static void Init( intf_thread_t *p_intf )
     else
     /*if( p_intf->pf_show_dialog )*/
         vlc_thread_ready( p_intf );
+    // Translation - get locale
+    QLocale ql = QLocale::system ();
+    // Translations for qt's own dialogs
+    QTranslator qtTranslator( 0 );
+    // Let's find the right path for the translation file
+#if !defined( WIN32 )
+    
+    QString path =  QString(QT4LOCALEDIR);
+#else
+    QString path = QString( QString(system_VLCPath()) + DIR_SEP +
+                            "locale" + DIR_SEP );
+#endif
+    // files depending on locale
+    bool b_loaded = qtTranslator.load( path + "qt_" + ql.name());
+    if (!b_loaded)
+        msg_Dbg(p_intf, "Error while initializing qt-specific localization");
+    app->installTranslator(&qtTranslator);
 
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )
