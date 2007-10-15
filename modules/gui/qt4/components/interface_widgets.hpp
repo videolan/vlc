@@ -237,7 +237,6 @@ class PlaylistWidget : public QSplitter
 public:
     PlaylistWidget( intf_thread_t *_p_i ) ;
     virtual ~PlaylistWidget();
-    virtual QSize sizeHint() const;
 private:
     PLSelector *selector;
     PLPanel *rightPanel;
