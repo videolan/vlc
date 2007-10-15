@@ -258,6 +258,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
+
+    CONNECT( this, askReleaseVideo( void * ), this, releaseVideoSlot( void * ) );
+
     // DEBUG FIXME
     hide();
 }
@@ -355,6 +358,7 @@ void MainInterface::handleMainUi( QSettings *settings )
         bgWidget->resize( bgWidget->widgetSize );
         bgWidget->updateGeometry();
         mainLayout->insertWidget( 0, bgWidget );
+        CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
     }
 
     if( videoEmbeddedFlag )
@@ -367,8 +371,6 @@ void MainInterface::handleMainUi( QSettings *settings )
         p_intf->pf_request_window  = ::DoRequest;
         p_intf->pf_release_window  = ::DoRelease;
         p_intf->pf_control_window  = ::DoControl;
-
-        CONNECT( this, askVideoToHide(), videoWidget, hide() );
     }
 
     /* Finish the sizing */
@@ -388,31 +390,26 @@ void MainInterface::calculateInterfaceSize()
     int width = 0, height = 0;
     if( VISIBLE( bgWidget ) )
     {
-        width = bgWidget->widgetSize.width();
+        width  = bgWidget->widgetSize.width();
         height = bgWidget->widgetSize.height();
-//        assert( !(playlistWidget));// && playlistWidget->isVisible() ) );
-    }
-    else if( VISIBLE( playlistWidget ) )
-    {
-        width = playlistWidget->widgetSize.width();
-        height = playlistWidget->widgetSize.height();
     }
     else if( videoIsActive )
     {
-        width =  videoWidget->widgetSize.width() ;
+        width  = videoWidget->widgetSize.width() ;
         height = videoWidget->widgetSize.height();
     }
     else
     {
-        width = PREF_W - addSize.width();
+        width  = PREF_W - addSize.width();
         height = PREF_H - addSize.height();
+    }
+    if( !dockPL->isFloating() )
+    {
+        width  += dockPL->widget()->width();
+        height += dockPL->widget()->height();
     }
     if( VISIBLE( visualSelector ) )
         height += visualSelector->height();
-/*    if( VISIBLE( advControls) )
-    {
-        height += advControls->sizeHint().height();
-    }*/
     mainSize = QSize( width + addSize.width(), height + addSize.height() );
 }
 
@@ -428,18 +425,20 @@ void MainInterface::resizeEvent( QResizeEvent *e )
     }
     if( VISIBLE( playlistWidget ) )
     {
-        SET_WH( playlistWidget , e->size().width() - addSize.width(),
-                                 e->size().height() - addSize.height() );
+        //FIXME
+//        SET_WH( playlistWidget , e->size().width() - addSize.width(),
+              //                   e->size().height() - addSize.height() );
         playlistWidget->updateGeometry();
     }
 }
 
 /****************************************************************************
- * Small right-click menus
+ * Small right-click menu for rate control
  ****************************************************************************/
 void MainInterface::showSpeedMenu( QPoint pos )
 {
-    speedControlMenu->exec( QCursor::pos() - pos + QPoint( 0, speedLabel->height() ) );
+    speedControlMenu->exec( QCursor::pos() - pos
+            + QPoint( 0, speedLabel->height() ) );
 }
 
 /****************************************************************************
@@ -467,22 +466,18 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
 {
-    msg_Dbg( p_intf, "I was here" );
     void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
     if( ret )
     {
         videoIsActive = true;
-        if( VISIBLE( playlistWidget ) )
-        {
-            embeddedPlaylistWasActive = true;
-//            playlistWidget->hide();
-        }
+
         bool bgWasVisible = false;
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
-            bgWidget->hide();
+            emit askBgWidgetToToggle();
         }
+
         if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
         {
             videoWidget->widgetSize = QSize( *pi_width, *pi_height );
@@ -502,8 +497,13 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 
 void MainInterface::releaseVideo( void *p_win )
 {
+    emit askReleaseVideo( p_win );
+}
+
+void MainInterface::releaseVideoSlot( void *p_win )
+{
     videoWidget->release( p_win );
-    emit askVideoToHide();
+    videoWidget->hide();
 
     if( bgWidget )
         bgWidget->show();
@@ -515,7 +515,6 @@ void MainInterface::releaseVideo( void *p_win )
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
 {
     int i_ret = VLC_EGENERIC;
-    msg_Dbg( p_intf, "I was there" );
     switch( i_query )
     {
         case VOUT_GET_SIZE:
@@ -567,8 +566,9 @@ void MainInterface::togglePlaylist()
         if(bgWidget)
             CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
 
-        playlistWidget->widgetSize = settings->value( "playlistSize",
-                                               QSize( 650, 310 ) ).toSize();
+        //FIXME
+/*        playlistWidget->widgetSize = settings->value( "playlistSize",
+                                               QSize( 650, 310 ) ).toSize();*/
         /* Add it to the parent DockWidget */
         dockPL->setWidget( playlistWidget );
 
@@ -590,80 +590,13 @@ void MainInterface::togglePlaylist()
     /* toggle the display */
        TOGGLEV( dockPL );
     }
-
-#if 0  // Toggle the playlist dialog if not embedded and return
-    if( !playlistEmbeddedFlag )
-    {
-        if( playlistWidget )
-        {
-            /// \todo Destroy it
-        }
-        return;
-    }
-
-    // Create the playlist Widget and destroy the existing dialog
-    if( !playlistWidget )
-    {
-        PlaylistDialog::killInstance();
-        mainLayout->insertWidget( 0, playlistWidget );
-        playlistWidget->hide();
-    }
-
-    // And toggle visibility
-    if( VISIBLE( playlistWidget ) )
-    {
-        playlistWidget->hide();
-        if( bgWidget ) bgWidget->show();
-        if( videoIsActive )
-        {
-            videoWidget->widgetSize = savedVideoSize;
-            videoWidget->resize( videoWidget->widgetSize );
-            videoWidget->updateGeometry();
-            if( bgWidget ) bgWidget->hide();
-        }
-    }
-    else
-    {
-        playlistWidget->show();
-        if( videoIsActive )
-        {
-            savedVideoSize = videoWidget->widgetSize;
-            videoWidget->widgetSize.setHeight( 0 );
-            videoWidget->resize( videoWidget->widgetSize );
-            videoWidget->updateGeometry();
-        }
-        if( VISIBLE( bgWidget ) ) bgWidget->hide();
-    }
-#endif
     doComponentsUpdate();
 }
 
 void MainInterface::undockPlaylist()
 {
     dockPL->setFloating( true );
-#if 0
-    if( playlistWidget )
-    {
-        playlistWidget->hide();
-        playlistWidget->deleteLater();
-        mainLayout->removeWidget( playlistWidget );
-        playlistWidget = NULL;
-        playlistEmbeddedFlag = false;
-
-        menuBar()->clear();
-        QVLCMenu::createMenuBar( this, p_intf, false, visualSelectorEnabled);
-
-        if( videoIsActive )
-        {
-            videoWidget->widgetSize = savedVideoSize;
-            videoWidget->resize( videoWidget->widgetSize );
-            videoWidget->updateGeometry();
-        }
-
-        doComponentsUpdate();
-        THEDP->playlistDialog();
-    }
-#endif
+    doComponentsUpdate();
 }
 
 #if 0

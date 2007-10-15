@@ -91,6 +91,7 @@ private:
     intf_thread_t *p_intf;
 public slots:
     void setArt( QString );
+    void toggle(){ TOGGLEV( this ); }
 };
 
 class VisualSelector : public QFrame
@@ -107,6 +108,7 @@ private slots:
     void next();
 };
 
+/* Advanced Button Bar */
 class QPushButton;
 class AdvControlsWidget : public QFrame
 {
@@ -114,22 +116,23 @@ class AdvControlsWidget : public QFrame
 public:
     AdvControlsWidget( intf_thread_t *);
     virtual ~AdvControlsWidget();
+
     void enableInput( bool );
     void enableVideo( bool );
+
 private:
     intf_thread_t *p_intf;
-    QPushButton *normalButton, *recordButton, *ABButton;
+    QPushButton *recordButton, *ABButton;
     QPushButton *snapshotButton, *frameButton;
+
 private slots:
-    void normal();
     void snapshot();
     void frame();
     void fromAtoB();
     void record();
 };
 
-
-
+/* Button Bar */
 class InputSlider;
 class QSlider;
 class QGridLayout;
@@ -234,7 +237,6 @@ class PlaylistWidget : public QSplitter
 public:
     PlaylistWidget( intf_thread_t *_p_i ) ;
     virtual ~PlaylistWidget();
-    QSize widgetSize;
     virtual QSize sizeHint() const;
 private:
     PLSelector *selector;

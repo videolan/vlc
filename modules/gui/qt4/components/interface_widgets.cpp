@@ -238,12 +238,6 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     advLayout->addWidget( ABButton );
     BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), fromAtoB() );
 
-    snapshotButton = new QPushButton( "S" );
-    snapshotButton->setMaximumSize( QSize( 26, 26 ) );
-    snapshotButton->setIconSize( QSize( 20, 20 ) );
-    advLayout->addWidget( snapshotButton );
-    BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
-
 //FIXME Frame by frame function
     frameButton = new QPushButton( "Fr" );
     frameButton->setMaximumSize( QSize( 26, 26 ) );
@@ -259,11 +253,11 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     BUTTON_SET_ACT_I( recordButton, "", record_16px.png,
             qtr( "Record" ), record() );
 
-    normalButton = new QPushButton( "N" );
-    normalButton->setMaximumSize( QSize( 26, 26 ) );
-    normalButton->setIconSize( QSize( 20, 20 ) );
-    advLayout->addWidget( normalButton );
-    BUTTON_SET_ACT( normalButton, "N", qtr( "Normal rate" ), normal() );
+    snapshotButton = new QPushButton( "S" );
+    snapshotButton->setMaximumSize( QSize( 26, 26 ) );
+    snapshotButton->setIconSize( QSize( 20, 20 ) );
+    advLayout->addWidget( snapshotButton );
+    BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
 
 }
 
@@ -275,17 +269,11 @@ void AdvControlsWidget::enableInput( bool enable )
 {
     ABButton->setEnabled( enable );
     recordButton->setEnabled( enable );
-    normalButton->setEnabled( enable );
 }
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
     frameButton->setEnabled( enable );
-}
-
-void AdvControlsWidget::normal()
-{
-    THEMIM->getIM()->normalRate();
 }
 
 void AdvControlsWidget::snapshot()
@@ -304,17 +292,9 @@ void AdvControlsWidget::record(){}
 ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
                              QFrame( NULL ), p_intf( _p_i )
 {
-    //QSize size( 500, 200 );
-    //resize( size );
     controlLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
-
-#if DEBUG_COLOR
-    QPalette palette2;
-    palette2.setColor(this->backgroundRole(), Qt::magenta);
-    setPalette(palette2);
-#endif
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
@@ -327,27 +307,26 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
              THEMIM->getIM(), sliderUpdate( float ) );
 
     /** Slower and faster Buttons **/
-    slowerButton = new QPushButton( "S" );
+    slowerButton = new QPushButton;
     slowerButton->setFlat( true );
-
-    BUTTON_SET_ACT( slowerButton, "S", qtr( "Slower" ), slower() );
-    controlLayout->addWidget( slowerButton, 0, 0 );
     slowerButton->setMaximumSize( QSize( 26, 20 ) );
 
-    fasterButton = new QPushButton( "F" );
-    fasterButton->setFlat( true );
+    BUTTON_SET_ACT( slowerButton, "-", qtr( "Slower" ), slower() );
+    controlLayout->addWidget( slowerButton, 0, 0 );
 
-    BUTTON_SET_ACT( fasterButton, "F", qtr( "Faster" ), faster() );
-    controlLayout->addWidget( fasterButton, 0, 17 );
+    fasterButton = new QPushButton;
+    fasterButton->setFlat( true );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
+
+    BUTTON_SET_ACT( fasterButton, "+", qtr( "Faster" ), faster() );
+    controlLayout->addWidget( fasterButton, 0, 17 );
 
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 
     advControls = new AdvControlsWidget( p_intf );
-    controlLayout->addWidget( advControls, 1, 3, 2, 5, Qt::AlignBottom );
+    controlLayout->addWidget( advControls, 1, 3, 2, 4, Qt::AlignBottom );
     if( !b_advancedVisible ) advControls->hide();
-    // FIXME THIS should be removed.    need_components_update = true;
 
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
@@ -389,6 +368,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     /** TODO
      * Telextext QFrame
+     * Merge with upper menu in a StackLayout
      **/
 
     /** Play Buttons **/
@@ -481,7 +461,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     /** TODO:
      * Change this slider to use a nice Amarok-like one
-     * Add a Context menu to change to the most useful %
      * **/
     /** FIXME
      *  THis percerntage thing has to be handled correctly
@@ -587,7 +566,7 @@ void ControlsWidget::updateOnTimer()
         volumeSlider->setValue( i_volume );
         b_my_volume = false;
     }
- 
+
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
     //enableVideo( THEMIM->getIM()->hasVideo() );
@@ -744,21 +723,16 @@ PlaylistWidget::~PlaylistWidget()
 {
 }
 
-QSize PlaylistWidget::sizeHint() const
-{
-    return widgetSize;
-}
-
 /**********************************************************************
  * Speed control widget
  **********************************************************************/
 SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
                              QFrame( NULL ), p_intf( _p_i )
-{    
+{
     QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
- 
+
     speedSlider = new QSlider;
     speedSlider->setSizePolicy( sizePolicy );
     speedSlider->setMaximumSize( QSize( 80, 200 ) );
@@ -769,16 +743,16 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
     speedSlider->setSingleStep( 10 );
     speedSlider->setPageStep( 20 );
     speedSlider->setTickInterval( 20 );
- 
+
     CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
-    
+
     normalSpeedButton = new QPushButton( "N" );
     normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
     normalSpeedButton->setFlat( true );
     normalSpeedButton->setToolTip( qtr( "Revert to normal play speed" ) );
- 
+
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
- 
+
     QVBoxLayout *speedControlLayout = new QVBoxLayout;
     speedControlLayout->addWidget(speedSlider);
     speedControlLayout->addWidget(normalSpeedButton);
@@ -800,12 +774,12 @@ void SpeedControlWidget::updateControls( int rate )
         //We don't want to change anything if the user is using the slider
         return;
     }
-    
+
     int sliderValue;
     double speed = INPUT_RATE_DEFAULT / (double)rate;
-    
+
     if( rate >= INPUT_RATE_DEFAULT )
-    {        
+    {
         if( speed < RATE_SLIDER_MINIMUM )
         {
             sliderValue = speedSlider->minimum();
@@ -828,7 +802,7 @@ void SpeedControlWidget::updateControls( int rate )
                                         / ( RATE_SLIDER_MAXIMUM - 1.0 ) );
         }
     }
-    
+
     //Block signals to avoid feedback loop
     speedSlider->blockSignals( true );
     speedSlider->setValue( sliderValue );
@@ -838,7 +812,7 @@ void SpeedControlWidget::updateControls( int rate )
 void SpeedControlWidget::updateRate( int sliderValue )
 {
     int rate;
-    
+
     if( sliderValue < 0.0 )
     {
         rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
@@ -850,10 +824,10 @@ void SpeedControlWidget::updateRate( int sliderValue )
                 ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH );
     }
 
-    THEMIM->getIM()->setRate(rate);    
+    THEMIM->getIM()->setRate(rate);
 }
 
 void SpeedControlWidget::resetRate()
 {
-    THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);    
+    THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);
 }

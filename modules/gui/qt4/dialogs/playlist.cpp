@@ -44,8 +44,6 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowTitle( qtr( "Playlist" ) );
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
-    createPlMenuBar( menuBar(), p_intf );
-
     QHBoxLayout *l = new QHBoxLayout( centralWidget() );
     PlaylistWidget *plw = new PlaylistWidget( p_intf );
     l->addWidget( plw );
@@ -57,27 +55,6 @@ PlaylistDialog::~PlaylistDialog()
 {
     writeSettings( "playlist" );
 }
-
-void PlaylistDialog::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
-{
-    QMenu *manageMenu = new QMenu();
-    manageMenu->setTitle( qtr("Manage") );
-    manageMenu->addAction( qtr("Open playlist file"), THEDP,
-            SLOT( openPlaylist() ), qtr( "Ctrl+X") );
-    manageMenu->addSeparator();
-    manageMenu->addAction( qtr("Dock playlist"), this, SLOT( dock() ),
-            qtr( "Ctrl+U" ) );
-    bar->addMenu( manageMenu );
-    bar->addMenu( QVLCMenu::SDMenu( p_intf ) );
-}
-
-void PlaylistDialog::dock()
-{
-    hide();
-    QEvent *event = new QEvent( (QEvent::Type)(PLDockEvent_Type) );
-    QApplication::postEvent( p_intf->p_sys->p_mi, event );
-}
-
 
 void PlaylistDialog::dropEvent(QDropEvent *event)
 {
@@ -103,5 +80,4 @@ void PlaylistDialog::dragLeaveEvent(QDragLeaveEvent *event)
 {
      event->accept();
 }
-
 

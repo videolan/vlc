@@ -78,7 +78,7 @@ protected:
     void dragMoveEvent( QDragMoveEvent * );
     void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
- 
+
     friend class VolumeClickHandler;
 private:
     QSettings           *settings;
@@ -135,6 +135,10 @@ public slots:
     void togglePlaylist();
     void toggleUpdateSystrayMenu();
     void toggleAdvanced();
+
+    /* Manage the Video Functions from the vout threads */
+    void releaseVideoSlot( void * );
+
 private slots:
     void debug();
     void updateOnTimer();
@@ -153,7 +157,9 @@ private slots:
     void updateSystrayTooltipStatus( int );
     void showSpeedMenu( QPoint );
 signals:
-    void askVideoToHide();
+    void askReleaseVideo( void * );
+    void askVideoToToggle();
+    void askBgWidgetToToggle();
 };
 
 #endif

@@ -48,8 +48,6 @@ public:
     }
     virtual ~PlaylistDialog();
 private:
-
-    void createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf );
     PlaylistDialog( intf_thread_t * );
 
     void dropEvent( QDropEvent *);
@@ -58,11 +56,6 @@ private:
     void dragLeaveEvent( QDragLeaveEvent * );
 
     static PlaylistDialog *instance;
-
-    PLSelector *selector;
-    PLPanel *rightPanel;
-private slots:
-    void dock();
 };
 
 
