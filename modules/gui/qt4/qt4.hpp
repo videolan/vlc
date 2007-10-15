@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,8 +94,8 @@ struct intf_sys_t
             else  x->show(); }
 
 static int DialogEvent_Type = QEvent::User + 1;
-static int PLUndockEvent_Type = QEvent::User + 2;
-static int PLDockEvent_Type = QEvent::User + 3;
+//static int PLUndockEvent_Type = QEvent::User + 2;
+//static int PLDockEvent_Type = QEvent::User + 3;
 static int SetVideoOnTopEvent_Type = QEvent::User + 4;
 
 class DialogEvent : public QEvent

@@ -218,28 +218,32 @@ static void Init( intf_thread_t *p_intf )
     int argc = 1;
 
     Q_INIT_RESOURCE( vlc );
+
 #ifndef WIN32
     /* KLUDGE:
-     * disables icon theme use because that makes cleanlook style bug
+     * disables icon theme use because that makes Cleanlooks style bug
+     * because it asks gconf for some settings that timeout because of threads
      * see commits 21610 21622 21654 for reference */
     QApplication::setDesktopSettingsAware(false);
 #endif
+
+    /* Start the QApplication here */
     QApplication *app = new QApplication( argc, argv , true );
     app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
     p_intf->p_sys->p_app = app;
 
-    // Initialize timers
+    // Initialize timers and the Dialog Provider
     DialogsProvider::getInstance( p_intf );
 
-    // Normal interface
+    // Create the normal interface
     if( !p_intf->pf_show_dialog )
     {
         MainInterface *p_mi = new MainInterface( p_intf );
         p_intf->p_sys->p_mi = p_mi;
         p_mi->show();
     }
-
-    if( p_intf->pf_show_dialog )
+    else
+    /*if( p_intf->pf_show_dialog )*/
         vlc_thread_ready( p_intf );
 
     /* Start playing if needed */
@@ -248,10 +252,16 @@ static void Init( intf_thread_t *p_intf )
         playlist_Control( THEPL, PLAYLIST_AUTOPLAY, VLC_FALSE );
     }
 
+    /* Explain to the core how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
+    /* Last settings */
     app->setQuitOnLastWindowClosed( false );
+
+    /* Launch */
     app->exec();
+
+    /* And quit */
     MainInputManager::killInstance();
     DialogsProvider::killInstance();
     delete p_intf->p_sys->p_mi;

@@ -82,7 +82,11 @@ void InputManager::delInput()
 void InputManager::update()
 {
     /// \todo Emit the signals only if it changed
-    if( !p_input ) return;
+    if( !p_input )
+    {
+        emit nameChanged( "" );
+        return;
+    }
 
     if( p_input->b_dead || p_input->b_die )
     {
@@ -101,7 +105,7 @@ void InputManager::update()
     i_time = var_GetTime( p_input, "time") / 1000000;
     f_pos = var_GetFloat( p_input, "position" );
     emit positionUpdated( f_pos, i_time, i_length );
- 
+
     int i_new_rate = var_GetInteger( p_input, "rate");
     if( i_new_rate != i_rate )
     {
@@ -162,6 +166,7 @@ void InputManager::update()
         emit nameChanged( text );
         old_name=text;
     }
+
     /* Update playing status */
     var_Get( p_input, "state", &val );
     val.i_int = val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S;
