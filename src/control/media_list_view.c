@@ -141,7 +141,7 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
  *       libvlc_media_list_view_retain (Public)
  **************************************************************************/
 void
-libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
+libvlc_media_list_view_retain( libvlc_media_list_view_t * p_mlv )
 {
     vlc_mutex_lock( &p_mlv->object_lock );
     p_mlv->i_refcount++;
