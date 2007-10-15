@@ -50,12 +50,11 @@ Cian Duffy <cian at rapturetv.com> - BeOS builds and maintener
 Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
 Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
-Daniel "aLtgLasS" Dreibrodt <daniel d0t dreibrodt at paderborn.com>  - skins, design and help on the forum and the wiki
+Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.5 default skin, skins, design and help on the forum and the wiki
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
 Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements. Meta information core fixes. XSPF playlist support
 Danko Dolch <info at dolchonline d0t net> - Icons and Design for Qt4 Interface
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
-Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.5 default skin
 Daniel Nylander <info @t danielnylander at se> - Swedish translation
 David J LaBarre "DJ" - Forum help, moderation and support
 David Thiel - security audit and report
