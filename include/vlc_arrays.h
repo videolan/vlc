@@ -308,7 +308,7 @@ vlc_array_count( vlc_array_t * p_array )
 }
 
 static inline void *
-vlc_array_object_at_index( vlc_array_t * p_array, int i_index )
+vlc_array_item_at_index( vlc_array_t * p_array, int i_index )
 {
     return p_array->pp_elems[i_index];
 }
