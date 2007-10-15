@@ -193,7 +193,10 @@ while test $# -gt 0; do
     --objcflags)
       echo_objcflags=yes
       ;;
-    --libs)
+    --ldflags)
+      echo_ldflags=yes
+      ;;
+    --libs|-libs)
       echo_libs=yes
       ;;
     -*)
@@ -216,7 +219,7 @@ while test $# -gt 0; do
       ;;
     external)
       echo_external=yes
-      ldflags="${ldflags} -lvlc -lvlc-control"
+      libs="${libs} -lvlc -lvlc-control"
       ;;      
     *)
       module="$1"
@@ -307,6 +310,9 @@ fi
 if test "${echo_objcflags}" = yes; then
   echo "${cppflags} ${objcflags}"
 fi
+if test "${echo_ldflags}" = yes; then
+  echo "${ldflags}"
+fi
 
 # Libs
 # There are 4 possibilities
@@ -328,12 +334,12 @@ if test "${echo_libs}" = yes; then
   fi
   if test "${echo_external}" = yes; then
     for module in `echo "${builtins}"`; do
-      ldflags="${ldflags} @libdir@/vlc/lib${module}.a"
+      libs="${libs} @libdir@/vlc/lib${module}.a"
     done
     for module in `echo "${builtins}"`; do
       register_flags "${module}"
     done
     register_flags "vlc"
   fi
-  echo "${libs} ${ldflags}"
+  echo "${libs}"
 fi

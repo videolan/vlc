@@ -42,9 +42,9 @@ npvlc_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 npvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla` $(CPPFLAGS_mozilla_extra)
 npvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla` $(CPPFLAGS_mozilla_extra)
 npvlc_la_DEPENDENCIES = $(DATA_npvlc_rc) $(LIBRARIES_libvlc)
-npvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version \
+npvlc_la_LDFLAGS = `$(VLC_CONFIG) --ldflags mozilla` -module -avoid-version \
 				   $(LDFLAGS_mozilla_EXTRA)
-npvlc_la_LIBADD = $(LIBRARIES_libvlc)
+npvlc_la_LIBADD = `$(VLC_CONFIG) -libs mozilla` $(LIBRARIES_libvlc)
 
 DATA_npvlc_rc = $(noinst_npvlc_rc_DATA)
 noinst_npvlc_rc_DATA = npvlc_rc.$(OBJEXT)
@@ -78,9 +78,10 @@ npvlc_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 npvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla` $(CPPFLAGS_mozilla_EXTRA)
 npvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla` $(CPPFLAGS_mozilla_EXTRA) 
 npvlc_la_DEPENDENCIES = $(LIBRARIES_libvlc)
-npvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version \
+npvlc_la_LDFLAGS = `$(VLC_CONFIG) --ldflags mozilla` -module -avoid-version \
 				   $(LDFLAGS_mozilla_EXTRA)
-npvlc_la_LIBADD = $(LIBRARIES_libvlc)
+npvlc_la_LIBADD = `$(VLC_CONFIG) -libs mozilla` $(LIBRARIES_libvlc)
+
 
 noinst_DATA = npvlc.rsrc VLC\ Plugin.plugin
 MOSTLYCLEANFILES += npvlc.rsrc
@@ -171,8 +172,8 @@ SOURCES_support = support/npunix.c
 libvlcplugin_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 libvlcplugin_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla`
 libvlcplugin_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla`
-libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version -shrext $(LIBEXT)
-libvlcplugin_la_LIBADD = $(LIBRARIES_libvlc)
+libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --ldflags mozilla` -module -avoid-version -shrext $(LIBEXT)
+libvlcplugin_la_LIBADD = `$(VLC_CONFIG) -libs mozilla` $(LIBRARIES_libvlc)
 
 endif
 endif

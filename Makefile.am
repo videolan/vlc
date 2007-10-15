@@ -248,8 +248,8 @@ nodist_EXTRA_vlc_SOURCES = extras/zsh.cpp src/misc/darwin_specific.m
 
 vlc_DEPENDENCIES = $(DATA_win32_rc)
 
-vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL)
-vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc`
+vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL) `$(VLC_CONFIG) -libs vlc`
+vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
 if !HAVE_PLUGINS
 vlc_LDFLAGS += `$(VLC_CONFIG) --target plugin | sed -e 's/\_plugin /_plugin.la /g'`
 endif

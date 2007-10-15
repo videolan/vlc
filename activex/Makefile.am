@@ -75,8 +75,9 @@ axvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
 axvlc_la_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
 axvlc_la_LDFLAGS = $(srcdir)/axvlc.def -Wl,$(DATA_axvlc_rc) \
     -no-undefined -avoid-version -module \
-    `$(VLC_CONFIG) --libs activex libvlc`
-axvlc_la_LIBADD = $(LIBRARIES_libvlc)
+    `$(VLC_CONFIG) --ldflags activex libvlc`
+axvlc_la_LIBADD = $(LIBRARIES_libvlc) \
+	`$(VLC_CONFIG) -libs activex`
 
 DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
 noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
