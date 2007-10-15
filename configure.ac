@@ -5155,7 +5155,7 @@ AS_IF([test "${enable_qt4}" != "no" &&
       ALIASES="${ALIASES} qvlc"
       enableqt4=true
       VLC_ADD_LIBS([qt4],[$QT4_LIBS])
-      VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR='\"'$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/'\"'])
+      VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR='\\\"'$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/'\\\"'])
       AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
