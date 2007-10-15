@@ -3221,7 +3221,7 @@ then
       AC_CHECK_LIB(faad, NeAACDecOpen, [
         VLC_ADD_PLUGINS([faad])
         VLC_ADD_LIBS([faad],[-lfaad]) ],
-        [ AC_MSG_ERROR([Cannot find libfaad library...]) ]))
+        [ AC_MSG_ERROR([Cannot find libfaad library...]) ],[-lm]))
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
   fi
