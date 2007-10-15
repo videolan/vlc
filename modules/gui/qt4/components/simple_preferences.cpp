@@ -166,7 +166,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     {
         /* Video Panel Implementation */
         START_SPREFS_CAT( Video , qtr("General video settings") );
-           CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
+            CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
             CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
             CONFIG_GENERIC( "overlay", Bool, NULL, overlay );
@@ -195,6 +195,36 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
          /* Audio Panel Implementation */
         START_SPREFS_CAT( Audio, qtr("General audio settings") );
+
+        CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+
+        CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL,
+                 defaultVolume );
+        CONFIG_GENERIC( "audio-language" , String , NULL,
+                    preferredAudioLanguage );
+
+        CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
+        CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
+                    detectionDolby );
+
+         CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
+         CONNECT( control, Updated(), this, AudioDeviceChanged() );
+         QString aout_value = (dynamic_cast<ModuleConfigControl*>(control))->getValue();
+#ifndef WIN32
+         CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel, alsaDevice );
+         alsa_options = control;
+         CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
+                 OSSBrowse );
+         oss_options = control;
+#else
+         CONFIG_GENERIC( "directx-audio-device" , IntegerList, ui.DirectXLabel,
+                 DirectXDevice );
+         directx_options = control;
+#endif
+         CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.FileLabel, FileName,
+                 fileBrowseButton );
+         file_options = control;
+
 #ifdef WIN32
             ui.OSSBrowse->hide();
             ui.OSSDevice->hide();
@@ -205,27 +235,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.DirectXLabel->setVisible( false );
             ui.DirectXDevice->setVisible( false );
 #endif
-         CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
-         CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL,
-                 defaultVolume );
-         CONFIG_GENERIC( "audio-language" , String , NULL,
-                    preferredAudioLanguage );
-
-         CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
-         CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
-                    detectionDolby );
-
-         CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
-#ifndef WIN32
-         CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
-         CONFIG_GENERIC_FILE( "dspdev" , File , NULL, OSSDevice, OSSBrowse );
-#else
-         CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL,
-                 DirectXDevice );
-#endif
-         CONFIG_GENERIC_FILE( "audiofile-file" , File , NULL, FileName,
-                 fileBrowseButton );
+        updateAudioOptions( aout_value );
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
 //         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
@@ -319,6 +330,36 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     panel_layout->addStretch( 2 );
 
     this->setLayout(panel_layout);
+}
+
+void SPrefsPanel::AudioDeviceChanged()
+{
+    ModuleConfigControl *module_config =
+            dynamic_cast<ModuleConfigControl*>( sender() );
+    updateAudioOptions( module_config->getValue() );
+}
+
+void SPrefsPanel::updateAudioOptions( QString value )
+{
+#ifndef WIN32
+    alsa_options->hide();
+    oss_options->hide();
+#else
+    directx_options->hide();
+#endif
+    file_options->hide();
+
+    if( value == "aout_file" )
+        file_options->show();
+#ifndef WIN32
+    else if( value == "alsa" )
+        alsa_options->show();
+    else if( value == "oss" )
+        oss_options->show();
+#else
+    else if( value == "directx" )
+        directx_options->show();
+#endif
 }
 
 void SPrefsPanel::apply()

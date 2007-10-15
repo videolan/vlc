@@ -141,7 +141,7 @@
        </widget>
       </item>
       <item row="4" column="0" >
-       <widget class="QLabel" name="label_7" >
+       <widget class="QLabel" name="FileLabel" >
         <property name="text" >
          <string>_("File")</string>
         </property>
@@ -160,14 +160,14 @@
       <item row="3" column="0" >
        <widget class="QLabel" name="OSSLabel" >
         <property name="text" >
-         <string>_("OSS Device")</string>
+         <string>_("Device")</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="DirectXLabel" >
         <property name="text" >
-         <string>_("DirectX Device")</string>
+         <string>_("Device")</string>
         </property>
        </widget>
       </item>
@@ -177,7 +177,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="alsaLabel" >
         <property name="text" >
-         <string>_("Alsa Device")</string>
+         <string>_("Device")</string>
         </property>
        </widget>
       </item>

@@ -67,6 +67,21 @@ public:
 private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;
+
+/* ConfigControl for audio output options */
+#ifndef WIN32
+    ConfigControl *alsa_options;
+    ConfigControl *oss_options;
+#else
+    ConfigControl *directx_options;
+#endif
+    ConfigControl *file_options;
+
+    void updateAudioOptions( QString );
+
+/* Display only the options for the selected audio output */
+private slots:
+    void AudioDeviceChanged();
 };
 
 #endif

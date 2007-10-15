@@ -27,7 +27,6 @@
  * Todo:
  *  - Finish implementation (see WX)
  *  - Improvements over WX
- *      - Password field implementation (through "pwd" bool param
  *      - Validator for modulelist
  *  - Implement update stuff using a general Updated signal
  */
@@ -232,6 +231,8 @@ void StringConfigControl::finish()
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( text, SIGNAL(textChanged( const QString & )), this,
+             SIGNAL(Updated()) );
 }
 
 /*********** File **************/
@@ -297,6 +298,8 @@ void FileConfigControl::finish()
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( text, SIGNAL(textChanged( const QString & )), this,
+             SIGNAL(Updated()) );
 }
 
 /********* String / Directory **********/
@@ -392,6 +395,8 @@ void StringListConfigControl::finish( bool bycat )
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( combo, SIGNAL(currentIndexChanged( int )), this,
+             SIGNAL(Updated()) );
 }
 
 QString StringListConfigControl::getValue()
@@ -473,6 +478,8 @@ void ModuleConfigControl::finish( bool bycat )
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( combo, SIGNAL(currentIndexChanged( int )), this,
+             SIGNAL(Updated()) );
 }
 
 QString ModuleConfigControl::getValue()
@@ -488,6 +495,8 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 {
     groupBox = new QGroupBox ( qtr(p_item->psz_text) );
     text = new QLineEdit();
+    connect( text, SIGNAL(textChanged( const QString & )), this,
+             SIGNAL(Updated()) );
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
     finish( bycat );
@@ -639,6 +648,7 @@ void ModuleListConfigControl::onUpdate( int value )
             }
         }
     }
+    emit Updated();
 }
 
 /**************************************************************************
@@ -688,6 +698,8 @@ void IntegerConfigControl::finish()
     spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( spin, SIGNAL(valueChanged( int )), this,
+             SIGNAL(Updated()) );
 }
 
 int IntegerConfigControl::getValue()
@@ -785,6 +797,8 @@ void IntegerListConfigControl::finish( bool bycat )
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( combo, SIGNAL(currentIndexChanged( int )), this,
+             SIGNAL(Updated()) );
 }
 
 int IntegerListConfigControl::getValue()
@@ -829,6 +843,8 @@ void BoolConfigControl::finish()
     checkbox->setCheckState( p_item->value.i == VLC_TRUE ? Qt::Checked
                                                         : Qt::Unchecked );
     checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( checkbox, SIGNAL(stateChanged( int )), this,
+             SIGNAL(Updated()) );
 }
 
 int BoolConfigControl::getValue()
@@ -886,6 +902,8 @@ void FloatConfigControl::finish()
     spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    connect( spin, SIGNAL(valueChanged( double )), this,
+             SIGNAL(Updated()) );
 }
 
 float FloatConfigControl::getValue()
