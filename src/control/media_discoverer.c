@@ -24,7 +24,7 @@
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 #include <assert.h>
-#include "vlc_playlist.h"
+#include "vlc_services_discovery.h"
 
 /*
  * Private functions

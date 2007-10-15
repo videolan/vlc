@@ -1,0 +1,139 @@
+/*****************************************************************************
+ * flat_media_list_view.c: libvlc flat media list view functions.
+ *****************************************************************************
+ * Copyright (C) 2007 the VideoLAN team
+ * $Id: flat_media_list.c 21287 2007-08-20 01:28:12Z pdherbemont $
+ *
+ * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#include "libvlc_internal.h"
+#include <vlc/libvlc.h>
+#include <assert.h>
+#include "vlc_arrays.h"
+
+//#define DEBUG_FLAT_VIEW
+
+#ifdef DEBUG_FLAT_VIEW
+# define trace( fmt, ... ) printf( "%s(): " fmt, __FUNCTION__, ##__VA_ARGS__ )
+#else
+# define trace( ... )
+#endif
+
+struct libvlc_media_list_view_private_t
+{
+    vlc_array_t array;
+};
+
+/*
+ * Private functions
+ */
+static void add_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md );
+static void remove_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md );
+static void flat_media_list_view_release( libvlc_media_list_view_t * p_mlv );
+
+
+/**************************************************************************
+ *       add_item (private)
+ **************************************************************************/
+static void
+add_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md )
+{
+    trace( "p_md '%s'\n", p_md->p_input_item->psz_name );
+    libvlc_media_descriptor_retain( p_md );
+    vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
+}
+
+/**************************************************************************
+ *       remove_item (private)
+ **************************************************************************/
+static void
+remove_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md )
+{
+    trace( "p_md '%s'\n", p_md->p_input_item->psz_name );
+    int index = libvlc_media_list_index_of_item( p_mlv, p_md, NULL );
+    if( index < 0 )
+        return;
+
+    libvlc_media_descriptor_release( p_md );
+    vlc_array_remove( &p_mlv->p_this_view_data->array, index );
+}
+
+/**************************************************************************
+ *       flat_media_list_view_count  (private)
+ * (called by media_list_view_count)
+ **************************************************************************/
+static int
+flat_media_list_view_count( libvlc_media_list_view_t * p_mlv,
+                            libvlc_exception_t * p_e )
+{
+    (void)p_e;
+    return vlc_array_count( &p_mlv->p_this_view_data->array );
+}
+
+/**************************************************************************
+ *       flat_media_list_view_item_at_index  (private)
+ * (called by flat_media_list_view_item_at_index)
+ **************************************************************************/
+static libvlc_media_descriptor_t *
+flat_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
+                                    int index,
+                                    libvlc_exception_t * p_e )
+{
+    libvlc_media_descriptor_t * p_md;
+    (void)p_e;
+    p_md = vlc_array_item_at_index( &p_mlv->p_this_view_data->array, index );
+    libvlc_media_descriptor_retain( p_md );
+    return p_md;
+}
+
+/**************************************************************************
+ *       flat_media_list_view_release (private)
+ * (called by media_list_view_release)
+ **************************************************************************/
+static void
+flat_media_list_view_release( libvlc_media_list_view_t * p_mlv )
+{
+    vlc_array_clear( &p_mlv->p_this_view_data->array );
+    free( p_mlv->p_this_view_data );
+}
+
+/*
+ * Public libvlc functions
+ */
+
+/**************************************************************************
+ *       libvlc_media_list_flat_view (Public)
+ **************************************************************************/
+libvlc_media_list_view_t *
+libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
+                             libvlc_exception_t * p_e )
+{
+    trace("\n");
+    libvlc_media_list_view_t * p_mlv;
+    libvlc_media_list_lock( p_mlist );
+    struct libvlc_media_list_view_private_t * p_this_view_data;
+    p_this_view_data = malloc(sizeof(struct libvlc_media_list_view_private_t));
+    vlc_array_init( &p_this_view_data->array );
+    p_mlv = libvlc_media_list_view_new( p_mlist,
+                                        flat_media_list_view_count,
+                                        flat_media_list_view_item_at_index,
+                                        flat_media_list_view_release,
+                                        p_this_view_data,
+                                        p_e );
+    return p_mlv;
+}

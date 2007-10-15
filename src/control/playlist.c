@@ -21,11 +21,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 #include <vlc_playlist.h>
 
 #include <assert.h>
+
+#include "libvlc_internal.h"
 
 #include "../playlist/playlist_internal.h"
 
