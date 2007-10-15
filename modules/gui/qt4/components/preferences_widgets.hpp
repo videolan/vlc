@@ -117,8 +117,8 @@ public:
                           QLabel*, QSlider* );
     virtual ~IntegerConfigControl() {};
     virtual int getValue();
-    virtual void show() { spin->show(); label->show(); }
-    virtual void hide() { spin->hide(); label->hide(); }
+    virtual void show() { spin->show(); if( label ) label->show(); }
+    virtual void hide() { spin->hide(); if( label ) label->hide(); }
 
 protected:
     QSpinBox *spin;
@@ -161,8 +161,8 @@ public:
                               QComboBox*, bool );
     virtual ~IntegerListConfigControl() {};
     virtual int getValue();
-    virtual void hide() { combo->hide(); label->hide(); }
-    virtual void show() { combo->show(); label->show(); }
+    virtual void hide() { combo->hide(); if( label ) label->hide(); }
+    virtual void show() { combo->show(); if( label ) label->show(); }
 private:
     void finish( bool );
     QLabel *label;
@@ -211,8 +211,8 @@ public:
                         QLabel*, QDoubleSpinBox* );
     virtual ~FloatConfigControl() {};
     virtual float getValue();
-    virtual void show() { spin->show(); label->show(); }
-    virtual void hide() { spin->hide(); label->hide(); }
+    virtual void show() { spin->show(); if( label ) label->show(); }
+    virtual void hide() { spin->hide(); if( label ) label->hide(); }
 
 protected:
     QDoubleSpinBox *spin;
@@ -260,8 +260,8 @@ public:
                          QLineEdit*,  bool pwd );
     virtual ~StringConfigControl() {};
     virtual QString getValue() { return text->text(); };
-    virtual void show() { text->show(); label->show(); }
-    virtual void hide() { text->hide(); label->hide(); }
+    virtual void show() { text->show(); if( label ) label->show(); }
+    virtual void hide() { text->hide(); if( label ) label->hide(); }
 private:
     void finish();
     QLineEdit *text;
@@ -278,8 +278,8 @@ public:
                        QLineEdit *, QPushButton *, bool pwd );
     virtual ~FileConfigControl() {};
     virtual QString getValue() { return text->text(); };
-    virtual void show() { text->show(); label->show(); browse->show(); }
-    virtual void hide() { text->hide(); label->hide(); browse->hide(); }
+    virtual void show() { text->show(); if( label ) label->show(); browse->show(); }
+    virtual void hide() { text->hide(); if( label ) label->hide(); browse->hide(); }
 public slots:
     virtual void updateField();
 protected:
@@ -324,8 +324,8 @@ public:
                          QComboBox*, bool );
     virtual ~ModuleConfigControl() {};
     virtual QString getValue();
-    virtual void hide() { combo->hide(); label->hide(); }
-    virtual void show() { combo->show(); label->show(); }
+    virtual void hide() { combo->hide(); if( label ) label->hide(); }
+    virtual void show() { combo->show(); if( label ) label->show(); }
 private:
     void finish( bool );
     QLabel *label;
@@ -367,8 +367,8 @@ public:
                              QComboBox*, bool );
     virtual ~StringListConfigControl() {};
     virtual QString getValue();
-    virtual void hide() { combo->hide(); label->hide(); }
-    virtual void show() { combo->show(); label->show(); }
+    virtual void hide() { if( combo ) combo->hide(); if( label ) label->hide(); }
+    virtual void show() { if( combo ) combo->show(); if( label ) label->show(); }
 private:
     void finish( bool );
     QLabel *label;
@@ -422,8 +422,8 @@ public:
                         QGridLayout*, int& );
     virtual int getType() { return 4; }
     virtual ~KeySelectorControl() {};
-    virtual void hide() { table->hide(); label->hide(); }
-    virtual void show() { table->show(); label->show(); }
+    virtual void hide() { table->hide(); if( label ) label->hide(); }
+    virtual void show() { table->show(); if( label ) label->show(); }
     void doApply();
 private:
     void finish();
