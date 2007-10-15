@@ -268,8 +268,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( !b_cached )
         goto error;
 
-    if( (p_sys->i_wanted_page == p_sys->i_last_page) &&
-         (p_sys->b_update != VLC_TRUE) )
+    if( ( p_sys->i_wanted_page == p_sys->i_last_page ) &&
+        ( p_sys->b_update != VLC_TRUE ) )
         goto error;
 
     p_sys->i_last_page = p_sys->i_wanted_page;
@@ -308,9 +308,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_region->i_align = SUBPICTURE_ALIGN_TOP;
 
     /* Normal text subs, easy markup */
-    p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
+    p_spu->i_flags = SUBPICTURE_ALIGN_TOP;
 
     p_spu->i_start = (mtime_t) p_block->i_pts;
+    //msg_Dbg( p_dec, "spu start "I64Fd" pts "I64Fd, p_spu->i_start, p_block->i_pts );
     p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
