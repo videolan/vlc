@@ -515,6 +515,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
                            "0", video, "" );
     CREATE_AND_ADD_TO_CAT( vlost_frames_stat, qtr("Lost frames"),
                            "0", video, "" );
+    CREATE_AND_ADD_TO_CAT( vfps_stat, qtr("FPS"), "0", video, "" );
 
     CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent packets"), "0", streaming, "" );
     CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent bytes"),
@@ -566,6 +567,8 @@ void InputStatsPanel::update( input_item_t *p_item )
     UPDATE( vdecoded_stat, "%5i", p_item->p_stats->i_decoded_video );
     UPDATE( vdisplayed_stat, "%5i", p_item->p_stats->i_displayed_pictures );
     UPDATE( vlost_frames_stat, "%5i", p_item->p_stats->i_lost_pictures );
+/*  UPDATE( vfps_stat, "%5f", p_item->p_stats->i_lost_pictures );
+input_Control( p_input_thread, INPUT_GET_VIDEO_FPS, &f_fps */
 
     /* Sout */
     UPDATE( send_stat, "%5i", p_item->p_stats->i_sent_packets );

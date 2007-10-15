@@ -128,6 +128,7 @@ private:
     QTreeWidgetItem *vdecoded_stat;
     QTreeWidgetItem *vdisplayed_stat;
     QTreeWidgetItem *vlost_frames_stat;
+    QTreeWidgetItem *vfps_stat;
 
     QTreeWidgetItem *streaming;
     QTreeWidgetItem *send_stat;
