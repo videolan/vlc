@@ -19,7 +19,7 @@ lib_LTLIBRARIES = libjvlc.la
 
 if HAVE_WIN32
 DATA_noinst_libjvlc = jvlc$(LIBEXT) libjvlc$(LIBEXT).a
-LIBRARIES_libvlc = $(top_builddir)/src/.libs/libvlc.dll.a $(abs_top_srcdir)/src/.libs/libvlc-control.dll.a
+LIBRARIES_libvlc = $(top_builddir)/src/.libs/libvlc.dll.a $(top_builddir)/src/.libs/libvlc-control.dll.a
 LDFLAGS_jvlc = `$(VLC_CONFIG) --libs libvlc`
 libjvlc_DATA = libjvlc.def libjvlc.dll.a jvlc$(LIBEXT) 
 
