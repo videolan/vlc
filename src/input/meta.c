@@ -165,7 +165,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     input_FindArtInCache( p_playlist, p_item );
 
     char *psz_arturl = input_item_GetArtURL( p_item );
-    if( !EMPTY_STR( psz_arturl ) )
+    if( !strncmp( psz_arturl, "file://", strlen( "file://" ) ) )
     {
         free( psz_arturl );
         return 0; /* Art is in cache, no need to go further */
@@ -542,7 +542,10 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
 
     /* Check if we already dumped it */
     if( !utf8_stat( psz_filename+7, &s ) )
+    {
+        vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_filename );
         return;
+    }
 
     f = utf8_fopen( psz_filename+7, "w" );
     if( f )

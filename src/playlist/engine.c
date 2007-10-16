@@ -534,7 +534,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             }
             /* We already have all needed meta, but we need art right now */
             else if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
-                     EMPTY_STR( psz_arturl ) )
+                     strncmp( psz_arturl, "file://", strlen("file://") ) )
             {
                 preparse_item_t p;
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
