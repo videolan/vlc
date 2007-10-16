@@ -403,7 +403,7 @@ void MainInterface::calculateInterfaceSize()
         width  = PREF_W - addSize.width();
         height = PREF_H - addSize.height();
     }
-    if( !dockPL->isFloating() )
+    if( !dockPL->isFloating() && dockPL->widget() )
     {
         width  += dockPL->widget()->width();
         height += dockPL->widget()->height();
