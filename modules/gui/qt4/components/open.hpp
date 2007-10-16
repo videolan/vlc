@@ -103,10 +103,10 @@ private:
     QStringList browse( QString );
     FileOpenBox *dialogBox;
     QLineEdit *lineFileEdit;
+    QStringList fileCompleteList ;
 public slots:
     virtual void updateMRL();
 private slots:
-    void browseFile();
     void browseFileSub();
     void toggleSubtitleFrame();
 };

@@ -38,6 +38,7 @@
 #include <QStackedLayout>
 #include <QListView>
 #include <QCompleter>
+#include <QDirModel>
 
 /**************************************************************************
  * Open Files and subtitles                                               *
@@ -48,6 +49,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Classic UI Setup */
     ui.setupUi( this );
 
+    /** BEGIN QFileDialog tweaking **/
     /* Use a QFileDialog and customize it because we don't want to
        rewrite it all. Be careful to your eyes cause there are a few hacks.
        Be very careful and test correctly when you modify this. */
@@ -61,20 +63,19 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace( QString(";*"), QString(" *"));
 
+    /* retrieve last known path used in file browsing */
+    char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
+    if( EMPTY_STR( psz_filepath ) )
+    {
+        psz_filepath = p_intf->p_libvlc->psz_homedir;
+    }
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-            qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
+            qfu( psz_filepath ), fileTypes );
+    delete psz_filepath;
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
-
-    /* retrieve last known path used in file browsing */
-    char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
-    if( psz_filepath )
-    {
-        dialogBox->setDirectory( qfu( psz_filepath ) );
-        delete psz_filepath;
-    }
 
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
@@ -82,39 +83,40 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Add a tooltip */
     dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
 
-    // Add it to the layout
-    ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
-
     // But hide the two OK/Cancel buttons. Enable them for debug.
     QDialogButtonBox *fileDialogAcceptBox =
-                                        findChildren<QDialogButtonBox*>()[0];
+                      dialogBox->findChildren<QDialogButtonBox*>()[0];
     fileDialogAcceptBox->hide();
 
     /* Ugly hacks to get the good Widget */
     //This lineEdit is the normal line in the fileDialog.
 #if HAS_QT43
-    lineFileEdit = findChildren<QLineEdit*>()[2];
+    lineFileEdit = dialogBox->findChildren<QLineEdit*>()[0];
 #else
-    lineFileEdit = findChildren<QLineEdit*>()[3];
+    // FIXME
+    lineFileEdit = dialogBox->findChildren<QLineEdit*>()[1];
 #endif
 
-    QStringList fileCompleteList ;
-    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
-
-    lineFileEdit->setCompleter( fileCompleter );
-
-//    lineFileEdit->hide();
-
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
-    QList<QLabel *> listLabel = findChildren<QLabel*>();
+    QList<QLabel *> listLabel = dialogBox->findChildren<QLabel*>();
 
     /* Hide the FileNames one. Enable it for debug */
-    listLabel[4]->hide();
+    listLabel[1]->setText( qtr( "File names:" ) );
     /* Change the text that was uncool in the usual box */
-    listLabel[5]->setText( qtr( "Filter:" ) );
+    listLabel[2]->setText( qtr( "Filter:" ) );
 
+    dialogBox->layout()->setMargin( 0 );
+    dialogBox->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 
-    QListView *fileListView = findChildren<QListView*>().first();
+    /** END of QFileDialog tweaking **/
+
+    // Add the DialogBox to the layout
+    ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
+
+    //TODO later: fill the fileCompleteList with previous items played.
+    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
+    fileCompleter->setModel( new QDirModel( fileCompleter ) );
+    lineFileEdit->setCompleter( fileCompleter );
 
     // Hide the subtitles control by default.
     ui.subFrame->hide();
@@ -130,18 +132,13 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
 
-#if QT43
-    CONNECT( fileListView, clicked( QModelIndex ), this, updateMRL() );
-#else
-    CONNECT( ui.fileInput, editTextChanged( QString ), this, updateMRL() );
-#endif
-    CONNECT( ui.subInput, editTextChanged( QString ), this, updateMRL() );
+    CONNECT( lineFileEdit, textChanged( QString ), this, updateMRL() );
+
+    CONNECT( ui.subInput, textChanged( QString ), this, updateMRL() );
     CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this,
                                                             updateMRL() );
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this,
                                                             updateMRL() );
-
-    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile() );
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -152,15 +149,6 @@ QStringList FileOpenPanel::browse( QString help )
     return THEDP->showSimpleOpen( help );
 }
 
-void FileOpenPanel::browseFile()
-{
-    QString fileString = "";
-    foreach( QString file, dialogBox->selectedFiles() ) {
-         fileString += "\"" + file + "\" ";
-    }
-    ui.fileInput->setEditText( fileString );
-    updateMRL();
-}
 
 void FileOpenPanel::browseFileSub()
 {
@@ -169,17 +157,19 @@ void FileOpenPanel::browseFileSub()
                             EXT_FILTER_SUBTITLE,
                             dialogBox->directory().absolutePath() );
     if( files.isEmpty() ) return;
-    ui.subInput->setEditText( files.join(" ") );
+    ui.subInput->setText( files.join(" ") );
     updateMRL();
 }
 
 void FileOpenPanel::updateMRL()
 {
-    msg_Dbg( p_intf, "I was here" );
-    QString mrl = ui.fileInput->currentText();
+    QString mrl = "";
+    foreach( QString file, dialogBox->selectedFiles() ) {
+         mrl += "\"" + file + "\" ";
+    }
 
     if( ui.subCheckBox->isChecked() ) {
-        mrl.append( " :sub-file=" + ui.subInput->currentText() );
+        mrl.append( " :sub-file=" + ui.subInput->text() );
         int align = ui.alignSubComboBox->itemData(
                     ui.alignSubComboBox->currentIndex() ).toInt();
         mrl.append( " :subsdec-align=" + QString().setNum( align ) );
@@ -206,8 +196,7 @@ void FileOpenPanel::updateMRL()
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
-    ui.fileInput->addItem( ui.fileInput->currentText());
-    if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem( 0 );
+    //FIXME set the completer
 }
 
 void FileOpenBox::accept()
@@ -218,22 +207,13 @@ void FileOpenBox::accept()
 /* Function called by Open Dialog when clicked on cancel */
 void FileOpenPanel::clear()
 {
-    ui.fileInput->setEditText( "" );
-    ui.subInput->setEditText( "" );
+    lineFileEdit->clear();
+    ui.subInput->clear();
 }
 
 void FileOpenPanel::toggleSubtitleFrame()
 {
-    if ( ui.subFrame->isVisible() )
-    {
-        ui.subFrame->hide();
-        updateGeometry();
-    /* FiXME Size */
-    }
-    else
-    {
-        ui.subFrame->show();
-    }
+    TOGGLEV( ui.subFrame );
 
     /* Update the MRL */
     updateMRL();
@@ -536,6 +516,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     v4lFreq->setSuffix(" kHz");
     setSpinBoxFreq( v4lFreq );
     v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
+    v4lPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            2, 0, 2, 1 );
 
     /* v4l CONNECTs */
     CuMRL( v4lVideoDevice, textChanged( QString ) );
@@ -568,6 +550,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     v4l2StdBox = new QComboBox;
     setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
     v4l2PropLayout->addWidget( v4l2StdBox, 0 , 1 );
+    v4l2PropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            1, 0, 3, 1 );
 
     /* v4l2 CONNECTs */
     CuMRL( v4l2VideoDevice, textChanged( QString ) );
@@ -669,6 +653,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrBitr->setSuffix(" kHz");
     setSpinBoxFreq( pvrBitr );
     pvrPropLayout->addWidget( pvrBitr, 2, 1 );
+    pvrPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            3, 0, 1, 1 );
 
     /* PVR CONNECTs */
     CuMRL( pvrDevice, textChanged( QString ) );
@@ -716,6 +702,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     QLineEdit *dshowVSizeLine = new QLineEdit;
     dshowPropLayout->addWidget( dshowVSizeLine, 0, 1);
+    dshowPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            1, 0, 3, 1 );
 
     /* dshow CONNECTs */
     CuMRL( dshowVDevice, currentIndexChanged ( int ) );
@@ -770,6 +758,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     bdaBandLabel->hide();
     bdaBandBox->hide();
+    bdaPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            2, 0, 2, 1 );
 
     /* bda CONNECTs */
     CuMRL( bdaFreq, valueChanged ( int ) );
@@ -827,6 +817,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbSrate->setSuffix(" kHz");
     setSpinBoxFreq( dvbSrate );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
+    dvbPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            2, 0, 2, 1 );
 
     /* DVB CONNECTs */
     CuMRL( dvbCard, valueChanged ( int ) );

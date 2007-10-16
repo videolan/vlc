@@ -20,29 +20,6 @@
    <string>_("Open File")</string>
   </property>
   <layout class="QGridLayout" >
-   <item row="1" column="1" colspan="2" >
-    <widget class="QComboBox" name="fileInput" >
-     <property name="editable" >
-      <bool>true</bool>
-     </property>
-     <property name="maxVisibleItems" >
-      <number>7</number>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="fileLabel" >
-     <property name="maximumSize" >
-      <size>
-       <width>85</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text" >
-      <string>_("File Names:")</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="3" >
     <widget class="QWidget" native="1" name="tempWidget" >
      <property name="toolTip" >
@@ -88,19 +65,6 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <layout class="QGridLayout" >
-      <item row="1" column="7" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>16</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="0" >
        <spacer>
         <property name="orientation" >
@@ -114,47 +78,18 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="5" colspan="2" >
-       <widget class="QComboBox" name="alignSubComboBox" >
-        <property name="minimumSize" >
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
+      <item row="1" column="1" >
+       <widget class="QLabel" name="sizeSubLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="currentIndex" >
-         <number>-1</number>
-        </property>
-        <property name="insertPolicy" >
-         <enum>QComboBox::NoInsert</enum>
-        </property>
-        <property name="minimumContentsLength" >
-         <number>0</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4" >
-       <widget class="QLabel" name="alignSubLabel" >
         <property name="text" >
-         <string>_("Alignment:")</string>
-        </property>
-        <property name="buddy" >
-         <cstring>alignSubLabel</cstring>
+         <string>_("Size:")</string>
         </property>
        </widget>
-      </item>
-      <item row="1" column="3" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>71</width>
-          <height>26</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item row="1" column="2" >
        <widget class="QComboBox" name="sizeSubComboBox" >
@@ -166,22 +101,79 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="sizeSubLabel" >
+      <item row="1" column="3" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>30</width>
+          <height>26</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="4" >
+       <widget class="QLabel" name="alignSubLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text" >
-         <string>_("Size:")</string>
+         <string>_("Alignment:")</string>
         </property>
        </widget>
       </item>
+      <item row="1" column="5" >
+       <widget class="QComboBox" name="alignSubComboBox" >
+        <property name="minimumSize" >
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6" colspan="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>16</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="0" column="0" colspan="6" >
-       <widget class="QComboBox" name="subInput" >
-        <property name="editable" >
-         <bool>true</bool>
+       <widget class="QLineEdit" name="subInput" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
       <item row="0" column="6" colspan="2" >
        <widget class="QPushButton" name="subBrowseButton" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="toolTip" >
          <string>_("Select the subtitle file")</string>
         </property>
@@ -211,9 +203,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="0" margin="0" />
  <tabstops>
-  <tabstop>fileInput</tabstop>
   <tabstop>subCheckBox</tabstop>
   <tabstop>subInput</tabstop>
   <tabstop>subBrowseButton</tabstop>
