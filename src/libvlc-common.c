@@ -818,7 +818,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     }
     else if( psz_control && *psz_control )
     {
-        if( psz_modules ) free( psz_modules );
+        free( psz_modules );
         psz_modules = strdup( psz_control );
     }
 
@@ -841,10 +841,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             free( psz_temp );
         }
     }
-    if ( psz_modules )
-    {
-        free( psz_modules );
-    }
+    free( psz_modules );
+    free( psz_control );
 
     /*
      * Always load the hotkeys interface if it exists
