@@ -108,7 +108,7 @@ dnl kludge because only the debian package provides a ffmpeg-config
        with_live555_tree=${topdir}/extras/contrib/src/live
     fi
     if test -z $with_goom_tree; then
-      with_goom_tree=${topdir}/extras/contrib/src/goom
+       with_goom_tree=${topdir}/extras/contrib/src/goom
     fi
     if test -z $with_mozilla_sdk_path; then
        with_mozilla_sdk_path=${topdir}/extras/contrib/gecko-sdk
@@ -117,7 +117,10 @@ dnl kludge because only the debian package provides a ffmpeg-config
        with_cyberlink_tree=${topdir}/extras/contrib/src/clinkcc
     fi
     if test -z $with_libmpeg2_tree; then
-	with_libmpeg2_tree=${topdir}/extras/contrib/src/mpeg2dec
+       with_libmpeg2_tree=${topdir}/extras/contrib/src/mpeg2dec
+    fi
+    if test -z $with_a52_tree; then
+       with_a52_tree=${topdir}/extras/contrib/src/a52dec
     fi
 
     if test ".`uname -s`" = ".Darwin"; then
@@ -2954,7 +2957,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      fi])
 
  AC_ARG_WITH(ffmpeg-a52,
-   [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libamrnb support],
+   [    --with-ffmpeg-a52 specify if ffmpeg has been compiled with liba52 support],
    [
      if test "$with_ffmpeg_a52" = "yes";	then
      	VLC_ADD_LIBS([ffmpeg],[-la52])
@@ -3359,7 +3362,7 @@ then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([a52tofloat32],[-I${real_a52_tree}])
       VLC_ADD_LIBS([a52tofloat32],[-L${real_a52_tree}/liba52/.libs])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_a52tofloat32}"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_a52tofloat32} -lm"
       AC_CHECK_LIB(a52, a52_free, [
         VLC_ADD_BUILTINS([a52tofloat32])
         VLC_ADD_CPPFLAGS([a52tofloat32],[-DUSE_A52DEC_TREE])
@@ -3367,7 +3370,7 @@ then
         ],[
         if test -f ${real_a52_tree}/liba52/.libs/liba52.a
         then
-          AC_MSG_ERROR([make sure you have at least a52dec-0.7.3])
+          AC_MSG_ERROR([make sure you have at least a52dec-0.7.3 ($real_a52_tree)])
         else
           AC_MSG_ERROR([the specified tree hasn't been compiled])
         fi
