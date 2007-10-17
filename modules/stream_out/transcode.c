@@ -1679,6 +1679,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     id->p_decoder->fmt_out.i_extra = 0;
     id->p_decoder->fmt_out.p_extra = 0;
     id->p_decoder->pf_decode_video = 0;
+    id->p_decoder->pf_get_cc = 0;
     id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
     id->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
     id->p_decoder->pf_picture_link    = video_link_picture_decoder;

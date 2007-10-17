@@ -259,6 +259,9 @@ void stream_AccessUpdate( stream_t *s );
 /* decoder.c */
 void       input_DecoderDiscontinuity( decoder_t * p_dec, vlc_bool_t b_flush );
 vlc_bool_t input_DecoderEmpty( decoder_t * p_dec );
+int        input_DecoderSetCcState( decoder_t *, vlc_bool_t b_decode, int i_channel );
+int        input_DecoderGetCcState( decoder_t *, vlc_bool_t *pb_decode, int i_channel );
+void       input_DecoderIsCcPresent( decoder_t *, vlc_bool_t pb_present[4] );
 
 /* es_out.c */
 es_out_t  *input_EsOutNew( input_thread_t * );

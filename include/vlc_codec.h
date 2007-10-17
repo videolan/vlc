@@ -71,10 +71,19 @@ struct decoder_t
     /* Tell the decoder if it is allowed to drop frames */
     vlc_bool_t          b_pace_control;
 
+    /* */
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
     aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
     subpicture_t *      ( * pf_decode_sub)   ( decoder_t *, block_t ** );
     block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
+
+    /* Closed Caption (CEA 608/708) extraction.
+     * If set, it *may* be called after pf_decode_video/pf_packetize
+     * returned data. It should return CC for the pictures returned by the
+     * last pf_packetize/pf_decode_video call only,
+     * pb_present will be used to known which cc channel are present (but
+     * globaly, not necessary for the current packet */
+    block_t *           ( * pf_get_cc )      ( decoder_t *, vlc_bool_t pb_present[4] );
 
     /*
      * Buffers allocation
