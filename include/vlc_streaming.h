@@ -121,14 +121,20 @@ enum { I_VB, I_AB, I_CHANNELS, F_SCALE, B_SOVERLAY, PSZ_VC, PSZ_AC, PSZ_SC,
        PSZ_VE, PSZ_AE };
 struct sout_transcode_t
 {
-    int i_vb, i_ab, i_channels;
+    int32_t i_vb;
+    int32_t i_ab;
+    int32_t i_channels;
     float f_scale;
     vlc_bool_t b_soverlay;
     char *psz_vcodec;
-    char *psz_acodec, *psz_scodec, *psz_venc, *psz_aenc;
+    char *psz_acodec;
+    char *psz_scodec;
+    char *psz_venc;
+    char *psz_aenc;
     char *psz_additional;
 
-    int i_params; sout_param_t **pp_params;
+    int32_t i_params;
+    sout_param_t **pp_params;
 };
 void streaming_TranscodeParametersApply( sout_transcode_t *p_module );
 
@@ -136,9 +142,13 @@ void streaming_TranscodeParametersApply( sout_transcode_t *p_module );
 enum { PSZ_MUX, PSZ_ACCESS, PSZ_URL, PSZ_NAME, PSZ_GROUP };
 struct sout_std_t
 {
-    char *psz_mux, *psz_access;
-    char *psz_url, *psz_name, *psz_group;
-    int i_params; sout_param_t **pp_params;
+    char *psz_mux;
+    char *psz_access;
+    char *psz_url;
+    char *psz_name;
+    char *psz_group;
+    int i_params;
+    sout_param_t **pp_params;
 };
 void streaming_StdParametersApply( sout_std_t *p_module );
 
@@ -150,7 +160,8 @@ struct sout_display_t
 /* Duplicate */
 struct sout_duplicate_t
 {
-    int i_children, i_conditions;
+    int i_children;
+    int i_conditions;
     sout_chain_t **pp_children;
     char **ppsz_conditions;
 };
@@ -201,27 +212,63 @@ struct streaming_profile_t
     sout_chain_t *p_chain;
 };
 
+/** struct for holding account information needed to access the services */
+struct streaming_account_t
+{
+    char *psz_username; /*< username of account */
+    char *psz_password; /*< password of account */
+};
+
 /**************** GUI interaction *****************/
+/** struct to hold user interface information */
 struct sout_gui_descr_t
 {
-    /* Access */
-    vlc_bool_t b_local, b_file, b_http, b_mms, b_rtp, b_udp, b_dump;
-    char *psz_file, *psz_http, *psz_mms, *psz_rtp, *psz_udp;
-    int i_http, i_mms, i_rtp, i_udp;
+    /* Access types */
+    vlc_bool_t b_local;   /*< local access module */
+    vlc_bool_t b_file;    /*< file access module */
+    vlc_bool_t b_http;    /*< http access module */
+    vlc_bool_t b_mms;     /*< mms access module */
+    vlc_bool_t b_rtp;     /*< rtp access module */
+    vlc_bool_t b_udp;     /*< udp access module */
+    vlc_bool_t b_dump;    /*< dump access module */
+    vlc_bool_t b_icecast; /*< icecast access module */
+
+    char *psz_file;     /*< filename */
+    char *psz_http;     /*< HTTP servername or ipaddress */
+    char *psz_mms;      /*< MMS servername or ipaddress */
+    char *psz_rtp;      /*< RTP servername or ipaddress */
+    char *psz_udp;      /*< UDP servername or ipaddress */
+    char *psz_icecast;  /*< Icecast servername or ipaddress*/
+
+    int32_t i_http;     /*< http port number */
+    int32_t i_mms;      /*< mms port number */
+    int32_t i_rtp;      /*< rtp port number */
+    int32_t i_udp;      /*< udp port number */
+    int32_t i_icecast;  /*< icecast port number */
 
     /* Mux */
-    char *psz_mux;
+    char *psz_mux;      /*< name of muxer to use in streaming */
 
     /* Transcode */
-    vlc_bool_t b_soverlay;
-    char *psz_vcodec, *psz_acodec, *psz_scodec;
-    int i_vb, i_ab, i_channels;
-    float f_scale;
+    vlc_bool_t b_soverlay; /*< enable burning overlay in the video */
+    char *psz_vcodec;   /*< video codec to use in transcoding */
+    char *psz_acodec;   /*< audio codec to use in transcoding */
+    char *psz_scodec;   /*< subtitle codec to use in transcoding */
+    int32_t i_vb;       /*< video bitrate to use in transcoding */
+    int32_t i_ab;       /*< audio bitrate to use in transcoding */
+    int32_t i_channels; /*< number of audio channels to use in transcoding */
+    float f_scale;      /*< scaling factor to use in transcoding */
 
     /* Misc */
-    vlc_bool_t b_sap, b_all_es;
-    char *psz_group, *psz_name;
-    int i_ttl;
+    vlc_bool_t b_sap;   /*< send SAP announcement */
+    vlc_bool_t b_all_es;/*< send all elementary streams from source stream */
+    char *psz_group;    /*< SAP Group name */
+    char *psz_name;     /*< SAP name */
+    int32_t i_ttl;      /*< Time To Live (TTL) for network traversal */
+
+    /* Icecast */
+    char *psz_mountpoint;/*< path to Icecast mountpoint */
+    struct streaming_account_t sa_icecast;  /*< Icecast account information */
 };
 
 VLC_EXPORT(void, streaming_GuiDescToChain,(vlc_object_t*, sout_chain_t*, sout_gui_descr_t*));

@@ -264,15 +264,15 @@ void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
     { \
         pd->b_file = VLC_TRUE; pd->psz_file = strdup( STDM->psz_url ); \
     } \
-    else if(  !strcmp( STDM->psz_access, "http" ) )\
+    else if( !strcmp( STDM->psz_access, "http" ) )\
     { \
         pd->b_http = VLC_TRUE; pd->psz_http = strdup( STDM->psz_url ); \
     } \
-    else if(  !strcmp( STDM->psz_access, "mms" ) )\
+    else if( !strcmp( STDM->psz_access, "mms" ) )\
     { \
         pd->b_mms = VLC_TRUE; pd->psz_mms = strdup( STDM->psz_url ); \
     } \
-    else if(  !strcmp( STDM->psz_access, "udp" ) )\
+    else if( !strcmp( STDM->psz_access, "udp" ) )\
     { \
         pd->b_udp = VLC_TRUE; pd->psz_udp = strdup( STDM->psz_url ); \
     } \
@@ -378,6 +378,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
 {
     sout_duplicate_t *p_dup = NULL;
     (void)p_obj;
+
     /* Clean up the chain */
     streaming_ChainClean( p_chain );
 
@@ -392,7 +393,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
     }
     /* #std{} */
     if( pd->b_local + pd->b_file + pd->b_http + pd->b_mms + pd->b_rtp +
-        pd->b_udp > 1 )
+        pd->b_udp + pd->b_icecast > 1 )
     {
         p_dup = streaming_ChainAddDup( p_chain );
     }
@@ -424,13 +425,51 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
             p_std = streaming_ChainAddStd( DUP_OR_CHAIN, "udp",
                                            pd->psz_mux, pd->psz_udp );
         }
-        if( pd->i_ttl ) ADD_OPT( "ttl=%i", pd->i_ttl );
+        if( pd->i_ttl )
+            ADD_OPT( "ttl=%i", pd->i_ttl );
         if( pd->b_sap )
         {
             pd->b_sap = VLC_TRUE;
             p_std->psz_name = strdup( pd->psz_name );
             p_std->psz_group = pd->psz_group ? strdup( pd->psz_group ) : NULL;
         }
+    }
+    if( pd->b_icecast )
+    {
+        sout_std_t *p_std;
+        char *psz_username;
+
+        if( p_dup ) streaming_DupAddChild( p_dup );
+
+        if( !strcmp( pd->sa_icecast.psz_username, "" ) )
+        {
+            asprintf( &psz_username, "%s", "" );
+        }
+        else
+        {
+            asprintf( &psz_username, "%s:%s@", pd->sa_icecast.psz_username,
+                      pd->sa_icecast.psz_password );
+        }
+        if( pd->i_icecast > 0 )
+        {
+            char *psz_url;
+            asprintf( &psz_url, "%s%s:%i%s", psz_username, pd->psz_icecast,
+                      pd->i_icecast, pd->psz_mountpoint );
+            p_std = streaming_ChainAddStd( DUP_OR_CHAIN, "shout",
+                                           pd->psz_mux, psz_url );
+            free( psz_url );
+        }
+        else
+        {
+            char *psz_url;
+            asprintf( &psz_url, "%s:%s@%s%s", pd->sa_icecast.psz_username,
+                      pd->sa_icecast.psz_password, pd->psz_icecast,
+                      pd->psz_mountpoint );
+            p_std = streaming_ChainAddStd( DUP_OR_CHAIN, "shout",
+                                           pd->psz_mux, psz_url );
+            free( psz_url );
+        }
+        free( psz_username );
     }
     HANDLE_GUI_URL( http, "http" )
     HANDLE_GUI_URL( mms, "mms" )
@@ -490,11 +529,12 @@ static char * ChainToPsz( sout_chain_t *p_chain, vlc_bool_t b_root )
             break;
 
         case SOUT_MOD_DISPLAY:
-            CHAIN_APPEND( "display" )
+            CHAIN_APPEND( "display" );
             break;
         case SOUT_MOD_STD:
-            CHAIN_APPEND( "std{access=%s,url=%s,mux=%s}", STDM->psz_access,
+            CHAIN_APPEND( "std{access=%s,dst=%s,mux=%s}", STDM->psz_access,
                           STDM->psz_url, STDM->psz_mux );
+            break;
         }
         if( i != p_chain->i_modules - 1 ) CHAIN_APPEND( ":" );
     }
