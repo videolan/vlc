@@ -413,17 +413,13 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
         goto error;
     }
 
-    if( p_sys->psz_hostname != NULL )
+    assert( p_sys->psz_hostname != NULL );
+    if ( !gnutls_x509_crt_check_hostname( cert, p_sys->psz_hostname ) )
     {
-        if ( !gnutls_x509_crt_check_hostname( cert, p_sys->psz_hostname ) )
-        {
-            msg_Err( session, "Certificate does not match \"%s\"",
-                     p_sys->psz_hostname );
-            goto error;
-        }
+        msg_Err( session, "Certificate does not match \"%s\"",
+                 p_sys->psz_hostname );
+        goto error;
     }
-    else
-        msg_Warn( session, "Certificate and hostname were not verified" );
 
     if( gnutls_x509_crt_get_expiration_time( cert ) < time( NULL ) )
     {
@@ -713,7 +709,6 @@ static int OpenClient (vlc_object_t *obj)
     p_session->pf_set_fd = gnutls_SetFD;
 
     p_sys->session.b_handshaked = VLC_FALSE;
-    p_sys->session.psz_hostname = NULL;
 
     const char *homedir = obj->p_libvlc->psz_datadir,
                *datadir = config_GetDataDir ();
@@ -778,12 +773,12 @@ static int OpenClient (vlc_object_t *obj)
     }
 
     char *servername = var_GetNonEmptyString (p_session, "tls-server-name");
-    if (servername != NULL )
-    {
-        p_sys->session.psz_hostname = servername;
-        gnutls_server_name_set (p_sys->session.session, GNUTLS_NAME_DNS,
-                                servername, strlen (servername));
-    }
+    if (servername == NULL )
+        msg_Err (p_session, "server name missing for TLS session");
+
+    p_sys->session.psz_hostname = servername;
+    gnutls_server_name_set (p_sys->session.session, GNUTLS_NAME_DNS,
+                            servername, strlen (servername));
 
     return VLC_SUCCESS;
 
