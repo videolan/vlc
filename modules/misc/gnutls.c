@@ -72,11 +72,6 @@ static void CloseServer (vlc_object_t *);
     "This is the maximum number of resumed TLS sessions that " \
     "the cache will hold." )
 
-#define CHECK_CERT_TEXT N_("Check TLS/SSL server certificate validity")
-#define CHECK_CERT_LONGTEXT N_( \
-    "This ensures that the server certificate is valid " \
-    "(i.e. signed by an approved Certification Authority)." )
-
 vlc_module_begin();
     set_shortname( "GnuTLS" );
     set_description( _("GnuTLS transport layer security") );
@@ -85,8 +80,7 @@ vlc_module_begin();
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_MISC );
 
-    add_bool( "tls-check-cert", VLC_TRUE, NULL, CHECK_CERT_TEXT,
-              CHECK_CERT_LONGTEXT, VLC_FALSE );
+    add_obsolete_bool( "tls-check-cert" );
     add_obsolete_bool( "tls-check-hostname" );
 
     add_submodule();
@@ -728,19 +722,15 @@ static int OpenClient (vlc_object_t *obj)
     sprintf (path, "%s/ssl", homedir);
     utf8_mkdir (path, 0755);
 
-    if (var_CreateGetBool (obj, "tls-check-cert"))
-    {
-        sprintf (path, "%s/ssl/certs", homedir);
-        gnutls_Addx509Directory (VLC_OBJECT (p_session),
-                                  p_sys->x509_cred, path, VLC_FALSE);
+    sprintf (path, "%s/ssl/certs", homedir);
+    gnutls_Addx509Directory (VLC_OBJECT (p_session),
+                             p_sys->x509_cred, path, VLC_FALSE);
 
-        sprintf (path, "%s/ca-certificates.crt", datadir);
-        gnutls_Addx509File (VLC_OBJECT (p_session),
-                            p_sys->x509_cred, path, VLC_FALSE);
-        p_session->pf_handshake = gnutls_HandshakeAndValidate;
-    }
-    else
-        p_session->pf_handshake = gnutls_ContinueHandshake;
+    sprintf (path, "%s/ca-certificates.crt", datadir);
+    gnutls_Addx509File (VLC_OBJECT (p_session),
+                        p_sys->x509_cred, path, VLC_FALSE);
+    p_session->pf_handshake = gnutls_HandshakeAndValidate;
+    /*p_session->pf_handshake = gnutls_ContinueHandshake;*/
 
     sprintf (path, "%s/ssl/private", homedir);
     gnutls_Addx509Directory (VLC_OBJECT (p_session), p_sys->x509_cred,
