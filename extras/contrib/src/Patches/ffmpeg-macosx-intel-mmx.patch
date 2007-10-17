@@ -1,0 +1,40 @@
+Index: ffmpeg/libavcodec/i386/dsputil_mmx.c
+===================================================================
+--- ffmpeg/libavcodec/i386/dsputil_mmx.c	(revision 10759)
++++ ffmpeg/libavcodec/i386/dsputil_mmx.c	(working copy)
+@@ -2978,6 +2978,7 @@
+         ::"m"(c), "m"(*ff_pd_1), "m"(*ff_pd_2)
+     );
+ #define WELCH(MOVPD)\
++    do {\
+     asm volatile(\
+         "1:                         \n\t"\
+         "movapd   %%xmm7,  %%xmm1   \n\t"\
+@@ -2985,8 +2986,12 @@
+         "movapd   %%xmm6,  %%xmm0   \n\t"\
+         "subpd    %%xmm1,  %%xmm0   \n\t"\
+         "pshufd   $0x4e,   %%xmm0, %%xmm1 \n\t"\
+-        "cvtpi2pd (%4,%0), %%xmm2   \n\t"\
+-        "cvtpi2pd (%5,%1), %%xmm3   \n\t"\
++        "cvtpi2pd (%2,%0), %%xmm2   \n\t"\
++        "cvtpi2pd (%3,%1), %%xmm3   \n\t"\
++        :"+&r"(i), "+&r"(j)\
++        :"r"(data+n2), "r"(data+len-2-n2)\
++    );\
++    asm volatile(\
+         "mulpd    %%xmm0,  %%xmm2   \n\t"\
+         "mulpd    %%xmm1,  %%xmm3   \n\t"\
+         "movapd   %%xmm2, (%2,%0,2) \n\t"\
+@@ -2996,9 +3001,9 @@
+         "add      $8,      %0       \n\t"\
+         "jl 1b                      \n\t"\
+         :"+&r"(i), "+&r"(j)\
+-        :"r"(w_data+n2), "r"(w_data+len-2-n2),\
+-         "r"(data+n2), "r"(data+len-2-n2)\
+-    );
++        :"r"(w_data+n2), "r"(w_data+len-2-n2)\
++    );\
++    } while(0);
+     if(len&1)
+         WELCH("movupd")
+     else
