@@ -50,7 +50,7 @@ SRC = $(patsubst %,$(SRC_DIR)/%,$(_SRC))
 
 HEADERS = $(EXPORTED_HEADERS)
 
-INCLUDES=  -I .  -I $(LIBVLC_HEADERS) -I $(HEADERS_DIR)
+INCLUDES=  -I .  -I $(LIBVLC_HEADERS) -I $(HEADERS_DIR) -I $(HEADERS_DIR)/Internal
 
 FRAMEWORKS= -framework Cocoa  
 
