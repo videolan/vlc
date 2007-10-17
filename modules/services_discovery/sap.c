@@ -427,7 +427,6 @@ static void Close( vlc_object_t *p_this )
     }
     FREENULL( p_sys->pp_announces );
 
-    pl_Release( p_sd );
     free( p_sys );
 }
 
