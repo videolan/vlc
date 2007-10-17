@@ -204,8 +204,10 @@ void StandardPLPanel::setCurrentRootId( int _new )
         addButton->setEnabled( true );
         addButton->setToolTip( qtr(I_PL_ADDPL) );
     }
-    else if( currentRootId == THEPL->p_ml_category->i_id ||
-             currentRootId == THEPL->p_ml_onelevel->i_id )
+    else if( ( THEPL->p_ml_category &&
+                        currentRootId == THEPL->p_ml_category->i_id ) ||
+             ( THEPL->p_ml_onelevel &&
+                        currentRootId == THEPL->p_ml_onelevel->i_id ) )
     {
         addButton->setEnabled( true );
         addButton->setToolTip( qtr(I_PL_ADDML) );
@@ -224,8 +226,10 @@ void StandardPLPanel::popupAdd()
         popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT(PLAppendDialog()) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
     }
-    else if( currentRootId == THEPL->p_ml_category->i_id ||
-             currentRootId == THEPL->p_ml_onelevel->i_id )
+    else if( ( THEPL->p_ml_category &&
+                currentRootId == THEPL->p_ml_category->i_id ) ||
+             ( THEPL->p_ml_onelevel &&
+                currentRootId == THEPL->p_ml_onelevel->i_id ) )
     {
         popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(simpleMLAppendDialog()));
         popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT( MLAppendDialog() ) );
