@@ -490,9 +490,7 @@ void ControlsWidget::stop()
 
 void ControlsWidget::play()
 {
-    if( THEPL )
-        msg_Dbg( p_intf, "There is %i playlist items", THEPL->items.i_size ); /* FIXME: remove me */
-    if( playlist_IsEmpty( THEPL ) )
+    if( THEPL->current.i_size == 0 )
     {
         /* The playlist is empty, open a file requester */
         THEDP->openFileDialog();
