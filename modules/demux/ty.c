@@ -38,6 +38,7 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include "vlc_codec.h"
+#include "../codec/cc.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -145,6 +146,9 @@ struct demux_sys_t
   es_out_id_t *p_video;               /* ptr to video codec */
   es_out_id_t *p_audio;               /* holds either ac3 or mpeg codec ptr */
 
+  cc_data_t   cc;
+  es_out_id_t *p_cc[4];
+
   int             i_cur_chunk;
   int             i_stuff_cnt;
   size_t          i_stream_size;      /* size of input stream (if known) */
@@ -195,8 +199,8 @@ static void parse_master(demux_t *p_demux);
 static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
 static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
 static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
-static int DemuxRecXds( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
 
+static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 );
 
 /*
  * Open: check file and initialize demux structures
@@ -214,6 +218,7 @@ static int Open(vlc_object_t *p_this)
     demux_sys_t *p_sys;
     es_format_t fmt;
     const uint8_t *p_peek;
+    int i;
 
     /* peek at the first 12 bytes. */
     /* for TY streams, they're always the same */
@@ -278,11 +283,10 @@ static int Open(vlc_object_t *p_this)
     es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
     p_sys->p_video = es_out_Add( p_demux->out, &fmt );
 
-#if 0
-    /* register the CC decoder */
-    es_format_Init( &fmt, SPU_ES, VLC_FOURCC('s', 'u', 'b', 't'));
-    p_sys->p_subt_es = es_out_Add(p_demux->out, &fmt);
-#endif
+    /* */
+    for( i = 0; i < 4; i++ )
+        p_sys->p_cc[i] = NULL;
+    cc_Init( &p_sys->cc );
 
     return VLC_SUCCESS;
 }
@@ -374,15 +378,10 @@ static int Demux( demux_t *p_demux )
         /* Audio */
         DemuxRecAudio( p_demux, p_rec, p_block_in );
     }
-    else if ( p_rec->rec_type == 0x01 )
+    else if( p_rec->rec_type == 0x01 || p_rec->rec_type == 0x02 )
     {
-        /* Closed Captions */
+        /* Closed Captions/XDS */
         DemuxRecCc( p_demux, p_rec, p_block_in );
-    }
-    else if ( p_rec->rec_type == 0x02 )
-    {
-        /* XDS */
-        DemuxRecXds( p_demux, p_rec, p_block_in );
     }
     else if ( p_rec->rec_type == 0x03 )
     {
@@ -463,6 +462,7 @@ static void Close( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    cc_Exit( &p_sys->cc );
     free( p_sys->rec_hdrs );
     if( p_sys->seq_table )
         free( p_sys->seq_table );
@@ -577,6 +577,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     const int subrec_type = rec_hdr->subrec_type;
     const long l_rec_size = rec_hdr->l_rec_size;    // p_block_in->i_buffer might be better
     int esOffset1;
+    int i;
 
     assert( rec_hdr->rec_type == 0xe0 );
     if( !p_block_in )
@@ -673,6 +674,59 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             p_sys->lastVideoPTS = 0;
         }
     }
+
+    /* Register the CC decoders when needed */
+    for( i = 0; i < 4; i++ )
+    {
+        static const vlc_fourcc_t fcc[4] = {
+            VLC_FOURCC('c', 'c', '1', ' '),
+            VLC_FOURCC('c', 'c', '2', ' '),
+            VLC_FOURCC('c', 'c', '3', ' '),
+            VLC_FOURCC('c', 'c', '4', ' ')
+        };
+        static const char *ppsz_description[4] = {
+            N_("Closed captions 1"),
+            N_("Closed captions 2"),
+            N_("Closed captions 3"),
+            N_("Closed captions 4"),
+        };
+
+        es_format_t fmt;
+
+        if( !p_sys->cc.pb_present[i] || p_sys->p_cc[i] )
+            continue;
+
+        es_format_Init( &fmt, SPU_ES, fcc[i] );
+        fmt.psz_description = strdup( _(ppsz_description[i]) );
+        p_sys->p_cc[i] = es_out_Add( p_demux->out, &fmt );
+        es_format_Clean( &fmt );
+
+    }
+    /* Send the CC data */
+    if( p_block_in->i_pts > 0 && p_sys->cc.i_data > 0 )
+    {
+        int i_cc_count;
+
+        block_t *p_cc = block_New( p_demux, p_sys->cc.i_data );
+        p_cc->i_flags |= BLOCK_FLAG_TYPE_I;
+        p_cc->i_pts = p_block_in->i_pts;
+        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+
+        for( i = 0, i_cc_count = 0; i < 4; i++ )
+            i_cc_count += p_sys->p_cc[i] ? 1 : 0;
+
+        for( i = 0; i < 4; i++ )
+        {
+            if( !p_sys->p_cc[i] )
+                continue;
+            if( i_cc_count > 1 )
+                es_out_Send( p_demux->out, p_sys->p_cc[i], block_Duplicate( p_cc ) );
+            else
+                es_out_Send( p_demux->out, p_sys->p_cc[i], p_cc );
+        }
+        cc_Flush( &p_sys->cc );
+    }
+
     //msg_Dbg(p_demux, "sending rec %d as video type 0x%02x",
             //p_sys->i_cur_rec, subrec_type);
     es_out_Send(p_demux->out, p_sys->p_video, p_block_in);
@@ -883,56 +937,37 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
 static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
 {
-    uint8_t lastCC[ 16 ];
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_field;
+    int i_channel;
 
     if( p_block_in )
         block_Release(p_block_in);
 
-    /*msg_Dbg(p_demux, "CC1 %02x %02x [%c%c]", rec_hdr->ex1,
-               rec_hdr->ex2, rec_hdr->ex1, rec_hdr->ex2 );*/
+    if( rec_hdr->rec_type == 0x01 )
+        i_field = 0;
+    else if( rec_hdr->rec_type == 0x02 )
+        i_field = 1;
+    else
+        return 0;
 
-    /* construct a 'user-data' MPEG packet */
-    lastCC[ 0x00 ] = 0x00;
-    lastCC[ 0x01 ] = 0x00;
-    lastCC[ 0x02 ] = 0x01;
-    lastCC[ 0x03 ] = 0xb2;
-    lastCC[ 0x04 ] = 'T';    /* vcdimager code says this byte should be 0x11 */
-    lastCC[ 0x05 ] = 'Y';    /* (no other notes there) */
-    lastCC[ 0x06 ] = 0x01;
-    lastCC[ 0x07 ] = rec_hdr->ex1;
-    lastCC[ 0x08 ] = rec_hdr->ex2;
-    /* not sure what to send, because VLC doesn't yet support
-     * teletext type of subtitles (only supports the full-sentence type) */
-    /*p_block_in = block_NewEmpty(); ????
-    es_out_Send( p_demux->out, p_sys->p_subt_es, p_block_in );*/
+    /* XDS data (extract programs infos) transmitted on field 2 only */
+    if( i_field == 1 )
+        DemuxDecodeXds( p_demux, rec_hdr->ex1, rec_hdr->ex2 );
+
+    if( p_sys->cc.i_data + 3 > CC_MAX_DATA_SIZE )
+        return 0;
+
+    p_sys->cc.p_data[p_sys->cc.i_data+0] = i_field;
+    p_sys->cc.p_data[p_sys->cc.i_data+1] = rec_hdr->ex1;
+    p_sys->cc.p_data[p_sys->cc.i_data+2] = rec_hdr->ex2;
+    p_sys->cc.i_data += 3;
+
+    i_channel = cc_Channel( i_field, &p_sys->cc.p_data[p_sys->cc.i_data+1] );
+    if( i_channel >= 0 && i_channel < 4 )
+        p_sys->cc.pb_present[i_channel] = VLC_TRUE;
     return 0;
 }
-
-static int DemuxRecXds( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in )
-{
-    uint8_t lastXDS[ 16 ];
-
-    if( p_block_in )
-        block_Release(p_block_in);
-
-    /*msg_Dbg(p_demux, "CC2 %02x %02x", rec_hdr->ex1, rec_hdr->ex2 );*/
-
-    /* construct a 'user-data' MPEG packet */
-    lastXDS[ 0x00 ] = 0x00;
-    lastXDS[ 0x01 ] = 0x00;
-    lastXDS[ 0x02 ] = 0x01;
-    lastXDS[ 0x03 ] = 0xb2;
-    lastXDS[ 0x04 ] = 'T';    /* vcdimager code says this byte should be 0x11 */
-    lastXDS[ 0x05 ] = 'Y';    /* (no other notes there) */
-    lastXDS[ 0x06 ] = 0x02;
-    lastXDS[ 0x07 ] = rec_hdr->ex1;
-    lastXDS[ 0x08 ] = rec_hdr->ex2;
-    /* not sure what to send, because VLC doesn't support this?? */
-    /*p_block_in = block_NewEmpty(); ????
-    es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );*/
-    return 0;
-}
-
 
 /* seek to a position within the stream, if possible */
 static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
@@ -989,6 +1024,10 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     return VLC_SUCCESS;
 }
 
+static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
+{
+    /* TODO */
+}
 
 /* seek to an exact time position within the stream, if possible.
  * l_seek_time is in nanoseconds, the TIVO time standard.
@@ -1477,6 +1516,7 @@ static ty_rec_hdr_t *parse_chunk_headers( demux_t *p_demux, const uint8_t *p_buf
             p_rec_hdr->b_ext = VLC_FALSE;
             p_rec_hdr->l_ty_pts = U64_AT( &record_header[ 8 ] );
         }
+        //fprintf( stderr, "parse_chunk_headers[%d] t=0x%x s=%d\n", i, p_rec_hdr->rec_type, p_rec_hdr->subrec_type );
     } /* end of record-header loop */
     return p_hdrs;
 }
