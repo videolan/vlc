@@ -2873,7 +2873,7 @@ dnl
 dnl  ffmpeg decoder/demuxer plugin
 dnl
 dnl we try to find ffmpeg using : 1- given tree 2- ffmpeg-config, 3- pkg-config
-dnl 				4- default place, 
+dnl                               4- default place,
 
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
@@ -2886,14 +2886,14 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
    [
      if test "$with_ffmpeg_mp3lame" = "yes";	then
-     	VLC_ADD_LIBS([ffmpeg],[-lmp3lame])
+        VLC_ADD_LIBS([ffmpeg],[-lmp3lame])
      fi])
 
  AC_ARG_WITH(ffmpeg-faac,
    [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
    [
      if test "$with_ffmpeg_faac" = "yes"; then
-     	VLC_ADD_LIBS([ffmpeg],[-lfaac])
+        VLC_ADD_LIBS([ffmpeg],[-lfaac])
      fi])
 
  AC_ARG_WITH(ffmpeg-dts,
@@ -2932,35 +2932,35 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
    [
      if test "$with_ffmpeg_zlib" = "yes"; then
-		VLC_ADD_LIBS([ffmpeg],[-lz])
+        VLC_ADD_LIBS([ffmpeg],[-lz])
      fi])
 
  AC_ARG_WITH(ffmpeg-amrnb,
    [    --with-ffmpeg-amrnb specify if ffmpeg has been compiled with libamrnb support],
    [
      if test "$with_ffmpeg_amrnb" = "yes";	then
-     	VLC_ADD_LIBS([ffmpeg],[-lamrnb])
+        VLC_ADD_LIBS([ffmpeg],[-lamrnb])
      fi])
 
  AC_ARG_WITH(ffmpeg-amrwb,
    [    --with-ffmpeg-amrwb specify if ffmpeg has been compiled with libamrwb support],
    [
      if test "$with_ffmpeg_amrwb" = "yes";	then
-     	VLC_ADD_LIBS([ffmpeg],[-lamrwb])
+        VLC_ADD_LIBS([ffmpeg],[-lamrwb])
      fi])
 
  AC_ARG_WITH(ffmpeg-x264,
    [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libamrnb support],
    [
      if test "$with_ffmpeg_x264" = "yes";	then
-     	VLC_ADD_LIBS([ffmpeg],[-lx264])
+        VLC_ADD_LIBS([ffmpeg],[-lx264])
      fi])
 
  AC_ARG_WITH(ffmpeg-a52,
    [    --with-ffmpeg-a52 specify if ffmpeg has been compiled with liba52 support],
    [
      if test "$with_ffmpeg_a52" = "yes";	then
-     	VLC_ADD_LIBS([ffmpeg],[-la52])
+        VLC_ADD_LIBS([ffmpeg],[-la52])
      fi])
 
  dnl
@@ -2986,7 +2986,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      if test -f "${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a"; then
        VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec/libpostproc ${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a])	
      elif test -f "${real_ffmpeg_tree}/libpostproc/libpostproc.a"; then 
-	VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libpostproc ${real_ffmpeg_tree}/libpostproc/libpostproc.a])
+        VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libpostproc ${real_ffmpeg_tree}/libpostproc/libpostproc.a])
         VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}])
      else
        dnl  The given libavcodec wasn't built with --enable-pp
@@ -2996,43 +2996,42 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    fi
    dnl  Use a custom libffmpeg
    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-   
+
    dnl Use pkg-config to look for the ldflags in libav*-uninstalled.pc
    PKG_CONFIG_PATH_save="$PKG_CONFIG_PATH"
    PKG_CONFIG_LIBDIR_save="$PKG_CONFIG_LIBDIR"
    export PKG_CONFIG_PATH=""
    export PKG_CONFIG_LIBDIR="${real_ffmpeg_tree}"
-  
+
    PKG_CHECK_MODULES( [FFMPEG],[libavcodec libavformat libpostproc], [
-	VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher], ${FFMPEG_CFLAGS})
-	VLC_ADD_LIBS([ffmpeg stream_out_switcher], ${FFMPEG_LIBS})]
+        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher], ${FFMPEG_CFLAGS})
+        VLC_ADD_LIBS([ffmpeg stream_out_switcher], ${FFMPEG_LIBS})]
       ,[])
    AS_IF([test -n "${PKG_CONFIG_PATH_save}"],[
          export PKG_CONFIG_PATH="${PKG_CONFIG_PATH_save}"
    ],[
-	unset PKG_CONFIG_PATH
+        unset PKG_CONFIG_PATH
    ])
    AS_IF([test -n "${PKG_CONFIG_LIBDIR_save}"],[   
-   	export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR_save}"   
+        export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR_save}"
    ],[
         unset PKG_CONFIG_LIBDIR
    ])
-   
+
    VLC_ADD_BUILTINS([ffmpeg])
    if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes" ; then
      VLC_ADD_BUILTINS([stream_out_switcher])
    fi
-
 
    if test -f "${real_ffmpeg_tree}/libswscale/libswscale.a"; then
      AC_DEFINE(HAVE_LIBSWSCALE_TREE, 1, [Define if you have ffmpeg's libswscale.])
      VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libswscale ${real_ffmpeg_tree}/libswscale/libswscale.a])
      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libswscale])
    fi
-else    
-    
+else
+
 dnl Look for a ffmpeg-config (we are on debian )
- 
+
   FFMPEG_PATH="${PATH}"
   AC_ARG_WITH(ffmpeg-config-path,
     [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
@@ -3053,7 +3052,7 @@ dnl Look for a ffmpeg-config (we are on debian )
     fi
     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
     VLC_ADD_LIBS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
- 
+
  else
 
 dnl Trying with pkg-config
@@ -3096,7 +3095,7 @@ dnl Trying with pkg-config
        ],[ true ])
      VLC_RESTORE_FLAGS
     ],[
-     
+
     dnl
     dnl last chance: at the default place
     dnl
@@ -3119,11 +3118,10 @@ dnl Trying with pkg-config
         fi],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (svn version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ], [$LDAVUTIL])
 
-      
       AC_CHECK_LIB(postproc, pp_postprocess, [
         VLC_ADD_LIBS([ffmpeg],[-lpostproc])],
-	AC_MSG_ERROR([Could not find libpostproc inside FFmpeg. You should configure FFmpeg with --enable-gpl --enable-pp.]),
-	[$LDAVUTIL])
+      AC_MSG_ERROR([Could not find libpostproc inside FFmpeg. You should configure FFmpeg with --enable-gpl --enable-pp.]),
+        [$LDAVUTIL])
 
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         VLC_ADD_LIBS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
