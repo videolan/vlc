@@ -136,7 +136,7 @@ endif
 FFMPEGCONF+= --enable-small --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-v4l --disable-v4l2 --disable-bktr --disable-dv1394 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols --disable-encoders
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
-FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52
+FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52 --enable-swscaler
 endif
 
 ifdef HAVE_BEOS
