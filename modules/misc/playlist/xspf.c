@@ -283,7 +283,7 @@ static char *assertUTF8URI( char *psz_name )
 {
     char *psz_ret = NULL;              /**< the new result buffer to return */
     char *psz_s = NULL, *psz_d = NULL; /**< src & dest pointers for URI conversion */
-    vlc_bool_t b_name_is_uri = VLC_FALSE;
+    vlc_bool_t b_uri_is_file = VLC_FALSE; /**< we do additional %-encoding if the URI is a file:// one */
 
     if( !psz_name || !*psz_name )
         return NULL;
@@ -300,16 +300,22 @@ static char *assertUTF8URI( char *psz_name )
         return NULL;
 
     /** \todo check for a valid scheme part preceding the colon */
-    if( strchr( psz_s, ':' ) )
+    size_t i_delim = strcspn( psz_s, ":" );
+    if( i_delim != strlen( psz_s ) )
     {
-        psz_d = psz_ret;
-        b_name_is_uri = VLC_TRUE;
+        i_delim++; /* skip the ':' */
+        strncpy( psz_ret, psz_s, i_delim );
+        psz_d = psz_ret + i_delim;
+
+        if( !strncmp( psz_s, "file://", 7 ) )
+            b_uri_is_file = VLC_TRUE;
     }
     /* assume "file" scheme if no scheme-part is included */
     else
     {
         strcpy( psz_ret, "file://" );
         psz_d = psz_ret + 7;
+        b_uri_is_file = VLC_TRUE;
     }
 
     while( *psz_s )
@@ -320,7 +326,17 @@ static char *assertUTF8URI( char *psz_name )
             *psz_s == '>' ||
             *psz_s == '&' ||
             *psz_s == ' ' ||
-            ( *psz_s == '%' && !b_name_is_uri ) )
+            ( b_uri_is_file && (
+            *psz_s == ':' ||
+            *psz_s == '"' ||
+            *psz_s == '?' ||
+            *psz_s == '#' ||
+            *psz_s == '[' ||
+            *psz_s == ']' ||
+            *psz_s == '@' ||
+            *psz_s == '%' )
+            )
+          )
         {
             *psz_d++ = '%';
             *psz_d++ = hexchars[(*psz_s >> 4) & B00001111];
