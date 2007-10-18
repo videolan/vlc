@@ -38,6 +38,8 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include "vlc_codec.h"
+#include "vlc_meta.h"
+#include "vlc_input.h"
 #include "../codec/cc.h"
 
 /*****************************************************************************
@@ -141,6 +143,69 @@ typedef enum
     TIVO_AUDIO_MPEG
 } tivo_audio_t;
 
+#define XDS_MAX_DATA_SIZE (32)
+typedef enum
+{
+    XDS_CLASS_CURRENT        = 0,
+    XDS_CLASS_FUTURE         = 1,
+    XDS_CLASS_CHANNEL        = 2,
+    XDS_CLASS_MISCELLANEOUS  = 3,
+    XDS_CLASS_PUBLIC_SERVICE = 4,
+    XDS_CLASS_RESERVED       = 5,
+    XDS_CLASS_UNDEFINED      = 6,
+    XDS_CLASS_OTHER          = 7,
+
+    XDS_MAX_CLASS_COUNT
+} xds_class_t;
+typedef struct
+{
+    vlc_bool_t b_started;
+    int        i_data;
+    uint8_t    p_data[XDS_MAX_DATA_SIZE];
+    int        i_sum;
+} xds_packet_t;
+typedef enum
+{
+    XDS_META_PROGRAM_RATING_NONE,
+    XDS_META_PROGRAM_RATING_MPAA,
+    XDS_META_PROGRAM_RATING_TPG,
+    /* TODO add CA/CE rating */
+} xds_meta_program_rating_t;
+typedef struct
+{
+    char *psz_name;
+    xds_meta_program_rating_t rating;
+    char *psz_rating;
+    /* Add the other fields once I have the samples */
+} xds_meta_program_t;
+typedef struct
+{
+    char *psz_channel_name;
+    char *psz_channel_call_letter;
+    char *psz_channel_number;
+
+    xds_meta_program_t  current;
+    xds_meta_program_t  future;
+} xds_meta_t;
+typedef struct
+{
+    /* Are we in XDS mode */
+    vlc_bool_t b_xds;
+
+    /* Current class type */
+    xds_class_t i_class;
+    int         i_type;
+    vlc_bool_t  b_future;
+
+    /* */
+    xds_packet_t pkt[XDS_MAX_CLASS_COUNT][128]; /* XXX it is way too much, but simpler */
+
+    /* */
+    vlc_bool_t  b_meta_changed;
+    xds_meta_t  meta;
+
+} xds_t;
+
 struct demux_sys_t
 {
   es_out_id_t *p_video;               /* ptr to video codec */
@@ -148,6 +213,8 @@ struct demux_sys_t
 
   cc_data_t   cc;
   es_out_id_t *p_cc[4];
+
+  xds_t       xds;
 
   int             i_cur_chunk;
   int             i_stuff_cnt;
@@ -201,6 +268,11 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
 
 static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 );
+
+static void XdsInit( xds_t * );
+static void XdsExit( xds_t * );
+
+#define TY_ES_GROUP (1)
 
 /*
  * Open: check file and initialize demux structures
@@ -277,16 +349,20 @@ static int Open(vlc_object_t *p_this)
     } else {
         es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
     }
+    fmt.i_group = TY_ES_GROUP;
     p_sys->p_audio = es_out_Add( p_demux->out, &fmt );
 
     /* register the video stream */
     es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+    fmt.i_group = TY_ES_GROUP;
     p_sys->p_video = es_out_Add( p_demux->out, &fmt );
 
     /* */
     for( i = 0; i < 4; i++ )
         p_sys->p_cc[i] = NULL;
     cc_Init( &p_sys->cc );
+
+    XdsInit( &p_sys->xds );
 
     return VLC_SUCCESS;
 }
@@ -462,6 +538,7 @@ static void Close( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    XdsExit( &p_sys->xds );
     cc_Exit( &p_sys->cc );
     free( p_sys->rec_hdrs );
     if( p_sys->seq_table )
@@ -698,6 +775,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
         es_format_Init( &fmt, SPU_ES, fcc[i] );
         fmt.psz_description = strdup( _(ppsz_description[i]) );
+        fmt.i_group = TY_ES_GROUP;
         p_sys->p_cc[i] = es_out_Add( p_demux->out, &fmt );
         es_format_Clean( &fmt );
 
@@ -963,7 +1041,7 @@ static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block
     p_sys->cc.p_data[p_sys->cc.i_data+2] = rec_hdr->ex2;
     p_sys->cc.i_data += 3;
 
-    i_channel = cc_Channel( i_field, &p_sys->cc.p_data[p_sys->cc.i_data+1] );
+    i_channel = cc_Channel( i_field, &p_sys->cc.p_data[p_sys->cc.i_data-3 + 1] );
     if( i_channel >= 0 && i_channel < 4 )
         p_sys->cc.pb_present[i_channel] = VLC_TRUE;
     return 0;
@@ -1024,9 +1102,378 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     return VLC_SUCCESS;
 }
 
+/* XDS decoder */
+//#define TY_XDS_DEBUG
+static void XdsInit( xds_t *h )
+{
+    int i, j;
+
+    h->b_xds = VLC_FALSE;
+    h->i_class = XDS_MAX_CLASS_COUNT;
+    h->i_type = 0;
+    h->b_future = VLC_FALSE;
+    for( i = 0; i < XDS_MAX_CLASS_COUNT; i++ )
+    {
+        for( j = 0; j < 128; j++ )
+            h->pkt[i][j].b_started = VLC_FALSE;
+    }
+    h->b_meta_changed = VLC_FALSE;
+    memset( &h->meta, 0, sizeof(h->meta) );
+}
+static void XdsExit( xds_t *h )
+{
+    /* */
+    if( h->meta.psz_channel_name )
+        free( h->meta.psz_channel_name );
+    if( h->meta.psz_channel_call_letter )
+        free( h->meta.psz_channel_call_letter );
+    if( h->meta.psz_channel_number )
+        free( h->meta.psz_channel_number );
+
+    /* */
+    if( h->meta.current.psz_name )
+        free( h->meta.current.psz_name );
+    if( h->meta.current.psz_rating )
+        free( h->meta.current.psz_rating );
+    /* */
+    if( h->meta.future.psz_name )
+        free( h->meta.future.psz_name );
+    if( h->meta.future.psz_rating )
+        free( h->meta.future.psz_rating );
+}
+static void XdsStringUtf8( char dst[2*32+1], const uint8_t *p_src, int i_src )
+{
+    int i;
+    int i_dst;
+
+    for( i = 0, i_dst = 0; i < i_src; i++ )
+    {
+        switch( p_src[i] )
+        {
+#define E2( c, u1, u2 ) case c: dst[i_dst++] = u1; dst[i_dst++] = u2; break
+        E2( 0x2a, 0xc3,0xa1); // lowercase a, acute accent
+        E2( 0x5c, 0xc3,0xa9); // lowercase e, acute accent
+        E2( 0x5e, 0xc3,0xad); // lowercase i, acute accent
+        E2( 0x5f, 0xc3,0xb3); // lowercase o, acute accent
+        E2( 0x60, 0xc3,0xba); // lowercase u, acute accent
+        E2( 0x7b, 0xc3,0xa7); // lowercase c with cedilla
+        E2( 0x7c, 0xc3,0xb7); // division symbol
+        E2( 0x7d, 0xc3,0x91); // uppercase N tilde
+        E2( 0x7e, 0xc3,0xb1); // lowercase n tilde
+#undef E2
+        default:
+            dst[i_dst++] = p_src[i];
+            break;
+        }
+    }
+    dst[i_dst++] = '\0';
+}
+static vlc_bool_t XdsChangeString( xds_t *h, char **ppsz_dst, const char *psz_new )
+{
+    if( *ppsz_dst && psz_new && !strcmp( *ppsz_dst, psz_new ) )
+        return VLC_FALSE;
+    if( *ppsz_dst == NULL && psz_new == NULL )
+        return VLC_FALSE;
+
+    if( *ppsz_dst )
+        free( *ppsz_dst );
+    if( psz_new )
+        *ppsz_dst = strdup( psz_new );
+    else
+        *ppsz_dst = NULL;
+
+    h->b_meta_changed = VLC_TRUE;
+    return VLC_TRUE;
+}
+
+static void XdsDecodeCurrentFuture( xds_t *h, xds_packet_t *pk )
+{
+    xds_meta_program_t *p_prg = h->b_future ? &h->meta.future : &h->meta.current;
+    char name[2*32+1];
+    int i_rating;
+
+    switch( h->i_type )
+    {
+    case 0x03:
+        XdsStringUtf8( name, pk->p_data, pk->i_data );
+        if( XdsChangeString( h, &p_prg->psz_name, name ) )
+        {
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Current/Future (Program Name) %d'\n", pk->i_data );
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> program name %s\n", name );
+        }
+        break;
+    case 0x05:
+        i_rating = (pk->p_data[0] & 0x18);
+        if( i_rating == 0x08 )
+        {
+            /* TPG */
+            static const char *pppsz_ratings[8][2] = {
+                { "None",   "No rating (no content advisory)" },
+                { "TV-Y",   "All Children (no content advisory)" },
+                { "TV-Y7",  "Directed to Older Children (V = Fantasy Violence)" },
+                { "TV-G",   "General Audience (no content advisory)" },
+                { "TV-PG",  "Parental Guidance Suggested" },
+                { "TV-14",  "Parents Strongly Cautioned" },
+                { "TV-MA",  "Mature Audience Only" },
+                { "None",   "No rating (no content advisory)" }
+            };
+            p_prg->rating = XDS_META_PROGRAM_RATING_TPG;
+            if( XdsChangeString( h, &p_prg->psz_rating, pppsz_ratings[pk->p_data[1]&0x07][0] ) )
+            {
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Current/Future (Rating) %d'\n", pk->i_data );
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> TPG Rating %s (%s)\n",
+                //         pppsz_ratings[pk->p_data[1]&0x07][0], pppsz_ratings[pk->p_data[1]&0x07][1] );
+            }
+        }
+        else if( i_rating == 0x00 || i_rating == 0x10 )
+        {
+            /* MPAA */
+            static const char *pppsz_ratings[8][2] = {
+                { "N/A",    "N/A" },
+                { "G",      "General Audiences" },
+                { "PG",     "Parental Guidance Suggested" },
+                { "PG-13",  "Parents Strongly Cautioned" },
+                { "R",      "Restricted" },
+                { "NC-17",  "No one 17 and under admitted" },
+                { "X",      "No one under 17 admitted" },
+                { "NR",     "Not Rated" },
+            };
+            p_prg->rating = XDS_META_PROGRAM_RATING_MPAA;
+            if( XdsChangeString( h, &p_prg->psz_rating, pppsz_ratings[pk->p_data[0]&0x07][0] ) )
+            {
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Current/Future (Rating) %d'\n", pk->i_data );
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> TPG Rating %s (%s)\n",
+                //         pppsz_ratings[pk->p_data[0]&0x07][0], pppsz_ratings[pk->p_data[0]&0x07][1] );
+            }
+        }
+        else
+        {
+            /* Non US Rating TODO */
+            assert( i_rating == 0x18 ); // only left value possible */
+            p_prg->rating = XDS_META_PROGRAM_RATING_NONE;
+            if( XdsChangeString( h, &p_prg->psz_rating, NULL ) )
+            {
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Current/Future (Rating) %d'\n", pk->i_data );
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> 0x%2.2x 0x%2.2x\n", pk->p_data[0], pk->p_data[1] );
+            }
+        }
+        break;
+
+    default:
+#ifdef TY_XDS_DEBUG
+        fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Current/Future (Unknown 0x%x)'\n", h->i_type );
+#endif
+        break;
+    }
+}
+
+static void XdsDecodeChannel( xds_t *h, xds_packet_t *pk )
+{
+    char name[2*32+1];
+    char chan[2*32+1];
+
+    switch( h->i_type )
+    {
+    case 0x01:
+        if( pk->i_data < 2 )
+            return;
+        XdsStringUtf8( name, pk->p_data, pk->i_data );
+        if( XdsChangeString( h, &h->meta.psz_channel_name, name ) )
+        {
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Network Name) %d'\n", pk->i_data );
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> %s\n", name );
+        }
+        break;
+
+    case 0x02:
+        if( pk->i_data < 4 )
+            return;
+
+        XdsStringUtf8( name, pk->p_data, 4 );
+        if( XdsChangeString( h, &h->meta.psz_channel_call_letter, name ) )
+        {
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Network Call Letter)' %d\n", pk->i_data );
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> call letter %s\n", name );
+        }
+        if( pk->i_data >= 6 )
+        {
+            XdsStringUtf8( chan, &pk->p_data[4], 2 );
+            if( XdsChangeString( h, &h->meta.psz_channel_number, chan ) )
+            {
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Network Call Letter)' %d\n", pk->i_data );
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> channel number %s\n", chan );
+            }
+        }
+        else
+        {
+            if( XdsChangeString( h, &h->meta.psz_channel_number, NULL ) )
+            {
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Network Call Letter)' %d\n", pk->i_data );
+                //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: ====> no channel number letter anymore\n" );
+            }
+        }
+        break;
+    case 0x03:
+        //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Channel Tape Delay)'\n" );
+        break;
+    case 0x04:
+        //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Transmission Signal Identifier)'\n" );
+        break;
+    default:
+#ifdef TY_XDS_DEBUG
+        fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Channel (Unknown 0x%x)'\n", h->i_type );
+#endif
+        break;
+    }
+}
+
+static void XdsDecode( xds_t *h, xds_packet_t *pk )
+{
+    switch( h->i_class )
+    {
+    case XDS_CLASS_CURRENT:
+    case XDS_CLASS_FUTURE:
+        XdsDecodeCurrentFuture( h, pk );
+        break;
+    case XDS_CLASS_CHANNEL:
+        XdsDecodeChannel( h, pk );
+        break;
+    case XDS_CLASS_MISCELLANEOUS:
+#ifdef TY_XDS_DEBUG
+        fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Miscellaneous'\n" );
+#endif
+        break;
+    case XDS_CLASS_PUBLIC_SERVICE:
+#ifdef TY_XDS_DEBUG
+        fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: class 'Public Service'\n" );
+#endif
+        break;
+    default:
+        //fprintf( stderr, "xxxxxxxxxxxxxxxXDS XdsDecode: unknown class\n" );
+        break;
+    }
+}
+
+static void XdsParse( xds_t *h, uint8_t d1, uint8_t d2 )
+{
+    /* TODO check parity */
+    d1 &= 0x7f;
+    d2 &= 0x7f;
+
+    /* */
+    if( d1 >= 0x01 && d1 <= 0x0e )
+    {
+        const xds_class_t i_class = ( d1 - 1 ) >> 1;
+        const int i_type = d2;
+        const vlc_bool_t b_start = d1 & 0x01;
+        xds_packet_t *pk = &h->pkt[i_class][i_type];
+
+        if( !b_start && !pk->b_started )
+        {
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS Continuying a non started packet, ignoring\n" );
+            h->b_xds = VLC_FALSE;
+            return;
+        }
+
+        h->b_xds = VLC_TRUE;
+        h->i_class = i_class;
+        h->i_type  = i_type;
+        h->b_future = !b_start;
+        pk->b_started = VLC_TRUE;
+        if( b_start )
+        {
+            pk->i_data = 0;
+            pk->i_sum = d1 + d2;
+        }
+    }
+    else if( d1 == 0x0f && h->b_xds )
+    {
+        xds_packet_t *pk = &h->pkt[h->i_class][h->i_type];
+
+        /* TODO checksum and decode */
+        pk->i_sum += d1 + d2;
+        if( pk->i_sum & 0x7f )
+        {
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS invalid checksum, ignoring ---------------------------------\n" );
+            pk->b_started = VLC_FALSE;
+            return;
+        }
+        if( pk->i_data <= 0 )
+        {
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS empty packet, ignoring ---------------------------------\n" );
+            pk->b_started = VLC_FALSE;
+            return;
+        }
+
+        //if( pk->p_data[pk->i_data-1] == 0x40 ) /* Padding byte */
+        //    pk->i_data--;
+        XdsDecode( h, pk );
+
+        /* Reset it */
+        pk->b_started = VLC_FALSE;
+    }
+    else if( d1 >= 0x20 && h->b_xds )
+    {
+        xds_packet_t *pk = &h->pkt[h->i_class][h->i_type];
+
+        if( pk->i_data+2 > XDS_MAX_DATA_SIZE )
+        {
+            /* Broken -> reinit */
+            //fprintf( stderr, "xxxxxxxxxxxxxxxXDS broken, reset\n" );
+            h->b_xds = VLC_FALSE;
+            pk->b_started = VLC_FALSE;
+            return;
+        }
+        /* TODO check parity bit */
+        pk->p_data[pk->i_data++] = d1 & 0x7f;
+        pk->p_data[pk->i_data++] = d2 & 0x7f;
+        pk->i_sum += d1+d2;
+    }
+    else
+    {
+        h->b_xds = VLC_FALSE;
+    }
+}
+
 static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
 {
-    /* TODO */
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    XdsParse( &p_demux->p_sys->xds, d1, d2 );
+    if( p_demux->p_sys->xds.b_meta_changed )
+    {
+        xds_meta_t *m = &p_sys->xds.meta;
+        vlc_meta_t *p_meta;
+        vlc_epg_t *p_epg;
+
+        /* Channel meta data */
+        p_meta = vlc_meta_New();
+        if( m->psz_channel_name )
+            vlc_meta_SetPublisher( p_meta, m->psz_channel_name );
+        if( m->psz_channel_call_letter )
+            vlc_meta_SetTitle( p_meta, m->psz_channel_call_letter );
+        if( m->psz_channel_number )
+            vlc_meta_AddExtra( p_meta, "Channel number", m->psz_channel_number );
+        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META, TY_ES_GROUP, p_meta );
+        vlc_meta_Delete( p_meta );
+
+        /* Event meta data (current/future) */
+        p_epg = vlc_epg_New( NULL );
+        if( m->current.psz_name )
+        {
+            vlc_epg_AddEvent( p_epg, 0, 0, m->current.psz_name, NULL, NULL );
+            //if( m->current.psz_rating )
+            //  TODO but VLC cannot yet handle rating per epg event
+            vlc_epg_SetCurrent( p_epg, 0 );
+        }
+        if( m->future.psz_name )
+        {
+        }
+        if( p_epg->i_event > 0 )
+            es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, TY_ES_GROUP, p_epg );
+        vlc_epg_Delete( p_epg );
+    }
+    p_demux->p_sys->xds.b_meta_changed = VLC_FALSE;
 }
 
 /* seek to an exact time position within the stream, if possible.
