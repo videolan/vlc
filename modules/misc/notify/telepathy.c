@@ -92,6 +92,19 @@ static int Open( vlc_object_t *p_this )
 
     MALLOC_ERR( p_intf->p_sys, intf_sys_t );
 
+    /* connect to the session bus */
+    dbus_error_init( &error );
+    p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
+    if( !p_conn )
+    {
+        msg_Err( p_this, "Failed to connect to the DBus session daemon: %s",
+                error.message );
+        dbus_error_free( &error );
+        free( p_intf->p_sys );
+        return VLC_EGENERIC;
+    }
+    p_intf->p_sys->p_conn = p_conn;
+
     p_intf->p_sys->psz_format = config_GetPsz( p_intf, "telepathy-format" );
     if( !p_intf->p_sys->psz_format )
     {
@@ -107,19 +120,6 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
-    dbus_error_init( &error );
-
-    /* connect to the session bus */
-    p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
-    if( !p_conn )
-    {
-        msg_Err( p_this, "Failed to connect to the DBus session daemon: %s",
-                error.message );
-        dbus_error_free( &error );
-        free( p_intf->p_sys );
-        return VLC_EGENERIC;
-    }
-    p_intf->p_sys->p_conn = p_conn;
     return VLC_SUCCESS;
 }
 
