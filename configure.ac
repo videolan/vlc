@@ -3088,12 +3088,13 @@ dnl Trying with pkg-config
      VLC_ADD_LIBS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
 
      dnl even newer ffmpeg has a libswscale
-     PKG_CHECK_MODULES(SWSCALE, libavutil, libswscale,[
+     PKG_CHECK_MODULES(SWSCALE,[libavutil, libswscale],[
        VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}])
        VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
-       AC_CHECK_LIB(swscale, sws_getContext,
-         [AC_CHECK_HEADERS(ffmpeg/swscale.h)],[])
-       ],[ true ])
+       AC_CHECK_HEADERS(ffmpeg/swscale.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/swscale.h.])])
+dnl       AC_CHECK_LIB(swscale, sws_getContext,
+dnl         [AC_CHECK_HEADERS([ffmpeg/avutil.h, ffmpeg/swscale.h])],[])
+dnl       ],[ true ])
      VLC_RESTORE_FLAGS
     ],[
 
