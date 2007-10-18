@@ -3086,10 +3086,11 @@ dnl Trying with pkg-config
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LIBS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
+
      dnl even newer ffmpeg has a libswscale
-     PKG_CHECK_MODULES(SWSCALE, libswscale,[
-       VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}]) 
-       VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}]) 
+     PKG_CHECK_MODULES(SWSCALE, libavutil, libswscale,[
+       VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}])
+       VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
        AC_CHECK_LIB(swscale, sws_getContext,
          [AC_CHECK_HEADERS(ffmpeg/swscale.h)],[])
        ],[ true ])
