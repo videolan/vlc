@@ -59,7 +59,6 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     if( !psz_name ) psz_name = _("Undefined");
     p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), NULL, psz_name,
                                      0, NULL, -1, ITEM_TYPE_NODE );
-    p_input->i_id = ++p_playlist->i_last_input_id;
     p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist), p_input );
     p_item->i_children = 0;
 
