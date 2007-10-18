@@ -148,7 +148,6 @@ struct decoder_sys_t
 
     int     i_block;
     block_t *pp_block[CC_MAX_REORDER_SIZE];
-    block_t *p_current;
 
     int i_field;
     int i_channel;
@@ -203,7 +202,6 @@ static int Open( vlc_object_t *p_this )
     /* init of p_sys */
     memset( p_sys, 0, sizeof( *p_sys ) );
     p_sys->i_block = 0;
-    p_sys->p_current = NULL;
 
     p_sys->i_field = i_field;
     p_sys->i_channel = i_channel;
@@ -234,11 +232,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     for( ;; )
     {
-        block_t *p_block;
-
-        p_block = p_sys->p_current;
-        if( !p_block )
-            p_block = Pop( p_dec );
+        block_t *p_block = Pop( p_dec );
         if( !p_block )
             break;
 
@@ -385,22 +379,18 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
     const int64_t i_pts = p_block->i_pts;
     vlc_bool_t b_changed = VLC_FALSE;
 
-    p_sys->p_current = p_block;
-
     /* TODO do the real decoding here */
-    while( p_block && p_block->i_buffer >= 3 )
+    while( p_block->i_buffer >= 3 )
     {
         if( p_block->p_buffer[0] == p_sys->i_field )
             b_changed |= Eia608Parse( &p_sys->eia608, p_sys->i_channel, &p_block->p_buffer[1] );
 
         p_block->i_buffer -= 3;
         p_block->p_buffer += 3;
-        if( p_block->i_buffer <= 0 )
-        {
-            block_Release( p_block );
-            p_sys->p_current = p_block = NULL;
-        }
     }
+    if( p_block )
+        block_Release( p_block );
+
     static int64_t i_last = 0;
     if( b_changed )//&& i_pts - i_last > 100*1000 )
     {
@@ -1091,6 +1081,7 @@ static vlc_bool_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_
     Eia608ParseChannel( h, d1 );
     if( h->i_channel != i_channel_selected )
         return VLC_FALSE;
+    //fprintf( stderr, "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC %x %x\n", data[0], data[1] );
 
     if( d1 >= 0x10 )
     {
