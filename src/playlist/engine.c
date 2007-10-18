@@ -100,18 +100,18 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
                         var_CreateGetBool( p_playlist, "auto-preparse") ;
 
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL,
-                                                       0 );
+                                    0, NULL );
     p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL,
-                                                       0 );
+                                    0, p_playlist->p_root_category->p_input );
 
     if( !p_playlist->p_root_category || !p_playlist->p_root_onelevel )
         return NULL;
 
     /* Create playlist and media library */
-    p_playlist->p_local_category = playlist_NodeCreate( p_playlist,
-                              _( "Playlist" ),p_playlist->p_root_category, 0 );
-    p_playlist->p_local_onelevel =  playlist_NodeCreate( p_playlist,
-                              _( "Playlist" ), p_playlist->p_root_onelevel, 0 );
+    playlist_NodesPairCreate( p_playlist, _( "Playlist" ),
+                            &p_playlist->p_local_category,
+                            &p_playlist->p_local_onelevel, VLC_FALSE );
+
     p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
     p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
 
@@ -120,25 +120,17 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         !p_playlist->p_local_onelevel->p_input )
         return NULL;
 
-    /* Link the nodes together. Todo: actually create them from the same input*/
-    p_playlist->p_local_onelevel->p_input->i_id =
-        p_playlist->p_local_category->p_input->i_id;
-
     if( config_GetInt( p_playlist, "media-library") )
     {
-        p_playlist->p_ml_category =   playlist_NodeCreate( p_playlist,
-                         _( "Media Library" ), p_playlist->p_root_category, 0 );
-        p_playlist->p_ml_onelevel =  playlist_NodeCreate( p_playlist,
-                         _( "Media Library" ), p_playlist->p_root_onelevel, 0 );
+        playlist_NodesPairCreate( p_playlist, _( "Media Library" ),
+                            &p_playlist->p_ml_category,
+                            &p_playlist->p_ml_onelevel, VLC_FALSE );
 
         if(!p_playlist->p_ml_category || !p_playlist->p_ml_onelevel)
             return NULL;
 
         p_playlist->p_ml_category->i_flags |= PLAYLIST_RO_FLAG;
         p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
-        p_playlist->p_ml_onelevel->p_input->i_id =
-             p_playlist->p_ml_category->p_input->i_id;
-
     }
     else
     {

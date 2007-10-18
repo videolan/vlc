@@ -47,19 +47,24 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
  * \paam psz_name the name of the node
  * \param p_parent the parent node to attach to or NULL if no attach
  * \param p_flags miscellaneous flags
+ * \param p_input the input_item to attach to or NULL if it has to be created
  * \return the new node
  */
 playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
                                        const char *psz_name,
-                                       playlist_item_t *p_parent, int i_flags )
+                                       playlist_item_t *p_parent, int i_flags,
+                                       input_item_t *p_input )
 {
-    input_item_t *p_input;
+    input_item_t *p_new_input;
     playlist_item_t *p_item;
 
     if( !psz_name ) psz_name = _("Undefined");
-    p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), NULL, psz_name,
-                                     0, NULL, -1, ITEM_TYPE_NODE );
-    p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist), p_input );
+
+    if( !p_input )
+        p_new_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), NULL,
+                                        psz_name, 0, NULL, -1, ITEM_TYPE_NODE );
+    p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist),
+                                        p_input ? p_input : p_new_input );
 
     if( p_item == NULL )  return NULL;
     p_item->i_children = 0;
@@ -279,8 +284,7 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
 
 /**
  * Create a pair of nodes in the category and onelevel trees.
- * They share the same input ID.
- * \todo really share the input item
+ * They share the same input item.
  * \param p_playlist the playlist
  * \param psz_name the name of the nodes
  * \param pp_node_cat pointer to return the node in category tree
@@ -293,10 +297,10 @@ void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
                                vlc_bool_t b_for_sd )
 {
     *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
-                                        p_playlist->p_root_category, 0 );
+                                        p_playlist->p_root_category, 0, NULL );
     *pp_node_one = playlist_NodeCreate( p_playlist, psz_name,
-                                        p_playlist->p_root_onelevel, 0 );
-    (*pp_node_one)->p_input->i_id = (*pp_node_cat)->p_input->i_id;
+                                        p_playlist->p_root_onelevel, 0,
+                                        (*pp_node_cat)->p_input );
     if( b_for_sd )
     {
         (*pp_node_cat)->i_flags |= PLAYLIST_RO_FLAG;

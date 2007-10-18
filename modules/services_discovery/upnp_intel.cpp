@@ -853,7 +853,7 @@ void MediaServer::_buildPlaylist( Container* parent )
         playlist_item_t* parentNode = parent->getPlaylistNode();
 
         char* title = strdup( container->getTitle() );
-        playlist_item_t* node = playlist_NodeCreate( p_playlist, title, parentNode, 0 );
+        playlist_item_t* node = playlist_NodeCreate( p_playlist, title, parentNode, 0, NULL );
         free( title );
 
         container->setPlaylistNode( node );
@@ -916,7 +916,7 @@ bool MediaServerList::addServer( MediaServer* s )
     char* name = strdup( s->getFriendlyName() );
     playlist_item_t* node = playlist_NodeCreate( pl_Get( _cookie->serviceDiscovery ),
                                                  name,
-                                          _cookie->serviceDiscovery->p_sys->p_node_cat, 0 );
+                                          _cookie->serviceDiscovery->p_sys->p_node_cat, 0, NULL );
     free( name );
     s->setPlaylistNode( node );
 

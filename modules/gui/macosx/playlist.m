@@ -1373,12 +1373,12 @@
 
     if( psz_name != NULL && psz_name != "" )
         p_item = playlist_NodeCreate( p_playlist, psz_name,
-                                            p_playlist->p_local_category, 0 );
+                                      p_playlist->p_local_category, 0, NULL );
     else if(! config_GetInt( p_playlist, "interact" ) )
     {
         /* in case that the interaction is disabled, just give it a bogus name */
         p_item = playlist_NodeCreate( p_playlist, _("Empty Folder"),
-                                            p_playlist->p_local_category, 0 );
+                                      p_playlist->p_local_category, 0, NULL );
     }
 
     if(! p_item )

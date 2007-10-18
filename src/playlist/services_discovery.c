@@ -207,7 +207,7 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
         if( !p_cat )
         {
             p_cat = playlist_NodeCreate( p_parent->p_playlist, psz_cat,
-                                         p_parent, 0 );
+                                         p_parent, 0, NULL );
             p_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
         }
         p_parent = p_cat;
