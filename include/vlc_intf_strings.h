@@ -116,12 +116,12 @@
                   "will be turned to black and white, except the parts that "\
                   "are of the color that you select in the settings.")
 
-#define I_LONGHELP N_("<html>" \
-    "<h2>Welcome to VLC media player help</h2>" \
+#define I_LONGHELP N_("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />" \
+    "<h2>Welcome to VLC media player Help</h2>" \
         "<h3>Documentation</h3>" \
             "<p>You can find VLC documentation on VideoLAN's <a href=\"http://wiki.videolan.org\">wiki</a> website.</p>" \
             "<p>If you are a newcomer to VLC media player, please read the<br><a href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introduction to VLC media player</em></a>.</p>" \
-            "<p>You will find some information on how to use the player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How to play files with VLC media player<em></a>\" document.</p>" \
+            "<p>You will find some information on how to use the player in the <br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How to play files with VLC media player</em></a>\" document.</p>" \
             "<p>For all the saving, converting, transcoding, encoding, muxing and streaming tasks, you should find useful information in the <a href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</a>.</p>" \
             "<p>If you are unsure about terminology, please consult the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</p>" \
             "<p>To understand the main keyboard shortcuts, read the <a href=\"http://wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p>" \
@@ -130,6 +130,6 @@
             "<p>You might then get (and give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC channel ( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> on irc.freenode.net ).</p>" \
         "<h3>Contribute to the project</h3>" \
             "<p>You can help the VideoLAN project giving some of your time to help the community, to design skins, to translate the documentation, to test and to code. You can also give funds and material to help us. And of course, you can <b>promote</b> VLC media player.</p>" \
-    "</html>")
+    "</body></html>")
 
 #endif

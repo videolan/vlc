@@ -26,6 +26,7 @@
  *****************************************************************************/
 @interface VLAboutBox : NSObject
 {
+    /* main about panel and stuff related to its views */
     IBOutlet id o_about_window;
     IBOutlet id o_name_version_field;
     IBOutlet id o_revision_field;
@@ -47,9 +48,14 @@
     NSDictionary *o_info_dict;
     CFBundleRef localInfoBundle;
     NSDictionary *o_local_dict;
+    
+    /* generic help window */
+    IBOutlet id o_help_window;
+    IBOutlet id o_help_web_view;
 }
 
 + (VLAboutBox *)sharedInstance;
-- (void)showPanel;
+- (void)showAbout;
+- (void)showHelp;
 
 @end

@@ -213,6 +213,7 @@
                 togglePlaylist = id; 
                 viewAbout = id; 
                 viewErrorsAndWarnings = id; 
+                viewHelp = id; 
                 viewPreferences = id; 
             }; 
             CLASS = VLCMain; 
@@ -267,6 +268,7 @@
                 "o_mi_fullscreen" = id; 
                 "o_mi_fwd" = id; 
                 "o_mi_half_window" = id; 
+                "o_mi_help" = id; 
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
                 "o_mi_info" = id; 

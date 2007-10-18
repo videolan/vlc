@@ -667,6 +667,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
 
     [o_mu_help setTitle: _NS("Help")];
+    [o_mi_help setTitle: _NS("VLC media player Help...")];
     [o_mi_readme setTitle: _NS("ReadMe / FAQ...")];
     [o_mi_documentation setTitle: _NS("Online Documentation...")];
     [o_mi_website setTitle: _NS("VideoLAN Website...")];
@@ -1879,12 +1880,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)viewAbout:(id)sender
 {
-    if ( !nib_about_loaded )
+    if( !nib_about_loaded )
     {
         nib_about_loaded = [NSBundle loadNibNamed:@"About" owner:self];
-        [o_about showPanel];
+        [o_about showAbout];
     } else {
-        [o_about showPanel];
+        [o_about showAbout];
     }
 }
 
@@ -1898,10 +1899,21 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)checkForUpdate:(id)sender
 {
-    if ( !nib_update_loaded )
+    if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
     [o_update showUpdateWindow];
+}
+
+- (IBAction)viewHelp:(id)sender
+{
+    if( !nib_about_loaded )
+    {
+        nib_about_loaded = [NSBundle loadNibNamed:@"About" owner:self];
+        [o_about showHelp];
+    }
+    else
+        [o_about showHelp];
 }
 
 - (IBAction)openReadMe:(id)sender

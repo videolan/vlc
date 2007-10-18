@@ -253,6 +253,7 @@ struct intf_sys_t
     IBOutlet id o_mi_bring_atf;
 
     IBOutlet id o_mu_help;
+    IBOutlet id o_mi_help;
     IBOutlet id o_mi_readme;
     IBOutlet id o_mi_documentation;
     IBOutlet id o_mi_website;
@@ -347,11 +348,10 @@ struct intf_sys_t
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;
 - (IBAction)checkForUpdate:(id)sender;
+- (IBAction)viewHelp:(id)sender;
 - (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;
-- (IBAction)reportABug:(id)sender;
 - (IBAction)openWebsite:(id)sender;
-- (IBAction)openLicense:(id)sender;
 - (IBAction)openForum:(id)sender;
 - (IBAction)openDonate:(id)sender;
 - (IBAction)openCrashLog:(id)sender;

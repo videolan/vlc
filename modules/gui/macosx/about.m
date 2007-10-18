@@ -26,6 +26,8 @@
  *****************************************************************************/
 #include "intf.h"
 #include "about.h"
+#include <vlc_intf_strings.h>
+#import <WebKit/WebKit.h>
 
 /*****************************************************************************
  * VLAboutBox implementation
@@ -50,7 +52,11 @@ static VLAboutBox *_o_sharedInstance = nil;
     return _o_sharedInstance;
 }
 
-- (void)showPanel
+/*****************************************************************************
+* VLC About Window
+*****************************************************************************/
+
+- (void)showAbout
 {
     if (!o_credits_path)
     {
@@ -207,6 +213,19 @@ static VLAboutBox *_o_sharedInstance = nil;
             b_restart = YES;
         }
     }
+}
+
+/*****************************************************************************
+* VLC Generic Help Window
+*****************************************************************************/
+
+- (void)showHelp
+{
+    [o_help_window setTitle: _NS("VLC media player Help")];
+    [o_help_window makeKeyAndOrderFront: self];
+
+    [[o_help_web_view mainFrame] loadHTMLString: [NSString stringWithString: _NS(I_LONGHELP)]
+                                        baseURL: [NSURL URLWithString:@"http://videolan.org"]];
 }
 
 @end

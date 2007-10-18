@@ -84,6 +84,7 @@
 		CC4ED9B70ABE07C800CA4CC5 /* repeat_single_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B00ABE07C800CA4CC5 /* repeat_single_embedded_blue.png */; };
 		CC4ED9B80ABE07C800CA4CC5 /* shuffle_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */; };
 		CC4ED9B90ABE07C800CA4CC5 /* shuffle_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */; };
+		CC962E2D0CC7992800A56695 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CCCB86DB0ACFDFB300CF1E10 /* fs_time_slider.png in Resources */ = {isa = PBXBuildFile; fileRef = CCCB86C00ACFDFB300CF1E10 /* fs_time_slider.png */; };
 		CCCB86DC0ACFDFB400CF1E10 /* fs_skip_next_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = CCCB86C10ACFDFB300CF1E10 /* fs_skip_next_highlight.png */; };
 		CCCB86DD0ACFDFB400CF1E10 /* fs_skip_next.png in Resources */ = {isa = PBXBuildFile; fileRef = CCCB86C20ACFDFB300CF1E10 /* fs_skip_next.png */; };
@@ -975,6 +976,7 @@
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CC6EDD4F0B9CA2140096068A /* eyetv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eyetv.h; path = ../../modules/gui/macosx/eyetv.h; sourceTree = SOURCE_ROOT; };
 		CC6EDD500B9CA2140096068A /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../modules/gui/macosx/eyetv.m; sourceTree = SOURCE_ROOT; };
+		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCCB86C00ACFDFB300CF1E10 /* fs_time_slider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_time_slider.png; path = Resources/fs_time_slider.png; sourceTree = "<group>"; };
@@ -1039,6 +1041,7 @@
 				1058C7AFFEA557BF11CA2CBB /* Cocoa.framework in Frameworks */,
 				CC3DC89C0A7CDB9600B53F32 /* ApplicationServices.framework in Frameworks */,
 				CC1941250B9C1F8400635F6B /* QTKit.framework in Frameworks */,
+				CC962E2D0CC7992800A56695 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1144,6 +1147,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC962E2C0CC7992800A56695 /* WebKit.framework */,
 				CC1941240B9C1F8400635F6B /* QTKit.framework */,
 				CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,

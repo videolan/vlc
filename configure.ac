@@ -5305,7 +5305,7 @@ AC_ARG_ENABLE(macosx,
      VLC_ADD_PLUGINS([access_eyetv])
      VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
      VLC_ADD_LDFLAGS([minimal_macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL])
-     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit])
+     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit,-framework,WebKit])
      VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
      VLC_ADD_OBJCFLAGS( [minimal_macosx],[-fobjc-exceptions] )
    fi],
@@ -5315,7 +5315,7 @@ AC_ARG_ENABLE(macosx,
      VLC_ADD_BUILTINS([macosx])
      VLC_ADD_BUILTINS([minimal_macosx])
      VLC_ADD_LDFLAGS([minimal_macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL])
-     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit])
+     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit,-framework,WebKit])
      VLC_ADD_OBJCFLAGS([macosx],[-fobjc-exceptions])
      VLC_ADD_OBJCFLAGS([minimal_macosx],[-fobjc-exceptions])
     ])])
