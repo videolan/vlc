@@ -70,12 +70,14 @@ static const char *nloopf_list_text[] =
 static const char *enc_hq_list[] = { "rd", "bits", "simple" };
 static const char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
 
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
   N_("Experimental"), N_("Nearest neighbour (bad quality)"),
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
   N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -485,6 +487,9 @@ static struct
     { VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565 },
     { VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24 },
     { VLC_FOURCC('R','V','3','2'), PIX_FMT_RGBA32 },
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+    { VLC_FOURCC('R','G','B','A'), PIX_FMT_RGBA },
+#endif
     { VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8 },
 
     { 0, 0 }
