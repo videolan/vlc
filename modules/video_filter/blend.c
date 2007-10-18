@@ -141,7 +141,6 @@ static int OpenFilter( vlc_object_t *p_this )
              (char *)&p_filter->fmt_in.video.i_chroma,
              (char *)&p_filter->fmt_out.video.i_chroma );
 
-
     return VLC_SUCCESS;
 }
 
