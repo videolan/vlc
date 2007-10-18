@@ -60,9 +60,9 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), NULL, psz_name,
                                      0, NULL, -1, ITEM_TYPE_NODE );
     p_item = playlist_ItemNewFromInput( VLC_OBJECT(p_playlist), p_input );
-    p_item->i_children = 0;
 
     if( p_item == NULL )  return NULL;
+    p_item->i_children = 0;
 
     ARRAY_APPEND(p_playlist->all_items, p_item);
 
