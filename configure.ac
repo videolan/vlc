@@ -3062,8 +3062,8 @@ dnl Trying with pkg-config
      CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
      CFLAGS="${CFLAGS} ${FFMPEG_CFLAGS}"
      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
-     AC_CHECK_HEADERS(ffmpeg/avformat.h)
-     AC_CHECK_HEADERS(ffmpeg/avutil.h)
+     AC_CHECK_HEADERS(ffmpeg/avformat.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avformat.h.])] )
+     AC_CHECK_HEADERS(ffmpeg/avutil.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avutil.h.])] )
      dnl newer ffmpeg have a separate libpostproc
      PKG_CHECK_MODULES(POSTPROC, libpostproc,[
        VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
