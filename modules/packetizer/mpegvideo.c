@@ -130,6 +130,7 @@ struct decoder_sys_t
     vlc_bool_t b_cc_reset;
     uint32_t i_cc_flags;
     mtime_t i_cc_pts;
+    mtime_t i_cc_dts;
     cc_data_t cc;
 };
 
@@ -200,6 +201,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_cc_reset = VLC_FALSE;
     p_sys->i_cc_pts = 0;
+    p_sys->i_cc_dts = 0;
     p_sys->i_cc_flags = 0;
     cc_Init( &p_sys->cc );
 
@@ -401,8 +403,8 @@ static block_t *GetCc( decoder_t *p_dec, vlc_bool_t pb_present[4] )
     {
         memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
         p_cc->i_dts = 
-        p_cc->i_pts = p_sys->i_cc_pts;
-        p_cc->i_flags = p_sys->i_cc_flags & ( BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B);
+        p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
+        p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & ( BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B);
     }
     cc_Flush( &p_sys->cc );
     return p_cc;
@@ -543,6 +545,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         /* CC */
         p_sys->b_cc_reset = VLC_TRUE;
         p_sys->i_cc_pts = p_pic->i_pts;
+        p_sys->i_cc_dts = p_pic->i_dts;
         p_sys->i_cc_flags = p_pic->i_flags;
     }
 
