@@ -1368,7 +1368,7 @@ static int Mux( sout_mux_t *p_mux )
                                 continue;
 
                             if ( i_spu_delay >= I64C(100000000)
-                                  || i_spu_delay < 10000 )
+                                  || i_spu_delay < I64C(10000) )
                             {
                                 BufferChainClean( p_mux->p_sout,
                                                   &p_stream->chain_pes );
