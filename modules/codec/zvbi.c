@@ -4,7 +4,8 @@
  * Copyright (C) 2007, M2X
  * $Id$
  *
- * Authors: Derk-Jan Hartman <djhartman at m2x dot nl> for M2X
+ * Authors: Derk-Jan Hartman <djhartman at m2x dot nl>
+ *          Jean-Paul Saman <jpsaman at m2x dot nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,11 +130,19 @@ struct decoder_sys_t
 
     /* Positioning of Teletext images */
     int                     i_align;
+
+    /* Misc */
+#ifdef HAVE_FFMPEG_SWSCALE_H
+    image_handler_t         *p_image;
+#endif
 };
 
 static void event_handler( vbi_event *ev, void *user_data );
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int OpaquePage( decoder_t *p_dec, vbi_page p_page, video_format_t fmt,
+                        picture_t **p_src );
+
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int Position( vlc_object_t *p_this, char const *psz_cmd,
@@ -161,9 +170,18 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
-
     }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
+
+#ifdef HAVE_FFMPEG_SWSCALE_H
+    p_sys->p_image = image_HandlerCreate( VLC_OBJECT(p_dec) );
+    if( !p_sys->p_image )
+    {
+        free( p_sys );
+        msg_Err( p_dec, "out of memory" );
+        return VLC_ENOMEM;
+    }
+#endif
 
     p_sys->p_vbi_dec = vbi_decoder_new();
     p_sys->p_dvb_demux = vbi_dvb_pes_demux_new( NULL, NULL );
@@ -198,8 +216,11 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->b_text )
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('T','E','X','T');
     else
+#ifdef HAVE_FFMPEG_SWSCALE_H
+        p_dec->fmt_out.video.i_chroma = VLC_FOURCC('Y','U','V','A');
+#else
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('R','G','B','A');
-
+#endif
     return VLC_SUCCESS;
 }
 
@@ -211,6 +232,9 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+#ifdef HAVE_FFMPEG_SWSCALE_H
+    if( p_sys->p_image ) image_HandlerDelete( p_sys->p_image );
+#endif
     if( p_sys->p_vbi_dec ) vbi_decoder_delete( p_sys->p_vbi_dec );
     if( p_sys->p_dvb_demux ) vbi_dvb_demux_delete( p_sys->p_dvb_demux );
     free( p_sys );
@@ -223,7 +247,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
-    decoder_sys_t   *p_sys = p_dec->p_sys;
+    decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
     block_t         *p_block;
     subpicture_t    *p_spu = NULL;
     video_format_t  fmt;
@@ -231,12 +255,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     vbi_page        p_page;
     const uint8_t   *p_pos;
     unsigned int    i_left;
-
-    /* part of kludge */
-    uint32_t        *p_begin, *p_end;
-    unsigned        int x = 0, y = 0;
-    vbi_opacity     opacity;
-    /* end part of kludge */
 
     if( (pp_block == NULL) || (*pp_block == NULL) )
         return NULL;
@@ -274,9 +292,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_sys->i_last_page = p_sys->i_wanted_page;
     p_sys->b_update = VLC_FALSE;
+#if 0
     msg_Dbg( p_dec, "we now have page: %d ready for display",
              p_sys->i_wanted_page );
-
+#endif
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
@@ -288,7 +307,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') : VLC_FOURCC('R','G','B','A');
+    fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') :
+#ifdef HAVE_FFMPEG_SWSCALE_H
+                                   VLC_FOURCC('Y','U','V','A');
+#else
+                                   VLC_FOURCC('R','G','B','A');
+#endif
     fmt.i_aspect = p_sys->b_text ? 0 : VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
@@ -311,7 +335,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_flags = SUBPICTURE_ALIGN_TOP;
 
     p_spu->i_start = (mtime_t) p_block->i_pts;
-    //msg_Dbg( p_dec, "spu start "I64Fd" pts "I64Fd, p_spu->i_start, p_block->i_pts );
     p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
@@ -320,6 +343,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_height = fmt.i_height;
     p_spu->i_original_picture_width = p_page.columns * 12;
     p_spu->i_original_picture_height = p_page.rows * 10;
+
+#ifdef WORDS_BIGENDIAN
+# define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_BE
+#else
+# define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_LE
+#endif
 
     if( p_sys->b_text )
     {
@@ -331,60 +360,87 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                         "UTF-8", 0, 0, 0, 0, p_page.columns, p_page.rows );
         p_text[i_total] = '\0';
         /* Strip off the pagenumber */
-        if( i_total <= 8 ) goto error;
+        if( i_total <= 40 ) goto error;
         p_spu->p_region->psz_text = strdup( &p_text[8] );
 
         p_spu->p_region->fmt.i_height = p_spu->p_region->fmt.i_visible_height = p_page.rows + 1;
         msg_Dbg( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
     }
-    else 
+    else
     {
-        vbi_draw_vt_page( &p_page, VBI_PIXFMT_RGBA32_LE,
+#ifdef HAVE_FFMPEG_SWSCALE_H
+        video_format_t fmt_in;
+        picture_t *p_pic, *p_dest;
+
+        p_pic = ( picture_t * ) malloc( sizeof( picture_t ) );
+        if( !p_pic )
+        {
+            msg_Err( p_dec, "out of memory" );
+            goto error;
+        }
+
+        memset( &fmt_in, 0, sizeof( video_format_t ) );
+        memset( p_pic, 0, sizeof( picture_t ) );
+
+        fmt_in = p_spu->p_region->fmt;
+        fmt_in.i_chroma = VLC_FOURCC('R','G','B','A');
+
+        vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic, fmt_in.i_chroma,
+                        fmt_in.i_width, fmt_in.i_height, fmt_in.i_aspect );
+
+        if( !p_pic->i_planes )
+        {
+            free( p_pic->p_data_orig );
+            free( p_pic );
+            goto error;
+        }
+
+        vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
+                          p_pic->p->p_pixels, 1, 1 );
+
+        p_pic->p->i_lines = p_page.rows * 10;
+        p_pic->p->i_pitch = p_page.columns * 12 * 4;
+
+        OpaquePage( p_dec, p_page, fmt_in, &p_pic );
+
+#if 0
+        msg_Dbg( p_dec, "page %x-%x(%d,%d)",
+                 p_page.pgno, p_page.subno,
+                 p_page.rows, p_page.columns );
+#endif
+        p_dest = image_Convert( p_sys->p_image, p_pic, &fmt_in,
+                                &p_spu->p_region->fmt );
+        if( !p_dest )
+        {
+            free( p_pic->p_data_orig );
+            free( p_pic );
+            msg_Err( p_dec, "chroma conversion failed" );
+            goto error;
+        }
+
+        vout_CopyPicture( VLC_OBJECT(p_dec), &p_spu->p_region->picture,
+                          p_dest );
+
+        free( p_pic->p_data_orig );
+        free( p_pic );
+
+        free( p_dest->p_data_orig );
+        free( p_dest );
+#else
+        picture_t *p_pic;
+
+        vbi_draw_vt_page( &p_page, ZVBI_PIXFMT_RGBA32,
                           p_spu->p_region->picture.p->p_pixels, 1, 1 );
+
         p_spu->p_region->picture.p->i_lines = p_page.rows * 10;
         p_spu->p_region->picture.p->i_pitch = p_page.columns * 12 * 4;
+
+        p_pic = &(p_spu->p_region->picture);
+        OpaquePage( p_dec, p_page, fmt, &p_pic );
+#endif
     }
 
-    /* Kludge since zvbi doesn't provide an option to specify opacity. */
-    if( p_sys->b_opaque && !p_sys->b_text )
-    {
-        p_begin = (uint32_t *)p_spu->p_region->picture.p->p_pixels;
-        p_end   = (uint32_t *)p_spu->p_region->picture.p->p_pixels+(fmt.i_width * fmt.i_height);
-
-        for( ; p_begin < p_end; p_begin++ )
-        {
-            opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
-            switch( opacity )
-            {
-            /* Show video instead of this character */
-            case VBI_TRANSPARENT_SPACE:
-                *p_begin = 0;
-                break;
-            /* To make the boxed text "closed captioning" transparent
-             * change VLC_TRUE to VLC_FALSE.
-             */
-            case VBI_OPAQUE:
-                if( p_sys->b_opaque )
-                    break;
-            /* Full text transparency. only foreground color is show */
-            case VBI_TRANSPARENT_FULL:
-            /* Transparency for boxed text */
-            case VBI_SEMI_TRANSPARENT:
-                if( (*p_begin & 0xffffff00) == 0xff  )
-                    *p_begin = 0;
-                break;
-            default:
-                break;
-            }
-            x++;
-            if( x >= fmt.i_width )
-            {
-                x = 0;
-                y++;
-            }
-        }
-    }
-    /* end of kludge */
+#undef PIXFMT_RGBA32
 
     vbi_unref_page( &p_page );
     block_Release( p_block );
@@ -429,6 +485,74 @@ static void event_handler( vbi_event *ev, void *user_data )
         msg_Dbg( p_dec, "Aspect update" );
     else if( ev->type == VBI_EVENT_NETWORK )
         msg_Dbg( p_dec, "Program info received" );
+}
+
+static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
+                       video_format_t fmt, picture_t **p_src )
+{
+    decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
+    uint32_t        *p_begin, *p_end;
+    unsigned        int x = 0, y = 0;
+    vbi_opacity     opacity;
+
+    /* Kludge since zvbi doesn't provide an option to specify opacity. */
+    if( ( fmt.i_chroma != VLC_FOURCC('R','G','B','A' ) ) &&
+        ( fmt.i_chroma != VLC_FOURCC('Y','U','V','A' ) ) )
+    {
+        msg_Err( p_dec, "chroma not supported %4.4s", (char *)&fmt.i_chroma );
+        return VLC_EGENERIC;
+    }
+
+    switch( fmt.i_chroma )
+    {
+        case VLC_FOURCC('R','G','B','A' ):
+            p_begin = (uint32_t *)(*p_src)->p->p_pixels;
+            p_end = (uint32_t *)(*p_src)->p->p_pixels+(fmt.i_width * fmt.i_height);
+            break;
+        case VLC_FOURCC('Y','U','V','A' ):
+            p_begin = (uint32_t *)(*p_src)->p[A_PLANE].p_pixels;
+            p_end = (uint32_t *)(*p_src)->p[A_PLANE].p_pixels +
+                ( (*p_src)->p[A_PLANE].i_lines * (*p_src)->p[A_PLANE].i_pitch );
+            break;
+        default:
+            msg_Err( p_dec, "chroma not supported %4.4s", (char *)&fmt.i_chroma );
+            return VLC_EGENERIC;
+    }
+
+    for( ; p_begin < p_end; p_begin++ )
+    {
+        opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
+        switch( opacity )
+        {
+        /* Show video instead of this character */
+        case VBI_TRANSPARENT_SPACE:
+            *p_begin = 0;
+            break;
+        /* To make the boxed text "closed captioning" transparent
+         * change VLC_TRUE to VLC_FALSE.
+         */
+        case VBI_OPAQUE:
+            if( p_sys->b_opaque )
+                break;
+        /* Full text transparency. only foreground color is show */
+        case VBI_TRANSPARENT_FULL:
+        /* Transparency for boxed text */
+        case VBI_SEMI_TRANSPARENT:
+            if( (*p_begin & 0xffffff00) == 0xff  )
+                *p_begin = 0;
+            break;
+        default:
+            break;
+        }
+        x++;
+        if( x >= fmt.i_width )
+        {
+            x = 0;
+            y++;
+        }
+    }
+    /* end of kludge */
+    return VLC_SUCCESS;
 }
 
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
