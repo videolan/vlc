@@ -177,7 +177,7 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
     if( i_width <= 0 || i_height <= 0 ) return;
 
 #if 0
-    printf( "chroma: %4.4s -> %4.4s\n",
+    msg_Dbg( p_filter, "chroma: %4.4s -> %4.4s\n",
              (char *)&p_filter->fmt_in.video.i_chroma,
              (char *)&p_filter->fmt_out.video.i_chroma );
 #endif
