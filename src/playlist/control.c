@@ -475,7 +475,8 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
     free( psz_uri );
 
-    if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
+    if( p_playlist->p_fetcher &&
+            p_playlist->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
         vlc_bool_t b_has_art;
 
