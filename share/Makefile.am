@@ -251,6 +251,7 @@ DIST_lua= \
 	luameta/googleimage.lua \
 	luaplaylist/README.txt \
 	luaplaylist/dailymotion.lua \
+	luaplaylist/lelombrik.lua \
 	luaplaylist/youtube.lua \
 	luaplaylist/youtube_homepage.lua \
 	luaplaylist/metacafe.lua \
