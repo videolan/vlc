@@ -148,6 +148,24 @@ static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang );
 
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
 
+static const vlc_fourcc_t EsOutFourccClosedCaptions[4] = {
+    VLC_FOURCC('c', 'c', '1', ' '),
+    VLC_FOURCC('c', 'c', '2', ' '),
+    VLC_FOURCC('c', 'c', '3', ' '),
+    VLC_FOURCC('c', 'c', '4', ' '),
+};
+static inline int EsOutGetClosedCaptionsChannel( vlc_fourcc_t fcc )
+{
+    int i;
+    for( i = 0; i < 4; i++ )
+    {
+        if( fcc == EsOutFourccClosedCaptions[i] )
+            return i;
+    }
+    return -1;
+}
+
+
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
@@ -657,7 +675,9 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
         !vlc_meta_Get( p_meta, vlc_meta_NowPlaying) &&
         !vlc_meta_Get( p_meta, vlc_meta_Publisher) &&
         vlc_dictionary_keys_count( &p_meta->extra_tags ) <= 0 )
-            return;
+    {
+        return;
+    }
     /* Find program */
     for( i = 0; i < p_sys->i_pgrm; i++ )
     {
@@ -984,8 +1004,11 @@ static vlc_bool_t EsIsSelected( es_out_t *out, es_out_id_t *es )
     {
         vlc_bool_t b_decode = VLC_FALSE;
         if( es->p_master->p_dec )
-            input_DecoderGetCcState( es->p_master->p_dec, &b_decode,
-                                     es->fmt.i_codec == VLC_FOURCC('c','c','1',' ') ? 0 : 1 );
+        {
+            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
+            if( i_channel != -1 )
+                input_DecoderGetCcState( es->p_master->p_dec, &b_decode, i_channel );
+        }
         return b_decode;
     }
     else
@@ -1008,11 +1031,12 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
 
     if( es->p_master )
     {
+        int i_channel;
         if( !es->p_master->p_dec )
             return;
 
-        if( input_DecoderSetCcState( es->p_master->p_dec, VLC_TRUE,
-                                     es->fmt.i_codec == VLC_FOURCC('c','c','1',' ') ? 0 : 1 ) )
+        i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
+        if( i_channel == -1 || input_DecoderSetCcState( es->p_master->p_dec, VLC_TRUE, i_channel ) )
             return;
     }
     else
@@ -1088,7 +1112,11 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
     if( es->p_master )
     {
         if( es->p_master->p_dec )
-            input_DecoderSetCcState( es->p_master->p_dec, VLC_FALSE, es->fmt.i_codec == VLC_FOURCC('c','c','1',' ') ? 0 : 1 );
+        {
+            int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
+            if( i_channel != -1 )
+                input_DecoderSetCcState( es->p_master->p_dec, VLC_FALSE, i_channel );
+        }
     }
     else
     {
