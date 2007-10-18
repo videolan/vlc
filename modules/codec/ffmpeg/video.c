@@ -126,6 +126,8 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
         return VLC_FOURCC('R','V','2','4');
     case PIX_FMT_RGBA32:
         return VLC_FOURCC('R','V','3','2');
+    case PIX_FMT_RGBA:
+        return VLC_FOURCC('R','G','B','A');
     case PIX_FMT_GRAY8:
         return VLC_FOURCC('G','R','E','Y');
 
