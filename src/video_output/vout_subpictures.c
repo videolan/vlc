@@ -547,8 +547,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_blend->fmt_out.video.i_y_offset = 0;
             p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
             p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
-            p_spu->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
-            /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
+            p_spu->p_blend->fmt_in.video.i_chroma = p_region->fmt.i_chroma;
 
             p_spu->p_blend->p_module =
                 module_Need( p_spu->p_blend, "video blending", 0, 0 );
