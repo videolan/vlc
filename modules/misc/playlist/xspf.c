@@ -306,6 +306,7 @@ static char *assertUTF8URI( char *psz_name )
         i_delim++; /* skip the ':' */
         strncpy( psz_ret, psz_s, i_delim );
         psz_d = psz_ret + i_delim;
+        psz_s += i_delim;
 
         if( !strncmp( psz_s, "file://", 7 ) )
             b_uri_is_file = VLC_TRUE;
