@@ -139,6 +139,8 @@ private:
 public slots:
     virtual void updateMRL() ;
     virtual void updateButtons() ;
+private slots:
+    void browseDevice();
 };
 
 

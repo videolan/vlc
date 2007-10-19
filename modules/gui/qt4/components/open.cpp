@@ -247,10 +247,11 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 #endif /* Disc Probing under Windows */
 
     /* CONNECTs */
-    BUTTONACT( ui.dvdRadioButton, updateButtons());
-    BUTTONACT( ui.vcdRadioButton, updateButtons());
-    BUTTONACT( ui.audioCDRadioButton, updateButtons());
-    BUTTONACT( ui.dvdsimple,  updateButtons());
+    BUTTONACT( ui.dvdRadioButton, updateButtons() );
+    BUTTONACT( ui.vcdRadioButton, updateButtons() );
+    BUTTONACT( ui.audioCDRadioButton, updateButtons() );
+    BUTTONACT( ui.dvdsimple, updateButtons() );
+    BUTTONACT( ui.browseDiscButton, browseDevice() );
 
     CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
     CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
@@ -348,6 +349,15 @@ void DiscOpenPanel::updateMRL()
     emit mrlUpdated( mrl );
 }
 
+void DiscOpenPanel::browseDevice()
+{
+    QString dir = QFileDialog::getExistingDirectory( 0, 
+            qtr("Open a device or a VIDEO_TS directory") );
+    if (!dir.isEmpty()) {
+        ui.deviceCombo->setEditText( dir );
+    }
+    updateMRL();
+}
 
 /**************************************************************************
  * Open Network streams and URL pages                                     *
