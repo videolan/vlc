@@ -1432,6 +1432,10 @@ static struct
 #endif
     { VLC_FOURCC(0x22,0x0,0x0,0x0), CODEC_ID_TRUESPEECH,
       AUDIO_ES, "TrueSpeech" },
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(46<<8)+0)
+    { VLC_FOURCC('N','E','L','L'), CODEC_ID_NELLYMOSER,
+      AUDIO_ES, "NellyMoser ASAO" },
+#endif
 
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,

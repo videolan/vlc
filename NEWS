@@ -80,6 +80,7 @@ Decoders:
  * Closed Caption Decoder (DVD, ReplayTV, Tivo, DVB/ATSC)
  * H.264 PAFF support
  * DNxHD / VC-3 support
+ * NellyMoser ASAO support
 
 Encoders:
  * Flash Screen Video support
