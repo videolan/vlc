@@ -34,6 +34,7 @@
 #include "ui/sprefs_interface.h"
 
 #include <vlc_config_cat.h>
+#include "vlc_control.h"
 
 #include <QString>
 #include <QFont>
@@ -243,6 +244,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
                  volNormalizer );
          CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
+
+
+        if( control_Exists( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+            ui.lastfm->setCheckState( Qt::Checked );
+        else
+            ui.lastfm->setCheckState( Qt::Unchecked );
+        CONNECT( ui.lastfm, stateChanged( int ), this , lastfm_Changed( int ) );
+
+         CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
+                         lastfm_user_edit );
+         CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
+                         lastfm_pass_edit );
         END_SPREFS_CAT;
 
         /* Input and Codecs Panel Implementation */
@@ -375,3 +388,10 @@ void SPrefsPanel::apply()
 void SPrefsPanel::clean()
 {}
 
+void SPrefsPanel::lastfm_Changed( int i_state )
+{
+    if( i_state == Qt::Checked )
+        control_Add( VLC_OBJECT( p_intf ), "audioscrobbler" );
+    else if( i_state == Qt::Unchecked )
+        control_Remove( VLC_OBJECT( p_intf ), "audioscrobbler" );
+}

@@ -82,6 +82,7 @@ private:
 /* Display only the options for the selected audio output */
 private slots:
     void AudioDeviceChanged();
+    void lastfm_Changed( int );
 };
 
 #endif

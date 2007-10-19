@@ -423,6 +423,8 @@ void NetOpenPanel::updateMRL() {
         switch( proto ) {
         case 0:
             mrl = "http://" + addr;
+            emit methodChanged("http-caching");
+            break;
         case 1:
             mrl = "https://" + addr;
             emit methodChanged("http-caching");

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>461</width>
-    <height>554</height>
+    <height>682</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -237,6 +237,46 @@
        <widget class="QDoubleSpinBox" name="volNormalizer" >
         <property name="alignment" >
          <set>Qt::AlignRight</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4" >
+     <property name="title" >
+      <string>_("Last.fm")</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
+       <widget class="QCheckBox" name="lastfm" >
+        <property name="text" >
+         <string>_("Enable")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2" >
+       <widget class="QLineEdit" name="lastfm_user_edit" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="lastfm_user_label" >
+        <property name="text" >
+         <string>_("Username")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="lastfm_pass_label" >
+        <property name="text" >
+         <string>_("Password")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2" >
+       <widget class="QLineEdit" name="lastfm_pass_edit" >
+        <property name="echoMode" >
+         <enum>QLineEdit::PasswordEchoOnEdit</enum>
         </property>
        </widget>
       </item>
