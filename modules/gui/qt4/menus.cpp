@@ -185,7 +185,7 @@ QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
 
-    DP_SADD( menu, qtr( "Open &File..." ), "",
+    DP_SADD( menu, qtr( "&Open File..." ), "",
             ":/pixmaps/file-asym_16px.png", openFileDialog(), "Ctrl+O" );
     DP_SADD( menu, qtr( I_OPEN_FOLDER ), "",
             ":/pixmaps/folder-grey_16px.png", PLAppendDir(), "Ctrl+F" );
