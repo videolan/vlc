@@ -144,7 +144,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     picture_t *p_pic;
     int i_plane;
 
-    switch( p_sys->p_dirac->seq_params.chroma )
+    switch( p_sys->p_dirac->src_params.chroma )
     {
     case format420: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0'); break;
     case format422: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','2'); break;
@@ -155,9 +155,9 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     }
 
     p_dec->fmt_out.video.i_visible_width =
-    p_dec->fmt_out.video.i_width = p_sys->p_dirac->seq_params.width;
+    p_dec->fmt_out.video.i_width = p_sys->p_dirac->src_params.width;
     p_dec->fmt_out.video.i_visible_height =
-    p_dec->fmt_out.video.i_height = p_sys->p_dirac->seq_params.height;
+    p_dec->fmt_out.video.i_height = p_sys->p_dirac->src_params.height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
 
     p_dec->fmt_out.video.i_frame_rate =
@@ -250,19 +250,19 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             uint8_t *buf[3];
 
             msg_Dbg( p_dec, "%dx%d, chroma %i, %f fps",
-                     p_sys->p_dirac->seq_params.width,
-                     p_sys->p_dirac->seq_params.height,
-                     p_sys->p_dirac->seq_params.chroma,
+                     p_sys->p_dirac->src_params.width,
+                     p_sys->p_dirac->src_params.height,
+                     p_sys->p_dirac->src_params.chroma,
                      (float)p_sys->p_dirac->src_params.frame_rate.numerator/
                      p_sys->p_dirac->src_params.frame_rate.denominator );
 
             FreeFrameBuffer( p_sys->p_dirac );
-            buf[0] = malloc( p_sys->p_dirac->seq_params.width *
-                             p_sys->p_dirac->seq_params.height );
-            buf[1] = malloc( p_sys->p_dirac->seq_params.chroma_width *
-                             p_sys->p_dirac->seq_params.chroma_height );
-            buf[2] = malloc( p_sys->p_dirac->seq_params.chroma_width *
-                             p_sys->p_dirac->seq_params.chroma_height );
+            buf[0] = malloc( p_sys->p_dirac->src_params.width *
+                             p_sys->p_dirac->src_params.height );
+            buf[1] = malloc( p_sys->p_dirac->src_params.chroma_width *
+                             p_sys->p_dirac->src_params.chroma_height );
+            buf[2] = malloc( p_sys->p_dirac->src_params.chroma_width *
+                             p_sys->p_dirac->src_params.chroma_height );
 
             dirac_set_buf( p_sys->p_dirac, buf, NULL );
             break;
@@ -356,9 +356,9 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     dirac_encoder_context_init( &p_sys->ctx, VIDEO_FORMAT_CUSTOM );
     /* */
-    p_sys->ctx.seq_params.width = p_enc->fmt_in.video.i_width;
-    p_sys->ctx.seq_params.height = p_enc->fmt_in.video.i_height;
-    p_sys->ctx.seq_params.chroma = format420;
+    p_sys->ctx.src_params.width = p_enc->fmt_in.video.i_width;
+    p_sys->ctx.src_params.height = p_enc->fmt_in.video.i_height;
+    p_sys->ctx.src_params.chroma = format420;
     /* */
     p_sys->ctx.src_params.frame_rate.numerator =
         p_enc->fmt_in.video.i_frame_rate;

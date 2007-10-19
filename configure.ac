@@ -3709,7 +3709,7 @@ dnl
 AC_ARG_ENABLE(dirac,
 [  --enable-dirac          experimental dirac codec (default disabled)])
 if test "${enable_dirac}" = "yes"; then
-  PKG_CHECK_MODULES(DIRAC,[dirac >= 0.6.0], [
+  PKG_CHECK_MODULES(DIRAC,[dirac >= 0.8.0], [
       VLC_ADD_PLUGINS([dirac])
       VLC_ADD_CFLAGS([dirac],[$DIRAC_CFLAGS])
       VLC_ADD_LIBS([dirac],[$DIRAC_LIBS -lstdc++]) ],[
