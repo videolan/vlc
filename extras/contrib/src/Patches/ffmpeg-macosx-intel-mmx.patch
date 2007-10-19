@@ -1,40 +1,37 @@
 Index: ffmpeg/libavcodec/i386/dsputil_mmx.c
 ===================================================================
---- ffmpeg/libavcodec/i386/dsputil_mmx.c	(revision 10759)
-+++ ffmpeg/libavcodec/i386/dsputil_mmx.c	(working copy)
-@@ -2978,6 +2978,7 @@
-         ::"m"(c), "m"(*ff_pd_1), "m"(*ff_pd_2)
-     );
- #define WELCH(MOVPD)\
-+    do {\
-     asm volatile(\
-         "1:                         \n\t"\
-         "movapd   %%xmm7,  %%xmm1   \n\t"\
-@@ -2985,8 +2986,12 @@
-         "movapd   %%xmm6,  %%xmm0   \n\t"\
-         "subpd    %%xmm1,  %%xmm0   \n\t"\
-         "pshufd   $0x4e,   %%xmm0, %%xmm1 \n\t"\
+--- ffmpeg/libavcodec/i386/dsputil_mmx.c       (revision 10759)
++++ ffmpeg/libavcodec/i386/dsputil_mmx.c       (working copy)
+@@ -2967,7 +2967,6 @@
+      double c = 2.0 / (len-1.0);
+      int n2 = len>>1;
+      long i = -n2*sizeof(int32_t);
+-    long j =  n2*sizeof(int32_t);
+      asm volatile(
+          "movsd   %0,     %%xmm7 \n\t"
+          "movapd  %1,     %%xmm6 \n\t"
+@@ -2985,17 +2984,18 @@
+          "movapd   %%xmm6,  %%xmm0   \n\t"\
+          "subpd    %%xmm1,  %%xmm0   \n\t"\
+          "pshufd   $0x4e,   %%xmm0, %%xmm1 \n\t"\
 -        "cvtpi2pd (%4,%0), %%xmm2   \n\t"\
 -        "cvtpi2pd (%5,%1), %%xmm3   \n\t"\
-+        "cvtpi2pd (%2,%0), %%xmm2   \n\t"\
-+        "cvtpi2pd (%3,%1), %%xmm3   \n\t"\
-+        :"+&r"(i), "+&r"(j)\
-+        :"r"(data+n2), "r"(data+len-2-n2)\
-+    );\
-+    asm volatile(\
-         "mulpd    %%xmm0,  %%xmm2   \n\t"\
-         "mulpd    %%xmm1,  %%xmm3   \n\t"\
-         "movapd   %%xmm2, (%2,%0,2) \n\t"\
-@@ -2996,9 +3001,9 @@
-         "add      $8,      %0       \n\t"\
-         "jl 1b                      \n\t"\
-         :"+&r"(i), "+&r"(j)\
--        :"r"(w_data+n2), "r"(w_data+len-2-n2),\
--         "r"(data+n2), "r"(data+len-2-n2)\
--    );
-+        :"r"(w_data+n2), "r"(w_data+len-2-n2)\
-+    );\
-+    } while(0);
-     if(len&1)
-         WELCH("movupd")
-     else
++        "cvtpi2pd (%3,%0), %%xmm2   \n\t"\
+          "mulpd    %%xmm0,  %%xmm2   \n\t"\
++        "movapd   %%xmm2, (%1,%0,2) \n\t"\
++        "negl %0\n\t"\
++        "cvtpi2pd (%4,%0), %%xmm3   \n\t"\
+          "mulpd    %%xmm1,  %%xmm3   \n\t"\
+-        "movapd   %%xmm2, (%2,%0,2) \n\t"\
+-        MOVPD"    %%xmm3, (%3,%1,2) \n\t"\
++        MOVPD"    %%xmm3, (%2,%0,2) \n\t"\
+          "subpd    %%xmm5,  %%xmm7   \n\t"\
+-        "sub      $8,      %1       \n\t"\
++        "negl %0\n\t"\
+          "add      $8,      %0       \n\t"\
+          "jl 1b                      \n\t"\
+-        :"+&r"(i), "+&r"(j)\
++        :"+&r"(i)\
+          :"r"(w_data+n2), "r"(w_data+len-2-n2),\
+           "r"(data+n2), "r"(data+len-2-n2)\
+      );
