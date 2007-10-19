@@ -1212,7 +1212,6 @@ VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gra
 VLC_ADD_PLUGINS([converter_fixed mono])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
-VLC_ADD_PLUGINS([spatializer])
 VLC_ADD_PLUGINS([playlist export nsc xtag])
 VLC_ADD_PLUGINS([i420_rgb grey_yuv rawvideo blend scale image logo magnify puzzle colorthres])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au ty voc xa nuv smf])
@@ -1223,6 +1222,12 @@ VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 VLC_ADD_PLUGINS([packetizer_vc1])
 
+dnl
+dnl default modules that need g++
+dnl
+AC_LANG_PUSH(C++)
+VLC_ADD_PLUGINS([spatializer])
+AC_LANG_POP(C++)
 
 if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record access_filter_dump])
