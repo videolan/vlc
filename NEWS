@@ -61,6 +61,9 @@ Input/Demuxers:
   * Improved Ogg/Vorbis tags support
   * Raw video support
   * Standard MIDI File (types 0 & 1) support
+  * Tivo Series 2 support
+  * v4l2 access module support
+  * CD+G karaoke Files support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -74,6 +77,9 @@ Decoders:
  * Fluidsynth MIDI software synthesis (with external sound fonts)
  * New codec FOURCCs to support more specific files:
    Avid, FCP, Sony, Samsung, ...
+ * Closed Caption Decoder (DVD, ReplayTV, Tivo, DVB/ATSC)
+ * H.264 PAFF support
+ * DNxHD / VC-3 support
 
 Encoders:
  * Flash Screen Video support
