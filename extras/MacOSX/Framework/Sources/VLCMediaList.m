@@ -34,7 +34,7 @@ NSString *VLCMediaListItemAdded		= @"VLCMediaListItemAdded";
 NSString *VLCMediaListItemDeleted	= @"VLCMediaListItemDeleted";
 
 // TODO: Documentation
-@interface VLCMediaList (PrivateAPI)
+@interface VLCMediaList (Private)
 
 /* Initializers */
 - (void)initInternalMediaList;
@@ -273,7 +273,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
 @end
 
-@implementation VLCMediaList (PrivateAPI)
+@implementation VLCMediaList (Private)
 
 - (void)initInternalMediaList
 {

@@ -44,7 +44,7 @@ struct message {
     enum message_type_t type;
 };
 
-@interface VLCEventManager (PrivateAPI)
+@interface VLCEventManager (Private)
 
 - (void)callDelegateOfObjectAndSendNotificationWithArgs:(NSData*)data;
 - (void)callObjectMethodWithArgs:(NSData*)data;
@@ -188,7 +188,7 @@ static void * EventDispatcherMainLoop(void * user_data)
 }
 @end
 
-@implementation VLCEventManager (PrivateAPI)
+@implementation VLCEventManager (Private)
 
 - (void)callDelegateOfObjectAndSendNotificationWithArgs:(NSData*)data
 {

@@ -92,7 +92,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 
 // TODO: Documentation
-@interface VLCMedia (PrivateAPI)
+@interface VLCMedia (Private)
 
 /* Statics */
 + (libvlc_meta_t)stringToMetaType:(NSString *)string;
@@ -375,7 +375,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 @end
 
-@implementation VLCMedia (PrivateAPI)
+@implementation VLCMedia (Private)
 
 #define VLCStringToMeta( name, string ) if ([VLCMetaInformation##name compare:string] == NSOrderedSame) return libvlc_meta_##name;
 #define VLCMetaToString( name, type )   if (libvlc_meta_##name == type) return VLCMetaInformation##name;
