@@ -1436,7 +1436,10 @@ static struct
     { VLC_FOURCC('N','E','L','L'), CODEC_ID_NELLYMOSER,
       AUDIO_ES, "NellyMoser ASAO" },
 #endif
-
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(44<<8)+0)
+    { VLC_FOURCC('A','P','E',' '), CODEC_ID_APE,
+      AUDIO_ES, "Monkey's Audio" },
+#endif
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
