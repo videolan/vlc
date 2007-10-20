@@ -29,8 +29,8 @@
 
 @interface VLCMediaLibrary : NSObject
 {
-    void *mlib;
-    VLCMediaList *allMedia;
+    void * mlib;
+    VLCMediaList * allMedia;
 }
 + (id)sharedMediaLibrary;
 

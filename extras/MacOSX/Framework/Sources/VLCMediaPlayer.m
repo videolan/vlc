@@ -94,9 +94,9 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
         // it will change depending on the media descriptor provided to the media
         // instance
         libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+        libvlc_exception_init( &ex );
         instance = (void *)libvlc_media_instance_new([VLCLibrary sharedInstance], &ex);
-        quit_on_exception(&ex);
+        quit_on_exception( &ex );
         
         [self registerObservers];
         
@@ -139,11 +139,11 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     
     // Make sure that this instance has been associated with the drawing canvas.
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
     libvlc_media_instance_set_drawable ((libvlc_media_instance_t *)instance, 
                                         (libvlc_drawable_t)videoView, 
                                         &ex);
-    quit_on_exception(&ex);
+    quit_on_exception( &ex );
 }
 
 - (VLCVideoView *)videoView
@@ -159,100 +159,100 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 - (BOOL)fullscreen
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int result = libvlc_get_fullscreen(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    int result = libvlc_get_fullscreen( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setVideoAspectRatio:(char *)value
 {
-    libvlc_video_set_aspect_ratio(instance, value, NULL);
+    libvlc_video_set_aspect_ratio( instance, value, NULL );
 }
 
 - (char *)videoAspectRatio
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    char *result = libvlc_video_get_aspect_ratio(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    char *result = libvlc_video_get_aspect_ratio( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setVideoSubTitles:(int)value
 {
-    libvlc_video_set_spu(instance, value, NULL);
+    libvlc_video_set_spu( instance, value, NULL );
 }
 
 - (int)videoSubTitles
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int result = libvlc_video_get_spu(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    int result = libvlc_video_get_spu( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setVideoCropGeometry:(char *)value
 {
-    libvlc_video_set_crop_geometry(instance, value, NULL);
+    libvlc_video_set_crop_geometry( instance, value, NULL );
 }
 
 - (char *)videoCropGeometry
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    char *result = libvlc_video_get_crop_geometry(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    char *result = libvlc_video_get_crop_geometry( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setVideoTeleText:(int)value
 {
-    libvlc_video_set_teletext(instance, value, NULL);
+    libvlc_video_set_teletext( instance, value, NULL );
 }
 
 - (int)videoTeleText
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int result = libvlc_video_get_teletext(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    int result = libvlc_video_get_teletext( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setRate:(int)value
 {
-    libvlc_media_instance_set_rate(instance, value, NULL);
+    libvlc_media_instance_set_rate( instance, value, NULL );
 }
 
 - (int)rate
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    float result = libvlc_media_instance_get_rate(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    float result = libvlc_media_instance_get_rate( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (NSSize)videoSize
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
     NSSize result = NSMakeSize(libvlc_video_get_height((libvlc_media_instance_t *)instance, &ex),
                                libvlc_video_get_width((libvlc_media_instance_t *)instance, &ex));
-    quit_on_exception(&ex);
+    quit_on_exception( &ex );
     return result;    
 }
 
 - (BOOL)hasVideoOut
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
     BOOL result = libvlc_media_instance_has_vout((libvlc_media_instance_t *)instance, &ex);
-    if (libvlc_exception_raised(&ex))
+    if (libvlc_exception_raised( &ex ))
     {
-        libvlc_exception_clear(&ex);
+        libvlc_exception_clear( &ex );
         return NO;
     }
     else
@@ -262,34 +262,34 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 - (float)framesPerSecond
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    float result = libvlc_media_instance_get_fps((libvlc_media_instance_t *)instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    float result = libvlc_media_instance_get_fps( (libvlc_media_instance_t *)instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setTime:(VLCTime *)value
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
     // Time is managed in seconds, while duration is managed in microseconds
     // TODO: Redo VLCTime to provide value numberAsMilliseconds, numberAsMicroseconds, numberAsSeconds, numberAsMinutes, numberAsHours
-    libvlc_media_instance_set_time((libvlc_media_instance_t *)instance, 
-                                   (value ? [[value numberValue] longLongValue] / 1000 : 0),
-                                   &ex);
-    quit_on_exception(&ex);
+    libvlc_media_instance_set_time( (libvlc_media_instance_t *)instance, 
+                                    (value ? [[value numberValue] longLongValue] / 1000 : 0),
+                                    &ex );
+    quit_on_exception( &ex );
 }
 
 - (VLCTime *)time
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
     
     // Results are returned in seconds...duration is returned in milliseconds
-    long long time = libvlc_media_instance_get_time((libvlc_media_instance_t *)instance, &ex) * 1000;
-    if (libvlc_exception_raised(&ex))
+    long long time = libvlc_media_instance_get_time( (libvlc_media_instance_t *)instance, &ex ) * 1000;
+    if (libvlc_exception_raised( &ex ))
     {
-        libvlc_exception_clear(&ex);
+        libvlc_exception_clear( &ex );
         return [VLCTime nullTime];        // Error in obtaining the time, return a null time defintition (--:--:--)
     }
     else
@@ -298,29 +298,29 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 
 - (void)setAudioTrack:(int)value
 {
-    libvlc_audio_set_track(instance, value, NULL);
+    libvlc_audio_set_track( instance, value, NULL );
 }
 
 - (int)audioTrack
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int result = libvlc_audio_get_track(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    int result = libvlc_audio_get_track( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
 - (void)setAudioChannel:(int)value
 {
-    libvlc_audio_set_channel(instance, value, NULL);
+    libvlc_audio_set_channel( instance, value, NULL );
 }
 
 - (int)audioChannel
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int result = libvlc_audio_get_channel(instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    int result = libvlc_audio_get_channel( instance, &ex );
+    quit_on_exception( &ex );
     return result;
 }
 
@@ -347,9 +347,9 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
         [self didChangeValueForKey:@"media"];
 
         libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-        libvlc_media_instance_set_media_descriptor(instance, [media libVLCMediaDescriptor], &ex);
-        quit_on_exception(&ex);
+        libvlc_exception_init( &ex );
+        libvlc_media_instance_set_media_descriptor( instance, [media libVLCMediaDescriptor], &ex );
+        quit_on_exception( &ex );
         
         if (media) {
             if (wasPlaying)
@@ -370,10 +370,10 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
         return [self isPlaying];
     
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
 
-    libvlc_media_instance_play((libvlc_media_instance_t *)instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_media_instance_play( (libvlc_media_instance_t *)instance, &ex );
+    quit_on_exception( &ex );
 
     return YES;
 }
@@ -391,9 +391,9 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 
     // Pause the stream
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    libvlc_media_instance_pause((libvlc_media_instance_t *)instance, &ex);
-    quit_on_exception(&ex);
+    libvlc_exception_init( &ex );
+    libvlc_media_instance_pause( (libvlc_media_instance_t *)instance, &ex );
+    quit_on_exception( &ex );
     
     // TODO: Should we record the time in case the media instance is destroyed
     // then rebuilt?
@@ -409,9 +409,9 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     // The following is not implemented in the core, should I fix it or just
     // compensate?
     //    libvlc_exception_t ex;
-    //    libvlc_exception_init(&ex);
+    //    libvlc_exception_init( &ex );
     //    libvlc_media_instance_stop((libvlc_media_instance_t *)instance, &ex);
-    //    quit_on_exception(&ex);
+    //    quit_on_exception( &ex );
     
     // Pause and reposition to the begining of the stream.
     [self pause];
@@ -434,8 +434,8 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 - (BOOL)willPlay
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    BOOL ret = libvlc_media_instance_will_play((libvlc_media_instance_t *)instance, &ex);
+    libvlc_exception_init( &ex );
+    BOOL ret = libvlc_media_instance_will_play( (libvlc_media_instance_t *)instance, &ex );
     if (libvlc_exception_raised(&ex))
     {
         libvlc_exception_clear(&ex);
@@ -445,15 +445,15 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
         return ret;
 }
 
-static VLCMediaPlayerState libvlc_to_local_state [] =
+static VLCMediaPlayerState libvlc_to_local_state[] =
 {
     [libvlc_Stopped]    = VLCMediaPlayerStateStopped,
     [libvlc_Opening]    = VLCMediaPlayerStateOpening,
-    [libvlc_Buffering]    = VLCMediaPlayerStateBuffering,
+    [libvlc_Buffering]  = VLCMediaPlayerStateBuffering,
     [libvlc_Playing]    = VLCMediaPlayerStatePlaying,
-    [libvlc_Paused]        = VLCMediaPlayerStatePaused,
-    [libvlc_Ended]        = VLCMediaPlayerStateEnded,
-    [libvlc_Error]        = VLCMediaPlayerStateError
+    [libvlc_Paused]     = VLCMediaPlayerStatePaused,
+    [libvlc_Ended]      = VLCMediaPlayerStateEnded,
+    [libvlc_Error]      = VLCMediaPlayerStateError
 };
 
 - (VLCMediaPlayerState)state
@@ -463,11 +463,11 @@ static VLCMediaPlayerState libvlc_to_local_state [] =
         return VLCMediaPlayerStateStopped;
     
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    libvlc_state_t libvlc_state = libvlc_media_instance_get_state((libvlc_media_instance_t *)instance, &ex);
-    if (libvlc_exception_raised(&ex))
+    libvlc_exception_init( &ex );
+    libvlc_state_t libvlc_state = libvlc_media_instance_get_state( (libvlc_media_instance_t *)instance, &ex );
+    if (libvlc_exception_raised( &ex ))
     {
-        libvlc_exception_clear(&ex);
+        libvlc_exception_clear( &ex );
         return VLCMediaPlayerStateError;
     }
     else
@@ -479,23 +479,23 @@ static VLCMediaPlayerState libvlc_to_local_state [] =
 - (void)registerObservers
 {
     libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_exception_init( &ex );
 
     // Attach event observers into the media instance
-    libvlc_event_manager_t *p_em = libvlc_media_instance_event_manager(instance, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, &ex);
-    quit_on_exception(&ex);
+    libvlc_event_manager_t *p_em = libvlc_media_instance_event_manager( instance, &ex );
+    libvlc_event_attach( p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, &ex );
+    libvlc_event_attach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, &ex );
+    libvlc_event_attach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, &ex );
+    libvlc_event_attach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, &ex );
+    quit_on_exception( &ex );
 }
 
 - (void)unregisterObservers
 {
-    libvlc_event_manager_t *p_em = libvlc_media_instance_event_manager(instance, NULL);
-    libvlc_event_detach(p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, NULL);
-    libvlc_event_detach(p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, NULL);
-    libvlc_event_detach(p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, NULL);
-    libvlc_event_detach(p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, NULL);
+    libvlc_event_manager_t *p_em = libvlc_media_instance_event_manager( instance, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, NULL );
 }
 @end

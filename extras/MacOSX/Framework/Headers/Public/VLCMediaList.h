@@ -25,8 +25,8 @@
 #import "VLCMedia.h"
 
 /* Notification Messages */
-extern NSString *VLCMediaListItemAdded;
-extern NSString *VLCMediaListItemDeleted;
+extern NSString * VLCMediaListItemAdded;
+extern NSString * VLCMediaListItemDeleted;
 
 @class VLCMedia;
 @class VLCMediaList;
@@ -59,7 +59,7 @@ extern NSString *VLCMediaListItemDeleted;
 - (int)indexOfMedia:(VLCMedia *)media;
 - (int)count;
 
-#if 0 /* Disabled until this get fixed in libvlc
+#if 0 /* Disabled until this get fixed in libvlc */
 - (NSArray *)sublists; //< A way to see the same media list. Only sub media list.
 - (NSArray *)flatMediaView; //< A way to see the same media list. Only media.
 - (VLCMedia *)providerMedia;  //< If a media was at the origin of this media list, here it is.

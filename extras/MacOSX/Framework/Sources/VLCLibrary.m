@@ -37,7 +37,7 @@ void __quit_on_exception( void * e, const char * function, const char * file, in
     {
         /* XXX: localization */
         NSRunCriticalAlertPanel( @"Error", [NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)", 
-            libvlc_exception_get_message(ex), file, line_number, function], @"Quit", nil, nil );
+            libvlc_exception_get_message( ex ), file, line_number, function], @"Quit", nil, nil );
         exit( ex->i_code );
     }
 }
@@ -61,7 +61,7 @@ static void *DestroySharedLibraryAtExit()
         [[self alloc] init];
         
         // Register a function to gracefully destroy the shared library on exit.
-        atexit((void*)DestroySharedLibraryAtExit);
+        atexit( (void*)DestroySharedLibraryAtExit );
     }
     return sharedLibrary;
 }
@@ -79,8 +79,8 @@ static void *DestroySharedLibraryAtExit()
         libvlc_exception_init( &ex );
         
         // Figure out the frameworks path
-        char *applicationPath = strdup([[NSString stringWithFormat:@"%@/Versions/Current/VLC", 
-            [[NSBundle bundleForClass:[VLCLibrary class]] bundlePath]] UTF8String]);
+        char *applicationPath = strdup( [[NSString stringWithFormat:@"%@/Versions/Current/VLC", 
+            [[NSBundle bundleForClass:[VLCLibrary class]] bundlePath]] UTF8String] );
         // TODO: Raise error if there is no memory available
         
         char *lib_vlc_params[] = { 
@@ -89,7 +89,7 @@ static void *DestroySharedLibraryAtExit()
             "--no-video-title-show", NULL
         };
         
-        instance = (void *)libvlc_new(7, lib_vlc_params, &ex);
+        instance = (void *)libvlc_new( 7, lib_vlc_params, &ex );
         quit_on_exception( &ex );
         
         if (!sharedLibrary) 
@@ -99,7 +99,7 @@ static void *DestroySharedLibraryAtExit()
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
         
         // free allocated resources
-        free(applicationPath);
+        free( applicationPath );
     }
     return self;
 }
@@ -114,9 +114,9 @@ static void *DestroySharedLibraryAtExit()
         if (instance) 
         {
             libvlc_exception_t ex;
-            libvlc_exception_init(&ex);
+            libvlc_exception_init( &ex );
             
-            libvlc_destroy(instance, &ex);
+            libvlc_destroy( instance, &ex );
         }
     }
     @finally 

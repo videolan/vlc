@@ -124,12 +124,12 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
 - (void)lock
 {
-    libvlc_media_list_lock(p_mlist);
+    libvlc_media_list_lock( p_mlist );
 }
 
 - (void)unlock
 {
-    libvlc_media_list_unlock(p_mlist);
+    libvlc_media_list_unlock( p_mlist );
 }
 
 - (int)addMedia:(VLCMedia *)media
@@ -146,8 +146,8 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     // Add it to the libvlc's medialist
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    libvlc_media_list_insert_media_descriptor(p_mlist, [media libVLCMediaDescriptor], index, &p_e);
-    quit_on_exception(&p_e);
+    libvlc_media_list_insert_media_descriptor( p_mlist, [media libVLCMediaDescriptor], index, &p_e );
+    quit_on_exception( &p_e );
 }
 
 - (void)removeMediaAtIndex:(int)index
@@ -156,17 +156,17 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
     // Remove it from the libvlc's medialist
     libvlc_exception_t p_e;
-    libvlc_exception_init(&p_e);
-    libvlc_media_list_remove_index(p_mlist, index, &p_e);
-    quit_on_exception(&p_e);
+    libvlc_exception_init( &p_e );
+    libvlc_media_list_remove_index( p_mlist, index, &p_e );
+    quit_on_exception( &p_e );
 }
 
 - (VLCMedia *)mediaAtIndex:(int)index
 {
     libvlc_exception_t p_e;
-    libvlc_exception_init(&p_e);
-    libvlc_media_descriptor_t *p_md = libvlc_media_list_item_at_index(p_mlist, index, &p_e);
-    quit_on_exception(&p_e);
+    libvlc_exception_init( &p_e );
+    libvlc_media_descriptor_t *p_md = libvlc_media_list_item_at_index( p_mlist, index, &p_e );
+    quit_on_exception( &p_e );
     
     // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
     // new cocoa object representation of the media descriptor.
@@ -176,9 +176,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (int)count
 {
     libvlc_exception_t p_e;
-    libvlc_exception_init(&p_e);
-    int result = libvlc_media_list_count(p_mlist, &p_e);
-    quit_on_exception(&p_e);
+    libvlc_exception_init( &p_e );
+    int result = libvlc_media_list_count( p_mlist, &p_e );
+    quit_on_exception( &p_e );
 
     return result;
 }
@@ -186,9 +186,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (int)indexOfMedia:(VLCMedia *)media
 {
     libvlc_exception_t p_e;
-    libvlc_exception_init(&p_e);
-    int result = libvlc_media_list_index_of_item(p_mlist, [media libVLCMediaDescriptor], &p_e);
-    quit_on_exception(&p_e);
+    libvlc_exception_init( &p_e );
+    int result = libvlc_media_list_index_of_item( p_mlist, [media libVLCMediaDescriptor], &p_e );
+    quit_on_exception( &p_e );
     
     return result;
 }
@@ -199,22 +199,22 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     int i, count;
 
     libvlc_exception_t p_e;
-    libvlc_exception_init(&p_e);
-    count = libvlc_media_list_count(p_mlist, &p_e);
-    quit_on_exception(&p_e);
+    libvlc_exception_init( &p_e );
+    count = libvlc_media_list_count( p_mlist, &p_e );
+    quit_on_exception( &p_e );
 
     for(i = 0; i < count; i++)
     {
         libvlc_media_descriptor_t *p_md;
         libvlc_media_list_t *p_submlist;
-        p_md = libvlc_media_list_item_at_index(p_mlist, i, NULL);
-        p_submlist = libvlc_media_descriptor_subitems(p_md, NULL);
-        if(p_submlist)
+        p_md = libvlc_media_list_item_at_index( p_mlist, i, NULL );
+        p_submlist = libvlc_media_descriptor_subitems( p_md, NULL );
+        if (p_submlist)
         {
             [ret addObject:[VLCMediaList medialistWithLibVLCMediaList:p_submlist]];
-            libvlc_media_list_release(p_submlist);
+            libvlc_media_list_release( p_submlist );
         }
-        libvlc_media_descriptor_release(p_md);
+        libvlc_media_descriptor_release( p_md );
     }
     return [ret autorelease];
 }
@@ -275,9 +275,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     libvlc_exception_t p_e;
     libvlc_exception_init(&p_e);
 
-    libvlc_event_manager_t *p_em = libvlc_media_list_event_manager(p_mlist, &p_e);
-    libvlc_event_attach(p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, &p_e);
-    libvlc_event_attach(p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, &p_e);
+    libvlc_event_manager_t *p_em = libvlc_media_list_event_manager( p_mlist, &p_e );
+    libvlc_event_attach( p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, &p_e );
+    libvlc_event_attach( p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, &p_e );
     [self unlock];
     
     quit_on_exception( &p_e );

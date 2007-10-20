@@ -25,8 +25,8 @@
 #import <Cocoa/Cocoa.h>
 
 /* Notifications */
-extern NSString *VLCVideoViewEnteredFullScreen;
-extern NSString *VLCVideoViewLeftFullScreen;
+extern NSString * VLCVideoViewEnteredFullScreen;
+extern NSString * VLCVideoViewLeftFullScreen;
 
 @protocol VLCVideoViewDelegate
 // Notifications defined in VLCVideoView.h
@@ -49,7 +49,7 @@ extern NSString *VLCVideoViewLeftFullScreen;
 @interface VLCVideoView : NSView <VLCOpenGLVoutEmbedding>
 {
     id delegate;
-    NSColor *backColor;
+    NSColor * backColor;
     BOOL stretchesVideo;
     
     // TODO: Allow for view to report transparency to do some cool effects

@@ -26,8 +26,8 @@
 #import "VLCMedia.h"
 
 /* Notification Messages */
-extern NSString *VLCMediaPlayerTimeChanged;
-extern NSString *VLCMediaPlayerStateChanged;
+extern NSString * VLCMediaPlayerTimeChanged;
+extern NSString * VLCMediaPlayerStateChanged;
 
 // TODO: Documentation
 typedef enum VLCMediaPlayerState

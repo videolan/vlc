@@ -84,7 +84,7 @@ static VLCMediaLibrary * sharedMediaLibrary = nil;
 {
     libvlc_media_list_t *p_mlist = libvlc_media_library_media_list( mlib, NULL );
     VLCMediaList *medialist = [VLCMediaList medialistWithLibVLCMediaList:p_mlist];
-    libvlc_media_list_release(p_mlist);
+    libvlc_media_list_release( p_mlist );
     NSArray *ret = [medialist sublists];
     
     return ret;
