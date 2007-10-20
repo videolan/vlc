@@ -74,7 +74,7 @@ typedef enum {
 typedef struct {
     mediacontrol_PositionOrigin origin;
     mediacontrol_PositionKey key;
-    long value;
+    vlc_int64_t value;
 } mediacontrol_Position;
 
 /**
@@ -84,8 +84,8 @@ typedef struct {
 typedef struct {
     int  width;
     int  height;
-    long type;
-    vlc_int64_t date;
+    uint32_t type;
+    int64_t date;
     int  size;
     char *data;
 } mediacontrol_RGBPicture;
@@ -120,8 +120,8 @@ typedef struct {
 typedef struct {
     mediacontrol_PlayerStatus streamstatus;
     char *url;         /* The URL of the current media stream */
-    vlc_int64_t position;     /* actual location in the stream (in ms) */
-    vlc_int64_t length;         /* total length of the stream (in ms) */
+    int64_t position;  /* actual location in the stream (in ms) */
+    int64_t length;    /* total length of the stream (in ms) */
 } mediacontrol_StreamInformation;
 
 
