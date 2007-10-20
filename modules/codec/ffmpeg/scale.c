@@ -45,7 +45,7 @@
 #include "ffmpeg.h"
 
 /* Version checking */
-#if ( (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) && LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) )
+#if ( (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) && (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)) )
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor
@@ -84,6 +84,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     vlc_value_t val;
 
     unsigned int i_fmt_in, i_fmt_out;
+    unsigned int i_cpu;
     int i_sws_mode;
 
     float sws_lum_gblur = 0.0, sws_chr_gblur = 0.0;
@@ -115,7 +116,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     swscale_fast_memcpy = p_filter->p_libvlc->pf_memcpy;
 
     /* Set CPU capabilities */
-    unsigned i_cpu = vlc_CPU();
+    i_cpu = vlc_CPU();
     p_sys->i_cpu_mask = 0;
     if( i_cpu & CPU_CAPABILITY_MMX )
     {
@@ -154,7 +155,8 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     default: p_sys->i_sws_flags = SWS_FAST_BILINEAR; i_sws_mode = 0; break;
     }
 
-    p_sys->p_src_filter = 0; p_sys->p_dst_filter = 0;
+    p_sys->p_src_filter = NULL;
+    p_sys->p_dst_filter = NULL;
     p_sys->p_src_filter =
         sws_getDefaultFilter( sws_lum_gblur, sws_chr_gblur,
                               sws_lum_sharpen, sws_chr_sharpen,
@@ -288,9 +290,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         dst_stride[i_plane] = p_pic_dst->p[i_plane].i_pitch;
     }
 
+#if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
+    sws_scale( p_sys->ctx, src, src_stride,
+               0, p_filter->fmt_in.video.i_height,
+               dst, dst_stride );
+#else
     sws_scale_ordered( p_sys->ctx, src, src_stride,
-                       0, p_filter->fmt_in.video.i_height,
-                       dst, dst_stride );
+               0, p_filter->fmt_in.video.i_height,
+               dst, dst_stride );
+#endif
 
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
