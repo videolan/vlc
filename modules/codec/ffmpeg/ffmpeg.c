@@ -234,6 +234,7 @@ vlc_module_begin();
     set_capability( "crop padd", 10 );
     set_callbacks( E_(OpenCropPadd), E_(CloseFilter) );
     set_description( _("FFmpeg crop padd filter") );
+#endif
 
     /* video filter submodule */
     add_submodule();
@@ -241,7 +242,6 @@ vlc_module_begin();
     set_callbacks( E_(OpenDeinterlace), E_(CloseDeinterlace) );
     set_description( _("FFmpeg deinterlace video filter") );
     add_shortcut( "ffmpeg-deinterlace" );
-#endif
 
 vlc_module_end();
 
