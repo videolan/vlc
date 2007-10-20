@@ -81,6 +81,7 @@ Decoders:
  * H.264 PAFF support
  * DNxHD / VC-3 support
  * NellyMoser ASAO support
+ * APE ( Monkey audio ) support
 
 Encoders:
  * Flash Screen Video support
