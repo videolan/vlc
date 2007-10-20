@@ -40,8 +40,10 @@
 
 #define MASTER_SYNC_MAX_DRIFT 100000
 
-/* FIXME Ugly */
+/* FIXME Ugly, needed for (disabled) stats updates  */
+#if 0
 #include "../../src/input/input_internal.h"
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -1558,9 +1560,12 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
+#warning Stats not implemented!
+#if 0
         if( p_input )
             stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_audio,
                                  1, NULL );
+#endif
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
@@ -2159,9 +2164,12 @@ static int transcode_video_process( sout_stream_t *p_stream,
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = NULL;
+#warning Stats not implemented!
+#if 0
         if( p_input )
             stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_video,
                                  1, NULL );
+#endif
 
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {
