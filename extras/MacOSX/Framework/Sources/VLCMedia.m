@@ -93,7 +93,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 // TODO: Documentation
 @interface VLCMedia (Private)
-
 /* Statics */
 + (libvlc_meta_t)stringToMetaType:(NSString *)string;
 + (NSString *)metaTypeToString:(libvlc_meta_t)type;
@@ -111,11 +110,9 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 //- (void)subItemAdded:(libvlc_media_descriptor_t *)child;
 //- (void)subItemRemoved:(libvlc_media_descriptor_t *)child;
 - (void)metaChanged:(NSNumber *)metaType;
-
 @end
 
 @implementation VLCMedia
-
 + (id)mediaWithURL:(NSString *)aURL;
 {
     // For some unknown reason, compiler kept shooting me a warning saying:
@@ -257,9 +254,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 - (VLCTime *)length
 {
-    // TODO: Value is updated whenever the item is updated in the libvlc 
-    // (var_Addcallback(instance, "item-changed", callback)) would work but 
-    // that's not authorized from here.
     if (!length) 
     {
         // Try figuring out what the length is
@@ -273,11 +267,11 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     return [VLCTime nullTime];
 }
 
+- (VLCTime *)lengthWaitUntilDate:(NSDate *)aDate
+{
 #define CLOCK_FREQ      1000000
 #define THREAD_SLEEP    ((long long)(0.010*CLOCK_FREQ))
 
-- (VLCTime *)lengthWaitUntilDate:(NSDate *)aDate
-{
     if (![url hasPrefix:@"file://"])
         return [self length];
     else if (!length)
@@ -293,6 +287,8 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         if (!length)
             return [self length];
     }
+#undef CLOCK_FREQ
+#undef THREAD_SLEEP
     return [[length retain] autorelease];
 }
 
@@ -315,7 +311,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 {
     return delegate;
 }
-
 @end
 
 @implementation VLCMedia (LibVLCBridging)
@@ -372,16 +367,12 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 {
     return p_md;
 }
-
 @end
 
 @implementation VLCMedia (Private)
-
-#define VLCStringToMeta( name, string ) if ([VLCMetaInformation##name compare:string] == NSOrderedSame) return libvlc_meta_##name;
-#define VLCMetaToString( name, type )   if (libvlc_meta_##name == type) return VLCMetaInformation##name;
-
 + (libvlc_meta_t)stringToMetaType:(NSString *)string
 {
+#define VLCStringToMeta( name, string ) if ([VLCMetaInformation##name compare:string] == NSOrderedSame) return libvlc_meta_##name;
     VLCStringToMeta(Title, string);
     VLCStringToMeta(Artist, string);
     VLCStringToMeta(Genre, string);
@@ -398,11 +389,13 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     VLCStringToMeta(Publisher, string);
     VLCStringToMeta(ArtworkURL, string);
     VLCStringToMeta(TrackID, string);
+#undef VLCStringToMeta
     return -1;
 }
 
 + (NSString *)metaTypeToString:(libvlc_meta_t)type
 {
+#define VLCMetaToString( name, type )   if (libvlc_meta_##name == type) return VLCMetaInformation##name;
     VLCMetaToString(Title, type);
     VLCMetaToString(Artist, type);
     VLCMetaToString(Genre, type);
@@ -419,6 +412,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     VLCMetaToString(Publisher, type);
     VLCMetaToString(ArtworkURL, type);
     VLCMetaToString(TrackID, type);
+#undef VLCMetaToString
     return nil;
 }
 
@@ -563,7 +557,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         // There was actually a change, send out the notifications
         [self notifyChangeForKey:key withOldValue:oldValue];
 }
-
 @end
 
 @implementation VLCMedia (VLCMediaPlayerBridging)
@@ -588,5 +581,4 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         [self didChangeValueForKey:@"length"];
     }
 }
-
 @end

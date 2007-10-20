@@ -45,14 +45,12 @@ struct message {
 };
 
 @interface VLCEventManager (Private)
-
 - (void)callDelegateOfObjectAndSendNotificationWithArgs:(NSData*)data;
 - (void)callObjectMethodWithArgs:(NSData*)data;
 - (void)callDelegateOfObject:(id) aTarget withDelegateMethod:(SEL)aSelector withNotificationName: (NSString *)aNotificationName;
 - (pthread_cond_t *)signalData;
 - (pthread_mutex_t *)queueLock;
 - (NSMutableArray *)messageQueue;
-
 @end
 
 static void * EventDispatcherMainLoop(void * user_data)
@@ -114,7 +112,6 @@ static void * EventDispatcherMainLoop(void * user_data)
 }
 
 @implementation VLCEventManager
-
 + (id)sharedManager
 {
     /* We do want a lock here to avoid leaks */
@@ -189,7 +186,6 @@ static void * EventDispatcherMainLoop(void * user_data)
 @end
 
 @implementation VLCEventManager (Private)
-
 - (void)callDelegateOfObjectAndSendNotificationWithArgs:(NSData*)data
 {
     struct message * message = (struct message *)[data bytes];
@@ -236,5 +232,4 @@ static void * EventDispatcherMainLoop(void * user_data)
     void (*method)(id, SEL, id) = (void (*)(id, SEL, id))[[aTarget delegate] methodForSelector: aSelector];
     method( [aTarget delegate], aSelector, [NSNotification notificationWithName:aNotificationName object:aTarget]);
 }
-
 @end

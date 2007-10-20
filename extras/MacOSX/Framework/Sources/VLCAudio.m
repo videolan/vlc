@@ -80,5 +80,4 @@ NSString *VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
     quit_on_exception(&ex);
     return result;
 }
-
 @end

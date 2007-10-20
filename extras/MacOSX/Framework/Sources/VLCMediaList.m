@@ -35,14 +35,12 @@ NSString *VLCMediaListItemDeleted    = @"VLCMediaListItemDeleted";
 
 // TODO: Documentation
 @interface VLCMediaList (Private)
-
 /* Initializers */
 - (void)initInternalMediaList;
 
 /* Libvlc event bridges */
 - (void)mediaListItemAdded:(NSArray *)args;
 - (void)mediaListItemRemoved:(NSNumber *)index;
-
 @end
 
 /* libvlc event callback */
@@ -72,7 +70,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 }
 
 @implementation VLCMediaList
-
 - (id)init
 {
     if (self = [super init])
@@ -245,11 +242,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 //    quit_on_exception( &p_e );
 //    return ret;
 //}
-
 @end
 
 @implementation VLCMediaList (LibVLCBridging)
-
 + (id)medialistWithLibVLCMediaList:(void *)p_new_mlist;
 {
     return [[[VLCMediaList alloc] initWithLibVLCMediaList:p_new_mlist] autorelease];
@@ -270,11 +265,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 {
     return p_mlist;
 }
-
 @end
 
 @implementation VLCMediaList (Private)
-
 - (void)initInternalMediaList
 {
     // Add event callbacks
@@ -321,6 +314,5 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if (delegate && [delegate respondsToSelector:@selector(mediaList:mediaRemovedAtIndex:)])
         [delegate mediaList:self mediaRemovedAtIndex:index];
 }
-
 @end
 

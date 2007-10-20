@@ -27,7 +27,6 @@
 static VLCTime *nullTime = nil;
 
 @implementation VLCTime
-
 + (VLCTime *)nullTime
 {
     if (!nullTime)
@@ -114,5 +113,4 @@ static VLCTime *nullTime = nil;
 {
     return [self stringValue];
 }
-
 @end

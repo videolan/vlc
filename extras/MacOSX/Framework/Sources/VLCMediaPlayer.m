@@ -71,15 +71,12 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 }
 
 // TODO: Documentation
-@interface VLCMediaPlayer (PrivateAPI)
-
+@interface VLCMediaPlayer (Private)
 - (void)registerObservers;
 - (void)unregisterObservers;
-
 @end
 
 @implementation VLCMediaPlayer
-
 - (id)init
 {
     self = [self initWithVideoView:nil];
@@ -476,11 +473,9 @@ static VLCMediaPlayerState libvlc_to_local_state [] =
     else
         return libvlc_to_local_state[libvlc_state];
 }
-
 @end
 
-@implementation VLCMediaPlayer (PrivateAPI)
-
+@implementation VLCMediaPlayer (Private)
 - (void)registerObservers
 {
     libvlc_exception_t ex;
@@ -503,5 +498,4 @@ static VLCMediaPlayerState libvlc_to_local_state [] =
     libvlc_event_detach(p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, NULL);
     libvlc_event_detach(p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, NULL);
 }
-
 @end

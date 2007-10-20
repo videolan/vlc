@@ -28,7 +28,6 @@
 {
     NSNumber *value;
 }
-
 + (VLCTime *)nullTime;
 + (VLCTime *)timeWithNumber:(NSNumber *)aNumber;
 //+ (VLCTime *)timeWithString:(NSString *)aString;
@@ -40,5 +39,4 @@
 - (NSString *)stringValue;
 
 - (NSComparisonResult)compare:(VLCTime *)aTime;
-
 @end

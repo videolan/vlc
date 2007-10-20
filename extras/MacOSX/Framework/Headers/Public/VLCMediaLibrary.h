@@ -32,10 +32,8 @@
     void *mlib;
     VLCMediaList *allMedia;
 }
-
 + (id)sharedMediaLibrary;
 
 - (VLCMediaList *)allMedia;
 - (NSArray *)playlists;
-
 @end

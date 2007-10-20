@@ -34,11 +34,11 @@ typedef enum VLCMediaPlayerState
 {
     VLCMediaPlayerStateStopped,        //< Player has stopped
     VLCMediaPlayerStateOpening,        //< Stream is opening
-    VLCMediaPlayerStateBuffering,    //< Stream is buffering
-    VLCMediaPlayerStateEnded,        //< Stream has ended
-    VLCMediaPlayerStateError,        //< Player has generated an error
+    VLCMediaPlayerStateBuffering,      //< Stream is buffering
+    VLCMediaPlayerStateEnded,          //< Stream has ended
+    VLCMediaPlayerStateError,          //< Player has generated an error
     VLCMediaPlayerStatePlaying,        //< Stream is playing
-    VLCMediaPlayerStatePaused        //< Stream is paused
+    VLCMediaPlayerStatePaused          //< Stream is paused
 } VLCMediaPlayerState;
 
 extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
@@ -48,10 +48,8 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  * to be trapped by delegated objects.
  */
 @protocol VLCMediaPlayerDelegate
-
 - (void)mediaPlayerTimeChanged:(NSNotification *)aNotification;
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification;
-
 @end
 
 // TODO: Should we use medialist_player or our own flavor of media player?
@@ -177,5 +175,4 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  * \see VLCMediaState
  */
 - (VLCMediaPlayerState)state;
-     
 @end

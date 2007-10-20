@@ -29,15 +29,12 @@ extern NSString *VLCVideoViewEnteredFullScreen;
 extern NSString *VLCVideoViewLeftFullScreen;
 
 @protocol VLCVideoViewDelegate
-
 // Notifications defined in VLCVideoView.h
 - (void)videoEnteredFullscreen:(NSNotification *)aNotification;
 - (void)videoLeftFullscreen:(NSNotification *)aNotification;
-
 @end
 
 @protocol VLCOpenGLVoutEmbedding
-
 - (void)addVoutSubview:(NSView *)view;
 - (void)removeVoutSubview:(NSView *)view;
 
@@ -47,7 +44,6 @@ extern NSString *VLCVideoViewLeftFullScreen;
 - (BOOL)stretchesVideo;
 
 //- (void)setOnTop: (BOOL)ontop; /* Do we really want that in protocol? */
-
 @end
 
 @interface VLCVideoView : NSView <VLCOpenGLVoutEmbedding>
@@ -79,5 +75,4 @@ extern NSString *VLCVideoViewLeftFullScreen;
 
 // The media controls that were here previously should be moved elsewhere.  This
 // View is just that, a view not a controller. -- Moved to VLCMediaPlayer
-
 @end

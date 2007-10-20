@@ -38,7 +38,6 @@ extern NSString *VLCMediaPlayerVolumeChanged;
 {
     VLCLibrary *library;    //< Library to control audio for
 }
-
 /* Initializers */
 - (id)initWithLibrary:(VLCLibrary *)library;
 
@@ -48,5 +47,4 @@ extern NSString *VLCMediaPlayerVolumeChanged;
 
 - (void)setVolume:(int)value;
 - (int)volume;
-
 @end

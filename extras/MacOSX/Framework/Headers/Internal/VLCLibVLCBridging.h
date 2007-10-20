@@ -24,18 +24,15 @@
 
 // TODO: Documentation
 @interface VLCMediaList (LibVLCBridging)
-
 + (id)medialistWithLibVLCMediaList:(void *)p_new_mlist;
 - (id)initWithLibVLCMediaList:(void *)p_new_mlist;
 - (void *)libVLCMediaList;
-
 @end
 
 /**
 * Bridges functionality between libvlc and VLCMedia implementation.
  */
 @interface VLCMedia (LibVLCBridging)
-
 /* Object Factory */
 /**
  * Manufactures new object wrapped around specified media descriptor.
@@ -56,20 +53,15 @@
  * \return The receiver's internal media descriptor pointer.
  */
 - (void *)libVLCMediaDescriptor;
-
 @end
 
 // TODO: Documentation
 @interface VLCMedia (VLCMediaPlayerBridging)
-
 - (void)setLength:(VLCTime *)value;
-
 @end
 
 // TODO: Documentation
 @interface VLCLibrary (VLCAudioBridging)
-
 - (void)setAudio:(VLCAudio *)value;
-
 @end
 

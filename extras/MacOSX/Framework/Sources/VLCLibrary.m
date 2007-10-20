@@ -53,7 +53,6 @@ static void *DestroySharedLibraryAtExit()
 }
 
 @implementation VLCLibrary
-
 + (VLCLibrary *)sharedLibrary
 {
     if (!sharedLibrary) 
@@ -137,16 +136,13 @@ static void *DestroySharedLibraryAtExit()
 {
     return audio;
 }
-
 @end
 
 @implementation VLCLibrary (VLCAudioBridging)
-
 - (void)setAudio:(VLCAudio *)value
 {
     if (!audio)
         audio = value;
 }
-
 @end
 

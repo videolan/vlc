@@ -46,7 +46,6 @@
 /* Properties */
 - (void *)instance;
 - (VLCAudio *)audio;
-
 @end
 
 /*

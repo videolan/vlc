@@ -43,5 +43,4 @@
 - (void)callOnMainThreadObject:(id)aTarget 
                     withMethod:(SEL)aSelector 
           withArgumentAsObject:(id)arg;
-
 @end

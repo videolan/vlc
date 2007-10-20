@@ -38,13 +38,10 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
    library.  We could get rid of this, but it prevents warnings from the 
    compiler. */
 @interface VLCOpenGLVoutView : NSView
-
 - (void)detachFromVout;
-
 @end
 
 @implementation VLCVideoView
-
 - (id)initWithFrame:(NSRect)rect
 {
     if (self = [super initWithFrame:rect]) 
@@ -163,5 +160,4 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
 {
     return YES;
 }
-
 @end

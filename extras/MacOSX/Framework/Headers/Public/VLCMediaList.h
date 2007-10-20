@@ -33,16 +33,14 @@ extern NSString *VLCMediaListItemDeleted;
 
 // TODO: Documentation
 @protocol VLCMediaListDelegate
-
 - (void)mediaList:(VLCMediaList *) mediaAdded:(VLCMedia *)media atIndex:(int)index;
 - (void)mediaList:(VLCMediaList *) mediaRemovedAtIndex:(int)index;
-
 @end
 
 // TODO: Documentation
 @interface VLCMediaList : NSObject
 {
-    void *p_mlist;                //< Internal instance of media list
+    void * p_mlist;                //< Internal instance of media list
     id delegate;                //< Delegate object
 }
 
@@ -61,8 +59,9 @@ extern NSString *VLCMediaListItemDeleted;
 - (int)indexOfMedia:(VLCMedia *)media;
 - (int)count;
 
-- (NSArray *)sublists;                    // I don't see why this would be useful
-//- (VLCMediaList *)flatPlaylist;        // nore this one
-//- (VLCMedia *)providerMedia;            // I have no clue what this does
-
+#if 0 /* Disabled until this get fixed in libvlc
+- (NSArray *)sublists; //< A way to see the same media list. Only sub media list.
+- (NSArray *)flatMediaView; //< A way to see the same media list. Only media.
+- (VLCMedia *)providerMedia;  //< If a media was at the origin of this media list, here it is.
+#endif
 @end

@@ -66,7 +66,6 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  * trapped.
  */
 @protocol VLCMediaDelegate
-
 // TODO: SubItemAdded/SubItemRemoved implementation.  Not sure if we really want to implement this.
 ///**
 // * Delegate method called whenever a sub item has been added to the specified VLCMedia.
@@ -91,7 +90,6 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  * \param key The key of the value that was changed.
  */
 - (void)media:(VLCMedia *)aMedia metaValueChangedFrom:(id)oldValue forKey:(NSString *)key;
-
 @end
 
 /**
@@ -103,13 +101,13 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  */
 @interface VLCMedia : NSObject
 {
-    void                *p_md;                //< Internal media descriptor instance
-    NSString            *url;                //< URL for this media resource
-    VLCMediaList        *subitems;            //< Sub list of items
-    VLCTime                *length;            //< Duration of the media
-    NSMutableDictionary *metaDictionary;    //< Meta data storage
-    id                     delegate;            //< Delegate object
-    BOOL                 preparsed;            //< Value used to determine of the file has been preparsed
+    void *                p_md;              //< Internal media descriptor instance
+    NSString *            url;               //< URL for this media resource
+    VLCMediaList *        subitems;          //< Sub list of items
+    VLCTime *             length;            //< Duration of the media
+    NSMutableDictionary * metaDictionary;    //< Meta data storage
+    id                    delegate;          //< Delegate object
+    BOOL                  preparsed;         //< Value used to determine of the file has been preparsed
 }
 
 /* Object Factories */
@@ -193,5 +191,4 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  * \return The receiver's meta data as a NSDictionary object.
  */
 - (NSDictionary *)metaDictionary;
-
 @end

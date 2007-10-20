@@ -32,7 +32,6 @@
 static VLCMediaLibrary * sharedMediaLibrary = nil;
 
 @implementation VLCMediaLibrary
-
 + (id)sharedMediaLibrary
 {
     if(!sharedMediaLibrary)
