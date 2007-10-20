@@ -153,6 +153,9 @@ namespace VideoLAN.VLC
             }
         }
 
+        /**
+         * Switches to the next playlist item
+         */
         public void NextItem ()
         {
             CheckDisposed ();
@@ -160,6 +163,81 @@ namespace VideoLAN.VLC
             NativeException e = NativeException.Prepare ();
             MediaControlAPI.PlaylistNextItem (self, ref e);
             e.Consume ();
+        }
+
+        /**
+         * Normalized audio output volume in percent (must be [0..100]).
+         */
+        public short SoundVolume
+        {
+            get
+            {
+                CheckDisposed ();
+
+                NativeException e = NativeException.Prepare ();
+                short vol = MediaControlAPI.SoundGetVolume (self, ref e);
+                e.Consume ();
+                return vol;
+            }
+            set
+            {
+                CheckDisposed ();
+
+                if ((value < 0) || (value > 100))
+                    throw new ArgumentOutOfRangeException ("Volume not within [0..100]");
+
+                NativeException e = NativeException.Prepare ();
+                MediaControlAPI.SoundSetVolume (self, value, ref e);
+                e.Consume ();
+            }
+        }
+
+        /**
+         * Performance speed rate in percent.
+         */
+        public int Rate
+        {
+            get
+            {
+                CheckDisposed ();
+
+                NativeException e = NativeException.Prepare ();
+                int rate = MediaControlAPI.GetRate (self, ref e);
+                e.Consume ();
+                return rate;
+            }
+            set
+            {
+                CheckDisposed ();
+
+                NativeException e = NativeException.Prepare ();
+                MediaControlAPI.SetRate (self, value, ref e);
+                e.Consume ();
+            }
+        }
+
+        /**
+         * Fullscreen flag.
+         */
+        public bool Fullscreen
+        {
+            get
+            {
+                CheckDisposed ();
+
+                NativeException e = NativeException.Prepare ();
+                int ret = MediaControlAPI.GetFullscreen (self, ref e);
+                e.Consume ();
+                return ret != 0;
+            }
+            set
+            {
+                CheckDisposed ();
+
+                NativeException e = NativeException.Prepare ();
+                MediaControlAPI.SetFullscreen (self, value ? 1 : 0, ref e);
+                e.Consume ();
+            }
         }
 
         public void Dispose ()

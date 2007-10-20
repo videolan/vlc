@@ -34,11 +34,18 @@ namespace VideoLAN.VLC
             foreach (string s in args)
                 mc.AddItem (s);
 
+            Console.WriteLine ("Volume    : {0}%", mc.SoundVolume);
+            Console.WriteLine ("Rate      : {0}%", mc.Rate);
+            Console.WriteLine ("Fullscreen: {0}", mc.Fullscreen);
+            mc.Fullscreen = false;
+
             /*mc.Play ();*/
             Console.ReadLine ();
 
             mc.Stop ();
             mc.Clear ();
+            mc.SoundVolume = 100;
+            mc.Rate = 100;
 
             mc.Dispose ();
             return 0;

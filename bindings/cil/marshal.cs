@@ -50,7 +50,22 @@ namespace VideoLAN.VLC
         public static extern IntPtr PlaylistGetList (MediaControlHandle self, ref NativeException e);
         [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_playlist_next_item")]
         public static extern void PlaylistNextItem (MediaControlHandle self, ref NativeException e);
-    }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_sound_get_volume")]
+        public static extern short SoundGetVolume (MediaControlHandle self, ref NativeException e);
+        [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_sound_set_volume")]
+        public static extern void SoundSetVolume (MediaControlHandle self, short volume, ref NativeException e);
+        /* SetVisual */
+
+        [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_get_rate")]
+        public static extern short GetRate (MediaControlHandle self, ref NativeException e);
+        [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_set_rate")]
+        public static extern void SetRate (MediaControlHandle self, int rate, ref NativeException e);
+        [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_get_fullscreen")]
+        public static extern int GetFullscreen (MediaControlHandle self, ref NativeException e);
+        [DllImport ("libvlc-control.dll", EntryPoint="mediacontrol_set_fullscreen")]
+        public static extern void SetFullscreen (MediaControlHandle self, int full, ref NativeException e);
+    };
 
     /**
      * Abstract safe handle class for non-NULL pointers
