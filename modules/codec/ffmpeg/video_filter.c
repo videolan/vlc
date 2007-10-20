@@ -43,10 +43,10 @@
 void E_(InitLibavcodec) ( vlc_object_t *p_object );
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
-
-#else
-static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
 #endif
+
+static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
+
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor
