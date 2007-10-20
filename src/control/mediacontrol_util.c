@@ -281,12 +281,16 @@ mediacontrol_exception_init( mediacontrol_Exception *exception )
 }
 
 void
+mediacontrol_exception_cleanup( mediacontrol_Exception *exception )
+{
+    if( exception )
+        free( exception->message );
+}
+
+void
 mediacontrol_exception_free( mediacontrol_Exception *exception )
 {
-    if( ! exception )
-        return;
-
-    free( exception->message );
+    mediacontrol_exception_cleanup( exception );
     free( exception );
 }
 

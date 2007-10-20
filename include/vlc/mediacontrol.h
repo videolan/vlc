@@ -86,7 +86,14 @@ VLC_PUBLIC_API void
   mediacontrol_exception_init( mediacontrol_Exception *exception );
 
 /**
- * Free an exception structure.
+ * Clean up an existing exception structure after use.
+ * \param p_exception the exception to clean up.
+ */
+VLC_PUBLIC_API void
+mediacontrol_exception_cleanup( mediacontrol_Exception *exception );
+
+/**
+ * Free an exception structure created with mediacontrol_exception_create().
  * \return the exception
  */
 VLC_PUBLIC_API void mediacontrol_exception_free(mediacontrol_Exception *exception);
