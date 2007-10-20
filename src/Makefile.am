@@ -351,7 +351,7 @@ misc/revision.c:
 ###############################################################################
 # Unit/regression test
 ###############################################################################
-check_PROGRAMS = test_i18n_atof test_url test_utf8
+check_PROGRAMS = test_i18n_atof test_url test_utf8 test_control
 TESTS = $(check_PROGRAMS)
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
@@ -366,6 +366,10 @@ test_url_CFLAGS = $(CFLAGS_tests)
 test_utf8_SOURCES = test/utf8.c
 test_utf8_LDADD = libvlc.la
 test_utf8_CFLAGS = $(CFLAGS_tests)
+
+test_control_SOURCES = control/testapi.c
+test_control_LDADD = libvlc-control.la
+test_control_CFLAGS = $(CFLAGS_tests)
 
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2
