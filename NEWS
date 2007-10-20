@@ -145,7 +145,11 @@ Linux Port:
 
 Mac OS X Port:
  * Mac OS X Framework that can be used to embed VLC in third party
-   applications
+   applications. (Google Summer Of Code Student project).
+
+LibVLC:
+ * Event management and various improvement in libvlc.
+   (Part of a Google Summer Of Code Student project).
 
 Capture:
  * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft
