@@ -555,7 +555,7 @@ VLC.app: vlc
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
 		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc.dylib
-	$(INSTALL) $(top_builddir)/src/.libs/libvlc-control.0.dylib \
+	$(INSTALL) $(top_builddir)/src/.libs/libvlc-control.1.dylib \
 		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc-control.dylib
 	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
 		   @executable_path/lib/libvlc.dylib \
