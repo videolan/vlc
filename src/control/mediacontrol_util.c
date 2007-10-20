@@ -84,7 +84,7 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
                 return( value * f_fps / 1000.0 );
         }
         /* Cannot happen */
-        /* See http://catb.org/~esr/jargon/html/entry/can't-happen.html */
+        /* See http://catb.org/~esr/jargon/html/entry/can-t-happen.html */
         break;
 
     case mediacontrol_SampleCount:
