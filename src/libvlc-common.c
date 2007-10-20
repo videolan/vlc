@@ -854,6 +854,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) )
         VLC_AddIntf( 0, "dbus,none", VLC_FALSE, VLC_FALSE );
+
+    /* Prevents the power management daemon to suspend the computer
+     * when VLC is active */
+    if( config_GetInt( p_libvlc, "inhibit" ) )
+        VLC_AddIntf( 0, "inhibit,none", VLC_FALSE, VLC_FALSE );
 #endif
 
     /*

@@ -899,8 +899,12 @@ then
           VLC_ADD_PLUGINS([telepathy])
           VLC_ADD_LIBS([telepathy],[$DBUS_LIBS])
           VLC_ADD_CFLAGS([telepathy],[$DBUS_CFLAGS])
-        fi],
-
+        fi
+        dnl Power Management Inhibiter
+        VLC_ADD_PLUGINS([inhibit])
+        VLC_ADD_LIBS([inhibit],[$DBUS_LIBS])
+        VLC_ADD_CFLAGS([inhibit],[$DBUS_CFLAGS])
+        ],
     if ${PKG_CONFIG} --exists dbus-1
     then
       [AC_ARG_ENABLE(old-dbus,

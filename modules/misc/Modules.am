@@ -13,3 +13,4 @@ SOURCES_gnutls = gnutls.c dhparams.h
 SOURCES_svg = svg.c
 SOURCES_profile_parser = profile_parser.c
 SOURCES_audioscrobbler = audioscrobbler.c
+SOURCES_inhibit = inhibit.c
