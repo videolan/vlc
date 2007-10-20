@@ -2558,8 +2558,6 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
             input_ExtractAttachmentAndCacheArt( p_input );
     }
     free( psz_arturl );
- 
-    input_item_SetPreparsed( p_item, VLC_TRUE );
 
     /* A bit ugly */
     p_meta = NULL;
@@ -2569,6 +2567,8 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
         vlc_meta_Merge( p_meta, input_item_GetMetaObject( p_item ) );
     }
     vlc_mutex_unlock( &p_item->lock );
+
+    input_item_SetPreparsed( p_item, VLC_TRUE );
 
     if( i_arturl_event == VLC_TRUE )
     {
