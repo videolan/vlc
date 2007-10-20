@@ -143,6 +143,10 @@ Linux Port:
    http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
    (which means that VLC doesn't use the $HOME/.vlc directory anymore)
 
+Mac OS X Port:
+ * Mac OS X Framework that can be used to embed VLC in third party
+   applications
+
 Capture:
  * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft
    Windows
