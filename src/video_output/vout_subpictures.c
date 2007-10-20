@@ -547,10 +547,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_blend->fmt_out.video.i_y_offset = 0;
             p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
             p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
-            p_spu->p_blend->fmt_in.video.i_chroma = p_region->fmt.i_chroma;
 
-            p_spu->p_blend->p_module =
-                module_Need( p_spu->p_blend, "video blending", 0, 0 );
+            /* The blend module will be loaded when needed with the real input format */
+            memset( &p_spu->p_blend->fmt_in, 0, sizeof(p_spu->p_blend->fmt_in) );
+            p_spu->p_blend->p_module = NULL;
         }
 
         /* Load the text rendering module; it is possible there is a
@@ -721,7 +721,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 module_Need( p_spu->p_scale, "video filter2", 0, 0 );
         }
 
-        while( p_region && p_spu->p_blend && p_spu->p_blend->pf_video_blend )
+        while( p_region )
         {
             video_format_t orig_fmt = p_region->fmt;
             vlc_bool_t b_rerender_text = VLC_FALSE;
@@ -934,50 +934,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 i_y_offset -= ( p_spu->i_margin * i_inv_scale_y / 1000 + i_diff );
             }
 
-            p_spu->p_blend->fmt_in.video = p_region->fmt;
-
-            /* Force cropping if requested */
-            if( p_spu->b_force_crop )
-            {
-                video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
-                int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
-                                    * i_inv_scale_x / 1000;
-                int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / 1000
-                                    * i_inv_scale_y / 1000;
-                int i_crop_width = p_spu->i_crop_width * pi_scale_width[ i_scale_idx ] / 1000
-                                    * i_inv_scale_x / 1000;
-                int i_crop_height = p_spu->i_crop_height * pi_scale_height[ i_scale_idx ] / 1000
-                                    * i_inv_scale_y / 1000;
-
-                /* Find the intersection */
-                if( i_crop_x + i_crop_width <= i_x_offset ||
-                    i_x_offset + (int)p_fmt->i_visible_width < i_crop_x ||
-                    i_crop_y + i_crop_height <= i_y_offset ||
-                    i_y_offset + (int)p_fmt->i_visible_height < i_crop_y )
-                {
-                    /* No intersection */
-                    p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
-                }
-                else
-                {
-                    int i_x, i_y, i_x_end, i_y_end;
-                    i_x = __MAX( i_crop_x, i_x_offset );
-                    i_y = __MAX( i_crop_y, i_y_offset );
-                    i_x_end = __MIN( i_crop_x + i_crop_width,
-                                   i_x_offset + (int)p_fmt->i_visible_width );
-                    i_y_end = __MIN( i_crop_y + i_crop_height,
-                                   i_y_offset + (int)p_fmt->i_visible_height );
-
-                    p_fmt->i_x_offset = i_x - i_x_offset;
-                    p_fmt->i_y_offset = i_y - i_y_offset;
-                    p_fmt->i_visible_width = i_x_end - i_x;
-                    p_fmt->i_visible_height = i_y_end - i_y;
-
-                    i_x_offset = i_x;
-                    i_y_offset = i_y;
-                }
-            }
-
             if( p_subpic->b_fade )
             {
                 mtime_t i_fade_start = ( p_subpic->i_stop +
@@ -990,11 +946,69 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            i_x_offset = __MAX( i_x_offset, 0 );
-            i_y_offset = __MAX( i_y_offset, 0 );
-
             if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
             {
+                if( p_spu->p_blend->fmt_in.video.i_chroma != p_region->fmt.i_chroma )
+                {
+                    /* The chroma is not the same, we need to reload the blend module
+                     * XXX to match the old behaviour just test !p_spu->p_blend->fmt_in.video.i_chroma */
+                    if( p_spu->p_blend->p_module )
+                        module_Unneed( p_spu->p_blend, p_spu->p_blend->p_module );
+
+                    p_spu->p_blend->fmt_in.video = p_region->fmt;
+                    p_spu->p_blend->p_module = module_Need( p_spu->p_blend, "video blending", 0, 0 );
+                }
+                else
+                {
+                    p_spu->p_blend->fmt_in.video = p_region->fmt;
+                }
+
+                /* Force cropping if requested */
+                if( p_spu->b_force_crop )
+                {
+                    video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
+                    int i_crop_x = p_spu->i_crop_x * pi_scale_width[ i_scale_idx ] / 1000
+                                        * i_inv_scale_x / 1000;
+                    int i_crop_y = p_spu->i_crop_y * pi_scale_height[ i_scale_idx ] / 1000
+                                        * i_inv_scale_y / 1000;
+                    int i_crop_width = p_spu->i_crop_width * pi_scale_width[ i_scale_idx ] / 1000
+                                        * i_inv_scale_x / 1000;
+                    int i_crop_height = p_spu->i_crop_height * pi_scale_height[ i_scale_idx ] / 1000
+                                        * i_inv_scale_y / 1000;
+
+                    /* Find the intersection */
+                    if( i_crop_x + i_crop_width <= i_x_offset ||
+                        i_x_offset + (int)p_fmt->i_visible_width < i_crop_x ||
+                        i_crop_y + i_crop_height <= i_y_offset ||
+                        i_y_offset + (int)p_fmt->i_visible_height < i_crop_y )
+                    {
+                        /* No intersection */
+                        p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
+                    }
+                    else
+                    {
+                        int i_x, i_y, i_x_end, i_y_end;
+                        i_x = __MAX( i_crop_x, i_x_offset );
+                        i_y = __MAX( i_crop_y, i_y_offset );
+                        i_x_end = __MIN( i_crop_x + i_crop_width,
+                                       i_x_offset + (int)p_fmt->i_visible_width );
+                        i_y_end = __MIN( i_crop_y + i_crop_height,
+                                       i_y_offset + (int)p_fmt->i_visible_height );
+
+                        p_fmt->i_x_offset = i_x - i_x_offset;
+                        p_fmt->i_y_offset = i_y - i_y_offset;
+                        p_fmt->i_visible_width = i_x_end - i_x;
+                        p_fmt->i_visible_height = i_y_end - i_y;
+
+                        i_x_offset = i_x;
+                        i_y_offset = i_y;
+                    }
+                }
+
+
+                i_x_offset = __MAX( i_x_offset, 0 );
+                i_y_offset = __MAX( i_y_offset, 0 );
+
                 /* Update the output picture size */
                 p_spu->p_blend->fmt_out.video.i_width =
                     p_spu->p_blend->fmt_out.video.i_visible_width =
@@ -1003,9 +1017,18 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_spu->p_blend->fmt_out.video.i_visible_height =
                         p_fmt->i_height;
 
-                p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-                    p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
-                    i_fade_alpha * p_subpic->i_alpha / 255 );
+                if( p_spu->p_blend->p_module )
+                {
+                    p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
+                        p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
+                        i_fade_alpha * p_subpic->i_alpha / 255 );
+                }
+                else
+                {
+                    msg_Err( p_spu, "blending %4.4s to %4.4s failed",
+                             (char *)&p_spu->p_blend->fmt_out.video.i_chroma,
+                             (char *)&p_spu->p_blend->fmt_out.video.i_chroma );
+                }
             }
 
             if( b_rerender_text )
