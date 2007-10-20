@@ -22,17 +22,52 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <VLC/VLCTime.h>
+#import <VLCTime.h>
+
+static VLCTime *nullTime = nil;
 
 @implementation VLCTime
+
++ (VLCTime *)nullTime
+{
+    if (!nullTime)
+        nullTime = [VLCTime timeWithNumber:[NSNumber numberWithInt:0]];
+    return nullTime;
+}
+
++ (VLCTime *)timeWithNumber:(NSNumber *)aNumber
+{
+    return [[[VLCTime alloc] initWithNumber:aNumber] autorelease];
+}
+
+// TODO: Implement [VLCTime timeWithString]
+//+ (VLCTime *)timeWithString:(NSString *)aString
+//{
+//  return [[[VLCTime alloc] initWithString:aString] autorelease];
+//}
+
 - (id)initWithNumber:(NSNumber *)aNumber
 {
     if (self = [super init])
     {
-        value = [aNumber copy];
+        if (aNumber)
+            value = [[aNumber copy] retain];
+        else
+            value = nil;
     }
     return self;
 }
+
+// TODO: Implement [VLCTime initWithString]
+//- (id)initWithString:(NSString *)aString
+//{
+//  // Sounds like a good idea but I really don't think there is any value added
+//  if (self = [super init])
+//  {
+//      // convert value
+//  }
+//  return self;
+//}
 
 - (void)dealloc
 {
@@ -40,17 +75,44 @@
     [super dealloc];
 }
 
-- (NSNumber *)numberRepresentation
+- (NSNumber *)numberValue
 {
-    [[value copy] autorelease];
+    if (value)
+        return [value copy];
+    else
+        return nil;
 }
 
-- (NSString *)stringRepresentation
+- (NSString *)stringValue
 {
-    int hours = [value intValue] / (3600*1000);
-    int minutes = ([value intValue] - hours * 3600) / (60*1000);
-    int seconds = ([value intValue] - hours * 3600 * 1000 - minutes * 60 * 1000)/1000;
-
-    return [NSString stringWithFormat:@"%02d:%02d:%02d", hours, minutes, seconds];
+    if (value)
+    {
+        long long duration = [value longLongValue] / 1000000;
+        return [NSString stringWithFormat:@"%02d:%02d:%02d",
+            (long) (duration / 3600),
+            (long)((duration / 60) % 60),
+            (long) (duration % 60)];
+    }
+    else
+    {
+        // Return a string that represents an undefined time.
+        return @"--:--:--";
+    }
 }
+
+- (NSComparisonResult)compare:(VLCTime *)aTime
+{
+    if (!aTime && !value)
+        return NSOrderedSame;
+    else if (!aTime)
+        return NSOrderedDescending;
+    else
+        return [value compare:[aTime numberValue]];
+}
+
+- (NSString *)description
+{
+    return [self stringValue];
+}
+
 @end

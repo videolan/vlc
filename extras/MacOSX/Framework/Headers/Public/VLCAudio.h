@@ -1,11 +1,11 @@
 /*****************************************************************************
- * VLCTime.h: VLC.framework VLCTime header
+ * VLCAudio.h: VLC.framework VLCAudio header
  *****************************************************************************
- * Copyright (C) 2007 Pierre d'Herbemont
+ * Copyright (C) 2007 Faustino E. Osuna
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
  *
- * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ * Authors: Faustino E. Osuna <enrique.osuna # gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,30 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "VLCLibrary.h"
 
-@interface VLCTime : NSObject
+/* Notification Messages */
+/**
+ * Standard notification messages that are emitted by VLCMedia object.
+ */
+extern NSString *VLCMediaPlayerVolumeChanged;
+
+@class VLCLibrary;
+
+// TODO: Documentation
+@interface VLCAudio : NSObject 
 {
-    NSNumber * value;
+	VLCLibrary *library;	//< Library to control audio for
 }
-- (id)initWithNumber:(NSNumber *)aNumber;
 
-- (NSNumber *)numberRepresentation;
-- (NSString *)stringRepresentation;
+/* Initializers */
+- (id)initWithLibrary:(VLCLibrary *)library;
+
+/* Properties */
+- (void)setMute:(BOOL)value;
+- (BOOL)isMuted;
+
+- (void)setVolume:(int)value;
+- (int)volume;
+
 @end

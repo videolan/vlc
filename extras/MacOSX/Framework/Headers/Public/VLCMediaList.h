@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibrary.h: VLC.framework VLCLibrary implementation
+ * VLCMediaList.h: VLC.framework VLCMediaList header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
- * $Id$
+ * $Id: VLCMediaList.h 21564 2007-08-29 21:09:27Z pdherbemont $
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *
@@ -22,36 +22,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import "VLCAudio.h"
-#import "VLCMediaList.h"
 #import "VLCMedia.h"
 
-@class VLCAudio;
+/* Notification Messages */
+extern NSString *VLCMediaListItemAdded;
+extern NSString *VLCMediaListItemDeleted;
 
-/*
- * VLCLibrary object.  Internal use only.
- */
+@class VLCMedia;
+@class VLCMediaList;
+
 // TODO: Documentation
-@interface VLCLibrary : NSObject 
-{
-	void *instance;
-	VLCAudio *audio;
-}
+@protocol VLCMediaListDelegate
 
-/* Factories */
-+ (VLCLibrary *)sharedLibrary;
-+ (void *)sharedInstance;
-
-/* Properties */
-- (void *)instance;
-- (VLCAudio *)audio;
+- (void)mediaList:(VLCMediaList *) mediaAdded:(VLCMedia *)media atIndex:(int)index;
+- (void)mediaList:(VLCMediaList *) mediaRemovedAtIndex:(int)index;
 
 @end
 
-/*
- * Utility function
- */
-// TODO: Figure out a better way to raise error messages
-#define quit_on_exception( ex ) __quit_on_exception( (void*)(ex), __FUNCTION__, __FILE__, __LINE__ )
-extern void __quit_on_exception( void* e, const char *function, const char *file, int line_number );
+// TODO: Documentation
+@interface VLCMediaList : NSObject
+{
+    void *p_mlist;				//< Internal instance of media list
+	id delegate;                //< Delegate object
+}
+
+/* Properties */
+- (void)setDelegate:(id)value;
+- (id)delegate;
+
+/* Operations */
+- (void)lock;
+- (void)unlock;
+
+- (int)addMedia:(VLCMedia *)media;
+- (void)insertMedia:(VLCMedia *)media atIndex:(int)index;
+- (void)removeMediaAtIndex:(int)index;
+- (VLCMedia *)mediaAtIndex:(int)index;
+- (int)indexOfMedia:(VLCMedia *)media;
+- (int)count;
+
+- (NSArray *)sublists;					// I don't see why this would be useful
+//- (VLCMediaList *)flatPlaylist;		// nore this one
+//- (VLCMedia *)providerMedia;			// I have no clue what this does
+
+@end

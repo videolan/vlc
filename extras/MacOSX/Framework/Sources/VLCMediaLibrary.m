@@ -23,17 +23,19 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLCMediaLibrary.h>
+#import "VLCMediaLibrary.h"
 #import "VLCLibrary.h"
+#import "VLCLibVLCBridging.h"
 
 #include <vlc/libvlc.h>
 
-static VLCMediaLibrary * sharedMediaLibrary = NULL;
+static VLCMediaLibrary * sharedMediaLibrary = nil;
 
 @implementation VLCMediaLibrary
+
 + (id)sharedMediaLibrary
 {
-    if( !sharedMediaLibrary )
+    if(!sharedMediaLibrary)
     {
         sharedMediaLibrary = [[VLCMediaLibrary alloc] init];
     }
@@ -48,8 +50,9 @@ static VLCMediaLibrary * sharedMediaLibrary = NULL;
         libvlc_exception_init( &p_e );
         mlib = libvlc_media_library_new( [VLCLibrary sharedInstance], &p_e );
         quit_on_exception( &p_e );
-        libvlc_media_library_load( mlib, &p_e );
-        quit_on_exception( &p_e );
+        
+        libvlc_media_library_load(mlib, &p_e);
+        quit_on_exception(&p_e);
         allMedia = nil;
     }
     return self;
@@ -57,31 +60,34 @@ static VLCMediaLibrary * sharedMediaLibrary = NULL;
 
 - (void)dealloc
 {
-    if (allMedia)
-        [allMedia release];
-    libvlc_media_library_release( mlib );
+    [allMedia release];
+    
+    libvlc_media_library_release(mlib);
+    mlib = nil;     // make sure that the pointer is dead
+    
     [super dealloc];
 }
 
-- (VLCPlaylist *)allMedia
+- (VLCMediaList *)allMedia
 {
     if (!allMedia)
     {
-        libvlc_media_list_t * p_mlist = libvlc_media_library_media_list( mlib, NULL );
-        libvlc_media_list_t * p_flat_mlist = libvlc_media_list_flat_media_list( p_mlist, NULL );
-        allMedia = [[VLCPlaylist playlistWithLibVLCMediaList: p_flat_mlist] retain];
-        libvlc_media_list_release( p_flat_mlist );
-        libvlc_media_list_release( p_mlist );
+//        libvlc_media_list_t *p_mlist = libvlc_media_library_media_list(mlib, NULL);
+//        libvlc_media_list_t * p_flat_mlist = libvlc_media_list_flat_media_list(p_mlist, NULL);
+//        allMedia = [[VLCMediaList medialistWithLibVLCMediaList: p_flat_mlist] retain];
+//        libvlc_media_list_release(p_flat_mlist);
+//        libvlc_media_list_release(p_mlist);
     }
     return allMedia;
 }
 
-- (NSArray *) playlists
+- (NSArray *)playlists
 {
-    libvlc_media_list_t * p_mlist = libvlc_media_library_media_list( mlib, NULL );
-    VLCPlaylist * playlist = [VLCPlaylist playlistWithLibVLCMediaList: p_mlist];
-    libvlc_media_list_release( p_mlist );
-    NSArray * ret = [playlist sublists];
+    libvlc_media_list_t *p_mlist = libvlc_media_library_media_list( mlib, NULL );
+    VLCMediaList *medialist = [VLCMediaList medialistWithLibVLCMediaList:p_mlist];
+    libvlc_media_list_release(p_mlist);
+    NSArray *ret = [medialist sublists];
+    
     return ret;
 }
 @end

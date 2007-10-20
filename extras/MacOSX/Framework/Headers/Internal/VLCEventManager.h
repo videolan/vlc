@@ -26,18 +26,22 @@
 #import <pthread.h>
 
 /* This object is here to ensure safe inter thread communication */
-
 @interface VLCEventManager : NSObject
 {
-    NSMutableArray *    messageQueue;
-    pthread_t           dispatcherThread;
-    pthread_mutex_t     queueLock;
-    pthread_cond_t      signalData;
+    NSMutableArray  *messageQueue;
+    pthread_t        dispatcherThread;
+    pthread_mutex_t  queueLock;
+    pthread_cond_t   signalData;
 }
 
 /* Return the default manager */
 + (id)sharedManager;
 
-- (void)callOnMainThreadDelegateOfObject:(id)aTarget withDelegateMethod:(SEL)aSelector withNotificationName:(NSString *)aNotificationName;
-- (void)callOnMainThreadObject:(id)aTarget withMethod:(SEL)aSelector withArgumentAsObject: (id)arg;
+- (void)callOnMainThreadDelegateOfObject:(id)aTarget 
+					  withDelegateMethod:(SEL)aSelector 
+					withNotificationName:(NSString *)aNotificationName;
+- (void)callOnMainThreadObject:(id)aTarget 
+					withMethod:(SEL)aSelector 
+		  withArgumentAsObject:(id)arg;
+
 @end

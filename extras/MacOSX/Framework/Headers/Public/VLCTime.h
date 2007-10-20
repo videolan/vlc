@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaDiscoverer.h: VLC.framework VLCMediaDiscoverer header
+ * VLCTime.h: VLC.framework VLCTime header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -23,20 +23,22 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLCPlaylist.h>
 
-@class VLCPlaylist;
-
-@interface VLCMediaLibrary : NSObject
+@interface VLCTime : NSObject
 {
-    VLCPlaylist * allMedia;
-    void * mlib;
+    NSNumber *value;
 }
 
-+ (id)sharedMediaLibrary;
++ (VLCTime *)nullTime;
++ (VLCTime *)timeWithNumber:(NSNumber *)aNumber;
+//+ (VLCTime *)timeWithString:(NSString *)aString;
 
-- (VLCPlaylist *)allMedia;
+- (id)initWithNumber:(NSNumber *)aNumber;
+//- (id)initWithString:(NSString *)aString;
 
-- (NSArray *) playlists;
+- (NSNumber *)numberValue;
+- (NSString *)stringValue;
+
+- (NSComparisonResult)compare:(VLCTime *)aTime;
 
 @end

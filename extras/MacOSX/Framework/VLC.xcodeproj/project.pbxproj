@@ -1,0 +1,438 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		63030CCC0CCA65AC0088ECD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 63030CCA0CCA65AC0088ECD1 /* InfoPlist.strings */; };
+		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		EF7311900CB5797B009473B4 /* VLCAudio.h in Headers */ = {isa = PBXBuildFile; fileRef = EF73118E0CB5797B009473B4 /* VLCAudio.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF7311910CB5797B009473B4 /* VLCAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = EF73118F0CB5797B009473B4 /* VLCAudio.m */; };
+		EF78BD100CAEEEC300354E6E /* VLCEventManager.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD0D0CAEEEC300354E6E /* VLCEventManager.h */; settings = {ATTRIBUTES = (); }; };
+		EF78BD110CAEEEC300354E6E /* VLCLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD0E0CAEEEC300354E6E /* VLCLibrary.h */; settings = {ATTRIBUTES = (); }; };
+		EF78BD1B0CAEEEE700354E6E /* VLC.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD120CAEEEE700354E6E /* VLC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF78BD1C0CAEEEE700354E6E /* VLCMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD130CAEEEE700354E6E /* VLCMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF78BD1E0CAEEEE700354E6E /* VLCMediaLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD150CAEEEE700354E6E /* VLCMediaLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF78BD1F0CAEEEE700354E6E /* VLCMediaList.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD160CAEEEE700354E6E /* VLCMediaList.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF78BD460CAEEFF600354E6E /* VLCEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD3C0CAEEFF600354E6E /* VLCEventManager.m */; };
+		EF78BD470CAEEFF600354E6E /* VLCLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD3D0CAEEFF600354E6E /* VLCLibrary.m */; };
+		EF78BD480CAEEFF600354E6E /* VLCMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD3E0CAEEFF600354E6E /* VLCMedia.m */; };
+		EF78BD4A0CAEEFF600354E6E /* VLCMediaLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD400CAEEFF600354E6E /* VLCMediaLibrary.m */; };
+		EF78BD4B0CAEEFF600354E6E /* VLCMediaList.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD410CAEEFF600354E6E /* VLCMediaList.m */; };
+		EF78BE0F0CAF039400354E6E /* VLCTime.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD190CAEEEE700354E6E /* VLCTime.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF78BE100CAF039400354E6E /* VLCTime.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD440CAEEFF600354E6E /* VLCTime.m */; };
+		EF78BEF30CAF07E100354E6E /* VLCVideoView.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD1A0CAEEEE700354E6E /* VLCVideoView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF78BEF40CAF07E500354E6E /* VLCVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF78BD450CAEEFF600354E6E /* VLCVideoView.m */; };
+		EF8BB8D00CAFA8D80038A613 /* VLCMediaPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EF8BB8D10CAFA8D80038A613 /* VLCMediaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */; };
+		EFD551DD0CC6DD720074CEE1 /* VLCLibVLCBridging.h in Headers */ = {isa = PBXBuildFile; fileRef = EFD551DC0CC6DD720074CEE1 /* VLCLibVLCBridging.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		32DBCF5E0370ADEE00C91783 /* VLC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLC_Prefix.pch; sourceTree = "<group>"; };
+		63030CC70CCA652C0088ECD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
+		63030CCB0CCA65AC0088ECD1 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = ../../../../../Desktop/VLCFramework/English.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		8DC2EF5B0486A6940098B216 /* VLC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VLC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		EF73118E0CB5797B009473B4 /* VLCAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCAudio.h; path = Public/VLCAudio.h; sourceTree = "<group>"; };
+		EF73118F0CB5797B009473B4 /* VLCAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCAudio.m; sourceTree = "<group>"; };
+		EF78BD0D0CAEEEC300354E6E /* VLCEventManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCEventManager.h; path = Internal/VLCEventManager.h; sourceTree = "<group>"; };
+		EF78BD0E0CAEEEC300354E6E /* VLCLibrary.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCLibrary.h; path = Internal/VLCLibrary.h; sourceTree = "<group>"; };
+		EF78BD120CAEEEE700354E6E /* VLC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLC.h; path = Public/VLC.h; sourceTree = "<group>"; };
+		EF78BD130CAEEEE700354E6E /* VLCMedia.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCMedia.h; path = Public/VLCMedia.h; sourceTree = "<group>"; };
+		EF78BD150CAEEEE700354E6E /* VLCMediaLibrary.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCMediaLibrary.h; path = Public/VLCMediaLibrary.h; sourceTree = "<group>"; };
+		EF78BD160CAEEEE700354E6E /* VLCMediaList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCMediaList.h; path = Public/VLCMediaList.h; sourceTree = "<group>"; };
+		EF78BD190CAEEEE700354E6E /* VLCTime.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCTime.h; path = Public/VLCTime.h; sourceTree = "<group>"; };
+		EF78BD1A0CAEEEE700354E6E /* VLCVideoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCVideoView.h; path = Public/VLCVideoView.h; sourceTree = "<group>"; };
+		EF78BD350CAEEFB000354E6E /* Pre-Compile.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = "Pre-Compile.sh"; sourceTree = "<group>"; };
+		EF78BD3C0CAEEFF600354E6E /* VLCEventManager.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCEventManager.m; sourceTree = "<group>"; };
+		EF78BD3D0CAEEFF600354E6E /* VLCLibrary.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCLibrary.m; sourceTree = "<group>"; };
+		EF78BD3E0CAEEFF600354E6E /* VLCMedia.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCMedia.m; sourceTree = "<group>"; };
+		EF78BD400CAEEFF600354E6E /* VLCMediaLibrary.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCMediaLibrary.m; sourceTree = "<group>"; };
+		EF78BD410CAEEFF600354E6E /* VLCMediaList.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCMediaList.m; sourceTree = "<group>"; };
+		EF78BD440CAEEFF600354E6E /* VLCTime.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCTime.m; sourceTree = "<group>"; };
+		EF78BD450CAEEFF600354E6E /* VLCVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCVideoView.m; sourceTree = "<group>"; };
+		EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaPlayer.h; path = Public/VLCMediaPlayer.h; sourceTree = "<group>"; };
+		EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaPlayer.m; sourceTree = "<group>"; };
+		EF8BCECD0CB9339A004AA006 /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
+		EFD551DC0CC6DD720074CEE1 /* VLCLibVLCBridging.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCLibVLCBridging.h; path = Internal/VLCLibVLCBridging.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DC2EF560486A6940098B216 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DFFF38A50411DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DC2EF5B0486A6940098B216 /* VLC.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* VLC */ = {
+			isa = PBXGroup;
+			children = (
+				EF8BCECD0CB9339A004AA006 /* TODO */,
+				EF78BD3B0CAEEFD000354E6E /* Headers */,
+				08FB77AEFE84172EC02AAC07 /* Sources */,
+				32C88DFF0371C24200C91783 /* Other Sources */,
+				089C1665FE841158C02AAC07 /* Resources */,
+				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				034768DFFF38A50411DB9C8B /* Products */,
+			);
+			name = VLC;
+			sourceTree = "<group>";
+		};
+		0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				EF53DD5F0CBD7BD100D3D4D0 /* Linked Libraries */,
+				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
+				1058C7B2FEA5585E11CA2CBB /* Other Frameworks */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C1665FE841158C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				EF78BD350CAEEFB000354E6E /* Pre-Compile.sh */,
+				63030CC70CCA652C0088ECD1 /* Info.plist */,
+				63030CCA0CCA65AC0088ECD1 /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77AEFE84172EC02AAC07 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				EF78BD3C0CAEEFF600354E6E /* VLCEventManager.m */,
+				EF78BD3D0CAEEFF600354E6E /* VLCLibrary.m */,
+				EF78BD3E0CAEEFF600354E6E /* VLCMedia.m */,
+				EF78BD410CAEEFF600354E6E /* VLCMediaList.m */,
+				EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */,
+				EF78BD400CAEEFF600354E6E /* VLCMediaLibrary.m */,
+				EF78BD450CAEEFF600354E6E /* VLCVideoView.m */,
+				EF78BD440CAEEFF600354E6E /* VLCTime.m */,
+				EF73118F0CB5797B009473B4 /* VLCAudio.m */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7B2FEA5585E11CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
+				D2F7E79907B2D74100F64583 /* CoreData.framework */,
+				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		32C88DFF0371C24200C91783 /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32DBCF5E0370ADEE00C91783 /* VLC_Prefix.pch */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		EF53DD5F0CBD7BD100D3D4D0 /* Linked Libraries */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Linked Libraries";
+			sourceTree = "<group>";
+		};
+		EF78BD3B0CAEEFD000354E6E /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				EFD551DC0CC6DD720074CEE1 /* VLCLibVLCBridging.h */,
+				EF78BD120CAEEEE700354E6E /* VLC.h */,
+				EF78BD0D0CAEEEC300354E6E /* VLCEventManager.h */,
+				EF78BD0E0CAEEEC300354E6E /* VLCLibrary.h */,
+				EF78BD130CAEEEE700354E6E /* VLCMedia.h */,
+				EF78BD160CAEEEE700354E6E /* VLCMediaList.h */,
+				EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */,
+				EF78BD150CAEEEE700354E6E /* VLCMediaLibrary.h */,
+				EF78BD1A0CAEEEE700354E6E /* VLCVideoView.h */,
+				EF78BD190CAEEEE700354E6E /* VLCTime.h */,
+				EF73118E0CB5797B009473B4 /* VLCAudio.h */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8DC2EF500486A6940098B216 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF78BD100CAEEEC300354E6E /* VLCEventManager.h in Headers */,
+				EF78BD110CAEEEC300354E6E /* VLCLibrary.h in Headers */,
+				EF78BD1B0CAEEEE700354E6E /* VLC.h in Headers */,
+				EF78BD1C0CAEEEE700354E6E /* VLCMedia.h in Headers */,
+				EF78BD1E0CAEEEE700354E6E /* VLCMediaLibrary.h in Headers */,
+				EF78BD1F0CAEEEE700354E6E /* VLCMediaList.h in Headers */,
+				EF78BE0F0CAF039400354E6E /* VLCTime.h in Headers */,
+				EF78BEF30CAF07E100354E6E /* VLCVideoView.h in Headers */,
+				EF8BB8D00CAFA8D80038A613 /* VLCMediaPlayer.h in Headers */,
+				EF7311900CB5797B009473B4 /* VLCAudio.h in Headers */,
+				EFD551DD0CC6DD720074CEE1 /* VLCLibVLCBridging.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8DC2EF4F0486A6940098B216 /* VLC */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "VLC" */;
+			buildPhases = (
+				EF78BD2E0CAEEF9500354E6E /* ShellScript */,
+				8DC2EF540486A6940098B216 /* Sources */,
+				8DC2EF500486A6940098B216 /* Headers */,
+				8DC2EF520486A6940098B216 /* Resources */,
+				8DC2EF560486A6940098B216 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			comments = "-lvlc -lvlc-control -dylib_file @loader_path/../lib/vlc_libintl.dylib:$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework/lib/vlc_libintl.dylib -dylib_file @loader_path/../lib/libvlc.dylib:$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework/lib/libvlc.dylib";
+			dependencies = (
+			);
+			name = VLC;
+			productInstallPath = "$(HOME)/Library/Frameworks";
+			productName = VLC;
+			productReference = 8DC2EF5B0486A6940098B216 /* VLC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "VLC" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 0867D691FE84028FC02AAC07 /* VLC */;
+			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
+			projectDirPath = "";
+			targets = (
+				8DC2EF4F0486A6940098B216 /* VLC */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8DC2EF520486A6940098B216 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63030CCC0CCA65AC0088ECD1 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ ${ACTION} = \"\" ]; then\n\t# Debug --\n\tTARGET_BUILD_DIR=\".\"\n\tFULL_PRODUCT_NAME=\"VLC.framework\"\n\tCONTENTS_FOLDER_PATH=\"${FULL_PRODUCT_NAME}/Versions/A\"\n\tVLC_BUILD_DIR=\"../../..\"\n\tVLC_SRC_DIR=\"../../..\"\n\t# Debug --\nfi\n\nif [ ${ACTION} = \"build\" ]; then\t\n\tvlc_config=\"${VLC_SRC_DIR}/vlc-config\"\n\tlib=\"lib\"\n\tmodules=\"modules\"\n\ttarget=\"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}\"\n\ttarget_lib=\"${target}/${lib}\"\t\t\t# Should we consider using a different well-known folder like shared resources?\n\ttarget_modules=\"${target}/${modules}\"\t# Should we consider using a different well-known folder like shared resources?\n\t\n    ##########################\n    # @function install_library(src_lib, dest_dir)\n\t# @description Installs the specified library into the destination folder, automatically changes the references to dependencies\n\t# @param src_lib \tsource library to copy to the destination directory\n\t# @param dest_dir\tdestination directory where the src_lib should be copied to\n\tinstall_library() {\t\n\t\tif [ ${3} = \"library\" ]; then\n\t\t\tinstall_name=\"@loader_path/lib\"\n\t\telse\n\t\t\tinstall_name=\"@loader_path/modules\"\n\t\tfi\n\t\t\n\t\tif [ \"${4}\" != \"\" ]; then\n\t\t\tlib_dest=\"${2}/${4}\"\n\t\telse\n\t\t\tlib_dest=\"${2}/`basename ${1}`\"\n\t\tfi\n\t\t\n\t\tif test -e ${1} && ! test -e ${lib_dest}; then\n\t\t\tmkdir -p ${2}\n\t\t\t\n\t\t\t# Lets copy the library from the source folder to our new destination folder\n\t\t\tcp ${1} ${lib_dest}\n\n\t\t\t# Update the dynamic library so it will know where to look for the other libraries\n\t\t\techo \"Installing ${3} `basename ${lib_dest}`\"\n\n\t\t\t# Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory\n\t\t\tinstall_name_tool -change /usr/local/lib/libvlc.1.dylib @loader_path/../lib/libvlc.dylib ${lib_dest}\n\t\t\tinstall_name_tool -change @executable_path/lib/vlc_libintl.dylib @loader_path/../lib/vlc_libintl.dylib ${lib_dest}\n\t\t\tinstall_name_tool -id \"${install_name}/`basename ${lib_dest}`\" ${lib_dest}\n\n\t\t\t# Iterate through each installed library and modify the references to other dynamic libraries to match the framework's library directory\n\t\t\tfor linked_lib in `otool -L \"${lib_dest}\" | grep @executable_path | sed 's/(\\([0-z]*\\ *\\.*\\,*\\)*)//g'` ; do\n\t\t\t\tref_lib=`echo \"${linked_lib}\" | sed 's:executable_path/:loader_path/../:'`\n\t\t\t\tinstall_name_tool -change ${linked_lib} ${ref_lib} ${lib_dest}\n\t\t\tdone\n\t\tfi\n\t}\n\t# @function install_library\n    ##########################\n\n    ##########################\n\t# Create a symbolic link in the root of the framework\n\tmkdir -p ${target_lib}\n\tmkdir -p ${target_modules}\n\t\n\tpushd `pwd` > /dev/null \n\tcd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\n\t\n\tln -sf Versions/Current/${lib} .\n\tln -sf Versions/Current/${modules} .\n\t\n\tpopd > /dev/null \n\t# Create a symbolic link in the root of the framework\n    ##########################\n\t\n    ##########################\n    # Build the library folder (Same as VLC.framework/lib in Makefile)\n\techo \"Building library folder...\"\n\n\t# Check to see if there are any vlc libraries available\n\techo \"Copying VLC libraries...\"\n\tif test -d ${VLC_BUILD_DIR}/extras/contrib/vlc-lib; then\n\t\t# Iterate through the dyanmic libraries available\n\t\tfor lib_src in ${VLC_BUILD_DIR}/extras/contrib/vlc-lib/*.dylib ; do\n\t\t\tinstall_library ${lib_src} ${target_lib} \"library\"\n\t\tdone\n\tfi\n\n\t# Check to see if there are any core libraries available\n\techo \"Copying core libraries...\"\n#\tif test -d ${VLC_BUILD_DIR}/src/.libs; then\n#\t\t# Iterate through all the core libraries\n#\t\tfor lib_src = ${VLC_BUILD_DIR}/src/.libs/*.dylib; do\n#\t\t\t# Only install the library if it is not a symbolic link\n#\t\t\tif ! test -L ${lib_src}; then\n#\t\t\t\techo \"install_library ${lib_src} ${target_lib} `echo \"${lib_src}\" | sed 's:(.\\d+)+.dylib:.dylib:'`\"\n#\t\t\tfi\n#\t\tdone\n#\tfi\n\n\tinstall_library \"${VLC_BUILD_DIR}/src/.libs/libvlc.dylib\" ${target_lib} \"library\"\n\tinstall_library \"${VLC_BUILD_DIR}/src/.libs/libvlc-control.dylib\" ${target_lib} \"library\"\n\tinstall_library \"${VLC_BUILD_DIR}/extras/contrib/vlc-lib/vlc_libintl.dylib\" ${target_lib} \"library\"\n    # Build the library folder\n    ##########################\n\n    ##########################\n    # Build the modules folder (Same as VLC.framework/modules in Makefile)\n\techo \"Building modules folder...\"\n\t# Figure out what modules are available to install\n\tfor module in `top_builddir=\"${VLC_BUILD_DIR}\" ${vlc_config} --target plugin` ; do\n\t\t# Check to see that the reported module actually exists\n\t\tif test -n ${module}; then\n\t\t\tmodule_src=\"`dirname ${module}`/.libs/`basename ${module}`.dylib\"\n\t\t\tinstall_library ${module_src} ${target_modules} \"module\"\n\t\tfi\n    done\n\t\n    # Build the modules folder\n    ##########################\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DC2EF540486A6940098B216 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF78BD460CAEEFF600354E6E /* VLCEventManager.m in Sources */,
+				EF78BD470CAEEFF600354E6E /* VLCLibrary.m in Sources */,
+				EF78BD480CAEEFF600354E6E /* VLCMedia.m in Sources */,
+				EF78BD4A0CAEEFF600354E6E /* VLCMediaLibrary.m in Sources */,
+				EF78BD4B0CAEEFF600354E6E /* VLCMediaList.m in Sources */,
+				EF78BE100CAF039400354E6E /* VLCTime.m in Sources */,
+				EF78BEF40CAF07E500354E6E /* VLCVideoView.m in Sources */,
+				EF8BB8D10CAFA8D80038A613 /* VLCMediaPlayer.m in Sources */,
+				EF7311910CB5797B009473B4 /* VLCAudio.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		63030CCA0CCA65AC0088ECD1 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				63030CCB0CCA65AC0088ECD1 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB91AE08733DA50010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = VLC_Prefix.pch;
+				HEADER_SEARCH_PATHS = (
+					"$(VLC_SRC_DIR)/include",
+					"Headers/**",
+				);
+				INFOPLIST_FILE = Resources/Info.plist;
+				INSTALL_PATH = "@loader_path/../Frameworks";
+				LD_FLAGS_LIBINTL = "-dylib_file @loader_path/../lib/vlc_libintl.dylib:$(VLC_FRAMEWORK)/lib/vlc_libintl.dylib";
+				LD_FLAGS_LIBVLC = "-dylib_file @loader_path/lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib -dylib_file @loader_path/../lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib";
+				LD_FLAGS_LIBVLC_CONTROL = "-dylib_file @loader_path/lib/libvlc-control.dylib:$(VLC_FRAMEWORK)/lib/libvlc-control.dylib";
+				LIBRARY_SEARCH_PATHS = "$(VLC_FRAMEWORK)/lib";
+				OTHER_LDFLAGS = (
+					"-single_module",
+					"-read_only_relocs",
+					suppress,
+					"-lvlc",
+					"-lvlc-control",
+					"$(LD_FLAGS_LIBINTL)",
+					"$(LD_FLAGS_LIBVLC)",
+					"$(LD_FLAGS_LIBVLC_CONTROL)",
+				);
+				PRODUCT_NAME = VLC;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
+				SYMROOT = build;
+				VLC_BUILD_DIR = "$(VLC_SRC_DIR)";
+				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
+				VLC_SRC_DIR = ../../..;
+				WRAPPER_EXTENSION = framework;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB91AF08733DA50010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = VLC_Prefix.pch;
+				HEADER_SEARCH_PATHS = (
+					"$(VLC_SRC_DIR)/include",
+					"Headers/**",
+				);
+				INFOPLIST_FILE = Resources/Info.plist;
+				INSTALL_PATH = "@loader_path/../Frameworks";
+				LD_FLAGS_LIBINTL = "-dylib_file @loader_path/../lib/vlc_libintl.dylib:$(VLC_FRAMEWORK)/lib/vlc_libintl.dylib";
+				LD_FLAGS_LIBVLC = "-dylib_file @loader_path/lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib -dylib_file @loader_path/../lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib";
+				LD_FLAGS_LIBVLC_CONTROL = "-dylib_file @loader_path/lib/libvlc-control.dylib:$(VLC_FRAMEWORK)/lib/libvlc-control.dylib";
+				LIBRARY_SEARCH_PATHS = "$(VLC_FRAMEWORK)/lib";
+				OTHER_LDFLAGS = (
+					"-single_module",
+					"-read_only_relocs",
+					suppress,
+					"-lvlc",
+					"-lvlc-control",
+					"$(LD_FLAGS_LIBINTL)",
+					"$(LD_FLAGS_LIBVLC)",
+					"$(LD_FLAGS_LIBVLC_CONTROL)",
+				);
+				PRODUCT_NAME = VLC;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
+				SYMROOT = build;
+				VLC_BUILD_DIR = "$(VLC_SRC_DIR)";
+				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
+				VLC_SRC_DIR = ../../..;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+		1DEB91B208733DA50010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		1DEB91B308733DA50010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "VLC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91AE08733DA50010E9CD /* Debug */,
+				1DEB91AF08733DA50010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "VLC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91B208733DA50010E9CD /* Debug */,
+				1DEB91B308733DA50010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}

@@ -1,0 +1,24 @@
+TODO List:
+
+- Add user data into media_descriptor to reference internal VLC object -- fix not committed to SVN.
+
+- Fix stream.c to recognize VLC_ENOOBJECT
+- Easy way to tell the length of the movie without having to instiate the demuxer.  Maybe cached info?
+- Hook into "length" variable for media streams vs. using intf-change as a hook.
+- Figure out a better way to raise error messages versus quit_on_exception
+- Have VLCMedia search for playable files when directories are referenced.
+- Only fetch meta data that has been requested.  Just don't fetch it, just because.
+- md callback to notify VLCMedia that it is about to be destroyed.
+- add media_list_player
+
+Changelog
+- VLCMediaControl eliminated
+- setView/view renamed to setVideoView/videoView
+- VLCMediaPlayer NSView *view changed to VLCVideoView *videoView
+- VLCMediaPlayer initWithView changed to initWithVideoView:(VLCVideoView *)aVideoView
+- Updated VLCMediaPlayer.videoSize from NSRect to NSSize
+- Updated Pre-Compile.sh script to create symbolic links based on relative pathes
+- More issues with VLCTime length, released object by setting to nil
+- Added VLCMedia.h to VLCMediaPlayer.h.
+- Static linked libvlc-control.a and libvlc.a -- dynamically linked libiconv (system file) and vlc_libintl.dylib
+  eliminates errors and warning messages when framework linked against other applications.

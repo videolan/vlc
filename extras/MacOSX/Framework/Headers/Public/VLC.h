@@ -25,15 +25,16 @@
 #ifndef VLC_FRAMEWORK_VLC_H
 #define VLC_FRAMEWORK_VLC_H
 
-typedef void * _opaque_ptr;
-
 #import <VLC/VLCMedia.h>
-#import <VLC/VLCMediaDiscoverer.h>
 #import <VLC/VLCMediaLibrary.h>
-#import <VLC/VLCPlaylist.h>
-#import <VLC/VLCPlaylistDataSource.h>
-#import <VLC/VLCServicesDiscoverer.h>
+#import <VLC/VLCMediaList.h>
 #import <VLC/VLCTime.h>
 #import <VLC/VLCVideoView.h>
+
+@class VLCMedia;
+@class VLCMediaLibrary;
+@class VLCMediaList;
+@class VLCTime;
+@class VLCVideoView;
 
 #endif /* VLC_FRAMEWORK_VLC_H */

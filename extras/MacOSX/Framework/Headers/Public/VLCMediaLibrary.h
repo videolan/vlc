@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMedia.h: VLC.framework VLCMedia header
+ * VLCMediaDiscoverer.h: VLC.framework VLCMediaDiscoverer header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -23,34 +23,19 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLCPlaylist.h>
+#import "VLCMediaList.h"
 
-/* Meta */
-extern NSString * VLCMetaInformationTitle; /* Associated to an NSString */
-extern NSString * VLCMetaInformationAuthor; /* Associated to an NSString */
-extern NSString * VLCMetaInformationArtwork; /* Associated to an NSImage */
+@class VLCMediaList;
 
-/* Notification */
-extern NSString * VLCMediaSubItemAdded;
-
-@class VLCPlaylist;
-
-@interface VLCMedia : NSObject
+@interface VLCMediaLibrary : NSObject
 {
-    void * md;
-    NSString * url;
-    VLCPlaylist *subitems;
-    NSMutableDictionary *metaInformation;
+    void *mlib;
+    VLCMediaList *allMedia;
 }
 
-- (id)initWithURL:(NSString *)anURL;
-+ (id)mediaWithURL:(NSString *)anURL;
++ (id)sharedMediaLibrary;
 
-- (void) dealloc;
+- (VLCMediaList *)allMedia;
+- (NSArray *)playlists;
 
-- (NSString *)url;
-- (VLCPlaylist *)subitems;
-
-/* Returns a dictionary with corresponding object associated with a meta */
-- (NSDictionary *)metaInformation;
 @end
