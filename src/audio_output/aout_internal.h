@@ -21,6 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
+# error This header file can only be included from LibVLC.
+#endif
+
+#ifndef __LIBVLC_AOUT_INTERNAL_H
+# define __LIBVLC_AOUT_INTERNAL_H 1
+
 #if defined( __APPLE__ ) || defined( SYS_BSD )
 #undef HAVE_ALLOCA
 #endif
@@ -131,3 +138,4 @@ aout_buffer_t * aout_DecNewBuffer( aout_instance_t *, aout_input_t *, size_t );
 void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );
 int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
 
+#endif /* !__LIBVLC_AOUT_INTERNAL_H */

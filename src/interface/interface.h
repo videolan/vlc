@@ -23,9 +23,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
+# error This header file can only be included from LibVLC.
+#endif
+
+#ifndef __LIBVLC_INTERFACE_H
+# define __LIBVLC_INTERFACE_H 1
+
 /**********************************************************************
  * Interaction
  **********************************************************************/
 
 void intf_InteractionManage( playlist_t *);
 void intf_InteractionDestroy( interaction_t *);
+#endif

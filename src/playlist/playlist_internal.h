@@ -22,6 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef __LIBVLC_PLAYLIST_INTERNAL_H
+# define __LIBVLC_PLAYLIST_INTERNAL_H 1
+
 /**
  *  \file
  *  This file contain internal structures and function prototypes related
@@ -130,3 +133,4 @@ int playlist_ItemDelete ( playlist_item_t * );
 #endif
 
 #define PLI_NAME( p ) p && p->p_input ? p->p_input->psz_name : "null"
+#endif /* !__LIBVLC_PLAYLIST_INTERNAL_H */

@@ -21,6 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
+# error This header file can only be included from LibVLC.
+#endif
+
 #ifndef _INPUT_INTERNAL_H
 #define _INPUT_INTERNAL_H 1
 
@@ -357,9 +361,6 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
     return i_result;
 }
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__)
-# warning This is an internal header, something is wrong if you see this message.
-#else
 /* Stream */
 /**
  * stream_t definition
@@ -389,6 +390,5 @@ static inline stream_t *vlc_stream_create( vlc_object_t *obj )
     return (stream_t *)vlc_custom_create( obj, sizeof(stream_t),
                                           VLC_OBJECT_STREAM, "stream" );
 }
-#endif
 
 #endif

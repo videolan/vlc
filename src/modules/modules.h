@@ -21,6 +21,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
+# error This header file can only be included from LibVLC.
+#endif
+
+#ifndef __LIBVLC_MODULES_H
+# define __LIBVLC_MODULES_H 1
+
+
 /* Number of tries before we unload an unused module */
 #define MODULE_HIDE_DELAY 50
 
@@ -152,3 +160,5 @@ void  __module_LoadPlugins     ( vlc_object_t * );
 void  __module_EndBank         ( vlc_object_t * );
 #define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
 void  __module_ResetBank       ( vlc_object_t * );
+
+#endif /* !__LIBVLC_MODULES_H */
