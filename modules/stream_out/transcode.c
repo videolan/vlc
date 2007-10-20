@@ -40,11 +40,6 @@
 
 #define MASTER_SYNC_MAX_DRIFT 100000
 
-/* FIXME Ugly, needed for (disabled) stats updates  */
-#if 0
-#include "../../src/input/input_internal.h"
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -1319,7 +1314,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->fmt_out = id->p_decoder->fmt_in;
     id->p_decoder->fmt_out.i_extra = 0;
     id->p_decoder->fmt_out.p_extra = 0;
-    id->p_decoder->pf_decode_audio = 0;
+    id->p_decoder->pf_decode_audio = NULL;
     id->p_decoder->pf_aout_buffer_new = audio_new_buffer;
     id->p_decoder->pf_aout_buffer_del = audio_del_buffer;
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
@@ -1551,21 +1546,11 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     block_t *p_block, *p_audio_block;
     int i;
     *out = NULL;
-    input_thread_t *p_input = NULL;
-
-    if( p_stream->p_parent->p_parent && p_stream->p_parent->p_parent->
-                                i_object_type == VLC_OBJECT_INPUT )
-        p_input = (input_thread_t *)p_stream->p_parent->p_parent;
 
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
-#warning Stats not implemented!
-#if 0
-        if( p_input )
-            stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_audio,
-                                 1, NULL );
-#endif
+        sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_AUDIO, 1 );
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
@@ -1683,7 +1668,8 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     id->p_decoder->fmt_out = id->p_decoder->fmt_in;
     id->p_decoder->fmt_out.i_extra = 0;
     id->p_decoder->fmt_out.p_extra = 0;
-    id->p_decoder->pf_decode_video = 0;
+    id->p_decoder->pf_decode_video = NULL;
+    id->p_decoder->pf_get_cc = NULL;
     id->p_decoder->pf_get_cc = 0;
     id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
     id->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
@@ -2155,21 +2141,12 @@ static int transcode_video_process( sout_stream_t *p_stream,
     int i_duplicate = 1, i;
     picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
-    input_thread_t *p_input = NULL;
-
-    if( p_stream->p_parent->p_parent && p_stream->p_parent->p_parent->
-                                i_object_type == VLC_OBJECT_INPUT )
-        p_input = (input_thread_t *)p_stream->p_parent->p_parent;
 
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = NULL;
-#warning Stats not implemented!
-#if 0
-        if( p_input )
-            stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_video,
-                                 1, NULL );
-#endif
+
+        sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_VIDEO, 1 );
 
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {
@@ -2708,6 +2685,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
      */
 
     /* Initialization of decoder structures */
+    id->p_decoder->pf_decode_sub = NULL;
     id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
     id->p_decoder->pf_spu_buffer_del = spu_del_buffer;
     id->p_decoder->p_owner = (decoder_owner_sys_t *)p_stream;
@@ -2771,7 +2749,10 @@ static int transcode_spu_process( sout_stream_t *p_stream,
     *out = NULL;
 
     p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
-    if( !p_subpic ) return VLC_EGENERIC;
+    if( !p_subpic )
+        return VLC_EGENERIC;
+
+    sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_SUBTITLE, 1 );
 
     if( p_sys->b_master_sync && p_sys->i_master_drift )
     {

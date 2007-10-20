@@ -148,6 +148,59 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 }
 
 /*****************************************************************************
+ * 
+ *****************************************************************************/
+void sout_UpdateStatistic( sout_instance_t *p_sout, sout_statistic_t i_type, int i_delta )
+{
+    input_thread_t *p_input;
+    int i_bytes; /* That's pretty stupid to define it as an integer, it will overflow
+                    really fast ... */
+
+    if( !p_sout->p_libvlc->b_stats )
+        return;
+
+    /* FIXME that's ugly
+     * TODO add a private (ie not VLC_EXPORTed) input_UpdateStatistic for that */
+    p_input = vlc_object_find( p_sout, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( !p_input || p_input->i_state == INIT_S || p_input->i_state == ERROR_S )
+        return;
+
+    switch( i_type )
+    {
+#define I(c) stats_UpdateInteger( p_input, p_input->p->counters.c, i_delta, NULL )
+    case SOUT_STATISTIC_DECODED_VIDEO:
+        I(p_decoded_video);
+        break;
+    case SOUT_STATISTIC_DECODED_AUDIO:
+        I(p_decoded_audio);
+        break;
+    case SOUT_STATISTIC_DECODED_SUBTITLE:
+        I(p_decoded_sub);
+        break;
+#if 0
+    case SOUT_STATISTIC_ENCODED_VIDEO:
+    case SOUT_STATISTIC_ENCODED_AUDIO:
+    case SOUT_STATISTIC_ENCODED_SUBTITLE:
+        msg_Warn( p_sout, "Not yet supported statistic type %d", i_type );
+        break;
+#endif
+
+    case SOUT_STATISTIC_SENT_PACKET:
+        I(p_sout_sent_packets);
+        break;
+#undef I
+    case SOUT_STATISTIC_SENT_BYTE:
+        if( !stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes, i_delta, &i_bytes ) )
+            stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate, i_bytes, NULL );
+        break;
+
+    default:
+        msg_Err( p_sout, "Invalid statistic type %d (internal error)", i_type );
+        break;
+    }
+    vlc_object_release( p_input );
+}
+/*****************************************************************************
  * Packetizer/Input
  *****************************************************************************/
 sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
@@ -323,26 +376,14 @@ int sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    int i_total = 0;
+    const int i_packets_gather = 30;
     p_access->i_writes++;
     p_access->i_sent_bytes += p_buffer->i_buffer;
-    if( p_access->p_libvlc->b_stats && p_access->i_writes % 30 == 0 )
+    if( (p_access->i_writes % i_packets_gather) == 0 )
     {
-        /* Access_out -> sout_instance -> input_thread_t */
-        input_thread_t *p_input =
-            (input_thread_t *)vlc_object_find( p_access, VLC_OBJECT_INPUT,
-                                               FIND_PARENT );
-        if( p_input )
-        {
-            stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_packets,
-                     30, NULL );
-            stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes,
-                                 p_access->i_sent_bytes, &i_total );
-            stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate,
-                    (float)i_total, NULL );
-            p_access->i_sent_bytes = 0;
-            vlc_object_release( p_input );
-        }
+        sout_UpdateStatistic( p_access->p_sout, SOUT_STATISTIC_SENT_PACKET, i_packets_gather );
+        sout_UpdateStatistic( p_access->p_sout, SOUT_STATISTIC_SENT_BYTE, p_access->i_sent_bytes );
+        p_access->i_sent_bytes = 0;
     }
     return p_access->pf_write( p_access, p_buffer );
 }
