@@ -145,7 +145,7 @@ libvlc_la_DEPENDENCIES = libvlc.sym
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
 libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
-libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) -version-info 0:0:0
+libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) -version-info 1:0:0
 if HAVE_COMPILER_EXPORT
 libvlc_control_la_LDFLAGS += -export-dynamic
 else
