@@ -120,6 +120,10 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
         vlc_InputItemMetaChanged );
     vlc_event_manager_register_event_type( &p_i->event_manager,
         vlc_InputItemSubItemAdded );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemDurationChanged );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemPreparsedChanged );
 }
 
 static inline void input_ItemCopyOptions( input_item_t *p_parent,
@@ -302,21 +306,55 @@ static inline mtime_t input_item_GetDuration( input_item_t * p_i )
 
 static inline void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration )
 {
+    vlc_bool_t send_event = VLC_FALSE;
+
     vlc_mutex_lock( &p_i->lock );
-    p_i->i_duration = i_duration;
+    if( p_i->i_duration != i_duration )
+    {
+        p_i->i_duration = i_duration;
+        send_event = VLC_TRUE;
+    }
     vlc_mutex_unlock( &p_i->lock );
+    
+    if ( send_event == VLC_TRUE )
+    {
+        vlc_event_t event;
+        event.type = vlc_InputItemDurationChanged;
+        event.u.input_item_duration_changed.new_duration = i_duration;
+        vlc_event_send( &p_i->event_manager, &event );
+    }
+    
     return;
 }
 
 static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t preparsed )
 {
+    vlc_bool_t send_event = VLC_FALSE;
+
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
 
+    vlc_mutex_lock( &p_i->lock );
+    int new_status;
     if( preparsed )
-        p_i->p_meta->i_status |= ITEM_PREPARSED;
+        new_status = p_i->p_meta->i_status | ITEM_PREPARSED;
     else
-        p_i->p_meta->i_status &= ~ITEM_PREPARSED;
+        new_status = p_i->p_meta->i_status & ~ITEM_PREPARSED;
+    if ( p_i->p_meta->i_status != new_status )
+    {
+        p_i->p_meta->i_status = new_status;
+        send_event = VLC_TRUE;
+    }
+
+    vlc_mutex_unlock( &p_i->lock );
+    
+    if ( send_event == VLC_TRUE )
+    {
+        vlc_event_t event;
+        event.type = vlc_InputItemPreparsedChanged;
+        event.u.input_item_preparsed_changed.new_status = new_status;
+        vlc_event_send( &p_i->event_manager, &event );
+    }
 }
 
 static inline vlc_bool_t input_item_IsPreparsed( input_item_t *p_i )

@@ -189,6 +189,22 @@ VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
                                            libvlc_exception_t * p_e );
 
+VLC_PUBLIC_API vlc_int64_t
+   libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
+                                         libvlc_exception_t * p_e );
+                                         
+VLC_PUBLIC_API vlc_bool_t
+   libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
+                                         libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void 
+    libvlc_media_descriptor_set_user_data( libvlc_media_descriptor_t * p_md,
+                                           void * p_new_user_data,
+                                           libvlc_exception_t * p_e);
+VLC_PUBLIC_API void *
+    libvlc_media_descriptor_get_user_data( libvlc_media_descriptor_t * p_md,
+                                           libvlc_exception_t * p_e);
+
 /** @}*/
 
 /*****************************************************************************

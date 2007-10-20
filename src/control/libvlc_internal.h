@@ -88,6 +88,7 @@ struct libvlc_media_descriptor_t
     vlc_dictionary_t   tags; /* To be merged with core's meta soon */
     struct libvlc_media_list_t *p_subitems; /* A media descriptor can have
                                            * Sub item */
+    void *p_user_data; /* Allows for VLC.framework to hook into media descriptor without creating a new VLCMedia object. */
 };
 
 struct libvlc_tag_query_t

@@ -307,6 +307,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
     if( libvlc_exception_raised( &p_e ) )
     {
         libvlc_event_manager_release( p_mi->p_event_manager );
+        libvlc_exception_clear( &p_e );
         free( p_mi );
         return; /* no need to worry about no input thread */
     }

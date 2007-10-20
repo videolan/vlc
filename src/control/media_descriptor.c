@@ -124,6 +124,41 @@ static void input_item_meta_changed( const vlc_event_t *p_event,
     libvlc_event_send( p_md->p_event_manager, &event );
 }
 
+/**************************************************************************
+ * input_item_duration_changed (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_duration_changed( const vlc_event_t *p_event,
+                                         void * user_data )
+{
+    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaDescriptorDurationChanged;
+    event.u.media_descriptor_duration_changed.new_duration = 
+        p_event->u.input_item_duration_changed.new_duration;
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
+}
+
+/**************************************************************************
+ * input_item_preparsed_changed (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_preparsed_changed( const vlc_event_t *p_event,
+                                          void * user_data )
+{
+    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaDescriptorPreparsedChanged;
+    event.u.media_descriptor_preparsed_changed.new_status = 
+        p_event->u.input_item_preparsed_changed.new_status;
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
+}
 
 /**************************************************************************
  * Install event handler (Private)
@@ -137,6 +172,14 @@ static void install_input_item_observer( libvlc_media_descriptor_t *p_md )
     vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
+                      p_md );
+    vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemDurationChanged,
+                      input_item_duration_changed,
+                      p_md );
+    vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemPreparsedChanged,
+                      input_item_preparsed_changed,
                       p_md );
 }
 
@@ -152,6 +195,14 @@ static void uninstall_input_item_observer( libvlc_media_descriptor_t *p_md )
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
+                      p_md );
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemDurationChanged,
+                      input_item_duration_changed,
+                      p_md );
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemPreparsedChanged,
+                      input_item_preparsed_changed,
                       p_md );
 }
 
@@ -197,6 +248,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     p_md->p_input_item      = p_input_item;
     p_md->b_preparsed       = VLC_FALSE;
     p_md->i_refcount        = 1;
+    p_md->p_user_data       = NULL; // VLC.framework hook
 
     /* A media descriptor can be a playlist. When you open a playlist
      * It can give a bunch of item to read. */
@@ -209,6 +261,8 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
         libvlc_MediaDescriptorMetaChanged, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
         libvlc_MediaDescriptorSubItemAdded, p_e );
+    libvlc_event_manager_register_event_type( p_md->p_event_manager,
+        libvlc_MediaDescriptorDurationChanged, p_e );
 
     vlc_gc_incref( p_md->p_input_item );
 
@@ -461,4 +515,73 @@ libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
                                        libvlc_exception_t * p_e )
 {
     return p_md->p_event_manager;
+}
+
+/**************************************************************************
+ * Get duration of media_descriptor object.
+ **************************************************************************/
+vlc_int64_t
+libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
+                                      libvlc_exception_t * p_e )
+{
+    if( p_md && p_md->p_input_item)
+    {
+        return input_item_GetDuration( p_md->p_input_item );
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+/**************************************************************************
+ * Get preparsed status for media_descriptor object.
+ **************************************************************************/
+vlc_bool_t
+libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
+                                       libvlc_exception_t * p_e )
+{
+    if( p_md && p_md->p_input_item)
+    {
+        return input_item_IsPreparsed( p_md->p_input_item );
+    }
+    else
+    {
+        return VLC_FALSE;
+    }
+}
+
+/**************************************************************************
+ * Sets media descriptor's user_data. user_data is specialized data 
+ * accessed by the host application, VLC.framework uses it as a pointer to 
+ * an native object that references a libvlc_media_descriptor_t pointer
+ **************************************************************************/
+void 
+libvlc_media_descriptor_set_user_data( libvlc_media_descriptor_t * p_md,
+                                       void * p_new_user_data,
+                                       libvlc_exception_t * p_e )
+{
+    if( p_md )
+    {
+        p_md->p_user_data = p_new_user_data;
+    }
+}
+
+/**************************************************************************
+ * Get media descriptor's user_data. user_data is specialized data 
+ * accessed by the host application, VLC.framework uses it as a pointer to 
+ * an native object that references a libvlc_media_descriptor_t pointer
+ **************************************************************************/
+void *
+libvlc_media_descriptor_get_user_data( libvlc_media_descriptor_t * p_md,
+                                       libvlc_exception_t * p_e )
+{
+    if( p_md )
+    {
+        return p_md->p_user_data;
+    }
+    else
+    {
+        return NULL;
+    }
 }

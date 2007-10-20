@@ -114,6 +114,8 @@ typedef enum vlc_event_type_t {
     /* Input item events */
     vlc_InputItemMetaChanged,
     vlc_InputItemSubItemAdded,
+    vlc_InputItemDurationChanged,
+    vlc_InputItemPreparsedChanged,
 
     /* Service Discovery event */
     vlc_ServicesDiscoveryItemAdded,
@@ -136,7 +138,15 @@ typedef struct vlc_event_t
         {
             input_item_t * p_new_child;
         } input_item_subitem_added;
- 
+        struct vlc_input_item_duration_changed
+        {
+            mtime_t new_duration;
+        } input_item_duration_changed;
+        struct vlc_input_item_preparsed_changed
+        {
+            int new_status;
+        } input_item_preparsed_changed;
+
         /* Service discovery events */
         struct vlc_services_discovery_item_added
         {
