@@ -42,8 +42,8 @@ extern NSString *VLCMediaListItemDeleted;
 // TODO: Documentation
 @interface VLCMediaList : NSObject
 {
-    void *p_mlist;				//< Internal instance of media list
-	id delegate;                //< Delegate object
+    void *p_mlist;                //< Internal instance of media list
+    id delegate;                //< Delegate object
 }
 
 /* Properties */
@@ -61,8 +61,8 @@ extern NSString *VLCMediaListItemDeleted;
 - (int)indexOfMedia:(VLCMedia *)media;
 - (int)count;
 
-- (NSArray *)sublists;					// I don't see why this would be useful
-//- (VLCMediaList *)flatPlaylist;		// nore this one
-//- (VLCMedia *)providerMedia;			// I have no clue what this does
+- (NSArray *)sublists;                    // I don't see why this would be useful
+//- (VLCMediaList *)flatPlaylist;        // nore this one
+//- (VLCMedia *)providerMedia;            // I have no clue what this does
 
 @end

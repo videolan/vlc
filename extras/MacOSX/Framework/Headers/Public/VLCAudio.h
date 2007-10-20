@@ -36,7 +36,7 @@ extern NSString *VLCMediaPlayerVolumeChanged;
 // TODO: Documentation
 @interface VLCAudio : NSObject 
 {
-	VLCLibrary *library;	//< Library to control audio for
+    VLCLibrary *library;    //< Library to control audio for
 }
 
 /* Initializers */

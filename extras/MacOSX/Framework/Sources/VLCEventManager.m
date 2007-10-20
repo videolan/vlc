@@ -71,9 +71,9 @@ static void * EventDispatcherMainLoop(void * user_data)
         
         /* Wait until we have something on the queue */
         while([[self messageQueue] count] <= 0 )
-		{
+        {
             pthread_cond_wait( [self signalData], [self queueLock] );
-		}
+        }
         message = (struct message *)[(NSData *)[[self messageQueue] lastObject] bytes];
         
         /* Don't send the same notification twice */
@@ -84,7 +84,7 @@ static void * EventDispatcherMainLoop(void * user_data)
                 message_newer = (struct message *)[(NSData *)[[self messageQueue] objectAtIndex: i] bytes];
                 if( message_newer->type != VLCNotification )
                     continue;
-				
+                
                 if( message_newer->target == message->target && message_newer->target == message->target && [message_newer->u.name isEqualToString:message->u.name] )
                 {
                     [message_newer->target release];
@@ -110,7 +110,7 @@ static void * EventDispatcherMainLoop(void * user_data)
     
         [pool release];
     };
-	return nil;
+    return nil;
 }
 
 @implementation VLCEventManager
@@ -143,7 +143,7 @@ static void * EventDispatcherMainLoop(void * user_data)
     pthread_kill( dispatcherThread, SIGKILL );
     pthread_join( dispatcherThread, NULL );
 
-	[messageQueue release];
+    [messageQueue release];
     [super dealloc];
 }
 
@@ -151,14 +151,14 @@ static void * EventDispatcherMainLoop(void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
-	struct message message = 
-	{ 
-		[aTarget retain], 
-		aSelector, 
-		[aNotificationName retain], 
-		VLCNotification 
-	};
-	
+    struct message message = 
+    { 
+        [aTarget retain], 
+        aSelector, 
+        [aNotificationName retain], 
+        VLCNotification 
+    };
+    
     pthread_mutex_lock( [self queueLock] );
     [[self messageQueue] insertObject:[NSData dataWithBytes:&message length:sizeof(struct message)] atIndex:0];
     pthread_cond_signal( [self signalData] );
@@ -172,18 +172,18 @@ static void * EventDispatcherMainLoop(void * user_data)
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     struct message message = 
-	{ 
-		[aTarget retain], 
-		aSelector, 
-		[arg retain], 
-		VLCObjectMethodWithObjectArg 
-	};
-	
+    { 
+        [aTarget retain], 
+        aSelector, 
+        [arg retain], 
+        VLCObjectMethodWithObjectArg 
+    };
+    
     pthread_mutex_lock( [self queueLock] );
     [[self messageQueue] insertObject:[NSData dataWithBytes:&message length:sizeof(struct message)] atIndex:0];
     pthread_cond_signal( [self signalData] );
     pthread_mutex_unlock( [self queueLock] );
-	
+    
     [pool release];
 }
 @end

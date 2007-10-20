@@ -35,50 +35,50 @@ NSString *VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 - (id)init
 {
-	return nil;
+    return nil;
 }
 
 - (id)initWithLibrary:(VLCLibrary *)aLibrary
 {
-	if (![library audio] && (self = [super init]))
-	{
-		library = aLibrary;
-		[library setAudio:self];
-	}
-	return self;
+    if (![library audio] && (self = [super init]))
+    {
+        library = aLibrary;
+        [library setAudio:self];
+    }
+    return self;
 }
 
 - (void)setMute:(BOOL)value
 {
-	libvlc_audio_set_mute([library instance], value, NULL);
+    libvlc_audio_set_mute([library instance], value, NULL);
 }
 
 - (BOOL)isMuted
 {
-	libvlc_exception_t ex;
-	libvlc_exception_init(&ex);
-	BOOL result = libvlc_audio_get_mute([library instance], &ex);
-	quit_on_exception(&ex);
-	
-	return result;
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    BOOL result = libvlc_audio_get_mute([library instance], &ex);
+    quit_on_exception(&ex);
+    
+    return result;
 }
 
 - (void)setVolume:(int)value
 {
-	if (value < 0)
-		value = 0;
-	else if (value > 200)
-		value = 200;
-	libvlc_audio_set_volume([library instance], value, NULL);
+    if (value < 0)
+        value = 0;
+    else if (value > 200)
+        value = 200;
+    libvlc_audio_set_volume([library instance], value, NULL);
 }
 
 - (int)volume
 {
-	libvlc_exception_t ex;
-	libvlc_exception_init(&ex);
-	int result = libvlc_audio_get_volume([library instance], &ex);
-	quit_on_exception(&ex);
-	return result;
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    int result = libvlc_audio_get_volume([library instance], &ex);
+    quit_on_exception(&ex);
+    return result;
 }
 
 @end

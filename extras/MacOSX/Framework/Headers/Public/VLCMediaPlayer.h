@@ -32,13 +32,13 @@ extern NSString *VLCMediaPlayerStateChanged;
 // TODO: Documentation
 typedef enum VLCMediaPlayerState
 {
-    VLCMediaPlayerStateStopped,		//< Player has stopped
-    VLCMediaPlayerStateOpening,		//< Stream is opening
-    VLCMediaPlayerStateBuffering,	//< Stream is buffering
-    VLCMediaPlayerStateEnded,		//< Stream has ended
-    VLCMediaPlayerStateError,		//< Player has generated an error
-    VLCMediaPlayerStatePlaying,		//< Stream is playing
-    VLCMediaPlayerStatePaused		//< Stream is paused
+    VLCMediaPlayerStateStopped,        //< Player has stopped
+    VLCMediaPlayerStateOpening,        //< Stream is opening
+    VLCMediaPlayerStateBuffering,    //< Stream is buffering
+    VLCMediaPlayerStateEnded,        //< Stream has ended
+    VLCMediaPlayerStateError,        //< Player has generated an error
+    VLCMediaPlayerStatePlaying,        //< Stream is playing
+    VLCMediaPlayerStatePaused        //< Stream is paused
 } VLCMediaPlayerState;
 
 extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
@@ -57,11 +57,11 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 // TODO: Should we use medialist_player or our own flavor of media player?
 @interface VLCMediaPlayer : NSObject 
 {
-	id delegate;			//< Object delegate
-	VLCVideoView *videoView;//< NSView instance where media is rendered to
+    id delegate;            //< Object delegate
+    VLCVideoView *videoView;//< NSView instance where media is rendered to
 
-	void *instance;			//  Internal
-	VLCMedia *media;		//< Current media being played
+    void *instance;            //  Internal
+    VLCMedia *media;        //< Current media being played
 }
 
 /* Initializers */
@@ -177,5 +177,5 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  * \see VLCMediaState
  */
 - (VLCMediaPlayerState)state;
-	 
+     
 @end

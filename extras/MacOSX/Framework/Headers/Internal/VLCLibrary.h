@@ -35,8 +35,8 @@
 // TODO: Documentation
 @interface VLCLibrary : NSObject 
 {
-	void *instance;
-	VLCAudio *audio;
+    void *instance;
+    VLCAudio *audio;
 }
 
 /* Factories */

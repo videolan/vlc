@@ -52,12 +52,12 @@ extern NSString *VLCVideoViewLeftFullScreen;
 
 @interface VLCVideoView : NSView <VLCOpenGLVoutEmbedding>
 {
-	id delegate;
-	NSColor *backColor;
-	BOOL stretchesVideo;
-	
-	// TODO: Allow for view to report transparency to do some cool effects
-	// with the video?
+    id delegate;
+    NSColor *backColor;
+    BOOL stretchesVideo;
+    
+    // TODO: Allow for view to report transparency to do some cool effects
+    // with the video?
 }
 
 - (void)setDelegate:(id)value;

@@ -38,10 +38,10 @@
 + (id)sharedManager;
 
 - (void)callOnMainThreadDelegateOfObject:(id)aTarget 
-					  withDelegateMethod:(SEL)aSelector 
-					withNotificationName:(NSString *)aNotificationName;
+                      withDelegateMethod:(SEL)aSelector 
+                    withNotificationName:(NSString *)aNotificationName;
 - (void)callOnMainThreadObject:(id)aTarget 
-					withMethod:(SEL)aSelector 
-		  withArgumentAsObject:(id)arg;
+                    withMethod:(SEL)aSelector 
+          withArgumentAsObject:(id)arg;
 
 @end

@@ -30,32 +30,32 @@
 /**
  * Standard dictionary keys for retreiving meta data.
  */
-extern NSString *VLCMetaInformationTitle;	    /* NSString */
-extern NSString *VLCMetaInformationArtist;	    /* NSString */
+extern NSString *VLCMetaInformationTitle;        /* NSString */
+extern NSString *VLCMetaInformationArtist;        /* NSString */
 extern NSString *VLCMetaInformationTitle;       /* NSString */
-extern NSString *VLCMetaInformationArtist;		/* NSString */
-extern NSString *VLCMetaInformationGenre;		/* NSString */
-extern NSString *VLCMetaInformationCopyright;	/* NSString */
-extern NSString *VLCMetaInformationAlbum;		/* NSString */
-extern NSString *VLCMetaInformationTrackNumber;	/* NSString */
-extern NSString *VLCMetaInformationDescription;	/* NSString */
-extern NSString *VLCMetaInformationRating;		/* NSString */
-extern NSString *VLCMetaInformationDate;		/* NSString */
-extern NSString *VLCMetaInformationSetting;		/* NSString */
-extern NSString *VLCMetaInformationURL;			/* NSString */
-extern NSString *VLCMetaInformationLanguage;	/* NSString */
-extern NSString *VLCMetaInformationNowPlaying;	/* NSString */
-extern NSString *VLCMetaInformationPublisher;	/* NSString */
-extern NSString *VLCMetaInformationEncodedBy;	/* NSString */
-extern NSString *VLCMetaInformationArtworkURL;	/* NSString */
+extern NSString *VLCMetaInformationArtist;        /* NSString */
+extern NSString *VLCMetaInformationGenre;        /* NSString */
+extern NSString *VLCMetaInformationCopyright;    /* NSString */
+extern NSString *VLCMetaInformationAlbum;        /* NSString */
+extern NSString *VLCMetaInformationTrackNumber;    /* NSString */
+extern NSString *VLCMetaInformationDescription;    /* NSString */
+extern NSString *VLCMetaInformationRating;        /* NSString */
+extern NSString *VLCMetaInformationDate;        /* NSString */
+extern NSString *VLCMetaInformationSetting;        /* NSString */
+extern NSString *VLCMetaInformationURL;            /* NSString */
+extern NSString *VLCMetaInformationLanguage;    /* NSString */
+extern NSString *VLCMetaInformationNowPlaying;    /* NSString */
+extern NSString *VLCMetaInformationPublisher;    /* NSString */
+extern NSString *VLCMetaInformationEncodedBy;    /* NSString */
+extern NSString *VLCMetaInformationArtworkURL;    /* NSString */
 extern NSString *VLCMetaInformationArtwork;     /* NSImage  */
-extern NSString *VLCMetaInformationTrackID;		/* NSString */
+extern NSString *VLCMetaInformationTrackID;        /* NSString */
 
 /* Notification Messages */
 /**
  * Available notification messages.
  */
-extern NSString *VLCMediaMetaChanged;		//< Notification message for when the media's meta data has changed
+extern NSString *VLCMediaMetaChanged;        //< Notification message for when the media's meta data has changed
 
 // Forward declarations, supresses compiler error messages
 @class VLCMediaList;
@@ -103,13 +103,13 @@ extern NSString *VLCMediaMetaChanged;		//< Notification message for when the med
  */
 @interface VLCMedia : NSObject
 {
-    void				*p_md;				//< Internal media descriptor instance
-    NSString			*url;				//< URL for this media resource
-    VLCMediaList		*subitems;			//< Sub list of items
-	VLCTime				*length;			//< Duration of the media
-    NSMutableDictionary *metaDictionary;	//< Meta data storage
-	id					 delegate;			//< Delegate object
-	BOOL				 preparsed;			//< Value used to determine of the file has been preparsed
+    void                *p_md;                //< Internal media descriptor instance
+    NSString            *url;                //< URL for this media resource
+    VLCMediaList        *subitems;            //< Sub list of items
+    VLCTime                *length;            //< Duration of the media
+    NSMutableDictionary *metaDictionary;    //< Meta data storage
+    id                     delegate;            //< Delegate object
+    BOOL                 preparsed;            //< Value used to determine of the file has been preparsed
 }
 
 /* Object Factories */

@@ -32,110 +32,110 @@ static VLCLibrary *sharedLibrary = nil;
 // TODO: Change from a terminal error to raising an exception?
 void __quit_on_exception( void * e, const char * function, const char * file, int line_number )
 {
-	libvlc_exception_t *ex = (libvlc_exception_t *)e;
+    libvlc_exception_t *ex = (libvlc_exception_t *)e;
     if (libvlc_exception_raised( ex ))
     {
         /* XXX: localization */
         NSRunCriticalAlertPanel( @"Error", [NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)", 
-			libvlc_exception_get_message(ex), file, line_number, function], @"Quit", nil, nil );
+            libvlc_exception_get_message(ex), file, line_number, function], @"Quit", nil, nil );
         exit( ex->i_code );
     }
 }
 
 static void *DestroySharedLibraryAtExit()
 {
-	// Destroy the shared library
-	if (sharedLibrary)
-		[sharedLibrary release];
-	sharedLibrary = nil;
-	
-	return nil;
+    // Destroy the shared library
+    if (sharedLibrary)
+        [sharedLibrary release];
+    sharedLibrary = nil;
+    
+    return nil;
 }
 
 @implementation VLCLibrary
 
 + (VLCLibrary *)sharedLibrary
 {
-	if (!sharedLibrary) 
-	{
-		// Initialize a shared instance
-		[[self alloc] init];
-		
-		// Register a function to gracefully destroy the shared library on exit.
-		atexit((void*)DestroySharedLibraryAtExit);
-	}
-	return sharedLibrary;
+    if (!sharedLibrary) 
+    {
+        // Initialize a shared instance
+        [[self alloc] init];
+        
+        // Register a function to gracefully destroy the shared library on exit.
+        atexit((void*)DestroySharedLibraryAtExit);
+    }
+    return sharedLibrary;
 }
 
 + (void *)sharedInstance
 {
-	return [[self sharedLibrary] instance];
+    return [[self sharedLibrary] instance];
 }
 
 - (id)init 
 {
-	if (self = [super init]) 
+    if (self = [super init]) 
     {
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         
-		// Figure out the frameworks path
-		char *applicationPath = strdup([[NSString stringWithFormat:@"%@/Versions/Current/VLC", 
-			[[NSBundle bundleForClass:[VLCLibrary class]] bundlePath]] UTF8String]);
-		// TODO: Raise error if there is no memory available
-		
-		char *lib_vlc_params[] = { 
-			applicationPath, "-I", "dummy", "-vvvv", 
-			"--opengl-provider", "minimal_macosx", 
-			"--no-video-title-show", NULL
-		};
-		
-		instance = (void *)libvlc_new(7, lib_vlc_params, &ex);
+        // Figure out the frameworks path
+        char *applicationPath = strdup([[NSString stringWithFormat:@"%@/Versions/Current/VLC", 
+            [[NSBundle bundleForClass:[VLCLibrary class]] bundlePath]] UTF8String]);
+        // TODO: Raise error if there is no memory available
+        
+        char *lib_vlc_params[] = { 
+            applicationPath, "-I", "dummy", "-vvvv", 
+            "--opengl-provider", "minimal_macosx", 
+            "--no-video-title-show", NULL
+        };
+        
+        instance = (void *)libvlc_new(7, lib_vlc_params, &ex);
         quit_on_exception( &ex );
-		
-		if (!sharedLibrary) 
-			sharedLibrary = [[self retain] autorelease];
-		
-		// Assignment unneeded, as the audio unit will do it for us
-		/*audio = */ [[VLCAudio alloc] initWithLibrary:self];
-		
-		// free allocated resources
-		free(applicationPath);
+        
+        if (!sharedLibrary) 
+            sharedLibrary = [[self retain] autorelease];
+        
+        // Assignment unneeded, as the audio unit will do it for us
+        /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
+        
+        // free allocated resources
+        free(applicationPath);
     }
-	return self;
+    return self;
 }
 
 - (void)dealloc 
 {
-	// TODO: libvlc core locks up or has segfaults while shutting down, the 
-	// following code allows for the framework to be removed without crashing
-	// the host application.
-	@try
-	{
-		if (instance) 
-		{
-			libvlc_exception_t ex;
-			libvlc_exception_init(&ex);
-			
-			libvlc_destroy(instance, &ex);
-		}
-	}
-	@finally 
-	{
-		instance = nil;
-		[audio release];
-		[super dealloc];
-	}
+    // TODO: libvlc core locks up or has segfaults while shutting down, the 
+    // following code allows for the framework to be removed without crashing
+    // the host application.
+    @try
+    {
+        if (instance) 
+        {
+            libvlc_exception_t ex;
+            libvlc_exception_init(&ex);
+            
+            libvlc_destroy(instance, &ex);
+        }
+    }
+    @finally 
+    {
+        instance = nil;
+        [audio release];
+        [super dealloc];
+    }
 }
 
 - (void *)instance
 {
-	return instance;
+    return instance;
 }
 
 - (VLCAudio *)audio
 {
-	return audio;
+    return audio;
 }
 
 @end
@@ -144,8 +144,8 @@ static void *DestroySharedLibraryAtExit()
 
 - (void)setAudio:(VLCAudio *)value
 {
-	if (!audio)
-		audio = value;
+    if (!audio)
+        audio = value;
 }
 
 @end
