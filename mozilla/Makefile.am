@@ -114,12 +114,12 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	install_name_tool -change "$(libdir)/libvlc.1.dylib" \
 	    "@executable_path/lib/libvlc.dylib" \
 	    "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
-	install_name_tool -change "$(libdir)/libvlc-control.0.dylib" \
+	install_name_tool -change "$(libdir)/libvlc-control.1.dylib" \
 	    "@executable_path/lib/libvlc-control.dylib" \
 	    "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
 	$(INSTALL) "$(top_builddir)/src/.libs/libvlc.1.dylib" \
 	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc.dylib"
-	$(INSTALL) "$(top_builddir)/src/.libs/libvlc-control.0.dylib" \
+	$(INSTALL) "$(top_builddir)/src/.libs/libvlc-control.1.dylib" \
 	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"
 	install_name_tool -change "$(libdir)/libvlc.1.dylib" \
 	    "@executable_path/lib/libvlc.dylib" \
