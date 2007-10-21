@@ -4268,7 +4268,7 @@ then
   PKG_CHECK_MODULES(SVG, 
 	librsvg-2.0 >= 2.9.0,
 	[
- 	  VLC_ADD_LDFLAGS([svg],[$SVG_LIBS])
+ 	  VLC_ADD_LIBS([svg],[$SVG_LIBS])
       	  VLC_ADD_CFLAGS([svg],[$SVG_CFLAGS])
           VLC_ADD_PLUGINS([svg]) ],
         [AC_MSG_WARN(SVG library not found)])
@@ -4452,18 +4452,18 @@ AC_ARG_WITH(directfb,
 if test "${enable_directfb}" = "yes"; then
     have_directfb="false"
     CPPFLAGS_mydirectfb=
-    LDFLAGS_mydirectfb=
+    LIBS_mydirectfb=
     if test "${with_directfb}" != "no" -a -n "${with_directfb}"; then
         dnl Trying the given location
-        CPPFLAGS_save=${CPPFLAGS}
-        LDFLAGS_save=${LDFLAGS}
+        CPPFLAGS_save="${CPPFLAGS}"
+        LIBS_save="${LIBS}"
 
         CPPFLAGS_new="-I${with_directfb}/include -D_REENTRANT -D_GNU_SOURCE"
-        LDFLAGS_new="-L${with_directfb}/lib/fusion/.libs/ -L${with_directfb}/lib/direct/.libs/"
-        LDFLAGS_new="${LDFLAGS_new} -L${with_directfb}/src/.libs/"
+        LIBS_new="-L${with_directfb}/lib/fusion/.libs/ -L${with_directfb}/lib/direct/.libs/"
+        LIBS_new="${LIBS_new} -L${with_directfb}/src/.libs/"
 
         CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_new}"
-        LDFLAGS="${LD_FLAGS} ${LDFLAGS_new}"
+        LIBS="${LIBS} ${LIBS_new}"
 
         dnl FIXME: too obscure
         AC_CHECK_HEADER([directfb.h], [
@@ -4476,10 +4476,10 @@ if test "${enable_directfb}" = "yes"; then
 
         dnl Restore flags
         CPPFLAGS="${CPPFLAGS_save}"
-        LDFLAGS="${LDFLAGS_save}"
+        LIBS="${LIBS_save}"
 
         if test "${have_directfb}" = "true"; then
-            LDFLAGS_mydirectfb="${LDFLAGS_new} -lz -ldl -ldirectfb -lfusion -ldirect -lpthread"
+            LIBS_mydirectfb="${LIBS_new} -lz -ldl -ldirectfb -lfusion -ldirect -lpthread"
             CPPFLAGS_mydirectfb="${CPPFLAGS_new}"
         fi
     else 
@@ -4487,13 +4487,13 @@ if test "${enable_directfb}" = "yes"; then
         AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no, ${PATH})
         if test "${DIRECTFB_CONFIG}" != "no"; then
             CPPFLAGS_mydirectfb="`${DIRECTFB_CONFIG} --cflags`"
-            LDFLAGS_mydirectfb="`${DIRECTFB_CONFIG} --libs`"
+            LIBS_mydirectfb="`${DIRECTFB_CONFIG} --libs`"
             have_directfb="true"
         else 
             dnl Trying with pkg-config
             PKG_CHECK_MODULES(DIRECTFB, directfb, [
                 CPPFLAGS_mydirectfb="${DIRECTFB_CFLAGS}"
-                LDFLAGS_mydirectfb="${DIRECTFB_LIBS}"
+                LIBS_mydirectfb="${DIRECTFB_LIBS}"
                 have_directfb="true"
                 ], [have_directfb="false"])
         fi
@@ -4501,7 +4501,7 @@ if test "${enable_directfb}" = "yes"; then
     if test "${have_directfb}" = "true"; then
         VLC_ADD_PLUGINS([directfb])
         VLC_ADD_CPPFLAGS([directfb],[${CPPFLAGS_mydirectfb}])
-        VLC_ADD_LDFLAGS([directfb],[${LDFLAGS_mydirectfb}])
+        VLC_ADD_LIBS([directfb],[${LIBS_mydirectfb}])
     else 
         AC_MSG_ERROR([cannot find directfb headers and/or libraries ])
     fi
