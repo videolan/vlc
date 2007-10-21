@@ -84,14 +84,14 @@ namespace VideoLAN.LibVLC
 
 
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_loop")]
-        static extern void PlaylistLoop (InstanceHandle self, int b,
+        static extern void PlaylistLoop (InstanceHandle self, bool b,
                                          NativeException ex);
         /** Sets the playlist loop flag */
         public bool Loop
         {
             set
             {
-                PlaylistLoop (self, value ? 1 : 0, ex);
+                PlaylistLoop (self, value, ex);
                 ex.Raise ();
             }
         }
@@ -171,22 +171,34 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
         }
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_add")]
+        [DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_playlist_add_extended")]
         static extern void PlaylistAdd (InstanceHandle self, U8String uri,
-                                        U8String name, NativeException e);
-        /** Appends an item to the playlist */
-        public void Add (string mrl)
-        {
-            Add (mrl, null);
-        }
-        /** Appends an item to the playlist */
-        public void Add (string mrl, string name)
+                                        U8String name, int optc,
+                                        U8String[] optv, NativeException e);
+        /** Appends an item to the playlist with options */
+        public void Add (string mrl, string name, string[] opts)
         {
             U8String umrl = new U8String (mrl);
             U8String uname = new U8String (name);
+            U8String[] optv = new U8String[opts.Length];
+            for (int i = 0; i < opts.Length; i++)
+                optv[i] = new U8String (opts[i]);
 
-            PlaylistAdd (self, umrl, uname, ex);
+            PlaylistAdd (self, umrl, uname, optv.Length, optv, ex);
             ex.Raise ();
+        }
+        public void Add (string mrl, string[] opts)
+        {
+            Add (mrl, null, opts);
+        }
+        public void Add (string mrl, string name)
+        {
+            Add (mrl, name, new string[0]);
+        }
+        public void Add (string mrl)
+        {
+            Add (mrl, null, new string[0]);
         }
     };
 
