@@ -22,111 +22,73 @@
  **********************************************************************/
 
 using System;
+using System.Runtime.InteropServices;
 
-namespace VideoLAN.VLC
+namespace VideoLAN.LibVLC
 {
     /**
-     * Base class for managed LibVLC exceptions
+     * VLCException: managed base class for LibVLC exceptions
      */
-    public class MediaException : Exception
+    public class VLCException : Exception
     {
-        public MediaException ()
+        public VLCException ()
         {
         }
 
-        public MediaException (string message)
+        public VLCException (string message)
             : base (message)
         {
         }
 
-        public MediaException (string message, Exception inner)
+        public VLCException (string message, Exception inner)
            : base (message, inner)
         {
         }
     };
 
-    public class PositionKeyNotSupportedException : MediaException
+    /**
+     * libvlc_exception_t: structure for unmanaged LibVLC exceptions
+     */
+    [StructLayout (LayoutKind.Sequential)]
+    internal sealed class NativeException : IDisposable
     {
-        public PositionKeyNotSupportedException ()
+        int raised;
+        int code;
+        IntPtr message;
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_exception_init")]
+        static extern void Init (NativeException e);
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_exception_clear")]
+        static extern void Clear (NativeException e);
+        /*[DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_exception_raised")]
+        static extern int Raised (NativeException e);*/
+        [DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_exception_get_message")]
+        static extern IntPtr GetMessage (NativeException e);
+
+        public NativeException ()
         {
+            Init (this);
         }
 
-        public PositionKeyNotSupportedException (string message)
-            : base (message)
+        public void Raise ()
         {
+            try
+            {
+                string msg = U8String.FromNative (GetMessage (this));
+                if (msg != null)
+                    throw new VLCException (msg);
+            }
+            finally
+            {
+                Clear (this);
+            }
         }
 
-        public PositionKeyNotSupportedException (string message, Exception inner)
-           : base (message, inner)
+        public void Dispose ()
         {
-        }
-    };
-
-    public class PositionOriginNotSupportedException : MediaException
-    {
-        public PositionOriginNotSupportedException ()
-        {
-        }
-
-        public PositionOriginNotSupportedException (string message)
-            : base (message)
-        {
-        }
-
-        public PositionOriginNotSupportedException (string message, Exception inner)
-           : base (message, inner)
-        {
-        }
-    };
-
-    public class InvalidPositionException : MediaException
-    {
-        public InvalidPositionException ()
-        {
-        }
-
-        public InvalidPositionException (string message)
-            : base (message)
-        {
-        }
-
-        public InvalidPositionException (string message, Exception inner)
-           : base (message, inner)
-        {
-        }
-    };
-
-    public class PlaylistException : MediaException
-    {
-        public PlaylistException ()
-        {
-        }
-
-        public PlaylistException (string message)
-            : base (message)
-        {
-        }
-
-        public PlaylistException (string message, Exception inner)
-           : base (message, inner)
-        {
-        }
-    };
-
-    public class InternalException : MediaException
-    {
-        public InternalException ()
-        {
-        }
-
-        public InternalException (string message)
-            : base (message)
-        {
-        }
-
-        public InternalException (string message, Exception inner)
-           : base (message, inner)
-        {
+            Clear (this);
         }
     };
 };

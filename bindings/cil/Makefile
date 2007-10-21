@@ -1,4 +1,4 @@
-CS = gmcs
+CS = gmcs -codepage:utf8
 CSFLAGS =
 
 TARGETS = VideoLAN.VLC.Control.dll testvlc.exe
@@ -6,9 +6,9 @@ TARGETS = VideoLAN.VLC.Control.dll testvlc.exe
 all: $(TARGETS)
 
 clean:
-	rm -f -- $(TARGETS) *.netmodule
+	rm -f -- $(TARGETS) *.netmodule *~
 
-VideoLAN.VLC.Control.dll: marshal.cs libvlc.cs exception.cs
+VideoLAN.VLC.Control.dll: marshal.cs ustring.cs exception.cs libvlc.cs
 testvlc.exe: testvlc.cs VideoLAN.VLC.Control.dll
 
 %.netmodule: %.cs Makefile

@@ -24,225 +24,94 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace VideoLAN.VLC
+namespace VideoLAN.LibVLC
 {
-
-    public class MediaControl : IDisposable
+    /** Safe handle for unmanaged LibVLC instance pointer */
+    internal sealed class InstanceHandle : NonNullHandle
     {
-        /**
-         * Possible player status
-         */
-        enum PlayerStatus
+        private InstanceHandle ()
         {
-            PlayingStatus,
-            PauseStatus,
-            ForwardStatus,
-            BackwardStatus,
-            InitStatus,
-            EndStatus,
-            UndefinedStatus,
-        };
-
-        enum PositionOrigin
-        {
-            AbsolutePosition,
-            RelativePosition,
-            ModuloPosition,
-        };
-
-        enum PositionKey
-        {
-            ByteCount,
-            SampleCount,
-            MediaTime,
-        };
-
-        MediaControlHandle self;
-
-        private void CheckDisposed ()
-        {
-            if (self.IsInvalid)
-                throw new ObjectDisposedException ("Media controlled disposed");
         }
 
-        /**
-         * Creates a MediaControl with a new LibVLC instance
-         */
-        public MediaControl (string[] args)
-        {
-            NativeException e = NativeException.Prepare ();
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_new")]
+        public static extern
+        InstanceHandle Create (int argc, U8String[] argv, NativeException ex);
 
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_destroy")]
+        static extern void Destroy (InstanceHandle ptr, NativeException ex);
+
+        protected override bool ReleaseHandle ()
+        {
+            Destroy (this, null);
+            return true;
+        }
+    };
+
+    public class VLCInstance : IDisposable
+    {
+        NativeException ex;
+        InstanceHandle self;
+
+        public VLCInstance (string[] args)
+        {
             U8String[] argv = new U8String[args.Length];
             for (int i = 0; i < args.Length; i++)
                 argv[i] = new U8String (args[i]);
 
-            self = MediaControlAPI.New (argv.Length, argv, ref e);
-            e.Consume ();
-        }
-
-        /**
-         * Creates a MediaControl from an existing LibVLC instance
-         */
-        /*public MediaControl (MediaControl instance)
-        {
-            NativeException e = NativeException.Prepare ();
-            IntPtr libvlc = mediacontrol_get_libvlc_instance (instance.self);
-
-            self = mediacontrol_new_from_instance (libvlc, ref e);
-            e.Consume ();
-        }*/
-
-        /*public void Play (from)
-        {
-            CheckDisposed ();
-            throw new NotImplementedException ();
-        }*/
-
-        public void Resume ()
-        {
-            CheckDisposed ();
-            NativeException e = NativeException.Prepare ();
-
-            MediaControlAPI.Resume (self, IntPtr.Zero, ref e);
-            e.Consume ();
-        }
-
-        public void Pause ()
-        {
-            CheckDisposed ();
-            NativeException e = NativeException.Prepare ();
-
-            MediaControlAPI.Pause (self, IntPtr.Zero, ref e);
-            e.Consume ();
-        }
-
-        public void Stop ()
-        {
-            CheckDisposed ();
-
-            NativeException e = NativeException.Prepare ();
-            MediaControlAPI.Stop (self, IntPtr.Zero, ref e);
-            e.Consume ();
-        }
-
-        public void AddItem (string mrl)
-        {
-            CheckDisposed ();
-
-            U8String nmrl = new U8String (mrl);
-            NativeException e = NativeException.Prepare ();
-            MediaControlAPI.PlaylistAddItem (self, nmrl, ref e);
-            e.Consume ();
-        }
-
-        public void Clear ()
-        {
-            CheckDisposed ();
-
-            NativeException e = NativeException.Prepare ();
-            MediaControlAPI.PlaylistClear (self, ref e);
-            e.Consume ();
-        }
-
-        public string[] Playlist
-        {
-            get
-            {
-                CheckDisposed ();
-                throw new NotImplementedException ();
-            }
-        }
-
-        /**
-         * Switches to the next playlist item
-         */
-        public void NextItem ()
-        {
-            CheckDisposed ();
-
-            NativeException e = NativeException.Prepare ();
-            MediaControlAPI.PlaylistNextItem (self, ref e);
-            e.Consume ();
-        }
-
-        /**
-         * Normalized audio output volume in percent (must be [0..100]).
-         */
-        public short SoundVolume
-        {
-            get
-            {
-                CheckDisposed ();
-
-                NativeException e = NativeException.Prepare ();
-                short vol = MediaControlAPI.SoundGetVolume (self, ref e);
-                e.Consume ();
-                return vol;
-            }
-            set
-            {
-                CheckDisposed ();
-
-                if ((value < 0) || (value > 100))
-                    throw new ArgumentOutOfRangeException ("Volume not within [0..100]");
-
-                NativeException e = NativeException.Prepare ();
-                MediaControlAPI.SoundSetVolume (self, value, ref e);
-                e.Consume ();
-            }
-        }
-
-        /**
-         * Performance speed rate in percent.
-         */
-        public int Rate
-        {
-            get
-            {
-                CheckDisposed ();
-
-                NativeException e = NativeException.Prepare ();
-                int rate = MediaControlAPI.GetRate (self, ref e);
-                e.Consume ();
-                return rate;
-            }
-            set
-            {
-                CheckDisposed ();
-
-                NativeException e = NativeException.Prepare ();
-                MediaControlAPI.SetRate (self, value, ref e);
-                e.Consume ();
-            }
-        }
-
-        /**
-         * Fullscreen flag.
-         */
-        public bool Fullscreen
-        {
-            get
-            {
-                CheckDisposed ();
-
-                NativeException e = NativeException.Prepare ();
-                int ret = MediaControlAPI.GetFullscreen (self, ref e);
-                e.Consume ();
-                return ret != 0;
-            }
-            set
-            {
-                CheckDisposed ();
-
-                NativeException e = NativeException.Prepare ();
-                MediaControlAPI.SetFullscreen (self, value ? 1 : 0, ref e);
-                e.Consume ();
-            }
+            ex = new NativeException ();
+            self = InstanceHandle.Create (argv.Length, argv, ex);
+            ex.Raise ();
         }
 
         public void Dispose ()
         {
-            self.Dispose ();
+            ex.Dispose ();
+            self.Close ();
+        }
+
+        public MediaDescriptor CreateDescriptor (string mrl)
+        {
+            U8String umrl = new U8String (mrl);
+            DescriptorHandle dh = DescriptorHandle.Create (self, umrl, ex);
+            ex.Raise ();
+
+            return new MediaDescriptor (dh);
+        }
+    };
+
+    /** Safe handle for unmanaged LibVLC media descriptor */
+    internal sealed class DescriptorHandle : NonNullHandle
+    {
+        private DescriptorHandle ()
+        {
+        }
+
+        [DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_media_descriptor_new")]
+        public static extern
+        DescriptorHandle Create (InstanceHandle inst, U8String mrl,
+                                 NativeException ex);
+
+        [DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_media_descriptor_release")]
+        public static extern void Release (DescriptorHandle ptr);
+
+        protected override bool ReleaseHandle ()
+        {
+            Release (this);
+            return true;
+        }
+    };
+
+    public class MediaDescriptor
+    {
+        NativeException ex;
+        DescriptorHandle self;
+
+        internal MediaDescriptor (DescriptorHandle self)
+        {
+            this.self = self;
+            ex = new NativeException ();
         }
     };
 };
