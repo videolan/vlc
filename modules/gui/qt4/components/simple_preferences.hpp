@@ -26,7 +26,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
-
 #include <QWidget>
 
 enum {
@@ -41,7 +40,7 @@ enum {
 #define SPrefsDefaultCat SPrefsInterface
 
 class ConfigControl;
-
+class QComboBox;
 class SPrefsCatList : public QWidget
 {
     Q_OBJECT;
@@ -68,21 +67,16 @@ private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;
 
-/* ConfigControl for audio output options */
-#ifndef WIN32
-    ConfigControl *alsa_options;
-    ConfigControl *oss_options;
-#else
-    ConfigControl *directx_options;
-#endif
-    ConfigControl *file_options;
-
-    void updateAudioOptions( QString );
+    QWidget *alsa_options;
+    QWidget *oss_options;
+    QWidget *directx_options;
+    QWidget *file_options;
+    QComboBox *audioOutput;
 
 /* Display only the options for the selected audio output */
 private slots:
-    void AudioDeviceChanged();
     void lastfm_Changed( int );
+    void updateAudioOptions( int );
 };
 
 #endif

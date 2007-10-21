@@ -6,20 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>461</width>
-    <height>682</height>
+    <width>550</width>
+    <height>725</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>10</number>
-   </property>
    <item>
     <widget class="QCheckBox" name="enableAudio" >
      <property name="text" >
@@ -36,10 +30,22 @@
       <string>_("General Audio")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="2" column="0" >
@@ -52,9 +58,7 @@
       <item row="2" column="1" >
        <widget class="QComboBox" name="detectionDolby" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>3</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -87,9 +91,7 @@
       <item row="0" column="1" >
        <widget class="QSlider" name="defaultVolume" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>1</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -124,74 +126,167 @@
       <string>Output</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="4" column="1" >
-       <widget class="QLineEdit" name="FileName" />
-      </item>
-      <item row="4" column="2" >
-       <widget class="QPushButton" name="fileBrowseButton" >
-        <property name="text" >
-         <string>_("Browse...")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="FileLabel" >
-        <property name="text" >
-         <string>_("File")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" >
-       <widget class="QPushButton" name="OSSBrowse" >
-        <property name="text" >
-         <string>_("Browse...")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" >
-       <widget class="QLineEdit" name="OSSDevice" />
-      </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="OSSLabel" >
-        <property name="text" >
-         <string>_("Device")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="DirectXLabel" >
-        <property name="text" >
-         <string>_("Device")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" colspan="2" >
-       <widget class="QComboBox" name="DirectXDevice" />
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="alsaLabel" >
-        <property name="text" >
-         <string>_("Device")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QComboBox" name="alsaDevice" />
-      </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="QComboBox" name="outputModule" />
-      </item>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>_("Type")</string>
         </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QComboBox" name="outputModule" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QWidget" native="1" name="alsaControl" >
+        <layout class="QHBoxLayout" >
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="alsaLabel" >
+           <property name="text" >
+            <string>_("Device")</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="alsaDevice" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QWidget" native="1" name="DirectXControl" >
+        <layout class="QHBoxLayout" >
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="DirectXLabel" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>_("Device")</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="DirectXDevice" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2" >
+       <widget class="QWidget" native="1" name="OSSControl" >
+        <layout class="QHBoxLayout" >
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="OSSLabel" >
+           <property name="text" >
+            <string>_("Device")</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="OSSDevice" />
+         </item>
+         <item>
+          <widget class="QPushButton" name="OSSBrowse" >
+           <property name="text" >
+            <string>_("Browse...")</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2" >
+       <widget class="QWidget" native="1" name="fileControl" >
+        <layout class="QHBoxLayout" >
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="fileLabel" >
+           <property name="text" >
+            <string>_("File")</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="fileName" />
+         </item>
+         <item>
+          <widget class="QPushButton" name="fileBrowseButton" >
+           <property name="text" >
+            <string>_("Browse...")</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -203,10 +298,22 @@
       <string>_("Effects")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="2" column="1" >
@@ -296,7 +403,6 @@
   <tabstop>DirectXDevice</tabstop>
   <tabstop>OSSDevice</tabstop>
   <tabstop>OSSBrowse</tabstop>
-  <tabstop>FileName</tabstop>
   <tabstop>fileBrowseButton</tabstop>
   <tabstop>headphoneEffect</tabstop>
   <tabstop>volumeNormalizer</tabstop>
@@ -304,5 +410,70 @@
   <tabstop>visualisation</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>lastfm</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lastfm_pass_edit</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>188</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>360</x>
+     <y>689</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lastfm</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lastfm_pass_label</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>188</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>102</x>
+     <y>689</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lastfm</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lastfm_user_edit</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>188</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>360</x>
+     <y>653</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lastfm</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lastfm_user_label</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>188</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>102</x>
+     <y>653</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -231,8 +231,6 @@ void StringConfigControl::finish()
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( text, SIGNAL(textChanged( const QString & )), this,
-             SIGNAL(Updated()) );
 }
 
 /*********** File **************/
@@ -298,8 +296,6 @@ void FileConfigControl::finish()
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( text, SIGNAL(textChanged( const QString & )), this,
-             SIGNAL(Updated()) );
 }
 
 /********* String / Directory **********/
@@ -395,8 +391,6 @@ void StringListConfigControl::finish( bool bycat )
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( combo, SIGNAL(currentIndexChanged( int )), this,
-             SIGNAL(Updated()) );
 }
 
 QString StringListConfigControl::getValue()
@@ -425,6 +419,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
         l->addWidget( combo, line, 1, Qt::AlignRight );
     }
 }
+
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
                 bool bycat ) : VStringConfigControl( _p_this, _p_item )
@@ -478,8 +473,6 @@ void ModuleConfigControl::finish( bool bycat )
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( combo, SIGNAL(currentIndexChanged( int )), this,
-             SIGNAL(Updated()) );
 }
 
 QString ModuleConfigControl::getValue()
@@ -495,8 +488,6 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 {
     groupBox = new QGroupBox ( qtr(p_item->psz_text) );
     text = new QLineEdit();
-    connect( text, SIGNAL(textChanged( const QString & )), this,
-             SIGNAL(Updated()) );
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
     finish( bycat );
@@ -522,16 +513,6 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
     text->setToolTip( formatTooltip( qtr( p_item->psz_longtext) ) );
 }
-#if 0
-ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-        module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-        bool bycat ) : VStringConfigControl( _p_this, _p_item )
-{
-    combo = _combo;
-    label = _label;
-    finish( bycat );
-}
-#endif
 
 ModuleListConfigControl::~ModuleListConfigControl()
 {
@@ -698,8 +679,6 @@ void IntegerConfigControl::finish()
     spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( spin, SIGNAL(valueChanged( int )), this,
-             SIGNAL(Updated()) );
 }
 
 int IntegerConfigControl::getValue()
@@ -797,8 +776,6 @@ void IntegerListConfigControl::finish( bool bycat )
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( combo, SIGNAL(currentIndexChanged( int )), this,
-             SIGNAL(Updated()) );
 }
 
 int IntegerListConfigControl::getValue()
@@ -843,8 +820,6 @@ void BoolConfigControl::finish()
     checkbox->setCheckState( p_item->value.i == VLC_TRUE ? Qt::Checked
                                                         : Qt::Unchecked );
     checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( checkbox, SIGNAL(stateChanged( int )), this,
-             SIGNAL(Updated()) );
 }
 
 int BoolConfigControl::getValue()
@@ -902,8 +877,6 @@ void FloatConfigControl::finish()
     spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    connect( spin, SIGNAL(valueChanged( double )), this,
-             SIGNAL(Updated()) );
 }
 
 float FloatConfigControl::getValue()

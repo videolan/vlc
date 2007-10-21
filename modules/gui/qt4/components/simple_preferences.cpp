@@ -26,8 +26,8 @@
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 
-#include "ui/sprefs_audio.h"
 #include "ui/sprefs_input.h"
+#include "ui/sprefs_audio.h"
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_hotkeys.h"
@@ -196,53 +196,55 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          /* Audio Panel Implementation */
         START_SPREFS_CAT( Audio, qtr("General audio settings") );
 
-        CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+            CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
-        CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL,
-                 defaultVolume );
-        CONFIG_GENERIC( "audio-language" , String , NULL,
-                    preferredAudioLanguage );
+            CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
+                                     defaultVolume );
+            CONFIG_GENERIC( "audio-language" , String , NULL,
+                            preferredAudioLanguage );
 
-        CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
-        CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
-                    detectionDolby );
+            CONFIG_GENERIC( "spdif", Bool, NULL, spdifBox );
+            CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
+                            detectionDolby );
 
-         CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
-         CONNECT( control, Updated(), this, AudioDeviceChanged() );
-         QString aout_value = (dynamic_cast<ModuleConfigControl*>(control))->getValue();
+            CONFIG_GENERIC( "aout", Module, NULL, outputModule );
+
+            CONNECT( ui.outputModule, currentIndexChanged( int ), this,
+                             updateAudioOptions( int ) );
+            audioOutput = ui.outputModule;
+
+        //FIXME: use modules_Exists
 #ifndef WIN32
-         CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel, alsaDevice );
-         alsa_options = control;
-         CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
-                 OSSBrowse );
-         oss_options = control;
+            CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel, alsaDevice );
+            CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
+                                 OSSBrowse );
 #else
-         CONFIG_GENERIC( "directx-audio-device" , IntegerList, ui.DirectXLabel,
-                 DirectXDevice );
-         directx_options = control;
+            CONFIG_GENERIC( "directx-audio-device", IntegerList, ui.DirectXLabel,
+                            DirectXDevice );
 #endif
-         CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.FileLabel, FileName,
-                 fileBrowseButton );
-         file_options = control;
+        // File exists everywhere
+            CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel, fileName,
+                                 fileBrowseButton );
+            alsa_options = ui.alsaControl;
+            oss_options = ui.OSSControl;
+            directx_options = ui.DirectXControl;
+            file_options = ui.fileControl;
 
+        /* and hide if necessary */
 #ifdef WIN32
-            ui.OSSBrowse->hide();
-            ui.OSSDevice->hide();
-            ui.OSSLabel->hide();
-            ui.alsaDevice->hide();
-            ui.alsaLabel->hide();
+        oss_options->hide();
+        alsa_options->hide();
 #else
-            ui.DirectXLabel->setVisible( false );
-            ui.DirectXDevice->setVisible( false );
+        directx_options->hide();
 #endif
 
-        updateAudioOptions( aout_value );
+        updateAudioOptions( audioOutput->currentIndex() );
 
-         CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
+        CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
 //         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
-         CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
+        CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
                  volNormalizer );
-         CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
+        CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
 
 #if 0
         if( control_Exists( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
@@ -255,6 +257,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                          lastfm_user_edit );
          CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
                          lastfm_pass_edit );
+         ui.lastfm_user_edit->hide();
+         ui.lastfm_user_label->hide();
+         ui.lastfm_pass_edit->hide();
+         ui.lastfm_pass_label->hide();
         END_SPREFS_CAT;
 
         /* Input and Codecs Panel Implementation */
@@ -344,25 +350,21 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     this->setLayout(panel_layout);
 }
 
-void SPrefsPanel::AudioDeviceChanged()
+void SPrefsPanel::updateAudioOptions( int number)
 {
-    ModuleConfigControl *module_config =
-            dynamic_cast<ModuleConfigControl*>( sender() );
-    updateAudioOptions( module_config->getValue() );
-}
+    QString value = audioOutput->itemData( number ).toString();
+    msg_Dbg( p_intf, "I was here, waiting for funman, %s", qtu( value ) );
 
-void SPrefsPanel::updateAudioOptions( QString value )
-{
 #ifndef WIN32
-    alsa_options->hide();
     oss_options->hide();
+    alsa_options->hide();
 #else
     directx_options->hide();
 #endif
     file_options->hide();
 
-    if( value == "aout_file" )
-        file_options->show();
+   if( value == "aout_file" )
+         file_options->show();
 #ifndef WIN32
     else if( value == "alsa" )
         alsa_options->show();
