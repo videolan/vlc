@@ -36,12 +36,18 @@ namespace VideoLAN.LibVLC.Test
             MediaDescriptor md = vlc.CreateDescriptor (args[0]);
             md.Dispose ();
 
+            PlaylistItem item = null;
+
             foreach (string s in args)
-                vlc.Add (s);
+                item = vlc.Add (s);
 
             vlc.Loop = false;
             vlc.TogglePause ();
             Console.ReadLine ();
+
+            if (item != null)
+                vlc.Delete (item);
+            vlc.Clear ();
             vlc.Dispose ();
             return 0;
         }

@@ -22,6 +22,7 @@
  **********************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace VideoLAN.LibVLC
@@ -69,8 +70,11 @@ namespace VideoLAN.LibVLC
      */
     public class Instance : BaseObject<InstanceHandle>
     {
+        Dictionary<int, PlaylistItem> items;
+
         internal Instance (InstanceHandle self) : base (self)
         {
+            items = new Dictionary<int, PlaylistItem> ();
         }
 
         public MediaDescriptor CreateDescriptor (string mrl)
@@ -81,7 +85,6 @@ namespace VideoLAN.LibVLC
 
             return new MediaDescriptor (dh);
         }
-
 
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_loop")]
         static extern void PlaylistLoop (InstanceHandle self, bool b,
@@ -169,15 +172,19 @@ namespace VideoLAN.LibVLC
         {
             PlaylistClear (self, ex);
             ex.Raise ();
+
+            foreach (PlaylistItem item in items.Values)
+                item.Close ();
+            items.Clear ();
         }
 
         [DllImport ("libvlc-control.dll",
                     EntryPoint="libvlc_playlist_add_extended")]
-        static extern void PlaylistAdd (InstanceHandle self, U8String uri,
-                                        U8String name, int optc,
-                                        U8String[] optv, NativeException e);
+        static extern int PlaylistAdd (InstanceHandle self, U8String uri,
+                                       U8String name, int optc,
+                                       U8String[] optv, NativeException e);
         /** Appends an item to the playlist with options */
-        public void Add (string mrl, string name, string[] opts)
+        public PlaylistItem Add (string mrl, string name, string[] opts)
         {
             U8String umrl = new U8String (mrl);
             U8String uname = new U8String (name);
@@ -185,20 +192,65 @@ namespace VideoLAN.LibVLC
             for (int i = 0; i < opts.Length; i++)
                 optv[i] = new U8String (opts[i]);
 
-            PlaylistAdd (self, umrl, uname, optv.Length, optv, ex);
+            int id = PlaylistAdd (self, umrl, uname, optv.Length, optv, ex);
             ex.Raise ();
+
+            PlaylistItem item = new PlaylistItem (id);
+            items.Add (id, item);
+            return item;
         }
-        public void Add (string mrl, string[] opts)
+        public PlaylistItem Add (string mrl, string[] opts)
         {
-            Add (mrl, null, opts);
+            return Add (mrl, null, opts);
         }
-        public void Add (string mrl, string name)
+        public PlaylistItem Add (string mrl, string name)
         {
-            Add (mrl, name, new string[0]);
+            return Add (mrl, name, new string[0]);
         }
-        public void Add (string mrl)
+        public PlaylistItem Add (string mrl)
         {
-            Add (mrl, null, new string[0]);
+            return Add (mrl, null, new string[0]);
+        }
+
+        [DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_playlist_delete_item")]
+        static extern int PlaylistDelete (InstanceHandle self, int id,
+                                          NativeException e);
+        public void Delete (PlaylistItem item)
+        {
+            int id = item.Id;
+            PlaylistDelete (self, id, ex);
+            ex.Raise ();
+
+            item.Close ();
+            items.Remove (id);
+        }
+    };
+
+    public class PlaylistItem
+    {
+        int id;
+        bool deleted;
+
+        internal PlaylistItem (int id)
+        {
+            this.id = id;
+            this.deleted = false;
+        }
+
+        internal void Close ()
+        {
+            deleted = true;
+        }
+
+        internal int Id
+        {
+            get
+            {
+                if (deleted)
+                    throw new ObjectDisposedException ("Playlist item deleted");
+                return id;
+            }
         }
     };
 
