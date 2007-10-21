@@ -1665,12 +1665,8 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         else if( !EMPTY_STR( psz_artist ) )
         {
             char *psz_string = NULL;
-
-            psz_string = malloc( strlen( psz_name ) + strlen( psz_artist ) );
-            if( psz_string )
+            if( asprintf( &psz_string, "%s - %s", psz_name, psz_artist ) != -1 )
             {
-                sprintf( psz_string, "%s - %s", psz_name, psz_artist );
-
                 vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                        psz_string, NULL,
                                        p_vout->i_title_position,
