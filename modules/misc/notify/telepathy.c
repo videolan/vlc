@@ -193,7 +193,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         switch( SendToTelepathy( p_intf, "" ) )
         {
             case VLC_ENOMEM:
-                Close( p_this );
                 return VLC_ENOMEM;
             default:
                 return VLC_SUCCESS;
@@ -208,7 +207,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( SendToTelepathy( p_intf, psz_buf ) == VLC_ENOMEM )
     {
         free( psz_buf );
-        Close( p_this );
         return VLC_ENOMEM;
     }
     free( psz_buf );
