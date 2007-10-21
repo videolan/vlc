@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 
 #include <ctype.h>
+#include <limits.h>
 
 #include "input_internal.h"
 
