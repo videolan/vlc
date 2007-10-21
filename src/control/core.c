@@ -26,6 +26,8 @@
 
 #include <vlc_interface.h>
 
+static const char nomemstr[] = "Insufficient memory";
+
 /*************************************************************************
  * Exceptions handling
  *************************************************************************/
@@ -37,18 +39,19 @@ void libvlc_exception_init( libvlc_exception_t *p_exception )
 
 void libvlc_exception_clear( libvlc_exception_t *p_exception )
 {
-    if( p_exception->psz_message )
+    if( p_exception->psz_message != nomemstr )
         free( p_exception->psz_message );
     p_exception->psz_message = NULL;
     p_exception->b_raised = 0;
 }
 
-int libvlc_exception_raised( libvlc_exception_t *p_exception )
+int libvlc_exception_raised( const libvlc_exception_t *p_exception )
 {
     return (NULL != p_exception) && p_exception->b_raised;
 }
 
-char *libvlc_exception_get_message( libvlc_exception_t *p_exception )
+const char *
+libvlc_exception_get_message( const libvlc_exception_t *p_exception )
 {
     if( p_exception->b_raised == 1 && p_exception->psz_message )
     {
@@ -66,12 +69,11 @@ void libvlc_exception_raise( libvlc_exception_t *p_exception,
     if( p_exception == NULL ) return;
 
     /* remove previous exception if it wasn't cleared */
-    if( p_exception->b_raised && p_exception->psz_message )
-        free(p_exception->psz_message);
+    libvlc_exception_clear( p_exception );
 
     va_start( args, psz_format );
     if( vasprintf( &p_exception->psz_message, psz_format, args ) == -1)
-        p_exception->psz_message = NULL;
+        p_exception->psz_message = (char *)nomemstr;
     va_end( args );
 
     p_exception->b_raised = 1;

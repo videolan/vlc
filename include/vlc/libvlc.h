@@ -61,14 +61,17 @@ VLC_PUBLIC_API void libvlc_exception_init( libvlc_exception_t *p_exception );
  * \param p_exception the exception to query
  * \return 0 if no exception raised, 1 else
  */
-VLC_PUBLIC_API int libvlc_exception_raised( libvlc_exception_t *p_exception );
+VLC_PUBLIC_API int
+libvlc_exception_raised( const libvlc_exception_t *p_exception );
 
 /**
  * Raise an exception
  * \param p_exception the exception to raise
  * \param psz_message the exception message
  */
-VLC_PUBLIC_API void libvlc_exception_raise( libvlc_exception_t *p_exception, const char *psz_format, ... );
+VLC_PUBLIC_API void
+libvlc_exception_raise( libvlc_exception_t *p_exception,
+                        const char *psz_format, ... );
 
 /**
  * Clear an exception object so it can be reused.
@@ -83,7 +86,8 @@ VLC_PUBLIC_API void libvlc_exception_clear( libvlc_exception_t * );
  * \return the exception message or NULL if not applicable (exception not raised
  * for example)
  */
-VLC_PUBLIC_API char* libvlc_exception_get_message( libvlc_exception_t *p_exception );
+VLC_PUBLIC_API const char *
+libvlc_exception_get_message( const libvlc_exception_t *p_exception );
 
 /**@} */
 

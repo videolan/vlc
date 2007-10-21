@@ -303,7 +303,7 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaInstancePaused,
     libvlc_MediaInstanceReachedEnd,
     libvlc_MediaInstancePositionChanged,
- 
+
     libvlc_MediaListItemAdded,
     libvlc_MediaListItemDeleted,
 
