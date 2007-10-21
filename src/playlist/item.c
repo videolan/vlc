@@ -230,8 +230,8 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
 void playlist_Clear( playlist_t * p_playlist, vlc_bool_t b_locked )
 {
     if( !b_locked ) PL_LOCK;
-    playlist_NodeEmpty( p_playlist, p_playlist->p_root_category, VLC_TRUE );
-    playlist_NodeEmpty( p_playlist, p_playlist->p_root_onelevel, VLC_TRUE );
+    playlist_NodeEmpty( p_playlist, p_playlist->p_local_category, VLC_TRUE );
+    playlist_NodeEmpty( p_playlist, p_playlist->p_local_onelevel, VLC_TRUE );
     if( !b_locked ) PL_UNLOCK;
 }
 
