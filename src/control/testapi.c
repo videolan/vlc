@@ -56,7 +56,7 @@ int main (int argc, char *argv[])
     args[0] = "-vvv";
     args[1] = "-I";
     args[2] = "-dummy";
-    args[3] = "--plugin-path=..";
+    args[3] = "--plugin-path=../modules";
     for (int i = 1; i < argc; i++)
         args[i + 3] = argv[i];
 
