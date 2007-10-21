@@ -49,6 +49,7 @@ int main (int argc, char *argv[])
 {
     libvlc_instance_t *vlc;
     const char *args[argc + 3];
+    int id;
 
     alarm (30); /* Make sure "make check" does not get stuck */
 
@@ -61,6 +62,16 @@ int main (int argc, char *argv[])
 
     libvlc_exception_init (&ex);
     vlc = libvlc_new (sizeof (args) / sizeof (args[0]), args, &ex);
+    catch ();
+
+    libvlc_playlist_clear (vlc, &ex);
+    catch ();
+
+    id = libvlc_playlist_add_extended (vlc, "/dev/null", "Test", 0, NULL,
+                                       &ex);
+    catch ();
+
+    libvlc_playlist_clear (vlc, &ex);
     catch ();
 
     libvlc_destroy (vlc, &ex);
