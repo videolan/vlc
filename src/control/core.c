@@ -84,9 +84,6 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
 {
     libvlc_instance_t *p_new;
 
-    for (int i = 0; i < argc; i++)
-        printf ("%d: %s\n", i, argv[i]);
-
     libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
     if( !p_libvlc_int ) RAISENULL( "VLC initialization failed" );
 
