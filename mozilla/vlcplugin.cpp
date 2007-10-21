@@ -70,8 +70,8 @@ static bool boolValue(const char *value) {
 NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 {
     /* prepare VLC command line */
-    char *ppsz_argv[32] = { "vlc" };
-    int ppsz_argc = 1;
+    char *ppsz_argv[32];
+    int ppsz_argc = 0;
 
     /* locate VLC module path */
 #ifdef XP_MACOSX
