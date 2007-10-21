@@ -667,7 +667,7 @@ float libvlc_media_instance_get_rate(
     return (float)1000.0f/val.i_int;
 }
 
-static libvlc_state_t vlc_to_libvlc_state[] =
+static const libvlc_state_t vlc_to_libvlc_state[] =
 {
     [INIT_S]        = libvlc_Opening,
     [OPENING_S]     = libvlc_Opening,
