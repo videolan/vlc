@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_meta.h>
+#include <vlc_charset.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -349,8 +350,9 @@ void vlclua_read_meta_data( vlc_object_t *p_this, lua_State *p_state,
     if( lua_isstring( p_state, t ) )                        \
     {                                                       \
         psz_value = lua_tostring( p_state, t );             \
-        msg_Dbg( p_this, #b ": %s", psz_value );           \
-        input_item_Set ## b ( p_input, psz_value );   \
+        EnsureUTF8( psz_value );                            \
+        msg_Dbg( p_this, #b ": %s", psz_value );            \
+        input_item_Set ## b ( p_input, psz_value );         \
     }                                                       \
     lua_pop( p_state, 1 ); /* pop a */
     TRY_META( "title", Title );
