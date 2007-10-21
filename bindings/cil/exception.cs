@@ -50,7 +50,7 @@ namespace VideoLAN.LibVLC
      * libvlc_exception_t: structure for unmanaged LibVLC exceptions
      */
     [StructLayout (LayoutKind.Sequential)]
-    internal sealed class NativeException : IDisposable
+    public sealed class NativeException : IDisposable
     {
         int raised;
         int code;

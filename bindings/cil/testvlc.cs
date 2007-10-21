@@ -24,13 +24,19 @@
 using System;
 using VideoLAN.LibVLC;
 
-namespace VideoLAN.VLC
+namespace VideoLAN.LibVLC.Test
 {
     public sealed class Test
     {
         public static int Main (string[] args)
         {
-            VLCInstance vlc = new VLCInstance (args);
+            string[] argv = new string[3]{ "-vvv", "-I", "dummy" };
+
+            Instance vlc = VLC.CreateInstance (argv);
+            MediaDescriptor md = vlc.CreateDescriptor (args[0]);
+
+            md.Dispose ();
+            vlc.Dispose ();
             return 0;
         }
     };

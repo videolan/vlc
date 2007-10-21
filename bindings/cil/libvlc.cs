@@ -26,8 +26,25 @@ using System.Runtime.InteropServices;
 
 namespace VideoLAN.LibVLC
 {
+    public sealed class VLC
+    {
+        public static Instance CreateInstance (string[] args)
+        {
+            U8String[] argv = new U8String[args.Length];
+            for (int i = 0; i < args.Length; i++)
+                argv[i] = new U8String (args[i]);
+
+            NativeException ex = new NativeException ();
+
+            InstanceHandle h = InstanceHandle.Create (argv.Length, argv, ex);
+            ex.Raise ();
+
+            return new Instance (h);
+        }
+    };
+
     /** Safe handle for unmanaged LibVLC instance pointer */
-    internal sealed class InstanceHandle : NonNullHandle
+    public sealed class InstanceHandle : NonNullHandle
     {
         private InstanceHandle ()
         {
@@ -38,35 +55,19 @@ namespace VideoLAN.LibVLC
         InstanceHandle Create (int argc, U8String[] argv, NativeException ex);
 
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_destroy")]
-        static extern void Destroy (InstanceHandle ptr, NativeException ex);
+        static extern void Destroy (IntPtr ptr, NativeException ex);
 
         protected override bool ReleaseHandle ()
         {
-            Destroy (this, null);
+            Destroy (handle, null);
             return true;
         }
     };
 
-    public class VLCInstance : IDisposable
+    public class Instance : BaseObject<InstanceHandle>
     {
-        NativeException ex;
-        InstanceHandle self;
-
-        public VLCInstance (string[] args)
+        internal Instance (InstanceHandle self) : base (self)
         {
-            U8String[] argv = new U8String[args.Length];
-            for (int i = 0; i < args.Length; i++)
-                argv[i] = new U8String (args[i]);
-
-            ex = new NativeException ();
-            self = InstanceHandle.Create (argv.Length, argv, ex);
-            ex.Raise ();
-        }
-
-        public void Dispose ()
-        {
-            ex.Dispose ();
-            self.Close ();
         }
 
         public MediaDescriptor CreateDescriptor (string mrl)
@@ -80,7 +81,7 @@ namespace VideoLAN.LibVLC
     };
 
     /** Safe handle for unmanaged LibVLC media descriptor */
-    internal sealed class DescriptorHandle : NonNullHandle
+    public sealed class DescriptorHandle : NonNullHandle
     {
         private DescriptorHandle ()
         {
@@ -94,24 +95,19 @@ namespace VideoLAN.LibVLC
 
         [DllImport ("libvlc-control.dll",
                     EntryPoint="libvlc_media_descriptor_release")]
-        public static extern void Release (DescriptorHandle ptr);
+        public static extern void Release (IntPtr ptr);
 
         protected override bool ReleaseHandle ()
         {
-            Release (this);
+            Release (handle);
             return true;
         }
     };
 
-    public class MediaDescriptor
+    public class MediaDescriptor : BaseObject<DescriptorHandle>
     {
-        NativeException ex;
-        DescriptorHandle self;
-
-        internal MediaDescriptor (DescriptorHandle self)
+        internal MediaDescriptor (DescriptorHandle self) : base (self)
         {
-            this.self = self;
-            ex = new NativeException ();
         }
     };
 };

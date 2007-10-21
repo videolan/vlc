@@ -30,7 +30,7 @@ namespace VideoLAN.LibVLC
      * Abstract safe handle class for non-NULL pointers
      * (Microsoft.* namespace has a similar class, but lets stick to System.*)
      */
-    internal abstract class NonNullHandle : SafeHandle
+    public abstract class NonNullHandle : SafeHandle
     {
         protected NonNullHandle ()
             : base (IntPtr.Zero, true)
@@ -43,6 +43,24 @@ namespace VideoLAN.LibVLC
             {
                 return handle == IntPtr.Zero;
             }
+        }
+    };
+
+    public class BaseObject<HandleT> : IDisposable where HandleT : SafeHandle
+    {
+        protected NativeException ex;
+        protected HandleT self;
+
+        internal BaseObject (HandleT self)
+        {
+            this.self = self;
+            ex = new NativeException ();
+        }
+
+        public void Dispose ()
+        {
+            ex.Dispose ();
+            self.Close ();
         }
     };
 };
