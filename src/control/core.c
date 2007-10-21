@@ -79,7 +79,7 @@ void libvlc_exception_raise( libvlc_exception_t *p_exception,
     p_exception->b_raised = 1;
 }
 
-libvlc_instance_t * libvlc_new( int argc, char **argv,
+libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
                                 libvlc_exception_t *p_e )
 {
     libvlc_instance_t *p_new;

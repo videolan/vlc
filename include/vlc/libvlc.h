@@ -107,7 +107,8 @@ libvlc_exception_get_message( const libvlc_exception_t *p_exception );
  * \param argv command-line-type arguments
  * \param exception an initialized exception pointer
  */
-VLC_PUBLIC_API libvlc_instance_t * libvlc_new( int , char **, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_instance_t *
+libvlc_new( int , const char *const *, libvlc_exception_t *);
 
 /**
  * Returns a libvlc instance identifier for legacy APIs. Use of this

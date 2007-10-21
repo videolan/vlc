@@ -1,5 +1,5 @@
 /*
- * testapi.c - libvlc-control smoke test
+ * testapi.c - libvlc smoke test
  *
  * $Id$
  */
@@ -21,66 +21,46 @@
  *  http://www.gnu.org/copyleft/gpl.html                              *
  **********************************************************************/
 
-#include <vlc/mediacontrol.h>
+#include <vlc/libvlc.h>
 
 #undef NDEBUG
 #include <assert.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
+static libvlc_exception_t ex;
+
+static void catch (void)
+{
+    if (libvlc_exception_raised (&ex))
+    {
+         fprintf (stderr, "Exception: %s\n",
+                  libvlc_exception_get_message (&ex));
+         abort ();
+    }
+
+    assert (libvlc_exception_get_message (&ex) == NULL);
+    libvlc_exception_clear (&ex);
+}
+
 int main (int argc, char *argv[])
 {
-    mediacontrol_Exception ex;
-    mediacontrol_Instance *mc, *mc2;
     libvlc_instance_t *vlc;
+    const char *args[argc + 3];
 
-    mediacontrol_exception_init (&ex);
-    mc = mediacontrol_new (argc, argv, &ex);
-    assert (mc);
-    assert (!ex.code);
-    mediacontrol_exception_cleanup (&ex);
+    args[0] = "-I";
+    args[1] = "dummy";
+    args[2] = "-vvv";
+    args[3] = "--plugin-path=..";
+    for (int i = 1; i < argc; i++)
+        args[i + 3] = argv[i];
 
-    /* Duplication test */
-    vlc = mediacontrol_get_libvlc_instance (mc);
-    assert (vlc);
-    assert (!ex.code);
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (sizeof (args) / sizeof (args[0]), args, &ex);
+    catch ();
 
-    mediacontrol_exception_init (&ex);
-    mc2 = mediacontrol_new_from_instance (vlc, &ex);
-    assert (mc2);
-    assert (!ex.code);
-    mediacontrol_exception_cleanup (&ex);
-
-    //mediacontrol_exit (mc2);
-
-    /* Input tests */
-    mediacontrol_exception_init (&ex);
-    mediacontrol_resume (mc, NULL, &ex);
-    assert (ex.code); /* should fail: we have no input */
-    mediacontrol_exception_cleanup (&ex);
-
-    mediacontrol_exception_init (&ex);
-    mediacontrol_pause (mc, NULL, &ex);
-    assert (ex.code); /* should fail: we have no input */
-    mediacontrol_exception_cleanup (&ex);
-
-    mediacontrol_exception_init (&ex);
-    mediacontrol_stop (mc, NULL, &ex);
-    mediacontrol_exception_cleanup (&ex);
-
-    /* Playlist tests */
-    mediacontrol_exception_init (&ex);
-    mediacontrol_playlist_clear (mc, &ex);
-    assert (!ex.code);
-    mediacontrol_exception_cleanup (&ex);
-
-    mediacontrol_exception_init (&ex);
-    mediacontrol_playlist_add_item (mc, "/dev/null", &ex);
-    mediacontrol_exception_cleanup (&ex);
-
-    mediacontrol_exception_init (&ex);
-    mediacontrol_playlist_clear (mc, &ex);
-    assert (!ex.code);
-    mediacontrol_exception_cleanup (&ex);
-
-    mediacontrol_exit (mc);
+    libvlc_destroy (vlc, &ex);
+    catch ();
     return 0;
 }
