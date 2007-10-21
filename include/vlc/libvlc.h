@@ -134,7 +134,7 @@ VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
  * LibVLC Media Descriptor
  * @{
  */
- 
+
 /**
  * Create a media descriptor with the given mrl.
  * \param p_instance the instance
@@ -197,12 +197,12 @@ VLC_PUBLIC_API libvlc_event_manager_t *
 VLC_PUBLIC_API vlc_int64_t
    libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
                                          libvlc_exception_t * p_e );
-                                         
+
 VLC_PUBLIC_API vlc_bool_t
    libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
                                          libvlc_exception_t * p_e );
 
-VLC_PUBLIC_API void 
+VLC_PUBLIC_API void
     libvlc_media_descriptor_set_user_data( libvlc_media_descriptor_t * p_md,
                                            void * p_new_user_data,
                                            libvlc_exception_t * p_e);
@@ -1096,7 +1096,7 @@ VLC_PUBLIC_API void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_
  * \param p_exception an initialized exception
  */
 VLC_PUBLIC_API void libvlc_vlm_pause_media( libvlc_instance_t *, char *, libvlc_exception_t * );
- 
+
 /**
  * Seeks in the named broadcast.
  * \param p_instance the instance
@@ -1106,7 +1106,7 @@ VLC_PUBLIC_API void libvlc_vlm_pause_media( libvlc_instance_t *, char *, libvlc_
  */
 VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
                                            float, libvlc_exception_t * );
- 
+
 /**
  * Return information of the named broadcast.
  * \param p_instance the instance
