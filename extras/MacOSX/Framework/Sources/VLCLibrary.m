@@ -44,11 +44,11 @@ void __quit_on_exception( void * e, const char * function, const char * file, in
 
 static void *DestroySharedLibraryAtExit()
 {
-    // Destroy the shared library
-    if (sharedLibrary)
-        [sharedLibrary release];
+    /* Release the global object that may have been alloc-ed
+     * in -[VLCLibrary init] */
+    [sharedLibrary release];
     sharedLibrary = nil;
-    
+
     return nil;
 }
 
@@ -59,11 +59,8 @@ static void *DestroySharedLibraryAtExit()
     {
         // Initialize a shared instance
         [[self alloc] init];
-        
-        // Register a function to gracefully destroy the shared library on exit.
-        atexit( (void*)DestroySharedLibraryAtExit );
     }
-    return sharedLibrary;
+    return [[sharedLibrary retain] autorelease];
 }
 
 + (void *)sharedInstance
@@ -93,38 +90,30 @@ static void *DestroySharedLibraryAtExit()
         quit_on_exception( &ex );
         
         if (!sharedLibrary) 
-            sharedLibrary = [[self retain] autorelease];
+            sharedLibrary = self;
         
         // Assignment unneeded, as the audio unit will do it for us
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
         
         // free allocated resources
         free( applicationPath );
+        atexit(DestroySharedLibraryAtExit);
     }
     return self;
 }
 
 - (void)dealloc 
 {
-    // TODO: libvlc core locks up or has segfaults while shutting down, the 
-    // following code allows for the framework to be removed without crashing
-    // the host application.
-    @try
+    if (instance) 
     {
-        if (instance) 
-        {
-            libvlc_exception_t ex;
-            libvlc_exception_init( &ex );
-            
-            libvlc_destroy( instance, &ex );
-        }
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
+        
+        libvlc_destroy( instance, &ex );
     }
-    @finally 
-    {
-        instance = nil;
-        [audio release];
-        [super dealloc];
-    }
+    instance = nil;
+    [audio release];
+    [super dealloc];
 }
 
 - (void *)instance
