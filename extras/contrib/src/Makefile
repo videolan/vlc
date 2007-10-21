@@ -1592,8 +1592,8 @@ else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 endif
 endif
+endif
 	$(INSTALL_NAME)
-endif 
 	touch $@
 
 CLEAN_FILE += .png
