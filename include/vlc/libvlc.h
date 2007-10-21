@@ -338,7 +338,7 @@ VLC_PUBLIC_API int libvlc_playlist_add_extended( libvlc_instance_t *, const char
 VLC_PUBLIC_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
                                                 libvlc_exception_t * );
 
-/* Get the input that is currently being played by the playlist
+/** Get the input that is currently being played by the playlist
  * \param p_instance the instance to use
  * \param p_exception an initialized excecption
  * \return an input object
