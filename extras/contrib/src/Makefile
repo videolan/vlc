@@ -1870,7 +1870,7 @@ CLEAN_PKG += gecko-sdk-win32
 DISTCLEAN_PKG += gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
 
 # ***************************************************************************
-# mozilla
+# mozilla-macosx
 # ***************************************************************************
 
 mozilla-source-$(MOZILLA_VERSION).tar.bz2:
@@ -1879,12 +1879,12 @@ mozilla-source-$(MOZILLA_VERSION).tar.bz2:
 mozilla: mozilla-source-$(MOZILLA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
-.mozilla: mozilla
+.mozilla-macosx: mozilla-macosx
 	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=mac --enable-standalone-modules=xpcom,plugin && make && make install)
 	touch $@
 
-CLEAN_FILE += .mozilla
-CLEAN_PKG += mozilla
+CLEAN_FILE += .mozilla-macosx
+CLEAN_PKG += mozilla-macosx
 DISTCLEAN_PKG += mozilla-source-$(MOZILLA_VERSION).tar.bz2
 
 # ***************************************************************************
