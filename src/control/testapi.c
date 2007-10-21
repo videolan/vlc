@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 static libvlc_exception_t ex;
 
@@ -49,9 +50,11 @@ int main (int argc, char *argv[])
     libvlc_instance_t *vlc;
     const char *args[argc + 3];
 
-    args[0] = "-I";
-    args[1] = "dummy";
-    args[2] = "-vvv";
+    alarm (30); /* Make sure "make check" does not get stuck */
+
+    args[0] = "-vvv";
+    args[1] = "-I";
+    args[2] = "-dummy";
     args[3] = "--plugin-path=..";
     for (int i = 1; i < argc; i++)
         args[i + 3] = argv[i];
