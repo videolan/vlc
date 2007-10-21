@@ -250,7 +250,7 @@ VLC_PUBLIC_API int     VLC_Create( void );
  *  \param ppsz_argv an array of arguments
  *  \return VLC_SUCCESS on success
  */
-VLC_PUBLIC_API int     VLC_Init( int, int, char *[] );
+VLC_PUBLIC_API int     VLC_Init( int, int, const char *[] );
 
 /**
  * Add an interface

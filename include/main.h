@@ -37,7 +37,7 @@ struct libvlc_int_t
 
     /* Global properties */
     int                    i_argc;           ///< command line arguments count
-    char **                ppsz_argv;        ///< command line arguments
+    const char **          ppsz_argv;        ///< command line arguments
 
     char *                 psz_homedir;      ///< user's home directory
     char *                 psz_configdir;    ///< user's configuration directory

@@ -115,7 +115,7 @@ int VLC_Create( void )
  *  - message queue, module bank and playlist initialization
  *  - configuration and commandline parsing
  *****************************************************************************/
-int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
+int VLC_Init( int i_object, int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
     LIBVLC_FUNC;

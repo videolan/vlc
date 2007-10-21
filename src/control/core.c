@@ -90,10 +90,17 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     p_new = (libvlc_instance_t *)malloc( sizeof( libvlc_instance_t ) );
     if( !p_new ) RAISENULL( "Out of memory" );
 
+    const char *my_argv[argc + 2];
+
+    my_argv[0] = "libvlc"; /* dummy arg0, skipped by getopt() et al */
+    for( int i = 0; i < argc; i++ )
+         my_argv[i + 1] = argv[i];
+    my_argv[argc + 1] = NULL; /* C calling conventions require a NULL */
+
     /** \todo Look for interface settings. If we don't have any, add -I dummy */
     /* Because we probably don't want a GUI by default */
 
-    if( libvlc_InternalInit( p_libvlc_int, argc, argv ) )
+    if( libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv ) )
         RAISENULL( "VLC initialization failed" );
 
     p_new->p_libvlc_int = p_libvlc_int;

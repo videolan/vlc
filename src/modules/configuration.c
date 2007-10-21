@@ -1401,7 +1401,8 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
  * because we don't know (and don't want to know) in advance the configuration
  * options used (ie. exported) by each module.
  *****************************************************************************/
-int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
+int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
+                          const char *ppsz_argv[],
                           vlc_bool_t b_ignore_errors )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
@@ -1480,7 +1481,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
      * us, ignoring the arity of the options */
     if( b_ignore_errors )
     {
-        ppsz_argv = (char**)malloc( *pi_argc * sizeof(char *) );
+        ppsz_argv = (const char**)malloc( *pi_argc * sizeof(char *) );
         if( ppsz_argv == NULL )
         {
             msg_Err( p_this, "out of memory" );
@@ -1588,7 +1589,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
      */
     opterr = 0;
     optind = 0; /* set to 0 to tell GNU getopt to reinitialize */
-    while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
+    while( ( i_cmd = getopt_long( *pi_argc, (char **)ppsz_argv, psz_shortopts,
                                   p_longopts, &i_index ) ) != -1 )
     {
         /* A long option has been recognized */

@@ -105,7 +105,7 @@ static volatile unsigned int i_instances = 0;
 static void SetLanguage   ( char const * );
 #endif
 static inline int LoadMessages (void);
-static int  GetFilenames  ( libvlc_int_t *, int, char *[] );
+static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_module_name );
 static void ListModules   ( libvlc_int_t *, vlc_bool_t );
@@ -235,7 +235,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
  *  - message queue, module bank and playlist initialization
  *  - configuration and commandline parsing
  */
-int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
+int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
+                         const char *ppsz_argv[] )
 {
     char         p_capabilities[200];
     char *       p_tmp = NULL;
@@ -1238,7 +1239,7 @@ static inline int LoadMessages (void)
  * Parse command line for input files as well as their associated options.
  * An option always follows its associated input and begins with a ":".
  *****************************************************************************/
-static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, char *ppsz_argv[] )
+static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[] )
 {
     int i_opt, i_options;
 
@@ -1259,7 +1260,7 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, char *ppsz_argv[] )
          *       unnecessary lookups. */
 
         VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[i_opt],
-                       (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
+                       ( i_options ? &ppsz_argv[i_opt + 1] :
                                         NULL ), i_options,
                        PLAYLIST_INSERT, 0 );
     }

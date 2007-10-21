@@ -59,7 +59,7 @@ static void *SigHandler (void *set);
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
-int main( int i_argc, char *ppsz_argv[] )
+int main( int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
 
