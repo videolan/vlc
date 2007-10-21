@@ -1279,6 +1279,7 @@ libdca: libdca-$(LIBDCA_VERSION).tar.bz2
 
 .dca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .dca
@@ -1620,6 +1621,7 @@ ifdef HAVE_DARWIN_OS
 else
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 endif
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .zvbi
