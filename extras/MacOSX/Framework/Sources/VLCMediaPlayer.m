@@ -445,7 +445,7 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
         return ret;
 }
 
-static VLCMediaPlayerState libvlc_to_local_state[] =
+static const VLCMediaPlayerState libvlc_to_local_state[] =
 {
     [libvlc_Stopped]    = VLCMediaPlayerStateStopped,
     [libvlc_Opening]    = VLCMediaPlayerStateOpening,
