@@ -212,6 +212,7 @@ static int UnInhibit( intf_thread_t *p_intf )
 
     dbus_message_unref( p_msg );
 
+    p_intf->p_sys->i_cookie = 0;
     return VLC_TRUE;
 }
 
