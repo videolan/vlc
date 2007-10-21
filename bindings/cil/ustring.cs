@@ -36,6 +36,9 @@ namespace VideoLAN.LibVLC
 
         public U8String (string value)
         {
+            if (value == null)
+                return;
+
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes (value);
             mb_str = new byte[bytes.Length + 1];
             Array.Copy (bytes, mb_str, bytes.Length);

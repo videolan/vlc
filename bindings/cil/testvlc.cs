@@ -34,8 +34,14 @@ namespace VideoLAN.LibVLC.Test
 
             Instance vlc = VLC.CreateInstance (argv);
             MediaDescriptor md = vlc.CreateDescriptor (args[0]);
-
             md.Dispose ();
+
+            foreach (string s in args)
+                vlc.Add (s);
+
+            vlc.Loop = false;
+            vlc.TogglePause ();
+            Console.ReadLine ();
             vlc.Dispose ();
             return 0;
         }

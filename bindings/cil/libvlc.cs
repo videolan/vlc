@@ -64,6 +64,9 @@ namespace VideoLAN.LibVLC
         }
     };
 
+    /**
+     * Managed class for LibVLC instance (including playlist)
+     */
     public class Instance : BaseObject<InstanceHandle>
     {
         internal Instance (InstanceHandle self) : base (self)
@@ -77,6 +80,113 @@ namespace VideoLAN.LibVLC
             ex.Raise ();
 
             return new MediaDescriptor (dh);
+        }
+
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_loop")]
+        static extern void PlaylistLoop (InstanceHandle self, int b,
+                                         NativeException ex);
+        /** Sets the playlist loop flag */
+        public bool Loop
+        {
+            set
+            {
+                PlaylistLoop (self, value ? 1 : 0, ex);
+                ex.Raise ();
+            }
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_play")]
+        static extern void PlaylistPlay (InstanceHandle self, int id, int optc,
+                                         U8String[] optv, NativeException ex);
+        /** Plays the next playlist item */
+        public void Play ()
+        {
+            PlaylistPlay (self, -1, 0, new U8String[0], ex);
+            ex.Raise ();
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_pause")]
+        static extern void PlaylistPause (InstanceHandle self,
+                                          NativeException ex);
+        /** Toggles pause */
+        public void TogglePause ()
+        {
+            PlaylistPause (self, ex);
+            ex.Raise ();
+        }
+
+        [DllImport ("libvlc-control.dll",
+                    EntryPoint="libvlc_playlist_isplaying")]
+        static extern int PlaylistIsPlaying (InstanceHandle self,
+                                             NativeException ex);
+        /** Whether the playlist is running, or in pause/stop */
+        public bool IsPlaying
+        {
+            get
+            {
+                int ret = PlaylistIsPlaying (self, ex);
+                ex.Raise ();
+                return ret != 0;
+            }
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_stop")]
+        static extern void PlaylistStop (InstanceHandle self,
+                                         NativeException ex);
+        /** Stops playing */
+        public void Stop ()
+        {
+            PlaylistStop (self, ex);
+            ex.Raise ();
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_next")]
+        static extern void PlaylistNext (InstanceHandle self,
+                                         NativeException ex);
+        /** Goes to next playlist item (and start playing it) */
+        public void Next ()
+        {
+            PlaylistNext (self, ex);
+            ex.Raise ();
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_prev")]
+        static extern void PlaylistPrev (InstanceHandle self,
+                                         NativeException ex);
+        /** Goes to previous playlist item (and start playing it) */
+        public void Prev ()
+        {
+            PlaylistPrev (self, ex);
+            ex.Raise ();
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_clear")]
+        static extern void PlaylistClear (InstanceHandle self,
+                                          NativeException ex);
+        /** Clears the whole playlist */
+        public void Clear ()
+        {
+            PlaylistClear (self, ex);
+            ex.Raise ();
+        }
+
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_add")]
+        static extern void PlaylistAdd (InstanceHandle self, U8String uri,
+                                        U8String name, NativeException e);
+        /** Appends an item to the playlist */
+        public void Add (string mrl)
+        {
+            Add (mrl, null);
+        }
+        /** Appends an item to the playlist */
+        public void Add (string mrl, string name)
+        {
+            U8String umrl = new U8String (mrl);
+            U8String uname = new U8String (name);
+
+            PlaylistAdd (self, umrl, uname, ex);
+            ex.Raise ();
         }
     };
 
