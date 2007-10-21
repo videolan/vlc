@@ -254,7 +254,6 @@ static void Init( intf_thread_t *p_intf )
     QTranslator qtTranslator( 0 );
     // Let's find the right path for the translation file
 #if !defined( WIN32 )
-    
     QString path =  QString(QT4LOCALEDIR);
 #else
     QString path = QString( QString(system_VLCPath()) + DIR_SEP +
