@@ -1674,12 +1674,52 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
         {
             int i_rate;
 
-            if( i_type == INPUT_CONTROL_SET_RATE_SLOWER )
-                i_rate = p_input->p->i_rate * 2;
-            else if( i_type == INPUT_CONTROL_SET_RATE_FASTER )
-                i_rate = p_input->p->i_rate / 2;
-            else
+            if( i_type == INPUT_CONTROL_SET_RATE )
+            {
                 i_rate = val.i_int;
+            }
+            else
+            {
+                static const int ppi_factor[][2] = {
+                    {1,64}, {1,32}, {1,16}, {1,8}, {1,4}, {1,3}, {1,2}, {2,3},
+                    {1,1},
+                    {3,2}, {2,1}, {3,1}, {4,1}, {8,1}, {16,1}, {32,1}, {64,1},
+                    {0,0}
+                };
+                int i_error;
+                int i_idx;
+                int i;
+
+                i_error = INT_MAX;
+                i_idx = -1;
+                for( i = 0; ppi_factor[i][0] != 0; i++ )
+                {
+                    const int i_test_r = INPUT_RATE_DEFAULT * ppi_factor[i][0] / ppi_factor[i][1];
+                    const int i_test_e = abs(p_input->p->i_rate - i_test_r);
+                    if( i_test_e < i_error )
+                    {
+                        i_idx = i;
+                        i_error = i_test_e;
+                    }
+                }
+                assert( i_idx >= 0 && ppi_factor[i_idx][0] != 0 );
+
+                if( i_type == INPUT_CONTROL_SET_RATE_SLOWER )
+                {
+                    if( ppi_factor[i_idx+1][0] > 0 )
+                        i_rate = INPUT_RATE_DEFAULT * ppi_factor[i_idx+1][0] / ppi_factor[i_idx+1][1];
+                    else
+                        i_rate = INPUT_RATE_MAX+1;
+                }
+                else
+                {
+                    assert( i_type == INPUT_CONTROL_SET_RATE_FASTER );
+                    if( i_idx > 0 )
+                        i_rate = INPUT_RATE_DEFAULT * ppi_factor[i_idx-1][0] / ppi_factor[i_idx-1][1];
+                    else
+                        i_rate = INPUT_RATE_MIN-1;
+                }
+            }
 
             if( i_rate < INPUT_RATE_MIN )
             {
