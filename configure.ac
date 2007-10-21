@@ -4211,8 +4211,8 @@ from http://www.freetype.org/, or configure with --disable-freetype. Have a nice
     then
       VLC_ADD_CFLAGS([freetype], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
       VLC_ADD_CPPFLAGS([skins2], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
-      VLC_ADD_LDFLAGS([freetype], [`${FRIBIDI_CONFIG} --libs`])
-      VLC_ADD_LDFLAGS([skins2], [`${FRIBIDI_CONFIG} --libs`])
+      VLC_ADD_LIBS([freetype], [`${FRIBIDI_CONFIG} --libs`])
+      VLC_ADD_LIBS([skins2], [`${FRIBIDI_CONFIG} --libs`])
     fi
   fi
 fi
@@ -4233,7 +4233,7 @@ then
   AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
   if test "${XML2_CONFIG}" != "no"; then
     VLC_ADD_CPPFLAGS([xml],[`${XML2_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([xml],[`${XML2_CONFIG} --libs`])
+    VLC_ADD_LIBS([xml],[`${XML2_CONFIG} --libs`])
     dnl depends on the xmlTextReader extension
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xml}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xml}"
@@ -4323,10 +4323,10 @@ dnl  VLC_ADD_PLUGINS([qt_video])
 dnl  VLC_ADD_LIBS([qt_video],[-L${QTDIR}/lib])
 dnl  LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt_video}"
 dnl   AC_CHECK_LIB(qt-mt,main,[
-dnl    VLC_ADD_LDFLAGS([qt_video],[-lqt-mt])
+dnl    VLC_ADD_LIBS([qt_video],[-lqt-mt])
 dnl  ],[
 dnl    AC_CHECK_LIB(qt,main,[
-dnl      VLC_ADD_LDFLAGS([qt_video],[-lqt])
+dnl      VLC_ADD_LIBS([qt_video],[-lqt])
 dnl    ])
 dnl  ])
 dnl  NEED_QTE_MAIN=yes
@@ -4354,7 +4354,7 @@ if test "${enable_hd1000v}" != "no" -a "${CXX}" != "" &&
   if test "$can_build_roku" = "yes"
   then
     VLC_ADD_PLUGINS([hd1000v])
-    VLC_ADD_LDFLAGS([hd1000v],[-lCascade -ldvbpsi -lmad])
+    VLC_ADD_LIBS([hd1000v],[-lCascade -ldvbpsi -lmad])
   fi
   AC_LANG_POP([C++])
 fi
@@ -4380,15 +4380,15 @@ then
     then
       AC_CHECK_HEADERS(ddraw.h,
       [ VLC_ADD_PLUGINS([vout_directx aout_directx])
-        VLC_ADD_LDFLAGS([vout_directx],[-lgdi32])
+        VLC_ADD_LIBS([vout_directx],[-lgdi32])
       ])
       AC_CHECK_HEADERS(GL/gl.h,
       [ VLC_ADD_PLUGINS([glwin32])
-        VLC_ADD_LDFLAGS([glwin32],[-lopengl32 -lgdi32])
+        VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
       ])
       AC_CHECK_HEADERS(d3d9.h,
       [ VLC_ADD_PLUGINS([direct3d])
-        VLC_ADD_LDFLAGS([direct3d],[-lgdi32])
+        VLC_ADD_LIBS([direct3d],[-lgdi32])
       ])
     else
       AC_MSG_CHECKING(for directX headers in ${with_directx})
@@ -4396,7 +4396,7 @@ then
       then
         VLC_ADD_PLUGINS([vout_directx aout_directx])
         VLC_ADD_CPPFLAGS([vout_directx aout_directx],[-I${with_directx}])
-        VLC_ADD_LDFLAGS([vout_directx],[-lgdi32])
+        VLC_ADD_LIBS([vout_directx],[-lgdi32])
         AC_MSG_RESULT(yes)
       else
         AC_MSG_RESULT(no)
@@ -4436,7 +4436,7 @@ AC_ARG_ENABLE(svgalib,
 if test "${enable_svgalib}" = "yes"
 then
   VLC_ADD_PLUGINS([svgalib])
-  VLC_ADD_LDFLAGS([svgalib],[-lvgagl -lvga])
+  VLC_ADD_LIBS([svgalib],[-lvgagl -lvga])
 fi
 
 dnl
@@ -4517,7 +4517,7 @@ AC_ARG_ENABLE(ggi,
 if test "${enable_ggi}" = "yes"
 then
   VLC_ADD_PLUGINS([ggi])
-  VLC_ADD_LDFLAGS([ggi],[-lggi])
+  VLC_ADD_LIBS([ggi],[-lggi])
   AC_ARG_WITH(ggi,
     [    --with-ggi=PATH       path to libggi],
     [ if test "${with_ggi}" != "no" -a -n "${with_ggi}"
@@ -4546,7 +4546,7 @@ then
    CFLAGS="$CFLAGS -I/usr/include/glide"
    AC_CHECK_HEADER(glide.h,[   
       VLC_ADD_PLUGINS([glide])
-      VLC_ADD_LDFLAGS([glide],[-lglide2x -lm])
+      VLC_ADD_LIBS([glide],[-lglide2x -lm])
       VLC_ADD_CPPFLAGS([glide],[-I/usr/include/glide])
     ],[
       AC_MSG_ERROR([You don't have libglide. Install it or do not use --enable-glide])
@@ -4565,7 +4565,7 @@ then
   if test "${have_aa}" = "true"
   then
     VLC_ADD_PLUGINS([aa])
-    VLC_ADD_LDFLAGS([aa],[-laa])
+    VLC_ADD_LIBS([aa],[-laa])
   fi
 fi
 
@@ -4588,7 +4588,7 @@ then
   then
     VLC_ADD_PLUGINS([caca])
     VLC_ADD_CFLAGS([caca],[`${CACA_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([caca],[`${CACA_CONFIG} --plugin-libs`])
+    VLC_ADD_LIBS([caca],[`${CACA_CONFIG} --plugin-libs`])
   fi
 fi
 
@@ -4600,7 +4600,7 @@ AC_ARG_ENABLE(wingdi,
 if test "${enable_wingdi}" != "no"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     VLC_ADD_PLUGINS([wingdi])
-    VLC_ADD_LDFLAGS([wingdi],[-lgdi32])
+    VLC_ADD_LIBS([wingdi],[-lgdi32])
   fi
   if test "${SYS}" = "mingwce"; then
     VLC_ADD_PLUGINS([wingdi wingapi])
@@ -4625,7 +4625,7 @@ if test "${enable_oss}" != "no" &&
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
     VLC_ADD_PLUGINS([oss])
-    AC_CHECK_LIB(ossaudio,main,VLC_ADD_LDFLAGS([oss],[-lossaudio]))
+    AC_CHECK_LIB(ossaudio,main,VLC_ADD_LIBS([oss],[-lossaudio]))
   ])
 fi
 
@@ -4641,7 +4641,7 @@ AC_ARG_ENABLE(esd,
      then
        VLC_ADD_PLUGINS([esd])
        VLC_ADD_CFLAGS([esd],[`${ESD_CONFIG} --cflags`])
-       VLC_ADD_LDFLAGS([esd],[`${ESD_CONFIG} --libs`])
+       VLC_ADD_LIBS([esd],[`${ESD_CONFIG} --libs`])
      fi
    fi])
 
@@ -4655,9 +4655,9 @@ AC_ARG_ENABLE(portaudio,
      VLC_ADD_PLUGINS([portaudio])
      VLC_ADD_CXXFLAGS([portaudio],[])
      if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LDFLAGS([portaudio],[-lportaudio -lwinmm -lole32])
+        VLC_ADD_LIBS([portaudio],[-lportaudio -lwinmm -lole32])
      else
-        VLC_ADD_LDFLAGS([portaudio],[-lportaudio])
+        VLC_ADD_LIBS([portaudio],[-lportaudio])
      fi
    fi])
 
@@ -4673,7 +4673,7 @@ AC_ARG_ENABLE(arts,
     then
       VLC_ADD_PLUGINS([arts])
       VLC_ADD_CFLAGS([arts],[`${ARTS_CONFIG} --cflags`])
-      VLC_ADD_LDFLAGS([arts],[`${ARTS_CONFIG} --libs `])
+      VLC_ADD_LIBS([arts],[`${ARTS_CONFIG} --libs `])
     fi
   fi])
 
@@ -4694,7 +4694,7 @@ then
        [snd_pcm_hw_params_get_period_time(0,0,0);],
         AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
     VLC_ADD_PLUGINS([alsa])
-    VLC_ADD_LDFLAGS([alsa],[-lasound -lm -ldl])
+    VLC_ADD_LIBS([alsa],[-lasound -lm -ldl])
   else
     if test "${enable_alsa}" = "yes"; then
       AC_MSG_ERROR([Could not find ALSA development headers])
@@ -4710,7 +4710,7 @@ AC_ARG_ENABLE(waveout,
 if test "${enable_waveout}" != "no"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
     VLC_ADD_PLUGINS([waveout])
-    VLC_ADD_LDFLAGS([waveout],[-lwinmm])
+    VLC_ADD_LIBS([waveout],[-lwinmm])
   fi
   if test "${SYS}" = "mingwce"; then
     VLC_ADD_PLUGINS([waveout])
