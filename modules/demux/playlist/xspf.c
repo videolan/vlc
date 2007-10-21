@@ -652,6 +652,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
     char *psz_name = NULL;
     char *psz_value = NULL;
     char *psz_title = NULL;
+    char *psz_application = NULL;
     int i_node;
     xml_elem_hnd_t *p_handler = NULL;
 
@@ -677,9 +678,14 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         {
             psz_title = unescape_URI_duplicate( psz_value );
         }
+        /* extension attribute: application */
+        if( !strcmp( psz_name, "application" ) )
+        {
+            psz_application = strdup( psz_value );
+        }
         /* unknown attribute */
         else
-            msg_Warn( p_demux, "invalid <node> attribute:\"%s\"", psz_name);
+            msg_Warn( p_demux, "invalid <%s> attribute:\"%s\"", psz_element, psz_name );
 
         FREE_ATT();
     }
@@ -690,7 +696,23 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         msg_Warn( p_demux, "<node> requires \"title\" attribute" );
         return VLC_FALSE;
     }
-    if( psz_title ) free( psz_title );
+    free( psz_title );
+
+    if( !strcmp( psz_element, "extension" ) )
+    {
+        if( !psz_application )
+        {
+            msg_Warn( p_demux, "<extension> requires \"application\" attribute" );
+            return VLC_FALSE;
+        }
+        else if( strcmp( psz_application, "http://www.videolan.org/vlc/playlist/0" ) )
+        {
+            msg_Dbg( p_demux, "Skipping \"%s\" extension tag", psz_application );
+            free( psz_application );
+            return VLC_FALSE;
+        }
+    }
+    free( psz_application );
 
     /* parse the child elements */
     while( xml_ReaderRead( p_xml_reader ) == 1 )
