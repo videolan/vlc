@@ -42,14 +42,14 @@ void __quit_on_exception( void * e, const char * function, const char * file, in
     }
 }
 
-static void *DestroySharedLibraryAtExit()
+static void * DestroySharedLibraryAtExit( void )
 {
     /* Release the global object that may have been alloc-ed
      * in -[VLCLibrary init] */
     [sharedLibrary release];
     sharedLibrary = nil;
 
-    return nil;
+    return NULL;
 }
 
 @implementation VLCLibrary
@@ -57,8 +57,11 @@ static void *DestroySharedLibraryAtExit()
 {
     if (!sharedLibrary) 
     {
-        // Initialize a shared instance
-        [[self alloc] init];
+        /* Initialize a shared instance */
+        sharedLibrary = [[self alloc] init];
+
+        /* Make sure, this will get released at some point */
+        atexit( (void*)DestroySharedLibraryAtExit );
     }
     return [[sharedLibrary retain] autorelease];
 }
@@ -89,15 +92,11 @@ static void *DestroySharedLibraryAtExit()
         instance = (void *)libvlc_new( 7, lib_vlc_params, &ex );
         quit_on_exception( &ex );
         
-        if (!sharedLibrary) 
-            sharedLibrary = self;
-        
         // Assignment unneeded, as the audio unit will do it for us
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
         
         // free allocated resources
         free( applicationPath );
-        atexit(DestroySharedLibraryAtExit);
     }
     return self;
 }
