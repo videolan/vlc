@@ -279,6 +279,7 @@ static void Init( intf_thread_t *p_intf )
 
     /* Launch */
     app->exec();
+    delete app;
 
     /* And quit */
     MainInputManager::killInstance();
