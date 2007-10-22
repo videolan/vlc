@@ -75,6 +75,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
 
     p_em->p_obj = p_obj;
     p_em->p_libvlc_instance = p_libvlc_inst;
+    libvlc_retain( p_libvlc_inst );
     ARRAY_INIT( p_em->listeners_groups );
     vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->object_lock );
     vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->event_sending_lock );
@@ -102,6 +103,8 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
         free( listeners_group );
     FOREACH_END()
     ARRAY_RESET( p_em->listeners_groups );
+
+    libvlc_release( p_em->p_livclc_instance );
     free( p_em );
 }
 
