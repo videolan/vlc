@@ -1169,7 +1169,7 @@ VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, uns
  * \param p_instance libvlc instance
  * \param exception an initialized exception pointer
  */
-VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( const libvlc_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *, libvlc_exception_t *);
 
 /**
  * Close an instance of VLC message log

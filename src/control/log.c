@@ -27,7 +27,7 @@
 
 struct libvlc_log_t
 {
-    const libvlc_instance_t  *p_instance;
+    libvlc_instance_t  *p_instance;
     msg_subscription_t *p_messages;
 };
 
@@ -58,7 +58,7 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, li
         RAISEVOID("Invalid VLC instance!");
 }
 
-libvlc_log_t *libvlc_log_open( const libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     struct libvlc_log_t *p_log =
         (struct libvlc_log_t *)malloc(sizeof(struct libvlc_log_t));
