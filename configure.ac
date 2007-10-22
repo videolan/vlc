@@ -2034,7 +2034,7 @@ then
     then
       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
         [ VLC_ADD_PLUGINS([dvdread])
-          VLC_ADD_LIBS([dvdread],[-ldvdread ${LDFLAGS_dvdcss}])
+          VLC_ADD_LIBS([dvdread],[-ldvdread ${LIBS_dvdcss}])
         ],[
           if test -n "${enable_dvdread}"
           then
@@ -2055,7 +2055,7 @@ then
         dnl  Use a custom libdvdread
         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
         VLC_ADD_BUILTINS([dvdread])
-        VLC_ADD_LIBS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LDFLAGS_dvdcss}])
+        VLC_ADD_LIBS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LIBS_dvdcss}])
         VLC_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
       else
         dnl  The given libdvdread wasn't built
@@ -2070,7 +2070,7 @@ then
       dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
       AC_MSG_RESULT(yes)
       VLC_ADD_PLUGINS([dvdread])
-      VLC_ADD_LIBS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LDFLAGS_dvdcss}])
+      VLC_ADD_LIBS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LIBS_dvdcss}])
       VLC_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
     else
       dnl  No libdvdread could be found, sorry
@@ -2288,7 +2288,7 @@ then
   esac
   AC_CHECK_LIB(dvbpsi, dvbpsi_GenSDTSections, [
     AC_DEFINE(HAVE_DVBPSI_SDT, 1, [Define if you have dvbpsi_GenSDTSections.])
-  ], [], [${LDFLAGS_ts}])
+  ], [], [${LIBS_ts}])
 
 fi
 
@@ -2839,7 +2839,7 @@ then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${real_mad_tree}])
       VLC_ADD_LIBS([mpgatofixed32],[-L${real_mad_tree}/.libs])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mpgatofixed32}"
+      LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
       AC_CHECK_LIB(mad, mad_bit_init, [
         VLC_ADD_BUILTINS([mpgatofixed32])
         VLC_ADD_LIBS([mpgatofixed32],[-lmad])
@@ -2852,7 +2852,7 @@ then
     fi
   else
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mpgatofixed32}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_mpgatofixed32}"
+    LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
     AC_CHECK_HEADERS(mad.h, ,
       [ AC_MSG_ERROR([Could not find libmad on your system: you may get it from http://www.underbit.com/products/mad/. Alternatively you can use --disable-mad to disable the mad plugin.]) ])
     AC_CHECK_LIB(mad, mad_bit_init, [
@@ -2909,7 +2909,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
    [
      if test "$with_ffmpeg_dts" = "yes"; then
-             LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+             LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
              AC_CHECK_LIB(dts_pic, dts_free, 
                [ VLC_ADD_LIBS([ffmpeg],[-ldts_pic]) ],
                [ VLC_ADD_LIBS([ffmpeg],[-ldts]) ])
@@ -3111,7 +3111,7 @@ dnl    AC_CHECK_HEADERS(ffmpeg/swscale.h, [], [AC_MSG_ERROR([Missing header file
     dnl last chance: at the default place
     dnl
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(ffmpeg/avformat.h)
       AC_CHECK_HEADERS(ffmpeg/avutil.h)
@@ -3224,7 +3224,7 @@ then
     fi
   else
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_faad}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_faad}"
+    LDFLAGS="${LDFLAGS_save} ${LIBS_faad}"
     AC_CHECK_HEADERS(faad.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ])
     AC_CHECK_LIB(faad, faacDecOpen, [
@@ -3233,7 +3233,7 @@ then
       AC_CHECK_LIB(faad, NeAACDecOpen, [
         VLC_ADD_PLUGINS([faad])
         VLC_ADD_LIBS([faad],[-lfaad]) ],
-        [ AC_MSG_ERROR([Cannot find libfaad library...]) ],[-lm]))
+        [ AC_MSG_ERROR([Cannot find libfaad library...]) ]))
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
   fi
@@ -3272,7 +3272,7 @@ then
     fi
   else
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame} -DLIBTWOLAME_STATIC"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_twolame}"
+    LDFLAGS="${LDFLAGS_save} ${LIBS_twolame}"
     AC_CHECK_HEADERS(twolame.h, ,
       [ AC_MSG_ERROR([Cannot find development header for libtwolame...]) ])
     AC_CHECK_LIB(twolame, twolame_init, [
@@ -3371,7 +3371,7 @@ then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([a52tofloat32],[-I${real_a52_tree}])
       VLC_ADD_LIBS([a52tofloat32],[-L${real_a52_tree}/liba52/.libs])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_a52tofloat32} -lm"
+      LDFLAGS="${LDFLAGS_save} ${LIBS_a52tofloat32}"
       AC_CHECK_LIB(a52, a52_free, [
         VLC_ADD_BUILTINS([a52tofloat32])
         VLC_ADD_CPPFLAGS([a52tofloat32],[-DUSE_A52DEC_TREE])
@@ -3399,7 +3399,7 @@ then
       CPPFLAGS_test="-I${with_a52}/include"
     fi
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test} ${CPPFLAGS_a52tofloat32}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_test} ${LDFLAGS_a52tofloat32}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_test} ${LIBS_a52tofloat32}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
         VLC_ADD_PLUGINS([a52tofloat32])
@@ -3649,7 +3649,7 @@ then
     fi
   else
     AC_CHECK_HEADERS(speex/speex.h, [
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_speex}"
+      LDFLAGS="${LDFLAGS_save} ${LIBS_speex}"
       AC_CHECK_LIB(speex, speex_decode_int, [
         VLC_ADD_PLUGINS([speex])
         VLC_ADD_LIBS([speex],[-lspeex]) ],
@@ -3763,7 +3763,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([x264],[-I${real_x264_tree}])
       VLC_ADD_LIBS([x264],[-L${real_x264_tree}])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264} ${THREAD_LIB}"
+      LDFLAGS="${LDFLAGS_save} ${LIBS_x264} ${THREAD_LIB}"
       AC_CHECK_LIB(x264, x264_encoder_open, [
         VLC_ADD_BUILTINS([x264])
         VLC_ADD_LIBS([x264],[-lx264])
@@ -3776,7 +3776,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have x264.h])
     fi
   else
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264} ${THREAD_LIB}"
+    LDFLAGS="${LDFLAGS_save} ${LIBS_x264} ${THREAD_LIB}"
     AC_CHECK_HEADERS(x264.h, [
       AC_CHECK_LIB(x264, x264_encoder_open, [
         VLC_ADD_PLUGINS([x264])
@@ -4236,7 +4236,7 @@ then
     VLC_ADD_LIBS([xml],[`${XML2_CONFIG} --libs`])
     dnl depends on the xmlTextReader extension
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xml}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xml}"
+    LDFLAGS="${LDFLAGS_save} ${LIBS_xml}"
     AC_CHECK_LIB(xml2,xmlTextReaderConstName,[
       AC_EGREP_HEADER(xmlTextReaderConstName,libxml/xmlreader.h,[
         VLC_ADD_PLUGINS([xml]) ],[
@@ -5455,7 +5455,7 @@ then
     fi
   else
     AC_CHECK_HEADERS(goom/goom.h, [
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_goom}"
+      LDFLAGS="${LDFLAGS_save} ${LIBS_goom}"
       AC_CHECK_LIB(goom2, goom_init, [
         VLC_ADD_PLUGINS([goom])
         VLC_ADD_LIBS([goom],[-lgoom2])
