@@ -34,6 +34,7 @@
 #include "ui/sprefs_interface.h"
 
 #include <vlc_config_cat.h>
+#include <vlc_configuration.h>
 
 #include <QString>
 #include <QFont>
@@ -246,21 +247,22 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                  volNormalizer );
         CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
 
-#if 0
-        if( control_Exists( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+
+        CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
+                         lastfm_user_edit );
+        CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
+                         lastfm_pass_edit );
+        ui.lastfm_user_edit->hide();
+        ui.lastfm_user_label->hide();
+        ui.lastfm_pass_edit->hide();
+        ui.lastfm_pass_label->hide();
+
+        if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
             ui.lastfm->setCheckState( Qt::Checked );
         else
             ui.lastfm->setCheckState( Qt::Unchecked );
         CONNECT( ui.lastfm, stateChanged( int ), this , lastfm_Changed( int ) );
-#endif
-         CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
-                         lastfm_user_edit );
-         CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
-                         lastfm_pass_edit );
-         ui.lastfm_user_edit->hide();
-         ui.lastfm_user_label->hide();
-         ui.lastfm_pass_edit->hide();
-         ui.lastfm_pass_label->hide();
+
         END_SPREFS_CAT;
 
         /* Input and Codecs Panel Implementation */
@@ -391,10 +393,8 @@ void SPrefsPanel::clean()
 
 void SPrefsPanel::lastfm_Changed( int i_state )
 {
-#if 0
     if( i_state == Qt::Checked )
-        control_Add( VLC_OBJECT( p_intf ), "audioscrobbler" );
+        config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
     else if( i_state == Qt::Unchecked )
-        control_Remove( VLC_OBJECT( p_intf ), "audioscrobbler" );
-#endif
+        config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
 }
