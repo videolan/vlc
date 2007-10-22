@@ -138,17 +138,14 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
 
+    vlc_object_lock( p_intf );
     for(;;)
     {
         vlc_object_t *p_vout;
         vlc_bool_t b_quit;
 
         /* Check screensaver every 30 seconds */
-        vlc_object_lock( p_intf );
-        b_quit = vlc_object_timedwait( p_intf, mdate() + 30000000 ) < 0;
-        vlc_object_unlock( p_intf );
-
-        if( b_quit )
+        if( vlc_object_timedwait( p_intf, mdate() + 30000000 ) < 0 )
             break;
 
         p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
@@ -180,6 +177,7 @@ static void Run( intf_thread_t *p_intf )
             }
         }
     }
+    vlc_object_unlock( p_intf );
 }
 
 #ifdef HAVE_DBUS
