@@ -1,7 +1,8 @@
 /*****************************************************************************
  * dbus.c : D-Bus control interface
  *****************************************************************************
- * Copyright (C) 2006 Rafaël Carré
+ * Copyright © 2006-2007 Rafaël Carré
+ * Copyright © 2007 Mirsal Ennaime
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
@@ -28,9 +29,10 @@
  * D-Bus low-level C API (libdbus)
  *      http://dbus.freedesktop.org/doc/dbus/api/html/index.html
  *  extract:
-    "If you use this low-level API directly, you're signing up for some pain."
- * MPRIS Specification (still drafting on June, 25 of 2007):
- *      http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces
+ *   "If you use this low-level API directly, you're signing up for some pain."
+ *
+ * MPRIS Specification (still drafting on Oct, 23 of 2007):
+ *      http://wiki.xmms2.xmms.se/index.php/MPRIS
  */
 
 /*****************************************************************************
@@ -62,13 +64,16 @@ static int StateChange( vlc_object_t *, const char *, vlc_value_t,
 static int TrackChange( vlc_object_t *, const char *, vlc_value_t,
                         vlc_value_t, void * );
 
+static int StatusChangeEmit( vlc_object_t *, const char *, vlc_value_t,
+                        vlc_value_t, void * );
+
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
+static int MarshalStatus ( intf_thread_t *, DBusMessageIter * );
 
 struct intf_sys_t
 {
     DBusConnection *p_conn;
     vlc_bool_t      b_meta_read;
-    input_thread_t *p_input;
 };
 
 /*****************************************************************************
@@ -229,31 +234,18 @@ DBUS_METHOD( Stop )
 }
 
 DBUS_METHOD( GetStatus )
-{ /* returns an int: 0=playing 1=paused 2=stopped */
+{ /* returns the current status as a struct of 4 ints */
+/*
+    First   0 = Playing, 1 = Paused, 2 = Stopped.
+    Second  0 = Playing linearly , 1 = Playing randomly.
+    Third   0 = Go to the next element once the current has finished playing , 1 = Repeat the current element
+    Fourth  0 = Stop playing once the last element has been played, 1 = Never give up playing *
+ */
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    dbus_int32_t i_status;
-    vlc_value_t val;
+    MarshalStatus( p_this, &args );
 
-    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    PL_LOCK;
-    input_thread_t *p_input = p_playlist->p_input;
-
-    i_status = 2;
-    if( p_input )
-    {
-        var_Get( p_input, "state", &val );
-        if( val.i_int == PAUSE_S )
-            i_status = 1;
-        else if( val.i_int == PLAYING_S )
-            i_status = 0;
-    }
-
-    PL_UNLOCK;
-    pl_Release( p_playlist );
-
-    ADD_INT32( &i_status );
     REPLY_SEND;
 }
 
@@ -633,7 +625,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->b_meta_read = VLC_FALSE;
-    p_sys->p_input = NULL;
 
     dbus_error_init( &error );
 
@@ -672,6 +663,9 @@ static int Open( vlc_object_t *p_this )
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
     var_AddCallback( p_playlist, "playlist-current", TrackChange, p_intf );
+    var_AddCallback( p_playlist, "random", StatusChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
     PL_UNLOCK;
     pl_Release( p_playlist );
 
@@ -690,12 +684,25 @@ static void Close   ( vlc_object_t *p_this )
 {
     intf_thread_t   *p_intf     = (intf_thread_t*) p_this;
     playlist_t      *p_playlist = pl_Yield( p_intf );;
+    input_thread_t  *p_input;
+
+    p_this->b_dead = VLC_TRUE;
 
     PL_LOCK;
     var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
+    var_DelCallback( p_playlist, "random", StatusChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
+
+    p_input = p_playlist->p_input;
+    if ( p_input )
+    {
+        vlc_object_yield( p_input );
+        var_DelCallback( p_input, "state", StateChange, p_intf );
+        vlc_object_release( p_input );
+    }
+
     PL_UNLOCK;
-    if( p_intf->p_sys->p_input )
-        var_DelCallback( p_intf->p_sys->p_input, "state", StateChange, p_intf );
     pl_Release( p_playlist );
 
     dbus_connection_unref( p_intf->p_sys->p_conn );
@@ -732,6 +739,20 @@ DBUS_SIGNAL( TrackChangeSignal )
 }
 
 /*****************************************************************************
+ * StatusChange: Player status change signal
+ *****************************************************************************/
+
+DBUS_SIGNAL( StatusChangeSignal )
+{ /* send the updated status info on the bus */
+    SIGNAL_INIT( "StatusChange" );
+    OUT_ARGUMENTS;
+
+    MarshalStatus( (intf_thread_t*) p_data, &args );
+
+    SIGNAL_SEND;
+}
+
+/*****************************************************************************
  * StateChange: callback on input "state"
  *****************************************************************************/
 static int StateChange( vlc_object_t *p_this, const char* psz_var,
@@ -739,6 +760,9 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
 {
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
+
+    if( p_this->b_dead )
+        return VLC_SUCCESS;
 
     if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
     {
@@ -750,6 +774,25 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
         }
     }
 
+    if( newval.i_int == PLAYING_S || newval.i_int == PAUSE_S ||
+        newval.i_int == END_S )
+    {
+        StatusChangeSignal( p_sys->p_conn, (void*) p_intf );
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * StatusChangeEmit: Emits the StatusChange signal
+ *****************************************************************************/
+static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
+            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    if( p_this->b_dead )
+        return VLC_SUCCESS;
+
+    StatusChangeSignal( ((intf_thread_t*)p_data)->p_sys->p_conn, p_data );
     return VLC_SUCCESS;
 }
 
@@ -766,6 +809,9 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     input_item_t        *p_item     = NULL;
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
     VLC_UNUSED( oldval ); VLC_UNUSED( newval );
+
+    if( p_this->b_dead )
+        return VLC_SUCCESS;
 
     p_sys->b_meta_read = VLC_FALSE;
 
@@ -791,17 +837,13 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
         return VLC_EGENERIC;
     }
 
-    p_sys->p_input = NULL;
     if( input_item_IsPreparsed( p_item ) )
     {
         p_sys->b_meta_read = VLC_TRUE;
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
-    else
-    {
-        var_AddCallback( p_input, "state", StateChange, p_intf );
-        p_sys->p_input = p_input;
-    }
+
+    var_AddCallback( p_input, "state", StateChange, p_intf );
 
     vlc_object_release( p_input );
     return VLC_SUCCESS;
@@ -835,8 +877,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
 
 static int GetInputMeta( input_item_t* p_input,
                         DBusMessageIter *args )
-{ /*FIXME: Works only for already read metadata. */
-
+{
     DBusMessageIter dict, dict_entry, variant;
     /* We need the track length to be expressed in seconds
      * instead of milliseconds */
@@ -885,3 +926,57 @@ static int GetInputMeta( input_item_t* p_input,
 
 #undef ADD_META
 #undef ADD_VLC_META_STRING
+
+/*****************************************************************************
+ * MarshalStatus: Fill a DBusMessage with the current player status
+ *****************************************************************************/
+
+static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
+{ /* This is NOT the right way to do that, it would be better to sore
+     the status information in p_sys and update it on change, thus
+     avoiding a long lock */
+
+    DBusMessageIter status;
+    dbus_int32_t i_state, i_random, i_repeat, i_loop;
+    vlc_value_t val;
+    playlist_t* p_playlist = NULL;
+    input_thread_t* p_input = NULL;
+
+    p_playlist = pl_Yield( (vlc_object_t*) p_intf );
+    PL_LOCK;
+    p_input = p_playlist->p_input;
+
+    i_state = 2;
+    if( p_input )
+    {
+        var_Get( p_input, "state", &val );
+        if( val.i_int >= END_S )
+            i_state = 2;
+        else if( val.i_int == PAUSE_S )
+            i_state = 1;
+        else if( val.i_int <= PLAYING_S )
+            i_state = 0;
+    }
+
+    var_Get( p_playlist, "random", &val );
+    i_random = val.i_int;
+
+    var_Get( p_playlist, "repeat", &val );
+    i_repeat = val.i_int;
+
+    var_Get( p_playlist, "loop", &val );
+    i_loop = val.i_int;
+
+    PL_UNLOCK;
+    pl_Release( p_playlist );
+
+    dbus_message_iter_open_container( args, DBUS_TYPE_STRUCT, NULL, &status );
+    dbus_message_iter_append_basic( &status, DBUS_TYPE_INT32, &i_state );
+    dbus_message_iter_append_basic( &status, DBUS_TYPE_INT32, &i_random );
+    dbus_message_iter_append_basic( &status, DBUS_TYPE_INT32, &i_repeat );
+    dbus_message_iter_append_basic( &status, DBUS_TYPE_INT32, &i_loop );
+    dbus_message_iter_close_container( args, &status );
+
+    return VLC_SUCCESS;
+
+}
