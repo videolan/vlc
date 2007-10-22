@@ -213,6 +213,10 @@ VLC_EXPORT( int, config_Duplicate,( module_t *, const module_config_t *, size_t 
 
 VLC_EXPORT(const char *, config_GetDataDir, ( void ));
 
+VLC_EXPORT( void,       __config_AddIntf,    ( vlc_object_t *, const char * ) );
+VLC_EXPORT( void,       __config_RemoveIntf, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( vlc_bool_t, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
+
 #define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
 #define config_PutInt(a,b,c) __config_PutInt(VLC_OBJECT(a),b,c)
@@ -220,6 +224,10 @@ VLC_EXPORT(const char *, config_GetDataDir, ( void ));
 #define config_PutFloat(a,b,c) __config_PutFloat(VLC_OBJECT(a),b,c)
 #define config_GetPsz(a,b) __config_GetPsz(VLC_OBJECT(a),b)
 #define config_PutPsz(a,b,c) __config_PutPsz(VLC_OBJECT(a),b,c)
+
+#define config_AddIntf(a,b) __config_AddIntf(VLC_OBJECT(a),b)
+#define config_RemoveIntf(a,b) __config_RemoveIntf(VLC_OBJECT(a),b)
+#define config_ExistIntf(a,b) __config_ExistIntf(VLC_OBJECT(a),b)
 
 
 /*****************************************************************************
@@ -434,165 +442,6 @@ struct config_chain_t
 VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * ) );
 VLC_EXPORT( char *, config_ChainCreate, ( char **, config_chain_t **, const char * ) );
 VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
-
-static inline config_chain_t *config_chain_find( config_chain_t *p_cfg, const char *psz_name )
-{
-    while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
-    {
-        p_cfg = p_cfg->p_next;
-    }
-
-    return p_cfg;
-}
-
-static void config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
-{
-    assert( psz_intf );
-
-    char *psz_config, *psz_parser;
-    size_t i_len = strlen( psz_intf );
-
-    psz_config = psz_parser = config_GetPsz( p_this->p_libvlc, "control" );
-    while( psz_parser )
-    {
-        if( !strncmp( psz_intf, psz_parser, i_len ) )
-        {
-            free( psz_config );
-            return;
-        }
-        psz_parser = strchr( psz_parser, ':' );
-        if( psz_parser ) psz_parser++; /* skip the ':' */
-    }
-    free( psz_config );
-
-    psz_config = psz_parser = config_GetPsz( p_this->p_libvlc, "extraintf" );
-    while( psz_parser )
-    {
-        if( !strncmp( psz_intf, psz_parser, i_len ) )
-        {
-            free( psz_config );
-            return;
-        }
-        psz_parser = strchr( psz_parser, ':' );
-        if( psz_parser ) psz_parser++; /* skip the ':' */
-    }
-
-    /* interface not found in the config, let's add it */
-    if( psz_config && strlen( psz_config ) > 0 )
-    {
-        char *psz_newconfig;
-        if( asprintf( &psz_newconfig, "%s:%s", psz_config, psz_intf ) != -1 )
-        {
-            config_PutPsz( p_this->p_libvlc, "extraintf", psz_newconfig );
-            free( psz_newconfig );
-        }
-    }
-    else
-        config_PutPsz( p_this->p_libvlc, "extraintf", psz_intf );
-
-    free( psz_config );
-}
-
-static void config_RemoveIntf( vlc_object_t *p_this, const char *psz_intf )
-{
-    assert( psz_intf );
-
-    char *psz_config, *psz_parser;
-    size_t i_len = strlen( psz_intf );
-
-    psz_config = psz_parser = config_GetPsz( p_this->p_libvlc, "extraintf" );
-    while( psz_parser )
-    {
-        if( !strncmp( psz_intf, psz_parser, i_len ) )
-        {
-            char *psz_newconfig;
-            char *psz_end = psz_parser + i_len;
-            if( *psz_end == ':' ) psz_end++;
-            *psz_parser = '\0';
-            if( asprintf( &psz_newconfig, "%s%s", psz_config, psz_end ) != -1 )
-            {
-                config_PutPsz( p_this->p_libvlc, "extraintf", psz_newconfig );
-                free( psz_newconfig );
-            }
-            break;
-        }
-        psz_parser = strchr( psz_parser, ':' );
-        if( psz_parser ) psz_parser++; /* skip the ':' */
-    }
-    free( psz_config );
-
-    psz_config = psz_parser = config_GetPsz( p_this->p_libvlc, "control" );
-    while( psz_parser )
-    {
-        if( !strncmp( psz_intf, psz_parser, i_len ) )
-        {
-            char *psz_newconfig;
-            char *psz_end = psz_parser + i_len;
-            if( *psz_end == ':' ) psz_end++;
-            *psz_parser = '\0';
-            if( asprintf( &psz_newconfig, "%s%s", psz_config, psz_end ) != -1 )
-            {
-                config_PutPsz( p_this->p_libvlc, "control", psz_newconfig );
-                free( psz_newconfig );
-            }
-            break;
-        }
-        psz_parser = strchr( psz_parser, ':' );
-        if( psz_parser ) psz_parser++; /* skip the ':' */
-    }
-    free( psz_config );
-}
-
-static vlc_bool_t config_ExistIntf( vlc_object_t *p_this, const char *psz_intf )
-{
-    assert( psz_intf );
-
-    char *psz_config, *psz_parser;
-    size_t i_len = strlen( psz_intf );
-
-    psz_config = psz_parser = config_GetPsz( p_this->p_libvlc, "extraintf" );
-    while( psz_parser )
-    {
-        if( !strncmp( psz_parser, psz_intf, i_len ) )
-        {
-            free( psz_config );
-            return VLC_TRUE;
-        }
-        psz_parser = strchr( psz_parser, ':' );
-        if( psz_parser ) psz_parser++; /* skip the ':' */
-    }
-    free( psz_config );
-
-    psz_config = psz_parser = config_GetPsz( p_this->p_libvlc, "control" );
-    while( psz_parser )
-    {
-        if( !strncmp( psz_parser, psz_intf, i_len ) )
-        {
-            free( psz_config );
-            return VLC_TRUE;
-        }
-        psz_parser = strchr( psz_parser, ':' );
-        if( psz_parser ) psz_parser++; /* skip the ':' */
-    }
-    free( psz_config );
-
-    return VLC_FALSE;
-}
-
-static inline char *config_chain_find_value( config_chain_t *p_cfg, const char *psz_name )
-{
-    while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
-    {
-        p_cfg = p_cfg->p_next;
-    }
-
-    if( p_cfg && p_cfg->psz_value )
-    {
-        return( p_cfg->psz_value );
-    }
-
-    return NULL;
-}
 
 # ifdef __cplusplus
 }
