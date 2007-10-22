@@ -585,3 +585,4 @@ libvlc_media_descriptor_get_user_data( libvlc_media_descriptor_t * p_md,
         return NULL;
     }
 }
+
