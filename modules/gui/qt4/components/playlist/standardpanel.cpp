@@ -182,17 +182,8 @@ void StandardPLPanel::toggleRandom()
 
 void StandardPLPanel::handleExpansion( const QModelIndex &index )
 {
-    QModelIndex parent;
     if( model->isCurrent( index ) )
-    {
         view->scrollTo( index, QAbstractItemView::EnsureVisible );
-        parent = index;
-        while( parent.isValid() )
-        {
-            view->setExpanded( parent, true );
-            parent = model->parent( parent );
-        }
-    }
 }
 
 void StandardPLPanel::setCurrentRootId( int _new )
