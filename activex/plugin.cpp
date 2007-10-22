@@ -661,7 +661,7 @@ HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
         _p_libvlc = NULL;
         vlcDataObject->onClose();
 
-        libvlc_destroy(p_libvlc, NULL );
+        libvlc_release(p_libvlc, NULL );
     }
     return S_OK;
 };

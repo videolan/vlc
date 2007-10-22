@@ -108,7 +108,7 @@ static void * DestroySharedLibraryAtExit( void )
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         
-        libvlc_destroy( instance, &ex );
+        libvlc_release( instance, &ex );
     }
     instance = nil;
     [audio release];

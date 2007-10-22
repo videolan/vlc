@@ -55,7 +55,7 @@ namespace VideoLAN.LibVLC
         public static extern
         InstanceHandle Create (int argc, U8String[] argv, NativeException ex);
 
-        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_destroy")]
+        [DllImport ("libvlc-control.dll", EntryPoint="libvlc_release")]
         static extern void Destroy (IntPtr ptr, NativeException ex);
 
         protected override bool ReleaseHandle ()

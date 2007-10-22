@@ -112,7 +112,7 @@ static void
 vlcInstance_dealloc( PyObject *self )
 {
     libvlc_exception_t ex;
-    libvlc_destroy( LIBVLC_INSTANCE->p_instance, &ex );
+    libvlc_release( LIBVLC_INSTANCE->p_instance, &ex );
     PyObject_DEL( self );
 }
 

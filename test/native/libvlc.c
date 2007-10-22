@@ -42,7 +42,7 @@ PyObject *create_destroy( PyObject *self, PyObject *args )
     ASSERT( p_i1 != NULL, "Instance creation failed" );
     ASSERT_NOEXCEPTION;
     id1 = libvlc_get_vlc_id( p_i1 );
-    libvlc_destroy( p_i1, &exception );
+    libvlc_release( p_i1, &exception );
     ASSERT_NOEXCEPTION;
 
     /* Create and destroy two instances */
@@ -57,10 +57,10 @@ PyObject *create_destroy( PyObject *self, PyObject *args )
     ASSERT_NOEXCEPTION;
 
     fprintf( stderr, "Destroy 1\n" );
-    libvlc_destroy( p_i1, &exception );
+    libvlc_release( p_i1, &exception );
     ASSERT_NOEXCEPTION;
     fprintf( stderr, "Destroy 2\n" );
-    libvlc_destroy( p_i2, &exception );
+    libvlc_release( p_i2, &exception );
     ASSERT_NOEXCEPTION;
 
     /* Deinit */
