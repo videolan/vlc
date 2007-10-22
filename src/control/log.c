@@ -60,7 +60,6 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, li
 
 libvlc_log_t *libvlc_log_open( const libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
- 
     struct libvlc_log_t *p_log =
         (struct libvlc_log_t *)malloc(sizeof(struct libvlc_log_t));
 
@@ -69,8 +68,13 @@ libvlc_log_t *libvlc_log_open( const libvlc_instance_t *p_instance, libvlc_excep
     p_log->p_instance = p_instance;
     p_log->p_messages = msg_Subscribe(p_instance->p_libvlc_int, MSG_QUEUE_NORMAL);
 
-    if( !p_log->p_messages ) RAISENULL( "Out of memory" );
+    if( !p_log->p_messages )
+    {
+        free( p_log );
+        RAISENULL( "Out of memory" );
+    }
 
+    libvlc_retain( p_instance );
     return p_log;
 }
 
@@ -79,6 +83,7 @@ void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
     if( p_log && p_log->p_messages )
     {
         msg_Unsubscribe(p_log->p_instance->p_libvlc_int, p_log->p_messages);
+        libvlc_release( p_log->p_instance );
         free(p_log);
     }
     else
