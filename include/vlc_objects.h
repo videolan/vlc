@@ -159,7 +159,7 @@ vlc_bool_t __vlc_object_lock_and_wait( vlc_object_t *obj )
     vlc_bool_t b;
 
     vlc_object_lock( obj );
-    b = vlc_object_wait( obj );
+    b = obj->b_die ? VLC_TRUE : vlc_object_wait( obj );
     vlc_object_unlock( obj );
     return b;
 }
