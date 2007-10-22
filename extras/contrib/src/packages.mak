@@ -1,4 +1,4 @@
-#b ***************************************************************************
+# ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003 - 2006 the VideoLAN team
@@ -23,11 +23,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 # ***************************************************************************
 
+PENGUIN=http://ftp.penguin.cz/pub/users/utx/amr
 GNU=http://ftp.belnet.be/mirror/ftp.gnu.org/gnu
 SF=http://switch.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://download.videolan.org/pub/videolan
 PERL_VERSION=5.8.8
 PERL_URL=http://ftp.funet.fi/pub/CPAN/src/perl-$(PERL_VERSION).tar.gz
+LIBAMR_NB_VERSION=7.0.0.0
+LIBAMR_NB=$(PENGUIN)/amrnb-$(LIBAMR_NB_VERSION).tar.bz2
+LIBAMR_WB_VERSION=7.0.0.0
+LIBAMR_WB=$(PENGUIN)/amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 # Autoconf > 2.57 doesn't work ok on BeOS. Don't ask why.
 # we have to use a newer though, because bootstrap won't work otherwise
 AUTOCONF_VERSION=2.61
@@ -94,8 +99,8 @@ LIBDVDCSS_VERSION=1.2.9
 LIBDVDCSS_URL=$(VIDEOLAN)/libdvdcss/$(LIBDVDCSS_VERSION)/libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 LIBDVDNAV_VERSION=20050211
 LIBDVDNAV_URL=$(VIDEOLAN)/testing/contrib/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
-LIBDVBPSI_VERSION=0.1.5
-LIBDVBPSI_URL=$(VIDEOLAN)/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
+LIBDVBPSI_VERSION=0.1.6
+LIBDVBPSI_URL=$(VIDEOLAN)/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz
 LIVEDOTCOM_VERSION=latest
 LIVEDOTCOM_URL=http://live555.com/liveMedia/public/live555-$(LIVEDOTCOM_VERSION).tar.gz
 #GOOM_URL=$(VIDEOLAN)/testing/contrib/goom-macosx-altivec-bin.tar.gz

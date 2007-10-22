@@ -154,6 +154,10 @@ FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
 endif
 
+ifdef HAVE_AMR
+FFMPEGCONF+= --enable-libamr --enable-libamr-nb --enable-libamr-wb
+endif
+
 DATE=`date +%Y-%m-%d`
 
 # ***************************************************************************
@@ -1002,6 +1006,44 @@ CLEAN_PKG += libmatroska
 DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 
 # ***************************************************************************
+# libamrnb
+# ***************************************************************************
+
+amrnb-$(LIBAMR_NB_VERSION).tar.bz2:
+	$(WGET) $(LIBAMR_NB)
+
+libamrnb: amrnb-$(LIBAMR_NB_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.libamrnb: libamrnb
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --enable-shared && make && make install)
+	touch $@
+
+CLEAN_FILE += .libamrnb
+CLEAN_PKG += libamrnb
+DISTCLEAN_PKG += amrnb-$(LIBAMR_NB_VERSION).tar.bz2
+
+# ***************************************************************************
+# libamrwb
+# ***************************************************************************
+
+amrwb-$(LIBAMR_WB_VERSION).tar.bz2:
+	$(WGET) $(LIBAMR_WB)
+
+libamrwb: amrwb-$(LIBAMR_WB_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.libamrwb: libamrwb
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --enable-shared && make && make install)
+	touch $@
+
+
+CLEAN_FILE += .libamrwb
+CLEAN_PKG += libamrwb
+DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).bz2
+
+# ***************************************************************************
+
 # ffmpeg
 # ***************************************************************************
 
@@ -1132,10 +1174,10 @@ DISTCLEAN_PKG += libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 # libdvbpsi
 # ***************************************************************************
 
-libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz:
+libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz:
 	$(WGET) $(LIBDVBPSI_URL)
 
-libdvbpsi: libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
+libdvbpsi: libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
@@ -1145,7 +1187,7 @@ libdvbpsi: libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
 
 CLEAN_FILE += .dvbpsi
 CLEAN_PKG += libdvbpsi
-DISTCLEAN_PKG += libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
+DISTCLEAN_PKG += libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz
 
 # ***************************************************************************
 # live
