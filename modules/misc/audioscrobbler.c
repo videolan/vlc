@@ -459,7 +459,7 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    if( p_sys->b_meta_read == VLC_FALSE && newval.i_int != INIT_S )
+    if( p_sys->b_meta_read == VLC_FALSE && newval.i_int == PLAYING_S )
         ReadMetaData( p_intf );
 
     if( newval.i_int == END_S || newval.i_int == ERROR_S )
@@ -538,7 +538,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( input_item_IsPreparsed( p_item ) )
         ReadMetaData( p_intf );
     /* if the input item was not preparsed, we'll do it in PlayingChange()
-     * callback, when "state" != INIT_S */
+     * callback, when "state" == PLAYING_S */
 
     vlc_object_release( p_input );
     return VLC_SUCCESS;
