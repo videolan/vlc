@@ -56,15 +56,19 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
-static int TrackChange( vlc_object_t *p_this, const char *psz_var,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int StateChange( vlc_object_t *, const char *, vlc_value_t,
+                        vlc_value_t, void * );
 
-static int GetInputMeta ( input_item_t *p_input,
-                    DBusMessageIter *args);
+static int TrackChange( vlc_object_t *, const char *, vlc_value_t,
+                        vlc_value_t, void * );
+
+static int GetInputMeta ( input_item_t *, DBusMessageIter * );
 
 struct intf_sys_t
 {
     DBusConnection *p_conn;
+    vlc_bool_t      b_meta_read;
+    input_thread_t *p_input;
 };
 
 /*****************************************************************************
@@ -628,6 +632,9 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    p_sys->b_meta_read = VLC_FALSE;
+    p_sys->p_input = NULL;
+
     dbus_error_init( &error );
 
     /* connect to the session bus */
@@ -687,6 +694,8 @@ static void Close   ( vlc_object_t *p_this )
     PL_LOCK;
     var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
     PL_UNLOCK;
+    if( p_intf->p_sys->p_input )
+        var_DelCallback( p_intf->p_sys->p_input, "state", StateChange, p_intf );
     pl_Release( p_playlist );
 
     dbus_connection_unref( p_intf->p_sys->p_conn );
@@ -716,12 +725,37 @@ DBUS_SIGNAL( TrackChangeSignal )
     SIGNAL_INIT( "TrackChange" );
     OUT_ARGUMENTS;
 
-    input_thread_t *p_input = (input_thread_t*) p_data;
-    GetInputMeta ( input_GetItem(p_input), &args );
+    input_item_t *p_item = (input_item_t*) p_data;
+    GetInputMeta ( p_item, &args );
 
     SIGNAL_SEND;
 }
 
+/*****************************************************************************
+ * StateChange: callback on input "state"
+ *****************************************************************************/
+static int StateChange( vlc_object_t *p_this, const char* psz_var,
+            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
+    intf_sys_t          *p_sys      = p_intf->p_sys;
+
+    if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
+    {
+        input_item_t *p_item = input_GetItem( (input_thread_t*)p_this );
+        if( p_item )
+        {
+            p_sys->b_meta_read = VLC_TRUE;
+            TrackChangeSignal( p_sys->p_conn, p_item );
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * TrackChange: callback on playlist "playlist-current"
+ *****************************************************************************/
 static int TrackChange( vlc_object_t *p_this, const char *psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -729,7 +763,11 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     intf_sys_t          *p_sys      = p_intf->p_sys;
     playlist_t          *p_playlist;
     input_thread_t      *p_input    = NULL;
-    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
+    input_item_t        *p_item     = NULL;
+    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
+    VLC_UNUSED( oldval ); VLC_UNUSED( newval );
+
+    p_sys->b_meta_read = VLC_FALSE;
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -746,7 +784,24 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     PL_UNLOCK;
     pl_Release( p_playlist );
 
-    TrackChangeSignal( p_sys->p_conn, p_input );
+    p_item = input_GetItem( p_input );
+    if( !p_item )
+    {
+        vlc_object_release( p_input );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->p_input = NULL;
+    if( input_item_IsPreparsed( p_item ) )
+    {
+        p_sys->b_meta_read = VLC_TRUE;
+        TrackChangeSignal( p_sys->p_conn, p_item );
+    }
+    else
+    {
+        var_AddCallback( p_input, "state", StateChange, p_intf );
+        p_sys->p_input = p_input;
+    }
 
     vlc_object_release( p_input );
     return VLC_SUCCESS;
