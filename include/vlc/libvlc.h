@@ -102,7 +102,7 @@ libvlc_exception_get_message( const libvlc_exception_t *p_exception );
  */
 
 /**
- * Create an initialized libvlc instance
+ * Create an initialized libvlc instance.
  * \param argc the number of arguments
  * \param argv command-line-type arguments
  * \param exception an initialized exception pointer
@@ -119,10 +119,17 @@ libvlc_new( int , const char *const *, libvlc_exception_t *);
 VLC_PUBLIC_API int libvlc_get_vlc_id( libvlc_instance_t *p_instance );
 
 /**
- * Destroy a libvlc instance.
+ * Decrements the reference count of a libvlc instance, and destroys it
+ * if it reaches zero.
  * \param p_instance the instance to destroy
  */
-VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_release( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Increments the reference count of a libvlc instance.
+ * The reference count is initially one when libvlc_new() returns.
+ */
+VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
 
 /** @}*/
 

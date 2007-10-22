@@ -67,6 +67,7 @@ struct libvlc_instance_t
     libvlc_int_t *p_libvlc_int;
     vlm_t        *p_vlm;
     int           b_playlist_locked;
+    unsigned      ref_count;
     vlc_mutex_t   instance_lock;
     vlc_mutex_t   event_callback_lock;
     struct libvlc_callback_entry_list_t *p_callback_list;

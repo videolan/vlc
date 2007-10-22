@@ -20,11 +20,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include <stdarg.h>
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
 #include <vlc_interface.h>
+
+#include <stdarg.h>
+#include <limits.h>
+#include <assert.h>
 
 static const char nomemstr[] = "Insufficient memory";
 
@@ -106,6 +109,7 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     p_new->p_libvlc_int = p_libvlc_int;
     p_new->p_vlm = NULL;
     p_new->b_playlist_locked = 0;
+    p_new->ref_count = 1;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(p_libvlc_int, &p_new->instance_lock);
     vlc_mutex_init(p_libvlc_int, &p_new->event_callback_lock);
@@ -115,14 +119,37 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     return p_new;
 }
 
-void libvlc_destroy( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+void libvlc_retain( libvlc_instance_t *p_instance )
 {
-    libvlc_event_fini( p_instance, p_e );
-    vlc_mutex_destroy( &p_instance->instance_lock );
-    vlc_mutex_destroy( &p_instance->event_callback_lock);
-    libvlc_InternalCleanup( p_instance->p_libvlc_int );
-    libvlc_InternalDestroy( p_instance->p_libvlc_int, VLC_FALSE );
-    free( p_instance );
+    assert( p_instance != NULL );
+    assert( p_instance->ref_count < UINT_MAX );
+
+    vlc_mutex_lock( &p_instance->instance_lock );
+    p_instance->ref_count++;
+    vlc_mutex_unlock( &p_instance->instance_lock );
+}
+
+void libvlc_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+{
+    vlc_mutex_t *lock = &p_instance->instance_lock;
+    int refs;
+
+    assert( p_instance->ref_count > 0 );
+
+    vlc_mutex_lock( &p_instance->instance_lock );
+    refs = --p_instance->ref_count;
+    if( refs == 0 )
+        libvlc_event_fini( p_instance, p_e );
+    vlc_mutex_unlock( &p_instance->instance_lock );
+
+    if( refs == 0 )
+    {
+        vlc_mutex_destroy( &p_instance->instance_lock );
+        vlc_mutex_destroy( &p_instance->event_callback_lock );
+        libvlc_InternalCleanup( p_instance->p_libvlc_int );
+        libvlc_InternalDestroy( p_instance->p_libvlc_int, VLC_FALSE );
+        free( p_instance );
+    }
 }
 
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance )

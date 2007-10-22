@@ -88,7 +88,7 @@ mediacontrol_exit( mediacontrol_Instance *self )
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
 
-    libvlc_destroy( self->p_instance, &ex );
+    libvlc_release( self->p_instance, &ex );
 }
 
 libvlc_instance_t*

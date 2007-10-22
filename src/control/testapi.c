@@ -74,7 +74,10 @@ int main (int argc, char *argv[])
     libvlc_playlist_clear (vlc, &ex);
     catch ();
 
-    libvlc_destroy (vlc, &ex);
+    libvlc_retain (vlc);
+    libvlc_release (vlc, &ex);
+    catch ();
+    libvlc_release (vlc, &ex);
     catch ();
     return 0;
 }
