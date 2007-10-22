@@ -64,6 +64,7 @@ Input/Demuxers:
   * Tivo Series 2 support
   * v4l2 access module support
   * CD+G karaoke Files support
+  * MXF files support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
