@@ -57,6 +57,7 @@ libvlc_tag_query_new( libvlc_instance_t * p_inst,
     p_q->tag = NULL;
     p_q->psz_tag_key = NULL;
 
+    libvlc_retain( p_inst );
     return p_q;
 }
 
@@ -75,6 +76,7 @@ void libvlc_tag_query_release( libvlc_tag_query_t * p_q )
     free( p_q->tag );
     free( p_q->psz_tag_key );
  
+    libvlc_release( p_q->p_libvlc_instance );
     free( p_q );
 }
 
