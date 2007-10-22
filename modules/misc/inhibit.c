@@ -221,17 +221,13 @@ static int UnInhibit( intf_thread_t *p_intf )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    vlc_object_lock( p_intf );
     for(;;)
     {
         input_thread_t *p_input;
-        vlc_bool_t b_quit;
 
         /* Check playing state every 30 seconds */
-        vlc_object_lock( p_intf );
-        b_quit = vlc_object_timedwait( p_intf, mdate() + 30000000 ) < 0;
-        vlc_object_unlock( p_intf );
-
-        if( b_quit )
+        if( vlc_object_timedwait( p_intf, mdate() + 30000000 ) < 0 )
             break;
 
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
@@ -242,7 +238,7 @@ static void Run( intf_thread_t *p_intf )
                 if( !Inhibit( p_intf ) )
                 {
                     vlc_object_release( p_input );
-                    return;
+                    goto end;
                 }
             }
             else if( p_intf->p_sys->i_cookie )
@@ -250,7 +246,7 @@ static void Run( intf_thread_t *p_intf )
                 if( !UnInhibit( p_intf ) )
                 {
                     vlc_object_release( p_input );
-                    return;
+                    goto end;
                 }
             }
             vlc_object_release( p_input );
@@ -258,7 +254,10 @@ static void Run( intf_thread_t *p_intf )
         else if( p_intf->p_sys->i_cookie )
         {
             if( !UnInhibit( p_intf ) )
-                return;
+                goto end;
         }
     }
+
+end:
+    vlc_object_unlock( p_intf );
 }

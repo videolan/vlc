@@ -142,7 +142,6 @@ static void Run( intf_thread_t *p_intf )
     for(;;)
     {
         vlc_object_t *p_vout;
-        vlc_bool_t b_quit;
 
         /* Check screensaver every 30 seconds */
         if( vlc_object_timedwait( p_intf, mdate() + 30000000 ) < 0 )
