@@ -249,7 +249,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         SetErrorMode(oldMode);
     }
 
-    int index = ui.deviceCombo->findText( qfu( psz_discpath ) )
+    int index = ui.deviceCombo->findText( qfu( psz_discpath ) );
     if( index != -1 ) ui.deviceCombo->setCurrentIndex( index );
 
 #endif /* Disc Probing under Windows */
