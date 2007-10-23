@@ -68,7 +68,7 @@ static int StatusChangeEmit( vlc_object_t *, const char *, vlc_value_t,
                         vlc_value_t, void * );
 
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
-static int MarshalStatus ( intf_thread_t *, DBusMessageIter * );
+static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, vlc_bool_t );
 
 struct intf_sys_t
 {
@@ -113,19 +113,17 @@ DBUS_METHOD( PositionGet )
     dbus_int32_t i_pos;
 
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
-
+    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
 
     if( !p_input )
         i_pos = 0;
     else
     {
-        vlc_object_yield( p_input );
         var_Get( p_input, "time", &position );
-        vlc_object_release( p_input );
         i_pos = position.i_time / 1000;
     }
-
+    PL_UNLOCK;
     pl_Release( ((vlc_object_t*) p_this) );
     ADD_INT32( &i_pos );
     REPLY_SEND;
@@ -154,17 +152,15 @@ DBUS_METHOD( PositionSet )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
     p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
-
+    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
 
     if( p_input )
     {
         position.i_time = i_pos * 1000;
-        vlc_object_yield( p_input );
         var_Set( p_input, "time", position );
-        vlc_object_release( p_input );
     }
-
+    PL_UNLOCK;
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
 }
@@ -248,7 +244,7 @@ DBUS_METHOD( GetStatus )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    MarshalStatus( p_this, &args );
+    MarshalStatus( p_this, &args, VLC_TRUE );
 
     REPLY_SEND;
 }
@@ -290,10 +286,15 @@ DBUS_METHOD( Identity )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
-    char *psz_identity = malloc( strlen( PACKAGE ) + strlen( VERSION ) + 2 );
-    sprintf( psz_identity, "%s %s", PACKAGE, VERSION );
-    ADD_STRING( &psz_identity );
-    free( psz_identity );
+    char *psz_identity;
+    if( asprintf( &psz_identity, "%s %s", PACKAGE, VERSION ) != -1 )
+    {
+        ADD_STRING( &psz_identity );
+        free( psz_identity );
+    }
+    else
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
     REPLY_SEND;
 }
 
@@ -355,6 +356,7 @@ DBUS_METHOD( GetMetadata )
     dbus_int32_t i_position;
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    PL_LOCK;
 
     dbus_message_get_args( p_from, &error,
            DBUS_TYPE_INT32, &i_position,
@@ -362,6 +364,8 @@ DBUS_METHOD( GetMetadata )
 
     if( dbus_error_is_set( &error ) )
     {
+        PL_UNLOCK;
+        pl_Release( p_playlist );
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
                 error.message );
         dbus_error_free( &error );
@@ -373,6 +377,7 @@ DBUS_METHOD( GetMetadata )
         GetInputMeta( p_playlist->items.p_elems[i_position*2-1]->p_input, &args );
     }
 
+    PL_UNLOCK;
     pl_Release( p_playlist );
     REPLY_SEND;
 }
@@ -751,7 +756,9 @@ DBUS_SIGNAL( StatusChangeSignal )
     SIGNAL_INIT( "StatusChange" );
     OUT_ARGUMENTS;
 
-    MarshalStatus( (intf_thread_t*) p_data, &args );
+    /* we're called from a callback of input_thread_t, so it can not be
+     * destroyed before we return */
+    MarshalStatus( (intf_thread_t*) p_data, &args, VLC_FALSE );
 
     SIGNAL_SEND;
 }
@@ -765,7 +772,7 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
 
-    if( p_this->b_dead )
+    if( p_intf->b_dead )
         return VLC_SUCCESS;
 
     if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
@@ -793,10 +800,12 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
 static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    if( p_this->b_dead )
+    intf_thread_t *p_intf = p_data;
+
+    if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    StatusChangeSignal( ((intf_thread_t*)p_data)->p_sys->p_conn, p_data );
+    StatusChangeSignal( p_intf->p_sys->p_conn, p_data );
     return VLC_SUCCESS;
 }
 
@@ -814,13 +823,13 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
     VLC_UNUSED( oldval ); VLC_UNUSED( newval );
 
-    if( p_this->b_dead )
+    if( p_intf->b_dead )
         return VLC_SUCCESS;
 
     p_sys->b_meta_read = VLC_FALSE;
 
     p_playlist = pl_Yield( p_intf );
-
+    PL_LOCK;
     p_input = p_playlist->p_input;
 
     if( !p_input )
@@ -831,7 +840,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     vlc_object_yield( p_input );
-
+    PL_UNLOCK;
     pl_Release( p_playlist );
 
     p_item = input_GetItem( p_input );
@@ -883,8 +892,8 @@ static int GetInputMeta( input_item_t* p_input,
                         DBusMessageIter *args )
 {
     DBusMessageIter dict, dict_entry, variant;
-    /* We need the track length to be expressed in seconds
-     * instead of milliseconds */
+    /* We need the track length to be expressed in milli-seconds
+     * instead of µ-seconds */
     dbus_int64_t i_length = ( input_item_GetDuration( p_input ) / 1000 );
 
     const char* ppsz_meta_items[] =
@@ -935,7 +944,8 @@ static int GetInputMeta( input_item_t* p_input,
  * MarshalStatus: Fill a DBusMessage with the current player status
  *****************************************************************************/
 
-static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
+static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args,
+                          vlc_bool_t lock )
 { /* This is NOT the right way to do that, it would be better to sore
      the status information in p_sys and update it on change, thus
      avoiding a long lock */
@@ -947,13 +957,14 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
     input_thread_t* p_input = NULL;
 
     p_playlist = pl_Yield( (vlc_object_t*) p_intf );
-    p_input = p_playlist->p_input;
+    if( lock )
+        PL_LOCK;
 
     i_state = 2;
+
+    p_input = p_playlist->p_input;
     if( p_input )
     {
-        vlc_object_yield( p_input );
-
         var_Get( p_input, "state", &val );
         if( val.i_int >= END_S )
             i_state = 2;
@@ -961,8 +972,6 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
             i_state = 1;
         else if( val.i_int <= PLAYING_S )
             i_state = 0;
-
-        vlc_object_release( p_input );
     }
 
     var_Get( p_playlist, "random", &val );
@@ -974,6 +983,8 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
     var_Get( p_playlist, "loop", &val );
     i_loop = val.i_int;
 
+    if( lock )
+        PL_UNLOCK;
     pl_Release( p_playlist );
 
     dbus_message_iter_open_container( args, DBUS_TYPE_STRUCT, NULL, &status );
@@ -984,5 +995,4 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
     dbus_message_iter_close_container( args, &status );
 
     return VLC_SUCCESS;
-
 }
