@@ -116,7 +116,7 @@
                   "will be turned to black and white, except the parts that "\
                   "are of the color that you select in the settings.")
 
-#define I_LONGHELP N_("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />" \
+#define I_LONGHELP N_("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><body>" \
     "<h2>Welcome to VLC media player Help</h2>" \
         "<h3>Documentation</h3>" \
             "<p>You can find VLC documentation on VideoLAN's <a href=\"http://wiki.videolan.org\">wiki</a> website.</p>" \
