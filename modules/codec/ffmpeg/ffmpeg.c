@@ -577,6 +577,10 @@ static struct
     /* ATI VCR2 */
     { VLC_FOURCC('V','C','R','2'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "ATI VCR2 Video" },
+    { VLC_FOURCC('M','M','E','S'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "Matrox MPEG-2" },
+    { VLC_FOURCC('m','m','e','s'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "Matrox MPEG-2" },
 
     /* MPEG-4 Video */
     { VLC_FOURCC('D','I','V','X'), CODEC_ID_MPEG4,
