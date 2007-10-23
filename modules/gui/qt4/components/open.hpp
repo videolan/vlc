@@ -134,6 +134,7 @@ public:
     DiscOpenPanel( QWidget *, intf_thread_t * );
     virtual ~DiscOpenPanel();
     virtual void clear() ;
+    virtual void accept() ;
 private:
     Ui::OpenDisk ui;
 public slots:

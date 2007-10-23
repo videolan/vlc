@@ -4,6 +4,7 @@
  * Copyright (C) 2006-2007 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
+ *
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -69,6 +70,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     {
         psz_filepath = p_intf->p_libvlc->psz_homedir;
     }
+
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( psz_filepath ), fileTypes );
@@ -178,6 +180,15 @@ void FileOpenPanel::updateMRL()
         mrl.append( " :freetype-rel-fontsize=" + QString().setNum( size ) );
     }
 
+    emit mrlUpdated( mrl );
+    emit methodChanged( "file-caching" );
+}
+
+
+/* Function called by Open Dialog when clicke on Play/Enqueue */
+void FileOpenPanel::accept()
+{
+    //FIXME set the completer
     const char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
     if( ( NULL == psz_filepath )
       || strcmp( psz_filepath, qtu( dialogBox->directory().absolutePath() )) )
@@ -188,15 +199,6 @@ void FileOpenPanel::updateMRL()
     }
     delete psz_filepath;
 
-    emit mrlUpdated( mrl );
-    emit methodChanged( "file-caching" );
-}
-
-
-/* Function called by Open Dialog when clicke on Play/Enqueue */
-void FileOpenPanel::accept()
-{
-    //FIXME set the completer
 }
 
 void FileOpenBox::accept()
@@ -227,6 +229,8 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
 
+    char *psz_discpath = config_GetPsz( p_intf, "qt-discdialog-path" );
+
 #if WIN32 /* Disc drives probing for Windows */
     char szDrives[512];
     szDrives[0] = '\0';
@@ -244,7 +248,15 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         }
         SetErrorMode(oldMode);
     }
+
+    int index = ui.deviceCombo->findText( qfu( psz_discpath ) )
+    if( index != -1 ) ui.deviceCombo->setCurrentIndex( index );
+
 #endif /* Disc Probing under Windows */
+
+    ui.deviceCombo->setEditText( qfu( psz_discpath ) );
+
+    delete psz_discpath;
 
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton, updateButtons() );
@@ -357,6 +369,13 @@ void DiscOpenPanel::browseDevice()
         ui.deviceCombo->setEditText( dir );
     }
     updateMRL();
+}
+
+void DiscOpenPanel::accept()
+{
+    /* set dialog box current directory as last known path */
+    config_PutPsz( p_intf, "qt-discdialog-path",
+                       qtu( ui.deviceCombo->currentText() ) );
 }
 
 /**************************************************************************

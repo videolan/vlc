@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +70,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define TITLE_LONGTEXT N_("Show the name of the song or video in the " \
                           "controler window title")
 
-#define FILEDIALOG_PATH_TEXT N_("Path to use in file dialog")
+#define FILEDIALOG_PATH_TEXT N_("Path to use in openfile dialog")
+
+#define DISCDIALOG_PATH_TEXT N_("Path to device to use in open disc dialog")
 
 #define NOTIFICATION_TEXT N_("Show notification popup on track change")
 #define NOTIFICATION_LONGTEXT N_( \
@@ -124,6 +127,10 @@ vlc_module_begin();
                 FILEDIALOG_PATH_TEXT, VLC_TRUE);
             change_autosave();
             change_internal();
+        add_string( "qt-discdialog-path", NULL, NULL, DISCDIALOG_PATH_TEXT,
+                DISCDIALOG_PATH_TEXT, VLC_TRUE);
+            change_autosave();
+            change_internal();
 
         add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
                   NOTIFICATION_LONGTEXT, VLC_FALSE );
@@ -144,7 +151,6 @@ vlc_module_begin();
                 SHOWFLAGS_LONGTEXT, VLC_TRUE );
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
-
 
 /*****************************************************************************
  * Module callbacks
