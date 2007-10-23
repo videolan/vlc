@@ -199,7 +199,7 @@ VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 #define EXTENSIONS_MEDIA EXTENSIONS_VIDEO ";" EXTENSIONS_AUDIO ";" \
                           EXTENSIONS_PLAYLIST
 
-#define EXTENSIONS_SUBTITLE "*.idx;*.srt;*.sub;*.utf"
+#define EXTENSIONS_SUBTITLE "*.cdg;*.idx;*.srt;*.sub;*.utf"
 
 /** \defgroup vlc_interaction Interaction
  * \ingroup vlc_interface
