@@ -360,6 +360,7 @@ private:
 
 class StringListConfigControl : public VStringConfigControl
 {
+    Q_OBJECT;
 public:
     StringListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                              bool, QGridLayout*, int& );
@@ -373,6 +374,9 @@ private:
     void finish( bool );
     QLabel *label;
     QComboBox *combo;
+private slots:
+    void actionRequested( int );
+
 };
 #if 0
 struct ModuleCheckBox {

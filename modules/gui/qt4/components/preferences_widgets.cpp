@@ -44,7 +44,7 @@
 #include <QFontDialog>
 #include <QGroupBox>
 #include <QTreeWidgetItem>
-
+#include <QSignalMapper>
 QString formatTooltip(const QString & tooltip)
 {
     QString formatted =
@@ -363,6 +363,42 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     {
         l->addWidget( label, line, 0 );
         l->addWidget( combo, line, 1, Qt::AlignRight );
+    }
+
+    if( p_item->i_action )
+    {
+        QSignalMapper *signalMapper = new QSignalMapper(this);
+
+        /* Some stringLists like Capture listings have action associated */
+        for( int i = 0; i < p_item->i_action; i++ )
+        {
+            QPushButton *button =
+                new QPushButton( qfu( p_item->ppsz_action_text[i] ));
+            CONNECT( button, clicked(), signalMapper, map() );
+            signalMapper->setMapping( button, i );
+            l->addWidget( button, line, 2 + i, Qt::AlignRight );
+        }
+        CONNECT( signalMapper, mapped( int ),
+                this, actionRequested( int ) );
+    }
+}
+
+void StringListConfigControl::actionRequested( int i_action )
+{
+    /* Supplementary check for boundaries */
+    if( i_action < 0 || i_action >= p_item->i_action ) return;
+
+    vlc_value_t val;
+    val.psz_string = qtu( (combo->itemData( combo->currentIndex() ).toString() ) );
+
+    p_item->ppf_action[i_action]( p_this, getName(), val, val, 0 );
+
+    if( p_item->b_dirty )
+    {
+        combo->clear();
+        finish( true );
+        p_item->b_dirty = VLC_FALSE;
+
     }
 }
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
