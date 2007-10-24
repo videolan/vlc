@@ -212,7 +212,7 @@ class TimeLabel : public QLabel
     Q_OBJECT
     void mousePressEvent( QMouseEvent *event )
     {
-        if( event->button() == Qt::LeftButton ) emit timeLabelClicked();
+        emit timeLabelClicked();
     }
     void mouseDoubleClickEvent( QMouseEvent *event )
     {

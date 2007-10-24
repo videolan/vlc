@@ -146,7 +146,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     nameLabel = new QLabel;
     speedLabel = new QLabel( "1.00x" );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
-    timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
 
     /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
@@ -163,9 +162,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
     CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
-    CONNECT( timeLabel, customContextMenuRequested( QPoint ),
-             this, toggleTimeDisplay() );
     CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+    CONNECT( timeLabel, timeLabelDoubleClicked(), this, toggleTimeDisplay() );
 
     /* Speed Label behaviour:
        - right click gives the vertical speed slider */
