@@ -40,7 +40,6 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowTitle( qtr( "Go to time" ) );
-    resize( 260, 160 );
 
     QGridLayout *mainLayout = new QGridLayout( this );
 
@@ -55,8 +54,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QGroupBox *timeGroupBox = new QGroupBox;
     QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
 
-    QLabel *timeIntro = new
-        QLabel( "Go to time:" );
+    QLabel *timeIntro = new QLabel( qtr( "Go to time:" ) );
     timeIntro->setWordWrap( true );
     timeIntro->setAlignment( Qt::AlignCenter );
 
