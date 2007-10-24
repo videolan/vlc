@@ -144,6 +144,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_remainingTime = false;
     timeLabel = new TimeLabel;
     nameLabel = new QLabel;
+    nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
+                                      | Qt::TextSelectableByKeyboard );
     speedLabel = new QLabel( "1.00x" );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
 
