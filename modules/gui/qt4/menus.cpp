@@ -257,9 +257,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     {
         /* Minimal View */
         QAction *action=menu->addAction( qtr( "Minimal View..." ), mi,
-                SLOT( toggleMenus() ), qtr( "Ctrl+H" ) );
+                SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
+        //FIXME: remove useless thing. But keep it until the release, pls.
         action->setCheckable( true );
-        if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE ) 
+        if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
 
         /* Advanced Controls */

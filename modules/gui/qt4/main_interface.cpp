@@ -194,7 +194,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
             createSystray();
 
     if( config_GetInt( p_intf, "qt-minimal-view" ) )
-        toggleMenus();
+        toggleMinimalView();
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
@@ -621,8 +621,9 @@ void MainInterface::visual()
 }
 #endif
 
-void MainInterface::toggleMenus()
+void MainInterface::toggleMinimalView()
 {
+    TOGGLEV( menuBar() );
     TOGGLEV( controls );
     TOGGLEV( statusBar() );
     updateGeometry();
@@ -916,6 +917,13 @@ void MainInterface::customEvent( QEvent *event )
 
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
+    if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() & Qt::Key_H )
+          && menuBar()->isHidden() )
+    {
+        toggleMinimalView();
+        e->accept();
+    }
+
     int i_vlck = qtEventToVLCKey( e );
     if( i_vlck >= 0 )
     {
