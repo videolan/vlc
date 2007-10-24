@@ -720,6 +720,21 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
         var: "intf-add" selector: @selector(toggleVar:)];
 
+    /* check whether the user runs a valid version of OSX; alert is auto-released */
+    if( MACOS_VERSION < 10.5f )
+    {
+        NSAlert *ourAlert;
+        int i_returnValue;
+        ourAlert = [NSAlert alertWithMessageText: _NS("Your version of Mac OS X is not supported")
+                        defaultButton: _NS("Quit")
+                      alternateButton: NULL
+                          otherButton: NULL
+            informativeTextWithFormat: _NS("VLC media player requires Mac OS X 10.4 or higher.")];
+        [ourAlert setAlertStyle: NSCriticalAlertStyle];
+        i_returnValue = [ourAlert runModal];
+        [NSApp terminate: self];
+    }
+
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }
 
