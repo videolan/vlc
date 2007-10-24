@@ -675,7 +675,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     if( mi->isVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/vlc16.png" ),
-                qtr( "Hide VLC media player" ), mi,
+                qtr( "Hide VLC media player in taskbar" ), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
     else
