@@ -8,7 +8,7 @@
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *          Benjamin Pracht <bigben at videolan dot org>
- *          Felix KŸhne <fkuehne at videolan dot org>
+ *          Felix KÃ¼hne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

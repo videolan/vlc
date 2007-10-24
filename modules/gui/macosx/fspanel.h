@@ -4,8 +4,8 @@
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
- * Authors: Jérôme Decoodt <djc at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ * Authors: J√©r√¥me Decoodt <djc at videolan dot org>
+ *          Felix K√ºhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

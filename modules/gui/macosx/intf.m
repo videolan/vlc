@@ -7,7 +7,7 @@
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan.org>
- *          Felix Paul KŸhne <fkuehne at videolan dot org>
+ *          Felix Paul KÃ¼hne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,13 +1,13 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Felix KŸhne <fkuehne at videolan dot org>
+ *          Felix KÃ¼hne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
