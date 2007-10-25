@@ -413,10 +413,13 @@ VLC_PUBLIC_API vlc_int64_t libvlc_media_instance_get_time       ( libvlc_media_i
 VLC_PUBLIC_API void        libvlc_media_instance_set_time       ( libvlc_media_instance_t *, vlc_int64_t, libvlc_exception_t *);
 VLC_PUBLIC_API float       libvlc_media_instance_get_position   ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API void        libvlc_media_instance_set_position   ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API void        libvlc_media_instance_set_chapter    ( libvlc_media_instance_t *, int, libvlc_exception_t *);
+VLC_PUBLIC_API int         libvlc_media_instance_get_chapter    (libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int         libvlc_media_instance_get_chapter_count( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API vlc_bool_t  libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API float       libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API void        libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state      ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state   ( libvlc_media_instance_t *, libvlc_exception_t *);
 
 /**
  * Does this input have a video output ?
@@ -927,6 +930,14 @@ VLC_PUBLIC_API int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exceptio
  * \param p_exception an initialized exception
  */
 VLC_PUBLIC_API void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_exception_t *);
+
+/**
+ * Get number of available audio tracks
+ * \param p_mi media instance
+ * \param p_e an initialized exception
+ * \return the number of available audio tracks (int)
+ */
+VLC_PUBLIC_API int libvlc_audio_get_track_count( libvlc_media_instance_t *,  libvlc_exception_t * );
 
 /**
 +  * Get current audio track
