@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "VLCLibrary.h"
+#import "VLCLibVLCBridging.h"
 
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
@@ -59,16 +60,11 @@ static void * DestroySharedLibraryAtExit( void )
     {
         /* Initialize a shared instance */
         sharedLibrary = [[self alloc] init];
-
+        
         /* Make sure, this will get released at some point */
         atexit( (void*)DestroySharedLibraryAtExit );
     }
     return [[sharedLibrary retain] autorelease];
-}
-
-+ (void *)sharedInstance
-{
-    return [[self sharedLibrary] instance];
 }
 
 - (id)init 
@@ -78,25 +74,16 @@ static void * DestroySharedLibraryAtExit( void )
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         
-        // Figure out the frameworks path
-        char *applicationPath = strdup( [[NSString stringWithFormat:@"%@/Versions/Current/VLC", 
-            [[NSBundle bundleForClass:[VLCLibrary class]] bundlePath]] UTF8String] );
-        // TODO: Raise error if there is no memory available
-        
-        char *lib_vlc_params[] = { 
-            applicationPath, "-I", "dummy", "-vvvv", 
-            "--opengl-provider", "minimal_macosx", 
+        const char *lib_vlc_params[] = { 
+            "-I", "dummy", "-vvvv", "--opengl-provider", "minimal_macosx", 
             "--no-video-title-show", NULL
         };
         
-        instance = (void *)libvlc_new( 7, lib_vlc_params, &ex );
+        instance = (void *)libvlc_new( 6, lib_vlc_params, &ex );
         quit_on_exception( &ex );
         
         // Assignment unneeded, as the audio unit will do it for us
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
-        
-        // free allocated resources
-        free( applicationPath );
     }
     return self;
 }
@@ -115,14 +102,21 @@ static void * DestroySharedLibraryAtExit( void )
     [super dealloc];
 }
 
-- (void *)instance
-{
-    return instance;
-}
-
 - (VLCAudio *)audio
 {
     return audio;
+}
+@end
+
+@implementation VLCLibrary (VLCLibVLCBridging)
++ (void *)sharedInstance
+{
+    return [[self sharedLibrary] instance];
+}
+
+- (void *)instance
+{
+    return instance;
 }
 @end
 

@@ -3,7 +3,7 @@
 *****************************************************************************
 * Copyright (C) 2007 Pierre d'Herbemont
 * Copyright (C) 2007 the VideoLAN team
-* $Id: VLCEventManager.h 21564 2007-08-29 21:09:27Z pdherbemont $
+* $Id$
 *
 * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
 *
@@ -21,6 +21,8 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
+
+#include "VLCLibrary.h"
 
 // TODO: Documentation
 @interface VLCMediaList (LibVLCBridging)
@@ -61,7 +63,19 @@
 @end
 
 // TODO: Documentation
+@interface VLCLibrary (VLCLibVLCBridging)
++ (void *)sharedInstance;
+- (void *)instance;
+@end
+
+// TODO: Documentation
 @interface VLCLibrary (VLCAudioBridging)
 - (void)setAudio:(VLCAudio *)value;
 @end
+
+// TODO: Documentation
+@interface VLCAudio (VLCAudioBridging)
+- (id)initWithLibrary:(VLCLibrary *)library;
+@end
+
 

@@ -30,7 +30,7 @@
 @class VLCAudio;
 
 /*
- * VLCLibrary object.  Internal use only.
+ * VLCLibrary object.
  */
 // TODO: Documentation
 @interface VLCLibrary : NSObject 
@@ -41,10 +41,8 @@
 
 /* Factories */
 + (VLCLibrary *)sharedLibrary;
-+ (void *)sharedInstance;
 
 /* Properties */
-- (void *)instance;
 - (VLCAudio *)audio;
 @end
 
