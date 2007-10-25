@@ -296,6 +296,29 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
         return [VLCTime timeWithNumber:[NSNumber numberWithLongLong:time]];
 }
 
+- (void)setChapter:(int)value;
+{
+    libvlc_media_instance_set_chapter( instance, value, NULL );
+}
+
+- (int)chapter
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_media_instance_get_chapter( instance, &ex );
+    quit_on_exception( &ex );
+    return result;
+}
+
+- (int)countOfChapters
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_media_instance_get_chapter_count( instance, &ex );
+    quit_on_exception( &ex );
+    return result;
+}
+
 - (void)setAudioTrack:(int)value
 {
     libvlc_audio_set_track( instance, value, NULL );
@@ -306,6 +329,15 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_audio_get_track( instance, &ex );
+    quit_on_exception( &ex );
+    return result;
+}
+
+- (int)countOfAudioTracks
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_audio_get_track_count( instance, &ex );
     quit_on_exception( &ex );
     return result;
 }

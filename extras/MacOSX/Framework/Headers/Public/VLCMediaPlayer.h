@@ -110,9 +110,14 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 - (VLCTime *)time;
 
+- (void)setChapter:(int)value;
+- (int)chapter;
+- (int)countOfChapters;
+
 /* Audio Options */
 - (void)setAudioTrack:(int)value;
 - (int)audioTrack;
+- (int)countOfAudioTracks;
 
 - (void)setAudioChannel:(int)value;
 - (int)audioChannel;
