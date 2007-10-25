@@ -595,6 +595,57 @@ float libvlc_media_instance_get_position(
     return val.f_float;
 }
 
+void libvlc_media_instance_set_chapter(
+                                 libvlc_media_instance_t *p_mi,
+                                 int chapter,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+    val.i_int = chapter;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    if( !p_input_thread )
+        return;
+
+    var_Set( p_input_thread, "chapter", val );
+    vlc_object_release( p_input_thread );
+}
+
+int libvlc_media_instance_get_chapter(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( !p_input_thread )
+        return -1.0;
+
+    var_Get( p_input_thread, "chapter", &val );
+    vlc_object_release( p_input_thread );
+
+    return val.i_int;
+}
+
+int libvlc_media_instance_get_chapter_count(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( !p_input_thread )
+        return -1.0;
+
+    var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    vlc_object_release( p_input_thread );
+
+    return val.i_int;
+}
+
 float libvlc_media_instance_get_fps(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e)
