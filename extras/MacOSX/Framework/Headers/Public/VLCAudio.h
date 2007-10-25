@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "VLCLibrary.h"
 
 /* Notification Messages */
 /**
@@ -38,9 +37,6 @@ extern NSString *VLCMediaPlayerVolumeChanged;
 {
     VLCLibrary *library;    //< Library to control audio for
 }
-/* Initializers */
-- (id)initWithLibrary:(VLCLibrary *)library;
-
 /* Properties */
 - (void)setMute:(BOOL)value;
 - (BOOL)isMuted;
