@@ -115,6 +115,23 @@ void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
 }
 
 /*****************************************************************************
+ * libvlc_audio_get_track_count : Get the number of available audio tracks
+ *****************************************************************************/
+int libvlc_audio_get_track_count( libvlc_media_instance_t *p_mi, 
+                                  libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    vlc_value_t val_list;
+
+    if( !p_input_thread )
+        return -1;
+
+    var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    vlc_object_release( p_input_thread );
+    return val_list.p_list->i_count;
+}
+
+/*****************************************************************************
  * libvlc_audio_get_track : Get the current audio track
  *****************************************************************************/
 int libvlc_audio_get_track( libvlc_media_instance_t *p_mi,
@@ -151,6 +168,7 @@ int libvlc_audio_get_track( libvlc_media_instance_t *p_mi,
     vlc_object_release( p_input_thread );
     return i_track;
 }
+
 
 /*****************************************************************************
  * libvlc_audio_set_track : Set the current audio track
