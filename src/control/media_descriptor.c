@@ -262,6 +262,8 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
         libvlc_MediaDescriptorSubItemAdded, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
+        libvlc_MediaDescriptorFreed, p_e );
+    libvlc_event_manager_register_event_type( p_md->p_event_manager,
         libvlc_MediaDescriptorDurationChanged, p_e );
 
     vlc_gc_incref( p_md->p_input_item );
@@ -315,6 +317,14 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 
     uninstall_input_item_observer( p_md );
     vlc_gc_decref( p_md->p_input_item );
+
+    /* Construct the event */
+    libvlc_event_t event;
+    event.type = libvlc_MediaDescriptorFreed;
+    event.u.media_descriptor_freed.md = p_md;
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
 
     char ** all_keys = vlc_dictionary_all_keys( &p_md->tags );
     for( i = 0; all_keys[i]; i++ )

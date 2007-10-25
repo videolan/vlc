@@ -298,6 +298,7 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaDescriptorSubItemAdded,
     libvlc_MediaDescriptorDurationChanged,
     libvlc_MediaDescriptorPreparsedChanged,
+    libvlc_MediaDescriptorFreed,
 
     libvlc_MediaInstancePlayed,
     libvlc_MediaInstancePaused,
@@ -343,6 +344,10 @@ typedef struct libvlc_event_t
         {
             int new_status;
         } media_descriptor_preparsed_changed;
+        struct
+        {
+            libvlc_media_descriptor_t * md;
+        } media_descriptor_freed;
             
         /* media instance */
         struct
