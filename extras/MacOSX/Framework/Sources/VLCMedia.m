@@ -201,8 +201,8 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
             libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager(p_md, NULL);
 //            libvlc_event_detach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, NULL);
 //            libvlc_event_detach(p_em, libvlc_MediaDescriptorSubItemDeleted,  HandleMediaSubItemAdded,    self, NULL);
-//            libvlc_event_detach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, NULL);
-//            libvlc_event_detach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, NULL);
         }
         [super release];
     }
@@ -428,8 +428,8 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager( p_md, &ex );
 //    libvlc_event_attach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
 //    libvlc_event_attach(p_em, libvlc_MediaDescriptorSubItemRemoved,  HandleMediaSubItemRemoved,  self, &ex);
-//    libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
-//    libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
     quit_on_exception( &ex );
     
     libvlc_media_list_t *p_mlist = libvlc_media_descriptor_subitems( p_md, NULL );
