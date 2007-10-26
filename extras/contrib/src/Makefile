@@ -129,7 +129,7 @@ endif
 
 ifdef HAVE_UCLIBC
 ifdef HAVE_BIGENDIAN
-FFMPEGCONF+= --arch=armeb
+FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-small --enable-iwmmxt
 else
 FFMPEGCONF+= --arch=armv4l
 endif
