@@ -529,6 +529,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_packet_size = i_packet_size;
 
@@ -708,6 +710,13 @@ static int Open( vlc_object_t *p_this )
 
             /* Dummy PMT */
             prg = malloc( sizeof( ts_prg_psi_t ) );
+            if( !prg )
+            {
+                msg_Err( p_demux, "out of memory" );
+                Close( VLC_OBJECT(p_demux) );
+                return VLC_ENOMEM;
+            }
+
             memset( prg, 0, sizeof( ts_prg_psi_t ) );
             prg->i_pid_pcr  = -1;
             prg->i_pid_pmt  = -1;
@@ -1419,40 +1428,49 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
 
         if( !b_old_valid )
         {
+            free( pid->psi );
             pid->psi = malloc( sizeof( ts_psi_t ) );
-            pid->psi->handle= NULL;
-            pid->psi->i_prg = 0;
-            pid->psi->prg   = NULL;
+            if( pid->psi )
+            {
+                pid->psi->handle= NULL;
+                pid->psi->i_prg = 0;
+                pid->psi->prg   = NULL;
+            }
         }
         pid->psi->i_pat_version  = -1;
         pid->psi->i_sdt_version  = -1;
         if( p_owner )
         {
             ts_prg_psi_t *prg = malloc( sizeof( ts_prg_psi_t ) );
-            /* PMT */
-            prg->i_version  = -1;
-            prg->i_number   = -1;
-            prg->i_pid_pcr  = -1;
-            prg->i_pid_pmt  = -1;
-            prg->iod        = NULL;
-            prg->handle     = NULL;
+            if( prg )
+            {
+                /* PMT */
+                prg->i_version  = -1;
+                prg->i_number   = -1;
+                prg->i_pid_pcr  = -1;
+                prg->i_pid_pmt  = -1;
+                prg->iod        = NULL;
+                prg->handle     = NULL;
 
-            TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
+                TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
+            }
         }
     }
     else
     {
         pid->psi = NULL;
         pid->es  = malloc( sizeof( ts_es_t ) );
-
-        es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
-        pid->es->id      = NULL;
-        pid->es->p_pes   = NULL;
-        pid->es->i_pes_size= 0;
-        pid->es->i_pes_gathered= 0;
-        pid->es->pp_last = &pid->es->p_pes;
-        pid->es->p_mpeg4desc = NULL;
-        pid->es->b_gather = VLC_FALSE;
+        if( pid->es )
+        {
+            es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
+            pid->es->id      = NULL;
+            pid->es->p_pes   = NULL;
+            pid->es->i_pes_size= 0;
+            pid->es->i_pes_gathered= 0;
+            pid->es->pp_last = &pid->es->p_pes;
+            pid->es->p_mpeg4desc = NULL;
+            pid->es->b_gather = VLC_FALSE;
+        }
     }
 }
 
@@ -2055,6 +2073,7 @@ static char* IODGetURL( int *pi_data, uint8_t **pp_data )
 
     i_url_len = IODGetByte( pi_data, pp_data );
     url = malloc( i_url_len + 1 );
+    if( !url ) return NULL;
     for( i = 0; i < i_url_len; i++ )
     {
         url[i] = IODGetByte( pi_data, pp_data );
@@ -2073,6 +2092,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     int         i_iod_length;
 
     p_iod = malloc( sizeof( iod_descriptor_t ) );
+    if( !p_iod ) return NULL;
     memset( p_iod, 0, sizeof( iod_descriptor_t ) );
 
 #ifdef TS_DEBUG
@@ -2687,6 +2707,10 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
     i_out = i_in * 6 + 1;
 
     psz_outstring = malloc( i_out );
+    if( !psz_outstring )
+    {
+        return NULL;
+    }
 
     iconv_handle = vlc_iconv_open( "UTF-8", psz_encoding );
     if( iconv_handle == (vlc_iconv_t)(-1) )
@@ -3129,9 +3153,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     if( pid->es->fmt.i_extra > 0 )
                     {
                         pid->es->fmt.p_extra = malloc( pid->es->fmt.i_extra );
-                        memcpy( pid->es->fmt.p_extra,
-                                dcd->p_decoder_specific_info,
-                                pid->es->fmt.i_extra );
+                        if( pid->es->fmt.p_extra )
+                            memcpy( pid->es->fmt.p_extra,
+                                    dcd->p_decoder_specific_info,
+                                    pid->es->fmt.i_extra );
                     }
                 }
             }
@@ -3223,8 +3248,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_codec = VLC_FOURCC( 't', 'e', 'l', 'x' );
                     pid->es->fmt.i_extra = p_dr->i_length;
                     pid->es->fmt.p_extra = malloc( p_dr->i_length );
-                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
-                            p_dr->i_length );
+                    if( pid->es->fmt.p_extra )
+                        memcpy( pid->es->fmt.p_extra, p_dr->p_data,
+                                p_dr->i_length );
 
 #if defined _DVBPSI_DR_56_H_ && defined DVBPSI_VERSION \
                     && DVBPSI_VERSION_INT > ((0<<16)+(1<<8)+5)
@@ -3257,11 +3283,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                 else
                                 {
                                     p_es = malloc( sizeof( ts_es_t ) );
+                                    if( !p_es ) break;
 
                                     es_format_Copy( &p_es->fmt, &pid->es->fmt );
-                                    free( p_es->fmt.psz_language ); p_es->fmt.psz_language = NULL;
-                                    free( p_es->fmt.psz_description ); p_es->fmt.psz_description = NULL;
-
+                                    free( p_es->fmt.psz_language );
+                                    free( p_es->fmt.psz_description );
+                                    p_es->fmt.psz_language = NULL;                                    p_es->fmt.psz_description = NULL;
                                     p_es->id = NULL;
                                     p_es->p_pes = NULL;
                                     p_es->i_pes_size = 0;
@@ -3274,10 +3301,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                 }
 
                                 p_es->fmt.psz_language = malloc( 4 );
-                                memcpy( p_es->fmt.psz_language,
-                                        p_page->i_iso6392_language_code, 3 );
-                                p_es->fmt.psz_language[3] = 0;
-
+                                if( p_es->fmt.psz_language )
+                                {
+                                    memcpy( p_es->fmt.psz_language,
+                                            p_page->i_iso6392_language_code, 3 );
+                                    p_es->fmt.psz_language[3] = 0;
+                                }
                                 switch( p_page->i_teletext_type )
                                 {
                                 case 0x2:
@@ -3330,8 +3359,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_codec = VLC_FOURCC( 'd', 'v', 'b', 's' );
                     pid->es->fmt.i_extra = p_dr->i_length;
                     pid->es->fmt.p_extra = malloc( p_dr->i_length );
-                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
-                            p_dr->i_length );
+                    if( pid->es->fmt.p_extra )
+                        memcpy( pid->es->fmt.p_extra, p_dr->p_data,
+                                p_dr->i_length );
 
 #ifdef _DVBPSI_DR_59_H_
                     pid->es->fmt.i_group = p_pmt->i_program_number;
@@ -3358,7 +3388,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             else
                             {
                                 p_es = malloc( sizeof( ts_es_t ) );
-
+                                if( !p_es ) break;
                                 es_format_Copy( &p_es->fmt, &pid->es->fmt );
                                 free( p_es->fmt.psz_language ); p_es->fmt.psz_language = NULL;
                                 free( p_es->fmt.psz_description ); p_es->fmt.psz_description = NULL;
@@ -3375,9 +3405,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             }
 
                             p_es->fmt.psz_language = malloc( 4 );
-                            memcpy( p_es->fmt.psz_language,
-                                    p_sub->i_iso6392_language_code, 3 );
-                            p_es->fmt.psz_language[3] = 0;
+                            if( p_es->fmt.psz_language )
+                            {
+                                memcpy( p_es->fmt.psz_language,
+                                        p_sub->i_iso6392_language_code, 3 );
+                                p_es->fmt.psz_language[3] = 0;
+                            }
 
                             switch( p_sub->i_subtitling_type )
                             {
@@ -3501,8 +3534,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 if( pid->es->fmt.i_extra > 0 )
                 {
                     pid->es->fmt.p_extra = malloc( pid->es->fmt.i_extra );
-                    memcpy( pid->es->fmt.p_extra, &p_dr->p_data[10],
-                            pid->es->fmt.i_extra );
+                    if( pid->es->fmt.p_extra )
+                        memcpy( pid->es->fmt.p_extra, &p_dr->p_data[10],
+                                pid->es->fmt.i_extra );
                 }
             }
             else
@@ -3533,10 +3567,13 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 {
 #if defined(DR_0A_API_VER) && (DR_0A_API_VER >= 2)
                     pid->es->fmt.psz_language = malloc( 4 );
-                    memcpy( pid->es->fmt.psz_language,
-                            p_decoded->code[0].iso_639_code, 3 );
-                    pid->es->fmt.psz_language[3] = 0;
-                    msg_Dbg( p_demux, "found language: %s", pid->es->fmt.psz_language);
+                    if( pid->es->fmt.psz_language )
+                    {
+                        memcpy( pid->es->fmt.psz_language,
+                                p_decoded->code[0].iso_639_code, 3 );
+                        pid->es->fmt.psz_language[3] = 0;
+                        msg_Dbg( p_demux, "found language: %s", pid->es->fmt.psz_language);
+                    }
                     switch( p_decoded->code[0].i_audio_type ) {
                     case 0:
                         pid->es->fmt.psz_description = NULL;
@@ -3564,43 +3601,53 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         pid->es->fmt.p_extra_languages =
                             malloc( sizeof(*pid->es->fmt.p_extra_languages) *
                                     pid->es->fmt.i_extra_languages );
-                    for( i = 0; i < pid->es->fmt.i_extra_languages; i++ ) {
-                        msg_Dbg( p_demux, "bang" );
-                        pid->es->fmt.p_extra_languages[i].psz_language =
-                            malloc(4);
-                        memcpy(pid->es->fmt.p_extra_languages[i].psz_language,
-                               p_decoded->code[i+1].iso_639_code, 3 );
-                        pid->es->fmt.p_extra_languages[i].psz_language[3] = '\0';
-                        switch( p_decoded->code[i].i_audio_type ) {
-                        case 0:
-                            pid->es->fmt.p_extra_languages[i].psz_description =
-                                NULL;
-                            break;
-                        case 1:
-                            pid->es->fmt.p_extra_languages[i].psz_description =
-                                strdup(_("clean effects"));
-                            break;
-                        case 2:
-                            pid->es->fmt.p_extra_languages[i].psz_description =
-                                strdup(_("hearing impaired"));
-                            break;
-                        case 3:
-                            pid->es->fmt.p_extra_languages[i].psz_description =
-                                strdup(_("visual impaired commentary"));
-                            break;
-                        default:
-                            msg_Dbg( p_demux, "unknown audio type: %d",
-                                     p_decoded->code[i].i_audio_type);
-                            pid->es->fmt.psz_description = NULL;
-                            break;
-                        }
+                    if( pid->es->fmt.p_extra_languages )
+                    {
+                        for( i = 0; i < pid->es->fmt.i_extra_languages; i++ )
+                        {
+                            msg_Dbg( p_demux, "bang" );
+                            pid->es->fmt.p_extra_languages[i].psz_language =
+                                malloc(4);
+                            if( pid->es->fmt.p_extra_languages[i].psz_language )
+                            {
+                                memcpy( pid->es->fmt.p_extra_languages[i].psz_language,
+                                    p_decoded->code[i+1].iso_639_code, 3 );
+                                pid->es->fmt.p_extra_languages[i].psz_language[3] = '\0';
+                            }
+                            switch( p_decoded->code[i].i_audio_type ) {
+                            case 0:
+                                pid->es->fmt.p_extra_languages[i].psz_description =
+                                    NULL;
+                                break;
+                            case 1:
+                                pid->es->fmt.p_extra_languages[i].psz_description =
+                                    strdup(_("clean effects"));
+                                break;
+                            case 2:
+                                pid->es->fmt.p_extra_languages[i].psz_description =
+                                    strdup(_("hearing impaired"));
+                                break;
+                            case 3:
+                                pid->es->fmt.p_extra_languages[i].psz_description =
+                                    strdup(_("visual impaired commentary"));
+                                break;
+                            default:
+                                msg_Dbg( p_demux, "unknown audio type: %d",
+                                        p_decoded->code[i].i_audio_type);
+                                pid->es->fmt.psz_description = NULL;
+                                break;
+                            }
 
+                        }
                     }
 #else
                     pid->es->fmt.psz_language = malloc( 4 );
-                    memcpy( pid->es->fmt.psz_language,
-                            p_decoded->i_iso_639_code, 3 );
-                    pid->es->fmt.psz_language[3] = 0;
+                    if( pid->es->fmt.psz_language )
+                    {
+                        memcpy( pid->es->fmt.psz_language,
+                                p_decoded->i_iso_639_code, 3 );
+                        pid->es->fmt.psz_language[3] = 0;
+                    }
 #endif
                 }
             }
