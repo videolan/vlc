@@ -31,7 +31,7 @@ PERL_VERSION=5.8.8
 PERL_URL=http://ftp.funet.fi/pub/CPAN/src/perl-$(PERL_VERSION).tar.gz
 LIBAMR_NB_VERSION=7.0.0.0
 LIBAMR_NB=$(PENGUIN)/amrnb-$(LIBAMR_NB_VERSION).tar.bz2
-LIBAMR_WB_VERSION=7.0.0.0
+LIBAMR_WB_VERSION=7.0.0.2
 LIBAMR_WB=$(PENGUIN)/amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 # Autoconf > 2.57 doesn't work ok on BeOS. Don't ask why.
 # we have to use a newer though, because bootstrap won't work otherwise
