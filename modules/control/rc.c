@@ -408,6 +408,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "vratio", STRING, VideoConfig )
     ADD( "vcrop", STRING, VideoConfig )
     ADD( "vzoom", STRING, VideoConfig )
+    ADD( "snapshot", VOID, VideoConfig )
 
     /* audio commands */
     ADD( "volume", STRING, Volume )
@@ -883,6 +884,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| vratio [X]  . . . . . . . set/get video aspect ratio"));
     msg_rc(_("| vcrop [X]  . . . . . . . . . . .  set/get video crop"));
     msg_rc(_("| vzoom [X]  . . . . . . . . . . .  set/get video zoom"));
+    msg_rc(_("| snapshot . . . . . . . . . . . . take video snapshot"));
     msg_rc(_("| strack [X] . . . . . . . . . set/get subtitles track"));
     msg_rc(_("| key [hotkey name] . . . . . .  simulate hotkey press"));
     msg_rc(_("| menu . . [on|off|up|down|left|right|select] use menu"));
@@ -1634,7 +1636,6 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = NULL;
     vout_thread_t * p_vout;
     const char * psz_variable;
-    vlc_value_t val_name;
     int i_error;
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
@@ -1654,16 +1655,14 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     {
         psz_variable = "aspect-ratio";
     }
-    else /* if( !strcmp( psz_cmd, "vzoom" ) ) */
+    else if( !strcmp( psz_cmd, "vzoom" ) )
     {
         psz_variable = "zoom";
     }
-
-
-    /* Get the descriptive name of the variable */
-    var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT,
-                 &val_name, NULL );
-    if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
+    else if( !strcmp( psz_cmd, "snapshot" ) )
+    {
+        psz_variable = "video-snapshot";
+    }
 
     if( newval.psz_string && *newval.psz_string )
     {
@@ -1679,9 +1678,14 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
             i_error = var_Set( p_vout, psz_variable, newval );
         }
     }
+    else  if( !strcmp( psz_cmd, "snapshot" ) )
+    {
+        i_error = var_Set( p_vout, psz_variable, newval );
+    }
     else
     {
         /* get */
+        vlc_value_t val_name;
         vlc_value_t val, text;
         int i;
         float f_value = 0.;
@@ -1707,6 +1711,11 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
             vlc_object_release( p_vout );
             return VLC_EGENERIC;
         }
+
+        /* Get the descriptive name of the variable */
+        var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT,
+                    &val_name, NULL );
+        if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
 
         msg_rc( "+----[ %s ]", val_name.psz_string );
         if( !strcmp( psz_variable, "zoom" ) )

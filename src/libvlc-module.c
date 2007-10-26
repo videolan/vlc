@@ -444,6 +444,16 @@ static const char *ppsz_pos_descriptions[] =
 #define SNAP_SEQUENTIAL_LONGTEXT N_( \
     "Use sequential numbers instead of timestamps for snapshot numbering")
 
+#define SNAP_WIDTH_TEXT N_("Video snapshot width")
+#define SNAP_WIDTH_LONGTEXT N_( \
+    "You can enforce the width of the video snapshot. By default " \
+    "it will be 320 pixels." )
+
+#define SNAP_HEIGHT_TEXT N_("Video snapshot height")
+#define SNAP_HEIGHT_LONGTEXT N_( \
+    "You can enforce the height of the video snapshot. By default " \
+    "it will be 200 pixels." )
+
 #define CROP_TEXT N_("Video cropping")
 #define CROP_LONGTEXT N_( \
     "This forces the cropping of the source video. " \
@@ -1475,6 +1485,10 @@ vlc_module_begin();
               SNAP_PREVIEW_LONGTEXT, VLC_FALSE );
     add_bool( "snapshot-sequential", VLC_FALSE, NULL, SNAP_SEQUENTIAL_TEXT,
               SNAP_SEQUENTIAL_LONGTEXT, VLC_FALSE );
+    add_integer( "snapshot-width", 320, NULL, SNAP_WIDTH_TEXT,
+                 SNAP_WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( "snapshot-height", 200, NULL, SNAP_HEIGHT_TEXT,
+                 SNAP_HEIGHT_LONGTEXT, VLC_TRUE );
 
     set_section( N_("Window properties" ), NULL );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );

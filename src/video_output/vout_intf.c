@@ -202,6 +202,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "snapshot-num", VLC_VAR_INTEGER );
     var_SetInteger( p_vout, "snapshot-num", 1 );
+    var_Create( p_vout, "snapshot-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "snapshot-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -516,9 +518,10 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
         /* FIXME: should not be hardcoded. We should be able to
         specify the snapshot size (snapshot-width and snapshot-height). */
-        fmt_out.i_width = 320;
-        fmt_out.i_height = 200;
+        fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
+        fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
         fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
+
         p_block = ( block_t* ) image_Write( p_image, p_pic, &fmt_in, &fmt_out );
         if( !p_block )
         {
@@ -570,7 +573,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         image_HandlerDelete( p_image );
         return VLC_SUCCESS;
     }
-
 
 #if defined(__APPLE__) || defined(SYS_BEOS)
     if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
@@ -658,7 +660,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
      * Did the user specify a directory? If not, path = NULL.
      */
     path = utf8_opendir ( (const char *)val.psz_string  );
-
     if ( path != NULL )
     {
         char *psz_prefix = var_GetNonEmptyString( p_vout, "snapshot-prefix" );
@@ -1193,4 +1194,3 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
         p_vout->i_title_position = newval.i_int;
     return VLC_SUCCESS;
 }
-
