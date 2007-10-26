@@ -1336,16 +1336,16 @@ static int Mux( sout_mux_t *p_mux )
                     p_input = p_mux->pp_inputs[i];
                 p_stream = (ts_stream_t*)p_input->p_sys;
 
-                if( ( p_stream == p_pcr_stream &&
-                      p_stream->i_pes_length < i_shaping_delay ) ||
-                    p_stream->i_pes_dts + p_stream->i_pes_length <
-                    p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
+                if( ( ( p_stream == p_pcr_stream ) &&
+                      ( p_stream->i_pes_length < i_shaping_delay ) ) ||
+                    ( p_stream->i_pes_dts + p_stream->i_pes_length <
+                      p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length ) )
                 {
                     /* Need more data */
                     if( block_FifoCount( p_input->p_fifo ) <= 1 )
                     {
-                        if( p_input->p_fmt->i_cat == AUDIO_ES ||
-                            p_input->p_fmt->i_cat == VIDEO_ES )
+                        if( ( p_input->p_fmt->i_cat == AUDIO_ES ) ||
+                            ( p_input->p_fmt->i_cat == VIDEO_ES ) )
                         {
                             /* We need more data */
                             return VLC_SUCCESS;
@@ -1355,7 +1355,7 @@ static int Mux( sout_mux_t *p_mux )
                             /* spu, only one packet is needed */
                             continue;
                         }
-                        else
+                        else if( p_input->p_fmt->i_cat == SPU_ES )
                         {
                             /* Don't mux the SPU yet if it is too early */
                             block_t *p_spu = block_FifoShow( p_input->p_fifo );
@@ -1363,12 +1363,12 @@ static int Mux( sout_mux_t *p_mux )
                             i_spu_delay =
                                 p_spu->i_dts - p_pcr_stream->i_pes_dts;
 
-                            if( i_spu_delay > i_shaping_delay &&
-                                i_spu_delay < I64C(100000000) )
+                            if( ( i_spu_delay > i_shaping_delay ) &&
+                                ( i_spu_delay < I64C(100000000) ) )
                                 continue;
 
-                            if ( i_spu_delay >= I64C(100000000)
-                                  || i_spu_delay < I64C(10000) )
+                            if ( ( i_spu_delay >= I64C(100000000) ) ||
+                                 ( i_spu_delay < I64C(10000) ) )
                             {
                                 BufferChainClean( p_mux->p_sout,
                                                   &p_stream->chain_pes );
@@ -2211,18 +2211,24 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     block_t   *p_pmt[MAX_PMT];
-    block_t   *p_sdt;
 
-    dvbpsi_sdt_t        sdt;
     dvbpsi_pmt_es_t     *p_es;
-    dvbpsi_psi_section_t *p_section[MAX_PMT], *p_section2;
-    dvbpsi_sdt_service_t *p_service;
-    char            *psz_sdt_desc;
-    int             i_pidinput;
+    dvbpsi_psi_section_t *p_section[MAX_PMT];
 
+    int             i_pidinput;
     int             i_stream;
     int             i;
     int             *p_usepid = NULL;
+
+#ifdef HAVE_DVBPSI_SDT
+    block_t         *p_sdt;
+    dvbpsi_sdt_t    sdt;
+
+    dvbpsi_psi_section_t* p_section2;
+    dvbpsi_sdt_service_t *p_service;
+
+    uint8_t         *psz_sdt_desc;
+#endif
 
     if( p_sys->dvbpmt == NULL )
         p_sys->dvbpmt = malloc( p_sys->i_num_pmt * sizeof(dvbpsi_pmt_t) );
@@ -2253,26 +2259,30 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #define psz_sdtserv p_sys->sdt_descriptors[i].psz_service_name
 
             /* FIXME: Ineffecient malloc's & ugly code......  */
-            if( psz_sdtprov != NULL && psz_sdtserv != NULL )
+            if( ( psz_sdtprov != NULL ) && ( psz_sdtserv != NULL ) )
             {
                 psz_sdt_desc = malloc( 3 + strlen(psz_sdtprov)
                                          + strlen(psz_sdtserv) );
-                psz_sdt_desc[0] = 0x01; /* digital television service */
+                if( psz_sdt_desc )
+                {
+                    psz_sdt_desc[0] = 0x01; /* digital television service */
 
-                /* service provider name length */
-                psz_sdt_desc[1] = (char)strlen(psz_sdtprov);
-                memcpy( &psz_sdt_desc[2], psz_sdtprov, strlen(psz_sdtprov) );
+                    /* service provider name length */
+                    psz_sdt_desc[1] = (char)strlen(psz_sdtprov);
+                    memcpy( &psz_sdt_desc[2], psz_sdtprov, strlen(psz_sdtprov) );
 
-                /* service name length */
-                psz_sdt_desc[ 2 + strlen(psz_sdtprov) ]
-                    = (char)strlen(psz_sdtserv);
-                memcpy( &psz_sdt_desc[3+strlen(psz_sdtprov)], psz_sdtserv,
-                        strlen(psz_sdtserv) );
+                    /* service name length */
+                    psz_sdt_desc[ 2 + strlen(psz_sdtprov) ]
+                        = (char)strlen(psz_sdtserv);
+                    memcpy( &psz_sdt_desc[3+strlen(psz_sdtprov)], psz_sdtserv,
+                            strlen(psz_sdtserv) );
 
-                dvbpsi_SDTServiceAddDescriptor( p_service, 0x48,
-                        3 + strlen(psz_sdtprov) + strlen(psz_sdtserv),
-                        psz_sdt_desc );
-                free( psz_sdt_desc );
+                    dvbpsi_SDTServiceAddDescriptor( p_service, 0x48,
+                            3 + strlen(psz_sdtprov) + strlen(psz_sdtserv),
+                            (uint8_t *)psz_sdt_desc );
+                    free( psz_sdt_desc );
+                    psz_sdt_desc = NULL;
+                }
             }
 #undef psz_sdtprov
 #undef psz_sdtserv
