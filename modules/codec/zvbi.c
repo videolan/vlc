@@ -183,6 +183,7 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
+    p_sys->b_update = VLC_FALSE;
     p_sys->p_vbi_dec = vbi_decoder_new();
     p_sys->p_dvb_demux = vbi_dvb_pes_demux_new( NULL, NULL );
 
@@ -258,6 +259,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( (pp_block == NULL) || (*pp_block == NULL) )
         return NULL;
+
     p_block = *pp_block;
     *pp_block = NULL;
 
@@ -290,8 +292,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         ( p_sys->b_update != VLC_TRUE ) )
         goto error;
 
-    p_sys->i_last_page = p_sys->i_wanted_page;
     p_sys->b_update = VLC_FALSE;
+    p_sys->i_last_page = p_sys->i_wanted_page;
 #if 0
     msg_Dbg( p_dec, "we now have page: %d ready for display",
              p_sys->i_wanted_page );
@@ -334,7 +336,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     /* Normal text subs, easy markup */
     p_spu->i_flags = SUBPICTURE_ALIGN_TOP;
 
-    p_spu->i_start = (mtime_t) p_block->i_pts;
+    p_spu->i_start = (mtime_t) p_block->i_dts;
     p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
@@ -387,7 +389,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic, fmt_in.i_chroma,
                         fmt_in.i_width, fmt_in.i_height, fmt_in.i_aspect );
-
         if( !p_pic->i_planes )
         {
             free( p_pic->p_data_orig );
@@ -492,7 +493,7 @@ static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
 {
     decoder_sys_t   *p_sys = (decoder_sys_t *) p_dec->p_sys;
     uint32_t        *p_begin, *p_end;
-    unsigned        int x = 0, y = 0;
+    unsigned int    x = 0, y = 0;
     vbi_opacity     opacity;
 
     /* Kludge since zvbi doesn't provide an option to specify opacity. */
@@ -507,7 +508,8 @@ static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
     {
         case VLC_FOURCC('R','G','B','A' ):
             p_begin = (uint32_t *)(*p_src)->p->p_pixels;
-            p_end = (uint32_t *)(*p_src)->p->p_pixels+(fmt.i_width * fmt.i_height);
+            p_end = (uint32_t *)(*p_src)->p->p_pixels +
+                    ( fmt.i_width * fmt.i_height );
             break;
         case VLC_FOURCC('Y','U','V','A' ):
             p_begin = (uint32_t *)(*p_src)->p[A_PLANE].p_pixels;
@@ -536,12 +538,12 @@ static int OpaquePage( decoder_t *p_dec, vbi_page p_page,
                 break;
         /* Full text transparency. only foreground color is show */
         case VBI_TRANSPARENT_FULL:
+            *p_begin = 0;
+            break;
         /* Transparency for boxed text */
         case VBI_SEMI_TRANSPARENT:
-            if( (*p_begin & 0xffffff00) == 0xff  )
+            if( (*p_begin & 0xffffff00) == 0xff )
                 *p_begin = 0;
-            break;
-        default:
             break;
         }
         x++;
