@@ -285,12 +285,12 @@ static void Init( intf_thread_t *p_intf )
 
     /* Launch */
     app->exec();
-    delete app;
 
     /* And quit */
     MainInputManager::killInstance();
     DialogsProvider::killInstance();
     delete p_intf->p_sys->p_mi;
+    delete app;
 }
 
 /*****************************************************************************
