@@ -172,6 +172,7 @@ block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
     block_fifo_t *p_fifo;
 
     p_fifo = malloc( sizeof( block_fifo_t ) );
+    if( !p_fifo ) return NULL;
     vlc_mutex_init( p_obj, &p_fifo->lock );
     vlc_cond_init( p_obj, &p_fifo->wait );
     p_fifo->p_first = NULL;
