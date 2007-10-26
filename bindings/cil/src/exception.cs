@@ -31,15 +31,27 @@ namespace VideoLAN.LibVLC
      */
     public class VLCException : Exception
     {
+        /**
+         * Creates a managed VLC exception.
+         */
         public VLCException ()
         {
         }
 
+        /**
+         * Creates a managed VLC exception.
+         * @param message exception error message
+         */
         public VLCException (string message)
             : base (message)
         {
         }
 
+        /**
+         * Creates a managed VLC exception wrapping another exception.
+         * @param message exception error message
+         * @param inner inner wrapped exception
+         */
         public VLCException (string message, Exception inner)
            : base (message, inner)
         {
@@ -72,6 +84,10 @@ namespace VideoLAN.LibVLC
             Init (this);
         }
 
+        /**
+         * Throws a managed exception if LibVLC has returned a native
+         * unmanaged exception. Clears the native exception.
+         */
         public void Raise ()
         {
             try
@@ -86,6 +102,7 @@ namespace VideoLAN.LibVLC
             }
         }
 
+        /** IDisposable implementation. */
         public void Dispose ()
         {
             Clear (this);

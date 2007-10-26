@@ -1,5 +1,6 @@
-/*
- * libvlc.cs - libvlc-control CIL bindings
+/**
+ * @file libvlc.cs
+ * @brief libvlc-control CIL bindings
  *
  * $Id$
  */
@@ -27,8 +28,25 @@ using System.Runtime.InteropServices;
 
 namespace VideoLAN.LibVLC
 {
+    /**
+     * The VLC class is used to create LibVLC Instance objects.
+     * The VLC class has only one static method and cannot be instanciated.
+     *
+     * @code
+     * string[] argv = new string[]{ "-vvv", "-I", "dummy" };
+     *
+     * Instance vlc = VLC.CreateInstance (argv);
+     * @endcode
+     */
     public sealed class VLC
     {
+        /**
+         * Loads native LibVLC and creates a LibVLC instance.
+         *
+         * @param args VLC command line parameters for the LibVLC Instance.
+         *
+         * @return a new LibVLC Instance
+         */
         public static Instance CreateInstance (string[] args)
         {
             U8String[] argv = new U8String[args.Length];
@@ -44,7 +62,9 @@ namespace VideoLAN.LibVLC
         }
     };
 
-    /** Safe handle for unmanaged LibVLC instance pointer */
+    /**
+     * Safe handle for unmanaged LibVLC instance pointer.
+     */
     public sealed class InstanceHandle : NonNullHandle
     {
         private InstanceHandle ()
@@ -52,12 +72,15 @@ namespace VideoLAN.LibVLC
         }
 
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_new")]
-        public static extern
+        internal static extern
         InstanceHandle Create (int argc, U8String[] argv, NativeException ex);
 
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_release")]
         static extern void Destroy (IntPtr ptr, NativeException ex);
 
+        /**
+         * System.Runtime.InteropServices.SafeHandle::ReleaseHandle.
+         */
         protected override bool ReleaseHandle ()
         {
             Destroy (handle, null);
@@ -66,7 +89,8 @@ namespace VideoLAN.LibVLC
     };
 
     /**
-     * Managed class for LibVLC instance (including playlist)
+     * LibVLC Instance provides basic media player features from VLC,
+     * such as play/pause/stop and flat playlist management.
      */
     public class Instance : BaseObject<InstanceHandle>
     {
@@ -77,6 +101,11 @@ namespace VideoLAN.LibVLC
             items = new Dictionary<int, PlaylistItem> ();
         }
 
+        /**
+         * Creates a MediaDescriptor.
+         * @param mrl Media Resource Locator (file path or URL)
+         * @return create MediaDescriptor object.
+         */
         public MediaDescriptor CreateDescriptor (string mrl)
         {
             U8String umrl = new U8String (mrl);
@@ -89,7 +118,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_loop")]
         static extern void PlaylistLoop (InstanceHandle self, bool b,
                                          NativeException ex);
-        /** Sets the playlist loop flag */
+        /** Sets the playlist loop flag. */
         public bool Loop
         {
             set
@@ -102,7 +131,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_play")]
         static extern void PlaylistPlay (InstanceHandle self, int id, int optc,
                                          U8String[] optv, NativeException ex);
-        /** Plays the next playlist item */
+        /** Plays the next playlist item (if not already playing). */
         public void Play ()
         {
             PlaylistPlay (self, -1, 0, new U8String[0], ex);
@@ -112,7 +141,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_pause")]
         static extern void PlaylistPause (InstanceHandle self,
                                           NativeException ex);
-        /** Toggles pause */
+        /** Toggles pause (starts playing if stopped, pauses if playing). */
         public void TogglePause ()
         {
             PlaylistPause (self, ex);
@@ -123,7 +152,7 @@ namespace VideoLAN.LibVLC
                     EntryPoint="libvlc_playlist_isplaying")]
         static extern int PlaylistIsPlaying (InstanceHandle self,
                                              NativeException ex);
-        /** Whether the playlist is running, or in pause/stop */
+        /** Whether the playlist is running, or paused/stopped. */
         public bool IsPlaying
         {
             get
@@ -137,7 +166,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_stop")]
         static extern void PlaylistStop (InstanceHandle self,
                                          NativeException ex);
-        /** Stops playing */
+        /** Stops playing. */
         public void Stop ()
         {
             PlaylistStop (self, ex);
@@ -147,7 +176,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_next")]
         static extern void PlaylistNext (InstanceHandle self,
                                          NativeException ex);
-        /** Goes to next playlist item (and start playing it) */
+        /** Switches to next playlist item, and starts playing it. */
         public void Next ()
         {
             PlaylistNext (self, ex);
@@ -157,7 +186,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_prev")]
         static extern void PlaylistPrev (InstanceHandle self,
                                          NativeException ex);
-        /** Goes to previous playlist item (and start playing it) */
+        /** Switches to previous playlist item, and starts playing it. */
         public void Prev ()
         {
             PlaylistPrev (self, ex);
@@ -167,7 +196,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc-control.dll", EntryPoint="libvlc_playlist_clear")]
         static extern void PlaylistClear (InstanceHandle self,
                                           NativeException ex);
-        /** Clears the whole playlist */
+        /** Clears the whole playlist. */
         public void Clear ()
         {
             PlaylistClear (self, ex);
@@ -183,7 +212,13 @@ namespace VideoLAN.LibVLC
         static extern int PlaylistAdd (InstanceHandle self, U8String uri,
                                        U8String name, int optc,
                                        U8String[] optv, NativeException e);
-        /** Appends an item to the playlist with options */
+        /**
+         * Appends an item to the playlist, with options.
+         * @param mrl Media Resource Locator (file name or URL)
+         * @param name playlist item user-visible name
+         * @param opts item options (see LibVLC documentation for details)
+         * @return created playlist item.
+         */
         public PlaylistItem Add (string mrl, string name, string[] opts)
         {
             U8String umrl = new U8String (mrl);
@@ -199,14 +234,31 @@ namespace VideoLAN.LibVLC
             items.Add (id, item);
             return item;
         }
+        /**
+         * Appends an item with options.
+         * @param mrl Media Resource Locator (file name or URL)
+         * @param opts item options (see LibVLC documentation for details)
+         * @return created playlist item.
+         */
         public PlaylistItem Add (string mrl, string[] opts)
         {
             return Add (mrl, null, opts);
         }
+        /**
+         * Appends an item to the playlist.
+         * @param mrl Media Resource Locator (file name or URL)
+         * @param name playlist item user-visible name
+         * @return created playlist item.
+         */
         public PlaylistItem Add (string mrl, string name)
         {
             return Add (mrl, name, new string[0]);
         }
+        /**
+         * Appends an item to the playlist.
+         * @param mrl Media Resource Locator (file name or URL)
+         * @return created playlist item.
+         */
         public PlaylistItem Add (string mrl)
         {
             return Add (mrl, null, new string[0]);
@@ -216,6 +268,10 @@ namespace VideoLAN.LibVLC
                     EntryPoint="libvlc_playlist_delete_item")]
         static extern int PlaylistDelete (InstanceHandle self, int id,
                                           NativeException e);
+        /**
+         * Removes an item from the playlist.
+         * @param item playlist item (as obtained from Add())
+         */
         public void Delete (PlaylistItem item)
         {
             int id = item.Id;
@@ -227,6 +283,9 @@ namespace VideoLAN.LibVLC
         }
     };
 
+    /**
+     * A playlist item.
+     */
     public class PlaylistItem
     {
         int id;
@@ -278,6 +337,9 @@ namespace VideoLAN.LibVLC
         }
     };
 
+    /**
+     * Media descriptor. Not implemented yet.
+     */
     public class MediaDescriptor : BaseObject<DescriptorHandle>
     {
         internal MediaDescriptor (DescriptorHandle self) : base (self)

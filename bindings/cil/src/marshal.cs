@@ -1,5 +1,6 @@
-/*
- * libvlc.cs - libvlc-control CIL bindings
+/**
+ * @file marshal.cs
+ * @brief LibVLC marshalling utilities
  *
  * $Id$
  */
@@ -28,7 +29,8 @@ namespace VideoLAN.LibVLC
 {
     /**
      * Abstract safe handle class for non-NULL pointers
-     * (Microsoft.* namespace has a similar class, but lets stick to System.*)
+     * (Microsoft.* namespace has a similar class,
+     *  but lets stick to System.*).
      */
     public abstract class NonNullHandle : SafeHandle
     {
@@ -46,6 +48,9 @@ namespace VideoLAN.LibVLC
         }
     };
 
+    /**
+     * Generic class for managed wrapper around a native safe handle.
+     */
     public class BaseObject<HandleT> : IDisposable where HandleT : SafeHandle
     {
         protected NativeException ex;
