@@ -212,6 +212,7 @@ case $HOST in
     armeb-linux-uclibc)
             echo "HAVE_UCLIBC = 1" >> config.mak
             echo "HAVE_BIGENDIAN = 1" >> config.mak
+            EXTRA_CFLAGS="-Os -march=armv5 -msoft-float"
             if test ! -z "${DISTRO}";  then
                 cat src/Distributions/${DISTRO}.mak >> distro.mak
             else
