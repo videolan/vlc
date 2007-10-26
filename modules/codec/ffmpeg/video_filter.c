@@ -43,7 +43,6 @@
 void E_(InitLibavcodec) ( vlc_object_t *p_object );
 static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
-#endif
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor
@@ -62,12 +61,9 @@ struct filter_sys_t
 
     AVPicture tmp_pic;
 
-#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
     ImgReSampleContext *p_rsc;
-#endif
 };
 
-#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
 /*****************************************************************************
  * OpenFilterEx: common code to OpenFilter and OpenCropPadd
  *****************************************************************************/
