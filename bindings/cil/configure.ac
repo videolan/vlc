@@ -21,11 +21,16 @@ dnl ***********************************************************************
 
 AC_COPYRIGHT([Copyright (C) 2004-2007 Remi Denis-Courmont])
 AC_INIT(libvlc-cil, 0.9.0, vlc-devel_no_bulk_mail@videolan.org)
-AC_PREREQ(2.59c)
+AC_PREREQ(2.50)
 
 AC_CONFIG_SRCDIR(configure.ac)
 AC_CONFIG_AUX_DIR(admin)
 AC_CONFIG_MACRO_DIR(m4)
+
+AC_ARG_VAR([CSC], [C sharp compiler command])
+AC_ARG_VAR([CSFLAGS], [C sharp compiler flags])
+AC_PATH_PROG([CSC], [gmcs csc], [false])
+
 
 AM_INIT_AUTOMAKE
 
