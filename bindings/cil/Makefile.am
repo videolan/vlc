@@ -11,3 +11,8 @@ AUTOMAKE_OPTIONS = \
 
 SUBDIRS = src tests
 DIST_SUBDIRS = $(SUBDIRS) m4
+
+doc: Doxyfile
+	$(DOXYGEN)
+
+.PHONY: doc

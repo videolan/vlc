@@ -31,8 +31,10 @@ AC_ARG_VAR([CSC], [C sharp compiler command])
 AC_ARG_VAR([CSFLAGS], [C sharp compiler flags])
 AC_PATH_PROG([CSC], [gmcs csc], [false])
 
+AC_ARG_VAR([DOXYGEN], [Doxygen command])
+AC_PATH_PROG([DOXYGEN], [doxygen], [false])
 
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_FILES([Makefile m4/Makefile src/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile m4/Makefile src/Makefile tests/Makefile Doxyfile])
 AC_OUTPUT
