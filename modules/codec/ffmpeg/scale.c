@@ -83,7 +83,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     vlc_value_t val;
 
-    unsigned int i_fmt_in, i_fmt_out;
+    int i_fmt_in, i_fmt_out;
     unsigned int i_cpu;
     int i_sws_mode;
 
@@ -93,14 +93,12 @@ int E_(OpenScaler)( vlc_object_t *p_this )
 
     /* Supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24,
      * BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09 */
-    if( !(i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma)) )
-    {
-        return VLC_EGENERIC;
-    }
-
+    i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma);
     /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
      * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
-    if( !(i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma)) )
+    i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma);
+
+    if( ( i_fmt_in < 0 ) || ( i_fmt_out < 0 ) )
     {
         return VLC_EGENERIC;
     }
@@ -211,15 +209,16 @@ static int CheckInit( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ||
-        p_filter->fmt_in.video.i_height != p_sys->fmt_in.video.i_height ||
-        p_filter->fmt_out.video.i_width != p_sys->fmt_out.video.i_width ||
-        p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height )
+    if( ( p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ) ||
+        ( p_filter->fmt_in.video.i_height != p_sys->fmt_in.video.i_height ) ||
+        ( p_filter->fmt_out.video.i_width != p_sys->fmt_out.video.i_width ) ||
+        ( p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height ) )
     {
-        unsigned int i_fmt_in, i_fmt_out;
+        int i_fmt_in, i_fmt_out;
 
-        if( !(i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma)) ||
-            !(i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma)) )
+        i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma);
+        i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma);
+        if( (i_fmt_in < 0 ) || ( i_fmt_out < 0 ) )
         {
             msg_Err( p_filter, "format not supported" );
             return VLC_EGENERIC;
@@ -322,4 +321,3 @@ void E_(CloseScaler)( vlc_object_t *p_this )
 }
 
 #endif /* LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) */
-
