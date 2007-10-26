@@ -1289,7 +1289,6 @@ void update_download_for_real( download_thread_t *p_this )
     }
     else
     {
-
         p_file = utf8_fopen( psz_dest, "w" );
         if( !p_file )
         {
@@ -1305,27 +1304,30 @@ void update_download_for_real( download_thread_t *p_this )
 
             l_size = stream_Size(p_stream);
             p_buffer = (void *)malloc( 1<<10 );
-
-            while( ( l_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
+            if( p_buffer )
             {
-                float f_progress;
+                while( ( l_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
+                {
+                    float f_progress;
 
-                fwrite( p_buffer, l_read, 1, p_file );
+                    fwrite( p_buffer, l_read, 1, p_file );
 
-                l_done += l_read;
-                free( psz_status );
-                f_progress = 100.0*(float)l_done/(float)l_size;
-                psz_s1 = size_str( l_done );
-                psz_s2 = size_str( l_size );
-                asprintf( &psz_status, "%s\nDownloading... %s/%s (%.1f%%) done",
-                           p_this->psz_status, psz_s1, psz_s2, f_progress );
-                free( psz_s1 ); free( psz_s2 );
+                    l_done += l_read;
+                    free( psz_status );
+                    f_progress = 100.0*(float)l_done/(float)l_size;
+                    psz_s1 = size_str( l_done );
+                    psz_s2 = size_str( l_size );
+                    asprintf( &psz_status, "%s\nDownloading... %s/%s (%.1f%%) done",
+                            p_this->psz_status, psz_s1, psz_s2, f_progress );
+                    free( psz_s1 );
+                    free( psz_s2 );
 
-                intf_ProgressUpdate( p_libvlc, i_progress,
-                                     psz_status, f_progress, 0 );
+                    intf_ProgressUpdate( p_libvlc, i_progress,
+                                        psz_status, f_progress, 0 );
+                }
+
+                free( p_buffer );
             }
-
-            free( p_buffer );
             fclose( p_file );
             stream_Delete( p_stream );
 
