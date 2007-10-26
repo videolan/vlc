@@ -30,10 +30,12 @@ namespace VideoLAN.LibVLC.Test
     {
         public static int Main (string[] args)
         {
-            string[] argv = new string[3]{ "-vvv", "-I", "dummy" };
+            string[] argv = new string[]{
+                "-vvv", "-I", "dummy", "--plugin-path=../../modules"
+            };
 
             Instance vlc = VLC.CreateInstance (argv);
-            MediaDescriptor md = vlc.CreateDescriptor (args[0]);
+            MediaDescriptor md = vlc.CreateDescriptor ("/dev/null");
             md.Dispose ();
 
             PlaylistItem item = null;
@@ -44,10 +46,13 @@ namespace VideoLAN.LibVLC.Test
             vlc.Loop = false;
             vlc.TogglePause ();
             Console.ReadLine ();
+            vlc.Stop ();
 
             if (item != null)
                 vlc.Delete (item);
             vlc.Clear ();
+
+            Console.ReadLine ();
             vlc.Dispose ();
             return 0;
         }
