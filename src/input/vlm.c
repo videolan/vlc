@@ -1849,6 +1849,7 @@ static char *Save( vlm_t *vlm )
     /* now we have the length of save */
 
     p = save = malloc( i_length );
+    if( !save ) return NULL;
     *save = '\0';
 
     p += sprintf( p, "%s", psz_header );
@@ -2341,6 +2342,7 @@ static int vlm_ControlMediaChange( vlm_t *p_vlm, vlm_media_t *p_cfg )
 
     return vlm_OnMediaUpdate( p_vlm, p_media );
 }
+
 static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id )
 {
     vlm_media_sys_t *p_media;
@@ -2368,11 +2370,17 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         p_vlm->p_vod->p_data = p_vlm;
         p_vlm->p_vod->pf_media_control = vlm_MediaVodControl;
     }
-    if( p_cfg->b_vod )
-        p_vlm->i_vod++;
 
     p_media = malloc( sizeof( vlm_media_sys_t ) );
+    if( !p_media )
+    {
+        msg_Err( p_vlm, "out of memory" );
+        return VLC_ENOMEM;
+    }
     memset( p_media, 0, sizeof(vlm_media_sys_t) );
+
+    if( p_cfg->b_vod )
+        p_vlm->i_vod++;
 
     vlm_media_Copy( &p_media->cfg, p_cfg );
     p_media->cfg.id = p_vlm->i_id++;
