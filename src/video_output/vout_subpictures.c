@@ -145,10 +145,13 @@ int spu_ParseChain( spu_t *p_spu )
         if( p_spu->pp_filter[p_spu->i_filter]->p_module )
         {
             filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
-            p_spu->pp_filter[p_spu->i_filter]->p_owner = p_sys;
-            spu_Control( p_spu, SPU_CHANNEL_REGISTER, &p_sys->i_channel );
-            p_sys->p_spu = p_spu;
-            p_spu->i_filter++;
+            if( p_sys )
+            {
+                p_spu->pp_filter[p_spu->i_filter]->p_owner = p_sys;
+                spu_Control( p_spu, SPU_CHANNEL_REGISTER, &p_sys->i_channel );
+                p_sys->p_spu = p_spu;
+                p_spu->i_filter++;
+            }
         }
         else
         {
@@ -325,6 +328,7 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
 {
     subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
     (void)p_this;
+    if( !p_region ) return NULL;
     memset( p_region, 0, sizeof(subpicture_region_t) );
     p_region->p_next = 0;
     p_region->p_cache = 0;
@@ -1298,6 +1302,7 @@ static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
     subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
     (void)p_filter;
+    if( !p_subpic ) return NULL;
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->b_absolute = VLC_TRUE;
 
@@ -1323,7 +1328,7 @@ static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 static picture_t *spu_new_video_buffer( filter_t *p_filter )
 {
     picture_t *p_picture = malloc( sizeof(picture_t) );
-
+    if( !p_picture ) return NULL;
     if( vout_AllocatePicture( p_filter, p_picture,
                               p_filter->fmt_out.video.i_chroma,
                               p_filter->fmt_out.video.i_width,
