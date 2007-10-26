@@ -1224,8 +1224,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
-        [o_timefield setStringValue: @"0:00:00"];
-        [[[self getControls] getFSPanel] setStreamPos: 0 andTime: @"0:00:00"];
+        [o_timefield setStringValue: @"00:00"];
+        [[[self getControls] getFSPanel] setStreamPos: 0 andTime: @"00:00"];
         [[[self getControls] getFSPanel] setSeekable: b_seekable];
 
         [o_embedded_window setSeekable: b_seekable];
@@ -1293,8 +1293,8 @@ static VLCMain *_o_sharedMainInstance = nil;
             /* Update the slider */
             vlc_value_t time;
             NSString * o_time;
-            mtime_t i_seconds;
             vlc_value_t pos;
+            char psz_time[MSTRTIME_MAX_SIZE];
             float f_updated;
 
             var_Get( p_input, "position", &pos );
@@ -1302,12 +1302,9 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_timeslider setFloatValue: f_updated];
 
             var_Get( p_input, "time", &time );
-            i_seconds = time.i_time / 1000000;
 
-            o_time = [NSString stringWithFormat: @"%d:%02d:%02d",
-                            (int) (i_seconds / (60 * 60)),
-                            (int) (i_seconds / 60 % 60),
-                            (int) (i_seconds % 60)];
+            o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
+
             [o_timefield setStringValue: o_time];
             [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
             [o_embedded_window setTime: o_time position: f_updated];
@@ -1637,8 +1634,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         vlc_value_t time;
         vlc_value_t pos;
-        mtime_t i_seconds;
         NSString * o_time;
+        char psz_time[MSTRTIME_MAX_SIZE];
         vlc_object_yield( p_input );
 
         pos.f_float = f_updated / 10000.;
@@ -1646,12 +1643,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_timeslider setFloatValue: f_updated];
 
         var_Get( p_input, "time", &time );
-        i_seconds = time.i_time / 1000000;
 
-        o_time = [NSString stringWithFormat: @"%d:%02d:%02d",
-                        (int) (i_seconds / (60 * 60)),
-                        (int) (i_seconds / 60 % 60),
-                        (int) (i_seconds % 60)];
+        o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
         [o_timefield setStringValue: o_time];
         [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
         [o_embedded_window setTime: o_time position: f_updated];
