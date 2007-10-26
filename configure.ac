@@ -5389,7 +5389,7 @@ dnl
 dnl Framebuffer (overlay) plugin
 dnl
 AC_ARG_ENABLE(fbosd,
-  [  --enable-fbosd          fbosd interface supprt (default disabled)])
+  [  --enable-fbosd          fbosd interface support (default disabled)])
 if test "${enable_fbosd}" = "yes"
 then
   AC_CHECK_HEADERS(linux/fb.h, [
