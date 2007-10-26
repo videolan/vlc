@@ -5386,6 +5386,18 @@ then
 fi
 
 dnl
+dnl Framebuffer (overlay) plugin
+dnl
+AC_ARG_ENABLE(fbosd,
+  [  --enable-fbosd          fbosd interface supprt (default disabled)])
+if test "${enable_fbosd}" = "yes"
+then
+  AC_CHECK_HEADERS(linux/fb.h, [
+    VLC_ADD_PLUGINS([fbosd])
+ ])
+fi
+
+dnl
 dnl Visualisation plugin
 dnl
 AC_ARG_ENABLE(visual,

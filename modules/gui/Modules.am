@@ -1,1 +1,2 @@
 SOURCES_ncurses = ncurses.c
+SOURCES_fbosd = fbosd.c
