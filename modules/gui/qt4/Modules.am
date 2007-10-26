@@ -89,7 +89,7 @@ dialogs/about.hpp: Modules.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_s
 	cat $(top_srcdir)/COPYING | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
 	echo ";" >> dialogs/about.hpp.tmp
 	echo "static const char psz_thanks[] =" >> dialogs/about.hpp.tmp
-	grep -v '$$Id:'  $(top_srcdir)/THANKS | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
+	grep -v '$$Id:'  $(top_srcdir)/THANKS | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }'|sed s/"<.*.> "// >> dialogs/about.hpp.tmp
 	echo ";" >> dialogs/about.hpp.tmp
 	echo "static const char psz_authors[] =" >> dialogs/about.hpp.tmp
 	grep N: $(top_srcdir)/AUTHORS | cut -d" " -f 2- | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
