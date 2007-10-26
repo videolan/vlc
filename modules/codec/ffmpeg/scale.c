@@ -262,7 +262,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     int i_nb_planes = p_pic->i_planes;
 
     /* Check if format properties changed */
-    if( CheckInit( p_filter ) != VLC_SUCCESS ) return 0;
+    if( CheckInit( p_filter ) != VLC_SUCCESS ) return NULL;
 
     /* Request output picture */
     p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
