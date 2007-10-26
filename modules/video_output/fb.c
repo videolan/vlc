@@ -80,6 +80,11 @@ static void GfxMode        ( int i_tty );
 #define ASPECT_RATIO_LONGTEXT N_( \
     "Aspect ratio of the video image (4:3, 16:9). Default is square pixels." )
 
+#define FB_MODE_TEXT N_("Framebuffer resolution to use.")
+#define FB_MODE_LONGTEXT N_( \
+    "Select the resolution for the framebuffer. Currently it supports " \
+    "the values 0=QCIF 1=CIF 2=NTSC 3=PAL (default 3=PAL)" )
+
 vlc_module_begin();
     set_shortname( "Framebuffer" );
     set_category( CAT_VIDEO );
@@ -91,6 +96,8 @@ vlc_module_begin();
                 VLC_TRUE );
     add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+    add_integer( "fb-mode", 3, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
+                 VLC_TRUE );
     set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );
@@ -145,6 +152,7 @@ static int Create( vlc_object_t *p_this )
     vout_sys_t    *p_sys;
     char          *psz_chroma;
     char          *psz_aspect;
+    int           i_mode;
     struct sigaction    sig_tty;                 /* sigaction for tty change */
     struct vt_mode      vt_mode;                          /* vt current mode */
     struct termios      new_termios;
@@ -222,7 +230,29 @@ static int Create( vlc_object_t *p_this )
         psz_aspect = NULL;
     }
 
-    /* tty handling */
+    i_mode = var_CreateGetInteger( p_vout, "fb-mode" );
+    switch( i_mode )
+    {
+        case 0: /* QCIF */
+            p_sys->i_width  = 176;
+            p_sys->i_height = 144;
+            break;
+        case 1: /* CIF */
+            p_sys->i_width  = 352;
+            p_sys->i_height = 288;
+            break;
+        case 2: /* NTSC */
+            p_sys->i_width  = 640;
+            p_sys->i_height = 480;
+            break;
+        case 3: /* PAL */
+        default:
+            p_sys->i_width  = 704;
+            p_sys->i_height = 576;
+            break;
+     }
+
+     /* tty handling */
     if( p_sys->b_tty )
     {
         GfxMode( p_sys->i_tty );
@@ -548,9 +578,9 @@ static int panned=0;
 
         if( panned < 0 )
         {
-                ioctl( p_vout->p_sys->i_fd,
-                       FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
-                panned++;
+            ioctl( p_vout->p_sys->i_fd,
+                   FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
+            panned++;
         }
     }
 }
@@ -572,6 +602,7 @@ static void SetPalette( vout_thread_t *p_vout, uint16_t *red, uint16_t *green,
  *****************************************************************************/
 static int OpenDisplay( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = (vout_sys_t *) p_vout->p_sys;
     char *psz_device;                             /* framebuffer device path */
     struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
 
@@ -582,8 +613,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    p_vout->p_sys->i_fd = open( psz_device, O_RDWR);
-    if( p_vout->p_sys->i_fd == -1 )
+    p_sys->i_fd = open( psz_device, O_RDWR);
+    if( p_sys->i_fd == -1 )
     {
         msg_Err( p_vout, "cannot open %s (%m)", psz_device );
         free( psz_device );
@@ -593,136 +624,142 @@ static int OpenDisplay( vout_thread_t *p_vout )
     psz_device = NULL;
 
     /* Get framebuffer device information */
-    if( ioctl( p_vout->p_sys->i_fd,
-               FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
+    if( ioctl( p_sys->i_fd, FBIOGET_VSCREENINFO, &p_sys->var_info ) )
     {
         msg_Err( p_vout, "cannot get fb info (%m)" );
-        close( p_vout->p_sys->i_fd );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
-    memcpy( &p_vout->p_sys->old_info, &p_vout->p_sys->var_info,
+    memcpy( &p_sys->old_info, &p_sys->var_info,
             sizeof( struct fb_var_screeninfo ) );
 
-    /* Set some attributes */
-    p_vout->p_sys->var_info.activate = FB_ACTIVATE_NXTOPEN;
-    p_vout->p_sys->var_info.xoffset =  0;
-    p_vout->p_sys->var_info.yoffset =  0;
+    /* Get some info on the framebuffer itself */
+    if( ioctl( p_sys->i_fd, FBIOGET_FSCREENINFO, &fix_info ) == 0 )
+    {
+        p_sys->var_info.xres = p_sys->var_info.xres_virtual = p_sys->i_width;
+        p_sys->var_info.yres = p_sys->var_info.yres_virtual = p_sys->i_height;
+        p_vout->fmt_out.i_width = p_sys->i_width;
+        p_vout->fmt_out.i_height = p_sys->i_height;
+    }
 
-    if( ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info ) )
+    /* Set some attributes */
+    p_sys->var_info.activate = p_sys->b_tty
+                               ? FB_ACTIVATE_NXTOPEN
+                               : FB_ACTIVATE_NOW;
+    p_sys->var_info.xoffset =  0;
+    p_sys->var_info.yoffset =  0;
+
+    if( ioctl( p_sys->i_fd, FBIOPUT_VSCREENINFO, &p_sys->var_info ) )
     {
         msg_Err( p_vout, "cannot set fb info (%m)" );
-        close( p_vout->p_sys->i_fd );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
     /* Get some information again, in the definitive configuration */
-    if( ioctl( p_vout->p_sys->i_fd, FBIOGET_FSCREENINFO, &fix_info )
-         || ioctl( p_vout->p_sys->i_fd,
-                   FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
+    if( ioctl( p_sys->i_fd, FBIOGET_FSCREENINFO, &fix_info )
+         || ioctl( p_sys->i_fd, FBIOGET_VSCREENINFO, &p_sys->var_info ) )
     {
         msg_Err( p_vout, "cannot get additional fb info (%m)" );
 
         /* Restore fb config */
-        ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
+        ioctl( p_sys->i_fd, FBIOPUT_VSCREENINFO, &p_sys->old_info );
 
-        close( p_vout->p_sys->i_fd );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
     /* FIXME: if the image is full-size, it gets cropped on the left
      * because of the xres / xres_virtual slight difference */
     msg_Dbg( p_vout, "%ix%i (virtual %ix%i)",
-             p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres,
-             p_vout->p_sys->var_info.xres_virtual,
-             p_vout->p_sys->var_info.yres_virtual );
+             p_sys->var_info.xres, p_sys->var_info.yres,
+             p_sys->var_info.xres_virtual,
+             p_sys->var_info.yres_virtual );
 
-    p_vout->p_sys->i_height = p_vout->p_sys->var_info.yres;
-    p_vout->p_sys->i_width  = p_vout->p_sys->var_info.xres_virtual
-                               ? p_vout->p_sys->var_info.xres_virtual
-                               : p_vout->p_sys->var_info.xres;
+    /* If the fb has limitations on mode change,
+     * then keep the resolution of the fb */
+    p_sys->i_height = p_sys->var_info.yres;
+    p_sys->i_width  = p_sys->var_info.xres_virtual
+                               ? p_sys->var_info.xres_virtual
+                               : p_sys->var_info.xres;
 
-    p_vout->p_sys->p_palette = NULL;
-    p_vout->p_sys->b_pan = ( fix_info.ypanstep || fix_info.ywrapstep );
+    p_sys->p_palette = NULL;
+    p_sys->b_pan = ( fix_info.ypanstep || fix_info.ywrapstep );
 
-    switch( p_vout->p_sys->var_info.bits_per_pixel )
+    switch( p_sys->var_info.bits_per_pixel )
     {
     case 8:
-        p_vout->p_sys->p_palette = malloc( 8 * 256 * sizeof( uint16_t ) );
-        if( !p_vout->p_sys->p_palette )
+        p_sys->p_palette = malloc( 8 * 256 * sizeof( uint16_t ) );
+        if( !p_sys->p_palette )
         {
             msg_Err( p_vout, "out of memory" );
 
             /* Restore fb config */
-            ioctl( p_vout->p_sys->i_fd,
-                   FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
+            ioctl( p_sys->i_fd, FBIOPUT_VSCREENINFO, &p_sys->old_info );
 
-            close( p_vout->p_sys->i_fd );
+            close( p_sys->i_fd );
             return VLC_ENOMEM;
         }
-        p_vout->p_sys->fb_cmap.start = 0;
-        p_vout->p_sys->fb_cmap.len = 256;
-        p_vout->p_sys->fb_cmap.red = p_vout->p_sys->p_palette;
-        p_vout->p_sys->fb_cmap.green = p_vout->p_sys->p_palette + 256 * sizeof( uint16_t );
-        p_vout->p_sys->fb_cmap.blue = p_vout->p_sys->p_palette + 2 * 256 * sizeof( uint16_t );
-        p_vout->p_sys->fb_cmap.transp = p_vout->p_sys->p_palette + 3 * 256 * sizeof( uint16_t );
+        p_sys->fb_cmap.start = 0;
+        p_sys->fb_cmap.len = 256;
+        p_sys->fb_cmap.red = p_sys->p_palette;
+        p_sys->fb_cmap.green = p_sys->p_palette + 256 * sizeof( uint16_t );
+        p_sys->fb_cmap.blue = p_sys->p_palette + 2 * 256 * sizeof( uint16_t );
+        p_sys->fb_cmap.transp = p_sys->p_palette + 3 * 256 * sizeof( uint16_t );
 
         /* Save the colormap */
-        ioctl( p_vout->p_sys->i_fd, FBIOGETCMAP, &p_vout->p_sys->fb_cmap );
+        ioctl( p_sys->i_fd, FBIOGETCMAP, &p_sys->fb_cmap );
 
-        p_vout->p_sys->i_bytes_per_pixel = 1;
+        p_sys->i_bytes_per_pixel = 1;
         break;
 
     case 15:
     case 16:
-        p_vout->p_sys->i_bytes_per_pixel = 2;
+        p_sys->i_bytes_per_pixel = 2;
         break;
 
     case 24:
-        p_vout->p_sys->i_bytes_per_pixel = 3;
+        p_sys->i_bytes_per_pixel = 3;
         break;
 
     case 32:
-        p_vout->p_sys->i_bytes_per_pixel = 4;
+        p_sys->i_bytes_per_pixel = 4;
         break;
 
     default:
         msg_Err( p_vout, "screen depth %d is not supported",
-                         p_vout->p_sys->var_info.bits_per_pixel );
+                         p_sys->var_info.bits_per_pixel );
 
         /* Restore fb config */
-        ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
+        ioctl( p_sys->i_fd, FBIOPUT_VSCREENINFO, &p_sys->old_info );
 
-        close( p_vout->p_sys->i_fd );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
-    p_vout->p_sys->i_page_size = p_vout->p_sys->i_width *
-                p_vout->p_sys->i_height * p_vout->p_sys->i_bytes_per_pixel;
+    p_sys->i_page_size = p_sys->i_width * p_sys->i_height *
+                         p_sys->i_bytes_per_pixel;
 
     /* Map a framebuffer at the beginning */
-    p_vout->p_sys->p_video = mmap( 0, p_vout->p_sys->i_page_size,
-                                   PROT_READ | PROT_WRITE, MAP_SHARED,
-                                   p_vout->p_sys->i_fd, 0 );
+    p_sys->p_video = mmap( 0, p_sys->i_page_size,
+                              PROT_READ | PROT_WRITE, MAP_SHARED,
+                              p_sys->i_fd, 0 );
 
-    if( p_vout->p_sys->p_video == ((void*)-1) )
+    if( p_sys->p_video == ((void*)-1) )
     {
         msg_Err( p_vout, "cannot map video memory (%m)" );
 
-        if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
+        if( p_sys->var_info.bits_per_pixel == 8 )
         {
-            free( p_vout->p_sys->p_palette );
-            p_vout->p_sys->p_palette = NULL;
+            free( p_sys->p_palette );
+            p_sys->p_palette = NULL;
         }
 
         /* Restore fb config */
-        ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
+        ioctl( p_sys->i_fd, FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
 
-        close( p_vout->p_sys->i_fd );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
