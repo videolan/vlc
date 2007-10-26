@@ -472,7 +472,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         b_drawpicture = 0;
         if( p_sys->i_late_frames < 8 )
         {
-            p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
+            p_sys->p_context->skip_frame =
+                    (p_sys->i_skip_frame <= AVDISCARD_BIDIR) ?
+                    AVDISCARD_BIDIR : p_sys->i_skip_frame;
         }
         else
         {
