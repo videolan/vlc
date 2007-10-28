@@ -140,9 +140,9 @@ private:
     bool b_firstdvd, b_firstvcd, b_firstcdda;
 public slots:
     virtual void updateMRL() ;
-    virtual void updateButtons() ;
 private slots:
     void browseDevice();
+    void updateButtons() ;
 };
 
 
