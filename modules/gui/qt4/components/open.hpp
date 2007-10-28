@@ -137,6 +137,8 @@ public:
     virtual void accept() ;
 private:
     Ui::OpenDisk ui;
+    char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;
+    bool b_firstdvd, b_firstvcd, b_firstcdda;
 public slots:
     virtual void updateMRL() ;
     virtual void updateButtons() ;

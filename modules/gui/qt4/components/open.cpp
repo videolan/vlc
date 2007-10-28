@@ -98,7 +98,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     // FIXME
     lineFileEdit = dialogBox->findChildren<QLineEdit*>()[1];
 #endif
-
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
     QList<QLabel *> listLabel = dialogBox->findChildren<QLabel*>();
 
@@ -229,7 +228,15 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
 
-    char *psz_discpath = config_GetPsz( p_intf, "qt-discdialog-path" );
+    /* Get the default configuration path for the devices */
+    psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
+    psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
+    psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
+
+    /* State to avoid overwritting the users changes with the configuration */
+    b_firstdvd = true;
+    b_firstvcd = true;
+    b_firstcdda = true;
 
 #if WIN32 /* Disc drives probing for Windows */
     char szDrives[512];
@@ -248,15 +255,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         }
         SetErrorMode(oldMode);
     }
-
-    int index = ui.deviceCombo->findText( qfu( psz_discpath ) );
-    if( index != -1 ) ui.deviceCombo->setCurrentIndex( index );
-
 #endif /* Disc Probing under Windows */
-
-    ui.deviceCombo->setEditText( qfu( psz_discpath ) );
-
-    delete psz_discpath;
 
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton, updateButtons() );
@@ -270,21 +269,44 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
+    
+    updateButtons();
 }
 
 DiscOpenPanel::~DiscOpenPanel()
-{}
+{
+    delete psz_dvddiscpath;
+    delete psz_vcddiscpath;
+    delete psz_cddadiscpath;
+}
 
 void DiscOpenPanel::clear()
 {
     ui.titleSpin->setValue( 0 );
     ui.chapterSpin->setValue( 0 );
+    b_firstcdda = true;
+    b_firstdvd = true;
+    b_firstvcd = true;
 }
+
+#ifdef WIN32
+    #define setDrive( psz_name ) {\
+    int index = ui.deviceCombo->findText( qfu( psz_name ) ); \
+    if( index != -1 ) ui.deviceCombo->setCurrentIndex( index );}
+#else
+    #define setDrive( psz_name ) {\
+    ui.deviceCombo->setEditText( qfu( psz_name ) ); }
+#endif
 
 void DiscOpenPanel::updateButtons()
 {
     if ( ui.dvdRadioButton->isChecked() )
     {
+        if( b_firstdvd )
+        {
+            setDrive( psz_dvddiscpath );
+            b_firstdvd = false;
+        }
         ui.titleLabel->setText( qtr("Title") );
         ui.chapterLabel->show();
         ui.chapterSpin->show();
@@ -292,13 +314,23 @@ void DiscOpenPanel::updateButtons()
     }
     else if ( ui.vcdRadioButton->isChecked() )
     {
+        if( b_firstvcd )
+        {
+            setDrive( psz_vcddiscpath );
+            b_firstvcd = false;
+        }
         ui.titleLabel->setText( qtr("Entry") );
         ui.chapterLabel->hide();
         ui.chapterSpin->hide();
         ui.diskOptionBox_2->show();
     }
-    else
+    else /* CDDA */
     {
+        if( b_firstcdda )
+        {
+            setDrive( psz_cddadiscpath );
+            b_firstcdda = false;
+        }
         ui.titleLabel->setText( qtr("Track") );
         ui.chapterLabel->hide();
         ui.chapterSpin->hide();
@@ -307,7 +339,6 @@ void DiscOpenPanel::updateButtons()
 
     updateMRL();
 }
-
 
 void DiscOpenPanel::updateMRL()
 {
@@ -372,11 +403,7 @@ void DiscOpenPanel::browseDevice()
 }
 
 void DiscOpenPanel::accept()
-{
-    /* set dialog box current directory as last known path */
-    config_PutPsz( p_intf, "qt-discdialog-path",
-                       qtu( ui.deviceCombo->currentText() ) );
-}
+{}
 
 /**************************************************************************
  * Open Network streams and URL pages                                     *

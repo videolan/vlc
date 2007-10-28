@@ -72,8 +72,6 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define FILEDIALOG_PATH_TEXT N_("Path to use in openfile dialog")
 
-#define DISCDIALOG_PATH_TEXT N_("Path to device to use in open disc dialog")
-
 #define NOTIFICATION_TEXT N_("Show notification popup on track change")
 #define NOTIFICATION_LONGTEXT N_( \
     "Show a notification popup with the artist and track name when " \
@@ -125,10 +123,6 @@ vlc_module_begin();
                   TITLE_LONGTEXT, VLC_FALSE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_TEXT, VLC_TRUE);
-            change_autosave();
-            change_internal();
-        add_string( "qt-discdialog-path", NULL, NULL, DISCDIALOG_PATH_TEXT,
-                DISCDIALOG_PATH_TEXT, VLC_TRUE);
             change_autosave();
             change_internal();
 
