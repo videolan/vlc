@@ -422,9 +422,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     BUTTON_SET_ACT_I( nextButton, "", next.png, qtr( "Next" ), next() );
     BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr( "Stop" ), stop() );
 
-    controlLayout->setColumnStretch( 8 , 10 );
-    controlLayout->setColumnStretch( 9, 0 );
-
+    controlLayout->setColumnStretch( 7 , 2 );
+    
     /*
      * Other first Line buttons
      * Might need to be inside a frame to avoid a few resizing pb
@@ -450,7 +449,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     controlLayout->addWidget( extSettingsButton, 3, 12 );
 
     controlLayout->setColumnStretch( 14, 5 );
-
+    
     /* Volume */
     VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
 
