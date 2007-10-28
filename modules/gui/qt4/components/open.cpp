@@ -184,7 +184,6 @@ void FileOpenPanel::updateMRL()
     emit methodChanged( "file-caching" );
 }
 
-
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
@@ -270,7 +269,8 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
-    
+
+    /* Run once the updateButtons function in order to fill correctly the comboBoxes */    
     updateButtons();
 }
 
