@@ -434,6 +434,27 @@ QString StringListConfigControl::getValue()
     return combo->itemData( combo->currentIndex() ).toString();
 }
 
+
+void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
+                        QComboBox *combo, QWidget *parent )
+{
+    module_config_t *p_config =
+                      config_FindConfig( VLC_OBJECT(p_intf), configname );
+    if( p_config )
+    {
+        for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
+        {
+            combo->addItem( qfu( p_config->ppsz_list_text[i_index] ),
+                    QVariant( p_config->pi_list[i_index] ) );
+            if( p_config->value.i == p_config->pi_list[i_index] )
+            {
+                combo->setCurrentIndex( i_index );
+            }
+        }
+        combo->setToolTip( qfu( p_config->psz_longtext ) );
+    }
+}
+
 /********* Module **********/
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
                module_config_t *_p_item, QWidget *_parent, bool bycat,

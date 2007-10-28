@@ -378,6 +378,11 @@ private slots:
     void actionRequested( int );
 
 };
+
+void setfillVLCConfigCombo(const char *configname, intf_thread_t *p_intf,
+                        QComboBox *combo, QWidget *parent = 0 );
+
+
 #if 0
 struct ModuleCheckBox {
     QCheckBox *checkbox;

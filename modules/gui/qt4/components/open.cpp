@@ -31,7 +31,8 @@
 #include "components/open.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs_provider.hpp"
-#include "util/customwidgets.hpp"
+#include "components/preferences_widgets.hpp"
+
 
 #include <QFileDialog>
 #include <QDialogButtonBox>
