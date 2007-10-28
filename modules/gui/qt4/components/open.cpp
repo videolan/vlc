@@ -255,7 +255,11 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         }
         SetErrorMode(oldMode);
     }
-#endif /* Disc Probing under Windows */
+#else /* Disc Probing under Windows */
+    QCompleter *discCompleter = new QCompleter( this );
+    discCompleter->setModel( new QDirModel( discCompleter ) );
+    ui.deviceCombo->setCompleter( discCompleter );
+#endif
 
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton, updateButtons() );
