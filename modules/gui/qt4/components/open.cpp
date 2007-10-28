@@ -33,7 +33,6 @@
 #include "dialogs_provider.hpp"
 #include "components/preferences_widgets.hpp"
 
-
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QLineEdit>
@@ -96,7 +95,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 #if HAS_QT43
     lineFileEdit = dialogBox->findChildren<QLineEdit*>()[0];
 #else
-    // FIXME
     lineFileEdit = dialogBox->findChildren<QLineEdit*>()[1];
 #endif
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
@@ -135,23 +133,14 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
 
     CONNECT( lineFileEdit, textChanged( QString ), this, updateMRL() );
-
     CONNECT( ui.subInput, textChanged( QString ), this, updateMRL() );
-    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this,
-                                                            updateMRL() );
-    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this,
-                                                            updateMRL() );
+    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
+    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
 }
 
-FileOpenPanel::~FileOpenPanel()
-{}
+FileOpenPanel::~FileOpenPanel(){}
 
-QStringList FileOpenPanel::browse( QString help )
-{
-    return THEDP->showSimpleOpen( help );
-}
-
-
+/* Show a fileBrowser to select a subtitle */
 void FileOpenPanel::browseFileSub()
 {
     // FIXME Handle selection of more than one subtitles file
@@ -163,6 +152,7 @@ void FileOpenPanel::browseFileSub()
     updateMRL();
 }
 
+/* Update the current MRL */
 void FileOpenPanel::updateMRL()
 {
     QString mrl = "";
@@ -187,7 +177,7 @@ void FileOpenPanel::updateMRL()
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
-    //FIXME set the completer
+    //TODO set the completer
     const char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
     if( ( NULL == psz_filepath )
       || strcmp( psz_filepath, qtu( dialogBox->directory().absolutePath() )) )
@@ -197,7 +187,6 @@ void FileOpenPanel::accept()
                        qtu( dialogBox->directory().absolutePath() ) );
     }
     delete psz_filepath;
-
 }
 
 void FileOpenBox::accept()
@@ -255,7 +244,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         }
         SetErrorMode(oldMode);
     }
-#else /* Disc Probing under Windows */
+#else /* Use a Completer under Linux */
     QCompleter *discCompleter = new QCompleter( this );
     discCompleter->setModel( new QDirModel( discCompleter ) );
     ui.deviceCombo->setCompleter( discCompleter );
@@ -303,6 +292,7 @@ void DiscOpenPanel::clear()
     ui.deviceCombo->setEditText( qfu( psz_name ) ); }
 #endif
 
+/* update the buttons according the type of device */
 void DiscOpenPanel::updateButtons()
 {
     if ( ui.dvdRadioButton->isChecked() )
@@ -345,6 +335,7 @@ void DiscOpenPanel::updateButtons()
     updateMRL();
 }
 
+/* Update the current MRL */
 void DiscOpenPanel::updateMRL()
 {
     QString mrl = "";
@@ -422,7 +413,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.protocolCombo, currentIndexChanged( int ),
              this, updateProtocol( int ) );
     CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
-    CONNECT( ui.addressText, textChanged( QString ), this, updateAddress());
+    CONNECT( ui.addressText, textChanged( QString ), this, updateMRL());
     CONNECT( ui.timeShift, clicked(), this, updateMRL());
     CONNECT( ui.ipv6, clicked(), this, updateMRL());
 
@@ -441,6 +432,7 @@ NetOpenPanel::~NetOpenPanel()
 void NetOpenPanel::clear()
 {}
 
+/* update the widgets according the type of protocol */
 void NetOpenPanel::updateProtocol( int idx ) {
     QString addr = ui.addressText->text();
     QString proto = ui.protocolCombo->itemData( idx ).toString();
@@ -456,10 +448,6 @@ void NetOpenPanel::updateProtocol( int idx ) {
         addr.replace( QRegExp("^.*://"), proto + "://");
         ui.addressText->setText( addr );
     }
-    updateMRL();
-}
-
-void NetOpenPanel::updateAddress() {
     updateMRL();
 }
 

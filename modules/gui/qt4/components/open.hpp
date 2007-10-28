@@ -123,8 +123,7 @@ private:
 public slots:
     virtual void updateMRL();
 private slots:
-    void updateProtocol(int);
-    void updateAddress();
+    void updateProtocol( int );
 };
 
 class DiscOpenPanel: public OpenPanel
