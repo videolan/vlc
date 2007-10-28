@@ -76,7 +76,6 @@ void ClickLineEdit::dropEvent( QDropEvent *ev )
     QLineEdit::dropEvent( ev );
 }
 
-
 void ClickLineEdit::focusInEvent( QFocusEvent *ev )
 {
     if ( mDrawClickMsg == true ) {
@@ -85,7 +84,6 @@ void ClickLineEdit::focusInEvent( QFocusEvent *ev )
     }
     QLineEdit::focusInEvent( ev );
 }
-
 
 void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
 {
