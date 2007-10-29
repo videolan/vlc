@@ -268,7 +268,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /* Input and Codecs Panel Implementation */
         START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs settings") );
           /* Disk Devices */
-/*          CONFIG_GENERIC( );*/ //FIXME
+            {
+                ui.DVDDevice->setToolTip( qtr( "If this propriety is blank, then you have\n"
+                                                "values for DVD, VCD, and CDDA.\n You can define"
+                                                " a unique one or set that in the advanced preferences" ) );
+                char *psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
+                char *psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
+                char *psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
+                if( ( *psz_cddadiscpath == *psz_dvddiscpath )
+                   && ( *psz_dvddiscpath == *psz_vcddiscpath ) )
+                {
+                    ui.DVDDevice->setText( qfu( psz_dvddiscpath ) );
+                }
+                delete psz_cddadiscpath; delete psz_dvddiscpath; delete psz_vcddiscpath;
+            }
 
           CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
           CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
@@ -385,6 +398,15 @@ void SPrefsPanel::apply()
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
         c->doApply( p_intf );
+    }
+    /* Devices */
+    //FIXME is it qta or qtu ????
+    char *psz_devicepath = qtu( ui.DVDDevice->Text() );
+    if( !EMPTY_STR( psz_devicepath ) )
+    {
+        config_PutPsz( p_intf, "dvd", psz_devicepath );
+        config_PutPsz( p_intf, "vcd", psz_devicepath );
+        config_PutPsz( p_intf, "cd-audio", psz_devicepath );
     }
 }
 
