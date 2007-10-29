@@ -267,7 +267,7 @@ struct sout_gui_descr_t
     int32_t i_ttl;      /*< Time To Live (TTL) for network traversal */
 
     /* Icecast */
-    char *psz_mountpoint;/*< path to Icecast mountpoint */
+    char *psz_icecast_mountpoint;/*< path to Icecast mountpoint */
     struct streaming_account_t sa_icecast;  /*< Icecast account information */
 };
 
