@@ -62,7 +62,7 @@ private:
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
     PrefsPanel *advanced_panel;
-    SPrefsPanel *simple_panel;
+    SPrefsPanel *current_simple_panel;
     SPrefsPanel *simple_panels[SPrefsMax];
 
     QWidget *tree_panel;

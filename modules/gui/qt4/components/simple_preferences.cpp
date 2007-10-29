@@ -100,10 +100,11 @@ void SPrefsCatList::switchPanel( int i )
  * The Panels
  *********************************************************************/
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
-                          int number ) : QWidget( _parent ), p_intf( _p_intf )
+                          int _number ) : QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_config;
     ConfigControl *control;
+    number = _number;
 
 #define CONFIG_GENERIC( option, type, label, qcontrol )                   \
             p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
@@ -405,6 +406,8 @@ void SPrefsPanel::updateAudioOptions( int number)
 
 void SPrefsPanel::apply()
 {
+    msg_Dbg( p_intf, "Trying to save the %i simple panel", number );
+    
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
     {
@@ -413,20 +416,31 @@ void SPrefsPanel::apply()
     }
 
     /* Devices */
-    //FIXME is it qta or qtu ????
-    char *psz_devicepath = qtu( inputDevice->text() );
-    if( !EMPTY_STR( psz_devicepath ) )
+    if( number == SPrefsInputAndCodecs )
     {
-        config_PutPsz( p_intf, "dvd", psz_devicepath );
-        config_PutPsz( p_intf, "vcd", psz_devicepath );
-        config_PutPsz( p_intf, "cd-audio", psz_devicepath );
+        char *psz_devicepath = qtu( inputDevice->text() );
+        if( !EMPTY_STR( psz_devicepath ) )
+        {
+            config_PutPsz( p_intf, "dvd", psz_devicepath );
+            config_PutPsz( p_intf, "vcd", psz_devicepath );
+            config_PutPsz( p_intf, "cd-audio", psz_devicepath );
+        }
     }
-
+    
     /* Interfaces */
-    if( skinInterfaceButton->isChecked() )
-       config_PutPsz( p_intf, "intf", "skins2" );
-    if( qtInterfaceButton->isChecked() )
-        config_PutPsz( p_intf, "intf", "qt4" );
+    if( number == SPrefsInterface )
+    {
+        if( skinInterfaceButton->isChecked() )
+        {
+            msg_Dbg( p_intf, "hehehe skins" );
+            config_PutPsz( p_intf, "intf", "skins2" );
+        }
+        if( qtInterfaceButton->isChecked() )
+        {
+            msg_Dbg( p_intf, "hhhheeee qt" );
+            config_PutPsz( p_intf, "intf", "qt4" );
+        }
+    }
 }
 
 void SPrefsPanel::clean()

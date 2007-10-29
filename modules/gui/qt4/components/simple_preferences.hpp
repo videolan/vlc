@@ -70,6 +70,8 @@ private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;
 
+    int number;
+
     QWidget *alsa_options;
     QWidget *oss_options;
     QWidget *directx_options;
