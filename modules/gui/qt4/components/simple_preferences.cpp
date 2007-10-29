@@ -381,7 +381,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 void SPrefsPanel::updateAudioOptions( int number)
 {
     QString value = audioOutput->itemData( number ).toString();
-    msg_Dbg( p_intf, "I was here, waiting for funman, %s", qtu( value ) );
 
 #ifndef WIN32
     oss_options->hide();
@@ -408,6 +407,7 @@ void SPrefsPanel::apply()
 {
     msg_Dbg( p_intf, "Trying to save the %i simple panel", number );
     
+    /* Generic save for ever panel */
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
     {

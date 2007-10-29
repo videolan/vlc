@@ -268,15 +268,13 @@ void PrefsDialog::apply()
 {
     if( small->isChecked() && simple_tree )
     {
-        msg_Dbg( p_intf, "I was here, helping you or not...");
         for( int i = 0 ; i< SPrefsMax; i++ ){
-            if( simple_panels[i] ){ simple_panels[i]->apply();
-                msg_Dbg( p_intf, "I was here, helping you or not...2");}
-            }
+            if( simple_panels[i] )simple_panels[i]->apply();
+        }
     }
     else if( all->isChecked() && advanced_tree )
         advanced_tree->applyAll();
-    msg_Dbg( p_intf, "I was here, helping your");
+
     config_SaveConfigFile( p_intf, NULL );
 
     /* Delete the other panel in order to force its reload after clicking
