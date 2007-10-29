@@ -42,6 +42,7 @@ enum {
 class ConfigControl;
 class QComboBox;
 class QLineEdit;
+class QRadioButton;
 
 class SPrefsCatList : public QWidget
 {
@@ -75,6 +76,8 @@ private:
     QWidget *file_options;
     QComboBox *audioOutput;
     QLineEdit *inputDevice;
+    QRadioButton *skinInterfaceButton;
+    QRadioButton *qtInterfaceButton;
 
 /* Display only the options for the selected audio output */
 private slots:

@@ -247,7 +247,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                  volNormalizer );
         CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
 
-
         CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
                          lastfm_user_edit );
         CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
@@ -323,9 +322,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
             if( p_config->value.psz && strcmp( p_config->value.psz, "skins2" ))
             {
-                    ui.skins->setChecked( true );
+                ui.skins->setChecked( true );
             }
-            //FIXME interface choice
+            skinInterfaceButton = ui.skins;
+            qtInterfaceButton = ui.qt4;
 
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
@@ -400,6 +400,7 @@ void SPrefsPanel::apply()
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
         c->doApply( p_intf );
     }
+    
     /* Devices */
     //FIXME is it qta or qtu ????
     char *psz_devicepath = qtu( inputDevice->text() );
@@ -409,6 +410,12 @@ void SPrefsPanel::apply()
         config_PutPsz( p_intf, "vcd", psz_devicepath );
         config_PutPsz( p_intf, "cd-audio", psz_devicepath );
     }
+    
+    /* Interfaces */
+    if( skinInterfaceButton->isChecked() )
+       config_PutPsz( p_intf, "intf", "skins2" );
+    if( qtInterfaceButton->isChecked() )
+        config_PutPsz( p_intf, "intf", "qt4" );
 }
 
 void SPrefsPanel::clean()
