@@ -267,6 +267,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* Input and Codecs Panel Implementation */
         START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs settings") );
+            inputDevice = ui.DVDDevice;
           /* Disk Devices */
             {
                 ui.DVDDevice->setToolTip( qtr( "If this propriety is blank, then you have\n"
@@ -401,7 +402,7 @@ void SPrefsPanel::apply()
     }
     /* Devices */
     //FIXME is it qta or qtu ????
-    char *psz_devicepath = qtu( ui.DVDDevice->Text() );
+    char *psz_devicepath = qtu( inputDevice->text() );
     if( !EMPTY_STR( psz_devicepath ) )
     {
         config_PutPsz( p_intf, "dvd", psz_devicepath );
