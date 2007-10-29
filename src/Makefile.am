@@ -7,7 +7,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
-BUILT_SOURCES = modules/builtin.h misc/revision.c
+BUILT_SOURCES = modules/builtin.h misc/revision.c ../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
 
 ###############################################################################
@@ -112,6 +112,20 @@ endif
 
 modules/modules.c: modules/builtin.h
 
+../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
+	rm -f -- "$@.tmp"
+	mkdir -p -- ../include
+	echo "/* Automatically generated file - DO NOT EDIT */" > "$@.tmp"
+	echo "static const char psz_license[] =" >> "$@.tmp"
+	cat $(top_srcdir)/COPYING | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }' >> "$@.tmp"
+	echo ";" >> "$@.tmp"
+	echo "static const char psz_thanks[] =" >> "$@.tmp"
+	grep -v '$$Id:'  $(top_srcdir)/THANKS | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }'|sed s/"<.*.> "// >> "$@.tmp"
+	echo ";" >> "$@.tmp"
+	echo "static const char psz_authors[] =" >> "$@.tmp"
+	grep N: $(top_srcdir)/AUTHORS | cut -d" " -f 2- | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }' >> "$@.tmp"
+	echo ";" >> "$@.tmp"
+	mv -f -- "$@.tmp" "$@"
 ###############################################################################
 # Building libvlc
 ###############################################################################

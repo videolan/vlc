@@ -6057,7 +6057,7 @@ dnl  Handle substvars that use $(top_srcdir)
 dnl
 VLC_CONFIG="top_builddir=\"\$(top_builddir)\" \$(top_builddir)/vlc-config"
 AC_SUBST(VLC_CONFIG)
-CPPFLAGS_save="${CPPFLAGS_save} -I\$(top_srcdir)/include"
+CPPFLAGS_save="${CPPFLAGS_save} -I\$(top_srcdir)/include -I\$(top_builddir)/include"
 
 dnl
 dnl  Restore *FLAGS

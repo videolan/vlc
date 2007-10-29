@@ -10,7 +10,6 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 MOSTLYCLEANFILES = $(UIH)
-CLEANFILES += dialogs/about.hpp
 SUFFIXES += .ui .h .hpp .moc.cpp
 
 nodist_SOURCES_qt4 = \
@@ -63,7 +62,7 @@ nodist_SOURCES_qt4 = \
 		ui/sout.h
 
 if ENABLE_QT4
-BUILT_SOURCES += $(nodist_SOURCES_qt4) dialogs/about.hpp
+BUILT_SOURCES += $(nodist_SOURCES_qt4)
 endif
 
 resources.cpp: res.qrc
@@ -80,21 +79,7 @@ resources.cpp: res.qrc
 	sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
 	rm -f $@.tmp
 
-dialogs/help.cpp: dialogs/about.hpp
-
-dialogs/about.hpp: Modules.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
-	mkdir -p -- dialogs
-	echo "/* Automatically generated file - DO NOT EDIT */" > dialogs/about.hpp.tmp
-	echo "static const char psz_license[] =" >> dialogs/about.hpp.tmp
-	cat $(top_srcdir)/COPYING | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
-	echo ";" >> dialogs/about.hpp.tmp
-	echo "static const char psz_thanks[] =" >> dialogs/about.hpp.tmp
-	grep -v '$$Id:'  $(top_srcdir)/THANKS | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }'|sed s/"<.*.> "// >> dialogs/about.hpp.tmp
-	echo ";" >> dialogs/about.hpp.tmp
-	echo "static const char psz_authors[] =" >> dialogs/about.hpp.tmp
-	grep N: $(top_srcdir)/AUTHORS | cut -d" " -f 2- | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
-	echo ";" >> dialogs/about.hpp.tmp
-	mv -f -- dialogs/about.hpp.tmp dialogs/about.hpp
+dialogs/help.cpp: $(top_builddir)/include/vlc_about.h
 
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
@@ -142,7 +127,6 @@ noinst_HEADERS = \
 	dialogs/preferences.hpp \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
-	dialogs/about.hpp \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
 	dialogs/open.hpp \
