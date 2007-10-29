@@ -454,7 +454,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
         {
             char *psz_url;
             asprintf( &psz_url, "%s%s:%i%s", psz_username, pd->psz_icecast,
-                      pd->i_icecast, pd->psz_mountpoint );
+                      pd->i_icecast, pd->psz_icecast_mountpoint );
             p_std = streaming_ChainAddStd( DUP_OR_CHAIN, "shout",
                                            pd->psz_mux, psz_url );
             free( psz_url );
@@ -464,7 +464,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
             char *psz_url;
             asprintf( &psz_url, "%s:%s@%s%s", pd->sa_icecast.psz_username,
                       pd->sa_icecast.psz_password, pd->psz_icecast,
-                      pd->psz_mountpoint );
+                      pd->psz_icecast_mountpoint );
             p_std = streaming_ChainAddStd( DUP_OR_CHAIN, "shout",
                                            pd->psz_mux, psz_url );
             free( psz_url );
