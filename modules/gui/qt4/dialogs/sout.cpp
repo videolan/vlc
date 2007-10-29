@@ -258,7 +258,7 @@ void SoutDialog::updateMRL()
 {
     sout_gui_descr_t sout;
     memset( &sout, 0, sizeof( sout_gui_descr_t ) );
-    int counter = 0;
+    unsigned int counter = 0;
 
     sout.b_local = ui.localOutput->isChecked();
     sout.b_file = ui.fileOutput->isChecked();
@@ -359,12 +359,7 @@ void SoutDialog::updateMRL()
     {
 
 #define ISMORE() if ( more ) mrl.append( "," );
-
-#define ATLEASTONE() \
-        if ( counter > 1 ) \
-        { \
-            mrl.append( "dst=" ); \
-        }
+#define ATLEASTONE() if ( counter ) mrl.append( "dst=" ); 
 
 #define CHECKMUX() \
        if( sout.psz_mux ) \
@@ -372,7 +367,6 @@ void SoutDialog::updateMRL()
          mrl.append( ",mux=");\
          mrl.append( sout.psz_mux ); \
        }
-
 
         if ( trans )
         {
@@ -383,7 +377,7 @@ void SoutDialog::updateMRL()
             mrl = ":sout=#";
         }
 
-        if ( counter > 1 )
+        if ( counter )
         {
             mrl.append( "duplicate{" );
         }
@@ -474,7 +468,12 @@ void SoutDialog::updateMRL()
             more = true;
         }
 
-        if ( counter > 1 )
+        if( sout.b_icecast )
+        {
+            // TODO
+        }
+        
+        if ( counter )
         {
             mrl.append( "}" );
         }
