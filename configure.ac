@@ -796,7 +796,13 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
 dnl Check for headers
 AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h stdbool.h getopt.h strings.h inttypes.h sys/int_types.h wchar.h locale.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
-AC_CHECK_HEADERS([arpa/inet.h net/if.h netinet/in.h sys/socket.h netinet/udplite.h])
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h netinet/udplite.h])
+AC_CHECK_HEADERS([net/if.h], [], [],
+  [
+    #if HAVE_SYS_SOCKET_H
+    # include <sys/socket.h>
+    #endif
+  ])
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS([linux/version.h linux/dccp.h])
