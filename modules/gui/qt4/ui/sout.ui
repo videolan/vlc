@@ -277,7 +277,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0" >
+        <item row="7" column="0" >
          <widget class="QCheckBox" name="UDPOutput" >
           <property name="toolTip" >
            <string>_("Using this option is not recommended in most of the cases.")</string>
@@ -287,17 +287,17 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1" >
+        <item row="7" column="1" >
          <widget class="QLabel" name="UDPLabel" >
           <property name="text" >
            <string>_("Address")</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="2" >
+        <item row="7" column="2" >
          <widget class="QLineEdit" name="UDPEdit" />
         </item>
-        <item row="5" column="3" >
+        <item row="7" column="3" >
          <widget class="QLabel" name="UDPPortLabel" >
           <property name="text" >
            <string>_("Port")</string>
@@ -307,7 +307,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="4" >
+        <item row="7" column="4" >
          <widget class="QSpinBox" name="UDPPort" >
           <property name="maximumSize" >
            <size>
@@ -329,6 +329,91 @@
           </property>
           <property name="value" >
            <number>1234</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" >
+         <widget class="QCheckBox" name="IcecastOutput" >
+          <property name="text" >
+           <string>IceCast</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1" >
+         <widget class="QLabel" name="IcecastLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Address")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" >
+         <widget class="QLineEdit" name="IcecastEdit" />
+        </item>
+        <item row="5" column="3" >
+         <widget class="QLabel" name="IcecastPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Port:")</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="4" >
+         <widget class="QSpinBox" name="IcecastPort" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>90</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
+          </property>
+          <property name="value" >
+           <number>1024</number>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1" >
+         <widget class="QLabel" name="IcecastMountpointLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Mount Point")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2" >
+         <widget class="QLineEdit" name="IcecastMountpointEdit" />
+        </item>
+        <item row="6" column="3" >
+         <widget class="QLabel" name="IcecastNameLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Login:pass:")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="4" >
+         <widget class="QLineEdit" name="IcecastNamePassEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -1222,6 +1307,134 @@
     <hint type="destinationlabel" >
      <x>315</x>
      <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>296</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>227</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastPortLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>377</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastPort</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>488</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastMountpointEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>91</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>306</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastMountpointLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>91</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>226</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastNameLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>91</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>388</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>IcecastOutput</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>IcecastNamePassEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>91</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>526</x>
+     <y>175</y>
     </hint>
    </hints>
   </connection>

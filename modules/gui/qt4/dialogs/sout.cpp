@@ -2,11 +2,15 @@
  * sout.cpp : Stream output dialog ( old-style )
  ****************************************************************************
  * Copyright ( C ) 2006 the VideoLAN team
+ * Copyright (C) 2007 Société des arts technologiques
+ * Copyright (C) 2007 Savoir-faire Linux
+ *
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
  *          Jean-François Massol <jf.massol -at- gmail.com>
+ *          Pierre-Luc Beaudoin <pierre-luc.beaudoin@savoirfairelinux.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,20 +99,21 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
  #define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
  #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
 //     /* Output */
-     CB( fileOutput ); CB( HTTPOutput ); CB( localOutput );
-     CB( RTPOutput ); CB( MMSHOutput ); CB( rawInput ); CB( UDPOutput );
-     CT( fileEdit ); CT( HTTPEdit ); CT( RTPEdit ); CT( MMSHEdit ); CT( UDPEdit );
-     CS( HTTPPort ); CS( RTPPort ); CS( MMSHPort ); CS( UDPPort );
+    CB( fileOutput ); CB( HTTPOutput ); CB( localOutput );
+    CB( RTPOutput ); CB( MMSHOutput ); CB( rawInput ); CB( UDPOutput );
+    CT( fileEdit ); CT( HTTPEdit ); CT( RTPEdit ); CT( MMSHEdit ); CT( UDPEdit );
+    CT( IcecastEdit ); CT( IcecastMountpointEdit ); CT( IcecastNamePassEdit );
+    CS( HTTPPort ); CS( RTPPort ); CS( MMSHPort ); CS( UDPPort );
 //     /* Transcode */
-     CC( vCodecBox ); CC( subsCodecBox ); CC( aCodecBox ) ;
-     CB( transcodeVideo ); CB( transcodeAudio ); CB( transcodeSubs );
+    CC( vCodecBox ); CC( subsCodecBox ); CC( aCodecBox ) ;
+    CB( transcodeVideo ); CB( transcodeAudio ); CB( transcodeSubs );
 //     CB( sOverlay );
-     CS( vBitrateSpin ); CS( aBitrateSpin ); CS( aChannelsSpin ); CC( vScaleBox );
+    CS( vBitrateSpin ); CS( aBitrateSpin ); CS( aChannelsSpin ); CC( vScaleBox );
 //     /* Mux */
-     CB( PSMux ); CB( TSMux ); CB( MPEG1Mux ); CB( OggMux ); CB( ASFMux );
-     CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux ); CB( FLVMux );
+    CB( PSMux ); CB( TSMux ); CB( MPEG1Mux ); CB( OggMux ); CB( ASFMux );
+    CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux ); CB( FLVMux );
 //     /* Misc */
-     CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
+    CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
 //
     CONNECT( ui.profileBox, activated( const QString & ), this, setOptions() );
     CONNECT( ui.fileSelectButton, clicked() , this, fileBrowse()  );
@@ -259,6 +264,7 @@ void SoutDialog::updateMRL()
     sout.b_file = ui.fileOutput->isChecked();
     sout.b_http = ui.HTTPOutput->isChecked();
     sout.b_mms = ui.MMSHOutput->isChecked();
+    sout.b_icecast = ui.IcecastOutput->isChecked();
     sout.b_rtp = ui.RTPOutput->isChecked();
     sout.b_udp = ui.UDPOutput->isChecked();
     sout.b_sap = ui.sap->isChecked();
@@ -271,10 +277,15 @@ void SoutDialog::updateMRL()
     sout.psz_mms = strdup( qtu( ui.MMSHEdit->text() ) );
     sout.psz_rtp = strdup( qtu( ui.RTPEdit->text() ) );
     sout.psz_udp = strdup( qtu( ui.UDPEdit->text() ) );
+    sout.psz_icecast = strdup( qtu( ui.IcecastEdit->text() ) );
+    sout.sa_icecast.psz_username = strdup( qtu( ui.IcecastNamePassEdit->text() ) );
+    sout.sa_icecast.psz_password = strdup( qtu( ui.IcecastNamePassEdit->text() ) );
+    sout.psz_icecast_mountpoint = strdup( qtu( ui.IcecastMountpointEdit->text() ) );
     sout.i_http = ui.HTTPPort->value();
     sout.i_mms = ui.MMSHPort->value();
     sout.i_rtp = ui.RTPPort->value();
     sout.i_udp = ui.UDPPort->value();
+    sout.i_icecast = ui.IcecastPort->value();
     sout.i_ab = ui.aBitrateSpin->value();
     sout.i_vb = ui.vBitrateSpin->value();
     sout.i_channels = ui.aChannelsSpin->value();
@@ -282,23 +293,13 @@ void SoutDialog::updateMRL()
     sout.psz_group = strdup( qtu( ui.sapGroup->text() ) );
     sout.psz_name = strdup( qtu( ui.sapName->text() ) );
 
-#define COUNT() \
-    { \
-        if ( sout.b_local ) \
-        counter += 1; \
-        if ( sout.b_file ) \
-        counter += 1; \
-        if ( sout.b_http ) \
-        counter += 1; \
-        if ( sout.b_mms ) \
-        counter += 1; \
-        if ( sout.b_rtp ) \
-        counter += 1; \
-        if ( sout.b_udp ) \
-        counter += 1; \
-    }
-
-COUNT()
+    if ( sout.b_local ) counter++ ;
+    if ( sout.b_file ) counter++ ;
+    if ( sout.b_http ) counter++ ;
+    if ( sout.b_mms ) counter++ ;
+    if ( sout.b_rtp ) counter++ ;
+    if ( sout.b_udp ) counter ++;
+    if ( sout.b_icecast ) counter ++; 
 
 #define SMUX( x, txt ) if( ui.x->isChecked() ) sout.psz_mux = strdup( txt );
     SMUX( PSMux, "ps" );
@@ -489,4 +490,6 @@ COUNT()
     free( sout.psz_file );free( sout.psz_http ); free( sout.psz_mms );
     free( sout.psz_rtp ); free( sout.psz_udp ); free( sout.psz_mux );
     free( sout.psz_name ); free( sout.psz_group );
+    free( sout.psz_icecast ); free( sout.psz_icecast_mountpoint );
+    free( sout.sa_icecast.psz_password ); free( sout.sa_icecast.psz_username );
 }
