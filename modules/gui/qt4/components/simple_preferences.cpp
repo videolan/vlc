@@ -165,7 +165,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     switch( number )
     {
-        /* Video Panel Implementation */
+        /******************************
+         * VIDEO Panel Implementation *
+         ******************************/
         START_SPREFS_CAT( Video , qtr("General video settings") );
             CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
@@ -194,11 +196,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             snapshotsFormat );
          END_SPREFS_CAT;
 
-         /* Audio Panel Implementation */
+        /******************************
+         * AUDIO Panel Implementation *
+         ******************************/
         START_SPREFS_CAT( Audio, qtr("General audio settings") );
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
+            /* General Audio Options */
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONFIG_GENERIC( "audio-language" , String , NULL,
@@ -208,6 +213,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
                             detectionDolby );
 
+            CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
+//          CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
+            CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
+                                    volNormalizer );
+            CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
+
+            /* Audio Output Specifics */
             CONFIG_GENERIC( "aout", Module, NULL, outputModule );
 
             CONNECT( ui.outputModule, currentIndexChanged( int ), this,
@@ -220,12 +232,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
                                  OSSBrowse );
 #else
-            CONFIG_GENERIC( "directx-audio-device", IntegerList, ui.DirectXLabel,
-                            DirectXDevice );
+            CONFIG_GENERIC( "directx-audio-device", IntegerList,
+                    ui.DirectXLabel, DirectXDevice );
 #endif
         // File exists everywhere
-            CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel, fileName,
-                                 fileBrowseButton );
+            CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
+                                 fileName, fileBrowseButton );
             alsa_options = ui.alsaControl;
             oss_options = ui.OSSControl;
             directx_options = ui.DirectXControl;
@@ -233,34 +245,30 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* and hide if necessary */
 #ifdef WIN32
-        oss_options->hide();
-        alsa_options->hide();
+            oss_options->hide();
+            alsa_options->hide();
 #else
-        directx_options->hide();
+            directx_options->hide();
 #endif
 
-        updateAudioOptions( audioOutput->currentIndex() );
+            updateAudioOptions( audioOutput->currentIndex() );
 
-        CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
-//         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
-        CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
-                 volNormalizer );
-        CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
-
-        CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
+            /* LastFM */
+            CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
                          lastfm_user_edit );
-        CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
+            CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
                          lastfm_pass_edit );
-        ui.lastfm_user_edit->hide();
-        ui.lastfm_user_label->hide();
-        ui.lastfm_pass_edit->hide();
-        ui.lastfm_pass_label->hide();
+            ui.lastfm_user_edit->hide();
+            ui.lastfm_user_label->hide();
+            ui.lastfm_pass_edit->hide();
+            ui.lastfm_pass_label->hide();
 
-        if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
-            ui.lastfm->setCheckState( Qt::Checked );
-        else
-            ui.lastfm->setCheckState( Qt::Unchecked );
-        CONNECT( ui.lastfm, stateChanged( int ), this , lastfm_Changed( int ) );
+            if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+                ui.lastfm->setCheckState( Qt::Checked );
+            else
+                ui.lastfm->setCheckState( Qt::Unchecked );
+            CONNECT( ui.lastfm, stateChanged( int ), this ,
+                    lastfm_Changed( int ) );
 
         END_SPREFS_CAT;
 
@@ -269,9 +277,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             inputDevice = ui.DVDDevice;
           /* Disk Devices */
             {
-                ui.DVDDevice->setToolTip( qtr( "If this propriety is blank, then you have\n"
-                                                "values for DVD, VCD, and CDDA.\n You can define"
-                                                " a unique one or set that in the advanced preferences" ) );
+                ui.DVDDevice->setToolTip(
+                    qtr( "If this propriety is blank, then you have\n"
+                         "values for DVD, VCD, and CDDA.\n"
+                         "You can define a unique one or set that in"
+                         "the advanced preferences" ) );
                 char *psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
                 char *psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
                 char *psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
@@ -280,7 +290,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 {
                     ui.DVDDevice->setText( qfu( psz_dvddiscpath ) );
                 }
-                delete psz_cddadiscpath; delete psz_dvddiscpath; delete psz_vcddiscpath;
+                delete psz_cddadiscpath; delete psz_dvddiscpath;
+                delete psz_vcddiscpath;
             }
 
           CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
@@ -400,7 +411,7 @@ void SPrefsPanel::apply()
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
         c->doApply( p_intf );
     }
-    
+
     /* Devices */
     //FIXME is it qta or qtu ????
     char *psz_devicepath = qtu( inputDevice->text() );
@@ -410,7 +421,7 @@ void SPrefsPanel::apply()
         config_PutPsz( p_intf, "vcd", psz_devicepath );
         config_PutPsz( p_intf, "cd-audio", psz_devicepath );
     }
-    
+
     /* Interfaces */
     if( skinInterfaceButton->isChecked() )
        config_PutPsz( p_intf, "intf", "skins2" );
