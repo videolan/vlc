@@ -324,10 +324,10 @@ void PrefsTree::doAll( bool doclean )
 /*********************************************************************
  * The Panel
  *********************************************************************/
-PrefsPanel::PrefsPanel( QWidget *_parent ) : QWidget( _parent )
+AdvPrefsPanel::AdvPrefsPanel( QWidget *_parent ) : QWidget( _parent )
 {}
 
-PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                         PrefsItemData * data ) :
                         QWidget( _parent ), p_intf( _p_intf )
 {
@@ -490,7 +490,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     setLayout( global_layout );
 }
 
-void PrefsPanel::apply()
+void AdvPrefsPanel::apply()
 {
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
@@ -499,5 +499,5 @@ void PrefsPanel::apply()
         c->doApply( p_intf );
     }
 }
-void PrefsPanel::clean()
+void AdvPrefsPanel::clean()
 {}

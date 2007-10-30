@@ -103,23 +103,19 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
     if( config_GetInt( p_intf, "qt-advanced-pref") == 1 )
-    {
-        setAll();
-    }
+        SetAdvanced();
     else
-    {
         setSmall();
-    }
 
     BUTTONACT( save, save() );
     BUTTONACT( cancel, cancel() );
     BUTTONACT( reset, reset() );
-    BUTTONACT( small, setSmall() );
-    BUTTONACT( all, setAll() );
 
+    BUTTONACT( small, setSmall() );
+    BUTTONACT( all, SetAdvanced() );
 }
 
-void PrefsDialog::setAll()
+void PrefsDialog::SetAdvanced()
 {
     /* We already have a simple TREE, and we just want to hide it */
     if( simple_tree )
@@ -136,7 +132,7 @@ void PrefsDialog::setAll()
         /* and connections */
          CONNECT( advanced_tree,
                   currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem *),
-                  this, changePanel( QTreeWidgetItem * ) );
+                  this, changeAdvPanel( QTreeWidgetItem * ) );
     }
     /* Add the Advanced tree to the tree_panel, even if it is already inside,
        since it can't hurt. And show it. */
@@ -151,7 +147,7 @@ void PrefsDialog::setAll()
     }
     /* If no advanced Panel exist, create one, attach it and show it*/
     if( !advanced_panel )
-         advanced_panel = new PrefsPanel( main_panel );
+         advanced_panel = new AdvPrefsPanel( main_panel );
     main_panel_l->addWidget( advanced_panel );
     all->setChecked( true );
     advanced_panel->show();
@@ -193,6 +189,7 @@ void PrefsDialog::setSmall()
     current_simple_panel->show();
 }
 
+/* Switching from on simple panel to another */
 void PrefsDialog::changeSimplePanel( int number )
 {
     if( current_simple_panel  )
@@ -210,7 +207,8 @@ void PrefsDialog::changeSimplePanel( int number )
     current_simple_panel->show();
 }
 
-void PrefsDialog::changePanel( QTreeWidgetItem *item )
+/* Changing from one Advanced Panel to another */
+void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
 {
     PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData*>();
 
@@ -220,16 +218,18 @@ void PrefsDialog::changePanel( QTreeWidgetItem *item )
         advanced_panel->hide();
     }
     if( !data->panel )
-        data->panel = new PrefsPanel( p_intf, main_panel , data );
+        data->panel = new AdvPrefsPanel( p_intf, main_panel , data );
 
     advanced_panel = data->panel;
     main_panel_l->addWidget( advanced_panel );
     advanced_panel->show();
 }
 
+#if 0 
+/*Called from extended settings, is not used anymore, but could be useful one day*/
 void PrefsDialog::showModulePrefs( char *psz_module )
 {
-    setAll();
+    SetAdvanced();
     all->setChecked( true );
     for( int i_cat_index = 0 ; i_cat_index < advanced_tree->topLevelItemCount();
          i_cat_index++ )
@@ -257,14 +257,10 @@ void PrefsDialog::showModulePrefs( char *psz_module )
     }
     show();
 }
+#endif
 
+/* Actual apply and save for the preferences */
 void PrefsDialog::save()
-{
-    apply();
-    hide();
-}
-
-void PrefsDialog::apply()
 {
     if( small->isChecked() && simple_tree )
     {
@@ -289,8 +285,11 @@ void PrefsDialog::apply()
         delete current_simple_panel;
         current_simple_panel  = NULL;
     }
+    
+    hide();
 }
 
+/* Clean the preferences, dunno if it does something really */
 void PrefsDialog::cancel()
 {
     if( small->isChecked() && simple_tree )
@@ -306,6 +305,7 @@ void PrefsDialog::cancel()
     hide();
 }
 
+/* Reset all the preferences, when you click the button */
 void PrefsDialog::reset()
 {
     int ret = QMessageBox::question(this, qtr("Reset Preferences"),

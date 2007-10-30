@@ -37,7 +37,7 @@ enum
     TYPE_MODULE
 };
 
-class PrefsPanel;
+class AdvPrefsPanel;
 class QLabel;
 class QVBoxLayout;
 
@@ -47,7 +47,7 @@ public:
     PrefsItemData()
     { panel = NULL; i_object_id = 0; i_subcat_id = -1; psz_name = NULL; };
     virtual ~PrefsItemData() { free( psz_name ); };
-    PrefsPanel *panel;
+    AdvPrefsPanel *panel;
     int i_object_id;
     int i_subcat_id;
     int i_type;
@@ -76,13 +76,13 @@ private:
 
 class ConfigControl;
 
-class PrefsPanel : public QWidget
+class AdvPrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    PrefsPanel( intf_thread_t *, QWidget *, PrefsItemData * );
-    PrefsPanel( QWidget *);
-    virtual ~PrefsPanel() {};
+    AdvPrefsPanel( intf_thread_t *, QWidget *, PrefsItemData * );
+    AdvPrefsPanel( QWidget *);
+    virtual ~AdvPrefsPanel() {};
     void apply();
     void clean();
 private:

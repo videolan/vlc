@@ -29,7 +29,7 @@
 
 class PrefsTree;
 class SPrefsCatList;
-class PrefsPanel;
+class AdvPrefsPanel;
 class SPrefsPanel;
 class QTreeWidgetItem;
 class QTreeWidget;
@@ -54,14 +54,17 @@ public:
         return instance;
     }
     virtual ~PrefsDialog() {};
-
+#if 0
+    /*Called from extended settings, is not used anymore, but could be useful one day*/
     void showModulePrefs( char* );
+#endif
 private:
     PrefsDialog( intf_thread_t * );
 
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
-    PrefsPanel *advanced_panel;
+
+    AdvPrefsPanel *advanced_panel;
     SPrefsPanel *current_simple_panel;
     SPrefsPanel *simple_panels[SPrefsMax];
 
@@ -76,16 +79,18 @@ private:
     QGridLayout *main_layout;
 
     static PrefsDialog *instance;
+
 private slots:
-     void changePanel( QTreeWidgetItem * );
-     void changeSimplePanel( int );
-     void setAll();
-     void setSmall();
-     void save();
-     void apply();
-     void cancel();
-     void reset();
-     void close(){ save(); };
+    void SetAdvanced();
+    void setSmall();
+
+    void changeAdvPanel( QTreeWidgetItem * );
+    void changeSimplePanel( int );
+
+    void save();
+    void cancel();
+    void reset();
+    void close(){ save(); }; /* Needed for any generic CloseEvent*/
 };
 
 #endif
