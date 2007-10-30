@@ -181,7 +181,7 @@ static int Open( vlc_object_t *p_this )
     if( psz_url && strrchr( psz_url, '.' ) )
     {
         /* by extension */
-        static struct { const char ext[6]; const char mux[16]; } exttomux[] =
+        static struct { const char ext[6]; const char mux[32]; } exttomux[] =
         {
             { "avi", "avi" },
             { "ogg", "ogg" },
@@ -200,6 +200,7 @@ static int Open( vlc_object_t *p_this )
             { "mpeg1","mpeg1" },
             { "wav", "wav" },
             { "flv", "ffmpeg{mux=flv}" },
+            { "mkv", "ffmpeg{mux=matroska}"},
             { "",    "" }
         };
         const char *psz_ext = strrchr( psz_url, '.' ) + 1;
