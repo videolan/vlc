@@ -1851,7 +1851,7 @@ vlc_module_begin();
     add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, VLC_FALSE );
 
-    add_integer( "album-art", ALBUM_ART_WHEN_PLAYED, NULL, ALBUM_ART_TEXT,
+    add_integer( "album-art", ALBUM_ART_WHEN_ASKED, NULL, ALBUM_ART_TEXT,
                  ALBUM_ART_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_albumart_values,
                              ppsz_albumart_descriptions, 0 );
