@@ -173,7 +173,7 @@ libvlcplugin_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 libvlcplugin_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla`
 libvlcplugin_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla`
 libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --ldflags mozilla` -module -avoid-version -shrext $(LIBEXT)
-libvlcplugin_la_LIBADD = `$(VLC_CONFIG) -libs mozilla` $(LIBRARIES_libvlc)
+libvlcplugin_la_LIBADD = $(LIBRARIES_libvlc) `$(VLC_CONFIG) -libs mozilla`
 # automake gets confused by the ../..
 libvlcplugin_la_DEPENDENCIES = $(AM_LIBADD) 
 endif
