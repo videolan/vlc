@@ -442,7 +442,7 @@
    <item row="3" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="muxer" >
       <attribute name="title" >
@@ -528,7 +528,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2" >
+     <widget class="QWidget" name="videoCodec" >
       <property name="enabled" >
        <bool>true</bool>
       </property>
@@ -620,7 +620,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3" >
+     <widget class="QWidget" name="audioCodec" >
       <attribute name="title" >
        <string>_("Audio Codec")</string>
       </attribute>
@@ -712,7 +712,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_4" >
+     <widget class="QWidget" name="subtitles" >
       <attribute name="title" >
        <string>_("Subtitles")</string>
       </attribute>
