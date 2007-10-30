@@ -3801,7 +3801,7 @@ dnl
 dnl libfluidsynth (MIDI synthetizer) plugin
 dnl
 AC_ARG_ENABLE(fluidsynth,
-  [  --enable-fluidsynth     MIDI synthesisr with libfluidsynth (default auto)])
+  [  --enable-fluidsynth     MIDI synthesisr with libfluidsynth (default enabled)])
 AS_IF([test "x${enable_fluidsynth}" != "xno"], [
   PKG_CHECK_MODULES(FLUIDSYNTH, fluidsynth, [
     VLC_ADD_PLUGINS(fluidsynth)
@@ -4843,7 +4843,7 @@ dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
 AC_ARG_ENABLE(upnp,
-  [  --enable-upnp           Intel UPnP SDK (default auto)])
+  [  --enable-upnp           Intel UPnP SDK (default enabled)])
 
 VLC_ADD_CXXFLAGS([upnp_intel], [ ])
 AS_IF([test "x${enable_upnp}" != "xno"], [
@@ -5353,7 +5353,7 @@ dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
-  [  --disable-ncurses       ncurses interface support (default auto)],
+  [  --disable-ncurses       ncurses interface support (default enabled)],
   [if test "${enable_ncurses}" != "no"; then
     AC_CHECK_HEADER(ncurses.h,
       [AC_CHECK_LIB(ncursesw, mvprintw,
