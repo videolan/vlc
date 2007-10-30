@@ -312,6 +312,7 @@ void SoutDialog::updateMRL()
     SMUX( WAVMux, "wav" );
     SMUX( RAWMux, "raw" );
     SMUX( FLVMux, "flv" );
+    SMUX( MKVMux, "mkv" );
 
     bool trans = false;
     bool more = false;
