@@ -5353,21 +5353,24 @@ dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
-  [  --disable-ncurses       ncurses interface support (default enabled)],
+  [  --disable-ncurses       ncurses interface support (default auto)],
   [if test "${enable_ncurses}" != "no"; then
-     AC_CHECK_HEADERS(ncursesw/curses.h,
-       [AC_CHECK_LIB( ncursesw, mvprintw,
-         [VLC_ADD_PLUGINS([ncurses])
-         VLC_ADD_LIBS([ncurses],[-lncursesw])])
-       ],
-       [AC_CHECK_HEADER(curses.h,
-         [AC_CHECK_LIB(ncurses, mvprintw,
-           [VLC_ADD_PLUGINS([ncurses])
-           VLC_ADD_LIBS([ncurses],[-lncurses])]
-         )]
-       )]
-     )  
-   fi])
+    AC_CHECK_HEADER(ncurses.h,
+      [AC_CHECK_LIB(ncursesw, mvprintw,
+        [VLC_ADD_PLUGINS([ncurses])
+        VLC_ADD_LIBS([ncurses],[-lncursesw])
+        AC_DEFINE([HAVE_NCURSESW], 1, [Define to 1 if you have libncursesw.])
+        ],
+        [AC_CHECK_LIB( ncurses, mvprintw,
+          [VLC_ADD_PLUGINS([ncurses])
+          VLC_ADD_LIBS([ncurses],[-lncurses])],
+          [AS_IF([test "x${enable_ncurses}" != "x"], [
+            AC_MSG_ERROR([libncurses not found])])]
+        )]
+      )]
+    )
+  fi]
+)
 
 dnl
 dnl  XOSD plugin

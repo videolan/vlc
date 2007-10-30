@@ -32,11 +32,11 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <time.h>
 
-#ifdef HAVE_NCURSESW_CURSES_H
-#include <ncursesw/curses.h>
-#else
-#include <curses.h>
+#ifdef HAVE_NCURSESW
+#   define _XOPEN_SOURCE_EXTENDED 1
 #endif
+
+#include <ncurses.h>
 
 #include <vlc_interface.h>
 #include <vlc_vout.h>
@@ -437,7 +437,7 @@ static char *KeyToUTF8( int i_key, char *psz_part )
 
     psz_part[len] = (char)i_key;
 
-#ifdef HAVE_NCURSESW_CURSES_H
+#ifdef HAVE_NCURSESW
     psz_utf8 = strdup( psz_part );
 #else
     psz_utf8 = FromLocaleDup( psz_part );
@@ -1151,7 +1151,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     va_list  vl_args;
     char    *p_buf = NULL;
     int      i_len;
-#ifdef HAVE_NCURSESW_CURSES_H
+#ifdef HAVE_NCURSESW
     size_t   i_char_len;    /* UCS character length */
     size_t   i_width;       /* Display width */
     wchar_t *psz_wide;      /* wchar_t representation of p_buf */
@@ -1166,7 +1166,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         return;
 
     i_len = strlen( p_buf );
-#ifdef HAVE_NCURSESW_CURSES_H
+#ifdef HAVE_NCURSESW
     psz_wide = (wchar_t *) malloc( sizeof( wchar_t ) * ( i_len + 1 ) );
 
     i_char_len = mbstowcs( psz_wide, p_buf, i_len );
@@ -1199,7 +1199,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
             p_buf[w/2  ] = '.';
             p_buf[w/2+1] = '.';
         }
-#ifdef HAVE_NCURSESW_CURSES_H
+#ifdef HAVE_NCURSESW
         mvprintw( y, x, "%s", p_buf );
 #else
         char *psz_local = ToLocale( p_buf );
@@ -1209,7 +1209,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     }
     else
     {
-#ifdef HAVE_NCURSESW_CURSES_H
+#ifdef HAVE_NCURSESW
         mvprintw( y, x, "%s", p_buf );
         mvhline( y, x + i_width, ' ', w - i_width );
 #else
