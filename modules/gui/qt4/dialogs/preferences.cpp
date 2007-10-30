@@ -119,10 +119,7 @@ void PrefsDialog::setAdvanced()
 {
     /* We already have a simple TREE, and we just want to hide it */
     if( simple_tree )
-    {
-        tree_panel_l->removeWidget( simple_tree );
-        simple_tree->hide();
-    }
+        if( simple_tree->isVisible() ) simple_tree->hide();
 
     /* If don't have already and advanced TREE, then create it */
     if( !advanced_tree )
@@ -133,34 +130,33 @@ void PrefsDialog::setAdvanced()
          CONNECT( advanced_tree,
                   currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem *),
                   this, changeAdvPanel( QTreeWidgetItem * ) );
+        tree_panel_l->addWidget( advanced_tree );
     }
-    /* Add the Advanced tree to the tree_panel, even if it is already inside,
-       since it can't hurt. And show it. */
-    tree_panel_l->addWidget( advanced_tree );
+
+    /* Show it */
     advanced_tree->show();
 
     /* Remove the simple current panel from the main panels*/
     if( current_simple_panel  )
-    {
-        main_panel_l->removeWidget( current_simple_panel );
-        current_simple_panel->hide();
-    }
+        if( current_simple_panel->isVisible() ) current_simple_panel->hide();
+
     /* If no advanced Panel exist, create one, attach it and show it*/
     if( !advanced_panel )
+    {
          advanced_panel = new AdvPrefsPanel( main_panel );
-    main_panel_l->addWidget( advanced_panel );
-    all->setChecked( true );
+        main_panel_l->addWidget( advanced_panel );
+    }
     advanced_panel->show();
+    
+    all->setChecked( true );
 }
 
 void PrefsDialog::setSmall()
 {
     /* If an advanced TREE exists, remove and hide it */
     if( advanced_tree )
-    {
-        tree_panel_l->removeWidget( advanced_tree );
-        advanced_tree->hide();
-    }
+        if( advanced_tree->isVisible() ) advanced_tree->hide();
+
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
     {
@@ -168,42 +164,41 @@ void PrefsDialog::setSmall()
          CONNECT( simple_tree,
                   currentItemChanged( int ),
                   this,  changeSimplePanel( int ) );
+        tree_panel_l->addWidget( simple_tree );
     }
-    /* Attach anyway and show it */
-    tree_panel_l->addWidget( simple_tree );
+
+    /*show it */
     simple_tree->show();
 
     /* If an Advanced PANEL exists, remove it */
     if( advanced_panel )
-    {
-        main_panel_l->removeWidget( advanced_panel );
-        advanced_panel->hide();
-    }
+        if( advanced_panel->isVisible() ) advanced_panel->hide();
+
     if( !current_simple_panel  )
     {
         current_simple_panel  = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
         simple_panels[SPrefsDefaultCat] =  current_simple_panel;
+        main_panel_l->addWidget( current_simple_panel  );
     }
-    main_panel_l->addWidget( current_simple_panel  );
-    small->setChecked( true );
+    
     current_simple_panel->show();
+    small->setChecked( true );
 }
 
 /* Switching from on simple panel to another */
 void PrefsDialog::changeSimplePanel( int number )
 {
     if( current_simple_panel  )
-    {
-        main_panel_l->removeWidget( current_simple_panel  );
-        current_simple_panel->hide();
-    }
+        if( current_simple_panel->isVisible() ) current_simple_panel->hide();
+
     current_simple_panel = simple_panels[number];
     if( !current_simple_panel  )
     {
         current_simple_panel  = new SPrefsPanel( p_intf, main_panel, number );
         simple_panels[number] = current_simple_panel;
+        main_panel_l->addWidget( current_simple_panel  );
     }
-    main_panel_l->addWidget( current_simple_panel  );
+    
     current_simple_panel->show();
 }
 
@@ -213,10 +208,8 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
     PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData*>();
 
     if( advanced_panel )
-    {
-        main_panel_l->removeWidget( advanced_panel );
-        advanced_panel->hide();
-    }
+        if( advanced_panel->isVisible() ) advanced_panel->hide();
+
     if( !data->panel )
         data->panel = new AdvPrefsPanel( p_intf, main_panel , data );
 
@@ -262,19 +255,25 @@ void PrefsDialog::showModulePrefs( char *psz_module )
 /* Actual apply and save for the preferences */
 void PrefsDialog::save()
 {
-    if( small->isChecked() && simple_tree )
+    if( small->isChecked() && simple_tree->isVisible() )
     {
+        msg_Dbg( p_intf, "Saving the simple preferences" );
         for( int i = 0 ; i< SPrefsMax; i++ ){
             if( simple_panels[i] )simple_panels[i]->apply();
         }
     }
-    else if( all->isChecked() && advanced_tree )
+    else if( all->isChecked() && advanced_tree->isVisible() )
+    {
+        msg_Dbg( p_intf, "Saving the advanced preferences" );
         advanced_tree->applyAll();
+    }
 
+    /* Save to file */
     config_SaveConfigFile( p_intf, NULL );
 
     /* Delete the other panel in order to force its reload after clicking
        on apply - UGLY but will work for now. */
+    /* THIS CODE IS STILL WRONG, FIXME */
     if( current_simple_panel  && current_simple_panel->isVisible() && advanced_panel )
     {
         delete advanced_panel;

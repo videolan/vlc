@@ -431,15 +431,9 @@ void SPrefsPanel::apply()
     if( number == SPrefsInterface )
     {
         if( skinInterfaceButton->isChecked() )
-        {
-            msg_Dbg( p_intf, "hehehe skins" );
             config_PutPsz( p_intf, "intf", "skins2" );
-        }
         if( qtInterfaceButton->isChecked() )
-        {
-            msg_Dbg( p_intf, "hhhheeee qt" );
             config_PutPsz( p_intf, "intf", "qt4" );
-        }
     }
 }
 
