@@ -83,6 +83,7 @@ Decoders:
  * DNxHD / VC-3 support
  * NellyMoser ASAO support
  * APE ( Monkey audio ) support
+ * VBI & EBU (Teletext) support
 
 Encoders:
  * Flash Screen Video support
