@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include "dialogs/help.hpp"
-#include "dialogs/about.hpp"
+#include "vlc_about.h"
 
 #include "dialogs_provider.hpp"
 
