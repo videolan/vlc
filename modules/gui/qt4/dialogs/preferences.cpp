@@ -48,17 +48,17 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     resize( 750, 550 );
 
     /* Create Panels */
-    tree_panel = new QWidget( 0 );
+    tree_panel = new QWidget;
     tree_panel_l = new QHBoxLayout;
     tree_panel->setLayout( tree_panel_l );
-    main_panel = new QWidget( 0 );
+    main_panel = new QWidget;
     main_panel_l = new QHBoxLayout;
     main_panel->setLayout( main_panel_l );
 
     /* Choice for types */
     types = new QGroupBox( "Show settings" );
     types->setAlignment( Qt::AlignHCenter );
-    QHBoxLayout *types_l = new QHBoxLayout(0);
+    QHBoxLayout *types_l = new QHBoxLayout;
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
     small = new QRadioButton( qtr("Basic"), types );
     types_l->addWidget( small );
@@ -103,7 +103,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
     if( config_GetInt( p_intf, "qt-advanced-pref") == 1 )
-        SetAdvanced();
+        setAdvanced();
     else
         setSmall();
 
@@ -112,10 +112,10 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     BUTTONACT( reset, reset() );
 
     BUTTONACT( small, setSmall() );
-    BUTTONACT( all, SetAdvanced() );
+    BUTTONACT( all, setAdvanced() );
 }
 
-void PrefsDialog::SetAdvanced()
+void PrefsDialog::setAdvanced()
 {
     /* We already have a simple TREE, and we just want to hide it */
     if( simple_tree )
@@ -229,7 +229,7 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
 /*Called from extended settings, is not used anymore, but could be useful one day*/
 void PrefsDialog::showModulePrefs( char *psz_module )
 {
-    SetAdvanced();
+    setAdvanced();
     all->setChecked( true );
     for( int i_cat_index = 0 ; i_cat_index < advanced_tree->topLevelItemCount();
          i_cat_index++ )

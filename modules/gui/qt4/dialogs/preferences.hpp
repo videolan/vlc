@@ -58,8 +58,10 @@ public:
     /*Called from extended settings, is not used anymore, but could be useful one day*/
     void showModulePrefs( char* );
 #endif
+
 private:
     PrefsDialog( intf_thread_t * );
+    QGridLayout *main_layout;
 
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
@@ -70,18 +72,17 @@ private:
 
     QWidget *tree_panel;
     QHBoxLayout *tree_panel_l;
+
     SPrefsCatList *simple_tree;
     PrefsTree *advanced_tree;
 
     QGroupBox *types;
     QRadioButton *small,*all;
 
-    QGridLayout *main_layout;
-
     static PrefsDialog *instance;
 
 private slots:
-    void SetAdvanced();
+    void setAdvanced();
     void setSmall();
 
     void changeAdvPanel( QTreeWidgetItem * );
