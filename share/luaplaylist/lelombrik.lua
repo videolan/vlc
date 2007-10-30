@@ -16,12 +16,12 @@ function parse()
         if string.match( line, "id=\"nom_fichier\">" ) then
             vidtitle = string.gsub( line, ".*\"nom_fichier\">([^<]*).*", "%1" )
         end
-        if string.match( line, "<param name=\"movie\"" ) then
+        if string.match( line, "flvplayer.swf" ) then
             -- fallback: retrieve the title from the url if we didn't find it
             if vidtitle == "" then
                 vidtitle = string.gsub( vlc.path, ".*/([^.]*).*", "%1" )
             end
-            return { { path = string.gsub( line, ".*%?file=([^&]*).*", "%1" ); arturl = string.gsub( line, ".*&image=([^&]*).*", "%1" ); title = vidtitle } }
+            return { { path = string.gsub( line, ".*flashvars=\"&file=([^&]*).*", "%1" ); arturl = string.gsub( line, ".*&image=([^&]*).*", "%1" ); title = vidtitle } }
         end
     end
 end
