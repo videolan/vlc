@@ -143,7 +143,7 @@ void PrefsDialog::setAdvanced()
     /* If no advanced Panel exist, create one, attach it and show it*/
     if( !advanced_panel )
     {
-         advanced_panel = new AdvPrefsPanel( main_panel );
+        advanced_panel = new AdvPrefsPanel( main_panel );
         main_panel_l->addWidget( advanced_panel );
     }
     advanced_panel->show();
@@ -272,19 +272,23 @@ void PrefsDialog::save()
     config_SaveConfigFile( p_intf, NULL );
 
     /* Delete the other panel in order to force its reload after clicking
-       on apply - UGLY but will work for now. */
-    /* THIS CODE IS STILL WRONG, FIXME */
-    if( current_simple_panel  && current_simple_panel->isVisible() && advanced_panel )
+       on apply. In fact, if we don't do that, the preferences from the other
+       panels won't be accurate, so we would have to recreate the whole dialog,
+       and we don't want that.*/
+    if( small->isChecked() && advanced_panel )
     {
         delete advanced_panel;
         advanced_panel = NULL;
     }
-    if( advanced_panel && advanced_panel->isVisible() && current_simple_panel  )
+    if( all->isChecked() && current_simple_panel  )
     {
-        delete current_simple_panel;
+        for( int i = 0 ; i< SPrefsMax; i++ )
+        {
+            if( simple_panels[i] ) delete simple_panels[i];
+        }
         current_simple_panel  = NULL;
     }
-    
+
     hide();
 }
 
