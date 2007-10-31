@@ -871,7 +871,7 @@ static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame )
     block_t *p_block;
 
     if( !p_frame ) return 0;
-            
+
     /* New block */
     if( !( p_block = block_New( p_demux, p_sys->i_video_frame_size ) ) )
     {
@@ -1245,7 +1245,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         /* Try and set user chroma */
         if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
         {
-            msg_Warn( p_demux, "Driver is unable to use specified chroma.  Using defaults." );
+            msg_Warn( p_demux, "Driver is unable to use specified chroma %4.4s. Using defaults.", (char *)&fmt.fmt.pix.pixelformat );
             fmt.fmt.pix.pixelformat = 0;
         }
     }
