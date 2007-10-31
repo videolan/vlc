@@ -19,7 +19,7 @@ cflags=""
 cxxflags=""
 objcflags=""
 ldflags=""
-libs="-L@libdir@"
+libs=""
 
 cflags_tuning="@CFLAGS_TUNING@"
 cflags_optim_size="@CFLAGS_OPTIM_SIZE@"
