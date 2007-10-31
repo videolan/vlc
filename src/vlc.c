@@ -236,7 +236,8 @@ static void *SigHandler (void *data)
     for (;;)
     {
         int i_signal, state;
-        (void)sigwait (&fullset, &i_signal);
+        if( sigwait (&fullset, &i_signal) != 0 )
+            continue;
 
 #ifdef __APPLE__
         /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
