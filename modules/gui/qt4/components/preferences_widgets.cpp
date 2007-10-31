@@ -28,7 +28,6 @@
  *  - Finish implementation (see WX)
  *  - Improvements over WX
  *      - Validator for modulelist
- *  - Implement update stuff using a general Updated signal
  */
 
 #include "components/preferences_widgets.hpp"
@@ -685,7 +684,6 @@ void ModuleListConfigControl::onUpdate( int value )
             }
         }
     }
-    emit Updated();
 }
 
 /**************************************************************************

@@ -215,9 +215,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             detectionDolby );
 
             CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
-//          CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
+
             CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
-                                    volNormalizer );
+                                    volNormSpin );
             CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
 
             /* Audio Output Specifics */
@@ -271,6 +271,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.lastfm, stateChanged( int ), this ,
                     lastfm_Changed( int ) );
 
+            /* Normalizer */
+            normalizerBox = ui.volNormBox;
+            CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin, setEnabled( bool ) );
+            qs_filter = qfu( config_GetPsz( p_intf, "audio-filter" ) );
+            bool b_normalizer = ( qs_filter.contains( "volnorm" ) );
+            {
+                ui.volNormBox->setChecked( b_normalizer );
+                ui.volNormSpin->setEnabled( b_normalizer );
+            }
+
         END_SPREFS_CAT;
 
         /* Input and Codecs Panel Implementation */
@@ -297,7 +307,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
           CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
           CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
-
+            
           /* Caching */
 /*          CONFIG_GENERIC( );*/ //FIXME
 
@@ -327,14 +337,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
 
            /* interface */
-            p_config = config_FindConfig( VLC_OBJECT(p_intf), "intf" );
-            if( p_config->value.psz && strcmp( p_config->value.psz, "qt4" ))
+            char *psz_intf = config_GetPsz( p_intf, "intf" );
+            if( psz_intf )
             {
-                ui.qt4->setChecked( true );
-            }
-            if( p_config->value.psz && strcmp( p_config->value.psz, "skins2" ))
-            {
-                ui.skins->setChecked( true );
+                msg_Dbg( p_intf, "Interface in config file: %s", psz_intf );
+                if( strstr( psz_intf, "skin" ) )
+                    ui.skins->setChecked( true );
+                else if( strstr( psz_intf, "qt" ) )
+                    ui.qt4->setChecked( true );
             }
             skinInterfaceButton = ui.skins;
             qtInterfaceButton = ui.qt4;
@@ -434,6 +444,33 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "intf", "skins2" );
         if( qtInterfaceButton->isChecked() )
             config_PutPsz( p_intf, "intf", "qt4" );
+    }
+    
+    if( number == SPrefsAudio )
+    {
+        bool b_normChecked = normalizerBox->isChecked();
+        if( qs_filter.isEmpty() )
+        {
+            /* the psz_filter is already empty, so we just append it needed */
+            if( b_normChecked ) qs_filter = "volnorm";
+        }
+        else /* Not Empty */
+        {
+            if( qs_filter.contains( "volnorm" ) )
+            {
+                /* The qs_filter not empty and contains "volnorm" that we have to remove */
+                if( !b_normChecked )
+                {
+                    /* Ugly :D */
+                    qs_filter.remove( "volnorm:" );
+                    qs_filter.remove( ":volnorm" );
+                    qs_filter.remove( "volnorm" );
+                }
+            }
+            else /* qs_filter not empty, but doesn't have volnorm inside already */
+                if( b_normChecked ) qs_filter.append( ":volnorm" );
+        }
+        config_PutPsz( p_intf, "audio-filter", qtu( qs_filter ) );
     }
 }
 

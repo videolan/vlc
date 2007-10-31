@@ -43,6 +43,8 @@ class ConfigControl;
 class QComboBox;
 class QLineEdit;
 class QRadioButton;
+class QCheckBox;
+class QString;
 
 class SPrefsCatList : public QWidget
 {
@@ -72,6 +74,7 @@ private:
 
     int number;
 
+    /* this is ugly and bad until I found a new solution */
     QWidget *alsa_options;
     QWidget *oss_options;
     QWidget *directx_options;
@@ -80,6 +83,8 @@ private:
     QLineEdit *inputDevice;
     QRadioButton *skinInterfaceButton;
     QRadioButton *qtInterfaceButton;
+    QString qs_filter;
+    QCheckBox *normalizerBox;
 
 /* Display only the options for the selected audio output */
 private slots:

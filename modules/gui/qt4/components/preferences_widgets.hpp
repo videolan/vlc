@@ -85,8 +85,11 @@ protected:
     QString _name;
     QWidget *widget;
     bool _advanced;
+#if 0
+/* You shouldn't use that now..*/
 signals:
     void Updated();
+#endif
 };
 
 /*******************************************************

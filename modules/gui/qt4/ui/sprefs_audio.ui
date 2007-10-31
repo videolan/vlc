@@ -255,7 +255,7 @@
        </widget>
       </item>
       <item row="1" column="0" >
-       <widget class="QCheckBox" name="volumeNormalizer" >
+       <widget class="QCheckBox" name="volNormBox" >
         <property name="text" >
          <string>_("Volume normalizer")</string>
         </property>
@@ -269,7 +269,7 @@
        </widget>
       </item>
       <item row="1" column="1" >
-       <widget class="QDoubleSpinBox" name="volNormalizer" >
+       <widget class="QDoubleSpinBox" name="volNormSpin" >
         <property name="alignment" >
          <set>Qt::AlignRight</set>
         </property>
@@ -333,8 +333,8 @@
   <tabstop>OSSBrowse</tabstop>
   <tabstop>fileBrowseButton</tabstop>
   <tabstop>headphoneEffect</tabstop>
-  <tabstop>volumeNormalizer</tabstop>
-  <tabstop>volNormalizer</tabstop>
+  <tabstop>volNormBox</tabstop>
+  <tabstop>volNormSpin</tabstop>
   <tabstop>visualisation</tabstop>
  </tabstops>
  <resources/>
