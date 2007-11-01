@@ -1049,7 +1049,11 @@ static int64_t vlm_Date(void)
     ftime( &tm );
     return ((int64_t)tm.time) * 1000000 + ((int64_t)tm.millitm) * 1000;
 #else
-    return mdate();
+    struct timeval tv_date;
+
+    /* gettimeofday() cannot fail given &tv_date is a valid address */
+    (void)gettimeofday( &tv_date, NULL );
+    return (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec;
 #endif
 }
 
