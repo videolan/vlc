@@ -1703,9 +1703,8 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
     {
         *psz_unicode_start = '\0';
     }
-    else
+    else if( psz_unicode > psz_unicode_start )
     {
-        psz_unicode++;
         for( i=0; psz_unicode[ i ]; i++ )
             psz_unicode_start[ i ] = psz_unicode[ i ];
         psz_unicode_start[ i ] = '\0';
@@ -2507,6 +2506,16 @@ static int ProcessLines( filter_t *p_filter,
 
                     p_prev = p_line;
                     p_line = NULL;
+
+                    if( *psz_unicode == '\n')
+                    {
+                        uint32_t *c_ptr;
+
+                        for( c_ptr = psz_unicode; *c_ptr; c_ptr++ )
+                        {
+                            *c_ptr = *(c_ptr+1);
+                        }
+                    }
                 }
             }
             free( psz_unicode );
