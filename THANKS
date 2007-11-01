@@ -33,6 +33,7 @@ Bernie Purcell <b dot purcell at adbglobal dot com> - MKV USF subtitles support,
 Bill <wenwuangel at hotmail .com> - memleak fixes
 Bill Eldridge <bill at rfa.org> - documentation
 Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
+Brian C. Wiles - vlm schedule date fix
 Brian Robb <vascy at hotmail dot com> - win32 CD/DVD drive detection in wx, bug fixes
 Brian Raymond <braymond at echostorm dot net> - Quicktime 404 error on RTSP SETUP fix
 Brieuc Jeunhomme <bbp at via.ecp.fr> - bug fixes
