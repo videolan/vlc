@@ -579,6 +579,11 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
             case KEY_ENTER:
             case 0x0d:
+                if( !p_sys->pp_plist || !p_sys->pp_plist[p_sys->i_box_plidx] )
+                {
+                    b_ret = VLC_FALSE;
+                    break;
+                }
                 if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
                         == -1 )
                 {
