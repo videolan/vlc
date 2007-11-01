@@ -1,4 +1,4 @@
-List of vlc plugins (271)
+List of vlc plugins (333)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52sys: A/52 decapsulation demuxer.
@@ -51,8 +51,10 @@ $Id$
  * bluescreen: Bluescreen (weather channel like) video filter
  * bonjour: Zeroconf services discovery
  * caca: color ASCII art video output using libcaca
+ * cc: CC 608/708 subtitles decoder
  * cdda: input module to read audio CDs
  * cddax: input module to read audio CDs via libcdio
+ * cdg: CD-G decoder
  * cinepak: Cinepack video decoder
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
@@ -61,10 +63,10 @@ $Id$
  * converter_float: Floating-point audio format conversions
  * crop: Crop video filter
  * cvdsub: CVD subtitles decoder
- * daap: iTunes shares services discovery
  * dbus: D-Bus control interface
  * dc1394: firewire input module
  * deinterlace: naive deinterlacing filter.
+ * demux_cdg: Demuxer for CD-G files (Karaoke)
  * demuxdump: Pseudo-demuxer that dumps the stream
  * dirac: BBC Dirac codec
  * direct3d: video output module using the Direct3D API.
@@ -93,11 +95,13 @@ $Id$
  * faad: AAC decoder using libfaad2
  * fake: fake codec to be used in advanced streaming setups
  * fb: video output module for the Linux framebuffer.
+ * fbosd: framebuffer osd plugin
  * ffmpeg: Video decoder using the ffmpeg library
  * ffmpegaltivec: Video decoder using the ffmpeg library (Altivec version)
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
  * float32_mixer: Precise float32 audio mixer
+ * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
  * ftp : FTP input module
@@ -115,6 +119,8 @@ $Id$
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
  * gradient: Gradient and edge detection video effects filter
+ * grain: Grain Video filter
+ * grey_yuv: grayscale to others conversion module
  * growl: announce currently playing stream to growl
  * gtk2_main: Gtk+ wrapper for gtk_main
  * gtk_main: Gtk+ wrapper for gtk_main
@@ -127,16 +133,20 @@ $Id$
  * http: HTTP remote control webinterface
  * i420_rgb: planar YUV to packed RGB conversion functions.
  * i420_rgb_mmx: MMX accelerated version of i420_rgb.
+ * i420_rgb_sse2: sse2 accelerated version of i420_rgb.
  * i420_ymga: YUV to YUC conversion functions
  * i420_ymga_mmx: MMX accelerated version of i420_ymga
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions.
  * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2.
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2.
+ * i420_yuy2_sse2: sse2 accelerated version of i420_yuy2.
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions.
  * i422_yuy2_mmx: MMX accelerated version of i422_yuy2.
+ * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2.
  * id3: ID3 tag skipper
  * id3tag: ID3 tag parser/skipper using libid3tag
  * image: Image file video output
+ * inhibit: preventing the computer from suspending
  * invert: inverse video filter.
  * jack: jack server audio output
  * libmpeg2: Mpeg2 video decoder using libmpeg2
@@ -146,6 +156,7 @@ $Id$
  * logger: file logger plugin
  * logo: video filter to put a logo on the video
  * lpcm: LPCM decoder
+ * lua: Lua scripting inteface
  * m4a: MPEG-4 Audio Stream demuxer
  * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X.
@@ -158,6 +169,7 @@ $Id$
  * memcpymmx: MMX accelerated version of memcpy.
  * memcpymmxext: MMX EXT accelerated version of memcpy.
  * mga: video output module for Matrox cards using the Linux mga kernel driver.
+ * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork
  * mjpeg: a demuxer for multipart and concatenated JPEG data.
  * mkv: Matroska demuxer
  * mod: MOD demuxer
@@ -241,12 +253,15 @@ $Id$
  * screen: a input module that takes screenshots of the primary monitor
  * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
+ * seamcarving: Seam Carving for Content-Aware Image Resizing video filter
  * sharpen: Sharpen video filter
  * shout: Shoutcast services discovery
  * showintf: shows the main interface
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
+ * smf: Standard MIDI file demuxer
  * snapshot: a output module to save pictures from the vout.
+ * spatializer: A spatializer audio filter
  * spdif_mixer: dummy audio mixer for the S/PDIF output
  * speex: a speex audio decoder/packetizer using the libspeex library.
  * spudec: RLE DVD subtitles decoder.
@@ -265,13 +280,15 @@ $Id$
  * stream_out_transcode: audio & video transcoder using ffmpeg
  * stream_out_transrate: audio & video transrater using ffmpeg
  * subsdec: a codec to output textual subtitles
+ * subsusf: a demuxer for USF subtitles
  * subtitle: a demuxer for subtitle files
  * svcdsub: SVCD subtitles decoder
  * svg: a svg renderer module
  * svgalib: SGVAlib output plugin
- * swscale: Image scaling module
+ * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * tarkin: a tarkin video decoder using libtarkin
+ * telepathy: Telepathy Presence information using MissionControl notification
  * telnet: Telnet control interface for VideoLAN Media Manager
  * telx: teletext subtitles decoder
  * test1: Empty C module
@@ -323,3 +340,4 @@ $Id$
  * xvid: Decoder for the Xvid codec, using libxvidcore
  * xvideo: video output module using the XVideo API.
  * xvmc: XVMC video output and decoder
+ * zvbi: Teletext decoder using libzbvi
