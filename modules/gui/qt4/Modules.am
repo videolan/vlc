@@ -79,8 +79,6 @@ resources.cpp: res.qrc
 	sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
 	rm -f $@.tmp
 
-dialogs/help.cpp: $(top_builddir)/include/vlc_about.h
-
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
 		main_interface.cpp \
