@@ -115,7 +115,7 @@ struct libvlc_media_list_t
     libvlc_media_list_t *       p_flat_mlist;
 };
 
-typedef int (*libvlc_media_list_view_release_func_t)( libvlc_media_list_view_t * p_mlv ) ;
+typedef void (*libvlc_media_list_view_release_func_t)( libvlc_media_list_view_t * p_mlv ) ;
 
 typedef int (*libvlc_media_list_view_count_func_t)( struct libvlc_media_list_view_t * p_mlv,
         libvlc_exception_t * ) ;
