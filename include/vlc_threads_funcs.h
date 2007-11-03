@@ -69,7 +69,7 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 #define vlc_mutex_lock( P_MUTEX )                                           \
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( __FreeBSD__ )
 #   define CAST_PTHREAD_TO_INT(t) (unsigned long int)(uintptr_t)(void *)t
 #else
 #   define CAST_PTHREAD_TO_INT(t) (unsigned long int)t
