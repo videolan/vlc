@@ -1,6 +1,4 @@
 --[[
- French humor site: http://lelombrik.net
-
  $Id$
 
  Copyright © 2007 the VideoLAN team
