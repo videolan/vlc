@@ -42,36 +42,8 @@ struct libvlc_media_list_view_private_t
 /*
  * Private functions
  */
-static void add_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md );
-static void remove_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md );
 static void flat_media_list_view_release( libvlc_media_list_view_t * p_mlv );
 
-
-/**************************************************************************
- *       add_item (private)
- **************************************************************************/
-static void
-add_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md )
-{
-    trace( "p_md '%s'\n", p_md->p_input_item->psz_name );
-    libvlc_media_descriptor_retain( p_md );
-    vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
-}
-
-/**************************************************************************
- *       remove_item (private)
- **************************************************************************/
-static void
-remove_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md )
-{
-    trace( "p_md '%s'\n", p_md->p_input_item->psz_name );
-    int index = libvlc_media_list_index_of_item( p_mlv, p_md, NULL );
-    if( index < 0 )
-        return;
-
-    libvlc_media_descriptor_release( p_md );
-    vlc_array_remove( &p_mlv->p_this_view_data->array, index );
-}
 
 /**************************************************************************
  *       flat_media_list_view_count  (private)
