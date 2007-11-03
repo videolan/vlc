@@ -136,15 +136,15 @@ void libvlc_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 
     assert( p_instance->ref_count > 0 );
 
-    vlc_mutex_lock( &p_instance->instance_lock );
+    vlc_mutex_lock( lock );
     refs = --p_instance->ref_count;
     if( refs == 0 )
         libvlc_event_fini( p_instance, p_e );
-    vlc_mutex_unlock( &p_instance->instance_lock );
+    vlc_mutex_unlock( lock );
 
     if( refs == 0 )
     {
-        vlc_mutex_destroy( &p_instance->instance_lock );
+        vlc_mutex_destroy( lock );
         vlc_mutex_destroy( &p_instance->event_callback_lock );
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int, VLC_FALSE );
