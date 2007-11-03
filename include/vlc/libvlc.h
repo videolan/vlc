@@ -522,9 +522,9 @@ VLC_PUBLIC_API void
 VLC_PUBLIC_API void
     libvlc_media_list_unlock( libvlc_media_list_t * );
 
-VLC_PUBLIC_API libvlc_media_list_t *
-    libvlc_media_list_flat_media_list( libvlc_media_list_t *,
-                                       libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_media_list_view_t *
+    libvlc_media_list_flat_view( libvlc_media_list_t *,
+                                 libvlc_exception_t * );
 
 VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_list_event_manager( libvlc_media_list_t *,
