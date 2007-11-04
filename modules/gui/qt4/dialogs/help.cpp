@@ -94,7 +94,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
                 "VideoLAN Team.\nIt is a standalone multimedia player, "
                 "encoder and streamer, that can read from many supports "
                 "(files, CDs, DVDs, networks, capture cards...) and that "
-                " works on many platforms.\n\n" )
+                "works on many platforms.\n\n" )
             + qtr( "You are using the new Qt4 Interface.\n" )
             + qtr( "Compiled by " ) + qfu( VLC_CompileBy() )+ "@"
             + qfu( VLC_CompileDomain() ) + ".\n"
@@ -121,7 +121,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QWidget *thanksWidget = new QWidget( this );
     QVBoxLayout *thanksLayout = new QVBoxLayout( thanksWidget );
 
-    QLabel *thanksLabel = new QLabel( qtr("We would like to thanks the whole "
+    QLabel *thanksLabel = new QLabel( qtr("We would like to thank the whole "
                 "community, the testers, our users and the following people "
                 "(and the missing ones...) for their collaboration to "
                 "provide the best software." ) );
