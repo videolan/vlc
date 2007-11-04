@@ -43,7 +43,6 @@
     NSString *o_credits_path;
     NSString *o_credits;
     NSString *o_thanks;
-    NSString *o_name_version;
     NSString *o_copyright;
     NSDictionary *o_info_dict;
     CFBundleRef localInfoBundle;
