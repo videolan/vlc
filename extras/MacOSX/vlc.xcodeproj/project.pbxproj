@@ -58,12 +58,8 @@
 		8E9390CB0565D6D300C7661C /* volumeslider_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 8E9390B10565D6D300C7661C /* volumeslider_blue.png */; };
 		8E9390CC0565D6D300C7661C /* volumeslider_normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 8E9390B20565D6D300C7661C /* volumeslider_normal.png */; };
 		8E9390CD0565D6D300C7661C /* volumetrack.png in Resources */ = {isa = PBXBuildFile; fileRef = 8E9390B30565D6D300C7661C /* volumetrack.png */; };
-		8E9CC7B2046EFD700059A3A7 /* THANKS in Resources */ = {isa = PBXBuildFile; fileRef = 8E9CC7B1046EFD700059A3A7 /* THANKS */; };
 		8EBF3FA403F13FFB0059A3A7 /* vlc.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */; };
-		8ED6C29F03E2F32E0059A3A7 /* AUTHORS in Resources */ = {isa = PBXBuildFile; fileRef = 8ED6C29D03E2F32E0059A3A7 /* AUTHORS */; };
-		8ED6C2A003E2F32E0059A3A7 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 8ED6C29E03E2F32E0059A3A7 /* COPYING */; };
 		8EDAC3440440F72D0059A3A7 /* README.MacOSX.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */; };
-		A0E6B59904407FBD0080DD97 /* README in Resources */ = {isa = PBXBuildFile; fileRef = A0E6B59804407FBD0080DD97 /* README */; };
 		C2F2A6FB0958A6E600018C74 /* skip_forward_active_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FA0958A6E600018C74 /* skip_forward_active_embedded.png */; };
 		C2F2A6FD0958A94500018C74 /* play_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FC0958A94500018C74 /* play_embedded.png */; };
 		C2F2A6FF0958AA9300018C74 /* pause_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FE0958AA9300018C74 /* pause_embedded.png */; };
@@ -997,7 +993,6 @@
 		8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = prefs_widgets.m; path = ../../modules/gui/macosx/prefs_widgets.m; sourceTree = SOURCE_ROOT; };
 		8E9CA1A506D7DEE800B7186C /* voutgl.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = voutgl.m; path = ../../modules/gui/macosx/voutgl.m; sourceTree = SOURCE_ROOT; };
 		8E9CA1A606D7DEE800B7186C /* voutqt.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = voutqt.m; path = ../../modules/gui/macosx/voutqt.m; sourceTree = SOURCE_ROOT; };
-		8E9CC7B1046EFD700059A3A7 /* THANKS */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = text; name = THANKS; path = ../../THANKS; sourceTree = SOURCE_ROOT; };
 		8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text; name = vlc.scriptSuite; path = Resources/vlc.scriptSuite; sourceTree = SOURCE_ROOT; };
 		8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = vlc.scriptTerminology; path = Resources/vlc.scriptTerminology; sourceTree = SOURCE_ROOT; };
 		8ED6C27B03E2EB1C0059A3A7 /* controls.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = controls.m; path = ../../modules/gui/macosx/controls.m; sourceTree = SOURCE_ROOT; };
@@ -1014,12 +1009,9 @@
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28703E2EB1C0059A3A7 /* vout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = vout.h; path = ../../modules/gui/macosx/vout.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28803E2EB1C0059A3A7 /* vout.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = vout.m; path = ../../modules/gui/macosx/vout.m; sourceTree = SOURCE_ROOT; };
-		8ED6C29D03E2F32E0059A3A7 /* AUTHORS */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = text; name = AUTHORS; path = ../../AUTHORS; sourceTree = SOURCE_ROOT; };
-		8ED6C29E03E2F32E0059A3A7 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = text; name = COPYING; path = ../../COPYING; sourceTree = SOURCE_ROOT; };
 		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = README.MacOSX.rtf; path = ../../README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
 		8EE1AF9F044465080059A3A7 /* about.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = about.h; path = ../../modules/gui/macosx/about.h; sourceTree = SOURCE_ROOT; };
 		8EE1AFA0044465080059A3A7 /* about.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = about.m; path = ../../modules/gui/macosx/about.m; sourceTree = SOURCE_ROOT; };
-		A0E6B59804407FBD0080DD97 /* README */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = text; name = README; path = Resources/README; sourceTree = "<group>"; };
 		C2F2A6FA0958A6E600018C74 /* skip_forward_active_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_forward_active_embedded.png; path = Resources/skip_forward_active_embedded.png; sourceTree = "<group>"; };
 		C2F2A6FC0958A94500018C74 /* play_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = play_embedded.png; path = Resources/play_embedded.png; sourceTree = "<group>"; };
 		C2F2A6FE0958AA9300018C74 /* pause_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause_embedded.png; path = Resources/pause_embedded.png; sourceTree = "<group>"; };
@@ -1149,10 +1141,6 @@
 				8E445F86047289E50059A3A7 /* fileicons */,
 				8ECA7E520563CD9500DFC000 /* Controller */,
 				F69B0CA602E24F6401A80112 /* InfoPlist.strings */,
-				8ED6C29D03E2F32E0059A3A7 /* AUTHORS */,
-				8E9CC7B1046EFD700059A3A7 /* THANKS */,
-				8ED6C29E03E2F32E0059A3A7 /* COPYING */,
-				A0E6B59804407FBD0080DD97 /* README */,
 				8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */,
 				8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */,
 				8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */,
@@ -1412,13 +1400,9 @@
 				F6E4F91402D2648B01A80112 /* mpeg2.icns in Resources */,
 				F6E4F91502D2648B01A80112 /* mpeg4.icns in Resources */,
 				F69B0CA802E24F6401A80112 /* InfoPlist.strings in Resources */,
-				8ED6C29F03E2F32E0059A3A7 /* AUTHORS in Resources */,
-				8ED6C2A003E2F32E0059A3A7 /* COPYING in Resources */,
 				8EBF3FA403F13FFB0059A3A7 /* vlc.scriptSuite in Resources */,
 				DCC9AE9507F77DE600394C42 /* vlc.scriptTerminology in Resources */,
-				A0E6B59904407FBD0080DD97 /* README in Resources */,
 				8EDAC3440440F72D0059A3A7 /* README.MacOSX.rtf in Resources */,
-				8E9CC7B2046EFD700059A3A7 /* THANKS in Resources */,
 				8E445F9D04728A700059A3A7 /* a52.icns in Resources */,
 				8E445F9E04728A700059A3A7 /* aac.icns in Resources */,
 				8E445F9F04728A700059A3A7 /* asf.icns in Resources */,
