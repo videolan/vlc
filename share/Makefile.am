@@ -256,4 +256,10 @@ DIST_lua= \
 	luaplaylist/youtube.lua \
 	luaplaylist/youtube_homepage.lua \
 	luaplaylist/metacafe.lua \
-	luaplaylist/googlevideo.lua
+	luaplaylist/googlevideo.lua \
+	luaintf/rc.lua \
+	luaintf/hotkeys.lua \
+	luaintf/modules/common.lua \
+	luaintf/modules/host.lua \
+	luaintf/telnet.lua \
+	luaintf/dummy.lua

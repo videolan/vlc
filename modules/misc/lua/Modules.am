@@ -1,1 +1,1 @@
-SOURCES_lua = luaplaylist.c luameta.c vlclua.c vlclua.h
+SOURCES_lua = playlist.c meta.c intf.c vlc.c vlc.h callbacks.c objects.c variables.c configuration.c net.c vlm.c

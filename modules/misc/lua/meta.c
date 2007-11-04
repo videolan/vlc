@@ -1,5 +1,5 @@
 /*****************************************************************************
- * luameta.c: Get meta/artwork using lua scripts
+ * meta.c: Get meta/artwork using lua scripts
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
@@ -38,17 +38,18 @@
 #include <vlc_stream.h>
 #include <vlc_charset.h>
 
-#include "vlclua.h"
+#include "vlc.h"
 
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
-                       lua_State * p_state, void * user_data );
+                       lua_State * L, void * user_data );
 static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
-                      lua_State * p_state, void * user_data );
-static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item );
+                      lua_State * L, void * user_data );
+static lua_State *vlclua_meta_init( vlc_object_t *p_this,
+                                    input_item_t * p_item );
 
 
 /*****************************************************************************
@@ -57,6 +58,20 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
 /* Functions to register */
 static luaL_Reg p_reg[] =
 {
+    /* TODO: make an object out of the stream stuff, so we can do something
+     * like:
+     *
+     * s = vlc.stream_new( "http://www.videolan.org" )
+     * page = s:read( 2^16 )
+     * s:delete()
+     *
+     * instead of (which could be problematic since we don't check if
+     * s is really a stream object):
+     *
+     * s = vlc.stream_new( "http://www.videolan.org" )
+     * page = vlc.stream_read( s, 2^16 )
+     * vlc.stream_delete( s )
+     */
     { "stream_new", vlclua_stream_new },
     { "stream_read", vlclua_stream_read },
     { "stream_readline", vlclua_stream_readline },
@@ -75,8 +90,8 @@ static luaL_Reg p_reg[] =
  *****************************************************************************/
 static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item )
 {
-    lua_State * p_state = luaL_newstate();
-    if( !p_state )
+    lua_State * L = luaL_newstate();
+    if( !L )
     {
         msg_Err( p_this, "Could not create new Lua State" );
         return NULL;
@@ -84,40 +99,40 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     char *psz_meta;
 
     /* Load Lua libraries */
-    luaL_openlibs( p_state ); /* XXX: Don't open all the libs? */
+    luaL_openlibs( L ); /* XXX: Don't open all the libs? */
 
-    luaL_register( p_state, "vlc", p_reg );
+    luaL_register( L, "vlc", p_reg );
 
-    lua_pushlightuserdata( p_state, p_this );
-    lua_setfield( p_state, lua_gettop( p_state ) - 1, "private" );
+    lua_pushlightuserdata( L, p_this );
+    lua_setfield( L, -2, "private" );
 
     psz_meta = input_item_GetName( p_item );
-    lua_pushstring( p_state, psz_meta );
-    lua_setfield( p_state, lua_gettop( p_state ) - 1, "name" );
+    lua_pushstring( L, psz_meta );
+    lua_setfield( L, -2, "name" );
     free( psz_meta );
 
     psz_meta = input_item_GetArtist( p_item );
-    lua_pushstring( p_state, psz_meta );
-    lua_setfield( p_state, lua_gettop( p_state ) - 1, "artist" );
+    lua_pushstring( L, psz_meta );
+    lua_setfield( L, -2, "artist" );
     free( psz_meta );
 
     psz_meta = input_item_GetTitle( p_item ) ;
-    lua_pushstring( p_state, psz_meta );
-    lua_setfield( p_state, lua_gettop( p_state ) - 1, "title" );
+    lua_pushstring( L, psz_meta );
+    lua_setfield( L, -2, "title" );
     free( psz_meta );
 
     psz_meta = input_item_GetAlbum( p_item );
-    lua_pushstring( p_state, psz_meta );
-    lua_setfield( p_state, lua_gettop( p_state ) - 1, "album" );
+    lua_pushstring( L, psz_meta );
+    lua_setfield( L, -2, "album" );
     free( psz_meta );
 
     psz_meta = input_item_GetArtURL( p_item );
-    lua_pushstring( p_state, psz_meta );
-    lua_setfield( p_state, lua_gettop( p_state ) - 1, "arturl" );
+    lua_pushstring( L, psz_meta );
+    lua_setfield( L, -2, "arturl" );
     free( psz_meta );
     /* XXX: all should be passed ( could use macro ) */
 
-    return p_state;
+    return L;
 }
 
 /*****************************************************************************
@@ -125,7 +140,7 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
  * pointed by psz_filename.
  *****************************************************************************/
 static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
-                      lua_State * p_state, void * user_data )
+                      lua_State * L, void * user_data )
 {
     int i_ret = VLC_EGENERIC;
     input_item_t * p_input = user_data;
@@ -133,44 +148,44 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
 
     /* Ugly hack to delete previous versions of the fetchart()
     * functions. */
-    lua_pushnil( p_state );
-    lua_setglobal( p_state, "fetch_art" );
+    lua_pushnil( L );
+    lua_setglobal( L, "fetch_art" );
 
     /* Load and run the script(s) */
-    if( luaL_dofile( p_state, psz_filename ) )
+    if( luaL_dofile( L, psz_filename ) )
     {
         msg_Warn( p_this, "Error loading script %s: %s", psz_filename,
-                  lua_tostring( p_state, lua_gettop( p_state ) ) );
-        lua_pop( p_state, 1 );
+                  lua_tostring( L, lua_gettop( L ) ) );
+        lua_pop( L, 1 );
         return VLC_EGENERIC;
     }
 
-    lua_getglobal( p_state, "fetch_art" );
+    lua_getglobal( L, "fetch_art" );
 
-    if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
+    if( !lua_isfunction( L, lua_gettop( L ) ) )
     {
         msg_Warn( p_this, "Error while runing script %s, "
                   "function fetch_art() not found", psz_filename );
-        lua_pop( p_state, 1 );
+        lua_pop( L, 1 );
         return VLC_EGENERIC;
     }
 
-    if( lua_pcall( p_state, 0, 1, 0 ) )
+    if( lua_pcall( L, 0, 1, 0 ) )
     {
         msg_Warn( p_this, "Error while runing script %s, "
                   "function fetch_art(): %s", psz_filename,
-                  lua_tostring( p_state, lua_gettop( p_state ) ) );
-        lua_pop( p_state, 1 );
+                  lua_tostring( L, lua_gettop( L ) ) );
+        lua_pop( L, 1 );
         return VLC_EGENERIC;
     }
 
-    if((s = lua_gettop( p_state )))
+    if((s = lua_gettop( L )))
     {
         const char * psz_value;
 
-        if( lua_isstring( p_state, s ) )
+        if( lua_isstring( L, s ) )
         {
-            psz_value = lua_tostring( p_state, s );
+            psz_value = lua_tostring( L, s );
             if( psz_value && *psz_value != 0 )
             {
                 lua_Dbg( p_this, "setting arturl: %s", psz_value );
@@ -178,7 +193,7 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
                 i_ret = VLC_SUCCESS;
             }
         }
-        else if( !lua_isnil( p_state, s ) )
+        else if( !lua_isnil( L, s ) )
         {
             msg_Err( p_this, "Lua art fetcher script %s: "
                  "didn't return a string", psz_filename );
@@ -197,56 +212,55 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
  * pointed by psz_filename.
  *****************************************************************************/
 static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
-                       lua_State * p_state, void * user_data )
+                       lua_State * L, void * user_data )
 {
     input_item_t * p_input = user_data;
-    int t;
 
-    /* Ugly hack to delete previous versions of the fetchmeta()
-    * functions. */
-    lua_pushnil( p_state );
-    lua_setglobal( p_state, "fetch_meta" );
+    /* In lua, setting a variable to nil is equivalent to deleting it */
+    lua_pushnil( L );
+    lua_setglobal( L, "fetch_meta" );
 
     /* Load and run the script(s) */
-    if( luaL_dofile( p_state, psz_filename ) )
+    if( luaL_dofile( L, psz_filename ) )
     {
         msg_Warn( p_this, "Error loading script %s: %s", psz_filename,
-                  lua_tostring( p_state, lua_gettop( p_state ) ) );
-        lua_pop( p_state, 1 );
+                  lua_tostring( L, lua_gettop( L ) ) );
+        lua_pop( L, 1 );
         return VLC_EGENERIC;
     }
 
-    lua_getglobal( p_state, "fetch_meta" );
+    lua_getglobal( L, "fetch_meta" );
 
-    if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
+    if( !lua_isfunction( L, lua_gettop( L ) ) )
     {
         msg_Warn( p_this, "Error while runing script %s, "
                   "function fetch_meta() not found", psz_filename );
-        lua_pop( p_state, 1 );
+        lua_pop( L, 1 );
         return VLC_EGENERIC;
     }
 
-    if( lua_pcall( p_state, 0, 1, 0 ) )
+    if( lua_pcall( L, 0, 1, 0 ) )
     {
         msg_Warn( p_this, "Error while runing script %s, "
                   "function fetch_meta(): %s", psz_filename,
-                  lua_tostring( p_state, lua_gettop( p_state ) ) );
-        lua_pop( p_state, 1 );
+                  lua_tostring( L, lua_gettop( L ) ) );
+        lua_pop( L, 1 );
         return VLC_EGENERIC;
     }
 
 
-    if((t = lua_gettop( p_state )))
+    if( lua_gettop( L ) )
     {
-        if( lua_istable( p_state, t ) )
+        if( lua_istable( L, -1 ) )
         {
-            vlclua_read_meta_data( p_this, p_state, t, t+1, p_input );
-            vlclua_read_custom_meta_data( p_this, p_state, t, t+1, p_input );
+            /* ... item */
+            vlclua_read_meta_data( p_this, L, p_input );
+            vlclua_read_custom_meta_data( p_this, L, p_input );
         }
         else
         {
             msg_Err( p_this, "Lua playlist script %s: "
-                 "didn't return a table", psz_filename );
+                     "didn't return a table", psz_filename );
         }
     }
     else
@@ -267,10 +281,10 @@ int E_(FindMeta)( vlc_object_t *p_this )
 {
     meta_engine_t *p_me = (meta_engine_t *)p_this;
     input_item_t *p_item = p_me->p_item;
-    lua_State *p_state = vlclua_meta_init( p_this, p_item );
+    lua_State *L = vlclua_meta_init( p_this, p_item );
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "luameta", &fetch_meta, p_state, p_item );
-    lua_close( p_state );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "luameta", &fetch_meta, L, p_item );
+    lua_close( L );
     return i_ret;
 }
 
@@ -281,10 +295,10 @@ int E_(FindArt)( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t *)p_this;
     input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
-    lua_State *p_state = vlclua_meta_init( p_this, p_item );
+    lua_State *L = vlclua_meta_init( p_this, p_item );
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "luameta", &fetch_art, p_state, p_item );
-    lua_close( p_state );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "luameta", &fetch_art, L, p_item );
+    lua_close( L );
     return i_ret;
 }
 

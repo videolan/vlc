@@ -433,6 +433,14 @@ VLC-release.app: vlc
 	for i in $(srcdir)/share/luameta/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luameta/`basename $${i}` ; \
 	done ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf
+	for i in $(srcdir)/share/luaintf/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf/`basename $${i}` ; \
+	done ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf/modules
+	for i in $(srcdir)/share/luaintf/modules/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf/modules/`basename $${i}` ; \
+	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old
@@ -732,6 +740,14 @@ package-win32-base-debug: package-win-common
 	$(INSTALL) -d $(top_builddir)/vlc-${VERSION}/share/luameta
 	for i in $(srcdir)/share/luameta/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-${VERSION}/share/luameta/`basename $${i}` ; \
+	done ;
+	$(INSTALL) -d $(top_builddir)/vlc-${VERSION}/share/luaintf
+	for i in $(srcdir)/share/luaintf/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-${VERSION}/share/luaintf/`basename $${i}` ; \
+	done ;
+	$(INSTALL) -d $(top_builddir)/vlc-${VERSION}/share/luaintf/modules
+	for i in $(srcdir)/share/luaintf/modules/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-${VERSION}/share/luaintf/modules/`basename $${i}` ; \
 	done ;
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu"
