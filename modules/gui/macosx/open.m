@@ -235,15 +235,17 @@ static VLCOpen *_o_sharedMainInstance = nil;
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
 
-    /* wake up with the correct GUI */
+    /* wake up with the correct EyeTV GUI */
     if( [[[VLCMain sharedInstance] getEyeTVController] isEyeTVrunning] == YES )
         [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
-    if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
+    else if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
     {
         [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
         [self setupChannelInfo];
     }
- 
+    else
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"noeyetv"];
+
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self
                                                         selector: @selector(eyetvChanged:)
                                                             name: NULL
