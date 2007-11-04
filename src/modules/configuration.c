@@ -140,6 +140,7 @@ int __config_GetType( vlc_object_t *p_this, const char *psz_name )
         break;
 
     case CONFIG_ITEM_INTEGER:
+    case CONFIG_ITEM_KEY:
         i_type = VLC_VAR_INTEGER;
         break;
 
