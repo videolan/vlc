@@ -32,6 +32,10 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #ifdef HAVE_DBUS
 
 #define DBUS_API_SUBJECT_TO_CHANGE
@@ -125,6 +129,33 @@ static void Deactivate( vlc_object_t *p_this )
 #endif
 }
 
+/*****************************************************************************
+ * Execute: Spawns a process using execv()
+ *****************************************************************************/
+static void Execute( intf_thread_t *p_this, const char *psz_path,
+                                            const char *const *ppsz_args )
+{
+    pid_t pid;
+    switch( pid = fork() )
+    {
+        case 0:     /* we're the child */
+            /* We don't want output */
+            fclose( stdout );
+            fclose( stderr );
+            execv( psz_path, (char *const *)ppsz_args );
+            /* If the file we want to execute doesn't exist we exit() */
+            exit( -1 );
+            break;
+        case -1:    /* we're the error */
+            msg_Dbg( p_this, "Couldn't fork() while launching %s", psz_path );
+            break;
+        default:    /* we're the parent */
+            /* Wait for the child to exit.
+             * We will not deadlock because we ran "/bin/sh &" */
+            waitpid( pid, NULL, 0 );
+            break;
+    }
+}
 
 /*****************************************************************************
  * Run: main thread
@@ -160,7 +191,9 @@ static void Run( intf_thread_t *p_intf )
                 if( PLAYING_S == p_input->i_state )
                 {
                     /* http://www.jwz.org/xscreensaver/faq.html#dvd */
-                    system( "xscreensaver-command -deactivate >&- 2>&- &" );
+                    const char *const ppsz_xsargs[] = { "/bin/sh", "-c",
+                            "xscreensaver-command -deactivate &", (char*)NULL };
+                    Execute( p_intf, "/bin/sh", ppsz_xsargs );
 
                     /* If we have dbus support, let's communicate directly
                        with gnome-screensave else, run
@@ -168,7 +201,9 @@ static void Run( intf_thread_t *p_intf )
 #ifdef HAVE_DBUS
                     poke_screensaver( p_intf, p_intf->p_sys->p_connection );
 #else
-                    system( "gnome-screensaver-command --poke >&- 2>&- &" );
+                    const char *const ppsz_gsargs[] = { "/bin/sh", "-c",
+                            "gnome-screensaver-command --poke &", (char*)NULL };
+                    Execute( p_intf, "/bin/sh", ppsz_gsargs );
 #endif
                     /* FIXME: add support for other screensavers */
                 }
