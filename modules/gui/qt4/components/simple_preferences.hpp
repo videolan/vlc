@@ -85,6 +85,7 @@ private:
     QRadioButton *qtInterfaceButton;
     QString qs_filter;
     QCheckBox *normalizerBox;
+    QCheckBox *recordBox, *dumpBox, *bandwidthBox, *timeshiftBox;
 
 /* Display only the options for the selected audio output */
 private slots:

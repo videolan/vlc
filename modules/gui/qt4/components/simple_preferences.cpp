@@ -227,7 +227,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                              updateAudioOptions( int ) );
             audioOutput = ui.outputModule;
 
-        //FIXME: use modules_Exists
+        //TODO: use modules_Exists
 #ifndef WIN32
             CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel, alsaDevice );
             CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
@@ -305,23 +305,30 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 delete psz_vcddiscpath;
             }
 
-          CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
-          CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
-            
+            CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
+            CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
+        
           /* Caching */
 /*          CONFIG_GENERIC( );*/ //FIXME
 
-          CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
-          CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
-          CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
+            CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
+            CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
+            CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
 #ifdef WIN32
-          CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
+            CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
 #else
-          ui.systemCodecBox->hide();
-#endif
-          CONFIG_GENERIC( "timeshift-force", Bool, NULL, timeshiftBox );
-          CONFIG_GENERIC( "dump-force", Bool, NULL, DumpBox );
-//        CONFIG_GENERIC( "", Bool, NULL, RecordBox ); //FIXME activate record
+            ui.systemCodecBox->hide();
+#endif  
+            /* Access Filters */
+            qs_filter = qfu( config_GetPsz( p_intf, "access-filter" ) );
+            ui.timeshiftBox->setChecked( qs_filter.contains( "timeshift" ) );
+            ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
+            ui.recordBox->setChecked( qs_filter.contains( "record" ) );
+            ui.bandwidthBox->setChecked( qs_filter.contains( "bandwidth" ) );
+            timeshiftBox = ui.timeshiftBox;
+            recordBox = ui.recordBox;
+            dumpBox = ui.dumpBox;
+            bandwidthBox = ui.bandwidthBox;
         END_SPREFS_CAT;
 
         /* Interface Panel */
@@ -348,6 +355,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
             skinInterfaceButton = ui.skins;
             qtInterfaceButton = ui.qt4;
+            delete psz_intf;
 
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
@@ -416,7 +424,7 @@ void SPrefsPanel::updateAudioOptions( int number)
 void SPrefsPanel::apply()
 {
     msg_Dbg( p_intf, "Trying to save the %i simple panel", number );
-    
+
     /* Generic save for ever panel */
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
@@ -435,8 +443,24 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "vcd", psz_devicepath );
             config_PutPsz( p_intf, "cd-audio", psz_devicepath );
         }
-    }
+
+        bool b_first = true;
+#define saveBox( name, box ) {\
+        if( box->isChecked() ) { \
+            if( b_first ) { \
+                qs_filter.append( name ); \
+                b_first = false; \
+            } \
+            else qs_filter.append( ":" ).append( name ); \
+        } } 
     
+        saveBox( "record", recordBox );
+        saveBox( "dump", dumpBox );
+        saveBox( "timeshift", timeshiftBox );
+        saveBox( "bandwidth", bandwidthBox );
+        config_PutPsz( p_intf, "access-filter", qtu( qs_filter ) );
+    }
+
     /* Interfaces */
     if( number == SPrefsInterface )
     {
@@ -445,7 +469,7 @@ void SPrefsPanel::apply()
         if( qtInterfaceButton->isChecked() )
             config_PutPsz( p_intf, "intf", "qt4" );
     }
-    
+
     if( number == SPrefsAudio )
     {
         bool b_normChecked = normalizerBox->isChecked();
@@ -458,7 +482,8 @@ void SPrefsPanel::apply()
         {
             if( qs_filter.contains( "volnorm" ) )
             {
-                /* The qs_filter not empty and contains "volnorm" that we have to remove */
+                /* The qs_filter not empty and contains "volnorm" 
+                   that we have to remove */
                 if( !b_normChecked )
                 {
                     /* Ugly :D */
@@ -467,7 +492,7 @@ void SPrefsPanel::apply()
                     qs_filter.remove( "volnorm" );
                 }
             }
-            else /* qs_filter not empty, but doesn't have volnorm inside already */
+            else /* qs_filter not empty, but doesn't have volnorm inside */
                 if( b_normChecked ) qs_filter.append( ":volnorm" );
         }
         config_PutPsz( p_intf, "audio-filter", qtu( qs_filter ) );
