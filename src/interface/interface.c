@@ -93,11 +93,13 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     }
 
     /* Choose the best module */
+    p_intf->psz_intf = strdup( psz_module );
     p_intf->p_module = module_Need( p_intf, "interface", psz_module, VLC_FALSE );
 
     if( p_intf->p_module == NULL )
     {
         msg_Err( p_intf, "no suitable interface module" );
+        free( p_intf->psz_intf );
         vlc_object_destroy( p_intf );
         return NULL;
     }
@@ -183,6 +185,7 @@ void intf_Destroy( intf_thread_t *p_intf )
     {
         module_Unneed( p_intf, p_intf->p_module );
     }
+    free( p_intf->psz_intf );
 
     vlc_mutex_destroy( &p_intf->change_lock );
 
@@ -290,8 +293,8 @@ static void RunInterface( intf_thread_t *p_intf )
 
         vlc_mutex_unlock( &p_intf->object_lock );
 
+        p_intf->psz_intf = psz_intf;
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
-        free( psz_intf );
     }
     while( p_intf->p_module );
 }
