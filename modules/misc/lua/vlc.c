@@ -180,11 +180,11 @@ int vlclua_stream_new( lua_State *L )
     vlc_object_t * p_this = vlclua_get_this( L );
     stream_t * p_stream;
     const char * psz_url;
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
     psz_url = luaL_checkstring( L, -1 );
-    lua_pop( L, 1 );
     p_stream = stream_UrlNew( p_this, psz_url );
-    if( !p_stream ) return vlclua_error( L );
+    if( !p_stream )
+        return luaL_error( L, "Error when opening url: `%s'", psz_url );
+    lua_pop( L, 1 );
     lua_pushlightuserdata( L, p_stream );
     return 1;
 }
