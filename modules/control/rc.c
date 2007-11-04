@@ -1086,14 +1086,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "faster" ) )
     {
-        val.b_bool = VLC_TRUE;
         var_Set( p_input, "rate-faster", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "slower" ) )
     {
-        val.b_bool = VLC_TRUE;
         var_Set( p_input, "rate-slower", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
