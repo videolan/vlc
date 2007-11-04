@@ -136,7 +136,7 @@ int vlclua_quit( lua_State *L )
 int vlclua_volume_set( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    int i_volume = luaL_checkint( L, -1 );
+    int i_volume = luaL_checkint( L, 1 );
     /* Do we need to check that i_volume is in the AOUT_VOLUME_MIN->MAX range?*/
     return vlclua_push_ret( L, aout_VolumeSet( p_this, i_volume ) );
 }
@@ -184,7 +184,6 @@ int vlclua_stream_new( lua_State *L )
     p_stream = stream_UrlNew( p_this, psz_url );
     if( !p_stream )
         return luaL_error( L, "Error when opening url: `%s'", psz_url );
-    lua_pop( L, 1 );
     lua_pushlightuserdata( L, p_stream );
     return 1;
 }
@@ -195,10 +194,8 @@ int vlclua_stream_read( lua_State *L )
     int n;
     byte_t *p_read;
     int i_read;
-    if( lua_gettop( L ) != 2 ) return vlclua_error( L );
-    p_stream = (stream_t *)luaL_checklightuserdata( L, -2 );
-    n = luaL_checkint( L, -1 );
-    lua_pop( L, 2 );
+    p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
+    n = luaL_checkint( L, 2 );
     p_read = malloc( n );
     if( !p_read ) return vlclua_error( L );
     i_read = stream_Read( p_stream, p_read, n );
@@ -210,9 +207,7 @@ int vlclua_stream_read( lua_State *L )
 int vlclua_stream_readline( lua_State *L )
 {
     stream_t * p_stream;
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    p_stream = (stream_t *)luaL_checklightuserdata( L, -1 );
-    lua_pop( L, 1 );
+    p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
     char *psz_line = stream_ReadLine( p_stream );
     if( psz_line )
     {
@@ -220,94 +215,94 @@ int vlclua_stream_readline( lua_State *L )
         free( psz_line );
     }
     else
-    {
         lua_pushnil( L );
-    }
     return 1;
 }
 
 int vlclua_stream_delete( lua_State *L )
 {
     stream_t * p_stream;
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    p_stream = (stream_t *)luaL_checklightuserdata( L, -1 );
-    lua_pop( L, 1 );
+    p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
     stream_Delete( p_stream );
-    return 1;
+    return 0;
 }
 
 /*****************************************************************************
  * String transformations
  *****************************************************************************/
-/* TODO: make it work for any number of arguments */
 int vlclua_decode_uri( lua_State *L )
 {
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    const char *psz_cstring = luaL_checkstring( L, 1 );
-    if( !psz_cstring ) return vlclua_error( L );
-    char *psz_string = strdup( psz_cstring );
-    lua_pop( L, 1 );
-    decode_URI( psz_string );
-    lua_pushstring( L, psz_string );
-    free( psz_string );
-    return 1;
+    int i_top = lua_gettop( L );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+    {
+        const char *psz_cstring = luaL_checkstring( L, 1 );
+        char *psz_string = strdup( psz_cstring );
+        lua_remove( L, 1 ); /* remove elements to prevent being limited by
+                             * the stack's size (this function will work with
+                             * up to (stack size - 1) arguments */
+        decode_URI( psz_string );
+        lua_pushstring( L, psz_string );
+        free( psz_string );
+    }
+    return i_top;
 }
 
-/* TODO: make it work for any number of arguments */
 int vlclua_resolve_xml_special_chars( lua_State *L )
 {
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    const char *psz_cstring = luaL_checkstring( L, 1 );
-    if( !psz_cstring ) return vlclua_error( L );
-    char *psz_string = strdup( psz_cstring );
-    lua_pop( L, 1 );
-    resolve_xml_special_chars( psz_string );
-    lua_pushstring( L, psz_string );
-    free( psz_string );
-    return 1;
+    int i_top = lua_gettop( L );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+    {
+        const char *psz_cstring = luaL_checkstring( L, 1 );
+        char *psz_string = strdup( psz_cstring );
+        lua_remove( L, 1 ); /* remove elements to prevent being limited by
+                             * the stack's size (this function will work with
+                             * up to (stack size - 1) arguments */
+        resolve_xml_special_chars( psz_string );
+        lua_pushstring( L, psz_string );
+        free( psz_string );
+    }
+    return i_top;
 }
 
 /*****************************************************************************
  * Messaging facilities
  *****************************************************************************/
-/* TODO: make it work for any number of arguments */
 int vlclua_msg_dbg( lua_State *L )
 {
+    int i_top = lua_gettop( L );
     vlc_object_t *p_this = vlclua_get_this( L );
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    const char *psz_cstring = luaL_checkstring( L, 1 );
-    if( !psz_cstring ) return vlclua_error( L );
-    msg_Dbg( p_this, "%s", psz_cstring );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+        msg_Dbg( p_this, "%s", luaL_checkstring( L, 1 ) );
     return 0;
 }
-/* TODO: make it work for any number of arguments */
 int vlclua_msg_warn( lua_State *L )
 {
+    int i_top = lua_gettop( L );
     vlc_object_t *p_this = vlclua_get_this( L );
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    const char *psz_cstring = luaL_checkstring( L, 1 );
-    if( !psz_cstring ) return vlclua_error( L );
-    msg_Warn( p_this, "%s", psz_cstring );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+        msg_Warn( p_this, "%s", luaL_checkstring( L, i ) );
     return 0;
 }
-/* TODO: make it work for any number of arguments */
 int vlclua_msg_err( lua_State *L )
 {
+    int i_top = lua_gettop( L );
     vlc_object_t *p_this = vlclua_get_this( L );
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    const char *psz_cstring = luaL_checkstring( L, 1 );
-    if( !psz_cstring ) return vlclua_error( L );
-    msg_Err( p_this, "%s", psz_cstring );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+        msg_Err( p_this, "%s", luaL_checkstring( L, i ) );
     return 0;
 }
-/* TODO: make it work for any number of arguments */
 int vlclua_msg_info( lua_State *L )
 {
+    int i_top = lua_gettop( L );
     vlc_object_t *p_this = vlclua_get_this( L );
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    const char *psz_cstring = luaL_checkstring( L, 1 );
-    if( !psz_cstring ) return vlclua_error( L );
-    msg_Info( p_this, "%s", psz_cstring );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+        msg_Info( p_this, "%s", luaL_checkstring( L, i ) );
     return 0;
 }
 

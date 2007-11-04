@@ -60,14 +60,9 @@ struct demux_sys_t
 static int vlclua_demux_peek( lua_State *L )
 {
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
-    int i = lua_gettop( L );
-    int n;
+    int n = luaL_checkint( L, 1 );
     const uint8_t *p_peek;
-    int i_peek;
-    if( !i ) return 0;
-    n = lua_tonumber( L, 1 );
-    lua_pop( L, i );
-    i_peek = stream_Peek( p_demux->s, &p_peek, n );
+    int i_peek = stream_Peek( p_demux->s, &p_peek, n );
     lua_pushlstring( L, (const char *)p_peek, i_peek );
     return 1;
 }
@@ -75,14 +70,9 @@ static int vlclua_demux_peek( lua_State *L )
 static int vlclua_demux_read( lua_State *L )
 {
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
-    int i = lua_gettop( L );
-    int n;
     byte_t *p_read;
-    int i_read;
-    if( !i ) return 0;
-    n = lua_tonumber( L, 1 );
-    lua_pop( L, i );
-    i_read = stream_Read( p_demux->s, &p_read, n );
+    int n = luaL_checkint( L, 1 );
+    int i_read = stream_Read( p_demux->s, &p_read, n );
     lua_pushlstring( L, (const char *)p_read, i_read );
     return 1;
 }
@@ -153,7 +143,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
 
     lua_getglobal( L, "probe" );
 
-    if( !lua_isfunction( L, lua_gettop( L ) ) )
+    if( !lua_isfunction( L, -1 ) )
     {
         msg_Warn( p_demux, "Error while runing script %s, "
                   "function probe() not found", psz_filename );
@@ -259,7 +249,7 @@ static int Demux( demux_t *p_demux )
 
     lua_getglobal( L, "parse" );
 
-    if( !lua_isfunction( L, lua_gettop( L ) ) )
+    if( !lua_isfunction( L, -1 ) )
     {
         msg_Warn( p_demux, "Error while runing script %s, "
                   "function parse() not found", psz_filename );
