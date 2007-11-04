@@ -457,7 +457,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
              if( *pp_sectors == NULL )
              {
                  msg_Err( p_this, "out of memory" );
-                 return NULL;
+                 return 0;
              }
 
              toc_entries.address_format = CD_LBA_FORMAT;
