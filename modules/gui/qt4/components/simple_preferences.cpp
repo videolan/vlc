@@ -26,12 +26,7 @@
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 
-#include "ui/sprefs_input.h"
-#include "ui/sprefs_audio.h"
-#include "ui/sprefs_video.h"
-#include "ui/sprefs_subtitles.h"
-#include "ui/sprefs_hotkeys.h"
-#include "ui/sprefs_interface.h"
+
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -137,7 +132,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #define START_SPREFS_CAT( name , label )    \
         case SPrefs ## name:                \
         {                                   \
-            Ui::SPrefs ## name ui;          \
+            Ui::SPrefs ## name ui;      \
             ui.setupUi( panel );            \
             panel_label->setText( label );
 
@@ -183,7 +178,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #ifdef WIN32
             CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
             CONFIG_GENERIC( "directx-device", StringList, NULL,
-                    dXdisplayDevice );
+                            dXdisplayDevice );
 #else
             ui.directXBox->setVisible( false );
 #endif
@@ -203,6 +198,19 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Audio, qtr("General audio settings") );
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+
+            /* and hide if necessary */
+
+#ifdef WIN32
+            ui.OSSControl->hide();
+            ui.alsaControl->hide();
+#else
+            ui.DirectXControl->hide();
+#endif
+            ui.lastfm_user_edit->hide();
+            ui.lastfm_user_label->hide();
+            ui.lastfm_pass_edit->hide();
+            ui.lastfm_pass_label->hide();
 
             /* General Audio Options */
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
@@ -225,7 +233,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONNECT( ui.outputModule, currentIndexChanged( int ), this,
                              updateAudioOptions( int ) );
-            audioOutput = ui.outputModule;
+            
 
         //TODO: use modules_Exists
 #ifndef WIN32
@@ -239,30 +247,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         // File exists everywhere
             CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
                                  fileName, fileBrowseButton );
-            alsa_options = ui.alsaControl;
-            oss_options = ui.OSSControl;
-            directx_options = ui.DirectXControl;
-            file_options = ui.fileControl;
 
-        /* and hide if necessary */
-#ifdef WIN32
-            oss_options->hide();
-            alsa_options->hide();
-#else
-            directx_options->hide();
-#endif
-
-            updateAudioOptions( audioOutput->currentIndex() );
+            optionWidgets.append( ui.alsaControl );
+            optionWidgets.append( ui.OSSControl );
+            optionWidgets.append( ui.DirectXControl );
+            optionWidgets.append( ui.fileControl );
+            optionWidgets.append( ui.outputModule );
+            optionWidgets.append( ui.volNormBox );
+            updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
             CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
                          lastfm_user_edit );
             CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
                          lastfm_pass_edit );
-            ui.lastfm_user_edit->hide();
-            ui.lastfm_user_label->hide();
-            ui.lastfm_pass_edit->hide();
-            ui.lastfm_pass_label->hide();
 
             if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
                 ui.lastfm->setCheckState( Qt::Checked );
@@ -272,8 +270,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     lastfm_Changed( int ) );
 
             /* Normalizer */
-            normalizerBox = ui.volNormBox;
-            CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin, setEnabled( bool ) );
+          
+            CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin,
+                     setEnabled( bool ) );
             qs_filter = qfu( config_GetPsz( p_intf, "audio-filter" ) );
             bool b_normalizer = ( qs_filter.contains( "volnorm" ) );
             {
@@ -285,8 +284,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* Input and Codecs Panel Implementation */
         START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs settings") );
-            inputDevice = ui.DVDDevice;
-          /* Disk Devices */
+
+            
+            /* Disk Devices */
             {
                 ui.DVDDevice->setToolTip(
                     qtr( "If this propriety is blank, then you have\n"
@@ -308,8 +308,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
             CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
         
-          /* Caching */
-/*          CONFIG_GENERIC( );*/ //FIXME
+            /* Caching */
+            #define addToCachingBox( str, cachingNumber ) \
+                ui.cachingCombo->addItem( str, QVariant( cachingNumber ) );
+            addToCachingBox( "Custom", CachingCustom );
+            addToCachingBox( "Lowest latency", CachingLowest );
+            addToCachingBox( "Low latency", CachingLow );
+            addToCachingBox( "Normal", CachingNormal );
+            addToCachingBox( "High latency", CachingHigh );
+            addToCachingBox( "Higher latency", CachingHigher );
 
             CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
             CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
@@ -325,13 +332,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
             ui.recordBox->setChecked( qs_filter.contains( "record" ) );
             ui.bandwidthBox->setChecked( qs_filter.contains( "bandwidth" ) );
-            timeshiftBox = ui.timeshiftBox;
-            recordBox = ui.recordBox;
-            dumpBox = ui.dumpBox;
-            bandwidthBox = ui.bandwidthBox;
+            
+            optionWidgets.append( ui.recordBox );
+            optionWidgets.append( ui.dumpBox );
+            optionWidgets.append( ui.bandwidthBox );
+            optionWidgets.append( ui.timeshiftBox );
+            optionWidgets.append( ui.DVDDevice );
+            optionWidgets.append( ui.cachingCombo );
         END_SPREFS_CAT;
 
-        /* Interface Panel */
+        /*******************
+         * Interface Panel *
+         *******************/
         START_SPREFS_CAT( Interface, qtr("Interface settings") );
             ui.defaultLabel->setFont( italicFont );
             ui.skinsLabel->setFont( italicFont );
@@ -343,7 +355,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.languageLabel->hide();
 #endif
 
-           /* interface */
+            /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
             if( psz_intf )
             {
@@ -353,14 +365,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 else if( strstr( psz_intf, "qt" ) )
                     ui.qt4->setChecked( true );
             }
-            skinInterfaceButton = ui.skins;
-            qtInterfaceButton = ui.qt4;
             delete psz_intf;
+
+            optionWidgets.append( ui.skins );
+            optionWidgets.append( ui.qt4 );
 
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
                     skinBrowse );
-#if defined( WIN32 ) || defined(HAVE_DBUS_3)
+#if defined( WIN32 ) || defined( HAVE_DBUS_3 )
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
                     EnqueueOneInterfaceMode );
@@ -388,37 +401,26 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
         }
 
-    panel_layout->addWidget(panel_label);
-    panel_layout->addWidget(title_line);
+    panel_layout->addWidget( panel_label );
+    panel_layout->addWidget( title_line );
     panel_layout->addWidget( panel );
     panel_layout->addStretch( 2 );
 
-    this->setLayout(panel_layout);
+    setLayout( panel_layout );
 }
 
 void SPrefsPanel::updateAudioOptions( int number)
 {
-    QString value = audioOutput->itemData( number ).toString();
+    QString value = qobject_cast<QComboBox *>(optionWidgets[audioOutCoB])
+                                            ->itemData( number ).toString();
 
 #ifndef WIN32
-    oss_options->hide();
-    alsa_options->hide();
+    optionWidgets[ossW]->setVisible( ( value == "oss" ) );
+    optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
 #else
-    directx_options->hide();
+    optionWidgets[directxW]->setVisible( ( value == "directx" ) );
 #endif
-    file_options->hide();
-
-   if( value == "aout_file" )
-         file_options->show();
-#ifndef WIN32
-    else if( value == "alsa" )
-        alsa_options->show();
-    else if( value == "oss" )
-        oss_options->show();
-#else
-    else if( value == "directx" )
-        directx_options->show();
-#endif
+    optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
 }
 
 void SPrefsPanel::apply()
@@ -436,7 +438,9 @@ void SPrefsPanel::apply()
     /* Devices */
     if( number == SPrefsInputAndCodecs )
     {
-        char *psz_devicepath = qtu( inputDevice->text() );
+        /* Device default selection */
+        char *psz_devicepath = 
+              qtu( qobject_cast<QLineEdit *>(optionWidgets[inputLE] )->text() );
         if( !EMPTY_STR( psz_devicepath ) )
         {
             config_PutPsz( p_intf, "dvd", psz_devicepath );
@@ -444,7 +448,7 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "cd-audio", psz_devicepath );
         }
 
-        bool b_first = true;
+        /* Access filters */
 #define saveBox( name, box ) {\
         if( box->isChecked() ) { \
             if( b_first ) { \
@@ -453,26 +457,33 @@ void SPrefsPanel::apply()
             } \
             else qs_filter.append( ":" ).append( name ); \
         } } 
-    
-        saveBox( "record", recordBox );
-        saveBox( "dump", dumpBox );
-        saveBox( "timeshift", timeshiftBox );
-        saveBox( "bandwidth", bandwidthBox );
+
+        bool b_first = true;    
+        saveBox( "record", qobject_cast<QCheckBox *>(optionWidgets[recordChB]) );
+        saveBox( "dump", qobject_cast<QCheckBox *>(optionWidgets[dumpChB]) );
+        saveBox( "timeshift", qobject_cast<QCheckBox *>(optionWidgets[timeshiftChB]) );
+        saveBox( "bandwidth", qobject_cast<QCheckBox *>(optionWidgets[bandwidthChB] ) );
         config_PutPsz( p_intf, "access-filter", qtu( qs_filter ) );
+
+        QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
+        /* Caching */
+        msg_Dbg( p_intf, "%i", 
+                cachingCombo->itemData( cachingCombo->currentIndex() ).toInt() );
     }
 
     /* Interfaces */
     if( number == SPrefsInterface )
     {
-        if( skinInterfaceButton->isChecked() )
+        if( qobject_cast<QRadioButton *>(optionWidgets[skinRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "skins2" );
-        if( qtInterfaceButton->isChecked() )
+        if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "qt4" );
     }
 
     if( number == SPrefsAudio )
     {
-        bool b_normChecked = normalizerBox->isChecked();
+        bool b_normChecked = 
+            qobject_cast<QCheckBox *>(optionWidgets[normalizerChB])->isChecked();
         if( qs_filter.isEmpty() )
         {
             /* the psz_filter is already empty, so we just append it needed */

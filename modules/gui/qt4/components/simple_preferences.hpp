@@ -28,6 +28,13 @@
 #include <vlc_interface.h>
 #include <QWidget>
 
+#include "ui/sprefs_input.h"
+#include "ui/sprefs_audio.h"
+#include "ui/sprefs_video.h"
+#include "ui/sprefs_subtitles.h"
+#include "ui/sprefs_hotkeys.h"
+#include "ui/sprefs_interface.h"
+
 enum {
     SPrefsInterface = 0,
     SPrefsAudio,
@@ -38,6 +45,19 @@ enum {
     SPrefsMax
 };
 #define SPrefsDefaultCat SPrefsInterface
+
+enum {
+    CachingCustom = 0,
+    CachingLowest = 100,
+    CachingLow = 200,
+    CachingNormal = 300,
+    CachingHigh = 400,
+    CachingHigher = 500
+};
+
+enum { alsaW = 0, ossW, directxW, fileW, audioOutCoB, normalizerChB };
+enum { recordChB, dumpChB, bandwidthChB, timeshiftChB, inputLE, cachingCoB };
+enum { skinRB, qtRB };
 
 class ConfigControl;
 class QComboBox;
@@ -74,18 +94,8 @@ private:
 
     int number;
 
-    /* this is ugly and bad until I found a new solution */
-    QWidget *alsa_options;
-    QWidget *oss_options;
-    QWidget *directx_options;
-    QWidget *file_options;
-    QComboBox *audioOutput;
-    QLineEdit *inputDevice;
-    QRadioButton *skinInterfaceButton;
-    QRadioButton *qtInterfaceButton;
+    QList<QWidget *> optionWidgets;
     QString qs_filter;
-    QCheckBox *normalizerBox;
-    QCheckBox *recordBox, *dumpBox, *bandwidthBox, *timeshiftBox;
 
 /* Display only the options for the selected audio output */
 private slots:

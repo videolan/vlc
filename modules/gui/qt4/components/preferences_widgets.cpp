@@ -44,6 +44,7 @@
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QSignalMapper>
+
 QString formatTooltip(const QString & tooltip)
 {
     QString formatted =
