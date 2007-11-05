@@ -834,7 +834,7 @@ static void ALSAFill( aout_instance_t * p_aout )
         }
         else
         {
-            /* Here the device should be either in the RUNNING state.
+            /* Here the device should be in RUNNING state.
              * p_status is valid. */
 
 #if 0
@@ -887,7 +887,7 @@ static void ALSAFill( aout_instance_t * p_aout )
                 /* Device does not supprot resuming, restart it */
                 i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
 
-            if( i_snd_rc < 0 )
+            if( i_snd_rc == 0 )
                 i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm,
                                            p_buffer->p_buffer,
                                            p_buffer->i_nb_samples );
