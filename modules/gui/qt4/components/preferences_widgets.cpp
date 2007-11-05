@@ -45,6 +45,7 @@
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QSignalMapper>
+#include <QDialogButtonBox>
 
 QString formatTooltip(const QString & tooltip)
 {
@@ -1120,6 +1121,7 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
     values = _values;
     conflicts = false;
     keyToChange = _keyToChange;
+    
     setWindowTitle( qtr( "Hotkey for " ) + qfu( keyToChange)  );
 
     QVBoxLayout *l = new QVBoxLayout( this );
@@ -1128,16 +1130,16 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
     l->addWidget( selected , Qt::AlignCenter );
     l->addWidget( warning, Qt::AlignCenter );
 
-    QHBoxLayout *l2 = new QHBoxLayout();
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
     QPushButton *ok = new QPushButton( qtr("OK") );
-    l2->addWidget( ok );
     QPushButton *cancel = new QPushButton( qtr("Cancel") );
-    l2->addWidget( cancel );
+    buttonBox->addButton( ok, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
 
-    BUTTONACT( ok, accept() );
-    BUTTONACT( cancel, reject() );
-
-    l->addLayout( l2 );
+    l->addWidget( buttonBox );
+    
+    CONNECT( buttonBox, accepted(), this, accept() );
+    CONNECT( buttonBox, rejected(), this, reject() );
 }
 
 void KeyInputDialog::checkForConflicts( int i_vlckey )
