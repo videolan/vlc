@@ -25,7 +25,8 @@
 
 /**
  * Todo:
- *  - Finish implementation (see WX)
+ *  - Finish implementation (see WX, there might be missing a
+ *    i_action handler for IntegerLists, but I don't see any module using it...
  *  - Improvements over WX
  *      - Validator for modulelist
  */
@@ -398,7 +399,6 @@ void StringListConfigControl::actionRequested( int i_action )
         combo->clear();
         finish( true );
         p_item->b_dirty = VLC_FALSE;
-
     }
 }
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
