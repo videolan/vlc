@@ -57,7 +57,6 @@ nodist_SOURCES_qt4 = \
 		ui/sprefs_interface.h \
 		ui/sprefs_subtitles.h \
 		ui/sprefs_video.h \
-		ui/sprefs_hotkeys.h \
 		ui/streampanel.h \
 		ui/sout.h
 
@@ -157,7 +156,6 @@ EXTRA_DIST += \
 	ui/sprefs_audio.ui \
 	ui/sprefs_input.ui \
 	ui/sprefs_interface.ui \
-	ui/sprefs_hotkeys.ui \
 	ui/sprefs_subtitles.ui \
 	ui/sprefs_video.ui \
 	ui/streampanel.ui \

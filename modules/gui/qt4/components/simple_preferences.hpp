@@ -32,7 +32,6 @@
 #include "ui/sprefs_audio.h"
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
-#include "ui/sprefs_hotkeys.h"
 #include "ui/sprefs_interface.h"
 
 enum {
