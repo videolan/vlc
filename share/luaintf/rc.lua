@@ -464,19 +464,20 @@ while not vlc.should_die() do
 
     for _, client in pairs(read) do
         local input = client:recv(1000)
+        local done = false
         if string.match(input,"\n$") then
             client.buffer = string.gsub(client.buffer..input,"\r?\n$","")
+            done = true
         elseif client.buffer == ""
            and ((client.type == host.client_type.stdio and input == "")
            or  (client.type == host.client_type.net and input == "\004")) then
             -- Caught a ^D
             client.buffer = "quit"
+            done = true
         else
             client.buffer = client.buffer .. input
         end
-        if client.buffer == "" then
-            client:send( client.env.prompt )
-        else
+        if done then
             local cmd,arg = split_input(client.buffer)
             client.buffer = ""
             client:switch_status(host.status.write)
