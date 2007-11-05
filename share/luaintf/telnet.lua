@@ -21,7 +21,10 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]==========================================================================]
 
---[==========================================================================[
+description=
+[============================================================================[
+ VLM Interface plugin
+
  Copy (features wise) of the original VLC modules/control/telnet.c module.
 
  Differences are:
@@ -31,7 +34,13 @@
       for example:
         listen on stdin: vlc -I lua --lua-intf telnet --lua-config "telnet={host='*console'}"
         listen on stdin + 2 ports on localhost: vlc -I lua --lua-intf telnet --lua-config "telnet={hosts={'localhost:4212','localhost:5678','*console'}}"
---]==========================================================================]
+ 
+ Configuration options setable throught the --lua-config option are:
+    * hosts: A list of hosts to listen on (see examples above).
+    * host: A host to listen on. (won't be used if `hosts' is set)
+    * password: The password used for remote clients.
+    * prompt: The prompt.
+]============================================================================]
 
 require "host"
 
@@ -54,7 +63,7 @@ function on_password( client )
     end
 end
 function on_read( client )
-    client:send( "> " )
+    client:send( config.prompt and tostring(config.prompt) or "> " )
 end
 function on_write( client )
 end
@@ -118,6 +127,12 @@ function lock(client)
     client.buffer = ""
     return false
 end
+function print_text(text)
+    return function(client)
+        client:append(string.gsub(text,"\r?\n","\r\n"))
+        return true
+    end
+end
 function help(client)
     client:append("    Telnet Specific Commands:")
     for c,t in pairs(commands) do
@@ -126,11 +141,13 @@ function help(client)
     return true
 end
 commands = {
-    ["shutdown"] = { func = shutdown, help = "shutdown VLC" },
-    ["quit"]     = { func = quit, help = "logout from telnet/shutdown VLC from local shell" },
-    ["logout"]   = { func = logout, help = "logout" },
-    ["lock"]     = { func = lock, help = "lock the telnet prompt" },
-    ["help"]     = { func = help, help = "show this help", dovlm = true },
+    ["shutdown"]    = { func = shutdown, help = "shutdown VLC" },
+    ["quit"]        = { func = quit, help = "logout from telnet/shutdown VLC from local shell" },
+    ["logout"]      = { func = logout, help = "logout" },
+    ["lock"]        = { func = lock, help = "lock the telnet prompt" },
+    ["description"] = { func = print_text(description), help = "describe this module" },
+    ["license"]     = { func = print_text(vlc.license()), help = "print VLC's license message" },
+    ["help"]        = { func = help, help = "show this help", dovlm = true },
     }
 
 function client_command( client )
@@ -138,9 +155,10 @@ function client_command( client )
     client.buffer = ""
     if not commands[cmd] or not commands[cmd].func or commands[cmd].dovlm then
         -- if it's not an interface specific command, it has to be a VLM command
-        message = vlc.vlm.execute_command( vlm, cmd )
+        local message, vlc_err = vlc.vlm.execute_command( vlm, cmd )
         vlm_message_to_string( client, message )
         if not commands[cmd] or not commands[cmd].func and not commands[cmd].dovlm then
+            if vlc_err ~= 0 then client:append( "Type `help' for help." ) end
             return true
         end
     end

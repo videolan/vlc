@@ -144,6 +144,7 @@ vlc_object_t * vlclua_get_this( lua_State * );
 int vlclua_push_ret( lua_State *, int i_error );
 
 int vlclua_version( lua_State * );
+int vlclua_license( lua_State * );
 int vlclua_quit( lua_State * );
 
 int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val ); /* internal use only */

@@ -21,7 +21,10 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]==========================================================================]
 
---[==========================================================================[
+description=
+[============================================================================[
+ Remote control interface for VLC
+
  This is a modules/control/rc.c look alike (with a bunch of new features)
  
  Use on local term:
@@ -33,7 +36,21 @@
  
  Note:
     -I luarc is an alias for -I lua --lua-intf rc
---]==========================================================================]
+
+ Configuration options setable throught the --lua-config option are:
+    * hosts: A list of hosts to listen on.
+    * host: A host to listen on. (won't be used if `hosts' is set)
+ The following can be set using the --lua-config option or in the interface
+ itself using the `set' command:
+    * prompt: The prompt.
+    * welcome: The welcome message.
+    * width: The default terminal width (used to format text).
+    * autocompletion: When issuing an unknown command, print a list of
+                      possible commands to autocomplete with. (0 to disable,
+                      1 to enable).
+    * autoalias: If autocompletion returns only one possibility, use it
+                 (0 to disable, 1 to enable).
+]============================================================================]
 
 require("common")
 skip = common.skip
@@ -48,6 +65,18 @@ env = { prompt = "> ";
         autoalias = 1;
         welcome = "Remote control interface initialized. Type `help' for help."
       }
+
+--[[ Import custom environement variables from the command line config (if possible) ]]
+for k,v in pairs(env) do
+    if config[k] then
+        if type(env[k]) == type(config[k]) then
+            env[k] = config[k]
+            vlc.msg.dbg("set environement variable `"..k.."' to "..tonumber(env[k]))
+        else
+            vlc.msg.err("environement variable `"..k.."' should be of type "..type(env[k])..". config value will be discarded.")
+        end
+    end
+end
 
 --[[ Command functions ]]
 function set_env(name,client,value)
@@ -158,6 +187,18 @@ function playlist(name,client,arg)
         client:append(str)
     end
     client:append("+----[ End of playlist ]")
+end
+
+function print_text(label,text)
+    return function(name,client)
+        client:append("+----[ "..label.." ]")
+        client:append "|"
+        for line in string.gmatch(text,".-\r?\n") do
+            client:append("| "..string.gsub(line,"\r?\n",""))
+        end
+        client:append "|"
+        client:append("+----[ End of "..string.lower(label).." ]")
+    end
 end
 
 function help(name,client,arg)
@@ -352,6 +393,8 @@ commands_ordered = {
     { "save_env"; { func = save_env; help = "save env vars (for future clients)"; adv = true } };
     { "alias"; { func = skip(alias); args = "[cmd]"; help = "set/get command aliases"; adv = true } };
     { "eval"; { func = skip(eval); help = "eval some lua (*debug*)"; adv =true } }; -- FIXME: comment out if you're not debugging
+    { "description"; { func = print_text("Description",description); help = "describe this module" } };
+    { "license"; { func = print_text("License message",vlc.license()); help = "print VLC's license message"; adv = true } };
     { "help"; { func = help; args = "[pattern]"; help = "a help message"; aliases = { "?" } } };
     { "longhelp"; { func = help; args = "[pattern]"; help = "a longer help message" } };
     { "logout"; { func = logout; help = "exit (if in a socket connection)" } };
@@ -447,7 +490,9 @@ h.status_callbacks[host.status.password] = function(client)
     client:switch_status(host.status.read)
 end
 -- Print prompt when switching a client's status to `read'
-h.status_callbacks[host.status.read] = function(client) client:send( client.env.prompt ) end
+h.status_callbacks[host.status.read] = function(client)
+    client:send( client.env.prompt )
+end
 
 h:listen( config.hosts or config.host or "*console" )
 

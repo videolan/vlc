@@ -87,9 +87,10 @@ int vlclua_vlm_execute_command( lua_State *L )
     vlm_t *p_vlm = (vlm_t*)vlclua_checkobject( L, 1, VLC_OBJECT_VLM );
     const char *psz_command = luaL_checkstring( L, 2 );
     vlm_message_t *message;
-    vlm_ExecuteCommand( p_vlm, psz_command, &message );
+    int i_ret;
+    i_ret = vlm_ExecuteCommand( p_vlm, psz_command, &message );
     lua_settop( L, 0 );
     push_message( L, message );
     vlm_MessageDelete( message );
-    return 1;
+    return 1 + vlclua_push_ret( L, i_ret );
 }

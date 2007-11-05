@@ -557,6 +557,7 @@ static luaL_Reg p_reg[] =
     { "signal", vlclua_signal },
 
     { "version", vlclua_version },
+    { "license", vlclua_license },
     { "should_die", vlclua_intf_should_die },
     { "quit", vlclua_quit },
 
