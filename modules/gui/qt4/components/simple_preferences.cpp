@@ -420,10 +420,23 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Hotkeys, "Configure Hotkeys" );
-        //FIMXE
-        END_SPREFS_CAT;
+        case SPrefsHotkeys:
+        {
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "key-fullscreen" );
+
+            QGridLayout *gLayout = new QGridLayout;
+            panel->setLayout( gLayout );
+            int line = 0;
+
+            KeySelectorControl *ksCtrl =
+                        new KeySelectorControl( VLC_OBJECT(p_intf), p_config ,
+                                                this, gLayout, line );
+
+            panel_label->setText( qtr( "Configure Hotkeys" ) );
+
+            break;
         }
+    }
 
     panel_layout->addWidget( panel_label );
     panel_layout->addWidget( title_line );

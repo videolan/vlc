@@ -451,7 +451,6 @@ private:
     QTreeWidget *table;
     KeyShortcutEdit *shortcutValue;
     QList<module_config_t *> values;
-    //QWidget *parent;
 private slots:
     void setTheKey();
     void selectKey( QTreeWidgetItem * = NULL );
