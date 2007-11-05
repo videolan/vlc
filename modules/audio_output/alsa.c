@@ -451,7 +451,7 @@ static int Open( vlc_object_t *p_this )
 
         msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
 
-        /* Since it seems snd_pcm_close hasen't really released the device at
+        /* Since it seems snd_pcm_close hasn't really released the device at
           the time it returns, probe if the device is available in loop for 1s.
           We cannot use blocking mode since the we would wait indefinitely when
           switching from a dmx device to surround51. */
@@ -800,7 +800,7 @@ static void ALSAFill( aout_instance_t * p_aout )
             return;
         }
 
-        /* Handle buffer underruns and reget the status */
+        /* Handle buffer underruns and get the status again */
         if( snd_pcm_status_get_state( p_status ) == SND_PCM_STATE_XRUN )
         {
             /* Prepare the device */
@@ -810,7 +810,7 @@ static void ALSAFill( aout_instance_t * p_aout )
             {
                 msg_Dbg( p_aout, "recovered from buffer underrun" );
 
-                /* Reget the status */
+                /* Get the new status */
                 i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
                 if( i_snd_rc < 0 )
                 {
@@ -878,11 +878,19 @@ static void ALSAFill( aout_instance_t * p_aout )
         { /* a suspend event occurred
            * (stream is suspended and waiting for an application recovery) */
             msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
+
             while( !p_aout->b_die && !p_aout->p_libvlc->b_die &&
                 ( i_snd_rc = snd_pcm_resume( p_sys->p_snd_pcm ) ) == -EAGAIN )
                 msleep( 100000 );
-            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
-                                       p_buffer->i_nb_samples );
+
+            if( i_snd_rc < 0 )
+                /* Device does not supprot resuming, restart it */
+                i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
+
+            if( i_snd_rc < 0 )
+                i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm,
+                                           p_buffer->p_buffer,
+                                           p_buffer->i_nb_samples );
 
         }
 
