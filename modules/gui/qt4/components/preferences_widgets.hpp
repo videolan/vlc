@@ -412,7 +412,7 @@ private slot:
 class KeyInputDialog : public QDialog
 {
 public:
-    KeyInputDialog( QList<module_config_t *> &, const char * );
+    KeyInputDialog( QList<module_config_t *> &, const char *, QWidget * );
     int keyValue;
     bool conflicts;
 private:
@@ -423,6 +423,15 @@ private:
     QLabel *warning;
     const char * keyToChange;
     QList<module_config_t*> values;
+};
+
+class KeyShortcutEdit: public QLineEdit
+{
+    Q_OBJECT
+private:
+    virtual void mousePressEvent( QMouseEvent *event );
+signals:
+    void pressed();
 };
 
 class KeySelectorControl : public ConfigControl
@@ -440,9 +449,13 @@ private:
     void finish();
     QLabel *label;
     QTreeWidget *table;
+    KeyShortcutEdit *shortcutValue;
     QList<module_config_t *> values;
+    //QWidget *parent;
 private slots:
-    void selectKey( QTreeWidgetItem *);
+    void setTheKey();
+    void selectKey( QTreeWidgetItem * = NULL );
+    void select1Key( QTreeWidgetItem *);
 };
 
 #endif

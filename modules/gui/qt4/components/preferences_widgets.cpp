@@ -978,31 +978,35 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 {
     QWidget *keyContainer = new QWidget;
     QGridLayout *gLayout = new QGridLayout( keyContainer );
+
+    label = new QLabel(
+            qtr( "Select an action to change the associated hotkey") );
     
-    label = new QLabel( qtr("Select an action to change the associated hotkey") );
+    /* Deactivated for now
     QLabel *searchLabel = new QLabel( qtr( "Search" ) );
+    QLineEdit *actionSearch = new QLineEdit;*/
     
     table = new QTreeWidget;
     table->setColumnCount(2);
     table->headerItem()->setText( 0, qtr( "Action" ) );
     table->headerItem()->setText( 1, qtr( "Shortcut" ) );
-    
-    QLineEdit *shortcutValue = new QLineEdit;
+
+    shortcutValue = new KeyShortcutEdit;
     shortcutValue->setReadOnly(true);
-    QLineEdit *actionSearch = new QLineEdit;
-    
+
     QPushButton *clearButton = new QPushButton( qtr( "Clear" ) );
     QPushButton *setButton = new QPushButton( qtr( "Set" ) );
     finish();
-    
+
     gLayout->addWidget( label, 0, 0, 1, 4 );
+  /* deactivated for now
     gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
-    gLayout->addWidget( actionSearch, 1, 2, 1, 2 ); 
+    gLayout->addWidget( actionSearch, 1, 2, 1, 2 ); */
     gLayout->addWidget( table, 2, 0, 1, 4 );
     gLayout->addWidget( clearButton, 3, 0, 1, 1 );
     gLayout->addWidget( shortcutValue, 3, 1, 1, 2 ); 
     gLayout->addWidget( setButton, 3, 3, 1, 1 );
-    
+
     if( !l ) /* This shouldn't happen */
     {
         QVBoxLayout *layout = new QVBoxLayout();
@@ -1013,6 +1017,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     {
         l->addWidget( keyContainer, 0, 0, 1, 2 );
     }
+    CONNECT( clearButton, clicked(), shortcutValue, clear() );
+    BUTTONACT( setButton, setTheKey() );
 }
 
 void KeySelectorControl::finish()
@@ -1045,16 +1051,31 @@ void KeySelectorControl::finish()
     }
     table->resizeColumnToContents( 0 );
 
+    CONNECT( table, itemClicked( QTreeWidgetItem *, int ),
+             this, select1Key( QTreeWidgetItem * ) );
     CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem * ) );
+    CONNECT( shortcutValue, pressed(), this, selectKey() );
+}
+
+void KeySelectorControl::select1Key( QTreeWidgetItem *keyItem )
+{
+    shortcutValue->setText( keyItem->text( 1 ) );
 }
 
 void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
 {
-   module_config_t *p_keyItem = static_cast<module_config_t*>
+    /* This happens when triggered by ClickEater */
+    if( keyItem == NULL ) keyItem = table->currentItem();
+    
+    /* This can happen when nothing is selected on the treeView
+       and the shortcutValue is clicked */
+    if( !keyItem ) return;
+
+    module_config_t *p_keyItem = static_cast<module_config_t*>
                           (keyItem->data( 0, Qt::UserRole ).value<void*>());
 
-    KeyInputDialog *d = new KeyInputDialog( values, p_keyItem->psz_text );
+    KeyInputDialog *d = new KeyInputDialog( values, p_keyItem->psz_text, widget );
     d->exec();
     if( d->result() == QDialog::Accepted )
     {
@@ -1068,13 +1089,18 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
                               (it->data( 0, Qt::UserRole ).value<void*>());
                 if( p_keyItem != p_item && p_item->value.i == d->keyValue )
                     p_item->value.i = 0;
-                it->setText( 1, VLCKeyToString( p_item->value.i ) );
+                shortcutValue->setText( VLCKeyToString( p_item->value.i ) );
             }
         }
         else
-            keyItem->setText( 1, VLCKeyToString( p_keyItem->value.i ) );
+            shortcutValue->setText( VLCKeyToString( p_keyItem->value.i ) );
     }
     delete d;
+}
+
+void KeySelectorControl::setTheKey()
+{
+    table->currentItem()->setText( 1, shortcutValue->text() );
 }
 
 void KeySelectorControl::doApply()
@@ -1086,8 +1112,9 @@ void KeySelectorControl::doApply()
 }
 
 KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
-                                const char * _keyToChange ) :
-                                                QDialog(0), keyValue(0)
+                                const char * _keyToChange,
+                                QWidget *_parent ) :
+                                QDialog( _parent ), keyValue(0)
 {
     setModal( true );
     values = _values;
@@ -1150,4 +1177,9 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     selected->setText( VLCKeyToString( i_vlck ) );
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
+}
+
+void KeyShortcutEdit::mousePressEvent( QMouseEvent *)
+{
+    emit pressed();
 }
