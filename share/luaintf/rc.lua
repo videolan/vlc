@@ -111,7 +111,7 @@ end
 function shutdown(name,client)
     client:append("Bye-bye!")
     h:broadcast("Shutting down.")
-    vlc.msg.err("Requested shutdown.")
+    vlc.msg.info("Requested shutdown.")
     vlc.quit()
 end
 
@@ -466,17 +466,17 @@ while not vlc.should_die() do
         local input = client:recv(1000)
         if string.match(input,"\n$") then
             client.buffer = string.gsub(client.buffer..input,"\r?\n$","")
-            done = true
         elseif client.buffer == ""
            and ((client.type == host.client_type.stdio and input == "")
            or  (client.type == host.client_type.net and input == "\004")) then
             -- Caught a ^D
             client.buffer = "quit"
-            done = true
         else
             client.buffer = client.buffer .. input
         end
-        if done then
+        if client.buffer == "" then
+            client:send( client.env.prompt )
+        else
             local cmd,arg = split_input(client.buffer)
             client.buffer = ""
             client:switch_status(host.status.write)
