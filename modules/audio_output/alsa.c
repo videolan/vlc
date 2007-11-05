@@ -788,117 +788,108 @@ static void ALSAFill( aout_instance_t * p_aout )
     mtime_t next_date;
 
     /* Fill in the buffer until space or audio output buffer shortage */
+
+    /* Get the status */
+    i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
+    if( i_snd_rc < 0 )
     {
-        /* Get the status */
+        msg_Err( p_aout, "cannot get device status" );
+        goto error;
+    }
+
+    /* Handle buffer underruns and get the status again */
+    if( snd_pcm_status_get_state( p_status ) == SND_PCM_STATE_XRUN )
+    {
+        /* Prepare the device */
+        i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
+
+        if( i_snd_rc )
+        {
+            msg_Err( p_aout, "cannot recover from buffer underrun" );
+            goto error;
+        }
+
+        msg_Dbg( p_aout, "recovered from buffer underrun" );
+
+        /* Get the new status */
         i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
         if( i_snd_rc < 0 )
         {
-            msg_Err( p_aout, "unable to get the device's status (%s)",
-                             snd_strerror( i_snd_rc ) );
-
-            msleep( p_sys->i_period_time >> 1 );
-            return;
+            msg_Err( p_aout, "cannot get device status after recovery" );
+            goto error;
         }
 
-        /* Handle buffer underruns and get the status again */
-        if( snd_pcm_status_get_state( p_status ) == SND_PCM_STATE_XRUN )
-        {
-            /* Prepare the device */
-            i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
-
-            if( i_snd_rc == 0 )
-            {
-                msg_Dbg( p_aout, "recovered from buffer underrun" );
-
-                /* Get the new status */
-                i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
-                if( i_snd_rc < 0 )
-                {
-                    msg_Err( p_aout, "unable to get the device's status after "
-                             "recovery (%s)", snd_strerror( i_snd_rc ) );
-
-                    msleep( p_sys->i_period_time >> 1 );
-                    return;
-                }
-            }
-            else
-            {
-                msg_Err( p_aout, "unable to recover from buffer underrun" );
-
-                msleep( p_sys->i_period_time >> 1 );
-                return;
-            }
-
-            /* Underrun, try to recover as quickly as possible */
-            next_date = mdate();
-        }
-        else
-        {
-            /* Here the device should be in RUNNING state.
-             * p_status is valid. */
+        /* Underrun, try to recover as quickly as possible */
+        next_date = mdate();
+    }
+    else
+    {
+        /* Here the device should be in RUNNING state.
+         * p_status is valid. */
 
 #if 0
-    /* This apparently does not work correctly in Alsa 1.0.11 */
-            snd_pcm_status_get_tstamp( p_status, &ts_next );
-            next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
-            if( next_date )
-            {
-                next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
-                        * 1000000 / p_aout->output.output.i_rate;
-            }
-            else
+        /* This apparently does not work correctly in Alsa 1.0.11 */
+        snd_pcm_status_get_tstamp( p_status, &ts_next );
+        next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
+        if( next_date )
+        {
+            next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
+                    * 1000000 / p_aout->output.output.i_rate;
+        }
+        else
 #endif
-            {
-                /* With screwed ALSA drivers the timestamp is always zero;
-                 * use another method then */
-                snd_pcm_sframes_t delay = 0;
+        {
+            /* With screwed ALSA drivers the timestamp is always zero;
+             * use another method then */
+            snd_pcm_sframes_t delay = 0;
 
-                snd_pcm_delay( p_sys->p_snd_pcm, &delay );
-                next_date = mdate() + (mtime_t)(delay) * 1000000 /
-                          p_aout->output.output.i_rate
+            snd_pcm_delay( p_sys->p_snd_pcm, &delay );
+            next_date = mdate() + (mtime_t)(delay) * 1000000
+                        / p_aout->output.output.i_rate
                         * p_aout->output.output.i_frame_length;
-            }
         }
+    }
 
-        p_buffer = aout_OutputNextBuffer( p_aout, next_date,
-                        (p_aout->output.output.i_format ==
-                         VLC_FOURCC('s','p','d','i')) );
+    p_buffer = aout_OutputNextBuffer( p_aout, next_date,
+           (p_aout->output.output.i_format ==  VLC_FOURCC('s','p','d','i')) );
 
-        /* Audio output buffer shortage -> stop the fill process and wait */
-        if( p_buffer == NULL )
+    /* Audio output buffer shortage -> stop the fill process and wait */
+    if( p_buffer == NULL )
+        goto error;
+
+    for (;;)
+    {
+        i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
+                                   p_buffer->i_nb_samples );
+        if( i_snd_rc != -ESTRPIPE )
+            break;
+
+        /* a suspend event occurred
+         * (stream is suspended and waiting for an application recovery) */
+        msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
+
+        while( !p_aout->b_die && !p_aout->p_libvlc->b_die &&
+               ( i_snd_rc = snd_pcm_resume( p_sys->p_snd_pcm ) ) == -EAGAIN )
         {
-            msleep( p_sys->i_period_time >> 1 );
-            return;
-        }
-
-        for (;;)
-        {
-            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
-                                       p_buffer->i_nb_samples );
-            if( i_snd_rc != -ESTRPIPE )
-                break;
-
-            /* a suspend event occurred
-             * (stream is suspended and waiting for an application recovery) */
-            msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
-
-            while( !p_aout->b_die && !p_aout->p_libvlc->b_die &&
-                ( i_snd_rc = snd_pcm_resume( p_sys->p_snd_pcm ) ) == -EAGAIN )
-                msleep( 100000 );
-
-            if( i_snd_rc < 0 )
-                /* Device does not supprot resuming, restart it */
-                i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
+            msleep( 1000000 );
         }
 
         if( i_snd_rc < 0 )
-        {
-            msg_Err( p_aout, "write failed (%s)",
-                             snd_strerror( i_snd_rc ) );
-        }
+            /* Device does not supprot resuming, restart it */
+            i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
 
-        aout_BufferFree( p_buffer );
     }
+
+    if( i_snd_rc < 0 )
+        msg_Err( p_aout, "cannot write: %s", snd_strerror( i_snd_rc ) );
+
+    aout_BufferFree( p_buffer );
+    return;
+
+error:
+    if( i_snd_rc < 0 )
+        msg_Err( p_aout, "ALSA error: %s", snd_strerror( i_snd_rc ) );
+    msleep( p_sys->i_period_time >> 1 );
 }
 
 static void GetDevicesForCard( module_config_t *p_item, int i_card );
