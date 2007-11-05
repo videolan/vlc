@@ -7,28 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>508</width>
-    <height>478</height>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="spacing" >
-    <number>10</number>
-   </property>
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
@@ -61,55 +46,14 @@
       <string>_("Network")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QLabel" name="label" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>_("Default Network caching in ms")</string>
+         <string>_("Server Default Port")</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
-         <string>_("HTTP Proxy")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" >
-       <widget class="QSpinBox" name="networkCache" >
-        <property name="alignment" >
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="maximum" >
-         <number>10000</number>
-        </property>
-        <property name="value" >
-         <number>300</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QLineEdit" name="proxy" />
-      </item>
-      <item row="0" column="1" colspan="2" >
+      <item row="0" column="1" >
        <widget class="QSpinBox" name="UDPPort" >
         <property name="alignment" >
          <set>Qt::AlignRight</set>
@@ -125,12 +69,34 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_4" >
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
         <property name="text" >
-         <string>_("Server Default Port")</string>
+         <string>_("HTTP Proxy")</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="proxy" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_5" >
+     <property name="title" >
+      <string>_("Caching")</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <item>
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>_("Default caching level")</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cachingCombo" />
       </item>
      </layout>
     </widget>
@@ -141,24 +107,6 @@
       <string>_("Codecs / Muxers")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
@@ -215,21 +163,6 @@
       <string>_("Access Filter")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
       <item>
        <widget class="QCheckBox" name="timeshiftBox" >
         <property name="text" >
@@ -268,7 +201,6 @@
   <tabstop>DVDBrowse</tabstop>
   <tabstop>UDPPort</tabstop>
   <tabstop>proxy</tabstop>
-  <tabstop>networkCache</tabstop>
   <tabstop>PostProcLevel</tabstop>
   <tabstop>AviRepair</tabstop>
   <tabstop>RTSP_TCPBox</tabstop>
