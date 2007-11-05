@@ -877,6 +877,10 @@ package-macosx:
 	echo "Create package directory: vlc-${VERSION}/";
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/";
 
+# For now, export the framework for third parties, from here
+	(cd $(top_builddir)/extras/MacOSX/Framework && xcodebuild);
+	cp -r $(top_builddir)/extras/MacOSX/Framework/build/Release/VLC.framework $(top_builddir)/vlc-${VERSION}/VLC.framework
+
 # Copy relevant files 
 	@if test -e "$(top_builddir)/VLC-release.app/"; then \
 	  cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"; \
