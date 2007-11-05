@@ -2,7 +2,7 @@
  host.lua: VLC Lua interface command line host module
 --[==========================================================================[
  Copyright (C) 2007 the VideoLAN team
- $Id: $
+ $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
 

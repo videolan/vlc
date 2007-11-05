@@ -2,7 +2,7 @@
  hotkeys.lua: hotkey handling for VLC
 --[==========================================================================[
  Copyright (C) 2007 the VideoLAN team
- $Id: $
+ $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
 
