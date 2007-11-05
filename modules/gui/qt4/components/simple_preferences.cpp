@@ -233,7 +233,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONNECT( ui.outputModule, currentIndexChanged( int ), this,
                              updateAudioOptions( int ) );
-            
+
 
         //TODO: use modules_Exists
 #ifndef WIN32
@@ -270,7 +270,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     lastfm_Changed( int ) );
 
             /* Normalizer */
-          
+
             CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin,
                      setEnabled( bool ) );
             qs_filter = qfu( config_GetPsz( p_intf, "audio-filter" ) );
@@ -285,7 +285,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /* Input and Codecs Panel Implementation */
         START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs settings") );
 
-            
             /* Disk Devices */
             {
                 ui.DVDDevice->setToolTip(
@@ -307,8 +306,30 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
             CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
-        
+            CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
+            CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
+            CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
+#ifdef WIN32
+            CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
+#else
+            ui.systemCodecBox->hide();
+#endif
+            /* Access Filters */
+            qs_filter = qfu( config_GetPsz( p_intf, "access-filter" ) );
+            ui.timeshiftBox->setChecked( qs_filter.contains( "timeshift" ) );
+            ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
+            ui.recordBox->setChecked( qs_filter.contains( "record" ) );
+            ui.bandwidthBox->setChecked( qs_filter.contains( "bandwidth" ) );
+
+            optionWidgets.append( ui.recordBox );
+            optionWidgets.append( ui.dumpBox );
+            optionWidgets.append( ui.bandwidthBox );
+            optionWidgets.append( ui.timeshiftBox );
+            optionWidgets.append( ui.DVDDevice );
+            optionWidgets.append( ui.cachingCombo );
+
             /* Caching */
+            /* Add the things to the ComboBox */
             #define addToCachingBox( str, cachingNumber ) \
                 ui.cachingCombo->addItem( str, QVariant( cachingNumber ) );
             addToCachingBox( "Custom", CachingCustom );
@@ -318,29 +339,32 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             addToCachingBox( "High latency", CachingHigh );
             addToCachingBox( "Higher latency", CachingHigher );
 
-            CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
-            CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
-            CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
-#ifdef WIN32
-            CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
-#else
-            ui.systemCodecBox->hide();
-#endif  
-            /* Access Filters */
-            qs_filter = qfu( config_GetPsz( p_intf, "access-filter" ) );
-            ui.timeshiftBox->setChecked( qs_filter.contains( "timeshift" ) );
-            ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
-            ui.recordBox->setChecked( qs_filter.contains( "record" ) );
-            ui.bandwidthBox->setChecked( qs_filter.contains( "bandwidth" ) );
-            
-            optionWidgets.append( ui.recordBox );
-            optionWidgets.append( ui.dumpBox );
-            optionWidgets.append( ui.bandwidthBox );
-            optionWidgets.append( ui.timeshiftBox );
-            optionWidgets.append( ui.DVDDevice );
-            optionWidgets.append( ui.cachingCombo );
-        END_SPREFS_CAT;
+#define TestCaC( name ) \
+    b_cache_equal =  b_cache_equal && ( i_cache == config_GetInt( p_intf, name ) );
 
+#define TestCaCi( name, int ) \
+    b_cache_equal = b_cache_equal && ( ( i_cache * int ) == config_GetInt( p_intf, name ) );
+            /* Select the accurate value of the ComboBox */
+            bool b_cache_equal = true;
+            int i_cache = config_GetInt( p_intf, "file-caching");
+
+            TestCaC( "udp-caching" ) TestCaC( "dvdread-caching" )
+            TestCaC( "dvdnav-caching" ) TestCaC( "tcp-caching" )
+            TestCaC( "fake-caching" ) TestCaC( "cdda-caching" )
+            TestCaC( "screen-caching" ) TestCaC( "vcd-caching" )
+            #ifdef WIN32
+            TestCaC( "dshow-caching" )
+            #else
+            TestCaC( "v4l-caching" ) TestCaC( "jack-input-caching" )
+            TestCaC( "v4l2-caching" ) TestCaC( "pvr-caching" )
+            #endif
+            TestCaCi( "rtsp-caching", 4 ) TestCaCi( "ftp-caching", 2 )
+            TestCaCi( "http-caching", 4 ) TestCaCi( "realrtsp-caching", 10 )
+            TestCaCi( "mms-caching", 19 )
+            if( b_cache_equal )
+               ui.cachingCombo->setCurrentIndex( ui.cachingCombo->findData( QVariant( i_cache ) ) );
+
+        END_SPREFS_CAT;
         /*******************
          * Interface Panel *
          *******************/
@@ -439,7 +463,7 @@ void SPrefsPanel::apply()
     if( number == SPrefsInputAndCodecs )
     {
         /* Device default selection */
-        char *psz_devicepath = 
+        char *psz_devicepath =
               qtu( qobject_cast<QLineEdit *>(optionWidgets[inputLE] )->text() );
         if( !EMPTY_STR( psz_devicepath ) )
         {
@@ -456,19 +480,39 @@ void SPrefsPanel::apply()
                 b_first = false; \
             } \
             else qs_filter.append( ":" ).append( name ); \
-        } } 
+        } }
 
-        bool b_first = true;    
+        bool b_first = true;
+        qs_filter.clear();
         saveBox( "record", qobject_cast<QCheckBox *>(optionWidgets[recordChB]) );
         saveBox( "dump", qobject_cast<QCheckBox *>(optionWidgets[dumpChB]) );
         saveBox( "timeshift", qobject_cast<QCheckBox *>(optionWidgets[timeshiftChB]) );
         saveBox( "bandwidth", qobject_cast<QCheckBox *>(optionWidgets[bandwidthChB] ) );
         config_PutPsz( p_intf, "access-filter", qtu( qs_filter ) );
 
-        QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
+#define CaCi( name, int ) config_PutInt( p_intf, name, int * i_comboValue );
+#define CaC( name ) CaCi( name, 1 );
         /* Caching */
-        msg_Dbg( p_intf, "%i", 
-                cachingCombo->itemData( cachingCombo->currentIndex() ).toInt() );
+        QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
+        int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
+        if( i_comboValue )
+        {
+            msg_Dbg( p_intf, "Adjusting all the cache values at level: %i", i_comboValue );
+            CaC( "udp-caching" ); CaC( "dvdread-caching" );
+            CaC( "dvdnav-caching" ); CaC( "tcp-caching" ); CaC( "vcd-caching" );
+            CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
+            CaC( "screen-caching" );
+            CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
+            CaCi( "http-caching", 4 ); CaCi( "realrtsp-caching", 10 );
+            CaCi( "mms-caching", 19 );
+            #ifdef WIN32
+            CaC( "dshow-caching" );
+            #else
+            CaC( "v4l-caching" ); CaC( "jack-input-caching" ); CaC( "v4l2-caching" );
+            CaC( "pvr-caching" );
+            #endif
+            //CaCi( "dv-caching" ) too short...
+        }
     }
 
     /* Interfaces */
@@ -482,7 +526,7 @@ void SPrefsPanel::apply()
 
     if( number == SPrefsAudio )
     {
-        bool b_normChecked = 
+        bool b_normChecked =
             qobject_cast<QCheckBox *>(optionWidgets[normalizerChB])->isChecked();
         if( qs_filter.isEmpty() )
         {
@@ -493,7 +537,7 @@ void SPrefsPanel::apply()
         {
             if( qs_filter.contains( "volnorm" ) )
             {
-                /* The qs_filter not empty and contains "volnorm" 
+                /* The qs_filter not empty and contains "volnorm"
                    that we have to remove */
                 if( !b_normChecked )
                 {
