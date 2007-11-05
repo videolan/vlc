@@ -755,23 +755,23 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int ALSAThread( aout_instance_t * p_aout )
 {
-    p_aout->output.p_sys->p_status =
-        (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    p_sys->p_status = (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
 
     /* Wait for the exact time to start playing (avoids resampling) */
-    vlc_mutex_lock( &p_aout->output.p_sys->lock );
-    if( !p_aout->output.p_sys->start_date )
-        vlc_cond_wait( &p_aout->output.p_sys->wait,
-                       &p_aout->output.p_sys->lock );
-    vlc_mutex_unlock( &p_aout->output.p_sys->lock );
+    vlc_mutex_lock( &p_sys->lock );
+    while( !p_sys->start_date )
+        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+    vlc_mutex_unlock( &p_sys->lock );
 
-    mwait( p_aout->output.p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
+    mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
     while ( !p_aout->b_die )
     {
         ALSAFill( p_aout );
     }
 
+    snd_pcm_drop( p_sys->p_snd_pcm );
     free( p_aout->output.p_sys->p_status );
     return 0;
 }
@@ -871,12 +871,15 @@ static void ALSAFill( aout_instance_t * p_aout )
             return;
         }
 
-        i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
-                                   p_buffer->i_nb_samples );
+        for (;;)
+        {
+            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
+                                       p_buffer->i_nb_samples );
+            if( i_snd_rc != -ESTRPIPE )
+                break;
 
-        if( i_snd_rc == -ESTRPIPE )
-        { /* a suspend event occurred
-           * (stream is suspended and waiting for an application recovery) */
+            /* a suspend event occurred
+             * (stream is suspended and waiting for an application recovery) */
             msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
 
             while( !p_aout->b_die && !p_aout->p_libvlc->b_die &&
@@ -886,12 +889,6 @@ static void ALSAFill( aout_instance_t * p_aout )
             if( i_snd_rc < 0 )
                 /* Device does not supprot resuming, restart it */
                 i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
-
-            if( i_snd_rc == 0 )
-                i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm,
-                                           p_buffer->p_buffer,
-                                           p_buffer->i_nb_samples );
-
         }
 
         if( i_snd_rc < 0 )
