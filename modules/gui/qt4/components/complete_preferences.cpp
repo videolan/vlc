@@ -457,13 +457,6 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         if( !control )
             continue;
 
-        if( has_hotkey )
-        {
-            /* A hotkey widget takes 2 lines */
-            if( box ) i_boxline ++;
-            else i_line++;
-        }
-
         if( box ) i_boxline++;
         else i_line++;
         controls.append( control );

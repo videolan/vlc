@@ -390,7 +390,8 @@ void StringListConfigControl::actionRequested( int i_action )
     if( i_action < 0 || i_action >= p_item->i_action ) return;
 
     vlc_value_t val;
-    val.psz_string = qtu( (combo->itemData( combo->currentIndex() ).toString() ) );
+    val.psz_string = 
+        qtu( (combo->itemData( combo->currentIndex() ).toString() ) );
 
     p_item->ppf_action[i_action]( p_this, getName(), val, val, 0 );
 
@@ -975,11 +976,34 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
                                 ConfigControl( _p_this, _p_item, _parent )
 
 {
+    QWidget *keyContainer = new QWidget;
+    QGridLayout *gLayout = new QGridLayout( keyContainer );
+    
     label = new QLabel( qtr("Select an action to change the associated hotkey") );
-    table = new QTreeWidget( 0 );
+    QLabel *searchLabel = new QLabel( qtr( "Search" ) );
+    
+    table = new QTreeWidget;
+    table->setColumnCount(2);
+    table->headerItem()->setText( 0, qtr( "Action" ) );
+    table->headerItem()->setText( 1, qtr( "Shortcut" ) );
+    
+    QLineEdit *shortcutValue = new QLineEdit;
+    shortcutValue->setReadOnly(true);
+    QLineEdit *actionSearch = new QLineEdit;
+    
+    QPushButton *clearButton = new QPushButton( qtr( "Clear" ) );
+    QPushButton *setButton = new QPushButton( qtr( "Set" ) );
     finish();
-
-    if( !l )
+    
+    gLayout->addWidget( label, 0, 0, 1, 4 );
+    gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
+    gLayout->addWidget( actionSearch, 1, 2, 1, 2 ); 
+    gLayout->addWidget( table, 2, 0, 1, 4 );
+    gLayout->addWidget( clearButton, 3, 0, 1, 1 );
+    gLayout->addWidget( shortcutValue, 3, 1, 1, 2 ); 
+    gLayout->addWidget( setButton, 3, 3, 1, 1 );
+    
+    if( !l ) /* This shouldn't happen */
     {
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget( label, 0 ); layout->addWidget( table, 1 );
@@ -987,8 +1011,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     }
     else
     {
-        l->addWidget( label, line, 0, 1, 2 );
-        l->addWidget( table, line+1, 0, 1,2 );
+        l->addWidget( keyContainer, 0, 0, 1, 2 );
     }
 }
 
