@@ -51,6 +51,7 @@ class QTreeWidgetItem;
 class QGroupBox;
 class QGridLayout;
 class QDialogButtonBox;
+class QVBoxLayout;
 
 class ConfigControl : public QObject
 {
@@ -421,8 +422,8 @@ private:
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
     QLabel *selected;
-    QLabel *warning;
-    const char * keyToChange;
+    QVBoxLayout *vLayout;
+    const char *keyToChange;
     QList<module_config_t*> values;
     QDialogButtonBox *buttonBox;
 };

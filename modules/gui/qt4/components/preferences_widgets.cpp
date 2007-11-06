@@ -1039,7 +1039,7 @@ void KeySelectorControl::finish()
         module_config_t *p_item = p_main->p_config + i;
 
         if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
-            strstr( p_item->psz_name , "key-" ) )
+            strstr( p_item->psz_name , "key-" ) && !EMPTY_STR( p_item->psz_text ) )
         {
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
             treeItem->setText( 0, qtr( p_item->psz_text ) );
@@ -1124,11 +1124,9 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
 
     setWindowTitle( qtr( "Hotkey for " ) + qfu( keyToChange)  );
 
-    QVBoxLayout *l = new QVBoxLayout( this );
-    selected = new QLabel( qtr("Press the new keys for ")  + qfu(keyToChange) );
-    warning = new QLabel();
-    l->addWidget( selected , Qt::AlignCenter );
-    l->addWidget( warning, Qt::AlignCenter );
+    vLayout = new QVBoxLayout( this );
+    selected = new QLabel( qtr("Press the new keys for ") + qfu( keyToChange ) );
+    vLayout->addWidget( selected , Qt::AlignCenter );
 
     buttonBox = new QDialogButtonBox;
     QPushButton *ok = new QPushButton( qtr("OK") );
@@ -1136,7 +1134,7 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
     buttonBox->addButton( ok, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
 
-    l->addWidget( buttonBox );
+    vLayout->addWidget( buttonBox );
     buttonBox->hide();
 
     CONNECT( buttonBox, accepted(), this, accept() );
@@ -1160,10 +1158,12 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
 
     if( conflicts )
     {
-        warning->setText(
+        QLabel *warning = new QLabel(
           qtr("Warning: the  key is already assigned to \"") +
           qfu( p_current->psz_text ) + "\"" );
-        buttonBox->hide();
+        warning->setWordWrap( true );
+        vLayout->insertWidget( 1, warning );
+        buttonBox->show();
     }
     else accept();
 }
