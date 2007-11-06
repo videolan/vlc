@@ -1130,13 +1130,14 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
     l->addWidget( selected , Qt::AlignCenter );
     l->addWidget( warning, Qt::AlignCenter );
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox = new QDialogButtonBox;
     QPushButton *ok = new QPushButton( qtr("OK") );
     QPushButton *cancel = new QPushButton( qtr("Cancel") );
     buttonBox->addButton( ok, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
 
     l->addWidget( buttonBox );
+    buttonBox->hide();
 
     CONNECT( buttonBox, accepted(), this, accept() );
     CONNECT( buttonBox, rejected(), this, reject() );
@@ -1146,6 +1147,7 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
 {
     conflicts = false;
     module_config_t *p_current = NULL;
+    /* Search for conflicts */
     foreach( p_current, values )
     {
         if( p_current->value.i == i_vlckey && strcmp( p_current->psz_text,
@@ -1155,13 +1157,15 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
             break;
         }
     }
+
     if( conflicts )
     {
         warning->setText(
           qtr("Warning: the  key is already assigned to \"") +
-          QString( p_current->psz_text ) + "\"" );
+          qfu( p_current->psz_text ) + "\"" );
+        buttonBox->hide();
     }
-    else warning->setText( "" );
+    else accept();
 }
 
 void KeyInputDialog::keyPressEvent( QKeyEvent *e )

@@ -50,6 +50,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
 class QGridLayout;
+class QDialogButtonBox;
 
 class ConfigControl : public QObject
 {
@@ -423,6 +424,7 @@ private:
     QLabel *warning;
     const char * keyToChange;
     QList<module_config_t*> values;
+    QDialogButtonBox *buttonBox;
 };
 
 class KeyShortcutEdit: public QLineEdit
