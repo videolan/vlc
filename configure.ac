@@ -345,9 +345,9 @@ dnl
 AC_ARG_WITH(macosx-sdk,
    [  --with-macosx-sdk       compile with the Mac OS X 10.4u SDK],[], with_macosx_sdk=no)
 if test "${with_macosx_sdk}" != "no" ; then
-    CC="${CC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
-    CXX="${CXX} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
-    OBJC="${OBJC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
+    CC="${CC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk" 
+    CXX="${CXX} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk" 
+    OBJC="${OBJC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk" 
     LD="${LD} -syslibroot /Developer/SDKs/MacOSX10.4u.sdk"
     CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; CXXFLAGS="${CXXFLAGS_save}"
