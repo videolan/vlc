@@ -460,6 +460,7 @@ void SPrefsPanel::updateAudioOptions( int number)
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
 }
 
+/* Function called from the main Preferences dialog on each SPrefs Panel */
 void SPrefsPanel::apply()
 {
     msg_Dbg( p_intf, "Trying to save the %i simple panel", number );
@@ -472,8 +473,9 @@ void SPrefsPanel::apply()
         c->doApply( p_intf );
     }
 
-    /* Devices */
-    if( number == SPrefsInputAndCodecs )
+    switch( number )
+    {
+    case SPrefsInputAndCodecs:
     {
         /* Device default selection */
         char *psz_devicepath =
@@ -526,18 +528,20 @@ void SPrefsPanel::apply()
             #endif
             //CaCi( "dv-caching" ) too short...
         }
+        break;
     }
 
     /* Interfaces */
-    if( number == SPrefsInterface )
+    case SPrefsInterface:
     {
         if( qobject_cast<QRadioButton *>(optionWidgets[skinRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "skins2" );
         if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "qt4" );
+        break;
     }
 
-    if( number == SPrefsAudio )
+    case SPrefsAudio:
     {
         bool b_normChecked =
             qobject_cast<QCheckBox *>(optionWidgets[normalizerChB])->isChecked();
@@ -564,6 +568,8 @@ void SPrefsPanel::apply()
                 if( b_normChecked ) qs_filter.append( ":volnorm" );
         }
         config_PutPsz( p_intf, "audio-filter", qtu( qs_filter ) );
+        break;
+    }
     }
 }
 
