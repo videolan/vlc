@@ -26,8 +26,6 @@
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 
-
-
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
 
@@ -343,7 +341,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     b_cache_equal =  b_cache_equal && ( i_cache == config_GetInt( p_intf, name ) );
 
 #define TestCaCi( name, int ) \
-    b_cache_equal = b_cache_equal && ( ( i_cache * int ) == config_GetInt( p_intf, name ) );
+    b_cache_equal = b_cache_equal &&  \
+    ( ( i_cache * int ) == config_GetInt( p_intf, name ) );
             /* Select the accurate value of the ComboBox */
             bool b_cache_equal = true;
             int i_cache = config_GetInt( p_intf, "file-caching");
@@ -361,8 +360,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             TestCaCi( "rtsp-caching", 4 ) TestCaCi( "ftp-caching", 2 )
             TestCaCi( "http-caching", 4 ) TestCaCi( "realrtsp-caching", 10 )
             TestCaCi( "mms-caching", 19 )
-            if( b_cache_equal )
-               ui.cachingCombo->setCurrentIndex( ui.cachingCombo->findData( QVariant( i_cache ) ) );
+            if( b_cache_equal ) ui.cachingCombo->setCurrentIndex(
+                ui.cachingCombo->findData( QVariant( i_cache ) ) );
 
         END_SPREFS_CAT;
         /*******************
@@ -512,7 +511,7 @@ void SPrefsPanel::apply()
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
-            msg_Dbg( p_intf, "Adjusting all the cache values at level: %i", i_comboValue );
+            msg_Dbg( p_intf, "Adjusting all cache values at: %i", i_comboValue );
             CaC( "udp-caching" ); CaC( "dvdread-caching" );
             CaC( "dvdnav-caching" ); CaC( "tcp-caching" ); CaC( "vcd-caching" );
             CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
@@ -523,8 +522,8 @@ void SPrefsPanel::apply()
             #ifdef WIN32
             CaC( "dshow-caching" );
             #else
-            CaC( "v4l-caching" ); CaC( "jack-input-caching" ); CaC( "v4l2-caching" );
-            CaC( "pvr-caching" );
+            CaC( "v4l-caching" ); CaC( "jack-input-caching" );
+            CaC( "v4l2-caching" ); CaC( "pvr-caching" );
             #endif
             //CaCi( "dv-caching" ) too short...
         }
