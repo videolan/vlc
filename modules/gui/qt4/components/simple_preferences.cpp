@@ -440,7 +440,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     panel_layout->addWidget( panel_label );
     panel_layout->addWidget( title_line );
     panel_layout->addWidget( panel );
-    panel_layout->addStretch( 2 );
+    if( number != SPrefsHotkeys ) panel_layout->addStretch( 2 );
 
     setLayout( panel_layout );
 }
