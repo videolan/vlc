@@ -1008,16 +1008,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     gLayout->addWidget( shortcutValue, 3, 1, 1, 2 );
     gLayout->addWidget( setButton, 3, 3, 1, 1 );
 
-    if( !l ) /* This shouldn't happen */
-    {
-        QVBoxLayout *layout = new QVBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( table, 1 );
-        widget->setLayout( layout );
-    }
-    else
-    {
-        l->addWidget( keyContainer, line, 0, 1, 2 );
-    }
+    l->addWidget( keyContainer, line, 0, 1, 2 );
+
     CONNECT( clearButton, clicked(), shortcutValue, clear() );
     BUTTONACT( setButton, setTheKey() );
 }
