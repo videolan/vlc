@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>444</width>
-    <height>520</height>
+    <width>445</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -163,10 +163,17 @@
       <item row="0" column="1" >
        <widget class="QComboBox" name="artFetcher" />
       </item>
-      <item row="1" column="0" >
+      <item row="2" column="0" >
        <widget class="QCheckBox" name="qtUpdates" >
         <property name="text" >
          <string>_("Activate update notifier")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="metaFetcher" >
+        <property name="text" >
+         <string>_("Fetch the metadata from Internet")</string>
         </property>
        </widget>
       </item>
