@@ -97,6 +97,8 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     }
     p_playlist->p_fetcher->i_waiting = 0;
     p_playlist->p_fetcher->p_waiting = NULL;
+    p_playlist->p_fetcher->b_fetch_meta = var_CreateGetInteger( p_playlist,
+                                                                 "meta-fetch" );
     p_playlist->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
                                                                 "album-art" );
 

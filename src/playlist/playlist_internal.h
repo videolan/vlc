@@ -55,6 +55,7 @@ struct playlist_fetcher_t
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
     int             i_art_policy;
+    vlc_bool_t      b_fetch_meta;
     int             i_waiting;
     preparse_item_t *p_waiting;
 

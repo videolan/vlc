@@ -590,8 +590,14 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
         {
             if( !b_fetch_art )
             {
-                input_MetaFetch( p_playlist, p_item );
-                var_SetInteger( p_playlist, "item-change", p_item->i_id );
+                /* If the user doesn't want us to fetch meta automatically 
+                 * abort here. */
+                if( p_playlist->p_fetcher->b_fetch_meta )
+                {
+                    input_MetaFetch( p_playlist, p_item );
+                    var_SetInteger( p_playlist, "item-change", p_item->i_id );
+                }
+
                 /*  Fetch right now */
                 if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL )
                 {

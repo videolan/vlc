@@ -1065,6 +1065,11 @@ static const char *ppsz_clock_descriptions[] =
     "Automatically preparse files added to the playlist " \
     "(to retrieve some metadata)." )
 
+#define FETCH_META_TEXT N_( "Meta fetcher policy" )
+#define FETCH_META_LONGTEXT N_( \
+    "Specify if you want to attempt to fetch files'"\
+    "meta informations using the network." );
+
 #define ALBUM_ART_TEXT N_( "Album art policy" )
 #define ALBUM_ART_LONGTEXT N_( \
     "Choose how album art will be downloaded." );
@@ -1850,6 +1855,9 @@ vlc_module_begin();
 
     add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, VLC_FALSE );
+
+    add_integer( "fetch-meta", VLC_TRUE, NULL, FETCH_META_TEXT,
+                 FETCH_META_LONGTEXT, VLC_FALSE );
 
     add_integer( "album-art", ALBUM_ART_WHEN_ASKED, NULL, ALBUM_ART_TEXT,
                  ALBUM_ART_LONGTEXT, VLC_FALSE );
