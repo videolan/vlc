@@ -121,11 +121,11 @@ VLC_EXPORT( char*,          httpd_ServerIP, ( const httpd_client_t *cl, char *ps
 /* High level */
 
 VLC_EXPORT( httpd_file_t *, httpd_FileNew, ( httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t * ) );
-VLC_EXPORT( void,           httpd_FileDelete, ( httpd_file_t * ) );
+VLC_EXPORT( httpd_file_sys_t *, httpd_FileDelete, ( httpd_file_t * ) );
 
 
 VLC_EXPORT( httpd_handler_t *, httpd_HandlerNew, ( httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_handler_callback_t pf_fill, httpd_handler_sys_t * ) );
-VLC_EXPORT( void,           httpd_HandlerDelete, ( httpd_handler_t * ) );
+VLC_EXPORT( httpd_handler_sys_t *, httpd_HandlerDelete, ( httpd_handler_t * ) );
 
 
 VLC_EXPORT( httpd_redirect_t *, httpd_RedirectNew, ( httpd_host_t *, const char *psz_url_dst, const char *psz_url_src ) );

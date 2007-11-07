@@ -484,14 +484,18 @@ httpd_file_t *httpd_FileNew( httpd_host_t *host,
     return file;
 }
 
-void httpd_FileDelete( httpd_file_t *file )
+httpd_file_sys_t *httpd_FileDelete( httpd_file_t *file )
 {
+    httpd_file_sys_t *p_sys = file->p_sys;
+
     httpd_UrlDelete( file->url );
 
     free( file->psz_url );
     free( file->psz_mime );
 
     free( file );
+
+    return p_sys;
 }
 
 /*****************************************************************************
@@ -618,10 +622,12 @@ httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
     return handler;
 }
 
-void httpd_HandlerDelete( httpd_handler_t *handler )
+httpd_handler_sys_t *httpd_HandlerDelete( httpd_handler_t *handler )
 {
+    httpd_handler_sys_t *p_sys = handler->p_sys;
     httpd_UrlDelete( handler->url );
     free( handler );
+    return p_sys;
 }
 
 /*****************************************************************************
