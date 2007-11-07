@@ -658,7 +658,10 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
                                                            : time );
 
-    QString title; title.sprintf( "%s/%s", psz_time, psz_length );
+    QString title;
+    title.sprintf( "%s/%s", psz_time,
+                            ( !length && time ) ? "--:--" : psz_length );
+
     /* Add a minus to remaining time*/
     if( b_remainingTime && length ) timeLabel->setText( " -"+title+" " );
     else timeLabel->setText( " "+title+" " );
