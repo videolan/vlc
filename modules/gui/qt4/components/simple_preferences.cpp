@@ -393,6 +393,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
 
+            CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel, artFetcher );
+            CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, qtUpdates );
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
                     skinBrowse );

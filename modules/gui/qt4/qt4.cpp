@@ -95,6 +95,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define ERROR_TEXT N_("Show unimportant error and warnings dialogs" )
 #define MINIMAL_TEXT N_("Start in minimal view (menus hidden)." )
 
+#define UPDATER_TEXT N_("Activate the new updates notification")
+#define UPDATER_LONGTEXT N_("Activate the automatic notification of new " \
+                            "versions of the software. It runs once a week." )
+
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
@@ -137,6 +141,8 @@ vlc_module_begin();
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
                 ERROR_TEXT, VLC_FALSE );
+        add_bool( "qt-updates-notif", VLC_TRUE, NULL, UPDATER_TEXT, 
+                UPDATER_LONGTEXT, VLC_FALSE );
 
         add_integer( "qt-pl-showflags",
                 VLC_META_ENGINE_ARTIST|VLC_META_ENGINE_TITLE|
