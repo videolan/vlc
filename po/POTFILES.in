@@ -4,6 +4,7 @@
 include/iso_lang.h
 include/main.h
 include/mmx.h
+include/vlc_about.h
 include/vlc_access.h
 include/vlc_acl.h
 include/vlc_aout.h
@@ -93,6 +94,7 @@ src/control/media_list_player.c
 src/control/media_list_view.c
 src/control/playlist.c
 src/control/tag_query.c
+src/control/testapi.c
 src/control/video.c
 src/control/vlm.c
 src/extras/dirent.c
@@ -344,6 +346,8 @@ modules/audio_output/waveout.c
 modules/codec/a52.c
 modules/codec/adpcm.c
 modules/codec/araw.c
+modules/codec/cc.c
+modules/codec/cc.h
 modules/codec/cdg.c
 modules/codec/cinepak.c
 modules/codec/cmml/browser_open.c
@@ -372,6 +376,7 @@ modules/codec/faad.c
 modules/codec/fake.c
 modules/codec/ffmpeg/audio.c
 modules/codec/ffmpeg/chroma.c
+modules/codec/ffmpeg/deinterlace.c
 modules/codec/ffmpeg/demux.c
 modules/codec/ffmpeg/encoder.c
 modules/codec/ffmpeg/ffmpeg.c
@@ -534,6 +539,7 @@ modules/gui/beos/TransportButton.cpp
 modules/gui/beos/TransportButton.h
 modules/gui/beos/VideoOutput.cpp
 modules/gui/beos/VideoWindow.h
+modules/gui/fbosd.c
 modules/gui/macosx/about.h
 modules/gui/macosx/about.m
 modules/gui/macosx/AppleRemote.h
@@ -595,6 +601,7 @@ modules/gui/minimal_macosx/voutagl.m
 modules/gui/minimal_macosx/voutgl.h
 modules/gui/minimal_macosx/voutgl.m
 modules/gui/ncurses.c
+modules/gui/opie/opie.ui
 modules/gui/pda/pda.c
 modules/gui/pda/pda_callbacks.c
 modules/gui/pda/pda_callbacks.h
@@ -1007,11 +1014,19 @@ modules/misc/dummy/vout.c
 modules/misc/freetype.c
 modules/misc/gnutls.c
 modules/misc/gtk_main.c
+modules/misc/inhibit.c
 modules/misc/logger.c
-modules/misc/lua/luameta.c
-modules/misc/lua/luaplaylist.c
-modules/misc/lua/vlclua.c
-modules/misc/lua/vlclua.h
+modules/misc/lua/callbacks.c
+modules/misc/lua/configuration.c
+modules/misc/lua/intf.c
+modules/misc/lua/meta.c
+modules/misc/lua/net.c
+modules/misc/lua/objects.c
+modules/misc/lua/playlist.c
+modules/misc/lua/variables.c
+modules/misc/lua/vlc.c
+modules/misc/lua/vlc.h
+modules/misc/lua/vlm.c
 modules/misc/memcpy/fastmemcpy.h
 modules/misc/memcpy/memcpyaltivec.c
 modules/misc/memcpy/memcpy.c
