@@ -1294,6 +1294,11 @@ static struct
     { VLC_FOURCC('M','P','C',' '), CODEC_ID_MUSEPACK7,
       AUDIO_ES, "MUSEPACK7 Audio" },
 #endif
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(48<<8)+0)
+    /* MUSEPACK8 Audio */
+    { VLC_FOURCC('M','P','C','K'), CODEC_ID_MUSEPACK8,
+      AUDIO_ES, "MUSEPACK8 Audio" },
+#endif
 
     /* RealAudio 1.0 */
     { VLC_FOURCC('1','4','_','4'), CODEC_ID_RA_144,
