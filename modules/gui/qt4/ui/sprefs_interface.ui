@@ -140,7 +140,7 @@
       <item>
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode" >
         <property name="text" >
-         <string>_("Enqueue files in playlist when in one interface mode")</string>
+         <string>_("Enqueue files in playlist when in one instance mode")</string>
         </property>
        </widget>
       </item>
