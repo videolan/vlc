@@ -26,7 +26,7 @@
    <item row="1" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>_("Default Interface")</string>
+      <string>_("Skins")</string>
      </property>
      <layout class="QGridLayout" >
       <item row="2" column="0" colspan="3" >
@@ -150,7 +150,7 @@
    <item row="3" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
-      <string>_("Interface / Network Interaction")</string>
+      <string>_("Privacy / Network Interaction")</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
