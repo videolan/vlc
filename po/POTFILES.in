@@ -4,7 +4,6 @@
 include/iso_lang.h
 include/main.h
 include/mmx.h
-include/vlc_about.h
 include/vlc_access.h
 include/vlc_acl.h
 include/vlc_aout.h

@@ -1031,7 +1031,7 @@ update-po:
 	  echo "" ; \
 	  echo "# main sources" ; \
 	  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
-	    | grep -v '\(misc/modules_\|src/misc/revision.c\|modules/builtin.h\)' \
+	    | grep -v '\(misc/modules_\|src/misc/revision.c\|modules/builtin.h\|include/vlc_about.h\)' \
 	    | sort ; \
 	  echo "" ; \
 	  echo "# modules" ; \
