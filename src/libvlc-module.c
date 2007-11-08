@@ -404,7 +404,7 @@ static const char *ppsz_pos_descriptions[] =
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
 #define INHIBIT_TEXT N_("Inhibits the power management daemon during playback.")
-#define INHIBIT_LONGTEXT N_("Inhibits the power management daemon during any" \
+#define INHIBIT_LONGTEXT N_("Inhibits the power management daemon during any " \
     "playback, to avoid the computer being suspended because of inactivity.")
 
 #define VIDEO_DECO_TEXT N_("Window decorations")
