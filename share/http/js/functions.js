@@ -1042,7 +1042,7 @@ function browse_path( p )
 }
 function refresh_albumart( force )
 {
-    if( albumart_id != pl_cur_id || force )
+    if( albumart_id != pl_cur_id || force )
     {
         var now = new Date();
         var albumart = document.getElementById( 'albumart' );
