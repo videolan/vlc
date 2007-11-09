@@ -230,7 +230,8 @@ void DialogsProvider::openCaptureDialog()
 /* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, ENQUEUE)->showTab(0);
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_ENQUEUE)
+                            ->showTab( OPEN_FILE_TAB );
 }
 
 /* Unimplemmented yet - Usefull ? */

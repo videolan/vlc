@@ -563,7 +563,7 @@ void MainInterface::togglePlaylist()
     {
         msg_Dbg( p_intf, "Creating a new playlist" );
         playlistWidget = new PlaylistWidget( p_intf );
-        if(bgWidget)
+        if( bgWidget )
             CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
 
         //FIXME
@@ -578,10 +578,10 @@ void MainInterface::togglePlaylist()
         msg_Dbg( p_intf, "Creating a new playlist" );
 
         /* Make the playlist floating is requested. Default is not. */
-        if( !settings->value( "playlist-embedded", true ).toBool() );
+        if( !(settings->value( "playlist-embedded", true )).toBool() );
         {
             msg_Dbg( p_intf, "we don't want it inside");
-            dockPL->setFloating( true );
+            //dockPL->setFloating( true );
         }
 
     }
