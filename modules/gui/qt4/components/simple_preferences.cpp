@@ -232,7 +232,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.outputModule, currentIndexChanged( int ), this,
                              updateAudioOptions( int ) );
 
-
         //TODO: use modules_Exists
 #ifndef WIN32
             CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel, alsaDevice );

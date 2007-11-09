@@ -287,7 +287,7 @@
       <item row="0" column="0" colspan="2" >
        <widget class="QCheckBox" name="lastfm" >
         <property name="text" >
-         <string>_("Enable")</string>
+         <string>_("Enable last.fm submission")</string>
         </property>
        </widget>
       </item>
