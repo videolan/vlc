@@ -82,7 +82,7 @@ struct filter_sys_t
     struct atomic_operation_t * p_atomic_operations;
 };
 
-#define MONO_DOWNMIX_TEXT N_("Use downmix algorithme.")
+#define MONO_DOWNMIX_TEXT N_("Use downmix algorithm")
 #define MONO_DOWNMIX_LONGTEXT N_("This option selects a stereo to mono " \
     "downmix algorithm that is used in the headphone channel mixer. It" \
     "gives the effect of standing in a room full of speakers." )
