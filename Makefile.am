@@ -634,7 +634,7 @@ package-win-common:
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "vlc-${VERSION}/"
 	cp "$(top_builddir)/src/.libs/libvlc-control$(LIBEXT)" "vlc-${VERSION}/"
 
-	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
+	for file in AUTHORS MAINTAINERS THANKS ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
 	  unix2dos "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; done
 
