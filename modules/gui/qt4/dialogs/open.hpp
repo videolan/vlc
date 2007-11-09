@@ -92,7 +92,7 @@ private slots:
     void toggleAdvancedPanel();
     void updateMRL( QString );
     void updateMRL();
-    void newMethod(QString);
+    void newCachingMethod( QString );
     void signalCurrent();
 };
 

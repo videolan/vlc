@@ -112,13 +112,13 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     CONNECT( captureOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
-                                                 this, newMethod(QString) );
+                                                 this, newCachingMethod(QString) );
     CONNECT( netOpenPanel, methodChanged( QString ),
-                                                 this, newMethod(QString) );
+                                                 this, newCachingMethod(QString) );
     CONNECT( discOpenPanel, methodChanged( QString ),
-                                                 this, newMethod(QString) );
+                                                 this, newCachingMethod(QString) );
     CONNECT( captureOpenPanel, methodChanged( QString ),
-                                                 this, newMethod(QString) );
+                                                 this, newCachingMethod(QString) );
 
     /* Advanced frame Connects */
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
@@ -135,7 +135,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     /* Initialize caching */
     storedMethod = "";
-    newMethod("file-caching");
+    newCachingMethod("file-caching");
 
     mainHeight = advHeight = 0;
 }
@@ -179,6 +179,31 @@ void OpenDialog::signalCurrent() {
         (dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() ))->updateMRL();
 }
 
+void OpenDialog::toggleAdvancedPanel()
+{
+    //FIXME does not work under Windows
+    if( ui.advancedFrame->isVisible() ) {
+        ui.advancedFrame->hide();
+#ifndef WIN32
+        setMinimumHeight(1);
+        resize( width(), mainHeight );
+#endif
+    } else {
+#ifndef WIN32
+        if( mainHeight == 0 )
+            mainHeight = height();
+#endif
+
+        ui.advancedFrame->show();
+#ifndef WIN32
+        if( advHeight == 0 ) {
+            advHeight = height() - mainHeight;
+        }
+        resize( width(), mainHeight + advHeight );
+#endif
+    }
+}
+
 /***********
  * Actions *
  ***********/
@@ -186,8 +211,9 @@ void OpenDialog::signalCurrent() {
 /* If Cancel is pressed or escaped */
 void OpenDialog::cancel()
 {
-    fileOpenPanel->clear();
-    this->toggleVisible();
+    for( int i = 0; i <= OPEN_TAB_MAX; i++ ) 
+        dynamic_cast<OpenPanel*>(ui.Tab->widget( i ))->clear();
+    toggleVisible();
     if( isModal() ) reject();
 }
 
@@ -230,7 +256,7 @@ void OpenDialog::stream( bool b_transcode_only )
 
 void OpenDialog::finish( bool b_enqueue = false )
 {
-    this->toggleVisible();
+    toggleVisible();
     mrl = ui.advancedLineInput->text();
 
     if( !isModal() )
@@ -240,18 +266,17 @@ void OpenDialog::finish( bool b_enqueue = false )
         {
             bool b_start = !i && !b_enqueue;
             input_item_t *p_input;
-            const char *psz_utf8 = qtu( tempMRL[i] );
 
-            p_input = input_ItemNew( p_intf, psz_utf8, NULL );
+            p_input = input_ItemNew( p_intf, qtu( tempMRL[i] ), NULL );
 
             /* Insert options */
             while( i + 1 < tempMRL.size() && tempMRL[i + 1].startsWith( ":" ) )
             {
                 i++;
-                psz_utf8 = qtu( tempMRL[i] );
-                input_ItemAddOption( p_input, psz_utf8 );
+                input_ItemAddOption( p_input, qtu( tempMRL[i] ) );
             }
 
+            /* Switch between enqueuing and starting the item */
             if( b_start )
             {
                 playlist_AddInput( THEPL, p_input,
@@ -261,7 +286,7 @@ void OpenDialog::finish( bool b_enqueue = false )
             else
             {
                 playlist_AddInput( THEPL, p_input,
-                                   PLAYLIST_APPEND|PLAYLIST_PREPARSE,
+                                   PLAYLIST_APPEND | PLAYLIST_PREPARSE,
                                    PLAYLIST_END, VLC_TRUE, VLC_FALSE );
             }
         }
@@ -270,29 +295,12 @@ void OpenDialog::finish( bool b_enqueue = false )
         accept();
 }
 
-void OpenDialog::toggleAdvancedPanel()
-{
-    //FIXME does not work under Windows
-    if( ui.advancedFrame->isVisible() ) {
-        ui.advancedFrame->hide();
-#ifndef WIN32
-        setMinimumHeight(1);
-        resize( width(), mainHeight );
-#endif
-    } else {
-#ifndef WIN32
-        if( mainHeight == 0 )
-            mainHeight = height();
-#endif
 
-        ui.advancedFrame->show();
-#ifndef WIN32
-        if( advHeight == 0 ) {
-            advHeight = height() - mainHeight;
-        }
-        resize( width(), mainHeight + advHeight );
-#endif
-    }
+/* Update the MRL */
+void OpenDialog::updateMRL( QString tempMRL )
+{
+    mainMRL = tempMRL;
+    updateMRL();
 }
 
 void OpenDialog::updateMRL() {
@@ -312,18 +320,12 @@ void OpenDialog::updateMRL() {
     ui.advancedLineInput->setText(mrl);
 }
 
-void OpenDialog::updateMRL(QString tempMRL)
-{
-    mainMRL = tempMRL;
-    updateMRL();
-}
-
-void OpenDialog::newMethod(QString method)
+void OpenDialog::newCachingMethod( QString method )
 {
     if( method != storedMethod ) {
         storedMethod = method;
-        int i_value = config_GetInt( p_intf, qta(storedMethod) );
-        ui.cacheSpinBox->setValue(i_value);
+        int i_value = config_GetInt( p_intf, qta( storedMethod ) );
+        ui.cacheSpinBox->setValue( i_value );
     }
 }
 

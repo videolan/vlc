@@ -74,7 +74,8 @@ enum {
     OPEN_FILE_TAB,
     OPEN_DISC_TAB,
     OPEN_NETWORK_TAB,
-    OPEN_CAPTURE_TAB
+    OPEN_CAPTURE_TAB,
+    OPEN_TAB_MAX
 };
 
 enum {
