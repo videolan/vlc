@@ -58,25 +58,23 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     ui.Tab->insertTab( OPEN_CAPTURE_TAB, captureOpenPanel,
                                 qtr( "Capture &Device" ) );
 
-    /* Hide the advancedPanel */
-    if(! config_GetInt( p_intf, "qt-adv-options") )
-    {
-        ui.advancedFrame->hide();
-    }
-    else
-    {
-        ui.advancedCheckBox->setCheckState( Qt::Checked );
-    }
-
+    /* Hide the Slave input widgets */
     ui.slaveLabel->hide();
     ui.slaveText->hide();
     ui.slaveBrowseButton->hide();
+
+    /* Hide the advancedPanel */
+    if(! config_GetInt( p_intf, "qt-adv-options") )
+        ui.advancedFrame->hide();
+    else
+        ui.advancedCheckBox->setCheckState( Qt::Checked );
 
     /* Buttons Creation */
     QSizePolicy buttonSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
     buttonSizePolicy.setHorizontalStretch(0);
     buttonSizePolicy.setVerticalStretch(0);
 
+    /* Play Button */
     playButton = new QToolButton( this );
     playButton->setText( qtr( "&Play" ) );
     playButton->setSizePolicy( buttonSizePolicy );
@@ -84,10 +82,12 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     playButton->setPopupMode( QToolButton::MenuButtonPopup );
     playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
 
+    /* Cancel Button */
     cancelButton = new QPushButton();
     cancelButton->setText( qtr( "&Cancel" ) );
     cancelButton->setSizePolicy( buttonSizePolicy );
 
+    /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open" );
     openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
                                     QKeySequence( "Alt+E") );
@@ -109,8 +109,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( discOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
-    CONNECT( captureOpenPanel, mrlUpdated( QString ), this,
-                                                         updateMRL(QString) );
+    CONNECT( captureOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
                                                  this, newMethod(QString) );
@@ -133,7 +132,6 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     /* At creation time, modify the default buttons */
     if ( i_action_flag ) setMenuAction();
-
 
     /* Initialize caching */
     storedMethod = "";
@@ -170,16 +168,15 @@ void OpenDialog::setMenuAction()
    }
 }
 
-void OpenDialog::showTab(int i_tab=0)
+void OpenDialog::showTab( int i_tab=0 )
 {
     this->show();
-    ui.Tab->setCurrentIndex(i_tab);
+    ui.Tab->setCurrentIndex( i_tab );
 }
 
 void OpenDialog::signalCurrent() {
-    if (ui.Tab->currentWidget() != NULL) {
-        (dynamic_cast<OpenPanel*>(ui.Tab->currentWidget()))->updateMRL();
-    }
+    if (ui.Tab->currentWidget() != NULL)
+        (dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() ))->updateMRL();
 }
 
 /***********
@@ -191,8 +188,7 @@ void OpenDialog::cancel()
 {
     fileOpenPanel->clear();
     this->toggleVisible();
-    if( isModal() )
-        reject();
+    if( isModal() ) reject();
 }
 
 /* If EnterKey is pressed */
