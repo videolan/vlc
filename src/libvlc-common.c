@@ -1330,6 +1330,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 #   define WHITE   COL(37)
 #   define GRAY    "\033[0m"
 #define COLOR_FORMAT_STRING (WHITE"  %s --%s"YELLOW"%s%s%s%s%s%s "GRAY)
+#define COLOR_FORMAT_STRING_BOOL (WHITE"  %s --%s%s%s%s%s%s%s "GRAY)
 
 #define LINE_START 8
 #define PADDING_SPACES 25
@@ -1342,6 +1343,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
     char psz_format[sizeof(COLOR_FORMAT_STRING)];
+    char psz_format_bool[sizeof(COLOR_FORMAT_STRING_BOOL)];
     char psz_buffer[10000];
     char psz_short[4];
     int i_index;
@@ -1358,9 +1360,15 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     psz_spaces_longtext[LINE_START+2] = '\0';
 
     if( b_color )
+    {
         strcpy( psz_format, COLOR_FORMAT_STRING );
+        strcpy( psz_format_bool, COLOR_FORMAT_STRING_BOOL );
+    }
     else
+    {
         strcpy( psz_format, FORMAT_STRING );
+        strcpy( psz_format_bool, FORMAT_STRING );
+    }
 
     /* List all modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -1607,9 +1615,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
             if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
             {
-                utf8_fprintf( stdout, psz_format, psz_short, p_item->psz_name,
-                         psz_prefix, p_item->psz_name, psz_bra, psz_type,
-                         psz_ket, psz_spaces );
+                utf8_fprintf( stdout, psz_format_bool, psz_short, 
+                              p_item->psz_name, psz_prefix, p_item->psz_name,
+                              psz_bra, psz_type, psz_ket, psz_spaces );
             }
             else
             {
