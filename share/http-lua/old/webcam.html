@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>VideoLAN browser output</title>
+		<link href="style.css" title="Default" rel="stylesheet" type="text/css" />
+	</head>
+<body>
+<p>
+This is an example webpage for viewing a Multipart MJPEG stream from any browser. You should edit it to point to the URL of your MPJEG stream that you are streaming with VLC or with a AXIS webcam for instance. For setting up such a stream, refer to the <a href="http://www.videolan.org/doc">VideoLAN HOWTO</a>.</p>
+<p>The page has two modes. A Netscape browser compatible mode which will directly show the videostream, and a mode in which it uses a Java Applet. This is because many browsers cannot handle live MJPEG streams. The Applet in use is the <a href="http://www.charliemouse.com/code/cambozola">Cambozola</a> plugin. You will need to download it from the Cambozola website and put it in the same directory as this webpage.</p>
+
+<h1>Netscape style</h1>
+<a href="http://vlc.server.org:8080/thestream">Click Here</a><br />
+
+<h1>Java applet style</h1>
+<applet code="com.charliemouse.cambozola.Viewer" archive="cambozola.jar" width="320" height="240">
+<param name="url" value="http://vlc.server.org:8080/thestream">
+<param name="properties" value="none">
+</applet>
+
+</body>
+</html>

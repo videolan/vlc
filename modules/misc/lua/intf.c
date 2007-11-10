@@ -122,7 +122,7 @@ static int vlclua_input_info( lua_State *L )
     int i_cat;
     int i;
     if( !p_input ) return vlclua_error( L );
-    vlc_mutex_lock( &input_GetItem(p_input)->lock );
+    //vlc_mutex_lock( &input_GetItem(p_input)->lock );
     i_cat = input_GetItem(p_input)->i_categories;
     lua_createtable( L, 0, i_cat );
     for( i = 0; i < i_cat; i++ )
@@ -141,7 +141,7 @@ static int vlclua_input_info( lua_State *L )
         }
         lua_settable( L, -3 );
     }
-    vlc_object_release( p_input );
+    //vlc_object_release( p_input );
     return 1;
 }
 
@@ -161,6 +161,36 @@ static int vlclua_get_title( lua_State *L )
     {
         lua_pushstring( L, input_GetItem(p_input)->psz_name );
         vlc_object_release( p_input );
+    }
+    return 1;
+}
+
+static int vlclua_input_stats( lua_State *L )
+{
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    input_item_t *p_item = p_input && p_input->p ? input_GetItem( p_input ) : NULL;
+    lua_newtable( L );
+    if( p_item )
+    {
+#define STATS_INT( n ) lua_pushinteger( L, p_item->p_stats->i_ ## n ); \
+                       lua_setfield( L, -2, #n );
+#define STATS_FLOAT( n ) lua_pushnumber( L, p_item->p_stats->f_ ## n ); \
+                         lua_setfield( L, -2, #n );
+        STATS_INT( read_bytes )
+        STATS_FLOAT( input_bitrate )
+        STATS_INT( demux_read_bytes )
+        STATS_FLOAT( demux_bitrate )
+        STATS_INT( decoded_video )
+        STATS_INT( displayed_pictures )
+        STATS_INT( lost_pictures )
+        STATS_INT( decoded_audio )
+        STATS_INT( played_abuffers )
+        STATS_INT( lost_abuffers )
+        STATS_INT( sent_packets )
+        STATS_INT( sent_bytes )
+        STATS_FLOAT( send_bitrate )
+#undef STATS_INT
+#undef STATS_FLOAT
     }
     return 1;
 }
@@ -454,7 +484,10 @@ static int vlclua_playlist_get( lua_State *L )
         lua_setfield( L, -2, "name" );
         lua_pushstring( L, p_input->psz_uri );
         lua_setfield( L, -2, "path" );
-        lua_pushnumber( L, ((double)p_input->i_duration)*1e-6 );
+        if( p_input->i_duration < 0 )
+            lua_pushnumber( L, -1 );
+        else
+            lua_pushnumber( L, ((double)p_input->i_duration)*1e-6 );
         lua_setfield( L, -2, "duration" );
         lua_pushinteger( L, p_input->i_nb_played );
         lua_setfield( L, -2, "nb_played" );
@@ -476,15 +509,16 @@ static int vlclua_playlist_status( lua_State *L )
 {
     intf_thread_t *p_intf = (intf_thread_t *)vlclua_get_this( L );
     playlist_t *p_playlist = pl_Yield( p_intf );
+    /*
     int i_count = 0;
-    lua_settop( L, 0 );
+    lua_settop( L, 0 );*/
     if( p_playlist->p_input )
     {
-        char *psz_uri =
+        /*char *psz_uri =
             input_item_GetURI( input_GetItem( p_playlist->p_input ) );
         lua_pushstring( L, psz_uri );
         free( psz_uri );
-        lua_pushnumber( L, config_GetInt( p_intf, "volume" ) );
+        lua_pushnumber( L, config_GetInt( p_intf, "volume" ) );*/
         vlc_mutex_lock( &p_playlist->object_lock );
         switch( p_playlist->status.i_status )
         {
@@ -492,7 +526,7 @@ static int vlclua_playlist_status( lua_State *L )
                 lua_pushstring( L, "stopped" );
                 break;
             case PLAYLIST_RUNNING:
-                lua_pushstring( L, "running" );
+                lua_pushstring( L, "playing" );
                 break;
             case PLAYLIST_PAUSED:
                 lua_pushstring( L, "paused" );
@@ -502,10 +536,14 @@ static int vlclua_playlist_status( lua_State *L )
                 break;
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
-        i_count += 3;
+        /*i_count += 3;*/
+    }
+    else
+    {
+        lua_pushstring( L, "stopped" );
     }
     vlc_object_release( p_playlist );
-    return i_count;
+    return 1;
 }
 
 
@@ -552,14 +590,22 @@ static luaL_Reg p_reg[] =
 
     { "decode_uri", vlclua_decode_uri },
     { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
+    { "convert_xml_special_chars", vlclua_convert_xml_special_chars },
 
     { "lock_and_wait", vlclua_lock_and_wait },
     { "signal", vlclua_signal },
 
     { "version", vlclua_version },
     { "license", vlclua_license },
+    { "copyright", vlclua_copyright },
     { "should_die", vlclua_intf_should_die },
     { "quit", vlclua_quit },
+
+    { "homedir", vlclua_homedir },
+    { "datadir", vlclua_datadir },
+    { "configdir", vlclua_configdir },
+    { "cachedir", vlclua_cachedir },
+    { "datadir_list", vlclua_datadir_list },
 
     { NULL, NULL }
 };
@@ -620,6 +666,7 @@ static luaL_Reg p_reg_playlist[] =
     { "add", vlclua_playlist_add },
     { "enqueue", vlclua_playlist_enqueue },
     { "get", vlclua_playlist_get },
+    { "stats", vlclua_input_stats },
 
     { NULL, NULL }
 };
@@ -664,6 +711,9 @@ static luaL_Reg p_reg_fd[] =
 /*    { "open", vlclua_fd_open },*/
     { "read", vlclua_fd_read },
     { "write", vlclua_fd_write },
+    { "stat", vlclua_stat },
+
+    { "opendir", vlclua_opendir },
 
     { "new_fd_set", vlclua_fd_set_new },
     { "fd_clr", vlclua_fd_clr },
@@ -683,6 +733,32 @@ static luaL_Reg p_reg_vlm[] =
     { NULL, NULL }
 };
 
+static luaL_Reg p_reg_httpd[] =
+{
+    { "host_new", vlclua_httpd_tls_host_new },
+    { "host_delete", vlclua_httpd_host_delete },
+    { "handler_new", vlclua_httpd_handler_new },
+    { "handler_delete", vlclua_httpd_handler_delete },
+    { "file_new", vlclua_httpd_file_new },
+    { "file_delete", vlclua_httpd_file_delete },
+    { "redirect_new", vlclua_httpd_redirect_new },
+    { "redirect_delete", vlclua_httpd_redirect_delete },
+
+    { NULL, NULL }
+};
+
+static luaL_Reg p_reg_acl[] =
+{
+    { "create", vlclua_acl_create },
+    { "delete", vlclua_acl_delete },
+    { "check", vlclua_acl_check },
+    { "duplicate", vlclua_acl_duplicate },
+    { "add_host", vlclua_acl_add_host },
+    { "add_net", vlclua_acl_add_net },
+    { "load_file", vlclua_acl_load_file },
+
+    { NULL, NULL }
+};
 
 static void Run( intf_thread_t *p_intf );
 
@@ -817,6 +893,8 @@ int E_(Open_LuaIntf)( vlc_object_t *p_this )
     luaL_register_submodule( L, "net", p_reg_net );
     luaL_register_submodule( L, "fd", p_reg_fd );
     luaL_register_submodule( L, "vlm", p_reg_vlm );
+    luaL_register_submodule( L, "httpd", p_reg_httpd );
+    luaL_register_submodule( L, "acl", p_reg_acl );
     /* clean up */
     lua_pop( L, 1 );
 

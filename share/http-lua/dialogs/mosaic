@@ -1,0 +1,116 @@
+<?vlc --[[
+vim:syntax=html
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  mosaic: VLC media player web interface - mosaic wizard
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+This dialog needs the following dialogs to be fully functional: input and
+sout.
+]]?>
+
+<div id="mosaic" class="dialog">
+  <div class="title">
+    VLC media player - Mosaic wizard
+    <button id="btn_toggle_text" onclick="toggle_btn_text();">
+      <img src="images/help.png" alt="Help" />
+      Help
+    </button>
+  </div>
+  <div class="controls">
+    <b>Mosaic dimensions:</b><br/>
+    <table style="text-align: right;">
+      <tr>
+        <td>
+          <label for="bg_width">Background width*:</label> <input class="mosaic_bg" type="text" id="bg_width" value="400" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="bg_height">Background height*:</label> <input class="mosaic_bg" type="text" id="bg_height" value="300" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_width">Width:</label> <input class="mosaic_tbl" type="text" id="mosaic_width" value="200" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_height">Height:</label> <input class="mosaic_tbl" type="text" id="mosaic_height" value="200" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_xoffset">X offset (left):</label> <input class="mosaic_tbl" type="text" id="mosaic_xoffset" value="10" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_yoffset">Y offset (top):</label> <input class="mosaic_tbl" type="text" id="mosaic_yoffset" value="10" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_cols">Columns:</label> <input class="mosaic_itm" type="text" id="mosaic_cols" value="2" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_rows">Rows:</label> <input class="mosaic_itm" type="text" id="mosaic_rows" value="2" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_hborder">Horizontal border:</label> <input class="mosaic_itm" type="text" id="mosaic_hborder" value="10" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_vborder">Vertical border:</label> <input class="mosaic_itm" type="text" id="mosaic_vborder" value="5" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+        *: these values aren't used by the mosaic code.<br/> They're only here to adapt the preview's size.
+        </td>
+      </tr>
+    </table>
+    <b>Background:</b><br/>
+    <label for="mosaic_bg_input">Input:<label> <input type="text" id="mosaic_bg_input" class="mosaic_bg" value="" size="60" onblur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_input_edit( 'mosaic_bg_input' );" /><br/>
+    <b>Item:</b><br/>
+    <label for="mosaic_input_name">Name:</label> <input type="text" id="mosaic_input_name" value="" class="mosaic_itm" />
+    <label for="mosaic_input">Input:</label> <input type="text" id="mosaic_input" value="" class="mosaic_itm" /> <input type="button" value="Edit" onclick="vlm_input_edit( 'mosaic_input' );" /> <input type="button" value="Add to input list" onclick="mosaic_add_input();" /><br/>
+    <b>Stream:</b> (leave this empty to display locally)<br/>
+    <label for="mosaic_output">Output:</label> <input type="text" id="mosaic_output" value="" size="60" onblur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_output_edit( 'mosaic_output' );" /><br/>
+    <div id="mosaic_feedback"></div>
+  </div>
+  <div  id="mosaic_list" class="popup">[<a href="javascript:hide('mosaic_list');">hide</a>] - Select a stream:<br/><div id="mosaic_list_content"></div></div>
+  <div class="controls">
+    Click on each of the cells to assign inputs. (<a href="javascript:document.getElementById('mosaic_list').value='';show('mosaic_list');">Show input list</a>)
+  </div>
+</div>
+
+<div id="mosaic_layout" class="mosaic_bg"></div>
+
+<div class="dialog" style="overflow:visible;">
+  <div class="controls">
+    <input type="button" value="Let's go!" onclick="mosaic_batch(document.getElementById('mosaic_code').value);" />
+    <input type="button" value="Stop" onclick="mosaic_stop()" />
+    <input type="button" id="mosaic_code_show" value="Show VLM code" onclick="show('mosaic_code_div');hide('mosaic_code_show');showinline('mosaic_code_hide');" />
+    <input type="button" id="mosaic_code_hide" style="display:none" value="Hide VLM code" onclick="hide('mosaic_code_div');hide('mosaic_code_hide');showinline('mosaic_code_show');" />
+    <br/><br/>
+  </div>
+  <div id="mosaic_code_div" style="display:none;" >
+    Edit the following VLM command batch if you want to fine tune your mosaic settings:
+  <textarea id="mosaic_code" cols="80" rows="30"></textarea>
+  </div>
+</div>

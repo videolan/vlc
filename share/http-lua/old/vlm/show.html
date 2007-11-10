@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
+    <title>VLC media player</title>
+    <link href="../style.css" title="Default" rel="stylesheet" type="text/css" />
+
+    <vlc id="control" param1="vlm_setup,vlm_new,vlm_del,vlm_play,vlm_pause,vlm_stop,vlm_seek,vlm_save,vlm_load" />
+
+ </head>
+ <body>
+    <h2>
+     <a href="http://www.videolan.org/">VLC media player<vlc id="value" param1="version" /></a> (http interface)</h2>
+    <div class="sectitle">VLM - Edit <vlc id="value" param1="'name' url_extract"/></div>
+    <div class="section">
+
+<vlc id="foreach" param1="el" param2="vlm" />
+<vlc id="if" param1="'name' url_extract el.name value strcmp 0 =" />
+
+    <vlc id="if" param1="'type' url_extract 'broadcast' strcmp 0 =" />
+        <table>
+        <tr><td>Name : </td><td><vlc id="value" param1="'name' url_extract"/> </td> </tr>
+        <tr><td>Type: </td><td>Broadcast </td></tr>
+        <tr><td valign="top">Inputs: </td>
+            <td>
+            <vlc id="foreach" param1="in" param2="el.inputs" /><vlc id="value" param1="in" /><br/><vlc id="end" />
+            </td></tr>
+        <tr><td>Output: </td><td><vlc id="value" param1="el.output" /></td></tr>
+        <tr><td>Option: </td>
+             <td>
+             <vlc id="foreach" param1="op" param2="el.options" /><vlc id="value" param1="op" /><br/><vlc id="end" />
+             </td></tr>
+        </table>
+        <form method="get" action="/old/vlm/edit.html" />
+         <input type="hidden" name="name" value="<vlc id="value" param1="'name' url_extract"/>" />
+         <input type="hidden" name="type" value="broadcast" />
+         <button name="control" value="vlm_setup">setup</button>
+        </form>
+    <vlc id="else" />
+    <vlc id="if" param1="'type' url_extract 'schedule' strcmp 0 =" />
+        <table>
+        <tr><td>Name : </td><td><vlc id="value" param1="'name' url_extract"/> </td> </tr>
+        <tr><td>Type: </td><td>Schedule </td></tr>
+        <tr><td valign="top">Commands: </td>
+            <td><vlc id="foreach" param1="in" param2="el.commands" /><vlc id="value" param1="in" /><br/><vlc id="end" />
+            </td></tr>
+        <tr><td>Date: </td>
+            <td><vlc id="value" param1="el.date" /></td>
+        </tr>
+<vlc id="if" param1="el.period value '0' strcmp" />
+        <tr>
+         <td>Period: </td>
+         <td><vlc id="value" param1="el.period" /></td>
+        </tr>
+        <tr>
+         <td>Repeat: </td>
+<vlc id="if" param1="el.repeat value "-1" strcmp" />
+         <td><vlc id="value" param1="el.repeat" /></td>
+<vlc id="else" />
+         Endless
+<vlc id="end" />
+        </tr>
+<vlc id="end" />
+        </table>
+        <form method="get" action="/old/vlm/edit.html" />
+         <input type="hidden" name="name" value="<vlc id="value" param1="'name' url_extract"/>" />
+         <input type="hidden" name="type" value="schedule" />
+         <button name="control" value="vlm_setup">setup</button>
+        </form>
+    <vlc id="end" />
+    <vlc id="end" />
+<vlc id="end" />
+<vlc id="end" />
+
+    </div>
+
+    <hr/>
+    <p> <vlc id="value" param1="copyright" /> </p>
+</body>
+</html>

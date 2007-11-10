@@ -159,7 +159,7 @@ int vlclua_add_callback( lua_State *L )
      * the function in the stack to nil) */
     p_callback->i_index = i_index;
     p_callback->i_type = var_Type( p_obj, psz_var );
-    p_callback->L = lua_newthread( L );
+    p_callback->L = lua_newthread( L ); /* Do we have to keep a reference to this thread somewhere to prevent garbage collection? */
 
     var_AddCallback( p_obj, psz_var, vlclua_callback, p_callback );
     return 0;

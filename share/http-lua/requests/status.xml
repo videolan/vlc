@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?<?vlcprint'>'?>
+<?vlc --[[
+vim:syntax=lua
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  status.xml: VLC media player web interface
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+]]?>
+<?vlc
+
+local input = _GET['input']
+local command = _GET['command']
+local id = tonumber(_GET['id'] or -1)
+local val = _GET['val']
+
+--vlc.msg.err("requests/status.xml got:","input: "..tostring(input),"command: "..tostring(command),"id: "..tostring(id),"val: "..tostring(val))
+
+local function stripslashes(s)
+  return string.gsub(s,"\\(%.)","%1")
+end
+
+local status = vlc.playlist.status()
+
+if command == "in_play" then
+  local options = {}
+  for o in string.gmatch(input," :[^ ]*") do -- FIXME: options should be in seperate variables, not in the same string as the input.
+    table.insert(options,string.sub(o,3))
+  end
+  vlc.playlist.add({{path=stripslashes(input),options=options}})
+elseif command == "in_enqueue" then
+  vlc.playlist.enqueue(stripslashes(input))
+elseif command == "pl_play" then
+  vlc.playlist.goto(id)
+elseif command == "pl_pause" then
+  vlc.msg.err("FIXME: pl_pause implementation is ugly")
+  common.hotkey("key-play-pause") -- gruik
+elseif command == "pl_stop" then
+  vlc.playlist.stop()
+elseif command == "pl_next" then
+  vlc.playlist.next()
+elseif command == "pl_previous" then
+  vlc.playlist.prev()
+elseif command == "pl_delete" then
+  vlc.msg.err("FIXME: pl_delete unimplemented")
+  --vlc.playlist.delete(id)
+elseif command == "pl_empty" then
+  vlc.playlist.clear()
+elseif command == "pl_sort" then
+  vlc.msg.err("FIXME: pl_sort unimplemented")
+elseif command == "pl_random" then
+  vlc.playlist.random()
+elseif command == "pl_loop" then
+  vlc.playlist.loop()
+elseif command == "pl_repeat" then
+  vlc.playlist.repeat_()
+elseif command == "pl_sd" then
+  vlc.msg.err("FIXME: pl_sd unimplemented")
+  --[[
+    <vlc id="if" param1="val value services_discovery_is_loaded" />
+      <vlc id="rpn" param1="val value services_discovery_remove" />
+    <vlc id="else" />
+      <vlc id="rpn" param1="val value services_discovery_add" />
+    <vlc id="end" />
+  ]]
+elseif command == "fullscreen" then
+  vlc.fullscreen()
+elseif command == "snapshot" then
+  common.snapshot()
+elseif command == "volume" then
+  vlc.volume.set(tonumber(val))
+elseif command == "seek" then
+  common.seek(val)
+elseif command == "key" then
+  common.hotkey("key-"..val)
+end
+
+local input = nil
+local command = nil
+local id = nil
+local val = nil
+
+local input = vlc.object.input()
+local playlist = vlc.object.playlist()
+local vout = input and vlc.object.find(input,'vout','child')
+?>
+<root>
+  <volume><?vlc print(vlc.volume.get()) ?></volume>
+  <length><?vlc if input then print(vlc.var.get(input,"length")) else print(0) end?></length>
+  <time><?vlc if input then print(vlc.var.get(input,"time")) else print(0) end?></time>
+  <state><?vlc print(status) ?></state>
+  <position><?vlc if input then print(vlc.var.get(input,"position")) else print(0) end?></position>
+  <fullscreen><?vlc if vout then vlc.var.get(vout,"fullscreen") else print(0) end?></fullscreen>
+  <random><?vlc print(vlc.var.get(playlist,"random")) ?></random>
+  <loop><?vlc print(vlc.var.get(playlist,"loop")) ?></loop>
+  <repeat><?vlc print(vlc.var.get(playlist,"repeat")) ?></repeat>
+  <information>
+  <?vlc
+    if input then
+      local info = vlc.input_info()
+      for k, v in pairs(info) do
+        print("<category name='"..k.."'>")
+          for k2, v2 in pairs(v) do
+            print("<info name='"..k2.."'>"..v2.."</info>")
+          end
+        print("</category>")
+      end
+    end
+  ?>
+  </information>
+  <stats>
+  <?vlc
+    if input then
+      local stats = vlc.playlist.stats()
+      for k,v in pairs(stats) do
+        local tag = string.gsub(k,"_","")
+        print("<"..tag..">"..tostring(v).."</"..tag..">\n")
+      end
+    end
+  ?>
+  </stats>
+</root>

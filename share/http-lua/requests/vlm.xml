@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?<?vlc print '>'
+--[[
+vim:syntax=lua
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  vlm.xml: VLC media player web interface
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+]]
+
+local function insert_children(c,t)
+  print(c.children)
+    if c.children then
+      for _, d in ipairs(c.children) do
+        table.insert(t,d.value or d.name)
+        if d.value then
+        print("V"..d.value.."|")
+        end
+        if d.name then
+        print("N"..d.name.."|")
+        end
+      end
+    end
+end
+local function print_table(name,t)
+  print("<"..name.."s>")
+  if #t ~= 0 then
+    for _,v in ipairs(t) do
+      print("<"..name..">")
+        print(v)
+      print("</"..name..">")
+    end
+  end
+  print("</"..name.."s>")
+end
+local function print_media(m)
+  local name = m.name
+  local type_, enabled, loop, output
+  local inputs = {}
+  local options = {}
+  local instances = {}
+  for _,c in ipairs(m.children) do
+    if c.name=="type" then
+      type_ = c.value
+    elseif c.name=="enabled" then
+      enabled = c.value
+    elseif c.name=="loop" then
+      loop = c.value
+    elseif c.name=="output" then
+      output = c.value
+    elseif c.name=="inputs" then
+      insert_children(c,inputs)
+    elseif c.name=="options" then
+      insert_children(c,options)
+    elseif c.name=="instances" then
+      if c.children then
+        for _, d in ipairs(c.children) do
+          local instance = "<instance "
+          for _,e in ipairs(d.children) do
+            instance = instance .. e.name .. "=\"" .. e.value .. "\" "
+          end
+          instance = instance .. "/>"
+          table.insert(instances,instance)
+        end
+      end
+    end
+  end
+  print("<"..type_.." name=\""..name.."\" enabled=\""..enabled.."\" loop=\""..loop.."\">\n")
+  print("<output>"..output.."</output>\n")
+  print_table("input",inputs)
+  print_table("option",options)
+  print "<instances>\n"
+  if #instances ~= 0 then
+    print(table.concat(instances))
+  end
+  print "</instances>\n"
+  print("</"..type_..">\n")
+end
+
+local function print_schedule(m)
+  local name = m.name
+  local enabled, date, period, repeat_ = "", "", "", ""
+  local commands = {}
+  for _,c in ipairs(m.children) do
+    if c.name=="enabled" then
+      enabled = c.value
+    elseif c.name=="date" then
+      date = c.value
+    elseif c.name=="period" then
+      period = c.value
+    elseif c.name=="repeat" then
+      repeat_ = c.value
+    elseif c.name=="commands" then
+      insert_children(c,commands)
+    end
+  end
+  print("<schedule name=\""..name.."\" enabled=\""..enabled.."\" period=\""..period.."\" repeat=\""..repeat_.."\">\n")
+  print_table("command",commands)
+  print("</schedule>\n")
+end
+
+local function print_xml(m)
+  print "<vlm>"
+  if m then
+    for _, c in ipairs(m.children) do
+      if c.name=="media" and c.children then
+        for _, d in ipairs(c.children) do
+          print_media(d)
+        end
+      elseif c.name=="schedule" and c.children then
+        for _, d in ipairs(c.children) do
+          print_schedule(d)
+        end
+      end
+    end
+  else
+    print "oops"
+  end
+  print "</vlm>"
+end
+
+local function print_msg(m)
+  if not m then return end
+  print("<"..m.name..">\n")
+  if m.children then
+    for _, child in ipairs(m.children) do
+      print_msg(child)
+    end
+  elseif m.value then
+    print(m.value)
+  end
+  print("</"..m.name..">\n")
+end
+
+local msg = vlc.vlm.execute_command(vlm,"show")
+print_xml(msg)
+--print_msg(msg)
+
+?>

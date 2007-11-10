@@ -205,3 +205,89 @@ int vlclua_fd_read( lua_State *L )
     lua_pushlstring( L, psz_buffer, i_len );
     return 1;
 }
+
+int vlclua_stat( lua_State *L )
+{
+#ifdef HAVE_SYS_STAT_H
+    const char *psz_path = luaL_checkstring( L, 1 );
+    struct stat s;
+    if( utf8_stat( psz_path, &s ) )
+        return 0;
+        //return luaL_error( L, "Couldn't stat %s.", psz_path );
+    lua_newtable( L );
+    if( S_ISREG( s.st_mode ) )
+        lua_pushstring( L, "file" );
+    else if( S_ISDIR( s.st_mode ) )
+        lua_pushstring( L, "dir" );
+#ifdef S_ISCHR
+    else if( S_ISCHR( s.st_mode ) )
+        lua_pushstring( L, "character device" );
+#endif
+#ifdef S_ISBLK
+    else if( S_ISBLK( s.st_mode ) )
+        lua_pushstring( L, "block device" );
+#endif
+#ifdef S_ISFIFO
+    else if( S_ISFIFO( s.st_mode ) )
+        lua_pushstring( L, "fifo" );
+#endif
+#ifdef S_ISLNK
+    else if( S_ISLNK( s.st_mode ) )
+        lua_pushstring( L, "symbolic link" );
+#endif
+#ifdef S_ISSOCK
+    else if( S_ISSOCK( s.st_mode ) )
+        lua_pushstring( L, "socket" );
+#endif
+    else
+        lua_pushstring( L, "unknown" );
+    lua_setfield( L, -2, "type" );
+    lua_pushinteger( L, s.st_mode );
+    lua_setfield( L, -2, "mode" );
+    lua_pushinteger( L, s.st_uid );
+    lua_setfield( L, -2, "uid" );
+    lua_pushinteger( L, s.st_gid );
+    lua_setfield( L, -2, "gid" );
+    lua_pushinteger( L, s.st_size );
+    lua_setfield( L, -2, "size" );
+    lua_pushinteger( L, s.st_atime );
+    lua_setfield( L, -2, "access_time" );
+    lua_pushinteger( L, s.st_mtime );
+    lua_setfield( L, -2, "modification_time" );
+    lua_pushinteger( L, s.st_ctime );
+    lua_setfield( L, -2, "creation_time" );
+    return 1;
+#else
+#   warning "Woops, looks like we don't have stat on your platform"
+    return luaL_error( L, "System is missing <sys/stat.h>" );
+#endif
+}
+
+int vlclua_opendir( lua_State *L )
+{
+    const char *psz_dir = luaL_checkstring( L, 1 );
+    DIR *p_dir;
+    int i = 0;
+#ifdef HAVE_SYS_STAT_H
+    struct stat s;
+    if( utf8_stat( psz_dir, &s ) == -1 )
+        return luaL_error( L, "Error while trying to stat `%s'.", psz_dir );
+    if( !S_ISDIR( s.st_mode ) )
+        return luaL_error( L, "`%s' is not a directory.", psz_dir );
+#endif
+    if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
+        return luaL_error( L, "cannot open directory `%s'.", psz_dir );
+
+    lua_newtable( L );
+    for( ;; )
+    {
+        char *psz_filename = utf8_readdir( p_dir );
+        if( !psz_filename ) break;
+        i++;
+        lua_pushstring( L, psz_filename );
+        lua_rawseti( L, -2, i );
+        free( psz_filename );
+    }
+    closedir( p_dir );
+    return 1;
+}

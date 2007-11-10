@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
+    <title>VLC media player</title>
+    <link href="../style.css" title="Default" rel="stylesheet" type="text/css" />
+
+    <vlc id="if" param1="url_param"/>
+        <meta http-equiv="refresh" content="0;URL=/old/vlm/" />
+    <vlc id="end" />
+
+    <vlc id="control" param1="vlm_setup,vlm_new,vlm_del,vlm_play,vlm_pause,vlm_stop,vlm_seek,vlm_save,vlm_load" />
+ </head>
+ <body>
+    <h2>
+     <a href="http://www.videolan.org/">VLC media player <vlc id="value" param1="version" /></a> (http interface)</h2>
+     <h3>
+     The VLM http interface is currently brocken. You should use the telnet interface instead.
+     </h3>
+    <div class="sectitle">VLM - Configuration</div>
+    <div class="section">
+
+    <form method="get" action="" />
+    <input type="test" name="file" size="40"/>
+    <button name="control" value="vlm_load">Load</button>
+    <button name="control" value="vlm_save">Save</button>
+    </form>
+    </div>
+
+    <div class="sectitle">VLM - New</div>
+    <div class="section">
+
+    <form method="get" action="/old/vlm/new.html" />
+    <input type="test" name="name" size="40"/>
+    <input type="submit" name="type" value="broadcast"/>
+    </form>
+
+    <form method="get" action="/old/vlm/new.html" />
+    <input type="test" name="name" size="40"/>
+    <input type="submit" name="type" value="schedule"/>
+    </form>
+    </div>
+
+    <div class="sectitle">VLM - Media</div>
+    <div class="section">
+    <table border="1">
+     <tr class="ligne2">
+      <td>Media</td>
+      <td>State</td>
+      <td>Control</td>
+     </tr>
+<vlc id="foreach" param1="el" param2="vlm" />
+<vlc id="if" param1="el.type value 'broadcast' strcmp 0 = " />
+     <tr>
+      <td>
+       <table>
+        <tr>
+         <td width="30%">
+          <form method="get" action="" />
+           <button name="control" value="vlm_del">del</button>
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+          </form>
+         </td>
+         <td><a href="/old/vlm/show.html?name=<vlc id="value" param1="el.name" />&type=broadcast"><vlc id="value" param1="el.name" /></a></td>
+        </tr>
+       </table>
+      </td>
+      <td>
+<vlc id="if" param1="el.enabled value 'yes' strcmp 0 = " />
+       <table>
+        <tr>
+         <td>
+          <vlc id="foreach" param1="instance" param2="el.instances" />
+           <vlc id="value" param1="instance" />
+          <vlc id="end" />
+         </td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="disabled" value="" />
+           <button name="control" value="vlm_setup">disable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="else" />
+       <table>
+        <tr>
+         <td>disabled</td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="enabled" value="" />
+           <button name="control" value="vlm_setup">enable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="end" />
+      </td>
+      <td>
+<vlc id="if" param1="el.enabled value 'yes' strcmp 0 = " />
+       <form method="get" action="" />
+        <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+         <button name="control" value="vlm_stop">stop</button>
+         <button name="control" value="vlm_play">play</button>
+         <button name="control" value="vlm_pause">pause</button>
+        </form>
+<vlc id="end" />
+      </td>
+     </tr>
+<vlc id="end" />
+<vlc id="end" />
+    </table>
+    </div>
+
+    <div class="sectitle">VLM - Schedule</div>
+    <div class="section">
+    <table border="1">
+     <tr class="ligne2">
+      <td>Schedule</td>
+      <td>State</td>
+     </tr>
+<vlc id="foreach" param1="el" param2="vlm" />
+<vlc id="if" param1="el.type value 'schedule' strcmp 0 = " />
+     <tr>
+      <td>
+       <table>
+        <tr>
+         <td width="30%">
+          <form method="get" action="" />
+           <button name="control" value="vlm_del">del</button>
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+          </form>
+         </td>
+         <td><a href="/old/vlm/show.html?name=<vlc id="value" param1="el.name" />&type=schedule"><vlc id="value" param1="el.name" /></a></td>
+        </tr>
+       </table>
+      </td>
+      <td>
+<vlc id="if" param1="el.enabled value 'yes' strcmp 0 = " />
+       <table>
+        <tr>
+         <td>enabled</td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="disabled" value="" />
+           <button name="control" value="vlm_setup">disable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="else" />
+       <table>
+        <tr>
+         <td>disabled</td>
+         <td align="right">
+          <form method="get" action="" />
+           <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
+           <input type="hidden" name="enabled" value="" />
+           <button name="control" value="vlm_setup">enable</button>
+          </form>
+         </td>
+        </tr>
+       </table>
+<vlc id="end" />
+      </td>
+     </tr>
+<vlc id="end" />
+<vlc id="end" />
+    </table>
+    </div>
+
+    <hr/>
+    <p> <vlc id="value" param1="copyright" /> </p>
+</body>
+</html>

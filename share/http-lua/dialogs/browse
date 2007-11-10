@@ -1,0 +1,45 @@
+<?vlc --[[
+vim:syntax=html
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  browse: VLC media player web interface - remote file browse dialog
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+This dialog needs the following dialogs to be fully functional: <none>
+]]?>
+
+<div id="browse" class="popup" style="display: none;">
+  <div class="title">
+    Browse
+    <img class="close" src="images/white_cross_small.png" alt="Close" onclick="hide('browse');"/>
+  </div>
+  <div id="browser">
+    <a href="javascript:browse_dir(document.getElementById( 'browse_lastdir' ).value);">Click here to browse</a>
+    ( or <a href="javascript:browse_dir('');">here</a> if it doesn't work )
+  </div>
+  <div class="controls">
+    <button id="btn_browse_close" onclick="hide('browse');">
+      Close
+    </button>
+    <input type="hidden" id="browse_lastdir" value="~" />
+    <input type="hidden" id="browse_dest" value="" />
+  </div>
+</div>

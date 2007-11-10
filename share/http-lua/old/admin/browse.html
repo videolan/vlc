@@ -1,0 +1,51 @@
+<html>
+<head>
+    <title>VLC media player - Browser</title>
+    <link href="../style.css" title="Default" rel="stylesheet" type="text/css" />
+
+    <vlc id="if" param1="'control' url_extract strlen"/>
+        <meta http-equiv="refresh" content="0;URL=/old/admin/browse.html?dir=<vlc id="value" param1="'dir' url_extract" />" />
+    <vlc id="end" />
+
+    <vlc id="control" param1="add"/>
+</head>
+<body>
+    <h2><center><a href="/old/">VLC media player <vlc id="value" param1="version" /></a></center></h2>
+    <hr/>
+    <table  width="100%" border=0 cellspacing=1 cellpadding=2>
+    <tr>
+        <th align="left" bgcolor="#88ff88" colspan="2">File (<vlc id="value" param1="'dir' url_extract" />)</th>
+        <th align="left" bgcolor="#cccccc">Size</th>
+        <th align="left" bgcolor="#cccccc">Date</th>
+    </tr>
+    <p>This page is default disabled for security reasons (change _directory_ into directory to enable it).</p>
+    <vlc id="rpn" param1="counter 0 store" />
+    <vlc id="rpn" param1="'dir' url_extract" />
+    <vlc id="foreach" param1="file" param2="_directory_" />
+        <vlc id="rpn" param1="counter counter value 1 + store" />
+        <tr class="<vlc id="if" param1="counter value 2 % 0 =" />line1<vlc id="else" />line2<vlc id="end" />">
+            <td>
+                <vlc id="if" param1="file.type value 'directory' strcmp 0 =" />
+                    <img src="/icons/dir.gif" alt=[DIR]" border="0" width="20" height="22">
+                    <a href="?dir=<vlc id="value" param1="file.name" />"><vlc id="value" param1="file.name" /></a>
+                <vlc id="else" /> 
+                    <img src="/icons/text.gif" alt=[FILE]" border="0" width="20" height="22">
+                    <vlc id="value" param1="file.name" />
+                <vlc id="end" />
+            </td>
+            <td align="right">
+                <form method="get" action="">
+                    <input type="hidden" name="dir" value="<vlc id="value" param1="'dir' url_extract" />"/>
+                    <input type="hidden" name="mrl" value="<vlc id="value" param1="file.name" />"/>
+                    <input type="submit" name="control" value="add" />
+                </form>
+            </td>
+            <td align="right"><vlc id="value" param1="file.size" /></td>
+            <td align="center"><vlc id="value" param1="file.date" /></td>
+        </tr>
+    <vlc id="end" />
+    </table>
+    <hr/>
+    <p><vlc id="value" param1="copyright" /> </p>
+</body>
+</html>

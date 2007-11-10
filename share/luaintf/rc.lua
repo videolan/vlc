@@ -286,12 +286,7 @@ function titlechap_offset(client,offset)
 end
 
 function seek(name,client,value)
-    local input = vlc.object.input()
-    if string.sub(value,#value)=="%" then
-        vlc.var.set(input,"position",tonumber(string.sub(value,1,#value-1))/100.)
-    else
-        vlc.var.set(input,"time",tonumber(value))
-    end
+    common.seek(value)
 end
 
 function volume(name,client,value)

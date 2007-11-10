@@ -100,6 +100,13 @@ static inline const void *luaL_checkuserdata( lua_State *L, int narg, size_t siz
     return lua_topointer( L, narg );
 }
 
+static inline const char *luaL_nilorcheckstring( lua_State *L, int narg )
+{
+    if( lua_isnil( L, narg ) )
+        return NULL;
+    return luaL_checkstring( L, narg );
+}
+
 /*****************************************************************************
  * Lua vlc_object_t wrapper
  *****************************************************************************/
@@ -132,9 +139,30 @@ int vlclua_fd_zero( lua_State * );
 int vlclua_fd_read( lua_State * );
 int vlclua_fd_write( lua_State * );
 
+int vlclua_stat( lua_State * );
+int vlclua_opendir( lua_State * );
+
 int vlclua_vlm_new( lua_State * );
 int vlclua_vlm_delete( lua_State * );
 int vlclua_vlm_execute_command( lua_State * );
+
+int vlclua_httpd_tls_host_new( lua_State *L );
+int vlclua_httpd_host_delete( lua_State *L );
+int vlclua_httpd_handler_new( lua_State * L );
+int vlclua_httpd_handler_delete( lua_State *L );
+int vlclua_httpd_file_new( lua_State *L );
+int vlclua_httpd_file_delete( lua_State *L );
+int vlclua_httpd_redirect_new( lua_State *L );
+int vlclua_httpd_redirect_delete( lua_State *L );
+
+int vlclua_acl_create( lua_State * );
+int vlclua_acl_delete( lua_State * );
+int vlclua_acl_check( lua_State * );
+int vlclua_acl_duplicate( lua_State * );
+int vlclua_acl_add_host( lua_State * );
+int vlclua_acl_add_net( lua_State * );
+int vlclua_acl_load_file( lua_State * );
+
 
 /*****************************************************************************
  * Lua function bridge
@@ -145,7 +173,14 @@ int vlclua_push_ret( lua_State *, int i_error );
 
 int vlclua_version( lua_State * );
 int vlclua_license( lua_State * );
+int vlclua_copyright( lua_State * );
 int vlclua_quit( lua_State * );
+
+int vlclua_datadir( lua_State * );
+int vlclua_homedir( lua_State * );
+int vlclua_configdir( lua_State * );
+int vlclua_cachedir( lua_State * );
+int vlclua_datadir_list( lua_State * );
 
 int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val ); /* internal use only */
 int vlclua_var_get( lua_State * );
@@ -169,6 +204,7 @@ int vlclua_stream_delete( lua_State * );
 
 int vlclua_decode_uri( lua_State * );
 int vlclua_resolve_xml_special_chars( lua_State * );
+int vlclua_convert_xml_special_chars( lua_State * );
 
 int vlclua_msg_dbg( lua_State * );
 int vlclua_msg_warn( lua_State * );

@@ -1,0 +1,98 @@
+div {
+    padding: 0px;
+    margin: 0px;
+    border-width: 0px;
+    border-style: none;
+}
+
+/* page body */
+body {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 10pt;
+    padding: 5pt;
+    margin: 5pt;
+}
+
+/* left column */
+div.left {
+    float: left;
+    width: 19%;
+}
+
+/* main content */
+div.right {
+    float: right;
+    width: 80%;
+}
+
+/* section bloc title */
+div.sectitle {
+    background-color: #5A5ABB;
+    color: #FFFFFF;
+    border: 1px black solid;
+    border-bottom: 0pt black none;
+    font-weight: bold;
+    padding: 0pt 5pt;
+}
+
+/* section bloc content */
+div.section {
+    background-color: #DDDDFF;
+    border: 1px black solid;
+    margin-bottom: 2em;
+    padding: 5pt;
+}
+
+/* section bloc controls */
+div.section-controls {
+    text-align: center;
+    background-color: #DDDDFF;
+    border: 1px black solid;
+    margin-bottom: 2em;
+    padding: 5pt;
+}
+
+/* page title */
+h2.title {
+    text-align: center;
+}
+
+h3 {
+    text-align: left;
+}
+
+table {
+    width: 100%;
+}
+
+table.add {
+    width: 100%;
+}
+
+/* playlist line */
+tr.line1 {
+    background-color: #EEEEFF;
+}
+
+/* playlist line */
+tr.line2 {
+    background-color: #CCCCFF;
+}
+
+/* help text */
+span.small {
+    font-size: 0.9em;
+}
+
+form {
+    margin: 0pt;
+    padding: 0pt;
+}
+
+input {
+    border: 1px solid black;
+}
+
+ul#playlist, ul#playlist ul{
+    list-style-type: none;
+}

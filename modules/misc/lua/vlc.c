@@ -119,6 +119,15 @@ int vlclua_version( lua_State *L )
 }
 
 /*****************************************************************************
+ * Get the VLC copyright
+ *****************************************************************************/
+int vlclua_copyright( lua_State *L )
+{
+    lua_pushstring( L, COPYRIGHT_MESSAGE );
+    return 1;
+}
+
+/*****************************************************************************
  * Get the VLC license msg/disclaimer
  *****************************************************************************/
 int vlclua_license( lua_State *L )
@@ -137,6 +146,49 @@ int vlclua_quit( lua_State *L )
      * though. */
     vlc_object_kill( p_this->p_libvlc );
     return 0;
+}
+
+/*****************************************************************************
+ * Global properties getters
+ *****************************************************************************/
+int vlclua_datadir( lua_State *L )
+{
+    lua_pushstring( L, config_GetDataDir() );
+    return 1;
+}
+int vlclua_homedir( lua_State *L )
+{
+    lua_pushstring( L, vlclua_get_this( L )->p_libvlc->psz_homedir );
+    return 1;
+}
+int vlclua_configdir( lua_State *L )
+{
+    lua_pushstring( L, vlclua_get_this( L )->p_libvlc->psz_configdir );
+    return 1;
+}
+int vlclua_cachedir( lua_State *L )
+{
+    lua_pushstring( L, vlclua_get_this( L )->p_libvlc->psz_cachedir );
+    return 1;
+}
+int vlclua_datadir_list( lua_State *L )
+{
+    const char *psz_dirname = luaL_checkstring( L, 1 );
+    vlc_object_t *p_this = vlclua_get_this( L );
+    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
+    char **ppsz_dir = ppsz_dir_list;
+    int i = 1;
+
+    if( vlclua_dir_list( p_this, psz_dirname, ppsz_dir_list ) != VLC_SUCCESS )
+        return 0;
+    lua_newtable( L );
+    for( ; *ppsz_dir; ppsz_dir++ )
+    {
+        lua_pushstring( L, *ppsz_dir );
+        lua_rawseti( L, -2, i );
+        i ++;
+    }
+    return 1;
 }
 
 /*****************************************************************************
@@ -269,6 +321,20 @@ int vlclua_resolve_xml_special_chars( lua_State *L )
                              * the stack's size (this function will work with
                              * up to (stack size - 1) arguments */
         resolve_xml_special_chars( psz_string );
+        lua_pushstring( L, psz_string );
+        free( psz_string );
+    }
+    return i_top;
+}
+
+int vlclua_convert_xml_special_chars( lua_State *L )
+{
+    int i_top = lua_gettop( L );
+    int i;
+    for( i = 1; i <= i_top; i++ )
+    {
+        char *psz_string = convert_xml_special_chars( luaL_checkstring(L,1) );
+        lua_remove( L, 1 );
         lua_pushstring( L, psz_string );
         free( psz_string );
     }

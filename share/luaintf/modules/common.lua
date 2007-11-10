@@ -70,3 +70,18 @@ function durationtostring(duration)
                          math.floor(duration/60)%60,
                          math.floor(duration%60))
 end
+
+-- realpath
+function realpath(path)
+    return string.gsub(string.gsub(string.gsub(string.gsub(path,"/%.%./[^/]+","/"),"/[^/]+/%.%./","/"),"/%./","/"),"//","/")
+end
+
+-- seek
+function seek(value)
+    local input = vlc.object.input()
+    if string.sub(value,#value)=="%" then
+        vlc.var.set(input,"position",tonumber(string.sub(value,1,#value-1))/100.)
+    else
+        vlc.var.set(input,"time",tonumber(value))
+    end
+end

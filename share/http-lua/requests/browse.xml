@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?<?vlc print'>'?>
+<?vlc --[[
+vim:syntax=lua
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  status.xml: VLC media player web interface
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+]] ?>
+
+<root>
+<?vlc
+local dir = _GET["dir"]
+if dir then
+  if dir == "~" then dir = vlc.homedir() end
+  dir = common.realpath(dir.."/")
+  local d = vlc.fd.opendir(dir)
+  table.sort(d)
+  for _,f in pairs(d) do
+    if f == ".." or not string.match(f,"^%.") then
+      local df = common.realpath(dir..f)
+      local s = vlc.fd.stat(df)
+      local path, name = vlc.convert_xml_special_chars( df, f )
+      print("<element type='"..s.type.."' size='"..s.size.."' path='"..path.."' name='"..name.."'/>\n")
+    end
+  end
+end
+?>
+</root>

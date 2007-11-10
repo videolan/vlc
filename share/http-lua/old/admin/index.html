@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
+    <title>VLC media player</title>
+    <style>
+        body {font-family:Verdana, Arial, Sans Serif; }
+        h2 { text-align:center; }
+	td {border:1pt black solid;margin:0em; }
+        table.border {border:1pt black solid;}
+        div.section {background-color:#DDDDFF;
+             border:1pt black solid;
+             margin-bottom:2em;
+	     padding:0.5em; }
+	div.section-ctr {background-color:#CCCCFF;
+             border:1pt black solid;
+             margin-bottom:2em;
+             padding:0.5em;
+	     font-size:1.2em;
+	     text-align:center; }
+
+        div.sectitle {  background-color:#5A5ABB;
+                        color:#FFFFFF;
+                        border:1pt black solid;
+                        width:20%;
+                        font-weight:bold;}
+        tr.ligne1 { background-color:#EEFFFF; }
+        tr.ligne2 { background-color:#CCCCFF; }
+    </style>
+    <vlc id="if" param1="url_param"/>
+        <meta http-equiv="refresh" content="0;URL=/old/admin/" />
+    <vlc id="end" />
+
+    <vlc id="control" />
+    <vlc id="set" param1="sout" param2="string" />
+</head>
+<body>
+    <h2><a href="/old/">VLC media player - Admin <vlc id="value" param1="version" /></a></h2>
+
+<div class="section-ctr">Shutdown VLC<br /> <form method="get" action=""> <input type="submit" name="control" value="shutdown" /> </form></div>
+
+  <div class="sectitle">Host list</div>
+  <div class="section">
+    <table class="border" >
+    <tr>
+        <th>Id</th><th>Host</th><th>IP</th><th>Port</th>
+    </tr>
+    <vlc id="foreach" param1="host" param2="hosts" />
+        <tr>
+        <td><vlc id="value" param1="host.id" /></td>
+        <td><vlc id="value" param1="host.host" /> </td>
+        <td><vlc id="value" param1="host.ip" /> </td>
+        <td><vlc id="value" param1="host.port" /> </td>
+        </tr>
+    <vlc id="end" />
+    </table>
+   </div>
+ 
+   <div class="sectitle">File list</div>
+   <div class="section">
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>URL</th><th>Mime</th><th>Protected</th><th>Usage</th>
+    </tr>
+    <vlc id="foreach" param1="url" param2="urls" />
+        <vlc id="if" param1="url.stream 0 =" /> 
+            <tr>
+            <td><vlc id="value" param1="url.id" /></td>
+            <td><vlc id="value" param1="url.url" /></td>
+            <td><vlc id="value" param1="url.mime" /></td>
+            <td><vlc id="value" param1="url.protected" /></td>
+            <td><vlc id="value" param1="url.used" /></td>
+            </tr>
+        <vlc id="end" />
+    <vlc id="end" />
+    </table>
+   </div>
+
+
+   <div class="sectitle">Stream list</div>
+   <div class="section">
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>URL</th><th>Mime</th><th>Protected</th><th>Usage</th>
+    </tr>
+    <vlc id="foreach" param1="url" param2="urls" />
+        <vlc id="if" param1="url.stream" />
+            <tr>
+            <td><vlc id="value" param1="url.id" /></td>
+            <td><vlc id="value" param1="url.url" /></td>
+            <td><vlc id="value" param1="url.mime" /></td>
+            <td><vlc id="value" param1="url.protected" /></td>
+            <td><vlc id="value" param1="url.used" /></td>
+            </tr>
+        <vlc id="end" />
+    <vlc id="end" />
+    </table>
+   </div>
+
+   <div class="sectitle">Connections list</div>
+   <div class="section">
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>ip</th><th>URL</th><th>Status</th><th>Actions</th>
+    </tr>
+    <vlc id="foreach" param1="con" param2="connections" />
+        <tr>
+        <td><vlc id="value" param1="con.id" /></td>
+        <td><vlc id="value" param1="con.ip" /></td>
+        <td><vlc id="value" param1="con.url" /></td>
+        <td><vlc id="value" param1="con.status" /></td>
+        <td>
+        <form method="get" action="">
+            <input type="hidden" name="id" value="<vlc id="value" param1="con.id" />"/>
+            <input type="submit" name="control" value="close" />
+        </form>
+
+        </td>
+        </tr>
+    <vlc id="end" />
+    </table>
+   </div>
+    <hr />
+    <p> <vlc id="value" param1="copyright" /> </p>
+</body>
+</html>
+
