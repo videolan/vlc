@@ -1526,16 +1526,20 @@ AS_IF([test "${CFLAGS_TUNING}"],
 dnl
 dnl  x86 accelerations
 dnl
-if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "x86_64"
-then
+AC_ARG_ENABLE(mmx,
+[  --disable-mmx       disable MMX optimizations (default enabled on x86)],
+[ if test "${enable_mmx}" = "yes"; then ARCH="${ARCH} mmx";
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ],
+[ if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "x86_64"; then
     ARCH="${ARCH} mmx"
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}])
-fi
-if test "${host_cpu}" = "i686" -o "${host_cpu}" = "x86_64"
-then
-    ARCH="${ARCH} sse sse2"
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}])
-fi
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ])
+
+AC_ARG_ENABLE(sse,
+[  --disable-sse       disable SSE (1 and 2) optimizations (default enabled on i686 and x86_64)],
+[ if test "${enable_sse}" = "yes"; then ARCH="${ARCH} sse sse2";
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ],
+[ if test "${host_cpu}" = "i686" -o "${host_cpu}" = "x86_64"; then ARCH="${ARCH} sse sse2";
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ])
 
 dnl
 dnl  Memory usage
