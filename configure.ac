@@ -218,7 +218,26 @@ case "${host_os}" in
         echo "  Assuming --disable-glx"
         enable_xvideo="no"
         echo "  Assuming --disable-xvideo"
+    fi
+    if test ".`uname -p`" = ".i386"; then
+        dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
+        dnl without hacking it a lot, we disable mmx and sse.
+        dnl (that bug is about ld being unable to handle
+        dnl text relocation)
+        save_cflags="$CFLAGS"
+        CFLAGS="$CFLAGS -dynamiclib"
+        AC_TRY_LINK(
+            [int a;], [asm("movq _a,%mm0\n");],
+            ac_ld_does_not_support_text_reloc=no,
+            ac_ld_does_not_support_text_reloc=yes)
+        CFLAGS="$save_cflags"
 
+        if test "x$ac_ld_does_not_support_text_reloc" = "xyes"; then
+            enable_mmx="no"
+            echo "  Assuming --disable-mmx (due to a bug in ld)"
+            enable_sse="no"
+            echo "  Assuming --disable-sse (due to a bug in ld)"
+        fi
     fi
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
