@@ -424,7 +424,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
                 msg_Err( p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode." );
                 intf_UserFatal( p_aout, VLC_FALSE, _("Audio device is not configured"),
                                 _("You should configure your speaker layout with "
-                                  "the \"Audio Midi Setup Utility\" in /Applications/"
+                                  "the \"Audio Midi Setup\" utility in /Applications/"
                                   "Utilities. Stereo mode is being used now.") );
             }
         }

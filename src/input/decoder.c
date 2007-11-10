@@ -103,10 +103,9 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
     msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
              "VLC probably does not support this sound or video format.",
              (char*)&codec );
-    intf_UserFatal( p_dec, VLC_FALSE, _("No suitable decoder module "
-        "for format"), _("VLC probably does not support the \"%4.4s\" "
-        "audio or video format. Unfortunately there is no way for you "
-        "to fix this."), (char*)&codec );
+    intf_UserFatal( p_dec, VLC_FALSE, _("No suitable decoder module"), 
+                    _("VLC does not support the audio or video format \"%4.4s\". "
+                      "Unfortunately there is no way for you to fix this."), (char*)&codec );
 }
 
 /* decoder_GetInputAttachment:

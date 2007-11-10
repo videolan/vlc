@@ -84,7 +84,7 @@ struct intf_sys_t
     char                    *psz_nowp_file;     /**< file to which submit   */
 #endif
     vlc_bool_t              b_handshaked;       /**< are we authenticated ? */
-    char                    psz_auth_token[33]; /**< authentification token */
+    char                    psz_auth_token[33]; /**< Authentication token */
 
     /* data about song currently playing */
     audioscrobbler_song_t   p_current_song;     /**< song being played      */
@@ -274,7 +274,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( b_die )
         {
-            msg_Dbg( p_intf, "audioscrobbler is dying\n");
+            msg_Dbg( p_intf, "audioscrobbler is dying");
             return;
         }
 
@@ -293,9 +293,9 @@ static void Run( intf_thread_t *p_intf )
                     /* username not set */
                     intf_UserFatal( p_intf, VLC_FALSE,
                         _("Last.fm username not set"),
-                        _("Please set an username or disable "
-                        "audioscrobbler plugin, and then restart VLC.\n"
-                        "Visit https://www.last.fm/join/ to get an account")
+                        _("Please set a username or disable the "
+                        "audioscrobbler plugin, and restart VLC.\n"
+                        "Visit http://www.last.fm/join/ to get an account.")
                     );
                     Unload( p_intf );
                     return;
@@ -418,7 +418,7 @@ static void Run( intf_thread_t *p_intf )
         p_buffer_pos = strstr( ( char * ) p_buffer, "BADSESSION" );
         if ( p_buffer_pos )
         {
-            msg_Dbg( p_intf, "Authentification failed, handshaking again" );
+            msg_Dbg( p_intf, "Authentication failed, handshaking again" );
             p_sys->b_handshaked = VLC_FALSE;
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
             continue;
@@ -433,11 +433,11 @@ static void Run( intf_thread_t *p_intf )
             p_sys->i_songs = 0;
             p_sys->i_interval = 0;
             time( &p_sys->next_exchange );
-            msg_Dbg( p_intf, "Submission successfull!" );
+            msg_Dbg( p_intf, "Submission successful!" );
         }
         else
         {
-            msg_Dbg( p_intf, "Authentification failed, handshaking again" );
+            msg_Dbg( p_intf, "Authentication failed, handshaking again" );
             p_sys->b_handshaked = VLC_FALSE;
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
             continue;
@@ -809,8 +809,8 @@ static int Handshake( intf_thread_t *p_this )
         /* authentication failed, bad username/password combination */
         intf_UserFatal( p_this, VLC_FALSE,
             _("last.fm: Authentication failed"),
-            _("last.fm Username or Password is incorrect,"
-              " please verify your settings and relaunch VLC." ) );
+            _("last.fm username or password is incorrect. "
+              "Please verify your settings and relaunch VLC." ) );
         return VLC_AUDIOSCROBBLER_EFATAL;
     }
 
@@ -819,7 +819,7 @@ static int Handshake( intf_thread_t *p_this )
     {
         /* oops, our version of vlc has been banned by last.fm servers */
         msg_Err( p_intf, "This version of VLC has been banned by last.fm. "
-                         "You should upgrade VLC, or disable last.fm plugin." );
+                         "You should upgrade VLC, or disable the last.fm plugin." );
         return VLC_AUDIOSCROBBLER_EFATAL;
     }
 

@@ -2363,8 +2363,8 @@ static int InputSourceInit( input_thread_t *p_input,
             msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                      psz_access, psz_demux, psz_path );
             intf_UserFatal( VLC_OBJECT( p_input ), VLC_FALSE,
-                            _("Can't recognize the input's format"),
-                            _("The format of '%s' can't be detected. "
+                            _("VLC can't recognize the input's format"),
+                            _("The format of '%s' cannot be detected. "
                             "Have a look the log for details."), psz_mrl );
             goto error;
         }

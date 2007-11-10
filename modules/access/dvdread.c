@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "DVDRead cannot open source: %s", psz_name );
         intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"),
-                        _("DVDRead could not open disk \"%s\"."), psz_name );
+                        _("DVDRead could not open the disk \"%s\"."), psz_name );
         free( psz_name );
         return VLC_EGENERIC;
     }
