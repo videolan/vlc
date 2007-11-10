@@ -131,6 +131,7 @@ case $HOST in
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
+        echo "HAVE_DARWIN_9 = 1" >> config.mak
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_CFLAGS=" -D\${ENVP} -mmacosx-version-min=\${SDK_TARGET}"
         CC="gcc -isysroot \${MACOSX_SDK}"
@@ -149,6 +150,7 @@ case $HOST in
         SDK_TARGET=10.4
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
+        echo "HAVE_DARWIN_9 = 1" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
         CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
