@@ -1064,7 +1064,7 @@ ifdef HAVE_BEOS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-alignment.patch)
 endif
 ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/ffmpeg-macosx-intel-mmx.patch
+	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
