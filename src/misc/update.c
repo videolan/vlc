@@ -1283,7 +1283,7 @@ void update_download_for_real( download_thread_t *p_this )
     if( !p_stream )
     {
         msg_Err( p_libvlc, "Failed to open %s for reading", psz_src );
-        intf_UserFatal( p_libvlc, VLC_TRUE, "Error while Downloading...",
+        intf_UserFatal( p_libvlc, VLC_TRUE, "Download Error",
                         "VLC failed to open %s for reading.", psz_src );
         intf_UserHide( p_libvlc, i_progress );
     }
@@ -1293,7 +1293,7 @@ void update_download_for_real( download_thread_t *p_this )
         if( !p_file )
         {
             msg_Err( p_libvlc, "Failed to open %s for writing", psz_dest );
-            intf_UserFatal( p_libvlc, VLC_TRUE, "Error while Downloading...",
+            intf_UserFatal( p_libvlc, VLC_TRUE, "Download Error",
                             "VLC failed to open %s for writing.", psz_dest );
             intf_UserHide( p_libvlc, i_progress );
         }
