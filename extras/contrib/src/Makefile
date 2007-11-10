@@ -771,8 +771,11 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 ifdef HAVE_BEOS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm --disable-examples && make && make install)
 else
+  ifdef HAVE_DARWIN_9
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm --disable-examples && make && make install)
+  else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples && make && make install)
-
+  endif
 endif
 	$(INSTALL_NAME)
 	touch $@
