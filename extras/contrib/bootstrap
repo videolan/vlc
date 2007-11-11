@@ -98,10 +98,9 @@ case $HOST in
         exit 1
     ;;
     powerpc-apple-darwin8)
-# Mac OS X 10.4
+# Mac OS X 10.4 or 10.5 with Xcode 2.5
 # Makefile cross compiling is only supported with gcc-4.0
 # ENVP defines the oldest environment on which the program will be able to run
-# SDK 10.2.8 requires gcc-3.3 (so we cannot use that SDK)
         SDK_TARGET=10.4
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
@@ -127,6 +126,7 @@ case $HOST in
         cat src/Distributions/darwin.mak >> distro.mak
         ;;
     powerpc-apple-darwin9)
+# Mac OS X 10.5 with Xcode 3, specific rules apply
         SDK_TARGET=10.4
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
