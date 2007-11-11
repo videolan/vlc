@@ -213,15 +213,15 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
 {
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
-    menu->addAction ( QIcon( ":/pixmaps/playlist_16px.png" ),
-                      qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
+    menu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
+                     qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
     menu->addSeparator();
 
     DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+X" );
     DP_SADD( menu, qtr( I_PL_SAVE ), "", "", savePlaylist(), "Ctrl+Y" );
     menu->addSeparator();
     menu->addAction( qtr( "Undock from interface" ), mi,
-            SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );
+                     SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );
     return menu;
 }
 
@@ -412,45 +412,32 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
     menu->setTitle( qtr( I_PL_SD ) );
-    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-            FIND_ANYWHERE );
-    int i_num = 0;
-    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
+    char **ppsz_longnames;
+    char **ppsz_names = services_discovery_GetServicesNames( p_intf,
+                                                             &ppsz_longnames );
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+    for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        module_t * p_parser = ( module_t * )p_list->p_values[i_index].p_object ;
-        if( module_IsCapable( p_parser, "services_discovery" ) )
-            i_num++;
-    }
-    for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
-    {
-        module_t * p_parser = ( module_t * )p_list->p_values[i_index].p_object;
-        if( !module_IsCapable( p_parser, "services_discovery" ) )
-            continue;
-
-        QAction *a = new QAction( qfu( module_GetLongName( p_parser ) ), menu );
+        QAction *a = new QAction( qfu( *ppsz_longname ), menu );
         a->setCheckable( true );
-        /* hack to handle submodules properly */
-        int i = -1;
-        while( p_parser->pp_shortcuts[++i] != NULL );
-        i--;
-        if( playlist_IsServicesDiscoveryLoaded( THEPL,
-                    i>=0?p_parser->pp_shortcuts[i]
-                    : module_GetObjName( p_parser ) ) )
+        if( playlist_IsServicesDiscoveryLoaded( THEPL, *ppsz_name ) )
             a->setChecked( true );
         CONNECT( a , triggered(), THEDP->SDMapper, map() );
-        THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
-                                              module_GetObjName( p_parser ) );
+        THEDP->SDMapper->setMapping( a, QString( *ppsz_name ) );
         menu->addAction( a );
 
-        if( !strcmp( p_parser->psz_object_name, "podcast" ) )
+        if( !strcmp( *ppsz_name, "podcast" ) )
         {
             QAction *b = new QAction( qfu( "Configure podcasts..." ), menu );
             //b->setEnabled( a->isChecked() );
             menu->addAction( b );
             CONNECT( b, triggered(), THEDP, podcastConfigureDialog() );
         }
+        free( *ppsz_name );
+        free( *ppsz_longname );
     }
-    vlc_list_release( p_list );
+    free( ppsz_names );
+    free( ppsz_longnames );
     return menu;
 }
 /**

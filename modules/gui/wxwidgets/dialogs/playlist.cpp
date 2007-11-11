@@ -411,7 +411,12 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 Playlist::~Playlist()
 {
-    if( pp_sds != NULL ) free( pp_sds );
+    if( pp_sds != NULL )
+    {
+        char **pp_sd = pp_sds;
+        for( ; *pp_sd; pp_sd++ ) free( *pp_sd );
+        free( pp_sds );
+    }
 
     if( p_playlist == NULL ) return;
 
@@ -1400,47 +1405,23 @@ wxMenu *Playlist::SDMenu()
 {
     p_sd_menu = new wxMenu;
 
-    vlc_list_t *p_list = vlc_list_find( p_playlist, VLC_OBJECT_MODULE,
-                                        FIND_ANYWHERE );
+    char **ppsz_longnames;
+    char **ppsz_names = services_discovery_GetServicesNames( p_playlist,
+                                                             &ppsz_longnames );
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
 
-    int i_number = 0;
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        p_sd_menu->AppendCheckItem( FirstSD_Event + i_number ,
+                                    wxU( *ppsz_longname ) );
 
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-            i_number++;
+        if( playlist_IsServicesDiscoveryLoaded( p_playlist, *ppsz_name ) )
+            p_sd_menu->Check( FirstSD_Event + i_number, TRUE );
+
+        free( *ppsz_longname );
     }
-    if( i_number ) pp_sds = (const char **)calloc( i_number, sizeof(void *) );
-
-    i_number = 0;
-    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
-    {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-        {
-            p_sd_menu->AppendCheckItem( FirstSD_Event + i_number ,
-                wxU( p_parser->psz_longname ? p_parser->psz_longname :
-                     (p_parser->psz_shortname ?
-                      p_parser->psz_shortname : p_parser->psz_object_name) ) );
-
-            /* hack to handle submodules properly */
-            int i = -1;
-            while( p_parser->pp_shortcuts[++i] != NULL );
-            i--;
-            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
-                                    i>=0?p_parser->pp_shortcuts[i]
-                                    :p_parser->psz_object_name ) )
-            {
-                p_sd_menu->Check( FirstSD_Event + i_number, TRUE );
-            }
-
-            pp_sds[i_number++] = i>=0?p_parser->pp_shortcuts[i]
-                                 :p_parser->psz_object_name;
-        }
-    }
-    vlc_list_release( p_list );
+    pp_sds = ppsz_names;
+    free( ppsz_longnames );
     return p_sd_menu;
 }
 

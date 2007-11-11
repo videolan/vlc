@@ -62,7 +62,9 @@ struct services_discovery_t
 
 /* Get the services discovery modules names to use in Create(), in a null
  * terminated string array. Array and string must be freed after use. */
-VLC_EXPORT( char **, services_discovery_GetServicesNames, ( vlc_object_t * p_super, char ***pppsz_longnames ) );
+VLC_EXPORT( char **, __services_discovery_GetServicesNames, ( vlc_object_t * p_super, char ***pppsz_longnames ) );
+#define services_discovery_GetServicesNames(a,b) \
+        __services_discovery_GetServicesNames(VLC_OBJECT(a),b)
 
 /* Creation of a service_discovery object */
 VLC_EXPORT( services_discovery_t *, services_discovery_Create, ( vlc_object_t * p_super, const char * psz_service_name ) );
