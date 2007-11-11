@@ -268,12 +268,14 @@ static int OpenDll( decoder_t *p_dec )
       "/opt/RealPlayer8/Codecs",
       "/usr/lib/RealPlayer9/users/Real/Codecs",
       "/usr/lib/RealPlayer10/codecs",
-      "/usr/lib/helix/player/codecs"
+      "/usr/lib/RealPlayer10GOLD/codecs",
+      "/usr/lib/helix/player/codecs",
       "/usr/lib64/RealPlayer8/Codecs",
       "/usr/lib64/RealPlayer9/users/Real/Codecs",
-      "/usr/lib64/RealPlayer10GOLD/codecs"
+      "/usr/lib64/RealPlayer10/codecs",
+      "/usr/lib64/RealPlayer10GOLD/codecs",
       "/usr/lib/win32",
-      "/usr/lib/codecs"
+      "/usr/lib/codecs",
       "/usr/local/lib/codecs"
 #endif
       NULL,
