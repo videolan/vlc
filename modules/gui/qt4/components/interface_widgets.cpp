@@ -309,17 +309,18 @@ void AdvControlsWidget::fromAtoB()
     timeB = 0;
     ABButton->setText( "AB" );
 }
-   
+
 void AdvControlsWidget::record(){}
 
 void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
 {
     if( timeB )
     {
-        if( i_time == (int)(timeB/1000000) )
+        if( i_time >= (int)(timeB/1000000) )
             var_SetTime( THEMIM->getInput(), "time" , timeA );
     }
 }
+
 /*****************************
  * DA Control Widget !
  *****************************/
