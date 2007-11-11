@@ -237,6 +237,8 @@ case "${host_os}" in
             echo "  Assuming --disable-mmx (due to a bug in ld)"
             enable_sse="no"
             echo "  Assuming --disable-sse (due to a bug in ld)"
+            enable_ffmpeg="no"
+            echo "  Assuming --disable-ffmpeg (due to a bug in ld)"
         fi
     fi
     ;;
@@ -6255,4 +6257,11 @@ with \`./vlc-config --list plugin'.
 You can tune the compiler flags in vlc-config.
 To build vlc and its plugins, type \`./compile' or \`make'.
 "
-
+if test "x$ac_ld_does_not_support_text_reloc" = "xyes"; then
+   echo ""
+   echo "Warning: Due to a bug in ld, mmx/sse support has been"
+   echo "         turned off."
+   echo "         More over FFmpeg support has been disabled."
+   echo "         VLC WILL NOT BE ABLE TO PLAY MOST FILES."
+   echo ""
+fi
