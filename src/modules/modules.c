@@ -779,7 +779,8 @@ vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
  * Free after uses both the string and the table.
  *****************************************************************************/
 char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
-                                               const char * psz_capability )
+                                               const char * psz_capability,
+                                               char ***pppsz_longname )
 {
     vlc_list_t *p_list;
     int i, j, count = 0;
@@ -795,6 +796,8 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
             count++;
     }
     psz_ret = malloc( sizeof(char*) * (count+1) );
+    if( pppsz_longname )
+        *pppsz_longname = malloc( sizeof(char*) * (count+1) );
     j = 0;
     for( i = 0 ; i < p_list->i_count; i++)
     {
@@ -810,6 +813,8 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
             }
             psz_ret[j] = strdup( k>=0?p_module->pp_shortcuts[k]
                                      :p_module->psz_object_name );
+            if( pppsz_longname )
+                (*pppsz_longname)[j] = strdup( module_GetName( p_module, VLC_TRUE ) );
             j++;
         }
     }

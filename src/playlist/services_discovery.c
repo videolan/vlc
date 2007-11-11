@@ -37,9 +37,11 @@ static void RunSD( services_discovery_t *p_sd );
 /***********************************************************************
  * GetServicesNames
  ***********************************************************************/
-char ** services_discovery_GetServicesNames( vlc_object_t * p_super )
+char ** services_discovery_GetServicesNames( vlc_object_t * p_super,
+                                             char ***pppsz_longnames )
 {
-    return module_GetModulesNamesForCapability( p_super, "services_discovery" );
+    return module_GetModulesNamesForCapability( p_super, "services_discovery",
+                                                pppsz_longnames );
 }
 
 /***********************************************************************
