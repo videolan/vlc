@@ -782,7 +782,7 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
                                                const char * psz_capability )
 {
     vlc_list_t *p_list;
-    int i, count = 0;
+    int i, j, count = 0;
     char ** psz_ret;
 
     /* Do it in two passes */
@@ -794,18 +794,29 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
         if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
             count++;
     }
-    psz_ret = malloc( sizeof(char**) * (count+1) );
+    psz_ret = malloc( sizeof(char*) * (count+1) );
+    j = 0;
     for( i = 0 ; i < p_list->i_count; i++)
     {
         module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
         const char *psz_module_capability = p_module->psz_capability;
         if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
-            psz_ret[i] = strdup( p_module->psz_object_name );
+        {
+            int k = -1; /* hack to handle submodules properly */
+            if( p_module->b_submodule )
+            {
+                while( p_module->pp_shortcuts[++k] != NULL );
+                k--;
+            }
+            psz_ret[j] = strdup( k>=0?p_module->pp_shortcuts[k]
+                                     :p_module->psz_object_name );
+            j++;
+        }
     }
     psz_ret[count] = NULL;
 
     vlc_list_release( p_list );
- 
+
     return psz_ret;
 }
 
