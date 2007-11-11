@@ -237,6 +237,10 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     ABButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( ABButton );
     BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), fromAtoB() );
+    timeA = 0;
+    timeB = 0;
+    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+             this, AtoBLoop( float, int, int ) );
 
 //FIXME Frame by frame function
     frameButton = new QPushButton( "Fr" );
@@ -282,10 +286,40 @@ void AdvControlsWidget::snapshot()
     if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
 }
 
-void AdvControlsWidget::frame(){}
-void AdvControlsWidget::fromAtoB(){}
+void AdvControlsWidget::frame()
+{
+}
+
+void AdvControlsWidget::fromAtoB()
+{
+    if( !timeA )
+    {
+        timeA = var_GetTime( THEMIM->getInput(), "time"  );
+        ABButton->setText( "A->..." );
+        return;
+    }
+    if( !timeB )
+    {
+        timeB = var_GetTime( THEMIM->getInput(), "time"  );
+        var_SetTime( THEMIM->getInput(), "time" , timeA );
+        ABButton->setText( "A<=>B" );
+        return;
+    }
+    timeA = 0;
+    timeB = 0;
+    ABButton->setText( "AB" );
+}
+   
 void AdvControlsWidget::record(){}
 
+void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
+{
+    if( timeB )
+    {
+        if( i_time == (int)(timeB/1000000) )
+            var_SetTime( THEMIM->getInput(), "time" , timeA );
+    }
+}
 /*****************************
  * DA Control Widget !
  *****************************/

@@ -125,11 +125,14 @@ private:
     QPushButton *recordButton, *ABButton;
     QPushButton *snapshotButton, *frameButton;
 
+    mtime_t timeA, timeB;
+
 private slots:
     void snapshot();
     void frame();
     void fromAtoB();
     void record();
+    void AtoBLoop( float, int, int );
 };
 
 /* Button Bar */
