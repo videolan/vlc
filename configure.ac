@@ -225,7 +225,7 @@ case "${host_os}" in
         dnl (that bug is about ld being unable to handle
         dnl text relocation)
         save_cflags="$CFLAGS"
-        CFLAGS="$CFLAGS -dynamiclib -single_module -read_only_reloc suppress"
+        CFLAGS="$CFLAGS -dynamiclib -single_module -read_only_relocs suppress"
         AC_TRY_LINK(
             [int a;], [asm("movq _a,%mm0\n");],
             ac_ld_does_not_support_text_reloc=no,
