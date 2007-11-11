@@ -99,13 +99,14 @@ void InputManager::update()
     }
 
     /* Update position */
-    mtime_t i_length, i_time;
+    int i_length, i_time; /* Int is enough, since we store seconds */
     float f_pos;
     i_length = var_GetTime( p_input, "length" ) / 1000000;
     i_time = var_GetTime( p_input, "time") / 1000000;
     f_pos = var_GetFloat( p_input, "position" );
     emit positionUpdated( f_pos, i_time, i_length );
 
+    /* Update Rate */
     int i_new_rate = var_GetInteger( p_input, "rate");
     if( i_new_rate != i_rate )
     {
