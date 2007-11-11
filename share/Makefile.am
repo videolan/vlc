@@ -17,6 +17,7 @@ nobase_dist_pkgdata_DATA = \
 	utils/video-vlc-default.sh \
 	$(DIST_skins2) \
 	$(DIST_http) \
+	$(DIST_http_lua) \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
@@ -257,10 +258,13 @@ DIST_lua= \
 	luaplaylist/youtube_homepage.lua \
 	luaplaylist/metacafe.lua \
 	luaplaylist/googlevideo.lua \
+	luaintf/http.lua \
 	luaintf/rc.lua \
 	luaintf/hotkeys.lua \
 	luaintf/modules/common.lua \
 	luaintf/modules/host.lua \
+	luaintf/modules/httpd.lua \
+	luaintf/modules/acl.lua \
 	luaintf/telnet.lua \
 	luaintf/dummy.lua
 
