@@ -276,7 +276,7 @@ static int OpenDll( decoder_t *p_dec )
       "/usr/lib64/RealPlayer10GOLD/codecs",
       "/usr/lib/win32",
       "/usr/lib/codecs",
-      "/usr/local/lib/codecs"
+      "/usr/local/lib/codecs",
 #endif
       NULL,
       NULL,
@@ -290,11 +290,20 @@ static int OpenDll( decoder_t *p_dec )
 
     for( i = 0; ppsz_path[i]; i++ )
     {
+        /* Old format */
         asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
                   (char *)&p_dec->fmt_in.i_codec );
         i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
         free( psz_dll );
         if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+
+        /* New format */
+        asprintf( &psz_dll, "%s/%4.4s.so", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec );
+        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+        free( psz_dll );
+        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+
     }
 
 #ifdef WIN32
