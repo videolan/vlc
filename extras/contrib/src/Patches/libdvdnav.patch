@@ -1,0 +1,229 @@
+diff -r -u libdvdnav-4.1.1/configure.ac libdvdnav/configure.ac
+--- libdvdnav-4.1.1/configure.ac	2007-05-01 11:11:52.000000000 +0100
++++ libdvdnav/configure.ac	2007-11-12 11:40:20.406250000 +0000
+@@ -130,6 +130,11 @@
+ AC_C_BIGENDIAN
+ 
+ dnl ---------------------------------------------
++dnl Check for basic *nix fonction that we may emulate on other OS
++dnl ---------------------------------------------
++AC_CHECK_FUNCS(gettimeofday)
++
++dnl ---------------------------------------------
+ dnl threads
+ dnl ---------------------------------------------
+ case $host in
+@@ -150,25 +155,61 @@
+ AC_SUBST(THREAD_CFLAGS)
+ 
+ dnl ---------------------------------------------
+-dnl dynamic linker
++dnl dvdcss checking
+ dnl ---------------------------------------------
+-case $host in
+-  *mingw32*)
+-    CFLAGS="-idirafter \$(top_srcdir)/msvc/include $CFLAGS"
+-    LDFLAGS="-no-undefined $LDFLAGS"
+-    ;;
+-  *cygwin*)
+-    LDFLAGS="-no-undefined $LDFLAGS"
+-    ;;
+-  *)
+-    AC_CHECK_LIB(c, dlopen,
+-	         DYNAMIC_LD_LIBS="",
+-	         AC_CHECK_LIB(dl, dlopen,
+-             	              DYNAMIC_LD_LIBS="-ldl",
+-	                      AC_MSG_ERROR(dynamic linker needed)))
+-    AC_SUBST(DYNAMIC_LD_LIBS)
+-    ;;
+-esac
++AC_ARG_WITH( [libdvdcss],
++    [  --with-libdvdcss[=PATH]    force linking against libdvdcss],
++    [if test x"$withval" != xno; then
++       link_dvdcss=yes
++     fi
++     if test x"$withval" != xyes; then
++       dvdcss_path=$withval
++     fi])
++
++if test x"$link_dvdcss" != xyes; then
++dnl dlopen libdvdcss
++  AC_CHECK_FUNC( dlopen,
++    [DL_LIBS="" ],
++    AC_CHECK_LIB( dl, dlopen,
++      [DL_LIBS=-ld ],
++      AC_MSG_ERROR(You need libdl (dlopen))
++    )
++  )
++else
++dnl link with libdvdcss
++  if test -z "$dvdcss_path"; then
++    AC_CHECK_LIB(dvdcss, dvdcss_interface_2,
++      [ CSS_LIBS=-ldvdcss ],
++      AC_MSG_ERROR(You need libdvdcss.so.2 or later)
++    )
++    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
++      [ ],
++      AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
++    )
++  else
++    saved_CFLAGS=$CFLAGS
++    CFLAGS="$CFLAGS -L$dvdcss_path/lib"
++    AC_CHECK_LIB(dvdcss, dvdcss_interface_2,
++      [ CSS_LIBS="-L$dvdcss_path/lib -R$dvdcss_path/lib -ldvdcss"
++        CSS_CFLAGS=-I$dvdcss_path/include ],
++      AC_MSG_ERROR(You need libdvdcss.so.2 or later)
++    )
++    CFLAGS=$saved_CFLAGS
++    dnl -w added to shutup GCC3.1's cpp warning about -I/usr/local
++    saved_CPPFLAGS=$CPPFLAGS
++    CPPFLAGS="-w $CPPFLAGS -I$dvdcss_path/include"
++    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
++      [ ],
++      AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
++    )
++    CPPFLAGS=$saved_CPPFLAGS
++  fi
++fi
++
++AC_SUBST(DL_LIBS)
++AC_SUBST(CSS_LIBS)
++AC_SUBST(CSS_CFLAGS)
++ 
+ 
+ dnl ---------------------------------------------
+ dnl cflags
+diff -r -u libdvdnav-4.1.1/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
+--- libdvdnav-4.1.1/src/dvdnav_internal.h	2007-04-21 12:56:41.000000000 +0100
++++ libdvdnav/src/dvdnav_internal.h	2007-11-12 11:42:26.046875000 +0000
+@@ -39,6 +39,7 @@
+ #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
+ #define pthread_mutex_destroy(a)
+ 
++#ifndef HAVE_GETTIMEOFDAY
+ /* replacement gettimeofday implementation */
+ #include <sys/timeb.h>
+ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+@@ -50,6 +51,8 @@
+   return 0;
+ }
+ #define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
++#endif
++
+ #include <io.h> /* read() */
+ #define lseek64 _lseeki64
+ 
+diff -r -u libdvdnav-4.1.1/src/dvdread/bswap.h libdvdnav/src/dvdread/bswap.h
+--- libdvdnav-4.1.1/src/dvdread/bswap.h	2007-05-05 11:32:13.000000000 +0100
++++ libdvdnav/src/dvdread/bswap.h	2007-11-12 11:17:38.343750000 +0000
+@@ -81,14 +81,14 @@
+       (((x) & 0x0000ff00) <<  8) | \
+       (((x) & 0x000000ff) << 24))
+ #define B2N_64(x) \
+- x = ((((x) & 0xff00000000000000) >> 56) | \
+-      (((x) & 0x00ff000000000000) >> 40) | \
+-      (((x) & 0x0000ff0000000000) >> 24) | \
+-      (((x) & 0x000000ff00000000) >>  8) | \
+-      (((x) & 0x00000000ff000000) <<  8) | \
+-      (((x) & 0x0000000000ff0000) << 24) | \
+-      (((x) & 0x000000000000ff00) << 40) | \
+-      (((x) & 0x00000000000000ff) << 56))
++ x = ((((x) & 0xff00000000000000LL) >> 56) | \
++      (((x) & 0x00ff000000000000LL) >> 40) | \
++      (((x) & 0x0000ff0000000000LL) >> 24) | \
++      (((x) & 0x000000ff00000000LL) >>  8) | \
++      (((x) & 0x00000000ff000000LL) <<  8) | \
++      (((x) & 0x0000000000ff0000LL) << 24) | \
++      (((x) & 0x000000000000ff00LL) << 40) | \
++      (((x) & 0x00000000000000ffLL) << 56))
+ 
+ #else
+ 
+diff -r -u libdvdnav-4.1.1/src/dvdread/dvd_input.c libdvdnav/src/dvdread/dvd_input.c
+--- libdvdnav-4.1.1/src/dvdread/dvd_input.c	2007-04-19 16:45:30.000000000 +0100
++++ libdvdnav/src/dvdread/dvd_input.c	2007-11-12 11:19:57.984375000 +0000
+@@ -27,6 +27,11 @@
+ #include "dvd_reader.h"
+ #include "dvd_input.h"
+ 
++#ifdef WIN32
++#   define lseek _lseeki64
++#   undef off_t
++#   define off_t int64_t
++#endif
+ 
+ /* The function pointers that is the exported interface of this file. */
+ dvd_input_t (*dvdinput_open)  (const char *);
+diff -r -u libdvdnav-4.1.1/src/vm/vm.c libdvdnav/src/vm/vm.c
+--- libdvdnav-4.1.1/src/vm/vm.c	2007-04-25 00:06:22.000000000 +0100
++++ libdvdnav/src/vm/vm.c	2007-11-12 11:35:55.859375000 +0000
+@@ -135,24 +135,25 @@
+ }
+ #endif
+ 
++#include <dvdread/dvd_input.h>
++
+ static void dvd_read_name(char *name, const char *device) {
+     /* Because we are compiling with _FILE_OFFSET_BITS=64
+      * all off_t are 64bit.
+      */
+     off_t off;
+-    int fd, i;
++    dvd_input_t fd; int i;
+     uint8_t data[DVD_VIDEO_LB_LEN];
+ 
+     /* Read DVD name */
+-    fd = open(device, O_RDONLY);
++    fd = dvdinput_open(device);
+     if (fd > 0) { 
+-      off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
+-      if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
+-        off = read( fd, data, DVD_VIDEO_LB_LEN ); 
+-        close(fd);
+-        if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
++      off = dvdinput_seek( fd, 16 );
++      if( off == 16 ) {
++        off = dvdinput_read( fd, data, 1, DVDINPUT_NOFLAGS ); 
++        if (off == 1 ) {
+           fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
+-          for(i=25; i < 73; i++ ) {
++          for(i=40; i < 73; i++ ) {
+             if((data[i] == 0)) break;
+             if((data[i] > 32) && (data[i] < 127)) {
+               fprintf(MSG_OUT, "%c", data[i]);
+@@ -160,10 +161,12 @@
+               fprintf(MSG_OUT, " ");
+             }
+           }
+-          strncpy(name, &data[25], 48);
+-          name[48] = 0;
++	  strncpy(name, &data[40], 32);
++	  i=31;
++	  while( (i >= 0) && (name[i] <= ' ')) --i;
++	  name[i+1] = '\0';
+           fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
+-          for(i=73; i < 89; i++ ) {
++          for(i=813; i < 829; i++ ) {
+             if((data[i] == 0)) break;
+             if((data[i] > 32) && (data[i] < 127)) {
+               fprintf(MSG_OUT, "%c", data[i]);
+@@ -187,7 +190,7 @@
+       } else {
+         fprintf(MSG_OUT, "libdvdnav: Can't seek to block %u\n", 32 );
+       }
+-      close(fd);
++      dvdinput_close(fd);
+     } else {
+     fprintf(MSG_OUT, "NAME OPEN FAILED\n");
+   }
+--- libdvdnav-4.1.1/examples/Makefile.am	2004-01-11 21:43:13.000000000 +0000
++++ libdvdnav/examples/Makefile.am	2007-11-12 12:44:09.328125000 +0000
+@@ -8,7 +8,7 @@
+ 
+ menus_SOURCES = menus.c
+ menus_LDFLAGS = -L$(top_srcdir)/src/
+-menus_LDADD   = $(DVDNAV_LIB)
++menus_LDADD   = $(DVDNAV_LIB) $(CSS_LIBS)  
+ 
+ $(DVDNAV_LIB):
+ 	@cd $(top_builddir)/src/ && $(MAKE) libdvdnav.la

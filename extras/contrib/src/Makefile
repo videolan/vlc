@@ -1142,7 +1142,9 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 .dvdread: .dvdnav
 	$(INSTALL_NAME)
-	(install_name_tool -change $(PREFIX)/lib/libdvdread.0.dylib @executable_path/lib/vlc_libdvdread.dylib $(PREFIX)/vlc-lib/vlc_libdvdnav.dylib)
+ifdef HAVE_DARWIN_OS
+	install_name_tool -change $(PREFIX)/lib/libdvdread.4.dylib @executable_path/lib/vlc_libdvdread.dylib $(PREFIX)/vlc-lib/vlc_libdvdnav.dylib
+endif
 	touch $@
 
 CLEAN_FILE += .dvdread
@@ -1151,14 +1153,20 @@ CLEAN_FILE += .dvdread
 # libdvdnav
 # ***************************************************************************
 
+ifdef SVN
+libdvdnav:
+	$(SVN) export $(LIBDVDNAV_SVN)  libdvdnav
+	patch -p0 < Patches/libdvdnav.patch
+	(cd $@; ./autogen.sh noconfig)
+else
 libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 	$(WGET) $(LIBDVDNAV_URL)
 
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p0 < Patches/dvdnav.patch
-	patch -p0 < Patches/libdvdnav-mactel.patch
+	patch -p0 < Patches/libdvdnav.patch
 	(cd $@; ./autogen.sh noconfig)
+endif
 
 .dvdnav: libdvdnav .dvdcss
 ifdef HAVE_WIN32	
