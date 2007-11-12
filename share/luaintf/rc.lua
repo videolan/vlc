@@ -164,29 +164,92 @@ function add(name,client,arg)
 end
 
 function playlist(name,client,arg)
-    -- TODO: add possibility to filter playlist items using a mask
-    local playlist
-    if arg == "ml" then
-        playlist = vlc.playlist.get(true)
-        client:append("+----[ Playlist - Media Library ]")
-    else
-        playlist = vlc.playlist.get()
-        client:append("+----[ Playlist ]")
-    end
-    for i, item in pairs(playlist) do
-        local str = "| "..tostring(i).." - "..item.name
-        if item.duration > 0 then
-            str = str.." ("..common.durationtostring(item.duration)..")"
+    function playlist0(item,prefix)
+        local prefix = prefix or ""
+        if not item.flags.disabled then
+            local str = "| "..prefix..tostring(item.id).." - "..item.name
+            if item.duration > 0 then
+                str = str.." ("..common.durationtostring(item.duration)..")"
+            end
+            if item.nb_played > 0 then
+                str = str.." [played "..tostring(item.nb_played).." time"
+                if item.nb_played > 1 then
+                    str = str .. "s"
+                end
+                str = str .. "]"
+            end
+            client:append(str)
         end
-        if item.nb_played > 0 then
-            str = str.." played "..tostring(item.nb_played).." time"
-            if item.nb_played > 1 then
-                str = str .. "s"
+        if item.children then
+            for _, c in ipairs(item.children) do
+                playlist0(c,prefix.."  ")
             end
         end
-        client:append(str)
     end
-    client:append("+----[ End of playlist ]")
+    local playlist
+    if name == "search" then
+        playlist = vlc.playlist.search(arg or "")
+    else
+        if tonumber(arg) then
+            print "number"
+            playlist = vlc.playlist.get(tonumber(arg))
+        elseif arg then
+            print "string"
+            playlist = vlc.playlist.get(arg)
+        else
+            playlist = vlc.playlist.get()
+        end
+    end
+    if name == "search" then
+        client:append("+----[ Search - "..(arg or "`reset'").." ]")
+    else
+        client:append("+----[ Playlist - "..playlist.name.." ]")
+    end
+    if playlist.children then
+        for _, item in ipairs(playlist.children) do
+            playlist0(item)
+        end
+    else
+        playlist0(playlist)
+    end
+    if name == "search" then
+        client:append("+----[ End of search - Use `search' to reset ]")
+    else
+        client:append("+----[ End of playlist ]")
+    end
+end
+
+function playlist_sort(name,client,arg)
+    if not arg then
+        client:append("Valid sort keys are: id, title, artist, genre, random, duration, album.")
+    else
+        vlc.playlist.sort(arg)
+    end
+end
+
+function services_discovery(name,client,arg)
+    if arg then
+        if vlc.sd.is_loaded(arg) then
+            vlc.sd.remove(arg)
+            client:append(arg.." disabled.")
+        else
+            vlc.sd.add(arg)
+            client:append(arg.." enabled.")
+        end
+    else
+        local sd = vlc.sd.get_services_names()
+        client:append("+----[ Services discovery ]")
+        for n,ln in pairs(sd) do
+            local status
+            if vlc.sd.is_loaded(n) then
+                status = "enabled"
+            else
+                status = "disabled"
+            end
+            client:append("| "..n..": " .. ln .. " (" .. status .. ")")
+        end
+        client:append("+----[ End of services discovery ]")
+    end
 end
 
 function print_text(label,text)
@@ -338,6 +401,9 @@ commands_ordered = {
     { "add"; { func = add; args = "XYZ"; help = "add XYZ to playlist" } };
     { "enqueue"; { func = add; args = "XYZ"; help = "queue XYZ to playlist" } };
     { "playlist"; { func = playlist; help = "show items currently in playlist" } };
+    { "search"; { func = playlist; args = "[string]"; help = "search for items in playlist (or reset search)" } };
+    { "sort"; { func = playlist_sort; args = "key"; help = "sort the playlist" } };
+    { "sd"; { func = services_discovery; args = "[sd]"; help = "show services discovery or toggle" } };
     { "play"; { func = skip2(vlc.playlist.play); help = "play stream" } };
     { "stop"; { func = skip2(vlc.playlist.stop); help = "stop stream" } };
     { "next"; { func = skip2(vlc.playlist.next); help = "next playlist item" } };

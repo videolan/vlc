@@ -86,6 +86,11 @@ static inline int luaL_checkboolean( lua_State *L, int narg )
     return lua_toboolean( L, narg );
 }
 
+static inline int luaL_optboolean( lua_State *L, int narg, int def )
+{
+    return luaL_opt( L, luaL_checkboolean, narg, def );
+}
+
 static inline const void *luaL_checklightuserdata( lua_State *L, int narg )
 {
     luaL_checktype( L, narg, LUA_TLIGHTUSERDATA ); /* can raise an error */
@@ -118,6 +123,9 @@ vlc_object_t *vlclua_checkobject( lua_State *L, int narg, int i_type );
 int vlclua_gc_release( lua_State *L );
 int vlclua_object_find( lua_State *L );
 int vlclua_object_find_name( lua_State *L );
+
+vlc_object_t * vlclua_get_this( lua_State * );
+playlist_t *vlclua_get_playlist_internal( lua_State * );
 
 int vlclua_add_callback( lua_State * );
 int vlclua_del_callback( lua_State * );
@@ -163,11 +171,15 @@ int vlclua_acl_add_host( lua_State * );
 int vlclua_acl_add_net( lua_State * );
 int vlclua_acl_load_file( lua_State * );
 
+int vlclua_sd_get_services_names( lua_State * );
+int vlclua_sd_add( lua_State * );
+int vlclua_sd_remove( lua_State * );
+int vlclua_sd_is_loaded( lua_State * );
+
 
 /*****************************************************************************
  * Lua function bridge
  *****************************************************************************/
-vlc_object_t * vlclua_get_this( lua_State * );
 #define vlclua_error( L ) luaL_error( L, "VLC lua error in file %s line %d (function %s)", __FILE__, __LINE__, __func__ )
 int vlclua_push_ret( lua_State *, int i_error );
 

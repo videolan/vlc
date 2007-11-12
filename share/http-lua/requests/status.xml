@@ -64,7 +64,7 @@ elseif command == "pl_delete" then
 elseif command == "pl_empty" then
   vlc.playlist.clear()
 elseif command == "pl_sort" then
-  vlc.msg.err("FIXME: pl_sort unimplemented")
+  vlc.playlist.sort( val, id > 0 )
 elseif command == "pl_random" then
   vlc.playlist.random()
 elseif command == "pl_loop" then
@@ -72,14 +72,11 @@ elseif command == "pl_loop" then
 elseif command == "pl_repeat" then
   vlc.playlist.repeat_()
 elseif command == "pl_sd" then
-  vlc.msg.err("FIXME: pl_sd unimplemented")
-  --[[
-    <vlc id="if" param1="val value services_discovery_is_loaded" />
-      <vlc id="rpn" param1="val value services_discovery_remove" />
-    <vlc id="else" />
-      <vlc id="rpn" param1="val value services_discovery_add" />
-    <vlc id="end" />
-  ]]
+  if vlc.sd.is_loaded(val) then
+    vlc.sd.remove(val)
+  else
+    vlc.sd.add(val)
+  end
 elseif command == "fullscreen" then
   vlc.fullscreen()
 elseif command == "snapshot" then

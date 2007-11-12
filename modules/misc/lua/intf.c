@@ -53,7 +53,7 @@ struct intf_sys_t
 /*****************************************************************************
  * Internal lua<->vlc utils
  *****************************************************************************/
-static inline playlist_t *vlclua_get_playlist_internal( lua_State *L )
+playlist_t *vlclua_get_playlist_internal( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     return pl_Yield( p_this );
@@ -355,10 +355,27 @@ static int vlclua_playlist_next( lua_State * L )
     return 0;
 }
 
+static int vlclua_playlist_skip( lua_State * L )
+{
+    int i_skip = luaL_checkint( L, 1 );
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    playlist_Skip( p_playlist, i_skip );
+    vlc_object_release( p_playlist );
+    return 0;
+}
+
 static int vlclua_playlist_play( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Play( p_playlist );
+    vlc_object_release( p_playlist );
+    return 0;
+}
+
+static int vlclua_playlist_pause( lua_State * L )
+{
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    playlist_Pause( p_playlist );
     vlc_object_release( p_playlist );
     return 0;
 }
@@ -406,37 +423,14 @@ static int vlclua_playlist_random( lua_State * L )
 
 static int vlclua_playlist_goto( lua_State * L )
 {
-    /* XXX: logic copied from rc.c ... i'm not sure that it's ok as it
-     *      implies knowledge of the playlist internals. */
-    playlist_t *p_playlist;
-    int i_size;
-    playlist_item_t *p_item, *p_parent;
-
-    int i_pos;
-    if( lua_gettop( L ) != 1 ) return vlclua_error( L );
-    i_pos = luaL_checkint( L, -1 );
-    lua_pop( L, 1 );
-    if( i_pos <= 0 ) return 0;
-
-    p_playlist = vlclua_get_playlist_internal( L );
-    /* The playlist stores 2 times the same item: onelevel & category */
-    i_size = p_playlist->items.i_size / 2;
-
-    if( i_pos > i_size )
-    {
-        vlc_object_release( p_playlist );
-        return 0;
-    }
-
-    p_item = p_parent = p_playlist->items.p_elems[i_pos*2-1];
-    while( p_parent->p_parent )
-        p_parent = p_parent->p_parent;
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
-                      p_parent, p_item );
-
+    int i_id = luaL_checkint( L, 1 );
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    int i_ret = playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                                  VLC_TRUE, NULL,
+                                  playlist_ItemGetById( p_playlist, i_id,
+                                                        VLC_TRUE ) );
     vlc_object_release( p_playlist );
-    lua_pushboolean( L, 1 );
-    return 1;
+    return vlclua_push_ret( L, i_ret );
 }
 
 static int vlclua_playlist_add( lua_State *L )
@@ -463,23 +457,31 @@ static int vlclua_playlist_enqueue( lua_State *L )
     return 1;
 }
 
-static int vlclua_playlist_get( lua_State *L )
+static void push_playlist_item( lua_State *L, playlist_item_t *p_item );
+static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
 {
-    /* TODO: make it possible to get the tree playlist */
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_item_t *p_root;
-    int i;
-    if( lua_isboolean( L, 1 ) && lua_toboolean( L, 1 ) )
-        p_root = p_playlist->p_ml_onelevel; /* media library */
-    else
-        p_root = p_playlist->p_local_onelevel; /* local/normal playlist */
-    lua_createtable( L, p_root->i_children, 0 );
-    for( i = 0; i < p_root->i_children; i++ )
+    input_item_t *p_input = p_item->p_input;
+    int i_flags = p_item->i_flags;
+    lua_newtable( L );
+    lua_pushinteger( L, p_item->i_id );
+    lua_setfield( L, -2, "id" );
+    lua_newtable( L );
+#define CHECK_AND_SET_FLAG( name, label ) \
+    if( i_flags & PLAYLIST_ ## name ## _FLAG ) \
+    { \
+        lua_pushboolean( L, 1 ); \
+        lua_setfield( L, -2, #label ); \
+    }
+    CHECK_AND_SET_FLAG( SAVE, save )
+    CHECK_AND_SET_FLAG( SKIP, skip )
+    CHECK_AND_SET_FLAG( DBL, disabled )
+    CHECK_AND_SET_FLAG( RO, ro )
+    CHECK_AND_SET_FLAG( REMOVE, remove )
+    CHECK_AND_SET_FLAG( EXPANDED, expanded )
+#undef CHECK_AND_SET_FLAG
+    lua_setfield( L, -2, "flags" );
+    if( p_input )
     {
-        playlist_item_t *p_item = p_root->pp_children[i];
-        input_item_t *p_input = p_item->p_input;
-        lua_pushinteger( L, i+1 );
-        lua_newtable( L );
         lua_pushstring( L, p_input->psz_name );
         lua_setfield( L, -2, "name" );
         lua_pushstring( L, p_input->psz_uri );
@@ -492,16 +494,166 @@ static int vlclua_playlist_get( lua_State *L )
         lua_pushinteger( L, p_input->i_nb_played );
         lua_setfield( L, -2, "nb_played" );
         /* TODO: add (optional) info categories, meta, options, es */
-        lua_settable( L, -3 );
     }
+    if( p_item->i_children >= 0 )
+    {
+        int i;
+        lua_createtable( L, p_item->i_children, 0 );
+        for( i = 0; i < p_item->i_children; i++ )
+        {
+            push_playlist_item( L, p_item->pp_children[i] );
+            lua_rawseti( L, -2, i+1 );
+        }
+        lua_setfield( L, -2, "children" );
+    }
+}
+
+static int vlclua_playlist_get( lua_State *L )
+{
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    int b_category = luaL_optboolean( L, 2, 1 ); /* Default to tree playlist (discared when 1st argument is a playlist_item's id) */
+    playlist_item_t *p_item = NULL;
+
+    if( lua_isnumber( L, 1 ) )
+    {
+        int i_id = lua_tointeger( L, 1 );
+        p_item = playlist_ItemGetById( p_playlist, i_id, VLC_TRUE );
+        if( !p_item )
+        {
+            vlc_object_release( p_playlist );
+            return 0; /* Should we return an error instead? */
+        }
+    }
+    else if( lua_isstring( L, 1 ) )
+    {
+        const char *psz_what = lua_tostring( L, 1 );
+        if( !strcasecmp( psz_what, "normal" )
+         || !strcasecmp( psz_what, "playlist" ) )
+            p_item = b_category ? p_playlist->p_local_category
+                                : p_playlist->p_local_onelevel;
+        else if( !strcasecmp( psz_what, "ml" )
+              || !strcasecmp( psz_what, "media library" ) )
+            p_item = b_category ? p_playlist->p_ml_category
+                                : p_playlist->p_ml_onelevel;
+        else if( !strcasecmp( psz_what, "root" ) )
+            p_item = b_category ? p_playlist->p_root_category
+                                : p_playlist->p_root_onelevel;
+        else
+        {
+            int i;
+            for( i = 0; i < p_playlist->i_sds; i++ )
+            {
+                if( !strcasecmp( psz_what,
+                                 p_playlist->pp_sds[i]->p_sd->psz_module ) )
+                {
+                    p_item = b_category ? p_playlist->pp_sds[i]->p_cat
+                                        : p_playlist->pp_sds[i]->p_one;
+                    break;
+                }
+            }
+            if( !p_item )
+            {
+                vlc_object_release( p_playlist );
+                return 0; /* Should we return an error instead? */
+            }
+        }
+    }
+    else
+    {
+        p_item = b_category ? p_playlist->p_root_category
+                            : p_playlist->p_root_onelevel;
+    }
+    push_playlist_item( L, p_item );
     vlc_object_release( p_playlist );
     return 1;
+}
+#if 0
+    int s;
+    lua_createtable( L, 0, 2 + p_playlist->i_sds );
+    for( s = -2; s < p_playlist->i_sds; s++ )
+    {
+        playlist_item_t *p_root;
+        switch( s )
+        {
+            case -2:
+                /* local/normal playlist */
+                lua_pushstring( L, "local" );
+                p_root = p_playlist->p_local_onelevel;
+                break;
+            case -1:
+                /* media library */
+                lua_pushstring( L, "ml" );
+                p_root = p_playlist->p_ml_onelevel;
+                break;
+            default:
+                lua_pushstring( L, p_playlist->pp_sds[s]->p_sd->psz_module );
+                printf("%s\n", p_playlist->pp_sds[s]->p_sd->psz_module );
+                p_root = p_playlist->pp_sds[s]->p_one;
+                break;
+        }
+        printf("s = %d\n", s);
+        printf("children = %d\n", p_root->i_children );
+        push_playlist_item( L, p_root );
+        lua_settable( L, -3 );
+    }
+    printf("done\n");
+#endif
+
+static int vlclua_playlist_search( lua_State *L )
+{
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    const char *psz_string = luaL_optstring( L, 1, "" );
+    int b_category = luaL_optboolean( L, 2, 1 ); /* default to category */
+    playlist_LiveSearchUpdate( p_playlist,
+                               b_category ? p_playlist->p_root_category
+                                          : p_playlist->p_root_onelevel,
+                               psz_string );
+    push_playlist_item( L, p_playlist->p_root_category );
+    vlc_object_release( p_playlist );
+    return 1;
+}
+
+static int vlc_sort_key_from_string( const char *psz_name )
+{
+    static const struct
+    {
+        const char *psz_name;
+        int i_key;
+    } pp_keys[] =
+        { { "id", SORT_ID },
+          { "title", SORT_TITLE },
+          { "title nodes first", SORT_TITLE_NODES_FIRST },
+          { "artist", SORT_ARTIST },
+          { "genre", SORT_GENRE },
+          { "random", SORT_RANDOM },
+          { "duration", SORT_DURATION },
+          { "title numeric", SORT_TITLE_NUMERIC },
+          { "album", SORT_ALBUM },
+          { NULL, -1 } };
+    int i;
+    for( i = 0; pp_keys[i].psz_name; i++ )
+    {
+        if( !strcmp( psz_name, pp_keys[i].psz_name ) )
+            return pp_keys[i].i_key;
+    }
+    return -1;
 }
 
 static int vlclua_playlist_sort( lua_State *L )
 {
     /* allow setting the different sort keys */
-    return 0;
+    int i_mode = vlc_sort_key_from_string( luaL_checkstring( L, 1 ) );
+    if( i_mode == -1 )
+        return luaL_error( L, "Invalid search key." );
+    int i_type = luaL_optboolean( L, 2, 0 ) ? ORDER_REVERSE : ORDER_NORMAL;
+    int b_category = luaL_optboolean( L, 3, 1 ); /* default to category */
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    playlist_item_t *p_root = b_category ? p_playlist->p_local_category
+                                         : p_playlist->p_local_onelevel;
+    int i_ret = playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
+                                            i_type );
+    vlc_object_release( p_playlist );
+    return vlclua_push_ret( L, i_ret );
 }
 
 /* FIXME: split this in 3 different functions? */
@@ -655,7 +807,9 @@ static luaL_Reg p_reg_playlist[] =
 {
     { "prev", vlclua_playlist_prev },
     { "next", vlclua_playlist_next },
+    { "skip", vlclua_playlist_skip },
     { "play", vlclua_playlist_play },
+    { "pause", vlclua_playlist_pause },
     { "stop", vlclua_playlist_stop },
     { "clear", vlclua_playlist_clear },
     { "repeat_", vlclua_playlist_repeat },
@@ -666,7 +820,20 @@ static luaL_Reg p_reg_playlist[] =
     { "add", vlclua_playlist_add },
     { "enqueue", vlclua_playlist_enqueue },
     { "get", vlclua_playlist_get },
+    { "search", vlclua_playlist_search },
+    { "sort", vlclua_playlist_sort },
+
     { "stats", vlclua_input_stats },
+
+    { NULL, NULL }
+};
+
+static luaL_Reg p_reg_sd[] =
+{
+    { "get_services_names", vlclua_sd_get_services_names },
+    { "add", vlclua_sd_add },
+    { "remove", vlclua_sd_remove },
+    { "is_loaded", vlclua_sd_is_loaded },
 
     { NULL, NULL }
 };
@@ -888,6 +1055,7 @@ int E_(Open_LuaIntf)( vlc_object_t *p_this )
     luaL_register_submodule( L, "config", p_reg_config );
     luaL_register_submodule( L, "msg", p_reg_msg );
     luaL_register_submodule( L, "playlist", p_reg_playlist );
+    luaL_register_submodule( L, "sd", p_reg_sd );
     luaL_register_submodule( L, "volume", p_reg_volume );
     luaL_register_submodule( L, "osd", p_reg_osd );
     luaL_register_submodule( L, "net", p_reg_net );

@@ -61,14 +61,17 @@ This dialog needs the following dialogs to be fully functional: <none>
             <span class="btn_text">Sort</span>
           </button>
           <div id="menu_sort" class="menu" >
-            <button class="menuout" onclick="pl_sort(1,0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Name ascending" >Name</button><br/>
-            <button class="menuout" onclick="pl_sort(1,1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Name descending" >Name reverse</button><br/>
-            <button class="menuout" onclick="pl_sort(3,0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Author ascending" >Author</button><br/>
-            <button class="menuout" onclick="pl_sort(3,1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Author ascending" >Author reverse</button><br/>
-            <button class="menuout" onclick="pl_sort(5,0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Randomize" >Random</button><br/>
-            <button class="menuout" onclick="pl_sort(7,0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Track number" >Track number</button><br/>
-            <button class="menuout" onclick="pl_sort(0,0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Id ascending" >Id</button><br/>
-            <button class="menuout" onclick="pl_sort(0,1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Id descending" >Id reverse</button><br/>
+            <button class="menuout" onclick="pl_sort('title',0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Title ascending" >Title</button><br/>
+            <button class="menuout" onclick="pl_sort('title',1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Title descending" >Title reverse</button><br/>
+            <button class="menuout" onclick="pl_sort('artist',0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Artist ascending" >Artist</button><br/>
+            <button class="menuout" onclick="pl_sort('artist',1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Artist ascending" >Artist reverse</button><br/>
+            <button class="menuout" onclick="pl_sort('album',0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Album ascending" >Album</button><br/>
+            <button class="menuout" onclick="pl_sort('album',1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Album ascending" >Album reverse</button><br/>
+            <button class="menuout" onclick="pl_sort('genre',0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Genre ascending" >Genre</button><br/>
+            <button class="menuout" onclick="pl_sort('genre',1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Genre ascending" >Genre reverse</button><br/>
+            <button class="menuout" onclick="pl_sort('random',0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Randomize" >Random</button><br/>
+            <button class="menuout" onclick="pl_sort('id',0);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Id ascending" >Id</button><br/>
+            <button class="menuout" onclick="pl_sort('id',1);hide_menu('menu_sort');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" title="Sort by Id descending" >Id reverse</button><br/>
           </div>
         </td>
         <td onmouseover="show_menu('menu_sd');" onmouseout="hide_menu('menu_sd');">
@@ -77,12 +80,12 @@ This dialog needs the following dialogs to be fully functional: <none>
             <span class="btn_text">Services Discovery</span>
           </button>
           <div id="menu_sd" class="menu" >
-          <?vlc --[[ FIXME
-            <vlc id="rpn" param1="services_discovery" />
-            <vlc id="foreach" param1="sd" param2="object" />
-            <button onclick="pl_sd('<vlc id="value" param1="sd" />');hide_menu('menu_sd');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" class="menuout" title="Toggle <vlc id="value" param1="sd.name" />" ><vlc id="value" param1="sd.name" /></button><br/>
-            <vlc id="end" />
-          ]] ?>
+          <?vlc
+            local sd = vlc.sd.get_services_names()
+            for n,ln in pairs(sd) do
+              print([[<button onclick="pl_sd(']]..n..[[');hide_menu('menu_sd');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" class="menuout" title="Toggle ]]..ln..[[" >]]..ln..[[</button><br/>]])
+            end
+          ?>
           </div>
         </td>
       </tr>

@@ -25,17 +25,44 @@ vim:syntax=lua
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 ]] ?>
 
-<node id="0" name="Undefined" ro="ro">
 <?vlc
-local playlist = vlc.playlist.get()
-for i,item in ipairs(playlist) do
-  local name, path = vlc.convert_xml_special_chars(item.name,item.path)
-  print("<leaf id='"..tostring(i).."' uri='"..path.."' name='"..name.."' ro='ro' duration='"..tostring(item.duration).."'/>")
+--[[<node id="0" name="Undefined" ro="ro">]]
+function print_playlist(item)
+  if item.children then
+    local name = vlc.convert_xml_special_chars(item.name)
+    print("<node id=\""..tostring(item.id).."\" name=\""..name.."\" ro=\""..(item.flags.ro and "ro" or "rw").."\">")
+    for _, c in ipairs(item.children) do
+      print_playlist(c)
+    end
+    print("</node>")
+  else
+    local name, path = vlc.convert_xml_special_chars(item.name,item.path or "")
+    print("<leaf id='"..tostring(item.id).."' uri='"..path.."' name='"..name.."' ro='"..(item.flags.ro and "ro" or "rw").."' duration='"..tostring(item.duration).."'/>")
+  end
 end
+function a(t,pre)
+  local pre = pre or ""
+  for k,v in pairs(t) do
+    vlc.msg.err(pre..tostring(k).." : "..tostring(v))
+    if type(v) == "table" then
+      a(v,pre.."  ")
+    end
+  end
+end
+--[[
+for cat,pl in pairs(p) do
+  print("<node id=\"-1\" name=\""..cat.."\" ro=\"ro\">")
+  print_playlist(pl)
+  print("</node>")
+end
+--]]
+local p = vlc.playlist.get()
+-- a(p) Uncomment to debug
+print_playlist(p)
 ?>
-</node>
 
 <?vlc --[[
+</node>
 <node id="9" name="Nevermind" ro="rw">
 <leaf id="10" current="current" uri="file:///mnt/stuff/media/Nirvana/Nevermind/01 - Smells Like Teen Spirit.mp3" name="Smells Like Teen Spirit" ro="rw" duration="-1"/>
 ]]?>
