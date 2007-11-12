@@ -73,16 +73,6 @@ int E_(xspf_export_playlist)( vlc_object_t *p_this )
         free( psz_temp );
     }
 
-    /* export all items in a flat format */
-    fprintf( p_export->p_file, "\t<trackList>\n" );
-    i_count = 0;
-    for( i = 0; i < p_node->i_children; i++ )
-    {
-        xspf_export_item( p_node->pp_children[i], p_export->p_file,
-                          &i_count );
-    }
-    fprintf( p_export->p_file, "\t</trackList>\n" );
-
     /* export the tree structure in <extension> */
     fprintf( p_export->p_file, "\t<extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" );
     i_count = 0;
@@ -92,6 +82,16 @@ int E_(xspf_export_playlist)( vlc_object_t *p_this )
                              &i_count );
     }
     fprintf( p_export->p_file, "\t</extension>\n" );
+
+    /* export all items in a flat format */
+    fprintf( p_export->p_file, "\t<trackList>\n" );
+    i_count = 0;
+    for( i = 0; i < p_node->i_children; i++ )
+    {
+        xspf_export_item( p_node->pp_children[i], p_export->p_file,
+                          &i_count );
+    }
+    fprintf( p_export->p_file, "\t</trackList>\n" );
 
     /* close the header elements */
     fprintf( p_export->p_file, "</playlist>\n" );
