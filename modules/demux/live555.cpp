@@ -978,8 +978,7 @@ static int Demux( demux_t *p_demux )
     /* Check if we need to send the server a Keep-A-Live signal */
     if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
     {
-        char *psz_bye = NULL;
-        p_sys->rtsp->getMediaSessionParameter( *p_sys->ms, NULL, psz_bye );
+        p_sys->rtsp->setMediaSessionParameter( *p_sys->ms, "vlc" , "1" );
         p_sys->b_timeout_call = VLC_FALSE;
     }
 
