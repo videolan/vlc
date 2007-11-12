@@ -198,15 +198,12 @@ function playlist(name,client,arg)
     end
     local playlist
     local tree = playlist_is_tree(client)
-    print("tree",tree)
     if name == "search" then
         playlist = vlc.playlist.search(arg or "", tree)
     else
         if tonumber(arg) then
-            print "number"
             playlist = vlc.playlist.get(tonumber(arg), tree)
         elseif arg then
-            print "string"
             playlist = vlc.playlist.get(arg, tree)
         else
             playlist = vlc.playlist.get(nil, tree)

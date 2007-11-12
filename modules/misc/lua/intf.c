@@ -567,48 +567,16 @@ static int vlclua_playlist_get( lua_State *L )
     vlc_object_release( p_playlist );
     return 1;
 }
-#if 0
-    int s;
-    lua_createtable( L, 0, 2 + p_playlist->i_sds );
-    for( s = -2; s < p_playlist->i_sds; s++ )
-    {
-        playlist_item_t *p_root;
-        switch( s )
-        {
-            case -2:
-                /* local/normal playlist */
-                lua_pushstring( L, "local" );
-                p_root = p_playlist->p_local_onelevel;
-                break;
-            case -1:
-                /* media library */
-                lua_pushstring( L, "ml" );
-                p_root = p_playlist->p_ml_onelevel;
-                break;
-            default:
-                lua_pushstring( L, p_playlist->pp_sds[s]->p_sd->psz_module );
-                printf("%s\n", p_playlist->pp_sds[s]->p_sd->psz_module );
-                p_root = p_playlist->pp_sds[s]->p_one;
-                break;
-        }
-        printf("s = %d\n", s);
-        printf("children = %d\n", p_root->i_children );
-        push_playlist_item( L, p_root );
-        lua_settable( L, -3 );
-    }
-    printf("done\n");
-#endif
 
 static int vlclua_playlist_search( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     const char *psz_string = luaL_optstring( L, 1, "" );
     int b_category = luaL_optboolean( L, 2, 1 ); /* default to category */
-    playlist_LiveSearchUpdate( p_playlist,
-                               b_category ? p_playlist->p_root_category
-                                          : p_playlist->p_root_onelevel,
-                               psz_string );
-    push_playlist_item( L, p_playlist->p_root_category );
+    playlist_item_t *p_item = b_category ? p_playlist->p_root_category
+                                         : p_playlist->p_root_onelevel;
+    playlist_LiveSearchUpdate( p_playlist, p_item, psz_string );
+    push_playlist_item( L, p_item );
     vlc_object_release( p_playlist );
     return 1;
 }
