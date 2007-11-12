@@ -1410,9 +1410,11 @@ wxMenu *Playlist::SDMenu()
                                                              &ppsz_longnames );
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
 
+    int i_number = 0;
+
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        p_sd_menu->AppendCheckItem( FirstSD_Event + i_number ,
+        p_sd_menu->AppendCheckItem( FirstSD_Event + i_number++ ,
                                     wxU( *ppsz_longname ) );
 
         if( playlist_IsServicesDiscoveryLoaded( p_playlist, *ppsz_name ) )
