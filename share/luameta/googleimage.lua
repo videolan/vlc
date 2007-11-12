@@ -44,5 +44,9 @@ function fetch_art()
     page = vlc.stream_read( fd, 65653 )
     vlc.stream_delete( fd )
     _, _, arturl = string.find( page, "imgurl=([^&]+)" )
-    return vlc.decode_uri(arturl)
+    if arturl then
+        return vlc.decode_uri(arturl)
+    else
+        return nil
+    end
 end
