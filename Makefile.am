@@ -983,38 +983,7 @@ package-macosx:
 	hdiutil attach -readwrite -noverify -noautoopen "$(top_builddir)/vlc-${VERSION}.dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
 	bless --folder "$(top_builddir)/vlcmnt/vlc-${VERSION}/" --openfolder "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
 	sleep 1 # Make sure operation completes
-
-# Place the image disk finder icon at the correct place
-# Note: careful here the finder does some weird things
-# sometimes. delays in the script should prevent those.
 	cd "$(srcdir)"
-#	osascript -e "tell application \"Finder\"" \
-#	-e "   set f to POSIX file (\"$(top_builddir)/vlcmnt/vlc-${VERSION}/\" as string) as alias" \
-#	-e "   tell folder f" \
-#	-e "       open" \
-#	-e "       tell container window" \
-#	-e "          set toolbar visible to false" \
-#	-e "          set statusbar visible to false" \
-#	-e "          set current view to icon view" \
-#	-e "          delay 1 -- Sync" \
-#	-e "          set the bounds to {50, 100, 1000, 1000} -- Big size so the finder won't do silly things" \
-#	-e "       end tell" \
-#	-e "       delay 1 -- Sync" \
-#	-e "       set icon size of the icon view options of container window to 128" \
-#	-e "       set arrangement of the icon view options of container window to not arranged" \
-#	-e "       set background picture of the icon view options of container window to file \".background:background.png\"" \
-#	-e "       set position of item \"VLC.app\" to {100, 20}" \
-#	-e "       set position of item \"Applications\" to {310, 20}" \
-#	-e "       set position of item \"Goodies\" to {40, 200}" \
-#	-e "       set position of item \"Read Me.rtf\" to {410, 200}" \
-#	-e "       set the bounds of the container window to {50, 100, 590, 500}" \
-#	-e "       update without registering applications" \
-#	-e "       delay 5 -- Sync" \
-#	-e "       close" \
-#	-e "   end tell" \
-#	-e "   -- Sync" \
-#	-e "   delay 5" \
-#	-e "end tell" || true # Make sure we don't make the build bots fail
 
 # Unmount the image now
 	hdiutil detach "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
