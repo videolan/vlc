@@ -282,20 +282,10 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
             continue;
 
         char * psz = services_discovery_GetLocalizedName( p_sd );
-        if( psz )
-        {
-            playlist_NodesPairCreate( p_playlist, psz,
-                    &p_cat, &p_one, VLC_FALSE );
-            free( psz );
-        }
-        else
-        {
-            /* No name, just add at the top of the playlist */
-            PL_LOCK;
-            p_cat = p_playlist->p_root_category;
-            p_one = p_playlist->p_root_onelevel;
-            PL_UNLOCK;
-        }
+        assert( psz );
+        playlist_NodesPairCreate( p_playlist, psz,
+                &p_cat, &p_one, VLC_FALSE );
+        free( psz );
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
                           vlc_ServicesDiscoveryItemAdded,

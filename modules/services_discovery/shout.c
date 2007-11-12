@@ -124,12 +124,16 @@ static int Open( vlc_object_t *p_this, int i_type )
     switch( i_type )
     {
         case TV:
+            services_discovery_SetLocalizedName( p_sd, _("Shoutcast TV") );
+
             p_sys->p_input = input_ItemNewExt( p_sd,
                                 SHOUTCAST_TV_BASE_URL, _("Shoutcast TV"),
                                 0, NULL, -1 );
             break;
         case RADIO:
         default:
+            services_discovery_SetLocalizedName( p_sd, _("Shoutcast Radio") );
+
             p_sys->p_input = input_ItemNewExt( p_sd,
                                 SHOUTCAST_BASE_URL, _("Shoutcast Radio"),
                                 0, NULL, -1 );
@@ -140,14 +144,24 @@ static int Open( vlc_object_t *p_this, int i_type )
 }
 
 /*****************************************************************************
+ * ItemAdded:
+ *****************************************************************************/
+static void ItemAdded( const vlc_event_t * p_event, void * user_data )
+{
+    services_discovery_t *p_sd = user_data;
+    services_discovery_AddItem( p_sd,
+            p_event->u.input_item_subitem_added.p_new_child,
+            NULL /* no category */ );
+}
+
+/*****************************************************************************
  * Run:
  *****************************************************************************/
 static void Run( services_discovery_t *p_sd )
 {
-    p_sd->p_sys->p_input->b_prefers_tree = VLC_TRUE;
-    services_discovery_AddItem( p_sd, p_sd->p_sys->p_input, NULL /* no category */ );
-
-    input_Read( p_sd, p_sd->p_sys->p_input, VLC_FALSE );
+    vlc_event_attach( &p_sd->p_sys->p_input->event_manager, vlc_InputItemSubItemAdded, ItemAdded, p_sd );
+    input_Read( p_sd, p_sd->p_sys->p_input, VLC_TRUE );
+    vlc_event_detach( &p_sd->p_sys->p_input->event_manager, vlc_InputItemSubItemAdded, ItemAdded, p_sd );
 }
 
 /*****************************************************************************
@@ -157,6 +171,5 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
-    services_discovery_RemoveItem( p_sd, p_sys->p_input );
     free( p_sys );
 }
