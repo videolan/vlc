@@ -50,6 +50,7 @@ description=
                       1 to enable).
     * autoalias: If autocompletion returns only one possibility, use it
                  (0 to disable, 1 to enable).
+    * flatplaylist: 0 to disable, 1 to enable.
 ]============================================================================]
 
 require("common")
@@ -63,7 +64,8 @@ env = { prompt = "> ";
         width = 70;
         autocompletion = 1;
         autoalias = 1;
-        welcome = "Remote control interface initialized. Type `help' for help."
+        welcome = "Remote control interface initialized. Type `help' for help.";
+        flatplaylist = 0;
       }
 
 --[[ Import custom environement variables from the command line config (if possible) ]]
@@ -163,6 +165,14 @@ function add(name,client,arg)
     f({{path=arg}})
 end
 
+function playlist_is_tree( client )
+    if client.env.flatplaylist == 0 then
+        return true
+    else
+        return false
+    end
+end
+
 function playlist(name,client,arg)
     function playlist0(item,prefix)
         local prefix = prefix or ""
@@ -187,17 +197,19 @@ function playlist(name,client,arg)
         end
     end
     local playlist
+    local tree = playlist_is_tree(client)
+    print("tree",tree)
     if name == "search" then
-        playlist = vlc.playlist.search(arg or "")
+        playlist = vlc.playlist.search(arg or "", tree)
     else
         if tonumber(arg) then
             print "number"
-            playlist = vlc.playlist.get(tonumber(arg))
+            playlist = vlc.playlist.get(tonumber(arg), tree)
         elseif arg then
             print "string"
-            playlist = vlc.playlist.get(arg)
+            playlist = vlc.playlist.get(arg, tree)
         else
-            playlist = vlc.playlist.get()
+            playlist = vlc.playlist.get(nil, tree)
         end
     end
     if name == "search" then
@@ -223,7 +235,8 @@ function playlist_sort(name,client,arg)
     if not arg then
         client:append("Valid sort keys are: id, title, artist, genre, random, duration, album.")
     else
-        vlc.playlist.sort(arg)
+        local tree = playlist_is_tree(client)
+        vlc.playlist.sort(arg,false,tree)
     end
 end
 
