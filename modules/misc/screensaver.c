@@ -132,8 +132,7 @@ static void Deactivate( vlc_object_t *p_this )
 /*****************************************************************************
  * Execute: Spawns a process using execv()
  *****************************************************************************/
-static void Execute( intf_thread_t *p_this, const char *psz_path,
-                                            const char *const *ppsz_args )
+static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
 {
     pid_t pid;
     switch( pid = fork() )
@@ -142,12 +141,13 @@ static void Execute( intf_thread_t *p_this, const char *psz_path,
             /* We don't want output */
             fclose( stdout );
             fclose( stderr );
-            execv( psz_path, (char *const *)ppsz_args );
+            execv( ppsz_args[0] , (char *const *)ppsz_args );
             /* If the file we want to execute doesn't exist we exit() */
             exit( -1 );
             break;
         case -1:    /* we're the error */
-            msg_Dbg( p_this, "Couldn't fork() while launching %s", psz_path );
+            msg_Dbg( p_this, "Couldn't fork() while launching %s",
+                     ppsz_args[0] );
             break;
         default:    /* we're the parent */
             /* Wait for the child to exit.
@@ -193,7 +193,7 @@ static void Run( intf_thread_t *p_intf )
                     /* http://www.jwz.org/xscreensaver/faq.html#dvd */
                     const char *const ppsz_xsargs[] = { "/bin/sh", "-c",
                             "xscreensaver-command -deactivate &", (char*)NULL };
-                    Execute( p_intf, "/bin/sh", ppsz_xsargs );
+                    Execute( p_intf, ppsz_xsargs );
 
                     /* If we have dbus support, let's communicate directly
                        with gnome-screensave else, run
@@ -203,7 +203,7 @@ static void Run( intf_thread_t *p_intf )
 #else
                     const char *const ppsz_gsargs[] = { "/bin/sh", "-c",
                             "gnome-screensaver-command --poke &", (char*)NULL };
-                    Execute( p_intf, "/bin/sh", ppsz_gsargs );
+                    Execute( p_intf, ppsz_gsargs );
 #endif
                     /* FIXME: add support for other screensavers */
                 }
