@@ -103,6 +103,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 static int HeaderRead( demux_t *p_demux );
 static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num );
 
+// Map flavour to bytes per second
+static int sipr_fl2bps[4] = {813, 1062, 625, 2000}; // 6.5, 8.5, 5, 16 kbit per second
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -482,7 +485,7 @@ static int Demux( demux_t *p_demux )
                             (int64_t)p_sys->i_pcr );
         }
 
-        if( tk->fmt.i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
+        if( tk->fmt.i_codec == VLC_FOURCC( 'm','p','4','a' ) )
         {
             int     i_sub = (p_sys->buffer[1] >> 4)&0x0f;
             uint8_t *p_sub = &p_sys->buffer[2+2*i_sub];
@@ -517,8 +520,7 @@ static int Demux( demux_t *p_demux )
             if( i_flags & 2 ) y = tk->i_subpacket = 0;
 
             if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
-                tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ) ||
-                tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r' ) )
+                tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ))
             for( i = 0; i < tk->i_frame_size / tk->i_subpacket_size; i++ )
             {
                 block_t *p_block = block_New( p_demux, tk->i_subpacket_size );
@@ -533,7 +535,8 @@ static int Demux( demux_t *p_demux )
                 tk->i_subpacket++;
             }
 
-            if( tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8' ) )
+            if( tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8' ) ||
+                tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r' ) )
             for( i = 0; i < tk->i_subpacket_h / 2; i++ )
             {
                 block_t *p_block = block_New( p_demux, tk->i_coded_frame_size);
@@ -1000,32 +1003,32 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             return VLC_EGENERIC;
         }
 
-        p_peek += 2; /* 00 00 */
-        p_peek += 4; /* .ra4 or .ra5 */
-        p_peek += 4; /* data size */
-        p_peek += 2; /* version (4 or 5) */
-        i_header_size = GetDWBE( p_peek ); p_peek += 4; /* header size */
-        i_flavor = GetWBE( p_peek ); p_peek += 2; /* codec flavor */
+        p_peek += 2;                                                /* 00 00 */
+        p_peek += 4;                                         /* .ra4 or .ra5 */
+        p_peek += 4;                                            /* data size */
+        p_peek += 2;                                     /* version (4 or 5) */
+        i_header_size = GetDWBE( p_peek ); p_peek += 4;       /* header size */
+        i_flavor = GetWBE( p_peek ); p_peek += 2;            /* codec flavor */
         i_coded_frame_size = GetDWBE( p_peek ); p_peek += 4; /* coded frame size*/
-        p_peek += 4; /* ?? */
-        p_peek += 4; /* ?? */
-        p_peek += 4; /* ?? */
-        i_subpacket_h = GetWBE( p_peek ); p_peek += 2; /* 1 */
-        i_frame_size = GetWBE( p_peek ); p_peek += 2; /* frame size */
-        i_subpacket_size = GetWBE( p_peek ); p_peek += 2; /* subpacket_size */
+        p_peek += 4;                                                   /* ?? */
+        p_peek += 4;                                                   /* ?? */
+        p_peek += 4;                                                   /* ?? */
+        i_subpacket_h = GetWBE( p_peek ); p_peek += 2;                  /* 1 */
+        i_frame_size = GetWBE( p_peek ); p_peek += 2;          /* frame size */
+        i_subpacket_size = GetWBE( p_peek ); p_peek += 2;  /* subpacket_size */
         p_peek += 2; /* ?? */
 
-        if( i_version == 5 ) p_peek += 6; /* 0, srate, 0 */
+        if( i_version == 5 ) p_peek += 6;                     /* 0, srate, 0 */
 
-        fmt.audio.i_rate = GetWBE( p_peek ); p_peek += 2; /* Sample Rate */
+        fmt.audio.i_rate = GetWBE( p_peek ); p_peek += 2;     /* Sample Rate */
         p_peek += 2; /* ?? */
-        fmt.audio.i_bitspersample = GetWBE( p_peek ); p_peek += 2; /* Sure?*/
-        fmt.audio.i_channels = GetWBE( p_peek ); p_peek += 2; /* Channels */
+        fmt.audio.i_bitspersample = GetWBE( p_peek ); p_peek += 2;   /* Sure?*/
+        fmt.audio.i_channels = GetWBE( p_peek ); p_peek += 2;    /* Channels */
         fmt.audio.i_blockalign = i_frame_size;
 
         if( i_version == 5 )
         {
-            p_peek += 4; /* genr */
+            p_peek += 4;                                            /* genr */
             memcpy( (char *)&fmt.i_codec, p_peek, 4 ); p_peek += 4;
         }
         else
@@ -1043,14 +1046,14 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         switch( fmt.i_codec )
         {
-        case VLC_FOURCC( 'd', 'n', 'e', 't' ):
-            fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+        case VLC_FOURCC( 'd','n','e','t' ):
+            fmt.i_codec = VLC_FOURCC( 'a','5','2',' ' );
             break;
 
-        case VLC_FOURCC( 'r', 'a', 'a', 'c' ):
-        case VLC_FOURCC( 'r', 'a', 'c', 'p' ):
+        case VLC_FOURCC( 'r','a','a','c' ):
+        case VLC_FOURCC( 'r','a','c','p' ):
             fmt.i_extra = GetDWBE( p_peek ); p_peek += 4;
-            //version 5 ? 
+            // For version == 4, there might need an extra p_peek++
             if( fmt.i_extra > 0 ) { fmt.i_extra--; p_peek++; }
             if( fmt.i_extra > 0 )
             {
@@ -1058,12 +1061,11 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 memcpy( fmt.p_extra, p_peek, fmt.i_extra );
             }
 
-            fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
+            fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
             break;
 
         case VLC_FOURCC('c','o','o','k'):
         case VLC_FOURCC('a','t','r','c'):
-//        case VLC_FOURCC('s','i','p','r'):
             fmt.audio.i_blockalign = i_subpacket_size;
             if( !(fmt.i_extra = GetDWBE( p_peek )) ) break;
             fmt.p_extra = malloc( fmt.i_extra );
@@ -1073,6 +1075,12 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         case VLC_FOURCC('2','8','_','8'):
             fmt.i_extra = 0;
             fmt.audio.i_blockalign = i_coded_frame_size;
+            break;
+
+        case VLC_FOURCC('s','i','p','r'):
+            fmt.i_extra = 0;
+            fmt.audio.i_blockalign = i_coded_frame_size;
+            fmt.audio.i_bitspersample = sipr_fl2bps[ i_flavor ];
             break;
 
         default:
