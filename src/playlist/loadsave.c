@@ -99,8 +99,11 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
     /* The media library input has one and only one option: "meta-file"
      * So we remove that unneeded option. */
-    free( p_item->ppsz_options[0] );
-    p_item->i_options = 0;
+    if( p_item->i_options == 1 )
+    {
+        free( p_item->ppsz_options[0] );
+        p_item->i_options = 0;
+    }
 
     playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
             VLC_FALSE, VLC_FALSE );

@@ -477,7 +477,6 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    input_ItemAddSubItem( p_input_item, p_new_input );
                     if( p_demux->p_sys->i_identifier <
                         p_demux->p_sys->i_tracklist_entries )
                     {
@@ -655,6 +654,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
     char *psz_application = NULL;
     int i_node;
     xml_elem_hnd_t *p_handler = NULL;
+    input_item_t *p_new_input = NULL;
 
     xml_elem_hnd_t pl_elements[] =
         { {"node",  COMPLEX_CONTENT, {.cmplx = parse_extension_node} },
@@ -691,14 +691,24 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
     }
 
     /* attribute title is mandatory except for <extension> */
-    if( !strcmp( psz_element, "node" ) && !psz_title )
+    if( !strcmp( psz_element, "node" ) )
     {
-        msg_Warn( p_demux, "<node> requires \"title\" attribute" );
-        return VLC_FALSE;
-    }
-    free( psz_title );
+        if( !psz_title )
+        {
+            msg_Warn( p_demux, "<node> requires \"title\" attribute" );
+            return VLC_FALSE;
+        }
 
-    if( !strcmp( psz_element, "extension" ) )
+        p_new_input = input_ItemNewWithType( p_playlist, "", psz_title,
+                                             0, NULL, -1, ITEM_TYPE_DIRECTORY );
+        if( p_new_input )
+        {
+            input_ItemAddSubItem( p_input_item, p_new_input );
+            p_input_item = p_new_input;
+        }
+        free( psz_title );
+    }
+    else if( !strcmp( psz_element, "extension" ) )
     {
         if( !psz_application )
         {
@@ -824,6 +834,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
  */
 static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
 {
+    input_item_t *p_new_input = NULL;
     char *psz_name = NULL;
     char *psz_value = NULL;
     int i_href = -1;
@@ -858,13 +869,17 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
         return VLC_FALSE;
     }
 
-    /* XXX: We can't check the validity of the 'href' attribute if we do parse
-            the extension before the TrackList
     if( i_href > p_demux->p_sys->i_tracklist_entries )
     {
         msg_Warn( p_demux, "invalid \"href\" attribute" );
         return VLC_FALSE;
-    }*/
+    }
+
+    p_new_input = p_demux->p_sys->pp_tracklist[ i_href ];
+    if( p_new_input )
+    {
+        input_ItemAddSubItem( p_input_item, p_new_input );
+    }
 
     /* fix for #1293 - XTAG sends ENDELEM for self closing tag */
     /* (libxml sends NONE) */
