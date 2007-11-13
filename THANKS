@@ -1,9 +1,4 @@
 $Id$
-VLC makes extensive use of the following persons' code:
-
-Aaron Holtzman <aholtzma at ess.engr.uvic.ca> - AC3 decoder, MPEG video decoder
-Michel Lespinasse <walken at zoy.org> - AC3 decoder, MPEG audio and video decoders
-
 
 The VideoLAN team would like to thank the following contributors:
 
@@ -216,4 +211,11 @@ Xavier Marchesini <xav at alarue.net> - Win32 fixes
 Xènia Albà Cantero <xenia_alba at hotmail.com> - Catalan translation
 Yves Duret <yves at zarb.org> - RPM packages
 Ye zhang <yzhang90003 _at_ gmail dot com> - Fix for VLM RTSP concurent LEAVE make VLC crash
+
+
+Some VLC plugins use external libraries and makes extensive use of the following persons' or companies' code:
+
+Fabrice Bellard & Co - FFmpeg
+Aaron Holtzman & Michel Lespinasse - liba52
+"Code from FAAD2 is copyright (c) Nero AG, www.nero.com"
 
