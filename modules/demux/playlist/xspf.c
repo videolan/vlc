@@ -858,11 +858,13 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
         return VLC_FALSE;
     }
 
+    /* XXX: We can't check the validity of the 'href' attribute if we do parse
+            the extension before the TrackList
     if( i_href > p_demux->p_sys->i_tracklist_entries )
     {
         msg_Warn( p_demux, "invalid \"href\" attribute" );
         return VLC_FALSE;
-    }
+    }*/
 
     /* fix for #1293 - XTAG sends ENDELEM for self closing tag */
     /* (libxml sends NONE) */
