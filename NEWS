@@ -42,8 +42,11 @@ Playlist:
     * "Live search"
     * Shoutcast TV listings
     * Audioscrobbler/last.fm support
+ * Album art support
  * User definable Lua playlist scripts. See share/luaplaylist/README.txt
    (Default scripts open YouTube, DailyMotion, metacafe and Google Video URLs)
+ * User definable Lua metadata and album art fetcher scripts. See
+   share/luameta/README.txt
 
 Input/Demuxers:
   * UDP-Lite transport for RTP/AVP
@@ -129,6 +132,7 @@ Interfaces:
  * All
    * Improved user interaction
    * Improved mouse gestures
+   * Experimental Lua interface modules. See vlc -I lua for more info
  * Unix
    * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 
