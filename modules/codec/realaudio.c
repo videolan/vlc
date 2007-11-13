@@ -84,7 +84,7 @@ struct decoder_sys_t
 
     /* Codec params */
     void *context;
-    int i_codec_flavor;
+    short int i_codec_flavor;
 
     void *dll;
     unsigned long (*raCloseCodec)(void*);
@@ -178,6 +178,8 @@ static int Open( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
     case VLC_FOURCC('c','o','o','k'):
+    case VLC_FOURCC('a','t','r','c'):
+    case VLC_FOURCC('s','i','p','r'):
         break;
 
     default:
@@ -206,6 +208,8 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_codec_flavor = 0;
         else
             p_sys->i_codec_flavor = 2;
+        msg_Dbg( p_dec, "Got sipr flavor %d from bitrate %d\n", 
+            p_sys->i_codec_flavor, p_dec->fmt_in.audio.i_bitspersample );
     }
 
     if( OpenDll( p_dec ) != VLC_SUCCESS )
@@ -258,6 +262,7 @@ static int OpenDll( decoder_t *p_dec )
     char *psz_dll;
     int i, i_result;
 
+    /** Find the good path for the dlls.**/
     char *ppsz_path[] =
     {
       ".",
@@ -286,27 +291,7 @@ static int OpenDll( decoder_t *p_dec )
 #ifdef WIN32
     char psz_win32_real_codecs[MAX_PATH + 1];
     char psz_win32_helix_codecs[MAX_PATH + 1];
-#endif
 
-    for( i = 0; ppsz_path[i]; i++ )
-    {
-        /* Old format */
-        asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
-                  (char *)&p_dec->fmt_in.i_codec );
-        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
-        free( psz_dll );
-        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
-
-        /* New format */
-        asprintf( &psz_dll, "%s/%4.4s.so", ppsz_path[i],
-                  (char *)&p_dec->fmt_in.i_codec );
-        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
-        free( psz_dll );
-        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
-
-    }
-
-#ifdef WIN32
     {
         HKEY h_key;
         DWORD i_type, i_data = MAX_PATH + 1, i_index = 1;
@@ -348,6 +333,30 @@ static int OpenDll( decoder_t *p_dec )
     }
 #endif
 
+
+    /** Try the native libraries first **/
+#ifndef WIN32
+    for( i = 0; ppsz_path[i]; i++ )
+    {
+        /* Old format */
+        asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec );
+        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+        free( psz_dll );
+        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+
+        /* New format */
+        asprintf( &psz_dll, "%s/%4.4s.so", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec );
+        i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+        free( psz_dll );
+        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+
+    }
+#endif
+
+    /** Or use the WIN32 dlls **/
+#if defined(LOADER) || defined(WIN32)
     for( i = 0; ppsz_path[i]; i++ )
     {
         /* New format */
@@ -364,6 +373,7 @@ static int OpenDll( decoder_t *p_dec )
         free( psz_dll );
         if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
     }
+#endif
 
     return VLC_EGENERIC;
 }
