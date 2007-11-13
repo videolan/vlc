@@ -643,6 +643,7 @@ function parse_playlist()
                     {
                         elt = elt.parentNode;
                         if( ! elt.parentNode ) break;
+                        pos = pos.parentNode;
                     }
                     if( ! elt.parentNode ) break;
                     elt = elt.parentNode.nextSibling;
