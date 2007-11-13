@@ -32,6 +32,7 @@
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_strings.h>
+#include <vlc_url.h>
 #include <vlc_charset.h>
 #include "xspf.h"
 
@@ -250,7 +251,7 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
     {
         int i;
         char *psz_temp;
-        psz_temp = convert_xml_special_chars( p_item->p_input->psz_name );
+        psz_temp = encode_URI_component( p_item->p_input->psz_name );
         fprintf( p_file, "\t\t<node title=\"%s\">\n",
                  *psz_temp ? psz_temp : "" );
         free( psz_temp );

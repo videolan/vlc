@@ -635,7 +635,7 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     }
     else if( !strcmp( psz_name, "image" ) )
     {
-        const char *psz_uri = decode_URI_duplicate( psz_value );
+        char *psz_uri = decode_URI_duplicate( psz_value );
         input_item_SetArtURL( p_input, psz_uri );
         free( psz_uri );
     }
@@ -676,7 +676,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         /* attribute: title */
         if( !strcmp( psz_name, "title" ) )
         {
-            psz_title = unescape_URI_duplicate( psz_value );
+            psz_title = decode_URI_duplicate( psz_value );
         }
         /* extension attribute: application */
         else if( !strcmp( psz_name, "application" ) )
@@ -698,9 +698,8 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return VLC_FALSE;
         }
-
-        p_new_input = input_ItemNewWithType( p_playlist, "", psz_title,
-                                             0, NULL, -1, ITEM_TYPE_DIRECTORY );
+        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "",
+                                psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
             input_ItemAddSubItem( p_input_item, p_new_input );
