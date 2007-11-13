@@ -2,7 +2,7 @@
  * functions.js: VLC media player web interface
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * $Id$
+ * $Id: functions.js 21264 2007-08-19 17:48:28Z dionoea $
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -394,6 +394,19 @@ function update_status()
 function update_playlist()
 {
     loadXMLDoc( 'requests/playlist.xml', parse_playlist );
+}
+function update_playlist_search(key)
+{
+    loadXMLDoc( 'requests/playlist.xml?search='+encodeURIComponent(key), parse_playlist )
+}
+function reset_search()
+{
+    var search = document.getElementById('search')
+    if( search )
+    {
+        search.value = '<search>'
+        update_playlist_search('')
+    }
 }
 
 /**********************************************************************

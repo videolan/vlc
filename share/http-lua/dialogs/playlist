@@ -88,6 +88,15 @@ This dialog needs the following dialogs to be fully functional: <none>
           ?>
           </div>
         </td>
+	<td style='width: 30px'></td>
+        <td>
+          <span class="btn_text">Live search:</span>
+          <input title="Live search" type="text" value="<?vlc if _G.search_key then print(search_key) else print('<search>') end ?>" id="search" onfocus="if( this.value == '<search>' ) this.value = ''" onblur="if( this.value == '' ) reset_search()" onchange="update_playlist_search(this.value)" onkeyup="update_playlist_search(this.value)" />
+          <button id="btn_search_reset" onclick="reset_search()" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Reset search">
+            <img src="images/reset.png" alt="Reset" />
+            <span class="btn_text">Reset</span>
+          </button>
+        </td>
       </tr>
     </table>
   </div>

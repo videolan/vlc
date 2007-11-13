@@ -28,6 +28,7 @@ vim:syntax=lua
 <?vlc
 --[[<node id="0" name="Undefined" ro="ro">]]
 function print_playlist(item)
+  if item.flags.disabled then return end
   if item.children then
     local name = vlc.convert_xml_special_chars(item.name)
     print("<node id=\""..tostring(item.id).."\" name=\""..name.."\" ro=\""..(item.flags.ro and "ro" or "rw").."\">")
@@ -56,7 +57,18 @@ for cat,pl in pairs(p) do
   print("</node>")
 end
 --]]
-local p = vlc.playlist.get()
+local p
+if _GET["search"] then
+  if _GET["search"] ~= "" then
+    _G.search_key = _GET["search"]
+  else
+    _G.search_key = nil
+  end
+  local key = vlc.decode_uri(_GET["search"])
+  p = vlc.playlist.search(key)
+else
+  p = vlc.playlist.get()
+end
 -- a(p) Uncomment to debug
 print_playlist(p)
 ?>
