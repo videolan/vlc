@@ -42,8 +42,8 @@ static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t *
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
 static vlc_bool_t osd_isVisible( osd_menu_t *p_osd );
-static int  osd_ParserLoad( vlc_object_t *, const char *, osd_menu_t ** );
-static void osd_ParserUnload( vlc_object_t *, osd_menu_t ** );
+static osd_menu_t *osd_ParserLoad( vlc_object_t *, const char * );
+static void osd_ParserUnload( vlc_object_t *, osd_menu_t * );
 
 static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 {
@@ -91,7 +91,7 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
                                         psz_type, VLC_TRUE );
         if( !p_menu->p_parser )
         {
-            osd_ParserUnload( p_this, pp_menu );
+            osd_ParserUnload( p_this, p_menu );
             return NULL;
         }
     }
@@ -207,7 +207,7 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     var_Destroy( p_osd, "osd-menu-visible" );
     var_Destroy( p_osd, "osd-menu-update" );
 
-    osd_ParserUnload( p_this, &p_osd );
+    osd_ParserUnload( p_this, p_osd );
 
     vlc_mutex_unlock( lockval.p_address );
 }
