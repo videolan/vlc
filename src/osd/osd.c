@@ -29,6 +29,7 @@
 #include <vlc_keys.h>
 #include <vlc_osd.h>
 #include "libvlc.h"
+#include <vlc_image.h>
 
 #undef OSD_MENU_DEBUG
 
@@ -77,6 +78,12 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
             return NULL;
         }
 
+        /* Stuff needed for Parser */
+        p_osd->p_image = image_HandlerCreate( p_this );
+        if( !p_osd->p_image )
+            msg_Err( p_this, "unable to load images" );
+        p_osd->psz_file = strdup( psz_file );
+
         /* Parse configuration file */
         if( osd_ConfigLoader( p_this, psz_file, &p_osd ) )
             goto error;
@@ -116,6 +123,13 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
 
 error:
     msg_Err( p_this, "creating OSD menu object failed" );
+
+    if( p_osd->p_image )
+        image_HandlerDelete( p_osd->p_image );
+    if( p_osd->psz_file )
+        free( p_osd->psz_file );
+
+    vlc_mutex_unlock( lockval.p_address );
     vlc_object_destroy( p_osd );
     vlc_mutex_unlock( lockval.p_address );
     return NULL;
@@ -141,6 +155,12 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     var_Destroy( p_osd, "osd-menu-update" );
 
     osd_ConfigUnload( p_this, &p_osd );
+
+    if( p_osd->p_image )
+        image_HandlerDelete( p_osd->p_image );
+    if( p_osd->psz_file )
+        free( p_osd->psz_file );
+
     vlc_object_detach( p_osd );
     vlc_object_destroy( p_osd );
     p_osd = NULL;

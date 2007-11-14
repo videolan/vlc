@@ -123,6 +123,9 @@ extern "C" {
    #define SUBCAT_PLAYLIST_SD 702
    #define SUBCAT_PLAYLIST_EXPORT 703
 
+#define CAT_OSD 8
+   #define SUBCAT_OSD_IMPORT 801
+
 struct config_category_t
 {
     int         i_id;
