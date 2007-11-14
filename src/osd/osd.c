@@ -66,7 +66,8 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
         msg_Err( p_this, "out of memory" );
         return NULL;
     }
-    vlc_object_attach( p_this, p_menu );
+    vlc_object_yield( p_menu );
+    vlc_object_attach( p_menu, p_this->p_libvlc );
 
     /* Stuff needed for Parser */
     p_menu->psz_file = strdup( psz_file );
@@ -155,9 +156,6 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         /* Initialize OSD state */
         osd_UpdateState( p_osd->p_state, p_osd->i_x, p_osd->i_y,
                          p_osd->i_width, p_osd->i_height, NULL );
-
-        vlc_object_yield( p_osd );
-        vlc_object_attach( p_osd, p_this->p_libvlc );
 
         /* Signal when an update of OSD menu is needed */
         var_Create( p_osd, "osd-menu-update", VLC_VAR_BOOL );
