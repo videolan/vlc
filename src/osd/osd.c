@@ -28,8 +28,9 @@
 #include <vlc/vlc.h>
 #include <vlc_keys.h>
 #include <vlc_osd.h>
-#include "libvlc.h"
 #include <vlc_image.h>
+
+#include "libvlc.h"
 
 #undef OSD_MENU_DEBUG
 
@@ -55,18 +56,15 @@ static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 /*****************************************************************************
  * Wrappers for loading and unloading osd parser modules.
  *****************************************************************************/
-static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file,
-                           osd_menu_t **pp_menu )
+static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
 {
-    osd_menu_t *p_menu = *pp_menu;
-
-    if( pp_menu && p_menu ) return VLC_EGENERIC;
+    osd_menu_t *p_menu;
 
     p_menu = vlc_object_create( p_this, VLC_OBJECT_OSDMENU );
     if( !p_menu )
     {
         msg_Err( p_this, "out of memory" );
-        return VLC_ENOMEM;
+        return NULL;
     }
     vlc_object_attach( p_this, p_menu );
 
@@ -76,8 +74,8 @@ static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file,
     if( !p_menu->p_image || !p_menu->psz_file )
     {
         msg_Err( p_this, "unable to load images, aborting .." );
-        osd_ParserUnload( p_this, pp_menu );
-        return VLC_ENOMEM;
+        osd_ParserUnload( p_this, p_menu );
+        return NULL;
     }
     else
     {
@@ -94,16 +92,14 @@ static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file,
         if( !p_menu->p_parser )
         {
             osd_ParserUnload( p_this, pp_menu );
-            return VLC_ENOOBJ;
+            return NULL;
         }
     }
-    return VLC_SUCCESS;
+    return p_menu;
 }
 
-static void osd_ParserUnload( vlc_object_t *p_this, osd_menu_t **pp_menu )
+static void osd_ParserUnload( vlc_object_t *p_this, osd_menu_t *p_menu )
 {
-    osd_menu_t *p_menu = (osd_menu_t *) *pp_menu;
-
     if( p_menu->p_parser )
     {
         module_Unneed( p_menu, p_menu->p_parser );
@@ -141,7 +137,8 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         vlc_value_t val;
 
         /* Parse configuration file */
-        if( osd_ParserLoad( p_this, psz_file, &p_osd ) )
+        p_osd = osd_ParserLoad( p_this, psz_file );
+        if( !p_osd )
             goto error;
 
         /* Setup default button (first button) */
