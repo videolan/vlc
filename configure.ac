@@ -93,9 +93,9 @@ AC_ARG_WITH(contrib,
     OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
     OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
     if test $build = $host -o "$PKG_CONFIG_LIBDIR"; then
-    	export PKG_CONFIG_PATH=${topdir}/extras/contrib/lib/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=${topdir}/extras/contrib/lib/pkgconfig:$PKG_CONFIG_PATH
     else
-    	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
+        export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
     fi
     LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
@@ -3052,7 +3052,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    ],[
         unset PKG_CONFIG_PATH
    ])
-   AS_IF([test -n "${PKG_CONFIG_LIBDIR_save}"],[   
+   AS_IF([test -n "${PKG_CONFIG_LIBDIR_save}"],[
         export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR_save}"
    ],[
         unset PKG_CONFIG_LIBDIR
@@ -3763,7 +3763,7 @@ AC_CHECK_HEADERS(png.h, [
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LIBS([png],[-lpng -lz])
     VLC_ADD_PLUGINS([png])
-    VLC_ADD_PLUGINS([osdmenu])
+    VLC_ADD_PLUGINS([osdmenu osd_parser])
     AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])],
     [],[-lz])
   LDFLAGS="${LDFLAGS_save}"
@@ -6194,6 +6194,7 @@ AC_CONFIG_FILES([
   modules/misc/notify/Makefile
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
+  modules/misc/osd/Makefile
   modules/misc/xml/Makefile
   modules/misc/probe/Makefile
   modules/mux/Makefile
