@@ -118,7 +118,6 @@ vlc_module_begin();
     add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
         OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,
         OSD_UPDATE_LONGTEXT, VLC_TRUE );
-
     add_integer_with_range( OSD_CFG "alpha", 255, 0, 255, NULL,
         OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, VLC_TRUE );
 
@@ -156,6 +155,7 @@ struct filter_sys_t
     int          i_alpha;       /* alpha transparency value */
 
     char        *psz_file;      /* OSD Menu configuration file */
+    char        *psz_path;      /* Path to OSD Menu pictures */
     osd_menu_t  *p_menu;        /* pointer to OSD Menu object */
 };
 
@@ -166,7 +166,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = NULL;
-    vlc_value_t val;
 
     p_filter->p_sys = p_sys = (filter_sys_t *) malloc( sizeof(filter_sys_t) );
     if( !p_filter->p_sys )
@@ -177,12 +176,10 @@ static int CreateFilter ( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof(filter_sys_t) );
 
     /* Populating struct */
-    p_filter->p_sys->p_menu = NULL;
-    p_filter->p_sys->psz_file = NULL;
-
-    p_filter->p_sys->psz_file = config_GetPsz( p_filter, OSD_CFG "file" );
-    if( (p_filter->p_sys->psz_file == NULL) ||
-        (*p_filter->p_sys->psz_file == '\0') )
+    p_sys->psz_path = var_CreateGetString( p_this, OSD_CFG "file-path" );
+    p_sys->psz_file = var_CreateGetString( p_this, OSD_CFG "file" );
+    if( (p_sys->psz_file == NULL) ||
+        (*p_sys->psz_file == '\0') )
     {
         msg_Err( p_filter, "unable to get filename" );
         goto error;
@@ -194,14 +191,10 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, OSD_CFG "alpha" );
 
     /* in micro seconds - divide by 2 to match user expectations */
-    var_Create( p_this, OSD_CFG "timeout",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Get( p_this, OSD_CFG "timeout", &val );
-    p_sys->i_timeout = (mtime_t)(val.i_int * 1000000) >> 2;
-    var_Create( p_this, OSD_CFG "update",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Get( p_this, OSD_CFG "update", &val );
-    p_sys->i_update = (mtime_t)(val.i_int * 1000); /* in micro seconds */
+    p_sys->i_timeout = var_CreateGetIntegerCommand( p_this, OSD_CFG "timeout" );
+    p_sys->i_timeout = (mtime_t)(p_sys->i_timeout * 1000000) >> 2;
+    p_sys->i_update  = var_CreateGetIntegerCommand( p_this, OSD_CFG "update" );
+    p_sys->i_update = (mtime_t)(p_sys->i_update * 1000); /* in micro seconds */
 
     var_AddCallback( p_filter, OSD_CFG "position", OSDMenuCallback, p_sys );
     var_AddCallback( p_filter, OSD_CFG "timeout", OSDMenuCallback, p_sys );
@@ -253,18 +246,15 @@ static int CreateFilter ( vlc_object_t *p_this )
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
     p_filter->fmt_out.i_priority = 0;
 
-    msg_Dbg( p_filter, "successfully loaded osdmenu filter" );
     return VLC_SUCCESS;
 
 error:
     msg_Err( p_filter, "osdmenu filter discarded" );
-    if( p_filter->p_sys->p_menu )
-    {
-        osd_MenuDelete( p_this, p_filter->p_sys->p_menu );
-        p_filter->p_sys->p_menu = NULL;
-    }
-    if( p_filter->p_sys->psz_file ) free( p_filter->p_sys->psz_file );
-    if( p_filter->p_sys ) free( p_filter->p_sys );
+
+    osd_MenuDelete( p_this, p_sys->p_menu );
+    p_sys->p_menu = NULL;
+    if( p_sys->psz_file ) free( p_sys->psz_file );
+    if( p_sys ) free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -286,6 +276,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_DelCallback( p_sys->p_menu, "osd-menu-visible",
                      OSDMenuVisibleEvent, p_filter );
 
+    var_Destroy( p_this, OSD_CFG "file-path" );
     var_Destroy( p_this, OSD_CFG "file" );
     var_Destroy( p_this, OSD_CFG "x" );
     var_Destroy( p_this, OSD_CFG "y" );
@@ -298,8 +289,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     if( p_sys->psz_file ) free( p_sys->psz_file );
     if( p_sys ) free( p_sys );
-
-    msg_Dbg( p_filter, "osdmenu filter destroyed" );
 }
 
 /*****************************************************************************
