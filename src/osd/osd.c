@@ -55,7 +55,8 @@ static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 /*****************************************************************************
  * Wrappers for loading and unloading osd parser modules.
  *****************************************************************************/
-static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file, osd_menu_t **pp_menu )
+static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file,
+                           osd_menu_t **pp_menu )
 {
     osd_menu_t *p_menu = *pp_menu;
 
@@ -88,7 +89,8 @@ static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file, osd_menu_
         else
             psz_type = "import-osd-xml";
 
-        p_menu->p_parser = module_Need( p_menu, "osd parser", psz_type, VLC_TRUE );
+        p_menu->p_parser = module_Need( p_menu, "osd parser",
+                                        psz_type, VLC_TRUE );
         if( !p_menu->p_parser )
         {
             osd_ParserUnload( p_this, pp_menu );
