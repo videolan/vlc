@@ -163,7 +163,6 @@ src/network/tcp.c
 src/network/tls.c
 src/network/udp.c
 src/osd/osd.c
-src/osd/osd_parser.c
 src/osd/osd_text.c
 src/osd/osd_widgets.c
 src/playlist/control.c
@@ -600,7 +599,6 @@ modules/gui/minimal_macosx/voutagl.m
 modules/gui/minimal_macosx/voutgl.h
 modules/gui/minimal_macosx/voutgl.m
 modules/gui/ncurses.c
-modules/gui/opie/opie.ui
 modules/gui/pda/pda.c
 modules/gui/pda/pda_callbacks.c
 modules/gui/pda/pda_callbacks.h
@@ -1015,13 +1013,16 @@ modules/misc/gnutls.c
 modules/misc/gtk_main.c
 modules/misc/inhibit.c
 modules/misc/logger.c
+modules/misc/lua/acl.c
 modules/misc/lua/callbacks.c
 modules/misc/lua/configuration.c
+modules/misc/lua/httpd.c
 modules/misc/lua/intf.c
 modules/misc/lua/meta.c
 modules/misc/lua/net.c
 modules/misc/lua/objects.c
 modules/misc/lua/playlist.c
+modules/misc/lua/sd.c
 modules/misc/lua/variables.c
 modules/misc/lua/vlc.c
 modules/misc/lua/vlc.h
@@ -1034,6 +1035,11 @@ modules/misc/notify/msn.c
 modules/misc/notify/notify.c
 modules/misc/notify/telepathy.c
 modules/misc/notify/xosd.c
+modules/misc/osd/osd_menu.c
+modules/misc/osd/osd_menu.h
+modules/misc/osd/parser.c
+modules/misc/osd/simple.c
+modules/misc/osd/xml.c
 modules/misc/playlist/export.c
 modules/misc/playlist/m3u.c
 modules/misc/playlist/old.c

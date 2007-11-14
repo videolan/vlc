@@ -1077,7 +1077,9 @@ update-po:
 	  echo "# modules" ; \
 	  find modules -name '*.[chm]' -o -name '*.[ch]pp' -o -name '*.ui' \
 	    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
-	    | grep -vE 'qt4/ui/.*.h' |grep -v 'qt4/resources.cpp\|qt4/dialogs/about.hpp' \
+	    | grep -vE 'qt4/ui/.*.h' \
+	    | grep -v 'qt4/resources.cpp\|qt4/dialogs/about.hpp' \
+	    | grep -v 'gui/opie' \
 	    | sort ; \
 	} > $(top_srcdir)/po/POTFILES.in
 	rm -f $(top_srcdir)/po/vlc.pot
