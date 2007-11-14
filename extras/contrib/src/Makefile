@@ -1753,9 +1753,6 @@ libgpg-error-$(GPGERROR_VERSION).tar.bz2:
 
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_WIN32
-	patch -p0 < Patches/libgpg-error-win32.patch
-endif
 
 .gpg-error: libgpg-error
 ifdef HAVE_DARWIN_OS_ON_INTEL
