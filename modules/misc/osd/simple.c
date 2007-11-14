@@ -34,12 +34,16 @@
 #include <vlc_osd.h>
 #include <vlc_charset.h>
 
+#include "osd_menu.h"
+
+int osd_parser_simpleOpen( vlc_object_t *p_this );
+
 /*****************************************************************************
- * osd_ConfigLoader: Load and parse osd text configurationfile
+ * Simple parser open function
  *****************************************************************************/
-int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
+int osd_parser_simpleOpen( vlc_object_t *p_this )
 {
-    osd_menu_t     *p_menu = (osd_menu_t *) p_this->p_menu;
+    osd_menu_t     *p_menu = (osd_menu_t *) p_this;
     osd_button_t   *p_current = NULL; /* button currently processed */
     osd_button_t   *p_prev = NULL;    /* previous processed button */
 
@@ -47,11 +51,14 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
     FILE       *fd = NULL;
     int        result = 0;
 
+    if( !p_menu ) return VLC_ENOOBJ;
+
     msg_Dbg( p_this, "opening osdmenu definition file %s", p_menu->psz_file );
     fd = utf8_fopen( p_menu->psz_file, "r" );
     if( !fd )
     {
-        msg_Err( p_this, "failed to open osdmenu definition file %s", p_menu->psz_file );
+        msg_Err( p_this, "failed to open osdmenu definition file %s",
+                p_menu->psz_file );
         return VLC_EGENERIC;
     }
 
@@ -96,9 +103,9 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
         msg_Dbg( p_this, "osdmenu dir %s", &path[0] );
 
         if( i_len == 0 )
-            *p_menu = osd_MenuNew( *p_menu, NULL, 0, 0 );
+            p_menu = osd_MenuNew( p_menu, NULL, 0, 0 );
         else
-            *p_menu = osd_MenuNew( *p_menu, &path[0], 0, 0 );
+            p_menu = osd_MenuNew( p_menu, &path[0], 0, 0 );
 
         /* Peek for 'style' argument */
         pos = ftell( fd );
@@ -114,11 +121,11 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
         {
             if( strncmp( &action[0], "default", 7) == 0 )
             {
-                (*p_menu)->i_style = OSD_MENU_STYLE_SIMPLE;
+                p_menu->i_style = OSD_MENU_STYLE_SIMPLE;
             }
             else if( strncmp( &action[0], "concat", 6) == 0 )
             {
-                (*p_menu)->i_style = OSD_MENU_STYLE_CONCAT;
+                p_menu->i_style = OSD_MENU_STYLE_CONCAT;
             }
         }
         else
@@ -129,7 +136,7 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
         }
     }
 
-    if( !*p_menu )
+    if( !p_menu )
         goto error;
 
     /* read successive lines */
@@ -161,7 +168,7 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
         if( p_prev )
             p_prev->p_next = p_current;
         else
-            (*p_menu)->p_button = p_current;
+            p_menu->p_button = p_current;
         p_current->p_prev = p_prev;
 
         /* parse all states */
@@ -197,7 +204,7 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                 {
                     if( strncmp( &type[0], "volume", 6 ) == 0 )
                     {
-                        (*p_menu)->p_state->p_volume = p_up;
+                        p_menu->p_state->p_volume = p_up;
                         msg_Dbg( p_this, " + type=%s", &type[0] );
                     }
                 }
@@ -223,7 +230,7 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                         goto error;
 
                     msg_Dbg( p_this, " + (menu up) hotkey down %s, file=%s%s",
-                             &action[0], (*p_menu)->psz_path, &file[0] );
+                             &action[0], p_menu->psz_path, &file[0] );
 
                     if( p_up->psz_action_down ) free( p_up->psz_action_down );
                     p_up->psz_action_down = strdup( &action[0] );
@@ -245,19 +252,19 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
 
                         p_range_prev = p_range_current;
 
-                        if( (*p_menu)->psz_path )
+                        if( p_menu->psz_path )
                         {
-                            size_t i_path_size = strlen( (*p_menu)->psz_path );
+                            size_t i_path_size = strlen( p_menu->psz_path );
                             size_t i_file_size = strlen( &file[0] );
 
-                            strncpy( &path[0], (*p_menu)->psz_path, i_path_size );
+                            strncpy( &path[0], p_menu->psz_path, i_path_size );
                             strncpy( &path[i_path_size], &file[0], 512 - (i_path_size + i_file_size) );
                             path[ i_path_size + i_file_size ] = '\0';
 
-                            p_range_current = osd_StateNew( p_this, &path[0], "pressed" );
+                            p_range_current = osd_StateNew( p_menu, &path[0], "pressed" );
                         }
                         else /* absolute paths are used. */
-                            p_range_current = osd_StateNew( p_this, &file[0], "pressed" );
+                            p_range_current = osd_StateNew( p_menu, &file[0], "pressed" );
 
                         if( !p_range_current || !p_range_current->p_pic )
                             goto error;
@@ -272,8 +279,8 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                         p_range_current->p_prev = p_range_prev;
 
                         msg_Dbg( p_this, "  |- range=%d, file=%s%s",
-                                p_up->i_ranges,
-                                (*p_menu)->psz_path, &file[0] );
+                                 p_up->i_ranges,
+                                 p_menu->psz_path, &file[0] );
                     }
                     if( i_index > 0 )
                     {
@@ -319,8 +326,10 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                 if( result == 0 )
                     goto error;
 
-                msg_Dbg( p_this, " + hotkey down %s, file=%s%s", &action[0], (*p_menu)->psz_path, &file[0] );
-                if( p_current->psz_action_down ) free( p_current->psz_action_down );
+                msg_Dbg( p_this, " + hotkey down %s, file=%s%s", 
+                         &action[0], p_menu->psz_path, &file[0] );
+                if( p_current->psz_action_down ) 
+                    free( p_current->psz_action_down );
                 p_current->psz_action_down = strdup( &action[0] );
 
                 /* Parse range contstruction :
@@ -340,19 +349,19 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
 
                     p_range_prev = p_range_current;
 
-                    if( (*p_menu)->psz_path )
+                    if( p_menu->psz_path )
                     {
-                        size_t i_path_size = strlen( (*p_menu)->psz_path );
+                        size_t i_path_size = strlen( p_menu->psz_path );
                         size_t i_file_size = strlen( &file[0] );
 
-                        strncpy( &path[0], (*p_menu)->psz_path, i_path_size );
+                        strncpy( &path[0], p_menu->psz_path, i_path_size );
                         strncpy( &path[i_path_size], &file[0], 512 - (i_path_size + i_file_size) );
                         path[ i_path_size + i_file_size ] = '\0';
 
-                        p_range_current = osd_StateNew( p_this, &path[0], "pressed" );
+                        p_range_current = osd_StateNew( p_menu, &path[0], "pressed" );
                     }
                     else /* absolute paths are used. */
-                        p_range_current = osd_StateNew( p_this, &file[0], "pressed" );
+                        p_range_current = osd_StateNew( p_menu, &file[0], "pressed" );
 
                     if( !p_range_current || !p_range_current->p_pic )
                         goto error;
@@ -367,8 +376,8 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                     p_range_current->p_prev = p_range_prev;
 
                     msg_Dbg( p_this, "  |- range=%d, file=%s%s",
-                            p_current->i_ranges,
-                            (*p_menu)->psz_path, &file[0] );
+                             p_current->i_ranges,
+                             p_menu->psz_path, &file[0] );
                 }
                 if( i_index > 0 )
                 {
@@ -407,19 +416,19 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                 goto error;
             }
 
-            if( (*p_menu)->psz_path )
+            if( p_menu->psz_path )
             {
-                size_t i_path_size = strlen( (*p_menu)->psz_path );
+                size_t i_path_size = strlen( p_menu->psz_path );
                 size_t i_file_size = strlen( &file[0] );
 
-                strncpy( &path[0], (*p_menu)->psz_path, i_path_size );
+                strncpy( &path[0], p_menu->psz_path, i_path_size );
                 strncpy( &path[i_path_size], &file[0], 512 - (i_path_size + i_file_size) );
                 path[ i_path_size + i_file_size ] = '\0';
 
-                p_state_current = osd_StateNew( p_this, &path[0], &state[0] );
+                p_state_current = osd_StateNew( p_menu, &path[0], &state[0] );
             }
             else /* absolute paths are used. */
-                p_state_current = osd_StateNew( p_this, &file[0], &state[0] );
+                p_state_current = osd_StateNew( p_menu, &file[0], &state[0] );
 
             if( !p_state_current || !p_state_current->p_pic )
                 goto error;
@@ -430,7 +439,8 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
                 p_current->p_states = p_state_current;
             p_state_current->p_prev = p_state_prev;
 
-            msg_Dbg( p_this, " |- state=%s, file=%s%s", &state[0], (*p_menu)->psz_path, &file[0] );
+            msg_Dbg( p_this, " |- state=%s, file=%s%s", &state[0],
+                     p_menu->psz_path, &file[0] );
         }
         p_current->p_current_state = p_current->p_states;
     }
@@ -438,21 +448,21 @@ int E_(osd_parser_simpleOpen) ( vlc_object_t *p_this )
     /* Find the last button and store its pointer.
      * The OSD menu behaves like a roundrobin list.
      */
-    p_current = (*p_menu)->p_button;
+    p_current = p_menu->p_button;
     while( p_current && p_current->p_next )
     {
         osd_button_t *p_temp = NULL;
         p_temp = p_current->p_next;
         p_current = p_temp;
     }
-    (*p_menu)->p_last_button = p_current;
+    p_menu->p_last_button = p_current;
     fclose( fd );
     return VLC_SUCCESS;
 
 #undef MAX_FILE_PATH
 error:
-    msg_Err( p_this, "parsing file failed (returned %d)", result );
-    osd_MenuFree( p_this, *p_menu );
+    msg_Err( p_menu, "parsing file failed (returned %d)", result );
+    osd_MenuFree( p_menu );
     fclose( fd );
     return VLC_EGENERIC;
 }

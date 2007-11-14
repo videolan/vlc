@@ -88,6 +88,7 @@ static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )
     else
         return VLC_EGENERIC;
 }
+
 static inline int spu_Control( spu_t *p_spu, int i_query, ... )
 {
     va_list args;
@@ -270,8 +271,6 @@ struct text_style_t
 static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE_OUTLINE,
                 0x000000, 0xff, 0x000000, 0xff, 0xffffff, 0x80, 0xffffff, 0xff, 1, 0, -1 };
 
-
-
 /**
  * OSD menu button states
  *
@@ -285,6 +284,8 @@ static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE
 #define OSD_BUTTON_UNSELECT 0
 #define OSD_BUTTON_SELECT   1
 #define OSD_BUTTON_PRESSED  2
+
+static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
 
 /**
  * OSD State object

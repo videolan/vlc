@@ -29,11 +29,11 @@
  */
 osd_menu_t   *osd_MenuNew( osd_menu_t *, const char *, int, int );
 osd_button_t *osd_ButtonNew( const char *, int, int );
-osd_state_t  *osd_StateNew( vlc_object_t *, const char *, const char * );
+osd_state_t  *osd_StateNew( osd_menu_t *, const char *, const char * );
 
-void osd_MenuFree  ( vlc_object_t *, osd_menu_t * );
-void osd_ButtonFree( vlc_object_t *, osd_button_t * );
-void osd_StatesFree( vlc_object_t *, osd_state_t * );
+void osd_MenuFree  ( osd_menu_t * );
+void osd_ButtonFree( osd_menu_t *, osd_button_t * );
+void osd_StatesFree( osd_menu_t *, osd_state_t * );
 
 #endif
 

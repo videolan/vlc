@@ -1,5 +1,5 @@
 /*****************************************************************************
- * parser.c :  OSD import module
+ * parser.c : OSD import module
  *****************************************************************************
  * Copyright (C) 2007 M2X
  * $Id: $
@@ -41,12 +41,12 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
 
 /*****************************************************************************
  * Create a new Menu structure
  *****************************************************************************/
-osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path, int i_x, int i_y )
+osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path,
+                         int i_x, int i_y )
 {
     if( !p_menu ) return NULL;
 
@@ -62,6 +62,7 @@ osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path, int i_x, int 
         p_menu->psz_path = strdup( psz_path );
     else
         p_menu->psz_path = NULL;
+
     p_menu->i_x = i_x;
     p_menu->i_y = i_y;
     p_menu->i_style = OSD_MENU_STYLE_SIMPLE;
@@ -72,15 +73,17 @@ osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path, int i_x, int 
 /*****************************************************************************
  * Free the menu
  *****************************************************************************/
-void osd_MenuFree( vlc_object_t *p_this, osd_menu_t *p_menu )
+void osd_MenuFree( osd_menu_t *p_menu )
 {
-    msg_Dbg( p_this, "freeing menu" );
-    osd_ButtonFree( p_this, p_menu->p_button );
+    msg_Dbg( p_menu, "freeing menu" );
+    osd_ButtonFree( p_menu, p_menu->p_button );
+
+    if( p_menu->psz_path ) free( p_menu->psz_path );
+    if( p_menu->p_state ) free( p_menu->p_state );
+
     p_menu->p_button = NULL;
     p_menu->p_last_button = NULL;
-    if( p_menu->psz_path ) free( p_menu->psz_path );
     p_menu->psz_path = NULL;
-    if( p_menu->p_state ) free( p_menu->p_state );
     p_menu->p_state = NULL;
 }
 
@@ -107,7 +110,7 @@ osd_button_t *osd_ButtonNew( const char *psz_action, int i_x, int i_y )
 /*****************************************************************************
  * Free a button
  *****************************************************************************/
-void osd_ButtonFree( vlc_object_t *p_this, osd_button_t *p_button )
+void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
 {
     osd_button_t *p_current = p_button;
     osd_button_t *p_next = NULL;
@@ -122,7 +125,8 @@ void osd_ButtonFree( vlc_object_t *p_this, osd_button_t *p_button )
     /* Then free end first and walk to the start. */
     while( p_current->p_prev )
     {
-        msg_Dbg( p_this, "+ freeing button %s [%p]", p_current->psz_action, p_current );
+        msg_Dbg( p_menu, "+ freeing button %s [%p]",
+                 p_current->psz_action, p_current );
         p_prev = p_current->p_prev;
         p_current = p_prev;
         if( p_current->p_next )
@@ -138,16 +142,13 @@ void osd_ButtonFree( vlc_object_t *p_this, osd_button_t *p_button )
             if( p_current->p_feedback )
                 free( p_current->p_feedback );
 
-            p_current->p_next->psz_action_down = NULL;
-            p_current->p_next->psz_action = NULL;
-            p_current->p_next->psz_name = NULL;
             p_current->p_feedback = NULL;
 
             /* Free all states first */
             if( p_current->p_next->p_states )
-                osd_StatesFree( p_this, p_current->p_next->p_states );
-            p_current->p_next->p_states = NULL;
-            if( p_current->p_next) free( p_current->p_next );
+                osd_StatesFree( p_menu, p_current->p_next->p_states );
+
+            free( p_current->p_next );
             p_current->p_next = NULL;
         }
 
@@ -164,23 +165,20 @@ void osd_ButtonFree( vlc_object_t *p_this, osd_button_t *p_button )
             if( p_current->p_feedback )
                 free( p_current->p_feedback );
 
-            p_current->p_up->psz_action_down = NULL;
-            p_current->p_up->psz_action = NULL;
-            p_current->p_up->psz_name = NULL;
             p_current->p_feedback = NULL;
 
             /* Free all states first */
             if( p_current->p_up->p_states )
-                osd_StatesFree( p_this, p_current->p_up->p_states );
-            p_current->p_up->p_states = NULL;
-            if( p_current->p_up ) free( p_current->p_up );
+                osd_StatesFree( p_menu, p_current->p_up->p_states );
+            free( p_current->p_up );
             p_current->p_up = NULL;
         }
     }
     /* Free the last one. */
     if( p_button )
     {
-        msg_Dbg( p_this, "+ freeing button %s [%p]", p_button->psz_action, p_button );
+        msg_Dbg( p_menu, "+ freeing button %s [%p]",
+                 p_button->psz_action, p_button );
         if( p_button->psz_name ) free( p_button->psz_name );
         if( p_button->psz_action ) free( p_button->psz_action );
         if( p_button->psz_action_down ) free( p_button->psz_action_down );
@@ -188,15 +186,11 @@ void osd_ButtonFree( vlc_object_t *p_this, osd_button_t *p_button )
             free( p_current->p_feedback->p_data_orig );
         if( p_current->p_feedback )
             free( p_current->p_feedback );
-
-        p_button->psz_name = NULL;
-        p_button->psz_action = NULL;
-        p_button->psz_action_down = NULL;
         p_current->p_feedback = NULL;
 
         if( p_button->p_states )
-            osd_StatesFree( p_this, p_button->p_states );
-        p_button->p_states = NULL;
+            osd_StatesFree( p_menu, p_button->p_states );
+
         free( p_button );
         p_button = NULL;
     }
@@ -205,9 +199,9 @@ void osd_ButtonFree( vlc_object_t *p_this, osd_button_t *p_button )
 /*****************************************************************************
  * Create a new state image
  *****************************************************************************/
-osd_state_t *osd_StateNew( vlc_object_t *p_this, const char *psz_file, const char *psz_state )
+osd_state_t *osd_StateNew( osd_menu_t *p_menu, const char *psz_file,
+                           const char *psz_state )
 {
-    osd_menu_t *p_this;
     osd_state_t *p_state = NULL;
     video_format_t fmt_in, fmt_out;
 
@@ -216,14 +210,13 @@ osd_state_t *osd_StateNew( vlc_object_t *p_this, const char *psz_file, const cha
         return NULL;
 
     memset( p_state, 0, sizeof(osd_state_t) );
-
     memset( &fmt_in, 0, sizeof(video_format_t) );
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    if( p_osd->p_image )
+    if( p_menu->p_image )
     {
-        p_state->p_pic = image_ReadUrl( p_osd->p_image, p_osd->psz_file,
+        p_state->p_pic = image_ReadUrl( p_menu->p_image, p_menu->psz_file,
                                         &fmt_in, &fmt_out );
     }
 
@@ -246,7 +239,7 @@ osd_state_t *osd_StateNew( vlc_object_t *p_this, const char *psz_file, const cha
 /*****************************************************************************
  * Free state images
  *****************************************************************************/
-void osd_StatesFree( vlc_object_t *p_this, osd_state_t *p_states )
+void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
 {
     osd_state_t *p_state = p_states;
     osd_state_t *p_next = NULL;
@@ -260,17 +253,20 @@ void osd_StatesFree( vlc_object_t *p_this, osd_state_t *p_states )
     /* Then free end first and walk to the start. */
     while( p_state->p_prev )
     {
-        msg_Dbg( p_this, " |- freeing state %s [%p]", p_state->psz_state, p_state );
+        msg_Dbg( p_menu, " |- freeing state %s [%p]",
+                 p_state->psz_state, p_state );
         p_prev = p_state->p_prev;
         p_state = p_prev;
         if( p_state->p_next )
         {
-            if( p_state->p_next->p_pic && p_state->p_next->p_pic->p_data_orig )
-                free( p_state->p_next->p_pic->p_data_orig );
-            if( p_state->p_next->p_pic ) free( p_state->p_next->p_pic );
-            p_state->p_next->p_pic = NULL;
-            if( p_state->p_next->psz_state ) free( p_state->p_next->psz_state );
-            p_state->p_next->psz_state = NULL;
+            if( p_state->p_next->p_pic )
+            {
+                if( p_state->p_next->p_pic->p_data_orig )
+                    free( p_state->p_next->p_pic->p_data_orig );
+                free( p_state->p_next->p_pic );
+            }
+            if( p_state->p_next->psz_state )
+                free( p_state->p_next->psz_state );
             free( p_state->p_next );
             p_state->p_next = NULL;
         }
@@ -278,13 +274,15 @@ void osd_StatesFree( vlc_object_t *p_this, osd_state_t *p_states )
     /* Free the last one. */
     if( p_states )
     {
-        msg_Dbg( p_this, " |- freeing state %s [%p]", p_state->psz_state, p_states );
-        if( p_states->p_pic && p_states->p_pic->p_data_orig )
-            free( p_states->p_pic->p_data_orig );
-        if( p_states->p_pic ) free( p_states->p_pic );
-        p_states->p_pic = NULL;
+        msg_Dbg( p_menu, " |- freeing state %s [%p]",
+                 p_state->psz_state, p_states );
+        if( p_states->p_pic )
+        {
+            if( p_states->p_pic->p_data_orig )
+                free( p_states->p_pic->p_data_orig );
+            free( p_states->p_pic );
+        }
         if( p_state->psz_state ) free( p_state->psz_state );
-        p_state->psz_state = NULL;
         free( p_states );
         p_states = NULL;
     }

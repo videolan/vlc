@@ -34,38 +34,17 @@
 #include <vlc_osd.h>
 #include <vlc_charset.h>
 
-/***************************************************************************
- * Prototypes
- ***************************************************************************/
+#include "osd_menu.h"
 
-static int  E_(osd_parser_xmlOpen) ( vlc_object_t *p_this );
-static void E_(osd_parser_xmlClose)( vlc_object_t *p_this );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-vlc_module_begin();
-
-    set_category( CAT_MISC );
-    set_subcategory( SUBCAT_OSD_IMPORT );
-
-    set_description( _("XML OSD configuration importer") );
-    add_shortcut( "import-osd-xml" );
-    set_capability( "osd parser" , 0);
-    set_callbacks( osd_parser_xmlOpen, osd_parser_xmlClose );
-
-vlc_module_end();
+int osd_parser_xmlOpen ( vlc_object_t *p_this );
 
 /****************************************************************************
  * Local structures
  ****************************************************************************/
 
-int  E_(osd_parser_xmlOpen) ( vlc_object_t *p_this )
+int osd_parser_xmlOpen( vlc_object_t *p_this )
 {
 
     return VLC_SUCCESS;
 }
 
-void E_(osd_parser_xmlClose) ( vlc_object_t *p_this )
-{
-}
