@@ -216,7 +216,7 @@ osd_state_t *osd_StateNew( osd_menu_t *p_menu, const char *psz_file,
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
     if( p_menu->p_image )
     {
-        p_state->p_pic = image_ReadUrl( p_menu->p_image, p_menu->psz_file,
+        p_state->p_pic = image_ReadUrl( p_menu->p_image, psz_file,
                                         &fmt_in, &fmt_out );
     }
 
