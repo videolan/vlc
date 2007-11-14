@@ -36,3 +36,4 @@ void osd_ButtonFree( vlc_object_t *, osd_button_t * );
 void osd_StatesFree( vlc_object_t *, osd_state_t * );
 
 #endif
+

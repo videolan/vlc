@@ -5,3 +5,4 @@ SOURCES_osd_parser = \
             osd_menu.h \
             xml.c \
             $(NULL)
+
