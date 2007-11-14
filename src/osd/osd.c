@@ -100,20 +100,16 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
 
 static void osd_ParserUnload( vlc_object_t *p_this, osd_menu_t *p_menu )
 {
-    if( p_menu->p_parser )
-    {
-        module_Unneed( p_menu, p_menu->p_parser );
-    }
-    p_menu->p_parser = NULL;
-
     if( p_menu->p_image )
         image_HandlerDelete( p_menu->p_image );
     if( p_menu->psz_file )
         free( p_menu->psz_file );
 
+    if( p_menu->p_parser )
+        module_Unneed( p_menu, p_menu->p_parser );
+
     vlc_object_detach( p_menu );
     vlc_object_destroy( p_menu );
-    p_menu = NULL;
 }
 
 /*****************************************************************************
@@ -182,7 +178,7 @@ error:
     if( p_osd->psz_file )
         free( p_osd->psz_file );
 
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_object_detach( p_osd );
     vlc_object_destroy( p_osd );
     vlc_mutex_unlock( lockval.p_address );
     return NULL;
@@ -208,7 +204,7 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     var_Destroy( p_osd, "osd-menu-update" );
 
     osd_ParserUnload( p_this, p_osd );
-
+    p_osd = NULL;
     vlc_mutex_unlock( lockval.p_address );
 }
 
