@@ -114,6 +114,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     /* GPL License */
     QTextEdit *licenseEdit = new QTextEdit( this );
+    licenseEdit->setFontFamily( "Monospace" );
     licenseEdit->setText( qfu( psz_license ) );
     licenseEdit->setReadOnly( true );
 
