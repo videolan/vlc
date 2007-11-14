@@ -296,7 +296,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     osd_MenuDelete( p_filter, p_sys->p_menu );
 
-    if( p_sys->psz_file) free( p_sys->psz_file );
+    if( p_sys->psz_file ) free( p_sys->psz_file );
     if( p_sys ) free( p_sys );
 
     msg_Dbg( p_filter, "osdmenu filter destroyed" );
