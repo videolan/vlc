@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osd.c - The OSD Menu core code.
  *****************************************************************************
- * Copyright (C) 2005 M2X
+ * Copyright (C) 2005-2007 M2X
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -41,6 +41,8 @@ static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t *
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
 static vlc_bool_t osd_isVisible( osd_menu_t *p_osd );
+static int  osd_ParserLoad( vlc_object_t *, const char *, osd_menu_t ** );
+static void osd_ParserUnload( vlc_object_t *, osd_menu_t ** );
 
 static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 {
@@ -48,6 +50,72 @@ static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 
     var_Get( p_osd, "osd-menu-visible", &val );
     return val.b_bool;
+}
+
+/*****************************************************************************
+ * Wrappers for loading and unloading osd parser modules.
+ *****************************************************************************/
+static int osd_ParserLoad( vlc_object_t *p_this, const char *psz_file, osd_menu_t **pp_menu )
+{
+    osd_menu_t *p_menu = *pp_menu;
+
+    if( pp_menu && p_menu ) return VLC_EGENERIC;
+
+    p_menu = vlc_object_create( p_this, VLC_OBJECT_OSDMENU );
+    if( !p_menu )
+    {
+        msg_Err( p_this, "out of memory" );
+        return VLC_ENOMEM;
+    }
+    vlc_object_attach( p_this, p_menu );
+
+    /* Stuff needed for Parser */
+    p_menu->psz_file = strdup( psz_file );
+    p_menu->p_image = image_HandlerCreate( p_this );
+    if( !p_menu->p_image || !p_menu->psz_file )
+    {
+        msg_Err( p_this, "unable to load images, aborting .." );
+        osd_ParserUnload( p_this, pp_menu );
+        return VLC_ENOMEM;
+    }
+    else
+    {
+        char *psz_type;
+        char *psz_ext = strrchr( p_menu->psz_file, '.' );
+
+        if( psz_ext && !strcmp( psz_ext, ".cfg") )
+            psz_type = "import-osd";
+        else
+            psz_type = "import-osd-xml";
+
+        p_menu->p_parser = module_Need( p_menu, "osd parser", psz_type, VLC_TRUE );
+        if( !p_menu->p_parser )
+        {
+            osd_ParserUnload( p_this, pp_menu );
+            return VLC_ENOOBJ;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static void osd_ParserUnload( vlc_object_t *p_this, osd_menu_t **pp_menu )
+{
+    osd_menu_t *p_menu = (osd_menu_t *) *pp_menu;
+
+    if( p_menu->p_parser )
+    {
+        module_Unneed( p_menu, p_menu->p_parser );
+    }
+    p_menu->p_parser = NULL;
+
+    if( p_menu->p_image )
+        image_HandlerDelete( p_menu->p_image );
+    if( p_menu->psz_file )
+        free( p_menu->psz_file );
+
+    vlc_object_detach( p_menu );
+    vlc_object_destroy( p_menu );
+    p_menu = NULL;
 }
 
 /*****************************************************************************
@@ -70,22 +138,8 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     {
         vlc_value_t val;
 
-        msg_Dbg( p_this, "creating OSD menu object" );
-        if( ( p_osd = vlc_object_create( p_this, VLC_OBJECT_OSDMENU ) ) == NULL )
-        {
-            msg_Err( p_this, "out of memory" );
-            vlc_mutex_unlock( lockval.p_address );
-            return NULL;
-        }
-
-        /* Stuff needed for Parser */
-        p_osd->p_image = image_HandlerCreate( p_this );
-        if( !p_osd->p_image )
-            msg_Err( p_this, "unable to load images" );
-        p_osd->psz_file = strdup( psz_file );
-
         /* Parse configuration file */
-        if( osd_ConfigLoader( p_this, psz_file, &p_osd ) )
+        if( osd_ParserLoad( p_this, psz_file, &p_osd ) )
             goto error;
 
         /* Setup default button (first button) */
@@ -154,16 +208,7 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     var_Destroy( p_osd, "osd-menu-visible" );
     var_Destroy( p_osd, "osd-menu-update" );
 
-    osd_ConfigUnload( p_this, &p_osd );
-
-    if( p_osd->p_image )
-        image_HandlerDelete( p_osd->p_image );
-    if( p_osd->psz_file )
-        free( p_osd->psz_file );
-
-    vlc_object_detach( p_osd );
-    vlc_object_destroy( p_osd );
-    p_osd = NULL;
+    osd_ParserUnload( p_this, &p_osd );
 
     vlc_mutex_unlock( lockval.p_address );
 }

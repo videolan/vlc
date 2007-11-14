@@ -397,7 +397,7 @@ struct osd_menu_t
     osd_button_t  *p_last_button; /*< pointer to last button in the list */
 
     /* misc parser */
-    module_t        *p_module;  /*< pointer to parser module */
+    module_t        *p_parser;  /*< pointer to parser module */
     char            *psz_file;  /*< Config file name */
     image_handler_t *p_image;   /*< handler to image loading and conversion libraries */
 };
@@ -597,15 +597,6 @@ VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) ATTRIBUTE_FORMAT( 3,
  */
 VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, int, int, short ) );
 VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, short ) );
-
-/**
- * Loading and parse the OSD Configuration file
- *
- * These functions load/unload the OSD menu configuration file and
- * create/destroy the themable OSD menu structure on the OSD object.
- */
-VLC_EXPORT( int,  osd_ConfigLoader, ( vlc_object_t *, const char *, osd_menu_t ** ) );
-VLC_EXPORT( void, osd_ConfigUnload, ( vlc_object_t *, osd_menu_t ** ) );
 
 /** @} */
 

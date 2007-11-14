@@ -1,8 +1,8 @@
 SOURCES_osd_parser = \
             parser.c \
-            simple.c \
             osd_menu.c \
             osd_menu.h \
+            simple.c \
             xml.c \
             $(NULL)
 

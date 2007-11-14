@@ -38,11 +38,10 @@
 /***************************************************************************
  * Prototypes
  ***************************************************************************/
-int osd_parser_simpleOpen ( vlc_object_t *p_this );
-void osd_parser_simpleClose( vlc_object_t *p_this );
+int  E_(osd_parser_simpleOpen) ( vlc_object_t *p_this );
+int  E_(osd_parser_xmlOpen) ( vlc_object_t *p_this );
 
-int osd_parser_xmlOpen    ( vlc_object_t *p_this );
-void osd_parser_xmlClose   ( vlc_object_t *p_this );
+static void osd_parser_Close( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Module descriptor
@@ -56,12 +55,23 @@ vlc_module_begin();
         set_description( _("OSD configuration importer") );
         add_shortcut( "import-osd" );
         set_capability( "osd parser" , 0);
-        set_callbacks( osd_parser_simpleOpen, osd_parser_simpleClose );
+        set_callbacks( E_(osd_parser_simpleOpen), osd_parser_Close );
 
     add_submodule();
         set_description( _("XML OSD configuration importer") );
         add_shortcut( "import-osd-xml" );
         set_capability( "osd parser" , 0);
-        set_callbacks( osd_parser_xmlOpen, osd_parser_xmlClose );
+        set_callbacks( E_(osd_parser_xmlOpen), osd_parser_Close );
 
 vlc_module_end();
+
+/*****************************************************************************
+ * osd_parser_Close: Free all osd menu structure resources
+ *****************************************************************************/
+
+void osd_parser_Close ( vlc_object_t *p_this )
+{
+    osd_menu_t *p_menu = (osd_menu_t *) p_this;
+    if( p_menu )
+        osd_MenuFree( p_this, &p_menu );
+}

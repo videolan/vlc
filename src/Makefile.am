@@ -271,7 +271,6 @@ SOURCES_libvlc_common = \
 	stream_output/sap.c \
 	stream_output/sdp.c \
 	osd/osd.c \
-	osd/osd_parser.c \
 	osd/osd_text.c \
 	osd/osd_widgets.c \
 	network/acl.c \
