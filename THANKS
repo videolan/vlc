@@ -215,7 +215,10 @@ Ye zhang <yzhang90003 _at_ gmail dot com> - Fix for VLM RTSP concurent LEAVE mak
 
 Some VLC plugins use external libraries and makes extensive use of the following persons' or companies' code:
 
-Fabrice Bellard & Co - FFmpeg
-Aaron Holtzman & Michel Lespinasse - liba52
-"Code from FAAD2 is copyright (c) Nero AG, www.nero.com"
-
+FFmpeg - Copyright (c) 2000-2007 Fabrice Bellard, et al.
+liba52 - Aaron Holtzman & Michel Lespinasse, et al.
+FAAD2 - "Code from FAAD2 is copyright (c) Nero AG, www.nero.com"
+FAAC - Menno Bakker, Krzysztof Nikiel & The individual contributors
+libmpeg2 - Aaron Holtzman & Michel Lespinasse, et al.
+ogg, theora, vorbis - Monty & the Xiph.org Foundation
+flac - Josh Coalson et al.
