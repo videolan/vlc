@@ -545,8 +545,6 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
     int v;
 
     vlc_assert_locked( &obj->object_lock );
-    if( obj->b_die || obj->p_libvlc->b_die )
-        return -1; /* don't wait if we are dying */
     v = vlc_cond_timedwait( &obj->object_wait, &obj->object_lock, deadline );
     if( v == 0 ) /* signaled */
         return obj->b_die ? -1 : 1;
