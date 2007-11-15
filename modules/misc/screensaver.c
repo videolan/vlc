@@ -139,11 +139,11 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
     {
         case 0:     /* we're the child */
             /* We don't want output */
-            fclose( stdout );
-            fclose( stderr );
+            freopen( "/dev/null", "w", stdout );
+            freopen( "/dev/null", "w" stderr );
             execv( ppsz_args[0] , (char *const *)ppsz_args );
             /* If the file we want to execute doesn't exist we exit() */
-            exit( -1 );
+            exit( 1 );
             break;
         case -1:    /* we're the error */
             msg_Dbg( p_this, "Couldn't fork() while launching %s",
@@ -152,7 +152,7 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
         default:    /* we're the parent */
             /* Wait for the child to exit.
              * We will not deadlock because we ran "/bin/sh &" */
-            waitpid( pid, NULL, 0 );
+            while( waitpid( pid, NULL, 0 ) != pid);
             break;
     }
 }
