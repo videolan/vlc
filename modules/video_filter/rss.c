@@ -178,7 +178,7 @@ static const char *ppsz_title_modes[] =
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_capability( "sub filter", 0 );
+    set_capability( "sub filter", 1 );
     set_shortname( "RSS / Atom" );
     set_callbacks( CreateFilter, DestroyFilter );
     set_category( CAT_VIDEO );
@@ -254,10 +254,28 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_length = var_CreateGetInteger( p_filter, CFG_PREFIX "length" );
     p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
     p_sys->b_images = var_CreateGetBool( p_filter, CFG_PREFIX "images" );
+
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length + 1 );
+    if( p_sys->psz_marquee == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        vlc_mutex_unlock( &p_sys->lock );
+        vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     p_sys->psz_marquee[p_sys->i_length] = '\0';
 
     p_sys->p_style = malloc( sizeof( text_style_t ));
+    if( p_sys->p_style == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        free( p_sys->psz_marquee );
+        vlc_mutex_unlock( &p_sys->lock );
+        vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ));
 
     p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
@@ -275,23 +293,37 @@ static int CreateFilter( vlc_object_t *p_this )
     if( FetchRSS( p_filter ) )
     {
         msg_Err( p_filter, "failed while fetching RSS ... too bad" );
+        free( p_sys->p_style );
+        free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
+        vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     p_sys->t_last_update = time( NULL );
 
     if( p_sys->i_feeds == 0 )
     {
+        free( p_sys->p_style );
+        free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
+        vlc_mutex_destroy( &p_sys->lock );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     for( i_feed=0; i_feed < p_sys->i_feeds; i_feed ++ )
+    {
         if( p_sys->p_feeds[i_feed].i_items == 0 )
         {
+            free( p_sys->p_style );
+            free( p_sys->psz_marquee );
+            FreeRSS( p_filter );
             vlc_mutex_unlock( &p_sys->lock );
+            vlc_mutex_destroy( &p_sys->lock );
+            free( p_sys );
             return VLC_EGENERIC;
         }
-
+    }
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
     p_sys->last_date = (mtime_t)0;
