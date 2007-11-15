@@ -220,6 +220,7 @@
     }                                                                       \
 }
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 /* API */
 #define DECL_ARRAY(type) struct {                                           \
