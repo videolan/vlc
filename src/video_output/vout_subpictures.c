@@ -662,7 +662,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
              * dimensions specified - we don't need to scale it.
              */
             if( (p_subpic->i_original_picture_height > 0) &&
-                (p_subpic->i_original_picture_width  <= 0) )
+                (p_subpic->i_original_picture_width <= 0) )
             {
                 pi_scale_height[ k ] = pi_scale_height[ k ] * i_source_video_height /
                                  p_subpic->i_original_picture_height;
@@ -670,7 +670,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                                  p_subpic->i_original_picture_height;
             }
         }
-
 
         /* Set default subpicture aspect ratio */
         if( p_region && p_region->fmt.i_aspect &&
@@ -1008,7 +1007,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                         i_y_offset = i_y;
                     }
                 }
-
 
                 i_x_offset = __MAX( i_x_offset, 0 );
                 i_y_offset = __MAX( i_y_offset, 0 );
