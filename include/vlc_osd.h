@@ -285,8 +285,6 @@ static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE
 #define OSD_BUTTON_SELECT   1
 #define OSD_BUTTON_PRESSED  2
 
-static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
-
 /**
  * OSD State object
  *
@@ -302,6 +300,11 @@ struct osd_state_t
 
     char        *psz_state; /*< state name */
     int          i_state;   /*< state index */
+
+    int     i_x;            /*< x-position of button state image */
+    int     i_y;            /*< y-position of button state image */
+    int     i_width;        /*< width of button state image */
+    int     i_height;       /*< height of button state image */
 };
 
 /**
@@ -330,6 +333,8 @@ struct osd_button_t
 
     int     i_x;            /*< x-position of button visible state image */
     int     i_y;            /*< y-position of button visible state image */
+    int     i_width;        /*< width of button visible state image */
+    int     i_height;       /*< height of button visible state image */
 
     /* range style button */
     vlc_bool_t   b_range;    /*< button should be interpreted as range */
@@ -389,6 +394,7 @@ struct osd_menu_t
     int     i_width;    /*< width of OSD Menu on the video screen */
     int     i_height;   /*< height of OSD Menu on the video screen */
     int     i_style;    /*< style of spu region generation */
+    int     i_position; /*< display position */
 
     char             *psz_path;  /*< directory where OSD menu images are stored */
     osd_button_t     *p_button;  /*< doubly linked list of buttons */
@@ -421,20 +427,23 @@ VLC_EXPORT( osd_menu_t *, __osd_MenuCreate, ( vlc_object_t *, const char * ) );
  */
 VLC_EXPORT( void, __osd_MenuDelete, ( vlc_object_t *, osd_menu_t * ) );
 
-/**
- * Change state on an osd_button_t.
- *
- * This function selects the specified state and returns a pointer to it. The
- * following states are currently supported:
- * \see OSD_BUTTON_UNSELECT
- * \see OSD_BUTTON_SELECT
- * \see OSD_BUTTON_PRESSED
- */
-VLC_EXPORT( osd_state_t *, __osd_StateChange, ( osd_state_t *, const int ) );
-
 #define osd_MenuCreate(object,file) __osd_MenuCreate( VLC_OBJECT(object), file )
 #define osd_MenuDelete(object,osd)  __osd_MenuDelete( VLC_OBJECT(object), osd )
-#define osd_StateChange(object,value) __osd_StateChange( object, value )
+
+/**
+ * Find OSD Menu button at position x,y
+ */
+VLC_EXPORT( osd_button_t *, __osd_ButtonFind, ( vlc_object_t *p_this,
+     int, int, int, int, int, int ) );
+
+#define osd_ButtonFind(object,x,y,h,w,sh,sw)  __osd_ButtonFind(object,x,y,h,w,sh,sw)
+
+/**
+ * Select the button provided as the new active button
+ */
+VLC_EXPORT( void, __osd_ButtonSelect, ( vlc_object_t *, osd_button_t *) );
+
+#define osd_ButtonSelect(object,button) __osd_ButtonSelect(object,button)
 
 /**
  * Show the OSD menu.

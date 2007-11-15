@@ -269,6 +269,9 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                         if( !p_range_current || !p_range_current->p_pic )
                             goto error;
 
+                        p_range_current->i_x = i_x;
+                        p_range_current->i_y = i_y;
+
                         /* increment the number of ranges for this button */
                         p_up->i_ranges++;
 
@@ -366,6 +369,9 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                     if( !p_range_current || !p_range_current->p_pic )
                         goto error;
 
+                    p_range_current->i_x = i_x;
+                    p_range_current->i_y = i_y;
+
                     /* increment the number of ranges for this button */
                     p_current->i_ranges++;
 
@@ -432,6 +438,9 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
 
             if( !p_state_current || !p_state_current->p_pic )
                 goto error;
+
+            p_state_current->i_x = i_x;
+            p_state_current->i_y = i_y;
 
             if( p_state_prev )
                 p_state_prev->p_next = p_state_current;

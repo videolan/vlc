@@ -218,6 +218,9 @@ osd_state_t *osd_StateNew( osd_menu_t *p_menu, const char *psz_file,
     {
         p_state->p_pic = image_ReadUrl( p_menu->p_image, psz_file,
                                         &fmt_in, &fmt_out );
+
+        p_state->i_width  = p_state->p_pic->p[Y_PLANE].i_visible_pitch;
+        p_state->i_height = p_state->p_pic->p[Y_PLANE].i_visible_lines;
     }
 
     if( psz_state )
