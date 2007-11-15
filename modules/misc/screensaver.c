@@ -140,7 +140,7 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
         case 0:     /* we're the child */
             /* We don't want output */
             freopen( "/dev/null", "w", stdout );
-            freopen( "/dev/null", "w" stderr );
+            freopen( "/dev/null", "w", stderr );
             execv( ppsz_args[0] , (char *const *)ppsz_args );
             /* If the file we want to execute doesn't exist we exit() */
             exit( 1 );
