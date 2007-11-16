@@ -55,8 +55,6 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
 {
     mediacontrol_Instance* retval;
     libvlc_exception_t ex;
-    char** ppsz_argv = NULL;
-    int i_index;
 
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
@@ -65,22 +63,11 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
     if( !retval )
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
 
-    /* Prepend a dummy argv[0] so that users of the API do not have to
-       do it themselves, and can simply provide the args list. */
-    ppsz_argv = malloc( ( argc + 2 ) * sizeof( char * ) ) ;
-    if( ! ppsz_argv )
-        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
-
-    ppsz_argv[0] = strdup("vlc");
-    for ( i_index = 0; i_index < argc; i_index++ )
-        ppsz_argv[i_index + 1] = argv[i_index];
-    ppsz_argv[argc + 1] = NULL;
-
-    retval->p_instance = libvlc_new( argc + 1, ppsz_argv, &ex );
-    retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
+    retval->p_instance = libvlc_new( argc, argv, &ex );
     HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
+    retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
     return retval;
-};
+}
 
 void
 mediacontrol_exit( mediacontrol_Instance *self )
