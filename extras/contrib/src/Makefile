@@ -1513,6 +1513,24 @@ CLEAN_PKG += qt4
 DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
 
 # ***************************************************************************
+# qt4 (trolltech binaries)
+# ***************************************************************************
+
+qt-win-opensource-$(QT4T_VERSION)-mingw.exe:
+	wget $(QT4T_URL)
+
+Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
+	wine qt-win-opensource-$(QT4T_VERSION)-mingw.exe /S
+	mv ~/.wine/drive_c/Qt/4.3.2/ Qt
+
+.Qt: Qt
+
+CLEAN_FILE += .Qt
+CLEAN_PKG += Qt
+#ISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
+
+
+# ***************************************************************************
 # zlib
 # ***************************************************************************
 
