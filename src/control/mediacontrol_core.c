@@ -333,6 +333,7 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
     mediacontrol_PlaylistSeq *retval = NULL;
     int i_index;
     playlist_t * p_playlist = self->p_playlist;
+    playlist_item_t *p_root;
     int i_playlist_size;
 
     mediacontrol_exception_init( exception );
@@ -343,13 +344,14 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    i_playlist_size = p_playlist->current.i_size;
 
+    p_root = p_playlist->p_root_onelevel->pp_children[0];
+    i_playlist_size = p_root->i_children;
     retval = private_mediacontrol_PlaylistSeq__alloc( i_playlist_size );
 
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {
-        retval->data[i_index] = input_item_GetURI( ARRAY_VAL(p_playlist->current, i_index)->p_input );
+        retval->data[i_index] = strdup( p_root->pp_children[i_index]->p_input->psz_name );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
