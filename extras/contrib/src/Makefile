@@ -1520,10 +1520,15 @@ qt-win-opensource-$(QT4T_VERSION)-mingw.exe:
 	wget $(QT4T_URL)
 
 Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
-	wine qt-win-opensource-$(QT4T_VERSION)-mingw.exe /S
-	mv ~/.wine/drive_c/Qt/4.3.2/ Qt
+	7z x qt-win-opensource-$(QT4T_VERSION)-mingw.exe
+#DIY... Hate makefiles.
+#	rm -r $$\[44\]/
+#	rm -r $$PLUGINSDIR
+#	`mv \$$OUTDIR/bin\ / Qt`
 
 .Qt: Qt
+	cp Qt/bin/uic.exe Qt/bin/moc.exe Qt/bin/rcc.exe $(PREFIX)/bin;
+	mkdir -p $(PREFIX)/include/qt4/;
 
 CLEAN_FILE += .Qt
 CLEAN_PKG += Qt
