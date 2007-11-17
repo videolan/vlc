@@ -1169,6 +1169,7 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         case VLC_FOURCC('r','a','l','f'):
             msg_Dbg( p_demux, "    - audio codec not supported=%4.4s",
                      (char*)&fmt.i_codec );
+            break;
 
         default:
             msg_Dbg( p_demux, "    - unknown audio codec=%4.4s",
