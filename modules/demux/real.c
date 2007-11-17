@@ -1081,46 +1081,46 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         else
         {
 
-        p_peek += 2;                                                /* 00 00 */
-        p_peek += 4;                                         /* .ra4 or .ra5 */
-        p_peek += 4;                                            /* data size */
-        p_peek += 2;                                     /* version (4 or 5) */
-        i_header_size = GetDWBE( p_peek ); p_peek += 4;       /* header size */
-        i_flavor = GetWBE( p_peek ); p_peek += 2;            /* codec flavor */
-        i_coded_frame_size = GetDWBE( p_peek ); p_peek += 4; /* coded frame size*/
-        p_peek += 4;                                                   /* ?? */
-        p_peek += 4;                                                   /* ?? */
-        p_peek += 4;                                                   /* ?? */
-        i_subpacket_h = GetWBE( p_peek ); p_peek += 2;                  /* 1 */
-        i_frame_size = GetWBE( p_peek ); p_peek += 2;          /* frame size */
-        i_subpacket_size = GetWBE( p_peek ); p_peek += 2;  /* subpacket_size */
-        p_peek += 2; /* ?? */
+            p_peek += 2;                                           /* 00 00 */
+            p_peek += 4;                                    /* .ra4 or .ra5 */
+            p_peek += 4;                                       /* data size */
+            p_peek += 2;                                /* version (4 or 5) */
+            i_header_size = GetDWBE( p_peek ); p_peek += 4;   /* header size */
+            i_flavor = GetWBE( p_peek ); p_peek += 2;        /* codec flavor */
+            i_coded_frame_size = GetDWBE( p_peek ); p_peek += 4; /* coded frame size*/
+            p_peek += 4;                                               /* ?? */
+            p_peek += 4;                                               /* ?? */
+            p_peek += 4;                                               /* ?? */
+            i_subpacket_h = GetWBE( p_peek ); p_peek += 2;              /* 1 */
+            i_frame_size = GetWBE( p_peek ); p_peek += 2;      /* frame size */
+            i_subpacket_size = GetWBE( p_peek ); p_peek += 2;  /* subpacket_size */
+            p_peek += 2;                                               /* ?? */
 
-        if( i_version == 5 ) p_peek += 6;                     /* 0, srate, 0 */
+            if( i_version == 5 ) p_peek += 6;                 /* 0, srate, 0 */
 
-        fmt.audio.i_rate = GetWBE( p_peek ); p_peek += 2;     /* Sample Rate */
-        p_peek += 2; /* ?? */
-        fmt.audio.i_bitspersample = GetWBE( p_peek ); p_peek += 2;   /* Sure?*/
-        fmt.audio.i_channels = GetWBE( p_peek ); p_peek += 2;    /* Channels */
-        fmt.audio.i_blockalign = i_frame_size;
+            fmt.audio.i_rate = GetWBE( p_peek ); p_peek += 2; /* Sample Rate */
+            p_peek += 2;                                               /* ?? */
+            fmt.audio.i_bitspersample = GetWBE( p_peek ); p_peek += 2;/* Sure?*/
+            fmt.audio.i_channels = GetWBE( p_peek ); p_peek += 2; /* Channels */
+            fmt.audio.i_blockalign = i_frame_size;
 
-        if( i_version == 5 )
-        {
-            p_peek += 4;                                            /* genr */
-            memcpy( (char *)&fmt.i_codec, p_peek, 4 ); p_peek += 4;
-        }
-        else
-        {
-            p_peek += p_peek[0] + 1; /* descr 1 */
-            memcpy( (char *)&fmt.i_codec, p_peek + 1, 4 ); /* descr 2 */
-            p_peek += p_peek[0] + 1;
-        }
+            if( i_version == 5 )
+            {
+                p_peek += 4;                                         /* genr */
+                memcpy( (char *)&fmt.i_codec, p_peek, 4 ); p_peek += 4;
+            }
+            else
+            {
+                p_peek += p_peek[0] + 1;                          /* descr 1 */
+                memcpy( (char *)&fmt.i_codec, p_peek + 1, 4 );    /* descr 2 */
+                p_peek += p_peek[0] + 1;
+            }
 
-        msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
+            msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
                  (char*)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate );
 
-        p_peek += 3; /* ?? */
-        if( i_version == 5 ) p_peek++;
+            p_peek += 3;                                               /* ?? */
+            if( i_version == 5 ) p_peek++;
         }
 
         switch( fmt.i_codec )
