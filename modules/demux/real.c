@@ -988,20 +988,98 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
     }
     else if( !strncmp( (char *)p_peek, ".ra\xfd", 4 ) )
     {
-        int i_version = GetWBE( &p_peek[4] );
         int i_header_size, i_flavor, i_coded_frame_size, i_subpacket_h;
         int i_frame_size, i_subpacket_size;
-
+        int i_version = GetWBE( &p_peek[4] );   /* [0..3] = '.','r','a',0xfd */
         msg_Dbg( p_demux, "    - audio version=%d", i_version );
 
-        p_peek += 6;
+        p_peek += 6;                                          /* 4 + version */
         es_format_Init( &fmt, AUDIO_ES, 0 );
 
         if( i_version == 3 )
         {
-            msg_Dbg( p_demux, "    - audio version 3 is not supported!" );
-            return VLC_EGENERIC;
+            int i_len;
+            char *psz;
+
+            i_header_size = GetWBE( p_peek ); p_peek += 2;  /* Size from now */
+            p_peek += 10;                                         /* Unknown */
+
+            p_peek += 4;                                        /* Data Size */
+
+            /* Title */
+            i_len = *p_peek ; p_peek++;
+            if( i_len > 0 )
+            {
+                psz = malloc( i_len + 1 );
+                memcpy( psz, p_peek, i_len );
+                psz[i_len] = '\0';
+
+                msg_Dbg( p_demux, "    - title=`%s'", psz );
+                EnsureUTF8( psz );
+                asprintf( &p_sys->psz_title, psz );
+                free( psz );
+            }
+            p_peek += i_len;
+
+            /* Authors */
+            i_len = *p_peek ; p_peek++;
+            if( i_len > 0 )
+            {
+                psz = malloc( i_len + 1 );
+                memcpy( psz, p_peek, i_len );
+                psz[i_len] = '\0';
+
+                msg_Dbg( p_demux, "    - artist=`%s'", psz );
+                EnsureUTF8( psz );
+                asprintf( &p_sys->psz_artist, psz );
+                free( psz );
+            }
+            p_peek += i_len;
+
+            /* Copyright */
+            i_len = *p_peek ; p_peek++;
+            if( i_len > 0 )
+            {
+                psz = malloc( i_len + 1 );
+                memcpy( psz, p_peek, i_len );
+                psz[i_len] = '\0';
+
+                msg_Dbg( p_demux, "    - Copyright=`%s'", psz );
+                EnsureUTF8( psz );
+                asprintf( &p_sys->psz_copyright, psz );
+                free( psz );
+            }
+            p_peek += i_len;
+
+            /* Comment */
+            i_len = *p_peek ; p_peek++;
+            if( i_len > 0 )
+            {
+                psz = malloc( i_len + 1 );
+                memcpy( psz, p_peek, i_len );
+                psz[i_len] = '\0';
+
+                msg_Dbg( p_demux, "    - Comment=`%s'", psz );
+                EnsureUTF8( psz );
+                asprintf( &p_sys->psz_description, psz );
+                free( psz );
+            }
+            /* This might be unusefull */
+            p_peek += i_len;
+
+            p_peek ++;                                           /* Unknown */
+            p_peek ++;                                 /* FourCC length = 4 */
+            memcpy( (char *)&fmt.i_codec, p_peek, 4 ); p_peek += 4;
+            /* Up to here :) */
+
+            fmt.audio.i_channels = 1;      /* This is always the case in rm3 */
+            fmt.audio.i_rate = 8000;
+
+            msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
+                 (char*)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate );
         }
+        else
+        {
 
         p_peek += 2;                                                /* 00 00 */
         p_peek += 4;                                         /* .ra4 or .ra5 */
@@ -1043,6 +1121,7 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         p_peek += 3; /* ?? */
         if( i_version == 5 ) p_peek++;
+        }
 
         switch( fmt.i_codec )
         {
@@ -1082,6 +1161,9 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             fmt.audio.i_blockalign = i_coded_frame_size;
             fmt.audio.i_bitspersample = sipr_fl2bps[ i_flavor ];
             break;
+
+        case VLC_FOURCC('l','p','c','J'):
+            fmt.i_codec = VLC_FOURCC( '1','4','_','4' );
 
         default:
             msg_Dbg( p_demux, "    - unknown audio codec=%4.4s",
