@@ -1121,6 +1121,8 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
             p_peek += 3;                                               /* ?? */
             if( i_version == 5 ) p_peek++;
+            /* Extra Data then: DWord + byte[] */
+            fmt.i_extra = GetDWBE( p_peek ); p_peek += 4;
         }
 
         switch( fmt.i_codec )
@@ -1140,8 +1142,6 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         case VLC_FOURCC( 'r','a','a','c' ):
         case VLC_FOURCC( 'r','a','c','p' ):
-            fmt.i_extra = GetDWBE( p_peek ); p_peek += 4;
-            // For version == 4, there might need an extra p_peek++
             if( fmt.i_extra > 0 ) { fmt.i_extra--; p_peek++; }
             if( fmt.i_extra > 0 )
             {
@@ -1155,9 +1155,9 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         case VLC_FOURCC('c','o','o','k'):
         case VLC_FOURCC('a','t','r','c'):
             fmt.audio.i_blockalign = i_subpacket_size;
-            if( !(fmt.i_extra = GetDWBE( p_peek )) ) break;
+            if( !fmt.i_extra ) break;
             fmt.p_extra = malloc( fmt.i_extra );
-            memcpy( fmt.p_extra, p_peek + 4, fmt.i_extra );
+            memcpy( fmt.p_extra, p_peek, fmt.i_extra );
             break;
 
         case VLC_FOURCC('s','i','p','r'):
