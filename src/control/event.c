@@ -51,7 +51,7 @@ void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
  *
  * finalization function.
  **************************************************************************/
-void libvlc_event_fini( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+void libvlc_event_fini( libvlc_instance_t *p_instance )
 {
 }
 

@@ -47,7 +47,7 @@ VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_boo
                             vlc_bool_t, int, const char *const * ) );
 
 VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *, libvlc_exception_t * ) );
-VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t *, libvlc_exception_t * ) );
+VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t * ) );
 
 
 /***************************************************************************
