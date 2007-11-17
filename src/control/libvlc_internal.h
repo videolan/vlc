@@ -300,10 +300,6 @@ VLC_EXPORT ( void, libvlc_media_list_view_set_ml_notification_callback, (
                 void (*item_removed)(const libvlc_event_t *, void *) ));
 
 /* Events */
-VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );
-
-VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );
-
 VLC_EXPORT (libvlc_event_manager_t *, libvlc_event_manager_new, ( void * p_obj, libvlc_instance_t * p_libvlc_inst, libvlc_exception_t *p_e ) );
 
 VLC_EXPORT (void, libvlc_event_manager_release, ( libvlc_event_manager_t * p_em ) );
