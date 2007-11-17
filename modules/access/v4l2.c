@@ -66,7 +66,7 @@ static void Close( vlc_object_t * );
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device to use. " \
-    "If you don't specify anything, no audio device will be used.")
+    "If you don't specify anything, /dev/dsp will be used.")
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
@@ -119,7 +119,7 @@ vlc_module_begin();
 
     add_string( "v4l2-dev", "/dev/video0", 0, DEV_TEXT, DEV_LONGTEXT,
                 VLC_FALSE );
-    add_string( "v4l2-adev", "/dev/dsp", 0, DEV_TEXT, DEV_LONGTEXT,
+    add_string( "v4l2-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
     add_integer( "v4l2-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
                 VLC_FALSE );
@@ -548,7 +548,7 @@ static void ParseMRL( demux_t *p_demux )
             else if( !strncmp( psz_parser, "caching=", strlen( "caching=" ) ) )
             {
                 p_sys->i_pts = strtol( psz_parser + strlen( "caching=" ),
-                                       &psz_parser, DEFAULT_PTS_DELAY / 1000 );
+                                       &psz_parser, 0 );
             }
             else
             {
