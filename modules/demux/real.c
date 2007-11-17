@@ -1125,6 +1125,15 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         switch( fmt.i_codec )
         {
+        case VLC_FOURCC('l','p','c','J'):
+            fmt.i_codec = VLC_FOURCC( '1','4','_','4' );
+            break;
+
+        case VLC_FOURCC('2','8','_','8'):
+            fmt.i_extra = 0;
+            fmt.audio.i_blockalign = i_coded_frame_size;
+            break;
+
         case VLC_FOURCC( 'd','n','e','t' ):
             fmt.i_codec = VLC_FOURCC( 'a','5','2',' ' );
             break;
@@ -1151,19 +1160,15 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             memcpy( fmt.p_extra, p_peek + 4, fmt.i_extra );
             break;
 
-        case VLC_FOURCC('2','8','_','8'):
-            fmt.i_extra = 0;
-            fmt.audio.i_blockalign = i_coded_frame_size;
-            break;
-
         case VLC_FOURCC('s','i','p','r'):
             fmt.i_extra = 0;
             fmt.audio.i_blockalign = i_coded_frame_size;
             fmt.audio.i_bitspersample = sipr_fl2bps[ i_flavor ];
             break;
 
-        case VLC_FOURCC('l','p','c','J'):
-            fmt.i_codec = VLC_FOURCC( '1','4','_','4' );
+        case VLC_FOURCC('r','a','l','f'):
+            msg_Dbg( p_demux, "    - audio codec not supported=%4.4s",
+                     (char*)&fmt.i_codec );
 
         default:
             msg_Dbg( p_demux, "    - unknown audio codec=%4.4s",
