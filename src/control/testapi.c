@@ -45,23 +45,16 @@ static void catch (void)
     libvlc_exception_clear (&ex);
 }
 
-int main (int argc, char *argv[])
+static void test_core (const char ** argv, int argc);
+static void test_media_list (const char ** argv, int argc);
+
+static void test_core (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
-    const char *args[argc + 3];
     int id;
 
-    alarm (30); /* Make sure "make check" does not get stuck */
-
-    args[0] = "-vvv";
-    args[1] = "-I";
-    args[2] = "-dummy";
-    args[3] = "--plugin-path=../modules";
-    for (int i = 1; i < argc; i++)
-        args[i + 3] = argv[i];
-
     libvlc_exception_init (&ex);
-    vlc = libvlc_new (sizeof (args) / sizeof (args[0]), args, &ex);
+    vlc = libvlc_new (argc, argv, &ex);
     catch ();
 
     libvlc_playlist_clear (vlc, &ex);
@@ -79,5 +72,56 @@ int main (int argc, char *argv[])
     catch ();
     libvlc_release (vlc, &ex);
     catch ();
+}
+
+static void test_media_list (const char ** argv, int argc)
+{
+    libvlc_instance_t *vlc;
+    libvlc_media_descriptor_t *md;
+    libvlc_media_list_t *ml;
+
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (argc, argv, &ex);
+    catch ();
+
+    ml = libvlc_media_list_new (vlc, &ex);
+    catch ();
+
+    md = libvlc_media_descriptor_new (vlc, "/dev/null", &ex);
+    catch ();
+
+    libvlc_media_list_add_media_descriptor (ml, md, &ex);
+    catch ();
+    libvlc_media_list_add_media_descriptor (ml, md, &ex);
+    catch ();
+
+    assert( libvlc_media_list_count (ml, &ex) == 2 );
+    catch ();
+
+    libvlc_media_descriptor_release (md);
+
+    libvlc_media_list_release (ml);
+
+    libvlc_release (vlc, &ex);
+    catch ();
+}
+
+int main (int argc, char *argv[])
+{
+    const char *args[argc + 3];
+    int nlibvlc_args = sizeof (args) / sizeof (args[0]);
+
+    alarm (30); /* Make sure "make check" does not get stuck */
+
+    args[0] = "-vvv";
+    args[1] = "-I";
+    args[2] = "-dummy";
+    args[3] = "--plugin-path=../modules";
+    for (int i = 1; i < argc; i++)
+        args[i + 3] = argv[i];
+
+    test_core (args, nlibvlc_args);
+
+    test_media_list (args, nlibvlc_args);
     return 0;
 }
