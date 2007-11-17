@@ -238,6 +238,12 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
 
 VLCPlugin::~VLCPlugin()
 {
+    /*
+    ** bump refcount to avoid recursive release from
+    ** following interfaces when releasing this interface
+    */
+    AddRef();
+
     delete vlcSupportErrorInfo;
     delete vlcOleObject;
     delete vlcDataObject;
