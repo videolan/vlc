@@ -2258,7 +2258,8 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             msg_Dbg( p_input, "retrying with access `' demux `' path `%s'",
                      psz_mrl );
-             in->p_access = access2_New( p_input,
+            psz_demux=strdup(""); 
+            in->p_access = access2_New( p_input,
                                          "", "", psz_mrl,
                                          p_input->b_preparsing );
         }
