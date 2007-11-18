@@ -2990,7 +2990,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      fi])
 
  AC_ARG_WITH(ffmpeg-x264,
-   [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libamrnb support],
+   [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libx264 support],
    [
      if test "$with_ffmpeg_x264" = "yes";	then
         VLC_ADD_LIBS([ffmpeg],[-lx264])
