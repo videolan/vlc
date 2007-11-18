@@ -181,8 +181,7 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 #define VLC_META_PUBLISHER          input_MetaTypeToLocalizedString( vlc_meta_Publisher )
 #define VLC_META_ENCODED_BY         input_MetaTypeToLocalizedString( vlc_meta_EncodedBy )
 #define VLC_META_ART_URL            input_MetaTypeToLocalizedString( vlc_meta_ArtworkURL )
-#define VLC_META_CODEC_NAME         N_("Codec Name")
-#define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")
+#define VLC_META_TRACKID            input_MetaTypeToLocalizedString( vlc_meta_TrackID )
 
 enum {
     ALBUM_ART_WHEN_ASKED,
