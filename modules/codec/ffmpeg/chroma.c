@@ -215,19 +215,36 @@ struct filter_owner_sys_t
     vout_thread_t *p_vout;
 };
 
+static void PictureRelease( picture_t *p_pic )
+{
+    if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
+}
+
 static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
-    picture_t *p_picture;
-    vout_thread_t *p_vout = p_filter->p_owner->p_vout;
+    picture_t *p_picture = malloc( sizeof(picture_t) );
+    if( !p_picture ) return NULL;
+    if( vout_AllocatePicture( p_filter, p_picture,
+                              p_filter->fmt_out.video.i_chroma,
+                              p_filter->fmt_out.video.i_width,
+                              p_filter->fmt_out.video.i_height,
+                              p_filter->fmt_out.video.i_aspect )
+        != VLC_SUCCESS )
+    {
+        free( p_picture );
+        return NULL;
+    }
 
-    p_picture = vout_CreatePicture( p_vout, 0, 0, 0 );
+    p_picture->pf_release = PictureRelease;
 
     return p_picture;
 }
 
 static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 {
-    vout_DestroyPicture( p_filter->p_owner->p_vout, p_pic );
+    (void)p_filter;
+    if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
+    if( p_pic ) free( p_pic );
 }
 
 /*****************************************************************************
@@ -295,50 +312,24 @@ static void ChromaConversion( vout_thread_t *p_vout,
         p_sys->p_swscaler && p_sys->p_swscaler->p_module )
     {
         picture_t *p_pic;
-#if 0
-        p_pic = (picture_t *) malloc( sizeof( picture_t ) );
-        if( p_pic )
-        {
-            memset( p_pic, 0, sizeof( picture_t ) );
-            vout_AllocatePicture( VLC_OBJECT(p_vout),
-                                  p_pic, p_vout->fmt_in.i_chroma,
-                                  p_vout->fmt_in.i_width,
-                                  p_vout->fmt_in.i_height,
-                                  p_vout->fmt_in.i_aspect );
-            if( !p_pic->i_planes )
-            {
-                free( p_pic->p_data_orig );
-                free( p_pic );
-            }
-            else
-            {
-                vout_CopyPicture( p_vout, p_pic, p_src );
-                p_sys->p_swscaler->fmt_in.video = p_vout->fmt_in;
-                p_sys->p_swscaler->fmt_out.video = p_vout->fmt_out;
-                p_pic = p_sys->p_swscaler->pf_video_filter( p_sys->p_swscaler, p_pic );
-                if( p_pic )
-                {
-                    vout_CopyPicture( p_vout, p_dest, p_pic );
-                    free( p_pic->p_data_orig );
-                    if( p_pic->pf_release ) p_pic->pf_release( p_pic );
-                }
-            }
-        }
-#else
+
         p_sys->p_swscaler->fmt_in.video = p_vout->fmt_in;
         p_sys->p_swscaler->fmt_out.video = p_vout->fmt_out;
 
+#if 0
         msg_Dbg( p_vout, "chroma %4.4s (%d) to %4.4s (%d)",
                  (char *)&p_vout->fmt_in.i_chroma, p_src->i_planes,
                  (char *)&p_vout->fmt_out.i_chroma, p_dest->i_planes  );
-        p_pic = p_sys->p_swscaler->pf_video_filter( (filter_t*)p_sys->p_swscaler, p_src );
+#endif
+        p_pic = p_sys->p_swscaler->pf_vout_buffer_new( p_sys->p_swscaler );
         if( p_pic )
         {
-            vout_CopyPicture( p_vout, p_dest, p_pic );
-            free( p_pic->p_data_orig );
-            if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+            picture_t *p_dst_pic;
+            vout_CopyPicture( p_vout, p_pic, p_src );
+            p_dst_pic = p_sys->p_swscaler->pf_video_filter( p_sys->p_swscaler, p_pic );
+            vout_CopyPicture( p_vout, p_dest, p_dst_pic );
+            p_dst_pic->pf_release( p_dst_pic );
         }
-#endif
     }
 }
 
