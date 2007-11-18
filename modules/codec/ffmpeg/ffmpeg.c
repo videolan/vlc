@@ -1303,6 +1303,8 @@ static struct
     /* RealAudio 1.0 */
     { VLC_FOURCC('1','4','_','4'), CODEC_ID_RA_144,
       AUDIO_ES, "RealAudio 1.0" },
+    { VLC_FOURCC('l','p','c','J'), CODEC_ID_RA_144,
+      AUDIO_ES, "RealAudio 1.0" },
 
     /* RealAudio 2.0 */
     { VLC_FOURCC('2','8','_','8'), CODEC_ID_RA_288,

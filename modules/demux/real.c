@@ -1127,6 +1127,8 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         switch( fmt.i_codec )
         {
+        case VLC_FOURCC('1','4','_','4'):
+            break:
         case VLC_FOURCC('l','p','c','J'):
             fmt.i_codec = VLC_FOURCC( '1','4','_','4' );
             break;
