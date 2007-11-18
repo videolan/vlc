@@ -216,13 +216,8 @@ vlc_module_begin();
     set_callbacks( E_(OpenScaler), E_(CloseScaler) );
     add_integer( "swscale-mode", 0, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_mode_values, ppsz_mode_descriptions, 0 );
-#else
-    /* chroma conversion submodule */
-    add_submodule();
-    set_capability( "chroma", 50 );
-    set_callbacks( E_(OpenChroma), E_(CloseChroma) );
-    set_description( _("FFmpeg chroma conversion") );
 
+#else
     /* video filter submodule */
     add_submodule();
     set_capability( "video filter2", 50 );
@@ -235,6 +230,12 @@ vlc_module_begin();
     set_callbacks( E_(OpenCropPadd), E_(CloseFilter) );
     set_description( _("FFmpeg crop padd filter") );
 #endif
+
+    /* chroma conversion submodule */
+    add_submodule();
+    set_capability( "chroma", 50 );
+    set_callbacks( E_(OpenChroma), E_(CloseChroma) );
+    set_description( _("FFmpeg chroma conversion") );
 
     /* video filter submodule */
     add_submodule();

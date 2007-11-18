@@ -27,6 +27,10 @@
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 
+#ifdef HAVE_FFMPEG_SWSCALE_H
+#include <vlc_filter.h>
+#endif
+
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
@@ -188,4 +192,174 @@ void E_(CloseChroma)( vlc_object_t *p_this )
     }
     free( p_vout->chroma.p_sys );
 }
+#else
+
+static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
+
+/*****************************************************************************
+ * chroma_sys_t: chroma method descriptor
+ *****************************************************************************
+ * This structure is part of the chroma transformation descriptor, it
+ * describes the chroma plugin specific properties.
+ *****************************************************************************/
+struct chroma_sys_t
+{
+    filter_t *p_swscaler;
+};
+
+/*****************************************************************************
+ * Video Filter2 functions
+ *****************************************************************************/
+struct filter_owner_sys_t
+{
+    vout_thread_t *p_vout;
+};
+
+static picture_t *video_new_buffer_filter( filter_t *p_filter )
+{
+    picture_t *p_picture;
+    vout_thread_t *p_vout = p_filter->p_owner->p_vout;
+
+    p_picture = vout_CreatePicture( p_vout, 0, 0, 0 );
+
+    return p_picture;
+}
+
+static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
+{
+    vout_DestroyPicture( p_filter->p_owner->p_vout, p_pic );
+}
+
+/*****************************************************************************
+ * OpenChroma: allocate a chroma function
+ *****************************************************************************
+ * This function allocates and initializes a chroma function
+ *****************************************************************************/
+int E_(OpenChroma)( vlc_object_t *p_this )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    chroma_sys_t  *p_sys = p_vout->chroma.p_sys;
+
+    p_vout->chroma.p_sys = p_sys = malloc( sizeof( chroma_sys_t ) );
+    if( p_vout->chroma.p_sys == NULL )
+    {
+        return VLC_ENOMEM;
+    }
+    p_vout->chroma.pf_convert = ChromaConversion;
+
+    p_sys->p_swscaler = vlc_object_create( p_vout, VLC_OBJECT_FILTER );
+    vlc_object_attach( p_sys->p_swscaler, p_vout );
+
+    p_sys->p_swscaler->pf_vout_buffer_new = video_new_buffer_filter;
+    p_sys->p_swscaler->pf_vout_buffer_del = video_del_buffer_filter;
+
+    p_sys->p_swscaler->fmt_out.video.i_x_offset =
+        p_sys->p_swscaler->fmt_out.video.i_y_offset = 0;
+    p_sys->p_swscaler->fmt_in.video = p_vout->fmt_in;
+    p_sys->p_swscaler->fmt_out.video = p_vout->fmt_out;
+    p_sys->p_swscaler->fmt_out.video.i_aspect = p_vout->render.i_aspect;
+    p_sys->p_swscaler->fmt_in.video.i_chroma = p_vout->render.i_chroma;
+    p_sys->p_swscaler->fmt_out.video.i_chroma = p_vout->output.i_chroma;
+
+    p_sys->p_swscaler->p_module = module_Need( p_sys->p_swscaler,
+                           "video filter2", 0, 0 );
+
+    if( p_sys->p_swscaler->p_module )
+    {
+        p_sys->p_swscaler->p_owner =
+            malloc( sizeof( filter_owner_sys_t ) );
+        if( p_sys->p_swscaler->p_owner )
+            p_sys->p_swscaler->p_owner->p_vout = p_vout;
+    }
+
+    if( !p_sys->p_swscaler->p_module || !p_sys->p_swscaler->p_owner )
+    {
+        vlc_object_detach( p_sys->p_swscaler );
+        vlc_object_destroy( p_sys->p_swscaler );
+        free( p_vout->chroma.p_sys );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ChromaConversion: actual chroma conversion function
+ *****************************************************************************/
+static void ChromaConversion( vout_thread_t *p_vout,
+                              picture_t *p_src, picture_t *p_dest )
+{
+    chroma_sys_t *p_sys = (chroma_sys_t *) p_vout->chroma.p_sys;
+
+    if( p_sys && p_src && p_dest && 
+        p_sys->p_swscaler && p_sys->p_swscaler->p_module )
+    {
+        picture_t *p_pic;
+#if 0
+        p_pic = (picture_t *) malloc( sizeof( picture_t ) );
+        if( p_pic )
+        {
+            memset( p_pic, 0, sizeof( picture_t ) );
+            vout_AllocatePicture( VLC_OBJECT(p_vout),
+                                  p_pic, p_vout->fmt_in.i_chroma,
+                                  p_vout->fmt_in.i_width,
+                                  p_vout->fmt_in.i_height,
+                                  p_vout->fmt_in.i_aspect );
+            if( !p_pic->i_planes )
+            {
+                free( p_pic->p_data_orig );
+                free( p_pic );
+            }
+            else
+            {
+                vout_CopyPicture( p_vout, p_pic, p_src );
+                p_sys->p_swscaler->fmt_in.video = p_vout->fmt_in;
+                p_sys->p_swscaler->fmt_out.video = p_vout->fmt_out;
+                p_pic = p_sys->p_swscaler->pf_video_filter( p_sys->p_swscaler, p_pic );
+                if( p_pic )
+                {
+                    vout_CopyPicture( p_vout, p_dest, p_pic );
+                    free( p_pic->p_data_orig );
+                    if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+                }
+            }
+        }
+#else
+        p_sys->p_swscaler->fmt_in.video = p_vout->fmt_in;
+        p_sys->p_swscaler->fmt_out.video = p_vout->fmt_out;
+
+        msg_Dbg( p_vout, "chroma %4.4s (%d) to %4.4s (%d)",
+                 (char *)&p_vout->fmt_in.i_chroma, p_src->i_planes,
+                 (char *)&p_vout->fmt_out.i_chroma, p_dest->i_planes  );
+        p_pic = p_sys->p_swscaler->pf_video_filter( (filter_t*)p_sys->p_swscaler, p_src );
+        if( p_pic )
+        {
+            vout_CopyPicture( p_vout, p_dest, p_pic );
+            free( p_pic->p_data_orig );
+            if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+        }
+#endif
+    }
+}
+
+/*****************************************************************************
+ * CloseChroma: free the chroma function
+ *****************************************************************************
+ * This function frees the previously allocated chroma function
+ *****************************************************************************/
+void E_(CloseChroma)( vlc_object_t *p_this )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    chroma_sys_t  *p_sys  = (chroma_sys_t *)p_vout->chroma.p_sys;
+    if( p_sys->p_swscaler && p_sys->p_swscaler->p_module )
+    {
+        free( p_sys->p_swscaler->p_owner );
+        module_Unneed( p_sys->p_swscaler, p_sys->p_swscaler->p_module );
+        vlc_object_detach( p_sys->p_swscaler );
+        vlc_object_destroy( p_sys->p_swscaler );
+        p_sys->p_swscaler= NULL;
+    }
+    free( p_vout->chroma.p_sys );
+}
+
 #endif /* !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE) */
