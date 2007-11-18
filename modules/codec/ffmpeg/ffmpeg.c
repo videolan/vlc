@@ -488,7 +488,7 @@ static struct
     { VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565 },
     { VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24 },
     { VLC_FOURCC('R','V','3','2'), PIX_FMT_RGBA32 },
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+#if defined(PIX_FMT_RGBA)
     { VLC_FOURCC('R','G','B','A'), PIX_FMT_RGBA },
 #endif
     { VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8 },
