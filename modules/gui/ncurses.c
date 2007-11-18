@@ -537,6 +537,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 return 1;
 
             /* Playlist navigation */
+            case 'g':
+                FindIndex( p_intf );
+                break;
             case KEY_HOME:
                 p_sys->i_box_plidx = 0;
                 break;
@@ -1507,6 +1510,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "     R           Toggle Repeat item" );
         MainBoxWrite( p_intf, l++, 1, "     o           Order Playlist by title" );
         MainBoxWrite( p_intf, l++, 1, "     O           Reverse order Playlist by title" );
+        MainBoxWrite( p_intf, l++, 1, "     g           Go to the current playing item" );
         MainBoxWrite( p_intf, l++, 1, "     /           Look for an item" );
         MainBoxWrite( p_intf, l++, 1, "     A           Add an entry" );
         MainBoxWrite( p_intf, l++, 1, "     D, <del>    Delete an entry" );
