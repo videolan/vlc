@@ -676,7 +676,8 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         /* attribute: title */
         if( !strcmp( psz_name, "title" ) )
         {
-            psz_title = decode_URI_duplicate( psz_value );
+            resolve_xml_special_chars( psz_value );
+            psz_title = strdup( psz_value );
         }
         /* extension attribute: application */
         else if( !strcmp( psz_name, "application" ) )
