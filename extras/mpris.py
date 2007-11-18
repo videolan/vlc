@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf8 -*-
 #
 # Copyright © 2006-2007 Rafaël Carré <funman at videolanorg>
