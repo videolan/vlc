@@ -157,8 +157,7 @@ static block_t* GrabVideo( demux_t *p_demux );
 static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame );
 static block_t* GrabAudio( demux_t *p_demux );
 
-vlc_bool_t IsChromaSupported( demux_t *p_demux, unsigned int i_v4l2 );
-unsigned int GetFourccFromString( char *psz_fourcc );
+vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat );
 
 static int OpenVideoDev( demux_t *, char *psz_device );
 static int OpenAudioDev( demux_t *, char *psz_device );
@@ -204,6 +203,8 @@ struct demux_sys_t
 
     char *psz_adev;
     int  i_fd_audio;
+    
+    char *psz_requested_chroma;
 
     /* Video */
     io_method io;
@@ -264,7 +265,6 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     vlc_value_t val;
-    char *psz;
 
     /* Only when selected */
     if( *p_demux->psz_access == '\0' ) return VLC_EGENERIC;
@@ -297,9 +297,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_demux, "v4l2-samplerate", &val );
     p_sys->i_sample_rate = val.i_int;
 
-    psz = var_CreateGetString( p_demux, "v4l2-chroma" );
-    p_sys->i_fourcc = GetFourccFromString( psz );
-    free( psz );
+    p_sys->psz_requested_chroma = var_CreateGetString( p_demux, "v4l2-chroma" );
 
     var_Create( p_demux, "v4l2-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-stereo", &val );
@@ -374,9 +372,10 @@ static int Open( vlc_object_t *p_this )
         if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
         {
             if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
-            p_sys->psz_vdev = var_CreateGetString( p_demux, "v4l2-dev" );;
+            p_sys->psz_vdev = var_CreateGetString( p_demux, "v4l2-dev" );
         }
 
+        msg_Dbg( p_demux, "opening '%s' as video", p_sys->psz_vdev );
         if( p_sys->psz_vdev && *p_sys->psz_vdev && ProbeVideoDev( p_demux, p_sys->psz_vdev ) )
         {
             p_sys->i_fd_video = OpenVideoDev( p_demux, p_sys->psz_vdev );
@@ -389,9 +388,10 @@ static int Open( vlc_object_t *p_this )
         if( !p_sys->psz_adev || !*p_sys->psz_adev )
         {
             if( p_sys->psz_adev ) free( p_sys->psz_adev );
-            p_sys->psz_adev = var_CreateGetString( p_demux, "v4l2-adev" );;
+            p_sys->psz_adev = var_CreateGetString( p_demux, "v4l2-adev" );
         }
 
+        msg_Dbg( p_demux, "opening '%s' as audio", p_sys->psz_adev );
         if( p_sys->psz_adev && *p_sys->psz_adev && ProbeAudioDev( p_demux, p_sys->psz_adev ) )
         {
             p_sys->i_fd_audio = OpenAudioDev( p_demux, p_sys->psz_adev );
@@ -489,9 +489,8 @@ static void ParseMRL( demux_t *p_demux )
                     i_len = strlen( psz_parser );
                 }
 
-                char* chroma = strndup( psz_parser, i_len );
-                p_sys->i_fourcc = GetFourccFromString( chroma );
-                free( chroma );
+                if( p_sys->psz_requested_chroma ) free( p_sys->psz_requested_chroma );
+                p_sys->psz_requested_chroma = strndup( psz_parser, i_len );
 
                 psz_parser += i_len;
             }
@@ -655,6 +654,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_inputs ) free( p_sys->p_inputs );
     if( p_sys->p_tuners ) free( p_sys->p_tuners );
     if( p_sys->p_codecs ) free( p_sys->p_codecs );
+    if( p_sys->psz_requested_chroma ) free( p_sys->psz_requested_chroma );
 
     free( p_sys );
 }
@@ -825,7 +825,7 @@ static block_t* GrabVideo( demux_t *p_demux )
             default:
                 msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
                 return 0;
-               }
+            }
         }
 
         /* Find frame? */
@@ -836,7 +836,8 @@ static block_t* GrabVideo( demux_t *p_demux )
                 buf.length == p_sys->p_buffers[i].length ) break;
         }
 
-        if( i >= p_sys->i_nbuffers ) {
+        if( i >= p_sys->i_nbuffers ) 
+        {
             msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
             return 0;
         }
@@ -1077,38 +1078,16 @@ open_failed:
 }
 
 /*****************************************************************************
- * GetFourccFromString: Returns the fourcc code from the given string
+ * IsPixelFormatSupported: returns true if the specified V4L2 pixel format is
+ * in the array of supported formats returned by the driver
  *****************************************************************************/
-unsigned int GetFourccFromString( char *psz_fourcc )
-{
-    if( strlen( psz_fourcc ) >= 4 )
-    {
-        int i_chroma = VLC_FOURCC( psz_fourcc[0], psz_fourcc[1], psz_fourcc[2], psz_fourcc[3] );
-
-        /* Find out v4l2 chroma code */
-        for( int i = 0; v4l2chroma_to_fourcc[i].i_fourcc != 0; i++ )
-        {
-            if( v4l2chroma_to_fourcc[i].i_fourcc == i_chroma )
-            {
-                return v4l2chroma_to_fourcc[i].i_fourcc;
-            }
-        }
-    }
-
-    return 0;
-}
-
-/*****************************************************************************
- * IsChromaSupported: returns true if the specified V4L2 chroma constant is
- * in the array of supported chromas returned by the driver
- *****************************************************************************/
-vlc_bool_t IsChromaSupported( demux_t *p_demux, unsigned int i_chroma )
+vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
     for( int i_index = 0; i_index < p_sys->i_codec; i_index++ )
     {
-        if( p_sys->p_codecs[i_index].pixelformat == i_chroma ) return VLC_TRUE;
+        if( p_sys->p_codecs[i_index].pixelformat == i_pixelformat ) return VLC_TRUE;
     }
 
     return VLC_FALSE;
@@ -1139,8 +1118,8 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     {
         if( ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
         {
-           msg_Err( p_demux, "cannot set input (%m)" );
-           goto open_failed;
+            msg_Err( p_demux, "cannot set standard (%m)" );
+            goto open_failed;
         }
         msg_Dbg( p_demux, "Set standard" );
     }
@@ -1155,8 +1134,8 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
     if( ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
     {
-       msg_Err( p_demux, "cannot set input (%m)" );
-       goto open_failed;
+        msg_Err( p_demux, "cannot set input (%m)" );
+        goto open_failed;
     }
 
     /* Verify device support for the various IO methods */
@@ -1206,11 +1185,12 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     /* Try and find default resolution if not specified */
-    if( !p_sys->i_width && !p_sys->i_height ) {
+    if( !p_sys->i_width && !p_sys->i_height ) 
+    {
         memset( &fmt, 0, sizeof(fmt) );
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-        if ( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
+        if( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
             msg_Err( p_demux, "Cannot get default width and height." );
             goto open_failed;
@@ -1231,21 +1211,27 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
     /* Test and set Chroma */
     fmt.fmt.pix.pixelformat = 0;
-    if( p_sys->i_fourcc )
+    if( p_sys->psz_requested_chroma && strlen( p_sys->psz_requested_chroma ) > 0 )
     {
         /* User specified chroma */
-        for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
-        {
-            if( v4l2chroma_to_fourcc[i].i_fourcc == p_sys->i_fourcc )
+        if( strlen( p_sys->psz_requested_chroma ) >= 4 )
+        { 
+            int i_requested_fourcc = VLC_FOURCC( 
+                p_sys->psz_requested_chroma[0], p_sys->psz_requested_chroma[1], 
+                p_sys->psz_requested_chroma[2], p_sys->psz_requested_chroma[3] );
+            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
             {
-                fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
-                break;
+                if( v4l2chroma_to_fourcc[i].i_fourcc == i_requested_fourcc )
+                {
+                    fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
+                    break;
+                }
             }
         }
         /* Try and set user chroma */
-        if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
+        if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
         {
-            msg_Warn( p_demux, "Driver is unable to use specified chroma %4.4s. Using defaults.", (char *)&fmt.fmt.pix.pixelformat );
+            msg_Warn( p_demux, "Driver is unable to use specified chroma %s. Trying defaults.", p_sys->psz_requested_chroma );
             fmt.fmt.pix.pixelformat = 0;
         }
     }
@@ -1254,13 +1240,13 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     if( !fmt.fmt.pix.pixelformat )
     {
         fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YVU420;
-        if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+        if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
         {
             fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
-            if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+            if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
             {
                 fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-                if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+                if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
                 {
                     msg_Err( p_demux, "Could not select any of the default chromas!" );
                     goto open_failed;
@@ -1362,14 +1348,16 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             buf.memory = V4L2_MEMORY_MMAP;
             buf.index = i;
 
-            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) {
+            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) 
+            {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
             }
         }
 
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 ) {
+        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 ) 
+        {
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
         }
@@ -1388,14 +1376,16 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             buf.m.userptr = (unsigned long)p_sys->p_buffers[i].start;
             buf.length = p_sys->p_buffers[i].length;
 
-            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) {
+            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) 
+            {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
             }
         }
 
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 ) {
+        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 ) 
+        {
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
         }
@@ -1412,7 +1402,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     return i_fd;
 
 open_failed:
-    if( i_fd ) close( i_fd );
+    if( i_fd >= 0 ) close( i_fd );
     return -1;
 
 }
@@ -1693,9 +1683,29 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                 msg_Err( p_demux, "cannot get codec description (%m)" );
                 goto open_failed;
             }
-
-            msg_Dbg( p_demux, "device supports Codec %s",
+            
+            /* only print if vlc supports the format */
+            vlc_bool_t b_codec_supported = VLC_FALSE;
+            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
+            {
+                if( v4l2chroma_to_fourcc[i].i_v4l2 == p_sys->p_codecs[i_index].pixelformat )
+                {
+                    b_codec_supported = VLC_TRUE;
+                    
+                    char psz_fourcc[5];
+                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
+                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc, &psz_fourcc );
+                    msg_Dbg( p_demux, "device supports chroma %4s [%s]",
+                                psz_fourcc,
                                 p_sys->p_codecs[i_index].description );
+                }
+            }
+            if( !b_codec_supported )
+            {
+                msg_Dbg( p_demux, "device codec %s not supported",
+                    p_sys->p_codecs[i_index].description );
+            }
+
         }
     }
 
@@ -1731,11 +1741,11 @@ vlc_bool_t ProbeAudioDev( demux_t *p_demux, char *psz_device )
         goto open_failed;
     }
 
-    if( i_fd ) close( i_fd );
+    if( i_fd >= 0 ) close( i_fd );
     return VLC_TRUE;
 
 open_failed:
-    if( i_fd ) close( i_fd );
+    if( i_fd >= 0 ) close( i_fd );
     return VLC_FALSE;
 
 }
