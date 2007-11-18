@@ -21,6 +21,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * Status of this demuxer:
+ * Real Media format
+ * -----------------
+ *
+ * version v3 w/ 14_4/lpcJ is ok.
+ * version v4/5: - atrac3 is ok.
+ *               - cook is ok.
+ *               - raac, racp are ok.
+ *               - dnet is twisted "The byte order of the data is reversed
+ *                                  from standard AC3"
+ *               - 28_8 seem problematic.
+ *               - sipr should be fine, but our decoder suxx :)
+ *               - ralf is unsupported, but hardly any sample exist.
+ *               - mp3 is unsupported, one sample exists...
+ *
+ * Real Audio Only
+ * ---------------
+ * Not supported...
+ */
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
