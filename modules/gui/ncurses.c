@@ -1,13 +1,14 @@
 /*****************************************************************************
- * ncurses.c : NCurses plugin for vlc
+ * ncurses.c : NCurses interface for vlc
  *****************************************************************************
- * Copyright (C) 2001-2006 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Yoann Peronneau <yoann@videolan.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,6 +45,7 @@
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
+#include <vlc_meta.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -128,7 +130,8 @@ enum
     BOX_PLAYLIST,
     BOX_SEARCH,
     BOX_OPEN,
-    BOX_BROWSE
+    BOX_BROWSE,
+    BOX_META
 };
 enum
 {
@@ -572,8 +575,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                                          VLC_TRUE , VLC_FALSE );
                 }
                 vlc_mutex_unlock( &p_playlist->object_lock );
-                p_sys->b_need_update = VLC_TRUE;
-
+                PlaylistRebuild( p_intf );
                 break;
             }
 
@@ -599,7 +601,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                                       VLC_TRUE, p_parent, p_item );
                 }
                 else
-                {
+                {   /* FIXME doesn't work if the node is empty */
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
                         VLC_TRUE,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item,
@@ -703,7 +705,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             return 1;
         }
     }
-    else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO )
+    else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
+             p_sys->i_box_type == BOX_META )
     {
         switch( i_key )
         {
@@ -886,6 +889,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_NONE;
             else
                 p_sys->i_box_type = BOX_INFO;
+            p_sys->i_box_lines_total = 0;
+            return 1;
+        case 'm':
+            if( p_sys->i_box_type == BOX_META )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_META;
             p_sys->i_box_lines_total = 0;
             return 1;
         case 'L':
@@ -1156,11 +1166,6 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     va_list  vl_args;
     char    *p_buf = NULL;
     int      i_len;
-#ifdef HAVE_NCURSESW
-    size_t   i_char_len;    /* UCS character length */
-    size_t   i_width;       /* Display width */
-    wchar_t *psz_wide;      /* wchar_t representation of p_buf */
-#endif
 
     va_start( vl_args, p_fmt );
     if( vasprintf( &p_buf, p_fmt, vl_args ) == -1 )
@@ -1171,24 +1176,77 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         return;
 
     i_len = strlen( p_buf );
+
 #ifdef HAVE_NCURSESW
-    psz_wide = (wchar_t *) malloc( sizeof( wchar_t ) * ( i_len + 1 ) );
+    wchar_t psz_wide[i_len + 1];
+    
+    EnsureUTF8( p_buf );
+    size_t i_char_len = mbstowcs( psz_wide, p_buf, i_len );
 
-    i_char_len = mbstowcs( psz_wide, p_buf, i_len );
+    size_t i_width; /* number of columns */
 
-    if( i_char_len == (size_t)-1 ) /* an invalid character was encountered */
-        i_width = i_len;
+    if( i_char_len == (size_t)-1 )
+        /* an invalid character was encountered */
+        abort();
     else
     {
         i_width = wcswidth( psz_wide, i_char_len );
-        if( i_width == (size_t)-1 ) /* a non printable character was encountered */
-            i_width = i_len;
+        if( i_width == (size_t)-1 )
+            /* a non printable character was encountered */
+            abort();
     }
     if( i_width > (size_t)w )
+    {
+        int i_total_width = 0;
+        int i = 0;
+        while( i_total_width < w )
+        {
+            i_total_width += wcwidth( psz_wide[i] );
+            if( w > 7 && i_total_width >= w/2 )
+            {
+                psz_wide[i  ] = '.';
+                psz_wide[i+1] = '.';
+                i_total_width -= wcwidth( psz_wide[i] ) - 2;
+                if( i > 0 )
+                {
+                    /* we require this check only if at least one character
+                     * 4 or more columns wide exists (which i doubt) */
+                    psz_wide[i-1] = '.';
+                    i_total_width -= wcwidth( psz_wide[i-1] ) - 1;
+                }
+
+                /* find the widest string */
+                int j, i_2nd_width = 0;
+                for( j = i_char_len - 1; i_2nd_width < w - i_total_width; j-- )
+                    i_2nd_width += wcwidth( psz_wide[j] );
+
+                /* we already have i_total_width columns filled, and we can't
+                 * have more than w columns */
+                if( i_2nd_width > w - i_total_width )
+                    j++;
+
+                wmemmove( &psz_wide[i+2], &psz_wide[j+1], i_char_len - j - 1 );
+                psz_wide[i + 2 + i_char_len - j - 1] = '\0';
+                break;
+            }
+            i++;
+        }
+        if( w <= 7 ) /* we don't add the '...' else we lose too much chars */
+            psz_wide[i] = '\0';
+
+        size_t i_wlen = wcslen( psz_wide ) * 6 + 1; /* worst case */
+        char psz_ellipsized[i_wlen];
+        wcstombs( psz_ellipsized, psz_wide, i_wlen );
+        mvprintw( y, x, "%s", psz_ellipsized );
+    }
+    else
+    {
+        mvprintw( y, x, "%s", p_buf );
+        mvhline( y, x + i_width, ' ', w - i_width );
+    }
 #else
     if( i_len > w )
-#endif
-    { /* FIXME: ncursesw: ellipsize psz_wide while keeping the width in mind */
+    {
         int i_cut = i_len - w;
         int x1 = i_len/2 - i_cut/2;
         int x2 = x1 + i_cut;
@@ -1204,26 +1262,18 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
             p_buf[w/2  ] = '.';
             p_buf[w/2+1] = '.';
         }
-#ifdef HAVE_NCURSESW
-        mvprintw( y, x, "%s", p_buf );
-#else
         char *psz_local = ToLocale( p_buf );
         mvprintw( y, x, "%s", psz_local );
         LocaleFree( p_buf );
-#endif
     }
     else
     {
-#ifdef HAVE_NCURSESW
-        mvprintw( y, x, "%s", p_buf );
-        mvhline( y, x + i_width, ' ', w - i_width );
-#else
         char *psz_local = ToLocale( p_buf );
         mvprintw( y, x, "%s", psz_local );
         LocaleFree( p_buf );
         mvhline( y, x + i_len, ' ', w - i_len );
-#endif
     }
+#endif
 }
 static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt, ... )
 {
@@ -1262,11 +1312,30 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 
     /* Title */
     attrset( A_REVERSE );
-    mvnprintw( y, 0, COLS, "VLC media player" " (ncurses interface) [ h for help ]" );
+    int i_len = strlen( "VLC media player [ h for help ]" );
+    int mid = ( COLS - i_len ) / 2;
+    if( mid < 0 )
+        mid = 0;
+    int i_size = ( COLS > i_len + 1 ) ? COLS : i_len + 1;
+    char psz_title[i_size];
+    memset( psz_title, ' ', mid );
+    snprintf( &psz_title[mid], i_size, "VLC media player [ h for help ]" );
+    mvnprintw( y, 0, COLS, "%s", psz_title );
     attroff( A_REVERSE );
     y += 2;
 
     /* Infos */
+
+    char psz_state[25];
+    /* strlen( "[Repeat] [Random] [Loop]" ) == 24, + '\0' */
+    psz_state[0] = '\0';
+    if( var_GetBool( p_sys->p_playlist, "repeat" ) )
+        strcat( psz_state, "[Repeat] " );
+    if( var_GetBool( p_sys->p_playlist, "random" ) )
+        strcat( psz_state, "[Random] " );
+    if( var_GetBool( p_sys->p_playlist, "loop" ) )
+        strcat( psz_state, "[Loop]" );
+
     if( p_input && !p_input->b_dead )
     {
         char buf1[MSTRTIME_MAX_SIZE];
@@ -1283,31 +1352,20 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         var_Get( p_input, "state", &val );
         if( val.i_int == PLAYING_S )
         {
-            mvnprintw( y, 0, COLS, " State    : Playing" );
+            mvnprintw( y++, 0, COLS, " State    : Playing %s", psz_state );
         }
         else if( val.i_int == OPENING_S )
         {
-            mvnprintw( y, 0, COLS, " State    : Opening/Connecting" );
+            mvnprintw( y++, 0, COLS, " State    : Opening/Connecting %s", psz_state );
         }
         else if( val.i_int == BUFFERING_S )
         {
-            mvnprintw( y, 0, COLS, " State    : Buffering" );
+            mvnprintw( y++, 0, COLS, " State    : Buffering %s", psz_state );
         }
         else if( val.i_int == PAUSE_S )
         {
-            mvnprintw( y, 0, COLS, " State    : Paused" );
+            mvnprintw( y++, 0, COLS, " State    : Paused %s", psz_state );
         }
-        char *psz_playlist_state = malloc( 25 );
-        /* strlen( "[Repeat] [Random] [Loop] ) == 24, + '\0' */
-        psz_playlist_state[0] = '\0';
-        if( var_GetBool( p_sys->p_playlist, "repeat" ) )
-            strcat( psz_playlist_state, "[Repeat] " );
-        if( var_GetBool( p_sys->p_playlist, "random" ) )
-            strcat( psz_playlist_state, "[Random] " );
-        if( var_GetBool( p_sys->p_playlist, "loop" ) )
-            strcat( psz_playlist_state, "[Loop]" );
-        mvnprintw( y++, 32, COLS, psz_playlist_state );
-        free( psz_playlist_state );
 
         if( val.i_int != INIT_S && val.i_int != END_S )
         {
@@ -1355,7 +1413,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     }
     else
     {
-        mvnprintw( y++, 0, COLS, "Source: <no current item>" );
+        mvnprintw( y++, 0, COLS, "Source: <no current item> %s", psz_state );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
@@ -1381,6 +1439,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "[Display]" );
         MainBoxWrite( p_intf, l++, 1, "     h,H         Show/Hide help box" );
         MainBoxWrite( p_intf, l++, 1, "     i           Show/Hide info box" );
+        MainBoxWrite( p_intf, l++, 1, "     m           Show/Hide metadata box" );
         MainBoxWrite( p_intf, l++, 1, "     L           Show/Hide messages box" );
         MainBoxWrite( p_intf, l++, 1, "     P           Show/Hide playlist box" );
         MainBoxWrite( p_intf, l++, 1, "     B           Show/Hide filebrowser" );
@@ -1401,9 +1460,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Playlist]" );
-        MainBoxWrite( p_intf, l++, 1, "     r           Random" );
-        MainBoxWrite( p_intf, l++, 1, "     l           Loop Playlist" );
-        MainBoxWrite( p_intf, l++, 1, "     R           Repeat item" );
+        MainBoxWrite( p_intf, l++, 1, "     r           Toggle Random playing" );
+        MainBoxWrite( p_intf, l++, 1, "     l           Toggle Loop Playlist" );
+        MainBoxWrite( p_intf, l++, 1, "     R           Toggle Repeat item" );
         MainBoxWrite( p_intf, l++, 1, "     o           Order Playlist by title" );
         MainBoxWrite( p_intf, l++, 1, "     O           Reverse order Playlist by title" );
         MainBoxWrite( p_intf, l++, 1, "     /           Look for an item" );
@@ -1468,6 +1527,96 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 }
             }
             vlc_mutex_unlock( &input_GetItem(p_input)->lock );
+        }
+        else
+        {
+            MainBoxWrite( p_intf, l++, 1, "No item currently playing" );
+        }
+        p_sys->i_box_lines_total = l;
+        if( p_sys->i_box_start >= p_sys->i_box_lines_total )
+        {
+            p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+        }
+
+        if( l - p_sys->i_box_start < p_sys->i_box_lines )
+        {
+            y += l - p_sys->i_box_start;
+        }
+        else
+        {
+            y += p_sys->i_box_lines;
+        }
+    }
+    else if( p_sys->i_box_type == BOX_META )
+    {
+        /* Meta data box */
+        int l = 0;
+
+        int i_len = strlen( VLC_META_INFO_CAT );
+        char psz_title[i_len + 3];
+        psz_title[0] = ' ';
+        psz_title[1] = '\0';
+        strcat( &psz_title[1], VLC_META_INFO_CAT );
+        psz_title[i_len + 1] = ' ';
+        psz_title[i_len + 2] = '\0';
+        DrawBox( p_sys->w, y++, 0, h, COLS, psz_title );
+
+        if( p_input )
+        {
+            int i;
+            input_item_t *p_item = input_GetItem( p_input );
+            vlc_mutex_lock( &p_item->lock );
+            for( i=0; i<VLC_META_TYPE_COUNT; i++ )
+            {
+                if( y >= y_end ) break;
+                char *psz_meta = p_item->p_meta->ppsz_meta[i];
+                if( psz_meta && *psz_meta )
+                {
+                    const char *psz_meta_title;
+                    switch( i )
+                    {
+                        case 0:
+                            psz_meta_title = VLC_META_TITLE; break;
+                        case 1:
+                            psz_meta_title = VLC_META_ARTIST; break;
+                        case 2:
+                            psz_meta_title = VLC_META_GENRE ; break;
+                        case 3:
+                            psz_meta_title = VLC_META_COPYRIGHT; break;
+                        case 4:
+                            psz_meta_title = VLC_META_COLLECTION; break;
+                        case 5:
+                            psz_meta_title = VLC_META_SEQ_NUM; break;
+                        case 6:
+                            psz_meta_title = VLC_META_DESCRIPTION; break;
+                        case 7:
+                            psz_meta_title = VLC_META_RATING; break;
+                        case 8:
+                            psz_meta_title = VLC_META_DATE; break;
+                        case 9:
+                            psz_meta_title = VLC_META_SETTING; break;
+                        case 10:
+                            psz_meta_title = VLC_META_URL; break;
+                        case 11:
+                            psz_meta_title = VLC_META_LANGUAGE; break;
+                        case 12:
+                            psz_meta_title = VLC_META_NOW_PLAYING; break;
+                        case 13:
+                            psz_meta_title = VLC_META_PUBLISHER; break;
+                        case 14:
+                            psz_meta_title = VLC_META_ENCODED_BY; break;
+                        case 15:
+                            psz_meta_title = VLC_META_ART_URL; break;
+                        case 16:
+                            psz_meta_title = VLC_META_TRACKID; break;
+                        default:
+                            psz_meta_title = ""; break;
+                    }
+                    MainBoxWrite( p_intf, l++, 1, "  [%s]", psz_meta_title );
+                    MainBoxWrite( p_intf, l++, 1, "      %s", psz_meta );
+                }
+            }
+            vlc_mutex_unlock( &p_item->lock );
         }
         else
         {
