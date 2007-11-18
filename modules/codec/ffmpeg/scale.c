@@ -97,7 +97,6 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     /* Supported output formats: YV12, I420/IYUV, YUY2, UYVY,
      * {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09 */
     i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma);
-
     if( ( i_fmt_in < 0 ) || ( i_fmt_out < 0 ) )
     {
         return VLC_EGENERIC;
@@ -218,7 +217,7 @@ static int CheckInit( filter_t *p_filter )
 
         i_fmt_in = E_(GetFfmpegChroma)(p_filter->fmt_in.video.i_chroma);
         i_fmt_out = E_(GetFfmpegChroma)(p_filter->fmt_out.video.i_chroma);
-        if( (i_fmt_in < 0 ) || ( i_fmt_out < 0 ) )
+        if( (i_fmt_in < 0) || (i_fmt_out < 0) )
         {
             msg_Err( p_filter, "format not supported" );
             return VLC_EGENERIC;
