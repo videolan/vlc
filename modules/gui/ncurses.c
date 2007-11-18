@@ -540,6 +540,11 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case KEY_HOME:
                 p_sys->i_box_plidx = 0;
                 break;
+#ifdef __FreeBSD__
+/* workaround for FreeBSD + xterm:
+ * see http://www.nabble.com/curses-vs.-xterm-key-mismatch-t3574377.html */
+            case KEY_SELECT:
+#endif
             case KEY_END:
                 p_sys->i_box_plidx = p_sys->p_playlist->items.i_size - 1;
                 break;
@@ -600,8 +605,23 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
                                       VLC_TRUE, p_parent, p_item );
                 }
+                else if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
+                        == 0 )
+                {   /* We only want to set the current node */
+                    vlc_object_lock( p_sys->p_playlist );
+
+                    p_sys->p_playlist->request.p_node = 
+                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+                    p_sys->p_playlist->request.i_skip = 0;
+                    p_sys->p_playlist->request.p_item =
+                        p_sys->p_playlist->status.p_item;
+                    p_sys->p_playlist->request.b_request = VLC_TRUE;
+                    p_sys->p_playlist->request.i_status = PLAYLIST_STOPPED;
+
+                    vlc_object_unlock( p_sys->p_playlist );
+                }
                 else
-                {   /* FIXME doesn't work if the node is empty */
+                {
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
                         VLC_TRUE,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item,
@@ -635,6 +655,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case KEY_HOME:
                 p_sys->i_box_bidx = 0;
                 break;
+#ifdef __FreeBSD__
+            case KEY_SELECT:
+#endif
             case KEY_END:
                 p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
                 break;
@@ -669,14 +692,15 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
                     playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
                     if( !p_parent )
-                        p_parent = p_sys->p_playlist->p_root_onelevel;
+                        p_parent = p_sys->p_playlist->p_local_onelevel;
 
-                    while( p_parent->p_parent )
+                    while( p_parent->p_parent && p_parent->p_parent->p_parent )
                         p_parent = p_parent->p_parent;
 
                     playlist_Add( p_sys->p_playlist, psz_uri, NULL,
                                   PLAYLIST_APPEND, PLAYLIST_END,
-                                  p_parent == p_sys->p_playlist->p_root_onelevel
+                                  p_parent->p_input == 
+                                    p_sys->p_playlist->p_local_onelevel->p_input
                                   , VLC_FALSE );
                     p_sys->i_box_type = BOX_PLAYLIST;
                     free( psz_uri );
@@ -713,6 +737,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case KEY_HOME:
                 p_sys->i_box_start = 0;
                 return 1;
+#ifdef __FreeBSD__
+            case KEY_SELECT:
+#endif
             case KEY_END:
                 p_sys->i_box_start = p_sys->i_box_lines_total - 1;
                 return 1;
@@ -748,6 +775,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->f_slider = 0;
                 ManageSlider( p_intf );
                 return 1;
+#ifdef __FreeBSD__
+            case KEY_SELECT:
+#endif
             case KEY_END:
                 p_sys->f_slider = 99.9;
                 ManageSlider( p_intf );
@@ -834,15 +864,17 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_playlist && i_chain_len > 0 )
                 {
                     playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
-                    if( !p_parent )
-                        p_parent = p_sys->p_playlist->p_root_onelevel;
 
-                    while( p_parent->p_parent )
+                    if( !p_parent )
+                        p_parent = p_sys->p_playlist->p_local_onelevel;
+
+                    while( p_parent->p_parent && p_parent->p_parent->p_parent )
                         p_parent = p_parent->p_parent;
 
                     playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
                                   PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
-                                  p_parent == p_sys->p_playlist->p_root_onelevel
+                                  p_parent->p_input == 
+                                    p_sys->p_playlist->p_local_onelevel->p_input
                                   , VLC_FALSE );
                     p_sys->b_box_plidx_follow = VLC_TRUE;
                 }
@@ -1192,8 +1224,18 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     {
         i_width = wcswidth( psz_wide, i_char_len );
         if( i_width == (size_t)-1 )
+        {
             /* a non printable character was encountered */
-            abort();
+            unsigned int i;
+            int i_cwidth;
+            i_width = 0;
+            for( i = 0 ; i < i_char_len ; i++ )
+            {
+                i_cwidth = wcwidth( psz_wide[i] );
+                if( i_cwidth != -1 )
+                    i_width += i_cwidth;
+            }
+        }
     }
     if( i_width > (size_t)w )
     {
@@ -1790,8 +1832,13 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         for( i_item = i_start; i_item < i_stop; i_item++ )
         {
             vlc_bool_t b_selected = ( p_sys->i_box_plidx == i_item );
-            int c = ( PlaylistIsPlaying( p_intf,
-                          p_sys->pp_plist[i_item]->p_item ) ) ? '>' : ' ';
+            int c = ' ';
+            if( p_sys->pp_plist[i_item]->p_item->p_input ==
+                        p_sys->p_playlist->status.p_node->p_input )
+                c = '*';
+            else if( PlaylistIsPlaying( p_intf,
+                        p_sys->pp_plist[i_item]->p_item ) )
+                c = '>';
 
             if( y >= y_end ) break;
             if( b_selected )
