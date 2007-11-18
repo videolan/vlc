@@ -417,7 +417,7 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    if( i_position >= p_playlist->items.i_size / 2 )
+    if( i_position <= p_playlist->items.i_size / 2 )
     {
         playlist_DeleteFromInput( p_playlist,
             p_playlist->items.p_elems[i_position*2-1]->i_id,
