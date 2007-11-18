@@ -2189,7 +2189,6 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Try access_demux if no demux given */
         if( *psz_demux == '\0' )
         {
-                printf("********  psz_path = %s",  psz_path); 
             in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
                                       NULL, p_input->p->p_es_out, VLC_FALSE );
         }
@@ -2260,7 +2259,6 @@ static int InputSourceInit( input_thread_t *p_input,
             msg_Dbg( p_input, "retrying with access `' demux `' path `%s'",
                      psz_mrl );
             psz_demux =  "" ; 
-            psz_path = psz_mrl;
             in->p_access = access2_New( p_input,
                                          "", "", psz_mrl,
                                          p_input->b_preparsing );
@@ -2346,7 +2344,6 @@ static int InputSourceInit( input_thread_t *p_input,
             if( in->p_access->psz_path )
             {
                 const char *psz_a, *psz_d;
-                
                 psz_buf = strdup( in->p_access->psz_path );
                 MRLSplit( VLC_OBJECT(p_input), psz_buf,
                           &psz_a, &psz_d, &psz_real_path );
