@@ -3,20 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 44;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		631220BC0C87F72D005CC6A4 /* VLC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631220BB0C87F72D005CC6A4 /* VLC.framework */; };
-		631220C90C87F730005CC6A4 /* VLC.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 631220BB0C87F72D005CC6A4 /* VLC.framework */; };
-		635FDAEF0C8080B900CE5E69 /* VLCCategoryOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 635FDAED0C8080B900CE5E69 /* VLCCategoryOutlineView.m */; };
-		635FDAF00C8080B900CE5E69 /* VLCCategoryOutlineView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 635FDAEE0C8080B900CE5E69 /* VLCCategoryOutlineView.h */; };
-		635FDB3D0C8083BC00CE5E69 /* VLCCategoryCell.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 635FDB3B0C8083BC00CE5E69 /* VLCCategoryCell.h */; };
-		635FDB3E0C8083BC00CE5E69 /* VLCCategoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 635FDB3C0C8083BC00CE5E69 /* VLCCategoryCell.m */; };
-		63C5518C0C7F663500B202D3 /* VLCController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 63C5518A0C7F663500B202D3 /* VLCController.h */; };
+		630FBE2D0CF0B3940072CB10 /* VLC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 630FBE2C0CF0B3930072CB10 /* VLC.framework */; };
+		630FBE3C0CF0B3D80072CB10 /* VLC.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 630FBE2C0CF0B3930072CB10 /* VLC.framework */; };
 		63C5518D0C7F663500B202D3 /* VLCController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C5518B0C7F663500B202D3 /* VLCController.m */; };
-		63C551900C7F6A2000B202D3 /* VLCCategoryListDataSource.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 63C5518E0C7F6A2000B202D3 /* VLCCategoryListDataSource.h */; };
-		63C551910C7F6A2000B202D3 /* VLCCategoryListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C5518F0C7F6A2000B202D3 /* VLCCategoryListDataSource.m */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -30,11 +23,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				631220C90C87F730005CC6A4 /* VLC.framework in CopyFiles */,
-				63C5518C0C7F663500B202D3 /* VLCController.h in CopyFiles */,
-				63C551900C7F6A2000B202D3 /* VLCCategoryListDataSource.h in CopyFiles */,
-				635FDAF00C8080B900CE5E69 /* VLCCategoryOutlineView.h in CopyFiles */,
-				635FDB3D0C8083BC00CE5E69 /* VLCCategoryCell.h in CopyFiles */,
+				630FBE3C0CF0B3D80072CB10 /* VLC.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -49,15 +38,9 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* VLC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLC_Prefix.pch; sourceTree = "<group>"; };
-		631220BB0C87F72D005CC6A4 /* VLC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLC.framework; path = ../Framework/VLC.framework; sourceTree = SOURCE_ROOT; };
-		635FDAED0C8080B900CE5E69 /* VLCCategoryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCCategoryOutlineView.m; sourceTree = "<group>"; };
-		635FDAEE0C8080B900CE5E69 /* VLCCategoryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCCategoryOutlineView.h; sourceTree = "<group>"; };
-		635FDB3B0C8083BC00CE5E69 /* VLCCategoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCCategoryCell.h; sourceTree = "<group>"; };
-		635FDB3C0C8083BC00CE5E69 /* VLCCategoryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCCategoryCell.m; sourceTree = "<group>"; };
+		630FBE2C0CF0B3930072CB10 /* VLC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLC.framework; path = ../Framework/build/Release/VLC.framework; sourceTree = SOURCE_ROOT; };
 		63C5518A0C7F663500B202D3 /* VLCController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCController.h; sourceTree = "<group>"; };
 		63C5518B0C7F663500B202D3 /* VLCController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCController.m; sourceTree = "<group>"; };
-		63C5518E0C7F6A2000B202D3 /* VLCCategoryListDataSource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCCategoryListDataSource.h; sourceTree = "<group>"; };
-		63C5518F0C7F6A2000B202D3 /* VLCCategoryListDataSource.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCCategoryListDataSource.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* VLC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VLC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -68,7 +51,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
-				631220BC0C87F72D005CC6A4 /* VLC.framework in Frameworks */,
+				630FBE2D0CF0B3940072CB10 /* VLC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,12 +63,6 @@
 			children = (
 				63C5518A0C7F663500B202D3 /* VLCController.h */,
 				63C5518B0C7F663500B202D3 /* VLCController.m */,
-				63C5518E0C7F6A2000B202D3 /* VLCCategoryListDataSource.h */,
-				63C5518F0C7F6A2000B202D3 /* VLCCategoryListDataSource.m */,
-				635FDAEE0C8080B900CE5E69 /* VLCCategoryOutlineView.h */,
-				635FDAED0C8080B900CE5E69 /* VLCCategoryOutlineView.m */,
-				635FDB3B0C8083BC00CE5E69 /* VLCCategoryCell.h */,
-				635FDB3C0C8083BC00CE5E69 /* VLCCategoryCell.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -93,7 +70,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				631220BB0C87F72D005CC6A4 /* VLC.framework */,
+				630FBE2C0CF0B3930072CB10 /* VLC.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -193,9 +170,11 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "VLC" */;
+			compatibilityVersion = "Xcode 3.0";
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* VLC */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* VLC */,
 			);
@@ -221,9 +200,6 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				63C5518D0C7F663500B202D3 /* VLCController.m in Sources */,
-				63C551910C7F6A2000B202D3 /* VLCCategoryListDataSource.m in Sources */,
-				635FDAEF0C8080B900CE5E69 /* VLCCategoryOutlineView.m in Sources */,
-				635FDB3E0C8083BC00CE5E69 /* VLCCategoryCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +233,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"\"$(SRCROOT)/../Framework/build/Release\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../..\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../Framework\"";
@@ -280,6 +257,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"\"$(SRCROOT)/../Framework/build/Release\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../..\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../Framework\"";
