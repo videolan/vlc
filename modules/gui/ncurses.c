@@ -339,6 +339,7 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
+    playlist_t    *p_playlist = pl_Yield( p_intf );
 
     int i_key;
     time_t t_last_refresh;
@@ -353,7 +354,6 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
 
         /* Update the input */
-        playlist_t *p_playlist = pl_Yield( p_intf );
         var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
         var_AddCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
 
