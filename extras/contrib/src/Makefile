@@ -505,11 +505,11 @@ DISTCLEAN_PKG += freetype-$(FREETYPE2_VERSION).tar.gz
 # fribidi
 # ***************************************************************************
 
-fribidi-$(FRIBIDI_VERSION).tar.bz2:
+fribidi-$(FRIBIDI_VERSION).tar.gz:
 	$(WGET) $(FRIBIDI_URL)
 
-fribidi: fribidi-$(FRIBIDI_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
+	$(EXTRACT_GZ)
 	patch -p0 < Patches/fribidi.patch.real
 ifdef HAVE_WIN32
 	patch -p0 <Patches/fribidi-win32.patch
@@ -525,7 +525,7 @@ endif
 
 CLEAN_FILE += .fribidi
 CLEAN_PKG += fribidi
-DISTCLEAN_PKG += fribidi-$(FRIBIDI_VERSION).tar.bz2
+DISTCLEAN_PKG += fribidi-$(FRIBIDI_VERSION).tar.gz
 
 # ***************************************************************************
 # liba52
