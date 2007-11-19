@@ -1264,9 +1264,20 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
             if( p_prev ) p_prev->p_next = p_line;
             else p_lines = p_line;
 
+            uint32_t *psz_unicode_saved = psz_unicode;
             while( psz_unicode > psz_line_start && *psz_unicode != ' ' )
             {
                 psz_unicode--;
+            }
+            if( psz_unicode == psz_line_start )
+            {   /* try harder to break that line */
+                psz_unicode = psz_unicode_saved;
+                while( psz_unicode > psz_line_start &&
+                    *psz_unicode != '_'  && *psz_unicode != '/' &&
+                    *psz_unicode != '\\' && *psz_unicode != '.' )
+                {
+                    psz_unicode--;
+                }
             }
             if( psz_unicode == psz_line_start )
             {
