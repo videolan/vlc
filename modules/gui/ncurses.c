@@ -150,7 +150,6 @@ struct pl_item_t
 };
 struct intf_sys_t
 {
-    playlist_t     *p_playlist;
     input_thread_t *p_input;
 
     float           f_slider;
@@ -167,6 +166,8 @@ struct intf_sys_t
     int             i_box_plidx;    /* Playlist index */
     int             b_box_plidx_follow;
     int             i_box_bidx;     /* browser index */
+
+    playlist_item_t *p_node;        /* current node */
 
     int             b_box_cleared;
 
@@ -207,7 +208,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Allocate instance and initialize some members */
     p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    p_sys->p_playlist = NULL;
+    p_sys->p_node = NULL;
     p_sys->p_input = NULL;
     p_sys->f_slider = 0.0;
     p_sys->f_slider_old = 0.0;
@@ -290,12 +291,11 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
+    playlist_t    *p_playlist = pl_Get( p_intf );
     int i;
 
-    var_DelCallback( p_sys->p_playlist, "intf-change", PlaylistChanged,
-                     p_intf );
-    var_DelCallback( p_sys->p_playlist, "item-append", PlaylistChanged,
-                     p_intf );
+    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
+    var_DelCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
 
     PlaylistDestroy( p_intf );
 
@@ -317,10 +317,7 @@ static void Close( vlc_object_t *p_this )
     {
         vlc_object_release( p_sys->p_input );
     }
-    if( p_sys->p_playlist )
-    {
-        vlc_object_release( p_sys->p_playlist );
-    }
+    pl_Release( p_intf );
 
     /* Close the ncurses interface */
     endwin();
@@ -356,43 +353,32 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
 
         /* Update the input */
-        if( p_sys->p_playlist == NULL )
+        playlist_t *p_playlist = pl_Yield( p_intf );
+        var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
+        var_AddCallback( p_playlist, "item-append", PlaylistChanged, p_intf );
+
+        PL_LOCK;
+        if( p_sys->p_input == NULL )
         {
-            p_sys->p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-            if( p_sys->p_playlist )
+            p_sys->p_input = p_playlist->p_input;
+            if( p_sys->p_input )
             {
-                var_AddCallback( p_sys->p_playlist, "intf-change",
-                                 PlaylistChanged, p_intf );
-                var_AddCallback( p_sys->p_playlist, "item-append",
-                                 PlaylistChanged, p_intf );
-            }
-        }
-        if( p_sys->p_playlist )
-        {
-            vlc_mutex_lock( &p_sys->p_playlist->object_lock );
-            if( p_sys->p_input == NULL )
-            {
-                p_sys->p_input = p_sys->p_playlist->p_input;
-                if( p_sys->p_input )
+                if( !p_sys->p_input->b_dead )
                 {
-                    if( !p_sys->p_input->b_dead )
-                    {
-                        vlc_object_yield( p_sys->p_input );
-                    }
+                    vlc_object_yield( p_sys->p_input );
                 }
             }
-            else if( p_sys->p_input->b_dead )
-            {
-                vlc_object_release( p_sys->p_input );
-                p_sys->p_input = NULL;
-                p_sys->f_slider = p_sys->f_slider_old = 0.0;
-                p_sys->b_box_cleared = VLC_FALSE;
-            }
-            vlc_mutex_unlock( &p_sys->p_playlist->object_lock );
         }
+        else if( p_sys->p_input->b_dead )
+        {
+            vlc_object_release( p_sys->p_input );
+            p_sys->p_input = NULL;
+            p_sys->f_slider = p_sys->f_slider_old = 0.0;
+            p_sys->b_box_cleared = VLC_FALSE;
+        }
+        PL_UNLOCK;
 
-        if( p_sys->b_box_plidx_follow && p_sys->p_playlist->status.p_item )
+        if( p_sys->b_box_plidx_follow && p_playlist->status.p_item )
         {
             FindIndex( p_intf );
         }
@@ -482,8 +468,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     vlc_value_t val;
+    playlist_t *p_playlist = pl_Get( p_intf );
 
-    if( p_sys->i_box_type == BOX_PLAYLIST && p_sys->p_playlist )
+    if( p_sys->i_box_type == BOX_PLAYLIST )
     {
         int b_ret = VLC_TRUE;
         vlc_bool_t b_box_plidx_follow = VLC_FALSE;
@@ -493,30 +480,30 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             vlc_value_t val;
             /* Playlist Settings */
             case 'r':
-                var_Get( p_sys->p_playlist, "random", &val );
+                var_Get( p_playlist, "random", &val );
                 val.b_bool = !val.b_bool;
-                var_Set( p_sys->p_playlist, "random", val );
+                var_Set( p_playlist, "random", val );
                 return 1;
             case 'l':
-                var_Get( p_sys->p_playlist, "loop", &val );
+                var_Get( p_playlist, "loop", &val );
                 val.b_bool = !val.b_bool;
-                var_Set( p_sys->p_playlist, "loop", val );
+                var_Set( p_playlist, "loop", val );
                 return 1;
             case 'R':
-                var_Get( p_sys->p_playlist, "repeat", &val );
+                var_Get( p_playlist, "repeat", &val );
                 val.b_bool = !val.b_bool;
-                var_Set( p_sys->p_playlist, "repeat", val );
+                var_Set( p_playlist, "repeat", val );
                 return 1;
 
             /* Playlist sort */
             case 'o':
-                playlist_RecursiveNodeSort( p_sys->p_playlist,
+                playlist_RecursiveNodeSort( p_playlist,
                                             PlaylistGetRoot( p_intf ),
                                             SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
                 p_sys->b_need_update = VLC_TRUE;
                 return 1;
             case 'O':
-                playlist_RecursiveNodeSort( p_sys->p_playlist,
+                playlist_RecursiveNodeSort( p_playlist,
                                             PlaylistGetRoot( p_intf ),
                                             SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
                 p_sys->b_need_update = VLC_TRUE;
@@ -549,7 +536,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case KEY_SELECT:
 #endif
             case KEY_END:
-                p_sys->i_box_plidx = p_sys->p_playlist->items.i_size - 1;
+                p_sys->i_box_plidx = p_playlist->items.i_size - 1;
                 break;
             case KEY_UP:
                 p_sys->i_box_plidx--;
@@ -567,10 +554,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case KEY_BACKSPACE:
             case KEY_DC:
             {
-                playlist_t *p_playlist = p_sys->p_playlist;
                 playlist_item_t *p_item;
 
-                vlc_mutex_lock( &p_playlist->object_lock );
+                PL_LOCK;
                 p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
                 if( p_item->i_children == -1 )
                 {
@@ -582,7 +568,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     playlist_NodeDelete( p_playlist, p_item,
                                          VLC_TRUE , VLC_FALSE );
                 }
-                vlc_mutex_unlock( &p_playlist->object_lock );
+                PL_UNLOCK;
                 PlaylistRebuild( p_intf );
                 break;
             }
@@ -602,33 +588,23 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                             p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
 
                     if( !p_parent )
-                        p_parent = p_sys->p_playlist->p_root_onelevel;
+                        p_parent = p_playlist->p_root_onelevel;
                     while( p_parent->p_parent )
                         p_parent = p_parent->p_parent;
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
+                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                                       VLC_TRUE, p_parent, p_item );
                 }
                 else if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
                         == 0 )
                 {   /* We only want to set the current node */
-                    vlc_object_lock( p_sys->p_playlist );
-
-                    p_sys->p_playlist->request.p_node = 
-                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-                    p_sys->p_playlist->request.i_skip = 0;
-                    p_sys->p_playlist->request.p_item =
-                        p_sys->p_playlist->status.p_item;
-                    p_sys->p_playlist->request.b_request = VLC_TRUE;
-                    p_sys->p_playlist->request.i_status = PLAYLIST_STOPPED;
-
-                    vlc_object_unlock( p_sys->p_playlist );
+                    playlist_Stop( p_playlist );
+                    p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
                 }
                 else
                 {
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                        VLC_TRUE,
-                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item,
-                        NULL );
+                    p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item, NULL );
                 }
                 b_box_plidx_follow = VLC_TRUE;
                 break;
@@ -693,18 +669,21 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
                     sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
 
-                    playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
+                    playlist_item_t *p_parent = p_sys->p_node;
                     if( !p_parent )
-                        p_parent = p_sys->p_playlist->p_local_onelevel;
+                    p_parent = p_playlist->status.p_node;
+                    if( !p_parent )
+                        p_parent = p_playlist->p_local_onelevel;
 
                     while( p_parent->p_parent && p_parent->p_parent->p_parent )
                         p_parent = p_parent->p_parent;
 
-                    playlist_Add( p_sys->p_playlist, psz_uri, NULL,
-                                  PLAYLIST_APPEND, PLAYLIST_END,
+                    playlist_Add( p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
+                                  PLAYLIST_END,
                                   p_parent->p_input == 
-                                    p_sys->p_playlist->p_local_onelevel->p_input
+                                    p_playlist->p_local_onelevel->p_input
                                   , VLC_FALSE );
+
                     p_sys->i_box_type = BOX_PLAYLIST;
                     free( psz_uri );
                 }
@@ -855,7 +834,6 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     else if( p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain )
     {
         int i_chain_len = strlen( p_sys->psz_open_chain );
-        playlist_t *p_playlist = p_sys->p_playlist;
 
         switch( i_key )
         {
@@ -864,12 +842,14 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 return 1;
             case KEY_ENTER:
             case 0x0d:
-                if( p_playlist && i_chain_len > 0 )
+                if( i_chain_len > 0 )
                 {
-                    playlist_item_t *p_parent = p_sys->p_playlist->status.p_node;
-
+                    playlist_item_t *p_parent = p_sys->p_node;
+                   
                     if( !p_parent )
-                        p_parent = p_sys->p_playlist->p_local_onelevel;
+                    p_parent = p_playlist->status.p_node;
+                    if( !p_parent )
+                        p_parent = p_playlist->p_local_onelevel;
 
                     while( p_parent->p_parent && p_parent->p_parent->p_parent )
                         p_parent = p_parent->p_parent;
@@ -877,8 +857,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
                                   PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
                                   p_parent->p_input == 
-                                    p_sys->p_playlist->p_local_onelevel->p_input
+                                    p_playlist->p_local_onelevel->p_input
                                   , VLC_FALSE );
+
                     p_sys->b_box_plidx_follow = VLC_TRUE;
                 }
                 p_sys->i_box_type = BOX_PLAYLIST;
@@ -1014,16 +995,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 }
                 else
                 {
-                    playlist_t *p_playlist;
-                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                  FIND_ANYWHERE );
-                    if( p_playlist )
-                    {
-                        var_Get( p_playlist, "fullscreen", &val );
-                        val.b_bool = !val.b_bool;
-                        var_Set( p_playlist, "fullscreen", val );
-                        vlc_object_release( p_playlist );
-                    }
+                    var_Get( p_playlist, "fullscreen", &val );
+                    val.b_bool = !val.b_bool;
+                    var_Set( p_playlist, "fullscreen", val );
                 }
             }
             return 0;
@@ -1034,10 +1008,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             return 1;
 
         case 's':
-            if( p_intf->p_sys->p_playlist )
-            {
-                playlist_Stop( p_intf->p_sys->p_playlist );
-            }
+            playlist_Stop( p_playlist );
             return 1;
 
         case 'e':
@@ -1077,18 +1048,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             return 1;
 
         case 'p':
-            if( p_intf->p_sys->p_playlist )
-            {
-                playlist_Prev( p_intf->p_sys->p_playlist );
-            }
+            playlist_Prev( p_playlist );
             clear();
             return 1;
 
         case 'n':
-            if( p_intf->p_sys->p_playlist )
-            {
-                playlist_Next( p_intf->p_sys->p_playlist );
-            }
+            playlist_Next( p_playlist );
             clear();
             return 1;
 
@@ -1349,6 +1314,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     input_thread_t *p_input = p_sys->p_input;
+    playlist_t     *p_playlist = pl_Get( p_intf );
     int y = 0;
     int h;
     int y_end;
@@ -1374,11 +1340,11 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     char psz_state[25];
     /* strlen( "[Repeat] [Random] [Loop]" ) == 24, + '\0' */
     psz_state[0] = '\0';
-    if( var_GetBool( p_sys->p_playlist, "repeat" ) )
+    if( var_GetBool( p_playlist, "repeat" ) )
         strcat( psz_state, "[Repeat] " );
-    if( var_GetBool( p_sys->p_playlist, "random" ) )
+    if( var_GetBool( p_playlist, "random" ) )
         strcat( psz_state, "[Random] " );
-    if( var_GetBool( p_sys->p_playlist, "loop" ) )
+    if( var_GetBool( p_playlist, "loop" ) )
         strcat( psz_state, "[Loop]" );
 
     if( p_input && !p_input->b_dead )
@@ -1773,9 +1739,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         }
 
     }
-    else if( ( p_sys->i_box_type == BOX_PLAYLIST ||
+    else if( p_sys->i_box_type == BOX_PLAYLIST ||
                p_sys->i_box_type == BOX_SEARCH ||
-               p_sys->i_box_type == BOX_OPEN  ) && p_sys->p_playlist )
+               p_sys->i_box_type == BOX_OPEN   )
     {
         /* Playlist box */
         int        i_start, i_stop, i_max = p_sys->i_plist_entries;
@@ -1836,12 +1802,15 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         for( i_item = i_start; i_item < i_stop; i_item++ )
         {
             vlc_bool_t b_selected = ( p_sys->i_box_plidx == i_item );
+            playlist_item_t *p_item = p_sys->pp_plist[i_item]->p_item;
+            playlist_item_t *p_node = p_sys->p_node;
             int c = ' ';
-            if( p_sys->pp_plist[i_item]->p_item->p_input ==
-                        p_sys->p_playlist->status.p_node->p_input )
+            if( ( p_node && p_item->p_input == p_node->p_input ) ||
+                        ( !p_node && p_item->p_input ==
+                        p_playlist->status.p_node->p_input ) )
                 c = '*';
-            else if( PlaylistIsPlaying( p_intf,
-                        p_sys->pp_plist[i_item]->p_item ) )
+            else if( p_item == p_node || ( p_item != p_node &&
+                        PlaylistIsPlaying( p_intf, p_item ) ) )
                 c = '>';
 
             if( y >= y_end ) break;
@@ -1901,12 +1870,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = p_sys->p_playlist;
-
-    if( p_playlist == NULL )
-    {
-        return NULL;
-    }
+    playlist_t *p_playlist = pl_Get( p_intf );
 
     switch( p_sys->i_current_view )
     {
@@ -1920,14 +1884,9 @@ static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
 static void PlaylistRebuild( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = p_sys->p_playlist;
+    playlist_t *p_playlist = pl_Get( p_intf );
 
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
+    PL_LOCK;
 
     /* First clear the old one */
     PlaylistDestroy( p_intf );
@@ -1937,7 +1896,7 @@ static void PlaylistRebuild( intf_thread_t *p_intf )
 
     p_sys->b_need_update = VLC_FALSE;
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    PL_UNLOCK;
 }
 
 static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
@@ -1993,7 +1952,9 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    playlist_t *p_playlist = pl_Get( p_intf );
     p_intf->p_sys->b_need_update = VLC_TRUE;
+    p_intf->p_sys->p_node = p_playlist->status.p_node;
     return VLC_SUCCESS;
 }
 
@@ -2001,7 +1962,8 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 static inline vlc_bool_t PlaylistIsPlaying( intf_thread_t *p_intf,
                                             playlist_item_t *p_item )
 {
-    playlist_item_t *p_played_item = p_intf->p_sys->p_playlist->status.p_item;
+    playlist_t *p_playlist = pl_Get( p_intf );
+    playlist_item_t *p_played_item = p_playlist->status.p_item;
     return( p_item != NULL && p_played_item != NULL &&
             p_item->p_input != NULL && p_played_item->p_input != NULL &&
             p_item->p_input->i_id == p_played_item->p_input->i_id );
@@ -2012,17 +1974,19 @@ static void FindIndex( intf_thread_t *p_intf )
     intf_sys_t *p_sys = p_intf->p_sys;
     int i;
 
-    if( p_sys->i_box_plidx < p_sys->i_plist_entries &&
-        p_sys->i_box_plidx >= 0 &&
-        PlaylistIsPlaying( p_intf,
-                           p_sys->pp_plist[p_sys->i_box_plidx]->p_item ) )
+    if( p_sys->i_box_plidx < p_sys->i_plist_entries && p_sys->i_box_plidx >= 0 )
     {
-        return;
+        playlist_item_t *p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+        if( ( p_item->i_children == 0 && p_item == p_sys->p_node ) ||
+                PlaylistIsPlaying( p_intf, p_item ) )
+            return;
     }
 
     for( i = 0; i < p_sys->i_plist_entries; i++ )
     {
-        if( PlaylistIsPlaying( p_intf, p_sys->pp_plist[i]->p_item ) )
+        playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
+        if( ( p_item->i_children == 0 && p_item == p_sys->p_node ) ||
+                PlaylistIsPlaying( p_intf, p_sys->pp_plist[i]->p_item ) )
         {
             p_sys->i_box_plidx = i;
             break;
@@ -2056,20 +2020,12 @@ static void Eject( intf_thread_t *p_intf )
      * If it's neither of these, then return
      */
 
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
+    playlist_t * p_playlist = pl_Get( p_intf );
+    PL_LOCK;
 
     if( p_playlist->status.p_item == NULL )
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
+        PL_UNLOCK;
         return;
     }
 
@@ -2125,8 +2081,7 @@ static void Eject( intf_thread_t *p_intf )
         }
     }
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
+    PL_UNLOCK;
 
     if( psz_device == NULL )
     {
@@ -2274,6 +2229,7 @@ static void ReadDir( intf_thread_t *p_intf )
 static void PlayPause( intf_thread_t *p_intf )
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
+    playlist_t *p_playlist = pl_Get( p_intf );
     vlc_value_t val;
 
     if( p_input )
@@ -2289,10 +2245,8 @@ static void PlayPause( intf_thread_t *p_intf )
         }
         var_Set( p_input, "state", val );
     }
-    else if( p_intf->p_sys->p_playlist )
-    {
-        playlist_Play( p_intf->p_sys->p_playlist );
-    }
+    else
+        playlist_Play( p_playlist );
 }
 
 /****************************************************************************
