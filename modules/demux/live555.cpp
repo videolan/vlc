@@ -32,6 +32,7 @@
 #include <vlc_demux.h>
 #include <vlc_interface.h>
 #include <vlc_network.h>
+#include <vlc_url.h>
 
 #include <iostream>
 
@@ -152,6 +153,7 @@ struct demux_sys_t
 {
     char            *p_sdp;    /* XXX mallocated */
     char            *psz_path; /* URL-encoded path */
+    vlc_url_t       url;
 
     MediaSession     *ms;
     TaskScheduler    *scheduler;
@@ -262,6 +264,9 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_real = VLC_FALSE;
     p_sys->psz_path = strdup( p_demux->psz_path );
 
+    /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
+    vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
+
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {
         msg_Err( p_demux, "BasicTaskScheduler::createNew failed" );
@@ -311,7 +316,8 @@ static int  Open ( vlc_object_t *p_this )
         }
         p_sys->p_sdp = (char*)p_sdp;
     }
-    else if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "sdp" ) )
+    else if( ( p_demux->s == NULL ) &&
+             !strcasecmp( p_demux->psz_access, "sdp" ) )
     {
         /* sdp:// link from SAP */
         p_sys->p_sdp = strdup( p_sys->psz_path );
@@ -378,6 +384,8 @@ error:
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
     if( p_sys->psz_path ) free( p_sys->psz_path );
 
+    vlc_UrlClean( &p_sys->url );
+
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -417,6 +425,8 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
     if( p_sys->psz_path ) free( p_sys->psz_path );
 
+    vlc_UrlClean( &p_sys->url );
+
     free( p_sys );
 }
 
@@ -440,7 +450,7 @@ createnew:
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
 
-    if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env,
+    if( ( p_sys->rtsp = RTSPClient::createNew( *p_sys->env,
           p_demux->p_libvlc->i_verbose > 1,
           "VLC media player", i_http_port ) ) == NULL )
     {
@@ -448,17 +458,34 @@ createnew:
                  p_sys->env->getResultMsg() );
         return VLC_EGENERIC;
     }
-    psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
-    sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
 
-    psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
+    psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
+    if( !psz_url ) return VLC_ENOMEM;
+
+    if( p_sys->url.psz_username || p_sys->url.psz_password )
+    {
+        sprintf( psz_url, "rtsp://%s%s", p_sys->url.psz_host,
+                 p_sys->url.psz_path );
+
+        psz_user = strdup( p_sys->url.psz_username );
+        psz_pwd  = strdup( p_sys->url.psz_password );
+    }
+    else
+    {
+        sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
+
+        psz_user = var_CreateGetString( p_demux, "rtsp-user" );
+        psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
+    }
+
+    authenticator.setUsernameAndPassword( (const char*)psz_user,
+                                          (const char*)psz_pwd );
+
+    psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
+                                               &authenticator );
     if( psz_options ) delete [] psz_options;
 
-    psz_user = var_CreateGetString( p_demux, "rtsp-user" );
-    psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
-
 describe:
-    authenticator.setUsernameAndPassword( (const char*)psz_user, (const char*)psz_pwd );
     p_sdp = p_sys->rtsp->describeURL( psz_url,
                 &authenticator, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
 
@@ -486,6 +513,7 @@ describe:
             {
                msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
                            psz_login, psz_password );
+               if( psz_url ) free( psz_url );
                if( psz_login ) psz_user = psz_login;
                if( psz_password ) psz_pwd = psz_password;
                goto describe;
@@ -493,7 +521,7 @@ describe:
             if( psz_login ) free( psz_login );
             if( psz_password ) free( psz_password );
         }
-        else if( !var_CreateGetBool( p_demux, "rtsp-http" ) )
+        else if( !var_GetBool( p_demux, "rtsp-http" ) )
         {
             /* Perhaps a firewall is being annoying. Try HTTP tunneling mode */
             vlc_value_t val;
@@ -510,6 +538,7 @@ describe:
 
     /* malloc-ated copy */
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
+    p_sys->p_sdp = NULL;
     if( p_sdp ) p_sys->p_sdp = strdup( (char*)p_sdp );
     delete[] p_sdp;
 
@@ -531,7 +560,8 @@ static int SessionsSetup( demux_t *p_demux )
     unsigned int   i_buffer = 0;
     unsigned const thresh = 200000; /* RTP reorder threshold .2 second (default .1) */
 
-    b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" );
+    b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" ) ||
+                    var_GetBool( p_demux, "rtsp-http" );
     i_client_port = var_CreateGetInteger( p_demux, "rtp-client-port" );
 
     /* Create the session from the SDP */
@@ -1047,16 +1077,19 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    if( p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 120 )
+    if( p_sys->b_multicast && p_sys->b_no_data &&
+        ( p_sys->i_no_data_ti > 120 ) )
     {
         /* FIXME Make this configurable
         msg_Err( p_demux, "no multicast data received in 36s, aborting" );
         return 0;
         */
     }
-    else if( !p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 34 )
+    else if( !p_sys->b_multicast && p_sys->b_no_data &&
+             ( p_sys->i_no_data_ti > 34 ) )
     {
-        vlc_bool_t b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" );
+        vlc_bool_t b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" ) ||
+                                var_GetBool( p_demux, "rtsp-http" );
 
         if( !b_rtsp_tcp && p_sys->rtsp && p_sys->ms )
         {
@@ -1298,9 +1331,11 @@ static int RollOverTcp( demux_t *p_demux )
     p_sys->i_track = 0;
 
     /* Reopen rtsp client */
-    if( p_demux->s != NULL && ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
+    if( ( p_demux->s != NULL ) &&
+        ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
     {
-        msg_Err( p_demux, "Failed to connect with rtsp://%s", p_sys->psz_path );
+        msg_Err( p_demux, "Failed to connect with rtsp://%s",
+                 p_sys->psz_path );
         goto error;
     }
 
