@@ -56,7 +56,7 @@ media_list_item_added( const libvlc_event_t * p_event, void * p_user_data )
                              libvlc_MediaListItemDeleted,
                              media_list_item_removed, p_mlv, NULL );
     }
-    if( p_mlv->pf_ml_item_added ) p_mlv->pf_ml_item_added( p_event, p_user_data );
+    if( p_mlv->pf_ml_item_added ) p_mlv->pf_ml_item_added( p_event, p_mlv );
 }
 
 static void
@@ -74,7 +74,7 @@ media_list_item_removed( const libvlc_event_t * p_event, void * p_user_data )
                              libvlc_MediaListItemDeleted,
                              media_list_item_removed, p_mlv, NULL );
     }
-    if( p_mlv->pf_ml_item_removed ) p_mlv->pf_ml_item_removed( p_event, p_user_data );
+    if( p_mlv->pf_ml_item_removed ) p_mlv->pf_ml_item_removed( p_event, p_mlv );
 }
 
 
@@ -84,8 +84,8 @@ media_list_item_removed( const libvlc_event_t * p_event, void * p_user_data )
 void
 libvlc_media_list_view_set_ml_notification_callback(
                 libvlc_media_list_view_t * p_mlv,
-                void (*item_added)(const libvlc_event_t *, void *),
-                void (*item_removed)(const libvlc_event_t *, void *) )
+                void (*item_added)(const libvlc_event_t *, libvlc_media_list_view_t *),
+                void (*item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *) )
 {
     p_mlv->pf_ml_item_added = item_added;
     p_mlv->pf_ml_item_removed = item_removed;

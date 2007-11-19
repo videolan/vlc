@@ -42,8 +42,32 @@ struct libvlc_media_list_view_private_t
 /*
  * Private functions
  */
-static void flat_media_list_view_release( libvlc_media_list_view_t * p_mlv );
 
+/**************************************************************************
+ *       ml_item_added  (private) (Callback from media_list_view item_added)
+ **************************************************************************/
+static void
+ml_item_added( const libvlc_event_t * p_event, libvlc_media_list_view_t * p_mlv )
+{
+    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
+    libvlc_media_descriptor_retain( p_md );
+    vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
+}
+
+/**************************************************************************
+ *       ml_item_removed  (private) (Callback from media_list_view)
+ **************************************************************************/
+static void
+ml_item_removed( const libvlc_event_t * p_event, libvlc_media_list_view_t * p_mlv )
+{
+    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_deleted.item;
+    int i = vlc_array_index_of_item( &p_mlv->p_this_view_data->array, p_md );
+    if( i >= 0 )
+    {
+        vlc_array_remove( &p_mlv->p_this_view_data->array, i );
+        libvlc_media_descriptor_release( p_md );
+    }
+}
 
 /**************************************************************************
  *       flat_media_list_view_count  (private)
@@ -120,5 +144,9 @@ libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
                                         flat_media_list_view_release,
                                         p_this_view_data,
                                         p_e );
+    libvlc_media_list_view_set_ml_notification_callback( p_mlv,
+        ml_item_added,
+        ml_item_removed );
+
     return p_mlv;
 }
