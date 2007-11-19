@@ -172,10 +172,10 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     char *psz_charset = NULL;
 
+    /* First try demux-specified encoding */
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('t','1','4','0') )
         psz_charset = strdup( "UTF-8" ); /* IUT T.140 is always using UTF-8 */
     else
-    /* First try demux-specified encoding */
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
         psz_charset = strdup (p_dec->fmt_in.subs.psz_encoding);
@@ -211,6 +211,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
     }
 
+    /* Forth, don't do character decoding, i.e. assume UTF-8 */
     if (psz_charset == NULL)
     {
         psz_charset = strdup ("UTF-8");
@@ -218,6 +219,7 @@ static int OpenDecoder( vlc_object_t *p_this )
                  psz_charset ? psz_charset : "error");
     }
 
+    /* Fifth, fail */
     if (psz_charset == NULL)
     {
         free (p_sys);
