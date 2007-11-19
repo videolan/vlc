@@ -33,15 +33,15 @@ extern NSString * VLCMediaListItemDeleted;
 
 // TODO: Documentation
 @protocol VLCMediaListDelegate
-- (void)mediaList:(VLCMediaList *) mediaAdded:(VLCMedia *)media atIndex:(int)index;
-- (void)mediaList:(VLCMediaList *) mediaRemovedAtIndex:(int)index;
+- (void)mediaList:(VLCMediaList *)aMediaList mediaAdded:(VLCMedia *)media atIndex:(int)index;
+- (void)mediaList:(VLCMediaList *)aMediaList mediaRemovedAtIndex:(int)index;
 @end
 
 // TODO: Documentation
 @interface VLCMediaList : NSObject
 {
     void * p_mlist;                //< Internal instance of media list
-    id delegate;                //< Delegate object
+    id <VLCMediaListDelegate,NSObject> delegate;                //< Delegate object
 }
 
 /* Properties */
