@@ -215,18 +215,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     if (psz_charset == NULL)
     {
         psz_charset = strdup ("UTF-8");
-        msg_Dbg (p_dec, "trying hard-coded character encoding: %s",
-                 psz_charset ? psz_charset : "error");
+        msg_Dbg (p_dec, "using UTF-8 character encoding" );
     }
 
-    /* Fifth, fail */
-    if (psz_charset == NULL)
-    {
-        free (p_sys);
-        return VLC_ENOMEM;
-    }
-
-    if (strcasecmp (psz_charset, "UTF-8") && strcasecmp (psz_charset, "utf8"))
+    if ((psz_charset != NULL)
+     && strcasecmp (psz_charset, "UTF-8")
+     && strcasecmp (psz_charset, "utf8"))
     {
         p_sys->iconv_handle = vlc_iconv_open ("UTF-8", psz_charset);
         if (p_sys->iconv_handle == (vlc_iconv_t)(-1))
