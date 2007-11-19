@@ -97,7 +97,7 @@ static const char *FindFallbackEncoding (const char *locale)
 
     /* Hebrew (ISO-8859-8) */
     if (!locale_match ("he" "iw" "yi", locale))
-        return "CP1255"; // Compatible Microsoft superset
+        return "ISO-8859-8"; // CP1255 is reportedly screwed up
 
     /* Latin-5 Turkish (ISO-8859-9) */
     if (!locale_match ("tr" "ku", locale))
@@ -204,8 +204,20 @@ const char *GetFallbackEncoding( void )
     return FindFallbackEncoding (psz_lang);
 #else
     static char buf[16] = "";
+
     if (buf[0] == 0)
-        snprintf (buf, sizeof (buf), "CP%u", GetACP ());
+    {
+        int cp = GetACP ();
+
+        switch (cp)
+        {
+            case 1255: // Hebrew, CP1255 screws up somewhat
+                strcpy (buf, "ISO-8859-8");
+                break;
+            default:
+                snprintf (buf, sizeof (buf), "CP%u", GetACP ());
+        }
+    }
     return buf;
 #endif
 }
