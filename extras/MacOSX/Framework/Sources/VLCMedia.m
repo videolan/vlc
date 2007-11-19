@@ -124,56 +124,15 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 }
 
 - (id)initWithURL:(NSString *)aURL
-{
-    // Parse the URL
-    NSString *scheme;   // Everything before ://, defaults to file if not present
-    NSString *path;     // Everything after ://
-    NSRange range;
-    
-    range = [aURL rangeOfString:@"://"];
-    if (range.length > 0)
-    {
-        scheme = [aURL substringToIndex:range.location];
-    }
-    else
-    {
-        scheme = @"file";
-        range.location = 0;
-    }
-    path = [aURL substringFromIndex:NSMaxRange(range)];
-    
-    if ([scheme isEqualToString:@"file"]) 
-    {
-        BOOL isDirectory;
-        path = [path stringByExpandingTildeInPath];
-        
-        // Check to see if it's a file or url
-        NSString *videoTSPath = path;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:videoTSPath isDirectory:&isDirectory] && isDirectory)
-        {
-            if ([[videoTSPath lastPathComponent] compare:@"VIDEO_TS"] != NSOrderedSame)
-                videoTSPath = [videoTSPath stringByAppendingPathComponent:@"VIDEO_TS/"];
-            videoTSPath = [videoTSPath stringByAppendingPathComponent:@"VIDEO_TS.VOB"];
-            
-            // The url is a directory should we check for a DVD directory structure?
-            if ([[NSFileManager defaultManager] fileExistsAtPath:videoTSPath isDirectory:&isDirectory] && !isDirectory)
-                /* do nothing because this is a DVD */;
-            else
-                // TODO: Should we search for playable items?
-                // This is not a playable file
-                return nil;
-        }
-    }
-    
+{        
     if (self = [super init])
     {
-        url = [[NSString stringWithFormat:@"%@://%@", scheme, path] retain];
         
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
         
         p_md = libvlc_media_descriptor_new([VLCLibrary sharedInstance],
-                                           [url cString],
+                                           [aURL cString],
                                            &ex);
         quit_on_exception(&ex);
         
