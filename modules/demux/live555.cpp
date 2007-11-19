@@ -478,6 +478,7 @@ createnew:
         psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
     }
 
+describe:
     authenticator.setUsernameAndPassword( (const char*)psz_user,
                                           (const char*)psz_pwd );
 
@@ -485,7 +486,6 @@ createnew:
                                                &authenticator );
     if( psz_options ) delete [] psz_options;
 
-describe:
     p_sdp = p_sys->rtsp->describeURL( psz_url,
                 &authenticator, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
 
@@ -499,7 +499,9 @@ describe:
         const char *psz_error = p_sys->env->getResultMsg();
 
         msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
-        sscanf( psz_error, "%*sRTSP/%*s%3u", &i_code );
+        if( var_CreateGetBool( p_demux, "rtsp-http" ) )
+            sscanf( psz_error, "%*s %*s HTTP GET %*s HTTP/%*u.%*u %3u %*s", &i_code );
+        else sscanf( psz_error, "%*sRTSP/%*s%3u", &i_code );
 
         if( i_code == 401 )
         {
