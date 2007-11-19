@@ -2332,6 +2332,17 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 }
             }
         }
+        else if( !strncmp( tracks[i_track]->psz_codec, "V_REAL/RV", 9 ) )
+        {
+            if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV10" ) )
+                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '1', '0' );
+            else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV20" ) )
+                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '2', '0' );
+            else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV30" ) )
+                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '3', '0' );
+            else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV40" ) )
+                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '4', '0' );
+        }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_MPEG4", 7 ) )
         {
             if( !strcmp( tracks[i_track]->psz_codec, "V_MPEG4/MS/V3" ) )
