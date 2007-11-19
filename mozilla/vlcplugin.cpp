@@ -99,10 +99,6 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     }
     ppsz_argv[ppsz_argc++] = "--no-one-instance";
 
-#if 1
-    ppsz_argv[0] = "C:\\Cygwin\\home\\damienf\\vlc-trunk\\vlc";
-#endif
-
 #endif /* XP_MACOSX */
 
     /* common settings */
