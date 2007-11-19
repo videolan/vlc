@@ -30,6 +30,14 @@
 #include <vlc_about.h>
 #import <WebKit/WebKit.h>
 
+#ifdef __x86_64__
+#define PLATFORM "Intel"
+#elif __i386__
+#define PLATFORM "Intel"
+#else
+#define PLATFORM "PowerPC"
+#endif
+
 /*****************************************************************************
  * VLAboutBox implementation
  *****************************************************************************/
@@ -63,8 +71,7 @@ static VLAboutBox *_o_sharedInstance = nil;
     {
         NSString *o_name;
         NSString *o_version;
-        NSString *o_platform;
-        
+
         /* Get the info dictionary (Info.plist) */
         o_info_dict = [[NSBundle mainBundle] infoDictionary];
  
@@ -79,12 +86,6 @@ static VLAboutBox *_o_sharedInstance = nil;
         /* Set the about box title */
         [o_about_window setTitle:_NS("About VLC media player")];
 
-        #ifdef __powerpc__ || __ppc__ || __ppc64__
-                o_platform = @"PowerPC";
-        #else
-                o_platform = @"Intel";
-        #endif        
-
         /* setup the creator / revision field */
         if( VLC_Changeset() != "exported" )
         [o_revision_field setStringValue: [NSString stringWithFormat: \
@@ -95,7 +96,7 @@ static VLAboutBox *_o_sharedInstance = nil;
             _NS("Compiled by %s"), VLC_CompileBy()]];
  
         /* Setup the nameversion field */
-        [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%@)", VLC_Version(), o_platform]];
+        [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VLC_Version(), PLATFORM]];
 
         /* setup the authors and thanks field */
         [o_credits_textview setString: [NSString stringWithFormat: @"%@\n\n\n\n%@\n%@\n\n%@", 
