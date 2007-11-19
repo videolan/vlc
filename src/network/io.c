@@ -333,6 +333,14 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 #endif
         }
 
+        if (n == 0)
+            /* For streams, this means end of file, and there will not be any
+             * further data ever on the stream. For datagram sockets, this
+             * means empty datagram, and there could be more data coming.
+             * However, it makes no sense to set <waitall> with datagrams.
+             */
+            break; // EOF
+
         if (n == -1)
         {
 #if defined(WIN32) || defined(UNDER_CE)
@@ -367,7 +375,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         p_buf += n;
         i_buflen -= n;
 
-        if ((n == 0) || !waitall)
+        if (!waitall)
             break;
     }
     return i_total;
