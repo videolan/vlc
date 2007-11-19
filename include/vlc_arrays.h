@@ -314,6 +314,18 @@ vlc_array_item_at_index( vlc_array_t * p_array, int i_index )
     return p_array->pp_elems[i_index];
 }
 
+static inline int
+vlc_array_index_of_item( vlc_array_t * p_array, void * item )
+{
+    int i;
+    for( i = 0; i < p_array->i_count; i++)
+    {
+        if( p_array->pp_elems[i] == item )
+            return i;
+    }
+    return -1;
+}
+
 /* Write */
 static inline void
 vlc_array_insert( vlc_array_t * p_array, void * p_elem, int i_index )
