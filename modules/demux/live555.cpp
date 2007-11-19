@@ -546,7 +546,7 @@ describe:
 }
 
 /*****************************************************************************
- * Connect: prepares the subsessions and does the SETUP
+ * SessionsSetup: prepares the subsessions and does the SETUP
  *****************************************************************************/
 static int SessionsSetup( demux_t *p_demux )
 {
@@ -775,13 +775,13 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "SPEEX" ) )
                 {
                     tk->fmt.i_codec = VLC_FOURCC( 's', 'p', 'x', 'r' );
-		    if ( sub->rtpTimestampFrequency() )
-		        tk->fmt.audio.i_rate = sub->rtpTimestampFrequency();
+                    if ( sub->rtpTimestampFrequency() )
+                        tk->fmt.audio.i_rate = sub->rtpTimestampFrequency();
                     else
-		    {
-		        msg_Warn( p_demux,"Using 8kHz as default sample rate." );
-			tk->fmt.audio.i_rate = 8000;
-		    }
+                    {
+                        msg_Warn( p_demux,"Using 8kHz as default sample rate." );
+                        tk->fmt.audio.i_rate = 8000;
+                    }
                 }
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
@@ -955,13 +955,13 @@ static int Play( demux_t *p_demux )
     }
     p_sys->i_pcr = 0;
 
-#if 0
+#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
     /* TODO */
     for( i = 0; i < p_sys->i_track; i++ )
     {
-        //p_sys->track[i]->i_pts = 0;
+        p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
         p_sys->track[i]->i_start_seq = (int)p_sys->track[i]->sub->rtpInfo.seqNum;
-        msg_Dbg( p_demux, "set startseq: %u", p_sys->track[i]->i_start_seq );
+        msg_Info( p_demux, "set startseq: %u", p_sys->track[i]->i_start_seq );
     }
 #endif
 
@@ -1171,13 +1171,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 p_sys->i_pcr = 0;
-#if 0
+#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
                 /* Retrieve RTP-Info values */
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
-                    //p_sys->track[i]->i_pts = 0;
+                    p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
                     p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
-                    msg_Dbg( p_demux, "set pos startseq: %u", p_sys->track[i]->i_start_seq );
+                    msg_Info( p_demux, "set pos startseq: %u", p_sys->track[i]->i_start_seq );
                 }
 #endif
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 9999999999)
@@ -1248,12 +1248,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             p_sys->i_pcr = 0;
-#if 0
+#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
             for( i = 0; i < p_sys->i_track; i++ )
             {
-                //p_sys->track[i]->i_pts = 0;
+                p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
                 p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
-                msg_Dbg( p_demux, "set pause startseq: %u", p_sys->track[i]->i_start_seq );
+                msg_Info( p_demux, "set pause startseq: %u", p_sys->track[i]->i_start_seq );
             }
 #endif
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 9999999999)
