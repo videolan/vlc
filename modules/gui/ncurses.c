@@ -1904,48 +1904,51 @@ static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     playlist_item_t *p_child;
-    char *psz_tmp;
     int k;
 
-    psz_tmp = (char *)malloc( strlen( c ) + 4 );
-    if( psz_tmp == NULL ) return;
     for( k = 0; k < p_node->i_children; k++ )
     {
-        struct pl_item_t *p_pl_item;
-        char *buff;
-        int i_size;
-
+        char *psz_display;
         p_child = p_node->pp_children[k];
-        i_size = strlen( c ) + strlen( p_child->p_input->psz_name ) + 4;
-        buff = (char *)malloc( sizeof( char ) * i_size );
-        p_pl_item = (struct pl_item_t *)malloc( sizeof( struct pl_item_t ) );
-        if( p_pl_item == NULL || buff == NULL ) return;
-
-        if( strlen( c ) )
+        char *psz_name = input_item_GetTitle( p_child->p_input );
+        if( !psz_name || !*psz_name )
         {
-            sprintf( buff, "%s%c-%s", c, k == p_node->i_children - 1 ?
-                     '`' : '|', p_child->p_input->psz_name );
+            free( psz_name );
+            psz_name = input_item_GetName( p_child->p_input );
+        }
+
+        if( c && *c )
+        {
+            if( asprintf( &psz_display, "%s%c-%s", c,
+                    k == p_node->i_children - 1 ?  '`' : '|', psz_name ) == -1 )
+                return;
         }
         else
         {
-            sprintf( buff, " %s", p_child->p_input->psz_name );
+            if( asprintf( &psz_display, " %s", psz_name ) == -1 )
+                return;
         }
-        p_pl_item->psz_display = strdup( buff );
+        free( psz_name );
+        struct pl_item_t *p_pl_item = malloc( sizeof( struct pl_item_t ) );
+        if( !p_pl_item )
+            return;
+        p_pl_item->psz_display = psz_display;
         p_pl_item->p_item = p_child;
         INSERT_ELEM( p_sys->pp_plist, p_sys->i_plist_entries,
                      p_sys->i_plist_entries, p_pl_item );
-        free( buff );
         i++;
 
         if( p_child->i_children > 0 )
         {
-            sprintf( psz_tmp, "%s%c ", c,
-                     k == p_node->i_children - 1 ? ' ' : '|' );
+            char *psz_tmp;
+            if( asprintf( &psz_tmp, "%s%c ", c,
+                     k == p_node->i_children - 1 ? ' ' : '|' ) == -1 )
+                return; 
             PlaylistAddNode( p_intf, p_child, i,
                              strlen( c ) ? psz_tmp : " " );
+            free( psz_tmp );
         }
     }
-    free( psz_tmp );
 }
 
 static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
