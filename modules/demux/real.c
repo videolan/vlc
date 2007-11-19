@@ -124,9 +124,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 static int HeaderRead( demux_t *p_demux );
 static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num );
 
-// Map flavour to bytes per second
-static int sipr_fl2bps[4] = {813, 1062, 625, 2000}; // 6.5, 8.5, 5, 16 kbit per second
-
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -138,6 +135,11 @@ static int Open( vlc_object_t *p_this )
     const uint8_t *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) return VLC_EGENERIC;
+    if( !memcmp( p_peek, ".ra", 3 ) )
+    {
+        msg_Warn( p_demux, ".ra files unsuported" );
+        return VLC_EGENERIC;
+    }
     if( memcmp( p_peek, ".RMF", 4 ) ) return VLC_EGENERIC;
 
     /* Fill p_demux field */
@@ -1011,6 +1013,7 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
     {
         int i_header_size, i_flavor, i_coded_frame_size, i_subpacket_h;
         int i_frame_size, i_subpacket_size;
+        char p_genr[4];
         int i_version = GetWBE( &p_peek[4] );   /* [0..3] = '.','r','a',0xfd */
         msg_Dbg( p_demux, "    - audio version=%d", i_version );
 
@@ -1099,9 +1102,8 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
                  (char*)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate );
         }
-        else
+        else /* RMF version 4/5 */
         {
-
             p_peek += 2;                                           /* 00 00 */
             p_peek += 4;                                    /* .ra4 or .ra5 */
             p_peek += 4;                                       /* data size */
@@ -1127,7 +1129,7 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
             if( i_version == 5 )
             {
-                p_peek += 4;                                         /* genr */
+                memcpy( (char *)p_genr, p_peek, 4 ); p_peek += 4;    /* genr */
                 memcpy( (char *)&fmt.i_codec, p_peek, 4 ); p_peek += 4;
             }
             else
@@ -1149,8 +1151,10 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         switch( fmt.i_codec )
         {
         case VLC_FOURCC('1','4','_','4'):
+            /* fmt.audio.i_blockalign = 0x14 */
             break;
         case VLC_FOURCC('l','p','c','J'):
+            /* fmt.audio.i_blockalign = 0x14 */
             fmt.i_codec = VLC_FOURCC( '1','4','_','4' );
             break;
 
@@ -1175,18 +1179,17 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
             break;
 
+        case VLC_FOURCC('s','i','p','r'):
+            fmt.audio.i_flavor = i_flavor;
         case VLC_FOURCC('c','o','o','k'):
         case VLC_FOURCC('a','t','r','c'):
-            fmt.audio.i_blockalign = i_subpacket_size;
+            if( !memcmp( p_genr, "genr", 4 ) )
+                fmt.audio.i_blockalign = i_subpacket_size;
+            else
+                fmt.audio.i_blockalign = i_coded_frame_size;
             if( !fmt.i_extra ) break;
             fmt.p_extra = malloc( fmt.i_extra );
             memcpy( fmt.p_extra, p_peek, fmt.i_extra );
-            break;
-
-        case VLC_FOURCC('s','i','p','r'):
-            fmt.i_extra = 0;
-            fmt.audio.i_blockalign = i_coded_frame_size;
-            fmt.audio.i_bitspersample = sipr_fl2bps[ i_flavor ];
             break;
 
         case VLC_FOURCC('r','a','l','f'):

@@ -186,6 +186,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* Channel detection */
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
         p_dec->fmt_in.audio.i_channels > 6 )
     {
@@ -197,19 +198,12 @@ static int Open( vlc_object_t *p_this )
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
+    /* Flavor for SIPR codecs */
     p_sys->i_codec_flavor = -1;
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','i','p','r') )
     {
-        if( p_dec->fmt_in.audio.i_bitspersample > 1531 )
-            p_sys->i_codec_flavor = 3;
-        else if( p_dec->fmt_in.audio.i_bitspersample > 937 )
-            p_sys->i_codec_flavor = 1;
-        else if( p_dec->fmt_in.audio.i_bitspersample > 719 )
-            p_sys->i_codec_flavor = 0;
-        else
-            p_sys->i_codec_flavor = 2;
-        msg_Dbg( p_dec, "Got sipr flavor %d from bitrate %d\n", 
-            p_sys->i_codec_flavor, p_dec->fmt_in.audio.i_bitspersample );
+        p_sys->i_codec_flavor = p_dec->fmt_in.audio.i_flavor;
+        msg_Dbg( p_dec, "Got sipr flavor %d", p_sys->i_codec_flavor );
     }
 
     if( OpenDll( p_dec ) != VLC_SUCCESS )

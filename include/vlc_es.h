@@ -95,6 +95,7 @@ struct audio_format_t
     unsigned     i_bitspersample;
     unsigned     i_blockalign;
     uint8_t      i_channels; /* must be <=32 */
+    uint8_t      i_flavor;
 };
 
 #ifdef WORDS_BIGENDIAN
