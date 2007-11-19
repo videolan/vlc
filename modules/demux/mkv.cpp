@@ -2609,7 +2609,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
         else
         {
-            msg_Err( &sys.demuxer, "unknow codec id=`%s'", tracks[i_track]->psz_codec );
+            msg_Err( &sys.demuxer, "unknown codec id=`%s'", tracks[i_track]->psz_codec );
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
         if( tracks[i_track]->b_default )
