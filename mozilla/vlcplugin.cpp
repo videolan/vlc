@@ -90,7 +90,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
          {
              if( i_type == REG_SZ )
              {
-                 strcat( p_data, "\\plugins000" );
+                 strcat( p_data, "\\plugins" );
                  ppsz_argv[ppsz_argc++] = "--plugin-path";
                  ppsz_argv[ppsz_argc++] = p_data;
              }
