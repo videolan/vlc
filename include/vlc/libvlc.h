@@ -555,6 +555,12 @@ VLC_PUBLIC_API libvlc_media_descriptor_t *
                                            int index,
                                            libvlc_exception_t * p_e );
 
+VLC_PUBLIC_API libvlc_media_list_view_t *
+    libvlc_media_list_view_children_at_index(  libvlc_media_list_view_t * p_mlv,
+                                           int index,
+                                           libvlc_exception_t * p_e );
+
+
 VLC_PUBLIC_API int
     libvlc_media_list_view_index_of_item(  libvlc_media_list_view_t * p_mlv,
                                            libvlc_media_descriptor_t * p_md,

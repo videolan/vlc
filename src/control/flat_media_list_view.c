@@ -74,6 +74,18 @@ flat_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
 }
 
 /**************************************************************************
+ *       flat_media_list_view_item_at_index  (private)
+ * (called by flat_media_list_view_item_at_index)
+ **************************************************************************/
+static libvlc_media_list_view_t *
+flat_media_list_view_children_at_index( libvlc_media_list_view_t * p_mlv,
+                                        int index,
+                                        libvlc_exception_t * p_e )
+{
+    return NULL;
+}
+
+/**************************************************************************
  *       flat_media_list_view_release (private)
  * (called by media_list_view_release)
  **************************************************************************/
@@ -104,6 +116,7 @@ libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
     p_mlv = libvlc_media_list_view_new( p_mlist,
                                         flat_media_list_view_count,
                                         flat_media_list_view_item_at_index,
+                                        flat_media_list_view_children_at_index,
                                         flat_media_list_view_release,
                                         p_this_view_data,
                                         p_e );
