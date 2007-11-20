@@ -306,7 +306,9 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaInstancePositionChanged,
 
     libvlc_MediaListItemAdded,
+    libvlc_MediaListWillAddItem,
     libvlc_MediaListItemDeleted,
+    libvlc_MediaListWillDeleteItem,
 
     libvlc_MediaListPlayerPlayed,
     libvlc_MediaListPlayerNextItemSet,
@@ -365,7 +367,17 @@ typedef struct libvlc_event_t
         {
             libvlc_media_descriptor_t * item;
             int index;
+        } media_list_will_add_item;
+        struct
+        {
+            libvlc_media_descriptor_t * item;
+            int index;
         } media_list_item_deleted;
+        struct
+        {
+            libvlc_media_descriptor_t * item;
+            int index;
+        } media_list_will_delete_item;
     } u;
 } libvlc_event_t;
 

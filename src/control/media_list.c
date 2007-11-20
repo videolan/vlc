@@ -26,6 +26,11 @@
 #include <assert.h>
 #include "vlc_arrays.h"
 
+typedef enum EventPlaceInTime {
+    EventWillHappen,
+    EventDidHappen
+} EventPlaceInTime;
+
 /*
  * Private functions
  */
@@ -40,14 +45,24 @@
 static void
 notify_item_addition( libvlc_media_list_t * p_mlist,
                       libvlc_media_descriptor_t * p_md,
-                      int index )
+                      int index,
+                      EventPlaceInTime event_status )
 {
     libvlc_event_t event;
 
     /* Construct the event */
-    event.type = libvlc_MediaListItemAdded;
-    event.u.media_list_item_added.item = p_md;
-    event.u.media_list_item_added.index = index;
+    if( event_status == EventDidHappen )
+    {
+        event.type = libvlc_MediaListItemAdded;
+        event.u.media_list_item_added.item = p_md;
+        event.u.media_list_item_added.index = index;
+    }
+    else /* if( event_status == EventWillHappen ) */
+    {
+        event.type = libvlc_MediaListWillAddItem;
+        event.u.media_list_will_add_item.item = p_md;
+        event.u.media_list_will_add_item.index = index;
+    }
 
     /* Send the event */
     libvlc_event_send( p_mlist->p_event_manager, &event );
@@ -61,14 +76,24 @@ notify_item_addition( libvlc_media_list_t * p_mlist,
 static void
 notify_item_deletion( libvlc_media_list_t * p_mlist,
                       libvlc_media_descriptor_t * p_md,
-                      int index )
+                      int index,
+                      EventPlaceInTime event_status )
 {
     libvlc_event_t event;
 
     /* Construct the event */
-    event.type = libvlc_MediaListItemDeleted;
-    event.u.media_list_item_deleted.item = p_md;
-    event.u.media_list_item_deleted.index = index;
+    if( event_status == EventDidHappen )
+    {
+        event.type = libvlc_MediaListItemDeleted;
+        event.u.media_list_item_deleted.item = p_md;
+        event.u.media_list_item_deleted.index = index;
+    }
+    else /* if( event_status == EventWillHappen ) */
+    {
+        event.type = libvlc_MediaListWillDeleteItem;
+        event.u.media_list_will_delete_item.item = p_md;
+        event.u.media_list_will_delete_item.index = index;
+    }
 
     /* Send the event */
     libvlc_event_send( p_mlist->p_event_manager, &event );
@@ -277,8 +302,10 @@ void libvlc_media_list_add_media_descriptor(
 {
     (void)p_e;
     libvlc_media_descriptor_retain( p_md );
+
+    notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items ), EventWillHappen );
     vlc_array_append( &p_mlist->items, p_md );
-    notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items )-1 );
+    notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items )-1, EventDidHappen );
 }
 
 /**************************************************************************
@@ -295,8 +322,9 @@ void libvlc_media_list_insert_media_descriptor(
     (void)p_e;
     libvlc_media_descriptor_retain( p_md );
 
+    notify_item_addition( p_mlist, p_md, index, EventWillHappen );
     vlc_array_insert( &p_mlist->items, p_md, index );
-    notify_item_addition( p_mlist, p_md, index );
+    notify_item_addition( p_mlist, p_md, index, EventDidHappen );
 }
 
 /**************************************************************************
@@ -312,8 +340,9 @@ void libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
 
     p_md = vlc_array_item_at_index( &p_mlist->items, index );
 
+    notify_item_deletion( p_mlist, p_md, index, EventWillHappen );
     vlc_array_remove( &p_mlist->items, index );
-    notify_item_deletion( p_mlist, p_md, index );
+    notify_item_deletion( p_mlist, p_md, index, EventDidHappen );
 
     libvlc_media_descriptor_release( p_md );
 }
