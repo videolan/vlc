@@ -479,6 +479,7 @@ createnew:
     }
 
 describe:
+msg_Info( p_demux, "[%s] user=%s pwd=%s", psz_url, psz_user, psz_pwd );
     authenticator.setUsernameAndPassword( (const char*)psz_user,
                                           (const char*)psz_pwd );
 
@@ -513,11 +514,12 @@ describe:
                                                    &psz_login, &psz_password );
             if( i_ret == DIALOG_OK_YES )
             {
-               msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
-                           psz_login, psz_password );
-               if( psz_login ) psz_user = psz_login;
-               if( psz_password ) psz_pwd = psz_password;
-               goto describe;
+                msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
+                            psz_login, psz_password );
+                if( psz_login ) psz_user = psz_login;
+                if( psz_password ) psz_pwd = psz_password;
+                i_ret = VLC_SUCCESS;
+                goto describe;
             }
             if( psz_login ) free( psz_login );
             if( psz_password ) free( psz_password );
