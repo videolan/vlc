@@ -73,6 +73,9 @@ void E_(Close_IFO) ( vlc_object_t * );
 int E_(Import_VideoPortal) ( vlc_object_t * );
 void E_(Close_VideoPortal) ( vlc_object_t * );
 
+int E_(Import_iTML) ( vlc_object_t * );
+void E_(Close_iTML) ( vlc_object_t * );
+
 #define INIT_PLAYLIST_STUFF \
     playlist_t *p_playlist = pl_Yield( p_demux ); \
     input_thread_t *p_input_thread = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT ); \

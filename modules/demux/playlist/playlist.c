@@ -123,6 +123,11 @@ vlc_module_begin();
         set_description( _("Dummy ifo demux") );
         set_capability( "demux2", 12 );
         set_callbacks( E_(Import_IFO), E_(Close_IFO) );
+    add_submodule();
+        set_description( _("iTunes Music Library importer") );
+        add_shortcut( "itml" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_iTML), E_(Close_iTML) );
 vlc_module_end();
 
 
