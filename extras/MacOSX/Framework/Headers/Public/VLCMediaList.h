@@ -58,10 +58,4 @@ extern NSString * VLCMediaListItemDeleted;
 - (VLCMedia *)mediaAtIndex:(int)index;
 - (int)indexOfMedia:(VLCMedia *)media;
 - (int)count;
-
-#if 0 /* Disabled until this get fixed in libvlc */
-- (NSArray *)sublists; //< A way to see the same media list. Only sub media list.
-- (NSArray *)flatMediaView; //< A way to see the same media list. Only media.
-- (VLCMedia *)providerMedia;  //< If a media was at the origin of this media list, here it is.
-#endif
 @end

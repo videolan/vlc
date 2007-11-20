@@ -222,56 +222,6 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
     
     return result;
 }
-
-- (NSArray *)sublists
-{
-    NSMutableArray *ret = [[NSMutableArray alloc] initWithCapacity: 0];
-    int i, count;
-
-    libvlc_exception_t p_e;
-    libvlc_exception_init( &p_e );
-    count = libvlc_media_list_count( p_mlist, &p_e );
-    quit_on_exception( &p_e );
-
-    for(i = 0; i < count; i++)
-    {
-        libvlc_media_descriptor_t *p_md;
-        libvlc_media_list_t *p_submlist;
-        p_md = libvlc_media_list_item_at_index( p_mlist, i, NULL );
-        p_submlist = libvlc_media_descriptor_subitems( p_md, NULL );
-        if (p_submlist)
-        {
-            [ret addObject:[VLCMediaList medialistWithLibVLCMediaList:p_submlist]];
-            libvlc_media_list_release( p_submlist );
-        }
-        libvlc_media_descriptor_release( p_md );
-    }
-    return [ret autorelease];
-}
-
-//- (VLCMediaList *)flatPlaylist
-//{
-//    VLCMediaList * flatPlaylist;
-//    libvlc_exception_t p_e;
-//    libvlc_exception_init( &p_e );
-//    libvlc_media_list_t * p_flat_mlist = libvlc_media_list_flat_media_list( p_mlist, &p_e );
-//    quit_on_exception( &p_e );
-//    flatPlaylist = [VLCMediaList medialistWithLibVLCMediaList: p_flat_mlist];
-//    libvlc_media_list_release( p_flat_mlist );
-//    return flatPlaylist;
-//}
-//
-//- (VLCMedia *)providerMedia
-//{
-//    VLCMedia * ret;
-//    libvlc_exception_t p_e;
-//    libvlc_exception_init( &p_e );
-//    libvlc_media_descriptor_t * p_md = libvlc_media_list_media_descriptor( p_mlist, &p_e );
-//    ret = [VLCMedia mediaWithLibVLCMediaDescriptor: p_md];
-//    libvlc_media_descriptor_release( p_md );
-//    quit_on_exception( &p_e );
-//    return ret;
-//}
 @end
 
 @implementation VLCMediaList (LibVLCBridging)
