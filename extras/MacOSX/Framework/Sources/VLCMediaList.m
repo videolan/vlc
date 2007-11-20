@@ -47,10 +47,8 @@ NSString *VLCMediaListItemDeleted    = @"VLCMediaListItemDeleted";
 static void HandleMediaListItemAdded(const libvlc_event_t *event, void *user_data)
 {
     id self = user_data;
-    
-    // Check to see if the last item added is this item we're trying to introduce
-    // If no, then add the item to the local list, otherwise, the item has already 
-    // been added
+    int index = event->u.media_list_item_added.index;
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaListItemAdded:) 
                                        withArgumentAsObject:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -58,11 +56,19 @@ static void HandleMediaListItemAdded(const libvlc_event_t *event, void *user_dat
                                                           [NSNumber numberWithInt:event->u.media_list_item_added.index], @"index",
                                                           nil]];
 }
+static void HandleMediaListWillAddItem(const libvlc_event_t *event, void *user_data)
+{
+    id self = user_data;
+    int index = event->u.media_list_will_add_item.index;
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+}
+
 
 static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * user_data)
 {
     id self = user_data;
-    
+    int index = event->u.media_list_will_add_item.index;
+    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
     // Check to see if the last item deleted is this item we're trying delete now.
     // If no, then delete the item from the local list, otherwise, the item has already 
     // been deleted
@@ -70,6 +76,26 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
                                                  withMethod:@selector(mediaListItemRemoved:) 
                                        withArgumentAsObject:[NSNumber numberWithInt:event->u.media_list_item_deleted.index]];
 }
+
+static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *user_data)
+{
+    id self = user_data;
+    int index = event->u.media_list_will_add_item.index;
+    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+}
+
+@implementation VLCMediaList (KeyValueCodingCompliance)
+/* For the @"Media" key */
+- (int) countOfMedia
+{
+    return [self count];
+}
+
+- (id) objectInMediaAtIndex:(int)i
+{
+    return [self mediaAtIndex:i];
+}
+@end
 
 @implementation VLCMediaList
 - (id)init
@@ -100,7 +126,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(p_mlist, NULL);
             libvlc_event_detach(p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaListWillDeleteItem, HandleMediaListWillDeleteItem, self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaListWillAddItem, HandleMediaListWillAddItem, self, NULL);
         }
         [super release];
     }
