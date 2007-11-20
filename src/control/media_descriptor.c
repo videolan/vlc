@@ -326,6 +326,8 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
     /* Send the event */
     libvlc_event_send( p_md->p_event_manager, &event );
 
+    libvlc_event_manager_release( p_md->p_event_manager );
+
     char ** all_keys = vlc_dictionary_all_keys( &p_md->tags );
     for( i = 0; all_keys[i]; i++ )
     {
