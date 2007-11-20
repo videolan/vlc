@@ -34,6 +34,7 @@ InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
 {
     mymove = false;
     setMinimum( 0 );
+    setMouseTracking(true);
     setMaximum( 1000 );
     setSingleStep( 2 );
     setPageStep( 10 );
@@ -50,6 +51,7 @@ void InputSlider::setPosition( float pos, int a, int b )
     mymove = true;
     setValue( (int)(pos * 1000.0 ) );
     mymove = false;
+    inputLength = b;
 }
 
 void InputSlider::userDrag( int new_value )
@@ -60,3 +62,11 @@ void InputSlider::userDrag( int new_value )
         emit sliderDragged( f_pos );
     }
 }
+
+void InputSlider::mouseMoveEvent(QMouseEvent *event)
+{
+    char psz_length[MSTRTIME_MAX_SIZE];
+    secstotimestr( psz_length,  (int)((float)event->x()/size().width()*inputLength) );
+    setToolTip( psz_length );
+}
+

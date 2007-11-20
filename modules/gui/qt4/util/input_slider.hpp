@@ -33,8 +33,11 @@ public:
     InputSlider( QWidget *_parent );
     InputSlider( Qt::Orientation q,QWidget *_parent );
     virtual ~InputSlider()   {};
+protected:
+    void mouseMoveEvent(QMouseEvent *event);
 private:
     bool mymove;
+    int inputLength;
 public slots:
     void setPosition( float, int, int );
 private slots:
