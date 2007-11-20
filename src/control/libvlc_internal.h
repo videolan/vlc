@@ -149,11 +149,11 @@ struct libvlc_media_list_view_t
     libvlc_media_list_view_item_at_index_func_t      pf_item_at_index;
     libvlc_media_list_view_children_at_index_func_t  pf_children_at_index;
 
-    libvlc_media_list_view_release_func_t       pf_release;
+    libvlc_media_list_view_release_func_t            pf_release;
 
     /* Notification callback */
-    void (*pf_ml_item_added)(const libvlc_event_t *, void *);
-    void (*pf_ml_item_removed)(const libvlc_event_t *, void *);
+    void (*pf_ml_item_added)(const libvlc_event_t *, libvlc_media_list_view_t *);
+    void (*pf_ml_item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *);
 };
 
 struct libvlc_dynamic_media_list_t

@@ -336,6 +336,7 @@ SOURCES_libvlc_control = \
 	control/dynamic_media_list.c \
 	control/event.c \
 	control/flat_media_list_view.c \
+	control/hierarchical_media_list_view.c \
 	control/media_descriptor.c \
 	control/media_instance.c \
 	control/media_list.c \
