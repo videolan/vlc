@@ -1043,7 +1043,7 @@ libamrwb: amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 CLEAN_FILE += .libamrwb
 CLEAN_PKG += libamrwb
-DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).bz2
+DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 # ***************************************************************************
 
