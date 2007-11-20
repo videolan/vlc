@@ -145,6 +145,13 @@ static int Demux( demux_t *p_demux )
                 if( psz_artist )
                     psz_artist = strdup( psz_artist );
             }
+#if 0
+            /* You're going to need a pretty strong explanation, why
+             * this is not a big security hole if you are to uncomment
+             * this piece of code. Potentially untrusted input file must
+             * not be allowed to specify options in an open-handed fashion.
+             * -- Courmisch
+             */
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
             {
@@ -158,6 +165,7 @@ static int Demux( demux_t *p_demux )
                     INSERT_ELEM( ppsz_options, i_options, i_options,
                                  psz_option );
             }
+#endif
         }
         else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
         {
