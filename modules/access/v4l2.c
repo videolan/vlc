@@ -81,6 +81,12 @@ static void Close( vlc_object_t * );
 #define IOMETHOD_TEXT N_( "IO Method" )
 #define IOMETHOD_LONGTEXT N_( \
     "IO Method (READ, MMAP, USERPTR)." )
+#define WIDTH_TEXT N_( "Width" )
+#define WIDTH_LONGTEXT N_( \
+    "Force width (-1 for autodetect)." )
+#define HEIGHT_TEXT N_( "Height" )
+#define HEIGHT_LONGTEXT N_( \
+    "Force height (-1 for autodetect)." )
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(-1 for autodetect)." )
@@ -129,8 +135,12 @@ vlc_module_begin();
     add_integer( "v4l2-input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
                 VLC_TRUE );
     add_integer( "v4l2-io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
-                 IOMETHOD_LONGTEXT, VLC_FALSE );
+                 IOMETHOD_LONGTEXT, VLC_TRUE );
         change_integer_list( i_iomethod_list, psz_iomethod_list_text, 0 );
+    add_integer( "v4l2-width", 0, NULL, WIDTH_TEXT,
+                WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l2-height", 0, NULL, HEIGHT_TEXT,
+                HEIGHT_LONGTEXT, VLC_TRUE );
     add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
     add_bool( "v4l2-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 VLC_TRUE );
@@ -288,6 +298,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_selected_input = var_CreateGetInteger( p_demux, "v4l2-input" );
 
     p_sys->io = var_CreateGetInteger( p_demux, "v4l2-io" );
+
+    p_sys->i_width = var_CreateGetInteger( p_demux, "v4l2-width" );
+    p_sys->i_height = var_CreateGetInteger( p_demux, "v4l2-height" );
 
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
@@ -527,6 +540,20 @@ static void ParseMRL( demux_t *p_demux )
                     p_sys->io = strtol( psz_parser, &psz_parser, 0 );
                 }
             }
+            else if( !strncmp( psz_parser, "width=",
+                               strlen( "width=" ) ) )
+            {
+                p_sys->i_width =
+                    strtol( psz_parser + strlen( "width=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "height=",
+                               strlen( "height=" ) ) )
+            {
+                p_sys->i_height =
+                    strtol( psz_parser + strlen( "height=" ),
+                            &psz_parser, 0 );
+            }            
             else if( !strncmp( psz_parser, "samplerate=",
                                strlen( "samplerate=" ) ) )
             {
@@ -1185,11 +1212,11 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     /* Try and find default resolution if not specified */
-    if( !p_sys->i_width && !p_sys->i_height ) 
-    {
-        memset( &fmt, 0, sizeof(fmt) );
-        fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    memset( &fmt, 0, sizeof(fmt) );
+    fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
+    if( p_sys->i_width <= 0 || p_sys->i_height <= 0 ) 
+    {
         if( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
             msg_Err( p_demux, "Cannot get default width and height." );
@@ -1203,6 +1230,10 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         {
             p_sys->i_height = p_sys->i_height * 2;
         }
+    }
+    else 
+    {
+        msg_Dbg( p_demux, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
     }
 
     fmt.fmt.pix.width = p_sys->i_width;
