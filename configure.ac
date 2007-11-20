@@ -100,10 +100,6 @@ AC_ARG_WITH(contrib,
     LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
 
-dnl kludge because only the debian package provides a ffmpeg-config
-    if test -z $with_ffmpeg_config_path; then 
-       with_ffmpeg_config_path=${topdir}/extras/contrib/bin;
-    fi
     if test -z $with_live555_tree; then
        with_live555_tree=${topdir}/extras/contrib/src/live
     fi
@@ -2912,8 +2908,8 @@ AS_IF([test "${enable_id3tag}" != "no"], [
 dnl
 dnl  ffmpeg decoder/demuxer plugin
 dnl
-dnl we try to find ffmpeg using : 1- given tree 2- ffmpeg-config, 3- pkg-config
-dnl                               4- default place,
+dnl we try to find ffmpeg using : 1- given tree, 2- pkg-config
+dnl                               3- default place,
 
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
@@ -3070,30 +3066,6 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    fi
 else
 
-dnl Look for a ffmpeg-config (we are on debian )
-
-  FFMPEG_PATH="${PATH}"
-  AC_ARG_WITH(ffmpeg-config-path,
-    [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
-    [ if test "${with_ffmpeg_config_path}" != "no"
-      then
-        FFMPEG_PATH="${with_ffmpeg_config_path}"
-      fi ])
-  AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
-  if test "${FFMPEG_CONFIG}" != "no"
-  then
-    AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
-    AC_CHECK_HEADERS(ffmpeg/avformat.h)
-    AC_CHECK_HEADERS(ffmpeg/avutil.h)
-    AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
-    VLC_ADD_PLUGINS([ffmpeg])
-    if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes"; then
-        VLC_ADD_PLUGINS([stream_out_switcher])
-    fi
-    VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
-    VLC_ADD_LIBS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
-
- else
 
 dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
@@ -3177,7 +3149,6 @@ dnl    AC_CHECK_HEADERS(ffmpeg/swscale.h, [], [AC_MSG_ERROR([Missing header file
       CPPFLAGS="${CPPFLAGS_save}"
     ])
   fi
- fi 
 fi
 
 dnl
