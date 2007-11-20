@@ -38,6 +38,7 @@
 #include <vlc/vlc.h>
 
 #include <ctype.h>                                              /* tolower() */
+#include <assert.h>
 
 
 #include <vlc_update.h>
@@ -85,22 +86,23 @@
  * Local Prototypes
  *****************************************************************************/
 
-void FreeMirrorsList( update_t * );
-void FreeReleasesList( update_t * );
-void GetMirrorsList( update_t *, vlc_bool_t );
-void GetFilesList( update_t *, vlc_bool_t );
+static void FreeMirrorsList( update_t * );
+static void FreeReleasesList( update_t * );
+static void GetMirrorsList( update_t *, vlc_bool_t );
+static void GetFilesList( update_t *, vlc_bool_t );
 
-int CompareReleases( struct update_release_t *, struct update_release_t * );
-int CompareReleaseToCurrent( struct update_release_t * );
+static int CompareReleases( const struct update_release_t *,
+                            const struct update_release_t * );
+static int CompareReleaseToCurrent( const struct update_release_t * );
 
-unsigned int update_iterator_Reset( update_iterator_t * );
-unsigned int update_iterator_NextFile( update_iterator_t * );
-unsigned int update_iterator_PrevFile( update_iterator_t * );
-unsigned int update_iterator_NextMirror( update_iterator_t * );
-unsigned int update_iterator_PrevMirror( update_iterator_t * );
+static unsigned int update_iterator_Reset( update_iterator_t * );
+static unsigned int update_iterator_NextFile( update_iterator_t * );
+static unsigned int update_iterator_PrevFile( update_iterator_t * );
+static unsigned int update_iterator_NextMirror( update_iterator_t * );
+static unsigned int update_iterator_PrevMirror( update_iterator_t * );
 
-void update_iterator_GetData( update_iterator_t * );
-void update_iterator_ClearData( update_iterator_t * );
+static void update_iterator_GetData( update_iterator_t * );
+static void update_iterator_ClearData( update_iterator_t * );
 
 /*****************************************************************************
  * Update_t functions
@@ -151,6 +153,8 @@ update_t *__update_New( vlc_object_t *p_this )
  */
 void update_Delete( update_t *p_update )
 {
+    assert( p_update );
+
     vlc_mutex_destroy( &p_update->lock );
     FreeMirrorsList( p_update );
     FreeReleasesList( p_update );
@@ -164,7 +168,7 @@ void update_Delete( update_t *p_update )
  * \param p_update pointer to the update struct
  * \return nothing
  */
-void FreeMirrorsList( update_t *p_update )
+static void FreeMirrorsList( update_t *p_update )
 {
     int i;
 
@@ -187,7 +191,7 @@ void FreeMirrorsList( update_t *p_update )
  * \param p_update pointer to the update struct
  * \return nothing
  */
-void FreeReleasesList( update_t *p_update )
+static void FreeReleasesList( update_t *p_update )
 {
     int i;
 
@@ -221,7 +225,7 @@ void FreeReleasesList( update_t *p_update )
  * \param b_force set to VLC_TRUE if you want to force the mirrors list update
  * \return nothing
  */
-void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
+static void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
 {
     stream_t *p_stream = NULL;
 
@@ -392,7 +396,7 @@ void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
  * \param b_force set to VLC_TRUE if you want to force the files list update
  * \return nothing
  */
-void GetFilesList( update_t *p_update, vlc_bool_t b_force )
+static void GetFilesList( update_t *p_update, vlc_bool_t b_force )
 {
     stream_t *p_stream = NULL;
 
@@ -684,7 +688,8 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
  */
 void update_Check( update_t *p_update, vlc_bool_t b_force )
 {
-    if( p_update == NULL ) return;
+    assert( p_update );
+
     GetMirrorsList( p_update, b_force );
     GetFilesList( p_update, b_force );
 }
@@ -699,7 +704,8 @@ void update_Check( update_t *p_update, vlc_bool_t b_force )
  * \param p2 second release
  * \return like strcmp
  */
-int CompareReleases( struct update_release_t *p1, struct update_release_t *p2 )
+static int CompareReleases( const struct update_release_t *p1,
+                            const struct update_release_t *p2 )
 {
     int d;
     if( ( d = strcmp( p1->psz_major, p2->psz_major ) ) ) ;
@@ -737,7 +743,7 @@ int CompareReleases( struct update_release_t *p1, struct update_release_t *p2 )
  * \param p a release
  * \return >0 if newer, 0 if equal and <0 if older
  */
-int CompareReleaseToCurrent( struct update_release_t *p )
+static int CompareReleaseToCurrent( const struct update_release_t *p )
 {
     struct update_release_t c;
     int r;
@@ -772,8 +778,7 @@ update_iterator_t *update_iterator_New( update_t *p_u )
 {
     update_iterator_t *p_uit = NULL;
 
-    if( p_u == NULL )
-        return NULL;
+    assert( p_u );
 
     p_uit = (update_iterator_t *)malloc( sizeof( update_iterator_t ) );
     if( p_uit == NULL ) return NULL;
@@ -814,7 +819,8 @@ update_iterator_t *update_iterator_New( update_t *p_u )
  */
 void update_iterator_Delete( update_iterator_t *p_uit )
 {
-    if( !p_uit ) return;
+    assert( p_uit );
+
     update_iterator_ClearData( p_uit );
     free( p_uit );
 }
@@ -827,7 +833,7 @@ void update_iterator_Delete( update_iterator_t *p_uit )
  */
 unsigned int update_iterator_Reset( update_iterator_t *p_uit )
 {
-    if( !p_uit ) return UPDATE_FAIL;
+    assert( p_uit );
 
     p_uit->i_r = -1;
     p_uit->i_f = -1;
@@ -844,12 +850,11 @@ unsigned int update_iterator_Reset( update_iterator_t *p_uit )
  * \param p_uit update iterator
  * \return UPDATE_FAIL if we can't find the next file, UPDATE_SUCCESS|UPDATE_FILE if we stay in the same release, UPDATE_SUCCESS|UPDATE_RELEASE|UPDATE_FILE if we change the release index
  */
-unsigned int update_iterator_NextFile( update_iterator_t *p_uit )
+static unsigned int update_iterator_NextFile( update_iterator_t *p_uit )
 {
     int r,f=-1,old_r;
 
-    if( !p_uit ) return UPDATE_FAIL;
-
+    assert( p_uit );
     old_r=p_uit->i_r;
 
     /* if the update iterator was already in a "no match" state, start over */
@@ -906,7 +911,7 @@ unsigned int update_iterator_NextFile( update_iterator_t *p_uit )
  * \return UPDATE_FAIL if we can't find the previous file, UPDATE_SUCCESS|UPDATE_FILE if we stay in the same release, UPDATE_SUCCESS|UPDATE_RELEASE|UPDATE_FILE if we change the release index
  */
 //TODO: test
-unsigned int update_iterator_PrevFile( update_iterator_t *p_uit )
+static unsigned int update_iterator_PrevFile( update_iterator_t *p_uit )
 {
     int r,f=-1,old_r;
 
@@ -967,7 +972,7 @@ unsigned int update_iterator_PrevFile( update_iterator_t *p_uit )
  * \param update iterator
  * \return UPDATE_FAIL if we can't find the next mirror, UPDATE_SUCCESS|UPDATE_MIRROR otherwise
  */
-unsigned int update_iterator_NextMirror( update_iterator_t *p_uit )
+static unsigned int update_iterator_NextMirror( update_iterator_t *p_uit )
 {
     if( !p_uit ) return UPDATE_FAIL;
     vlc_mutex_lock( &p_uit->p_u->lock );
@@ -984,7 +989,7 @@ unsigned int update_iterator_NextMirror( update_iterator_t *p_uit )
  * \param update iterator
  * \return UPDATE_FAIL if we can't find a previous mirror, UPDATE_SUCCESS|UPDATE_MIRROR otherwise
  */
-unsigned int update_iterator_PrevMirror( update_iterator_t *p_uit )
+static unsigned int update_iterator_PrevMirror( update_iterator_t *p_uit )
 {
     if( !p_uit ) return UPDATE_FAIL;
     vlc_mutex_lock( &p_uit->p_u->lock );
@@ -1069,7 +1074,7 @@ unsigned int update_iterator_ChooseMirrorAndFile( update_iterator_t *p_uit,
  * \param p_uit update iterator
  * \return nothing
  */
-void update_iterator_GetData( update_iterator_t *p_uit )
+static void update_iterator_GetData( update_iterator_t *p_uit )
 {
     struct update_release_t *p_r = NULL;
     struct update_file_t *p_f = NULL;
@@ -1125,7 +1130,7 @@ void update_iterator_GetData( update_iterator_t *p_uit )
  * \param p_uit update iterator
  * \return nothing
  */
-void update_iterator_ClearData( update_iterator_t *p_uit )
+static void update_iterator_ClearData( update_iterator_t *p_uit )
 {
     p_uit->file.i_type = UPDATE_FILE_TYPE_NONE;
     FREENULL( p_uit->file.psz_md5 );
