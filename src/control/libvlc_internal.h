@@ -307,6 +307,19 @@ VLC_EXPORT ( void, libvlc_media_list_view_set_ml_notification_callback, (
                 void (*item_added)(const libvlc_event_t *, libvlc_media_list_view_t *),
                 void (*item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *) ));
 
+VLC_EXPORT ( void, libvlc_media_list_view_will_delete_item, ( libvlc_media_list_view_t * p_mlv,
+                                                              libvlc_media_descriptor_t * p_item,
+                                                              int index ));
+VLC_EXPORT ( void, libvlc_media_list_view_item_deleted, ( libvlc_media_list_view_t * p_mlv,
+                                                          libvlc_media_descriptor_t * p_item,
+                                                          int index ));
+VLC_EXPORT ( void, libvlc_media_list_view_will_add_item, ( libvlc_media_list_view_t * p_mlv,
+                                                           libvlc_media_descriptor_t * p_item,
+                                                           int index ));
+VLC_EXPORT ( void, libvlc_media_list_view_item_added, ( libvlc_media_list_view_t * p_mlv,
+                                                        libvlc_media_descriptor_t * p_item,
+                                                        int index ));
+
 /* Events */
 VLC_EXPORT (libvlc_event_manager_t *, libvlc_event_manager_new, ( void * p_obj, libvlc_instance_t * p_libvlc_inst, libvlc_exception_t *p_e ) );
 

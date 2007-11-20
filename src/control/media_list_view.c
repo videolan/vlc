@@ -81,6 +81,9 @@ media_list_item_removed( const libvlc_event_t * p_event, void * p_user_data )
 /*
  * LibVLC Internal functions
  */
+/**************************************************************************
+ *       libvlc_media_list_view_set_ml_notification_callback (Internal)
+ **************************************************************************/
 void
 libvlc_media_list_view_set_ml_notification_callback(
                 libvlc_media_list_view_t * p_mlv,
@@ -95,6 +98,86 @@ libvlc_media_list_view_set_ml_notification_callback(
     libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemDeleted,
                          media_list_item_removed, p_mlv, NULL );
+}
+
+/**************************************************************************
+ *       libvlc_media_list_view_notify_deletion (Internal)
+ **************************************************************************/
+void
+libvlc_media_list_view_will_delete_item(
+                libvlc_media_list_view_t * p_mlv,
+                libvlc_media_descriptor_t * p_item,
+                int index )
+{
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaListViewWillDeleteItem;
+    event.u.media_list_view_will_delete_item.item = p_item;
+    event.u.media_list_view_will_delete_item.index = index;
+
+    /* Send the event */
+    libvlc_event_send( p_mlv->p_event_manager, &event );
+}
+
+/**************************************************************************
+ *       libvlc_media_list_view_item_deleted (Internal)
+ **************************************************************************/
+void
+libvlc_media_list_view_item_deleted(
+                libvlc_media_list_view_t * p_mlv,
+                libvlc_media_descriptor_t * p_item,
+                int index )
+{
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaListViewItemDeleted;
+    event.u.media_list_view_item_deleted.item = p_item;
+    event.u.media_list_view_item_deleted.index = index;
+
+    /* Send the event */
+    libvlc_event_send( p_mlv->p_event_manager, &event );
+}
+
+/**************************************************************************
+ *       libvlc_media_list_view_will_add_item (Internal)
+ **************************************************************************/
+void
+libvlc_media_list_view_will_add_item(
+                libvlc_media_list_view_t * p_mlv,
+                libvlc_media_descriptor_t * p_item,
+                int index )
+{
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaListViewWillAddItem;
+    event.u.media_list_view_will_add_item.item = p_item;
+    event.u.media_list_view_will_add_item.index = index;
+
+    /* Send the event */
+    libvlc_event_send( p_mlv->p_event_manager, &event );
+}
+
+/**************************************************************************
+ *       libvlc_media_list_view_item_added (Internal)
+ **************************************************************************/
+void
+libvlc_media_list_view_item_added(
+                libvlc_media_list_view_t * p_mlv,
+                libvlc_media_descriptor_t * p_item,
+                int index )
+{
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaListViewItemAdded;
+    event.u.media_list_view_item_added.item = p_item;
+    event.u.media_list_view_item_added.index = index;
+
+    /* Send the event */
+    libvlc_event_send( p_mlv->p_event_manager, &event );
 }
 
 /**************************************************************************
@@ -171,14 +254,14 @@ libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
     {
         libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                             libvlc_MediaListItemAdded,
-                            p_mlv->pf_ml_item_added, p_mlv, NULL );
+                            (void (*)(const libvlc_event_t *, void*))p_mlv->pf_ml_item_added, p_mlv, NULL );
         /* XXX: descend the whole tree and remove observer */
     }
     if( p_mlv->pf_ml_item_removed )
     {
         libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                             libvlc_MediaListItemDeleted,
-                            p_mlv->pf_ml_item_removed, p_mlv, NULL );
+                            (void (*)(const libvlc_event_t *, void*))p_mlv->pf_ml_item_removed, p_mlv, NULL );
         /* XXX: descend the whole tree and remove observer */
     }
 
