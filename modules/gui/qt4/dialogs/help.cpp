@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
+ *          Rémi Duraffort <ivoire (at) via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +24,7 @@
 
 #include "dialogs/help.hpp"
 #include <vlc_about.h>
+#include <vlc_update.h>
 
 #include "dialogs_provider.hpp"
 
@@ -33,6 +35,9 @@
 #include <QFile>
 #include <QLabel>
 #include <QString>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <QDialogButtonBox>
 
 HelpDialog *HelpDialog::instance = NULL;
 
@@ -153,4 +158,94 @@ AboutDialog::~AboutDialog()
 void AboutDialog::close()
 {
     this->toggleVisible();
+}
+
+
+UpdateDialog *UpdateDialog::instance = NULL;
+
+UpdateDialog::UpdateDialog( intf_thread_t *_p_intf) : QVLCFrame( _p_intf )
+{
+    setWindowTitle( qtr( "Update" ) );
+    resize( 230, 180 );
+
+    QGridLayout *layout = new QGridLayout( this );
+
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    QPushButton *updateButton = new QPushButton( qtr( "&Update List" ) );
+    updateButton->setDefault( true );
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal);
+    buttonBox->addButton( updateButton, QDialogButtonBox::ActionRole );
+    buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+
+    QGroupBox *checkGroup = new QGroupBox( qtr( "Select Package" ) );
+    QGridLayout *checkLayout = new QGridLayout( checkGroup );
+    checkInfo = new QCheckBox( qtr( "Information" ) );
+    checkSource = new QCheckBox( qtr( "Sources" ) );
+    checkBinary = new QCheckBox( qtr( "Binary" ) );
+    checkPlugin = new QCheckBox( qtr( "Plugin" ) );
+
+    checkInfo->setDisabled( true );
+    checkSource->setDisabled( true );
+    checkBinary->setDisabled( true );
+    checkPlugin->setDisabled( true );
+
+    checkLayout->addWidget( checkInfo, 0, 0 );
+    checkLayout->addWidget( checkSource, 1, 0 );
+    checkLayout->addWidget( checkBinary, 2, 0 );
+    checkLayout->addWidget( checkPlugin, 3, 0 );
+
+    layout->addWidget( checkGroup, 0, 0 );
+    layout->addWidget( buttonBox, 1, 0 );
+
+    BUTTONACT( updateButton, update() );
+    BUTTONACT( closeButton, close() );
+
+    p_update = update_New( _p_intf );
+}
+
+UpdateDialog::~UpdateDialog()
+{
+    update_Delete( p_update );
+}
+
+void UpdateDialog::close()
+{
+    toggleVisible();
+}
+
+void UpdateDialog::update()
+{
+    update_Check( p_update, VLC_FALSE );
+    update_iterator_t *p_uit = update_iterator_New( p_update );
+    if( p_uit )
+    {
+        p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
+        p_uit->i_t = UPDATE_FILE_TYPE_ALL;
+        update_iterator_Action( p_uit, UPDATE_MIRROR );
+        while( update_iterator_Action( p_uit, UPDATE_FILE ) != UPDATE_FAIL )
+        {
+            switch( p_uit->file.i_type )
+            {
+            case UPDATE_FILE_TYPE_INFO:
+                checkInfo->setDisabled( false );
+                checkInfo->setCheckState( Qt::Checked );
+                break;
+            case UPDATE_FILE_TYPE_SOURCE:
+                checkSource->setDisabled( false );
+                checkSource->setCheckState( Qt::Checked );
+                break;
+            case UPDATE_FILE_TYPE_BINARY:
+                checkBinary->setDisabled( false );
+                checkBinary->setCheckState( Qt::Checked );
+                break;
+            case UPDATE_FILE_TYPE_PLUGIN:
+                checkPlugin->setDisabled( false );
+                checkPlugin->setCheckState( Qt::Checked );
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    update_iterator_Delete( p_uit );
 }

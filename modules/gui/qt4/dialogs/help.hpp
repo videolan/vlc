@@ -24,7 +24,11 @@
 #ifndef _HELP_DIALOG_H_
 #define _HELP_DIALOG_H_
 
+#include <vlc_update.h>
+
 #include "util/qvlcframe.hpp"
+
+class QCheckBox;
 
 class HelpDialog : public QVLCFrame
 {
@@ -64,5 +68,32 @@ private:
 public slots:
     void close();
 };
+
+
+class UpdateDialog : public QVLCFrame
+{
+    Q_OBJECT;
+public:
+    static UpdateDialog * getInstance( intf_thread_t *p_intf )
+    {
+        if( !instance)
+            instance = new UpdateDialog( p_intf);
+        return instance;
+    }
+    virtual ~UpdateDialog();
+
+private:
+    UpdateDialog( intf_thread_t *);
+    static UpdateDialog *instance;
+    QCheckBox *checkInfo;
+    QCheckBox *checkSource;
+    QCheckBox *checkBinary;
+    QCheckBox *checkPlugin;
+    update_t *p_update;
+private slots:
+    void close();
+    void update();
+};
+
 
 #endif

@@ -170,6 +170,11 @@ void DialogsProvider::helpDialog()
     HelpDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::updateDialog()
+{
+    UpdateDialog::getInstance( p_intf )->toggleVisible();
+}
+
 void DialogsProvider::aboutDialog()
 {
     AboutDialog::getInstance( p_intf )->toggleVisible();

@@ -448,6 +448,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *menu = new QMenu();
     DP_SADD( menu, qtr( "Help..." ) , "", ":/pixmaps/menus_help_16px.png",
              helpDialog(), "F1" );
+    DP_SADD( menu, qtr( "Update" ) , "", "", updateDialog(), "");
     menu->addSeparator();
     DP_SADD( menu, qtr( I_MENU_ABOUT ), "", "", aboutDialog(), "Ctrl+F1" );
     return menu;

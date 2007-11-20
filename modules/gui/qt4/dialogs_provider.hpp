@@ -144,6 +144,7 @@ public slots:
     void messagesDialog();
     void vlmDialog();
     void helpDialog();
+    void updateDialog();
     void aboutDialog();
     void gotoTimeDialog();
 
