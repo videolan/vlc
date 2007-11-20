@@ -455,19 +455,20 @@ fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/fontconfig.patch
+	patch -p0 < Patches/fontconfig-nodocs.patch
 
 .fontconfig: fontconfig
 ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
-	(cd $<; LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
+	(cd $<; autoreconf && LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
   else
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
+	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
 else
   ifdef HAVE_DARWIN_OS
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-confdir=/etc/fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install-exec && (cd fontconfig ; make install-data))
+	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-confdir=/etc/fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data))
   else
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
+	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
 endif
 	$(INSTALL_NAME)
@@ -1520,20 +1521,28 @@ qt-win-opensource-$(QT4T_VERSION)-mingw.exe:
 	wget $(QT4T_URL)
 
 Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
-	7z x qt-win-opensource-$(QT4T_VERSION)-mingw.exe
-#DIY... Hate makefiles.
-#	rm -r $$\[44\]/
-#	rm -r $$PLUGINSDIR
-#	`mv \$$OUTDIR/bin\ / Qt`
+	mkdir Qt
+	7z -oQt x qt-win-opensource-$(QT4T_VERSION)-mingw.exe \$$OUTDIR/bin\ /bin \$$OUTDIR/bin\ /lib \$$OUTDIR/bin\ /include/QtCore \$$OUTDIR/bin\ /include/QtGui \$$OUTDIR/bin\ /src/gui \$$OUTDIR/bin\ /src/corelib
+	mv Qt/\$$OUTDIR/bin\ /* Qt/ && rmdir Qt/\$$OUTDIR/bin\  Qt/\$$OUTDIR
+	find Qt -name '* ' -exec sh -c "mv \"{}\" `echo {}`" \;
+	find Qt/src -name '*.cpp' -exec rm {} \;
+	find Qt/include -name '*.h' -exec sh -c "mv {} {}.tmp; sed 's,..\/..\/src,..\/src,' {}.tmp > {}; rm -f {}.tmp" \;
+	mkdir Qt/lib/pkgconfig
+	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtCore.pc.in > Qt/lib/pkgconfig/QtCore.pc
+	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtGui.pc.in > Qt/lib/pkgconfig/QtGui.pc
 
 .Qt: Qt
-	cp Qt/bin/uic.exe Qt/bin/moc.exe Qt/bin/rcc.exe $(PREFIX)/bin;
-	mkdir -p $(PREFIX)/include/qt4/;
+	mkdir -p $(PREFIX)/bin $(PREFIX)/include/qt4/src $(PREFIX)/lib/pkgconfig
+	cp Qt/bin/moc.exe Qt/bin/rcc.exe Qt/bin/uic.exe $(PREFIX)/bin
+	cp -r Qt/include/QtCore Qt/include/QtGui $(PREFIX)/include/qt4
+	cp -r Qt/src/corelib Qt/src/gui $(PREFIX)/include/qt4/src
+	cp Qt/lib/libQtCore4.a Qt/lib/libQtGui4.a $(PREFIX)/lib
+	cp -r Qt/lib/pkgconfig/* $(PREFIX)/lib/pkgconfig
+	touch $@
 
 CLEAN_FILE += .Qt
 CLEAN_PKG += Qt
-#ISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
-
+DISTCLEAN_PKG += qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 
 # ***************************************************************************
 # zlib
