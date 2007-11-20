@@ -27,7 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 
-#ifdef HAVE_FFMPEG_SWSCALE_H
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 #include <vlc_filter.h>
 #endif
 
