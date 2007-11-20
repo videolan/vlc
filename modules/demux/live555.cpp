@@ -515,7 +515,6 @@ describe:
             {
                msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
                            psz_login, psz_password );
-               if( psz_url ) free( psz_url );
                if( psz_login ) psz_user = psz_login;
                if( psz_password ) psz_pwd = psz_password;
                goto describe;
