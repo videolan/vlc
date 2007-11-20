@@ -85,17 +85,70 @@ hierarch_media_list_view_children_at_index( libvlc_media_list_view_t * p_mlv,
 }
 
 /**************************************************************************
+ *       media_list_(item|will)_* (private) (Event callback)
+ **************************************************************************/
+static void
+media_list_item_added( const libvlc_event_t * p_event, void * user_data )
+{
+    libvlc_media_descriptor_t * p_md;
+    libvlc_media_list_view_t * p_mlv = user_data;
+    int index = p_event->u.media_list_item_added.index;
+    p_md = p_event->u.media_list_item_added.item;
+    libvlc_media_list_view_item_added( p_mlv, p_md, index );
+}
+static void
+media_list_will_add_item( const libvlc_event_t * p_event, void * user_data )
+{
+    libvlc_media_descriptor_t * p_md;
+    libvlc_media_list_view_t * p_mlv = user_data;
+    int index = p_event->u.media_list_will_add_item.index;
+    p_md = p_event->u.media_list_will_add_item.item;
+    libvlc_media_list_view_will_add_item( p_mlv, p_md, index );
+}
+static void
+media_list_item_deleted( const libvlc_event_t * p_event, void * user_data )
+{
+    libvlc_media_descriptor_t * p_md;
+    libvlc_media_list_view_t * p_mlv = user_data;
+    int index = p_event->u.media_list_item_deleted.index;
+    p_md = p_event->u.media_list_item_deleted.item;
+    libvlc_media_list_view_item_deleted( p_mlv, p_md, index );
+}
+static void
+media_list_will_delete_item( const libvlc_event_t * p_event, void * user_data )
+{
+    libvlc_media_descriptor_t * p_md;
+    libvlc_media_list_view_t * p_mlv = user_data;
+    int index = p_event->u.media_list_will_delete_item.index;
+    p_md = p_event->u.media_list_will_delete_item.item;
+    libvlc_media_list_view_will_delete_item( p_mlv, p_md, index );
+}
+
+/*
+ * Public libvlc functions
+ */
+
+
+/**************************************************************************
  *       flat_media_list_view_release (private)
  * (called by media_list_view_release)
  **************************************************************************/
 static void
 hierarch_media_list_view_release( libvlc_media_list_view_t * p_mlv )
 {
+    libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListItemAdded,
+                         media_list_item_added, p_mlv, NULL );
+    libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListWillAddItem,
+                         media_list_will_add_item, p_mlv, NULL );
+    libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListItemDeleted,
+                         media_list_item_deleted, p_mlv, NULL );
+    libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListWillDeleteItem,
+                         media_list_will_delete_item, p_mlv, NULL );
 }
-
-/*
- * Public libvlc functions
- */
 
 /**************************************************************************
  *       libvlc_media_list_flat_view (Public)
@@ -114,6 +167,18 @@ libvlc_media_list_hierarchical_view( libvlc_media_list_t * p_mlist,
                                         hierarch_media_list_view_release,
                                         NULL,
                                         p_e );
+    libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListItemAdded,
+                         media_list_item_added, p_mlv, NULL );
+    libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListWillAddItem,
+                         media_list_will_add_item, p_mlv, NULL );
+    libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListItemDeleted,
+                         media_list_item_deleted, p_mlv, NULL );
+    libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
+                         libvlc_MediaListWillDeleteItem,
+                         media_list_will_delete_item, p_mlv, NULL );
     libvlc_media_list_unlock( p_mlist );
     return p_mlv;
 }
