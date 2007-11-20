@@ -215,7 +215,7 @@ const char *GetFallbackEncoding( void )
                 strcpy (buf, "ISO-8859-8");
                 break;
             default:
-                snprintf (buf, sizeof (buf), "CP%u", GetACP ());
+                snprintf (buf, sizeof (buf), "CP%u", cp);
         }
     }
     return buf;
