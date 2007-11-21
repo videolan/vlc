@@ -1522,22 +1522,24 @@ qt-win-opensource-$(QT4T_VERSION)-mingw.exe:
 
 Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 	mkdir Qt
-	7z -oQt x qt-win-opensource-$(QT4T_VERSION)-mingw.exe \$$OUTDIR/bin\ /bin \$$OUTDIR/bin\ /lib \$$OUTDIR/bin\ /include/QtCore \$$OUTDIR/bin\ /include/QtGui \$$OUTDIR/bin\ /src/gui \$$OUTDIR/bin\ /src/corelib
+	7z -oQt x qt-win-opensource-$(QT4T_VERSION)-mingw.exe \$$OUTDIR/bin\ /bin \$$OUTDIR/bin\ /lib \$$OUTDIR/bin\ /include/QtCore \$$OUTDIR/bin\ /include/QtGui \$$OUTDIR/bin\ /src/gui \$$OUTDIR/bin\ /src/corelib \$$OUTDIR/bin\ /translations
 	mv Qt/\$$OUTDIR/bin\ /* Qt/ && rmdir Qt/\$$OUTDIR/bin\  Qt/\$$OUTDIR
 	find Qt -name '* ' -exec sh -c "mv \"{}\" `echo {}`" \;
 	find Qt/src -name '*.cpp' -exec rm {} \;
+	find Qt/translations -type f -a ! -name 'qt_*.qm' -exec rm {} \;
 	find Qt/include -name '*.h' -exec sh -c "mv {} {}.tmp; sed 's,..\/..\/src,..\/src,' {}.tmp > {}; rm -f {}.tmp" \;
 	mkdir Qt/lib/pkgconfig
 	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtCore.pc.in > Qt/lib/pkgconfig/QtCore.pc
 	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtGui.pc.in > Qt/lib/pkgconfig/QtGui.pc
 
 .Qt: Qt
-	mkdir -p $(PREFIX)/bin $(PREFIX)/include/qt4/src $(PREFIX)/lib/pkgconfig
+	mkdir -p $(PREFIX)/bin $(PREFIX)/include/qt4/src $(PREFIX)/lib/pkgconfig $(PREFIX)/share/qt4/translations
 	cp Qt/bin/moc.exe Qt/bin/rcc.exe Qt/bin/uic.exe $(PREFIX)/bin
 	cp -r Qt/include/QtCore Qt/include/QtGui $(PREFIX)/include/qt4
 	cp -r Qt/src/corelib Qt/src/gui $(PREFIX)/include/qt4/src
 	cp Qt/lib/libQtCore4.a Qt/lib/libQtGui4.a $(PREFIX)/lib
-	cp -r Qt/lib/pkgconfig/* $(PREFIX)/lib/pkgconfig
+	cp Qt/lib/pkgconfig/* $(PREFIX)/lib/pkgconfig
+	cp Qt/translations/* $(PREFIX)/share/qt4/translations 
 	touch $@
 
 CLEAN_FILE += .Qt
