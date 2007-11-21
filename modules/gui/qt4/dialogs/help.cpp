@@ -38,6 +38,8 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QDialogButtonBox>
+#include <QFileDialog>
+
 
 HelpDialog *HelpDialog::instance = NULL;
 
@@ -171,7 +173,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf) : QVLCFrame( _p_intf )
     QGridLayout *layout = new QGridLayout( this );
 
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    QPushButton *updateButton = new QPushButton( qtr( "&Update List" ) );
+    updateButton = new QPushButton( qtr( "&Update List" ) );
     updateButton->setDefault( true );
     QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal);
     buttonBox->addButton( updateButton, QDialogButtonBox::ActionRole );
@@ -197,10 +199,11 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf) : QVLCFrame( _p_intf )
     layout->addWidget( checkGroup, 0, 0 );
     layout->addWidget( buttonBox, 1, 0 );
 
-    BUTTONACT( updateButton, update() );
+    BUTTONACT( updateButton, updateOrUpload() );
     BUTTONACT( closeButton, close() );
 
     p_update = update_New( _p_intf );
+    b_updated = false;
 }
 
 UpdateDialog::~UpdateDialog()
@@ -213,39 +216,102 @@ void UpdateDialog::close()
     toggleVisible();
 }
 
-void UpdateDialog::update()
+void UpdateDialog::updateOrUpload()
 {
-    update_Check( p_update, VLC_FALSE );
-    update_iterator_t *p_uit = update_iterator_New( p_update );
-    if( p_uit )
+    if( !b_updated )
     {
-        p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
-        p_uit->i_t = UPDATE_FILE_TYPE_ALL;
-        update_iterator_Action( p_uit, UPDATE_MIRROR );
-        while( update_iterator_Action( p_uit, UPDATE_FILE ) != UPDATE_FAIL )
+        update_Check( p_update, VLC_FALSE );
+        update_iterator_t *p_updateit = update_iterator_New( p_update );
+        bool b_download = false;
+        if( p_updateit )
         {
-            switch( p_uit->file.i_type )
+            p_updateit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
+            p_updateit->i_t = UPDATE_FILE_TYPE_ALL;
+            update_iterator_Action( p_updateit, UPDATE_MIRROR );
+            while( update_iterator_Action( p_updateit, UPDATE_FILE ) != UPDATE_FAIL )
             {
-            case UPDATE_FILE_TYPE_INFO:
-                checkInfo->setDisabled( false );
-                checkInfo->setCheckState( Qt::Checked );
-                break;
-            case UPDATE_FILE_TYPE_SOURCE:
-                checkSource->setDisabled( false );
-                checkSource->setCheckState( Qt::Checked );
-                break;
-            case UPDATE_FILE_TYPE_BINARY:
-                checkBinary->setDisabled( false );
-                checkBinary->setCheckState( Qt::Checked );
-                break;
-            case UPDATE_FILE_TYPE_PLUGIN:
-                checkPlugin->setDisabled( false );
-                checkPlugin->setCheckState( Qt::Checked );
-                break;
-            default:
-                break;
+                switch( p_updateit->file.i_type )
+                {
+                    case UPDATE_FILE_TYPE_INFO:
+                    checkInfo->setText( qtr( "Information" ) + " (" + qfu( p_updateit->release.psz_version ) + ")" );
+                    checkInfo->setDisabled( false );
+                    checkInfo->setCheckState( Qt::Checked );
+                    b_download = true;
+                    break;
+                case UPDATE_FILE_TYPE_SOURCE:
+                    checkSource->setText( qtr( "Source" ) + " (" + qfu( p_updateit->release.psz_version ) + ")" );
+                    checkSource->setDisabled( false );
+                    checkSource->setCheckState( Qt::Checked );
+                    b_download = true;
+                    break;
+                case UPDATE_FILE_TYPE_BINARY:
+                    checkBinary->setText( qtr( "Binary" ) + " (" + qfu( p_updateit->release.psz_version ) + ")" );
+                    checkBinary->setDisabled( false );
+                    checkBinary->setCheckState( Qt::Checked );
+                    b_download = true;
+                    break;
+                case UPDATE_FILE_TYPE_PLUGIN:
+                    checkPlugin->setText( qtr( "Plugin" ) + " (" + qfu( p_updateit->release.psz_version ) + ")");
+                    checkPlugin->setDisabled( false );
+                    checkPlugin->setCheckState( Qt::Checked );
+                    b_download = true;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        if( b_download )
+        {
+            updateButton->setText(qtr( "Download" ) );
+            b_updated = true;
+        }
+        update_iterator_Delete( p_updateit );
+    }
+    else
+    {
+        update_iterator_t *p_updateit = update_iterator_New( p_update );
+        bool b_download = false;
+        if( p_updateit )
+        {
+            QString saveDir = QFileDialog::getExistingDirectory( this, qtr( "Choose a direcctory..." ),
+                                                                qfu( p_intf->p_libvlc->psz_homedir ) );
+
+            p_updateit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
+            p_updateit->i_t = UPDATE_FILE_TYPE_ALL;
+            update_iterator_Action( p_updateit, UPDATE_MIRROR );
+
+            while( update_iterator_Action( p_updateit, UPDATE_FILE ) != UPDATE_FAIL )
+            {
+                b_download = false;
+                switch( p_updateit->file.i_type )
+                {
+                case UPDATE_FILE_TYPE_INFO:
+                    if( checkInfo->isChecked() )
+                        b_download = true;
+                    break;
+                case UPDATE_FILE_TYPE_SOURCE:
+                    if( checkSource->isChecked() )
+                        b_download = true;
+                    break;
+                case UPDATE_FILE_TYPE_BINARY:
+                    if( checkBinary->isChecked() )
+                        b_download = true;
+                    break;
+                case UPDATE_FILE_TYPE_PLUGIN:
+                    if( checkPlugin->isChecked() )
+                        b_download = true;
+                    break;
+                        default:
+                        break;
+                }
+                if( b_download )
+                {
+                    QString strFileName = p_updateit->file.psz_url;
+                    strFileName.remove( 0, strFileName.lastIndexOf( "/" ) + 1 );
+                    update_download( p_updateit, qtu( ( saveDir + strFileName ) ) );
+                }
             }
         }
     }
-    update_iterator_Delete( p_uit );
 }

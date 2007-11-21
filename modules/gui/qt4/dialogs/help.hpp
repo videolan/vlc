@@ -28,6 +28,7 @@
 
 #include "util/qvlcframe.hpp"
 
+class QPushButton;
 class QCheckBox;
 
 class HelpDialog : public QVLCFrame
@@ -85,14 +86,16 @@ public:
 private:
     UpdateDialog( intf_thread_t *);
     static UpdateDialog *instance;
+    QPushButton *updateButton;
     QCheckBox *checkInfo;
     QCheckBox *checkSource;
     QCheckBox *checkBinary;
     QCheckBox *checkPlugin;
     update_t *p_update;
+    bool b_updated;
 private slots:
     void close();
-    void update();
+    void updateOrUpload();
 };
 
 
