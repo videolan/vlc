@@ -272,6 +272,19 @@ libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
     vlc_mutex_destroy( &p_mlv->object_lock );
 }
 
+/**************************************************************************
+ *       libvlc_media_list_view_event_manager (Public)
+ **************************************************************************/
+libvlc_event_manager_t *
+libvlc_media_list_view_event_manager( libvlc_media_list_view_t * p_mlv )
+{
+    libvlc_event_manager_t * p_em;
+    vlc_mutex_lock( &p_mlv->object_lock );
+    p_em = p_mlv->p_event_manager;
+    vlc_mutex_unlock( &p_mlv->object_lock );
+    return p_em;
+}
+
 /* Limited to four args, because it should be enough */
 
 #define AN_SELECT( collapser, dec1, dec2, dec3, dec4, p, ...) p
