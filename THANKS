@@ -85,6 +85,7 @@ Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix
 Gisle Vanem <giva at bgnet dot no>  - gettieoffay under win32
+Glen Gray <slaine at slaine do rog> - RTSP keepalive
 Greg Farrell <greg at gregfarell dot org> - rc interface "enqueue" command
 Gregory Hazel <ghazel at gmail dot com> - wxWidgets fixes and improvements
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
