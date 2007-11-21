@@ -177,7 +177,10 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     [url release];
     [subitems release];
     [metaDictionary release];
-    
+
+    if( self == libvlc_media_descriptor_get_user_data( p_md, NULL ) )
+        libvlc_media_descriptor_set_user_data( p_md, nil, NULL );
+
     libvlc_media_descriptor_release( p_md );
 
     [super dealloc];
