@@ -35,5 +35,4 @@
 + (id)sharedMediaLibrary;
 
 - (VLCMediaList *)allMedia;
-- (NSArray *)playlists;
 @end

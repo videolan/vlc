@@ -71,22 +71,10 @@ static VLCMediaLibrary * sharedMediaLibrary = nil;
 {
     if (!allMedia)
     {
-//        libvlc_media_list_t *p_mlist = libvlc_media_library_media_list(mlib, NULL);
-//        libvlc_media_list_t * p_flat_mlist = libvlc_media_list_flat_media_list(p_mlist, NULL);
-//        allMedia = [[VLCMediaList medialistWithLibVLCMediaList: p_flat_mlist] retain];
-//        libvlc_media_list_release(p_flat_mlist);
-//        libvlc_media_list_release(p_mlist);
+        libvlc_media_list_t *p_mlist = libvlc_media_library_media_list(mlib, NULL);
+        allMedia = [[VLCMediaList medialistWithLibVLCMediaList: p_mlist] retain];
+        libvlc_media_list_release(p_mlist);
     }
     return allMedia;
-}
-
-- (NSArray *)playlists
-{
-    libvlc_media_list_t *p_mlist = libvlc_media_library_media_list( mlib, NULL );
-    VLCMediaList *medialist = [VLCMediaList medialistWithLibVLCMediaList:p_mlist];
-    libvlc_media_list_release( p_mlist );
-    NSArray *ret = [medialist sublists];
-    
-    return ret;
 }
 @end
