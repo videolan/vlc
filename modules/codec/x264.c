@@ -669,7 +669,7 @@ struct encoder_sys_t
     int             i_buffer;
     uint8_t         *p_buffer;
 
-    mtime_t         i_last_ref_pts;
+    mtime_t         i_interpolated_dts;
 
     char *psz_stat_name;
 };
@@ -720,7 +720,7 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
-    p_sys->i_last_ref_pts = 0;
+    p_sys->i_interpolated_dts = 0;
     p_sys->psz_stat_name = NULL;
 
     x264_param_default( &p_sys->param );
@@ -1239,19 +1239,21 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         p_enc->fmt_in.video.i_frame_rate_base /
             p_enc->fmt_in.video.i_frame_rate;
 
-    p_block->i_dts = p_block->i_pts = pic.i_pts;
+    p_block->i_pts = pic.i_pts;
 
     if( p_sys->param.i_bframe > 0 )
     {
         if( p_block->i_flags & BLOCK_FLAG_TYPE_B )
         {
+            /* FIXME : this is wrong if bpyramid is set */
             p_block->i_dts = p_block->i_pts;
+            p_sys->i_interpolated_dts = p_block->i_dts;
         }
         else
         {
-            if( p_sys->i_last_ref_pts )
+            if( p_sys->i_interpolated_dts )
             {
-                p_block->i_dts = p_sys->i_last_ref_pts;
+                p_block->i_dts = p_sys->i_interpolated_dts;
             }
             else
             {
@@ -1259,8 +1261,12 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
                 p_block->i_dts = p_block->i_pts;
             }
 
-            p_sys->i_last_ref_pts = p_block->i_pts;
+            p_sys->i_interpolated_dts += p_block->i_length;
         }
+    }
+    else
+    {
+        p_block->i_dts = p_block->i_pts;
     }
 
     return p_block;
