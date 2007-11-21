@@ -460,6 +460,21 @@ createnew:
         return VLC_EGENERIC;
     }
 
+    /* Kasenna enables KeepAlive by analysing the User-Agent string. 
+     * Appending _KA to the string should be enough to enable this feature, 
+     * however, there is a bug where the _KA doesn't get parsed from the 
+     * default User-Agent as created by VLC/Live555 code. This is probably due 
+     * to spaces in the string or the string being too long. Here we override
+     * the default string with a more compact version.
+     */
+    if( var_CreateGetBool( p_demux, "rtsp-kasenna" ))
+    {
+#if LIVEMEDIA_LIBRARY_VERSION_INT > 1130457500
+        p_sys->rtsp->setUserAgentString( "VLC_MEDIA_PLAYER_KA" );
+#endif
+    }
+
+
     psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
     if( !psz_url ) return VLC_ENOMEM;
 
