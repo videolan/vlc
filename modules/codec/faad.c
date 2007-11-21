@@ -89,6 +89,22 @@ static const uint32_t pi_channels_ordered[MAX_CHANNEL_POSITIONS] =
       AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
       AOUT_CHAN_CENTER, AOUT_CHAN_REARCENTER, AOUT_CHAN_LFE
     };
+static const uint32_t pi_channels_guessed[MAX_CHANNEL_POSITIONS] =
+    { 0, AOUT_CHAN_CENTER, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_LFE,
+      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+          | AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+          | AOUT_CHAN_REARRIGHT | AOUT_CHAN_CENTER,
+      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+          | AOUT_CHAN_REARRIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_LFE,
+      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_MIDDLELEFT
+          | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+          | AOUT_CHAN_CENTER,
+      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_MIDDLELEFT
+          | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+          | AOUT_CHAN_CENTER | AOUT_CHAN_LFE
+    };
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -147,6 +163,9 @@ static int Open( vlc_object_t *p_this )
 
         p_dec->fmt_out.audio.i_rate = i_rate;
         p_dec->fmt_out.audio.i_channels = i_channels;
+        p_dec->fmt_out.audio.i_physical_channels
+            = p_dec->fmt_out.audio.i_original_channels
+            = pi_channels_guessed[i_channels];
         aout_DateInit( &p_sys->date, i_rate );
     }
     else
