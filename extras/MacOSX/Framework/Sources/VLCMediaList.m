@@ -222,6 +222,26 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
     
     return result;
 }
+
+/* Media list aspect */
+- (VLCMediaListAspect *)hierarchicalAspect
+{
+    VLCMediaListAspect * hierarchicalAspect;
+    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_view( p_mlist, NULL );
+    hierarchicalAspect = [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv];
+    libvlc_media_list_view_release( p_mlv );
+    return hierarchicalAspect;
+}
+
+- (VLCMediaListAspect *)flatAspect
+{
+    VLCMediaListAspect * flatAspect;
+    libvlc_media_list_view_t * p_mlv = libvlc_media_list_flat_view( p_mlist, NULL );
+    flatAspect = [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv];
+    libvlc_media_list_view_release( p_mlv );
+    return flatAspect;
+}
+
 @end
 
 @implementation VLCMediaList (LibVLCBridging)

@@ -28,6 +28,7 @@
 #import <VLC/VLCMedia.h>
 #import <VLC/VLCMediaLibrary.h>
 #import <VLC/VLCMediaList.h>
+#import <VLC/VLCMediaListAspect.h>
 #import <VLC/VLCTime.h>
 #import <VLC/VLCVideoView.h>
 

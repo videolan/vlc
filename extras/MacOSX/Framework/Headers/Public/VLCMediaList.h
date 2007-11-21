@@ -30,6 +30,7 @@ extern NSString * VLCMediaListItemDeleted;
 
 @class VLCMedia;
 @class VLCMediaList;
+@class VLCMediaListAspect;
 
 // TODO: Documentation
 @protocol VLCMediaListDelegate
@@ -58,4 +59,8 @@ extern NSString * VLCMediaListItemDeleted;
 - (VLCMedia *)mediaAtIndex:(int)index;
 - (int)indexOfMedia:(VLCMedia *)media;
 - (int)count;
+
+/* Media list aspect */
+- (VLCMediaListAspect *)hierarchicalAspect;
+- (VLCMediaListAspect *)flatAspect;
 @end

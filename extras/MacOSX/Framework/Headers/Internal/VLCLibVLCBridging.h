@@ -1,5 +1,5 @@
 /*****************************************************************************
-* VLCLibVLCbridging.h: VLC.framework VLCLibVLCBridging header
+* VLCLibVLCbridging.h: VLC.framework VLCLibVLCBridging (Private) header
 *****************************************************************************
 * Copyright (C) 2007 Pierre d'Herbemont
 * Copyright (C) 2007 the VideoLAN team
@@ -22,7 +22,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-#include "VLCLibrary.h"
+#import "VLCLibrary.h"
 
 // TODO: Documentation
 @interface VLCMediaList (LibVLCBridging)
@@ -57,6 +57,7 @@
 - (void *)libVLCMediaDescriptor;
 @end
 
+
 // TODO: Documentation
 @interface VLCMedia (VLCMediaPlayerBridging)
 - (void)setLength:(VLCTime *)value;
@@ -66,6 +67,12 @@
 @interface VLCLibrary (VLCLibVLCBridging)
 + (void *)sharedInstance;
 - (void *)instance;
+@end
+
+@interface VLCMediaListAspect (VLCLibVLCBridging)
++ (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
+- (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
+- (libvlc_media_list_view_t *)libVLCMediaListView;
 @end
 
 // TODO: Documentation
