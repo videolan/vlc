@@ -102,7 +102,8 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    p_sys->i_duration = var_CreateGetInteger( p_demux, "fake-duration" ) * 1000;
+    p_sys->i_duration =
+        (mtime_t)var_CreateGetInteger( p_demux, "fake-duration" ) * 1000;
     p_sys->f_fps = var_CreateGetFloat( p_demux, "fake-fps" );
 
     /* Declare the elementary stream */
