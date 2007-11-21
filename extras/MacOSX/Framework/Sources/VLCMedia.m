@@ -285,10 +285,8 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         libvlc_exception_clear( &ex );
         return [[[VLCMedia alloc] initWithLibVLCMediaDescriptor:md] autorelease];
     }
-    else
-    {
-        return media;
-    }
+
+    return media;
 }
 
 - (id)initWithLibVLCMediaDescriptor:(void *)md
