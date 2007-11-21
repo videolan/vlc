@@ -41,12 +41,37 @@
 {
     return [self count];
 }
-
 - (id) objectInMediaAtIndex:(int)i
 {
     return [self mediaAtIndex:i];
 }
 @end
+
+/* libvlc event callback */
+static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user_data)
+{
+    id self = user_data;
+    int index = event->u.media_list_view_item_added.index;
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+}
+static void HandleMediaListViewWillAddItem(const libvlc_event_t *event, void *user_data)
+{
+    id self = user_data;
+    int index = event->u.media_list_view_will_add_item.index;
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+}
+static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void * user_data)
+{
+    id self = user_data;
+    int index = event->u.media_list_view_will_add_item.index;
+    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+}
+static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void *user_data)
+{
+    id self = user_data;
+    int index = event->u.media_list_view_will_add_item.index;
+    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+}
 
 @implementation VLCMediaListAspect
 - (void)dealloc
@@ -105,7 +130,18 @@
 @implementation VLCMediaListAspect (Private)
 - (void)initInternalMediaListView
 {
+    libvlc_exception_t e;
+    libvlc_exception_init( &e );
+
+    libvlc_event_manager_t *p_em = libvlc_media_list_event_manager( p_mlv, &e );
+
     /* Add internal callback */
+    libvlc_event_attach( p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e );
+    libvlc_event_attach( p_em, libvlc_MediaListViewWillAddItem, HandleMediaListViewWillAddItem, self, &e );
+    libvlc_event_attach( p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e );
+    libvlc_event_attach( p_em, libvlc_MediaListViewWillDeleteItem, HandleMediaListViewWillDeleteItem, self, &e );
+
+    quit_on_exception( &e );
 }
 @end
 
