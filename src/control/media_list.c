@@ -128,7 +128,11 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
             libvlc_MediaListItemAdded, p_e );
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
+            libvlc_MediaListWillAddItem, p_e );
+    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
             libvlc_MediaListItemDeleted, p_e );
+    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
+            libvlc_MediaListWillDeleteItem, p_e );
 
     if( libvlc_exception_raised( p_e ) )
     {
