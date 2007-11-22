@@ -23,7 +23,7 @@
 
 #import "eyetv.h"
 /* for apple event interaction [carbon] */
-#import <ApplicationServices/ApplicationServices.h> 
+//#import <Foundation/NSAppleScript>
 /* for various VLC core related calls */
 #import "intf.h"
 
@@ -85,86 +85,106 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 
 - (void)launchEyeTV
 {
-    OSStatus stat;
-    FSRef eyetvPath;
-
-    stat = LSFindApplicationForInfo ( 'EyTV',
-                                       CFSTR("com.elgato.eyetv"),
-                                       NULL,
-                                       &eyetvPath,
-                                       NULL );
-    if( stat != noErr )
-        msg_Err( VLCIntf, "finding EyeTV failed with error code %i", (int)stat );
-    
-    stat = LSOpenFSRef( &eyetvPath, NULL );
-    if( stat != noErr )
-        msg_Err( VLCIntf, "opening EyeTV failed with error code %i", (int)stat );
-    
+    NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
+                @"tell application \"EyeTV\" to launch with server mode"];
+    NSDictionary *errorDict;
+    NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
+    if( nil == descriptor ) 
+    {
+        NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
+        msg_Err( VLCIntf, "opening EyeTV failed with error code %s", [errorString UTF8String] );
+    }
+    [script release];
 }
 
 - (void)switchChannelUp:(BOOL)b_yesOrNo
 {
-    OSErr err;
-    AppleEvent ourAE = {typeNull, nil};
-    AEBuildError theBuildError;
-    const OSType eyetvSignature = 'EyTV';   /* carbon FOURCC style */
-    OSType eyetvCommand;
-    
+    NSAppleScript *script;
+    NSDictionary *errorDict;
+    NSAppleEventDescriptor *descriptor;
+
     if( b_yesOrNo == YES )
     {
-        eyetvCommand = 'Chup';     /* same style */
+        script = [[NSAppleScript alloc] initWithSource:
+                    @"tell application \"EyeTV\" to channel_up"];
         msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel up" );
     }
     else
     {
-        eyetvCommand = 'Chdn';     /* same style again */
+        script = [[NSAppleScript alloc] initWithSource:@"tell application \"EyeTV\" to channel_down"];
         msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel down" );
     }
     
-    err = AEBuildAppleEvent(
-                            /* EyeTV script suite */ eyetvSignature,
-                            /* command */ eyetvCommand,
-                            /* signature type */ typeApplSignature,
-                            /* signature */ &eyetvSignature,
-                            /* signature size */ sizeof(eyetvSignature),
-                            /* basic return id */ kAutoGenerateReturnID,
-                            /* generic transaction id */ kAnyTransactionID,
-                            /* to-be-created AE */ &ourAE,
-                            /* get some possible errors */ &theBuildError, 
-                            /* got no params for now */ "" );
-    if( err != aeBuildSyntaxNoErr )
+    descriptor = [script executeAndReturnError:&errorDict];
+    if( nil == descriptor ) 
     {
-        msg_Err( VLCIntf, "Error %i encountered while trying to the build the AE to launch eyetv.\n" \
-                 "additionally, the following info was returned: AEBuildErrorCode:%i at pos:%i", 
-                 (int)err, theBuildError.fError, theBuildError.fErrorPos);
-        return;
+        NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
+        msg_Err( VLCIntf, "EyeTV channel change failed with error code %s", [errorString UTF8String] );
     }
-    else
-        msg_Dbg( VLCIntf, "AE created successfully, trying to send now" );
-    
-    err = AESendMessage(
-                        /* our AE */ &ourAE,
-                        /* no need for a response-AE */ NULL,
-                        /* we neither want a response nor user interaction */ kAENoReply | kAENeverInteract,
-                        /* we don't need a special time-out */ kAEDefaultTimeout );
-    if( err != noErr )
-        msg_Err( VLCIntf, "Error %i encountered while trying to tell EyeTV to switch channel", (int)err );
-    
-    err = AEDisposeDesc(&ourAE);
+    [script release];
 }
 
 - (void)selectChannel: (int)theChannelNum
 {
+    NSAppleScript *script;
+    switch( theChannelNum )
+    {
+        case -2: // Composite
+            script = [[NSAppleScript alloc] initWithSource:
+                        @"tell application \"EyeTV\" to input_change input source composite video input"];
+            break;
+        case -1: // S-Video
+            script = [[NSAppleScript alloc] initWithSource:
+                        @"tell application \"EyeTV\" to input_change input source S video input"];
+            break;
+        case 0: // Tuner
+            script = [[NSAppleScript alloc] initWithSource:
+                        @"tell application \"EyeTV\" to input_change input source tuner input"];
+            break;
+        default:
+            if( theChannelNum > 0 )
+            {
+                NSString *channel_change = [NSString stringWithFormat:
+                    @"tell application \"EyeTV\" to channel_change channel number %d", theChannelNum];
+                script = [[NSAppleScript alloc] initWithSource:channel_change];
+            }
+            else
+                return;
+    }
+    NSDictionary *errorDict;
+    NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
+    if( nil == descriptor ) 
+    {
+        NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
+        msg_Err( VLCIntf, "EyeTV source change failed with error code %s", [errorString UTF8String] );
+    }
+    [script release];
 }
 
-- (int)getNumberOfChannels
+- (NSEnumerator *)getChannels
 {
-    return 2;
-}
-
-- (NSString *)getNameOfChannel: (int)theChannelNum
-{
-    return @"dummy name";
+    NSEnumerator *channels = nil;
+    NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
+            @"tell application \"EyeTV\" to get name of every channel"];
+    NSDictionary *errorDict;
+    NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
+    if( nil == descriptor ) 
+    {
+        NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
+        msg_Err( VLCIntf, "EyeTV channel inventory failed with error code %s", [errorString UTF8String] );
+    }
+    else
+    {
+        int count = [descriptor numberOfItems];
+        int x=0; 
+        NSMutableArray *channelArray = [NSMutableArray arrayWithCapacity:count];
+        while( x++ < count ) {
+            [channelArray addObject:[[descriptor descriptorAtIndex:x] stringValue]];
+        }
+        channels = [channelArray objectEnumerator];
+    }
+    [script release];
+    return channels;
 }
 
 @end

@@ -35,7 +35,6 @@
 - (void)launchEyeTV;
 - (void)switchChannelUp:(BOOL)b_yesOrNo;
 - (void)selectChannel:(int)theChannelNum;
-- (int)getNumberOfChannels;
-- (NSString *)getNameOfChannel:(int)theChannelNum;
+- (NSEnumerator *)getChannels;
 
 @end

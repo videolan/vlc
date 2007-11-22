@@ -804,7 +804,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO];
     else if( sender == o_eyetv_channels_pop )
         [[[VLCMain sharedInstance] getEyeTVController] selectChannel:
-            [sender indexOfSelectedItem]];
+            [[sender selectedItem] tag]];
     else
         msg_Err( VLCIntf, "eyetvSwitchChannel sent by unknown object" );
 }
@@ -856,16 +856,29 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_status_txt setHidden: NO];
  
     /* retrieve info */
-    int x = 0;
-    int channelCount = ( [[[VLCMain sharedInstance] getEyeTVController] getNumberOfChannels] + 1 );
-    while( x != channelCount )
-    {
-        /* we have to add items this way, because we accept duplicates
-         * additionally, we save a bit of time */
-        [[o_eyetv_channels_pop menu] addItemWithTitle: [[[VLCMain sharedInstance] getEyeTVController] getNameOfChannel: x]
+    NSEnumerator *channels = [[[VLCMain sharedInstance] getEyeTVController] getChannels];
+    int x = -2;
+    [[[o_eyetv_channels_pop menu] addItemWithTitle: _NS("Composite input")
                                                action: nil
-                                        keyEquivalent: @""];
-        x += 1;
+                                        keyEquivalent: @""] setTag:x++];
+    [[[o_eyetv_channels_pop menu] addItemWithTitle: _NS("S-Video input")
+                                               action: nil
+                                        keyEquivalent: @""] setTag:x++];
+    if( channels ) 
+    {
+        NSString *channel;
+        [[[o_eyetv_channels_pop menu] addItemWithTitle: _NS("Tuner")
+                                                   action: nil
+                                            keyEquivalent: @""] setTag:x++];
+        [[o_eyetv_channels_pop menu] addItem: [NSMenuItem separatorItem]];
+        while( channel = [channels nextObject] )
+        {
+            /* we have to add items this way, because we accept duplicates
+             * additionally, we save a bit of time */
+            [[[o_eyetv_channels_pop menu] addItemWithTitle: channel
+                                                   action: nil
+                                            keyEquivalent: @""] setTag:x++];
+        }
     }
  
     /* clean up GUI */
