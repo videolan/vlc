@@ -201,6 +201,15 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
     p_mlv->p_event_manager = libvlc_event_manager_new( p_mlist,
                                     p_mlv->p_libvlc_instance, p_e );
 
+    libvlc_event_manager_register_event_type( p_mlv->p_event_manager,
+            libvlc_MediaListViewItemAdded, p_e );
+    libvlc_event_manager_register_event_type( p_mlv->p_event_manager,
+            libvlc_MediaListViewWillAddItem, p_e );
+    libvlc_event_manager_register_event_type( p_mlv->p_event_manager,
+            libvlc_MediaListViewItemDeleted, p_e );
+    libvlc_event_manager_register_event_type( p_mlv->p_event_manager,
+            libvlc_MediaListViewWillDeleteItem, p_e );
+
     libvlc_media_list_retain( p_mlist );
     p_mlv->p_mlist = p_mlist;
 
