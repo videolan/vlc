@@ -202,6 +202,49 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
  */
 
 /**************************************************************************
+ *       libvlc_event_type_name (public) :
+ *
+ * Get the char * name of an event type.
+ **************************************************************************/
+static const char * event_type_to_name[] =
+{
+#define EVENT(a) [a]=#a
+    EVENT(libvlc_MediaDescriptorMetaChanged),
+    EVENT(libvlc_MediaDescriptorSubItemAdded),
+    EVENT(libvlc_MediaDescriptorDurationChanged),
+    EVENT(libvlc_MediaDescriptorPreparsedChanged),
+    EVENT(libvlc_MediaDescriptorFreed),
+
+    EVENT(libvlc_MediaInstancePlayed),
+    EVENT(libvlc_MediaInstancePaused),
+    EVENT(libvlc_MediaInstanceReachedEnd),
+    EVENT(libvlc_MediaInstancePositionChanged),
+
+    EVENT(libvlc_MediaListItemAdded),
+    EVENT(libvlc_MediaListWillAddItem),
+    EVENT(libvlc_MediaListItemDeleted),
+    EVENT(libvlc_MediaListWillDeleteItem),
+
+    EVENT(libvlc_MediaListViewItemAdded),
+    EVENT(libvlc_MediaListViewWillAddItem),
+    EVENT(libvlc_MediaListViewItemDeleted),
+    EVENT(libvlc_MediaListViewWillDeleteItem),
+
+    EVENT(libvlc_MediaListPlayerPlayed),
+    EVENT(libvlc_MediaListPlayerNextItemSet),
+    EVENT(libvlc_MediaListPlayerStopped)
+#undef EVENT
+};
+static const char * unkwown_event_name = "Unknown Event";
+
+const char * libvlc_event_type_name( libvlc_event_type_t event_type )
+{
+    if( event_type >= sizeof(event_type_to_name)/sizeof(event_type_to_name[0]))
+        return unkwown_event_name;
+    return strdup(event_type_to_name[event_type]);
+}
+
+/**************************************************************************
  *       libvlc_event_attach (public) :
  *
  * Add a callback for an event.
@@ -239,7 +282,7 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
     free(listener);
     libvlc_exception_raise( p_e,
             "This object event manager doesn't know about '%s' events",
-            libvlc_event_type_name(a));
+            libvlc_event_type_name(event_type));
 }
 
 /**************************************************************************
