@@ -136,6 +136,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
                                            &ex);
         quit_on_exception(&ex);
         
+        url = [aURL copy];
         delegate = nil;
         metaDictionary = nil;
         
