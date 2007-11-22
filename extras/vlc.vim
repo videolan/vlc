@@ -7,7 +7,7 @@ function VlcSyntax()
   let line=1
   let vlc=0
   while(line<=15)
-    if matchend(getline(line), "Copyright.*VideoLAN( team)?") > -1
+    if match(getline(line), ".*Copyright.*VideoLAN.*") > -1
       let vlc=1
       break
     endif
