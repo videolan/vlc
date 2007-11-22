@@ -799,9 +799,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)eyetvSwitchChannel:(id)sender
 {
     if( sender == o_eyetv_nextProgram_btn )
-        [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: YES];
+        [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: YES]];
     else if( sender == o_eyetv_previousProgram_btn )
-        [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO];
+        [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO]];
     else if( sender == o_eyetv_channels_pop )
         [[[VLCMain sharedInstance] getEyeTVController] selectChannel:
             [[sender selectedItem] tag]];
@@ -856,7 +856,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_status_txt setHidden: NO];
  
     /* retrieve info */
-    NSEnumerator *channels = [[[VLCMain sharedInstance] getEyeTVController] getChannels];
+    NSEnumerator *channels = [[[VLCMain sharedInstance] getEyeTVController] allChannels];
     int x = -2;
     [[[o_eyetv_channels_pop menu] addItemWithTitle: _NS("Composite input")
                                                action: nil
@@ -879,11 +879,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
                                                    action: nil
                                             keyEquivalent: @""] setTag:x++];
         }
+        /* make Tuner the default */
+        [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] getEyeTVController] currentChannel]];
     }
  
     /* clean up GUI */
     [o_eyetv_chn_bgbar setHidden: YES];
     [o_eyetv_chn_status_txt setHidden: YES];
+
+    [o_mrl setStringValue: @"eyetv:"];
 }
 
 - (IBAction)subsChanged:(id)sender

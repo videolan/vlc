@@ -5,6 +5,7 @@
 * $Id$
 *
 * Authors: Felix Kühne <fkuehne at videolan dot org>
+*                Damien Fouilleul <damienf at videolan dot org>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -86,19 +87,42 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 - (void)launchEyeTV
 {
     NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
-                @"tell application \"EyeTV\" to launch with server mode"];
+                @"tell application \"EyeTV\"\n"
+                   "launch with server mode\n"
+                 "end tell"];
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "opening EyeTV failed with error code %s", [errorString UTF8String] );
+        msg_Err( VLCIntf, "opening EyeTV failed with error status '%s'", [errorString UTF8String] );
     }
     [script release];
 }
 
-- (void)switchChannelUp:(BOOL)b_yesOrNo
+- (int)currentChannel
 {
+    int currentChannel = 0;
+    NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
+            @"tell application \"EyeTV\" to get current channel"];
+    NSDictionary *errorDict;
+    NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
+    if( nil == descriptor ) 
+    {
+        NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
+        msg_Err( VLCIntf, "EyeTV channel inventory failed with error status '%s'", [errorString UTF8String] );
+    }
+    else
+    {
+        currentChannel = (int)[descriptor int32Value];
+    }
+    [script release];
+    return currentChannel;
+}
+
+- (int)switchChannelUp:(BOOL)b_yesOrNo
+{
+    int currentChannel = 0;
     NSAppleScript *script;
     NSDictionary *errorDict;
     NSAppleEventDescriptor *descriptor;
@@ -106,12 +130,23 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( b_yesOrNo == YES )
     {
         script = [[NSAppleScript alloc] initWithSource:
-                    @"tell application \"EyeTV\" to channel_up"];
+                    @"tell application \"EyeTV\"\n"
+                       "channel_up\n"
+                       "volume_change level 0\n"
+                       "tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                       "get current channel\n"
+                     "end tell"];
         msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel up" );
     }
     else
     {
-        script = [[NSAppleScript alloc] initWithSource:@"tell application \"EyeTV\" to channel_down"];
+        script = [[NSAppleScript alloc] initWithSource:
+                    @"tell application \"EyeTV\"\n"
+                       "channel_down\n"
+                       "volume_change level 0\n"
+                       "tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                       "get current channel\n"
+                     "end tell"];
         msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel down" );
     }
     
@@ -119,9 +154,14 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV channel change failed with error code %s", [errorString UTF8String] );
+        msg_Err( VLCIntf, "EyeTV channel change failed with error status '%s'", [errorString UTF8String] );
+    }
+    else
+    {
+        currentChannel = (int)[descriptor int32Value];
     }
     [script release];
+    return currentChannel;
 }
 
 - (void)selectChannel: (int)theChannelNum
@@ -131,21 +171,37 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     {
         case -2: // Composite
             script = [[NSAppleScript alloc] initWithSource:
-                        @"tell application \"EyeTV\" to input_change input source composite video input"];
+                        @"tell application \"EyeTV\"\n"
+                         "  input_change input source composite video input"
+                         "  volume_change level 0\n"
+                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                         "end tell"];
             break;
         case -1: // S-Video
             script = [[NSAppleScript alloc] initWithSource:
-                        @"tell application \"EyeTV\" to input_change input source S video input"];
+                        @"tell application \"EyeTV\"\n"
+                         "  input_change input source S video input"
+                         "  volume_change level 0\n"
+                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                         "end tell"];
             break;
         case 0: // Tuner
             script = [[NSAppleScript alloc] initWithSource:
-                        @"tell application \"EyeTV\" to input_change input source tuner input"];
+                        @"tell application \"EyeTV\"\n"
+                         "  input_change input source tuner input"
+                         "  volume_change level 0\n"
+                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                         "end tell"];
             break;
         default:
             if( theChannelNum > 0 )
             {
                 NSString *channel_change = [NSString stringWithFormat:
-                    @"tell application \"EyeTV\" to channel_change channel number %d", theChannelNum];
+                    @"tell application \"EyeTV\"\n"
+                    @"  channel_change channel number %d\n"
+                     "  volume_change level 0\n"
+                     "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                     "end tell", theChannelNum];
                 script = [[NSAppleScript alloc] initWithSource:channel_change];
             }
             else
@@ -156,12 +212,12 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV source change failed with error code %s", [errorString UTF8String] );
+        msg_Err( VLCIntf, "EyeTV source change failed with error status '%s'", [errorString UTF8String] );
     }
     [script release];
 }
 
-- (NSEnumerator *)getChannels
+- (NSEnumerator *)allChannels
 {
     NSEnumerator *channels = nil;
     NSAppleScript *script = [[NSAppleScript alloc] initWithSource:
@@ -171,7 +227,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV channel inventory failed with error code %s", [errorString UTF8String] );
+        msg_Err( VLCIntf, "EyeTV channel inventory failed with error status '%s'", [errorString UTF8String] );
     }
     else
     {

@@ -33,8 +33,9 @@
 - (BOOL)isEyeTVrunning;
 - (BOOL)isDeviceConnected;
 - (void)launchEyeTV;
-- (void)switchChannelUp:(BOOL)b_yesOrNo;
+- (int)currentChannel;
+- (int)switchChannelUp:(BOOL)b_yesOrNo;
 - (void)selectChannel:(int)theChannelNum;
-- (NSEnumerator *)getChannels;
+- (NSEnumerator *)allChannels;
 
 @end
