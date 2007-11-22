@@ -107,7 +107,7 @@ static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void 
 @implementation VLCMediaListAspect (LibVLCBridging)
 + (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
 {
-    return [[[VLCMediaList alloc] initWithLibVLCMediaList:p_new_mlv] autorelease];
+    return [[[VLCMediaListAspect alloc] initWithLibVLCMediaListView:p_new_mlv] autorelease];
 }
 
 - (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
