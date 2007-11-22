@@ -699,7 +699,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return VLC_FALSE;
         }
-        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "",
+        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc:skip",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
@@ -869,7 +869,7 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
         return VLC_FALSE;
     }
 
-    if( i_href > p_demux->p_sys->i_tracklist_entries )
+    if( i_href >= p_demux->p_sys->i_tracklist_entries )
     {
         msg_Warn( p_demux, "invalid \"href\" attribute" );
         return VLC_FALSE;
