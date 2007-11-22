@@ -120,10 +120,11 @@ Jonas Larsen <jonas at vrt.dk> - Danish translation
 Jouni Kähkönen - Finnish translation
 Julien Blache <jb at technologeek.org> - disc ejection code
 Julien Plissonneau Duquène - JACK audio input module 
-kty0ne - WinAmp 5 skin for VLC
+Kang Jeong-Hee <keizie at gmail dot com> - Korean translation
 Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no> - Audioscrobbler plugin
 Kenneth Self <kens at campoz DoT. fslife _dOt co dOT- uk> - BDA capture plugin
-Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation patch by Kevin H. Patterson (kevpatt at khptech dot com
+Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation 
+kty0ne - WinAmp 5 skin for VLC
 K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
@@ -156,6 +157,7 @@ Miroslav Oujeský <oujesky at mail dot muni dot cz> - Czech translation
 Mirsal Ennaime <mirsal.ennaime at gmail dot com> - D-Bus ameliorations
 Moritz Bunkus <moritz at bunkus dot org> - Matroska patches
 Morten Brix Pedersen <morten at wtf.dk> - Danish translation
+Namhyung Kim <namhyung at gmail d0t com> - Korean translation
 Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes
 Olivier Aubert <oaubert at bat710.univ-lyon1.fr> - clone list patch
 Olivier Houchard <doginou @t dong d0t ci0 d0t org> - UDP & HTTP access output fix, ffmpeg mux fix
