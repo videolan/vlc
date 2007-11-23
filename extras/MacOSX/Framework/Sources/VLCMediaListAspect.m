@@ -110,7 +110,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         libvlc_media_list_view_retain(p_mlv);
         //libvlc_media_list_lock(p_mlist);
         cachedMedia = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
-        int i, count = libvlc_media_list_count(p_mlv, NULL);
+        int i, count = libvlc_media_list_view_count(p_mlv, NULL);
         for( i = 0; i < count; i++ )
         {
             libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index(p_mlv, i, NULL);
