@@ -50,27 +50,35 @@
 /* libvlc event callback */
 static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user_data)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     int index = event->u.media_list_view_item_added.index;
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [pool release];
 }
 static void HandleMediaListViewWillAddItem(const libvlc_event_t *event, void *user_data)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     int index = event->u.media_list_view_will_add_item.index;
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [pool release];
 }
 static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void * user_data)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     int index = event->u.media_list_view_will_add_item.index;
     [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [pool release];
 }
 static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void *user_data)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     int index = event->u.media_list_view_will_add_item.index;
     [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [pool release];
 }
 
 @implementation VLCMediaListAspect
