@@ -418,7 +418,7 @@ static void Run( intf_thread_t *p_intf )
         p_buffer_pos = strstr( ( char * ) p_buffer, "BADSESSION" );
         if ( p_buffer_pos )
         {
-            msg_Dbg( p_intf, "Authentication failed, handshaking again" );
+            msg_Dbg( p_intf, "Authentication failed (BADSESSION), are you connected to last.fm with another program ?" );
             p_sys->b_handshaked = VLC_FALSE;
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
             continue;
@@ -437,7 +437,8 @@ static void Run( intf_thread_t *p_intf )
         }
         else
         {
-            msg_Dbg( p_intf, "Authentication failed, handshaking again" );
+            msg_Dbg( p_intf, "Authentication failed, handshaking again (%s)", 
+                             p_buffer );
             p_sys->b_handshaked = VLC_FALSE;
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
             continue;
