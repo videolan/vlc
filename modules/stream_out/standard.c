@@ -53,7 +53,7 @@
   "This allows you to specify a group for the session, that will be announced "\
   "if you choose to use SAP." )
 
-#define DESC_TEXT N_("Session descriptipn")
+#define DESC_TEXT N_("Session description")
 #define DESC_LONGTEXT N_( \
     "This allows you to give a short description with details about the stream, " \
     "that will be announced in the SDP (Session Descriptor)." )
