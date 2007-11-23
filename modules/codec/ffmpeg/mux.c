@@ -148,7 +148,7 @@ int E_(OpenMux)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->oc->pb = p_sys->io;
+    p_sys->oc->pb = &p_sys->io;
     p_sys->oc->nb_streams = 0;
 
     p_sys->b_write_header = VLC_TRUE;
@@ -389,12 +389,12 @@ static int Mux( sout_mux_t *p_mux )
         if( av_write_header( p_sys->oc ) < 0 )
         {
             msg_Err( p_mux, "could not write header" );
-        p_sys->b_write_header = VLC_FALSE;
+            p_sys->b_write_header = VLC_FALSE;
             p_sys->b_error = VLC_TRUE;
             return VLC_EGENERIC;
         }
 
-        put_flush_packet( &p_sys->oc->pb );
+        put_flush_packet( p_sys->oc->pb );
         p_sys->b_write_header = VLC_FALSE;
     }
 
