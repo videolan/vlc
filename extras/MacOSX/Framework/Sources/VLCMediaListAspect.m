@@ -77,7 +77,7 @@ static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void 
 - (void)dealloc
 {
     // Release allocated memory
-    libvlc_media_list_release(p_mlv);
+    libvlc_media_list_view_release(p_mlv);
     
     [super dealloc];
 }
