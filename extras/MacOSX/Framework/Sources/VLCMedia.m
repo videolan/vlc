@@ -179,9 +179,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     [subitems release];
     [metaDictionary release];
 
-    if( self == libvlc_media_descriptor_get_user_data( p_md, NULL ) )
-        libvlc_media_descriptor_set_user_data( p_md, nil, NULL );
-
     libvlc_media_descriptor_release( p_md );
 
     [super dealloc];
@@ -280,35 +277,15 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 + (id)mediaWithLibVLCMediaDescriptor:(void *)md
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    
-    VLCMedia *media = (VLCMedia *)libvlc_media_descriptor_get_user_data( md, &ex );
-    if (!media || libvlc_exception_raised( &ex ))
-    {
-        libvlc_exception_clear( &ex );
-        return [[[VLCMedia alloc] initWithLibVLCMediaDescriptor:md] autorelease];
-    }
-
-    return media;
+    return [[[VLCMedia alloc] initWithLibVLCMediaDescriptor:md] autorelease];
 }
 
 - (id)initWithLibVLCMediaDescriptor:(void *)md
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-
-    // Core hacks that allows for native objects to be paired with core objects.  Otherwise, a native object
-    // would be recreated every time we want to address the media descriptor.  This eliminates the need
-    // for maintaining local copies of core objects.
-    if ((self = (id)libvlc_media_descriptor_get_user_data(md, &ex)) && !libvlc_exception_raised(&ex))
-    {
-        return [self retain];
-    }
-    libvlc_exception_clear( &ex );    // Just in case an exception was raised, lets release it
-    
     if (self = [super init])
     {
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
         char * p_url;
         
         p_url = libvlc_media_descriptor_get_mrl( md, &ex );
