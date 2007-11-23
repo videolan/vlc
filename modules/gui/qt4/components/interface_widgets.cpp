@@ -495,12 +495,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     volMuteLabel->installEventFilter( hVolLabel );
     controlLayout->addWidget( volMuteLabel, 3, 15 );
 
-    volumeSlider = new SoundSlider( this );
+    volumeSlider = new SoundSlider( this, config_GetInt( p_intf, "qt-volume-complete" ) );
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
     volumeSlider->setMinimumSize( QSize( 80, 20 ) );
-    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
-    volumeSlider->setMaximum( VOLUME_MAX );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
+    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
+    
+    /* Set the volume from the config */
+    volumeSlider->setValue( (config_GetInt( p_intf, "volume" ) )*  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );

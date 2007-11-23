@@ -80,10 +80,10 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
 #define SOUNDMAX  200 // % OR 400 ?
 #define SOUNDSTEP 5   // %
 
-SoundSlider::SoundSlider( QWidget *_parent ) : QAbstractSlider( _parent )
+SoundSlider::SoundSlider( QWidget *_parent, bool b_hard ) : QAbstractSlider( _parent )
 {
     padding = 5;
-    setRange( SOUNDMIN, SOUNDMAX );
+    setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
 
     pixGradient = QPixmap( QSize( WLENGTH, WHEIGHT ) );
 //    QBixmap mask = QBitmap( QPixmap );

@@ -98,6 +98,12 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define UPDATER_TEXT N_("Activate the new updates notification")
 #define UPDATER_LONGTEXT N_("Activate the automatic notification of new " \
                             "versions of the software. It runs once a week." )
+                            
+#define COMPLETEVOL_TEXT N_("Allow the volume to be set to 400%" )
+#define COMPLETEVOL_LONGTEXT N_("Allow the volume to have range from 0% to " \
+                                "400%, instead of 0% to 200%. This option " \
+                                "can distort the audio, since it uses " \
+                                "software amplification.")
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
@@ -123,6 +129,8 @@ vlc_module_begin();
         add_bool( "qt-minimal-view", VLC_FALSE, NULL, MINIMAL_TEXT,
                 MINIMAL_TEXT, VLC_TRUE );
 
+        add_bool( "qt-volume-complete", VLC_FALSE, NULL, COMPLETEVOL_TEXT,
+                COMPLETEVOL_LONGTEXT, VLC_TRUE);
         add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, VLC_FALSE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
