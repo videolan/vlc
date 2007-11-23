@@ -90,9 +90,11 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
 //    QBixmap mask = QBitmap( QPixmap );
 
     QPainter p( &pixGradient );
-    QLinearGradient gradient( 0, 0, WLENGTH, WHEIGHT );
+    QLinearGradient gradient( 0, 0, WLENGTH, 0 );
     gradient.setColorAt( 0.0, Qt::white );
-    gradient.setColorAt( 1.0, Qt::blue );
+    gradient.setColorAt( 0.2, QColor( 20, 226, 20 ) );
+    gradient.setColorAt( 0.5, QColor( 255, 176, 15 ) );
+    gradient.setColorAt( 1.0, QColor( 235, 30, 20 ) );
     p.setPen( Qt::NoPen );
     p.setBrush( gradient );
 
