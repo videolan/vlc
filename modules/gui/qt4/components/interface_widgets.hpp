@@ -140,6 +140,8 @@ class InputSlider;
 class QSlider;
 class QGridLayout;
 class VolumeClickHandler;
+class SoundSlider;
+
 class ControlsWidget : public QFrame
 {
     Q_OBJECT
@@ -148,7 +150,7 @@ public:
     virtual ~ControlsWidget();
 
     QPushButton *playlistButton;
-    QSlider *volumeSlider;
+    SoundSlider *volumeSlider;
     void setStatus( int );
     void enableInput( bool );
     void enableVideo( bool );
@@ -226,6 +228,7 @@ signals:
     void timeLabelDoubleClicked();
 };
 
+
 /******************** Playlist Widgets ****************/
 #include <QModelIndex>
 #include <QSplitter>
@@ -272,6 +275,5 @@ private slots:
     void updateRate( int );
     void resetRate();
 };
-
 
 #endif

@@ -29,6 +29,7 @@
 #include "input_manager.hpp"
 #include "menus.hpp"
 #include "util/input_slider.hpp"
+#include "util/customwidgets.hpp"
 #include <vlc_vout.h>
 
 #include <QLabel>
@@ -486,29 +487,20 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
-    VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
+    VolumeClickHandler *hVolLabel = new VolumeClickHandler( p_intf, this );
 
     volMuteLabel = new QLabel;
     volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
-    volMuteLabel->installEventFilter( h );
+    volMuteLabel->installEventFilter( hVolLabel );
+    controlLayout->addWidget( volMuteLabel, 3, 15 );
 
-    /** TODO:
-     * Change this slider to use a nice Amarok-like one
-     * **/
-    /** FIXME
-     *  THis percerntage thing has to be handled correctly
-     *  This has to match to the OSD
-     **/
-    volumeSlider = new QSlider;
-    volumeSlider->setSizePolicy( sizePolicy );
-    volumeSlider->setMaximumSize( QSize( 80, 200 ) );
-    volumeSlider->setOrientation( Qt::Horizontal );
-
+    volumeSlider = new SoundSlider( this );
+    volumeSlider->setMaximumSize( QSize( 200, 40 ) );
+    volumeSlider->setMinimumSize( QSize( 80, 20 ) );
+    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
     volumeSlider->setMaximum( VOLUME_MAX );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
-    controlLayout->addWidget( volMuteLabel, 3, 15 );
-    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
@@ -863,3 +855,5 @@ void SpeedControlWidget::resetRate()
 {
     THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);
 }
+
+

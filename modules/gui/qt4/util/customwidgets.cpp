@@ -195,3 +195,4 @@ QString VLCKeyToString( int val )
     }
     return r;
 }
+

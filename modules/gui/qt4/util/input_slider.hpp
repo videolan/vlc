@@ -45,4 +45,31 @@ private slots:
 signals:
     void sliderDragged( float );
 };
+
+
+class QPaintEvent;
+#include <QAbstractSlider>
+
+class SoundSlider : public QAbstractSlider
+{
+    Q_OBJECT
+public:
+    SoundSlider( QWidget *_parent );
+    virtual ~SoundSlider() {};
+protected:
+    int padding;
+    virtual void paintEvent(QPaintEvent *);
+    virtual void wheelEvent( QWheelEvent *event );
+    virtual void mousePressEvent( QMouseEvent * );
+    virtual void mouseMoveEvent( QMouseEvent * );
+    virtual void mouseReleaseEvent( QMouseEvent * );
+private:
+    bool b_sliding;
+    bool b_outside;
+    int i_oldvalue;
+    void changeValue( int x );
+    QPixmap pixGradient;
+    QPixmap pixLimit;
+};
+
 #endif
