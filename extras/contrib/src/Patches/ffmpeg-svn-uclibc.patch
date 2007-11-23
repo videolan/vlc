@@ -11,12 +11,3 @@
    alpha)
      arch="alpha"
      enable fast_64bit
-@@ -1567,7 +1567,7 @@
- EOF
- else
-     # programs cannot be launched if cross compiling, so make a static guess
--    if test "$arch" = "powerpc" -o "$arch" = "mips" ; then
-+    if test "$arch" = "powerpc" -o "$arch" = "mips" -o "$arch" = "armeb"; then
-         bigendian="yes"
-     fi
- fi
