@@ -33,6 +33,9 @@
 @interface VLCMediaListAspect (Private)
 /* Initializers */
 - (void)initInternalMediaListView;
+
+- (void)mediaListViewItemAdded:(NSDictionary *)args;
+- (void)mediaListViewItemRemoved:(NSNumber *)index;
 @end
 
 @implementation VLCMediaListAspect (KeyValueCodingCompliance)
@@ -52,16 +55,22 @@ static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    int index = event->u.media_list_view_item_added.index;
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
+                                                 withMethod:@selector(mediaListViewItemAdded:) 
+                                       withArgumentAsObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                          [VLCMedia mediaWithLibVLCMediaDescriptor:event->u.media_list_item_added.item], @"media",
+                                                          [NSNumber numberWithInt:event->u.media_list_item_added.index], @"index",
+                                                          nil]];
     [pool release];
 }
+
 static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    int index = event->u.media_list_view_item_deleted.index;
-    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
+                                                 withMethod:@selector(mediaListViewItemRemoved:) 
+                                       withArgumentAsObject:[NSNumber numberWithInt:event->u.media_list_item_deleted.index]];
     [pool release];
 }
 
@@ -141,6 +150,23 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     libvlc_event_attach( p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e );
     libvlc_event_attach( p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e );
     quit_on_exception( &e );
+}
+
+- (void)mediaListViewItemAdded:(NSDictionary *)args
+{
+    int index = [[args objectForKey:@"index"] intValue];
+    VLCMedia * media = [args objectForKey:@"media"];
+
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
+    [cachedMedia insertObject:media atIndex:index];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
+}
+
+- (void)mediaListViewItemRemoved:(NSNumber *)index
+{
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
+    [cachedMedia removeObjectAtIndex:[index intValue]];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
 }
 @end
 
