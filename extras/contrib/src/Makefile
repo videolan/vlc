@@ -1054,7 +1054,8 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 ifdef SVN
 ffmpeg:
 	$(SVN) export $(FFMPEG_SVN)  ffmpeg
-	(cd "$@" && patch -p0 < ../Patches/ffmpeg-svn-swscale-pc.patch)
+	(cd "$@" && patch -p0 < ../Patches/ffmpeg-svn-swscale-pc.patch && \
+	 patch -p1 < ../Patches/ffmpeg-svn-avdevices.patch)
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
