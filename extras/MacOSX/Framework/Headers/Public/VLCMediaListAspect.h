@@ -30,6 +30,7 @@
 @interface VLCMediaListAspect : NSObject
 {
     void * p_mlv;                //< Internal instance of media list view
+    NSMutableArray * cachedMedia;
 }
 
 - (VLCMedia *)mediaAtIndex:(int)index;
