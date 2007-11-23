@@ -48,8 +48,6 @@ static void HandleMediaListItemAdded(const libvlc_event_t *event, void *user_dat
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    int index = event->u.media_list_item_added.index;
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaListItemAdded:) 
                                        withArgumentAsObject:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -58,37 +56,14 @@ static void HandleMediaListItemAdded(const libvlc_event_t *event, void *user_dat
                                                           nil]];
     [pool release];
 }
-static void HandleMediaListWillAddItem(const libvlc_event_t *event, void *user_data)
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    id self = user_data;
-    int index = event->u.media_list_will_add_item.index;
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
-    [pool release];
-}
-
 
 static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    int index = event->u.media_list_will_add_item.index;
-    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
-    // Check to see if the last item deleted is this item we're trying delete now.
-    // If no, then delete the item from the local list, otherwise, the item has already 
-    // been deleted
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaListItemRemoved:) 
                                        withArgumentAsObject:[NSNumber numberWithInt:event->u.media_list_item_deleted.index]];
-    [pool release];
-}
-
-static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *user_data)
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    id self = user_data;
-    int index = event->u.media_list_will_add_item.index;
-    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
     [pool release];
 }
 
@@ -117,6 +92,7 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
         quit_on_exception(&p_e);
         
         // Initialize internals to defaults
+        cachedMedia = [[NSMutableArray alloc] init];
         delegate = nil;
         [self initInternalMediaList];
     }
@@ -134,9 +110,7 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(p_mlist, NULL);
             libvlc_event_detach(p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaListWillDeleteItem, HandleMediaListWillDeleteItem, self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaListWillAddItem, HandleMediaListWillAddItem, self, NULL);
         }
         [super release];
     }
@@ -146,7 +120,7 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
 {
     // Release allocated memory
     libvlc_media_list_release(p_mlist);
-    
+    [cachedMedia release];
     [super dealloc];
 }
 
@@ -201,24 +175,12 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
 
 - (VLCMedia *)mediaAtIndex:(int)index
 {
-    libvlc_exception_t p_e;
-    libvlc_exception_init( &p_e );
-    libvlc_media_descriptor_t *p_md = libvlc_media_list_item_at_index( p_mlist, index, &p_e );
-    quit_on_exception( &p_e );
-    
-    // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
-    // new cocoa object representation of the media descriptor.
-    return [VLCMedia mediaWithLibVLCMediaDescriptor:p_md];
+    return [cachedMedia objectAtIndex:index];
 }
 
 - (int)count
 {
-    libvlc_exception_t p_e;
-    libvlc_exception_init( &p_e );
-    int result = libvlc_media_list_count( p_mlist, &p_e );
-    quit_on_exception( &p_e );
-
-    return result;
+    return [cachedMedia count];
 }
 
 - (int)indexOfMedia:(VLCMedia *)media
@@ -264,7 +226,17 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
     {
         p_mlist = p_new_mlist;
         libvlc_media_list_retain(p_mlist);
+        libvlc_media_list_lock(p_mlist);
+        cachedMedia = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_count(p_mlist, NULL)];
+        int i, count = libvlc_media_list_count(p_mlist, NULL);
+        for( i = 0; i < count; i++ )
+        {
+            libvlc_media_descriptor_t * p_md = libvlc_media_list_item_at_index(p_mlist, i, NULL);
+            [cachedMedia addObject:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
+            libvlc_media_descriptor_release(p_md);
+        }
         [self initInternalMediaList];
+        libvlc_media_list_unlock(p_mlist);
     }
     return self;
 }
@@ -285,35 +257,44 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
 
     libvlc_event_manager_t *p_em = libvlc_media_list_event_manager( p_mlist, &p_e );
     libvlc_event_attach( p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, &p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListWillAddItem, HandleMediaListWillAddItem, self, &p_e );
     libvlc_event_attach( p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, &p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListWillDeleteItem, HandleMediaListWillDeleteItem, self, &p_e );
     [self unlock];
     
     quit_on_exception( &p_e );
 }
 
 - (void)mediaListItemAdded:(NSDictionary *)args
-{    
+{
+    int index = [[args objectForKey:@"index"] intValue];
+    VLCMedia * media = [args objectForKey:@"media"];
+
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [cachedMedia insertObject:media atIndex:index];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+
     // Post the notification
     [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaListItemAdded
                                                         object:self
                                                       userInfo:args];
-    
+
     // Let the delegate know that the item was added
     if (delegate && [delegate respondsToSelector:@selector(mediaList:mediaAdded:atIndex:)])
-        [delegate mediaList:self mediaAdded:[args objectForKey:@"media"] atIndex:[[args objectForKey:@"index"] intValue]];
+        [delegate mediaList:self mediaAdded:media atIndex:index];
 }
 
 - (void)mediaListItemRemoved:(NSNumber *)index
 {
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"Media"];
+    [cachedMedia removeObjectAtIndex:[index intValue]];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"Media"];
+
     // Post the notification
     [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaListItemDeleted 
                                                         object:self
                                                       userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
                                                           index, @"index",
                                                           nil]];
-    
+
     // Let the delegate know that the item is being removed
     if (delegate && [delegate respondsToSelector:@selector(mediaList:mediaRemovedAtIndex:)])
         [delegate mediaList:self mediaRemovedAtIndex:[index intValue]];
