@@ -133,7 +133,7 @@ FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
 else
 FFMPEGCONF+= --arch=armv4l
 endif
-FFMPEGCONF+= --enable-small --enable-pthreads --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-v4l --disable-v4l2 --disable-bktr --disable-dv1394 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols --disable-encoders
+FFMPEGCONF+= --enable-small --enable-pthreads --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-demuxer=ac3 --disable-parser=mpegts --disable-parser=ac3 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=ac3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-decoder=nellymoser --disable-protocols 
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52 --enable-swscaler
