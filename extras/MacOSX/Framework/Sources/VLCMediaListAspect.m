@@ -36,7 +36,7 @@
 @end
 
 @implementation VLCMediaListAspect (KeyValueCodingCompliance)
-/* For the @"Media" key */
+/* For the @"media" key */
 - (int) countOfMedia
 {
     return [self count];
@@ -53,7 +53,7 @@ static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     int index = event->u.media_list_view_item_added.index;
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
     [pool release];
 }
 static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void * user_data)
@@ -61,7 +61,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     int index = event->u.media_list_view_item_deleted.index;
-    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
     [pool release];
 }
 
