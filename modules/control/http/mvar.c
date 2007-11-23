@@ -303,29 +303,22 @@ mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
     for ( i = 0; i < input_GetItem(p_input)->i_categories; i++ )
     {
         info_category_t *p_category = input_GetItem(p_input)->pp_categories[i];
-        char *psz;
 
         mvar_t *cat  = E_(mvar_New)( name, "set" );
         mvar_t *iset = E_(mvar_New)( "info", "set" );
 
-        psz = E_(FromUTF8)( p_intf, p_category->psz_name );
-        E_(mvar_AppendNewVar)( cat, "name", psz );
-        free( psz );
+        E_(mvar_AppendNewVar)( cat, "name", p_category->psz_name );
         E_(mvar_AppendVar)( cat, iset );
 
         for ( j = 0; j < p_category->i_infos; j++ )
         {
             info_t *p_info = p_category->pp_infos[j];
             mvar_t *info = E_(mvar_New)( "info", "" );
-            char *psz_name = E_(FromUTF8)( p_intf, p_info->psz_name );
-            char *psz_value = E_(FromUTF8)( p_intf, p_info->psz_value );
 
             /* msg_Dbg( p_input, "adding info name=%s value=%s",
                      psz_name, psz_value ); */
-            E_(mvar_AppendNewVar)( info, "name",  psz_name );
-            E_(mvar_AppendNewVar)( info, "value", psz_value );
-            free( psz_name );
-            free( psz_value );
+            E_(mvar_AppendNewVar)( info, "name",  p_info->psz_name );
+            E_(mvar_AppendNewVar)( info, "value", p_info->psz_value );
             E_(mvar_AppendVar)( iset, info );
         }
         E_(mvar_AppendVar)( s, cat );
@@ -425,11 +418,10 @@ mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
         {
         case VLC_VAR_STRING:
             itm = E_(mvar_New)( name, "set" );
-            psz = E_(FromUTF8)( p_intf, text_list.p_list->p_values[i].psz_string );
+            /* FIXME: Memory leak here?? (remove strdup?) */
+            psz = strdup( text_list.p_list->p_values[i].psz_string );
             E_(mvar_AppendNewVar)( itm, "name", psz );
-            psz = E_(FromUTF8)( p_intf, val_list.p_list->p_values[i].psz_string );
-            E_(mvar_AppendNewVar)( itm, "id", psz );
-            free( psz );
+            E_(mvar_AppendNewVar)( itm, "id", val_list.p_list->p_values[i].psz_string );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       ( !strcmp( val.psz_string,
                                    val_list.p_list->p_values[i].psz_string )
@@ -440,7 +432,7 @@ mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
 
         case VLC_VAR_INTEGER:
             itm = E_(mvar_New)( name, "set" );
-            psz = E_(FromUTF8)( p_intf, text_list.p_list->p_values[i].psz_string );
+            psz = strdup( text_list.p_list->p_values[i].psz_string );
             E_(mvar_AppendNewVar)( itm, "name", psz );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       val_list.p_list->p_values[i].i_int );
@@ -540,32 +532,29 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
 
     for( i = 0; i < i_dir_content; i++ )
     {
-        char *psz_dir_content = ppsz_dir_content[i];
-        char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_dir_content ) + 1];
+        char *psz_name = ppsz_dir_content[i], *psz_ext, *psz_dummy;
+        char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_name ) + 1];
         mvar_t *f;
-        char *psz_name, *psz_ext, *psz_dummy;
 
 #if defined( WIN32 )
         if( psz_dir[0] == '\0' || (psz_dir[0] == '\\' && psz_dir[1] == '\0') )
         {
-            strcpy( psz_tmp, psz_dir_content );
+            strcpy( psz_tmp, psz_name );
         }
         else
 #endif
         {
-            sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_dir_content );
+            sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_name );
 
 #ifdef HAVE_SYS_STAT_H
             if( utf8_stat( psz_tmp, &stat_info ) == -1 )
             {
-                free( psz_dir_content );
+                free( psz_name );
                 continue;
             }
 #endif
         }
         f = E_(mvar_New)( name, "set" );
-
-        psz_name = E_(FromUTF8)( p_intf, psz_dir_content );
 
         /* put lower-case file extension in 'ext' */
         psz_ext = strrchr( psz_name, '.' );
@@ -632,7 +621,6 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         E_(mvar_AppendVar)( s, f );
 
         free( psz_name );
-        free( psz_dir_content );
     }
 
     free( psz_dir );

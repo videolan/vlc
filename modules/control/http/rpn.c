@@ -352,11 +352,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             char *value = E_(ExtractURIString)( url, name );
             if( value != NULL )
             {
-                char *tmp;
                 decode_URI( value );
-                tmp = E_(FromUTF8)( p_intf, value );
-                E_(SSPush)( st, tmp );
-                free( tmp );
+                E_(SSPush)( st, value );
                 free( value );
             }
             else
@@ -367,12 +364,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "url_encode" ) )
         {
             char *url = E_(SSPop)( st );
-            char *value;
-
-            value = E_(ToUTF8)( p_intf, url );
-            free( url );
-            url = value;
-            value = vlc_UrlEncode( url );
+            char *value = vlc_UrlEncode( url );
             free( url );
             E_(SSPush)( st, value );
             free( value );
@@ -836,16 +828,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         {
             char *psz_name = E_(SSPop)( st );
             char *mrl = E_(SSPop)( st );
-            char *tmp;
             input_item_t *p_input;
             int i_ret;
-
-            tmp = E_(ToUTF8)( p_intf, psz_name );
-            free( psz_name );
-            psz_name = tmp;
-            tmp = E_(ToUTF8)( p_intf, mrl );
-            free( mrl );
-            mrl = tmp;
 
             p_input = E_(MRLParse)( p_intf, mrl, psz_name );
 

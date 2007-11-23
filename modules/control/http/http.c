@@ -39,9 +39,6 @@ static void Close( vlc_object_t * );
     "machine, enter 127.0.0.1" )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
-#define CHARSET_TEXT N_( "Charset" )
-#define CHARSET_LONGTEXT N_( \
-        "Charset declared in Content-Type header (default UTF-8)." )
 #define HANDLERS_TEXT N_( "Handlers" )
 #define HANDLERS_LONGTEXT N_( \
         "List of handler extensions and executable paths (for instance: " \
@@ -68,7 +65,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_MAIN );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
-        add_string ( "http-charset", "UTF-8", NULL, CHARSET_TEXT, CHARSET_LONGTEXT, VLC_TRUE );
+        add_obsolete_string ( "http-charset" );
 #if defined( HAVE_FORK ) || defined( WIN32 )
         add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, VLC_TRUE );
 #endif
@@ -133,7 +130,7 @@ static int Open( vlc_object_t *p_this )
     const char    *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
                   *psz_crl = NULL;
     int           i_port       = 0;
-    char          *psz_src;
+    char          *psz_src = NULL;
 
     psz_address = var_GetNonEmptyString(p_intf->p_libvlc, "http-host");
     if( psz_address != NULL )
@@ -160,52 +157,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_address = psz_address;
     p_sys->i_port     = i_port;
     p_sys->p_art_handler = NULL;
-
-    /* determine Content-Type value for HTML pages */
-    psz_src = config_GetPsz( p_intf, "http-charset" );
-    if( psz_src == NULL || !*psz_src )
-    {
-        if( psz_src != NULL ) free( psz_src );
-        psz_src = strdup("UTF-8");
-    }
-
-    p_sys->psz_html_type = malloc( 20 + strlen( psz_src ) );
-    if( p_sys->psz_html_type == NULL )
-    {
-        pl_Release( p_this );
-        free( p_sys->psz_address );
-        free( p_sys );
-        free( psz_src );
-        return VLC_ENOMEM ;
-    }
-    sprintf( p_sys->psz_html_type, "text/html; charset=%s", psz_src );
-    msg_Dbg( p_intf, "using charset=%s", psz_src );
-
-    if( strcmp( psz_src, "UTF-8" ) )
-    {
-        char psz_encoding[strlen( psz_src ) + sizeof( "//translit")];
-        sprintf( psz_encoding, "%s//translit", psz_src);
-
-        p_sys->iconv_from_utf8 = vlc_iconv_open( psz_encoding, "UTF-8" );
-        if( p_sys->iconv_from_utf8 == (vlc_iconv_t)-1 )
-            msg_Warn( p_intf, "unable to perform charset conversion to %s",
-                      psz_encoding );
-        else
-        {
-            p_sys->iconv_to_utf8 = vlc_iconv_open( "UTF-8", psz_src );
-            if( p_sys->iconv_to_utf8 == (vlc_iconv_t)-1 )
-                msg_Warn( p_intf,
-                          "unable to perform charset conversion from %s",
-                          psz_src );
-        }
-    }
-    else
-    {
-        p_sys->iconv_from_utf8 = p_sys->iconv_to_utf8 = (vlc_iconv_t)-1;
-    }
-
-    p_sys->psz_charset = psz_src;
-    psz_src = NULL;
 
     /* determine file handler associations */
     p_sys->i_handlers = 0;
@@ -279,7 +230,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
         pl_Release( p_this );
-        free( p_sys->psz_html_type );
         free( p_sys->psz_address );
         free( p_sys );
         return VLC_EGENERIC;
@@ -381,11 +331,6 @@ failed:
     free( p_sys->pp_files );
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
-    free( p_sys->psz_html_type );
-    if( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
-        vlc_iconv_close( p_sys->iconv_from_utf8 );
-    if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
-        vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
     pl_Release( p_this );
     return VLC_EGENERIC;
@@ -441,12 +386,6 @@ static void Close ( vlc_object_t *p_this )
         httpd_HandlerDelete( p_sys->p_art_handler );
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
-    free( p_sys->psz_html_type );
-
-    if( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
-        vlc_iconv_close( p_sys->iconv_from_utf8 );
-    if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
-        vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
     pl_Release( p_this );
 }
@@ -558,7 +497,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     E_(mvar_AppendNewVar)( p_args->vars, "stream_length", length );
     E_(mvar_AppendNewVar)( p_args->vars, "volume", volume );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_state", state );
-    E_(mvar_AppendNewVar)( p_args->vars, "charset", p_sys->psz_charset );
+    E_(mvar_AppendNewVar)( p_args->vars, "charset", "UTF-8" );
 
     /* Stats */
     if( p_sys->p_input )

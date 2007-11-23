@@ -110,13 +110,6 @@ char *E_(FileToUrl)( char *name, vlc_bool_t *pb_index );
 /** This function returns the real path of a file or directory */
 char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src );
 
-/* Locale handling functions */
-
-/** This fuction converts a locale string to UTF-8 */
-char *E_(FromUTF8)( intf_thread_t *p_intf, char *psz_utf8 );
-/** This function converts an UTF-8 to locale */
-char *E_(ToUTF8)( intf_thread_t *p_intf, char *psz_local );
-
 /** This command parses the "seek" command for the HTTP interface
  * and performs the requested action */
 void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value );
@@ -371,9 +364,6 @@ struct intf_sys_t
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
-    char                *psz_html_type;
-    char                *psz_charset;
-    vlc_iconv_t         iconv_from_utf8, iconv_to_utf8;
 
     char                *psz_address;
     unsigned short      i_port;
