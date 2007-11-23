@@ -129,6 +129,33 @@ flat_media_list_view_release( libvlc_media_list_view_t * p_mlv )
  * Public libvlc functions
  */
 
+/* Little helper */
+static void
+import_mlist_rec( libvlc_media_list_view_t * p_mlv,
+                  libvlc_media_list_t * p_mlist,
+                  libvlc_exception_t * p_e )
+{
+    int i, count;
+    count = libvlc_media_list_count( p_mlist, p_e );
+    for( i = 0; i < count; i++ )
+    {
+        libvlc_media_descriptor_t * p_md;
+        libvlc_media_list_t * p_submlist;
+        p_md = libvlc_media_list_item_at_index( p_mlist, i, p_e );
+        vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
+        p_submlist = libvlc_media_descriptor_subitems( p_md, p_e );
+        if( p_submlist )
+        {
+            libvlc_media_list_lock( p_submlist );
+            import_mlist_rec( p_mlv, p_submlist, p_e );
+            libvlc_media_list_unlock( p_submlist );
+            libvlc_media_list_release( p_submlist );
+        }
+        /* No need to release the md, as we want to retain it, as it is
+         * stored in our array */
+    }
+}
+                        
 /**************************************************************************
  *       libvlc_media_list_flat_view (Public)
  **************************************************************************/
@@ -138,7 +165,6 @@ libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
 {
     trace("\n");
     libvlc_media_list_view_t * p_mlv;
-    libvlc_media_list_lock( p_mlist );
     struct libvlc_media_list_view_private_t * p_this_view_data;
     p_this_view_data = malloc(sizeof(struct libvlc_media_list_view_private_t));
     vlc_array_init( &p_this_view_data->array );
@@ -149,9 +175,12 @@ libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
                                         flat_media_list_view_release,
                                         p_this_view_data,
                                         p_e );
+    libvlc_media_list_lock( p_mlist );
+    import_mlist_rec( p_mlv, p_mlist, p_e );
     libvlc_media_list_view_set_ml_notification_callback( p_mlv,
         ml_item_added,
         ml_item_removed );
+    libvlc_media_list_unlock( p_mlist );
 
     return p_mlv;
 }
