@@ -314,7 +314,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         p_url = libvlc_media_descriptor_get_mrl( md, &ex );
         quit_on_exception( &ex );
         
-        url = [NSString stringWithCString:p_url];
+        url = [[NSString stringWithCString:p_url] retain];
         
         libvlc_media_descriptor_retain( md );
         p_md = md;
