@@ -56,28 +56,12 @@ static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
     [pool release];
 }
-static void HandleMediaListViewWillAddItem(const libvlc_event_t *event, void *user_data)
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    id self = user_data;
-    int index = event->u.media_list_view_will_add_item.index;
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
-    [pool release];
-}
 static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    int index = event->u.media_list_view_will_add_item.index;
+    int index = event->u.media_list_view_item_deleted.index;
     [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
-    [pool release];
-}
-static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void *user_data)
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    id self = user_data;
-    int index = event->u.media_list_view_will_add_item.index;
-    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
     [pool release];
 }
 
@@ -86,7 +70,7 @@ static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void 
 {
     // Release allocated memory
     libvlc_media_list_view_release(p_mlv);
-    
+    [cachedMedia release];
     [super dealloc];
 }
 - (VLCMedia *)mediaAtIndex:(int)index
@@ -124,7 +108,17 @@ static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void 
     {
         p_mlv = p_new_mlv;
         libvlc_media_list_view_retain(p_mlv);
+        //libvlc_media_list_lock(p_mlist);
+        cachedMedia = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
+        int i, count = libvlc_media_list_count(p_mlv, NULL);
+        for( i = 0; i < count; i++ )
+        {
+            libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index(p_mlv, i, NULL);
+            [cachedMedia addObject:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
+            libvlc_media_descriptor_release(p_md);
+        }
         [self initInternalMediaListView];
+        //libvlc_media_list_unlock(p_mlist);
     }
     return self;
 }
@@ -145,10 +139,7 @@ static void HandleMediaListViewWillDeleteItem(const libvlc_event_t *event, void 
 
     /* Add internal callback */
     libvlc_event_attach( p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e );
-    libvlc_event_attach( p_em, libvlc_MediaListViewWillAddItem, HandleMediaListViewWillAddItem, self, &e );
     libvlc_event_attach( p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e );
-    libvlc_event_attach( p_em, libvlc_MediaListViewWillDeleteItem, HandleMediaListViewWillDeleteItem, self, &e );
-
     quit_on_exception( &e );
 }
 @end
