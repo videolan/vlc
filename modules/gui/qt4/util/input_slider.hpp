@@ -54,7 +54,7 @@ class SoundSlider : public QAbstractSlider
 {
     Q_OBJECT
 public:
-    SoundSlider( QWidget *_parent, bool b_softamp );
+    SoundSlider( QWidget *_parent, int _i_step, bool b_softamp );
     virtual ~SoundSlider() {};
 protected:
     int padding;
@@ -67,6 +67,7 @@ private:
     bool b_sliding;
     bool b_outside;
     int i_oldvalue;
+    float f_step;
     void changeValue( int x );
     QPixmap pixGradient;
     QPixmap pixLimit;
