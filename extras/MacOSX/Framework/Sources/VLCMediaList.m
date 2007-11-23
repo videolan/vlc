@@ -245,7 +245,7 @@ static void HandleMediaListWillDeleteItem(const libvlc_event_t *event, void *use
 @end
 
 @implementation VLCMediaList (LibVLCBridging)
-+ (id)medialistWithLibVLCMediaList:(void *)p_new_mlist;
++ (id)mediaListWithLibVLCMediaList:(void *)p_new_mlist;
 {
     return [[[VLCMediaList alloc] initWithLibVLCMediaList:p_new_mlist] autorelease];
 }

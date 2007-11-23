@@ -26,7 +26,7 @@
 
 // TODO: Documentation
 @interface VLCMediaList (LibVLCBridging)
-+ (id)medialistWithLibVLCMediaList:(void *)p_new_mlist;
++ (id)mediaListWithLibVLCMediaList:(void *)p_new_mlist;
 - (id)initWithLibVLCMediaList:(void *)p_new_mlist;
 - (void *)libVLCMediaList;
 @end

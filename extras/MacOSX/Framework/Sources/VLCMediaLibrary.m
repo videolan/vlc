@@ -72,7 +72,7 @@ static VLCMediaLibrary * sharedMediaLibrary = nil;
     if (!allMedia)
     {
         libvlc_media_list_t *p_mlist = libvlc_media_library_media_list(mlib, NULL);
-        allMedia = [[VLCMediaList medialistWithLibVLCMediaList: p_mlist] retain];
+        allMedia = [[VLCMediaList mediaListWithLibVLCMediaList: p_mlist] retain];
         libvlc_media_list_release(p_mlist);
     }
     return allMedia;

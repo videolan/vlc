@@ -399,7 +399,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     else
     {
         [subitems release];
-        subitems = [[VLCMediaList medialistWithLibVLCMediaList:p_mlist] retain];
+        subitems = [[VLCMediaList mediaListWithLibVLCMediaList:p_mlist] retain];
         libvlc_media_list_release( p_mlist );
     }
     [self fetchMetaInformation];
