@@ -4,7 +4,7 @@
    echo "  --disable-ffmpeg         disable ffmpeg build"
    echo "  --disable-ffserver       disable ffserver build"
    echo "  --disable-ffplay         disable ffplay build"
-+  echo "  --enable-avdevices       disable avdevices build"
++  echo "  --enable-avdevices       enable avdevices build"
    echo "  --enable-small           optimize for size instead of speed"
    echo "  --enable-memalign-hack   emulate memalign, interferes with memory debuggers"
    echo "  --disable-encoder=NAME   disables encoder NAME"
