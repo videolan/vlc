@@ -133,7 +133,7 @@ FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
 else
 FFMPEGCONF+= --arch=armv4l
 endif
-FFMPEGCONF+= --enable-small --enable-pthreads --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-demuxer=ac3 --disable-parser=mpegts --disable-parser=ac3 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=ac3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-decoder=nellymoser --disable-protocols 
+FFMPEGCONF+= --enable-small --enable-pthreads --disable-debug --disable-encoders --disable-muxers --disable-demuxers --enable-demuxer=avi --enable-demuxer=avisynth --enable-demuxer=gif --enable-demuxer=h261 --enable-demuxer=h263 --enable-demuxer=h264 --enable-demuxer=image2 --enable-demuxer=image2pipe --enable-demuxer=m4v --enable-demuxer=mjpg --enable-demuxer=mov --enable-demuxer=mpegps --enable-demuxer=mpegvideo --enable-demuxer=yuv4mpegpipe --disable-parsers --enable-parser=mpeg4video --enable-parser=vc1 --enable-parser=mjpeg --enable-parser=mpegaudio --enable-parser=mpegvideo --enable-parser=pnm --enable-parser=h264 --enable-parser=h263 --enable-parser=h264 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=ac3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-decoder=nellymoser --disable-protocols 
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52 --enable-swscaler
@@ -1070,6 +1070,7 @@ endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
+	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
 
 else
