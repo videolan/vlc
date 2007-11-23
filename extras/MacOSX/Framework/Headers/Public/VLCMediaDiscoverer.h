@@ -23,20 +23,21 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLCPlaylist.h>
+#import <VLC/VLCMediaList.h>
 
-@class VLCPlaylist;
+@class VLCMediaList;
 
 @interface VLCMediaDiscoverer : NSObject
 {
     NSString *localizedName;
-    VLCPlaylist * playlist;
+    VLCMediaList * discoveredMedia;
     void * mdis;
 }
++ (NSArray *)availableMediaDiscoverer;
 
 - (id)initWithName:(NSString *)aServiceName;
 
-- (VLCPlaylist *)playlist;
+- (VLCMediaList *)discoveredMedia;
 
 - (NSString *)localizedName;
 @end

@@ -32,7 +32,7 @@
     VLCMediaList * mediaList = [[VLCMediaList alloc] init];
     [mediaList addMedia:[VLCMedia mediaWithURL:@"/dev/null"]];
     NSArrayController * arrayController = [[NSArrayController alloc] init];
-    [arrayController bind:@"contentArray" toObject:mediaList withKeyPath:@"media" options:nil];
+    [arrayController bind:@"contentArray" toObject:[mediaList flatAspect] withKeyPath:@"media" options:nil];
     NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
 
     [bindingOptions setObject:@"No Title" forKey:NSDisplayNameBindingOption];

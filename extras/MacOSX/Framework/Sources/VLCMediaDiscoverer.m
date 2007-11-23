@@ -23,13 +23,27 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLCMediaDiscoverer.h>
+#import "VLCMediaDiscoverer.h"
 #import "VLCLibrary.h"
+#import "VLCLibVLCBridging.h"
 
 #include <vlc/libvlc.h>
 
+static NSArray * availableMediaDiscoverer = nil;
 
 @implementation VLCMediaDiscoverer
++ (NSArray *)availableMediaDiscoverer
+{
+        if( !availableMediaDiscoverer )
+        {
+            availableMediaDiscoverer = [[NSArray arrayWithObjects:
+                                    [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
+                                    [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
+                                    [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease], nil] retain];
+        }
+        return availableMediaDiscoverer;
+}
+
 - (id)initWithName:(NSString *)aServiceName
 {
     if (self = [super init])
@@ -37,7 +51,7 @@
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         localizedName = nil;
-        playlist = nil;
+        discoveredMedia = nil;
         mdis = libvlc_media_discoverer_new_from_name( [VLCLibrary sharedInstance],
                                                       [aServiceName cString],
                                                       &ex );
@@ -50,40 +64,31 @@
 {
     if( localizedName )
         [localizedName release];
-    if( playlist )
-        [playlist release];
+    if( discoveredMedia )
+        [discoveredMedia release];
     libvlc_media_discoverer_release( mdis );
     [super dealloc];
 }
 
-- (VLCPlaylist *) playlist
+- (VLCMediaList *) discoveredMedia
 {
-    if( playlist )
-        return playlist;
+    if( discoveredMedia )
+        return discoveredMedia;
 
     libvlc_media_list_t * p_mlist = libvlc_media_discoverer_media_list( mdis );
-    VLCPlaylist * ret = [VLCPlaylist playlistWithLibVLCMediaList: p_mlist];
+    VLCMediaList * ret = [VLCMediaList mediaListWithLibVLCMediaList: p_mlist];
     libvlc_media_list_release( p_mlist );
-
-    /* Hack until this gets done properly upstream */
-    char * name = libvlc_media_discoverer_localized_name( mdis );
-    if( !name )
-    {
-        VLCMedia * media = [ret mediaAtIndex: 0];
-        ret = media ? (VLCPlaylist *)[media subitems] : nil;
-    }
-    free(name);
 
     if( ret )
     {
-        playlist = [ret retain];
+        discoveredMedia = [ret retain];
     }
-    return ret;
+    return discoveredMedia;
 }
 
 - (NSString *)localizedName
 {
-    NSString * ret = nil;
+    NSString * aString = nil;
     char * name = libvlc_media_discoverer_localized_name( mdis );
 
     if( localizedName )
@@ -91,19 +96,12 @@
 
     if (name)
     {
-        ret = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
+        aString = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
         free( name );
     }
-    /* XXX: Hack until this gets done properly upstream. This is really slow. */
-    if (!ret)
+    if( aString )
     {
-        libvlc_media_list_t * p_mlist = libvlc_media_discoverer_media_list( mdis );
-        ret = [[[[VLCPlaylist playlistWithLibVLCMediaList: p_mlist] mediaAtIndex:0] metaInformation] objectForKey: VLCMetaInformationTitle];
-        libvlc_media_list_release( p_mlist );
-    }
-    if( ret )
-    {
-        localizedName = [ret retain];
+        localizedName = [aString retain];
     }
     return localizedName;
 }
