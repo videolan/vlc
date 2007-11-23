@@ -29,8 +29,7 @@
 @implementation VLCController
 - (void)awakeFromNib
 {
-    VLCMediaList * mediaList = [[VLCMediaList alloc] init];
-    [mediaList addMedia:[VLCMedia mediaWithURL:@"/dev/null"]];
+    VLCMediaList * mediaList = [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] discoveredMedia];
     NSArrayController * arrayController = [[NSArrayController alloc] init];
     [arrayController bind:@"contentArray" toObject:[mediaList flatAspect] withKeyPath:@"media" options:nil];
     NSMutableDictionary *bindingOptions = [NSMutableDictionary dictionary];
@@ -41,7 +40,13 @@
     NSTableColumn * tableColumn = [detailList tableColumnWithIdentifier:@"title"];
 	
 	[tableColumn bind:@"value" toObject: arrayController
-		  withKeyPath:@"arrangedObjects.url" options:bindingOptions];
+		  withKeyPath:@"arrangedObjects.metaDictionary.title" options:bindingOptions];
+    /* Predicate */
+    [bindingOptions removeAllObjects];
+    [bindingOptions setObject:@"metaDictionary.title contains[c] $value" forKey:NSPredicateFormatBindingOption];
+    [bindingOptions setObject:@"No Title" forKey:NSDisplayNameBindingOption];
+    [detailSearchField bind:@"predicate" toObject: arrayController
+        withKeyPath:@"filterPredicate" options:bindingOptions];
     
 }
 

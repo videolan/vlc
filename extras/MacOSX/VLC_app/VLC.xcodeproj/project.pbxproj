@@ -3,12 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 44;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		630FBE3C0CF0B3D80072CB10 /* VLC.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 630FBE2C0CF0B3930072CB10 /* VLC.framework */; };
-		637D59B60CF5A5F90073EA45 /* VLC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 630FBE2C0CF0B3930072CB10 /* VLC.framework */; };
+		6310515A0CF7604600ACDE1E /* VLC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631051590CF7604600ACDE1E /* VLC.framework */; };
+		6310515D0CF7604900ACDE1E /* VLC.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 631051590CF7604600ACDE1E /* VLC.framework */; };
 		63C5518D0C7F663500B202D3 /* VLCController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C5518B0C7F663500B202D3 /* VLCController.m */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -23,7 +23,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				630FBE3C0CF0B3D80072CB10 /* VLC.framework in CopyFiles */,
+				6310515D0CF7604900ACDE1E /* VLC.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,7 +38,7 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* VLC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLC_Prefix.pch; sourceTree = "<group>"; };
-		630FBE2C0CF0B3930072CB10 /* VLC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLC.framework; path = ../Framework/build/Release/VLC.framework; sourceTree = SOURCE_ROOT; };
+		631051590CF7604600ACDE1E /* VLC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLC.framework; path = ../Framework/build/Debug/VLC.framework; sourceTree = SOURCE_ROOT; };
 		63C5518A0C7F663500B202D3 /* VLCController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCController.h; sourceTree = "<group>"; };
 		63C5518B0C7F663500B202D3 /* VLCController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCController.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -50,8 +50,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				637D59B60CF5A5F90073EA45 /* VLC.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				6310515A0CF7604600ACDE1E /* VLC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,8 +70,8 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				630FBE2C0CF0B3930072CB10 /* VLC.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+				631051590CF7604600ACDE1E /* VLC.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -235,6 +235,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"\"$(SRCROOT)/../Framework/build/Debug\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../..\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../Framework\"";
@@ -262,6 +263,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"\"$(SRCROOT)/../Framework/build/Debug\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../..\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../Framework\"";
