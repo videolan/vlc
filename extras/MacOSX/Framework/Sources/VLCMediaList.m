@@ -68,7 +68,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 }
 
 @implementation VLCMediaList (KeyValueCodingCompliance)
-/* For the @"Media" key */
+/* For the @"media" key */
 - (int) countOfMedia
 {
     return [self count];
@@ -154,7 +154,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (void)insertMedia:(VLCMedia *)media atIndex: (int)index
 {
     [media retain];
-    
+
     // Add it to the libvlc's medialist
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
@@ -268,9 +268,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     int index = [[args objectForKey:@"index"] intValue];
     VLCMedia * media = [args objectForKey:@"media"];
 
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
     [cachedMedia insertObject:media atIndex:index];
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"Media"];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
 
     // Post the notification
     [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaListItemAdded
@@ -284,9 +284,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
 - (void)mediaListItemRemoved:(NSNumber *)index
 {
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"Media"];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
     [cachedMedia removeObjectAtIndex:[index intValue]];
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"Media"];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
 
     // Post the notification
     [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaListItemDeleted 
