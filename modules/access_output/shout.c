@@ -475,6 +475,7 @@ static int Read( sout_access_out_t *p_access, block_t *p_buffer )
 static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
+    long i_ret;
 
     shout_sync( p_access->p_sys->p_shout );
     while( p_buffer )
@@ -491,6 +492,20 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
         {
             msg_Err( p_access, "cannot write to stream: %s",
                      shout_get_error(p_access->p_sys->p_shout) );
+
+            /* This can be caused by a server disconnect. Reconnecting might help... */
+            shout_close( p_access->p_sys->p_shout );
+            msg_Warn( p_access, "server unavailable? waiting 30 seconds to reconnect..." );
+            msleep( 30000000 );
+            if( shout_open( p_access->p_sys->p_shout ) == SHOUTERR_SUCCESS )
+            {
+                msg_Warn( p_access, "reconnected to server" );
+            }
+            else
+            {
+                msg_Err( p_access, "failed to reconnect to server" );
+            }
+
         }
         block_Release( p_buffer );
 
