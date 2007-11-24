@@ -440,6 +440,7 @@ void MainInterface::privacyDialog( QList<ConfigControl *> controls )
     {                                                             \
         control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
                 p_config, options, false, optionsLayout, line );  \
+        controls.append( control );                               \
     }
 
 #define CONFIG_GENERIC_NOBOOL( option, type )                     \
@@ -448,6 +449,7 @@ void MainInterface::privacyDialog( QList<ConfigControl *> controls )
     {                                                             \
         control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
                 p_config, options, optionsLayout, line );  \
+        controls.append( control );                               \
     }
 
     CONFIG_GENERIC( "album-art", IntegerList ); line++;
