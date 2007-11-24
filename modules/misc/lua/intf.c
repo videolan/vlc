@@ -941,6 +941,8 @@ static struct
     /* { "hotkeys", "hotkeys" }, */
     { "luatelnet", "telnet" },
     /* { "telnet", "telnet" }, */
+    { "luahttp", "http" },
+    /* { "http", "http" }, */
     { NULL, NULL } };
 
 static vlc_bool_t WordInList( const char *psz_list, const char *psz_word )
