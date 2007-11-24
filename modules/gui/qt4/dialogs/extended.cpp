@@ -34,21 +34,27 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
+
     setWindowTitle( qtr( "Adjustments and Effects" ) );
 
     QGridLayout *layout = new QGridLayout( this );
 
-    QTabWidget *tab = new QTabWidget( this );
+    QTabWidget *mainTab = new QTabWidget( this );
+    mainTab->setTabPosition( QTabWidget::West );
+
+    QTabWidget *audioTab = new QTabWidget( mainTab );
+
     Equalizer *equal = new Equalizer( p_intf, this );
-    tab->addTab( equal, qtr( "Graphic Equalizer" ) );
+    audioTab->addTab( equal, qtr( "Graphic Equalizer" ) );
 
     Spatializer *spatial = new Spatializer( p_intf, this );
-    tab->addTab( spatial, qtr( "Audio Effects" ) );
+    audioTab->addTab( spatial, qtr( "Spatializer" ) );
+    mainTab->addTab( audioTab, qtr( "Audio effects" ) );
 
     ExtVideo *videoEffect = new ExtVideo( p_intf, this );
-    tab->addTab( videoEffect, qtr( "Video Adjustments and Effects" ) );
+    mainTab->addTab( videoEffect, qtr( "Video Adjustments and Effects" ) );
 
-    layout->addWidget( tab, 0, 0, 1, 5 );
+    layout->addWidget( mainTab, 0, 0, 1, 5 );
 
     QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
     layout->addWidget( closeButton, 1, 4, 1, 1);
