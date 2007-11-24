@@ -27,6 +27,7 @@
 
 #include "qt4.hpp"
 #include "util/qvlcframe.hpp"
+#include "components/preferences_widgets.hpp"
 
 #include <vlc_aout.h>
 
@@ -98,6 +99,7 @@ private:
     void handleSystray();
     void doComponentsUpdate();
     void createSystray();
+    void privacyDialog( QList<ConfigControl *> controls );
 
     /* Video */
     VideoWidget         *videoWidget;

@@ -32,6 +32,7 @@
 #include "dialogs/playlist.hpp"
 #include "menus.hpp"
 
+
 #include <QMenuBar>
 #include <QCloseEvent>
 #include <QPushButton>
@@ -46,6 +47,7 @@
 #include <QWidgetAction>
 #include <QDockWidget>
 #include <QToolBar>
+#include <QGroupBox>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -95,6 +97,23 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     embeddedPlaylistWasActive = videoIsActive = false;
     input_name = "";
 
+    /* Ask for the network policy on first startup */
+    if( config_GetInt( p_intf, "privacy-ask") )
+    {
+        QList<ConfigControl *> controls;
+        privacyDialog( controls );
+
+        QList<ConfigControl *>::Iterator i;
+        for(  i = controls.begin() ; i != controls.end() ; i++ )
+        {
+            ConfigControl *c = qobject_cast<ConfigControl *>(*i);
+            c->doApply( p_intf );
+        }
+
+        config_PutInt( p_intf,  "privacy-ask" , 0 );
+        config_SaveConfigFile( p_intf, NULL );
+    }
+
     /**
      *  Configuration and settings
      **/
@@ -103,7 +122,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Main settings */
     setFocusPolicy( Qt::StrongFocus );
-    setAcceptDrops(true);
+    setAcceptDrops( true );
     setWindowIcon( QApplication::windowIcon() );
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
@@ -120,6 +139,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
     notificationEnabled = config_GetInt( p_intf, "qt-notification" )
                           ? true : false;
+
     /**************************
      *  UI and Widgets design
      **************************/
@@ -377,6 +397,69 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Finish the sizing */
     setMinimumSize( PREF_W, addSize.height() );
+}
+
+
+void MainInterface::privacyDialog( QList<ConfigControl *> controls )
+{
+    QDialog *privacy = new QDialog( this );
+
+    privacy->setWindowTitle( qtr( "Privacy and Network policies" ) );
+
+    QGridLayout *gLayout = new QGridLayout( privacy );
+
+    QGroupBox *blabla = new QGroupBox( qtr( "Privacy and Network Warning" ) );
+    QGridLayout *blablaLayout = new QGridLayout( blabla );
+    QLabel *text = new QLabel( qtr(
+        "<p>The <i>VideoLAN Team</i> doesn't like when an application goes online without "
+        "authorisation.</p>\n "
+        "<p><i>VLC media player</i> can request limited information on "
+        "Internet, espically to get CD Covers and songs metadata or to know "
+        "if updates are available.</p>\n"
+        "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> information, even anonymously about your "
+        "usage.</p>\n"
+        "<p>Therefore please check the following options, the default being almost no "
+        "access on the web.</p>\n") );
+    text->setWordWrap( true );
+    text->setTextFormat( Qt::RichText );
+
+    blablaLayout->addWidget( text, 0, 0 ) ;
+
+    QGroupBox *options = new QGroupBox;
+    QGridLayout *optionsLayout = new QGridLayout( options );
+
+    gLayout->addWidget( blabla, 0, 0, 1, 3 );
+    gLayout->addWidget( options, 1, 0, 1, 3 );
+    module_config_t *p_config;
+    ConfigControl *control;
+    int line = 0;
+
+#define CONFIG_GENERIC( option, type )                            \
+    p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
+    if( p_config )                                                \
+    {                                                             \
+        control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
+                p_config, options, false, optionsLayout, line );  \
+    }
+
+#define CONFIG_GENERIC_NOBOOL( option, type )                     \
+    p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
+    if( p_config )                                                \
+    {                                                             \
+        control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
+                p_config, options, optionsLayout, line );  \
+    }
+
+    CONFIG_GENERIC( "album-art", IntegerList ); line++;
+    CONFIG_GENERIC_NOBOOL( "fetch-meta", Bool ); line++;
+    CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool );
+
+    QPushButton *ok = new QPushButton( qtr( "Ok" ) );
+
+    gLayout->addWidget( ok, 2, 2 );
+
+    CONNECT( ok, clicked(), privacy, accept() );
+    privacy->exec();
 }
 
 void MainInterface::debug()

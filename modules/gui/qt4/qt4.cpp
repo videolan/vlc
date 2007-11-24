@@ -107,6 +107,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define BLING_TEXT N_("Use non native buttons and volume slider")
 
+#define PRIVACY_TEXT N_("Ask for network policy at start")
+
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
@@ -162,6 +164,8 @@ vlc_module_begin();
                 VLC_META_ENGINE_DURATION|VLC_META_ENGINE_COLLECTION,
                 NULL, SHOWFLAGS_TEXT,
                 SHOWFLAGS_LONGTEXT, VLC_TRUE );
+        add_bool( "privacy-ask", VLC_TRUE, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
+                VLC_FALSE );
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 
