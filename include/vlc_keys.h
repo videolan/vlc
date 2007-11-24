@@ -25,6 +25,9 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+#ifndef _VLC_KEYS_H
+#define _VLC_KEYS_H 1
+
 #define KEY_MODIFIER         0xFF000000
 #define KEY_MODIFIER_ALT     0x01000000
 #define KEY_MODIFIER_SHIFT   0x02000000
@@ -316,3 +319,5 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_MENU_UP               89
 #define ACTIONID_MENU_DOWN             90
 #define ACTIONID_MENU_SELECT           91
+
+#endif
