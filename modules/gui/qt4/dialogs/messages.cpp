@@ -52,7 +52,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     verbosityBox->setWrapping( true );
     verbosityBox->setMaximumWidth( 50 );
 
-    QLabel *verbosityLabel = new QLabel(qtr( "Verbosity Level" ) );
+    QLabel *verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
 
     messages = new QTextEdit();
     messages->setReadOnly( true );
@@ -145,7 +145,7 @@ void MessagesDialog::updateLog()
 
 void MessagesDialog::close()
 {
-    this->hide();
+    hide();
 }
 
 void MessagesDialog::clear()
