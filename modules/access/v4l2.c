@@ -213,7 +213,7 @@ struct demux_sys_t
 
     char *psz_adev;
     int  i_fd_audio;
-    
+
     char *psz_requested_chroma;
 
     /* Video */
@@ -553,7 +553,7 @@ static void ParseMRL( demux_t *p_demux )
                 p_sys->i_height =
                     strtol( psz_parser + strlen( "height=" ),
                             &psz_parser, 0 );
-            }            
+            }
             else if( !strncmp( psz_parser, "samplerate=",
                                strlen( "samplerate=" ) ) )
             {
@@ -864,7 +864,7 @@ static block_t* GrabVideo( demux_t *p_demux )
                 buf.length == p_sys->p_buffers[i].length ) break;
         }
 
-        if( i >= p_sys->i_nbuffers ) 
+        if( i >= p_sys->i_nbuffers )
         {
             msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
             return 0;
@@ -1216,7 +1216,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     memset( &fmt, 0, sizeof(fmt) );
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    if( p_sys->i_width <= 0 || p_sys->i_height <= 0 ) 
+    if( p_sys->i_width <= 0 || p_sys->i_height <= 0 )
     {
         if( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
@@ -1232,7 +1232,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             p_sys->i_height = p_sys->i_height * 2;
         }
     }
-    else 
+    else
     {
         msg_Dbg( p_demux, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
     }
@@ -1247,9 +1247,9 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     {
         /* User specified chroma */
         if( strlen( p_sys->psz_requested_chroma ) >= 4 )
-        { 
-            int i_requested_fourcc = VLC_FOURCC( 
-                p_sys->psz_requested_chroma[0], p_sys->psz_requested_chroma[1], 
+        {
+            int i_requested_fourcc = VLC_FOURCC(
+                p_sys->psz_requested_chroma[0], p_sys->psz_requested_chroma[1],
                 p_sys->psz_requested_chroma[2], p_sys->psz_requested_chroma[3] );
             for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
             {
@@ -1380,7 +1380,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             buf.memory = V4L2_MEMORY_MMAP;
             buf.index = i;
 
-            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) 
+            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
@@ -1388,7 +1388,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         }
 
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 ) 
+        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
@@ -1408,7 +1408,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             buf.m.userptr = (unsigned long)p_sys->p_buffers[i].start;
             buf.length = p_sys->p_buffers[i].length;
 
-            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) 
+            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
@@ -1416,7 +1416,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         }
 
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 ) 
+        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
@@ -1715,7 +1715,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                 msg_Err( p_demux, "cannot get codec description (%m)" );
                 goto open_failed;
             }
-            
+
             /* only print if vlc supports the format */
             vlc_bool_t b_codec_supported = VLC_FALSE;
             for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
@@ -1723,13 +1723,50 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                 if( v4l2chroma_to_fourcc[i].i_v4l2 == p_sys->p_codecs[i_index].pixelformat )
                 {
                     b_codec_supported = VLC_TRUE;
-                    
+
                     char psz_fourcc[5];
                     memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
                     vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc, &psz_fourcc );
                     msg_Dbg( p_demux, "device supports chroma %4s [%s]",
                                 psz_fourcc,
                                 p_sys->p_codecs[i_index].description );
+
+                    /* List valid frame sizes for this format */
+                    struct v4l2_frmsizeenum frmsize;
+                    frmsize.index = 0;
+                    frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
+                    if( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
+                    {
+                        msg_Err( p_demux, "Error while querying for frame size" );
+                    }
+                    else
+                    {
+                        switch( frmsize.type )
+                        {
+                            case V4L2_FRMSIZE_TYPE_DISCRETE:
+                                do
+                                {
+                                    msg_Dbg( p_demux,
+                "device supports size %dx%d",
+                frmsize.discrete.width, frmsize.discrete.height );
+                                    frmsize.index++;
+                                } while( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
+                                break;
+                            case V4L2_FRMSIZE_TYPE_STEPWISE:
+                                msg_Dbg( p_demux,
+                "device supports sizes %dx%d to %dx%d using %dx%d increments",
+                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
+                frmsize.stepwise.max_width, frmsize.stepwise.max_height,
+                frmsize.stepwise.step_width, frmsize.stepwise.step_height );
+                                break;
+                            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+                                msg_Dbg( p_demux,
+                "device supports all sizes %dx%d to %dx%d",
+                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
+                frmsize.stepwise.max_width, frmsize.stepwise.max_height );
+                                break;
+                        }
+                    }
                 }
             }
             if( !b_codec_supported )
