@@ -109,6 +109,7 @@ static int Demux( demux_t *p_demux )
     const char**ppsz_options = NULL;
     int        i_options = 0;
     vlc_bool_t b_cleanup = VLC_FALSE;
+    vlc_bool_t b_enable_extvlcopt = config_GetInt( p_demux, "m3u-extvlcopt" );
     input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
@@ -145,27 +146,26 @@ static int Demux( demux_t *p_demux )
                 if( psz_artist )
                     psz_artist = strdup( psz_artist );
             }
-#if 0
-            /* You're going to need a pretty strong explanation, why
-             * this is not a big security hole if you are to uncomment
-             * this piece of code. Potentially untrusted input file must
-             * not be allowed to specify options in an open-handed fashion.
-             * -- Courmisch
-             */
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
             {
-                /* VLC Option */
-                char *psz_option;
-                psz_parse += sizeof("EXTVLCOPT:") -1;
-                if( !*psz_parse ) goto error;
+                if( b_enable_extvlcopt )
+                {
+                    /* VLC Option */
+                    char *psz_option;
+                    psz_parse += sizeof("EXTVLCOPT:") -1;
+                    if( !*psz_parse ) goto error;
 
-                psz_option = MaybeFromLocaleDup( psz_parse );
-                if( psz_option )
-                    INSERT_ELEM( ppsz_options, i_options, i_options,
-                                 psz_option );
+                    psz_option = MaybeFromLocaleDup( psz_parse );
+                    if( psz_option )
+                        INSERT_ELEM( ppsz_options, i_options, i_options,
+                                     psz_option );
+                }
+                else
+                {
+                    msg_Err( p_demux, "m3u EXTVLCOPT parsing is disabled for security reasons. If you need it and trust the m3u playlist you are trying to open, please append --m3u-extvlcopt to you command line." );
+                }
             }
-#endif
         }
         else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
         {
