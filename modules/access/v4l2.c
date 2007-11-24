@@ -1310,6 +1310,49 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     if( fmt.fmt.pix.sizeimage < i_min )
         fmt.fmt.pix.sizeimage = i_min;
 
+    /* List supported frame rates */
+    struct v4l2_frmivalenum frmival;
+    frmival.index = 0;
+    frmival.pixel_format = fmt.fmt.pix.pixelformat;
+    frmival.width = p_sys->i_width;
+    frmival.height = p_sys->i_height;
+    if( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
+    {
+        msg_Dbg( p_demux, "supported frame intervals for %4s, %dx%d:",
+                 (const char *)&p_sys->i_fourcc, frmival.width, frmival.height );
+        switch( frmival.type )
+        {
+            case V4L2_FRMIVAL_TYPE_DISCRETE:
+                do
+                {
+                    msg_Dbg( p_demux, "    supported frame interval: %d/%d",
+                             frmival.discrete.numerator,
+                             frmival.discrete.denominator );
+                    frmival.index++;
+                } while( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 );
+                break;
+            case V4L2_FRMIVAL_TYPE_STEPWISE:
+                msg_Dbg( p_demux, "    supported frame intervals: %d/%d to "
+                         "%d/%d using %d/%d increments",
+                         frmival.stepwise.min.numerator,
+                         frmival.stepwise.min.denominator,
+                         frmival.stepwise.max.numerator,
+                         frmival.stepwise.max.denominator,
+                         frmival.stepwise.step.numerator,
+                         frmival.stepwise.step.denominator );
+                break;
+            case V4L2_FRMIVAL_TYPE_CONTINUOUS:
+                msg_Dbg( p_demux, "    supported frame intervals: %d/%d to %d/%d",
+                         frmival.stepwise.min.numerator,
+                         frmival.stepwise.min.denominator,
+                         frmival.stepwise.max.numerator,
+                         frmival.stepwise.max.denominator,
+                         frmival.stepwise.step.numerator,
+                         frmival.stepwise.step.denominator );
+                break;
+        }
+    }
+
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
         p_sys->i_width, p_sys->i_height, p_sys->i_width *
@@ -1747,21 +1790,21 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                                 do
                                 {
                                     msg_Dbg( p_demux,
-                "device supports size %dx%d",
+                "    device supports size %dx%d",
                 frmsize.discrete.width, frmsize.discrete.height );
                                     frmsize.index++;
                                 } while( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
                                 break;
                             case V4L2_FRMSIZE_TYPE_STEPWISE:
                                 msg_Dbg( p_demux,
-                "device supports sizes %dx%d to %dx%d using %dx%d increments",
+                "    device supports sizes %dx%d to %dx%d using %dx%d increments",
                 frmsize.stepwise.min_width, frmsize.stepwise.min_height,
                 frmsize.stepwise.max_width, frmsize.stepwise.max_height,
                 frmsize.stepwise.step_width, frmsize.stepwise.step_height );
                                 break;
                             case V4L2_FRMSIZE_TYPE_CONTINUOUS:
                                 msg_Dbg( p_demux,
-                "device supports all sizes %dx%d to %dx%d",
+                "    device supports all sizes %dx%d to %dx%d",
                 frmsize.stepwise.min_width, frmsize.stepwise.min_height,
                 frmsize.stepwise.max_width, frmsize.stepwise.max_height );
                                 break;
