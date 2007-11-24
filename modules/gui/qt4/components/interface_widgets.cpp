@@ -325,7 +325,9 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
 /*****************************
  * DA Control Widget !
  *****************************/
-ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
+ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
+                                bool b_advControls,
+                                bool b_shiny ) :
                              QFrame( NULL ), p_intf( _p_i )
 {
     controlLayout = new QGridLayout( this );
@@ -495,16 +497,25 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     volMuteLabel->installEventFilter( hVolLabel );
     controlLayout->addWidget( volMuteLabel, 3, 15 );
 
-    volumeSlider = new SoundSlider( this,
+    if( b_shiny )
+    {
+        volumeSlider = new SoundSlider( this,
             config_GetInt( p_intf, "volume-step" ),
             config_GetInt( p_intf, "qt-volume-complete" ) );
+    }
+    else
+    {
+        volumeSlider = new QSlider( this );
+        volumeSlider->setOrientation( Qt::Horizontal );
+    }
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
     volumeSlider->setMinimumSize( QSize( 80, 20 ) );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
     controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
 
     /* Set the volume from the config */
-    volumeSlider->setValue( (config_GetInt( p_intf, "volume" ) )*  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
+    volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
+                              VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );

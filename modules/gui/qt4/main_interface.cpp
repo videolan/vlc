@@ -323,8 +323,10 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
+    bool b_shiny = config_GetInt( p_intf, "qt-blingbling" );
     controls = new ControlsWidget( p_intf,
-                   settings->value( "adv-controls", false ).toBool() );
+                   settings->value( "adv-controls", false ).toBool(),
+                   b_shiny );
 
     /* Configure the Controls, the playlist button doesn't trigger THEDP
        but the toggle from this MainInterface */

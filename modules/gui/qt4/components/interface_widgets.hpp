@@ -141,16 +141,17 @@ class QSlider;
 class QGridLayout;
 class VolumeClickHandler;
 class SoundSlider;
+class QAbstractSlider;
 
 class ControlsWidget : public QFrame
 {
     Q_OBJECT
 public:
-    ControlsWidget( intf_thread_t *, bool );
+    /* p_intf, advanced control visible or not, blingbling or not */
+    ControlsWidget( intf_thread_t *, bool, bool );
     virtual ~ControlsWidget();
 
     QPushButton *playlistButton;
-    SoundSlider *volumeSlider;
     void setStatus( int );
     void enableInput( bool );
     void enableVideo( bool );
@@ -170,6 +171,7 @@ private:
     QPushButton         *slowerButton, *fasterButton;
     AdvControlsWidget   *advControls;
     QLabel              *volMuteLabel;
+    QAbstractSlider     *volumeSlider;
 
     bool                 b_advancedVisible;
 private slots:
