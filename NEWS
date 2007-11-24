@@ -32,6 +32,8 @@ Important notes:
    Please use the RTP stream output instead, e.g.:
      Old: '#std{access=rtp,dst=239.255.1.2,sap}'
      New: '#rtp{dst=239.255.1.2,sap}'
+ * You now need to append --m3u-extvlcopt to your command line to enable
+   EXTVLCOPT options parsing in m3u playlists.
 
 Changes:
 --------
@@ -143,6 +145,7 @@ Interfaces:
    * Ncurses interface now uses ncursesw to correctly display wide characters
      when using an UTF-8 locale.
    * Plugin to set Telepathy presence message using MissionControl
+ * Fix VLM schedule time on Linux.
 
 Linux Port:
  * VLC now complies with the XDG Base Directory Specification version 0.6
