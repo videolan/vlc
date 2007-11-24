@@ -134,7 +134,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
-        int i_line, i_num_lines, i_offset;
+        int i_line, i_num_lines, i_visible_pitch, i_pixel_pitch, i_offset,
+            i_visible_pixels;
         uint8_t black_pixel;
         uint8_t *p_in, *p_out;
 
@@ -142,6 +143,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_out = p_outpic->p[i_index].p_pixels;
 
         i_num_lines = p_pic->p[i_index].i_visible_lines;
+        i_visible_pitch = p_pic->p[i_index].i_visible_pitch;
+        i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
+        i_visible_pixels = i_visible_pitch/i_pixel_pitch;
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
@@ -149,17 +153,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (int)( (double)(p_pic->p[i_index].i_visible_pitch)
+            i_offset = (int)( (double)(i_visible_pixels)
                          * sin( f_angle + 10.0 * (double)i_line
                                                / (double)i_num_lines )
-                         / 20.0 );
+                         / 20.0 )*i_pixel_pitch;
 
             if( i_offset )
             {
                 if( i_offset < 0 )
                 {
                     p_filter->p_libvlc->pf_memcpy( p_out, p_in - i_offset,
-                             p_pic->p[i_index].i_visible_pitch + i_offset );
+                                                   i_visible_pitch + i_offset );
                     p_in += p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
                     p_filter->p_libvlc->pf_memset( p_out + i_offset,
@@ -168,7 +172,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 else
                 {
                     p_filter->p_libvlc->pf_memcpy( p_out + i_offset, p_in,
-                             p_pic->p[i_index].i_visible_pitch - i_offset );
+                                                   i_visible_pitch - i_offset );
                     p_filter->p_libvlc->pf_memset( p_out, black_pixel,
                                                    i_offset );
                     p_in += p_pic->p[i_index].i_pitch;
@@ -178,7 +182,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             else
             {
                 p_filter->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_index].i_visible_pitch );
+                                               i_visible_pitch );
                 p_in += p_pic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }

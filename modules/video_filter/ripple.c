@@ -133,13 +133,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
-        int i_line, i_first_line, i_num_lines, i_offset;
+        int i_line, i_first_line, i_num_lines, i_offset, i_pixel_pitch,
+            i_visible_pixels;
         uint8_t black_pixel;
         uint8_t *p_in, *p_out;
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
         i_num_lines = p_pic->p[i_index].i_visible_lines;
+        i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
+        i_visible_pixels = p_pic->p[i_index].i_visible_pitch/p_pic->p[i_index].i_pixel_pitch;
 
         i_first_line = i_num_lines * 4 / 5;
 
@@ -158,13 +161,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         for( i_line = i_first_line ; i_line < i_num_lines ; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (int)( (double)(p_pic->p[i_index].i_pitch)
+            i_offset = (int)( (double)(i_visible_pixels)
                          * sin( f_angle + 2.0 * (double)i_line
                                               / (double)( 1 + i_line
                                                             - i_first_line) )
                          * (double)(i_line - i_first_line)
                          / (double)i_num_lines
-                         / 8.0 );
+                         / 8.0 )*p_pic->p[i_index].i_pixel_pitch;
 
             if( i_offset )
             {
