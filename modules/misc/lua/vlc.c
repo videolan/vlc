@@ -51,11 +51,12 @@
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
 
 vlc_module_begin();
-    add_shortcut( "luameta" );
-    set_shortname( N_( "Lua Meta" ) );
-    set_description( _("Fetch metadata using lua scripts") );
-    set_capability( "meta fetcher", 10 );
-    set_callbacks( E_(FindMeta), NULL );
+    add_submodule();
+        add_shortcut( "luameta" );
+        set_shortname( N_( "Lua Meta" ) );
+        set_description( _("Fetch metadata using lua scripts") );
+        set_capability( "meta fetcher", 10 );
+        set_callbacks( E_(FindMeta), NULL );
     add_submodule();
         set_shortname( N_( "Lua Art" ) );
         set_description( _("Fetch artwork using lua scripts") );
@@ -77,6 +78,8 @@ vlc_module_begin();
         /* add_shortcut( "hotkeys" ); */
         add_shortcut( "luatelnet" );
         /* add_shortcut( "telnet" ); */
+        add_shortcut( "luahttp" );
+        /* add_shortcut( "http" ); */
         set_description( _("Lua Interface Module") );
         set_capability( "interface", 0 );
         add_string( "lua-intf", "dummy", NULL,
