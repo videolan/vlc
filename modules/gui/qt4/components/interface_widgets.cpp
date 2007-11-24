@@ -123,15 +123,17 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     label = new QLabel;
-    label->setMaximumHeight( ICON_SIZE );
-    label->setMaximumWidth( ICON_SIZE );
+    label->setMaximumHeight( MAX_BG_SIZE );
+    label->setMaximumWidth( MAX_BG_SIZE );
     label->setScaledContents( true );
     label->setPixmap( QPixmap( ":/vlc128.png" ) );
     backgroundLayout = new QHBoxLayout;
     backgroundLayout->addWidget( label );
     setLayout( backgroundLayout );
+    updateGeometry();
 }
 
 BackgroundWidget::~BackgroundWidget()
@@ -146,19 +148,26 @@ void BackgroundWidget::setArt( QString url )
         label->setPixmap( QPixmap( ":/vlc128.png" ) );
     else
         label->setPixmap( QPixmap( url ) );
+    updateGeometry();
 }
 
 QSize BackgroundWidget::sizeHint() const
 {
-    return widgetSize;
+    return label->maximumSize();
 }
 
 void BackgroundWidget::resizeEvent( QResizeEvent *e )
 {
-    if( e->size().height() < ICON_SIZE -1 )
+    if( e->size().height() < MAX_BG_SIZE -1 )
+    {
         label->setMaximumWidth( e->size().height() );
+        label->setMaximumHeight( e->size().width() );
+    }
     else
-        label->setMaximumWidth( ICON_SIZE );
+    {
+        label->setMaximumHeight( MAX_BG_SIZE );
+        label->setMaximumWidth( MAX_BG_SIZE );
+    }
 }
 
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
@@ -194,6 +203,7 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
 
 VisualSelector::~VisualSelector()
 {
+
 }
 
 void VisualSelector::prev()
@@ -332,7 +342,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 {
     controlLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
+    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Fixed );
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
@@ -518,12 +528,20 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                               VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
     /* Volume control connection */
+    resize( QSize( 400, 60 ) );
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
-    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+    msg_Dbg( p_intf, "controls size: %i - %i", size().width(), size().height() );
 }
 ControlsWidget::~ControlsWidget()
 {
 }
+
+QSize ControlsWidget::sizeHint() const
+{
+    return QSize( 300, 50 );
+}
+
+
 void ControlsWidget::stop()
 {
     THEMIM->stop();
@@ -596,7 +614,7 @@ void ControlsWidget::updateOnTimer()
     /* Audio part */
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
-    i_volume = ( i_volume *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2) ;
+    i_volume = ( i_volume *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
     int i_gauge = volumeSlider->value();
     b_my_volume = false;
     if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
@@ -744,18 +762,29 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) :
     QList<int> sizeList;
     sizeList << 180 << 520 ;
     setSizes( sizeList );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+    resize(700,200);
+    updateGeometry();
 }
 
 void PlaylistWidget::setArt( QString url )
 {
     if( url.isNull() )
+    {
         art->setPixmap( QPixmap( ":/noart.png" ) );
+        emit artSet( url );
+    }
     else if( prevArt != url )
     {
         art->setPixmap( QPixmap( url ) );
         prevArt = url;
         emit artSet( url );
     }
+}
+
+QSize PlaylistWidget::sizeHint() const
+{
+   return QSize( 700, 200 );
 }
 
 PlaylistWidget::~PlaylistWidget()

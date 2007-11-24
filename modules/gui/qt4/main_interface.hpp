@@ -73,7 +73,7 @@ public:
     QMenu *getSysTrayMenu() { return systrayMenu; };
     int getControlsVisibilityStatus();
 protected:
-    void resizeEvent( QResizeEvent * );
+//    void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
     void dragEnterEvent( QDragEnterEvent * );
     void dragMoveEvent( QDragMoveEvent * );
@@ -94,7 +94,6 @@ private:
 
     bool                 need_components_update;
 
-    void calculateInterfaceSize();
     void handleMainUi( QSettings* );
     void handleSystray();
     void doComponentsUpdate();

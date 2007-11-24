@@ -96,6 +96,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
     input_name = "";
+    playlistWidget = new PlaylistWidget( p_intf );
 
     /* Ask for the network policy on first startup */
     if( config_GetInt( p_intf, "privacy-ask") )
@@ -144,14 +145,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      *  UI and Widgets design
      **************************/
     setVLCWindowsTitle();
-    handleMainUi( settings );
+    dockPL = new QDockWidget( qtr("Playlist"), this );
 
     /* Create a Dock to get the playlist */
-    dockPL = new QDockWidget( qtr("Playlist"), this );
+    handleMainUi( settings );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
                            | Qt::BottomDockWidgetArea );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
+    dockPL->setWidget( playlistWidget );
+    addDockWidget( Qt::BottomDockWidgetArea, dockPL );
 
     /* Menu Bar */
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
@@ -283,6 +286,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     // DEBUG FIXME
     hide();
+    updateGeometry();
 }
 
 MainInterface::~MainInterface()
@@ -363,8 +367,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     speedControlMenu->addAction( widgetAction );
 
     /* Set initial size */
-    resize( PREF_W, PREF_H );
-    addSize = QSize( mainLayout->margin() * 2, PREF_H );
 
     /* Visualisation */
     visualSelector = new VisualSelector( p_intf );
@@ -381,6 +383,7 @@ void MainInterface::handleMainUi( QSettings *settings )
         bgWidget->updateGeometry();
         mainLayout->insertWidget( 0, bgWidget );
         CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
+        CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
     }
 
     if( videoEmbeddedFlag )
@@ -396,7 +399,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     }
 
     /* Finish the sizing */
-    setMinimumSize( PREF_W, addSize.height() );
+    setMinimumSize( PREF_W, PREF_H );
+    updateGeometry();
 }
 
 
@@ -472,6 +476,7 @@ void MainInterface::debug()
 /**********************************************************************
  * Handling of sizing of the components
  **********************************************************************/
+#if 0
 void MainInterface::calculateInterfaceSize()
 {
     int width = 0, height = 0;
@@ -518,6 +523,7 @@ void MainInterface::resizeEvent( QResizeEvent *e )
         playlistWidget->updateGeometry();
     }
 }
+#endif
 
 /****************************************************************************
  * Small right-click menu for rate control
@@ -577,7 +583,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
             videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         }
         videoWidget->updateGeometry(); // Needed for deinterlace
-        need_components_update = true;
+        updateGeometry();
     }
     return ret;
 }
@@ -596,7 +602,7 @@ void MainInterface::releaseVideoSlot( void *p_win )
         bgWidget->show();
 
     videoIsActive = false;
-    need_components_update = true;
+    updateGeometry();
 }
 
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
@@ -619,7 +625,7 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
             unsigned int i_height = va_arg( args, unsigned int );
             videoWidget->widgetSize = QSize( i_width, i_height );
             videoWidget->updateGeometry();
-            need_components_update = true;
+            updateGeometry();
             i_ret = VLC_SUCCESS;
             break;
         }
@@ -676,14 +682,21 @@ void MainInterface::togglePlaylist()
     {
     /* toggle the display */
        TOGGLEV( dockPL );
+       resize(sizeHint());
     }
+#if 0
     doComponentsUpdate();
+#endif
+    updateGeometry();
 }
 
 void MainInterface::undockPlaylist()
 {
     dockPL->setFloating( true );
+    updateGeometry();
+#if 0
     doComponentsUpdate();
+#endif
 }
 
 #if 0
@@ -718,11 +731,13 @@ void MainInterface::toggleMinimalView()
 
 /* Video widget cannot do this synchronously as it runs in another thread */
 /* Well, could it, actually ? Probably dangerous ... */
+#if 0
 void MainInterface::doComponentsUpdate()
 {
     calculateInterfaceSize();
     resize( mainSize );
 }
+#endif
 
 void MainInterface::toggleAdvanced()
 {
@@ -794,11 +809,13 @@ void MainInterface::updateOnTimer()
         QApplication::closeAllWindows();
         QApplication::quit();
     }
+#if 0
     if( need_components_update )
     {
         doComponentsUpdate();
         need_components_update = false;
     }
+#endif
 
     controls->updateOnTimer();
 }

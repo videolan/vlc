@@ -59,7 +59,7 @@ public:
     vout_thread_t *p_vout;
 
     QSize widgetSize;
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const;
 private:
     QWidget *frame;
     intf_thread_t *p_intf;
@@ -79,7 +79,7 @@ public:
     BackgroundWidget( intf_thread_t * );
     virtual ~BackgroundWidget();
     QSize widgetSize;
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const;
 private:
     QPalette plt;
     QLabel *label;
@@ -149,6 +149,7 @@ class ControlsWidget : public QFrame
 public:
     /* p_intf, advanced control visible or not, blingbling or not */
     ControlsWidget( intf_thread_t *, bool, bool );
+    QSize sizeHint() const;
     virtual ~ControlsWidget();
 
     QPushButton *playlistButton;
@@ -245,6 +246,7 @@ class PlaylistWidget : public QSplitter
 public:
     PlaylistWidget( intf_thread_t *_p_i ) ;
     virtual ~PlaylistWidget();
+    QSize sizeHint() const;
 private:
     PLSelector *selector;
     PLPanel *rightPanel;
