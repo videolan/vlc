@@ -1310,6 +1310,8 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     if( fmt.fmt.pix.sizeimage < i_min )
         fmt.fmt.pix.sizeimage = i_min;
 
+#ifdef VIDIOC_ENUM_FRAMEINTERVALS
+    /* This is new in Linux 2.6.19 */
     /* List supported frame rates */
     struct v4l2_frmivalenum frmival;
     frmival.index = 0;
@@ -1352,6 +1354,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
                 break;
         }
     }
+#endif
 
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
@@ -1774,6 +1777,8 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                                 psz_fourcc,
                                 p_sys->p_codecs[i_index].description );
 
+#ifdef VIDIOC_ENUM_FRAMESIZES
+                    /* This is new in Linux 2.6.19 */
                     /* List valid frame sizes for this format */
                     struct v4l2_frmsizeenum frmsize;
                     frmsize.index = 0;
@@ -1810,6 +1815,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                                 break;
                         }
                     }
+#endif
                 }
             }
             if( !b_codec_supported )
