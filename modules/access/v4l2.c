@@ -628,7 +628,8 @@ static void Close( vlc_object_t *p_this )
             {
                 memset( &buf, 0, sizeof(buf) );
                 buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                buf.memory = V4L2_MEMORY_USERPTR;
+                buf.memory = ( p_sys->io == IO_METHOD_USERPTR ) ?
+                    V4L2_MEMORY_USERPTR : V4L2_MEMORY_MMAP;
                 ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ); /* ignore result */
             }
 
