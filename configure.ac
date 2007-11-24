@@ -1249,6 +1249,8 @@ VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 VLC_ADD_PLUGINS([packetizer_vc1])
 
+ALIASES="${ALIASES} cvlc"
+
 dnl
 dnl default modules that need g++
 dnl
@@ -1265,6 +1267,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
   VLC_ADD_PLUGINS([dolby_surround_decoder headphone_channel_mixer normvol equalizer param_eq])
   VLC_ADD_PLUGINS([converter_float a52tospdif dtstospdif audio_format])
+  ALIASES="${ALIASES} rvlc"
 fi
 
 dnl
@@ -5359,6 +5362,7 @@ AC_ARG_ENABLE(ncurses,
         ],
         [AC_CHECK_LIB( ncurses, mvprintw,
           [VLC_ADD_PLUGINS([ncurses])
+          ALIASES="${ALIASES} nvlc"
           VLC_ADD_LIBS([ncurses],[-lncurses])],
           [AS_IF([test "x${enable_ncurses}" != "x"], [
             AC_MSG_ERROR([libncurses not found])])]
