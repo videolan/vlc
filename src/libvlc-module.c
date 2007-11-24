@@ -1065,7 +1065,7 @@ static const char *ppsz_clock_descriptions[] =
     "Automatically preparse files added to the playlist " \
     "(to retrieve some metadata)." )
 
-#define FETCH_META_TEXT N_( "Meta fetcher policy" )
+#define FETCH_META_TEXT N_( "Autorise meta information fetching" )
 #define FETCH_META_LONGTEXT N_( \
     "Specify if you want to attempt to fetch files'"\
     "meta informations using the network." );
