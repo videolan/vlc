@@ -475,7 +475,6 @@ static int Read( sout_access_out_t *p_access, block_t *p_buffer )
 static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
-    long i_ret;
 
     shout_sync( p_access->p_sys->p_shout );
     while( p_buffer )
