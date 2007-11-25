@@ -304,7 +304,8 @@ MainInterface::~MainInterface()
     settings->setValue( "playlist-floats", dockPL->isFloating() );
     settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
-    playlistWidget->saveSettings( settings );
+    if( playlistWidget )
+        playlistWidget->saveSettings( settings );
     settings->endGroup();
     delete settings;
     p_intf->b_interaction = VLC_FALSE;
