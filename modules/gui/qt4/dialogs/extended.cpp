@@ -42,6 +42,8 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QTabWidget *mainTab = new QTabWidget( this );
     mainTab->setTabPosition( QTabWidget::West );
 
+    QWidget *audioWidget = new QWidget( this );
+    QHBoxLayout *audioLayout = new QHBoxLayout( audioWidget );
     QTabWidget *audioTab = new QTabWidget( mainTab );
 
     Equalizer *equal = new Equalizer( p_intf, this );
@@ -49,7 +51,9 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     Spatializer *spatial = new Spatializer( p_intf, this );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
-    mainTab->addTab( audioTab, qtr( "Audio effects" ) );
+    audioLayout->addWidget( audioTab );
+
+    mainTab->addTab( audioWidget, qtr( "Audio effects" ) );
 
     ExtVideo *videoEffect = new ExtVideo( p_intf, this );
     mainTab->addTab( videoEffect, qtr( "Video Adjustments and Effects" ) );

@@ -809,7 +809,7 @@
      </widget>
      <widget class="QWidget" name="tab_8" >
       <attribute name="title" >
-       <string>_("Find one here too")</string>
+       <string>_("Overlay")</string>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
