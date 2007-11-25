@@ -108,18 +108,31 @@ playlist_item_t * playlist_ItemGetByInputId( playlist_t *p_playlist,
  * Live search handling
  ***************************************************************************/
 
-int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
-                               const char *psz_string )
+static vlc_bool_t playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
+                                                     playlist_item_t *p_root,
+                                                     const char *psz_string );
+static vlc_bool_t playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
+                                                     playlist_item_t *p_root,
+                                                     const char *psz_string )
 {
    int i;
-   p_playlist->b_reset_currently_playing = VLC_TRUE;
-   for( i = 0 ; i< p_root->i_children ; i ++ )
+   vlc_bool_t b_match = VLC_FALSE;
+   for( i = 0 ; i < p_root->i_children ; i ++ )
    {
 
         playlist_item_t *p_item = p_root->pp_children[i];
         if( p_item->i_children > -1 )
         {
-            playlist_LiveSearchUpdate( p_playlist, p_item, psz_string );
+            if( playlist_LiveSearchUpdateInternal( p_playlist, p_item, psz_string ) ||
+                strcasestr( p_item->p_input->psz_name, psz_string ) )
+            {
+                p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
+                b_match = VLC_TRUE;
+            }
+            else
+            {
+                p_item->i_flags |= PLAYLIST_DBL_FLAG;
+            }
         }
         else
         {
@@ -128,6 +141,7 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                 input_item_MetaMatch( p_item->p_input, vlc_meta_Artist, psz_string ) )
             {
                 p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
+                b_match = VLC_TRUE;
             }
             else
             {
@@ -135,6 +149,14 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
             }
         }
    }
-   vlc_cond_signal( &p_playlist->object_wait );
-   return VLC_SUCCESS;
+   return b_match;
+}
+
+int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
+                               const char *psz_string )
+{
+   p_playlist->b_reset_currently_playing = VLC_TRUE;
+    playlist_LiveSearchUpdateInternal( p_playlist, p_root, psz_string );
+    vlc_cond_signal( &p_playlist->object_wait );
+    return VLC_SUCCESS;
 }
