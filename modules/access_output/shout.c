@@ -364,17 +364,10 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    /* Shoutcast using ICY protocol */
-    i_ret = shout_open( p_shout );
-    if( i_ret == SHOUTERR_SUCCESS )
+    /* Connect at startup. Cycle through the possible protocols. */
+    i_ret = shout_get_connected( p_shout );
+    while ( i_ret != SHOUTERR_CONNECTED )
     {
-        i_ret = SHOUTERR_CONNECTED;
-        msg_Dbg( p_access, "connected using 'icy' (shoutcast) protocol" );
-    }
-    else
-    {
-        msg_Warn( p_access, "failed to connect using 'icy' (shoutcast) protocol" );
-
         /* Shout parameters cannot be changed on an open connection */
         i_ret = shout_close( p_shout );
         if( i_ret == SHOUTERR_SUCCESS )
@@ -382,34 +375,67 @@ static int Open( vlc_object_t *p_this )
             i_ret = SHOUTERR_UNCONNECTED;
         }
 
-        /* IceCAST using HTTP protocol */
-        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_HTTP );
+        /* Re-initialize for Shoutcast using ICY protocol. Not needed for initial connection
+           but it is when we are reconnecting after other protocol was tried. */
+        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY );
         if( i_ret != SHOUTERR_SUCCESS )
         {
-            msg_Err( p_access, "failed to set the protocol to 'http'" );
+            msg_Err( p_access, "failed to set the protocol to 'icy'" );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
         }
-
         i_ret = shout_open( p_shout );
         if( i_ret == SHOUTERR_SUCCESS )
         {
             i_ret = SHOUTERR_CONNECTED;
-            msg_Dbg( p_access, "connected using 'http' (icecast 2.x) protocol" );
+            msg_Dbg( p_access, "connected using 'icy' (shoutcast) protocol" );
         }
         else
-            msg_Warn( p_access, "failed to connect using 'http' (icecast 2.x) protocol " );
+        {
+            msg_Warn( p_access, "failed to connect using 'icy' (shoutcast) protocol" );
+
+            /* Shout parameters cannot be changed on an open connection */
+            i_ret = shout_close( p_shout );
+            if( i_ret == SHOUTERR_SUCCESS )
+            {
+                i_ret = SHOUTERR_UNCONNECTED;
+            }
+
+            /* IceCAST using HTTP protocol */
+            i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_HTTP );
+            if( i_ret != SHOUTERR_SUCCESS )
+            {
+                msg_Err( p_access, "failed to set the protocol to 'http'" );
+                free( p_access->p_sys );
+                free( psz_accessname );
+                return VLC_EGENERIC;
+            }
+            i_ret = shout_open( p_shout );
+            if( i_ret == SHOUTERR_SUCCESS )
+            {
+                i_ret = SHOUTERR_CONNECTED;
+                msg_Dbg( p_access, "connected using 'http' (icecast 2.x) protocol" );
+            }
+            else
+                msg_Warn( p_access, "failed to connect using 'http' (icecast 2.x) protocol " );
+        }
+/*
+        for non-blocking, use:
+        while( i_ret == SHOUTERR_BUSY )
+        {
+            sleep( 1 );
+            i_ret = shout_get_connected( p_shout );
+        }
+*/
+        /* Only wait when we have no connection */
+        if ( i_ret != SHOUTERR_CONNECTED )
+    	{
+    	    msg_Warn( p_access, "unable to establish connection. waiting 30 seconds to retry..." );
+            msleep( 30000000 );
+        }
     }
 
-/*
-    for non-blocking, use:
-    while( i_ret == SHOUTERR_BUSY )
-    {
-        sleep( 1 );
-        i_ret = shout_get_connected( p_shout );
-    }
-*/
     if( i_ret != SHOUTERR_CONNECTED )
     {
         msg_Err( p_access, "failed to open shout stream to %s:%i/%s: %s",
