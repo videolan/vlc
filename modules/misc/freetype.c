@@ -91,6 +91,7 @@ static int RenderHtml( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 static char *FontConfig_Select( FcConfig *, const char *,
                                 vlc_bool_t, vlc_bool_t, int * );
+static int CheckIfFontBuildComplete( filter_t *p_filter );
 #endif
 static line_desc_t *NewLine( int );
 
@@ -275,11 +276,13 @@ struct filter_sys_t
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys;
-    char *psz_fontfile = NULL;
-    int i_error;
-    vlc_value_t val;
+    filter_t      *p_filter = (filter_t *)p_this;
+    filter_sys_t  *p_sys;
+    char          *psz_fontfile = NULL;
+    int            i_error;
+    vlc_value_t    val;
+    vlc_mutex_t   *lock;
+    vlc_object_t  *p_fontbuilder;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
@@ -363,34 +366,58 @@ static int Create( vlc_object_t *p_this )
 #ifdef HAVE_FONTCONFIG
     vlc_mutex_init( p_filter, &p_sys->fontconfig_lock );
     p_sys->b_fontconfig_ok = VLC_FALSE;
+    p_sys->p_fontconfig    = NULL;
 
-    p_sys->p_fontconfig = FcInitLoadConfig();
+    /* Check for an existing Fontbuilder thread */
+    lock = var_AcquireMutex( "fontbuilder" );
+    p_fontbuilder = vlc_object_find_name( p_filter->p_libvlc,
+                                          "fontlist builder",
+                                          FIND_CHILD );
 
-    if( p_sys->p_fontconfig )
+    if( ! p_fontbuilder )
     {
-        /* Normally this doesn't take very long, but an initial build of
-         * the fontconfig database or the addition of a lot of new fonts
-         * can cause it to take several minutes for a large number of fonts.
-         * Even a small number can take several seconds - much longer than
-         * we can afford to block, so we build the list in the background
-         * and if it succeeds we allow fontconfig to be used.
+        /* Create the FontBuilder thread as a child of a top-level
+         * object, so that it can survive the destruction of the
+         * freetype object - the fontlist only needs to be built once,
+         * and calling the fontbuild a second time while the first is
+         * still in progress can cause thread instabilities.
          */
-        if( vlc_thread_create( p_filter, "fontlist builder", FontBuilder,
-                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+
+        p_fontbuilder = vlc_object_create( p_filter->p_libvlc,
+                                           VLC_OBJECT_GENERIC );
+        if( p_fontbuilder )
         {
-            /* Don't destroy the fontconfig object - we won't be able to do
-             * italics or bold or change the font face, but we will still
-             * be able to do underline and change the font size.
-             */
-            msg_Warn( p_filter, "fontconfig database builder thread can't "
-                    "be launched. Font styling support will be limited." );
-        };
+            p_fontbuilder->psz_object_name = "fontlist builder";
+            vlc_object_attach( p_fontbuilder, p_filter->p_libvlc );
+
+            var_Create( p_fontbuilder, "build-done", VLC_VAR_BOOL );
+            var_SetBool( p_fontbuilder, "build-done", VLC_FALSE );
+
+            if( vlc_thread_create( p_fontbuilder,
+                                   "fontlist builder",
+                                   FontBuilder,
+                                   VLC_THREAD_PRIORITY_LOW,
+                                   VLC_FALSE ) )
+            {
+                /* Don't destroy the fontconfig object - we won't be able to do
+                 * italics or bold or change the font face, but we will still
+                 * be able to do underline and change the font size.
+                 */
+                msg_Warn( p_filter, "fontconfig database builder thread can't "
+                        "be launched. Font styling support will be limited." );
+            }
+        }
+        else
+        {
+            vlc_object_destroy( p_fontbuilder );
+        }
     }
     else
     {
-        msg_Warn( p_filter, "Couldn't initialise Fontconfig. "
-                            "Font styling won't be available." );
+        vlc_object_release( p_fontbuilder );
     }
+    vlc_mutex_unlock( lock );
+
 #endif
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
@@ -406,11 +433,10 @@ static int Create( vlc_object_t *p_this )
 
     p_filter->pf_render_text = RenderText;
 #ifdef HAVE_FONTCONFIG
-    if( p_sys->p_fontconfig )
-        p_filter->pf_render_html = RenderHtml;
-    else
+    p_filter->pf_render_html = RenderHtml;
+#else
+    p_filter->pf_render_html = NULL;
 #endif
-        p_filter->pf_render_html = NULL;
 
     LoadFontsFromAttachments( p_filter );
 
@@ -447,8 +473,6 @@ static void Destroy( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    /* wait for the FontBuilder thread to terminate */
-    vlc_thread_join( p_this );
     vlc_mutex_destroy( &p_sys->fontconfig_lock );
 
     if( p_sys->p_fontconfig )
@@ -469,33 +493,38 @@ static void Destroy( vlc_object_t *p_this )
 
 static void FontBuilder( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    time_t    t1, t2;
+    FcConfig      *p_fontconfig = FcInitLoadConfig();
+    vlc_mutex_t   *lock;
 
-    /* Find the session to announce */
-    vlc_mutex_lock( &p_sys->fontconfig_lock );
+    vlc_thread_ready( p_this );
 
-    msg_Dbg( p_filter, "Building font database..." );
-    time(&t1);
-    if(! FcConfigBuildFonts( p_sys->p_fontconfig ))
+    if( p_fontconfig )
     {
-        /* Don't destroy the fontconfig object - we won't be able to do
-         * italics or bold or change the font face, but we will still
-         * be able to do underline and change the font size.
-         */
-        msg_Err( p_filter, "fontconfig database can't be built. "
-                                "Font styling won't be available" );
+        time_t    t1, t2;
+
+        msg_Dbg( p_this, "Building font database..." );
+        time( &t1 );
+        if(! FcConfigBuildFonts( p_fontconfig ))
+        {
+            /* Don't destroy the fontconfig object - we won't be able to do
+             * italics or bold or change the font face, but we will still
+             * be able to do underline and change the font size.
+             */
+            msg_Err( p_this, "fontconfig database can't be built. "
+                                    "Font styling won't be available" );
+        }
+        time( &t2 );
+
+        msg_Dbg( p_this, "Finished building font database." );
+        if( t1 > 0 && t2 > 0 )
+            msg_Dbg( p_this, "Took %ld seconds", t2 - t1 );
+
+        lock = var_AcquireMutex( "fontbuilder" );
+        var_SetBool( p_this, "build-done", VLC_TRUE );
+
+        FcConfigDestroy( p_fontconfig );
+        vlc_mutex_unlock( lock );
     }
-    time(&t2);
-
-    msg_Dbg( p_filter, "Finished building font database." );
-    if( t1 > 0 && t2 > 0 )
-        msg_Dbg( p_filter, "Took %ld seconds", t2 - t1 );
-
-    p_sys->b_fontconfig_ok = VLC_TRUE;
-
-    vlc_mutex_unlock( &p_sys->fontconfig_lock );
 }
 
 #endif
@@ -2153,6 +2182,37 @@ static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style
     return VLC_EGENERIC;
 }
 
+static int CheckIfFontBuildComplete( filter_t *p_filter )
+{
+    filter_sys_t   *p_sys = p_filter->p_sys;
+    vlc_object_t   *p_fb = vlc_object_find_name( p_filter->p_libvlc,
+                                                 "fontlist builder",
+                                                 FIND_CHILD );
+    if( p_fb )
+    {
+        vlc_mutex_t *lock = var_AcquireMutex( "fontbuilder" );
+        vlc_value_t  val;
+
+        if( VLC_SUCCESS == var_Get( p_fb, "build-done", &val ))
+        {
+            p_sys->b_fontconfig_ok = val.b_bool;
+
+            if( p_sys->b_fontconfig_ok )
+            {
+                FcInit();
+                p_sys->p_fontconfig = FcConfigGetCurrent();
+            }
+            else
+                msg_Dbg( p_filter, "Font Build still not complete" );
+        }
+        vlc_mutex_unlock( lock );
+        vlc_object_release( p_fb );
+
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
+}
+
 static int ProcessLines( filter_t *p_filter,
                          uint32_t *psz_text,
                          int i_len,
@@ -2369,10 +2429,15 @@ static int ProcessLines( filter_t *p_filter,
             /* Look for a match amongst our attachments first */
             CheckForEmbeddedFont( p_sys, &p_face, p_style );
 
+            if( !p_sys->b_fontconfig_ok )
+            {
+                if( VLC_EGENERIC == CheckIfFontBuildComplete( p_filter ))
+                    msg_Err( p_filter, "Can't find FontBuilder thread!" );
+            }
+
             if( ! p_face && p_sys->b_fontconfig_ok )
             {
                 char *psz_fontfile;
-
                 vlc_mutex_lock( &p_sys->fontconfig_lock );
 
                 psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
@@ -2380,7 +2445,6 @@ static int ProcessLines( filter_t *p_filter,
                                                   p_style->b_bold,
                                                   p_style->b_italic,
                                                   &i_idx );
-
                 vlc_mutex_unlock( &p_sys->fontconfig_lock );
 
                 if( psz_fontfile && ! *psz_fontfile )
