@@ -50,26 +50,29 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   PLPanel( _parent, _p_intf )
 {
     model = new PLModel( p_playlist, p_intf, p_root, -1, this );
- 
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->setSpacing( 0 ); layout->setMargin( 0 );
+
     /* Create and configure the QTreeView */
     view = new QVLCTreeView( 0 );
     view->setModel(model);
-    view->setIconSize( QSize(20,20) );
+    view->setIconSize( QSize( 20, 20 ) );
     view->setAlternatingRowColors( true );
     view->setAnimated( true );
-    view->setSortingEnabled( true );    
+    view->setSortingEnabled( true );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
     view->setDragEnabled( true );
     view->setAcceptDrops( true );
     view->setDropIndicatorShown( true );
     view->setAutoScroll( true );
- 
+
     view->header()->resizeSection( 0, 230 );
-    view->header()->resizeSection( 1, 170 );
+    view->header()->resizeSection( 1, 80 );
     view->header()->setSortIndicatorShown( true );
     view->header()->setClickable( true );
     view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
- 
+
     CONNECT( view, activated( const QModelIndex& ) ,
              model,activateItem( const QModelIndex& ) );
     CONNECT( view, rightClicked( QModelIndex , QPoint ),
@@ -80,14 +83,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              this, popupSelectColumn( QPoint ) );
 
     currentRootId = -1;
-    CONNECT( parent, rootChanged(int), this, setCurrentRootId( int ) );
-
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->setSpacing( 0 ); layout->setMargin( 0 );
+    CONNECT( parent, rootChanged( int ), this, setCurrentRootId( int ) );
 
     /* Buttons configuration */
-    QHBoxLayout *buttons = new QHBoxLayout();
- 
+    QHBoxLayout *buttons = new QHBoxLayout;
+
     addButton = new QPushButton( QIcon( ":/pixmaps/playlist_add.png" ), "", this );
     addButton->setMaximumWidth( 25 );
     BUTTONACT( addButton, popupAdd() );
@@ -111,7 +111,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     buttons->addItem( spacer );
 
     repeatButton = new QPushButton( this );
-    if( model->hasRepeat() ) 
+    if( model->hasRepeat() )
     {
         repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_one.png" ) );
         repeatButton->setToolTip( qtr( I_PL_REPEAT ));
@@ -120,15 +120,14 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     {
         repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_all.png" ) );
         repeatButton->setToolTip( qtr( I_PL_LOOP ));
-    }   
+    }
     else
     {
         repeatButton->setIcon( QIcon( ":/pixmaps/playlist_repeat_off.png" ) );
         repeatButton->setToolTip( qtr( I_PL_NOREPEAT ));
-    }   
+    }
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
-
 
     QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
     buttons->addWidget( filter );
@@ -254,7 +253,7 @@ void StandardPLPanel::popupSelectColumn( QPoint )
     ADD_META_ACTION( DESCRIPTION );
 
 #undef ADD_META_ACTION
- 
+
     selectColMenu.exec( QCursor::pos() );
  }
 
