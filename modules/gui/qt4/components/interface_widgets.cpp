@@ -41,9 +41,6 @@
 #include <QPalette>
 #include <QResizeEvent>
 
-#define ICON_SIZE 128
-#define MAX_BG_SIZE 300
-
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -57,6 +54,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
+
     CONNECT( this, askResize(), this, SetMinSize() );
     CONNECT( this, askVideoToShow(), this, show() );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
@@ -110,37 +108,48 @@ void VideoWidget::release( void *p_win )
 {
     p_vout = NULL;
 }
+
+
 /**********************************************************************
  * Background Widget. Show a simple image background. Currently,
  * it's a static cone.
  **********************************************************************/
+#define ICON_SIZE 128
+#define MAX_BG_SIZE 400
+#define MIN_BG_SIZE 64
+
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
                                         QFrame( NULL ), p_intf( _p_i )
 {
+    /* We should use that one to take the more size it can */
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::MinimumExpanding );
 
+    /* A dark background */
     setAutoFillBackground( true );
     plt =  palette();
     plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred);
 
+    /* A cone in the middle */
     label = new QLabel;
+//    label->setScaledContents( true );
+    label->setMargin( 5 );
     label->setMaximumHeight( MAX_BG_SIZE );
     label->setMaximumWidth( MAX_BG_SIZE );
-    label->setScaledContents( true );
+    label->setMinimumHeight( MIN_BG_SIZE );
+    label->setMinimumWidth( MIN_BG_SIZE );
     label->setPixmap( QPixmap( ":/vlc128.png" ) );
-    backgroundLayout = new QHBoxLayout;
+
+    QVBoxLayout *backgroundLayout = new QVBoxLayout( this );
     backgroundLayout->addWidget( label );
-    setLayout( backgroundLayout );
+
+    resize( 300, 150 );
     updateGeometry();
 }
 
 BackgroundWidget::~BackgroundWidget()
-{
-    backgroundLayout->takeAt( 0 );
-    delete backgroundLayout;
-}
+{}
 
 void BackgroundWidget::setArt( QString url )
 {
@@ -153,20 +162,15 @@ void BackgroundWidget::setArt( QString url )
 
 QSize BackgroundWidget::sizeHint() const
 {
-    return label->maximumSize();
+    return label->size();
 }
 
 void BackgroundWidget::resizeEvent( QResizeEvent *e )
 {
-    if( e->size().height() < MAX_BG_SIZE -1 )
+    msg_Dbg( p_intf, "BG size, %i, %i", e->size().width(), e->size().height() );
+    if( e->size().height() < label->height() )
     {
-        label->setMaximumWidth( e->size().height() );
-        label->setMaximumHeight( e->size().width() );
-    }
-    else
-    {
-        label->setMaximumHeight( MAX_BG_SIZE );
-        label->setMaximumWidth( MAX_BG_SIZE );
+        label->resize( e->size().height(), e->size().height() );
     }
 }
 
@@ -174,11 +178,12 @@ void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 {
     QVLCMenu::PopupMenu( p_intf, true );
 }
+
 /**********************************************************************
  * Visualization selector panel
  **********************************************************************/
 VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
-                                                QFrame( NULL ), p_intf( _p_i )
+                                QFrame( NULL ), p_intf( _p_i )
 {
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
@@ -203,7 +208,6 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
 
 VisualSelector::~VisualSelector()
 {
-
 }
 
 void VisualSelector::prev()
@@ -242,25 +246,24 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     advLayout->setMargin( 0 );
     advLayout->setSpacing( 0 );
 
-/* FIXME A to B function */
+    /* A to B Button */
     ABButton = new QPushButton( "AB" );
     ABButton->setMaximumSize( QSize( 26, 26 ) );
     ABButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( ABButton );
     BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), fromAtoB() );
-    timeA = 0;
-    timeB = 0;
+    timeA = timeB = 0;
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, AtoBLoop( float, int, int ) );
 
-//FIXME Frame by frame function
+    //FIXME Frame by frame function
     frameButton = new QPushButton( "Fr" );
     frameButton->setMaximumSize( QSize( 26, 26 ) );
     frameButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( frameButton );
     BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by Frame" ), frame() );
 
-/* FIXME Record function */
+    /* FIXME Record function */
     recordButton = new QPushButton( "R" );
     recordButton->setMaximumSize( QSize( 26, 26 ) );
     recordButton->setIconSize( QSize( 20, 20 ) );
@@ -268,23 +271,23 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     BUTTON_SET_ACT_I( recordButton, "", record_16px.png,
             qtr( "Record" ), record() );
 
+    /* Snapshot Button */
     snapshotButton = new QPushButton( "S" );
     snapshotButton->setMaximumSize( QSize( 26, 26 ) );
     snapshotButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( snapshotButton );
     BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
-
 }
 
 AdvControlsWidget::~AdvControlsWidget()
-{
-}
+{}
 
 void AdvControlsWidget::enableInput( bool enable )
 {
     ABButton->setEnabled( enable );
     recordButton->setEnabled( enable );
 }
+
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
@@ -293,14 +296,12 @@ void AdvControlsWidget::enableVideo( bool enable )
 
 void AdvControlsWidget::snapshot()
 {
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    vout_thread_t *p_vout =
+        (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
 }
 
-void AdvControlsWidget::frame()
-{
-}
-
+/* Function called when the button is clicked() */
 void AdvControlsWidget::fromAtoB()
 {
     if( !timeA )
@@ -321,8 +322,7 @@ void AdvControlsWidget::fromAtoB()
     ABButton->setText( "AB" );
 }
 
-void AdvControlsWidget::record(){}
-
+/* Function called regularly when in an AtoB loop */
 void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
 {
     if( timeB )
@@ -332,24 +332,27 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
     }
 }
 
+void AdvControlsWidget::record(){}
+void AdvControlsWidget::frame(){}
+
 /*****************************
  * DA Control Widget !
  *****************************/
 ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                                 bool b_advControls,
                                 bool b_shiny ) :
-                             QFrame( NULL ), p_intf( _p_i )
+                                QFrame( NULL ), p_intf( _p_i )
 {
     controlLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
-    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Fixed );
+    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Minimum );
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
     controlLayout->addWidget( slider, 0, 1, 1, 16 );
     /* Update the position when the IM has changed */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             slider, setPosition( float,int, int ) );
+             slider, setPosition( float, int, int ) );
     /* And update the IM, when the position has changed */
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
@@ -431,7 +434,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     playButton->setMinimumSize( QSize( 45, 45 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
-    controlLayout->addWidget( playButton, 2, 0, 2, 2 );
+    controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
 
     controlLayout->setColumnMinimumWidth( 2, 20 );
     controlLayout->setColumnStretch( 2, 0 );
@@ -462,7 +465,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlButLayout->addWidget( nextButton );
 
     /* Add this block to the main layout */
-    controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
+    controlLayout->addLayout( controlButLayout, 3, 3, 1, 3, Qt::AlignBottom );
 
     BUTTON_SET_ACT_I( playButton, "", play.png, qtr( "Play" ), play() );
     BUTTON_SET_ACT_I( prevButton, "" , previous.png,
@@ -481,12 +484,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     fullscreenButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     setupSmallButton( fullscreenButton );
-    controlLayout->addWidget( fullscreenButton, 3, 10 );
+    controlLayout->addWidget( fullscreenButton, 3, 10, Qt::AlignBottom );
 
     /** Playlist Button **/
     playlistButton = new QPushButton;
     setupSmallButton( playlistButton );
-    controlLayout->addWidget( playlistButton, 3, 11 );
+    controlLayout->addWidget( playlistButton, 3, 11, Qt::AlignBottom );
     BUTTON_SET_IMG( playlistButton, "" , playlist.png, qtr( "Show playlist" ) );
 
     /** extended Settings **/
@@ -494,7 +497,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended Settings" ),
             extSettings() );
     setupSmallButton( extSettingsButton );
-    controlLayout->addWidget( extSettingsButton, 3, 12 );
+    controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );
 
     controlLayout->setColumnStretch( 14, 5 );
 
@@ -505,7 +508,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( hVolLabel );
-    controlLayout->addWidget( volMuteLabel, 3, 15 );
+    controlLayout->addWidget( volMuteLabel, 3, 15, Qt::AlignBottom );
 
     if( b_shiny )
     {
@@ -521,7 +524,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
     volumeSlider->setMinimumSize( QSize( 80, 20 ) );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
-    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
+    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2, Qt::AlignBottom );
 
     /* Set the volume from the config */
     volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
@@ -532,15 +535,17 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     msg_Dbg( p_intf, "controls size: %i - %i", size().width(), size().height() );
 }
+
 ControlsWidget::~ControlsWidget()
 {
 }
 
+/*
 QSize ControlsWidget::sizeHint() const
 {
     return QSize( 300, 50 );
 }
-
+*/
 
 void ControlsWidget::stop()
 {
@@ -646,7 +651,8 @@ void ControlsWidget::setStatus( int status )
  */
 void ControlsWidget::fullscreen()
 {
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    vout_thread_t *p_vout =
+        (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout)
     {
         var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
@@ -710,9 +716,16 @@ void ControlsWidget::toggleAdvanced()
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 
-PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) :
+#include <QSplitter>
+
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
                                 p_intf ( _p_i )
 {
+    /* In case we want to keep the splitter informations */
+    settings->beginGroup( "Playlist" );
+    restoreState(settings->value("splitterSizes").toByteArray());
+    settings->endGroup();
+    
     /* Left Part and design */
     QWidget *leftW = new QWidget( this );
     QVBoxLayout *left = new QVBoxLayout( leftW );
@@ -760,10 +773,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) :
     setCollapsible( 1, false );
 
     QList<int> sizeList;
-    sizeList << 180 << 520 ;
+    sizeList << 180 << 420 ;
     setSizes( sizeList );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-    resize(700,200);
+    resize( 600, 300 );
     updateGeometry();
 }
 
@@ -784,11 +797,18 @@ void PlaylistWidget::setArt( QString url )
 
 QSize PlaylistWidget::sizeHint() const
 {
-   return QSize( 700, 200 );
+   return QSize( 600 , 300 );
 }
 
 PlaylistWidget::~PlaylistWidget()
 {
+}
+
+void PlaylistWidget::saveSettings( QSettings *settings )
+{
+    settings->beginGroup( "Playlist" );
+    settings->setValue("splitterSizes", saveState() );
+    settings->endGroup();
 }
 
 /**********************************************************************
@@ -828,8 +848,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
 }
 
 SpeedControlWidget::~SpeedControlWidget()
-{
-}
+{}
 
 #define RATE_SLIDER_MAXIMUM 3.0
 #define RATE_SLIDER_MINIMUM 0.3
@@ -884,12 +903,12 @@ void SpeedControlWidget::updateRate( int sliderValue )
     if( sliderValue < 0.0 )
     {
         rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
-                ( sliderValue * ( 1.0 - RATE_SLIDER_MINIMUM ) + RATE_SLIDER_LENGTH ) ;
+            ( sliderValue * ( 1.0 - RATE_SLIDER_MINIMUM ) + RATE_SLIDER_LENGTH );
     }
     else
     {
         rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
-                ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH );
+            ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH );
     }
 
     THEMIM->getIM()->setRate(rate);
@@ -899,5 +918,3 @@ void SpeedControlWidget::resetRate()
 {
     THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);
 }
-
-

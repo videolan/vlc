@@ -96,9 +96,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
     input_name = "";
-    playlistWidget = new PlaylistWidget( p_intf );
 
-    /* Ask for the network policy on first startup */
+    /**
+     * Ask for the network policy on FIRST STARTUP
+     */
     if( config_GetInt( p_intf, "privacy-ask") )
     {
         QList<ConfigControl *> controls;
@@ -145,16 +146,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      *  UI and Widgets design
      **************************/
     setVLCWindowsTitle();
-    dockPL = new QDockWidget( qtr("Playlist"), this );
+    handleMainUi( settings );
 
     /* Create a Dock to get the playlist */
-    handleMainUi( settings );
+    dockPL = new QDockWidget( qtr("Playlist"), this );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
                            | Qt::BottomDockWidgetArea );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
     dockPL->setWidget( playlistWidget );
-    addDockWidget( Qt::BottomDockWidgetArea, dockPL );
 
     /* Menu Bar */
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
@@ -222,8 +222,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
     ON_TIMEOUT( updateOnTimer() );
-//    ON_TIMEOUT( debug() );
-
+    //ON_TIMEOUT( debug() );
 
     /********************
      * Various CONNECTs *
@@ -284,6 +283,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     CONNECT( this, askReleaseVideo( void * ), this, releaseVideoSlot( void * ) );
 
+    CONNECT( dockPL, topLevelChanged( bool ), this, doComponentsUpdate() );
     // DEBUG FIXME
     hide();
     updateGeometry();
@@ -301,9 +301,10 @@ MainInterface::~MainInterface()
         vlc_object_release( p_playlist );
     }
 
-    settings->setValue( "playlist-embedded", !dockPL->isFloating() );
+    settings->setValue( "playlist-floats", dockPL->isFloating() );
     settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
+    playlistWidget->saveSettings( settings );
     settings->endGroup();
     delete settings;
     p_intf->b_interaction = VLC_FALSE;
@@ -383,7 +384,6 @@ void MainInterface::handleMainUi( QSettings *settings )
         bgWidget->updateGeometry();
         mainLayout->insertWidget( 0, bgWidget );
         CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
-        CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
     }
 
     if( videoEmbeddedFlag )
@@ -415,15 +415,16 @@ void MainInterface::privacyDialog( QList<ConfigControl *> controls )
     QGroupBox *blabla = new QGroupBox( qtr( "Privacy and Network Warning" ) );
     QGridLayout *blablaLayout = new QGridLayout( blabla );
     QLabel *text = new QLabel( qtr(
-        "<p>The <i>VideoLAN Team</i> doesn't like when an application goes online without "
-        "authorisation.</p>\n "
+        "<p>The <i>VideoLAN Team</i> doesn't like when an application goes "
+        "online without authorisation.</p>\n "
         "<p><i>VLC media player</i> can request limited information on "
         "Internet, espically to get CD Covers and songs metadata or to know "
         "if updates are available.</p>\n"
-        "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> information, even anonymously about your "
+        "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> "
+        "information, even anonymously about your "
         "usage.</p>\n"
-        "<p>Therefore please check the following options, the default being almost no "
-        "access on the web.</p>\n") );
+        "<p>Therefore please check the following options, the default being "
+        "almost no access on the web.</p>\n") );
     text->setWordWrap( true );
     text->setTextFormat( Qt::RichText );
 
@@ -476,6 +477,25 @@ void MainInterface::debug()
 /**********************************************************************
  * Handling of sizing of the components
  **********************************************************************/
+QSize MainInterface::sizeHint() const
+{
+    msg_Dbg( p_intf, "Annoying debug to remove, main sizeHint was called %i %i ",
+    menuBar()->size().height(), menuBar()->size().width() );
+
+    QSize tempSize = controls->sizeHint() +
+        QSize( 100, menuBar()->size().height() + statusBar()->size().height() );
+
+    if( VISIBLE( bgWidget ) )
+        tempSize += bgWidget->sizeHint();
+    else if( videoIsActive )
+        tempSize += videoWidget->size();
+
+    if( !dockPL->isFloating() && dockPL->widget() )
+        tempSize += dockPL->widget()->size();
+
+    return tempSize;
+}
+
 #if 0
 void MainInterface::calculateInterfaceSize()
 {
@@ -563,8 +583,9 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
     if( ret )
     {
         videoIsActive = true;
-
         bool bgWasVisible = false;
+
+        /* Did we have a bg */
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
@@ -655,9 +676,10 @@ void MainInterface::togglePlaylist()
     if( !playlistWidget )
     {
         msg_Dbg( p_intf, "Creating a new playlist" );
-        playlistWidget = new PlaylistWidget( p_intf );
+        playlistWidget = new PlaylistWidget( p_intf, settings );
         if( bgWidget )
-            CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
+            CONNECT( playlistWidget, artSet( QString ),
+                     bgWidget, setArt(QString) );
 
         //FIXME
 /*        playlistWidget->widgetSize = settings->value( "playlistSize",
@@ -671,12 +693,11 @@ void MainInterface::togglePlaylist()
         msg_Dbg( p_intf, "Creating a new playlist" );
 
         /* Make the playlist floating is requested. Default is not. */
-        if( !(settings->value( "playlist-embedded", true )).toBool() );
+        if( settings->value( "playlist-floats", false ).toBool() );
         {
             msg_Dbg( p_intf, "we don't want it inside");
-            //dockPL->setFloating( true );
+            dockPL->setFloating( true );
         }
-
     }
     else
     {
@@ -731,13 +752,13 @@ void MainInterface::toggleMinimalView()
 
 /* Video widget cannot do this synchronously as it runs in another thread */
 /* Well, could it, actually ? Probably dangerous ... */
-#if 0
 void MainInterface::doComponentsUpdate()
 {
-    calculateInterfaceSize();
-    resize( mainSize );
+    msg_Dbg( p_intf, "trying" );
+
+    resize( sizeHint() );
 }
-#endif
+
 
 void MainInterface::toggleAdvanced()
 {

@@ -31,6 +31,7 @@
 class QSignalMapper;
 class PLSelector;
 class PLPanel;
+class QSettings;
 
 class PlaylistDialog : public QVLCMW
 {

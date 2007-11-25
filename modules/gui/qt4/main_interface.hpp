@@ -72,6 +72,7 @@ public:
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
     int getControlsVisibilityStatus();
+    QSize sizeHint() const;
 protected:
 //    void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
@@ -96,7 +97,7 @@ private:
 
     void handleMainUi( QSettings* );
     void handleSystray();
-    void doComponentsUpdate();
+
     void createSystray();
     void privacyDialog( QList<ConfigControl *> controls );
 
@@ -143,7 +144,7 @@ public slots:
 private slots:
     void debug();
     void updateOnTimer();
-
+    void doComponentsUpdate();
     void setStatus( int );
     void setRate( int );
     void setName( QString );

@@ -37,7 +37,8 @@
 
 PlaylistDialog *PlaylistDialog::instance = NULL;
 
-PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) 
+                : QVLCMW( _p_intf )
 {
     QWidget *main = new QWidget( this );
     setCentralWidget( main );
@@ -45,7 +46,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     QHBoxLayout *l = new QHBoxLayout( centralWidget() );
-    PlaylistWidget *plw = new PlaylistWidget( p_intf );
+    PlaylistWidget *plw = new PlaylistWidget( p_intf, NULL );
     l->addWidget( plw );
 
     readSettings( "playlist", QSize( 600,700 ) );

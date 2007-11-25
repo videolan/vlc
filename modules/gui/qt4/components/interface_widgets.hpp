@@ -83,11 +83,8 @@ public:
 private:
     QPalette plt;
     QLabel *label;
-    QHBoxLayout *backgroundLayout;
     virtual void resizeEvent( QResizeEvent *e );
     virtual void contextMenuEvent( QContextMenuEvent *event );
-    int DrawBackground();
-    int CleanBackground();
     intf_thread_t *p_intf;
 public slots:
     void setArt( QString );
@@ -149,7 +146,7 @@ class ControlsWidget : public QFrame
 public:
     /* p_intf, advanced control visible or not, blingbling or not */
     ControlsWidget( intf_thread_t *, bool, bool );
-    QSize sizeHint() const;
+//    QSize sizeHint() const;
     virtual ~ControlsWidget();
 
     QPushButton *playlistButton;
@@ -239,14 +236,16 @@ class QSignalMapper;
 class PLSelector;
 class PLPanel;
 class QPushButton;
+class QSettings;
 
 class PlaylistWidget : public QSplitter
 {
     Q_OBJECT;
 public:
-    PlaylistWidget( intf_thread_t *_p_i ) ;
+    PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) ;
     virtual ~PlaylistWidget();
     QSize sizeHint() const;
+    void saveSettings( QSettings *settings );
 private:
     PLSelector *selector;
     PLPanel *rightPanel;
@@ -254,7 +253,7 @@ private:
     QLabel *art;
     QString prevArt;
 protected:
-     intf_thread_t *p_intf;
+    intf_thread_t *p_intf;
 private slots:
     void setArt( QString );
 signals:
