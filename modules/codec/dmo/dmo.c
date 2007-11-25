@@ -175,8 +175,9 @@ static const codec_dll decoders_table[] =
     { VLC_FOURCC('w','v','c','1'), "wvc1dmod.dll", &guid_wvc1 },
     /* WMV3 */
     { VLC_FOURCC('W','M','V','3'), "wmv9dmod.dll", &guid_wmv9 },
-    { VLC_FOURCC('W','M','V','P'), "wmv9dmod.dll", &guid_wmv9 },
     { VLC_FOURCC('w','m','v','3'), "wmv9dmod.dll", &guid_wmv9 },
+    { VLC_FOURCC('W','M','V','P'), "wmv9dmod.dll", &guid_wmv9 },
+    { VLC_FOURCC('w','m','v','p'), "wmv9dmod.dll", &guid_wmv9 },
     /* WMV2 */
     { VLC_FOURCC('W','M','V','2'), "wmvdmod.dll", &guid_wmv },
     { VLC_FOURCC('w','m','v','2'), "wmvdmod.dll", &guid_wmv },
@@ -184,21 +185,27 @@ static const codec_dll decoders_table[] =
     { VLC_FOURCC('W','M','V','1'), "wmvdmod.dll", &guid_wmv },
     { VLC_FOURCC('w','m','v','1'), "wmvdmod.dll", &guid_wmv },
     /* Screen codecs */
-    { VLC_FOURCC('M','S','S','1'), "wmsdmod.dll", &guid_wms },
     { VLC_FOURCC('M','S','S','2'), "wmsdmod.dll", &guid_wms },
+    { VLC_FOURCC('m','s','s','2'), "wmsdmod.dll", &guid_wms },
+    { VLC_FOURCC('M','S','S','1'), "wmsdmod.dll", &guid_wms },
+    { VLC_FOURCC('m','s','s','1'), "wmsdmod.dll", &guid_wms },
     /* Windows Media Video Adv */
     { VLC_FOURCC('W','M','V','A'), "wmvadvd.dll", &guid_wmva },
+    { VLC_FOURCC('w','m','v','a'), "wmvadvd.dll", &guid_wmva },
     { VLC_FOURCC('W','V','P','2'), "wmvadvd.dll", &guid_wmva },
+    { VLC_FOURCC('w','v','p','2'), "wmvadvd.dll", &guid_wmva },
 
     /* WMA 3 */
     { VLC_FOURCC('W','M','A','3'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','3'), "wma9dmod.dll", &guid_wma9 },
+    { VLC_FOURCC('W','M','A','P'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','p'), "wma9dmod.dll", &guid_wma9 },
     /* WMA 2 */
     { VLC_FOURCC('W','M','A','2'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','2'), "wma9dmod.dll", &guid_wma9 },
 
     /* WMA Speech */
+    { VLC_FOURCC('W','M','A','S'), "wmspdmod.dll", &guid_wma },
     { VLC_FOURCC('w','m','a','s'), "wmspdmod.dll", &guid_wma },
 
     /* */
