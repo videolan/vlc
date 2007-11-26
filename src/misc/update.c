@@ -2,7 +2,7 @@
  * update.c: VLC update and plugins download
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -48,6 +48,7 @@
 #include <vlc_xml.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>
+#include <vlc_md5.h>
 
 /*****************************************************************************
  * Misc defines
@@ -1206,7 +1207,7 @@ unsigned int update_iterator_Action( update_iterator_t *p_uit, int i_action )
 typedef struct {
     VLC_COMMON_MEMBERS
     char *psz_dest;     //< Download destination
-    char *psz_src;      //< Download source
+    struct update_file_t src;  //< Download source
     char *psz_status;   //< Download status displayed in progress dialog
 } download_thread_t;
 
@@ -1226,7 +1227,11 @@ void update_download( update_iterator_t *p_uit, const char *psz_dest )
         vlc_object_create( p_uit->p_u->p_libvlc, sizeof( download_thread_t ) );
 
     p_dt->psz_dest = strdup( psz_dest );
-    p_dt->psz_src = strdup( p_uit->file.psz_url );
+    p_dt->src.i_type = p_uit->file.i_type;
+    p_dt->src.l_size = p_uit->file.l_size;
+    p_dt->src.psz_md5 = STRDUP( p_uit->file.psz_md5 );
+    p_dt->src.psz_url = STRDUP( p_uit->file.psz_description );
+    p_dt->src.psz_description = STRDUP( p_uit->file.psz_description );
     asprintf( &p_dt->psz_status, "%s - %s (%s)\nSource: %s\nDestination: %s",
               p_uit->file.psz_description, p_uit->release.psz_version,
               p_uit->release.psz_svn_revision, p_uit->file.psz_url,
@@ -1265,7 +1270,7 @@ static char *size_str( long int l_size )
 void update_download_for_real( download_thread_t *p_this )
 {
     char *psz_dest = p_this->psz_dest;
-    char *psz_src = p_this->psz_src;
+    char *psz_src = p_this->src.psz_url;
     stream_t *p_stream;
     libvlc_int_t *p_libvlc = p_this->p_libvlc;
 
@@ -1294,6 +1299,18 @@ void update_download_for_real( download_thread_t *p_this )
     }
     else
     {
+        l_size = stream_Size(p_stream);
+        if( l_size != p_this->src.l_size )
+        {
+            stream_Delete( p_stream );
+            free( psz_status );
+            msg_Err( p_this,    "%s hasn't a correct size (%li instead of %li)."
+                                " Cancelling download.",
+                                p_this->src.psz_description,
+                                l_size,
+                                p_this->src.l_size );
+            goto end;
+        }
         p_file = utf8_fopen( psz_dest, "w" );
         if( !p_file )
         {
@@ -1304,20 +1321,24 @@ void update_download_for_real( download_thread_t *p_this )
         }
         else
         {
-            long int l_read;
+            int i_read;
             char *psz_s1; char *psz_s2;
+            struct md5_s md5_s;
 
-            l_size = stream_Size(p_stream);
             p_buffer = (void *)malloc( 1<<10 );
             if( p_buffer )
             {
-                while( ( l_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
+                if( p_this->src.i_type & ( UPDATE_FILE_TYPE_SOURCE | UPDATE_FILE_TYPE_BINARY | UPDATE_FILE_TYPE_PLUGIN ) )
+                    InitMD5( &md5_s );
+                while( ( i_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
                 {
                     float f_progress;
 
-                    fwrite( p_buffer, l_read, 1, p_file );
+                    fwrite( p_buffer, i_read, 1, p_file );
+                    if( p_this->src.i_type & ( UPDATE_FILE_TYPE_SOURCE | UPDATE_FILE_TYPE_BINARY | UPDATE_FILE_TYPE_PLUGIN ) )
+                        AddMD5( &md5_s, p_buffer, (size_t) i_read );
 
-                    l_done += l_read;
+                    l_done += i_read;
                     free( psz_status );
                     f_progress = 100.0*(float)l_done/(float)l_size;
                     psz_s1 = size_str( l_done );
@@ -1330,11 +1351,28 @@ void update_download_for_real( download_thread_t *p_this )
                     intf_ProgressUpdate( p_libvlc, i_progress,
                                         psz_status, f_progress, 0 );
                 }
-
                 free( p_buffer );
             }
             fclose( p_file );
             stream_Delete( p_stream );
+
+            if( l_done == p_this->src.l_size && 
+                p_this->src.i_type & ( UPDATE_FILE_TYPE_SOURCE |
+                UPDATE_FILE_TYPE_BINARY | UPDATE_FILE_TYPE_PLUGIN ) )
+            {
+                EndMD5( &md5_s );
+                char *psz_md5 = psz_md5_hash( &md5_s );
+                if( !p_this->src.psz_md5 || !psz_md5 ||
+                    strncmp( psz_md5, p_this->src.psz_md5, 32 ) )
+                {
+                    msg_Err( p_this, 
+    _("%s has an incorrect checksum, download failed or mirror is compromised.\n
+    Please run an antivirus on %s, and report if that file is trojaned.\n
+    If not, please try later."),
+    p_this->src.psz_description );
+                }
+                free( psz_md5 );
+            }
 
             free( psz_status );
             psz_s2 = size_str( l_size );
@@ -1346,8 +1384,11 @@ void update_download_for_real( download_thread_t *p_this )
         }
     }
 
+end:
     free( p_this->psz_dest );
-    free( p_this->psz_src );
+    free( p_this->src.psz_url );
+    free( p_this->src.psz_description );
+    free( p_this->src.psz_md5 );
     free( p_this->psz_status );
 
     vlc_object_destroy( p_this );

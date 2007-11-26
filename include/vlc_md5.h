@@ -46,4 +46,28 @@ VLC_EXPORT(void, InitMD5, ( struct md5_s * ) );
 VLC_EXPORT(void, AddMD5, ( struct md5_s *, const void *, size_t ) );
 VLC_EXPORT(void, EndMD5, ( struct md5_s * ) );
 
+/** 
+ * Returns a char representation of the md5 hash, as shown by UNIX md5 or
+ * md5sum tools.
+ */
+static inline char * psz_md5_hash( struct md5_s *md5_s )
+{
+    char *psz = malloc( 33 ); /* md5 string is 32 bytes + NULL character */
+    if( !psz ) return NULL;
+
+    int i;
+    for ( i = 0; i < 4; i++ )
+    {
+        sprintf( &psz[8*i], "%02x%02x%02x%02x",
+            md5_s->p_digest[i] & 0xff,
+            ( md5_s->p_digest[i] >> 8 ) & 0xff,
+            ( md5_s->p_digest[i] >> 16 ) & 0xff,
+            md5_s->p_digest[i] >> 24
+        );
+    }
+    psz[32] = '\0';
+
+    return psz;
+}
+
 #endif

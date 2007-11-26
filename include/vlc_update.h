@@ -2,7 +2,7 @@
  * vlc_update.h: VLC update and plugins download
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -143,14 +143,7 @@ struct update_iterator_t
     int i_rs;       ///< Release status bitmask
     int i_rt;       ///< Release type bitmask
 
-    struct
-    {
-        int i_type;             ///< Type
-        char* psz_md5;          ///< MD5 hash
-        long int l_size;        ///< Size in bytes
-        char* psz_url;          ///< Absolute URL
-        char* psz_description;  ///< Description
-    } file;         ///< Local 'copy' of the current file's information
+    struct update_file_t file; ///< Local copy of the current file's information
     struct
     {
         char *psz_version;      ///< Version string

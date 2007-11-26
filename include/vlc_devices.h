@@ -2,7 +2,7 @@
  * vlc_devices.h : Devices handling
  *****************************************************************************
  * Copyright (C) 1999-2006 the VideoLAN team
- * $Id: vlc_input.h 15915 2006-06-15 21:22:35Z zorglub $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
