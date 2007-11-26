@@ -417,7 +417,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
             sprintf( str, "%06X", val.i_int );
             lineedit->setText( str );
         }
-        else if( combobox ) combobox->setCurrentIndex( 
+        else if( combobox ) combobox->setCurrentIndex(
                             combobox->findData( val.i_int ) );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
     }
@@ -431,7 +431,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     else if( i_type == VLC_VAR_STRING )
     {
         if( lineedit ) lineedit->setText( qfu( val.psz_string ) );
-        else if( combobox ) combobox->setCurrentIndex( 
+        else if( combobox ) combobox->setCurrentIndex(
                             combobox->findData( qfu( val.psz_string ) ) );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
         free( val.psz_string );
@@ -517,7 +517,7 @@ void ExtVideo::updateFilterOptions()
     {
         char *psz_string = NULL;
         if( lineedit ) psz_string = strdup( qtu( lineedit->text() ) );
-        else if( combobox ) psz_string = strdup( qtu( combobox->itemData( 
+        else if( combobox ) psz_string = strdup( qtu( combobox->itemData(
                                          combobox->currentIndex() ).toString() ) );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
         config_PutPsz( p_intf, option.toStdString().c_str(), psz_string );

@@ -37,7 +37,7 @@
 
 PlaylistDialog *PlaylistDialog::instance = NULL;
 
-PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) 
+PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
                 : QVLCMW( _p_intf )
 {
     QWidget *main = new QWidget( this );
@@ -54,7 +54,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
 
 PlaylistDialog::~PlaylistDialog()
 {
-    writeSettings( "playlist" );    
+    writeSettings( "playlist" );
 }
 
 void PlaylistDialog::dropEvent(QDropEvent *event)

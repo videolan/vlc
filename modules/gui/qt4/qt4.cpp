@@ -156,7 +156,7 @@ vlc_module_begin();
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
                 ERROR_TEXT, VLC_FALSE );
-        add_bool( "qt-updates-notif", VLC_TRUE, NULL, UPDATER_TEXT, 
+        add_bool( "qt-updates-notif", VLC_TRUE, NULL, UPDATER_TEXT,
                 UPDATER_LONGTEXT, VLC_FALSE );
 
         add_integer( "qt-pl-showflags",

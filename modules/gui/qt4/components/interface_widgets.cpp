@@ -771,7 +771,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     sizeList << 180 << 420 ;
     setSizes( sizeList );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
-    
+
     /* In case we want to keep the splitter informations */
     settings->beginGroup( "playlist" );
     restoreState( settings->value("splitterSizes").toByteArray());

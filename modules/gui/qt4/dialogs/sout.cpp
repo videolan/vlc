@@ -299,7 +299,7 @@ void SoutDialog::updateMRL()
     if ( sout.b_mms ) counter++ ;
     if ( sout.b_rtp ) counter++ ;
     if ( sout.b_udp ) counter ++;
-    if ( sout.b_icecast ) counter ++; 
+    if ( sout.b_icecast ) counter ++;
 
 #define SMUX( x, txt ) if( ui.x->isChecked() ) sout.psz_mux = strdup( txt );
     SMUX( PSMux, "ps" );
@@ -360,7 +360,7 @@ void SoutDialog::updateMRL()
     {
 
 #define ISMORE() if ( more ) mrl.append( "," );
-#define ATLEASTONE() if ( counter ) mrl.append( "dst=" ); 
+#define ATLEASTONE() if ( counter ) mrl.append( "dst=" );
 
 #define CHECKMUX() \
        if( sout.psz_mux ) \
@@ -473,7 +473,7 @@ void SoutDialog::updateMRL()
         {
             // TODO
         }
-        
+
         if ( counter )
         {
             mrl.append( "}" );

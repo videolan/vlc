@@ -147,7 +147,7 @@ void PrefsDialog::setAdvanced()
         main_panel_l->addWidget( advanced_panel );
     }
     advanced_panel->show();
-    
+
     all->setChecked( true );
 }
 
@@ -180,7 +180,7 @@ void PrefsDialog::setSmall()
         simple_panels[SPrefsDefaultCat] =  current_simple_panel;
         main_panel_l->addWidget( current_simple_panel  );
     }
-    
+
     current_simple_panel->show();
     small->setChecked( true );
 }
@@ -198,7 +198,7 @@ void PrefsDialog::changeSimplePanel( int number )
         simple_panels[number] = current_simple_panel;
         main_panel_l->addWidget( current_simple_panel  );
     }
-    
+
     current_simple_panel->show();
 }
 
@@ -218,7 +218,7 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
     advanced_panel->show();
 }
 
-#if 0 
+#if 0
 /*Called from extended settings, is not used anymore, but could be useful one day*/
 void PrefsDialog::showModulePrefs( char *psz_module )
 {

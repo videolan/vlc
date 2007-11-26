@@ -84,7 +84,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
                         : QAbstractSlider( _parent )
 {
     padding = 3;
-    
+
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
     setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
 
@@ -92,7 +92,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
 
     const QPixmap temp( ":/pixmaps/volume-slider-inside.png" );
     const QBitmap mask( temp.createHeuristicMask() );
-    
+
     setMinimumSize( pixOutside.size() );
 
     pixGradient = QPixmap( mask.size() );
@@ -178,7 +178,7 @@ void SoundSlider::paintEvent(QPaintEvent *e)
 {
     QPainter painter( this );
     const int offset = int( double( ( width() - 2 * padding ) * value() ) / maximum() );
-        
+
     const QRectF boundsG( 0, 0, offset , pixGradient.height() );
     painter.drawPixmap( boundsG, pixGradient, boundsG );
 

@@ -263,7 +263,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
 
-    /* Run once the updateButtons function in order to fill correctly the comboBoxes */    
+    /* Run once the updateButtons function in order to fill correctly the comboBoxes */
     updateButtons();
 }
 
@@ -390,7 +390,7 @@ void DiscOpenPanel::updateMRL()
 
 void DiscOpenPanel::browseDevice()
 {
-    QString dir = QFileDialog::getExistingDirectory( 0, 
+    QString dir = QFileDialog::getExistingDirectory( 0,
             qtr("Open a device or a VIDEO_TS directory") );
     if (!dir.isEmpty()) {
         ui.deviceCombo->setEditText( dir );

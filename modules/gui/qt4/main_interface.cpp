@@ -149,7 +149,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                            | Qt::BottomDockWidgetArea );
 
     /************
-     * Menu Bar 
+     * Menu Bar
      ************/
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
 
@@ -177,7 +177,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addPermanentWidget( timeLabel, 2 );
 
     /* timeLabel behaviour:
-       - double clicking opens the goto time dialog 
+       - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
     CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
@@ -289,9 +289,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 MainInterface::~MainInterface()
 {
     if( playlistWidget ) playlistWidget->savingSettings( settings );
-    if( ExtendedDialog::exists() ) 
+    if( ExtendedDialog::exists() )
         ExtendedDialog::getInstance( p_intf )->savingSettings();
-    
+
     settings->beginGroup( "MainWindow" );
     settings->setValue( "playlist-floats", dockPL->isFloating() );
     settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
@@ -309,7 +309,7 @@ MainInterface::~MainInterface()
         var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
-    
+
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
@@ -470,7 +470,7 @@ void MainInterface::privacyDialog( QList<ConfigControl *> controls )
     privacy->exec();
 }
 
-//FIXME remove me at the end... 
+//FIXME remove me at the end...
 void MainInterface::debug()
 {
     msg_Dbg( p_intf, "size: %i - %i", controls->size().height(), controls->size().width() );
@@ -485,8 +485,8 @@ void MainInterface::debug()
    Since we can't know from the playlist Widget if we are inside a dock or not,
    because the playlist Widget can be called by THEDP, as a separate windows for
    the skins.
-   Maybe the other solution is to redefine the sizeHint() of the playlist and 
-   ask _parent->isFloating()... 
+   Maybe the other solution is to redefine the sizeHint() of the playlist and
+   ask _parent->isFloating()...
    If you think this would be better, please FIX it...
 */
 QSize MainInterface::sizeHint() const
@@ -652,7 +652,7 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
  **/
 void MainInterface::togglePlaylist()
 {
-    /* CREATION 
+    /* CREATION
     If no playlist exist, then create one and attach it to the DockPL*/
     if( !playlistWidget )
     {
