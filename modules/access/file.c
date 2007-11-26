@@ -327,8 +327,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
 #ifdef HAVE_MMAP
 # define MMAP_SIZE (1 << 18)
-# ifndef MMAP_POPULATE
-#  define MMAP_POPULATE 0
+# ifndef MAP_POPULATE
+#  define MAP_POPULATE 0
 # endif
 
 struct block_sys_t
