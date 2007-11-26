@@ -97,19 +97,19 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
 
     pixGradient = QPixmap( mask.size() );
 
-    QPainter p( &pixGradient );
     QLinearGradient gradient( padding, 2, WLENGTH , 2 );
     gradient.setColorAt( 0.0, Qt::white );
     gradient.setColorAt( 0.2, QColor( 20, 226, 20 ) );
     gradient.setColorAt( 0.5, QColor( 255, 176, 15 ) );
     gradient.setColorAt( 1.0, QColor( 235, 30, 20 ) );
-    p.setPen( Qt::NoPen );
-    p.setBrush( gradient );
 
-    p.drawRect( pixGradient.rect() );
-    p.end();
+    QPainter painter( &pixGradient );
+    painter.setPen( Qt::NoPen );
+    painter.setBrush( gradient );
+    painter.drawRect( pixGradient.rect() );
+    painter.end();
 
-   pixGradient.setMask( mask );
+    pixGradient.setMask( mask );
 }
 
 void SoundSlider::wheelEvent( QWheelEvent *event )
@@ -128,6 +128,7 @@ void SoundSlider::mousePressEvent( QMouseEvent *event )
         b_sliding = true;
         i_oldvalue = value();
         emit sliderPressed();
+        changeValue( event->x() - padding );
     }
 }
 
