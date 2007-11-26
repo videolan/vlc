@@ -694,7 +694,6 @@ static int Handshake( intf_thread_t *p_this )
     char                psz_timestamp[33];
 
     struct md5_s        p_struct_md5;
-    char                psz_password_md5[33];
 
     stream_t            *p_stream;
     char                *psz_handshake_url;
@@ -735,15 +734,11 @@ static int Handshake( intf_thread_t *p_this )
 
     free( psz_password );
 
-    int i;
-    for ( i = 0; i < 4; i++ )
+    char *psz_password_md5 = psz_md5_hash( &p_struct_md5 );
+    if( !psz_password_md5 )
     {
-        sprintf( &psz_password_md5[8*i], "%02x%02x%02x%02x",
-            p_struct_md5.p_digest[i] & 0xff,
-            ( p_struct_md5.p_digest[i] >> 8 ) & 0xff,
-            ( p_struct_md5.p_digest[i] >> 16 ) & 0xff,
-            p_struct_md5.p_digest[i] >> 24
-        );
+        free( psz_username );
+        return VLC_ENOMEM;
     }
 
     snprintf( psz_timestamp, 33, "%llu", (uintmax_t)timestamp );
@@ -756,18 +751,16 @@ static int Handshake( intf_thread_t *p_this )
     AddMD5( &p_struct_md5, ( uint8_t* ) psz_password_md5, 32 );
     AddMD5( &p_struct_md5, ( uint8_t* ) psz_timestamp, strlen( psz_timestamp ));
     EndMD5( &p_struct_md5 );
+    free( psz_password_md5 );
 
-    for ( i = 0; i < 4; i++ )
+    char *psz_auth_token = psz_md5_hash( &p_struct_md5 );
+    if( !psz_auth_token )
     {
-        sprintf( &p_sys->psz_auth_token[8*i], "%02x%02x%02x%02x",
-            p_struct_md5.p_digest[i] & 0xff,
-            ( p_struct_md5.p_digest[i] >> 8 ) & 0xff,
-            ( p_struct_md5.p_digest[i] >> 16 ) & 0xff,
-            p_struct_md5.p_digest[i] >> 24
-        );
+        free( psz_username );
+        return VLC_ENOMEM;
     }
-
-    p_sys->psz_auth_token[32] = '\0';
+    strncpy( &p_sys->psz_auth_token[0], psz_auth_token, 33 );
+    free( psz_auth_token );
 
     if( !asprintf( &psz_handshake_url,
     "http://post.audioscrobbler.com/?hs=true&p=1.2&c=%s&v=%s&u=%s&t=%s&a=%s",
