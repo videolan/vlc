@@ -34,13 +34,13 @@
 struct block_sys_t
 {
     uint8_t     *p_allocated_buffer;
-    int         i_allocated_buffer;
+    size_t      i_allocated_buffer;
 };
 
 #define BLOCK_PADDING_SIZE 32
 static void BlockRelease( block_t * );
 
-block_t *__block_New( vlc_object_t *p_obj, int i_size )
+block_t *__block_New( vlc_object_t *p_obj, size_t i_size )
 {
     /* We do only one malloc
      * TODO bench if doing 2 malloc but keeping a pool of buffer is better
@@ -48,7 +48,7 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
      * 2 * BLOCK_PADDING_SIZE -> pre + post padding
      */
     block_sys_t *p_sys;
-    const int i_alloc = i_size + 2 * BLOCK_PADDING_SIZE + 16;
+    const size_t i_alloc = i_size + 2 * BLOCK_PADDING_SIZE + 16;
     block_t *p_block =
         malloc( sizeof( block_t ) + sizeof( block_sys_t ) + i_alloc );
 
@@ -82,9 +82,9 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     return p_block;
 }
 
-block_t *block_Realloc( block_t *p_block, int i_prebody, int i_body )
+block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 {
-    int i_buffer_size;
+    ssize_t i_buffer_size;
 
     if( p_block->pf_release != BlockRelease )
     {
@@ -100,7 +100,7 @@ block_t *block_Realloc( block_t *p_block, int i_prebody, int i_body )
 
     i_buffer_size = i_prebody + i_body;
 
-    if( i_body < 0 || i_buffer_size <= 0 )
+    if( i_buffer_size <= 0 )
     {
         block_Release( p_block );
         return NULL;
@@ -211,9 +211,9 @@ void block_FifoEmpty( block_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
 }
 
-int block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
+size_t block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
 {
-    int i_size = 0;
+    size_t i_size = 0;
     vlc_mutex_lock( &p_fifo->lock );
 
     do

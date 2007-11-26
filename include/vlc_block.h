@@ -92,7 +92,7 @@ struct block_t
     int         i_samples; /* Used for audio */
     int         i_rate;
 
-    int         i_buffer;
+    size_t      i_buffer;
     uint8_t     *p_buffer;
 
     /* This way the block_Release can be overloaded
@@ -127,8 +127,8 @@ struct block_t
  * - block_Duplicate : create a copy of a block.
  ****************************************************************************/
 #define block_New( a, b ) __block_New( VLC_OBJECT(a), b )
-VLC_EXPORT( block_t *,  __block_New,        ( vlc_object_t *, int ) );
-VLC_EXPORT( block_t *, block_Realloc,       ( block_t *, int i_pre, int i_body ) );
+VLC_EXPORT( block_t *,  __block_New,        ( vlc_object_t *, size_t ) );
+VLC_EXPORT( block_t *, block_Realloc,       ( block_t *, ssize_t i_pre, size_t i_body ) );
 
 static inline block_t *block_Duplicate( block_t *p_block )
 {
@@ -197,32 +197,28 @@ static inline void block_ChainRelease( block_t *p_block )
         p_block = p_next;
     }
 }
-static int block_ChainExtract( block_t *p_list, void *p_data, int i_max )
+
+static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
 {
-    block_t *b;
-    int     i_total = 0;
+    size_t  i_total = 0;
     uint8_t *p = (uint8_t*)p_data;
 
-    for( b = p_list; b != NULL; b = b->p_next )
+    while( p_list && i_max )
     {
-        int i_copy = __MIN( i_max, b->i_buffer );
-        if( i_copy > 0 )
-        {
-            memcpy( p, b->p_buffer, i_copy );
-            i_max   -= i_copy;
-            i_total += i_copy;
-            p       += i_copy;
+        size_t i_copy = __MIN( i_max, p_list->i_buffer );
+        memcpy( p, p_list->p_buffer, i_copy );
+        i_max   -= i_copy;
+        i_total += i_copy;
+        p       += i_copy;
 
-            if( i_max == 0 )
-                return i_total;
-        }
+        p_list = p_list->p_next;
     }
     return i_total;
 }
 
 static inline block_t *block_ChainGather( block_t *p_list )
 {
-    int     i_total = 0;
+    size_t  i_total = 0;
     mtime_t i_length = 0;
     block_t *b, *g;
 
@@ -270,7 +266,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
 VLC_EXPORT( block_fifo_t *, __block_FifoNew,    ( vlc_object_t * ) );
 VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );
 VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
-VLC_EXPORT( int,            block_FifoPut,      ( block_fifo_t *, block_t * ) );
+VLC_EXPORT( size_t,         block_FifoPut,      ( block_fifo_t *, block_t * ) );
 VLC_EXPORT( void,           block_FifoWake,     ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoShow,     ( block_fifo_t * ) );
