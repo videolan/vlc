@@ -434,8 +434,10 @@ static int Seek (access_t *p_access, int64_t i_pos)
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = VLC_FALSE;
 
-    /* Determine which file we need to access */
-    lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
+#ifdef HAVE_MMAP
+    if (p_access->pf_block == NULL)
+        lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
+#endif
     return VLC_SUCCESS;
 }
 
