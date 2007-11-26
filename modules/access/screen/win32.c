@@ -205,14 +205,10 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         DeleteObject( hbmp );
         return NULL;
     }
-    memset( &p_block->self, 0, sizeof( block_t->self ) );
-
     /* Fill all fields */
     i_buffer = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 *
         p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
-    p_block->self.p_next     = NULL;
-    p_block->self.i_buffer   = i_buffer;
-    p_block->self.p_buffer   = p_buffer;
+    block_Init( &p_block->self, p_buffer, i_buffer );
     p_block->self.pf_release = CaptureBlockRelease;
     p_block->hbmp            = hbmp;
 

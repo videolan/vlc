@@ -71,7 +71,8 @@ block_FifoRelease
 block_FifoShow
 block_FifoCount
 block_FifoSize
-__block_New
+block_Init
+block_Alloc
 block_Realloc
 config_ChainCreate
 config_ChainDestroy

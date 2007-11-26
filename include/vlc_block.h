@@ -78,6 +78,8 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
 #define BLOCK_FLAG_PRIVATE_SHIFT 16
 
+typedef void (*block_free_t) (block_t *);
+
 struct block_t
 {
     block_t     *p_next;
@@ -95,10 +97,8 @@ struct block_t
     size_t      i_buffer;
     uint8_t     *p_buffer;
 
-    /* This way the block_Release can be overloaded
-     * Don't mess with it now, if you need it the ask on ML
-     */
-    void        (*pf_release)   ( block_t * );
+    /* Rudimentary support for overloading block (de)allocation. */
+    block_free_t pf_release;
 };
 
 /****************************************************************************
@@ -117,9 +117,15 @@ struct block_t
  *      and decrease are supported). Use it as it is optimised.
  * - block_Duplicate : create a copy of a block.
  ****************************************************************************/
-#define block_New( a, b ) __block_New( NULL, b )
-VLC_EXPORT( block_t *,  __block_New,        ( vlc_object_t *, size_t ) );
-VLC_EXPORT( block_t *, block_Realloc,       ( block_t *, ssize_t i_pre, size_t i_body ) );
+VLC_EXPORT( void,      block_Init,    ( block_t *, void *, size_t ) );
+VLC_EXPORT( block_t *, block_Alloc,   ( size_t ) );
+VLC_EXPORT( block_t *, block_Realloc, ( block_t *, ssize_t i_pre, size_t i_body ) );
+
+static inline block_t *block_New( void *dummy, size_t size )
+{
+    (void)dummy;
+    return block_Alloc (size);
+}
 
 static inline block_t *block_Duplicate( block_t *p_block )
 {

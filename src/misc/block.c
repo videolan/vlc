@@ -38,10 +38,36 @@ struct block_sys_t
     uint8_t     p_allocated_buffer[0];
 };
 
-#define BLOCK_PADDING_SIZE 32
-static void BlockRelease( block_t * );
+#ifndef NDEBUG
+static void BlockNoRelease( block_t *b )
+{
+    fprintf( stderr, "block %p has no release callback! This is a bug!\n", b );
+    abort();
+}
+#endif
 
-block_t *__block_New( vlc_object_t *p_obj, size_t i_size )
+void block_Init( block_t *restrict b, void *buf, size_t size )
+{
+    /* Fill all fields to their default */
+    b->p_next = b->p_prev = NULL;
+    b->i_flags = 0;
+    b->i_pts = b->i_dts = b->i_length = 0;
+    b->i_rate = 0;
+    b->p_buffer = buf;
+    b->i_buffer = size;
+#ifndef NDEBUG
+    b->pf_release = BlockNoRelease;
+#endif
+}
+
+static void BlockRelease( block_t *p_block )
+{
+    free( p_block );
+}
+
+#define BLOCK_PADDING_SIZE 32
+
+block_t *block_Alloc( size_t i_size )
 {
     /* We do only one malloc
      * TODO bench if doing 2 malloc but keeping a pool of buffer is better
@@ -57,19 +83,9 @@ block_t *__block_New( vlc_object_t *p_obj, size_t i_size )
     /* Fill opaque data */
     p_sys->i_allocated_buffer = i_alloc;
 
-    /* Fill all fields */
-    p_sys->self.p_next      = NULL;
-    p_sys->self.p_prev      = NULL;
-    p_sys->self.i_flags     = 0;
-    p_sys->self.i_pts       = 0;
-    p_sys->self.i_dts       = 0;
-    p_sys->self.i_length    = 0;
-    p_sys->self.i_rate      = 0;
-    p_sys->self.i_buffer    = i_size;
-    p_sys->self.p_buffer    =
-        &p_sys->p_allocated_buffer[BLOCK_PADDING_SIZE +
-            16 - ((uintptr_t)p_sys->p_allocated_buffer % 16 )];
-    p_sys->self.pf_release     = BlockRelease;
+    block_Init( &p_sys->self, p_sys->p_allocated_buffer + BLOCK_PADDING_SIZE
+                + 16 - ((uintptr_t)p_sys->p_allocated_buffer % 16 ), i_size );
+    p_sys->self.pf_release    = BlockRelease;
 
     return &p_sys->self;
 }
@@ -138,12 +154,6 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 
     return p_block;
 }
-
-static void BlockRelease( block_t *p_block )
-{
-    free( p_block );
-}
-
 
 /*****************************************************************************
  * block_fifo_t management
