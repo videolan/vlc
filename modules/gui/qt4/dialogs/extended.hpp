@@ -37,10 +37,11 @@ public:
         return instance;
     }
     virtual ~ExtendedDialog();
+    static bool exists(){ return ( instance != NULL ) ; }
+    void savingSettings();
 private:
     ExtendedDialog( intf_thread_t * );
     static ExtendedDialog *instance;
-public slots:
 };
 
 #endif

@@ -54,7 +54,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
 
 PlaylistDialog::~PlaylistDialog()
 {
-    writeSettings( "playlist" );
+    writeSettings( "playlist" );    
 }
 
 void PlaylistDialog::dropEvent(QDropEvent *event)

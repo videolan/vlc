@@ -721,11 +721,6 @@ void ControlsWidget::toggleAdvanced()
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
                                 p_intf ( _p_i )
 {
-    /* In case we want to keep the splitter informations */
-    settings->beginGroup( "Playlist" );
-    restoreState(settings->value("splitterSizes").toByteArray());
-    settings->endGroup();
-
     /* Left Part and design */
     QWidget *leftW = new QWidget( this );
     QVBoxLayout *left = new QVBoxLayout( leftW );
@@ -776,8 +771,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     sizeList << 180 << 420 ;
     setSizes( sizeList );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
-    resize( 600, 300 );
-    //updateGeometry();
+    
+    /* In case we want to keep the splitter informations */
+    settings->beginGroup( "playlist" );
+    restoreState( settings->value("splitterSizes").toByteArray());
+    resize( settings->value("size", QSize(600, 300)).toSize());
+    move( settings->value("pos", QPoint( 0, 400)).toPoint());
+    settings->endGroup();
 }
 
 void PlaylistWidget::setArt( QString url )
@@ -801,12 +801,13 @@ QSize PlaylistWidget::sizeHint() const
 }
 
 PlaylistWidget::~PlaylistWidget()
-{
-}
+{}
 
-void PlaylistWidget::saveSettings( QSettings *settings )
+void PlaylistWidget::savingSettings( QSettings *settings )
 {
-    settings->beginGroup( "Playlist" );
+    settings->beginGroup( "playlist" );
+    settings->setValue( "pos", pos() );
+    settings->setValue( "size", size() );
     settings->setValue("splitterSizes", saveState() );
     settings->endGroup();
 }

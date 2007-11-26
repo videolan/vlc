@@ -54,12 +54,12 @@ public:
 protected:
     intf_thread_t *p_intf;
 
-    void readSettings( QString name, QSize defSize )
+    void readSettings( QString name, QSize defSize, QPoint defPos )
     {
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
         resize( settings.value( "size", defSize ).toSize() );
-        move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
+        move( settings.value( "pos", defPos ).toPoint() );
         settings.endGroup();
     }
     void writeSettings( QString name )
@@ -90,7 +90,6 @@ protected:
              msg_Dbg( p_intf, "Enter Key pressed" );
              close();
          }
-
     }
 };
 

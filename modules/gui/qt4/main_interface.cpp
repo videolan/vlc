@@ -29,6 +29,7 @@
 #include "util/customwidgets.hpp"
 #include "dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
+#include "dialogs/extended.hpp"
 #include "dialogs/playlist.hpp"
 #include "menus.hpp"
 
@@ -287,8 +288,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 MainInterface::~MainInterface()
 {
-    if( playlistWidget ) playlistWidget->saveSettings( settings );
-
+    if( playlistWidget ) playlistWidget->savingSettings( settings );
+    if( ExtendedDialog::exists() ) 
+        ExtendedDialog::getInstance( p_intf )->savingSettings();
+    
     settings->beginGroup( "MainWindow" );
     settings->setValue( "playlist-floats", dockPL->isFloating() );
     settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );

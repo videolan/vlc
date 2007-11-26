@@ -245,7 +245,7 @@ public:
     PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) ;
     virtual ~PlaylistWidget();
     QSize sizeHint() const;
-    void saveSettings( QSettings *settings );
+    void savingSettings( QSettings *settings );
 private:
     PLSelector *selector;
     PLPanel *rightPanel;
