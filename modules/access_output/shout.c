@@ -428,10 +428,9 @@ static int Open( vlc_object_t *p_this )
             i_ret = shout_get_connected( p_shout );
         }
 */
-        /* Only wait when we have no connection */
         if ( i_ret != SHOUTERR_CONNECTED )
     	{
-    	    msg_Warn( p_access, "unable to establish connection. waiting 30 seconds to retry..." );
+    	    msg_Warn( p_access, "unable to establish connection, retrying..." );
             msleep( 30000000 );
         }
     }
@@ -523,8 +522,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
                Since we already began with a working connection, the most feasable
                approach to get out of this error status is a (timed) reconnect approach. */
             shout_close( p_access->p_sys->p_shout );
-            msg_Warn( p_access, "server unavailable? waiting 30 seconds to reconnect..." );
-            msleep( 30000000 );
+            msg_Warn( p_access, "server unavailable? trying to reconnect..." );
             /* Re-open the connection (protocol params have already been set) and re-sync */
             if( shout_open( p_access->p_sys->p_shout ) == SHOUTERR_SUCCESS )
             {
