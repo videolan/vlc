@@ -100,10 +100,6 @@ struct block_t
      */
     void        (*pf_release)   ( block_t * );
 
-    /* It's an object that should be valid as long as the block_t is valid */
-    /* It should become a true block manager to reduce malloc/free */
-    vlc_object_t    *p_manager;
-
     /* Following fields are private, user should never touch it */
     /* XXX never touch that OK !!! the first that access that will
      * have Subversion account removed ;) XXX */
@@ -126,13 +122,13 @@ struct block_t
  *      and decrease are supported). Use it as it is optimised.
  * - block_Duplicate : create a copy of a block.
  ****************************************************************************/
-#define block_New( a, b ) __block_New( VLC_OBJECT(a), b )
+#define block_New( a, b ) __block_New( NULL, b )
 VLC_EXPORT( block_t *,  __block_New,        ( vlc_object_t *, size_t ) );
 VLC_EXPORT( block_t *, block_Realloc,       ( block_t *, ssize_t i_pre, size_t i_body ) );
 
 static inline block_t *block_Duplicate( block_t *p_block )
 {
-    block_t *p_dup = block_New( p_block->p_manager, p_block->i_buffer );
+    block_t *p_dup = block_New( NULL, p_block->i_buffer );
     if( p_dup == NULL )
         return NULL;
 
@@ -231,7 +227,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
         i_length += b->i_length;
     }
 
-    g = block_New( p_list->p_manager, i_total );
+    g = block_New( NULL, i_total );
     block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
 
     g->i_flags = p_list->i_flags;

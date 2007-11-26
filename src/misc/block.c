@@ -76,7 +76,6 @@ block_t *__block_New( vlc_object_t *p_obj, size_t i_size )
     p_block->pf_release     = BlockRelease;
 
     /* Is ok, as no comunication between p_vlc */
-    p_block->p_manager      = VLC_OBJECT( p_obj->p_libvlc );
     p_block->p_sys          = p_sys;
 
     return p_block;
@@ -123,7 +122,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 
     if( i_body > 0 || i_prebody > 0 )
     {
-        block_t *p_rea = block_New( p_block->p_manager, i_buffer_size );
+        block_t *p_rea = block_New( NULL, i_buffer_size );
 
         if( p_rea )
         {

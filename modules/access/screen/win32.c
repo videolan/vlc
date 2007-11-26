@@ -214,7 +214,6 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     p_block->i_buffer       = i_buffer;
     p_block->p_buffer       = p_buffer;
     p_block->pf_release     = CaptureBlockRelease;
-    p_block->p_manager      = VLC_OBJECT( p_demux->p_libvlc );
     p_block->p_sys->hbmp    = hbmp;
 
     return p_block;
