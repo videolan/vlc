@@ -32,7 +32,6 @@
 #include "dialogs/playlist.hpp"
 #include "menus.hpp"
 
-
 #include <QMenuBar>
 #include <QCloseEvent>
 #include <QPushButton>
@@ -52,14 +51,6 @@
 #include <assert.h>
 #include <vlc_keys.h>
 #include <vlc_vout.h>
-
-#ifdef WIN32
-    #define PREF_W 410
-    #define PREF_H 151
-#else
-    #define PREF_W 400
-    #define PREF_H 140
-#endif
 
 #define SET_WIDTH(i,j) i->widgetSize.setWidth(j)
 #define SET_HEIGHT(i,j) i->widgetSize.setHeight(j)
@@ -99,7 +90,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /**
      * Ask for the network policy on FIRST STARTUP
-     */
+     **/
     if( config_GetInt( p_intf, "privacy-ask") )
     {
         QList<ConfigControl *> controls;
@@ -150,13 +141,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Create a Dock to get the playlist */
     dockPL = new QDockWidget( qtr("Playlist"), this );
+    dockPL->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::MinimumExpanding );
+    dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
                            | Qt::BottomDockWidgetArea );
-    dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
-    dockPL->setWidget( playlistWidget );
 
-    /* Menu Bar */
+    /************
+     * Menu Bar 
+     ************/
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
 
     /****************
@@ -286,7 +279,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( dockPL, topLevelChanged( bool ), this, doComponentsUpdate() );
     // DEBUG FIXME
     hide();
+
+
     updateGeometry();
+    settings->endGroup();
 }
 
 MainInterface::~MainInterface()
@@ -300,12 +296,11 @@ MainInterface::~MainInterface()
         var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
-
+    settings->beginGroup( "MainWindow" );
     settings->setValue( "playlist-floats", dockPL->isFloating() );
     settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
-    if( playlistWidget )
-        playlistWidget->saveSettings( settings );
+    playlistWidget->saveSettings( settings );
     settings->endGroup();
     delete settings;
     p_intf->b_interaction = VLC_FALSE;
@@ -335,7 +330,6 @@ void MainInterface::setVLCWindowsTitle( QString aTitle )
         setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
     }
 }
-
 
 void MainInterface::handleMainUi( QSettings *settings )
 {
@@ -368,12 +362,13 @@ void MainInterface::handleMainUi( QSettings *settings )
     widgetAction->setDefaultWidget( speedControl );
     speedControlMenu->addAction( widgetAction );
 
-    /* Set initial size */
-
     /* Visualisation */
+    /* Disabled for now, they SUCK */
+    #if 0
     visualSelector = new VisualSelector( p_intf );
     mainLayout->insertWidget( 0, visualSelector );
     visualSelector->hide();
+    #endif
 
     /* And video Outputs */
     if( alwaysVideoFlag )
@@ -400,10 +395,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     }
 
     /* Finish the sizing */
-    setMinimumSize( PREF_W, PREF_H );
     updateGeometry();
 }
-
 
 void MainInterface::privacyDialog( QList<ConfigControl *> controls )
 {
@@ -470,19 +463,27 @@ void MainInterface::privacyDialog( QList<ConfigControl *> controls )
     privacy->exec();
 }
 
+//FIXME remove me at the end... 
 void MainInterface::debug()
 {
     msg_Dbg( p_intf, "size: %i - %i", controls->size().height(), controls->size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", controls->sizeHint().height(), controls->sizeHint().width() );
 }
+
 /**********************************************************************
  * Handling of sizing of the components
  **********************************************************************/
+
+/* This function is probably wrong, but we don't have many many choices...
+   Since we can't know from the playlist Widget if we are inside a dock or not,
+   because the playlist Widget can be called by THEDP, as a separate windows for
+   the skins.
+   Maybe the other solution is to redefine the sizeHint() of the playlist and 
+   ask _parent->isFloating()... 
+   If you think this would be better, please FIX it...
+*/
 QSize MainInterface::sizeHint() const
 {
-    msg_Dbg( p_intf, "Annoying debug to remove, main sizeHint was called %i %i ",
-    menuBar()->size().height(), menuBar()->size().width() );
-
     QSize tempSize = controls->sizeHint() +
         QSize( 100, menuBar()->size().height() + statusBar()->size().height() );
 
@@ -498,34 +499,7 @@ QSize MainInterface::sizeHint() const
 }
 
 #if 0
-void MainInterface::calculateInterfaceSize()
-{
-    int width = 0, height = 0;
-    if( VISIBLE( bgWidget ) )
-    {
-        width  = bgWidget->widgetSize.width();
-        height = bgWidget->widgetSize.height();
-    }
-    else if( videoIsActive )
-    {
-        width  = videoWidget->widgetSize.width() ;
-        height = videoWidget->widgetSize.height();
-    }
-    else
-    {
-        width  = PREF_W - addSize.width();
-        height = PREF_H - addSize.height();
-    }
-    if( !dockPL->isFloating() && dockPL->widget() )
-    {
-        width  += dockPL->widget()->width();
-        height += dockPL->widget()->height();
-    }
-    if( VISIBLE( visualSelector ) )
-        height += visualSelector->height();
-    mainSize = QSize( width + addSize.width(), height + addSize.height() );
-}
-
+/* This is dead code and need to be removed AT THE END */
 void MainInterface::resizeEvent( QResizeEvent *e )
 {
     if( videoWidget )
@@ -563,8 +537,7 @@ class SetVideoOnTopQtEvent : public QEvent
 public:
     SetVideoOnTopQtEvent( bool _onTop ) :
       QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
-    {
-    }
+    {}
 
     bool OnTop() const
     {
@@ -574,7 +547,6 @@ public:
 private:
     bool onTop;
 };
-
 
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
@@ -586,7 +558,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
         videoIsActive = true;
         bool bgWasVisible = false;
 
-        /* Did we have a bg */
+        /* Did we have a bg ? */
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
@@ -673,7 +645,8 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
  **/
 void MainInterface::togglePlaylist()
 {
-    /* If no playlist exist, then create one and attach it to the DockPL*/
+    /* CREATION 
+    If no playlist exist, then create one and attach it to the DockPL*/
     if( !playlistWidget )
     {
         msg_Dbg( p_intf, "Creating a new playlist" );
@@ -682,16 +655,11 @@ void MainInterface::togglePlaylist()
             CONNECT( playlistWidget, artSet( QString ),
                      bgWidget, setArt(QString) );
 
-        //FIXME
-/*        playlistWidget->widgetSize = settings->value( "playlistSize",
-                                               QSize( 650, 310 ) ).toSize();*/
         /* Add it to the parent DockWidget */
         dockPL->setWidget( playlistWidget );
 
         /* Add the dock to the main Interface */
         addDockWidget( Qt::BottomDockWidgetArea, dockPL );
-
-        msg_Dbg( p_intf, "Creating a new playlist" );
 
         /* Make the playlist floating is requested. Default is not. */
         if( settings->value( "playlist-floats", false ).toBool() );
@@ -702,9 +670,9 @@ void MainInterface::togglePlaylist()
     }
     else
     {
-    /* toggle the display */
+    /* toggle the visibility of the playlist */
        TOGGLEV( dockPL );
-       resize(sizeHint());
+     //resize(sizeHint());
     }
 #if 0
     doComponentsUpdate();
@@ -712,13 +680,39 @@ void MainInterface::togglePlaylist()
     updateGeometry();
 }
 
+/* Function called from the menu to undock the playlist */
 void MainInterface::undockPlaylist()
 {
     dockPL->setFloating( true );
     updateGeometry();
-#if 0
-    doComponentsUpdate();
-#endif
+}
+
+void MainInterface::toggleMinimalView()
+{
+    TOGGLEV( menuBar() );
+    TOGGLEV( controls );
+    TOGGLEV( statusBar() );
+    updateGeometry();
+}
+
+/* Video widget cannot do this synchronously as it runs in another thread */
+/* Well, could it, actually ? Probably dangerous ... */
+void MainInterface::doComponentsUpdate()
+{
+    updateGeometry();
+}
+
+/* toggling advanced controls buttons */
+void MainInterface::toggleAdvanced()
+{
+    controls->toggleAdvanced();
+}
+
+/* Get the visibility status of the controls (hidden or not, advanced or not) */
+int MainInterface::getControlsVisibilityStatus()
+{
+    return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
+                + CONTROLS_ADVANCED * controls->b_advancedVisible );
 }
 
 #if 0
@@ -742,35 +736,6 @@ void MainInterface::visual()
     doComponentsUpdate();
 }
 #endif
-
-void MainInterface::toggleMinimalView()
-{
-    TOGGLEV( menuBar() );
-    TOGGLEV( controls );
-    TOGGLEV( statusBar() );
-    updateGeometry();
-}
-
-/* Video widget cannot do this synchronously as it runs in another thread */
-/* Well, could it, actually ? Probably dangerous ... */
-void MainInterface::doComponentsUpdate()
-{
-    msg_Dbg( p_intf, "trying" );
-
-    resize( sizeHint() );
-}
-
-
-void MainInterface::toggleAdvanced()
-{
-    controls->toggleAdvanced();
-}
-
-int MainInterface::getControlsVisibilityStatus()
-{
-    return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
-                + CONTROLS_ADVANCED * controls->b_advancedVisible );
-}
 
 /************************************************************************
  * Other stuff

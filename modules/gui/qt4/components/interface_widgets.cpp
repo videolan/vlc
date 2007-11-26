@@ -141,7 +141,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     label->setMinimumWidth( MIN_BG_SIZE );
     label->setPixmap( QPixmap( ":/vlc128.png" ) );
 
-    QVBoxLayout *backgroundLayout = new QVBoxLayout( this );
+    QHBoxLayout *backgroundLayout = new QHBoxLayout( this );
     backgroundLayout->addWidget( label );
 
     resize( 300, 150 );
@@ -434,7 +434,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     playButton->setMinimumSize( QSize( 45, 45 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
-    controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
+    controlLayout->addWidget( playButton, 2, 0, 2, 2 );
 
     controlLayout->setColumnMinimumWidth( 2, 20 );
     controlLayout->setColumnStretch( 2, 0 );
@@ -725,7 +725,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     settings->beginGroup( "Playlist" );
     restoreState(settings->value("splitterSizes").toByteArray());
     settings->endGroup();
-    
+
     /* Left Part and design */
     QWidget *leftW = new QWidget( this );
     QVBoxLayout *left = new QVBoxLayout( leftW );
@@ -775,9 +775,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     QList<int> sizeList;
     sizeList << 180 << 420 ;
     setSizes( sizeList );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
     resize( 600, 300 );
-    updateGeometry();
+    //updateGeometry();
 }
 
 void PlaylistWidget::setArt( QString url )
