@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001-2006 the VideoLAN team
- * Copyright © 2006 Rémi Denis-Courmont
+ * Copyright © 2006-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include <vlc_access.h>
 #include <vlc_interface.h>
 
+#include <assert.h>
 #include <errno.h>
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
@@ -47,6 +48,9 @@
 #else
 #   include <unistd.h>
 #   include <poll.h>
+#endif
+#ifdef HAVE_MMAP
+#   include <sys/mman.h>
 #endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
@@ -104,6 +108,7 @@ vlc_module_end();
 static int  Seek( access_t *, int64_t );
 static int  Read( access_t *, uint8_t *, int );
 static int  Control( access_t *, int, va_list );
+static block_t *mmapBlock( access_t * );
 
 static int  open_file( access_t *, const char * );
 
@@ -193,6 +198,14 @@ static int Open( vlc_object_t *p_this )
     if (!S_ISREG (st.st_mode) && !S_ISBLK (st.st_mode)
      && (!S_ISCHR (st.st_mode) || (st.st_size == 0)))
         p_sys->b_seekable = VLC_FALSE;
+
+# ifdef HAVE_MMAP
+    if (p_sys->b_pace_control && S_ISREG (st.st_mode))
+    {
+        p_access->pf_read = NULL;
+        p_access->pf_block = mmapBlock;
+    }
+# endif
 #else
     p_sys->b_seekable = !b_stdin;
 # warning File size not known!
@@ -311,6 +324,96 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
     return i_ret;
 }
+
+#ifdef HAVE_MMAP
+# define MMAP_SIZE (1 << 18)
+# ifndef MMAP_POPULATE
+#  define MMAP_POPULATE 0
+# endif
+
+struct block_sys_t
+{
+    block_t self;
+    //vlc_object_t *owner;
+    void *base_addr;
+    size_t length;
+};
+
+static void mmapRelease (block_t *block)
+{
+    block_sys_t *p_sys = (block_sys_t *)block;
+
+    fprintf (stderr, "munmap (%p, %u)\n", p_sys->base_addr, MMAP_SIZE);
+    munmap (p_sys->base_addr, p_sys->length);
+    //vlc_object_release (p_sys->owner);
+    free (p_sys);
+}
+
+static block_t *mmapBlock (access_t *p_access)
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    const int flags = MAP_SHARED | MAP_POPULATE;
+    const size_t pagesize = sysconf (_SC_PAGE_SIZE);
+    off_t offset = p_access->info.i_pos & ~(pagesize - 1);
+    size_t align = p_access->info.i_pos & (pagesize - 1);
+    size_t length = (MMAP_SIZE > pagesize) ? MMAP_SIZE : pagesize;
+    void *addr;
+
+    /* File grown while being played? */
+    if (offset + length >= p_access->info.i_size)
+    {
+        struct stat st;
+
+        if ((fstat (p_sys->fd, &st) == 0)
+         && (st.st_size > p_access->info.i_size))
+        {
+            p_access->info.i_size = st.st_size;
+            p_access->info.i_update |= INPUT_UPDATE_SIZE;
+        }
+    }
+
+    /* Really at end of file? */
+    if (offset >= p_access->info.i_size)
+    {
+        p_access->info.b_eof = VLC_TRUE;
+        msg_Dbg (p_access, "at end of memory mapped file");
+        return NULL;
+    }
+
+    if (offset + length > p_access->info.i_size)
+        length = p_access->info.i_size - offset;
+
+    assert (length > 0);
+
+    addr = mmap (NULL, length, PROT_READ, flags, p_sys->fd, offset);
+    if (addr == MAP_FAILED)
+    {
+        msg_Err (p_access, "memory mapping failed: %m");
+        msleep( INPUT_ERROR_SLEEP );
+        return NULL;
+    }
+
+    p_access->info.i_pos += length;
+
+    msg_Dbg (p_access, "mapped %lu bytes at %p from offset %lu",
+             (unsigned long)length, addr, (unsigned long)offset);
+    block_sys_t *block = malloc (sizeof (*block));
+    if (block == NULL)
+    {
+        munmap (addr, length);
+        return NULL;
+    }
+
+    block_Init (&block->self, ((uint8_t *)addr) + align, length - align);
+    block->self.pf_release = mmapRelease;
+    block->base_addr = addr;
+    block->length = length;
+    //vlc_object_yield (block->owner = VLC_OBJECT (p_access));
+
+    return &block->self;
+}
+#endif
 
 /*****************************************************************************
  * Seek: seek to a specific location in a file
