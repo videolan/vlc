@@ -33,8 +33,8 @@
 /* private */
 struct block_sys_t
 {
-    uint8_t     *p_allocated_buffer;
     size_t      i_allocated_buffer;
+    uint8_t     p_allocated_buffer[0];
 };
 
 #define BLOCK_PADDING_SIZE 32
@@ -58,8 +58,6 @@ block_t *__block_New( vlc_object_t *p_obj, size_t i_size )
     /* Fill opaque data */
     p_sys = (block_sys_t*)( (uint8_t*)p_block + sizeof( block_t ) );
     p_sys->i_allocated_buffer = i_alloc;
-    p_sys->p_allocated_buffer = (uint8_t*)p_block + sizeof( block_t ) +
-        sizeof( block_sys_t );
 
     /* Fill all fields */
     p_block->p_next         = NULL;
