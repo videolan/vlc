@@ -70,7 +70,7 @@ private:
     float f_step;
     void changeValue( int x );
     QPixmap pixGradient;
-    QPixmap pixLimit;
+    QPixmap pixOutside;
 };
 
 #endif

@@ -26,8 +26,9 @@
 
 #include <QPaintEvent>
 #include <QPainter>
-
+#include <QBitmap>
 #include <QStyle>
+
 InputSlider::InputSlider( QWidget *_parent ) : DirectSlider( _parent )
 {
     InputSlider::InputSlider( Qt::Horizontal, _parent );
@@ -75,22 +76,26 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
 }
 
 #define WLENGTH   100 // px
-#define WHEIGHT   25  // px
+#define WHEIGHT   28  // px
 #define SOUNDMIN  0   // %
 #define SOUNDMAX  200 // % OR 400 ?
 
 SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
                         : QAbstractSlider( _parent )
 {
-    padding = 5;
+    padding = 3;
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
     setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
 
-    pixGradient = QPixmap( QSize( WLENGTH, WHEIGHT ) );
-//    QBixmap mask = QBitmap( QPixmap );
+    pixOutside = QPixmap( ":/pixmaps/volume-slider-outside.png" );
+
+    const QPixmap temp( ":/pixmaps/volume-slider-inside.png" );
+    const QBitmap mask( temp.createHeuristicMask() );
+
+    pixGradient = QPixmap( mask.size() );
 
     QPainter p( &pixGradient );
-    QLinearGradient gradient( 0, 0, WLENGTH, 0 );
+    QLinearGradient gradient( 0, padding, WLENGTH + 2 * padding, padding );
     gradient.setColorAt( 0.0, Qt::white );
     gradient.setColorAt( 0.2, QColor( 20, 226, 20 ) );
     gradient.setColorAt( 0.5, QColor( 255, 176, 15 ) );
@@ -98,15 +103,10 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
     p.setPen( Qt::NoPen );
     p.setBrush( gradient );
 
-//static const QPointF points[3] = { QPointF( 0.0, WHEIGHT ),
-  //        QPointF( WLENGTH, WHEIGHT ),  QPointF( WLENGTH, 0.0 ) };
-
- //   p.drawConvexPolygon( points, 3 );
-
     p.drawRect( pixGradient.rect() );
     p.end();
 
- //   pixGradient.setMask( mask );
+   pixGradient.setMask( mask );
 }
 
 void SoundSlider::wheelEvent( QWheelEvent *event )
@@ -147,7 +147,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     if( b_sliding )
     {
         QRect rect( padding - 15,     padding - 1,
-                    WLENGTH + 15 * 2, WHEIGHT + 2 );
+                    WLENGTH + 15 * 2, WHEIGHT + 4 );
         if( !rect.contains( event->pos() ) )
         { /* We are outside */
             if ( !b_outside )
@@ -175,21 +175,12 @@ void SoundSlider::paintEvent(QPaintEvent *e)
 {
     QPainter painter( this );
     const int offset = int( double( ( width() - 2 * padding ) * value() ) / maximum() );
-    const QRectF boundsG( padding, 0, offset , pixGradient.height() );
+    const QRectF boundsG( padding, padding, offset , pixGradient.height() );
     painter.drawPixmap( boundsG, pixGradient, boundsG );
 
+    const QRectF boundsO( 0, 0, pixOutside.width(), pixOutside.height() );
+    painter.drawPixmap( boundsO, pixOutside, boundsO );
+
     painter.end();
-/*    QPainter painter( this );
-    printf( "%i\n", value() );
-
-    QLinearGradient gradient( 0.0, 0.0, WLENGTH, WHEIGHT );
-    gradient.setColorAt( 0.0, Qt::white );
-    gradient.setColorAt( 1.0, Qt::blue );
-
-    painter.setPen( QPen( QBrush( Qt::black ), 0, Qt::SolidLine, Qt::RoundCap ) );
-    painter.setBrush( gradient );
-    painter.setRenderHint( QPainter::Antialiasing );
-
-    painter.end();*/
 }
 

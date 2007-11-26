@@ -60,5 +60,7 @@
   <file>pixmaps/volume-high.png</file>
   <file>pixmaps/volume-low.png</file>
   <file>pixmaps/volume-muted.png</file>
+  <file>pixmaps/volume-slider-inside.png</file>
+  <file>pixmaps/volume-slider-outside.png</file>
  </qresource>
 </RCC>

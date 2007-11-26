@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/home/jb/qt4/pixmaps"
+   sodipodi:docname="volume-slider.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="106.87195"
+     inkscape:cy="320.89619"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="872"
+     inkscape:window-height="625"
+     inkscape:window-x="0"
+     inkscape:window-y="36" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.65841436px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
+       d="M 61.298632,747.87419 C 63.795859,749.12213 81.883538,750.23841 106.98714,749.75013 C 132.09075,749.26185 156.24053,749.62667 158.08578,747.22095 C 159.44576,745.4479 160.32608,727.31021 157.69485,725.62013 C 151.96332,721.93866 120.60673,732.80257 108.78734,735.75216 C 90.729054,740.25869 68.425988,743.27519 61.863585,743.91032 C 58.528343,744.54544 58.801405,746.62625 61.298632,747.87419 z "
+       id="path2168"
+       sodipodi:nodetypes="csssscz"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:export-filename="/home/jb/qt4/pixmaps/volume-slider-outside.png" />
+  </g>
+</svg>

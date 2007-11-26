@@ -524,7 +524,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
     volumeSlider->setMinimumSize( QSize( 80, 20 ) );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
-    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2, Qt::AlignBottom );
+    controlLayout->addWidget( volumeSlider, 2, 16, 2 , 2, Qt::AlignBottom );
 
     /* Set the volume from the config */
     volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
