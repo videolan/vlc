@@ -287,6 +287,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 MainInterface::~MainInterface()
 {
+    if( playlistWidget ) playlistWidget->saveSettings( settings );
+
+    settings->beginGroup( "MainWindow" );
+    settings->setValue( "playlist-floats", dockPL->isFloating() );
+    settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
+    settings->setValue( "pos", pos() );
+
+    settings->endGroup();
+    delete settings;
+
     /* Unregister callback for the intf-popupmenu variable */
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -296,13 +306,7 @@ MainInterface::~MainInterface()
         var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
-    settings->beginGroup( "MainWindow" );
-    settings->setValue( "playlist-floats", dockPL->isFloating() );
-    settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
-    settings->setValue( "pos", pos() );
-    playlistWidget->saveSettings( settings );
-    settings->endGroup();
-    delete settings;
+    
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
