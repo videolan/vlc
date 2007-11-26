@@ -6049,7 +6049,7 @@ AC_DEFINE_UNQUOTED(VLC_COMPILE_DOMAIN, "`dnsdomainname 2>/dev/null || domainname
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler]) 
 
 dnl New definitions with value matching 0.9.0 release
-module_symbol="0_9_0b"
+module_symbol="0_9_0c"
 AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${module_symbol}", [String suffix for module functions])
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, $module_symbol, [Symbol suffix for module functions])
 VLC_ENTRY="vlc_entry__${module_symbol}"
