@@ -1365,11 +1365,8 @@ void update_download_for_real( download_thread_t *p_this )
                 if( !p_this->src.psz_md5 || !psz_md5 ||
                     strncmp( psz_md5, p_this->src.psz_md5, 32 ) )
                 {
-                    msg_Err( p_this, 
-    _("%s has an incorrect checksum, download failed or mirror is compromised.\n
-    Please run an antivirus on %s, and report if that file is trojaned.\n
-    If not, please try later."),
-    p_this->src.psz_description );
+                    msg_Err( p_this, _("%s has an incorrect checksum, download failed or mirror is compromised.\n Please run an antivirus on %s, and report if that file is trojaned.\n If not, please try later."),
+                    p_this->src.psz_description );
                 }
                 free( psz_md5 );
             }
