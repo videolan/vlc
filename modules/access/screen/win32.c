@@ -157,6 +157,7 @@ int screen_CloseCapture( demux_t *p_demux )
 
 struct block_sys_t
 {
+    block_t self;
     HBITMAP hbmp;
 };
 
@@ -170,7 +171,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data = p_sys->p_data;
-    block_t *p_block;
+    block_sys_t *p_block;
     void *p_buffer;
     int i_buffer;
     HBITMAP hbmp;
@@ -204,17 +205,16 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         DeleteObject( hbmp );
         return NULL;
     }
-    memset( p_block, 0, sizeof( block_t ) );
-    p_block->p_sys = (block_sys_t *)( (uint8_t *)p_block + sizeof( block_t ) );
+    memset( &p_block->self, 0, sizeof( block_t->self ) );
 
     /* Fill all fields */
     i_buffer = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 *
         p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
-    p_block->p_next         = NULL;
-    p_block->i_buffer       = i_buffer;
-    p_block->p_buffer       = p_buffer;
-    p_block->pf_release     = CaptureBlockRelease;
-    p_block->p_sys->hbmp    = hbmp;
+    p_block->self.p_next     = NULL;
+    p_block->self.i_buffer   = i_buffer;
+    p_block->self.p_buffer   = p_buffer;
+    p_block->self.pf_release = CaptureBlockRelease;
+    p_block->hbmp            = hbmp;
 
     return p_block;
 }

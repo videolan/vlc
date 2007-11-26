@@ -33,6 +33,7 @@
 /* private */
 struct block_sys_t
 {
+    block_t     self;
     size_t      i_allocated_buffer;
     uint8_t     p_allocated_buffer[0];
 };
@@ -47,40 +48,35 @@ block_t *__block_New( vlc_object_t *p_obj, size_t i_size )
      * 16 -> align on 16
      * 2 * BLOCK_PADDING_SIZE -> pre + post padding
      */
-    block_sys_t *p_sys;
     const size_t i_alloc = i_size + 2 * BLOCK_PADDING_SIZE + 16;
-    block_t *p_block =
-        malloc( sizeof( block_t ) + sizeof( block_sys_t ) + i_alloc );
+    block_sys_t *p_sys = malloc( sizeof( *p_sys ) + i_alloc );
 
-    if( p_block == NULL )
+    if( p_sys == NULL )
         return NULL;
 
     /* Fill opaque data */
-    p_sys = (block_sys_t*)( (uint8_t*)p_block + sizeof( block_t ) );
     p_sys->i_allocated_buffer = i_alloc;
 
     /* Fill all fields */
-    p_block->p_next         = NULL;
-    p_block->p_prev         = NULL;
-    p_block->i_flags        = 0;
-    p_block->i_pts          = 0;
-    p_block->i_dts          = 0;
-    p_block->i_length       = 0;
-    p_block->i_rate         = 0;
-    p_block->i_buffer       = i_size;
-    p_block->p_buffer       =
+    p_sys->self.p_next      = NULL;
+    p_sys->self.p_prev      = NULL;
+    p_sys->self.i_flags     = 0;
+    p_sys->self.i_pts       = 0;
+    p_sys->self.i_dts       = 0;
+    p_sys->self.i_length    = 0;
+    p_sys->self.i_rate      = 0;
+    p_sys->self.i_buffer    = i_size;
+    p_sys->self.p_buffer    =
         &p_sys->p_allocated_buffer[BLOCK_PADDING_SIZE +
             16 - ((uintptr_t)p_sys->p_allocated_buffer % 16 )];
-    p_block->pf_release     = BlockRelease;
+    p_sys->self.pf_release     = BlockRelease;
 
-    /* Is ok, as no comunication between p_vlc */
-    p_block->p_sys          = p_sys;
-
-    return p_block;
+    return &p_sys->self;
 }
 
 block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 {
+    block_sys_t *p_sys = (block_sys_t *)p_block;
     ssize_t i_buffer_size;
 
     if( p_block->pf_release != BlockRelease )
@@ -103,16 +99,16 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         return NULL;
     }
 
-    if( p_block->p_buffer - i_prebody > p_block->p_sys->p_allocated_buffer &&
-        p_block->p_buffer - i_prebody < p_block->p_sys->p_allocated_buffer +
-        p_block->p_sys->i_allocated_buffer )
+    if( p_block->p_buffer - i_prebody > p_sys->p_allocated_buffer &&
+        p_block->p_buffer - i_prebody < p_sys->p_allocated_buffer +
+        p_sys->i_allocated_buffer )
     {
         p_block->p_buffer -= i_prebody;
         p_block->i_buffer += i_prebody;
         i_prebody = 0;
     }
-    if( p_block->p_buffer + i_body < p_block->p_sys->p_allocated_buffer +
-        p_block->p_sys->i_allocated_buffer )
+    if( p_block->p_buffer + i_body < p_sys->p_allocated_buffer +
+        p_sys->i_allocated_buffer )
     {
         p_block->i_buffer = i_buffer_size;
         i_body = 0;

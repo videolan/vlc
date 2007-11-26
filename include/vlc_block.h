@@ -99,11 +99,6 @@ struct block_t
      * Don't mess with it now, if you need it the ask on ML
      */
     void        (*pf_release)   ( block_t * );
-
-    /* Following fields are private, user should never touch it */
-    /* XXX never touch that OK !!! the first that access that will
-     * have Subversion account removed ;) XXX */
-    block_sys_t *p_sys;
 };
 
 /****************************************************************************
