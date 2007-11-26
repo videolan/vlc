@@ -1264,6 +1264,11 @@ static int audio_BitsPerSample( vlc_fourcc_t i_format )
     return 0;
 }
 
+static block_t *transcode_audio_alloc (filter_t *filter, int size)
+{
+    return block_New (filter, size);
+}
+
 static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
                                              sout_stream_id_t *id,
                                              es_format_t *p_fmt_in,
@@ -1274,7 +1279,7 @@ static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
     filter_t *p_filter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
 
     vlc_object_attach( p_filter, p_stream );
-    p_filter->pf_audio_buffer_new = (block_t* (*) (filter_t*, int))__block_New;
+    p_filter->pf_audio_buffer_new = transcode_audio_alloc;
 
     p_filter->fmt_in = *p_fmt_in;
     p_filter->fmt_out = *p_fmt_out;
