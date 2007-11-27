@@ -343,7 +343,6 @@ static void mmapRelease (block_t *block)
 {
     block_sys_t *p_sys = (block_sys_t *)block;
 
-    fprintf (stderr, "munmap (%p, %u)\n", p_sys->base_addr, MMAP_SIZE);
     munmap (p_sys->base_addr, p_sys->length);
     //vlc_object_release (p_sys->owner);
     free (p_sys);
@@ -360,30 +359,34 @@ static block_t *mmapBlock (access_t *p_access)
     size_t length = (MMAP_SIZE > pagesize) ? MMAP_SIZE : pagesize;
     void *addr;
 
-    /* File grown while being played? */
-    if (offset + length >= p_access->info.i_size)
+    if (p_access->info.i_pos >= p_access->info.i_size)
     {
+        /* End of file - check that file size hasn't change... */
         struct stat st;
 
         if ((fstat (p_sys->fd, &st) == 0)
-         && (st.st_size > p_access->info.i_size))
+         && (st.st_size != p_access->info.i_size))
         {
             p_access->info.i_size = st.st_size;
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
-    }
 
-    /* Really at end of file? */
-    if (offset >= p_access->info.i_size)
-    {
-        p_access->info.b_eof = VLC_TRUE;
-        msg_Dbg (p_access, "at end of memory mapped file");
-        return NULL;
+        /* Really at end of file then */
+        if (p_access->info.i_pos >= p_access->info.i_size)
+        {
+            p_access->info.b_eof = VLC_TRUE;
+            msg_Dbg (p_access, "at end of memory mapped file");
+            return NULL;
+        }
     }
 
     if (offset + length > p_access->info.i_size)
+        /* Don't mmap paste end of file */
         length = p_access->info.i_size - offset;
 
+    assert (offset <= p_access->info.i_pos);               /* and */
+    assert (p_access->info.i_pos < p_access->info.i_size); /* imply */
+    assert (offset < p_access->info.i_size);               /* imply */
     assert (length > 0);
 
     addr = mmap (NULL, length, PROT_READ, flags, p_sys->fd, offset);
@@ -394,7 +397,7 @@ static block_t *mmapBlock (access_t *p_access)
         return NULL;
     }
 
-    p_access->info.i_pos += length;
+    p_access->info.i_pos = offset + length;
 
     msg_Dbg (p_access, "mapped %lu bytes at %p from offset %lu",
              (unsigned long)length, addr, (unsigned long)offset);
