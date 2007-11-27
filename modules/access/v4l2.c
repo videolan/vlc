@@ -1320,8 +1320,11 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     frmival.height = p_sys->i_height;
     if( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
     {
+        char psz_fourcc[5];
+        memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
+        vlc_fourcc_to_char( p_sys->i_fourcc, &psz_fourcc );
         msg_Dbg( p_demux, "supported frame intervals for %4s, %dx%d:",
-                 (const char *)&p_sys->i_fourcc, frmival.width, frmival.height );
+                 (const char *)&psz_fourcc, frmival.width, frmival.height );
         switch( frmival.type )
         {
             case V4L2_FRMIVAL_TYPE_DISCRETE:
@@ -1348,9 +1351,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
                          frmival.stepwise.min.numerator,
                          frmival.stepwise.min.denominator,
                          frmival.stepwise.max.numerator,
-                         frmival.stepwise.max.denominator,
-                         frmival.stepwise.step.numerator,
-                         frmival.stepwise.step.denominator );
+                         frmival.stepwise.max.denominator );
                 break;
         }
     }
