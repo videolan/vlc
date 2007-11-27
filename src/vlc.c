@@ -31,6 +31,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#ifdef __GLIBC__
+#include <dlfcn.h>
+#endif
 
 
 /* Explicit HACK */
@@ -63,6 +66,19 @@ int main( int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
 
+#   ifdef __GLIBC__
+    if (dlsym (RTLD_NEXT, "sync_file_range"))
+    {
+        /* Way too many Linux users have glibc 2.6 that keeps crashing
+         * inside its non-thread-safe dcgettext(). */
+        fprintf (stderr,
+"***************************************************\n"
+"*** glibc version with broken libintl detected. ***\n"
+"*** Messages localization will be disabled.     ***\n"
+"***************************************************\n");
+        setenv ("LC_MESSAGES", "C", 1);
+    }
+#   endif
     setlocale (LC_ALL, "");
 
 #ifndef __APPLE__
