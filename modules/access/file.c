@@ -200,11 +200,23 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_seekable = VLC_FALSE;
 
 # ifdef HAVE_MMAP
-    if (p_sys->b_pace_control && S_ISREG (st.st_mode))
+    /* Autodetect mmap() support */
+    if (p_sys->b_pace_control && S_ISREG (st.st_mode) && (st.st_size > 0))
     {
-        p_access->pf_read = NULL;
-        p_access->pf_block = mmapBlock;
+        void *addr = mmap (NULL, 1, PROT_READ, MAP_PRIVATE, fd, 0);
+        if (addr != MAP_FAILED)
+        {
+            /* Does the file system needs to support mmap? */
+            munmap (addr, 1);
+            p_access->pf_read = NULL;
+            p_access->pf_block = mmapBlock;
+            msg_Dbg (p_this, "mmap enabled");
+        }
+        else
+            msg_Dbg (p_this, "mmap disabled (%m)");
     }
+    else
+        msg_Dbg (p_this, "mmap disabled (non regular file)");
 # endif
 #else
     p_sys->b_seekable = !b_stdin;
@@ -389,7 +401,9 @@ static block_t *mmapBlock (access_t *p_access)
     addr = mmap (NULL, length, PROT_READ, flags, p_sys->fd, offset);
     if (addr == MAP_FAILED)
     {
-        msg_Err (p_access, "memory mapping failed: %m");
+        msg_Err (p_access, "memory mapping failed (%m)");
+        intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
+                        _("VLC could not read the file."));
         msleep( INPUT_ERROR_SLEEP );
         return NULL;
     }
