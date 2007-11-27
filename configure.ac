@@ -5358,6 +5358,7 @@ AC_ARG_ENABLE(ncurses,
       [AC_CHECK_LIB(ncursesw, mvprintw,
         [VLC_ADD_PLUGINS([ncurses])
         VLC_ADD_LIBS([ncurses],[-lncursesw])
+        ALIASES="${ALIASES} nvlc"
         AC_DEFINE([HAVE_NCURSESW], 1, [Define to 1 if you have libncursesw.])
         ],
         [AC_CHECK_LIB( ncurses, mvprintw,
