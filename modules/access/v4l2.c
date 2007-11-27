@@ -87,6 +87,18 @@ static void Close( vlc_object_t * );
 #define HEIGHT_TEXT N_( "Height" )
 #define HEIGHT_LONGTEXT N_( \
     "Force height (-1 for autodetect)." )
+#define BRIGHTNESS_TEXT N_( "Brightness" )
+#define BRIGHTNESS_LONGTEXT N_( \
+    "Brightness of the video input." )
+#define CONTRAST_TEXT N_( "Contrast" )
+#define CONTRAST_LONGTEXT N_( \
+    "Contrast of the video input." )
+#define SATURATION_TEXT N_( "Saturation" )
+#define SATURATION_LONGTEXT N_( \
+    "Saturation of the video input." )
+#define HUE_TEXT N_( "Hue" )
+#define HUE_LONGTEXT N_( \
+    "Hue of the video input." )
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(-1 for autodetect)." )
@@ -141,6 +153,14 @@ vlc_module_begin();
                 WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "v4l2-height", 0, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l2-brightness", -1, NULL, BRIGHTNESS_TEXT,
+                BRIGHTNESS_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l2-contrast", -1, NULL, CONTRAST_TEXT,
+                CONTRAST_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l2-saturation", -1, NULL, SATURATION_TEXT,
+                SATURATION_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l2-hue", -1, NULL, HUE_TEXT,
+                HUE_LONGTEXT, VLC_TRUE );
     add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
     add_bool( "v4l2-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 VLC_TRUE );
@@ -250,6 +270,11 @@ struct demux_sys_t
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
 
+    int i_brightness;
+    int i_contrast;
+    int i_saturation;
+    int i_hue;
+
     picture_t pic;
     int i_video_frame_size;
 
@@ -301,6 +326,11 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_width = var_CreateGetInteger( p_demux, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_demux, "v4l2-height" );
+
+    p_sys->i_brightness = var_CreateGetInteger( p_demux, "v4l2-brightness" );
+    p_sys->i_contrast = var_CreateGetInteger( p_demux, "v4l2-contrast" );
+    p_sys->i_saturation = var_CreateGetInteger( p_demux, "v4l2-saturation" );
+    p_sys->i_hue = var_CreateGetInteger( p_demux, "v4l2-hue" );
 
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
@@ -552,6 +582,34 @@ static void ParseMRL( demux_t *p_demux )
             {
                 p_sys->i_height =
                     strtol( psz_parser + strlen( "height=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "brightness=",
+                               strlen( "brightness=" ) ) )
+            {
+                p_sys->i_brightness =
+                    strtol( psz_parser + strlen( "brightness=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "contrast=",
+                               strlen( "contrast=" ) ) )
+            {
+                p_sys->i_contrast =
+                    strtol( psz_parser + strlen( "contrast=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "saturation=",
+                               strlen( "saturation=" ) ) )
+            {
+                p_sys->i_saturation =
+                    strtol( psz_parser + strlen( "saturation=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "hue=",
+                               strlen( "hue=" ) ) )
+            {
+                p_sys->i_hue =
+                    strtol( psz_parser + strlen( "hue=" ),
                             &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "samplerate=",
@@ -1356,6 +1414,77 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         }
     }
 #endif
+
+    /* Set picture controls... */
+    struct v4l2_control control;
+
+    /* brightness */
+    memset( &control, 0, sizeof( control ) );
+    control.id = V4L2_CID_BRIGHTNESS;
+    if( p_sys->i_brightness >= 0 )
+    {
+        control.value = p_sys->i_brightness;
+        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+        {
+            msg_Err( p_demux, "unable to set brightness to %d (%m)", p_sys->i_brightness );
+            goto open_failed;
+        }
+    }
+    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+    {
+        msg_Dbg( p_demux, "video brightness: %d", control.value );
+    }
+
+    /* contrast */
+    memset( &control, 0, sizeof( control ) );
+    control.id = V4L2_CID_CONTRAST;
+    if( p_sys->i_contrast >= 0 )
+    {
+        control.value = p_sys->i_contrast;
+        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+        {
+            msg_Err( p_demux, "unable to set contrast to %d (%m)", p_sys->i_contrast );
+            goto open_failed;
+        }
+    }
+    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+    {
+        msg_Dbg( p_demux, "video contrast: %d", control.value );
+    }
+
+    /* saturation */
+    memset( &control, 0, sizeof( control ) );
+    control.id = V4L2_CID_SATURATION;
+    if( p_sys->i_saturation >= 0 )
+    {
+        control.value = p_sys->i_saturation;
+        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+        {
+            msg_Err( p_demux, "unable to set saturation to %d (%m)", p_sys->i_saturation );
+            goto open_failed;
+        }
+    }
+    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+    {
+        msg_Dbg( p_demux, "video saturation: %d", control.value );
+    }
+
+    /* hue */
+    memset( &control, 0, sizeof( control ) );
+    control.id = V4L2_CID_HUE;
+    if( p_sys->i_hue >= 0 )
+    {
+        control.value = p_sys->i_hue;
+        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+        {
+            msg_Err( p_demux, "unable to set hue to %d (%m)", p_sys->i_hue );
+            goto open_failed;
+        }
+    }
+    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+    {
+        msg_Dbg( p_demux, "video hue: %d", control.value );
+    }
 
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
