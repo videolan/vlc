@@ -1320,11 +1320,11 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     frmival.height = p_sys->i_height;
     if( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
     {
-        char psz_fourcc[5];
-        memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
-        vlc_fourcc_to_char( p_sys->i_fourcc, &psz_fourcc );
+        char sz_fourcc[5];
+        memset( &sz_fourcc, 0, sizeof( sz_fourcc ) );
+        vlc_fourcc_to_char( p_sys->i_fourcc, &sz_fourcc );
         msg_Dbg( p_demux, "supported frame intervals for %4s, %dx%d:",
-                 (const char *)&psz_fourcc, frmival.width, frmival.height );
+                 sz_fourcc, frmival.width, frmival.height );
         switch( frmival.type )
         {
             case V4L2_FRMIVAL_TYPE_DISCRETE:
@@ -1771,11 +1771,11 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                 {
                     b_codec_supported = VLC_TRUE;
 
-                    char psz_fourcc[5];
-                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
-                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc, &psz_fourcc );
+                    char sz_fourcc[5];
+                    memset( &sz_fourcc, 0, sizeof( sz_fourcc ) );
+                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc, &sz_fourcc );
                     msg_Dbg( p_demux, "device supports chroma %4s [%s]",
-                                psz_fourcc,
+                                sz_fourcc,
                                 p_sys->p_codecs[i_index].description );
 
 #ifdef VIDIOC_ENUM_FRAMESIZES
