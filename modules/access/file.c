@@ -394,7 +394,7 @@ static block_t *mmapBlock (access_t *p_access)
         return NULL;
     }
 
-    p_access->info.i_pos = offset + length;
+    p_access->info.i_pos += length;
 
     msg_Dbg (p_access, "mapped %lu bytes at %p from offset %lu",
              (unsigned long)length, addr, (unsigned long)offset);
