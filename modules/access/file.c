@@ -206,7 +206,7 @@ static int Open( vlc_object_t *p_this )
         void *addr = mmap (NULL, 1, PROT_READ, MAP_PRIVATE, fd, 0);
         if (addr != MAP_FAILED)
         {
-            /* Does the file system needs to support mmap? */
+            /* Does the file system support mmap? */
             munmap (addr, 1);
             p_access->pf_read = NULL;
             p_access->pf_block = mmapBlock;
