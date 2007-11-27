@@ -165,6 +165,8 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    vlc_thread_ready( p_intf );
+
 #ifdef HAVE_DBUS
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
