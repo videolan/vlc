@@ -327,9 +327,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
 #ifdef HAVE_MMAP
 # define MMAP_SIZE (1 << 18)
-# ifndef MAP_POPULATE
-#  define MAP_POPULATE 0
-# endif
 
 struct block_sys_t
 {
@@ -352,7 +349,7 @@ static block_t *mmapBlock (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    const int flags = MAP_SHARED | MAP_POPULATE;
+    const int flags = MAP_SHARED;
     const size_t pagesize = sysconf (_SC_PAGE_SIZE);
     off_t offset = p_access->info.i_pos & ~(pagesize - 1);
     size_t align = p_access->info.i_pos & (pagesize - 1);
