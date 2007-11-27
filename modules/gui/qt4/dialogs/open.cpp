@@ -211,7 +211,7 @@ void OpenDialog::toggleAdvancedPanel()
 /* If Cancel is pressed or escaped */
 void OpenDialog::cancel()
 {
-    for( int i = 0; i <= OPEN_TAB_MAX; i++ )
+    for( int i = 0; i < OPEN_TAB_MAX; i++ )
         dynamic_cast<OpenPanel*>(ui.Tab->widget( i ))->clear();
     toggleVisible();
     if( isModal() ) reject();
