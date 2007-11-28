@@ -87,7 +87,7 @@
 
 /* DVD and VCD devices */
 #if !defined( WIN32 ) && !defined( UNDER_CE )
-#   define CD_DEVICE      "dev/cdrom"
+#   define CD_DEVICE      "/dev/cdrom"
 #   define DVD_DEVICE     "/dev/dvd"
 #else
 #   define CD_DEVICE      "D:"
