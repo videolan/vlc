@@ -214,7 +214,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Announce who we are - Do it only for first instance ? */
     msg_Dbg( p_libvlc, COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
-    msg_Info( p_libvlc, "Running vlc with the default interface. Use 'cvlc' to use vlc without interface.");
+    if( strcmp( p_libvlc->psz_object_name, "cvlc" ) ) /* Not running with cvlc */
+        msg_Info( p_libvlc, "Running vlc with the default interface. Use 'cvlc' to use vlc without interface.");
 
     /* Initialize mutexes */
     vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
