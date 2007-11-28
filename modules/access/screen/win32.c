@@ -163,7 +163,7 @@ struct block_sys_t
 
 static void CaptureBlockRelease( block_t *p_block )
 {
-    DeleteObject( p_block->p_sys->hbmp );
+    DeleteObject( ((block_sys_t *)p_block)->hbmp );
     free( p_block );
 }
 
@@ -212,7 +212,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     p_block->self.pf_release = CaptureBlockRelease;
     p_block->hbmp            = hbmp;
 
-    return p_block;
+    return &p_block->self;
 }
 
 block_t *screen_Capture( demux_t *p_demux )
