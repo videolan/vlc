@@ -91,7 +91,7 @@
 #   define DVD_DEVICE     "/dev/dvd"
 #else
 #   define CD_DEVICE      "D:"
-#   define DVD_DEVICE     CD_DEVICE
+#   define DVD_DEVICE     NULL
 #endif
 #define VCD_DEVICE        CD_DEVICE
 #define CDAUDIO_DEVICE    CD_DEVICE
