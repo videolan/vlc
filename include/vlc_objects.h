@@ -153,23 +153,6 @@ VLC_EXPORT( vlc_bool_t, __vlc_object_wait, ( vlc_object_t * ) );
 #define vlc_object_wait( obj ) \
     __vlc_object_wait( VLC_OBJECT( obj ) )
 
-/* NOTE: this function is a *temporary* convenience.
- * See the vlc_object_alive() documentation for a better alternative.
- */
-static inline
-vlc_bool_t __vlc_object_lock_and_wait( vlc_object_t *obj )
-{
-    vlc_bool_t b = VLC_TRUE;
-
-    vlc_object_lock( obj );
-    if( vlc_object_alive( obj ) )
-        b = vlc_object_wait( obj );
-    vlc_object_unlock( obj );
-    return b;
-}
-#define vlc_object_lock_and_wait( obj ) \
-    __vlc_object_lock_and_wait( VLC_OBJECT(obj) )
-
 VLC_EXPORT( int, __vlc_object_timedwait, ( vlc_object_t *, mtime_t ) );
 #define vlc_object_timedwait( obj, d ) \
     __vlc_object_timedwait( VLC_OBJECT( obj ), d )
@@ -196,3 +179,22 @@ VLC_EXPORT( vlc_bool_t, __vlc_object_alive, ( vlc_object_t * ) );
     __vlc_object_alive( VLC_OBJECT(a) )
 
 int vlc_object_waitpipe( vlc_object_t *obj );
+
+/* NOTE: this function is a *temporary* convenience.
+ * See the vlc_object_alive() documentation for a better alternative.
+ */
+static inline
+vlc_bool_t __vlc_object_lock_and_wait( vlc_object_t *obj )
+{
+    vlc_bool_t b = VLC_TRUE;
+
+    vlc_object_lock( obj );
+    if( vlc_object_alive( obj ) )
+        b = vlc_object_wait( obj );
+    vlc_object_unlock( obj );
+    return b;
+}
+#define vlc_object_lock_and_wait( obj ) \
+    __vlc_object_lock_and_wait( VLC_OBJECT(obj) )
+
+
