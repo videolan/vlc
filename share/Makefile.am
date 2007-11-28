@@ -35,14 +35,14 @@ DIST_rsrc = \
 	vlc_win32_rc.rc
 
 DIST_pda = \
-        pda-forwardb16x16.xpm \
-        pda-openb16x16.xpm \
-        pda-pauseb16x16.xpm \
-        pda-playb16x16.xpm \
-        pda-playlistb16x16.xpm \
-        pda-preferencesb16x16.xpm \
-        pda-rewindb16x16.xpm \
-        pda-stopb16x16.xpm
+	pda-forwardb16x16.xpm \
+	pda-openb16x16.xpm \
+	pda-pauseb16x16.xpm \
+	pda-playb16x16.xpm \
+	pda-playlistb16x16.xpm \
+	pda-preferencesb16x16.xpm \
+	pda-rewindb16x16.xpm \
+	pda-stopb16x16.xpm
 
 DIST_icons16 = vlc16x16.png vlc16x16.xpm
 
@@ -60,34 +60,34 @@ DIST_skins2 = \
 	skins2/winamp2.xml
 
 skins2_default_vlt_FILES = \
-        skins2/default/main/pause_over.png \
-        skins2/default/main/main_up.png \
-        skins2/default/main/timeslider.png \
-        skins2/default/main/main_down.png \
-        skins2/default/main/main.png \
-        skins2/default/main/dvd_prevtitle.png \
-        skins2/default/main/dvd_nexttitle.png \
-        skins2/default/main/dvd_nextchapter.png \
-        skins2/default/main/pause_up.png \
-        skins2/default/main/main_over.png \
-        skins2/default/main/pause_down.png \
-        skins2/default/main/dvd_prevchapter.png \
-        skins2/default/main/vol_bg.png \
-        skins2/default/main/vol_mask.png \
-        skins2/default/main/vol_slider.png \
-        skins2/default/main/dvd_menu.png \
-        skins2/default/switch.png \
-        skins2/default/font.otf \
-        skins2/default/credits.png \
-        skins2/default/theme.xml \
-        skins2/default/playlist/plscroller.png \
-        skins2/default/playlist/playlist_down.png \
-        skins2/default/playlist/playtreeglyphs.png \
-        skins2/default/playlist/playlist_up.png \
-        skins2/default/playlist/playlist_over.png \
-        skins2/default/playlist/playlist.png \
-        skins2/default/minimal.png \
-        skins2/default/equalizer.png
+	skins2/default/main/pause_over.png \
+	skins2/default/main/main_up.png \
+	skins2/default/main/timeslider.png \
+	skins2/default/main/main_down.png \
+	skins2/default/main/main.png \
+	skins2/default/main/dvd_prevtitle.png \
+	skins2/default/main/dvd_nexttitle.png \
+	skins2/default/main/dvd_nextchapter.png \
+	skins2/default/main/pause_up.png \
+	skins2/default/main/main_over.png \
+	skins2/default/main/pause_down.png \
+	skins2/default/main/dvd_prevchapter.png \
+	skins2/default/main/vol_bg.png \
+	skins2/default/main/vol_mask.png \
+	skins2/default/main/vol_slider.png \
+	skins2/default/main/dvd_menu.png \
+	skins2/default/switch.png \
+	skins2/default/font.otf \
+	skins2/default/credits.png \
+	skins2/default/theme.xml \
+	skins2/default/playlist/plscroller.png \
+	skins2/default/playlist/playlist_down.png \
+	skins2/default/playlist/playtreeglyphs.png \
+	skins2/default/playlist/playlist_up.png \
+	skins2/default/playlist/playlist_over.png \
+	skins2/default/playlist/playlist.png \
+	skins2/default/minimal.png \
+	skins2/default/equalizer.png
 
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	mkdir -p skins2
@@ -251,6 +251,7 @@ DIST_lua= \
 	luameta/README.txt \
 	luameta/googleimage.lua \
 	luaplaylist/README.txt \
+	luaplaylist/appletrailers.lua \
 	luaplaylist/break.lua \
 	luaplaylist/dailymotion.lua \
 	luaplaylist/joox.lua \
@@ -271,6 +272,7 @@ DIST_lua= \
 
 DIST_http_lua = \
 	http-lua/.hosts \
+	http-lua/custom.lua \
 	http-lua/dialogs/.hosts \
 	http-lua/dialogs/browse \
 	http-lua/dialogs/footer \
@@ -299,6 +301,7 @@ DIST_http_lua = \
 	http-lua/images/prev.png \
 	http-lua/images/refresh.png \
 	http-lua/images/repeat.png \
+	http-lua/images/reset.png \
 	http-lua/images/sd.png \
 	http-lua/images/shuffle.png \
 	http-lua/images/slider_bar.png \

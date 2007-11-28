@@ -176,7 +176,8 @@ EXTRA_DIST += \
 	pixmaps/folder-blue_16px.png \
 	pixmaps/folder-grey_16px.png \
 	pixmaps/go-next.png \
-pixmaps/menus_help_16px.png \
+	pixmaps/harddisk_16px.png \
+	pixmaps/menus_help_16px.png \
 	pixmaps/menus_info_16px.png \
 	pixmaps/menus_messages_16px.png \
 	pixmaps/menus_preferences_16px.png \
@@ -219,4 +220,7 @@ pixmaps/menus_help_16px.png \
 	pixmaps/type_unknown.xpm \
 	pixmaps/volume-high.png \
 	pixmaps/volume-low.png \
-	pixmaps/volume-muted.png 
+	pixmaps/volume-muted.png \
+	pixmaps/volume-slider.svg \
+	pixmaps/volume-slider-inside.png \
+	pixmaps/volume-slider-outside.png
