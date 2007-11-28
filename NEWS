@@ -5,6 +5,8 @@ Changes between 0.8.6 and 0.9.0-svn (not released yet):
 
 Important notes:
 ----------------
+ * On Linux, localization will be disabled if you have glibc 2.6 or 2.7 due
+   to a major bug in libintl with these glibc versions.
  * The HTTP interface is now only available on the local machine by default.
    If you want to make it available from other machines, you will have to
    edit the ".hosts" file.

@@ -67,7 +67,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     int i_ret;
 
 #   ifdef __GLIBC__
-    if (dlsym (RTLD_NEXT, "sync_file_range"))
+    if (dlsym (RTLD_NEXT, "sync_file_range") && !dlsym (RTLD_NEXT, "qsort_r"))
     {
         /* Way too many Linux users have glibc 2.6 that keeps crashing
          * inside its non-thread-safe dcgettext(). */
