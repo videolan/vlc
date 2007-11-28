@@ -87,12 +87,14 @@
 
 /* DVD and VCD devices */
 #if !defined( WIN32 ) && !defined( UNDER_CE )
-#   define VCD_DEVICE "/dev/cdrom"
-#   define CDAUDIO_DEVICE "/dev/cdrom"
+#   define CD_DEVICE      "dev/cdrom"
+#   define DVD_DEVICE     "/dev/dvd"
 #else
-#   define VCD_DEVICE "D:"
-#   define CDAUDIO_DEVICE "D:"
+#   define CD_DEVICE      "D:"
+#   define DVD_DEVICE     CD_DEVICE
 #endif
+#define VCD_DEVICE        CD_DEVICE
+#define CDAUDIO_DEVICE    CD_DEVICE
 
 /*****************************************************************************
  * Audio configuration
