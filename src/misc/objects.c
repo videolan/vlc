@@ -553,6 +553,36 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
 
 
 /**
+ * Checks whether an object has been "killed".
+ * The object lock must be held.
+ *
+ * Typical code for an object thread could be:
+ *
+   vlc_object_lock (self);
+   ...initialization...
+   while (vlc_object_alive (self))
+   {
+       ...preprocessing...
+
+       if (vlc_object_wait (self))
+           continue;
+
+       ...postprocessing...
+   }
+   ...deinitialization...
+   vlc_object_unlock (self);
+ *
+ *
+ * @return true iff the object has not been killed yet
+ */
+vlc_bool_t __vlc_object_alive( vlc_object_t *obj )
+{
+    vlc_assert_locked( &obj->object_lock );
+    return !obj->b_die;
+}
+
+
+/**
  * Signals an object for which the lock is held.
  */
 void __vlc_object_signal_unlocked( vlc_object_t *obj )

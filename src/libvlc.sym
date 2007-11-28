@@ -17,6 +17,7 @@ NTPtime64
 __str_format
 path_sanitize
 __vlc_object_kill
+__vlc_object_alive
 vlc_b64_encode
 __net_Connect
 __net_ConnectDgram
