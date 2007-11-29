@@ -975,10 +975,10 @@ static int Play( demux_t *p_demux )
     p_sys->i_pcr = 0;
 
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
-    /* TODO */
     for( i = 0; i < p_sys->i_track; i++ )
     {
-        p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
+        if( !p_sys->track[i]->b_rtcp_sync )
+            p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
         p_sys->track[i]->i_start_seq = (int)p_sys->track[i]->sub->rtpInfo.seqNum;
         msg_Info( p_demux, "set startseq: %u", p_sys->track[i]->i_start_seq );
     }
@@ -1181,7 +1181,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->rtsp && p_sys->i_npt_length > 0 )
             {
                 int i;
-                time = f * (double)p_sys->i_npt_length / 1000000.0;   /* in second */
+                time = f * (double)p_sys->i_npt_length / (double)1000000.0;   /* in second */
                 if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
                 {
                     msg_Err( p_demux, "PLAY failed %s",
@@ -1194,6 +1194,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 /* Retrieve RTP-Info values */
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
+                    //if( !p_sys->track[i]->b_rtcp_sync )
+                    p_sys->track[i]->b_rtcp_sync = VLC_FALSE;
                     p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
                     p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
                     msg_Info( p_demux, "set pos startseq: %u", p_sys->track[i]->i_start_seq );
@@ -1284,7 +1286,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1195257600)
             for( i = 0; i < p_sys->i_track; i++ )
             {
-                p_sys->track[i]->i_pts = (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
+                if( !p_sys->track[i]->b_rtcp_sync )
+                    p_sys->track[i]->i_pts = 0; // (int64_t) ( p_sys->track[i]->sub->rtpInfo.timestamp * (double)1000000.0 );
                 p_sys->track[i]->i_start_seq = p_sys->track[i]->sub->rtpInfo.seqNum;
                 msg_Info( p_demux, "set pause startseq: %u", p_sys->track[i]->i_start_seq );
             }
