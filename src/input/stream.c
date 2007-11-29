@@ -871,7 +871,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
         /* Refill a block */
         if( AStreamRefillBlock( s ) )
         {
-            msg_Err( s, "cannot re fill buffer" );
+            msg_Err( s, "cannot pre fill buffer" );
             return VLC_EGENERIC;
         }
         /* Update stat */
