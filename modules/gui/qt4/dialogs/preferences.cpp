@@ -211,10 +211,12 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
         if( advanced_panel->isVisible() ) advanced_panel->hide();
 
     if( !data->panel )
+    {
         data->panel = new AdvPrefsPanel( p_intf, main_panel , data );
+        main_panel_l->addWidget( data->panel );
+    }
 
     advanced_panel = data->panel;
-    main_panel_l->addWidget( advanced_panel );
     advanced_panel->show();
 }
 
@@ -277,14 +279,21 @@ void PrefsDialog::save()
        and we don't want that.*/
     if( small->isChecked() && advanced_panel )
     {
-        delete advanced_panel;
+        /* Deleting only the active panel from the advanced config doesn't work
+           because the data records of PrefsItemData  contains still a
+           reference to it only cleanAll() is sure to remove all Panels! */
+        advanced_tree->cleanAll();
         advanced_panel = NULL;
     }
     if( all->isChecked() && current_simple_panel  )
     {
         for( int i = 0 ; i< SPrefsMax; i++ )
         {
-            if( simple_panels[i] ) delete simple_panels[i];
+            if( simple_panels[i] )
+            {
+               delete simple_panels[i];
+               simple_panels[i] = NULL;
+            }
         }
         current_simple_panel  = NULL;
     }
