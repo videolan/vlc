@@ -218,6 +218,7 @@ void UpdateDialog::close()
 
 void UpdateDialog::updateOrUpload()
 {
+    if( !p_update ) return;
     if( !b_updated )
     {
         update_Check( p_update, VLC_FALSE );
