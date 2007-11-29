@@ -2347,7 +2347,7 @@ then
 fi
 
 dnl
-dnl  Video4Linux plugin
+dnl  Video4Linux2 plugin
 dnl
 AC_ARG_ENABLE(v4l2,
   [  --enable-v4l2           Video4Linux2 input support (default disabled)])
@@ -2358,6 +2358,19 @@ then
   if test "${with_v4l2}" != "no" -a -n "${with_v4l2}"
   then
     VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
+  fi
+
+  AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_v4l2_alsa="true", have_v4l2_alsa="false"),have_v4l2_alsa="false")
+  if test "${have_v4l2_alsa}" = "true"
+  then
+    CFLAGS="${CFLAGS_save}"
+    AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
+                    #define ALSA_PCM_NEW_SW_PARAMS_API
+                    #include <alsa/asoundlib.h>],
+       [snd_pcm_hw_params_get_period_time(0,0,0);],
+        AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
+    VLC_ADD_LDFLAGS([v4l2],[-lasound -lm -ldl])
+    AC_DEFINE(HAVE_ALSA, 1, Define if ALSA is present.)
   fi
 
   CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l2}"
