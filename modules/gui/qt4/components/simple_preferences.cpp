@@ -284,7 +284,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* Disk Devices */
             {
                 ui.DVDDevice->setToolTip(
-                    qtr( "If this propriety is blank, then you have\n"
+                    //BUG: make this sentence understandable
+                    qtr( "If this property is blank, then you have\n"
                          "values for DVD, VCD, and CDDA.\n"
                          "You can define a unique one or set that in"
                          "the advanced preferences" ) );
