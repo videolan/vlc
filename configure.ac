@@ -5560,7 +5560,7 @@ dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
   [  --enable-libgcrypt      libgcrypts support (default enabled)])
-if test "${enable_libgcrypt}" != "no" -a "${enable_gnutls}" != "no"i
+if test "${enable_libgcrypt}" != "no" -a "${enable_gnutls}" != "no"
 then
   dnl Workaround for cross-compiling since AM_PATH_LIBGRYPT doesn't dectect
   dnl it and looks for libgcrypt headers in the wrong place.
