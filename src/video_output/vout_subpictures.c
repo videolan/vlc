@@ -513,11 +513,19 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             subpicture_t *p_subpic,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
-    int i_source_video_width  = p_fmt->i_width  * 1000 / i_scale_width_orig;
-    int i_source_video_height = p_fmt->i_height * 1000 / i_scale_height_orig;
+    int i_source_video_width;
+    int i_source_video_height;
 
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
+
+    if( i_scale_width_orig <= 0 )
+        i_scale_width_orig = 1;
+    if( i_scale_height_orig <= 0 )
+        i_scale_height_orig = 1;
+
+    i_source_video_width  = p_fmt->i_width  * 1000 / i_scale_width_orig;
+    i_source_video_height = p_fmt->i_height * 1000 / i_scale_height_orig;
 
     /* Check i_status again to make sure spudec hasn't destroyed the subpic */
     while( ( p_subpic != NULL ) && ( p_subpic->i_status != FREE_SUBPICTURE ) )
