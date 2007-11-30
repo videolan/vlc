@@ -55,6 +55,8 @@
     svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
 
  * Move /opt/ftp/pub/videolan/testing/vlc-X.X.X to /opt/ftp/pub/videolan/vlc/X.X.X
+  - At first block access to this directory by http or ftp. Only authorize rsync.
+    This is to avoid leak as some journalist and forum seems to watch the ftp.
   - Update the "latest" symlink
 
  * Update the website
