@@ -555,7 +555,7 @@ size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst, const char
     int i_level;
     int i_last;
 
-    for( i_level = 0, i_last = 0; i_dst > 0 && *p != '\0'; i_dst--, p++ )
+    for( i_level = 0, i_last = 0; (size_t)( p_dst - p_start ) < i_dst && *p != '\0'; p++ )
     {
         const int c = b64[(unsigned int)*p];
         if( c == -1 )
