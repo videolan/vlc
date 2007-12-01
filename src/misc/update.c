@@ -1230,7 +1230,7 @@ void update_download( update_iterator_t *p_uit, const char *psz_dest )
     p_dt->src.i_type = p_uit->file.i_type;
     p_dt->src.l_size = p_uit->file.l_size;
     p_dt->src.psz_md5 = STRDUP( p_uit->file.psz_md5 );
-    p_dt->src.psz_url = STRDUP( p_uit->file.psz_description );
+    p_dt->src.psz_url = STRDUP( p_uit->file.psz_url );
     p_dt->src.psz_description = STRDUP( p_uit->file.psz_description );
     asprintf( &p_dt->psz_status, "%s - %s (%s)\nSource: %s\nDestination: %s",
               p_uit->file.psz_description, p_uit->release.psz_version,
