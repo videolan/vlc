@@ -176,8 +176,10 @@ vlc_module_begin();
     add_integer( "v4l2-hue", -1, NULL, HUE_TEXT,
                 HUE_LONGTEXT, VLC_TRUE );
     add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+#ifdef HAVE_ALSA
     add_bool( "v4l2-alsa", VLC_FALSE, NULL, ALSA_TEXT, ALSA_LONGTEXT,
                 VLC_TRUE );
+#endif
     add_bool( "v4l2-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 VLC_TRUE );
     add_integer( "v4l2-samplerate", 48000, NULL, SAMPLERATE_TEXT,
@@ -217,20 +219,20 @@ static struct
     int i_fourcc;
 } v4l2chroma_to_fourcc[] =
 {
-    { V4L2_PIX_FMT_GREY, VLC_FOURCC( 'G', 'R', 'E', 'Y' ) },
-    { V4L2_PIX_FMT_HI240, VLC_FOURCC( 'I', '2', '4', '0' ) },
-    { V4L2_PIX_FMT_RGB565, VLC_FOURCC( 'R', 'V', '1', '6' ) },
-    { V4L2_PIX_FMT_RGB555, VLC_FOURCC( 'R', 'V', '1', '5' ) },
-    { V4L2_PIX_FMT_BGR24, VLC_FOURCC( 'R', 'V', '2', '4' ) },
-    { V4L2_PIX_FMT_BGR32, VLC_FOURCC( 'R', 'V', '3', '2' ) },
-    { V4L2_PIX_FMT_YUYV, VLC_FOURCC( 'Y', 'U', 'Y', '2' ) },
-    { V4L2_PIX_FMT_YUYV, VLC_FOURCC( 'Y', 'U', 'Y', 'V' ) },
-    { V4L2_PIX_FMT_UYVY, VLC_FOURCC( 'U', 'Y', 'V', 'Y' ) },
-    { V4L2_PIX_FMT_Y41P, VLC_FOURCC( 'I', '4', '1', 'N' ) },
+    { V4L2_PIX_FMT_GREY,    VLC_FOURCC( 'G', 'R', 'E', 'Y' ) },
+    { V4L2_PIX_FMT_HI240,   VLC_FOURCC( 'I', '2', '4', '0' ) },
+    { V4L2_PIX_FMT_RGB565,  VLC_FOURCC( 'R', 'V', '1', '6' ) },
+    { V4L2_PIX_FMT_RGB555,  VLC_FOURCC( 'R', 'V', '1', '5' ) },
+    { V4L2_PIX_FMT_BGR24,   VLC_FOURCC( 'R', 'V', '2', '4' ) },
+    { V4L2_PIX_FMT_BGR32,   VLC_FOURCC( 'R', 'V', '3', '2' ) },
+    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC( 'Y', 'U', 'Y', '2' ) },
+    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC( 'Y', 'U', 'Y', 'V' ) },
+    { V4L2_PIX_FMT_UYVY,    VLC_FOURCC( 'U', 'Y', 'V', 'Y' ) },
+    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC( 'I', '4', '1', 'N' ) },
     { V4L2_PIX_FMT_YUV422P, VLC_FOURCC( 'I', '4', '2', '2' ) },
-    { V4L2_PIX_FMT_YVU420, VLC_FOURCC( 'I', '4', '2', '0' ) },
+    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC( 'I', '4', '2', '0' ) },
     { V4L2_PIX_FMT_YUV411P, VLC_FOURCC( 'I', '4', '1', '1' ) },
-    { V4L2_PIX_FMT_YUV410, VLC_FOURCC( 'I', '4', '1', '0' ) },
+    { V4L2_PIX_FMT_YUV410,  VLC_FOURCC( 'I', '4', '1', '0' ) },
     { 0, 0 }
 };
 
@@ -304,9 +306,9 @@ struct demux_sys_t
     block_t *p_block_audio;
     es_out_id_t *p_es_audio;
 
+#ifdef HAVE_ALSA
     /* ALSA Audio */
     vlc_bool_t b_use_alsa;
-#ifdef HAVE_ALSA
     snd_pcm_t *p_alsa_pcm;
     int i_alsa_frame_size;
     int i_alsa_chunk_size;
@@ -367,9 +369,11 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_requested_chroma = var_CreateGetString( p_demux, "v4l2-chroma" );
 
+#ifdef HAVE_ALSA
     var_Create( p_demux, "v4l2-alsa", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-alsa", &val );
     p_sys->b_use_alsa = val.b_bool;
+#endif
 
     var_Create( p_demux, "v4l2-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-stereo", &val );
@@ -386,8 +390,8 @@ static int Open( vlc_object_t *p_this )
 
     ParseMRL( p_demux );
 
-    /* Alsa support available? */
 #ifdef HAVE_ALSA
+    /* Alsa support available? */
     msg_Dbg( p_demux, "ALSA input support available" );
 #endif
 
@@ -653,11 +657,13 @@ static void ParseMRL( demux_t *p_demux )
                     strtol( psz_parser + strlen( "samplerate=" ),
                             &psz_parser, 0 );
             }
+#ifdef HAVE_ALSA
             else if( !strncmp( psz_parser, "alsa", strlen( "alsa" ) ) )
             {
                 psz_parser += strlen( "alsa" );
                 p_sys->b_use_alsa = VLC_TRUE;
             }
+#endif
             else if( !strncmp( psz_parser, "stereo", strlen( "stereo" ) ) )
             {
                 psz_parser += strlen( "stereo" );
@@ -769,13 +775,13 @@ static void Close( vlc_object_t *p_this )
 
     /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
+#ifdef HAVE_ALSA
     if( p_sys->b_use_alsa )
     {
-#ifdef HAVE_ALSA
         if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
-#endif
     }
-    else 
+    else
+#endif
     {
         if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
     }
@@ -1041,17 +1047,15 @@ static block_t* GrabAudio( demux_t *p_demux )
 
     p_sys->p_block_audio = p_block;
 
+#ifdef HAVE_ALSA
     if( p_sys->b_use_alsa )
     {
         /* ALSA */
-#ifdef HAVE_ALSA
         i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
         /* TODO: ALSA ERROR HANDLING?? xrun?? */
-#else
-        i_read = 0;
-#endif
     }
     else
+#endif
     {
         /* OSS */
         i_read = read( p_sys->i_fd_audio, p_block->p_buffer,
@@ -1065,16 +1069,18 @@ static block_t* GrabAudio( demux_t *p_demux )
 
     /* Correct the date because of kernel buffering */
     i_correct = i_read;
+#ifdef HAVE_ALSA
     if( !p_sys->b_use_alsa )
+#endif
     {
         if( ioctl( p_sys->i_fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
         {
             i_correct += buf_info.bytes;
         }
     }
+#ifdef HAVE_ALSA
     else
     {
-#ifdef HAVE_ALSA
         /* TODO: ALSA timing */
         /* Very experimental code... */
         int i_err;
@@ -1097,8 +1103,8 @@ static block_t* GrabAudio( demux_t *p_demux )
             msg_Warn( p_demux, "ALSA snd_pcm_delay failed (%s)", snd_strerror( i_err ) );
             snd_pcm_prepare( p_sys->p_alsa_pcm );
         }
-#endif
     }
+#endif
 
     /* Timestamp */
     p_block->i_pts = p_block->i_dts =
@@ -1705,6 +1711,7 @@ open_failed:
 
 }
 
+#ifdef HAVE_ALSA
 /*****************************************************************************
  * ResolveALSADeviceName: Change any . to : in the ALSA device name
  *****************************************************************************/
@@ -1717,6 +1724,7 @@ char* ResolveALSADeviceName( char *psz_device )
     }
     return psz_alsa_name;
 }
+#endif
 
 /*****************************************************************************
  * OpenAudioDev: open and set up the audio device and probe for capabilities
@@ -1728,23 +1736,23 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
     int i_format;
 #ifdef HAVE_ALSA
     p_sys->p_alsa_pcm = NULL;
-    char* psz_alsa_device_name = ResolveALSADeviceName( psz_device );        
+    char* psz_alsa_device_name = ResolveALSADeviceName( psz_device );
     snd_pcm_hw_params_t *p_hw_params = NULL;
     snd_pcm_uframes_t buffer_size;
     snd_pcm_uframes_t chunk_size;
 #endif
 
-    if( p_sys->b_use_alsa ) 
+#ifdef HAVE_ALSA
+    if( p_sys->b_use_alsa )
     {
         /* ALSA */
 
-#ifdef HAVE_ALSA
         int i_err;
 
-        if( ( i_err = snd_pcm_open( &p_sys->p_alsa_pcm, psz_alsa_device_name, 
+        if( ( i_err = snd_pcm_open( &p_sys->p_alsa_pcm, psz_alsa_device_name,
             SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0)
         {
-            msg_Err( p_demux, "Cannot open ALSA audio device %s (%s)", 
+            msg_Err( p_demux, "Cannot open ALSA audio device %s (%s)",
                 psz_alsa_device_name,
                 snd_strerror( i_err ) );
             goto adev_fail;
@@ -1790,11 +1798,11 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
         }
 
         /* Set sample rate */
-        #ifdef HAVE_ALSA_NEW_API
-            i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
-        #else
-            i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, p_sys->i_sample_rate, NULL );
-        #endif
+#ifdef HAVE_ALSA_NEW_API
+        i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
+#else
+        i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, p_sys->i_sample_rate, NULL );
+#endif
         if( i_err < 0 )
         {
             msg_Err( p_demux, "ALSA: cannot set sample rate (%s)",
@@ -1809,10 +1817,10 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
             channels = ( channels==1 ) ? 2 : 1;
             msg_Warn( p_demux, "ALSA: cannot set channel count (%s). Trying with channels=%d",
                 snd_strerror( i_err ),
-                channels );                    
+                channels );
             if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
             {
-                msg_Err( p_demux, "ALSA: cannot set channel count (%s)", 
+                msg_Err( p_demux, "ALSA: cannot set channel count (%s)",
                     snd_strerror( i_err ) );
                 goto adev_fail;
             }
@@ -1820,35 +1828,35 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
         }
 
         /* Set metrics for buffer calculations later */
-        unsigned int buffer_time;            
+        unsigned int buffer_time;
         if( ( i_err = snd_pcm_hw_params_get_buffer_time_max(p_hw_params, &buffer_time, 0) ) < 0 )
         {
             msg_Err( p_demux, "ALSA: cannot get buffer time max (%s)",
                 snd_strerror( i_err ) );
-            goto adev_fail;           
+            goto adev_fail;
         }
         if (buffer_time > 500000) buffer_time = 500000;
 
         /* Set period time */
         unsigned int period_time = buffer_time / 4;
-        #ifdef HAVE_ALSA_NEW_API
-            i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
-        #else
-            i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, period_time, 0 );
-        #endif
+#ifdef HAVE_ALSA_NEW_API
+        i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
+#else
+        i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, period_time, 0 );
+#endif
         if( i_err < 0 )
         {
             msg_Err( p_demux, "ALSA: cannot set period time (%s)",
                 snd_strerror( i_err ) );
             goto adev_fail;
-        }     
+        }
 
         /* Set buffer time */
-        #ifdef HAVE_ALSA_NEW_API
-            i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
-        #else
-            i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, buffer_time, 0 );
-        #endif
+#ifdef HAVE_ALSA_NEW_API
+        i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
+#else
+        i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, buffer_time, 0 );
+#endif
         if( i_err < 0 )
         {
             msg_Err( p_demux, "ALSA: cannot set buffer time (%s)",
@@ -1895,9 +1903,9 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
         /* Return a fake handle so other tests work */
         i_fd = 1;
 
-#endif
-    } 
-    else 
+    }
+    else
+#endif /* HAVE_ALSA */
     {
         /* OSS */
 
@@ -2265,13 +2273,14 @@ vlc_bool_t ProbeAudioDev( demux_t *p_demux, char *psz_device )
 {
     int i_fd = 0;
     int i_caps;
+
+#ifdef HAVE_ALSA
     demux_sys_t *p_sys = p_demux->p_sys;
 
     if( p_sys->b_use_alsa )
     {
         /* ALSA */
 
-#ifdef HAVE_ALSA
         int i_err;
         snd_pcm_t *p_alsa_pcm;
         char* psz_alsa_device_name = ResolveALSADeviceName( psz_device );
@@ -2285,12 +2294,9 @@ vlc_bool_t ProbeAudioDev( demux_t *p_demux, char *psz_device )
 
         snd_pcm_close( p_alsa_pcm );
         free( psz_alsa_device_name );
-#else
-        msg_Err( p_demux, "ALSA support not available" );
-        goto open_failed;
-#endif
-    } 
+    }
     else
+#endif /* HAVE_ALSA */
     {
         /* OSS */
 
