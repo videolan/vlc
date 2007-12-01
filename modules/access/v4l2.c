@@ -213,6 +213,13 @@ static int OpenAudioDev( demux_t *, char *psz_device );
 static vlc_bool_t ProbeVideoDev( demux_t *, char *psz_device );
 static vlc_bool_t ProbeAudioDev( demux_t *, char *psz_device );
 
+static int VideoControlList( demux_t *p_demux, int i_fd );
+static int VideoControl( demux_t *, int i_fd,
+                         const char *psz_label, int i_cid, int i_value );
+static int VideoControlCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data );
+
 static struct
 {
     unsigned int i_v4l2;
@@ -354,10 +361,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_width = var_CreateGetInteger( p_demux, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_demux, "v4l2-height" );
 
-    p_sys->i_brightness = var_CreateGetInteger( p_demux, "v4l2-brightness" );
-    p_sys->i_contrast = var_CreateGetInteger( p_demux, "v4l2-contrast" );
-    p_sys->i_saturation = var_CreateGetInteger( p_demux, "v4l2-saturation" );
-    p_sys->i_hue = var_CreateGetInteger( p_demux, "v4l2-hue" );
+    p_sys->i_brightness =
+        var_CreateGetIntegerCommand( p_demux, "v4l2-brightness" );
+    p_sys->i_contrast =
+        var_CreateGetIntegerCommand( p_demux, "v4l2-contrast" );
+    p_sys->i_saturation =
+        var_CreateGetIntegerCommand( p_demux, "v4l2-saturation" );
+    p_sys->i_hue =
+        var_CreateGetIntegerCommand( p_demux, "v4l2-hue" );
+
+    var_AddCallback( p_demux, "v4l2-brightness", VideoControlCallback, NULL );
+    var_AddCallback( p_demux, "v4l2-contrast", VideoControlCallback, NULL );
+    var_AddCallback( p_demux, "v4l2-saturation", VideoControlCallback, NULL );
+    var_AddCallback( p_demux, "v4l2-hue", VideoControlCallback, NULL );
 
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
@@ -1511,76 +1527,16 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 #endif
 
-    /* Set picture controls... */
-    struct v4l2_control control;
+    VideoControlList( p_demux, i_fd );
 
-    /* brightness */
-    memset( &control, 0, sizeof( control ) );
-    control.id = V4L2_CID_BRIGHTNESS;
-    if( p_sys->i_brightness >= 0 )
-    {
-        control.value = p_sys->i_brightness;
-        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
-        {
-            msg_Err( p_demux, "unable to set brightness to %d (%m)", p_sys->i_brightness );
-            goto open_failed;
-        }
-    }
-    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
-    {
-        msg_Dbg( p_demux, "video brightness: %d", control.value );
-    }
-
-    /* contrast */
-    memset( &control, 0, sizeof( control ) );
-    control.id = V4L2_CID_CONTRAST;
-    if( p_sys->i_contrast >= 0 )
-    {
-        control.value = p_sys->i_contrast;
-        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
-        {
-            msg_Err( p_demux, "unable to set contrast to %d (%m)", p_sys->i_contrast );
-            goto open_failed;
-        }
-    }
-    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
-    {
-        msg_Dbg( p_demux, "video contrast: %d", control.value );
-    }
-
-    /* saturation */
-    memset( &control, 0, sizeof( control ) );
-    control.id = V4L2_CID_SATURATION;
-    if( p_sys->i_saturation >= 0 )
-    {
-        control.value = p_sys->i_saturation;
-        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
-        {
-            msg_Err( p_demux, "unable to set saturation to %d (%m)", p_sys->i_saturation );
-            goto open_failed;
-        }
-    }
-    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
-    {
-        msg_Dbg( p_demux, "video saturation: %d", control.value );
-    }
-
-    /* hue */
-    memset( &control, 0, sizeof( control ) );
-    control.id = V4L2_CID_HUE;
-    if( p_sys->i_hue >= 0 )
-    {
-        control.value = p_sys->i_hue;
-        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
-        {
-            msg_Err( p_demux, "unable to set hue to %d (%m)", p_sys->i_hue );
-            goto open_failed;
-        }
-    }
-    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
-    {
-        msg_Dbg( p_demux, "video hue: %d", control.value );
-    }
+    if( VideoControl( p_demux, i_fd,
+                      "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness )
+     || VideoControl( p_demux, i_fd,
+                      "contrast", V4L2_CID_CONTRAST, p_sys->i_contrast )
+     || VideoControl( p_demux, i_fd,
+                      "saturation", V4L2_CID_SATURATION, p_sys->i_saturation )
+     || VideoControl( p_demux, i_fd, "hue", V4L2_CID_HUE, p_sys->i_hue ) )
+        goto open_failed;
 
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
@@ -2324,3 +2280,160 @@ open_failed:
 
 }
 
+/*****************************************************************************
+ * List available controls
+ *****************************************************************************/
+static int VideoControlList( demux_t *p_demux, int i_fd )
+{
+    struct v4l2_queryctrl queryctrl;
+    struct v4l2_querymenu querymenu;
+
+    memset( &queryctrl, 0, sizeof( queryctrl ) );
+
+    /* List public controls */
+    for( queryctrl.id = V4L2_CID_BASE;
+         queryctrl.id < V4L2_CID_LASTP1;
+         queryctrl.id ++ )
+    {
+        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) )
+        {
+            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                continue;
+            msg_Dbg( p_demux, "Available control: %s (%x)",
+                     queryctrl.name, queryctrl.id );
+            if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
+                msg_Dbg( p_demux, "    control is busy" );
+            if( queryctrl.flags & V4L2_CTRL_FLAG_READ_ONLY )
+                msg_Dbg( p_demux, "    control is read-only" );
+            switch( queryctrl.type )
+            {
+                case V4L2_CTRL_TYPE_INTEGER:
+                    msg_Dbg( p_demux, "    integer control" );
+                    msg_Dbg( p_demux,
+                             "    valid values: %d to %d by steps of %d",
+                             queryctrl.minimum, queryctrl.maximum,
+                             queryctrl.step );
+                    msg_Dbg( p_demux, "    default value: %d",
+                             queryctrl.default_value );
+                    break;
+                case V4L2_CTRL_TYPE_BOOLEAN:
+                    msg_Dbg( p_demux, "    boolean control" );
+                    msg_Dbg( p_demux, "    default value: %d",
+                             queryctrl.default_value );
+                    break;
+                case V4L2_CTRL_TYPE_MENU:
+                    msg_Dbg( p_demux, "    menu control" );
+                    memset( &querymenu, 0, sizeof( querymenu ) );
+                    for( querymenu.index = queryctrl.minimum;
+                         querymenu.index <= (unsigned)queryctrl.maximum;
+                         querymenu.index++ )
+                    {
+                        if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) )
+                        {
+                            msg_Dbg( p_demux, "        %d: %s",
+                                     querymenu.index, querymenu.name );
+                        }
+                    }
+                    msg_Dbg( p_demux, "    default value: %d",
+                             queryctrl.default_value );
+                    break;
+                case V4L2_CTRL_TYPE_BUTTON:
+                    msg_Dbg( p_demux, "    button control" );
+                    break;
+                default:
+                    msg_Dbg( p_demux, "    unknown control type (FIXME)" );
+                    /* FIXME */
+                    break;
+            }
+        }
+    }
+
+    /* List private controls */
+    for( queryctrl.id = V4L2_CID_PRIVATE_BASE;
+         ;
+         queryctrl.id ++ )
+    {
+        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) )
+        {
+            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                continue;
+            msg_Dbg( p_demux, "Available private control: %s",
+                     queryctrl.name );
+        }
+        else
+            break;
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Issue video controls
+ *****************************************************************************/
+static int VideoControl( demux_t *p_demux, int i_fd,
+                         const char *psz_label, int i_cid, int i_value )
+{
+    struct v4l2_queryctrl queryctrl;
+    struct v4l2_control control;
+    memset( &queryctrl, 0, sizeof( queryctrl ) );
+
+    queryctrl.id = i_cid;
+
+    if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
+        || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+    {
+        msg_Err( p_demux, "%s (%x) control is not supported.", psz_label,
+                 i_value );
+        return VLC_EGENERIC;
+    }
+
+    memset( &control, 0, sizeof( control ) );
+    control.id = i_cid;
+
+    if( i_value >= 0 )
+    {
+        control.value = i_value;
+        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+        {
+            msg_Err( p_demux, "unable to set %s to %d (%m)", psz_label,
+                     i_value );
+            return VLC_EGENERIC;
+        }
+    }
+    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+    {
+        msg_Dbg( p_demux, "video %s: %d", psz_label, control.value );
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * On the fly change settings callback
+ *****************************************************************************/
+static int VideoControlCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    int i_fd = p_sys->i_fd_video;
+
+    if( i_fd < 0 )
+        return VLC_EGENERIC;
+
+    if( !strcmp( psz_var, "brightness" ) )
+        return VideoControl( p_demux, i_fd,
+                    "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness );
+    else if( !strcmp( psz_var, "contrast" ) )
+        return VideoControl( p_demux, i_fd,
+                    "contrast", V4L2_CID_CONTRAST, p_sys->i_contrast );
+    else if( !strcmp( psz_var, "saturation" ) )
+        return VideoControl( p_demux, i_fd,
+                    "saturation", V4L2_CID_SATURATION, p_sys->i_saturation );
+    else if( !strcmp( psz_var, "hue" ) )
+        return VideoControl( p_demux, i_fd,
+                    "hue", V4L2_CID_HUE, p_sys->i_hue );
+    else
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
