@@ -1529,14 +1529,13 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
     VideoControlList( p_demux, i_fd );
 
-    if( VideoControl( p_demux, i_fd,
-                      "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness )
-     || VideoControl( p_demux, i_fd,
-                      "contrast", V4L2_CID_CONTRAST, p_sys->i_contrast )
-     || VideoControl( p_demux, i_fd,
-                      "saturation", V4L2_CID_SATURATION, p_sys->i_saturation )
-     || VideoControl( p_demux, i_fd, "hue", V4L2_CID_HUE, p_sys->i_hue ) )
-        goto open_failed;
+    VideoControl( p_demux, i_fd,
+                  "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness );
+    VideoControl( p_demux, i_fd,
+                  "contrast", V4L2_CID_CONTRAST, p_sys->i_contrast );
+    VideoControl( p_demux, i_fd,
+                  "saturation", V4L2_CID_SATURATION, p_sys->i_saturation );
+    VideoControl( p_demux, i_fd, "hue", V4L2_CID_HUE, p_sys->i_hue );
 
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
@@ -2422,17 +2421,29 @@ static int VideoControlCallback( vlc_object_t *p_this,
         return VLC_EGENERIC;
 
     if( !strcmp( psz_var, "brightness" ) )
+    {
+        p_sys->i_brightness = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness );
+    }
     else if( !strcmp( psz_var, "contrast" ) )
+    {
+        p_sys->i_contrast = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "contrast", V4L2_CID_CONTRAST, p_sys->i_contrast );
+    }
     else if( !strcmp( psz_var, "saturation" ) )
+    {
+        p_sys->i_saturation = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "saturation", V4L2_CID_SATURATION, p_sys->i_saturation );
+    }
     else if( !strcmp( psz_var, "hue" ) )
+    {
+        p_sys->i_hue = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "hue", V4L2_CID_HUE, p_sys->i_hue );
+    }
     else
         return VLC_EGENERIC;
     return VLC_SUCCESS;
