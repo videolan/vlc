@@ -1110,6 +1110,9 @@ static block_t* GrabAudio( demux_t *p_demux )
         /* ALSA */
         i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
         /* TODO: ALSA ERROR HANDLING?? xrun?? */
+
+        /* convert from frames to bytes */
+        if( i_read > 0 ) i_read *= p_sys->i_alsa_frame_size;
     }
     else
 #endif
