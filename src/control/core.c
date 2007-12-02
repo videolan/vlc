@@ -63,22 +63,38 @@ libvlc_exception_get_message( const libvlc_exception_t *p_exception )
     return NULL;
 }
 
+void libvlc_exception_not_handled( const char *psz )
+{
+    fprintf( stderr, "*** LibVLC Exception not handled: %s\nSet a breakpoint in '%s' to debug.\n", psz, __FUNCTION__ );
+}
+
 void libvlc_exception_raise( libvlc_exception_t *p_exception,
                                            const char *psz_format, ... )
 {
     va_list args;
+    char * psz;
 
-    /* does caller care about exceptions ? */
-    if( p_exception == NULL ) return;
-
-    /* remove previous exception if it wasn't cleared */
-    libvlc_exception_clear( p_exception );
-
+    /* Unformat-ize the message */
     va_start( args, psz_format );
-    if( vasprintf( &p_exception->psz_message, psz_format, args ) == -1)
-        p_exception->psz_message = (char *)nomemstr;
+    if( vasprintf( &psz, psz_format, args ) == -1)
+        psz = (char *)nomemstr;
     va_end( args );
 
+    /* Does caller care about exceptions ? */
+    if( p_exception == NULL ) {
+        /* Print something, so lazy third-parties can easily
+         * notice that something may have gone unoticedly wrong */
+        libvlc_exception_not_handled( psz );
+        return;
+    }
+
+    /* Make sure that there is no unoticed previous exception */
+    if( p_exception->b_raised )
+    {
+        libvlc_exception_not_handled( p_exception->psz_message );
+        libvlc_exception_clear( p_exception );
+    }
+    p_exception->psz_message = psz;
     p_exception->b_raised = 1;
 }
 
