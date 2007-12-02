@@ -107,7 +107,7 @@ static void * EventDispatcherMainLoop(void * user_data)
         pthread_mutex_unlock( [self queueLock] );
     
         [pool release];
-    };
+    }
     return nil;
 }
 
