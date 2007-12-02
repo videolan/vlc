@@ -2527,7 +2527,7 @@ static int VideoControlCallback( vlc_object_t *p_this,
     {
         p_sys->i_gamma = newval.i_int;
         return VideoControl( p_demux, i_fd,
-                    "gamma", V4L2_CID_HUE, p_sys->i_gamma );
+                    "gamma", V4L2_CID_GAMMA, p_sys->i_gamma );
     }
     else if( !strcmp( psz_var, "videocontrol" ) )
     {
