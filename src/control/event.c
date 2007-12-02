@@ -31,7 +31,6 @@
  * Private functions
  */
 
-
 /*
  * Internal libvlc functions
  */
@@ -344,6 +343,6 @@ void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
         vlc_mutex_unlock( &p_event_manager->event_sending_lock );
 
     libvlc_exception_raise( p_e,
-            "This object event manager doesn't know about '%i,%p,%p' event observer",
-            event_type, pf_callback, p_user_data );
+            "This object event manager doesn't know about '%s,%p,%p' event observer",
+            libvlc_event_type_name(event_type), pf_callback, p_user_data );
 }
