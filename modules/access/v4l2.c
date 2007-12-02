@@ -392,6 +392,9 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_demux, "v4l2-hue", VideoControlCallback, NULL );
     var_AddCallback( p_demux, "v4l2-gamma", VideoControlCallback, NULL );
 
+    var_Create( p_demux, "videocontrol", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_demux, "videocontrol", VideoControlCallback, NULL );
+
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
     p_sys->f_fps = val.f_float;
@@ -2405,10 +2408,11 @@ static int VideoControl( demux_t *p_demux, int i_fd,
 {
     struct v4l2_queryctrl queryctrl;
     struct v4l2_control control;
-    memset( &queryctrl, 0, sizeof( queryctrl ) );
 
     if( i_value == -1 )
         return VLC_SUCCESS;
+
+    memset( &queryctrl, 0, sizeof( queryctrl ) );
 
     queryctrl.id = i_cid;
 
@@ -2416,9 +2420,12 @@ static int VideoControl( demux_t *p_demux, int i_fd,
         || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
     {
         msg_Err( p_demux, "%s (%x) control is not supported.", psz_label,
-                 i_value );
+                 i_cid );
         return VLC_EGENERIC;
     }
+
+    if( !psz_label )
+        psz_label = (const char*)queryctrl.name;
 
     memset( &control, 0, sizeof( control ) );
     control.id = i_cid;
@@ -2484,6 +2491,13 @@ static int VideoControlCallback( vlc_object_t *p_this,
         p_sys->i_gamma = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "gamma", V4L2_CID_HUE, p_sys->i_gamma );
+    }
+    else if( !strcmp( psz_var, "videocontrol" ) )
+    {
+        char *psz_var = newval.psz_string;
+        int i_cid = strtol( psz_var, &psz_var, 16 );
+        int i_value = strtol( psz_var, &psz_var, 0 );
+        return VideoControl( p_demux, i_fd, NULL, i_cid, i_value );
     }
 
     return VLC_EGENERIC;
