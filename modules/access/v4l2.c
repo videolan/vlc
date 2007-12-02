@@ -2375,12 +2375,15 @@ static int VideoControl( demux_t *p_demux, int i_fd,
     struct v4l2_control control;
     memset( &queryctrl, 0, sizeof( queryctrl ) );
 
+    if( i_value == -1 )
+        return VLC_SUCCESS;
+
     queryctrl.id = i_cid;
 
     if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
         || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
     {
-        msg_Warn( p_demux, "%s (%x) control is not supported.", psz_label,
+        msg_Err( p_demux, "%s (%x) control is not supported.", psz_label,
                  i_value );
         return VLC_EGENERIC;
     }
@@ -2420,31 +2423,30 @@ static int VideoControlCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    if( !strcmp( psz_var, "brightness" ) )
+    if( !strcmp( psz_var, "v4l2-brightness" ) )
     {
         p_sys->i_brightness = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness );
     }
-    else if( !strcmp( psz_var, "contrast" ) )
+    else if( !strcmp( psz_var, "v4l2-contrast" ) )
     {
         p_sys->i_contrast = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "contrast", V4L2_CID_CONTRAST, p_sys->i_contrast );
     }
-    else if( !strcmp( psz_var, "saturation" ) )
+    else if( !strcmp( psz_var, "v4l2-saturation" ) )
     {
         p_sys->i_saturation = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "saturation", V4L2_CID_SATURATION, p_sys->i_saturation );
     }
-    else if( !strcmp( psz_var, "hue" ) )
+    else if( !strcmp( psz_var, "v4l2-hue" ) )
     {
         p_sys->i_hue = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "hue", V4L2_CID_HUE, p_sys->i_hue );
     }
-    else
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
+
+    return VLC_EGENERIC;
 }
