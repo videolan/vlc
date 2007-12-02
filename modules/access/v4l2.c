@@ -74,10 +74,6 @@ static void Close( vlc_object_t * );
 #define DEV_LONGTEXT N_( \
     "Name of the device to use. " \
     "If you don't specify anything, /dev/video0 will be used.")
-#define ADEV_TEXT N_("Audio device name")
-#define ADEV_LONGTEXT N_( \
-    "Name of the audio device to use. " \
-    "If you don't specify anything, /dev/dsp will be used.")
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
@@ -98,6 +94,10 @@ static void Close( vlc_object_t * );
 #define HEIGHT_TEXT N_( "Height" )
 #define HEIGHT_LONGTEXT N_( \
     "Force height (-1 for autodetect)." )
+#define FPS_TEXT N_( "Framerate" )
+#define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
+    "(-1 for autodetect)." )
+
 #define BRIGHTNESS_TEXT N_( "Brightness" )
 #define BRIGHTNESS_LONGTEXT N_( \
     "Brightness of the video input." )
@@ -110,9 +110,14 @@ static void Close( vlc_object_t * );
 #define HUE_TEXT N_( "Hue" )
 #define HUE_LONGTEXT N_( \
     "Hue of the video input." )
-#define FPS_TEXT N_( "Framerate" )
-#define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(-1 for autodetect)." )
+#define GAMMA_TEXT N_( "Gamma" )
+#define GAMMA_LONGTEXT N_( \
+    "Gamma of the video input." )
+
+#define ADEV_TEXT N_("Audio device name")
+#define ADEV_LONGTEXT N_( \
+    "Name of the audio device to use. " \
+    "If you don't specify anything, /dev/dsp will be used.")
 #define ALSA_TEXT N_( "Use Alsa" )
 #define ALSA_LONGTEXT N_( \
     "Use ALSA instead of OSS for audio" )
@@ -122,6 +127,7 @@ static void Close( vlc_object_t * );
 #define SAMPLERATE_TEXT N_( "Samplerate" )
 #define SAMPLERATE_LONGTEXT N_( \
     "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, 48000)" )
+
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Caching value for V4L2 captures. This " \
@@ -149,9 +155,8 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
+    set_section( N_( "Video input" ), NULL );
     add_string( "v4l2-dev", "/dev/video0", 0, DEV_TEXT, DEV_LONGTEXT,
-                VLC_FALSE );
-    add_string( "v4l2-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
     add_integer( "v4l2-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
                 VLC_FALSE );
@@ -167,6 +172,9 @@ vlc_module_begin();
                 WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "v4l2-height", 0, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, VLC_TRUE );
+    add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+
+    set_section( N_( "Video controls" ), NULL );
     add_integer( "v4l2-brightness", -1, NULL, BRIGHTNESS_TEXT,
                 BRIGHTNESS_LONGTEXT, VLC_TRUE );
     add_integer( "v4l2-contrast", -1, NULL, CONTRAST_TEXT,
@@ -175,7 +183,12 @@ vlc_module_begin();
                 SATURATION_LONGTEXT, VLC_TRUE );
     add_integer( "v4l2-hue", -1, NULL, HUE_TEXT,
                 HUE_LONGTEXT, VLC_TRUE );
-    add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+    add_integer( "v4l2-gamma", -1, NULL, GAMMA_TEXT,
+                GAMMA_LONGTEXT, VLC_TRUE );
+
+    set_section( N_( "Audio input" ), NULL );
+    add_string( "v4l2-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
+                VLC_FALSE );
 #ifdef HAVE_ALSA
     add_bool( "v4l2-alsa", VLC_FALSE, NULL, ALSA_TEXT, ALSA_LONGTEXT,
                 VLC_TRUE );
@@ -300,6 +313,7 @@ struct demux_sys_t
     int i_contrast;
     int i_saturation;
     int i_hue;
+    int i_gamma;
 
     picture_t pic;
     int i_video_frame_size;
@@ -369,11 +383,14 @@ static int Open( vlc_object_t *p_this )
         var_CreateGetIntegerCommand( p_demux, "v4l2-saturation" );
     p_sys->i_hue =
         var_CreateGetIntegerCommand( p_demux, "v4l2-hue" );
+    p_sys->i_gamma =
+        var_CreateGetIntegerCommand( p_demux, "v4l2-gamma" );
 
     var_AddCallback( p_demux, "v4l2-brightness", VideoControlCallback, NULL );
     var_AddCallback( p_demux, "v4l2-contrast", VideoControlCallback, NULL );
     var_AddCallback( p_demux, "v4l2-saturation", VideoControlCallback, NULL );
     var_AddCallback( p_demux, "v4l2-hue", VideoControlCallback, NULL );
+    var_AddCallback( p_demux, "v4l2-gamma", VideoControlCallback, NULL );
 
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
@@ -664,6 +681,13 @@ static void ParseMRL( demux_t *p_demux )
             {
                 p_sys->i_hue =
                     strtol( psz_parser + strlen( "hue=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "gamma=",
+                               strlen( "gamma=" ) ) )
+            {
+                p_sys->i_gamma =
+                    strtol( psz_parser + strlen( "gamma=" ),
                             &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "samplerate=",
@@ -1536,6 +1560,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     VideoControl( p_demux, i_fd,
                   "saturation", V4L2_CID_SATURATION, p_sys->i_saturation );
     VideoControl( p_demux, i_fd, "hue", V4L2_CID_HUE, p_sys->i_hue );
+    VideoControl( p_demux, i_fd, "gamma", V4L2_CID_GAMMA, p_sys->i_gamma );
 
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
@@ -2282,10 +2307,59 @@ open_failed:
 /*****************************************************************************
  * List available controls
  *****************************************************************************/
+static void VideoControlListPrint( demux_t *p_demux, int i_fd,
+                                   struct v4l2_queryctrl queryctrl )
+{
+    struct v4l2_querymenu querymenu;
+    if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
+        msg_Dbg( p_demux, "    control is busy" );
+    if( queryctrl.flags & V4L2_CTRL_FLAG_READ_ONLY )
+        msg_Dbg( p_demux, "    control is read-only" );
+    switch( queryctrl.type )
+    {
+        case V4L2_CTRL_TYPE_INTEGER:
+            msg_Dbg( p_demux, "    integer control" );
+            msg_Dbg( p_demux,
+                     "    valid values: %d to %d by steps of %d",
+                     queryctrl.minimum, queryctrl.maximum,
+                     queryctrl.step );
+            msg_Dbg( p_demux, "    default value: %d",
+                     queryctrl.default_value );
+            break;
+        case V4L2_CTRL_TYPE_BOOLEAN:
+            msg_Dbg( p_demux, "    boolean control" );
+            msg_Dbg( p_demux, "    default value: %d",
+                     queryctrl.default_value );
+            break;
+        case V4L2_CTRL_TYPE_MENU:
+            msg_Dbg( p_demux, "    menu control" );
+            memset( &querymenu, 0, sizeof( querymenu ) );
+            for( querymenu.index = queryctrl.minimum;
+                 querymenu.index <= (unsigned)queryctrl.maximum;
+                 querymenu.index++ )
+            {
+                if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
+                {
+                    msg_Dbg( p_demux, "        %d: %s",
+                             querymenu.index, querymenu.name );
+                }
+            }
+            msg_Dbg( p_demux, "    default value: %d",
+                     queryctrl.default_value );
+            break;
+        case V4L2_CTRL_TYPE_BUTTON:
+            msg_Dbg( p_demux, "    button control" );
+            break;
+        default:
+            msg_Dbg( p_demux, "    unknown control type (FIXME)" );
+            /* FIXME */
+            break;
+    }
+}
+
 static int VideoControlList( demux_t *p_demux, int i_fd )
 {
     struct v4l2_queryctrl queryctrl;
-    struct v4l2_querymenu querymenu;
 
     memset( &queryctrl, 0, sizeof( queryctrl ) );
 
@@ -2300,50 +2374,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
                 continue;
             msg_Dbg( p_demux, "Available control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
-                msg_Dbg( p_demux, "    control is busy" );
-            if( queryctrl.flags & V4L2_CTRL_FLAG_READ_ONLY )
-                msg_Dbg( p_demux, "    control is read-only" );
-            switch( queryctrl.type )
-            {
-                case V4L2_CTRL_TYPE_INTEGER:
-                    msg_Dbg( p_demux, "    integer control" );
-                    msg_Dbg( p_demux,
-                             "    valid values: %d to %d by steps of %d",
-                             queryctrl.minimum, queryctrl.maximum,
-                             queryctrl.step );
-                    msg_Dbg( p_demux, "    default value: %d",
-                             queryctrl.default_value );
-                    break;
-                case V4L2_CTRL_TYPE_BOOLEAN:
-                    msg_Dbg( p_demux, "    boolean control" );
-                    msg_Dbg( p_demux, "    default value: %d",
-                             queryctrl.default_value );
-                    break;
-                case V4L2_CTRL_TYPE_MENU:
-                    msg_Dbg( p_demux, "    menu control" );
-                    memset( &querymenu, 0, sizeof( querymenu ) );
-                    for( querymenu.index = queryctrl.minimum;
-                         querymenu.index <= (unsigned)queryctrl.maximum;
-                         querymenu.index++ )
-                    {
-                        if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
-                        {
-                            msg_Dbg( p_demux, "        %d: %s",
-                                     querymenu.index, querymenu.name );
-                        }
-                    }
-                    msg_Dbg( p_demux, "    default value: %d",
-                             queryctrl.default_value );
-                    break;
-                case V4L2_CTRL_TYPE_BUTTON:
-                    msg_Dbg( p_demux, "    button control" );
-                    break;
-                default:
-                    msg_Dbg( p_demux, "    unknown control type (FIXME)" );
-                    /* FIXME */
-                    break;
-            }
+            VideoControlListPrint( p_demux, i_fd, queryctrl );
         }
     }
 
@@ -2356,8 +2387,9 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                 continue;
-            msg_Dbg( p_demux, "Available private control: %s",
-                     queryctrl.name );
+            msg_Dbg( p_demux, "Available private control: %s (%x)",
+                     queryctrl.name, queryctrl.id );
+            VideoControlListPrint( p_demux, i_fd, queryctrl );
         }
         else
             break;
@@ -2446,6 +2478,12 @@ static int VideoControlCallback( vlc_object_t *p_this,
         p_sys->i_hue = newval.i_int;
         return VideoControl( p_demux, i_fd,
                     "hue", V4L2_CID_HUE, p_sys->i_hue );
+    }
+    else if( !strcmp( psz_var, "v4l2-gamma" ) )
+    {
+        p_sys->i_gamma = newval.i_int;
+        return VideoControl( p_demux, i_fd,
+                    "gamma", V4L2_CID_HUE, p_sys->i_gamma );
     }
 
     return VLC_EGENERIC;
