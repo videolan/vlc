@@ -98,6 +98,9 @@ static void Close( vlc_object_t * );
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(-1 for autodetect)." )
 
+#define VIDEOCTRL_RESET_TEXT N_( "Reset video controls" )
+#define VIDEOCTRL_RESET_LONGTEXT N_( \
+    "Reset video controls to defaults provided by the v4l2 driver." )
 #define BRIGHTNESS_TEXT N_( "Brightness" )
 #define BRIGHTNESS_LONGTEXT N_( \
     "Brightness of the video input." )
@@ -175,6 +178,8 @@ vlc_module_begin();
     add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Video controls" ), NULL );
+    add_bool( "v4l2-videocontrol-reset", VLC_FALSE, NULL, VIDEOCTRL_RESET_TEXT,
+              VIDEOCTRL_RESET_LONGTEXT, VLC_TRUE );
     add_integer( "v4l2-brightness", -1, NULL, BRIGHTNESS_TEXT,
                 BRIGHTNESS_LONGTEXT, VLC_TRUE );
     add_integer( "v4l2-contrast", -1, NULL, CONTRAST_TEXT,
@@ -226,7 +231,7 @@ static int OpenAudioDev( demux_t *, char *psz_device );
 static vlc_bool_t ProbeVideoDev( demux_t *, char *psz_device );
 static vlc_bool_t ProbeAudioDev( demux_t *, char *psz_device );
 
-static int VideoControlList( demux_t *p_demux, int i_fd );
+static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset );
 static int VideoControl( demux_t *, int i_fd,
                          const char *psz_label, int i_cid, int i_value );
 static int VideoControlCallback( vlc_object_t *p_this,
@@ -309,6 +314,7 @@ struct demux_sys_t
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
 
+    vlc_bool_t b_videoctrl_reset;
     int i_brightness;
     int i_contrast;
     int i_saturation;
@@ -375,6 +381,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_width = var_CreateGetInteger( p_demux, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_demux, "v4l2-height" );
 
+    p_sys->b_videoctrl_reset =
+        var_CreateGetBool( p_demux, "v4l2-videocontrol-reset" );
     p_sys->i_brightness =
         var_CreateGetIntegerCommand( p_demux, "v4l2-brightness" );
     p_sys->i_contrast =
@@ -657,6 +665,12 @@ static void ParseMRL( demux_t *p_demux )
                 p_sys->i_height =
                     strtol( psz_parser + strlen( "height=" ),
                             &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "videocontrol-reset",
+                               strlen( "videocontrol-reset" ) ) )
+            {
+                p_sys->b_videoctrl_reset = VLC_TRUE;
+                psz_parser += strlen( "videocontrol-reset" );
             }
             else if( !strncmp( psz_parser, "brightness=",
                                strlen( "brightness=" ) ) )
@@ -1554,7 +1568,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 #endif
 
-    VideoControlList( p_demux, i_fd );
+    VideoControlList( p_demux, i_fd, p_sys->b_videoctrl_reset );
 
     VideoControl( p_demux, i_fd,
                   "brightness", V4L2_CID_BRIGHTNESS, p_sys->i_brightness );
@@ -2311,7 +2325,8 @@ open_failed:
  * List available controls
  *****************************************************************************/
 static void VideoControlListPrint( demux_t *p_demux, int i_fd,
-                                   struct v4l2_queryctrl queryctrl )
+                                   struct v4l2_queryctrl queryctrl,
+                                   vlc_bool_t b_reset )
 {
     struct v4l2_querymenu querymenu;
     if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
@@ -2326,17 +2341,14 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
                      "    valid values: %d to %d by steps of %d",
                      queryctrl.minimum, queryctrl.maximum,
                      queryctrl.step );
-            msg_Dbg( p_demux, "    default value: %d",
-                     queryctrl.default_value );
             break;
         case V4L2_CTRL_TYPE_BOOLEAN:
             msg_Dbg( p_demux, "    boolean control" );
-            msg_Dbg( p_demux, "    default value: %d",
-                     queryctrl.default_value );
             break;
         case V4L2_CTRL_TYPE_MENU:
             msg_Dbg( p_demux, "    menu control" );
             memset( &querymenu, 0, sizeof( querymenu ) );
+            querymenu.id = queryctrl.id;
             for( querymenu.index = queryctrl.minimum;
                  querymenu.index <= (unsigned)queryctrl.maximum;
                  querymenu.index++ )
@@ -2347,8 +2359,6 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
                              querymenu.index, querymenu.name );
                 }
             }
-            msg_Dbg( p_demux, "    default value: %d",
-                     queryctrl.default_value );
             break;
         case V4L2_CTRL_TYPE_BUTTON:
             msg_Dbg( p_demux, "    button control" );
@@ -2358,9 +2368,36 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
             /* FIXME */
             break;
     }
+
+    switch( queryctrl.type )
+    {
+        case V4L2_CTRL_TYPE_INTEGER:
+        case V4L2_CTRL_TYPE_BOOLEAN:
+        case V4L2_CTRL_TYPE_MENU:
+            {
+                struct v4l2_control control;
+                msg_Dbg( p_demux, "    default value: %d",
+                         queryctrl.default_value );
+                memset( &control, 0, sizeof( control ) );
+                control.id = queryctrl.id;
+                if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+                {
+                    msg_Dbg( p_demux, "    current value: %d", control.value );
+                }
+                if( b_reset && queryctrl.default_value != control.value )
+                {
+                    msg_Dbg( p_demux, "    reset value to default" );
+                    VideoControl( p_demux, i_fd, NULL,
+                                  queryctrl.id, queryctrl.default_value );
+                }
+            }
+            break;
+        default:
+            break;
+    }
 }
 
-static int VideoControlList( demux_t *p_demux, int i_fd )
+static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
 {
     struct v4l2_queryctrl queryctrl;
 
@@ -2377,7 +2414,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
                 continue;
             msg_Dbg( p_demux, "Available control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            VideoControlListPrint( p_demux, i_fd, queryctrl );
+            VideoControlListPrint( p_demux, i_fd, queryctrl, b_reset );
         }
     }
 
@@ -2392,7 +2429,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
                 continue;
             msg_Dbg( p_demux, "Available private control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            VideoControlListPrint( p_demux, i_fd, queryctrl );
+            VideoControlListPrint( p_demux, i_fd, queryctrl, b_reset );
         }
         else
             break;
