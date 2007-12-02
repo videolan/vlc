@@ -2294,7 +2294,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
          queryctrl.id < V4L2_CID_LASTP1;
          queryctrl.id ++ )
     {
-        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) )
+        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                 continue;
@@ -2327,7 +2327,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
                          querymenu.index <= (unsigned)queryctrl.maximum;
                          querymenu.index++ )
                     {
-                        if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) )
+                        if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
                         {
                             msg_Dbg( p_demux, "        %d: %s",
                                      querymenu.index, querymenu.name );
@@ -2352,7 +2352,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd )
          ;
          queryctrl.id ++ )
     {
-        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) )
+        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                 continue;
@@ -2380,7 +2380,7 @@ static int VideoControl( demux_t *p_demux, int i_fd,
     if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
         || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
     {
-        msg_Err( p_demux, "%s (%x) control is not supported.", psz_label,
+        msg_Warn( p_demux, "%s (%x) control is not supported.", psz_label,
                  i_value );
         return VLC_EGENERIC;
     }
