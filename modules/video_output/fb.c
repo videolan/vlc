@@ -51,6 +51,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
+static int  Control   ( vout_thread_t *, int, va_list );
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
@@ -171,6 +172,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
+    p_vout->pf_control = Control;
 
     /* Set tty and fb devices */
     p_sys->i_tty = 0; /* 0 == /dev/tty0 == current console */
@@ -499,6 +501,18 @@ static void Destroy( vlc_object_t *p_this )
 
     /* Destroy structure */
     free( p_vout->p_sys );
+}
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+       default:
+            return vout_vaControlDefault( p_vout, i_query, args );
+    }
 }
 
 /*****************************************************************************
