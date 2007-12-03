@@ -79,6 +79,7 @@ void InputManager::delInput()
     }
 }
 
+//FIXME break that
 void InputManager::update()
 {
     /// \todo Emit the signals only if it changed
@@ -122,14 +123,15 @@ void InputManager::update()
     {
         val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int > 0 )
+        emit navigationChanged( (val.i_int > 0) ? 1 : 2 );
+        /*if( val.i_int > 0 )
         {
             emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 0 = NO
         }
         else
         {
             emit navigationChanged( 2 );
-        }
+        }*/
     }
     else
     {
@@ -180,24 +182,23 @@ void InputManager::update()
 
 void InputManager::sliderUpdate( float new_pos )
 {
-    if( hasInput() )
-        var_SetFloat( p_input, "position", new_pos );
+    if( hasInput() ) var_SetFloat( p_input, "position", new_pos );
 }
 
 void InputManager::togglePlayPause()
 {
     vlc_value_t state;
     var_Get( p_input, "state", &state );
-    if( state.i_int != PAUSE_S )
-    {
+    state.i_int = ( ( state.i_int != PAUSE_S ) ? PAUSE_S : PLAYING_S );
+    /*{
         /* A stream is being played, pause it */
-        state.i_int = PAUSE_S;
+       /* state.i_int = PAUSE_S;
     }
     else
     {
         /* Stream is paused, resume it */
-        state.i_int = PLAYING_S;
-    }
+        /*state.i_int = PLAYING_S;
+    }*/
     var_Set( p_input, "state", state );
     emit statusChanged( state.i_int );
 }

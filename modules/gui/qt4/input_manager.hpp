@@ -42,11 +42,11 @@ public:
     bool hasVideo() { return b_has_video; }
     bool b_has_audio, b_has_video, b_had_audio, b_had_video;
 private:
-    intf_thread_t *p_intf;
+    intf_thread_t  *p_intf;
     input_thread_t *p_input;
-    int i_old_playing_status;
-    QString old_name;
-    int i_rate;
+    int             i_old_playing_status;
+    QString         old_name;
+    int             i_rate;
 public slots:
     void togglePlayPause();
     void update(); ///< Periodic updates
@@ -89,11 +89,12 @@ public:
     InputManager *getIM() { return im; };
 
 private:
-    InputManager *im;
-    intf_thread_t *p_intf;
-    input_thread_t *p_input;
-    static MainInputManager *instance;
     MainInputManager( intf_thread_t *);
+
+    InputManager            *im;
+    intf_thread_t           *p_intf;
+    input_thread_t          *p_input;
+    static MainInputManager *instance;
 public slots:
     void togglePlayPause();
     void stop();
@@ -104,6 +105,5 @@ private slots:
 signals:
     void inputChanged( input_thread_t *);
 };
-
 
 #endif

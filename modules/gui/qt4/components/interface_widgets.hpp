@@ -145,7 +145,7 @@ class ControlsWidget : public QFrame
     Q_OBJECT
 public:
     /* p_intf, advanced control visible or not, blingbling or not */
-    ControlsWidget( intf_thread_t *, bool, bool );
+    ControlsWidget( intf_thread_t *, MainInterface*, bool, bool );
 //    QSize sizeHint() const;
     virtual ~ControlsWidget();
 

@@ -24,7 +24,6 @@
 #include "input_manager.hpp"
 
 #include "dialogs/open.hpp"
-#include "components/open.hpp"
 
 #include <QTabWidget>
 #include <QGridLayout>

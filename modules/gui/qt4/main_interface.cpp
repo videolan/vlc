@@ -84,9 +84,9 @@ static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* Variables initialisation */
-    need_components_update = false;
+    // need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
-    embeddedPlaylistWasActive = videoIsActive = false;
+    videoIsActive = false;
     input_name = "";
 
     /**
@@ -95,17 +95,18 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( config_GetInt( p_intf, "privacy-ask") )
     {
         QList<ConfigControl *> controls;
-        privacyDialog( controls );
-
-        QList<ConfigControl *>::Iterator i;
-        for(  i = controls.begin() ; i != controls.end() ; i++ )
+        if( privacyDialog( controls ) == QDialog::Accepted )
         {
-            ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-            c->doApply( p_intf );
-        }
+            QList<ConfigControl *>::Iterator i;
+            for(  i = controls.begin() ; i != controls.end() ; i++ )
+            {
+                ConfigControl *c = qobject_cast<ConfigControl *>(*i);
+                c->doApply( p_intf );
+            }
 
-        config_PutInt( p_intf,  "privacy-ask" , 0 );
-        config_SaveConfigFile( p_intf, NULL );
+            config_PutInt( p_intf,  "privacy-ask" , 0 );
+            config_SaveConfigFile( p_intf, NULL );
+        }
     }
 
     /**
@@ -122,15 +123,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Set The Video In emebedded Mode or not */
     videoEmbeddedFlag = false;
-    if( config_GetInt( p_intf, "embedded-video" ) )
-        videoEmbeddedFlag = true;
+    if( config_GetInt( p_intf, "embedded-video" ) ) videoEmbeddedFlag = true;
 
+    /* Are we in the enhanced always-video mode or not ? */
     alwaysVideoFlag = false;
     if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ) )
         alwaysVideoFlag = true;
 
     /* Set the other interface settings */
-    visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
+    //FIXME I don't like that code
+    visualSelectorEnabled = settings->value( "visual-selector", false ).toBool(); 
     notificationEnabled = config_GetInt( p_intf, "qt-notification" )
                           ? true : false;
 
@@ -142,7 +144,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Create a Dock to get the playlist */
     dockPL = new QDockWidget( qtr("Playlist"), this );
-    dockPL->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::MinimumExpanding );
+    dockPL->setSizePolicy( QSizePolicy::Preferred,
+                           QSizePolicy::MinimumExpanding );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
@@ -216,7 +219,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
     ON_TIMEOUT( updateOnTimer() );
-    //ON_TIMEOUT( debug() );
+    //ON_TIMEOUT( debug() ):;
 
     /********************
      * Various CONNECTs *
@@ -281,7 +284,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     // DEBUG FIXME
     hide();
 
-
     updateGeometry();
     settings->endGroup();
 }
@@ -341,31 +343,28 @@ void MainInterface::setVLCWindowsTitle( QString aTitle )
 void MainInterface::handleMainUi( QSettings *settings )
 {
     /* Create the main Widget and the mainLayout */
-    QWidget *main = new QWidget( this );
-    mainLayout = new QVBoxLayout( main );
+    QWidget *main = new QWidget;
     setCentralWidget( main );
+    mainLayout = new QVBoxLayout( main );
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
-    bool b_shiny = config_GetInt( p_intf, "qt-blingbling" );
-    controls = new ControlsWidget( p_intf,
+    /* bool b_shiny = config_GetInt( p_intf, "qt-blingbling" ); */
+    controls = new ControlsWidget( p_intf, this, 
                    settings->value( "adv-controls", false ).toBool(),
-                   b_shiny );
-
-    /* Configure the Controls, the playlist button doesn't trigger THEDP
-       but the toggle from this MainInterface */
-    BUTTONACT( controls->playlistButton, togglePlaylist() );
+                   config_GetInt( p_intf, "qt-blingbling" ) );
 
     /* Add the controls Widget to the main Widget */
-    mainLayout->addWidget( controls );
+    mainLayout->insertWidget( 0, controls );
 
     /* Create the Speed Control Widget */
     speedControl = new SpeedControlWidget( p_intf );
     speedControlMenu = new QMenu( this );
-    QWidgetAction *widgetAction = new QWidgetAction( this );
+
+    QWidgetAction *widgetAction = new QWidgetAction( speedControl );
     widgetAction->setDefaultWidget( speedControl );
     speedControlMenu->addAction( widgetAction );
 
@@ -382,7 +381,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     {
         bgWidget = new BackgroundWidget( p_intf );
         bgWidget->widgetSize = settings->value( "backgroundSize",
-                                           QSize( 300, 300 ) ).toSize();
+                                           QSize( 300, 200 ) ).toSize();
         bgWidget->resize( bgWidget->widgetSize );
         bgWidget->updateGeometry();
         mainLayout->insertWidget( 0, bgWidget );
@@ -405,7 +404,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     updateGeometry();
 }
 
-void MainInterface::privacyDialog( QList<ConfigControl *> controls )
+int MainInterface::privacyDialog( QList<ConfigControl *> controls )
 {
     QDialog *privacy = new QDialog( this );
 
@@ -467,7 +466,7 @@ void MainInterface::privacyDialog( QList<ConfigControl *> controls )
     gLayout->addWidget( ok, 2, 2 );
 
     CONNECT( ok, clicked(), privacy, accept() );
-    privacy->exec();
+    return privacy->exec();
 }
 
 //FIXME remove me at the end...
@@ -506,7 +505,7 @@ QSize MainInterface::sizeHint() const
 }
 
 #if 0
-/* This is dead code and need to be removed AT THE END */
+/* FIXME This is dead code and need to be removed AT THE END */
 void MainInterface::resizeEvent( QResizeEvent *e )
 {
     if( videoWidget )
@@ -765,7 +764,8 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
 
 void MainInterface::toggleTimeDisplay()
 {
-    b_remainingTime = ( b_remainingTime ? false : true );
+    b_remainingTime = !b_remainingTime;
+    //b_remainingTime = ( b_remainingTime ? false : true );
 }
 
 void MainInterface::setName( QString name )
@@ -795,14 +795,14 @@ void MainInterface::setRate( int rate )
     speedControl->updateControls( rate );
 }
 
+//FIXME Remove this function at the end...
 void MainInterface::updateOnTimer()
 {
-    /* \todo Make this event-driven */
-    if( intf_ShouldDie( p_intf ) )
+ /*   if( intf_ShouldDie( p_intf ) )
     {
         QApplication::closeAllWindows();
         QApplication::quit();
-    }
+    }*/
 #if 0
     if( need_components_update )
     {
@@ -843,6 +843,7 @@ void MainInterface::createSystray()
  */
 void MainInterface::toggleUpdateSystrayMenu()
 {
+    /* If hidden, show it */
     if( isHidden() )
     {
         show();
@@ -850,11 +851,13 @@ void MainInterface::toggleUpdateSystrayMenu()
     }
     else if( isMinimized() )
     {
+        /* Minimized */
         showNormal();
         activateWindow();
     }
     else
     {
+        /* Visible */
 #ifdef WIN32
         /* check if any visible window is above vlc in the z-order,
          * but ignore the ones always on top */
@@ -891,7 +894,7 @@ void MainInterface::handleSystrayClick(
         case QSystemTrayIcon::MiddleClick:
             sysTray->showMessage( qtr( "VLC media player" ),
                     qtr( "Control menu for the player" ),
-                    QSystemTrayIcon::Information, 4000 );
+                    QSystemTrayIcon::Information, 3000 );
             break;
     }
 }
@@ -912,7 +915,7 @@ void MainInterface::updateSystrayTooltipName( QString name )
         if( notificationEnabled && ( isHidden() || isMinimized() ) )
         {
             sysTray->showMessage( qtr( "VLC media player" ), name,
-                    QSystemTrayIcon::NoIcon, 4000 );
+                    QSystemTrayIcon::NoIcon, 3000 );
         }
     }
 }
@@ -926,6 +929,7 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
     switch( i_status )
     {
         case  0:
+        case  END_S:
             {
                 sysTray->setToolTip( qtr( "VLC media player" ) );
                 break;
@@ -1047,6 +1051,8 @@ void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
     vlc_object_kill( p_intf );
+    QApplication::closeAllWindows();
+    QApplication::quit();
 }
 
 /*****************************************************************************

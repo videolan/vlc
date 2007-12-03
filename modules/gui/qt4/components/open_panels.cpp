@@ -28,7 +28,7 @@
 
 
 #include "qt4.hpp"
-#include "components/open.hpp"
+#include "components/open_panels.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs_provider.hpp"
 #include "components/preferences_widgets.hpp"

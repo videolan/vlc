@@ -29,7 +29,7 @@
 #include "util/qvlcframe.hpp"
 #include "dialogs_provider.hpp"
 #include "ui/open.h"
-#include "components/open.hpp"
+#include "components/open_panels.hpp"
 
 class QString;
 class QToolButton;

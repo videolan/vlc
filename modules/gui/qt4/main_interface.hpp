@@ -99,14 +99,13 @@ private:
     void handleSystray();
 
     void createSystray();
-    void privacyDialog( QList<ConfigControl *> controls );
+    int privacyDialog( QList<ConfigControl *> controls );
 
     /* Video */
     VideoWidget         *videoWidget;
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
 
-    bool                 embeddedPlaylistWasActive;
     bool                 videoIsActive;
     QSize                savedVideoSize;
 
