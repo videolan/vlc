@@ -43,6 +43,7 @@ static int  Manage     ( vout_thread_t * );
 static void Render     ( vout_thread_t *, picture_t * );
 static void Display    ( vout_thread_t *, picture_t * );
 static void SetPalette ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
+static int  Control   ( vout_thread_t *, int, va_list );
 
 /*****************************************************************************
  * OpenVideo: activates dummy video thread output method
@@ -58,9 +59,23 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_render = Render;
     p_vout->pf_display = Display;
+    p_vout->pf_control = Control;
 
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+       default:
+            return vout_vaControlDefault( p_vout, i_query, args );
+    }
+}
+
 
 /*****************************************************************************
  * Init: initialize dummy video thread output method
