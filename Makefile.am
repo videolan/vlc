@@ -316,7 +316,6 @@ install-exec-local: install-binPROGRAMS
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
 	  ln -sf "$${inst}" "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
-	$(INSTALL) $(top_builddir)/.libs/vlc ${DESTDIR}${bindir}/vlc;
 
 # the opposite of install-{data,exec}-local
 uninstall-local:
