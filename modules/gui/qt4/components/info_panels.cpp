@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #include "qt4.hpp"
-#include "components/infopanels.hpp"
+#include "components/info_panels.hpp"
 
 #include <QTreeWidget>
 #include <QListView>

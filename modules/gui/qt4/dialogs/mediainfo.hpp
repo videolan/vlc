@@ -26,7 +26,7 @@
 #define _MEDIAINFO_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
-#include "components/infopanels.hpp"
+#include "components/info_panels.hpp"
 
 class QTabWidget;
 class InfoTab;

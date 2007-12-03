@@ -32,7 +32,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/podcast_configuration.moc.cpp \
 		dialogs/vlm.moc.cpp \
 		components/extended_panels.moc.cpp \
-		components/infopanels.moc.cpp \
+		components/info_panels.moc.cpp \
 		components/preferences_widgets.moc.cpp \
 		components/complete_preferences.moc.cpp \
 		components/simple_preferences.moc.cpp \
@@ -98,7 +98,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/vlm.cpp \
 		dialogs/podcast_configuration.cpp \
 		components/extended_panels.cpp \
-		components/infopanels.cpp \
+		components/info_panels.cpp \
 		components/preferences_widgets.cpp \
 		components/complete_preferences.cpp \
 		components/simple_preferences.cpp \
@@ -130,7 +130,7 @@ noinst_HEADERS = \
 	dialogs/vlm.hpp \
 	dialogs/podcast_configuration.hpp \
 	components/extended_panels.hpp \
-	components/infopanels.hpp \
+	components/info_panels.hpp \
 	components/preferences_widgets.hpp \
 	components/complete_preferences.hpp \
 	components/simple_preferences.hpp \

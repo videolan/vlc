@@ -23,7 +23,6 @@
  ******************************************************************************/
 
 #include "dialogs/mediainfo.hpp"
-#include "components/infopanels.hpp"
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
 
