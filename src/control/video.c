@@ -127,7 +127,7 @@ void libvlc_toggle_fullscreen( libvlc_media_instance_t *p_mi,
 
 void
 libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
-                       libvlc_exception_t *p_e )
+        unsigned int i_width, unsigned int i_height, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     input_thread_t *p_input_thread;
@@ -144,6 +144,8 @@ libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
         return;
     }
 
+    var_SetInteger( p_vout, "snapshot-width", i_width );
+    var_SetInteger( p_vout, "snapshot-height", i_height );
 
     p_input_thread = (input_thread_t*)vlc_object_get(
                                  p_mi->p_libvlc_instance->p_libvlc_int,

@@ -822,11 +822,15 @@ VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_instance_t *, int, l
 
 /**
  * Take a snapshot of the current video window
+ * If i_width AND i_height is 0, original size is used
+ * if i_width XOR i_height is 0, original aspect-ratio is preserved
  * \param p_input the input
  * \param psz_filepath the path where to save the screenshot to
+ * \param i_width the snapshot's width
+ * \param i_height the snapshot's height
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_instance_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_instance_t *, char *,unsigned int, unsigned int, libvlc_exception_t * );
 
 VLC_PUBLIC_API int libvlc_video_destroy( libvlc_media_instance_t *, libvlc_exception_t *);
 
