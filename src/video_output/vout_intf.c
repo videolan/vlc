@@ -516,8 +516,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         /* Save the snapshot to a memory zone */
         fmt_in = p_vout->fmt_in;
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
-        /* FIXME: should not be hardcoded. We should be able to
-        specify the snapshot size (snapshot-width and snapshot-height). */
         fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
         fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
         fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
