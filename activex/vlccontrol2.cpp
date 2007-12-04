@@ -2479,7 +2479,7 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
                 return E_FAIL;
 
             /* take snapshot into file */
-            libvlc_video_take_snapshot(p_md, psz_filepath, &ex);
+            libvlc_video_take_snapshot(p_md, psz_filepath, 0, 0, &ex);
             libvlc_media_instance_release(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
