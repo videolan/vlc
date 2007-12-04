@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_osd.h - OSD menu and subpictures definitions and function prototypes
  *****************************************************************************
- * Copyright (Cà 1999-2006 the VideoLAN team
+ * Copyright (C) 1999-2006 the VideoLAN team
  * Copyright (C) 2004-2005 M2X
  * $Id$
  *
