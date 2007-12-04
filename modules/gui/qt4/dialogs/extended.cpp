@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +35,6 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
-
     setWindowTitle( qtr( "Adjustments and Effects" ) );
 
     QGridLayout *layout = new QGridLayout( this );
@@ -42,7 +42,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QTabWidget *mainTab = new QTabWidget( this );
     mainTab->setTabPosition( QTabWidget::West );
 
-    QWidget *audioWidget = new QWidget( this );
+    QWidget *audioWidget = new QWidget;
     QHBoxLayout *audioLayout = new QHBoxLayout( audioWidget );
     QTabWidget *audioTab = new QTabWidget( mainTab );
 

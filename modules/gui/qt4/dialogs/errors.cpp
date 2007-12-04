@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 #include <QTextEdit>
 #include <QCheckBox>
 #include <QGridLayout>
+#include <QDialogButtonBox>
 #include <QPushButton>
 
 ErrorsDialog *ErrorsDialog::instance = NULL;
@@ -34,13 +36,18 @@ ErrorsDialog *ErrorsDialog::instance = NULL;
 ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Errors" ) );
-    resize( 500 , 200 );
+    resize( 500 , 300 );
 
     setWindowModality( Qt::ApplicationModal );
 
     QGridLayout *layout = new QGridLayout( this );
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
+    buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( clearButton, QDialogButtonBox::ActionRole );
+
     messages = new QTextEdit();
     messages->setReadOnly( true );
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -49,10 +56,9 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     layout->addWidget( messages, 0, 0, 1, 3 );
     layout->addWidget( stopShowing, 1, 0 );
     layout->addItem( new QSpacerItem( 200, 20, QSizePolicy::Expanding ), 2,0 );
-    layout->addWidget( clearButton, 2, 1 );
-    layout->addWidget( closeButton, 2, 2 );
+    layout->addWidget( buttonBox, 2, 2 );
 
-    BUTTONACT( closeButton, close() );
+    CONNECT( buttonBox, accepted(), this, close() );
     BUTTONACT( clearButton, clear() );
     BUTTONACT( stopShowing, dontShow() );
 }

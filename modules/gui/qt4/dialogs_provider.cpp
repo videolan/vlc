@@ -146,6 +146,7 @@ void DialogsProvider::prefsDialog()
 {
     PrefsDialog::getInstance( p_intf )->toggleVisible();
 }
+
 void DialogsProvider::extendedDialog()
 {
     ExtendedDialog::getInstance( p_intf )->toggleVisible();
@@ -278,6 +279,11 @@ QStringList DialogsProvider::showSimpleOpen( QString help,
         fileTypes );
 }
 
+/**
+ * Open a file,
+ * pl helps you to choose from playlist or media library,
+ * go to start or enqueue
+ **/
 void DialogsProvider::addFromSimple( bool pl, bool go)
 {
     QStringList files = DialogsProvider::showSimpleOpen();
@@ -295,6 +301,11 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
     }
 }
 
+void DialogsProvider::simpleOpenDialog()
+{
+    addFromSimple( true, true ); /* Playlist and Go */
+}
+
 void DialogsProvider::simplePLAppendDialog()
 {
     addFromSimple( true, false );
@@ -305,13 +316,7 @@ void DialogsProvider::simpleMLAppendDialog()
     addFromSimple( false, false );
 }
 
-void DialogsProvider::simpleOpenDialog()
-{
-    addFromSimple( true, true );
-}
-
 /* Directory */
-
 /**
  * Open a directory,
  * pl helps you to choose from playlist or media library,
@@ -344,7 +349,7 @@ void DialogsProvider::MLAppendDir()
 /****************
  * Playlist     *
  ****************/
-void DialogsProvider::openPlaylist()
+void DialogsProvider::openAPlaylist()
 {
     QStringList files = showSimpleOpen( qtr( "Open playlist file" ),
                                         EXT_FILTER_PLAYLIST );
@@ -354,7 +359,7 @@ void DialogsProvider::openPlaylist()
     }
 }
 
-void DialogsProvider::savePlaylist()
+void DialogsProvider::saveAPlaylist()
 {
     QFileDialog *qfd = new QFileDialog( NULL,
                                    qtr("Choose a filename to save playlist"),
@@ -456,7 +461,6 @@ void DialogsProvider::streamingDialog()
     }
     delete o;
 }*/
-
 
 
 /****************************************************************************

@@ -217,8 +217,8 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
                      qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
     menu->addSeparator();
 
-    DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+X" );
-    DP_SADD( menu, qtr( I_PL_SAVE ), "", "", savePlaylist(), "Ctrl+Y" );
+    DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openAPlaylist(), "Ctrl+X" );
+    DP_SADD( menu, qtr( I_PL_SAVE ), "", "", saveAPlaylist(), "Ctrl+Y" );
     menu->addSeparator();
     menu->addAction( qtr( "Undock from interface" ), mi,
                      SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );

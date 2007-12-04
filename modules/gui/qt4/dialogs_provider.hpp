@@ -147,6 +147,7 @@ public slots:
     void updateDialog();
     void aboutDialog();
     void gotoTimeDialog();
+    void podcastConfigureDialog();
 
     void simpleOpenDialog();
     void simplePLAppendDialog();
@@ -168,10 +169,8 @@ public slots:
     void openThenStreamingDialogs();
     void openThenTranscodingDialogs();
 
-    void openPlaylist();
-    void savePlaylist();
-
-    void podcastConfigureDialog();
+    void openAPlaylist();
+    void saveAPlaylist();
 
     void switchToSkins();
     void quit();
