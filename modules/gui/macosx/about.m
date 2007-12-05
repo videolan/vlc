@@ -76,10 +76,10 @@ static VLAboutBox *_o_sharedInstance = nil;
         o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
 
         /* Setup the name field */
-        o_name_field = [o_local_dict objectForKey:@"CFBundleName"];
+        [o_name_field setStringValue: [o_local_dict objectForKey:@"CFBundleName"]];
  
         /* Set the about box title */
-        [o_about_window setTitle:_NS("About VLC media player")];
+        [o_about_window setTitle: _NS("About VLC media player")];
 
         /* setup the creator / revision field */
         if( VLC_Changeset() != "exported" )
