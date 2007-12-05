@@ -275,8 +275,8 @@ void UpdateDialog::updateOrUpload()
         bool b_download = false;
         if( p_updateit )
         {
-            QString saveDir = QFileDialog::getExistingDirectory( this, qtr( "Choose a direcctory..." ),
-                                                                qfu( p_intf->p_libvlc->psz_homedir ) );
+            QString saveDir = QFileDialog::getExistingDirectory( this, qtr( "Choose a directory..." ),
+                                                            qfu( p_intf->p_libvlc->psz_homedir ) );
 
             p_updateit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
             p_updateit->i_t = UPDATE_FILE_TYPE_ALL;
