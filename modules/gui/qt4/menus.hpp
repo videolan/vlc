@@ -72,8 +72,7 @@ class QVLCMenu : public QObject
 {
     Q_OBJECT;
 public:
-    static void createMenuBar( MainInterface *mi, intf_thread_t *,
-                               bool );
+    static void createMenuBar( MainInterface *mi, intf_thread_t *, bool );
 
     /* Menus */
     static QMenu *FileMenu();
@@ -91,6 +90,7 @@ public:
     static void VideoPopupMenu( intf_thread_t * );
     static void MiscPopupMenu( intf_thread_t * );
     static void PopupMenu( intf_thread_t *, bool );
+    static void PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu );
 
     /* Systray */
     static void updateSystrayMenu( MainInterface *,intf_thread_t  *,
