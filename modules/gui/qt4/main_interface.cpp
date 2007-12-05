@@ -132,7 +132,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Set the other interface settings */
     //FIXME I don't like that code
-    visualSelectorEnabled = settings->value( "visual-selector", false ).toBool(); 
+    visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
     notificationEnabled = config_GetInt( p_intf, "qt-notification" )
                           ? true : false;
 
@@ -353,7 +353,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Create the CONTROLS Widget */
     /* bool b_shiny = config_GetInt( p_intf, "qt-blingbling" ); */
-    controls = new ControlsWidget( p_intf, this, 
+    controls = new ControlsWidget( p_intf, this,
                    settings->value( "adv-controls", false ).toBool(),
                    config_GetInt( p_intf, "qt-blingbling" ) );
 
