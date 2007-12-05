@@ -35,33 +35,33 @@
 #include <QTimer>
 #include <QApplication>
 
-#define ADD_FILTER_MEDIA( string )   \
-    string += qtr("Media Files");      \
-    string += " ( ";                 \
-    string += EXTENSIONS_MEDIA;      \
+#define ADD_FILTER_MEDIA( string )     \
+    string += qtr( "Media Files" );    \
+    string += " ( ";                   \
+    string += EXTENSIONS_MEDIA;        \
     string += ");;";
-#define ADD_FILTER_VIDEO( string )   \
-    string += qtr("Video Files");      \
-    string += " ( ";                 \
-    string += EXTENSIONS_VIDEO;      \
+#define ADD_FILTER_VIDEO( string )     \
+    string += qtr( "Video Files" );    \
+    string += " ( ";                   \
+    string += EXTENSIONS_VIDEO;        \
     string += ");;";
-#define ADD_FILTER_AUDIO( string )   \
-    string += qtr("Audio Files");      \
-    string += " ( ";                 \
-    string += EXTENSIONS_AUDIO;      \
+#define ADD_FILTER_AUDIO( string )     \
+    string += qtr( "Audio Files" );    \
+    string += " ( ";                   \
+    string += EXTENSIONS_AUDIO;        \
     string += ");;";
-#define ADD_FILTER_PLAYLIST( string )\
-    string += qtr("Playlist Files");   \
-    string += " ( ";                 \
-    string += EXTENSIONS_PLAYLIST;   \
+#define ADD_FILTER_PLAYLIST( string )  \
+    string += qtr( "Playlist Files" ); \
+    string += " ( ";                   \
+    string += EXTENSIONS_PLAYLIST;     \
     string += ");;";
-#define ADD_FILTER_SUBTITLE( string )\
-    string += qtr("Subtitles Files");   \
-    string += " ( ";                 \
-    string += EXTENSIONS_SUBTITLE;   \
+#define ADD_FILTER_SUBTITLE( string )  \
+    string += qtr( "Subtitles Files" );\
+    string += " ( ";                   \
+    string += EXTENSIONS_SUBTITLE;     \
     string += ");;";
-#define ADD_FILTER_ALL( string )     \
-    string += qtr("All Files");        \
+#define ADD_FILTER_ALL( string )       \
+    string += qtr( "All Files" );      \
     string += " (*.*)";
 
 #define EXT_FILTER_MEDIA        0x01
@@ -132,7 +132,7 @@ private:
 public slots:
     void doInteraction( intf_dialog_args_t * );
     void menuAction( QObject *);
-    void menuUpdateAction( QObject *);
+    void menuUpdateAction( QObject * );
     void SDMenuAction( QString );
 
     void playlistDialog();

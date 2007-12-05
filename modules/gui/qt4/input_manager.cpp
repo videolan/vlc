@@ -38,7 +38,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
     i_old_playing_status = END_S;
-    old_name="";
+    old_name = "";
     p_input = NULL;
     i_rate = 0;
     ON_TIMEOUT( update() );
@@ -176,7 +176,7 @@ void InputManager::update()
     if( i_old_playing_status != val.i_int )
     {
         i_old_playing_status = val.i_int;
-        emit statusChanged(  val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S );
+        emit statusChanged( val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S );
     }
 }
 

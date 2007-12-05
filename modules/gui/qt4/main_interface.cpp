@@ -143,7 +143,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     handleMainUi( settings );
 
     /* Create a Dock to get the playlist */
-    dockPL = new QDockWidget( qtr("Playlist"), this );
+    dockPL = new QDockWidget( qtr( "Playlist" ), this );
     dockPL->setSizePolicy( QSizePolicy::Preferred,
                            QSizePolicy::MinimumExpanding );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
@@ -789,7 +789,7 @@ void MainInterface::setStatus( int status )
 void MainInterface::setRate( int rate )
 {
     QString str;
-    str.setNum( ( 1000 / (double)rate), 'f', 2 );
+    str.setNum( ( 1000 / (double)rate ), 'f', 2 );
     str.append( "x" );
     speedLabel->setText( str );
     speedControl->updateControls( rate );

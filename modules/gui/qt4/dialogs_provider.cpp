@@ -88,48 +88,48 @@ void DialogsProvider::customEvent( QEvent *event )
         DialogEvent *de = static_cast<DialogEvent*>(event);
         switch( de->i_dialog )
         {
-            case INTF_DIALOG_FILE_SIMPLE:
-            case INTF_DIALOG_FILE:
-                openDialog(); break;
-            case INTF_DIALOG_DISC:
-                openDiscDialog(); break;
-            case INTF_DIALOG_NET:
-                openNetDialog(); break;
-            case INTF_DIALOG_SAT:
-            case INTF_DIALOG_CAPTURE:
-                openCaptureDialog(); break;
-            case INTF_DIALOG_DIRECTORY:
-                PLAppendDir(); break;
-            case INTF_DIALOG_PLAYLIST:
-                playlistDialog(); break;
-            case INTF_DIALOG_MESSAGES:
-                messagesDialog(); break;
-            case INTF_DIALOG_FILEINFO:
-               mediaInfoDialog(); break;
-            case INTF_DIALOG_PREFS:
-               prefsDialog(); break;
-            case INTF_DIALOG_BOOKMARKS:
-               bookmarksDialog(); break;
-            case INTF_DIALOG_EXTENDED:
-               extendedDialog(); break;
-            case INTF_DIALOG_VLM:
-               vlmDialog(); break;
-            case INTF_DIALOG_INTERACTION:
-               doInteraction( de->p_arg ); break;
-            case INTF_DIALOG_POPUPMENU:
-               QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0) ); break;
-            case INTF_DIALOG_AUDIOPOPUPMENU:
-               QVLCMenu::AudioPopupMenu( p_intf ); break;
-            case INTF_DIALOG_VIDEOPOPUPMENU:
-               QVLCMenu::VideoPopupMenu( p_intf ); break;
-            case INTF_DIALOG_MISCPOPUPMENU:
-               QVLCMenu::MiscPopupMenu( p_intf ); break;
-            case INTF_DIALOG_WIZARD:
-            case INTF_DIALOG_STREAMWIZARD:
-            case INTF_DIALOG_UPDATEVLC:
-            case INTF_DIALOG_EXIT:
-            default:
-               msg_Warn( p_intf, "unimplemented dialog\n" );
+        case INTF_DIALOG_FILE_SIMPLE:
+        case INTF_DIALOG_FILE:
+            openDialog(); break;
+        case INTF_DIALOG_DISC:
+            openDiscDialog(); break;
+        case INTF_DIALOG_NET:
+            openNetDialog(); break;
+        case INTF_DIALOG_SAT:
+        case INTF_DIALOG_CAPTURE:
+            openCaptureDialog(); break;
+        case INTF_DIALOG_DIRECTORY:
+            PLAppendDir(); break;
+        case INTF_DIALOG_PLAYLIST:
+            playlistDialog(); break;
+        case INTF_DIALOG_MESSAGES:
+            messagesDialog(); break;
+        case INTF_DIALOG_FILEINFO:
+           mediaInfoDialog(); break;
+        case INTF_DIALOG_PREFS:
+           prefsDialog(); break;
+        case INTF_DIALOG_BOOKMARKS:
+           bookmarksDialog(); break;
+        case INTF_DIALOG_EXTENDED:
+           extendedDialog(); break;
+        case INTF_DIALOG_VLM:
+           vlmDialog(); break;
+        case INTF_DIALOG_INTERACTION:
+           doInteraction( de->p_arg ); break;
+        case INTF_DIALOG_POPUPMENU:
+           QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0) ); break;
+        case INTF_DIALOG_AUDIOPOPUPMENU:
+           QVLCMenu::AudioPopupMenu( p_intf ); break;
+        case INTF_DIALOG_VIDEOPOPUPMENU:
+           QVLCMenu::VideoPopupMenu( p_intf ); break;
+        case INTF_DIALOG_MISCPOPUPMENU:
+           QVLCMenu::MiscPopupMenu( p_intf ); break;
+        case INTF_DIALOG_WIZARD:
+        case INTF_DIALOG_STREAMWIZARD:
+        case INTF_DIALOG_UPDATEVLC:
+        case INTF_DIALOG_EXIT:
+        default:
+           msg_Warn( p_intf, "unimplemented dialog" );
         }
     }
 }
@@ -362,10 +362,10 @@ void DialogsProvider::openAPlaylist()
 void DialogsProvider::saveAPlaylist()
 {
     QFileDialog *qfd = new QFileDialog( NULL,
-                                   qtr("Choose a filename to save playlist"),
+                                   qtr( "Choose a filename to save playlist" ),
                                    qfu( p_intf->p_libvlc->psz_homedir ),
-                                   qtr("XSPF playlist (*.xspf);; ") +
-                                   qtr("M3U playlist (*.m3u);; Any (*.*) ") );
+                                   qtr( "XSPF playlist (*.xspf);; " ) +
+                                   qtr( "M3U playlist (*.m3u);; Any (*.*) " ) );
     qfd->setFileMode( QFileDialog::AnyFile );
     qfd->setAcceptMode( QFileDialog::AcceptSave );
     qfd->setConfirmOverwrite( true );
@@ -381,8 +381,8 @@ void DialogsProvider::saveAPlaylist()
             QString file = qfd->selectedFiles().first();
             QString filter = qfd->selectedFilter();
 
-            if( file.contains(".xsp") ||
-                ( filter.contains(".xspf") && !file.contains(".m3u") ) )
+            if( file.contains( ".xsp" ) ||
+                ( filter.contains( ".xspf" ) && !file.contains( ".m3u" ) ) )
             {
                 psz_module = psz_xspf;
                 if( !file.contains( ".xsp" ) )
@@ -395,7 +395,7 @@ void DialogsProvider::saveAPlaylist()
                     file.append( ".m3u" );
             }
 
-            playlist_Export( THEPL, qtu(file), THEPL->p_local_category,
+            playlist_Export( THEPL, qtu( file ), THEPL->p_local_category,
                              psz_module);
         }
     }
@@ -414,10 +414,10 @@ void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
                                                     b_transcode_only );
     if( s->exec() == QDialog::Accepted )
     {
-        msg_Err( p_intf, "mrl %s\n", qta( s->getMrl() ) );
+        msg_Err( p_intf, "mrl %s", qta( s->getMrl() ) );
         /* Just do it */
         int i_len = strlen( qtu( s->getMrl() ) ) + 10;
-        char *psz_option = (char*)malloc(i_len);
+        char *psz_option = (char*)malloc( i_len );
         snprintf( psz_option, i_len - 1, "%s", qtu( s->getMrl() ) );
 
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",

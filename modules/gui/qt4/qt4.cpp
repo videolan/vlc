@@ -47,67 +47,67 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALWAYS_VIDEO_TEXT N_("Always show video area")
-#define ALWAYS_VIDEO_LONGTEXT N_("Start VLC with a cone image, and display it" \
-                                   " when there is no video track." )
+#define ALWAYS_VIDEO_TEXT N_( "Always show video area" )
+#define ALWAYS_VIDEO_LONGTEXT N_( "Start VLC with a cone image, and display it" \
+                                  " when there is no video track." )
 
-#define ADVANCED_PREFS_TEXT N_("Show advanced prefs over simple ones")
-#define ADVANCED_PREFS_LONGTEXT N_("Show advanced preferences and not simple " \
-                                   "preferences when opening the preferences " \
-                                   "dialog.")
+#define ADVANCED_PREFS_TEXT N_( "Show advanced prefs over simple ones" )
+#define ADVANCED_PREFS_LONGTEXT N_( "Show advanced preferences and not simple " \
+                                    "preferences when opening the preferences " \
+                                    "dialog." )
 
-#define SYSTRAY_TEXT N_("Systray icon")
-#define SYSTRAY_LONGTEXT N_("Show an icon in the systray " \
-                            "allowing you to control VLC media player " \
-                            "for basic actions")
+#define SYSTRAY_TEXT N_( "Systray icon" )
+#define SYSTRAY_LONGTEXT N_( "Show an icon in the systray " \
+                             "allowing you to control VLC media player " \
+                             "for basic actions" )
 
-#define MINIMIZED_TEXT N_("Start VLC with only a systray icon")
-#define MINIMIZED_LONGTEXT N_("When you launch VLC with that option, " \
-                            "VLC will start with just an icon in" \
-                            "your taskbar")
+#define MINIMIZED_TEXT N_( "Start VLC with only a systray icon" )
+#define MINIMIZED_LONGTEXT N_( "When you launch VLC with that option, " \
+                               "VLC will start with just an icon in" \
+                               "your taskbar" )
 
-#define TITLE_TEXT N_("Show playing item name in window title")
-#define TITLE_LONGTEXT N_("Show the name of the song or video in the " \
-                          "controler window title")
+#define TITLE_TEXT N_( "Show playing item name in window title" )
+#define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
+                           "controler window title" )
 
-#define FILEDIALOG_PATH_TEXT N_("Path to use in openfile dialog")
+#define FILEDIALOG_PATH_TEXT N_( "Path to use in openfile dialog" )
 
-#define NOTIFICATION_TEXT N_("Show notification popup on track change")
+#define NOTIFICATION_TEXT N_( "Show notification popup on track change" )
 #define NOTIFICATION_LONGTEXT N_( \
     "Show a notification popup with the artist and track name when " \
     "the current playlist item changes, when VLC is minimized or hidden." )
 
-#define ADVANCED_OPTIONS_TEXT N_("Advanced options")
-#define ADVANCED_OPTIONS_LONGTEXT N_("Show all the advanced options " \
-                                    "in the dialogs")
+#define ADVANCED_OPTIONS_TEXT N_( "Advanced options" )
+#define ADVANCED_OPTIONS_LONGTEXT N_( "Show all the advanced options " \
+                                      "in the dialogs" )
 
-#define OPACITY_TEXT N_("Windows opacity between 0.1 and 1.")
-#define OPACITY_LONGTEXT N_("Sets the windows opacity between 0.1 and 1 " \
-                            "for main interface, playlist and extended panel." \
-                            " This option only works with Windows and " \
-                            "X11 with composite extensions.")
+#define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1." )
+#define OPACITY_LONGTEXT N_( "Sets the windows opacity between 0.1 and 1 " \
+                             "for main interface, playlist and extended panel." \
+                             " This option only works with Windows and " \
+                             "X11 with composite extensions." )
 
-#define SHOWFLAGS_TEXT N_("Define what columns to show in playlist window")
-#define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want: \n" \
-            "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
-            "Copyright: 16; Collection/album: 32; Rating: 256." )
+#define SHOWFLAGS_TEXT N_( "Define what columns to show in playlist window" )
+#define SHOWFLAGS_LONGTEXT N_( "Enter the sum of the options that you want: \n" \
+                               "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
+                               "Copyright: 16; Collection/album: 32; Rating: 256." )
 
-#define ERROR_TEXT N_("Show unimportant error and warnings dialogs" )
-#define MINIMAL_TEXT N_("Start in minimal view (menus hidden)." )
+#define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
+#define MINIMAL_TEXT N_( "Start in minimal view (menus hidden)." )
 
-#define UPDATER_TEXT N_("Activate the new updates notification")
-#define UPDATER_LONGTEXT N_("Activate the automatic notification of new " \
+#define UPDATER_TEXT N_( "Activate the new updates notification" )
+#define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
                             "versions of the software. It runs once a week." )
 
-#define COMPLETEVOL_TEXT N_("Allow the volume to be set to 400%" )
-#define COMPLETEVOL_LONGTEXT N_("Allow the volume to have range from 0% to " \
-                                "400%, instead of 0% to 200%. This option " \
-                                "can distort the audio, since it uses " \
-                                "software amplification.")
+#define COMPLETEVOL_TEXT N_( "Allow the volume to be set to 400%" )
+#define COMPLETEVOL_LONGTEXT N_( "Allow the volume to have range from 0% to " \
+                                 "400%, instead of 0% to 200%. This option " \
+                                 "can distort the audio, since it uses " \
+                                 "software amplification." )
 
-#define BLING_TEXT N_("Use non native buttons and volume slider")
+#define BLING_TEXT N_( "Use non native buttons and volume slider" )
 
-#define PRIVACY_TEXT N_("Ask for network policy at start")
+#define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
@@ -144,9 +144,9 @@ vlc_module_begin();
                   BLING_TEXT, VLC_FALSE );
 
         add_bool( "qt-volume-complete", VLC_FALSE, NULL, COMPLETEVOL_TEXT,
-                COMPLETEVOL_LONGTEXT, VLC_TRUE);
+                COMPLETEVOL_LONGTEXT, VLC_TRUE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
-                FILEDIALOG_PATH_TEXT, VLC_TRUE);
+                FILEDIALOG_PATH_TEXT, VLC_TRUE );
             change_autosave();
             change_internal();
 
@@ -183,10 +183,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 #endif
-    p_intf->p_sys = (intf_sys_t *)malloc(sizeof( intf_sys_t ) );
+    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
     {
-        msg_Err(p_intf, "Out of memory");
+        msg_Err( p_intf, "Out of memory" );
         return VLC_ENOMEM;
     }
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
@@ -250,7 +250,7 @@ static void Init( intf_thread_t *p_intf )
      * disables icon theme use because that makes Cleanlooks style bug
      * because it asks gconf for some settings that timeout because of threads
      * see commits 21610 21622 21654 for reference */
-    QApplication::setDesktopSettingsAware(false);
+    QApplication::setDesktopSettingsAware( false );
 #endif
 
     /* Start the QApplication here */
@@ -272,12 +272,12 @@ static void Init( intf_thread_t *p_intf )
     /*if( p_intf->pf_show_dialog )*/
         vlc_thread_ready( p_intf );
     // Translation - get locale
-    QLocale ql = QLocale::system ();
+    QLocale ql = QLocale::system();
     // Translations for qt's own dialogs
     QTranslator qtTranslator( 0 );
     // Let's find the right path for the translation file
 #if !defined( WIN32 )
-    QString path =  QString(QT4LOCALEDIR);
+    QString path =  QString( QT4LOCALEDIR );
 #else
     QString path = QString( QString(system_VLCPath()) + DIR_SEP +
                             "locale" + DIR_SEP );
@@ -285,8 +285,8 @@ static void Init( intf_thread_t *p_intf )
     // files depending on locale
     bool b_loaded = qtTranslator.load( path + "qt_" + ql.name());
     if (!b_loaded)
-        msg_Dbg(p_intf, "Error while initializing qt-specific localization");
-    app->installTranslator(&qtTranslator);
+        msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
+    app->installTranslator( &qtTranslator );
 
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )

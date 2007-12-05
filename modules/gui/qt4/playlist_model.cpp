@@ -58,7 +58,7 @@ static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
  *      Duration
  */
 
-void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
+void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 {
     parentItem = parent;
     i_id = _i_id; i_input_id = _i_input_id;
@@ -91,39 +91,39 @@ void PLItem::updateview( void )
         {
             switch( i_index )
             {
-                case VLC_META_ENGINE_ARTIST:
-                    strings.append( qtr( VLC_META_ARTIST ) );
-                    break;
-                case VLC_META_ENGINE_TITLE:
-                    strings.append( qtr( VLC_META_TITLE ) );
-                    break;
-                case VLC_META_ENGINE_DESCRIPTION:
-                    strings.append( qtr( VLC_META_DESCRIPTION ) );
-                    break;
-                case VLC_META_ENGINE_DURATION:
-                    strings.append( qtr( "Duration" ) );
-                    break;
-                case VLC_META_ENGINE_GENRE:
-                    strings.append( qtr( VLC_META_GENRE ) );
-                    break;
-                case VLC_META_ENGINE_COLLECTION:
-                    strings.append( qtr( VLC_META_COLLECTION ) );
-                    break;
-                case VLC_META_ENGINE_SEQ_NUM:
-                    strings.append( qtr( VLC_META_SEQ_NUM ) );
-                    break;
-                case VLC_META_ENGINE_RATING:
-                    strings.append( qtr( VLC_META_RATING ) );
-                    break;
-                default:
-                    break;
+            case VLC_META_ENGINE_ARTIST:
+                strings.append( qtr( VLC_META_ARTIST ) );
+                break;
+            case VLC_META_ENGINE_TITLE:
+                strings.append( qtr( VLC_META_TITLE ) );
+                break;
+            case VLC_META_ENGINE_DESCRIPTION:
+                strings.append( qtr( VLC_META_DESCRIPTION ) );
+                break;
+            case VLC_META_ENGINE_DURATION:
+                strings.append( qtr( "Duration" ) );
+                break;
+            case VLC_META_ENGINE_GENRE:
+                strings.append( qtr( VLC_META_GENRE ) );
+                break;
+            case VLC_META_ENGINE_COLLECTION:
+                strings.append( qtr( VLC_META_COLLECTION ) );
+                break;
+            case VLC_META_ENGINE_SEQ_NUM:
+                strings.append( qtr( VLC_META_SEQ_NUM ) );
+                break;
+            case VLC_META_ENGINE_RATING:
+                strings.append( qtr( VLC_META_RATING ) );
+                break;
+            default:
+                break;
             }
         }
     }
 }
 
 
-PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
+PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 {
     init( _i_id, _i_input_id, parent, m );
 }
@@ -135,7 +135,7 @@ PLItem::PLItem( playlist_item_t * p_item, PLItem *parent, PLModel *m )
 
 PLItem::~PLItem()
 {
-    qDeleteAll(children);
+    qDeleteAll( children );
     children.clear();
 }
 
@@ -161,7 +161,7 @@ void PLItem::remove( PLItem *removed )
 int PLItem::row() const
 {
     if( parentItem )
-        return parentItem->children.indexOf(const_cast<PLItem*>(this));
+        return parentItem->children.indexOf( const_cast<PLItem*>(this) );
     return 0;
 }
 
@@ -201,43 +201,43 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         {
             switch( i_index )
             {
-                case VLC_META_ENGINE_ARTIST:
-                    ADD_META( p_item, Artist );
-                    break;
-                case VLC_META_ENGINE_TITLE:
-                    char *psz_title, *psz_name;
-                    psz_title = input_item_GetTitle( p_item->p_input );
-                    psz_name = input_item_GetName( p_item->p_input );
-                    if( psz_title )
-                    {
-                        ADD_META( p_item, Title );
-                    } else {
-                        strings.append( qfu( psz_name ) );
-                    }
-                    free( psz_title );
-                    free( psz_name );
-                    break;
-                case VLC_META_ENGINE_DESCRIPTION:
-                    ADD_META( p_item, Description );
-                    break;
-                case VLC_META_ENGINE_DURATION:
-                    secstotimestr( psz_duration,
-                        input_item_GetDuration( p_item->p_input ) / 1000000 );
-                    strings.append( QString( psz_duration ) );
-                    break;
-                case VLC_META_ENGINE_GENRE:
-                    ADD_META( p_item, Genre );
-                    break;
-                case VLC_META_ENGINE_COLLECTION:
-                    ADD_META( p_item, Album );
-                    break;
-                case VLC_META_ENGINE_SEQ_NUM:
-                    ADD_META( p_item, TrackNum );
-                    break;
-                case VLC_META_ENGINE_RATING:
-                    ADD_META( p_item, Rating );
-                default:
-                    break;
+            case VLC_META_ENGINE_ARTIST:
+                ADD_META( p_item, Artist );
+                break;
+            case VLC_META_ENGINE_TITLE:
+                char *psz_title, *psz_name;
+                psz_title = input_item_GetTitle( p_item->p_input );
+                psz_name = input_item_GetName( p_item->p_input );
+                if( psz_title )
+                {
+                    ADD_META( p_item, Title );
+                } else {
+                    strings.append( qfu( psz_name ) );
+                }
+                free( psz_title );
+                free( psz_name );
+                break;
+            case VLC_META_ENGINE_DESCRIPTION:
+                ADD_META( p_item, Description );
+                break;
+            case VLC_META_ENGINE_DURATION:
+                secstotimestr( psz_duration,
+                    input_item_GetDuration( p_item->p_input ) / 1000000 );
+                strings.append( QString( psz_duration ) );
+                break;
+            case VLC_META_ENGINE_GENRE:
+                ADD_META( p_item, Genre );
+                break;
+            case VLC_META_ENGINE_COLLECTION:
+                ADD_META( p_item, Album );
+                break;
+            case VLC_META_ENGINE_SEQ_NUM:
+                ADD_META( p_item, TrackNum );
+                break;
+            case VLC_META_ENGINE_RATING:
+                ADD_META( p_item, Rating );
+            default:
+                break;
             }
         }
 
@@ -250,8 +250,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
  *************************************************************************/
 
 PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
-                    playlist_item_t * p_root, int _i_depth, QObject *parent)
-                                    : QAbstractItemModel(parent)
+                    playlist_item_t * p_root, int _i_depth, QObject *parent )
+                                    : QAbstractItemModel( parent )
 {
     i_depth = _i_depth;
     assert( i_depth == 1 || i_depth == -1 );
@@ -290,9 +290,9 @@ Qt::DropActions PLModel::supportedDropActions() const
     return Qt::CopyAction;
 }
 
-Qt::ItemFlags PLModel::flags(const QModelIndex &index) const
+Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 {
-    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
+    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags( index );
     if( index.isValid() )
         return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | defaultFlags;
     else
@@ -306,26 +306,26 @@ QStringList PLModel::mimeTypes() const
     return types;
 }
 
-QMimeData *PLModel::mimeData(const QModelIndexList &indexes) const
+QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 {
     QMimeData *mimeData = new QMimeData();
     QByteArray encodedData;
-    QDataStream stream(&encodedData, QIODevice::WriteOnly);
+    QDataStream stream( &encodedData, QIODevice::WriteOnly );
 
-    foreach (QModelIndex index, indexes) {
-        if (index.isValid() && index.column() == 0 )
-            stream << itemId(index);
+    foreach( QModelIndex index, indexes ) {
+        if( index.isValid() && index.column() == 0 )
+            stream << itemId( index );
     }
-    mimeData->setData("vlc/playlist-item-id", encodedData);
+    mimeData->setData( "vlc/playlist-item-id", encodedData );
     return mimeData;
 }
 
-bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
-                           int row, int column, const QModelIndex &target)
+bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
+                           int row, int column, const QModelIndex &target )
 {
-    if ( data->hasFormat("vlc/playlist-item-id") )
+    if( data->hasFormat( "vlc/playlist-item-id" ) )
     {
-        if (action == Qt::IgnoreAction)
+        if( action == Qt::IgnoreAction )
             return true;
 
         PLItem *targetItem;
@@ -334,11 +334,11 @@ bool PLModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
         else
             targetItem = rootItem;
 
-        QByteArray encodedData = data->data("vlc/playlist-item-id");
-        QDataStream stream(&encodedData, QIODevice::ReadOnly);
+        QByteArray encodedData = data->data( "vlc/playlist-item-id" );
+        QDataStream stream( &encodedData, QIODevice::ReadOnly );
 
         PLItem *newParentItem;
-        while (!stream.atEnd())
+        while( !stream.atEnd() )
         {
             int i;
             int srcId;
@@ -456,9 +456,9 @@ void PLModel::activateItem( playlist_item_t *p_item )
 }
 
 /****************** Base model mandatory implementations *****************/
-QVariant PLModel::data(const QModelIndex &index, int role) const
+QVariant PLModel::data( const QModelIndex &index, int role ) const
 {
-    if(!index.isValid() ) return QVariant();
+    if( !index.isValid() ) return QVariant();
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
     if( role == Qt::DisplayRole )
     {
@@ -492,25 +492,25 @@ int PLModel::itemId( const QModelIndex &index ) const
 }
 
 QVariant PLModel::headerData( int section, Qt::Orientation orientation,
-                              int role) const
+                              int role ) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
             return QVariant( rootItem->columnString( section ) );
     return QVariant();
 }
 
-QModelIndex PLModel::index(int row, int column, const QModelIndex &parent)
+QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
                   const
 {
     PLItem *parentItem;
-    if (!parent.isValid())
+    if( !parent.isValid() )
         parentItem = rootItem;
     else
         parentItem = static_cast<PLItem*>(parent.internalPointer());
 
-    PLItem *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
+    PLItem *childItem = parentItem->child( row );
+    if( childItem )
+        return createIndex( row, column, childItem );
     else
         return QModelIndex();
 }
@@ -526,12 +526,12 @@ QModelIndex PLModel::index( PLItem *item, int column ) const
     return QModelIndex();
 }
 
-QModelIndex PLModel::parent(const QModelIndex &index) const
+QModelIndex PLModel::parent( const QModelIndex &index ) const
 {
     if( !index.isValid() ) return QModelIndex();
 
     PLItem *childItem = static_cast<PLItem*>(index.internalPointer());
-    if( !childItem ) { msg_Err( p_playlist, "NULL CHILD \n" ); return QModelIndex(); }
+    if( !childItem ) { msg_Err( p_playlist, "NULL CHILD" ); return QModelIndex(); }
     PLItem *parentItem = childItem->parent();
     if( !parentItem || parentItem == rootItem ) return QModelIndex();
     if( ! parentItem->parentItem )
@@ -549,16 +549,16 @@ int PLModel::columnCount( const QModelIndex &i) const
     return rootItem->strings.count();
 }
 
-int PLModel::childrenCount(const QModelIndex &parent) const
+int PLModel::childrenCount( const QModelIndex &parent ) const
 {
     return rowCount( parent );
 }
 
-int PLModel::rowCount(const QModelIndex &parent) const
+int PLModel::rowCount( const QModelIndex &parent ) const
 {
     PLItem *parentItem;
 
-    if (!parent.isValid())
+    if( !parent.isValid() )
         parentItem = rootItem;
     else
         parentItem = static_cast<PLItem*>(parent.internalPointer());
@@ -860,7 +860,7 @@ void PLModel::doDelete( QModelIndexList selected )
     }
 }
 
-void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList)
+void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList )
 {
     for( int i = children.size() - 1; i >= 0 ; i-- )
     {
@@ -978,32 +978,32 @@ void PLModel::viewchanged( int meta )
        int index=0;
        switch( meta )
        {
-           case VLC_META_ENGINE_TITLE:
-               index=0;
-               break;
-           case VLC_META_ENGINE_DURATION:
-               index=1;
-               break;
-           case VLC_META_ENGINE_ARTIST:
-               index=2;
-               break;
-           case VLC_META_ENGINE_GENRE:
-               index=3;
-               break;
-           case VLC_META_ENGINE_COPYRIGHT:
-               index=4;
-               break;
-           case VLC_META_ENGINE_COLLECTION:
-               index=5;
-               break;
-           case VLC_META_ENGINE_SEQ_NUM:
-               index=6;
-               break;
-           case VLC_META_ENGINE_DESCRIPTION:
-               index=7;
-               break;
-           default:
-               break;
+       case VLC_META_ENGINE_TITLE:
+           index=0;
+           break;
+       case VLC_META_ENGINE_DURATION:
+           index=1;
+           break;
+       case VLC_META_ENGINE_ARTIST:
+           index=2;
+           break;
+       case VLC_META_ENGINE_GENRE:
+           index=3;
+           break;
+       case VLC_META_ENGINE_COPYRIGHT:
+           index=4;
+           break;
+       case VLC_META_ENGINE_COLLECTION:
+           index=5;
+           break;
+       case VLC_META_ENGINE_SEQ_NUM:
+           index=6;
+           break;
+       case VLC_META_ENGINE_DESCRIPTION:
+           index=7;
+           break;
+       default:
+           break;
        }
        emit layoutAboutToBeChanged();
        index = __MIN( index , rootItem->strings.count() );

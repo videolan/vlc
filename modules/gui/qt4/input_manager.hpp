@@ -33,7 +33,7 @@ class InputManager : public QObject
 {
     Q_OBJECT;
 public:
-    InputManager( QObject *, intf_thread_t *);
+    InputManager( QObject *, intf_thread_t * );
     virtual ~InputManager();
 
     void delInput();
@@ -89,7 +89,7 @@ public:
     InputManager *getIM() { return im; };
 
 private:
-    MainInputManager( intf_thread_t *);
+    MainInputManager( intf_thread_t * );
 
     InputManager            *im;
     intf_thread_t           *p_intf;
@@ -103,7 +103,7 @@ public slots:
 private slots:
     void updateInput();
 signals:
-    void inputChanged( input_thread_t *);
+    void inputChanged( input_thread_t * );
 };
 
 #endif

@@ -40,8 +40,8 @@ class QSignalMapper;
 class PLItem
 {
 public:
-    PLItem( int, int, PLItem *parent , PLModel *);
-    PLItem( playlist_item_t *, PLItem *parent, PLModel *);
+    PLItem( int, int, PLItem *parent , PLModel * );
+    PLItem( playlist_item_t *, PLItem *parent, PLModel * );
     ~PLItem();
 
     int row() const;
@@ -57,7 +57,7 @@ public:
     QString columnString( int col ) { return strings.value( col ); };
     PLItem *parent() { return parentItem; };
 
-    void update( playlist_item_t *, bool);
+    void update( playlist_item_t *, bool );
 protected:
     QList<PLItem*> children;
     QList<QString> strings;
@@ -102,19 +102,19 @@ class PLModel : public QAbstractItemModel
 
 public:
     PLModel( playlist_t *, intf_thread_t *,
-             playlist_item_t *, int, QObject *parent = 0);
+             playlist_item_t *, int, QObject *parent = 0 );
     ~PLModel();
 
     /* All types of lookups / QModel stuff */
-    QVariant data( const QModelIndex &index, int role) const;
-    Qt::ItemFlags flags( const QModelIndex &index) const;
+    QVariant data( const QModelIndex &index, int role ) const;
+    Qt::ItemFlags flags( const QModelIndex &index ) const;
     QVariant headerData( int section, Qt::Orientation orientation,
-                         int role = Qt::DisplayRole) const;
+                         int role = Qt::DisplayRole ) const;
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
     int itemId( const QModelIndex &index ) const;
     bool isCurrent( const QModelIndex &index );
-    QModelIndex parent( const QModelIndex &index) const;
+    QModelIndex parent( const QModelIndex &index ) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -122,7 +122,7 @@ public:
     bool b_need_update;
     int i_items_to_append;
 
-    void rebuild(); void rebuild( playlist_item_t *);
+    void rebuild(); void rebuild( playlist_item_t * );
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
 
     /* Actions made by the views */
@@ -134,9 +134,9 @@ public:
 
     /* DnD handling */
     Qt::DropActions supportedDropActions() const;
-    QMimeData* mimeData(const QModelIndexList &indexes) const;
-    bool dropMimeData(const QMimeData *data, Qt::DropAction action,
-                      int row, int column, const QModelIndex &target);
+    QMimeData* mimeData( const QModelIndexList &indexes ) const;
+    bool dropMimeData( const QMimeData *data, Qt::DropAction action,
+                      int row, int column, const QModelIndex &target );
     QStringList mimeTypes() const;
 
     void sendArt( QString url );
@@ -167,7 +167,7 @@ private:
     void UpdateNodeChildren( playlist_item_t *, PLItem * );
 
     /* Actions */
-    void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList);
+    void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
 
     /* Popup */
