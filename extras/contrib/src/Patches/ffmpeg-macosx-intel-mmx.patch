@@ -315,69 +315,7 @@ Index: libavcodec/i386/dsputil_mmx.c
 +        :"+&r"(i)\
          :"r"(w_data+n2), "r"(w_data+len-2-n2),\
           "r"(data+n2), "r"(data+len-2-n2)\
-     );
-Index: libavcodec/i386/h264dsp_mmx.c
-===================================================================
---- libavcodec/i386/h264dsp_mmx.c	(revision 10865)
-+++ libavcodec/i386/h264dsp_mmx.c	(working copy)
-@@ -341,21 +341,21 @@
- // in: mm0=p1 mm1=p0 mm2=q0 mm3=q1 mm7=(tc&mask)
- // out: mm1=p0' mm2=q0'
- // clobbers: mm0,3-6
--#define H264_DEBLOCK_P0_Q0(pb_01, pb_3f)\
-+#define H264_DEBLOCK_P0_Q0(pb_01, pb_3, pb_a1)\
-         "movq    %%mm1              , %%mm5 \n\t"\
-         "pxor    %%mm2              , %%mm5 \n\t" /* p0^q0*/\
-         "pand    "#pb_01"           , %%mm5 \n\t" /* (p0^q0)&1*/\
-         "pcmpeqb %%mm4              , %%mm4 \n\t"\
-         "pxor    %%mm4              , %%mm3 \n\t"\
-         "pavgb   %%mm0              , %%mm3 \n\t" /* (p1 - q1 + 256)>>1*/\
--        "pavgb   "MANGLE(ff_pb_3)"  , %%mm3 \n\t" /*(((p1 - q1 + 256)>>1)+4)>>1 = 64+2+(p1-q1)>>2*/\
-+        "pavgb   "#pb_3"            , %%mm3 \n\t" /*(((p1 - q1 + 256)>>1)+4)>>1 = 64+2+(p1-q1)>>2*/\
-         "pxor    %%mm1              , %%mm4 \n\t"\
-         "pavgb   %%mm2              , %%mm4 \n\t" /* (q0 - p0 + 256)>>1*/\
-         "pavgb   %%mm5              , %%mm3 \n\t"\
-         "paddusb %%mm4              , %%mm3 \n\t" /* d+128+33*/\
--        "movq    "MANGLE(ff_pb_A1)" , %%mm6 \n\t"\
-+        "movq    "#pb_a1"           , %%mm6 \n\t"\
-         "psubusb %%mm3              , %%mm6 \n\t"\
--        "psubusb "MANGLE(ff_pb_A1)" , %%mm3 \n\t"\
-+        "psubusb "#pb_a1"           , %%mm3 \n\t"\
-         "pminub  %%mm7              , %%mm6 \n\t"\
-         "pminub  %%mm7              , %%mm3 \n\t"\
-         "psubusb %%mm6              , %%mm1 \n\t"\
-@@ -422,14 +422,14 @@
-         H264_DEBLOCK_Q1(%%mm3, %%mm4, "(%2,%3,2)", "(%2,%3)", %%mm5, %%mm6)
- 
-         /* filter p0, q0 */
--        H264_DEBLOCK_P0_Q0(%8, unused)
-+        H264_DEBLOCK_P0_Q0(%8, %9, %10)
-         "movq      %%mm1, (%1,%3,2) \n\t"
-         "movq      %%mm2, (%2)      \n\t"
- 
-         : "=m"(*tmp0)
-         : "r"(pix-3*stride), "r"(pix), "r"((long)stride),
-           "m"(*tmp0/*unused*/), "m"(*(uint32_t*)tc0), "m"(alpha1), "m"(beta1),
--          "m"(mm_bone)
-+          "m"(mm_bone), "m" (ff_pb_3), "m" (ff_pb_A1)
-     );
- }
- 
-@@ -470,13 +470,13 @@
-         "movd      %3,    %%mm6     \n\t"
-         "punpcklbw %%mm6, %%mm6     \n\t"
-         "pand      %%mm6, %%mm7     \n\t" // mm7 = tc&mask
--        H264_DEBLOCK_P0_Q0(%6, %7)
-+        H264_DEBLOCK_P0_Q0(%6, %7, %8)
-         "movq      %%mm1, (%0,%2)   \n\t"
-         "movq      %%mm2, (%1)      \n\t"
- 
-         :: "r"(pix-2*stride), "r"(pix), "r"((long)stride),
-            "r"(*(uint32_t*)tc0),
--           "m"(alpha1), "m"(beta1), "m"(mm_bone), "m"(ff_pb_3F)
-+           "m"(alpha1), "m"(beta1), "m"(mm_bone), "m" (ff_pb_3), "m" (ff_pb_A1)
-     );
- }
+     ); 
  
 Index: libavcodec/i386/simple_idct_mmx.c
 ===================================================================
