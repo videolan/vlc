@@ -2032,9 +2032,12 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
-        while( ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_input ) >= 0 )
+        struct v4l2_input t_input;
+        t_input.index = 0;
+        while( ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
         {
             p_sys->i_input++;
+            t_input.index = p_sys->i_input;
         }
 
         p_sys->p_inputs = calloc( 1, p_sys->i_input * sizeof( struct v4l2_input ) );
@@ -2095,7 +2098,6 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     /* Probe audio inputs */
-
     if( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO )
     {
         while( p_sys->i_audio < 32 &&
@@ -2118,14 +2120,15 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
         }
     }
 
+    /* List tuner caps */
     if( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER )
     {
         struct v4l2_tuner tuner;
-
         memset( &tuner, 0, sizeof(tuner) );
-        while( ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) >= 0 )
+        while( ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
         {
             p_sys->i_tuner++;
+            memset( &tuner, 0, sizeof(tuner) );
             tuner.index = p_sys->i_tuner;
         }
 
@@ -2213,7 +2216,8 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                     frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
                     if( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
                     {
-                        msg_Err( p_demux, "Error while querying for frame size" );
+                        /* Not all devices support this ioctl */
+                        msg_Warn( p_demux, "Unable to query for frame sizes" );
                     }
                     else
                     {
@@ -2332,6 +2336,7 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
                                    vlc_bool_t b_reset )
 {
     struct v4l2_querymenu querymenu;
+    unsigned int i_mid;
     if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
         msg_Dbg( p_demux, "    control is busy" );
     if( queryctrl.flags & V4L2_CTRL_FLAG_READ_ONLY )
@@ -2351,11 +2356,12 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
         case V4L2_CTRL_TYPE_MENU:
             msg_Dbg( p_demux, "    menu control" );
             memset( &querymenu, 0, sizeof( querymenu ) );
-            querymenu.id = queryctrl.id;
-            for( querymenu.index = queryctrl.minimum;
-                 querymenu.index <= (unsigned)queryctrl.maximum;
-                 querymenu.index++ )
+            for( i_mid = queryctrl.minimum;
+                 i_mid <= (unsigned)queryctrl.maximum;
+                 i_mid++ )
             {
+                querymenu.index = i_mid;
+                querymenu.id = queryctrl.id;
                 if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
                 {
                     msg_Dbg( p_demux, "        %d: %s",
@@ -2403,14 +2409,16 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
 static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
 {
     struct v4l2_queryctrl queryctrl;
+    int i_cid;
 
     memset( &queryctrl, 0, sizeof( queryctrl ) );
 
     /* List public controls */
-    for( queryctrl.id = V4L2_CID_BASE;
-         queryctrl.id < V4L2_CID_LASTP1;
-         queryctrl.id ++ )
+    for( i_cid = V4L2_CID_BASE;
+         i_cid < V4L2_CID_LASTP1;
+         i_cid ++ )
     {
+        queryctrl.id = i_cid;
         if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
@@ -2422,10 +2430,11 @@ static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
     }
 
     /* List private controls */
-    for( queryctrl.id = V4L2_CID_PRIVATE_BASE;
+    for( i_cid = V4L2_CID_PRIVATE_BASE;
          ;
-         queryctrl.id ++ )
+         i_cid ++ )
     {
+        queryctrl.id = i_cid;
         if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
