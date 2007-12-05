@@ -126,7 +126,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Buttons action */
-    BUTTONACT( playButton, play());
+    BUTTONACT( playButton, selectSlots());
     BUTTONACT( cancelButton, cancel());
 
     /* At creation time, modify the default buttons */
@@ -148,22 +148,18 @@ void OpenDialog::setMenuAction()
 {
     switch ( i_action_flag )
     {
-        case OPEN_AND_STREAM:
-            playButton->setText( qtr("&Stream") );
-            BUTTONACT( playButton, stream() );
-            break;
-        case OPEN_AND_SAVE:
-            playButton->setText( qtr("&Convert / Save") );
-            BUTTONACT( playButton, transcode() );
-            break;
-        case OPEN_AND_ENQUEUE:
-            playButton->setText( qtr("&Enqueue") );
-            BUTTONACT( playButton, enqueue() );
-            break;
-        case OPEN_AND_PLAY:
-        default:
-            playButton->setText( qtr("&Play") );
-            BUTTONACT( playButton, play() );
+    case OPEN_AND_STREAM:
+        playButton->setText( qtr("&Stream") );
+        break;
+    case OPEN_AND_SAVE:
+        playButton->setText( qtr("&Convert / Save") );
+        break;
+    case OPEN_AND_ENQUEUE:
+        playButton->setText( qtr("&Enqueue") );
+        break;
+    case OPEN_AND_PLAY:
+    default:
+        playButton->setText( qtr("&Play") );
    }
 }
 
@@ -231,6 +227,25 @@ void OpenDialog::close()
 }
 
 /* Play button */
+void OpenDialog::selectSlots()
+{
+    switch ( i_action_flag )
+    {
+    case OPEN_AND_STREAM:
+        stream();
+        break;
+    case OPEN_AND_SAVE:
+        transcode();
+        break;
+    case OPEN_AND_ENQUEUE:
+        enqueue();
+        break;
+    case OPEN_AND_PLAY:
+    default:
+        play();
+    }
+}
+
 void OpenDialog::play()
 {
     finish( false );

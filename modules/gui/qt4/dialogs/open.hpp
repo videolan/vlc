@@ -61,6 +61,7 @@ public:
     QString mainMRL;
 
 public slots:
+    void selectSlots();
     void play();
     void stream( bool b_transode_only = false );
     void enqueue();
