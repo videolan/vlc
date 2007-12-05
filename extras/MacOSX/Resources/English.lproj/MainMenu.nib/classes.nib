@@ -235,7 +235,6 @@
                 "o_dmi_stop" = id; 
                 "o_embedded_window" = id; 
                 "o_info" = id; 
-                "o_license_mi" = id; 
                 "o_main_pgbar" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
@@ -274,6 +273,7 @@
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
                 "o_mi_info" = id; 
+                "o_mi_license" = id; 
                 "o_mi_loop" = id; 
                 "o_mi_messages" = id; 
                 "o_mi_minimize" = id; 
