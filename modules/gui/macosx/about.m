@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Felix Paul KŸhne <fkuehne -at- videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,21 +68,15 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)showAbout
 {
-    if (!o_credits_path)
+    if(! b_isSetUp )
     {
-        NSString *o_name;
-        NSString *o_version;
+        NSDictionary *o_local_dict;
 
-        /* Get the info dictionary (Info.plist) */
-        o_info_dict = [[NSBundle mainBundle] infoDictionary];
- 
         /* Get the localized info dictionary (InfoPlist.strings) */
-        localInfoBundle = CFBundleGetMainBundle();
-        o_local_dict = (NSDictionary *)
-                        CFBundleGetLocalInfoDictionary( localInfoBundle );
- 
+        o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
+
         /* Setup the name field */
-        o_name = [o_local_dict objectForKey:@"CFBundleName"];
+        o_name_field = [o_local_dict objectForKey:@"CFBundleName"];
  
         /* Set the about box title */
         [o_about_window setTitle:_NS("About VLC media player")];
@@ -106,8 +101,7 @@ static VLAboutBox *_o_sharedInstance = nil;
                                             [NSString stringWithUTF8String: psz_thanks]]];
  
         /* Setup the copyright field */
-        o_copyright = [o_local_dict objectForKey:@"NSHumanReadableCopyright"];
-        [o_copyright_field setStringValue:o_copyright];
+        [o_copyright_field setStringValue: [o_local_dict objectForKey:@"NSHumanReadableCopyright"]];
 
         /* Setup the window */
         [o_credits_textview setDrawsBackground: NO];
@@ -115,20 +109,23 @@ static VLAboutBox *_o_sharedInstance = nil;
         [o_about_window setExcludedFromWindowsMenu:YES];
         [o_about_window setMenu:nil];
         [o_about_window center];
+        [o_gpl_btn setTitle: _NS("License")];
+        
+        b_isSetUp = YES;
     }
  
     /* Show the window */
     b_restart = YES;
-    [o_about_window makeKeyAndOrderFront:nil];
+    [o_about_window makeKeyAndOrderFront: nil];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
-    o_scroll_timer = [NSTimer scheduledTimerWithTimeInterval:1/6
-                           target:self
-                           selector:@selector(scrollCredits:)
-                           userInfo:nil
-                           repeats:YES];
+    o_scroll_timer = [NSTimer scheduledTimerWithTimeInterval: 1/6
+                                                      target:self
+                                                    selector:@selector(scrollCredits:)
+                                                    userInfo:nil
+                                                     repeats:YES];
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
@@ -138,7 +135,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)scrollCredits:(NSTimer *)timer
 {
-    if (b_restart)
+    if( b_restart )
     {
         /* Reset the starttime */
         i_start = [NSDate timeIntervalSinceReferenceDate] + 3.0;
@@ -147,7 +144,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         b_restart = NO;
     }
 
-    if ([NSDate timeIntervalSinceReferenceDate] >= i_start)
+    if( [NSDate timeIntervalSinceReferenceDate] >= i_start )
     {
         /* Scroll to the position */
         [o_credits_textview scrollPoint:NSMakePoint( 0, f_current )];
@@ -156,11 +153,24 @@ static VLAboutBox *_o_sharedInstance = nil;
         f_current += 0.005;
  
         /* If at end, restart at the top */
-        if ( f_current >= f_end )
+        if( f_current >= f_end )
         {
             b_restart = YES;
         }
     }
+}
+
+/*****************************************************************************
+* VLC GPL Window, action called from the about window and the help menu
+*****************************************************************************/
+
+- (IBAction)showGPL:(id)sender
+{
+    [o_gpl_window setTitle: _NS("License")];
+    [o_gpl_field setString: [NSString stringWithUTF8String: psz_license]];
+    
+    [o_gpl_window center];
+    [o_gpl_window makeKeyAndOrderFront: sender];
 }
 
 /*****************************************************************************

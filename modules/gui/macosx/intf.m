@@ -669,6 +669,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_help setTitle: _NS("Help")];
     [o_mi_help setTitle: _NS("VLC media player Help...")];
     [o_mi_readme setTitle: _NS("ReadMe / FAQ...")];
+    [o_mi_license setTitle: _NS("License")];
     [o_mi_documentation setTitle: _NS("Online Documentation...")];
     [o_mi_website setTitle: _NS("VideoLAN Website...")];
     [o_mi_donation setTitle: _NS("Make a donation...")];
@@ -1878,25 +1879,27 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
  
     if ( !nib_bookmarks_loaded )
-    {
         nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
-        [o_bookmarks showBookmarks];
-    } else {
-        [o_bookmarks showBookmarks];
-    }
+
+    [o_bookmarks showBookmarks];
 }
 
 - (IBAction)viewAbout:(id)sender
 {
     if( !nib_about_loaded )
-    {
         nib_about_loaded = [NSBundle loadNibNamed:@"About" owner:self];
-        [o_about showAbout];
-    } else {
-        [o_about showAbout];
-    }
+
+    [o_about showAbout];
 }
 
+- (IBAction)showLicense:(id)sender
+{
+    if( !nib_about_loaded )
+        nib_about_loaded = [NSBundle loadNibNamed:@"About" owner:self];
+
+    [o_about showGPL: sender];
+}
+    
 - (IBAction)viewPreferences:(id)sender
 {
 /* GRUIIIIIIIK */

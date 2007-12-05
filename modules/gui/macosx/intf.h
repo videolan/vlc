@@ -256,6 +256,7 @@ struct intf_sys_t
     IBOutlet id o_mi_help;
     IBOutlet id o_mi_readme;
     IBOutlet id o_mi_documentation;
+    IBOutlet id o_mi_license;
     IBOutlet id o_mi_website;
     IBOutlet id o_mi_donation;
     IBOutlet id o_mi_forum;
@@ -346,6 +347,7 @@ struct intf_sys_t
 - (IBAction)showSFilters:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;
+- (IBAction)showLicense:(id)sender;
 - (IBAction)viewPreferences:(id)sender;
 - (IBAction)checkForUpdate:(id)sender;
 - (IBAction)viewHelp:(id)sender;

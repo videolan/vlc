@@ -3,6 +3,7 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = MPSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
         {
+            ACTIONS = {showGPL = id; }; 
             CLASS = VLAboutBox; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -10,8 +11,12 @@
                 "o_copyright_field" = id; 
                 "o_credits_scrollview" = id; 
                 "o_credits_textview" = id; 
+                "o_gpl_btn" = id; 
+                "o_gpl_field" = id; 
+                "o_gpl_window" = id; 
                 "o_help_web_view" = id; 
                 "o_help_window" = id; 
+                "o_name_field" = id; 
                 "o_name_version_field" = id; 
                 "o_revision_field" = id; 
             }; 

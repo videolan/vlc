@@ -206,6 +206,7 @@
                 openWebsite = id; 
                 showBookmarks = id; 
                 showExtended = id; 
+                showLicense = id; 
                 showMessagesPanel = id; 
                 showSFilters = id; 
                 showWizard = id; 
@@ -234,6 +235,7 @@
                 "o_dmi_stop" = id; 
                 "o_embedded_window" = id; 
                 "o_info" = id; 
+                "o_license_mi" = id; 
                 "o_main_pgbar" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 

@@ -1,10 +1,11 @@
 /*****************************************************************************
  * about.h: MacOS X About Panel
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Felix Paul KŸhne <fkuehne -at- videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,28 +34,28 @@
     IBOutlet id o_copyright_field;
     IBOutlet id o_credits_textview;
     IBOutlet id o_credits_scrollview;
+    IBOutlet id o_gpl_btn;
+    IBOutlet id o_name_field;
 
     NSTimer *o_scroll_timer;
     float f_current;
     float f_end;
     NSTimeInterval i_start;
     BOOL b_restart;
+    BOOL b_isSetUp;
 
-    NSString *o_credits_path;
-    NSString *o_credits;
-    NSString *o_thanks;
-    NSString *o_copyright;
-    NSDictionary *o_info_dict;
-    CFBundleRef localInfoBundle;
-    NSDictionary *o_local_dict;
-    
     /* generic help window */
     IBOutlet id o_help_window;
     IBOutlet id o_help_web_view;
+
+    /* licence window */
+    IBOutlet id o_gpl_window;
+    IBOutlet id o_gpl_field;
 }
 
 + (VLAboutBox *)sharedInstance;
 - (void)showAbout;
 - (void)showHelp;
+- (IBAction)showGPL:(id)sender;
 
 @end
