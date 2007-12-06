@@ -180,7 +180,7 @@ static int Create( vlc_object_t *p_this )
 #ifndef WIN32
 #if defined(HAVE_ISATTY)
     /* Check that stdin is a TTY */
-    if( !p_sys->b_tty && !isatty( 0 ) )
+    if( p_sys->b_tty && !isatty( 0 ) )
     {
         msg_Warn( p_vout, "fd 0 is not a TTY" );
         return VLC_EGENERIC;
