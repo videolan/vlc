@@ -177,7 +177,8 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     p_intf->pf_run = Run;
 #if defined HAVE_GETENV && defined Q_WS_X11
-    if( !getenv( "DISPLAY" ) )
+    char *psz_display = getenv( "DISPLAY" );
+    if( !psz_display || !*psz_display )
     {
         msg_Err(p_intf, "no X server");
         return VLC_EGENERIC;
