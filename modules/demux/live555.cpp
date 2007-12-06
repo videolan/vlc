@@ -219,6 +219,7 @@ static int  Open ( vlc_object_t *p_this )
     MediaSubsessionIterator *iter   = NULL;
     MediaSubsession         *sub    = NULL;
     int i, i_return;
+    int i_error = VLC_EGENERIC;
 
     if( p_demux->s )
     {
@@ -292,6 +293,12 @@ static int  Open ( vlc_object_t *p_this )
         int     i_sdp_max   = 1000;
         uint8_t *p_sdp      = (uint8_t*) malloc( i_sdp_max );
 
+        if( !p_sdp )
+        {
+            i_error = VLC_ENOMEM;
+            goto error;
+        }
+
         for( ;; )
         {
             int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp],
@@ -332,6 +339,7 @@ static int  Open ( vlc_object_t *p_this )
     if( p_sys->p_sdp == NULL )
     {
         msg_Err( p_demux, "Failed to retrieve the RTSP Session Description" );
+        i_error = VLC_ENOMEM;
         goto error;
     }
 
@@ -388,7 +396,7 @@ error:
     vlc_UrlClean( &p_sys->url );
 
     free( p_sys );
-    return VLC_EGENERIC;
+    return i_error;
 }
 
 /*****************************************************************************
@@ -447,6 +455,25 @@ static int Connect( demux_t *p_demux )
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
 
+    psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
+    if( !psz_url ) return VLC_ENOMEM;
+
+    if( p_sys->url.psz_username || p_sys->url.psz_password )
+    {
+        sprintf( psz_url, "rtsp://%s%s", p_sys->url.psz_host,
+                 p_sys->url.psz_path );
+
+        psz_user = strdup( p_sys->url.psz_username );
+        psz_pwd  = strdup( p_sys->url.psz_password );
+    }
+    else
+    {
+        sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
+
+        psz_user = var_CreateGetString( p_demux, "rtsp-user" );
+        psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
+    }
+
 createnew:
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
@@ -474,28 +501,7 @@ createnew:
 #endif
     }
 
-
-    psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
-    if( !psz_url ) return VLC_ENOMEM;
-
-    if( p_sys->url.psz_username || p_sys->url.psz_password )
-    {
-        sprintf( psz_url, "rtsp://%s%s", p_sys->url.psz_host,
-                 p_sys->url.psz_path );
-
-        psz_user = strdup( p_sys->url.psz_username );
-        psz_pwd  = strdup( p_sys->url.psz_password );
-    }
-    else
-    {
-        sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
-
-        psz_user = var_CreateGetString( p_demux, "rtsp-user" );
-        psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
-    }
-
 describe:
-msg_Info( p_demux, "[%s] user=%s pwd=%s", psz_url, psz_user, psz_pwd );
     authenticator.setUsernameAndPassword( (const char*)psz_user,
                                           (const char*)psz_pwd );
 
@@ -503,12 +509,8 @@ msg_Info( p_demux, "[%s] user=%s pwd=%s", psz_url, psz_user, psz_pwd );
                                                &authenticator );
     if( psz_options ) delete [] psz_options;
 
-    p_sdp = p_sys->rtsp->describeURL( psz_url,
-                &authenticator, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
-
-    if( psz_user ) free( psz_user );
-    if( psz_pwd ) free( psz_pwd );
-
+    p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
+                         var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
     if( p_sdp == NULL )
     {
         /* failure occurred */
@@ -517,28 +519,28 @@ msg_Info( p_demux, "[%s] user=%s pwd=%s", psz_url, psz_user, psz_pwd );
 
         msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
         if( var_CreateGetBool( p_demux, "rtsp-http" ) )
-            sscanf( psz_error, "%*s %*s HTTP GET %*s HTTP/%*u.%*u %3u %*s", &i_code );
+            sscanf( psz_error, "%*s %*s HTTP GET %*s HTTP/%*u.%*u %3u %*s",
+                    &i_code );
         else sscanf( psz_error, "%*sRTSP/%*s%3u", &i_code );
 
         if( i_code == 401 )
         {
-            char *psz_login = NULL; char *psz_password = NULL;
+            int i_result;
             msg_Dbg( p_demux, "authentication failed" );
 
-            i_ret = intf_UserLoginPassword( p_demux, _("RTSP authentication"),
+            if( psz_user ) free( psz_user );
+            if( psz_pwd ) free( psz_pwd );
+            psz_user = psz_pwd = NULL;
+
+            i_result = intf_UserLoginPassword( p_demux, _("RTSP authentication"),
                            _("Please enter a valid login name and a password."),
-                                                   &psz_login, &psz_password );
-            if( i_ret == DIALOG_OK_YES )
+                                                   &psz_user, &psz_pwd );
+            if( i_result == DIALOG_OK_YES )
             {
                 msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
-                            psz_login, psz_password );
-                if( psz_login ) psz_user = psz_login;
-                if( psz_password ) psz_pwd = psz_password;
-                i_ret = VLC_SUCCESS;
+                         psz_user, psz_pwd );
                 goto describe;
             }
-            if( psz_login ) free( psz_login );
-            if( psz_password ) free( psz_password );
         }
         else if( !var_GetBool( p_demux, "rtsp-http" ) )
         {
@@ -547,7 +549,6 @@ msg_Info( p_demux, "[%s] user=%s pwd=%s", psz_url, psz_user, psz_pwd );
             val.b_bool = VLC_TRUE;
             msg_Dbg( p_demux, "we will now try HTTP tunneling mode" );
             var_Set( p_demux, "rtsp-http", val );
-            if( psz_url ) free( psz_url );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             goto createnew;
         }
@@ -556,6 +557,9 @@ msg_Info( p_demux, "[%s] user=%s pwd=%s", psz_url, psz_user, psz_pwd );
     if( psz_url ) free( psz_url );
 
     /* malloc-ated copy */
+    if( psz_user ) free( psz_user );
+    if( psz_pwd ) free( psz_pwd );
+
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
     p_sys->p_sdp = NULL;
     if( p_sdp ) p_sys->p_sdp = strdup( (char*)p_sdp );
