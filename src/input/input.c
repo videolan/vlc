@@ -835,7 +835,6 @@ static int Init( input_thread_t * p_input )
             {
                 /* Create a new one */
                 p_input->p->p_sout = sout_NewInstance( p_input, psz );
-
                 if( !p_input->p->p_sout )
                 {
                     input_ChangeState( p_input, ERROR_S );
@@ -1253,10 +1252,10 @@ error:
  *****************************************************************************/
 static void Error( input_thread_t *p_input )
 {
+    input_ChangeState( p_input, ERROR_S );
     while( !p_input->b_die )
     {
         /* Sleep a while */
-        input_ChangeState( p_input, ERROR_S );
         msleep( INPUT_IDLE_SLEEP );
     }
 }
