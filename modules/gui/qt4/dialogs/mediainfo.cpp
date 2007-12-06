@@ -35,13 +35,15 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param );
 MediaInfoDialog *MediaInfoDialog::instance = NULL;
 
-MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
+MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
+                                  input_item_t *_p_item,
+                                  bool _mainInput,
                                   bool _stats ) :
                                   QVLCFrame( _p_intf ), mainInput(_mainInput),
                                   stats( _stats )
 {
     i_runs = 0;
-    p_input = NULL;
+    p_item = _p_item;
     b_need_update = true;
 
     setWindowTitle( qtr( "Media information" ) );
@@ -85,13 +87,13 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
 
     /* Let the MetaData Panel update the URI */
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
-    CONNECT( MP, editing(), this, editMeta() );
+    CONNECT( MP, editing(), this, showMetaSaveButton() );
 
     CONNECT( IT, currentChanged( int ), this, updateButtons( int ) );
 
     /* Create the main Update function with a time (150ms) */
     if( mainInput ) {
-        ON_TIMEOUT( update() );
+        ON_TIMEOUT( updateOnTimeOut() );
         var_AddCallback( THEPL, "item-change", ItemChanged, this );
     }
 }
@@ -110,7 +112,7 @@ void MediaInfoDialog::showTab( int i_tab = 0 )
     IT->setCurrentIndex( i_tab );
 }
 
-void MediaInfoDialog::editMeta()
+void MediaInfoDialog::showMetaSaveButton()
 {
     saveMetaButton->show();
 }
@@ -129,36 +131,22 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-void MediaInfoDialog::setInput( input_item_t *p_input )
-{
-    clear();
-    update( p_input, true, true );
-    /* if info is from current input, don't set default to edit, if user opens
-     * some other item, se default to edit, so it won't be updated to current item metas
-     *
-     * This really doesn't seem as clean solution as it could be
-     */
-    input_thread_t *p_current =
-                     MainInputManager::getInstance( p_intf )->getInput();
-    MP->setEditMode( ( !p_current || p_current->b_dead || input_GetItem( p_current ) != p_input ) ?
-                            true: false );
-}
-
-void MediaInfoDialog::update()
+/* Function called on TimeOut */
+void MediaInfoDialog::updateOnTimeOut()
 {
     /* Timer runs at 150 ms, dont' update more than 2 times per second */
     i_runs++;
     if( i_runs % 4 != 0 ) return;
 
     /* Get Input and clear if non-existant */
-    input_thread_t *p_input =
-                     MainInputManager::getInstance( p_intf )->getInput();
+    input_thread_t *p_input = THEMIM->getInput();
     if( !p_input || p_input->b_dead )
     {
         clear();
         return;
     }
 
+    /* Launch the update in all the panels */
     vlc_object_yield( p_input );
 
     update( input_GetItem(p_input), b_need_update, b_need_update );
@@ -168,10 +156,9 @@ void MediaInfoDialog::update()
 }
 
 void MediaInfoDialog::update( input_item_t *p_item,
-                                                 bool update_info,
-                                                 bool update_meta )
+                              bool update_info,
+                              bool update_meta )
 {
-    MP->setInput( p_item );
     if( update_info )
         IP->update( p_item );
     if( update_meta )
@@ -198,7 +185,6 @@ void MediaInfoDialog::close()
     if( mainInput == false ) {
         deleteLater();
     }
-    MP->setEditMode( false );
 }
 
 void MediaInfoDialog::updateButtons( int i_tab )

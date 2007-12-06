@@ -55,9 +55,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     int line = 0; /* Counter for GridLayout */
     p_input = NULL;
 
-#define ADD_META( string, widget ) {                             \
+#define ADD_META( string, widget ) {                                      \
     metaLayout->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
-    widget = new QLineEdit;                                      \
+    widget = new QLineEdit;                                               \
     metaLayout->addWidget( widget, line, 1, 1, 9 );                       \
     line++;            }
 
@@ -67,7 +67,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     ADD_META( VLC_META_COLLECTION, collection_text ); /* OK */
 
     /* Genre Name */
-    /* FIXME List id3genres.h is not includable yet ? */
+    /* TODO List id3genres.h is not includable yet ? */
     genre_text = new QLineEdit;
     metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
     metaLayout->addWidget( genre_text, line, 1, 1, 4 );
@@ -117,9 +117,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     l->addWidget( setting_text, line, 6, 1, 4 ); */
 
 /* Less used metadata */
-#define ADD_META_2( string, widget ) {                             \
+#define ADD_META_2( string, widget ) {                                    \
     metaLayout->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
-    widget = new QLineEdit;                                      \
+    widget = new QLineEdit;                                               \
     metaLayout->addWidget( widget, line, 1, 1, 7 );                       \
     line++;            }
 
@@ -162,6 +162,7 @@ void MetaPanel::update( input_item_t *p_item )
 {
     /* Don't update if you are in edit mode */
     if( b_inEditMode ) return;
+    else p_input = p_item;
 
     char *psz_meta;
 #define UPDATE_META( meta, widget ) {               \
@@ -241,7 +242,6 @@ void MetaPanel::update( input_item_t *p_item )
 void MetaPanel::saveMeta()
 {
     playlist_t *p_playlist;
-    char psz[5];
 
     meta_export_t p_export;
     p_export.p_item = p_input;
@@ -309,18 +309,25 @@ void MetaPanel::setEditMode( bool b_editing )
     if( b_editing )emit editing();
 }
 
-void MetaPanel::setInput( input_item_t *input )
-{
-    if( b_inEditMode ) return;
-
-    p_input = input;
-}
-
 /*
  * Clear all the metadata widgets
- * Unused yet FIXME
  */
-void MetaPanel::clear(){
+void MetaPanel::clear()
+{
+    uri_text->clear();
+    title_text->clear();
+    artist_text->clear();
+    genre_text->clear();
+    copyright_text->clear();
+    collection_text->clear();
+    seqnum_text->clear();
+    description_text->clear();
+    date_text->clear();
+    language_text->clear();
+    nowplaying_text->clear();
+    publisher_text->clear();
+    art_cover;
+
     setEditMode( false );
 }
 

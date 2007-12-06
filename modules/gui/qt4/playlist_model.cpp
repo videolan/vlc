@@ -1046,11 +1046,11 @@ void PLModel::popupPlay()
 void PLModel::popupInfo()
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    i_popup_item,VLC_TRUE );
+                                                    i_popup_item,
+                                                    VLC_TRUE );
     if( p_item )
     {
-        MediaInfoDialog *mid = new MediaInfoDialog( p_intf );
-        mid->setInput( p_item->p_input );
+        MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_item->p_input );
         mid->show();
     }
 }

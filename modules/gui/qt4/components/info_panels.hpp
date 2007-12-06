@@ -55,7 +55,6 @@ public:
     MetaPanel( QWidget *, intf_thread_t * );
     virtual ~MetaPanel();
     void saveMeta();
-    void setInput( input_item_t * );
 
     bool isInEditMode();
     void setEditMode( bool );
