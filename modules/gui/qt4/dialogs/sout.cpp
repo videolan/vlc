@@ -177,7 +177,7 @@ void SoutDialog::setSTranscodeOptions( bool b_trans )
 
 void SoutDialog::setRawOptions( bool b_raw )
 {
-    if ( b_raw )
+    if( b_raw )
     {
         ui.tabWidget->setDisabled( true );
     }

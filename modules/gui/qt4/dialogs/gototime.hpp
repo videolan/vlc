@@ -35,13 +35,13 @@ public:
     static GotoTimeDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new GotoTimeDialog( p_intf);
+            instance = new GotoTimeDialog( p_intf );
         return instance;
     }
     virtual ~GotoTimeDialog();
 
 private:
-    GotoTimeDialog( intf_thread_t *);
+    GotoTimeDialog( intf_thread_t * );
     static GotoTimeDialog *instance;
     QTimeEdit *timeEdit;
 private slots:

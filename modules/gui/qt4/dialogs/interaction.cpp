@@ -109,7 +109,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         progressBar = new QProgressBar;
         progressBar->setMaximum( 1000 );
         progressBar->setTextVisible( true );
-        progressBar->setOrientation(Qt::Horizontal);
+        progressBar->setOrientation( Qt::Horizontal );
         layout->addWidget( progressBar );
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
@@ -174,7 +174,7 @@ void InteractionDialog::update()
     {
         assert( progressBar );
         progressBar->setValue( (int)(p_dialog->val.f_float*1000) );
-        msg_Dbg( p_intf, "Setting progress to %i\n", progressBar->value() );
+        msg_Dbg( p_intf, "Setting progress to %i", progressBar->value() );
     }
 }
 

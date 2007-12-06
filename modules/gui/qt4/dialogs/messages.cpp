@@ -60,9 +60,9 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
     layout->addWidget( messages, 0, 0, 1, 0 );
-    layout->addWidget( verbosityLabel, 1, 0, 1,1 );
+    layout->addWidget( verbosityLabel, 1, 0, 1, 1 );
     layout->addWidget( verbosityBox, 1, 1 );
-    layout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 1,2 );
+    layout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 1, 2 );
     layout->addWidget( saveLogButton, 1, 3 );
     layout->addWidget( clearButton, 1, 4 );
     layout->addWidget( closeButton, 1, 5 );
@@ -103,7 +103,7 @@ void MessagesDialog::updateLog()
             {
                 messages->setFontItalic( true );
                 messages->setTextColor( "darkBlue" );
-                messages->insertPlainText( qfu(p_sub->p_msg[i_start].psz_module));
+                messages->insertPlainText( qfu( p_sub->p_msg[i_start].psz_module ) );
             }
             else
                 continue;

@@ -42,7 +42,7 @@ public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
                  int _action_flag = 0 )
     {
-        if( !instance)
+        if( !instance )
             instance = new OpenDialog( parent, p_intf, false, _action_flag );
         else
         {

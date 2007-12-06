@@ -92,7 +92,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     main_layout->setColumnStretch( 0, 1 );
     main_layout->setColumnStretch( 1, 3 );
 
-    main_layout->setRowStretch( 2, 4);
+    main_layout->setRowStretch( 2, 4 );
 
     setLayout( main_layout );
 
@@ -102,7 +102,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
-    if( config_GetInt( p_intf, "qt-advanced-pref") == 1 )
+    if( config_GetInt( p_intf, "qt-advanced-pref" ) == 1 )
         setAdvanced();
     else
         setSmall();
@@ -128,7 +128,7 @@ void PrefsDialog::setAdvanced()
          advanced_tree = new PrefsTree( p_intf, tree_panel );
         /* and connections */
          CONNECT( advanced_tree,
-                  currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem *),
+                  currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
                   this, changeAdvPanel( QTreeWidgetItem * ) );
         tree_panel_l->addWidget( advanced_tree );
     }
@@ -137,7 +137,7 @@ void PrefsDialog::setAdvanced()
     advanced_tree->show();
 
     /* Remove the simple current panel from the main panels*/
-    if( current_simple_panel  )
+    if( current_simple_panel )
         if( current_simple_panel->isVisible() ) current_simple_panel->hide();
 
     /* If no advanced Panel exist, create one, attach it and show it*/
@@ -174,11 +174,11 @@ void PrefsDialog::setSmall()
     if( advanced_panel )
         if( advanced_panel->isVisible() ) advanced_panel->hide();
 
-    if( !current_simple_panel  )
+    if( !current_simple_panel )
     {
-        current_simple_panel  = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
+        current_simple_panel = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
         simple_panels[SPrefsDefaultCat] =  current_simple_panel;
-        main_panel_l->addWidget( current_simple_panel  );
+        main_panel_l->addWidget( current_simple_panel );
     }
 
     current_simple_panel->show();
@@ -188,15 +188,15 @@ void PrefsDialog::setSmall()
 /* Switching from on simple panel to another */
 void PrefsDialog::changeSimplePanel( int number )
 {
-    if( current_simple_panel  )
+    if( current_simple_panel )
         if( current_simple_panel->isVisible() ) current_simple_panel->hide();
 
     current_simple_panel = simple_panels[number];
-    if( !current_simple_panel  )
+    if( !current_simple_panel )
     {
         current_simple_panel  = new SPrefsPanel( p_intf, main_panel, number );
         simple_panels[number] = current_simple_panel;
-        main_panel_l->addWidget( current_simple_panel  );
+        main_panel_l->addWidget( current_simple_panel );
     }
 
     current_simple_panel->show();
@@ -285,7 +285,7 @@ void PrefsDialog::save()
         advanced_tree->cleanAll();
         advanced_panel = NULL;
     }
-    if( all->isChecked() && current_simple_panel  )
+    if( all->isChecked() && current_simple_panel )
     {
         for( int i = 0 ; i< SPrefsMax; i++ )
         {
@@ -320,12 +320,12 @@ void PrefsDialog::cancel()
 /* Reset all the preferences, when you click the button */
 void PrefsDialog::reset()
 {
-    int ret = QMessageBox::question(this, qtr("Reset Preferences"),
-                 qtr("This will reset your VLC media player preferences.\n"
-                         "Are you sure you want to continue?"),
+    int ret = QMessageBox::question(this, qtr( "Reset Preferences" ),
+                 qtr( "This will reset your VLC media player preferences.\n"
+                         "Are you sure you want to continue?" ),
                   QMessageBox::Ok | QMessageBox::Cancel,
                                                          QMessageBox::Ok);
-    if ( ret == QMessageBox::Ok )
+    if( ret == QMessageBox::Ok )
     {
         config_ResetAll( p_intf );
         config_SaveConfigFile( p_intf, NULL );

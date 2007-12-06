@@ -70,8 +70,8 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     /* Buttons Creation */
     QSizePolicy buttonSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
-    buttonSizePolicy.setHorizontalStretch(0);
-    buttonSizePolicy.setVerticalStretch(0);
+    buttonSizePolicy.setHorizontalStretch( 0 );
+    buttonSizePolicy.setVerticalStretch( 0 );
 
     /* Play Button */
     playButton = new QToolButton( this );
@@ -88,13 +88,13 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open" );
-    openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
+    openButtonMenu->addAction( qtr( "&Enqueue" ), this, SLOT( enqueue() ),
                                     QKeySequence( "Alt+E") );
-    openButtonMenu->addAction( qtr("&Play"), this, SLOT( play() ),
+    openButtonMenu->addAction( qtr( "&Play" ), this, SLOT( play() ),
                                     QKeySequence( "Alt+P" ) );
-    openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
+    openButtonMenu->addAction( qtr( "&Stream" ), this, SLOT( stream() ) ,
                                     QKeySequence( "Alt+S" ) );
-    openButtonMenu->addAction( qtr("&Convert"), this, SLOT( transcode() ) ,
+    openButtonMenu->addAction( qtr( "&Convert" ), this, SLOT( transcode() ) ,
                                     QKeySequence( "Alt+C" ) );
 
     playButton->setMenu( openButtonMenu );
@@ -103,7 +103,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     ui.buttonsBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
     /* Force MRL update on tab change */
-    CONNECT( ui.Tab, currentChanged(int), this, signalCurrent());
+    CONNECT( ui.Tab, currentChanged(int), this, signalCurrent() );
 
     CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
@@ -120,21 +120,21 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
                                                  this, newCachingMethod(QString) );
 
     /* Advanced frame Connects */
-    CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
-    CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
-    CONNECT( ui.startTimeSpinBox, valueChanged(int), this, updateMRL());
+    CONNECT( ui.slaveText, textChanged(QString), this, updateMRL() );
+    CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL() );
+    CONNECT( ui.startTimeSpinBox, valueChanged(int), this, updateMRL() );
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Buttons action */
-    BUTTONACT( playButton, selectSlots());
-    BUTTONACT( cancelButton, cancel());
+    BUTTONACT( playButton, selectSlots() );
+    BUTTONACT( cancelButton, cancel() );
 
     /* At creation time, modify the default buttons */
     if ( i_action_flag ) setMenuAction();
 
     /* Initialize caching */
     storedMethod = "";
-    newCachingMethod("file-caching");
+    newCachingMethod( "file-caching" );
 
     mainHeight = advHeight = 0;
 }
@@ -149,17 +149,17 @@ void OpenDialog::setMenuAction()
     switch ( i_action_flag )
     {
     case OPEN_AND_STREAM:
-        playButton->setText( qtr("&Stream") );
+        playButton->setText( qtr( "&Stream" ) );
         break;
     case OPEN_AND_SAVE:
-        playButton->setText( qtr("&Convert / Save") );
+        playButton->setText( qtr( "&Convert / Save" ) );
         break;
     case OPEN_AND_ENQUEUE:
-        playButton->setText( qtr("&Enqueue") );
+        playButton->setText( qtr( "&Enqueue" ) );
         break;
     case OPEN_AND_PLAY:
     default:
-        playButton->setText( qtr("&Play") );
+        playButton->setText( qtr( "&Play" ) );
    }
 }
 
@@ -180,7 +180,7 @@ void OpenDialog::toggleAdvancedPanel()
     if( ui.advancedFrame->isVisible() ) {
         ui.advancedFrame->hide();
 #ifndef WIN32
-        setMinimumHeight(1);
+        setMinimumHeight( 1 );
         resize( width(), mainHeight );
 #endif
     } else {
@@ -322,16 +322,16 @@ void OpenDialog::updateMRL() {
     if( ui.slaveCheckbox->isChecked() ) {
         mrl += " :input-slave=" + ui.slaveText->text();
     }
-    int i_cache = config_GetInt( p_intf, qta(storedMethod) );
+    int i_cache = config_GetInt( p_intf, qta( storedMethod ) );
     if( i_cache != ui.cacheSpinBox->value() ) {
-        mrl += QString(" :%1=%2").arg(storedMethod).
-                                  arg(ui.cacheSpinBox->value());
+        mrl += QString( " :%1=%2" ).arg( storedMethod ).
+                                  arg( ui.cacheSpinBox->value() );
     }
-    if( ui.startTimeSpinBox->value()) {
-        mrl += " :start-time=" + QString("%1").
-            arg(ui.startTimeSpinBox->value());
+    if( ui.startTimeSpinBox->value() ) {
+        mrl += " :start-time=" + QString( "%1" ).
+            arg( ui.startTimeSpinBox->value() );
     }
-    ui.advancedLineInput->setText(mrl);
+    ui.advancedLineInput->setText( mrl );
 }
 
 void OpenDialog::newCachingMethod( QString method )

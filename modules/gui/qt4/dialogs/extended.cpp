@@ -61,7 +61,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( mainTab, 0, 0, 1, 5 );
 
     QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
-    layout->addWidget( closeButton, 1, 4, 1, 1);
+    layout->addWidget( closeButton, 1, 4, 1, 1 );
     CONNECT( closeButton, clicked(), this, close() );
 
     readSettings( "EPanel", QSize( 400, 280 ), QPoint( 450, 0 ) );

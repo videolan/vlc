@@ -57,7 +57,7 @@ PlaylistDialog::~PlaylistDialog()
     writeSettings( "playlist" );
 }
 
-void PlaylistDialog::dropEvent(QDropEvent *event)
+void PlaylistDialog::dropEvent( QDropEvent *event )
 {
      const QMimeData *mimeData = event->mimeData();
      foreach( QUrl url, mimeData->urls() ) {
@@ -69,15 +69,15 @@ void PlaylistDialog::dropEvent(QDropEvent *event)
      }
      event->acceptProposedAction();
 }
-void PlaylistDialog::dragEnterEvent(QDragEnterEvent *event)
+void PlaylistDialog::dragEnterEvent( QDragEnterEvent *event )
 {
      event->acceptProposedAction();
 }
-void PlaylistDialog::dragMoveEvent(QDragMoveEvent *event)
+void PlaylistDialog::dragMoveEvent( QDragMoveEvent *event )
 {
      event->acceptProposedAction();
 }
-void PlaylistDialog::dragLeaveEvent(QDragLeaveEvent *event)
+void PlaylistDialog::dragLeaveEvent( QDragLeaveEvent *event )
 {
      event->accept();
 }

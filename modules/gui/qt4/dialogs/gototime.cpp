@@ -66,11 +66,11 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QLabel *helpFormat = new QLabel( timeEdit->displayFormat() );
     helpFormat->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred );
 
-    QSpacerItem *spacerBox = new QSpacerItem(20, 10, QSizePolicy::Minimum,
-                                        QSizePolicy::Fixed);
+    QSpacerItem *spacerBox = new QSpacerItem( 20, 10, QSizePolicy::Minimum,
+                                        QSizePolicy::Fixed );
 
-    QSpacerItem *spacerItem = new QSpacerItem(20, 3, QSizePolicy::Minimum,
-                                        QSizePolicy::Expanding);
+    QSpacerItem *spacerItem = new QSpacerItem( 20, 3, QSizePolicy::Minimum,
+                                        QSizePolicy::Expanding );
 
     boxLayout->addWidget( timeIntro, 0, 0, 1, 2 );
     boxLayout->addItem( spacerBox, 1, 0, 1, 2 );

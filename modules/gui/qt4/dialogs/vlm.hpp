@@ -59,7 +59,7 @@ public:
     virtual ~VLMDialog();
 
 private:
-    VLMDialog( intf_thread_t *);
+    VLMDialog( intf_thread_t * );
     static VLMDialog *instance;
     Ui::Vlm ui;
 

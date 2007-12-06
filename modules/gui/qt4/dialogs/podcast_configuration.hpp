@@ -33,14 +33,14 @@ class PodcastConfigDialog : public QVLCFrame
 public:
     static PodcastConfigDialog * getInstance( intf_thread_t *p_intf )
     {
-        if( !instance)
+        if( !instance )
             instance = new PodcastConfigDialog( p_intf );
         return instance;
     }
     virtual ~PodcastConfigDialog();
 
 private:
-    PodcastConfigDialog( intf_thread_t *);
+    PodcastConfigDialog( intf_thread_t * );
     static PodcastConfigDialog *instance;
     Ui::PodcastConfiguration ui;
 public slots:

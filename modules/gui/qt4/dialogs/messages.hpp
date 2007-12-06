@@ -39,13 +39,13 @@ public:
     static MessagesDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new MessagesDialog( p_intf);
+            instance = new MessagesDialog( p_intf );
         return instance;
     }
     virtual ~MessagesDialog();
 
 private:
-    MessagesDialog( intf_thread_t *);
+    MessagesDialog( intf_thread_t * );
     static MessagesDialog *instance;
     QSpinBox *verbosityBox;
     QTextEdit *messages;
