@@ -64,11 +64,13 @@
     string += qtr( "All Files" );      \
     string += " (*.*)";
 
-#define EXT_FILTER_MEDIA        0x01
-#define EXT_FILTER_VIDEO        0x02
-#define EXT_FILTER_AUDIO        0x04
-#define EXT_FILTER_PLAYLIST     0x08
-#define EXT_FILTER_SUBTITLE     0x10
+enum {
+    EXT_FILTER_MEDIA     =  0x01,
+    EXT_FILTER_VIDEO     =  0x02,
+    EXT_FILTER_AUDIO     =  0x04,
+    EXT_FILTER_PLAYLIST  =  0x08,
+    EXT_FILTER_SUBTITLE  =  0x10,
+};
 
 enum {
     OPEN_FILE_TAB,
