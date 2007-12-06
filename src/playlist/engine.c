@@ -287,7 +287,7 @@ check_input:
         {
             PL_DEBUG( "dying input" );
             PL_UNLOCK;
-            msleep( 25000 ); /* 25 ms */
+            msleep( INTF_IDLE_SLEEP );
             PL_LOCK;
             goto check_input;
         }
