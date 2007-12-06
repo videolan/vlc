@@ -1057,11 +1057,12 @@ void PLModel::popupInfo()
 
 void PLModel::popupStream()
 {
-    fprintf( stderr, "Stream not implemented\n" );
+     msg_Err( p_playlist, "Stream not implemented" );
 }
+
 void PLModel::popupSave()
 {
-    fprintf( stderr, "Save not implemented\n" );
+     msg_Err( p_playlist, "Save not implemented" );
 }
 
 #ifdef WIN32
