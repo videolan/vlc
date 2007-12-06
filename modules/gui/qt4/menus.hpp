@@ -92,6 +92,7 @@ public:
     static void PopupMenu( intf_thread_t *, bool );
     static void PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu );
 
+static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, input_thread_t *p_input );
     /* Systray */
     static void updateSystrayMenu( MainInterface *,intf_thread_t  *,
                                    bool b_force_visible = false);

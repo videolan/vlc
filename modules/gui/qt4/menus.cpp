@@ -70,20 +70,20 @@ void addDPStaticEntry( QMenu *menu,
 }
 
 void addMIMStaticEntry( intf_thread_t *p_intf,
-               QMenu *menu,
-               const QString text,
-               char *help,
-               char *icon,
-               const char *member )
+                        QMenu *menu,
+                        const QString text,
+                        char *help,
+                        char *icon,
+                        const char *member )
 {
     if( strlen( icon ) > 0 )
     {
-        QAction *action = menu->addAction( text, THEMIM, SLOT( slot ) );
+        QAction *action = menu->addAction( text, THEMIM,  member );
         action->setIcon( QIcon( icon ) );
     }
     else
     {
-        menu->addAction( text, THEMIM, SLOT( slot ) );
+        menu->addAction( text, THEMIM, member );
     }
 }
 
@@ -213,6 +213,7 @@ QMenu *QVLCMenu::FileMenu()
     return menu;
 }
 
+/* Playlist/MediaLibrary Control */
 QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
 {
     QMenu *menu = new QMenu();
@@ -235,6 +236,7 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
  * Tools/View Menu
  * This is kept in the same menu for now, but could change if it gets much
  * longer.
+ * This menu can be an interface menu but also a right click menu.
  **/
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
                             MainInterface *mi,
@@ -481,28 +483,32 @@ QMenu *QVLCMenu::HelpMenu()
     p_intf->p_sys->p_popup_menu = NULL; \
     i_last_separator = 0;
 
-#define POPUP_PLAY_ENTRIES( menu )\
-    if( p_input ) \
-    { \
-        vlc_value_t val; \
-        var_Get( p_input, "state", &val ); \
-        if( val.i_int == PLAYING_S ) \
-            addMIMStaticEntry( p_intf, menu, qtr( "Pause" ), "", \
-                    ":/pixmaps/pause_16px.png", SLOT( togglePlayPause() ) ); \
-        else \
-            addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "", \
-                    ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) ); \
-    } \
-    else if( THEPL->items.i_size && THEPL->i_enabled ) \
-        addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "", \
-                ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) ); \
-    \
-    addMIMStaticEntry( p_intf, menu, qtr( "Stop" ), "", \
-            ":/pixmaps/stop_16px.png", SLOT( stop() ) ); \
-    addMIMStaticEntry( p_intf, menu, qtr( "Previous" ), "", \
-            ":/pixmaps/previous_16px.png", SLOT( prev() ) ); \
-    addMIMStaticEntry( p_intf, menu, qtr( "Next" ), "", \
+void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
+                                        intf_thread_t *p_intf,
+                                        input_thread_t *p_input )
+{
+    if( p_input )
+    {
+        vlc_value_t val;
+        var_Get( p_input, "state", &val );
+        if( val.i_int == PLAYING_S )
+            addMIMStaticEntry( p_intf, menu, qtr( "Pause" ), "",
+                    ":/pixmaps/pause_16px.png", SLOT( togglePlayPause() ) );
+        else
+            addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "",
+                    ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) );
+    }
+    else if( THEPL->items.i_size && THEPL->i_enabled )
+        addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "",
+                ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) );
+
+    addMIMStaticEntry( p_intf, menu, qtr( "Stop" ), "",
+            ":/pixmaps/stop_16px.png", SLOT( stop() ) );
+    addMIMStaticEntry( p_intf, menu, qtr( "Previous" ), "",
+            ":/pixmaps/previous_16px.png", SLOT( prev() ) );
+    addMIMStaticEntry( p_intf, menu, qtr( "Next" ), "",
             ":/pixmaps/next_16px.png", SLOT( next() ) );
+    }
 
 void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
 {
@@ -593,7 +599,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
     Populate( p_intf, menu, varnames, objects );
 
     menu->addSeparator();
-    POPUP_PLAY_ENTRIES( menu );
+    PopupMenuControlEntries( menu, p_intf, p_input );
 
     menu->addSeparator();
     PopupMenuStaticEntries( p_intf, menu );
@@ -647,7 +653,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             QMenu *menu = new QMenu();
             Populate( p_intf, menu, varnames, objects );
             menu->addSeparator();
-            POPUP_PLAY_ENTRIES( menu );
+            PopupMenuControlEntries( menu, p_intf, p_input );
             menu->addSeparator();
             PopupMenuStaticEntries( p_intf, menu );
 
@@ -692,7 +698,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     }
 
     sysMenu->addSeparator();
-    POPUP_PLAY_ENTRIES( sysMenu );
+    PopupMenuControlEntries( sysMenu, p_intf, p_input );
 
     sysMenu->addSeparator();
     addDPStaticEntry( sysMenu, qtr( "&Open Media" ), "",
