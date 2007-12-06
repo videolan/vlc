@@ -256,7 +256,7 @@ check_input:
 
             /* Release the playlist lock, because we may get stuck
              * in input_DestroyThread() for some time. */
-            PL_UNLOCK
+            PL_UNLOCK;
 
             /* Destroy input */
             input_DestroyThread( p_input );
@@ -287,7 +287,7 @@ check_input:
         {
             PL_DEBUG( "dying input" );
             PL_UNLOCK;
-            msleep( 25000 ); // 25 ms
+            msleep( 25000 ); /* 25 ms */
             PL_LOCK;
             goto check_input;
         }
@@ -327,7 +327,7 @@ check_input:
              {
                 msg_Dbg( p_playlist, "nothing to play" );
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
-                PL_UNLOCK
+                PL_UNLOCK;
 
                 if( b_playexit == VLC_TRUE )
                 {
@@ -358,7 +358,7 @@ check_input:
             PL_LOCK;
         }
     }
-    PL_UNLOCK
+    PL_UNLOCK;
 }
 
 /** Playlist dying last loop */
@@ -369,11 +369,10 @@ void playlist_LastLoop( playlist_t *p_playlist )
     /* If there is an input, kill it */
     while( 1 )
     {
-        PL_LOCK
-
+        PL_LOCK;
         if( p_playlist->p_input == NULL )
         {
-            PL_UNLOCK
+            PL_UNLOCK;
             break;
         }
 
@@ -384,7 +383,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
             /* Unlink current input */
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
-            PL_UNLOCK
+            PL_UNLOCK;
 
             /* Destroy input */
             input_DestroyThread( p_input );
@@ -398,15 +397,14 @@ void playlist_LastLoop( playlist_t *p_playlist )
         else if( p_playlist->p_input->b_error || p_playlist->p_input->b_eof )
         {
             input_StopThread( p_playlist->p_input );
-            PL_UNLOCK
+            PL_UNLOCK;
             continue;
         }
         else
         {
             p_playlist->p_input->b_eof = 1;
         }
-
-        PL_UNLOCK
+        PL_UNLOCK;
 
         msleep( INTF_IDLE_SLEEP );
     }

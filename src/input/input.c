@@ -2095,7 +2095,7 @@ static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
         pl_Yield( p_input );
         var_SetInteger( pl_Get( p_input ), "item-change",
                         p_input->p->input.p_item->i_id );
-        pl_Release( p_input )
+        pl_Release( p_input );
     }
 }
 

@@ -913,7 +913,7 @@ void PLModel::sort( int column, Qt::SortOrder order )
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
     }
-    PL_UNLOCK
+    PL_UNLOCK;
     rebuild();
 }
 
