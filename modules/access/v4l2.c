@@ -4,8 +4,9 @@
  * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
- * Author: Benjamin Pracht <bigben at videolan dot org>
- *         Richard Hosking <richard at hovis dot net>
+ * Authors: Benjamin Pracht <bigben at videolan dot org>
+ *          Richard Hosking <richard at hovis dot net>
+ *          Antoine Cellerier <dionoea at videolan d.t net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -220,7 +221,7 @@ static int Control( demux_t *, int, va_list );
 
 static int Demux( demux_t * );
 static block_t* GrabVideo( demux_t *p_demux );
-static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame );
+static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t );
 static block_t* GrabAudio( demux_t *p_demux );
 
 vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat );
@@ -244,20 +245,28 @@ static struct
     int i_fourcc;
 } v4l2chroma_to_fourcc[] =
 {
-    { V4L2_PIX_FMT_GREY,    VLC_FOURCC( 'G', 'R', 'E', 'Y' ) },
-    { V4L2_PIX_FMT_HI240,   VLC_FOURCC( 'I', '2', '4', '0' ) },
-    { V4L2_PIX_FMT_RGB565,  VLC_FOURCC( 'R', 'V', '1', '6' ) },
-    { V4L2_PIX_FMT_RGB555,  VLC_FOURCC( 'R', 'V', '1', '5' ) },
-    { V4L2_PIX_FMT_BGR24,   VLC_FOURCC( 'R', 'V', '2', '4' ) },
-    { V4L2_PIX_FMT_BGR32,   VLC_FOURCC( 'R', 'V', '3', '2' ) },
-    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC( 'Y', 'U', 'Y', '2' ) },
-    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC( 'Y', 'U', 'Y', 'V' ) },
-    { V4L2_PIX_FMT_UYVY,    VLC_FOURCC( 'U', 'Y', 'V', 'Y' ) },
-    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC( 'I', '4', '1', 'N' ) },
-    { V4L2_PIX_FMT_YUV422P, VLC_FOURCC( 'I', '4', '2', '2' ) },
-    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC( 'I', '4', '2', '0' ) },
-    { V4L2_PIX_FMT_YUV411P, VLC_FOURCC( 'I', '4', '1', '1' ) },
-    { V4L2_PIX_FMT_YUV410,  VLC_FOURCC( 'I', '4', '1', '0' ) },
+    /* Raw data types */
+    { V4L2_PIX_FMT_GREY,    VLC_FOURCC('G','R','E','Y') },
+    { V4L2_PIX_FMT_HI240,   VLC_FOURCC('I','2','4','0') },
+    { V4L2_PIX_FMT_RGB565,  VLC_FOURCC('R','V','1','6') },
+    { V4L2_PIX_FMT_RGB555,  VLC_FOURCC('R','V','1','5') },
+    { V4L2_PIX_FMT_BGR24,   VLC_FOURCC('R','V','2','4') },
+    { V4L2_PIX_FMT_BGR32,   VLC_FOURCC('R','V','3','2') },
+    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC('Y','U','Y','2') },
+    { V4L2_PIX_FMT_YUYV,    VLC_FOURCC('Y','U','Y','V') },
+    { V4L2_PIX_FMT_UYVY,    VLC_FOURCC('U','Y','V','Y') },
+    { V4L2_PIX_FMT_Y41P,    VLC_FOURCC('I','4','1','N') },
+    { V4L2_PIX_FMT_YUV422P, VLC_FOURCC('I','4','2','2') },
+    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC('I','4','2','0') },
+    { V4L2_PIX_FMT_YUV411P, VLC_FOURCC('I','4','1','1') },
+    { V4L2_PIX_FMT_YUV410,  VLC_FOURCC('I','4','1','0') },
+    /* Compressed data types */
+    { V4L2_PIX_FMT_MJPEG,   VLC_FOURCC('M','J','P','G') },
+#if 0
+    { V4L2_PIX_FMT_JPEG,    VLC_FOURCC('J','P','E','G') },
+    { V4L2_PIX_FMT_DV,      VLC_FOURCC('?','?','?','?') },
+    { V4L2_PIX_FMT_MPEG,    VLC_FOURCC('?','?','?','?') },
+#endif
     { 0, 0 }
 };
 
@@ -320,9 +329,6 @@ struct demux_sys_t
     int i_saturation;
     int i_hue;
     int i_gamma;
-
-    picture_t pic;
-    int i_video_frame_size;
 
     es_out_id_t *p_es_video;
 
@@ -933,6 +939,7 @@ static block_t* GrabVideo( demux_t *p_demux )
 
     block_t *p_block = NULL;
     struct v4l2_buffer buf;
+    ssize_t i_ret;
 
     if( p_sys->f_fps >= 0.1 && p_sys->i_video_pts > 0 )
     {
@@ -946,7 +953,8 @@ static block_t* GrabVideo( demux_t *p_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( read( p_sys->i_fd_video, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length ) )
+        i_ret = read( p_sys->i_fd_video, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length );
+        if( i_ret == -1 )
         {
             switch( errno )
             {
@@ -961,7 +969,7 @@ static block_t* GrabVideo( demux_t *p_demux )
                }
         }
 
-        p_block = ProcessVideoFrame( p_demux, (uint8_t*)p_sys->p_buffers[0].start );
+        p_block = ProcessVideoFrame( p_demux, (uint8_t*)p_sys->p_buffers[0].start, i_ret );
         if( !p_block ) return 0;
 
         break;
@@ -992,7 +1000,7 @@ static block_t* GrabVideo( demux_t *p_demux )
             return 0;
         }
 
-        p_block = ProcessVideoFrame( p_demux, p_sys->p_buffers[buf.index].start );
+        p_block = ProcessVideoFrame( p_demux, p_sys->p_buffers[buf.index].start, buf.bytesused );
         if( !p_block ) return 0;
 
         /* Unlock */
@@ -1039,7 +1047,7 @@ static block_t* GrabVideo( demux_t *p_demux )
             return 0;
         }
 
-        p_block = ProcessVideoFrame( p_demux, (uint8_t*)buf.m.userptr );
+        p_block = ProcessVideoFrame( p_demux, (uint8_t*)buf.m.userptr, buf.bytesused );
         if( !p_block ) return 0;
 
         /* Unlock */
@@ -1063,22 +1071,21 @@ static block_t* GrabVideo( demux_t *p_demux )
  * ProcessVideoFrame: Helper function to take a buffer and copy it into
  * a new block
  *****************************************************************************/
-static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame )
+static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t i_size )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
 
     if( !p_frame ) return 0;
 
     /* New block */
-    if( !( p_block = block_New( p_demux, p_sys->i_video_frame_size ) ) )
+    if( !( p_block = block_New( p_demux, i_size ) ) )
     {
         msg_Warn( p_demux, "Cannot get new block" );
         return 0;
     }
 
     /* Copy frame */
-    memcpy( p_block->p_buffer, p_frame, p_sys->i_video_frame_size );
+    memcpy( p_block->p_buffer, p_frame, i_size );
 
     return p_block;
 }
@@ -1383,26 +1390,26 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     /* Verify device support for the various IO methods */
     switch( p_sys->io )
     {
-    case IO_METHOD_READ:
-        if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) )
-        {
-            msg_Err( p_demux, "device does not support read i/o" );
-            goto open_failed;
-        }
-        break;
+        case IO_METHOD_READ:
+            if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) )
+            {
+                msg_Err( p_demux, "device does not support read i/o" );
+                goto open_failed;
+            }
+            break;
 
-    case IO_METHOD_MMAP:
-    case IO_METHOD_USERPTR:
-        if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) )
-        {
-            msg_Err( p_demux, "device does not support streaming i/o" );
-            goto open_failed;
-        }
-        break;
+        case IO_METHOD_MMAP:
+        case IO_METHOD_USERPTR:
+            if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) )
+            {
+                msg_Err( p_demux, "device does not support streaming i/o" );
+                goto open_failed;
+            }
+            break;
 
-    default:
-        msg_Err( p_demux, "io method not supported" );
-        goto open_failed;
+        default:
+            msg_Err( p_demux, "io method not supported" );
+            goto open_failed;
     }
 
     /* Reset Cropping */
@@ -1416,12 +1423,12 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         {
             switch( errno )
             {
-            case EINVAL:
-                /* Cropping not supported. */
-                break;
-            default:
-                /* Errors ignored. */
-                break;
+                case EINVAL:
+                    /* Cropping not supported. */
+                    break;
+                default:
+                    /* Errors ignored. */
+                    break;
             }
         }
     }
@@ -1581,21 +1588,6 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
                   "saturation", V4L2_CID_SATURATION, p_sys->i_saturation );
     VideoControl( p_demux, i_fd, "hue", V4L2_CID_HUE, p_sys->i_hue );
     VideoControl( p_demux, i_fd, "gamma", V4L2_CID_GAMMA, p_sys->i_gamma );
-
-    /* Init vout Picture */
-    vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
-        p_sys->i_width, p_sys->i_height, p_sys->i_width *
-        VOUT_ASPECT_FACTOR / p_sys->i_height );
-    if( !p_sys->pic.i_planes )
-    {
-        msg_Err( p_demux, "unsupported chroma" );
-        goto open_failed;
-    }
-    p_sys->i_video_frame_size = 0;
-    for( int i = 0; i < p_sys->pic.i_planes; i++ )
-    {
-         p_sys->i_video_frame_size += p_sys->pic.p[i].i_visible_lines * p_sys->pic.p[i].i_visible_pitch;
-    }
 
     /* Init IO method */
     switch( p_sys->io )
