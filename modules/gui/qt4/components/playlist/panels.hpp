@@ -27,12 +27,13 @@
 #include <vlc/vlc.h>
 
 #include "qt4.hpp"
-#include "../interface_widgets.hpp"
+#include "components/playlist/playlist.hpp"
 
 #include <QModelIndex>
 #include <QWidget>
 #include <QString>
 
+class QSignalMapper;
 class QTreeView;
 class PLModel;
 class QPushButton;
@@ -56,7 +57,6 @@ public slots:
     virtual void setRoot( int ) = 0;
 };
 
-class PlaylistWidget;
 
 class StandardPLPanel: public PLPanel
 {

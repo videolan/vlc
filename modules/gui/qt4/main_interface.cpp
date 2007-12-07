@@ -29,6 +29,7 @@
 #include "util/customwidgets.hpp"
 #include "dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
+#include "components/playlist/playlist.hpp"
 #include "dialogs/extended.hpp"
 #include "dialogs/playlist.hpp"
 #include "menus.hpp"

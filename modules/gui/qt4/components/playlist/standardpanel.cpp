@@ -40,6 +40,7 @@
 #include <QLabel>
 #include <QSpacerItem>
 #include <QMenu>
+#include <QSignalMapper>
 
 #include <assert.h>
 
@@ -67,12 +68,14 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     view->setDropIndicatorShown( true );
     view->setAutoScroll( true );
 
-    view->header()->resizeSection( 0, 230 );
+    /* Configure the size of the header */
+    view->header()->resizeSection( 0, 200 );
     view->header()->resizeSection( 1, 80 );
     view->header()->setSortIndicatorShown( true );
     view->header()->setClickable( true );
     view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
 
+    /* Connections for the TreeView */
     CONNECT( view, activated( const QModelIndex& ) ,
              model,activateItem( const QModelIndex& ) );
     CONNECT( view, rightClicked( QModelIndex , QPoint ),
@@ -88,11 +91,14 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     /* Buttons configuration */
     QHBoxLayout *buttons = new QHBoxLayout;
 
-    addButton = new QPushButton( QIcon( ":/pixmaps/playlist_add.png" ), "", this );
-    addButton->setMaximumWidth( 25 );
+    /* Add item to the playlist button */
+    addButton = new QPushButton;
+    addButton->setIcon( QIcon( ":/pixmaps/playlist_add.png" ) );
+    addButton->setMaximumWidth( 30 );
     BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
+    /* Random 2-state button */
     randomButton = new QPushButton( this );
     if( model->hasRandom() )
     {
@@ -107,9 +113,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( randomButton, toggleRandom() );
     buttons->addWidget( randomButton );
 
-    QSpacerItem *spacer = new QSpacerItem( 10, 20 );
-    buttons->addItem( spacer );
-
+    /* Repeat 3-state button */
     repeatButton = new QPushButton( this );
     if( model->hasRepeat() )
     {
@@ -129,24 +133,33 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
 
+    /* A Spacer and the search possibilities */
+    QSpacerItem *spacer = new QSpacerItem( 10, 20 );
+    buttons->addItem( spacer );
+
     QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
     buttons->addWidget( filter );
+
     searchLine = new  ClickLineEdit( qtr(I_PL_FILTER), 0 );
+    searchLine->setMinimumWidth( 80 );
     CONNECT( searchLine, textChanged(QString), this, search(QString));
     buttons->addWidget( searchLine ); filter->setBuddy( searchLine );
 
-    QPushButton *clear = new QPushButton( qfu( "CL") );
+    QPushButton *clear = new QPushButton;
+    clear->setText( qfu( "CL") );
     clear->setMaximumWidth( 30 );
     clear->setToolTip( qtr( "Clear" ));
     BUTTONACT( clear, clearFilter() );
     buttons->addWidget( clear );
 
+    /* Finish the layout */
     layout->addWidget( view );
     layout->addLayout( buttons );
 //    layout->addWidget( bar );
     setLayout( layout );
 }
 
+/* Function to toggle between the Repeat states */
 void StandardPLPanel::toggleRepeat()
 {
     if( model->hasRepeat() )
@@ -169,6 +182,7 @@ void StandardPLPanel::toggleRepeat()
     }
 }
 
+/* Function to toggle between the Random states */
 void StandardPLPanel::toggleRandom()
 {
     bool prev = model->hasRandom();
@@ -206,6 +220,7 @@ void StandardPLPanel::setCurrentRootId( int _new )
         addButton->setEnabled( false );
 }
 
+/* PopupAdd Menu for the Add Menu */
 void StandardPLPanel::popupAdd()
 {
     QMenu popup;
@@ -225,22 +240,24 @@ void StandardPLPanel::popupAdd()
         popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT( MLAppendDialog() ) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
     }
-    popup.exec( QCursor::pos() );
+    popup.exec( QCursor::pos() - addButton->mapFromGlobal( QCursor::pos() )
+                        + QPoint( 0, addButton->height() ) );
 }
 
-void StandardPLPanel::popupSelectColumn( QPoint )
+void StandardPLPanel::popupSelectColumn( QPoint pos )
 {
     ContextUpdateMapper = new QSignalMapper(this);
 
     QMenu selectColMenu;
 
 #define ADD_META_ACTION( meta ) { \
-   QAction* option = selectColMenu.addAction( qfu(VLC_META_##meta) );     \
-   option->setCheckable( true );                                           \
-   option->setChecked( model->shownFlags() & VLC_META_ENGINE_##meta );   \
-   ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
-   CONNECT( option, triggered(), ContextUpdateMapper, map() );             \
-   }
+    QAction* option = selectColMenu.addAction( qfu(VLC_META_##meta) );      \
+    option->setCheckable( true );                                           \
+    option->setChecked( model->shownFlags() & VLC_META_ENGINE_##meta );     \
+    ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
+    CONNECT( option, triggered(), ContextUpdateMapper, map() );             \
+}
+
     CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
 
     ADD_META_ACTION( TITLE );
@@ -255,13 +272,15 @@ void StandardPLPanel::popupSelectColumn( QPoint )
 #undef ADD_META_ACTION
 
     selectColMenu.exec( QCursor::pos() );
- }
+}
 
+/* ClearFilter LineEdit */
 void StandardPLPanel::clearFilter()
 {
     searchLine->setText( "" );
 }
 
+/* Search in the playlist */
 void StandardPLPanel::search( QString searchText )
 {
     model->search( searchText );
@@ -290,6 +309,8 @@ void StandardPLPanel::removeItem( int i_id )
     model->removeItem( i_id );
 }
 
+/* Delete and Suppr key remove the selection 
+   FilterKey function and code function */
 void StandardPLPanel::keyPressEvent( QKeyEvent *e )
 {
     switch( e->key() )

@@ -38,6 +38,7 @@ nodist_SOURCES_qt4 = \
 		components/simple_preferences.moc.cpp \
 		components/open_panels.moc.cpp \
 		components/interface_widgets.moc.cpp \
+		components/playlist/playlist.moc.cpp \
 		components/playlist/panels.moc.cpp \
 		components/playlist/selector.moc.cpp \
 		util/input_slider.moc.cpp \
@@ -105,6 +106,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/open_panels.cpp \
 		components/interface_widgets.cpp \
 		components/playlist/standardpanel.cpp \
+		components/playlist/playlist.cpp \
 		components/playlist/selector.cpp \
 		util/input_slider.cpp \
 		util/customwidgets.cpp
@@ -137,6 +139,7 @@ noinst_HEADERS = \
 	components/open_panels.hpp \
 	components/interface_widgets.hpp \
 	components/playlist/panels.hpp \
+	components/playlist/playlist.hpp \
 	components/playlist/selector.hpp \
 	util/input_slider.hpp \
 	util/directslider.hpp \

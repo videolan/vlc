@@ -229,39 +229,6 @@ signals:
 };
 
 
-/******************** Playlist Widgets ****************/
-#include <QModelIndex>
-#include <QSplitter>
-class QSignalMapper;
-class PLSelector;
-class PLPanel;
-class QPushButton;
-class QSettings;
-
-class PlaylistWidget : public QSplitter
-{
-    Q_OBJECT;
-public:
-    PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) ;
-    virtual ~PlaylistWidget();
-    QSize sizeHint() const;
-    void savingSettings( QSettings *settings );
-private:
-    PLSelector *selector;
-    PLPanel *rightPanel;
-    QPushButton *addButton;
-    QLabel *art;
-    QString prevArt;
-protected:
-    intf_thread_t *p_intf;
-private slots:
-    void setArt( QString );
-signals:
-    void rootChanged( int );
-    void artSet( QString );
-};
-
-
 /******************** Speed Control Widgets ****************/
 class SpeedControlWidget : public QFrame
 {

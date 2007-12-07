@@ -24,7 +24,7 @@
 #include "dialogs/playlist.hpp"
 
 #include "main_interface.hpp"
-#include "components/interface_widgets.hpp"
+#include "components/playlist/playlist.hpp"
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
 
