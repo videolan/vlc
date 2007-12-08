@@ -5,6 +5,7 @@
  * $Id: preferences.hpp 16643 2006-09-13 12:45:46Z zorglub $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,8 +66,7 @@ public:
 private:
     intf_thread_t *p_intf;
     Ui::ExtV4l2Widget ui;
-    QVBoxLayout *layout;
-    QLabel *help;
+    QGroupBox *box;
 
 private slots:
     void Refresh( void );

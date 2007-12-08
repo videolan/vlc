@@ -568,23 +568,25 @@ ExtV4l2::ExtV4l2( intf_thread_t *_p_intf, QWidget *_parent )
 
     BUTTONACT( ui.refresh, Refresh() );
 
-    layout = new QVBoxLayout;
-    ui.vboxLayout->addLayout( layout );
-
-    help = new QLabel( qtr( "No v4l2 instance found. Press the refresh button to try again." ) );
-    layout->addWidget( help );
+    box = NULL;
 }
 
 ExtV4l2::~ExtV4l2()
 {
-    delete help;
-    delete layout;
+    if( box )
+        delete box;
 }
 
 void ExtV4l2::Refresh( void )
 {
     vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( p_intf, "v4l2", FIND_ANYWHERE );
-    help->hide();
+    ui.help->hide();
+    if( box )
+    {
+        ui.vboxLayout->removeWidget( box );
+        delete box;
+        box = NULL;
+    }
     if( p_obj )
     {
         msg_Dbg( p_intf, "Found v4l2 instance" );
@@ -593,10 +595,17 @@ void ExtV4l2::Refresh( void )
                                 &val, &text );
         if( i_ret < 0 )
         {
-            msg_Err( p_intf, "Oops" );
+            msg_Err( p_intf, "Oops, v4l2 object doesn't have a 'controls' variable." );
+            ui.help->show();
             vlc_object_release( p_obj );
             return;
         }
+
+        box = new QGroupBox( this );
+        ui.vboxLayout->addWidget( box );
+        QVBoxLayout *layout = new QVBoxLayout( box );
+        box->setLayout( layout );
+
         for( int i = 0; i < val.p_list->i_count; i++ )
         {
             const char *psz_var = text.p_list->p_values[i].psz_string;
@@ -610,13 +619,13 @@ void ExtV4l2::Refresh( void )
             {
                 case VLC_VAR_INTEGER:
                 {
-                    QLabel *label = new QLabel( psz_label );
-                    QHBoxLayout *hlayout = new QHBoxLayout;
+                    QLabel *label = new QLabel( psz_label, box );
+                    QHBoxLayout *hlayout = new QHBoxLayout( box );
                     hlayout->addWidget( label );
                     int i_val = var_GetInteger( p_obj, psz_var );
                     if( i_type & VLC_VAR_HASCHOICE )
                     {
-                        QComboBox *combobox = new QComboBox;
+                        QComboBox *combobox = new QComboBox( box );
                         combobox->setObjectName( psz_var );
 
                         vlc_value_t val2, text2;
@@ -639,7 +648,7 @@ void ExtV4l2::Refresh( void )
                     }
                     else
                     {
-                        QSlider *slider = new QSlider;
+                        QSlider *slider = new QSlider( box );
                         slider->setObjectName( psz_var );
                         slider->setOrientation( Qt::Horizontal );
                         vlc_value_t val2;
@@ -663,7 +672,7 @@ void ExtV4l2::Refresh( void )
                 }
                 case VLC_VAR_BOOL:
                 {
-                    QRadioButton *button = new QRadioButton( psz_label );
+                    QCheckBox *button = new QCheckBox( psz_label, box );
                     button->setObjectName( psz_var );
                     button->setChecked( var_GetBool( p_obj, psz_var ) );
 
@@ -674,7 +683,7 @@ void ExtV4l2::Refresh( void )
                 }
                 case VLC_VAR_VOID:
                 {
-                    QPushButton *button = new QPushButton( psz_label );
+                    QPushButton *button = new QPushButton( psz_label, box );
                     button->setObjectName( psz_var );
 
                     CONNECT( button, clicked( bool ), this,
@@ -694,7 +703,7 @@ void ExtV4l2::Refresh( void )
     else
     {
         msg_Dbg( p_intf, "Couldn't find v4l2 instance" );
-        help->show();
+        ui.help->show();
     }
 
 }

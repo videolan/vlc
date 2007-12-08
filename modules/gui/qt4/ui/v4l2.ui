@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>405</width>
     <height>300</height>
    </rect>
   </property>
@@ -17,6 +17,13 @@
     <widget class="QPushButton" name="refresh" >
      <property name="text" >
       <string>Refresh</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="help" >
+     <property name="text" >
+      <string>No v4l2 instance found. Press the refresh button to try again.</string>
      </property>
     </widget>
    </item>
