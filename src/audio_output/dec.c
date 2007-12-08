@@ -87,10 +87,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     p_input->b_changed = 0;
     p_input->b_error = 1;
 
-    if ( !p_format->i_bytes_per_frame )
-        aout_FormatPrepare( p_format );
-    else 
-        p_format->i_frame_length = 1;
+    aout_FormatPrepare( p_format );
 
     memcpy( &p_input->input, p_format,
             sizeof(audio_sample_format_t) );
