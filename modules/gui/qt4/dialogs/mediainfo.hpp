@@ -71,6 +71,7 @@ private:
     int i_runs;
     bool mainInput;
     bool stats;
+    bool b_cleaned;
 
     QTabWidget *IT;
     InputStatsPanel *ISP;

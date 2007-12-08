@@ -45,6 +45,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     i_runs = 0;
     p_item = _p_item;
     b_need_update = true;
+    b_cleaned = true;
 
     setWindowTitle( qtr( "Media information" ) );
     resize( 600 , 480 );
@@ -142,7 +143,11 @@ void MediaInfoDialog::updateOnTimeOut()
     input_thread_t *p_input = THEMIM->getInput();
     if( !p_input || p_input->b_dead )
     {
-        clear();
+        if( !b_cleaned )
+        {
+            clear();
+            b_cleaned = true;
+        }
         return;
     }
 
@@ -151,6 +156,7 @@ void MediaInfoDialog::updateOnTimeOut()
 
     update( input_GetItem(p_input), b_need_update, b_need_update );
     b_need_update = false;
+    b_cleaned = false;
 
     vlc_object_release( p_input );
 }
@@ -176,6 +182,7 @@ void MediaInfoDialog::clear()
     MP->clear();
     EMP->clear();
     if( stats ) ISP->clear();
+    b_cleaned = true;
 }
 
 void MediaInfoDialog::close()

@@ -64,7 +64,6 @@ private:
     intf_thread_t *p_intf;
     bool b_inEditMode;
 
-    QLineEdit *uri_text;
     QLineEdit *title_text;
     QLineEdit *artist_text;
     QLineEdit *genre_text;

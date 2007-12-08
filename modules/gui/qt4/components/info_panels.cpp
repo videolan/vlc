@@ -288,7 +288,8 @@ void MetaPanel::saveMeta()
     PL_UNLOCK;
     pl_Release( p_playlist );
 
-    /* Reset the status of the mode. No need to emit any signal */
+    /* Reset the status of the mode. No need to emit any signal because parent
+       is the only caller */
     b_inEditMode = false;
 }
 
@@ -300,6 +301,7 @@ bool MetaPanel::isInEditMode()
 
 void MetaPanel::enterEditMode()
 {
+    msg_Dbg( p_intf, "Entering Edit MetaData Mode" );
     setEditMode( true );
 }
 
@@ -314,7 +316,6 @@ void MetaPanel::setEditMode( bool b_editing )
  */
 void MetaPanel::clear()
 {
-    uri_text->clear();
     title_text->clear();
     artist_text->clear();
     genre_text->clear();
