@@ -29,6 +29,7 @@
 
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
+#include "ui/v4l2.h"
 
 #define BANDS 10
 #define NUM_SP_CTRL 5
@@ -52,6 +53,25 @@ private:
 private slots:
     void updateFilters();
     void updateFilterOptions();
+};
+
+class ExtV4l2 : public QWidget
+{
+    Q_OBJECT
+public:
+    ExtV4l2( intf_thread_t *, QWidget * );
+    virtual ~ExtV4l2();
+
+private:
+    intf_thread_t *p_intf;
+    Ui::ExtV4l2Widget ui;
+    QVBoxLayout *layout;
+    QLabel *help;
+
+private slots:
+    void Refresh( void );
+    void ValueChange( int value );
+    void ValueChange( bool value );
 };
 
 class Equalizer: public QWidget

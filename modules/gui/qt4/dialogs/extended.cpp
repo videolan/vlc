@@ -58,6 +58,12 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     ExtVideo *videoEffect = new ExtVideo( p_intf, this );
     mainTab->addTab( videoEffect, qtr( "Video Adjustments and Effects" ) );
 
+    if( module_Exists( p_intf, "v4l2" ) )
+    {
+        ExtV4l2 *v4l2 = new ExtV4l2( p_intf, this );
+        mainTab->addTab( v4l2, qtr( "v4l2 controls" ) );
+    }
+
     layout->addWidget( mainTab, 0, 0, 1, 5 );
 
     QPushButton *closeButton = new QPushButton( qtr( "Close" ) );

@@ -28,6 +28,7 @@
 #include <QFont>
 #include <QGridLayout>
 #include <QSignalMapper>
+#include <QComboBox>
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
@@ -555,6 +556,188 @@ void ExtVideo::gotoConf( QObject* src )
     SHOWCONF( "colorthres" )
 }
 #endif
+
+/**********************************************************************
+ * v4l2 controls
+ **********************************************************************/
+
+ExtV4l2::ExtV4l2( intf_thread_t *_p_intf, QWidget *_parent )
+    : QWidget( _parent ), p_intf( _p_intf )
+{
+    ui.setupUi( this );
+
+    BUTTONACT( ui.refresh, Refresh() );
+
+    layout = new QVBoxLayout;
+    ui.vboxLayout->addLayout( layout );
+
+    help = new QLabel( qtr( "No v4l2 instance found. Press the refresh button to try again." ) );
+    layout->addWidget( help );
+}
+
+ExtV4l2::~ExtV4l2()
+{
+    delete help;
+    delete layout;
+}
+
+void ExtV4l2::Refresh( void )
+{
+    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( p_intf, "v4l2", FIND_ANYWHERE );
+    help->hide();
+    if( p_obj )
+    {
+        msg_Dbg( p_intf, "Found v4l2 instance" );
+        vlc_value_t val, text, name;
+        int i_ret = var_Change( p_obj, "controls", VLC_VAR_GETCHOICES,
+                                &val, &text );
+        if( i_ret < 0 )
+        {
+            msg_Err( p_intf, "Oops" );
+            vlc_object_release( p_obj );
+            return;
+        }
+        for( int i = 0; i < val.p_list->i_count; i++ )
+        {
+            const char *psz_var = text.p_list->p_values[i].psz_string;
+            var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &name, NULL );
+            const char *psz_label = name.psz_string;
+            msg_Dbg( p_intf, "v4l2 control \"%x\": %s (%s)",
+                     val.p_list->p_values[i].i_int, psz_var, name.psz_string );
+
+            int i_type = var_Type( p_obj, psz_var );
+            switch( i_type & VLC_VAR_TYPE )
+            {
+                case VLC_VAR_INTEGER:
+                {
+                    QLabel *label = new QLabel( psz_label );
+                    QHBoxLayout *hlayout = new QHBoxLayout;
+                    hlayout->addWidget( label );
+                    int i_val = var_GetInteger( p_obj, psz_var );
+                    if( i_type & VLC_VAR_HASCHOICE )
+                    {
+                        QComboBox *combobox = new QComboBox;
+                        combobox->setObjectName( psz_var );
+
+                        vlc_value_t val2, text2;
+                        var_Change( p_obj, psz_var, VLC_VAR_GETCHOICES,
+                                    &val2, &text2 );
+                        for( int j = 0; j < val2.p_list->i_count; j++ )
+                        {
+                            combobox->addItem(
+                                       text2.p_list->p_values[j].psz_string,
+                                       val2.p_list->p_values[j].i_int );
+                            if( i_val == val2.p_list->p_values[j].i_int )
+                                combobox->setCurrentIndex( j );
+                        }
+                        var_Change( p_obj, psz_var, VLC_VAR_FREELIST,
+                                    &val2, &text2 );
+
+                        CONNECT( combobox, currentIndexChanged( int ), this,
+                                 ValueChange( int ) );
+                        hlayout->addWidget( combobox );
+                    }
+                    else
+                    {
+                        QSlider *slider = new QSlider;
+                        slider->setObjectName( psz_var );
+                        slider->setOrientation( Qt::Horizontal );
+                        vlc_value_t val2;
+                        var_Change( p_obj, psz_var, VLC_VAR_GETMIN,
+                                    &val2, NULL );
+                        slider->setMinimum( val2.i_int );
+                        var_Change( p_obj, psz_var, VLC_VAR_GETMAX,
+                                    &val2, NULL );
+                        slider->setMaximum( val2.i_int );
+                        var_Change( p_obj, psz_var, VLC_VAR_GETSTEP,
+                                    &val2, NULL );
+                        slider->setSingleStep( val2.i_int );
+                        slider->setValue( i_val );
+
+                        CONNECT( slider, valueChanged( int ), this,
+                                 ValueChange( int ) );
+                        hlayout->addWidget( slider );
+                    }
+                    layout->addLayout( hlayout );
+                    break;
+                }
+                case VLC_VAR_BOOL:
+                {
+                    QRadioButton *button = new QRadioButton( psz_label );
+                    button->setObjectName( psz_var );
+                    button->setChecked( var_GetBool( p_obj, psz_var ) );
+
+                    CONNECT( button, clicked( bool ), this,
+                             ValueChange( bool ) );
+                    layout->addWidget( button );
+                    break;
+                }
+                case VLC_VAR_VOID:
+                {
+                    QPushButton *button = new QPushButton( psz_label );
+                    button->setObjectName( psz_var );
+
+                    CONNECT( button, clicked( bool ), this,
+                             ValueChange( bool ) );
+                    layout->addWidget( button );
+                    break;
+                }
+                default:
+                    msg_Warn( p_intf, "Unhandled var type for %s", psz_var );
+                    break;
+            }
+            free( name.psz_string );
+        }
+        var_Change( p_obj, "controls", VLC_VAR_FREELIST, &val, &text );
+        vlc_object_release( p_obj );
+    }
+    else
+    {
+        msg_Dbg( p_intf, "Couldn't find v4l2 instance" );
+        help->show();
+    }
+
+}
+
+void ExtV4l2::ValueChange( bool value )
+{
+    ValueChange( (int)value );
+}
+
+void ExtV4l2::ValueChange( int value )
+{
+    QObject *s = sender();
+    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( p_intf, "v4l2", FIND_ANYWHERE );
+    if( p_obj )
+    {
+        char *psz_var = strdup( s->objectName().toStdString().c_str() );
+        int i_type = var_Type( p_obj, psz_var );
+        switch( i_type & VLC_VAR_TYPE )
+        {
+            case VLC_VAR_INTEGER:
+                if( i_type & VLC_VAR_HASCHOICE )
+                {
+                    QComboBox *combobox = qobject_cast<QComboBox*>( s );
+                    value = combobox->itemData( value ).toInt();
+                }
+                var_SetInteger( p_obj, psz_var, value );
+                break;
+            case VLC_VAR_BOOL:
+                var_SetBool( p_obj, psz_var, value );
+                break;
+            case VLC_VAR_VOID:
+                var_SetVoid( p_obj, psz_var );
+                break;
+        }
+        free( psz_var );
+        vlc_object_release( p_obj );
+    }
+    else
+    {
+        msg_Warn( p_intf, "Oops, v4l2 object isn't available anymore" );
+        Refresh();
+    }
+}
 
 /**********************************************************************
  * Equalizer
