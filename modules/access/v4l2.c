@@ -1593,10 +1593,6 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     VideoControlList( p_demux, i_fd,
                       var_GetBool( p_demux, "v4l2-control-reset" ) );
 
-    for( i = 0; controls[i].psz_name != NULL; i++ )
-        VideoControl( p_demux, i_fd, controls[i].psz_name, controls[i].i_cid,
-                      var_GetInteger( p_demux, controls[i].psz_name ) );
-
     /* Init IO method */
     switch( p_sys->io )
     {
