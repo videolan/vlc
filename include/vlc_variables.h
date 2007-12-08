@@ -94,6 +94,10 @@
 #define VLC_VAR_SETTEXT             0x0014
 #define VLC_VAR_GETTEXT             0x0015
 
+#define VLC_VAR_GETMIN              0x0016
+#define VLC_VAR_GETMAX              0x0017
+#define VLC_VAR_GETSTEP             0x0018
+
 #define VLC_VAR_ADDCHOICE           0x0020
 #define VLC_VAR_DELCHOICE           0x0021
 #define VLC_VAR_CLEARCHOICES        0x0022

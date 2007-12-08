@@ -241,7 +241,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->pf_cmp = CmpString;
             p_var->pf_dup = DupString;
             p_var->pf_free = FreeString;
-            p_var->val.psz_string = "";
+            p_var->val.psz_string = strdup( "" );
             break;
         case VLC_VAR_FLOAT:
             p_var->pf_cmp = CmpFloat;
@@ -420,6 +420,12 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->pf_dup( &p_var->min );
             CheckValue( p_var, &p_var->val );
             break;
+        case VLC_VAR_GETMIN:
+            if( p_var->i_type & VLC_VAR_HASMIN )
+            {
+                *p_val = p_var->min;
+            }
+            break;
         case VLC_VAR_SETMAX:
             if( p_var->i_type & VLC_VAR_HASMAX )
             {
@@ -430,6 +436,12 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->pf_dup( &p_var->max );
             CheckValue( p_var, &p_var->val );
             break;
+        case VLC_VAR_GETMAX:
+            if( p_var->i_type & VLC_VAR_HASMAX )
+            {
+                *p_val = p_var->max;
+            }
+            break;
         case VLC_VAR_SETSTEP:
             if( p_var->i_type & VLC_VAR_HASSTEP )
             {
@@ -439,6 +451,12 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->step = *p_val;
             p_var->pf_dup( &p_var->step );
             CheckValue( p_var, &p_var->val );
+            break;
+        case VLC_VAR_GETSTEP:
+            if( p_var->i_type & VLC_VAR_HASSTEP )
+            {
+                *p_val = p_var->step;
+            }
             break;
         case VLC_VAR_ADDCHOICE:
             /* FIXME: the list is sorted, dude. Use something cleverer. */
@@ -622,7 +640,9 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             {
                 vlc_value_t val;
 
-                if( InheritValue( p_this, psz_name, &val, p_var->i_type )
+                if( InheritValue( p_this,
+                                  p_val2 ? p_val2->psz_string :  psz_name,
+                                  &val, p_var->i_type )
                     == VLC_SUCCESS )
                 {
                     /* Duplicate already done */
@@ -1092,6 +1112,7 @@ void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
     case VLC_VAR_MODULE:
     case VLC_VAR_FILE:
     case VLC_VAR_DIRECTORY:
+        if( val.psz_string ) free( val.psz_string );
         val.psz_string = psz_value;
         break;
 
