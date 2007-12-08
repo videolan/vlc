@@ -21,11 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _MMS_H_
+#define _MMS_H_ 1
+
 #define MMS_PROTO_AUTO  0
 #define MMS_PROTO_TCP   1
 #define MMS_PROTO_UDP   2
 #define MMS_PROTO_HTTP  3
-
 
 /* mmst and mmsu */
 int  E_( MMSTUOpen )  ( access_t * );
@@ -34,3 +36,6 @@ void E_( MMSTUClose ) ( access_t * );
 /* mmsh */
 int  E_( MMSHOpen )  ( access_t * );
 void E_( MMSHClose ) ( access_t * );
+
+#endif
+

@@ -21,34 +21,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _MMSTU_H_
+#define _MMSTU_H_ 1
+
 #define MMS_PACKET_ANY          0
 #define MMS_PACKET_CMD          1
 #define MMS_PACKET_HEADER       2
 #define MMS_PACKET_MEDIA        3
 #define MMS_PACKET_UDP_TIMING   4
 
-
 #define MMS_CMD_HEADERSIZE  48
 
 #define MMS_BUFFER_SIZE 100000
 struct access_sys_t
 {
-    int                 i_proto;        /* MMS_PROTO_TCP, MMS_PROTO_UDP */
-    int                 i_handle_tcp;   /* TCP socket for communication with server */
-    int                 i_handle_udp;   /* Optional UDP socket for data(media/header packet) */
-                                        /* send by server */
-    char                sz_bind_addr[NI_MAXNUMERICHOST]; /* used by udp */
+    int         i_proto;        /* MMS_PROTO_TCP, MMS_PROTO_UDP */
+    int         i_handle_tcp;   /* TCP socket for communication with server */
+    int         i_handle_udp;   /* Optional UDP socket for data(media/header packet) */
+                                /* send by server */
+    char        sz_bind_addr[NI_MAXNUMERICHOST]; /* used by udp */
 
-    vlc_url_t           url;
+    vlc_url_t   url;
 
-    asf_header_t        asfh;
+    asf_header_t    asfh;
 
     /* */
-    uint8_t             buffer_tcp[MMS_BUFFER_SIZE];
-    int                 i_buffer_tcp;
+    uint8_t     buffer_tcp[MMS_BUFFER_SIZE];
+    int         i_buffer_tcp;
 
-    uint8_t             buffer_udp[MMS_BUFFER_SIZE];
-    int                 i_buffer_udp;
+    uint8_t     buffer_udp[MMS_BUFFER_SIZE];
+    int         i_buffer_udp;
 
     /* data necessary to send data to server */
     guid_t      guid;
@@ -86,7 +88,8 @@ struct access_sys_t
     int         i_max_bit_rate;
     int         i_header_size;
 
-    /* */
+    /* misc */
     vlc_bool_t  b_seekable;
 };
 
+#endif

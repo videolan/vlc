@@ -21,6 +21,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _MMSH_H_
+#define _MMSH_H_ 1
+
 typedef struct
 {
     uint16_t i_type;
@@ -66,3 +69,5 @@ struct access_sys_t
     asf_header_t    asfh;
     guid_t          guid;
 };
+
+#endif

@@ -21,6 +21,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _MMS_BUFFER_H_
+#define _MMS_BUFFER_H_ 1
+
 typedef struct
 {
     uint8_t *p_data;    // pointer on data
@@ -29,7 +32,6 @@ typedef struct
     // private
     int    i_size;     // size of p_data memory allocated
 } var_buffer_t;
-
 
 /*****************************************************************************
  * Macro/Function to create/manipulate buffer
@@ -54,3 +56,4 @@ int       var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int64_t i_mem
 int       var_buffer_readempty( var_buffer_t *p_buf );
 void      var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid );
 
+#endif
