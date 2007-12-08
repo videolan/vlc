@@ -98,7 +98,6 @@ void var_buffer_add64( var_buffer_t *p_buf, uint64_t i_long )
     var_buffer_add32( p_buf, ( i_long >> 32 )&0xffffffff );
 }
 
-
 void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
 {
     /* check if there is enough data */
@@ -175,7 +174,6 @@ uint8_t var_buffer_get8 ( var_buffer_t *p_buf )
     return( i_byte );
 }
 
-
 uint16_t var_buffer_get16( var_buffer_t *p_buf )
 {
     uint16_t i_b1, i_b2;
@@ -218,7 +216,6 @@ int var_buffer_getmemory ( var_buffer_t *p_buf, void *p_mem, int64_t i_mem )
     }
     if( i_copy < 0 )
     {
-//        fprintf( stderr, "\n**************arrrrrrggggg\n" );
         i_copy = 0;
     }
     p_buf->i_data += i_copy;
@@ -243,4 +240,3 @@ void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
         p_guid->v4[i] = var_buffer_get8( p_buf );
     }
 }
-
