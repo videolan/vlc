@@ -65,7 +65,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 
     QGridLayout *layout = new QGridLayout( this );
 
-    /* FIXME GNOME/KDE ? */
+    /* No need to use a QDialogButtonBox here */
     saveMetaButton = new QPushButton( qtr( "&Save Metadata" ) );
     saveMetaButton->hide();
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );

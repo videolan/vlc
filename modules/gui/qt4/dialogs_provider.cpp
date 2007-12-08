@@ -194,7 +194,7 @@ void DialogsProvider::mediaCodecDialog()
 
 void DialogsProvider::bookmarksDialog()
 {
-    /* FIXME - Implement me */
+    /* TODO - Implement me */
     /*  BookmarkDialog::getInstance( p_intf )->toggleVisible(); */
 }
 

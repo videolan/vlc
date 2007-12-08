@@ -79,7 +79,7 @@ void InputManager::delInput()
     }
 }
 
-//FIXME break that
+//TODO break that
 void InputManager::update()
 {
     /// \todo Emit the signals only if it changed

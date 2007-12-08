@@ -176,7 +176,8 @@ void PrefsDialog::setSmall()
 
     if( !current_simple_panel )
     {
-        current_simple_panel = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
+        current_simple_panel =
+            new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
         simple_panels[SPrefsDefaultCat] =  current_simple_panel;
         main_panel_l->addWidget( current_simple_panel );
     }
@@ -320,11 +321,14 @@ void PrefsDialog::cancel()
 /* Reset all the preferences, when you click the button */
 void PrefsDialog::reset()
 {
-    int ret = QMessageBox::question(this, qtr( "Reset Preferences" ),
+    int ret = QMessageBox::question(
+                 this,
+                 qtr( "Reset Preferences" ),
                  qtr( "This will reset your VLC media player preferences.\n"
-                         "Are you sure you want to continue?" ),
-                  QMessageBox::Ok | QMessageBox::Cancel,
-                                                         QMessageBox::Ok);
+                      "Are you sure you want to continue?" ),
+                 QMessageBox::Ok | QMessageBox::Cancel,
+                 QMessageBox::Ok);
+
     if( ret == QMessageBox::Ok )
     {
         config_ResetAll( p_intf );

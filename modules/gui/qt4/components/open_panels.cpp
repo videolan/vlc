@@ -143,7 +143,7 @@ FileOpenPanel::~FileOpenPanel(){}
 /* Show a fileBrowser to select a subtitle */
 void FileOpenPanel::browseFileSub()
 {
-    // FIXME Handle selection of more than one subtitles file
+    // TODO Handle selection of more than one subtitles file
     QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
                             EXT_FILTER_SUBTITLE,
                             dialogBox->directory().absolutePath() );
@@ -340,7 +340,7 @@ void DiscOpenPanel::updateMRL()
 {
     QString mrl = "";
 
-    /* CDDAX and VCDX not implemented. FIXME ? */
+    /* CDDAX and VCDX not implemented. TODO ? */
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )

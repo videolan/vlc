@@ -268,7 +268,6 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         /* Minimal View */
         QAction *action=menu->addAction( qtr( "Minimal View..." ), mi,
                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
-        //FIXME: remove useless thing. But keep it until the release, pls.
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
@@ -399,12 +398,11 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *navMenu )
     vector<int> objects;
     vector<const char *> varnames;
 
-    /* FIXME */
     p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
             FIND_ANYWHERE );
     if( p_object != NULL )
     {
-        InputAutoMenuBuilder( p_object, objects, varnames );
+        InputAutoMenuBuilder(  p_object, objects, varnames );
         PUSH_VAR( "prev-title" ); PUSH_VAR ( "next-title" );
         PUSH_VAR( "prev-chapter" ); PUSH_VAR( "next-chapter" );
         vlc_object_release( p_object );

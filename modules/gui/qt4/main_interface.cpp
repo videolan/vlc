@@ -132,7 +132,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         alwaysVideoFlag = true;
 
     /* Set the other interface settings */
-    //FIXME I don't like that code
+    //TODO: I don't like that code
     visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
     notificationEnabled = config_GetInt( p_intf, "qt-notification" )
                           ? true : false;
@@ -282,8 +282,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askReleaseVideo( void * ), this, releaseVideoSlot( void * ) );
 
     CONNECT( dockPL, topLevelChanged( bool ), this, doComponentsUpdate() );
-    // DEBUG FIXME
-    hide();
+    CONNECT( controls, advancedControlsToggled( bool ), 
+             this, doComponentsUpdate() );
 
     updateGeometry();
     settings->endGroup();
@@ -297,7 +297,8 @@ MainInterface::~MainInterface()
 
     settings->beginGroup( "MainWindow" );
     settings->setValue( "playlist-floats", dockPL->isFloating() );
-    settings->setValue( "adv-controls", getControlsVisibilityStatus() & CONTROLS_ADVANCED );
+    settings->setValue( "adv-controls", 
+                        getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
 
     settings->endGroup();
@@ -487,7 +488,7 @@ void MainInterface::debug()
    the skins.
    Maybe the other solution is to redefine the sizeHint() of the playlist and
    ask _parent->isFloating()...
-   If you think this would be better, please FIX it...
+   If you think this would be better, please FIXME it...
 */
 QSize MainInterface::sizeHint() const
 {
@@ -519,7 +520,6 @@ void MainInterface::resizeEvent( QResizeEvent *e )
     }
     if( VISIBLE( playlistWidget ) )
     {
-        //FIXME
 //        SET_WH( playlistWidget , e->size().width() - addSize.width(),
               //                   e->size().height() - addSize.height() );
         playlistWidget->updateGeometry();
@@ -533,7 +533,7 @@ void MainInterface::resizeEvent( QResizeEvent *e )
 void MainInterface::showSpeedMenu( QPoint pos )
 {
     speedControlMenu->exec( QCursor::pos() - pos
-            + QPoint( 0, speedLabel->height() ) );
+                          + QPoint( 0, speedLabel->height() ) );
 }
 
 /****************************************************************************
@@ -679,7 +679,7 @@ void MainInterface::togglePlaylist()
     {
     /* toggle the visibility of the playlist */
        TOGGLEV( dockPL );
-     //resize(sizeHint());
+       //resize(sizeHint());
     }
 #if 0
     doComponentsUpdate();
@@ -796,15 +796,14 @@ void MainInterface::setRate( int rate )
     speedControl->updateControls( rate );
 }
 
-//FIXME Remove this function at the end...
 void MainInterface::updateOnTimer()
 {
- /*   if( intf_ShouldDie( p_intf ) )
+#if 0
+    if( intf_ShouldDie( p_intf ) )
     {
         QApplication::closeAllWindows();
         QApplication::quit();
-    }*/
-#if 0
+    }
     if( need_components_update )
     {
         doComponentsUpdate();

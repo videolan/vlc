@@ -256,14 +256,12 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, AtoBLoop( float, int, int ) );
 
-    //FIXME Frame by frame function
     frameButton = new QPushButton( "Fr" );
     frameButton->setMaximumSize( QSize( 26, 26 ) );
     frameButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( frameButton );
     BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by Frame" ), frame() );
 
-    /* FIXME Record function */
     recordButton = new QPushButton( "R" );
     recordButton->setMaximumSize( QSize( 26, 26 ) );
     recordButton->setIconSize( QSize( 20, 20 ) );
@@ -332,7 +330,10 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
     }
 }
 
+/* FIXME Record function */
 void AdvControlsWidget::record(){}
+
+//FIXME Frame by frame function
 void AdvControlsWidget::frame(){}
 
 /*****************************
@@ -478,8 +479,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     /*
      * Other first Line buttons
-     * Might need to be inside a frame to avoid a few resizing pb
-     * FIXME
      */
     /** Fullscreen/Visualisation **/
     fullscreenButton = new QPushButton( "F" );
@@ -708,8 +707,7 @@ void ControlsWidget::toggleAdvanced()
         advControls->hide();
         b_advancedVisible = false;
     }
-    //FIXME connect this one :D
-    emit advancedControlsToggled( b_advancedVisible );  //  doComponentsUpdate();
+    emit advancedControlsToggled( b_advancedVisible );
 }
 
 

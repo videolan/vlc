@@ -202,7 +202,6 @@ void OpenDialog::toggleAdvancedPanel()
 /***********
  * Actions *
  ***********/
-
 /* If Cancel is pressed or escaped */
 void OpenDialog::cancel()
 {
@@ -215,15 +214,7 @@ void OpenDialog::cancel()
 /* If EnterKey is pressed */
 void OpenDialog::close()
 {
-    /* FIXME */
-    if ( !i_action_flag )
-    {
-        play();
-    }
-    else
-    {
-        stream();
-    }
+    selectSlots();
 }
 
 /* Play button */

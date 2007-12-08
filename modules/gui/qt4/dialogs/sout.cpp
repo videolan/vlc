@@ -207,6 +207,7 @@ void SoutDialog::setOptions()
     }
 
     /* ADD HERE the profiles you want and need */
+    /* FIXME */
     if( profileString == "IPod" ) setProfile( MP4, true, "mp4a", true, "mp4v" )
     else if( profileString == "XBox" ) setProfile( ASF, true, "wma", true, "WMV2" )
 
