@@ -389,7 +389,6 @@ static int Mux( sout_mux_t *p_mux )
     {
         msg_Dbg( p_mux, "writing header" );
 
-
         if( av_write_header( p_sys->oc ) < 0 )
         {
             msg_Err( p_mux, "could not write header" );
