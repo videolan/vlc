@@ -577,6 +577,12 @@ ExtV4l2::~ExtV4l2()
         delete box;
 }
 
+void ExtV4l2::showEvent( QShowEvent *event )
+{
+    QWidget::showEvent( event );
+    Refresh();
+}
+
 void ExtV4l2::Refresh( void )
 {
     vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( p_intf, "v4l2", FIND_ANYWHERE );
@@ -620,7 +626,7 @@ void ExtV4l2::Refresh( void )
                 case VLC_VAR_INTEGER:
                 {
                     QLabel *label = new QLabel( psz_label, box );
-                    QHBoxLayout *hlayout = new QHBoxLayout( box );
+                    QHBoxLayout *hlayout = new QHBoxLayout();
                     hlayout->addWidget( label );
                     int i_val = var_GetInteger( p_obj, psz_var );
                     if( i_type & VLC_VAR_HASCHOICE )

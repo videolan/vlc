@@ -63,6 +63,8 @@ public:
     ExtV4l2( intf_thread_t *, QWidget * );
     virtual ~ExtV4l2();
 
+    virtual void showEvent( QShowEvent *event );
+
 private:
     intf_thread_t *p_intf;
     Ui::ExtV4l2Widget ui;
