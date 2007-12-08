@@ -109,8 +109,8 @@ MediaInfoDialog::~MediaInfoDialog()
 
 void MediaInfoDialog::showTab( int i_tab = 0 )
 {
-    this->show();
     IT->setCurrentIndex( i_tab );
+    show();
 }
 
 void MediaInfoDialog::showMetaSaveButton()
