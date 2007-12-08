@@ -317,6 +317,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     while( !p_access->b_die )
     {
+        msg_Warn( p_access, "GetPacket 1" );
         if( GetPacket( p_access, &ck ) )
             break;
 
@@ -392,6 +393,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         else
         {
             chunk_t ck;
+        msg_Warn( p_access, "GetPacket 2" );
             if( GetPacket( p_access, &ck ) )
             {
                 int i_ret = -1;
@@ -437,13 +439,13 @@ static int Restart( access_t *p_access )
     if( Describe( p_access, &psz_location ) )
     {
         msg_Err( p_access, "describe failed" );
-        return VLC_ENGENERIC;
+        return VLC_EGENERIC;
     }
     /* */
     if( Start( p_access, 0 ) )
     {
         msg_Err( p_access, "Start failed" );
-        return VLC_ENGENERIC;
+        return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
@@ -465,7 +467,7 @@ static int Reset( access_t *p_access )
     /* Get the next header FIXME memory loss ? */
     GetHeader( p_access );
     if( p_sys->i_header <= 0 )
-        return VLC_ENGENERIC;
+        return VLC_EGENERIC;
 
     E_( asf_HeaderParse )( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
@@ -749,7 +751,7 @@ static void GetHeader( access_t *p_access )
 
 /*****************************************************************************
  * Start stream
- *****************************************************************************/
+ ****************************************************************************/
 static int Start( access_t *p_access, off_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -816,6 +818,7 @@ static int Start( access_t *p_access, off_t i_pos )
         }
     }
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" );
+#if 0
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "Connection: Close\r\n" );
 
@@ -824,11 +827,12 @@ static int Start( access_t *p_access, off_t i_pos )
         msg_Err( p_access, "failed to send request" );
         return VLC_EGENERIC;
     }
+#endif
 
     psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
     if( psz == NULL )
     {
-        msg_Err( p_access, "cannot read data" );
+        msg_Err( p_access, "cannot read data 0" );
         return VLC_EGENERIC;
     }
 
@@ -847,7 +851,7 @@ static int Start( access_t *p_access, off_t i_pos )
         char *psz = net_Gets( p_access, p_sys->fd, NULL );
         if( psz == NULL )
         {
-            msg_Err( p_access, "cannot read data" );
+            msg_Err( p_access, "cannot read data 1" );
             return VLC_EGENERIC;
         }
         if( *psz == '\0' )
@@ -898,7 +902,10 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
      * entire header.
      */
     if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 4, VLC_TRUE ) < 4 )
+    {
+       msg_Err( p_access, "cannot read data 2" );
        return VLC_EGENERIC;
+    }
 
     p_ck->i_type = GetWLE( p_sys->buffer);
     p_ck->i_size = GetWLE( p_sys->buffer + 2);
@@ -909,7 +916,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
 
     if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer + 4, restsize, VLC_TRUE ) < restsize )
     {
-        msg_Err( p_access, "cannot read data" );
+        msg_Err( p_access, "cannot read data 3" );
         return VLC_EGENERIC;
     }
     p_ck->i_sequence  = GetDWLE( p_sys->buffer + 4);
@@ -956,7 +963,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
         (net_Read( p_access, p_sys->fd, NULL, &p_sys->buffer[12],
                    p_ck->i_data, VLC_TRUE ) < p_ck->i_data) )
     {
-        msg_Err( p_access, "cannot read data" );
+        msg_Err( p_access, "cannot read data 4" );
         return VLC_EGENERIC;
     }
 
