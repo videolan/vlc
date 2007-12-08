@@ -21,7 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -94,7 +93,6 @@ struct access_sys_t
     int i_proto;
 };
 
-
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -143,7 +141,8 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_sys->i_proto == MMS_PROTO_TCP || p_sys->i_proto == MMS_PROTO_UDP )
+    if( ( p_sys->i_proto == MMS_PROTO_TCP ) ||
+        ( p_sys->i_proto == MMS_PROTO_UDP ) )
     {
         E_( MMSTUClose )( p_access );
     }
