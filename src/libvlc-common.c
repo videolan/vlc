@@ -263,8 +263,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Get the executable name (similar to the basename command) */
     if( i_argc > 0 )
     {
-        const char *exe = ppsz_argv[0];
-        p_libvlc->psz_object_name = exe = ppsz_argv[ 0 ];
+        const char *exe = p_libvlc->psz_object_name = ppsz_argv[0];
         while( *exe )
         {
             if( *exe++ == '/' )
