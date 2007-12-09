@@ -354,8 +354,8 @@ static block_t * CDDAReadBlocks( access_t * p_access )
 /*****************************************************************************
  * CDDARead: Handler for audio control reads the CD-DA.
  *****************************************************************************/
-static int
-CDDARead( access_t * p_access, uint8_t *p_buffer, int i_len )
+static ssize_t
+CDDARead( access_t * p_access, uint8_t *p_buffer, size_t i_len )
 {
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
 
