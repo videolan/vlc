@@ -121,7 +121,6 @@ vlc_module_begin();
     set_capability( "interface", 151 );
     set_callbacks( Open, Close );
 
-    set_program( "qvlc" );
     add_shortcut("qt");
 
     add_submodule();

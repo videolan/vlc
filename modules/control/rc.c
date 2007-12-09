@@ -192,7 +192,6 @@ vlc_module_begin();
     add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
 
     set_capability( "interface", 20 );
-    set_program( "rvlc" );
 
     set_callbacks( Activate, Deactivate );
 vlc_module_end();

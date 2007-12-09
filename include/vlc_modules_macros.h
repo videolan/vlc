@@ -167,10 +167,6 @@ E_(vlc_entry) ( module_t *p_module );
                         (void *)(intptr_t)(score))) \
         goto error
 
-#define set_program( program ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_PROGRAM, (void *)(program))) \
-        goto error
-
 #define set_callbacks( activate, deactivate ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_CB_OPEN, (void *)(activate)) \
      || vlc_module_set (p_submodule, VLC_MODULE_CB_CLOSE, \

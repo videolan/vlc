@@ -61,7 +61,6 @@ vlc_module_begin();
     set_capability( "interface", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "wince" );
-    set_program( "wcevlc" );
 
     add_bool( "wince-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );

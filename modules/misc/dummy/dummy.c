@@ -57,7 +57,6 @@ vlc_module_begin();
     set_description( _("Dummy interface function") );
     set_capability( "interface", 0 );
     add_shortcut( "vlc" );
-    set_program( "cvlc" );
     set_callbacks( E_(OpenIntf), NULL );
 #ifdef WIN32
     set_section( N_( "Dummy Interface" ), NULL );

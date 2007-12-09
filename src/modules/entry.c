@@ -64,7 +64,6 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_object_name = module->psz_object_name;
     submodule->psz_shortname = module->psz_shortname;
     submodule->psz_longname = module->psz_longname;
-    submodule->psz_program = module->psz_program;
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
     submodule->i_cpu = module->i_cpu;
@@ -112,10 +111,6 @@ int vlc_module_set (module_t *module, int propid, void *value)
             module->i_score = (intptr_t)value;
             break;
 
-        case VLC_MODULE_PROGRAM:
-            module->psz_program = (char *)value;
-            break;
-
         case VLC_MODULE_CB_OPEN:
             module->pf_activate = (int (*) (vlc_object_t *))value;
             break;
@@ -133,6 +128,10 @@ int vlc_module_set (module_t *module, int propid, void *value)
             if (module->psz_longname == default_name)
                 module->psz_longname = (char *)value;
             break;
+
+        case VLC_MODULE_PROGRAM:
+            msg_Warn (module, "deprecated module property %d", propid);
+            return 0;
 
         default:
             msg_Err (module, "unknown module property %d", propid);

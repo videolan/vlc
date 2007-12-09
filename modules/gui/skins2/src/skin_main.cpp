@@ -467,7 +467,6 @@ vlc_module_begin();
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
     add_shortcut( "skins" );
-    set_program( "svlc" );
 
     add_submodule();
         set_description( _("Skins loader demux") );

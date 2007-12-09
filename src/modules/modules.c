@@ -402,7 +402,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     vlc_list_t *p_all;
 
     int i_which_module, i_index = 0;
-    vlc_bool_t b_intf = VLC_FALSE;
 
     module_t *p_module;
 
@@ -534,25 +533,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
 found_shortcut:
-
-        /* Special case: test if we requested a particular intf plugin */
-        if( !i_shortcuts && p_module->psz_program
-             && !strcmp( psz_capability, "interface" )
-             && !strcmp( p_module->psz_program,
-                         p_this->p_libvlc->psz_object_name ) )
-        {
-            if( !b_intf )
-            {
-                /* Remove previous non-matching plugins */
-                i_index = 0;
-                b_intf = VLC_TRUE;
-            }
-        }
-        else if( b_intf )
-        {
-            /* This one doesn't match */
-            continue;
-        }
 
         /* Store this new module */
         p_list[ i_index ].p_module = p_module;
@@ -1235,11 +1215,6 @@ static void DupModule( module_t *p_module )
     p_module->psz_help = p_module->psz_help ? strdup( p_module->psz_help )
                                             : NULL;
 
-    if( p_module->psz_program != NULL )
-    {
-        p_module->psz_program = strdup( p_module->psz_program );
-    }
-
     for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
     {
         DupModule( (module_t*)p_module->pp_children[ i_submodule ] );
@@ -1271,7 +1246,6 @@ static void UndupModule( module_t *p_module )
     free( (void*)p_module->psz_shortname );
     free( (void*)p_module->psz_longname );
     free( (void*)p_module->psz_help );
-    free( (void*)p_module->psz_program );
 }
 
 #endif /* HAVE_DYNAMIC_PLUGINS */
@@ -1836,7 +1810,6 @@ static void CacheLoad( vlc_object_t *p_this )
         LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
         LOAD_STRING( pp_cache[i]->p_module->psz_longname );
         LOAD_STRING( pp_cache[i]->p_module->psz_help );
-        LOAD_STRING( pp_cache[i]->p_module->psz_program );
         for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
         {
             LOAD_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
@@ -1863,7 +1836,6 @@ static void CacheLoad( vlc_object_t *p_this )
             LOAD_STRING( p_module->psz_shortname );
             LOAD_STRING( p_module->psz_longname );
             LOAD_STRING( p_module->psz_help );
-            LOAD_STRING( p_module->psz_program );
             for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
             {
                 LOAD_STRING( p_module->pp_shortcuts[j] ); // FIX
@@ -2107,7 +2079,6 @@ static void CacheSave( vlc_object_t *p_this )
         SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
         SAVE_STRING( pp_cache[i]->p_module->psz_longname );
         SAVE_STRING( pp_cache[i]->p_module->psz_help );
-        SAVE_STRING( pp_cache[i]->p_module->psz_program );
         for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
         {
             SAVE_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
@@ -2137,7 +2108,6 @@ static void CacheSave( vlc_object_t *p_this )
             SAVE_STRING( p_module->psz_shortname );
             SAVE_STRING( p_module->psz_longname );
             SAVE_STRING( p_module->psz_help );
-            SAVE_STRING( p_module->psz_program );
             for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
             {
                 SAVE_STRING( p_module->pp_shortcuts[j] ); // FIX

@@ -123,7 +123,6 @@ vlc_module_begin();
     add_shortcut( "wxwin" );
     add_shortcut( "wx" );
     add_shortcut( "wxwidgets" );
-    set_program( "wxvlc" );
 
     add_bool( "wx-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );

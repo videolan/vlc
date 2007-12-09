@@ -1809,14 +1809,6 @@ static void ListModules( libvlc_int_t *p_this, vlc_bool_t b_verbose )
                                   p_parser->psz_capability,
                                   p_parser->i_score );
             }
-            if( p_parser->psz_program )
-            {
-                if( b_color )
-                    utf8_fprintf( stdout, YELLOW "   p %s\n"GRAY,
-                                  p_parser->psz_program );
-                else
-                    utf8_fprintf( stdout, "   p %s\n", p_parser->psz_program );
-            }
         }
 
         psz_spaces[i] = ' ';
