@@ -32,6 +32,10 @@
 #include "input_manager.hpp"
 #include "main_interface.hpp"
 
+#ifdef HAVE_X11_XLIB_H
+#include <X11/Xlib.h>
+#endif
+
 #include "../../../share/vlc32x32.xpm"
 
 /*****************************************************************************
@@ -176,13 +180,22 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     p_intf->pf_run = Run;
-#if defined HAVE_GETENV && defined Q_WS_X11
+#if defined HAVE_GETENV && defined Q_WS_X11 && defined HAVE_X11_XLIB_H
     char *psz_display = getenv( "DISPLAY" );
     if( !psz_display || !*psz_display )
     {
-        msg_Err(p_intf, "no X server");
+        msg_Err( p_intf, "no X server" );
         return VLC_EGENERIC;
     }
+    /* Thanks for libqt4 calling exit() in QApplication::QApplication()
+     * instead of returning an error, we have to check for DISPLAY validity */
+    Display *p_display = XOpenDisplay( psz_display );
+    if( !p_display )
+    {
+        msg_Err( p_intf, "Could not connect to X server %s", psz_display );
+        return VLC_EGENERIC;
+    }
+    XCloseDisplay( p_display );
 #endif
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )

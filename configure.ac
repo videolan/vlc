@@ -5187,6 +5187,9 @@ AS_IF([test "${enable_qt4}" != "no" &&
     [ VLC_ADD_PLUGINS([qt4])
       ALIASES="${ALIASES} qvlc"
       enableqt4=true
+      if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin"; then
+        AC_CHECK_HEADERS([X11/Xlib.h],[],[AC_MSG_ERROR([You need X11 headers])])
+      fi
       VLC_ADD_LIBS([qt4],[$QT4_LIBS])
       VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR=\\\\\\\"$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/\\\\\\\"])
       AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
@@ -5194,9 +5197,9 @@ AS_IF([test "${enable_qt4}" != "no" &&
       AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       ],
       AS_IF([test "${enable_qt4}" = "yes"],[
-	AC_MSG_ERROR(QT4 library not found)
+    AC_MSG_ERROR(QT4 library not found)
       ],[
-	 AC_MSG_WARN(QT4 library not found)
+    AC_MSG_WARN(QT4 library not found)
       ])
     )
 ])
