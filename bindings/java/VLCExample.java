@@ -77,7 +77,7 @@ public class VLCExample
                 System.out.println("real size.");
                 jvlc.video.setFullscreen(false);
                 System.out.print("Taking snapshot... ");
-                jvlc.video.getSnapshot(System.getProperty("user.dir") + "/snap.png");
+                jvlc.video.getSnapshot(System.getProperty("user.dir") + "/snap.png",0,0);
                 System.out.println("taken. (see " + System.getProperty("user.dir") + "/snap.png )");
                 Thread.sleep(2000);
                 System.out.println("Resizing to 300x300");
