@@ -58,7 +58,7 @@ public interface VideoIntf {
      * If you only give a path, not including the filename, the snapshot will be saved in
      * the specified path using vlc naming conventions. 
      */
-    void	getSnapshot(String filepath) throws VLCException;
+    void	getSnapshot(String filepath,int width,int height) throws VLCException;
     
     
     /**

@@ -24,7 +24,7 @@ public final class Video implements VideoIntf {
     private native boolean		_getFullscreen();
     private native int			_getHeight();
     private native int			_getWidth();
-    private native void			_getSnapshot(String filename);
+    private native void			_getSnapshot(String filename,int width,int height);
     private native void			_destroyVideo();
     private native void			_reparent(JVLCCanvas component);
     private native void			_setSize(int width, int height);
@@ -47,8 +47,8 @@ public final class Video implements VideoIntf {
 	/* (non-Javadoc)
 	 * @see org.videolan.jvlc.VideoIntf#getSnapshot(java.lang.String)
 	 */
-	public void getSnapshot(String filepath) throws VLCException {
-		_getSnapshot( filepath );
+	public void getSnapshot(String filepath,int width,int height) throws VLCException {
+		_getSnapshot( filepath , width, height);
 	}
 
 	/* (non-Javadoc)
