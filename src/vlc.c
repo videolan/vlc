@@ -67,10 +67,11 @@ int main( int i_argc, const char *ppsz_argv[] )
     int i_ret;
 
 #   ifdef __GLIBC__
-    if (dlsym (RTLD_NEXT, "sync_file_range") && !dlsym (RTLD_NEXT, "qsort_r"))
+    if (dlsym (RTLD_NEXT, "inet6_rth_add") && !dlsym (RTLD_NEXT, "qsort_r"))
     {
-        /* Way too many Linux users have glibc 2.6 that keeps crashing
+        /* Way too many Linux users have glibc 2.5-2.7 that keeps crashing
          * inside its non-thread-safe dcgettext(). */
+        /* Hopefully glibc 2.8 will eventually work, not sure though */
         fprintf (stderr,
 "***************************************************\n"
 "*** glibc version with broken libintl detected. ***\n"
