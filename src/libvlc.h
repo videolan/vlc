@@ -27,9 +27,6 @@
 
 extern const char vlc_usage[];
 
-extern const module_config_t libvlc_config[];
-extern const size_t libvlc_config_count;
-
 extern const struct hotkey libvlc_hotkeys[];
 extern const size_t libvlc_hotkeys_size;
 
@@ -124,5 +121,59 @@ static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
 {
     return obj->p_internals;
 }
+
+/*
+ * Configuration stuff
+ */
+#if 0
+struct module_config_t
+{
+    int          i_type;                               /* Configuration type */
+    const char  *psz_type;                          /* Configuration subtype */
+    const char  *psz_name;                                    /* Option name */
+    char         i_short;                      /* Optional short option name */
+    const char  *psz_text;      /* Short comment on the configuration option */
+    const char  *psz_longtext;   /* Long comment on the configuration option */
+    module_value_t value;                                    /* Option value */
+    module_value_t orig;
+    module_value_t saved;
+    module_nvalue_t min;
+    module_nvalue_t max;
+
+    /* Function to call when commiting a change */
+    vlc_callback_t pf_callback;
+    void          *p_callback_data;
+
+    /* Values list */
+    const char **ppsz_list;       /* List of possible values for the option */
+    int         *pi_list;                              /* Idem for integers */
+    const char **ppsz_list_text;          /* Friendly names for list values */
+    int          i_list;                               /* Options list size */
+
+    /* Actions list */
+    vlc_callback_t *ppf_action;    /* List of possible actions for a config */
+    const char    **ppsz_action_text;         /* Friendly names for actions */
+    int            i_action;                           /* actions list size */
+
+    /* Misc */
+    vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
+    vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
+    vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
+    vlc_bool_t   b_internal;   /* Flag to indicate option is not to be shown */
+    vlc_bool_t   b_restart;   /* Flag to indicate the option needs a restart */
+                              /* to take effect */
+
+    /* Deprecated */
+    const char    *psz_current;                         /* Good option name */
+    vlc_bool_t     b_strict;                     /* Transitionnal or strict */
+
+    /* Option values loaded from config file */
+    vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
+    vlc_bool_t   b_unsaveable;                    /* Config should be saved */
+};
+#endif
+
+extern const module_config_t libvlc_config[];
+extern const size_t libvlc_config_count;
 
 #endif
