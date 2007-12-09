@@ -180,19 +180,13 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     p_intf->pf_run = Run;
-#if defined HAVE_GETENV && defined Q_WS_X11 && defined HAVE_X11_XLIB_H
-    char *psz_display = getenv( "DISPLAY" );
-    if( !psz_display || !*psz_display )
-    {
-        msg_Err( p_intf, "no X server" );
-        return VLC_EGENERIC;
-    }
+#if defined Q_WS_X11 && defined HAVE_X11_XLIB_H
     /* Thanks for libqt4 calling exit() in QApplication::QApplication()
-     * instead of returning an error, we have to check for DISPLAY validity */
-    Display *p_display = XOpenDisplay( psz_display );
+     * instead of returning an error, we have to check the X11 display */
+    Display *p_display = XOpenDisplay( NULL );
     if( !p_display )
     {
-        msg_Err( p_intf, "Could not connect to X server %s", psz_display );
+        msg_Err( p_intf, "Could not connect to X server" );
         return VLC_EGENERIC;
     }
     XCloseDisplay( p_display );
