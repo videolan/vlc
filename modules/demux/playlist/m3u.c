@@ -163,7 +163,7 @@ static int Demux( demux_t *p_demux )
                 }
                 else
                 {
-                    msg_Err( p_demux, "m3u EXTVLCOPT parsing is disabled for security reasons. If you need it and trust the m3u playlist you are trying to open, please append --m3u-extvlcopt to you command line." );
+                    msg_Err( p_demux, "m3u EXTVLCOPT parsing is disabled for security reasons. If you need it and trust the m3u playlist you are trying to open, please append --m3u-extvlcopt to your command line." );
                 }
             }
         }
