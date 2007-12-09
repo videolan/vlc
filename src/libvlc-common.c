@@ -37,7 +37,7 @@
 #include <vlc_input.h>
 
 #include "modules/modules.h"
-#include "modules/configuration.h"
+#include "config/config.h"
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */

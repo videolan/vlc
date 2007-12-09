@@ -53,6 +53,8 @@ int __config_LoadConfigFile( vlc_object_t *, const char * );
 
 int IsConfigStringType( int type );
 
+int ConfigStringToKey( const char * );
+
 /* The configuration file and directory */
 #if defined (SYS_BEOS)
 #  define CONFIG_DIR                    "config/settings/VideoLAN Client"

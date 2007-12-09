@@ -24,7 +24,7 @@
 #include <vlc_playlist.h>
 #include <vlc_events.h>
 #include "playlist_internal.h"
-#include "modules/configuration.h"
+#include "config/config.h"
 #include <vlc_charset.h>
 
 #include <sys/types.h>

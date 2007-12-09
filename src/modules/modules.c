@@ -76,7 +76,7 @@
 #   endif
 #endif
 
-#include "modules/configuration.h"
+#include "config/config.h"
 #include "libvlc.h"
 
 #include "vlc_charset.h"

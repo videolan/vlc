@@ -1,7 +1,7 @@
 /*****************************************************************************
- * configuration_chain.c : configuration module chain parsing stuff
+ * chain.c : configuration module chain parsing stuff
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

@@ -299,9 +299,11 @@ SOURCES_libvlc_common = \
 	misc/threads.c \
 	misc/stats.c \
 	misc/cpu.c \
-	modules/configuration.h \
-	modules/configuration.c \
-	modules/configuration_chain.c \
+	config/configuration.h \
+	config/core.c \
+	config/chain.c \
+	config/file.c \
+	config/cmdline.c \
 	misc/events.c \
 	misc/image.c \
 	misc/messages.c \
