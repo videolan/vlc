@@ -236,6 +236,14 @@ vlc-config.in: vlc-config.in.in
 CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
 DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 
+# Shortcut for developpers to rebuild the core (libvlc + vlc)
+# Don't use it if you don't know what it is about.
+# Don't complain if it doesn't work. -- Courmisch
+libvlc:
+	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
+
+.PHONY: libvlc
+
 ###############################################################################
 # Building vlc
 ###############################################################################
@@ -262,15 +270,9 @@ LIBVLC = src/$(LIB_libvlc)
 nice:
 	$(top_builddir)/compile
 
-# Shortcut for developpers to rebuild the core (libvlc + vlc)
-# Don't use it if you don't know what it is about.
-# Don't complain if it doesn't work. -- Courmisch
-libvlc:
-	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
-
 core: libvlc vlc$(EXEEXT)
 
-.PHONY: libvlc core
+.PHONY: core
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	@rm -f vlc$(EXEEXT)
@@ -309,19 +311,35 @@ vlc-bundle: vlc
 	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
 
-# Install the symlinks
-install-exec-local: install-binPROGRAMS
-	inst="`echo vlc | sed -e '$(transform)'`" ; \
-	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
-	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
-	  ln -sf "$${inst}" "$(DESTDIR)$(bindir)/$$i" ; \
-	fi ; done
+###############################################################################
+# Building aliases
+###############################################################################
 
-# the opposite of install-{data,exec}-local
-uninstall-local:
-	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
-	  rm -f "$(DESTDIR)$(bindir)/$$i" ; \
-	fi ; done
+ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc
+bin_SCRIPTS += $(ALIASES)
+EXTRA_SCRIPTS = $(ALL_ALIASES)
+
+dist_noinst_SCRIPTS += make-alias
+
+MKALIAS = bindir="$(bindir)" transform="$(transform)" $(top_srcdir)/make-alias $@
+
+cvlc: make-alias
+	$(MKALIAS) dummy
+
+rvlc: make-alias
+	$(MKALIAS) rc
+
+svlc: make-alias
+	$(MKALIAS) skins2
+
+wxvlc: make-alias
+	$(MKALIAS) wx
+
+qvlc: make-alias
+	$(MKALIAS) qt4
+
+nvlc: make-alias
+	$(MKALIAS) ncurses
 
 if HAVE_DARWIN
 # Create the MacOS X app

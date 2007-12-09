@@ -1,0 +1,14 @@
+#! /bin/sh
+# Interface alias build script for VLC
+# Copyright © 2007 Rémi Denis-Courmont.
+
+OUT="$1"
+IFACE="$2"
+
+cat > "$OUT.tmp" << EOF
+#! /bin/sh
+exec $bindir/`echo vlc | sed -e "$transform"` -I "$IFACE" "\$@"
+EOF
+
+chmod +x "$OUT.tmp"
+mv -f -- "$OUT.tmp" "$OUT"
