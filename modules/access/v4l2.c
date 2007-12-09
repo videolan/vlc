@@ -34,7 +34,6 @@
  */
 
 /*
- * TODO: No mjpeg support yet.
  * TODO: Tuner partial implementation.
  * TODO: Alsa input support - experimental
  */
@@ -183,7 +182,7 @@ vlc_module_begin();
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Video controls" ), NULL );
-    add_bool( CFG_PREFIX "control-reset", VLC_FALSE, NULL, CTRL_RESET_TEXT,
+    add_bool( CFG_PREFIX "controls-reset", VLC_FALSE, NULL, CTRL_RESET_TEXT,
               CTRL_RESET_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "brightness", -1, NULL, BRIGHTNESS_TEXT,
                 BRIGHTNESS_LONGTEXT, VLC_TRUE );
@@ -221,7 +220,7 @@ vlc_module_end();
 
 static void ParseMRL( demux_t * );
 
-static int Control( demux_t *, int, va_list );
+static int DemuxControl( demux_t *, int, va_list );
 
 static int Demux( demux_t * );
 static block_t* GrabVideo( demux_t *p_demux );
@@ -236,10 +235,13 @@ static int OpenAudioDev( demux_t *, char *psz_device );
 static vlc_bool_t ProbeVideoDev( demux_t *, char *psz_device );
 static vlc_bool_t ProbeAudioDev( demux_t *, char *psz_device );
 
-static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset );
-static int VideoControl( demux_t *, int i_fd,
-                         const char *psz_name, int i_cid, int i_value );
-static int VideoControlCallback( vlc_object_t *p_this,
+static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset );
+static int Control( demux_t *, int i_fd,
+                    const char *psz_name, int i_cid, int i_value );
+static int ControlCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data );
+static int ControlResetCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data );
 
@@ -394,7 +396,7 @@ static int Open( vlc_object_t *p_this )
     if( *p_demux->psz_access == '\0' ) return VLC_EGENERIC;
 
     /* Set up p_demux */
-    p_demux->pf_control = Control;
+    p_demux->pf_control = DemuxControl;
     p_demux->pf_demux = Demux;
     p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
@@ -416,7 +418,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_width = var_CreateGetInteger( p_demux, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_demux, "v4l2-height" );
 
-    var_CreateGetBool( p_demux, "v4l2-control-reset" );
+    var_CreateGetBool( p_demux, "v4l2-controls-reset" );
 
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
@@ -681,11 +683,11 @@ static void ParseMRL( demux_t *p_demux )
                     strtol( psz_parser + strlen( "height=" ),
                             &psz_parser, 0 );
             }
-            else if( !strncmp( psz_parser, "control-reset",
-                               strlen( "control-reset" ) ) )
+            else if( !strncmp( psz_parser, "controls-reset",
+                               strlen( "controls-reset" ) ) )
             {
-                var_SetBool( p_demux, "v4l2-control-reset", VLC_TRUE );
-                psz_parser += strlen( "control-reset" );
+                var_SetBool( p_demux, "v4l2-controls-reset", VLC_TRUE );
+                psz_parser += strlen( "controls-reset" );
             }
 #if 0
             else if( !strncmp( psz_parser, "brightness=",
@@ -874,9 +876,9 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Control:
+ * DemuxControl:
  *****************************************************************************/
-static int Control( demux_t *p_demux, int i_query, va_list args )
+static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     vlc_bool_t *pb;
@@ -1365,7 +1367,6 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     struct v4l2_format fmt;
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
-    int i;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
@@ -1590,8 +1591,8 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 #endif
 
-    VideoControlList( p_demux, i_fd,
-                      var_GetBool( p_demux, "v4l2-control-reset" ) );
+    ControlList( p_demux, i_fd,
+                      var_GetBool( p_demux, "v4l2-controls-reset" ) );
 
     /* Init IO method */
     switch( p_sys->io )
@@ -2325,11 +2326,12 @@ open_failed:
 }
 
 /*****************************************************************************
- * List available controls
+ * Print a user-class v4l2 control's details, create the relevant variable,
+ * change the value if needed.
  *****************************************************************************/
-static void VideoControlListPrint( demux_t *p_demux, int i_fd,
-                                   struct v4l2_queryctrl queryctrl,
-                                   vlc_bool_t b_reset )
+static void ControlListPrint( demux_t *p_demux, int i_fd,
+                              struct v4l2_queryctrl queryctrl,
+                              vlc_bool_t b_reset )
 {
     struct v4l2_querymenu querymenu;
     unsigned int i_mid;
@@ -2446,13 +2448,13 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
                     if( b_reset && queryctrl.default_value != control.value )
                     {
                         msg_Dbg( p_demux, "    reset value to default" );
-                        VideoControl( p_demux, i_fd, psz_name,
+                        Control( p_demux, i_fd, psz_name,
                                       queryctrl.id, queryctrl.default_value );
                     }
                 }
                 else
                 {
-                    VideoControl( p_demux, i_fd, psz_name,
+                    Control( p_demux, i_fd, psz_name,
                                   queryctrl.id, i_val );
                 }
             }
@@ -2484,12 +2486,16 @@ static void VideoControlListPrint( demux_t *p_demux, int i_fd,
     }
 
     var_AddCallback( p_demux, psz_name,
-                    VideoControlCallback, (void*)queryctrl.id );
+                    ControlCallback, (void*)queryctrl.id );
 
     free( psz_name );
 }
 
-static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
+/*****************************************************************************
+ * List all user-class v4l2 controls, set them to the user specified
+ * value and create the relevant variables to enable runtime changes
+ *****************************************************************************/
+static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
 {
     struct v4l2_queryctrl queryctrl;
     int i_cid;
@@ -2500,6 +2506,18 @@ static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
      * stored as choices in the "controls" variable. We'll thus be able
      * to use those to create an appropriate interface */
     var_Create( p_demux, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+
+    var_Create( p_demux, "controls-update", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+
+    /* Add a control to reset all controls to their default values */
+    vlc_value_t val, val2;
+    var_Create( p_demux, "controls-reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    val.psz_string = _( "Reset controls to default" );
+    var_Change( p_demux, "controls-reset", VLC_VAR_SETTEXT, &val, NULL );
+    val.i_int = -1;
+    val2.psz_string = (char *)"controls-reset";
+    var_Change( p_demux, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
+    var_AddCallback( p_demux, "controls-reset", ControlResetCallback, NULL );
 
     /* List public controls */
     for( i_cid = V4L2_CID_BASE;
@@ -2513,7 +2531,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
                 continue;
             msg_Dbg( p_demux, "Available control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            VideoControlListPrint( p_demux, i_fd, queryctrl, b_reset );
+            ControlListPrint( p_demux, i_fd, queryctrl, b_reset );
         }
     }
 
@@ -2529,7 +2547,7 @@ static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
                 continue;
             msg_Dbg( p_demux, "Available private control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            VideoControlListPrint( p_demux, i_fd, queryctrl, b_reset );
+            ControlListPrint( p_demux, i_fd, queryctrl, b_reset );
         }
         else
             break;
@@ -2538,10 +2556,73 @@ static int VideoControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
 }
 
 /*****************************************************************************
- * Issue video controls
+ * Reset all user-class v4l2 controls to their default value
  *****************************************************************************/
-static int VideoControl( demux_t *p_demux, int i_fd,
-                         const char *psz_name, int i_cid, int i_value )
+static int ControlReset( demux_t *p_demux, int i_fd )
+{
+    struct v4l2_queryctrl queryctrl;
+    int i_cid;
+
+    memset( &queryctrl, 0, sizeof( queryctrl ) );
+
+    /* public controls */
+    for( i_cid = V4L2_CID_BASE;
+         i_cid < V4L2_CID_LASTP1;
+         i_cid ++ )
+    {
+        queryctrl.id = i_cid;
+        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+        {
+            struct v4l2_control control;
+            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                continue;
+            memset( &control, 0, sizeof( control ) );
+            control.id = queryctrl.id;
+            if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+             && queryctrl.default_value != control.value )
+            {
+                int i;
+                for( i = 0; controls[i].psz_name != NULL; i++ )
+                    if( controls[i].i_cid == queryctrl.id ) break;
+                Control( p_demux, i_fd,
+                         controls[i].psz_name ? controls[i].psz_name
+                                              : (const char *)queryctrl.name,
+                         queryctrl.id, queryctrl.default_value );
+            }
+        }
+    }
+
+    /* private controls */
+    for( i_cid = V4L2_CID_PRIVATE_BASE;
+         ;
+         i_cid ++ )
+    {
+        queryctrl.id = i_cid;
+        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+        {
+            struct v4l2_control control;
+            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                continue;
+            memset( &control, 0, sizeof( control ) );
+            control.id = queryctrl.id;
+            if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+             && queryctrl.default_value != control.value )
+            {
+                Control( p_demux, i_fd, (const char *)queryctrl.name,
+                         queryctrl.id, queryctrl.default_value );
+            }
+        }
+        else
+            break;
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Issue user-class v4l2 controls
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_fd,
+                    const char *psz_name, int i_cid, int i_value )
 {
     struct v4l2_queryctrl queryctrl;
     struct v4l2_control control;
@@ -2583,10 +2664,12 @@ static int VideoControl( demux_t *p_demux, int i_fd,
             case VLC_VAR_BOOL:
                 val.b_bool = control.value;
                 var_Change( p_demux, psz_name, VLC_VAR_SETVALUE, &val, NULL );
+                var_SetVoid( p_demux, "controls-update" );
                 break;
             case VLC_VAR_INTEGER:
                 val.i_int = control.value;
                 var_Change( p_demux, psz_name, VLC_VAR_SETVALUE, &val, NULL );
+                var_SetVoid( p_demux, "controls-update" );
                 break;
         }
     }
@@ -2596,7 +2679,7 @@ static int VideoControl( demux_t *p_demux, int i_fd,
 /*****************************************************************************
  * On the fly change settings callback
  *****************************************************************************/
-static int VideoControlCallback( vlc_object_t *p_this,
+static int ControlCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data )
 {
@@ -2609,7 +2692,24 @@ static int VideoControlCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    VideoControl( p_demux, i_fd, psz_var, i_cid, newval.i_int );
+    Control( p_demux, i_fd, psz_var, i_cid, newval.i_int );
+
+    return VLC_EGENERIC;
+}
+
+static int ControlResetCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    int i_fd = p_sys->i_fd_video;
+
+    if( i_fd < 0 )
+        return VLC_EGENERIC;
+
+    ControlReset( p_demux, i_fd );
 
     return VLC_EGENERIC;
 }
