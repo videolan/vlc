@@ -55,7 +55,7 @@ access_t *p_cdda_input = NULL;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int      CDDARead( access_t *, uint8_t *, int );
+static ssize_t  CDDARead( access_t *, uint8_t *, size_t );
 static block_t *CDDAReadBlocks( access_t * p_access );
 static int      CDDASeek( access_t * p_access, int64_t i_pos );
 static int      CDDAControl( access_t *p_access, int i_query,

@@ -72,7 +72,7 @@ CFDataRef dataFromEyetv;
 int lastPacketId;
 int lastForwardedPacketId;
 
-static int Read( access_t *, uint8_t *, int );
+static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Control( access_t *, int, va_list );
 static void Thread( vlc_object_t * );
 CFDataRef msgPortCallback( CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info );
@@ -240,7 +240,7 @@ CFDataRef msgPortCallback( CFMessagePortRef local, SInt32 msgid, CFDataRef data,
 /*****************************************************************************
 * Read: forwarding data from EyeTV plugin which was received above
 *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     extern CFDataRef dataFromEyetv;

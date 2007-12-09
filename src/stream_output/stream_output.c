@@ -365,7 +365,7 @@ int sout_AccessOutSeek( sout_access_out_t *p_access, off_t i_pos )
 /*****************************************************************************
  * sout_AccessRead:
  *****************************************************************************/
-int sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
+ssize_t sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
 {
     return( p_access->pf_read ?
             p_access->pf_read( p_access, p_buffer ) : VLC_EGENERIC );
@@ -374,9 +374,9 @@ int sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
 /*****************************************************************************
  * sout_AccessWrite:
  *****************************************************************************/
-int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
+ssize_t sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    const int i_packets_gather = 30;
+    const unsigned i_packets_gather = 30;
     p_access->i_writes++;
     p_access->i_sent_bytes += p_buffer->i_buffer;
     if( (p_access->i_writes % i_packets_gather) == 0 )

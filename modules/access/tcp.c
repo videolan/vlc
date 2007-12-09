@@ -64,7 +64,7 @@ struct access_sys_t
 };
 
 
-static int Read( access_t *, uint8_t *, int );
+static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Control( access_t *, int, va_list );
 
 /*****************************************************************************
@@ -132,7 +132,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Read: read on a file descriptor, checking b_die periodically
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;

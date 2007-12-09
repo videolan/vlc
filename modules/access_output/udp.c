@@ -112,7 +112,7 @@ static const char *const ppsz_core_options[] = {
     NULL
 };
 
-static int  Write   ( sout_access_out_t *, block_t * );
+static ssize_t Write   ( sout_access_out_t *, block_t * );
 static int  Seek    ( sout_access_out_t *, off_t  );
 
 static void ThreadWrite( vlc_object_t * );
@@ -323,7 +323,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Write: standard write on a file descriptor.
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i_len = 0;

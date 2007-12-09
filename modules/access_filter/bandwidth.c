@@ -49,7 +49,7 @@ vlc_module_begin ();
                  BANDWIDTH_LONGTEXT, VLC_FALSE);
 vlc_module_end();
 
-static int Read (access_t *access, uint8_t *buffer, int len);
+static ssize_t Read (access_t *access, uint8_t *buffer, size_t len);
 static int Seek (access_t *access, int64_t offset);
 static int Control (access_t *access, int cmd, va_list ap);
 
@@ -107,7 +107,7 @@ static void Close (vlc_object_t *obj)
 }
 
 
-static int Read (access_t *access, uint8_t *buffer, int len)
+static ssize_t Read (access_t *access, uint8_t *buffer, size_t len)
 {
     access_t *src = access->p_source;
     access_sys_t *p_sys = access->p_sys;

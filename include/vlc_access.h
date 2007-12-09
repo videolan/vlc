@@ -88,7 +88,7 @@ struct access_t
 
     /* pf_read/pf_block is used to read data.
      * XXX A access should set one and only one of them */
-    int         (*pf_read) ( access_t *, uint8_t *, int );  /* Return -1 if no data yet, 0 if no more data, else real data read */
+    ssize_t     (*pf_read) ( access_t *, uint8_t *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */
     block_t    *(*pf_block)( access_t * );                  /* return a block of data in his 'natural' size, NULL if not yet data or eof */
 
     /* Called for each seek.

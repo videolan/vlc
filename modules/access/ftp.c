@@ -92,8 +92,8 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Read( access_t *, uint8_t *, int );
-static int Write( sout_access_out_t *, block_t * );
+static ssize_t Read( access_t *, uint8_t *, size_t );
+static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek( access_t *, int64_t );
 static int OutSeek( sout_access_out_t *, int64_t );
 static int Control( access_t *, int, va_list );
@@ -461,7 +461,7 @@ static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
@@ -485,7 +485,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 /*****************************************************************************
  * Write:
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     access_sys_t *p_sys = GET_OUT_SYS(p_access);
     size_t i_write = 0;

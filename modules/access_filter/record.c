@@ -67,7 +67,7 @@ vlc_module_end();
  *****************************************************************************/
 
 static block_t *Block  ( access_t * );
-static int      Read   ( access_t *, uint8_t *, int );
+static ssize_t  Read   ( access_t *, uint8_t *, size_t );
 static int      Control( access_t *, int i_query, va_list args );
 static int      Seek   ( access_t *, int64_t );
 
@@ -205,7 +205,7 @@ static block_t *Block( access_t *p_access )
 /*****************************************************************************
  *
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_t     *p_src = p_access->p_source;
     int i_ret;

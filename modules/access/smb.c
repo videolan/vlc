@@ -91,7 +91,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Read( access_t *, uint8_t *, int );
+static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, int64_t );
 static int Control( access_t *, int, va_list );
 
@@ -348,7 +348,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;

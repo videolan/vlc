@@ -144,9 +144,8 @@ static const char *ppsz_sout_options[] = {
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static int Write( sout_access_out_t *, block_t * );
+static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek ( sout_access_out_t *, off_t  );
-static int Read ( sout_access_out_t *, block_t * );
 
 struct sout_access_out_sys_t
 {
@@ -445,7 +444,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_access->pf_write = Write;
-    p_access->pf_read  = Read;
     p_access->pf_seek  = Seek;
 
     msg_Dbg( p_access, "shout access output opened (%s@%s:%i/%s)",
@@ -486,18 +484,9 @@ static void Close( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
- * Read: standard read -- not supported
- *****************************************************************************/
-static int Read( sout_access_out_t *p_access, block_t *p_buffer )
-{
-    msg_Err( p_access, "cannot read from shout" );
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
  * Write: standard write
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
 

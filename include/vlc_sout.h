@@ -93,8 +93,8 @@ struct sout_access_out_t
     char                    *psz_path;
     sout_access_out_sys_t   *p_sys;
     int                     (*pf_seek)( sout_access_out_t *, off_t );
-    int                     (*pf_read)( sout_access_out_t *, block_t * );
-    int                     (*pf_write)( sout_access_out_t *, block_t * );
+    ssize_t                 (*pf_read)( sout_access_out_t *, block_t * );
+    ssize_t                 (*pf_write)( sout_access_out_t *, block_t * );
     int                     (*pf_control)( sout_access_out_t *, int, va_list);
 
     config_chain_t              *p_cfg;
@@ -104,8 +104,8 @@ struct sout_access_out_t
 VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, const char *psz_access, const char *psz_name ) );
 VLC_EXPORT( void,               sout_AccessOutDelete, ( sout_access_out_t * ) );
 VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
-VLC_EXPORT( int,                sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
-VLC_EXPORT( int,                sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
+VLC_EXPORT( ssize_t,            sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
+VLC_EXPORT( ssize_t,            sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
 VLC_EXPORT( int,                sout_AccessOutControl,( sout_access_out_t *, int, va_list ) );
 
 /** Muxer structure */

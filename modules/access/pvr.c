@@ -166,7 +166,7 @@ vlc_module_end();
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-static int Read   ( access_t *, uint8_t *, int );
+static ssize_t Read   ( access_t *, uint8_t *, size_t );
 static int Control( access_t *, int, va_list );
 
 /* ivtv specific ioctls */
@@ -1063,7 +1063,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read
  *****************************************************************************/
-static int Read( access_t * p_access, uint8_t * p_buffer, int i_len )
+static ssize_t Read( access_t * p_access, uint8_t * p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
     struct pollfd ufd;

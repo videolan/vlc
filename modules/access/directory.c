@@ -121,8 +121,8 @@ enum
 
 typedef struct stat_list_t stat_list_t;
 
-static int Read( access_t *, uint8_t *, int );
-static int ReadNull( access_t *, uint8_t *, int );
+static ssize_t Read( access_t *, uint8_t *, size_t );
+static ssize_t ReadNull( access_t *, uint8_t *, size_t );
 static int Control( access_t *, int, va_list );
 
 static int Demux( demux_t *p_demux );
@@ -172,7 +172,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * ReadNull: read the directory
  *****************************************************************************/
-static int ReadNull( access_t *p_access, uint8_t *p_buffer, int i_len)
+static ssize_t ReadNull( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
     /* Return fake data */
     memset( p_buffer, 0, i_len );
@@ -182,7 +182,7 @@ static int ReadNull( access_t *p_access, uint8_t *p_buffer, int i_len)
 /*****************************************************************************
  * Read: read the directory
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
     char               *psz;
     int                 i_mode, i_activity;
@@ -261,7 +261,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 
     /* Return fake data forever */
     p_access->pf_read = ReadNull;
-    return ReadNull( p_access, p_buffer, i_len );
+    return -1;
 }
 
 /*****************************************************************************

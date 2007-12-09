@@ -122,7 +122,7 @@ static const char *ppsz_sout_options[] = {
     "user", "pwd", "mime", "cert", "key", "ca", "crl", NULL
 };
 
-static int Write( sout_access_out_t *, block_t * );
+static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek ( sout_access_out_t *, off_t  );
 
 struct sout_access_out_sys_t
@@ -373,7 +373,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Write:
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i_err = 0;

@@ -48,8 +48,8 @@
 int  E_(MMSHOpen)  ( access_t * );
 void E_(MMSHClose) ( access_t * );
 
-static int  Read( access_t *, uint8_t *, int );
-static int  ReadRedirect( access_t *, uint8_t *, int );
+static ssize_t Read( access_t *, uint8_t *, size_t );
+static ssize_t ReadRedirect( access_t *, uint8_t *, size_t );
 static int  Seek( access_t *, int64_t );
 static int  Control( access_t *, int, va_list );
 
@@ -338,22 +338,22 @@ static int Seek( access_t *p_access, int64_t i_pos )
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static int ReadRedirect( access_t *p_access, uint8_t *p, int i_len )
+static ssize_t ReadRedirect( access_t *p_access, uint8_t *p, size_t i_len )
 {
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     size_t       i_copy;
     size_t       i_data = 0;
 
     if( p_access->info.b_eof )
-        return VLC_SUCCESS;
+        return 0;
 
     while( i_data < (size_t) i_len )
     {

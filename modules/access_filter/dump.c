@@ -60,7 +60,7 @@ vlc_module_begin ();
                  MARGIN_LONGTEXT, VLC_FALSE);
 vlc_module_end();
 
-static int Read (access_t *access, uint8_t *buffer, int len);
+static ssize_t Read (access_t *access, uint8_t *buffer, size_t len);
 static block_t *Block (access_t *access);
 static int Seek (access_t *access, int64_t offset);
 static int Control (access_t *access, int cmd, va_list ap);
@@ -180,7 +180,7 @@ error:
 }
 
 
-static int Read (access_t *access, uint8_t *buffer, int len)
+static ssize_t Read (access_t *access, uint8_t *buffer, size_t len)
 {
     access_t *src = access->p_source;
 

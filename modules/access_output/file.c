@@ -83,9 +83,9 @@ static const char *ppsz_sout_options[] = {
     "append", NULL
 };
 
-static int Write( sout_access_out_t *, block_t * );
+static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek ( sout_access_out_t *, off_t  );
-static int Read ( sout_access_out_t *, block_t * );
+static ssize_t Read ( sout_access_out_t *, block_t * );
 
 struct sout_access_out_sys_t
 {
@@ -184,7 +184,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Read( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Read( sout_access_out_t *p_access, block_t *p_buffer )
 {
     if( strcmp( p_access->psz_path, "-" ) )
     {
@@ -199,7 +199,7 @@ static int Read( sout_access_out_t *p_access, block_t *p_buffer )
 /*****************************************************************************
  * Write: standard write on a file descriptor.
  *****************************************************************************/
-static int Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
 
