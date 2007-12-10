@@ -26,7 +26,6 @@
 #include "dialogs/vlm.hpp"
 #include <vlc_streaming.h>
 
-#include <iostream>
 #include <QString>
 #include <QFileDialog>
 #include <QComboBox>
@@ -44,6 +43,7 @@
 #include <QTimeEdit>
 #include <QDateEdit>
 #include <QSpinBox>
+#include <QHeaderView>
 
 VLMDialog *VLMDialog::instance = NULL;
 
@@ -53,68 +53,39 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     // UI stuff
     ui.setupUi( this );
 
-    /* Layout in the main groupBox */
-    layout = new QVBoxLayout( ui.groupBox );
+#define ADDMEDIATYPES( str, type ) ui.mediaType->addItem( qtr( str ), QVariant( type ) );
+    ADDMEDIATYPES( "Broadcast", QVLM_Broadcast );
+    ADDMEDIATYPES( "Video On Demand ( VOD )", QVLM_VOD );
+    ADDMEDIATYPES( "Schedule", QVLM_Schedule );
+#undef ADDMEDIATYPES
+    
+  /*  ui.mediasDB->horizontalHeader()->setResizeMode( 0, QHeaderView::ResizeToContents );
+    ui.mediasDB->horizontalHeader()->resizeSection( 1, 160 );
+    ui.mediasDB->horizontalHeader()->resizeSection( 2, 120 );
+    ui.mediasDB->horizontalHeader()->resizeSection( 3, 120 );
+    ui.mediasDB->horizontalHeader()->setStretchLastSection ( true );*/
 
-    mediatype = new QComboBox( ui.groupBox );
-    layout->addWidget( mediatype );
+    QGridLayout *bcastlayout = new QGridLayout( ui.pBcast );
+    QLabel *bcastname = new QLabel( qtr( "Name:" ) );
+    bcastnameledit = new QLineEdit;
+    bcastenable = new QCheckBox( qtr( "Enable" ) );
+    bcastenable->setCheckState( Qt::Checked );
+    QLabel *bcastinput = new QLabel( qtr( "Input:" ) );
+    bcastinputledit = new QLineEdit;
+    bcastinputtbutton = new QToolButton;
+    QLabel *bcastoutput = new QLabel( qtr( "Output:" ) );
+    bcastoutputledit = new QLineEdit;
+    bcastoutputtbutton = new QToolButton;
+    QGroupBox *bcastcontrol = new QGroupBox( qtr( "Controls" ) );
+    QHBoxLayout *bcastgbox = new QHBoxLayout( bcastcontrol );
+    bcastplay = new QPushButton( qtr( "Play" ) );
+    bcastpause = new QPushButton( qtr( "Pause" ) );
+    bcaststop = new QPushButton( qtr( "Stop" ) );
 
-#define ADDMEDIATYPES( type ) mediatype->addItem( qtr( type ) );
-
-    ADDMEDIATYPES( "Broadcast" );
-    ADDMEDIATYPES( "Video On Demand ( VOD )" );
-    ADDMEDIATYPES( "Schedule" );
-
-    makeBcastPage();
-    makeVODPage();
-    makeSchedulePage();
-
-    /* Create a Stacked Widget to old the different phases */
-    slayout = new QStackedWidget( ui.groupBox );
-    slayout->addWidget( pBcast );
-    slayout->addWidget( pVod );
-    slayout->addWidget( pSchedule );
-
-    layout->addWidget( slayout );
-
-    QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
-    QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
-    ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
-    ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
-
-    CONNECT( mediatype, currentIndexChanged( int ), slayout,
-            setCurrentIndex( int ) );
-    CONNECT( closeButton, clicked(), this, hide() );
-
-}
-
-VLMDialog::~VLMDialog(){}
-
-void VLMDialog::makeBcastPage()
-{
-    pBcast = new QWidget( ui.groupBox );
-    bcastlayout = new QGridLayout( pBcast );
-    bcastname = new QLabel( qtr( "Name :" ), pBcast );
-    bcastnameledit = new QLineEdit( pBcast );
-    bcastenable = new QCheckBox( qtr( "Enable" ), pBcast );
-    bcastinput = new QLabel( qtr( "Input :" ), pBcast );
-    bcastinputledit = new QLineEdit( pBcast );
-    bcastinputtbutton = new QToolButton( pBcast );
-    bcastoutput = new QLabel( qtr( "Output :" ), pBcast );
-    bcastoutputledit = new QLineEdit( pBcast );
-    bcastoutputtbutton = new QToolButton( pBcast );
-    bcastcontrol = new QGroupBox( qtr( "Controls" ), pBcast );
-    bcastgbox = new QHBoxLayout( bcastcontrol );
-    bcastplay = new QPushButton( qtr( "Play" ), bcastcontrol );
-    bcastpause = new QPushButton( qtr( "Pause" ), bcastcontrol );
-    bcaststop = new QPushButton( qtr( "Stop" ), bcastcontrol );
-    bcastadd = new QPushButton( qtr( "Add" ), pBcast );
-    bcastremove = new QPushButton( qtr( "Remove" ), pBcast );
-
-// Adding all widgets in the QGridLayout
     bcastgbox->addWidget( bcastplay );
     bcastgbox->addWidget( bcastpause );
     bcastgbox->addWidget( bcaststop );
+
     bcastlayout->addWidget( bcastname, 0, 0 );
     bcastlayout->addWidget( bcastnameledit, 0, 1 );
     bcastlayout->addWidget( bcastenable, 0, 2 );
@@ -125,27 +96,22 @@ void VLMDialog::makeBcastPage()
     bcastlayout->addWidget( bcastoutputledit, 2, 1 );
     bcastlayout->addWidget( bcastoutputtbutton, 2, 2 );
     bcastlayout->addWidget( bcastcontrol, 3, 0, 1, 3 );
-    bcastlayout->addWidget( bcastadd, 4, 1 );
-    bcastlayout->addWidget( bcastremove, 4, 2 );
-}
+    QSpacerItem *spacerItem = new QSpacerItem(10, 5,
+                        QSizePolicy::Expanding, QSizePolicy::MinimumExpanding );
+    bcastlayout->addItem(spacerItem, 4, 0, 1, 1);
 
-void VLMDialog::makeVODPage()
-{
-    pVod = new QWidget( ui.groupBox );
-    vodlayout = new QGridLayout( pVod );
-    vodname = new QLabel( qtr( "Name :" ), pVod );
-    vodnameledit = new QLineEdit( pVod );
-    vodenable = new QCheckBox( qtr( "Enable" ), pVod );
-    vodinput = new QLabel( qtr( "Input :" ), pVod );
-    vodinputledit = new QLineEdit( pVod );
-    vodinputtbutton = new QToolButton( pVod );
-    vodoutput = new QLabel( qtr( "Output :" ), pVod );
-    vodoutputledit = new QLineEdit( pVod );
-    vodoutputtbutton = new QToolButton( pVod );
-    vodadd = new QPushButton( qtr( "Add" ), pVod );
-    vodremove = new QPushButton( qtr( "Remove" ), pVod );
 
-// Adding all widgets in the QGridLayout
+    QGridLayout *vodlayout = new QGridLayout( ui.pVod );
+    QLabel *vodname = new QLabel( qtr( "Name :" ) );
+    vodnameledit = new QLineEdit;
+    vodenable = new QCheckBox( qtr( "Enable" ) );
+    QLabel *vodinput = new QLabel( qtr( "Input :" ) );
+    vodinputledit = new QLineEdit;
+    vodinputtbutton = new QToolButton;
+    QLabel *vodoutput = new QLabel( qtr( "Output :" ) );
+    vodoutputledit = new QLineEdit;
+    vodoutputtbutton = new QToolButton;
+
     vodlayout->addWidget( vodname, 0, 0 );
     vodlayout->addWidget( vodnameledit, 0, 1 );
     vodlayout->addWidget( vodenable, 0, 2 );
@@ -155,37 +121,40 @@ void VLMDialog::makeVODPage()
     vodlayout->addWidget( vodoutput, 2, 0 );
     vodlayout->addWidget( vodoutputledit, 2, 1 );
     vodlayout->addWidget( vodoutputtbutton, 2, 2 );
-    vodlayout->addWidget( vodadd, 3, 1 );
-    vodlayout->addWidget( vodremove, 3, 2 );
-}
+    QSpacerItem *spacerVod = new QSpacerItem(10, 5, 
+                        QSizePolicy::Expanding, QSizePolicy::MinimumExpanding );
+    vodlayout->addItem( spacerVod, 4, 0, 1, 1);
 
-void VLMDialog::makeSchedulePage()
-{
-    pSchedule = new QWidget( ui.groupBox );
-    schelayout = new QGridLayout( pSchedule );
-    schename = new QLabel( qtr( "Name :" ), pSchedule );
-    schenameledit = new QLineEdit( pSchedule );
-    scheenable = new QCheckBox( qtr( "Enable" ), pSchedule );
-    scheinput = new QLabel( qtr( "Input :" ), pSchedule );
-    scheinputledit = new QLineEdit( pSchedule );
-    scheinputtbutton = new QToolButton( pSchedule );
-    scheoutput = new QLabel( qtr( "Output :" ), pSchedule );
-    scheoutputledit = new QLineEdit( pSchedule );
-    scheoutputtbutton = new QToolButton( pSchedule );
-    schecontrol = new QGroupBox( qtr( "Time Control" ), pSchedule );
-    scheadd = new QPushButton( qtr( "Add" ), pSchedule );
-    scheremove = new QPushButton( qtr( "Remove" ), pSchedule );
-    schetimelayout = new QGridLayout( schecontrol );
-    schetimelabel = new QLabel( qtr( "Hours/Minutes/Seconds :" ), schecontrol );
-    schedatelabel = new QLabel( qtr( "Day/Month/Year :" ), schecontrol );
-    schetimerepeat = new QLabel( qtr( "Repeat :" ), schecontrol );
-    time = new QTimeEdit( schecontrol );
-    date = new QDateEdit( schecontrol );
-    scherepeatnumber = new QSpinBox( schecontrol );
 
-    //scheadd->setMaximumWidth( 30 );
+    QGridLayout *schelayout = new QGridLayout( ui.pSched );
+    QLabel *schename = new QLabel( qtr( "Name:" ) );
+    schenameledit = new QLineEdit;
+    scheenable = new QCheckBox( qtr( "Enable" ) );
+    QLabel *scheinput = new QLabel( qtr( "Input:" ) );
+    scheinputledit = new QLineEdit;
+    scheinputtbutton = new QToolButton;
+    QLabel *scheoutput = new QLabel( qtr( "Output:" ) );
+    scheoutputledit = new QLineEdit;
+    scheoutputtbutton = new QToolButton;
 
-// Adding all widgets in the QGridLayout
+    QGroupBox *schecontrol = new QGroupBox( qtr( "Time Control" ), ui.pSched );
+    QGridLayout *schetimelayout = new QGridLayout( schecontrol );
+    QLabel *schetimelabel = new QLabel( qtr( "Hours/Minutes/Seconds:" ) );
+    QLabel *schedatelabel = new QLabel( qtr( "Day Month Year:" ) );
+    QLabel *schetimerepeat = new QLabel( qtr( "Repeat:" ) );
+    time = new QTimeEdit( QTime::currentTime() );
+    time->setAlignment( Qt::AlignRight );
+    date = new QDateEdit( QDate::currentDate() );
+    date->setAlignment( Qt::AlignRight );
+#ifdef WIN32
+    date->setDisplayFormat( "dd MM yyyy" );
+#else
+    date->setDisplayFormat( "dd MMMM yyyy" );
+#endif
+    scherepeatnumber = new QSpinBox;
+    scherepeatnumber->setAlignment( Qt::AlignRight );
+    schecontrol->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
+
     schetimelayout->addWidget( schetimelabel, 0, 0 );
     schetimelayout->addWidget( time, 0, 1 );
     schetimelayout->addWidget( schedatelabel, 1, 0 );
@@ -202,7 +171,78 @@ void VLMDialog::makeSchedulePage()
     schelayout->addWidget( scheoutputledit, 2, 1 );
     schelayout->addWidget( scheoutputtbutton, 2, 2 );
     schelayout->addWidget( schecontrol, 3, 0, 1, 3 );
-    schelayout->addWidget( scheadd, 4, 1 );
-    schelayout->addWidget( scheremove, 4, 2 );
+
+    QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
+    QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
+    ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
+
+    ui.mediaStacked->setCurrentIndex( QVLM_Broadcast );
+    CONNECT( ui.mediaType, currentIndexChanged( int ),
+             ui.mediaStacked, setCurrentIndex( int ) );
+
+    BUTTONACT( closeButton, finish() );
+    BUTTONACT( cancelButton, cancel() );
+
+    BUTTONACT( ui.addButton, addVLMItem() );
+    BUTTONACT( ui.clearButton, clearVLMItem() );
 }
 
+VLMDialog::~VLMDialog(){}
+
+void VLMDialog::cancel()
+{
+    hide();
+
+}
+
+void VLMDialog::finish()
+{
+   // for( int i = 0; i < ui.mediasDB->topLevelItemCount(); i++ );
+    hide();
+}
+
+void VLMDialog::addVLMItem()
+{
+   // int row =  ui.mediasDB->rowCount() -1 ;
+    int type = ui.mediaType->itemData( ui.mediaType->currentIndex() ).toInt();
+    QString str;
+    QString name;
+
+    switch( type )
+    {
+    case QVLM_Broadcast:
+        str = "broadcast";
+        name = bcastnameledit->text();        
+    break;
+    case QVLM_VOD:
+        str = "vod";
+        name = vodnameledit->text();
+        break;
+    case QVLM_Schedule:
+        str = "schedule";
+        name = schenameledit->text();
+        break;
+    default:
+        break;
+    }
+
+    QGroupBox *groupItem = new QGroupBox( name );
+    
+    /*QTableWidgetItem *newItem = new QTableWidgetItem( str );
+    ui.mediasDB->setItem( row, 0,  newItem );
+    QTableWidgetItem *newItem2 = new QTableWidgetItem( name );
+    ui.mediasDB->setItem( row, 1,  newItem2 );*/
+
+}
+
+void VLMDialog::removeVLMItem()
+{
+    
+}
+
+
+void VLMDialog::clearVLMItem()
+{
+    
+}

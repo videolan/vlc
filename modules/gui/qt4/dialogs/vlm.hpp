@@ -30,11 +30,16 @@
 #include "ui/vlm.h"
 #include "util/qvlcframe.hpp"
 
+enum{
+    QVLM_Broadcast,
+    QVLM_VOD,
+    QVLM_Schedule
+};
+
 class QComboBox;
 class QVBoxLayout;
 class QStackedWidget;
 class QLabel;
-class QWidget;
 class QGridLayout;
 class QLineEdit;
 class QCheckBox;
@@ -62,31 +67,28 @@ private:
     VLMDialog( intf_thread_t * );
     static VLMDialog *instance;
     Ui::Vlm ui;
-
-    void makeBcastPage();
-    void makeVODPage();
-    void makeSchedulePage();
+    
+    QGridLayout *vlmItemLayout;
 
     QComboBox *mediatype;
-    QVBoxLayout *layout;
-    QHBoxLayout *bcastgbox, ;
-    QStackedWidget *slayout;
-    QWidget *pBcast, *pVod, *pSchedule;
-    QGridLayout *bcastlayout, *vodlayout, *schelayout, *schetimelayout;
-    QLabel *bcastname, *vodname, *schename,*bcastinput, *vodinput, *scheinput;
-    QLabel *bcastoutput, *vodoutput, *scheoutput;
     QCheckBox *bcastenable, *vodenable, *scheenable;
     QLineEdit *bcastnameledit, *vodnameledit, *schenameledit, *bcastinputledit, *vodinputledit, *scheinputledit;
     QLineEdit *bcastoutputledit, *vodoutputledit, *scheoutputledit;
-    QToolButton *bcastinputtbutton, *vodinputtbutton, *scheinputtbutton;
-    QToolButton *bcastoutputtbutton, *vodoutputtbutton, *scheoutputtbutton;
-    QGroupBox *bcastcontrol, *schecontrol;
-    QPushButton *bcastplay, *bcastpause, *bcaststop;
-    QPushButton *bcastadd, *vodadd, *scheadd, *bcastremove, *vodremove, *scheremove;
     QTimeEdit *time;
     QDateEdit *date;
-    QLabel *schetimelabel, *schedatelabel, *schetimerepeat;
     QSpinBox *scherepeatnumber;
+
+    QToolButton *bcastinputtbutton, *vodinputtbutton, *scheinputtbutton;
+    QToolButton *bcastoutputtbutton, *vodoutputtbutton, *scheoutputtbutton;
+    QPushButton *bcastplay, *bcastpause, *bcaststop;
+    QPushButton *bcastadd, *vodadd, *scheadd, *bcastremove, *vodremove, *scheremove;
+
+private slots:
+    void finish();
+    void cancel();
+    void addVLMItem();
+    void removeVLMItem();
+    void clearVLMItem();
 };
 
 #endif
