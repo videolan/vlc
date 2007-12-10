@@ -381,15 +381,6 @@ static NSMutableArray *blackoutWindows = NULL;
     [super dealloc];
 }
 
-#if GC_ENABLED
-- (void)finalize
-{
-    /* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
-    [self unregisterDraggedTypes];
-    [super finalize];
-}
-#endif
-
 - (void)awakeFromNib
 {
     [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType,
@@ -467,15 +458,6 @@ static NSMutableArray *blackoutWindows = NULL;
     [self unregisterDraggedTypes];
     [super dealloc];
 }
-
-#if GC_ENABLED
-- (void)finalize
-{
-    /* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
-    [self unregisterDraggedTypes];
-    [super finalize];
-}
-#endif
 
 - (void)awakeFromNib
 {

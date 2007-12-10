@@ -117,15 +117,6 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
     [super dealloc];
 }
 
-/* this was added by the VideoLAN team to ensure Leopard-compatibility and is VLC-only */
-#if GC_ENABLED
-- (void)finalize
-{
-    [self stopListening: self];
-    [super finalize];
-}
-#endif
-
 - (int) remoteId {
     return remoteId;
 }

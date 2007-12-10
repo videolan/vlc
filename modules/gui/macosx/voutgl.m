@@ -1,7 +1,7 @@
 /*****************************************************************************
  * voutgl.m: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2004, 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -1049,6 +1049,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
 
 static int aglLock( vout_thread_t * p_vout )
 {
+#warning the following check is incorrect, needs testing!
 #ifdef __ppc__
     /*
      * before 10.4, we set the AGL context as current and
@@ -1073,6 +1074,7 @@ static int aglLock( vout_thread_t * p_vout )
 
 static void aglUnlock( vout_thread_t * p_vout )
 {
+#warning the following check is incorrect, needs testing!
 #ifdef __ppc__
     /*
      * before 10.4, we assume that the AGL context is current.

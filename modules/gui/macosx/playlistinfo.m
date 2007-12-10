@@ -111,16 +111,6 @@
 
     [super dealloc];
 }
-
-#if GC_ENABLED
-- (void)finalize
-{
-    /* since dealloc isn't called with enabled GC on 10.5, we need this to prevent core crashes */
-    if( [o_statUpdateTimer isValid] )
-        [o_statUpdateTimer invalidate];
-    [super finalize];
-}
-#endif
  
 - (IBAction)togglePlaylistInfoPanel:(id)sender
 {
@@ -514,11 +504,6 @@ static VLCInfoTreeItem *o_root_item = nil;
     return ( i_tmp == IsALeafNode ) ? (-1) : (int)[i_tmp count];
 }
 
-/*- (int)selectedPlaylistItem
-{
-    return i_item;
-}
-*/
 - (void)refresh
 {
     p_item = [[[VLCMain sharedInstance] getInfo] getItem];

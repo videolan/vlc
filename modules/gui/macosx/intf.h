@@ -51,9 +51,6 @@ unsigned int CocoaKeyToVLC( unichar i_key );
             @"/System/Library/CoreServices/SystemVersion.plist"] \
             objectForKey: @"ProductVersion"] floatValue]
 
-/* switch this to 1, if you want to use Obj-C with GC */
-#define GC_ENABLED 0
-
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
@@ -106,14 +103,14 @@ struct intf_sys_t
     id o_sfilters;              /* VLCsFilters    */
     id o_update;                /* VLCUpdate      */
     id o_eyetv;                 /* VLCEyeTVController */
-    BOOL nib_main_loaded;       /* reference to the main-nib */
-    BOOL nib_open_loaded;       /* reference to the open-nib */
-    BOOL nib_about_loaded;      /* reference to the about-nib */
-    BOOL nib_wizard_loaded;     /* reference to the wizard-nib */
-    BOOL nib_extended_loaded;   /* reference to the extended-nib */
-    BOOL nib_bookmarks_loaded;  /* reference to the bookmarks-nib */
-    BOOL nib_sfilters_loaded;   /* reference to the sfilters-nib */
-    BOOL nib_update_loaded;     /* reference to the update-nib */
+    BOOL nib_main_loaded;       /* main nibfile */
+    BOOL nib_open_loaded;       /* open nibfile */
+    BOOL nib_about_loaded;      /* about nibfile */
+    BOOL nib_wizard_loaded;     /* wizard nibfile */
+    BOOL nib_extended_loaded;   /* extended nibfile */
+    BOOL nib_bookmarks_loaded;  /* bookmarks nibfile */
+    BOOL nib_sfilters_loaded;   /* sfilters nibfile */
+    BOOL nib_update_loaded;     /* update nibfile */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_playlist_view;/* playlist view  */
@@ -125,14 +122,14 @@ struct intf_sys_t
     float f_slider_old;         /* old slider val */
     IBOutlet id o_volumeslider; /* volume slider  */
 
-    IBOutlet id o_main_pgbar;   /* main interface progress bar */
+    IBOutlet id o_main_pgbar;   /* playlist window progress bar */
     IBOutlet id o_btn_prev;     /* btn previous   */
     IBOutlet id o_btn_rewind;   /* btn rewind     */
     IBOutlet id o_btn_play;     /* btn play       */
     IBOutlet id o_btn_stop;     /* btn stop       */
     IBOutlet id o_btn_ff;       /* btn fast forward     */
     IBOutlet id o_btn_next;     /* btn next       */
-    IBOutlet id o_btn_fullscreen;/* btn fullscreen      */
+    IBOutlet id o_btn_fullscreen;/* btn fullscreen (embedded vout window) */
     IBOutlet id o_btn_playlist; /* btn playlist   */
 
     NSImage * o_img_play;       /* btn play img   */

@@ -82,16 +82,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [super dealloc];
 }
 
-#if GC_ENABLED
-- (void)finalize
-{
-    /* release old input even if GC is enabled on 10.5 */
-    if( p_old_input )
-        vlc_object_release( p_old_input );
-    [super finalize];
-}
-#endif
-
 - (void)initStrings
 {
     /* localise the items */

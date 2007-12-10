@@ -409,16 +409,6 @@
     [self setFrame:frame];
 }
 
-#if GC_ENABLED
-- (void)finalize
-{
-    /* since dealloc isn't called on 10.5 if GC is enabled and since GC is
-     * Obj-C only, we need to do this: */
-    if( psz_name ) free( psz_name );
-    [super finalize];
-}
-#endif
-
 - (void)dealloc
 {
     if( o_label ) [o_label release];

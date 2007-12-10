@@ -94,16 +94,6 @@
     return o_error_panel;
 }
 
-#if GC_ENABLED
--(void)finalize
-{
-    /* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [o_interaction_list removeAllObjects];
-    [super finalize];
-}
-#endif
-
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -278,7 +268,7 @@
 {
     if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
-        [o_prog_description setStringValue: \
+        [o_prog_description setStringValue:
             [NSString stringWithUTF8String: p_dialog->psz_description]];
         [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
 

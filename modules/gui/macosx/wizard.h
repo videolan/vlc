@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wizard.h: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
@@ -181,7 +181,6 @@
 - (void)createOpts;
 - (void)rebuildCodecMenus;
 - (id)getPlaylistWizard;
-- (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to \
-    ofItem: (NSString *)item;
+- (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to ofItem: (NSString *)item;
 
 @end

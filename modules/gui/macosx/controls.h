@@ -1,7 +1,7 @@
 /*****************************************************************************
  * controls.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -83,17 +83,17 @@
 - (BOOL) isFullscreen;
 - (IBAction)windowAction:(id)sender;
 - (BOOL)keyEvent:(NSEvent *)o_event;
-- (void)scrollWheel:(NSEvent *)theEvent;
+- (void)scrollWheel: (NSEvent *)theEvent;
 
 - (void)setupVarMenuItem:(NSMenuItem *)o_mi
-                    target:(vlc_object_t *)p_object
-                    var:(const char *)psz_variable
-                    selector:(SEL)pf_callback;
+                  target:(vlc_object_t *)p_object
+                     var:(const char *)psz_variable
+                selector:(SEL)pf_callback;
 - (void)setupVarMenu:(NSMenu *)o_menu
-                    forMenuItem: (NSMenuItem *)o_parent
-                    target:(vlc_object_t *)p_object
-                    var:(const char *)psz_variable
-                    selector:(SEL)pf_callback;
+         forMenuItem: (NSMenuItem *)o_parent
+              target:(vlc_object_t *)p_object
+                 var:(const char *)psz_variable
+            selector:(SEL)pf_callback;
 - (IBAction)toggleVar:(id)sender;
 - (int)toggleVarThread:(id)_o_data;
 
@@ -116,8 +116,10 @@
     int i_type;
 }
 
-- (id)initWithVar: (const char *)_psz_name Object: (int)i_id
-        Value: (vlc_value_t)val ofType: (int)_i_type;
+- (id)initWithVar: (const char *)_psz_name 
+           Object: (int)i_id
+            Value: (vlc_value_t)val 
+           ofType: (int)_i_type;
 - (char *)name;
 - (int)objectID;
 - (vlc_value_t)value;

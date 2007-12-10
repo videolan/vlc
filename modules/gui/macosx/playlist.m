@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2006 the VideoLAN team
+* Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -1667,13 +1667,6 @@
     vlc_object_release( p_playlist );
     return NO;
 }
-
-/* Delegate method of NSWindow */
-/*- (void)windowWillClose:(NSNotification *)aNotification
-{
-    [o_btn_playlist setState: NSOffState];
-}
-*/
 @end
 
 

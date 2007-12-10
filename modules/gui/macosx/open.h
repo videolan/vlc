@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.h: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -128,7 +128,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
 - (IBAction)openFileBrowse:(id)sender;
-- (void) pathChosenInPanel: (NSOpenPanel *) sheet withReturn:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void)pathChosenInPanel: (NSOpenPanel *)sheet withReturn:(int)returnCode contextInfo:(void *)contextInfo;
 - (IBAction)openFileStreamChanged:(id)sender;
 
 - (void)openDisc;

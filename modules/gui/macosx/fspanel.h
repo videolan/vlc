@@ -46,31 +46,31 @@
 
 - (void)setPlay;
 - (void)setPause;
-- (void)setStreamTitle:(NSString *)o_title;
-- (void)setStreamPos:(float) f_pos andTime:(NSString *)o_time;
-- (void)setSeekable:(BOOL) b_seekable;
+- (void)setStreamTitle: (NSString *)o_title;
+- (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
+- (void)setSeekable: (BOOL)b_seekable;
 - (void)setVolumeLevel: (float)f_volumeLevel;
 
-- (void)setNonActive:(id)noData;
-- (void)setActive:(id)noData;
+- (void)setNonActive: (id)noData;
+- (void)setActive: (id)noData;
 
-- (void)focus:(NSTimer *)timer;
-- (void)unfocus:(NSTimer *)timer;
-- (void)mouseExited:(NSEvent *)theEvent;
+- (void)focus: (NSTimer *)timer;
+- (void)unfocus: (NSTimer *)timer;
+- (void)mouseExited: (NSEvent *)theEvent;
 
 - (void)fadeIn;
 - (void)fadeOut;
 
 - (NSTimer *)fadeTimer;
-- (void)setFadeTimer:(NSTimer *)timer;
+- (void)setFadeTimer: (NSTimer *)timer;
 - (void)autoHide;
-- (void)keepVisible:(NSTimer *)timer;
+- (void)keepVisible: (NSTimer *)timer;
 
-- (void)mouseDown:(NSEvent *)theEvent;
-- (void)mouseDragged:(NSEvent *)theEvent;
+- (void)mouseDown: (NSEvent *)theEvent;
+- (void)mouseDragged: (NSEvent *)theEvent;
 
 - (BOOL)isDisplayed;
-- (void)setVoutWasUpdated: (int) i_screen;
+- (void)setVoutWasUpdated: (int)i_screen;
 @end
 
 @interface VLCFSPanelView : NSView
@@ -80,8 +80,8 @@
     NSTextField *o_streamTitle_txt, *o_streamPosition_txt;
     NSSlider *o_fs_timeSlider, *o_fs_volumeSlider;
 }
-- (id)initWithFrame:(NSRect)frameRect;
-- (void)drawRect:(NSRect)rect;
+- (id)initWithFrame: (NSRect)frameRect;
+- (void)drawRect: (NSRect)rect;
 
 - (void)setPlay;
 - (void)setPause;
@@ -94,23 +94,23 @@
 - (IBAction)next:(id)sender;
 - (IBAction)forward:(id)sender;
 - (IBAction)backward:(id)sender;
-- (IBAction)fsTimeSliderUpdate:(id)sender;
-- (IBAction)fsVolumeSliderUpdate:(id)sender;
+- (IBAction)fsTimeSliderUpdate: (id)sender;
+- (IBAction)fsVolumeSliderUpdate: (id)sender;
 
 @end
 
 @interface VLCFSTimeSlider : NSSlider
 {
 }
-- (void)drawKnobInRect:(NSRect)knobRect;
-- (void)drawRect:(NSRect)rect;
+- (void)drawKnobInRect: (NSRect)knobRect;
+- (void)drawRect: (NSRect)rect;
 
 @end
 
 @interface VLCFSVolumeSlider : NSSlider
 {
 }
-- (void)drawKnobInRect:(NSRect)knobRect;
-- (void)drawRect:(NSRect)rect;
+- (void)drawKnobInRect: (NSRect)knobRect;
+- (void)drawRect: (NSRect)rect;
 
 @end

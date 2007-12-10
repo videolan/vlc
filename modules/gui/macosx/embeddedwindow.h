@@ -1,7 +1,7 @@
 /*****************************************************************************
  * embeddedwindow.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
@@ -52,9 +52,9 @@
     NSRecursiveLock * o_animation_lock;
 }
 
-- (void)setTime:(NSString *)o_arg_ime position:(float)f_position;
-- (void)playStatusUpdated:(int)i_status;
-- (void)setSeekable:(BOOL)b_seekable;
+- (void)setTime: (NSString *)o_arg_ime position: (float)f_position;
+- (void)playStatusUpdated: (int)i_status;
+- (void)setSeekable: (BOOL)b_seekable;
 
 - (NSView *)mainView;
 

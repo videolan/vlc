@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2001-2006 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -72,7 +72,7 @@
 - (id)getWindow;
 
 + (id)getVoutView: (vout_thread_t *)p_vout subView: (NSView *) view
-                            frame: (NSRect *) s_frame;
+            frame: (NSRect *) s_frame;
 + (vout_thread_t *)getRealVout: (vout_thread_t *)p_vout;
 
 - (void)enterFullscreen;

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * embeddedwindow.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>

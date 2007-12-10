@@ -1,7 +1,7 @@
 /*****************************************************************************
  * applescript.h: MacOS X AppleScript support
  *****************************************************************************
- * Copyright (C) 2002-2003 the VideoLAN team
+ * Copyright (C) 2002-2003, 2005, 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -38,6 +38,6 @@
 *****************************************************************************/
 @interface NSApplication(ScriptSupport)
 
-- (BOOL) scriptFullscreenMode;
-- (void) setScriptFullscreenMode: (BOOL) mode;
+- (BOOL)scriptFullscreenMode;
+- (void)setScriptFullscreenMode: (BOOL)mode;
 @end
