@@ -554,7 +554,7 @@ describe:
         }
         else
         {
-            msg_Info( p_demux, "connection timeout, retrying" );
+            msg_Dbg( p_demux, "connection timeout, retrying" );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             goto createnew;
         }
