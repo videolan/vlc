@@ -96,7 +96,7 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Menu         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
-static void checkUpdates( intf_thread_t *p_intf, char *psz_arg );
+static void checkUpdates( intf_thread_t *p_intf );
 
 /* Status Callbacks */
 static int TimeOffsetChanged( vlc_object_t *, char const *,
@@ -752,7 +752,7 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( !strcmp( psz_cmd, "check-updates" ) )
         {
-            checkUpdates( p_intf, psz_arg );
+            checkUpdates( p_intf );
         }
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
@@ -2105,116 +2105,20 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 /*****************************************************************************
  * checkUpdates : check for updates
  ****************************************************************************/
-static void checkUpdates( intf_thread_t *p_intf, char *psz_arg )
+static void checkUpdates( intf_thread_t *p_intf )
 {
-    update_iterator_t *p_uit;
     update_t *p_u = update_New( p_intf );
     if( p_u == NULL ) return;
-    p_uit = update_iterator_New( p_u );
-    if( p_uit )
-    {
-        int s = 0, t = 0;
 
-        if( strstr( psz_arg, "newer" ) )
-            s |= UPDATE_RELEASE_STATUS_NEWER;
-        if( strstr( psz_arg, "equal" ) )
-            s |= UPDATE_RELEASE_STATUS_EQUAL;
-        if( strstr( psz_arg, "older" ) )
-            s |= UPDATE_RELEASE_STATUS_OLDER;
-        if( s ) p_uit->i_rs = s;
-        else p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
+    update_Check( p_u );
+    msg_rc( "\nChecking for updates" );
 
-        if( strstr( psz_arg, "undef" ) )
-            t |= UPDATE_FILE_TYPE_UNDEF;
-        if( strstr( psz_arg, "info" ) )
-            t |= UPDATE_FILE_TYPE_INFO;
-        if( strstr( psz_arg, "source" ) )
-            t |= UPDATE_FILE_TYPE_SOURCE;
-        if( strstr( psz_arg, "binary" ) )
-            t |= UPDATE_FILE_TYPE_BINARY;
-        if( strstr( psz_arg, "plugin" ) )
-            t |= UPDATE_FILE_TYPE_PLUGIN;
-        if( t ) p_uit->i_t = t;
-
-        update_Check( p_u, VLC_FALSE );
-        update_iterator_Action( p_uit, UPDATE_MIRROR );
-        msg_rc( "\nUsing mirror: %s (%s) [%s]",
-                p_uit->mirror.psz_name,
-                p_uit->mirror.psz_location,
-                p_uit->mirror.psz_type );
-        while( (s = update_iterator_Action( p_uit, UPDATE_FILE )) != UPDATE_FAIL )
-        {
-            char *psz_tmp;
-            if( s & UPDATE_RELEASE )
-            {
-                switch( p_uit->release.i_status )
-                {
-                    case UPDATE_RELEASE_STATUS_OLDER:
-                        psz_tmp = strdup( "older" );
-                        break;
-                    case UPDATE_RELEASE_STATUS_EQUAL:
-                        psz_tmp = strdup( "equal" );
-                        break;
-                    case UPDATE_RELEASE_STATUS_NEWER:
-                        psz_tmp = strdup( "newer" );
-                        break;
-                    default:
-                        psz_tmp = strdup( "?!?" );
-                        break;
-                }
-                msg_rc( "\n+----[ VLC %s %s (%s) ] ",
-                        p_uit->release.psz_version,
-                        p_uit->release.psz_svn_revision,
-                        psz_tmp );
-                free( psz_tmp );
-            }
-            switch( p_uit->file.i_type )
-            {
-                case UPDATE_FILE_TYPE_UNDEF:
-                    psz_tmp = strdup( "undef" );
-                    break;
-                case UPDATE_FILE_TYPE_INFO:
-                    psz_tmp = strdup( "info" );
-                    break;
-                case UPDATE_FILE_TYPE_SOURCE:
-                    psz_tmp = strdup( "source" );
-                    break;
-                case UPDATE_FILE_TYPE_BINARY:
-                    psz_tmp = strdup( "binary" );
-                    break;
-                case UPDATE_FILE_TYPE_PLUGIN:
-                    psz_tmp = strdup( "plugin" );
-                    break;
-                default:
-                    psz_tmp = strdup( "?!?" );
-                    break;
-            }
-            msg_rc( "| %s (%s)", p_uit->file.psz_description, psz_tmp );
-            free( psz_tmp );
-            if( p_uit->file.l_size )
-            {
-                if( p_uit->file.l_size > 1024 * 1024 * 1024 )
-                    asprintf( &psz_tmp, "(%ld GB)",
-                              p_uit->file.l_size / (1024*1024*1024) );
-                if( p_uit->file.l_size > 1024 * 1024 )
-                    asprintf( &psz_tmp, "(%ld MB)",
-                              p_uit->file.l_size / (1024*1024) );
-                else if( p_uit->file.l_size > 1024 )
-                    asprintf( &psz_tmp, "(%ld kB)",
-                              p_uit->file.l_size / 1024 );
-                else
-                    asprintf( &psz_tmp, "(%ld B)", p_uit->file.l_size );
-            }
-            else
-            {
-                psz_tmp = strdup( "" );
-            }
-            msg_rc( "| %s %s", p_uit->file.psz_url, psz_tmp );
-            msg_rc( "+----" );
-            free( psz_tmp );
-        }
-        msg_rc( "" );
-        update_iterator_Delete( p_uit );
-    }
+    if( update_CompareReleaseToCurrent( p_u ) == UpdateReleaseStatusNewer )
+        msg_rc( "\n+----[ VLC %i.%i.%i%s ] ", p_u->release.i_major,
+                                              p_u->release.i_minor,
+                                              p_u->release.i_revision,
+                                              p_u->release.psz_extra );
+    else
+        msg_rc( "\n+----Last version" );
     update_Delete( p_u );
 }

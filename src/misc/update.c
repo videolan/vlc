@@ -21,11 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* TODO
- * --> check release types.
- * --> make sure that the version comparision method is ok.
- */
-
 /**
  *   \file
  *   This file contains functions related to VLC and plugins update management
@@ -45,65 +40,44 @@
 
 #include <vlc_block.h>
 #include <vlc_stream.h>
-#include <vlc_xml.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>
-#include <vlc_md5.h>
 
 /*****************************************************************************
  * Misc defines
  *****************************************************************************/
 
-/* All release notes and source packages should match on "*"
- * Only binary installers are OS specific ( we only provide these
- * for Win32, Mac OS X, WincCE, beos(?) ) */
+//#define UPDATE_VLC_STATUS_URL "http://zen.via.ecp.fr/~ivoire/videolan/update"
+
 #if defined( UNDER_CE )
-#   define UPDATE_VLC_OS "*"
-#   define UPDATE_VLC_ARCH "*"
+#   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
 #elif defined( WIN32 )
-#   define UPDATE_VLC_OS "windows"
-#   define UPDATE_VLC_ARCH "i386"
+#   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-win-x86"
 #elif defined( __APPLE__ )
 #   define UPDATE_VLC_OS "macosx"
 #   if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-#       define UPDATE_VLC_ARCH "ppc"
+#       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-mac-ppc"
 #   else
-#       define UPDATE_VLC_ARCH "x86"
+#       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-mac-x86"
 #   endif
 #elif defined( SYS_BEOS )
-#   define UPDATE_VLC_OS "beos"
-#   define UPDATE_VLC_ARCH "i386"
+#       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-beos-x86"
 #else
-#   define UPDATE_VLC_OS "*"
-#   define UPDATE_VLC_ARCH "*"
+#   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
 #endif
 
-#define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status.xml"
-#define UPDATE_VLC_MIRRORS_URL "http://update.videolan.org/mirrors.xml"
-
 #define STRDUP( a ) ( a ? strdup( a ) : NULL )
+
 
 /*****************************************************************************
  * Local Prototypes
  *****************************************************************************/
+static void EmptyRelease( update_t *p_update );
+static void GetUpdateFile( update_t *p_update );
+static int cmp( int i1, int i2 );
+static int CompareReleases( const struct update_release_t *p1,
+                            const struct update_release_t *p2 );
 
-static void FreeMirrorsList( update_t * );
-static void FreeReleasesList( update_t * );
-static void GetMirrorsList( update_t *, vlc_bool_t );
-static void GetFilesList( update_t *, vlc_bool_t );
-
-static int CompareReleases( const struct update_release_t *,
-                            const struct update_release_t * );
-static int CompareReleaseToCurrent( const struct update_release_t * );
-
-static unsigned int update_iterator_Reset( update_iterator_t * );
-static unsigned int update_iterator_NextFile( update_iterator_t * );
-static unsigned int update_iterator_PrevFile( update_iterator_t * );
-static unsigned int update_iterator_NextMirror( update_iterator_t * );
-static unsigned int update_iterator_PrevMirror( update_iterator_t * );
-
-static void update_iterator_GetData( update_iterator_t * );
-static void update_iterator_ClearData( update_iterator_t * );
 
 /*****************************************************************************
  * Update_t functions
@@ -128,22 +102,12 @@ update_t *__update_New( vlc_object_t *p_this )
 
     p_update->p_libvlc = p_this->p_libvlc;
 
-    p_update->p_releases = NULL;
-    p_update->i_releases = 0;
-    p_update->b_releases = VLC_FALSE;
+    p_update->release.psz_svnrev = NULL;
+    p_update->release.psz_extra = NULL;
+    p_update->release.psz_url = NULL;
+    p_update->release.psz_desc = NULL;
 
-    p_update->p_mirrors = NULL;
-    p_update->i_mirrors = 0;
-    p_update->b_mirrors = VLC_FALSE;
-
-#if 1
-    msg_Err( p_this, "Auto-update currently disabled." );
-    vlc_mutex_destroy( &p_update->lock );
-    free( p_update );
-    return NULL;
-#else
-    return p_update
-#endif
+    return p_update;
 }
 
 /**
@@ -157,283 +121,89 @@ void update_Delete( update_t *p_update )
     assert( p_update );
 
     vlc_mutex_destroy( &p_update->lock );
-    FreeMirrorsList( p_update );
-    FreeReleasesList( p_update );
+
+    if( p_update->release.psz_svnrev )
+    {
+        free( p_update->release.psz_svnrev );
+        p_update->release.psz_svnrev = NULL;
+    }
+
+    if( p_update->release.psz_extra )
+    {
+        free( p_update->release.psz_extra );
+        p_update->release.psz_extra = NULL;
+    }
+
+    if( p_update->release.psz_url )
+    {
+        free( p_update->release.psz_url );
+        p_update->release.psz_url = NULL;
+    }
+
+    if( p_update->release.psz_desc )
+    {
+        free( p_update->release.psz_desc );
+        p_update->release.psz_desc = NULL;
+    }
+
     free( p_update );
 }
 
 /**
- * Empty the mirrors list
- * *p_update should be locked before using this function
+ * Empty the release struct
  *
- * \param p_update pointer to the update struct
+ * \param p_update update_t* pointer
  * \return nothing
  */
-static void FreeMirrorsList( update_t *p_update )
+static void EmptyRelease( update_t *p_update )
 {
-    int i;
+    p_update->release.i_major = 0;
+    p_update->release.i_minor = 0;
+    p_update->release.i_revision = 0;
 
-    for( i = 0; i < p_update->i_mirrors; i++ )
+    if( p_update->release.psz_svnrev )
     {
-        free( p_update->p_mirrors[i].psz_name );
-        free( p_update->p_mirrors[i].psz_location );
-        free( p_update->p_mirrors[i].psz_type );
-        free( p_update->p_mirrors[i].psz_base_url );
+        free( p_update->release.psz_svnrev );
+        p_update->release.psz_svnrev = NULL;
     }
-    FREENULL( p_update->p_mirrors );
-    p_update->i_mirrors = 0;
-    p_update->b_mirrors = VLC_FALSE;
+
+    if( p_update->release.psz_extra )
+    {
+        free( p_update->release.psz_extra );
+        p_update->release.psz_extra = NULL;
+    }
+
+    if( p_update->release.psz_url )
+    {
+        free( p_update->release.psz_url );
+        p_update->release.psz_url = NULL;
+    }
+
+    if( p_update->release.psz_desc )
+    {
+        free( p_update->release.psz_desc );
+        p_update->release.psz_desc = NULL;
+    } 
 }
 
 /**
- * Empty the releases list
- * *p_update should be locked before calling this function
- *
- * \param p_update pointer to the update struct
- * \return nothing
- */
-static void FreeReleasesList( update_t *p_update )
-{
-    int i;
-
-    for( i = 0; i < p_update->i_releases; i++ )
-    {
-        int j;
-        struct update_release_t *p_release = (p_update->p_releases + i);
-        for( j = 0; j < p_release->i_files; j++ )
-        {
-            free( p_release->p_files[j].psz_md5 );
-            free( p_release->p_files[j].psz_url );
-            free( p_release->p_files[j].psz_description );
-        }
-        free( p_release->psz_major );
-        free( p_release->psz_minor );
-        free( p_release->psz_revision );
-        free( p_release->psz_extra );
-        free( p_release->psz_svn_revision );
-        free( p_release->p_files );
-    }
-    FREENULL( p_update->p_releases );
-    p_update->i_releases = 0;
-    p_update->b_releases = VLC_FALSE;
-}
-
-/**
- * Get the mirrors list XML file and parse it
- * *p_update has to be unlocked when calling this function
- *
- * \param p_update pointer to the update struct
- * \param b_force set to VLC_TRUE if you want to force the mirrors list update
- * \return nothing
- */
-static void GetMirrorsList( update_t *p_update, vlc_bool_t b_force )
-{
-    stream_t *p_stream = NULL;
-
-    xml_t *p_xml = NULL;
-    xml_reader_t *p_xml_reader = NULL;
-    char *psz_eltname = NULL;
-    //char *psz_eltvalue = NULL;
-    char *psz_name = NULL;
-    char *psz_value = NULL;
-    struct update_mirror_t tmp_mirror;
-
-    vlc_mutex_lock( &p_update->lock );
-
-    memset( &tmp_mirror, 0, sizeof(struct update_mirror_t));
-
-    if( p_update->b_mirrors && b_force == VLC_FALSE )
-    {
-        vlc_mutex_unlock( &p_update->lock );
-        return;
-    }
-
-    p_xml = xml_Create( p_update->p_libvlc );
-    if( !p_xml )
-    {
-        msg_Err( p_update->p_libvlc, "Failed to open XML parser" );
-        goto error;
-    }
-
-    p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_MIRRORS_URL );
-    if( !p_stream )
-    {
-        msg_Err( p_update->p_libvlc, "Failed to open %s for reading",
-                 UPDATE_VLC_MIRRORS_URL );
-        goto error;
-    }
-
-    p_xml_reader = xml_ReaderCreate( p_xml, p_stream );
-
-    if( !p_xml_reader )
-    {
-        msg_Err( p_update->p_libvlc, "Failed to open %s for parsing",
-                 UPDATE_VLC_MIRRORS_URL );
-        goto error;
-    }
-
-    if( p_update->p_mirrors )
-    {
-        FreeMirrorsList( p_update );
-    }
-
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
-    {
-        switch( xml_ReaderNodeType( p_xml_reader ) )
-        {
-            case -1:
-                msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                         UPDATE_VLC_MIRRORS_URL );
-                goto error;
-
-            case XML_READER_STARTELEM:
-                psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname )
-                {
-                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                             UPDATE_VLC_MIRRORS_URL );
-                    goto error;
-                }
-
-                while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                {
-                    psz_name = xml_ReaderName( p_xml_reader );
-                    psz_value = xml_ReaderValue( p_xml_reader );
-
-                    if( !psz_name || !psz_value )
-                    {
-                        msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                                 UPDATE_VLC_MIRRORS_URL );
-                        goto error;
-                    }
-
-                    if( !strcmp( psz_eltname, "mirror" ) )
-                    {
-                        if( !strcmp( psz_name, "name" ) )
-                            tmp_mirror.psz_name = STRDUP( psz_value );
-                        else if( !strcmp( psz_name, "location" ) )
-                            tmp_mirror.psz_location = STRDUP( psz_value );
-                    }
-                    else if( !strcmp( psz_eltname, "url" ) )
-                    {
-                        if( !strcmp( psz_name, "type" ) )
-                            tmp_mirror.psz_type = STRDUP( psz_value );
-                        else if( !strcmp( psz_name, "base" ) )
-                            tmp_mirror.psz_base_url = STRDUP( psz_value );
-                    }
-                    FREENULL( psz_name );
-                    FREENULL( psz_value );
-                }
-                if( !strcmp( psz_eltname, "url" ) )
-                {
-                    /* append to mirrors list */
-                    p_update->p_mirrors =
-                    (struct update_mirror_t *)realloc( p_update->p_mirrors,
-                                       (++(p_update->i_mirrors))
-                                       *sizeof( struct update_mirror_t ) );
-                    p_update->p_mirrors[ p_update->i_mirrors - 1 ] =
-                        tmp_mirror;
-                    tmp_mirror.psz_name = STRDUP( tmp_mirror.psz_name );
-                    tmp_mirror.psz_location = STRDUP( tmp_mirror.psz_location );
-                    tmp_mirror.psz_type = NULL;
-                    tmp_mirror.psz_base_url = NULL;
-                }
-                FREENULL( psz_eltname );
-                break;
-
-            case XML_READER_ENDELEM:
-                psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname )
-                {
-                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                             UPDATE_VLC_MIRRORS_URL );
-                    goto error;
-                }
-
-                if( !strcmp( psz_eltname, "mirror" ) )
-                {
-                    FREENULL( tmp_mirror.psz_name );
-                    FREENULL( tmp_mirror.psz_location );
-                }
-
-                FREENULL( psz_eltname );
-                break;
-
-            /*case XML_READER_TEXT:
-                psz_eltvalue = xml_ReaderValue( p_xml_reader );
-                FREENULL( psz_eltvalue );
-                break;*/
-        }
-    }
-
-    p_update->b_mirrors = VLC_TRUE;
-
-    error:
-        vlc_mutex_unlock( &p_update->lock );
-
-        free( psz_eltname );
-        //free( psz_eltvalue );
-        free( psz_name );
-        free( psz_value );
-
-        free( tmp_mirror.psz_name );
-        free( tmp_mirror.psz_location );
-        free( tmp_mirror.psz_type );
-        free( tmp_mirror.psz_base_url );
-
-        if( p_xml_reader && p_xml )
-            xml_ReaderDelete( p_xml, p_xml_reader );
-        if( p_stream )
-            stream_Delete( p_stream );
-        if( p_xml )
-            xml_Delete( p_xml );
-}
-
-/**
- * Get the files list XML file and parse it
+ * Get the update file and parse it
  * *p_update has to be unlocked when calling this function
  *
  * \param p_update pointer to update struct
- * \param b_force set to VLC_TRUE if you want to force the files list update
  * \return nothing
  */
-static void GetFilesList( update_t *p_update, vlc_bool_t b_force )
+static void GetUpdateFile( update_t *p_update )
 {
     stream_t *p_stream = NULL;
-
-    xml_t *p_xml = NULL;
-    xml_reader_t *p_xml_reader = NULL;
-
-    char *psz_eltname = NULL;
-    char *psz_eltvalue = NULL;
-    char *psz_name = NULL;
-    char *psz_value = NULL;
-
-    struct update_release_t *p_release = NULL;
-    struct update_release_t tmp_release;
-    struct update_file_t tmp_file;
-
-    vlc_bool_t b_os = VLC_FALSE, b_arch = VLC_FALSE;
-
-    memset( &tmp_release, 0, sizeof(struct update_release_t) );
-    memset( &tmp_file, 0, sizeof(struct update_file_t) );
-
-    tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
+    int i_major = 0;
+    int i_minor = 0;
+    int i_revision = 0;
+    char *psz_extra = NULL;
+    char *psz_svnrev = NULL;
+    char *psz_line = NULL;
 
     vlc_mutex_lock( &p_update->lock );
-
-    if( p_update->b_releases && b_force == VLC_FALSE )
-    {
-        vlc_mutex_unlock( &p_update->lock );
-        return;
-    }
-
-    p_xml = xml_Create( p_update->p_libvlc );
-    if( !p_xml )
-    {
-        msg_Err( p_update->p_libvlc, "Failed to open XML parser" );
-        goto error;
-    }
 
     p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
@@ -443,950 +213,171 @@ static void GetFilesList( update_t *p_update, vlc_bool_t b_force )
         goto error;
     }
 
-    p_xml_reader = xml_ReaderCreate( p_xml, p_stream );
-
-    if( !p_xml_reader )
+    /* Try to read three lines */
+    if( !( psz_line = stream_ReadLine( p_stream ) ) )
     {
-        msg_Err( p_update->p_libvlc, "Failed to open %s for parsing",
+        msg_Err( p_update->p_libvlc, "Update file %s is corrupted : missing version",
                  UPDATE_VLC_STATUS_URL );
         goto error;
     }
 
-    if( p_update->p_releases )
+    /* first line : version number */
+    if( sscanf( psz_line, "%i.%i.%i%as %as", &i_major, &i_minor, &i_revision, &psz_extra, &psz_svnrev ) )
     {
-        FreeReleasesList( p_update );
+        p_update->release.i_major = i_major;
+        p_update->release.i_minor = i_minor;
+        p_update->release.i_revision = i_revision;
+
+        if( psz_svnrev )
+            p_update->release.psz_svnrev = psz_svnrev;
+        else
+            p_update->release.psz_svnrev = STRDUP( "" );
+
+        if( psz_extra )
+            p_update->release.psz_extra = psz_extra;
+        else
+            p_update->release.psz_extra = STRDUP( "" );
+    }
+    else
+    {
+        msg_Err( p_update->p_libvlc, "Update version false formated" );
+        free( psz_line );
+        goto error;
     }
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    /* Second line : URL */
+    if( !( psz_line = stream_ReadLine( p_stream ) ) )
     {
-        switch( xml_ReaderNodeType( p_xml_reader ) )
-        {
-            case -1:
-                msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                         UPDATE_VLC_STATUS_URL );
-                goto error;
-
-            case XML_READER_STARTELEM:
-                psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname )
-                {
-                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                             UPDATE_VLC_STATUS_URL );
-                    goto error;
-                }
-
-                while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                {
-                    psz_name = xml_ReaderName( p_xml_reader );
-                    psz_value = xml_ReaderValue( p_xml_reader );
-
-                    if( !psz_name || !psz_value )
-                    {
-                        msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                                 UPDATE_VLC_STATUS_URL );
-                        goto error;
-                    }
-
-                    if( b_os && b_arch )
-                    {
-                        if( strcmp( psz_eltname, "version" ) == 0 )
-                        {
-                            if( !strcmp( psz_name, "major" ) )
-                                tmp_release.psz_major = STRDUP( psz_value );
-                            else if( !strcmp( psz_name, "minor" ) )
-                                tmp_release.psz_minor = STRDUP( psz_value );
-                            else if( !strcmp( psz_name, "revision" ) )
-                                tmp_release.psz_revision = STRDUP( psz_value );
-                            else if( !strcmp( psz_name, "extra" ) )
-                                tmp_release.psz_extra = STRDUP( psz_value );
-                            else if( !strcmp( psz_name, "svn" ) )
-                                tmp_release.psz_svn_revision =
-                                                           STRDUP( psz_value );
-                            else if( !strcmp( psz_name, "version" ) )
-                            {
-                                if( !strcmp( psz_value, "unstable" ) )
-                                    tmp_release.i_type =
-                                                  UPDATE_RELEASE_TYPE_UNSTABLE;
-                                else if( !strcmp( psz_value, "testing" ) )
-                                    tmp_release.i_type =
-                                                  UPDATE_RELEASE_TYPE_TESTING;
-                                else
-                                    tmp_release.i_type =
-                                                  UPDATE_RELEASE_TYPE_STABLE;
-                            }
-                        }
-                        else if( !strcmp( psz_eltname, "file" ) )
-                        {
-                            if( !strcmp( psz_name, "type" ) )
-                            {
-                                if( !strcmp( psz_value, "info" ) )
-                                    tmp_file.i_type = UPDATE_FILE_TYPE_INFO;
-                                else if( !strcmp( psz_value, "source" ) )
-                                    tmp_file.i_type = UPDATE_FILE_TYPE_SOURCE;
-                                else if( !strcmp( psz_value, "binary" ) )
-                                    tmp_file.i_type = UPDATE_FILE_TYPE_BINARY;
-                                else if( !strcmp( psz_value, "plugin" ) )
-                                    tmp_file.i_type = UPDATE_FILE_TYPE_PLUGIN;
-                                else
-                                    tmp_file.i_type = UPDATE_FILE_TYPE_UNDEF;
-                            }
-                            else if( !strcmp( psz_name, "md5" ) )
-                                tmp_file.psz_md5 = STRDUP( psz_value );
-                            else if( !strcmp( psz_name, "size" ) )
-                                tmp_file.l_size = atol( psz_value );
-                            else if( !strcmp( psz_name, "url" ) )
-                                tmp_file.psz_url = STRDUP( psz_value );
-                        }
-                    }
-                    if( !strcmp( psz_name, "name" )
-                        && ( !strcmp( psz_value, UPDATE_VLC_OS )
-                           || !strcmp( psz_value, "*" ) )
-                        && !strcmp( psz_eltname, "os" ) )
-                    {
-                        b_os = VLC_TRUE;
-                    }
-                    if( b_os && !strcmp( psz_name, "name" )
-                        && ( !strcmp( psz_value, UPDATE_VLC_ARCH )
-                           || !strcmp( psz_value, "*" ) )
-                        && !strcmp( psz_eltname, "arch" ) )
-                    {
-                        b_arch = VLC_TRUE;
-                    }
-                    FREENULL( psz_name );
-                    FREENULL( psz_value );
-                }
-                if( ( b_os && b_arch && strcmp( psz_eltname, "arch" ) ) )
-                {
-                    if( !strcmp( psz_eltname, "version" ) )
-                    {
-                        int i;
-                        /* look for a previous occurrence of this release */
-                        for( i = 0; i < p_update->i_releases; i++ )
-                        {
-                            p_release = p_update->p_releases + i;
-                            if( CompareReleases( p_release, &tmp_release )
-                                == UPDATE_RELEASE_STATUS_EQUAL )
-                            {
-                                break;
-                            }
-                        }
-                        /* if this is the first time that we see this release,
-                         * append it to the list of releases */
-                        if( i == p_update->i_releases )
-                        {
-                            tmp_release.i_status =
-                                CompareReleaseToCurrent( &tmp_release );
-                            p_update->p_releases =
-               (struct update_release_t *)realloc( p_update->p_releases,
-               (++(p_update->i_releases))*sizeof( struct update_release_t ) );
-                            p_update->p_releases[ p_update->i_releases - 1 ] =
-                                tmp_release;
-                            p_release =
-                                p_update->p_releases + p_update->i_releases - 1;
-                            tmp_release.psz_major = NULL;
-                            tmp_release.psz_minor = NULL;
-                            tmp_release.psz_revision = NULL;
-                            tmp_release.psz_extra = NULL;
-                            tmp_release.psz_svn_revision = NULL;
-                            tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
-                            tmp_release.i_status = 0;
-                            tmp_release.p_files = NULL;
-                            tmp_release.i_files = 0;
-                        }
-                        else
-                        {
-                            FREENULL( tmp_release.psz_major );
-                            FREENULL( tmp_release.psz_minor );
-                            FREENULL( tmp_release.psz_revision );
-                            FREENULL( tmp_release.psz_extra );
-                            FREENULL( tmp_release.psz_svn_revision );
-                            tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
-                            FREENULL( tmp_release.p_files );
-                            tmp_release.i_files = 0;
-                        }
-                    }
-                    else if( !strcmp( psz_eltname, "file" ) )
-                    {
-                        /* append file to p_release's file list */
-                        if( p_release == NULL )
-                        {
-                            goto error;
-                        }
-                        p_release->p_files =
-                    (struct update_file_t *)realloc( p_release->p_files,
-                    (++(p_release->i_files))*sizeof( struct update_file_t ) );
-                        p_release->p_files[ p_release->i_files - 1 ] = tmp_file;
-                        tmp_file.i_type = UPDATE_FILE_TYPE_UNDEF;
-                        tmp_file.psz_md5 = NULL;
-                        tmp_file.l_size = 0;
-                        tmp_file.psz_url = NULL;
-                        tmp_file.psz_description = NULL;
-                    }
-                }
-                FREENULL( psz_eltname );
-                break;
-
-            case XML_READER_ENDELEM:
-                psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname )
-                {
-                    msg_Err( p_update->p_libvlc, "Error while parsing %s",
-                             UPDATE_VLC_STATUS_URL );
-                    goto error;
-                }
-
-                if( !strcmp( psz_eltname, "os" ) )
-                    b_os = VLC_FALSE;
-                else if( !strcmp( psz_eltname, "arch" ) )
-                    b_arch = VLC_FALSE;
-                FREENULL( psz_eltname );
-                break;
-
-            case XML_READER_TEXT:
-                psz_eltvalue = xml_ReaderValue( p_xml_reader );
-                if( p_release && p_release->i_files )
-                    p_release->p_files[ p_release->i_files - 1 ]
-                               .psz_description = STRDUP( psz_eltvalue );
-                FREENULL( psz_eltvalue );
-                break;
-        }
+        msg_Err( p_update->p_libvlc, "Update file %s is corrupted : URL missing",
+                 UPDATE_VLC_STATUS_URL );
+        goto error;
     }
+    p_update->release.psz_url = psz_line;
 
-    p_update->b_releases = VLC_TRUE;
+
+    /* Third line : description */
+    if( !( psz_line = stream_ReadLine( p_stream ) ) )
+    {
+        msg_Err( p_update->p_libvlc, "Update file %s is corrupted : description missing",
+                 UPDATE_VLC_STATUS_URL );
+        goto error;
+    }
+    p_update->release.psz_desc = psz_line;
 
     error:
         vlc_mutex_unlock( &p_update->lock );
 
-        free( psz_eltname );
-        free( psz_eltvalue );
-        free( psz_name );
-        free( psz_value );
-
-        free( tmp_release.psz_major );
-        free( tmp_release.psz_minor );
-        free( tmp_release.psz_revision );
-        free( tmp_release.psz_extra );
-        free( tmp_release.psz_svn_revision );
-
-        free( tmp_file.psz_md5 );
-        free( tmp_file.psz_url );
-        free( tmp_file.psz_description );
-
-        if( p_xml_reader && p_xml )
-            xml_ReaderDelete( p_xml, p_xml_reader );
         if( p_stream )
             stream_Delete( p_stream );
-        if( p_xml )
-            xml_Delete( p_xml );
 }
 
 /**
  * Check for updates
  *
  * \param p_update pointer to update struct
- * \param b_force set to VLC_TRUE if you want to force the update
  * \returns nothing
  */
-void update_Check( update_t *p_update, vlc_bool_t b_force )
+void update_Check( update_t *p_update )
 {
     assert( p_update );
 
-    GetMirrorsList( p_update, b_force );
-    GetFilesList( p_update, b_force );
+    EmptyRelease( p_update );
+
+    GetUpdateFile( p_update );
+}
+
+/**
+ * Compare two integers
+ *
+ * \param p1 first integer
+ * \param p2 second integer
+ * \return like strcmp
+ */
+static int cmp( int i1, int i2 )
+{
+    if( i1 < i2 )
+        return -1;
+    else if(i1 == i2)
+        return 0;
+    else
+        return 1;
 }
 
 /**
  * Compare two release numbers
- * The comparision algorith basically performs an alphabetical order (strcmp)
- * comparision of each of the version number elements until it finds two
- * different ones. This is the tricky function.
  *
  * \param p1 first release
  * \param p2 second release
- * \return like strcmp
+ * \return UpdateReleaseStatus(Older|Equal|Newer)
  */
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 )
 {
     int d;
-    if( ( d = strcmp( p1->psz_major, p2->psz_major ) ) ) ;
-    else if( ( d = strcmp( p1->psz_minor, p2->psz_minor ) ) ) ;
-    else if( ( d = strcmp( p1->psz_revision, p2->psz_revision ) ) ) ;
+    if( ( d = cmp( p1->i_major, p2->i_major ) ) ) ;
+    else if( ( d = cmp( p1->i_minor, p2->i_minor ) ) ) ;
+    else if( ( d = cmp( p1->i_revision, p2->i_revision ) ) ) ;
     else
     {
-        d = strcmp( p1->psz_extra, p2->psz_extra );
-        if( d<0 )
+        if( p1->psz_extra[0] == '-' )
         {
-        /* FIXME:
-         * not num < NULL < num
-         * -test and -svn releases are thus always considered older than
-         * -'' or -0 releases, which is the best i could come up with */
-            char *psz_end1;
-            char *psz_end2;
-            strtol( p1->psz_extra, &psz_end1, 10 );
-            strtol( p2->psz_extra, &psz_end2, 10 );
-            if( psz_end2 == p2->psz_extra
-             && ( psz_end1 != p1->psz_extra || *p1->psz_extra == '\0' ) )
+            if( p2->psz_extra[0] == '-' )
+                d = strcmp( p1->psz_extra, p2->psz_extra );
+            else
                 d = 1;
         }
+        else
+        {
+            if( p2->psz_extra[0] == '-' )
+                d = -1;
+            else
+                d = strcmp(p1->psz_extra, p2->psz_extra );
+        }
+        if( d == 0 )
+            d = strcmp( p1->psz_svnrev, p2->psz_svnrev );
     }
+
     if( d < 0 )
-        return UPDATE_RELEASE_STATUS_OLDER;
+        return UpdateReleaseStatusOlder;
     else if( d == 0 )
-        return UPDATE_RELEASE_STATUS_EQUAL;
+        return UpdateReleaseStatusEqual;
     else
-        return UPDATE_RELEASE_STATUS_NEWER;
+        return UpdateReleaseStatusNewer;
 }
 
 /**
  * Compare a given release's version number to the current VLC's one
  *
  * \param p a release
- * \return >0 if newer, 0 if equal and <0 if older
+ * \return UpdateReleaseStatus(Older|Equal|Newer)
  */
-static int CompareReleaseToCurrent( const struct update_release_t *p )
+int update_CompareReleaseToCurrent( update_t *p_update )
 {
+    assert( p_update );
+
     struct update_release_t c;
-    int r;
+    int i_major = 0;
+    int i_minor = 0;
+    int i_revision = 0;
+    char *psz_extra;
+    int i_result = UpdateReleaseStatusOlder;
 
-    memset( &c, 0, sizeof(struct update_release_t) );
-    c.psz_major = STRDUP( PACKAGE_VERSION_MAJOR );
-    c.psz_minor = STRDUP( PACKAGE_VERSION_MINOR );
-    c.psz_revision = STRDUP( PACKAGE_VERSION_REVISION );
-    c.psz_extra = STRDUP( PACKAGE_VERSION_EXTRA );
-    r =  CompareReleases( p, &c );
-    free( c.psz_major );
-    free( c.psz_minor );
-    free( c.psz_revision );
-    free( c.psz_extra );
-    return r;
-}
-
-/*****************************************************************************
- * Updatei_iterator_t functions
- *****************************************************************************/
-
-/**
- * Create a new update iterator structure. This structure can then be used to
- * describe a position and move through the update and mirror trees/lists.
- * This will use an existing update struct or create a new one if none is
- * found
- *
- * \param p_u the calling update_t
- * \return a pointer to an update iterator
- */
-update_iterator_t *update_iterator_New( update_t *p_u )
-{
-    update_iterator_t *p_uit = NULL;
-
-    assert( p_u );
-
-    p_uit = (update_iterator_t *)malloc( sizeof( update_iterator_t ) );
-    if( p_uit == NULL ) return NULL;
-
-    p_uit->p_u = p_u;
-
-    p_uit->i_m = -1;
-    p_uit->i_r = -1;
-    p_uit->i_f = -1;
-
-    p_uit->i_t = UPDATE_FILE_TYPE_ALL;
-    p_uit->i_rs = UPDATE_RELEASE_STATUS_ALL;
-    p_uit->i_rt = UPDATE_RELEASE_TYPE_STABLE;
-
-    p_uit->file.i_type = UPDATE_FILE_TYPE_NONE;
-    p_uit->file.psz_md5 = NULL;
-    p_uit->file.psz_url = NULL;
-    p_uit->file.l_size = 0;
-    p_uit->file.psz_description = NULL;
-
-    p_uit->release.psz_version = NULL;
-    p_uit->release.psz_svn_revision = NULL;
-    p_uit->release.i_type = UPDATE_RELEASE_TYPE_UNSTABLE;
-    p_uit->release.i_status = UPDATE_RELEASE_STATUS_NONE;
-
-    p_uit->mirror.psz_name = NULL;
-    p_uit->mirror.psz_location = NULL;
-    p_uit->mirror.psz_type = NULL;
-
-    return p_uit;
-}
-
-/**
- * Delete an update iterator structure (duh!)
- *
- * \param p_uit pointer to an update iterator
- * \return nothing
- */
-void update_iterator_Delete( update_iterator_t *p_uit )
-{
-    assert( p_uit );
-
-    update_iterator_ClearData( p_uit );
-    free( p_uit );
-}
-
-/**
- * Reset an update_iterator_t structure
- *
- * \param p_uit pointer to an update iterator
- * \return UPDATE_FAIL upon error, UPDATE_SUCCESS otherwise
- */
-unsigned int update_iterator_Reset( update_iterator_t *p_uit )
-{
-    assert( p_uit );
-
-    p_uit->i_r = -1;
-    p_uit->i_f = -1;
-    p_uit->i_m = -1;
-
-    update_iterator_ClearData( p_uit );
-    return UPDATE_SUCCESS;
-}
-
-/**
- * Finds the next file in the update tree that matches status and type
- * requirements set in the update_iterator
- *
- * \param p_uit update iterator
- * \return UPDATE_FAIL if we can't find the next file, UPDATE_SUCCESS|UPDATE_FILE if we stay in the same release, UPDATE_SUCCESS|UPDATE_RELEASE|UPDATE_FILE if we change the release index
- */
-static unsigned int update_iterator_NextFile( update_iterator_t *p_uit )
-{
-    int r,f=-1,old_r;
-
-    assert( p_uit );
-    old_r=p_uit->i_r;
-
-    /* if the update iterator was already in a "no match" state, start over */
-    if( p_uit->i_r == -1 ) p_uit->i_r = 0;
-    //if( p_uit->i_f == -1 ) p_uit->i_f = 0;
-
-    vlc_mutex_lock( &p_uit->p_u->lock );
-
-    for( r = p_uit->i_r; r < p_uit->p_u->i_releases; r++ )
+    /* get the current version number */
+    if( sscanf( PACKAGE_VERSION, "%i.%i.%i%as", &i_major, &i_minor, &i_revision, &psz_extra ) )
     {
-        if( !( p_uit->p_u->p_releases[r].i_status & p_uit->i_rs ) ) continue;
-        for( f = ( r == p_uit->i_r ? p_uit->i_f + 1 : 0 );
-             f < p_uit->p_u->p_releases[r].i_files; f++ )
-        {
-            if( p_uit->p_u->p_releases[r].p_files[f].i_type & p_uit->i_t )
-            {
-                goto done;/* "double break" */
-            }
-        }
-    }
-    done:
-    p_uit->i_r = r;
-    p_uit->i_f = f;
-
-    r = p_uit->p_u->i_releases;
-
-    if( old_r == p_uit->i_r )
-    {
-        update_iterator_GetData( p_uit );
-        vlc_mutex_unlock( &p_uit->p_u->lock );
-        return UPDATE_SUCCESS|UPDATE_FILE;
-    }
-    else if( p_uit->i_r == r )
-    {
-        p_uit->i_r = -1;
-        p_uit->i_f = -1;
-        update_iterator_GetData( p_uit );
-        vlc_mutex_unlock( &p_uit->p_u->lock );
-        return UPDATE_FAIL;
-    }
-    else
-    {
-        update_iterator_GetData( p_uit );
-        vlc_mutex_unlock( &p_uit->p_u->lock );
-        return UPDATE_SUCCESS|UPDATE_RELEASE|UPDATE_FILE;
-    }
-}
-
-/**
- * Finds the previous file in the update tree that matches status and type
- * requirements set in the update_iterator
- *
- * \param p_uit update iterator
- * \return UPDATE_FAIL if we can't find the previous file, UPDATE_SUCCESS|UPDATE_FILE if we stay in the same release, UPDATE_SUCCESS|UPDATE_RELEASE|UPDATE_FILE if we change the release index
- */
-//TODO: test
-static unsigned int update_iterator_PrevFile( update_iterator_t *p_uit )
-{
-    int r,f=-1,old_r;
-
-    if( !p_uit ) return UPDATE_FAIL;
-
-    old_r=p_uit->i_r;
-
-    /* if the update iterator was already in a "no match" state, start over
-     * (begin at the end of the list) */
-    if( p_uit->i_r == -1 ) p_uit->i_r = p_uit->p_u->i_releases - 1;
-    p_uit->i_f = p_uit->p_u->p_releases[p_uit->i_r].i_files + 1;
-
-    vlc_mutex_lock( &p_uit->p_u->lock );
-
-    for( r = p_uit->i_r; r >= 0; r-- )
-    {
-        if( !( p_uit->p_u->p_releases[r].i_status & p_uit->i_rs ) ) continue;
-        for( f =( r==p_uit->i_r ? p_uit->i_f - 1 : p_uit->p_u->p_releases[r].i_files );
-             f >= 0; f-- )
-        {
-            if( p_uit->p_u->p_releases[r].p_files[f].i_type & p_uit->i_t )
-            {
-                goto done;/* "double break" */
-            }
-        }
-    }
-    done:
-    p_uit->i_r = r;
-    p_uit->i_f = f;
-
-    r = p_uit->p_u->i_releases;
-
-    if( old_r == p_uit->i_r )
-    {
-        update_iterator_GetData( p_uit );
-        vlc_mutex_unlock( &p_uit->p_u->lock );
-        return UPDATE_SUCCESS|UPDATE_FILE;
-    }
-    else if( p_uit->i_r == -1 )
-    {
-        p_uit->i_r = -1;
-        p_uit->i_f = -1;
-        update_iterator_GetData( p_uit );
-        vlc_mutex_unlock( &p_uit->p_u->lock );
-        return UPDATE_FAIL;
-    }
-    else
-    {
-        update_iterator_GetData( p_uit );
-        vlc_mutex_unlock( &p_uit->p_u->lock );
-        return UPDATE_SUCCESS|UPDATE_RELEASE|UPDATE_FILE;
-    }
-}
-
-/**
- * Finds the next mirror in the update tree
- *
- * \param update iterator
- * \return UPDATE_FAIL if we can't find the next mirror, UPDATE_SUCCESS|UPDATE_MIRROR otherwise
- */
-static unsigned int update_iterator_NextMirror( update_iterator_t *p_uit )
-{
-    if( !p_uit ) return UPDATE_FAIL;
-    vlc_mutex_lock( &p_uit->p_u->lock );
-    p_uit->i_m++;
-    if( p_uit->i_m >= p_uit->p_u->i_mirrors ) p_uit->i_m = -1;
-    update_iterator_GetData( p_uit );
-    vlc_mutex_unlock( &p_uit->p_u->lock );
-    return p_uit->i_m == -1 ? UPDATE_FAIL : UPDATE_SUCCESS|UPDATE_MIRROR;
-}
-
-/**
- * Finds the previous mirror in the update tree
- *
- * \param update iterator
- * \return UPDATE_FAIL if we can't find a previous mirror, UPDATE_SUCCESS|UPDATE_MIRROR otherwise
- */
-static unsigned int update_iterator_PrevMirror( update_iterator_t *p_uit )
-{
-    if( !p_uit ) return UPDATE_FAIL;
-    vlc_mutex_lock( &p_uit->p_u->lock );
-    p_uit->i_m--;
-    update_iterator_GetData( p_uit );
-    vlc_mutex_unlock( &p_uit->p_u->lock );
-    return p_uit->i_m == -1 ? UPDATE_FAIL : UPDATE_SUCCESS|UPDATE_MIRROR;
-}
-
-/**
- * Change the update iterator's position in the file and mirrors tree
- * If position is negative, don't change it
- *
- * \param i_m position in mirrors list
- * \param i_r position in releases list
- * \param i_f position in release's files list
- * \return UPDATE_FAIL when changing position fails or position wasn't changed, a combination of UPDATE_MIRROR, UPDATE_RELEASE and UPDATE_FILE otherwise
- */
-unsigned int update_iterator_ChooseMirrorAndFile( update_iterator_t *p_uit,
-                                        int i_m, int i_r, int i_f )
-{
-    unsigned int i_val = 0;
-
-    if( !p_uit ) return 0;
-    vlc_mutex_lock( &p_uit->p_u->lock );
-
-    if( i_m >= 0 )
-    {
-        if( i_m < p_uit->p_u->i_mirrors )
-        {
-            if( i_m != p_uit->i_m )
-                i_val |= UPDATE_MIRROR;
-            p_uit->i_m = i_m;
-        }
-        else i_m = -1;
-    }
-
-    if( i_r >= 0 )
-    {
-        if( i_r < p_uit->p_u->i_releases )
-        {
-            if( i_r != p_uit->i_r )
-                i_val |= UPDATE_FILE;
-            p_uit->i_r = i_r;
-        }
-        else i_r = -1;
-    }
-
-    if( i_f >= 0 )
-    {
-        if( i_r >= 0 && i_r < p_uit->p_u->i_releases
-            && i_f < p_uit->p_u->p_releases[p_uit->i_r].i_files )
-        {
-            if( i_f != p_uit->i_f )
-                i_val |= UPDATE_FILE;
-            p_uit->i_f = i_f;
-        }
-        else i_f = -1;
-    }
-
-    update_iterator_GetData( p_uit );
-    vlc_mutex_unlock( &p_uit->p_u->lock );
-
-    if(    ( i_m < 0 || p_uit->i_m >= 0 )
-        && ( i_r < 0 || p_uit->i_r >= 0 )
-        && ( i_f < 0 || p_uit->i_f >= 0 ) )
-    {
-        /* Everything worked */
-        return UPDATE_SUCCESS|i_val;
-    }
-    else
-    {
-        /* Something failed */
-        return UPDATE_FAIL;
-    }
-}
-
-/**
- * Fills the iterator data (file, release and mirror structs)
- * The update struct should be locked before calling this function.
- *
- * \param p_uit update iterator
- * \return nothing
- */
-static void update_iterator_GetData( update_iterator_t *p_uit )
-{
-    struct update_release_t *p_r = NULL;
-    struct update_file_t *p_f = NULL;
-    struct update_mirror_t *p_m = NULL;
-
-    update_iterator_ClearData( p_uit );
-
-    if( p_uit->i_m >= 0 )
-    {
-        p_m = p_uit->p_u->p_mirrors + p_uit->i_m;
-        p_uit->mirror.psz_name = STRDUP( p_m->psz_name );
-        p_uit->mirror.psz_location = STRDUP( p_m->psz_location );
-        p_uit->mirror.psz_type = STRDUP( p_m->psz_type );
-    }
-
-    if( p_uit->i_r >= 0 )
-    {
-        p_r = p_uit->p_u->p_releases + p_uit->i_r;
-        asprintf( &p_uit->release.psz_version, "%s.%s.%s-%s",
-                                              p_r->psz_major,
-                                              p_r->psz_minor,
-                                              p_r->psz_revision,
-                                              p_r->psz_extra );
-        p_uit->release.psz_svn_revision = STRDUP( p_r->psz_svn_revision );
-        p_uit->release.i_type = p_r->i_type;
-        p_uit->release.i_status = p_r->i_status;
-        if( p_uit->i_f >= 0 )
-        {
-            p_f = p_r->p_files + p_uit->i_f;
-            p_uit->file.i_type = p_f->i_type;
-            p_uit->file.psz_md5 = STRDUP( p_f->psz_md5 );
-            p_uit->file.l_size = p_f->l_size;
-            p_uit->file.psz_description = STRDUP( p_f->psz_description);
-            if( p_f->psz_url[0] == '/' )
-            {
-                if( p_m )
-                {
-                    asprintf( &p_uit->file.psz_url, "%s%s",
-                              p_m->psz_base_url, p_f->psz_url );
-                }
-            }
-            else
-            {
-                p_uit->file.psz_url = STRDUP( p_f->psz_url );
-            }
-        }
-    }
-}
-
-/**
- * Clears the iterator data (file, release and mirror structs)
- *
- * \param p_uit update iterator
- * \return nothing
- */
-static void update_iterator_ClearData( update_iterator_t *p_uit )
-{
-    p_uit->file.i_type = UPDATE_FILE_TYPE_NONE;
-    FREENULL( p_uit->file.psz_md5 );
-    p_uit->file.l_size = 0;
-    FREENULL( p_uit->file.psz_description );
-    FREENULL( p_uit->file.psz_url );
-    FREENULL( p_uit->release.psz_version );
-    FREENULL( p_uit->release.psz_svn_revision );
-    p_uit->release.i_type = UPDATE_RELEASE_TYPE_UNSTABLE;
-    p_uit->release.i_status = UPDATE_RELEASE_STATUS_NONE;
-    FREENULL( p_uit->mirror.psz_name );
-    FREENULL( p_uit->mirror.psz_location );
-    FREENULL( p_uit->mirror.psz_type );
-}
-
-/**
- * Perform an action on the update iterator
- * Only the first matching action is performed.
- *
- * \param p_uit update iterator
- * \param i_action update action bitmask. can be a combination of UPDATE_NEXT, UPDATE_PREV, UPDATE_MIRROR, UPDATE_RELEASE, UPDATE_FILE, UPDATE_RESET
- * \return UPDATE_FAIL if action fails, UPDATE_SUCCESS|(combination of UPDATE_MIRROR, UPDATE_RELEASE and UPDATE_FILE if these changed) otherwise
- */
-unsigned int update_iterator_Action( update_iterator_t *p_uit, int i_action )
-{
-    if( i_action & UPDATE_RESET )
-    {
-        return update_iterator_Reset( p_uit );
-    }
-    else
-    if( i_action & UPDATE_MIRROR )
-    {
-        if( i_action & UPDATE_PREV )
-        {
-            return update_iterator_PrevMirror( p_uit );
-        }
+        c.i_major = i_major;
+        c.i_minor = i_minor;
+        c.i_revision = i_revision;
+        if( psz_extra )
+            c.psz_extra = psz_extra;
         else
-        {
-            return update_iterator_NextMirror( p_uit );
-        }
+            c.psz_extra = STRDUP( "" );
+        c.psz_svnrev = STRDUP( VLC_Changeset() );
+
+        i_result = CompareReleases( &p_update->release, &c );
+
+        free( c.psz_extra );
+        free( c.psz_svnrev );
     }
-    /*else if( i_action & UPDATE_RELEASE )
-    {
-        if( i_action & UPDATE_PREV )
-        {
-            return update_iterator_PrevRelease( p_uit );
-        }
-        else
-        {
-            return update_iterator_NextRelease( p_uit );
-        }
-    }*/
-    else if( i_action & UPDATE_FILE )
-    {
-        if( i_action & UPDATE_PREV )
-        {
-            return update_iterator_PrevFile( p_uit );
-        }
-        else
-        {
-            return update_iterator_NextFile( p_uit );
-        }
-    }
-    else
-    {
-        return UPDATE_SUCCESS;
-    }
-}
-
-/**
- * Object to launch download thread in a different object
- */
-typedef struct {
-    VLC_COMMON_MEMBERS
-    char *psz_dest;     //< Download destination
-    struct update_file_t src;  //< Download source
-    char *psz_status;   //< Download status displayed in progress dialog
-} download_thread_t;
-
-void update_download_for_real( download_thread_t *p_this );
-
-/**
- * Download the file selected by the update iterator. This function will
- * launch the download in a new thread (downloads can be long)
- *
- * \param p_uit update iterator
- * \param psz_dest destination file path
- * \return nothing
- */
-void update_download( update_iterator_t *p_uit, const char *psz_dest )
-{
-    download_thread_t *p_dt =
-        vlc_object_create( p_uit->p_u->p_libvlc, sizeof( download_thread_t ) );
-
-    p_dt->psz_dest = strdup( psz_dest );
-    p_dt->src.i_type = p_uit->file.i_type;
-    p_dt->src.l_size = p_uit->file.l_size;
-    p_dt->src.psz_md5 = STRDUP( p_uit->file.psz_md5 );
-    p_dt->src.psz_url = STRDUP( p_uit->file.psz_url );
-    p_dt->src.psz_description = STRDUP( p_uit->file.psz_description );
-    asprintf( &p_dt->psz_status, "%s - %s (%s)\nSource: %s\nDestination: %s",
-              p_uit->file.psz_description, p_uit->release.psz_version,
-              p_uit->release.psz_svn_revision, p_uit->file.psz_url,
-              psz_dest);
-
-    vlc_thread_create( p_dt, "download thread", update_download_for_real,
-                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
-}
-
-/**
- * Convert a long int size in bytes to a string
- *
- * \param l_size the size in bytes
- * \return the size as a string
- */
-static char *size_str( long int l_size )
-{
-    char *psz_tmp;
-    if( l_size>> 30 )
-        asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
-    if( l_size >> 20 )
-        asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
-    else if( l_size >> 10 )
-        asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
-    else
-        asprintf( &psz_tmp, "%ld B", l_size );
-    return psz_tmp;
-}
-
-/**
- * The true download function.
- *
- * \param p_this the download_thread_t object
- * \return nothing
- */
-void update_download_for_real( download_thread_t *p_this )
-{
-    char *psz_dest = p_this->psz_dest;
-    char *psz_src = p_this->src.psz_url;
-    stream_t *p_stream;
-    libvlc_int_t *p_libvlc = p_this->p_libvlc;
-
-    FILE *p_file = NULL;
-    void *p_buffer;
-
-    char *psz_status;
-
-    int i_progress;
-    long int l_size, l_done = 0;
-
-    vlc_thread_ready( p_this );
-
-    asprintf( &psz_status, "%s\nDownloading... 0.0/? %.1f%% done",
-              p_this->psz_status, 0.0 );
-    i_progress = intf_UserProgress( p_libvlc, "Downloading...",
-                                    psz_status, 0.0, 0 );
-
-    p_stream = stream_UrlNew( p_libvlc, psz_src );
-    if( !p_stream )
-    {
-        msg_Err( p_libvlc, "Failed to open %s for reading", psz_src );
-        intf_UserFatal( p_libvlc, VLC_TRUE, "Download Error",
-                        "VLC failed to open %s for reading.", psz_src );
-        intf_UserHide( p_libvlc, i_progress );
-    }
-    else
-    {
-        l_size = stream_Size(p_stream);
-        if( l_size != p_this->src.l_size )
-        {
-            stream_Delete( p_stream );
-            free( psz_status );
-            msg_Err( p_this,    "%s hasn't a correct size (%li instead of %li)."
-                                " Cancelling download.",
-                                p_this->src.psz_description,
-                                l_size,
-                                p_this->src.l_size );
-            goto end;
-        }
-        p_file = utf8_fopen( psz_dest, "w" );
-        if( !p_file )
-        {
-            msg_Err( p_libvlc, "Failed to open %s for writing", psz_dest );
-            intf_UserFatal( p_libvlc, VLC_TRUE, "Download Error",
-                            "VLC failed to open %s for writing.", psz_dest );
-            intf_UserHide( p_libvlc, i_progress );
-        }
-        else
-        {
-            int i_read;
-            char *psz_s1; char *psz_s2;
-            struct md5_s md5_s;
-
-            p_buffer = (void *)malloc( 1<<10 );
-            if( p_buffer )
-            {
-                if( p_this->src.i_type & ( UPDATE_FILE_TYPE_SOURCE | UPDATE_FILE_TYPE_BINARY | UPDATE_FILE_TYPE_PLUGIN ) )
-                    InitMD5( &md5_s );
-                while( ( i_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
-                {
-                    float f_progress;
-
-                    fwrite( p_buffer, i_read, 1, p_file );
-                    if( p_this->src.i_type & ( UPDATE_FILE_TYPE_SOURCE | UPDATE_FILE_TYPE_BINARY | UPDATE_FILE_TYPE_PLUGIN ) )
-                        AddMD5( &md5_s, p_buffer, (size_t) i_read );
-
-                    l_done += i_read;
-                    free( psz_status );
-                    f_progress = 100.0*(float)l_done/(float)l_size;
-                    psz_s1 = size_str( l_done );
-                    psz_s2 = size_str( l_size );
-                    asprintf( &psz_status, "%s\nDownloading... %s/%s (%.1f%%) done",
-                            p_this->psz_status, psz_s1, psz_s2, f_progress );
-                    free( psz_s1 );
-                    free( psz_s2 );
-
-                    intf_ProgressUpdate( p_libvlc, i_progress,
-                                        psz_status, f_progress, 0 );
-                }
-                free( p_buffer );
-            }
-            fclose( p_file );
-            stream_Delete( p_stream );
-
-            if( l_done == p_this->src.l_size && 
-                p_this->src.i_type & ( UPDATE_FILE_TYPE_SOURCE |
-                UPDATE_FILE_TYPE_BINARY | UPDATE_FILE_TYPE_PLUGIN ) )
-            {
-                EndMD5( &md5_s );
-                char *psz_md5 = psz_md5_hash( &md5_s );
-                if( !p_this->src.psz_md5 || !psz_md5 ||
-                    strncmp( psz_md5, p_this->src.psz_md5, 32 ) )
-                {
-                    msg_Err( p_this, _("%s has an incorrect checksum, download failed or mirror is compromised.\n Please run an antivirus on %s, and report if that file is trojaned.\n If not, please try later."),
-                    p_this->src.psz_description, psz_dest );
-                }
-                free( psz_md5 );
-            }
-
-            free( psz_status );
-            psz_s2 = size_str( l_size );
-            asprintf( &psz_status, "%s\nDone %s (100.00%%)",
-                       p_this->psz_status, psz_s2 );
-            free( psz_s2 );
-            intf_ProgressUpdate( p_libvlc, i_progress, psz_status, 100.0, 0 );
-            free( psz_status );
-        }
-    }
-
-end:
-    free( p_this->psz_dest );
-    free( p_this->src.psz_url );
-    free( p_this->src.psz_description );
-    free( p_this->src.psz_md5 );
-    free( p_this->psz_status );
-
-    vlc_object_destroy( p_this );
+    return i_result;
 }

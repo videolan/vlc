@@ -29,7 +29,7 @@
 #include "util/qvlcframe.hpp"
 
 class QPushButton;
-class QCheckBox;
+class QTextBrowser;
 
 class HelpDialog : public QVLCFrame
 {
@@ -44,7 +44,7 @@ public:
     virtual ~HelpDialog();
 
 private:
-    HelpDialog( intf_thread_t *);
+    HelpDialog( intf_thread_t * );
     static HelpDialog *instance;
 public slots:
     void close();
@@ -58,13 +58,13 @@ public:
     static AboutDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new AboutDialog( p_intf);
+            instance = new AboutDialog( p_intf );
         return instance;
     }
     virtual ~AboutDialog();
 
 private:
-    AboutDialog( intf_thread_t *);
+    AboutDialog( intf_thread_t * );
     static AboutDialog *instance;
 public slots:
     void close();
@@ -77,22 +77,17 @@ class UpdateDialog : public QVLCFrame
 public:
     static UpdateDialog * getInstance( intf_thread_t *p_intf )
     {
-        if( !instance)
-            instance = new UpdateDialog( p_intf);
+        if( !instance )
+            instance = new UpdateDialog( p_intf );
         return instance;
     }
     virtual ~UpdateDialog();
 
 private:
-    UpdateDialog( intf_thread_t *);
+    UpdateDialog( intf_thread_t * );
     static UpdateDialog *instance;
-    QPushButton *updateButton;
-    QCheckBox *checkInfo;
-    QCheckBox *checkSource;
-    QCheckBox *checkBinary;
-    QCheckBox *checkPlugin;
     update_t *p_update;
-    bool b_updated;
+    QTextBrowser *updateBrowser;
 private slots:
     void close();
     void updateOrUpload();
