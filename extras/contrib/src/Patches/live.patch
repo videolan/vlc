@@ -114,3 +114,26 @@ diff -ru live/groupsock/NetInterface.cpp live-patched/groupsock/NetInterface.cpp
  }
  
  Boolean RTSPClient::parseGetParameterHeader(char const* line, 
+--- live/liveMedia/RTSPClient.cpp	2007-04-28 16:02:39.000000000 +0200
++++ live-patched/liveMedia/RTSPClient.cpp	2007-12-10 10:42:00.000000000 +0100
+@@ -2074,7 +2076,8 @@ Boolean RTSPClient::getResponse(char con
+ unsigned RTSPClient::getResponse1(char*& responseBuffer,
+ 				  unsigned responseBufferSize) {
+   struct sockaddr_in fromAddress;
+-  
++  struct timeval timeout;
++
+   if (responseBufferSize == 0) return 0; // just in case...
+   responseBuffer[0] = '\0'; // ditto
+ 
+@@ -2084,7 +2087,9 @@ unsigned RTSPClient::getResponse1(char*&
+   Boolean success = False;
+   while (1) {
+     unsigned char firstByte;
+-    if (readSocket(envir(), fInputSocketNum, &firstByte, 1, fromAddress)
++    timeout.tv_sec = 5;
++    timeout.tv_usec = 0;
++    if (readSocket(envir(), fInputSocketNum, &firstByte, 1, fromAddress, &timeout)
+ 	!= 1) break;
+     if (firstByte != '$') {
+       // Normal case: This is the start of a regular response; use it:

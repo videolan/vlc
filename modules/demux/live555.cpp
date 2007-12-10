@@ -552,6 +552,12 @@ describe:
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             goto createnew;
         }
+        else
+        {
+            msg_Info( p_demux, "connection timeout, retrying" );
+            if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
+            goto createnew;
+        }
         i_ret = VLC_EGENERIC;
     }
     if( psz_url ) free( psz_url );
