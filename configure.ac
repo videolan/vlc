@@ -217,6 +217,10 @@ case "${host_os}" in
 
         with_macosx_sdk="yes"
         echo "  Assuming --with-macosx-sdk"
+
+        enable_screen="no"
+		echo "  Attention: Screen Capturing is not available"
+        echo "  Assuming --disable-screen"
     fi
     if test ".`uname -p`" = ".i386"; then
         dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
