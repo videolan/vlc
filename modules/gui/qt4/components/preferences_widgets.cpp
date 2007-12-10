@@ -354,6 +354,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
+    combo->setMinimumWidth( 80 );
     finish( bycat );
     if( !l )
     {
@@ -464,6 +465,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
+    combo->setMinimumWidth( 80 );
     finish( bycat );
     if( !l )
     {
@@ -797,6 +799,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
+    combo->setMinimumWidth( 80 );
     finish( bycat );
     if( !l )
     {
@@ -896,7 +899,8 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
                     VFloatConfigControl( _p_this, _p_item, _parent )
 {
     label = new QLabel( qtr(p_item->psz_text) );
-    spin = new QDoubleSpinBox; spin->setMinimumWidth( 80 );
+    spin = new QDoubleSpinBox; 
+    spin->setMinimumWidth( 80 );
     spin->setMaximumWidth( 90 );
     spin->setAlignment( Qt::AlignRight );
     finish();

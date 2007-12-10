@@ -35,7 +35,6 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
-#include <QScrollArea>
 #include <QMessageBox>
 #include <QDialogButtonBox>
 
