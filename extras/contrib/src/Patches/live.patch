@@ -131,7 +131,7 @@ diff -ru live/groupsock/NetInterface.cpp live-patched/groupsock/NetInterface.cpp
    while (1) {
      unsigned char firstByte;
 -    if (readSocket(envir(), fInputSocketNum, &firstByte, 1, fromAddress)
-+    timeout.tv_sec = 5;
++    timeout.tv_sec = 30;
 +    timeout.tv_usec = 0;
 +    if (readSocket(envir(), fInputSocketNum, &firstByte, 1, fromAddress, &timeout)
  	!= 1) break;
