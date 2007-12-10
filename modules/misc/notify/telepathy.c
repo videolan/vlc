@@ -51,6 +51,8 @@ static void Close   ( vlc_object_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
+static int StateChange( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 static int SendToTelepathy( intf_thread_t *, const char * );
 
 /*****************************************************************************
@@ -128,6 +130,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    p_this->b_dead = VLC_TRUE;
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist = pl_Yield( p_this );
 
@@ -137,8 +140,12 @@ static void Close( vlc_object_t *p_this )
     /* Do not check for VLC_ENOMEM as we're closing */
     SendToTelepathy( p_intf, "" );
 
+    PL_LOCK;
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    if( p_playlist->p_input )
+        var_DelCallback( p_playlist->p_input, "state", StateChange, p_intf );
+    PL_UNLOCK;
     pl_Release( p_this );
 
     /* we won't use the DBus connection anymore */
@@ -158,6 +165,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     intf_thread_t *p_intf = (intf_thread_t *)param;
     char *psz_buf = NULL;
     input_thread_t *p_input;
+
+    if( p_intf->b_dead )
+        return VLC_EGENERIC;
 
     /* Don't update Telepathy presence each time an item has been preparsed */
     if( !strncmp( "playlist-current", psz_var, 16 ) )
@@ -199,8 +209,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         }
     }
 
+    if( !strncmp( "playlist-current", psz_var, 16 ) )
+        var_AddCallback( p_input, "state", StateChange, p_intf );
+
     /* We format the string to be displayed */
     psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
+
     /* We don't need the input anymore */
     vlc_object_release( p_input );
 
@@ -210,6 +224,20 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         return VLC_ENOMEM;
     }
     free( psz_buf );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * StateChange: State change callback
+ *****************************************************************************/
+static int StateChange( vlc_object_t *p_this, const char *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    if( p_intf->b_dead )
+        return VLC_EGENERIC;
+    if( newval.i_int >= END_S )
+        return SendToTelepathy( p_intf, "" );
     return VLC_SUCCESS;
 }
 
