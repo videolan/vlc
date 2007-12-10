@@ -374,6 +374,9 @@ if test "${with_macosx_sdk}" != "no" ; then
     OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; OBJCFLAGS="${OBJCFLAGS_save}"
     MACOSX_DEPLOYMENT_TARGET="10.4"
     export MACOSX_DEPLOYMENT_TARGET
+else
+    MACOSX_DEPLOYMENT_TARGET="10.4"
+    export MACOSX_DEPLOYMENT_TARGET
 fi
 
 dnl
