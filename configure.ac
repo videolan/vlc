@@ -215,12 +215,8 @@ case "${host_os}" in
         enable_xvideo="no"
         echo "  Assuming --disable-xvideo"
 
-        with_macosx_sdk="yes"
-        echo "  Assuming --with-macosx-sdk"
-
-        enable_screen="no"
-		echo "  Attention: Screen Capturing is not available"
-        echo "  Assuming --disable-screen"
+        with_macosx_sdk="no"
+        echo "  Compiling without SDK usage"
     fi
     if test ".`uname -p`" = ".i386"; then
         dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
@@ -372,7 +368,7 @@ if test "${with_macosx_sdk}" != "no" ; then
     CC="${CC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
     CXX="${CXX} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
     OBJC="${OBJC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
-    LD="${LD} -syslibroot /Developer/SDKs/MacOSX10.4u.sdk"
+    LD="${LD} -syslibroot/Developer/SDKs/MacOSX10.4u.sdk"
     CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; OBJCFLAGS="${OBJCFLAGS_save}"
