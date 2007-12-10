@@ -133,17 +133,27 @@ if [ "${release}" = yes ]; then
   cppflags="${cppflags} -DHAVE_RELEASE"
 fi
 if [ "${optim}" = size ]; then
-  cppflags="${cppflags} ${cflags_optim_size} ${cflags_tuning}"
+  cflags="${cflags} ${cflags_optim_size} ${cflags_tuning}"
+  cxxflags="${cxxflags} ${cflags_optim_size} ${cflags_tuning}"
+  objcflags="${objcflags} ${cflags_optim_size} ${cflags_tuning}"
   if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
-    cppflags="${cppflags} ${cflags_optim_nodebug}"
+    cflags="${cflags} ${cflags_optim_nodebug}"
+    cxxflags="${cxxflags} ${cflags_optim_nodebug}"
+    objcflags="${objcflags} ${cflags_optim_nodebug}"
   fi
 elif [ "${optim}" = speed ]; then
-  cppflags="${cppflags} ${cflags_optim_speed} ${cflags_tuning}"
+  cflags="${cflags} ${cflags_optim_speed} ${cflags_tuning}"
+  cxxflags="${cxxflags} ${cflags_optim_speed} ${cflags_tuning}"
+  objcflags="${objcflags} ${cflags_optim_speed} ${cflags_tuning}"
   if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
-    cppflags="${cppflags} ${cflags_optim_nodebug}"
+    cflags="${cflags} ${cflags_optim_nodebug}"
+    cxxflags="${cxxflags} ${cflags_optim_nodebug}"
+    objcflags="${objcflags} ${cflags_optim_nodebug}"
   fi
 else
-  cppflags="${cppflags} ${cflags_nooptim}"
+  cflags="${cflags} ${cflags_nooptim}"
+  cxxflags="${cxxflags} ${cflags_nooptim}"
+  objcflags="${objcflags} ${cflags_nooptim}"
 fi
 
 #
@@ -187,6 +197,9 @@ while test $# -gt 0; do
       ;;
     --cflags)
       echo_cflags=yes
+      ;;
+    --cppflags)
+      echo_cppflags=yes
       ;;
     --cxxflags)
       echo_cxxflags=yes
