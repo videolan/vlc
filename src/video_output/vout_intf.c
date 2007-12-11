@@ -1144,8 +1144,6 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     var_Get( p_vout, "crop", &val );
     return CropCallback( p_this, "crop", val, val, 0 );
-
-    return VLC_SUCCESS;
 }
 
 static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
