@@ -49,8 +49,6 @@ SOURCES_macosx = \
 	embeddedwindow.m \
 	fspanel.m \
 	fspanel.h \
-	update.h \
-	update.m \
 	eyetv.h \
 	eyetv.m \
 	$(NULL)
