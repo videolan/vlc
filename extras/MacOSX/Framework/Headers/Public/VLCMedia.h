@@ -120,17 +120,18 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  * will be automatically released.
  * \see initWithMediaURL
  */
-+ (id)mediaWithURL:(NSString *)anURL;
++ (id)mediaWithURL:(NSURL *)anURL;
++ (id)mediaWithPath:(NSString *)aPath;
 
 /* Initializers */
 /**
  * Initializes a new VLCMedia object to use the specified URL.  Will return nil if
  * the specified URL references a directory that does not comply with DVD file
  * structure.
- * \param anURL URL to media to be accessed.
+ * \param aPath URL to media to be accessed.
  * \return A new VLCMedia object, only if there were no errors.
  */
-- (id)initWithURL:(NSString *)anURL;
+- (id)initWithPath:(NSString *)aPath;
 
 /**
  * Returns an NSComparisonResult value that indicates the lexical ordering of 

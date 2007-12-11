@@ -113,17 +113,17 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 @end
 
 @implementation VLCMedia
-+ (id)mediaWithURL:(NSString *)aURL;
++ (id)mediaWithPath:(NSString *)aPath;
 {
-    // For some unknown reason, compiler kept shooting me a warning saying:
-    //  warning: passing argument 1 of 'initWithURL:' from distinct Objective-C type
-    // Research on the net shows that the error means that the argument passed
-    // is not compatible with the expected argument.  Doesn't make sense, however
-    // the warning goes away when it is casted it with "id".
-    return [[[VLCMedia alloc] initWithURL:(id)aURL] autorelease];
+    return [[[VLCMedia alloc] initWithPath:(id)aPath] autorelease];
 }
 
-- (id)initWithURL:(NSString *)aURL
++ (id)mediaWithURL:(NSURL *)aURL;
+{
+    return [[[VLCMedia alloc] initWithPath:(id)[aURL path] autorelease];
+}
+
+- (id)initWithPath:(NSString *)aPath
 {        
     if (self = [super init])
     {
@@ -138,7 +138,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         
         url = [aURL copy];
         delegate = nil;
-        metaDictionary = nil;
+        metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
         
         // This value is set whenever the demuxer figures out what the length is.
         // TODO: Easy way to tell the length of the movie without having to instiate the demuxer.  Maybe cached info?
