@@ -60,6 +60,8 @@ resource 'STR#' (127)
         /* 3GPP2 */
         "3GPP2 audio",
         "3GPP2 video",
+        /* DIVX */
+        "DivX video",
     };
 };
 
@@ -104,6 +106,8 @@ resource 'STR#' (128,"MIME Type")
         /* 3GPP2 */
         "audio/3gpp2", "3g2,3gpp2",
         "video/3gpp2", "3g2,3gpp2",
+        /* DIVX */
+        "video/divx", "divx",
     };
 };
 

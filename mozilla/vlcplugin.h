@@ -162,5 +162,7 @@ private:
     /* 3GPP2 */ \
     "audio/3gpp2:3g2,3gpp2:3GPP2 audio;" \
     "video/3gpp2:3g2,3gpp2:3GPP2 video;" \
+    /* DIVX */ \
+    "video/divx:divx:DivX video;"
 
 #endif
