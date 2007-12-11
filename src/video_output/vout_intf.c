@@ -187,11 +187,79 @@ int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
 /*****************************************************************************
  * vout_IntfInit: called during the vout creation to initialise misc things.
  *****************************************************************************/
+static const struct
+{
+    double f_value;
+    const char *psz_label;
+} p_zoom_values[] = {
+    { 0.25, N_("1:4 Quarter") },
+    { 0.5, N_("1:2 Half") },
+    { 1, N_("1:1 Original") },
+    { 2, N_("2:1 Double") },
+    { 0, NULL } };
+
+static const struct
+{
+    const char *psz_value;
+    const char *psz_label;
+} p_crop_values[] = {
+    { "", N_("Default") },
+    { "1:1", "1:1" },
+    { "4:3", "4:3" },
+    { "16:9", "16:9" },
+    { "16:10", "16:10" },
+    { "5:4", "5:4" },
+    { "5:3", "5:3" },
+    { "1.85:1", "1.85:1" },
+    { "221:100", "2.21:1" },
+    { "235:100", "2.35:1" },
+    { "239:100", "2.39:1" },
+    { NULL, NULL } };
+
+static const struct
+{
+    const char *psz_value;
+    const char *psz_label;
+} p_aspect_ratio_values[] = {
+    { "", N_("Default") },
+    { "1:1", "1:1" },
+    { "4:3", "4:3" },
+    { "16:9", "16:9" },
+    { "16:10", "16:10" },
+    { "221:100", "2.21:1" },
+    { "5:4", "5:4" },
+    { NULL, NULL } };
+
+static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
+                             char *psz_list )
+{
+    if( psz_list && *psz_list )
+    {
+        char *psz_cur = psz_list;
+        char *psz_next;
+        while( psz_cur && *psz_cur )
+        {
+            vlc_value_t val, text;
+            psz_next = strchr( psz_cur, ',' );
+            if( psz_next )
+            {
+                *psz_next = '\0';
+                psz_next++;
+            }
+            val.psz_string = psz_cur;
+            text.psz_string = psz_cur;
+            var_Change( p_vout, psz_var, VLC_VAR_ADDCHOICE, &val, &text);
+            psz_cur = psz_next;
+        }
+    }
+}
+
 void vout_IntfInit( vout_thread_t *p_vout )
 {
     vlc_value_t val, text, old_val;
     vlc_bool_t b_force_par = VLC_FALSE;
     char *psz_buf;
+    int i;
 
     /* Create a few object variables we'll need later on */
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -207,20 +275,16 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "align", &val );
-    p_vout->i_alignment = val.i_int;
+    p_vout->i_alignment = var_CreateGetInteger( p_vout, "align" );
 
     var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    var_Create( p_vout, "video-title-show", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "video-title-timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "video-title-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
-    p_vout->b_title_show = var_GetBool( p_vout, "video-title-show" );
-    p_vout->i_title_timeout = (mtime_t) var_GetInteger( p_vout, "video-title-timeout" );
-    p_vout->i_title_position = var_GetInteger( p_vout, "video-title-position" );
+    p_vout->b_title_show = var_CreateGetBool( p_vout, "video-title-show" );
+    p_vout->i_title_timeout =
+        (mtime_t)var_CreateGetInteger( p_vout, "video-title-timeout" );
+    p_vout->i_title_position =
+        var_CreateGetInteger( p_vout, "video-title-position" );
 
     var_AddCallback( p_vout, "video-title-show", TitleCallback, NULL );
     var_AddCallback( p_vout, "video-title-timeout", TitleCallback, NULL );
@@ -234,24 +298,17 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text, NULL );
 
     var_Get( p_vout, "zoom", &old_val );
-    if( old_val.f_float == 0.25 ||
-        old_val.f_float == 0.5 ||
-        old_val.f_float == 1 ||
-        old_val.f_float == 2 )
+
+    for( i = 0; p_zoom_values[i].f_value; i++ )
     {
-        var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
+        if( old_val.f_float == p_zoom_values[i].f_value )
+            var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
+        val.f_float = p_zoom_values[i].f_value;
+        text.psz_string = _( p_zoom_values[i].psz_label );
+        var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
     }
 
-    val.f_float = 0.25; text.psz_string = _("1:4 Quarter");
-    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
-    val.f_float = 0.5; text.psz_string = _("1:2 Half");
-    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
-    val.f_float = 1; text.psz_string = _("1:1 Original");
-    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
-    val.f_float = 2; text.psz_string = _("2:1 Double");
-    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
-
-    var_Set( p_vout, "zoom", old_val );
+    var_Set( p_vout, "zoom", old_val ); /* Is this really needed? */
 
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
 
@@ -260,11 +317,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "crop-top", VLC_VAR_INTEGER );
     var_Create( p_vout, "crop-right", VLC_VAR_INTEGER );
     var_Create( p_vout, "crop-bottom", VLC_VAR_INTEGER );
-
-    var_SetInteger( p_vout, "crop-left", 0 );
-    var_SetInteger( p_vout, "crop-top", 0 );
-    var_SetInteger( p_vout, "crop-right", 0 );
-    var_SetInteger( p_vout, "crop-bottom", 0 );
 
     var_AddCallback( p_vout, "crop-left", CropCallback, NULL );
     var_AddCallback( p_vout, "crop-top", CropCallback, NULL );
@@ -278,54 +330,20 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Crop");
     var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text, NULL );
 
-    val.psz_string = "";
+    val.psz_string = (char*)"";
     var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
-    val.psz_string = ""; text.psz_string = _("Default");
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "1:1"; text.psz_string = "1:1";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "4:3"; text.psz_string = "4:3";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:9"; text.psz_string = "16:9";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:10"; text.psz_string = "16:10";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "5:4"; text.psz_string = "5:4";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "5:3"; text.psz_string = "5:3";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "1.85:1"; text.psz_string = "1.85:1";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "221:100"; text.psz_string = "2.21:1";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "235:100"; text.psz_string = "2.35:1";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "239:100"; text.psz_string = "2.39:1";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+
+    for( i = 0; p_crop_values[i].psz_value; i++ )
+    {
+        val.psz_string = (char*)p_crop_values[i].psz_value;
+        text.psz_string = _( p_crop_values[i].psz_label );
+        var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    }
 
     /* Add custom crop ratios */
     psz_buf = config_GetPsz( p_vout, "custom-crop-ratios" );
-    if( psz_buf && *psz_buf )
-    {
-        char *psz_cur = psz_buf;
-        char *psz_next;
-        while( psz_cur && *psz_cur )
-        {
-            psz_next = strchr( psz_cur, ',' );
-            if( psz_next )
-            {
-                *psz_next = '\0';
-                psz_next++;
-            }
-            val.psz_string = strdup( psz_cur );
-            text.psz_string = strdup( psz_cur );
-            var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text);
-            free( val.psz_string );
-            free( text.psz_string );
-            psz_cur = psz_next;
-        }
-    }
-    if( psz_buf ) free( psz_buf );
+    AddCustomRatios( p_vout, "crop", psz_buf );
+    free( psz_buf );
 
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
     var_Get( p_vout, "crop", &old_val );
@@ -373,46 +391,20 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Aspect-ratio");
     var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text, NULL );
 
-    val.psz_string = "";
+    val.psz_string = (char*)"";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_DELCHOICE, &val, 0 );
-    val.psz_string = ""; text.psz_string = _("Default");
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "1:1"; text.psz_string = "1:1";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "4:3"; text.psz_string = "4:3";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:9"; text.psz_string = "16:9";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:10"; text.psz_string = "16:10";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "221:100"; text.psz_string = "2.21:1";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "5:4"; text.psz_string = "5:4";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
+
+    for( i = 0; p_aspect_ratio_values[i].psz_value; i++ )
+    {
+        val.psz_string = (char*)p_aspect_ratio_values[i].psz_value;
+        text.psz_string = _( p_aspect_ratio_values[i].psz_label );
+        var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
+    }
 
     /* Add custom aspect ratios */
     psz_buf = config_GetPsz( p_vout, "custom-aspect-ratios" );
-    if( psz_buf && *psz_buf )
-    {
-        char *psz_cur = psz_buf;
-        char *psz_next;
-        while( psz_cur && *psz_cur )
-        {
-            psz_next = strchr( psz_cur, ',' );
-            if( psz_next )
-            {
-                *psz_next = '\0';
-                psz_next++;
-            }
-            val.psz_string = strdup( psz_cur );
-            text.psz_string = strdup( psz_cur );
-            var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text);
-            free( val.psz_string );
-            free( text.psz_string );
-            psz_cur = psz_next;
-        }
-    }
-    if( psz_buf ) free( psz_buf );
+    AddCustomRatios( p_vout, "aspect-ratio", psz_buf );
+    free( psz_buf );
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
     var_Get( p_vout, "aspect-ratio", &old_val );
@@ -434,15 +426,13 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Add a fullscreen variable */
-    var_Create( p_vout, "fullscreen", VLC_VAR_BOOL );
-    text.psz_string = _("Fullscreen");
-    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
-    var_Change( p_vout, "fullscreen", VLC_VAR_INHERITVALUE, &val, NULL );
-    if( val.b_bool )
+    if( var_CreateGetBool( p_vout, "fullscreen" ) )
     {
         /* user requested fullscreen */
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
     }
+    text.psz_string = _("Fullscreen");
+    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 
     /* Add a snapshot variable */
@@ -459,8 +449,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
     var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE;
-    var_Set( p_vout, "intf-change", val );
+    var_SetBool( p_vout, "intf-change", VLC_TRUE );
 }
 
 /*****************************************************************************
@@ -658,7 +647,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
      * Did the user specify a directory? If not, path = NULL.
      */
     path = utf8_opendir ( (const char *)val.psz_string  );
-    if ( path != NULL )
+    if( path != NULL )
     {
         char *psz_prefix = var_GetNonEmptyString( p_vout, "snapshot-prefix" );
         if( psz_prefix == NULL )
