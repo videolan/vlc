@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
-    <height>393</height>
+    <width>738</width>
+    <height>598</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -22,7 +22,7 @@
    <string>_("VLM configurator")</string>
   </property>
   <layout class="QGridLayout" >
-   <item rowspan="3" row="0" column="0" >
+   <item rowspan="5" row="0" column="0" >
     <widget class="QGroupBox" name="mediaConfBox" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
@@ -31,10 +31,10 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>_("Media Creation")</string>
+      <string>_("Media Manager Edition")</string>
      </property>
-     <layout class="QVBoxLayout" >
-      <item>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="3" >
        <widget class="QComboBox" name="mediaType" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
@@ -44,41 +44,115 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0" colspan="3" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QStackedWidget" name="mediaStacked" >
-        <property name="currentIndex" >
-         <number>2</number>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="nameLabel" >
+        <property name="text" >
+         <string>_("Name:")</string>
         </property>
-        <widget class="QWidget" name="pBcast" />
-        <widget class="QWidget" name="pVod" />
-        <widget class="QWidget" name="pSched" />
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLineEdit" name="nameLedit" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QCheckBox" name="enableCheck" >
+        <property name="text" >
+         <string>_("Enable")</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="inputLabel" >
+        <property name="text" >
+         <string>_("Input:")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLineEdit" name="inputLedit" />
+      </item>
+      <item row="3" column="2" >
+       <widget class="QPushButton" name="inputButton" >
+        <property name="text" >
+         <string>_("Select Input")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="outputLabel" >
+        <property name="text" >
+         <string>_("Output:")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="outputLedit" />
+      </item>
+      <item row="4" column="2" >
+       <widget class="QPushButton" name="outputButton" >
+        <property name="text" >
+         <string>_("Select Output")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="3" >
+       <widget class="QGroupBox" name="schedBox" >
+        <property name="title" >
+         <string>_("Time Control")</string>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item row="0" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1" >
     <widget class="QPushButton" name="addButton" >
      <property name="text" >
       <string>_("Add")</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" >
+   <item row="2" column="1" >
     <widget class="QPushButton" name="clearButton" >
      <property name="text" >
       <string>_("Clear")</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" >
+   <item row="3" column="1" >
+    <widget class="QPushButton" name="saveButton" >
+     <property name="text" >
+      <string>_("Save")</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -86,12 +160,12 @@
      <property name="sizeHint" >
       <size>
        <width>80</width>
-       <height>20</height>
+       <height>81</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" colspan="2" >
+   <item row="5" column="0" colspan="2" >
     <widget class="QGroupBox" name="mediaBox" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
@@ -100,12 +174,52 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>_("Media Configuration")</string>
+      <string>_("Media Manager List")</string>
      </property>
-     <layout class="QHBoxLayout" />
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QListWidget" name="vlmListItem" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="Line" name="line_2" >
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QScrollArea" native="1" name="vlmItemScroll" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2" >
+   <item row="6" column="0" colspan="2" >
     <widget class="QDialogButtonBox" name="buttonBox" >
      <property name="standardButtons" >
       <set>QDialogButtonBox::NoButton</set>
@@ -114,6 +228,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QScrollArea</class>
+   <extends>QWidget</extends>
+   <header>qscrollarea.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

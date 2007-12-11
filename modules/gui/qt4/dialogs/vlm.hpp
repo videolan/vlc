@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlm.hpp : Stream output dialog ( old-style, ala WX )
+ * vlm.hpp : VLM Management
  ****************************************************************************
  * Copyright ( C ) 2006 the VideoLAN team
  * $Id: vlm.hpp 21875 2007-09-08 16:01:33Z jb $
@@ -32,8 +32,8 @@
 
 enum{
     QVLM_Broadcast,
-    QVLM_VOD,
-    QVLM_Schedule
+    QVLM_Schedule,
+    QVLM_VOD
 };
 
 class QComboBox;
@@ -50,6 +50,7 @@ class QHBoxLayout;
 class QDateEdit;
 class QTimeEdit;
 class QSpinBox;
+class VLMObject;
 
 class VLMDialog : public QVLCFrame
 {
@@ -67,28 +68,50 @@ private:
     VLMDialog( intf_thread_t * );
     static VLMDialog *instance;
     Ui::Vlm ui;
-    
-    QGridLayout *vlmItemLayout;
 
+    QList<VLMObject *> vlmItems;
+    int currentIndex;
+
+    QVBoxLayout *vlmItemLayout;
+    QWidget *vlmItemWidget;
+  
     QComboBox *mediatype;
-    QCheckBox *bcastenable, *vodenable, *scheenable;
-    QLineEdit *bcastnameledit, *vodnameledit, *schenameledit, *bcastinputledit, *vodinputledit, *scheinputledit;
-    QLineEdit *bcastoutputledit, *vodoutputledit, *scheoutputledit;
     QTimeEdit *time;
     QDateEdit *date;
     QSpinBox *scherepeatnumber;
-
-    QToolButton *bcastinputtbutton, *vodinputtbutton, *scheinputtbutton;
-    QToolButton *bcastoutputtbutton, *vodoutputtbutton, *scheoutputtbutton;
-    QPushButton *bcastplay, *bcastpause, *bcaststop;
-    QPushButton *bcastadd, *vodadd, *scheadd, *bcastremove, *vodremove, *scheremove;
-
+    bool isNameGenuine( QString );
+public slots:
+    void removeVLMItem( VLMObject * );
+    void startModifyVLMItem( VLMObject * );
 private slots:
-    void finish();
-    void cancel();
     void addVLMItem();
-    void removeVLMItem();
-    void clearVLMItem();
+    void clearWidgets();
+    void saveModifications();
+    void showScheduleWidget( int );
+    void selectVLMItem( int );
+};
+
+class VLMObject : public QGroupBox 
+{
+    Q_OBJECT
+    friend class VLMDialog;
+public:
+    VLMObject( int type, QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+private:
+    QString name;
+    QString input;
+    QString output;
+    bool b_looped;
+    bool b_enabled;
+    VLMDialog *parent;
+protected:
+    virtual void enterEvent( QEvent * );
+private slots:
+    void modify();
+    void stop();
+    void del();
+    void togglePlayPause();
+    void toggleLoop();
 };
 
 #endif
