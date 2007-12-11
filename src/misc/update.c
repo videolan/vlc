@@ -47,8 +47,6 @@
  * Misc defines
  *****************************************************************************/
 
-//#define UPDATE_VLC_STATUS_URL "http://zen.via.ecp.fr/~ivoire/videolan/update"
-
 #if defined( UNDER_CE )
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
 #elif defined( WIN32 )
@@ -74,7 +72,7 @@
  *****************************************************************************/
 static void EmptyRelease( update_t *p_update );
 static void GetUpdateFile( update_t *p_update );
-static int cmp( int i1, int i2 );
+static int extracmp( char *psz_1, char *psz_2 );
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 );
 
@@ -122,29 +120,10 @@ void update_Delete( update_t *p_update )
 
     vlc_mutex_destroy( &p_update->lock );
 
-    if( p_update->release.psz_svnrev )
-    {
-        free( p_update->release.psz_svnrev );
-        p_update->release.psz_svnrev = NULL;
-    }
-
-    if( p_update->release.psz_extra )
-    {
-        free( p_update->release.psz_extra );
-        p_update->release.psz_extra = NULL;
-    }
-
-    if( p_update->release.psz_url )
-    {
-        free( p_update->release.psz_url );
-        p_update->release.psz_url = NULL;
-    }
-
-    if( p_update->release.psz_desc )
-    {
-        free( p_update->release.psz_desc );
-        p_update->release.psz_desc = NULL;
-    }
+    FREENULL( p_update->release.psz_svnrev );
+    FREENULL( p_update->release.psz_extra );
+    FREENULL( p_update->release.psz_url );
+    FREENULL( p_update->release.psz_desc );
 
     free( p_update );
 }
@@ -161,29 +140,10 @@ static void EmptyRelease( update_t *p_update )
     p_update->release.i_minor = 0;
     p_update->release.i_revision = 0;
 
-    if( p_update->release.psz_svnrev )
-    {
-        free( p_update->release.psz_svnrev );
-        p_update->release.psz_svnrev = NULL;
-    }
-
-    if( p_update->release.psz_extra )
-    {
-        free( p_update->release.psz_extra );
-        p_update->release.psz_extra = NULL;
-    }
-
-    if( p_update->release.psz_url )
-    {
-        free( p_update->release.psz_url );
-        p_update->release.psz_url = NULL;
-    }
-
-    if( p_update->release.psz_desc )
-    {
-        free( p_update->release.psz_desc );
-        p_update->release.psz_desc = NULL;
-    } 
+    FREENULL( p_update->release.psz_svnrev );
+    FREENULL( p_update->release.psz_extra );
+    FREENULL( p_update->release.psz_url );
+    FREENULL( p_update->release.psz_desc );
 }
 
 /**
@@ -228,15 +188,8 @@ static void GetUpdateFile( update_t *p_update )
         p_update->release.i_minor = i_minor;
         p_update->release.i_revision = i_revision;
 
-        if( psz_svnrev )
-            p_update->release.psz_svnrev = psz_svnrev;
-        else
-            p_update->release.psz_svnrev = STRDUP( "" );
-
-        if( psz_extra )
-            p_update->release.psz_extra = psz_extra;
-        else
-            p_update->release.psz_extra = STRDUP( "" );
+        p_update->release.psz_svnrev = psz_svnrev ? psz_svnrev : STRDUP( "" );
+        p_update->release.psz_extra = psz_extra ? psz_extra : STRDUP( "" );
     }
     else
     {
@@ -287,22 +240,29 @@ void update_Check( update_t *p_update )
 }
 
 /**
- * Compare two integers
+ * Compare two extra
  *
  * \param p1 first integer
  * \param p2 second integer
  * \return like strcmp
  */
-static int cmp( int i1, int i2 )
+static int extracmp( char *psz_1, char *psz_2 )
 {
-    if( i1 < i2 )
-        return -1;
-    else if(i1 == i2)
-        return 0;
+    if( psz_1[0] == '-' )
+    {
+        if( psz_2[0] == '-' )
+            return strcmp( psz_1, psz_2 );
+        else
+            return 1;
+    }
     else
-        return 1;
+    {
+        if( psz_2[0] == '-' )
+            return -1;
+        else
+            return strcmp( psz_1, psz_2 );
+    }
 }
-
 /**
  * Compare two release numbers
  *
@@ -313,29 +273,13 @@ static int cmp( int i1, int i2 )
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 )
 {
-    int d;
-    if( ( d = cmp( p1->i_major, p2->i_major ) ) ) ;
-    else if( ( d = cmp( p1->i_minor, p2->i_minor ) ) ) ;
-    else if( ( d = cmp( p1->i_revision, p2->i_revision ) ) ) ;
-    else
-    {
-        if( p1->psz_extra[0] == '-' )
-        {
-            if( p2->psz_extra[0] == '-' )
-                d = strcmp( p1->psz_extra, p2->psz_extra );
-            else
-                d = 1;
-        }
-        else
-        {
-            if( p2->psz_extra[0] == '-' )
-                d = -1;
-            else
-                d = strcmp(p1->psz_extra, p2->psz_extra );
-        }
-        if( d == 0 )
-            d = strcmp( p1->psz_svnrev, p2->psz_svnrev );
-    }
+    int32_t d;
+    d = ( p1->i_major << 24 ) + ( p1->i_minor << 16 ) + ( p1->i_revision << 8 );
+    d = d - ( p2->i_major << 24 ) - ( p2->i_minor << 16 ) - ( p2->i_revision << 8 );
+    d += extracmp( p1->psz_extra, p2->psz_extra );
+
+    if( d == 0 )
+        d = strcmp( p1->psz_svnrev, p2->psz_svnrev );
 
     if( d < 0 )
         return UpdateReleaseStatusOlder;
