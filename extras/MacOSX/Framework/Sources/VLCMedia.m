@@ -52,14 +52,36 @@ NSString *VLCMetaInformationTrackID     = @"trackID";
 /* Notification Messages */
 NSString *VLCMediaMetaChanged           = @"VLCMediaMetaChanged";
 
-/* libvlc event callback */
+/******************************************************************************
+ * Interface (Private)
+ */
+// TODO: Documentation
+@interface VLCMedia (Private)
+/* Statics */
++ (libvlc_meta_t)stringToMetaType:(NSString *)string;
++ (NSString *)metaTypeToString:(libvlc_meta_t)type;
+
+/* Initializers */
+- (void)initInternalMediaDescriptor;
+
+/* Operations */
+- (void)fetchMetaInformationFromLibVLCWithType:(NSString*)metaType;
+- (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL;
+
+/* Callback Methods */
+- (void)metaChanged:(NSString *)metaType;
+@end
+
+
+/******************************************************************************
+ * LibVLC Event Callback
+ */
 static void HandleMediaMetaChanged(const libvlc_event_t *event, void *self)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
     [[VLCEventManager sharedManager] callOnMainThreadObject:self
                                                  withMethod:@selector(metaChanged:)
-                                       withArgumentAsObject:[NSNumber numberWithInt:(int)event->u.media_descriptor_meta_changed.meta_type]];
+                                       withArgumentAsObject:[VLCMedia metaTypeToString:event->u.media_descriptor_meta_changed.meta_type]];
     [pool release];
 }
 
@@ -74,26 +96,9 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     [pool release];
 }
 
-
-// TODO: Documentation
-@interface VLCMedia (Private)
-/* Statics */
-+ (libvlc_meta_t)stringToMetaType:(NSString *)string;
-+ (NSString *)metaTypeToString:(libvlc_meta_t)type;
-
-/* Initializers */
-- (void)initInternalMediaDescriptor;
-
-/* Operations */
-- (BOOL)setMetaValue:(char *)value forKey:(NSString *)key;
-- (void)fetchMetaInformation;
-- (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL;
-- (void)notifyChangeForKey:(NSString *)key withOldValue:(id)oldValue;
-
-/* Callback Methods */
-- (void)metaChanged:(NSNumber *)metaType;
-@end
-
+/******************************************************************************
+ * Implementation
+ */
 @implementation VLCMedia
 + (id)mediaWithPath:(NSString *)aPath;
 {
@@ -102,7 +107,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 + (id)mediaWithURL:(NSURL *)aURL;
 {
-    return [[[VLCMedia alloc] initWithPath:(id)[aURL path] autorelease];
+    return [[[VLCMedia alloc] initWithPath:(id)[aURL path]] autorelease];
 }
 
 - (id)initWithPath:(NSString *)aPath
@@ -114,11 +119,11 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         libvlc_exception_init(&ex);
         
         p_md = libvlc_media_descriptor_new([VLCLibrary sharedInstance],
-                                           [aURL cString],
+                                           [aPath UTF8String],
                                            &ex);
         quit_on_exception(&ex);
         
-        url = [aURL copy];
+        url = [aPath copy];
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
         
@@ -166,9 +171,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 - (NSString *)description
 {
-    NSString *result = nil;
-    if (metaDictionary)
-        result = [metaDictionary objectForKey:VLCMetaInformationTitle];
+    NSString *result = [metaDictionary objectForKey:VLCMetaInformationTitle];
     return (result ? result : url);
 }
 
@@ -209,8 +212,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
 - (VLCTime *)lengthWaitUntilDate:(NSDate *)aDate
 {
-#define CLOCK_FREQ      1000000
-#define THREAD_SLEEP    ((long long)(0.010*CLOCK_FREQ))
+    static const long long thread_sleep = 10000;
 
     if (![url hasPrefix:@"file://"])
         return [self length];
@@ -218,7 +220,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     {
         while (!length && ![self isPreparsed] && [aDate timeIntervalSinceNow] > 0)
         {
-            usleep( THREAD_SLEEP );
+            usleep( thread_sleep );
         }
         
         // So we're done waiting, but sometimes we trap the fact that the parsing
@@ -227,8 +229,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         if (!length)
             return [self length];
     }
-#undef CLOCK_FREQ
-#undef THREAD_SLEEP
+
     return [[length retain] autorelease];
 }
 
@@ -253,6 +254,9 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 }
 @end
 
+/******************************************************************************
+ * Implementation VLCMedia (LibVLCBridging)
+ */
 @implementation VLCMedia (LibVLCBridging)
 
 + (id)mediaWithLibVLCMediaDescriptor:(void *)md
@@ -287,6 +291,9 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 }
 @end
 
+/******************************************************************************
+ * Implementation VLCMedia (Private)
+ */
 @implementation VLCMedia (Private)
 + (libvlc_meta_t)stringToMetaType:(NSString *)string
 {
@@ -352,130 +359,78 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         subitems = nil;
     else
     {
-        [subitems release];
         subitems = [[VLCMediaList mediaListWithLibVLCMediaList:p_mlist] retain];
         libvlc_media_list_release( p_mlist );
     }
-    [self fetchMetaInformation];
+    
+    /* Let's retrieve some info */
+    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
+    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationAlbum];
+    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtist];
 }
 
-- (BOOL)setMetaValue:(char *)value forKey:(NSString *)key
+- (void)fetchMetaInformationFromLibVLCWithType:(NSString *)metaType
 {
-    BOOL result = NO;
-    
-    NSString *oldValue = [metaDictionary valueForKey:key];
-    if ((!oldValue && value) || (oldValue && !value) || (oldValue && value && [oldValue compare:[NSString stringWithCString:value]] != NSOrderedSame))
-    {
-        if (!metaDictionary)
-            metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
+    char * psz_value = libvlc_media_descriptor_get_meta( p_md, [VLCMedia stringToMetaType:metaType], NULL);
+    NSString *newValue = psz_value ? [NSString stringWithUTF8String: psz_value] : nil;
+    NSString *oldValue = [metaDictionary valueForKey:metaType];
+    free(psz_value);
 
-        if (value)
-            [metaDictionary setValue:[NSString stringWithCString:value] forKeyPath:key];
-        else
-            [metaDictionary setValue:nil forKeyPath:key];
-        
-        if ([key compare:VLCMetaInformationArtworkURL] == NSOrderedSame)
+    if ( !(newValue && oldValue && [oldValue compare:newValue] == NSOrderedSame) )
+    {        
+        if ([metaType isEqualToString:VLCMetaInformationArtworkURL])
         {
-            if ([metaDictionary valueForKey:VLCMetaInformationArtworkURL])
-            {
-                // Initialize a new thread
-                [NSThread detachNewThreadSelector:@selector(fetchMetaInformationForArtWorkWithURL:) 
+            [NSThread detachNewThreadSelector:@selector(fetchMetaInformationForArtWorkWithURL:) 
                                          toTarget:self
-                                       withObject:[metaDictionary valueForKey:VLCMetaInformationArtworkURL]];
-            }
+                                       withObject:newValue];
+            return;
         }
-        result = YES;
+        @synchronized(metaDictionary) {
+            [metaDictionary setValue: newValue forKeyPath:metaType];
+        }
     }
-    free( value );
-    return result;
 }
 
-- (void)fetchMetaInformation
-{
-    // TODO: Only fetch meta data that has been requested.  Just don't fetch
-    // it, just because.
-    
-    [self setMetaValue:libvlc_media_descriptor_get_meta( p_md, libvlc_meta_Title,      NULL ) forKey:[VLCMedia metaTypeToString:libvlc_meta_Title]];
-    [self setMetaValue:libvlc_media_descriptor_get_meta( p_md, libvlc_meta_Artist,     NULL ) forKey:[VLCMedia metaTypeToString:libvlc_meta_Artist]];
-    [self setMetaValue:libvlc_media_descriptor_get_meta( p_md, libvlc_meta_ArtworkURL, NULL ) forKey:[VLCMedia metaTypeToString:libvlc_meta_ArtworkURL]];
-}
 
 - (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    @try
-    {
-        // Go ahead and load up the art work
-        NSURL *artUrl = [NSURL URLWithString:[anURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-        NSImage *art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease]; 
+    
+    // Go ahead and load up the art work
+    NSURL * artUrl = [NSURL URLWithString:[anURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSImage * art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease]; 
         
-        // If anything was found, lets save it to the meta data dictionary
-        if (art)
-        {
-            @synchronized(metaDictionary)
-            {
-                [metaDictionary setObject:art forKey:VLCMetaInformationArtwork];
-            }
-            
-            // Let the world know that there is new art work available
-            [self notifyChangeForKey:VLCMetaInformationArtwork withOldValue:nil];
+    // If anything was found, lets save it to the meta data dictionary
+    if (art)
+    {
+        @synchronized(metaDictionary) {
+            [metaDictionary setObject:art forKey:VLCMetaInformationArtwork];
         }
     }
-    @finally 
-    {
-        [pool release];
-    }
+
+    [pool release];
 }
 
-- (void)notifyChangeForKey:(NSString *)key withOldValue:(id)oldValue
+- (void)metaChanged:(NSString *)metaType
 {
-    // Send out a formal notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaMetaChanged
-                                                        object:self
-                                                      userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                          key, @"key",
-                                                          oldValue, @"oldValue", 
-                                                          nil]];
-    
-    // Now notify the delegate
-    if (delegate && [delegate respondsToSelector:@selector(media:metaValueChangedFrom:forKey:)])
-        [delegate media:self metaValueChangedFrom:oldValue forKey:key];
-}
-
-- (void)metaChanged:(NSNumber *)metaType
-{
-    // TODO: Only retrieve the meta that was changed
-    // Can we figure out what piece was changed instead of retreiving everything?
-    NSString *key = [VLCMedia metaTypeToString:[metaType intValue]];
-    id oldValue = (metaDictionary ? [metaDictionary valueForKey:key] : nil);
-
-    // Update the meta data
-    if ([self setMetaValue:libvlc_media_descriptor_get_meta(p_md, [metaType intValue], NULL) forKey:key])
-        // There was actually a change, send out the notifications
-        [self notifyChangeForKey:key withOldValue:oldValue];
+    [self fetchMetaInformationFromLibVLCWithType:metaType];
 }
 @end
+
+/******************************************************************************
+ * Implementation VLCMedia (VLCMediaPlayerBridging)
+ */
 
 @implementation VLCMedia (VLCMediaPlayerBridging)
 
 - (void)setLength:(VLCTime *)value
 {
-    if (length != value)
-    {
-        if (length && value && [length compare:value] == NSOrderedSame)
-            return;
+    if (length && value && [length compare:value] == NSOrderedSame)
+        return;
         
-        [self willChangeValueForKey:@"length"];
-
-        if (length) {
-            [length release];
-            length = nil;
-        }
-        
-        if (value)
-            length = [value retain];
-
-        [self didChangeValueForKey:@"length"];
-    }
+    [self willChangeValueForKey:@"length"];
+    [length release];       
+    length = value ? [value retain] : nil;
+    [self didChangeValueForKey:@"length"];
 }
 @end
