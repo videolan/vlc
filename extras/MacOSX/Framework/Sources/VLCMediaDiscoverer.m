@@ -53,7 +53,7 @@ static NSArray * availableMediaDiscoverer = nil;
         localizedName = nil;
         discoveredMedia = nil;
         mdis = libvlc_media_discoverer_new_from_name( [VLCLibrary sharedInstance],
-                                                      [aServiceName cString],
+                                                      [aServiceName UTF8String],
                                                       &ex );
         quit_on_exception( &ex );       
     }
@@ -96,7 +96,7 @@ static NSArray * availableMediaDiscoverer = nil;
 
     if (name)
     {
-        aString = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
+        aString = [NSString stringWithUTF8String:name];
         free( name );
     }
     if( aString )
