@@ -2219,10 +2219,12 @@ static int InputSourceInit( input_thread_t *p_input,
             in->i_title = 0;
             in->title   = NULL;
         }
-        demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
-                        &in->b_can_pace_control );
-        demux2_Control( in->p_demux, DEMUX_CAN_PAUSE,
-                        &in->b_can_pause );
+        if( demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
+                            &in->b_can_pace_control ) )
+            in->b_can_pace_control = VLC_FALSE;
+        if( demux2_Control( in->p_demux, DEMUX_CAN_PAUSE,
+                            &in->b_can_pause ) )
+            in->b_can_pause = VLC_FALSE;
 
         /* FIXME todo
         demux2_Control( in->p_demux, DEMUX_CAN_SEEK,

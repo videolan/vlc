@@ -124,10 +124,22 @@ enum demux_query_e
     DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */
 
     /* II. Specific access_demux queries */
-    DEMUX_CAN_PAUSE,            /* arg1= vlc_bool_t*    cannot fail */
-    DEMUX_CAN_CONTROL_PACE,     /* arg1= vlc_bool_t*    cannot fail */
+    DEMUX_CAN_PAUSE,            /* arg1= vlc_bool_t*    can fail (assume false)*/
+    DEMUX_SET_PAUSE_STATE,      /* arg1= vlc_bool_t     can fail */
+
     DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */
-    DEMUX_SET_PAUSE_STATE       /* arg1= vlc_bool_t     can fail */
+
+    /* DEMUX_CAN_CONTROL_PACE returns true (*pb_pace) if we can read the
+     * data at our pace */
+    DEMUX_CAN_CONTROL_PACE,     /* arg1= vlc_bool_t*pb_pace    can fail (assume false) */
+
+    /* DEMUX_CAN_CONTROL_RATE is called only if DEMUX_CAN_CONTROL_PACE has returned false.
+     * *pb_rate should be true when the rate can be changed (using DEMUX_SET_RATE)
+     * *pb_ts_rescale should be true when the timestamps (pts/dts/pcr) have to be rescaled */
+    DEMUX_CAN_CONTROL_RATE,     /* arg1= vlc_bool_t*pb_rate arg2= vlc_bool_t*pb_ts_rescale  can fail(assume false) */
+    /* DEMUX_SET_RATE is called only if DEMUX_CAN_CONTROL_RATE has returned true.
+     * It should return the value really used in *pi_rate */
+    DEMUX_SET_RATE,             /* arg1= int*pi_rate                                        can fail */
 };
 
 VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
