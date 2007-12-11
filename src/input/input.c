@@ -174,6 +174,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->input.title    = NULL;
     p_input->p->input.i_title_offset = p_input->p->input.i_seekpoint_offset = 0;
     p_input->p->input.b_can_pace_control = VLC_TRUE;
+    p_input->p->input.b_can_rate_control = VLC_TRUE;
+    p_input->p->input.b_rescale_ts = VLC_TRUE;
     p_input->p->input.b_eof = VLC_FALSE;
     p_input->p->input.i_cr_average = 0;
 
@@ -896,6 +898,7 @@ static int Init( input_thread_t * p_input )
         /* Global flag */
         p_input->b_can_pace_control = p_input->p->input.b_can_pace_control;
         p_input->p->b_can_pause        = p_input->p->input.b_can_pause;
+        p_input->p->b_can_rate_control = p_input->p->input.b_can_rate_control;
 
         /* Fix pts delay */
         if( p_input->i_pts_delay < 0 )
@@ -1732,12 +1735,29 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 i_rate = INPUT_RATE_MAX;
             }
             if( i_rate != INPUT_RATE_DEFAULT &&
-                ( !p_input->b_can_pace_control ||
+                ( ( !p_input->b_can_pace_control && !p_input->p->b_can_rate_control ) ||
                   ( p_input->p->p_sout && !p_input->p->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
                 i_rate = INPUT_RATE_DEFAULT;
             }
+            if( i_rate != p_input->p->i_rate &&
+                !p_input->b_can_pace_control && p_input->p->b_can_rate_control )
+            {
+                int i_ret;
+                if( p_input->p->input.p_access )
+                    i_ret = VLC_EGENERIC;
+                else
+                    i_ret = demux2_Control( p_input->p->input.p_demux,
+                                            DEMUX_SET_RATE, &i_rate );
+                if( i_ret )
+                {
+                    msg_Warn( p_input, "ACCESS/DEMUX_SET_RATE failed" );
+                    i_rate = p_input->p->i_rate;
+                }
+            }
+
+            /* */
             if( i_rate != p_input->p->i_rate )
             {
                 val.i_int = i_rate;
@@ -1745,7 +1765,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 p_input->p->i_rate  = i_rate;
 
-                input_EsOutChangeRate( p_input->p->p_es_out, i_rate );
+                /* FIXME do we need a RESET_PCR when !p_input->p->input.b_rescale_ts ? */
+                if( p_input->p->input.b_rescale_ts )
+                    input_EsOutChangeRate( p_input->p->p_es_out, i_rate );
 
                 b_force_update = VLC_TRUE;
             }
@@ -2118,7 +2140,10 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
     in->p_demux  = NULL;
     in->b_title_demux = VLC_FALSE;
     TAB_INIT( in->i_title, in->title );
+    in->b_can_pause = VLC_TRUE;
     in->b_can_pace_control = VLC_TRUE;
+    in->b_can_rate_control = VLC_TRUE;
+    in->b_rescale_ts = VLC_TRUE;
     in->b_eof = VLC_FALSE;
     in->f_fps = 0.0;
     in->i_cr_average = 0;
@@ -2222,6 +2247,21 @@ static int InputSourceInit( input_thread_t *p_input,
         if( demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
                             &in->b_can_pace_control ) )
             in->b_can_pace_control = VLC_FALSE;
+
+        if( !in->b_can_pace_control )
+        {
+            if( demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
+                                &in->b_can_rate_control, &in->b_rescale_ts ) )
+            {
+                in->b_can_rate_control = VLC_FALSE;
+                in->b_rescale_ts = VLC_TRUE; /* not used */
+            }
+        }
+        else
+        {
+            in->b_can_rate_control = VLC_TRUE;
+            in->b_rescale_ts = VLC_TRUE;
+        }
         if( demux2_Control( in->p_demux, DEMUX_CAN_PAUSE,
                             &in->b_can_pause ) )
             in->b_can_pause = VLC_FALSE;
@@ -2315,6 +2355,9 @@ static int InputSourceInit( input_thread_t *p_input,
             }
             access2_Control( in->p_access, ACCESS_CAN_CONTROL_PACE,
                              &in->b_can_pace_control );
+            in->b_can_rate_control = in->b_can_pace_control;
+            in->b_rescale_ts = VLC_TRUE;
+
             access2_Control( in->p_access, ACCESS_CAN_PAUSE,
                              &in->b_can_pause );
             access2_Control( in->p_access, ACCESS_CAN_SEEK,

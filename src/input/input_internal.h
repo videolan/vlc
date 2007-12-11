@@ -60,8 +60,11 @@ typedef struct
     int i_seekpoint_end;
 
     /* Properties */
-    vlc_bool_t b_can_pace_control;
     vlc_bool_t b_can_pause;
+    vlc_bool_t b_can_pace_control;
+    vlc_bool_t b_can_rate_control;
+    vlc_bool_t b_rescale_ts;
+
     vlc_bool_t b_eof;   /* eof of demuxer */
     double     f_fps;
 
@@ -75,6 +78,7 @@ struct input_thread_private_t
 {
     /* Global properties */
     vlc_bool_t  b_can_pause;
+    vlc_bool_t  b_can_rate_control;
 
     int         i_rate;
     /* */
