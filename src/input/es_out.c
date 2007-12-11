@@ -128,6 +128,9 @@ struct es_out_sys_t
     /* delay */
     int64_t i_audio_delay;
     int64_t i_spu_delay;
+
+    /* Rate used to rescale ES ts */
+    int         i_rate;
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
@@ -169,7 +172,7 @@ static inline int EsOutGetClosedCaptionsChannel( vlc_fourcc_t fcc )
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
-es_out_t *input_EsOutNew( input_thread_t *p_input )
+es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 {
     es_out_t     *out = malloc( sizeof( es_out_t ) );
     es_out_sys_t *p_sys = malloc( sizeof( es_out_sys_t ) );
@@ -249,6 +252,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
 
     p_sys->i_audio_delay= 0;
     p_sys->i_spu_delay  = 0;
+
+    p_sys->i_rate = i_rate;
 
     return out;
 }
@@ -344,15 +349,16 @@ static void EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_flush, vlc_bool_t b_
             input_DecoderDiscontinuity( es->p_dec, b_flush );
     }
 }
-void input_EsOutChangeRate( es_out_t *out )
+void input_EsOutChangeRate( es_out_t *out, int i_rate )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
 
+    p_sys->i_rate = i_rate;
     EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
-        input_ClockSetRate( p_sys->p_input, &p_sys->pgrm[i]->clock );
+        input_ClockSetRate( p_sys->p_input, &p_sys->pgrm[i]->clock, i_rate );
 }
 
 void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
@@ -575,7 +581,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    input_ClockInit( p_input, &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average );
+    input_ClockInit( p_input, &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average, p_sys->i_rate );
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -1414,13 +1420,13 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         }
     }
 
-    p_block->i_rate = p_input->p->i_rate;
+    p_block->i_rate = p_sys->i_rate;
 
     /* TODO handle mute */
     if( es->p_dec &&
         ( es->fmt.i_cat != AUDIO_ES ||
-          ( p_input->p->i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
-            p_input->p->i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE ) ) )
+          ( p_sys->i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
+            p_sys->i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE ) ) )
     {
         vlc_bool_t pb_cc[4];
         vlc_bool_t b_cc_new = VLC_FALSE;

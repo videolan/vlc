@@ -115,7 +115,7 @@ static void ClockNewRef( input_clock_t *cl,
  *                  discontinuity
  *****************************************************************************/
 void input_ClockInit( input_thread_t *p_input,
-                      input_clock_t *cl, vlc_bool_t b_master, int i_cr_average )
+                      input_clock_t *cl, vlc_bool_t b_master, int i_cr_average, int i_rate )
 {
     cl->i_synchro_state = SYNCHRO_START;
 
@@ -126,7 +126,7 @@ void input_ClockInit( input_thread_t *p_input,
     cl->sysdate_ref = 0;
     cl->delta_cr = 0;
     cl->i_delta_cr_residue = 0;
-    cl->i_rate = p_input->p->i_rate;
+    cl->i_rate = i_rate;
 
     cl->i_cr_average = i_cr_average;
 
@@ -165,7 +165,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
          * warning from the stream control facilities (dd-edited
          * stream ?). */
         msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
-        input_ClockInit( p_input, cl, cl->b_master, cl->i_cr_average );
+        input_ClockInit( p_input, cl, cl->b_master, cl->i_cr_average, cl->i_rate );
         /* Feed synchro with a new reference point. */
         msg_Warn( p_input, "feeding synchro with a new reference point trying to recover from clock gap" );
         ClockNewRef( cl, i_clock,
@@ -233,12 +233,12 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
 /*****************************************************************************
  * input_ClockSetRate:
  *****************************************************************************/
-void input_ClockSetRate( input_thread_t *p_input, input_clock_t *cl )
+void input_ClockSetRate( input_thread_t *p_input, input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
     if( cl->i_synchro_state == SYNCHRO_OK )
         ClockNewRef( cl, cl->last_cr, cl->last_sysdate );
 
-    cl->i_rate = p_input->p->i_rate;
+    cl->i_rate = i_rate;
 }
 

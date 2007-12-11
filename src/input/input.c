@@ -866,7 +866,7 @@ static int Init( input_thread_t * p_input )
     }
 
     /* Create es out */
-    p_input->p->p_es_out = input_EsOutNew( p_input );
+    p_input->p->p_es_out = input_EsOutNew( p_input, p_input->p->i_rate );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, VLC_FALSE );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
@@ -1745,7 +1745,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 p_input->p->i_rate  = i_rate;
 
-                input_EsOutChangeRate( p_input->p->p_es_out );
+                input_EsOutChangeRate( p_input->p->p_es_out, i_rate );
 
                 b_force_update = VLC_TRUE;
             }

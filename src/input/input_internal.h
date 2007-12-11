@@ -268,11 +268,11 @@ int        input_DecoderGetCcState( decoder_t *, vlc_bool_t *pb_decode, int i_ch
 void       input_DecoderIsCcPresent( decoder_t *, vlc_bool_t pb_present[4] );
 
 /* es_out.c */
-es_out_t  *input_EsOutNew( input_thread_t * );
+es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 void       input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
-void       input_EsOutChangeRate( es_out_t * );
+void       input_EsOutChangeRate( es_out_t *, int );
 void       input_EsOutChangeState( es_out_t * );
 void       input_EsOutChangePosition( es_out_t * );
 vlc_bool_t input_EsOutDecodersEmpty( es_out_t * );
@@ -306,11 +306,11 @@ typedef struct
     int                     i_delta_cr_residue;
 } input_clock_t;
 
-void    input_ClockInit( input_thread_t *, input_clock_t *, vlc_bool_t b_master, int i_cr_average );
+void    input_ClockInit( input_thread_t *, input_clock_t *, vlc_bool_t b_master, int i_cr_average, int i_rate );
 void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
 void    input_ClockResetPCR( input_thread_t *, input_clock_t * );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
-void    input_ClockSetRate( input_thread_t *, input_clock_t *cl );
+void    input_ClockSetRate( input_thread_t *, input_clock_t *cl, int i_rate );
 
 /* Subtitles */
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
