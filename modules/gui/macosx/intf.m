@@ -393,7 +393,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_interaction_list = [[VLCInteractionList alloc] init];
     o_sfilters = nil;
-    o_update = [[VLCUpdate alloc] init];
+    //FIXME o_update = [[VLCUpdate alloc] init];
 
     i_lastShownVolume = -1;
 
@@ -789,8 +789,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     if ( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
-    if([o_update shouldCheckForUpdate])
-        [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
+    // FIXME
+    //if([o_update shouldCheckForUpdate])
+    //    [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
  
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
@@ -1909,12 +1910,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 }
 
 - (IBAction)checkForUpdate:(id)sender
-{
+{/* FIXME
     if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
     [o_update showUpdateWindow];
-}
+*/}
 
 - (IBAction)viewHelp:(id)sender
 {
