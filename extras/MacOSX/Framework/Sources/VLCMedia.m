@@ -280,6 +280,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         libvlc_media_descriptor_retain( md );
         p_md = md;
         
+        metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
         [self initInternalMediaDescriptor];
     }
     return self;
@@ -348,7 +349,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 
     libvlc_media_descriptor_set_user_data( p_md, (void*)self, &ex );
     quit_on_exception( &ex );
-    
+
     libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager( p_md, &ex );
     libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
@@ -377,7 +378,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     free(psz_value);
 
     if ( !(newValue && oldValue && [oldValue compare:newValue] == NSOrderedSame) )
-    {        
+    {
         if ([metaType isEqualToString:VLCMetaInformationArtworkURL])
         {
             [NSThread detachNewThreadSelector:@selector(fetchMetaInformationForArtWorkWithURL:) 
@@ -385,8 +386,9 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
                                        withObject:newValue];
             return;
         }
+
         @synchronized(metaDictionary) {
-            [metaDictionary setValue: newValue forKeyPath:metaType];
+            [metaDictionary setValue:newValue forKeyPath:metaType];
         }
     }
 }
