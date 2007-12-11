@@ -1152,7 +1152,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64;
     double  *pf, f;
-    vlc_bool_t *pb, b_bool;
+    vlc_bool_t *pb, *pb2, b_bool;
+    int *pi_int;
 
     switch( i_query )
     {
@@ -1259,6 +1260,55 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pb = VLC_TRUE;
 #endif
             return VLC_SUCCESS;
+
+#if 0
+        case DEMUX_CAN_CONTROL_RATE:
+            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            pb2 = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+
+            *pb = p_sys->rtsp != NULL && p_sys->i_npt_length > 0 && !var_GetBool( p_demux, "rtsp-kasenna" );
+            *pb2 = VLC_FALSE;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_RATE:
+        {
+            double f_scale;
+
+            if( !p_sys->rtsp || p_sys->i_npt_length <= 0 || var_GetBool( p_demux, "rtsp-kasenna" ) )
+                return VLC_EGENERIC;
+
+            /* TODO we might want to ensure that the new rate is different from
+             * old rate after playMediaSession...
+             * I have no idea how the server map the requested rate to the
+             * ones it supports.
+             * ex:
+             *  current is x2 we request x1.5 if the server return x2 we will
+             *  never succeed to return to x1.
+             *  In this case we should retry with a lower rate until we have
+             *  one (even x1).
+             */
+
+            pi_int = (int*)va_arg( args, int * );
+            f_scale = (double)INPUT_RATE_DEFAULT / (*p_int);
+
+            /* Passing -1 for the start and end time will mean liveMedia won't
+            * create a Range: section for the RTSP message. The server should
+            * pick up from the current position */
+            if( !p_sys->rtsp->playMediaSession( *p_sys->ms, -1, -1, f_scale ) )
+            {
+                msg_Err( p_demux, "PLAY with Scale %0.2f failed %s", f_scale,
+                        p_sys->env->getResultMsg() );
+                return VLC_EGENERIC;
+            }
+            /* ReSync the stream */
+            p_sys->i_npt_start = 0;
+            p_sys->i_pcr = 0;
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
+            *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() + 0.5 );
+            return VLC_SUCCESS;
+        }
+#endif
 
         case DEMUX_SET_PAUSE_STATE:
         {
