@@ -11,6 +11,7 @@
 		6303C43C0CF45CC30000ECC8 /* VLCMediaListAspect.h in Headers */ = {isa = PBXBuildFile; fileRef = 6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		637D5ABD0CF6F2650073EA45 /* VLCMediaDiscoverer.h in Headers */ = {isa = PBXBuildFile; fileRef = 637D5ABC0CF6F2650073EA45 /* VLCMediaDiscoverer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		637D5ADC0CF6F2720073EA45 /* VLCMediaDiscoverer.m in Sources */ = {isa = PBXBuildFile; fileRef = 637D5ADB0CF6F2720073EA45 /* VLCMediaDiscoverer.m */; };
+		6384FD080D0DBA20005EB1F7 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6384FD070D0DBA20005EB1F7 /* QuartzCore.framework */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		EF7311900CB5797B009473B4 /* VLCAudio.h in Headers */ = {isa = PBXBuildFile; fileRef = EF73118E0CB5797B009473B4 /* VLCAudio.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EF7311910CB5797B009473B4 /* VLCAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = EF73118F0CB5797B009473B4 /* VLCAudio.m */; };
@@ -44,6 +45,7 @@
 		6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaListAspect.h; path = Public/VLCMediaListAspect.h; sourceTree = "<group>"; };
 		637D5ABC0CF6F2650073EA45 /* VLCMediaDiscoverer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCMediaDiscoverer.h; path = Public/VLCMediaDiscoverer.h; sourceTree = "<group>"; };
 		637D5ADB0CF6F2720073EA45 /* VLCMediaDiscoverer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCMediaDiscoverer.m; sourceTree = "<group>"; };
+		6384FD070D0DBA20005EB1F7 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		8DC2EF5B0486A6940098B216 /* VLC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VLC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		EF73118E0CB5797B009473B4 /* VLCAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCAudio.h; path = Public/VLCAudio.h; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
+				6384FD080D0DBA20005EB1F7 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +147,7 @@
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6384FD070D0DBA20005EB1F7 /* QuartzCore.framework */,
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -201,6 +205,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6303C43C0CF45CC30000ECC8 /* VLCMediaListAspect.h in Headers */,
 				EF78BD100CAEEEC300354E6E /* VLCEventManager.h in Headers */,
 				EF78BD110CAEEEC300354E6E /* VLCLibrary.h in Headers */,
 				EF78BD1B0CAEEEE700354E6E /* VLC.h in Headers */,
@@ -212,7 +217,6 @@
 				EF8BB8D00CAFA8D80038A613 /* VLCMediaPlayer.h in Headers */,
 				EF7311900CB5797B009473B4 /* VLCAudio.h in Headers */,
 				EFD551DD0CC6DD720074CEE1 /* VLCLibVLCBridging.h in Headers */,
-				6303C43C0CF45CC30000ECC8 /* VLCMediaListAspect.h in Headers */,
 				637D5ABD0CF6F2650073EA45 /* VLCMediaDiscoverer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -396,20 +400,24 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				GCC_ENABLE_OBJC_GC = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 			};
 			name = Debug;
 		};
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				GCC_ENABLE_OBJC_GC = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 			};
 			name = Release;
 		};
