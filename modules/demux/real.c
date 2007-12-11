@@ -495,40 +495,10 @@ static int Demux( demux_t *p_demux )
     }
     else if( tk->fmt.i_cat == AUDIO_ES && b_selected )
     {
-        if( tk->fmt.i_codec == VLC_FOURCC( 'm','p','4','a' ) )
-        {
-            int     i_sub = (p_sys->buffer[1] >> 4)&0x0f;
-            uint8_t *p_sub = &p_sys->buffer[2+2*i_sub];
-
-             /* Set PCR */
-             if( p_sys->i_pcr < i_pts )
-             {
-                    p_sys->i_pcr = i_pts;
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                                     (int64_t)p_sys->i_pcr );
-             }
-
-            int i;
-            for( i = 0; i < i_sub; i++ )
-            {
-                int i_sub_size = GetWBE( &p_sys->buffer[2+i*2]);
-                block_t *p_block = block_New( p_demux, i_sub_size );
-                if( p_block )
-                {
-                    memcpy( p_block->p_buffer, p_sub, i_sub_size );
-                    p_sub += i_sub_size;
-
-                    p_block->i_dts =
-                    p_block->i_pts = ( i == 0 ? i_pts : 0 );
-
-                    es_out_Send( p_demux->out, tk->p_es, p_block );
-                }
-            }
-        }
-        else if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
-                 tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c') ||
-                 tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r') ||
-                 tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8') )
+        if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
+            tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c') ||
+            tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r') ||
+            tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8') )
         {
             uint8_t *p_buf = p_sys->buffer;
             int y = tk->i_subpacket / ( tk->i_frame_size /tk->i_subpacket_size);
@@ -604,9 +574,7 @@ static int Demux( demux_t *p_demux )
         }
         else
         {
-            block_t *p_block = block_New( p_demux, i_size );
-
-            /* Set the PCR */
+            /* Set PCR */
             if( p_sys->i_pcr < i_pts )
             {
                 p_sys->i_pcr = i_pts;
@@ -614,26 +582,53 @@ static int Demux( demux_t *p_demux )
                         (int64_t)p_sys->i_pcr );
             }
 
-            if( tk->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+            if( tk->fmt.i_codec == VLC_FOURCC( 'm','p','4','a' ) )
             {
-                uint8_t *src = p_sys->buffer;
-                uint8_t *dst = p_block->p_buffer;
+                int     i_sub = (p_sys->buffer[1] >> 4)&0x0f;
+                uint8_t *p_sub = &p_sys->buffer[2+2*i_sub];
 
-                /* byte swap data */
-                while( dst < &p_block->p_buffer[i_size- 1])
+                int i;
+                for( i = 0; i < i_sub; i++ )
                 {
-                    *dst++ = src[1];
-                    *dst++ = src[0];
+                    int i_sub_size = GetWBE( &p_sys->buffer[2+i*2]);
+                    block_t *p_block = block_New( p_demux, i_sub_size );
+                    if( p_block )
+                    {
+                        memcpy( p_block->p_buffer, p_sub, i_sub_size );
+                        p_sub += i_sub_size;
 
-                    src += 2;
+                        p_block->i_dts =
+                            p_block->i_pts = ( i == 0 ? i_pts : 0 );
+
+                        es_out_Send( p_demux->out, tk->p_es, p_block );
+                    }
                 }
             }
             else
             {
-                memcpy( p_block->p_buffer, p_sys->buffer, i_size );
+                block_t *p_block = block_New( p_demux, i_size );
+
+                if( tk->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+                {
+                    uint8_t *src = p_sys->buffer;
+                    uint8_t *dst = p_block->p_buffer;
+
+                    /* byte swap data */
+                    while( dst < &p_block->p_buffer[i_size- 1])
+                    {
+                        *dst++ = src[1];
+                        *dst++ = src[0];
+
+                        src += 2;
+                    }
+                }
+                else
+                {
+                    memcpy( p_block->p_buffer, p_sys->buffer, i_size );
+                }
+                p_block->i_dts = p_block->i_pts = i_pts;
+                es_out_Send( p_demux->out, tk->p_es, p_block );
             }
-            p_block->i_dts = p_block->i_pts = i_pts;
-            es_out_Send( p_demux->out, tk->p_es, p_block );
         }
     }
 
