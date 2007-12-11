@@ -49,7 +49,7 @@ namespace wxvlc
         DECLARE_EVENT_TABLE();
 
         intf_thread_t *p_intf;
-        update_t *p_u;
+        update_t *p_update;
     };
 };
 
