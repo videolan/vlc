@@ -358,13 +358,6 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Dbg( p_demux, "sending size=%d", tk->p_frame->i_buffer );
 
-                if( p_sys->i_pcr < tk->p_frame->i_dts )
-                {
-                    p_sys->i_pcr = tk->p_frame->i_dts;
-
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                    (int64_t)p_sys->i_pcr );
-                }
                 es_out_Send( p_demux->out, tk->p_es, tk->p_frame );
 
                 tk->i_frame = 0;
@@ -402,7 +395,9 @@ static int Demux( demux_t *p_demux )
                 msg_Dbg( p_demux, "copying new buffer n=%d offset=%d copy=%d",
                          i_ck, i_offset, i_copy );
 
-                ((uint32_t*)(tk->p_frame->p_buffer+i_len+8))[i_ck] = i_offset;
+                ((uint32_t*)(tk->p_frame->p_buffer+i_len+8))[i_ck*2 +0 ] = 1;
+                ((uint32_t*)(tk->p_frame->p_buffer+i_len+8))[i_ck*2 +1 ] = i_offset;
+
 
                 memcpy( &tk->p_frame->p_buffer[i_offset + 8], p, i_copy );
             }
@@ -500,18 +495,18 @@ static int Demux( demux_t *p_demux )
     }
     else if( tk->fmt.i_cat == AUDIO_ES && b_selected )
     {
-        /* Set PCR */
-        if( p_sys->i_pcr < i_pts )
-        {
-            p_sys->i_pcr = i_pts;
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                            (int64_t)p_sys->i_pcr );
-        }
-
         if( tk->fmt.i_codec == VLC_FOURCC( 'm','p','4','a' ) )
         {
             int     i_sub = (p_sys->buffer[1] >> 4)&0x0f;
             uint8_t *p_sub = &p_sys->buffer[2+2*i_sub];
+
+             /* Set PCR */
+             if( p_sys->i_pcr < i_pts )
+             {
+                    p_sys->i_pcr = i_pts;
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                                                     (int64_t)p_sys->i_pcr );
+             }
 
             int i;
             for( i = 0; i < i_sub; i++ )
@@ -577,6 +572,14 @@ static int Demux( demux_t *p_demux )
             while( tk->i_out_subpacket != tk->i_subpackets &&
                    tk->p_subpackets[tk->i_out_subpacket] )
             {
+                /* Set the PCR */
+                if (tk->i_out_subpacket == 0)
+                {
+                    p_sys->i_pcr = tk->p_subpackets[tk->i_out_subpacket]->i_dts;
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                            (int64_t)p_sys->i_pcr );
+                }
+
                 block_t *p_block = tk->p_subpackets[tk->i_out_subpacket];
                 tk->p_subpackets[tk->i_out_subpacket] = 0;
 
@@ -602,6 +605,14 @@ static int Demux( demux_t *p_demux )
         else
         {
             block_t *p_block = block_New( p_demux, i_size );
+
+            /* Set the PCR */
+            if( p_sys->i_pcr < i_pts )
+            {
+                p_sys->i_pcr = i_pts;
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                        (int64_t)p_sys->i_pcr );
+            }
 
             if( tk->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
             {
