@@ -51,24 +51,8 @@ NSString *VLCMetaInformationTrackID     = @"trackID";
 
 /* Notification Messages */
 NSString *VLCMediaMetaChanged           = @"VLCMediaMetaChanged";
-//NSString *VLCMediaSubItemAdded        = @"VLCMediaSubItemAdded";
-//NSString *VLCMediaSubItemDeleted      = @"VLCMediaSubItemDeleted";
 
 /* libvlc event callback */
-//static void HandleMediaSubItemAdded(const libvlc_event_t *event, void *self)
-//{
-//  [[VLCEventManager sharedManager] callOnMainThreadObject:self
-//                                               withMethod:@selector(subItemAdded:)
-//                                     withArgumentAsObject:(id)event->u.media_descriptor_subitem_added.new_child];
-//}
-//
-//static void HandleMediaSubItemDeleted(const libvlc_event_t *event, void *self)
-//{
-//  [[VLCEventManager sharedManager] callOnMainThreadObject:self
-//                                               withMethod:@selector(subItemDeleted)
-//                                     withArgumentAsObject:nil];
-//}
-
 static void HandleMediaMetaChanged(const libvlc_event_t *event, void *self)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -107,8 +91,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 - (void)notifyChangeForKey:(NSString *)key withOldValue:(id)oldValue;
 
 /* Callback Methods */
-//- (void)subItemAdded:(libvlc_media_descriptor_t *)child;
-//- (void)subItemRemoved:(libvlc_media_descriptor_t *)child;
 - (void)metaChanged:(NSNumber *)metaType;
 @end
 
@@ -159,8 +141,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
              * We also may receive a -retain in some event callback that may occcur
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager(p_md, NULL);
-//            libvlc_event_detach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, NULL);
-//            libvlc_event_detach(p_em, libvlc_MediaDescriptorSubItemDeleted,  HandleMediaSubItemAdded,    self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, NULL);
         }
@@ -362,10 +342,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     libvlc_media_descriptor_set_user_data( p_md, (void*)self, &ex );
     quit_on_exception( &ex );
     
-    // TODO: Should these events be caught by VLCMediaList's notification hooks?
     libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager( p_md, &ex );
-//    libvlc_event_attach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
-//    libvlc_event_attach(p_em, libvlc_MediaDescriptorSubItemRemoved,  HandleMediaSubItemRemoved,  self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
     quit_on_exception( &ex );
@@ -464,24 +441,6 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     if (delegate && [delegate respondsToSelector:@selector(media:metaValueChangedFrom:forKey:)])
         [delegate media:self metaValueChangedFrom:oldValue forKey:key];
 }
-
-//- (void)subItemAdded:(libvlc_media_descriptor_t *)child
-//{
-//  // TODO: SubItemAdded Notification
-////    if (!subitems)
-////    {
-////        subitems = [[VLCMediaList alloc] initWithLibVLCMediaList:];
-////    }
-//}
-//
-//- (void)subItemRemoved:(libvlc_media_descriptor_t *)child
-//{
-//  // TODO: SubItemAdded Notification
-//  //    if (!subitems)
-//  //    {
-//  //      subitems = [[VLCMediaList alloc] initWithLibVLCMediaList:];
-//  //    }
-//}
 
 - (void)metaChanged:(NSNumber *)metaType
 {
