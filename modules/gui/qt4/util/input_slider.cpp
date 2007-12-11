@@ -75,15 +75,16 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
     setToolTip( psz_length );
 }
 
-#define WLENGTH   100 // px
-#define WHEIGHT   28  // px
+#define WLENGTH   90 // px
+#define WHEIGHT   25  // px
 #define SOUNDMIN  0   // %
 #define SOUNDMAX  200 // % OR 400 ?
 
 SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
                         : QAbstractSlider( _parent )
 {
-    padding = 3;
+    paddingL = 5;
+    paddingR = 3;
 
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
     setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
@@ -97,7 +98,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
 
     pixGradient = QPixmap( mask.size() );
 
-    QLinearGradient gradient( padding, 2, WLENGTH , 2 );
+    QLinearGradient gradient( paddingL, 4, WLENGTH + paddingL , 4 );
     gradient.setColorAt( 0.0, Qt::white );
     gradient.setColorAt( 0.2, QColor( 20, 226, 20 ) );
     gradient.setColorAt( 0.5, QColor( 255, 176, 15 ) );
@@ -128,7 +129,7 @@ void SoundSlider::mousePressEvent( QMouseEvent *event )
         b_sliding = true;
         i_oldvalue = value();
         emit sliderPressed();
-        changeValue( event->x() - padding );
+        changeValue( event->x() - paddingL );
     }
 }
 
@@ -150,7 +151,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
 {
     if( b_sliding )
     {
-        QRect rect( padding - 15,     padding - 1,
+        QRect rect( paddingL - 15,    -1,
                     WLENGTH + 15 * 2, WHEIGHT + 4 );
         if( !rect.contains( event->pos() ) )
         { /* We are outside */
@@ -161,7 +162,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
         else
         { /* We are inside */
             b_outside = false;
-            changeValue( event->x() - padding );
+            changeValue( event->x() - paddingL );
             emit sliderMoved( value() );
         }
     }
@@ -171,14 +172,15 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
 
 void SoundSlider::changeValue( int x )
 {
-    setValue( QStyle::sliderValueFromPosition(
-                minimum(), maximum(), x, width() - 2 * padding ) );
+    setValue( x * maximum() / WLENGTH );
 }
 
 void SoundSlider::paintEvent(QPaintEvent *e)
 {
     QPainter painter( this );
-    const int offset = int( double( ( width() - 2 * padding ) * value() ) / maximum() );
+    const int offset = int(
+            double( WLENGTH * value() ) /
+            double( maximum() ) ) + paddingL;
 
     const QRectF boundsG( 0, 0, offset , pixGradient.height() );
     painter.drawPixmap( boundsG, pixGradient, boundsG );

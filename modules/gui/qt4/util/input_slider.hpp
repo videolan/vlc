@@ -57,7 +57,8 @@ public:
     SoundSlider( QWidget *_parent, int _i_step, bool b_softamp );
     virtual ~SoundSlider() {};
 protected:
-    int padding;
+    int paddingL;
+    int paddingR;
     virtual void paintEvent(QPaintEvent *);
     virtual void wheelEvent( QWheelEvent *event );
     virtual void mousePressEvent( QMouseEvent * );
