@@ -507,18 +507,23 @@ void ModuleConfigControl::finish( bool bycat )
         {
             if( !strcmp( module_GetObjName( p_parser ), "main" ) ) continue;
 
-            for (size_t i = 0; i < p_parser->confsize; i++)
+            unsigned confsize;
+            module_config_t *p_config;
+
+            p_config = module_GetConfig (p_parser, &confsize);
+             for (size_t i = 0; i < confsize; i++)
             {
-                module_config_t *p_config = p_parser->p_config + i;
                 /* Hack: required subcategory is stored in i_min */
-                if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->value.i == p_item->min.i )
+                const module_config_t *p_cfg = p_config + i;
+                if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
+                    p_cfg->value.i == p_item->min.i )
                     combo->addItem( qtr( module_GetLongName( p_parser )),
                                     QVariant( module_GetObjName( p_parser ) ) );
                 if( p_item->value.psz && !strcmp( p_item->value.psz,
                                                   module_GetObjName( p_parser ) ) )
                     combo->setCurrentIndex( combo->count() - 1 );
             }
+            module_PutConfig (p_config);
         }
         else if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
@@ -594,12 +599,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
        cb->setToolTip( formatTooltip( qtr( module_GetLongName( p_parser ))));\
        cbl->checkBox = cb; \
 \
-       int i = -1; \
-       while( p_parser->pp_shortcuts[++i] != NULL); \
-       i--; \
-\
-       cbl->psz_module = strdup( i>=0?p_parser->pp_shortcuts[i] \
-                                 : module_GetObjName( p_parser ) ); \
+       cbl->psz_module = strdup( module_GetObjName( p_parser ) ); \
        modules.push_back( cbl ); \
 }
 
@@ -619,16 +619,20 @@ void ModuleListConfigControl::finish( bool bycat )
         {
             if( !strcmp( module_GetObjName( p_parser ), "main" ) ) continue;
 
-            for (size_t i = 0; i < p_parser->confsize; i++)
+            unsigned confsize;
+            module_config_t *p_config = module_GetConfig (p_parser, &confsize);
+
+            for (size_t i = 0; i < confsize; i++)
             {
-                module_config_t *p_config = p_parser->p_config + i;
+                module_config_t *p_cfg = p_config + i;
                 /* Hack: required subcategory is stored in i_min */
-                if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                        p_config->value.i == p_item->min.i )
+                if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
+                        p_cfg->value.i == p_item->min.i )
                 {
                     CHECKBOX_LISTS;
                 }
             }
+            module_PutConfig (p_config);
         }
         else if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
@@ -1030,9 +1034,14 @@ void KeySelectorControl::finish()
     module_t *p_main = config_FindModule( p_this, "main" );
     assert( p_main );
 
-    for (size_t i = 0; i < p_main->confsize; i++)
+    unsigned confsize;
+    module_config_t *p_config;
+
+    p_config = module_GetConfig (p_main, &confsize);
+
+    for (size_t i = 0; i < confsize; i++)
     {
-        module_config_t *p_item = p_main->p_config + i;
+        module_config_t *p_item = p_config + i;
 
         if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
             strstr( p_item->psz_name , "key-" ) && !EMPTY_STR( p_item->psz_text ) )
@@ -1046,6 +1055,8 @@ void KeySelectorControl::finish()
             table->addTopLevelItem( treeItem );
         }
     }
+    module_PutConfig (p_config);
+
     table->resizeColumnToContents( 0 );
 
     CONNECT( table, itemClicked( QTreeWidgetItem *, int ),

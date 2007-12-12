@@ -51,7 +51,6 @@ public:
     int i_object_id;
     int i_subcat_id;
     int i_type;
-    bool b_submodule;
     char *psz_name;
     QString name;
     QString help;

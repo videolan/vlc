@@ -25,75 +25,6 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
-#if 1
-/* FIXME: scheduled for privatization */
-#define MODULE_SHORTCUT_MAX 50
-
-/* The module handle type. */
-#if defined(HAVE_DL_DYLD)
-#   if defined (HAVE_MACH_O_DYLD_H)
-#       include <mach-o/dyld.h>
-#   endif
-typedef NSModule module_handle_t;
-#elif defined(HAVE_IMAGE_H)
-typedef int module_handle_t;
-#elif defined(WIN32) || defined(UNDER_CE)
-typedef void * module_handle_t;
-#elif defined(HAVE_DL_DLOPEN)
-typedef void * module_handle_t;
-#elif defined(HAVE_DL_SHL_LOAD)
-typedef shl_t module_handle_t;
-#endif
-
-/**
- * Module descriptor
- */
-struct module_t
-{
-    VLC_COMMON_MEMBERS
-
-    /*
-     * Variables set by the module to identify itself
-     */
-    const char *psz_shortname;                              /**< Module name */
-    const char *psz_longname;                   /**< Module descriptive name */
-    const char *psz_help;        /**< Long help string for "special" modules */
-
-    /** Shortcuts to the module */
-    const char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
-
-    char    *psz_capability;                                 /**< Capability */
-    int      i_score;                          /**< Score for the capability */
-    uint32_t i_cpu;                           /**< Required CPU capabilities */
-
-    vlc_bool_t b_unloadable;                        /**< Can we be dlclosed? */
-    vlc_bool_t b_reentrant;                           /**< Are we reentrant? */
-    vlc_bool_t b_submodule;                        /**< Is this a submodule? */
-
-    /* Callbacks */
-    int  ( * pf_activate )   ( vlc_object_t * );
-    void ( * pf_deactivate ) ( vlc_object_t * );
-
-    /*
-     * Variables set by the module to store its config options
-     */
-    module_config_t *p_config;             /* Module configuration structure */
-    size_t           confsize;            /* Number of module_config_t items */
-    unsigned int     i_config_items;        /* number of configuration items */
-    unsigned int     i_bool_items;            /* number of bool config items */
-
-    /*
-     * Variables used internally by the module manager
-     */
-    /* Plugin-specific stuff */
-    module_handle_t     handle;                             /* Unique handle */
-    char *              psz_filename;                     /* Module filename */
-
-    vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
-    vlc_bool_t          b_loaded;        /* Set to true if the dll is loaded */
-};
-#endif
-
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
@@ -108,6 +39,9 @@ VLC_EXPORT( vlc_bool_t,  __module_Exists, ( vlc_object_t *, const char * ) );
 #define module_FindName(a,b) __module_FindName(VLC_OBJECT(a),b)
 VLC_EXPORT( module_t *, __module_FindName, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void, module_Put, ( module_t *module ) );
+
+VLC_EXPORT( module_config_t *, module_GetConfig, ( const module_t *, unsigned * ) );
+VLC_EXPORT( void, module_PutConfig, ( module_config_t * ) );
 
 
 /* Return a NULL terminated array with the names of the modules that have a

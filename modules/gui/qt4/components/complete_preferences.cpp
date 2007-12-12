@@ -85,9 +85,15 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     PrefsItemData *data = NULL;
     QTreeWidgetItem *current_item = NULL;
-    for (size_t i = 0; i < p_module->confsize; i++)
+    unsigned confsize;
+    module_config_t *p_config;
+
+    p_config = module_GetConfig (p_module, &confsize);
+
+    for (size_t i = 0; i < confsize; i++)
     {
-        const module_config_t *p_item = p_module->p_config + i;
+        module_config_t *p_item = p_config + i;
+
         const char *psz_help;
         QIcon icon;
         switch( p_item->i_type )
@@ -175,6 +181,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             break;
         }
     }
+    module_PutConfig (p_config);
 
     /* Build the tree of plugins */
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
@@ -184,15 +191,13 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         // Main module excluded
         if( !strcmp( module_GetObjName( p_module ), "main" ) ) continue;
 
-        /* Exclude submodules; they have no config options of their own */
-        if( p_module->b_submodule ) continue;
-
-        unsigned i_subcategory = 0, i_category = 0;
+        unsigned i_subcategory = 0, i_category = 0, confsize;
         bool b_options = false;
+        module_config_t *p_config = module_GetConfig (p_module, &confsize);
 
-        for (size_t i = 0; i < p_module->confsize; i++)
+        for (size_t i = 0; i < confsize; i++)
         {
-            const module_config_t *p_item = p_module->p_config + i;
+            const module_config_t *p_item = p_config + i;
 
             if( p_item->i_type == CONFIG_CATEGORY )
                 i_category = p_item->value.i;
@@ -205,6 +210,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             if( b_options && i_category && i_subcategory )
                 break;
         }
+        module_PutConfig (p_config);
         if( !b_options || i_category == 0 || i_subcategory == 0 ) continue;
 
         // Locate the category item;
@@ -241,12 +247,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         if( !b_found ) continue;
 
         PrefsItemData *module_data = new PrefsItemData();
-        module_data->b_submodule = p_module->b_submodule;
         module_data->i_type = TYPE_MODULE;
         module_data->psz_name = strdup( module_GetObjName( p_module ) );
-        module_data->i_object_id = p_module->b_submodule ?
-                         ((module_t *)p_module->p_parent)->i_object_id :
-                         p_module->i_object_id;
         module_data->help.clear();
         // TODO image
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
@@ -336,20 +338,17 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( data->i_type == TYPE_CATEGORY )
         return;
     else if( data->i_type == TYPE_MODULE )
-        p_module = (module_t *) vlc_object_get( p_intf, data->i_object_id );
+        p_module = module_FindName( VLC_OBJECT(p_intf), data->psz_name );
     else
     {
-        p_module = config_FindModule( VLC_OBJECT(p_intf), "main" );
+        p_module = module_FindName( VLC_OBJECT(p_intf), "main" );
         assert( p_module );
-        vlc_object_yield( p_module );
     }
 
-    module_t *p_realmodule = p_module->b_submodule
-            ? (module_t *)(p_module->p_parent)
-            : p_module;
-
-    module_config_t *p_item = p_realmodule->p_config;
-    module_config_t *p_end = p_item + p_realmodule->confsize;
+    unsigned confsize;
+    module_config_t *p_config = module_GetConfig (p_module, &confsize),
+                    *p_item = p_config,
+                    *p_end = p_config + confsize;
 
     if( data->i_type == TYPE_SUBCATEGORY || data->i_type ==  TYPE_CATSUBCAT )
     {
@@ -364,6 +363,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             p_item++;
         }
     }
+    module_PutConfig (p_config);
 
     /* Widgets now */
     global_layout = new QVBoxLayout();
@@ -380,11 +380,12 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
     else
     {
+        const char *psz_help = module_GetHelp (p_module);
         head = QString( qtr( module_GetLongName( p_module ) ) );
-        if( p_module->psz_help )
+        if( psz_help )
         {
             help.append( "\n" );
-            help.append( qtr( module_GetHelp( p_module ) ) );
+            help.append( qtr( psz_help ) );
         }
     }
 
@@ -473,7 +474,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         layout->addWidget( box, i_line, 0, 1, 2 );
     }
 
-    vlc_object_release( p_module );
+    module_Put( p_module );
 
     scrolled_area->setSizePolicy( QSizePolicy::Preferred,QSizePolicy::Fixed );
     scrolled_area->setLayout( layout );
