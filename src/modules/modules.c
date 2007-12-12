@@ -1020,11 +1020,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 
         i_len = strlen( file->d_name );
         psz_file = malloc( i_dirlen + 1 + i_len + 1 );
-#ifdef WIN32
-        sprintf( psz_file, "%s\\%s", psz_dir, file->d_name );
-#else
-        sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
-#endif
+        sprintf( psz_file, "%s"DIR_SEP"%s", psz_dir, file->d_name );
 
         i_stat = stat( psz_file, &statbuf );
         if( !i_stat && statbuf.st_mode & S_IFDIR )
