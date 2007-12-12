@@ -42,11 +42,11 @@
 /* For the @"media" key */
 - (int) countOfMedia
 {
-    return [self count];
+    return [cachedMedia count];
 }
 - (id) objectInMediaAtIndex:(int)i
 {
-    return [self mediaAtIndex:i];
+    return [cachedMedia objectAtIndex:i];
 }
 @end
 
