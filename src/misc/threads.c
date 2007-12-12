@@ -78,6 +78,19 @@ static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 vlc_threadvar_t msg_context_global_key;
 
 /*****************************************************************************
+ * vlc_threads_error: Report an error from the threading mecanism
+ *****************************************************************************
+ * This is especially useful to debug those errors, as this is a nice symbol
+ * on which you can break.
+ *****************************************************************************/
+void
+__vlc_threads_error( vlc_object_t *p_this )
+{
+    msg_Err( p_this, "Error detected. Put a breakpoint in '%s' to debug.",
+            __func__ );
+}
+
+/*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************
  * This function requires lazy initialization of a global lock in order to
@@ -379,6 +392,7 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
         msg_Err( p_mutex->p_this,
                  "thread %d: mutex_destroy failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_result );
+        vlc_threads_error( p_mutex->p_this );
     }
     return i_result;
 }
@@ -541,6 +555,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
         msg_Err( p_condvar->p_this,
                  "thread %d: cond_destroy failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_result );
+        vlc_threads_error( p_condvar->p_this );
     }
     return i_result;
 }
@@ -710,6 +725,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         errno = i_ret;
         msg_Err( p_this, "%s thread could not be created at %s:%d (%m)",
                          psz_name, psz_file, i_line );
+        vlc_threads_error( p_this );
         vlc_mutex_unlock( &p_this->object_lock );
     }
 
@@ -811,6 +827,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
                          (unsigned int)p_priv->thread_id.id,
              psz_file, i_line, GetLastError() );
+        vlc_threads_error( p_this );
         p_priv->b_thread = VLC_FALSE;
         return;
     }
@@ -885,6 +902,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         errno = i_ret;
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%m)",
                          (unsigned int)p_priv->thread_id, psz_file, i_line );
+        vlc_threads_error( p_this );
     }
     else
     {

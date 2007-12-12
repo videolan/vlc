@@ -35,6 +35,7 @@
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
+VLC_EXPORT( void, __vlc_threads_error, ( vlc_object_t *) );
 VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );
@@ -44,6 +45,12 @@ VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, cons
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
+
+/*****************************************************************************
+ * vlc_threads_error: Signalize an error in the threading system
+ *****************************************************************************/
+#define vlc_threads_error( P_THIS )                                          \
+    __vlc_threads_error( VLC_OBJECT(P_THIS) )
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -139,6 +146,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
         msg_Err( p_mutex->p_this,
                  "thread %li: mutex_lock failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_result );
+        vlc_threads_error( p_mutex->p_this );
     }
     return i_result;
 }
@@ -215,6 +223,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
         msg_Err( p_mutex->p_this,
                  "thread %li: mutex_unlock failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_result );
+        vlc_threads_error( p_mutex->p_this );
     }
 
     return i_result;
@@ -361,6 +370,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
         msg_Err( p_condvar->p_this,
                  "thread %li: cond_signal failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_result );
+        vlc_threads_error( p_condvar->p_this );
     }
 
     return i_result;
@@ -544,6 +554,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
         msg_Err( p_condvar->p_this,
                  "thread %li: cond_wait failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_result );
+        vlc_threads_error( p_condvar->p_this );
     }
 
     return i_result;
@@ -702,6 +713,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
         msg_Err( p_condvar->p_this,
                  "thread %li: cond_wait failed at %s:%d (%d:%m)",
                  i_thread, psz_file, i_line, i_res );
+        vlc_threads_error( p_condvar->p_this );
     }
 
     return i_res;
