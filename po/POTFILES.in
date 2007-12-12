@@ -72,6 +72,12 @@ src/audio_output/input.c
 src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
+src/config/chain.c
+src/config/cmdline.c
+src/config/config.h
+src/config/core.c
+src/config/file.c
+src/config/intf.c
 src/control/audio.c
 src/control/core.c
 src/control/dynamic_media_list.c
@@ -147,12 +153,11 @@ src/misc/variables.c
 src/misc/variables.h
 src/misc/win32_specific.c
 src/misc/xml.c
-src/modules/configuration.c
-src/modules/configuration_chain.c
-src/modules/configuration.h
+src/modules/cache.c
 src/modules/entry.c
 src/modules/modules.c
 src/modules/modules.h
+src/modules/os.c
 src/network/acl.c
 src/network/error.c
 src/network/getaddrinfo.c
@@ -624,6 +629,8 @@ modules/gui/qt4/components/interface_widgets.hpp
 modules/gui/qt4/components/open_panels.cpp
 modules/gui/qt4/components/open_panels.hpp
 modules/gui/qt4/components/playlist/panels.hpp
+modules/gui/qt4/components/playlist/playlist.cpp
+modules/gui/qt4/components/playlist/playlist.hpp
 modules/gui/qt4/components/playlist/selector.cpp
 modules/gui/qt4/components/playlist/selector.hpp
 modules/gui/qt4/components/playlist/standardpanel.cpp
@@ -683,6 +690,7 @@ modules/gui/qt4/ui/sprefs_interface.ui
 modules/gui/qt4/ui/sprefs_subtitles.ui
 modules/gui/qt4/ui/sprefs_video.ui
 modules/gui/qt4/ui/streampanel.ui
+modules/gui/qt4/ui/v4l2.ui
 modules/gui/qt4/ui/video_effects.ui
 modules/gui/qt4/ui/vlm.ui
 modules/gui/qt4/util/customwidgets.cpp
