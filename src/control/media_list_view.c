@@ -129,6 +129,7 @@ media_list_subitem_added( const libvlc_event_t * p_event, void * p_user_data )
  */
 /**************************************************************************
  *       libvlc_media_list_view_set_ml_notification_callback (Internal)
+ * The mlist lock should be held when entered
  **************************************************************************/
 void
 libvlc_media_list_view_set_ml_notification_callback(
@@ -138,7 +139,6 @@ libvlc_media_list_view_set_ml_notification_callback(
 {
     p_mlv->pf_ml_item_added = item_added;
     p_mlv->pf_ml_item_removed = item_removed;
-    libvlc_media_list_lock( p_mlv->p_mlist );
     libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemAdded,
                          media_list_item_added, p_mlv, NULL );
@@ -153,7 +153,6 @@ libvlc_media_list_view_set_ml_notification_callback(
         install_md_listener( p_mlv, p_md );
         libvlc_media_descriptor_release( p_md );
     }
-    libvlc_media_list_unlock( p_mlv->p_mlist );
 }
 
 /**************************************************************************
