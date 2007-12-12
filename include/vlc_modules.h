@@ -25,6 +25,8 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+#if 1
+/* FIXME: scheduled for privatization */
 #define MODULE_SHORTCUT_MAX 50
 
 /* The module handle type. */
@@ -46,8 +48,6 @@ typedef shl_t module_handle_t;
 /**
  * Module descriptor
  */
-#ifndef __PLUGIN__FIXME___
-/* FIXME: scheduled for privatization */
 struct module_t
 {
     VLC_COMMON_MEMBERS

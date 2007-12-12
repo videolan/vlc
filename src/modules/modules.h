@@ -109,15 +109,10 @@ struct module_t
     const char *psz_longname;                   /**< Module descriptive name */
     const char *psz_help;        /**< Long help string for "special" modules */
 
-    /*
-     * Variables set by the module to tell us what it can do
-     */
-    const char *psz_program; /**< Program name which will activate the module */
-
     /** Shortcuts to the module */
     const char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
 
-    const char    *psz_capability;                           /**< Capability */
+    char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
     uint32_t i_cpu;                           /**< Required CPU capabilities */
 
