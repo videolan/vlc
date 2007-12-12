@@ -1027,12 +1027,12 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 
 #if defined (WIN32)
 #   include <dirent.h>
-VLC_INTERNAL( void *, vlc_wopendir, ( const wchar_t * ) );
-VLC_INTERNAL( struct _wdirent *, vlc_wreaddir, ( void * ) );
-VLC_EXPORT( int, vlc_wclosedir, ( void * ) );
-VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
-VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
-VLC_INTERNAL( long, vlc_telldir, ( void * ) );
+ VLC_INTERNAL( void *, vlc_wopendir, ( const wchar_t * ) );
+ VLC_INTERNAL( struct _wdirent *, vlc_wreaddir, ( void * ) );
+ VLC_EXPORT( int, vlc_wclosedir, ( void * ) );
+ VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
+ VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
+ VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #   define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
 #   define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
 #   define closedir vlc_wclosedir
@@ -1183,7 +1183,7 @@ VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
  * I18n stuff
  *****************************************************************************/
 #ifdef WIN32
-VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
+    VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #endif
 
 #if defined( ENABLE_NLS ) && \
