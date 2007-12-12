@@ -134,17 +134,22 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
 {
-    pid_t pid;
-    switch( pid = fork() )
+    pid_t pid = fork();
+    switch( pid )
     {
         case 0:     /* we're the child */
+        {
+            sigset_t set;
+            sigemptyset (&set);
+            pthread_sigmask (SIG_SETMASK, &set, NULL);
+
             /* We don't want output */
             freopen( "/dev/null", "w", stdout );
             freopen( "/dev/null", "w", stderr );
             execv( ppsz_args[0] , (char *const *)ppsz_args );
             /* If the file we want to execute doesn't exist we exit() */
-            exit( 1 );
-            break;
+            exit( EXIT_FAILURE );
+        }
         case -1:    /* we're the error */
             msg_Dbg( p_this, "Couldn't fork() while launching %s",
                      ppsz_args[0] );

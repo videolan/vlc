@@ -953,6 +953,11 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
             return -1;
 
         case 0:
+        {
+            sigset_t set;
+            sigemptyset (&set);
+            pthread_sigmask (SIG_SETMASK, &set, NULL);
+
             /* NOTE:
              * Like it or not, close can fail (and not only with EBADF)
              */
@@ -962,7 +967,8 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
              && ((psz_cwd == NULL) || (chdir (psz_cwd) == 0)))
                 execve (ppsz_argv[0], ppsz_argv, ppsz_env);
 
-            exit (1);
+            exit (EXIT_FAILURE);
+        }
     }
 
     close (fds[1]);
