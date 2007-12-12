@@ -40,6 +40,7 @@ block_FifoPut
 block_FifoRelease
 block_FifoShow
 block_FifoSize
+block_FifoWake
 block_Init
 block_Realloc
 config_ChainCreate
@@ -384,8 +385,6 @@ __vlc_object_yield
 vlc_parse_cmdline
 vlc_rand_bytes
 vlc_sdp_Start
-vlc_strndup
-vlc_strnlen
 vlc_submodule_create
 __vlc_thread_create
 __vlc_thread_join
@@ -428,15 +427,6 @@ vout_RequestWindow
 vout_ShowTextAbsolute
 vout_ShowTextRelative
 vout_Snapshot
-vout_SynchroChoose
-vout_SynchroDate
-vout_SynchroDecode
-vout_SynchroEnd
-__vout_SynchroInit
-vout_SynchroNewPicture
-vout_SynchroRelease
-vout_SynchroReset
-vout_SynchroTrash
 vout_UnlinkPicture
 vout_vaControlDefault
 vout_VarCallback
