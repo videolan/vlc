@@ -146,12 +146,14 @@ LocaleFree
 mdate
 __module_Exists
 __module_FindName
+module_GetConfig
 module_GetHelp
 module_GetName
 module_GetObjName
 module_IsCapable
 __module_Need
 module_Put
+module_PutConfig
 __module_Unneed
 __msg_Dbg
 __msg_Err
