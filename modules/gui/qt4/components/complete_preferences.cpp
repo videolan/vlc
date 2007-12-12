@@ -86,9 +86,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     PrefsItemData *data = NULL;
     QTreeWidgetItem *current_item = NULL;
     unsigned confsize;
-    module_config_t *p_config;
-
-    p_config = module_GetConfig (p_module, &confsize);
+    module_config_t *const p_config = module_GetConfig (p_module, &confsize);
 
     for (size_t i = 0; i < confsize; i++)
     {
@@ -193,7 +191,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
         unsigned i_subcategory = 0, i_category = 0, confsize;
         bool b_options = false;
-        module_config_t *p_config = module_GetConfig (p_module, &confsize);
+        module_config_t *const p_config = module_GetConfig (p_module, &confsize);
 
         for (size_t i = 0; i < confsize; i++)
         {
@@ -346,7 +344,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     unsigned confsize;
-    module_config_t *p_config = module_GetConfig (p_module, &confsize),
+    module_config_t *const p_config = module_GetConfig (p_module, &confsize),
                     *p_item = p_config,
                     *p_end = p_config + confsize;
 
@@ -363,7 +361,6 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             p_item++;
         }
     }
-    module_PutConfig (p_config);
 
     /* Widgets now */
     global_layout = new QVBoxLayout();
