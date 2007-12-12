@@ -49,6 +49,8 @@ static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
                         unsigned int *, unsigned int * );
 static void DoRelease( intf_thread_t *, void * );
 static int DoControl( intf_thread_t *, void *, int, va_list );
+static int ItemChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
@@ -133,7 +135,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
 
     /* A cone in the middle */
     label = new QLabel;
-//    label->setScaledContents( true );
+    label->setScaledContents( true );
     label->setMargin( 5 );
     label->setMaximumHeight( MAX_BG_SIZE );
     label->setMaximumWidth( MAX_BG_SIZE );
@@ -146,18 +148,58 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
 
     resize( 300, 150 );
     updateGeometry();
+    i_runs = 0;
+    b_need_update = VLC_FALSE;
+    var_AddCallback( THEPL, "item-change", ItemChanged, this );
+    ON_TIMEOUT( update() );
 }
 
 BackgroundWidget::~BackgroundWidget()
-{}
-
-void BackgroundWidget::setArt( QString url )
 {
-    if( url.isNull() )
+    var_DelCallback( THEPL, "item-change", ItemChanged, this );
+}
+
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    BackgroundWidget *p_d = (BackgroundWidget*)param;
+    p_d->b_need_update = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+void BackgroundWidget::update()
+{
+    /* Timer runs at 150 ms, dont' update more than once every 750ms */
+    i_runs++;
+    if( i_runs % 6 != 0 ) return;
+
+    /* Get Input and clear if non-existant */
+    input_thread_t *p_input =
+                     MainInputManager::getInstance( p_intf )->getInput();
+    if( !p_input || p_input->b_dead )
+    {
         label->setPixmap( QPixmap( ":/vlc128.png" ) );
-    else
-        label->setPixmap( QPixmap( url ) );
-    updateGeometry();
+        return;
+    }
+
+
+    if( b_need_update )
+    {
+        vlc_object_yield( p_input );
+        char *psz_arturl = input_item_GetArtURL( input_GetItem(p_input) );
+        vlc_object_release( p_input );
+        QString url = qfu( psz_arturl );
+        QString arturl = url.replace( "file://",QString("" ) );
+        if( arturl.isNull() )
+            label->setPixmap( QPixmap( ":/vlc128.png" ) );
+        else
+        {
+            label->setPixmap( QPixmap( arturl ) );
+            msg_Dbg( p_intf, "changing input b_need_update done %s", psz_arturl );
+        }
+        free( psz_arturl );
+    }
+    b_need_update = false;
 }
 
 QSize BackgroundWidget::sizeHint() const
@@ -167,10 +209,15 @@ QSize BackgroundWidget::sizeHint() const
 
 void BackgroundWidget::resizeEvent( QResizeEvent *e )
 {
-    msg_Dbg( p_intf, "BG size, %i, %i", e->size().width(), e->size().height() );
-    if( e->size().height() < label->height() )
+    if( e->size().height() < MAX_BG_SIZE -1 )
     {
-        label->resize( e->size().height(), e->size().height() );
+        label->setMaximumWidth( e->size().height() );
+        label->setMaximumHeight( e->size().width() );
+    }
+    else
+    {
+        label->setMaximumHeight( MAX_BG_SIZE );
+        label->setMaximumWidth( MAX_BG_SIZE );
     }
 }
 

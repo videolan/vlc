@@ -658,9 +658,6 @@ void MainInterface::togglePlaylist()
     {
         msg_Dbg( p_intf, "Creating a new playlist" );
         playlistWidget = new PlaylistWidget( p_intf, settings );
-        if( bgWidget )
-            CONNECT( playlistWidget, artSet( QString ),
-                     bgWidget, setArt(QString) );
 
         /* Add it to the parent DockWidget */
         dockPL->setWidget( playlistWidget );
