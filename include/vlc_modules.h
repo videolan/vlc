@@ -25,7 +25,7 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
-#if 0
+#if 1
 /* FIXME: scheduled for privatization */
 #define MODULE_SHORTCUT_MAX 50
 
