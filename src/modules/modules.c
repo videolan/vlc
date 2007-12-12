@@ -709,6 +709,16 @@ module_t *__module_FindName( vlc_object_t *p_this, const char * psz_name )
     return NULL;
 }
 
+
+/*****************************************************************************
+ * module_Put: release a module_t pointer from module_FindName().
+ *****************************************************************************/
+void module_Put ( module_t *module )
+{
+    vlc_object_release ( module );
+}
+
+
 /*****************************************************************************
  * module_Exists: tell if a module exists.
  *****************************************************************************
@@ -719,7 +729,7 @@ vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
     module_t *p_module = __module_FindName( p_this, psz_name );
     if( p_module )
     {
-        vlc_object_release( p_module );
+        module_Put( p_module );
         return VLC_TRUE;
     }
     else

@@ -176,6 +176,8 @@ __intf_UserYesNo
 IsUTF8
 LocaleFree
 mdate
+__module_FindName
+module_Put
 __module_Exists
 __module_Need
 __module_Unneed

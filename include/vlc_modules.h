@@ -25,7 +25,7 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
-#if 1
+#if 0
 /* FIXME: scheduled for privatization */
 #define MODULE_SHORTCUT_MAX 50
 
@@ -107,6 +107,8 @@ VLC_EXPORT( vlc_bool_t,  __module_Exists, ( vlc_object_t *, const char * ) );
 /* Use only if you know what you're doing... */
 #define module_FindName(a,b) __module_FindName(VLC_OBJECT(a),b)
 VLC_EXPORT( module_t *, __module_FindName, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( void, module_Put, ( module_t *module ) );
+
 
 /* Return a NULL terminated array with the names of the modules that have a
  * certain capability.
