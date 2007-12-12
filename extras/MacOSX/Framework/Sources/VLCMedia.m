@@ -374,10 +374,9 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         libvlc_media_list_release( p_mlist );
     }
     
-    /* Let's retrieve some info */
+    /* Force VLCMetaInformationTitle, that will trigger preparsing
+     * And all the other meta will be added through the libvlc event system */
     [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
-    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationAlbum];
-    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtist];
 }
 
 - (void)fetchMetaInformationFromLibVLCWithType:(NSString *)metaType
