@@ -233,11 +233,11 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
     }
     else
     {
-        vlc_object_release( p_obj );
+        module_Put( p_obj );
         msg_Err( p_intf, "Unknown video filter type." );
         return;
     }
-    vlc_object_release( p_obj );
+    module_Put( p_obj );
 
     psz_string = config_GetPsz( p_intf, psz_filter_type );
 
