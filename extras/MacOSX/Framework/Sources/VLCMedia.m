@@ -296,27 +296,37 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
  * Implementation VLCMedia (Private)
  */
 @implementation VLCMedia (Private)
+
 + (libvlc_meta_t)stringToMetaType:(NSString *)string
 {
-#define VLCStringToMeta( name, string ) if ([VLCMetaInformation##name compare:string] == NSOrderedSame) return libvlc_meta_##name;
-    VLCStringToMeta(Title, string);
-    VLCStringToMeta(Artist, string);
-    VLCStringToMeta(Genre, string);
-    VLCStringToMeta(Copyright, string);
-    VLCStringToMeta(Album, string);
-    VLCStringToMeta(TrackNumber, string);
-    VLCStringToMeta(Description, string);
-    VLCStringToMeta(Rating, string);
-    VLCStringToMeta(Date, string);
-    VLCStringToMeta(Setting, string);
-    VLCStringToMeta(URL, string);
-    VLCStringToMeta(Language, string);
-    VLCStringToMeta(NowPlaying, string);
-    VLCStringToMeta(Publisher, string);
-    VLCStringToMeta(ArtworkURL, string);
-    VLCStringToMeta(TrackID, string);
+    static NSDictionary * stringToMetaDictionary = nil;
+    // TODO: Thread safe-ize
+    if( !stringToMetaDictionary )
+    {
+#define VLCStringToMeta( name ) [NSNumber numberWithInt: libvlc_meta_##name], VLCMetaInformation##name
+        stringToMetaDictionary =
+            [[NSDictionary dictionaryWithObjectsAndKeys:
+                VLCStringToMeta(Title),
+                VLCStringToMeta(Artist),
+                VLCStringToMeta(Genre),
+                VLCStringToMeta(Copyright),
+                VLCStringToMeta(Album),
+                VLCStringToMeta(TrackNumber),
+                VLCStringToMeta(Description),
+                VLCStringToMeta(Rating),
+                VLCStringToMeta(Date),
+                VLCStringToMeta(Setting),
+                VLCStringToMeta(URL),
+                VLCStringToMeta(Language),
+                VLCStringToMeta(NowPlaying),
+                VLCStringToMeta(Publisher),
+                VLCStringToMeta(ArtworkURL),
+                VLCStringToMeta(TrackID),
+                nil] retain];
 #undef VLCStringToMeta
-    return -1;
+    }
+    NSNumber * number = [stringToMetaDictionary objectForKey:string];
+    return number ? [number intValue] : -1;
 }
 
 + (NSString *)metaTypeToString:(libvlc_meta_t)type
@@ -387,9 +397,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
             return;
         }
 
-        @synchronized(metaDictionary) {
-            [metaDictionary setValue:newValue forKeyPath:metaType];
-        }
+        [metaDictionary setValue:newValue forKeyPath:metaType];
     }
 }
 
