@@ -2008,11 +2008,10 @@ static void CacheSave( vlc_object_t *p_this )
     }
 
     char psz_filename[sizeof(DIR_SEP) + 32 + strlen(psz_cachedir)];
-    i_len = sizeof(DIR_SEP) + 32 + strlen(psz_cachedir);
     config_CreateDir( p_this, psz_cachedir );
 
-    snprintf( psz_filename, i_len, "%s"DIR_SEP"CACHEDIR.TAG", psz_cachedir );
-    psz_filename[i_len-1] = '\0';
+    snprintf( psz_filename, sizeof( psz_filename ),
+              "%s"DIR_SEP"CACHEDIR.TAG", psz_cachedir );
     file = utf8_fopen( psz_filename, "wb" );
     if( file )
     {
@@ -2020,9 +2019,8 @@ static void CacheSave( vlc_object_t *p_this )
         fclose( file );
     }
 
-    memset( psz_filename, 0, i_len );
-    snprintf( psz_filename, i_len, "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
-    psz_filename[i_len-1] = '\0';
+    snprintf( psz_filename, sizeof( psz_filename ),
+              "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
     file = utf8_fopen( psz_filename, "wb" );
