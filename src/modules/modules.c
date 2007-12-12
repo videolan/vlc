@@ -686,9 +686,9 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 }
 
 /*****************************************************************************
- * module_FindName: get a pointer to a module_t given it's name.
+ * module_Find: get a pointer to a module_t given it's name.
  *****************************************************************************/
-module_t *__module_FindName( vlc_object_t *p_this, const char * psz_name )
+module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
 {
     vlc_list_t *p_list;
     int i;
@@ -711,7 +711,7 @@ module_t *__module_FindName( vlc_object_t *p_this, const char * psz_name )
 
 
 /*****************************************************************************
- * module_Put: release a module_t pointer from module_FindName().
+ * module_Put: release a module_t pointer from module_Find().
  *****************************************************************************/
 void module_Put ( module_t *module )
 {
@@ -726,7 +726,7 @@ void module_Put ( module_t *module )
  *****************************************************************************/
 vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
 {
-    module_t *p_module = __module_FindName( p_this, psz_name );
+    module_t *p_module = __module_Find( p_this, psz_name );
     if( p_module )
     {
         module_Put( p_module );

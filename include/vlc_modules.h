@@ -35,9 +35,8 @@ VLC_EXPORT( void, __module_Unneed, ( vlc_object_t *, module_t * ) );
 #define module_Exists(a,b) __module_Exists(VLC_OBJECT(a),b)
 VLC_EXPORT( vlc_bool_t,  __module_Exists, ( vlc_object_t *, const char * ) );
 
-/* Use only if you know what you're doing... */
-#define module_FindName(a,b) __module_FindName(VLC_OBJECT(a),b)
-VLC_EXPORT( module_t *, __module_FindName, ( vlc_object_t *, const char * ) );
+#define module_Find(a,b) __module_Find(VLC_OBJECT(a),b)
+VLC_EXPORT( module_t *, __module_Find, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void, module_Put, ( module_t *module ) );
 
 VLC_EXPORT( module_config_t *, module_GetConfig, ( const module_t *, unsigned * ) );

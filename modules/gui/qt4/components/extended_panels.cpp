@@ -212,7 +212,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
 
     /* Please leave p_libvlc_global. This is where cached modules are
      * stored. We're not trying to find a module instance. */
-    module_t *p_obj = module_FindName( p_intf, psz_name );
+    module_t *p_obj = module_Find( p_intf, psz_name );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\n.", psz_name );

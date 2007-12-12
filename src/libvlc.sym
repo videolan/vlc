@@ -48,7 +48,6 @@ config_ChainDestroy
 __config_ChainParse
 config_Duplicate
 config_FindConfig
-config_FindModule
 config_GetDataDir
 __config_GetFloat
 __config_GetInt
@@ -145,7 +144,7 @@ IsUTF8
 LocaleFree
 mdate
 __module_Exists
-__module_FindName
+__module_Find
 module_GetConfig
 module_GetHelp
 module_GetName

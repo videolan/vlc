@@ -210,7 +210,6 @@ VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) );
-VLC_EXPORT( module_t *, config_FindModule,( vlc_object_t *, const char * ) );
 
 VLC_EXPORT( int, config_Duplicate,( module_t *, const module_config_t *, size_t ));
 

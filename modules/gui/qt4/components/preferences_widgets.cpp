@@ -1031,7 +1031,7 @@ void KeySelectorControl::finish()
     table->setColumnCount( 2 );
     table->setAlternatingRowColors( true );
 
-    module_t *p_main = config_FindModule( p_this, "main" );
+    module_t *p_main = module_Find( p_this, "main" );
     assert( p_main );
 
     unsigned confsize;
@@ -1056,6 +1056,7 @@ void KeySelectorControl::finish()
         }
     }
     module_PutConfig (p_config);
+    module_Put (p_module);
 
     table->resizeColumnToContents( 0 );
 

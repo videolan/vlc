@@ -84,7 +84,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     /* Now add user filters */
     if( var_Type( p_aout, "visual" ) == 0 )
     {
-        module_t *p_module;
         var_Create( p_aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         text.psz_string = _("Visualizations");
         var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
@@ -98,16 +97,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
 
         /* Look for goom plugin */
-        p_module = config_FindModule( VLC_OBJECT(p_aout), "goom" );
-        if( p_module )
+        if( module_Exists( VLC_OBJECT(p_aout), "goom" ) )
         {
             val.psz_string = "goom"; text.psz_string = "Goom";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
         /* Look for galaktos plugin */
-        p_module = config_FindModule( VLC_OBJECT(p_aout), "galaktos" );
-        if( p_module )
+        if( module_Exists( VLC_OBJECT(p_aout), "galaktos" ) )
         {
             val.psz_string = "galaktos"; text.psz_string = "GaLaktos";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );

@@ -484,34 +484,6 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 }
 
 /*****************************************************************************
- * config_FindModule: find a specific module structure.
- *****************************************************************************/
-module_t *config_FindModule( vlc_object_t *p_this, const char *psz_name )
-{
-    vlc_list_t *p_list;
-    module_t *p_module, *p_result = NULL;
-    int i_index;
-
-    if( !psz_name ) return NULL;
-
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
-    {
-        p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( p_module->psz_object_name, psz_name ) )
-        {
-             p_result = p_module;
-             break;
-        }
-    }
-
-    vlc_list_release( p_list );
-
-    return p_result;
-}
-
-/*****************************************************************************
  * config_Duplicate: creates a duplicate of a module's configuration data.
  *****************************************************************************
  * Unfortunatly we cannot work directly with the module's config data as
