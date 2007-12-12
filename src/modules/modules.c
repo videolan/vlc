@@ -1993,6 +1993,7 @@ static void CacheSave( vlc_object_t *p_this )
         "#   http://www.brynosaurus.com/cachedir/\r\n";
 
     char *psz_cachedir;
+    size_t i_len = 0;
     FILE *file;
     int i, j, i_cache;
     module_cache_t **pp_cache;
@@ -2007,9 +2008,11 @@ static void CacheSave( vlc_object_t *p_this )
     }
 
     char psz_filename[sizeof(DIR_SEP) + 32 + strlen(psz_cachedir)];
+    i_len = sizeof(DIR_SEP) + 32 + strlen(psz_cachedir);
     config_CreateDir( p_this, psz_cachedir );
 
-    sprintf( psz_filename, "%s"DIR_SEP"CACHEDIR.TAG", psz_cachedir );
+    snprintf( psz_filename, i_len, "%s"DIR_SEP"CACHEDIR.TAG", psz_cachedir );
+    psz_filename[i_len-1] = '\0';
     file = utf8_fopen( psz_filename, "wb" );
     if( file )
     {
@@ -2017,8 +2020,9 @@ static void CacheSave( vlc_object_t *p_this )
         fclose( file );
     }
 
-    sprintf( psz_filename, "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
-
+    memset( psz_filename, 0, i_len );
+    snprintf( psz_filename, i_len, "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
+    psz_filename[i_len-1] = '\0';
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
     file = utf8_fopen( psz_filename, "wb" );
@@ -2026,7 +2030,6 @@ static void CacheSave( vlc_object_t *p_this )
     {
         msg_Warn( p_this, "could not open plugins cache file %s for writing",
                   psz_filename );
-        free( psz_filename );
         return;
     }
 
@@ -2126,8 +2129,6 @@ static void CacheSave( vlc_object_t *p_this )
     fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
 
     fclose( file );
-
-    return;
 }
 
 void CacheSaveConfig( module_t *p_module, FILE *file )
