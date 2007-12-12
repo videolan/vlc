@@ -295,7 +295,9 @@ SOURCES_libvlc_common = \
 	misc/block.c \
 	modules/modules.h \
 	modules/modules.c \
+	modules/cache.c \
 	modules/entry.c \
+	modules/os.c \
 	misc/threads.c \
 	misc/stats.c \
 	misc/cpu.c \

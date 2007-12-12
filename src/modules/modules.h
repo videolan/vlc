@@ -161,4 +161,15 @@ void  __module_EndBank         ( vlc_object_t * );
 #define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
 void  __module_ResetBank       ( vlc_object_t * );
 
+/* Low-level OS-dependant handler */
+int  module_Call   (module_t *);
+int  module_Load   (vlc_object_t *, const char *, module_handle_t *);
+void module_Unload (module_handle_t);
+
+/* Plugins cache */
+void   CacheMerge (vlc_object_t *, module_t *, module_t *);
+void   CacheLoad  (vlc_object_t * );
+void   CacheSave  (vlc_object_t * );
+module_cache_t * CacheFind (vlc_object_t *, const char *, int64_t, int64_t);
+
 #endif /* !__LIBVLC_MODULES_H */
