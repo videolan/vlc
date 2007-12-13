@@ -386,12 +386,14 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
         else
             p_playlist->i_current_index = -1;
 
-        if( p_playlist->current.i_size && i_skip > 0 )
+        if( p_playlist->current.i_size && (i_skip > 0) )
         {
+            if( p_playlist->i_current_index < -1 )
+                p_playlist->i_current_index = -1;
             for( i = i_skip; i > 0 ; i-- )
             {
                 p_playlist->i_current_index++;
-                if( p_playlist->i_current_index == p_playlist->current.i_size )
+                if( p_playlist->i_current_index >= p_playlist->current.i_size )
                 {
                     PL_DEBUG( "looping - restarting at beginning of node" );
                     p_playlist->i_current_index = 0;
@@ -400,12 +402,12 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             p_new = ARRAY_VAL( p_playlist->current,
                                p_playlist->i_current_index );
         }
-        else if( p_playlist->current.i_size && i_skip < 0 )
+        else if( p_playlist->current.i_size && (i_skip < 0) )
         {
             for( i = i_skip; i < 0 ; i++ )
             {
                 p_playlist->i_current_index--;
-                if( p_playlist->i_current_index == -1 )
+                if( p_playlist->i_current_index <= -1 )
                 {
                     PL_DEBUG( "looping - restarting at end of node" );
                     p_playlist->i_current_index = p_playlist->current.i_size-1;
