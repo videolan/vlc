@@ -90,7 +90,7 @@ private:
     int i_runs;
 public slots:
     void toggle(){ TOGGLEV( this ); }
-    void update( void );
+    void update( input_thread_t * );
 };
 
 class VisualSelector : public QFrame

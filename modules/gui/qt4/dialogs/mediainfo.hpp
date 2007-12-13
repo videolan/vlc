@@ -83,7 +83,7 @@ private:
     QLineEdit *uriLine;
 
 public slots:
-    void updateOnTimeOut();
+    void update( input_thread_t * );
     void update( input_item_t *, bool, bool );
 
 private slots:

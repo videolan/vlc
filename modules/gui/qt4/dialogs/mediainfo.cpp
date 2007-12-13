@@ -31,8 +31,6 @@
 #include <QLineEdit>
 #include <QLabel>
 
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param );
 MediaInfoDialog *MediaInfoDialog::instance = NULL;
 
 MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
@@ -92,18 +90,13 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 
     CONNECT( IT, currentChanged( int ), this, updateButtons( int ) );
 
-    /* Create the main Update function with a time (150ms) */
-    if( mainInput ) {
-        ON_TIMEOUT( updateOnTimeOut() );
-        var_AddCallback( THEPL, "item-change", ItemChanged, this );
-    }
+    CONNECT( THEMIM, inputChanged( input_thread_t * ), this, update( input_thread_t * ) );
+    /* Call update by hand, so info is shown from current item too */
+    update( input_GetItem(THEMIM->getInput()), true, true );
 }
 
 MediaInfoDialog::~MediaInfoDialog()
 {
-    if( mainInput ) {
-        var_DelCallback( THEPL, "item-change", ItemChanged, this );
-    }
     writeSettings( "mediainfo" );
 }
 
@@ -124,23 +117,9 @@ void MediaInfoDialog::saveMeta()
     saveMetaButton->hide();
 }
 
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
-        vlc_value_t oldval, vlc_value_t newval, void *param )
+/* Function called on inputChanged-update*/
+void MediaInfoDialog::update( input_thread_t *p_input )
 {
-    MediaInfoDialog *p_d = (MediaInfoDialog *)param;
-    p_d->b_need_update = VLC_TRUE;
-    return VLC_SUCCESS;
-}
-
-/* Function called on TimeOut */
-void MediaInfoDialog::updateOnTimeOut()
-{
-    /* Timer runs at 150 ms, dont' update more than 2 times per second */
-    i_runs++;
-    if( i_runs % 4 != 0 ) return;
-
-    /* Get Input and clear if non-existant */
-    input_thread_t *p_input = THEMIM->getInput();
     if( !p_input || p_input->b_dead )
     {
         if( !b_cleaned )

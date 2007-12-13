@@ -50,8 +50,6 @@ static void *DoRequest( intf_thread_t *, vout_thread_t *, int*,int*,
                         unsigned int *, unsigned int * );
 static void DoRelease( intf_thread_t *, void * );
 static int DoControl( intf_thread_t *, void *, int, va_list );
-static int ItemChanged( vlc_object_t *, const char *,
-                        vlc_value_t, vlc_value_t, void * );
 
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
@@ -149,34 +147,16 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
 
     resize( 300, 150 );
     updateGeometry();
-    i_runs = 0;
-    b_need_update = VLC_FALSE;
-    var_AddCallback( THEPL, "item-change", ItemChanged, this );
-    ON_TIMEOUT( update() );
+    CONNECT( THEMIM, inputChanged( input_thread_t *), this, update( input_thread_t * ) );
 }
 
 BackgroundWidget::~BackgroundWidget()
 {
-    var_DelCallback( THEPL, "item-change", ItemChanged, this );
 }
 
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
-        vlc_value_t oldval, vlc_value_t newval, void *param )
-{
-    BackgroundWidget *p_d = (BackgroundWidget*)param;
-    p_d->b_need_update = VLC_TRUE;
-    return VLC_SUCCESS;
-}
 
-void BackgroundWidget::update()
+void BackgroundWidget::update( input_thread_t *p_input )
 {
-    /* Timer runs at 150 ms, dont' update more than once every 750ms */
-    i_runs++;
-    if( i_runs % 6 != 0 ) return;
-
-    /* Get Input and clear if non-existant */
-    input_thread_t *p_input =
-                     MainInputManager::getInstance( p_intf )->getInput();
     if( !p_input || p_input->b_dead )
     {
         label->setPixmap( QPixmap( ":/vlc128.png" ) );
@@ -184,23 +164,19 @@ void BackgroundWidget::update()
     }
 
 
-    if( b_need_update )
+    vlc_object_yield( p_input );
+    char *psz_arturl = input_item_GetArtURL( input_GetItem(p_input) );
+    vlc_object_release( p_input );
+    QString url = qfu( psz_arturl );
+    QString arturl = url.replace( "file://",QString("" ) );
+    if( arturl.isNull() )
+        label->setPixmap( QPixmap( ":/vlc128.png" ) );
+    else
     {
-        vlc_object_yield( p_input );
-        char *psz_arturl = input_item_GetArtURL( input_GetItem(p_input) );
-        vlc_object_release( p_input );
-        QString url = qfu( psz_arturl );
-        QString arturl = url.replace( "file://",QString("" ) );
-        if( arturl.isNull() )
-            label->setPixmap( QPixmap( ":/vlc128.png" ) );
-        else
-        {
-            label->setPixmap( QPixmap( arturl ) );
-            msg_Dbg( p_intf, "changing input b_need_update done %s", psz_arturl );
-        }
-        free( psz_arturl );
+        label->setPixmap( QPixmap( arturl ) );
+        msg_Dbg( p_intf, "changing input b_need_update done %s", psz_arturl );
     }
-    b_need_update = false;
+    free( psz_arturl );
 }
 
 QSize BackgroundWidget::sizeHint() const
