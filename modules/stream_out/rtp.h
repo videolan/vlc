@@ -41,6 +41,27 @@ void rtp_del_sink( sout_stream_id_t *id, int fd );
 uint16_t rtp_get_seq( const sout_stream_id_t *id );
 unsigned rtp_get_num( const sout_stream_id_t *id );
 
+/* RTP packetization */
+void rtp_packetize_common (sout_stream_id_t *id, block_t *out,
+                           int b_marker, int64_t i_pts);
+void rtp_packetize_send (sout_stream_id_t *id, block_t *out);
+size_t rtp_mtu (const sout_stream_id_t *id);
+size_t rtp_plen (const sout_stream_id_t * id, unsigned ptime);
+
+int rtp_packetize_l16  (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_l8   (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_mpa  (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_mpv  (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_ac3  (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_split(sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_mp4a (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_mp4a_latm (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_h263 (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_h264 (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_amr  (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_spx  (sout_stream_t *, sout_stream_id_t *, block_t *);
+int rtp_packetize_t140 (sout_stream_t *, sout_stream_id_t *, block_t *);
+
 /* RTCP */
 typedef struct rtcp_sender_t rtcp_sender_t;
 rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
