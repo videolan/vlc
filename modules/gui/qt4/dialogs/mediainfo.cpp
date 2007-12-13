@@ -42,7 +42,6 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 {
     i_runs = 0;
     p_item = _p_item;
-    b_need_update = true;
     b_cleaned = true;
 
     setWindowTitle( qtr( "Media information" ) );
@@ -133,9 +132,7 @@ void MediaInfoDialog::update( input_thread_t *p_input )
     /* Launch the update in all the panels */
     vlc_object_yield( p_input );
 
-    update( input_GetItem(p_input), b_need_update, b_need_update );
-    b_need_update = false;
-    b_cleaned = false;
+    update( input_GetItem(p_input), true, true);
 
     vlc_object_release( p_input );
 }

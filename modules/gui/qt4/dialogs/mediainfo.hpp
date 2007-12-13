@@ -62,7 +62,6 @@ public:
 #if 0
     void setInput( input_item_t * );
 #endif
-    bool b_need_update;
 
 private:
     input_item_t *p_item;
