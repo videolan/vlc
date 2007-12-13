@@ -35,7 +35,6 @@
 
 /*
  * TODO: Tuner partial implementation.
- * TODO: Alsa input support - experimental
  */
 
 /*****************************************************************************
@@ -1129,10 +1128,32 @@ static block_t* GrabAudio( demux_t *p_demux )
     {
         /* ALSA */
         i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
-        /* TODO: ALSA ERROR HANDLING?? xrun?? */
-
-        /* convert from frames to bytes */
-        if( i_read > 0 ) i_read *= p_sys->i_alsa_frame_size;
+        if( i_read <= 0 )
+        {
+            int i_resume;
+            switch( i_read )
+            {
+                case -EAGAIN:
+                    break;
+                case -EPIPE:
+                    /* xrun */
+                    snd_pcm_prepare( p_sys->p_alsa_pcm );
+                    break;
+                case -ESTRPIPE:
+                    /* suspend */
+                    i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
+                    if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
+                    break;
+                default:
+                    msg_Err( p_demux, "Failed to read alsa frame (%s)", snd_strerror( i_read ) );
+                    return 0;
+            }
+        }
+        else
+        {
+            /* convert from frames to bytes */
+            i_read *= p_sys->i_alsa_frame_size;
+        }
     }
     else
 #endif
@@ -1153,6 +1174,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     if( !p_sys->b_use_alsa )
 #endif
     {
+        /* OSS */
         if( ioctl( p_sys->i_fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
         {
             i_correct += buf_info.bytes;
@@ -1161,8 +1183,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 #ifdef HAVE_ALSA
     else
     {
-        /* TODO: ALSA timing */
-        /* Very experimental code... */
+        /* ALSA */
         int i_err;
         snd_pcm_sframes_t delay = 0;
         if( ( i_err = snd_pcm_delay( p_sys->p_alsa_pcm, &delay ) ) >= 0 )
