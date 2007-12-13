@@ -40,7 +40,6 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
                                   QVLCFrame( _p_intf ), mainInput(_mainInput),
                                   stats( _stats )
 {
-    i_runs = 0;
     p_item = _p_item;
     b_cleaned = true;
 
@@ -165,6 +164,12 @@ void MediaInfoDialog::close()
 {
     this->toggleVisible();
 
+    /* if dialog is closed, revert editing if not saved */
+    if( MP->isInEditMode() )
+    {
+        MP->setEditMode( false );
+        updateButtons( 0 );
+    }
     if( mainInput == false ) {
         deleteLater();
     }

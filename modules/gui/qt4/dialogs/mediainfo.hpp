@@ -67,7 +67,6 @@ private:
     input_item_t *p_item;
     static MediaInfoDialog *instance;
 
-    int i_runs;
     bool mainInput;
     bool stats;
     bool b_cleaned;
