@@ -31,7 +31,7 @@
 int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
                        block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 12 - 4; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
@@ -70,7 +70,7 @@ int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
                        block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 12 - 4; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
@@ -173,7 +173,7 @@ int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
                        block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 12 - 2; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - 2; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
@@ -210,7 +210,7 @@ int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
                          block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 12; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id); /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
@@ -244,7 +244,7 @@ int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *id,
                              block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 14;              /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - 2;              /* payload max in one packet */
     int     latmhdrsize = in->i_buffer / 0xff + 1;
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
@@ -357,7 +357,7 @@ int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
                         block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 16; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - 4; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
@@ -405,7 +405,7 @@ int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
     uint8_t *p_data = in->p_buffer;
     int     i_data  = in->i_buffer;
     int     i;
-    int     i_max   = rtp_mtu (id) - 12 - RTP_H263_HEADER_SIZE; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - RTP_H263_HEADER_SIZE; /* payload max in one packet */
     int     i_count;
     int     b_p_bit;
     int     b_v_bit = 0; // no pesky error resilience
@@ -466,7 +466,7 @@ rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
                         int64_t i_dts, vlc_bool_t b_last, int64_t i_length )
 {
-    const int i_max = rtp_mtu (id) - 12; /* payload max in one packet */
+    const int i_max = rtp_mtu (id); /* payload max in one packet */
     int i_nal_hdr;
     int i_nal_type;
 
@@ -575,7 +575,7 @@ int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
                        block_t *in )
 {
-    int     i_max   = rtp_mtu (id) - 14; /* payload max in one packet */
+    int     i_max   = rtp_mtu (id) - 2; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
@@ -614,7 +614,7 @@ int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
 int rtp_packetize_t140( sout_stream_t *p_stream, sout_stream_id_t *id,
                         block_t *in )
 {
-    const size_t   i_max  = rtp_mtu (id) - 12;
+    const size_t   i_max  = rtp_mtu (id);
     const uint8_t *p_data = in->p_buffer;
     size_t         i_data = in->i_buffer;
 
@@ -667,7 +667,7 @@ int rtp_packetize_spx( sout_stream_t *p_stream, sout_stream_id_t *id,
     i_payload_padding = 0;
     block_t *p_out;
 
-    if ( in->i_buffer + 12 > rtp_mtu (id) )
+    if ( in->i_buffer > rtp_mtu (id) )
     {
         msg_Warn( p_stream, "Cannot send packet larger than output MTU" );
         return VLC_SUCCESS;
