@@ -29,7 +29,7 @@
 #ifndef __VLC_URL_H
 # define __VLC_URL_H
 
-typedef struct
+struct vlc_url_t
 {
     char *psz_protocol;
     char *psz_username;
@@ -42,7 +42,7 @@ typedef struct
     char *psz_option;
 
     char *psz_buffer; /* to be freed */
-} vlc_url_t;
+};
 
 VLC_EXPORT( char *, unescape_URI_duplicate, ( const char *psz ) );
 VLC_EXPORT( void, unescape_URI, ( char *psz ) );

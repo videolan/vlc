@@ -383,6 +383,7 @@ typedef struct virtual_socket_t v_socket_t;
 typedef struct sockaddr sockaddr;
 typedef struct addrinfo addrinfo;
 typedef struct vlc_acl_t vlc_acl_t;
+typedef struct vlc_url_t vlc_url_t;
 
 /* Misc */
 typedef struct iso639_lang_t iso639_lang_t;

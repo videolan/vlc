@@ -27,9 +27,6 @@
 #include <vlc_block.h>
 
 #include <vlc_network.h>
-
-
-#include <vlc_url.h>
 #include <vlc_sout.h>
 #include "rtp.h"
 
