@@ -348,6 +348,10 @@ static void Run( intf_thread_t *p_intf )
      * force drawing the interface for the first time
      */
     t_last_refresh = ( time( 0 ) - 1);
+    /*
+     * force building of the playlist array
+     */
+    PlaylistRebuild( p_intf );
 
     while( !intf_ShouldDie( p_intf ) )
     {
@@ -575,7 +579,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
             case KEY_ENTER:
             case 0x0d:
-                if( !p_sys->pp_plist || !p_sys->pp_plist[p_sys->i_box_plidx] )
+                if( !p_sys->pp_plist[p_sys->i_box_plidx] )
                 {
                     b_ret = VLC_FALSE;
                     break;
