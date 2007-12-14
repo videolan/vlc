@@ -841,17 +841,21 @@ static int Open( vlc_object_t * p_this )
     result = ioctl( p_sys->i_fd, VIDIOC_QUERYCAP, &device_capability );
     if( result < 0 )
     {
-        msg_Err( p_access, "unknown ivtv driver version in use" );
+        msg_Err( p_access, "unknown ivtv/pvr driver version in use" );
         Close( VLC_OBJECT(p_access) );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_access, "ivtv driver version %02x.%02x.%02x",
+    msg_Dbg( p_access, "%s driver (%s on %s) version %02x.%02x.%02x",
+              device_capability.driver,
+              device_capability.card,
+              device_capability.bus_info,
             ( device_capability.version >> 16 ) & 0xff,
             ( device_capability.version >>  8 ) & 0xff,
             ( device_capability.version       ) & 0xff);
 
-    if ( device_capability.version >= 0x000800 )
+    if ( strncmp( (char *) device_capability.driver, "ivtv", 4 )
+           || device_capability.version >= 0x000800 )
     {
         /* Drivers > 0.8.0 use v4l2 API instead of IVTV ioctls */
         msg_Dbg( p_access, "this driver uses the v4l2 API" );
