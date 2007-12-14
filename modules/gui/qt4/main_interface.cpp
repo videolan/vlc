@@ -147,7 +147,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Create a Dock to get the playlist */
     dockPL = new QDockWidget( qtr( "Playlist" ), this );
     dockPL->setSizePolicy( QSizePolicy::Preferred,
-                           QSizePolicy::MinimumExpanding );
+                           QSizePolicy::Expanding );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
