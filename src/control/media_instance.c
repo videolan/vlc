@@ -495,7 +495,18 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
 void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
-    //libvlc_exception_raise( p_e, "Not implemented" );
+    if( p_mi->b_own_its_input_thread )
+        release_input_thread( p_mi ); /* This will stop the input thread */
+    else
+    {
+        input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+
+        if( !p_input_thread )
+            return;
+
+        input_StopThread( p_input_thread );
+        vlc_object_release( p_input_thread );
+    }
 }
 
 /**************************************************************************
