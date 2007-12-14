@@ -1305,10 +1305,11 @@
                 if( !strcmp( module_GetObjName( p_parser ), "main" ) )
                     continue;
                 unsigned int confsize;
+                unsigned int unused;
                 module_GetConfig( p_parser, &confsize );
                 for ( i = 0; i < confsize; i++ )
                 {
-                    module_config_t *p_config = module_GetConfig( p_parser, NULL ) + i;
+                    module_config_t *p_config = module_GetConfig( p_parser, &unused ) + i;
                     /* Hack: required subcategory is stored in i_min */
                     if( p_config->i_type == CONFIG_SUBCATEGORY &&
                         p_config->value.i == p_item->min.i )
@@ -1382,11 +1383,11 @@
 
             if( !strcmp( module_GetObjName( p_parser ), "main" ) )
                 continue;
-            unsigned int confsize;
+            unsigned int confsize, unused;
             module_GetConfig( p_parser, &confsize );
             for ( i = 0; i < confsize; i++ )
             {
-                module_config_t *p_config = module_GetConfig( p_parser, NULL ) + i;
+                module_config_t *p_config = module_GetConfig( p_parser, &unused ) + i;
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
                     p_config->value.i == p_item->min.i )
@@ -2058,7 +2059,8 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 
         for ( i = 0; i < confsize; i++ )
         {
-            module_config_t *p_config = module_GetConfig( p_parser, NULL ) + i;
+            unsigned int unused;
+            module_config_t *p_config = module_GetConfig( p_parser, &unused ) + i;
             NSString *o_modulelongname, *o_modulename;
             NSNumber *o_moduleenabled = nil;
 
