@@ -278,13 +278,13 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
+        if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
-            combo->Append( wxU(p_parser->psz_longname),
-                           (char *)p_parser->psz_object_name );
+            combo->Append( wxU(module_GetLongName(p_parser)),
+                           (char *)module_GetObjName(p_parser) );
             if( p_item->value.psz && !strcmp(p_item->value.psz,
-                                             p_parser->psz_object_name) )
-                combo->SetValue( wxU(p_parser->psz_longname) );
+                                             module_GetObjName(p_parser)) )
+                combo->SetValue( wxU(module_GetLongName(p_parser)) );
         }
     }
     vlc_list_release( p_list );
@@ -331,25 +331,29 @@ ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( p_parser->psz_object_name, "main" ) )
+        if( !strcmp( module_GetObjName(p_parser), "main" ) )
               continue;
 
-        module_config_t *p_config = p_parser->p_config;
-        module_config_t *p_end = p_config + p_parser->confsize;
+        unsigned int i_confsize;
+        module_config_t *p_config, *p_start, *p_end;
+        p_start = module_GetConfig( p_parser, &i_confsize );
+        p_end = p_start + i_confsize;
 
-        if( p_config ) do
+        for( p_config = p_start; p_config < p_end; p_config++ )
         {
             /* Hack: required subcategory is stored in min.i */
             if( p_config->i_type == CONFIG_SUBCATEGORY &&
                 p_config->value.i == p_item->min.i )
             {
-                combo->Append( wxU(p_parser->psz_longname),
-                               (char *)p_parser->psz_object_name );
-                if( p_item->value.psz && !strcmp(p_item->value.psz,
-                                        p_parser->psz_object_name) )
-                combo->SetValue( wxU(p_parser->psz_longname) );
+                combo->Append( wxU(module_GetLongName(p_parser)),
+                               (char *)module_GetObjName(p_parser) );
+                if( p_item->value.psz &&
+                    !strcmp(p_item->value.psz, module_GetObjName(p_parser)) )
+                    combo->SetValue( wxU(module_GetLongName(p_parser)) );
             }
-        } while( p_config < p_end && p_config++ );
+        }
+
+        module_PutConfig( p_start );
     }
     vlc_list_release( p_list );
 
@@ -402,31 +406,27 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
-        if( !strcmp( p_parser->psz_object_name, "main" ) )
+        if( !strcmp( module_GetObjName(p_parser), "main" ) )
               continue;
 
-        module_config_t *p_config, *p_end;
-        if( p_parser->b_submodule )
-            p_config = ((module_t*)p_parser->p_parent)->p_config;
-        else
-            p_config = p_parser->p_config;
-            p_end = p_config + p_parser->confsize;
+        unsigned int i_confsize;
+        module_config_t *p_config, *p_start, *p_end;
 
-        if( p_config ) do
+        p_start = module_GetConfig( p_parser, &i_confsize );
+        p_end = p_start + i_confsize;
+
+        for( p_config = p_start; p_config < p_end; p_config++ )
         {
             /* Hack: required subcategory is stored in min.i */
             if( p_config->i_type == CONFIG_SUBCATEGORY &&
                 p_config->value.i == p_item->min.i )
             {
                 moduleCheckBox *mc = new moduleCheckBox;
-                mc->checkbox = new wxCheckBox( this, wxID_HIGHEST,
-                                               wxU(p_parser->psz_longname));
-                /* hack to handle submodules properly */
-                int i = -1;
-                while( p_parser->pp_shortcuts[++i] != NULL );
-                i--;
-                mc->psz_module = strdup( i>=0?p_parser->pp_shortcuts[i]
-                                         :p_parser->psz_object_name );
+                mc->checkbox =
+                    new wxCheckBox( this, wxID_HIGHEST,
+                                    wxU(module_GetLongName(p_parser)) );
+
+                mc->psz_module = strdup( module_GetObjName(p_parser) );
                 pp_checkboxes.push_back( mc );
 
                 if( p_item->value.psz &&
@@ -436,7 +436,9 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
                 }
                 sizer->Add( mc->checkbox );
             }
-        } while( p_config < p_end && p_config++ );
+        }
+
+        module_PutConfig( p_start );
     }
     vlc_list_release( p_list );
 

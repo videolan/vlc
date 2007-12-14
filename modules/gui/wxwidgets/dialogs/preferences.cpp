@@ -356,27 +356,32 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( p_module->psz_object_name, "main" ) )
+        if( !strcmp( module_GetObjName(p_module), "main" ) )
             break;
     }
     if( i_index < p_list->i_count )
     {
         wxTreeItemId current_item;
         const char *psz_help;
+        unsigned int i_confsize;
+        module_config_t *p_config;
+
         /* We found the main module */
 
         /* Enumerate config categories and store a reference so we can
          * generate their config panel them when it is asked by the user. */
 
-        for (size_t i = 0; i < p_module->confsize; i++)
+        p_config = module_GetConfig( p_module, &i_confsize );
+        for( size_t i = 0; i < i_confsize; i++ )
         {
-            module_config_t *p_item = p_module->p_config + i;
+            module_config_t *p_item = p_config + i;
             ConfigTreeData *config_data;
             switch( p_item->i_type )
             {
             case CONFIG_CATEGORY:
-                config_data = new ConfigTreeData;
                 if( p_item->value.i == -1 )   break; // Don't display it
+
+                config_data = new ConfigTreeData;
                 config_data->psz_name = strdup( config_CategoryNameGet(
                                                             p_item->value.i ) );
                 psz_help = config_CategoryHelpGet( p_item->value.i );
@@ -489,6 +494,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             }
         }
 
+        module_PutConfig( p_config );
     }
 
 
@@ -497,24 +503,25 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
      */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        int i_category = -1;
-        int i_subcategory = -1;
-        int i_options = 0;
+        int i_category = -1, i_subcategory = -1, i_options = 0;
+        unsigned int i_confsize;
+        module_config_t *p_config;
 
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         /* Exclude the main module */
-        if( !strcmp( p_module->psz_object_name, "main" ) )
+        if( !strcmp( module_GetObjName(p_module), "main" ) )
             continue;
+
         /* Exclude empty plugins (submodules don't have config options, they
          * are stored in the parent module) */
-        if( p_module->b_submodule )
-              continue;
-//            p_item = ((module_t *)p_module->p_parent)->p_config;
-        else
-        for (size_t i = 0; i < p_module->confsize; i++)
+        if( module_IsSubModule(p_module) )
+            continue;
+
+        p_config = module_GetConfig( p_module, &i_confsize );
+        for( size_t i = 0; i < i_confsize; i++ )
         {
-            module_config_t *p_item = p_module->p_config + i;
+            module_config_t *p_item = p_config + i;
             if( p_item->i_type == CONFIG_CATEGORY )
             {
                 i_category = p_item->value.i;
@@ -573,11 +580,11 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Add the plugin to the tree */
         ConfigTreeData *config_data = new ConfigTreeData;
-        config_data->b_submodule = p_module->b_submodule;
+        config_data->b_submodule = module_IsSubModule(p_module);
         config_data->i_type = TYPE_MODULE;
-        config_data->i_object_id = p_module->b_submodule ?
-            ((module_t *)p_module->p_parent)->i_object_id :
-        p_module->i_object_id;
+        config_data->i_object_id = config_data->b_submodule ?
+            ((vlc_object_t *)p_module)->p_parent->i_object_id :
+            ((vlc_object_t *)p_module)->i_object_id;
         config_data->psz_help = NULL;
 
         /* WXMSW doesn't know image -1 ... FIXME */
@@ -602,10 +609,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         #else
         i_image = -1;
         #endif
-        AppendItem( subcategory_item, wxU( p_module->psz_shortname ?
-                       p_module->psz_shortname : p_module->psz_object_name )
-                                    , i_image, -1,
-                    config_data );
+        AppendItem( subcategory_item, wxU( module_GetName(p_module, 0) ),
+                    i_image, -1, config_data );
     }
 
     /* Sort all this mess */
@@ -850,7 +855,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                         ConfigTreeData *config_data )
   :  wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
-    module_config_t *p_item, *p_end;
+    module_config_t *p_item, *p_start, *p_end;
+    unsigned int i_confsize;
     vlc_list_t *p_list = NULL;;
 
     wxStaticText *label;
@@ -891,8 +897,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         /* Get a pointer to the module */
         if( config_data->i_type == TYPE_MODULE )
         {
-            p_module = (module_t *)vlc_object_get( p_intf,
-                                                   config_data->i_object_id );
+            p_module = (module_t *)
+                vlc_object_get( p_intf, config_data->i_object_id );
         }
         else
         {
@@ -905,7 +911,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
                 p_module = (module_t *)p_list->p_values[i_index].p_object;
-                if( !strcmp( p_module->psz_object_name, "main" ) )
+                if( !strcmp( module_GetObjName(p_module), "main" ) )
                 {
                     b_found = VLC_TRUE;
                     break;
@@ -919,27 +925,22 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             }
         }
 
-        if( p_module->i_object_type != VLC_OBJECT_MODULE )
-        {
-            /* 0OOoo something went really bad */
-            return;
-        }
-
         /* Enumerate config options and add corresponding config boxes
          * (submodules don't have config options, they are stored in the
          *  parent module) */
-        if( p_module->b_submodule )
-            p_item = ((module_t *)p_module->p_parent)->p_config;
+        if( module_IsSubModule(p_module) )
+            p_start = module_GetConfig((module_t *)(((vlc_object_t *)p_module)->p_parent), &i_confsize);
         else
-            p_item = p_module->p_config;
+            p_start = module_GetConfig(p_module, &i_confsize);
 
-        p_end = p_item + p_module->confsize;
+        p_item = p_start;
+        p_end = p_start + i_confsize;
 
         /* Find the category if it has been specified */
         if( config_data->i_type == TYPE_SUBCATEGORY ||
             config_data->i_type == TYPE_CATSUBCAT )
         {
-            do
+            for( ; p_item && p_item < p_end; p_item++ )
             {
                 if( p_item->i_type == CONFIG_SUBCATEGORY &&
                     ( config_data->i_type == TYPE_SUBCATEGORY &&
@@ -949,7 +950,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 {
                     break;
                 }
-            } while( p_item++ <= p_end );
+            }
         }
 
         /* Add a head title to the panel */
@@ -962,7 +963,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         }
         else
         {
-            psz_head = p_module->psz_longname;
+            psz_head = module_GetLongName(p_module);
         }
 
         label = new wxStaticText( this, -1,
@@ -981,7 +982,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         config_window->SetAutoLayout( TRUE );
         config_window->SetScrollRate( 5, 5 );
 
-        if( p_item ) do
+        for( ; p_item && p_item < p_end; p_item++ )
         {
             /* If a category has been specified, check we finished the job */
             if( ( ( config_data->i_type == TYPE_SUBCATEGORY &&
@@ -1006,11 +1007,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
             config_sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
-        while( !( ( config_data->i_type == TYPE_SUBCATEGORY ||
-                   config_data->i_type == TYPE_CATSUBCAT ) &&
-                 ( p_item->i_type == CONFIG_CATEGORY ||
-                   p_item->i_type == CONFIG_SUBCATEGORY )) && ( ++p_item < p_end) );
 
+        module_PutConfig( p_start );
 
         config_sizer->Layout();
         config_window->SetSizer( config_sizer );
@@ -1034,7 +1032,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         if( config_data->i_type == TYPE_MODULE )
         {
-            vlc_object_release( p_module );
+            module_Put( p_module );
         }
         else
         {

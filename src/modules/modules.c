@@ -332,6 +332,14 @@ vlc_bool_t module_IsCapable( const module_t *m, const char *cap )
 }
 
 /*****************************************************************************
+ * module_IsSubModule: checks whether a module is a sub-module.
+ *****************************************************************************/
+vlc_bool_t module_IsSubModule( const module_t *m )
+{
+    return m->b_submodule;
+}
+
+/*****************************************************************************
  * module_GetObjName: internal name of a module.
  *****************************************************************************/
 const char *module_GetObjName( const module_t *m )
@@ -794,11 +802,12 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
 module_config_t *module_GetConfig (const module_t *module, unsigned *restrict psize)
 {
     unsigned size = module->confsize;
+    module_config_t *config;
 
     assert (psize != NULL);
     *psize = size;
 
-    module_config_t *config = malloc (size * sizeof (*config));
+    config = malloc (size * sizeof (*config));
     if (config)
         memcpy (config, module->p_config, size * sizeof (*config));
 
@@ -807,7 +816,7 @@ module_config_t *module_GetConfig (const module_t *module, unsigned *restrict ps
 
 void module_PutConfig (module_config_t *config)
 {
-    free (config);
+    if(config) free (config);
 }
 
 /*****************************************************************************

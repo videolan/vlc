@@ -219,17 +219,20 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
                                 intf_thread_t *_p_intf,
                                 const module_t *p_module )
   : wxPanel( parent, -1, wxDefaultPosition, wxDefaultSize ),
-    name( wxU( module_GetObjName(p_module) ) ),
+    name( wxU(module_GetObjName(p_module)) ),
     p_advanced_mrl_combo( NULL ),
     p_intf( _p_intf ), p_open_dialog( dialog ), p_advanced_dialog( NULL )
 {
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
     bool b_advanced = false;
+    unsigned int i_confsize; 
+    module_config_t *p_config;
     int n;
 
-    for( n = 0; n < p_module->confsize; n++ )
+    p_config = module_GetConfig (p_module, &i_confsize);
+    for( n = 0; n < i_confsize; n++ )
     {
-        module_config_t *p_item = &p_module->p_config[n];
+        module_config_t *p_item = p_config + n;
         if( !(p_item->i_type & CONFIG_HINT) && p_item->b_advanced )
             b_advanced = true;
 
@@ -259,8 +262,8 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         /* Build the advanced dialog */
         p_advanced_dialog =
             new wxDialog( this, -1, ((wxString)wxU(_("Advanced options"))) +
-                          wxT(" (") + wxU( module_GetLongName(p_module) ) + wxT(")"),
-                          wxDefaultPosition, wxDefaultSize,
+                          wxT(" (") + wxU( module_GetLongName(p_module) ) +
+                          wxT(")"), wxDefaultPosition, wxDefaultSize,
                           wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 
         wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
@@ -283,9 +286,9 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         sizer->Add( mrl_sizer_sizer, 0, wxEXPAND | wxALL, 2 );
 
         /* Add advanced options to panel */
-        for( n = 0; n < p_module->confsize; n++ )
+        for( n = 0; n < i_confsize; n++ )
         {
-            module_config_t *p_item = &p_module->p_config[n];
+            module_config_t *p_item = p_config + n;
             if( p_item->i_type & CONFIG_HINT || !p_item->b_advanced )
                 continue;
 
@@ -326,6 +329,8 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         sizer->SetMinSize( 400, -1 );
         p_advanced_dialog->SetSizerAndFit( sizer );
     }
+
+    module_PutConfig (p_config);
 
     this->SetSizerAndFit( sizer );
 }
@@ -508,8 +513,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, VLC_FALSE) ),
+        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
+        module_Put( p_module );
     }
 
     p_module = module_Find( VLC_OBJECT(p_intf), "pvr" );
@@ -518,8 +524,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, VLC_FALSE) ),
+        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
+        module_Put( p_module );
     }
 
     p_module = module_Find( VLC_OBJECT(p_intf), "dvb" );
@@ -528,8 +535,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, VLC_FALSE) ),
+        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
+        module_Put( p_module );
     }
 
     p_module = module_Find( VLC_OBJECT(p_intf), "dshow" );
@@ -538,8 +546,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( module_GetName(p_module, VLC_FALSE) ),
+        notebook->AddPage( autopanel, wxU( module_GetName(p_module, 0) ),
                            i_access_method == CAPTURE_ACCESS );
+        module_Put( p_module );
     }
 
     /* Update Disc panel */
