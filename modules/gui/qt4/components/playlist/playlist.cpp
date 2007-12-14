@@ -42,12 +42,11 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
                                 p_intf ( _p_i )
 {
     /* Left Part and design */
-    QWidget *leftW = new QWidget( this );
-    QVBoxLayout *left = new QVBoxLayout( leftW );
+    QSplitter *leftW = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
     selector = new PLSelector( this, p_intf, THEPL );
-    left->addWidget( selector );
+    leftW->addWidget( selector );
 
     /* Art label */
     art = new QLabel( "" );
@@ -57,7 +56,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     art->setMaximumWidth( 128 );
     art->setScaledContents( true );
     art->setPixmap( QPixmap( ":/noart.png" ) );
-    left->addWidget( art );
+    leftW->addWidget( art );
 
     /* Initialisation of the playlist */
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
@@ -84,15 +83,14 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     addWidget( leftW );
     addWidget( rightPanel );
 
-    leftW->setMaximumWidth( 250 );
-    setCollapsible( 1, false );
-
     QList<int> sizeList;
     sizeList << 180 << 420 ;
     setSizes( sizeList );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
     setStretchFactor( 0, 0 );
     setStretchFactor( 1, 3 );
+    leftW->setMaximumWidth( 250 );
+    setCollapsible( 1, false );
 
     /* In case we want to keep the splitter informations */
     settings->beginGroup( "playlist" );
