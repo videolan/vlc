@@ -47,10 +47,9 @@ class QToolButton;
 class QGroupBox;
 class QPushButton;
 class QHBoxLayout;
-class QDateEdit;
-class QTimeEdit;
+class QDateTimeEdit;
 class QSpinBox;
-class VLMObject;
+class VLMAWidget;
 
 class VLMDialog : public QVLCFrame
 {
@@ -69,20 +68,19 @@ private:
     static VLMDialog *instance;
     Ui::Vlm ui;
 
-    QList<VLMObject *> vlmItems;
+    QList<VLMAWidget *> vlmItems;
     int currentIndex;
 
     QVBoxLayout *vlmItemLayout;
     QWidget *vlmItemWidget;
   
     QComboBox *mediatype;
-    QTimeEdit *time;
-    QDateEdit *date;
-    QSpinBox *scherepeatnumber;
+    QDateTimeEdit *time, *date, *repeatTime;
+    QSpinBox *scherepeatnumber, *repeatDays;
     bool isNameGenuine( QString );
 public slots:
-    void removeVLMItem( VLMObject * );
-    void startModifyVLMItem( VLMObject * );
+    void removeVLMItem( VLMAWidget * );
+    void startModifyVLMItem( VLMAWidget * );
 private slots:
     void addVLMItem();
     void clearWidgets();
@@ -91,27 +89,52 @@ private slots:
     void selectVLMItem( int );
 };
 
-class VLMObject : public QGroupBox 
+class VLMAWidget : public QGroupBox 
 {
     Q_OBJECT
     friend class VLMDialog;
 public:
-    VLMObject( int type, QString name, QString input, QString output, bool _enable, VLMDialog *parent );
-private:
+    VLMAWidget( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+protected:
+    QLabel *nameLabel;
     QString name;
     QString input;
     QString output;
-    bool b_looped;
     bool b_enabled;
     VLMDialog *parent;
-protected:
     virtual void enterEvent( QEvent * );
+    QGridLayout *objLayout;
 private slots:
-    void modify();
+    virtual void modify();
+    virtual void del();
+};
+
+class VLMBroadcast : public VLMAWidget
+{
+    Q_OBJECT
+public:
+    VLMBroadcast( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+private:
+    bool b_looped;
+
+private slots:
     void stop();
-    void del();
     void togglePlayPause();
     void toggleLoop();
+};
+
+class VLMVod : public VLMAWidget
+{
+public:
+    VLMVod( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+private:
+    QString mux;
+};
+
+class VLMSchedule : public VLMAWidget
+{
+public:
+    VLMSchedule( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
 };
 
 #endif

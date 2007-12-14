@@ -38,8 +38,7 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QHBoxLayout>
-#include <QTimeEdit>
-#include <QDateEdit>
+#include <QDateTimeEdit>
 #include <QSpinBox>
 #include <QHeaderView>
 #include <QScrollArea>
@@ -68,24 +67,37 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     schetimelayout->addWidget( schedatelabel, 1, 0 );
     QLabel *scherepeatLabel = new QLabel( qtr( "Repeat:" ) );
     schetimelayout->addWidget( scherepeatLabel, 2, 0 );
-    
-    time = new QTimeEdit( QTime::currentTime() );
+    QLabel *scherepeatTimeLabel = new QLabel( qtr( "Repeat delay:" ) );
+    schetimelayout->addWidget( scherepeatTimeLabel, 3, 0 );
+
+    time = new QDateTimeEdit( QTime::currentTime() );
     time->setAlignment( Qt::AlignRight );
-    schetimelayout->addWidget( time, 0, 1 );
-    
-    date = new QDateEdit( QDate::currentDate() );
+    schetimelayout->addWidget( time, 0, 1, 1, 3 );
+
+    date = new QDateTimeEdit( QDate::currentDate() );
     date->setAlignment( Qt::AlignRight );
+    date->setCalendarPopup( true );
 #ifdef WIN32
     date->setDisplayFormat( "dd MM yyyy" );
 #else
     date->setDisplayFormat( "dd MMMM yyyy" );
 #endif
-    schetimelayout->addWidget( date, 1, 1 );
+    schetimelayout->addWidget( date, 1, 1, 1, 3 );
 
     scherepeatnumber = new QSpinBox;
     scherepeatnumber->setAlignment( Qt::AlignRight );
-    schetimelayout->addWidget( scherepeatnumber, 2, 1 );
-    
+    schetimelayout->addWidget( scherepeatnumber, 2, 1, 1, 3 );
+
+    repeatDays = new QSpinBox;
+    repeatDays->setAlignment( Qt::AlignRight );
+    schetimelayout->addWidget( repeatDays, 3, 1, 1, 1 );
+    repeatDays->setSuffix( qtr(" days") );
+
+    repeatTime = new QDateTimeEdit;
+    repeatTime->setAlignment( Qt::AlignRight );
+    schetimelayout->addWidget( repeatTime, 3, 2, 1, 2 );
+    repeatTime->setDisplayFormat( "hh:mm:ss" );
+
     /* scrollArea */
     ui.vlmItemScroll->setFrameStyle( QFrame::NoFrame );
     ui.vlmItemScroll->setWidgetResizable( true );
@@ -94,13 +106,14 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     vlmItemWidget->setLayout( vlmItemLayout );
     ui.vlmItemScroll->setWidget( vlmItemWidget );
 
-    QSpacerItem *spacer = new QSpacerItem( 10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSpacerItem *spacer =
+        new QSpacerItem( 10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vlmItemLayout->addItem( spacer );
 
     QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
     ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
 
-    ui.schedBox->hide();
+    showScheduleWidget( QVLM_Broadcast );
 
     /* Connect the comboBox to show the right Widgets */
     CONNECT( ui.mediaType, currentIndexChanged( int ),
@@ -109,7 +122,7 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     /* Connect the leftList to show the good VLMItem */
     CONNECT( ui.vlmListItem, currentRowChanged( int ),
              this, selectVLMItem( int ) );
-    
+
     BUTTONACT( closeButton, close() );
     BUTTONACT( ui.addButton, addVLMItem() );
     BUTTONACT( ui.clearButton, clearWidgets() );
@@ -121,6 +134,8 @@ VLMDialog::~VLMDialog(){}
 void VLMDialog::showScheduleWidget( int i )
 {
     ui.schedBox->setVisible( ( i == QVLM_Schedule ) );
+    ui.loopBCast->setVisible( ( i == QVLM_Broadcast ) );
+    ui.vodBox->setVisible( ( i == QVLM_VOD ) );
 }
 
 void VLMDialog::selectVLMItem( int i )
@@ -151,18 +166,27 @@ void VLMDialog::addVLMItem()
     }
 
     int type = ui.mediaType->itemData( ui.mediaType->currentIndex() ).toInt();
+
     QString typeShortName;
-    
+    QString inputText = ui.inputLedit->text();
+    QString outputText = ui.outputLedit->text();
+    bool b_checked;
+
+    VLMAWidget * vlmAwidget;
+
     switch( type )
     {
     case QVLM_Broadcast:
         typeShortName = "Bcast";
+        vlmAwidget = new VLMBroadcast( name, inputText, outputText, b_checked, this );
     break;
     case QVLM_VOD:
         typeShortName = "VOD";
+        vlmAwidget = new VLMVod( name, inputText, outputText, b_checked, this );
         break;
     case QVLM_Schedule:
         typeShortName = "Sched";
+        vlmAwidget = new VLMSchedule( name, inputText, outputText, b_checked, this );
         break;
     default:
         msg_Warn( p_intf, "Something bad happened" );
@@ -173,15 +197,10 @@ void VLMDialog::addVLMItem()
     ui.vlmListItem->addItem( typeShortName + " : " + name );
     ui.vlmListItem->setCurrentRow( vlmItemCount - 1 );
 
-    /* Add a new VLMObject on the main List */
-    VLMObject *vlmObject = new VLMObject( type, name, 
-                                          ui.inputLedit->text(),
-                                          ui.outputLedit->text(),
-                                          ui.enableCheck->isChecked(),
-                                          this );
+    /* Add a new VLMAWidget on the main List */
 
-    vlmItemLayout->insertWidget( vlmItemCount, vlmObject );
-    vlmItems.append( vlmObject );
+    vlmItemLayout->insertWidget( vlmItemCount, vlmAwidget );
+    vlmItems.append( vlmAwidget );
 
     /* HERE BE DRAGONS VLM REQUEST */
 }
@@ -199,7 +218,7 @@ void VLMDialog::clearWidgets()
 
 void VLMDialog::saveModifications()
 {
-    VLMObject *vlmObj = vlmItems.at( currentIndex );
+    VLMAWidget *vlmObj = vlmItems.at( currentIndex );
     if( vlmObj )
     {
         vlmObj->input = ui.inputLedit->text();
@@ -210,22 +229,23 @@ void VLMDialog::saveModifications()
     ui.saveButton->hide();
     ui.addButton->show();
     clearWidgets();
-}    
+}
 
 /* Object Modification */
-void VLMDialog::removeVLMItem( VLMObject *vlmObj )
+void VLMDialog::removeVLMItem( VLMAWidget *vlmObj )
 {
     int index = vlmItems.indexOf( vlmObj );
     if( index < 0 ) return;
-    
+
+    //FIXME, this is going to segfault if the focus in on the ListWidget
     delete ui.vlmListItem->takeItem( index );
-    vlmItems.removeAt( index );    
+    vlmItems.removeAt( index );
     delete vlmObj;
 
     /* HERE BE DRAGONS VLM REQUEST */
 }
 
-void VLMDialog::startModifyVLMItem( VLMObject *vlmObj )
+void VLMDialog::startModifyVLMItem( VLMAWidget *vlmObj )
 {
     currentIndex = vlmItems.indexOf( vlmObj );
     if( currentIndex < 0 ) return;
@@ -243,15 +263,15 @@ void VLMDialog::startModifyVLMItem( VLMObject *vlmObj )
 
 
 /*********************************
- * VLMObject
+ * VLMAWidget
  ********************************/
-VLMObject::VLMObject( int type, 
-                      QString _name,
-                      QString _input,
-                      QString _output,
-                      bool _enabled,
-                      VLMDialog *_parent ) 
-         : QGroupBox( _name, _parent )
+
+VLMAWidget::VLMAWidget( QString _name,
+                        QString _input,
+                        QString _output,
+                        bool _enabled,
+                        VLMDialog *_parent )
+                      : QGroupBox( _name, _parent )
 {
     parent = _parent;
     name = _name;
@@ -260,68 +280,93 @@ VLMObject::VLMObject( int type,
     b_enabled = _enabled;
     setChecked( b_enabled );
 
-    QGridLayout *objLayout = new QGridLayout( this );
+    objLayout = new QGridLayout( this );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
-    
-    QLabel *label = new QLabel( psz_type[type] + ( ": " + name ) );
-    objLayout->addWidget( label, 0, 0, 1, 4 );
 
-    QToolButton *playButton = new QToolButton;
-    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
-    objLayout->addWidget( playButton, 1, 0 );
-    
-    QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( QPixmap( ":/pixmaps/stop_16px.png" ) ) );
-    objLayout->addWidget( stopButton, 1, 1 );
-    
-    QToolButton *loopButton = new QToolButton;
-    loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_off.png" ) ) );
-    objLayout->addWidget( loopButton, 1, 2 );
-    
-    QLabel *time = new QLabel( "--:--/--:--" );
-    objLayout->addWidget( time, 1, 3, 1, 2 );
+    nameLabel = new QLabel;
+    objLayout->addWidget( nameLabel, 0, 0, 1, 4 );
+
+    /*QLabel *time = new QLabel( "--:--/--:--" );
+    objLayout->addWidget( time, 1, 3, 1, 2 );*/
 
     QToolButton *modifyButton = new QToolButton;
     modifyButton->setIcon( QIcon( QPixmap( ":/pixmaps/menus_settings_16px.png" ) ) );
     objLayout->addWidget( modifyButton, 0, 5 );
-    
+
     QToolButton *deleteButton = new QToolButton;
     deleteButton->setIcon( QIcon( QPixmap( ":/pixmaps/menus_quit_16px.png" ) ) );
     objLayout->addWidget( deleteButton, 0, 6 );
-    
-    BUTTONACT( playButton, togglePlayPause() );
-    BUTTONACT( stopButton, stop() );
+
     BUTTONACT( modifyButton, modify() );
     BUTTONACT( deleteButton, del() );
-    BUTTONACT( loopButton, toggleLoop() );
 }
 
-void VLMObject::modify()
+void VLMAWidget::modify()
 {
     parent->startModifyVLMItem( this );
 }
 
-void VLMObject::del()
+void VLMAWidget::del()
 {
     parent->removeVLMItem( this );
 }
 
-void VLMObject::togglePlayPause()
+
+VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
+                            bool _enabled, VLMDialog *_parent)
+                          : VLMAWidget( _name, _input, _output,
+                                        _enabled, _parent)
 {
-    
+    nameLabel->setText( "Broadcast: " + name );
+    QToolButton *playButton = new QToolButton;
+    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+    objLayout->addWidget( playButton, 1, 0 );
+
+    QToolButton *stopButton = new QToolButton;
+    stopButton->setIcon( QIcon( QPixmap( ":/pixmaps/stop_16px.png" ) ) );
+    objLayout->addWidget( stopButton, 1, 1 );
+
+    QToolButton *loopButton = new QToolButton;
+    loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_off.png" ) ) );
+    objLayout->addWidget( loopButton, 1, 2 );
+
+    BUTTONACT( playButton, togglePlayPause() );
+    BUTTONACT( stopButton, stop() );
+    BUTTONACT( loopButton, toggleLoop() );
 }
 
-void VLMObject::toggleLoop()
+
+void VLMBroadcast::togglePlayPause()
 {
-    
+
 }
 
-void VLMObject::stop()
+void VLMBroadcast::toggleLoop()
 {
-    
+
 }
 
-void VLMObject::enterEvent( QEvent *event )
+void VLMBroadcast::stop()
+{
+
+}
+
+void VLMAWidget::enterEvent( QEvent *event )
 {
     printf( "test" );
+}
+
+
+VLMSchedule::VLMSchedule( QString name, QString input, QString output,
+                            bool enabled, VLMDialog *parent) : VLMAWidget( name, input,
+                            output, enabled, parent)
+{
+    nameLabel->setText( "Schedule: " + name );
+}
+
+VLMVod::VLMVod( QString name, QString input, QString output,
+                            bool enabled, VLMDialog *parent) : VLMAWidget( name, input,
+                            output, enabled, parent)
+{
+    nameLabel->setText( "VOD:" + name );
 }

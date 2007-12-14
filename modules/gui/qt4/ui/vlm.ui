@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>738</width>
-    <height>598</height>
+    <height>693</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -109,6 +109,52 @@
        <widget class="QGroupBox" name="schedBox" >
         <property name="title" >
          <string>_("Time Control")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="3" >
+       <widget class="QGroupBox" name="vodBox" >
+        <property name="title" >
+         <string>_("Mux Control")</string>
+        </property>
+        <layout class="QHBoxLayout" >
+         <item>
+          <widget class="QLabel" name="label" >
+           <property name="text" >
+            <string>Muxer:</string>
+           </property>
+           <property name="margin" >
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="muxLedit" >
+           <property name="inputMask" >
+            <string>AAAA; </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>411</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="2" >
+       <widget class="QCheckBox" name="loopBCast" >
+        <property name="text" >
+         <string>_("Loop")</string>
         </property>
        </widget>
       </item>
