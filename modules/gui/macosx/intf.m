@@ -751,7 +751,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     return( TRUE );
 }
 
-- (NSString *)localizedString:(char *)psz
+- (NSString *)localizedString:(const char *)psz
 {
     NSString * o_str = nil;
 
