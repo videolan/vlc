@@ -152,6 +152,21 @@ VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_descriptor_new(
                                    const char * psz_mrl,
                                    libvlc_exception_t *p_e );
 
+/**
+ * Add an option to the media descriptor,
+ * This option will be used to determine how the media_instance will
+ * read the media_descriptor. This allow to use VLC advanced
+ * reading/streaming options in a per-media basis.
+ *
+ * The options are detailled in vlc --long-help, for instance "--sout-all"
+ * \param p_instance the instance
+ * \param psz_mrl the mrl to read
+ */
+VLC_PUBLIC_API void libvlc_media_descriptor_add_option(
+                                   libvlc_media_descriptor_t * p_md,
+                                   const char * ppsz_options,
+                                   libvlc_exception_t * p_e );
+
 VLC_PUBLIC_API void libvlc_media_descriptor_retain(
                                    libvlc_media_descriptor_t *p_meta_desc );
 

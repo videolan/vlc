@@ -299,6 +299,23 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
 }
 
 /**************************************************************************
+ * Add an option to the media descriptor,
+ * that will be used to determine how the media_instance will read the
+ * media_descriptor. This allow to use VLC advanced reading/streaming
+ * options in a per-media basis
+ *
+ * The options are detailled in vlc --long-help, for instance "--sout-all"
+ **************************************************************************/
+void libvlc_media_descriptor_add_option(
+                                   libvlc_media_descriptor_t * p_md,
+                                   const char * ppsz_option,
+                                   libvlc_exception_t *p_e )
+{
+    (void)p_e;
+    input_ItemAddOptionNoDup( p_md->p_input_item, ppsz_option );
+}
+
+/**************************************************************************
  * Delete a media descriptor object
  **************************************************************************/
 void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
