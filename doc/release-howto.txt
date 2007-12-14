@@ -15,6 +15,7 @@
      · read all the commits and add important things to the NEWS file
      · update the milestones info on https://trac.videolan.org/vlc
    - Add a note about the matching contrib package in INSTALL.win32
+   - Make sure that the gpg key embedded in include/vlc_update.h is the last one
 
  * Commit
 
@@ -32,19 +33,20 @@
 
  * BeOS Packages
     Information on building: http://developers.videolan.org/vlc/beos-compile.html
+    Configure with --enable-update-check
     Build in the "buildbeos" chroot on altair.
     # add the .zip files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/beos/
+   generate md5 hashes and gpg signature of these files
 
  * Win32 Packages
-    make the packages using the nightly builds configure/options/...
+    make the packages using the nightly builds configure/options/... , don't forget --enable-update-check
     don't forget to test the installer and uninstaller (the first 0.8.4 uninstaller was broken ...
     kind of suxxs)
     add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
    generate md5 hashes and gpg signature of these files
 
  * OS X packages
-    At the moment, only FK can do them (so they can be compatible with OS X 10.2)
-    Later: on the G5
+   configure with --enable-update-check
    generate md5 hashes and gpg signature of these files
 
  * Commit changes ... it never works the first time

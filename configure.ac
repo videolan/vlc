@@ -5589,6 +5589,20 @@ then
 fi
 AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
 
+dnl
+dnl update checking system
+dnl
+AC_ARG_ENABLE(update-check,
+  [  --enable-update-check   update checking system (default disabled)])
+if test "${enable_update_check}" = "yes"
+then
+  if test "${have_libgcrypt}" != "yes"
+  then
+    AC_MSG_ERROR([libgcrypt is required for update checking system])
+  fi
+  VLC_ADD_LIBS([libvlc], [-lgcrypt])
+  AC_DEFINE([UPDATE_CHECK], [1], [Define if you want to use the VLC update mechanism])
+fi
 
 dnl
 dnl  Endianness check, AC_C_BIGENDIAN doesn't work if we are cross-compiling

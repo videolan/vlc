@@ -22,9 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
+
 #include "dialogs/help.hpp"
 #include <vlc_about.h>
+
+#ifdef UPDATE_CHECK
 #include <vlc_update.h>
+#endif
 
 #include "dialogs_provider.hpp"
 
@@ -159,7 +164,7 @@ void AboutDialog::close()
     this->toggleVisible();
 }
 
-
+#ifdef UPDATE_CHECK
 UpdateDialog *UpdateDialog::instance = NULL;
 
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
@@ -217,3 +222,5 @@ void UpdateDialog::updateOrUpload()
                                  <body><center>You have the latest version of VLC.</center></body></html>" );
     }
 }
+
+#endif

@@ -63,7 +63,9 @@ private:
     void Open( int i_access_method, int i_arg );
 
     /* Event handlers (these functions should _not_ be virtual) */
+#ifdef UPDATE_CHECK
     void OnUpdateVLC( wxCommandEvent& event );
+#endif
     //void OnVLM( wxCommandEvent& event );
     void OnInteraction( wxCommandEvent& event );
     void OnExit( wxCommandEvent& event );
@@ -108,7 +110,9 @@ public:
     wxFrame             *p_prefs_dialog;
     wxFrame             *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
+#ifdef UPDATE_CHECK
     UpdateVLC           *p_updatevlc_dialog;
+#endif
     //VLMFrame            *p_vlm_dialog;
 };
 }
@@ -156,8 +160,10 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
 
     EVT_COMMAND(INTF_DIALOG_EXIT, wxEVT_DIALOG,
                 DialogsProvider::OnExitThread)
+#ifdef UPDATE_CHECK
     EVT_COMMAND(INTF_DIALOG_UPDATEVLC, wxEVT_DIALOG,
                 DialogsProvider::OnUpdateVLC)
+#endif
 #if 0
     EVT_COMMAND(INTF_DIALOG_VLM, wxEVT_DIALOG,
                 DialogsProvider::OnVLM)
@@ -549,6 +555,7 @@ void DialogsProvider::OnExitThread( wxCommandEvent& WXUNUSED(event) )
     wxTheApp->ExitMainLoop();
 }
 
+#ifdef UPDATE_CHECK
 void DialogsProvider::OnUpdateVLC( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the file info window */
@@ -560,6 +567,7 @@ void DialogsProvider::OnUpdateVLC( wxCommandEvent& WXUNUSED(event) )
         p_updatevlc_dialog->Show( !p_updatevlc_dialog->IsShown() );
     }
 }
+#endif
 
 #if 0
 void DialogsProvider::OnVLM( wxCommandEvent& WXUNUSED(event) )

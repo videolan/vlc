@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifdef UPDATE_CHECK
 #import <Cocoa/Cocoa.h>
 #import <vlc_update.h>
 
@@ -55,3 +56,4 @@
 + (VLCUpdate *)sharedInstance;
 
 @end
+#endif

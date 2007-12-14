@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
+
 #include <vlc_intf_strings.h>
 
 #include "main_interface.hpp"
@@ -457,7 +459,9 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *menu = new QMenu();
     addDPStaticEntry( menu, qtr( "Help..." ) , "",
         ":/pixmaps/menus_help_16px.png", SLOT( helpDialog() ), "F1" );
+#ifdef UPDATE_CHECK
     addDPStaticEntry( menu, qtr( "Update" ) , "", "", SLOT( updateDialog() ), "");
+#endif
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( I_MENU_ABOUT ), "", "", SLOT( aboutDialog() ),
         "Ctrl+F1" );

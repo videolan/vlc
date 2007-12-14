@@ -27,6 +27,7 @@
  * ../wxwidgets/dialogs/updatevlc.cpp, written by Antoine Cellerier.
  *****************************************************************************/
 
+#ifdef UPDATE_CHECK
 
 /*****************************************************************************
  * Preamble
@@ -351,3 +352,5 @@ static VLCUpdate *_o_sharedInstance = nil;
 }
 
 @end
+
+#endif

@@ -101,7 +101,9 @@ struct intf_sys_t
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_interaction_list;      /* VLCInteractionList*/
     id o_sfilters;              /* VLCsFilters    */
+#ifdef UPDATE_CHECK
     id o_update;                /* VLCUpdate      */
+#endif
     id o_eyetv;                 /* VLCEyeTVController */
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */

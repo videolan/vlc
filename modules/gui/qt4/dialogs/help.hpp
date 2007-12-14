@@ -24,7 +24,7 @@
 #ifndef _HELP_DIALOG_H_
 #define _HELP_DIALOG_H_
 
-#include <vlc_update.h>
+#include <vlc/vlc.h>
 
 #include "util/qvlcframe.hpp"
 
@@ -70,7 +70,7 @@ public slots:
     void close();
 };
 
-
+#ifdef UPDATE_CHECK
 class UpdateDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -92,6 +92,6 @@ private slots:
     void close();
     void updateOrUpload();
 };
-
+#endif
 
 #endif

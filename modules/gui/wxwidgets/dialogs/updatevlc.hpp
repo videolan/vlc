@@ -21,6 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef UPDATE_CHECK
+
 #ifndef _WXVLC_UPDATEVLC_H_
 #define _WXVLC_UPDATEVLC_H_
 
@@ -52,5 +54,7 @@ namespace wxvlc
         update_t *p_update;
     };
 };
+
+#endif
 
 #endif

@@ -172,10 +172,12 @@ void DialogsProvider::helpDialog()
     HelpDialog::getInstance( p_intf )->toggleVisible();
 }
 
+#ifdef UPDATE_CHECK
 void DialogsProvider::updateDialog()
 {
     UpdateDialog::getInstance( p_intf )->toggleVisible();
 }
+#endif
 
 void DialogsProvider::aboutDialog()
 {

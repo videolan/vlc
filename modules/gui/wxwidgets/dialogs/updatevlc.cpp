@@ -21,6 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef UPDATE_CHECK
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -120,3 +122,4 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
     SetSizerAndFit( main_sizer );
     Layout();
 }
+#endif

@@ -96,7 +96,9 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Menu         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+#ifdef UPDATE_CHECK
 static void checkUpdates( intf_thread_t *p_intf );
+#endif
 
 /* Status Callbacks */
 static int TimeOffsetChanged( vlc_object_t *, char const *,
@@ -750,10 +752,12 @@ static void Run( intf_thread_t *p_intf )
 
             Help( p_intf, b_longhelp );
         }
+#ifdef UPDATE_CHECK
         else if( !strcmp( psz_cmd, "check-updates" ) )
         {
             checkUpdates( p_intf );
         }
+#endif
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
             var_SetInteger( p_intf->p_libvlc, "key-pressed",
@@ -922,9 +926,11 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| @name mosaic-cols #. . . . . . . . . . .number of cols"));
         msg_rc(_("| @name mosaic-order id(,id)* . . . . order of pictures "));
         msg_rc(_("| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
+#ifdef UPDATE_CHECK
         msg_rc(  "| ");
         msg_rc(_("| check-updates [newer] [equal] [older]\n"
                  "|               [undef] [info] [source] [binary] [plugin]"));
+#endif
         msg_rc(  "| ");
     }
     msg_rc(_("| help . . . . . . . . . . . . . . . this help message"));
@@ -1634,7 +1640,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input = NULL;
     vout_thread_t * p_vout;
-    const char * psz_variable;
+    const char * psz_variable = NULL;
     int i_error;
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
@@ -2105,6 +2111,7 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 /*****************************************************************************
  * checkUpdates : check for updates
  ****************************************************************************/
+#ifdef UPDATE_CHECK
 static void checkUpdates( intf_thread_t *p_intf )
 {
     update_t *p_u = update_New( p_intf );
@@ -2122,3 +2129,4 @@ static void checkUpdates( intf_thread_t *p_intf )
         msg_rc( "\n+----Last version" );
     update_Delete( p_u );
 }
+#endif

@@ -300,7 +300,9 @@ enum
     About_Event = wxID_ABOUT,
     OnWebLink_Event,
     OnWebHelp_Event,
+#ifdef UPDATE_CHECK
     UpdateVLC_Event,
+#endif
     //VLM_Event,
 
     Iconize_Event,
@@ -314,7 +316,9 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(About_Event, Interface::OnAbout)
     EVT_MENU(OnWebLink_Event, Interface::OnWebLink)
     EVT_MENU(OnWebHelp_Event, Interface::OnWebHelp)
+#ifdef UPDATE_CHECK
     EVT_MENU(UpdateVLC_Event, Interface::OnShowDialog)
+#endif
     //EVT_MENU(VLM_Event, Interface::OnShowDialog)
 
     EVT_MENU(Playlist_Event, Interface::OnShowDialog)
@@ -617,8 +621,10 @@ void Interface::CreateOurMenuBar()
     help_menu->Append( OnWebHelp_Event, wxU(_("Online Help")) );
     help_menu->AppendSeparator();
     help_menu->Append( About_Event, wxU(_("About...")) );
+#ifdef UPDATE_CHECK
     help_menu->AppendSeparator();
     help_menu->Append( UpdateVLC_Event, wxU(_("Check for Updates...")) );
+#endif
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar();
@@ -1024,9 +1030,11 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case Bookmarks_Event:
             i_id = INTF_DIALOG_BOOKMARKS;
             break;
+#ifdef UPDATE_CHECK
         case UpdateVLC_Event:
             i_id = INTF_DIALOG_UPDATEVLC;
             break;
+#endif
 #if 0
         case VLM_Event:
             i_id = INTF_DIALOG_VLM;
