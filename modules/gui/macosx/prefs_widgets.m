@@ -1287,15 +1287,14 @@
 
             if( p_item->i_type == CONFIG_ITEM_MODULE )
             {
-                if( !strcmp( p_parser->psz_capability,
-                            p_item->psz_type ) )
+                if( module_IsCapable( p_parser, p_item->psz_type ) )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
-                        localizedString: (char *)p_parser->psz_longname];
+                        localizedString: module_GetLongName( p_parser )];
                     [o_popup addItemWithTitle: o_description];
 
                     if( p_item->value.psz &&
-                !strcmp( p_item->value.psz, p_parser->psz_object_name ) )
+                !strcmp( p_item->value.psz, module_GetObjName( p_parser ) ) )
                         [o_popup selectItem:[o_popup lastItem]];
                 }
             }
@@ -1303,22 +1302,23 @@
             {
                 int i;
 
-                if( !strcmp( p_parser->psz_object_name, "main" ) )
+                if( !strcmp( module_GetObjName( p_parser ), "main" ) )
                     continue;
-
-                for ( i = 0; i < p_parser->confsize; i++ )
+                unsigned int confsize;
+                module_GetConfig( p_parser, &confsize );
+                for ( i = 0; i < confsize; i++ )
                 {
-                    module_config_t *p_config = p_parser->p_config + i;
+                    module_config_t *p_config = module_GetConfig( p_parser, NULL ) + i;
                     /* Hack: required subcategory is stored in i_min */
                     if( p_config->i_type == CONFIG_SUBCATEGORY &&
                         p_config->value.i == p_item->min.i )
                     {
                         NSString *o_description = [[VLCMain sharedInstance]
-                            localizedString: (char *)p_parser->psz_longname];
+                            localizedString: module_GetLongName( p_parser )];
                         [o_popup addItemWithTitle: o_description];
 
                         if( p_item->value.psz && !strcmp(p_item->value.psz,
-                                                p_parser->psz_object_name) )
+                                                module_GetObjName( p_parser )) )
                             [o_popup selectItem:[o_popup lastItem]];
                     }
                 }
@@ -1365,14 +1365,13 @@
 
         if( p_item->i_type == CONFIG_ITEM_MODULE )
         {
-            if( !strcmp( p_parser->psz_capability,
-                    p_item->psz_type ) )
+            if( module_IsCapable( p_parser, p_item->psz_type ) )
             {
                 NSString *o_description = [[VLCMain sharedInstance]
-                    localizedString: (char *)p_parser->psz_longname];
+                    localizedString: module_GetLongName( p_parser )];
                 if( [newval isEqualToString: o_description] )
                 {
-                    returnval = strdup(p_parser->psz_object_name);
+                    returnval = strdup( module_GetObjName( p_parser ));
                     break;
                 }
             }
@@ -1381,21 +1380,22 @@
         {
             int i;
 
-            if( !strcmp( p_parser->psz_object_name, "main" ) )
+            if( !strcmp( module_GetObjName( p_parser ), "main" ) )
                 continue;
-
-            for ( i = 0; i < p_parser->confsize; i++ )
+            unsigned int confsize;
+            module_GetConfig( p_parser, &confsize );
+            for ( i = 0; i < confsize; i++ )
             {
-                module_config_t *p_config = p_parser->p_config + i;
+                module_config_t *p_config = module_GetConfig( p_parser, NULL ) + i;
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
                     p_config->value.i == p_item->min.i )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
-                        localizedString: (char *)p_parser->psz_longname];
+                        localizedString: module_GetLongName( p_parser )];
                     if( [newval isEqualToString: o_description] )
                     {
-                        returnval = strdup(p_parser->psz_object_name);
+                        returnval = strdup(module_GetObjName( p_parser ));
                         break;
                     }
                 }
@@ -2050,12 +2050,15 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
         int i;
         p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
 
-        if( !strcmp( p_parser->psz_object_name, "main" ) )
+        if( !strcmp( module_GetObjName( p_parser ), "main" ) )
             continue;
 
-        for ( i = 0; i < p_parser->confsize; i++ )
+        unsigned int confsize;
+        module_GetConfig( p_parser, &confsize );
+
+        for ( i = 0; i < confsize; i++ )
         {
-            module_config_t *p_config = p_parser->p_config + i;
+            module_config_t *p_config = module_GetConfig( p_parser, NULL ) + i;
             NSString *o_modulelongname, *o_modulename;
             NSNumber *o_moduleenabled = nil;
 
@@ -2064,12 +2067,12 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
                 p_config->value.i == _p_item->min.i )
             {
                 o_modulelongname = [NSString stringWithUTF8String:
-                                        p_parser->psz_longname];
+                                        module_GetLongName( p_parser )];
                 o_modulename = [NSString stringWithUTF8String:
-                                        p_parser->psz_object_name];
+                                        module_GetObjName( p_parser )];
 
                 if( _p_item->value.psz &&
-                    strstr( _p_item->value.psz, p_parser->psz_object_name ) )
+                    strstr( _p_item->value.psz, module_GetObjName( p_parser ) ) )
                     o_moduleenabled = [NSNumber numberWithBool:YES];
                 else
                     o_moduleenabled = [NSNumber numberWithBool:NO];
