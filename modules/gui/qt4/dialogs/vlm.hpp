@@ -94,13 +94,14 @@ class VLMAWidget : public QGroupBox
     Q_OBJECT
     friend class VLMDialog;
 public:
-    VLMAWidget( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+    VLMAWidget( QString name, QString input, QString output, bool _enable, VLMDialog *parent, int _type = QVLM_Broadcast );
 protected:
     QLabel *nameLabel;
     QString name;
     QString input;
     QString output;
     bool b_enabled;
+    int type;
     VLMDialog *parent;
     virtual void enterEvent( QEvent * );
     QGridLayout *objLayout;
@@ -116,7 +117,6 @@ public:
     VLMBroadcast( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
 private:
     bool b_looped;
-
 private slots:
     void stop();
     void togglePlayPause();
@@ -135,6 +135,8 @@ class VLMSchedule : public VLMAWidget
 {
 public:
     VLMSchedule( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+private:
+    
 };
 
 #endif

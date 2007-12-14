@@ -170,7 +170,7 @@ void VLMDialog::addVLMItem()
     QString typeShortName;
     QString inputText = ui.inputLedit->text();
     QString outputText = ui.outputLedit->text();
-    bool b_checked;
+    bool b_checked = ui.enableCheck->isChecked();
 
     VLMAWidget * vlmAwidget;
 
@@ -178,15 +178,18 @@ void VLMDialog::addVLMItem()
     {
     case QVLM_Broadcast:
         typeShortName = "Bcast";
-        vlmAwidget = new VLMBroadcast( name, inputText, outputText, b_checked, this );
+        vlmAwidget = new VLMBroadcast( name, inputText, outputText,
+                                       b_checked, this );
     break;
     case QVLM_VOD:
         typeShortName = "VOD";
-        vlmAwidget = new VLMVod( name, inputText, outputText, b_checked, this );
+        vlmAwidget = new VLMVod( name, inputText, outputText,
+                                 b_checked, this );
         break;
     case QVLM_Schedule:
         typeShortName = "Sched";
-        vlmAwidget = new VLMSchedule( name, inputText, outputText, b_checked, this );
+        vlmAwidget = new VLMSchedule( name, inputText, outputText,
+                                      b_checked, this );
         break;
     default:
         msg_Warn( p_intf, "Something bad happened" );
@@ -214,6 +217,8 @@ void VLMDialog::clearWidgets()
     date->setDate( QDate::currentDate() );
     ui.enableCheck->setChecked( true );
     ui.nameLedit->setReadOnly( false );
+    ui.saveButton->hide();
+    ui.addButton->show();
 }
 
 void VLMDialog::saveModifications()
@@ -226,8 +231,6 @@ void VLMDialog::saveModifications()
         vlmObj->setChecked( ui.enableCheck->isChecked() );
         vlmObj->b_enabled = ui.enableCheck->isChecked();
     }
-    ui.saveButton->hide();
-    ui.addButton->show();
     clearWidgets();
 }
 
@@ -250,6 +253,7 @@ void VLMDialog::startModifyVLMItem( VLMAWidget *vlmObj )
     currentIndex = vlmItems.indexOf( vlmObj );
     if( currentIndex < 0 ) return;
 
+    msg_Dbg( p_intf, "Type: %i", vlmObj->type );
     ui.vlmListItem->setCurrentRow( currentIndex );
     ui.nameLedit->setText( vlmObj->name );
     ui.inputLedit->setText( vlmObj->input );
@@ -270,7 +274,8 @@ VLMAWidget::VLMAWidget( QString _name,
                         QString _input,
                         QString _output,
                         bool _enabled,
-                        VLMDialog *_parent )
+                        VLMDialog *_parent,
+                        int _type )
                       : QGroupBox( _name, _parent )
 {
     parent = _parent;
@@ -278,6 +283,9 @@ VLMAWidget::VLMAWidget( QString _name,
     input = _input;
     output = _output;
     b_enabled = _enabled;
+    type = _type;
+
+    setCheckable( true );
     setChecked( b_enabled );
 
     objLayout = new QGridLayout( this );
@@ -315,9 +323,10 @@ void VLMAWidget::del()
 VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
                             bool _enabled, VLMDialog *_parent)
                           : VLMAWidget( _name, _input, _output,
-                                        _enabled, _parent)
+                                        _enabled, _parent, QVLM_Broadcast )
 {
     nameLabel->setText( "Broadcast: " + name );
+    type = QVLM_Broadcast;
     QToolButton *playButton = new QToolButton;
     playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
     objLayout->addWidget( playButton, 1, 0 );
@@ -359,14 +368,14 @@ void VLMAWidget::enterEvent( QEvent *event )
 
 VLMSchedule::VLMSchedule( QString name, QString input, QString output,
                             bool enabled, VLMDialog *parent) : VLMAWidget( name, input,
-                            output, enabled, parent)
+                            output, enabled, parent, QVLM_Schedule )
 {
     nameLabel->setText( "Schedule: " + name );
 }
 
 VLMVod::VLMVod( QString name, QString input, QString output,
                             bool enabled, VLMDialog *parent) : VLMAWidget( name, input,
-                            output, enabled, parent)
+                            output, enabled, parent, QVLM_VOD )
 {
     nameLabel->setText( "VOD:" + name );
 }
