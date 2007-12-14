@@ -36,6 +36,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#ifdef HAVE_SIGNAL_H
+#   include <signal.h>
+#endif
+
 #ifdef HAVE_DBUS
 
 #define DBUS_API_SUBJECT_TO_CHANGE
