@@ -159,7 +159,6 @@ libvlc_media_list_hierarchical_view( libvlc_media_list_t * p_mlist,
 {
     trace("\n");
     libvlc_media_list_view_t * p_mlv;
-    libvlc_media_list_lock( p_mlist );
     p_mlv = libvlc_media_list_view_new( p_mlist,
                                         hierarch_media_list_view_count,
                                         hierarch_media_list_view_item_at_index,
@@ -167,6 +166,7 @@ libvlc_media_list_hierarchical_view( libvlc_media_list_t * p_mlist,
                                         hierarch_media_list_view_release,
                                         NULL,
                                         p_e );
+    libvlc_media_list_lock( p_mlist );
     libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemAdded,
                          media_list_item_added, p_mlv, NULL );
