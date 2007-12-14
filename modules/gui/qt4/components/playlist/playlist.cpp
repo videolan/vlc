@@ -91,6 +91,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
     sizeList << 180 << 420 ;
     setSizes( sizeList );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
+    setStretchFactor( 0, 0 );
+    setStretchFactor( 1, 3 );
 
     /* In case we want to keep the splitter informations */
     settings->beginGroup( "playlist" );
