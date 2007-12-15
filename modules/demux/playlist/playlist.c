@@ -72,7 +72,6 @@ vlc_module_begin();
         set_capability( "demux2", 10 );
         add_bool( "m3u-extvlcopt", VLC_FALSE, NULL,
                   EXTVLCOPT_TEXT, EXTVLCOPT_LONGTEXT, VLC_FALSE );
-        change_unsaveable();
         set_callbacks( E_(Import_M3U), E_(Close_M3U) );
     add_submodule();
         set_description( _("PLS playlist import") );
