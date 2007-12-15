@@ -812,11 +812,6 @@
                       withView: (NSView *)o_parent_view
 {
     VLCConfigControl *p_control = NULL;
-    /* Skip depracated options */
-    if( _p_item->psz_current )
-    {
-        return NULL;
-    }
 
     switch( _p_item->i_type )
     {

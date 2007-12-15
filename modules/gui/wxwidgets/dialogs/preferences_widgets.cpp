@@ -38,12 +38,6 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
 {
     ConfigControl *p_control = NULL;
 
-    /*Skip deprecated options */
-    if( p_item->psz_current || p_item->b_unsaveable )
-    {
-        return NULL;
-    }
-
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:

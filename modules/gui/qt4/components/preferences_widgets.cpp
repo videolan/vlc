@@ -74,7 +74,6 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                              QGridLayout *l, int &line )
 {
     ConfigControl *p_control = NULL;
-    if( p_item->psz_current || p_item->b_unsaveable ) return NULL;
 
     switch( p_item->i_type )
     {

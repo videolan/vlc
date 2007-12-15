@@ -614,12 +614,6 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
 
     BRect r;
     BMenuItem * menuItem;
-    /* Skip deprecated options */
-    if( p_item->psz_current )
-    {
-        fInitOK = false;
-        return;
-    }
 
     fInitOK = true;
 
