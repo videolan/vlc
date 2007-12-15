@@ -71,7 +71,7 @@ static void GfxMode        ( int i_tty );
 #define TTY_TEXT N_("Run fb on current tty.")
 #define TTY_LONGTEXT N_( \
     "Run framebuffer on current TTY device (default enabled). " \
-    "(disable tty handling with caution)" );
+    "(disable tty handling with caution)" )
 
 #define CHROMA_TEXT N_("Chroma used.")
 #define CHROMA_LONGTEXT N_( \
