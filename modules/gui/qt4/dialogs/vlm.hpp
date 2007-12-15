@@ -60,7 +60,6 @@ class QSpinBox;
 class VLMAWidget;
 class VLMWrapper;
 
-#define THEVLM parent->vlmWrapper->GetVLM()
 
 class VLMDialog : public QVLCFrame
 {
@@ -75,7 +74,7 @@ public:
     virtual ~VLMDialog();
 
     VLMWrapper *vlmWrapper;
-
+vlm_t *p_vlm;
 private:
     VLMDialog( intf_thread_t * );
     static VLMDialog *instance;
@@ -105,33 +104,29 @@ private slots:
 class VLMWrapper
 {
 public:
-    VLMWrapper( intf_thread_t * );
+    VLMWrapper( vlm_t * );
     virtual ~VLMWrapper();
 
-    bool AttachVLM();
-
-    static void AddBroadcast( vlm_t *, const QString, const QString, const QString,
+    static void AddBroadcast( const QString, const QString, const QString,
                        bool b_enabled = true,
                        bool b_loop = false );
-    static void EditBroadcast( vlm_t *, const QString, const QString, const QString,
+    static void EditBroadcast( const QString, const QString, const QString,
                        bool b_enabled = true,
                        bool b_loop = false );
-    static void AddVod( vlm_t *, const QString, const QString, const QString,
+    static void AddVod( const QString, const QString, const QString,
                        bool b_enabled = true, QString mux = "" );
-    static void EditVod( vlm_t *, const QString, const QString, const QString,
+    static void EditVod( const QString, const QString, const QString,
                        bool b_enabled = true, QString mux = "" );
 
-    static void ControlBroadcast( vlm_t *, const QString, int, unsigned int seek = 0 );
+    static void ControlBroadcast( const QString, int, unsigned int seek = 0 );
 
-    vlm_t * GetVLM(){ return p_vlm;}
     /* We don't have yet the accessors in the core, so the following is commented */
     //unsigned int NbMedia() { if( p_vlm ) return p_vlm->i_media; return 0; }
    /* vlm_media_t *GetMedia( int i )
     { if( p_vlm ) return p_vlm->media[i]; return NULL; }*/
 
 private:
-    vlm_t *p_vlm;
-    intf_thread_t *p_intf;
+    static vlm_t *p_vlm;
 };
 
 class VLMAWidget : public QGroupBox 
