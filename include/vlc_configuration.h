@@ -446,7 +446,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
     vlc_config_set (p_config + i_config, VLC_CONFIG_PERSISTENT)
 
 #define change_unsaveable() \
-    vlc_config_set (p_config + i_config, VLC_VOLATILE)
+    vlc_config_set (p_config + i_config, VLC_CONFIG_VOLATILE)
 
 /****************************************************************************
  * config_chain_t:
