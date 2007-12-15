@@ -547,10 +547,10 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
         }
 
         p_module->p_config[i].psz_type = strdupnull (p_orig[i].psz_type);
-        p_module->p_config[i].psz_name = strdupnull (p_orig[i].psz_name);
+        p_module->p_config[i].psz_name = p_orig[i].psz_name;
         p_module->p_config[i].psz_current = strdupnull (p_orig[i].psz_current);
-        p_module->p_config[i].psz_text = _strdupnull (p_orig[i].psz_text);
-        p_module->p_config[i].psz_longtext = _strdupnull (p_orig[i].psz_longtext);
+        p_module->p_config[i].psz_text = p_orig[i].psz_text;
+        p_module->p_config[i].psz_longtext = p_orig[i].psz_longtext;
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
 

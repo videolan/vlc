@@ -231,6 +231,22 @@ VLC_EXPORT( vlc_bool_t, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
 #define config_RemoveIntf(a,b) __config_RemoveIntf(VLC_OBJECT(a),b)
 #define config_ExistIntf(a,b) __config_ExistIntf(VLC_OBJECT(a),b)
 
+typedef enum vlc_config_properties
+{
+    /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
+     * Append new items at the end ONLY. */
+    VLC_CONFIG_NAME,     /* command line name (args=const char *, vlc_callback_t) */
+    VLC_CONFIG_DESC,     /* description (args=const char *, const char *) */
+    VLC_CONFIG_VALUE,    /* actual value (args=<type>) */
+    VLC_CONFIG_RANGE,    /* minimum value (args=<type>, <type>) */
+    VLC_CONFIG_STEP,     /* interval value (args=<type>) */
+    VLC_CONFIG_ADVANCED, /* enable advanced flag (args=none) */
+    VLC_CONFIG_VOLATILE, /* don't write variable to storage (args=none) */
+    VLC_CONFIG_PRIVATE,  /* hide from user (args=none) */
+} vlc_config_t;
+
+
+VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
@@ -258,8 +274,8 @@ VLC_EXPORT( vlc_bool_t, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
 
 #define add_typedesc_inner( type, text, longtext ) \
     add_type_inner( type ); \
-    p_config[i_config].psz_text = text; \
-    p_config[i_config].psz_longtext = longtext
+    vlc_config_set (p_config + i_config, VLC_CONFIG_DESC, \
+                    (const char *)(text), (const char *)(longtext))
 
 #define add_typeadv_inner( type, text, longtext, advc ) \
     add_typedesc_inner( type, text, longtext ); \
@@ -267,8 +283,8 @@ VLC_EXPORT( vlc_bool_t, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
 
 #define add_typename_inner( type, name, text, longtext, advc, cb ) \
     add_typeadv_inner( type, text, longtext, advc ); \
-    p_config[i_config].psz_name = name; \
-    p_config[i_config].pf_callback = cb
+    vlc_config_set (p_config + i_config, VLC_CONFIG_NAME, \
+                    (const char *)(name), (vlc_callback_t)(cb))
 
 #define add_string_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ); \

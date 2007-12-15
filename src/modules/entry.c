@@ -20,10 +20,10 @@
 
 #include <vlc/vlc.h>
 #include <assert.h>
+#include <stdarg.h>
 
-#include "modules/modules.h"
+#include "modules.h"
 #include "libvlc.h"
-#include "../libvlc.h"
 
 static const char default_name[] = "unnamed";
 
@@ -139,4 +139,49 @@ int vlc_module_set (module_t *module, int propid, void *value)
             return VLC_EGENERIC;
     }
     return 0;
+}
+
+int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
+{
+    int ret = -1;
+    va_list ap;
+
+    assert (item != NULL);
+    va_start (ap, id);
+
+    switch (id)
+    {
+        case VLC_CONFIG_NAME:
+        {
+            const char *name = va_arg (ap, const char *);
+            vlc_callback_t cb = va_arg (ap, vlc_callback_t);
+
+            assert (name != NULL);
+            item->psz_name = strdup (name);
+            item->pf_callback = cb;
+            break;
+        }
+
+        case VLC_CONFIG_DESC:
+        {
+            const char *text = va_arg (ap, const char *);
+            const char *longtext = va_arg (ap, const char *);
+
+            item->psz_text = text ? strdup (gettext (text)) : NULL;
+            item->psz_longtext = longtext ? strdup (gettext (text)) : NULL;
+            ret = 0;
+            break;
+        }
+
+        case VLC_CONFIG_VALUE:
+        case VLC_CONFIG_RANGE:
+        case VLC_CONFIG_STEP:
+        case VLC_CONFIG_ADVANCED:
+        case VLC_CONFIG_VOLATILE:
+        case VLC_CONFIG_PRIVATE:
+            break;
+    }
+
+    va_end (ap);
+    return ret;
 }
