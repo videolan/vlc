@@ -329,6 +329,8 @@ static char *assertUTF8URI( char *psz_name )
             *psz_s == '>' ||
             *psz_s == '&' ||
             *psz_s == ' ' ||
+            *psz_s == '+' ||
+            *psz_s == '%' ||
             ( b_uri_is_file && (
             *psz_s == ':' ||
             *psz_s == '"' ||
@@ -336,9 +338,7 @@ static char *assertUTF8URI( char *psz_name )
             *psz_s == '#' ||
             *psz_s == '[' ||
             *psz_s == ']' ||
-            *psz_s == '@' ||
-            *psz_s == '+' ||
-            *psz_s == '%' )
+            *psz_s == '@' )
             )
           )
         {
