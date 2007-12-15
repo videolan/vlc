@@ -801,11 +801,14 @@ module_config_t *module_GetConfig (const module_t *module, unsigned *restrict ps
 
     for (unsigned i = 0, j = 0; i < size; i++)
     {
-        if (module->p_config[i].b_internal)
+        const module_config_t *item = module->p_config + i;
+        if (item->b_internal /* internal option */
+         || item->b_unsaveable /* non-modifiable option */
+         || item->psz_current /* deprecated option name */)
             continue;
 
         if (config != NULL)
-            memcpy (config + j, module->p_config + i, sizeof (*config));
+            memcpy (config + j, item, sizeof (*config));
         *psize = j;
         j++;
     }
