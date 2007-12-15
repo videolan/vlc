@@ -75,7 +75,6 @@ enum vlc_module_properties
 };
 
 VLC_EXPORT( vlc_bool_t, module_IsCapable, ( const module_t *m, const char *cap ) );
-VLC_EXPORT( vlc_bool_t, module_IsSubModule, ( const module_t *m ) );
 VLC_EXPORT( const char *, module_GetObjName, ( const module_t *m ) );
 VLC_EXPORT( const char *, module_GetName, ( const module_t *m, vlc_bool_t long_name ) );
 #define module_GetLongName( m ) module_GetName( m, VLC_TRUE )
