@@ -22,7 +22,8 @@
 #include <assert.h>
 #include <stdarg.h>
 
-#include "modules.h"
+#include "modules/modules.h"
+#include "config/config.h"
 #include "libvlc.h"
 
 static const char default_name[] = "unnamed";
@@ -159,6 +160,7 @@ int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
             assert (name != NULL);
             item->psz_name = strdup (name);
             item->pf_callback = cb;
+            ret = 0;
             break;
         }
 
@@ -174,11 +176,69 @@ int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
         }
 
         case VLC_CONFIG_VALUE:
+        {
+            if (IsConfigIntegerType (item->i_type))
+            {
+                item->value.i = va_arg (ap, int);
+                ret = 0;
+            }
+            else
+            if (IsConfigFloatType (item->i_type))
+            {
+                item->value.f = va_arg (ap, double);
+                ret = 0;
+            }
+            else
+            if (IsConfigStringType (item->i_type))
+            {
+                const char *value = va_arg (ap, const char *);
+                item->value.psz = value ? strdup (value) : NULL;
+                ret = 0;
+            }
+            break;
+        }
+
         case VLC_CONFIG_RANGE:
-        case VLC_CONFIG_STEP:
+        {
+            if (IsConfigIntegerType (item->i_type))
+            {
+                item->min.i = va_arg (ap, int);
+                item->max.i = va_arg (ap, int);
+                ret = 0;
+            }
+            else
+            if (IsConfigFloatType (item->i_type))
+            {
+                item->min.f = va_arg (ap, double);
+                item->max.f = va_arg (ap, double);
+                ret = 0;
+            }
+            break;
+        }
+
         case VLC_CONFIG_ADVANCED:
+            item->b_advanced = VLC_TRUE;
+            ret = 0;
+            break;
+
         case VLC_CONFIG_VOLATILE:
+            item->b_unsaveable = VLC_TRUE;
+            ret = 0;
+            break;
+
+        case VLC_CONFIG_PERSISTENT:
+            item->b_autosave = VLC_TRUE;
+            ret = 0;
+            break;
+
+        case VLC_CONFIG_RESTART:
+            item->b_restart = VLC_TRUE;
+            ret = 0;
+            break;
+
         case VLC_CONFIG_PRIVATE:
+            item->b_internal = VLC_TRUE;
+            ret = 0;
             break;
     }
 

@@ -149,11 +149,11 @@ typedef union
 struct module_config_t
 {
     int          i_type;                               /* Configuration type */
-    const char  *psz_type;                          /* Configuration subtype */
-    const char  *psz_name;                                    /* Option name */
+    char        *psz_type;                          /* Configuration subtype */
+    char        *psz_name;                                    /* Option name */
     char         i_short;                      /* Optional short option name */
-    const char  *psz_text;      /* Short comment on the configuration option */
-    const char  *psz_longtext;   /* Long comment on the configuration option */
+    char        *psz_text;      /* Short comment on the configuration option */
+    char        *psz_longtext;   /* Long comment on the configuration option */
     module_value_t value;                                    /* Option value */
     module_value_t orig;
     module_value_t saved;
@@ -239,9 +239,10 @@ typedef enum vlc_config_properties
     VLC_CONFIG_DESC,     /* description (args=const char *, const char *) */
     VLC_CONFIG_VALUE,    /* actual value (args=<type>) */
     VLC_CONFIG_RANGE,    /* minimum value (args=<type>, <type>) */
-    VLC_CONFIG_STEP,     /* interval value (args=<type>) */
     VLC_CONFIG_ADVANCED, /* enable advanced flag (args=none) */
     VLC_CONFIG_VOLATILE, /* don't write variable to storage (args=none) */
+    VLC_CONFIG_PERSISTENT, /* always write variable to storage (args=none) */
+    VLC_CONFIG_RESTART,  /* restart required to apply value change (args=none) */
     VLC_CONFIG_PRIVATE,  /* hide from user (args=none) */
 } vlc_config_t;
 
@@ -279,7 +280,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 #define add_typeadv_inner( type, text, longtext, advc ) \
     add_typedesc_inner( type, text, longtext ); \
-    p_config[i_config].b_advanced = advc
+    if (advc) vlc_config_set (p_config + i_config, VLC_CONFIG_ADVANCED)
 
 #define add_typename_inner( type, name, text, longtext, advc, cb ) \
     add_typeadv_inner( type, text, longtext, advc ); \
@@ -288,11 +289,11 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 #define add_string_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ); \
-    p_config[i_config].value.psz = v
+    vlc_config_set (p_config + i_config, VLC_CONFIG_VALUE, (const char *)(v))
 
 #define add_int_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ); \
-    p_config[i_config].value.i = v
+    vlc_config_set (p_config + i_config, VLC_CONFIG_VALUE, (int)(v))
 
 
 #define set_category( i_id ) \
@@ -358,7 +359,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 #define add_float( name, v, p_callback, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_FLOAT, name, text, longtext, advc, p_callback ); \
-    p_config[i_config].value.f = v
+    vlc_config_set (p_config + i_config, VLC_CONFIG_VALUE, (double)(v))
 
 #define add_float_with_range( name, value, f_min, f_max, p_callback, text, longtext, advc ) \
     add_float( name, value, p_callback, text, longtext, advc ); \
@@ -372,7 +373,8 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 #define add_deprecated_alias( name ) \
     add_config_inner( ); \
     p_config[ i_config ].i_type = p_config[ i_config -1 ].i_type; \
-    p_config[ i_config ].psz_name = name; \
+    vlc_config_set (p_config + i_config, VLC_CONFIG_NAME, \
+                    (const char *)(name), (vlc_callback_t)NULL); \
     p_config[i_config].b_strict = VLC_FALSE; \
     p_config[ i_config ].psz_current = p_config[ i_config-1 ].psz_current \
         ? p_config[ i_config-1 ].psz_current \
@@ -381,8 +383,9 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 /* For removed option */
 #define add_obsolete_inner( name, type ) \
     add_type_inner( type ); \
-    p_config[ i_config ].psz_name = name; \
-    p_config[ i_config ].psz_current = "SUPPRESSED";
+    vlc_config_set (p_config + i_config, VLC_CONFIG_NAME, \
+                    (const char *)(name), (vlc_callback_t)NULL); \
+    p_config[ i_config ].psz_current = "SUPPRESSED"
 
 #define add_obsolete_bool( name ) \
         add_obsolete_inner( name, CONFIG_ITEM_BOOL )
@@ -411,12 +414,12 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
     p_config[i_config].ppsz_list_text = list_text;
 
 #define change_integer_range( minv, maxv ) \
-    p_config[i_config].min.i = minv; \
-    p_config[i_config].max.i = maxv;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_RANGE, \
+                    (int)(minv), (int)(maxv))
 
 #define change_float_range( minv, maxv ) \
-    p_config[i_config].min.f = minv; \
-    p_config[i_config].max.f = maxv;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_RANGE, \
+                    (double)(minv), (double)(maxv))
 
 #define change_action_add( pf_action, action_text ) \
     if( !p_config[i_config].i_action ) \
@@ -434,16 +437,16 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
     p_config[i_config].i_action++;
 
 #define change_internal() \
-    p_config[i_config].b_internal = VLC_TRUE;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_PRIVATE)
 
 #define change_need_restart() \
-    p_config[i_config].b_restart = VLC_TRUE;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_RESTART)
 
 #define change_autosave() \
-    p_config[i_config].b_autosave = VLC_TRUE;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_PERSISTENT)
 
 #define change_unsaveable() \
-    p_config[i_config].b_unsaveable = VLC_TRUE;
+    vlc_config_set (p_config + i_config, VLC_VOLATILE)
 
 /****************************************************************************
  * config_chain_t:
