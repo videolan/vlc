@@ -485,7 +485,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         PL_LOCK;
         if( p_current )
         {
-            if( !strncmp( p_current->psz_uri, "file:", 5 ) )
+            if( p_current->i_type == ITEM_TYPE_FILE )
             {
                 stats_TimerStart( p_playlist, "Preparse run",
                                   STATS_TIMER_PREPARSE );
