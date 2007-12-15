@@ -1068,11 +1068,11 @@ static const char *ppsz_clock_descriptions[] =
 #define FETCH_META_TEXT N_( "Autorise meta information fetching" )
 #define FETCH_META_LONGTEXT N_( \
     "Specify if you want to attempt to fetch files'"\
-    "meta informations using the network." );
+    "meta informations using the network." )
 
 #define ALBUM_ART_TEXT N_( "Album art policy" )
 #define ALBUM_ART_LONGTEXT N_( \
-    "Choose how album art will be downloaded." );
+    "Choose how album art will be downloaded." )
 
 static int pi_albumart_values[] = { ALBUM_ART_WHEN_ASKED,
                                     ALBUM_ART_WHEN_PLAYED,
