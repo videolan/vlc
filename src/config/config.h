@@ -52,6 +52,11 @@ char *config_GetCustomConfigFile( libvlc_int_t * );
 int __config_LoadConfigFile( vlc_object_t *, const char * );
 
 int IsConfigStringType( int type );
+int IsConfigIntegerType (int type);
+static inline int IsConfigFloatType (int type)
+{
+    return type == CONFIG_ITEM_FLOAT;
+}
 
 int ConfigStringToKey( const char * );
 

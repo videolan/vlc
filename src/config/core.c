@@ -89,7 +89,7 @@ int IsConfigStringType (int type)
 }
 
 
-static int IsConfigIntegerType (int type)
+int IsConfigIntegerType (int type)
 {
     static const unsigned char config_types[] =
     {
@@ -98,12 +98,6 @@ static int IsConfigIntegerType (int type)
     };
 
     return memchr (config_types, type, sizeof (config_types)) != NULL;
-}
-
-
-static inline int IsConfigFloatType (int type)
-{
-    return type == CONFIG_ITEM_FLOAT;
 }
 
 
