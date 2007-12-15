@@ -794,13 +794,21 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
 module_config_t *module_GetConfig (const module_t *module, unsigned *restrict psize)
 {
     unsigned size = module->confsize;
+    module_config_t *config = malloc (size * sizeof (*config));
 
     assert (psize != NULL);
-    *psize = size;
+    *psize = 0;
 
-    module_config_t *config = malloc (size * sizeof (*config));
-    if (config)
-        memcpy (config, module->p_config, size * sizeof (*config));
+    for (unsigned i = 0, j = 0; i < size; i++)
+    {
+        if (module->p_config[i].b_internal)
+            continue;
+
+        if (config != NULL)
+            memcpy (config + j, module->p_config + i, sizeof (*config));
+        *psize = j;
+        j++;
+    }
 
     return config;
 }
