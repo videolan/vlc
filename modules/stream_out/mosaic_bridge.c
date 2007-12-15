@@ -130,12 +130,12 @@ static int MosaicBridgeCallback( vlc_object_t *, char const *,
 
 #define VFILTER_TEXT N_("Video filter")
 #define VFILTER_LONGTEXT N_( \
-    "Video filters will be applied to the video stream." );
+    "Video filters will be applied to the video stream." )
 
 #define CHROMA_TEXT N_("Image chroma")
 #define CHROMA_LONGTEXT N_( \
     "Force the use of a specific chroma. Use YUVA if you're planning " \
-    "to use the Alphamask or Bluescreen video filter." );
+    "to use the Alphamask or Bluescreen video filter." )
 
 #define CFG_PREFIX "sout-mosaic-bridge-"
 
