@@ -26,6 +26,7 @@
 #define _VLM_DIALOG_H_
 
 #include <vlc/vlc.h>
+#include <vlc_vlm.h>
 
 #include "ui/vlm.h"
 #include "util/qvlcframe.hpp"
@@ -34,6 +35,13 @@ enum{
     QVLM_Broadcast,
     QVLM_Schedule,
     QVLM_VOD
+};
+
+enum{
+    ControlBroadcastPlay,
+    ControlBroadcastPause,
+    ControlBroadcastStop,
+    ControlBroadcastSeek
 };
 
 class QComboBox;
@@ -50,6 +58,9 @@ class QHBoxLayout;
 class QDateTimeEdit;
 class QSpinBox;
 class VLMAWidget;
+class VLMWrapper;
+
+#define THEVLM parent->vlmWrapper->GetVLM()
 
 class VLMDialog : public QVLCFrame
 {
@@ -62,6 +73,8 @@ public:
         return instance;
     };
     virtual ~VLMDialog();
+
+    VLMWrapper *vlmWrapper;
 
 private:
     VLMDialog( intf_thread_t * );
@@ -89,12 +102,46 @@ private slots:
     void selectVLMItem( int );
 };
 
+class VLMWrapper
+{
+public:
+    VLMWrapper( intf_thread_t * );
+    virtual ~VLMWrapper();
+
+    bool AttachVLM();
+
+    static void AddBroadcast( vlm_t *, const QString, const QString, const QString,
+                       bool b_enabled = true,
+                       bool b_loop = false );
+    static void EditBroadcast( vlm_t *, const QString, const QString, const QString,
+                       bool b_enabled = true,
+                       bool b_loop = false );
+    static void AddVod( vlm_t *, const QString, const QString, const QString,
+                       bool b_enabled = true, QString mux = "" );
+    static void EditVod( vlm_t *, const QString, const QString, const QString,
+                       bool b_enabled = true, QString mux = "" );
+
+    static void ControlBroadcast( vlm_t *, const QString, int, unsigned int seek = 0 );
+
+    vlm_t * GetVLM(){ return p_vlm;}
+    /* We don't have yet the accessors in the core, so the following is commented */
+    //unsigned int NbMedia() { if( p_vlm ) return p_vlm->i_media; return 0; }
+   /* vlm_media_t *GetMedia( int i )
+    { if( p_vlm ) return p_vlm->media[i]; return NULL; }*/
+
+private:
+    vlm_t *p_vlm;
+    intf_thread_t *p_intf;
+};
+
 class VLMAWidget : public QGroupBox 
 {
     Q_OBJECT
     friend class VLMDialog;
 public:
-    VLMAWidget( QString name, QString input, QString output, bool _enable, VLMDialog *parent, int _type = QVLM_Broadcast );
+    VLMAWidget( QString name, QString input, QString output,
+            bool _enable, VLMDialog *parent, int _type = QVLM_Broadcast );
+    virtual void update() = 0;
 protected:
     QLabel *nameLabel;
     QString name;
@@ -113,10 +160,15 @@ private slots:
 class VLMBroadcast : public VLMAWidget
 {
     Q_OBJECT
+    friend class VLMDialog;
 public:
-    VLMBroadcast( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+    VLMBroadcast( QString name, QString input, QString output,
+            bool _enable, bool _loop, VLMDialog *parent );
+    void update();
 private:
     bool b_looped;
+    bool b_playing;
+    QToolButton *loopButton, *playButton;
 private slots:
     void stop();
     void togglePlayPause();
@@ -125,16 +177,23 @@ private slots:
 
 class VLMVod : public VLMAWidget
 {
+    Q_OBJECT
+    friend class VLMDialog;
 public:
-    VLMVod( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+    VLMVod( QString name, QString input, QString output,
+            bool _enable, QString _mux, VLMDialog *parent );
+    void update();
 private:
     QString mux;
+    QLabel *muxLabel;
 };
 
 class VLMSchedule : public VLMAWidget
 {
+    friend class VLMDialog;
 public:
     VLMSchedule( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+    void update();
 private:
     
 };

@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #include "dialogs/vlm.hpp"
-#include <vlc_streaming.h>
 
 #include <QString>
 #include <QComboBox>
@@ -49,6 +48,13 @@ VLMDialog *VLMDialog::instance = NULL;
 
 VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
+    vlmWrapper = new VLMWrapper( p_intf );
+    if( !vlmWrapper->AttachVLM() )
+    {
+        msg_Warn( p_intf, "Couldn't build VLM object ");
+        return;   
+    }
+
     // UI stuff
     ui.setupUi( this );
     ui.saveButton->hide();
@@ -129,7 +135,10 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     BUTTONACT( ui.saveButton, saveModifications() );
 }
 
-VLMDialog::~VLMDialog(){}
+VLMDialog::~VLMDialog()
+{
+    delete vlmWrapper;
+}
 
 void VLMDialog::showScheduleWidget( int i )
 {
@@ -171,6 +180,7 @@ void VLMDialog::addVLMItem()
     QString inputText = ui.inputLedit->text();
     QString outputText = ui.outputLedit->text();
     bool b_checked = ui.enableCheck->isChecked();
+    bool b_looped = ui.loopBCast->isChecked();
 
     VLMAWidget * vlmAwidget;
 
@@ -179,12 +189,14 @@ void VLMDialog::addVLMItem()
     case QVLM_Broadcast:
         typeShortName = "Bcast";
         vlmAwidget = new VLMBroadcast( name, inputText, outputText,
-                                       b_checked, this );
+                                  b_checked, b_looped, this );
+        VLMWrapper::AddBroadcast( vlmWrapper->GetVLM(), name, inputText, outputText, b_checked, b_looped ); 
     break;
     case QVLM_VOD:
         typeShortName = "VOD";
         vlmAwidget = new VLMVod( name, inputText, outputText,
-                                 b_checked, this );
+                                 b_checked, ui.muxLedit->text(), this );
+        VLMWrapper::AddVod( vlmWrapper->GetVLM(), name, inputText, outputText, b_checked );
         break;
     case QVLM_Schedule:
         typeShortName = "Sched";
@@ -217,21 +229,10 @@ void VLMDialog::clearWidgets()
     date->setDate( QDate::currentDate() );
     ui.enableCheck->setChecked( true );
     ui.nameLedit->setReadOnly( false );
+    ui.loopBCast->setChecked( false );
+    ui.muxLedit->clear();
     ui.saveButton->hide();
     ui.addButton->show();
-}
-
-void VLMDialog::saveModifications()
-{
-    VLMAWidget *vlmObj = vlmItems.at( currentIndex );
-    if( vlmObj )
-    {
-        vlmObj->input = ui.inputLedit->text();
-        vlmObj->output = ui.outputLedit->text();
-        vlmObj->setChecked( ui.enableCheck->isChecked() );
-        vlmObj->b_enabled = ui.enableCheck->isChecked();
-    }
-    clearWidgets();
 }
 
 /* Object Modification */
@@ -260,14 +261,53 @@ void VLMDialog::startModifyVLMItem( VLMAWidget *vlmObj )
     ui.outputLedit->setText( vlmObj->output );
     ui.enableCheck->setChecked( vlmObj->b_enabled );
 
+    switch( vlmObj->type )
+    {
+    case QVLM_Broadcast:
+        ui.loopBCast->setChecked( (qobject_cast<VLMBroadcast *>(vlmObj))->b_looped );
+        break;
+    case QVLM_VOD:
+        ui.muxLedit->setText( (qobject_cast<VLMVod *>(vlmObj))->mux );
+        break;
+    case QVLM_Schedule:
+        //(qobject_cast<VLMSchedule *>)
+        break;
+    }
+
     ui.nameLedit->setReadOnly( true );
     ui.addButton->hide();
     ui.saveButton->show();
 }
 
+void VLMDialog::saveModifications()
+{
+    VLMAWidget *vlmObj = vlmItems.at( currentIndex );
+    if( vlmObj )
+    {
+        vlmObj->input = ui.inputLedit->text();
+        vlmObj->output = ui.outputLedit->text();
+        vlmObj->setChecked( ui.enableCheck->isChecked() );
+        vlmObj->b_enabled = ui.enableCheck->isChecked();
+        switch( vlmObj->type )
+        {
+        case QVLM_Broadcast:
+            (qobject_cast<VLMBroadcast *>(vlmObj))->b_looped = ui.loopBCast->isChecked();
+            break;
+        case QVLM_VOD:
+            (qobject_cast<VLMVod *>(vlmObj))->mux = ui.muxLedit->text();
+            break;
+        case QVLM_Schedule:
+            break;
+           //           vlmObj->
+        }
+        vlmObj->update(); /* It should call the correct function is VLMAWidget
+                             is abstract, but I am far from sure... FIXME ? */
+    }
+    clearWidgets();
+}
 
 /*********************************
- * VLMAWidget
+ * VLMAWidget - Abstract class
  ********************************/
 
 VLMAWidget::VLMAWidget( QString _name,
@@ -319,63 +359,244 @@ void VLMAWidget::del()
     parent->removeVLMItem( this );
 }
 
-
-VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
-                            bool _enabled, VLMDialog *_parent)
-                          : VLMAWidget( _name, _input, _output,
-                                        _enabled, _parent, QVLM_Broadcast )
-{
-    nameLabel->setText( "Broadcast: " + name );
-    type = QVLM_Broadcast;
-    QToolButton *playButton = new QToolButton;
-    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
-    objLayout->addWidget( playButton, 1, 0 );
-
-    QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( QPixmap( ":/pixmaps/stop_16px.png" ) ) );
-    objLayout->addWidget( stopButton, 1, 1 );
-
-    QToolButton *loopButton = new QToolButton;
-    loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_off.png" ) ) );
-    objLayout->addWidget( loopButton, 1, 2 );
-
-    BUTTONACT( playButton, togglePlayPause() );
-    BUTTONACT( stopButton, stop() );
-    BUTTONACT( loopButton, toggleLoop() );
-}
-
-
-void VLMBroadcast::togglePlayPause()
-{
-
-}
-
-void VLMBroadcast::toggleLoop()
-{
-
-}
-
-void VLMBroadcast::stop()
-{
-
-}
-
+//FIXME, remove me before release
 void VLMAWidget::enterEvent( QEvent *event )
 {
     printf( "test" );
 }
 
+/****************
+ * VLMBroadcast 
+ ****************/
+VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
+                            bool _enabled, bool _looped, VLMDialog *_parent)
+                          : VLMAWidget( _name, _input, _output,
+                                        _enabled, _parent, QVLM_Broadcast )
+{
+    nameLabel->setText( "Broadcast: " + name );
+    type = QVLM_Broadcast;
+    b_looped = _looped;
 
+    playButton = new QToolButton;
+    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+    objLayout->addWidget( playButton, 1, 0 );
+    b_playing = true;
+
+    QToolButton *stopButton = new QToolButton;
+    stopButton->setIcon( QIcon( QPixmap( ":/pixmaps/stop_16px.png" ) ) );
+    objLayout->addWidget( stopButton, 1, 1 );
+
+    loopButton = new QToolButton;
+    objLayout->addWidget( loopButton, 1, 2 );
+
+    BUTTONACT( playButton, togglePlayPause() );
+    BUTTONACT( stopButton, stop() );
+    BUTTONACT( loopButton, toggleLoop() );
+    
+    update();
+}
+
+void VLMBroadcast::update()
+{
+    VLMWrapper::EditBroadcast( THEVLM, name, input, output, b_enabled, b_looped );
+    if( b_looped )
+        loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_all.png" ) ) );
+    else
+        loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_off.png" ) ) );
+}
+
+void VLMBroadcast::togglePlayPause()
+{
+    if( b_playing = true )
+    {
+        VLMWrapper::ControlBroadcast( THEVLM, name, ControlBroadcastPause );
+        playButton->setIcon( QIcon( QPixmap( ":/pixmaps/pause_16px.png" ) ) );
+    }
+    else
+    {
+        VLMWrapper::ControlBroadcast( THEVLM, name, ControlBroadcastPlay );
+        playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+    }
+    b_playing = !b_playing;
+}
+
+void VLMBroadcast::toggleLoop()
+{
+    b_enabled = !b_enabled;
+    update();
+}
+
+void VLMBroadcast::stop()
+{
+    VLMWrapper::ControlBroadcast( THEVLM, name, ControlBroadcastStop );
+    playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
+}
+
+/****************
+ * VLMSchedule
+ ****************/
 VLMSchedule::VLMSchedule( QString name, QString input, QString output,
-                            bool enabled, VLMDialog *parent) : VLMAWidget( name, input,
-                            output, enabled, parent, QVLM_Schedule )
+                            bool enabled, VLMDialog *parent) 
+            : VLMAWidget( name, input, output, enabled, parent, QVLM_Schedule )
 {
     nameLabel->setText( "Schedule: " + name );
 }
 
+void VLMSchedule::update()
+{
+}
+
+/****************
+ * VLMVOD
+ ****************/
 VLMVod::VLMVod( QString name, QString input, QString output,
-                            bool enabled, VLMDialog *parent) : VLMAWidget( name, input,
-                            output, enabled, parent, QVLM_VOD )
+                bool enabled, QString _mux, VLMDialog *parent)
+       : VLMAWidget( name, input, output, enabled, parent, QVLM_VOD )
 {
     nameLabel->setText( "VOD:" + name );
+
+    mux = _mux;
+    muxLabel = new QLabel;
+    objLayout->addWidget( muxLabel, 1, 0 );
+    
+    update();
+}
+
+void VLMVod::update()
+{
+    muxLabel->setText( mux );
+    VLMWrapper::EditVod( THEVLM, name, input, output, b_enabled, mux );
+}
+
+
+/*******************
+ * VLMWrapper
+ *******************/
+VLMWrapper::VLMWrapper( intf_thread_t *_p_intf )
+{
+    p_intf = _p_intf;
+    p_vlm = vlm_New( p_intf );
+}
+
+VLMWrapper::~VLMWrapper()
+{
+   /* FIXME :you have to destroy vlm here to close
+    * but we shouldn't destroy vlm here in case somebody else wants it */
+    if( p_vlm )
+        vlm_Delete( p_vlm );
+}
+
+bool VLMWrapper::AttachVLM()
+{
+    p_vlm = vlm_New( p_intf );
+    return (p_vlm ? true: false );
+}
+
+void VLMWrapper::AddBroadcast( vlm_t *p_vlm, const QString name, QString input,
+                               QString output,
+                               bool b_enabled, bool b_loop  )
+{
+    vlm_message_t *message;
+    QString command = "new \"" + name + "\" broadcast";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    EditBroadcast( p_vlm, name, input, output, b_enabled, b_loop );
+}
+
+void VLMWrapper::EditBroadcast( vlm_t *p_vlm, const QString name, const QString input,
+                                const QString output,
+                                bool b_enabled, bool b_loop  )
+{
+    vlm_message_t *message;
+    QString command;
+    
+    command = "setup \"" + name + "\" inputdel all";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    command = "setup \"" + name + "\" input \"" + input + "\"";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    if( !output.isEmpty() )
+    {
+        command = "setup \"" + name + "\" output \"" + output + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+    if( b_enabled )
+    {
+        command = "setup \"" + name + "\" enabled";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+    if( b_loop )
+    {
+        command = "setup \"" + name + "\" loop";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+}
+
+void VLMWrapper::ControlBroadcast( vlm_t *p_vlm, const QString name, int BroadcastStatus, 
+                                   unsigned int seek )
+{
+    vlm_message_t *message;
+
+    QString command = "setup \"" + name;
+    switch( BroadcastStatus )
+    {
+    case ControlBroadcastPlay:
+        command += " play";
+        break;
+    case ControlBroadcastPause:
+        command += " pause";
+        break;
+    case ControlBroadcastStop:
+        command += " stop";
+        break;
+    case ControlBroadcastSeek:
+        command += " seek" + seek;
+        break;
+    }
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+}
+
+void VLMWrapper::AddVod( vlm_t *p_vlm, const QString name, const QString input,
+                         const QString output,
+                         bool b_enabled, const QString mux )
+{
+    vlm_message_t *message;
+    QString command = "new \"" + name + "\" vod";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    EditVod( p_vlm, name, input, output, b_enabled, mux );
+}
+
+void VLMWrapper::EditVod( vlm_t *p_vlm, const QString name, const QString input,
+                          const QString output, 
+                          bool b_enabled,
+                          const QString mux )
+{
+    vlm_message_t *message;
+    QString command = "setup \"" + name + "\" input \"" + input + "\"";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    if( !output.isEmpty() )
+    {
+        command = "setup \"" + name + "\" output \"" + output + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+    if( b_enabled )
+    {
+        command = "setup \"" + name + "\" enabled";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+    if( !mux.isEmpty() )
+    {
+        command = "setup \"" + name + "\" mux \"" + mux + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
 }
