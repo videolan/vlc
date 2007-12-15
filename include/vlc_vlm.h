@@ -229,7 +229,7 @@ static inline void vlm_media_Clean( vlm_media_t *p_media )
 }
 static inline vlm_media_t *vlm_media_New(void)
 {
-    vlm_media_t *p_media = malloc( sizeof(vlm_media_t) );
+    vlm_media_t *p_media = (vlm_media_t *)malloc( sizeof(vlm_media_t) );
     if( p_media )
         vlm_media_Init( p_media );
     return p_media;
@@ -265,7 +265,7 @@ static inline void vlm_media_instance_Clean( vlm_media_instance_t *p_instance )
 }
 static inline vlm_media_instance_t *vlm_media_instance_New(void)
 {
-    vlm_media_instance_t *p_instance = malloc( sizeof(vlm_media_instance_t) );
+    vlm_media_instance_t *p_instance = (vlm_media_instance_t *) malloc( sizeof(vlm_media_instance_t) );
     if( p_instance )
         vlm_media_instance_Init( p_instance );
     return p_instance;
