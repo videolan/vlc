@@ -119,6 +119,7 @@ public:
                        bool b_enabled = true, QString mux = "" );
 
     static void ControlBroadcast( const QString, int, unsigned int seek = 0 );
+    static void EnableItem( const QString, bool );
 
     /* We don't have yet the accessors in the core, so the following is commented */
     //unsigned int NbMedia() { if( p_vlm ) return p_vlm->i_media; return 0; }
@@ -150,6 +151,7 @@ protected:
 private slots:
     virtual void modify();
     virtual void del();
+    virtual void toggleEnabled( bool );
 };
 
 class VLMBroadcast : public VLMAWidget

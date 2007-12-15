@@ -195,13 +195,13 @@ void VLMDialog::addVLMItem()
         typeShortName = "Bcast";
         vlmAwidget = new VLMBroadcast( name, inputText, outputText,
                                   b_checked, b_looped, this );
-        //VLMWrapper::AddBroadcast( vlmWrapper->p_vlc, name, inputText, outputText, b_checked, b_looped ); 
+        VLMWrapper::AddBroadcast( name, inputText, outputText, b_checked, b_looped ); 
     break;
     case QVLM_VOD:
         typeShortName = "VOD";
         vlmAwidget = new VLMVod( name, inputText, outputText,
                                  b_checked, ui.muxLedit->text(), this );
-        ///VLMWrapper::AddVod( vlmWrapper->GetVLM(), name, inputText, outputText, b_checked );
+        VLMWrapper::AddVod( name, inputText, outputText, b_checked );
         break;
     case QVLM_Schedule:
         typeShortName = "Sched";
@@ -352,6 +352,7 @@ VLMAWidget::VLMAWidget( QString _name,
 
     BUTTONACT( modifyButton, modify() );
     BUTTONACT( deleteButton, del() );
+    CONNECT( this, clicked( bool ), this, toggleEnabled( bool ) );
 }
 
 void VLMAWidget::modify()
@@ -368,6 +369,11 @@ void VLMAWidget::del()
 void VLMAWidget::enterEvent( QEvent *event )
 {
     printf( "test" );
+}
+
+void VLMAWidget::toggleEnabled( bool b_enable )
+{
+    VLMWrapper::EnableItem( name, b_enable );
 }
 
 /****************
@@ -403,7 +409,7 @@ VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
 
 void VLMBroadcast::update()
 {
-    //VLMWrapper::EditBroadcast( VLMWrapper::p_vlm, name, input, output, b_enabled, b_looped );
+    VLMWrapper::EditBroadcast( name, input, output, b_enabled, b_looped );
     if( b_looped )
         loopButton->setIcon( QIcon( QPixmap( ":/pixmaps/playlist_repeat_all.png" ) ) );
     else
@@ -414,12 +420,12 @@ void VLMBroadcast::togglePlayPause()
 {
     if( b_playing = true )
     {
-      //  VLMWrapper::ControlBroadcast( VLMWrapper::p_vlm, name, ControlBroadcastPause );
+        VLMWrapper::ControlBroadcast( name, ControlBroadcastPause );
         playButton->setIcon( QIcon( QPixmap( ":/pixmaps/pause_16px.png" ) ) );
     }
     else
     {
-        //VLMWrapper::ControlBroadcast( VLMWrapper::p_vlm, name, ControlBroadcastPlay );
+        VLMWrapper::ControlBroadcast( name, ControlBroadcastPlay );
         playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
     }
     b_playing = !b_playing;
@@ -433,7 +439,7 @@ void VLMBroadcast::toggleLoop()
 
 void VLMBroadcast::stop()
 {
-    //VLMWrapper::ControlBroadcast( VLMWrapper::p_vlm, name, ControlBroadcastStop );
+    VLMWrapper::ControlBroadcast( name, ControlBroadcastStop );
     playButton->setIcon( QIcon( QPixmap( ":/pixmaps/play_16px.png" ) ) );
 }
 
@@ -470,7 +476,7 @@ VLMVod::VLMVod( QString name, QString input, QString output,
 void VLMVod::update()
 {
     muxLabel->setText( mux );
-    //VLMWrapper::EditVod( p_vlm, name, input, output, b_enabled, mux );
+    VLMWrapper::EditVod( name, input, output, b_enabled, mux );
 }
 
 
@@ -531,12 +537,18 @@ void VLMWrapper::EditBroadcast( const QString name, const QString input,
     }
 }
 
+void VLMWrapper::EnableItem( const QString name, bool b_enable )
+{
+    vlm_message_t *message;
+    QString command = "setup \"" + name + ( b_enable ? " enable" : " disable" );
+}
+
 void VLMWrapper::ControlBroadcast( const QString name, int BroadcastStatus, 
                                    unsigned int seek )
 {
     vlm_message_t *message;
 
-    QString command = "setup \"" + name;
+    QString command = "control \"" + name;
     switch( BroadcastStatus )
     {
     case ControlBroadcastPlay:
