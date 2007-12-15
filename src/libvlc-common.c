@@ -305,7 +305,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE ) )
     {
         vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
+        p_help_module->p_config = NULL;
+        p_help_module->confsize = 0;
         vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
@@ -413,7 +414,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        config_Free( p_help_module );
+        p_help_module->p_config = NULL; p_help_module->confsize = 0;
         vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return i_ret;
@@ -523,7 +524,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        config_Free( p_help_module );
+        p_help_module->p_config = NULL; p_help_module->confsize = 0;
         vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return i_ret;
@@ -556,7 +557,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         PauseConsole();
 #endif
         vlc_object_detach( p_help_module );
-        config_Free( p_help_module );
+        p_help_module->p_config = NULL; p_help_module->confsize = 0;
         vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
@@ -564,7 +565,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* Hack: remove the help module here */
     vlc_object_detach( p_help_module );
-    config_Free( p_help_module );
+    p_help_module->p_config = NULL; p_help_module->confsize = 0;
     vlc_object_destroy( p_help_module );
     /* End hack */
 
