@@ -28,7 +28,9 @@
 #include <errno.h>                                                 /* ENOMEM */
 
 #include <vlc/vlc.h>
+#include <vlc_input.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include <gtk/gtk.h>
 
@@ -293,7 +295,7 @@ static void Run( intf_thread_t *p_intf )
                 G_TYPE_STRING, /* Filename */
                 G_TYPE_STRING, /* Time */
                 G_TYPE_UINT);  /* Hidden index */
-    PlaylistRebuildListStore(p_playlist_store, p_playlist);
+    PlaylistRebuildListStore(p_intf,p_playlist_store, p_playlist);
     gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvplaylist), GTK_TREE_MODEL(p_playlist_store));
     g_object_unref(p_playlist_store);
     vlc_object_release(p_playlist); /* Free the playlist */
@@ -365,7 +367,7 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
     {
         p_intf = (intf_thread_t *)p_list->p_values[i_index].p_object ;
 
-        if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
+        if( strcmp( MODULE_STRING, module_GetObjName(p_intf->p_module) ) )
         {
             continue;
         }
@@ -434,7 +436,7 @@ static int Manage( intf_thread_t *p_intf )
                                             G_TYPE_STRING,
                                             G_TYPE_STRING,
                                             G_TYPE_UINT);  /* Hidden index */
-                PlaylistRebuildListStore(p_liststore, p_playlist);
+                PlaylistRebuildListStore(p_intf, p_liststore, p_playlist);
                 gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) p_liststore);
                 g_object_unref(p_liststore);
                 vlc_object_release( p_playlist );
@@ -607,4 +609,3 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
     gtk_widget_set_sensitive( lookup_widget( p_intf->p_sys->p_window, "tbForward"), b_control );
     return TRUE;
 }
-

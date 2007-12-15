@@ -25,7 +25,9 @@
  * Preamble
  *****************************************************************************/
 #include <sys/types.h>                                              /* off_t */
+
 #include <vlc/vlc.h>
+#include <vlc_input.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
@@ -35,10 +37,6 @@
 #include <unistd.h>
 #include <pwd.h>
 #include <grp.h>
-
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
 
 #include <gtk/gtk.h>
 
@@ -85,7 +83,7 @@ void * E_(__GtkGetIntf)( GtkWidget * widget )
     return p_data;
 }
 
-void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_size)
+static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_size)
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t    *p_playlist;
@@ -118,7 +116,7 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
             gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
                                     0, name,   /* Add path to it !!! */
                                     1, "no info",
-                                    2, p_playlist->i_size, /* Hidden index. */
+                                    2, playlist_CurrentSize(p_intf), /* Hidden index. */
                                     -1 );
 
             /* Add to VLC's playlist */
@@ -135,7 +133,8 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
                               (const char*)name,
                               PLAYLIST_APPEND, PLAYLIST_END,
                               (mtime_t) 0,
-                              (const char **) ppsz_options, i_pos );
+                              (const char **) ppsz_options, i_pos,
+                              VLC_TRUE, VLC_FALSE );
             }
 
             /* Cleanup memory */
@@ -147,7 +146,8 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
     vlc_object_release( p_playlist );
 }
 
-void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
+void PlaylistRebuildListStore( intf_thread_t *p_intf,
+    GtkListStore * p_list, playlist_t * p_playlist )
 {
     GtkTreeIter iter;
     int         i_dummy;
@@ -159,16 +159,20 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
     red.green   = 0;
 #endif
     vlc_mutex_lock( &p_playlist->object_lock );
-    for( i_dummy = 0; i_dummy < p_playlist->i_size ; i_dummy++ )
+    for( i_dummy = 0; i_dummy < playlist_CurrentSize(p_intf) ; i_dummy++ )
     {
-        ppsz_text[0] = p_playlist->pp_items[i_dummy]->input.psz_name;
-        ppsz_text[1] = "no info";
-        gtk_list_store_append (p_list, &iter);
-        gtk_list_store_set (p_list, &iter,
-                            0, ppsz_text[0],
-                            1, ppsz_text[1],
-                            2, i_dummy, /* Hidden index */
-                            -1);
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy, VLC_TRUE );
+        if( p_item )
+        {
+            ppsz_text[0] = p_item->p_input->psz_name;
+            ppsz_text[1] = "no info";
+            gtk_list_store_append (p_list, &iter);
+            gtk_list_store_set (p_list, &iter,
+                                0, ppsz_text[0],
+                                1, ppsz_text[1],
+                                2, i_dummy, /* Hidden index */
+                                -1);
+        }
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 }
@@ -376,7 +380,7 @@ void onPlay(GtkButton *button, gpointer user_data)
     if (p_playlist)
     {
         vlc_mutex_lock( &p_playlist->object_lock );
-        if (p_playlist->i_size)
+        if (playlist_CurrentSize(p_intf))
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
             playlist_Play( p_playlist );
@@ -457,7 +461,7 @@ void SliderMove(GtkRange *range, GtkScrollType scroll, gpointer user_data)
 }
 
 
-void addSelectedToPlaylist(GtkTreeModel *model, GtkTreePath *path,
+static void addSelectedToPlaylist(GtkTreeModel *model, GtkTreePath *path,
                            GtkTreeIter *iter, gpointer *userdata)
 {
     gchar *psz_filename;
@@ -478,7 +482,7 @@ void onFileListRow(GtkTreeView *treeview, GtkTreePath *path,
         struct stat   st;
         GtkTreeModel *p_model;
         GtkTreeIter   iter;
-        gchar        *psz_filename;
+        char         *psz_filename;
 
         /* This might be a directory selection */
         p_model = gtk_tree_view_get_model(treeview);
@@ -595,7 +599,7 @@ void onAddNetworkPlaylist(GtkButton *button, gpointer user_data)
     if (b_network_transcode)
     {
         msg_Dbg( p_intf, "Network transcode option selected." );
-        onAddTranscodeToPlaylist(GTK_WIDGET(button), (gchar *)psz_mrl_name);
+        onAddTranscodeToPlaylist(button, (gchar *)psz_mrl_name);
     }
     else
     {
@@ -733,7 +737,7 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
     if (b_v4l_transcode)
     {
         msg_Dbg( p_intf, "Camera transcode option selected." );
-        onAddTranscodeToPlaylist(GTK_WIDGET(button), (gchar *)v4l_mrl);
+        onAddTranscodeToPlaylist(button, (gchar *)v4l_mrl);
     }
     else
     {
@@ -778,6 +782,7 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
         GtkTreeModel *p_model;
         GtkTreeIter   iter;
         int           i_row;
+        int           i_skip;
 
         /* This might be a directory selection */
         p_model = gtk_tree_view_get_model(treeview);
@@ -793,7 +798,8 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
         }
 
         gtk_tree_model_get(p_model, &iter, 2, &i_row, -1);
-        playlist_Goto( p_playlist, i_row );
+        i_skip = i_row - p_playlist->i_current_index;
+        playlist_Skip( p_playlist, i_skip );
     }
     vlc_object_release( p_playlist );
 }
@@ -823,7 +829,7 @@ void onUpdatePlaylist(GtkButton *button, gpointer user_data)
                     G_TYPE_UINT);  /* Hidden field */
         if (p_model)
         {
-            PlaylistRebuildListStore(p_model, p_playlist);
+            PlaylistRebuildListStore(p_intf, p_model, p_playlist);
             gtk_tree_view_set_model(GTK_TREE_VIEW(p_tvplaylist), GTK_TREE_MODEL(p_model));
             g_object_unref(p_model);
         }
@@ -831,7 +837,7 @@ void onUpdatePlaylist(GtkButton *button, gpointer user_data)
     vlc_object_release( p_playlist );
 }
 
-void deleteItemFromPlaylist(gpointer data, gpointer user_data)
+static void deleteItemFromPlaylist(gpointer data, gpointer user_data)
 {
     gtk_tree_path_free((GtkTreePath*) data); // removing an item.
 }
@@ -897,7 +903,7 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
                     G_TYPE_UINT);  /* Hidden field */
         if (p_store)
         {
-            PlaylistRebuildListStore(p_store, p_playlist);
+            PlaylistRebuildListStore(p_intf, p_store, p_playlist);
             gtk_tree_view_set_model(GTK_TREE_VIEW(p_tvplaylist), GTK_TREE_MODEL(p_store));
             g_object_unref(p_store);
         }
@@ -919,9 +925,9 @@ void onClearPlaylist(GtkButton *button, gpointer user_data)
         return;
     }
 
-    for(item = p_playlist->i_size - 1; item >= 0 ;item-- )
+    for(item = playlist_CurrentSize(p_intf) - 1; item >= 0 ;item-- )
     {
-        msg_Err( p_playlist "fix pda delete");
+        msg_Err( p_playlist, "fix pda delete" );
     }
     vlc_object_release( p_playlist );
 

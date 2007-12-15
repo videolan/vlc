@@ -27,7 +27,7 @@
 #include <vlc_interface.h>
 
 void ReadDirectory( intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir );
-void PlaylistRebuildListStore( GtkListStore *p_list, playlist_t * p_playlist );
+void PlaylistRebuildListStore( intf_thread_t *p_intf, GtkListStore *p_list, playlist_t * p_playlist );
 
 
 gboolean
