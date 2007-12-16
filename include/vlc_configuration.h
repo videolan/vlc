@@ -247,6 +247,7 @@ typedef enum vlc_config_properties
 } vlc_config_t;
 
 
+VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int type) );
 VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 /*****************************************************************************
@@ -367,7 +368,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 #define add_bool( name, v, p_callback, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc, p_callback ); \
-    p_config[i_config].value.i = v
+    if (v) vlc_config_set (p_config + i_config, VLC_CONFIG_VALUE, (int)VLC_TRUE)
 
 /* For renamed option */
 #define add_deprecated_alias( name ) \

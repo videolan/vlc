@@ -142,6 +142,25 @@ int vlc_module_set (module_t *module, int propid, void *value)
     return 0;
 }
 
+module_config_t *vlc_config_create (module_t *module, int type)
+{
+    unsigned confsize = module->confsize;
+    module_config_t *tab = module->p_config;
+
+    if ((confsize & 0xf) == 0)
+    {
+        tab = realloc (tab, (confsize + 17) * sizeof (*tab));
+        if (tab == NULL)
+            return NULL;
+
+        module->p_config = tab;
+    }
+    module->confsize++;
+
+    memset (tab + confsize, 0, sizeof (tab[confsize]));
+    return tab + confsize;
+}
+
 int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
 {
     int ret = -1;
