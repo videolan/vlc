@@ -371,7 +371,9 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 {
     controlLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
-    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Minimum );
+    //controlLayout->setMargin( 0 );
+
+    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
@@ -456,8 +458,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     /* Play */
     playButton = new QPushButton;
     playButton->setSizePolicy( sizePolicy );
-    playButton->setMaximumSize( QSize( 38, 38 ) );
-    playButton->setMinimumSize( QSize( 45, 45 ) );
+    playButton->setMaximumSize( QSize( 36, 36 ) );
+    playButton->setMinimumSize( QSize( 36, 36 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2 );
@@ -499,8 +501,10 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     BUTTON_SET_ACT_I( nextButton, "", next.png, qtr( "Next" ), next() );
     BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr( "Stop" ), stop() );
 
-    controlLayout->setColumnStretch( 7 , 2 );
-
+    controlLayout->setColumnMinimumWidth( 7, 20 );
+    controlLayout->setColumnStretch( 7, 0 );
+    controlLayout->setColumnStretch( 8, 0 );
+    controlLayout->setColumnStretch( 9, 0 );
     /*
      * Other first Line buttons
      */
@@ -524,6 +528,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     setupSmallButton( extSettingsButton );
     controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );
 
+    controlLayout->setColumnStretch( 13, 0 );
     controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
@@ -562,8 +567,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 }
 
 ControlsWidget::~ControlsWidget()
-{
-}
+{}
 
 /*
 QSize ControlsWidget::sizeHint() const

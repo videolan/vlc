@@ -352,6 +352,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
+    main->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
