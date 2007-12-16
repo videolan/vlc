@@ -47,7 +47,6 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
 {
     aout_input_t * p_input;
     input_thread_t * p_input_thread;
-    vlc_value_t val;
 
     /* Sanitize audio format */
     if( p_format->i_channels > 32 )
@@ -140,7 +139,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     aout_InputNew( p_aout, p_input );
 
     vlc_mutex_unlock( &p_aout->mixer_lock );
-    p_input->i_desync = var_CreateGet( p_this, "audio-desync" ) * 1000;
+    p_input->i_desync = var_CreateGetInteger( p_this, "audio-desync" ) * 1000;
 
     p_input_thread = (input_thread_t *)vlc_object_find( p_this,
                                            VLC_OBJECT_INPUT, FIND_PARENT );
