@@ -63,8 +63,13 @@ static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int SnapshotCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
-static int TitleCallback( vlc_object_t *, char const *,
-                       vlc_value_t, vlc_value_t, void * );
+
+static int TitleShowCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+static int TitleTimeoutCallback( vlc_object_t *, char const *,
+                                 vlc_value_t, vlc_value_t, void * );
+static int TitlePositionCallback( vlc_object_t *, char const *,
+                                  vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_RequestWindow: Create/Get a video window if possible.
@@ -88,10 +93,8 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     if( !var_Type( p_vout, "aspect-ratio" ) ) vout_IntfInit( p_vout );
 
     /* Get requested coordinates */
-    var_Get( p_vout, "video-x", &val );
-    *pi_x_hint = val.i_int ;
-    var_Get( p_vout, "video-y", &val );
-    *pi_y_hint = val.i_int;
+    *pi_x_hint = var_GetInteger( p_vout, "video-x" );
+    *pi_y_hint = var_GetInteger( p_vout, "video-y" );
 
     *pi_width_hint = p_vout->i_window_width;
     *pi_height_hint = p_vout->i_window_height;
@@ -286,9 +289,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
     p_vout->i_title_position =
         var_CreateGetInteger( p_vout, "video-title-position" );
 
-    var_AddCallback( p_vout, "video-title-show", TitleCallback, NULL );
-    var_AddCallback( p_vout, "video-title-timeout", TitleCallback, NULL );
-    var_AddCallback( p_vout, "video-title-position", TitleCallback, NULL );
+    var_AddCallback( p_vout, "video-title-show", TitleShowCallback, NULL );
+    var_AddCallback( p_vout, "video-title-timeout", TitleTimeoutCallback, NULL );
+    var_AddCallback( p_vout, "video-title-position", TitlePositionCallback, NULL );
 
     /* Zoom object var */
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
@@ -313,10 +316,10 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
 
     /* Crop offset vars */
-    var_Create( p_vout, "crop-left", VLC_VAR_INTEGER );
-    var_Create( p_vout, "crop-top", VLC_VAR_INTEGER );
-    var_Create( p_vout, "crop-right", VLC_VAR_INTEGER );
-    var_Create( p_vout, "crop-bottom", VLC_VAR_INTEGER );
+    var_Create( p_vout, "crop-left", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_Create( p_vout, "crop-top", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_Create( p_vout, "crop-right", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_Create( p_vout, "crop-bottom", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
 
     var_AddCallback( p_vout, "crop-left", CropCallback, NULL );
     var_AddCallback( p_vout, "crop-top", CropCallback, NULL );
@@ -324,7 +327,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "crop-bottom", CropCallback, NULL );
 
     /* Crop object var */
-    var_Create( p_vout, "crop", VLC_VAR_STRING |
+    var_Create( p_vout, "crop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
                 VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Crop");
@@ -385,7 +388,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     if( val.psz_string ) free( val.psz_string );
 
     /* Aspect-ratio object var */
-    var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING |
+    var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
                 VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Aspect-ratio");
@@ -417,7 +420,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
                     &p_vout->i_window_height );
 
     /* Add a variable to indicate if the window should be on top of others */
-    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
+                | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
@@ -426,7 +430,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Add a fullscreen variable */
-    if( var_CreateGetBool( p_vout, "fullscreen" ) )
+    if( var_CreateGetBoolCommand( p_vout, "fullscreen" ) )
     {
         /* user requested fullscreen */
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -466,8 +470,8 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     DIR *path;
     int i_ret;
 
-    memset( &fmt_in, 0, sizeof(video_format_t));
-    memset( &fmt_out, 0, sizeof(video_format_t));
+    memset( &fmt_in, 0, sizeof(video_format_t) );
+    memset( &fmt_out, 0, sizeof(video_format_t) );
 
     var_Get( p_vout, "snapshot-path", &val );
     if( val.psz_string && !*val.psz_string )
@@ -667,18 +671,29 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             FILE *p_file;
             do
             {
-                asprintf( &psz_filename, "%s" DIR_SEP "%s%05d.%s", val.psz_string,
-                          psz_prefix, i_num++, format.psz_string );
+                if( asprintf( &psz_filename, "%s" DIR_SEP "%s%05d.%s",
+                              val.psz_string, psz_prefix, i_num++,
+                              format.psz_string ) == -1 )
+                {
+                    msg_Err( p_vout, "could not create snapshot" );
+                    image_HandlerDelete( p_image );
+                    return VLC_EGENERIC;
+                }
             }
             while( ( p_file = utf8_fopen( psz_filename, "r" ) ) && !fclose( p_file ) );
             var_SetInteger( p_vout, "snapshot-num", i_num );
         }
         else
         {
-            asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s", val.psz_string,
-                      psz_prefix,
-                      (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
-                      format.psz_string );
+            if( asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s",
+                          val.psz_string, psz_prefix,
+                          (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
+                          format.psz_string ) == -1 )
+            {
+                msg_Err( p_vout, "could not create snapshot" );
+                image_HandlerDelete( p_image );
+                return VLC_EGENERIC;
+            }
         }
 
         free( psz_prefix );
@@ -781,8 +796,12 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
         if( !psz_parser )
         {
             psz_parser = psz_string;
-            asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
-                            psz_string, psz_name );
+            if( asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
+                          psz_string, psz_name ) == -1 )
+            {
+                free( psz_parser );
+                return;
+            }
             free( psz_parser );
         }
         else
@@ -1176,20 +1195,29 @@ static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_Control( p_vout, VOUT_SNAPSHOT );
-    (void)psz_cmd; (void)oldval; (void)newval; (void)p_data;
     return VLC_SUCCESS;
 }
 
-static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
+static int TitleShowCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    p_vout->b_title_show = newval.b_bool;
+    return VLC_SUCCESS;
+}
 
-    if( !strncmp( psz_cmd, "video-title-show", 16 ) )
-        p_vout->b_title_show = newval.b_bool;
-    else if( !strncmp( psz_cmd, "video-title-timeout", 19 ) )
-        p_vout->i_title_timeout = (mtime_t) newval.i_int;
-    else if( !strncmp( psz_cmd, "video-title-position", 20 ) )
-        p_vout->i_title_position = newval.i_int;
+static int TitleTimeoutCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    p_vout->i_title_timeout = (mtime_t) newval.i_int;
+    return VLC_SUCCESS;
+}
+
+static int TitlePositionCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    p_vout->i_title_position = newval.i_int;
     return VLC_SUCCESS;
 }
