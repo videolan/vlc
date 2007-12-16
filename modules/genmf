@@ -53,7 +53,7 @@ AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
 if HAVE_COMPILER_EXPORT
 AM_LDFLAGS += -export-dynamic
 else
-AM_LDFLAGS += -export-symbol-regex ^\$(VLC_ENTRY)\$\$
+AM_LDFLAGS += -export-symbol-regex ^vlc_entry
 endif
 AM_LIBADD = \$(LTLIBVLC)
 endif

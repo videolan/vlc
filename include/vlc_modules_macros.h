@@ -32,6 +32,11 @@
 #   define MODULE_NAME main
 #endif
 
+/**
+ * Current plugin ABI version
+ */
+# define MODULE_SUFFIX __0_9_0e
+
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
  *****************************************************************************/
