@@ -351,7 +351,7 @@ VLC-release.app: vlc
 	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras"; \
+	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/MacOSX"; \
 	fi
 	rm -Rf $(top_builddir)/VLC-release.app
 	cp -R $(srcdir)/extras/MacOSX/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
