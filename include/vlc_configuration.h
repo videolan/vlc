@@ -235,15 +235,39 @@ typedef enum vlc_config_properties
 {
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
-    VLC_CONFIG_NAME,     /* command line name (args=const char *, vlc_callback_t) */
-    VLC_CONFIG_DESC,     /* description (args=const char *, const char *) */
-    VLC_CONFIG_VALUE,    /* actual value (args=<type>) */
-    VLC_CONFIG_RANGE,    /* minimum value (args=<type>, <type>) */
-    VLC_CONFIG_ADVANCED, /* enable advanced flag (args=none) */
-    VLC_CONFIG_VOLATILE, /* don't write variable to storage (args=none) */
-    VLC_CONFIG_PERSISTENT, /* always write variable to storage (args=none) */
-    VLC_CONFIG_RESTART,  /* restart required to apply value change (args=none) */
-    VLC_CONFIG_PRIVATE,  /* hide from user (args=none) */
+
+    VLC_CONFIG_NAME,
+    /* command line name (args=const char *, vlc_callback_t) */
+
+    VLC_CONFIG_DESC,
+    /* description (args=const char *, const char *) */
+
+    VLC_CONFIG_VALUE,
+    /* actual value (args=int/double/const char *) */
+
+    VLC_CONFIG_RANGE,
+    /* minimum value (args=int/double/const char * twice) */
+
+    VLC_CONFIG_ADVANCED,
+    /* enable advanced flag (args=none) */
+
+    VLC_CONFIG_VOLATILE,
+    /* don't write variable to storage (args=none) */
+
+    VLC_CONFIG_PERSISTENT,
+    /* always write variable to storage (args=none) */
+
+    VLC_CONFIG_RESTART,
+    /* restart required to apply value change (args=none) */
+
+    VLC_CONFIG_PRIVATE,
+    /* hide from user (args=none) */
+
+    VLC_CONFIG_REMOVED,
+    /* tag as no longer supported (args=none) */
+
+    VLC_CONFIG_CAPABILITY,
+    /* capability for a module or list thereof (args=const char*) */
 } vlc_config_t;
 
 
@@ -334,7 +358,8 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 #define add_module( name, psz_caps, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE, name, text, longtext, advc, p_callback, value ); \
-    p_config[i_config].psz_type = psz_caps
+    vlc_config_set (p_config + i_config, VLC_CONFIG_CAPABILITY, \
+                    (const char *)(psz_caps))
 
 #define add_module_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_CAT, name, text, longtext, advc, p_callback, value ); \
@@ -342,7 +367,8 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
 
 #define add_module_list( name, psz_caps, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST, name, text, longtext, advc, p_callback, value ); \
-    p_config[i_config].psz_type = psz_caps
+    vlc_config_set (p_config + i_config, VLC_CONFIG_CAPABILITY, \
+                    (const char *)(psz_caps))
 
 #define add_module_list_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, advc, p_callback, value ); \
@@ -386,7 +412,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
     add_type_inner( type ); \
     vlc_config_set (p_config + i_config, VLC_CONFIG_NAME, \
                     (const char *)(name), (vlc_callback_t)NULL); \
-    p_config[ i_config ].psz_current = "SUPPRESSED"
+    vlc_config_set (p_config + i_config, VLC_CONFIG_REMOVED)
 
 #define add_obsolete_bool( name ) \
         add_obsolete_inner( name, CONFIG_ITEM_BOOL )

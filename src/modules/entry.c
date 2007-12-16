@@ -259,6 +259,19 @@ int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
             item->b_internal = VLC_TRUE;
             ret = 0;
             break;
+
+        case VLC_CONFIG_REMOVED:
+            item->psz_current = "SUPPRESSED";
+            ret = 0;
+            break;
+
+        case VLC_CONFIG_CAPABILITY:
+        {
+            const char *cap = va_arg (ap, const char *);
+            item->psz_type = cap ? strdup (cap) : NULL;
+            ret = 0;
+            break;
+        }
     }
 
     va_end (ap);
