@@ -544,5 +544,7 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
 char *aout_VisualChange( vlc_object_t *p_this, int i_skip )
 {
     (void)p_this; (void)i_skip;
+    msg_Err( p_this, "FIXME: %s (%s %d) isn't implemented.", __func__,
+             __FILE__, __LINE__ );
     return strdup("foobar");
 }
