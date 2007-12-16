@@ -42,7 +42,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "DV" );
     set_description( _("DV (Digital Video) demuxer") );
-    set_capability( "demux2", 2 );
+    set_capability( "demux2", 3 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, VLC_FALSE );
