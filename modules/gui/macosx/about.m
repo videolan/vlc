@@ -25,11 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "intf.h"
-#include "about.h"
-#include <vlc_intf_strings.h>
-#include <vlc_about.h>
-#import <WebKit/WebKit.h>
+#import "intf.h"
+#import "about.h"
+#import <vlc_intf_strings.h>
+#import <vlc_about.h>
 
 #ifdef __x86_64__
 #define PLATFORM "Intel"
@@ -180,10 +179,28 @@ static VLAboutBox *_o_sharedInstance = nil;
 - (void)showHelp
 {
     [o_help_window setTitle: _NS("VLC media player Help")];
-    [o_help_window makeKeyAndOrderFront: self];
+    [o_help_fwd_btn setToolTip: _NS("Next")];
+    [o_help_bwd_btn setToolTip: _NS("Previous")];
+    [o_help_home_btn setToolTip: _NS("Index")];
 
+    [o_help_window makeKeyAndOrderFront: self];
+    
     [[o_help_web_view mainFrame] loadHTMLString: [NSString stringWithString: _NS(I_LONGHELP)]
                                         baseURL: [NSURL URLWithString:@"http://videolan.org"]];
+}
+
+- (IBAction)helpGoHome:(id)sender
+{
+    /* go home */
+    [[o_help_web_view mainFrame] loadHTMLString: [NSString stringWithString: _NS(I_LONGHELP)]
+                                        baseURL: [NSURL URLWithString:@"http://videolan.org"]];
+}
+
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+{
+    /* delegate to update button states (we're the frameLoadDelegate for our help's webview */
+    [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]]; 
+    [o_help_bwd_btn setEnabled: [o_help_web_view canGoBack]];
 }
 
 @end

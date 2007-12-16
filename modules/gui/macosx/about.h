@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <WebKit/WebKit.h>
+
 /*****************************************************************************
  * VLAboutBox interface
  *****************************************************************************/
@@ -43,10 +45,13 @@
     NSTimeInterval i_start;
     BOOL b_restart;
     BOOL b_isSetUp;
-
+    
     /* generic help window */
     IBOutlet id o_help_window;
-    IBOutlet id o_help_web_view;
+    IBOutlet WebView *o_help_web_view; //we may _not_ use id here because of method name collisions
+    IBOutlet id o_help_bwd_btn;
+    IBOutlet id o_help_fwd_btn;
+    IBOutlet id o_help_home_btn;
 
     /* licence window */
     IBOutlet id o_gpl_window;
@@ -57,5 +62,6 @@
 - (void)showAbout;
 - (void)showHelp;
 - (IBAction)showGPL:(id)sender;
+- (IBAction)helpGoHome:(id)sender;
 
 @end
