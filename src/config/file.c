@@ -27,6 +27,7 @@
 #include "vlc_keys.h"
 
 #include <errno.h>                                                  /* errno */
+#include <stdbool.h>
 
 #ifdef HAVE_LIMITS_H
 #   include <limits.h>
@@ -342,6 +343,32 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
     return -1;
 }
 
+static int
+config_Write (FILE *file, const char *type, const char *desc,
+              bool comment, const char *name, const char *fmt, ...)
+{
+    va_list ap;
+    int ret;
+
+    if (desc == NULL)
+        desc = "?";
+
+    if (fprintf (file, "# %s (%s)\n%s%s=", desc, gettext (type),
+                 comment ? "#" : "", name) < 0)
+        return -1;
+
+    va_start (ap, fmt);
+    ret = vfprintf (file, fmt, ap);
+    va_end (ap);
+    if (ret < 0)
+        return -1;
+
+    if (fputs ("\n\n", file) == EOF)
+        return -1;
+    return 0;
+}
+
+
 /*****************************************************************************
  * config_SaveConfigFile: Save a module's config options.
  *****************************************************************************
@@ -511,85 +538,68 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
              p_item < p_end;
              p_item++ )
         {
-            char  *psz_key;
-            int   i_value = p_item->value.i;
-            float f_value = p_item->value.f;
-            const char  *psz_value = p_item->value.psz;
+            /* Do not save the new value in the configuration file
+             * if doing an autosave, and the item is not an "autosaved" one. */
+            vlc_bool_t b_retain = b_autosave && !p_item->b_autosave;
 
-            if( p_item->i_type & CONFIG_HINT )
-                /* ignore hints */
-                continue;
-            /* Ignore deprecated options */
-            if( p_item->psz_current )
-                continue;
-            if( p_item->b_unsaveable )
-                /*obvious*/
+            if ((p_item->i_type & CONFIG_HINT) /* ignore hint */
+             || p_item->psz_current            /* ignore deprecated option */
+             || p_item->b_unsaveable)          /* ignore volatile option */
                 continue;
 
-            if( b_autosave && !p_item->b_autosave )
+            if (IsConfigIntegerType (p_item->i_type))
             {
-                i_value = p_item->saved.i;
-                f_value = p_item->saved.f;
-                psz_value = p_item->saved.psz;
-                if( !psz_value ) psz_value = p_item->orig.psz;
+                int val = b_retain ? p_item->saved.i : p_item->value.i;
+                if (p_item->i_type == CONFIG_ITEM_KEY)
+                {
+                    char *psz_key = ConfigKeyToString (val);
+                    config_Write (file, p_item->psz_text, N_("key"),
+                                  val == p_item->orig.i,
+                                  p_item->psz_name, "%s",
+                                  psz_key ? psz_key : "");
+                    free (psz_key);
+                }
+                else
+                    config_Write (file, p_item->psz_text,
+                                  (p_item->i_type == CONFIG_ITEM_BOOL)
+                                      ? N_("boolean") : N_("integer"),
+                                  val == p_item->orig.i,
+                                  p_item->psz_name, "%d", val);
+                p_item->saved.i = val;
+            }
+            else
+            if (IsConfigFloatType (p_item->i_type))
+            {
+                float val = b_retain ? p_item->saved.f : p_item->value.f;
+                config_Write (file, p_item->psz_text, N_("float"),
+                              val == p_item->orig.f,
+                              p_item->psz_name, "%f", val);
+                p_item->saved.f = val;
             }
             else
             {
-                p_item->b_dirty = VLC_FALSE;
-            }
+                const char *psz_value = b_retain ? p_item->saved.psz
+                                                 : p_item->value.psz;
+                bool modified;
 
-            switch( p_item->i_type )
-            {
-            case CONFIG_ITEM_BOOL:
-            case CONFIG_ITEM_INTEGER:
-                if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
-                             (p_item->i_type == CONFIG_ITEM_BOOL) ?
-                             _("boolean") : _("integer") );
-                if( i_value == p_item->orig.i )
-                    fputc ('#', file);
-                fprintf( file, "%s=%i\n", p_item->psz_name, i_value );
+                assert (IsConfigStringType (p_item->i_type));
 
-                p_item->saved.i = i_value;
-                break;
+                if (b_retain && (psz_value == NULL)) /* FIXME: hack */
+                    psz_value = p_item->orig.psz;
 
-            case CONFIG_ITEM_KEY:
-                if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
-                             _("key") );
-                if( i_value == p_item->orig.i )
-                    fputc ('#', file);
-                psz_key = ConfigKeyToString( i_value );
-                fprintf( file, "%s=%s\n", p_item->psz_name,
-                         psz_key ? psz_key : "" );
-                free (psz_key);
+                modified =
+                    (psz_value != NULL)
+                        ? ((p_item->orig.psz != NULL)
+                            ? (strcmp (psz_value, p_item->orig.psz) != 0)
+                            : true)
+                        : (p_item->orig.psz != NULL);
 
-                p_item->saved.i = i_value;
-                break;
+                config_Write (file, p_item->psz_text, N_("string"),
+                              modified, p_item->psz_name, "%s",
+                              psz_value ? psz_value : "");
 
-            case CONFIG_ITEM_FLOAT:
-                if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
-                             _("float") );
-                if( f_value == p_item->orig.f )
-                    fputc ('#', file);
-                fprintf( file, "%s=%f\n", p_item->psz_name, (double)f_value );
-
-                p_item->saved.f = f_value;
-                break;
-
-            default:
-                if( p_item->psz_text )
-                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
-                             _("string") );
-                if( (!psz_value && !p_item->orig.psz) ||
-                    (psz_value && p_item->orig.psz &&
-                     !strcmp( psz_value, p_item->orig.psz )) )
-                    fputc ('#', file);
-                fprintf( file, "%s=%s\n", p_item->psz_name,
-                         psz_value ?: "" );
-
-                if( b_autosave && !p_item->b_autosave ) break;
+                if (b_retain)
+                    break;
 
                 free ((char *)p_item->saved.psz);
                 if( (psz_value && p_item->orig.psz &&
@@ -599,9 +609,10 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 else
                     p_item->saved.psz = NULL;
             }
-        }
 
-        fputc ('\n', file);
+            if (!b_retain)
+                p_item->b_dirty = VLC_FALSE;
+        }
     }
 
     vlc_list_release( p_list );
