@@ -183,7 +183,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_sys->i_align = 0;
@@ -629,7 +628,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 dbg((p_dec, "%s\n", dbg));
             }
 #endif
- 
         }
         else if ( row == 25 )
         {
@@ -736,4 +734,3 @@ error:
     block_Release( p_block );
     return NULL;
 }
-

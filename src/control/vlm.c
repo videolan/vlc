@@ -232,7 +232,6 @@ void libvlc_vlm_add_input( libvlc_instance_t *p_instance, char *psz_name,
 #undef VLM_CHANGE_CODE
 }
 
-
 void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
                               char *psz_input, char *psz_output, int i_options,
                               char **ppsz_options, int b_enabled, int b_loop,
@@ -259,7 +258,6 @@ void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
 
 void libvlc_vlm_play_media( libvlc_instance_t *p_instance, char *psz_name,
                             libvlc_exception_t *p_exception )
- 
 {
     vlm_t *p_vlm;
     int64_t id;
@@ -275,7 +273,6 @@ void libvlc_vlm_play_media( libvlc_instance_t *p_instance, char *psz_name,
 
 void libvlc_vlm_stop_media( libvlc_instance_t *p_instance, char *psz_name,
                             libvlc_exception_t *p_exception )
- 
 {
     vlm_t *p_vlm;
     int64_t id;
@@ -291,7 +288,6 @@ void libvlc_vlm_stop_media( libvlc_instance_t *p_instance, char *psz_name,
 
 void libvlc_vlm_pause_media( libvlc_instance_t *p_instance, char *psz_name,
                             libvlc_exception_t *p_exception )
- 
 {
     vlm_t *p_vlm;
     int64_t id;
@@ -307,7 +303,6 @@ void libvlc_vlm_pause_media( libvlc_instance_t *p_instance, char *psz_name,
 
 void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
                             float f_percentage, libvlc_exception_t *p_exception )
- 
 {
     vlm_t *p_vlm;
     int64_t id;
@@ -385,4 +380,3 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
     libvlc_exception_raise( p_exception, "Unable to call show %s", psz_name );
     return NULL;
 }
-

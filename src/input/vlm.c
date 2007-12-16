@@ -34,7 +34,6 @@
 
 #ifdef ENABLE_VLM
 
-
 #ifdef HAVE_TIME_H
 #   include <time.h>                                              /* ctime() */
 #   include <sys/timeb.h>                                         /* ftime() */
@@ -867,6 +866,7 @@ error:
     }
     return VLC_EGENERIC;
 }
+
 static int ExecuteNew( vlm_t *p_vlm, const char *psz_name, const char *psz_type, const int i_property, char *ppsz_property[], vlm_message_t **pp_status )
 {
     /* Check name */

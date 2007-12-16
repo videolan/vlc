@@ -193,4 +193,3 @@ static void GtkMain( vlc_object_t *p_this )
 
     gdk_threads_leave();
 }
-
