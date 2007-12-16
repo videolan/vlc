@@ -135,6 +135,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
                            | Qt::BottomDockWidgetArea );
+    dockPL->hide();
 
     /************
      * Menu Bar
@@ -622,10 +623,9 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
           /*  videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         }*/
 
-        videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        emit askVideoToResize( *pi_width, *pi_height );
-
         videoIsActive = true;
+
+        emit askVideoToResize( *pi_width, *pi_height );
         emit askUpdate();
     }
     return ret;
@@ -666,8 +666,8 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
         {
             unsigned int i_width  = va_arg( args, unsigned int );
             unsigned int i_height = va_arg( args, unsigned int );
-            videoWidget->widgetSize = QSize( i_width, i_height );
-            videoWidget->updateGeometry();
+            emit askVideoToResize( i_width, i_height );
+            emit askUpdate();
             updateGeometry();
             i_ret = VLC_SUCCESS;
             break;

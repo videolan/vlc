@@ -107,6 +107,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
 /* Set the Widget to the correct Size */
 void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
+    widgetSize = QSize( w, h );
     resize( w, h );
     //updateGeometry(); // Needed for deinterlace
     msg_Dbg( p_intf, "%i %i", sizeHint().height(), sizeHint().width() );
