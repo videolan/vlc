@@ -138,10 +138,10 @@ void InputManager::update()
         emit navigationChanged( 0 );
     }
 
+#ifdef ZVBI_COMPILED
     /* Update teletext status*/
-
-    /* emit teletextEnabled( true|false ) */
-
+    emit teletextEnabled( true );/* FIXME */
+#endif
 
     /* Update text */
     QString text;
@@ -236,6 +236,7 @@ void InputManager::sectionMenu()
         var_SetInteger( p_input, "title 0", 2 );
 }
 
+#ifdef ZVBI_COMPILED
 void InputManager::telexGotoPage( int page )
 {
     // TODO: this has only sense when telx codec is available
@@ -272,6 +273,7 @@ void InputManager::telexSetTransparency( bool b_transp )
         }
     }
 }
+#endif
 
 void InputManager::slower()
 {

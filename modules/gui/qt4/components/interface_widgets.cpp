@@ -457,10 +457,11 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
              sectionNext() );
     CONNECT( menuButton, clicked(), THEMIM->getIM(),
              sectionMenu() );
-    /** TODO
+    /**
      * Telextext QFrame
-     * Merge with upper menu in a StackLayout
+     * TODO: Merge with upper menu in a StackLayout
      **/
+#ifdef ZVBI_COMPILED
     telexFrame = new QWidget( this );
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
     telexLayout->setSpacing( 0 );
@@ -493,6 +494,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
              THEMIM->getIM(), telexSetTransparency( bool ) );
     CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
              telexFrame, setVisible( bool ) );
+#endif
 
     /** Play Buttons **/
     QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );

@@ -59,9 +59,11 @@ public slots:
     void sectionNext();
     void sectionPrev();
     void sectionMenu();
+#ifdef ZVBI_COMPILED
     void telexGotoPage( int );
     void telexToggle( bool );
     void telexSetTransparency( bool );
+#endif
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
@@ -69,7 +71,9 @@ signals:
     void nameChanged( QString );
     /// Used to signal whether we should show navigation buttons
     void navigationChanged( int );
+#ifdef ZVBI_COMPILED
     void teletextEnabled( bool );
+#endif
     /// Play/pause status
     void statusChanged( int );
 };
