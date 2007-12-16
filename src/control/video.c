@@ -496,7 +496,7 @@ int libvlc_video_get_teletext( libvlc_media_instance_t *p_mi,
                                                    FIND_ANYWHERE );
     if( p_vbi )
     {
-        i_ret = var_GetInteger( p_vout, "vbi-page" );
+        i_ret = var_GetInteger( p_vbi, "vbi-page" );
         vlc_object_release( p_vbi );
     }
 
