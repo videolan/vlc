@@ -238,7 +238,9 @@ void InputManager::sectionMenu()
 
 void InputManager::telexGotoPage( int page )
 {
-    //TODO
+    // TODO: this has only sense when telx codec is available
+    if( hasInput() )
+        var_SetInteger( p_input->p_libvlc, "vbi-page", page );
 }
 
 void InputManager::telexToggle( bool b_enabled )
@@ -248,7 +250,9 @@ void InputManager::telexToggle( bool b_enabled )
 
 void InputManager::telexSetTransparency( bool b_transp )
 {
-    //TODO
+    // TODO: this has only sense when telx codec is available
+    if( hasInput() )
+        var_SetBool( p_input->p_libvlc, "vbi-opaque", b_transp );
 }
 
 void InputManager::slower()
