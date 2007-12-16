@@ -35,7 +35,7 @@
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL __0_9_0e
+# define MODULE_SYMBOL 0_9_0e
 # define MODULE_SUFFIX "__0_9_0e"
 
 /*****************************************************************************
