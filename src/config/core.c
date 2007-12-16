@@ -571,18 +571,15 @@ void config_Free( module_t *p_module )
             free (p_item->saved.psz);
         }
 
-        if( p_item->i_list )
-        {
-            if( p_item->ppsz_list )
-                for( i = 0; i < p_item->i_list; i++ )
-                    free( p_item->ppsz_list[i] );
-            if( p_item->ppsz_list_text )
-                for( i = 0; i < p_item->i_list; i++ )
-                    free( p_item->ppsz_list[i] );
-            free( p_item->ppsz_list );
-            free( p_item->ppsz_list_text );
-            free( p_item->pi_list );
-        }
+        if( p_item->ppsz_list )
+            for( i = 0; i < p_item->i_list; i++ )
+                free( p_item->ppsz_list[i] );
+        if( p_item->ppsz_list_text )
+            for( i = 0; i < p_item->i_list; i++ )
+                free( p_item->ppsz_list_text[i] );
+        free( p_item->ppsz_list );
+        free( p_item->ppsz_list_text );
+        free( p_item->pi_list );
 
         if( p_item->i_action )
         {
