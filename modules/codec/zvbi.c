@@ -204,12 +204,12 @@ static int Open( vlc_object_t *p_this )
                                 event_handler, p_dec );
 
     /* Create the var on vlc_global. */
-    p_sys->i_wanted_page = var_CreateGetInteger( p_dec->p_libvlc, "vbi-page" );
-    var_AddCallback( p_dec->p_libvlc, "vbi-page",
+    p_sys->i_wanted_page = var_CreateGetInteger( p_dec, "vbi-page" );
+    var_AddCallback( p_dec, "vbi-page",
                      RequestPage, p_sys );
 
-    p_sys->b_opaque = var_CreateGetBool( p_dec->p_libvlc, "vbi-opaque" );
-    var_AddCallback( p_dec->p_libvlc, "vbi-opaque", Opaque, p_sys );
+    p_sys->b_opaque = var_CreateGetBool( p_dec, "vbi-opaque" );
+    var_AddCallback( p_dec, "vbi-opaque", Opaque, p_sys );
 
     p_sys->i_align = var_CreateGetInteger( p_dec, "vbi-position" );
     var_AddCallback( p_dec, "vbi-position", Position, p_sys );
@@ -237,10 +237,10 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    var_Destroy( p_dec->p_libvlc, "vbi-opaque" );
-    var_Destroy( p_dec->p_libvlc, "vbi-page" );
-    var_DelCallback( p_dec->p_libvlc, "vbi-page", RequestPage, p_sys );
-    var_DelCallback( p_dec->p_libvlc, "vbi-opaque", Opaque, p_sys );
+    var_Destroy( p_dec, "vbi-opaque" );
+    var_Destroy( p_dec, "vbi-page" );
+    var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
+    var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
 
 #ifdef HAVE_FFMPEG_SWSCALE_H
     if( p_sys->p_image ) image_HandlerDelete( p_sys->p_image );
@@ -473,7 +473,7 @@ static void event_handler( vbi_event *ev, void *user_data )
 
     if( ev->type == VBI_EVENT_TTX_PAGE )
     {
-        /* msg_Dbg( p_dec, "Page %03x.%02x ",
+        /* msg_Info( p_dec, "Page %03x.%02x ",
                     ev->ev.ttx_page.pgno,
                     ev->ev.ttx_page.subno & 0xFF);
         */

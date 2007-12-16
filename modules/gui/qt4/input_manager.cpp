@@ -240,7 +240,16 @@ void InputManager::telexGotoPage( int page )
 {
     // TODO: this has only sense when telx codec is available
     if( hasInput() )
-        var_SetInteger( p_input->p_libvlc, "vbi-page", page );
+    {
+        vlc_object_t *p_vbi;
+        p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+                    "zvbi", FIND_ANYWHERE );
+        if( p_vbi )
+        {
+            var_SetInteger( p_vbi, "vbi-page", page );
+            vlc_object_release( p_vbi );
+        }
+    }
 }
 
 void InputManager::telexToggle( bool b_enabled )
@@ -252,7 +261,16 @@ void InputManager::telexSetTransparency( bool b_transp )
 {
     // TODO: this has only sense when telx codec is available
     if( hasInput() )
-        var_SetBool( p_input->p_libvlc, "vbi-opaque", b_transp );
+    {
+        vlc_object_t *p_vbi;
+        p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+                    "zvbi", FIND_ANYWHERE );
+        if( p_vbi )
+        {
+            var_SetBool( p_input->p_libvlc, "vbi-opaque", b_transp );
+            vlc_object_release( p_vbi );
+        }
+    }
 }
 
 void InputManager::slower()
