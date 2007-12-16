@@ -2,7 +2,7 @@
  * zvbi.c : VBI and Teletext PES demux and decoder using libzvbi
  *****************************************************************************
  * Copyright (C) 2007, M2X
- * $Id: $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <djhartman at m2x dot nl>
  *          Jean-Paul Saman <jpsaman at m2x dot nl>
@@ -208,8 +208,8 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_dec->p_libvlc, "vbi-page",
                      RequestPage, p_sys );
 
-    p_sys->b_opaque = var_CreateGetBool( p_dec, "vbi-opaque" );
-    var_AddCallback( p_dec, "vbi-opaque", Opaque, p_sys );
+    p_sys->b_opaque = var_CreateGetBool( p_dec->p_libvlc, "vbi-opaque" );
+    var_AddCallback( p_dec->p_libvlc, "vbi-opaque", Opaque, p_sys );
 
     p_sys->i_align = var_CreateGetInteger( p_dec, "vbi-position" );
     var_AddCallback( p_dec, "vbi-position", Position, p_sys );
@@ -236,6 +236,11 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    var_Destroy( p_dec->p_libvlc, "vbi-opaque" );
+    var_Destroy( p_dec->p_libvlc, "vbi-page" );
+    var_DelCallback( p_dec->p_libvlc, "vbi-page", RequestPage, p_sys );
+    var_DelCallback( p_dec->p_libvlc, "vbi-opaque", Opaque, p_sys );
 
 #ifdef HAVE_FFMPEG_SWSCALE_H
     if( p_sys->p_image ) image_HandlerDelete( p_sys->p_image );
@@ -298,9 +303,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_sys->b_update = VLC_FALSE;
     p_sys->i_last_page = p_sys->i_wanted_page;
-#if 0
-    msg_Dbg( p_dec, "we now have page: %d ready for display",
-             p_sys->i_wanted_page );
+#if 1
+    msg_Info( p_dec, "we now have page: %d ready for display",
+              p_sys->i_wanted_page );
 #endif
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
@@ -370,7 +375,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_spu->p_region->psz_text = strdup( &p_text[8] );
 
         p_spu->p_region->fmt.i_height = p_spu->p_region->fmt.i_visible_height = p_page.rows + 1;
-        msg_Dbg( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
+        msg_Info( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
     }
     else
     {
