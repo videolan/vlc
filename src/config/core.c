@@ -487,7 +487,6 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
                       size_t n )
 {
-    int j;
     const module_config_t *p_item, *p_end = p_orig + n;
 
     /* Calculate the structure length */
@@ -560,48 +559,44 @@ void config_Free( module_t *p_module )
     {
         module_config_t *p_item = p_module->p_config + j;
 
-        free( (char*) p_item->psz_type );
-        free( (char*) p_item->psz_name );
-        free( (char*) p_item->psz_text );
-        free( (char*) p_item->psz_longtext );
+        free( p_item->psz_type );
+        free( p_item->psz_name );
+        free( p_item->psz_text );
+        free( p_item->psz_longtext );
 
         if (IsConfigStringType (p_item->i_type))
         {
-            free ((char *)p_item->value.psz);
-            free ((char *)p_item->orig.psz);
-            free ((char *)p_item->saved.psz);
+            free (p_item->value.psz);
+            free (p_item->orig.psz);
+            free (p_item->saved.psz);
         }
 
         if( p_item->i_list )
         {
-            for( i = 0; i < p_item->i_list; i++ )
-            {
-                if( p_item->ppsz_list && p_item->ppsz_list[i] )
-                    free( (char*) p_item->ppsz_list[i] );
-                if( p_item->ppsz_list_text && p_item->ppsz_list_text[i] )
-                    free( (char*) p_item->ppsz_list_text[i] );
-            }
-            if( p_item->ppsz_list ) free( p_item->ppsz_list );
-            if( p_item->ppsz_list_text ) free( p_item->ppsz_list_text );
-            if( p_item->pi_list ) free( p_item->pi_list );
+            if( p_item->ppsz_list )
+                for( i = 0; i < p_item->i_list; i++ )
+                    free( p_item->ppsz_list[i] );
+            if( p_item->ppsz_list_text )
+                for( i = 0; i < p_item->i_list; i++ )
+                    free( p_item->ppsz_list[i] );
+            free( p_item->ppsz_list );
+            free( p_item->ppsz_list_text );
+            free( p_item->pi_list );
         }
 
         if( p_item->i_action )
         {
             for( i = 0; i < p_item->i_action; i++ )
             {
-                free( (char*) p_item->ppsz_action_text[i] );
+                free( p_item->ppsz_action_text[i] );
             }
-            if( p_item->ppf_action ) free( p_item->ppf_action );
-            if( p_item->ppsz_action_text ) free( p_item->ppsz_action_text );
+            free( p_item->ppf_action );
+            free( p_item->ppsz_action_text );
         }
     }
 
-    if (p_module->p_config != NULL)
-    {
-        free (p_module->p_config);
-        p_module->p_config = NULL;
-    }
+    free (p_module->p_config);
+    p_module->p_config = NULL;
 }
 
 /*****************************************************************************

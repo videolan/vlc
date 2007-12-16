@@ -135,7 +135,7 @@ struct config_category_t
 
 typedef union
 {
-    const char *psz;
+    char       *psz;
     int         i;
     float       f;
 } module_value_t;
