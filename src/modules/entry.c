@@ -132,7 +132,7 @@ int vlc_module_set (module_t *module, int propid, void *value)
 
         case VLC_MODULE_PROGRAM:
             msg_Warn (module, "deprecated module property %d", propid);
-            return 0;
+            break;
 
         default:
             msg_Err (module, "unknown module property %d", propid);
@@ -161,7 +161,7 @@ module_config_t *vlc_config_create (module_t *module, int type)
     return tab + confsize;
 }
 
-int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
+int vlc_config_set (module_config_t *restrict item, int id, ...)
 {
     int ret = -1;
     va_list ap;

@@ -71,7 +71,7 @@ enum vlc_module_properties
     VLC_MODULE_CB_OPEN,
     VLC_MODULE_CB_CLOSE,
     VLC_MODULE_UNLOADABLE,
-    VLC_MODULE_NAME
+    VLC_MODULE_NAME,
 };
 
 VLC_EXPORT( vlc_bool_t, module_IsCapable, ( const module_t *m, const char *cap ) );

@@ -231,7 +231,7 @@ VLC_EXPORT( vlc_bool_t, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
 #define config_RemoveIntf(a,b) __config_RemoveIntf(VLC_OBJECT(a),b)
 #define config_ExistIntf(a,b) __config_ExistIntf(VLC_OBJECT(a),b)
 
-typedef enum vlc_config_properties
+enum vlc_config_properties
 {
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
@@ -268,11 +268,11 @@ typedef enum vlc_config_properties
 
     VLC_CONFIG_CAPABILITY,
     /* capability for a module or list thereof (args=const char*) */
-} vlc_config_t;
+};
 
 
 VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int type) );
-VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
+VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
@@ -361,18 +361,20 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, vlc_config_t, ...) );
     vlc_config_set (p_config + i_config, VLC_CONFIG_CAPABILITY, \
                     (const char *)(psz_caps))
 
-#define add_module_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_MODULE_CAT, name, text, longtext, advc, p_callback, value ); \
-    p_config[i_config].min.i = i_subcategory /* gruik */
-
 #define add_module_list( name, psz_caps, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST, name, text, longtext, advc, p_callback, value ); \
     vlc_config_set (p_config + i_config, VLC_CONFIG_CAPABILITY, \
                     (const char *)(psz_caps))
 
+#ifndef __PLUGIN__
+#define add_module_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
+    add_string_inner( CONFIG_ITEM_MODULE_CAT, name, text, longtext, advc, p_callback, value ); \
+    p_config[i_config].min.i = i_subcategory /* gruik */
+
 #define add_module_list_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, advc, p_callback, value ); \
     p_config[i_config].min.i = i_subcategory /* gruik */
+#endif
 
 #define add_integer( name, value, p_callback, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, p_callback, value )
