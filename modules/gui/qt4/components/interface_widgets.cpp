@@ -378,7 +378,11 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 {
     controlLayout = new QGridLayout( this );
     controlLayout->setSpacing( 0 );
-    //controlLayout->setMargin( 0 );
+#if QT43
+    controlLayout->setContentsMargins( 9, 6, 9, 6 );
+#else
+    controlLayout->setMargin( 6 );
+#endif
 
     setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
 
