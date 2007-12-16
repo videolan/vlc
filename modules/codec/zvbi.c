@@ -303,8 +303,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_sys->b_update = VLC_FALSE;
     p_sys->i_last_page = p_sys->i_wanted_page;
-#if 1
-    msg_Info( p_dec, "we now have page: %d ready for display",
+#if 0
+    msg_Dbg( p_dec, "we now have page: %d ready for display",
               p_sys->i_wanted_page );
 #endif
     /* If there is a page or sub to render, then we do that here */
