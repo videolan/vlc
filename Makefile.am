@@ -354,7 +354,8 @@ VLC-release.app: vlc
 	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras"; \
 	fi
 	rm -Rf $(top_builddir)/VLC-release.app
-	cp -R $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
+	cp -R $(srcdir)/extras/MacOSX/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
+	cp -R $(srcdir)/extras/MacOSX/Resources $(top_builddir)/tmp/extras/MacOSX
 	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -542,10 +543,11 @@ VLC.app: vlc
 	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras"; \
+	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/MacOSX"; \
 	fi
 	rm -Rf $(top_builddir)/VLC.app
-	cp -R $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
+	cp -R $(srcdir)/extras/MacOSX/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
+	cp -R $(srcdir)/extras/MacOSX/Resources $(top_builddir)/tmp/extras/MacOSX
 	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
