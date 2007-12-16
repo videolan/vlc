@@ -572,7 +572,7 @@ static void OpenAudioDev( demux_t *p_demux )
         CloseAudioDev( p_demux );
     }
 
-    msg_Dbg( p_demux, "openened adev=`%s' %s %dHz",
+    msg_Dbg( p_demux, "opened adev=`%s' %s %dHz",
              psz_device,
              (p_sys->channels > 1) ? "stereo" : "mono",
              p_sys->i_sample_rate );
