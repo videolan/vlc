@@ -3086,6 +3086,12 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libswscale ${real_ffmpeg_tree}/libswscale/libswscale.a])
      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libswscale])
    fi
+
+    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
+      AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
+      VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
+      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
+    fi
 else
 
 
