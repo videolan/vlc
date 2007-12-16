@@ -475,14 +475,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     setupSmallButton( telexTransparent );
     telexLayout->addWidget( telexTransparent );
 
-    QSpinBox *telexPage = new QSpinBox();
+    QSpinBox *telexPage = new QSpinBox;
     telexPage->setRange( 0, 999 );
     telexPage->setValue( 100 );
     telexPage->setAlignment( Qt::AlignRight );
     telexLayout->addWidget( telexPage );
 
     controlLayout->addWidget( telexFrame, 1, 10, 2, 3, Qt::AlignBottom );
-    telexFrame->hide();
+//    telexFrame->hide();
 
     CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
              telexGotoPage( int ) );
