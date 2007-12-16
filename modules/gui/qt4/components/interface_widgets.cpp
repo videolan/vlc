@@ -37,6 +37,7 @@
 #include <QSpacerItem>
 #include <QCursor>
 #include <QPushButton>
+#include <QToolButton>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QPalette>
@@ -419,7 +420,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     if( !b_advancedVisible ) advControls->hide();
 
     /** Disc and Menus handling */
-    discFrame = new QFrame( this );
+    discFrame = new QWidget( this );
 
     QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
     discLayout->setSpacing( 0 );
@@ -455,11 +456,41 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
              sectionNext() );
     CONNECT( menuButton, clicked(), THEMIM->getIM(),
              sectionMenu() );
-
     /** TODO
      * Telextext QFrame
      * Merge with upper menu in a StackLayout
      **/
+    telexFrame = new QWidget( this );
+    QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
+    telexLayout->setSpacing( 0 );
+    telexLayout->setMargin( 0 );
+
+    QToolButton *telexOn = new QToolButton;
+    telexOn->setText( qtr( "On" ) );
+    setupSmallButton( telexOn );
+    telexLayout->addWidget( telexOn );
+
+    QToolButton *telexTransparent = new QToolButton;
+    telexTransparent->setText( qtr( "Transparent" ) );
+    setupSmallButton( telexTransparent );
+    telexLayout->addWidget( telexTransparent );
+
+    QSpinBox *telexPage = new QSpinBox;
+    telexPage->setRange( 0, 999 );
+    telexPage->setAlignment( Qt::AlignRight );
+    telexLayout->addWidget( telexPage );
+
+    controlLayout->addWidget( telexFrame, 1, 10, 2, 3, Qt::AlignBottom );
+    telexFrame->hide();
+
+    CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
+             telexGotoPage( int ) );
+    CONNECT( telexOn, clicked( bool ), THEMIM->getIM(),
+             telexToggle( bool ) );
+    CONNECT( telexTransparent, clicked( bool ),
+             THEMIM->getIM(), telexSetTransparency( bool ) );
+    CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
+             telexFrame, setVisible( bool ) );
 
     /** Play Buttons **/
     QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );

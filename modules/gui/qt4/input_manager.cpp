@@ -138,6 +138,11 @@ void InputManager::update()
         emit navigationChanged( 0 );
     }
 
+    /* Update teletext status*/
+
+    /* emit teletextEnabled( true|false ) */
+
+
     /* Update text */
     QString text;
     char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
@@ -229,6 +234,21 @@ void InputManager::sectionMenu()
 {
     if( hasInput() )
         var_SetInteger( p_input, "title 0", 2 );
+}
+
+void InputManager::telexGotoPage( int page )
+{
+    //TODO
+}
+
+void InputManager::telexToggle( bool b_enabled )
+{
+    //TODO
+}
+
+void InputManager::telexSetTransparency( bool b_transp )
+{
+    //TODO
 }
 
 void InputManager::slower()

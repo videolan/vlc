@@ -59,6 +59,9 @@ public slots:
     void sectionNext();
     void sectionPrev();
     void sectionMenu();
+    void telexGotoPage( int );
+    void telexToggle( bool );
+    void telexSetTransparency( bool );
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
@@ -66,6 +69,7 @@ signals:
     void nameChanged( QString );
     /// Used to signal whether we should show navigation buttons
     void navigationChanged( int );
+    void teletextEnabled( bool );
     /// Play/pause status
     void statusChanged( int );
 };

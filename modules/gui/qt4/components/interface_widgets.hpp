@@ -163,7 +163,8 @@ protected:
     friend class VolumeClickHandler;
 private:
     intf_thread_t       *p_intf;
-    QFrame              *discFrame;
+    QWidget             *discFrame;
+    QWidget             *telexFrame;
     QGridLayout         *controlLayout;
     InputSlider         *slider;
     QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
