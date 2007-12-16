@@ -192,6 +192,7 @@ vlc_module_begin();
     add_integer( ENC_CFG_PREFIX "chroma-elim-threshold", 0, NULL,
                  ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, VLC_TRUE );
 
+#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
     /* demux submodule */
     add_submodule();
     set_description( _("FFmpeg demuxer" ) );
@@ -205,6 +206,7 @@ vlc_module_begin();
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_TRUE );
     set_callbacks( E_(OpenMux), E_(CloseMux) );
+#endif
 
 #if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
     /* video filter submodule */

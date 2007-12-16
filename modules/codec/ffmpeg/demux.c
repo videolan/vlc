@@ -497,15 +497,4 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     return stream_Tell( p_demux->s );
 }
 
-#else /* HAVE_FFMPEG_AVFORMAT_H */
-
-int E_(OpenDemux)( vlc_object_t *p_this )
-{
-    return VLC_EGENERIC;
-}
-
-void E_(CloseDemux)( vlc_object_t *p_this )
-{
-}
-
 #endif /* HAVE_FFMPEG_AVFORMAT_H */

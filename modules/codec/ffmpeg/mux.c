@@ -252,6 +252,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->time_base.den = p_input->p_fmt->video.i_frame_rate;
         codec->time_base.num = p_input->p_fmt->video.i_frame_rate_base;
         break;
+
+    default:
+        msg_Warn( p_mux, "Unhandled ES category" );
     }
 
     codec->bit_rate = p_input->p_fmt->i_bitrate;
@@ -495,17 +498,6 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     }
 
     return 0;
-}
-
-#else /* HAVE_FFMPEG_AVFORMAT_H */
-
-int E_(OpenMux)( vlc_object_t *p_this )
-{
-    return VLC_EGENERIC;
-}
-
-void E_(CloseMux)( vlc_object_t *p_this )
-{
 }
 
 #endif /* HAVE_FFMPEG_AVFORMAT_H */
