@@ -3271,8 +3271,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         for( n = 0; n < sub->i_pages_number; n++ )
                         {
                             dvbpsi_teletextpage_t *p_page = &sub->p_pages[n];
-                            if( p_page->i_teletext_type == 0x2
-                                 || p_page->i_teletext_type == 0x5 )
+                            if( (p_page->i_teletext_type == 0x2)
+                                 || (p_page->i_teletext_type == 0x5) )
                             {
                                 ts_es_t *p_es;
 
@@ -3288,7 +3288,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                     es_format_Copy( &p_es->fmt, &pid->es->fmt );
                                     free( p_es->fmt.psz_language );
                                     free( p_es->fmt.psz_description );
-                                    p_es->fmt.psz_language = NULL;                                    p_es->fmt.psz_description = NULL;
+                                    p_es->fmt.psz_language = NULL;
+                                    p_es->fmt.psz_description = NULL;
                                     p_es->id = NULL;
                                     p_es->p_pes = NULL;
                                     p_es->i_pes_size = 0;
