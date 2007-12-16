@@ -158,6 +158,9 @@ module_config_t *vlc_config_create (module_t *module, int type)
     module->confsize++;
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
+    tab[confsize].i_type = type;
+    tab[confsize].p_lock = &module->object_lock;
+
     return tab + confsize;
 }
 
@@ -273,6 +276,82 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
         {
             const char *cap = va_arg (ap, const char *);
             item->psz_type = cap ? strdup (cap) : NULL;
+            ret = 0;
+            break;
+        }
+
+        case VLC_CONFIG_SHORTCUT:
+            item->i_short = va_arg (ap, int);
+            ret = 0;
+            break;
+
+        case VLC_CONFIG_LIST:
+        {
+            size_t len = va_arg (ap, size_t);
+            char **dtext = malloc (sizeof (char *) * (len + 1));
+
+            if (dtext == NULL)
+                break;
+
+            /* Copy values */
+            if (IsConfigIntegerType (item->i_type))
+            {
+                const int *src = va_arg (ap, const int *);
+                int *dst = malloc (sizeof (int) * (len + 1));
+
+                if (dst != NULL)
+                {
+                    memcpy (dst, src, sizeof (int) * len);
+                    dst[len] = 0;
+                }
+                item->pi_list = dst;
+            }
+            else
+#if 0
+            if (IsConfigFloatType (item->i_type))
+            {
+                const float *src = va_arg (ap, const float *);
+                float *dst = malloc (sizeof (float) * (len + 1));
+
+                if (dst != NULL)
+                {
+                    memcpy (dst, src, sizeof (float) * len);
+                    dst[len] = 0.;
+                }
+                item->pf_list = dst;
+            }
+            else
+#endif
+            if (IsConfigStringType (item->i_type))
+            {
+                const char *const *src = va_arg (ap, const char *const *);
+                char **dst = malloc (sizeof (char *) * (len + 1));
+
+                if (dst != NULL)
+                {
+                    for (size_t i = 0; i < len; i++)
+                        dst[i] = src[i] ? strdup (src[i]) : NULL;
+                    dst[len] = NULL;
+                }
+                item->ppsz_list = dst;
+            }
+            else
+                break;
+
+            /* Copy textual descriptions */
+            const char *const *text = va_arg (ap, const char *const *);
+            if (text != NULL)
+            {
+                for (size_t i = 0; i < len; i++)
+                    dtext[i] = text[i] ? strdup (gettext (text[i])) : NULL;
+
+                dtext[len] = NULL;
+                item->ppsz_list_text = dtext;
+            }
+            else
+                item->ppsz_list_text = NULL;
+
+            item->i_list = len;
             ret = 0;
             break;
         }

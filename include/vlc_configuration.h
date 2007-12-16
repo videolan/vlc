@@ -165,14 +165,14 @@ struct module_config_t
     void          *p_callback_data;
 
     /* Values list */
-    const char **ppsz_list;       /* List of possible values for the option */
+    char **      ppsz_list;       /* List of possible values for the option */
     int         *pi_list;                              /* Idem for integers */
-    const char **ppsz_list_text;          /* Friendly names for list values */
+    char       **ppsz_list_text;          /* Friendly names for list values */
     int          i_list;                               /* Options list size */
 
     /* Actions list */
     vlc_callback_t *ppf_action;    /* List of possible actions for a config */
-    const char    **ppsz_action_text;         /* Friendly names for actions */
+    char          **ppsz_action_text;         /* Friendly names for actions */
     int            i_action;                           /* actions list size */
 
     /* Misc */
@@ -268,6 +268,13 @@ enum vlc_config_properties
 
     VLC_CONFIG_CAPABILITY,
     /* capability for a module or list thereof (args=const char*) */
+
+    VLC_CONFIG_SHORTCUT,
+    /* one-character (short) command line option name (args=char) */
+
+    VLC_CONFIG_LIST,
+    /* possible values list
+     * (args=size_t, const <type> *, const char *const *) */
 };
 
 
@@ -430,17 +437,25 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
 
 /* Modifier macros for the config options (used for fine tuning) */
 #define change_short( ch ) \
-    p_config[i_config].i_short = ch;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_SHORTCUT, (int)(ch))
 
 #define change_string_list( list, list_text, list_update_func ) \
-    p_config[i_config].i_list = sizeof(list)/sizeof(char *); \
-    p_config[i_config].ppsz_list = list; \
-    p_config[i_config].ppsz_list_text = list_text;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_LIST, \
+                    (size_t)(sizeof (list) / sizeof (char *)), \
+                    (const char *const *)(list), \
+                    (const char *const *)(list_text))
 
 #define change_integer_list( list, list_text, list_update_func ) \
-    p_config[i_config].i_list = sizeof(list)/sizeof(int); \
-    p_config[i_config].pi_list = (int *)list; \
-    p_config[i_config].ppsz_list_text = list_text;
+    vlc_config_set (p_config + i_config, VLC_CONFIG_LIST, \
+                    (size_t)(sizeof (list) / sizeof (int)), \
+                    (const int *)(list), \
+                    (const char *const *)(list_text))
+
+#define change_float_list( list, list_text, list_update_func ) \
+    vlc_config_set (p_config + i_config, VLC_CONFIG_LIST, \
+                    (size_t)(sizeof (list) / sizeof (float)), \
+                    (const float *)(list), \
+                    (const char *const *)(list_text))
 
 #define change_integer_range( minv, maxv ) \
     vlc_config_set (p_config + i_config, VLC_CONFIG_RANGE, \

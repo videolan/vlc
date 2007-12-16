@@ -522,46 +522,6 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
         p_module->p_config[i] = p_orig[i];
         p_module->p_config[i].p_lock = &p_module->object_lock;
 
-        /* duplicate the string list */
-        if( p_orig[i].i_list )
-        {
-            if( p_orig[i].ppsz_list )
-            {
-                p_module->p_config[i].ppsz_list =
-                    malloc( (p_orig[i].i_list + 1) * sizeof(char *) );
-                if( p_module->p_config[i].ppsz_list )
-                {
-                    for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].ppsz_list[j] =
-                                strdupnull (p_orig[i].ppsz_list[j]);
-                    p_module->p_config[i].ppsz_list[j] = NULL;
-                }
-            }
-            if( p_orig[i].ppsz_list_text )
-            {
-                p_module->p_config[i].ppsz_list_text =
-                    calloc( (p_orig[i].i_list + 1), sizeof(char *) );
-                if( p_module->p_config[i].ppsz_list_text )
-                {
-                    for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].ppsz_list_text[j] =
-                                strdupnull (_(p_orig[i].ppsz_list_text[j]));
-                    p_module->p_config[i].ppsz_list_text[j] = NULL;
-                }
-            }
-            if( p_orig[i].pi_list )
-            {
-                p_module->p_config[i].pi_list =
-                    malloc( (p_orig[i].i_list + 1) * sizeof(int) );
-                if( p_module->p_config[i].pi_list )
-                {
-                    for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].pi_list[j] =
-                            p_orig[i].pi_list[j];
-                }
-            }
-        }
-
         /* duplicate the actions list */
         if( p_orig[i].i_action )
         {
