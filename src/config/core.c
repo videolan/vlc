@@ -520,32 +520,6 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
     for( size_t i = 0; i < n ; i++ )
     {
         p_module->p_config[i] = p_orig[i];
-
-        if (IsConfigIntegerType (p_module->p_config[i].i_type))
-        {
-            p_module->p_config[i].orig.i = p_orig[i].value.i;
-            p_module->p_config[i].saved.i = p_orig[i].value.i;
-        }
-        else
-        if (IsConfigFloatType (p_module->p_config[i].i_type))
-        {
-            p_module->p_config[i].orig.f = p_orig[i].value.f;
-            p_module->p_config[i].saved.f = p_orig[i].value.f;
-        }
-        else
-        if (IsConfigStringType (p_module->p_config[i].i_type))
-        {
-            p_module->p_config[i].value.psz = strdupnull (p_orig[i].value.psz);
-            p_module->p_config[i].orig.psz = strdupnull (p_orig[i].value.psz);
-            p_module->p_config[i].saved.psz = NULL;
-        }
-
-        p_module->p_config[i].psz_type = p_orig[i].psz_type;
-        p_module->p_config[i].psz_name = p_orig[i].psz_name;
-        p_module->p_config[i].psz_current = p_orig[i].psz_current;
-        p_module->p_config[i].psz_text = p_orig[i].psz_text;
-        p_module->p_config[i].psz_longtext = p_orig[i].psz_longtext;
-
         p_module->p_config[i].p_lock = &p_module->object_lock;
 
         /* duplicate the string list */

@@ -198,12 +198,14 @@ int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
         {
             if (IsConfigIntegerType (item->i_type))
             {
+                item->orig.i = item->saved.i =
                 item->value.i = va_arg (ap, int);
                 ret = 0;
             }
             else
             if (IsConfigFloatType (item->i_type))
             {
+                item->orig.f = item->saved.f =
                 item->value.f = va_arg (ap, double);
                 ret = 0;
             }
@@ -212,6 +214,8 @@ int vlc_config_set (module_config_t *restrict item, vlc_config_t id, ...)
             {
                 const char *value = va_arg (ap, const char *);
                 item->value.psz = value ? strdup (value) : NULL;
+                item->orig.psz = value ? strdup (value) : NULL;
+                item->saved.psz = value ? strdup (value) : NULL;
                 ret = 0;
             }
             break;
