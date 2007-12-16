@@ -55,9 +55,10 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
-
-    CONNECT( this, askResize(), this, SetMinSize() );
-    CONNECT( this, askVideoToShow(), this, show() );
+    hide(); setMinimumSize( 16, 16 );
+ 
+   // CONNECT( this, askResize( int, int ), this, SetSizing( int, int ) );
+    CONNECT( this, askVideoWidgetToShow(), this, show() );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
@@ -86,23 +87,29 @@ QSize VideoWidget::sizeHint() const
     return widgetSize;
 }
 
+/**
+ * Request the video to avoid the conflicts 
+ **/
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
-    emit askVideoToShow();
+    emit askVideoWidgetToShow();
     if( p_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
         return NULL;
     }
     p_vout = p_nvout;
-    emit askResize();
     return ( void* )winId();
 }
 
-void VideoWidget::SetMinSize()
+/* Set the Widget to the correct Size */
+void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
-    setMinimumSize( 16, 16 );
+    resize( w, h );
+    //updateGeometry(); // Needed for deinterlace
+    msg_Dbg( p_intf, "%i %i", sizeHint().height(), sizeHint().width() );
+    emit askResize();
 }
 
 void VideoWidget::release( void *p_win )
@@ -563,7 +570,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                               VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
     /* Volume control connection */
-    resize( QSize( 400, 60 ) );
+    //resize( QSize( 300, 60 ) );
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     msg_Dbg( p_intf, "controls size: %i - %i", size().width(), size().height() );
 }

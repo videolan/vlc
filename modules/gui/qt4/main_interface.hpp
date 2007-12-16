@@ -96,7 +96,9 @@ private:
     bool                 need_components_update;
 
     void handleMainUi( QSettings* );
+    void privacy();
     void handleSystray();
+    //void buildStatus();
 
     void createSystray();
     int privacyDialog( QList<ConfigControl *> controls );
@@ -159,8 +161,10 @@ private slots:
     void showSpeedMenu( QPoint );
 signals:
     void askReleaseVideo( void * );
+    void askVideoToResize( unsigned int, unsigned int );
     void askVideoToToggle();
     void askBgWidgetToToggle();
+    void askUpdate();
 };
 
 #endif

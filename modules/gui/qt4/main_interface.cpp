@@ -91,25 +91,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     videoIsActive = false;
     input_name = "";
 
-    /**
-     * Ask for the network policy on FIRST STARTUP
-     **/
-    if( config_GetInt( p_intf, "privacy-ask") )
-    {
-        QList<ConfigControl *> controls;
-        if( privacyDialog( controls ) == QDialog::Accepted )
-        {
-            QList<ConfigControl *>::Iterator i;
-            for(  i = controls.begin() ; i != controls.end() ; i++ )
-            {
-                ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-                c->doApply( p_intf );
-            }
-
-            config_PutInt( p_intf,  "privacy-ask" , 0 );
-            config_SaveConfigFile( p_intf, NULL );
-        }
-    }
+    /* Ask for privacy */
+    privacy();
 
     /**
      *  Configuration and settings
@@ -161,7 +144,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /****************
      *  Status Bar  *
      ****************/
-
     /* Widgets Creation*/
     b_remainingTime = false;
     timeLabel = new TimeLabel;
@@ -218,24 +200,26 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( config_GetInt( p_intf, "qt-minimal-view" ) )
         toggleMinimalView();
 
-    /* Init input manager */
+    /********************
+     * Input Manager    *
+     ********************/
     MainInputManager::getInstance( p_intf );
-    ON_TIMEOUT( updateOnTimer() );
-    //ON_TIMEOUT( debug() ):;
-
+    
     /********************
      * Various CONNECTs *
      ********************/
-
     /* Connect the input manager to the GUI elements it manages */
+    
     /* It is also connected to the control->slider, see the ControlsWidget */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplayPosition( float, int, int ) );
-
+    /* Change the SpeedRate in the Status */
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
     /**
      * Connects on nameChanged()
+     * Those connects are not merged because different options can trigger
+     * them down.
      */
     /* Naming in the controller statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
@@ -253,7 +237,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              setVLCWindowsTitle( QString ) );
     }
 
-    /** CONNECTS on PLAY_STATUS **/
+    /**
+     * CONNECTS on PLAY_STATUS 
+     **/
     /* Status on the main controller */
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
     /* and in the systray */
@@ -262,6 +248,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
                  updateSystrayTooltipStatus( int ) );
     }
+
+    /** OnTimeOut **/
+    // TODO
+    ON_TIMEOUT( updateOnTimer() );
+    //ON_TIMEOUT( debug() );
 
     /**
      * Callbacks
@@ -280,13 +271,17 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         vlc_object_release( p_playlist );
     }
 
+    /* VideoWidget connect mess to avoid different threads speaking to each other */
     CONNECT( this, askReleaseVideo( void * ), this, releaseVideoSlot( void * ) );
+    CONNECT( this, askVideoToResize( unsigned int, unsigned int ), 
+             videoWidget, SetSizing( unsigned int, unsigned int ) );
+    CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
     CONNECT( dockPL, topLevelChanged( bool ), this, doComponentsUpdate() );
     CONNECT( controls, advancedControlsToggled( bool ), 
              this, doComponentsUpdate() );
 
-    resize( settings->value( "size", QSize( 300, 80 ) ).toSize() );
+    resize( settings->value( "size", QSize( 350, 60 ) ).toSize() );
     updateGeometry();
     settings->endGroup();
 }
@@ -354,7 +349,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
-    main->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
+   // main->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
@@ -397,7 +392,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     if( videoEmbeddedFlag )
     {
         videoWidget = new VideoWidget( p_intf );
-        videoWidget->widgetSize = QSize( 1, 1 );
+        //videoWidget->widgetSize = QSize( 16, 16 );
+        //videoWidget->hide();
         //videoWidget->resize( videoWidget->widgetSize );
         mainLayout->insertWidget( 0, videoWidget );
 
@@ -408,6 +404,29 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Finish the sizing */
     updateGeometry();
+}
+
+inline void MainInterface::privacy()
+{
+    /**
+     * Ask for the network policy on FIRST STARTUP
+     **/
+    if( config_GetInt( p_intf, "privacy-ask") )
+    {
+        QList<ConfigControl *> controls;
+        if( privacyDialog( controls ) == QDialog::Accepted )
+        {
+            QList<ConfigControl *>::Iterator i;
+            for(  i = controls.begin() ; i != controls.end() ; i++ )
+            {
+                ConfigControl *c = qobject_cast<ConfigControl *>(*i);
+                c->doApply( p_intf );
+            }
+
+            config_PutInt( p_intf,  "privacy-ask" , 0 );
+            config_SaveConfigFile( p_intf, NULL );
+        }
+    }
 }
 
 int MainInterface::privacyDialog( QList<ConfigControl *> controls )
@@ -496,18 +515,31 @@ void MainInterface::debug()
 */
 QSize MainInterface::sizeHint() const
 {
-    QSize tempSize = controls->sizeHint() +
-        QSize( 100, menuBar()->size().height() + statusBar()->size().height() );
+    int nwidth = controls->sizeHint().width();
+    int nheight = controls->sizeHint().height();
+                + menuBar()->size().height() 
+                + statusBar()->size().height();
 
+    msg_Dbg( p_intf, "1 %i %i", nheight, nwidth );
     if( VISIBLE( bgWidget ) )
-        tempSize += bgWidget->sizeHint();
+    {
+        nheight += bgWidget->size().height();
+        nwidth  = bgWidget->size().width();
+    }
     else if( videoIsActive )
-        tempSize += videoWidget->size();
-
+    {
+        nheight += videoWidget->size().height();
+        nwidth  = videoWidget->size().width();
+        msg_Dbg( p_intf, "2 %i %i", nheight, nwidth );
+    }
     if( !dockPL->isFloating() && dockPL->widget() )
-        tempSize += dockPL->widget()->size();
-
-    return tempSize;
+    {
+        nheight += dockPL->size().height();
+        nwidth = MAX( nwidth, dockPL->size().width() );
+        msg_Dbg( p_intf, "3 %i %i", nheight, nwidth );
+    }
+    msg_Dbg( p_intf, "4 %i %i", nheight, nwidth );
+    return QSize( nwidth, nheight );
 }
 
 #if 0
@@ -559,36 +591,42 @@ private:
     bool onTop;
 };
 
+/* function called from ::DoRequest in order to show a nice VideoWidget
+    at the good size */
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
 {
-    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
-    if( ret )
-    {
-        videoIsActive = true;
-        bool bgWasVisible = false;
+    bool bgWasVisible = false;
 
-        /* Did we have a bg ? */
+    /* Request the videoWidget */
+    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
+    if( ret ) /* The videoWidget is available */
+    {
+        /* Did we have a bg ? Hide it! */
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
             emit askBgWidgetToToggle();
         }
 
-        if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
+        /*if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
         {
             videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         }
         else /* Background widget available, use its size */
-        {
+        /*{
             /* Ok, our visualizations are bad, so don't do this for the moment
              * use the requested size anyway */
             // videoWidget->widgetSize = bgWidget->widgeTSize;
-            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        }
-        videoWidget->updateGeometry(); // Needed for deinterlace
-        updateGeometry();
+          /*  videoWidget->widgetSize = QSize( *pi_width, *pi_height );
+        }*/
+
+        videoWidget->widgetSize = QSize( *pi_width, *pi_height );
+        emit askVideoToResize( *pi_width, *pi_height );
+
+        videoIsActive = true;
+        emit askUpdate();
     }
     return ret;
 }
@@ -603,11 +641,11 @@ void MainInterface::releaseVideoSlot( void *p_win )
     videoWidget->release( p_win );
     videoWidget->hide();
 
-    if( bgWidget )
+    if( bgWidget )// WORONG
         bgWidget->show();
 
     videoIsActive = false;
-    updateGeometry();
+    emit askUpdate();
 }
 
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
@@ -707,7 +745,9 @@ void MainInterface::toggleMinimalView()
 /* Well, could it, actually ? Probably dangerous ... */
 void MainInterface::doComponentsUpdate()
 {
+    msg_Dbg( p_intf, "coi " );
     updateGeometry();
+    resize( sizeHint() );
 }
 
 /* toggling advanced controls buttons */
@@ -767,7 +807,6 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
 void MainInterface::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
-    //b_remainingTime = ( b_remainingTime ? false : true );
 }
 
 void MainInterface::setName( QString name )
