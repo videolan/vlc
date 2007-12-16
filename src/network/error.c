@@ -147,6 +147,7 @@ const char *net_strerror( int value )
         if( e->code == value )
             return e->msg;
 
+    /* Remember to update src/misc/messages.c if you change this one */
     return "Unknown network stack error";
 }
 #endif

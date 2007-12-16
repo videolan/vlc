@@ -327,7 +327,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
                 strncpy( errbuf, net_strerror( sockerr ), 1001 );
                 WSASetLastError( sockerr );
             }
-            else
+            if ((sockerr == 0)
+             || (strcmp ("Unknown network stack error", errbuf) == 0))
                 strncpy( errbuf, strerror( errno ), 1001 );
 #endif
             errbuf[1000] = 0;
