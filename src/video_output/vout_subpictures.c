@@ -560,7 +560,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
             p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
 
-            /* The blend module will be loaded when needed with the real input format */
+            /* The blend module will be loaded when needed with the real
+            * input format */
             memset( &p_spu->p_blend->fmt_in, 0, sizeof(p_spu->p_blend->fmt_in) );
             p_spu->p_blend->p_module = NULL;
         }
@@ -605,12 +606,13 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         {
             subpicture_region_t *p_text_region = p_subpic->p_region;
 
-            /* Only overwrite the size fields if the region is still in pre-rendered
-             * TEXT format. We have to traverse the subregion list because if more
-             * than one subregion is present, the text region isn't guarentteed to
-             * be the first in the list, and only text regions use this flag.
-             * All of this effort assists with the rescaling of text that has been
-             * rendered at native resolution, rather than video resolution.
+            /* Only overwrite the size fields if the region is still in
+             * pre-rendered TEXT format. We have to traverse the subregion
+             * list because if more than one subregion is present, the text
+             * region isn't guarentteed to be the first in the list, and
+             * only text regions use this flag. All of this effort assists
+             * with the rescaling of text that has been rendered at native
+             * resolution, rather than video resolution.
              */
             while( p_text_region &&
                    ( p_text_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
@@ -618,7 +620,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_text_region = p_text_region->p_next;
             }
 
-            if( p_text_region && 
+            if( p_text_region &&
                 ( ( p_text_region->i_align & SUBPICTURE_RENDERED ) == 0 ) )
             {
                 if( (p_subpic->i_original_picture_height > 0) &&
@@ -665,9 +667,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         for( k = 0; k < SCALE_SIZE ; k++ )
         {
-            /* Case of both width and height being specified has been dealt with
-             * above by instead rendering to an output pane of the explicit
-             * dimensions specified - we don't need to scale it.
+            /* Case of both width and height being specified has been dealt
+             * with above by instead rendering to an output pane of the
+             * explicit dimensions specified - we don't need to scale it.
              */
             if( (p_subpic->i_original_picture_height > 0) &&
                 (p_subpic->i_original_picture_width <= 0) )
@@ -694,7 +696,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Take care of the aspect ratio */
-        if( p_region && 
+        if( p_region &&
             ( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
               ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) ) )
         {
@@ -823,7 +825,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
 
             /* Scale SPU if necessary */
-            if( p_region->p_cache && 
+            if( p_region->p_cache &&
                 ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
             {
                 if( pi_scale_width[ i_scale_idx ] * p_region->fmt.i_width / 1000 !=
@@ -837,9 +839,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            if( ( ( pi_scale_width[ i_scale_idx ] != 1000 ) || 
+            if( ( ( pi_scale_width[ i_scale_idx ] != 1000 ) ||
                   ( pi_scale_height[ i_scale_idx ] != 1000 ) ) &&
-                ( ( pi_scale_width[ i_scale_idx ] > 0 ) || 
+                ( ( pi_scale_width[ i_scale_idx ] > 0 ) ||
                   ( pi_scale_height[ i_scale_idx ] > 0 ) ) &&
                 p_spu->p_scale && !p_region->p_cache &&
                 ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
@@ -1306,8 +1308,8 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 
 static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
-    subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
     (void)p_filter;
+    subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
     if( !p_subpic ) return NULL;
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->b_absolute = VLC_TRUE;
@@ -1354,8 +1356,11 @@ static picture_t *spu_new_video_buffer( filter_t *p_filter )
 static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
 {
     (void)p_filter;
-    if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
-    if( p_pic ) free( p_pic );
+    if( p_pic )
+    {
+        if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
+        free( p_pic );
+    }
 }
 
 static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
@@ -1363,13 +1368,10 @@ static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
 {
     (void)p_object; (void)oldval; (void)newval;
 
-    if( !strcmp( psz_var, "sub-filter" ) )
-    {
-        spu_t *p_spu = (spu_t *)p_data;
-        vlc_mutex_lock( &p_spu->subpicture_lock );
-        spu_DeleteChain( p_spu );
-        spu_ParseChain( p_spu );
-        vlc_mutex_unlock( &p_spu->subpicture_lock );
-    }
+    spu_t *p_spu = (spu_t *)p_data;
+    vlc_mutex_lock( &p_spu->subpicture_lock );
+    spu_DeleteChain( p_spu );
+    spu_ParseChain( p_spu );
+    vlc_mutex_unlock( &p_spu->subpicture_lock );
     return VLC_SUCCESS;
 }
