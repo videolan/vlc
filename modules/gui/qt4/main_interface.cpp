@@ -286,6 +286,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( controls, advancedControlsToggled( bool ), 
              this, doComponentsUpdate() );
 
+    resize( settings->value( "size", QSize( 300, 80 ) ).toSize() );
     updateGeometry();
     settings->endGroup();
 }
@@ -301,6 +302,7 @@ MainInterface::~MainInterface()
     settings->setValue( "adv-controls", 
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
+    settings->setValue( "size", size() );
 
     settings->endGroup();
     delete settings;

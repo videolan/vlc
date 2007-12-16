@@ -505,6 +505,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->setColumnStretch( 7, 0 );
     controlLayout->setColumnStretch( 8, 0 );
     controlLayout->setColumnStretch( 9, 0 );
+
     /*
      * Other first Line buttons
      */
@@ -529,6 +530,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->addWidget( extSettingsButton, 3, 12, Qt::AlignBottom );
 
     controlLayout->setColumnStretch( 13, 0 );
+    controlLayout->setColumnMinimumWidth( 13, 24 );
     controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
