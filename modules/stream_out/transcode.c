@@ -263,7 +263,7 @@ vlc_module_begin();
                  ARATE_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "audio-sync", 0, NULL, ASYNC_TEXT,
               ASYNC_LONGTEXT, VLC_FALSE );
-    add_module_list_cat( SOUT_CFG_PREFIX "afilter", SUBCAT_AUDIO_MISC,
+    add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter2",
                      NULL, NULL,
                      AFILTER_TEXT, AFILTER_LONGTEXT, VLC_FALSE );
 
@@ -274,7 +274,7 @@ vlc_module_begin();
                 SCODEC_LONGTEXT, VLC_FALSE );
     add_bool( SOUT_CFG_PREFIX "soverlay", 0, NULL, SCODEC_TEXT,
                SCODEC_LONGTEXT, VLC_FALSE );
-    add_module_list_cat( SOUT_CFG_PREFIX "sfilter", SUBCAT_VIDEO_SUBPIC,
+    add_module_list( SOUT_CFG_PREFIX "sfilter", "video filter",
                      NULL, NULL,
                      SFILTER_TEXT, SFILTER_LONGTEXT, VLC_FALSE );
 
