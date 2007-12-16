@@ -632,7 +632,7 @@ static VLCTreeItem *o_root_item = nil;
             do
             {
                 p_item++;
-                if( !p_item )
+                if( !p_item || !p_item->i_type )
                 {
                     msg_Err( p_intf, "invalid preference item found" );
                     break;

@@ -392,7 +392,7 @@
     if( self != nil )
     {
         p_item = _p_item;
-        psz_name = strdup( p_item->psz_name );
+        psz_name = p_item->psz_name;
         o_label = NULL;
         i_type = p_item->i_type;
         i_view_type = 0;
