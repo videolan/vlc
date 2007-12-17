@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <WebKit/WebKit.h>
+#import <WebKit/WebKit.h> //we need to be here, because we're using a WebView object below
 
 /*****************************************************************************
  * VLAboutBox interface
@@ -60,6 +60,7 @@
 
 + (VLAboutBox *)sharedInstance;
 - (void)showAbout;
+- (void)VLCWillTerminate;
 - (void)showHelp;
 - (IBAction)showGPL:(id)sender;
 - (IBAction)helpGoHome:(id)sender;

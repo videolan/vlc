@@ -69,15 +69,20 @@ static VLAboutBox *_o_sharedInstance = nil;
 {
     if(! b_isSetUp )
     {
-        NSDictionary *o_local_dict;
-
+        /* we want to know when VLC wants to quit to prevent a crash while scrolling our credits */
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(VLCWillTerminate)
+                                                     name: NSApplicationWillTerminateNotification
+                                                   object: nil];
+        
         /* Get the localized info dictionary (InfoPlist.strings) */
+        NSDictionary *o_local_dict;
         o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
 
-        /* Setup the name field */
-        [o_name_field setStringValue: [o_local_dict objectForKey:@"CFBundleName"]];
- 
-        /* Set the about box title */
+        /* Setup the copyright field */
+        [o_copyright_field setStringValue: [o_local_dict objectForKey:@"NSHumanReadableCopyright"]];
+
+        /* Set the box title */
         [o_about_window setTitle: _NS("About VLC media player")];
 
         /* setup the creator / revision field */
@@ -86,8 +91,8 @@ static VLAboutBox *_o_sharedInstance = nil;
                 [NSString stringWithFormat: _NS("Compiled by %s, based on SVN revision %s"), 
                     VLC_CompileBy(), VLC_Changeset()]];
         else
-        [o_revision_field setStringValue: [NSString stringWithFormat:
-            _NS("Compiled by %s"), VLC_CompileBy()]];
+            [o_revision_field setStringValue: 
+                [NSString stringWithFormat: _NS("Compiled by %s"), VLC_CompileBy()]];
  
         /* Setup the nameversion field */
         [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VLC_Version(), PLATFORM]];
@@ -98,9 +103,6 @@ static VLAboutBox *_o_sharedInstance = nil;
                                             _NS("VLC was brought to you by:"),
                                             [NSString stringWithUTF8String: psz_authors], 
                                             [NSString stringWithUTF8String: psz_thanks]]];
- 
-        /* Setup the copyright field */
-        [o_copyright_field setStringValue: [o_local_dict objectForKey:@"NSHumanReadableCopyright"]];
 
         /* Setup the window */
         [o_credits_textview setDrawsBackground: NO];
@@ -159,6 +161,12 @@ static VLAboutBox *_o_sharedInstance = nil;
     }
 }
 
+- (void)VLCWillTerminate
+{
+    [o_scroll_timer invalidate];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
 /*****************************************************************************
 * VLC GPL Window, action called from the about window and the help menu
 *****************************************************************************/
@@ -185,20 +193,19 @@ static VLAboutBox *_o_sharedInstance = nil;
 
     [o_help_window makeKeyAndOrderFront: self];
     
-    [[o_help_web_view mainFrame] loadHTMLString: [NSString stringWithString: _NS(I_LONGHELP)]
+    [[o_help_web_view mainFrame] loadHTMLString: _NS(I_LONGHELP)
                                         baseURL: [NSURL URLWithString:@"http://videolan.org"]];
 }
 
 - (IBAction)helpGoHome:(id)sender
 {
-    /* go home */
-    [[o_help_web_view mainFrame] loadHTMLString: [NSString stringWithString: _NS(I_LONGHELP)]
+    [[o_help_web_view mainFrame] loadHTMLString: _NS(I_LONGHELP)
                                         baseURL: [NSURL URLWithString:@"http://videolan.org"]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
-    /* delegate to update button states (we're the frameLoadDelegate for our help's webview */
+    /* delegate to update button states (we're the frameLoadDelegate for our help's webview)« */
     [o_help_fwd_btn setEnabled: [o_help_web_view canGoForward]]; 
     [o_help_bwd_btn setEnabled: [o_help_web_view canGoBack]];
 }
