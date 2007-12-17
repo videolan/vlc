@@ -492,9 +492,6 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
     const module_config_t *p_item, *p_end = p_orig + n;
 
     /* Calculate the structure length */
-    p_module->i_config_items = 0;
-    p_module->i_bool_items = 0;
-
     for( p_item = p_orig; p_item < p_end; p_item++ )
     {
         if( p_item->i_type & CONFIG_ITEM )
@@ -508,19 +505,12 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
         }
     }
 
-    /* Allocate memory */
-    p_module->p_config = (module_config_t *)calloc( n, sizeof(*p_orig) );
-    if( p_module->p_config == NULL )
-    {
-        msg_Err( p_module, "config error: can't duplicate p_config" );
-        return VLC_ENOMEM;
-    }
+    p_module->p_config = p_orig;
     p_module->confsize = n;
 
     /* Do the duplication job */
     for( size_t i = 0; i < n ; i++ )
     {
-        p_module->p_config[i] = p_orig[i];
         p_module->p_config[i].p_lock = &p_module->object_lock;
     }
     return VLC_SUCCESS;

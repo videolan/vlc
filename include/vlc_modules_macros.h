@@ -121,14 +121,10 @@ E_(vlc_entry) ( module_t *p_module );
 
 #define vlc_module_end( )                                                     \
         }                                                                     \
-        res = config_Duplicate( p_module, p_config, ++i_config );             \
-        free( p_config );                                                     \
-        if (res)                                                              \
-            return res;                                                       \
-        return VLC_SUCCESS;                                                   \
+        return config_Duplicate( p_module, p_config, ++i_config );            \
                                                                               \
     error:                                                                    \
-        free( p_config );                                                     \
+        /* FIXME: config_Free( p_config ); */                                 \
         /* FIXME: cleanup submodules objects ??? */                           \
         return VLC_EGENERIC;                                                  \
     }                                                                         \

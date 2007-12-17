@@ -40,6 +40,8 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->psz_object_name = module->psz_longname = default_name;
     module->psz_capability = "";
     module->i_score = 1;
+    module->i_config_items = module->i_bool_items = 0;
+
     return module;
 }
 
@@ -160,6 +162,13 @@ module_config_t *vlc_config_create (module_t *module, int type)
     memset (tab + confsize, 0, sizeof (tab[confsize]));
     tab[confsize].i_type = type;
     tab[confsize].p_lock = &module->object_lock;
+
+    if (type & CONFIG_ITEM)
+    {
+        module->i_config_items++;
+        if (type == CONFIG_ITEM_BOOL)
+            module->i_bool_items++;
+    }
 
     return tab + confsize;
 }
