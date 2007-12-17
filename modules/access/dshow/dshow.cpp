@@ -1863,10 +1863,10 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     if( !list_devices.size() ) return VLC_SUCCESS;
 
     p_item->ppsz_list =
-        (const char **)realloc( p_item->ppsz_list,
+        (char **)realloc( p_item->ppsz_list,
                           (list_devices.size()+3) * sizeof(char *) );
     p_item->ppsz_list_text =
-        (const char **)realloc( p_item->ppsz_list_text,
+        (char **)realloc( p_item->ppsz_list_text,
                           (list_devices.size()+3) * sizeof(char *) );
 
     list<string>::iterator iter;
