@@ -472,7 +472,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
     p_config[i_config].ppf_action = (vlc_callback_t *) \
       realloc( p_config[i_config].ppf_action, \
       (p_config[i_config].i_action + 1) * sizeof(void *) ); \
-    p_config[i_config].ppsz_action_text = (const char **)\
+    p_config[i_config].ppsz_action_text = (char **)\
       realloc( p_config[i_config].ppsz_action_text, \
       (p_config[i_config].i_action + 1) * sizeof(void *) ); \
     p_config[i_config].ppf_action[p_config[i_config].i_action] = pf_action; \
