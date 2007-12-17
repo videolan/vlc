@@ -111,7 +111,6 @@ E_(vlc_entry) ( module_t *p_module );
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
         int res;                                                              \
-        size_t i_config = (size_t)(-1);                                       \
         module_config_t *p_config = NULL;                                     \
         if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
                             (void *)(MODULE_STRING)))                         \
@@ -121,10 +120,10 @@ E_(vlc_entry) ( module_t *p_module );
 
 #define vlc_module_end( )                                                     \
         }                                                                     \
-        return config_Duplicate( p_module, p_config, ++i_config );            \
+        return VLC_SUCCESS;                                                   \
                                                                               \
     error:                                                                    \
-        /* FIXME: config_Free( p_config ); */                                 \
+        /* FIXME: config_Free( p_module ); */                                 \
         /* FIXME: cleanup submodules objects ??? */                           \
         return VLC_EGENERIC;                                                  \
     }                                                                         \

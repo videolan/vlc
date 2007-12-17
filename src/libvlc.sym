@@ -46,7 +46,6 @@ block_Realloc
 config_ChainCreate
 config_ChainDestroy
 __config_ChainParse
-config_Duplicate
 config_FindConfig
 config_GetDataDir
 __config_GetFloat

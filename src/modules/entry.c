@@ -157,7 +157,6 @@ module_config_t *vlc_config_create (module_t *module, int type)
 
         module->p_config = tab;
     }
-    module->confsize++;
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
     tab[confsize].i_type = type;
@@ -170,6 +169,7 @@ module_config_t *vlc_config_create (module_t *module, int type)
             module->i_bool_items++;
     }
 
+    module->confsize++;
     return tab + confsize;
 }
 
