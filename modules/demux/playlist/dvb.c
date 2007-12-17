@@ -175,6 +175,8 @@ static struct
     { "QAM_64", "dvb-modulation=64" },
     { "QAM_128", "dvb-modulation=128" },
     { "QAM_256", "dvb-modulation=256" },
+    { "8VSB", "dvb-modulation=8"  },
+    { "16VSB", "dvb-modulation=16"  },
 
     { "TRANSMISSION_MODE_AUTO", "dvb-transmission=0" },
     { "TRANSMISSION_MODE_2K", "dvb-transmission=2" },
