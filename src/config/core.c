@@ -464,7 +464,9 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
             if( p_item->i_type & CONFIG_HINT )
                 /* ignore hints */
                 continue;
-            if( !strcmp( psz_name, p_item->psz_name ) )
+            if( !strcmp( psz_name, p_item->psz_name )
+             || ( p_item->psz_oldname
+              && !strcmp( psz_name, p_item->psz_oldname ) ) )
             {
                 vlc_list_release( p_list );
                 return p_item;

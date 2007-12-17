@@ -268,7 +268,7 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             break;
 
         case VLC_CONFIG_REMOVED:
-            item->psz_current = "SUPPRESSED";
+            item->b_removed = VLC_TRUE;
             ret = 0;
             break;
 
@@ -384,6 +384,15 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
 
             item->i_action++;
             ret = 0;
+            break;
+        }
+
+        case VLC_CONFIG_OLDNAME:
+        {
+            const char *oldname = va_arg (ap, const char *);
+            item->psz_oldname = oldname ? strdup (oldname) : NULL;
+            ret = 0;
+            break;
         }
     }
 

@@ -184,8 +184,8 @@ struct module_config_t
                               /* to take effect */
 
     /* Deprecated */
-    const char    *psz_current;                         /* Good option name */
-    vlc_bool_t     b_strict;                     /* Transitionnal or strict */
+    char          *psz_oldname;                          /* Old option name */
+    vlc_bool_t     b_removed;
 
     /* Option values loaded from config file */
     vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
@@ -278,6 +278,9 @@ enum vlc_config_properties
 
     VLC_CONFIG_ADD_ACTION,
     /* add value change callback (args=vlc_callback_t, const char *) */
+
+    VLC_CONFIG_OLDNAME,
+    /* former option name (args=const char *) */
 };
 
 
@@ -408,17 +411,6 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc, p_callback ); \
     if (v) vlc_config_set (p_config + i_config, VLC_CONFIG_VALUE, (int)VLC_TRUE)
 
-/* For renamed option */
-#define add_deprecated_alias( name ) \
-    add_config_inner( ); \
-    p_config[ i_config ].i_type = p_config[ i_config -1 ].i_type; \
-    vlc_config_set (p_config + i_config, VLC_CONFIG_NAME, \
-                    (const char *)(name), (vlc_callback_t)NULL); \
-    p_config[i_config].b_strict = VLC_FALSE; \
-    p_config[ i_config ].psz_current = p_config[ i_config-1 ].psz_current \
-        ? p_config[ i_config-1 ].psz_current \
-        : p_config[ i_config-1 ].psz_name;
-
 /* For removed option */
 #define add_obsolete_inner( name, type ) \
     add_type_inner( type ); \
@@ -439,6 +431,11 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
         add_obsolete_inner( name, CONFIG_ITEM_STRING )
 
 /* Modifier macros for the config options (used for fine tuning) */
+
+#define add_deprecated_alias( name ) \
+    vlc_config_set (p_config + i_config, VLC_CONFIG_OLDNAME, \
+                    (const char *)(name))
+
 #define change_short( ch ) \
     vlc_config_set (p_config + i_config, VLC_CONFIG_SHORTCUT, (int)(ch))
 

@@ -296,20 +296,24 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
 
         /* This is basically cut and paste from src/misc/configuration.c
          * with slight changes */
-        if( p_conf && p_conf->psz_current )
+        if( p_conf )
         {
-            if( p_conf->b_strict )
+            if( p_conf->b_removed )
             {
                 msg_Err( p_this, "Option %s is not supported anymore.",
-                         p_conf->psz_name );
+                         name );
                 /* TODO: this should return an error and end option parsing
                  * ... but doing this would change the VLC API and all the
                  * modules so i'll do it later */
                 continue;
             }
-            msg_Warn( p_this, "Option %s is obsolete. Use %s instead.",
-                      p_conf->psz_name, p_conf->psz_current );
-            psz_name = p_conf->psz_current;
+            if( p_conf->psz_oldname
+             && !strcmp( p_conf->psz_oldname, name ) )
+            {
+                 psz_name = p_conf->psz_name;
+                 msg_Warn( p_this, "Option %s is obsolete. Use %s instead.",
+                           name, psz_name );
+            }
         }
         /* </Check if the option is deprecated> */
 

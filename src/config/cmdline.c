@@ -278,20 +278,21 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             if( p_conf )
             {
                 /* Check if the option is deprecated */
-                if( p_conf->psz_current )
+                if( p_conf->b_removed )
                 {
-                    if( p_conf->b_strict )
-                    {
-                        fprintf(stderr,
-                                "Warning: option --%s no longer exists.\n",
-                                p_conf->psz_name);
-                       continue;
-                    }
+                    fprintf(stderr,
+                            "Warning: option --%s no longer exists.\n",
+                            psz_name);
+                    continue;
+                }
 
+                if( p_conf->psz_oldname
+                 && !strcmp( p_conf->psz_oldname, psz_name) )
+                {
                     fprintf( stderr,
                              "%s: option --%s is deprecated. Use --%s instead.\n",
                              b_ignore_errors ? "Warning" : "Error",
-                             p_conf->psz_name, p_conf->psz_current);
+                             psz_name, p_conf->psz_name );
                     if( !b_ignore_errors )
                     {
                         /*free */
@@ -303,8 +304,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                         return -1;
                     }
 
-                    psz_name = (char *)p_conf->psz_current;
-                    p_conf = config_FindConfig( p_this, psz_name );
+                    psz_name = p_conf->psz_name;
                 }
 
                 switch( p_conf->i_type )

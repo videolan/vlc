@@ -543,7 +543,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             vlc_bool_t b_retain = b_autosave && !p_item->b_autosave;
 
             if ((p_item->i_type & CONFIG_HINT) /* ignore hint */
-             || p_item->psz_current            /* ignore deprecated option */
+             || p_item->b_removed              /* ignore deprecated option */
              || p_item->b_unsaveable)          /* ignore volatile option */
                 continue;
 

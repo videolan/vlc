@@ -1455,8 +1455,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             signed int i;
             size_t i_cur_width;
 
-            /* Skip deprecated options */
-            if( p_item->psz_current )
+            /* Skip removed options */
+            if( p_item->b_removed )
             {
                 continue;
             }

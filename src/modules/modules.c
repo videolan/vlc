@@ -804,7 +804,7 @@ module_config_t *module_GetConfig (const module_t *module, unsigned *restrict ps
         const module_config_t *item = module->p_config + i;
         if (item->b_internal /* internal option */
          || item->b_unsaveable /* non-modifiable option */
-         || item->psz_current /* deprecated option name */)
+         || item->b_removed /* removed option */)
             continue;
 
         if (config != NULL)
