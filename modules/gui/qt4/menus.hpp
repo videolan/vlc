@@ -91,7 +91,7 @@ public:
     static void MiscPopupMenu( intf_thread_t * );
     static void PopupMenu( intf_thread_t *, bool );
     static void PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu );
-    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, 
+    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                          input_thread_t *p_input );
     /* Systray */
     static void updateSystrayMenu( MainInterface *,intf_thread_t  *,

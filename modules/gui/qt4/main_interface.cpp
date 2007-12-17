@@ -205,12 +205,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Input Manager    *
      ********************/
     MainInputManager::getInstance( p_intf );
-    
+
     /********************
      * Various CONNECTs *
      ********************/
     /* Connect the input manager to the GUI elements it manages */
-    
+
     /* It is also connected to the control->slider, see the ControlsWidget */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplayPosition( float, int, int ) );
@@ -239,7 +239,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     }
 
     /**
-     * CONNECTS on PLAY_STATUS 
+     * CONNECTS on PLAY_STATUS
      **/
     /* Status on the main controller */
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
@@ -274,12 +274,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connect mess to avoid different threads speaking to each other */
     CONNECT( this, askReleaseVideo( void * ), this, releaseVideoSlot( void * ) );
-    CONNECT( this, askVideoToResize( unsigned int, unsigned int ), 
+    CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
              videoWidget, SetSizing( unsigned int, unsigned int ) );
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
     CONNECT( dockPL, topLevelChanged( bool ), this, doComponentsUpdate() );
-    CONNECT( controls, advancedControlsToggled( bool ), 
+    CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
     resize( settings->value( "size", QSize( 350, 60 ) ).toSize() );
@@ -295,7 +295,7 @@ MainInterface::~MainInterface()
 
     settings->beginGroup( "MainWindow" );
     settings->setValue( "playlist-floats", dockPL->isFloating() );
-    settings->setValue( "adv-controls", 
+    settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
     settings->setValue( "size", size() );
@@ -518,7 +518,7 @@ QSize MainInterface::sizeHint() const
 {
     int nwidth = controls->sizeHint().width();
     int nheight = controls->sizeHint().height();
-                + menuBar()->size().height() 
+                + menuBar()->size().height()
                 + statusBar()->size().height();
 
     msg_Dbg( p_intf, "1 %i %i", nheight, nwidth );
