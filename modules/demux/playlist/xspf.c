@@ -116,14 +116,15 @@ int Demux( demux_t *p_demux )
         FREE_NAME();
     }
 
-    i_ret = parse_playlist_node( p_demux, p_playlist, p_current_input,
-                                 p_xml_reader, "playlist" );
+    if( i_ret == VLC_SUCCESS )
+        i_ret = parse_playlist_node( p_demux, p_playlist, p_current_input,
+                                     p_xml_reader, "playlist" );
     HANDLE_PLAY_AND_RELEASE;
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
-    return -1; /* Needed for correct operation of go back */
+    return i_ret; /* Needed for correct operation of go back */
 }
 
 /** \brief dummy function for demux callback interface */
