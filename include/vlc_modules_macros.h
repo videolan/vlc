@@ -110,7 +110,6 @@ E_(vlc_entry) ( module_t *p_module );
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
-        int res;                                                              \
         module_config_t *p_config = NULL;                                     \
         if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
                             (void *)(MODULE_STRING)))                         \
