@@ -520,27 +520,6 @@ int config_Duplicate( module_t *p_module, const module_config_t *p_orig,
     {
         p_module->p_config[i] = p_orig[i];
         p_module->p_config[i].p_lock = &p_module->object_lock;
-
-        /* duplicate the actions list */
-        if( p_orig[i].i_action )
-        {
-            int j;
-
-            p_module->p_config[i].ppf_action =
-                malloc( p_orig[i].i_action * sizeof(void *) );
-            p_module->p_config[i].ppsz_action_text =
-                malloc( p_orig[i].i_action * sizeof(char *) );
-
-            for( j = 0; j < p_orig[i].i_action; j++ )
-            {
-                p_module->p_config[i].ppf_action[j] =
-                    p_orig[i].ppf_action[j];
-                p_module->p_config[i].ppsz_action_text[j] =
-                    strdupnull (p_orig[i].ppsz_action_text[j]);
-            }
-        }
-
-        p_module->p_config[i].pf_callback = p_orig[i].pf_callback;
     }
     return VLC_SUCCESS;
 }

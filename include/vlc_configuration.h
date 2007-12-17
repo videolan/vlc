@@ -275,6 +275,9 @@ enum vlc_config_properties
     VLC_CONFIG_LIST,
     /* possible values list
      * (args=size_t, const <type> *, const char *const *) */
+
+    VLC_CONFIG_ADD_ACTION,
+    /* add value change callback (args=vlc_callback_t, const char *) */
 };
 
 
@@ -465,20 +468,9 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
     vlc_config_set (p_config + i_config, VLC_CONFIG_RANGE, \
                     (double)(minv), (double)(maxv))
 
-#define change_action_add( pf_action, action_text ) \
-    if( !p_config[i_config].i_action ) \
-    { p_config[i_config].ppsz_action_text = 0; \
-      p_config[i_config].ppf_action = 0; } \
-    p_config[i_config].ppf_action = (vlc_callback_t *) \
-      realloc( p_config[i_config].ppf_action, \
-      (p_config[i_config].i_action + 1) * sizeof(void *) ); \
-    p_config[i_config].ppsz_action_text = (char **)\
-      realloc( p_config[i_config].ppsz_action_text, \
-      (p_config[i_config].i_action + 1) * sizeof(void *) ); \
-    p_config[i_config].ppf_action[p_config[i_config].i_action] = pf_action; \
-    p_config[i_config].ppsz_action_text[p_config[i_config].i_action] = \
-      action_text; \
-    p_config[i_config].i_action++;
+#define change_action_add( pf_action, text ) \
+    vlc_config_set (p_config + i_config, VLC_CONFIG_ADD_ACTION, \
+                    (vlc_callback_t)(pf_action), (const char *)(text))
 
 #define change_internal() \
     vlc_config_set (p_config + i_config, VLC_CONFIG_PRIVATE)

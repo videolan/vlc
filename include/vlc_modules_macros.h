@@ -110,7 +110,7 @@ E_(vlc_entry) ( module_t *p_module );
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
-        int i_shortcut = 1, res;                                              \
+        int res;                                                              \
         size_t i_config = (size_t)(-1);                                       \
         module_config_t *p_config = NULL;                                     \
         if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
@@ -122,18 +122,9 @@ E_(vlc_entry) ( module_t *p_module );
 #define vlc_module_end( )                                                     \
         }                                                                     \
         res = config_Duplicate( p_module, p_config, ++i_config );             \
-        for( size_t i = 0; i < i_config; i++ )                                \
-        {                                                                     \
-            if( p_config[ i ].i_action )                                      \
-            {                                                                 \
-                free( p_config[ i ].ppf_action );                             \
-                free( p_config[ i ].ppsz_action_text );                       \
-            }                                                                 \
-        }                                                                     \
         free( p_config );                                                     \
         if (res)                                                              \
             return res;                                                       \
-        (void)i_shortcut;                                                     \
         return VLC_SUCCESS;                                                   \
                                                                               \
     error:                                                                    \

@@ -355,6 +355,36 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             ret = 0;
             break;
         }
+
+        case VLC_CONFIG_ADD_ACTION:
+        {
+            vlc_callback_t cb = va_arg (ap, vlc_callback_t), *tabcb;
+            const char *name = va_arg (ap, const char *);
+            char **tabtext;
+
+            tabcb = realloc (item->ppf_action,
+                             (item->i_action + 2) * sizeof (cb));
+            if (tabcb == NULL)
+                break;
+            item->ppf_action = tabcb;
+            tabcb[item->i_action] = cb;
+            tabcb[item->i_action + 1] = NULL;
+
+            tabtext = realloc (item->ppsz_action_text,
+                               (item->i_action + 2) * sizeof (name));
+            if (tabtext == NULL)
+                break;
+            item->ppsz_action_text = tabtext;
+
+            if (name)
+                tabtext[item->i_action] = strdup (gettext (name));
+            else
+                tabtext[item->i_action] = NULL;
+            tabtext[item->i_action + 1] = NULL;
+
+            item->i_action++;
+            ret = 0;
+        }
     }
 
     va_end (ap);
