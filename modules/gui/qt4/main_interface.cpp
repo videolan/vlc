@@ -698,7 +698,6 @@ void MainInterface::togglePlaylist()
     If no playlist exist, then create one and attach it to the DockPL*/
     if( !playlistWidget )
     {
-        msg_Dbg( p_intf, "Creating a new playlist" );
         playlistWidget = new PlaylistWidget( p_intf, settings );
 
         /* Add it to the parent DockWidget */
@@ -708,9 +707,10 @@ void MainInterface::togglePlaylist()
         addDockWidget( Qt::BottomDockWidgetArea, dockPL );
 
         /* Make the playlist floating is requested. Default is not. */
+        //FIXME
         if( settings->value( "playlist-floats", false ).toBool() );
         {
-            msg_Dbg( p_intf, "we don't want it inside");
+            msg_Dbg( p_intf, "we don't want the playlist inside");
             dockPL->setFloating( true );
         }
     }
@@ -745,7 +745,7 @@ void MainInterface::toggleMinimalView()
 /* Well, could it, actually ? Probably dangerous ... */
 void MainInterface::doComponentsUpdate()
 {
-    msg_Dbg( p_intf, "coi " );
+    msg_Dbg( p_intf, "Updating the geometry" );
     updateGeometry();
     resize( sizeHint() );
 }
