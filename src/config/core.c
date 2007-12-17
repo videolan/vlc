@@ -544,6 +544,7 @@ void config_Free( module_t *p_module )
         free( p_item->psz_name );
         free( p_item->psz_text );
         free( p_item->psz_longtext );
+        free( p_item->psz_oldname );
 
         if (IsConfigStringType (p_item->i_type))
         {

@@ -349,7 +349,10 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
                 item->ppsz_list_text = dtext;
             }
             else
+            {
+                free (dtext);
                 item->ppsz_list_text = NULL;
+            }
 
             item->i_list = len;
             ret = 0;
