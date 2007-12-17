@@ -148,9 +148,9 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
             pthread_sigmask (SIG_SETMASK, &set, NULL);
 
             /* We don't want output */
-            freopen( "/dev/null", "w", stdout );
-            freopen( "/dev/null", "w", stderr );
-            execv( ppsz_args[0] , (char *const *)ppsz_args );
+            if( ( freopen( "/dev/null", "w", stdout ) != NULL )
+             && ( freopen( "/dev/null", "w", stderr ) != NULL ) )
+                execv( ppsz_args[0] , (char *const *)ppsz_args );
             /* If the file we want to execute doesn't exist we exit() */
             exit( EXIT_FAILURE );
         }
