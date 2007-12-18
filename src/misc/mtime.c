@@ -67,16 +67,17 @@ struct timespec
 int nanosleep(struct timespec *, struct timespec *);
 #endif
 
-#ifdef HAVE_CLOCK_NANOSLEEP
-#  if !defined _POSIX_CLOCK_SELECTION || (_POSIX_CLOCK_SELECTION - 0 <= 0)
+#if (!defined (_POSIX_CLOCK_SELECTION)) || (_POSIX_CLOCK_SELECTION < 0)
 /*
  * We cannot use the monotonic clock is clock selection is not available,
  * as it would screw vlc_cond_timedwait() completely. Instead, we have to
  * stick to the realtime clock. Nevermind it screws everything when ntpdate
  * warps the wall clock.
  */
-#    undef CLOCK_MONOTONIC
-#    define CLOCK_MONOTONIC CLOCK_REALTIME
+#  undef CLOCK_MONOTONIC
+#  define CLOCK_MONOTONIC CLOCK_REALTIME
+#  ifndef HAVE_CLOCK_NANOSLEEP
+#   error We have quite a situation here! Fix me if it ever happens.
 #  endif
 #endif
 
