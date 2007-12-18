@@ -247,7 +247,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     char *       psz_control = NULL;
     vlc_bool_t   b_exit = VLC_FALSE;
     int          i_ret = VLC_EEXIT;
-    module_t    *p_help_module = NULL;
     playlist_t  *p_playlist = NULL;
     vlc_value_t  val;
 #if defined( ENABLE_NLS ) \
@@ -289,25 +288,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * options) */
     module_InitBank( p_libvlc );
 
-    /* Hack: insert the help module here */
-    p_help_module = vlc_module_create( VLC_OBJECT(p_libvlc) );
-    if( p_help_module == NULL )
-    {
-        module_EndBank( p_libvlc );
-        return VLC_EGENERIC;
-    }
-    p_help_module->psz_object_name = "help";
-    p_help_module->psz_longname = N_("Help options");
-    config_Duplicate( p_help_module, libvlc_config, libvlc_config_count );
-    vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
-    /* End hack */
-
     if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE ) )
     {
-        vlc_object_detach( p_help_module );
-        p_help_module->p_config = NULL;
-        p_help_module->confsize = 0;
-        vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
@@ -339,10 +321,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         libvlc_global.p_module_bank->b_cache_delete = VLC_TRUE;
     }
-
-    /* Hack: remove the help module here */
-    vlc_object_detach( p_help_module );
-    /* End hack */
 
     /* Will be re-done properly later on */
     p_libvlc->i_verbose = config_GetInt( p_libvlc, "verbose" );
@@ -414,8 +392,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        p_help_module->p_config = NULL; p_help_module->confsize = 0;
-        vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return i_ret;
     }
@@ -467,10 +443,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     msg_Dbg( p_libvlc, "module bank initialized, found %i modules",
                     libvlc_global.p_module_bank->i_children );
 
-    /* Hack: insert the help module here */
-    vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
-    /* End hack */
-
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_libvlc, "module" )) )
     {
@@ -503,29 +475,19 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Check for config file options */
     if( config_GetInt( p_libvlc, "reset-config" ) )
     {
-        vlc_object_detach( p_help_module );
         config_ResetAll( p_libvlc );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
         config_SaveConfigFile( p_libvlc, NULL );
-        vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
     }
     if( config_GetInt( p_libvlc, "save-config" ) )
     {
-        vlc_object_detach( p_help_module );
         config_LoadConfigFile( p_libvlc, NULL );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
         config_SaveConfigFile( p_libvlc, NULL );
-        vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
     }
-
-    /* Hack: remove the help module here */
-    vlc_object_detach( p_help_module );
-    /* End hack */
 
     if( b_exit )
     {
-        p_help_module->p_config = NULL; p_help_module->confsize = 0;
-        vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return i_ret;
     }
@@ -540,10 +502,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     config_LoadConfigFile( p_libvlc, NULL );
 
-    /* Hack: insert the help module here */
-    vlc_object_attach( p_help_module, libvlc_global.p_module_bank );
-    /* End hack */
-
     /*
      * Override configuration with command line settings
      */
@@ -556,18 +514,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                  "that they are valid.\n" );
         PauseConsole();
 #endif
-        vlc_object_detach( p_help_module );
-        p_help_module->p_config = NULL; p_help_module->confsize = 0;
-        vlc_object_destroy( p_help_module );
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
-
-    /* Hack: remove the help module here */
-    vlc_object_detach( p_help_module );
-    p_help_module->p_config = NULL; p_help_module->confsize = 0;
-    vlc_object_destroy( p_help_module );
-    /* End hack */
 
     /*
      * System specific configuration

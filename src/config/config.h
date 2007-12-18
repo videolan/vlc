@@ -34,9 +34,6 @@ extern "C" {
 int  config_CreateDir( vlc_object_t *, const char * );
 int  config_AutoSaveConfigFile( vlc_object_t * );
 
-/* TODO: remove this, only used for helper module */
-int config_Duplicate( module_t *, module_config_t *, size_t );
-
 void config_Free( module_t * );
 
 void config_SetCallbacks( module_config_t *, module_config_t *, size_t );

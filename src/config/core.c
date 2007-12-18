@@ -480,44 +480,6 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 }
 
 /*****************************************************************************
- * config_Duplicate: creates a duplicate of a module's configuration data.
- *****************************************************************************
- * Unfortunatly we cannot work directly with the module's config data as
- * this module might be unloaded from memory at any time (remember HideModule).
- * This is why we need to create an exact copy of the config data.
- *****************************************************************************/
-int config_Duplicate( module_t *p_module, module_config_t *p_orig,
-                      size_t n )
-{
-    const module_config_t *p_item, *p_end = p_orig + n;
-
-    /* Calculate the structure length */
-    for( p_item = p_orig; p_item < p_end; p_item++ )
-    {
-        if( p_item->i_type & CONFIG_ITEM )
-        {
-            p_module->i_config_items++;
-        }
-
-        if( p_item->i_type == CONFIG_ITEM_BOOL )
-        {
-            p_module->i_bool_items++;
-        }
-    }
-
-    p_module->p_config = p_orig;
-    p_module->confsize = n;
-
-    /* Do the duplication job */
-    for( size_t i = 0; i < n ; i++ )
-    {
-        p_module->p_config[i].p_lock = &p_module->object_lock;
-    }
-    return VLC_SUCCESS;
-}
-
-
-/*****************************************************************************
  * config_Free: frees a duplicated module's configuration data.
  *****************************************************************************
  * This function frees all the data duplicated by config_Duplicate.

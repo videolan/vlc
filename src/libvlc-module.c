@@ -2461,13 +2461,6 @@ vlc_module_begin();
     set_capability( "main", 100 );
 vlc_module_end();
 
-module_config_t libvlc_config[] =
-{
-};
-
-const size_t libvlc_config_count = sizeof (libvlc_config)
-                                 / sizeof (libvlc_config[0]);
-
 /*****************************************************************************
  * End configuration.
  *****************************************************************************/
