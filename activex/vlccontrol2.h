@@ -530,6 +530,7 @@ public:
     STDMETHODIMP put_teletext(long);
     STDMETHODIMP takeSnapshot(LPPICTUREDISP*);
     STDMETHODIMP toggleFullscreen();
+    STDMETHODIMP toggleTeletext();
 
 protected:
     HRESULT loadTypeInfo();

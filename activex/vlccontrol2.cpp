@@ -2539,6 +2539,32 @@ STDMETHODIMP VLCVideo::toggleFullscreen()
     return hr;
 };
 
+STDMETHODIMP VLCVideo::toggleTeletext()
+{
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            libvlc_toggle_teletext(p_md, &ex);
+            libvlc_media_instance_release(p_md);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                return NOERROR;
+            }
+        }
+        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
 /*******************************************************************************/
 
 VLCControl2::VLCControl2(VLCPlugin *p_instance) :

@@ -2070,11 +2070,13 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
 const NPUTF8 * const LibvlcVideoNPObject::methodNames[] =
 {
     "toggleFullscreen",
+    "toggleTeletext"
 };
 
 enum LibvlcVideoNPObjectMethodIds
 {
     ID_video_togglefullscreen,
+    ID_video_toggleteletext
 };
 
 const int LibvlcVideoNPObject::methodCount = sizeof(LibvlcVideoNPObject::methodNames)/sizeof(NPUTF8 *);
@@ -2102,6 +2104,34 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::invoke(int index, const NPVar
                 if( argCount == 0 )
                 {
                     libvlc_toggle_fullscreen(p_md, &ex);
+                    libvlc_media_instance_release(p_md);
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+                    else
+                    {
+                        VOID_TO_NPVARIANT(result);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                }
+                else
+                {
+                    /* cannot get md, probably not playing */
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                    }
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            case ID_video_toggleteletext:
+                if( argCount == 0 )
+                {
+                    libvlc_toggle_teletext(p_md, &ex);
                     libvlc_media_instance_release(p_md);
                     if( libvlc_exception_raised(&ex) )
                     {

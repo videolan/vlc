@@ -444,6 +444,9 @@ library AXVLC
 
         [helpstring("take video snapshot and save it into picture object.")]
         HRESULT takeSnapshot([out, retval] IPictureDisp** picture);
+
+        [helpstring("toggle teletext transparent state.")]
+        HRESULT toggleTeletext();
     };
 
     [

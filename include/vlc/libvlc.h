@@ -820,6 +820,13 @@ VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_instance_t *, 
 VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_instance_t *, char *, libvlc_exception_t * );
 
 /**
+ * Toggle teletext transparent status on video output
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_instance_t *, libvlc_exception_t * );
+
+/**
  * Get current teletext page requested.
  * \param p_input the input
  * \param p_exception an initialized exception
