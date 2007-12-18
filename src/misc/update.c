@@ -1,10 +1,12 @@
 /*****************************************************************************
- * update.c: VLC update and plugins download
+ * update.c: VLC update checking and downloading
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright © 2005-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+ *          Rémi Duraffort <ivoire at via.ecp.fr>
+            Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +28,7 @@
  *   This file contains functions related to VLC and plugins update management
  */
 
-/*
- * TODO:  * pgp verification of the update file
-          * binary download, and pgp verification
- */
+/* TODO: pgp verification of the status file, and downloaded binaries */
 
 /*****************************************************************************
  * Preamble
@@ -53,6 +52,18 @@
 /*****************************************************************************
  * Misc defines
  *****************************************************************************/
+
+/*
+ * Here is the format of these "status files" :
+ * First line is the last version: "X.Y.Ze" where:
+ *      * X is the major number
+ *      * Y is the minor number
+ *      * Z is the revision number
+ *      * e is an OPTIONAL extra letter
+ *      * AKA "0.8.6d" or "0.9.0"
+ * Second line is an url to the last binary
+ * Third line is a description of the update (it MAY be extended to several lines, but for now it is only one line)
+ */
 
 #if defined( UNDER_CE )
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
@@ -79,7 +90,6 @@
  *****************************************************************************/
 static void EmptyRelease( update_t *p_update );
 static void GetUpdateFile( update_t *p_update );
-static int extracmp( char *psz_1, char *psz_2 );
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 );
 static char * size_str( long int l_size );
@@ -761,8 +771,6 @@ update_t *__update_New( vlc_object_t *p_this )
 
     p_update->p_libvlc = p_this->p_libvlc;
 
-    p_update->release.psz_svnrev = NULL;
-    p_update->release.psz_extra = NULL;
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
 
@@ -786,8 +794,6 @@ void update_Delete( update_t *p_update )
 
     var_Destroy( p_update->p_libvlc, "update-notify" );
 
-    FREENULL( p_update->release.psz_svnrev );
-    FREENULL( p_update->release.psz_extra );
     FREENULL( p_update->release.psz_url );
     FREENULL( p_update->release.psz_desc );
 
@@ -806,8 +812,6 @@ static void EmptyRelease( update_t *p_update )
     p_update->release.i_minor = 0;
     p_update->release.i_revision = 0;
 
-    FREENULL( p_update->release.psz_svnrev );
-    FREENULL( p_update->release.psz_extra );
     FREENULL( p_update->release.psz_url );
     FREENULL( p_update->release.psz_desc );
 }
@@ -825,8 +829,7 @@ static void GetUpdateFile( update_t *p_update )
     int i_major = 0;
     int i_minor = 0;
     int i_revision = 0;
-    char *psz_extra = NULL;
-    char *psz_svnrev = NULL;
+    unsigned char extra;
     char *psz_line = NULL;
 
     p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
@@ -846,20 +849,20 @@ static void GetUpdateFile( update_t *p_update )
     }
 
     /* first line : version number */
-    if( sscanf( psz_line, "%i.%i.%i%as %as", &i_major, &i_minor, &i_revision, &psz_extra, &psz_svnrev ) )
+    p_update->release.extra = 0;
+    switch( sscanf( psz_line, "%i.%i.%i%c", &i_major, &i_minor, &i_revision, &extra ) )
     {
-        p_update->release.i_major = i_major;
-        p_update->release.i_minor = i_minor;
-        p_update->release.i_revision = i_revision;
-
-        p_update->release.psz_svnrev = psz_svnrev ? psz_svnrev : STRDUP( "" );
-        p_update->release.psz_extra = psz_extra ? psz_extra : STRDUP( "" );
-    }
-    else
-    {
-        msg_Err( p_update->p_libvlc, "Update version false formated" );
-        free( psz_line );
-        goto error;
+        case 4:
+            p_update->release.extra = extra;
+        case 3:
+            p_update->release.i_major = i_major;
+            p_update->release.i_minor = i_minor;
+            p_update->release.i_revision = i_revision;
+            break;
+        default:
+            msg_Err( p_update->p_libvlc, "Update version false formated" );
+            free( psz_line );
+            goto error;
     }
 
     /* Second line : URL */
@@ -929,31 +932,6 @@ void update_CheckReal( update_check_thread_t *p_uct )
 }
 
 /**
- * Compare two extra
- *
- * \param p1 first integer
- * \param p2 second integer
- * \return like strcmp
- */
-static int extracmp( char *psz_1, char *psz_2 )
-{
-    if( psz_1[0] == '-' )
-    {
-        if( psz_2[0] == '-' )
-            return strcmp( psz_1, psz_2 );
-        else
-            return 1;
-    }
-    else
-    {
-        if( psz_2[0] == '-' )
-            return -1;
-        else
-            return strcmp( psz_1, psz_2 );
-    }
-}
-
-/**
  * Compare two release numbers
  *
  * \param p1 first release
@@ -963,17 +941,10 @@ static int extracmp( char *psz_1, char *psz_2 )
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 )
 {
-    /* The string musn't be NULL if we don't want a segfault with strcmp */
-    if( !p1->psz_extra || !p2->psz_extra || !p1->psz_svnrev || !p2->psz_svnrev )
-        return UpdateReleaseStatusEqual;
-
     int32_t d;
-    d = ( p1->i_major << 24 ) + ( p1->i_minor << 16 ) + ( p1->i_revision << 8 );
-    d = d - ( p2->i_major << 24 ) - ( p2->i_minor << 16 ) - ( p2->i_revision << 8 );
-    d += extracmp( p1->psz_extra, p2->psz_extra );
-
-    if( d == 0 )
-        d = strcmp( p1->psz_svnrev, p2->psz_svnrev );
+    d = ( p1->i_major << 24 ) + ( p1->i_minor << 16 ) + ( p1->i_revision << 8 )
+      - ( p2->i_major << 24 ) - ( p2->i_minor << 16 ) - ( p2->i_revision << 8 )
+      + ( p1->extra ) - ( p2->extra );
 
     if( d < 0 )
         return UpdateReleaseStatusOlder;
@@ -994,29 +965,14 @@ int update_CompareReleaseToCurrent( update_t *p_update )
     assert( p_update );
 
     struct update_release_t c;
-    int i_major = 0;
-    int i_minor = 0;
-    int i_revision = 0;
-    char *psz_extra;
-    int i_result = UpdateReleaseStatusOlder;
 
     /* get the current version number */
-    if( sscanf( PACKAGE_VERSION, "%i.%i.%i%as", &i_major, &i_minor, &i_revision, &psz_extra ) )
-    {
-        c.i_major = i_major;
-        c.i_minor = i_minor;
-        c.i_revision = i_revision;
-        if( psz_extra )
-            c.psz_extra = psz_extra;
-        else
-            c.psz_extra = STRDUP( "" );
-        c.psz_svnrev = STRDUP( VLC_Changeset() );
-        i_result = CompareReleases( &p_update->release, &c );
-        free( c.psz_extra );
-        free( c.psz_svnrev );
-    }
+    c.i_major = *PACKAGE_VERSION_MAJOR - '0';
+    c.i_minor = *PACKAGE_VERSION_MINOR - '0';
+    c.i_revision = *PACKAGE_VERSION_REVISION - '0';
+    c.extra = *PACKAGE_VERSION_EXTRA;
 
-    return i_result;
+    return CompareReleases( &p_update->release, &c );
 }
 
 /**
@@ -1027,10 +983,10 @@ int update_CompareReleaseToCurrent( update_t *p_update )
  */
 static char *size_str( long int l_size )
 {
-    char *psz_tmp;
-    if( l_size>> 30 )
+    char *psz_tmp = NULL;
+    if( l_size >> 30 )
         asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
-    if( l_size >> 20 )
+    else if( l_size >> 20 )
         asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
     else if( l_size >> 10 )
         asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
