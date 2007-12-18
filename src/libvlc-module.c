@@ -2377,7 +2377,84 @@ vlc_module_begin();
     add_string( "bookmark10", NULL, NULL,
               BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
 
-    /* Usage (mainly useful for cmd line stuff) */
+#define HELP_TEXT \
+    N_("print help for VLC (can be combined with --advanced and " \
+       "--help-verbose)")
+#define LONGHELP_TEXT \
+    N_("print help for VLC and all its modules (can be combined with " \
+       "--advanced and --help-verbose)")
+#define ADVANCED_TEXT \
+    N_("print help for the advanced options")
+#define HELP_VERBOSE_TEXT \
+    N_("ask for extra verbosity when displaying help")
+#define LIST_TEXT \
+    N_("print a list of available modules")
+#define LIST_VERBOSE_TEXT \
+    N_("print a list of available modules with extra detail")
+#define MODULE_TEXT \
+    N_("print help on a specific module (can be combined with --advanced " \
+       "and --help-verbose)")
+#define SAVE_CONFIG_TEXT \
+    N_("save the current command line options in the config")
+#define RESET_CONFIG_TEXT \
+    N_("reset the current config to the default values")
+#define CONFIG_TEXT \
+    N_("use alternate config file")
+#define RESET_PLUGINS_CACHE_TEXT \
+    N_("resets the current plugins cache")
+#define VERSION_TEXT \
+    N_("print version information")
+ 
+    add_bool( "help", VLC_FALSE, NULL, HELP_TEXT, "", VLC_FALSE );
+        change_short( 'h' );
+        change_internal();
+        change_unsaveable();
+    add_bool( "longhelp", VLC_FALSE, NULL, LONGHELP_TEXT, "", VLC_FALSE );
+        change_short( 'H' );
+        change_internal();
+        change_unsaveable();
+    add_bool( "advanced", VLC_FALSE, NULL, ADVANCED_TEXT, "", VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_bool( "help-verbose", VLC_FALSE, NULL, HELP_VERBOSE_TEXT, "",
+              VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_bool( "list", VLC_FALSE, NULL, LIST_TEXT, "", VLC_FALSE );
+        change_short( 'l' );
+        change_internal();
+        change_unsaveable();
+    add_bool( "list-verbose", VLC_FALSE, NULL, LIST_VERBOSE_TEXT, "",
+              VLC_FALSE );
+        change_short( 'l' );
+        change_internal();
+        change_unsaveable();
+    add_string( "module", NULL, NULL, MODULE_TEXT, "", VLC_FALSE );
+        change_short( 'p' );
+        change_internal();
+        change_unsaveable();
+    add_bool( "save-config", VLC_FALSE, NULL, SAVE_CONFIG_TEXT, "",
+              VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_bool( "reset-config", VLC_FALSE, NULL, MODULE_TEXT, "", VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_bool( "reset-plugins-cache", VLC_FALSE, NULL,
+              RESET_PLUGINS_CACHE_TEXT, "", VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_bool( "version", VLC_FALSE, NULL, VERSION_TEXT, "", VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_string( "config", NULL, NULL, CONFIG_TEXT, "", VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+    add_bool( "version", VLC_FALSE, NULL, VERSION_TEXT, "", VLC_FALSE );
+        change_internal();
+        change_unsaveable();
+
+   /* Usage (mainly useful for cmd line stuff) */
     /* add_usage_hint( PLAYLIST_USAGE ); */
 
     set_description( N_("main program") );
@@ -2386,70 +2463,6 @@ vlc_module_end();
 
 module_config_t libvlc_config[] =
 {
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "help",
-        .i_short  = 'h',
-        .psz_text = N_("print help for VLC (can be combined with --advanced and --help-verbose)")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "longhelp",
-        .i_short  = 'H',
-        .psz_text = N_("print help for VLC and all its modules (can be combined with --advanced and --help-verbose)")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "advanced",
-        .psz_text = N_("print help for the advanced options")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "help-verbose",
-        .psz_text = N_("ask for extra verbosity when displaying help")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "list",
-        .i_short  = 'l',
-        .psz_text = N_("print a list of available modules")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "list-verbose",
-        .psz_text = N_("print a list of available modules with extra detail")
-    },
-    {
-        .i_type   = CONFIG_ITEM_STRING,
-        .psz_name = "module",
-        .i_short  = 'p',
-        .psz_text = N_("print help on a specific module (can be combined with --advanced and --help-verbose)")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "save-config",
-        .psz_text = N_("save the current command line options in the config")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "reset-config",
-        .psz_text = N_("reset the current config to the default values")
-    },
-    {
-        .i_type   = CONFIG_ITEM_STRING,
-        .psz_name = "config",
-        .psz_text = N_("use alternate config file")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "reset-plugins-cache",
-        .psz_text = N_("resets the current plugins cache")
-    },
-    {
-        .i_type   = CONFIG_ITEM_BOOL,
-        .psz_name = "version",
-        .psz_text = N_("print version information")
-    }
 };
 
 const size_t libvlc_config_count = sizeof (libvlc_config)
