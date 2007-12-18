@@ -1071,7 +1071,7 @@ msgid "Sample rate"
 msgstr "Abtastrate"
 
 #: src/input/es_out.c:2031
-#, c-format
+#, fuzzy, c-format
 msgid "%u Hz"
 msgstr "%d Hz"
 
@@ -1087,7 +1087,7 @@ msgid "Bitrate"
 msgstr "Bitrate"
 
 #: src/input/es_out.c:2043
-#, c-format
+#, fuzzy, c-format
 msgid "%u kb/s"
 msgstr "%d kb/s"
 
