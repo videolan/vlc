@@ -283,6 +283,7 @@ VLC_EXPORT( update_t *, __update_New, ( vlc_object_t * ) );
 VLC_EXPORT( void, update_Delete, ( update_t * ) );
 VLC_EXPORT( void, update_Check, ( update_t * ) );
 VLC_EXPORT( int, update_CompareReleaseToCurrent, ( update_t * ) );
+VLC_EXPORT( void, update_Download, ( update_t *, char* ) );
 
 /**
  * @}

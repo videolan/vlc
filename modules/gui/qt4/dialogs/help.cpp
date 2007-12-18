@@ -41,6 +41,8 @@
 #include <QLabel>
 #include <QString>
 #include <QDialogButtonBox>
+#include <QEvent>
+#include <QFileDialog>
 
 
 HelpDialog *HelpDialog::instance = NULL;
@@ -165,38 +167,54 @@ void AboutDialog::close()
 }
 
 #ifdef UPDATE_CHECK
+
+/*****************************************************************************
+ * UpdateDialog
+ *****************************************************************************/
+/* callback to get information from the core */
+static int updateCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval, void *data )
+{
+    UpdateDialog* UDialog = (UpdateDialog *)data;
+    QEvent *event = new QEvent( QEvent::User );
+    QApplication::postEvent( UDialog, event );
+    return VLC_SUCCESS;
+}
+
 UpdateDialog *UpdateDialog::instance = NULL;
 
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Update" ) );
-    resize( 320, 120 );
+    resize( 120, 80 );
 
     QGridLayout *layout = new QGridLayout( this );
 
-    updateBrowser = new QTextBrowser( this );
-    updateBrowser->setOpenExternalLinks( true );
-    updateBrowser->setHtml( qtr( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"utf-8\" /></head> \
-                                  <body><center>Push the update button to get the updates</center></body></html>" ) );
-    
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    QPushButton *updateButton = new QPushButton( qtr( "&Update List" ) );
+    updateButton = new QPushButton( qtr( "&Update List" ) );
     updateButton->setDefault( true );
     QDialogButtonBox *buttonBox = new QDialogButtonBox( Qt::Horizontal );
     buttonBox->addButton( updateButton, QDialogButtonBox::ActionRole );
     buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
 
-    layout->addWidget( updateBrowser, 0, 0 );
+    updateLabel = new QLabel( qtr( "Checking for the update..." ) );
+    updateLabel->setWordWrap( true );
+
+    layout->addWidget( updateLabel, 0, 0 );
     layout->addWidget( buttonBox, 1, 0 );
 
-    BUTTONACT( updateButton, updateOrUpload() );
+    BUTTONACT( updateButton, UpdateOrDownload() );
     BUTTONACT( closeButton, close() );
 
+    /* create the update structure and the callback */
     p_update = update_New( _p_intf );
+    var_AddCallback( _p_intf->p_libvlc, "update-notify", updateCallback, this );
+    b_checked = false;
 }
 
 UpdateDialog::~UpdateDialog()
 {
+    var_DelCallback( p_update->p_libvlc, "update-notify", updateCallback, this );
     update_Delete( p_update );
 }
 
@@ -205,22 +223,52 @@ void UpdateDialog::close()
     toggleVisible();
 }
 
-void UpdateDialog::updateOrUpload()
+/* Check for updates */
+void UpdateDialog::UpdateOrDownload()
 {
-    update_Check( p_update );
-
-    if( update_CompareReleaseToCurrent( p_update ) == UpdateReleaseStatusNewer )
+    if( !b_checked )
     {
-        updateBrowser->setHtml( qtr( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"utf-8\" /></head> \
-                                      <body><center><p>" ) + qtu( (QString)p_update->release.psz_desc ) +
-                                      qtr( "</p>You can download the latest version of VLC <a href=\"" ) +
-                                      qtu( (QString)p_update->release.psz_url ) + qtr( "\">here</a></center></body></html>" ) );
+        updateButton->setEnabled( false );
+        update_Check( p_update );
     }
     else
     {
-        updateBrowser->setHtml( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"utf-8\" /></head> \
-                                 <body><center>You have the latest version of VLC.</center></body></html>" );
+        updateButton->setEnabled( false );
+        QString dest_dir = QFileDialog::getExistingDirectory( this, qtr( "Select a directory ..." ),
+                                                              qfu( p_update->p_libvlc->psz_homedir ) );
+
+        if( dest_dir != "" )
+        {
+            toggleVisible();
+            update_Download( p_update, qtu( dest_dir ) );
+        }
+        else
+            updateButton->setEnabled( true );
     }
 }
+
+/* Handle the events */
+void UpdateDialog::customEvent( QEvent *event )
+{
+    updateNotify();
+}
+
+/* Notify the end of the update_Check */
+void UpdateDialog::updateNotify()
+{
+    if( update_CompareReleaseToCurrent( p_update ) == UpdateReleaseStatusNewer )
+    {
+        b_checked = true;
+        updateButton->setText( "Download" );
+        updateLabel->setText( qtr( "There is a new version of vlc :\n" ) + qfu( p_update->release.psz_desc )  );
+    }
+    else
+    {
+        updateLabel->setText( qtr( "You have the latest version of vlc" ) );
+    }
+    adjustSize();
+    updateButton->setEnabled( true );
+}
+
 
 #endif

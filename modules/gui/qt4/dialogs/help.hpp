@@ -30,6 +30,9 @@
 
 class QPushButton;
 class QTextBrowser;
+class QLabel;
+class QEvent;
+class QPushButton;
 
 class HelpDialog : public QVLCFrame
 {
@@ -71,6 +74,7 @@ public slots:
 };
 
 #ifdef UPDATE_CHECK
+
 class UpdateDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -82,15 +86,20 @@ public:
         return instance;
     }
     virtual ~UpdateDialog();
+    void updateNotify();
 
 private:
     UpdateDialog( intf_thread_t * );
     static UpdateDialog *instance;
     update_t *p_update;
-    QTextBrowser *updateBrowser;
+    QPushButton *updateButton;
+    QLabel *updateLabel;
+    void customEvent( QEvent * );
+    bool b_checked;
+
 private slots:
     void close();
-    void updateOrUpload();
+    void UpdateOrDownload();
 };
 #endif
 

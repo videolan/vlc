@@ -82,6 +82,8 @@ static void GetUpdateFile( update_t *p_update );
 static int extracmp( char *psz_1, char *psz_2 );
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 );
+static char * size_str( long int l_size );
+
 
 /*****************************************************************************
  * OpenPGP functions
@@ -764,6 +766,9 @@ update_t *__update_New( vlc_object_t *p_this )
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
 
+    var_Create( p_this->p_libvlc, "update-notify", VLC_VAR_INTEGER |
+                VLC_VAR_ISCOMMAND );
+
     return p_update;
 }
 
@@ -778,6 +783,8 @@ void update_Delete( update_t *p_update )
     assert( p_update );
 
     vlc_mutex_destroy( &p_update->lock );
+
+    var_Destroy( p_update->p_libvlc, "update-notify" );
 
     FREENULL( p_update->release.psz_svnrev );
     FREENULL( p_update->release.psz_extra );
@@ -807,7 +814,7 @@ static void EmptyRelease( update_t *p_update )
 
 /**
  * Get the update file and parse it
- * *p_update has to be unlocked when calling this function
+ * *p_update has to be locked when calling this function
  *
  * \param p_update pointer to update struct
  * \return nothing
@@ -821,8 +828,6 @@ static void GetUpdateFile( update_t *p_update )
     char *psz_extra = NULL;
     char *psz_svnrev = NULL;
     char *psz_line = NULL;
-
-    vlc_mutex_lock( &p_update->lock );
 
     p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
@@ -877,11 +882,21 @@ static void GetUpdateFile( update_t *p_update )
     p_update->release.psz_desc = psz_line;
 
     error:
-        vlc_mutex_unlock( &p_update->lock );
-
         if( p_stream )
             stream_Delete( p_stream );
 }
+
+
+/**
+ * Struct to launch the check in an other thread
+ */
+typedef struct
+{
+    VLC_COMMON_MEMBERS
+    update_t *p_update;
+} update_check_thread_t;
+
+void update_CheckReal( update_check_thread_t *p_uct );
 
 /**
  * Check for updates
@@ -893,9 +908,24 @@ void update_Check( update_t *p_update )
 {
     assert( p_update );
 
-    EmptyRelease( p_update );
+    update_check_thread_t *p_uct = vlc_object_create( p_update->p_libvlc,
+                                            sizeof( update_check_thread_t ) );
+    p_uct->p_update = p_update;
 
-    GetUpdateFile( p_update );
+    vlc_thread_create( p_uct, "check for update", update_CheckReal,
+                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+}
+
+void update_CheckReal( update_check_thread_t *p_uct )
+{
+    vlc_mutex_lock( &p_uct->p_update->lock );
+
+    EmptyRelease( p_uct->p_update );
+    GetUpdateFile( p_uct->p_update );
+
+    vlc_mutex_unlock( &p_uct->p_update->lock );
+
+    var_TriggerCallback( p_uct->p_update->p_libvlc, "update-notify" );
 }
 
 /**
@@ -922,6 +952,7 @@ static int extracmp( char *psz_1, char *psz_2 )
             return strcmp( psz_1, psz_2 );
     }
 }
+
 /**
  * Compare two release numbers
  *
@@ -932,6 +963,10 @@ static int extracmp( char *psz_1, char *psz_2 )
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 )
 {
+    /* The string musn't be NULL if we don't want a segfault with strcmp */
+    if( !p1->psz_extra || !p2->psz_extra || !p1->psz_svnrev || !p2->psz_svnrev )
+        return UpdateReleaseStatusEqual;
+
     int32_t d;
     d = ( p1->i_major << 24 ) + ( p1->i_minor << 16 ) + ( p1->i_revision << 8 );
     d = d - ( p2->i_major << 24 ) - ( p2->i_minor << 16 ) - ( p2->i_revision << 8 );
@@ -951,7 +986,7 @@ static int CompareReleases( const struct update_release_t *p1,
 /**
  * Compare a given release's version number to the current VLC's one
  *
- * \param p a release
+ * \param p_update structure
  * \return UpdateReleaseStatus(Older|Equal|Newer)
  */
 int update_CompareReleaseToCurrent( update_t *p_update )
@@ -976,13 +1011,149 @@ int update_CompareReleaseToCurrent( update_t *p_update )
         else
             c.psz_extra = STRDUP( "" );
         c.psz_svnrev = STRDUP( VLC_Changeset() );
-
         i_result = CompareReleases( &p_update->release, &c );
-
         free( c.psz_extra );
         free( c.psz_svnrev );
     }
+
     return i_result;
+}
+
+/**
+ * Convert a long int size in bytes to a string
+ *
+ * \param l_size the size in bytes
+ * \return the size as a string
+ */
+static char *size_str( long int l_size )
+{
+    char *psz_tmp;
+    if( l_size>> 30 )
+        asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
+    if( l_size >> 20 )
+        asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
+    else if( l_size >> 10 )
+        asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
+    else
+        asprintf( &psz_tmp, "%ld B", l_size );
+    return psz_tmp;
+}
+
+
+/*
+ * Struct to launch the download in a thread
+ */
+typedef struct
+{
+    VLC_COMMON_MEMBERS
+    update_t *p_update;
+    char *psz_destdir;
+} update_download_thread_t;
+
+void update_DownloadReal( update_download_thread_t *p_udt );
+
+/**
+ * Download the file given in the update_t
+ *
+ * \param p_update structure
+ * \param dir to store the download file
+ * \return nothing
+ */
+void update_Download( update_t *p_update, char *psz_destdir )
+{
+    assert( p_update );
+
+    update_download_thread_t *p_udt = vlc_object_create( p_update->p_libvlc,
+                                                      sizeof( update_download_thread_t ) );
+
+    p_udt->p_update = p_update;
+    p_udt->psz_destdir = STRDUP( psz_destdir );
+
+    vlc_thread_create( p_udt, "download update", update_DownloadReal,
+                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+}
+void update_DownloadReal( update_download_thread_t *p_udt )
+{
+    int i_progress = 0;
+    long int l_size;
+    long int l_downloaded = 0;
+    char *psz_status;
+    char *psz_downloaded;
+    char *psz_size;
+    char *psz_destfile;
+    char *psz_tmpdestfile;
+
+    FILE *p_file = NULL;
+    stream_t *p_stream;
+    void* p_buffer;
+    int i_read;
+
+    update_t *p_update = p_udt->p_update;
+    char *psz_destdir = p_udt->psz_destdir;
+
+    /* Open the stream */
+    p_stream = stream_UrlNew( p_update->p_libvlc, p_update->release.psz_url );
+
+    if( !p_stream )
+    {
+        msg_Err( p_update->p_libvlc, "Failed to open %s for reading", p_update->release.psz_url );
+    }
+    else
+    {
+        /* Get the stream size and open the output file */
+        l_size = stream_Size( p_stream );
+
+        psz_tmpdestfile = strrchr( p_update->release.psz_url, '/' );
+        psz_tmpdestfile++;
+        asprintf( &psz_destfile, "%s%s", psz_destdir, psz_tmpdestfile );
+
+        p_file = utf8_fopen( psz_destfile, "w" );
+        if( !p_file )
+        {
+            msg_Err( p_update->p_libvlc, "Failed to open %s for writing", psz_destfile );
+        }
+        else
+        {
+            /* Create a buffer and fill it with the downloaded file */
+            p_buffer = (void *)malloc( 1 << 10 );
+            if( p_buffer )
+            {
+                psz_size = size_str( l_size );
+                asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",  p_update->release.psz_url, psz_size, 0.0 );
+                i_progress = intf_UserProgress( p_update->p_libvlc, "Downloading ...", psz_status, 0.0, 0 );
+                free( psz_status );
+
+                while( ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
+                         !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                {
+                    fwrite( p_buffer, i_read, 1, p_file );
+
+                    l_downloaded += i_read;
+                    psz_downloaded = size_str( l_downloaded );
+                    asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done", p_update->release.psz_url,
+                              psz_size, psz_downloaded, 100.0*(float)l_downloaded/(float)l_size );
+                    intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 10.0, 0 );
+                    free( psz_downloaded );
+                    free( psz_status );
+                }
+
+                /* If the user cancelled the download */
+                if( !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                {
+                    asprintf( &psz_status, "%s\nDone %s (100.0%%)", p_update->release.psz_url, psz_size );
+                    intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 100.0, 0 );
+                    free( psz_status );
+                }
+                free( p_buffer );
+                free( psz_size );
+            }
+            fclose( p_file );
+            if( intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                remove( psz_destfile );
+        }
+        stream_Delete( p_stream );
+    }
+    free( psz_destdir );
 }
 
 #endif

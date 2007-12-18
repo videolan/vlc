@@ -2114,19 +2114,12 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 #ifdef UPDATE_CHECK
 static void checkUpdates( intf_thread_t *p_intf )
 {
+    /*TODO: - modify this to delete p_update to avoid a memory leak !
+            - complete the function wich is not working obiously !
     update_t *p_u = update_New( p_intf );
-    if( p_u == NULL ) return;
+    var_AddCallback( p_intf->p_libvlc, "update-notify", updatesCallback, p_intf );
 
-    update_Check( p_u );
     msg_rc( "\nChecking for updates" );
-
-    if( update_CompareReleaseToCurrent( p_u ) == UpdateReleaseStatusNewer )
-        msg_rc( "\n+----[ VLC %i.%i.%i%s ] ", p_u->release.i_major,
-                                              p_u->release.i_minor,
-                                              p_u->release.i_revision,
-                                              p_u->release.psz_extra );
-    else
-        msg_rc( "\n+----Last version" );
-    update_Delete( p_u );
+    update_Check( p_u );*/
 }
 #endif
