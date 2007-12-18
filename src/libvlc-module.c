@@ -1906,7 +1906,7 @@ vlc_module_begin();
 #endif
 
     add_bool( "color", VLC_TRUE, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
-    add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
+    add_bool( "advanced", VLC_FALSE, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
         change_need_restart();
     add_bool( "interact", VLC_TRUE, NULL, INTERACTION_TEXT,
@@ -2383,8 +2383,6 @@ vlc_module_begin();
 #define LONGHELP_TEXT \
     N_("print help for VLC and all its modules (can be combined with " \
        "--advanced and --help-verbose)")
-#define ADVANCED_TEXT \
-    N_("print help for the advanced options")
 #define HELP_VERBOSE_TEXT \
     N_("ask for extra verbosity when displaying help")
 #define LIST_TEXT \
@@ -2411,9 +2409,6 @@ vlc_module_begin();
         change_unsaveable();
     add_bool( "longhelp", VLC_FALSE, NULL, LONGHELP_TEXT, "", VLC_FALSE );
         change_short( 'H' );
-        change_internal();
-        change_unsaveable();
-    add_bool( "advanced", VLC_FALSE, NULL, ADVANCED_TEXT, "", VLC_FALSE );
         change_internal();
         change_unsaveable();
     add_bool( "help-verbose", VLC_FALSE, NULL, HELP_VERBOSE_TEXT, "",
