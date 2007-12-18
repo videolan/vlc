@@ -282,8 +282,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
+    move( settings->value( "pos", QPoint( 0, 0 ) ).toPoint() );
+
     resize( settings->value( "size", QSize( 350, 60 ) ).toSize() );
     updateGeometry();
+
     settings->endGroup();
 }
 
