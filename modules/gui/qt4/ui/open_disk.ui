@@ -56,7 +56,7 @@
       <item row="3" column="7" >
        <widget class="QPushButton" name="browseDiscButton" >
         <property name="toolTip" >
-         <string>_("Select the device")</string>
+         <string>_("Select the device or the VIDEO_TS folder")</string>
         </property>
         <property name="text" >
          <string>_("Browse...")</string>
@@ -67,6 +67,9 @@
        <widget class="QLabel" name="deviceLabel" >
         <property name="text" >
          <string>_("Disk device")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>deviceCombo</cstring>
         </property>
        </widget>
       </item>
@@ -295,7 +298,6 @@
   <tabstop>audioCDRadioButton</tabstop>
   <tabstop>dvdsimple</tabstop>
   <tabstop>deviceCombo</tabstop>
-  <tabstop>toolButton</tabstop>
   <tabstop>titleSpin</tabstop>
   <tabstop>chapterSpin</tabstop>
   <tabstop>subtitlesSpin</tabstop>
