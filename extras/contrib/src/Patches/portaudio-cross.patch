@@ -1,6 +1,19 @@
---- portaudio/configure.in	2005-12-01 15:07:26.000000000 +0000
-+++ portaudio-new/configure.in	2005-12-09 18:48:43.000000000 +0000
-@@ -75,9 +75,10 @@
+diff -ruN portaudio/Makefile.in portaudio.n/Makefile.in
+--- portaudio/Makefile.in	2007-10-24 17:29:04.000000000 +0200
++++ portaudio.n/Makefile.in	2007-12-18 05:43:27.000000000 +0100
+@@ -120,7 +120,7 @@
+ SUBDIRS =
+ @ENABLE_CXX_TRUE@SUBDIRS += bindings/cpp
+ 
+-all: lib/$(PALIB) all-recursive tests
++all: lib/$(PALIB) all-recursive
+ 
+ tests: bin-stamp $(TESTS)
+ 
+diff -ruN portaudio/configure.in portaudio.n/configure.in
+--- portaudio/configure.in	2007-11-13 22:22:56.000000000 +0100
++++ portaudio.n/configure.in	2007-12-18 05:43:14.000000000 +0100
+@@ -95,9 +95,10 @@
  
  dnl sizeof checks: we will need a 16-bit and a 32-bit type
  
@@ -12,5 +25,5 @@
 +dnl AC_CHECK_SIZEOF(int)
 +dnl AC_CHECK_SIZEOF(long)
  
- dnl extra variables
- AC_SUBST(OTHER_OBJS)
+ save_LIBS="${LIBS}"
+ AC_CHECK_LIB(rt, clock_gettime, [rt_libs=" -lrt"])
