@@ -173,7 +173,7 @@ struct module_config_t
 };
 #endif
 
-extern const module_config_t libvlc_config[];
+extern module_config_t libvlc_config[];
 extern const size_t libvlc_config_count;
 
 #endif

@@ -2384,7 +2384,7 @@ vlc_module_begin();
     set_capability( "main", 100 );
 vlc_module_end();
 
-const module_config_t libvlc_config[] =
+module_config_t libvlc_config[] =
 {
     {
         .i_type   = CONFIG_ITEM_BOOL,
