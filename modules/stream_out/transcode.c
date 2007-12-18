@@ -373,8 +373,8 @@ struct sout_stream_sys_t
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
     char            *psz_aenc;
     config_chain_t  *p_audio_cfg;
-    int             i_sample_rate;
-    int             i_channels;
+    uint32_t        i_sample_rate;
+    uint32_t        i_channels;
     int             i_abitrate;
     char            *psz_afilters[TRANSCODE_FILTERS];
     config_chain_t  *p_afilters_cfg[TRANSCODE_FILTERS];
@@ -962,7 +962,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         /* Complete destination format */
         id->p_encoder->fmt_out.i_codec = p_sys->i_acodec;
         id->p_encoder->fmt_out.audio.i_rate = p_sys->i_sample_rate > 0 ?
-            p_sys->i_sample_rate : (int)p_fmt->audio.i_rate;
+            p_sys->i_sample_rate : p_fmt->audio.i_rate;
         id->p_encoder->fmt_out.i_bitrate = p_sys->i_abitrate;
         id->p_encoder->fmt_out.audio.i_bitspersample =
             p_fmt->audio.i_bitspersample;
