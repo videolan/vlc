@@ -153,6 +153,16 @@ VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_descriptor_new(
                                    libvlc_exception_t *p_e );
 
 /**
+ * Create a media descriptor as an empty node with the passed name.
+ * \param p_instance the instance
+ * \param psz_name the name of the node
+ */
+VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_descriptor_new_as_node(
+                                   libvlc_instance_t *p_instance,
+                                   const char * psz_name,
+                                   libvlc_exception_t *p_e );
+
+/**
  * Add an option to the media descriptor,
  * This option will be used to determine how the media_instance will
  * read the media_descriptor. This allow to use VLC advanced

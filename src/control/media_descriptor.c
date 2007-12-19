@@ -299,6 +299,33 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
 }
 
 /**************************************************************************
+ * Create a new media descriptor object
+ **************************************************************************/
+libvlc_media_descriptor_t * libvlc_media_descriptor_new_as_node(
+                                   libvlc_instance_t *p_instance,
+                                   const char * psz_name,
+                                   libvlc_exception_t *p_e )
+{
+    input_item_t * p_input_item;
+    libvlc_media_descriptor_t * p_md;
+
+    p_input_item = input_ItemNew( p_instance->p_libvlc_int, "vlc:nop", psz_name );
+
+    if (!p_input_item)
+    {
+        libvlc_exception_raise( p_e, "Can't create md's input_item" );
+        return NULL;
+    }
+
+    p_md = libvlc_media_descriptor_new_from_input_item( p_instance,
+                p_input_item, p_e );
+
+    p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
+
+    return p_md;
+}
+
+/**************************************************************************
  * Add an option to the media descriptor,
  * that will be used to determine how the media_instance will read the
  * media_descriptor. This allow to use VLC advanced reading/streaming
