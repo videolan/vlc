@@ -155,20 +155,23 @@ public:
     virtual void clear() ;
 private:
     Ui::OpenCapture ui;
-    QRadioButton *dvbs, *dvbt, *dvbc;
+#ifdef WIN32
     QRadioButton *bdas, *bdat, *bdac;
+    QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
+    QLabel *bdaSrateLabel, *bdaBandLabel;
+    QComboBox *bdaBandBox;
+#else
+    QRadioButton *dvbs, *dvbt, *dvbc;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
     QLineEdit *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox, *bdaBandBox;
+    QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
-    QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
-
-    QLabel *bdaSrateLabel, *bdaBandLabel;
+#endif
 
 public slots:
     virtual void updateMRL();
