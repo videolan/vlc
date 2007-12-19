@@ -841,12 +841,12 @@ void MainInterface::setRate( int rate )
 
 void MainInterface::updateOnTimer()
 {
-#if 0
     if( intf_ShouldDie( p_intf ) )
     {
         QApplication::closeAllWindows();
         QApplication::quit();
     }
+#if 0
     if( need_components_update )
     {
         doComponentsUpdate();
