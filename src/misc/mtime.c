@@ -67,7 +67,11 @@ struct timespec
 int nanosleep(struct timespec *, struct timespec *);
 #endif
 
-#if (!defined (_POSIX_CLOCK_SELECTION)) || (_POSIX_CLOCK_SELECTION < 0)
+#if !defined (_POSIX_CLOCK_SELECTION)
+#  define _POSIX_CLOCK_SELECTION (-1)
+#endif
+
+# if (_POSIX_CLOCK_SELECTION < 0)
 /*
  * We cannot use the monotonic clock is clock selection is not available,
  * as it would screw vlc_cond_timedwait() completely. Instead, we have to
