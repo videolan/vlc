@@ -76,9 +76,9 @@ int nanosleep(struct timespec *, struct timespec *);
  */
 #  undef CLOCK_MONOTONIC
 #  define CLOCK_MONOTONIC CLOCK_REALTIME
-#  ifndef HAVE_CLOCK_NANOSLEEP
-#   error We have quite a situation here! Fix me if it ever happens.
-#  endif
+#elif !defined (HAVE_CLOCK_NANOSLEEP)
+/* Clock selection without clock in the first place, I don't think so. */
+#  error We have quite a situation here! Fix me if it ever happens.
 #endif
 
 /**
