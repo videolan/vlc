@@ -183,6 +183,8 @@ case "${host_os}" in
     then
         echo ""
         echo "Building with Mac OS X defaults:"
+        enable_macosx="yes"
+        echo "  Assuming --enable-macosx"
         enable_faad="yes"
         echo "  Assuming --enable-faad"
         enable_flac="yes"
@@ -5333,32 +5335,27 @@ AC_ARG_ENABLE(opie,
    fi])
 
 dnl
-dnl  MacOS X module
+dnl  MacOS X video output/gui modules
 dnl
-ORIGCFLAGS=$CFLAGS
-CFLAGS="$CFLAGS -x objective-c"
-AC_ARG_ENABLE(macosx,
-  [  --enable-macosx         MacOS X support (default enabled on MacOS X)],
-  [if test "${enable_macosx}" = "yes"
-   then
-     VLC_ADD_PLUGINS([access_eyetv])
-     VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
-     VLC_ADD_LDFLAGS([minimal_macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL])
-     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit,-framework,WebKit])
-     VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
-     VLC_ADD_OBJCFLAGS( [minimal_macosx],[-fobjc-exceptions] )
-   fi],
-  [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
-    [VLC_ADD_PLUGINS([access_eyetv])
-     VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
-     VLC_ADD_BUILTINS([macosx])
-     VLC_ADD_BUILTINS([minimal_macosx])
-     VLC_ADD_LDFLAGS([minimal_macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL])
-     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit,-framework,WebKit])
-     VLC_ADD_OBJCFLAGS([macosx],[-fobjc-exceptions])
-     VLC_ADD_OBJCFLAGS([minimal_macosx],[-fobjc-exceptions])
-    ])])
-CFLAGS=$ORIGCFLAGS
+AC_ARG_ENABLE(macosx, [--enable-macosx MacOS X support (default enabled on MacOS X)])
+if test "x${enable_macosx}" = "xyes"
+then
+  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,CoreFoundation])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
+  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
+  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QuickTime])
+  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QTKit])
+  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
+  VLC_ADD_LDFLAGS([opengllayer],                      [-Wl,-framework,QuartzCore])
+
+  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer], [-fobjc-exceptions] )
+
+  VLC_ADD_PLUGINS([access_eyetv])
+  VLC_ADD_BUILTINS([macosx minimal_macosx opengllayer])
+fi
 
 dnl
 dnl  QNX RTOS module
