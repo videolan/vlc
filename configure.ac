@@ -5350,11 +5350,15 @@ then
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QTKit])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_LDFLAGS([opengllayer],                      [-Wl,-framework,QuartzCore])
-
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer], [-fobjc-exceptions] )
 
   VLC_ADD_PLUGINS([access_eyetv])
-  VLC_ADD_BUILTINS([macosx minimal_macosx opengllayer])
+  VLC_ADD_BUILTINS([macosx minimal_macosx])
+ 
+  ORIGCFLAGS=$CFLAGS
+  CFLAGS="$CFLAGS -x objective-c"
+  AC_CHECK_HEADER(QuartzCore/CALayer.h, [VLC_ADD_BUILTINS([opengllayer])])
+  CFLAGS=$ORIGCFLAGS
 fi
 
 dnl
