@@ -74,9 +74,13 @@ uninstall_md_listener( libvlc_media_list_view_t * p_mlv,
                        libvlc_media_descriptor_t * p_md)
 {
     libvlc_media_list_t * p_mlist;
+    libvlc_exception_t ignored_exception;
+    libvlc_exception_init( &ignored_exception );
     libvlc_event_detach( p_md->p_event_manager,
                          libvlc_MediaDescriptorSubItemAdded,
-                         media_list_subitem_added, p_mlv, NULL );
+                         media_list_subitem_added, p_mlv, &ignored_exception );
+    if( libvlc_exception_raised( &ignored_exception ) )
+        libvlc_exception_clear( &ignored_exception ); /* We don't care if we encounter an exception */
     if((p_mlist = libvlc_media_descriptor_subitems( p_md, NULL )))
     {
         libvlc_media_list_lock( p_mlist );
