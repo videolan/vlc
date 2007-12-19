@@ -118,7 +118,8 @@ int Demux( demux_t *p_demux )
 
     if( i_ret == VLC_SUCCESS )
         i_ret = parse_playlist_node( p_demux, p_playlist, p_current_input,
-                                     p_xml_reader, "playlist" );
+                                     p_xml_reader, "playlist" )
+                                     ? VLC_SUCCESS : VLC_EGENERIC;
     HANDLE_PLAY_AND_RELEASE;
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
