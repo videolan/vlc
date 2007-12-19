@@ -122,6 +122,8 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  */
 + (id)mediaWithURL:(NSURL *)anURL;
 + (id)mediaWithPath:(NSString *)aPath;
++ (id)mediaAsNodeWithName:(NSString *)aName;
+
 
 /* Initializers */
 /**
@@ -132,6 +134,7 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  * \return A new VLCMedia object, only if there were no errors.
  */
 - (id)initWithPath:(NSString *)aPath;
+- (id)initAsNodeWithName:(NSString *)aName;
 
 /**
  * Returns an NSComparisonResult value that indicates the lexical ordering of 

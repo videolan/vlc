@@ -102,12 +102,43 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 @implementation VLCMedia
 + (id)mediaWithPath:(NSString *)aPath;
 {
-    return [[[VLCMedia alloc] initWithPath:(id)aPath] autorelease];
+    return [[[VLCMedia alloc] initWithPath:aPath] autorelease];
 }
 
 + (id)mediaWithURL:(NSURL *)aURL;
 {
-    return [[[VLCMedia alloc] initWithPath:(id)[aURL path]] autorelease];
+    return [[[VLCMedia alloc] initWithPath:[aURL path]] autorelease];
+}
+
++ (id)mediaAsNodeWithName:(NSString *)aName;
+{
+    return [[[VLCMedia alloc] initAsNodeWithName:aName] autorelease];
+}
+
+- (id)initAsNodeWithName:(NSString *)aName
+{        
+    if (self = [super init])
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        
+        p_md = libvlc_media_descriptor_new_as_node(
+                                [VLCLibrary sharedInstance],
+                                [aName UTF8String],
+                                &ex);
+        quit_on_exception(&ex);
+        
+        url = [aName copy];
+        delegate = nil;
+        metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
+        
+        // This value is set whenever the demuxer figures out what the length is.
+        // TODO: Easy way to tell the length of the movie without having to instiate the demuxer.  Maybe cached info?
+        length = nil;
+
+        [self initInternalMediaDescriptor];
+    }
+    return self;
 }
 
 - (id)initWithPath:(NSString *)aPath
@@ -172,7 +203,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 - (NSString *)description
 {
     NSString *result = [metaDictionary objectForKey:VLCMetaInformationTitle];
-    return (result ? result : url);
+    return [NSString stringWithFormat:@"<%@ %p> %@", [self className], self, (result ? result : url)];
 }
 
 - (NSComparisonResult)compare:(VLCMedia *)media
@@ -366,6 +397,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     quit_on_exception( &ex );
     
     libvlc_media_list_t *p_mlist = libvlc_media_descriptor_subitems( p_md, NULL );
+
     if (!p_mlist)
         subitems = nil;
     else
