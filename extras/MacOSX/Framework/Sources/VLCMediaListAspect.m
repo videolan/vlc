@@ -38,15 +38,40 @@
 - (void)mediaListViewItemRemoved:(NSNumber *)index;
 @end
 
+@implementation VLCMediaListAspectNode
+@synthesize media;
+@synthesize children;
+
+- (BOOL)isLeaf
+{
+    return self.children == NULL;
+}
+
+-(void)dealloc
+{
+    [self.children release];
+    [super dealloc];
+}
+@end
+
 @implementation VLCMediaListAspect (KeyValueCodingCompliance)
 /* For the @"media" key */
 - (int) countOfMedia
 {
-    return [cachedMedia count];
+    return [cachedNode count];
 }
 - (id) objectInMediaAtIndex:(int)i
 {
-    return [cachedMedia objectAtIndex:i];
+    return [[cachedNode objectAtIndex:i] media];
+}
+/* For the @"node" key */
+- (int) countOfNode
+{
+    return [cachedNode count];
+}
+- (id) objectInNodeAtIndex:(int)i
+{
+    return [cachedNode objectAtIndex:i];
 }
 @end
 
@@ -79,7 +104,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 {
     // Release allocated memory
     libvlc_media_list_view_release(p_mlv);
-    [cachedMedia release];
+    [cachedNode release];
     [super dealloc];
 }
 - (VLCMedia *)mediaAtIndex:(int)index
@@ -92,6 +117,28 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
     // new cocoa object representation of the media descriptor.
     return [VLCMedia mediaWithLibVLCMediaDescriptor:p_md];
+}
+
+- (VLCMediaListAspect *)childrenAtIndex:(int)index
+{
+    libvlc_exception_t p_e;
+    libvlc_exception_init( &p_e );
+    libvlc_media_list_view_t *p_sub_mlv = libvlc_media_list_view_children_at_index( p_mlv, index, &p_e );
+    quit_on_exception( &p_e );
+
+    if( !p_sub_mlv )
+        return nil;
+
+    // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
+    // new cocoa object representation of the media descriptor.
+    return [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_sub_mlv];
+}
+
+- (VLCMediaListAspectNode *)nodeAtIndex:(int)index
+{
+    VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
+    [node setMedia:[self mediaAtIndex: index]];
+    return node;
 }
 
 - (int)count
@@ -117,17 +164,22 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     {
         p_mlv = p_new_mlv;
         libvlc_media_list_view_retain(p_mlv);
-        //libvlc_media_list_lock(p_mlist);
-        cachedMedia = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
+        //libvlc_media_list_lock(p_mlv->p_mlist);
+        cachedNode = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
         int i, count = libvlc_media_list_view_count(p_mlv, NULL);
         for( i = 0; i < count; i++ )
         {
             libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index(p_mlv, i, NULL);
-            [cachedMedia addObject:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
+            libvlc_media_list_view_t * p_sub_mlv = libvlc_media_list_view_children_at_index(p_mlv, i, NULL);
+            VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
+            [node setMedia:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
+            [node setChildren: p_sub_mlv ? [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_sub_mlv] : nil];
+            [cachedNode addObject:node];
             libvlc_media_descriptor_release(p_md);
+            if( p_sub_mlv ) libvlc_media_list_view_release(p_sub_mlv);
         }
         [self initInternalMediaListView];
-        //libvlc_media_list_unlock(p_mlist);
+        //libvlc_media_list_unlock(p_mlv->p_mlist);
     }
     return self;
 }
@@ -157,15 +209,23 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     int index = [[args objectForKey:@"index"] intValue];
     VLCMedia * media = [args objectForKey:@"media"];
 
+    VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
+    [node setMedia:media];
+    [node setChildren:[self childrenAtIndex:index]];
+
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
-    [cachedMedia insertObject:media atIndex:index];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"node"];
+    [cachedNode insertObject:node atIndex:index];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"node"];
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
 }
 
 - (void)mediaListViewItemRemoved:(NSNumber *)index
 {
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
-    [cachedMedia removeObjectAtIndex:[index intValue]];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"node"];
+    [cachedNode removeObjectAtIndex:[index intValue]];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"node"];
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
 }
 @end

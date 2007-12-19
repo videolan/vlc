@@ -27,12 +27,23 @@
 @class VLCMedia;
 @class VLCMediaList;
 
+@interface VLCMediaListAspectNode : NSObject
+{
+    VLCMedia * media;
+    VLCMediaListAspect * children;
+}
+@property (retain) VLCMedia * media;
+@property (retain) VLCMediaListAspect * children;
+- (BOOL)isLeaf;
+@end
+
 @interface VLCMediaListAspect : NSObject
 {
     void * p_mlv;                //< Internal instance of media list view
-    NSMutableArray * cachedMedia;
+    NSMutableArray * cachedNode;
 }
 
 - (VLCMedia *)mediaAtIndex:(int)index;
+- (VLCMediaListAspectNode *)nodeAtIndex:(int)index;
 - (int)count;
 @end
