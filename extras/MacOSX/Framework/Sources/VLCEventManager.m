@@ -98,9 +98,9 @@ static void * EventDispatcherMainLoop(void * user_data)
         pthread_mutex_unlock( [self queueLock] );
         
         if( message->type == VLCNotification )
-            [self performSelectorOnMainThread:@selector(callDelegateOfObjectAndSendNotificationWithArgs:) withObject:[dataMessage retain] waitUntilDone: NO];
+            [self performSelectorOnMainThread:@selector(callDelegateOfObjectAndSendNotificationWithArgs:) withObject:[dataMessage retain]  /* released in the call */ waitUntilDone: NO];
         else
-            [self performSelectorOnMainThread:@selector(callObjectMethodWithArgs:) withObject:[dataMessage retain] waitUntilDone: NO];
+            [self performSelectorOnMainThread:@selector(callObjectMethodWithArgs:) withObject:[dataMessage retain]  /* released in the call */ waitUntilDone: NO];
 
         pthread_mutex_lock( [self queueLock] );
         [[self messageQueue] removeLastObject];
@@ -155,7 +155,13 @@ static void * EventDispatcherMainLoop(void * user_data)
         [aNotificationName retain], 
         VLCNotification 
     };
-    
+
+    if([NSThread isMainThread])
+    {
+        [self callDelegateOfObjectAndSendNotificationWithArgs:[[NSData dataWithBytes:&message length:sizeof(struct message)] retain] /* released in the call */];
+        return;
+    }
+
     pthread_mutex_lock( [self queueLock] );
     [[self messageQueue] insertObject:[NSData dataWithBytes:&message length:sizeof(struct message)] atIndex:0];
     pthread_cond_signal( [self signalData] );
@@ -167,7 +173,6 @@ static void * EventDispatcherMainLoop(void * user_data)
 - (void)callOnMainThreadObject:(id)aTarget withMethod:(SEL)aSelector withArgumentAsObject: (id)arg
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
     struct message message = 
     { 
         [aTarget retain], 
@@ -175,6 +180,12 @@ static void * EventDispatcherMainLoop(void * user_data)
         [arg retain], 
         VLCObjectMethodWithObjectArg 
     };
+
+    if([NSThread isMainThread])
+    {
+        [self callObjectMethodWithArgs:[[NSData dataWithBytes:&message length:sizeof(struct message)] retain] /* released in the call */];
+        return;
+    }
     
     pthread_mutex_lock( [self queueLock] );
     [[self messageQueue] insertObject:[NSData dataWithBytes:&message length:sizeof(struct message)] atIndex:0];
