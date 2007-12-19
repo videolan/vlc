@@ -127,7 +127,7 @@ static int Demux( demux_t *p_demux )
     }
 
     HANDLE_PLAY_AND_RELEASE;
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 static struct

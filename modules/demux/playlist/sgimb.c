@@ -377,7 +377,7 @@ static int Demux ( demux_t *p_demux )
     if( !p_child )
     {
         msg_Err( p_demux, "A valid playlistitem could not be created" );
-        return VLC_EGENERIC;
+        return -1;
     }
 
     input_ItemCopyOptions( p_current_input, p_child );
@@ -406,7 +406,7 @@ static int Demux ( demux_t *p_demux )
 
     input_ItemAddSubItem( p_current_input, p_child );
     HANDLE_PLAY_AND_RELEASE
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

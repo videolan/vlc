@@ -70,7 +70,7 @@ void E_(Close_xspf)( vlc_object_t *p_this )
  */
 int Demux( demux_t *p_demux )
 {
-    int i_ret = VLC_SUCCESS;
+    int i_ret = 1;
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
@@ -83,43 +83,44 @@ int Demux( demux_t *p_demux )
     /* create new xml parser from stream */
     p_xml = xml_Create( p_demux );
     if( !p_xml )
-        i_ret = VLC_ENOMOD;
+        i_ret = -1;
     else
     {
         p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
         if( !p_xml_reader )
-            i_ret = VLC_EGENERIC;
+            i_ret = -1;
     }
 
     /* locating the root node */
-    if( i_ret == VLC_SUCCESS )
+    if( i_ret == 1 )
     {
         do
         {
             if( xml_ReaderRead( p_xml_reader ) != 1 )
             {
                 msg_Err( p_demux, "can't read xml stream" );
-                i_ret = VLC_EGENERIC;
+                i_ret = -1;
             }
         } while( i_ret == VLC_SUCCESS &&
                  xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
     }
     /* checking root node name */
-    if( i_ret == VLC_SUCCESS )
+    if( i_ret == 1 )
     {
         psz_name = xml_ReaderName( p_xml_reader );
         if( !psz_name || strcmp( psz_name, "playlist" ) )
         {
             msg_Err( p_demux, "invalid root node name: %s", psz_name );
-            i_ret = VLC_EGENERIC;
+            i_ret = -1;
         }
         FREE_NAME();
     }
 
-    if( i_ret == VLC_SUCCESS )
+    if( i_ret == 1 )
         i_ret = parse_playlist_node( p_demux, p_playlist, p_current_input,
-                                     p_xml_reader, "playlist" )
-                                     ? VLC_SUCCESS : VLC_EGENERIC;
+                                     p_xml_reader, "playlist" ) ? 0 : -1;
+
+
     HANDLE_PLAY_AND_RELEASE;
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );

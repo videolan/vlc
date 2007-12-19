@@ -147,7 +147,7 @@ static int Demux( demux_t *p_demux )
 
     HANDLE_PLAY_AND_RELEASE;
     p_sys->p_playlist = NULL;
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 #define GET_VALUE( a ) \

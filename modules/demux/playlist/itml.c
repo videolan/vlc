@@ -120,7 +120,7 @@ int Demux( demux_t *p_demux )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 /** \brief dummy function for demux callback interface */

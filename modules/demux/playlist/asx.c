@@ -251,7 +251,7 @@ static int Demux( demux_t *p_demux )
             p_sys->i_data_len += 1024;
             p_sys->psz_data = realloc( p_sys->psz_data, p_sys->i_data_len * sizeof( char * ) +1 );
         }
-        if( p_sys->i_data_len <= 0 ) return VLC_EGENERIC;
+        if( p_sys->i_data_len <= 0 ) return -1;
     }
 
     psz_parse = p_sys->psz_data;
@@ -688,7 +688,7 @@ static int Demux( demux_t *p_demux )
 #endif
     }
     HANDLE_PLAY_AND_RELEASE;
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

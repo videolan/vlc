@@ -375,7 +375,7 @@ static int Demux( demux_t *p_demux )
     free( psz_src );
     free( psz_mimetype );
 
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )

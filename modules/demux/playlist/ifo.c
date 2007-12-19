@@ -57,7 +57,7 @@ int E_(Import_IFO)( vlc_object_t *p_this )
         const byte_t *p_peek;
         i_peek = stream_Peek( p_demux->s, &p_peek, 8 );
 
-        if( strncmp( p_peek, "DVDVIDEO", 8 ) )
+        if( i_peek != 8 || memcmp( p_peek, "DVDVIDEO", 8 ) )
             return VLC_EGENERIC;
     }
     else
@@ -95,7 +95,7 @@ static int Demux( demux_t *p_demux )
 
     HANDLE_PLAY_AND_RELEASE;
 
-    return -1; /* Needed for correct operation of go back */
+    return 0; /* Needed for correct operation of go back */
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
