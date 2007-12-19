@@ -1,6 +1,6 @@
 Index: libavcodec/i386/motion_est_mmx.c
 ===================================================================
---- libavcodec/i386/motion_est_mmx.c	(revision 10865)
+--- libavcodec/i386/motion_est_mmx.c	(revision 11270)
 +++ libavcodec/i386/motion_est_mmx.c	(working copy)
 @@ -167,7 +167,7 @@
  static inline void sad8_4_mmx2(uint8_t *blk1, uint8_t *blk2, int stride, int h)
@@ -40,7 +40,7 @@ Index: libavcodec/i386/motion_est_mmx.c
  
 Index: libavcodec/i386/dsputil_h264_template_mmx.c
 ===================================================================
---- libavcodec/i386/dsputil_h264_template_mmx.c	(revision 10865)
+--- libavcodec/i386/dsputil_h264_template_mmx.c	(revision 11270)
 +++ libavcodec/i386/dsputil_h264_template_mmx.c	(working copy)
 @@ -188,8 +188,8 @@
          "pxor   %%mm7, %%mm7        \n\t"
@@ -64,9 +64,9 @@ Index: libavcodec/i386/dsputil_h264_template_mmx.c
  
 Index: libavcodec/i386/dsputil_mmx.c
 ===================================================================
---- libavcodec/i386/dsputil_mmx.c	(revision 10865)
+--- libavcodec/i386/dsputil_mmx.c	(revision 11270)
 +++ libavcodec/i386/dsputil_mmx.c	(working copy)
-@@ -1917,7 +1917,7 @@
+@@ -1920,7 +1920,7 @@
  
  #define QPEL_V_LOW(m3,m4,m5,m6, pw_20, pw_3, rnd, in0, in1, in2, in7, out, OP)\
          "paddw " #m4 ", " #m3 "           \n\t" /* x1 */\
@@ -75,7 +75,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "pmullw " #m3 ", %%mm4            \n\t" /* 20x1 */\
          "movq "#in7", " #m3 "             \n\t" /* d */\
          "movq "#in0", %%mm5               \n\t" /* D */\
-@@ -1929,7 +1929,7 @@
+@@ -1932,7 +1932,7 @@
          "paddw " #m5 ", %%mm6             \n\t" /* x2 */\
          "paddw %%mm6, %%mm6               \n\t" /* 2x2 */\
          "psubw %%mm6, %%mm5               \n\t" /* -2x2 + x3 */\
@@ -84,7 +84,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "paddw " #rnd ", %%mm4            \n\t" /* x2 */\
          "paddw %%mm4, %%mm5               \n\t" /* 20x1 - 6x2 + 3x3 - x4 */\
          "psraw $5, %%mm5                  \n\t"\
-@@ -1963,10 +1963,10 @@
+@@ -1966,10 +1966,10 @@
          "paddw %%mm5, %%mm5               \n\t" /* 2b */\
          "psubw %%mm5, %%mm6               \n\t" /* c - 2b */\
          "pshufw $0x06, %%mm0, %%mm5       \n\t" /* 0C0B0A0A */\
@@ -97,7 +97,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "psubw %%mm5, %%mm0               \n\t" /* 20a - d */\
          "paddw %6, %%mm6                  \n\t"\
          "paddw %%mm6, %%mm0               \n\t" /* 20a - 6b + 3c - d */\
-@@ -1989,10 +1989,10 @@
+@@ -1992,10 +1992,10 @@
          "psrlq $24, %%mm6                 \n\t" /* IJKLM000 */\
          "punpcklbw %%mm7, %%mm2           \n\t" /* 0F0G0H0I */\
          "punpcklbw %%mm7, %%mm6           \n\t" /* 0I0J0K0L */\
@@ -110,7 +110,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "psubw %%mm4, %%mm3               \n\t" /* - 6b +3c - d */\
          "paddw %6, %%mm1                  \n\t"\
          "paddw %%mm1, %%mm3               \n\t" /* 20a - 6b +3c - d */\
-@@ -2015,7 +2015,7 @@
+@@ -2018,7 +2018,7 @@
          "psubw %%mm5, %%mm0               \n\t" /* c - 2b */\
          "movq %%mm3, %%mm5                \n\t" /* JKLMNOPQ */\
          "psrlq $24, %%mm3                 \n\t" /* MNOPQ000 */\
@@ -119,7 +119,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "punpcklbw %%mm7, %%mm3           \n\t" /* 0M0N0O0P */\
          "paddw %%mm3, %%mm2               \n\t" /* d */\
          "psubw %%mm2, %%mm0               \n\t" /* -6b + 3c - d */\
-@@ -2023,7 +2023,7 @@
+@@ -2026,7 +2026,7 @@
          "punpcklbw %%mm7, %%mm2           \n\t" /* 0J0K0L0M */\
          "punpckhbw %%mm7, %%mm5           \n\t" /* 0N0O0P0Q */\
          "paddw %%mm2, %%mm6               \n\t" /* a */\
@@ -128,7 +128,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "paddw %6, %%mm0                  \n\t"\
          "paddw %%mm6, %%mm0               \n\t" /* 20a - 6b + 3c - d */\
          "psraw $5, %%mm0                  \n\t"\
-@@ -2038,8 +2038,8 @@
+@@ -2041,8 +2041,8 @@
          "paddw %%mm2, %%mm5               \n\t" /* d */\
          "paddw %%mm6, %%mm6               \n\t" /* 2b */\
          "psubw %%mm6, %%mm4               \n\t" /* c - 2b */\
@@ -139,7 +139,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "psubw %%mm5, %%mm3               \n\t" /* -6b + 3c - d */\
          "paddw %6, %%mm4                  \n\t"\
          "paddw %%mm3, %%mm4               \n\t" /* 20a - 6b + 3c - d */\
-@@ -2052,7 +2052,9 @@
+@@ -2055,7 +2055,9 @@
          "decl %2                          \n\t"\
          " jnz 1b                          \n\t"\
          : "+a"(src), "+c"(dst), "+m"(h)\
@@ -150,7 +150,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          : "memory"\
      );\
  }\
-@@ -2130,10 +2132,10 @@
+@@ -2133,10 +2135,10 @@
          "paddw %%mm5, %%mm5               \n\t" /* 2b */\
          "psubw %%mm5, %%mm6               \n\t" /* c - 2b */\
          "pshufw $0x06, %%mm0, %%mm5       \n\t" /* 0C0B0A0A */\
@@ -163,7 +163,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "psubw %%mm5, %%mm0               \n\t" /* 20a - d */\
          "paddw %6, %%mm6                  \n\t"\
          "paddw %%mm6, %%mm0               \n\t" /* 20a - 6b + 3c - d */\
-@@ -2151,8 +2153,8 @@
+@@ -2154,8 +2156,8 @@
          "paddw %%mm5, %%mm4               \n\t" /* d */\
          "paddw %%mm2, %%mm2               \n\t" /* 2b */\
          "psubw %%mm2, %%mm3               \n\t" /* c - 2b */\
@@ -174,7 +174,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          "psubw %%mm4, %%mm3               \n\t" /* -6b + 3c - d */\
          "paddw %6, %%mm1                  \n\t"\
          "paddw %%mm1, %%mm3               \n\t" /* 20a - 6b + 3c - d */\
-@@ -2165,7 +2167,9 @@
+@@ -2168,7 +2170,9 @@
          "decl %2                          \n\t"\
          " jnz 1b                          \n\t"\
          : "+a"(src), "+c"(dst), "+m"(h)\
@@ -185,7 +185,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          : "memory"\
      );\
  }\
-@@ -2244,31 +2248,31 @@
+@@ -2247,31 +2251,31 @@
          "movq 8(%0), %%mm1              \n\t"\
          "movq 16(%0), %%mm2             \n\t"\
          "movq 24(%0), %%mm3             \n\t"\
@@ -233,7 +233,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          \
          "add $136, %0                   \n\t"\
          "add %6, %1                     \n\t"\
-@@ -2276,7 +2280,9 @@
+@@ -2279,7 +2283,9 @@
          " jnz 1b                        \n\t"\
          \
          : "+r"(temp_ptr), "+r"(dst), "+g"(count)\
@@ -244,7 +244,7 @@ Index: libavcodec/i386/dsputil_mmx.c
          :"memory"\
      );\
  }\
-@@ -2316,19 +2322,19 @@
+@@ -2319,19 +2325,19 @@
          "movq 8(%0), %%mm1              \n\t"\
          "movq 16(%0), %%mm2             \n\t"\
          "movq 24(%0), %%mm3             \n\t"\
@@ -272,7 +272,7 @@ Index: libavcodec/i386/dsputil_mmx.c
                  \
          "add $72, %0                    \n\t"\
          "add %6, %1                     \n\t"\
-@@ -2336,7 +2342,9 @@
+@@ -2339,7 +2345,9 @@
          " jnz 1b                        \n\t"\
           \
          : "+r"(temp_ptr), "+r"(dst), "+g"(count)\
@@ -283,43 +283,9 @@ Index: libavcodec/i386/dsputil_mmx.c
          : "memory"\
     );\
  }\
-@@ -2967,7 +2975,6 @@
-     double c = 2.0 / (len-1.0);
-     int n2 = len>>1;
-     long i = -n2*sizeof(int32_t);
--    long j =  n2*sizeof(int32_t);
-     asm volatile(
-         "movsd   %0,     %%xmm7 \n\t"
-         "movapd  %1,     %%xmm6 \n\t"
-@@ -2985,17 +2992,18 @@
-         "movapd   %%xmm6,  %%xmm0   \n\t"\
-         "subpd    %%xmm1,  %%xmm0   \n\t"\
-         "pshufd   $0x4e,   %%xmm0, %%xmm1 \n\t"\
--        "cvtpi2pd (%4,%0), %%xmm2   \n\t"\
--        "cvtpi2pd (%5,%1), %%xmm3   \n\t"\
-+        "cvtpi2pd (%3,%0), %%xmm2   \n\t"\
-         "mulpd    %%xmm0,  %%xmm2   \n\t"\
-+        "movapd   %%xmm2, (%1,%0,2) \n\t"\
-+        "negl %0\n\t"\
-+        "cvtpi2pd (%4,%0), %%xmm3   \n\t"\
-         "mulpd    %%xmm1,  %%xmm3   \n\t"\
--        "movapd   %%xmm2, (%2,%0,2) \n\t"\
--        MOVPD"    %%xmm3, (%3,%1,2) \n\t"\
-+        MOVPD"    %%xmm3, (%2,%0,2) \n\t"\
-         "subpd    %%xmm5,  %%xmm7   \n\t"\
--        "sub      $8,      %1       \n\t"\
-+        "negl %0\n\t"\
-         "add      $8,      %0       \n\t"\
-         "jl 1b                      \n\t"\
--        :"+&r"(i), "+&r"(j)\
-+        :"+&r"(i)\
-         :"r"(w_data+n2), "r"(w_data+len-2-n2),\
-          "r"(data+n2), "r"(data+len-2-n2)\
-     ); 
- 
 Index: libavcodec/i386/simple_idct_mmx.c
 ===================================================================
---- libavcodec/i386/simple_idct_mmx.c	(revision 10865)
+--- libavcodec/i386/simple_idct_mmx.c	(revision 11270)
 +++ libavcodec/i386/simple_idct_mmx.c	(working copy)
 @@ -363,7 +363,7 @@
          "movq " #src4 ", %%mm1          \n\t" /* R6     R2      r6      r2 */\
@@ -366,10 +332,9 @@ Index: libavcodec/i386/simple_idct_mmx.c
                  : "%eax"
          );
  }
-
 Index: libavcodec/i386/cavsdsp_mmx.c
 ===================================================================
---- libavcodec/i386/cavsdsp_mmx.c	(revision 11171)
+--- libavcodec/i386/cavsdsp_mmx.c	(revision 11270)
 +++ libavcodec/i386/cavsdsp_mmx.c	(working copy)
 @@ -23,9 +23,15 @@
   */
@@ -388,3 +353,82 @@ Index: libavcodec/i386/cavsdsp_mmx.c
  /*****************************************************************************
   *
   * inverse transform
+Index: libavcodec/i386/flacdsp_mmx.c
+===================================================================
+--- libavcodec/i386/flacdsp_mmx.c	(revision 11270)
++++ libavcodec/i386/flacdsp_mmx.c	(working copy)
+@@ -26,7 +26,6 @@
+     double c = 2.0 / (len-1.0);
+     int n2 = len>>1;
+     long i = -n2*sizeof(int32_t);
+-    long j =  n2*sizeof(int32_t);
+     asm volatile(
+         "movsd   %0,     %%xmm7 \n\t"
+         "movapd  %1,     %%xmm6 \n\t"
+@@ -44,17 +43,18 @@
+         "movapd   %%xmm6,  %%xmm0   \n\t"\
+         "subpd    %%xmm1,  %%xmm0   \n\t"\
+         "pshufd   $0x4e,   %%xmm0, %%xmm1 \n\t"\
+-        "cvtpi2pd (%4,%0), %%xmm2   \n\t"\
+-        "cvtpi2pd (%5,%1), %%xmm3   \n\t"\
++        "cvtpi2pd (%3,%0), %%xmm2   \n\t"\
+         "mulpd    %%xmm0,  %%xmm2   \n\t"\
++        "movapd   %%xmm2, (%1,%0,2) \n\t"\
++        "negl %0\n\t"\
++        "cvtpi2pd (%4,%0), %%xmm3   \n\t"\
+         "mulpd    %%xmm1,  %%xmm3   \n\t"\
+-        "movapd   %%xmm2, (%2,%0,2) \n\t"\
+-        MOVPD"    %%xmm3, (%3,%1,2) \n\t"\
++        MOVPD"    %%xmm3, (%2,%0,2) \n\t"\
+         "subpd    %%xmm5,  %%xmm7   \n\t"\
+-        "sub      $8,      %1       \n\t"\
++        "negl %0\n\t"\
+         "add      $8,      %0       \n\t"\
+         "jl 1b                      \n\t"\
+-        :"+&r"(i), "+&r"(j)\
++        :"+&r"(i)\
+         :"r"(w_data+n2), "r"(w_data+len-2-n2),\
+          "r"(data+n2), "r"(data+len-2-n2)\
+     );
+@@ -85,9 +85,11 @@
+         long i = -len*sizeof(double);
+         if(j == lag-2) {
+             asm volatile(
+-                "movsd     %6,     %%xmm0 \n\t"
+-                "movsd     %6,     %%xmm1 \n\t"
+-                "movsd     %6,     %%xmm2 \n\t"
++                "movsd     %0,     %%xmm0 \n\t"
++                "movsd     %0,     %%xmm1 \n\t"
++                "movsd     %0,     %%xmm2 \n\t"
++                :: "m"(*ff_pd_1) );
++            asm volatile(
+                 "1:                       \n\t"
+                 "movapd   (%4,%0), %%xmm3 \n\t"
+                 "movupd -8(%5,%0), %%xmm4 \n\t"
+@@ -110,12 +112,14 @@
+                 "movsd     %%xmm1, %2     \n\t"
+                 "movsd     %%xmm2, %3     \n\t"
+                 :"+&r"(i), "=m"(autoc[j]), "=m"(autoc[j+1]), "=m"(autoc[j+2])
+-                :"r"(data1+len), "r"(data1+len-j), "m"(*ff_pd_1)
++                :"r"(data1+len), "r"(data1+len-j)
+             );
+         } else {
+             asm volatile(
+-                "movsd     %5,     %%xmm0 \n\t"
+-                "movsd     %5,     %%xmm1 \n\t"
++                "movsd     %0,     %%xmm0 \n\t"
++                "movsd     %0,     %%xmm1 \n\t"
++                :: "m"(*ff_pd_1) );
++            asm volatile(
+                 "1:                       \n\t"
+                 "movapd   (%3,%0), %%xmm3 \n\t"
+                 "movupd -8(%4,%0), %%xmm4 \n\t"
+@@ -132,7 +136,7 @@
+                 "movsd     %%xmm0, %1     \n\t"
+                 "movsd     %%xmm1, %2     \n\t"
+                 :"+&r"(i), "=m"(autoc[j]), "=m"(autoc[j+1])
+-                :"r"(data1+len), "r"(data1+len-j), "m"(*ff_pd_1)
++                :"r"(data1+len), "r"(data1+len-j)
+             );
+         }
+     }
