@@ -1060,56 +1060,72 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         l_size = stream_Size( p_stream );
 
         psz_tmpdestfile = strrchr( p_update->release.psz_url, '/' );
-        psz_tmpdestfile++;
-        asprintf( &psz_destfile, "%s%s", psz_destdir, psz_tmpdestfile );
-
-        p_file = utf8_fopen( psz_destfile, "w" );
-        if( !p_file )
+        if( !psz_tmpdestfile )
         {
-            msg_Err( p_update->p_libvlc, "Failed to open %s for writing", psz_destfile );
+            msg_Err( p_update->p_libvlc, "The URL %s is false formated", p_update->release.psz_url );
+            return;
         }
         else
         {
-            /* Create a buffer and fill it with the downloaded file */
-            p_buffer = (void *)malloc( 1 << 10 );
-            if( p_buffer )
+            psz_tmpdestfile++;
+            if( asprintf( &psz_destfile, "%s%s", psz_destdir, psz_tmpdestfile ) != -1 )
             {
-                psz_size = size_str( l_size );
-                asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",  p_update->release.psz_url, psz_size, 0.0 );
-                i_progress = intf_UserProgress( p_update->p_libvlc, "Downloading ...", psz_status, 0.0, 0 );
-                free( psz_status );
-
-                while( ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
-                         !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                p_file = utf8_fopen( psz_destfile, "w" );
+                if( !p_file )
                 {
-                    fwrite( p_buffer, i_read, 1, p_file );
-
-                    l_downloaded += i_read;
-                    psz_downloaded = size_str( l_downloaded );
-                    asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done", p_update->release.psz_url,
-                              psz_size, psz_downloaded, 100.0*(float)l_downloaded/(float)l_size );
-                    intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 10.0, 0 );
-                    free( psz_downloaded );
-                    free( psz_status );
+                        msg_Err( p_update->p_libvlc, "Failed to open %s for writing", psz_destfile );
                 }
-
-                /* If the user cancelled the download */
-                if( !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                else
                 {
-                    asprintf( &psz_status, "%s\nDone %s (100.0%%)", p_update->release.psz_url, psz_size );
-                    intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 100.0, 0 );
-                    free( psz_status );
+                    /* Create a buffer and fill it with the downloaded file */
+                    p_buffer = (void *)malloc( 1 << 10 );
+                    if( p_buffer )
+                    {
+                        psz_size = size_str( l_size );
+                        if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",  p_update->release.psz_url, psz_size, 0.0 ) != -1 )
+                        {
+                            i_progress = intf_UserProgress( p_update->p_libvlc, "Downloading ...", psz_status, 0.0, 0 );
+                            free( psz_status );
+                        }
+
+                        while( ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
+                                 !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                        {
+                            fwrite( p_buffer, i_read, 1, p_file );
+
+                            l_downloaded += i_read;
+                            psz_downloaded = size_str( l_downloaded );
+                            if( asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done", p_update->release.psz_url,
+                                          psz_size, psz_downloaded, 100.0*(float)l_downloaded/(float)l_size ) != -1 )
+                            {
+                                intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 10.0, 0 );
+                                free( psz_status );
+                            }
+                            free( psz_downloaded );
+                        }
+                        free( p_buffer );
+
+                        /* If the user cancelled the download */
+                        if( !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                        {
+                             if( asprintf( &psz_status, "%s\nDone %s (100.0%%)", p_update->release.psz_url, psz_size ) != -1 )
+                             {
+                                intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 100.0, 0 );
+                                free( psz_status );
+                            }
+                        }
+                        free( psz_size );
+                    }
+                    fclose( p_file );
+                    if( intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                        remove( psz_destfile );
                 }
-                free( p_buffer );
-                free( psz_size );
+                free( psz_destfile );
             }
-            fclose( p_file );
-            if( intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
-                remove( psz_destfile );
         }
-        stream_Delete( p_stream );
     }
     free( psz_destdir );
+    stream_Delete( p_stream );
 }
 
 #endif
