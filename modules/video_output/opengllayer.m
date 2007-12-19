@@ -357,11 +357,11 @@ static int InitTextures( vout_thread_t *p_vout )
            our buffer */
         glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
         glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+#endif
 
         /* Use AGP texturing */
         glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
                          GL_STORAGE_SHARED_APPLE );
-#endif
         /* Call glTexImage2D only once, and use glTexSubImage2D later */
         glTexImage2D( VLCGL_TARGET, 0, 3, p_sys->i_tex_width,
                       p_sys->i_tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
