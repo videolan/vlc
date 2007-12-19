@@ -66,7 +66,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     if(! config_GetInt( p_intf, "qt-adv-options") )
         ui.advancedFrame->hide();
     else
-        ui.advancedCheckBox->setCheckState( Qt::Checked );
+        ui.advancedCheckBox->setChecked( true );
 
     /* Buttons Creation */
     QSizePolicy buttonSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );

@@ -261,9 +261,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                         lastfm_pass_edit );
 
                 if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
-                    ui.lastfm->setCheckState( Qt::Checked );
+                    ui.lastfm->setChecked( true );
                 else
-                    ui.lastfm->setCheckState( Qt::Unchecked );
+                    ui.lastfm->setChecked( false );
                 CONNECT( ui.lastfm, stateChanged( int ), this ,
                         lastfm_Changed( int ) );
             }

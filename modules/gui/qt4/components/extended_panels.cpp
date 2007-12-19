@@ -105,12 +105,12 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
         if( p_obj ) \
         { \
             vlc_object_release( p_obj ); \
-            if( checkbox ) checkbox->setCheckState( Qt::Checked ); \
+            if( checkbox ) checkbox->setChecked( true ); \
             else groupbox->setChecked( true ); \
         } \
         else \
         { \
-            if( checkbox ) checkbox->setCheckState( Qt::Unchecked ); \
+            if( checkbox ) checkbox->setChecked( false ); \
             else groupbox->setChecked( false ); \
         } \
     } \
