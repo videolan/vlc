@@ -1208,6 +1208,7 @@ VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
 #else
 #   define _(String) (String)
 #   define N_(String) (String)
+#   define gettext(String) (String)
 #endif
 
 /*****************************************************************************
