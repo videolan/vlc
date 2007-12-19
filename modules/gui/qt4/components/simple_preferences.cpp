@@ -253,17 +253,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
-            CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
-                         lastfm_user_edit );
-            CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
-                         lastfm_pass_edit );
+            if( module_Exists( p_intf, "Audioscrobbler" ) )
+            {
+                CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
+                        lastfm_user_edit );
+                CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
+                        lastfm_pass_edit );
 
-            if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
-                ui.lastfm->setCheckState( Qt::Checked );
-            else
-                ui.lastfm->setCheckState( Qt::Unchecked );
-            CONNECT( ui.lastfm, stateChanged( int ), this ,
-                    lastfm_Changed( int ) );
+                if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+                    ui.lastfm->setCheckState( Qt::Checked );
+                else
+                    ui.lastfm->setCheckState( Qt::Unchecked );
+                CONNECT( ui.lastfm, stateChanged( int ), this ,
+                        lastfm_Changed( int ) );
+            }
 
             /* Normalizer */
 
