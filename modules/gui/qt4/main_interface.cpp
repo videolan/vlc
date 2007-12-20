@@ -716,6 +716,7 @@ void MainInterface::togglePlaylist()
             msg_Dbg( p_intf, "we don't want the playlist inside");
             dockPL->setFloating( true );
         }
+        dockPL->show();
     }
     else
     {
