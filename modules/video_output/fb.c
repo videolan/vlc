@@ -84,7 +84,7 @@ static void GfxMode        ( int i_tty );
 #define FB_MODE_TEXT N_("Framebuffer resolution to use.")
 #define FB_MODE_LONGTEXT N_( \
     "Select the resolution for the framebuffer. Currently it supports " \
-    "the values 0=QCIF 1=CIF 2=NTSC 3=PAL (default 3=PAL)" )
+    "the values 0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)" )
 
 vlc_module_begin();
     set_shortname( "Framebuffer" );
@@ -97,7 +97,7 @@ vlc_module_begin();
                 VLC_TRUE );
     add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, VLC_TRUE );
-    add_integer( "fb-mode", 3, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
+    add_integer( "fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  VLC_TRUE );
     set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
@@ -131,10 +131,11 @@ struct vout_sys_t
     uint16_t                    *p_palette;              /* original palette */
 
     /* Video information */
-    int i_width;
-    int i_height;
+    uint32_t i_width;
+    uint32_t i_height;
     int i_aspect;
     int i_bytes_per_pixel;
+    vlc_bool_t   b_auto;       /* Automatically adjust video size to fb size */
     vlc_fourcc_t i_chroma;
 
     /* Video memory */
@@ -232,12 +233,13 @@ static int Create( vlc_object_t *p_this )
         psz_aspect = NULL;
     }
 
+    p_sys->b_auto = VLC_FALSE;
     i_mode = var_CreateGetInteger( p_vout, "fb-mode" );
     switch( i_mode )
     {
         case 0: /* QCIF */
             p_sys->i_width  = 176;
-            p_sys->i_height = 144;
+            p_sys->i_height = 144;;
             break;
         case 1: /* CIF */
             p_sys->i_width  = 352;
@@ -248,13 +250,16 @@ static int Create( vlc_object_t *p_this )
             p_sys->i_height = 480;
             break;
         case 3: /* PAL */
-        default:
             p_sys->i_width  = 704;
             p_sys->i_height = 576;
             break;
+        case 4:
+        default:
+            p_sys->b_auto = VLC_TRUE;
+            break;
      }
 
-     /* tty handling */
+    /* tty handling */
     if( p_sys->b_tty )
     {
         GfxMode( p_sys->i_tty );
@@ -394,8 +399,13 @@ static int Init( vout_thread_t *p_vout )
     }
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
-    p_vout->output.i_width  = p_vout->render.i_width  = p_sys->i_width;
-    p_vout->output.i_height = p_vout->render.i_height = p_sys->i_height;
+    if( !p_sys->b_auto )
+    {
+        p_vout->render.i_width = p_sys->i_width;
+        p_vout->render.i_height = p_sys->i_height;
+    }
+    p_vout->output.i_width  = p_sys->i_width;
+    p_vout->output.i_height = p_sys->i_height;
 
     /* Assume we have square pixels */
     if( p_sys->i_aspect < 0 )
@@ -450,9 +460,7 @@ static int Init( vout_thread_t *p_vout )
 
     p_pic->p->i_visible_pitch = p_vout->p_sys->var_info.xres
                                  * p_vout->p_sys->i_bytes_per_pixel;
-
     p_pic->i_planes = 1;
-
     p_pic->i_status = DESTROYED_PICTURE;
     p_pic->i_type   = DIRECT_PICTURE;
 
@@ -649,7 +657,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
             sizeof( struct fb_var_screeninfo ) );
 
     /* Get some info on the framebuffer itself */
-    if( ioctl( p_sys->i_fd, FBIOGET_FSCREENINFO, &fix_info ) == 0 )
+    if( !p_sys->b_auto )
     {
         p_sys->var_info.xres = p_sys->var_info.xres_virtual = p_sys->i_width;
         p_sys->var_info.yres = p_sys->var_info.yres_virtual = p_sys->i_height;
@@ -684,19 +692,28 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    /* FIXME: if the image is full-size, it gets cropped on the left
-     * because of the xres / xres_virtual slight difference */
-    msg_Dbg( p_vout, "%ix%i (virtual %ix%i)",
-             p_sys->var_info.xres, p_sys->var_info.yres,
-             p_sys->var_info.xres_virtual,
-             p_sys->var_info.yres_virtual );
-
     /* If the fb has limitations on mode change,
      * then keep the resolution of the fb */
+    if( (p_sys->i_height != p_sys->var_info.yres) ||
+        (p_sys->i_width != p_sys->var_info.xres) )
+    {
+        p_sys->b_auto = VLC_TRUE;
+        msg_Warn( p_vout,
+                  "using framebuffer native resolution instead of requested (%ix%i)",
+                  p_sys->i_width, p_sys->i_height );
+    }
     p_sys->i_height = p_sys->var_info.yres;
     p_sys->i_width  = p_sys->var_info.xres_virtual
                                ? p_sys->var_info.xres_virtual
                                : p_sys->var_info.xres;
+
+    /* FIXME: if the image is full-size, it gets cropped on the left
+     * because of the xres / xres_virtual slight difference */
+    msg_Dbg( p_vout, "%ix%i (virtual %ix%i) (request %ix%i)",
+             p_sys->var_info.xres, p_sys->var_info.yres,
+             p_sys->var_info.xres_virtual,
+             p_sys->var_info.yres_virtual,
+             p_sys->i_width, p_sys->i_height );
 
     p_sys->p_palette = NULL;
     p_sys->b_pan = ( fix_info.ypanstep || fix_info.ywrapstep );
