@@ -27,6 +27,7 @@
 #include <QSignalMapper>
 #include <QFileDialog>
 
+#include <vlc/vlc.h>
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
 #include "main_interface.hpp"
@@ -126,8 +127,10 @@ void DialogsProvider::customEvent( QEvent *event )
            QVLCMenu::MiscPopupMenu( p_intf ); break;
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
+#ifdef UPDATE_CHECK
         case INTF_DIALOG_UPDATEVLC:
             updateDialog(); break;
+#endif
         case INTF_DIALOG_EXIT:
         default:
            msg_Warn( p_intf, "unimplemented dialog" );
@@ -173,12 +176,12 @@ void DialogsProvider::helpDialog()
     HelpDialog::getInstance( p_intf )->toggleVisible();
 }
 
+#ifdef UPDATE_CHECK
 void DialogsProvider::updateDialog()
 {
-#ifdef UPDATE_CHECK
     UpdateDialog::getInstance( p_intf )->toggleVisible();
-#endif
 }
+#endif
 
 void DialogsProvider::aboutDialog()
 {

@@ -146,7 +146,9 @@ public slots:
     void messagesDialog();
     void vlmDialog();
     void helpDialog();
+#ifdef UPDATE_CHECK
     void updateDialog();
+#endif
     void aboutDialog();
     void gotoTimeDialog();
     void podcastConfigureDialog();
