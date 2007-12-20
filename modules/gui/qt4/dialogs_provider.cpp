@@ -127,6 +127,7 @@ void DialogsProvider::customEvent( QEvent *event )
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
         case INTF_DIALOG_UPDATEVLC:
+            updateDialog(); break;
         case INTF_DIALOG_EXIT:
         default:
            msg_Warn( p_intf, "unimplemented dialog" );
