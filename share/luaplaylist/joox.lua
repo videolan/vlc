@@ -22,7 +22,7 @@
 function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "joox.net" ) or
-            string.match( vlc.path, "dp.ylle.net" )
+            string.match( vlc.path, "/iframe.php%?video=1&" )
 end
 
 -- Parse function.
