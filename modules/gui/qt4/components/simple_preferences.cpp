@@ -181,7 +181,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
 
             CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
-                    snapshotsDirectory, snapshotsDirectoryBrowse );
+                                 snapshotsDirectory, snapshotsDirectoryBrowse );
             CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
             CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
                             snapshotsSequentialNumbering );
@@ -196,8 +196,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
-            /* and hide if necessary */
-
+            /* hide if necessary */
 #ifdef WIN32
             ui.OSSControl->hide();
             ui.alsaControl->hide();
@@ -228,14 +227,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* Audio Output Specifics */
             CONFIG_GENERIC( "aout", Module, NULL, outputModule );
 
-            CONNECT( ui.outputModule, currentIndexChanged( int ), this,
-                             updateAudioOptions( int ) );
+            CONNECT( ui.outputModule, currentIndexChanged( int ),
+                     this, updateAudioOptions( int ) );
 
-        //TODO: use modules_Exists
 #ifndef WIN32
-            CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel, alsaDevice );
-            CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
+            if( module_Exists( p_intf, "alsa" ) )
+            {
+                CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel,
+                                alsaDevice );
+            }
+            if( module_Exists( p_intf, "oss" ) )
+            {
+                CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
                                  OSSBrowse );
+            }
 #else
             CONFIG_GENERIC( "directx-audio-device", IntegerList,
                     ui.DirectXLabel, DirectXDevice );
@@ -253,7 +258,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
-            if( module_Exists( p_intf, "Audioscrobbler" ) )
+            if( module_Exists( p_intf, "audioscrobbler" ) )
             {
                 CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
                         lastfm_user_edit );
@@ -267,6 +272,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 CONNECT( ui.lastfm, stateChanged( int ), this ,
                         lastfm_Changed( int ) );
             }
+            else
+                ui.lastfm->hide();
 
             /* Normalizer */
 
