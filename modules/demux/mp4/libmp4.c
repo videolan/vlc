@@ -2312,7 +2312,7 @@ static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
                 return MP4_ReadBox_sample_tx3g( p_stream, p_box );
             default:
                 msg_Warn( p_stream,
-                          "unknown handler type in stsd (uncompletetly loaded)" );
+                          "unknown handler type in stsd (incompletely loaded)" );
                 return 1;
         }
     }
@@ -2320,11 +2320,11 @@ static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
 unknown:
     if MP4_BOX_TYPE_ASCII()
         msg_Warn( p_stream,
-                "unknown box type %4.4s (uncompletetly loaded)",
+                "unknown box type %4.4s (incompletely loaded)",
                 (char*)&p_box->i_type );
     else
         msg_Warn( p_stream,
-                "unknown box type c%3.3s (uncompletetly loaded)",
+                "unknown box type c%3.3s (incompletely loaded)",
                 (char*)&p_box->i_type+1 );
 
     return 1;
