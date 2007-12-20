@@ -194,7 +194,6 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( ( p_vout->fmt_render.i_width != p_fmt->i_width ) ||
             ( p_vout->fmt_render.i_height != p_fmt->i_height ) ||
-           
             ( p_vout->fmt_render.i_aspect != p_fmt->i_aspect ) ||
             p_vout->b_filter_change )
         {

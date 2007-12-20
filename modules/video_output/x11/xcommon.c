@@ -1519,7 +1519,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 #ifdef MODULE_NAME_IS_xvmc
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
- 
+
 #ifdef HAVE_OSSO
     if ( p_vout->p_sys->p_octx != NULL ) {
         if ( p_vout->p_sys->i_backlight_on_counter == i_backlight_on_interval ) {
@@ -1534,7 +1534,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         }
     }
 #endif
-    
+
     vlc_mutex_unlock( &p_vout->p_sys->lock );
     return 0;
 }

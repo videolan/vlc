@@ -687,7 +687,6 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->i_changes = VOUT_CROP_CHANGE;        //to force change
         p_sys->p_vout->i_alignment = p_vout->i_alignment;    
     }
-    
     return i_ret;
 }
 
