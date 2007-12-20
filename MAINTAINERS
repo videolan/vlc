@@ -21,7 +21,7 @@
 
 * PLAYLIST
 
-  - core support [zorglub]
+  - core support [zorglub] [funman]
 
 * PORTS
 
@@ -43,7 +43,7 @@
   - qt4       : [jb]
   - skins2    : [ipkiss] [asmax]
   - macosx    : [thedj] [bigben] [fkuehne]
-  - lirc, dummy, rc, ncurses : [sam]
+  - lirc, dummy, rc, ncurses : [sam] [funman]
   - familiar  : [jpsaman]
   - http      : [meuuh]
 
@@ -105,3 +105,4 @@
 [stef] = Stéphane Borel
 [thedj] = Derk-Jan Hartman
 [jb] = Jean-Baptiste Kempf
+[funman] = Rafaël Carré
