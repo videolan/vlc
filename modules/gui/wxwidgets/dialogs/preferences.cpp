@@ -512,12 +512,12 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         /* Exclude the main module */
         if( !strcmp( module_GetObjName(p_module), "main" ) )
             continue;
-
+#if 0
         /* Exclude empty plugins (submodules don't have config options, they
          * are stored in the parent module) */
         if( module_IsSubModule(p_module) )
             continue;
-
+#endif
         p_config = module_GetConfig( p_module, &i_confsize );
         for( size_t i = 0; i < i_confsize; i++ )
         {
@@ -580,7 +580,9 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Add the plugin to the tree */
         ConfigTreeData *config_data = new ConfigTreeData;
+#if 0
         config_data->b_submodule = module_IsSubModule(p_module);
+#endif
         config_data->i_type = TYPE_MODULE;
         config_data->i_object_id = config_data->b_submodule ?
             ((vlc_object_t *)p_module)->p_parent->i_object_id :
@@ -928,9 +930,11 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         /* Enumerate config options and add corresponding config boxes
          * (submodules don't have config options, they are stored in the
          *  parent module) */
+#if 0
         if( module_IsSubModule(p_module) )
             p_start = module_GetConfig((module_t *)(((vlc_object_t *)p_module)->p_parent), &i_confsize);
         else
+#endif
             p_start = module_GetConfig(p_module, &i_confsize);
 
         p_item = p_start;
