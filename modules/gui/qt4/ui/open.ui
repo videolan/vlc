@@ -23,21 +23,6 @@
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="spacing" >
-    <number>6</number>
-   </property>
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="Tab" >
      <property name="sizePolicy" >
@@ -73,24 +58,6 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
       <item row="0" column="2" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
@@ -234,16 +201,7 @@
      <property name="spacing" >
       <number>6</number>
      </property>
-     <property name="leftMargin" >
-      <number>0</number>
-     </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
+     <property name="margin" >
       <number>0</number>
      </property>
      <item>
