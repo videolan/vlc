@@ -4,4 +4,5 @@ SOURCES_shout = shout.c
 SOURCES_upnp_cc = upnp_cc.cpp
 SOURCES_upnp_intel = upnp_intel.cpp
 SOURCES_bonjour = bonjour.c
+SOURCES_freebox = freebox.c
 SOURCES_podcast = podcast.c

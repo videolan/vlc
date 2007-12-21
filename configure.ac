@@ -1268,7 +1268,7 @@ AC_LANG_POP(C++)
 
 if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record access_filter_dump])
-  VLC_ADD_PLUGINS([gestures rc telnet hotkeys showintf marq podcast shout sap fake folder])
+  VLC_ADD_PLUGINS([gestures rc telnet hotkeys showintf marq podcast shout sap freebox fake folder])
   VLC_ADD_PLUGINS([rss mosaic wall motiondetect clone crop erase bluescreen alphamask gaussianblur])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga i422_i420])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
