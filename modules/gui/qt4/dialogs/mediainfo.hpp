@@ -70,6 +70,7 @@ private:
     bool mainInput;
     bool stats;
     bool b_cleaned;
+    int i_runs;
 
     QTabWidget *IT;
     InputStatsPanel *ISP;
@@ -85,6 +86,7 @@ public slots:
     void update( input_item_t *, bool, bool );
 
 private slots:
+    void updateOnTimeOut();
     void close();
     void clear();
     void saveMeta();
