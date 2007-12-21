@@ -822,17 +822,18 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
 
     CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
 
-    normalSpeedButton = new QPushButton( "N" );
+    QToolButton *normalSpeedButton = new QToolButton( this );
     normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
-    normalSpeedButton->setFlat( true );
+    normalSpeedButton->setAutoRaise( true );
+    normalSpeedButton->setText( "N" );
     normalSpeedButton->setToolTip( qtr( "Revert to normal play speed" ) );
 
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
 
     QVBoxLayout *speedControlLayout = new QVBoxLayout;
-    speedControlLayout->addWidget(speedSlider);
-    speedControlLayout->addWidget(normalSpeedButton);
-    setLayout(speedControlLayout);
+    speedControlLayout->addWidget( speedSlider );
+    speedControlLayout->addWidget( normalSpeedButton );
+    setLayout( speedControlLayout );
 }
 
 SpeedControlWidget::~SpeedControlWidget()

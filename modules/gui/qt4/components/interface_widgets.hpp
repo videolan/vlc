@@ -243,7 +243,6 @@ public:
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;
-    QPushButton *normalSpeedButton;
 private slots:
     void updateRate( int );
     void resetRate();
