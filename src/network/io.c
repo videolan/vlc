@@ -288,7 +288,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                 goto error;
 
             case 0: // timeout
-                if( timeout ) return 0;
+                if( timeout ) return i_total;
                 continue;
         }
 
