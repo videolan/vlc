@@ -326,11 +326,11 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
 
 #define set_category( i_id ) \
     add_type_inner( CONFIG_CATEGORY ); \
-    p_config->value.i = i_id
+    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)(i_id))
 
 #define set_subcategory( i_id ) \
     add_type_inner( CONFIG_SUBCATEGORY ); \
-    p_config->value.i = i_id
+    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)(i_id))
 
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
