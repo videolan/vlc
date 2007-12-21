@@ -108,7 +108,9 @@ vlc_module_end();
 static int  Seek( access_t *, int64_t );
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int  Control( access_t *, int, va_list );
+#ifdef HAVE_MMAP
 static block_t *mmapBlock( access_t * );
+#endif
 
 static int  open_file( access_t *, const char * );
 
