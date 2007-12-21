@@ -5,6 +5,8 @@
   <file alias="vlc128.png">../../../share/vlc128x128.png</file>
   <file alias="vlc16.png">../../../share/vlc16x16.png</file>
   <file alias="vlc48.png">../../../share/vlc48x48.png</file>
+  <file alias="vlc128-christmas.png">../../../share/vlc128x128-christmas.png</file>
+  <file alias="vlc48-christmas.png">../../../share/vlc48x48-christmas.png</file>
   <file>pixmaps/advprefs_audio.png</file>
   <file>pixmaps/advprefs_codec.png</file>
   <file>pixmaps/advprefs_extended.png</file>

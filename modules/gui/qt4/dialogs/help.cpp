@@ -43,6 +43,7 @@
 #include <QDialogButtonBox>
 #include <QEvent>
 #include <QFileDialog>
+#include <QDate>
 
 
 HelpDialog *HelpDialog::instance = NULL;
@@ -90,7 +91,10 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QLabel *introduction = new QLabel(
             qtr( "Information about VLC media player." ) );
     QLabel *iconVLC = new QLabel;
-    iconVLC->setPixmap( QPixmap( ":/vlc48.png" ) );
+    if( QDate::currentDate().dayOfYear() >= 354 )
+        iconVLC->setPixmap( QPixmap( ":/vlc48-christmas.png" ) );
+    else
+        iconVLC->setPixmap( QPixmap( ":/vlc48.png" ) );
     layout->addWidget( iconVLC, 0, 0, 1, 1 );
     layout->addWidget( introduction, 0, 1, 1, 7 );
     layout->addWidget( tab, 1, 0, 1, 8 );
@@ -119,7 +123,10 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     infoLabel->setWordWrap( infoLabel );
 
     QLabel *iconVLC2 = new QLabel;
-    iconVLC2->setPixmap( QPixmap( ":/vlc128.png" ) );
+    if( QDate::currentDate().dayOfYear() >= 354 )
+        iconVLC2->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+    else
+        iconVLC2->setPixmap( QPixmap( ":/vlc128.png" ) );
     infoLayout->addWidget( iconVLC2 );
     infoLayout->addWidget( infoLabel );
 

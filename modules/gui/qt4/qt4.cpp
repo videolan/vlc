@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include <QDate>
 
 #include "qt4.hpp"
 #include <vlc_os_specific.h>
@@ -37,6 +38,7 @@
 #endif
 
 #include "../../../share/vlc32x32.xpm"
+#include "../../../share/vlc32x32-christmas.xpm"
 
 /*****************************************************************************
  * Local prototypes.
@@ -262,7 +264,10 @@ static void Init( intf_thread_t *p_intf )
 
     /* Start the QApplication here */
     QApplication *app = new QApplication( argc, argv , true );
-    app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
+    if( QDate::currentDate().dayOfYear() >= 354 )
+        app->setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
+    else
+        app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
     p_intf->p_sys->p_app = app;
 
     // Initialize timers and the Dialog Provider

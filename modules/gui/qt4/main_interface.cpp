@@ -50,6 +50,7 @@
 #include <QDockWidget>
 #include <QToolBar>
 #include <QGroupBox>
+#include <QDate>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -868,7 +869,11 @@ void MainInterface::updateOnTimer()
  **/
 void MainInterface::createSystray()
 {
-    QIcon iconVLC =  QIcon( QPixmap( ":/vlc128.png" ) );
+    QIcon iconVLC;
+    if( QDate::currentDate().dayOfYear() >= 354 )
+        iconVLC =  QIcon( QPixmap( ":/vlc128-christmas.png" ) );
+    else
+        iconVLC =  QIcon( QPixmap( ":/vlc128.png" ) );
     sysTray = new QSystemTrayIcon( iconVLC, this );
     sysTray->setToolTip( qtr( "VLC media player" ));
 

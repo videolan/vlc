@@ -42,6 +42,7 @@
 #include <QMenu>
 #include <QPalette>
 #include <QResizeEvent>
+#include <QDate>
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -149,7 +150,10 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     label->setMaximumWidth( MAX_BG_SIZE );
     label->setMinimumHeight( MIN_BG_SIZE );
     label->setMinimumWidth( MIN_BG_SIZE );
-    label->setPixmap( QPixmap( ":/vlc128.png" ) );
+    if( QDate::currentDate().dayOfYear() >= 354 )
+        label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+    else
+        label->setPixmap( QPixmap( ":/vlc128.png" ) );
 
     QHBoxLayout *backgroundLayout = new QHBoxLayout( this );
     backgroundLayout->addWidget( label );
@@ -168,7 +172,10 @@ void BackgroundWidget::update( input_thread_t *p_input )
 {
     if( !p_input || p_input->b_dead )
     {
-        label->setPixmap( QPixmap( ":/vlc128.png" ) );
+        if( QDate::currentDate().dayOfYear() >= 354 )
+            label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+        else
+            label->setPixmap( QPixmap( ":/vlc128.png" ) );
         return;
     }
 
@@ -179,7 +186,12 @@ void BackgroundWidget::update( input_thread_t *p_input )
     QString url = qfu( psz_arturl );
     QString arturl = url.replace( "file://",QString("" ) );
     if( arturl.isNull() )
-        label->setPixmap( QPixmap( ":/vlc128.png" ) );
+    {
+        if( QDate::currentDate().dayOfYear() >= 354 )
+            label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+        else
+            label->setPixmap( QPixmap( ":/vlc128.png" ) );
+    }
     else
     {
         label->setPixmap( QPixmap( arturl ) );
