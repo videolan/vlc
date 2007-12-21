@@ -139,7 +139,7 @@ static int Open( vlc_object_t *p_this, int i_type )
                                 0, NULL, -1 );
             break;
     }
-    vlc_gc_decref( p_sys->p_input ); /* Refcount to 1, so we can release it
+    vlc_gc_incref( p_sys->p_input ); /* Refcount to 1, so we can release it
                                       * in Close() */
 
     input_ItemAddOption( p_sys->p_input, "no-playlist-autostart" );
