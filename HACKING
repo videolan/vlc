@@ -8,7 +8,7 @@ First
 
  - Read this file
 
- - Read the information present on http://developers.videolan.org/vlc/
+ - Read the information present on http://www.videolan.org/developers/
 
 
 Requirements
@@ -18,7 +18,7 @@ You will need the following tools if you plan to use the SVN version of vlc:
 
  - Autoconf version 2.60 or later
  - Automake version 1.9 or later
- - gettext version 0.11.5 or later
+ - gettext version 0.16.1 or later
  - pkg-config
  - libgcrypt 1.2 (or compatible)
 
