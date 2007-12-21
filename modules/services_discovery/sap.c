@@ -210,6 +210,8 @@ struct attribute_t
 struct sap_announce_t
 {
     mtime_t i_last;
+    mtime_t i_period;
+    uint8_t i_period_trust;
 
     uint16_t    i_hash;
     uint32_t    i_source[4];
@@ -539,16 +541,22 @@ static void Run( services_discovery_t *p_sd )
 
         i_read = net_Select( p_sd, p_sd->p_sys->pi_fd,
                              p_sd->p_sys->i_fd, p_buffer,
-                             MAX_SAP_BUFFER );
+                             MAX_SAP_BUFFER, 500 );
 
         /* Check for items that need deletion */
         for( i = 0; i < p_sd->p_sys->i_announces; i++ )
         {
             mtime_t i_timeout = ( mtime_t ) 1000000 * p_sd->p_sys->i_timeout;
-
-            if( mdate() - p_sd->p_sys->pp_announces[i]->i_last > i_timeout )
+            sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
+            mtime_t i_last_period = mdate() - p_announce->i_last;
+            
+            /* Remove the annoucement, if the last announcement was 1 hour ago
+             * or if the last packet emitted was 3 times the average time
+             * between two packets */
+            if( ( p_announce->i_period_trust > 5 && i_last_period > 3 * p_announce->i_period ) ||
+                i_last_period > i_timeout )
             {
-                RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i] );
+                RemoveAnnounce( p_sd, p_announce );
             }
         }
 
@@ -737,17 +745,30 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
 
     for( i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
     {
+        sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
         /* FIXME: slow */
         /* FIXME: we create a new announce each time the sdp changes */
-        if( IsSameSession( p_sd->p_sys->pp_announces[i]->p_sdp, p_sdp ) )
+        if( IsSameSession( p_announce->p_sdp, p_sdp ) )
         {
-            if( b_need_delete )
+            /* We don't support delete announcement as they can easily
+             * Be used to highjack an announcement by a third party.
+             * Intead we cleverly implement Implicit Announcement removal.
+             *
+             * if( b_need_delete )
+             *    RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i]);
+             * else
+             */
+
+            if( !b_need_delete )
             {
-                RemoveAnnounce( p_sd, p_sd->p_sys->pp_announces[i]);
-            }
-            else
-            {
-                p_sd->p_sys->pp_announces[i]->i_last = mdate();
+                /* No need to go after six, as we start to trust the
+                 * average period at six */
+                if( p_announce->i_period_trust <= 5 )
+                    p_announce->i_period_trust++;
+
+                /* Compute the average period */
+                p_announce->i_period = (p_announce->i_period + (mdate() - p_announce->i_last)) / 2;
+                p_announce->i_last = mdate();
             }
             FreeSDP( p_sdp ); p_sdp = NULL;
             return VLC_SUCCESS;
@@ -774,6 +795,8 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sys = p_sd->p_sys;
 
     p_sap->i_last = mdate();
+    p_sap->i_period = 0;
+    p_sap->i_period_trust = 0;
     p_sap->i_hash = i_hash;
     p_sap->p_sdp = p_sdp;
 
