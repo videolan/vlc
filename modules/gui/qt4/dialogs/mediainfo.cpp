@@ -33,6 +33,11 @@
 
 MediaInfoDialog *MediaInfoDialog::instance = NULL;
 
+/* This Dialog has two main modes:
+    - General Mode that shows the current Played item, and the stats
+    - Single mode that shows the info on ONE SINGLE Item on the playlist
+   Please be Careful of not breaking one the modes behaviour... */
+
 MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
                                   input_item_t *_p_item,
                                   bool _mainInput,
@@ -89,11 +94,20 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 
     CONNECT( IT, currentChanged( int ), this, updateButtons( int ) );
 
-    CONNECT( THEMIM, inputChanged( input_thread_t * ), this, update( input_thread_t * ) );
+    /* If using the General Mode */
+    if( !p_item )
+    {
+        msg_Dbg( p_intf, "Using a general windows" );
+        CONNECT( THEMIM, inputChanged( input_thread_t * ),
+                 this, update( input_thread_t * ) );
+
+        p_item = input_GetItem( THEMIM->getInput() );
+    }
 
     /* Call update by hand, so info is shown from current item too */
-    if( THEMIM->getInput() )
-        update( input_GetItem(THEMIM->getInput() ), true, true );
+    if( p_item )
+        update( p_item, true, true );
+
     if( stats )
         ON_TIMEOUT( updateOnTimeOut() );
 }
