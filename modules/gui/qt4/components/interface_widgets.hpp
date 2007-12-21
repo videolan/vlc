@@ -141,6 +141,7 @@ class QGridLayout;
 class VolumeClickHandler;
 class SoundSlider;
 class QAbstractSlider;
+class QToolButton;
 
 class ControlsWidget : public QFrame
 {
@@ -169,7 +170,7 @@ private:
     InputSlider         *slider;
     QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
     QPushButton         *playButton, *fullscreenButton;
-    QPushButton         *slowerButton, *fasterButton;
+    QToolButton         *slowerButton, *fasterButton;
     AdvControlsWidget   *advControls;
     QLabel              *volMuteLabel;
     QAbstractSlider     *volumeSlider;

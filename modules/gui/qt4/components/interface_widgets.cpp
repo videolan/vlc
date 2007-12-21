@@ -411,15 +411,15 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
              THEMIM->getIM(), sliderUpdate( float ) );
 
     /** Slower and faster Buttons **/
-    slowerButton = new QPushButton;
-    slowerButton->setFlat( true );
+    slowerButton = new QToolButton;
+    slowerButton->setAutoRaise( true );
     slowerButton->setMaximumSize( QSize( 26, 20 ) );
 
     BUTTON_SET_ACT( slowerButton, "-", qtr( "Slower" ), slower() );
     controlLayout->addWidget( slowerButton, 0, 0 );
 
-    fasterButton = new QPushButton;
-    fasterButton->setFlat( true );
+    fasterButton = new QToolButton;
+    fasterButton->setAutoRaise( true );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
     BUTTON_SET_ACT( fasterButton, "+", qtr( "Faster" ), faster() );
