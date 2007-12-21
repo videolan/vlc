@@ -1,7 +1,7 @@
 /*****************************************************************************
  * freebox.c :  Freebox interface module
  *****************************************************************************
- * Copyright (C) 2004-2007 the VideoLAN team
+ * Copyright (C) 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
