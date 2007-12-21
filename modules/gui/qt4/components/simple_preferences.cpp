@@ -347,28 +347,41 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             addToCachingBox( "Higher latency", CachingHigher );
 
 #define TestCaC( name ) \
-    b_cache_equal =  b_cache_equal && ( i_cache == config_GetInt( p_intf, name ) );
+    b_cache_equal =  b_cache_equal && \
+     ( i_cache == config_GetInt( p_intf, name ) )
 
 #define TestCaCi( name, int ) \
     b_cache_equal = b_cache_equal &&  \
-    ( ( i_cache * int ) == config_GetInt( p_intf, name ) );
+    ( ( i_cache * int ) == config_GetInt( p_intf, name ) )
             /* Select the accurate value of the ComboBox */
             bool b_cache_equal = true;
             int i_cache = config_GetInt( p_intf, "file-caching");
 
-            TestCaC( "udp-caching" ) TestCaC( "dvdread-caching" )
-            TestCaC( "dvdnav-caching" ) TestCaC( "tcp-caching" )
-            TestCaC( "fake-caching" ) TestCaC( "cdda-caching" )
-            TestCaC( "screen-caching" ) TestCaC( "vcd-caching" )
+            TestCaC( "udp-caching" );
+            if (module_Exists (p_intf, "dvdread"))
+                TestCaC( "dvdread-caching" );
+            if (module_Exists (p_intf, "dvdnav"))
+                TestCaC( "dvdnav-caching" );
+            TestCaC( "tcp-caching" );
+            TestCaC( "fake-caching" ); TestCaC( "cdda-caching" );
+            TestCaC( "screen-caching" ); TestCaC( "vcd-caching" );
             #ifdef WIN32
-            TestCaC( "dshow-caching" )
+            TestCaC( "dshow-caching" );
             #else
-            TestCaC( "v4l-caching" ) TestCaC( "jack-input-caching" )
-            TestCaC( "v4l2-caching" ) TestCaC( "pvr-caching" )
+            if (module_Exists (p_intf, "v4l"))
+                TestCaC( "v4l-caching" );
+            if (module_Exists (p_intf, "access_jack"))
+                TestCaC( "jack-input-caching" );
+            if (module_Exists (p_intf, "v4l2"))
+                TestCaC( "v4l2-caching" );
+            if (module_Exists (p_intf, "pvr"))
+                TestCaC( "pvr-caching" );
             #endif
-            TestCaCi( "rtsp-caching", 4 ) TestCaCi( "ftp-caching", 2 )
-            TestCaCi( "http-caching", 4 ) TestCaCi( "realrtsp-caching", 10 )
-            TestCaCi( "mms-caching", 19 )
+            TestCaCi( "rtsp-caching", 4 ); TestCaCi( "ftp-caching", 2 );
+            TestCaCi( "http-caching", 4 );
+            if (module_Exists (p_intf, "access_realrtsp"))
+                TestCaCi( "realrtsp-caching", 10 );
+            TestCaCi( "mms-caching", 19 );
             if( b_cache_equal ) ui.cachingCombo->setCurrentIndex(
                 ui.cachingCombo->findData( QVariant( i_cache ) ) );
 
@@ -516,26 +529,38 @@ void SPrefsPanel::apply()
         saveBox( "bandwidth", qobject_cast<QCheckBox *>(optionWidgets[bandwidthChB] ) );
         config_PutPsz( p_intf, "access-filter", qtu( qs_filter ) );
 
-#define CaCi( name, int ) config_PutInt( p_intf, name, int * i_comboValue );
-#define CaC( name ) CaCi( name, 1 );
+#define CaCi( name, int ) config_PutInt( p_intf, name, int * i_comboValue )
+#define CaC( name ) CaCi( name, 1 )
         /* Caching */
         QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
             msg_Dbg( p_intf, "Adjusting all cache values at: %i", i_comboValue );
-            CaC( "udp-caching" ); CaC( "dvdread-caching" );
-            CaC( "dvdnav-caching" ); CaC( "tcp-caching" ); CaC( "vcd-caching" );
+            CaC( "udp-caching" );
+            if (module_Exists (p_intf, "dvdread"))
+                CaC( "dvdread-caching" );
+            if (module_Exists (p_intf, "dvdnav"))
+                CaC( "dvdnav-caching" );
+            CaC( "tcp-caching" ); CaC( "vcd-caching" );
             CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
             CaC( "screen-caching" );
             CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
-            CaCi( "http-caching", 4 ); CaCi( "realrtsp-caching", 10 );
+            CaCi( "http-caching", 4 );
+            if (module_Exists (p_intf, "access_realrtsp"))
+                CaCi( "realrtsp-caching", 10 );
             CaCi( "mms-caching", 19 );
             #ifdef WIN32
             CaC( "dshow-caching" );
             #else
-            CaC( "v4l-caching" ); CaC( "jack-input-caching" );
-            CaC( "v4l2-caching" ); CaC( "pvr-caching" );
+            if (module_Exists (p_intf, "v4l"))
+                CaC( "v4l-caching" );
+            if (module_Exists (p_intf, "access_jack"))
+            CaC( "jack-input-caching" );
+            if (module_Exists (p_intf, "v4l2"))
+                CaC( "v4l2-caching" );
+            if (module_Exists (p_intf, "pvr"))
+                CaC( "pvr-caching" );
             #endif
             //CaCi( "dv-caching" ) too short...
         }
