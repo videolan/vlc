@@ -809,8 +809,7 @@ module_config_t *module_GetConfig (const module_t *module, unsigned *restrict ps
 
         if (config != NULL)
             memcpy (config + j, item, sizeof (*config));
-        *psize = j;
-        j++;
+        *psize = ++j;
     }
 
     return config;
