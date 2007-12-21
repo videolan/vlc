@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "dialogs/vlm.hpp"
+#include "dialogs/open.hpp"
 
 #include <QString>
 #include <QComboBox>
@@ -136,6 +137,7 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     BUTTONACT( ui.addButton, addVLMItem() );
     BUTTONACT( ui.clearButton, clearWidgets() );
     BUTTONACT( ui.saveButton, saveModifications() );
+    BUTTONACT( ui.inputButton, selectInput() );
 }
 
 VLMDialog::~VLMDialog()
@@ -222,8 +224,6 @@ void VLMDialog::addVLMItem()
 
     vlmItemLayout->insertWidget( vlmItemCount, vlmAwidget );
     vlmItems.append( vlmAwidget );
-
-    /* HERE BE DRAGONS VLM REQUEST */
 }
 
 void VLMDialog::clearWidgets()
@@ -239,6 +239,13 @@ void VLMDialog::clearWidgets()
     ui.muxLedit->clear();
     ui.saveButton->hide();
     ui.addButton->show();
+}
+
+void VLMDialog::selectInput()
+{
+    OpenDialog *o = OpenDialog::getInstance( this, p_intf, 0, true );
+    o->exec();
+    ui.inputLedit->setText( o->getMRL() );
 }
 
 /* Object Modification */

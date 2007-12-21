@@ -99,6 +99,7 @@ private slots:
     void saveModifications();
     void showScheduleWidget( int );
     void selectVLMItem( int );
+    void selectInput();
 };
 
 class VLMWrapper
