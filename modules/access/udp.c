@@ -326,16 +326,17 @@ static block_t *BlockUDP( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t      *p_block;
+    ssize_t len;
 
     if( p_access->info.b_eof )
         return NULL;
 
     /* Read data */
     p_block = block_New( p_access, MTU );
-    p_block->i_buffer = net_Read( p_access, p_sys->fd, NULL,
-                                  p_block->p_buffer, MTU, VLC_FALSE );
-    if( ( p_block->i_buffer < 0 )
-     || ( p_sys->b_comedia && ( p_block->i_buffer == 0 ) ) )
+    len = net_Read( p_access, p_sys->fd, NULL,
+                    p_block->p_buffer, MTU, VLC_FALSE );
+    if( ( len < 0 )
+     || ( p_sys->b_comedia && ( len == 0 ) ) )
     {
         if( p_sys->b_comedia )
         {
@@ -346,7 +347,7 @@ static block_t *BlockUDP( access_t *p_access )
         return NULL;
     }
 
-    return block_Realloc( p_block, 0, p_block->i_buffer );
+    return block_Realloc( p_block, 0, p_block->i_buffer = len );
 }
 
 /*****************************************************************************
@@ -395,7 +396,7 @@ static block_t *BlockTCP( access_t *p_access )
         p_block->i_buffer += i_read;
     }
 
-    if( p_block->i_buffer < (2 + framelen) )
+    if( p_block->i_buffer < (2u + framelen) )
         return NULL; // incomplete frame
 
     /* Hide framing from RTP layer */
