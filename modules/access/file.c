@@ -252,7 +252,7 @@ static void Close (vlc_object_t * p_this)
 static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_ret;
+    ssize_t i_ret;
     int fd = p_sys->fd;
 
 #if !defined(WIN32) && !defined(UNDER_CE)
