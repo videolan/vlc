@@ -89,8 +89,10 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     CONNECT( IT, currentChanged( int ), this, updateButtons( int ) );
 
     CONNECT( THEMIM, inputChanged( input_thread_t * ), this, update( input_thread_t * ) );
+
     /* Call update by hand, so info is shown from current item too */
-    update( input_GetItem(THEMIM->getInput()), true, true );
+    if( THEMIM->getInput() )
+        update( input_GetItem(THEMIM->getInput()), true, true );
 }
 
 MediaInfoDialog::~MediaInfoDialog()
