@@ -452,8 +452,8 @@ static int Seek (access_t *p_access, int64_t i_pos)
 
 #ifdef HAVE_MMAP
     if (p_access->pf_block == NULL)
-        lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
 #endif
+        lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
     return VLC_SUCCESS;
 }
 
