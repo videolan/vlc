@@ -40,25 +40,12 @@ class OpenDialog : public QVLCDialog
     Q_OBJECT;
 public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
-                 int _action_flag = 0 )
-    {
-        if( !instance )
-            instance = new OpenDialog( parent, p_intf, false, _action_flag );
-        else
-        {
-            instance->i_action_flag = _action_flag;
-            instance->setMenuAction();
-        }
-        return instance;
-    }
-    OpenDialog( QWidget *parent, intf_thread_t *, bool modal,
-                int _action_flag = 0 );
+                                     int _action_flag = 0, bool modal = false  );
+
     virtual ~OpenDialog();
 
     void showTab( int );
-
-    QString mrl;
-    QString mainMRL;
+    QString getMRL(){ return mrl; }
 
 public slots:
     void selectSlots();
@@ -66,9 +53,17 @@ public slots:
     void stream( bool b_transode_only = false );
     void enqueue();
     void transcode();
+
 private:
+    OpenDialog( QWidget *parent, intf_thread_t *, bool modal,
+                int _action_flag = 0 );
+
     static OpenDialog *instance;
     input_thread_t *p_input;
+
+    QString mrl;
+    QString mainMRL;
+    QString storedMethod;
 
     Ui::Open ui;
     FileOpenPanel *fileOpenPanel;
@@ -76,14 +71,12 @@ private:
     DiscOpenPanel *discOpenPanel;
     CaptureOpenPanel *captureOpenPanel;
 
-    QString storedMethod;
-    QString mrlSub;
-    int advHeight, mainHeight;
     int i_action_flag;
     QStringList SeparateEntries( QString );
 
-    QPushButton *cancelButton;
+    QPushButton *cancelButton, *selectButton;
     QToolButton *playButton;
+
     void finish( bool );
 
 private slots:

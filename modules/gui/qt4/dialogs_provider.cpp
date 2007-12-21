@@ -127,6 +127,7 @@ void DialogsProvider::customEvent( QEvent *event )
            QVLCMenu::MiscPopupMenu( p_intf ); break;
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
+            openThenStreamingDialogs(); break;
 #ifdef UPDATE_CHECK
         case INTF_DIALOG_UPDATEVLC:
             updateDialog(); break;
@@ -249,8 +250,7 @@ void DialogsProvider::PLAppendDialog()
 
 /* Unimplemmented yet - Usefull ? */
 void DialogsProvider::MLAppendDialog()
-{
-}
+{}
 
 /**
  * Simple open
@@ -414,14 +414,13 @@ void DialogsProvider::saveAPlaylist()
  * Sout emulation
  ****************************************************************************/
 
-//FIXME !!
 void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
 {
     SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf,
                                                     b_transcode_only );
     if( s->exec() == QDialog::Accepted )
     {
-        msg_Err( p_intf, "mrl %s", qta( s->getMrl() ) );
+        msg_Err( p_intf, "Sout mrl %s", qta( s->getMrl() ) );
         /* Just do it */
         int i_len = strlen( qtu( s->getMrl() ) ) + 10;
         char *psz_option = (char*)malloc( i_len );

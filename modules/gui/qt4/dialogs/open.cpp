@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.cpp : Advanced open dialog
  *****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright ( C ) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
@@ -9,7 +9,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * ( at your option ) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,21 +33,46 @@
 
 OpenDialog *OpenDialog::instance = NULL;
 
-OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
+OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
+        int _action_flag, bool modal )
+{
+    /* Creation */
+    if( !instance )
+        instance = new OpenDialog( parent, p_intf, modal, _action_flag );
+    else
+    {
+        /* Request the instance but change small details:
+           - Button menu
+           - Modality on top of the parent dialog */
+        instance->i_action_flag = _action_flag;
+        instance->setMenuAction();
+        if( modal ) instance->setWindowModality( Qt::WindowModal );
+    }
+    return instance;
+}
+
+OpenDialog::OpenDialog( QWidget *parent,
+                        intf_thread_t *_p_intf,
+                        bool modal,
                         int _action_flag )  :  QVLCDialog( parent, _p_intf )
 {
-    setModal( modal );
     i_action_flag = _action_flag;
+
+    if( modal ) /* Select mode */
+    {
+        setWindowModality( Qt::WindowModal );
+        i_action_flag = SELECT;
+    }
 
     /* Basic Creation of the Window */
     ui.setupUi( this );
-    setWindowTitle( qtr("Open" ) );
-    resize( 410, 300);
+    setWindowTitle( qtr( "Open" ) );
+    resize( 410, 300 );
 
     /* Tab definition and creation */
-    fileOpenPanel = new FileOpenPanel( ui.Tab, p_intf );
-    discOpenPanel = new DiscOpenPanel( ui.Tab, p_intf );
-    netOpenPanel = new NetOpenPanel( ui.Tab, p_intf );
+    fileOpenPanel    = new FileOpenPanel( ui.Tab, p_intf );
+    discOpenPanel    = new DiscOpenPanel( ui.Tab, p_intf );
+    netOpenPanel     = new NetOpenPanel( ui.Tab, p_intf );
     captureOpenPanel = new CaptureOpenPanel( ui.Tab, p_intf );
 
     /* Insert the tabs */
@@ -55,18 +80,12 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     ui.Tab->insertTab( OPEN_DISC_TAB, discOpenPanel, qtr( "&Disc" ) );
     ui.Tab->insertTab( OPEN_NETWORK_TAB, netOpenPanel, qtr( "&Network" ) );
     ui.Tab->insertTab( OPEN_CAPTURE_TAB, captureOpenPanel,
-                                qtr( "Capture &Device" ) );
+                       qtr( "Capture &Device" ) );
 
     /* Hide the Slave input widgets */
     ui.slaveLabel->hide();
     ui.slaveText->hide();
     ui.slaveBrowseButton->hide();
-
-    /* Hide the advancedPanel */
-    if(! config_GetInt( p_intf, "qt-adv-options") )
-        ui.advancedFrame->hide();
-    else
-        ui.advancedCheckBox->setChecked( true );
 
     /* Buttons Creation */
     QSizePolicy buttonSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
@@ -77,7 +96,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     playButton = new QToolButton( this );
     playButton->setText( qtr( "&Play" ) );
     playButton->setSizePolicy( buttonSizePolicy );
-    playButton->setMinimumSize( QSize(90, 0) );
+    playButton->setMinimumSize( QSize( 90, 0 ) );
     playButton->setPopupMode( QToolButton::MenuButtonPopup );
     playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
 
@@ -86,10 +105,15 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     cancelButton->setText( qtr( "&Cancel" ) );
     cancelButton->setSizePolicy( buttonSizePolicy );
 
+    /* Select Button */
+    selectButton = new QPushButton;
+    selectButton->setText( qtr( "Select" ) );
+    selectButton->setSizePolicy( buttonSizePolicy );
+
     /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open" );
     openButtonMenu->addAction( qtr( "&Enqueue" ), this, SLOT( enqueue() ),
-                                    QKeySequence( "Alt+E") );
+                                    QKeySequence( "Alt+E" ) );
     openButtonMenu->addAction( qtr( "&Play" ), this, SLOT( play() ),
                                     QKeySequence( "Alt+P" ) );
     openButtonMenu->addAction( qtr( "&Stream" ), this, SLOT( stream() ) ,
@@ -99,103 +123,110 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     playButton->setMenu( openButtonMenu );
 
-    ui.buttonsBox->addButton( playButton, QDialogButtonBox::AcceptRole );
+    /* Add the three Buttons */
+    ui.buttonsBox->addButton( playButton, QDialogButtonBox::ActionRole );
+    ui.buttonsBox->addButton( selectButton, QDialogButtonBox::AcceptRole );
     ui.buttonsBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    /* Force MRL update on tab change */
-    CONNECT( ui.Tab, currentChanged(int), this, signalCurrent() );
+    /* At creation time, modify the default buttons */
+    setMenuAction();
 
-    CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
-    CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
-    CONNECT( discOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
-    CONNECT( captureOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
+    /* Force MRL update on tab change */
+    CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent() );
+
+    CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
+    CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
+    CONNECT( discOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
+    CONNECT( captureOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
-                                                 this, newCachingMethod(QString) );
+             this, newCachingMethod( QString ) );
     CONNECT( netOpenPanel, methodChanged( QString ),
-                                                 this, newCachingMethod(QString) );
+             this, newCachingMethod( QString ) );
     CONNECT( discOpenPanel, methodChanged( QString ),
-                                                 this, newCachingMethod(QString) );
+             this, newCachingMethod( QString ) );
     CONNECT( captureOpenPanel, methodChanged( QString ),
-                                                 this, newCachingMethod(QString) );
+             this, newCachingMethod( QString ) );
 
     /* Advanced frame Connects */
-    CONNECT( ui.slaveText, textChanged(QString), this, updateMRL() );
-    CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL() );
-    CONNECT( ui.startTimeSpinBox, valueChanged(int), this, updateMRL() );
+    CONNECT( ui.slaveText, textChanged( QString ), this, updateMRL() );
+    CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
+    CONNECT( ui.startTimeSpinBox, valueChanged( int ), this, updateMRL() );
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Buttons action */
     BUTTONACT( playButton, selectSlots() );
+    BUTTONACT( selectButton, close() );
     BUTTONACT( cancelButton, cancel() );
 
-    /* At creation time, modify the default buttons */
-    if ( i_action_flag ) setMenuAction();
+    /* Hide the advancedPanel */
+    if( !config_GetInt( p_intf, "qt-adv-options" ) )
+        ui.advancedFrame->hide();
+    else
+        ui.advancedCheckBox->setChecked( true );
 
     /* Initialize caching */
     storedMethod = "";
     newCachingMethod( "file-caching" );
-
-    mainHeight = advHeight = 0;
 }
 
 OpenDialog::~OpenDialog()
-{
-}
+{}
 
 /* Finish the dialog and decide if you open another one after */
 void OpenDialog::setMenuAction()
 {
-    switch ( i_action_flag )
+    if( i_action_flag == SELECT )
     {
-    case OPEN_AND_STREAM:
-        playButton->setText( qtr( "&Stream" ) );
-        break;
-    case OPEN_AND_SAVE:
-        playButton->setText( qtr( "&Convert / Save" ) );
-        break;
-    case OPEN_AND_ENQUEUE:
-        playButton->setText( qtr( "&Enqueue" ) );
-        break;
-    case OPEN_AND_PLAY:
-    default:
-        playButton->setText( qtr( "&Play" ) );
-   }
+        playButton->hide();
+        selectButton->show();
+    }
+    else
+    {
+        switch ( i_action_flag )
+        {
+        case OPEN_AND_STREAM:
+            playButton->setText( qtr( "&Stream" ) );
+            break;
+        case OPEN_AND_SAVE:
+            playButton->setText( qtr( "&Convert / Save" ) );
+            break;
+        case OPEN_AND_ENQUEUE:
+            playButton->setText( qtr( "&Enqueue" ) );
+            break;
+        case OPEN_AND_PLAY:
+        default:
+            playButton->setText( qtr( "&Play" ) );
+        }
+        playButton->show();
+        selectButton->hide();
+    }
 }
 
 void OpenDialog::showTab( int i_tab=0 )
 {
-    this->show();
     ui.Tab->setCurrentIndex( i_tab );
+    show();
 }
 
-void OpenDialog::signalCurrent() {
-    if (ui.Tab->currentWidget() != NULL)
-        (dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() ))->updateMRL();
+/* Function called on signal currentChanged triggered */
+void OpenDialog::signalCurrent()
+{
+    if( ui.Tab->currentWidget() != NULL )
+        ( dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() ) )->updateMRL();
 }
 
 void OpenDialog::toggleAdvancedPanel()
 {
-    //FIXME does not work under Windows
-    if( ui.advancedFrame->isVisible() ) {
+    if( ui.advancedFrame->isVisible() )
+    {
         ui.advancedFrame->hide();
-#ifndef WIN32
-        setMinimumHeight( 1 );
-        resize( width(), mainHeight );
-#endif
-    } else {
-#ifndef WIN32
-        if( mainHeight == 0 )
-            mainHeight = height();
-#endif
-
+        //FIXME: Clear Bug here. Qt ?
+        resize( size().width(), size().height() - ui.advancedFrame->height() );
+    }
+    else
+    {
         ui.advancedFrame->show();
-#ifndef WIN32
-        if( advHeight == 0 ) {
-            advHeight = height() - mainHeight;
-        }
-        resize( width(), mainHeight + advHeight );
-#endif
     }
 }
 
@@ -205,16 +236,26 @@ void OpenDialog::toggleAdvancedPanel()
 /* If Cancel is pressed or escaped */
 void OpenDialog::cancel()
 {
+    /* Clear the panels */
     for( int i = 0; i < OPEN_TAB_MAX; i++ )
-        dynamic_cast<OpenPanel*>(ui.Tab->widget( i ))->clear();
-    toggleVisible();
-    if( isModal() ) reject();
+        dynamic_cast<OpenPanel*>( ui.Tab->widget( i ) )->clear();
+
+    /* Clear the variables */
+    mrl.clear();
+    mainMRL.clear();
+
+    /* If in Select Mode, reject instead of hiding */
+    if( windowModality() != Qt::NonModal ) reject();
+    else hide();
 }
 
 /* If EnterKey is pressed */
 void OpenDialog::close()
 {
-    selectSlots();
+    if( windowModality() != Qt::NonModal )
+        accept();
+    else
+        selectSlots();
 }
 
 /* Play button */
@@ -247,24 +288,13 @@ void OpenDialog::enqueue()
     finish( true );
 }
 
-void OpenDialog::transcode()
-{
-    stream( true );
-}
-
-void OpenDialog::stream( bool b_transcode_only )
-{
-    /* not finished FIXME */
-    /* Should go through the finish function */
-    THEDP->streamingDialog( mrl, b_transcode_only );
-}
 
 void OpenDialog::finish( bool b_enqueue = false )
 {
     toggleVisible();
     mrl = ui.advancedLineInput->text();
 
-    if( !isModal() )
+    if( windowModality() == Qt::NonModal )
     {
         QStringList tempMRL = SeparateEntries( mrl );
         for( size_t i = 0; i < tempMRL.size(); i++ )
@@ -300,6 +330,17 @@ void OpenDialog::finish( bool b_enqueue = false )
         accept();
 }
 
+void OpenDialog::transcode()
+{
+    stream( true );
+}
+
+void OpenDialog::stream( bool b_transcode_only )
+{
+    mrl = ui.advancedLineInput->text();
+    toggleVisible();
+    THEDP->streamingDialog( mrl, b_transcode_only );
+}
 
 /* Update the MRL */
 void OpenDialog::updateMRL( QString tempMRL )

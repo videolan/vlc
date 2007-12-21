@@ -84,7 +84,8 @@ enum {
     OPEN_AND_PLAY,
     OPEN_AND_STREAM,
     OPEN_AND_SAVE,
-    OPEN_AND_ENQUEUE
+    OPEN_AND_ENQUEUE,
+    SELECT
 };
 
 class QEvent;
