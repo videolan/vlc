@@ -277,7 +277,7 @@ struct demux_sys_t
     static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
 
-static inline int min( int a, int b )
+static inline int min_int( int a, int b )
 {
     return a > b ? b : a;
 }
@@ -608,8 +608,8 @@ static void Run( services_discovery_t *p_sd )
             {
                 /* Compute next timeout */
                 if( p_announce->i_period_trust > 5 )
-                    timeout = min((3 * p_announce->i_period - i_last_period) / 1000, timeout);
-                timeout = min((i_timeout - i_last_period)/1000, timeout);
+                    timeout = min_int((3 * p_announce->i_period - i_last_period) / 1000, timeout);
+                timeout = min_int((i_timeout - i_last_period)/1000, timeout);
             }
         }
 
