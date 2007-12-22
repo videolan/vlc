@@ -621,20 +621,11 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                               VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
     /* Volume control connection */
-    //resize( QSize( 300, 60 ) );
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
-    msg_Dbg( p_intf, "controls size: %i - %i", size().width(), size().height() );
 }
 
 ControlsWidget::~ControlsWidget()
 {}
-
-/*
-QSize ControlsWidget::sizeHint() const
-{
-    return QSize( 300, 50 );
-}
-*/
 
 void ControlsWidget::stop()
 {
