@@ -277,6 +277,11 @@ struct demux_sys_t
     static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
 
+static inline int min( int a, int b )
+{
+    return a > b ? b : a;
+}
+
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
@@ -459,6 +464,7 @@ static void Run( services_discovery_t *p_sd )
 {
     char *psz_addr;
     int i;
+    int timeout = -1;
 
     /* Braindead Winsock DNS resolver will get stuck over 2 seconds per failed
      * DNS queries, even if the DNS server returns an error with milliseconds.
@@ -549,8 +555,7 @@ static void Run( services_discovery_t *p_sd )
             ufd[i].revents = 0;
         }
 
-        /* FIXME FIXME FIXME: short arbitrary timer */
-        if (poll (ufd, n, 500) > 0)
+        if (poll (ufd, n, timeout) > 0)
         {
             for (unsigned i = 0; i < n; i++)
             {
@@ -575,6 +580,10 @@ static void Run( services_discovery_t *p_sd )
 
         mtime_t now = mdate();
 
+        /* A 1 hour timeout correspong to the RFC Implicit timeout.
+         * This timeout is tuned in the following loop. */
+        timeout = 1000 * 60 * 60;
+
         /* Check for items that need deletion */
         for( i = 0; i < p_sd->p_sys->i_announces; i++ )
         {
@@ -590,7 +599,19 @@ static void Run( services_discovery_t *p_sd )
             {
                 RemoveAnnounce( p_sd, p_announce );
             }
+            else
+            {
+                /* Compute next timeout */
+                if( p_announce->i_period_trust > 5 )
+                    timeout = min((3 * p_announce->i_period - i_last_period) / 1000, timeout);
+                timeout = min((i_timeout - i_last_period)/1000, timeout);
+            }
         }
+
+        if( !p_sd->p_sys->i_announces )
+            timeout = -1; /* We can safely poll indefinitly. */
+        else if( timeout < 200 )
+            timeout = 200; /* Don't wakeup too fast. */
     }
 }
 
