@@ -133,6 +133,7 @@ void DialogsProvider::customEvent( QEvent *event )
             updateDialog(); break;
 #endif
         case INTF_DIALOG_EXIT:
+            quit(); break;
         default:
            msg_Warn( p_intf, "unimplemented dialog" );
         }
@@ -414,10 +415,11 @@ void DialogsProvider::saveAPlaylist()
  * Sout emulation
  ****************************************************************************/
 
-void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
+void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
+                                       bool b_transcode_only )
 {
-    SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf,
-                                                    b_transcode_only );
+    SoutDialog *s = SoutDialog::getInstance( parent, p_intf, b_transcode_only );
+
     if( s->exec() == QDialog::Accepted )
     {
         msg_Err( p_intf, "Sout mrl %s", qta( s->getMrl() ) );
@@ -430,7 +432,6 @@ void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
                         -1, &psz_option, 1, VLC_TRUE, VLC_FALSE );
     }
-    delete s;
 }
 
 void DialogsProvider::openThenStreamingDialogs()
@@ -444,29 +445,6 @@ void DialogsProvider::openThenTranscodingDialogs()
     OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_SAVE )
                                 ->showTab( 0 );
 }
-/*
-void DialogsProvider::streamingDialog()
-{
-    OpenDialog *o = new OpenDialog( p_intf->p_sys->p_mi, p_intf, true );
-    if ( o->exec() == QDialog::Accepted )
-    {
-        SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf );
-        if( s->exec() == QDialog::Accepted )
-        {
-            msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
-            /* Just do it
-            int i_len = strlen( qtu(s->mrl) ) + 10;
-            char *psz_option = (char*)malloc(i_len);
-            snprintf( psz_option, i_len - 1, ":sout=%s", qtu(s->mrl));
-
-            playlist_AddExt( THEPL, qtu( o->mrl ), "Streaming",
-                             PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
-                             -1, &psz_option, 1, VLC_TRUE, VLC_FALSE );
-        }
-        delete s;
-    }
-    delete o;
-}*/
 
 
 /****************************************************************************

@@ -95,6 +95,8 @@ class QVLCMenu;
 class DialogsProvider : public QObject
 {
     Q_OBJECT;
+    friend class QVLCMenu;
+
 public:
     static DialogsProvider *getInstance()
     {
@@ -121,11 +123,11 @@ public:
                                 EXT_FILTER_PLAYLIST,
                                 QString path = QString() );
 protected:
-    friend class QVLCMenu;
     QSignalMapper *menusMapper;
     QSignalMapper *menusUpdateMapper;
     QSignalMapper *SDMapper;
     void customEvent( QEvent *);
+
 private:
     DialogsProvider( intf_thread_t *);
     intf_thread_t *p_intf;
@@ -170,7 +172,8 @@ public slots:
     void PLAppendDir();
     void MLAppendDir();
 
-    void streamingDialog( QString mrl = "", bool b_stream = true );
+    void streamingDialog( QWidget *parent, QString mrl = "",
+            bool b_stream = true );
     void openThenStreamingDialogs();
     void openThenTranscodingDialogs();
 

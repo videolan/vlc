@@ -156,14 +156,14 @@ void MediaInfoDialog::update( input_thread_t *p_input )
     vlc_object_release( p_input );
 }
 
-void MediaInfoDialog::updateOnTimeOut() 
+void MediaInfoDialog::updateOnTimeOut()
 {
-    /* Timer runs at 150 ms, dont' update more than 2 times per second */ 
-    i_runs++; 
-    if( i_runs % 4 != 0 ) return; 
+    /* Timer runs at 150 ms, dont' update more than 2 times per second */
+    i_runs++;
+    if( i_runs % 4 != 0 ) return;
 
-    /* Get Input and clear if non-existant */ 
-    input_thread_t *p_input = THEMIM->getInput(); 
+    /* Get Input and clear if non-existant */
+    input_thread_t *p_input = THEMIM->getInput();
 
     if( p_input && !p_input->b_dead )
     {

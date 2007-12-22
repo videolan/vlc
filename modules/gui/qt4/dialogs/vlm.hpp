@@ -85,7 +85,7 @@ private:
 
     QVBoxLayout *vlmItemLayout;
     QWidget *vlmItemWidget;
-  
+
     QComboBox *mediatype;
     QDateTimeEdit *time, *date, *repeatTime;
     QSpinBox *scherepeatnumber, *repeatDays;
@@ -100,6 +100,7 @@ private slots:
     void showScheduleWidget( int );
     void selectVLMItem( int );
     void selectInput();
+    void selectOutput();
 };
 
 class VLMWrapper
@@ -131,7 +132,7 @@ private:
     static vlm_t *p_vlm;
 };
 
-class VLMAWidget : public QGroupBox 
+class VLMAWidget : public QGroupBox
 {
     Q_OBJECT
     friend class VLMDialog;
@@ -193,7 +194,7 @@ public:
     VLMSchedule( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
     void update();
 private:
-    
+
 };
 
 #endif

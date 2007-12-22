@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sout.cpp : Stream output dialog ( old-style )
  ****************************************************************************
- * Copyright ( C ) 2006 the VideoLAN team
+ * Copyright (C) 2006 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  *
@@ -133,11 +133,6 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT( cancelButton, cancel() );
 
     if( b_transcode_only ) toggleSout();
-}
-
-QString SoutDialog::getMrl()
-{
-    return mrl;
 }
 
 void SoutDialog::fileBrowse()
