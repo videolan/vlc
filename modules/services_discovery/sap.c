@@ -543,7 +543,7 @@ static void Run( services_discovery_t *p_sd )
     }
 
     /* read SAP packets */
-    while( !p_sd->b_die )
+    while( vlc_object_alive( p_sd ) )
     {
         unsigned n = p_sd->p_sys->i_fd;
         struct pollfd ufd[n];
@@ -554,6 +554,11 @@ static void Run( services_discovery_t *p_sd )
             ufd[i].events = POLLIN;
             ufd[i].revents = 0;
         }
+
+        /* FIXME: remove this stupid evil hack when we have sorted out how to
+         * to cancel threads while doing network I/O */
+        if (timeout > 2000)
+            timeout = 2000;
 
         if (poll (ufd, n, timeout) > 0)
         {
