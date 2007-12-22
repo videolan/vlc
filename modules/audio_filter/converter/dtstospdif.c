@@ -139,7 +139,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     if( p_filter->p_sys->i_frames < 3 )
     {
-        if( !p_filter->p_sys->i_frames )
+        if( p_filter->p_sys->i_frames == 1 )
             /* We'll need the starting date */
             p_filter->p_sys->start_date = p_in_buf->start_date;
 
