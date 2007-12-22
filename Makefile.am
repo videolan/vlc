@@ -987,7 +987,7 @@ package-macosx:
 # Create disk image 
 	echo "Creating disk image" ;
 	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
-	hdiutil create -srcfolder "$(top_builddir)/vlc-${VERSION}" \
+	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-${VERSION}" \
 	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDRW \
 	  -scrub -imagekey zlib-level=9 ;
 
