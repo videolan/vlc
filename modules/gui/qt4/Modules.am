@@ -224,6 +224,7 @@ EXTRA_DIST += \
 	pixmaps/type_playlist.png \
 	pixmaps/type_unknown.xpm \
 	pixmaps/volume-high.png \
+	pixmaps/volume-medium.png \
 	pixmaps/volume-low.png \
 	pixmaps/volume-muted.png \
 	pixmaps/volume-slider.svg \

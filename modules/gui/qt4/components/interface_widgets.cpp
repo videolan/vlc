@@ -596,7 +596,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     VolumeClickHandler *hVolLabel = new VolumeClickHandler( p_intf, this );
 
     volMuteLabel = new QLabel;
-    volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
+    volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( hVolLabel );
     controlLayout->addWidget( volMuteLabel, 3, 15, Qt::AlignBottom );
@@ -690,9 +690,11 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
     }
     if( i_sliderVolume == 0 )
         volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
-    else if( i_sliderVolume < VOLUME_MAX / 2 )
+    else if( i_sliderVolume < VOLUME_MAX / 3 )
         volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
-    else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
+    else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
+        volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
 }
 
 void ControlsWidget::updateOnTimer()
