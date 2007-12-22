@@ -239,7 +239,6 @@ void InputManager::sectionMenu()
 #ifdef ZVBI_COMPILED
 void InputManager::telexGotoPage( int page )
 {
-    // TODO: this has only sense when telx codec is available
     if( hasInput() )
     {
         vlc_object_t *p_vbi;
@@ -255,12 +254,15 @@ void InputManager::telexGotoPage( int page )
 
 void InputManager::telexToggle( bool b_enabled )
 {
-    //TODO
+    int i_page = 0;
+
+    if( b_enabled )
+        i_page = 100;
+    telexGotoPage( i_page );
 }
 
 void InputManager::telexSetTransparency( bool b_transp )
 {
-    // TODO: this has only sense when telx codec is available
     if( hasInput() )
     {
         vlc_object_t *p_vbi;
