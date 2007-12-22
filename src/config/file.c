@@ -353,7 +353,7 @@ config_Write (FILE *file, const char *type, const char *desc,
     if (desc == NULL)
         desc = "?";
 
-    if (fprintf (file, "# %s (%s)\n%s%s=", desc, gettext (type),
+    if (fprintf (file, "# %s (%s)\n%s%s=", desc, _(type),
                  comment ? "#" : "", name) < 0)
         return -1;
 
