@@ -2030,10 +2030,11 @@ static void httpd_HostThread( httpd_host_t *host )
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     int evfd;
-    vlc_bool_t b_die = VLC_FALSE;
+    vlc_bool_t b_die;
 
     vlc_object_lock( host );
     evfd = vlc_object_waitpipe( host );
+    b_die = vlc_object_alive( host );
     vlc_object_unlock( host );
 
     while( !b_die )
