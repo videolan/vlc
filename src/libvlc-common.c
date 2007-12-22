@@ -884,11 +884,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Create volume callback system. */
     var_Create( p_libvlc, "volume-change", VLC_VAR_BOOL );
 
-    /* Notify interfaces that a new VLC version is available */
-#ifdef UPDATE_CHECK
-    var_Create( p_libvlc, "update-notify", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-#endif
-
     /*
      * Get input filenames given as commandline arguments
      */

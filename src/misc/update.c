@@ -883,6 +883,8 @@ typedef struct
 {
     VLC_COMMON_MEMBERS
     update_t *p_update;
+    void (*pf_callback)( void * );
+    void *p_data;
 } update_check_thread_t;
 
 void update_CheckReal( update_check_thread_t *p_uct );
@@ -891,15 +893,19 @@ void update_CheckReal( update_check_thread_t *p_uct );
  * Check for updates
  *
  * \param p_update pointer to update struct
+ * \param pf_callback pointer to a function to call when the update_check is finished
+ * \param p_data pointer to some datas to give to the callback
  * \returns nothing
  */
-void update_Check( update_t *p_update )
+void update_Check( update_t *p_update, void (*pf_callback)( void* ), void *p_data )
 {
     assert( p_update );
 
     update_check_thread_t *p_uct = vlc_object_create( p_update->p_libvlc,
                                             sizeof( update_check_thread_t ) );
     p_uct->p_update = p_update;
+    p_uct->pf_callback = pf_callback;
+    p_uct->p_data = p_data;
 
     vlc_thread_create( p_uct, "check for update", update_CheckReal,
                        VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
@@ -914,7 +920,8 @@ void update_CheckReal( update_check_thread_t *p_uct )
 
     vlc_mutex_unlock( &p_uct->p_update->lock );
 
-    var_TriggerCallback( p_uct->p_libvlc, "update-notify" );
+    if( p_uct->pf_callback )
+        (p_uct->pf_callback)( p_uct->p_data );
 }
 
 /**
@@ -1035,7 +1042,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     char *psz_destdir = p_udt->psz_destdir;
 
     /* Open the stream */
-    p_stream = stream_UrlNew( p_update->p_libvlc, p_update->release.psz_url );
+    p_stream = stream_UrlNew( p_udt, p_update->release.psz_url );
     if( !p_stream )
     {
         msg_Err( p_udt, "Failed to open %s for reading", p_update->release.psz_url );
@@ -1107,15 +1114,15 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     else
         remove( psz_destfile );
 
-    error:
-        if( p_stream )
-            stream_Delete( p_stream );
-        if( p_file )
-            fclose( p_file );
-        free( psz_destdir );
-        free( psz_destfile );
-        free( p_buffer );
-        free( psz_size );
+error:
+    if( p_stream )
+        stream_Delete( p_stream );
+    if( p_file )
+        fclose( p_file );
+    free( psz_destdir );
+    free( psz_destfile );
+    free( p_buffer );
+    free( psz_size );
 }
 
 #endif

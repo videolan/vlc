@@ -179,13 +179,11 @@ void AboutDialog::close()
  * UpdateDialog
  *****************************************************************************/
 /* callback to get information from the core */
-static int updateCallback( vlc_object_t *p_this, char const *psz_cmd,
-                           vlc_value_t oldval, vlc_value_t newval, void *data )
+static void UpdateCallback( void *data )
 {
     UpdateDialog* UDialog = (UpdateDialog *)data;
     QEvent *event = new QEvent( QEvent::User );
     QApplication::postEvent( UDialog, event );
-    return VLC_SUCCESS;
 }
 
 UpdateDialog *UpdateDialog::instance = NULL;
@@ -215,13 +213,11 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     /* create the update structure and the callback */
     p_update = update_New( _p_intf );
-    var_AddCallback( _p_intf->p_libvlc, "update-notify", updateCallback, this );
     b_checked = false;
 }
 
 UpdateDialog::~UpdateDialog()
 {
-    var_DelCallback( p_update->p_libvlc, "update-notify", updateCallback, this );
     update_Delete( p_update );
 }
 
@@ -236,7 +232,7 @@ void UpdateDialog::UpdateOrDownload()
     if( !b_checked )
     {
         updateButton->setEnabled( false );
-        update_Check( p_update );
+        update_Check( p_update, UpdateCallback, this );
     }
     else
     {

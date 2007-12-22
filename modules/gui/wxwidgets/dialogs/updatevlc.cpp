@@ -100,7 +100,7 @@ void UpdateVLC::OnClose( wxCloseEvent& WXUNUSED(event) )
 
 void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
 {
-    update_Check( p_update );
+    update_Check( p_update, NULL, this );
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
 
     DestroyChildren();
