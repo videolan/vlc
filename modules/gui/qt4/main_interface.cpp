@@ -150,6 +150,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Widgets Creation*/
     b_remainingTime = false;
     timeLabel = new TimeLabel;
+    timeLabel->setAlignment( Qt::AlignRight );
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
@@ -164,7 +165,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* and adding those */
     statusBar()->addWidget( nameLabel, 8 );
     statusBar()->addPermanentWidget( speedLabel, 0 );
-    statusBar()->addPermanentWidget( timeLabel, 2 );
+    statusBar()->addPermanentWidget( timeLabel, 0 );
 
     /* timeLabel behaviour:
        - double clicking opens the goto time dialog
