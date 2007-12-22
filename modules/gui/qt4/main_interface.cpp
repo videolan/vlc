@@ -298,7 +298,7 @@ MainInterface::~MainInterface()
         ExtendedDialog::getInstance( p_intf )->savingSettings();
 
     settings->beginGroup( "MainWindow" );
-    settings->setValue( "playlist-floats", dockPL->isFloating() );
+    settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
@@ -502,8 +502,8 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
 //FIXME remove me at the end...
 void MainInterface::debug()
 {
-    msg_Dbg( p_intf, "size: %i - %i", controls->size().height(), controls->size().width() );
-    msg_Dbg( p_intf, "sizeHint: %i - %i", controls->sizeHint().height(), controls->sizeHint().width() );
+    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
 }
 
 /**********************************************************************
@@ -537,7 +537,7 @@ QSize MainInterface::sizeHint() const
         nwidth  = videoWidget->size().width();
         msg_Dbg( p_intf, "2 %i %i", nheight, nwidth );
     }
-    if( !dockPL->isFloating() && dockPL->widget() )
+    if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
     {
         nheight += dockPL->size().height();
         nwidth = MAX( nwidth, dockPL->size().width() );
@@ -711,31 +711,28 @@ void MainInterface::togglePlaylist()
         addDockWidget( Qt::BottomDockWidgetArea, dockPL );
 
         /* Make the playlist floating is requested. Default is not. */
-        //FIXME
-        if( settings->value( "playlist-floats", false ).toBool() );
+        settings->beginGroup( "MainWindow" );
+        if( settings->value( "playlist-floats", 1 ).toInt() )
         {
             msg_Dbg( p_intf, "we don't want the playlist inside");
             dockPL->setFloating( true );
         }
+        settings->endGroup();
         dockPL->show();
     }
     else
     {
     /* toggle the visibility of the playlist */
        TOGGLEV( dockPL );
-       //resize(sizeHint());
+       resize( sizeHint() );
     }
-#if 0
-    doComponentsUpdate();
-#endif
-    updateGeometry();
 }
 
 /* Function called from the menu to undock the playlist */
 void MainInterface::undockPlaylist()
 {
     dockPL->setFloating( true );
-    updateGeometry();
+    resize( sizeHint() );
 }
 
 void MainInterface::toggleMinimalView()
@@ -750,9 +747,9 @@ void MainInterface::toggleMinimalView()
 /* Well, could it, actually ? Probably dangerous ... */
 void MainInterface::doComponentsUpdate()
 {
+    resize( sizeHint() );
     msg_Dbg( p_intf, "Updating the geometry" );
     updateGeometry();
-    resize( sizeHint() );
 }
 
 /* toggling advanced controls buttons */
