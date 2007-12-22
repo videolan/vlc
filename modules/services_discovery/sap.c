@@ -542,11 +542,13 @@ static void Run( services_discovery_t *p_sd )
         return;
     }
 
+    vlc_object_lock( p_sd );
+
     /* read SAP packets */
     while( vlc_object_alive( p_sd ) )
     {
         unsigned n = p_sd->p_sys->i_fd;
-        struct pollfd ufd[n];
+        struct pollfd ufd[n+1];
 
         for (unsigned i = 0; i < n; i++)
         {
@@ -555,12 +557,23 @@ static void Run( services_discovery_t *p_sd )
             ufd[i].revents = 0;
         }
 
-        /* FIXME: remove this stupid evil hack when we have sorted out how to
-         * to cancel threads while doing network I/O */
-        if (timeout > 2000)
-            timeout = 2000;
+        /* Make sure we track vlc_object_signal() */
+        ufd[n].fd = vlc_object_waitpipe( p_sd );
+        ufd[n].events = POLLIN | POLLHUP;
+        ufd[n].revents = 0;
 
-        if (poll (ufd, n, timeout) > 0)
+        if( ufd[n].fd == -1 )
+        {
+            /* On windows, fd will be -1, as we can't select on a pipe()-ed
+             * fildes. Because we have no other solution to track that
+             * object is killed, we make sure the timeout won't be to long. */
+            if( timeout > 1000 || timeout == -1 )
+                timeout = 1000;
+        }
+
+        vlc_object_unlock( p_sd );
+
+        if (poll (ufd, n+1, timeout) > 0)
         {
             for (unsigned i = 0; i < n; i++)
             {
@@ -617,7 +630,10 @@ static void Run( services_discovery_t *p_sd )
             timeout = -1; /* We can safely poll indefinitly. */
         else if( timeout < 200 )
             timeout = 200; /* Don't wakeup too fast. */
+
+        vlc_object_lock( p_sd );
     }
+    vlc_object_unlock( p_sd );
 }
 
 /**********************************************************************
