@@ -44,6 +44,9 @@
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
 #endif
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
@@ -536,20 +539,49 @@ static void Run( services_discovery_t *p_sd )
     /* read SAP packets */
     while( !p_sd->b_die )
     {
-        int i_read;
-        uint8_t p_buffer[MAX_SAP_BUFFER+1];
+        unsigned n = p_sd->p_sys->i_fd;
+        struct pollfd ufd[n];
 
-        i_read = net_Select( p_sd, p_sd->p_sys->pi_fd,
-                             p_sd->p_sys->i_fd, p_buffer,
-                             MAX_SAP_BUFFER, 500 );
+        for (unsigned i = 0; i < n; i++)
+        {
+            ufd[i].fd = p_sd->p_sys->pi_fd[i];
+            ufd[i].events = POLLIN;
+            ufd[i].revents = 0;
+        }
+
+        /* FIXME FIXME FIXME: short arbitrary timer */
+        if (poll (ufd, n, 500) > 0)
+        {
+            for (unsigned i = 0; i < n; i++)
+            {
+                if (ufd[i].revents)
+                {
+                    uint8_t p_buffer[MAX_SAP_BUFFER+1];
+                    ssize_t i_read;
+
+                    i_read = net_Read (p_sd, ufd[i].fd, NULL, p_buffer,
+                                       MAX_SAP_BUFFER, VLC_FALSE);
+                    if (i_read < 0)
+                        msg_Warn (p_sd, "receive error: %m");
+                    if (i_read > 6)
+                    {
+                        /* Parse the packet */
+                        p_buffer[i_read] = '\0';
+                        ParseSAP (p_sd, p_buffer, i_read);
+                    }
+                }
+            }
+        }
+
+        mtime_t now = mdate();
 
         /* Check for items that need deletion */
         for( i = 0; i < p_sd->p_sys->i_announces; i++ )
         {
             mtime_t i_timeout = ( mtime_t ) 1000000 * p_sd->p_sys->i_timeout;
             sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
-            mtime_t i_last_period = mdate() - p_announce->i_last;
-            
+            mtime_t i_last_period = now - p_announce->i_last;
+
             /* Remove the annoucement, if the last announcement was 1 hour ago
              * or if the last packet emitted was 3 times the average time
              * between two packets */
@@ -559,21 +591,6 @@ static void Run( services_discovery_t *p_sd )
                 RemoveAnnounce( p_sd, p_announce );
             }
         }
-
-        /* Minimum length is > 6 */
-        if( i_read <= 6 )
-        {
-            if( i_read < 0 )
-            {
-                msg_Warn( p_sd, "socket read error" );
-            }
-            continue;
-        }
-
-        p_buffer[i_read] = '\0';
-
-        /* Parse the packet */
-        ParseSAP( p_sd, p_buffer, i_read );
     }
 }
 
