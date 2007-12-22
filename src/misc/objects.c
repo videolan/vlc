@@ -482,7 +482,7 @@ void __vlc_object_unlock( vlc_object_t *obj )
  * @param obj object that would be signaled (object lock MUST hold)
  * @return a readable pipe descriptor, or -1 on error.
  */
-int vlc_object_waitpipe( vlc_object_t *obj )
+int __vlc_object_waitpipe( vlc_object_t *obj )
 {
     int *pipes = obj->p_internals->pipes;
     vlc_assert_locked( &obj->object_lock );

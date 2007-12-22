@@ -178,7 +178,9 @@ VLC_EXPORT( vlc_bool_t, __vlc_object_alive, ( vlc_object_t * ) );
 #define vlc_object_alive(a) \
     __vlc_object_alive( VLC_OBJECT(a) )
 
-int vlc_object_waitpipe( vlc_object_t *obj );
+VLC_EXPORT( int, __vlc_object_waitpipe, ( vlc_object_t *obj ));
+#define vlc_object_waitpipe(a) \
+    __vlc_object_waitpipe( VLC_OBJECT(a) )
 
 /* NOTE: this function is a *temporary* convenience.
  * See the vlc_object_alive() documentation for a better alternative.
