@@ -256,8 +256,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 static ssize_t
 net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                const v_socket_t *const *restrict vsv,
-               uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall,
-               int timeout)
+               uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall)
 {
     size_t i_total = 0;
 
@@ -282,13 +281,12 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             ufd[i].revents = 0;
         }
 
-        switch (poll (ufd, fdc, timeout ? timeout : 500))
+        switch (poll (ufd, fdc, 500))
         {
             case -1:
                 goto error;
 
             case 0: // timeout
-                if( timeout ) return i_total;
                 continue;
         }
 
@@ -401,7 +399,7 @@ ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
 {
     return net_ReadInner( p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          buf, len, b_retry, 0 );
+                          buf, len, b_retry );
 }
 
 
@@ -409,19 +407,16 @@ ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
  * __net_Select:
  *****************************************************************************
  * Read from several sockets. Takes data from the first socket that has some.
- * if timeout is zero, net_Select will wait indefinitely. timeout is in
- * millisecond.
  *****************************************************************************/
 ssize_t __net_Select( vlc_object_t *restrict p_this,
                       const int *restrict fds, int nfd,
-                      uint8_t *restrict buf, size_t len,
-                      int timeout )
+                      uint8_t *restrict buf, size_t len )
 {
     const v_socket_t *vsv[nfd];
     memset( vsv, 0, sizeof (vsv) );
 
     return net_ReadInner( p_this, nfd, fds, vsv,
-                          buf, len, VLC_FALSE, timeout );
+                          buf, len, VLC_FALSE );
 }
 
 
