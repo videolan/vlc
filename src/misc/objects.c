@@ -493,8 +493,6 @@ int vlc_object_waitpipe( vlc_object_t *obj )
 
 #ifndef WIN32
         if( pipe( pipes ) )
-#else
-        if( _pipe( pipes, 1, _O_BINARY ) )
 #endif
             return -1;
     }
