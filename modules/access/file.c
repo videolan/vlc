@@ -372,6 +372,13 @@ static block_t *mmapBlock (access_t *p_access)
     size_t length = (MMAP_SIZE > p_sys->pagemask) ? MMAP_SIZE : (p_sys->pagemask + 1);
     void *addr;
 
+#ifndef NDEBUG
+    int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
+    if (dbgpos != p_access->info.i_pos)
+        msg_Err (p_access, "position: 0x%08llx instead of 0x%08llx",
+                 p_access->info.i_pos, dbgpos);
+#endif
+
     if (p_access->info.i_pos >= p_access->info.i_size)
     {
         /* End of file - check if file size changed... */
@@ -429,6 +436,18 @@ static block_t *mmapBlock (access_t *p_access)
     block->length = length;
     //vlc_object_yield (block->owner = VLC_OBJECT (p_access));
 
+#ifndef NDEBUG
+    /* Compare normal I/O with memory mapping */
+    char buf[block->self.i_buffer];
+    ssize_t i_read = read (p_sys->fd, buf, block->self.i_buffer);
+
+    if (i_read != (ssize_t)block->self.i_buffer)
+        msg_Err (p_access, "read %u instead of %u bytes", (unsigned)i_read,
+                 (unsigned)block->self.i_buffer);
+    if (memcmp (buf, block->self.p_buffer, block->self.i_buffer))
+        msg_Err (p_access, "inconsistent data buffer");
+#endif
+
     return &block->self;
 }
 #endif
@@ -451,7 +470,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = VLC_FALSE;
 
-#ifdef HAVE_MMAP
+#if defined (HAVE_MMAP) && defined (NDEBUG)
     if (p_access->pf_block == NULL)
 #endif
         lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
