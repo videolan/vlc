@@ -39,9 +39,8 @@ class SoutDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static SoutDialog * getInstance( QWidget *parent,
-                                     intf_thread_t *p_intf,
-                                     bool transcode_only )
+    static SoutDialog* getInstance( QWidget *parent, intf_thread_t *p_intf,
+                                    bool transcode_only )
     {
         if( !instance )
             instance = new SoutDialog( parent, p_intf, transcode_only );
@@ -55,18 +54,17 @@ public:
             }
         }
         return instance;
-    };
+    }
 
-    virtual ~SoutDialog();
+    virtual ~SoutDialog(){}
 
     QString getMrl(){ return mrl; }
 
 private:
+    Ui::Sout ui;
+    static SoutDialog *instance;
     SoutDialog( QWidget* parent, intf_thread_t *,
                 bool _transcode_only = false );
-    static SoutDialog *instance;
-
-    Ui::Sout ui;
     QPushButton *okButton;
     QString mrl;
     bool b_transcode_only;

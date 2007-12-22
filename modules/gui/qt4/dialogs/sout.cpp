@@ -30,9 +30,10 @@
 #include "dialogs/sout.hpp"
 #include <vlc_streaming.h>
 
-#include <iostream>
 #include <QString>
 #include <QFileDialog>
+
+SoutDialog* SoutDialog::instance = NULL;
 
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
                      bool _transcode_only ) : QVLCDialog( parent,  _p_intf )
