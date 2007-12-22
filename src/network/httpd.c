@@ -1071,6 +1071,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     vlc_object_lock( host );
     if( vlc_object_waitpipe( VLC_OBJECT( host ) ) == -1 )
     {
+        msg_Err( host, "signaling pipe error: %m")
         vlc_object_unlock( host );
         goto error;
     }

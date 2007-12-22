@@ -64,6 +64,7 @@
 #else
 # include <io.h>
 # include <fcntl.h>
+# include <errno.h> /* ENOSYS */
 #endif
 
 /*****************************************************************************
@@ -493,6 +494,8 @@ int vlc_object_waitpipe( vlc_object_t *obj )
 
 #ifndef WIN32
         if( pipe( pipes ) )
+#else
+        errno = ENOSYS;
 #endif
             return -1;
     }
