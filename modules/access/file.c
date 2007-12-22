@@ -116,6 +116,7 @@ static int  open_file( access_t *, const char * );
 
 struct access_sys_t
 {
+    uint64_t     pagemask;
     unsigned int i_nb_reads;
     vlc_bool_t   b_kfir;
 
@@ -202,6 +203,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_seekable = VLC_FALSE;
 
 # ifdef HAVE_MMAP
+    p_sys->pagemask = sysconf (_SC_PAGE_SIZE) - 1;
+
     /* Autodetect mmap() support */
     if (p_sys->b_pace_control && S_ISREG (st.st_mode) && (st.st_size > 0))
     {
@@ -340,7 +343,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 }
 
 #ifdef HAVE_MMAP
-# define MMAP_SIZE (1 << 18)
+# define MMAP_SIZE (1 << 20)
 
 struct block_sys_t
 {
@@ -364,15 +367,14 @@ static block_t *mmapBlock (access_t *p_access)
     access_sys_t *p_sys = p_access->p_sys;
 
     const int flags = MAP_SHARED;
-    const size_t pagesize = sysconf (_SC_PAGE_SIZE);
-    off_t offset = p_access->info.i_pos & ~(pagesize - 1);
-    size_t align = p_access->info.i_pos & (pagesize - 1);
-    size_t length = (MMAP_SIZE > pagesize) ? MMAP_SIZE : pagesize;
+    off_t offset = p_access->info.i_pos & ~p_sys->pagemask;
+    size_t align = p_access->info.i_pos & p_sys->pagemask;
+    size_t length = (MMAP_SIZE > p_sys->pagemask) ? MMAP_SIZE : (p_sys->pagemask + 1);
     void *addr;
 
     if (p_access->info.i_pos >= p_access->info.i_size)
     {
-        /* End of file - check that file size hasn't change... */
+        /* End of file - check if file size changed... */
         struct stat st;
 
         if ((fstat (p_sys->fd, &st) == 0)
@@ -392,7 +394,7 @@ static block_t *mmapBlock (access_t *p_access)
     }
 
     if (offset + length > p_access->info.i_size)
-        /* Don't mmap paste end of file */
+        /* Don't mmap beyond end of file */
         length = p_access->info.i_size - offset;
 
     assert (offset <= p_access->info.i_pos);               /* and */
@@ -412,7 +414,7 @@ static block_t *mmapBlock (access_t *p_access)
 
     p_access->info.i_pos = offset + length;
 
-    msg_Dbg (p_access, "mapped %lu bytes at %p from offset %lu",
+    msg_Dbg (p_access, "mapped 0x%lx bytes at %p from offset 0x%lx",
              (unsigned long)length, addr, (unsigned long)offset);
     block_sys_t *block = malloc (sizeof (*block));
     if (block == NULL)
@@ -436,15 +438,14 @@ static block_t *mmapBlock (access_t *p_access)
  *****************************************************************************/
 static int Seek (access_t *p_access, int64_t i_pos)
 {
-    if (i_pos > p_access->info.i_size)
+    /* FIXME: i_size should really be unsigned */
+    if ((uint64_t)i_pos > (uint64_t)p_access->info.i_size)
     {
-        msg_Err (p_access, "seeking too far");
+        /* This should only happen with corrupted files.
+         * But it also seems to happen with buggy demuxes (ASF) */
+        msg_Err (p_access, "seeking too far (0x"I64Fx" / 0x"I64Fx")",
+                 i_pos, p_access->info.i_size);
         i_pos = p_access->info.i_size;
-    }
-    else if (i_pos < 0)
-    {
-        msg_Err (p_access, "seeking too early");
-        i_pos = 0;
     }
 
     p_access->info.i_pos = i_pos;
