@@ -150,6 +150,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Widgets Creation*/
     b_remainingTime = false;
     timeLabel = new TimeLabel;
+    timeLabel->setText( " --:--/--:-- " );
     timeLabel->setAlignment( Qt::AlignRight );
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
@@ -811,13 +812,13 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
                                                            : time );
 
-    QString title;
-    title.sprintf( "%s/%s", psz_time,
+    QString timestr;
+    timestr.sprintf( "%s/%s", psz_time,
                             ( !length && time ) ? "--:--" : psz_length );
 
     /* Add a minus to remaining time*/
-    if( b_remainingTime && length ) timeLabel->setText( " -"+title+" " );
-    else timeLabel->setText( " "+title+" " );
+    if( b_remainingTime && length ) timeLabel->setText( " -"+timestr+" " );
+    else timeLabel->setText( " "+timestr+" " );
 }
 
 void MainInterface::toggleTimeDisplay()
