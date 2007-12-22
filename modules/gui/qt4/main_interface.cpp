@@ -397,9 +397,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     if( videoEmbeddedFlag )
     {
         videoWidget = new VideoWidget( p_intf );
-        //videoWidget->widgetSize = QSize( 16, 16 );
-        //videoWidget->hide();
-        //videoWidget->resize( videoWidget->widgetSize );
         mainLayout->insertWidget( 0, videoWidget );
 
         p_intf->pf_request_window  = ::DoRequest;
@@ -702,7 +699,7 @@ void MainInterface::togglePlaylist()
     If no playlist exist, then create one and attach it to the DockPL*/
     if( !playlistWidget )
     {
-        playlistWidget = new PlaylistWidget( p_intf, settings );
+        playlistWidget = new PlaylistWidget( p_intf, settings, dockPL );
 
         /* Add it to the parent DockWidget */
         dockPL->setWidget( playlistWidget );
@@ -717,6 +714,10 @@ void MainInterface::togglePlaylist()
             msg_Dbg( p_intf, "we don't want the playlist inside");
             dockPL->setFloating( true );
         }
+        settings->endGroup();
+        settings->beginGroup( "playlist" );
+        dockPL->move( settings->value( "pos", QPoint( 0,0 ) ).toPoint() );
+        dockPL->resize( settings->value( "size", QSize( 400, 300 ) ).toSize() );
         settings->endGroup();
         dockPL->show();
     }

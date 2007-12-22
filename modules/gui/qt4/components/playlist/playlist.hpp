@@ -41,7 +41,7 @@ class PlaylistWidget : public QSplitter
 {
     Q_OBJECT;
 public:
-    PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) ;
+    PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidget *parent ) ;
     virtual ~PlaylistWidget();
     QSize sizeHint() const;
     void savingSettings( QSettings *settings );
@@ -51,6 +51,7 @@ private:
     QPushButton *addButton;
     QLabel *art;
     QString prevArt;
+    QWidget *parent;
 protected:
     intf_thread_t *p_intf;
 private slots:

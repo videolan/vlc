@@ -38,8 +38,8 @@
  * Playlist Widget. The embedded playlist
  **********************************************************************/
 
-PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings ) :
-                                p_intf ( _p_i )
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidget *_parent ) :
+                                p_intf ( _p_i ), parent( _parent )
 {
     /* Left Part and design */
     QSplitter *leftW = new QSplitter( Qt::Vertical, this );
@@ -126,9 +126,9 @@ PlaylistWidget::~PlaylistWidget()
 void PlaylistWidget::savingSettings( QSettings *settings )
 {
     settings->beginGroup( "playlist" );
-    settings->setValue( "pos", pos() );
-    settings->setValue( "size", size() );
-    settings->setValue("splitterSizes", saveState() );
+    settings->setValue( "pos", parent->pos() );
+    settings->setValue( "size", parent->size() );
+    settings->setValue( "splitterSizes", saveState() );
     settings->endGroup();
 }
 
