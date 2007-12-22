@@ -253,12 +253,22 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 }
 
 
-static ssize_t
-net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
-               const v_socket_t *const *restrict vsv,
-               uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall)
+/*****************************************************************************
+ * __net_Read:
+ *****************************************************************************
+ * Read from a network socket
+ * If waitall is true, then we repeat until we have read the right amount of
+ * data; in that case, a short count means EOF has been reached.
+ *****************************************************************************/
+ssize_t
+__net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
+            uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall)
 {
     size_t i_total = 0;
+    struct pollfd ufd[1];
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN;
+
 
     while (i_buflen > 0)
     {
@@ -272,16 +282,9 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             goto error;
         }
 
-        struct pollfd ufd[fdc];
-
-        for (unsigned i = 0; i < fdc; i++)
-        {
-            ufd[i].fd = fdv[i];
-            ufd[i].events = POLLIN;
-            ufd[i].revents = 0;
-        }
-
-        switch (poll (ufd, fdc, 500))
+        ufd[0].revents = 0;
+        /* TODO: don't use arbitrary timer just for b_die */
+        switch (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), 500))
         {
             case -1:
                 goto error;
@@ -290,56 +293,33 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                 continue;
         }
 
-        for (unsigned i = 0;; i++)
-        {
-            assert (i < fdc); /* no events found = bug ! */
-
-            if (ufd[i].revents == 0)
-                continue;
+        assert (ufd[0].revents);
 
 #ifndef POLLRDHUP /* This is nice but non-portable */
 # define POLLRDHUP 0
 #endif
-            if (i_total > 0)
-            {
-                // Errors (-1) and EOF (0) will be returned on next run
-                if (ufd[i].revents & (POLLERR|POLLNVAL|POLLRDHUP))
-                    return i_total;
-            }
-            else
-            {
-                if (ufd[i].revents & POLLRDHUP)
-                    return 0; // EOF, read() would yield 0
-            }
-
-            fdc = 1;
-            fdv += i;
-            vsv += i;
-
-            break;
+        if (i_total > 0)
+        {
+            /* Errors (-1) and EOF (0) will be returned on next call,
+             * otherwise we'd "hide" the error from the caller, which is a
+             * bad idea™. */
+            if (ufd[0].revents & (POLLERR|POLLNVAL|POLLRDHUP))
+                return i_total;
         }
 
         ssize_t n;
-        if (*vsv != NULL)
+        if (vs != NULL)
         {
-            n = (*vsv)->pf_recv ((*vsv)->p_sys, p_buf, i_buflen);
+            n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
         }
         else
         {
 #ifdef WIN32
-            n = recv (*fdv, p_buf, i_buflen, 0);
+            n = recv (fd, p_buf, i_buflen, 0);
 #else
-            n = read (*fdv, p_buf, i_buflen);
+            n = read (fd, p_buf, i_buflen);
 #endif
         }
-
-        if (n == 0)
-            /* For streams, this means end of file, and there will not be any
-             * further data ever on the stream. For datagram sockets, this
-             * means empty datagram, and there could be more data coming.
-             * However, it makes no sense to set <waitall> with datagrams.
-             */
-            break; // EOF
 
         if (n == -1)
         {
@@ -347,7 +327,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             switch (WSAGetLastError ())
             {
                 case WSAEWOULDBLOCK:
-                /* only happens with vs != NULL (SSL) - not really an error */
+                /* only happens with vs != NULL (TLS) - not really an error */
                     continue;
 
                 case WSAEMSGSIZE:
@@ -371,6 +351,15 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 #endif
         }
 
+        if (n == 0)
+            /* For streams, this means end of file, and there will not be any
+             * further data ever on the stream. For datagram sockets, this
+             * means empty datagram, and there could be more data coming.
+             * However, it makes no sense to set <waitall> with datagrams in the
+             * first place.
+             */
+            break; // EOF
+
         i_total += n;
         p_buf += n;
         i_buflen -= n;
@@ -383,40 +372,6 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 error:
     msg_Err (p_this, "Read error: %m");
     return i_total ? (ssize_t)i_total : -1;
-}
-
-
-/*****************************************************************************
- * __net_Read:
- *****************************************************************************
- * Read from a network socket
- * If b_retry is true, then we repeat until we have read the right amount of
- * data; in that case, a short count means EOF has been reached.
- *****************************************************************************/
-ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
-                    const v_socket_t *restrict p_vs,
-                    uint8_t *restrict buf, size_t len, vlc_bool_t b_retry )
-{
-    return net_ReadInner( p_this, 1, &(int){ fd },
-                          &(const v_socket_t *){ p_vs },
-                          buf, len, b_retry );
-}
-
-
-/*****************************************************************************
- * __net_Select:
- *****************************************************************************
- * Read from several sockets. Takes data from the first socket that has some.
- *****************************************************************************/
-ssize_t __net_Select( vlc_object_t *restrict p_this,
-                      const int *restrict fds, int nfd,
-                      uint8_t *restrict buf, size_t len )
-{
-    const v_socket_t *vsv[nfd];
-    memset( vsv, 0, sizeof (vsv) );
-
-    return net_ReadInner( p_this, nfd, fds, vsv,
-                          buf, len, VLC_FALSE );
 }
 
 

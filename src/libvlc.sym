@@ -174,7 +174,6 @@ net_ListenClose
 __net_OpenDgram
 net_Printf
 __net_Read
-__net_Select
 net_SetCSCov
 __net_vaPrintf
 __net_Write
