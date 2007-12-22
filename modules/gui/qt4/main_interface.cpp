@@ -91,6 +91,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     videoIsActive = false;
     input_name = "";
+    playlistVisible = false;
 
     /* Ask for privacy */
     privacy();
@@ -286,9 +287,17 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     move( settings->value( "pos", QPoint( 0, 0 ) ).toPoint() );
 
     resize( settings->value( "size", QSize( 350, 60 ) ).toSize() );
+
+    int tgPlay = settings->value( "playlist-visible", 0 ).toInt();
+    settings->endGroup();
+
+    if( tgPlay )
+    {
+        togglePlaylist();
+    }
+
     updateGeometry();
 
-    settings->endGroup();
 }
 
 MainInterface::~MainInterface()
@@ -299,6 +308,7 @@ MainInterface::~MainInterface()
 
     settings->beginGroup( "MainWindow" );
     settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
+    settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
@@ -720,12 +730,14 @@ void MainInterface::togglePlaylist()
         dockPL->resize( settings->value( "size", QSize( 400, 300 ) ).toSize() );
         settings->endGroup();
         dockPL->show();
+        playlistVisible = true;
     }
     else
     {
     /* toggle the visibility of the playlist */
        TOGGLEV( dockPL );
        resize( sizeHint() );
+       playlistVisible = !playlistVisible;
     }
 }
 

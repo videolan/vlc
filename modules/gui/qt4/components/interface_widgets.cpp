@@ -58,7 +58,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
     hide(); setMinimumSize( 16, 16 );
- 
+
    // CONNECT( this, askResize( int, int ), this, SetSizing( int, int ) );
     CONNECT( this, askVideoWidgetToShow(), this, show() );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
@@ -160,7 +160,8 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
 
     resize( 300, 150 );
     updateGeometry();
-    CONNECT( THEMIM, inputChanged( input_thread_t *), this, update( input_thread_t * ) );
+    CONNECT( THEMIM, inputChanged( input_thread_t *),
+             this, update( input_thread_t * ) );
 }
 
 BackgroundWidget::~BackgroundWidget()

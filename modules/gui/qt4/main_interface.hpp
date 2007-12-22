@@ -63,15 +63,19 @@ public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
 
+    /* Video requests from core */
     void *requestVideo( vout_thread_t *p_nvout, int *pi_x,
                         int *pi_y, unsigned int *pi_width,
                         unsigned int *pi_height );
     void releaseVideo( void * );
     int controlVideo( void *p_window, int i_query, va_list args );
 
+    /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
     int getControlsVisibilityStatus();
+
+    /* Sizehint() */
     QSize sizeHint() const;
 protected:
 //    void resizeEvent( QResizeEvent * );
@@ -84,44 +88,39 @@ protected:
     friend class VolumeClickHandler;
 private:
     QSettings           *settings;
-    QSize                mainSize, addSize;
     QSystemTrayIcon     *sysTray;
     QMenu               *systrayMenu;
     QString              input_name;
     QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
-    QMenu                *speedControlMenu;
+    QMenu               *speedControlMenu;
     SpeedControlWidget  *speedControl;
-
-    bool                 need_components_update;
 
     void handleMainUi( QSettings* );
     void privacy();
-    void handleSystray();
-    //void buildStatus();
+    int  privacyDialog( QList<ConfigControl *> controls );
 
+    /* Systray */
+    void handleSystray();
     void createSystray();
-    int privacyDialog( QList<ConfigControl *> controls );
 
     /* Video */
     VideoWidget         *videoWidget;
-    virtual void keyPressEvent( QKeyEvent *);
-    virtual void wheelEvent( QWheelEvent * );
-
-    bool                 videoIsActive;
-    QSize                savedVideoSize;
+    //    QSize                savedVideoSize;
 
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
     QDockWidget         *dockPL;
 
-    bool                 videoEmbeddedFlag;
-    bool                 alwaysVideoFlag;
+    bool                 videoIsActive; ///< Having a video now / THEMIM->hasV
+    bool                 videoEmbeddedFlag; ///< Want an external Video Window
+    bool                 playlistVisible; ///< Is the playlist visible ?
+    bool                 alwaysVideoFlag; ///< Always show the background
     bool                 visualSelectorEnabled;
-    bool                 notificationEnabled;
+    bool                 notificationEnabled; /// Systray Notifications
+    bool                 b_remainingTime; /* showing elapsed or remaining time */
 
-    InputManager        *main_input_manager;
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
     /* Status Bar */
@@ -129,9 +128,10 @@ private:
     QLabel              *speedLabel;
     QLabel              *nameLabel;
 
-    bool                 b_remainingTime; /* showing elapsed or remaining time */
+    virtual void customEvent( QEvent *);
+    virtual void keyPressEvent( QKeyEvent *);
+    virtual void wheelEvent( QWheelEvent * );
 
-    void customEvent( QEvent *);
 public slots:
     void undockPlaylist();
     void toggleMinimalView();
