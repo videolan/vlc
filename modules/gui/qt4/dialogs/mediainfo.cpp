@@ -101,7 +101,8 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
         CONNECT( THEMIM, inputChanged( input_thread_t * ),
                  this, update( input_thread_t * ) );
 
-        p_item = input_GetItem( THEMIM->getInput() );
+        if( THEMIM->getInput() )
+            p_item = input_GetItem( THEMIM->getInput() );
     }
 
     /* Call update by hand, so info is shown from current item too */
