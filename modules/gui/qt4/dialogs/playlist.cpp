@@ -46,7 +46,8 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     QHBoxLayout *l = new QHBoxLayout( centralWidget() );
-    PlaylistWidget *plw = new PlaylistWidget( p_intf, NULL );
+    QSettings *settings = new QSettings( "vlc", "vlc-qt-interface" );
+    PlaylistWidget *plw = new PlaylistWidget( p_intf, settings );
     l->addWidget( plw );
 
     readSettings( "playlist", QSize( 600,700 ) );
