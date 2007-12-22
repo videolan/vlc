@@ -40,9 +40,7 @@
 
 #include <assert.h>
 
-
 #include <vlc_update.h>
-
 #include <vlc_stream.h>
 #include <vlc_interface.h>
 
@@ -77,8 +75,6 @@
 #else
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
 #endif
-
-#define STRDUP( a ) ( a ? strdup( a ) : NULL )
 
 
 /*****************************************************************************
@@ -757,8 +753,7 @@ static uint8_t *key_sign_hash( public_key_t *p_pkey )
 update_t *__update_New( vlc_object_t *p_this )
 {
     update_t *p_update;
-
-    if( p_this == NULL ) return NULL;
+    assert( p_this );
 
     p_update = (update_t *)malloc( sizeof( update_t ) );
     if( !p_update ) return NULL;
@@ -769,9 +764,6 @@ update_t *__update_New( vlc_object_t *p_this )
 
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
-
-    var_Create( p_this->p_libvlc, "update-notify", VLC_VAR_INTEGER |
-                VLC_VAR_ISCOMMAND );
 
     return p_update;
 }
@@ -787,8 +779,6 @@ void update_Delete( update_t *p_update )
     assert( p_update );
 
     vlc_mutex_destroy( &p_update->lock );
-
-    var_Destroy( p_update->p_libvlc, "update-notify" );
 
     FREENULL( p_update->release.psz_url );
     FREENULL( p_update->release.psz_desc );
@@ -880,9 +870,9 @@ static void GetUpdateFile( update_t *p_update )
     }
     p_update->release.psz_desc = psz_line;
 
-    error:
-        if( p_stream )
-            stream_Delete( p_stream );
+error:
+    if( p_stream )
+        stream_Delete( p_stream );
 }
 
 
@@ -924,7 +914,7 @@ void update_CheckReal( update_check_thread_t *p_uct )
 
     vlc_mutex_unlock( &p_uct->p_update->lock );
 
-    var_TriggerCallback( p_uct->p_update->p_libvlc, "update-notify" );
+    var_TriggerCallback( p_uct->p_libvlc, "update-notify" );
 }
 
 /**
@@ -1019,7 +1009,7 @@ void update_Download( update_t *p_update, char *psz_destdir )
                                                       sizeof( update_download_thread_t ) );
 
     p_udt->p_update = p_update;
-    p_udt->psz_destdir = STRDUP( psz_destdir );
+    p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
     vlc_thread_create( p_udt, "download update", update_DownloadReal,
                        VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
@@ -1048,7 +1038,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     p_stream = stream_UrlNew( p_update->p_libvlc, p_update->release.psz_url );
     if( !p_stream )
     {
-        msg_Err( p_update->p_libvlc, "Failed to open %s for reading", p_update->release.psz_url );
+        msg_Err( p_udt, "Failed to open %s for reading", p_update->release.psz_url );
         goto error;
     }
 
@@ -1059,7 +1049,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     psz_tmpdestfile = strrchr( p_update->release.psz_url, '/' );
     if( !psz_tmpdestfile )
     {
-        msg_Err( p_update->p_libvlc, "The URL %s is false formated", p_update->release.psz_url );
+        msg_Err( p_udt, "The URL %s is false formated", p_update->release.psz_url );
         goto error;
     }
     psz_tmpdestfile++;
@@ -1069,7 +1059,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     p_file = utf8_fopen( psz_destfile, "w" );
     if( !p_file )
     {
-        msg_Err( p_update->p_libvlc, "Failed to open %s for writing", psz_destfile );
+        msg_Err( p_udt, "Failed to open %s for writing", psz_destfile );
         goto error;
     }
 
@@ -1081,12 +1071,12 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     psz_size = size_str( l_size );
     if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",  p_update->release.psz_url, psz_size, 0.0 ) != -1 )
     {
-        i_progress = intf_UserProgress( p_update->p_libvlc, "Downloading ...", psz_status, 0.0, 0 );
+        i_progress = intf_UserProgress( p_udt, "Downloading ...", psz_status, 0.0, 0 );
         free( psz_status );
     }
 
     while( ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
-                                   !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+                                   !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
         fwrite( p_buffer, i_read, 1, p_file );
 
@@ -1097,7 +1087,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         if( asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done", p_update->release.psz_url,
                       psz_size, psz_downloaded, f_progress ) != -1 )
         {
-            intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, f_progress, 0 );
+            intf_ProgressUpdate( p_udt, i_progress, psz_status, f_progress, 0 );
             free( psz_status );
         }
         free( psz_downloaded );
@@ -1106,11 +1096,11 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     /* Finish the progress bar or delete the file if the user had canceled */
     fclose( p_file );
     p_file = NULL;
-    if( !intf_ProgressIsCancelled( p_update->p_libvlc, i_progress ) )
+    if( !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
         if( asprintf( &psz_status, "%s\nDone %s (100.0%%)", p_update->release.psz_url, psz_size ) != -1 )
         {
-            intf_ProgressUpdate( p_update->p_libvlc, i_progress, psz_status, 100.0, 0 );
+            intf_ProgressUpdate( p_udt, i_progress, psz_status, 100.0, 0 );
             free( psz_status );
         }
     }
