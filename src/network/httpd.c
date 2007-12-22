@@ -1069,7 +1069,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         goto error;
 
     vlc_object_lock( host );
-    if( vlc_object_waitpipe( host ) == -1 )
+    if( vlc_object_waitpipe( VLC_OBJECT( host ) ) == -1 )
     {
         vlc_object_unlock( host );
         goto error;
@@ -2033,7 +2033,7 @@ static void httpd_HostThread( httpd_host_t *host )
     vlc_bool_t b_die;
 
     vlc_object_lock( host );
-    evfd = vlc_object_waitpipe( host );
+    evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
     b_die = vlc_object_alive( host );
     vlc_object_unlock( host );
 
