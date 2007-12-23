@@ -525,6 +525,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                            PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL,
                                            VLC_FALSE );
+                    vlc_gc_decref( p_input );
                 }
             }
         }
