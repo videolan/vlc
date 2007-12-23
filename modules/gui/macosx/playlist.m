@@ -82,8 +82,7 @@
 
         case NSEnterCharacter:
         case NSCarriageReturnCharacter:
-            [(VLCPlaylist *)[[VLCMain sharedInstance] getPlaylist]
-                                                            playItem:self];
+            [(VLCPlaylist *)[[VLCMain sharedInstance] getPlaylist] playItem:self];
             break;
 
         default:
@@ -201,8 +200,8 @@
 
     if( o_value == nil )
     {
+        msg_Warn( VLCIntf, "playlist item misses pointer value, adding one" );
         o_value = [[NSValue valueWithPointer: p_return] retain];
-        msg_Err( VLCIntf, "missing playlist item's pointer value" );
     }
     return o_value;
 }
