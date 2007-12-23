@@ -109,7 +109,8 @@ static int Demux( demux_t *p_demux )
     const char**ppsz_options = NULL;
     int        i_options = 0;
     vlc_bool_t b_cleanup = VLC_FALSE;
-    vlc_bool_t b_enable_extvlcopt = config_GetInt( p_demux, "m3u-extvlcopt" );
+    vlc_bool_t b_enable_extvlcopt = var_CreateGetInteger( p_demux,
+                                                          "m3u-extvlcopt" );
     input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
@@ -220,6 +221,7 @@ static int Demux( demux_t *p_demux )
         }
     }
     HANDLE_PLAY_AND_RELEASE;
+    var_Destroy( p_demux, "m3u-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
 }
 

@@ -43,13 +43,14 @@ static const struct
 {
     const char *psz_url;
     const char *psz_name;
+    const char *ppsz_options[2];
 } p_items[] = {
     { "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml",
-      N_("Shoutcast Radio") },
+      N_("Shoutcast Radio"), { NULL } },
     { "http/shout-winamp://www.shoutcast.com/sbin/newtvlister.phtml?alltv=1",
-      N_("Shoutcast TV") },
+      N_("Shoutcast TV"), { NULL } },
     { "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u",
-      N_("Freebox TV") },
+      N_("Freebox TV"), { "m3u-extvlcopt=1", NULL } },
 };
 
 /* Main functions */
@@ -128,10 +129,14 @@ static void ItemAdded( const vlc_event_t * p_event, void * user_data )
 static void Run( services_discovery_t *p_sd )
 {
     enum type_e i_type = (enum type_e)p_sd->p_sys;
+    int i;
     input_item_t *p_input = input_ItemNewExt( p_sd,
                         p_items[i_type].psz_url, _(p_items[i_type].psz_name),
                         0, NULL, -1 );
+    for( i = 0; p_items[i_type].ppsz_options[i] != NULL; i++ )
+        input_ItemAddOption( p_input, p_items[i_type].ppsz_options[i] );
     input_ItemAddOption( p_input, "no-playlist-autostart" );
+
 
     vlc_gc_incref( p_input );
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
