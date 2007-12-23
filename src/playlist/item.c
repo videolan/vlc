@@ -295,6 +295,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
 
     i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist,
                                b_locked );
+    vlc_gc_decref( p_input );
     if( i_ret == VLC_SUCCESS )
         return p_input->i_id;
     return -1;
