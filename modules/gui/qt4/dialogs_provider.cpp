@@ -485,7 +485,7 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         break;
     case INTERACT_UPDATE:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
-        if( qdialog)
+        if( qdialog )
             qdialog->update();
         break;
     case INTERACT_HIDE:

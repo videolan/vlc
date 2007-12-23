@@ -173,7 +173,7 @@ void InteractionDialog::update()
     if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
         assert( progressBar );
-        progressBar->setValue( (int)(p_dialog->val.f_float*1000) );
+        progressBar->setValue( (int)(p_dialog->val.f_float*10) );
         msg_Dbg( p_intf, "Setting progress to %i", progressBar->value() );
     }
 }
