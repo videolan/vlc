@@ -922,6 +922,8 @@ void update_CheckReal( update_check_thread_t *p_uct )
 
     if( p_uct->pf_callback )
         (p_uct->pf_callback)( p_uct->p_data );
+
+    vlc_object_destroy( p_uct );
 }
 
 /**
@@ -1021,6 +1023,7 @@ void update_Download( update_t *p_update, char *psz_destdir )
     vlc_thread_create( p_udt, "download update", update_DownloadReal,
                        VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
 }
+
 void update_DownloadReal( update_download_thread_t *p_udt )
 {
     int i_progress = 0;
@@ -1123,6 +1126,8 @@ error:
     free( psz_destfile );
     free( p_buffer );
     free( psz_size );
+
+    vlc_object_destroy( p_udt );
 }
 
 #endif
