@@ -529,8 +529,8 @@ void MainInterface::debug()
 */
 QSize MainInterface::sizeHint() const
 {
-    int nwidth = controls->sizeHint().width();
-    int nheight = controls->sizeHint().height()
+    int nwidth  = controls->size().width();
+    int nheight = controls->size().height()
                 + menuBar()->size().height()
                 + statusBar()->size().height();
 
@@ -670,8 +670,8 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
         {
             unsigned int *pi_width  = va_arg( args, unsigned int * );
             unsigned int *pi_height = va_arg( args, unsigned int * );
-            *pi_width = videoWidget->widgetSize.width();
-            *pi_height = videoWidget->widgetSize.height();
+            *pi_width = videoWidget->width();
+            *pi_height = videoWidget->height();
             i_ret = VLC_SUCCESS;
             break;
         }

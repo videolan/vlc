@@ -58,10 +58,7 @@ public:
     int i_video_height, i_video_width;
     vout_thread_t *p_vout;
 
-    QSize widgetSize;
-    QSize sizeHint() const;
 private:
-    QWidget *frame;
     intf_thread_t *p_intf;
     vlc_mutex_t lock;
 signals:
