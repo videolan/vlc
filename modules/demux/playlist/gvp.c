@@ -210,6 +210,7 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "docid", psz_docid );
         SADD_INFO( "description", psz_description );
         input_ItemAddSubItem( p_current_input, p_input );
+        vlc_gc_decref( p_input );
     }
 
     HANDLE_PLAY_AND_RELEASE;

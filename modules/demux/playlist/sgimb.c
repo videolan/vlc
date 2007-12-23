@@ -405,6 +405,7 @@ static int Demux ( demux_t *p_demux )
     }
 
     input_ItemAddSubItem( p_current_input, p_child );
+    vlc_gc_decref( p_child );
     HANDLE_PLAY_AND_RELEASE
     return 0; /* Needed for correct operation of go back */
 }

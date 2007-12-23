@@ -236,6 +236,7 @@ static int DemuxGenre( demux_t *p_demux )
                                                 p_input );
                     free( psz_mrl );
                     input_ItemAddSubItem( p_sys->p_current_input, p_input );
+                    vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                 }
                 FREENULL( psz_eltname );
@@ -423,7 +424,7 @@ static int DemuxStation( demux_t *p_demux )
                     if( psz_rt )
                         input_item_SetRating( p_input, psz_rt );
                     input_ItemAddSubItem( p_sys->p_current_input, p_input );
-
+                    vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                     FREENULL( psz_mt );
                     FREENULL( psz_id );

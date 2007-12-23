@@ -266,6 +266,7 @@ static int Demux( demux_t *p_demux )
                         msg_Err( p_playlist, "Unsupported meta bitrate" );
 
                     input_ItemAddSubItem( p_current_input, p_input );
+                    vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                     FREENULL( psz_mrl );
                     FREENULL( psz_genre );

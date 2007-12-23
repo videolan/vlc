@@ -378,7 +378,8 @@ static vlc_bool_t parse_track_dict COMPLEX_INTERFACE
 
             /* add meta info */
             add_meta( p_new_input, p_track );
-
+            vlc_gc_decref( p_new_input );
+    
             p_demux->p_sys->i_ntracks++;
         }
         else

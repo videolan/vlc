@@ -527,6 +527,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
                     if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
                     input_ItemAddSubItem( p_current_input, p_entry );
+                    vlc_gc_decref( p_entry );
                 }
 
                 /* cleanup entry */;

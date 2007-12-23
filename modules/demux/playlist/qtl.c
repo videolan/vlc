@@ -357,11 +357,13 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "href", psz_href );
         SADD_INFO( "mime type", psz_mimetype );
         input_ItemAddSubItem( p_current_input, p_input );
+        vlc_gc_decref( p_input );
         if( psz_qtnext )
         {
             p_input = input_ItemNewExt( p_sys->p_playlist,
                                         psz_qtnext, NULL, 0, NULL, -1 );
             input_ItemAddSubItem( p_current_input, p_input );
+            vlc_gc_decref( p_input );
         }
     }
 
