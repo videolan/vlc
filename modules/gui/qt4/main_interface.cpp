@@ -529,7 +529,7 @@ void MainInterface::debug()
 */
 QSize MainInterface::sizeHint() const
 {
-    int nwidth  = controls->size().width();
+    int nwidth  = controls->sizeHint().width();
     int nheight = controls->size().height()
                 + menuBar()->size().height()
                 + statusBar()->size().height();

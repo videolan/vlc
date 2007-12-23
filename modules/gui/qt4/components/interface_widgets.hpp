@@ -52,17 +52,18 @@ public:
 
     void *request( vout_thread_t *, int *, int *,
                    unsigned int *, unsigned int * );
-    void release( void * );
-    int control( void *, int, va_list );
+    void  release( void * );
+    int   control( void *, int, va_list );
 
 private:
     intf_thread_t *p_intf;
-    vlc_mutex_t lock;
     vout_thread_t *p_vout;
 
+    vlc_mutex_t lock;
+
 signals:
-    //void askResize();
     void askVideoWidgetToShow();
+    //void askResize();
 
 public slots:
     void SetSizing( unsigned int, unsigned int );
