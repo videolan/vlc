@@ -321,7 +321,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
     else
     {
-        [o_window setTitle: [NSString stringWithCString: VOUT_TITLE]];
+        [o_window setTitle: [NSString stringWithUTF8String: VOUT_TITLE]];
     }
     vlc_object_release( p_input );
 }

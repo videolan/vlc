@@ -275,8 +275,6 @@
         if( !EMPTY_STR( psz_title ) )
         {
             o_value = [NSString stringWithUTF8String: psz_title];
-            if( o_value == NULL )
-                o_value = [NSString stringWithCString: psz_title];
         }
         else
         {
@@ -284,8 +282,6 @@
             if( psz_name != NULL )
             {
                 o_value = [NSString stringWithUTF8String: psz_name];
-                if( o_value == NULL )
-                    o_value = [NSString stringWithCString: psz_name];
             }
             free( psz_name );
         }
@@ -297,8 +293,6 @@
         if( [[o_tc identifier] isEqualToString:@"2"] && !EMPTY_STR( psz_artist ) )
         {
             o_value = [NSString stringWithUTF8String: psz_artist];
-            if( o_value == NULL )
-                o_value = [NSString stringWithCString: psz_artist];
         }
         else if( [[o_tc identifier] isEqualToString:@"3"] )
         {
@@ -410,7 +404,7 @@
                                          action: @selector(servicesChange:)
                                          keyEquivalent: @""];
         [o_lmi setTarget: self];
-        [o_lmi setRepresentedObject: [NSString stringWithCString: ppsz_services[i]]];
+        [o_lmi setRepresentedObject: [NSString stringWithUTF8String: ppsz_services[i]]];
         if( b_enabled ) [o_lmi setState: NSOnState];
 
         /* Create the menu entries for the main menu */
@@ -419,7 +413,7 @@
                                          action: @selector(servicesChange:)
                                          keyEquivalent: @""];
         [o_lmi setTarget: self];
-        [o_lmi setRepresentedObject: [NSString stringWithCString: ppsz_services[i]]];
+        [o_lmi setRepresentedObject: [NSString stringWithUTF8String: ppsz_services[i]]];
         if( b_enabled ) [o_lmi setState: NSOnState];
 
         free( ppsz_services[i] );
@@ -953,14 +947,14 @@
         {
             NSMutableString *o_temp, *o_temp2;
             o_temp = [NSMutableString stringWithString: o_uri];
-            o_temp2 = [NSMutableString stringWithCString: mounts[i_index].f_mntfromname];
+            o_temp2 = [NSMutableString stringWithUTF8String: mounts[i_index].f_mntfromname];
             [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:nil range:NSMakeRange(0, [o_temp length]) ];
             [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:nil range:NSMakeRange(0, [o_temp2 length]) ];
             [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:nil range:NSMakeRange(0, [o_temp2 length]) ];
 
             if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
             {
-                o_name = [[NSFileManager defaultManager] displayNameAtPath: [NSString stringWithCString:mounts[i_index].f_mntonname]];
+                o_name = [[NSFileManager defaultManager] displayNameAtPath: [NSString stringWithUTF8String:mounts[i_index].f_mntonname]];
             }
         }
     }
@@ -980,7 +974,7 @@
         buf = (struct statfs *) malloc (sizeof(struct statfs));
         statfs( [o_uri fileSystemRepresentation], buf );
         psz_dev = strdup(buf->f_mntfromname);
-        o_temp = [NSMutableString stringWithCString: psz_dev ];
+        o_temp = [NSMutableString stringWithUTF8String: psz_dev ];
         [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:nil range:NSMakeRange(0, [o_temp length]) ];
         [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:nil range:NSMakeRange(0, [o_temp length]) ];
         [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:nil range:NSMakeRange(0, [o_temp length]) ];

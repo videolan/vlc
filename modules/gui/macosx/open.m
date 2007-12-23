@@ -109,7 +109,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                                     sizeof(psz_buf) - dev_path_length,
                                     kCFStringEncodingASCII ) )
             {
-                [p_list addObject: [NSString stringWithCString: psz_buf]];
+                [p_list addObject: [NSString stringWithUTF8String: psz_buf]];
             }
  
             CFRelease( str_bsd_path );
@@ -291,12 +291,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
              i_index++ )
         {
             [o_file_sub_encoding_pop addItemWithTitle:
-                [NSString stringWithCString:
-                p_item->ppsz_list[i_index]]];
+                [NSString stringWithUTF8String: p_item->ppsz_list[i_index]]];
         }
         [o_file_sub_encoding_pop selectItemWithTitle:
-                [NSString stringWithCString:
-                p_item->value.psz]];
+                [NSString stringWithUTF8String: p_item->value.psz]];
     }
 
     p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-align" );

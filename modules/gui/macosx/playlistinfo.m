@@ -182,10 +182,7 @@
     char *psz_uri = input_item_GetURI( p_item->p_input );
     if( psz_uri )
     {
-        [o_uri_txt setStringValue:
-            ([NSString stringWithUTF8String:psz_uri] == nil ) ?
-            [NSString stringWithCString:psz_uri] :
-            [NSString stringWithUTF8String:psz_uri]];
+        [o_uri_txt setStringValue: [NSString stringWithUTF8String:psz_uri]];
     }
     free( psz_uri );
 
@@ -220,10 +217,7 @@
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
 {
     if( psz_meta != NULL && *psz_meta)
-        [theItem setStringValue:
-            ([NSString stringWithUTF8String:psz_meta] == nil ) ?
-            [NSString stringWithCString:psz_meta] :
-            [NSString stringWithUTF8String:psz_meta]];
+        [theItem setStringValue: [NSString stringWithUTF8String:psz_meta]];
     else
         [theItem setStringValue: @"-"];
 }

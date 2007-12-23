@@ -1282,9 +1282,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             }
             o_temp = [NSString stringWithUTF8String:
                 p_playlist->status.p_item->p_input->psz_name];
-            if( o_temp == NULL )
-                o_temp = [NSString stringWithCString:
-                    p_playlist->status.p_item->p_input->psz_name];
             [self setScrollField: o_temp stopAfter:-1];
             [[[self getControls] getFSPanel] setStreamTitle: o_temp];
 
@@ -1487,9 +1484,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         vlc_object_yield( p_input );
         o_temp = [NSString stringWithUTF8String:
                   p_playlist->status.p_item->p_input->psz_name];
-        if( o_temp == NULL )
-            o_temp = [NSString stringWithCString:
-                    p_playlist->status.p_item->p_input->psz_name];
         [self setScrollField: o_temp stopAfter:-1];
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );

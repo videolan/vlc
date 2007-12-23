@@ -1986,7 +1986,7 @@
             for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++)
                 if( vlc_keys[i].psz_key_string && *vlc_keys[i].psz_key_string )
                     POPULATE_A_KEY( o_keys_menu,
-                        [NSString stringWithCString:vlc_keys[i].psz_key_string]
+                        [NSString stringWithUTF8String:vlc_keys[i].psz_key_string]
                         , vlc_keys[i].i_key_code)
         }
         [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
@@ -2141,7 +2141,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     [o_dataCell setTitle:@""];
     [o_dataCell setFont:[NSFont systemFontOfSize:0]];
     NSTableColumn *o_tableColumn = [[NSTableColumn alloc]
-        initWithIdentifier:[NSString stringWithCString: "Enabled"]];
+        initWithIdentifier:@"Enabled"];
     [o_tableColumn setHeaderCell: o_headerCell];
     [o_tableColumn setDataCell: o_dataCell];
     [o_tableColumn setWidth:17];
@@ -2151,7 +2151,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     o_dataCell = [[NSTextFieldCell alloc] init];
     [o_dataCell setFont:[NSFont systemFontOfSize:12]];
     o_tableColumn = [[NSTableColumn alloc]
-        initWithIdentifier:[NSString stringWithCString: "Module"]];
+        initWithIdentifier:@"Module"];
     [o_tableColumn setHeaderCell: o_headerCell];
     [o_tableColumn setDataCell: o_dataCell];
     [o_tableColumn setWidth:388 - 17];
@@ -2311,11 +2311,9 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 - (id)tableView:(NSTableView *)aTableView
     objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-    if( [[aTableColumn identifier] isEqualToString:
-        [NSString stringWithCString:"Enabled"]] )
+    if( [[aTableColumn identifier] isEqualToString: @"Enabled"] )
         return [[o_modulearray objectAtIndex:rowIndex] objectAtIndex:2];
-    if( [[aTableColumn identifier] isEqualToString:
-        [NSString stringWithCString:"Module"]] )
+    if( [[aTableColumn identifier] isEqualToString: @"Module"] )
         return [[o_modulearray objectAtIndex:rowIndex] objectAtIndex:1];
 
     return nil;
