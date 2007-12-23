@@ -844,6 +844,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 i_ret = playlist_AddInput( p_sys->p_playlist, p_input,
                                    PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
                                    VLC_FALSE);
+                vlc_gc_decref( p_input );
                 msg_Dbg( p_intf, "requested mrl add: %s", mrl );
             }
             free( psz_uri );
