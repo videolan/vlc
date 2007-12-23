@@ -237,13 +237,19 @@ static void End( vout_thread_t *p_vout )
 
     p_vout->p_sys->b_frame_available = 0;
 
+    [CATransaction performSelectorOnMainThread:@selector(begin)
+                    withObject:nil waitUntilDone:YES];
+
     [p_sys->o_layer performSelectorOnMainThread:@selector(removeFromSuperlayer)
                     withObject:nil waitUntilDone:YES];
+    [CATransaction performSelectorOnMainThread:@selector(commit)
+                    withObject:nil waitUntilDone:YES];
+
+    // Should be done automatically
     [p_sys->o_layer release];
     [p_sys->autorealease_pool release];
 
     /* Free the texture buffer*/
-    glDeleteTextures( 2, p_sys->p_textures );
     if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
     if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
 }
@@ -304,6 +310,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     p_sys->b_frame_available = 1;
+    [p_sys->o_layer setNeedsDisplay];
 }
 
 /*****************************************************************************
@@ -400,6 +407,8 @@ static int InitTextures( vout_thread_t *p_vout )
     {
         me.asynchronous = YES;
         [me setVout: _p_vout];
+        me.bounds = CGRectMake( 0.0, 0.0,  (float)_p_vout->output.i_height,  (float)_p_vout->output.i_width );
+
     }
     return me;
 }
@@ -492,4 +501,15 @@ static int InitTextures( vout_thread_t *p_vout )
     CGLUnlockContext( context );
     return context;
 }
+
+- (void)releaseCGLContext:(CGLContextObj)glContext
+{
+    CGLLockContext( glContext );
+    CGLSetCurrentContext( glContext );
+    
+    glDeleteTextures( 2, p_vout->p_sys->p_textures );
+
+    CGLUnlockContext( glContext );
+}
+
 @end
