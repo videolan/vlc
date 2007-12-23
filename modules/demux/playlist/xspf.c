@@ -552,6 +552,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                            free( psz_uri );
                            psz_uri = psz_tmp;
                         }
+                        /* FIXME: We are leaking that one */
                         p_new_input = input_ItemNewExt( p_playlist, psz_uri,
                                                         NULL, 0, NULL, -1 );
                         free( psz_uri );
