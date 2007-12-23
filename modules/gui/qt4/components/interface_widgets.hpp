@@ -55,15 +55,15 @@ public:
     void release( void * );
     int control( void *, int, va_list );
 
-    int i_video_height, i_video_width;
-    vout_thread_t *p_vout;
-
 private:
     intf_thread_t *p_intf;
     vlc_mutex_t lock;
+    vout_thread_t *p_vout;
+
 signals:
-    void askResize();
+    //void askResize();
     void askVideoWidgetToShow();
+
 public slots:
     void SetSizing( unsigned int, unsigned int );
 };
