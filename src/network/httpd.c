@@ -437,7 +437,7 @@ httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
     psz_connection = httpd_MsgGet( &cl->query, "Connection" );
     if( psz_connection != NULL )
     {
-        httpd_MsgAdd( answer, "Connection", psz_connection );
+        httpd_MsgAdd( answer, "Connection", "%s", psz_connection );
     }
 
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
