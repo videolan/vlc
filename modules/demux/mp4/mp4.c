@@ -426,6 +426,7 @@ static int Open( vlc_object_t * p_this )
                                                p_item_in_category,
                                                PLAYLIST_APPEND, PLAYLIST_END,
                                                NULL, NULL, VLC_FALSE );
+                        vlc_gc_decref( p_input );
                     }
                 }
                 else
