@@ -295,6 +295,9 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
     p_md = libvlc_media_descriptor_new_from_input_item( p_instance,
                 p_input_item, p_e );
 
+    /* The p_input_item is retained in libvlc_media_descriptor_new_from_input_item */
+    vlc_gc_decref( p_input_item );
+    
     return p_md;
 }
 
