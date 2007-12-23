@@ -106,7 +106,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     resize( w, h );
     //updateGeometry(); // Needed for deinterlace
     msg_Dbg( p_intf, "%i %i", sizeHint().height(), sizeHint().width() );
-    emit askResize();
+    //emit askResize();
 }
 
 void VideoWidget::release( void *p_win )
