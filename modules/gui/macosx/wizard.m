@@ -304,52 +304,10 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (void)resetWizard
 {
-    /* get the current state of our setting to keep the selections or not */
-    b_keepSettingsOrNot = (BOOL)config_GetInt( VLCIntf, "macosx-wizard-keep" );
-
     /* go to the front page and clean up a bit */
     [o_userSelections removeAllObjects];
     [o_btn_forward setTitle: _NS("Next")];
     [o_tab_pageHolder selectFirstTabViewItem:self];
-
- 
-    if( b_keepSettingsOrNot )
-        return;
- 
-    /* reset the wizard-window to its default values if wanted */
-    [o_t1_matrix_strmgOrTrnscd selectCellAtRow:0 column:0];
-    [[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setState: NSOffState];
-
-    /* "Input" */
-    [o_t2_fld_pathToNewStrm setStringValue: @""];
-    [o_t2_ckb_enblPartExtrct setState: NSOffState];
-    [self t2_enableExtract:nil];
-    [o_t2_matrix_inputSourceType selectCellAtRow:0 column:0];
-    [[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setState: NSOffState];
-    [o_t2_fld_pathToNewStrm setEnabled:YES];
-    [o_t2_btn_chooseFile setEnabled:YES];
-    [o_t2_tbl_plst setEnabled:NO];
-
-    /* "Streaming 1" */
-    [o_t3_fld_address setStringValue: @""];
-    [o_t3_matrix_stmgMhd selectCellAtRow:0 column:0];
-    [[o_t3_matrix_stmgMhd cellAtRow:0 column:1] setState: NSOffState];
-    [[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setState: NSOffState];
-    [[o_t3_matrix_stmgMhd cellAtRow:1 column:2] setState: NSOffState];
-
-    /* "Transcode 1" */
-    [o_t4_ckb_audio setState: NSOffState];
-    [o_t4_ckb_video setState: NSOffState];
-    [self t4_enblVidTrnscd:nil];
-    [self t4_enblAudTrnscd:nil];
-
-    /* "Streaming 2" */
-    [o_t6_fld_ttl setStringValue: @"1"];
-    [o_t6_ckb_sap setState: NSOffState];
-    [self t6_enblSapAnnce:nil];
-
-    /* "Transcode 2" */
-    [o_t7_fld_filePath setStringValue: @""];
 }
 
 - (void)initStrings
@@ -1368,7 +1326,7 @@ static VLCWizard *_o_sharedInstance = nil;
             objectAtIndex:0]];
         x += 1;
     }
-    if( b_keepSettingsOrNot && savePreviousSel >= 0 )
+    if( savePreviousSel >= 0 )
         [o_t4_pop_videoCodec selectItemAtIndex: savePreviousSel];
 
     savePreviousSel = [o_t4_pop_audioCodec indexOfSelectedItem];
@@ -1380,7 +1338,7 @@ static VLCWizard *_o_sharedInstance = nil;
             objectAtIndex:0]];
         x += 1;
     }
-    if( b_keepSettingsOrNot && savePreviousSel >= 0 )
+    if( savePreviousSel >= 0 )
         [o_t4_pop_audioCodec selectItemAtIndex: savePreviousSel];
 }
 

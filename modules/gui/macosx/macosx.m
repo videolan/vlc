@@ -78,10 +78,6 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define FSPANEL_LONGTEXT N_("Shows a lucent controller when moving the mouse " \
                             "in fullscreen mode.")
 
-#define WIZARD_OPTIONS_SAVING_TEXT N_("Remember wizard options")
-#define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Remember the options in the " \
-        "wizard during one session of VLC.")
-
 #define AUTOPLAY_OSX_TEST N_("Auto-playback of new items")
 #define AUTOPLAY_OSX_LONGTEXT N_("Start playback of new items immediately " \
         "once they were added." )
@@ -98,8 +94,6 @@ vlc_module_begin();
                      VLC_FALSE );
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
                      VLC_FALSE );
-    add_bool( "macosx-wizard-keep", 1, NULL, WIZARD_OPTIONS_SAVING_TEXT,
-                WIZARD_OPTIONS_SAVING_LONGTEXT, VLC_TRUE );
 
     add_submodule();
         set_description( _("Quartz video") );

@@ -151,8 +151,6 @@
     NSArray * o_encapFormats;
     NSArray * o_strmgMthds;
     NSString * o_opts;
-
-    BOOL b_keepSettingsOrNot;
 }
 - (IBAction)cancelRun:(id)sender;
 - (IBAction)nextTab:(id)sender;
