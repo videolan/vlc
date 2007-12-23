@@ -120,6 +120,15 @@ int Demux( demux_t *p_demux )
         i_ret = parse_playlist_node( p_demux, p_playlist, p_current_input,
                                      p_xml_reader, "playlist" ) ? 0 : -1;
 
+    int i;
+    for( i = 0 ; i < p_demux->p_sys->i_tracklist_entries ; i++ )
+    {
+        input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
+        if( p_new_input )
+        {
+            input_ItemAddSubItem( p_current_input, p_new_input );
+        }
+    }
 
     HANDLE_PLAY_AND_RELEASE;
     if( p_xml_reader )
@@ -882,9 +891,10 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
     if( p_new_input )
     {
         input_ItemAddSubItem( p_input_item, p_new_input );
+        p_demux->p_sys->pp_tracklist[i_href] = NULL;
     }
 
-    /* fix for #1293 - XTAG sends ENDELEM for self closing tag */
+    /* kludge for #1293 - XTAG sends ENDELEM for self closing tag */
     /* (libxml sends NONE) */
     xml_ReaderRead( p_xml_reader );
 

@@ -25,9 +25,11 @@
 #define FREE_VALUE() if (psz_value) {free(psz_value);psz_value=NULL;}
 #define FREE_ATT()   FREE_NAME();FREE_VALUE()
 
-#define UNKNOWN_CONTENT 0
-#define SIMPLE_CONTENT 1
-#define COMPLEX_CONTENT 2
+enum {
+    UNKNOWN_CONTENT,
+    SIMPLE_CONTENT,
+    COMPLEX_CONTENT
+};
 
 #define SIMPLE_INTERFACE  (input_item_t    *p_input,\
                            const char      *psz_name,\
