@@ -1,0 +1,15 @@
+--- libdvdnav.orig/src/remap.c	2007-12-23 13:48:04.000000000 +0100
++++ libdvdnav/src/remap.c	2007-12-23 13:49:45.000000000 +0100
+@@ -203,7 +203,11 @@
+     remap_t *map;
+ 
+     /* Build the map filename */
+-    home = getenv("HOME"); assert(home);
++    home = getenv("HOME");
++    if (!home) {
++    fprintf( MSG_OUT, "libdvdnav: Unable to find map for title '%s' (HOME directory not found)\n", title);
++    return NULL;
++    }
+     snprintf(fname, sizeof(fname), "%s/.dvdnav/%s.map", home, title);
+ 
+     /* Open the map file */
