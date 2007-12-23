@@ -400,30 +400,28 @@
         char        *objectname;
         NSMenuItem  *o_lmi;
 
-        if( !strcmp( ppsz_services[i], "services_discovery" ) )
-        {
-            char * name = ppsz_name[i] ? ppsz_name[i] : ppsz_services[i];
-            /* Check whether to enable these menuitems */
-            b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, objectname );
- 
-            /* Create the menu entries used in the playlist menu */
-            o_lmi = [[o_mi_services submenu] addItemWithTitle:
-                     [NSString stringWithUTF8String: name]
-                                             action: @selector(servicesChange:)
-                                             keyEquivalent: @""];
-            [o_lmi setTarget: self];
-            [o_lmi setRepresentedObject: [NSString stringWithCString: ppsz_services[i]]];
-            if( b_enabled ) [o_lmi setState: NSOnState];
- 
-            /* Create the menu entries for the main menu */
-            o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
-                     [NSString stringWithUTF8String: name]
-                                             action: @selector(servicesChange:)
-                                             keyEquivalent: @""];
-            [o_lmi setTarget: self];
-            [o_lmi setRepresentedObject: [NSString stringWithCString: ppsz_services[i]]];
-            if( b_enabled ) [o_lmi setState: NSOnState];
-        }
+        char * name = ppsz_name[i] ? ppsz_name[i] : ppsz_services[i];
+        /* Check whether to enable these menuitems */
+        b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, objectname );
+
+        /* Create the menu entries used in the playlist menu */
+        o_lmi = [[o_mi_services submenu] addItemWithTitle:
+                 [NSString stringWithUTF8String: name]
+                                         action: @selector(servicesChange:)
+                                         keyEquivalent: @""];
+        [o_lmi setTarget: self];
+        [o_lmi setRepresentedObject: [NSString stringWithCString: ppsz_services[i]]];
+        if( b_enabled ) [o_lmi setState: NSOnState];
+
+        /* Create the menu entries for the main menu */
+        o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
+                 [NSString stringWithUTF8String: name]
+                                         action: @selector(servicesChange:)
+                                         keyEquivalent: @""];
+        [o_lmi setTarget: self];
+        [o_lmi setRepresentedObject: [NSString stringWithCString: ppsz_services[i]]];
+        if( b_enabled ) [o_lmi setState: NSOnState];
+
         free( ppsz_services[i] );
         free( ppsz_name[i] );
     }
