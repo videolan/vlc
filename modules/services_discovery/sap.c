@@ -895,7 +895,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     services_discovery_AddItem( p_sd, p_input, psz_value /* category name */ );
 
     TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );
-
+    vlc_gc_decref( p_input );
     return p_sap;
 }
 

@@ -753,7 +753,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                                            PLAYLIST_APPEND | PLAYLIST_PREPARSE,
                                            PLAYLIST_END, VLC_TRUE, VLC_FALSE );
                     i_count ++; /* increment counter */
-
+                    vlc_gc_decref( p_input );
                     while( i_options > 0 )
                         free( ppsz_options[--i_options] );
                     free( ppsz_options );

@@ -189,6 +189,7 @@ static void resolve_callback(
             vlc_dictionary_insert( &p_sys->services_name_to_input_item,
                 name, p_input );
             services_discovery_AddItem( p_sd, p_input, NULL /* no category */ );
+            vlc_gc_decref( p_input );
        }
     }
 

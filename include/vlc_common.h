@@ -63,6 +63,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -610,25 +611,38 @@ struct gc_object_t
 
 static inline void __vlc_gc_incref( gc_object_t * p_gc )
 {
+    assert( p_gc->i_gc_refcount > 0 );
+
     p_gc->i_gc_refcount ++;
 };
 
 static inline void __vlc_gc_decref( gc_object_t *p_gc )
 {
+    if( !p_gc ) return;
+
+    assert( p_gc->i_gc_refcount > 0 );
+
     p_gc->i_gc_refcount -- ;
 
     if( p_gc->i_gc_refcount == 0 )
     {
         p_gc->pf_destructor( p_gc );
         /* Do not use the p_gc pointer from now on ! */
-     }
+    }
+}
+
+static inline void
+__vlc_gc_init( gc_object_t * p_gc, void (*pf_destructor)( gc_object_t * ),
+               void * arg)
+{
+    p_gc->i_gc_refcount = 1;
+    p_gc->pf_destructor = pf_destructor;
+    p_gc->p_destructor_arg = arg;
 }
 
 #define vlc_gc_incref( a ) __vlc_gc_incref( (gc_object_t *)a )
 #define vlc_gc_decref( a ) __vlc_gc_decref( (gc_object_t *)a )
-#define vlc_gc_init( a,b,c ) {  ((gc_object_t *)a)->i_gc_refcount = 0; \
-                              ((gc_object_t *)a)->pf_destructor = b; \
-                              ((gc_object_t *)a)->p_destructor_arg = c; }
+#define vlc_gc_init( a,b,c ) __vlc_gc_init( (gc_object_t *)a,b,c )
 
 
 /*****************************************************************************

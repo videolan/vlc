@@ -201,6 +201,7 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
     {
         return;
     }
+    vlc_gc_incref( p_input );
     p_udi_entry->p_item = p_input;
     p_udi_entry->psz_udi = strdup( psz_device );
     TAB_APPEND( p_sys->i_devices_number, p_sys->pp_devices, p_udi_entry );
@@ -238,6 +239,7 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 #else
     AddItem( p_sd, p_input );
 #endif
+    vlc_gc_decref( p_input );
 }
 
 #ifdef HAVE_HAL_1
@@ -251,6 +253,7 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
         if( strcmp( psz_udi, p_sys->pp_devices[i]->psz_udi ) == 0 )
         { /* delete the corresponding item */    
             services_discovery_RemoveItem( p_sd, p_sys->pp_devices[i]->p_item );
+            vlc_gc_decref( p_sys->pp_devices[i]->p_item );
             if( p_sys->pp_devices[i]->psz_udi )
                 free( p_sys->pp_devices[i]->psz_udi );
             TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
@@ -284,6 +287,7 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
 #else
     AddItem( p_sd, p_input );
 #endif
+    vlc_gc_decref( p_input );
 }
 
 static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
