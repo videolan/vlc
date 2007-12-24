@@ -30,8 +30,10 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 #include <vlc_vout.h>
-#include <vlc_aout.h>
+#include <vlc_keys.h>
+//#include <vlc_aout.h>
 
 #include <sys/types.h>
 #ifndef WIN32
@@ -95,6 +97,9 @@ static void CloseDisplay    ( vout_thread_t * );
 static int  NewPicture      ( vout_thread_t *, picture_t * );
 static void SetPalette      ( vout_thread_t *,
                               uint16_t *, uint16_t *, uint16_t * );
+
+static int ConvertKey( SDLKey );
+
 
 #define CHROMA_TEXT N_("SDL chroma format")
 #define CHROMA_LONGTEXT N_( \
@@ -195,6 +200,9 @@ static int Open ( vlc_object_t *p_this )
         vlc_mutex_unlock( lock );
         return VLC_EGENERIC;
     }
+
+    /* Translate keys into unicode */
+    SDL_EnableUNICODE(1);
 
     vlc_mutex_unlock( lock );
 
@@ -334,7 +342,7 @@ static int Manage( vout_thread_t *p_vout )
     unsigned int i_width, i_height, i_x, i_y;
 
     /* Process events */
-    while( SDL_PollEvent(&event) )
+    while( SDL_PollEvent( &event ) )
     {
         switch( event.type )
         {
@@ -345,6 +353,7 @@ static int Manage( vout_thread_t *p_vout )
             p_vout->i_window_height = p_vout->p_sys->i_height = event.resize.h;
             break;
 
+        /* Mouse move */
         case SDL_MOUSEMOTION:
             vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
                                p_vout->p_sys->i_height,
@@ -375,17 +384,48 @@ static int Manage( vout_thread_t *p_vout )
             }
             break;
 
+        /* Mouse button pressed */
         case SDL_MOUSEBUTTONUP:
             switch( event.button.button )
             {
             case SDL_BUTTON_LEFT:
+                var_Get( p_vout, "mouse-button-down", &val );
+                val.i_int &= ~1;
+                var_Set( p_vout, "mouse-button-down", val );
+
                 val.b_bool = VLC_TRUE;
                 var_Set( p_vout, "mouse-clicked", val );
+                break;
+
+            case SDL_BUTTON_MIDDLE:
+                {
+                    playlist_t *p_playlist;
+
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int &= ~2;
+                    var_Set( p_vout, "mouse-button-down", val );
+
+                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+                    if( p_playlist != NULL )
+                    {
+                        vlc_value_t val;
+                        var_Get( p_playlist, "intf-show", &val );
+                        val.b_bool = !val.b_bool;
+                        var_Set( p_playlist, "intf-show", val );
+                        vlc_object_release( p_playlist );
+                    }
+                }
                 break;
 
             case SDL_BUTTON_RIGHT:
                 {
                     intf_thread_t *p_intf;
+                    playlist_t *p_playlist;
+
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int &= ~4;
+                    var_Set( p_vout, "mous-button-down", val );
                     p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
                                                       FIND_ANYWHERE );
                     if( p_intf )
@@ -393,17 +433,30 @@ static int Manage( vout_thread_t *p_vout )
                         p_intf->b_menu_change = 1;
                         vlc_object_release( p_intf );
                     }
+
+                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+
+                    if( p_playlist != NULL )
+                    {
+                        vlc_value_t val;
+                        val.b_bool = VLC_TRUE;
+                        var_Set( p_playlist, "intf-popupmenu", val );
+                        vlc_object_release( p_playlist );
+                    }
                 }
                 break;
             }
             break;
 
+        /* Mouse button released */
         case SDL_MOUSEBUTTONDOWN:
             switch( event.button.button )
             {
             case SDL_BUTTON_LEFT:
-                /* In this part we will eventually manage
-                 * clicks for DVD navigation for instance. */
+                var_Get( p_vout, "mouse-button-down", &val );
+                val.i_int |= 1;
+                var_Set( p_vout, "mouse-button-down", val );
 
                 /* detect double-clicks */
                 if( ( mdate() - p_vout->p_sys->i_lastpressed ) < 300000 )
@@ -412,118 +465,60 @@ static int Manage( vout_thread_t *p_vout )
                 p_vout->p_sys->i_lastpressed = mdate();
                 break;
 
-            case 4:
+            case SDL_BUTTON_MIDDLE:
+                var_Get( p_vout, "mouse-button-down", &val );
+                val.i_int |= 2;
+                var_Set( p_vout, "mouse-button-down", val );
                 break;
 
-            case 5:
+            case SDL_BUTTON_RIGHT:
+                var_Get( p_vout, "mouse-button-down", &val );
+                val.i_int |= 4;
+                var_Set( p_vout, "mouse-button-down", val );
                 break;
             }
             break;
 
+        /* Quit event (close the window) */
         case SDL_QUIT:
-            vlc_object_kill( p_vout->p_libvlc );
-            break;
-
-        case SDL_KEYDOWN:                             /* if a key is pressed */
-
-            switch( event.key.keysym.sym )
             {
-            case SDLK_ESCAPE:
-                if( p_vout->b_fullscreen )
+                playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+                if( p_playlist != NULL )
                 {
-                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    playlist_Stop( p_playlist );
+                    vlc_object_release( p_playlist );
                 }
-                else
-                {
-                    vlc_object_kill( p_vout->p_libvlc );
-                }
-                break;
-
-            case SDLK_q:                                             /* quit */
-                vlc_object_kill( p_vout->p_libvlc );
-                break;
-
-            case SDLK_f:                             /* switch to fullscreen */
-                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                break;
-
-            case SDLK_c:                                 /* toggle grayscale */
-                p_vout->b_grayscale = ! p_vout->b_grayscale;
-                p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
-                break;
-
-            case SDLK_i:                                      /* toggle info */
-                p_vout->b_info = ! p_vout->b_info;
-                p_vout->i_changes |= VOUT_INFO_CHANGE;
-                break;
-
-            case SDLK_s:                                   /* toggle scaling */
-                p_vout->b_scale = ! p_vout->b_scale;
-                p_vout->i_changes |= VOUT_SCALE_CHANGE;
-                break;
-
-            case SDLK_SPACE:                             /* toggle interface */
-                p_vout->b_interface = ! p_vout->b_interface;
-                p_vout->i_changes |= VOUT_INTF_CHANGE;
-                break;
-
-            case SDLK_MENU:
-                {
-                    intf_thread_t *p_intf;
-                    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
-                                                      FIND_ANYWHERE );
-                    if( p_intf != NULL )
-                    {
-                        p_intf->b_menu_change = 1;
-                        vlc_object_release( p_intf );
-                    }
-                }
-                break;
-
-            case SDLK_LEFT:
-                break;
-
-            case SDLK_RIGHT:
-                break;
-
-            case SDLK_UP:
-                break;
-
-            case SDLK_DOWN:
-                break;
-
-            case SDLK_b:
-                {
-                    audio_volume_t i_volume;
-                    if ( !aout_VolumeDown( p_vout, 1, &i_volume ) )
-                    {
-                        msg_Dbg( p_vout, "audio volume is now %d", i_volume );
-                    }
-                    else
-                    {
-                        msg_Dbg( p_vout, "audio volume: operation not supported" );
-                    }
-                }
-                break;
-
-            case SDLK_n:
-                {
-                    audio_volume_t i_volume;
-                    if ( !aout_VolumeUp( p_vout, 1, &i_volume ) )
-                    {
-                        msg_Dbg( p_vout, "audio volume is now %d", i_volume );
-                    }
-                    else
-                    {
-                        msg_Dbg( p_vout, "audio volume: operation not supported" );
-                    }
-                }
-                break;
-
-             default:
-                break;
             }
             break;
+
+        /* Key pressed */
+        case SDL_KEYDOWN:
+            val.i_int = ConvertKey( event.key.keysym.sym );
+
+            if( !val.i_int )
+            {
+                if( ( event.key.keysym.unicode & 0xff80 ) == 0 )
+                {
+                    val.i_int = event.key.keysym.unicode & 0x7f;
+                }
+            }
+
+            if( val.i_int )
+            {
+                if( ( event.key.keysym.mod & KMOD_SHIFT ) )
+                {
+                    val.i_int |= KEY_MODIFIER_SHIFT;
+                }
+                if( ( event.key.keysym.mod & KMOD_CTRL ) )
+                {
+                    val.i_int |= KEY_MODIFIER_CTRL;
+                }
+                if( ( event.key.keysym.mod & KMOD_ALT ) )
+                {
+                    val.i_int |= KEY_MODIFIER_ALT;
+                }
+                var_Set( p_vout->p_libvlc, "key-pressed", val );
+            }
 
         default:
             break;
@@ -533,7 +528,14 @@ static int Manage( vout_thread_t *p_vout )
     /* Fullscreen change */
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
-        p_vout->b_fullscreen = ! p_vout->b_fullscreen;
+        vlc_value_t val_fs;
+
+        /* Update the object variable and trigger callback */
+        val_fs.b_bool = !p_vout->b_fullscreen;
+        p_vout->b_fullscreen = !p_vout->b_fullscreen;
+        var_Set( p_vout, "fullscreen", val_fs );
+
+        /*TODO: add the always on top code !*/
 
         p_vout->p_sys->b_cursor_autohidden = 0;
         SDL_ShowCursor( p_vout->p_sys->b_cursor &&
@@ -543,9 +545,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 
-    /*
-     * Size change
-     */
+    /* Size change */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
         msg_Dbg( p_vout, "video display resized (%dx%d)",
@@ -572,6 +572,72 @@ static int Manage( vout_thread_t *p_vout )
 
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Key events handling
+ *****************************************************************************/
+static struct
+{
+    SDLKey sdl_key;
+    int i_vlckey;
+} sdlkeys_to_vlckeys[] =
+{
+    { SDLK_F1,  KEY_F1 },
+    { SDLK_F2,  KEY_F2 },
+    { SDLK_F3,  KEY_F3 },
+    { SDLK_F4,  KEY_F4 },
+    { SDLK_F5,  KEY_F5 },
+    { SDLK_F6,  KEY_F6 },
+    { SDLK_F7,  KEY_F7 },
+    { SDLK_F8,  KEY_F8 },
+    { SDLK_F9,  KEY_F9 },
+    { SDLK_F10, KEY_F10 },
+    { SDLK_F11, KEY_F11 },
+    { SDLK_F12, KEY_F12 },
+
+    { SDLK_RETURN, KEY_ENTER },
+    { SDLK_KP_ENTER, KEY_ENTER },
+    { SDLK_SPACE, KEY_SPACE },
+    { SDLK_ESCAPE, KEY_ESC },
+
+    { SDLK_MENU, KEY_MENU },
+    { SDLK_LEFT, KEY_LEFT },
+    { SDLK_RIGHT, KEY_RIGHT },
+    { SDLK_UP, KEY_UP },
+    { SDLK_DOWN, KEY_DOWN },
+
+    { SDLK_HOME, KEY_HOME },
+    { SDLK_END, KEY_END },
+    { SDLK_PAGEUP, KEY_PAGEUP },
+    { SDLK_PAGEDOWN,  KEY_PAGEDOWN },
+
+    { SDLK_INSERT, KEY_INSERT },
+    { SDLK_DELETE, KEY_DELETE },
+    /*TODO: find a equivalent for SDL 
+    { , KEY_MEDIA_NEXT_TRACK }
+    { , KEY_MEDIA_PREV_TRACK }
+    { , KEY_VOLUME_MUTE }
+    { , KEY_VOLUME_DOWN }
+    { , KEY_VOLUME_UP }
+    { , KEY_MEDIA_PLAY_PAUSE }
+    { , KEY_MEDIA_PLAY_PAUSE }*/
+
+    { 0, 0 }
+};
+
+static int ConvertKey( SDLKey sdl_key )
+{
+    int i;
+    for( i=0; sdlkeys_to_vlckeys[i].sdl_key != 0; i++ )
+    {
+        if( sdlkeys_to_vlckeys[i].sdl_key == sdl_key )
+        {
+            return sdlkeys_to_vlckeys[i].i_vlckey;
+        }
+    }
+    return 0;
+}
+
 
 /*****************************************************************************
  * Display: displays previously rendered output
