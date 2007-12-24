@@ -137,8 +137,6 @@ static void Run( services_discovery_t *p_sd )
         input_ItemAddOption( p_input, p_items[i_type].ppsz_options[i] );
     input_ItemAddOption( p_input, "no-playlist-autostart" );
 
-
-    vlc_gc_incref( p_input );
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                       ItemAdded, p_sd );
     input_Read( p_sd, p_input, VLC_TRUE );
