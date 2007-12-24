@@ -158,7 +158,7 @@ void playlist_Destroy( playlist_t *p_playlist )
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
     var_Destroy( p_playlist, "playlist-current" );
-    var_Destroy( p_playlist, "intf-popmenu" );
+    var_Destroy( p_playlist, "intf-popupmenu" );
     var_Destroy( p_playlist, "intf-show" );
     var_Destroy( p_playlist, "play-and-stop" );
     var_Destroy( p_playlist, "play-and-exit" );
