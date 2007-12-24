@@ -201,7 +201,7 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             const char *longtext = va_arg (ap, const char *);
 
             item->psz_text = text ? strdup ( _(text)) : NULL;
-            item->psz_longtext = longtext ? strdup ( _(text)) : NULL;
+            item->psz_longtext = longtext ? strdup ( _(longtext)) : NULL;
             ret = 0;
             break;
         }
