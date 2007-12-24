@@ -27,6 +27,24 @@
 #include "libvlc_internal.h"
 #include "libvlc.h"
 
+static const libvlc_state_t vlc_to_libvlc_state_array[] =
+{
+    [INIT_S]        = libvlc_Opening,
+    [OPENING_S]     = libvlc_Opening,
+    [BUFFERING_S]   = libvlc_Buffering,    
+    [PLAYING_S]     = libvlc_Playing,    
+    [PAUSE_S]       = libvlc_Paused,    
+    [END_S]         = libvlc_Ended,    
+    [ERROR_S]       = libvlc_Error,    
+};
+static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
+{
+    if( vlc_state < 0 || vlc_state > 6 )
+        return libvlc_Stopped;
+
+    return vlc_to_libvlc_state_array[vlc_state];
+}
+
 /*
  * Release the associated input thread
  *
@@ -114,18 +132,27 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
 
+    printf("input_state_changed!!!!!!!!\n");
     if( newval.i_int == oldval.i_int )
         return VLC_SUCCESS; /* No change since last time, don't propagate */
 
     switch ( newval.i_int )
     {
         case END_S:
+            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
             event.type = libvlc_MediaInstanceReachedEnd;
             break;
         case PAUSE_S:
+            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Playing, NULL);
             event.type = libvlc_MediaInstancePaused;
             break;
         case PLAYING_S:
+                printf("PLAYING_S!!!!!!!!\n");
+            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Playing, NULL);
+            event.type = libvlc_MediaInstancePlayed;
+            break;
+        case ERROR_S:
+            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Error, NULL);
             event.type = libvlc_MediaInstancePlayed;
             break;
         default:
@@ -729,17 +756,6 @@ float libvlc_media_instance_get_rate(
     return (float)1000.0f/val.i_int;
 }
 
-static const libvlc_state_t vlc_to_libvlc_state[] =
-{
-    [INIT_S]        = libvlc_Opening,
-    [OPENING_S]     = libvlc_Opening,
-    [BUFFERING_S]   = libvlc_Buffering,    
-    [PLAYING_S]     = libvlc_Playing,    
-    [PAUSE_S]       = libvlc_Paused,    
-    [END_S]         = libvlc_Ended,    
-    [ERROR_S]       = libvlc_Error,    
-};
-
 libvlc_state_t libvlc_media_instance_get_state(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e )
@@ -754,8 +770,5 @@ libvlc_state_t libvlc_media_instance_get_state(
     var_Get( p_input_thread, "state", &val );
     vlc_object_release( p_input_thread );
 
-    if( val.i_int < 0 || val.i_int > 6 )
-        return libvlc_Stopped;
-
-    return vlc_to_libvlc_state[val.i_int];
+    return vlc_to_libvlc_state(val.i_int);
 }

@@ -87,6 +87,7 @@ struct libvlc_media_descriptor_t
     int                i_refcount;
     libvlc_instance_t *p_libvlc_instance;
     vlc_dictionary_t   tags; /* To be merged with core's meta soon */
+    libvlc_state_t     state;
     struct libvlc_media_list_t *p_subitems; /* A media descriptor can have
                                            * Sub item */
     void *p_user_data; /* Allows for VLC.framework to hook into media descriptor without creating a new VLCMedia object. */
@@ -291,6 +292,9 @@ VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_
 
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
                         ( libvlc_media_descriptor_t * ) );
+
+VLC_EXPORT (void, libvlc_media_descriptor_set_state,
+                        ( libvlc_media_descriptor_t *, libvlc_state_t, libvlc_exception_t * ) );
 
 /* Media List View */
 VLC_EXPORT ( libvlc_media_list_view_t *, libvlc_media_list_view_new,

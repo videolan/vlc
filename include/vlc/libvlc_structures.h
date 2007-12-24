@@ -122,6 +122,7 @@ typedef struct libvlc_media_instance_t libvlc_media_instance_t;
 
 typedef enum libvlc_state_t
 {
+    libvlc_NothingSpecial,
     libvlc_Stopped,
     libvlc_Opening,
     libvlc_Buffering,
@@ -299,6 +300,7 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaDescriptorDurationChanged,
     libvlc_MediaDescriptorPreparsedChanged,
     libvlc_MediaDescriptorFreed,
+    libvlc_MediaDescriptorStateChanged,
 
     libvlc_MediaInstancePlayed,
     libvlc_MediaInstancePaused,
@@ -355,6 +357,10 @@ typedef struct libvlc_event_t
         {
             libvlc_media_descriptor_t * md;
         } media_descriptor_freed;
+        struct
+        {
+            libvlc_state_t new_state;
+        } media_descriptor_state_changed;
             
         /* media instance */
         struct
