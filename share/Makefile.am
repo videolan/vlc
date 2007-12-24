@@ -46,11 +46,11 @@ DIST_pda = \
 
 DIST_icons16 = vlc16x16.png vlc16x16.xpm
 
-DIST_icons32 = vlc32x32.png vlc32x32.xpm
+DIST_icons32 = vlc32x32.png vlc32x32.xpm vlc32x32-christmas.xpm
 
-DIST_icons48 = vlc48x48.ico vlc48x48.png
+DIST_icons48 = vlc48x48.ico vlc48x48.png vlc48x48-christmas.png
 
-DIST_icons128 = vlc128x128.png
+DIST_icons128 = vlc128x128.png vlc128x128-christmas.png
 
 DIST_skins2 = \
 	skins2/fonts/FreeSans.ttf \
