@@ -1279,7 +1279,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 #   define BLUE    COL(34)
 #   define MAGENTA COL(35)
 #   define CYAN    COL(36)
-#   define WHITE   COL(37)
+#   define WHITE   COL(0)
 #   define GRAY    "\033[0m"
 #define COLOR_FORMAT_STRING (WHITE"  %s --%s"YELLOW"%s%s%s%s%s%s "GRAY)
 #define COLOR_FORMAT_STRING_BOOL (WHITE"  %s --%s%s%s%s%s%s%s "GRAY)

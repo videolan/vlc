@@ -563,7 +563,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #   define RED     COL(31)
 #   define GREEN   COL(32)
 #   define YELLOW  COL(33)
-#   define WHITE   COL(37)
+#   define WHITE   COL(0)
 #   define GRAY    "\033[0m"
 
 #ifdef UNDER_CE
