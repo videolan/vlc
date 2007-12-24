@@ -711,7 +711,7 @@ osd_button_t *__osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
     int i_scale_width, int i_scale_height )
 {
     osd_menu_t *p_osd;
-    osd_button_t *p_button, *p_start, *p_end;
+    osd_button_t *p_button;
     vlc_value_t lockval;
 
     p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
