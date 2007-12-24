@@ -70,22 +70,19 @@ public slots:
 };
 
 /******************** Background Widget ****************/
-class BackgroundWidget : public QFrame
+class BackgroundWidget : public QWidget
 {
     Q_OBJECT
 public:
     BackgroundWidget( intf_thread_t * );
     virtual ~BackgroundWidget();
-    QSize widgetSize;
-    QSize sizeHint() const;
-    bool b_need_update;
+
 private:
     QPalette plt;
     QLabel *label;
-    virtual void resizeEvent( QResizeEvent *e );
     virtual void contextMenuEvent( QContextMenuEvent *event );
     intf_thread_t *p_intf;
-    int i_runs;
+
 public slots:
     void toggle(){ TOGGLEV( this ); }
     void update( input_thread_t * );

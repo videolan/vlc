@@ -315,6 +315,8 @@ MainInterface::~MainInterface()
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
     settings->setValue( "size", size() );
+    if( bgWidget )
+        settings->setValue( "backgroundSize", bgWidget->size() );
 
     settings->endGroup();
     delete settings;
@@ -398,9 +400,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     if( alwaysVideoFlag )
     {
         bgWidget = new BackgroundWidget( p_intf );
-        bgWidget->widgetSize = settings->value( "backgroundSize",
-                                           QSize( 300, 200 ) ).toSize();
-        bgWidget->resize( bgWidget->widgetSize );
+        bgWidget->resize(
+             settings->value( "backgroundSize", QSize( 300, 150 ) ).toSize() );
         bgWidget->updateGeometry();
         mainLayout->insertWidget( 0, bgWidget );
         CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
@@ -539,6 +540,7 @@ QSize MainInterface::sizeHint() const
     {
         nheight += bgWidget->size().height();
         nwidth  = bgWidget->size().width();
+        msg_Dbg( p_intf, "1b %i %i", nheight, nwidth );
     }
     else if( videoIsActive )
     {
@@ -1139,6 +1141,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    msg_Dbg( p_this, "Menu Requested" ); // DEBUG to track the non disparition of the menu...
 
     if( p_intf->pf_show_dialog )
     {
@@ -1156,6 +1159,7 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    msg_Dbg( p_this, "Intf Show Requested" ); // DEBUG to track the non disparition of the menu...
     //p_intf->p_sys->b_intf_show = VLC_TRUE;
 
     return VLC_SUCCESS;

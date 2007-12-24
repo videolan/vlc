@@ -124,10 +124,10 @@ void VideoWidget::release( void *p_win )
 #define MIN_BG_SIZE 64
 
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
-                                        QFrame( NULL ), p_intf( _p_i )
+                                        QWidget( NULL ), p_intf( _p_i )
 {
     /* We should use that one to take the more size it can */
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::MinimumExpanding );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 
     /* A dark background */
     setAutoFillBackground( true );
@@ -138,7 +138,6 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
 
     /* A cone in the middle */
     label = new QLabel;
-    label->setScaledContents( true );
     label->setMargin( 5 );
     label->setMaximumHeight( MAX_BG_SIZE );
     label->setMaximumWidth( MAX_BG_SIZE );
@@ -149,19 +148,19 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     else
         label->setPixmap( QPixmap( ":/vlc128.png" ) );
 
-    QHBoxLayout *backgroundLayout = new QHBoxLayout( this );
-    backgroundLayout->addWidget( label );
+    QGridLayout *backgroundLayout = new QGridLayout( this );
+    backgroundLayout->addWidget( label, 0, 1 );
+    backgroundLayout->setColumnStretch( 0, 1 );
+    backgroundLayout->setColumnStretch( 2, 1 );
 
-    resize( 300, 150 );
-    updateGeometry();
     CONNECT( THEMIM, inputChanged( input_thread_t *),
              this, update( input_thread_t * ) );
+    resize( 300, 150 );
 }
 
 BackgroundWidget::~BackgroundWidget()
 {
 }
-
 
 void BackgroundWidget::update( input_thread_t *p_input )
 {
@@ -174,12 +173,11 @@ void BackgroundWidget::update( input_thread_t *p_input )
         return;
     }
 
-
     vlc_object_yield( p_input );
     char *psz_arturl = input_item_GetArtURL( input_GetItem(p_input) );
     vlc_object_release( p_input );
-    QString url = qfu( psz_arturl );
-    QString arturl = url.replace( "file://",QString("" ) );
+
+    QString arturl = qfu( psz_arturl ).replace( "file://",QString("" ) );
     if( arturl.isNull() )
     {
         if( QDate::currentDate().dayOfYear() >= 354 )
@@ -193,25 +191,6 @@ void BackgroundWidget::update( input_thread_t *p_input )
         msg_Dbg( p_intf, "changing input b_need_update done %s", psz_arturl );
     }
     free( psz_arturl );
-}
-
-QSize BackgroundWidget::sizeHint() const
-{
-    return label->size();
-}
-
-void BackgroundWidget::resizeEvent( QResizeEvent *e )
-{
-    if( e->size().height() < MAX_BG_SIZE -1 )
-    {
-        label->setMaximumWidth( e->size().height() );
-        label->setMaximumHeight( e->size().width() );
-    }
-    else
-    {
-        label->setMaximumHeight( MAX_BG_SIZE );
-        label->setMaximumWidth( MAX_BG_SIZE );
-    }
 }
 
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
