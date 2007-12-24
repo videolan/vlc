@@ -1305,6 +1305,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     vlc_bool_t b_description = config_GetInt( p_this, "help-verbose" );
     vlc_bool_t b_description_hack;
     vlc_bool_t b_color       = config_GetInt( p_this, "color" );
+    vlc_bool_t b_has_advanced = VLC_FALSE;
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
@@ -1412,6 +1413,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             /* Skip advanced options if requested */
             if( p_item->b_advanced && !b_advanced )
             {
+                b_has_advanced = VLC_TRUE;
                 continue;
             }
 
@@ -1464,6 +1466,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             case CONFIG_ITEM_MODULE_CAT:
             case CONFIG_ITEM_MODULE_LIST:
             case CONFIG_ITEM_MODULE_LIST_CAT:
+            case CONFIG_ITEM_FONT:
+            case CONFIG_ITEM_PASSWORD:
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("string");
                 psz_ket = ">";
@@ -1680,6 +1684,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             }
         }
     }
+
+    if( b_has_advanced )
+        utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " %s\n", _( "Note:" ),
+        _( "add --advanced to your command line to see advanced options." ) );
 
     /* Release the module list */
     vlc_list_release( p_list );
