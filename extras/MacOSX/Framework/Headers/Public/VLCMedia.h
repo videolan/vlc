@@ -61,6 +61,14 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
 @class VLCMediaList;
 @class VLCMedia;
 
+typedef enum VLCMediaState
+{
+    VLCMediaStateNothingSpecial,       //< Nothing
+    VLCMediaStateBuffering,            //< Stream is buffering
+    VLCMediaStatePlaying,              //< Stream is playing
+    VLCMediaStateError,                //< Can't be played because an error occured
+} VLCMediaState;
+
 /**
  * Informal protocol declaration for VLCMedia delegates.  Allows data changes to be
  * trapped.
@@ -108,6 +116,7 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
     NSMutableDictionary * metaDictionary;    //< Meta data storage
     id                    delegate;          //< Delegate object
     BOOL                  preparsed;         //< Value used to determine of the file has been preparsed
+    VLCMediaState         state;
 }
 
 /* Object Factories */
@@ -195,4 +204,10 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
  * \return The receiver's meta data as a NSDictionary object.
  */
 - (NSDictionary *)metaDictionary;
+
+/**
+ * Returns the receiver's state.
+ * \return The receiver's state, such as Playing, Error, NothingSpecial, Buffering.
+ */
+- (VLCMediaState)state;
 @end

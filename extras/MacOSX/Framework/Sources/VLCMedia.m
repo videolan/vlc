@@ -72,6 +72,22 @@ NSString *VLCMediaMetaChanged           = @"VLCMediaMetaChanged";
 - (void)metaChanged:(NSString *)metaType;
 @end
 
+static VLCMediaState libvlc_state_to_media_state[] =
+{
+    [libvlc_NothingSpecial] = VLCMediaStateNothingSpecial,
+    [libvlc_Stopped]        = VLCMediaStateNothingSpecial,
+    [libvlc_Opening]        = VLCMediaStateNothingSpecial,
+    [libvlc_Buffering]      = VLCMediaStateBuffering,
+    [libvlc_Ended]          = VLCMediaStateNothingSpecial,
+    [libvlc_Error]          = VLCMediaStateError,
+    [libvlc_Playing]        = VLCMediaStatePlaying,
+    [libvlc_Paused]         = VLCMediaStatePlaying,
+};
+
+static inline VLCMediaState LibVLCStateToMediaState( libvlc_state_t state )
+{
+    return libvlc_state_to_media_state[state];
+}
 
 /******************************************************************************
  * LibVLC Event Callback
@@ -93,6 +109,16 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 //                                                 withMethod:@selector(setLength:)
 //                                       withArgumentAsObject:[VLCTime timeWithNumber:
 //                                           [NSNumber numberWithLongLong:event->u.media_descriptor_duration_changed.new_duration]]];
+    [pool release];
+}
+
+static void HandleMediaStateChanged(const libvlc_event_t *event, void *self)
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(setState:)
+                                       withArgumentAsObject:[NSNumber numberWithInt:
+                                            LibVLCStateToMediaState(event->u.media_descriptor_state_changed.new_state)]];
     [pool release];
 }
 
@@ -179,6 +205,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
             libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager(p_md, NULL);
             libvlc_event_detach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaDescriptorStateChanged,    HandleMediaStateChanged,    self, NULL);
         }
         [super release];
     }
@@ -282,6 +309,11 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
 - (id)delegate
 {
     return delegate;
+}
+
+- (VLCMediaState)state
+{
+    return state;
 }
 @end
 
@@ -394,6 +426,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     libvlc_event_manager_t *p_em = libvlc_media_descriptor_event_manager( p_md, &ex );
     libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaDescriptorStateChanged,    HandleMediaStateChanged,    self, &ex);
     quit_on_exception( &ex );
     
     libvlc_media_list_t *p_mlist = libvlc_media_descriptor_subitems( p_md, NULL );
@@ -405,7 +438,7 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
         subitems = [[VLCMediaList mediaListWithLibVLCMediaList:p_mlist] retain];
         libvlc_media_list_release( p_mlist );
     }
-    
+    state = LibVLCStateToMediaState(libvlc_media_descriptor_get_state( p_md, NULL ));
     /* Force VLCMetaInformationTitle, that will trigger preparsing
      * And all the other meta will be added through the libvlc event system */
     [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
@@ -473,5 +506,12 @@ static void HandleMediaDurationChanged(const libvlc_event_t *event, void *self)
     [length release];       
     length = value ? [value retain] : nil;
     [self didChangeValueForKey:@"length"];
+}
+
+- (void)setState:(NSNumber *)newStateAsNumber
+{        
+    [self willChangeValueForKey:@"state"];
+    state = [newStateAsNumber intValue];
+    [self didChangeValueForKey:@"state"];
 }
 @end
