@@ -50,7 +50,7 @@ static const struct
     { "http/shout-winamp://www.shoutcast.com/sbin/newtvlister.phtml?alltv=1",
       N_("Shoutcast TV"), { NULL } },
     { "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u",
-      N_("Freebox TV"), { NULL } },
+      N_("Freebox TV"), { "m3u-extvlcopt=1", NULL } },
 };
 
 /* Main functions */
