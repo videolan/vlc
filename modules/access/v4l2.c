@@ -35,6 +35,7 @@
 
 /*
  * TODO: Tuner partial implementation.
+ * TODO: Add more MPEG stream params
  */
 
 /*****************************************************************************
@@ -66,8 +67,10 @@
  * Module descriptior
  *****************************************************************************/
 
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  DemuxOpen ( vlc_object_t * );
+static void DemuxClose( vlc_object_t * );
+static int  AccessOpen ( vlc_object_t * );
+static void AccessClose( vlc_object_t * );
 
 #define DEV_TEXT N_("Device name")
 #define DEV_LONGTEXT N_( \
@@ -210,18 +213,30 @@ vlc_module_begin();
 
     add_shortcut( "v4l2" );
     set_capability( "access_demux", 10 );
-    set_callbacks( Open, Close );
+    set_callbacks( DemuxOpen, DemuxClose );
+
+    add_submodule();
+    set_description( _("Video4Linux2 Compressed A/V") );
+    set_capability( "access2", 0 );
+    /* use these when open as access_demux fails; VLC will use another demux */
+    set_callbacks( AccessOpen, AccessClose );
+
 vlc_module_end();
 
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
 
-static void ParseMRL( demux_t * );
+static void CommonClose( vlc_object_t *, demux_sys_t * );
+static void ParseMRL( demux_sys_t *, char *, vlc_object_t * );
+static void GetV4L2Params( demux_sys_t * , vlc_object_t * );
 
 static int DemuxControl( demux_t *, int, va_list );
+static int AccessControl( access_t *, int, va_list );
 
 static int Demux( demux_t * );
+static ssize_t AccessRead( access_t *, uint8_t *, size_t );
+
 static block_t* GrabVideo( demux_t *p_demux );
 static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t );
 static block_t* GrabAudio( demux_t *p_demux );
@@ -229,18 +244,24 @@ static block_t* GrabAudio( demux_t *p_demux );
 vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat );
 
 char* ResolveALSADeviceName( char *psz_device );
-static int OpenVideoDev( demux_t *, char *psz_device );
+static int OpenVideoDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
 static int OpenAudioDev( demux_t *, char *psz_device );
-static vlc_bool_t ProbeVideoDev( demux_t *, char *psz_device );
+static vlc_bool_t ProbeVideoDev( vlc_object_t *, demux_sys_t *, char *psz_device );
 static vlc_bool_t ProbeAudioDev( demux_t *, char *psz_device );
 
-static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset );
-static int Control( demux_t *, int i_fd,
+static int ControlList( vlc_object_t *, int , vlc_bool_t, vlc_bool_t );
+static int Control( vlc_object_t *, int i_fd,
                     const char *psz_name, int i_cid, int i_value );
-static int ControlCallback( vlc_object_t *p_this,
+static int DemuxControlCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data );
-static int ControlResetCallback( vlc_object_t *p_this,
+static int DemuxControlResetCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data );
+static int AccessControlCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data );
+static int AccessControlResetCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data );
 
@@ -379,17 +400,16 @@ struct demux_sys_t
 };
 
 /*****************************************************************************
- * Open: opens v4l2 device
+ * DemuxOpen: opens v4l2 device, access_demux callback
  *****************************************************************************
  *
  * url: <video device>::::
  *
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int DemuxOpen( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_value_t val;
 
     /* Only when selected */
     if( *p_demux->psz_access == '\0' ) return VLC_EGENERIC;
@@ -404,51 +424,9 @@ static int Open( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL ) return VLC_ENOMEM;
 
-    p_sys->i_video_pts = -1;
+    GetV4L2Params(p_sys, (vlc_object_t *) p_demux);
 
-    var_Create( p_demux, "v4l2-standard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l2-standard", &val );
-    p_sys->i_selected_standard_id = i_standards_list[val.i_int];
-
-    p_sys->i_selected_input = var_CreateGetInteger( p_demux, "v4l2-input" );
-
-    p_sys->io = var_CreateGetInteger( p_demux, "v4l2-io" );
-
-    p_sys->i_width = var_CreateGetInteger( p_demux, "v4l2-width" );
-    p_sys->i_height = var_CreateGetInteger( p_demux, "v4l2-height" );
-
-    var_CreateGetBool( p_demux, "v4l2-controls-reset" );
-
-    var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l2-fps", &val );
-    p_sys->f_fps = val.f_float;
-
-    var_Create( p_demux, "v4l2-samplerate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l2-samplerate", &val );
-    p_sys->i_sample_rate = val.i_int;
-
-    p_sys->psz_requested_chroma = var_CreateGetString( p_demux, "v4l2-chroma" );
-
-#ifdef HAVE_ALSA
-    var_Create( p_demux, "v4l2-alsa", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l2-alsa", &val );
-    p_sys->b_use_alsa = val.b_bool;
-#endif
-
-    var_Create( p_demux, "v4l2-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l2-stereo", &val );
-    p_sys->b_stereo = val.b_bool;
-
-    p_sys->i_pts = var_CreateGetInteger( p_demux, "v4l2-caching" );
-
-    p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
-    p_sys->i_fd_video = -1;
-    p_sys->i_fd_audio = -1;
-
-    p_sys->p_es_video = p_sys->p_es_audio = 0;
-    p_sys->p_block_audio = 0;
-
-    ParseMRL( p_demux );
+    ParseMRL( p_sys, p_demux->psz_path, (vlc_object_t *) p_demux );
 
 #ifdef HAVE_ALSA
     /* Alsa support available? */
@@ -462,17 +440,17 @@ static int Open( vlc_object_t *p_this )
 
         /* Try to open as video device */
         msg_Dbg( p_demux, "trying device '%s' as video", p_sys->psz_device );
-        if( ProbeVideoDev( p_demux, p_sys->psz_device ) )
+        if( ProbeVideoDev( (vlc_object_t *) p_demux, p_sys, p_sys->psz_device ) )
         {
             msg_Dbg( p_demux, "'%s' is a video device", p_sys->psz_device );
             /* Device was a video device */
             if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
             p_sys->psz_vdev = p_sys->psz_device;
             p_sys->psz_device = NULL;
-            p_sys->i_fd_video = OpenVideoDev( p_demux, p_sys->psz_vdev );
+            p_sys->i_fd_video = OpenVideoDev( (vlc_object_t *) p_demux, p_sys, VLC_TRUE );
             if( p_sys->i_fd_video < 0 )
             {
-                Close( p_this );
+                DemuxClose( p_this );
                 return VLC_EGENERIC;
             }
         }
@@ -490,7 +468,7 @@ static int Open( vlc_object_t *p_this )
                 p_sys->i_fd_audio = OpenAudioDev( p_demux, p_sys->psz_adev );
                 if( p_sys->i_fd_audio < 0 )
                 {
-                    Close( p_this );
+                    DemuxClose( p_this );
                     return VLC_EGENERIC;
                 }
             }
@@ -502,7 +480,7 @@ static int Open( vlc_object_t *p_this )
     {
         if( strcmp( p_demux->psz_access, "v4l2" ) )
         {
-            Close( p_this );
+            DemuxClose( p_this );
             return VLC_EGENERIC;
         }
     }
@@ -517,9 +495,9 @@ static int Open( vlc_object_t *p_this )
         }
 
         msg_Dbg( p_demux, "opening '%s' as video", p_sys->psz_vdev );
-        if( p_sys->psz_vdev && *p_sys->psz_vdev && ProbeVideoDev( p_demux, p_sys->psz_vdev ) )
+        if( p_sys->psz_vdev && *p_sys->psz_vdev && ProbeVideoDev( (vlc_object_t *) p_demux, p_sys, p_sys->psz_vdev ) )
         {
-            p_sys->i_fd_video = OpenVideoDev( p_demux, p_sys->psz_vdev );
+            p_sys->i_fd_video = OpenVideoDev( (vlc_object_t *) p_demux, p_sys, VLC_TRUE );
         }
     }
 
@@ -541,7 +519,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_fd_video < 0 && p_sys->i_fd_audio < 0 )
     {
-        Close( p_this );
+        DemuxClose( p_this );
         return VLC_EGENERIC;
     }
 
@@ -549,13 +527,63 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * GetV4L2Params: fill in p_sys parameters (shared by DemuxOpen and AccessOpen)
+ *****************************************************************************/
+void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
+{
+    vlc_value_t val;
+
+    p_sys->i_video_pts = -1;
+
+    var_Create( p_obj, "v4l2-standard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_obj, "v4l2-standard", &val );
+    p_sys->i_selected_standard_id = i_standards_list[val.i_int];
+
+    p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
+
+    p_sys->io = var_CreateGetInteger( p_obj, "v4l2-io" );
+
+    p_sys->i_width = var_CreateGetInteger( p_obj, "v4l2-width" );
+    p_sys->i_height = var_CreateGetInteger( p_obj, "v4l2-height" );
+
+    var_CreateGetBool( p_obj, "v4l2-controls-reset" );
+
+    var_Create( p_obj, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Get( p_obj, "v4l2-fps", &val );
+    p_sys->f_fps = val.f_float;
+
+    var_Create( p_obj, "v4l2-samplerate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_obj, "v4l2-samplerate", &val );
+    p_sys->i_sample_rate = val.i_int;
+
+    p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
+
+#ifdef HAVE_ALSA
+    var_Create( p_obj, "v4l2-alsa", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_obj, "v4l2-alsa", &val );
+    p_sys->b_use_alsa = val.b_bool;
+#endif
+
+    var_Create( p_obj, "v4l2-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_obj, "v4l2-stereo", &val );
+    p_sys->b_stereo = val.b_bool;
+
+    p_sys->i_pts = var_CreateGetInteger( p_obj, "v4l2-caching" );
+
+    p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
+    p_sys->i_fd_video = -1;
+    p_sys->i_fd_audio = -1;
+
+    p_sys->p_es_video = p_sys->p_es_audio = 0;
+    p_sys->p_block_audio = 0;
+}
+
+/*****************************************************************************
  * ParseMRL: parse the options contained in the MRL
  *****************************************************************************/
-static void ParseMRL( demux_t *p_demux )
+static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    char *psz_dup = strdup( p_demux->psz_path );
+    char *psz_dup = strdup( psz_path );
     char *psz_parser = psz_dup;
 
     while( *psz_parser && *psz_parser != ':' )
@@ -685,42 +713,42 @@ static void ParseMRL( demux_t *p_demux )
             else if( !strncmp( psz_parser, "controls-reset",
                                strlen( "controls-reset" ) ) )
             {
-                var_SetBool( p_demux, "v4l2-controls-reset", VLC_TRUE );
+                var_SetBool( p_obj, "v4l2-controls-reset", VLC_TRUE );
                 psz_parser += strlen( "controls-reset" );
             }
 #if 0
             else if( !strncmp( psz_parser, "brightness=",
                                strlen( "brightness=" ) ) )
             {
-                var_SetInteger( p_demux, "brightness",
+                var_SetInteger( p_obj, "brightness",
                     strtol( psz_parser + strlen( "brightness=" ),
                             &psz_parser, 0 ) );
             }
             else if( !strncmp( psz_parser, "contrast=",
                                strlen( "contrast=" ) ) )
             {
-                var_SetInteger( p_demux, "contrast",
+                var_SetInteger( p_obj, "contrast",
                     strtol( psz_parser + strlen( "contrast=" ),
                             &psz_parser, 0 ) );
             }
             else if( !strncmp( psz_parser, "saturation=",
                                strlen( "saturation=" ) ) )
             {
-                var_SetInteger( p_demux, "saturation",
+                var_SetInteger( p_obj, "saturation",
                     strtol( psz_parser + strlen( "saturation=" ),
                             &psz_parser, 0 ) );
             }
             else if( !strncmp( psz_parser, "hue=",
                                strlen( "hue=" ) ) )
             {
-                var_SetInteger( p_demux, "hue",
+                var_SetInteger( p_obj, "hue",
                     strtol( psz_parser + strlen( "hue=" ),
                             &psz_parser, 0 ) );
             }
             else if( !strncmp( psz_parser, "gamma=",
                                strlen( "gamma=" ) ) )
             {
-                var_SetInteger( p_demux, "gamma",
+                var_SetInteger( p_obj, "gamma",
                     strtol( psz_parser + strlen( "gamma=" ),
                             &psz_parser, 0 ) );
             }
@@ -756,7 +784,7 @@ static void ParseMRL( demux_t *p_demux )
             }
             else
             {
-                msg_Warn( p_demux, "unknown option" );
+                msg_Warn( p_obj, "unknown option" );
             }
 
             while( *psz_parser && *psz_parser != ':' )
@@ -782,13 +810,22 @@ static void ParseMRL( demux_t *p_demux )
 /*****************************************************************************
  * Close: close device, free resources
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void AccessClose( vlc_object_t *p_this )
 {
-    demux_t     *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys   = p_demux->p_sys;
+    access_t    *p_access = (access_t *)p_this;
+    demux_sys_t *p_sys   = (demux_sys_t *) p_access->p_sys;
+
+    CommonClose( p_this, p_sys );
+}
+
+static void DemuxClose( vlc_object_t *p_this )
+{
     struct v4l2_buffer buf;
     enum v4l2_buf_type buf_type;
     unsigned int i;
+
+    demux_t     *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys   = p_demux->p_sys;
 
     /* Stop video capture */
     if( p_sys->i_fd_video >= 0 )
@@ -813,7 +850,7 @@ static void Close( vlc_object_t *p_this )
 
             buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             if( ioctl( p_sys->i_fd_video, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
-                msg_Err( p_demux, "VIDIOC_STREAMOFF failed" );
+                msg_Err( p_this, "VIDIOC_STREAMOFF failed" );
             }
 
             break;
@@ -833,7 +870,7 @@ static void Close( vlc_object_t *p_this )
             {
                 if( munmap( p_sys->p_buffers[i].start, p_sys->p_buffers[i].length ) )
                 {
-                    msg_Err( p_demux, "munmap failed" );
+                    msg_Err( p_this, "munmap failed" );
                 }
             }
             break;
@@ -848,6 +885,11 @@ static void Close( vlc_object_t *p_this )
         free( p_sys->p_buffers );
     }
 
+    CommonClose( p_this, p_sys );
+}
+
+static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
+{
     /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
 #ifdef HAVE_ALSA
@@ -872,6 +914,99 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->psz_requested_chroma ) free( p_sys->psz_requested_chroma );
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * AccessOpen: opens v4l2 device, access2 callback
+ *****************************************************************************
+ *
+ * url: <video device>::::
+ *
+ *****************************************************************************/
+static int AccessOpen( vlc_object_t * p_this )
+{
+    access_t *p_access = (access_t*) p_this;
+    demux_sys_t * p_sys;
+
+    /* Only when selected */
+    if( *p_access->psz_access == '\0' ) return VLC_EGENERIC;
+
+    p_access->pf_read = AccessRead;
+    p_access->pf_block = NULL;
+    p_access->pf_seek = NULL;
+    p_access->pf_control = AccessControl;
+    p_access->info.i_update = 0;
+    p_access->info.i_size = 0;
+    p_access->info.i_pos = 0;
+    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.i_title = 0;
+    p_access->info.i_seekpoint = 0;
+
+    p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    p_access->p_sys = (access_sys_t *) p_sys;
+    if( p_sys == NULL ) return VLC_ENOMEM;
+
+    GetV4L2Params(p_sys, (vlc_object_t *) p_access);
+
+    ParseMRL( p_sys, p_access->psz_path, (vlc_object_t *) p_access );
+
+    /* Find main device (video) */
+    if( p_sys->psz_device && *p_sys->psz_device )
+    {
+        msg_Dbg( p_access, "main device='%s'", p_sys->psz_device );
+
+        /* Try to open as video device */
+        msg_Dbg( p_access, "trying device '%s' as video", p_sys->psz_device );
+        if( ProbeVideoDev( (vlc_object_t *) p_access, p_sys, p_sys->psz_device ) )
+        {
+            msg_Dbg( p_access, "'%s' is a video device", p_sys->psz_device );
+            /* Device was a video device */
+            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            p_sys->psz_vdev = p_sys->psz_device;
+            p_sys->psz_device = NULL;
+            p_sys->i_fd_video = OpenVideoDev( (vlc_object_t *) p_access, p_sys, VLC_FALSE );
+            if( p_sys->i_fd_video < 0 )
+            {
+                AccessClose( p_this );
+                return VLC_EGENERIC;
+            }
+        }
+    }
+
+    /* If no device opened, only continue if the access was forced */
+    if( p_sys->i_fd_video < 0 )
+    {
+        if( strcmp( p_access->psz_access, "v4l2" ) )
+        {
+            AccessClose( p_this );
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* Find video device */
+    if( p_sys->i_fd_video < 0 )
+    {
+        if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
+        {
+            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            p_sys->psz_vdev = var_CreateGetString( p_access, "v4l2-dev" );
+        }
+
+        msg_Dbg( p_access, "opening '%s' as video", p_sys->psz_vdev );
+        if( p_sys->psz_vdev && *p_sys->psz_vdev && ProbeVideoDev( (vlc_object_t *) p_access, p_sys, p_sys->psz_vdev ) )
+        {
+            p_sys->i_fd_video = OpenVideoDev( (vlc_object_t *) p_access, p_sys, VLC_FALSE );
+        }
+    }
+
+
+    if( p_sys->i_fd_video < 0 )
+    {
+        AccessClose( p_this );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -909,6 +1044,108 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     }
 
     return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * AccessControl: access2 callback
+ *****************************************************************************/
+static int AccessControl( access_t *p_access, int i_query, va_list args )
+{
+    vlc_bool_t   *pb_bool;
+    int          *pi_int;
+    int64_t      *pi_64;
+    demux_sys_t  *p_sys = (demux_sys_t *) p_access->p_sys;
+
+    switch( i_query )
+    {
+        /* */
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;
+            break;
+        case ACCESS_CAN_PAUSE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;
+            break;
+        case ACCESS_CAN_CONTROL_PACE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;
+            break;
+
+        /* */
+        case ACCESS_GET_MTU:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = 0;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = (int64_t) p_sys->i_pts * 1000;
+            break;
+
+        /* */
+        case ACCESS_SET_PAUSE_STATE:
+            /* Nothing to do */
+            break;
+
+        case ACCESS_GET_TITLE_INFO:
+        case ACCESS_SET_TITLE:
+        case ACCESS_SET_SEEKPOINT:
+        case ACCESS_SET_PRIVATE_ID_STATE:
+        case ACCESS_GET_CONTENT_TYPE:
+        case ACCESS_GET_META:
+            return VLC_EGENERIC;
+
+        default:
+            msg_Warn( p_access, "Unimplemented query in control(%d).", i_query);
+            return VLC_EGENERIC;
+
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * AccessRead: access2 callback
+ ******************************************************************************/
+static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len )
+{
+    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
+    struct pollfd ufd;
+    int i_ret;
+
+    ufd.fd = p_sys->i_fd_video;
+    ufd.events = POLLIN;
+
+    if( p_access->info.b_eof )
+        return 0;
+
+    do
+    {
+        if( p_access->b_die )
+            return 0;
+
+        ufd.revents = 0;
+    }
+    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
+
+    if( i_ret < 0 )
+    {
+        msg_Err( p_access, "Polling error (%m)." );
+        return -1;
+    }
+
+    i_ret = read( p_sys->i_fd_video, p_buffer, i_len );
+    if( i_ret == 0 )
+    {
+        p_access->info.b_eof = VLC_TRUE;
+    }
+    else if( i_ret > 0 )
+    {
+        p_access->info.i_pos += i_ret;
+    }
+
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -1379,19 +1616,19 @@ vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat 
 /*****************************************************************************
  * OpenVideoDev: open and set up the video device and probe for capabilities
  *****************************************************************************/
-int OpenVideoDev( demux_t *p_demux, char *psz_device )
+int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_demux )
 {
     int i_fd;
-    demux_sys_t *p_sys = p_demux->p_sys;
     struct v4l2_cropcap cropcap;
     struct v4l2_crop crop;
     struct v4l2_format fmt;
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
+    char *psz_device = p_sys->psz_vdev;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_demux, "cannot open device (%m)" );
+        msg_Err( p_obj, "cannot open device (%m)" );
         goto open_failed;
     }
 
@@ -1401,25 +1638,37 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     {
         if( ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
         {
-            msg_Err( p_demux, "cannot set standard (%m)" );
+            msg_Err( p_obj, "cannot set standard (%m)" );
             goto open_failed;
         }
-        msg_Dbg( p_demux, "Set standard" );
+        msg_Dbg( p_obj, "Set standard" );
     }
 
     /* Select input */
 
     if( p_sys->i_selected_input > p_sys->i_input )
     {
-        msg_Warn( p_demux, "invalid input. Using the default one" );
+        msg_Warn( p_obj, "invalid input. Using the default one" );
         p_sys->i_selected_input = 0;
     }
 
     if( ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
     {
-        msg_Err( p_demux, "cannot set input (%m)" );
+        msg_Err( p_obj, "cannot set input (%m)" );
         goto open_failed;
     }
+
+    /* TODO: Move the resolution stuff up here */
+    /* if MPEG encoder card, no need to do anything else after this */
+    if( VLC_FALSE == b_demux)
+    {
+        ControlList( p_obj, i_fd,
+                      var_GetBool( p_obj, "v4l2-controls-reset" ), b_demux );
+
+        return i_fd;
+    }
+
+    demux_t *p_demux = (demux_t *) p_obj;
 
     /* Verify device support for the various IO methods */
     switch( p_sys->io )
@@ -1524,6 +1773,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     /* If no user specified chroma, find best */
+    /* This also decides if MPEG encoder card or not */
     if( !fmt.fmt.pix.pixelformat )
     {
         fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YVU420;
@@ -1535,7 +1785,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
                 fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
                 if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
                 {
-                    msg_Err( p_demux, "Could not select any of the default chromas!" );
+                    msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access2)" );
                     goto open_failed;
                 }
             }
@@ -1611,9 +1861,6 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         }
     }
 #endif
-
-    ControlList( p_demux, i_fd,
-                      var_GetBool( p_demux, "v4l2-controls-reset" ) );
 
     /* Init IO method */
     switch( p_sys->io )
@@ -2000,17 +2247,16 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
 /*****************************************************************************
  * ProbeVideoDev: probe video for capabilities
  *****************************************************************************/
-vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
+vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, char *psz_device )
 {
     int i_index;
     int i_standard;
 
     int i_fd;
-    demux_sys_t *p_sys = p_demux->p_sys;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_demux, "cannot open video device (%m)" );
+        msg_Err( p_obj, "cannot open video device (%m)" );
         goto open_failed;
     }
 
@@ -2018,11 +2264,11 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
     if( ioctl( i_fd, VIDIOC_QUERYCAP, &p_sys->dev_cap ) < 0 )
     {
-        msg_Err( p_demux, "cannot get video capabilities (%m)" );
+        msg_Err( p_obj, "cannot get video capabilities (%m)" );
         goto open_failed;
     }
 
-    msg_Dbg( p_demux, "V4L2 device: %s using driver: %s (version: %u.%u.%u) on %s",
+    msg_Dbg( p_obj, "V4L2 device: %s using driver: %s (version: %u.%u.%u) on %s",
                             p_sys->dev_cap.card,
                             p_sys->dev_cap.driver,
                             (p_sys->dev_cap.version >> 16) & 0xFF,
@@ -2030,14 +2276,14 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                             p_sys->dev_cap.version & 0xFF,
                             p_sys->dev_cap.bus_info );
 
-    msg_Dbg( p_demux, "the device has the capabilities: (%c) Video Capure, "
+    msg_Dbg( p_obj, "the device has the capabilities: (%c) Video Capure, "
                                                        "(%c) Audio, "
                                                        "(%c) Tuner",
              ( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
              ( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
              ( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER  ? 'X':' ') );
 
-    msg_Dbg( p_demux, "supported I/O methods are: (%c) Read/Write, "
+    msg_Dbg( p_obj, "supported I/O methods are: (%c) Read/Write, "
                                                  "(%c) Streaming, "
                                                  "(%c) Asynchronous",
             ( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
@@ -2067,10 +2313,10 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
             if( ioctl( i_fd, VIDIOC_ENUMINPUT, &p_sys->p_inputs[i_index] ) )
             {
-                msg_Err( p_demux, "cannot get video input characteristics (%m)" );
+                msg_Err( p_obj, "cannot get video input characteristics (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_demux, "video input %i (%s) has type: %s",
+            msg_Dbg( p_obj, "video input %i (%s) has type: %s",
                                 i_index,
                                 p_sys->p_inputs[i_index].name,
                                 p_sys->p_inputs[i_index].type
@@ -2100,10 +2346,10 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
             if( ioctl( i_fd, VIDIOC_ENUMSTD, &p_sys->p_standards[i_standard] ) )
             {
-                msg_Err( p_demux, "cannot get video input standards (%m)" );
+                msg_Err( p_obj, "cannot get video input standards (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_demux, "video standard %i is: %s",
+            msg_Dbg( p_obj, "video standard %i is: %s",
                                 i_standard,
                                 p_sys->p_standards[i_standard].name);
         }
@@ -2123,11 +2369,11 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
         {
             if( ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
             {
-                msg_Err( p_demux, "cannot get audio input characteristics (%m)" );
+                msg_Err( p_obj, "cannot get audio input characteristics (%m)" );
                 goto open_failed;
             }
 
-            msg_Dbg( p_demux, "audio device %i (%s) is %s",
+            msg_Dbg( p_obj, "audio device %i (%s) is %s",
                                 p_sys->i_audio,
                                 p_sys->p_audios[p_sys->i_audio].name,
                                 p_sys->p_audios[p_sys->i_audio].capability &
@@ -2159,10 +2405,10 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
             if( ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
             {
-                msg_Err( p_demux, "cannot get tuner characteristics (%m)" );
+                msg_Err( p_obj, "cannot get tuner characteristics (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_demux, "tuner %i (%s) has type: %s, "
+            msg_Dbg( p_obj, "tuner %i (%s) has type: %s, "
                               "frequency range: %.1f %s -> %.1f %s",
                                 i_index,
                                 p_sys->p_tuners[i_index].name,
@@ -2207,7 +2453,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
             if( ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
             {
-                msg_Err( p_demux, "cannot get codec description (%m)" );
+                msg_Err( p_obj, "cannot get codec description (%m)" );
                 goto open_failed;
             }
 
@@ -2222,7 +2468,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                     char sz_fourcc[5];
                     memset( &sz_fourcc, 0, sizeof( sz_fourcc ) );
                     vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc, &sz_fourcc );
-                    msg_Dbg( p_demux, "device supports chroma %4s [%s]",
+                    msg_Dbg( p_obj, "device supports chroma %4s [%s]",
                                 sz_fourcc,
                                 p_sys->p_codecs[i_index].description );
 
@@ -2235,7 +2481,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                     if( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
                     {
                         /* Not all devices support this ioctl */
-                        msg_Warn( p_demux, "Unable to query for frame sizes" );
+                        msg_Warn( p_obj, "Unable to query for frame sizes" );
                     }
                     else
                     {
@@ -2244,21 +2490,21 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                             case V4L2_FRMSIZE_TYPE_DISCRETE:
                                 do
                                 {
-                                    msg_Dbg( p_demux,
+                                    msg_Dbg( p_obj,
                 "    device supports size %dx%d",
                 frmsize.discrete.width, frmsize.discrete.height );
                                     frmsize.index++;
                                 } while( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
                                 break;
                             case V4L2_FRMSIZE_TYPE_STEPWISE:
-                                msg_Dbg( p_demux,
+                                msg_Dbg( p_obj,
                 "    device supports sizes %dx%d to %dx%d using %dx%d increments",
                 frmsize.stepwise.min_width, frmsize.stepwise.min_height,
                 frmsize.stepwise.max_width, frmsize.stepwise.max_height,
                 frmsize.stepwise.step_width, frmsize.stepwise.step_height );
                                 break;
                             case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-                                msg_Dbg( p_demux,
+                                msg_Dbg( p_obj,
                 "    device supports all sizes %dx%d to %dx%d",
                 frmsize.stepwise.min_width, frmsize.stepwise.min_height,
                 frmsize.stepwise.max_width, frmsize.stepwise.max_height );
@@ -2270,7 +2516,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
             }
             if( !b_codec_supported )
             {
-                msg_Dbg( p_demux, "device codec %s not supported",
+                msg_Dbg( p_obj, "device codec %s not supported as access_demux",
                     p_sys->p_codecs[i_index].description );
             }
 
@@ -2350,9 +2596,9 @@ open_failed:
  * Print a user-class v4l2 control's details, create the relevant variable,
  * change the value if needed.
  *****************************************************************************/
-static void ControlListPrint( demux_t *p_demux, int i_fd,
+static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
                               struct v4l2_queryctrl queryctrl,
-                              vlc_bool_t b_reset )
+                              vlc_bool_t b_reset, vlc_bool_t b_demux )
 {
     struct v4l2_querymenu querymenu;
     unsigned int i_mid;
@@ -2364,9 +2610,9 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
     vlc_value_t val, val2;
 
     if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
-        msg_Dbg( p_demux, "    control is busy" );
+        msg_Dbg( p_obj, "    control is busy" );
     if( queryctrl.flags & V4L2_CTRL_FLAG_READ_ONLY )
-        msg_Dbg( p_demux, "    control is read-only" );
+        msg_Dbg( p_obj, "    control is read-only" );
 
     for( i = 0; controls[i].psz_name != NULL; i++ )
         if( controls[i].i_cid == queryctrl.id ) break;
@@ -2376,8 +2622,8 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
         psz_name = strdup( controls[i].psz_name );
         char psz_cfg_name[40];
         sprintf( psz_cfg_name, CFG_PREFIX "%s", psz_name );
-        i_val = var_CreateGetInteger( p_demux, psz_cfg_name );
-        var_Destroy( p_demux, psz_cfg_name );
+        i_val = var_CreateGetInteger( p_obj, psz_cfg_name );
+        var_Destroy( p_obj, psz_cfg_name );
     }
     else
     {
@@ -2393,30 +2639,30 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
     switch( queryctrl.type )
     {
         case V4L2_CTRL_TYPE_INTEGER:
-            msg_Dbg( p_demux, "    integer control" );
-            msg_Dbg( p_demux,
+            msg_Dbg( p_obj, "    integer control" );
+            msg_Dbg( p_obj,
                      "    valid values: %d to %d by steps of %d",
                      queryctrl.minimum, queryctrl.maximum,
                      queryctrl.step );
 
-            var_Create( p_demux, psz_name,
+            var_Create( p_obj, psz_name,
                         VLC_VAR_INTEGER | VLC_VAR_HASMIN | VLC_VAR_HASMAX
                       | VLC_VAR_HASSTEP | VLC_VAR_ISCOMMAND );
             val.i_int = queryctrl.minimum;
-            var_Change( p_demux, psz_name, VLC_VAR_SETMIN, &val, NULL );
+            var_Change( p_obj, psz_name, VLC_VAR_SETMIN, &val, NULL );
             val.i_int = queryctrl.maximum;
-            var_Change( p_demux, psz_name, VLC_VAR_SETMAX, &val, NULL );
+            var_Change( p_obj, psz_name, VLC_VAR_SETMAX, &val, NULL );
             val.i_int = queryctrl.step;
-            var_Change( p_demux, psz_name, VLC_VAR_SETSTEP, &val, NULL );
+            var_Change( p_obj, psz_name, VLC_VAR_SETSTEP, &val, NULL );
             break;
         case V4L2_CTRL_TYPE_BOOLEAN:
-            msg_Dbg( p_demux, "    boolean control" );
-            var_Create( p_demux, psz_name,
+            msg_Dbg( p_obj, "    boolean control" );
+            var_Create( p_obj, psz_name,
                         VLC_VAR_BOOL | VLC_VAR_ISCOMMAND );
             break;
         case V4L2_CTRL_TYPE_MENU:
-            msg_Dbg( p_demux, "    menu control" );
-            var_Create( p_demux, psz_name,
+            msg_Dbg( p_obj, "    menu control" );
+            var_Create( p_obj, psz_name,
                         VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
                       | VLC_VAR_ISCOMMAND );
             memset( &querymenu, 0, sizeof( querymenu ) );
@@ -2428,22 +2674,22 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
                 querymenu.id = queryctrl.id;
                 if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
                 {
-                    msg_Dbg( p_demux, "        %d: %s",
+                    msg_Dbg( p_obj, "        %d: %s",
                              querymenu.index, querymenu.name );
                     val.i_int = querymenu.index;
                     val2.psz_string = (char *)querymenu.name;
-                    var_Change( p_demux, psz_name,
+                    var_Change( p_obj, psz_name,
                                 VLC_VAR_ADDCHOICE, &val, &val2 );
                 }
             }
             break;
         case V4L2_CTRL_TYPE_BUTTON:
-            msg_Dbg( p_demux, "    button control" );
-            var_Create( p_demux, psz_name,
+            msg_Dbg( p_obj, "    button control" );
+            var_Create( p_obj, psz_name,
                         VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
             break;
         default:
-            msg_Dbg( p_demux, "    unknown control type (FIXME)" );
+            msg_Dbg( p_obj, "    unknown control type (FIXME)" );
             /* FIXME */
             break;
     }
@@ -2455,27 +2701,27 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
         case V4L2_CTRL_TYPE_MENU:
             {
                 struct v4l2_control control;
-                msg_Dbg( p_demux, "    default value: %d",
+                msg_Dbg( p_obj, "    default value: %d",
                          queryctrl.default_value );
                 memset( &control, 0, sizeof( control ) );
                 control.id = queryctrl.id;
                 if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
                 {
-                    msg_Dbg( p_demux, "    current value: %d", control.value );
+                    msg_Dbg( p_obj, "    current value: %d", control.value );
                 }
                 if( i_val == -1 )
                 {
                     i_val = control.value;
                     if( b_reset && queryctrl.default_value != control.value )
                     {
-                        msg_Dbg( p_demux, "    reset value to default" );
-                        Control( p_demux, i_fd, psz_name,
+                        msg_Dbg( p_obj, "    reset value to default" );
+                        Control( p_obj, i_fd, psz_name,
                                       queryctrl.id, queryctrl.default_value );
                     }
                 }
                 else
                 {
-                    Control( p_demux, i_fd, psz_name,
+                    Control( p_obj, i_fd, psz_name,
                                   queryctrl.id, i_val );
                 }
             }
@@ -2485,29 +2731,33 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
     }
 
     val.psz_string = (char *)queryctrl.name;
-    var_Change( p_demux, psz_name, VLC_VAR_SETTEXT, &val, NULL );
+    var_Change( p_obj, psz_name, VLC_VAR_SETTEXT, &val, NULL );
     val.i_int = queryctrl.id;
     val2.psz_string = (char *)psz_name;
-    var_Change( p_demux, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
+    var_Change( p_obj, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
 
-    switch( var_Type( p_demux, psz_name ) & VLC_VAR_TYPE )
+    switch( var_Type( p_obj, psz_name ) & VLC_VAR_TYPE )
     {
         case VLC_VAR_BOOL:
-            var_SetBool( p_demux, psz_name, i_val );
+            var_SetBool( p_obj, psz_name, i_val );
             break;
         case VLC_VAR_INTEGER:
-            var_SetInteger( p_demux, psz_name, i_val );
+            var_SetInteger( p_obj, psz_name, i_val );
             break;
         case VLC_VAR_VOID:
             break;
         default:
-            msg_Warn( p_demux, "FIXME: %s %s %d", __FILE__, __func__,
+            msg_Warn( p_obj, "FIXME: %s %s %d", __FILE__, __func__,
                       __LINE__ );
             break;
     }
 
-    var_AddCallback( p_demux, psz_name,
-                    ControlCallback, (void*)queryctrl.id );
+    if (b_demux)
+        var_AddCallback( p_obj, psz_name,
+                        DemuxControlCallback, (void*)queryctrl.id );
+    else
+        var_AddCallback( p_obj, psz_name,
+                        AccessControlCallback, (void*)queryctrl.id );
 
     free( psz_name );
 }
@@ -2516,7 +2766,7 @@ static void ControlListPrint( demux_t *p_demux, int i_fd,
  * List all user-class v4l2 controls, set them to the user specified
  * value and create the relevant variables to enable runtime changes
  *****************************************************************************/
-static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
+static int ControlList( vlc_object_t *p_obj, int i_fd, vlc_bool_t b_reset, vlc_bool_t b_demux )
 {
     struct v4l2_queryctrl queryctrl;
     int i_cid;
@@ -2526,19 +2776,22 @@ static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
     /* A list of available controls (aka the variable name) will be
      * stored as choices in the "controls" variable. We'll thus be able
      * to use those to create an appropriate interface */
-    var_Create( p_demux, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_obj, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
 
-    var_Create( p_demux, "controls-update", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_Create( p_obj, "controls-update", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
 
     /* Add a control to reset all controls to their default values */
     vlc_value_t val, val2;
-    var_Create( p_demux, "controls-reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_Create( p_obj, "controls-reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     val.psz_string = _( "Reset controls to default" );
-    var_Change( p_demux, "controls-reset", VLC_VAR_SETTEXT, &val, NULL );
+    var_Change( p_obj, "controls-reset", VLC_VAR_SETTEXT, &val, NULL );
     val.i_int = -1;
     val2.psz_string = (char *)"controls-reset";
-    var_Change( p_demux, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
-    var_AddCallback( p_demux, "controls-reset", ControlResetCallback, NULL );
+    var_Change( p_obj, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
+    if (b_demux)
+        var_AddCallback( p_obj, "controls-reset", DemuxControlResetCallback, NULL );
+    else
+        var_AddCallback( p_obj, "controls-reset", AccessControlResetCallback, NULL );
 
     /* List public controls */
     for( i_cid = V4L2_CID_BASE;
@@ -2550,9 +2803,9 @@ static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                 continue;
-            msg_Dbg( p_demux, "Available control: %s (%x)",
+            msg_Dbg( p_obj, "Available control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            ControlListPrint( p_demux, i_fd, queryctrl, b_reset );
+            ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
         }
     }
 
@@ -2566,9 +2819,9 @@ static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
         {
             if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                 continue;
-            msg_Dbg( p_demux, "Available private control: %s (%x)",
+            msg_Dbg( p_obj, "Available private control: %s (%x)",
                      queryctrl.name, queryctrl.id );
-            ControlListPrint( p_demux, i_fd, queryctrl, b_reset );
+            ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
         }
         else
             break;
@@ -2579,7 +2832,7 @@ static int ControlList( demux_t *p_demux, int i_fd, vlc_bool_t b_reset )
 /*****************************************************************************
  * Reset all user-class v4l2 controls to their default value
  *****************************************************************************/
-static int ControlReset( demux_t *p_demux, int i_fd )
+static int ControlReset( vlc_object_t *p_obj, int i_fd )
 {
     struct v4l2_queryctrl queryctrl;
     int i_cid;
@@ -2605,7 +2858,7 @@ static int ControlReset( demux_t *p_demux, int i_fd )
                 int i;
                 for( i = 0; controls[i].psz_name != NULL; i++ )
                     if( controls[i].i_cid == queryctrl.id ) break;
-                Control( p_demux, i_fd,
+                Control( p_obj, i_fd,
                          controls[i].psz_name ? controls[i].psz_name
                                               : (const char *)queryctrl.name,
                          queryctrl.id, queryctrl.default_value );
@@ -2629,7 +2882,7 @@ static int ControlReset( demux_t *p_demux, int i_fd )
             if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
              && queryctrl.default_value != control.value )
             {
-                Control( p_demux, i_fd, (const char *)queryctrl.name,
+                Control( p_obj, i_fd, (const char *)queryctrl.name,
                          queryctrl.id, queryctrl.default_value );
             }
         }
@@ -2642,7 +2895,7 @@ static int ControlReset( demux_t *p_demux, int i_fd )
 /*****************************************************************************
  * Issue user-class v4l2 controls
  *****************************************************************************/
-static int Control( demux_t *p_demux, int i_fd,
+static int Control( vlc_object_t *p_obj, int i_fd,
                     const char *psz_name, int i_cid, int i_value )
 {
     struct v4l2_queryctrl queryctrl;
@@ -2658,7 +2911,7 @@ static int Control( demux_t *p_demux, int i_fd,
     if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
         || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
     {
-        msg_Dbg( p_demux, "%s (%x) control is not supported.", psz_name,
+        msg_Dbg( p_obj, "%s (%x) control is not supported.", psz_name,
                  i_cid );
         return VLC_EGENERIC;
     }
@@ -2671,7 +2924,7 @@ static int Control( demux_t *p_demux, int i_fd,
         control.value = i_value;
         if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
         {
-            msg_Err( p_demux, "unable to set %s to %d (%m)", psz_name,
+            msg_Err( p_obj, "unable to set %s to %d (%m)", psz_name,
                      i_value );
             return VLC_EGENERIC;
         }
@@ -2679,18 +2932,18 @@ static int Control( demux_t *p_demux, int i_fd,
     if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
     {
         vlc_value_t val;
-        msg_Dbg( p_demux, "video %s: %d", psz_name, control.value );
-        switch( var_Type( p_demux, psz_name ) & VLC_VAR_TYPE )
+        msg_Dbg( p_obj, "video %s: %d", psz_name, control.value );
+        switch( var_Type( p_obj, psz_name ) & VLC_VAR_TYPE )
         {
             case VLC_VAR_BOOL:
                 val.b_bool = control.value;
-                var_Change( p_demux, psz_name, VLC_VAR_SETVALUE, &val, NULL );
-                var_SetVoid( p_demux, "controls-update" );
+                var_Change( p_obj, psz_name, VLC_VAR_SETVALUE, &val, NULL );
+                var_SetVoid( p_obj, "controls-update" );
                 break;
             case VLC_VAR_INTEGER:
                 val.i_int = control.value;
-                var_Change( p_demux, psz_name, VLC_VAR_SETVALUE, &val, NULL );
-                var_SetVoid( p_demux, "controls-update" );
+                var_Change( p_obj, psz_name, VLC_VAR_SETVALUE, &val, NULL );
+                var_SetVoid( p_obj, "controls-update" );
                 break;
         }
     }
@@ -2700,7 +2953,7 @@ static int Control( demux_t *p_demux, int i_fd,
 /*****************************************************************************
  * On the fly change settings callback
  *****************************************************************************/
-static int ControlCallback( vlc_object_t *p_this,
+static int DemuxControlCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data )
 {
@@ -2713,12 +2966,12 @@ static int ControlCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    Control( p_demux, i_fd, psz_var, i_cid, newval.i_int );
+    Control( p_this, i_fd, psz_var, i_cid, newval.i_int );
 
     return VLC_EGENERIC;
 }
 
-static int ControlResetCallback( vlc_object_t *p_this,
+static int DemuxControlResetCallback( vlc_object_t *p_this,
     const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
     void *p_data )
 {
@@ -2730,7 +2983,42 @@ static int ControlResetCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    ControlReset( p_demux, i_fd );
+    ControlReset( p_this, i_fd );
+
+    return VLC_EGENERIC;
+}
+
+static int AccessControlCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data )
+{
+    access_t *p_access = (access_t *)p_this;
+    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
+    int i_cid = (int)p_data;
+
+    int i_fd = p_sys->i_fd_video;
+
+    if( i_fd < 0 )
+        return VLC_EGENERIC;
+
+    Control( p_this, i_fd, psz_var, i_cid, newval.i_int );
+
+    return VLC_EGENERIC;
+}
+
+static int AccessControlResetCallback( vlc_object_t *p_this,
+    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
+    void *p_data )
+{
+    access_t *p_access = (access_t *)p_this;
+    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
+
+    int i_fd = p_sys->i_fd_video;
+
+    if( i_fd < 0 )
+        return VLC_EGENERIC;
+
+    ControlReset( p_this, i_fd );
 
     return VLC_EGENERIC;
 }
