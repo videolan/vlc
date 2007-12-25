@@ -46,7 +46,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
             p_item, NULL );
 
     libvlc_media_list_lock( p_mdis->p_mlist );
-    libvlc_media_list_add_media_descriptor( p_mdis->p_mlist, p_md, NULL );
+    _libvlc_media_list_add_media_descriptor( p_mdis->p_mlist, p_md, NULL );
     libvlc_media_list_unlock( p_mdis->p_mlist );
 }
 
@@ -68,7 +68,7 @@ static void services_discovery_item_removed( const vlc_event_t * p_event,
         p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i, NULL );
         if( p_md->p_input_item == p_item )
         {
-            libvlc_media_list_remove_index( p_mdis->p_mlist, i, NULL );
+            _libvlc_media_list_remove_index( p_mdis->p_mlist, i, NULL );
             break;
         }
     }
@@ -128,6 +128,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 
     p_mdis->p_libvlc_instance = p_inst;
     p_mdis->p_mlist = libvlc_media_list_new( p_inst, NULL );
+    p_mdis->p_mlist->b_read_only = VLC_TRUE;
     p_mdis->running = VLC_FALSE;
 
     p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis,
