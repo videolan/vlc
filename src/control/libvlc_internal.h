@@ -209,6 +209,7 @@ struct libvlc_media_discoverer_t
     libvlc_instance_t *      p_libvlc_instance;
     services_discovery_t *   p_sd;
     libvlc_media_list_t *    p_mlist;
+    vlc_bool_t               running;
 };
 
 /*

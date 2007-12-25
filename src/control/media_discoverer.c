@@ -84,6 +84,7 @@ static void services_discovery_started( const vlc_event_t * p_event,
 {
     libvlc_media_discoverer_t * p_mdis = user_data;
     libvlc_event_t event;
+    p_mdis->running = VLC_TRUE;
     event.type = libvlc_MediaDiscovererStarted;
     libvlc_event_send( p_mdis->p_event_manager, &event );
 }
@@ -97,6 +98,7 @@ static void services_discovery_ended( const vlc_event_t * p_event,
 {
     libvlc_media_discoverer_t * p_mdis = user_data;
     libvlc_event_t event;
+    p_mdis->running = VLC_FALSE;
     event.type = libvlc_MediaDiscovererEnded;
     libvlc_event_send( p_mdis->p_event_manager, &event );
 }
@@ -126,6 +128,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 
     p_mdis->p_libvlc_instance = p_inst;
     p_mdis->p_mlist = libvlc_media_list_new( p_inst, NULL );
+    p_mdis->running = VLC_FALSE;
 
     p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis,
             p_inst, NULL );
@@ -205,5 +208,15 @@ libvlc_event_manager_t *
 libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis )
 {
     return p_mdis->p_event_manager;
+}
+
+
+/**************************************************************************
+ * running (Public)
+ **************************************************************************/
+int
+libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis )
+{
+    return p_mdis->running;
 }
 

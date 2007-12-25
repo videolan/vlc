@@ -1051,6 +1051,9 @@ VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_
 VLC_PUBLIC_API libvlc_event_manager_t *
         libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
 
+VLC_PUBLIC_API int
+        libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
+
 /**@} */
 
 /*****************************************************************************
