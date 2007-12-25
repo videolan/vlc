@@ -26,11 +26,40 @@
 #import "VLCMediaDiscoverer.h"
 #import "VLCLibrary.h"
 #import "VLCLibVLCBridging.h"
+#import "VLCEventManager.h"
 
 #include <vlc/libvlc.h>
 
 static NSArray * availableMediaDiscoverer = nil;
 
+@interface VLCMediaDiscoverer (Private)
+- (void)mediaDiscovererStarted;
+- (void)mediaDiscovererEnded;
+@end
+
+/* libvlc event callback */
+static void HandleMediaDiscovererStarted(const libvlc_event_t *event, void *user_data)
+{
+    NSLog(@"oopps");
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    id self = user_data;
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
+                                                 withMethod:@selector(mediaDiscovererStarted) 
+                                       withArgumentAsObject:nil];
+    [pool release];
+}
+
+static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * user_data)
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    id self = user_data;
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
+                                                 withMethod:@selector(mediaDiscovererEnded) 
+                                       withArgumentAsObject:nil];
+    [pool release];
+}
+
+ 
 @implementation VLCMediaDiscoverer
 + (NSArray *)availableMediaDiscoverer
 {
@@ -55,9 +84,31 @@ static NSArray * availableMediaDiscoverer = nil;
         mdis = libvlc_media_discoverer_new_from_name( [VLCLibrary sharedInstance],
                                                       [aServiceName UTF8String],
                                                       &ex );
+        libvlc_event_manager_t * p_em = libvlc_media_discoverer_event_manager(mdis);
+        libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, NULL);
+        libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, NULL);
+        running = libvlc_media_discoverer_is_running(mdis);
+
         quit_on_exception( &ex );       
     }
     return self;
+}
+
+- (void)release
+{
+    @synchronized(self)
+    {
+        if([self retainCount] <= 1)
+        {
+            /* We must make sure we won't receive new event after an upcoming dealloc
+             * We also may receive a -retain in some event callback that may occcur
+             * Before libvlc_event_detach. So this can't happen in dealloc */
+            libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(mdis, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, NULL);
+        }
+        [super release];
+    }
 }
 
 - (void)dealloc
@@ -104,5 +155,26 @@ static NSArray * availableMediaDiscoverer = nil;
         localizedName = [aString retain];
     }
     return localizedName;
+}
+
+- (BOOL)isRunning
+{
+    return running;
+}
+@end
+
+@implementation VLCMediaDiscoverer (Private)
+- (void)mediaDiscovererStarted
+{
+    [self willChangeValueForKey:@"running"];
+    running = YES;
+    NSLog(@"mediaDiscovererStarted %@", [self localizedName]);
+    [self didChangeValueForKey:@"running"];
+}
+- (void)mediaDiscovererEnded
+{
+    [self willChangeValueForKey:@"running"];
+    running = NO;
+    [self didChangeValueForKey:@"running"];
 }
 @end

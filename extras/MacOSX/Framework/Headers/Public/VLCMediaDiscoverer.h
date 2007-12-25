@@ -32,6 +32,7 @@
     NSString *localizedName;
     VLCMediaList * discoveredMedia;
     void * mdis;
+    BOOL running;
 }
 + (NSArray *)availableMediaDiscoverer;
 
@@ -40,4 +41,6 @@
 - (VLCMediaList *)discoveredMedia;
 
 - (NSString *)localizedName;
+
+- (BOOL)isRunning;
 @end
