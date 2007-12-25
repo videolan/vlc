@@ -63,7 +63,7 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer_with_range( FILTER_PREFIX "angle", 0, 0, 359, NULL,
+    add_integer_with_range( FILTER_PREFIX "angle", 30, 0, 359, NULL,
         ANGLE_TEXT, ANGLE_LONGTEXT, VLC_FALSE );
 
     add_shortcut( "rotate" );
@@ -99,6 +99,27 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
+    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2')
+
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','2')
+      )
+    {
+        /* We only want planar YUV 4:2:0 or 4:2:2 */
+        msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                 (char*)&(p_filter->fmt_in.video.i_chroma) );
+        return VLC_EGENERIC;
+    }
+
+    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+    {
+        msg_Err( p_filter, "Input and output chromas don't match" );
+        return VLC_EGENERIC;
+    }
+
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
@@ -113,9 +134,11 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->i_angle = var_CreateGetIntegerCommand( p_filter,
                                                   FILTER_PREFIX "angle" ) * 10;
-    var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "deciangle" );
+    var_Create( p_filter, FILTER_PREFIX "deciangle",
+                VLC_VAR_INTEGER|VLC_VAR_ISCOMMAND );
     var_AddCallback( p_filter, FILTER_PREFIX "angle", RotateCallback, p_sys );
-    var_AddCallback( p_filter, FILTER_PREFIX "deciangle", PreciseRotateCallback, p_sys );
+    var_AddCallback( p_filter, FILTER_PREFIX "deciangle",
+                     PreciseRotateCallback, p_sys );
 
     cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
 
@@ -162,6 +185,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_pitch         = p_pic->p[i_plane].i_pitch;
         const int i_hidden_pitch  = i_pitch - i_visible_pitch;
 
+        const int i_aspect = ( i_visible_lines * p_pic->p[Y_PLANE].i_visible_pitch ) / ( p_pic->p[Y_PLANE].i_visible_lines * i_visible_pitch );
+        /* = 2 for U and V planes in YUV 4:2:2, = 1 otherwise */
+
         const int i_line_center = i_visible_lines>>1;
         const int i_col_center  = i_visible_pitch>>1;
 
@@ -172,11 +198,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         const uint8_t black_pixel = ( i_plane == Y_PLANE ) ? 0x00 : 0x80;
 
-        const int i_line_next =  i_cos-i_sin*i_visible_pitch;
-        const int i_col_next  = -i_sin-i_cos*i_visible_pitch;
-        int i_line_orig0 = - i_cos * i_line_center
-                           - i_sin * i_col_center + (1<<11);
-        int i_col_orig0 =    i_sin * i_line_center
+        const int i_line_next =  i_cos / i_aspect -i_sin*i_visible_pitch;
+        const int i_col_next  = -i_sin / i_aspect -i_cos*i_visible_pitch;
+        int i_line_orig0 = ( - i_cos * i_line_center / i_aspect
+                             - i_sin * i_col_center + (1<<11) );
+        int i_col_orig0 =    i_sin * i_line_center / i_aspect
                            - i_cos * i_col_center + (1<<11);
         for( ; p_outendline < p_outend;
              p_out += i_hidden_pitch, p_outendline += i_pitch,
@@ -185,7 +211,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             for( ; p_out < p_outendline;
                  p_out++, i_line_orig0 += i_sin, i_col_orig0 += i_cos )
             {
-                const int i_line_orig = (i_line_orig0>>12) + i_line_center;
+                const int i_line_orig = (i_line_orig0>>12)*i_aspect + i_line_center;
                 const int i_col_orig  = (i_col_orig0>>12)  + i_col_center;
                 const uint8_t* p_orig_offset = p_in + i_line_orig * i_pitch
                                                 + i_col_orig;
@@ -211,17 +237,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
                         if(  ( i_col_orig < i_visible_pitch - 1)
                              && ( i_line_orig >= 0 ) )
-                            i_colpix=*p_orig_offset;
+                            i_colpix = *p_orig_offset;
 
                         p_orig_offset+=i_pitch;
                         if( ( i_line_orig < i_visible_lines - 1)
                             && ( i_col_orig  < i_visible_pitch - 1) )
-                            i_nexpix=*p_orig_offset;
+                            i_nexpix = *p_orig_offset;
 
                         p_orig_offset--;
                         if(  ( i_line_orig < i_visible_lines - 1)
                              && ( i_col_orig >= 0 ) )
-                            i_linpix=*p_orig_offset;
+                            i_linpix = *p_orig_offset;
 
                         unsigned int temp = 0;
                         temp+= i_curpix *
@@ -264,32 +290,24 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 }
 
 /*****************************************************************************
- *
+ * Angle modification callbacks.
  *****************************************************************************/
 static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
-
-    if( !strcmp( psz_var, "rotate-angle" ) )
-    {
-        p_sys->i_angle = newval.i_int*10;
-
-        cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
-    }
+    p_sys->i_angle = newval.i_int*10;
+    cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
     return VLC_SUCCESS;
 }
+
 static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
-
-    if( !strcmp( psz_var, "rotate-deciangle" ) )
-    {
-        p_sys->i_angle = newval.i_int;
-        cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
-    }
+    p_sys->i_angle = newval.i_int;
+    cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
     return VLC_SUCCESS;
 }

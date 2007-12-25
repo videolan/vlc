@@ -184,6 +184,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_converted = image_Convert( p_filter->p_sys->p_image, p_pic,
                                  &(p_pic->format), &fmt_out );
 
+    if( p_converted )
+    {
 #define copyimage( plane, b ) \
     for( y=0; y<p_converted->p[plane].i_visible_lines; y++) { \
     for( x=0; x<p_converted->p[plane].i_visible_pitch; x++) { \
@@ -204,6 +206,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 #undef copyimage
 
     p_converted->pf_release( p_converted );
+    }
+    else
+    {
+        msg_Err( p_filter, "Image scaling failed miserably." );
+    }
 
     p_filter->p_sys->x += p_filter->p_sys->xinc;
     p_filter->p_sys->y += p_filter->p_sys->yinc;

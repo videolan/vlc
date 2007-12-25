@@ -94,7 +94,13 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
 
     /* XXX: we might need to add/remove some FOURCCs ... */
-    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0') )
+    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2')
+
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','2') )
     {
         msg_Err( p_filter, "Unsupported input chroma (%4s)",
                  (char*)&(p_filter->fmt_in.video.i_chroma) );

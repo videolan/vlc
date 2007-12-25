@@ -123,6 +123,27 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','0')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2')
+
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','2')
+      )
+    {
+        /* We only want planar YUV 4:2:0 or 4:2:2 */
+        msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                 (char*)&(p_filter->fmt_in.video.i_chroma) );
+        return VLC_EGENERIC;
+    }
+
+    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+    {
+        msg_Err( p_filter, "Input and output chromas don't match" );
+        return VLC_EGENERIC;
+    }
+
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
     {
@@ -286,7 +307,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_pitch = p_pic->p[i_plane].i_pitch;
 
         int i_line, i_col;
-        const int factor = i_plane ? 1 : 0;
+        const int x_factor = p_pic->p[Y_PLANE].i_visible_pitch/i_visible_pitch-1;
+        const int y_factor = p_pic->p[Y_PLANE].i_visible_lines/i_visible_lines-1;
 
         for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {
@@ -299,16 +321,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 #endif
                 int x;
                 const int c = i_line*i_pitch+i_col;
-                for( x = __MAX( -i_dim, -i_col*(factor+1) );
-                     x <= __MIN( i_dim, (i_visible_pitch - i_col)*(factor+1) + 1 );
+                for( x = __MAX( -i_dim, -i_col*(x_factor+1) );
+                     x <= __MIN( i_dim, (i_visible_pitch - i_col)*(x_factor+1) + 1 );
                      x++ )
                 {
 #ifdef DONT_USE_FLOATS
                     value += pi_distribution[x+i_dim]
-                           * p_in[c+(x>>factor)];
+                           * p_in[c+(x>>x_factor)];
 #else
                     value += pf_distribution[x+i_dim]
-                           * (float)p_in[c+(x>>factor)];
+                           * (float)p_in[c+(x>>x_factor)];
 #endif
                 }
 #ifdef DONT_USE_FLOATS
@@ -329,22 +351,22 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 #endif
                 int y;
                 const int c = i_line*i_pitch+i_col;
-                for( y = __MAX( -i_dim, (-i_line)*(factor+1) );
-                     y <= __MIN( i_dim, (i_visible_lines - i_line)*(factor+1) - 1 );
+                for( y = __MAX( -i_dim, (-i_line)*(y_factor+1) );
+                     y <= __MIN( i_dim, (i_visible_lines - i_line)*(y_factor+1) - 1 );
                      y++ )
                 {
 #ifdef DONT_USE_FLOATS
                     value += pi_distribution[y+i_dim]
-                           * pi_buffer[c+(y>>factor)*i_pitch];
+                           * pi_buffer[c+(y>>y_factor)*i_pitch];
 #else
                     value += pf_distribution[y+i_dim]
-                           * pf_buffer[c+(y>>factor)*i_pitch];
+                           * pf_buffer[c+(y>>y_factor)*i_pitch];
 #endif
                 }
 #ifdef DONT_USE_FLOATS
-                p_out[c] = (uint8_t)(value/pi_scale[(i_line<<factor)*(i_pitch<<factor)+(i_col<<factor)]);
+                p_out[c] = (uint8_t)(value/pi_scale[(i_line<<y_factor)*(i_pitch<<x_factor)+(i_col<<x_factor)]);
 #else
-                p_out[c] = (uint8_t)(value*pf_scale[(i_line<<factor)*(i_pitch<<factor)+(i_col<<factor)]);
+                p_out[c] = (uint8_t)(value*pf_scale[(i_line<<y_factor)*(i_pitch<<x_factor)+(i_col<<x_factor)]);
 #endif
             }
         }
