@@ -37,7 +37,7 @@ if test "${ACTION}" = "build"; then
             lib_dest="${2}/`basename ${1}`"
         fi
         
-        if test -e ${1} && ! test -e ${lib_dest}; then
+        if test -e ${1} && ((! test -e ${lib_dest}) || test ${1} -nt ${lib_dest} ); then
             mkdir -p ${2}
             
             # Lets copy the library from the source folder to our new destination folder
