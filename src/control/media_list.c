@@ -124,6 +124,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
 
     /* Code for that one should be handled in flat_media_list.c */
     p_mlist->p_flat_mlist = NULL;
+    p_mlist->b_read_only = VLC_FALSE;
 
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
             libvlc_MediaListItemAdded, p_e );
@@ -323,6 +324,22 @@ void libvlc_media_list_insert_media_descriptor(
                                    int index,
                                    libvlc_exception_t * p_e )
 {
+    if( p_mlist->b_read_only )
+    {
+        /* We are read only from user side */
+        libvlc_exception_raise( p_e, "Trying to write into a read-only media list." );
+        return;
+    }
+    _libvlc_media_list_insert_media_descriptor( p_mlist, p_md, index, p_e );
+}
+
+/* LibVLC internal version */
+void _libvlc_media_list_insert_media_descriptor(
+                                   libvlc_media_list_t * p_mlist,
+                                   libvlc_media_descriptor_t * p_md,
+                                   int index,
+                                   libvlc_exception_t * p_e )
+{
     (void)p_e;
     libvlc_media_descriptor_retain( p_md );
 
@@ -337,6 +354,20 @@ void libvlc_media_list_insert_media_descriptor(
  * Lock should be hold when entering.
  **************************************************************************/
 void libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
+                                     int index,
+                                     libvlc_exception_t * p_e )
+{
+    if( p_mlist->b_read_only )
+    {
+        /* We are read only from user side */
+        libvlc_exception_raise( p_e, "Trying to write into a read-only media list." );
+        return;
+    }
+    _libvlc_media_list_remove_index( p_mlist, index, p_e );
+}
+
+/* LibVLC internal version */
+void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
                                      int index,
                                      libvlc_exception_t * p_e )
 {
@@ -389,6 +420,16 @@ int libvlc_media_list_index_of_item( libvlc_media_list_t * p_mlist,
 }
 
 /**************************************************************************
+ *       libvlc_media_list_is_readonly (Public)
+ *
+ * This indicates if this media list is read-only from a user point of view
+ **************************************************************************/
+vlc_bool_t libvlc_media_list_is_readonly( libvlc_media_list_t * p_mlist )
+{
+    return p_mlist->b_read_only;
+}
+
+/**************************************************************************
  *       libvlc_media_list_lock (Public)
  *
  * The lock must be held in access operations. It is never used in the
@@ -409,7 +450,6 @@ void libvlc_media_list_unlock( libvlc_media_list_t * p_mlist )
 {
     vlc_mutex_unlock( &p_mlist->object_lock );
 }
-
 
 
 /**************************************************************************

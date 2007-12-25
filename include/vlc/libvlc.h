@@ -546,6 +546,10 @@ VLC_PUBLIC_API int
                                      libvlc_media_descriptor_t *,
                                      libvlc_exception_t * );
 
+/* This indicates if this media list is read-only from a user point of view */
+VLC_PUBLIC_API vlc_bool_t
+    libvlc_media_list_is_readonly( libvlc_media_list_t * p_mlist );
+
 VLC_PUBLIC_API void
     libvlc_media_list_lock( libvlc_media_list_t * );
 VLC_PUBLIC_API void

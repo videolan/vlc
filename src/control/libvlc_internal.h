@@ -114,6 +114,10 @@ struct libvlc_media_list_t
     /* Other way to see that media list */
     /* Used in flat_media_list.c */
     libvlc_media_list_t *       p_flat_mlist;
+
+    /* This indicates if this media list is read-only
+     * from a user point of view */
+    vlc_bool_t                  b_read_only;
 };
 
 typedef void (*libvlc_media_list_view_release_func_t)( libvlc_media_list_view_t * p_mlv ) ;
@@ -296,6 +300,18 @@ VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
 
 VLC_EXPORT (void, libvlc_media_descriptor_set_state,
                         ( libvlc_media_descriptor_t *, libvlc_state_t, libvlc_exception_t * ) );
+
+/* Media List */
+VLC_EXPORT ( void, _libvlc_media_list_insert_media_descriptor,
+                        ( libvlc_media_list_t * p_mlist,
+                          libvlc_media_descriptor_t * p_md,
+                          int index,
+                          libvlc_exception_t * p_e ) );
+
+VLC_EXPORT ( void, _libvlc_media_list_remove_index,
+                        ( libvlc_media_list_t * p_mlist,
+                          int index,
+                          libvlc_exception_t * p_e ) );
 
 /* Media List View */
 VLC_EXPORT ( libvlc_media_list_view_t *, libvlc_media_list_view_new,
