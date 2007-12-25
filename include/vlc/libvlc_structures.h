@@ -321,6 +321,9 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaListPlayerNextItemSet,
     libvlc_MediaListPlayerStopped,
 
+    libvlc_MediaDiscovererStarted,
+    libvlc_MediaDiscovererEnded
+
 } libvlc_event_type_t;
 
 /**
@@ -411,6 +414,16 @@ typedef struct libvlc_event_t
             libvlc_media_descriptor_t * item;
             int index;
         } media_list_view_will_delete_item;
+        /* media list view */
+        struct
+        {
+            void * unused;
+        } media_media_discoverer_started;
+        struct
+        {
+            void * unused;
+        } media_media_discoverer_ended;
+
     } u;
 } libvlc_event_t;
 

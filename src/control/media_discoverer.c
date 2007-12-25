@@ -29,7 +29,7 @@
 /*
  * Private functions
  */
- 
+
 /**************************************************************************
  *       services_discovery_item_added (Private) (VLC event callback)
  **************************************************************************/
@@ -57,7 +57,48 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
 static void services_discovery_item_removed( const vlc_event_t * p_event,
                                              void * user_data )
 {
-    /* Not handled */
+    input_item_t * p_item = p_event->u.services_discovery_item_added.p_new_item;
+    libvlc_media_descriptor_t * p_md;
+    libvlc_media_discoverer_t * p_mdis = user_data;
+
+    int i, count = libvlc_media_list_count( p_mdis->p_mlist, NULL );
+    libvlc_media_list_lock( p_mdis->p_mlist );
+    for( i = 0; i < count; i++ )
+    {
+        p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i, NULL );
+        if( p_md->p_input_item == p_item )
+        {
+            libvlc_media_list_remove_index( p_mdis->p_mlist, i, NULL );
+            break;
+        }
+    }
+    libvlc_media_list_unlock( p_mdis->p_mlist );
+}
+
+/**************************************************************************
+ *       services_discovery_started (Private) (VLC event callback)
+ **************************************************************************/
+
+static void services_discovery_started( const vlc_event_t * p_event,
+                                        void * user_data )
+{
+    libvlc_media_discoverer_t * p_mdis = user_data;
+    libvlc_event_t event;
+    event.type = libvlc_MediaDiscovererStarted;
+    libvlc_event_send( p_mdis->p_event_manager, &event );
+}
+
+/**************************************************************************
+ *       services_discovery_ended (Private) (VLC event callback)
+ **************************************************************************/
+
+static void services_discovery_ended( const vlc_event_t * p_event,
+                                      void * user_data )
+{
+    libvlc_media_discoverer_t * p_mdis = user_data;
+    libvlc_event_t event;
+    event.type = libvlc_MediaDiscovererEnded;
+    libvlc_event_send( p_mdis->p_event_manager, &event );
 }
 
 /*
@@ -85,6 +126,15 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 
     p_mdis->p_libvlc_instance = p_inst;
     p_mdis->p_mlist = libvlc_media_list_new( p_inst, NULL );
+
+    p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis,
+            p_inst, NULL );
+
+    libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
+            libvlc_MediaDiscovererStarted, NULL );
+    libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
+            libvlc_MediaDiscovererEnded, NULL );
+
     p_mdis->p_sd = services_discovery_Create( (vlc_object_t*)p_inst->p_libvlc_int, psz_name );
 
     if( !p_mdis->p_sd )
@@ -101,6 +151,14 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
     vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
                       vlc_ServicesDiscoveryItemRemoved,
                       services_discovery_item_removed,
+                      p_mdis );
+    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
+                      vlc_ServicesDiscoveryStarted,
+                      services_discovery_started,
+                      p_mdis );
+    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
+                      vlc_ServicesDiscoveryEnded,
+                      services_discovery_ended,
                       p_mdis );
  
     services_discovery_Start( p_mdis->p_sd );
