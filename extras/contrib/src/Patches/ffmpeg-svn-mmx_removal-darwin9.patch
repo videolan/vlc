@@ -1,0 +1,135 @@
+Index: libswscale/yuv2rgb.c
+===================================================================
+--- libswscale/yuv2rgb.c	(revision 25527)
++++ libswscale/yuv2rgb.c	(working copy)
+@@ -156,6 +156,7 @@
+ };
+ #endif
+ 
++#if 0
+ #ifdef HAVE_MMX
+ 
+ /* hope these constant values are cache line aligned */
+@@ -201,6 +202,7 @@
+ #include "yuv2rgb_template.c"
+ 
+ #endif /* defined(ARCH_X86) */
++#endif
+ 
+ const int32_t Inverse_Table_6_9[8][4] = {
+     {117504, 138453, 13954, 34903}, /* no sequence_display_extension */
+Index: libswscale/swscale.c
+===================================================================
+--- libswscale/swscale.c	(revision 25527)
++++ libswscale/swscale.c	(working copy)
+@@ -875,9 +875,7 @@
+ 
+ //Note: we have C, X86, MMX, MMX2, 3DNOW version therse no 3DNOW+MMX2 one
+ //Plain C versions
+-#if !defined (HAVE_MMX) || defined (RUNTIME_CPUDETECT) || !defined(CONFIG_GPL)
+ #define COMPILE_C
+-#endif
+ 
+ #ifdef ARCH_POWERPC
+ #if (defined (HAVE_ALTIVEC) || defined (RUNTIME_CPUDETECT)) && defined (CONFIG_GPL)
+@@ -885,6 +883,7 @@
+ #endif //HAVE_ALTIVEC
+ #endif //ARCH_POWERPC
+ 
++#if 0
+ #if defined(ARCH_X86)
+ 
+ #if ((defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)) && defined (CONFIG_GPL)
+@@ -899,6 +898,7 @@
+ #define COMPILE_3DNOW
+ #endif
+ #endif //ARCH_X86 || ARCH_X86_64
++#endif
+ 
+ #undef HAVE_MMX
+ #undef HAVE_MMX2
+@@ -1544,13 +1544,6 @@
+ #if defined(RUNTIME_CPUDETECT) && defined (CONFIG_GPL)
+ #if defined(ARCH_X86)
+     // ordered per speed fasterst first
+-    if (flags & SWS_CPU_CAPS_MMX2)
+-        return swScale_MMX2;
+-    else if (flags & SWS_CPU_CAPS_3DNOW)
+-        return swScale_3DNow;
+-    else if (flags & SWS_CPU_CAPS_MMX)
+-        return swScale_MMX;
+-    else
+         return swScale_C;
+ 
+ #else
+Index: libswscale/rgb2rgb.c
+===================================================================
+--- libswscale/rgb2rgb.c	(revision 25527)
++++ libswscale/rgb2rgb.c	(working copy)
+@@ -171,6 +171,7 @@
+ #define RENAME(a) a ## _C
+ #include "rgb2rgb_template.c"
+ 
++#if 0
+ #if defined(ARCH_X86) && defined(CONFIG_GPL)
+ 
+ //MMX versions
+@@ -201,6 +202,7 @@
+ #include "rgb2rgb_template.c"
+ 
+ #endif //ARCH_X86 || ARCH_X86_64
++#endif
+ 
+ /*
+  rgb15->rgb16 Original by Strepto/Astral
+Index: libpostproc/postprocess.c
+===================================================================
+--- libpostproc/postprocess.c	(revision 11315)
++++ libpostproc/postprocess.c	(working copy)
+@@ -566,10 +566,6 @@
+ 
+ //Note: we have C, MMX, MMX2, 3DNOW version there is no 3DNOW+MMX2 one
+ //Plain C versions
+-#if !defined (HAVE_MMX) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_C
+-#endif
+-
+ #ifdef ARCH_POWERPC
+ #ifdef HAVE_ALTIVEC
+ #define COMPILE_ALTIVEC
+@@ -578,17 +574,8 @@
+ 
+ #if defined(ARCH_X86)
+ 
+-#if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_MMX
+-#endif
++#define COMPILE_C
+ 
+-#if defined (HAVE_MMX2) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_MMX2
+-#endif
+-
+-#if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_3DNOW
+-#endif
+ #endif /* defined(ARCH_X86) */
+ 
+ #undef HAVE_MMX
+@@ -658,15 +645,7 @@
+         // someone might exchange the CPU whithout restarting MPlayer ;)
+ #ifdef RUNTIME_CPUDETECT
+ #if defined(ARCH_X86)
+-        // ordered per speed fasterst first
+-        if(c->cpuCaps & PP_CPU_CAPS_MMX2)
+-                postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+-        else if(c->cpuCaps & PP_CPU_CAPS_3DNOW)
+-                postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+-        else if(c->cpuCaps & PP_CPU_CAPS_MMX)
+-                postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+-        else
+-                postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
++        postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+ #else
+ #ifdef ARCH_POWERPC
+ #ifdef HAVE_ALTIVEC

@@ -147,6 +147,10 @@ ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack --cpu=pentium-m
 endif
 
+ifdef HAVE_DARWIN_9
+FFMPEGCONF += --disable-mmx
+endif
+
 ifdef HAVE_DARWIN_OS
 X264CONF += --enable-pic
 ifdef HAVE_DARWIN_OS_ON_INTEL
@@ -1067,6 +1071,11 @@ ifdef HAVE_BEOS
 endif
 ifdef HAVE_DARWIN_OS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
+endif
+ifdef HAVE_DARWIN_9
+ifdef HAVE_DARWIN_OS_ON_INTEL
+	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
+endif
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
