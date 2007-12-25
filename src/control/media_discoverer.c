@@ -215,7 +215,7 @@ libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis )
 /**************************************************************************
  * running (Public)
  **************************************************************************/
-int
+vlc_bool_t
 libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis )
 {
     return p_mdis->running;

@@ -719,7 +719,7 @@ VLC_PUBLIC_API void
     libvlc_media_list_player_pause( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
 
-VLC_PUBLIC_API int
+VLC_PUBLIC_API vlc_bool_t
     libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
                                          libvlc_exception_t * p_e );
 
@@ -1055,7 +1055,7 @@ VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_
 VLC_PUBLIC_API libvlc_event_manager_t *
         libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
 
-VLC_PUBLIC_API int
+VLC_PUBLIC_API vlc_bool_t
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
 
 /**@} */

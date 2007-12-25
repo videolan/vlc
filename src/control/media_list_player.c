@@ -338,8 +338,9 @@ void libvlc_media_list_player_pause( libvlc_media_list_player_t * p_mlp,
 /**************************************************************************
  *        is_playing (Public)
  **************************************************************************/
-int libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
-                                         libvlc_exception_t * p_e )
+vlc_bool_t
+libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
+                                     libvlc_exception_t * p_e )
 {
     libvlc_state_t state = libvlc_media_instance_get_state( p_mlp->p_mi, p_e );
     return (state == libvlc_Opening) || (state == libvlc_Buffering) ||
