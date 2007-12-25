@@ -203,6 +203,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_seekable = VLC_FALSE;
 
 # ifdef HAVE_MMAP
+# ifndef __APPLE__
     p_sys->pagemask = sysconf (_SC_PAGE_SIZE) - 1;
 
     /* Autodetect mmap() support */
@@ -222,6 +223,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
         msg_Dbg (p_this, "mmap disabled (non regular file)");
+# endif
 # endif
 #else
     p_sys->b_seekable = !b_stdin;
