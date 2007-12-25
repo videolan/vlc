@@ -618,6 +618,10 @@ VLC_PUBLIC_API void
                                       libvlc_media_descriptor_t * p_md,
                                       libvlc_exception_t * p_e );
 
+VLC_PUBLIC_API libvlc_media_list_t *
+    libvlc_media_list_view_parent_media_list(  libvlc_media_list_view_t * p_mlv,
+                                               libvlc_exception_t * p_e );
+
 /** @} */
 
 /*****************************************************************************
