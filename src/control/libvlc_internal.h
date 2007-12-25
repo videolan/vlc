@@ -302,6 +302,11 @@ VLC_EXPORT (void, libvlc_media_descriptor_set_state,
                         ( libvlc_media_descriptor_t *, libvlc_state_t, libvlc_exception_t * ) );
 
 /* Media List */
+VLC_EXPORT ( void, _libvlc_media_list_add_media_descriptor,
+                        ( libvlc_media_list_t * p_mlist,
+                          libvlc_media_descriptor_t * p_md,
+                          libvlc_exception_t * p_e ) );
+
 VLC_EXPORT ( void, _libvlc_media_list_insert_media_descriptor,
                         ( libvlc_media_list_t * p_mlist,
                           libvlc_media_descriptor_t * p_md,

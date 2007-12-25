@@ -305,6 +305,22 @@ void libvlc_media_list_add_media_descriptor(
                                    libvlc_media_descriptor_t * p_md,
                                    libvlc_exception_t * p_e )
 {
+    if( p_mlist->b_read_only )
+    {
+        /* We are read only from user side */
+        libvlc_exception_raise( p_e, "Trying to write into a read-only media list." );
+        return;
+    }
+
+    _libvlc_media_list_add_media_descriptor( p_mlist, p_md, p_e );
+}
+
+/* LibVLC internal version */
+void _libvlc_media_list_add_media_descriptor(
+                                   libvlc_media_list_t * p_mlist,
+                                   libvlc_media_descriptor_t * p_md,
+                                   libvlc_exception_t * p_e )
+{
     (void)p_e;
     libvlc_media_descriptor_retain( p_md );
 
