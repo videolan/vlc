@@ -62,6 +62,10 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
             vlc_ServicesDiscoveryItemAdded );
     vlc_event_manager_register_event_type( &p_sd->event_manager,
             vlc_ServicesDiscoveryItemRemoved );
+    vlc_event_manager_register_event_type( &p_sd->event_manager,
+            vlc_ServicesDiscoveryStarted );
+    vlc_event_manager_register_event_type( &p_sd->event_manager,
+            vlc_ServicesDiscoveryEnded );
 
     p_sd->p_module = module_Need( p_sd, "services_discovery", psz_module_name, VLC_TRUE );
 
@@ -180,7 +184,15 @@ services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_it
  ***********************************************************************/
 static void RunSD( services_discovery_t *p_sd )
 {
+    vlc_event_t event;
+
+    event.type = vlc_ServicesDiscoveryStarted;
+    vlc_event_send( &p_sd->event_manager, &event );
+
     p_sd->pf_run( p_sd );
+
+    event.type = vlc_ServicesDiscoveryEnded;
+    vlc_event_send( &p_sd->event_manager, &event );
     return;
 }
 
