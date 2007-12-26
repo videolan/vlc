@@ -258,18 +258,10 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     p_input->i_duration = i_duration;
     p_input->ppsz_options = NULL;
+    p_input->i_options = 0;
 
-    for( p_input->i_options = 0; p_input->i_options < i_options;
-         p_input->i_options++ )
-    {
-        if( !p_input->i_options )
-        {
-            p_input->ppsz_options = malloc( i_options * sizeof(char *) );
-            if( !p_input->ppsz_options ) break;
-        }
-        p_input->ppsz_options[p_input->i_options] =
-                    strdup( ppsz_options[p_input->i_options] );
-    }
+    for( int i = 0; i < i_options; i++ )
+        input_ItemAddOption( p_input, ppsz_options[i] );
     return p_input;
 }
 
