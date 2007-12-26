@@ -40,7 +40,6 @@ static NSArray * availableMediaDiscoverer = nil;
 /* libvlc event callback */
 static void HandleMediaDiscovererStarted(const libvlc_event_t *event, void *user_data)
 {
-    NSLog(@"oopps");
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
@@ -168,7 +167,6 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
 {
     [self willChangeValueForKey:@"running"];
     running = YES;
-    NSLog(@"mediaDiscovererStarted %@", [self localizedName]);
     [self didChangeValueForKey:@"running"];
 }
 - (void)mediaDiscovererEnded
