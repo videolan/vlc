@@ -152,14 +152,17 @@
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     BOOL blackout_other_displays = var_GetBool( p_vout, "macosx-black" );
 
-    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )];
-
-    vlc_object_release( p_vout );
+    screen = [[NSScreen screens] objectAtIndex: var_GetInteger( p_vout, "video-device" )];
  
     [self lockFullscreenAnimation];
 
     if (!screen)
+    {
+        msg_Dbg( p_vout, "chosen screen isn't present, using current screen for fullscreen mode" );
         screen = [self screen];
+    }
+    
+    vlc_object_release( p_vout );
 
     screen_rect = [screen frame];
 
