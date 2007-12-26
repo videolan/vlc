@@ -71,3 +71,14 @@ SOURCES_grey_yuv = \
 	grey_yuv.c \
 	$(NULL)
 
+SOURCES_yuy2_i422 = \
+	yuy2_i422.c \
+	$(NULL)
+
+SOURCES_yuy2_i420 = \
+	yuy2_i420.c \
+	$(NULL)
+
+SOURCES_chroma_chain = \
+	chain.c \
+	$(NULL)
