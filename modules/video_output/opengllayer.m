@@ -310,7 +310,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     p_sys->b_frame_available = 1;
-    [p_sys->o_layer setNeedsDisplay];
 }
 
 /*****************************************************************************
@@ -407,8 +406,9 @@ static int InitTextures( vout_thread_t *p_vout )
     {
         me.asynchronous = YES;
         [me setVout: _p_vout];
-        me.bounds = CGRectMake( 0.0, 0.0,  (float)_p_vout->output.i_height,  (float)_p_vout->output.i_width );
-
+        me.bounds = CGRectMake( 0.0, 0.0, 
+                                (float)_p_vout->fmt_in.i_visible_width * _p_vout->fmt_in.i_sar_num,
+                                (float)_p_vout->fmt_in.i_visible_height * _p_vout->fmt_in.i_sar_den );
     }
     return me;
 }
@@ -498,6 +498,15 @@ static int InitTextures( vout_thread_t *p_vout )
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
+
+    /* Swap buffers only during the vertical retrace of the monitor.
+    http://developer.apple.com/documentation/GraphicsImaging/
+    Conceptual/OpenGL/chap5/chapter_5_section_44.html */
+
+    long params[] = { 1 };
+    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
+                    params );
+
     CGLUnlockContext( context );
     return context;
 }
@@ -506,7 +515,7 @@ static int InitTextures( vout_thread_t *p_vout )
 {
     CGLLockContext( glContext );
     CGLSetCurrentContext( glContext );
-    
+
     glDeleteTextures( 2, p_vout->p_sys->p_textures );
 
     CGLUnlockContext( glContext );
