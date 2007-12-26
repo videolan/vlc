@@ -152,7 +152,7 @@
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     BOOL blackout_other_displays = var_GetBool( p_vout, "macosx-black" );
 
-    screen = [[NSScreen screens] objectAtIndex: var_GetInteger( p_vout, "video-device" )];
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )]; 
  
     [self lockFullscreenAnimation];
 
