@@ -29,6 +29,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_filter.h"
+#include "filter_picture.h"
 
 #include "math.h"
 
@@ -51,6 +52,7 @@ static void get_blue_from_yuv422( picture_t *, picture_t *, int, int, int );
 static void make_projection_matrix( filter_t *, int color, int *matrix );
 static void get_custom_from_yuv420( picture_t *, picture_t *, int, int, int, int * );
 static void get_custom_from_yuv422( picture_t *, picture_t *, int, int, int, int * );
+static void get_custom_from_packedyuv422( picture_t *, picture_t *, int * );
 
 
 #define COMPONENT_TEXT N_("RGB component to extract")
@@ -96,6 +98,26 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+    switch( p_filter->fmt_in.video.i_chroma )
+    {
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('J','4','2','0'):
+        case VLC_FOURCC('Y','V','1','2'):
+
+        case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('J','4','2','2'):
+
+        CASE_PACKED_YUV_422
+            break;
+
+        default:
+            /* We only want planar YUV 4:2:0 or 4:2:2 */
+            msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                     (char*)&(p_filter->fmt_in.video.i_chroma) );
+            return VLC_EGENERIC;
+    }
+
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
@@ -118,17 +140,10 @@ static int Create( vlc_object_t *p_this )
                                                FILTER_PREFIX "component" );
     var_AddCallback( p_filter, FILTER_PREFIX "component",
                      ExtractCallback, p_filter->p_sys );
-    switch( p_filter->p_sys->i_color )
-    {
-        case RED:
-        case GREEN:
-        case BLUE:
-            break;
-        default:
-            make_projection_matrix( p_filter, p_filter->p_sys->i_color,
-                                    p_filter->p_sys->projection_matrix );
-            break;
-    }
+
+    /* Matrix won't be used for RED, GREEN or BLUE in planar formats */
+    make_projection_matrix( p_filter, p_filter->p_sys->i_color,
+                            p_filter->p_sys->projection_matrix );
 
     p_filter->pf_video_filter = Filter;
 
@@ -214,6 +229,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                                             p_filter->p_sys->projection_matrix);
                     break;
             }
+            break;
+
+        CASE_PACKED_YUV_422
+            get_custom_from_packedyuv422( p_pic, p_outpic,
+                                          p_filter->p_sys->projection_matrix );
             break;
 
         default:
@@ -389,6 +409,59 @@ static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
         uout  += i_uv_pitch - i_uv_visible_pitch;
         vin   += i_uv_pitch - i_uv_visible_pitch;
         vout  += i_uv_pitch - i_uv_visible_pitch;
+    }
+}
+
+static void get_custom_from_packedyuv422( picture_t *p_inpic,
+                                          picture_t *p_outpic,
+                                          int *m )
+{
+    int i_y_offset, i_u_offset, i_v_offset;
+    if( GetPackedYuvOffsets( p_inpic->format.i_chroma, &i_y_offset,
+                         &i_u_offset, &i_v_offset ) != VLC_SUCCESS )
+        return;
+
+    uint8_t *yin = p_inpic->p->p_pixels + i_y_offset;
+    uint8_t *uin = p_inpic->p->p_pixels + i_u_offset;
+    uint8_t *vin = p_inpic->p->p_pixels + i_v_offset;
+
+    uint8_t *yout = p_outpic->p->p_pixels + i_y_offset;
+    uint8_t *uout = p_outpic->p->p_pixels + i_u_offset;
+    uint8_t *vout = p_outpic->p->p_pixels + i_v_offset;
+
+    const int i_pitch = p_inpic->p->i_pitch;
+    const int i_visible_pitch = p_inpic->p->i_visible_pitch;
+    const int i_visible_lines = p_inpic->p->i_visible_lines;
+
+    const uint8_t *yend = yin + i_visible_lines * i_pitch;
+    while( yin < yend )
+    {
+        const uint8_t *ylend = yin + i_visible_pitch;
+        while( yin < ylend )
+        {
+            *uout = crop( (*yin * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
+                      / 65536 + U );
+            uout += 4;
+            *vout = crop( (*yin * m[6] + (*uin-U) * m[7] + (*vin-V) * m[8])
+                     / 65536 + V );
+            vout += 4;
+            *yout = crop( (*yin * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
+                       / 65536 );
+            yin  += 2;
+            yout += 2;
+            *yout = crop( (*yin * m[0] + (*uin-U) * m[1] + (*vin-V) * m[2])
+                       / 65536 );
+            yin  += 2;
+            yout += 2;
+            uin  += 4;
+            vin  += 4;
+        }
+        yin  += i_pitch - i_visible_pitch;
+        yout += i_pitch - i_visible_pitch;
+        uin  += i_pitch - i_visible_pitch;
+        uout += i_pitch - i_visible_pitch;
+        vin  += i_pitch - i_visible_pitch;
+        vout += i_pitch - i_visible_pitch;
     }
 }
 
@@ -699,17 +772,9 @@ static int ExtractCallback( vlc_object_t *p_this, char const *psz_var,
     if( !strcmp( psz_var, FILTER_PREFIX "component" ) )
     {
         p_sys->i_color = newval.i_int;
-        switch( p_sys->i_color )
-        {
-            case RED:
-            case GREEN:
-            case BLUE:
-                break;
-            default:
-                make_projection_matrix( (filter_t *)p_this, p_sys->i_color,
-                                        p_sys->projection_matrix );
-                break;
-        }
+        /* Matrix won't be used for RED, GREEN or BLUE in planar formats */
+        make_projection_matrix( (filter_t *)p_this, p_sys->i_color,
+                                p_sys->projection_matrix );
     }
     else
     {

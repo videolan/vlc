@@ -120,6 +120,23 @@ static int Create( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     char *psz_filename;
 
+    switch( p_filter->fmt_in.video.i_chroma )
+    {
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('J','4','2','0'):
+        case VLC_FOURCC('Y','V','1','2'):
+
+        case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('J','4','2','2'):
+            break;
+
+        default:
+            msg_Err( p_filter, "Unsupported input chroma (%4s)",
+                     (char*)&(p_filter->fmt_in.video.i_chroma) );
+            return VLC_EGENERIC;
+    }
+
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
@@ -181,23 +198,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_outpic;
 
     if( !p_pic ) return NULL;
-    switch( p_pic->format.i_chroma )
-    {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('J','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
-
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
-            break;
-        default:
-            msg_Warn( p_filter, "Unsupported input chroma (%4s)",
-                      (char*)&(p_pic->format.i_chroma) );
-            if( p_pic->pf_release )
-                p_pic->pf_release( p_pic );
-            return NULL;
-    }
 
     p_outpic = p_filter->pf_vout_buffer_new( p_filter );
     if( !p_outpic )
