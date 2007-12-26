@@ -99,33 +99,6 @@ struct input_item_t
 #define ITEM_TYPE_NODE          8
 #define ITEM_TYPE_NUMBER        9
 
-static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
-{
-    memset( p_i, 0, sizeof(input_item_t) );
-    p_i->psz_name = NULL;
-    p_i->psz_uri = NULL;
-    TAB_INIT( p_i->i_es, p_i->es );
-    TAB_INIT( p_i->i_options, p_i->ppsz_options );
-    TAB_INIT( p_i->i_categories, p_i->pp_categories );
-
-    p_i->i_type = ITEM_TYPE_UNKNOWN;
-    p_i->b_fixed_name = VLC_TRUE;
-
-    p_i->p_stats = NULL;
-    p_i->p_meta = NULL;
-
-    vlc_mutex_init( p_o, &p_i->lock );
-    vlc_event_manager_init( &p_i->event_manager, p_i, p_o );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemMetaChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemSubItemAdded );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemDurationChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemPreparsedChanged );
-}
-
 static inline void input_ItemCopyOptions( input_item_t *p_parent,
                                           input_item_t *p_child )
 {
@@ -315,7 +288,7 @@ static inline void input_item_SetDuration( input_item_t * p_i, mtime_t i_duratio
         send_event = VLC_TRUE;
     }
     vlc_mutex_unlock( &p_i->lock );
-    
+
     if ( send_event == VLC_TRUE )
     {
         vlc_event_t event;
@@ -323,54 +296,14 @@ static inline void input_item_SetDuration( input_item_t * p_i, mtime_t i_duratio
         event.u.input_item_duration_changed.new_duration = i_duration;
         vlc_event_send( &p_i->event_manager, &event );
     }
-    
+
     return;
 }
 
-static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t preparsed )
-{
-    vlc_bool_t send_event = VLC_FALSE;
-
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    vlc_mutex_lock( &p_i->lock );
-    int new_status;
-    if( preparsed )
-        new_status = p_i->p_meta->i_status | ITEM_PREPARSED;
-    else
-        new_status = p_i->p_meta->i_status & ~ITEM_PREPARSED;
-    if ( p_i->p_meta->i_status != new_status )
-    {
-        p_i->p_meta->i_status = new_status;
-        send_event = VLC_TRUE;
-    }
-
-    vlc_mutex_unlock( &p_i->lock );
-    
-    if ( send_event == VLC_TRUE )
-    {
-        vlc_event_t event;
-        event.type = vlc_InputItemPreparsedChanged;
-        event.u.input_item_preparsed_changed.new_status = new_status;
-        vlc_event_send( &p_i->event_manager, &event );
-    }
-}
 
 static inline vlc_bool_t input_item_IsPreparsed( input_item_t *p_i )
 {
     return p_i->p_meta ? p_i->p_meta->i_status & ITEM_PREPARSED : VLC_FALSE ;
-}
-
-static inline void input_item_SetMetaFetched( input_item_t *p_i, vlc_bool_t metafetched )
-{
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    if( metafetched )
-        p_i->p_meta->i_status |= ITEM_META_FETCHED;
-    else
-        p_i->p_meta->i_status &= ~ITEM_META_FETCHED;
 }
 
 static inline vlc_bool_t input_item_IsMetaFetched( input_item_t *p_i )
@@ -378,28 +311,6 @@ static inline vlc_bool_t input_item_IsMetaFetched( input_item_t *p_i )
     return p_i->p_meta ? p_i->p_meta->i_status & ITEM_META_FETCHED : VLC_FALSE ;
 }
 
-
-static inline void input_item_SetArtNotFound( input_item_t *p_i, vlc_bool_t notfound )
-{
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    if( notfound )
-        p_i->p_meta->i_status |= ITEM_ART_NOTFOUND;
-    else
-        p_i->p_meta->i_status &= ~ITEM_ART_NOTFOUND;
-}
-
-static inline void input_item_SetArtFetched( input_item_t *p_i, vlc_bool_t artfetched )
-{
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    if( artfetched )
-        p_i->p_meta->i_status |= ITEM_ART_FETCHED;
-    else
-        p_i->p_meta->i_status &= ~ITEM_ART_FETCHED;
-}
 
 static inline vlc_bool_t input_item_IsArtFetched( input_item_t *p_i )
 {
