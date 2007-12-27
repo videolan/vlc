@@ -422,10 +422,9 @@ static block_t *mmapBlock (access_t *p_access)
     }
 
     p_access->info.i_pos = offset + length;
-#if 0
     msg_Dbg (p_access, "mapped 0x%lx bytes at %p from offset 0x%lx",
              (unsigned long)length, addr, (unsigned long)offset);
-#endif
+
     block_sys_t *block = malloc (sizeof (*block));
     if (block == NULL)
     {
