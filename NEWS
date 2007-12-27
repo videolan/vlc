@@ -18,13 +18,13 @@ Important notes:
    - On Mac OS X, you can find it in VLC.app/Contents/MacOS/share/http/.hosts
      and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
  * This version of VLC contains a new interface for Windows and Linux. This
-   interface lacks a few features that used to be present in vlc 0.8.6:
+   interface lacks a few features that used to be present in VLC 0.8.6:
    - "Streaming wizard" and "VLM control". These features will be replaced
      by a better alternative in the next version. If you absolutely need these
-     features, we advise you to keep vlc 0.8.6
+     features, we advise you to keep VLC 0.8.6
    - Similarly, "Bookmarks" will be reintroduced in an improved version at a
      later point
-  * The default for --sout-keep has changed. It's now activated by default.
+  * The behavior of --sout-keep has changed. It's now activated by default.
   * The marq, mosaic and logo commands in the rc interface changed. They
     now require a target name as their first argument. Example:
     vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
@@ -35,7 +35,8 @@ Important notes:
      Old: '#std{access=rtp,dst=239.255.1.2,sap}'
      New: '#rtp{dst=239.255.1.2,sap}'
  * You now need to append --m3u-extvlcopt to your command line to enable
-   EXTVLCOPT options parsing in m3u playlists.
+   EXTVLCOPT options parsing in m3u playlists. Note that only a limited set
+   of options is available to m3u playlists.
 
 Changes:
 --------
@@ -59,7 +60,7 @@ Input/Demuxers:
   * JACK audio input support
   * MP4 gpac and Apple chapter support
   * Input run time option (improved live stream recording)
-  * Fixed aiff stereo file
+  * Fixed playback of AIFF stereo files
   * Fixed audio glitch on seek
   * Improved FLAC demuxer (duration / current time / meta data)
   * AAC tags support
@@ -68,7 +69,7 @@ Input/Demuxers:
   * Improved Ogg/Vorbis tags support
   * Raw video support
   * Standard MIDI File (types 0 & 1) support
-  * Tivo Series 2 support
+  * TiVo Series 2 support
   * v4l2 access module support
   * CD+G karaoke Files support
   * MXF files support
@@ -76,7 +77,7 @@ Input/Demuxers:
 Decoders:
  * VP60/VP61/VP6F/VP62 support
  * MKV USF subtitles support
- * HTML based subtitles support
+ * HTML-based subtitles support
  * Flash Screen Video support
  * CamStudio Screen Video support
  * DosBox Capture support
@@ -85,17 +86,18 @@ Decoders:
  * Fluidsynth MIDI software synthesis (with external sound fonts)
  * New codec FOURCCs to support more specific files:
    Avid, FCP, Sony, Samsung, ...
- * Closed Caption Decoder (DVD, ReplayTV, Tivo, DVB/ATSC)
+ * Closed Caption Decoder (DVD, ReplayTV, TiVo, DVB/ATSC)
  * H.264 PAFF support
  * DNxHD / VC-3 support
  * NellyMoser ASAO support
- * APE ( Monkey audio ) support
+ * APE (Monkey audio) support
  * VBI & EBU (Teletext) support
 
 Encoders:
  * Flash Screen Video support
 
 Video output and filters:
+ * New CoreAnimation output module (Mac OS X 10.5 only)
  * Adjust, Invert and Distort (now split into Wave, Ripple, Gradient and
    Psychedelic) video filters can now be streamed
  * New puzzle video output filter
@@ -104,7 +106,7 @@ Video output and filters:
    video)
  * New sharpen video filter (increase the contrast of adjacent pixels)
  * New erase video filter (remove a logo from a video)
- * Enhancements to subtitles' renderer to support bold, italics and some HTML
+ * Enhancements to subtitles' renderer to support bold, italic and some HTML
    tags
  * Support for RGBA and I420 blending. This improves Mosaic CPU usage *a lot*.
  * New transparency mask video filter (for use with the mosaic_bridge module).
@@ -112,13 +114,13 @@ Video output and filters:
    was previously part of the mosaic module.
  * Fix random characters problem in RSS filter.
  * Add rotate-deciangle for more precision on rotate filter
- * Support for Intel SSE2 intruction set in chroma converters
- * Improved use of Intel MMX intruction set in chroma converters
+ * Support for Intel SSE2 instruction set in chroma converters
+ * Improved use of Intel MMX instruction set in chroma converters
 
 Audio output and filters
- * Replay gain support.
- * Play audio when going slower/faster ( no pitch filter yet ).
- * New spatializer audio filter.
+ * Replay gain support
+ * Audio playback when going slower/faster (no pitch filter yet)
+ * New spatializer audio filter
 
 Stream output:
  * RTSP for TS-multiplexed broadcast streams
@@ -136,7 +138,13 @@ Interfaces:
  * All
    * Improved user interaction
    * Improved mouse gestures
+   * Fastly improved Update checker
    * Experimental Lua interface modules. See vlc -I lua for more info
+   * ncurses interface now uses ncursesw to correctly display wide characters
+     when using an UTF-8 locale.
+ * Mac OS X
+   * Improved video output features
+   * Access to VideoLAN's Help Wiki within VLC
  * Unix
    * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 
@@ -144,10 +152,8 @@ Interfaces:
      interface for media players that intends to become an xdg standard when 
      finished: http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces .
    * Motion module use disk accelerometers to keep video horizontal
-   * Ncurses interface now uses ncursesw to correctly display wide characters
-     when using an UTF-8 locale.
    * Plugin to set Telepathy presence message using MissionControl
- * Fix VLM schedule time on Linux.
+ * Fixed VLM schedule time on Linux
 
 Linux Port:
  * VLC now complies with the XDG Base Directory Specification version 0.6
@@ -156,24 +162,25 @@ Linux Port:
 
 Mac OS X Port:
  * Mac OS X Framework that can be used to embed VLC in third party
-   applications. (Google Summer Of Code Student project).
+   applications (Google Summer of Code Student project)
+ * Complete compatibility with Mac OS X 10.5 Leopard
 
 LibVLC:
- * Event management and various improvement in libvlc.
-   (Part of a Google Summer Of Code Student project).
+ * Event management and various improvements in libvlc
+   (Part of a Google Summer of Code Student project)
 
 Capture:
  * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft
    Windows
 
-Localisations:
+New Localizations:
  * Finnish
  * Persian
  * Polish
 
 
 Changes between 0.8.6c and 0.8.6d:
-----------------------------------------------------------
+----------------------------------
 
 Various bugfixes:
  * Mozilla plugin: supports a reasonable amount of MIME types on Windows
