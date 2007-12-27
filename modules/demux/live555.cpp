@@ -475,6 +475,14 @@ static int Connect( demux_t *p_demux )
     }
 
 createnew:
+    if( p_demux->b_die || p_demux->b_error )
+    {
+        free( psz_user );
+        free( psz_pwd );
+        free( psz_url );
+        return VLC_EGENERIC;
+    }
+
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
 
@@ -484,6 +492,9 @@ createnew:
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
                  p_sys->env->getResultMsg() );
+        free( psz_user );
+        free( psz_pwd );
+        free( psz_url );
         return VLC_EGENERIC;
     }
 
@@ -510,18 +521,18 @@ describe:
     if( psz_options ) delete [] psz_options;
 
     p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
-                         var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
+                         var_GetBool( p_demux, "rtsp-kasenna" ) );
     if( p_sdp == NULL )
     {
         /* failure occurred */
         int i_code = 0;
         const char *psz_error = p_sys->env->getResultMsg();
 
-        msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
-        if( var_CreateGetBool( p_demux, "rtsp-http" ) )
+        if( var_GetBool( p_demux, "rtsp-http" ) )
             sscanf( psz_error, "%*s %*s HTTP GET %*s HTTP/%*u.%*u %3u %*s",
                     &i_code );
         else sscanf( psz_error, "%*sRTSP/%*s%3u", &i_code );
+        msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
 
         if( i_code == 401 )
         {
@@ -542,7 +553,7 @@ describe:
                 goto describe;
             }
         }
-        else if( !var_GetBool( p_demux, "rtsp-http" ) )
+        else if( (i_code != 0) && !var_GetBool( p_demux, "rtsp-http" ) )
         {
             /* Perhaps a firewall is being annoying. Try HTTP tunneling mode */
             vlc_value_t val;
@@ -550,19 +561,21 @@ describe:
             msg_Dbg( p_demux, "we will now try HTTP tunneling mode" );
             var_Set( p_demux, "rtsp-http", val );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
+            p_sys->rtsp = NULL;
             goto createnew;
         }
         else
         {
             msg_Dbg( p_demux, "connection timeout, retrying" );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
+            p_sys->rtsp = NULL;
             goto createnew;
         }
         i_ret = VLC_EGENERIC;
     }
-    if( psz_url ) free( psz_url );
 
     /* malloc-ated copy */
+    if( psz_url ) free( psz_url );
     if( psz_user ) free( psz_user );
     if( psz_pwd ) free( psz_pwd );
 
