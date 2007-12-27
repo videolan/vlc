@@ -5914,7 +5914,7 @@ fi
 AC_LANG_POP(C++)
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
-   dnl Tests for Osso and Xsp
+dnl Tests for Osso and Xsp
 if test "${enable_x11}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_x11}" = "yes"); then
