@@ -104,9 +104,9 @@ diff -ruN live.orig/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
 +Boolean RTSPClient::parseRangeHeader(char const* line, float& start, float& end) {
 +  if (_strncasecmp(line, "Range: ", 7) != 0) return False;
 +  line += 7;
-+
 +  /* "npt=start-" is also valid */
-+  return radix_safe_sscanf(line, "npt = %f - %f", &start, &end) >= 1;
++  Locale("C", LC_NUMERIC);
++  return (sscanf(line, "npt = %f - %f", &start, &end) >= 1);
 +}
 +
  Boolean RTSPClient::parseGetParameterHeader(char const* line, 
