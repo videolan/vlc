@@ -2035,7 +2035,7 @@ static void httpd_HostThread( httpd_host_t *host )
 
     vlc_object_lock( host );
     evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
-    b_die = vlc_object_alive( host );
+    b_die = !vlc_object_alive( host );
     vlc_object_unlock( host );
 
     while( !b_die )
