@@ -41,13 +41,13 @@ extern NSString * VLCVideoViewLeftFullScreen;
     id delegate;
     NSColor * backColor;
     BOOL stretchesVideo;
-    BOOL fullscreen;
+    BOOL fullScreen;
     id layoutManager;
     // TODO: Allow for view to report transparency to do some cool effects
     // with the video?
 }
 
-@property (readonly, assign) BOOL fullscreen;
+@property BOOL fullScreen;
 @property BOOL fillScreen;
 
 - (void)setDelegate:(id)value;

@@ -59,10 +59,6 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
 /******************************************************************************
  * VLCVideoView (Private) 
  */
-@interface VLCVideoView ()
-/* Property */
-@property (readwrite, assign) BOOL fullscreen;
-@end
 
 @interface VLCVideoView (Private)
 /* Method */
@@ -141,7 +137,6 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
  */
 
 @implementation VLCVideoView
-@synthesize fullscreen;
 
 - (BOOL)fillScreen
 {
@@ -151,6 +146,25 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
 {
     [layoutManager setFillScreenEntirely:fillScreen];
     [[self layer] setNeedsLayout];
+}
+
+- (BOOL)fullScreen
+{
+    return fullScreen;
+}
+
+- (void)setFullScreen:(BOOL)newFullScreen
+{
+    if( newFullScreen )
+    {
+        fullScreen = YES;
+        [self enterFullscreen];
+    }
+    else
+    {
+        fullScreen = NO;
+        [self leaveFullscreen];
+    }
 }
 
 
@@ -210,7 +224,7 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
                                                  withNotificationName:VLCVideoViewEnteredFullScreen];
     
     [super enterFullScreenMode:[[self window] screen] withOptions:nil];
-    self.fullscreen = YES;
+    if( !self.fullScreen ) self.fullScreen = YES;
 }
 
 /* This is a LibVLC notification that we're about to enter leaving full screen,
@@ -224,7 +238,7 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
     
     // There is nothing else to do, as this object strictly displays the video feed
     [super exitFullScreenModeWithOptions:nil];
-    self.fullscreen = NO;
+    if( self.fullScreen ) self.fullScreen = NO;
 }
 
 - (void)drawRect:(NSRect)aRect
@@ -244,7 +258,7 @@ NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
 {
     if([theEvent clickCount] != 2)
         return;
-    if(self.fullscreen)
+    if(self.fullScreen)
         [self leaveFullscreen];
     else
         [self enterFullscreen];
