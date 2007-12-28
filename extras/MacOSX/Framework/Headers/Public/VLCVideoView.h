@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import <QuartzCore/QuartzCore.h>
+@class CALayer;
 
 /* Notifications */
 extern NSString * VLCVideoViewEnteredFullScreen;
@@ -34,39 +36,25 @@ extern NSString * VLCVideoViewLeftFullScreen;
 - (void)videoLeftFullscreen:(NSNotification *)aNotification;
 @end
 
-@protocol VLCOpenGLVoutEmbedding
-- (void)addVoutSubview:(NSView *)view;
-- (void)removeVoutSubview:(NSView *)view;
-
-- (void)enterFullscreen;
-- (void)leaveFullscreen;
-
-- (BOOL)stretchesVideo;
-
-//- (void)setOnTop: (BOOL)ontop; /* Do we really want that in protocol? */
-@end
-
-@interface VLCVideoView : NSView <VLCOpenGLVoutEmbedding>
+@interface VLCVideoView : NSView
 {
     id delegate;
     NSColor * backColor;
     BOOL stretchesVideo;
-    
+    BOOL fullscreen;
+    id layoutManager;
     // TODO: Allow for view to report transparency to do some cool effects
     // with the video?
 }
+
+@property (readonly, assign) BOOL fullscreen;
+@property BOOL fillScreen;
 
 - (void)setDelegate:(id)value;
 - (id)delegate;
 
 - (void)setBackColor:(NSColor *)value;
 - (NSColor *)backColor;
-
-- (void)setStretchesVideo:(BOOL)value;
-- (BOOL)stretchesVideo;
-
-- (void)addVoutSubview:(NSView *)aView;
-- (void)removeVoutSubview:(NSView *)aView;
 
 - (void)enterFullscreen;
 - (void)leaveFullscreen;
