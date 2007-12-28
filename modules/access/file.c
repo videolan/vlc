@@ -203,7 +203,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_seekable = VLC_FALSE;
 
 # ifdef HAVE_MMAP
-# ifndef __APPLE__
     p_sys->pagemask = sysconf (_SC_PAGE_SIZE) - 1;
 
     /* Autodetect mmap() support */
@@ -223,7 +222,6 @@ static int Open( vlc_object_t *p_this )
     }
     else
         msg_Dbg (p_this, "mmap disabled (non regular file)");
-# endif
 # endif
 #else
     p_sys->b_seekable = !b_stdin;
@@ -440,7 +438,7 @@ static block_t *mmapBlock (access_t *p_access)
 
 #ifndef NDEBUG
     /* Compare normal I/O with memory mapping */
-    char buf[block->self.i_buffer];
+    char *buf = malloc (block->self.i_buffer);
     ssize_t i_read = read (p_sys->fd, buf, block->self.i_buffer);
 
     if (i_read != (ssize_t)block->self.i_buffer)
@@ -448,6 +446,7 @@ static block_t *mmapBlock (access_t *p_access)
                  (unsigned)block->self.i_buffer);
     if (memcmp (buf, block->self.p_buffer, block->self.i_buffer))
         msg_Err (p_access, "inconsistent data buffer");
+    free (buf);
 #endif
 
     return &block->self;
