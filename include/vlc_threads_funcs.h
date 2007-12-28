@@ -79,7 +79,7 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 #if defined( PTHREAD_COND_T_IN_PTHREAD_H )
 static inline int CAST_PTHREAD_TO_INT (pthread_t th)
 {
-     union { pthread_t th; int i; } v = { .i = 0 };
+     union { pthread_t th; int i; } v = { };
      v.th = th;
      return v.i;
 }
