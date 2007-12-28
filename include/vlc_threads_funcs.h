@@ -77,9 +77,9 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
 #if defined( PTHREAD_COND_T_IN_PTHREAD_H )
-static inline int CAST_PTHREAD_TO_INT (pthread_t th)
+static inline unsigned long int CAST_PTHREAD_TO_INT (pthread_t th)
 {
-     union { pthread_t th; int i; } v = { };
+     union { pthread_t th; unsigned long int i; } v = { };
      v.th = th;
      return v.i;
 }
