@@ -33,12 +33,15 @@
 {
     IBOutlet id o_main;
 
-    IBOutlet id o_btn_fullscreen;
     IBOutlet id o_volumeslider;
 
     IBOutlet id o_btn_shuffle;
     IBOutlet id o_btn_addNode;
     IBOutlet id o_btn_repeat;
+    
+    NSImage * o_repeat_single;
+    NSImage * o_repeat_all;
+    NSImage * o_repeat_off;
 
     IBOutlet id o_specificTime_cancel_btn;
     IBOutlet id o_specificTime_enter_fld;
@@ -51,6 +54,7 @@
 
     VLCFSPanel *o_fs_panel;
 }
+- (void)controlTintChanged;
 
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;

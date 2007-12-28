@@ -51,9 +51,12 @@
     [o_slider setToolTip: _NS("Position")];
 
     o_img_play = [NSImage imageNamed: @"play_embedded"];
-    o_img_play_pressed = [NSImage imageNamed: @"play_embedded_blue"];
     o_img_pause = [NSImage imageNamed: @"pause_embedded"];
-    o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_blue"];
+    [self controlTintChanged];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector( controlTintChanged )
+                                                 name: NSControlTintDidChangeNotification
+                                               object: nil];
 
     /* Useful to save o_view frame in fullscreen mode */
     o_temp_view = [[NSView alloc] init];
@@ -70,6 +73,39 @@
      * are called from the same thread */
     o_animation_lock = [[NSRecursiveLock alloc] init];
     b_animation_lock_alreadylocked = NO;
+}
+
+- (void)controlTintChanged
+{
+    if( [NSColor currentControlTint] == NSGraphiteControlTint )
+    {
+        o_img_play_pressed = [NSImage imageNamed: @"play_embedded_graphite"];
+        o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_graphite"];
+        [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_embedded_graphite"]];
+        [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_embedded_graphite"]];
+        [o_btn_play setAlternateImage: o_img_play_pressed];
+        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_graphite"]];
+    }
+    else
+    {
+        o_img_play_pressed = [NSImage imageNamed: @"play_embedded_blue"];
+        o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_blue"];
+        [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_embedded_blue"]];
+        [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_embedded_blue"]];
+        [o_btn_play setAlternateImage: o_img_play_pressed];
+        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_blue"]];
+    }
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [o_img_play release];
+    [o_img_play_pressed release];
+    [o_img_pause release];
+    [o_img_pause_pressed release];
+    
+    [super dealloc];
 }
 
 - (void)setTime:(NSString *)o_arg_time position:(float)f_position

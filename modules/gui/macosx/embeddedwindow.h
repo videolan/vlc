@@ -52,6 +52,8 @@
     NSRecursiveLock * o_animation_lock;
 }
 
+- (void)controlTintChanged;
+
 - (void)setTime: (NSString *)o_arg_ime position: (float)f_position;
 - (void)playStatusUpdated: (int)i_status;
 - (void)setSeekable: (BOOL)b_seekable;

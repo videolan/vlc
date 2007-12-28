@@ -133,6 +133,7 @@ struct intf_sys_t
     IBOutlet id o_btn_next;     /* btn next       */
     IBOutlet id o_btn_fullscreen;/* btn fullscreen (embedded vout window) */
     IBOutlet id o_btn_playlist; /* btn playlist   */
+    IBOutlet id o_btn_equalizer; /* eq btn */
 
     NSImage * o_img_play;       /* btn play img   */
     NSImage * o_img_pause;      /* btn pause img  */
@@ -299,6 +300,8 @@ struct intf_sys_t
 
 - (intf_thread_t *)getIntf;
 - (void)setIntf:(intf_thread_t *)p_mainintf;
+
+- (void)controlTintChanged;
 
 - (id)getControls;
 - (id)getPlaylist;

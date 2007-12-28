@@ -220,7 +220,9 @@
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "o_btn_equalizer" = id; 
                 "o_btn_ff" = id; 
+                "o_btn_fullscreen" = id; 
                 "o_btn_next" = id; 
                 "o_btn_play" = id; 
                 "o_btn_playlist" = id; 

@@ -544,8 +544,60 @@ static VLCMain *_o_sharedMainInstance = nil;
                                              selector: @selector(refreshVoutDeviceMenu:)
                                                  name: NSApplicationDidChangeScreenParametersNotification
                                                object: nil];
- 
+
+    o_img_play = [NSImage imageNamed: @"play"];
+    o_img_pause = [NSImage imageNamed: @"pause"];    
+    
+    [self controlTintChanged];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector( controlTintChanged )
+                                                 name: NSControlTintDidChangeNotification
+                                               object: nil];
+    
     nib_main_loaded = TRUE;
+}
+
+- (void)controlTintChanged
+{
+    BOOL b_playing = NO;
+    
+    if( [o_btn_play image] == o_img_play_pressed )
+        b_playing = YES;
+    
+    if( [NSColor currentControlTint] == NSGraphiteControlTint )
+    {
+        o_img_play_pressed = [NSImage imageNamed: @"play_graphite"];
+        o_img_pause_pressed = [NSImage imageNamed: @"pause_graphite"];
+        
+        [o_btn_prev setAlternateImage: [NSImage imageNamed: @"previous_graphite"]];
+        [o_btn_rewind setAlternateImage: [NSImage imageNamed: @"skip_previous_graphite"]];
+        [o_btn_stop setAlternateImage: [NSImage imageNamed: @"stop_graphite"]];
+        [o_btn_ff setAlternateImage: [NSImage imageNamed: @"skip_forward_graphite"]];
+        [o_btn_next setAlternateImage: [NSImage imageNamed: @"next_graphite"]];
+        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_graphite"]];
+        [o_btn_playlist setAlternateImage: [NSImage imageNamed: @"playlistdrawer_graphite"]];
+        [o_btn_equalizer setAlternateImage: [NSImage imageNamed: @"equalizerdrawer_graphite"]];
+    }
+    else
+    {
+        o_img_play_pressed = [NSImage imageNamed: @"play_blue"];
+        o_img_pause_pressed = [NSImage imageNamed: @"pause_blue"];
+        
+        [o_btn_prev setAlternateImage: [NSImage imageNamed: @"previous_blue"]];
+        [o_btn_rewind setAlternateImage: [NSImage imageNamed: @"skip_previous_blue"]];
+        [o_btn_stop setAlternateImage: [NSImage imageNamed: @"stop_blue"]];
+        [o_btn_ff setAlternateImage: [NSImage imageNamed: @"skip_forward_blue"]];
+        [o_btn_next setAlternateImage: [NSImage imageNamed: @"next_blue"]];
+        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_blue"]];
+        [o_btn_playlist setAlternateImage: [NSImage imageNamed: @"playlistdrawer_blue"]];
+        [o_btn_equalizer setAlternateImage: [NSImage imageNamed: @"equalizerdrawer_blue"]];
+    }
+    
+    if( b_playing )
+        [o_btn_play setImage: o_img_play_pressed];
+    else
+        [o_btn_play setImage: o_img_pause_pressed];
 }
 
 - (void)initStrings
@@ -702,11 +754,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
-
-    o_img_play = [[NSImage imageNamed: @"play"] retain];
-    o_img_play_pressed = [[NSImage imageNamed: @"play_blue"] retain];
-    o_img_pause = [[NSImage imageNamed: @"pause"] retain];
-    o_img_pause_pressed = [[NSImage imageNamed: @"pause_blue"] retain];
 
     [p_intf->p_sys->o_sendport setDelegate: self];
     [[NSRunLoop currentRunLoop]
@@ -1683,12 +1730,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
 
     /* remove global observer watching for vout device changes correctly */
-    [[NSNotificationCenter defaultCenter] removeObserver: self
-                                                    name: NSApplicationDidChangeScreenParametersNotification
-                                                  object: nil];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     /* release some other objects here, because it isn't sure whether dealloc
-     * will be called later on -- FK (10/6/05) */
+     * will be called later on */
+    
     if( nib_about_loaded && o_about )
         [o_about release];
  
@@ -1722,7 +1768,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         o_img_pause_pressed = nil;
     }
 
-    if( o_img_pause_pressed != nil )
+    if( o_img_play_pressed != nil )
     {
         [o_img_pause_pressed release];
         o_img_pause_pressed = nil;

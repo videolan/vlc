@@ -59,6 +59,60 @@
     [o_specificTime_ok_btn setTitle: _NS("OK")];
     [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
     [o_specificTime_goTo_lbl setStringValue: _NS("Jump to time")];
+
+    o_repeat_off = [NSImage imageNamed:@"repeat_embedded"];
+
+    [self controlTintChanged];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector( controlTintChanged )
+                                                 name: NSControlTintDidChangeNotification
+                                               object: nil];
+}
+
+- (void)controlTintChanged
+{
+    int i_repeat = 0;
+    if( [o_btn_repeat image] == o_repeat_single )
+        i_repeat = 1;
+    else if( [o_btn_repeat image] == o_repeat_all )
+        i_repeat = 2;
+
+    if( [NSColor currentControlTint] == NSGraphiteControlTint )
+    {
+        o_repeat_single = [NSImage imageNamed:@"repeat_single_embedded_graphite"];
+        o_repeat_all = [NSImage imageNamed:@"repeat_embedded_graphite"];
+        
+        [o_btn_shuffle setAlternateImage: [NSImage imageNamed: @"shuffle_embedded_graphite"]];
+        [o_btn_addNode setAlternateImage: [NSImage imageNamed: @"add_embedded_graphite"]];
+    }
+    else
+    {
+        o_repeat_single = [NSImage imageNamed:@"repeat_single_embedded_blue"];
+        o_repeat_all = [NSImage imageNamed:@"repeat_embedded_blue"];
+        
+        [o_btn_shuffle setAlternateImage: [NSImage imageNamed: @"shuffle_embedded_blue"]];
+        [o_btn_addNode setAlternateImage: [NSImage imageNamed: @"add_embedded_blue"]];
+    }
+    
+    /* update the repeat button, but keep its state */
+    if( i_repeat == 1 )
+        [self repeatOne];
+    else if( i_repeat == 2 )
+        [self repeatAll];
+    else
+        [self repeatOff];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [o_repeat_single release];
+    [o_repeat_all release];
+    [o_repeat_off release];
+    
+    [super dealloc];
 }
 
 - (IBAction)play:(id)sender
@@ -178,18 +232,18 @@
 /* three little ugly helpers */
 - (void)repeatOne
 {
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_single_embedded_blue"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded_blue"]];
+    [o_btn_repeat setImage: o_repeat_single];
+    [o_btn_repeat setAlternateImage: o_repeat_all];
 }
 - (void)repeatAll
 {
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded_blue"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded"]];
+    [o_btn_repeat setImage: o_repeat_all];
+    [o_btn_repeat setAlternateImage: o_repeat_off];
 }
 - (void)repeatOff
 {
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_single_embedded_blue"]];
+    [o_btn_repeat setImage: o_repeat_off];
+    [o_btn_repeat setAlternateImage: o_repeat_single];
 }
 - (void)shuffle
 {

@@ -635,14 +635,27 @@ void _drawFrameInRect(NSRect frameRect)
 - (id)init
 {
     self = [super init];
-    _knobOff = [[NSImage imageNamed:@"volumeslider_normal"] retain];
-    _knobOn = [[NSImage imageNamed:@"volumeslider_blue"] retain];
+    _knobOff = [NSImage imageNamed:@"volumeslider_normal"];
+    [self controlTintChanged];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector( controlTintChanged )
+                                                 name: NSControlTintDidChangeNotification
+                                               object: nil];
     b_mouse_down = FALSE;
     return self;
 }
 
+- (void)controlTintChanged
+{
+    if( [NSColor currentControlTint] == NSGraphiteControlTint )
+        _knobOn = [NSImage imageNamed:@"volumeslider_graphite"];
+    else
+        _knobOn = [NSImage imageNamed:@"volumeslider_blue"];
+}
+
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     [_knobOff release];
     [_knobOn release];
     [super dealloc];
