@@ -63,6 +63,8 @@ extern NSString * VLCMediaListItemDeleted;
 - (int)indexOfMedia:(VLCMedia *)media;
 - (int)count;
 
+- (BOOL)isReadOnly;
+
 /* Media list aspect */
 - (VLCMediaListAspect *)hierarchicalAspect;
 - (VLCMediaListAspect *)flatAspect;

@@ -208,6 +208,16 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     return result;
 }
 
+- (BOOL)isReadOnly
+{
+    libvlc_exception_t p_e;
+    libvlc_exception_init( &p_e );
+    BOOL isReadOnly = libvlc_media_list_is_readonly( p_mlist );
+    quit_on_exception( &p_e );
+    
+    return isReadOnly;
+}
+
 /* Media list aspect */
 - (VLCMediaListAspect *)hierarchicalAspect
 {
