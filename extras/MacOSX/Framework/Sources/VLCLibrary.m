@@ -75,11 +75,11 @@ static void * DestroySharedLibraryAtExit( void )
         libvlc_exception_init( &ex );
         
         const char *lib_vlc_params[] = { 
-            "-I", "dummy", "-vvvv", "--opengl-provider", "minimal_macosx", 
-            "--no-video-title-show", NULL
+            "-I", "dummy", "--vout=opengllayer", 
+            "--no-video-title-show"
         };
         
-        instance = (void *)libvlc_new( 6, lib_vlc_params, &ex );
+        instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );
         quit_on_exception( &ex );
         
         // Assignment unneeded, as the audio unit will do it for us
@@ -127,4 +127,3 @@ static void * DestroySharedLibraryAtExit( void )
         audio = value;
 }
 @end
-
