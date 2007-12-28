@@ -325,4 +325,3 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
         [delegate mediaList:self mediaRemovedAtIndex:[index intValue]];
 }
 @end
-

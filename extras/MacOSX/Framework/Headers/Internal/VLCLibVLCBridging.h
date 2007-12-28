@@ -84,5 +84,3 @@
 @interface VLCAudio (VLCAudioBridging)
 - (id)initWithLibrary:(VLCLibrary *)library;
 @end
-
-

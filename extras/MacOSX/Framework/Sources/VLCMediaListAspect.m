@@ -239,4 +239,3 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:[index intValue]] forKey:@"media"];
 }
 @end
-
