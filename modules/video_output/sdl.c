@@ -384,7 +384,7 @@ static int Manage( vout_thread_t *p_vout )
             }
             break;
 
-        /* Mouse button pressed */
+        /* Mouse button released */
         case SDL_MOUSEBUTTONUP:
             switch( event.button.button )
             {
@@ -449,7 +449,7 @@ static int Manage( vout_thread_t *p_vout )
             }
             break;
 
-        /* Mouse button released */
+        /* Mouse button pressed */
         case SDL_MOUSEBUTTONDOWN:
             switch( event.button.button )
             {
@@ -535,13 +535,32 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->b_fullscreen = !p_vout->b_fullscreen;
         var_Set( p_vout, "fullscreen", val_fs );
 
-        /*TODO: add the always on top code !*/
+        /*TODO: add the "always on top" code here !*/
 
         p_vout->p_sys->b_cursor_autohidden = 0;
         SDL_ShowCursor( p_vout->p_sys->b_cursor &&
                         ! p_vout->p_sys->b_cursor_autohidden );
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    /* Crop or Aspect Ratio Changes */
+    if( p_vout->i_changes & VOUT_CROP_CHANGE ||
+        p_vout->i_changes & VOUT_ASPECT_CHANGE )
+    {
+        p_vout->i_changes &= ~VOUT_CROP_CHANGE;
+        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
+
+        p_vout->fmt_out.i_x_offset = p_vout->fmt_in.i_x_offset;
+        p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
+        p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
+        p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
+        p_vout->fmt_out.i_aspect = p_vout->fmt_in.i_aspect;
+        p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
+        p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
+        p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
+
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 
@@ -558,7 +577,6 @@ static int Manage( vout_thread_t *p_vout )
          * we can handle rescaling ourselves */
         if( p_vout->p_sys->p_overlay != NULL )
             p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
     }
 
     /* Pointer change */
