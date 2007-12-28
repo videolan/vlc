@@ -105,6 +105,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     // Release allocated memory
     libvlc_media_list_view_release(p_mlv);
     [cachedNode release];
+    [parentMediaList release];
     [super dealloc];
 }
 - (VLCMedia *)mediaAtIndex:(int)index
@@ -150,6 +151,11 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 
     return result;
 }
+
+- (VLCMediaList *)parentMediaList
+{
+    return [[parentMediaList retain] autorelease];
+}
 @end
 
 @implementation VLCMediaListAspect (LibVLCBridging)
@@ -164,6 +170,10 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     {
         p_mlv = p_new_mlv;
         libvlc_media_list_view_retain(p_mlv);
+        libvlc_media_list_t * p_mlist = libvlc_media_list_view_parent_media_list(p_mlv, NULL);
+        parentMediaList = [[VLCMediaList mediaListWithLibVLCMediaList: p_mlist] retain];
+        libvlc_media_list_release( p_mlist );
+
         //libvlc_media_list_lock(p_mlv->p_mlist);
         cachedNode = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
         int i, count = libvlc_media_list_view_count(p_mlv, NULL);
