@@ -60,6 +60,7 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
     void *instance;            //  Internal
     VLCMedia *media;        //< Current media being played
+    VLCTime *cachedTime;
 }
 
 /* Initializers */
