@@ -1525,28 +1525,56 @@ static VLCWizard *_o_sharedInstance = nil;
                     [o_sap_option appendFormat: @"sap,name=\"%s\"",
                         [[o_userSelections objectForKey:@"sapText"] UTF8String]];
                 }
-                [o_opts_string appendFormat:
-                    @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s,%s}",
-                    [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String],
-                    [[[o_encapFormats objectAtIndex: [[o_userSelections
-                    objectForKey: @"encapFormat"] intValue]] objectAtIndex:0]
-                    UTF8String], [[o_userSelections objectForKey: @"stmgDest"]
-                    UTF8String], [[[o_strmgMthds objectAtIndex: [[o_userSelections
-                    objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0]
-                    UTF8String], [o_sap_option UTF8String]];
+                if( [[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp" )
+                {
+                    /* RTP is no access out, but a stream out module */
+                    [o_opts_string appendFormat:
+                                             @":sout=#%s%srtp{mux=%s,dst=%s,%s}",
+                        [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String],
+                        [[[o_encapFormats objectAtIndex: [[o_userSelections objectForKey: @"encapFormat"] intValue]] objectAtIndex:0]
+                            UTF8String], 
+                        [[o_userSelections objectForKey: @"stmgDest"] UTF8String],
+                        [o_sap_option UTF8String]];
+                }
+                else
+                {
+                    [o_opts_string appendFormat:
+                                             @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s,%s}",
+                        [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String],
+                        [[[o_encapFormats objectAtIndex: [[o_userSelections objectForKey: @"encapFormat"] intValue]] objectAtIndex:0]
+                            UTF8String], 
+                        [[o_userSelections objectForKey: @"stmgDest"] UTF8String], 
+                        [[[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0]
+                            UTF8String], 
+                        [o_sap_option UTF8String]];                    
+                }
             }
             else
             {
                 /* no SAP, just streaming */
-                [o_opts_string appendFormat:
-                    @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s}",
-                    [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String],
-                    [[[o_encapFormats objectAtIndex: [[o_userSelections
-                    objectForKey: @"encapFormat"] intValue]] objectAtIndex:0]
-                    UTF8String], [[o_userSelections objectForKey:
-                    @"stmgDest"] UTF8String], [[[o_strmgMthds objectAtIndex:
-                    [[o_userSelections objectForKey: @"stmgMhd"] intValue]]
-                    objectAtIndex:0] UTF8String]];
+                if( [[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] == @"rtp" )
+                {
+                    /* RTP is different from the other protocols, as it isn't provided through an access out module anymore */
+                    [o_opts_string appendFormat:
+                                             @":sout=#%s%srtp{mux=%s,dst=%s}",
+                        [o_duplicateCmd UTF8String], 
+                        [o_trnscdCmd UTF8String],
+                        [[[o_encapFormats objectAtIndex: [[o_userSelections objectForKey: @"encapFormat"] intValue]] objectAtIndex:0]
+                            UTF8String], 
+                        [[o_userSelections objectForKey: @"stmgDest"] UTF8String]];
+                }
+                else
+                {
+                    /* all other protocols are cool */
+                    [o_opts_string appendFormat:
+                                             @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s}",
+                        [o_duplicateCmd UTF8String], 
+                        [o_trnscdCmd UTF8String],
+                        [[[o_encapFormats objectAtIndex: [[o_userSelections objectForKey: @"encapFormat"] intValue]] objectAtIndex:0]
+                            UTF8String], 
+                        [[o_userSelections objectForKey: @"stmgDest"] UTF8String], 
+                        [[[o_strmgMthds objectAtIndex: [[o_userSelections objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] UTF8String]];
+                }
             }
         }
 
