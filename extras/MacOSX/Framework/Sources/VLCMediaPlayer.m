@@ -43,10 +43,15 @@ static void HandleMediaInstanceVolumeChanged(const libvlc_event_t *event, void *
 
 static void HandleMediaTimeChanged(const libvlc_event_t * event, void * self)
 {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
+                                                 withMethod:@selector(mediaPlayerTimeChanged:) 
+                                       withArgumentAsObject:[NSNumber numberWithLongLong:event->u.media_instance_position_changed.new_position]];
+
     [[VLCEventManager sharedManager] callOnMainThreadDelegateOfObject:self
                                                    withDelegateMethod:@selector(mediaPlayerTimeChanged:)
                                                  withNotificationName:VLCMediaPlayerTimeChanged];
-        
+    [pool release];
 }
 
 static void HandleMediaInstanceStateChanged(const libvlc_event_t *event, void *self)
@@ -74,13 +79,13 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 @interface VLCMediaPlayer (Private)
 - (void)registerObservers;
 - (void)unregisterObservers;
+- (void)mediaPlayerTimeChanged:(NSNumber *)newTime;
 @end
 
 @implementation VLCMediaPlayer
 - (id)init
 {
-    self = [self initWithVideoView:nil];
-    return self;
+    return [self initWithVideoView:nil];
 }
 
 - (id)initWithVideoView:(VLCVideoView *)aVideoView
@@ -89,7 +94,7 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     {
         delegate = nil;
         media = nil;
-        
+        cachedTime = [[VLCTime nullTime] retain];
         // Create a media instance, it doesn't matter what library we start off with
         // it will change depending on the media descriptor provided to the media
         // instance
@@ -116,10 +121,9 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     libvlc_media_instance_release((libvlc_media_instance_t *)instance);
     
     // Get rid of everything else
-    instance = nil;
-    videoView = nil;
     [media release];
-    
+    [cachedTime release];
+
     [super dealloc];
 }
 
@@ -282,18 +286,7 @@ NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 
 - (VLCTime *)time
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    
-    // Results are returned in seconds...duration is returned in milliseconds
-    long long time = libvlc_media_instance_get_time( (libvlc_media_instance_t *)instance, &ex ) * 1000;
-    if (libvlc_exception_raised( &ex ))
-    {
-        libvlc_exception_clear( &ex );
-        return [VLCTime nullTime];        // Error in obtaining the time, return a null time defintition (--:--:--)
-    }
-    else
-        return [VLCTime timeWithNumber:[NSNumber numberWithLongLong:time]];
+    return cachedTime;
 }
 
 - (void)setChapter:(int)value;
@@ -518,6 +511,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_event_attach( p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, &ex );
     libvlc_event_attach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, &ex );
     libvlc_event_attach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, &ex );
+    /* FIXME: We may want to turn that off when none is interested by that */
     libvlc_event_attach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, &ex );
     quit_on_exception( &ex );
 }
@@ -529,5 +523,12 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_event_detach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, NULL );
+}
+- (void)mediaPlayerTimeChanged:(NSNumber *)newTime
+{
+    [self willChangeValueForKey:@"time"];
+    [cachedTime release];
+    cachedTime = [[VLCTime timeWithNumber:newTime] retain];
+    [self didChangeValueForKey:@"time"];
 }
 @end
