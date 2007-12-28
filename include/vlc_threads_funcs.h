@@ -76,10 +76,13 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 #define vlc_mutex_lock( P_MUTEX )                                           \
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
-#if defined( __APPLE__ ) || defined( __FreeBSD__ )
-#   define CAST_PTHREAD_TO_INT(t) (unsigned long int)(uintptr_t)(void *)t
-#else
-#   define CAST_PTHREAD_TO_INT(t) (unsigned long int)t
+#if defined( PTHREAD_COND_T_IN_PTHREAD_H )
+static inline int CAST_PTHREAD_TO_INT (pthread_t th)
+{
+     union { pthread_t th; int i; } v = { .i = 0 };
+     v.th = th;
+     return v.i;
+}
 #endif
 
 static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
