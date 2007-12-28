@@ -1202,7 +1202,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         vlc_bool_t b_chapters = VLC_FALSE;
 
         playlist_t * p_playlist = pl_Yield( p_intf );
-    /** \todo fix i_size use */
+    /* TODO: fix i_size use */
         b_plmul = p_playlist->items.i_size > 1;
         p_input = p_playlist->p_input;
 
@@ -1212,9 +1212,8 @@ static VLCMain *_o_sharedMainInstance = nil;
             vlc_object_yield( p_input );
             b_seekable = var_GetBool( p_input, "seekable" );
 
-            /* check wether slow/fast motion is possible*/
+            /* check whether slow/fast motion is possible */
             b_control = p_input->b_can_pace_control;
- 
 
             /* chapters & titles */
             //b_chapters = p_input->stream.i_area_nb > 1;
@@ -1236,6 +1235,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         [o_embedded_window setSeekable: b_seekable];
 
+        p_intf->p_sys->b_current_title_update = VLC_TRUE;
+        
         p_intf->p_sys->b_intf_update = VLC_FALSE;
     }
 
