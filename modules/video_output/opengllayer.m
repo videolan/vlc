@@ -66,6 +66,9 @@
 #   define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
+@interface VLCVideoView : NSObject
+- (void)addVoutLayer:(CALayer *)layer;
+@end
 
 /*****************************************************************************
  * Vout interface
@@ -391,7 +394,7 @@ static int InitTextures( vout_thread_t *p_vout )
 {
     vout_thread_t * p_vout = [arg pointerValue];
     p_vout->p_sys->o_layer = [[VLCVideoLayer layerWithVout: p_vout] retain];
-    [p_vout->p_sys->o_cocoa_container addVoutSubview:p_vout->p_sys->o_layer];
+    [p_vout->p_sys->o_cocoa_container addVoutLayer:p_vout->p_sys->o_layer];
 }
 
 - (void)setVout:(vout_thread_t*)_p_vout 
@@ -503,9 +506,9 @@ static int InitTextures( vout_thread_t *p_vout )
     http://developer.apple.com/documentation/GraphicsImaging/
     Conceptual/OpenGL/chap5/chapter_5_section_44.html */
 
-    long params[] = { 1 };
+    GLint params = 1;
     CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
-                    params );
+                    &params );
 
     CGLUnlockContext( context );
     return context;
