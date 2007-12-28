@@ -42,6 +42,7 @@ block_FifoShow
 block_FifoSize
 block_FifoWake
 block_Init
+block_mmap_Alloc
 block_Realloc
 config_ChainCreate
 config_ChainDestroy

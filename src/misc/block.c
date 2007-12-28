@@ -155,6 +155,44 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     return p_block;
 }
 
+#ifdef HAVE_MMAP
+# include <sys/mman.h>
+
+typedef struct block_mmap_t
+{
+    block_t     self;
+    void       *base_addr;
+    size_t      length;
+} block_mmap_t;
+
+static void block_mmap_Release (block_t *block)
+{
+    block_mmap_t *p_sys = (block_mmap_t *)block;
+
+    munmap (p_sys->base_addr, p_sys->length);
+    free (p_sys);
+}
+
+block_t *block_mmap_Alloc (void *addr, size_t length)
+{
+    if (addr == MAP_FAILED)
+        return NULL;
+
+    block_mmap_t *block = malloc (sizeof (*block));
+    if (block == NULL)
+    {
+        munmap (addr, length);
+        return NULL;
+    }
+
+    block_Init (&block->self, (uint8_t *)addr, length);
+    block->self.pf_release = block_mmap_Release;
+    block->base_addr = addr;
+    block->length = length;
+    return &block->self;
+}
+#endif
+
 /*****************************************************************************
  * block_fifo_t management
  *****************************************************************************/

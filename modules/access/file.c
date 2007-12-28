@@ -345,23 +345,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 #ifdef HAVE_MMAP
 # define MMAP_SIZE (1 << 20)
 
-struct block_sys_t
-{
-    block_t self;
-    //vlc_object_t *owner;
-    void *base_addr;
-    size_t length;
-};
-
-static void mmapRelease (block_t *block)
-{
-    block_sys_t *p_sys = (block_sys_t *)block;
-
-    munmap (p_sys->base_addr, p_sys->length);
-    //vlc_object_release (p_sys->owner);
-    free (p_sys);
-}
-
 static block_t *mmapBlock (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -420,36 +403,31 @@ static block_t *mmapBlock (access_t *p_access)
     }
 
     p_access->info.i_pos = offset + length;
+
+    block_t *block = block_mmap_Alloc (addr, length);
+    if (block == NULL)
+        return NULL;
+
+    block->p_buffer += align;
+    block->i_buffer -= align;
+
+#ifndef NDEBUG
     msg_Dbg (p_access, "mapped 0x%lx bytes at %p from offset 0x%lx",
              (unsigned long)length, addr, (unsigned long)offset);
 
-    block_sys_t *block = malloc (sizeof (*block));
-    if (block == NULL)
-    {
-        munmap (addr, length);
-        return NULL;
-    }
-
-    block_Init (&block->self, ((uint8_t *)addr) + align, length - align);
-    block->self.pf_release = mmapRelease;
-    block->base_addr = addr;
-    block->length = length;
-    //vlc_object_yield (block->owner = VLC_OBJECT (p_access));
-
-#ifndef NDEBUG
     /* Compare normal I/O with memory mapping */
-    char *buf = malloc (block->self.i_buffer);
-    ssize_t i_read = read (p_sys->fd, buf, block->self.i_buffer);
+    char *buf = malloc (block->i_buffer);
+    ssize_t i_read = read (p_sys->fd, buf, block->i_buffer);
 
-    if (i_read != (ssize_t)block->self.i_buffer)
+    if (i_read != (ssize_t)block->i_buffer)
         msg_Err (p_access, "read %u instead of %u bytes", (unsigned)i_read,
-                 (unsigned)block->self.i_buffer);
-    if (memcmp (buf, block->self.p_buffer, block->self.i_buffer))
+                 (unsigned)block->i_buffer);
+    if (memcmp (buf, block->p_buffer, block->i_buffer))
         msg_Err (p_access, "inconsistent data buffer");
     free (buf);
 #endif
 
-    return &block->self;
+    return block;
 }
 #endif
 

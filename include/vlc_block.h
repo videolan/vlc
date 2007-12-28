@@ -148,6 +148,18 @@ static inline void block_Release( block_t *p_block )
     p_block->pf_release( p_block );
 }
 
+/**
+ * Creates a block from a virtual address memory mapping (mmap).
+ * This is provided by LibVLC so that mmap blocks can safely be deallocated
+ * even after the allocating plugin has been unloaded from memory.
+ *
+ * @param addr base address of the mapping (as returned by mmap)
+ * @param length length (bytes) of the mapping (as passed to mmap)
+ * @return NULL if addr is MAP_FAILED, or an error occurred (in the later
+ * case, munmap(addr, length) is invoked before returning).
+ */
+VLC_EXPORT( block_t *, block_mmap_Alloc, (void *addr, size_t length) );
+
 /****************************************************************************
  * Chains of blocks functions helper
  ****************************************************************************
