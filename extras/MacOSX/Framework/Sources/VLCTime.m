@@ -30,7 +30,7 @@ static VLCTime *nullTime = nil;
 + (VLCTime *)nullTime
 {
     if (!nullTime)
-        nullTime = [VLCTime timeWithNumber:[NSNumber numberWithInt:0]];
+        nullTime = [[VLCTime timeWithNumber:nil] retain];
     return nullTime;
 }
 
@@ -76,10 +76,7 @@ static VLCTime *nullTime = nil;
 
 - (NSNumber *)numberValue
 {
-    if (value)
-        return [value copy];
-    else
-        return nil;
+    return value ? [value copy] : nil;
 }
 
 - (NSString *)stringValue
