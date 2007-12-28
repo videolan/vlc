@@ -360,8 +360,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * a raw approximation with time/position */
             if( i_ret && i_query == DEMUX_GET_LENGTH &&!p_sys->i_bitrate_avg )
             {
-                float f_pos = (double)( stream_Tell( p_demux->s ) ) /
-                              (double)( stream_Size( p_demux->s ) );
+                float f_pos = (double)(uint64_t)( stream_Tell( p_demux->s ) ) /
+                              (double)(uint64_t)( stream_Size( p_demux->s ) );
                 /* The first few seconds are guaranteed to be very whacky,
                  * don't bother trying ... Too bad */
                 if( f_pos < 0.01 ||
