@@ -208,7 +208,14 @@ static int Open( vlc_object_t *p_this )
     /* Autodetect mmap() support */
     if (p_sys->b_pace_control && S_ISREG (st.st_mode) && (st.st_size > 0))
     {
-        void *addr = mmap (NULL, 1, PROT_READ, MAP_PRIVATE, fd, 0);
+        /* TODO: Do not allow PROT_WRITE, we should not need it.
+         * However, this far, "block" ownership seems such that whoever
+         * "receives" a block can freely modify its content. Hence we _may_
+         * need PROT_WRITE not to default memory protection.
+         * NOTE: With MAP_PRIVATE, changes are not committed to the underlying
+         * file, write open permission is not required.
+         */
+        void *addr = mmap (NULL, 1, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
         if (addr != MAP_FAILED)
         {
             /* Does the file system support mmap? */
