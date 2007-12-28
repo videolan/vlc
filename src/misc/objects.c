@@ -467,6 +467,59 @@ void __vlc_object_unlock( vlc_object_t *obj )
     vlc_mutex_unlock( &obj->object_lock );
 }
 
+#ifdef WIN32
+# include <winsock2.h>
+# include <ws2tcpip.h>
+
+/**
+ * select()-able pipes emulated using Winsock
+ */
+static int pipe (int fd[2])
+{
+    SOCKADDR_IN addr;
+    int addrlen = sizeof (addr);
+
+    SOCKET l = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP), a,
+           c = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if ((l == INVALID_SOCKET) || (c == INVALID_SOCKET))
+        goto error;
+
+    memset (&addr, 0, sizeof (addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+    if (bind (l, (PSOCKADDR)&addr, sizeof (addr))
+     || getsockname (l, (PSOCKADDR)&addr, &addrlen)
+     || listen (l, 1)
+     || connect (c, (PSOCKADDR)&addr, addrlen))
+        goto error;
+
+    a = accept (l, NULL, NULL);
+    if (a == INVALID_SOCKET)
+        goto error;
+
+    closesocket (l);
+    shutdown (a, 0);
+    shutdown (c, 1);
+    fd[0] = c;
+    fd[1] = a;
+    return 0;
+
+error:
+    if (l != INVALID_SOCKET)
+        closesocket (l);
+    if (c != INVALID_SOCKET)
+        closesocket (c);
+    return -1;
+}
+
+#undef  read
+#define read( a, b, c )  recv (a, b, c, 0)
+#undef  write
+#define write( a, b, c ) send (a, b, c, 0)
+#undef  close
+#define close( a )       closesocket (a)
+#endif /* WIN32 */
+
 /**
  * Returns the readable end of a pipe that becomes readable whenever
  * an object is signaled. This can be used to wait for VLC object events
@@ -492,11 +545,7 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
         /* This can only ever happen if someone killed us without locking */
         assert( pipes[0] == -1 );
 
-#ifndef WIN32
         if( pipe( pipes ) )
-#else
-        errno = ENOSYS;
-#endif
             return -1;
     }
 
