@@ -1093,13 +1093,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             s_rect.size.width  = p_vout->i_window_width;
             s_rect.size.height = p_vout->i_window_height;
-
-            /* go to our default position, if set */
-            if( var_GetInteger( p_vout, "video-x" ) > -1 )
-                s_rect.origin.x = var_GetInteger( p_vout, "video-x" );
-            if( var_GetInteger( p_vout, "video-y" ) > -1 )
-                s_rect.origin.y = var_GetInteger( p_vout, "video-y" );
-            msg_Dbg( p_vout, "vout will open at %i:%i", s_rect.origin.x, s_rect.origin.y );
         }
         else
         {
@@ -1115,7 +1108,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         if( !s_frame )
         {
-            msg_Warn( p_vout, "no frame found, centering vout" );
             [self center];
         }
     }
