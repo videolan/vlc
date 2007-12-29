@@ -30,6 +30,7 @@
 #import <VLC/VLCMediaList.h>
 #import <VLC/VLCMediaListAspect.h>
 #import <VLC/VLCMediaDiscoverer.h>
+#import <VLC/VLCMediaPlayer.h>
 #import <VLC/VLCTime.h>
 #import <VLC/VLCVideoView.h>
 
