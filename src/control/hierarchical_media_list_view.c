@@ -80,6 +80,7 @@ hierarch_media_list_view_children_at_index( libvlc_media_list_view_t * p_mlv,
     p_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, index, p_e );
     if( !p_md ) return NULL;
     p_submlist = libvlc_media_descriptor_subitems( p_md, p_e );
+    libvlc_media_descriptor_release( p_md );
     if( !p_submlist ) return NULL;
     return libvlc_media_list_hierarchical_view( p_submlist, p_e );
 }
