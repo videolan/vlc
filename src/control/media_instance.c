@@ -174,16 +174,17 @@ input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_instance_t * p_mi = p_userdata;
     vlc_value_t val;
  
-    if (!strcmp(psz_cmd, "intf" /* "-change" no need to go further */))
+    if (!strncmp(psz_cmd, "intf", 4 /* "-change" no need to go further */))
     {
+        vlc_value_t val2;
         input_thread_t * p_input = (input_thread_t *)p_this;
-        var_Get( p_input, "position", &val );
 
+        var_Get( p_input, "time", &val );
         if ((val.i_time % I64C(500000)) != 0)
             return VLC_SUCCESS; /* No need to have a better precision */
-        var_Get( p_input, "state", &val );
 
-        if( val.i_int != PLAYING_S )
+        var_Get( p_input, "state", &val2 );
+        if( val2.i_int != PLAYING_S )
             return VLC_SUCCESS; /* Don't send the position while stopped */
     }
     else
