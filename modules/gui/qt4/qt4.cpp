@@ -283,6 +283,7 @@ static void Init( intf_thread_t *p_intf )
     else
     /*if( p_intf->pf_show_dialog )*/
         vlc_thread_ready( p_intf );
+#ifdef ENABLE_NLS
     // Translation - get locale
     QLocale ql = QLocale::system();
     // Translations for qt's own dialogs
@@ -299,7 +300,7 @@ static void Init( intf_thread_t *p_intf )
     if (!b_loaded)
         msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
     app->installTranslator( &qtTranslator );
-
+#endif  //ENABLE_NLS
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )
     {
