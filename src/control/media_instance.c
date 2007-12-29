@@ -151,7 +151,7 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
             break;
         case ERROR_S:
             libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Error, NULL);
-            event.type = libvlc_MediaInstancePlayed;
+            event.type = libvlc_MediaInstanceReachedEnd; /* Because ERROR_S is buggy */
             break;
         default:
             return VLC_SUCCESS;
@@ -206,16 +206,13 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
 
     if (!strncmp(psz_cmd, "intf", 4 /* "-change" no need to go further */))
     {
-        vlc_value_t val2;
         input_thread_t * p_input = (input_thread_t *)p_this;
+    
+        var_Get( p_input, "state", &val );
+        if( val.i_int != PLAYING_S )
+            return VLC_SUCCESS; /* Don't send the position while stopped */
 
         var_Get( p_input, "time", &val );
-        if ((val.i_time % I64C(500000)) != 0)
-            return VLC_SUCCESS; /* No need to have a better precision */
-
-        var_Get( p_input, "state", &val2 );
-        if( val2.i_int != PLAYING_S )
-            return VLC_SUCCESS; /* Don't send the position while stopped */
     }
     else
         val.i_time = newval.i_time;
