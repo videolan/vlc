@@ -192,4 +192,7 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 - (float)position;
 - (void)setPosition:(float)newPosition;
+
+- (BOOL)isSeekable;
+
 @end

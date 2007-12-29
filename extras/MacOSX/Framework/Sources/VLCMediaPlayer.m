@@ -58,7 +58,6 @@ static void HandleMediaInstanceVolumeChanged(const libvlc_event_t *event, void *
 static void HandleMediaTimeChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    NSLog(@"time!");
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaPlayerTimeChanged:) 
                                        withArgumentAsObject:[NSNumber numberWithLongLong:event->u.media_instance_time_changed.new_time]];
@@ -120,9 +119,6 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t *event, void *s
 @end
 
 @implementation VLCMediaPlayer
-+ (void)initialize {
-    [self setKeys:[NSArray arrayWithObject:@"state"] triggerChangeNotificationsForDependentKey:@"playing"];
-}
 
 - (id)init
 {
@@ -133,6 +129,8 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t *event, void *s
 {
     if (self = [super init])
     {
+        [VLCMediaPlayer setKeys:[NSArray arrayWithObject:@"state"] triggerChangeNotificationsForDependentKey:@"playing"];
+        [VLCMediaPlayer setKeys:[NSArray arrayWithObjects:@"state", @"media", nil] triggerChangeNotificationsForDependentKey:@"seekable"];
         delegate = nil;
         media = nil;
         cachedTime = [[VLCTime nullTime] retain];
@@ -542,10 +540,12 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
 {
     return cachedState;
 }
+
 - (float)position
 {
     return position;
 }
+
 - (void)setPosition:(float)newPosition
 {
     libvlc_exception_t ex;
@@ -553,6 +553,16 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_media_instance_set_position( instance, newPosition, &ex );
     quit_on_exception( &ex );
 }
+
+- (BOOL)isSeekable
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    BOOL ret = libvlc_media_instance_is_seekable( instance, &ex );
+    quit_on_exception( &ex );
+    return ret;
+}
+
 @end
 
 @implementation VLCMediaPlayer (Private)
