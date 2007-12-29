@@ -104,18 +104,18 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 /*****************************************************************************
  * Listen to vlc_InputItemAddSubItem event
  *****************************************************************************/
-static void install_input_item_observer( playlist_item_t * p_item,
-                                         input_item_t * p_input )
+static void install_input_item_observer( playlist_item_t * p_item )
 {
-    vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
+    vlc_event_attach( &p_item->p_input->event_manager,
+                      vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
                       p_item );
 }
 
-static void uninstall_input_item_observer( playlist_item_t * p_item,
-                                           input_item_t * p_input )
+static void uninstall_input_item_observer( playlist_item_t * p_item )
 {
-    vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
+    vlc_event_detach( &p_item->p_input->event_manager,
+                      vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
                       p_item );
  
@@ -156,7 +156,7 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
     p_item->i_flags = 0;
     p_item->p_playlist = p_playlist;
 
-    install_input_item_observer( p_item, p_input );
+    install_input_item_observer( p_item );
 
     pl_Release( p_item->p_playlist );
 
@@ -170,7 +170,7 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
 /** Delete a playlist item and detach its input item */
 int playlist_ItemDelete( playlist_item_t *p_item )
 {
-    uninstall_input_item_observer( p_item, p_item->p_input );
+    uninstall_input_item_observer( p_item );
 
     vlc_gc_decref( p_item->p_input );
     free( p_item );
