@@ -24,6 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "VLCMedia.h"
+#import "VLCVideoView.h"
+#import "VLCTime.h"
 
 /* Notification Messages */
 extern NSString * VLCMediaPlayerTimeChanged;
@@ -61,6 +63,8 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
     void *instance;            //  Internal
     VLCMedia *media;        //< Current media being played
     VLCTime *cachedTime;
+    VLCMediaPlayerState cachedState;
+    float position;
 }
 
 /* Initializers */
@@ -181,4 +185,11 @@ extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  * \see VLCMediaState
  */
 - (VLCMediaPlayerState)state;
+
+/**
+ * Returns the receiver's position in the reading. 
+ * \return A number between 0 and 1. indicating the position
+ */
+- (float)position;
+- (void)setPosition:(float)newPosition;
 @end
