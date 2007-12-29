@@ -305,6 +305,7 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaInstancePlayed,
     libvlc_MediaInstancePaused,
     libvlc_MediaInstanceReachedEnd,
+    libvlc_MediaInstanceTimeChanged,
     libvlc_MediaInstancePositionChanged,
 
     libvlc_MediaListItemAdded,
@@ -368,8 +369,12 @@ typedef struct libvlc_event_t
         /* media instance */
         struct
         {
-            long int new_position;
+            float new_position;
         } media_instance_position_changed;
+        struct
+        {
+            long int new_time;
+        } media_instance_time_changed;
 
         /* media list */
         struct
@@ -414,7 +419,8 @@ typedef struct libvlc_event_t
             libvlc_media_descriptor_t * item;
             int index;
         } media_list_view_will_delete_item;
-        /* media list view */
+
+        /* media discoverer */
         struct
         {
             void * unused;

@@ -213,10 +213,12 @@ static const char * event_type_to_name[] =
     EVENT(libvlc_MediaDescriptorDurationChanged),
     EVENT(libvlc_MediaDescriptorPreparsedChanged),
     EVENT(libvlc_MediaDescriptorFreed),
+    EVENT(libvlc_MediaDescriptorStateChanged),
 
     EVENT(libvlc_MediaInstancePlayed),
     EVENT(libvlc_MediaInstancePaused),
     EVENT(libvlc_MediaInstanceReachedEnd),
+    EVENT(libvlc_MediaInstanceTimeChanged),
     EVENT(libvlc_MediaInstancePositionChanged),
 
     EVENT(libvlc_MediaListItemAdded),
@@ -231,7 +233,10 @@ static const char * event_type_to_name[] =
 
     EVENT(libvlc_MediaListPlayerPlayed),
     EVENT(libvlc_MediaListPlayerNextItemSet),
-    EVENT(libvlc_MediaListPlayerStopped)
+    EVENT(libvlc_MediaListPlayerStopped),
+
+    EVENT(libvlc_MediaDiscovererStarted),
+    EVENT(libvlc_MediaDiscovererEnded)
 #undef EVENT
 };
 static const char * unkwown_event_name = "Unknown Event";
@@ -240,7 +245,7 @@ const char * libvlc_event_type_name( libvlc_event_type_t event_type )
 {
     if( event_type >= sizeof(event_type_to_name)/sizeof(event_type_to_name[0]))
         return unkwown_event_name;
-    return strdup(event_type_to_name[event_type]);
+    return event_type_to_name[event_type];
 }
 
 /**************************************************************************
