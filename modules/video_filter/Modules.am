@@ -35,4 +35,4 @@ SOURCES_alphamask = alphamask.c
 SOURCES_gaussianblur = gaussianblur.c
 SOURCES_grain = grain.c
 SOURCES_seamcarving = seamcarving.c
-noinst_HEADERS = filter_common.h
+noinst_HEADERS = filter_common.h filter_picture.h
