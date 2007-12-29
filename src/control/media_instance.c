@@ -132,9 +132,6 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    if( newval.i_int == oldval.i_int )
-        return VLC_SUCCESS; /* No change since last time, don't propagate */
-
     switch ( newval.i_int )
     {
         case END_S:
@@ -523,6 +520,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         var_Set( p_input_thread, "drawable", val );
     }
     var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
+    var_AddCallback( p_input_thread, "seekable", input_state_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
 
@@ -796,10 +794,36 @@ libvlc_state_t libvlc_media_instance_get_state(
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if ( !p_input_thread )
+    {
+        /* We do return the right value, no need to throw an exception */
+        if( libvlc_exception_raised( p_e ) )
+            libvlc_exception_clear( p_e );
         return libvlc_Stopped;
+    }
 
     var_Get( p_input_thread, "state", &val );
     vlc_object_release( p_input_thread );
 
     return vlc_to_libvlc_state(val.i_int);
+}
+
+vlc_bool_t libvlc_media_instance_is_seekable(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if ( !p_input_thread )
+    {
+        /* We do return the right value, no need to throw an exception */
+        if( libvlc_exception_raised( p_e ) )
+            libvlc_exception_clear( p_e );
+        return VLC_FALSE;
+    }
+    var_Get( p_input_thread, "seekable", &val );
+    vlc_object_release( p_input_thread );
+
+    return val.b_bool;
 }

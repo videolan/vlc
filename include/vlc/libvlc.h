@@ -382,6 +382,10 @@ VLC_PUBLIC_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
 VLC_PUBLIC_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
                                 libvlc_instance_t *, libvlc_exception_t * );
 
+VLC_PUBLIC_API vlc_bool_t libvlc_media_instance_is_seekable(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e );
+
 /** @}*/
 
 /*****************************************************************************
