@@ -562,7 +562,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     BOOL b_playing = NO;
     
-    if( [o_btn_play image] == o_img_play_pressed )
+    if( [o_btn_play alternateImage] == o_img_play_pressed )
         b_playing = YES;
     
     if( [NSColor currentControlTint] == NSGraphiteControlTint )
@@ -595,9 +595,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     
     if( b_playing )
-        [o_btn_play setImage: o_img_play_pressed];
+        [o_btn_play setAlternateImage: o_img_play_pressed];
     else
-        [o_btn_play setImage: o_img_pause_pressed];
+        [o_btn_play setAlternateImage: o_img_pause_pressed];
 }
 
 - (void)initStrings

@@ -77,13 +77,16 @@
 
 - (void)controlTintChanged
 {
+    BOOL b_playing = NO;
+    if( [o_btn_play alternateImage] == o_img_play_pressed )
+        b_playing = YES;
+    
     if( [NSColor currentControlTint] == NSGraphiteControlTint )
     {
         o_img_play_pressed = [NSImage imageNamed: @"play_embedded_graphite"];
         o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_graphite"];
         [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_embedded_graphite"]];
         [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_embedded_graphite"]];
-        [o_btn_play setAlternateImage: o_img_play_pressed];
         [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_graphite"]];
     }
     else
@@ -92,9 +95,13 @@
         o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_blue"];
         [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_embedded_blue"]];
         [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_embedded_blue"]];
-        [o_btn_play setAlternateImage: o_img_play_pressed];
         [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_blue"]];
     }
+    
+    if( b_playing )
+        [o_btn_play setAlternateImage: o_img_play_pressed];
+    else
+        [o_btn_play setAlternateImage: o_img_pause_pressed];
 }
 
 - (void)dealloc
