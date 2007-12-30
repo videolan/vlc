@@ -456,7 +456,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     QGridLayout *blablaLayout = new QGridLayout( blabla );
     QLabel *text = new QLabel( qtr(
         "<p>The <i>VideoLAN Team</i> doesn't like when an application goes "
-        "online without authorisation.</p>\n "
+        "online without authorization.</p>\n "
         "<p><i>VLC media player</i> can request limited information on "
         "Internet, espically to get CD Covers and songs metadata or to know "
         "if updates are available.</p>\n"
