@@ -643,7 +643,7 @@ VLC.app: vlc
 	    ln -sfn `pwd`/$${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/`basename $${i}` ; \
 	  done ; \
 	fi
-	ln -sfn $(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
+	ln -sfn `pwd`/$(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
