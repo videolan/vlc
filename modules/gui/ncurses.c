@@ -667,11 +667,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case ' ':
                 if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ' )
                 {
-                    int i_size_entry = strlen( p_sys->psz_current_dir ) +
+                    int i_size_entry = strlen( "directory://" ) +
+                                       strlen( p_sys->psz_current_dir ) +
                                        strlen( p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) + 2;
                     char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
 
-                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
+                    sprintf( psz_uri, "directory://%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path );
 
                     playlist_item_t *p_parent = p_sys->p_node;
                     if( !p_parent )
