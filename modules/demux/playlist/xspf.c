@@ -537,19 +537,29 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 
                     if( psz_uri )
                     {
-                        if( p_demux->p_sys->psz_base &&
+                        if( ( p_demux->p_sys->psz_base ||
+                              strrchr( p_demux->psz_path, DIR_SEP_CHAR ) ) &&
                             !strstr( psz_uri, "://" ) )
                         {
-                           char* psz_tmp = malloc(
-                                   strlen(p_demux->p_sys->psz_base) +
-                                   strlen(psz_uri) +1 );
+                           char *psz_baseref = p_demux->p_sys->psz_base;
+                           size_t i_baselen;
+                           if( psz_baseref )
+                               i_baselen = strlen( psz_baseref );
+                           else
+                           {
+                               psz_baseref = p_demux->psz_path;
+                               i_baselen = strrchr( psz_baseref, DIR_SEP_CHAR )
+                                            - psz_baseref + 1;
+                           }
+                           char* psz_tmp = malloc( i_baselen +
+                                   strlen( psz_uri ) + 1 );
                            if( !psz_tmp )
                            {
                                msg_Err( p_demux, "out of memory");
                                return VLC_FALSE;
                            }
-                           sprintf( psz_tmp, "%s%s",
-                                    p_demux->p_sys->psz_base, psz_uri );
+                           strncpy( psz_tmp, psz_baseref, i_baselen );
+                           strcpy( psz_tmp + i_baselen, psz_uri );
                            free( psz_uri );
                            psz_uri = psz_tmp;
                         }
