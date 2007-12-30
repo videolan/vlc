@@ -567,6 +567,10 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
     libvlc_media_list_hierarchical_view( libvlc_media_list_t *,
                                          libvlc_exception_t * );
 
+VLC_PUBLIC_API libvlc_media_list_view_t *
+    libvlc_media_list_hierarchical_node_view( libvlc_media_list_t *,
+                                              libvlc_exception_t * );
+
 VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_list_event_manager( libvlc_media_list_t *,
                                      libvlc_exception_t * );
