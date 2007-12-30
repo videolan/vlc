@@ -112,6 +112,7 @@ struct intf_sys_t
     BOOL nib_extended_loaded;   /* extended nibfile */
     BOOL nib_bookmarks_loaded;  /* bookmarks nibfile */
     BOOL nib_sfilters_loaded;   /* sfilters nibfile */
+    BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_update_loaded;     /* update nibfile */
 
     IBOutlet id o_window;       /* main window    */

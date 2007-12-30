@@ -108,9 +108,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (void)showPrefs
 {
-    /* load our nib (if not already loaded) */
-    [NSBundle loadNibNamed:@"Preferences" owner:self];
-
     [o_prefs_window center];
     [o_prefs_window makeKeyAndOrderFront:self];
 }

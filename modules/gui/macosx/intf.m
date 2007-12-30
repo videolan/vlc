@@ -385,7 +385,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
     o_about = [[VLAboutBox alloc] init];
-    o_prefs = nil;
+    o_prefs = [[VLCPrefs alloc] init];
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
     o_extended = nil;
@@ -1737,7 +1737,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     
     if( nib_about_loaded && o_about )
         [o_about release];
- 
+    
+    if( nib_prefs_loaded && o_prefs )
+        [o_prefs release];
+    
     if( nib_open_loaded && o_open )
         [o_open release];
  
@@ -1948,9 +1951,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     
 - (IBAction)viewPreferences:(id)sender
 {
-/* GRUIIIIIIIK */
-    if( o_prefs == nil )
-        o_prefs = [[VLCPrefs alloc] init];
+    if( !nib_prefs_loaded )
+        nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: self];
+
     [o_prefs showPrefs];
 }
 
