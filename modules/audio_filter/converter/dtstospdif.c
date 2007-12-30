@@ -171,7 +171,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         if( p_filter->output.i_format == VLC_FOURCC('s','p','d','b') )
         {
             p_filter->p_libvlc->pf_memcpy( p_out, p_sync_be, 6 );
-            p_out[4] = i_ac5_spdif_type;
+            p_out[5] = i_ac5_spdif_type;
             p_out[6] = (( i_length ) >> 5 ) & 0xFF;
             p_out[7] = ( i_length << 3 ) & 0xFF;
         }
