@@ -229,6 +229,16 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     return hierarchicalAspect;
 }
 
+- (VLCMediaListAspect *)hierarchicalNodeAspect
+{
+    if( hierarchicalAspect )
+        return hierarchicalAspect;
+    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view( p_mlist, NULL );
+    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv] retain];
+    libvlc_media_list_view_release( p_mlv );
+    return hierarchicalAspect;
+}
+
 - (VLCMediaListAspect *)flatAspect
 {
     if( flatAspect )

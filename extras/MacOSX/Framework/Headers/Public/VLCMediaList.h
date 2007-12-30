@@ -67,5 +67,6 @@ extern NSString * VLCMediaListItemDeleted;
 
 /* Media list aspect */
 - (VLCMediaListAspect *)hierarchicalAspect;
+- (VLCMediaListAspect *)hierarchicalNodeAspect;
 - (VLCMediaListAspect *)flatAspect;
 @end
