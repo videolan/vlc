@@ -457,7 +457,7 @@ static int Demux( demux_t *p_demux )
                             psz_string[i_strlen] = '\0';
                             p_input = input_ItemNew( p_playlist, psz_string, psz_title_asx );
                             input_ItemCopyOptions( p_current_input, p_input );
-                            input_ItemAddSubItem( p_current_input, p_input );
+                            input_ItemAddSubItem( p_current_input, p_input, VLC_FALSE );
                             free( psz_string );
                         }
                         else continue;
@@ -526,7 +526,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_copyright_entry ) input_item_SetCopyright( p_entry, psz_copyright_entry );
                     if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
                     if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
-                    input_ItemAddSubItem( p_current_input, p_entry );
+                    input_ItemAddSubItem( p_current_input, p_entry, VLC_FALSE );
                     vlc_gc_decref( p_entry );
                 }
 

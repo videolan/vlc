@@ -45,10 +45,11 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     input_item_t * p_parent, * p_child;
     playlist_item_t * p_child_in_category;
     playlist_item_t * p_item_in_category;
-    vlc_bool_t b_play;
+    vlc_bool_t b_play, b_node;
 
     p_parent = p_event->p_obj;
     p_child = p_event->u.input_item_subitem_added.p_new_child;
+    b_node = p_event->u.input_item_subitem_added.b_node;
 
     PL_LOCK;
     b_play = var_CreateGetBool( p_playlist, "playlist-autostart" );
@@ -64,7 +65,6 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
     if( !p_child_in_category )
     {
-        /* Then, transform to a node if needed */
         p_item_in_category = playlist_ItemFindFromInputAndRoot(
                                 p_playlist, p_parent->i_id,
                                 p_playlist->p_root_category,
@@ -78,17 +78,23 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
         b_play = b_play && p_item_in_category == p_playlist->status.p_item;
 
-        /* If this item is already a node don't transform it */
-        if( p_item_in_category->i_children == -1 )
-        {
-            p_item_in_category = playlist_ItemToNode( p_playlist,
-                    p_item_in_category, VLC_TRUE );
-            p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
-        }
- 
+        /* If you want to use vlc_input_item_subitem_added event, 
+         * you must explicitely create nodes */
+        assert( p_item_in_category->i_children != -1 );
+
         playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
                 PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
                 NULL, NULL,  VLC_TRUE );
+
+        if( b_node )
+        {
+            playlist_item_t *p_pl_item, *p_new_pl_item;
+            p_pl_item = playlist_ItemFindFromInputAndRoot( p_playlist, 
+                    p_child->i_id, p_playlist->p_root_category, VLC_FALSE );
+            p_new_pl_item = playlist_ItemToNode( p_playlist, p_pl_item,
+                    VLC_TRUE );
+            p_new_pl_item->p_input->i_type = ITEM_TYPE_NODE;
+        }
 
         if( b_play )
         {
@@ -412,7 +418,6 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
 /**
  * Transform an item to a node. Return the node in the category tree, or NULL
  * if not found there
- * This function must be entered without the playlist lock
  */
 playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                       playlist_item_t *p_item,

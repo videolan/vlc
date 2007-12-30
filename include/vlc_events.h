@@ -139,6 +139,7 @@ typedef struct vlc_event_t
         struct vlc_input_item_subitem_added
         {
             input_item_t * p_new_child;
+            vlc_bool_t b_node;
         } input_item_subitem_added;
         struct vlc_input_item_duration_changed
         {

@@ -288,7 +288,7 @@ static int Demux( demux_t *p_demux )
                                                 "%s bytes",
                                                 psz_item_size );
                     }
-                    input_ItemAddSubItem( p_current_input, p_input );
+                    input_ItemAddSubItem( p_current_input, p_input, VLC_FALSE );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_item_name );
                     FREENULL( psz_item_mrl );

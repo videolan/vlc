@@ -126,8 +126,9 @@ int Demux( demux_t *p_demux )
         input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
         if( p_new_input )
         {
-            input_ItemAddSubItem( p_current_input, p_new_input );
+            input_ItemAddSubItem( p_current_input, p_new_input, VLC_FALSE );
         }
+        vlc_gc_decref( p_new_input );
     }
 
     HANDLE_PLAY_AND_RELEASE;
@@ -712,11 +713,11 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return VLC_FALSE;
         }
-        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc:skip",
+        p_new_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), "vlc:nop",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
-            input_ItemAddSubItem( p_input_item, p_new_input );
+            input_ItemAddSubItem( p_input_item, p_new_input, VLC_TRUE );
             p_input_item = p_new_input;
         }
         free( psz_title );
@@ -891,8 +892,9 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
     p_new_input = p_demux->p_sys->pp_tracklist[ i_href ];
     if( p_new_input )
     {
-        input_ItemAddSubItem( p_input_item, p_new_input );
+        input_ItemAddSubItem( p_input_item, p_new_input, VLC_FALSE );
         p_demux->p_sys->pp_tracklist[i_href] = NULL;
+        vlc_gc_decref( p_new_input );
     }
 
     /* kludge for #1293 - XTAG sends ENDELEM for self closing tag */

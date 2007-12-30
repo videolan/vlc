@@ -96,6 +96,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 {
     playlist_t *p_playlist = user_data;
     input_item_t *p_item = p_event->u.input_item_subitem_added.p_new_child;
+    vlc_bool_t b_node = p_event->u.input_item_subitem_added.b_node;
 
     /* The media library input has one and only one option: "meta-file"
      * So we remove that unneeded option. */
@@ -107,6 +108,15 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
     playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
             VLC_FALSE, VLC_FALSE );
+
+    if( b_node )
+    {
+        playlist_item_t *p_pl_item, *p_new_pl_item;
+        p_pl_item = playlist_ItemFindFromInputAndRoot( p_playlist, p_item->i_id,
+                                    p_playlist->p_root_category, VLC_FALSE );
+        p_new_pl_item = playlist_ItemToNode( p_playlist, p_pl_item, VLC_FALSE );
+        p_new_pl_item->p_input->i_type = ITEM_TYPE_NODE;
+    }
 }
 
 int playlist_MLLoad( playlist_t *p_playlist )
