@@ -125,9 +125,7 @@ int Demux( demux_t *p_demux )
     {
         input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
         if( p_new_input )
-        {
             input_ItemAddSubItem( p_current_input, p_new_input, VLC_FALSE );
-        }
         vlc_gc_decref( p_new_input );
     }
 
@@ -490,13 +488,9 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    if( p_demux->p_sys->i_identifier <
+                    if( p_demux->p_sys->i_identifier == -1 ||
+                        p_demux->p_sys->i_identifier ==
                         p_demux->p_sys->i_tracklist_entries )
-                    {
-                        p_demux->p_sys->pp_tracklist[
-                            p_demux->p_sys->i_identifier ] = p_new_input;
-                    }
-                    else
                     {
                         if( p_demux->p_sys->i_identifier >
                             p_demux->p_sys->i_tracklist_entries )
@@ -508,6 +502,13 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                                      p_demux->p_sys->i_tracklist_entries,
                                      p_demux->p_sys->i_tracklist_entries,
                                      p_new_input );
+                        p_demux->p_sys->i_identifier = -1; 
+                    }
+                    else
+                    {
+                        msg_Err( p_demux, "Invalid identifier %d", p_demux->p_sys->i_identifier );
+                        p_demux->p_sys->i_identifier = -1;
+                        return VLC_FALSE;
                     }
                     return VLC_TRUE;
                 }
@@ -578,7 +579,8 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                         return VLC_FALSE;
                     }
                 }
-                else if( !strcmp( p_handler->name, "identifier" ) )
+                else if( !strcmp( p_handler->name, "identifier" ) && 
+                        *psz_value >= '0' && *psz_value <= '9' )
                 {
                     p_demux->p_sys->i_identifier = atoi( psz_value );
                 }
