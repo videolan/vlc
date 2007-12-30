@@ -467,7 +467,7 @@ VLC-release.app: vlc
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/old/vlm
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/images
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/requests
-    $(INSTALL) -m 644 $(srcdir)/share/http-lua/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/.hosts
+	$(INSTALL) -m 644 $(srcdir)/share/http-lua/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/.hosts
 	for i in $(srcdir)/share/http-lua/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/`basename $${i}` ; \
 	done ; \
@@ -500,8 +500,8 @@ VLC-release.app: vlc
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/vlm
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests
-    $(INSTALL) -m 644 $(srcdir)/share/http/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/.hosts
-    $(INSTALL) -m 644 $(srcdir)/share/http/old/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/.hosts
+	$(INSTALL) -m 644 $(srcdir)/share/http/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/.hosts
+	$(INSTALL) -m 644 $(srcdir)/share/http/old/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/.hosts
 	for i in $(srcdir)/share/http/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/`basename $${i}` ; \
 	done ; \
