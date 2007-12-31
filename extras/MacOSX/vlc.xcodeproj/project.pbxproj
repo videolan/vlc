@@ -211,6 +211,10 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>generic.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>audio/flac</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>FLAC Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -223,6 +227,10 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Generic.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/xspf+xml</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>XSPF Playlist</string>
 			<key>CFBundleTypeRole</key>
@@ -315,7 +323,11 @@
 				<string>spx</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
+			<string>ogg.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>audio/ogg</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Speex Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -474,7 +486,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>ogm.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Ogg Vorbis Media container</string>
+			<string>Ogg MPEG-4 Video File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -485,8 +497,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>ogg.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>audio/ogg</string>
+			</array>
 			<key>CFBundleTypeName</key>
-			<string>Ogg Multimedia File</string>
+			<string>Ogg Vorbis File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -497,6 +513,10 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>ogg.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>audio/ogg</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Ogg Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -509,6 +529,10 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>ogg.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>video/ogg</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Ogg Video File</string>
 			<key>CFBundleTypeRole</key>
@@ -521,8 +545,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>ogg.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/ogg</string>
+			</array>
 			<key>CFBundleTypeName</key>
-			<string>Ogg Multimedia File</string>
+			<string>Ogg Application File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -534,7 +562,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>ogg.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Annodex Multimedia File</string>
+			<string>Annodex Application File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -1115,7 +1143,7 @@
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
 		DC7F46EC08A183FC0027DB24 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Extended.nib; sourceTree = "<group>"; };
 		DC7F46F008A187F60027DB24 /* extended.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 5; name = extended.h; path = ../../modules/gui/macosx/extended.h; sourceTree = SOURCE_ROOT; usesTabs = 0; };
-		DC7F46F108A187F60027DB24 /* extended.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 5; includeInIndex = 0; name = extended.m; path = ../../modules/gui/macosx/extended.m; sourceTree = SOURCE_ROOT; };
+		DC7F46F108A187F60027DB24 /* extended.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; includeInIndex = 0; name = extended.m; path = ../../modules/gui/macosx/extended.m; sourceTree = SOURCE_ROOT; };
 		DCA00AA8075F948800E6BF46 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/About.nib; sourceTree = "<group>"; };
 		DCA693C20789DF8700139EC6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Open.nib; sourceTree = "<group>"; };
 		DCDA5E6408F94518009D93A8 /* about_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about_bg.png; path = Resources/about_bg.png; sourceTree = "<group>"; };
