@@ -156,59 +156,11 @@ struct public_key_t
 typedef struct public_key_t public_key_t;
 
 /* We trust this public key, and by extension, also keys signed by it. */
-
-//#define OLD 1 //Define OLD to use Videolan Key 2006, to test public key download
-
 static uint8_t videolan_public_key_longid[8] = {
-#ifdef OLD
-  0xC3, 0x67, 0xD8, 0xB9, 0x81, 0xCA, 0xCA, 0x84
-#else
   0x90, 0x28, 0x17, 0xE4, 0xAA, 0x5F, 0x4D, 0xE6 
-#endif
 };
 
 static uint8_t videolan_public_key[] = {
-#ifdef OLD
-"-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
-"Version: GnuPG v2.0.4 (FreeBSD)\n"
-"\n"
-"mQGiBEPBV9IRBADqm3i6AnMyZ2/iowBPZJrP3bwhcqx9EhJR5/N8Pz+QjhvLsY5P\n"
-"efH1381RlEk33dl0vEvKULFstqT2GO+vtdoE+35tf1YlYFvxy23qn3Gsn2IMM6pl\n"
-"e0AatBnxzD1Vtlh7+Xhm0PvGJilZeg/MamEK2A8hgwhj3aGxVfzdtkQ1HwCg9XIo\n"
-"PZ8x5W0r6sfRXYmCDR06NFEEANRY98cFWJdvBmutLzoSC9y7eLxyGzKofs7ikxKg\n"
-"myT1o3eraeCoZc+mIbZG4cZA9UqL/fmqZa/3gvnvDEzoI8u7u7gL6bu499XAnzVd\n"
-"VV4cwvzgAPnMiqhi0jNWlXbt4dyZ+sWDhkL+ivrg3HsRU9xQUvYv54YQT0FxmR+E\n"
-"yTnjA/9KoPRPwAWy7Q4R24CNSjMz5+075J2LUz0QDjTzcLh6Y/gI7oxNGsgsmLQ8\n"
-"LMgtPZPbNw1FP6c6LMdUsLBCuCBKr7K3qOMubZc4694kB28bnpvP9EiHqvF8XiuY\n"
-"lNNHzqFVCufAuSceg4B+INczF46i0KUT0xhsIkw0KMfofac+g7Q9VmlkZW9MQU4g\n"
-"QXV0b21hdGljIFNpZ25pbmcgS2V5ICgyMDA2KSA8dmlkZW9sYW5AdmlkZW9sYW4u\n"
-"b3JnPohGBBARAgAGBQJDwVhJAAoJEK0m7YKmyAW5enUAoKomp97VmvhcxzFFAWVq\n"
-"nVmgR5o1AJ9pDxHnR987+WpQJEb29fOGRCv9mIhGBBARAgAGBQJDwvoRAAoJEKe9\n"
-"h1GAZnhb3x0AnjPZNWxOxcgCm3pYNqvvoEG4Yn6lAKC25Llg8SZZ2ClPNK5a43Lm\n"
-"QSLm8ohGBBMRAgAGBQJDwqW1AAoJEMPsbb7dbRK9zUIAoMxt11NpDs2I6PWn5rs3\n"
-"kv2ERS/jAJ4lzBh03apWuHGRVTpa7JUwcuRrTIhGBBMRAgAGBQJDwveAAAoJEDlN\n"
-"xZEO1wTqjN8Ani62eTBkOmn48PiGgDxlv0HDKGY+AKCT8dJrDIvWRbioeVoZ2q32\n"
-"ro6nBohGBBMRAgAGBQJECI5aAAoJEMcpqsa+jGsuS4AAnRF5BHE4I5+x6LxpXwqI\n"
-"rJYaJlr6AKCDpSflz+eOARGyMVNZ+tfN7zuYP4hJBBARAgAJBQJEiFlSAgcAAAoJ\n"
-"EJ7/Di3F33VbbR8An2SLqQLhyCrSivMvhkY5y09u/JVyAJ9jLnR/JR/tP0bsaKSz\n"
-"+unF3Tb7YohlBBMRAgAmBQJDwVfSAhsDBQkB3+IABgsJCAcDAgQVAggDBBYCAwEC\n"
-"HgECF4AACgkQw2fYuYHKyoSRdACfcNQ3qoDA0PXABrljF5CctywanhoAmMZ9tbyn\n"
-"LFy4ELbzCCglS8aJrYS5Ag0EQ8FX4xAIAICyMekh4upMZcq/x3krQAQ8bVTzOd1h\n"
-"tcI4UV2voBEapdA7DA/xRpEjNO05o1LM/oq9Rzh8oQtEWf75vNeOLJfiVR1Vy3cz\n"
-"0+a45GR4xFSTHg9zl13OM/oLI5hXrp5O5Zwu6yIZqBRiQNoCifKNvM3nrPhkjszr\n"
-"TNMx2gH84DkoTDGh7th4Iar/t05Q9Ni3HS86LHOAJS4aEimPl/zqM3NyJnZDtlu1\n"
-"dQ0DT13ykHmofrEb4cLNBwER2KfhmR/o9f/ybpPwpUaL3Wo1jJYYEQscBHH0o1Rl\n"
-"OvLKwZrrkwEAuIJRGMWYYtFSecqr/kuSHKc5XQtx/mUnOy+Nrt7ooPcAAwUH+wWM\n"
-"Ce3G4L4dASjTeZlmd8ETUV5Y7iP9GUJrGHek1S5JJeiMKqjfoMVsshBTJlZPkUYq\n"
-"OwnJZzI5lxGD9SbkE2n9LUWGXll3GDbV0zXdzaG5/Efzq5BpISkpqyDszDxb9LPi\n"
-"XQD/EiYP9pqlivgCTIqtcxN0Pdr0ArW0q7/yBfqWe0Fw9JrxHFN8dzmBnZk/sUis\n"
-"ZIxcRWlK/mdfxgcbRSKsaqucToubwJvIONaW3y/zURjG/Ehdkh/NR7yEnMJN6/SY\n"
-"E8VgjwL9Wx1KfC8nuqkFhmSMoIVKOck+0lAU3iTpThyYlU0M1luJvkYT2+Enlc1P\n"
-"eqMK0FlDmF60NbnPuzOITwQYEQIADwUCQ8FX4wIbDAUJAd/iAAAKCRDDZ9i5gcrK\n"
-"hCMLAKDB2xwcJT9OFM6G/seEnVMWGBfzrACg8UyCfxX2mNWNPTE4MQ/xiaQ6VBM=\n"
-"=tVe2\n"
-"-----END PGP PUBLIC KEY BLOCK-----\n"
-#else
 "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
 "Version: GnuPG v2.0.4 (FreeBSD)\n"
 "\n"
@@ -243,7 +195,6 @@ static uint8_t videolan_public_key[] = {
 "oMPb2o2D9gSwQFKXhamx2YdrykHOAKDqQ1tHH3ULY5cLLAKVaQtsNhVEtQ==\n"
 "=qrc1\n"
 "-----END PGP PUBLIC KEY BLOCK-----\n"
-#endif
 };
 
 enum
@@ -274,6 +225,7 @@ struct update_t
     libvlc_int_t *p_libvlc;
     vlc_mutex_t lock;
     struct update_release_t release;    ///< Release (version)
+    public_key_t *p_pkey;
 };
 
 #define update_New( a ) __update_New( VLC_OBJECT( a ) )

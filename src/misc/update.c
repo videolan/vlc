@@ -28,8 +28,6 @@
  *   This file contains functions related to VLC and plugins update management
  */
 
-/* TODO: pgp verification of the status file, and downloaded binaries */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -43,6 +41,8 @@
 #include <vlc_update.h>
 #include <vlc_stream.h>
 #include <vlc_interface.h>
+
+#include <unistd.h> /* unlink() */
 
 /*****************************************************************************
  * Misc defines
@@ -81,7 +81,7 @@
  * Local Prototypes
  *****************************************************************************/
 static void EmptyRelease( update_t *p_update );
-static void GetUpdateFile( update_t *p_update );
+static vlc_bool_t GetUpdateFile( update_t *p_update );
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 );
 static char * size_str( long int l_size );
@@ -330,7 +330,8 @@ static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
  * We're given the file's url, we just append ".asc" to it and download 
  */
 static int download_signature(  vlc_object_t *p_this,
-                                signature_packet_v3_t *p_sig, char *psz_url )
+                                signature_packet_v3_t *p_sig,
+                                const char *psz_url )
 {
     char *psz_sig = (char*) malloc( strlen( psz_url ) + 4 + 1 ); /* ".asc" + \0 */
     if( !psz_sig )
@@ -593,7 +594,7 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
     if( !f )
         return NULL;
 
-    uint8_t buffer[4096]; //FIXME
+    uint8_t buffer[4096];
 
     gcry_md_hd_t hd;
     if( gcry_md_open( &hd, GCRY_MD_SHA1, 0 ) )
@@ -621,11 +622,9 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
 static public_key_t *download_key( vlc_object_t *p_this, const uint8_t *p_longid, const uint8_t *p_signature_issuer )
 {
     char *psz_url;
-    if( asprintf( &psz_url, "http://download.videolan.org/pub/keys/%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x.asc",
-                            p_longid[0], p_longid[1],
-                            p_longid[2], p_longid[3],
-                            p_longid[4], p_longid[5],
-                            p_longid[6], p_longid[7] ) == -1 )
+    if( asprintf( &psz_url, "http://download.videolan.org/pub/keys/%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X.asc",
+                    p_longid[0], p_longid[1], p_longid[2], p_longid[3],
+                    p_longid[4], p_longid[5], p_longid[6], p_longid[7] ) == -1 )
         return NULL;
 
     stream_t *p_stream = stream_UrlNew( p_this, psz_url );
@@ -764,6 +763,8 @@ update_t *__update_New( vlc_object_t *p_this )
 
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
+    
+    p_update->p_pkey = NULL;
 
     return p_update;
 }
@@ -780,8 +781,9 @@ void update_Delete( update_t *p_update )
 
     vlc_mutex_destroy( &p_update->lock );
 
-    FREENULL( p_update->release.psz_url );
-    FREENULL( p_update->release.psz_desc );
+    free( p_update->release.psz_url );
+    free( p_update->release.psz_desc );
+    free( p_update->p_pkey );
 
     free( p_update );
 }
@@ -807,9 +809,9 @@ static void EmptyRelease( update_t *p_update )
  * *p_update has to be locked when calling this function
  *
  * \param p_update pointer to update struct
- * \return nothing
+ * \return VLC_TRUE if the update is valid and authenticated
  */
-static void GetUpdateFile( update_t *p_update )
+static vlc_bool_t GetUpdateFile( update_t *p_update )
 {
     stream_t *p_stream = NULL;
     int i_major = 0;
@@ -817,6 +819,7 @@ static void GetUpdateFile( update_t *p_update )
     int i_revision = 0;
     unsigned char extra;
     char *psz_line = NULL;
+    char *psz_version_line = NULL;
 
     p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
@@ -834,6 +837,7 @@ static void GetUpdateFile( update_t *p_update )
         goto error;
     }
 
+    psz_version_line = psz_line;
     /* first line : version number */
     p_update->release.extra = 0;
     switch( sscanf( psz_line, "%i.%i.%i%c", &i_major, &i_minor, &i_revision, &extra ) )
@@ -847,7 +851,6 @@ static void GetUpdateFile( update_t *p_update )
             break;
         default:
             msg_Err( p_update->p_libvlc, "Update version false formated" );
-            free( psz_line );
             goto error;
     }
 
@@ -870,9 +873,130 @@ static void GetUpdateFile( update_t *p_update )
     }
     p_update->release.psz_desc = psz_line;
 
+    stream_Delete( p_stream );
+    p_stream = NULL;
+
+    /* Now that we know the status is valid, we must download its signature 
+     * to authenticate it */
+    signature_packet_v3_t sign;
+    if( download_signature( VLC_OBJECT( p_update->p_libvlc ), &sign, 
+            UPDATE_VLC_STATUS_URL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_update->p_libvlc, "Couldn't download signature of status file" );
+        goto error;
+    }
+
+    if( sign.type != BINARY_SIGNATURE && sign.type != TEXT_SIGNATURE )
+    {
+        msg_Err( p_update->p_libvlc, "Invalid signature type" );
+        goto error;
+    }
+
+    p_update->p_pkey = (public_key_t*)malloc( sizeof( public_key_t ) );
+    if( !p_update->p_pkey )
+        goto error;
+
+    if( parse_public_key( videolan_public_key, sizeof( videolan_public_key ),
+                        p_update->p_pkey, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_update->p_libvlc, "Couldn't parse embedded public key, something went really wrong..." );
+        FREENULL( p_update->p_pkey );
+        goto error;
+    }
+
+    if( memcmp( sign.issuer_longid, videolan_public_key_longid , 8 ) != 0 )
+    {
+        msg_Dbg( p_update->p_libvlc, "Need to download the GPG key" );
+        public_key_t *p_new_pkey = download_key(
+                VLC_OBJECT(p_update->p_libvlc),
+                sign.issuer_longid, videolan_public_key_longid );
+        if( !p_new_pkey )
+        {
+            msg_Err( p_update->p_libvlc, "Couldn't download GPG key" );
+            FREENULL( p_update->p_pkey );
+            goto error;
+        }
+
+        uint8_t *p_hash = key_sign_hash( p_new_pkey );
+        if( !p_hash )
+        {
+            msg_Err( p_update->p_libvlc, "Failed to hash signature" );
+            free( p_new_pkey );
+            FREENULL( p_update->p_pkey );
+            goto error;
+        }
+
+        if( verify_signature( VLC_OBJECT(p_update->p_libvlc),
+                    p_new_pkey->sig.r, p_new_pkey->sig.s,
+                    &p_update->p_pkey->key, p_hash ) == VLC_SUCCESS )
+        {
+            free( p_hash );
+            msg_Info( p_update->p_libvlc, "Key authenticated" );
+            free( p_update->p_pkey );
+            p_update->p_pkey = p_new_pkey;
+        }
+        else
+        {
+            free( p_hash );
+            msg_Err( p_update->p_libvlc, "Key signature invalid !\n" );
+            goto error;
+        }
+    }
+
+    gcry_md_hd_t hd;
+    if( gcry_md_open( &hd, GCRY_MD_SHA1, 0 ) )
+        goto error;
+
+    gcry_md_write( hd, psz_version_line, strlen( psz_version_line ) );
+    FREENULL( psz_version_line );
+    if( sign.type == TEXT_SIGNATURE )
+        gcry_md_putc( hd, '\r' );
+    gcry_md_putc( hd, '\n' );
+    gcry_md_write( hd, p_update->release.psz_url,
+                        strlen( p_update->release.psz_url ) );
+    if( sign.type == TEXT_SIGNATURE )
+        gcry_md_putc( hd, '\r' );
+    gcry_md_putc( hd, '\n' );
+    gcry_md_write( hd, p_update->release.psz_desc,
+                        strlen( p_update->release.psz_desc ) );
+    if( sign.type == TEXT_SIGNATURE )
+        gcry_md_putc( hd, '\r' );
+    gcry_md_putc( hd, '\n' );
+
+    gcry_md_putc( hd, sign.type );
+    gcry_md_write( hd, &sign.timestamp, 4 );
+
+    gcry_md_final( hd );
+
+    uint8_t *p_hash = gcry_md_read( hd, GCRY_MD_SHA1 );
+
+    if( p_hash[0] != sign.hash_verification[0] ||
+        p_hash[1] != sign.hash_verification[1] )
+    {
+        msg_Warn( p_update->p_libvlc, "Bad SHA1 hash for status file" );
+        free( p_hash );
+        goto error;
+    }
+
+    if( verify_signature( VLC_OBJECT(p_update->p_libvlc),
+            sign.r, sign.s, &p_update->p_pkey->key, p_hash ) != VLC_SUCCESS )
+    {
+        msg_Err( p_update->p_libvlc, "BAD SIGNATURE for status file" );
+        free( p_hash );
+        goto error;
+    }
+    else
+    {
+        msg_Info( p_update->p_libvlc, "Status file authenticated" );
+        free( p_hash );
+        return VLC_TRUE;
+    }
+
 error:
     if( p_stream )
         stream_Delete( p_stream );
+    free( psz_version_line );
+    return VLC_FALSE;
 }
 
 
@@ -913,14 +1037,15 @@ void update_Check( update_t *p_update, void (*pf_callback)( void* ), void *p_dat
 
 void update_CheckReal( update_check_thread_t *p_uct )
 {
+    vlc_bool_t b_ret;
     vlc_mutex_lock( &p_uct->p_update->lock );
 
     EmptyRelease( p_uct->p_update );
-    GetUpdateFile( p_uct->p_update );
-
+    b_ret = GetUpdateFile( p_uct->p_update );
     vlc_mutex_unlock( &p_uct->p_update->lock );
 
-    if( p_uct->pf_callback )
+    /* FIXME: return b_ret in pf_callback */
+    if( b_ret && p_uct->pf_callback )
         (p_uct->pf_callback)( p_uct->p_data );
 
     vlc_object_destroy( p_uct );
@@ -1049,7 +1174,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     if( !p_stream )
     {
         msg_Err( p_udt, "Failed to open %s for reading", p_update->release.psz_url );
-        goto error;
+        goto end;
     }
 
     /* Get the stream size */
@@ -1060,23 +1185,23 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     if( !psz_tmpdestfile )
     {
         msg_Err( p_udt, "The URL %s is false formated", p_update->release.psz_url );
-        goto error;
+        goto end;
     }
     psz_tmpdestfile++;
     if( asprintf( &psz_destfile, "%s%s", psz_destdir, psz_tmpdestfile ) == -1 )
-        goto error;
+        goto end;
 
     p_file = utf8_fopen( psz_destfile, "w" );
     if( !p_file )
     {
         msg_Err( p_udt, "Failed to open %s for writing", psz_destfile );
-        goto error;
+        goto end;
     }
 
     /* Create a buffer and fill it with the downloaded file */
     p_buffer = (void *)malloc( 1 << 10 );
     if( !p_buffer )
-        goto error;
+        goto end;
 
     psz_size = size_str( l_size );
     if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",  p_update->release.psz_url, psz_size, 0.0 ) != -1 )
@@ -1106,6 +1231,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     /* Finish the progress bar or delete the file if the user had canceled */
     fclose( p_file );
     p_file = NULL;
+
     if( !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
         if( asprintf( &psz_status, "%s\nDone %s (100.0%%)", p_update->release.psz_url, psz_size ) != -1 )
@@ -1115,9 +1241,54 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         }
     }
     else
-        remove( psz_destfile );
+    {
+        unlink( psz_destfile ); /* FIXME: use (and write) utf8_unlink() ? */
+        goto end;
+    }
 
-error:
+    signature_packet_v3_t sign;
+    if( download_signature( VLC_OBJECT( p_udt ), &sign,
+            p_update->release.psz_url ) != VLC_SUCCESS )
+    {
+        msg_Err( p_udt, "Couldn't download signature of status file" );
+        goto end;
+    }
+
+    if( sign.type != BINARY_SIGNATURE )
+    {
+        msg_Err( p_udt, "Invalid signature type" );
+        goto end;
+    }
+
+    uint8_t *p_hash = hash_sha1_from_file( psz_destfile, &sign );
+    if( !p_hash )
+    {
+        msg_Err( p_udt, "Unable to hash %s", psz_destfile );
+        unlink( psz_destfile );
+        goto end;
+    }
+
+    if( p_hash[0] != sign.hash_verification[0] ||
+        p_hash[1] != sign.hash_verification[1] )
+    {
+        msg_Err( p_udt, "Bad SHA1 hash for %s", psz_destfile );
+        unlink( psz_destfile );
+        goto end;
+    }
+
+    if( verify_signature( VLC_OBJECT(p_udt), sign.r, sign.s,
+                &p_update->p_pkey->key, p_hash ) != VLC_SUCCESS )
+    {
+        msg_Err( p_udt, "BAD SIGNATURE for %s", psz_destfile );
+        free( p_hash );
+        unlink( psz_destfile );
+        goto end;
+    }
+
+    msg_Info( p_udt, "%s authenticated", psz_destfile );
+    free( p_hash );
+
+end:
     if( p_stream )
         stream_Delete( p_stream );
     if( p_file )
