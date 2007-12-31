@@ -128,7 +128,6 @@ media_list_item_added( const libvlc_event_t * p_event, void * p_user_data )
     libvlc_media_list_view_t * p_mlv = p_user_data;
     libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
     install_md_listener( p_mlv, p_md );
-    printf("media_list_item_added\n");
     if( p_mlv->pf_ml_item_added ) p_mlv->pf_ml_item_added( p_event, p_mlv );
 }
 
