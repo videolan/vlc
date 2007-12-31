@@ -52,6 +52,8 @@ ml_item_added( const libvlc_event_t * p_event, libvlc_media_list_view_t * p_mlv 
     int index = vlc_array_count( &p_mlv->p_this_view_data->array );
     libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
     libvlc_media_descriptor_retain( p_md );
+    trace("appending item at index %d\n", index);
+
     libvlc_media_list_view_will_add_item( p_mlv, p_md, index );
     vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
     libvlc_media_list_view_item_added( p_mlv, p_md, index );
