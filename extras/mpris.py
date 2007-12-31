@@ -271,14 +271,22 @@ def icon_clicked(widget, event):
 # get playing status, modify the Play/Pause button accordingly
 def GetPlayStatus(widget):
     global playing
+    global shuffle
+    global loop
+    global repeat
     status = player.GetStatus()
-    if status == 0:
+
+    playing = status[0] == 0
+    if playing:
         img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        playing = True
     else:
         img_bt_toggle.set_from_stock("gtk-media-play", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        playing = False
-
+    shuffle = status[1] == 1
+    bt_shuffle.set_active( shuffle )
+    loop = status[2] == 1
+    bt_loop.set_active( loop )
+    repeat = status[3] == 1
+    bt_repeat.set_active( repeat )
 # loads glade file from the directory where the script is,
 # so we can use /path/to/mpris.py to execute it.
 import sys
