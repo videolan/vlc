@@ -121,6 +121,7 @@ Audio output and filters
  * Replay gain support
  * Audio playback when going slower/faster (no pitch filter yet)
  * New spatializer audio filter
+ * Correct DTS output via S/PDIF
 
 Stream output:
  * RTSP for TS-multiplexed broadcast streams
@@ -145,6 +146,7 @@ Interfaces:
  * Mac OS X
    * Improved video output features
    * Access to VideoLAN's Help Wiki within VLC
+   * New setting to disable the "Recent Items" service
  * Unix
    * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 

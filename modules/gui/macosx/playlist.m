@@ -994,7 +994,7 @@
 
     /* Recent documents menu */
     o_true_file = [NSURL fileURLWithPath: o_uri];
-    if( o_true_file != nil )
+    if( o_true_file != nil && (BOOL)config_GetInt( p_playlist, "macosx-recentitems" ) == YES )
     {
         [[NSDocumentController sharedDocumentController]
             noteNewRecentDocumentURL: o_true_file];

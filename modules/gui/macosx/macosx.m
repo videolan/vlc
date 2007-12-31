@@ -48,31 +48,29 @@ void E_(CloseVideoGL) ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 #define EMBEDDED_TEXT N_("Embedded video output")
-#define EMBEDDED_LONGTEXT N_( \
-   "Display the video in the controller window instead of a in separate window.")
+#define EMBEDDED_LONGTEXT N_( "Display the video in the controller window instead of a in separate window.")
 
 #define VDEV_TEXT N_("Video device")
 #define VDEV_LONGTEXT N_("Number of the screen to use by default to display " \
-    "videos in 'fullscreen'. The screen number correspondance can be found in "\
-    "the video device selection menu.")
+                         "videos in 'fullscreen'. The screen number correspondance can be found in "\
+                         "the video device selection menu.")
 
 #define OPAQUENESS_TEXT N_("Opaqueness")
-#define OPAQUENESS_LONGTEXT N_( \
-    "Set the transparency of the video output. 1 is non-transparent (default) " \
-    "0 is fully transparent.")
- 
+#define OPAQUENESS_LONGTEXT N_( "Set the transparency of the video output. 1 is non-transparent (default) " \
+                                "0 is fully transparent.")
+
 #define STRETCH_TEXT N_("Stretch video to fill window")
 #define STRETCH_LONGTEXT N_("Stretch the video to fill the entire window when "\
-        "resizing the video instead of keeping the aspect ratio and "\
-        "displaying black borders.")
+                            "resizing the video instead of keeping the aspect ratio and "\
+                            "displaying black borders.")
 
 #define BLACK_TEXT N_("Black screens in fullscreen")
 #define BLACK_LONGTEXT N_("In fullscreen mode, keep screen where there is no " \
-        "video displayed black" )
+                          "video displayed black" )
 
 #define BACKGROUND_TEXT N_("Use as Desktop Background")
 #define BACKGROUND_LONGTEXT N_("Use the video as the Desktop Background " \
-        "Desktop icons cannot be interacted with in this mode." )
+                               "Desktop icons cannot be interacted with in this mode." )
 
 #define FSPANEL_TEXT N_("Show Fullscreen controller")
 #define FSPANEL_LONGTEXT N_("Shows a lucent controller when moving the mouse " \
@@ -80,7 +78,11 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 
 #define AUTOPLAY_OSX_TEST N_("Auto-playback of new items")
 #define AUTOPLAY_OSX_LONGTEXT N_("Start playback of new items immediately " \
-        "once they were added." )
+                                 "once they were added." )
+
+#define RECENT_ITEMS_TEXT N_("Keep Recent Items")
+#define RECENT_ITEMS_LONGTEXT N_("By default, VLC keeps a list of the last 10 items. " \
+                                 "This feature can be disabled here.")
 
 vlc_module_begin();
     set_description( _("Mac OS X interface") );
@@ -89,11 +91,13 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
-                     VLC_FALSE );
+              VLC_FALSE );
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
-                     VLC_FALSE );
+              VLC_FALSE );
+    add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
+              VLC_FALSE );
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
-                     VLC_FALSE );
+              VLC_FALSE );
 
     add_submodule();
         set_description( _("Quartz video") );
@@ -105,13 +109,13 @@ vlc_module_begin();
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
                      VLC_FALSE );
         add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
-                     VLC_FALSE );
+                  VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
-                OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
+                              OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
         add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
                   VLC_FALSE );
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
-                     VLC_FALSE );
+                  VLC_FALSE );
     add_submodule();
         set_description( "Mac OS X OpenGL" );
         set_capability( "opengl provider", 100 );
