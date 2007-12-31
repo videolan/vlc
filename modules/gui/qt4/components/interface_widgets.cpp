@@ -117,7 +117,7 @@ void VideoWidget::release( void *p_win )
 
 /**********************************************************************
  * Background Widget. Show a simple image background. Currently,
- * it's a static cone.
+ * it's album art if present or cone.
  **********************************************************************/
 #define ICON_SIZE 128
 #define MAX_BG_SIZE 400
@@ -153,8 +153,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     backgroundLayout->setColumnStretch( 0, 1 );
     backgroundLayout->setColumnStretch( 2, 1 );
 
-    CONNECT( THEMIM, inputChanged( input_thread_t *),
-             this, update( input_thread_t * ) );
+    CONNECT( THEMIM->getIM(), artChanged( QString ), this, update( QString ) );
     resize( 300, 150 );
 }
 
@@ -162,9 +161,9 @@ BackgroundWidget::~BackgroundWidget()
 {
 }
 
-void BackgroundWidget::update( input_thread_t *p_input )
+void BackgroundWidget::update( QString url )
 {
-    if( !p_input || p_input->b_dead )
+    if( url.isNull() )
     {
         if( QDate::currentDate().dayOfYear() >= 354 )
             label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
@@ -173,11 +172,7 @@ void BackgroundWidget::update( input_thread_t *p_input )
         return;
     }
 
-    vlc_object_yield( p_input );
-    char *psz_arturl = input_item_GetArtURL( input_GetItem(p_input) );
-    vlc_object_release( p_input );
-
-    QString arturl = qfu( psz_arturl ).replace( "file://",QString("" ) );
+    QString arturl = url.replace( "file://",QString("" ) );
     if( arturl.isNull() )
     {
         if( QDate::currentDate().dayOfYear() >= 354 )
@@ -188,9 +183,8 @@ void BackgroundWidget::update( input_thread_t *p_input )
     else
     {
         label->setPixmap( QPixmap( arturl ) );
-        msg_Dbg( p_intf, "changing input b_need_update done %s", psz_arturl );
+        msg_Dbg( p_intf, "changing input b_need_update done ");
     }
-    free( psz_arturl );
 }
 
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )

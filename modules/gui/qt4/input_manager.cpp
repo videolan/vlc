@@ -96,6 +96,7 @@ void InputManager::update()
         i_old_playing_status = 0;
         emit statusChanged( END_S ); // see vlc_input.h, input_state_e enum
         delInput();
+        emit artChanged( "" );
         return;
     }
 
@@ -182,6 +183,16 @@ void InputManager::update()
     {
         i_old_playing_status = val.i_int;
         emit statusChanged( val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S );
+    }
+
+    QString url;
+    char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
+    url.sprintf("%s", psz_art );
+    free( psz_art );
+    if( artUrl != url )
+    {
+        emit artChanged( url );
+        artUrl = url;
     }
 }
 

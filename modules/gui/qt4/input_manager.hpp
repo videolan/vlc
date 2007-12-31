@@ -46,6 +46,7 @@ private:
     input_thread_t *p_input;
     int             i_old_playing_status;
     QString         old_name;
+    QString         artUrl;
     int             i_rate;
 public slots:
     void togglePlayPause();
@@ -76,6 +77,7 @@ signals:
 #endif
     /// Play/pause status
     void statusChanged( int );
+    void artChanged( QString );
 };
 
 class MainInputManager : public QObject

@@ -85,7 +85,7 @@ private:
 
 public slots:
     void toggle(){ TOGGLEV( this ); }
-    void update( input_thread_t * );
+    void update( QString );
 };
 
 class VisualSelector : public QFrame
