@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
- * $Id: VLCController.m 23286 2007-11-23 21:40:20Z pdherbemont $
+ * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *
@@ -42,6 +42,7 @@
 
 - (void)awakeFromNib
 {
+   // [NSException raise:@"Hello" format:@"Hello"];
     /***********************************
      * Register our bindings value transformer
      */

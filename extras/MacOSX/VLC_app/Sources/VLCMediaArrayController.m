@@ -50,7 +50,7 @@
 /* Implement drag and drop */
 - (NSDragOperation)tableView:(NSTableView*)tv validateDrop:(id <NSDraggingInfo>)info 
 				 proposedRow:(int)row proposedDropOperation:(NSTableViewDropOperation)op
-{    
+{
     return [contentMediaList isReadOnly] ? NSDragOperationNone : NSDragOperationGeneric;
 }
 
