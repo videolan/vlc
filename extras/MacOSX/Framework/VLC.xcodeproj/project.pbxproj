@@ -678,7 +678,7 @@
 				1DEB91AF08733DA50010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "VLC" */ = {
 			isa = XCConfigurationList;
@@ -687,7 +687,7 @@
 				1DEB91B308733DA50010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib-core-framework" */ = {
 			isa = XCConfigurationList;
@@ -696,7 +696,7 @@
 				633BD6D50D2ADE050012A314 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		633BD6DF0D2ADE6D0012A314 /* Build configuration list for PBXLegacyTarget "vlc-core" */ = {
 			isa = XCConfigurationList;
@@ -705,7 +705,7 @@
 				633BD6DE0D2ADE4F0012A314 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		633BD6EC0D2ADF460012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib" */ = {
 			isa = XCConfigurationList;
@@ -714,7 +714,7 @@
 				633BD6E60D2ADF030012A314 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		63FFDBD50D2AE3250092FC96 /* Build configuration list for PBXAggregateTarget "vlc-configure" */ = {
 			isa = XCConfigurationList;
@@ -723,7 +723,7 @@
 				63FFDBD10D2AE2AE0092FC96 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

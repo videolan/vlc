@@ -621,7 +621,7 @@
 				633BD70F0D2AE0DF0012A314 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		637F33F80D2AEE67001E70AB /* Build configuration list for PBXAggregateTarget "vlc-framework-app" */ = {
 			isa = XCConfigurationList;
@@ -630,7 +630,7 @@
 				637F33E10D2AEE05001E70AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "VLC" */ = {
 			isa = XCConfigurationList;
@@ -639,7 +639,7 @@
 				C01FCF4C08A954540054247B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "VLC" */ = {
 			isa = XCConfigurationList;
@@ -648,7 +648,7 @@
 				C01FCF5008A954540054247B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
