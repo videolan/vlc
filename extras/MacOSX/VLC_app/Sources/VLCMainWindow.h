@@ -43,7 +43,7 @@
     IBOutlet NSTextField * mediaDescriptionText;
 
     IBOutlet id navigatorViewToggleButton;
-    IBOutlet NSSplitView * mainSplitView;
+    IBOutlet VLCOneSplitView * mainSplitView;
     IBOutlet NSView * navigatorView;
     IBOutlet NSView * videoPlayerAndControlView;
     IBOutlet NSView * controlView;
