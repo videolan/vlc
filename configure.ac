@@ -184,6 +184,8 @@ case "${host_os}" in
     then
         echo ""
         echo "Building with Mac OS X defaults:"
+        with_macosx_version_min="10.4"
+        echo "  Assuming --with-macosx-version-min=10.4"
         enable_macosx="yes"
         echo "  Assuming --enable-macosx"
         enable_faad="yes"
@@ -218,8 +220,8 @@ case "${host_os}" in
         enable_xvideo="no"
         echo "  Assuming --disable-xvideo"
 
-        with_macosx_sdk="no"
-        echo "  Compiling without SDK usage"
+        with_macosx_sdk=""
+        echo "  Compiling with default SDK"
     fi
     if test ".`uname -p`" = ".i386"; then
         dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
@@ -240,6 +242,30 @@ case "${host_os}" in
             enable_sse="no"
             echo "  Assuming --disable-sse (due to a bug in ld)"
         fi
+    fi
+    dnl
+    dnl  Check for Mac OS X SDK settings
+    dnl
+    AC_ARG_WITH(macosx-sdk,
+       [  --with-macosx-sdk=DIR   compile using the SDK in DIR])
+    if test "${with_macosx_sdk}" != "" ; then
+        CC="${CC} -isysroot ${with_macosx_sdk}" 
+        CXX="${CXX} -isysroot ${with_macosx_sdk}"
+        OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
+        LD="${LD} -syslibroot ${with_macosx_sdk}"
+    fi
+    AC_ARG_WITH(macosx-version-min,
+       [  --with-macosx-version-min=VERSION  compile for MacOSX VERSION and above])
+    if test "${with_macosx_version_min}" != "" ; then
+        CC="${CC} -mmacosx-version-min=${with_macosx_version_min}" 
+        CXX="${CXX} -mmacosx-version-min=${with_macosx_version_min}"
+        OBJC="${OBJC} -mmacosx-version-min=${with_macosx_version_min}"
+        LD="${LD} -macosx_version_min=${with_macosx_version_min}"
+        CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; CFLAGS="${CFLAGS_save}"
+        CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; CXXFLAGS="${CXXFLAGS_save}"
+        OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; OBJCFLAGS="${OBJCFLAGS_save}"
+        MACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}
+        export MACOSX_DEPLOYMENT_TARGET
     fi
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
@@ -359,26 +385,6 @@ m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
 
 lt_cv_deplibs_check_method=pass_all
 
-
-dnl
-dnl  Check for Mac OS X SDK settings
-dnl
-AC_ARG_WITH(macosx-sdk,
-   [  --with-macosx-sdk       compile with the Mac OS X 10.4u SDK],[], with_macosx_sdk=no)
-if test "${with_macosx_sdk}" != "no" ; then
-    CC="${CC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
-    CXX="${CXX} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
-    OBJC="${OBJC} -isysroot /Developer/SDKs/MacOSX10.4u.sdk" 
-    LD="${LD} -syslibroot/Developer/SDKs/MacOSX10.4u.sdk"
-    CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4"; OBJCFLAGS="${OBJCFLAGS_save}"
-    MACOSX_DEPLOYMENT_TARGET="10.4"
-    export MACOSX_DEPLOYMENT_TARGET
-else
-    MACOSX_DEPLOYMENT_TARGET="10.4"
-    export MACOSX_DEPLOYMENT_TARGET
-fi
 
 dnl
 dnl Gettext stuff
@@ -5336,7 +5342,8 @@ AC_ARG_ENABLE(opie,
 dnl
 dnl  MacOS X video output/gui modules
 dnl
-AC_ARG_ENABLE(macosx, [--enable-macosx MacOS X support (default enabled on MacOS X)])
+AC_ARG_ENABLE(macosx,
+  [  --enable-macosx         MacOS X support (default enabled on MacOS X)])
 if test "x${enable_macosx}" = "xyes"
 then
   VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,CoreFoundation])
