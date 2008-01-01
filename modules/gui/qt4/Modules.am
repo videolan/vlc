@@ -76,7 +76,7 @@ resources.cpp: res.qrc
 	mkdir -p -- ui
 	rm -f $@ $@.tmp
 	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.tmp
-	$(UIC) -tr "Q_" $< | grep -v setObjectName | grep -v objectName >> $@.tmp
+	$(UIC) -tr "Q_" $< >> $@.tmp
 	sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
 	rm -f $@.tmp
 
