@@ -31,7 +31,7 @@
 
 /* Notification Messages */
 NSString *VLCMediaListItemAdded        = @"VLCMediaListItemAdded";
-NSString *VLCMediaListItemDeleted    = @"VLCMediaListItemDeleted";
+NSString *VLCMediaListItemDeleted      = @"VLCMediaListItemDeleted";
 
 // TODO: Documentation
 @interface VLCMediaList (Private)
@@ -39,7 +39,7 @@ NSString *VLCMediaListItemDeleted    = @"VLCMediaListItemDeleted";
 - (void)initInternalMediaList;
 
 /* Libvlc event bridges */
-- (void)mediaListItemAdded:(NSDictionary *)args;
+- (void)mediaListItemAdded:(NSArray *)args;
 - (void)mediaListItemRemoved:(NSNumber *)index;
 @end
 
@@ -50,10 +50,10 @@ static void HandleMediaListItemAdded(const libvlc_event_t *event, void *user_dat
     id self = user_data;
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaListItemAdded:) 
-                                       withArgumentAsObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                       withArgumentAsObject:[NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:
                                                           [VLCMedia mediaWithLibVLCMediaDescriptor:event->u.media_list_item_added.item], @"media",
                                                           [NSNumber numberWithInt:event->u.media_list_item_added.index], @"index",
-                                                          nil]];
+                                                          nil]]];
     [pool release];
 }
 
@@ -130,12 +130,10 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 {
     NSMutableString *content = [NSMutableString string];
     int i;
-    [self lock];
     for( i = 0; i < [self count]; i++)
     {
         [content appendFormat:@"%@\n", [self mediaAtIndex: i]];
     }
-    [self unlock];
     return [NSString stringWithFormat:@"<%@ %p> {\n%@}", [self className], self, content];
 }
 
@@ -224,7 +222,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( hierarchicalAspect )
         return hierarchicalAspect;
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_view( p_mlist, NULL );
-    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv] retain];
+    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return hierarchicalAspect;
 }
@@ -234,7 +232,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( hierarchicalAspect )
         return hierarchicalAspect;
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view( p_mlist, NULL );
-    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv] retain];
+    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return hierarchicalAspect;
 }
@@ -244,7 +242,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( flatAspect )
         return flatAspect;
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_flat_view( p_mlist, NULL );
-    flatAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv] retain];
+    flatAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return flatAspect;
 }
@@ -298,23 +296,35 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     quit_on_exception( &p_e );
 }
 
-- (void)mediaListItemAdded:(NSDictionary *)args
+- (void)mediaListItemAdded:(NSArray *)arrayOfArgs
 {
-    int index = [[args objectForKey:@"index"] intValue];
-    VLCMedia * media = [args objectForKey:@"media"];
-
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
-    [cachedMedia insertObject:media atIndex:index];
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
+    /* We hope to receive index in a nide range, that could change one day */
+    int start = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
+    int end = [[[arrayOfArgs objectAtIndex: [arrayOfArgs count]-1] objectForKey:@"index"] intValue];
+    NSRange range = NSMakeRange(start, end-start);
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
+    int i = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
+    [arrayOfArgs retain];
+    for( NSDictionary * args in arrayOfArgs )
+    {
+        int index = [[args objectForKey:@"index"] intValue];
+        VLCMedia * media = [args objectForKey:@"media"];
+        /* Sanity check */
+        NSAssert( i == index, @"Expects some troubles, inserted items are not in a range" ); i++;
+        if( index && index >= [cachedMedia count] )
+            index = [cachedMedia count] - 1;
+        [cachedMedia insertObject:media atIndex:index];
+    }
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
 
     // Post the notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaListItemAdded
-                                                        object:self
-                                                      userInfo:args];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaListItemAdded
+//                                                        object:self
+//                                                      userInfo:args];
 
     // Let the delegate know that the item was added
-    if (delegate && [delegate respondsToSelector:@selector(mediaList:mediaAdded:atIndex:)])
-        [delegate mediaList:self mediaAdded:media atIndex:index];
+  //  if (delegate && [delegate respondsToSelector:@selector(mediaList:mediaAdded:atIndex:)])
+    //    [delegate mediaList:self mediaAdded:media atIndex:index];
 }
 
 - (void)mediaListItemRemoved:(NSNumber *)index

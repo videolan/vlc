@@ -42,6 +42,7 @@
     void * p_mlv;                //< Internal instance of media list view
     NSMutableArray * cachedNode;
     VLCMediaList *parentMediaList;
+    BOOL ownHisMediaList;
 }
 - (VLCMedia *)mediaAtIndex:(int)index;
 - (VLCMediaListAspectNode *)nodeAtIndex:(int)index;

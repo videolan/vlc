@@ -34,7 +34,7 @@
 /* Initializers */
 - (void)initInternalMediaListView;
 
-- (void)mediaListViewItemAdded:(NSDictionary *)args;
+- (void)mediaListViewItemAdded:(NSArray *)args;
 - (void)mediaListViewItemRemoved:(NSNumber *)index;
 @end
 
@@ -82,10 +82,10 @@ static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user
     id self = user_data;
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaListViewItemAdded:) 
-                                       withArgumentAsObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                       withArgumentAsObject:[NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:
                                                           [VLCMedia mediaWithLibVLCMediaDescriptor:event->u.media_list_item_added.item], @"media",
                                                           [NSNumber numberWithInt:event->u.media_list_item_added.index], @"index",
-                                                          nil]];
+                                                          nil]]];
     [pool release];
 }
 
@@ -105,9 +105,21 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     // Release allocated memory
     libvlc_media_list_view_release(p_mlv);
     [cachedNode release];
-    [parentMediaList release];
+    if( ownHisMediaList )
+        [parentMediaList release];
     [super dealloc];
 }
+- (NSString *)description
+{
+    NSMutableString *content = [NSMutableString string];
+    int i;
+    for( i = 0; i < [self count]; i++)
+    {
+        [content appendFormat:@"%@\n", [self mediaAtIndex: i]];
+    }
+    return [NSString stringWithFormat:@"<%@ %p> {\n%@}", [self className], self, content];
+}
+
 - (VLCMedia *)mediaAtIndex:(int)index
 {
     libvlc_exception_t p_e;
@@ -154,28 +166,47 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 
 - (VLCMediaList *)parentMediaList
 {
-    return [[parentMediaList retain] autorelease];
+    return parentMediaList;
 }
 @end
 
 @implementation VLCMediaListAspect (LibVLCBridging)
-+ (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
++ (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv
 {
-    return [[[VLCMediaListAspect alloc] initWithLibVLCMediaListView:p_new_mlv] autorelease];
+    return [[[VLCMediaListAspect alloc] initWithLibVLCMediaListView:p_new_mlv andMediaList:nil] autorelease];
 }
 
-- (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
++ (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv andMediaList:(VLCMediaList *)mediaList;
+{
+    return [[[VLCMediaListAspect alloc] initWithLibVLCMediaListView:p_new_mlv andMediaList:mediaList] autorelease];
+}
+
+- (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv andMediaList:(VLCMediaList *)mediaList;
 {
     if( self = [super init] )
     {
         p_mlv = p_new_mlv;
         libvlc_media_list_view_retain(p_mlv);
-        libvlc_media_list_t * p_mlist = libvlc_media_list_view_parent_media_list(p_mlv, NULL);
-        parentMediaList = [[VLCMediaList mediaListWithLibVLCMediaList: p_mlist] retain];
-        libvlc_media_list_release( p_mlist );
+
+        /* parentMediaList isn't retained, because we need a mediaList to exists, and not the contrary */
+        parentMediaList = mediaList;
+        ownHisMediaList = NO;
+        if( !parentMediaList )
+        {
+            /* We have to create it then */
+            libvlc_media_list_view_retain(p_mlv);
+            libvlc_media_list_t * p_mlist = libvlc_media_list_view_parent_media_list(p_mlv, NULL);
+            parentMediaList = [[VLCMediaList mediaListWithLibVLCMediaList: p_mlist] retain];
+            libvlc_media_list_release( p_mlist );
+            /* This is an exception, and we owns it here */
+            ownHisMediaList = YES;
+        }
 
         //libvlc_media_list_lock(p_mlv->p_mlist);
         cachedNode = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
+        libvlc_media_list_t * p_mlist;
+        p_mlist = libvlc_media_list_view_parent_media_list( p_mlv, NULL );
+        libvlc_media_list_lock( p_mlist );
         int i, count = libvlc_media_list_view_count(p_mlv, NULL);
         for( i = 0; i < count; i++ )
         {
@@ -189,6 +220,8 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
             if( p_sub_mlv ) libvlc_media_list_view_release(p_sub_mlv);
         }
         [self initInternalMediaListView];
+        libvlc_media_list_unlock( p_mlist );
+        libvlc_media_list_release( p_mlist );
         //libvlc_media_list_unlock(p_mlv->p_mlist);
     }
     return self;
@@ -214,20 +247,33 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     quit_on_exception( &e );
 }
 
-- (void)mediaListViewItemAdded:(NSDictionary *)args
+- (void)mediaListViewItemAdded:(NSArray *)arrayOfArgs
 {
-    int index = [[args objectForKey:@"index"] intValue];
-    VLCMedia * media = [args objectForKey:@"media"];
+    NSAssert([NSThread isMainThread], @"We are not on main thread");
 
-    VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
-    [node setMedia:media];
-    [node setChildren:[self childrenAtIndex:index]];
+    /* We hope to receive index in a nide range, that could change one day */
+    int start = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
+    int end = [[[arrayOfArgs objectAtIndex: [arrayOfArgs count]-1] objectForKey:@"index"] intValue];
+    NSRange range = NSMakeRange(start, end-start);
 
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"node"];
-    [cachedNode insertObject:node atIndex:index];
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"node"];
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"media"];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"node"];
+    int i = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
+    for( NSDictionary * args in arrayOfArgs )
+    {
+        int index = [[args objectForKey:@"index"] intValue];
+        VLCMedia * media = [args objectForKey:@"media"];
+        VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
+        [node setMedia:media];
+        [node setChildren:[self childrenAtIndex:index]];
+        /* Sanity check */
+        NSAssert( i == index, @"Expects some troubles, inserted items are not in a range" ); i++;
+        if( index && index >= [cachedNode count] )
+            index = [cachedNode count] - 1;
+        [cachedNode insertObject:node atIndex:index];
+    }
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"node"];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
 }
 
 - (void)mediaListViewItemRemoved:(NSNumber *)index

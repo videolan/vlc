@@ -71,7 +71,8 @@
 
 @interface VLCMediaListAspect (VLCLibVLCBridging)
 + (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
-- (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
++ (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv andMediaList:(VLCMediaList*)mediaList;
+- (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv andMediaList:(VLCMediaList*)mediaList;
 - (libvlc_media_list_view_t *)libVLCMediaListView;
 @end
 
