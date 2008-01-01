@@ -29,6 +29,22 @@
 
 static void GuessType( input_item_t *p_item );
 
+void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )
+{
+    vlc_event_t event;
+
+    vlc_mutex_lock( &p_i->lock );
+    if( !p_i->p_meta )
+        p_i->p_meta = vlc_meta_New();
+    vlc_meta_Set( p_i->p_meta, meta_type, psz_val );
+    vlc_mutex_unlock( &p_i->lock );
+
+    /* Notify interested third parties */
+    event.type = vlc_InputItemMetaChanged;
+    event.u.input_item_meta_changed.meta_type = meta_type;
+    vlc_event_send( &p_i->event_manager, &event );
+}
+
 /**
  * Get the item from an input thread
  */
