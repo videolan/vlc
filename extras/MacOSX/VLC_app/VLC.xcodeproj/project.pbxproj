@@ -14,10 +14,22 @@
 			);
 			dependencies = (
 				633BD7110D2AE0E50012A314 /* PBXTargetDependency */,
-				633BD7130D2AE0EB0012A314 /* PBXTargetDependency */,
+				637F33EB0D2AEE4B001E70AB /* PBXTargetDependency */,
 			);
 			name = "vlc-contrib-core-framework-app";
 			productName = "vlc-contrib-core-framework-app";
+		};
+		637F33DF0D2AEE05001E70AB /* vlc-framework-app */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 637F33F80D2AEE67001E70AB /* Build configuration list for PBXAggregateTarget "vlc-framework-app" */;
+			buildPhases = (
+			);
+			dependencies = (
+				637F33E50D2AEE29001E70AB /* PBXTargetDependency */,
+				637F33E90D2AEE48001E70AB /* PBXTargetDependency */,
+			);
+			name = "vlc-framework-app";
+			productName = "vlc-framework-app";
 		};
 /* End PBXAggregateTarget section */
 
@@ -60,13 +72,6 @@
 			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
 			remoteInfo = VLC;
 		};
-		633BD6C30D2ADBBC0012A314 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 633BD69D0D2ACE520012A314 /* VLC.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = VLC;
-		};
 		633BD7100D2AE0E50012A314 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 633BD69D0D2ACE520012A314 /* VLC.xcodeproj */;
@@ -74,12 +79,26 @@
 			remoteGlobalIDString = 633BD6D20D2ADE040012A314;
 			remoteInfo = "vlc-contrib-core-framework";
 		};
-		633BD7120D2AE0EB0012A314 /* PBXContainerItemProxy */ = {
+		637F33E40D2AEE29001E70AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 633BD69D0D2ACE520012A314 /* VLC.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* VLC */;
+			remoteInfo = VLC;
+		};
+		637F33E80D2AEE48001E70AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090;
+			remoteGlobalIDString = 8D1107260486CEB800E47090 /* VLC */;
 			remoteInfo = VLC;
+		};
+		637F33EA0D2AEE4B001E70AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 637F33DF0D2AEE05001E70AB /* vlc-framework-app */;
+			remoteInfo = "vlc-framework-app";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -329,7 +348,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				633BD6C40D2ADBBC0012A314 /* PBXTargetDependency */,
 			);
 			name = VLC;
 			productInstallPath = "$(HOME)/Applications";
@@ -356,6 +374,7 @@
 			projectRoot = "";
 			targets = (
 				633BD70D0D2AE0DF0012A314 /* vlc-contrib-core-framework-app */,
+				637F33DF0D2AEE05001E70AB /* vlc-framework-app */,
 				8D1107260486CEB800E47090 /* VLC */,
 			);
 		};
@@ -409,7 +428,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $SRCROOT/../Framework/build/$BUILD_VARIANTS/VLC.framework $BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/Contents/Frameworks";
+			shellScript = "/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $SRCROOT/../Framework/build/$CONFIGURATION/VLC.framework $BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/Contents/Frameworks";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -435,20 +454,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		633BD6C40D2ADBBC0012A314 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = VLC;
-			targetProxy = 633BD6C30D2ADBBC0012A314 /* PBXContainerItemProxy */;
-		};
 		633BD7110D2AE0E50012A314 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "vlc-contrib-core-framework";
 			targetProxy = 633BD7100D2AE0E50012A314 /* PBXContainerItemProxy */;
 		};
-		633BD7130D2AE0EB0012A314 /* PBXTargetDependency */ = {
+		637F33E50D2AEE29001E70AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = VLC;
+			targetProxy = 637F33E40D2AEE29001E70AB /* PBXContainerItemProxy */;
+		};
+		637F33E90D2AEE48001E70AB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D1107260486CEB800E47090 /* VLC */;
-			targetProxy = 633BD7120D2AE0EB0012A314 /* PBXContainerItemProxy */;
+			targetProxy = 637F33E80D2AEE48001E70AB /* PBXContainerItemProxy */;
+		};
+		637F33EB0D2AEE4B001E70AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 637F33DF0D2AEE05001E70AB /* vlc-framework-app */;
+			targetProxy = 637F33EA0D2AEE4B001E70AB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -497,6 +521,27 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "vlc-contrib-core-framework-app";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		637F33E00D2AEE05001E70AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "vlc-framework-app";
+			};
+			name = Debug;
+		};
+		637F33E10D2AEE05001E70AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "vlc-framework-app";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -574,6 +619,15 @@
 			buildConfigurations = (
 				633BD70E0D2AE0DF0012A314 /* Debug */,
 				633BD70F0D2AE0DF0012A314 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		637F33F80D2AEE67001E70AB /* Build configuration list for PBXAggregateTarget "vlc-framework-app" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				637F33E00D2AEE05001E70AB /* Debug */,
+				637F33E10D2AEE05001E70AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
