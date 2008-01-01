@@ -6,6 +6,46 @@
 	objectVersion = 42;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib-core-framework" */;
+			buildPhases = (
+			);
+			dependencies = (
+				633BD6EE0D2AE03E0012A314 /* PBXTargetDependency */,
+				63FFDBD30D2AE3070092FC96 /* PBXTargetDependency */,
+				633BD6F00D2AE0400012A314 /* PBXTargetDependency */,
+				633BD6F20D2AE0430012A314 /* PBXTargetDependency */,
+			);
+			name = "vlc-contrib-core-framework";
+			productName = "vlc-core-modules";
+		};
+		633BD6E40D2ADF030012A314 /* vlc-contrib */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 633BD6EC0D2ADF460012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib" */;
+			buildPhases = (
+				633BD6E30D2ADF030012A314 /* ShellScript */,
+				633BD6EB0D2ADF280012A314 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "vlc-contrib";
+			productName = "vlc-contrib";
+		};
+		63FFDBCE0D2AE2AE0092FC96 /* vlc-configure */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 63FFDBD50D2AE3250092FC96 /* Build configuration list for PBXAggregateTarget "vlc-configure" */;
+			buildPhases = (
+				63FFDBCD0D2AE2AE0092FC96 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "vlc-configure";
+			productName = "vlc-bootstrap";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		6303C43A0CF45CAE0000ECC8 /* VLCMediaListAspect.m in Sources */ = {isa = PBXBuildFile; fileRef = 6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */; };
 		6303C43C0CF45CC30000ECC8 /* VLCMediaListAspect.h in Headers */ = {isa = PBXBuildFile; fileRef = 6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -34,6 +74,37 @@
 		EF8BB8D10CAFA8D80038A613 /* VLCMediaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */; };
 		EFD551DD0CC6DD720074CEE1 /* VLCLibVLCBridging.h in Headers */ = {isa = PBXBuildFile; fileRef = EFD551DC0CC6DD720074CEE1 /* VLCLibVLCBridging.h */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		633BD6ED0D2AE03E0012A314 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 633BD6E40D2ADF030012A314;
+			remoteInfo = "vlc-contrib";
+		};
+		633BD6EF0D2AE0400012A314 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 633BD6DB0D2ADE4E0012A314;
+			remoteInfo = "vlc-core";
+		};
+		633BD6F10D2AE0430012A314 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = VLC;
+		};
+		63FFDBD20D2AE3070092FC96 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 63FFDBCE0D2AE2AE0092FC96 /* vlc-bootstrap */;
+			remoteInfo = "vlc-bootstrap";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -223,6 +294,23 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXLegacyTarget section */
+		633BD6DB0D2ADE4E0012A314 /* vlc-core */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "";
+			buildConfigurationList = 633BD6DF0D2ADE6D0012A314 /* Build configuration list for PBXLegacyTarget "vlc-core" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = ../../..;
+			dependencies = (
+			);
+			name = "vlc-core";
+			passBuildSettingsInEnvironment = 1;
+			productName = "vlc-core";
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		8DC2EF4F0486A6940098B216 /* VLC */ = {
 			isa = PBXNativeTarget;
@@ -258,7 +346,11 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */,
 				8DC2EF4F0486A6940098B216 /* VLC */,
+				633BD6E40D2ADF030012A314 /* vlc-contrib */,
+				633BD6DB0D2ADE4E0012A314 /* vlc-core */,
+				63FFDBCE0D2AE2AE0092FC96 /* vlc-configure */,
 			);
 		};
 /* End PBXProject section */
@@ -274,6 +366,52 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		633BD6E30D2ADF030012A314 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				$SRCROOT/../../contrib/bootstrap,
+			);
+			outputPaths = (
+				$SRCROOT/../../contrib/config.mak,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../contrib && ./bootstrap";
+			showEnvVarsInLog = 0;
+		};
+		633BD6EB0D2ADF280012A314 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../contrib && make";
+			showEnvVarsInLog = 0;
+		};
+		63FFDBCD0D2AE2AE0092FC96 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				$SRCROOT/../../../bootstrap,
+				$SRCROOT/../../../configure.ac,
+			);
+			outputPaths = (
+				$SRCROOT/../../../configure,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../.. && ./bootstrap && ./configure --enable-debug --disable-nls\n";
+		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -309,6 +447,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		633BD6EE0D2AE03E0012A314 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 633BD6E40D2ADF030012A314 /* vlc-contrib */;
+			targetProxy = 633BD6ED0D2AE03E0012A314 /* PBXContainerItemProxy */;
+		};
+		633BD6F00D2AE0400012A314 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 633BD6DB0D2ADE4E0012A314 /* vlc-core */;
+			targetProxy = 633BD6EF0D2AE0400012A314 /* PBXContainerItemProxy */;
+		};
+		633BD6F20D2AE0430012A314 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* VLC */;
+			targetProxy = 633BD6F10D2AE0430012A314 /* PBXContainerItemProxy */;
+		};
+		63FFDBD30D2AE3070092FC96 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 63FFDBCE0D2AE2AE0092FC96 /* vlc-configure */;
+			targetProxy = 63FFDBD20D2AE3070092FC96 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
@@ -422,6 +583,89 @@
 			};
 			name = Release;
 		};
+		633BD6D40D2ADE050012A314 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "vlc-core-modules";
+			};
+			name = Debug;
+		};
+		633BD6D50D2ADE050012A314 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "vlc-core-modules";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		633BD6DD0D2ADE4F0012A314 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+			};
+			name = Debug;
+		};
+		633BD6DE0D2ADE4F0012A314 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "vlc-core";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		633BD6E50D2ADF030012A314 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "vlc-contrib";
+			};
+			name = Debug;
+		};
+		633BD6E60D2ADF030012A314 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "vlc-contrib";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		63FFDBD00D2AE2AE0092FC96 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "vlc-bootstrap";
+			};
+			name = Debug;
+		};
+		63FFDBD10D2AE2AE0092FC96 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "vlc-bootstrap";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -439,6 +683,42 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib-core-framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				633BD6D40D2ADE050012A314 /* Debug */,
+				633BD6D50D2ADE050012A314 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		633BD6DF0D2ADE6D0012A314 /* Build configuration list for PBXLegacyTarget "vlc-core" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				633BD6DD0D2ADE4F0012A314 /* Debug */,
+				633BD6DE0D2ADE4F0012A314 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		633BD6EC0D2ADF460012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				633BD6E50D2ADF030012A314 /* Debug */,
+				633BD6E60D2ADF030012A314 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63FFDBD50D2AE3250092FC96 /* Build configuration list for PBXAggregateTarget "vlc-configure" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63FFDBD00D2AE2AE0092FC96 /* Debug */,
+				63FFDBD10D2AE2AE0092FC96 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
