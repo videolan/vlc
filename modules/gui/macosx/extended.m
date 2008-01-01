@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extended.m: MacOS X Extended interface panel
  *****************************************************************************
- * Copyright (C) 2005-2007 the VideoLAN team
+ * Copyright (C) 2005-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne@videolan.org>
@@ -93,10 +93,10 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_ckb_intZoom setToolTip: _NS("Enables an interactive Zoom feature")];
     [o_ckb_vlme_norm setTitle: _NS("Volume normalization")];
     [o_ckb_vlme_norm setToolTip: _NS("Prevents the audio output from going "
-        "over a predefined value.")];
+                                     "over a predefined value.")];
     [o_ckb_hdphnVirt setTitle: _NS("Headphone virtualization")];
     [o_ckb_hdphnVirt setToolTip: _NS("Imitates the effect of surround sound "
-        "when using headphones.")];
+                                     "when using headphones.")];
     [o_lbl_maxLevel setStringValue: _NS("Maximum level")];
     [o_btn_rstrDefaults setTitle: _NS("Restore Defaults")];
     [o_ckb_enblAdjustImg setTitle: _NS("Enable")];
@@ -177,17 +177,13 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* collaps all views so Cocoa saves the window position correctly */
     if( o_adjImg_expanded )
-    {
         [self expandAdjustImage: nil];
-    }
+
     if( o_audFlts_expanded )
-    {
         [self expandAudioFilters: nil];
-    }
+
     if( o_vidFlts_expanded )
-    {
         [self expandVideoFilters: nil];
-    }
 }
 
 - (BOOL)getConfigChanged
@@ -211,37 +207,26 @@ static VLCExtended *_o_sharedInstance = nil;
  
     f_value = config_GetFloat( p_intf, "saturation" );
     if( f_value > 0 && f_value < 5 )
-    {
         [o_sld_saturation setIntValue: (int)(100 * f_value) ];
-    }
 
     f_value = config_GetFloat( p_intf, "contrast" );
     if( f_value > 0 && f_value < 4 )
-    {
         [o_sld_contrast setIntValue: (int)(100 * f_value) ];
-    }
 
     f_value = config_GetFloat( p_intf, "brightness" );
     if( f_value > 0 && f_value < 2 )
-    {
         [o_sld_brightness setIntValue: (int)(100 * f_value) ];
-    }
 
     f_value = config_GetFloat( p_intf, "gamma" );
     if( f_value > 0 && f_value < 10 )
-    {
         [o_sld_gamma setIntValue: (int)(10 * f_value) ];
-    }
 
     f_value = config_GetFloat( p_intf, "norm-max-level" );
     if( f_value > 0 && f_value < 10 )
-    {
         [o_sld_maxLevel setFloatValue: f_value ];
-    }
 
     [o_sld_opaque setFloatValue: (config_GetFloat( p_intf,
         "macosx-opaqueness") * 100)];
-
 
     /* show the window */
     [o_extended_window displayIfNeeded];
@@ -260,7 +245,9 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_hue setEnabled: YES];
         [o_sld_saturation setEnabled: YES];
         [self changeVideoFiltersString: "adjust" onOrOff: VLC_TRUE];
-    }else{
+    }
+    else
+    {
         [o_btn_rstrDefaults setEnabled: NO];
         [o_sld_brightness setEnabled: NO];
         [o_sld_contrast setEnabled: NO];
@@ -280,7 +267,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_sld_hue setIntValue: 0];
     [o_sld_saturation setIntValue: 100];
     [o_sld_opaque setIntValue: 100];
- 
+
     /* transmit the values */
     [self sliderActionAdjustImage: o_sld_brightness];
     [self sliderActionAdjustImage: o_sld_contrast];
@@ -294,58 +281,79 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* read-out the sliders' values and apply them */
     intf_thread_t * p_intf = VLCIntf;
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find(p_intf,
-                                 VLC_OBJECT_VOUT, FIND_ANYWHERE);
+    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find(p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE);
+    vlc_object_t *p_filter;
+
     if( p_vout == NULL )
     {
+        msg_Dbg( p_intf, "no vout present, saving settings anyway" );
         if (sender == o_sld_brightness)
         {
             config_PutFloat( p_intf , "brightness" , [o_sld_brightness floatValue] / 100);
-        } else if (sender == o_sld_contrast)
+        } 
+        else if (sender == o_sld_contrast)
         {
             config_PutFloat( p_intf , "contrast" , [o_sld_contrast floatValue] / 100);
-        } else if (sender == o_sld_gamma)
+        } 
+        else if (sender == o_sld_gamma)
         {
             config_PutFloat( p_intf , "gamma" , [o_sld_gamma floatValue] / 10);
-        } else if (sender == o_sld_hue)
+        } 
+        else if (sender == o_sld_hue)
         {
             config_PutInt( p_intf , "hue" , [o_sld_hue intValue]);
-        } else if (sender == o_sld_saturation)
+        } 
+        else if (sender == o_sld_saturation)
         {
             config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100);
-        } else {
+        } 
+        else
+        {
             msg_Warn( p_intf, "the corresponding subfilter coundn't be found" );
         }
-    } else {
-        vlc_value_t val;
+    } 
+    else
+    {
+        msg_Dbg( p_intf, "we found a vout to adjust, let's look for the filter" );
+        p_filter = (vlc_object_t *)vlc_object_find_name( p_intf, "adjust", FIND_ANYWHERE );
+
+        if(! p_filter )
+        {
+            msg_Err( p_intf, "we're unable to find the adjust filter!" );
+            vlc_object_release( p_vout );
+            return;
+        }
+
         if (sender == o_sld_brightness)
         {
-            val.f_float = [o_sld_brightness floatValue] / 100;
-            var_Set( p_vout, "brightness", val );
-            config_PutFloat( p_intf , "brightness" , [o_sld_brightness floatValue] / 100);
-        } else if (sender == o_sld_contrast)
+            var_SetFloat( p_filter, "brightness", [o_sld_brightness floatValue] / 100 );
+            config_PutFloat( p_intf, "brightness", [o_sld_brightness floatValue] / 100 );
+        } 
+        else if (sender == o_sld_contrast)
         {
-            val.f_float = [o_sld_contrast floatValue] / 100;
-            var_Set( p_vout, "contrast", val );
-            config_PutFloat( p_intf , "contrast" , [o_sld_contrast floatValue] / 100);
-        } else if (sender == o_sld_gamma)
+            var_SetFloat( p_filter, "contrast", [o_sld_contrast floatValue] / 100 );
+            config_PutFloat( p_intf, "contrast", [o_sld_contrast floatValue] / 100 );
+        } 
+        else if (sender == o_sld_gamma)
         {
-            val.f_float = [o_sld_gamma floatValue] / 10;
-            var_Set( p_vout, "gamma", val );
-            config_PutFloat( p_intf , "gamma" , [o_sld_gamma floatValue] / 10);
-        } else if (sender == o_sld_hue)
+            var_SetFloat( p_filter, "gamma", [o_sld_gamma floatValue] / 10 );
+            config_PutFloat( p_intf, "gamma", [o_sld_gamma floatValue] / 10 );
+        } 
+        else if (sender == o_sld_hue)
         {
-            val.i_int = [o_sld_hue intValue];
-            var_Set( p_vout, "hue", val );
-            config_PutInt( p_intf , "hue" , [o_sld_hue intValue]);
-        } else if (sender == o_sld_saturation)
+            var_SetInteger( p_filter, "hue", [o_sld_hue intValue] );
+            config_PutInt( p_intf , "hue" , [o_sld_hue intValue] );
+        } 
+        else if (sender == o_sld_saturation)
         {
-            val.f_float = [o_sld_saturation floatValue] / 100;
-            var_Set( p_vout, "saturation", val );
-            config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100);
-        } else {
-            msg_Warn( p_intf, "the corresponding subfilter coundn't be found" );
+            var_SetFloat( p_filter, "saturation", [o_sld_saturation floatValue] / 100 );
+            config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100 );
+        } 
+        else
+        {
+            msg_Warn( p_intf, "couldn't find variable for slider!" );
         }
+        vlc_object_release( p_filter );
         vlc_object_release( p_vout );
     }
 
@@ -365,7 +373,6 @@ static VLCExtended *_o_sharedInstance = nil;
 
     val.f_float = [o_sld_opaque floatValue] / 100;
 
-
     if( p_vout != NULL )
     {
         p_real_vout = [VLCVoutView getRealVout: p_vout];
@@ -383,10 +390,10 @@ static VLCExtended *_o_sharedInstance = nil;
         }
         vlc_object_release( p_vout );
     }
- 
+
     /* store to prefs */
     config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
- 
+
     vlc_object_release( p_playlist );
 
     o_config_changed = YES;
@@ -396,24 +403,23 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* en-/disable headphone virtualisation */
     if ([o_ckb_hdphnVirt state] == NSOnState)
-    {
         [self changeAFiltersString: "headphone_channel_mixer" onOrOff: VLC_TRUE ];
-    }else{
+    else
         [self changeAFiltersString: "headphone_channel_mixer" onOrOff: VLC_FALSE ];
-    }
 }
 
 - (IBAction)sliderActionMaximumAudioLevel:(id)sender
 {
     /* read-out the slider's value and apply it */
     intf_thread_t * p_intf = VLCIntf;
-    aout_instance_t * p_aout= (aout_instance_t *)vlc_object_find(p_intf,
-                                 VLC_OBJECT_AOUT, FIND_ANYWHERE);
+    aout_instance_t * p_aout= (aout_instance_t *)vlc_object_find(p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE);
+
     if( p_aout != NULL )
     {
         var_SetFloat( p_aout, "norm-max-level", [o_sld_maxLevel floatValue] );
         vlc_object_release( p_aout );
     }
+
     config_PutFloat( p_intf, "norm-max-level", [o_sld_maxLevel floatValue] );
 
     o_config_changed = YES;
@@ -422,12 +428,10 @@ static VLCExtended *_o_sharedInstance = nil;
 - (IBAction)enableVolumeNormalization:(id)sender
 {
     /* en-/disable volume normalisation */
-    if ([o_ckb_vlme_norm state] == NSOnState)
-    {
+    if( [o_ckb_vlme_norm state] == NSOnState )
         [self changeAFiltersString: "normvol" onOrOff: YES ];
-    }else{
+    else
         [self changeAFiltersString: "normvol" onOrOff: NO ];
-    }
 }
 
 - (IBAction)expandAdjustImage:(id)sender
@@ -438,7 +442,7 @@ static VLCExtended *_o_sharedInstance = nil;
     NSRect o_box_vidFlts_rect = [o_box_vidFlts frame];
     NSRect o_box_adjImg_rect = [o_box_adjImg frame];
  
-    if (o_adjImg_expanded)
+    if( o_adjImg_expanded )
     {
         /* move the window contents upwards (partially done through settings
          * inside the nib) and resize the window */
@@ -449,8 +453,9 @@ static VLCExtended *_o_sharedInstance = nil;
  
         /* remove the inserted view */
         [o_adjustImg_view removeFromSuperviewWithoutNeedingDisplay];
-    }else{
- 
+    }
+    else
+    {
         /* move the window contents downwards and resize the window */
         o_win_rect.size.height = o_win_rect.size.height + 193;
         o_win_rect.origin.y = [o_extended_window frame].origin.y - 193;
@@ -463,11 +468,13 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_extended_window displayIfNeeded];
     [o_extended_window setFrame: o_win_rect display:YES animate: YES];
  
-    if (o_adjImg_expanded)
+    if( o_adjImg_expanded )
     {
         o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height - 193;
         o_adjImg_expanded = NO;
-    } else {
+    } 
+    else
+    {
         /* insert view */
         o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height + 193;
         [o_adjustImg_view setFrame: NSMakeRect( 20, -10, 370, 203)];
@@ -485,7 +492,7 @@ static VLCExtended *_o_sharedInstance = nil;
     NSRect o_win_rect = [o_extended_window frame];
     NSRect o_box_audFlts_rect = [o_box_audFlts frame];
  
-    if (o_audFlts_expanded)
+    if( o_audFlts_expanded )
     {
         /* move the window contents upwards (partially done through settings
          * inside the nib) and resize the window */
@@ -494,7 +501,9 @@ static VLCExtended *_o_sharedInstance = nil;
  
         /* remove the inserted view */
         [o_audioFlts_view removeFromSuperviewWithoutNeedingDisplay];
-    }else{
+    }
+    else
+    {
         /* move the window contents downwards and resize the window */
         o_win_rect.size.height = o_win_rect.size.height + 66;
         o_win_rect.origin.y = [o_extended_window frame].origin.y - 66;
@@ -503,11 +512,13 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_extended_window setFrame: o_win_rect display:YES animate: YES];
  
  
-    if (o_audFlts_expanded)
+    if( o_audFlts_expanded )
     {
         o_box_audFlts_rect.size.height = [o_box_audFlts frame].size.height - 66;
         o_audFlts_expanded = NO;
-    } else {
+    } 
+    else
+    {
         /* insert view */
         o_box_audFlts_rect.size.height = [o_box_audFlts frame].size.height + 66;
         [o_audioFlts_view setFrame: NSMakeRect( 20, -20, 370, 76)];
@@ -526,7 +537,7 @@ static VLCExtended *_o_sharedInstance = nil;
     NSRect o_box_audFlts_rect = [o_box_audFlts frame];
     NSRect o_box_vidFlts_rect = [o_box_vidFlts frame];
  
-    if (o_vidFlts_expanded)
+    if( o_vidFlts_expanded )
     {
         /* move the window contents upwards (partially done through settings
          * inside the nib) and resize the window */
@@ -536,8 +547,9 @@ static VLCExtended *_o_sharedInstance = nil;
  
         /* remove the inserted view */
         [o_videoFilters_view removeFromSuperviewWithoutNeedingDisplay];
-    }else{
- 
+    }
+    else
+    {
         /* move the window contents downwards and resize the window */
         o_win_rect.size.height = o_win_rect.size.height + 172;
         o_win_rect.origin.y = [o_extended_window frame].origin.y - 172;
@@ -548,11 +560,13 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_extended_window displayIfNeeded];
     [o_extended_window setFrame: o_win_rect display:YES animate: YES];
  
-    if (o_vidFlts_expanded)
+    if( o_vidFlts_expanded )
     {
         o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height - 172;
         o_vidFlts_expanded = NO;
-    } else {
+    } 
+    else
+    {
         /* insert view */
         o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height + 172;
         [o_videoFilters_view setFrame: NSMakeRect( 20, -10, 370, 172)];
@@ -597,22 +611,27 @@ static VLCExtended *_o_sharedInstance = nil;
     else if (sender == o_ckb_ripple )
         [self changeVideoFiltersString: "ripple" onOrOff: [o_ckb_ripple state]];
 
-    else {
-        /* this shouldn't happen */
-        msg_Err( VLCIntf, "cannot find switched video-filter" );
-    }
+    else
+        msg_Err( VLCIntf, "cannot find switched video-filter" ); /* this can't happen */
 }
 
 - (IBAction)moreInfoVideoFilters:(id)sender
 {
     /* show info sheet */
-    NSBeginInformationalAlertSheet(_NS("About the video filters"), _NS("OK"), @"", @"",
-        o_extended_window, nil, nil, nil, nil, _NS("This panel allows "
-        "on-the-fly selection of various video effects.\n"
-        "These filters can be configured individually in the Preferences, in "
-        "the subsections of Video/Filters.\n"
-        "To choose the order in which the filter are applied, a filter "
-        "option string can be set in the Preferences, Video / Filters section."));
+    NSBeginInformationalAlertSheet(_NS("About the video filters"), 
+                                   _NS("OK"), 
+                                   @"", 
+                                   @"",
+                                   o_extended_window, 
+                                   nil, 
+                                   nil, 
+                                   nil, 
+                                   nil, 
+                                   _NS("This panel allows on-the-fly selection of various video effects.\n"
+                                       "These filters can be configured individually in the Preferences, in "
+                                       "the subsections of Video/Filters.\n"
+                                       "To choose the order in which the filter are applied, a filter "
+                                       "option string can be set in the Preferences, Video / Filters section."));
 }
 
 
@@ -624,7 +643,7 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* copied from ../wxwidgets/extrapanel.cpp
      * renamed to conform with Cocoa's rules */
-    /* this method only changes 1st generation video filters (the ones which
+    /* this method only changes 1st generation video filters (the ones that
      * can't be used for transcoding). Have a look at changeVideoFiltersString
      * for the 2nd generation filters. */
  
@@ -840,9 +859,18 @@ static VLCExtended *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Yield( VLCIntf );
     int returnedValue;
     NSArray * theModules;
-    theModules = [[NSArray alloc] initWithObjects: @"main", @"headphone",
-        @"transform", @"adjust", @"invert", @"motionblur", @"distort",
-        @"clone", @"crop", @"normvol", @"headphone_channel_mixer", @"macosx",
+    theModules = [[NSArray alloc] initWithObjects: @"main", 
+        @"headphone",
+        @"transform", 
+        @"adjust", 
+        @"invert", 
+        @"motionblur", 
+        @"distort",
+        @"clone", 
+        @"crop", 
+        @"normvol", 
+        @"headphone_channel_mixer", 
+        @"macosx",
         nil];
     unsigned int x = 0;
  
@@ -865,7 +893,7 @@ static VLCExtended *_o_sharedInstance = nil;
         x = ( x + 1 );
     }
  
-    msg_Dbg( p_playlist, "VLCExtended: saved certain preferences successfully" );
+    msg_Dbg( VLCIntf, "VLCExtended: saved certain preferences successfully" );
  
     [theModules release];
     vlc_object_release( p_playlist );
