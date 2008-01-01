@@ -271,7 +271,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)updateTitle
 {
-    NSMutableString * o_title = nil, * o_mrl = nil;
+    NSString * o_title = nil; 
+    NSMutableString * o_mrl = nil;
     input_thread_t * p_input;
 
     if( p_vout == NULL )
@@ -286,14 +287,21 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         return;
     }
 
+    char *psz_nowPlaying = input_item_GetNowPlaying ( input_GetItem( p_input ) );
     char *psz_name = input_item_GetName( input_GetItem( p_input ) );
     char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
-    if( psz_name != NULL )
-        o_title = [NSMutableString stringWithUTF8String: psz_name];
+    if( psz_nowPlaying != NULL )
+        o_title = [NSString stringWithUTF8String: psz_nowPlaying];
+    else if( psz_name != NULL )
+        o_title = [NSString stringWithUTF8String: psz_name];
+
     if( psz_uri != NULL )
         o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
-    free( psz_name );
-    free( psz_uri );
+
+    FREENULL( psz_nowPlaying );
+    FREENULL( psz_name );
+    FREENULL( psz_uri );
+
     if( o_title == nil )
         o_title = o_mrl;
 

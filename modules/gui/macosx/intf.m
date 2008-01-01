@@ -1328,8 +1328,12 @@ static VLCMain *_o_sharedMainInstance = nil;
                 vlc_object_release( p_playlist );
                 return;
             }
-            o_temp = [NSString stringWithUTF8String:
-                p_playlist->status.p_item->p_input->psz_name];
+            if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
+                o_temp = [NSString stringWithUTF8String: 
+                    input_item_GetNowPlaying ( p_playlist->status.p_item->p_input )];
+            else
+                o_temp = [NSString stringWithUTF8String:
+                    p_playlist->status.p_item->p_input->psz_name];
             [self setScrollField: o_temp stopAfter:-1];
             [[[self getControls] getFSPanel] setStreamTitle: o_temp];
 
