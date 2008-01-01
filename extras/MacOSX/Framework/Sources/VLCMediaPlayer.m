@@ -421,20 +421,13 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t *event, void *s
 //                usleep(1000);
         }
         
-        [self willChangeValueForKey:@"media"];
         [media release];
         media = [value retain];
-        [self didChangeValueForKey:@"media"];
 
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         libvlc_media_instance_set_media_descriptor( instance, [media libVLCMediaDescriptor], &ex );
         quit_on_exception( &ex );
-        
-        if (media) {
-            if (wasPlaying)
-                [self play];
-        }
     }
 }
 
@@ -444,17 +437,11 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t *event, void *s
 }
 
 - (BOOL)play
-{
-    // Return if there is no media available or if the stream is already playing something
-    if (!media || [self isPlaying])
-        return [self isPlaying];
-    
+{    
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-
     libvlc_media_instance_play( (libvlc_media_instance_t *)instance, &ex );
     quit_on_exception( &ex );
-
     return YES;
 }
 
