@@ -59,6 +59,9 @@ struct vout_sys_t
     int i_width;
     int i_height;
 
+    unsigned int i_desktop_width;
+    unsigned int i_desktop_height;
+
     /* For YUV output */
     SDL_Overlay * p_overlay;   /* An overlay we keep to grab the XVideo port */
 
@@ -205,10 +208,14 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    vlc_mutex_unlock( lock );
+
     /* Translate keys into unicode */
     SDL_EnableUNICODE(1);
 
-    vlc_mutex_unlock( lock );
+    /* Get the desktop resolution */
+    p_vout->p_sys->i_desktop_width = SDL_GetVideoInfo()->current_w;
+    p_vout->p_sys->i_desktop_height = SDL_GetVideoInfo()->current_h;
 
     p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
@@ -721,9 +728,9 @@ static int OpenDisplay( vout_thread_t *p_vout )
     uint32_t i_chroma = 0;
 
     /* Set main window's size */
-    p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->output.i_width :
+    p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->p_sys->i_desktop_width :
                                                     p_vout->i_window_width;
-    p_vout->p_sys->i_height = p_vout->b_fullscreen ? p_vout->output.i_height :
+    p_vout->p_sys->i_height = p_vout->b_fullscreen ? p_vout->p_sys->i_desktop_height :
                                                      p_vout->i_window_height;
 
     /* Initialize flags and cursor */
@@ -739,8 +746,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->p_display = SDL_SetVideoMode( p_vout->p_sys->i_width,
-                                                 p_vout->p_sys->i_height,
-                                                 i_bpp, i_flags );
+                                                   p_vout->p_sys->i_height,
+                                                   i_bpp, i_flags );
 
     if( p_vout->p_sys->p_display == NULL )
     {
