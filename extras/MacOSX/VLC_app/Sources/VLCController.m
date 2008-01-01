@@ -42,7 +42,6 @@
 
 - (void)awakeFromNib
 {
-   // [NSException raise:@"Hello" format:@"Hello"];
     /***********************************
      * Register our bindings value transformer
      */
