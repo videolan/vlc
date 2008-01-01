@@ -117,6 +117,3 @@
 }
 
 @end
-
-@implementation VLCController (ExceptionHandlerDelegating)
-@end
