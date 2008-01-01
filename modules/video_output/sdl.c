@@ -219,8 +219,8 @@ static int Open ( vlc_object_t *p_this )
 
     p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
-    p_vout->p_sys->i_lastmoved = mdate();
 
+    p_vout->p_sys->i_lastmoved = p_vout->p_sys->i_lastpressed = mdate();
     if( OpenDisplay( p_vout ) )
     {
         msg_Err( p_vout, "cannot set up SDL (%s)", SDL_GetError() );
@@ -361,8 +361,8 @@ static int Manage( vout_thread_t *p_vout )
     {
         switch( event.type )
         {
-        case SDL_VIDEORESIZE:                          /* Resizing of window */
-            /* Update dimensions */
+        /* Resizing of window */
+        case SDL_VIDEORESIZE:
             p_vout->i_changes |= VOUT_SIZE_CHANGE;
             p_vout->i_window_width = p_vout->p_sys->i_width = event.resize.w;
             p_vout->i_window_height = p_vout->p_sys->i_height = event.resize.h;
@@ -746,8 +746,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->p_display = SDL_SetVideoMode( p_vout->p_sys->i_width,
-                                                   p_vout->p_sys->i_height,
-                                                   i_bpp, i_flags );
+                                                 p_vout->p_sys->i_height,
+                                                 i_bpp, i_flags );
 
     if( p_vout->p_sys->p_display == NULL )
     {
