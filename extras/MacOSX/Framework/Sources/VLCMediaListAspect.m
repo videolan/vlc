@@ -202,7 +202,6 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
             ownHisMediaList = YES;
         }
 
-        //libvlc_media_list_lock(p_mlv->p_mlist);
         cachedNode = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_view_count(p_mlv, NULL)];
         libvlc_media_list_t * p_mlist;
         p_mlist = libvlc_media_list_view_parent_media_list( p_mlv, NULL );
@@ -222,7 +221,6 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         [self initInternalMediaListView];
         libvlc_media_list_unlock( p_mlist );
         libvlc_media_list_release( p_mlist );
-        //libvlc_media_list_unlock(p_mlv->p_mlist);
     }
     return self;
 }

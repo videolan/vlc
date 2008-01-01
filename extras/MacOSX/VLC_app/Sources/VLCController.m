@@ -112,7 +112,8 @@
 
 - (void)addPlaylist:(id)sender
 {
-    [[arrayOfMasters mutableArrayValueForKey:@"[0].childrenInMasterView"] addObject:[VLCMedia mediaAsNodeWithName:@"Untitled Playlist"]];
+    // TODO
+    NSLog(@"unimplemented!");
 }
 
 @end
