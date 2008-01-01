@@ -93,7 +93,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
         
         // Initialize internals to defaults
         cachedMedia = [[NSMutableArray alloc] init];
-        delegate = flatAspect = hierarchicalAspect = nil;
+        delegate = flatAspect = hierarchicalAspect = hierarchicalNodeAspect = nil;
         [self initInternalMediaList];
     }
     return self;
@@ -123,6 +123,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     [cachedMedia release];
     [flatAspect release];
     [hierarchicalAspect release];
+    [hierarchicalNodeAspect release];
     [super dealloc];
 }
 
@@ -229,12 +230,12 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
 - (VLCMediaListAspect *)hierarchicalNodeAspect
 {
-    if( hierarchicalAspect )
-        return hierarchicalAspect;
+    if( hierarchicalNodeAspect )
+        return hierarchicalNodeAspect;
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view( p_mlist, NULL );
-    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
+    hierarchicalNodeAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
-    return hierarchicalAspect;
+    return hierarchicalNodeAspect;
 }
 
 - (VLCMediaListAspect *)flatAspect
