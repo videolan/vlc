@@ -103,8 +103,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     /* Main Introduction */
     QWidget *infoWidget = new QWidget( this );
     QHBoxLayout *infoLayout = new QHBoxLayout( infoWidget );
-    QLabel *infoLabel = new QLabel( "VLC media player " PACKAGE_VERSION "\n\n"
-            "(c) 1996-2007 - the VideoLAN Team\n\n" +
+    QLabel *infoLabel = new QLabel( "VLC media player " VERSION_MESSAGE "\n\n"
+            "(c) " COPYRIGHT_YEARS " - the VideoLAN Team\n\n" +
             qtr( "VLC media player is a free media player, made by the "
                  "VideoLAN Team.\nIt is a standalone multimedia player, "
                  "encoder and streamer, that can read from many supports "
