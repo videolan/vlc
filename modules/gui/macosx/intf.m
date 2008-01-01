@@ -1534,8 +1534,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         NSString *o_temp;
         vlc_object_yield( p_input );
-        o_temp = [NSString stringWithUTF8String:
-                  p_playlist->status.p_item->p_input->psz_name];
+        if( input_item_GetNowPlaying ( p_playlist->status.p_item->p_input ) )
+            o_temp = [NSString stringWithUTF8String: 
+                input_item_GetNowPlaying ( p_playlist->status.p_item->p_input )];
+        else
+            o_temp = [NSString stringWithUTF8String:
+                p_playlist->status.p_item->p_input->psz_name];
         [self setScrollField: o_temp stopAfter:-1];
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );
