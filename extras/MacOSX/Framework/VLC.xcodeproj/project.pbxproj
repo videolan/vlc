@@ -101,7 +101,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 63FFDBCE0D2AE2AE0092FC96 /* vlc-bootstrap */;
+			remoteGlobalIDString = 63FFDBCE0D2AE2AE0092FC96;
 			remoteInfo = "vlc-bootstrap";
 		};
 /* End PBXContainerItemProxy section */
@@ -425,6 +425,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh $SOURCE_ROOT/Pre-Compile.sh";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
