@@ -83,21 +83,21 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 633BD69D0D2ACE520012A314 /* VLC.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* VLC */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = VLC;
 		};
 		637F33E80D2AEE48001E70AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090 /* VLC */;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = VLC;
 		};
 		637F33EA0D2AEE4B001E70AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 637F33DF0D2AEE05001E70AB /* vlc-framework-app */;
+			remoteGlobalIDString = 637F33DF0D2AEE05001E70AB;
 			remoteInfo = "vlc-framework-app";
 		};
 /* End PBXContainerItemProxy section */
