@@ -37,6 +37,7 @@
  *****************************************************************************/
 VLC_EXPORT( void, __vlc_threads_error, ( vlc_object_t *) );
 VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
+VLC_EXPORT( int,  __vlc_mutex_init_recursive, ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );
 VLC_EXPORT( int,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
@@ -69,6 +70,12 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
  *****************************************************************************/
 #define vlc_mutex_init( P_THIS, P_MUTEX )                                   \
     __vlc_mutex_init( VLC_OBJECT(P_THIS), P_MUTEX )
+
+/*****************************************************************************
+ * vlc_mutex_init: initialize a recursive mutex (Don't use it)
+ *****************************************************************************/
+#define vlc_mutex_init_recursive( P_THIS, P_MUTEX )                         \
+    __vlc_mutex_init_recursive( VLC_OBJECT(P_THIS), P_MUTEX )
 
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex

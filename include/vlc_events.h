@@ -104,6 +104,7 @@ typedef struct vlc_event_manager_t
 {
     void * p_obj;
     vlc_mutex_t object_lock;
+    vlc_mutex_t event_sending_lock;
     vlc_object_t *p_parent_object;
     DECL_ARRAY(struct vlc_event_listeners_group_t *) listeners_groups;
 } vlc_event_manager_t;

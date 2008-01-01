@@ -86,7 +86,7 @@ vlc_threadvar_t msg_context_global_key;
 void
 __vlc_threads_error( vlc_object_t *p_this )
 {
-    msg_Err( p_this, "Error detected. Put a breakpoint in '%s' to debug.",
+     msg_Err( p_this, "Error detected. Put a breakpoint in '%s' to debug.",
             __func__ );
 }
 
@@ -321,6 +321,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 #   else
         pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
 #   endif
+
         i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
         pthread_mutexattr_destroy( &attr );
         return( i_result );
@@ -334,6 +335,40 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 
 #endif
 }
+
+/*****************************************************************************
+ * vlc_mutex_init: initialize a recursive mutex (Do not use)
+ *****************************************************************************/
+int __vlc_mutex_init_recursive( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
+{
+#if defined( WIN32 )
+    /* Create mutex returns a recursive mutex */
+    p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
+    return ( p_mutex->mutex != NULL ? 0 : 1 );
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_mutexattr_t attr;
+    int                 i_result;
+
+    pthread_mutexattr_init( &attr );
+# if defined(DEBUG)
+    /* Create error-checking mutex to detect problems more easily. */
+#   if defined(SYS_LINUX)
+    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
+#   else
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
+#   endif
+# endif
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+    i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
+    pthread_mutexattr_destroy( &attr );
+    return( i_result );
+#else
+    msg_Err(p_this, "no recursive mutex found. Falling back to regular mutex.\n"
+                    "Expect hangs\n")
+    return __vlc_mutex_init( p_this, p_mutex );
+#endif
+}
+
 
 /*****************************************************************************
  * vlc_mutex_destroy: destroy a mutex, inner version
