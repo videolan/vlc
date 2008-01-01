@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "VLCController.h"
 #import "VLCMediaArrayController.h"
+#import "VLCAppAdditions.h"
 
 @interface VLCMainWindow : NSWindow {
     /* IB elements */
