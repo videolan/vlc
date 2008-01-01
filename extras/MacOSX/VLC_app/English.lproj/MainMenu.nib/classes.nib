@@ -5,14 +5,13 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>CLASS</key>
-			<string>VLCCategoryOutlineView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSOutlineView</string>
-		</dict>
-		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>detailListItemDoubleClicked</key>
+				<string>id</string>
+				<key>newMainWindow</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>VLCController</string>
 			<key>LANGUAGE</key>
@@ -21,12 +20,18 @@
 			<dict>
 				<key>categoryList</key>
 				<string>id</string>
+				<key>detailItemFetchedStatus</key>
+				<string>id</string>
+				<key>detailItemsCount</key>
+				<string>id</string>
 				<key>detailList</key>
 				<string>id</string>
 				<key>detailSearchField</key>
 				<string>id</string>
-				<key>videoView</key>
+				<key>fillScreenButton</key>
 				<string>id</string>
+				<key>videoView</key>
+				<string>VLCBrowsableVideoView</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
@@ -38,6 +43,28 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>moveDown</key>
+				<string>id</string>
+				<key>moveUp</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCBrowsableVideoView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>selectedObject</key>
+				<string>id</string>
+				<key>target</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>VLCVideoView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
