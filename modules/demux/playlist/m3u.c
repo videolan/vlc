@@ -192,7 +192,7 @@ static int Demux( demux_t *p_demux )
             if ( psz_artist && *psz_artist )
                 input_ItemAddInfo( p_input, _(VLC_META_INFO_CAT),
                                    _(VLC_META_ARTIST), "%s", psz_artist );
-            input_ItemAddSubItem( p_current_input, p_input, VLC_FALSE );
+            input_ItemAddSubItem( p_current_input, p_input );
             vlc_gc_decref( p_input );
             free( psz_mrl );
         }

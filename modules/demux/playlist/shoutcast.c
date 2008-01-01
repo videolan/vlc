@@ -235,7 +235,7 @@ static int DemuxGenre( demux_t *p_demux )
                     input_ItemCopyOptions( p_sys->p_current_input,
                                                 p_input );
                     free( psz_mrl );
-                    input_ItemAddSubItem( p_sys->p_current_input, p_input, VLC_FALSE );
+                    input_ItemAddSubItem( p_sys->p_current_input, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                 }
@@ -423,7 +423,7 @@ static int DemuxStation( demux_t *p_demux )
                         input_item_SetNowPlaying( p_input, psz_ct );
                     if( psz_rt )
                         input_item_SetRating( p_input, psz_rt );
-                    input_ItemAddSubItem( p_sys->p_current_input, p_input, VLC_FALSE );
+                    input_ItemAddSubItem( p_sys->p_current_input, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                     FREENULL( psz_mt );

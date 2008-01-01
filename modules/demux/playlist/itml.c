@@ -374,7 +374,7 @@ static vlc_bool_t parse_track_dict COMPLEX_INTERFACE
 
             p_new_input = input_ItemNewExt( p_playlist, psz_uri,
                                             NULL, 0, NULL, -1 );
-            input_ItemAddSubItem( p_input_item, p_new_input, VLC_FALSE );
+            input_ItemAddSubItem( p_input_item, p_new_input );
 
             /* add meta info */
             add_meta( p_new_input, p_track );

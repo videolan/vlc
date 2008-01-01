@@ -125,8 +125,7 @@ static inline void input_item_SetName( input_item_t *p_item, const char *psz_nam
  * It is not the input item's responsability to keep all the ref of
  * the input item children. */
 static inline void input_ItemAddSubItem( input_item_t *p_parent,
-                                         input_item_t *p_child, 
-                                         vlc_bool_t b_node )
+                                         input_item_t *p_child )
 {
     vlc_event_t event;
 
@@ -135,7 +134,6 @@ static inline void input_ItemAddSubItem( input_item_t *p_parent,
     /* Notify interested third parties */
     event.type = vlc_InputItemSubItemAdded;
     event.u.input_item_subitem_added.p_new_child = p_child;
-    event.u.input_item_subitem_added.b_node = b_node;
     vlc_event_send( &p_parent->event_manager, &event );
 }
 

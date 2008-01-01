@@ -125,8 +125,9 @@ int Demux( demux_t *p_demux )
     {
         input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
         if( p_new_input )
-            input_ItemAddSubItem( p_current_input, p_new_input, VLC_FALSE );
-        vlc_gc_decref( p_new_input );
+        {
+            input_ItemAddSubItem( p_current_input, p_new_input );
+        }
     }
 
     HANDLE_PLAY_AND_RELEASE;
@@ -488,9 +489,13 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    if( p_demux->p_sys->i_identifier == -1 ||
-                        p_demux->p_sys->i_identifier ==
+                    if( p_demux->p_sys->i_identifier <
                         p_demux->p_sys->i_tracklist_entries )
+                    {
+                        p_demux->p_sys->pp_tracklist[
+                            p_demux->p_sys->i_identifier ] = p_new_input;
+                    }
+                    else
                     {
                         if( p_demux->p_sys->i_identifier >
                             p_demux->p_sys->i_tracklist_entries )
@@ -502,13 +507,6 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                                      p_demux->p_sys->i_tracklist_entries,
                                      p_demux->p_sys->i_tracklist_entries,
                                      p_new_input );
-                        p_demux->p_sys->i_identifier = -1; 
-                    }
-                    else
-                    {
-                        msg_Err( p_demux, "Invalid identifier %d", p_demux->p_sys->i_identifier );
-                        p_demux->p_sys->i_identifier = -1;
-                        return VLC_FALSE;
                     }
                     return VLC_TRUE;
                 }
@@ -538,29 +536,19 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 
                     if( psz_uri )
                     {
-                        if( ( p_demux->p_sys->psz_base ||
-                              strrchr( p_demux->psz_path, DIR_SEP_CHAR ) ) &&
+                        if( p_demux->p_sys->psz_base &&
                             !strstr( psz_uri, "://" ) )
                         {
-                           char *psz_baseref = p_demux->p_sys->psz_base;
-                           size_t i_baselen;
-                           if( psz_baseref )
-                               i_baselen = strlen( psz_baseref );
-                           else
-                           {
-                               psz_baseref = p_demux->psz_path;
-                               i_baselen = strrchr( psz_baseref, DIR_SEP_CHAR )
-                                            - psz_baseref + 1;
-                           }
-                           char* psz_tmp = malloc( i_baselen +
-                                   strlen( psz_uri ) + 1 );
+                           char* psz_tmp = malloc(
+                                   strlen(p_demux->p_sys->psz_base) +
+                                   strlen(psz_uri) +1 );
                            if( !psz_tmp )
                            {
                                msg_Err( p_demux, "out of memory");
                                return VLC_FALSE;
                            }
-                           strncpy( psz_tmp, psz_baseref, i_baselen );
-                           strcpy( psz_tmp + i_baselen, psz_uri );
+                           sprintf( psz_tmp, "%s%s",
+                                    p_demux->p_sys->psz_base, psz_uri );
                            free( psz_uri );
                            psz_uri = psz_tmp;
                         }
@@ -579,8 +567,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                         return VLC_FALSE;
                     }
                 }
-                else if( !strcmp( p_handler->name, "identifier" ) && 
-                        *psz_value >= '0' && *psz_value <= '9' )
+                else if( !strcmp( p_handler->name, "identifier" ) )
                 {
                     p_demux->p_sys->i_identifier = atoi( psz_value );
                 }
@@ -725,11 +712,11 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return VLC_FALSE;
         }
-        p_new_input = input_ItemNewWithType( VLC_OBJECT(p_playlist), "vlc:nop",
+        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc:skip",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
-            input_ItemAddSubItem( p_input_item, p_new_input, VLC_TRUE );
+            input_ItemAddSubItem( p_input_item, p_new_input );
             p_input_item = p_new_input;
         }
         free( psz_title );
@@ -904,9 +891,8 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
     p_new_input = p_demux->p_sys->pp_tracklist[ i_href ];
     if( p_new_input )
     {
-        input_ItemAddSubItem( p_input_item, p_new_input, VLC_FALSE );
+        input_ItemAddSubItem( p_input_item, p_new_input );
         p_demux->p_sys->pp_tracklist[i_href] = NULL;
-        vlc_gc_decref( p_new_input );
     }
 
     /* kludge for #1293 - XTAG sends ENDELEM for self closing tag */

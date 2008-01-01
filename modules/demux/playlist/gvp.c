@@ -209,7 +209,7 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "gvp_version", psz_version );
         SADD_INFO( "docid", psz_docid );
         SADD_INFO( "description", psz_description );
-        input_ItemAddSubItem( p_current_input, p_input, VLC_FALSE );
+        input_ItemAddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );
     }
 
