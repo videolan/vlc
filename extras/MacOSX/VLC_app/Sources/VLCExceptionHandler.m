@@ -27,7 +27,7 @@
 
 
 @implementation VLCExceptionHandler
-+ (void)initialize
++ (void)load
 {
     [[NSExceptionHandler defaultExceptionHandler] setDelegate:[[VLCExceptionHandler alloc] init]];
  
