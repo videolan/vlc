@@ -95,6 +95,13 @@ static inline VLCMediaState LibVLCStateToMediaState( libvlc_state_t state )
  */
 static void HandleMediaMetaChanged(const libvlc_event_t *event, void *self)
 {
+    if( event->u.media_descriptor_meta_changed.meta_type == libvlc_meta_Publisher ||
+        event->u.media_descriptor_meta_changed.meta_type == libvlc_meta_NowPlaying )
+    {
+        /* Skip those meta. We don't really care about them for now.
+         * And they occure a lot */
+        return;
+    }
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [[VLCEventManager sharedManager] callOnMainThreadObject:self
                                                  withMethod:@selector(metaChanged:)
@@ -349,7 +356,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t *event, void *self)
         p_url = libvlc_media_descriptor_get_mrl( md, &ex );
         quit_on_exception( &ex );
         
-        url = [[NSString stringWithCString:p_url] retain];
+        url = [[NSString stringWithUTF8String:p_url] retain];
         
         libvlc_media_descriptor_retain( md );
         p_md = md;
@@ -530,16 +537,12 @@ static void HandleMediaSubItemAdded(const libvlc_event_t *event, void *self)
     if (length && value && [length compare:value] == NSOrderedSame)
         return;
         
-    [self willChangeValueForKey:@"length"];
     [length release];       
     length = value ? [value retain] : nil;
-    [self didChangeValueForKey:@"length"];
 }
 
 - (void)setState:(NSNumber *)newStateAsNumber
 {        
-    [self willChangeValueForKey:@"state"];
     state = [newStateAsNumber intValue];
-    [self didChangeValueForKey:@"state"];
 }
 @end
