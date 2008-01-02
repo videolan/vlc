@@ -76,7 +76,7 @@
 @end
 
 /* libvlc event callback */
-static void HandleMediaListViewItemAdded(const libvlc_event_t *event, void *user_data)
+static void HandleMediaListViewItemAdded(const libvlc_event_t * event, void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
@@ -111,7 +111,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 }
 - (NSString *)description
 {
-    NSMutableString *content = [NSMutableString string];
+    NSMutableString * content = [NSMutableString string];
     int i;
     for( i = 0; i < [self count]; i++)
     {
@@ -124,7 +124,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    libvlc_media_descriptor_t *p_md = libvlc_media_list_view_item_at_index( p_mlv, index, &p_e );
+    libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index( p_mlv, index, &p_e );
     quit_on_exception( &p_e );
     
     // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
@@ -136,7 +136,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    libvlc_media_list_view_t *p_sub_mlv = libvlc_media_list_view_children_at_index( p_mlv, index, &p_e );
+    libvlc_media_list_view_t * p_sub_mlv = libvlc_media_list_view_children_at_index( p_mlv, index, &p_e );
     quit_on_exception( &p_e );
 
     if( !p_sub_mlv )
@@ -237,7 +237,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     libvlc_exception_t e;
     libvlc_exception_init( &e );
 
-    libvlc_event_manager_t *p_em = libvlc_media_list_event_manager( p_mlv, &e );
+    libvlc_event_manager_t * p_em = libvlc_media_list_event_manager( p_mlv, &e );
 
     /* Add internal callback */
     libvlc_event_attach( p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e );
