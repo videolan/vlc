@@ -47,10 +47,7 @@
 
 @implementation VLCVideoLayer
 
-+ (id)layer
-{
-    return [[CALayer alloc] init];
-}
+/* Nothing */
 
 @end
 
