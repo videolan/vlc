@@ -30,32 +30,30 @@
 /**
  * Standard dictionary keys for retreiving meta data.
  */
-extern NSString *VLCMetaInformationTitle;        /* NSString */
-extern NSString *VLCMetaInformationArtist;        /* NSString */
-extern NSString *VLCMetaInformationTitle;       /* NSString */
-extern NSString *VLCMetaInformationArtist;        /* NSString */
-extern NSString *VLCMetaInformationGenre;        /* NSString */
-extern NSString *VLCMetaInformationCopyright;    /* NSString */
-extern NSString *VLCMetaInformationAlbum;        /* NSString */
-extern NSString *VLCMetaInformationTrackNumber;    /* NSString */
-extern NSString *VLCMetaInformationDescription;    /* NSString */
-extern NSString *VLCMetaInformationRating;        /* NSString */
-extern NSString *VLCMetaInformationDate;        /* NSString */
-extern NSString *VLCMetaInformationSetting;        /* NSString */
-extern NSString *VLCMetaInformationURL;            /* NSString */
-extern NSString *VLCMetaInformationLanguage;    /* NSString */
-extern NSString *VLCMetaInformationNowPlaying;    /* NSString */
-extern NSString *VLCMetaInformationPublisher;    /* NSString */
-extern NSString *VLCMetaInformationEncodedBy;    /* NSString */
-extern NSString *VLCMetaInformationArtworkURL;    /* NSString */
-extern NSString *VLCMetaInformationArtwork;     /* NSImage  */
-extern NSString *VLCMetaInformationTrackID;        /* NSString */
+extern NSString * VLCMetaInformationTitle;          /* NSString */
+extern NSString * VLCMetaInformationArtist;         /* NSString */
+extern NSString * VLCMetaInformationGenre;          /* NSString */
+extern NSString * VLCMetaInformationCopyright;      /* NSString */
+extern NSString * VLCMetaInformationAlbum;          /* NSString */
+extern NSString * VLCMetaInformationTrackNumber;    /* NSString */
+extern NSString * VLCMetaInformationDescription;    /* NSString */
+extern NSString * VLCMetaInformationRating;         /* NSString */
+extern NSString * VLCMetaInformationDate;           /* NSString */
+extern NSString * VLCMetaInformationSetting;        /* NSString */
+extern NSString * VLCMetaInformationURL;            /* NSString */
+extern NSString * VLCMetaInformationLanguage;       /* NSString */
+extern NSString * VLCMetaInformationNowPlaying;     /* NSString */
+extern NSString * VLCMetaInformationPublisher;      /* NSString */
+extern NSString * VLCMetaInformationEncodedBy;      /* NSString */
+extern NSString * VLCMetaInformationArtworkURL;     /* NSString */
+extern NSString * VLCMetaInformationArtwork;        /* NSImage  */
+extern NSString * VLCMetaInformationTrackID;        /* NSString */
 
 /* Notification Messages */
 /**
  * Available notification messages.
  */
-extern NSString *VLCMediaMetaChanged;        //< Notification message for when the media's meta data has changed
+extern NSString * VLCMediaMetaChanged;  //< Notification message for when the media's meta data has changed
 
 // Forward declarations, supresses compiler error messages
 @class VLCMediaList;
@@ -63,10 +61,10 @@ extern NSString *VLCMediaMetaChanged;        //< Notification message for when t
 
 typedef enum VLCMediaState
 {
-    VLCMediaStateNothingSpecial,       //< Nothing
-    VLCMediaStateBuffering,            //< Stream is buffering
-    VLCMediaStatePlaying,              //< Stream is playing
-    VLCMediaStateError,                //< Can't be played because an error occured
+    VLCMediaStateNothingSpecial,        //< Nothing
+    VLCMediaStateBuffering,             //< Stream is buffering
+    VLCMediaStatePlaying,               //< Stream is playing
+    VLCMediaStateError,                 //< Can't be played because an error occured
 } VLCMediaState;
 
 /**
@@ -121,28 +119,52 @@ typedef enum VLCMediaState
 
 /* Object Factories */
 /**
- * Manufactures a new VLCMedia object using the URL specified.  Will return nil if
- * the specified URL references a directory that does not comply with DVD file 
- * structure.
+ * Manufactures a new VLCMedia object using the URL specified.
  * \param anURL URL to media to be accessed.
  * \return A new VLCMedia object, only if there were no errors.  This object 
  * will be automatically released.
  * \see initWithMediaURL
  */
 + (id)mediaWithURL:(NSURL *)anURL;
-+ (id)mediaWithPath:(NSString *)aPath;
-+ (id)mediaAsNodeWithName:(NSString *)aName;
 
+/**
+ * Manufactures a new VLCMedia object using the path specified.
+ * \param aPath Path to the media to be accessed.
+ * \return A new VLCMedia object, only if there were no errors.  This object 
+ * will be automatically released.
+ * \see initWithPath
+ */
++ (id)mediaWithPath:(NSString *)aPath;
+
+/**
+ * TODO
+ * \param aName TODO
+ * \return a new VLCMedia object, only if there were no errors.  This object
+ * will be automatically released.
+ * \see initAsNodeWithName
+ */
++ (id)mediaAsNodeWithName:(NSString *)aName;
 
 /* Initializers */
 /**
- * Initializes a new VLCMedia object to use the specified URL.  Will return nil if
- * the specified URL references a directory that does not comply with DVD file
- * structure.
- * \param aPath URL to media to be accessed.
+ * Initializes a new VLCMedia object to use the specified URL.  
+ * \param aPath Path to media to be accessed.
+ * \return A new VLCMedia object, only if there were no errors.
+ */
+- (id)initWithURL:(NSURL *)anURL;
+
+/**
+ * Initializes a new VLCMedia object to use the specified path.  
+ * \param aPath Path to media to be accessed.
  * \return A new VLCMedia object, only if there were no errors.
  */
 - (id)initWithPath:(NSString *)aPath;
+
+/**
+ * TODO
+ * \param aName TODO
+ * \return A new VLCMedia object, only if there were no errors.
+ */
 - (id)initAsNodeWithName:(NSString *)aName;
 
 /**
@@ -158,22 +180,16 @@ typedef enum VLCMediaState
 
 /* Properties */
 /**
- * Sets the receiver's delegate.
- * \param delegate The delegate for the receiver.
+ * Receiver's delegate.
  */
-- (void)setDelegate:(id)delegate;
+@property (assign) id delegate;
 
 /**
- * Returns the receiver's delegate
- * \return The receiver's delegate
+ * A VLCTime object describing the length of the media resource, only if it is
+ * available.  Use lengthWaitUntilDate: to wait for a specified length of time.
+ * \see lengthWaitUntilDate
  */
-- (id)delegate;
-
-/**
- * Returns a VLCTime object describing the length of the media resource.
- * \return The length of the media resource.
- */
-- (VLCTime *)length;
+@property (readonly) VLCTime * length;
 
 /**
  * Returns a VLCTime object describing the length of the media resource,
@@ -185,29 +201,28 @@ typedef enum VLCMediaState
  */
 - (VLCTime *)lengthWaitUntilDate:(NSDate *)aDate;
 
-- (BOOL)isPreparsed;
+/**
+ * Determines if the media has already been preparsed. 
+ */
+@property (readonly) BOOL isPreparsed;
 
 /**
- * Returns the URL for the receiver's media resource.
- * \return The URL for the receiver's media resource.
+ * The URL for the receiver's media resource.
  */
-- (NSString *)url;
+@property (readonly) NSString * url;
 
 /**
- * Returns the receiver's sub list.
- * \return The receiver's sub list.
+ * The receiver's sub list.
  */
-- (VLCMediaList *)subitems;
+@property (readonly) VLCMediaList * subitems;
 
 /**
- * Returns the receiver's meta data as a NSDictionary object.
- * \return The receiver's meta data as a NSDictionary object.
+ * The receiver's meta data as a NSDictionary object.
  */
-- (NSDictionary *)metaDictionary;
+@property (readonly) NSDictionary * metaDictionary;
 
 /**
- * Returns the receiver's state.
- * \return The receiver's state, such as Playing, Error, NothingSpecial, Buffering.
+ * The receiver's state, such as Playing, Error, NothingSpecial, Buffering.
  */
-- (VLCMediaState)state;
+@property (readonly) VLCMediaState state;
 @end
