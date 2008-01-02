@@ -29,12 +29,11 @@
 
 #include <vlc/libvlc.h>
 
-static VLCMediaLibrary * sharedMediaLibrary = nil;
-
 @implementation VLCMediaLibrary
 + (id)sharedMediaLibrary
 {
-    if(!sharedMediaLibrary)
+    static VLCMediaLibrary * sharedMediaLibrary = nil;
+    if( !sharedMediaLibrary )
     {
         sharedMediaLibrary = [[VLCMediaLibrary alloc] init];
     }
@@ -50,8 +49,9 @@ static VLCMediaLibrary * sharedMediaLibrary = nil;
         mlib = libvlc_media_library_new( [VLCLibrary sharedInstance], &p_e );
         quit_on_exception( &p_e );
         
-        libvlc_media_library_load(mlib, &p_e);
-        quit_on_exception(&p_e);
+        libvlc_media_library_load( mlib, &p_e );
+        quit_on_exception( &p_e );
+        
         allMedia = nil;
     }
     return self;
@@ -69,10 +69,10 @@ static VLCMediaLibrary * sharedMediaLibrary = nil;
 
 - (VLCMediaList *)allMedia
 {
-    if (!allMedia)
+    if( !allMedia )
     {
-        libvlc_media_list_t *p_mlist = libvlc_media_library_media_list(mlib, NULL);
-        allMedia = [[VLCMediaList mediaListWithLibVLCMediaList: p_mlist] retain];
+        libvlc_media_list_t * p_mlist = libvlc_media_library_media_list( mlib, NULL );
+        allMedia = [[VLCMediaList mediaListWithLibVLCMediaList:p_mlist] retain];
         libvlc_media_list_release(p_mlist);
     }
     return allMedia;

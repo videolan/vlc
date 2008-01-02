@@ -27,12 +27,17 @@
 
 @class VLCMediaList;
 
+/**
+ * TODO: Documentation
+ */
 @interface VLCMediaLibrary : NSObject
 {
     void * mlib;
     VLCMediaList * allMedia;
 }
+/* Singleton */
 + (id)sharedMediaLibrary;
 
-- (VLCMediaList *)allMedia;
+/* Properties */
+@property (readonly) VLCMediaList * allMedia;
 @end
