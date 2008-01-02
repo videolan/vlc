@@ -46,8 +46,8 @@
 - (BOOL)exceptionHandler:(NSExceptionHandler *)sender shouldLogException:(NSException *)exception mask:(unsigned int)aMask
 {
     [self printStackTrace:exception];
-    NSRunCriticalAlertPanel(@"Not handled exception",
-                            [NSString stringWithFormat:@"%@:%@\n\nBack trace has been printed to Console.\nWe will now wait for debugger connection...\n",
+    NSRunCriticalAlertPanel(@"Exception not handled!",
+                            [NSString stringWithFormat:@"%@: %@\n\nBack trace has been printed to Console.\n\nWe will now wait for debugger connection...\n",
                                 [exception name], [exception reason]],
                             @"Wait Debugger", nil, nil);
     return YES;
