@@ -177,7 +177,7 @@ NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
         [self setStretchesVideo:NO];
         [self setAutoresizesSubviews:YES];
         [self setFillScreen: NO];
-        layoutManager = [VLCConstraintLayoutManager layoutManager];
+        layoutManager = [[VLCConstraintLayoutManager layoutManager] retain];
     }
     return self;
 }
