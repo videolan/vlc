@@ -69,17 +69,7 @@
 
     aLayer.name = @"vlcopengllayer";
 
-    [self setLayoutManager:[CAConstraintLayoutManager layoutManager]];
-
-    [aLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMaxY
-                                       relativeTo:@"superlayer" attribute:kCAConstraintMaxY]];
-    [aLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMaxX
-                                       relativeTo:@"superlayer" attribute:kCAConstraintMaxX]];
-    [aLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMinX
-                                       relativeTo:@"superlayer" attribute:kCAConstraintMinX]];
-    [aLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMinY
-                                       relativeTo:@"superlayer" attribute:kCAConstraintMinY]];
-
+    [aLayer setAutoresizingMask:kCALayerWidthSizable|kCALayerHeightSizable];
 
     [self insertSublayer:aLayer atIndex:0];
 
