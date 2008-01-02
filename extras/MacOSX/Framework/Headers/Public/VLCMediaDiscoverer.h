@@ -27,20 +27,44 @@
 
 @class VLCMediaList;
 
+/**
+ * TODO: Documentation VLCMediaDiscoverer
+ */
 @interface VLCMediaDiscoverer : NSObject
 {
-    NSString *localizedName;
-    VLCMediaList * discoveredMedia;
-    void * mdis;
-    BOOL running;
+    NSString * localizedName;       //< TODO: Documentation VLCMediaDiscoverer.localizedName
+    VLCMediaList * discoveredMedia; //< TODO: Documentation VLCMediaDiscoverer.discoveredMedia
+    void * mdis;                    //< TODO: Documentation VLCMediaDiscoverer.mdis
+    BOOL running;                   //< TODO: Documentation VLCMediaDiscoverer.running
 }
+
+/**
+ * Maintains a list of available media discoverers.  This list is populated as new media
+ * discoverers are created.
+ * \return A list of available media discoverers.
+ */
 + (NSArray *)availableMediaDiscoverer;
 
+/* Initializers */
+/**
+ * Initializes new object with specified name.
+ * \param aSerchName Name of the service for this VLCMediaDiscoverer object.
+ * \returns Newly created media discoverer.
+ */
 - (id)initWithName:(NSString *)aServiceName;
 
-- (VLCMediaList *)discoveredMedia;
+/**
+ * TODO: Documentation VLCMediaDiscoverer.discoveredMedia
+ */
+@property (readonly) VLCMediaList * discoveredMedia;
 
-- (NSString *)localizedName;
+/**
+ * TODO: Documentation VLCMediaDiscoverer.localizedName
+ */
+@property (readonly) NSString * localizedName;
 
-- (BOOL)isRunning;
+/**
+ * TODO: Documentation VLCMediaDiscoverer.isRunning
+ */
+@property (readonly) BOOL isRunning;
 @end

@@ -30,15 +30,25 @@
 
 #include <vlc/libvlc.h>
 
-static NSArray * availableMediaDiscoverer = nil;
+static NSMutableArray * availableMediaDiscoverer = nil;     // Global list of media discoverers
 
+/**
+ * Declares call back functions to be used with libvlc event callbacks.
+ */
 @interface VLCMediaDiscoverer (Private)
+/**
+ * TODO: Documention
+ */
 - (void)mediaDiscovererStarted;
+
+/**
+ * TODO: Documention
+ */
 - (void)mediaDiscovererEnded;
 @end
 
 /* libvlc event callback */
-static void HandleMediaDiscovererStarted(const libvlc_event_t *event, void *user_data)
+static void HandleMediaDiscovererStarted(const libvlc_event_t * event, void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
@@ -62,14 +72,14 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
 @implementation VLCMediaDiscoverer
 + (NSArray *)availableMediaDiscoverer
 {
-        if( !availableMediaDiscoverer )
-        {
-            availableMediaDiscoverer = [[NSArray arrayWithObjects:
-                                    [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
-                                    [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
-                                    [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease], nil] retain];
-        }
-        return availableMediaDiscoverer;
+    if( !availableMediaDiscoverer )
+    {
+        availableMediaDiscoverer = [[NSArray arrayWithObjects:
+                                [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
+                                [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
+                                [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease], nil] retain];
+    }
+    return availableMediaDiscoverer;
 }
 
 - (id)initWithName:(NSString *)aServiceName
@@ -83,12 +93,12 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
         mdis = libvlc_media_discoverer_new_from_name( [VLCLibrary sharedInstance],
                                                       [aServiceName UTF8String],
                                                       &ex );
+        quit_on_exception( &ex );       
+
         libvlc_event_manager_t * p_em = libvlc_media_discoverer_event_manager(mdis);
         libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, NULL);
         libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, NULL);
         running = libvlc_media_discoverer_is_running(mdis);
-
-        quit_on_exception( &ex );       
     }
     return self;
 }
@@ -112,10 +122,8 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
 
 - (void)dealloc
 {
-    if( localizedName )
-        [localizedName release];
-    if( discoveredMedia )
-        [discoveredMedia release];
+    [localizedName release];
+    [discoveredMedia release];
     libvlc_media_discoverer_release( mdis );
     [super dealloc];
 }
@@ -126,32 +134,23 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
         return discoveredMedia;
 
     libvlc_media_list_t * p_mlist = libvlc_media_discoverer_media_list( mdis );
-    VLCMediaList * ret = [VLCMediaList mediaListWithLibVLCMediaList: p_mlist];
+    VLCMediaList * ret = [VLCMediaList mediaListWithLibVLCMediaList:p_mlist];
     libvlc_media_list_release( p_mlist );
 
-    if( ret )
-    {
-        discoveredMedia = [ret retain];
-    }
+    discoveredMedia = [ret retain];
     return discoveredMedia;
 }
 
 - (NSString *)localizedName
 {
-    NSString * aString = nil;
-    char * name = libvlc_media_discoverer_localized_name( mdis );
-
-    if( localizedName )
+    if ( localizedName )
         return localizedName;
-
+    
+    char * name = libvlc_media_discoverer_localized_name( mdis );
     if (name)
     {
-        aString = [NSString stringWithUTF8String:name];
+        localizedName = [[NSString stringWithUTF8String:name] retain];
         free( name );
-    }
-    if( aString )
-    {
-        localizedName = [aString retain];
     }
     return localizedName;
 }
@@ -169,6 +168,7 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
     running = YES;
     [self didChangeValueForKey:@"running"];
 }
+
 - (void)mediaDiscovererEnded
 {
     [self willChangeValueForKey:@"running"];
