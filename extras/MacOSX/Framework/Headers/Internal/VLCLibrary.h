@@ -29,26 +29,32 @@
 
 @class VLCAudio;
 
-/*
+/**
  * VLCLibrary object.
+ * TODO: Documentation VLCLibrary
  */
-// TODO: Documentation
 @interface VLCLibrary : NSObject 
 {
-    void *instance;
-    VLCAudio *audio;
+    void * instance;
+    VLCAudio * audio;
 }
 
 /* Factories */
+/**
+ * TODO: Documentation + [VLCLibrary sharedLibrary]
+ */
 + (VLCLibrary *)sharedLibrary;
 
 /* Properties */
-- (VLCAudio *)audio;
+/**
+ * TODO: Documentation VLCLibrary.audio
+ */
+@property (readonly) VLCAudio * audio;
 @end
 
 /*
  * Utility function
  */
 // TODO: Figure out a better way to raise error messages
-#define quit_on_exception( ex ) __quit_on_exception( (void*)(ex), __FUNCTION__, __FILE__, __LINE__ )
-extern void __quit_on_exception( void* e, const char *function, const char *file, int line_number );
+#define quit_on_exception( ex ) __quit_on_exception( (void *)(ex), __FUNCTION__, __FILE__, __LINE__ )
+extern void __quit_on_exception( void * e, const char * function, const char * file, int line_number );

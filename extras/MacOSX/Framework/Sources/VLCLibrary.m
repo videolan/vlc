@@ -28,12 +28,12 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
 
-static VLCLibrary *sharedLibrary = nil;
+static VLCLibrary * sharedLibrary = nil;
 
 // TODO: Change from a terminal error to raising an exception?
 void __quit_on_exception( void * e, const char * function, const char * file, int line_number )
 {
-    libvlc_exception_t *ex = (libvlc_exception_t *)e;
+    libvlc_exception_t * ex = (libvlc_exception_t *)e;
     if (libvlc_exception_raised( ex ))
     {
         /* XXX: localization */
@@ -62,7 +62,7 @@ static void * DestroySharedLibraryAtExit( void )
         sharedLibrary = [[self alloc] init];
         
         /* Make sure, this will get released at some point */
-        atexit( (void*)DestroySharedLibraryAtExit );
+        atexit( (void *)DestroySharedLibraryAtExit );
     }
     return [[sharedLibrary retain] autorelease];
 }
@@ -74,7 +74,7 @@ static void * DestroySharedLibraryAtExit( void )
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         
-        const char *lib_vlc_params[] = { 
+        const char * lib_vlc_params[] = { 
             "-I", "dummy", "--vout=opengllayer", 
             "--no-video-title-show"
         };
@@ -102,16 +102,13 @@ static void * DestroySharedLibraryAtExit( void )
     [super dealloc];
 }
 
-- (VLCAudio *)audio
-{
-    return audio;
-}
+@synthesize audio;
 @end
 
 @implementation VLCLibrary (VLCLibVLCBridging)
 + (void *)sharedInstance
 {
-    return [[self sharedLibrary] instance];
+    return [self sharedLibrary].instance;
 }
 
 - (void *)instance
