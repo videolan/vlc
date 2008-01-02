@@ -26,7 +26,7 @@
 #import "VLCLibVLCBridging.h"
 
 /* Notification Messages */
-NSString *VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged"; 
+NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged"; 
 
 /* libvlc event callback */
 // TODO: Callbacks

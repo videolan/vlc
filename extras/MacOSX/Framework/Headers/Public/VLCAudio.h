@@ -26,21 +26,23 @@
 
 /* Notification Messages */
 /**
- * Standard notification messages that are emitted by VLCMedia object.
+ * Standard notification messages that are emitted by VLCAudio object.
  */
-extern NSString *VLCMediaPlayerVolumeChanged;
+extern NSString * VLCMediaPlayerVolumeChanged;
 
 @class VLCLibrary;
 
-// TODO: Documentation
+/**
+ * TODO: Documentation VLCAudio
+ */
 @interface VLCAudio : NSObject 
 {
-    VLCLibrary *library;    //< Library to control audio for
+    VLCLibrary * library;   //< Library to control audio for
 }
+
 /* Properties */
 - (void)setMute:(BOOL)value;
-- (BOOL)isMuted;
 
-- (void)setVolume:(int)value;
-- (int)volume;
+@property (setter=setMute:) BOOL isMuted;
+@property (assign) int volume;
 @end
