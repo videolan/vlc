@@ -125,7 +125,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index( p_mlv, index, &p_e );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
     
     // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
     // new cocoa object representation of the media descriptor.
@@ -137,7 +137,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     libvlc_media_list_view_t * p_sub_mlv = libvlc_media_list_view_children_at_index( p_mlv, index, &p_e );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
 
     if( !p_sub_mlv )
         return nil;
@@ -159,7 +159,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     int result = libvlc_media_list_view_count( p_mlv, &p_e );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
 
     return result;
 }
@@ -242,7 +242,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     /* Add internal callback */
     libvlc_event_attach( p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e );
     libvlc_event_attach( p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e );
-    quit_on_exception( &e );
+    catch_exception( &e );
 }
 
 - (void)mediaListViewItemAdded:(NSArray *)arrayOfArgs

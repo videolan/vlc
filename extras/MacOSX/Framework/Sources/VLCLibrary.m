@@ -31,15 +31,17 @@
 static VLCLibrary * sharedLibrary = nil;
 
 // TODO: Change from a terminal error to raising an exception?
-void __quit_on_exception( void * e, const char * function, const char * file, int line_number )
+void __catch_exception( void * e, const char * function, const char * file, int line_number )
 {
     libvlc_exception_t * ex = (libvlc_exception_t *)e;
     if (libvlc_exception_raised( ex ))
     {
-        /* XXX: localization */
-        NSRunCriticalAlertPanel( @"Error", [NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)", 
-            libvlc_exception_get_message( ex ), file, line_number, function], @"Quit", nil, nil );
-        exit( ex->i_code );
+        NSException* libvlcException = [NSException
+            exceptionWithName:@"LibVLCException"
+            reason:[NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)", 
+                libvlc_exception_get_message( ex ), file, line_number, function]
+            userInfo:nil];
+        @throw libvlcException;
     }
 }
 
@@ -80,7 +82,7 @@ static void * DestroySharedLibraryAtExit( void )
         };
         
         instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );
-        quit_on_exception( &ex );
+        catch_exception( &ex );
         
         // Assignment unneeded, as the audio unit will do it for us
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];

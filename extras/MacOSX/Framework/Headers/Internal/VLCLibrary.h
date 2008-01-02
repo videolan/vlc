@@ -55,6 +55,5 @@
 /*
  * Utility function
  */
-// TODO: Figure out a better way to raise error messages
-#define quit_on_exception( ex ) __quit_on_exception( (void *)(ex), __FUNCTION__, __FILE__, __LINE__ )
-extern void __quit_on_exception( void * e, const char * function, const char * file, int line_number );
+#define catch_exception( ex ) __catch_exception( (void *)(ex), __FUNCTION__, __FILE__, __LINE__ )
+extern void __catch_exception( void * e, const char * function, const char * file, int line_number );

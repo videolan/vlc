@@ -144,7 +144,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         instance = (void *)libvlc_media_instance_new([VLCLibrary sharedInstance], &ex);
-        quit_on_exception( &ex );
+        catch_exception( &ex );
         
         [self registerObservers];
         
@@ -203,7 +203,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_media_instance_set_drawable ((libvlc_media_instance_t *)instance, 
                                         (libvlc_drawable_t)videoView, 
                                         &ex);
-    quit_on_exception( &ex );
+    catch_exception( &ex );
 }
 
 - (VLCVideoView *)videoView
@@ -221,7 +221,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_get_fullscreen( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -235,7 +235,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     char * result = libvlc_video_get_aspect_ratio( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -249,7 +249,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_video_get_spu( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -263,7 +263,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     char * result = libvlc_video_get_crop_geometry( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -277,7 +277,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_video_get_teletext( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -291,7 +291,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     float result = libvlc_media_instance_get_rate( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -301,7 +301,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_init( &ex );
     NSSize result = NSMakeSize(libvlc_video_get_height((libvlc_media_instance_t *)instance, &ex),
                                libvlc_video_get_width((libvlc_media_instance_t *)instance, &ex));
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;    
 }
 
@@ -324,7 +324,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     float result = libvlc_media_instance_get_fps( (libvlc_media_instance_t *)instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -337,7 +337,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_media_instance_set_time( (libvlc_media_instance_t *)instance, 
                                     (value ? [[value numberValue] longLongValue] / 1000 : 0),
                                     &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
 }
 
 - (VLCTime *)time
@@ -355,7 +355,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_media_instance_get_chapter( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -364,7 +364,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_media_instance_get_chapter_count( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -378,7 +378,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_audio_get_track( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -387,7 +387,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_audio_get_track_count( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -401,7 +401,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_audio_get_channel( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return result;
 }
 
@@ -428,7 +428,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         libvlc_media_instance_set_media_descriptor( instance, [media libVLCMediaDescriptor], &ex );
-        quit_on_exception( &ex );
+        catch_exception( &ex );
     }
 }
 
@@ -442,7 +442,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_instance_play( (libvlc_media_instance_t *)instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return YES;
 }
 
@@ -461,7 +461,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_instance_pause( (libvlc_media_instance_t *)instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     
     // TODO: Should we record the time in case the media instance is destroyed
     // then rebuilt?
@@ -479,7 +479,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     //    libvlc_exception_t ex;
     //    libvlc_exception_init( &ex );
     //    libvlc_media_instance_stop((libvlc_media_instance_t *)instance, &ex);
-    //    quit_on_exception( &ex );
+    //    catch_exception( &ex );
     
     // Pause and reposition to the begining of the stream.
     [self pause];
@@ -539,7 +539,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_instance_set_position( instance, newPosition, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
 }
 
 - (BOOL)isSeekable
@@ -547,7 +547,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     BOOL ret = libvlc_media_instance_is_seekable( instance, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     return ret;
 }
 
@@ -567,7 +567,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     /* FIXME: We may want to turn that off when none is interested by that */
     libvlc_event_attach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaPositionChanged,      self, &ex );
     libvlc_event_attach( p_em, libvlc_MediaInstanceTimeChanged,     HandleMediaTimeChanged,          self, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
 }
 
 - (void)unregisterObservers

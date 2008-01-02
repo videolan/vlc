@@ -173,7 +173,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         p_md = libvlc_media_descriptor_new([VLCLibrary sharedInstance],
                                            [aPath UTF8String],
                                            &ex);
-        quit_on_exception(&ex);
+        catch_exception(&ex);
         
         url = [aPath copy];
         delegate = nil;
@@ -198,7 +198,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         p_md = libvlc_media_descriptor_new_as_node([VLCLibrary sharedInstance],
                                                    [aName UTF8String],
                                                    &ex);
-        quit_on_exception(&ex);
+        catch_exception(&ex);
         
         url = [aName copy];
         delegate = nil;
@@ -332,7 +332,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         char * p_url;
         
         p_url = libvlc_media_descriptor_get_mrl( md, &ex );
-        quit_on_exception( &ex );
+        catch_exception( &ex );
         
         url = [[NSString stringWithUTF8String:p_url] retain];
         free( p_url );
@@ -418,14 +418,14 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     libvlc_exception_init( &ex );
 
     libvlc_media_descriptor_set_user_data( p_md, (void*)self, &ex );
-    quit_on_exception( &ex );
+    catch_exception( &ex );
 
     libvlc_event_manager_t * p_em = libvlc_media_descriptor_event_manager( p_md, &ex );
     libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
 //    libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaDescriptorStateChanged,    HandleMediaStateChanged,    self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
-    quit_on_exception( &ex );
+    catch_exception( &ex );
     
     libvlc_media_list_t * p_mlist = libvlc_media_descriptor_subitems( p_md, NULL );
 

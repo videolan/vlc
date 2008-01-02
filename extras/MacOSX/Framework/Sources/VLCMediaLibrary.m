@@ -47,10 +47,10 @@
         libvlc_exception_t p_e;
         libvlc_exception_init( &p_e );
         mlib = libvlc_media_library_new( [VLCLibrary sharedInstance], &p_e );
-        quit_on_exception( &p_e );
+        catch_exception( &p_e );
         
         libvlc_media_library_load( mlib, &p_e );
-        quit_on_exception( &p_e );
+        catch_exception( &p_e );
         
         allMedia = nil;
     }

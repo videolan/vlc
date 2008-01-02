@@ -76,7 +76,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
         libvlc_exception_t p_e;
         libvlc_exception_init( &p_e );
         p_mlist = libvlc_media_list_new( [VLCLibrary sharedInstance], &p_e );
-        quit_on_exception( &p_e );
+        catch_exception( &p_e );
         
         // Initialize internals to defaults
         cachedMedia = [[NSMutableArray alloc] init];
@@ -152,7 +152,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     libvlc_media_list_insert_media_descriptor( p_mlist, [media libVLCMediaDescriptor], index, &p_e );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
 }
 
 - (void)removeMediaAtIndex:(int)index
@@ -163,7 +163,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     libvlc_media_list_remove_index( p_mlist, index, &p_e );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
 }
 
 - (VLCMedia *)mediaAtIndex:(int)index
@@ -176,7 +176,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     int result = libvlc_media_list_index_of_item( p_mlist, [media libVLCMediaDescriptor], &p_e );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
     
     return result;
 }
@@ -204,7 +204,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
     BOOL isReadOnly = libvlc_media_list_is_readonly( p_mlist );
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
     
     return isReadOnly;
 }
@@ -290,7 +290,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     libvlc_event_attach( p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, &p_e );
     libvlc_event_attach( p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, &p_e );
     
-    quit_on_exception( &p_e );
+    catch_exception( &p_e );
 }
 
 - (void)mediaListItemAdded:(NSArray *)arrayOfArgs

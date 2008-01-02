@@ -58,7 +58,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
     BOOL result = libvlc_audio_get_mute([library instance], &ex);
-    quit_on_exception(&ex);
+    catch_exception(&ex);
     
     return result;
 }
@@ -77,7 +77,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
     int result = libvlc_audio_get_volume([library instance], &ex);
-    quit_on_exception(&ex);
+    catch_exception(&ex);
     return result;
 }
 @end
