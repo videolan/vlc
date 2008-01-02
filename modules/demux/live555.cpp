@@ -1516,8 +1516,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
                 uint8_t *endpos = (uint8_t*)qtRTPSource->qtState.sdAtom
                                   + qtRTPSource->qtState.sdAtomSize;
                 while (pos+8 < endpos) {
-                    unsigned atomLength = pos[0]<<24 | pos[1]<<16 | pos[2]<<8 | pos[3];
-                    if( atomLength == 0 || atomLength > endpos-pos) break;
+                    unsigned int atomLength = pos[0]<<24 | pos[1]<<16 | pos[2]<<8 | pos[3];
+                    if( atomLength == 0 || atomLength > (unsigned int)(endpos-pos)) break;
                     if( memcmp(pos+4, "avcC", 4) == 0 &&
                         atomLength > 8 &&
                         atomLength <= INT_MAX )
