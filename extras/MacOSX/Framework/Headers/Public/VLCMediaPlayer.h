@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "VLCMedia.h"
 #import "VLCVideoView.h"
+#import "VLCVideoLayer.h"
 #import "VLCTime.h"
 
 /* Notification Messages */
@@ -70,7 +71,6 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @interface VLCMediaPlayer : NSObject 
 {
     id delegate;                        //< Object delegate
-    VLCVideoView * videoView;           //< NSView instance where media is rendered to
 
     void * instance;                    //  Internal
     VLCMedia * media;                   //< Current media being played
@@ -81,6 +81,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
 /* Initializers */
 - (id)initWithVideoView:(VLCVideoView *)aVideoView;
+- (id)initWithVideoLayer:(VLCVideoLayer *)aVideoLayer;
 
 /* Properties */
 - (void)setDelegate:(id)value;
@@ -89,9 +90,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 /* Video View Options */
 // TODO: Should be it's own object?
 
-// TODO: use VLCVideoView instead of NSView
-- (void)setVideoView:(VLCVideoView *)value;
-- (VLCVideoView *)videoView;
+- (void)setVideoView:(VLCVideoView *)aVideoView;
+- (void)setVideoLayer:(VLCVideoLayer *)aVideoLayer;
 
 - (void)setFullscreen:(BOOL)value;
 - (BOOL)fullscreen;

@@ -112,6 +112,9 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 // TODO: Documentation
 @interface VLCMediaPlayer (Private)
+- (id)initWithDrawable:(id)aDrawable;
+- (void)setDrawable:(id)aDrawable;
+
 - (void)registerObservers;
 - (void)unregisterObservers;
 - (void)mediaPlayerTimeChanged:(NSNumber *)newTime;
@@ -123,34 +126,17 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (id)init
 {
-    return [self initWithVideoView:nil];
+    return [self initWithDrawable:nil];
 }
 
 - (id)initWithVideoView:(VLCVideoView *)aVideoView
 {
-    if (self = [super init])
-    {
-        [VLCMediaPlayer setKeys:[NSArray arrayWithObject:@"state"] triggerChangeNotificationsForDependentKey:@"playing"];
-        [VLCMediaPlayer setKeys:[NSArray arrayWithObjects:@"state", @"media", nil] triggerChangeNotificationsForDependentKey:@"seekable"];
-        delegate = nil;
-        media = nil;
-        cachedTime = [[VLCTime nullTime] retain];
-        position = 0.0f;
-        cachedState = VLCMediaPlayerStateStopped;
+    return [self initWithDrawable: aVideoView];
+}
 
-        // Create a media instance, it doesn't matter what library we start off with
-        // it will change depending on the media descriptor provided to the media
-        // instance
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
-        instance = (void *)libvlc_media_instance_new([VLCLibrary sharedInstance], &ex);
-        catch_exception( &ex );
-        
-        [self registerObservers];
-        
-        [self setVideoView:aVideoView];
-    }
-    return self;
+- (id)initWithVideoLayer:(VLCVideoLayer *)aVideoLayer
+{
+    return [self initWithDrawable: aVideoLayer];
 }
 
 - (void)release
@@ -193,22 +179,14 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return delegate;
 }
 
-- (void)setVideoView:(VLCVideoView *)value
-{
-    videoView = value;
-    
-    // Make sure that this instance has been associated with the drawing canvas.
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_media_instance_set_drawable ((libvlc_media_instance_t *)instance, 
-                                        (libvlc_drawable_t)videoView, 
-                                        &ex);
-    catch_exception( &ex );
+- (void)setVideoView:(VLCVideoView *)aVideoView
+{    
+    [self setDrawable: aVideoView];
 }
 
-- (VLCVideoView *)videoView
+- (void)setVideoLayer:(VLCVideoLayer *)aVideoLayer
 {
-    return videoView;
+    [self setDrawable: aVideoLayer];
 }
 
 - (void)setFullscreen:(BOOL)value
@@ -554,6 +532,44 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
 @end
 
 @implementation VLCMediaPlayer (Private)
+- (id)initWithDrawable:(id)aDrawable
+{
+    if (self = [super init])
+    {
+        [VLCMediaPlayer setKeys:[NSArray arrayWithObject:@"state"] triggerChangeNotificationsForDependentKey:@"playing"];
+        [VLCMediaPlayer setKeys:[NSArray arrayWithObjects:@"state", @"media", nil] triggerChangeNotificationsForDependentKey:@"seekable"];
+        delegate = nil;
+        media = nil;
+        cachedTime = [[VLCTime nullTime] retain];
+        position = 0.0f;
+        cachedState = VLCMediaPlayerStateStopped;
+
+        // Create a media instance, it doesn't matter what library we start off with
+        // it will change depending on the media descriptor provided to the media
+        // instance
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
+        instance = (void *)libvlc_media_instance_new([VLCLibrary sharedInstance], &ex);
+        catch_exception( &ex );
+        
+        [self registerObservers];
+        
+        [self setDrawable:aDrawable];
+    }
+    return self;
+}
+
+- (void)setDrawable:(id)aDrawable
+{
+    // Make sure that this instance has been associated with the drawing canvas.
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_instance_set_drawable ((libvlc_media_instance_t *)instance, 
+                                        (libvlc_drawable_t)aDrawable, 
+                                        &ex);
+    catch_exception( &ex );
+}
+
 - (void)registerObservers
 {
     libvlc_exception_t ex;
