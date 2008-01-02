@@ -313,6 +313,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     p_sys->b_frame_available = 1;
+    [p_sys->o_layer setNeedsDisplay];
 }
 
 /*****************************************************************************
@@ -366,11 +367,12 @@ static int InitTextures( vout_thread_t *p_vout )
            our buffer */
         glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
         glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
-#endif
 
         /* Use AGP texturing */
         glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
                          GL_STORAGE_SHARED_APPLE );
+#endif
+
         /* Call glTexImage2D only once, and use glTexSubImage2D later */
         glTexImage2D( VLCGL_TARGET, 0, 3, p_sys->i_tex_width,
                       p_sys->i_tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
@@ -407,7 +409,7 @@ static int InitTextures( vout_thread_t *p_vout )
     VLCVoutLayer* me = [super layer];
     if( me )
     {
-        me.asynchronous = YES;
+        me.asynchronous = NO;
         [me setVout: _p_vout];
         me.bounds = CGRectMake( 0.0, 0.0, 
                                 (float)_p_vout->fmt_in.i_visible_width * _p_vout->fmt_in.i_sar_num,
@@ -419,7 +421,9 @@ static int InitTextures( vout_thread_t *p_vout )
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
 {
     /* Only draw the frame when if have a frame that was previously rendered */
-    return p_vout->p_sys->b_frame_available;
+    BOOL ret = p_vout->p_sys->b_frame_available;
+    p_vout->p_sys->b_frame_available = VLC_FALSE;
+    return ret;
 }
 
 - (void)drawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
