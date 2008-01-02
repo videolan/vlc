@@ -31,7 +31,7 @@
 /******************************************************************************
  * VLCMainWindow (MasterViewDataSource)
  */
-@implementation VLCMainWindow (MasterViewDataSource)
+@implementation VLCMainWindow (MasterViewDelegate)
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
     return [[item representedObject] isKindOfClass:[NSDictionary class]];
@@ -46,6 +46,55 @@
 }
 @end
 
+@implementation VLCMainWindow (MasterViewDataSource)
+/* Drag and drop */
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id < NSDraggingInfo >)info item:(id)item childIndex:(NSInteger)index
+{
+    int i;
+
+    if(![item respondsToSelector:@selector(representedObject)])
+        return NO;
+    
+    NSArray *droppedItems = [[info draggingPasteboard] propertyListForType:@"VLCMediaURLType"];
+    if( !droppedItems )
+        droppedItems = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+    if( !droppedItems )
+        droppedItems = [[info draggingPasteboard] propertyListForType:NSURLPboardType];
+
+    NSAssert( droppedItems, @"Dropped an unsupported object type on the outline View" );
+
+    VLCMediaList * mediaList = [(VLCMedia *)[item representedObject] subitems];
+
+    for (i = 0; i < [droppedItems count]; i++)
+    {
+        NSString * filename = [droppedItems objectAtIndex:i];
+		VLCMedia *media = [VLCMedia mediaWithPath:filename];
+        [mediaList lock];
+		[mediaList insertMedia:media atIndex:index+1];
+        [mediaList unlock];
+    }
+    return YES;
+}
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id < NSDraggingInfo >)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
+{
+    NSArray *droppedItems = [[info draggingPasteboard] propertyListForType:@"VLCMediaURLType"];
+    if( !droppedItems )
+        droppedItems = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+    if( !droppedItems )
+        droppedItems = [[info draggingPasteboard] propertyListForType:NSURLPboardType];
+
+    if(! droppedItems ||
+       ![item respondsToSelector:@selector(representedObject)] ||
+       ![[item representedObject] isKindOfClass:[VLCMedia class]] )
+    {
+        return NSDragOperationNone;
+    }
+
+    return NSDragOperationMove;
+}
+@end
+
 /******************************************************************************
  * VLCMainWindow
  */
@@ -53,9 +102,6 @@
 - (void)awakeFromNib;
 {
     NSTableColumn * tableColumn;
-    
-    /* This one will be removable, so we keep a reference of it so we can safely call removeFromSuperview */
-    [navigatorView retain];    
 
     /* Check ib outlets */
     NSAssert( mainSplitView, @"No split view or wrong split view");
@@ -94,6 +140,8 @@
     [categoryList setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
     [categoryList setDelegate:self];
 
+    [categoryList registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSURLPboardType, @"VLCMediaURLType", nil]];
+    [categoryList setDataSource: self];
 
     /***********************************
      * detailList setup
