@@ -173,6 +173,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "test" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* test */;
 			projectDirPath = "";
@@ -182,6 +183,7 @@
 					ProjectRef = EFD552230CC6DF190074CEE1 /* VLC.xcodeproj */;
 				},
 			);
+			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* test */,
 			);

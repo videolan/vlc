@@ -120,7 +120,7 @@ static void *sleepForMe(void)
     for (i = 0; i < [droppedItems count]; i++)
     {
         NSString * filename = [droppedItems objectAtIndex:i];
-		VLCMedia *media = [VLCMedia mediaWithURL:filename];
+		VLCMedia * media = [VLCMedia mediaWithURL:[NSURL fileURLWithPath:filename]];
 		NSLog(@"%@ length = %@", media, [media lengthWaitUntilDate:[NSDate dateWithTimeIntervalSinceNow:60]]);
 		[playlist addMedia:media];
     }
