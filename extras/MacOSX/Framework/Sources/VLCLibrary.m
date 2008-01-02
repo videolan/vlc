@@ -30,7 +30,6 @@
 
 static VLCLibrary * sharedLibrary = nil;
 
-// TODO: Change from a terminal error to raising an exception?
 void __catch_exception( void * e, const char * function, const char * file, int line_number )
 {
     libvlc_exception_t * ex = (libvlc_exception_t *)e;
