@@ -518,7 +518,6 @@
 				);
 				PRODUCT_NAME = VLC;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SYMROOT = build;
 				VLC_BUILD_DIR = "$(VLC_SRC_DIR)";
 				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
 				VLC_SRC_DIR = ../../..;
@@ -561,7 +560,6 @@
 				);
 				PRODUCT_NAME = VLC;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SYMROOT = build;
 				VLC_BUILD_DIR = "$(VLC_SRC_DIR)";
 				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
 				VLC_SRC_DIR = ../../..;
