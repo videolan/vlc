@@ -1377,15 +1377,6 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_bitspersample =
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
-    /* Fix AAC SBR changing number of channels and sampling rate */
-    if( id->p_decoder->fmt_in.i_codec == VLC_FOURCC('m','p','4','a') &&
-        fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate &&
-        fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
-    {
-      id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;
-      id->p_encoder->fmt_out.audio.i_rate = fmt_last.audio.i_rate;
-    }
-
     /* Load conversion filters */
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels ||
         fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
