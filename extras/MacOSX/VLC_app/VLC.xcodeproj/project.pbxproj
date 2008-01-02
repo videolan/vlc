@@ -262,8 +262,8 @@
 		63874AF40D2591CE00F738AD /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				633BD4B10D2A90470012A314 /* VLCController.m */,
 				633BD4B40D2A90470012A314 /* VLCController.h */,
+				633BD4B10D2A90470012A314 /* VLCController.m */,
 				63874AF60D25920800F738AD /* Additions */,
 				633BD4620D2A8DF30012A314 /* Internals */,
 				63874AF50D2591EF00F738AD /* Video */,
@@ -428,7 +428,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $SRCROOT/../Framework/build/$CONFIGURATION/VLC.framework $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH";
+			shellScript = "if $SYMROOT != \"\"\nthen\n\tFRAMEWORK=$SRCROOT/../Framework/build/$CONFIGURATION/VLC.framework\nelse\n\tFRAMEWORK=$SYMROOT/VLC.framework\nfi\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $FRAMEWORK$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
