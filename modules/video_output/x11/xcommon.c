@@ -1363,13 +1363,30 @@ static int ManageVideo( vout_thread_t *p_vout )
                                p_vout->p_sys->p_win->i_height,
                                &i_x, &i_y, &i_width, &i_height );
 
+            /* Compute the x coordinate and check if the value is
+               in [0,p_vout->fmt_in.i_visible_width] */
             val.i_int = ( xevent.xmotion.x - i_x ) *
                 p_vout->fmt_in.i_visible_width / i_width +
                 p_vout->fmt_in.i_x_offset;
+
+            if( (int)(xevent.xmotion.x - i_x) < 0 )
+                val.i_int = 0;
+            else if( (unsigned int)val.i_int > p_vout->fmt_in.i_visible_width )
+                val.i_int = p_vout->fmt_in.i_visible_width;
+
             var_Set( p_vout, "mouse-x", val );
+
+            /* compute the y coordinate and check if the value is
+               in [0,p_vout->fmt_in.i_visible_height] */
             val.i_int = ( xevent.xmotion.y - i_y ) *
                 p_vout->fmt_in.i_visible_height / i_height +
                 p_vout->fmt_in.i_y_offset;
+
+            if( (int)(xevent.xmotion.y - i_y) < 0 )
+                val.i_int = 0;
+            else if( (unsigned int)val.i_int > p_vout->fmt_in.i_visible_height )
+                val.i_int = p_vout->fmt_in.i_visible_height;
+
             var_Set( p_vout, "mouse-y", val );
 
             val.b_bool = VLC_TRUE;
