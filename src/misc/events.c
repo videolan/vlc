@@ -167,7 +167,7 @@ int vlc_event_manager_register_event_type(
 void vlc_event_send( vlc_event_manager_t * p_em,
                      vlc_event_t * p_event )
 {
-    vlc_event_listeners_group_t * listeners_group;
+    vlc_event_listeners_group_t * listeners_group = NULL;
     vlc_event_listener_t * listener;
     vlc_event_listener_t * array_of_cached_listeners = NULL;
     vlc_event_listener_t * cached_listener;
