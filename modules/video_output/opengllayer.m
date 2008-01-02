@@ -94,7 +94,7 @@ vlc_module_begin();
     set_callbacks( CreateVout, DestroyVout );
 vlc_module_end();
 
-@interface VLCVideoLayer : CAOpenGLLayer {
+@interface VLCVoutLayer : CAOpenGLLayer {
     vout_thread_t * p_vout;
 }
 + (id)layerWithVout:(vout_thread_t*)_p_vout; 
@@ -119,7 +119,7 @@ struct vout_sys_t
     GLuint      p_textures[2];
 
     NSAutoreleasePool *autorealease_pool;
-    VLCVideoLayer * o_layer;
+    VLCVoutLayer * o_layer;
     id          o_cocoa_container;
 };
 
@@ -224,7 +224,7 @@ static int Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 1;
     p_sys->autorealease_pool = [[NSAutoreleasePool alloc] init];
 
-    [VLCVideoLayer performSelectorOnMainThread:@selector(autoinitInVout:)
+    [VLCVoutLayer performSelectorOnMainThread:@selector(autoinitInVout:)
                              withObject:[NSValue valueWithPointer:p_vout]
                              waitUntilDone:YES];
 
@@ -381,9 +381,9 @@ static int InitTextures( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * @implementation VLCVideoLayer
+ * @implementation VLCVoutLayer
  */
-@implementation VLCVideoLayer
+@implementation VLCVoutLayer
 
 /*****************************************************************************
  * autoinitInVout: Called from the video thread to create a layer.
@@ -393,7 +393,7 @@ static int InitTextures( vout_thread_t *p_vout )
 + (void)autoinitInVout:(NSValue*)arg
 {
     vout_thread_t * p_vout = [arg pointerValue];
-    p_vout->p_sys->o_layer = [[VLCVideoLayer layerWithVout: p_vout] retain];
+    p_vout->p_sys->o_layer = [[VLCVoutLayer layerWithVout: p_vout] retain];
     [p_vout->p_sys->o_cocoa_container addVoutLayer:p_vout->p_sys->o_layer];
 }
 
@@ -404,7 +404,7 @@ static int InitTextures( vout_thread_t *p_vout )
 
 + (id)layerWithVout:(vout_thread_t*)_p_vout 
 {
-    VLCVideoLayer* me = [super layer];
+    VLCVoutLayer* me = [super layer];
     if( me )
     {
         me.asynchronous = YES;
