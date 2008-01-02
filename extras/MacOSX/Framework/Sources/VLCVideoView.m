@@ -33,8 +33,8 @@
 #import <QuartzCore/QuartzCore.h>
 
 /* Notifications */
-NSString *VLCVideoViewEnteredFullScreen = @"VLCVideoViewEnteredFullScreen";
-NSString *VLCVideoViewLeftFullScreen = @"VLCVideoViewLeftFullScreen";
+NSString * VLCVideoViewEnteredFullScreen    = @"VLCVideoViewEnteredFullScreen";
+NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
 
 /******************************************************************************
  * Soon deprecated stuff 
