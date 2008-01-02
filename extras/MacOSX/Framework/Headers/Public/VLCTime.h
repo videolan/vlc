@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 
 /**
- * Provides an object to define VLCMedia's ti   me.
+ * Provides an object to define VLCMedia's time.
  */
 @interface VLCTime : NSObject
 {
