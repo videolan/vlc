@@ -1353,13 +1353,13 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, VLC_FOURCC('f','l','3','2') );
     id->p_encoder->fmt_in.audio.i_format = VLC_FOURCC('f','l','3','2');
 
-    id->p_encoder->fmt_in.audio.i_rate = id->p_decoder->fmt_out.audio.i_rate;
+    id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
-        id->p_decoder->fmt_out.audio.i_physical_channels;
+        id->p_encoder->fmt_out.audio.i_physical_channels;
     id->p_encoder->fmt_in.audio.i_original_channels =
-        id->p_decoder->fmt_out.audio.i_original_channels;
+        id->p_encoder->fmt_out.audio.i_original_channels;
     id->p_encoder->fmt_in.audio.i_channels =
-        id->p_decoder->fmt_out.audio.i_channels;
+        id->p_encoder->fmt_out.audio.i_channels;
     id->p_encoder->fmt_in.audio.i_bitspersample =
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
@@ -1378,9 +1378,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     /* Fix AAC SBR changing number of channels and sampling rate */
-    if( ( id->p_decoder->fmt_in.i_codec == VLC_FOURCC('m','p','4','a') ) &&
-        ( fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate ) &&
-        ( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )  )
+    if( id->p_decoder->fmt_in.i_codec == VLC_FOURCC('m','p','4','a') &&
+        fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate &&
+        fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
     {
       id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;
       id->p_encoder->fmt_out.audio.i_rate = fmt_last.audio.i_rate;
@@ -2781,6 +2781,7 @@ static int transcode_spu_process( sout_stream_t *p_stream,
             return VLC_SUCCESS;
         }
     }
+
     return VLC_EGENERIC;
 }
 
