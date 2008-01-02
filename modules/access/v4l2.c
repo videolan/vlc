@@ -59,10 +59,12 @@
 #include <sys/soundcard.h>
 
 #ifdef HAVE_ALSA
-# define ALSA_PCM_NEW_HW_PARAMS_API
-# define ALSA_PCM_NEW_SW_PARAMS_API
-# include <alsa/asoundlib.h>
+#   define ALSA_PCM_NEW_HW_PARAMS_API
+#   define ALSA_PCM_NEW_SW_PARAMS_API
+#   include <alsa/asoundlib.h>
 #endif
+
+#include <poll.h>
 
 /*****************************************************************************
  * Module descriptior
@@ -125,10 +127,12 @@ static void AccessClose( vlc_object_t * );
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device to use. " \
-    "If you don't specify anything, /dev/dsp will be used.")
-#define ALSA_TEXT N_( "Use Alsa" )
-#define ALSA_LONGTEXT N_( \
-    "Use ALSA instead of OSS for audio" )
+    "If you don't specify anything, \"/dev/dsp\" will be used for OSS, " \
+    "\"default\" for Alsa (if Alsa support is enabled).")
+#define AUDIO_METHOD_TEXT N_( "Audio method" )
+#define AUDIO_METHOD_LONGTEXT N_( \
+    "Audio method to use: 1 for OSS, 2 for ALSA, 3 for ALSA or OSS " \
+    "(ALSA is prefered)." )
 #define STEREO_TEXT N_( "Stereo" )
 #define STEREO_LONGTEXT N_( \
     "Capture the audio stream in stereo." )
@@ -157,6 +161,13 @@ static int i_iomethod_list[] =
 static const char *psz_iomethod_list_text[] =
     { N_("READ"), N_("MMAP"),  N_("USERPTR") };
 
+#define FIND_VIDEO 1
+#define FIND_AUDIO 2
+
+#define AUDIO_METHOD_OSS 1
+#define OSS_DEFAULT "/dev/dsp"
+#define AUDIO_METHOD_ALSA 2
+#define ALSA_DEFAULT "default"
 #define CFG_PREFIX "v4l2-"
 
 vlc_module_begin();
@@ -185,11 +196,11 @@ vlc_module_begin();
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Audio input" ), NULL );
-    add_string( CFG_PREFIX "adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
+    add_string( CFG_PREFIX "adev", NULL, 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
 #ifdef HAVE_ALSA
-    add_bool( CFG_PREFIX "alsa", VLC_FALSE, NULL, ALSA_TEXT, ALSA_LONGTEXT,
-                VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-method", AUDIO_METHOD_OSS|AUDIO_METHOD_ALSA,
+                 NULL, AUDIO_METHOD_TEXT, AUDIO_METHOD_LONGTEXT, VLC_TRUE );
 #endif
     add_bool( CFG_PREFIX "stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 VLC_TRUE );
@@ -246,7 +257,7 @@ static block_t* GrabAudio( demux_t *p_demux );
 static vlc_bool_t IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
-static char* ResolveALSADeviceName( char *psz_device );
+static char* ResolveALSADeviceName( const char *psz_device );
 static int OpenVideoDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
 static int OpenAudioDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
 static vlc_bool_t ProbeVideoDev( vlc_object_t *, demux_sys_t *,
@@ -396,17 +407,15 @@ struct demux_sys_t
     block_t *p_block_audio;
     es_out_id_t *p_es_audio;
 
+    int i_audio_method;
+
 #ifdef HAVE_ALSA
     /* ALSA Audio */
-    vlc_bool_t b_use_alsa;
     snd_pcm_t *p_alsa_pcm;
     int i_alsa_frame_size;
     int i_alsa_chunk_size;
 #endif
 };
-
-#define FIND_VIDEO 1
-#define FIND_AUDIO 2
 
 static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
                            int i_flags, vlc_bool_t b_demux,
@@ -443,7 +452,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
             {
                 msg_Dbg( p_this, "'%s' is an audio device", p_sys->psz_device );
                 /* Device was an audio device */
-                if( p_sys->psz_adev ) free( p_sys->psz_adev );
+                free( p_sys->psz_adev );
                 p_sys->psz_adev = p_sys->psz_device;
                 p_sys->psz_device = NULL;
                 p_sys->i_fd_audio = OpenAudioDev( p_this, p_sys, b_demux );
@@ -482,15 +491,13 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
     /* Find audio device */
     if( i_flags & FIND_AUDIO && p_sys->i_fd_audio < 0 )
     {
-        if( !p_sys->psz_adev || !*p_sys->psz_adev )
+        if( !p_sys->psz_adev )
         {
-            if( p_sys->psz_adev ) free( p_sys->psz_adev );
-            p_sys->psz_adev = var_CreateGetString( p_this, "v4l2-adev" );
+            p_sys->psz_adev = var_CreateGetNonEmptyString( p_this, "v4l2-adev" );
         }
 
         msg_Dbg( p_this, "opening '%s' as audio", p_sys->psz_adev );
-        if( p_sys->psz_adev && *p_sys->psz_adev
-         && ProbeAudioDev( p_this, p_sys, p_sys->psz_adev ) )
+        if( ProbeAudioDev( p_this, p_sys, p_sys->psz_adev ) )
         {
             p_sys->i_fd_audio = OpenAudioDev( p_this, p_sys, b_demux );
         }
@@ -572,7 +579,9 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
 
 #ifdef HAVE_ALSA
-    p_sys->b_use_alsa = var_CreateGetBool( p_obj, "v4l2-alsa" );
+    p_sys->i_audio_method = var_CreateGetInteger( p_obj, "v4l2-audio-method" );
+#else
+    p_sys->i_audio_method = AUDIO_METHOD_OSS;
 #endif
 
     p_sys->b_stereo = var_CreateGetBool( p_obj, "v4l2-stereo" );
@@ -622,6 +631,11 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                 }
 
                 p_sys->psz_adev = strndup( psz_parser, i_len );
+                if( !*p_sys->psz_adev )
+                {
+                    free( p_sys->psz_adev );
+                    p_sys->psz_adev = NULL;
+                }
 
                 psz_parser += i_len;
             }
@@ -770,10 +784,11 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                             &psz_parser, 0 );
             }
 #ifdef HAVE_ALSA
-            else if( !strncmp( psz_parser, "alsa", strlen( "alsa" ) ) )
+            else if( !strncmp( psz_parser, "audio-method", strlen( "audio-method" ) ) )
             {
-                psz_parser += strlen( "alsa" );
-                p_sys->b_use_alsa = VLC_TRUE;
+                p_sys->i_audio_method =
+                    strtol( psz_parser + strlen( "audio-method" ),
+                            &psz_parser, 0 );
             }
 #endif
             else if( !strncmp( psz_parser, "stereo", strlen( "stereo" ) ) )
@@ -902,25 +917,19 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
 #ifdef HAVE_ALSA
-    if( p_sys->b_use_alsa )
-    {
-        if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
-    }
-    else
+    if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
 #endif
-    {
-        if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
-    }
+    if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
 
     if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
-    if( p_sys->psz_device ) free( p_sys->psz_device );
-    if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
-    if( p_sys->psz_adev ) free( p_sys->psz_adev );
-    if( p_sys->p_standards ) free( p_sys->p_standards );
-    if( p_sys->p_inputs ) free( p_sys->p_inputs );
-    if( p_sys->p_tuners ) free( p_sys->p_tuners );
-    if( p_sys->p_codecs ) free( p_sys->p_codecs );
-    if( p_sys->psz_requested_chroma ) free( p_sys->psz_requested_chroma );
+    free( p_sys->psz_device );
+    free( p_sys->psz_vdev );
+    free( p_sys->psz_adev );
+    free( p_sys->p_standards );
+    free( p_sys->p_inputs );
+    free( p_sys->p_tuners );
+    free( p_sys->p_codecs );
+    free( p_sys->psz_requested_chroma );
 
     free( p_sys );
 }
@@ -1306,7 +1315,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     struct audio_buf_info buf_info;
-    int i_read, i_correct;
+    int i_read = 0, i_correct;
     block_t *p_block;
 
     if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
@@ -1321,7 +1330,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     p_sys->p_block_audio = p_block;
 
 #ifdef HAVE_ALSA
-    if( p_sys->b_use_alsa )
+    if( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
     {
         /* ALSA */
         i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
@@ -1354,6 +1363,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     }
     else
 #endif
+    if( p_sys->i_audio_method & AUDIO_METHOD_OSS )
     {
         /* OSS */
         i_read = read( p_sys->i_fd_audio, p_block->p_buffer,
@@ -1367,9 +1377,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 
     /* Correct the date because of kernel buffering */
     i_correct = i_read;
-#ifdef HAVE_ALSA
-    if( !p_sys->b_use_alsa )
-#endif
+    if( p_sys->i_audio_method & AUDIO_METHOD_OSS )
     {
         /* OSS */
         if( ioctl( p_sys->i_fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
@@ -1378,7 +1386,7 @@ static block_t* GrabAudio( demux_t *p_demux )
         }
     }
 #ifdef HAVE_ALSA
-    else
+    else if( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
     {
         /* ALSA */
         int i_err;
@@ -1939,7 +1947,7 @@ open_failed:
 /*****************************************************************************
  * ResolveALSADeviceName: Change any . to : in the ALSA device name
  *****************************************************************************/
-static char *ResolveALSADeviceName( char *psz_device )
+static char *ResolveALSADeviceName( const char *psz_device )
 {
     char* psz_alsa_name = strdup( psz_device );
     for( unsigned int i = 0; i < strlen( psz_device ); i++ )
@@ -1953,222 +1961,269 @@ static char *ResolveALSADeviceName( char *psz_device )
 /*****************************************************************************
  * OpenAudioDev: open and set up the audio device and probe for capabilities
  *****************************************************************************/
-static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
-                         vlc_bool_t b_demux )
+#ifdef HAVE_ALSA
+static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
+                             vlc_bool_t b_demux )
+{
+    char *psz_device = p_sys->psz_adev;
+    int i_fd = 0;
+    p_sys->p_alsa_pcm = NULL;
+    char* psz_alsa_device_name = NULL;
+    snd_pcm_hw_params_t *p_hw_params = NULL;
+    snd_pcm_uframes_t buffer_size;
+    snd_pcm_uframes_t chunk_size;
+
+    /* ALSA */
+    int i_err;
+    psz_alsa_device_name =
+        ResolveALSADeviceName( psz_device?: ALSA_DEFAULT );
+
+    if( ( i_err = snd_pcm_open( &p_sys->p_alsa_pcm, psz_alsa_device_name,
+        SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0)
+    {
+        msg_Err( p_this, "Cannot open ALSA audio device %s (%s)",
+                 psz_alsa_device_name, snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    if( ( i_err = snd_pcm_nonblock( p_sys->p_alsa_pcm, 1 ) ) < 0)
+    {
+        msg_Err( p_this, "Cannot set ALSA nonblock (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Begin setting hardware parameters */
+
+    if( ( i_err = snd_pcm_hw_params_malloc( &p_hw_params ) ) < 0 )
+    {
+        msg_Err( p_this,
+                 "ALSA: cannot allocate hardware parameter structure (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    if( ( i_err = snd_pcm_hw_params_any( p_sys->p_alsa_pcm, p_hw_params ) ) < 0 )
+    {
+        msg_Err( p_this,
+                "ALSA: cannot initialize hardware parameter structure (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Set Interleaved access */
+    if( ( i_err = snd_pcm_hw_params_set_access( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot set access type (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Set 16 bit little endian */
+    if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_FORMAT_S16_LE ) ) < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot set sample format (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Set sample rate */
+#ifdef HAVE_ALSA_NEW_API
+    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
+#else
+    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, p_sys->i_sample_rate, NULL );
+#endif
+    if( i_err < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot set sample rate (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Set channels */
+    unsigned int channels = p_sys->b_stereo ? 2 : 1;
+    if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
+    {
+        channels = ( channels==1 ) ? 2 : 1;
+        msg_Warn( p_this, "ALSA: cannot set channel count (%s). "
+                  "Trying with channels=%d",
+                  snd_strerror( i_err ),
+                  channels );
+        if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
+        {
+            msg_Err( p_this, "ALSA: cannot set channel count (%s)",
+                     snd_strerror( i_err ) );
+            goto adev_fail;
+        }
+        p_sys->b_stereo = ( channels == 2 );
+    }
+
+    /* Set metrics for buffer calculations later */
+    unsigned int buffer_time;
+    if( ( i_err = snd_pcm_hw_params_get_buffer_time_max(p_hw_params, &buffer_time, 0) ) < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot get buffer time max (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+    if (buffer_time > 500000) buffer_time = 500000;
+
+    /* Set period time */
+    unsigned int period_time = buffer_time / 4;
+#ifdef HAVE_ALSA_NEW_API
+    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
+#else
+    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, period_time, 0 );
+#endif
+    if( i_err < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot set period time (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Set buffer time */
+#ifdef HAVE_ALSA_NEW_API
+    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
+#else
+    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, buffer_time, 0 );
+#endif
+    if( i_err < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot set buffer time (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Apply new hardware parameters */
+    if( ( i_err = snd_pcm_hw_params( p_sys->p_alsa_pcm, p_hw_params ) ) < 0 )
+    {
+        msg_Err( p_this, "ALSA: cannot set hw parameters (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Get various buffer metrics */
+    snd_pcm_hw_params_get_period_size( p_hw_params, &chunk_size, 0 );
+    snd_pcm_hw_params_get_buffer_size( p_hw_params, &buffer_size );
+    if (chunk_size == buffer_size)
+    {
+        msg_Err( p_this,
+                 "ALSA: period cannot equal buffer size (%lu == %lu)",
+                 chunk_size, buffer_size);
+        goto adev_fail;
+    }
+
+    int bits_per_sample = snd_pcm_format_physical_width(SND_PCM_FORMAT_S16_LE);
+    int bits_per_frame = bits_per_sample * channels;
+
+    p_sys->i_alsa_chunk_size = chunk_size;
+    p_sys->i_alsa_frame_size = (bits_per_sample / 8) * channels;
+    p_sys->i_audio_max_frame_size = chunk_size * bits_per_frame / 8; 
+
+    snd_pcm_hw_params_free( p_hw_params );
+    p_hw_params = NULL;
+
+    /* Prep device */
+    if( ( i_err = snd_pcm_prepare( p_sys->p_alsa_pcm ) ) < 0 )
+    {
+        msg_Err( p_this,
+                 "ALSA: cannot prepare audio interface for use (%s)",
+                 snd_strerror( i_err ) );
+        goto adev_fail;
+    }
+
+    /* Return a fake handle so other tests work */
+    i_fd = 1;
+
+    free( psz_alsa_device_name );
+
+    if( !p_sys->psz_adev )
+        p_sys->psz_adev = strdup( ALSA_DEFAULT );
+    return i_fd;
+
+ adev_fail:
+
+    if( i_fd >= 0 ) close( i_fd );
+
+    if( p_hw_params ) snd_pcm_hw_params_free( p_hw_params );
+    if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
+    free( psz_alsa_device_name );
+
+    return -1;
+
+}
+#endif
+
+static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
+                            vlc_bool_t b_demux )
 {
     char *psz_device = p_sys->psz_adev;
     int i_fd = 0;
     int i_format;
-#ifdef HAVE_ALSA
-    p_sys->p_alsa_pcm = NULL;
-    char* psz_alsa_device_name = ResolveALSADeviceName( psz_device );
-    snd_pcm_hw_params_t *p_hw_params = NULL;
-    snd_pcm_uframes_t buffer_size;
-    snd_pcm_uframes_t chunk_size;
-#endif
+    /* OSS */
+    if( !psz_device ) psz_device = strdup( OSS_DEFAULT ); /* FIXME leak */
 
-#ifdef HAVE_ALSA
-    if( p_sys->b_use_alsa )
+    if( (i_fd = open( psz_device, O_RDONLY | O_NONBLOCK )) < 0 )
     {
-        /* ALSA */
-
-        int i_err;
-
-        if( ( i_err = snd_pcm_open( &p_sys->p_alsa_pcm, psz_alsa_device_name,
-            SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0)
-        {
-            msg_Err( p_this, "Cannot open ALSA audio device %s (%s)",
-                     psz_alsa_device_name, snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        if( ( i_err = snd_pcm_nonblock( p_sys->p_alsa_pcm, 1 ) ) < 0)
-        {
-            msg_Err( p_this, "Cannot set ALSA nonblock (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Begin setting hardware parameters */
-
-        if( ( i_err = snd_pcm_hw_params_malloc( &p_hw_params ) ) < 0 )
-        {
-            msg_Err( p_this,
-                     "ALSA: cannot allocate hardware parameter structure (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        if( ( i_err = snd_pcm_hw_params_any( p_sys->p_alsa_pcm, p_hw_params ) ) < 0 )
-        {
-            msg_Err( p_this,
-                    "ALSA: cannot initialize hardware parameter structure (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Set Interleaved access */
-        if( ( i_err = snd_pcm_hw_params_set_access( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set access type (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Set 16 bit little endian */
-        if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_FORMAT_S16_LE ) ) < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set sample format (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Set sample rate */
-#ifdef HAVE_ALSA_NEW_API
-        i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
-#else
-        i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, p_sys->i_sample_rate, NULL );
-#endif
-        if( i_err < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set sample rate (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Set channels */
-        unsigned int channels = p_sys->b_stereo ? 2 : 1;
-        if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
-        {
-            channels = ( channels==1 ) ? 2 : 1;
-            msg_Warn( p_this, "ALSA: cannot set channel count (%s). "
-                      "Trying with channels=%d",
-                      snd_strerror( i_err ),
-                      channels );
-            if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
-            {
-                msg_Err( p_this, "ALSA: cannot set channel count (%s)",
-                         snd_strerror( i_err ) );
-                goto adev_fail;
-            }
-            p_sys->b_stereo = ( channels == 2 );
-        }
-
-        /* Set metrics for buffer calculations later */
-        unsigned int buffer_time;
-        if( ( i_err = snd_pcm_hw_params_get_buffer_time_max(p_hw_params, &buffer_time, 0) ) < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot get buffer time max (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-        if (buffer_time > 500000) buffer_time = 500000;
-
-        /* Set period time */
-        unsigned int period_time = buffer_time / 4;
-#ifdef HAVE_ALSA_NEW_API
-        i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
-#else
-        i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, period_time, 0 );
-#endif
-        if( i_err < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set period time (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Set buffer time */
-#ifdef HAVE_ALSA_NEW_API
-        i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
-#else
-        i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, buffer_time, 0 );
-#endif
-        if( i_err < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set buffer time (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Apply new hardware parameters */
-        if( ( i_err = snd_pcm_hw_params( p_sys->p_alsa_pcm, p_hw_params ) ) < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set hw parameters (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Get various buffer metrics */
-        snd_pcm_hw_params_get_period_size( p_hw_params, &chunk_size, 0 );
-        snd_pcm_hw_params_get_buffer_size( p_hw_params, &buffer_size );
-        if (chunk_size == buffer_size)
-        {
-            msg_Err( p_this,
-                     "ALSA: period cannot equal buffer size (%lu == %lu)",
-                     chunk_size, buffer_size);
-            goto adev_fail;
-        }
-
-        int bits_per_sample = snd_pcm_format_physical_width(SND_PCM_FORMAT_S16_LE);
-        int bits_per_frame = bits_per_sample * channels;
-
-        p_sys->i_alsa_chunk_size = chunk_size;
-        p_sys->i_alsa_frame_size = (bits_per_sample / 8) * channels;
-        p_sys->i_audio_max_frame_size = chunk_size * bits_per_frame / 8; 
-
-        snd_pcm_hw_params_free( p_hw_params );
-        p_hw_params = NULL;
-
-        /* Prep device */
-        if( ( i_err = snd_pcm_prepare( p_sys->p_alsa_pcm ) ) < 0 )
-        {
-            msg_Err( p_this,
-                     "ALSA: cannot prepare audio interface for use (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-
-        /* Return a fake handle so other tests work */
-        i_fd = 1;
-
+        msg_Err( p_this, "cannot open OSS audio device (%m)" );
+        goto adev_fail;
     }
-    else
-#endif /* HAVE_ALSA */
+
+    i_format = AFMT_S16_LE;
+    if( ioctl( i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
+        || i_format != AFMT_S16_LE )
     {
-        /* OSS */
-
-        if( (i_fd = open( psz_device, O_RDONLY | O_NONBLOCK )) < 0 )
-        {
-            msg_Err( p_this, "cannot open OSS audio device (%m)" );
-            goto adev_fail;
-        }
-
-        i_format = AFMT_S16_LE;
-        if( ioctl( i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
-            || i_format != AFMT_S16_LE )
-        {
-            msg_Err( p_this,
-                     "cannot set audio format (16b little endian) (%m)" );
-            goto adev_fail;
-        }
-
-        if( ioctl( i_fd, SNDCTL_DSP_STEREO,
-                   &p_sys->b_stereo ) < 0 )
-        {
-            msg_Err( p_this, "cannot set audio channels count (%m)" );
-            goto adev_fail;
-        }
-
-        if( ioctl( i_fd, SNDCTL_DSP_SPEED,
-                   &p_sys->i_sample_rate ) < 0 )
-        {
-            msg_Err( p_this, "cannot set audio sample rate (%m)" );
-            goto adev_fail;
-        }
-
-        p_sys->i_audio_max_frame_size = 6 * 1024;
+        msg_Err( p_this,
+                 "cannot set audio format (16b little endian) (%m)" );
+        goto adev_fail;
     }
+
+    if( ioctl( i_fd, SNDCTL_DSP_STEREO,
+               &p_sys->b_stereo ) < 0 )
+    {
+        msg_Err( p_this, "cannot set audio channels count (%m)" );
+        goto adev_fail;
+    }
+
+    if( ioctl( i_fd, SNDCTL_DSP_SPEED,
+               &p_sys->i_sample_rate ) < 0 )
+    {
+        msg_Err( p_this, "cannot set audio sample rate (%m)" );
+        goto adev_fail;
+    }
+
+    p_sys->i_audio_max_frame_size = 6 * 1024;
+
+    if( !p_sys->psz_adev )
+        p_sys->psz_adev = strdup( OSS_DEFAULT );
+    return i_fd;
+
+ adev_fail:
+
+    if( i_fd >= 0 ) close( i_fd );
+    return -1;
+
+}
+
+static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
+                         vlc_bool_t b_demux )
+{
+    char *psz_device;
+    int i_fd = -1;
+
+#ifdef HAVE_ALSA
+    if( ( p_sys->i_audio_method & AUDIO_METHOD_ALSA ) && i_fd < 0 )
+        i_fd  = OpenAudioDevAlsa( p_this, p_sys, b_demux );
+#endif
+
+    if( ( p_sys->i_audio_method & AUDIO_METHOD_OSS ) && i_fd < 0 )
+        i_fd = OpenAudioDevOss( p_this, p_sys, b_demux );
+
+    if( i_fd < 0 )
+        return i_fd;
+
+    psz_device = p_sys->psz_adev;
 
     msg_Dbg( p_this, "opened adev=`%s' %s %dHz",
              psz_device, p_sys->b_stereo ? "stereo" : "mono",
@@ -2192,24 +2247,7 @@ static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
         p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
     }
 
-#ifdef HAVE_ALSA
-    free( psz_alsa_device_name );
-#endif
-
     return i_fd;
-
- adev_fail:
-
-    if( i_fd >= 0 ) close( i_fd );
-
-#ifdef HAVE_ALSA
-    if( p_hw_params ) snd_pcm_hw_params_free( p_hw_params );
-    if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
-    free( psz_alsa_device_name );
-#endif
-
-    return -1;
-
 }
 
 /*****************************************************************************
@@ -2506,56 +2544,77 @@ open_failed:
 /*****************************************************************************
  * ProbeAudioDev: probe audio for capabilities
  *****************************************************************************/
-static vlc_bool_t ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
-                                 char *psz_device )
+#ifdef HAVE_ALSA
+static vlc_bool_t ProbeAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
+                                     char *psz_device )
+{
+    int i_err;
+    snd_pcm_t *p_alsa_pcm;
+    char* psz_alsa_device_name = ResolveALSADeviceName( psz_device ?: ALSA_DEFAULT );
+
+    if( ( i_err = snd_pcm_open( &p_alsa_pcm, psz_alsa_device_name, SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0 )
+    {
+        msg_Err( p_this, "cannot open device %s for ALSA audio (%s)", psz_alsa_device_name, snd_strerror( i_err ) );
+        free( psz_alsa_device_name );
+        return VLC_FALSE;
+    }
+
+    snd_pcm_close( p_alsa_pcm );
+    free( psz_alsa_device_name );
+
+    return VLC_TRUE;
+}
+#endif
+
+static vlc_bool_t ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
+                                    char *psz_device )
 {
     int i_fd = 0;
     int i_caps;
+    if( !psz_device ) psz_device = strdup( OSS_DEFAULT ); /* FIXME leak */
 
-#ifdef HAVE_ALSA
-    if( p_sys->b_use_alsa )
+    if( ( i_fd = open( psz_device, O_RDONLY | O_NONBLOCK ) ) < 0 )
     {
-        /* ALSA */
-
-        int i_err;
-        snd_pcm_t *p_alsa_pcm;
-        char* psz_alsa_device_name = ResolveALSADeviceName( psz_device );
-
-        if( ( i_err = snd_pcm_open( &p_alsa_pcm, psz_alsa_device_name, SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0 )
-        {
-            msg_Err( p_this, "cannot open device %s for ALSA audio (%s)", psz_alsa_device_name, snd_strerror( i_err ) );
-            free( psz_alsa_device_name );
-            goto open_failed;
-        }
-
-        snd_pcm_close( p_alsa_pcm );
-        free( psz_alsa_device_name );
+        msg_Err( p_this, "cannot open device %s for OSS audio (%m)", psz_device );
+        goto open_failed;
     }
-    else
-#endif /* HAVE_ALSA */
+
+    /* this will fail if the device is video */
+    if( ioctl( i_fd, SNDCTL_DSP_GETCAPS, &i_caps ) < 0 )
     {
-        /* OSS */
-
-        if( ( i_fd = open( psz_device, O_RDONLY | O_NONBLOCK ) ) < 0 )
-        {
-            msg_Err( p_this, "cannot open device %s for OSS audio (%m)", psz_device );
-            goto open_failed;
-        }
-
-        /* this will fail if the device is video */
-        if( ioctl( i_fd, SNDCTL_DSP_GETCAPS, &i_caps ) < 0 )
-        {
-            msg_Err( p_this, "cannot get audio caps (%m)" );
-            goto open_failed;
-        }
-
-        if( i_fd >= 0 ) close( i_fd );
+        msg_Err( p_this, "cannot get audio caps (%m)" );
+        goto open_failed;
     }
+
+    if( i_fd >= 0 ) close( i_fd );
 
     return VLC_TRUE;
 
 open_failed:
     if( i_fd >= 0 ) close( i_fd );
+    return VLC_FALSE;
+}
+
+static vlc_bool_t ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
+                                 char *psz_device )
+{
+#ifdef HAVE_ALSA
+    if( ( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
+     && ProbeAudioDevAlsa( p_this, p_sys, psz_device ) )
+    {
+        p_sys->i_audio_method = AUDIO_METHOD_ALSA;
+        return VLC_TRUE;
+    }
+#endif
+
+    if( ( p_sys->i_audio_method & AUDIO_METHOD_OSS )
+     && ProbeAudioDevOss( p_this, p_sys, psz_device ) )
+    {
+        p_sys->i_audio_method = AUDIO_METHOD_OSS;
+        return VLC_TRUE;
+    }
+
+    p_sys->i_audio_method = 0;
     return VLC_FALSE;
 }
 
