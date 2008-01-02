@@ -32,42 +32,100 @@ extern NSString * VLCMediaListItemDeleted;
 @class VLCMediaList;
 @class VLCMediaListAspect;
 
-// TODO: Documentation
+/**
+ * TODO: Documentation VLCMediaListDelegate
+ */
 @protocol VLCMediaListDelegate
+/**
+ * TODO: Documentation - [VLCMediaListDelegate mediaList:mediaAdded:atIndex:]
+ */
 - (void)mediaList:(VLCMediaList *)aMediaList mediaAdded:(VLCMedia *)media atIndex:(int)index;
+
+/**
+ * TODO: Documentation - [VLCMediaListDelegate mediaList:mediaRemovedAtIndex:]
+ */
 - (void)mediaList:(VLCMediaList *)aMediaList mediaRemovedAtIndex:(int)index;
 @end
 
-// TODO: Documentation
+/**
+ * TODO: Documentation VLCMediaList
+ */
 @interface VLCMediaList : NSObject
 {
-    void * p_mlist;                //< Internal instance of media list
-    id <VLCMediaListDelegate,NSObject> delegate;                //< Delegate object
-    NSMutableArray *cachedMedia; /* We need that private copy because of Cocoa Bindings, that need to be working on first thread */
-    VLCMediaListAspect * flatAspect;
-    VLCMediaListAspect * hierarchicalAspect;
-    VLCMediaListAspect * hierarchicalNodeAspect;
+    void * p_mlist;                                 //< Internal instance of media list
+    id <VLCMediaListDelegate,NSObject> delegate;    //< Delegate object
+    /* We need that private copy because of Cocoa Bindings, that need to be working on first thread */
+    NSMutableArray * cachedMedia;                   //< Private copy of media objects.
+    VLCMediaListAspect * flatAspect;                //< TODO: Documentation VLCMediaList.flatAspect
+    VLCMediaListAspect * hierarchicalAspect;        //< TODO: Documentation VLCMediaList.hierarchicalAspect
+    VLCMediaListAspect * hierarchicalNodeAspect;    //< TODO: Documentation VLCMediaList.hierarchicalNodeAspect
 }
 
-/* Properties */
-- (void)setDelegate:(id)value;
-- (id)delegate;
-
 /* Operations */
+/**
+ * TODO: Documentation - [VLCMediaList lock]
+ */
 - (void)lock;
+
+/**
+ * TODO: Documentation - [VLCMediaList unlock]
+ */
 - (void)unlock;
 
+/**
+ * TODO: Documentation - [VLCMediaList addMedia:]
+ */
 - (int)addMedia:(VLCMedia *)media;
-- (void)insertMedia:(VLCMedia *)media atIndex:(int)index;
-- (void)removeMediaAtIndex:(int)index;
-- (VLCMedia *)mediaAtIndex:(int)index;
-- (int)indexOfMedia:(VLCMedia *)media;
-- (int)count;
 
-- (BOOL)isReadOnly;
+/**
+ * TODO: Documentation - [VLCMediaList insertMedia:atIndex:]
+ */
+- (void)insertMedia:(VLCMedia *)media atIndex:(int)index;
+
+/**
+ * TODO: Documentation - [VLCMediaList removeMediaAtIndex:]
+ */
+- (void)removeMediaAtIndex:(int)index;
+
+/**
+ * TODO: Documentation - [VLCMediaList mediaAtIndex:]
+ */
+- (VLCMedia *)mediaAtIndex:(int)index;
+
+/**
+ * TODO: Documentation - [VLCMediaList indexOfMedia:]
+ */
+- (int)indexOfMedia:(VLCMedia *)media;
+
+/* Properties */
+/**
+ * TODO: Documentation VLCMediaList.count
+ */
+@property (readonly) int count;
+
+/**
+ * TODO: Documentation VLCMediaList.delegate
+ */
+@property (assign) id delegate;
+
+/**
+ * TODO: Documentation VLCMediaList.isReadOnly
+ */
+@property (readonly) BOOL isReadOnly;
 
 /* Media list aspect */
-- (VLCMediaListAspect *)hierarchicalAspect;
-- (VLCMediaListAspect *)hierarchicalNodeAspect;
-- (VLCMediaListAspect *)flatAspect;
+/**
+ * TODO: Documentation VLCMediaList.hierarchicalAspect
+ */
+@property (readonly) VLCMediaListAspect * hierarchicalAspect;
+
+/**
+ * TODO: Documentation VLCMediaList.hierarchicalNodeAspect
+ */
+@property (readonly) VLCMediaListAspect * hierarchicalNodeAspect;
+
+/**
+ * TODO: Documentation VLCMediaList.flatAspect
+ */
+@property (readonly) VLCMediaListAspect * flatAspect;
 @end

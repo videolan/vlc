@@ -30,8 +30,8 @@
 #include <vlc/libvlc.h>
 
 /* Notification Messages */
-NSString *VLCMediaListItemAdded        = @"VLCMediaListItemAdded";
-NSString *VLCMediaListItemDeleted      = @"VLCMediaListItemDeleted";
+NSString * VLCMediaListItemAdded        = @"VLCMediaListItemAdded";
+NSString * VLCMediaListItemDeleted      = @"VLCMediaListItemDeleted";
 
 // TODO: Documentation
 @interface VLCMediaList (Private)
@@ -44,7 +44,7 @@ NSString *VLCMediaListItemDeleted      = @"VLCMediaListItemDeleted";
 @end
 
 /* libvlc event callback */
-static void HandleMediaListItemAdded(const libvlc_event_t *event, void *user_data)
+static void HandleMediaListItemAdded(const libvlc_event_t * event, void * user_data)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
@@ -67,19 +67,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     [pool release];
 }
 
-@implementation VLCMediaList (KeyValueCodingCompliance)
-/* For the @"media" key */
-- (int) countOfMedia
-{
-    return [self count];
-}
-
-- (id) objectInMediaAtIndex:(int)i
-{
-    return [self mediaAtIndex:i];
-}
-@end
-
 @implementation VLCMediaList
 - (id)init
 {
@@ -87,9 +74,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     {
         // Create a new libvlc media list instance
         libvlc_exception_t p_e;
-        libvlc_exception_init(&p_e);
-        p_mlist = libvlc_media_list_new([VLCLibrary sharedInstance], &p_e);
-        quit_on_exception(&p_e);
+        libvlc_exception_init( &p_e );
+        p_mlist = libvlc_media_list_new( [VLCLibrary sharedInstance], &p_e );
+        quit_on_exception( &p_e );
         
         // Initialize internals to defaults
         cachedMedia = [[NSMutableArray alloc] init];
@@ -119,7 +106,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (void)dealloc
 {
     // Release allocated memory
-    libvlc_media_list_release(p_mlist);
+    delegate = nil;
+    
+    libvlc_media_list_release( p_mlist );
     [cachedMedia release];
     [flatAspect release];
     [hierarchicalAspect release];
@@ -129,23 +118,13 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
 - (NSString *)description
 {
-    NSMutableString *content = [NSMutableString string];
+    NSMutableString * content = [NSMutableString string];
     int i;
     for( i = 0; i < [self count]; i++)
     {
         [content appendFormat:@"%@\n", [self mediaAtIndex: i]];
     }
     return [NSString stringWithFormat:@"<%@ %p> {\n%@}", [self className], self, content];
-}
-
-- (void)setDelegate:(id)value
-{
-    delegate = value;
-}
-
-- (id)delegate
-{
-    return delegate;
 }
 
 - (void)lock
@@ -192,11 +171,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     return [cachedMedia objectAtIndex:index];
 }
 
-- (int)count
-{
-    return [cachedMedia count];
-}
-
 - (int)indexOfMedia:(VLCMedia *)media
 {
     libvlc_exception_t p_e;
@@ -206,6 +180,24 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     
     return result;
 }
+
+/* KVC Compliance: For the @"media" key */
+- (int)countOfMedia
+{
+    return [self count];
+}
+
+- (id)objectInMediaAtIndex:(int)i
+{
+    return [self mediaAtIndex:i];
+}
+
+- (int)count
+{
+    return [cachedMedia count];
+}
+
+@synthesize delegate;
 
 - (BOOL)isReadOnly
 {
@@ -222,8 +214,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 {
     if( hierarchicalAspect )
         return hierarchicalAspect;
+    
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_view( p_mlist, NULL );
-    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
+    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return hierarchicalAspect;
 }
@@ -232,8 +225,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 {
     if( hierarchicalNodeAspect )
         return hierarchicalNodeAspect;
+    
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view( p_mlist, NULL );
-    hierarchicalNodeAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
+    hierarchicalNodeAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return hierarchicalNodeAspect;
 }
@@ -242,8 +236,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 {
     if( flatAspect )
         return flatAspect;
+    
     libvlc_media_list_view_t * p_mlv = libvlc_media_list_flat_view( p_mlist, NULL );
-    flatAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_mlv andMediaList:self] retain];
+    flatAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return flatAspect;
 }
@@ -261,14 +256,15 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( self = [super init] )
     {
         p_mlist = p_new_mlist;
-        libvlc_media_list_retain(p_mlist);
-        libvlc_media_list_lock(p_mlist);
-        cachedMedia = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_count(p_mlist, NULL)];
-        int i, count = libvlc_media_list_count(p_mlist, NULL);
+        libvlc_media_list_retain( p_mlist );
+        libvlc_media_list_lock( p_mlist );
+        cachedMedia = [[NSMutableArray alloc] initWithCapacity:libvlc_media_list_count( p_mlist, NULL )];
+
+        int i, count = libvlc_media_list_count( p_mlist, NULL );
         for( i = 0; i < count; i++ )
         {
-            libvlc_media_descriptor_t * p_md = libvlc_media_list_item_at_index(p_mlist, i, NULL);
-            [cachedMedia addObject:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
+            libvlc_media_descriptor_t * p_md = libvlc_media_list_item_at_index( p_mlist, i, NULL );
+            [cachedMedia addObject:[VLCMedia mediaWithLibVLCMediaDescriptor:p_md]];
             libvlc_media_descriptor_release(p_md);
         }
         [self initInternalMediaList];
@@ -288,9 +284,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 {
     // Add event callbacks
     libvlc_exception_t p_e;
-    libvlc_exception_init(&p_e);
+    libvlc_exception_init( &p_e );
 
-    libvlc_event_manager_t *p_em = libvlc_media_list_event_manager( p_mlist, &p_e );
+    libvlc_event_manager_t * p_em = libvlc_media_list_event_manager( p_mlist, &p_e );
     libvlc_event_attach( p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, &p_e );
     libvlc_event_attach( p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, &p_e );
     
