@@ -24,11 +24,10 @@
 
 #import <VLCTime.h>
 
-static VLCTime *nullTime = nil;
-
 @implementation VLCTime
 + (VLCTime *)nullTime
 {
+    static VLCTime * nullTime = nil;
     if (!nullTime)
         nullTime = [[VLCTime timeWithNumber:nil] retain];
     return nullTime;
@@ -76,7 +75,7 @@ static VLCTime *nullTime = nil;
 
 - (NSNumber *)numberValue
 {
-    return value ? [value copy] : nil;
+    return value ? [[value copy] autorelease] : nil;
 }
 
 - (NSString *)stringValue
@@ -103,11 +102,11 @@ static VLCTime *nullTime = nil;
     else if (!aTime)
         return NSOrderedDescending;
     else
-        return [value compare:[aTime numberValue]];
+        return [value compare:aTime.numberValue];
 }
 
 - (NSString *)description
 {
-    return [self stringValue];
+    return self.stringValue;
 }
 @end

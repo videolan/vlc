@@ -24,19 +24,27 @@
 
 #import <Cocoa/Cocoa.h>
 
+/**
+ * Provides an object to define VLCMedia's ti   me.
+ */
 @interface VLCTime : NSObject
 {
-    NSNumber *value;
+    NSNumber * value;       //< Holds, in seconds, the VLCTime value
 }
+
+/* Factories */
 + (VLCTime *)nullTime;
 + (VLCTime *)timeWithNumber:(NSNumber *)aNumber;
 //+ (VLCTime *)timeWithString:(NSString *)aString;
 
+/* Initializers */
 - (id)initWithNumber:(NSNumber *)aNumber;
 //- (id)initWithString:(NSString *)aString;
 
-- (NSNumber *)numberValue;
-- (NSString *)stringValue;
+/* Properties */
+@property (readonly) NSNumber * numberValue;
+@property (readonly) NSString * stringValue;
 
+/* Comparitors */
 - (NSComparisonResult)compare:(VLCTime *)aTime;
 @end
