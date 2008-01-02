@@ -117,7 +117,6 @@ static void * EventDispatcherMainLoop(void * user_data)
                     [message_newer->target release];
                     [message_newer->u.object release];
                     [[self messageQueue] removeObjectAtIndex: i];
-                    i++;
                     continue;
                 }
                 /* It should be a good idea not to collapse event, with other kind of event in-between

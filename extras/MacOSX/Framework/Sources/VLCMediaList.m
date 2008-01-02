@@ -300,14 +300,11 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     int end = [[[arrayOfArgs objectAtIndex: [arrayOfArgs count]-1] objectForKey:@"index"] intValue];
     NSRange range = NSMakeRange(start, end-start);
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
-    int i = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
-    [arrayOfArgs retain];
     for( NSDictionary * args in arrayOfArgs )
     {
         int index = [[args objectForKey:@"index"] intValue];
         VLCMedia * media = [args objectForKey:@"media"];
         /* Sanity check */
-        NSAssert( i == index, @"Expects some troubles, inserted items are not in a range" ); i++;
         if( index && index >= [cachedMedia count] )
             index = [cachedMedia count] - 1;
         [cachedMedia insertObject:media atIndex:index];

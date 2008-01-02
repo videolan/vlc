@@ -256,7 +256,6 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"node"];
-    int i = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
     for( NSDictionary * args in arrayOfArgs )
     {
         int index = [[args objectForKey:@"index"] intValue];
@@ -265,7 +264,6 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         [node setMedia:media];
         [node setChildren:[self childrenAtIndex:index]];
         /* Sanity check */
-        NSAssert( i == index, @"Expects some troubles, inserted items are not in a range" ); i++;
         if( index && index >= [cachedNode count] )
             index = [cachedNode count] - 1;
         [cachedNode insertObject:node atIndex:index];
