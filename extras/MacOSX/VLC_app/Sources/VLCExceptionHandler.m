@@ -50,6 +50,7 @@
                             [NSString stringWithFormat:@"%@: %@\n\nBack trace has been printed to Console.\n\nWe will now wait for debugger connection...\n",
                                 [exception name], [exception reason]],
                             @"Wait Debugger", nil, nil);
+    NSLog(@"*** Exception Handled! %@: %@", [exception name], [exception reason]);
     return YES;
 }
 
