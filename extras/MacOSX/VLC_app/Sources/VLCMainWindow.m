@@ -29,9 +29,9 @@
 #import "VLCAppAdditions.h"
 
 /******************************************************************************
- * VLCMainWindow (MasterViewDataSource)
+ * VLCMainWindow (CategoriesListDelegate)
  */
-@implementation VLCMainWindow (MasterViewDelegate)
+@implementation VLCMainWindow (CategoriesListDelegate)
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
     return [[item representedObject] isKindOfClass:[NSDictionary class]];
@@ -46,7 +46,10 @@
 }
 @end
 
-@implementation VLCMainWindow (MasterViewDataSource)
+/******************************************************************************
+ * VLCMainWindow (CategoriesListDataSource)
+ */
+@implementation VLCMainWindow (CategoriesListDataSource)
 /* Drag and drop */
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id < NSDraggingInfo >)info item:(id)item childIndex:(NSInteger)index
 {
@@ -113,21 +116,21 @@
     mediaPlayer = [[VLCMediaPlayer alloc] initWithVideoView:videoView];
 
     /***********************************
-     * MasterView OutlineView content
+     * CategoriesList OutlineView content
      */
-    /* treeController */ 
-    treeController = [[NSTreeController alloc] init];
-    [treeController setContent:controller.arrayOfMasters];
+    /* categoriesTreeController */ 
+    categoriesTreeController = [[NSTreeController alloc] init];
+    [categoriesTreeController setContent:controller.categories];
   
-    [treeController setChildrenKeyPath:@"childrenInMasterView"];
-    //[treeController bind:@"contentArray" toObject:controller withKeyPath:@"arrayOfMasters" options:nil];
+    [categoriesTreeController setChildrenKeyPath:@"childrenInCategoriesList"];
+    //[categoriesTreeController bind:@"contentArray" toObject:controller withKeyPath:@"arrayOfMasters" options:nil];
 
     /* Bind the "name" table column */
-    tableColumn = [categoryList tableColumnWithIdentifier:@"name"];
-	[tableColumn bind:@"value" toObject: treeController withKeyPath:@"arrangedObjects.descriptionInMasterView" options:nil];
+    tableColumn = [categoriesListView tableColumnWithIdentifier:@"name"];
+	[tableColumn bind:@"value" toObject: categoriesTreeController withKeyPath:@"arrangedObjects.descriptionInCategoriesList" options:nil];
     [tableColumn setEditable:YES];
     /* FIXME: this doesn't work obviously. */
-	[tableColumn bind:@"editable" toObject: treeController withKeyPath:@"arrangedObjects.editableInMasterView" options:nil];
+	[tableColumn bind:@"editable" toObject: categoriesTreeController withKeyPath:@"arrangedObjects.editableInCategoriesList" options:nil];
 
     /* Use an ImageAndTextCell in the "name" table column */
     ImageAndTextCell * cell = [[ImageAndTextCell alloc] init];
@@ -137,52 +140,52 @@
     [tableColumn setDataCell:cell];
 
     /* Other setup */
-    [categoryList setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
-    [categoryList setDelegate:self];
+    [categoriesListView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+    [categoriesListView setDelegate:self];
 
-    [categoryList registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSURLPboardType, @"VLCMediaURLType", nil]];
-    [categoryList setDataSource: self];
+    [categoriesListView registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSURLPboardType, @"VLCMediaURLType", nil]];
+    [categoriesListView setDataSource: self];
 
     /***********************************
-     * detailList setup
+     * mediaListView setup
      */
 
     mediaArrayController = [[VLCMediaArrayController alloc] init];
 
     /* 1- Drag and drop */
-    [detailList registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSURLPboardType, nil]];
-    [detailList setDataSource:mediaArrayController];
+    [mediaListView registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSURLPboardType, nil]];
+    [mediaListView setDataSource:mediaArrayController];
 
     /* 2- Double click */
-    [detailList setTarget:self];
-    [detailList setDoubleAction:@selector(detailListItemDoubleClicked:)];
+    [mediaListView setTarget:self];
+    [mediaListView setDoubleAction:@selector(mediaListViewItemDoubleClicked:)];
 
 	/* 3- binding for "title" column */
-    tableColumn = [detailList tableColumnWithIdentifier:@"title"];
+    tableColumn = [mediaListView tableColumnWithIdentifier:@"title"];
 	[tableColumn bind:@"value" toObject: mediaArrayController withKeyPath:@"arrangedObjects.metaDictionary.title" options:nil];
 
 	/* 4- binding for "state" column */
-    tableColumn = [detailList tableColumnWithIdentifier:@"state"];
+    tableColumn = [mediaListView tableColumnWithIdentifier:@"state"];
 	[tableColumn bind:@"value" toObject: mediaArrayController withKeyPath:@"arrangedObjects.stateAsImage" options:nil];
 
     /* 5- Search & Predicate */
     NSMutableDictionary * bindingOptions = [NSMutableDictionary dictionary];
     [bindingOptions setObject:@"metaDictionary.title contains[c] $value" forKey:NSPredicateFormatBindingOption];
     [bindingOptions setObject:@"No Title" forKey:NSDisplayNameBindingOption];
-    [detailSearchField bind:@"predicate" toObject: mediaArrayController withKeyPath:@"filterPredicate" options:bindingOptions];
+    [mediaListSearchField bind:@"predicate" toObject: mediaArrayController withKeyPath:@"filterPredicate" options:bindingOptions];
     
     /* 6- Bind the @"contentArray" and contentMediaList of the mediaArrayController */
-    [mediaArrayController bind:@"contentArray" toObject:treeController withKeyPath:@"selection.childrenInMasterViewForDetailView.media" options:nil];
-    [mediaArrayController bind:@"contentMediaList" toObject:treeController withKeyPath:@"selection.childrenInMasterViewForDetailView.parentMediaList" options:nil];
+    [mediaArrayController bind:@"contentArray" toObject:categoriesTreeController withKeyPath:@"selection.childrenInCategoriesListForDetailView.media" options:nil];
+    [mediaArrayController bind:@"contentMediaList" toObject:categoriesTreeController withKeyPath:@"selection.childrenInCategoriesListForDetailView.parentMediaList" options:nil];
     
     /* 7- Aspect */
-    [detailList setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
-    [detailList setAllowsTypeSelect:YES];
+    [mediaListView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+    [mediaListView setAllowsTypeSelect:YES];
 
     /***********************************
      * videoView setup
      */
-    [videoView setItemsTree:controller.arrayOfVideoViewMasters];
+    [videoView setItemsTree:controller.categories];
     [videoView setNodeKeyPath:@"childrenInVideoView"];
     [videoView setContentKeyPath:@"descriptionInVideoView"];
     [videoView setTarget:self];
@@ -193,8 +196,8 @@
      * Other interface element setup
      */
 
-    [detailItemsCount bind:@"displayPatternValue1" toObject:mediaArrayController withKeyPath:@"arrangedObjects.@count" options:[NSDictionary dictionaryWithObject:@"%{value1}@ items" forKey:NSDisplayPatternBindingOption]];
-    [detailItemFetchedStatus bind:@"animate" toObject:treeController withKeyPath:@"selection.currentlyFetchingItems" options:[NSDictionary dictionaryWithObject:@"%{value1}@ items" forKey:NSDisplayPatternBindingOption]];
+    [mediaListItemsCount bind:@"displayPatternValue1" toObject:mediaArrayController withKeyPath:@"arrangedObjects.@count" options:[NSDictionary dictionaryWithObject:@"%{value1}@ items" forKey:NSDisplayPatternBindingOption]];
+    [mediaListItemFetchedStatus bind:@"animate" toObject:categoriesTreeController withKeyPath:@"selection.currentlyFetchingItems" options:[NSDictionary dictionaryWithObject:@"%{value1}@ items" forKey:NSDisplayPatternBindingOption]];
 
     [fillScreenButton bind:@"value" toObject:videoView withKeyPath:@"fillScreen" options: [NSDictionary dictionaryWithObject:NSNegateBooleanTransformerName forKey:NSValueTransformerNameBindingOption]];
     [fullScreenButton bind:@"value" toObject:videoView withKeyPath:@"fullScreen" options: nil];
@@ -213,8 +216,8 @@
     [navigatorViewToggleButton bind:@"value" toObject:self withKeyPath:@"navigatorViewVisible" options: nil];
 
     /* Playlist buttons */
-    [removePlaylistButton bind:@"enabled" toObject:treeController withKeyPath:@"selection.editableInMasterView" options: nil];
-    [removePlaylistButton setTarget:treeController];
+    [removePlaylistButton bind:@"enabled" toObject:categoriesTreeController withKeyPath:@"selection.editableInCategoriesList" options: nil];
+    [removePlaylistButton setTarget:categoriesTreeController];
     [removePlaylistButton setAction:@selector(remove:)];
     [addPlaylistButton setTarget:controller];
     [addPlaylistButton setAction:@selector(addPlaylist:)];
@@ -222,20 +225,20 @@
     [mainSplitView setDelegate:self];
 
     /* Last minute setup */
-    [categoryList expandItem:nil expandChildren:YES];
-    [categoryList selectRowIndexes:[NSIndexSet indexSetWithIndex:[categoryList numberOfRows] > 0 ? [categoryList numberOfRows]-1 : 0] byExtendingSelection:NO];
+    [categoriesListView expandItem:nil expandChildren:YES];
+    [categoriesListView selectRowIndexes:[NSIndexSet indexSetWithIndex:[categoriesListView numberOfRows] > 0 ? [categoriesListView numberOfRows]-1 : 0] byExtendingSelection:NO];
 }
 
 - (void)dealloc
 {
     [navigatorView release];
     [mediaPlayer release];
-    [treeController release];
+    [categoriesTreeController release];
     [mediaArrayController release];
     [super dealloc];
 }
 
-- (void)detailListItemDoubleClicked:(id)sender
+- (void)mediaListViewItemDoubleClicked:(id)sender
 {
     [mediaPlayer setMedia:[[mediaArrayController selectedObjects] objectAtIndex:0]];
     [mediaPlayer play];

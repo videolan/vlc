@@ -26,15 +26,16 @@
 #import "VLCController.h"
 #import "VLCMediaArrayController.h"
 #import "VLCAppAdditions.h"
+#import "VLCBrowsableVideoView.h"
 
 @interface VLCMainWindow : NSWindow {
     /* IB elements */
-    IBOutlet id detailItemFetchedStatus;
-    IBOutlet id detailItemsCount;
-    IBOutlet id detailSearchField;
+    IBOutlet id mediaListItemFetchedStatus;
+    IBOutlet id mediaListItemsCount;
+    IBOutlet id mediaListSearchField;
 
-    IBOutlet NSOutlineView * categoryList;
-    IBOutlet NSTableView * detailList;
+    IBOutlet NSOutlineView * categoriesListView;
+    IBOutlet NSTableView * mediaListView;
 
     IBOutlet VLCBrowsableVideoView * videoView;
     IBOutlet id fillScreenButton;
@@ -57,7 +58,7 @@
     IBOutlet VLCController * controller; /* This is a VLCController binded to the File's Owner of the nib */
 
     /* Controllers */
-    NSTreeController * treeController;
+    NSTreeController * categoriesTreeController;
     VLCMediaArrayController * mediaArrayController;
     
     /* Window state */

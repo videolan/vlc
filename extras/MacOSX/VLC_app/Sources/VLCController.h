@@ -25,26 +25,14 @@
 #import <Cocoa/Cocoa.h>
 #import <VLC/VLC.h>
 
-#import "VLCMediaArrayController.h"
-#import "VLCBrowsableVideoView.h"
-
 @class VLCMainWindow;
-
-#define VLCPanic( ex ) __VLCPanic( ex, __FUNCTION__, __FILE__, __LINE__ )
-static inline void __VLCPanic( const char * str, const char * function, const char * file, int line_number )
-{
-    NSRunCriticalAlertPanel( @"Error", [NSString stringWithFormat:@"The following error was encountered: %s (%s:%d %s)", str, file, line_number, function], @"Quit", nil, nil );
-    exit( -1 );
-}
 
 @interface VLCController : NSObject
 {
-    NSMutableArray * arrayOfPlaylists;
-    NSArray * arrayOfMasters;
-    NSArray * arrayOfVideoViewMasters;
+    NSArray * categories;
 }
-@property (readonly, retain) NSArray * arrayOfMasters;
-@property (readonly, retain) NSArray * arrayOfVideoViewMasters;
+@property (readonly, retain) NSArray * categories;
 
 - (void)newMainWindow:(id)sender;
+- (void)addPlaylist:(id)sender;
 @end

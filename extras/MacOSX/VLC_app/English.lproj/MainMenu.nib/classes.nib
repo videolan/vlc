@@ -7,7 +7,7 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>detailListItemDoubleClicked</key>
+				<key>mediaListViewItemDoubleClicked</key>
 				<string>id</string>
 				<key>newMainWindow</key>
 				<string>id</string>
@@ -18,15 +18,15 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>categoryList</key>
+				<key>categoriesListView</key>
 				<string>id</string>
-				<key>detailItemFetchedStatus</key>
+				<key>mediaListItemFetchedStatus</key>
 				<string>id</string>
-				<key>detailItemsCount</key>
+				<key>mediaListItemsCount</key>
 				<string>id</string>
-				<key>detailList</key>
+				<key>mediaListView</key>
 				<string>id</string>
-				<key>detailSearchField</key>
+				<key>mediaListSearchField</key>
 				<string>id</string>
 				<key>fillScreenButton</key>
 				<string>id</string>

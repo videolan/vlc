@@ -28,9 +28,9 @@
 
 
 /******************************************************************************
- * VLCMediaDiscoverer (MasterViewBindings)
+ * VLCMediaDiscoverer (CategoriesListBindings)
  */
-@implementation VLCMediaDiscoverer (MasterViewBindings)
+@implementation VLCMediaDiscoverer (CategoriesListBindings)
 +(void)initialize
 {
     [VLCMediaDiscoverer setKeys:[NSArray arrayWithObject:@"running"] triggerChangeNotificationsForDependentKey:@"currentlyFetchingItems"];
@@ -43,7 +43,7 @@
     if( !dict )
     {
         dict = [[NSDictionary dictionaryWithObjectsAndKeys:
-            [NSSet setWithObject:@"discoveredMedia.flatAspect"], @"childrenInMasterViewForDetailView",
+            [NSSet setWithObject:@"discoveredMedia.flatAspect"], @"childrenInCategoriesListForDetailView",
             nil] retain];
     }
     return [dict objectForKey: key];
@@ -62,24 +62,24 @@
     return sdImage;
 }
 
-/* MasterView specific bindings */
-- (NSArray *)childrenInMasterView
+/* CategoriesList specific bindings */
+- (NSArray *)childrenInCategoriesList
 {
     return nil;
 }
-- (NSString *)descriptionInMasterView
+- (NSString *)descriptionInCategoriesList
 {
     return [self localizedName];
 }
-- (VLCMediaListAspect *)childrenInMasterViewForDetailView
+- (VLCMediaListAspect *)childrenInCategoriesListForDetailView
 {
     return [[self discoveredMedia] flatAspect];
 }
-- (BOOL)editableInMasterView
+- (BOOL)editableInCategoriesList
 {
     return NO;
 }
-- (BOOL)selectableInMasterView
+- (BOOL)selectableInCategoriesList
 {
     return YES;
 }
@@ -113,9 +113,9 @@
     if( !dict )
     {
         dict = [[NSDictionary dictionaryWithObjectsAndKeys:
-            [NSSet setWithObject:@"subitems.hierarchicalNodeAspect.media"], @"childrenInMasterView",
-            [NSSet setWithObject:@"metaDictionary.title"], @"descriptionInMasterView",
-            [NSSet setWithObject:@"subitems.flatAspect"], @"childrenInMasterViewForDetailView",
+            [NSSet setWithObject:@"subitems.hierarchicalNodeAspect.media"], @"childrenInCategoriesList",
+            [NSSet setWithObject:@"metaDictionary.title"], @"descriptionInCategoriesList",
+            [NSSet setWithObject:@"subitems.flatAspect"], @"childrenInCategoriesListForDetailView",
             [NSSet setWithObject:@"metaDictionary.title"], @"descriptionInVideoView",
             [NSSet setWithObject:@"state"], @"stateAsImage",
             nil] retain];
@@ -123,28 +123,28 @@
     return [dict objectForKey: key];
 }
 
-/* MasterView specific bindings */
-- (NSArray *)childrenInMasterView
+/* CategoriesList specific bindings */
+- (NSArray *)childrenInCategoriesList
 {
     return [[[self subitems] hierarchicalNodeAspect] valueForKeyPath:@"media"];
 }
-- (void)setDescriptionInMasterView:(NSString *)description
+- (void)setDescriptionInCategoriesList:(NSString *)description
 {
     NSLog(@"unimplemented: meta edition");
 }
-- (NSString *)descriptionInMasterView
+- (NSString *)descriptionInCategoriesList
 {
     return [[self metaDictionary] objectForKey:@"title"];
 }
-- (VLCMediaListAspect *)childrenInMasterViewForDetailView
+- (VLCMediaListAspect *)childrenInCategoriesListForDetailView
 {
     return [[self subitems] flatAspect];
 }
-- (BOOL)editableInMasterView
+- (BOOL)editableInCategoriesList
 {
     return YES;
 }
-- (BOOL)selectableInMasterView
+- (BOOL)selectableInCategoriesList
 {
     return YES;
 }
@@ -170,7 +170,7 @@
     return [[self metaDictionary] objectForKey:@"title"];
 }
 
-/* DetailList specific bindings */
+/* mediaListView specific bindings */
 - (NSImage *)stateAsImage
 {
     static NSImage * playing = nil;

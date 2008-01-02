@@ -29,16 +29,14 @@
 #import "VLCValueTransformer.h" 
 
 @interface VLCController ()
-@property (readwrite,retain) NSArray * arrayOfMasters;
-@property (readwrite,retain) NSArray * arrayOfVideoViewMasters;
+@property (readwrite,retain) NSArray * categories;
 @end
 
 /******************************************************************************
  * VLCBrowsableVideoView
  */
 @implementation VLCController
-@synthesize arrayOfMasters;
-@synthesize arrayOfVideoViewMasters;
+@synthesize categories;
 
 - (void)awakeFromNib
 {
@@ -53,52 +51,37 @@
     [NSValueTransformer setValueTransformer:(id)nonNilAsBool forName:@"NonNilAsBoolTransformer"];
 
     /***********************************
-     * arrayOfMasters: MasterView OutlineView content
+     * categories: Main content
      */
-    NSArray * arrayOfMediaDiscoverer = [NSArray arrayWithObjects:
+    NSArray * mediaDiscoverers = [NSArray arrayWithObjects:
         [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease],
         [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
         [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
         [[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] autorelease], nil];
 
-    arrayOfPlaylists = [NSMutableArray arrayWithObjects:[VLCMedia mediaAsNodeWithName:@"Default Playlist"], nil];
+    NSArray * playlists = [NSMutableArray arrayWithObjects:[VLCMedia mediaAsNodeWithName:@"Default Playlist"], nil];
 
-    NSDictionary * playlists = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                [@"Playlists" uppercaseString], @"descriptionInMasterView",
-                                [@"Playlists" uppercaseString], @"descriptionInVideoView",
-                                [NSNumber numberWithBool:NO], @"selectableInMasterView",
-                                arrayOfPlaylists, @"childrenInMasterView",
-                                arrayOfPlaylists, @"childrenInVideoView",
+    NSDictionary * playlistsAsDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                [@"Playlists" uppercaseString], @"descriptionInCategoriesList",
+                                @"Playlists", @"descriptionInVideoView",
+                                [NSNumber numberWithBool:NO], @"selectableInCategoriesList",
+                                playlists, @"childrenInCategoriesList",
+                                playlists, @"childrenInVideoView",
                                 nil];
 
-    self.arrayOfMasters = [NSArray arrayWithObjects:
+    self.categories = [NSArray arrayWithObjects:
                     [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                        [@"Service Discovery" uppercaseString], @"descriptionInMasterView",
-                        [NSNumber numberWithBool:NO], @"selectableInMasterView",
-                        arrayOfMediaDiscoverer, @"childrenInMasterView",
-                        nil],
-                    playlists,
-                    nil];
-    
-
-    /***********************************
-     * videoView setup
-     */
-    self.arrayOfVideoViewMasters = [NSArray arrayWithObjects:
-                    [NSDictionary dictionaryWithObjectsAndKeys:
+                        [@"Service Discovery" uppercaseString], @"descriptionInCategoriesList",
                         @"Service Discovery", @"descriptionInVideoView",
-                        arrayOfMediaDiscoverer, @"childrenInVideoView",
+                        [NSNumber numberWithBool:NO], @"selectableInCategoriesList",
+                        mediaDiscoverers, @"childrenInCategoriesList",
+                        mediaDiscoverers, @"childrenInVideoView",
                         nil],
-                    playlists,
+                    playlistsAsDictionary,
                     nil];
 
     /* Execution will continue in applicationDidFinishLaunching */
     [NSApp setDelegate:self];
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)notification
-{
-    [self newMainWindow: self];
 }
 
 - (void)newMainWindow:(id)sender
@@ -116,4 +99,11 @@
     NSLog(@"unimplemented!");
 }
 
+@end
+
+@implementation VLCController (NSAppDelegate)
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+    [self newMainWindow: self];
+}
 @end
