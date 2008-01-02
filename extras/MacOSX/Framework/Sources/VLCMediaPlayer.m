@@ -124,6 +124,11 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 @implementation VLCMediaPlayer
 
+/* Bindings */
++ (id)keysPathsForValuesAffectingPlaying { return [NSSet setWithObject:@"state"]; }
++ (id)keysPathsForValuesAffectingSeekable { return [NSSet setWithObjects:@"state", @"media"]; }
+
+/* Contructor */
 - (id)init
 {
     return [self initWithDrawable:nil];
@@ -536,8 +541,6 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
 {
     if (self = [super init])
     {
-        [VLCMediaPlayer setKeys:[NSArray arrayWithObject:@"state"] triggerChangeNotificationsForDependentKey:@"playing"];
-        [VLCMediaPlayer setKeys:[NSArray arrayWithObjects:@"state", @"media", nil] triggerChangeNotificationsForDependentKey:@"seekable"];
         delegate = nil;
         media = nil;
         cachedTime = [[VLCTime nullTime] retain];
