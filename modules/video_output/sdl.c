@@ -172,6 +172,7 @@ static int Open ( vlc_object_t *p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
+    p_vout->pf_control = NULL;
 
 #ifdef HAVE_SETENV
     psz_method = config_GetPsz( p_vout, "vout" );
@@ -217,10 +218,11 @@ static int Open ( vlc_object_t *p_this )
     p_vout->p_sys->i_desktop_width = SDL_GetVideoInfo()->current_w;
     p_vout->p_sys->i_desktop_height = SDL_GetVideoInfo()->current_h;
 
+    /* Create the cursor */
     p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
-
     p_vout->p_sys->i_lastmoved = p_vout->p_sys->i_lastpressed = mdate();
+
     if( OpenDisplay( p_vout ) )
     {
         msg_Err( p_vout, "cannot set up SDL (%s)", SDL_GetError() );
@@ -508,13 +510,21 @@ static int Manage( vout_thread_t *p_vout )
 
         /* Key pressed */
         case SDL_KEYDOWN:
+            /* convert the key if possible */
             val.i_int = ConvertKey( event.key.keysym.sym );
 
             if( !val.i_int )
             {
+                /* Find the right caracter */
                 if( ( event.key.keysym.unicode & 0xff80 ) == 0 )
                 {
                     val.i_int = event.key.keysym.unicode & 0x7f;
+                    /* FIXME: find a better solution than this
+                              hack to find the right caracter */
+                    if( val.i_int >= 1 && val.i_int <= 26 )
+                        val.i_int += 96;
+                    else if( val.i_int >= 65 && val.i_int <= 90 )
+                        val.i_int += 32;
                 }
             }
 
