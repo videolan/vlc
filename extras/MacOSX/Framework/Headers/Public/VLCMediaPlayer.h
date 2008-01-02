@@ -31,7 +31,9 @@
 extern NSString * VLCMediaPlayerTimeChanged;
 extern NSString * VLCMediaPlayerStateChanged;
 
-// TODO: Documentation
+/**
+ * TODO: Documentation VLCMediaPlayerState
+ */
 typedef enum VLCMediaPlayerState
 {
     VLCMediaPlayerStateStopped,        //< Player has stopped
@@ -43,26 +45,36 @@ typedef enum VLCMediaPlayerState
     VLCMediaPlayerStatePaused          //< Stream is paused
 } VLCMediaPlayerState;
 
-extern NSString *VLCMediaPlayerStateToString(VLCMediaPlayerState state);
+/**
+ * TODO: Documentation extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState)
+ */
+extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
 /**
  * Formal protocol declaration for playback delegates.  Allows playback messages
  * to be trapped by delegated objects.
  */
 @protocol VLCMediaPlayerDelegate
+/**
+ * TODO: Documentation - [VLCMediaPlayerDelegate ]
+ */
 - (void)mediaPlayerTimeChanged:(NSNotification *)aNotification;
+
+/**
+ * TODO: Documentation - [VLCMediaPlayerDelegate ]
+ */
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification;
 @end
 
 // TODO: Should we use medialist_player or our own flavor of media player?
 @interface VLCMediaPlayer : NSObject 
 {
-    id delegate;            //< Object delegate
-    VLCVideoView *videoView;//< NSView instance where media is rendered to
+    id delegate;                        //< Object delegate
+    VLCVideoView * videoView;           //< NSView instance where media is rendered to
 
-    void *instance;            //  Internal
-    VLCMedia *media;        //< Current media being played
-    VLCTime *cachedTime;
+    void * instance;                    //  Internal
+    VLCMedia * media;                   //< Current media being played
+    VLCTime * cachedTime;
     VLCMediaPlayerState cachedState;
     float position;
 }
