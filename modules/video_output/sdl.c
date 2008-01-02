@@ -386,8 +386,7 @@ static int Manage( vout_thread_t *p_vout )
             val.b_bool = VLC_TRUE;
             var_Set( p_vout, "mouse-moved", val );
 
-            if( p_vout->p_sys->b_cursor &&
-                (abs(event.motion.xrel) > 2 || abs(event.motion.yrel) > 2) )
+            if( p_vout->p_sys->b_cursor )
             {
                 if( p_vout->p_sys->b_cursor_autohidden )
                 {
