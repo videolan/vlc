@@ -125,8 +125,18 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 @implementation VLCMediaPlayer
 
 /* Bindings */
-+ (id)keysPathsForValuesAffectingPlaying { return [NSSet setWithObject:@"state"]; }
-+ (id)keysPathsForValuesAffectingSeekable { return [NSSet setWithObjects:@"state", @"media"]; }
++ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key
+{
+    static NSDictionary * dict = nil;
+    if( !dict )
+    {
+        dict = [[NSDictionary dictionaryWithObjectsAndKeys:
+            [NSSet setWithObject:@"state"], @"playing",
+            [NSSet setWithObjects:@"state", @"media", nil], @"seekable",
+            nil] retain];
+    }
+    return [dict objectForKey: key];
+}
 
 /* Contructor */
 - (id)init
