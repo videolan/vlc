@@ -28,7 +28,7 @@
 /* This object is here to ensure safe inter thread communication */
 @interface VLCEventManager : NSObject
 {
-    NSMutableArray  *messageQueue;
+    NSMutableArray * messageQueue;
     pthread_t        dispatcherThread;
     pthread_mutex_t  queueLock;
     pthread_cond_t   signalData;

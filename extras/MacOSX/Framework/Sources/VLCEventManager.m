@@ -63,7 +63,7 @@ static void * EventDispatcherMainLoop(void * user_data)
     {
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
         struct message * message, * message_newer = NULL;
-        NSData *dataMessage;
+        NSData * dataMessage;
         int i;
 
         /* Sleep a bit not to flood the interface */
@@ -72,7 +72,7 @@ static void * EventDispatcherMainLoop(void * user_data)
 
         pthread_mutex_lock( [self queueLock] );
         /* Wait until we have something on the queue */
-        while([[self messageQueue] count] <= 0 )
+        while( [[self messageQueue] count] <= 0 )
         {
             pthread_cond_wait( [self signalData], [self queueLock] );
         }
@@ -87,14 +87,14 @@ static void * EventDispatcherMainLoop(void * user_data)
         {
             for( i = 0; i < [[self messageQueue] count]-1; i++ )
             {
-                message_newer = (struct message *)[(NSData *)[[self messageQueue] objectAtIndex: i] bytes];
+                message_newer = (struct message *)[(NSData *)[[self messageQueue] objectAtIndex:i] bytes];
                 if( message_newer->type == VLCNotification &&
                     message_newer->target == message->target &&
                    [message_newer->u.name isEqualToString:message->u.name] )
                 {
                     [message_newer->target release];
-                    [message->u.name release];
-                    [[self messageQueue] removeObjectAtIndex: i];
+                    [message_newer->u.name release];
+                    [[self messageQueue] removeObjectAtIndex:i];
                     i--;
                     continue;
                 }
@@ -112,8 +112,8 @@ static void * EventDispatcherMainLoop(void * user_data)
                     message_newer->sel == message->sel )
                 {
                     if(!newArg)
-                        newArg = [NSMutableArray arrayWithArray: message->u.object];
-                    [newArg addObjectsFromArray: message_newer->u.object];
+                        newArg = [NSMutableArray arrayWithArray:message->u.object];
+                    [newArg addObjectsFromArray:message_newer->u.object];
                     [message_newer->target release];
                     [message_newer->u.object release];
                     [[self messageQueue] removeObjectAtIndex: i];
@@ -141,7 +141,6 @@ static void * EventDispatcherMainLoop(void * user_data)
             [self performSelectorOnMainThread:@selector(callDelegateOfObjectAndSendNotificationWithArgs:) withObject:[dataMessage retain]  /* released in the call */ waitUntilDone: NO];
         else
             [self performSelectorOnMainThread:@selector(callObjectMethodWithArgs:) withObject:[dataMessage retain]  /* released in the call */ waitUntilDone: YES];
-
 
         pthread_mutex_lock( [self queueLock] );
         [[self messageQueue] removeLastObject];
