@@ -24,18 +24,37 @@
 
 #import "VLCLibrary.h"
 
-// TODO: Documentation
+/**
+ * Bridges functionality between libvlc and VLCMediaList implementation.
+ */
 @interface VLCMediaList (LibVLCBridging)
+/* Factories */
+/**
+ * Manufactures new object wrapped around specified media list.
+ * \param p_new_mlist LibVLC media list pointer.
+ * \return Newly create media list instance using specified media list 
+ * pointer.
+ */
 + (id)mediaListWithLibVLCMediaList:(void *)p_new_mlist;
+
+/* Initializers */
+/**
+ * Initializes new object wrapped around specified media list.
+ * \param p_new_mlist LibVLC media list pointer.
+ * \return Newly create media list instance using specified media list
+ * pointer.
+ */
 - (id)initWithLibVLCMediaList:(void *)p_new_mlist;
-- (void *)libVLCMediaList;
+
+/* Properties */
+@property (readonly) void * libVLCMediaList;    //< LibVLC media list pointer.
 @end
 
 /**
-* Bridges functionality between libvlc and VLCMedia implementation.
+ * Bridges functionality between libvlc and VLCMedia implementation.
  */
 @interface VLCMedia (LibVLCBridging)
-/* Object Factory */
+/* Factories */
 /**
  * Manufactures new object wrapped around specified media descriptor.
  * \param md LibVLC media descriptor pointer.
@@ -43,6 +62,7 @@
  */
 + (id)mediaWithLibVLCMediaDescriptor:(void *)md;
 
+/* Initializers */
 /**
  * Initializes new object wrapped around specified media descriptor.
  * \param md LibVLC media descriptor pointer.
@@ -54,34 +74,87 @@
  * Returns the receiver's internal media descriptor pointer.
  * \return The receiver's internal media descriptor pointer.
  */
-- (void *)libVLCMediaDescriptor;
+@property (readonly) void * libVLCMediaDescriptor;
 @end
 
-
-// TODO: Documentation
+/**
+ * Bridges functionality between VLCMedia and VLCMediaPlayer
+ */
 @interface VLCMedia (VLCMediaPlayerBridging)
+/**
+ * Set's the length of the media object.  This value becomes available once the
+ * media object is being played.
+ * \param value
+ */
 - (void)setLength:(VLCTime *)value;
 @end
 
-// TODO: Documentation
+/**
+ * Bridges functionality between VLCLibrary and LibVLC core.
+ */
 @interface VLCLibrary (VLCLibVLCBridging)
+/**
+ * Shared singleton instance of libvlc library instance.
+ * \return libvlc pointer of library instance.
+ */
 + (void *)sharedInstance;
-- (void *)instance;
+
+/**
+ * Instance of libvlc library instance.
+ * \return libvlc pointer of library instance.
+ */
+@property (readonly) void * instance;
 @end
 
+/**
+ * Bridges functionality between VLCMediaListAspect and libvlc.
+ */
 @interface VLCMediaListAspect (VLCLibVLCBridging)
+/* Factories */
+/**
+ * Manufactures a new media list aspect object with libvlc media list view instance.
+ * \return Newly created media list aspect using specified libvlc media list view.
+ */
 + (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv;
+
+/**
+ * Manufactures a new media list aspect object with libvlc media list view instance.
+ * \return Newly created media list aspect using specified libvlc media list view.
+ */
 + (id)mediaListAspectWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv andMediaList:(VLCMediaList*)mediaList;
+
+/* Initializers */
+/**
+ * Initializes a new media list aspect object with libvlc media list view instance.
+ * \return Newly created media list aspect using specified libvlc media list view.
+ */
 - (id)initWithLibVLCMediaListView:(libvlc_media_list_view_t *)p_new_mlv andMediaList:(VLCMediaList*)mediaList;
-- (libvlc_media_list_view_t *)libVLCMediaListView;
+
+/* Properties */
+@property (readonly) libvlc_media_list_view_t * libVLCMediaListView; //< Libvlc pointer to media list view instance.
 @end
 
-// TODO: Documentation
+/**
+ * Bridges functionality between VLCLibrary and VLCAudio.
+ */
 @interface VLCLibrary (VLCAudioBridging)
+/**
+ * Called by VLCAudio, each library has a singleton VLCaudio instance.  VLCAudio
+ * calls this function to let the VLCLibrary instance know how to get in touch 
+ * with the VLCAudio instance.  TODO: Each media player instance should have it's
+ * own audio instance...not each library instance.
+ */
 - (void)setAudio:(VLCAudio *)value;
 @end
 
-// TODO: Documentation
+/**
+ * Bridges functionality between VLCAudio and VLCLibrary.
+ */
 @interface VLCAudio (VLCAudioBridging)
+/* Initializers */
+/**
+ * Initializes a new object using the specified library instance.
+ * \return Newly created audio object using specified VLCLibrary instance.
+ */
 - (id)initWithLibrary:(VLCLibrary *)library;
 @end
