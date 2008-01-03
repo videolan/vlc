@@ -25,6 +25,7 @@
 #ifndef VLC_FRAMEWORK_VLC_H
 #define VLC_FRAMEWORK_VLC_H
 
+#import <VLC/VLCLibrary.h>
 #import <VLC/VLCMedia.h>
 #import <VLC/VLCMediaLibrary.h>
 #import <VLC/VLCMediaList.h>
@@ -33,6 +34,7 @@
 #import <VLC/VLCMediaPlayer.h>
 #import <VLC/VLCTime.h>
 #import <VLC/VLCVideoView.h>
+#import <VLC/VLCVideoLayer.h>
 
 @class VLCMedia;
 @class VLCMediaLibrary;
