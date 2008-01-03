@@ -53,8 +53,13 @@
     IBOutlet NSButton * addPlaylistButton;
     IBOutlet NSButton * removePlaylistButton;
 
+    /* Toolbar */
+    IBOutlet NSView * toolbarMediaAudioVolume;
+    IBOutlet NSView * toolbarMediaDescription;
+    IBOutlet NSView * toolbarMediaControl;
+
     VLCMediaPlayer * mediaPlayer;
-    
+
     IBOutlet VLCController * controller; /* This is a VLCController binded to the File's Owner of the nib */
 
     /* Controllers */

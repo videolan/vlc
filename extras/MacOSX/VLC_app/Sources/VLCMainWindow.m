@@ -191,6 +191,10 @@
     [videoView setTarget:self];
     [videoView setAction:@selector(videoViewItemClicked:)];
     
+    /***********************************
+     * Toolbar setup
+     */
+    [[self toolbar] setDelegate:self];
 
     /***********************************
      * Other interface element setup
@@ -321,7 +325,7 @@
 
 - (void)splitView:(NSSplitView *)sender resizeSubviewsWithOldSize:(NSSize)oldSize
 {
-    [sender  adjustSubviews];
+    [sender adjustSubviews];
 
     /* Hack, because sliding cause some glitches */
     [navigatorView setFrame:[[navigatorView superview] bounds]];
@@ -332,7 +336,7 @@
 {
     /* Hack, because sliding cause some glitches */
     [navigatorView moveSubviewsToVisible];
-    
+
     /* This could be changed from now on, so post a KVO notification */
     [self willChangeValueForKey:@"navigatorViewVisible"];
 }
@@ -348,5 +352,83 @@
     if( proposedFrameSize.height < 120.f)
         proposedFrameSize.height = [self minSize].height;
     return proposedFrameSize;
+}
+@end
+
+@implementation VLCMainWindow (NSToolbarDelegating)
+/* Our item identifiers */
+static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
+static NSString * VLCToolbarMediaAudioVolume = @"VLCToolbarMediaAudioVolume";
+static NSString * VLCToolbarMediaDescription = @"VLCToolbarMediaDescription";
+
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
+{
+    NSLog(@"hello");
+    return [NSArray arrayWithObjects:
+                        NSToolbarCustomizeToolbarItemIdentifier,
+                        NSToolbarFlexibleSpaceItemIdentifier,
+                        NSToolbarSpaceItemIdentifier,
+                        NSToolbarSeparatorItemIdentifier,
+                        VLCToolbarMediaControl,
+                        VLCToolbarMediaAudioVolume,
+                        VLCToolbarMediaDescription,
+                        nil ];
+}
+
+- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
+{
+    return [NSArray arrayWithObjects:
+                        VLCToolbarMediaControl,
+                        VLCToolbarMediaAudioVolume,
+                        VLCToolbarMediaDescription,
+                        nil ];
+}
+
+- (NSToolbarItem *) toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
+{
+    NSToolbarItem *toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier] autorelease];
+ 
+    if( [itemIdentifier isEqual: VLCToolbarMediaControl] )
+    {
+        [toolbarItem setLabel:@"Media Controls"];
+        [toolbarItem setPaletteLabel:@"Media Controls"];
+     
+        [toolbarItem setView:toolbarMediaControl];
+        [toolbarItem setMinSize:[[toolbarItem view] frame].size];
+        [toolbarItem setMaxSize:[[toolbarItem view] frame].size];
+
+        /* TODO: setup a menu */
+    }
+    else if( [itemIdentifier isEqual: VLCToolbarMediaAudioVolume] )
+    {
+        [toolbarItem setLabel:@"Audio Volume"];
+        [toolbarItem setPaletteLabel:@"Audio Volume"];
+     
+        [toolbarItem setView:toolbarMediaAudioVolume];
+        [toolbarItem setMinSize:[[toolbarItem view] frame].size];
+        [toolbarItem setMaxSize:[[toolbarItem view] frame].size];
+
+        /* TODO: setup a menu */
+    }
+    else  if( [itemIdentifier isEqual: VLCToolbarMediaDescription] )
+    {
+        [toolbarItem setLabel:@"Media Description"];
+        [toolbarItem setPaletteLabel:@"Media Description"];
+     
+        [toolbarItem setView:toolbarMediaDescription];
+        [toolbarItem setMinSize:[[toolbarItem view] frame].size];
+        [toolbarItem setMaxSize:NSMakeSize(10000 /* Can be really big */, NSHeight([[toolbarItem view] frame]))];
+
+        /* TODO: setup a menu */
+    }
+    else
+    {
+        /* itemIdentifier referred to a toolbar item that is not
+         * provided or supported by us or Cocoa
+         * Returning nil will inform the toolbar
+         * that this kind of item is not supported */
+        toolbarItem = nil;
+    }
+    return toolbarItem;
 }
 @end
