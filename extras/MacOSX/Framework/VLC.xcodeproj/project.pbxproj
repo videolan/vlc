@@ -310,7 +310,7 @@
 /* Begin PBXLegacyTarget section */
 		633BD6DB0D2ADE4E0012A314 /* vlc-core */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "";
+			buildArgumentsString = $ACTION;
 			buildConfigurationList = 633BD6DF0D2ADE6D0012A314 /* Build configuration list for PBXLegacyTarget "vlc-core" */;
 			buildPhases = (
 			);
