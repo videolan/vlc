@@ -65,8 +65,6 @@ NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
 - (void)addVoutLayer:(CALayer *)aLayer;
 @end
 
-
-
 /******************************************************************************
  * Interface & Implementation VLCConstraintLayoutManager
  *

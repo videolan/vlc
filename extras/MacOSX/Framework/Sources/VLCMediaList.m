@@ -299,6 +299,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     int start = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
     int end = [[[arrayOfArgs objectAtIndex: [arrayOfArgs count]-1] objectForKey:@"index"] intValue];
     NSRange range = NSMakeRange(start, end-start);
+
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
     for( NSDictionary * args in arrayOfArgs )
     {

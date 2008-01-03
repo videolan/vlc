@@ -33,7 +33,7 @@ static VLCLibrary * sharedLibrary = nil;
 void __catch_exception( void * e, const char * function, const char * file, int line_number )
 {
     libvlc_exception_t * ex = (libvlc_exception_t *)e;
-    if (libvlc_exception_raised( ex ))
+    if( libvlc_exception_raised( ex ) )
     {
         NSException* libvlcException = [NSException
             exceptionWithName:@"LibVLCException"
@@ -92,13 +92,18 @@ static void * DestroySharedLibraryAtExit( void )
 
 - (void)dealloc 
 {
-    if (instance) 
+    if( instance ) 
     {
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
         
         libvlc_release( instance, &ex );
+        libvlc_exception_clear( &ex );
     }
+    
+    if( self == sharedLibrary ) 
+        sharedLibrary = nil;
+    
     instance = nil;
     [audio release];
     [super dealloc];
