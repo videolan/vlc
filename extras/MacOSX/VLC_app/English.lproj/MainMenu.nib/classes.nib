@@ -5,8 +5,18 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>addPlaylist</key>
+				<string>id</string>
 				<key>mediaListViewItemDoubleClicked</key>
 				<string>id</string>
 				<key>newMainWindow</key>
@@ -20,15 +30,15 @@
 			<dict>
 				<key>categoriesListView</key>
 				<string>id</string>
+				<key>fillScreenButton</key>
+				<string>id</string>
 				<key>mediaListItemFetchedStatus</key>
 				<string>id</string>
 				<key>mediaListItemsCount</key>
 				<string>id</string>
-				<key>mediaListView</key>
-				<string>id</string>
 				<key>mediaListSearchField</key>
 				<string>id</string>
-				<key>fillScreenButton</key>
+				<key>mediaListView</key>
 				<string>id</string>
 				<key>videoView</key>
 				<string>VLCBrowsableVideoView</string>
