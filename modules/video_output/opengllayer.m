@@ -313,7 +313,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     p_sys->b_frame_available = 1;
-    [p_sys->o_layer setNeedsDisplay];
 }
 
 /*****************************************************************************
@@ -409,7 +408,7 @@ static int InitTextures( vout_thread_t *p_vout )
     VLCVoutLayer* me = [super layer];
     if( me )
     {
-        me.asynchronous = NO;
+        me.asynchronous = YES;
         [me setVout: _p_vout];
         me.bounds = CGRectMake( 0.0, 0.0, 
                                 (float)_p_vout->fmt_in.i_visible_width * _p_vout->fmt_in.i_sar_num,
@@ -431,7 +430,7 @@ static int InitTextures( vout_thread_t *p_vout )
     /* Init */
     CGLLockContext( glContext );
     CGLSetCurrentContext( glContext );
-    
+
     float f_width, f_height, f_x, f_y;
 
     f_x = (float)p_vout->fmt_out.i_x_offset;
@@ -450,22 +449,24 @@ static int InitTextures( vout_thread_t *p_vout )
                      p_vout->fmt_out.i_height,
                      VLCGL_FORMAT, VLCGL_TYPE, p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index] );
 
-     }
-    
-    glClear( GL_COLOR_BUFFER_BIT );
 
-    glEnable( VLCGL_TARGET );
-    glBegin( GL_POLYGON );
-    glTexCoord2f( f_x, f_y ); glVertex2f( -1.0, 1.0 );
-    glTexCoord2f( f_width, f_y ); glVertex2f( 1.0, 1.0 );
-    glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
-    glTexCoord2f( f_x, f_height ); glVertex2f( -1.0, -1.0 );
-    glEnd();
-    
-    glDisable( VLCGL_TARGET );
+        glClear( GL_COLOR_BUFFER_BIT );
 
-    glFlush();
+        glEnable( VLCGL_TARGET );
+        glBegin( GL_POLYGON );
+        glTexCoord2f( f_x, f_y ); glVertex2f( -1.0, 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex2f( 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex2f( -1.0, -1.0 );
+        glEnd();
+
+        glDisable( VLCGL_TARGET );
+
+        glFlush();
+    }
+
     CGLUnlockContext( glContext );
+    p_vout->p_sys->b_frame_available = VLC_FALSE;
 }
 
 - (CGLPixelFormatObj)copyCGLPixelFormatForDisplayMask:(uint32_t)mask
@@ -486,15 +487,28 @@ static int InitTextures( vout_thread_t *p_vout )
 
 	NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: (NSOpenGLPixelFormatAttribute*) attribs]; 
     
-
-    return [fmt CGLPixelFormatObj];
+    return [super copyCGLPixelFormatForDisplayMask:mask];//[fmt CGLPixelFormatObj];
 }
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
 {
     CGLContextObj context = [super copyCGLContextForPixelFormat:pixelFormat];
 
-    CGLLockContext( context );
+
+    /* Swap buffers only during the vertical retrace of the monitor.
+    http://developer.apple.com/documentation/GraphicsImaging/
+    Conceptual/OpenGL/chap5/chapter_5_section_44.html */
+
+    GLint params = 1;
+    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
+                    &params );
+    
+    /* Make sure our texture will gets drawn at the right resolution */
+    GLint dim[2] = { p_vout->p_sys->i_tex_width, p_vout->p_sys->i_tex_height};
+    NSLog(@"asking for %dx%d", p_vout->p_sys->i_tex_width, p_vout->p_sys->i_tex_height);
+    CGLSetParameter(context, kCGLCPSurfaceBackingSize, dim);
+    CGLEnable (context, kCGLCESurfaceBackingSize);
+
     CGLSetCurrentContext( context );
     InitTextures( p_vout );
 
@@ -505,16 +519,6 @@ static int InitTextures( vout_thread_t *p_vout )
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
-
-    /* Swap buffers only during the vertical retrace of the monitor.
-    http://developer.apple.com/documentation/GraphicsImaging/
-    Conceptual/OpenGL/chap5/chapter_5_section_44.html */
-
-    GLint params = 1;
-    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
-                    &params );
-
-    CGLUnlockContext( context );
     return context;
 }
 
