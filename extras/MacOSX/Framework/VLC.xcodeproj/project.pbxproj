@@ -143,7 +143,6 @@
 		EF78BD450CAEEFF600354E6E /* VLCVideoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCVideoView.m; sourceTree = "<group>"; };
 		EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaPlayer.h; path = Public/VLCMediaPlayer.h; sourceTree = "<group>"; };
 		EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaPlayer.m; sourceTree = "<group>"; };
-		EF8BCECD0CB9339A004AA006 /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		EFD551DC0CC6DD720074CEE1 /* VLCLibVLCBridging.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VLCLibVLCBridging.h; path = Internal/VLCLibVLCBridging.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -171,7 +170,6 @@
 		0867D691FE84028FC02AAC07 /* VLC */ = {
 			isa = PBXGroup;
 			children = (
-				EF8BCECD0CB9339A004AA006 /* TODO */,
 				EF78BD3B0CAEEFD000354E6E /* Headers */,
 				08FB77AEFE84172EC02AAC07 /* Sources */,
 				32C88DFF0371C24200C91783 /* Other Sources */,
