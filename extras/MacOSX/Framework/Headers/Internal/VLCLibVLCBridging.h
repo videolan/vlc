@@ -27,6 +27,18 @@
 /**
  * Bridges functionality between libvlc and VLCMediaList implementation.
  */
+
+/*
+ * Utility function
+ */
+
+#define catch_exception( ex ) __catch_exception( (void *)(ex), __FUNCTION__, __FILE__, __LINE__ )
+extern void __catch_exception( void * e, const char * function, const char * file, int line_number );
+
+/*
+ * @interface VLC(class) (LibVLCBridging)
+ */
+
 @interface VLCMediaList (LibVLCBridging)
 /* Factories */
 /**
