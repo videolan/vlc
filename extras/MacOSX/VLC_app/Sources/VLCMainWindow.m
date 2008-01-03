@@ -314,12 +314,10 @@
     /* Hack, because sliding cause some glitches */
     [navigatorView moveSubviewsToVisible];
 
-    /* Get the bottom of the navigator view to get stuck at some points */
-    if( [sender bounds].size.height - proposedPosition < minHeight*3./2. &&
-        [sender bounds].size.height - proposedPosition >= minHeight/2 )
-         return [sender bounds].size.height - minHeight;
-    if( [sender bounds].size.height - proposedPosition < minHeight/2 )
+    /* Make a stuck point at the bottom of the nav view */
+    if( [sender bounds].size.height - proposedPosition < minHeight )
          return [sender bounds].size.height;
+
     return proposedPosition;
 }
 
