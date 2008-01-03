@@ -40,6 +40,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             reason:[NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)", 
                 libvlc_exception_get_message( ex ), file, line_number, function]
             userInfo:nil];
+        libvlc_exception_clear( ex );
         @throw libvlcException;
     }
 }
