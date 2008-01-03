@@ -22,7 +22,7 @@ static void *sleepForMe(void)
     [videoView setAutoresizingMask: NSViewHeightSizable|NSViewWidthSizable];
 
     playlist = [[VLCMediaList alloc] init];
-    [playlist setDelegate:self];
+    [playlist addObserver:self forKeyPath:@"media" options:NSKeyValueObservingOptionNew context:nil];
     
     player = [[VLCMediaPlayer alloc] initWithVideoView:videoView];
     mediaIndex = -1;
@@ -37,13 +37,14 @@ static void *sleepForMe(void)
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
+    [playlist removeObserver:self forKeyPath:@"media"];
+    
     [player pause];
     [player setMedia:nil];
     [player release];
     [playlist release];
     [videoView release];
 }
-
 
 - (void)changeAndPlay:(id)sender
 {
@@ -82,15 +83,11 @@ static void *sleepForMe(void)
     [player pause];
 }
 
-//
-- (void)mediaList:(VLCMediaList *)mediaList mediaAdded:(VLCMedia *)media atIndex:(int)index
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    [playlistOutline reloadData];
-}
-
-- (void)mediaList:(VLCMediaList *)mediaList mediaRemoved:(VLCMedia *)media atIndex:(int)index
-{
-    [playlistOutline reloadData];
+    if ([keyPath isEqualToString:@"media"] && object == playlist) {
+        [playlistOutline reloadData];
+    }
 }
 
 // NSTableView Implementation
@@ -102,7 +99,7 @@ static void *sleepForMe(void)
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn
 			row:(int)row
 {
-    return [[playlist mediaAtIndex:row] description];
+    return [(VLCMedia *)[playlist mediaAtIndex:row].metaDictionary valueForKey:VLCMetaInformationTitle];
 }
 
 - (NSDragOperation)tableView:(NSTableView*)tv validateDrop:(id <NSDraggingInfo>)info 
