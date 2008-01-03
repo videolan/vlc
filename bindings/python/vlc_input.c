@@ -296,7 +296,7 @@ vlcInput_video_take_snapshot( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_video_take_snapshot( LIBVLC_INPUT->p_md, psz_filename, &ex);
+    libvlc_video_take_snapshot( LIBVLC_INPUT->p_md, psz_filename, 0, 0, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
