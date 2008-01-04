@@ -999,7 +999,7 @@ package-macosx:
 # finder mounted dmg with the same name.
 	echo "Make sure the root window of the dmg will pop up when the dmg is mounted" ;
 	mkdir -p $(top_builddir)/vlcmnt ;
-	hdiutil attach -readwrite -noverify -noautoopen "$(top_builddir)/vlc-${VERSION}.dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
+	hdiutil attach -kernel -readwrite -noverify -noautoopen "$(top_builddir)/vlc-${VERSION}.dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
 	bless --folder "$(top_builddir)/vlcmnt/vlc-${VERSION}/" --openfolder "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
 	sleep 1 # Make sure operation completes
 	cd "$(srcdir)"
