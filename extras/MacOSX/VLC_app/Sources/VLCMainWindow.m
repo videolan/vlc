@@ -140,6 +140,8 @@
     [tableColumn setDataCell:cell];
 
     /* Other setup */
+    [categoriesListView setIndentationMarkerFollowsCell:YES];
+    [categoriesListView setAutoresizesOutlineColumn:NO];
     [categoriesListView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
     [categoriesListView setDelegate:self];
 
