@@ -140,6 +140,8 @@ enum demux_query_e
     /* DEMUX_SET_RATE is called only if DEMUX_CAN_CONTROL_RATE has returned true.
      * It should return the value really used in *pi_rate */
     DEMUX_SET_RATE,             /* arg1= int*pi_rate                                        can fail */
+
+    DEMUX_CAN_SEEK,            /* arg1= vlc_bool_t*    can fail (assume false)*/
 };
 
 VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );

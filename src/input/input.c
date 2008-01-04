@@ -2266,10 +2266,11 @@ static int InputSourceInit( input_thread_t *p_input,
                             &in->b_can_pause ) )
             in->b_can_pause = VLC_FALSE;
 
-        /* FIXME todo
-        demux2_Control( in->p_demux, DEMUX_CAN_SEEK,
+        int ret = demux2_Control( in->p_demux, DEMUX_CAN_SEEK,
                         &val.b_bool );
-        */
+        if( ret != VLC_SUCCESS )
+            val.b_bool = VLC_FALSE;
+        var_Set( p_input, "seekable", val );
     }
     else
     {

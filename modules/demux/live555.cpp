@@ -1256,6 +1256,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_SEEK:
             pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
             if( p_sys->rtsp && p_sys->i_npt_length )
                 /* Not always true, but will be handled in SET_PAUSE_STATE */
