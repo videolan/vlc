@@ -110,15 +110,15 @@ struct vout_sys_t
 {
     vout_thread_t * p_vout;
 
-    uint8_t    *pp_buffer[3]; /* one last rendered, one to be rendered */
-    int         i_rendering_index;
-    int         i_rendered_index;
-    int         i_on_screen_index;
+    uint8_t    *pp_buffer[2]; /* one last rendered, one to be rendered */
+    int         i_index;
     vlc_bool_t  b_frame_available;
+    
+    CGLContextObj glContext;
 
     int         i_tex_width;
     int         i_tex_height;
-    GLuint      p_textures[3];
+    GLuint      p_textures[2];
 
     NSAutoreleasePool *autorealease_pool;
     VLCVoutLayer * o_layer;
@@ -194,7 +194,7 @@ static int Init( vout_thread_t *p_vout )
     /* We know the chroma, allocate two buffer which will be used
      * directly by the decoder */
     int i;
-    for( i = 0; i < 3; i++ )
+    for( i = 0; i < 2; i++ )
     {
         p_sys->pp_buffer[i] =
             malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
@@ -205,12 +205,10 @@ static int Init( vout_thread_t *p_vout )
         }
     }
     p_sys->b_frame_available = VLC_FALSE;
-    p_sys->i_on_screen_index = 0;
-    p_sys->i_rendered_index = 1;
-    p_sys->i_rendering_index = 2;
+    p_sys->i_index = 0;
 
     p_vout->p_picture[0].i_planes = 1;
-    p_vout->p_picture[0].p->p_pixels = p_sys->pp_buffer[p_sys->i_rendering_index];
+    p_vout->p_picture[0].p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
     p_vout->p_picture[0].p->i_lines = p_vout->output.i_height;
     p_vout->p_picture[0].p->i_visible_lines = p_vout->output.i_height;
     p_vout->p_picture[0].p->i_pixel_pitch = i_pixel_pitch;
@@ -258,7 +256,6 @@ static void End( vout_thread_t *p_vout )
     /* Free the texture buffer*/
     free( p_sys->pp_buffer[0] );
     free( p_sys->pp_buffer[1] );
-    free( p_sys->pp_buffer[2] );
 }
 
 /*****************************************************************************
@@ -293,13 +290,35 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    /* Make sure we never draw to the currently on screen buffer */
-    assert(p_sys->i_rendering_index != p_sys->i_on_screen_index );
+    @synchronized( p_sys->o_layer ) /* Make sure the p_sys->glContext isn't edited */
+    {
+        if( p_sys->glContext )
+        {
+            CGLLockContext(p_sys->glContext);
+            CGLSetCurrentContext(p_sys->glContext);
+            int i_new_index;
+            i_new_index = ( p_sys->i_index + 1 ) & 1;
+
+
+            /* Update the texture */
+            glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_new_index] );
+            glTexSubImage2D( VLCGL_TARGET, 0, 0, 0,
+                         p_vout->fmt_out.i_width,
+                         p_vout->fmt_out.i_height,
+                         VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[i_new_index] );
+
+            /* Bind to the previous texture for drawing */
+            glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
+
+            /* Switch buffers */
+            p_sys->i_index = i_new_index;
+            p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
+            CGLUnlockContext(p_sys->glContext);
+        }
+    }
 
     /* Give a buffer where the image will be rendered */
-    p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_rendering_index];
-
-
+    p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
 }
 
 /*****************************************************************************
@@ -309,16 +328,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    /* Swap the buffer */
-    @synchronized(p_sys->o_layer)
-    {
-        int temp = p_sys->i_rendered_index;
-        p_sys->i_rendered_index = p_sys->i_rendering_index;
-        p_sys->i_rendering_index = temp;
-        p_sys->b_frame_available = VLC_TRUE;
-        assert(p_sys->i_rendering_index != p_sys->i_on_screen_index );
-    }
-
+    p_sys->b_frame_available = VLC_TRUE;
 }
 
 /*****************************************************************************
@@ -349,10 +359,10 @@ static int InitTextures( vout_thread_t *p_vout )
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_index;
 
-    glDeleteTextures( 3, p_sys->p_textures );
-    glGenTextures( 3, p_sys->p_textures );
+    glDeleteTextures( 2, p_sys->p_textures );
+    glGenTextures( 2, p_sys->p_textures );
 
-    for( i_index = 0; i_index < 3; i_index++ )
+    for( i_index = 0; i_index < 2; i_index++ )
     {
         glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_index] );
 
@@ -376,8 +386,7 @@ static int InitTextures( vout_thread_t *p_vout )
         glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
 
         /* Use AGP texturing */
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_SHARED_APPLE );
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_SHARED_APPLE );
 
         /* Call glTexImage2D only once, and use glTexSubImage2D later */
         glTexImage2D( VLCGL_TARGET, 0, 4, p_sys->i_tex_width,
@@ -427,7 +436,6 @@ static int InitTextures( vout_thread_t *p_vout )
 
 - (void)drawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
 {
-    /* Init */
     CGLLockContext( glContext );
     CGLSetCurrentContext( glContext );
 
@@ -440,48 +448,23 @@ static int InitTextures( vout_thread_t *p_vout )
     f_height = (float)p_vout->fmt_out.i_y_offset +
                (float)p_vout->fmt_out.i_visible_height;
 
-    assert(p_vout->p_sys->i_rendering_index != p_vout->p_sys->i_on_screen_index );
+    glClear( GL_COLOR_BUFFER_BIT );
 
-    @synchronized(self)
-    {
-        /* Swap the buffers */
-        if( p_vout->p_sys->b_frame_available )
-        {
-            int temp;
-            temp = p_vout->p_sys->i_on_screen_index;
-            p_vout->p_sys->i_on_screen_index = p_vout->p_sys->i_rendered_index;
-            p_vout->p_sys->i_rendered_index = temp;
-            p_vout->p_sys->b_frame_available = VLC_FALSE;
-        }
-    
-        glBindTexture( VLCGL_TARGET, p_vout->p_sys->p_textures[p_vout->p_sys->i_on_screen_index] );
+    glEnable( VLCGL_TARGET );
+    glBegin( GL_POLYGON );
+    glTexCoord2f( f_x, f_y ); glVertex2f( -1.0, 1.0 );
+    glTexCoord2f( f_width, f_y ); glVertex2f( 1.0, 1.0 );
+    glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
+    glTexCoord2f( f_x, f_height ); glVertex2f( -1.0, -1.0 );
+    glEnd();
 
-        glTexSubImage2D( VLCGL_TARGET, 0, 0, 0,
-                     p_vout->fmt_out.i_width,
-                     p_vout->fmt_out.i_height,
-                     VLCGL_FORMAT, VLCGL_TYPE, p_vout->p_sys->pp_buffer[p_vout->p_sys->i_on_screen_index] );
+    glDisable( VLCGL_TARGET );
 
-        /* Make sure the that there is no old reference of the pointer old texture kept around */
-        glFinishObjectAPPLE(GL_TEXTURE_RECTANGLE_EXT, p_vout->p_sys->p_textures[p_vout->p_sys->i_on_screen_index]);
+    glFlush();
 
-        glClear( GL_COLOR_BUFFER_BIT );
+    CGLUnlockContext( glContext );
 
-        glEnable( VLCGL_TARGET );
-        glBegin( GL_POLYGON );
-        glTexCoord2f( f_x, f_y ); glVertex2f( -1.0, 1.0 );
-        glTexCoord2f( f_width, f_y ); glVertex2f( 1.0, 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
-        glTexCoord2f( f_x, f_height ); glVertex2f( -1.0, -1.0 );
-        glEnd();
-
-        glDisable( VLCGL_TARGET );
-
-        glFlush();
-        
-        CGLUnlockContext( glContext );
-
-        p_vout->p_sys->b_frame_available = VLC_FALSE;
-    }
+    p_vout->p_sys->b_frame_available = VLC_FALSE;
 }
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
@@ -510,16 +493,25 @@ static int InitTextures( vout_thread_t *p_vout )
     glClear( GL_COLOR_BUFFER_BIT );
 
     CGLUnlockContext( context );
+    @synchronized( self )
+    {
+        p_vout->p_sys->glContext = context;
+    }
 
     return context;
 }
 
 - (void)releaseCGLContext:(CGLContextObj)glContext
 {
+    @synchronized( self )
+    {
+        p_vout->p_sys->glContext = nil;
+    }
+
     CGLLockContext( glContext );
     CGLSetCurrentContext( glContext );
 
-    glDeleteTextures( 3, p_vout->p_sys->p_textures );
+    glDeleteTextures( 2, p_vout->p_sys->p_textures );
 
     CGLUnlockContext( glContext );
 }
