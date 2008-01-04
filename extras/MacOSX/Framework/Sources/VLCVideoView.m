@@ -32,10 +32,6 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-/* Notifications */
-NSString * VLCVideoViewEnteredFullScreen    = @"VLCVideoViewEnteredFullScreen";
-NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
-
 /******************************************************************************
  * Soon deprecated stuff 
  */
@@ -146,26 +142,6 @@ NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
     [[self layer] setNeedsLayout];
 }
 
-- (BOOL)fullScreen
-{
-    return fullScreen;
-}
-
-- (void)setFullScreen:(BOOL)newFullScreen
-{
-    if( newFullScreen )
-    {
-        fullScreen = YES;
-        [self enterFullscreen];
-    }
-    else
-    {
-        fullScreen = NO;
-        [self leaveFullscreen];
-    }
-}
-
-
 - (id)initWithFrame:(NSRect)rect
 {
     if (self = [super initWithFrame:rect]) 
@@ -212,33 +188,6 @@ NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
     return backColor;
 }
 
-/* This is a LibVLC notification that we're about to enter into full screen,
-   there is no other place where I can see where we can trap this event */
-- (void)enterFullscreen
-{
-    // Go ahead and send a notification to the world we're going into full screen
-    [[VLCEventManager sharedManager] callOnMainThreadDelegateOfObject:self 
-                                                   withDelegateMethod:nil 
-                                                 withNotificationName:VLCVideoViewEnteredFullScreen];
-    
-    [super enterFullScreenMode:[[self window] screen] withOptions:nil];
-    if( !self.fullScreen ) self.fullScreen = YES;
-}
-
-/* This is a LibVLC notification that we're about to enter leaving full screen,
-   there is no other place where I can see where we can trap this event */
-- (void)leaveFullscreen
-{
-    // Go ahead and send a notification to the world we're leaving full screen
-    [[VLCEventManager sharedManager] callOnMainThreadDelegateOfObject:self 
-                                                   withDelegateMethod:nil 
-                                                 withNotificationName:VLCVideoViewLeftFullScreen];
-    
-    // There is nothing else to do, as this object strictly displays the video feed
-    [super exitFullScreenModeWithOptions:nil];
-    if( self.fullScreen ) self.fullScreen = NO;
-}
-
 - (void)drawRect:(NSRect)aRect
 {
     [self lockFocus];
@@ -250,16 +199,6 @@ NSString * VLCVideoViewLeftFullScreen       = @"VLCVideoViewLeftFullScreen";
 - (BOOL)isOpaque
 {
     return YES;
-}
-
-- (void)mouseDown:(NSEvent *)theEvent
-{
-    if([theEvent clickCount] != 2)
-        return;
-    if(self.fullScreen)
-        [self leaveFullscreen];
-    else
-        [self enterFullscreen];
 }
 @end
 

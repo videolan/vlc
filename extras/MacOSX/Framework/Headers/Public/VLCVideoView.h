@@ -24,30 +24,19 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
+
 @class CALayer;
-
-/* Notifications */
-extern NSString * VLCVideoViewEnteredFullScreen;
-extern NSString * VLCVideoViewLeftFullScreen;
-
-@protocol VLCVideoViewDelegate
-// Notifications defined in VLCVideoView.h
-- (void)videoEnteredFullscreen:(NSNotification *)aNotification;
-- (void)videoLeftFullscreen:(NSNotification *)aNotification;
-@end
 
 @interface VLCVideoView : NSView
 {
     id delegate;
     NSColor * backColor;
     BOOL stretchesVideo;
-    BOOL fullScreen;
     id layoutManager;
     // TODO: Allow for view to report transparency to do some cool effects
     // with the video?
 }
 
-@property BOOL fullScreen;
 @property BOOL fillScreen;
 
 - (void)setDelegate:(id)value;
@@ -55,12 +44,4 @@ extern NSString * VLCVideoViewLeftFullScreen;
 
 - (void)setBackColor:(NSColor *)value;
 - (NSColor *)backColor;
-
-- (void)enterFullscreen;
-- (void)leaveFullscreen;
-
-//- (void)setOnTop: (BOOL)ontop; /* Do we really want that in protocol? */
-
-// The media controls that were here previously should be moved elsewhere.  This
-// View is just that, a view not a controller. -- Moved to VLCMediaPlayer
 @end

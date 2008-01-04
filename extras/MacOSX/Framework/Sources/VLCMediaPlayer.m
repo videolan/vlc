@@ -204,20 +204,6 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     [self setDrawable: aVideoLayer];
 }
 
-- (void)setFullscreen:(BOOL)value
-{
-    libvlc_set_fullscreen(instance, value, NULL);
-}
-
-- (BOOL)fullscreen
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    int result = libvlc_get_fullscreen( instance, &ex );
-    catch_exception( &ex );
-    return result;
-}
-
 - (void)setVideoAspectRatio:(char *)value
 {
     libvlc_video_set_aspect_ratio( instance, value, NULL );

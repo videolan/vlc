@@ -93,9 +93,6 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setVideoView:(VLCVideoView *)aVideoView;
 - (void)setVideoLayer:(VLCVideoLayer *)aVideoLayer;
 
-- (void)setFullscreen:(BOOL)value;
-- (BOOL)fullscreen;
-
 - (void)setVideoAspectRatio:(char *)value;
 - (char *)videoAspectRatio;
 - (void)setVideoSubTitles:(int)value;
