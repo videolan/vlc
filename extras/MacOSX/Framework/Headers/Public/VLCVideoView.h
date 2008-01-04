@@ -37,11 +37,7 @@
     // with the video?
 }
 
+@property (assign) id delegate;
+@property (copy) NSColor *backColor;
 @property BOOL fillScreen;
-
-- (void)setDelegate:(id)value;
-- (id)delegate;
-
-- (void)setBackColor:(NSColor *)value;
-- (NSColor *)backColor;
 @end

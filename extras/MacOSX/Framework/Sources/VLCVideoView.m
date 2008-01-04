@@ -132,16 +132,6 @@
 
 @implementation VLCVideoView
 
-- (BOOL)fillScreen
-{
-    return [layoutManager fillScreenEntirely];
-}
-- (void)setFillScreen:(BOOL)fillScreen
-{
-    [layoutManager setFillScreenEntirely:fillScreen];
-    [[self layer] setNeedsLayout];
-}
-
 - (id)initWithFrame:(NSRect)rect
 {
     if (self = [super initWithFrame:rect]) 
@@ -164,30 +154,6 @@
     [super dealloc];
 }
 
-- (void)setDelegate:(id)value
-{
-    delegate = value;
-}
-
-- (id)delegate
-{
-    return delegate;
-}
-
-- (void)setBackColor:(NSColor *)value
-{
-    if (backColor != value)
-    {
-        [backColor release];
-        backColor = [value retain];
-    }
-}
-
-- (NSColor *)backColor
-{
-    return backColor;
-}
-
 - (void)drawRect:(NSRect)aRect
 {
     [self lockFocus];
@@ -199,6 +165,20 @@
 - (BOOL)isOpaque
 {
     return YES;
+}
+
+@synthesize delegate;
+@synthesize backColor;
+
+- (BOOL)fillScreen
+{
+    return [layoutManager fillScreenEntirely];
+}
+
+- (void)setFillScreen:(BOOL)fillScreen
+{
+    [layoutManager setFillScreenEntirely:fillScreen];
+    [[self layer] setNeedsLayout];
 }
 @end
 
