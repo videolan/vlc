@@ -67,7 +67,8 @@ static void * EventDispatcherMainLoop(void * user_data)
         int i;
 
         /* Sleep a bit not to flood the interface */
-        msleep(300);
+        usleep(300);
+
         /* Wait for some data */
 
         pthread_mutex_lock( [self queueLock] );
