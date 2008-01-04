@@ -238,7 +238,7 @@ static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    p_vout->p_sys->b_frame_available = 0;
+    p_vout->p_sys->b_frame_available = VLC_FALSE;
 
     [CATransaction performSelectorOnMainThread:@selector(begin)
                     withObject:nil waitUntilDone:YES];
@@ -253,8 +253,8 @@ static void End( vout_thread_t *p_vout )
     [p_sys->autorealease_pool release];
 
     /* Free the texture buffer*/
-    if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
-    if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
+    free( p_sys->pp_buffer[0] );
+    free( p_sys->pp_buffer[1] );
 }
 
 /*****************************************************************************
@@ -296,7 +296,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Give a buffer where the image will be rendered */
     p_pic->p->p_pixels = p_sys->pp_buffer[p_new_index];
-
 }
 
 /*****************************************************************************
@@ -312,7 +311,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         p_sys->i_index = (p_sys->i_index + 1) & 1; /* Indicate the layer should use that index */
     }
 
-    p_sys->b_frame_available = 1;
+    p_sys->b_frame_available = VLC_TRUE;
 }
 
 /*****************************************************************************
@@ -394,7 +393,7 @@ static int InitTextures( vout_thread_t *p_vout )
 + (void)autoinitInVout:(NSValue*)arg
 {
     vout_thread_t * p_vout = [arg pointerValue];
-    p_vout->p_sys->o_layer = [[VLCVoutLayer layerWithVout: p_vout] retain];
+    p_vout->p_sys->o_layer = [[VLCVoutLayer layerWithVout:p_vout] retain];
     [p_vout->p_sys->o_cocoa_container addVoutLayer:p_vout->p_sys->o_layer];
 }
 
@@ -419,10 +418,8 @@ static int InitTextures( vout_thread_t *p_vout )
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
 {
-    /* Only draw the frame when if have a frame that was previously rendered */
-    BOOL ret = p_vout->p_sys->b_frame_available;
-    p_vout->p_sys->b_frame_available = VLC_FALSE;
-    return ret;
+    /* Only draw the frame if we have a frame that was previously rendered */
+ 	return p_vout->p_sys->b_frame_available;    // Flag is cleared by drawInCGLContext:pixelFormat:forLayerTime:displayTime:
 }
 
 - (void)drawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
@@ -449,7 +446,6 @@ static int InitTextures( vout_thread_t *p_vout )
                      p_vout->fmt_out.i_height,
                      VLCGL_FORMAT, VLCGL_TYPE, p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index] );
 
-
         glClear( GL_COLOR_BUFFER_BIT );
 
         glEnable( VLCGL_TARGET );
@@ -466,34 +462,38 @@ static int InitTextures( vout_thread_t *p_vout )
     }
 
     CGLUnlockContext( glContext );
-    p_vout->p_sys->b_frame_available = VLC_FALSE;
+
+    p_vout->p_sys->b_frame_available = VLC_FALSE; 
 }
 
-- (CGLPixelFormatObj)copyCGLPixelFormatForDisplayMask:(uint32_t)mask
-{
-	GLuint attribs[] = 
-	{
-		NSOpenGLPFANoRecovery,
-		NSOpenGLPFAWindow,
-		NSOpenGLPFAAccelerated,
-		NSOpenGLPFADoubleBuffer,
-		NSOpenGLPFAColorSize, 24,
-		NSOpenGLPFAAlphaSize, 8,
-		NSOpenGLPFADepthSize, 24,
-		NSOpenGLPFAStencilSize, 8,
-		NSOpenGLPFAAccumSize, 0,
-		0
-	};
-
-	NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: (NSOpenGLPixelFormatAttribute*) attribs]; 
-    
-    return [super copyCGLPixelFormatForDisplayMask:mask];//[fmt CGLPixelFormatObj];
-}
+// - (CGLPixelFormatObj)copyCGLPixelFormatForDisplayMask:(uint32_t)mask
+// {
+//  GLuint attribs[] = 
+//  {
+//      NSOpenGLPFANoRecovery,
+//      NSOpenGLPFAWindow,
+//      NSOpenGLPFAAccelerated,
+//      NSOpenGLPFADoubleBuffer,
+//      NSOpenGLPFAColorSize, 24,
+//      NSOpenGLPFAAlphaSize, 8,
+//      NSOpenGLPFADepthSize, 24,
+//      NSOpenGLPFAStencilSize, 8,
+//      NSOpenGLPFAAccumSize, 0,
+//      0
+//  };
+// 
+//  NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: (NSOpenGLPixelFormatAttribute*) attribs]; 
+//     
+//     return [fmt CGLPixelFormatObj];
+// }
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat
 {
     CGLContextObj context = [super copyCGLContextForPixelFormat:pixelFormat];
 
+    CGLLockContext( context ); 
+    
+    CGLSetCurrentContext( context );
 
     /* Swap buffers only during the vertical retrace of the monitor.
     http://developer.apple.com/documentation/GraphicsImaging/
@@ -501,24 +501,18 @@ static int InitTextures( vout_thread_t *p_vout )
 
     GLint params = 1;
     CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
-                    &params );
+                     &params );
     
-    /* Make sure our texture will gets drawn at the right resolution */
-    GLint dim[2] = { p_vout->p_sys->i_tex_width, p_vout->p_sys->i_tex_height};
-    NSLog(@"asking for %dx%d", p_vout->p_sys->i_tex_width, p_vout->p_sys->i_tex_height);
-    CGLSetParameter(context, kCGLCPSurfaceBackingSize, dim);
-    CGLEnable (context, kCGLCESurfaceBackingSize);
-
-    CGLSetCurrentContext( context );
     InitTextures( p_vout );
 
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
+    glDisable( GL_BLEND );
+    glDisable( GL_DEPTH_TEST );
+    glDepthMask( GL_FALSE );
+    glDisable( GL_CULL_FACE) ;
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
+    CGLUnlockContext( context );
     return context;
 }
 
@@ -531,5 +525,4 @@ static int InitTextures( vout_thread_t *p_vout )
 
     CGLUnlockContext( glContext );
 }
-
 @end
