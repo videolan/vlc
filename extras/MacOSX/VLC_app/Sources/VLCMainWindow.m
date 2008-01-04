@@ -363,7 +363,6 @@ static NSString * VLCToolbarMediaDescription = @"VLCToolbarMediaDescription";
 
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
 {
-    NSLog(@"hello");
     return [NSArray arrayWithObjects:
                         NSToolbarCustomizeToolbarItemIdentifier,
                         NSToolbarFlexibleSpaceItemIdentifier,
