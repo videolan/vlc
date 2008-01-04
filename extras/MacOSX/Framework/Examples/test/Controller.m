@@ -20,7 +20,8 @@ static void *sleepForMe(void)
     videoView = [[VLCVideoView alloc] initWithFrame:rect];
     [videoHolderView addSubview:videoView];
     [videoView setAutoresizingMask: NSViewHeightSizable|NSViewWidthSizable];
-
+    videoView.fillScreen = YES;
+    
     playlist = [[VLCMediaList alloc] init];
     [playlist addObserver:self forKeyPath:@"media" options:NSKeyValueObservingOptionNew context:nil];
     
