@@ -62,11 +62,32 @@
 - (NSArray *)itemsTree {
     return itemsTree;
 }
+
 - (void)setItemsTree:(NSArray *)newItemsTree
 {
     [itemsTree release];
     itemsTree = [newItemsTree retain];
     [self changeSelectedPath:[[[NSIndexPath alloc] init] autorelease] withSelectedIndex:0];
+}
+
+- (BOOL)fullScreen
+{
+    return [super isInFullScreenMode];
+}
+
+- (void)setFullScreen:(BOOL)newFullScreen
+{
+    if( newFullScreen == self.fullScreen )
+        return;
+    
+    if( newFullScreen )
+    {
+        [super enterFullScreenMode:[[self window] screen] withOptions:nil];
+    }
+    else
+    {
+        [super exitFullScreenModeWithOptions:nil];
+    }
 }
 
 /* Initializer */
@@ -84,7 +105,6 @@
     //[self displayMenu];
     //[self changeSelectedIndex:0];
 }
-
 
 /* Hiding/Displaying the menu */
 
@@ -155,6 +175,14 @@
 -(void)moveDown:(id)sender
 {
     [self changeSelectedIndex:selectedIndex+1];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+    if([theEvent clickCount] != 2)
+        return;
+
+    self.fullScreen = !self.fullScreen;
 }
 
 - (void)keyDown:(NSEvent *)theEvent

@@ -38,7 +38,8 @@
     NSString *      nodeKeyPath;
     NSString *      contentKeyPath;
     id              selectedObject;
-
+    BOOL            fullScreen;
+    
     /* Actions on non-node items*/
     id target;
     SEL action;
@@ -50,6 +51,8 @@
 @property (copy) NSString * contentKeyPath;
 
 @property (readonly, retain) id selectedObject;
+
+@property (readwrite) BOOL fullScreen;
 
 /* Set up a specific action to do, on items that don't have node.
  * action first argument is the browsableVideoView. You can get the selected object,
