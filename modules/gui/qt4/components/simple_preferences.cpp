@@ -302,7 +302,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 char *psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
                 char *psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
                 char *psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
-                if( !strcmp( psz_cddadiscpath, psz_dvddiscpath ) &&
+                if( psz_dvddiscpath && psz_vcddiscpath && psz_cddadiscpath )
+				if( !strcmp( psz_cddadiscpath, psz_dvddiscpath ) &&
                     !strcmp( psz_dvddiscpath, psz_vcddiscpath ) )
                 {
                     ui.DVDDevice->setText( qfu( psz_dvddiscpath ) );
