@@ -670,10 +670,15 @@ __vlc_gc_init( gc_object_t * p_gc, void (*pf_destructor)( gc_object_t * ),
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-static int64_t GCD( int64_t a, int64_t b )
+static inline int64_t GCD( int64_t a, int64_t b )
 {
-    if( b ) return GCD( b, a % b );
-    else return a;
+    while( b )
+    {
+        int64_t c = a % b;
+        a = b;
+        b = c;
+    }
+    return a;
 }
 
 /* function imported from libavutil/common.h */
