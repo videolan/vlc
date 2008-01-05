@@ -270,7 +270,6 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         { .fd = -1, .events = POLLIN },
     };
 
-    msg_Dbg (p_this, "reading socket %d", fd);
     vlc_object_lock (p_this);
     ufd[1].fd = vlc_object_waitpipe (p_this);
 
@@ -380,7 +379,6 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
     }
 
     vlc_object_unlock (p_this);
-    msg_Dbg (p_this, "read %u bytes from socket %d", (unsigned)i_total, fd);
     return i_total;
 
 error:
