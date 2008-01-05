@@ -75,7 +75,10 @@ static void *sleepForMe(void)
 {
     [self setMediaIndex:mediaIndex+1];
     if (![player isPlaying])
+    {
+		NSLog(@"%@ length = %@", [playlist mediaAtIndex:mediaIndex], [[playlist mediaAtIndex:mediaIndex] lengthWaitUntilDate:[NSDate dateWithTimeIntervalSinceNow:60]]);
 		[player play];
+    }
 }
 
 - (void)pause:(id)sender
@@ -119,7 +122,6 @@ static void *sleepForMe(void)
     {
         NSString * filename = [droppedItems objectAtIndex:i];
 		VLCMedia * media = [VLCMedia mediaWithURL:[NSURL fileURLWithPath:filename]];
-		NSLog(@"%@ length = %@", media, [media lengthWaitUntilDate:[NSDate dateWithTimeIntervalSinceNow:60]]);
 		[playlist addMedia:media];
     }
     return YES;
