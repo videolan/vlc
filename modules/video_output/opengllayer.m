@@ -328,6 +328,9 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
+    [p_sys->o_layer performSelectorOnMainThread:@selector(setNeedsDisplay)
+                    withObject:nil waitUntilDone:NO];
+
     p_sys->b_frame_available = VLC_TRUE;
 }
 
@@ -420,7 +423,7 @@ static int InitTextures( vout_thread_t *p_vout )
     if( me )
     {
         me->p_vout = _p_vout;
-        me.asynchronous = YES;
+        me.asynchronous = NO;
         me.bounds = CGRectMake( 0.0, 0.0, 
                                 (float)_p_vout->fmt_in.i_visible_width * _p_vout->fmt_in.i_sar_num,
                                 (float)_p_vout->fmt_in.i_visible_height * _p_vout->fmt_in.i_sar_den );
