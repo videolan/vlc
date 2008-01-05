@@ -284,7 +284,7 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             ufd[i].revents = 0;
         }
 
-        switch (poll (ufd, n, b_block ? 500 : i_wait))
+        switch (poll (ufd, n, b_block ? 500 : i_wait / 1000))
         {
             case -1:
                 if (net_errno != EINTR)
