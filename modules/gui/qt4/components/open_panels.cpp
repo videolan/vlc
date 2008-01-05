@@ -788,7 +788,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /*********************
      * DirectShow Stuffs *
      *********************/
-    if( module_Exists( p_intf, "DirectShow" ) ){
+    if( module_Exists( p_intf, "dshow" ) ){
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
     /* dshow Main */
