@@ -133,6 +133,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         dict = [[NSDictionary dictionaryWithObjectsAndKeys:
             [NSSet setWithObject:@"state"], @"playing",
             [NSSet setWithObjects:@"state", @"media", nil], @"seekable",
+            [NSSet setWithObjects:@"state", @"media", nil], @"description",
             nil] retain];
     }
     return [dict objectForKey: key];
