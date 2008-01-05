@@ -39,6 +39,10 @@
 
 /* Split view that supports slider animation */
 @interface VLCOneSplitView : NSSplitView
+{
+    BOOL fixedCursorDuringResize;
+}
+@property (assign) BOOL fixedCursorDuringResize;
 - (float)sliderPosition;
 - (void)setSliderPosition:(float)newPosition;
 @end

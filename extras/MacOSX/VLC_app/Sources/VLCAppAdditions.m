@@ -84,6 +84,7 @@
 
 /* Split view that supports slider animation */
 @implementation VLCOneSplitView
+@synthesize fixedCursorDuringResize;
 - (float)sliderPosition
 {
     return [[[self subviews] objectAtIndex:0] frame].size.height;
@@ -99,6 +100,26 @@
         return [CABasicAnimation animation];
     }
     return [super defaultAnimationForKey: key];
+}
+- (void)adjustSubviews
+{
+    if( !fixedCursorDuringResize )
+    {
+        [super adjustSubviews];
+        return;
+    }
+    NSRect frame0 = [[[self subviews] objectAtIndex:0] frame];
+    NSRect frame1 = [[[self subviews] objectAtIndex:1] frame];
+    frame1.size.height = [self bounds].size.height - frame0.size.height - [self dividerThickness];
+    if( frame1.size.height < 0. )
+    {
+        float delta = -frame1.size.height;
+        frame1.size.height = 0.;
+        frame0.size.height -= delta;
+        frame1.origin.y = frame0.size.height + [self dividerThickness];
+        [[[self subviews] objectAtIndex:1] setFrame: frame0];
+    }
+    [[[self subviews] objectAtIndex:1] setFrame: frame1];
 }
 @end
 

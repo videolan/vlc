@@ -28,6 +28,10 @@
 #import "VLCBrowsableVideoView.h"
 #import "VLCAppAdditions.h"
 
+@interface VLCMainWindow (NavigatorViewHidingShowing)
+@property float contentHeight; /* animatable, keep the mainSplitView cursor at the same place, enabling playlist(navigator) togling */
+@end
+
 /******************************************************************************
  * VLCMainWindow (CategoriesListDelegate)
  */
@@ -280,28 +284,26 @@
     
     if(visible)
     {
-        if( !navigatorHeight ) navigatorHeight = 100.f;
+        /* Show the navigator view (playlist view) */
+        if( navigatorHeight < 100.f ) navigatorHeight = 100.f;
         if( ![self videoViewVisible] && ![self navigatorViewVisible] )
         {
+            /* Nothing is visible, only our toolbar */
             NSRect frame = [self frame];
-            frame.origin.y -= navigatorHeight;
+            frame.origin.y += navigatorHeight;
             frame.size.height += navigatorHeight;
             [[self animator] setFrame:frame display:YES];
         }
         else
-            [[mainSplitView animator] setSliderPosition:([mainSplitView bounds].size.height - navigatorHeight - [mainSplitView dividerThickness])];
+            [[self animator] setContentHeight:[mainSplitView bounds].size.height + navigatorHeight + [mainSplitView dividerThickness]];
         /* Hack, because sliding cause some glitches */
         [navigatorView moveSubviewsToVisible];
     }
     else
     {
+        /* Hide the navigator view (playlist view) */
         navigatorHeight = [navigatorView bounds].size.height;
-        NSRect frame0 = [self frame];
-        NSRect frame1 = [[[mainSplitView subviews] objectAtIndex: 1] frame];
-        frame0.size.height -= frame1.size.height;
-        frame0.origin.y += frame1.size.height;
-        frame1.size.height = 0;
-        [[mainSplitView animator] setSliderPosition:([mainSplitView bounds].size.height)];
+        [[self animator] setContentHeight:[mainSplitView bounds].size.height - navigatorHeight + [mainSplitView dividerThickness]];
         /* Hack, because sliding cause some glitches */
         [navigatorView moveSubviewsToVisible];
     }
@@ -352,6 +354,36 @@
     if( proposedFrameSize.height < 120.f)
         proposedFrameSize.height = [self minSize].height;
     return proposedFrameSize;
+}
+@end
+
+@implementation VLCMainWindow (NavigatorViewHidingShowing)
+- (float)contentHeight
+{
+    return [self contentRectForFrameRect:[self frame]].size.height;
+}
+
+- (void)setContentHeight:(float)height
+{
+    /* Set the Height while keeping the mainSplitView at his current position */
+    [mainSplitView setFixedCursorDuringResize:YES];
+    NSRect contentRect = [self contentRectForFrameRect:[self frame]];
+    float delta = height - contentRect.size.height;
+    contentRect.size.height = height;
+	NSRect windowFrame = [self frameRectForContentRect:contentRect];
+    windowFrame.origin.y -= delta;
+    windowFrame = [self constrainFrameRect:windowFrame toScreen:[self screen]];
+    [self setFrame:windowFrame display:YES];
+    [mainSplitView setFixedCursorDuringResize:NO];
+}
+
++ (id)defaultAnimationForKey:(NSString *)key
+{
+    if([key isEqualToString:@"contentHeight"])
+    {
+        return [CABasicAnimation animation];
+    }
+    return [super defaultAnimationForKey: key];
 }
 @end
 
