@@ -992,17 +992,17 @@ package-macosx:
 	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
 	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-${VERSION}" \
 	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDRW \
-	  -scrub -imagekey zlib-level=9 ;
+	  -scrub -imagekey zlib-level=9 -attach ;
 
 # Make sure the root window of the dmg will pop up when the dmg is mounted.
 # Note: We dont mount in /Volumes to be sure we won't collide with an other
 # finder mounted dmg with the same name.
 	echo "Make sure the root window of the dmg will pop up when the dmg is mounted" ;
-	mkdir -p $(top_builddir)/vlcmnt ;
-	hdiutil attach -nokernel -readwrite -noverify -noautoopen -private "$(top_builddir)/vlc-${VERSION}.dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
+#	mkdir -p $(top_builddir)/vlcmnt ;
+#	hdiutil attach -nokernel -readwrite -noverify -noautoopen -private "$(top_builddir)/vlc-${VERSION}.dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
 	bless --folder "$(top_builddir)/vlcmnt/vlc-${VERSION}/" --openfolder "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
 	sleep 1 # Make sure operation completes
-	cd "$(srcdir)"
+#	cd "$(srcdir)"
 
 # Unmount the image now
 	hdiutil detach "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
