@@ -426,6 +426,8 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
     {
         msg_Dbg( p_this, "main device='%s'", p_sys->psz_device );
 
+        vlc_bool_t b_maindevice_is_video = VLC_FALSE;
+
         /* Try to open as video device */
         if( i_flags & FIND_VIDEO )
         {
@@ -440,13 +442,14 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
                 p_sys->i_fd_video = OpenVideoDev( p_this, p_sys, b_demux );
                 if( p_sys->i_fd_video < 0 )
                     return VLC_EGENERIC;
-                return VLC_SUCCESS;
+                b_maindevice_is_video = VLC_TRUE;
+                /* If successful we carry on to try the audio if access is forced */
             }
         }
 
-        if( i_flags & FIND_AUDIO )
+        /* Try to open as audio device only if main device was not detected as video above */
+        if( i_flags & FIND_AUDIO && !b_maindevice_is_video )
         {
-            /* Try to open as audio device */
             msg_Dbg( p_this, "trying device '%s' as audio", p_sys->psz_device );
             if( ProbeAudioDev( p_this, p_sys, p_sys->psz_device ) )
             {
@@ -458,7 +461,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
                 p_sys->i_fd_audio = OpenAudioDev( p_this, p_sys, b_demux );
                 if( p_sys->i_fd_audio < 0 )
                     return VLC_EGENERIC;
-                return VLC_SUCCESS;
+                /* If successful we carry on to try the video if access is forced */
             }
         }
     }
@@ -917,7 +920,11 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
 #ifdef HAVE_ALSA
-    if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
+    if( p_sys->p_alsa_pcm ) 
+    {
+        snd_pcm_close( p_sys->p_alsa_pcm );
+        p_sys->i_fd_audio = -1;
+    }
 #endif
     if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
 
