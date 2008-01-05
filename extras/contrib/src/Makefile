@@ -664,12 +664,6 @@ DISTCLEAN_PKG += libmad-$(LIBMAD_VERSION).tar.gz
 # ogg
 # ***************************************************************************
 
-#ogg:
-#	@echo "*** Please type \"anoncvs\" here : ***"
-#	cvs -d $(OGG_CVSROOT) login
-#	cvs -d $(OGG_CVSROOT) co ogg
-#	(cd $@; ./autogen.sh)
-
 libogg-$(OGG_VERSION).tar.gz:
 	$(WGET) $(OGG_URL)
 
@@ -874,13 +868,6 @@ DISTCLEAN_PKG += speex-$(SPEEX_VERSION).tar.gz
 # ***************************************************************************
 # faad2
 # ***************************************************************************
-
-#faad2:
-#	@echo "*** Please type return here : ***"
-#	cvs -d $(FAAD2_CVSROOT) login
-#	cvs -d $(FAAD2_CVSROOT) co faad2
-#	(cd $@; patch -p1 < ../Patches/faad2.patch)
-#	(cd $@; sh ./bootstrap)
 
 faad2-$(FAAD2_VERSION).tar.gz:
 	$(WGET) $(FAAD2_URL)
