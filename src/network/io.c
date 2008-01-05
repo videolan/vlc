@@ -256,7 +256,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 /*****************************************************************************
  * __net_Read:
  *****************************************************************************
- * Read from a network socket
+ * Reads from a network socket.
  * If waitall is true, then we repeat until we have read the right amount of
  * data; in that case, a short count means EOF has been reached.
  *****************************************************************************/
@@ -265,14 +265,20 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall)
 {
     size_t i_total = 0;
-    struct pollfd ufd[1];
-    ufd[0].fd = fd;
-    ufd[0].events = POLLIN;
+    struct pollfd ufd[2] = {
+        { .fd = fd, .events = POLLIN },
+        { .fd = -1, .events = POLLIN },
+    };
 
+    msg_Dbg (p_this, "reading socket %d", fd);
+    vlc_object_lock (p_this);
+    ufd[1].fd = vlc_object_waitpipe (p_this);
 
     while (i_buflen > 0)
     {
-        if( ( p_this->b_die ) || ( p_this->p_libvlc->b_die ) )
+        int val;
+
+        if (!vlc_object_alive (p_this))
         {
 #if defined(WIN32) || defined(UNDER_CE)
             WSASetLastError (WSAEINTR);
@@ -281,16 +287,21 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 #endif
             goto error;
         }
+        ufd[0].revents = ufd[1].revents = 0;
 
-        ufd[0].revents = 0;
-        /* TODO: don't use arbitrary timer just for b_die */
-        switch (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), 500))
+        vlc_object_unlock (p_this);
+        val = poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1);
+        vlc_object_lock (p_this);
+
+        if (val < 0)
+            goto error;
+
+        if (ufd[1].revents)
         {
-            case -1:
-                goto error;
-
-            case 0: // timeout
-                continue;
+            msg_Dbg (p_this, "socket %d polling interrupted", fd);
+            vlc_object_wait (p_this);
+            msg_Dbg (p_this, "socket %d polling restarting", fd);
+            continue;
         }
 
         assert (ufd[0].revents);
@@ -304,7 +315,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
              * otherwise we'd "hide" the error from the caller, which is a
              * bad idea™. */
             if (ufd[0].revents & (POLLERR|POLLNVAL|POLLRDHUP))
-                return i_total;
+                break;
         }
 
         ssize_t n;
@@ -367,11 +378,16 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         if (!waitall)
             break;
     }
+
+    vlc_object_unlock (p_this);
+    msg_Dbg (p_this, "read %u bytes from socket %d", (unsigned)i_total, fd);
     return i_total;
 
 error:
     msg_Err (p_this, "Read error: %m");
-    return i_total ? (ssize_t)i_total : -1;
+
+    vlc_object_unlock (p_this);
+    return -1;
 }
 
 
