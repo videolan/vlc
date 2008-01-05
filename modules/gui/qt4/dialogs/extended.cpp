@@ -39,32 +39,32 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     QGridLayout *layout = new QGridLayout( this );
 
-    QTabWidget *mainTab = new QTabWidget( this );
-    mainTab->setTabPosition( QTabWidget::West );
+    QTabWidget *mainTabW = new QTabWidget( this );
+    mainTabW->setTabPosition( QTabWidget::West );
 
     QWidget *audioWidget = new QWidget;
     QHBoxLayout *audioLayout = new QHBoxLayout( audioWidget );
-    QTabWidget *audioTab = new QTabWidget( mainTab );
+    QTabWidget *audioTab = new QTabWidget( audioWidget );
 
-    Equalizer *equal = new Equalizer( p_intf, this );
+    Equalizer *equal = new Equalizer( p_intf, audioTab );
     audioTab->addTab( equal, qtr( "Graphic Equalizer" ) );
 
-    Spatializer *spatial = new Spatializer( p_intf, this );
+    Spatializer *spatial = new Spatializer( p_intf, audioTab );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );
 
-    mainTab->addTab( audioWidget, qtr( "Audio effects" ) );
+    mainTabW->addTab( audioWidget, qtr( "Audio effects" ) );
 
-    ExtVideo *videoEffect = new ExtVideo( p_intf, this );
-    mainTab->addTab( videoEffect, qtr( "Video Adjustments and Effects" ) );
+    ExtVideo *videoEffect = new ExtVideo( p_intf, mainTabW );
+    mainTabW->addTab( videoEffect, qtr( "Video Effects" ) );
 
     if( module_Exists( p_intf, "v4l2" ) )
     {
-        ExtV4l2 *v4l2 = new ExtV4l2( p_intf, this );
-        mainTab->addTab( v4l2, qtr( "v4l2 controls" ) );
+        ExtV4l2 *v4l2 = new ExtV4l2( p_intf, mainTabW );
+        mainTabW->addTab( v4l2, qtr( "v4l2 controls" ) );
     }
 
-    layout->addWidget( mainTab, 0, 0, 1, 5 );
+    layout->addWidget( mainTabW, 0, 0, 1, 5 );
 
     QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
     layout->addWidget( closeButton, 1, 4, 1, 1 );
