@@ -125,14 +125,25 @@ static void AccessClose( vlc_object_t * );
     "Gamma of the video input (if supported by v4l2 driver)." )
 
 #define ADEV_TEXT N_("Audio device name")
+#ifndef HAVE_ALSA
+#define ADEV_LONGTEXT N_( \
+    "Name of the audio device to use. " \
+    "If you don't specify anything, \"/dev/dsp\" will be used for OSS.")
+#else
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device to use. " \
     "If you don't specify anything, \"/dev/dsp\" will be used for OSS, " \
-    "\"default\" for Alsa (if Alsa support is enabled).")
+    "\"default\" for Alsa.")
+#endif
 #define AUDIO_METHOD_TEXT N_( "Audio method" )
+#ifndef HAVE_ALSA
 #define AUDIO_METHOD_LONGTEXT N_( \
-    "Audio method to use: 1 for OSS, 2 for ALSA, 3 for ALSA or OSS " \
-    "(ALSA is prefered)." )
+    "Audio method to use: 0 to disable audio, 1 for OSS." )
+#else
+#define AUDIO_METHOD_LONGTEXT N_( \
+    "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, " \
+    "3 for ALSA or OSS (ALSA is prefered)." )
+#endif
 #define STEREO_TEXT N_( "Stereo" )
 #define STEREO_LONGTEXT N_( \
     "Capture the audio stream in stereo." )
@@ -198,10 +209,8 @@ vlc_module_begin();
     set_section( N_( "Audio input" ), NULL );
     add_string( CFG_PREFIX "adev", NULL, 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
-#ifdef HAVE_ALSA
     add_integer( CFG_PREFIX "audio-method", AUDIO_METHOD_OSS|AUDIO_METHOD_ALSA,
                  NULL, AUDIO_METHOD_TEXT, AUDIO_METHOD_LONGTEXT, VLC_TRUE );
-#endif
     add_bool( CFG_PREFIX "stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 VLC_TRUE );
     add_integer( CFG_PREFIX "samplerate", 48000, NULL, SAMPLERATE_TEXT,
@@ -257,7 +266,9 @@ static block_t* GrabAudio( demux_t *p_demux );
 static vlc_bool_t IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
+#ifdef HAVE_ALSA
 static char* ResolveALSADeviceName( const char *psz_device );
+#endif
 static int OpenVideoDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
 static int OpenAudioDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
 static vlc_bool_t ProbeVideoDev( vlc_object_t *, demux_sys_t *,
@@ -403,7 +414,7 @@ struct demux_sys_t
     /* Audio */
     unsigned int i_sample_rate;
     vlc_bool_t b_stereo;
-    int i_audio_max_frame_size;
+    size_t i_audio_max_frame_size;
     block_t *p_block_audio;
     es_out_id_t *p_es_audio;
 
@@ -412,7 +423,7 @@ struct demux_sys_t
 #ifdef HAVE_ALSA
     /* ALSA Audio */
     snd_pcm_t *p_alsa_pcm;
-    int i_alsa_frame_size;
+    size_t i_alsa_frame_size;
     int i_alsa_chunk_size;
 #endif
 };
@@ -581,11 +592,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->i_sample_rate = var_CreateGetInteger( p_obj, "v4l2-samplerate" );
     p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
 
-#ifdef HAVE_ALSA
     p_sys->i_audio_method = var_CreateGetInteger( p_obj, "v4l2-audio-method" );
-#else
-    p_sys->i_audio_method = AUDIO_METHOD_OSS;
-#endif
 
     p_sys->b_stereo = var_CreateGetBool( p_obj, "v4l2-stereo" );
 
@@ -786,14 +793,12 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                     strtol( psz_parser + strlen( "samplerate=" ),
                             &psz_parser, 0 );
             }
-#ifdef HAVE_ALSA
             else if( !strncmp( psz_parser, "audio-method", strlen( "audio-method" ) ) )
             {
                 p_sys->i_audio_method =
                     strtol( psz_parser + strlen( "audio-method" ),
                             &psz_parser, 0 );
             }
-#endif
             else if( !strncmp( psz_parser, "stereo", strlen( "stereo" ) ) )
             {
                 psz_parser += strlen( "stereo" );
@@ -1401,11 +1406,12 @@ static block_t* GrabAudio( demux_t *p_demux )
         snd_pcm_sframes_t delay = 0;
         if( ( i_err = snd_pcm_delay( p_sys->p_alsa_pcm, &delay ) ) >= 0 )
         {
-            int i_correction_delta = delay * p_sys->i_alsa_frame_size;
+            size_t i_correction_delta = delay * p_sys->i_alsa_frame_size;
             /* Test for overrun */
-            if( i_correction_delta>p_sys->i_audio_max_frame_size )
+            if( i_correction_delta > p_sys->i_audio_max_frame_size )
             {
-                msg_Warn( p_demux, "ALSA read overrun" );
+                msg_Warn( p_demux, "ALSA read overrun (%d > %d)",
+                          i_correction_delta, p_sys->i_audio_max_frame_size );
                 i_correction_delta = p_sys->i_audio_max_frame_size;
                 snd_pcm_prepare( p_sys->p_alsa_pcm );
             }
@@ -2114,7 +2120,7 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
     /* Get various buffer metrics */
     snd_pcm_hw_params_get_period_size( p_hw_params, &chunk_size, 0 );
     snd_pcm_hw_params_get_buffer_size( p_hw_params, &buffer_size );
-    if (chunk_size == buffer_size)
+    if( chunk_size == buffer_size )
     {
         msg_Err( p_this,
                  "ALSA: period cannot equal buffer size (%lu == %lu)",
@@ -2126,8 +2132,8 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
     int bits_per_frame = bits_per_sample * channels;
 
     p_sys->i_alsa_chunk_size = chunk_size;
-    p_sys->i_alsa_frame_size = (bits_per_sample / 8) * channels;
-    p_sys->i_audio_max_frame_size = chunk_size * bits_per_frame / 8; 
+    p_sys->i_alsa_frame_size = bits_per_frame / 8;
+    p_sys->i_audio_max_frame_size = chunk_size * bits_per_frame / 8;
 
     snd_pcm_hw_params_free( p_hw_params );
     p_hw_params = NULL;
@@ -2531,8 +2537,13 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             }
             if( !b_codec_supported )
             {
-                msg_Dbg( p_obj, "device codec %s not supported as access_demux",
-                    p_sys->p_codecs[i_index].description );
+                    char psz_fourcc[5];
+                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
+                    vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
+                                        &psz_fourcc );
+                    msg_Dbg( p_obj,
+                         "device codec %4s (%s) not supported as access_demux",
+                         psz_fourcc, p_sys->p_codecs[i_index].description );
             }
 
         }
