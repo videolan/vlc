@@ -10,30 +10,18 @@
     <height>147</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Capture</string>
-  </property>
   <layout class="QGridLayout" >
-   <item row="5" column="0" colspan="2" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>_("Capture Mode")</string>
      </property>
-     <property name="sizeType" >
-      <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
-   <item row="0" column="1" >
+   <item row="0" column="2" colspan="2">
     <widget class="QComboBox" name="deviceCombo" >
      <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+      <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -43,36 +31,24 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>_("Capture Mode")</string>
+   <item row="1" column="0" colspan="4" >
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QGroupBox" name="optionsBox" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title" >
-      <string>_("Options")</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2" >
+   <item row="2" column="0" colspan="4" >
     <widget class="QGroupBox" name="cardBox" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="title" >
       <string>_("Card Selection")</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="4" >
+    <widget class="QGroupBox" name="optionsBox" >
+     <property name="title" >
+      <string>_("Options")</string>
      </property>
     </widget>
    </item>
@@ -86,12 +62,21 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2" >
-    <widget class="Line" name="line" >
+   <item row="5" column="0" colspan="4" >
+    <spacer>
      <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeType" >
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>30</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
