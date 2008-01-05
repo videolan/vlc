@@ -2715,6 +2715,10 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
             var_Create( p_obj, psz_name,
                         VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
             break;
+        case V4L2_CTRL_TYPE_CTRL_CLASS:
+            msg_Dbg( p_obj, "    control class" );
+            var_Create( p_obj, psz_name, VLC_VAR_VOID );
+            break;
         default:
             msg_Dbg( p_obj, "    unknown control type (FIXME)" );
             /* FIXME */
@@ -2821,39 +2825,73 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
     else
         var_AddCallback( p_obj, "controls-reset", AccessControlResetCallback, NULL );
 
-    /* List public controls */
-    for( i_cid = V4L2_CID_BASE;
-         i_cid < V4L2_CID_LASTP1;
-         i_cid ++ )
+    queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
+    if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
     {
-        queryctrl.id = i_cid;
-        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+        msg_Dbg( p_obj, "Extended control API supported by v4l2 driver" );
+
+        /* List extended controls */
+        queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
+        while( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
-            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                continue;
-            msg_Dbg( p_obj, "Available control: %s (%x)",
-                     queryctrl.name, queryctrl.id );
+            switch( V4L2_CTRL_ID2CLASS( queryctrl.id ) )
+            {
+                case V4L2_CTRL_CLASS_USER:
+                    msg_Dbg( p_obj, "Available control: %s (%x)",
+                             queryctrl.name, queryctrl.id );
+                    break;
+                case V4L2_CTRL_CLASS_MPEG:
+                    msg_Dbg( p_obj, "Available MPEG control: %s (%x)",
+                             queryctrl.name, queryctrl.id );
+                    break;
+                default:
+                    msg_Dbg( p_obj, "Available private control: %s (%x)",
+                             queryctrl.name, queryctrl.id );
+                    break;
+            }
             ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
+            queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
+        }
+    }
+    else
+    {
+        msg_Dbg( p_obj, "Extended control API not supported by v4l2 driver" );
+
+        /* List public controls */
+        for( i_cid = V4L2_CID_BASE;
+             i_cid < V4L2_CID_LASTP1;
+             i_cid ++ )
+        {
+            queryctrl.id = i_cid;
+            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            {
+                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                    continue;
+                msg_Dbg( p_obj, "Available control: %s (%x)",
+                         queryctrl.name, queryctrl.id );
+                ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
+            }
+        }
+
+        /* List private controls */
+        for( i_cid = V4L2_CID_PRIVATE_BASE;
+             ;
+             i_cid ++ )
+        {
+            queryctrl.id = i_cid;
+            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            {
+                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                    continue;
+                msg_Dbg( p_obj, "Available private control: %s (%x)",
+                         queryctrl.name, queryctrl.id );
+                ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
+            }
+            else
+                break;
         }
     }
 
-    /* List private controls */
-    for( i_cid = V4L2_CID_PRIVATE_BASE;
-         ;
-         i_cid ++ )
-    {
-        queryctrl.id = i_cid;
-        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-        {
-            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                continue;
-            msg_Dbg( p_obj, "Available private control: %s (%x)",
-                     queryctrl.name, queryctrl.id );
-            ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
-        }
-        else
-            break;
-    }
     return VLC_SUCCESS;
 }
 
