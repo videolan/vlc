@@ -133,9 +133,11 @@ static void * EventDispatcherMainLoop(void * user_data)
                     [message_newer->u.object release];
                     [[self messageQueue] removeObjectAtIndex:i];
                 }
-                /* It should be a good idea not to collapse event, with other kind of event in-between
+                /* It shouldn be a good idea not to collapse event with other kind of event in-between.
+                 * This could be particulary problematic when the same object receive two related events
+                 * (for instance Added and Removed).
                  * Ignore for now only if target is the same */
-                else if( message_newer->target != message->target )
+                else if( message_newer->target == message->target )
                     break;
             }
             
@@ -207,6 +209,7 @@ static void * EventDispatcherMainLoop(void * user_data)
 
 - (void)callOnMainThreadDelegateOfObject:(id)aTarget withDelegateMethod:(SEL)aSelector withNotificationName: (NSString *)aNotificationName
 {
+    /* Don't send on main thread before this gets sorted out */
 //    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     message_t message = 
@@ -229,7 +232,7 @@ static void * EventDispatcherMainLoop(void * user_data)
 //        pthread_mutex_unlock( [self queueLock] );
 //    }
     
-    [pool release];
+//    [pool release];
 }
 
 - (void)callOnMainThreadObject:(id)aTarget withMethod:(SEL)aSelector withArgumentAsObject: (id)arg
