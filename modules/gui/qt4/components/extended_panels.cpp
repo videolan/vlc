@@ -689,12 +689,20 @@ void ExtV4l2::Refresh( void )
                 }
                 case VLC_VAR_VOID:
                 {
-                    QPushButton *button = new QPushButton( psz_label, box );
-                    button->setObjectName( psz_var );
+                    if( i_type & VLC_VAR_ISCOMMAND )
+                    {
+                        QPushButton *button = new QPushButton( psz_label, box );
+                        button->setObjectName( psz_var );
 
-                    CONNECT( button, clicked( bool ), this,
-                             ValueChange( bool ) );
-                    layout->addWidget( button );
+                        CONNECT( button, clicked( bool ), this,
+                                 ValueChange( bool ) );
+                        layout->addWidget( button );
+                    }
+                    else
+                    {
+                        QLabel *label = new QLabel( psz_label, box );
+                        layout->addWidget( label );
+                    }
                     break;
                 }
                 default:
