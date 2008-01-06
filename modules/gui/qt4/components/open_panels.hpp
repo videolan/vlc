@@ -58,6 +58,10 @@ enum
     JACK_DEVICE
 };
 
+static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
+                                       "dshow", "screen", "jack" };
+
+
 class QWidget;
 class QLineEdit;
 class QString;
@@ -157,6 +161,8 @@ public:
     virtual void clear() ;
 private:
     Ui::OpenCapture ui;
+    QString advMRL;
+    QDialog *adv;
 #ifdef WIN32
     QRadioButton *bdas, *bdat, *bdac;
     QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
@@ -181,6 +187,7 @@ public slots:
     virtual void updateMRL();
 private slots:
     void updateButtons();
+    void advancedDialog();
 };
 
 #endif

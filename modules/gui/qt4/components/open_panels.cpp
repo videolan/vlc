@@ -39,6 +39,7 @@
 #include <QListView>
 #include <QCompleter>
 #include <QDirModel>
+#include <QScrollArea>
 
 /**************************************************************************
  * Open Files and subtitles                                               *
@@ -511,6 +512,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
 
+    BUTTONACT( ui.advancedButton, advancedDialog() );
+
     /* Create two stacked layouts in the main comboBoxes */
     QStackedLayout *stackedDevLayout = new QStackedLayout;
     ui.cardBox->setLayout( stackedDevLayout );
@@ -616,7 +619,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /*******
      * JACK *
      *******/
-    if( module_Exists( p_intf, "access_jack" ) ){
+    if( module_Exists( p_intf, "jack" ) ){
     addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit" );
 
     /* Jack Main panel */
@@ -905,10 +908,14 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 }
 
 CaptureOpenPanel::~CaptureOpenPanel()
-{}
+{
+    if( adv ) delete adv;
+}
 
 void CaptureOpenPanel::clear()
-{}
+{
+    advMRL.clear();
+}
 
 void CaptureOpenPanel::updateMRL()
 {
@@ -988,6 +995,9 @@ void CaptureOpenPanel::updateMRL()
         updateButtons();
         break;
     }
+
+    if( !advMRL.isEmpty() ) mrl += advMRL;
+
     emit mrlUpdated( mrl );
 }
 
@@ -1034,5 +1044,108 @@ void CaptureOpenPanel::updateButtons()
         ui.optionsBox->hide();
         ui.advancedButton->hide();
         break;
+    }
+
+    if( adv )
+    {
+        delete adv;
+        advMRL.clear();
+    }
+}
+
+void CaptureOpenPanel::advancedDialog()
+{
+    int i_devicetype = ui.deviceCombo->itemData(
+                                ui.deviceCombo->currentIndex() ).toInt();
+    module_t *p_module =
+        module_Find( VLC_OBJECT(p_intf), psz_devModule[i_devicetype] );
+    if( NULL == p_module ) return;
+
+    unsigned int i_confsize;
+    QList<ConfigControl *> controls;
+
+    module_config_t *p_config;
+    p_config = module_GetConfig( p_module, &i_confsize );
+
+    adv = new QDialog( this );
+    adv->setWindowTitle( qtr( "Advanced options..." ) );
+
+    QVBoxLayout *mainLayout = new QVBoxLayout( adv );
+    //TODO QScrollArea
+    QFrame *advFrame = new QFrame;
+    mainLayout->addWidget( advFrame );
+
+    QGridLayout *gLayout = new QGridLayout( advFrame );
+
+    for( int n = 0; n < i_confsize; n++ )
+    {
+        module_config_t *p_item = p_config + n;
+        ConfigControl *config = ConfigControl::createControl(
+                        VLC_OBJECT( p_intf ), p_item, advFrame, gLayout, n );
+        controls.append( config );
+    }
+
+   /* QGroupBox *optionGroup = new QGroupBox( qtr( "Advanced options..." ) );
+    QHBoxLayout *grLayout = new QHBoxLayout( optionGroup );
+
+    QLabel *optionLabel = new QLabel( qtr( "Options" ) + ":" );
+    grLayout->addWidget( optionLabel );
+
+    QLineEdit *optionLine = new QLineEdit;
+    grLayout->addWidget( optionLine );
+
+    gLayout->addWidget( optionGroup, i_confsize, 0, 1, -1 );*/
+
+    QDialogButtonBox *advButtonBox = new QDialogButtonBox( adv );
+    QPushButton *closeButton = new QPushButton( qtr( "Ok" ) );
+    QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
+
+    CONNECT( closeButton, clicked(), adv, accept() );
+    CONNECT( cancelButton, clicked(), adv, reject() );
+
+    advButtonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    advButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
+
+    gLayout->addWidget( advButtonBox, i_confsize + 1, 0, 1, -1  );
+
+    if( adv->exec() )
+    {
+        QString tempMRL = "";
+        for( int i = 0; i < controls.size(); i++ )
+        {
+            ConfigControl *control = controls[i];
+            if( !control )
+            {
+                msg_Dbg( p_intf, "This shouldn't happen, please report" );
+                continue;
+            }
+
+            tempMRL += (i ? " :" : ":");
+
+            if( control->getType() == CONFIG_ITEM_BOOL )
+                if( !( qobject_cast<VIntConfigControl *>(control)->getValue() ) )
+                    tempMRL += "no-";
+
+            tempMRL += control->getName();
+
+            switch( control->getType() )
+            {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_FILE:
+                case CONFIG_ITEM_DIRECTORY:
+                case CONFIG_ITEM_MODULE:
+                    tempMRL += QString("=\"%1\"").arg( qobject_cast<VStringConfigControl *>(control)->getValue() );
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    tempMRL += QString("=%1").arg( qobject_cast<VIntConfigControl *>(control)->getValue() );
+                    break;
+                case CONFIG_ITEM_FLOAT:
+                    tempMRL += QString("=%1").arg( qobject_cast<VFloatConfigControl *>(control)->getValue() );
+                    break;
+            }
+        }
+        advMRL = tempMRL;
+        msg_Dbg( p_intf, "%s", qtu( advMRL ) );
+        updateMRL();
     }
 }
