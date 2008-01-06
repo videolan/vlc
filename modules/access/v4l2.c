@@ -133,7 +133,7 @@ static void AccessClose( vlc_object_t * );
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device to use. " \
     "If you don't specify anything, \"/dev/dsp\" will be used for OSS, " \
-    "\"default\" for Alsa.")
+    "\"hw\" for Alsa.")
 #endif
 #define AUDIO_METHOD_TEXT N_( "Audio method" )
 #ifndef HAVE_ALSA
