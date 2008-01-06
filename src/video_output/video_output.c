@@ -394,7 +394,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p_cfg = p_cfg;
     p_vout->p_module = module_Need( p_vout,
         ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
-        "video filter" : "video output", psz_name, 0 );
+        "video filter" : "video output", psz_name, p_vout->psz_filter_chain && *p_vout->psz_filter_chain );
     free( psz_name );
 
     if( p_vout->p_module == NULL )
