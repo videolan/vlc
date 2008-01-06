@@ -108,7 +108,7 @@ typedef enum VLCMediaState
 @interface VLCMedia : NSObject
 {
     void *                p_md;              //< Internal media descriptor instance
-    NSString *            url;                  //< URL for this media resource
+    NSURL *               url;               //< URL for this media resource
     VLCMediaList *        subitems;          //< Sub list of items
     VLCTime *             length;            //< Duration of the media
     NSMutableDictionary * metaDictionary;    //< Meta data storage
@@ -209,7 +209,7 @@ typedef enum VLCMediaState
 /**
  * The URL for the receiver's media resource.
  */
-@property (readonly) NSString * url;
+@property (readonly) NSURL * url;
 
 /**
  * The receiver's sub list.

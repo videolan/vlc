@@ -175,7 +175,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
                                            &ex);
         catch_exception(&ex);
         
-        url = [aPath copy];
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
         
@@ -199,8 +198,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
                                                    [aName UTF8String],
                                                    &ex);
         catch_exception(&ex);
-        
-        url = [aName copy];
+
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
         
@@ -251,7 +249,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 - (NSString *)description
 {
     NSString * result = [metaDictionary objectForKey:VLCMetaInformationTitle];
-    return [NSString stringWithFormat:@"<%@ %p> %@", [self className], self, (result ? result : url)];
+    return [NSString stringWithFormat:@"<%@ %p> %@", [self className], self, (result ? result : [url absoluteString])];
 }
 
 - (NSComparisonResult)compare:(VLCMedia *)media
@@ -261,7 +259,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     else if (!media)
         return NSOrderedDescending;
     else
-        return [[self url] compare:[media url]];
+        return [[[self url] absoluteString] compare:[[media url] absoluteString]];
 }
 
 @synthesize delegate;
@@ -329,14 +327,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     {
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
-        char * p_url;
-        
-        p_url = libvlc_media_descriptor_get_mrl( md, &ex );
-        catch_exception( &ex );
-        
-        url = [[NSString stringWithUTF8String:p_url] retain];
-        free( p_url );
-        
+                
         libvlc_media_descriptor_retain( md );
         p_md = md;
         
@@ -416,6 +407,14 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
+
+    char * p_url = libvlc_media_descriptor_get_mrl( p_md, &ex );
+    catch_exception( &ex );
+
+    url = [[NSURL URLWithString:[NSString stringWithUTF8String:p_url]] retain];
+    if( !url ) /* Attempt to interpret as a file path then */
+        url = [[NSURL fileURLWithPath:[NSString stringWithUTF8String:p_url]] retain];
+    free( p_url );
 
     libvlc_media_descriptor_set_user_data( p_md, (void*)self, &ex );
     catch_exception( &ex );
