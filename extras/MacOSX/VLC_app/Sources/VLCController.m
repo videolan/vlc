@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <VLC/VLC.h>
+#import <VLCKit/VLCKit.h>
 
 #import "VLCController.h" 
 #import "VLCAppAdditions.h" 

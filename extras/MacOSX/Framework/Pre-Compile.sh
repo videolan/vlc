@@ -1,7 +1,7 @@
 if test "${ACTION}" = ""; then
     # Debug --
     TARGET_BUILD_DIR="."
-    FULL_PRODUCT_NAME="VLC.framework"
+    FULL_PRODUCT_NAME="VLCKit.framework"
     CONTENTS_FOLDER_PATH="${FULL_PRODUCT_NAME}/Versions/A"
     VLC_BUILD_DIR="../../.."
     VLC_SRC_DIR="../../.."
@@ -68,7 +68,7 @@ if test "${ACTION}" = "build"; then
     ##########################
 
     ##########################
-    # Build the modules folder (Same as VLC.framework/modules in Makefile)
+    # Build the modules folder (Same as VLCKit.framework/modules in Makefile)
     echo "Building modules folder..."
     # Figure out what modules are available to install
     for module in `top_builddir="${VLC_BUILD_DIR}" ${vlc_config} --target plugin` ; do
@@ -97,7 +97,7 @@ if test "${ACTION}" = "build"; then
     ##########################
     
     ##########################
-    # Build the library folder (Same as VLC.framework/lib in Makefile)
+    # Build the library folder (Same as VLCKit.framework/lib in Makefile)
     echo "Building library folder..."
     for linked_lib in ${linked_libs} ; do
         case "${linked_lib}" in

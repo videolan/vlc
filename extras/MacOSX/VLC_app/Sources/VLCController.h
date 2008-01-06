@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLC.h>
+#import <VLCKit/VLCKit.h>
 
 @class VLCMainWindow;
 

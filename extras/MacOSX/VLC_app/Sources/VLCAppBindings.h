@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLC.h>
+#import <VLCKit/VLCKit.h>
 
 /* We do implement some category functions,
  * But we don't publicise them, as they should

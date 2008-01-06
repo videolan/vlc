@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #import <QuartzCore/QuartzCore.h>
-#import <VLC/VLC.h>
+#import <VLCKit/VLCKit.h>
 
 @interface VLCBrowsableVideoView : VLCVideoView {
     BOOL            menuDisplayed;
