@@ -852,13 +852,13 @@ void SpeedControlWidget::updateRate( int sliderValue )
 
     if( sliderValue < 0.0 )
     {
-        rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
-            ( sliderValue * ( 1.0 - RATE_SLIDER_MINIMUM ) + RATE_SLIDER_LENGTH );
+        rate = (int)(INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
+            ( sliderValue * ( 1.0 - RATE_SLIDER_MINIMUM ) + RATE_SLIDER_LENGTH ));
     }
     else
     {
-        rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
-            ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH );
+        rate = (int)(INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
+            ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH ));
     }
 
     THEMIM->getIM()->setRate(rate);
