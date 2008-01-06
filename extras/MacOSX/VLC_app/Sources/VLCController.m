@@ -49,6 +49,9 @@
     VLCNonNilAsBoolTransformer *nonNilAsBool;
     nonNilAsBool = [[[VLCNonNilAsBoolTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer:(id)nonNilAsBool forName:@"NonNilAsBoolTransformer"];
+    VLCURLToRepresentedFileNameTransformer *urlToRepresentedFileName;
+    urlToRepresentedFileName = [[[VLCURLToRepresentedFileNameTransformer alloc] init] autorelease];
+    [NSValueTransformer setValueTransformer:(id)urlToRepresentedFileName forName:@"URLToRepresentedFileNameTransformer"];
 
     /***********************************
      * categories: Main content

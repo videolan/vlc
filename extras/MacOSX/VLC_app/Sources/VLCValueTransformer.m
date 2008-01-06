@@ -71,3 +71,26 @@
 
 @end
 
+@implementation VLCURLToRepresentedFileNameTransformer
+
++ (Class)transformedValueClass
+{
+    return [NSURL class];
+}
+
++ (BOOL)allowsReverseTransformation
+{
+    return NO;
+}
+
+- (NSString *)transformedValue:(id)value
+{
+    NSLog(@"%@", value);
+    if( ![value isKindOfClass:[NSURL class]] || ![value isFileURL] )
+        return @"";
+
+    return [value path];
+}
+
+@end
+

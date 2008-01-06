@@ -32,3 +32,7 @@
 }
 @end
 
+@interface VLCURLToRepresentedFileNameTransformer : NSValueTransformer {
+}
+@end
+

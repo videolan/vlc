@@ -222,6 +222,7 @@
                                                   [NSNumber numberWithBool:NO], NSConditionallySetsEnabledBindingOption, nil ]];
     [mediaReadingProgressText bind:@"value" toObject:mediaPlayer withKeyPath:@"time.stringValue" options: nil];
     [mediaDescriptionText bind:@"value" toObject:mediaPlayer withKeyPath:@"description" options: nil];
+    [self bind:@"representedFilename" toObject:mediaPlayer withKeyPath:@"media.url" options: [NSDictionary dictionaryWithObject:@"URLToRepresentedFileNameTransformer" forKey:NSValueTransformerNameBindingOption]];
     [self bind:@"title" toObject:mediaPlayer withKeyPath:@"description" options: nil];
 
     [navigatorViewToggleButton bind:@"value" toObject:self withKeyPath:@"navigatorViewVisible" options: nil];
