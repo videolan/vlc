@@ -178,7 +178,7 @@ static const char *psz_iomethod_list_text[] =
 #define AUDIO_METHOD_OSS 1
 #define OSS_DEFAULT "/dev/dsp"
 #define AUDIO_METHOD_ALSA 2
-#define ALSA_DEFAULT "default"
+#define ALSA_DEFAULT "hw"
 #define CFG_PREFIX "v4l2-"
 
 vlc_module_begin();
