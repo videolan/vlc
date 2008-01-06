@@ -76,9 +76,9 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
     for (i = 0; i < _dyld_image_count(); i++)
     {
         char * psz_img_name = _dyld_get_image_name(i);
-        /* Check for "VLCKit.framework/Versions/Current/VLC",
-         * as well as "VLCKit.framework/Versions/A/VLC" and
-         * "VLC.framework/Versions/B/VLC" */
+        /* Check for "VLCKit.framework/Versions/Current/VLCKit",
+         * as well as "VLCKit.framework/Versions/A/VLCKit" and
+         * "VLC.framework/Versions/B/VLCKit" */
         if( p_char = strstr( psz_img_name, "VLCKit.framework/Versions/" ))
         {
             /* Look for the next forward slash */
@@ -87,7 +87,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
                 p_char++;
             
             /* If the string ends with VLC then we've found a winner */
-            if ( !strcmp( p_char, "/VLC" ) )
+            if ( !strcmp( p_char, "/VLCKit" ) )
             {
                 p_char = strdup( psz_img_name );
                 break;

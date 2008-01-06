@@ -13,7 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
-				637F33EB0D2AEE4B001E70AB /* PBXTargetDependency */,
+				632F3CC60D318E3A003BBC56 /* PBXTargetDependency */,
 			);
 			name = "vlc-contrib-core-framework-app";
 			productName = "vlc-contrib-core-framework-app";
@@ -85,12 +85,12 @@
 			remoteGlobalIDString = 8D1107260486CEB800E47090 /* VLC */;
 			remoteInfo = VLC;
 		};
-		637F33EA0D2AEE4B001E70AB /* PBXContainerItemProxy */ = {
+		632F3CC50D318E3A003BBC56 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 637F33DF0D2AEE05001E70AB;
-			remoteInfo = "vlc-framework-app";
+			remoteGlobalIDString = 633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */;
+			remoteInfo = "vlc-contrib-core-framework";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -456,10 +456,10 @@
 			target = 8D1107260486CEB800E47090 /* VLC */;
 			targetProxy = 632F3C270D316FB5003BBC56 /* PBXContainerItemProxy */;
 		};
-		637F33EB0D2AEE4B001E70AB /* PBXTargetDependency */ = {
+		632F3CC60D318E3A003BBC56 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 637F33DF0D2AEE05001E70AB /* vlc-framework-app */;
-			targetProxy = 637F33EA0D2AEE4B001E70AB /* PBXContainerItemProxy */;
+			name = "vlc-contrib-core-framework";
+			targetProxy = 632F3CC50D318E3A003BBC56 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
