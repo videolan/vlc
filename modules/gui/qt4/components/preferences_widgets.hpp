@@ -107,7 +107,7 @@ public:
                 ConfigControl(a,b) {};
     virtual ~VIntConfigControl() {};
     virtual int getValue() = 0;
-    virtual int getType() { return 1; }
+    virtual int getType() { return CONFIG_ITEM_INTEGER; }
 };
 
 class IntegerConfigControl : public VIntConfigControl
@@ -185,6 +185,7 @@ public:
     virtual int getValue();
     virtual void show() { checkbox->show(); }
     virtual void hide() { checkbox->hide(); }
+    virtual int getType() { return CONFIG_ITEM_BOOL; }
 private:
     QCheckBox *checkbox;
     void finish();
@@ -203,7 +204,7 @@ public:
                 ConfigControl(a,b) {};
     virtual ~VFloatConfigControl() {};
     virtual float getValue() = 0;
-    virtual int getType() { return 2; }
+    virtual int getType() { return CONFIG_ITEM_FLOAT; }
 };
 
 class FloatConfigControl : public VFloatConfigControl
@@ -252,7 +253,7 @@ public:
                 ConfigControl(a,b) {};
     virtual ~VStringConfigControl() {};
     virtual QString getValue() = 0;
-    virtual int getType() { return 3; }
+    virtual int getType() { return CONFIG_ITEM_STRING; }
 };
 
 class StringConfigControl : public VStringConfigControl
@@ -443,7 +444,7 @@ class KeySelectorControl : public ConfigControl
 public:
     KeySelectorControl( vlc_object_t *, module_config_t *, QWidget *,
                         QGridLayout*, int& );
-    virtual int getType() { return 4; }
+    virtual int getType() { return CONFIG_ITEM_KEY; }
     virtual ~KeySelectorControl() {};
     virtual void hide() { table->hide(); if( label ) label->hide(); }
     virtual void show() { table->show(); if( label ) label->show(); }

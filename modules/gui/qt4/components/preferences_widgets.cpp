@@ -156,14 +156,15 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
 {
     switch( getType() )
     {
-        case 1:
+        case CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_BOOL:
         {
             VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(this);
             assert( vicc );
             config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
             break;
         }
-        case 2:
+        case CONFIG_ITEM_FLOAT:
         {
             VFloatConfigControl *vfcc =
                                     qobject_cast<VFloatConfigControl *>(this);
@@ -171,7 +172,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
             config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
             break;
         }
-        case 3:
+        case CONFIG_ITEM_STRING:
         {
             VStringConfigControl *vscc =
                             qobject_cast<VStringConfigControl *>(this);
@@ -179,7 +180,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
             config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
             break;
         }
-        case 4:
+        case CONFIG_ITEM_KEY:
         {
             KeySelectorControl *ksc = qobject_cast<KeySelectorControl *>(this);
             assert( ksc );
