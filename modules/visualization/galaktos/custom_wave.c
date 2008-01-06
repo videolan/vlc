@@ -604,18 +604,9 @@ custom_wave_t * find_custom_wave(int id, preset_t * preset, int create_flag) {
   return custom_wave;
 }
 
-static inline void evalCustomWaveInitConditions() {
-  splay_traverse(eval_custom_wave_init_conds, active_preset->custom_wave_tree);
-}
-
-static inline void eval_custom_wave_init_conds(custom_wave_t * custom_wave) {
-  splay_traverse(eval_init_cond, custom_wave->init_cond_tree);
-  splay_traverse(eval_init_cond, custom_wave->per_frame_init_eqn_tree);
-}
-
 /* Interface function. Makes another custom wave the current
    concern for per frame / point equations */
-static inline custom_wave_t * nextCustomWave() {
+custom_wave_t * nextCustomWave() {
 
   if ((interface_wave = splay_find(&interface_id, active_preset->custom_wave_tree)) == NULL) {
     interface_id = 0;
@@ -630,7 +621,7 @@ static inline custom_wave_t * nextCustomWave() {
 }
 
 
-static inline void evalPerPointEqns() { 
+void evalPerPointEqns() { 
 
   int x;
 
@@ -739,4 +730,8 @@ void load_unspec_init_cond(param_t * param) {
     
   }
  
+}
+
+void evalCustomWaveInitConditions() {
+  splay_traverse(eval_custom_wave_init_conds, active_preset->custom_wave_tree);
 }

@@ -24,7 +24,7 @@
 //#define EVAL_DEBUG 
 
 
-inline double eval_gen_expr(gen_expr_t * gen_expr);
+double eval_gen_expr(gen_expr_t * gen_expr);
 inline gen_expr_t * opt_gen_expr(gen_expr_t * gen_expr, int ** param_list);
 
 gen_expr_t * const_to_expr(double val);

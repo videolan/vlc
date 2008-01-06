@@ -43,6 +43,7 @@
 #include "custom_wave.h"
 #include "custom_shape_types.h"
 #include "custom_shape.h"
+#include "splaytree.h"
 //#include <dmalloc.h>
 
 // Forward declarations
@@ -116,6 +117,12 @@ double **origy;
 
 char *buffer; //XXX
 
+
+static inline int isPerPixelEqn(int op) {
+    
+  return active_preset->per_pixel_flag[op];
+
+}
 int galaktos_init( galaktos_thread_t *p_thread )
 {
     init_per_pixel_matrices();
@@ -1575,5 +1582,4 @@ void render_texture_to_studio()
 
     glPopMatrix();
 }
-
 

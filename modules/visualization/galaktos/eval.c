@@ -48,7 +48,7 @@ static inline double eval_prefun_expr(prefun_expr_t * prefun_expr);
 static inline double eval_val_expr(val_expr_t * val_expr);
 
 
-static inline double eval_gen_expr(gen_expr_t * gen_expr) {
+double eval_gen_expr(gen_expr_t * gen_expr) {
   double l;
 
   if (gen_expr == NULL) 

@@ -2,6 +2,7 @@
 #define INIT_COND_H
 #define INIT_COND_DEBUG 0
 #include "param_types.h"
+#include "init_cond_types.h"
 #include "splaytree_types.h"
 
 void eval_init_cond(init_cond_t * init_cond);

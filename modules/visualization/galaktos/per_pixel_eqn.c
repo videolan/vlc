@@ -52,7 +52,7 @@ extern int mesh_j;
 
 
 /* Evaluates a per pixel equation */
-static inline void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
+void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
 
   double ** param_matrix = NULL;
   gen_expr_t * eqn_ptr = NULL;
@@ -94,7 +94,7 @@ static inline void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
   per_pixel_eqn->param->matrix_flag = 1; 
 }
 
-static inline void evalPerPixelEqns() {
+void evalPerPixelEqns() {
 
   /* Evaluate all per pixel equations using splay traversal */
   splay_traverse(evalPerPixelEqn, active_preset->per_pixel_eqn_tree);
@@ -209,12 +209,6 @@ void free_per_pixel_eqn(per_pixel_eqn_t * per_pixel_eqn) {
 	free(per_pixel_eqn);
 	
 	return;
-}
-
-static inline int isPerPixelEqn(int op) {
-    
-  return active_preset->per_pixel_flag[op];
-
 }
 
 static inline int resetPerPixelEqnFlags(preset_t * preset) {

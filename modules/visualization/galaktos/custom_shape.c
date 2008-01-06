@@ -519,7 +519,7 @@ custom_shape_t * find_custom_shape(int id, preset_t * preset, int create_flag) {
   return custom_shape;
 }
 
-static inline void evalCustomShapeInitConditions() {
+void evalCustomShapeInitConditions() {
   splay_traverse(eval_custom_shape_init_conds, active_preset->custom_shape_tree);
 
 }
@@ -588,7 +588,7 @@ void load_unspec_init_cond_shape(param_t * param) {
 
 /* Interface function. Makes another custom shape the current
    concern for per frame / point equations */
-static inline custom_shape_t * nextCustomShape() {
+custom_shape_t * nextCustomShape() {
 
   if ((interface_shape = splay_find(&cwave_interface_id, active_preset->custom_shape_tree)) == NULL) {
     cwave_interface_id = 0;

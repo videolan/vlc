@@ -7,7 +7,6 @@ SOURCES_galaktos = plugin.c plugin.h \
                    param.c param.h param_types.h \
                    engine_vars.c engine_vars.h \
                    parser.c parser.h \
-                   builtin_funcs.c \
                    eval.c eval.h \
                    init_cond.c init_cond.h init_cond_types.h \
                    PCM.c PCM.h \
