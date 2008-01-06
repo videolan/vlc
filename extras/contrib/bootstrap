@@ -148,9 +148,13 @@ case $HOST in
         ;;
     i686-apple-darwin9)
         SDK_TARGET=10.4
+        MIN_LD_VERSION_WITH_TEXT_RELOCATION=81
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
         echo "HAVE_DARWIN_9 = 1" >> config.mak
+        if test `ld -v 2> /dev/stdout | sed -E 's/.*ld64-([0-9]+).*/\1/'` -lt ${MIN_LD_VERSION_WITH_TEXT_RELOCATION}; then
+            echo "NO_TEXT_RELOCATION = 1" >> config.mak
+        fi
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
         CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"

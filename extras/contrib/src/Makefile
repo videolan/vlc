@@ -147,7 +147,7 @@ ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack --cpu=pentium-m
 endif
 
-ifdef HAVE_DARWIN_9
+ifdef NO_TEXT_RELOCATION
 FFMPEGCONF += --disable-mmx
 endif
 
@@ -770,7 +770,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 ifdef HAVE_BEOS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm --disable-examples && make && make install)
 else
-  ifdef HAVE_DARWIN_9
+  ifdef NO_TEXT_RELOCATION
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm --disable-sdltest --disable-oggtest --disable-vorbistest --disable-asm --disable-examples && make && make install)
   else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples && make && make install)
@@ -1059,10 +1059,8 @@ endif
 ifdef HAVE_DARWIN_OS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
 endif
-ifdef HAVE_DARWIN_9
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef NO_TEXT_RELOCATION
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
-endif
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
