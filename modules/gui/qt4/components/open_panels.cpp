@@ -31,7 +31,6 @@
 #include "components/open_panels.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs_provider.hpp"
-#include "components/preferences_widgets.hpp"
 
 #include <QFileDialog>
 #include <QDialogButtonBox>
@@ -792,44 +791,30 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
     /* dshow Main */
+	int line = 0;
+    module_config_t *p_config = 
+        config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
+    vdevDshowW = new StringListConfigControl( 
+        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
+    line++;
 
-    QLabel *dshowVDeviceLabel = new QLabel( qtr( "Video Device Name " ) );
-    dshowDevLayout->addWidget( dshowVDeviceLabel, 0, 0 );
-
-    QLabel *dshowADeviceLabel = new QLabel( qtr( "Audio Device Name " ) );
-    dshowDevLayout->addWidget( dshowADeviceLabel, 1, 0 );
-
-    QComboBox *dshowVDevice = new QComboBox;
-    dshowDevLayout->addWidget( dshowVDevice, 0, 1 );
-
-    QComboBox *dshowADevice = new QComboBox;
-    dshowDevLayout->addWidget( dshowADevice, 1, 1 );
-
-    QPushButton *dshowVRefresh = new QPushButton( qtr( "Update List" ) );
-    dshowDevLayout->addWidget( dshowVRefresh, 0, 2 );
-
-    QPushButton *dshowARefresh = new QPushButton( qtr( "Update List" ) );
-    dshowDevLayout->addWidget( dshowARefresh, 1, 2 );
-
-    QPushButton *dshowVConfig = new QPushButton( qtr( "Configure" ) );
-    dshowDevLayout->addWidget( dshowVConfig, 0, 3 );
-
-    QPushButton *dshowAConfig = new QPushButton( qtr( "Configure" ) );
-    dshowDevLayout->addWidget( dshowAConfig, 1, 3 );
+    p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
+    adevDshowW = new StringListConfigControl( 
+        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
+	line++;
 
     /* dshow Properties */
-
     QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
     dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
 
-    QLineEdit *dshowVSizeLine = new QLineEdit;
+    dshowVSizeLine = new QLineEdit;
     dshowPropLayout->addWidget( dshowVSizeLine, 0, 1);
     dshowPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
             1, 0, 3, 1 );
 
     /* dshow CONNECTs */
-    CuMRL( dshowVDevice, currentIndexChanged ( int ) );
-    CuMRL( dshowADevice, currentIndexChanged ( int ) );
+    CuMRL( vdevDshowW->combo, currentIndexChanged ( int ) );
+    CuMRL( adevDshowW->combo, currentIndexChanged ( int ) );
     CuMRL( dshowVSizeLine, textChanged( QString ) );
     }
 
@@ -991,6 +976,11 @@ void CaptureOpenPanel::updateMRL()
                     bdaBandBox->currentIndex() ).toInt() );
         break;
     case DSHOW_DEVICE:
+        mrl = "dshow://";
+        mrl += " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
+        mrl += " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
+        if( dshowVSizeLine->isModified() ) 
+            mrl += " :dshow-size=" + dshowVSizeLine->text(); 
         break;
 #endif
     case SCREEN_DEVICE:

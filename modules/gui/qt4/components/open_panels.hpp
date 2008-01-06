@@ -37,6 +37,8 @@
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
 
+#include "components/preferences_widgets.hpp"
+
 #ifdef HAVE_LIMITS_H
 #   include <limits.h>
 #endif
@@ -160,6 +162,8 @@ private:
     QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
     QLabel *bdaSrateLabel, *bdaBandLabel;
     QComboBox *bdaBandBox;
+    StringListConfigControl *vdevDshowW, *adevDshowW;
+    QLineEdit *dshowVSizeLine;
 #else
     QRadioButton *dvbs, *dvbt, *dvbc;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;

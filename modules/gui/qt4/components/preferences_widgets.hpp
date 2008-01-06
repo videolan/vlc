@@ -375,10 +375,10 @@ public:
     virtual QString getValue();
     virtual void hide() { combo->hide(); if( label ) label->hide(); }
     virtual void show() { combo->show(); if( label ) label->show(); }
+	QComboBox *combo;
 private:
     void finish( bool );
     QLabel *label;
-    QComboBox *combo;
 private slots:
     void actionRequested( int );
 

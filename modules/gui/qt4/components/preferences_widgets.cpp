@@ -354,6 +354,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
     combo->setMinimumWidth( 80 );
+    combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
     finish( bycat );
     if( !l )
     {
