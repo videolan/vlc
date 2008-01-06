@@ -25,16 +25,16 @@
 #ifndef VLC_FRAMEWORK_VLC_H
 #define VLC_FRAMEWORK_VLC_H
 
-#import <VLC/VLCLibrary.h>
-#import <VLC/VLCMedia.h>
-#import <VLC/VLCMediaLibrary.h>
-#import <VLC/VLCMediaList.h>
-#import <VLC/VLCMediaListAspect.h>
-#import <VLC/VLCMediaDiscoverer.h>
-#import <VLC/VLCMediaPlayer.h>
-#import <VLC/VLCTime.h>
-#import <VLC/VLCVideoView.h>
-#import <VLC/VLCVideoLayer.h>
+#import <VLCKit/VLCLibrary.h>
+#import <VLCKit/VLCMedia.h>
+#import <VLCKit/VLCMediaLibrary.h>
+#import <VLCKit/VLCMediaList.h>
+#import <VLCKit/VLCMediaListAspect.h>
+#import <VLCKit/VLCMediaDiscoverer.h>
+#import <VLCKit/VLCMediaPlayer.h>
+#import <VLCKit/VLCTime.h>
+#import <VLCKit/VLCVideoView.h>
+#import <VLCKit/VLCVideoLayer.h>
 
 @class VLCMedia;
 @class VLCMediaLibrary;
