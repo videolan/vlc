@@ -791,7 +791,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
     /* dshow Main */
-	int line = 0;
+    int line = 0;
     module_config_t *p_config = 
         config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
     vdevDshowW = new StringListConfigControl( 
@@ -801,7 +801,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
     adevDshowW = new StringListConfigControl( 
         VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
-	line++;
+    line++;
 
     /* dshow Properties */
     QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
