@@ -1216,6 +1216,9 @@ live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	patch -p0 < Patches/live-noapps.patch
 
 .live: live
+ifdef HAVE_WIN32  
+	(cd $<;./genMakefiles mingw && make $(HOSTCC)) 
+else 
 ifdef HAVE_DARWIN_OS
 	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
@@ -1227,6 +1230,7 @@ ifdef HAVE_BIGENDIAN
 endif
 else
 	(cd $<; ./genMakefiles linux && make $(HOSTCC))
+endif
 endif
 endif
 	touch $@
