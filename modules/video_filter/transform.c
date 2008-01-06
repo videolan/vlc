@@ -29,6 +29,7 @@
 #include <vlc_vout.h>
 
 #include "filter_common.h"
+#include "filter_picture.h"
 
 #define TRANSFORM_MODE_HFLIP   1
 #define TRANSFORM_MODE_VFLIP   2
@@ -45,6 +46,9 @@ static void Destroy   ( vlc_object_t * );
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
+
+static void FilterPlanar( vout_thread_t *, const picture_t *, picture_t * );
+static void FilterYUYV( vout_thread_t *, const picture_t *, picture_t * );
 
 static int  SendEvents( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
@@ -92,6 +96,8 @@ struct vout_sys_t
     int i_mode;
     vlc_bool_t b_rotation;
     vout_thread_t *p_vout;
+
+    void (*pf_filter)( vout_thread_t *, const picture_t *, picture_t * );
 };
 
 /*****************************************************************************
@@ -132,6 +138,23 @@ static int Create( vlc_object_t *p_this )
 
     /* Look what method was requested */
     psz_method = var_CreateGetNonEmptyString( p_vout, "transform-type" );
+
+    switch( p_vout->fmt_in.i_chroma )
+    {
+        CASE_PLANAR_YUV
+        case VLC_FOURCC('G','R','E','Y'):
+            p_vout->p_sys->pf_filter = FilterPlanar;
+            break;
+
+        CASE_PACKED_YUV_422
+            p_vout->p_sys->pf_filter = FilterYUYV;
+            break;
+
+        default:
+            msg_Err( p_vout, "Unsupported chroma" );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+    }
 
     if( psz_method == NULL )
     {
@@ -284,7 +307,6 @@ static void Destroy( vlc_object_t *p_this )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int i_index;
 
     /* This is a new frame. Get a structure from the video_output. */
     while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
@@ -300,6 +322,88 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
+    p_vout->p_sys->pf_filter( p_vout, p_pic, p_outpic );
+
+    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
+
+    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+}
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
+    vlc_value_t sentval = newval;
+
+    /* Translate the mouse coordinates */
+    if( !strcmp( psz_var, "mouse-x" ) )
+    {
+        switch( p_vout->p_sys->i_mode )
+        {
+        case TRANSFORM_MODE_270:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
+                             - sentval.i_int;
+        case TRANSFORM_MODE_90:
+            var_Set( p_vout, "mouse-y", sentval );
+            return VLC_SUCCESS;
+
+        case TRANSFORM_MODE_180:
+        case TRANSFORM_MODE_HFLIP:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
+                             - sentval.i_int;
+            break;
+
+        case TRANSFORM_MODE_VFLIP:
+        default:
+            break;
+        }
+    }
+    else if( !strcmp( psz_var, "mouse-y" ) )
+    {
+        switch( p_vout->p_sys->i_mode )
+        {
+        case TRANSFORM_MODE_90:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
+                             - sentval.i_int;
+        case TRANSFORM_MODE_270:
+            var_Set( p_vout, "mouse-x", sentval );
+            return VLC_SUCCESS;
+
+        case TRANSFORM_MODE_180:
+        case TRANSFORM_MODE_VFLIP:
+            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
+                             - sentval.i_int;
+            break;
+
+        case TRANSFORM_MODE_HFLIP:
+        default:
+            break;
+        }
+    }
+
+    var_Set( p_vout, psz_var, sentval );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * SendEventsToChild: forward events to the child/children vout
+ *****************************************************************************/
+static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
+    return VLC_SUCCESS;
+}
+
+static void FilterPlanar( vout_thread_t *p_vout,
+                          const picture_t *p_pic, picture_t *p_outpic )
+{
+    int i_index;
     switch( p_vout->p_sys->i_mode )
     {
         case TRANSFORM_MODE_90:
@@ -417,14 +521,14 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
                 uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
-                                            * p_pic->p[i_index].i_pitch;
+                                         * p_pic->p[i_index].i_pitch;
 
                 uint8_t *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
                     uint8_t *p_line_end = p_in
-                                           + p_pic->p[i_index].i_visible_pitch;
+                                        + p_pic->p[i_index].i_visible_pitch;
 
                     for( ; p_in < p_line_end ; )
                     {
@@ -439,79 +543,190 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         default:
             break;
     }
-
-    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
-
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+static void FilterYUYV( vout_thread_t *p_vout,
+                        const picture_t *p_pic, picture_t *p_outpic )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
-    vlc_value_t sentval = newval;
+    int i_index;
+    int i_y_offset, i_u_offset, i_v_offset;
+    if( GetPackedYuvOffsets( p_pic->format.i_chroma, &i_y_offset,
+                             &i_u_offset, &i_v_offset ) != VLC_SUCCESS )
+        return;
 
-    /* Translate the mouse coordinates */
-    if( !strcmp( psz_var, "mouse-x" ) )
+    switch( p_vout->p_sys->i_mode )
     {
-        switch( p_vout->p_sys->i_mode )
-        {
-        case TRANSFORM_MODE_270:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
-                             - sentval.i_int;
         case TRANSFORM_MODE_90:
-            var_Set( p_vout, "mouse-y", sentval );
-            return VLC_SUCCESS;
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                int i_pitch = p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out_end = p_out +
+                    p_outpic->p[i_index].i_visible_lines *
+                    p_outpic->p[i_index].i_pitch;
+
+                int i_offset  = i_u_offset;
+                int i_offset2 = i_v_offset;
+                for( ; p_out < p_out_end ; )
+                {
+                    uint8_t *p_line_end;
+
+                    p_out_end -= p_outpic->p[i_index].i_pitch
+                                  - p_outpic->p[i_index].i_visible_pitch;
+                    p_line_end = p_in + p_pic->p[i_index].i_visible_lines *
+                        i_pitch;
+
+                    for( ; p_in < p_line_end ; )
+                    {
+                        p_line_end -= i_pitch;
+                        p_out_end -= 4;
+                        p_out_end[i_y_offset+2] = p_line_end[i_y_offset];
+                        p_out_end[i_u_offset] = p_line_end[i_offset];
+                        p_line_end -= i_pitch;
+                        p_out_end[i_y_offset] = p_line_end[i_y_offset];
+                        p_out_end[i_v_offset] = p_line_end[i_offset2];
+                    }
+
+                    p_in += 2;
+
+                    {
+                        int a = i_offset;
+                        i_offset = i_offset2;
+                        i_offset2 = a;
+                    }
+                }
+            }
+            break;
 
         case TRANSFORM_MODE_180:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
+                                            * p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+
+                for( ; p_in < p_in_end ; )
+                {
+                    uint8_t *p_line_start = p_in_end
+                                             - p_pic->p[i_index].i_pitch;
+                    p_in_end -= p_pic->p[i_index].i_pitch
+                                 - p_pic->p[i_index].i_visible_pitch;
+
+                    for( ; p_line_start < p_in_end ; )
+                    {
+                        p_in_end -= 4;
+                        p_out[i_y_offset] = p_in_end[i_y_offset+2];
+                        p_out[i_u_offset] = p_in_end[i_u_offset];
+                        p_out[i_y_offset+2] = p_in_end[i_y_offset];
+                        p_out[i_v_offset] = p_in_end[i_v_offset];
+                        p_out += 4;
+                    }
+
+                    p_out += p_outpic->p[i_index].i_pitch
+                              - p_outpic->p[i_index].i_visible_pitch;
+                }
+            }
+            break;
+
+        case TRANSFORM_MODE_270:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                int i_pitch = p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out_end = p_out +
+                    p_outpic->p[i_index].i_visible_lines *
+                    p_outpic->p[i_index].i_pitch;
+
+                int i_offset  = i_u_offset;
+                int i_offset2 = i_v_offset;
+                for( ; p_out < p_out_end ; )
+                {
+                    uint8_t *p_in_end;
+
+                    p_in_end = p_in
+                             + p_pic->p[i_index].i_visible_lines * i_pitch;
+
+                    for( ; p_in < p_in_end ; )
+                    {
+                        p_in_end -= i_pitch;
+                        p_out[i_y_offset] = p_in_end[i_y_offset];
+                        p_out[i_u_offset] = p_in_end[i_offset];
+                        p_in_end -= i_pitch;
+                        p_out[i_y_offset+2] = p_in_end[i_y_offset];
+                        p_out[i_v_offset] = p_in_end[i_offset2];
+                        p_out += 4;
+                    }
+
+                    p_out += p_outpic->p[i_index].i_pitch
+                           - p_outpic->p[i_index].i_visible_pitch;
+                    p_in += 2;
+
+                    {
+                        int a = i_offset;
+                        i_offset = i_offset2;
+                        i_offset2 = a;
+                    }
+                }
+            }
+            break;
+
         case TRANSFORM_MODE_HFLIP:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
-                             - sentval.i_int;
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
+                                            * p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+
+                for( ; p_in < p_in_end ; )
+                {
+                    p_in_end -= p_pic->p[i_index].i_pitch;
+                    p_vout->p_libvlc->pf_memcpy( p_out, p_in_end,
+                                           p_pic->p[i_index].i_visible_pitch );
+                    p_out += p_pic->p[i_index].i_pitch;
+                }
+            }
             break;
 
         case TRANSFORM_MODE_VFLIP:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
+                                         * p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+
+                for( ; p_in < p_in_end ; )
+                {
+                    uint8_t *p_line_end = p_in
+                                        + p_pic->p[i_index].i_visible_pitch;
+
+                    for( ; p_in < p_line_end ; )
+                    {
+                        p_line_end -= 4;
+                        p_out[i_y_offset] = p_line_end[i_y_offset+2];
+                        p_out[i_u_offset] = p_line_end[i_u_offset];
+                        p_out[i_y_offset+2] = p_line_end[i_y_offset];
+                        p_out[i_v_offset] = p_line_end[i_v_offset];
+                        p_out += 4;
+                    }
+
+                    p_in += p_pic->p[i_index].i_pitch;
+                }
+            }
+            break;
+
         default:
             break;
-        }
     }
-    else if( !strcmp( psz_var, "mouse-y" ) )
-    {
-        switch( p_vout->p_sys->i_mode )
-        {
-        case TRANSFORM_MODE_90:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
-                             - sentval.i_int;
-        case TRANSFORM_MODE_270:
-            var_Set( p_vout, "mouse-x", sentval );
-            return VLC_SUCCESS;
-
-        case TRANSFORM_MODE_180:
-        case TRANSFORM_MODE_VFLIP:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
-                             - sentval.i_int;
-            break;
-
-        case TRANSFORM_MODE_HFLIP:
-        default:
-            break;
-        }
-    }
-
-    var_Set( p_vout, psz_var, sentval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
 }

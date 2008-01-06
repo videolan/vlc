@@ -21,8 +21,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define CASE_PLANAR_YUV                     \
+        case VLC_FOURCC('I','4','2','0'):   \
+        case VLC_FOURCC('I','Y','U','V'):   \
+        case VLC_FOURCC('J','4','2','0'):   \
+        case VLC_FOURCC('Y','V','1','2'):   \
+        case VLC_FOURCC('I','4','1','1'):   \
+        case VLC_FOURCC('I','4','1','0'):   \
+        case VLC_FOURCC('Y','V','U','9'):   \
+        case VLC_FOURCC('I','4','2','2'):   \
+        case VLC_FOURCC('J','4','2','2'):   \
+        case VLC_FOURCC('I','4','4','4'):   \
+        case VLC_FOURCC('J','4','4','4'):   \
+        case VLC_FOURCC('Y','U','V','A'):
+
 #define CASE_PACKED_YUV_422                 \
-        case VLC_FOURCC('I','U','Y','V'):   \
         case VLC_FOURCC('U','Y','V','Y'):   \
         case VLC_FOURCC('U','Y','N','V'):   \
         case VLC_FOURCC('Y','4','2','2'):   \
@@ -36,7 +49,6 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
 {
     switch( i_chroma )
     {
-        case VLC_FOURCC('I','U','Y','V'): /* <-- FIXME: interlaced */
         case VLC_FOURCC('U','Y','V','Y'):
         case VLC_FOURCC('U','Y','N','V'):
         case VLC_FOURCC('Y','4','2','2'):

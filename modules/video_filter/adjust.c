@@ -125,18 +125,7 @@ static int Create( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('J','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','4','1','1'):
-        case VLC_FOURCC('I','4','1','0'):
-        case VLC_FOURCC('Y','V','U','9'):
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
-        case VLC_FOURCC('I','4','4','4'):
-        case VLC_FOURCC('J','4','4','4'):
-        case VLC_FOURCC('Y','U','V','A'):
+        CASE_PLANAR_YUV
             /* Planar YUV */
             p_filter->pf_video_filter = FilterPlanar;
             break;
