@@ -23,6 +23,7 @@
 *****************************************************************************/
 
 #import "VLCLibrary.h"
+#import "VLCMediaListAspect.h"
 
 /**
  * Bridges functionality between libvlc and VLCMediaList implementation.

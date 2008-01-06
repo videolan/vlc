@@ -2,49 +2,12 @@
 // Prefix header for all source files of the 'VLC' target in the 'VLC' project.
 //
 
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-#endif
-
-#include <vlc/vlc.h>
-
-#ifndef VLC_PUBLIC_API
-
-// For some reason Xcode refuses to read vlc/vlc.h contents -- so we have to do
-// this so we can supress the errors
-#define VLC_PUBLIC_API extern
-typedef int vlc_bool_t;
-typedef struct vlc_list_t vlc_list_t;
-typedef struct vlc_object_t vlc_object_t;
-typedef signed long long vlc_int64_t;
-
-#endif
-
-#include <vlc/libvlc_structures.h>
-#include <vlc/libvlc.h>
-
-//
-// Prefix header for all source files of the 'VLC' target in the 'VLC' project.
-//
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
 
 #include <vlc/vlc.h>
-
-#ifndef VLC_PUBLIC_API
-
-// For some reason Xcode refuses to read vlc/vlc.h contents -- so we have to do
-// this so we can supress the errors
-#define VLC_PUBLIC_API extern
-typedef int vlc_bool_t;
-typedef struct vlc_list_t vlc_list_t;
-typedef struct vlc_object_t vlc_object_t;
-typedef signed long long vlc_int64_t;
-
-#endif
-
 #include <vlc/libvlc_structures.h>
 #include <vlc/libvlc.h>
 

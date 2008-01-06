@@ -59,8 +59,7 @@
     NSArray * mediaDiscoverers = [NSArray arrayWithObjects:
         [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease],
         [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
-        [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
-        [[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] autorelease], nil];
+        [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease], nil];
 
     NSArray * playlists = [NSMutableArray arrayWithObjects:[VLCMedia mediaAsNodeWithName:@"Default Playlist"], nil];
 

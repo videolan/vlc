@@ -413,10 +413,10 @@
 			files = (
 			);
 			inputPaths = (
-				$SRCROOT/../Framework/build/$BUILD_VARIANTS/VLC.framework,
+				$SRCROOT/../Framework/build/$BUILD_VARIANTS/VLCKit.framework,
 			);
 			outputPaths = (
-				$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/VLC.framework,
+				$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/VLCKit.framework,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

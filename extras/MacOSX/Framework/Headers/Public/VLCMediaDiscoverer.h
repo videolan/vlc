@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLCMediaList.h>
+#import <VLCKit/VLCMediaList.h>
 
 @class VLCMediaList;
 
