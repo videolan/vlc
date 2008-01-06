@@ -330,19 +330,20 @@ connect:
             msg_Err( p_access, "insecure redirection ignored" );
             goto error;
         }
+        if( p_sys->i_code == 301 )
+        {
+            /* Permanent redirection: Change the URI */
+            p_playlist = pl_Yield( p_access );
+            PL_LOCK;
 
-        /* Change the URI */
-        p_playlist = pl_Yield( p_access );
-        PL_LOCK;
+            p_input_item = p_playlist->status.p_item->p_input;
+            input_item_SetURI( p_input_item, p_sys->psz_location );
 
-        p_input_item = p_playlist->status.p_item->p_input;
-        input_item_SetURI( p_input_item, p_sys->psz_location );
+            PL_UNLOCK;
+            pl_Release( p_access );
+        }
         free( p_access->psz_path );
         p_access->psz_path = strdup( p_sys->psz_location );
-
-        PL_UNLOCK;
-        pl_Release( p_access );
-
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
         vlc_UrlClean( &p_sys->proxy );
