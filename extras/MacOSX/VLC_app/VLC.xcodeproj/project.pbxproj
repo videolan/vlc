@@ -420,8 +420,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$SYMROOT\" == \"$PROJECT_DIR/build\"\nthen\n\tVLCFRAMEWORK=\"$SRCROOT/../Framework/build/$CONFIGURATION/VLCKit.framework\"\nelse\n\tVLCFRAMEWORK=\"$SYMROOT/VLCKit.framework\"\nfi\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $VLCFRAMEWORK $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n\n\n";
-			showEnvVarsInLog = 0;
+			shellScript = "if test \"$SYMROOT\" == \"$PROJECT_DIR/build\"\nthen\n\tVLCFRAMEWORK=\"$SRCROOT/../Framework/build/$CONFIGURATION/VLCKit.framework\"\nelse\n\tVLCFRAMEWORK=\"$SYMROOT/$CONFIGURATION/VLCKit.framework\"\nfi\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $VLCFRAMEWORK $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
