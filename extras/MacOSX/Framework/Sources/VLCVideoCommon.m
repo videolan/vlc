@@ -50,7 +50,7 @@
         
         CGFloat xRatio = CGRectGetWidth(bounds)/originalVideoSize.width;
         CGFloat yRatio = CGRectGetHeight(bounds)/originalVideoSize.height;
-        CGFloat ratio = fillScreenEntirely ? MIN(xRatio, yRatio) : MAX(xRatio, yRatio);
+        CGFloat ratio = fillScreenEntirely ? MAX(xRatio, yRatio) : MIX(xRatio, yRatio);
         
         videoRect.size.width = ratio*originalVideoSize.width;
         videoRect.size.height = ratio*originalVideoSize.height;

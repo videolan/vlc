@@ -209,7 +209,7 @@
     [mediaListItemsCount bind:@"displayPatternValue1" toObject:mediaArrayController withKeyPath:@"arrangedObjects.@count" options:[NSDictionary dictionaryWithObject:@"%{value1}@ items" forKey:NSDisplayPatternBindingOption]];
     [mediaListItemFetchedStatus bind:@"animate" toObject:categoriesTreeController withKeyPath:@"selection.currentlyFetchingItems" options:[NSDictionary dictionaryWithObject:@"%{value1}@ items" forKey:NSDisplayPatternBindingOption]];
 
-    [fillScreenButton bind:@"value" toObject:videoView withKeyPath:@"fillScreen" options: [NSDictionary dictionaryWithObject:NSNegateBooleanTransformerName forKey:NSValueTransformerNameBindingOption]];
+    [fillScreenButton bind:@"value" toObject:videoView withKeyPath:@"fillScreen" options: nil];
     [fullScreenButton bind:@"value" toObject:videoView withKeyPath:@"fullScreen" options: nil];
     [fullScreenButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"playing" options: nil];
     [fillScreenButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"playing" options: nil];
