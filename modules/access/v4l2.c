@@ -110,19 +110,58 @@ static void AccessClose( vlc_object_t * );
     "Reset controls to defaults provided by the v4l2 driver." )
 #define BRIGHTNESS_TEXT N_( "Brightness" )
 #define BRIGHTNESS_LONGTEXT N_( \
-    "Brightness of the video input (if supported by v4l2 driver)." )
+    "Brightness of the video input (if supported by the v4l2 driver)." )
 #define CONTRAST_TEXT N_( "Contrast" )
 #define CONTRAST_LONGTEXT N_( \
-    "Contrast of the video input (if supported by v4l2 driver)." )
+    "Contrast of the video input (if supported by the v4l2 driver)." )
 #define SATURATION_TEXT N_( "Saturation" )
 #define SATURATION_LONGTEXT N_( \
-    "Saturation of the video input (if supported by v4l2 driver)." )
+    "Saturation of the video input (if supported by the v4l2 driver)." )
 #define HUE_TEXT N_( "Hue" )
 #define HUE_LONGTEXT N_( \
-    "Hue of the video input (if supported by v4l2 driver)." )
+    "Hue of the video input (if supported by the v4l2 driver)." )
+#define BLACKLEVEL_TEXT N_( "Black level" )
+#define BLACKLEVEL_LONGTEXT N_( \
+    "Black level of the video input (if supported by the v4l2 driver)." )
+#define AUTOWHITEBALANCE_TEXT N_( "Auto white balance" )
+#define AUTOWHITEBALANCE_LONGTEXT N_( \
+    "Automatically set the white balance of the video input " \
+    "(if supported by the v4l2 driver)." )
+#define DOWHITEBALANCE_TEXT N_( "Do white balance" )
+#define DOWHITEBALANCE_LONGTEXT N_( \
+    "Trigger a white balancing action, useless if auto white balance is " \
+    "activated (if supported by the v4l2 driver)." )
+#define REDBALANCE_TEXT N_( "Red balance" )
+#define REDBALANCE_LONGTEXT N_( \
+    "Red balance of the video input (if supported by the v4l2 driver)." )
+#define BLUEBALANCE_TEXT N_( "Blue balance" )
+#define BLUEBALANCE_LONGTEXT N_( \
+    "Blue balance of the video input (if supported by the v4l2 driver)." )
 #define GAMMA_TEXT N_( "Gamma" )
 #define GAMMA_LONGTEXT N_( \
-    "Gamma of the video input (if supported by v4l2 driver)." )
+    "Gamma of the video input (if supported by the v4l2 driver)." )
+#define EXPOSURE_TEXT N_( "Exposure" )
+#define EXPOSURE_LONGTEXT N_( \
+    "Exposure of the video input (if supported by the v4L2 driver)." )
+#define AUTOGAIN_TEXT N_( "Auto gain" )
+#define AUTOGAIN_LONGTEXT N_( \
+    "Automatically set the video input's gain (if supported by the " \
+    "v4l2 driver)." )
+#define GAIN_TEXT N_( "Gain" )
+#define GAIN_LONGTEXT N_( \
+    "Video input's gain (if supported by the v4l2 driver)." )
+#define HFLIP_TEXT N_( "Horizontal flip" )
+#define HFLIP_LONGTEXT N_( \
+    "Flip the video horizontally (if supported by the v4l2 driver)." )
+#define VFLIP_TEXT N_( "Vertical flip" )
+#define VFLIP_LONGTEXT N_( \
+    "Flip the video vertically (if supported by the v4l2 driver)." )
+#define HCENTER_TEXT N_( "Horizontal centering" )
+#define HCENTER_LONGTEXT N_( \
+    "Set the camera's horizontal centering (if supported by the v4l2 driver)." )
+#define VCENTER_TEXT N_( "Vertical centering" )
+#define VCENTER_LONGTEXT N_( \
+    "Set the camera's vertical centering (if supported by the v4l2 driver)." )
 
 #define ADEV_TEXT N_("Audio device name")
 #ifndef HAVE_ALSA
@@ -218,20 +257,44 @@ vlc_module_begin();
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 
-    set_section( N_( "Controls" ), N_( "v4l2 driver controls" ) );
+    set_section( N_( "Controls" ),
+                 N_( "v4l2 driver controls, if supported by your v4l2 driver." ) );
     add_bool( CFG_PREFIX "controls-reset", VLC_FALSE, NULL, CTRL_RESET_TEXT,
               CTRL_RESET_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "brightness", -1, NULL, BRIGHTNESS_TEXT,
-                BRIGHTNESS_LONGTEXT, VLC_TRUE );
+                 BRIGHTNESS_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "contrast", -1, NULL, CONTRAST_TEXT,
-                CONTRAST_LONGTEXT, VLC_TRUE );
+                 CONTRAST_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "saturation", -1, NULL, SATURATION_TEXT,
-                SATURATION_LONGTEXT, VLC_TRUE );
+                 SATURATION_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "hue", -1, NULL, HUE_TEXT,
-                HUE_LONGTEXT, VLC_TRUE );
+                 HUE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "black-level", -1, NULL, BLACKLEVEL_TEXT,
+                 BLACKLEVEL_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "auto-white-balance", -1, NULL,
+                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "do-white-balance", -1, NULL, DOWHITEBALANCE_TEXT,
+                 DOWHITEBALANCE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "red-balance", -1, NULL, REDBALANCE_TEXT,
+                 REDBALANCE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "blue-balance", -1, NULL, BLUEBALANCE_TEXT,
+                 BLUEBALANCE_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "gamma", -1, NULL, GAMMA_TEXT,
-                GAMMA_LONGTEXT, VLC_TRUE );
-
+                 GAMMA_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "exposure", -1, NULL, EXPOSURE_TEXT,
+                 EXPOSURE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "autogain", -1, NULL, AUTOGAIN_TEXT,
+                 AUTOGAIN_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "gain", -1, NULL, GAIN_TEXT,
+                 GAIN_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "hflip", -1, NULL, HFLIP_TEXT,
+                 HFLIP_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "vflip", -1, NULL, VFLIP_TEXT,
+                 VFLIP_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "hcenter", -1, NULL, HCENTER_TEXT,
+                 HCENTER_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "vcenter", -1, NULL, VCENTER_TEXT,
+                 VCENTER_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "v4l2" );
     set_capability( "access_demux", 10 );
@@ -311,9 +374,15 @@ static struct
     { V4L2_PIX_FMT_UYVY,    VLC_FOURCC('U','Y','V','Y') },
     { V4L2_PIX_FMT_Y41P,    VLC_FOURCC('I','4','1','N') },
     { V4L2_PIX_FMT_YUV422P, VLC_FOURCC('I','4','2','2') },
-    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC('I','4','2','0') },
+    { V4L2_PIX_FMT_YVU420,  VLC_FOURCC('Y','V','1','2') },
     { V4L2_PIX_FMT_YUV411P, VLC_FOURCC('I','4','1','1') },
     { V4L2_PIX_FMT_YUV410,  VLC_FOURCC('I','4','1','0') },
+
+    /* Raw data types, not in V4L2 spec but still in videodev2.h and supported
+     * by VLC */
+    { V4L2_PIX_FMT_YUV420,  VLC_FOURCC('I','4','2','0') },
+    { V4L2_PIX_FMT_RGB444,  VLC_FOURCC('R','V','3','2') },
+
     /* Compressed data types */
     { V4L2_PIX_FMT_MJPEG,   VLC_FOURCC('M','J','P','G') },
 #if 0
@@ -323,6 +392,14 @@ static struct
 #endif
     { 0, 0 }
 };
+
+/**
+ * List of V4L2 chromas were confident enough to use as fallbacks if the
+ * user hasn't provided a --v4l2-chroma value.
+ */
+static const __u32 p_chroma_fallbacks[] =
+{ V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
+  V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_MJPEG };
 
 static struct
 {
@@ -1589,7 +1666,8 @@ static vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixel
 
     for( int i_index = 0; i_index < p_sys->i_codec; i_index++ )
     {
-        if( p_sys->p_codecs[i_index].pixelformat == i_pixelformat ) return VLC_TRUE;
+        if( p_sys->p_codecs[i_index].pixelformat == i_pixelformat )
+            return VLC_TRUE;
     }
 
     return VLC_FALSE;
@@ -1757,19 +1835,18 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
     /* This also decides if MPEG encoder card or not */
     if( !fmt.fmt.pix.pixelformat )
     {
-        fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YVU420;
-        if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+        unsigned int i;
+        for( i = 0; i < ARRAY_SIZE( p_chroma_fallbacks ); i++ )
         {
-            fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
-            if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
-            {
-                fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-                if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
-                {
-                    msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access2)" );
-                    goto open_failed;
-                }
-            }
+            fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
+            if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat )
+             && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
+                break;
+        }
+        if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
+        {
+            msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access2)" );
+            goto open_failed;
         }
     }
 
@@ -1806,11 +1883,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
     frmival.height = p_sys->i_height;
     if( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
     {
-        char sz_fourcc[5];
-        memset( &sz_fourcc, 0, sizeof( sz_fourcc ) );
-        vlc_fourcc_to_char( p_sys->i_fourcc, &sz_fourcc );
+        char psz_fourcc[5];
+        memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
+        vlc_fourcc_to_char( p_sys->i_fourcc, &psz_fourcc );
         msg_Dbg( p_demux, "supported frame intervals for %4s, %dx%d:",
-                 sz_fourcc, frmival.width, frmival.height );
+                 psz_fourcc, frmival.width, frmival.height );
         switch( frmival.type )
         {
             case V4L2_FRMIVAL_TYPE_DISCRETE:
@@ -2479,6 +2556,10 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             }
 
             /* only print if vlc supports the format */
+            char psz_fourcc_v4l2[5];
+            memset( &psz_fourcc_v4l2, 0, sizeof( psz_fourcc_v4l2 ) );
+            vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
+                                &psz_fourcc_v4l2 );
             vlc_bool_t b_codec_supported = VLC_FALSE;
             for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
             {
@@ -2486,12 +2567,14 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 {
                     b_codec_supported = VLC_TRUE;
 
-                    char sz_fourcc[5];
-                    memset( &sz_fourcc, 0, sizeof( sz_fourcc ) );
-                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc, &sz_fourcc );
-                    msg_Dbg( p_obj, "device supports chroma %4s [%s]",
-                                sz_fourcc,
-                                p_sys->p_codecs[i_index].description );
+                    char psz_fourcc[5];
+                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
+                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc,
+                                        &psz_fourcc );
+                    msg_Dbg( p_obj, "device supports chroma %4s [%s, %s]",
+                                psz_fourcc,
+                                p_sys->p_codecs[i_index].description,
+                                psz_fourcc_v4l2 );
 
 #ifdef VIDIOC_ENUM_FRAMESIZES
                     /* This is new in Linux 2.6.19 */
@@ -2537,13 +2620,10 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             }
             if( !b_codec_supported )
             {
-                    char psz_fourcc[5];
-                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
-                    vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
-                                        &psz_fourcc );
                     msg_Dbg( p_obj,
                          "device codec %4s (%s) not supported as access_demux",
-                         psz_fourcc, p_sys->p_codecs[i_index].description );
+                         psz_fourcc_v4l2,
+                         p_sys->p_codecs[i_index].description );
             }
 
         }
