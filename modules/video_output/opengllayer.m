@@ -241,13 +241,7 @@ static void End( vout_thread_t *p_vout )
 
     p_vout->p_sys->b_frame_available = VLC_FALSE;
 
-    [CATransaction performSelectorOnMainThread:@selector(begin)
-                    withObject:nil waitUntilDone:YES];
-
-    [p_sys->o_layer performSelectorOnMainThread:@selector(removeFromSuperlayer)
-                    withObject:nil waitUntilDone:YES];
-    [CATransaction performSelectorOnMainThread:@selector(commit)
-                    withObject:nil waitUntilDone:YES];
+    [p_vout->p_sys->o_cocoa_container performSelectorOnMainThread:@selector(removeVoutLayer:) withObject:p_vout->p_sys->o_layer waitUntilDone:YES];
 
     // Should be done automatically
     [p_sys->o_layer release];
@@ -314,6 +308,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             p_sys->i_index = i_new_index;
             p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
             CGLUnlockContext(p_sys->glContext);
+            
+            p_sys->b_frame_available = VLC_TRUE;
         }
     }
 
@@ -327,11 +323,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-
-    [p_sys->o_layer performSelectorOnMainThread:@selector(setNeedsDisplay)
-                    withObject:nil waitUntilDone:NO];
-
-    p_sys->b_frame_available = VLC_TRUE;
+    
+    [p_sys->o_layer performSelectorOnMainThread:@selector(display)
+                    withObject:nil waitUntilDone:YES];
 }
 
 /*****************************************************************************
@@ -466,8 +460,6 @@ static int InitTextures( vout_thread_t *p_vout )
     glFlush();
 
     CGLUnlockContext( glContext );
-
-    p_vout->p_sys->b_frame_available = VLC_FALSE;
 }
 
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat

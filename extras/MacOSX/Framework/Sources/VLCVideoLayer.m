@@ -25,6 +25,7 @@
 #import "VLCVideoLayer.h"
 #import "VLCLibrary.h"
 #import "VLCEventManager.h"
+#import "VLCVideoCommon.h"
 
 /* Libvlc */
 #include <vlc/vlc.h>
@@ -47,8 +48,6 @@
 
 @implementation VLCVideoLayer
 
-/* Nothing */
-
 @end
 
 /******************************************************************************
@@ -60,21 +59,25 @@
 /* This is called by the libvlc module 'opengllayer' as soon as there is one 
  * vout available
  */
-- (void)addVoutLayer:(CALayer *)aLayer
+- (void)addVoutLayer:(CALayer *)voutLayer
 {
     [CATransaction begin];
+ 
+    voutLayer.name = @"vlcopengllayer";
+    
+    VLCVideoLayoutManager * layoutManager = [VLCVideoLayoutManager layoutManager];
+    layoutManager.originalVideoSize = voutLayer.bounds.size;
+    self.layoutManager = layoutManager;
+    
+    [self insertSublayer:voutLayer atIndex:0];
 
-    aLayer.name = @"vlcopengllayer";
+    [CATransaction commit];
+}
 
-    [aLayer setAutoresizingMask:kCALayerWidthSizable|kCALayerHeightSizable];
-
-    [self insertSublayer:aLayer atIndex:0];
-
-    [aLayer setNeedsLayout];
-    [aLayer setNeedsDisplay];
-    [self setNeedsDisplay];
-    [self layoutIfNeeded];
-
+- (void)removeVoutLayer:(CALayer*)voutLayer
+{
+    [CATransaction begin];
+    [voutLayer removeFromSuperlayer];
     [CATransaction commit];
 }
 

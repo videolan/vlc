@@ -56,6 +56,8 @@
 		637D5ADC0CF6F2720073EA45 /* VLCMediaDiscoverer.m in Sources */ = {isa = PBXBuildFile; fileRef = 637D5ADB0CF6F2720073EA45 /* VLCMediaDiscoverer.m */; };
 		6384FD080D0DBA20005EB1F7 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6384FD070D0DBA20005EB1F7 /* QuartzCore.framework */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		A7A0CEA40D2EF13000F2C039 /* VLCVideoCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = A7A0CEA20D2EF13000F2C039 /* VLCVideoCommon.h */; };
+		A7A0CEA50D2EF13000F2C039 /* VLCVideoCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A0CEA30D2EF13000F2C039 /* VLCVideoCommon.m */; };
 		EF7311900CB5797B009473B4 /* VLCAudio.h in Headers */ = {isa = PBXBuildFile; fileRef = EF73118E0CB5797B009473B4 /* VLCAudio.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EF7311910CB5797B009473B4 /* VLCAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = EF73118F0CB5797B009473B4 /* VLCAudio.m */; };
 		EF78BD100CAEEEC300354E6E /* VLCEventManager.h in Headers */ = {isa = PBXBuildFile; fileRef = EF78BD0D0CAEEEC300354E6E /* VLCEventManager.h */; settings = {ATTRIBUTES = (); }; };
@@ -123,6 +125,8 @@
 		637D5ADB0CF6F2720073EA45 /* VLCMediaDiscoverer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCMediaDiscoverer.m; sourceTree = "<group>"; };
 		6384FD070D0DBA20005EB1F7 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		8DC2EF5B0486A6940098B216 /* VLC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VLC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7A0CEA20D2EF13000F2C039 /* VLCVideoCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCVideoCommon.h; path = Internal/VLCVideoCommon.h; sourceTree = "<group>"; };
+		A7A0CEA30D2EF13000F2C039 /* VLCVideoCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVideoCommon.m; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		EF73118E0CB5797B009473B4 /* VLCAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCAudio.h; path = Public/VLCAudio.h; sourceTree = "<group>"; };
 		EF73118F0CB5797B009473B4 /* VLCAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCAudio.m; sourceTree = "<group>"; };
@@ -210,6 +214,7 @@
 				6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */,
 				EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */,
 				EF78BD400CAEEFF600354E6E /* VLCMediaLibrary.m */,
+				A7A0CEA30D2EF13000F2C039 /* VLCVideoCommon.m */,
 				6341FCB00D2C0936002A97B7 /* VLCVideoLayer.m */,
 				EF78BD450CAEEFF600354E6E /* VLCVideoView.m */,
 				EF78BD440CAEEFF600354E6E /* VLCTime.m */,
@@ -273,6 +278,7 @@
 				6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */,
 				EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */,
 				EF78BD150CAEEEE700354E6E /* VLCMediaLibrary.h */,
+				A7A0CEA20D2EF13000F2C039 /* VLCVideoCommon.h */,
 				6341FCAE0D2C0929002A97B7 /* VLCVideoLayer.h */,
 				EF78BD1A0CAEEEE700354E6E /* VLCVideoView.h */,
 				EF78BD190CAEEEE700354E6E /* VLCTime.h */,
@@ -302,6 +308,7 @@
 				637D5ABD0CF6F2650073EA45 /* VLCMediaDiscoverer.h in Headers */,
 				6341FCAF0D2C0929002A97B7 /* VLCVideoLayer.h in Headers */,
 				637CFB940D2D280900A041B6 /* VLCLibrary.h in Headers */,
+				A7A0CEA40D2EF13000F2C039 /* VLCVideoCommon.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +466,7 @@
 				6303C43A0CF45CAE0000ECC8 /* VLCMediaListAspect.m in Sources */,
 				637D5ADC0CF6F2720073EA45 /* VLCMediaDiscoverer.m in Sources */,
 				6341FCB10D2C0936002A97B7 /* VLCVideoLayer.m in Sources */,
+				A7A0CEA50D2EF13000F2C039 /* VLCVideoCommon.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

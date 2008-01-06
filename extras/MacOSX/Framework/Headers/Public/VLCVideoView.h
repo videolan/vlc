@@ -25,8 +25,6 @@
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 
-@class CALayer;
-
 @interface VLCVideoView : NSView
 {
     id delegate;
