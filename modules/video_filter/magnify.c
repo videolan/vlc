@@ -31,6 +31,8 @@
 #include <math.h>
 
 #include "filter_common.h"
+#include "filter_picture.h"
+
 #include "vlc_image.h"
 #include "vlc_input.h"
 #include "vlc_playlist.h"
@@ -93,6 +95,16 @@ static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    switch( p_vout->fmt_in.i_chroma )
+    {
+        CASE_PLANAR_YUV
+        case VLC_FOURCC('G','R','E','Y'):
+            break;
+        default:
+            msg_Err( p_vout, "Unsupported chroma" );
+            return VLC_EGENERIC;
+    }
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -149,8 +161,8 @@ static int Init( vout_thread_t *p_vout )
 #define VIS_ZOOM 4
     p_vout->p_sys->i_x = 0;
     p_vout->p_sys->i_y = 0;
-#define ZOOM_FACTOR 100
-    p_vout->p_sys->i_zoom = 200;
+#define ZOOM_FACTOR 8
+    p_vout->p_sys->i_zoom = 2*ZOOM_FACTOR;
     p_vout->p_sys->b_visible = VLC_TRUE;
 
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout );
@@ -220,6 +232,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     video_format_t fmt_out;
     picture_t *p_converted;
     plane_t *p_oyp=NULL;
+    int i_plane;
 
     memset( &fmt_out, 0, sizeof(video_format_t) );
     /* This is a new frame. Get a structure from the video_output. */
@@ -240,35 +253,114 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     /* background magnified image */
     if( o_zoom != ZOOM_FACTOR )
     {
-#define magnify( plane ) \
-    o_yp = o_y*p_outpic->p[plane].i_lines/p_outpic->p[Y_PLANE].i_lines; \
-    o_xp = o_x*p_outpic->p[plane].i_pitch/p_outpic->p[Y_PLANE].i_pitch; \
-    for( y=0; y<p_outpic->p[plane].i_visible_lines; y++ ) \
-    { \
-        for( x=0; x<p_outpic->p[plane].i_visible_pitch; x++ ) \
-        { \
-            p_outpic->p[plane].p_pixels[y*p_outpic->p[plane].i_pitch+x] = \
-                p_pic->p[plane].p_pixels[ \
-                    ( o_yp + y*ZOOM_FACTOR/o_zoom )*p_outpic->p[plane].i_pitch \
-                    + o_xp + x*ZOOM_FACTOR/o_zoom \
-                ]; \
-        } \
-    }
-    magnify( Y_PLANE );
-    magnify( U_PLANE );
-    magnify( V_PLANE );
-#undef magnify
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+            o_yp = o_y*p_outpic->p[i_plane].i_lines
+                   /p_outpic->p[Y_PLANE].i_lines;
+            o_xp = o_x*p_outpic->p[i_plane].i_pitch
+                   /p_outpic->p[Y_PLANE].i_pitch;
+            int i_pitch = p_outpic->p[i_plane].i_pitch;
+#if 0
+            int o_zoom2 = o_zoom*o_zoom;
+            int o_zoom3 = o_zoom*o_zoom*o_zoom;
+            int o_zoom4 = o_zoom*o_zoom*o_zoom*o_zoom;
+            int o_zoom6 = o_zoom*o_zoom*o_zoom * o_zoom*o_zoom*o_zoom;
+#endif
+            for( y=0; y<p_outpic->p[i_plane].i_visible_lines; y++ )
+            {
+                for( x=0; x<p_outpic->p[i_plane].i_visible_pitch; x++ )
+                {
+#if 0
+                    /* Nearest neighbor */
+                    int nx = o_xp + x*ZOOM_FACTOR/o_zoom;
+                    int ny = o_yp + y*ZOOM_FACTOR/o_zoom;
+                    p_outpic->p[i_plane].p_pixels[y*i_pitch+x] =
+                        p_pic->p[i_plane].p_pixels[ny*i_pitch+nx];
+#elif 1
+                    /* Bi-linear */
+                    int nx_real = o_xp*o_zoom + x*ZOOM_FACTOR;
+                    int ny_real = o_yp*o_zoom + y*ZOOM_FACTOR;
+                    int nx = nx_real/o_zoom;
+                    int ny = ny_real/o_zoom;
+                    int wtl = ((nx+1)*o_zoom-nx_real)*((ny+1)*o_zoom-ny_real);
+                    int wtr = (nx_real-nx*o_zoom)*((ny+1)*o_zoom-ny_real);
+                    int wbl = ((nx+1)*o_zoom-nx_real)*(ny_real-ny*o_zoom);
+                    int wbr = (nx_real-nx*o_zoom)*(ny_real-ny*o_zoom);
+                    p_outpic->p[i_plane].p_pixels[y*i_pitch+x] =
+                        ( wtl*p_pic->p[i_plane].p_pixels[ny*i_pitch+nx]
+                        + wtr*p_pic->p[i_plane].p_pixels[ny*i_pitch+(nx+1)]
+                        + wbl*p_pic->p[i_plane].p_pixels[(ny+1)*i_pitch+nx]
+                        + wbr*p_pic->p[i_plane].p_pixels[(ny+1)*i_pitch+(nx+1)]
+                        ) / (o_zoom*o_zoom);
+#else
+                    /* Bi-cubic */
+                    /* FIXME: doesn't work */
+                    /* \Sigma_{i=0..3} \Sigma_{j=0..3} \alpha_{i,j} x^i y^j
+                     * 16 \alpha_{i,j} so we need to use the 16 nearest pixels
+                     *
+                     * In fact we should be able to write it as:
+                     * \Pi_{i=1..16} [ \Pi_{j!=i} ( x - x_j ) * ( y - y_j ) ]
+                     *   * z_i / [ \Pi_{j!=i} ( x_i - x_j ) * ( y_i - y_j ) ]
+                     * We also have to make sure that we don't use any
+                     * x_j == x_i or y_j == y_i in the \Pi on j (else we get
+                     * a 0/0 which kind of sucks) .
+                     */
+                    uint8_t *p = p_pic->p[i_plane].p_pixels;
+                    int nx_real = o_xp*o_zoom + x*ZOOM_FACTOR;
+                    int ny_real = o_yp*o_zoom + y*ZOOM_FACTOR;
+
+                    int nx = nx_real/o_zoom;
+                    int ny = ny_real/o_zoom;
+
+                    int xi, yi, xj, yj;
+                    int my = __MAX( ny-1, 0 );
+                    int mx = __MAX( nx-1, 0 );
+                    //p_outpic->p[i_plane].i_visible_lines - 4
+                    //p_outpic->p[i_plane].i_visible_pitch - 4
+                    int v = 1;
+                    for( yi = my; yi <= my+3; yi++ )
+                    {
+                        int numy = 1;
+                        int deny = 1;
+                        /*
+                        for( yj = my; yj <= my+3; yj++ )
+                        {
+                            if( yj != yi )
+                            {
+                                numy *= (ny_real-yj*o_zoom);
+                                deny *= (yi - yj);
+                            }
+                        }
+                        numy /= o_zoom2;*/
+                        for( xi = mx; xi <= mx+3; xi++ )
+                        {
+                            int num = numy;
+                            int den = deny;
+                            for( xj = mx; xj <= mx+3; xj++ )
+                            {
+                                if( xj != xi )
+                                {
+                                    num *= (nx_real-xj*o_zoom);
+                                    den *= (xi - xj);
+                                }
+                            }
+                            v = ( v * (p[yi*i_pitch+xi] * num) ) / ( den * o_zoom3 );
+                        }
+                    }
+                    p_outpic->p[i_plane].p_pixels[y*i_pitch+x] = v;
+#endif
+                }
+            }
+        }
     }
     else
     {
-#define copy( plane ) \
-        p_vout->p_libvlc-> \
-        pf_memcpy( p_outpic->p[plane].p_pixels, p_pic->p[plane].p_pixels, \
-            p_outpic->p[plane].i_lines * p_outpic->p[plane].i_pitch );
-        copy( Y_PLANE );
-        copy( U_PLANE );
-        copy( V_PLANE );
-#undef copy
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+        p_vout->p_libvlc->
+        pf_memcpy( p_outpic->p[i_plane].p_pixels, p_pic->p[i_plane].p_pixels,
+            p_outpic->p[i_plane].i_lines * p_outpic->p[i_plane].i_pitch );
+        }
     }
 
     if( p_vout->p_sys->b_visible )
@@ -279,18 +371,16 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         fmt_out.i_height = p_vout->render.i_height/VIS_ZOOM;
         p_converted = image_Convert( p_vout->p_sys->p_image, p_pic,
                                      &(p_pic->format), &fmt_out );
-    #define copyimage( plane ) \
-        for( y=0; y<p_converted->p[plane].i_visible_lines; y++) \
-        { \
-            p_vout->p_libvlc->pf_memcpy( \
-            p_outpic->p[plane].p_pixels+y*p_outpic->p[plane].i_pitch, \
-            p_converted->p[plane].p_pixels+y*p_converted->p[plane].i_pitch, \
-            p_converted->p[plane].i_visible_pitch ); \
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+            for( y=0; y<p_converted->p[i_plane].i_visible_lines; y++)
+            {
+                p_vout->p_libvlc->pf_memcpy(
+                p_outpic->p[i_plane].p_pixels+y*p_outpic->p[i_plane].i_pitch,
+                p_converted->p[i_plane].p_pixels+y*p_converted->p[i_plane].i_pitch,
+                p_converted->p[i_plane].i_visible_pitch );
+            }
         }
-        copyimage( Y_PLANE );
-        copyimage( U_PLANE );
-        copyimage( V_PLANE );
-    #undef copyimage
         p_converted->pf_release( p_converted );
 
         /* white rectangle on visualization */
