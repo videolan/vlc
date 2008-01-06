@@ -49,7 +49,7 @@
    <item>
     <widget class="QFrame" name="advancedFrame" >
      <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+      <sizepolicy vsizetype="MinimumExpanding" hsizetype="Minimum" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
