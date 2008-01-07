@@ -402,15 +402,6 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         if (media && [media compare:value] == NSOrderedSame)
             return;
         
-        BOOL wasPlaying;
-        if (wasPlaying = [self isPlaying])
-        {
-            [self pause];
-//            // TODO: Should we wait until it stops playing?
-//            while ([self isPlaying])
-//                usleep(1000);
-        }
-        
         [media release];
         media = [value retain];
 
@@ -475,7 +466,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
          * and tries to recontact us on the main thread */
         /* FIXME: to do this properly we need to do some locking. We may want 
          * to move that to libvlc */
-        [self performSelectorInBackground:@selector(pause) withObject:nil];
+        [self performSelectorInBackground:@selector(stop) withObject:nil];
         return;
     }
 
