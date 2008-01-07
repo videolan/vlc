@@ -299,12 +299,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     /*  where to locate the string: */
     if( p_sys->i_pos < 0 )
-    {   /* set to one of the 9 relative locations */
+    {   /*  set to an absolute xy */
         p_spu->p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
         p_spu->b_absolute = VLC_TRUE;
     }
     else
-    {   /*  set to an absolute xy */
+    {   /* set to one of the 9 relative locations */
         p_spu->p_region->i_align = p_sys->i_pos;
         p_spu->b_absolute = VLC_FALSE;
     }
