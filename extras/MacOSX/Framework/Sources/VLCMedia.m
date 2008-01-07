@@ -53,6 +53,13 @@ NSString * VLCMetaInformationTrackID        = @"trackID";
 NSString * VLCMediaMetaChanged              = @"VLCMediaMetaChanged";
 
 /******************************************************************************
+ * @property (readwrite)
+ */
+@interface VLCMedia ()
+@property (readwrite) VLCMediaState state;
+@end
+
+/******************************************************************************
  * Interface (Private)
  */
 // TODO: Documentation
@@ -504,6 +511,11 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     [self didChangeValueForKey:@"subitems"];
     libvlc_media_list_release( p_mlist );
 }
+
+- (void)setStateAsNumber:(NSNumber *)newStateAsNumber
+{
+    [self setState: [newStateAsNumber intValue]];
+}
 @end
 
 /******************************************************************************
@@ -519,16 +531,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         
     [length release];       
     length = value ? [value retain] : nil;
-}
-
-- (void)setStateAsNumber:(NSNumber *)newStateAsNumber
-{
-    [self setState: [newStateAsNumber intValue]];
-}
-
-- (void)setState:(VLCMediaState)newState
-{
-    state = newState;
 }
 
 @end
