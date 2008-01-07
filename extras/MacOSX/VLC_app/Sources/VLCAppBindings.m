@@ -31,22 +31,14 @@
  * VLCMediaDiscoverer (CategoriesListBindings)
  */
 @implementation VLCMediaDiscoverer (CategoriesListBindings)
-+(void)initialize
++ (NSSet *)keyPathsForValuesAffectingCurrentlyFetchingItems
 {
-    [VLCMediaDiscoverer setKeys:[NSArray arrayWithObject:@"running"] triggerChangeNotificationsForDependentKey:@"currentlyFetchingItems"];
+    return [NSSet setWithObject:@"running"];
 }
 
-+ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key
++ (NSSet *)keyPathsForValuesAffectingChildrenInCategoriesListForDetailView
 {
-    /* Thanks to Julien Robert, we'll have some nice auto triggered KVO event from here */
-    static NSDictionary * dict = nil;
-    if( !dict )
-    {
-        dict = [[NSDictionary dictionaryWithObjectsAndKeys:
-            [NSSet setWithObject:@"discoveredMedia.flatAspect"], @"childrenInCategoriesListForDetailView",
-            nil] retain];
-    }
-    return [dict objectForKey: key];
+    return [NSSet setWithObject:@"discoveredMedia.flatAspect"];
 }
 
 /* General shortcuts */
@@ -106,21 +98,25 @@
  */
 @implementation VLCMedia (VLCAppBindings)
 
-+ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key
++ (NSSet *)keyPathsForValuesAffectingChildrenInCategoriesList
 {
-    /* Thanks to Julien Robert, we'll have some nice auto triggered KVO event from here */
-    static NSDictionary * dict = nil;
-    if( !dict )
-    {
-        dict = [[NSDictionary dictionaryWithObjectsAndKeys:
-            [NSSet setWithObject:@"subitems.hierarchicalNodeAspect.media"], @"childrenInCategoriesList",
-            [NSSet setWithObject:@"metaDictionary.title"], @"descriptionInCategoriesList",
-            [NSSet setWithObject:@"subitems.flatAspect"], @"childrenInCategoriesListForDetailView",
-            [NSSet setWithObject:@"metaDictionary.title"], @"descriptionInVideoView",
-            [NSSet setWithObject:@"state"], @"stateAsImage",
-            nil] retain];
-    }
-    return [dict objectForKey: key];
+    return [NSSet setWithObject:@"subitems.hierarchicalNodeAspect.media"];
+}
++ (NSSet *)keyPathsForValuesAffectingDescriptionInCategoriesList
+{
+    return [NSSet setWithObject:@"metaDictionary.title"];
+}
++ (NSSet *)keyPathsForValuesAffectingChildrenInCategoriesListForDetailView
+{
+    return [NSSet setWithObject:@"subitems.flatAspect"];
+}
++ (NSSet *)keyPathsForValuesAffectingChildrenInDescriptionInVideoView
+{
+    return [NSSet setWithObject:@"metaDictionary.title"];
+}
++ (NSSet *)keyPathsForValuesAffectingStateAsImage
+{
+    return [NSSet setWithObject:@"state"];
 }
 
 /* CategoriesList specific bindings */
@@ -193,9 +189,17 @@
 @end
 
 @implementation VLCMediaPlayer (VLCAppBindings)
-+ (void)initialize
++ (NSSet *)keyPathsForValuesAffectingDescription
 {
-    [self setKeys:[NSArray arrayWithObjects:@"playing", @"media", nil] triggerChangeNotificationsForDependentKey:@"description"];
+    return [NSSet setWithObjects:@"playing", @"media", nil];
+}
++ (NSSet *)keyPathsForValuesAffectingStateAsButtonImage
+{
+    return [NSSet setWithObjects:@"state", @"playing", @"canPause", nil];
+}
++ (NSSet *)keyPathsForValuesAffectingStateAsButtonAlternateImage
+{
+    return [NSSet setWithObjects:@"state", @"playing", @"canPause", nil];
 }
 
 - (NSString *)description
@@ -204,5 +208,25 @@
         return [self valueForKeyPath:@"media.metaDictionary.title"];
     else
         return @"VLC Media Player";
+}
+
+- (NSImage *)stateAsButtonImage
+{
+    if([self state] == VLCMediaPlayerStatePlaying && [self canPause])
+        return [NSImage imageNamed:@"pause.png"];
+    else if( [self state] == VLCMediaPlayerStatePlaying )
+        return [NSImage imageNamed:@"stop.png"];
+    else
+        return [NSImage imageNamed:@"play.png"];
+}
+
+- (NSImage *)stateAsButtonAlternateImage
+{
+    if([self state] == VLCMediaPlayerStatePlaying && [self canPause])
+        return [NSImage imageNamed:@"pause_blue.png"];
+    else if( [self state] == VLCMediaPlayerStatePlaying )
+        return [NSImage imageNamed:@"stop_blue.png"];
+    else
+        return [NSImage imageNamed:@"play_blue.png"];
 }
 @end

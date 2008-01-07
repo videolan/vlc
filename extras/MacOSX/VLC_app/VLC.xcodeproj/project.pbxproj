@@ -34,6 +34,7 @@
 
 /* Begin PBXBuildFile section */
 		632F3C380D31711C003BBC56 /* VLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 632F3C230D316F37003BBC56 /* VLCKit.framework */; };
+		632F3E260D326FF0003BBC56 /* pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 632F3E250D326FF0003BBC56 /* pause.png */; };
 		633BD4BC0D2A90470012A314 /* VLCValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 633BD4AA0D2A90470012A314 /* VLCValueTransformer.m */; };
 		633BD4BD0D2A90470012A314 /* VLCMediaArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633BD4AC0D2A90470012A314 /* VLCMediaArrayController.m */; };
 		633BD4BE0D2A90470012A314 /* VLCMainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 633BD4AD0D2A90470012A314 /* VLCMainWindow.m */; };
@@ -68,28 +69,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216 /* VLCKit.framework */;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
 			remoteInfo = VLCKit;
 		};
 		632F3C250D316FAD003BBC56 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* VLCKit */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = VLCKit;
 		};
 		632F3C270D316FB5003BBC56 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090 /* VLC */;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = VLC;
 		};
 		632F3CC50D318E3A003BBC56 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */;
+			remoteGlobalIDString = 633BD6D20D2ADE040012A314;
 			remoteInfo = "vlc-contrib-core-framework";
 		};
 /* End PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* VLC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLC_Prefix.pch; sourceTree = "<group>"; };
+		632F3E250D326FF0003BBC56 /* pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause.png; path = ../Resources/pause.png; sourceTree = SOURCE_ROOT; };
 		633BD4AA0D2A90470012A314 /* VLCValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCValueTransformer.m; path = Sources/VLCValueTransformer.m; sourceTree = "<group>"; };
 		633BD4AB0D2A90470012A314 /* VLCValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCValueTransformer.h; path = Sources/VLCValueTransformer.h; sourceTree = "<group>"; };
 		633BD4AC0D2A90470012A314 /* VLCMediaArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMediaArrayController.m; path = Sources/VLCMediaArrayController.m; sourceTree = "<group>"; };
@@ -317,6 +319,7 @@
 				63E380A90D1C65A600FD6958 /* volume_low.png */,
 				63E380AC0D1C65D100FD6958 /* play.png */,
 				63E380AD0D1C65D100FD6958 /* play_blue.png */,
+				632F3E250D326FF0003BBC56 /* pause.png */,
 				63E380B00D1C65F200FD6958 /* skip_forward_active.png */,
 				63E380B10D1C65F200FD6958 /* skip_forward_blue.png */,
 				63E380B40D1C65FC00FD6958 /* skip_previous_active.png */,
@@ -401,6 +404,7 @@
 				63874B190D25960600F738AD /* MainWindow.xib in Resources */,
 				633BD4DA0D2A90C80012A314 /* dialog-error.png in Resources */,
 				633BD4DB0D2A90C80012A314 /* applications-internet.png in Resources */,
+				632F3E260D326FF0003BBC56 /* pause.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

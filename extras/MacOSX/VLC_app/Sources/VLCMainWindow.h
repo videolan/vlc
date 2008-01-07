@@ -46,6 +46,10 @@
 
     IBOutlet NSSlider * mediaSoundVolume;
 
+    IBOutlet NSButton * mediaPlayerForwardNextButton;
+    IBOutlet NSButton * mediaPlayerBackwardPrevButton;
+    IBOutlet NSButton * mediaPlayerPlayPauseStopButton;
+
     IBOutlet id navigatorViewToggleButton;
     IBOutlet VLCOneSplitView * mainSplitView;
     IBOutlet NSView * navigatorView;

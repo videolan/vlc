@@ -211,8 +211,8 @@
 
     [fillScreenButton bind:@"value" toObject:videoView withKeyPath:@"fillScreen" options: nil];
     [fullScreenButton bind:@"value" toObject:videoView withKeyPath:@"fullScreen" options: nil];
-    [fullScreenButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"playing" options: nil];
-    [fillScreenButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"playing" options: nil];
+    [fullScreenButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
+    [fillScreenButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
 
     [mediaReadingProgressSlider bind:@"enabled" toObject:mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
     [mediaReadingProgressSlider bind:@"enabled2" toObject:mediaPlayer withKeyPath:@"seekable" options: nil];
@@ -239,6 +239,20 @@
     /* Sound */
     [mediaSoundVolume bind:@"value" toObject:[VLCLibrary sharedLibrary] withKeyPath:@"audio.volume" options: nil];
 
+    /* mediaPlayer */
+    [mediaPlayerPlayPauseStopButton bind:@"enabled" toObject:mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
+    [mediaPlayerPlayPauseStopButton bind:@"state"   toObject:mediaPlayer withKeyPath:@"playing" options: nil];
+    [mediaPlayerPlayPauseStopButton bind:@"alternateImage" toObject:mediaPlayer withKeyPath:@"stateAsButtonAlternateImage" options: nil];
+    [mediaPlayerPlayPauseStopButton bind:@"image"   toObject:mediaPlayer withKeyPath:@"stateAsButtonImage" options: nil];
+    [mediaPlayerBackwardPrevButton  bind:@"enabled" toObject:mediaPlayer withKeyPath:@"playing" options: nil];
+    [mediaPlayerForwardNextButton   bind:@"enabled" toObject:mediaPlayer withKeyPath:@"playing" options: nil];
+    [mediaPlayerForwardNextButton   setTarget:mediaPlayer];
+    [mediaPlayerForwardNextButton   setAction:@selector(fastForward)];
+    [mediaPlayerBackwardPrevButton  setTarget:mediaPlayer];
+    [mediaPlayerBackwardPrevButton  setAction:@selector(rewind)];
+    [mediaPlayerPlayPauseStopButton setTarget:mediaPlayer];
+    [mediaPlayerPlayPauseStopButton setAction:@selector(pause)];
+    
     /* Last minute setup */
     [categoriesListView expandItem:nil expandChildren:YES];
     [categoriesListView selectRowIndexes:[NSIndexSet indexSetWithIndex:[categoriesListView numberOfRows] > 0 ? [categoriesListView numberOfRows]-1 : 0] byExtendingSelection:NO];
