@@ -1,7 +1,7 @@
 /*****************************************************************************
  * marq.c : marquee display video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright (C) 2003-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Mark Moriarty
@@ -139,9 +139,9 @@ vlc_module_begin();
                 VLC_FALSE );
 
     set_section( N_("Position"), NULL );
-    add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Font"), NULL );
@@ -159,8 +159,14 @@ vlc_module_begin();
                  VLC_FALSE );
 
     set_description( _("Marquee display") );
-    add_shortcut( "marq" );
     add_shortcut( "time" );
+    add_obsolete_string( "time-format" );
+    add_obsolete_string( "time-x" );
+    add_obsolete_string( "time-y" );
+    add_obsolete_string( "time-position" );
+    add_obsolete_string( "time-opacity" );
+    add_obsolete_string( "time-color" );
+    add_obsolete_string( "time-size" );
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
@@ -292,20 +298,20 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_ephemer = VLC_TRUE;
 
     /*  where to locate the string: */
-    if( p_sys->i_xoff < 0 || p_sys->i_yoff < 0 )
+    if( p_sys->i_pos < 0 )
     {   /* set to one of the 9 relative locations */
-        p_spu->p_region->i_align = p_sys->i_pos;
-        p_spu->i_x = 0;
-        p_spu->i_y = 0;
-        p_spu->b_absolute = VLC_FALSE;
-    }
-    else
-    {   /*  set to an absolute xy, referenced to upper left corner */
         p_spu->p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
-        p_spu->i_x = p_sys->i_xoff;
-        p_spu->i_y = p_sys->i_yoff;
         p_spu->b_absolute = VLC_TRUE;
     }
+    else
+    {   /*  set to an absolute xy */
+        p_spu->p_region->i_align = p_sys->i_pos;
+        p_spu->b_absolute = VLC_FALSE;
+    }
+
+    p_spu->i_x = p_sys->i_xoff;
+    p_spu->i_y = p_sys->i_yoff;
+
     p_spu->p_region->p_style = p_sys->p_style;
 
     return p_spu;
