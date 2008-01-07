@@ -320,8 +320,10 @@
         [[self layer] addSublayer:selectionLayer];
     }
     NSArray * items = [self.itemsTree objectAtIndexPath:selectedPath withNodeKeyPath:self.nodeKeyPath];
-    if( i < 0 ) i = 0;
+    if( [items count] <= 0 )
+        return;
     if( i >= [items count] ) i = [items count] - 1;
+    if( i < 0 ) i = 0;
 
     CALayer * layer = [[menuLayer sublayers] objectAtIndex: i];
     CGRect frame = layer.frame;
