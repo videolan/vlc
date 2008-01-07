@@ -71,6 +71,7 @@ NSString * VLCMediaMetaChanged              = @"VLCMediaMetaChanged";
 /* Callback Methods */
 - (void)metaChanged:(NSString *)metaType;
 - (void)subItemAdded;
+- (void)setStateAsNumber:(NSNumber *)newStateAsNumber;
 @end
 
 static VLCMediaState libvlc_state_to_media_state[] =
@@ -124,7 +125,7 @@ static void HandleMediaStateChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     [[VLCEventManager sharedManager] callOnMainThreadObject:self
-                                                 withMethod:@selector(setState:)
+                                                 withMethod:@selector(setStateAsNumber:)
                                        withArgumentAsObject:[NSNumber numberWithInt:
                                             LibVLCStateToMediaState(event->u.media_descriptor_state_changed.new_state)]];
     [pool release];
@@ -309,6 +310,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 @synthesize subitems;
 @synthesize metaDictionary;
 @synthesize state;
+
 @end
 
 /******************************************************************************
@@ -519,8 +521,14 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     length = value ? [value retain] : nil;
 }
 
-- (void)setState:(NSNumber *)newStateAsNumber
-{        
-    state = [newStateAsNumber intValue];
+- (void)setStateAsNumber:(NSNumber *)newStateAsNumber
+{
+    [self setState: [newStateAsNumber intValue]];
 }
+
+- (void)setState:(VLCMediaState)newState
+{
+    state = newState;
+}
+
 @end
