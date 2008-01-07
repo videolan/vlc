@@ -141,6 +141,7 @@
 
     [aLayer setNeedsLayout];
     [aLayer setNeedsDisplay];
+    [rootLayer setNeedsDisplayOnBoundsChange:YES];
     [rootLayer setNeedsDisplay];
     [rootLayer layoutIfNeeded];
     [CATransaction commit];

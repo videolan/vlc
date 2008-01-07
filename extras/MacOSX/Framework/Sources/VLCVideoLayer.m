@@ -70,6 +70,7 @@
     self.layoutManager = layoutManager;
     
     [self insertSublayer:voutLayer atIndex:0];
+    [self setNeedsDisplayOnBoundsChange:YES];
 
     [CATransaction commit];
 }
