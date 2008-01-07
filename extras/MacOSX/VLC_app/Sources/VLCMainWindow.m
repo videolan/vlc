@@ -269,6 +269,8 @@
 
 - (void)mediaListViewItemDoubleClicked:(id)sender
 {
+    if([[mediaArrayController selectedObjects] count] <= 0 )
+        return;
     [mediaPlayer setMedia:[[mediaArrayController selectedObjects] objectAtIndex:0]];
     [mediaPlayer play];
 }
