@@ -41,6 +41,9 @@
 
 - (void)layoutSublayersOfLayer:(CALayer *)layer
 {
+    [CATransaction begin];
+    [CATransaction setValue:[NSNumber numberWithBool:YES] forKey:kCATransactionDisableActions];
+    
     /* After having done everything normally resize the vlcopengllayer */
     if( [[layer sublayers] count] > 0 && [[[[layer sublayers] objectAtIndex:0] name] isEqualToString:@"vlcopengllayer"])
     {
@@ -59,5 +62,7 @@
         
         videolayer.frame = videoRect;
     }
+    
+    [CATransaction commit];
 }
 @end
