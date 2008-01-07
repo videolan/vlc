@@ -59,6 +59,7 @@ static void HandleMediaInstanceVolumeChanged(const libvlc_event_t * event, void 
 static void HandleMediaTimeChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaPlayerTimeChanged:) 
                                        withArgumentAsObject:[NSNumber numberWithLongLong:event->u.media_instance_time_changed.new_time]];
@@ -82,7 +83,7 @@ static void HandleMediaPositionChanged(const libvlc_event_t * event, void * self
 static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void * self)
 {
     VLCMediaPlayerState newState;
-    
+
     if( event->type == libvlc_MediaInstancePlayed )
         newState = VLCMediaPlayerStatePlaying;
     else if( event->type == libvlc_MediaInstancePaused )
@@ -128,13 +129,21 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 + (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key
 {
     static NSDictionary * dict = nil;
+    NSSet * superKeyPaths;
     if( !dict )
     {
         dict = [[NSDictionary dictionaryWithObjectsAndKeys:
             [NSSet setWithObject:@"state"], @"playing",
             [NSSet setWithObjects:@"state", @"media", nil], @"seekable",
+            [NSSet setWithObjects:@"state", @"media", nil], @"canPause",
             [NSSet setWithObjects:@"state", @"media", nil], @"description",
             nil] retain];
+    }
+    if( (superKeyPaths = [super keyPathsForValuesAffectingValueForKey: key]) )
+    {
+        NSMutableSet * ret = [NSMutableSet setWithSet:[dict objectForKey: key]];
+        [ret unionSet:superKeyPaths];
+        return ret;
     }
     return [dict objectForKey: key];
 }
@@ -261,12 +270,12 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return result;
 }
 
-- (void)setRate:(int)value
+- (void)setRate:(float)value
 {
     libvlc_media_instance_set_rate( instance, value, NULL );
 }
 
-- (int)rate
+- (float)rate
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -467,10 +476,25 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     // TODO: Should we pause this or destroy the media instance so that it appears as being "stopped"?
 }
 
-//- (void)fastForward;
-//- (void)fastForwardAtRate:(int)rate;
-//- (void)rewind;
-//- (void)rewindAtRate:(int)rate;
+- (void)fastForward
+{
+    [self fastForwardAtRate: 2.0];
+}
+
+- (void)fastForwardAtRate:(float)rate
+{
+    [self setRate:rate];
+}
+
+- (void)rewind
+{
+    [self rewindAtRate: 2.0];
+}
+
+- (void)rewindAtRate:(float)rate
+{
+    [self setRate: -rate];
+}
 
 - (BOOL)isPlaying
 {
@@ -531,6 +555,14 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     return ret;
 }
 
+- (BOOL)canPause
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    BOOL ret = libvlc_media_instance_can_pause( instance, &ex );
+    catch_exception( &ex );
+    return ret;
+}
 @end
 
 @implementation VLCMediaPlayer (Private)

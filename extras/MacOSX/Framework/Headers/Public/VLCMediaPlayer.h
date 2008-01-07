@@ -104,8 +104,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setVideoTeleText:(int)value;
 - (int)videoTeleText;
 
-- (void)setRate:(int)value;
-- (int)rate;
+@property float rate;
 
 /* Video Information */
 - (NSSize)videoSize;
@@ -157,24 +156,24 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 /**
  * Fast forwards through the feed at the standard 1x rate.
  */
-//- (void)fastForward;
+- (void)fastForward;
 
 /**
  * Fast forwards through the feed at the rate specified.
  * \param rate Rate at which the feed should be fast forwarded.
  */
-//- (void)fastForwardAtRate:(int)rate;
+- (void)fastForwardAtRate:(float)rate;
 
 /**
  * Rewinds through the feed at the standard 1x rate.
  */
-//- (void)rewind;
+- (void)rewind;
 
 /**
  * Rewinds through the feed at the rate specified.
  * \param rate Rate at which the feed should be fast rewound.
  */
-//- (void)rewindAtRate:(int)rate;
+- (void)rewindAtRate:(float)rate;
 
 /* Playback Information */
 /**
@@ -203,5 +202,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setPosition:(float)newPosition;
 
 - (BOOL)isSeekable;
+
+- (BOOL)canPause;
 
 @end
