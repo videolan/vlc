@@ -105,14 +105,14 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 
     add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
     /* default to 1000 ms per image, continuously cycle through them */
     add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "position", 6, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     /* subpicture filter submodule */
@@ -877,20 +877,19 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     vlc_mutex_unlock( &p_logo_list->lock );
 
     /*  where to locate the logo: */
-    if( p_sys->posx < 0 || p_sys->posy < 0 )
-    {   /* set to one of the 9 relative locations */
-        p_region->i_align = p_sys->pos;
-        p_spu->i_x = 0;
-        p_spu->i_y = 0;
-        p_spu->b_absolute = VLC_FALSE;
-    }
-    else
-    {   /*  set to an absolute xy, referenced to upper left corner */
-        p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
-        p_spu->i_x = p_sys->posx;
-        p_spu->i_y = p_sys->posy;
+    if( p_sys->pos < 0 )
+    {   /*  set to an absolute xy */
+        p_spu->p_region->i_align = OSD_ALIGN_RIGHT | OSD_ALIGN_TOP;
         p_spu->b_absolute = VLC_TRUE;
     }
+    else
+    {   /* set to one of the 9 relative locations */
+        p_spu->p_region->i_align = p_sys->pos;
+        p_spu->b_absolute = VLC_FALSE;
+    }
+
+    p_spu->i_x = p_sys->posx;
+    p_spu->i_y = p_sys->posy;
 
     p_spu->p_region = p_region;
 
