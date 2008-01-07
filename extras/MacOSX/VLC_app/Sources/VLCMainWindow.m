@@ -236,6 +236,9 @@
 
     [mainSplitView setDelegate:self];
 
+    /* Sound */
+    [mediaSoundVolume bind:@"value" toObject:[VLCLibrary sharedLibrary] withKeyPath:@"audio.volume" options: nil];
+
     /* Last minute setup */
     [categoriesListView expandItem:nil expandChildren:YES];
     [categoriesListView selectRowIndexes:[NSIndexSet indexSetWithIndex:[categoriesListView numberOfRows] > 0 ? [categoriesListView numberOfRows]-1 : 0] byExtendingSelection:NO];

@@ -44,6 +44,8 @@
     IBOutlet NSTextField * mediaReadingProgressText;
     IBOutlet NSTextField * mediaDescriptionText;
 
+    IBOutlet NSSlider * mediaSoundVolume;
+
     IBOutlet id navigatorViewToggleButton;
     IBOutlet VLCOneSplitView * mainSplitView;
     IBOutlet NSView * navigatorView;
