@@ -316,7 +316,7 @@
             [[self animator] setFrame:frame display:YES];
         }
         else
-            [[self animator] setContentHeight:[mainSplitView bounds].size.height + navigatorHeight + [mainSplitView dividerThickness]];
+            [[self animator] setContentHeight:[[self contentView] frame].size.height + navigatorHeight ];
         /* Hack, because sliding cause some glitches */
         [navigatorView moveSubviewsToVisible];
     }
@@ -324,7 +324,7 @@
     {
         /* Hide the navigator view (playlist view) */
         navigatorHeight = [navigatorView bounds].size.height;
-        [[self animator] setContentHeight:[mainSplitView bounds].origin.y + [mainSplitView bounds].size.height - navigatorHeight];
+        [[self animator] setContentHeight:[[self contentView] frame].size.height - navigatorHeight];
         /* Hack, because sliding cause some glitches */
         [navigatorView moveSubviewsToVisible];
     }
