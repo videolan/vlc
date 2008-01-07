@@ -437,6 +437,16 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)pause
 {
+    if( [NSThread isMainThread] )
+    {
+        /* Hack because we create a dead lock here, when the vout is stopped
+         * and tries to recontact us on the main thread */
+        /* FIXME: to do this properly we need to do some locking. We may want 
+         * to move that to libvlc */
+        [self performSelectorInBackground:@selector(pause) withObject:nil];
+        return;
+    }
+
     // Return if there is no media available or if the stream is not paused or 
     // playing something else
     if (!media || (![self isPlaying] && [self state] != VLCMediaPlayerStatePaused))
@@ -445,6 +455,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     // Should never get here.
     if (!instance)
         return;
+
 
     // Pause the stream
     libvlc_exception_t ex;
@@ -458,6 +469,16 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)stop
 {
+    if( [NSThread isMainThread] )
+    {
+        /* Hack because we create a dead lock here, when the vout is stopped
+         * and tries to recontact us on the main thread */
+        /* FIXME: to do this properly we need to do some locking. We may want 
+         * to move that to libvlc */
+        [self performSelectorInBackground:@selector(pause) withObject:nil];
+        return;
+    }
+
     // Return if there is no media available or if the system is not in play status 
     // or pause status.
     if (!media || (![self isPlaying] && [self state] != VLCMediaPlayerStatePaused))
