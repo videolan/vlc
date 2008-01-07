@@ -85,7 +85,6 @@
 
 - (NSString *)transformedValue:(id)value
 {
-    NSLog(@"%@", value);
     if( ![value isKindOfClass:[NSURL class]] || ![value isFileURL] )
         return @"";
 
