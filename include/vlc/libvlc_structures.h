@@ -67,6 +67,19 @@ typedef char * libvlc_tag_t;
 /**@} */
 
 /*****************************************************************************
+ * Time
+ *****************************************************************************/
+/** defgroup libvlc_time Time
+ * \ingroup libvlc
+ * LibVLC Time support in libvlc
+ * @{
+ */
+
+typedef vlc_int64_t libvlc_time_t;
+
+/**@} */
+
+/*****************************************************************************
  * Media Descriptor
  *****************************************************************************/
 /** defgroup libvlc_media_descriptor MediaDescriptor
@@ -373,7 +386,7 @@ typedef struct libvlc_event_t
         } media_instance_position_changed;
         struct
         {
-            long int new_time;
+            libvlc_time_t new_time;
         } media_instance_time_changed;
 
         /* media list */

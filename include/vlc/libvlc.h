@@ -230,7 +230,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
                                            libvlc_exception_t * p_e );
 
-VLC_PUBLIC_API vlc_int64_t
+VLC_PUBLIC_API libvlc_time_t
    libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
                                          libvlc_exception_t * p_e );
 
@@ -445,17 +445,17 @@ VLC_PUBLIC_API void libvlc_media_instance_stop ( libvlc_media_instance_t *, libv
 VLC_PUBLIC_API void libvlc_media_instance_set_drawable ( libvlc_media_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /** \bug This might go away ... to be replaced by a broader system */
-VLC_PUBLIC_API vlc_int64_t libvlc_media_instance_get_length     ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API vlc_int64_t libvlc_media_instance_get_time       ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_media_instance_set_time       ( libvlc_media_instance_t *, vlc_int64_t, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_media_instance_get_position   ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_media_instance_set_position   ( libvlc_media_instance_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_media_instance_set_chapter    ( libvlc_media_instance_t *, int, libvlc_exception_t *);
-VLC_PUBLIC_API int         libvlc_media_instance_get_chapter    (libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API int         libvlc_media_instance_get_chapter_count( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API vlc_bool_t  libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t libvlc_media_instance_get_length     ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t libvlc_media_instance_get_time       ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void          libvlc_media_instance_set_time       ( libvlc_media_instance_t *, libvlc_time_t, libvlc_exception_t *);
+VLC_PUBLIC_API float         libvlc_media_instance_get_position   ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void          libvlc_media_instance_set_position   ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API void          libvlc_media_instance_set_chapter    ( libvlc_media_instance_t *, int, libvlc_exception_t *);
+VLC_PUBLIC_API int           libvlc_media_instance_get_chapter    (libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int           libvlc_media_instance_get_chapter_count( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API vlc_bool_t    libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float         libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void          libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
 VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state   ( libvlc_media_instance_t *, libvlc_exception_t *);
 
 /**

@@ -221,7 +221,6 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_event_t event;
     event.type = libvlc_MediaInstanceTimeChanged;
     event.u.media_instance_time_changed.new_time = val.i_time;
-
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
 }
@@ -594,7 +593,7 @@ void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
 /**************************************************************************
  * Getters for stream information
  **************************************************************************/
-vlc_int64_t libvlc_media_instance_get_length(
+libvlc_time_t libvlc_media_instance_get_length(
                              libvlc_media_instance_t *p_mi,
                              libvlc_exception_t *p_e )
 {
@@ -611,7 +610,7 @@ vlc_int64_t libvlc_media_instance_get_length(
     return (val.i_time+500LL)/1000LL;
 }
 
-vlc_int64_t libvlc_media_instance_get_time(
+libvlc_time_t libvlc_media_instance_get_time(
                                    libvlc_media_instance_t *p_mi,
                                    libvlc_exception_t *p_e )
 {
@@ -629,7 +628,7 @@ vlc_int64_t libvlc_media_instance_get_time(
 
 void libvlc_media_instance_set_time(
                                  libvlc_media_instance_t *p_mi,
-                                 vlc_int64_t time,
+                                 libvlc_time_t time,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
