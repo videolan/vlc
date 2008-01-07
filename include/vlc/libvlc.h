@@ -386,6 +386,10 @@ VLC_PUBLIC_API vlc_bool_t libvlc_media_instance_is_seekable(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e );
 
+VLC_PUBLIC_API vlc_bool_t libvlc_media_instance_can_pause(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e );
+
 /** @}*/
 
 /*****************************************************************************

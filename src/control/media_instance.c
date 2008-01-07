@@ -131,8 +131,12 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
 {
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
+    libvlc_event_type_t type = newval.i_int;
 
-    switch ( newval.i_int )
+    if( strcmp( psz_cmd, "state" ) )
+        type = var_GetBool( p_this, "state" );
+
+    switch ( type )
     {
         case END_S:
             libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
@@ -521,6 +525,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     }
     var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
     var_AddCallback( p_input_thread, "seekable", input_state_changed, p_mi );
+    var_AddCallback( p_input_thread, "pausable", input_state_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
 
@@ -823,6 +828,27 @@ vlc_bool_t libvlc_media_instance_is_seekable(
         return VLC_FALSE;
     }
     var_Get( p_input_thread, "seekable", &val );
+    vlc_object_release( p_input_thread );
+
+    return val.b_bool;
+}
+
+vlc_bool_t libvlc_media_instance_can_pause(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_value_t val;
+
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if ( !p_input_thread )
+    {
+        /* We do return the right value, no need to throw an exception */
+        if( libvlc_exception_raised( p_e ) )
+            libvlc_exception_clear( p_e );
+        return VLC_FALSE;
+    }
+    var_Get( p_input_thread, "can-pause", &val );
     vlc_object_release( p_input_thread );
 
     return val.b_bool;
