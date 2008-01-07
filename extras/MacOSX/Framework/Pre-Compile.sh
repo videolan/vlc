@@ -115,4 +115,5 @@ if test "${ACTION}" = "build"; then
     # Build the library folder
     ##########################
     install_library "${VLC_BUILD_DIR}/src/.libs/libvlc-control.dylib" ${target_lib} "library"
+    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc.dylib" ${target_lib} "library"
 fi
