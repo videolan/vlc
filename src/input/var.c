@@ -448,6 +448,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "seekable", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE; /* Fixed later*/
     var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
+    var_Create( p_input, "can-pause", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE; /* Fixed later*/
+    var_Change( p_input, "can-pause", VLC_VAR_SETVALUE, &val, NULL );
 
     /* */
     var_Create( p_input, "access-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );

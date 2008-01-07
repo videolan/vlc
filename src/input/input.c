@@ -108,6 +108,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  *  - length
  *  - bookmarks
  *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown or not, for that check position != 0.0)
+ *  - can-pause
  * * For intf callback upon changes
  *  - intf-change
  * TODO explain when Callback is called
@@ -2265,6 +2266,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( demux2_Control( in->p_demux, DEMUX_CAN_PAUSE,
                             &in->b_can_pause ) )
             in->b_can_pause = VLC_FALSE;
+        var_SetBool( p_input, "can-pause", in->b_can_pause );
 
         int ret = demux2_Control( in->p_demux, DEMUX_CAN_SEEK,
                         &val.b_bool );
@@ -2361,6 +2363,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             access2_Control( in->p_access, ACCESS_CAN_PAUSE,
                              &in->b_can_pause );
+            var_SetBool( p_input, "can-pause", in->b_can_pause );
             access2_Control( in->p_access, ACCESS_CAN_SEEK,
                              &val.b_bool );
             var_Set( p_input, "seekable", val );
