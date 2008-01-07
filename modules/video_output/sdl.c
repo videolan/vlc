@@ -72,8 +72,6 @@ struct vout_sys_t
     vlc_bool_t  b_cursor_autohidden;
     mtime_t     i_lastmoved;
     mtime_t     i_lastpressed;                        /* to track dbl-clicks */
-
-    vlc_mutex_t lock;
 };
 
 /*****************************************************************************
@@ -155,8 +153,6 @@ static int Open ( vlc_object_t *p_this )
         vlc_mutex_unlock( lock );
         return VLC_ENOMEM;
     }
-
-    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
     /* Check if SDL video module has been initialized */
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
@@ -339,8 +335,6 @@ static void Close ( vlc_object_t *p_this )
     CloseDisplay( p_vout );
     SDL_QuitSubSystem( SDL_INIT_VIDEO );
 
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
-
     free( p_vout->p_sys );
 }
 
@@ -355,8 +349,6 @@ static int Manage( vout_thread_t *p_vout )
     SDL_Event event;                                            /* SDL event */
     vlc_value_t val;
     unsigned int i_width, i_height, i_x, i_y;
-
-    vlc_mutex_lock( &p_vout->p_sys->lock );
 
     /* Process events */
     while( SDL_PollEvent( &event ) )
@@ -631,8 +623,6 @@ static int Manage( vout_thread_t *p_vout )
         SDL_ShowCursor( 0 );
     }
 
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
-
     return VLC_SUCCESS;
 }
 
@@ -712,8 +702,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     unsigned int x, y, w, h;
     SDL_Rect disp;
 
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                        &x, &y, &w, &h );
     disp.x = x;
@@ -733,8 +721,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
         SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
     }
-
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 
 /* following functions are local */
