@@ -546,7 +546,10 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
     if( !p_input_thread )
         return;
 
-    input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
+    if( var_GetInteger( p_input_thread, "state" ) == PAUSE_S )
+        input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
+    else
+        input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
     vlc_object_release( p_input_thread );
 }
 
