@@ -60,13 +60,13 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOn );
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
-    BI( audio, ":/pixmaps/vlc_advprefs_audio.png" );
-    BI( video, ":/pixmaps/vlc_advprefs_video.png" );
-    BI( input, ":/pixmaps/vlc_advprefs_codec.png" );
-    BI( sout, ":/pixmaps/vlc_advprefs_sout.png" );
-    BI( advanced, ":/pixmaps/vlc_advprefs_extended.png" );
-    BI( playlist, ":/pixmaps/vlc_advprefs_playlist.png" );
-    BI( interface, ":/pixmaps/vlc_advprefs_intf.png" );
+    BI( audio, ":/pixmaps/advprefs_audio.png" );
+    BI( video, ":/pixmaps/advprefs_video.png" );
+    BI( input, ":/pixmaps/advprefs_codec.png" );
+    BI( sout, ":/pixmaps/advprefs_sout.png" );
+    BI( advanced, ":/pixmaps/advprefs_extended.png" );
+    BI( playlist, ":/pixmaps/advprefs_playlist.png" );
+    BI( interface, ":/pixmaps/advprefs_intf.png" );
 #undef BI
 
     /* Build the tree for the main module */
@@ -132,6 +132,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             break;
         case CONFIG_SUBCATEGORY:
             if( p_item->value.i == -1 ) break;
+
+            /* Special cases: move the main subcategories to the parent cat*/
             if( data &&
                 ( p_item->value.i == SUBCAT_VIDEO_GENERAL ||
                   p_item->value.i == SUBCAT_ADVANCED_MISC ||
@@ -155,6 +157,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                                        QVariant::fromValue( data ) );
                 continue;
             }
+
             data = new PrefsItemData();
             data->name = QString( qtr( config_CategoryNameGet(
                                                         p_item->value.i)) );
