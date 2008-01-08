@@ -560,10 +560,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
         case ACCESS_GET_CONTENT_TYPE:
+        case ACCESS_GET_META:
             return VLC_EGENERIC;
 
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
+            msg_Warn( p_access, "unimplemented query in control: %d", i_query);
             return VLC_EGENERIC;
 
     }
@@ -777,11 +778,16 @@ static int ftp_StopStream ( vlc_object_t *p_access, access_sys_t *p_sys )
 
     if( p_sys->fd_data != -1 )
     {
+        int i_answer;
+        ftp_ReadCommand( p_access, p_sys, &i_answer, NULL );
+        if ( i_answer != 227 )
+            /* If answer is from the previous command,
+             * rathen that succesful ABOR - read next command */
+            ftp_ReadCommand( p_access, p_sys, NULL, NULL );
+
         net_Close( p_sys->fd_data );
         p_sys->fd_data = -1;
-        ftp_ReadCommand( p_access, p_sys, NULL, NULL );
     }
-    ftp_ReadCommand( p_access, p_sys, NULL, NULL );
 
     return VLC_SUCCESS;
 }
