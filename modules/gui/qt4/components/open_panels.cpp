@@ -909,7 +909,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 CaptureOpenPanel::~CaptureOpenPanel()
 {
-    if( adv ) delete adv;
 }
 
 void CaptureOpenPanel::clear()
@@ -1046,37 +1045,42 @@ void CaptureOpenPanel::updateButtons()
         break;
     }
 
-    if( adv )
-    {
-        delete adv;
-        advMRL.clear();
-    }
+    advMRL.clear();
 }
 
 void CaptureOpenPanel::advancedDialog()
 {
+    /* Get selected device type */
     int i_devicetype = ui.deviceCombo->itemData(
                                 ui.deviceCombo->currentIndex() ).toInt();
+
+    /* Get the corresponding module */
     module_t *p_module =
         module_Find( VLC_OBJECT(p_intf), psz_devModule[i_devicetype] );
     if( NULL == p_module ) return;
 
-    unsigned int i_confsize;
+    /* Init */
     QList<ConfigControl *> controls;
 
+    /* Get the confsize  */
+    unsigned int i_confsize;
     module_config_t *p_config;
     p_config = module_GetConfig( p_module, &i_confsize );
 
+    /* New Adv Prop dialog */
     adv = new QDialog( this );
     adv->setWindowTitle( qtr( "Advanced options..." ) );
 
+    /* A main Layout with a Frame */
     QVBoxLayout *mainLayout = new QVBoxLayout( adv );
     //TODO QScrollArea
     QFrame *advFrame = new QFrame;
     mainLayout->addWidget( advFrame );
 
+    /* GridLayout inside the Frame */
     QGridLayout *gLayout = new QGridLayout( advFrame );
 
+    /* Create the options inside the FrameLayout */
     for( int n = 0; n < i_confsize; n++ )
     {
         module_config_t *p_item = p_config + n;
@@ -1085,17 +1089,7 @@ void CaptureOpenPanel::advancedDialog()
         controls.append( config );
     }
 
-   /* QGroupBox *optionGroup = new QGroupBox( qtr( "Advanced options..." ) );
-    QHBoxLayout *grLayout = new QHBoxLayout( optionGroup );
-
-    QLabel *optionLabel = new QLabel( qtr( "Options" ) + ":" );
-    grLayout->addWidget( optionLabel );
-
-    QLineEdit *optionLine = new QLineEdit;
-    grLayout->addWidget( optionLine );
-
-    gLayout->addWidget( optionGroup, i_confsize, 0, 1, -1 );*/
-
+    /* Button stuffs */
     QDialogButtonBox *advButtonBox = new QDialogButtonBox( adv );
     QPushButton *closeButton = new QPushButton( qtr( "Ok" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
@@ -1108,6 +1102,7 @@ void CaptureOpenPanel::advancedDialog()
 
     gLayout->addWidget( advButtonBox, i_confsize + 1, 0, 1, -1  );
 
+    /* Creation of the MRL */
     if( adv->exec() )
     {
         QString tempMRL = "";
@@ -1123,7 +1118,7 @@ void CaptureOpenPanel::advancedDialog()
             tempMRL += (i ? " :" : ":");
 
             if( control->getType() == CONFIG_ITEM_BOOL )
-                if( !( qobject_cast<VIntConfigControl *>(control)->getValue() ) )
+                if( !(qobject_cast<VIntConfigControl *>(control)->getValue() ) )
                     tempMRL += "no-";
 
             tempMRL += control->getName();
@@ -1145,7 +1140,9 @@ void CaptureOpenPanel::advancedDialog()
             }
         }
         advMRL = tempMRL;
-        msg_Dbg( p_intf, "%s", qtu( advMRL ) );
         updateMRL();
+        msg_Dbg( p_intf, "%s", qtu( advMRL ) );
     }
+    delete adv;
 }
+

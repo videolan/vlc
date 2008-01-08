@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>296</height>
+    <width>432</width>
+    <height>285</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -22,8 +22,8 @@
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <item>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="Tab" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
@@ -36,7 +36,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0" colspan="2" >
     <widget class="QCheckBox" name="advancedCheckBox" >
      <property name="toolTip" >
       <string>_("Show extended options")</string>
@@ -46,7 +46,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0" colspan="2" >
     <widget class="QFrame" name="advancedFrame" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="MinimumExpanding" hsizetype="Minimum" >
@@ -180,57 +180,31 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0" >
     <spacer>
      <property name="orientation" >
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType" >
-      <enum>QSizePolicy::MinimumExpanding</enum>
+      <enum>QSizePolicy::Minimum</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>20</width>
-       <height>1</height>
+       <width>240</width>
+       <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>6</number>
+   <item row="3" column="1" >
+    <widget class="QDialogButtonBox" name="buttonsBox" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="margin" >
-      <number>0</number>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::NoButton</set>
      </property>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Minimum</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>240</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="buttonsBox" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons" >
-        <set>QDialogButtonBox::NoButton</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    </widget>
    </item>
   </layout>
  </widget>
