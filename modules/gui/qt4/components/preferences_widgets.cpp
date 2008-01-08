@@ -47,14 +47,18 @@
 #include <QSignalMapper>
 #include <QDialogButtonBox>
 
+#define MINWIDTH_BOX 90
+#define LAST_COLUMN 10
+
 QString formatTooltip(const QString & tooltip)
 {
     QString formatted =
-    "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">"
-    " p, li { white-space: pre-wrap; } </style></head><body style=\" font-family:'Sans Serif';"
-    " font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;\">"
-    "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; "
-    "-qt-block-indent:0; text-indent:0px;\">" +
+    "<html><head><meta name=\"qrichtext\" content=\"1\" />"
+    "<style type=\"text/css\"> p, li { white-space: pre-wrap; } </style></head>"
+    "<body style=\" font-family:'Sans Serif'; font-size:9pt; font-weight:400; "
+    "font-style:normal; text-decoration:none;\">"
+    "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; "
+    "margin-right:0px; -qt-block-indent:0; text-indent:0px;\">" +
     tooltip +
     "</p></body></html>";
     return formatted;
@@ -64,7 +68,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                              module_config_t *p_item,
                                              QWidget *parent )
 {
-    int i=0;
+    int i = 0;
     return createControl( p_this, p_item, parent, NULL, i );
 }
 
@@ -208,12 +212,15 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
+        layout->addWidget( label, 0 ); layout->insertSpacing( 1, 10 );
+        layout->addWidget( text, LAST_COLUMN );
         widget->setLayout( layout );
     }
     else
     {
-        l->addWidget( label, line, 0 ); l->addWidget( text, line, 1 );
+        l->addWidget( label, line, 0 );
+        l->setColumnMinimumWidth( 1, 10 );
+        l->addWidget( text, line, LAST_COLUMN );
     }
 }
 
@@ -258,13 +265,15 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
     {
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget( label, 0 );
-        layout->addLayout( textAndButton, 1 );
+        layout->insertSpacing( 1, 10 );
+        layout->addLayout( textAndButton, LAST_COLUMN );
         widget->setLayout( layout );
     }
     else
     {
         l->addWidget( label, line, 0 );
-        l->addLayout( textAndButton, line, 1 );
+        l->setColumnMinimumWidth( 1, 10 );
+        l->addLayout( textAndButton, line, LAST_COLUMN );
     }
 }
 
@@ -354,19 +363,19 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
-    combo->setMinimumWidth( 80 );
+    combo->setMinimumWidth( MINWIDTH_BOX );
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
     finish( bycat );
     if( !l )
     {
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label ); layout->addWidget( combo );
-        widget->setLayout( layout );
+        l = new QGridLayout();
+        l->addWidget( label, 0, 0 ); l->addWidget( combo, 0, LAST_COLUMN );
+        widget->setLayout( l );
     }
     else
     {
         l->addWidget( label, line, 0 );
-        l->addWidget( combo, line, 1, Qt::AlignRight );
+        l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
     }
 
     if( p_item->i_action )
@@ -380,7 +389,8 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
                 new QPushButton( qfu( p_item->ppsz_action_text[i] ));
             CONNECT( button, clicked(), signalMapper, map() );
             signalMapper->setMapping( button, i );
-            l->addWidget( button, line, 2 + i, Qt::AlignRight );
+            l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i,
+                    Qt::AlignRight );
         }
         CONNECT( signalMapper, mapped( int ),
                 this, actionRequested( int ) );
@@ -466,18 +476,18 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
-    combo->setMinimumWidth( 80 );
+    combo->setMinimumWidth( MINWIDTH_BOX );
     finish( bycat );
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label ); layout->addWidget( combo );
+        layout->addWidget( label ); layout->addWidget( combo, LAST_COLUMN );
         widget->setLayout( layout );
     }
     else
     {
         l->addWidget( label, line, 0 );
-        l->addWidget( combo, line, 1, Qt::AlignRight );
+        l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
     }
 }
 
@@ -708,21 +718,21 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                            VIntConfigControl( _p_this, _p_item, _parent )
 {
     label = new QLabel( qtr(p_item->psz_text) );
-    spin = new QSpinBox; spin->setMinimumWidth( 80 );
+    spin = new QSpinBox; spin->setMinimumWidth( MINWIDTH_BOX );
     spin->setAlignment( Qt::AlignRight );
-    spin->setMaximumWidth( 90 );
+    spin->setMaximumWidth( MINWIDTH_BOX );
     finish();
 
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( spin, 1 );
+        layout->addWidget( label, 0 ); layout->addWidget( spin, LAST_COLUMN );
         widget->setLayout( layout );
     }
     else
     {
         l->addWidget( label, line, 0 );
-        l->addWidget( spin, line, 1, Qt::AlignRight );
+        l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
     }
 }
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
@@ -804,18 +814,18 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
-    combo->setMinimumWidth( 80 );
+    combo->setMinimumWidth( MINWIDTH_BOX );
     finish( bycat );
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label ); layout->addWidget( combo );
+        layout->addWidget( label ); layout->addWidget( combo, LAST_COLUMN );
         widget->setLayout( layout );
     }
     else
     {
         l->addWidget( label, line, 0 );
-        l->addWidget( combo, line, 1, Qt::AlignRight );
+        l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
     }
 }
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
@@ -904,22 +914,22 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
                     VFloatConfigControl( _p_this, _p_item, _parent )
 {
     label = new QLabel( qtr(p_item->psz_text) );
-    spin = new QDoubleSpinBox; 
-    spin->setMinimumWidth( 80 );
-    spin->setMaximumWidth( 90 );
+    spin = new QDoubleSpinBox;
+    spin->setMinimumWidth( MINWIDTH_BOX );
+    spin->setMaximumWidth( MINWIDTH_BOX );
     spin->setAlignment( Qt::AlignRight );
     finish();
 
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( spin, 1 );
+        layout->addWidget( label, 0 ); layout->addWidget( spin, LAST_COLUMN );
         widget->setLayout( layout );
     }
     else
     {
         l->addWidget( label, line, 0 );
-        l->addWidget( spin, line, 1, Qt::AlignRight );
+        l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
     }
 }
 
