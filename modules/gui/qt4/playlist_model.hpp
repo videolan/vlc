@@ -139,9 +139,6 @@ public:
                       int row, int column, const QModelIndex &target );
     QStringList mimeTypes() const;
 
-    void sendArt( QString url );
-    void removeArt( );
-
     int shownFlags() {  return rootItem->i_showflags;  }
 private:
     void addCallbacks();
@@ -184,7 +181,6 @@ private:
     int i_cached_id;
     int i_cached_input_id;
 signals:
-    void artSet( QString );
     void shouldRemove( int );
 public slots:
     void activateItem( const QModelIndex &index );

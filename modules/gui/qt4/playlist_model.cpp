@@ -173,14 +173,6 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     type = p_item->p_input->i_type;
     current = iscurrent;
 
-    char *psz_arturl = input_item_GetArtURL( p_item->p_input );
-    if( ( current && psz_arturl ) &&
-        !strncmp( psz_arturl, "file://", 7 ) )
-        model->sendArt( qfu( psz_arturl ) ) ;
-    else if( current )
-        model->removeArt();
-    free( psz_arturl );
-
     strings.clear();
 
     if( model->i_depth == 1 )  //left window for playlist etc.
@@ -826,17 +818,6 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
 }
 
 /************************* Actions ******************************/
-
-void PLModel::sendArt( QString url )
-{
-    QString arturl = url.replace( "file://",QString("" ) );
-    emit artSet( arturl );
-}
-
-void PLModel::removeArt()
-{
-    emit artSet( QString() );
-}
 
 /**
  * Deletion, here we have to do a ugly slow hack as we retrieve the full
