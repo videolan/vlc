@@ -980,7 +980,11 @@ static int Play( demux_t *p_demux )
         p_sys->i_timeout = p_sys->rtsp->sessionTimeoutParameter();
         if( p_sys->i_timeout <= 0 )
             p_sys->i_timeout = 60; /* default value from RFC2326 */
-        if( !p_sys->p_timeout )
+
+        /* start timeout-thread only on x-asf streams (wms), it has rtcp support but doesn't 
+         * seem to use it for liveness/keep-alive, get_parameter seems to work for it. get_parameter
+         * doesn't work with dss 5.5.4 & 5.5.5, they seems to work with rtcp */
+        if( !p_sys->p_timeout && p_sys->p_out_asf )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)vlc_object_create( p_demux, sizeof(timeout_thread_t) );
@@ -1648,8 +1652,12 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     if( (i_pts != tk->i_pts) && (!tk->b_muxed) )
     {
-        p_block->i_dts = ( tk->fmt.i_cat == VIDEO_ES ) ? 0 : i_pts;
         p_block->i_pts = i_pts;
+    }
+    if( !tk->b_muxed )
+    {
+        /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
+        p_block->i_dts = ( tk->fmt.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ) ? 0 : i_pts;
     }
 
     if( tk->b_muxed )
