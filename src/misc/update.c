@@ -1220,7 +1220,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         f_progress = 100.0*(float)l_downloaded/(float)l_size;
 
         if( asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done", p_update->release.psz_url,
-                      psz_size, psz_downloaded, f_progress ) != -1 )
+                      psz_downloaded, psz_size, f_progress ) != -1 )
         {
             intf_ProgressUpdate( p_udt, i_progress, psz_status, f_progress, 0 );
             free( psz_status );
