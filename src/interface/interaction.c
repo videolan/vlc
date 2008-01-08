@@ -263,7 +263,7 @@ int __intf_Progress( vlc_object_t *p_this, const char *psz_title,
     p_new->psz_description = strdup( psz_status );
     p_new->val.f_float = f_pos;
     p_new->i_timeToGo = i_time;
-    p_new->psz_alternate_button = strdup( _("Cancel" ) );
+    p_new->psz_alternate_button = strdup( _( "Cancel" ) );
 
     if( psz_title )
     {
@@ -310,6 +310,8 @@ void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
 
     p_dialog->i_status = UPDATED_DIALOG;
     vlc_mutex_unlock( &p_interaction->object_lock) ;
+
+    playlist_Signal( pl_Get( p_this ) );
 }
 
 /** Helper function to communicate dialogue cancellations between the
@@ -565,7 +567,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
         if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) // Wait for answer
         {
-            playlist_Signal( pl_Get(p_this) );
+            playlist_Signal( pl_Get( p_this ) );
             while( p_dialog->i_status != ANSWERED_DIALOG &&
                    p_dialog->i_status != HIDING_DIALOG &&
                    p_dialog->i_status != HIDDEN_DIALOG &&
@@ -582,7 +584,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
             }
             p_dialog->i_flags |= DIALOG_GOT_ANSWER;
             vlc_mutex_unlock( &p_interaction->object_lock );
-            playlist_Signal( pl_Get(p_this) );
+            playlist_Signal( pl_Get( p_this ) );
             return p_dialog->i_return;
         }
         else
@@ -590,7 +592,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
             // Pretend we already retrieved the "answer"
             p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
             vlc_mutex_unlock( &p_interaction->object_lock );
-            playlist_Signal( pl_Get(p_this) );
+            playlist_Signal( pl_Get( p_this ) );
             return VLC_SUCCESS;
         }
     }
