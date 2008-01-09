@@ -26,6 +26,7 @@
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 #include "components/playlist/playlist.hpp"
+#include "input_manager.hpp" /* art */
 
 #include <QSettings>
 #include <QLabel>
@@ -68,8 +69,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     /* Connects */
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
-    CONNECT( qobject_cast<StandardPLPanel *>( rightPanel )->model,
-             artSet( QString ) , this, setArt( QString ) );
+    CONNECT( THEMIM->getIM(), artChanged( QString ) , this, setArt( QString ) );
     /* Forward removal requests from the selector to the main panel */
     CONNECT( qobject_cast<PLSelector *>( selector )->model,
              shouldRemove( int ),
