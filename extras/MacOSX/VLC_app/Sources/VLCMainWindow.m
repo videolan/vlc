@@ -27,6 +27,7 @@
 #import "VLCMediaArrayController.h"
 #import "VLCBrowsableVideoView.h"
 #import "VLCAppAdditions.h"
+#import "VLCFullScreenControllerWindow.h"
 
 @interface VLCMainWindow (NavigatorViewHidingShowing)
 @property float contentHeight; /* animatable, keep the mainSplitView cursor at the same place, enabling playlist(navigator) togling */
@@ -106,6 +107,10 @@
  * VLCMainWindow
  */
 @implementation VLCMainWindow
+
+@synthesize mediaPlayer;
+@synthesize videoView;
+
 - (void)awakeFromNib;
 {
     NSTableColumn * tableColumn;
@@ -117,7 +122,7 @@
     /***********************************
      * Init the media player
      */
-    mediaPlayer = [[VLCMediaPlayer alloc] initWithVideoView:videoView];
+    [mediaPlayer setVideoView:videoView];
 
     /***********************************
      * CategoriesList OutlineView content
@@ -252,7 +257,7 @@
     [mediaPlayerBackwardPrevButton  setAction:@selector(rewind)];
     [mediaPlayerPlayPauseStopButton setTarget:mediaPlayer];
     [mediaPlayerPlayPauseStopButton setAction:@selector(pause)];
-    
+
     /* Last minute setup */
     [categoriesListView expandItem:nil expandChildren:YES];
     [categoriesListView selectRowIndexes:[NSIndexSet indexSetWithIndex:[categoriesListView numberOfRows] > 0 ? [categoriesListView numberOfRows]-1 : 0] byExtendingSelection:NO];

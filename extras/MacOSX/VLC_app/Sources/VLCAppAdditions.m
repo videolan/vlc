@@ -6,6 +6,8 @@
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *          Felix Kühne <fkuehne at videolan dot org>
+ *          Jérôme Decoodt <djc at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,6 +122,208 @@
         [[[self subviews] objectAtIndex:1] setFrame: frame0];
     }
     [[[self subviews] objectAtIndex:1] setFrame: frame1];
+}
+@end
+
+/*****************************************************************************
+ * NSScreen (VLCAdditions)
+ *
+ *  Missing extension to NSScreen
+ *****************************************************************************/
+
+@implementation NSScreen (VLCAdditions)
+
+static NSMutableArray *blackoutWindows = NULL;
+
++ (void)load
+{
+    /* init our fake object attribute */
+    blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
+}
+
++ (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
+{
+    int i;
+ 
+    for( i = 0; i < [[NSScreen screens] count]; i++ )
+    {
+        NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        if([screen displayID] == displayID)
+            return screen;
+    }
+    return nil;
+}
+
+- (BOOL)isMainScreen
+{
+    return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+}
+
+- (BOOL)isScreen: (NSScreen*)screen
+{
+    return ([self displayID] == [screen displayID]);
+}
+
+- (CGDirectDisplayID)displayID
+{
+    return (CGDirectDisplayID)_screenNumber;
+}
+
+- (void)blackoutOtherScreens
+{
+    unsigned int i;
+
+    /* Free our previous blackout window (follow blackoutWindow alloc strategy) */
+    [blackoutWindows makeObjectsPerformSelector:@selector(close)];
+    [blackoutWindows removeAllObjects];
+
+ 
+    for(i = 0; i < [[NSScreen screens] count]; i++)
+    {
+        NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        VLCWindow *blackoutWindow;
+        NSRect screen_rect;
+ 
+        if([self isScreen: screen])
+            continue;
+
+        screen_rect = [screen frame];
+        screen_rect.origin.x = screen_rect.origin.y = 0.0f;
+
+        /* blackoutWindow alloc strategy
+            - The NSMutableArray blackoutWindows has the blackoutWindow references
+            - blackoutOtherDisplays is responsible for alloc/releasing its Windows
+        */
+        blackoutWindow = [[VLCWindow alloc] initWithContentRect: screen_rect styleMask: NSBorderlessWindowMask
+                backing: NSBackingStoreBuffered defer: NO screen: screen];
+        [blackoutWindow setBackgroundColor:[NSColor blackColor]];
+        [blackoutWindow setLevel: NSFloatingWindowLevel]; /* Disappear when Expose is triggered */
+ 
+        [blackoutWindow orderFront: self];
+
+        [blackoutWindows addObject: blackoutWindow];
+        [blackoutWindow release];
+    }
+}
+
++ (void)unblackoutScreens
+{
+    unsigned int i;
+
+    for(i = 0; i < [blackoutWindows count]; i++)
+    {
+        VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex: i];
+        [blackoutWindow close];
+    }
+}
+
+@end
+
+/*****************************************************************************
+ * VLCWindow
+ *
+ *  Missing extension to NSWindow
+ *****************************************************************************/
+
+@implementation VLCWindow
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(unsigned int)styleMask
+    backing:(NSBackingStoreType)backingType defer:(BOOL)flag
+{
+    self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
+    if( self )
+        isset_canBecomeKeyWindow = NO;
+    return self;
+}
+- (void)setCanBecomeKeyWindow: (BOOL)canBecomeKey
+{
+    isset_canBecomeKeyWindow = YES;
+    canBecomeKeyWindow = canBecomeKey;
+}
+
+- (BOOL)canBecomeKeyWindow
+{
+    if(isset_canBecomeKeyWindow)
+        return canBecomeKeyWindow;
+
+    return [super canBecomeKeyWindow];
+}
+@end
+
+/*****************************************************************************
+ * VLCImageCustomizedSlider
+ *
+ *  Slider personalized by backgroundImage and knobImage
+ *****************************************************************************/
+@implementation VLCImageCustomizedSlider
+@synthesize backgroundImage;
+@synthesize knobImage;
+
+- (id)initWithFrame:(NSRect)frame
+{
+    if(self = [super initWithFrame:frame])
+    {
+        knobImage = nil;
+        backgroundImage = nil;
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [knobImage release];
+    [knobImage release];
+    [super dealloc];
+}
+
+- (void)drawKnobInRect:(NSRect) knobRect
+{
+    NSRect imageRect;
+    imageRect.size = [self.knobImage size];
+    imageRect.origin.x = 0;
+    imageRect.origin.y = 0;
+    knobRect.origin.x += (knobRect.size.width - imageRect.size.width) / 2;
+    knobRect.origin.y += (knobRect.size.width - imageRect.size.width) / 2;
+    knobRect.size.width = imageRect.size.width;
+    knobRect.size.height = imageRect.size.height;
+    [self.knobImage drawInRect:knobRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1];
+}
+
+- (void)drawBackgroundInRect:(NSRect) drawRect
+{
+    NSRect imageRect = drawRect;
+    imageRect.origin.y += ([self.backgroundImage size].height - [self bounds].size.height ) / 2;
+    [self.backgroundImage drawInRect:drawRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1];
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    /* Draw default to make sure the slider behaves correctly */
+    [[NSGraphicsContext currentContext] saveGraphicsState];
+    NSRectClip(NSZeroRect);
+    [super drawRect:rect];
+    [[NSGraphicsContext currentContext] restoreGraphicsState];
+    if( self.backgroundImage ) 
+        [self drawBackgroundInRect: rect];
+    if( self.knobImage ) 
+    {
+        NSRect knobRect = [[self cell] knobRectFlipped:NO];
+        [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
+        [self drawKnobInRect: knobRect];
+    }
+}
+
+@end
+
+/*****************************************************************************
+ * NSImageView (VLCAppAdditions)
+ *
+ *  Make the image view  move the window by mouse down by default
+ *****************************************************************************/
+
+@implementation NSImageView (VLCAppAdditions)
+- (void)mouseDownCanMoveWindow
+{
+    return YES;
 }
 @end
 

@@ -6,6 +6,8 @@
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *          Felix Kühne <fkuehne at videolan dot org>
+ *          Jérôme Decoodt <djc at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,20 +26,33 @@
 
 #import <Cocoa/Cocoa.h>
 
+/*****************************************************************************
+ * NSIndexPath (VLCAppAddition)
+ *****************************************************************************/
 @interface NSIndexPath (VLCAppAddition)
 - (NSIndexPath *)indexPathByRemovingFirstIndex;
 - (NSUInteger)lastIndex;
 @end
 
+/*****************************************************************************
+ * NSArray (VLCAppAddition)
+ *****************************************************************************/
 @interface NSArray (VLCAppAddition)
 - (id)objectAtIndexPath:(NSIndexPath *)path withNodeKeyPath:(NSString *)nodeKeyPath;
 @end
 
+/*****************************************************************************
+ * NSView (VLCAppAdditions)
+ *****************************************************************************/
 @interface NSView (VLCAppAdditions)
 - (void)moveSubviewsToVisible;
 @end
 
-/* Split view that supports slider animation */
+/*****************************************************************************
+ * VLCOneSplitView
+ *
+ *  Missing functionality to a one-split view
+ *****************************************************************************/
 @interface VLCOneSplitView : NSSplitView
 {
     BOOL fixedCursorDuringResize;
@@ -45,4 +60,65 @@
 @property (assign) BOOL fixedCursorDuringResize;
 - (float)sliderPosition;
 - (void)setSliderPosition:(float)newPosition;
+@end
+
+/*****************************************************************************
+ * NSScreen (VLCAdditions)
+ *
+ *  Missing extension to NSScreen
+ *****************************************************************************/
+
+@interface NSScreen (VLCAdditions)
+
++ (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
+- (BOOL)isMainScreen;
+- (BOOL)isScreen: (NSScreen*)screen;
+- (CGDirectDisplayID)displayID;
+- (void)blackoutOtherScreens;
++ (void)unblackoutScreens;
+@end
+
+/*****************************************************************************
+ * VLCWindow
+ *
+ *  Missing extension to NSWindow (Used only when needing setCanBecomeKeyWindow)
+ *****************************************************************************/
+
+@interface VLCWindow : NSWindow
+{
+    BOOL canBecomeKeyWindow;
+    BOOL isset_canBecomeKeyWindow;
+}
+- (void)setCanBecomeKeyWindow: (BOOL)canBecomeKey;
+@end
+
+
+/*****************************************************************************
+ * VLCImageCustomizedSlider
+ *
+ *  Slider personalized by backgroundImage and knobImage
+ *****************************************************************************/
+
+@interface VLCImageCustomizedSlider : NSSlider
+{
+    NSImage * knobImage;
+    NSImage * backgroundImage;
+}
+@property (retain) NSImage * knobImage;
+@property (retain) NSImage * backgroundImage;
+
+- (void)drawKnobInRect: (NSRect)knobRect;
+- (void)drawBackgroundInRect: (NSRect)knobRect;
+
+- (void)drawRect: (NSRect)rect;
+@end
+
+/*****************************************************************************
+ * NSImageView (VLCAppAdditions)
+ *
+ *  Make the image view move the window by mouse down by default
+ *****************************************************************************/
+
+@interface NSImageView (VLCAppAdditions)
+- (void)mouseDownCanMoveWindow;
 @end

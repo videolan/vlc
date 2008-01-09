@@ -201,6 +201,14 @@
 {
     return [NSSet setWithObjects:@"state", @"playing", @"canPause", nil];
 }
++ (NSSet *)keyPathsForValuesAffectingStateAsFullScreenButtonImage
+{
+    return [NSSet setWithObjects:@"state", @"playing", @"canPause", nil];
+}
++ (NSSet *)keyPathsForValuesAffectingStateAsFullScreenButtonAlternateImage
+{
+    return [NSSet setWithObjects:@"state", @"playing", @"canPause", nil];
+}
 
 - (NSString *)description
 {
@@ -229,4 +237,25 @@
     else
         return [NSImage imageNamed:@"play_blue.png"];
 }
+
+- (NSImage *)stateAsFullScreenButtonImage
+{
+    if([self state] == VLCMediaPlayerStatePlaying && [self canPause])
+        return [NSImage imageNamed:@"fs_pause.png"];
+    else if( [self state] == VLCMediaPlayerStatePlaying )
+        return [NSImage imageNamed:@"fs_stop.png"];
+    else
+        return [NSImage imageNamed:@"fs_play.png"];
+}
+
+- (NSImage *)stateAsFullScreenButtonAlternateImage
+{
+    if([self state] == VLCMediaPlayerStatePlaying && [self canPause])
+        return [NSImage imageNamed:@"fs_pause_highlight.png"];
+    else if( [self state] == VLCMediaPlayerStatePlaying )
+        return [NSImage imageNamed:@"fs_stop_highlight.png"];
+    else
+        return [NSImage imageNamed:@"fs_play_highlight.png"];
+}
+
 @end

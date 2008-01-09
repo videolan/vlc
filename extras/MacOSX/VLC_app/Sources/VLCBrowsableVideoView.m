@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCBrowsableVideoView.h: VideoView subclasses that allow fullscreen
+ * VLCBrowsableVideoView.h: VideoView subclasses that allow fullScreen
  * browsing
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
@@ -22,6 +22,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+/* DisableScreenUpdates, SetSystemUIMode, ... */
+#import <QuickTime/QuickTime.h>
 
 #import "VLCBrowsableVideoView.h"
 #import "VLCAppAdditions.h"
@@ -46,6 +49,16 @@
 - (void)displayEmptyView;
 @end
 
+
+@interface VLCBrowsableVideoView (FullScreenTransition)
+- (void)hasEndedFullScreen;
+- (void)hasBecomeFullScreen;
+
+- (void)enterFullScreen:(NSScreen *)screen;
+- (void)leaveFullScreen;
+- (void)leaveFullScreenAndFadeOut: (BOOL)fadeout;
+
+@end
 
 /******************************************************************************
  * VLCBrowsableVideoView
@@ -72,7 +85,7 @@
 
 - (BOOL)fullScreen
 {
-    return [super isInFullScreenMode];
+    return [self isInFullScreenMode];
 }
 
 - (void)setFullScreen:(BOOL)newFullScreen
@@ -82,11 +95,13 @@
     
     if( newFullScreen )
     {
-        [super enterFullScreenMode:[[self window] screen] withOptions:nil];
+        [self enterFullScreenMode:[[self window] screen] withOptions:
+                    [NSDictionary dictionaryWithObject: [NSNumber numberWithInt:1]
+                                                forKey: NSFullScreenModeWindowLevel]];
     }
     else
     {
-        [super exitFullScreenModeWithOptions:nil];
+        [self exitFullScreenModeWithOptions:nil];
     }
 }
 
@@ -101,9 +116,18 @@
     selectionLayer = backLayer = nil;
     menuLayer = nil;
     selectedPath = [[NSIndexPath alloc] init];
+    tempFullScreenView = [[NSView alloc] init];
+    fullScreen = NO;
     /* Observe our bindings */
     //[self displayMenu];
     //[self changeSelectedIndex:0];
+}
+
+- (void)dealloc
+{
+    [tempFullScreenView release];
+    [selectedPath release];
+    [super dealloc];
 }
 
 /* Hiding/Displaying the menu */
@@ -206,6 +230,23 @@
         [super keyDown: theEvent];
 
 }
+
+- (void)enterFullScreenMode:(NSScreen *)screen withOptions:(NSDictionary *)options
+{
+    [self enterFullScreen: screen];
+}
+
+- (void)exitFullScreenModeWithOptions:(NSDictionary *)options
+{
+    [self leaveFullScreen];
+
+}
+
+- (BOOL)isInFullScreenMode
+{
+    return fullScreen;
+}
+
 @end
 
 /******************************************************************************
@@ -430,4 +471,288 @@
     menuLayer = layer;
     selectionLayer = nil;
 }
+
+
 @end
+
+@implementation VLCBrowsableVideoView (FullScreenTransition)
+
+- (void)enterFullScreen:(NSScreen *)screen
+{
+    NSMutableDictionary *dict1,*dict2;
+    NSRect screenRect;
+    NSRect aRect;
+            
+    screenRect = [screen frame];
+        
+    [NSCursor setHiddenUntilMouseMoves: YES];
+    
+    /* Only create the o_fullScreen_window if we are not in the middle of the zooming animation */
+    if (!fullScreenWindow)
+    {
+        /* We can't change the styleMask of an already created NSWindow, so we create an other window, and do eye catching stuff */
+        
+        aRect = [[self superview] convertRect: [self frame] toView: nil]; /* Convert to Window base coord */
+        aRect.origin.x += [[self window] frame].origin.x;
+        aRect.origin.y += [[self window] frame].origin.y;
+        fullScreenWindow = [[VLCWindow alloc] initWithContentRect:aRect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+        [fullScreenWindow setBackgroundColor: [NSColor blackColor]];
+        [fullScreenWindow setCanBecomeKeyWindow: YES];
+
+        if (![[self window] isVisible] || [[self window] alphaValue] == 0.0 || [self isHiddenOrHasHiddenAncestor] )
+        {
+            /* We don't animate if we are not visible or if we are running on
+             * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+             * simply fade the display */
+            CGDisplayFadeReservationToken token;
+ 
+            [fullScreenWindow setFrame:screenRect display:NO];
+ 
+            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+            CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
+ 
+            if ([screen isMainScreen])
+                SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+ 
+            [self retain];
+            [[self superview] replaceSubview:self with:tempFullScreenView];
+            [tempFullScreenView setFrame:[self frame]];
+            [fullScreenWindow setContentView:self];
+            [fullScreenWindow makeKeyAndOrderFront:self];
+            [self release];
+            [[tempFullScreenView window] orderOut: self];
+
+            CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
+            CGReleaseDisplayFadeReservation( token);
+
+            [self hasBecomeFullScreen];
+
+            return;
+        }
+ 
+        /* Make sure we don't see the o_view disappearing of the screen during this operation */
+        DisableScreenUpdates();
+        [self retain]; /* Removing from a view, make sure we won't be released */
+        /* Make sure our layer won't disappear */
+        CALayer * layer = [[self layer] retain];
+        id alayoutManager = layer.layoutManager;
+        [[self superview] replaceSubview:self with:tempFullScreenView];
+        [tempFullScreenView setFrame:[self frame]];
+        [fullScreenWindow setContentView:self];
+        [self setWantsLayer:YES];
+        [self setLayer:layer];
+        layer.layoutManager = alayoutManager;
+
+        [fullScreenWindow makeKeyAndOrderFront:self];
+        EnableScreenUpdates();
+    }
+
+    /* We are in fullScreen (and no animation is running) */
+    if (fullScreen)
+    {
+        /* Make sure we are hidden */
+        [[tempFullScreenView window] orderOut: self];
+        return;
+    }
+
+    if (fullScreenAnim1)
+    {
+        [fullScreenAnim1 stopAnimation];
+        [fullScreenAnim1 release];
+    }
+    if (fullScreenAnim2)
+    {
+        [fullScreenAnim2 stopAnimation];
+        [fullScreenAnim2 release];
+    }
+ 
+    if ([screen isMainScreen])
+        SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+
+    dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
+    dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];
+
+    [dict1 setObject:[tempFullScreenView window] forKey:NSViewAnimationTargetKey];
+    [dict1 setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+
+    [dict2 setObject:fullScreenWindow forKey:NSViewAnimationTargetKey];
+    [dict2 setObject:[NSValue valueWithRect:[fullScreenWindow frame]] forKey:NSViewAnimationStartFrameKey];
+    [dict2 setObject:[NSValue valueWithRect:screenRect] forKey:NSViewAnimationEndFrameKey];
+
+    /* Strategy with NSAnimation allocation:
+        - Keep at most 2 animation at a time
+        - leaveFullScreen/enterFullScreen are the only responsible for releasing and alloc-ing
+    */
+    fullScreenAnim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict1, nil]];
+    fullScreenAnim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict2, nil]];
+
+    [dict1 release];
+    [dict2 release];
+
+    [fullScreenAnim1 setAnimationBlockingMode: NSAnimationNonblocking];
+    [fullScreenAnim1 setDuration: 0.3];
+    [fullScreenAnim1 setFrameRate: 30];
+    [fullScreenAnim2 setAnimationBlockingMode: NSAnimationNonblocking];
+    [fullScreenAnim2 setDuration: 0.3];
+    [fullScreenAnim2 setFrameRate: 30];
+
+    [fullScreenAnim2 setDelegate: self];
+    [fullScreenAnim2 startWhenAnimation: fullScreenAnim1 reachesProgress: 1.0];
+
+    [fullScreenAnim1 startAnimation];
+}
+
+- (void)hasBecomeFullScreen
+{
+    [fullScreenWindow makeFirstResponder: self];
+
+    [fullScreenWindow makeKeyWindow];
+    [fullScreenWindow setAcceptsMouseMovedEvents: TRUE];
+ 
+    [[tempFullScreenView window] orderOut: self];
+    [self willChangeValueForKey:@"fullScreen"];
+    fullScreen = YES;
+    [self didChangeValueForKey:@"fullScreen"];
+}
+
+- (void)leaveFullScreen
+{
+    [self leaveFullScreenAndFadeOut: NO];
+}
+
+- (void)leaveFullScreenAndFadeOut: (BOOL)fadeout
+{
+    NSMutableDictionary *dict1, *dict2;
+    NSRect frame;
+
+    [self willChangeValueForKey:@"fullScreen"];
+    fullScreen = NO;
+    [self didChangeValueForKey:@"fullScreen"];
+
+    /* Don't do anything if o_fullScreen_window is already closed */
+    if (!fullScreenWindow)
+        return;
+
+    if (fadeout || [tempFullScreenView isHiddenOrHasHiddenAncestor])
+    {
+        /* We don't animate if we are not visible or if we are running on
+        * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+        * simply fade the display */
+        CGDisplayFadeReservationToken token;
+
+        CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+        CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
+
+        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+
+        [self hasEndedFullScreen];
+
+        CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
+        CGReleaseDisplayFadeReservation( token);
+        return;
+    }
+
+    [[tempFullScreenView window] setAlphaValue: 0.0];
+    [[tempFullScreenView window] orderFront: self];
+
+    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+
+    if (fullScreenAnim1)
+    {
+        [fullScreenAnim1 stopAnimation];
+        [fullScreenAnim1 release];
+    }
+    if (fullScreenAnim2)
+    {
+        [fullScreenAnim2 stopAnimation];
+        [fullScreenAnim2 release];
+    }
+
+    frame = [[tempFullScreenView superview] convertRect: [tempFullScreenView frame] toView: nil]; /* Convert to Window base coord */
+    frame.origin.x += [tempFullScreenView window].frame.origin.x;
+    frame.origin.y += [tempFullScreenView window].frame.origin.y;
+
+    dict2 = [[NSMutableDictionary alloc] initWithCapacity:2];
+    [dict2 setObject:[tempFullScreenView window] forKey:NSViewAnimationTargetKey];
+    [dict2 setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+
+    fullScreenAnim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict2, nil]];
+    [dict2 release];
+
+    [fullScreenAnim2 setAnimationBlockingMode: NSAnimationNonblocking];
+    [fullScreenAnim2 setDuration: 0.3];
+    [fullScreenAnim2 setFrameRate: 30];
+
+    [fullScreenAnim2 setDelegate: self];
+
+    dict1 = [[NSMutableDictionary alloc] initWithCapacity:3];
+
+    [dict1 setObject:fullScreenWindow forKey:NSViewAnimationTargetKey];
+    [dict1 setObject:[NSValue valueWithRect:[fullScreenWindow frame]] forKey:NSViewAnimationStartFrameKey];
+    [dict1 setObject:[NSValue valueWithRect:frame] forKey:NSViewAnimationEndFrameKey];
+
+    fullScreenAnim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict1, nil]];
+    [dict1 release];
+
+    [fullScreenAnim1 setAnimationBlockingMode: NSAnimationNonblocking];
+    [fullScreenAnim1 setDuration: 0.2];
+    [fullScreenAnim1 setFrameRate: 30];
+    [fullScreenAnim2 startWhenAnimation: fullScreenAnim1 reachesProgress: 1.0];
+
+    /* Make sure o_fullScreen_window is the frontmost window */
+    [fullScreenWindow orderFront: self];
+
+    [fullScreenAnim1 startAnimation];
+}
+
+- (void)hasEndedFullScreen
+{
+    /* This function is private and should be only triggered at the end of the fullScreen change animation */
+    /* Make sure we don't see the o_view disappearing of the screen during this operation */
+    DisableScreenUpdates();
+    [self retain];
+    /* Make sure we don't loose the layer */
+    CALayer * layer = [[self layer] retain];
+    id alayoutManager = layer.layoutManager;
+    [self removeFromSuperviewWithoutNeedingDisplay];
+    [[tempFullScreenView superview] replaceSubview:tempFullScreenView with:self];
+    [self release];
+    [self setWantsLayer:YES];
+    [self setLayer:layer];
+    layer.layoutManager = alayoutManager;
+
+    [self setFrame:[tempFullScreenView frame]];
+    [[self window] makeFirstResponder: self];
+    if ([[self window] isVisible])
+        [[self window] makeKeyAndOrderFront:self];
+    [fullScreenWindow orderOut: self];
+    EnableScreenUpdates();
+
+    [fullScreenWindow release];
+    fullScreenWindow = nil;
+}
+
+- (void)animationDidEnd:(NSAnimation*)animation
+{
+    NSArray *viewAnimations;
+
+    if ([animation currentValue] < 1.0)
+        return;
+
+    /* FullScreen ended or started (we are a delegate only for leaveFullScreen's/enterFullscren's anim2) */
+    viewAnimations = [fullScreenAnim2 viewAnimations];
+    if ([viewAnimations count] >=1 &&
+        [[[viewAnimations objectAtIndex: 0] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect])
+    {
+        /* FullScreen ended */
+        [self hasEndedFullScreen];
+    }
+    else
+    {
+        /* FullScreen started */
+        [self hasBecomeFullScreen];
+    }
+}
+
+@end
+

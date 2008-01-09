@@ -25,6 +25,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <VLCKit/VLCKit.h>
+#import "VLCAppAdditions.h"
 
 @interface VLCBrowsableVideoView : VLCVideoView {
     BOOL            menuDisplayed;
@@ -43,6 +44,12 @@
     /* Actions on non-node items*/
     id target;
     SEL action;
+
+    /* FullScreenTransition */
+    VLCWindow * fullScreenWindow;
+    NSViewAnimation * fullScreenAnim1;
+    NSViewAnimation * fullScreenAnim2;
+    NSView * tempFullScreenView;
 }
 
 /* Binds an nsarray to that property. But don't forget the set the access keys. */

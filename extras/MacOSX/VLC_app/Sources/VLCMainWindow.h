@@ -64,7 +64,7 @@
     IBOutlet NSView * toolbarMediaDescription;
     IBOutlet NSView * toolbarMediaControl;
 
-    VLCMediaPlayer * mediaPlayer;
+    IBOutlet VLCMediaPlayer * mediaPlayer;
 
     IBOutlet VLCController * controller; /* This is a VLCController binded to the File's Owner of the nib */
 
@@ -77,4 +77,6 @@
 }
 
 @property BOOL navigatorViewVisible;
+@property (readonly) VLCMediaPlayer * mediaPlayer;
+@property (readonly) VLCBrowsableVideoView * videoView;
 @end
