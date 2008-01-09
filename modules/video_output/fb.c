@@ -239,7 +239,7 @@ static int Create( vlc_object_t *p_this )
     {
         case 0: /* QCIF */
             p_sys->i_width  = 176;
-            p_sys->i_height = 144;;
+            p_sys->i_height = 144;
             break;
         case 1: /* CIF */
             p_sys->i_width  = 352;
