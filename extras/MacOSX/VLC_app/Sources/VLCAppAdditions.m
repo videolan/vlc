@@ -321,7 +321,7 @@ static NSMutableArray *blackoutWindows = NULL;
  *****************************************************************************/
 
 @implementation NSImageView (VLCAppAdditions)
-- (void)mouseDownCanMoveWindow
+- (BOOL)mouseDownCanMoveWindow
 {
     return YES;
 }

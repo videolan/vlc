@@ -120,5 +120,5 @@
  *****************************************************************************/
 
 @interface NSImageView (VLCAppAdditions)
-- (void)mouseDownCanMoveWindow;
+- (BOOL)mouseDownCanMoveWindow;
 @end
