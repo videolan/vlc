@@ -117,6 +117,7 @@ if test "${ACTION}" = "build"; then
     ##########################
     # Build the library folder (Same as VLCKit.framework/lib in Makefile)
     echo "Building share folder..."
-    cp -R ${VLC_BUILD_DIR}/share/luameta ${target_share}
-    cp -R ${VLC_BUILD_DIR}/share/luaplaylist ${target_share}
+    pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks"
+    $pbxcp ${VLC_BUILD_DIR}/share/luameta ${target_share}
+    $pbxcp ${VLC_BUILD_DIR}/share/luaplaylist ${target_share}
 fi
