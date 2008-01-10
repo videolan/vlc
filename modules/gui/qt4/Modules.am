@@ -19,6 +19,7 @@ nodist_SOURCES_qt4 = \
 		input_manager.moc.cpp \
 		playlist_model.moc.cpp \
 		dialogs/playlist.moc.cpp \
+        dialogs/bookmarks.moc.cpp \
 		dialogs/mediainfo.moc.cpp \
 		dialogs/extended.moc.cpp \
 		dialogs/messages.moc.cpp \
@@ -87,6 +88,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		input_manager.cpp \
 		playlist_model.cpp \
 		dialogs/playlist.cpp \
+        dialogs/bookmarks.cpp \
 		dialogs/preferences.cpp \
 		dialogs/mediainfo.cpp \
 		dialogs/extended.cpp \
@@ -120,6 +122,7 @@ noinst_HEADERS = \
 	input_manager.hpp \
 	playlist_model.hpp \
 	dialogs/playlist.hpp \
+    dialogs/bookmarks.hpp \
 	dialogs/mediainfo.hpp \
 	dialogs/extended.hpp \
 	dialogs/messages.hpp \

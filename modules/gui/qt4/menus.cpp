@@ -298,9 +298,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) , "",
         ":/pixmaps/menus_info_16px.png", SLOT( mediaCodecDialog() ), "Ctrl+J" );
 
-#if 0 /* Not Implemented yet */
-    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","", "bookmarksDialog()", "Ctrl+B" );
-#endif
+
+    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","", 
+                      SLOT( bookmarksDialog() ), "Ctrl+B" );
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", "", SLOT( vlmDialog() ),
         "Ctrl+V" );
 

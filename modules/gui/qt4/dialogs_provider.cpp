@@ -36,6 +36,7 @@
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
+#include "dialogs/bookmarks.hpp"
 #include "dialogs/preferences.hpp"
 #include "dialogs/mediainfo.hpp"
 #include "dialogs/messages.hpp"
@@ -202,8 +203,7 @@ void DialogsProvider::mediaCodecDialog()
 
 void DialogsProvider::bookmarksDialog()
 {
-    /* TODO - Implement me */
-    /*  BookmarkDialog::getInstance( p_intf )->toggleVisible(); */
+    BookmarksDialog::getInstance( p_intf )->toggleVisible(); 
 }
 
 void DialogsProvider::podcastConfigureDialog()
