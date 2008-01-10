@@ -17,6 +17,7 @@ if test "${ACTION}" = "build"; then
     target="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
     target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
     target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
+    target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
     linked_libs=" "
     
     ##########################
@@ -112,8 +113,10 @@ if test "${ACTION}" = "build"; then
                 ;;
         esac
     done
-    # Build the library folder
+    # Build the share folder
     ##########################
-    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc-control.dylib" ${target_lib} "library"
-    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc.dylib" ${target_lib} "library"
+    # Build the library folder (Same as VLCKit.framework/lib in Makefile)
+    echo "Building share folder..."
+    cp -R ${VLC_BUILD_DIR}/share/luameta ${target_share}
+    cp -R ${VLC_BUILD_DIR}/share/luaplaylist ${target_share}
 fi
