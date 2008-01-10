@@ -213,6 +213,12 @@ void InteractionDialog::Finish( int i_ret )
     }
     p_dialog->i_status = ANSWERED_DIALOG;
     p_dialog->i_return = i_ret;
+
+    /* Alert the Dialog_*_Progress that the user had clicked on "cancel" */
+    if( p_dialog->i_flags & DIALOG_USER_PROGRESS ||
+        p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+        p_dialog->b_cancelled = true;
+
     hide();
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     playlist_Signal( THEPL );
