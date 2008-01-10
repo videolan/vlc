@@ -6,7 +6,7 @@
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
- *          Stephan AÃmus <stippi@yellowbites.com>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
