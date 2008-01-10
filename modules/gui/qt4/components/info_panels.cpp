@@ -342,13 +342,14 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
      QGridLayout *layout = new QGridLayout(this);
 
      QLabel *topLabel = new QLabel( qtr( "Extra metadata and other information"
-                 " are shown in this list.\n" ) );
+                 " are shown in this panel.\n" ) );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
      extraMetaTree = new QTreeWidget( this );
      extraMetaTree->setAlternatingRowColors( true );
      extraMetaTree->setColumnCount( 2 );
+     extraMetaTree->resizeColumnToContents( 0 );
      extraMetaTree->header()->hide();
 /*     QStringList headerList = ( QStringList() << qtr( "Type" )
  *                                             << qtr( "Value" ) );
@@ -363,16 +364,20 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
  **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
+    QStringList tempItem;
+    QList<QTreeWidgetItem *> items;
+
+    extraMetaTree->clear();
+
     vlc_mutex_lock( &p_item->lock );
     vlc_meta_t *p_meta = p_item->p_meta;
     if( !p_meta )
         return;
-    QStringList tempItem;
 
-    QList<QTreeWidgetItem *> items;
     vlc_dictionary_t * p_dict = &p_meta->extra_tags;
     char ** ppsz_allkey = vlc_dictionary_all_keys( p_dict );
-    for (int i = 0; ppsz_allkey[i] ; i++ )
+
+    for( int i = 0; ppsz_allkey[i] ; i++ )
     {
         const char * psz_value = (const char *)vlc_dictionary_value_for_key(
                 p_dict, ppsz_allkey[i] );
@@ -383,7 +388,9 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     }
     vlc_mutex_unlock( &p_item->lock );
     free( ppsz_allkey );
+
     extraMetaTree->addTopLevelItems( items );
+    extraMetaTree->resizeColumnToContents( 0 );
 }
 
 /**
