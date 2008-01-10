@@ -14,6 +14,7 @@ if test "${ACTION}" = "build"; then
     vlc_config="${VLC_SRC_DIR}/vlc-config"
     lib="lib"
     modules="modules"
+    share="share"
     target="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
     target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
     target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
@@ -118,6 +119,7 @@ if test "${ACTION}" = "build"; then
     # Build the library folder (Same as VLCKit.framework/lib in Makefile)
     echo "Building share folder..."
     pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks"
+    mkdir -p ${target_share}
     $pbxcp ${VLC_BUILD_DIR}/share/luameta ${target_share}
     $pbxcp ${VLC_BUILD_DIR}/share/luaplaylist ${target_share}
 fi
