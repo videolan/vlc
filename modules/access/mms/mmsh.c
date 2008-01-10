@@ -818,7 +818,6 @@ static int Start( access_t *p_access, off_t i_pos )
         }
     }
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" );
-#if 0
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "Connection: Close\r\n" );
 
@@ -827,7 +826,6 @@ static int Start( access_t *p_access, off_t i_pos )
         msg_Err( p_access, "failed to send request" );
         return VLC_EGENERIC;
     }
-#endif
 
     psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
     if( psz == NULL )
