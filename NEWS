@@ -71,6 +71,7 @@ Input/Demuxers:
   * Standard MIDI File (types 0 & 1) support
   * TiVo Series 2 support
   * v4l2 access module support
+  * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
   * CD+G karaoke Files support
   * MXF files support
 
@@ -141,8 +142,9 @@ Interfaces:
    * Improved mouse gestures
    * Fastly improved Update checker
    * Experimental Lua interface modules. See vlc -I lua for more info
-   * ncurses interface now uses ncursesw to correctly display wide characters
-     when using an UTF-8 locale.
+   * Ncurses:
+     * Correctly displays wide characters when using an UTF-8 locale, if libncursesw is available (not by default on MacOSX)
+     * Some nice colors if the terminal supports it (most do)
  * Mac OS X
    * Improved video output features
    * Access to VideoLAN's Help Wiki within VLC
@@ -170,10 +172,6 @@ Mac OS X Port:
 LibVLC:
  * Event management and various improvements in libvlc
    (Part of a Google Summer of Code Student project)
-
-Capture:
- * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft
-   Windows
 
 New Localizations:
  * Finnish
