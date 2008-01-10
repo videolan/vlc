@@ -93,8 +93,6 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
-#define MAX(A,B) ( (A) > (B) ? (A):(B))
-
 static int DialogEvent_Type = QEvent::User + 1;
 //static int PLUndockEvent_Type = QEvent::User + 2;
 //static int PLDockEvent_Type = QEvent::User + 3;

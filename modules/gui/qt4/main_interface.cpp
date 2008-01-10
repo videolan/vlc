@@ -551,7 +551,7 @@ QSize MainInterface::sizeHint() const
     if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
     {
         nheight += dockPL->size().height();
-        nwidth = MAX( nwidth, dockPL->size().width() );
+        nwidth = __MAX( nwidth, dockPL->size().width() );
         msg_Dbg( p_intf, "3 %i %i", nheight, nwidth );
     }
     msg_Dbg( p_intf, "4 %i %i", nheight, nwidth );
