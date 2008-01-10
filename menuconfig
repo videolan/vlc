@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # VLC media player configuration script, borrowed from linux menuconfig
 # Cyril Deguet <asmax@videolan.org>
