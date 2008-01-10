@@ -87,7 +87,7 @@ Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Gabor Kelemen <kelemeng at gnome dot hu> - Hungarian translation
 Geoffrey Roussel <meka321 at hotmail dot com> - Christmas easter egg Artwork
 Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix
-Gisle Vanem <giva at bgnet dot no>  - gettieoffay under win32
+Gisle Vanem <giva at bgnet dot no>  - gettimeoffay under win32
 Glen Gray <slaine at slaine do rog> - RTSP keepalive
 Greg Farrell <greg at gregfarell dot org> - rc interface "enqueue" command
 Gregory Hazel <ghazel at gmail dot com> - wxWidgets fixes and improvements
@@ -104,7 +104,6 @@ Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
 Javier Varela <tonxabar at hotmail.com> - Spanish translation
 Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
-Jean-Baptiste Kempf <jb at via dot ecp.fr> - Contrib system upgrade
 Jean-Baptiste Le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX), Universal Binary Script
 Jean-Philippe Grimaldi <jeanphi at via.ecp.fr> - bug fixes
 Dugal Harris <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
@@ -184,13 +183,12 @@ Rémi Duraffort <ivoire at via.ecp.fr> - various QT4 patches
 Remco Poortinga <poortinga at telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
 Richard Hosking <richard at hovis.net> - v4l2 support
-Rob Casey (rob dot casey AT swishgroup dot com dot au) - Amino RTSP fix
+Rob Casey <rob dot casey AT swishgroup dot com dot au> - Amino RTSP fix
 Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
 Roman Bednarek <roman at mikronika.com.pl> - MPL2 subtitles support
 Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs, multipass x264 patch
-Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX 
-improvements
+Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
 Simon Damkjær Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
 Stefán Freyr Stefánsson <stefan.freyr -at- gmail.com> - Qt4 speed slider
