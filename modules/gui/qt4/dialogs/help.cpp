@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
- *          Rémi Duraffort <ivoire (at) via.ecp.fr>
+ *          RÃ©mi Duraffort <ivoire (at) via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
