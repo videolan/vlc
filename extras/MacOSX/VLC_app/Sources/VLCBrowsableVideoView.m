@@ -146,6 +146,7 @@
     selectionLayer = backLayer = nil;
     menuLayer = nil;
     menuDisplayed = NO;
+    [self setNeedsDisplay:YES];
 }
 
 - (void)displayMenu
