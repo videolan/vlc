@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ncurses.c : NCurses interface for vlc
  *****************************************************************************
- * Copyright (C) 2001-2007 the VideoLAN team
+ * Copyright © 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -25,13 +25,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/*
+ * Note that when we use wide characters (and link with libncursesw),
+ * we assume that an UTF8 locale is used (or compatible, such as ASCII).
+ * Other characters encodings are not supported.
+ */
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-
-#include <errno.h>                                                 /* ENOMEM */
-#include <time.h>
 
 #ifdef HAVE_NCURSESW
 #   define _XOPEN_SOURCE_EXTENDED 1
@@ -98,6 +101,8 @@ static int  SubSearchPlaylist( intf_thread_t *, char *, int, int );
 static void ManageSlider   ( intf_thread_t * );
 static void ReadDir        ( intf_thread_t * );
 
+static void start_color_and_pairs ( intf_thread_t * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -135,6 +140,22 @@ enum
 };
 enum
 {
+    C_DEFAULT = 0,
+    C_TITLE,
+    C_PLAYLIST_1,
+    C_PLAYLIST_2,
+    C_PLAYLIST_3,
+    C_BOX,
+    C_STATUS,
+    C_INFO,
+    C_ERROR,
+    C_WARNING,
+    C_DEBUG,
+    C_CATEGORY,
+    C_FOLDER
+};
+enum
+{
     VIEW_CATEGORY,
     VIEW_ONELEVEL
 };
@@ -151,6 +172,9 @@ struct pl_item_t
 struct intf_sys_t
 {
     input_thread_t *p_input;
+
+    vlc_bool_t      b_color;
+    vlc_bool_t      b_color_started;
 
     float           f_slider;
     float           f_slider_old;
@@ -178,7 +202,9 @@ struct intf_sys_t
     int             i_before_search;
 
     char            *psz_open_chain;
+#ifndef HAVE_NCURSESW
     char             psz_partial_keys[7];
+#endif
 
     char            *psz_current_dir;
     int             i_dir_entries;
@@ -193,7 +219,7 @@ struct intf_sys_t
     int             i_verbose;                  /* stores verbosity level    */
 };
 
-static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title );
+static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title, vlc_bool_t b_color );
 static void DrawLine( WINDOW *win, int y, int x, int w );
 static void DrawEmptyLine( WINDOW *win, int y, int x, int w );
 
@@ -221,10 +247,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_box_plidx = 0;
     p_sys->i_box_bidx = 0;
     p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
+    p_sys->b_color = p_this->p_libvlc->b_color;
+    p_sys->b_color_started = VLC_FALSE;
+
+#ifndef HAVE_NCURSESW
     memset( p_sys->psz_partial_keys, 0, sizeof( p_sys->psz_partial_keys ) );
+#endif
 
     /* Initialize the curses library */
     p_sys->w = initscr();
+
+    if( p_sys->b_color )
+        start_color_and_pairs( p_intf );
+
     keypad( p_sys->w, TRUE );
     /* Don't do NL -> CR/NL */
     nonl();
@@ -232,9 +267,10 @@ static int Open( vlc_object_t *p_this )
     cbreak();
     /* Don't echo */
     noecho();
-
-    curs_set(0);
-    timeout(0);
+    /* Invisible cursor */
+    curs_set( 0 );
+    /* Non blocking wgetch() */
+    wtimeout( p_sys->w, 0 );
 
     clear();
 
@@ -386,8 +422,8 @@ static void Run( intf_thread_t *p_intf )
         {
             FindIndex( p_intf );
         }
-
-        while( ( i_key = getch() ) != -1 )
+    
+        while( ( i_key = wgetch( p_sys->w ) ) != -1 )
         {
             /*
              * HandleKey returns 1 if the screen needs to be redrawn
@@ -417,6 +453,59 @@ static void Run( intf_thread_t *p_intf )
 }
 
 /* following functions are local */
+static void start_color_and_pairs( intf_thread_t *p_intf )
+{
+    assert( p_intf->p_sys->b_color && !p_intf->p_sys->b_color_started );
+
+    if( !has_colors() )
+    {
+        p_intf->p_sys->b_color = VLC_FALSE;
+        msg_Warn( p_intf, "Terminal doesn't support colors" );
+        return;
+    }
+
+    start_color();
+
+    /* Available colors: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE */
+
+    /* untested, in all my terminals, !can_change_color() --funman */
+    if( can_change_color() )
+        init_color( COLOR_YELLOW, 960, 500, 0 ); /* YELLOW -> ORANGE */
+
+    /* title */
+    init_pair( C_TITLE, COLOR_YELLOW, COLOR_BLACK );
+
+    /* jamaican playlist */
+    init_pair( C_PLAYLIST_1, COLOR_GREEN, COLOR_BLACK );
+    init_pair( C_PLAYLIST_2, COLOR_YELLOW, COLOR_BLACK );
+    init_pair( C_PLAYLIST_3, COLOR_RED, COLOR_BLACK );
+
+    /* used in DrawBox() */
+    init_pair( C_BOX, COLOR_CYAN, COLOR_BLACK );
+    /* Source, State, Position, Volume, Chapters, etc...*/
+    init_pair( C_STATUS, COLOR_BLUE, COLOR_BLACK );
+
+    /* VLC messages, keep the order from highest priority to lowest */
+
+    /* infos */
+    init_pair( C_INFO, COLOR_BLACK, COLOR_WHITE );
+    /* errors */
+    init_pair( C_ERROR, COLOR_RED, COLOR_BLACK );
+    /* warnings */
+    init_pair( C_WARNING, COLOR_YELLOW, COLOR_BLACK );
+/* debug */
+    init_pair( C_DEBUG, COLOR_WHITE, COLOR_BLACK );
+
+    /* Category title (help, info, metadata) */
+    init_pair( C_CATEGORY, COLOR_MAGENTA, COLOR_BLACK );
+
+    /* Folder (BOX_BROWSE) */
+    init_pair( C_FOLDER, COLOR_RED, COLOR_BLACK );
+
+    p_intf->p_sys->b_color_started = VLC_TRUE;
+}
+
+#ifndef HAVE_NCURSESW
 static char *KeyToUTF8( int i_key, char *psz_part )
 {
     char *psz_utf8;
@@ -430,9 +519,6 @@ static char *KeyToUTF8( int i_key, char *psz_part )
 
     psz_part[len] = (char)i_key;
 
-#ifdef HAVE_NCURSESW
-    psz_utf8 = strdup( psz_part );
-#else
     psz_utf8 = FromLocaleDup( psz_part );
 
     /* Ugly check for incomplete bytes sequences
@@ -453,11 +539,11 @@ static char *KeyToUTF8( int i_key, char *psz_part )
         free( psz_utf8 );
         return NULL;
     }
-#endif
 
     memset( psz_part, 0, 6 );
     return psz_utf8;
 }
+#endif
 
 static inline int RemoveLastUTF8Entity( char *psz, int len )
 {
@@ -556,6 +642,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 break;
             case 'D':
             case KEY_BACKSPACE:
+            case 0x7f:
             case KEY_DC:
             {
                 playlist_item_t *p_item;
@@ -578,7 +665,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             }
 
             case KEY_ENTER:
-            case 0x0d:
+            case '\r':
+            case '\n':
                 if( !p_sys->pp_plist[p_sys->i_box_plidx] )
                 {
                     b_ret = VLC_FALSE;
@@ -663,7 +751,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 break;
 
             case KEY_ENTER:
-            case 0x0d:
+            case '\r':
+            case '\n':
             case ' ':
                 if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ' )
                 {
@@ -786,15 +875,16 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     }
     else if( p_sys->i_box_type == BOX_SEARCH && p_sys->psz_search_chain )
     {
-        int i_chain_len;
-        i_chain_len = strlen( p_sys->psz_search_chain );
+        int i_chain_len = strlen( p_sys->psz_search_chain );
         switch( i_key )
         {
+            case KEY_CLEAR:
             case 0x0c:      /* ^l */
                 clear();
                 return 1;
             case KEY_ENTER:
-            case 0x0d:
+            case '\r':
+            case '\n':
                 if( i_chain_len > 0 )
                 {
                     p_sys->psz_old_search = strdup( p_sys->psz_search_chain );
@@ -805,15 +895,39 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 }
                 p_sys->i_box_type = BOX_PLAYLIST;
                 return 1;
-            case 0x1b:      /* Esc. */
+            case 0x1b: /* ESC */
+                /* Alt+key combinations return 2 keys in the terminal keyboard:
+                 * ESC, and the 2nd key.
+                 * If some other key is available immediately (where immediately
+                 * means after wgetch() 1 second delay ), that means that the
+                 * ESC key was not pressed.
+                 *
+                 * man 3X curs_getch says:
+                 *
+                 * Use of the escape key by a programmer for a single
+                 * character function is discouraged, as it will cause a delay 
+                 * of up to one second while the keypad code looks for a
+                 * following function-key sequence.
+                 *
+                 */
+                if( wgetch( p_sys->w ) != ERR )
+                    return 0;
                 p_sys->i_box_plidx = p_sys->i_before_search;
                 p_sys->i_box_type = BOX_PLAYLIST;
                 return 1;
             case KEY_BACKSPACE:
+            case 0x7f:
                 RemoveLastUTF8Entity( p_sys->psz_search_chain, i_chain_len );
                 break;
             default:
             {
+#ifdef HAVE_NCURSESW
+                if( i_chain_len + 1 < SEARCH_CHAIN_SIZE )
+                {
+                    p_sys->psz_search_chain[i_chain_len] = (char) i_key;
+                    p_sys->psz_search_chain[i_chain_len + 1] = '\0';
+                }
+#else
                 char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
 
                 if( psz_utf8 != NULL )
@@ -825,6 +939,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     }
                     free( psz_utf8 );
                 }
+#endif
                 break;
             }
         }
@@ -842,11 +957,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
         switch( i_key )
         {
-            case 0x0c:      /* ^l */
+            case KEY_CLEAR:
+            case 0x0c:          /* ^l */
                 clear();
                 return 1;
             case KEY_ENTER:
-            case 0x0d:
+            case '\r': 
+            case '\n':
                 if( i_chain_len > 0 )
                 {
                     playlist_item_t *p_parent = p_sys->p_node;
@@ -869,14 +986,24 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 }
                 p_sys->i_box_type = BOX_PLAYLIST;
                 return 1;
-            case 0x1b:      /* Esc. */
+            case 0x1b:  /* ESC */
+                if( wgetch( p_sys->w ) != ERR )
+                    return 0;
                 p_sys->i_box_type = BOX_PLAYLIST;
                 return 1;
             case KEY_BACKSPACE:
+            case 0x7f:
                 RemoveLastUTF8Entity( p_sys->psz_open_chain, i_chain_len );
                 break;
             default:
             {
+#ifdef HAVE_NCURSESW
+                if( i_chain_len + 1 < OPEN_CHAIN_SIZE )
+                {
+                    p_sys->psz_open_chain[i_chain_len] = (char) i_key;
+                    p_sys->psz_open_chain[i_chain_len + 1] = '\0';
+                }
+#else
                 char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
 
                 if( psz_utf8 != NULL )
@@ -888,6 +1015,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                     }
                     free( psz_utf8 );
                 }
+#endif
                 break;
             }
         }
@@ -898,9 +1026,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     /* Common keys */
     switch( i_key )
     {
+        case 0x1b:  /* ESC */
+            if( wgetch( p_sys->w ) != ERR )
+                return 0;
         case 'q':
         case 'Q':
-        case 0x1b:  /* Esc */
+        case KEY_EXIT:
             vlc_object_kill( p_intf->p_libvlc );
             return 0;
 
@@ -936,6 +1067,11 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_NONE;
             else
                 p_sys->i_box_type = BOX_BROWSE;
+            return 1;
+        case 'c':
+            p_sys->b_color = !p_sys->b_color;
+            if( p_sys->b_color && !p_sys->b_color_started )
+                start_color_and_pairs( p_intf );
             return 1;
         case 'h':
         case 'H':
@@ -1075,7 +1211,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         /*
          * ^l should clear and redraw the screen
          */
-        case 0x0c:
+        case KEY_CLEAR:
+        case 0x0c:          /* ^l */
             clear();
             return 1;
 
@@ -1192,7 +1329,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 
     if( i_char_len == (size_t)-1 )
         /* an invalid character was encountered */
-        abort();
+        return;
     else
     {
         i_width = wcswidth( psz_wide, i_char_len );
@@ -1328,29 +1465,30 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 
     /* Title */
     attrset( A_REVERSE );
-    int i_len = strlen( "VLC media player [ h for help ]" );
+    int i_len = strlen( "VLC media player "PACKAGE_VERSION );
     int mid = ( COLS - i_len ) / 2;
     if( mid < 0 )
         mid = 0;
     int i_size = ( COLS > i_len + 1 ) ? COLS : i_len + 1;
     char psz_title[i_size];
     memset( psz_title, ' ', mid );
-    snprintf( &psz_title[mid], i_size, "VLC media player [ h for help ]" );
+    if( p_sys->b_color )
+        wcolor_set( p_sys->w, C_TITLE, NULL );
+    snprintf( &psz_title[mid], i_size, "VLC media player "PACKAGE_VERSION );
     mvnprintw( y, 0, COLS, "%s", psz_title );
     attroff( A_REVERSE );
     y += 2;
 
-    /* Infos */
+    if( p_sys->b_color )
+        wcolor_set( p_sys->w, C_STATUS, NULL );
 
-    char psz_state[25];
-    /* strlen( "[Repeat] [Random] [Loop]" ) == 24, + '\0' */
-    psz_state[0] = '\0';
-    if( var_GetBool( p_playlist, "repeat" ) )
-        strcat( psz_state, "[Repeat] " );
-    if( var_GetBool( p_playlist, "random" ) )
-        strcat( psz_state, "[Random] " );
-    if( var_GetBool( p_playlist, "loop" ) )
-        strcat( psz_state, "[Loop]" );
+    /* Infos */
+    char *psz_state;
+    if( asprintf( &psz_state, "%s%s%s",
+            var_GetBool( p_playlist, "repeat" ) ? _( "[Repeat] " ) : "",
+            var_GetBool( p_playlist, "random" ) ? _( "[Random] " ) : "",
+            var_GetBool( p_playlist, "loop" ) ? _( "[Loop]" ) : "" ) == -1 )
+        psz_state = NULL;
 
     if( p_input && !p_input->b_dead )
     {
@@ -1361,26 +1499,26 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 
         /* Source */
         char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
-        mvnprintw( y++, 0, COLS, " Source   : %s", psz_uri );
+        mvnprintw( y++, 0, COLS, _(" Source   : %s"), psz_uri );
         free( psz_uri );
 
         /* State */
         var_Get( p_input, "state", &val );
         if( val.i_int == PLAYING_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Playing %s", psz_state );
+            mvnprintw( y++, 0, COLS, _(" State    : Playing %s"), psz_state );
         }
         else if( val.i_int == OPENING_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Opening/Connecting %s", psz_state );
+            mvnprintw( y++, 0, COLS, _(" State    : Opening/Connecting %s"), psz_state );
         }
         else if( val.i_int == BUFFERING_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Buffering %s", psz_state );
+            mvnprintw( y++, 0, COLS, _(" State    : Buffering %s"), psz_state );
         }
         else if( val.i_int == PAUSE_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Paused %s", psz_state );
+            mvnprintw( y++, 0, COLS, _(" State    : Paused %s"), psz_state );
         }
 
         if( val.i_int != INIT_S && val.i_int != END_S )
@@ -1394,11 +1532,11 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             var_Get( p_input, "length", &val );
             msecstotimestr( buf2, val.i_time / 1000 );
 
-            mvnprintw( y++, 0, COLS, " Position : %s/%s (%.2f%%)", buf1, buf2, p_sys->f_slider );
+            mvnprintw( y++, 0, COLS, _(" Position : %s/%s (%.2f%%)"), buf1, buf2, p_sys->f_slider );
 
             /* Volume */
             aout_VolumeGet( p_intf, &i_volume );
-            mvnprintw( y++, 0, COLS, " Volume   : %i%%", i_volume*200/AOUT_VOLUME_MAX );
+            mvnprintw( y++, 0, COLS, _(" Volume   : %i%%"), i_volume*200/AOUT_VOLUME_MAX );
 
             /* Title */
             if( !var_Get( p_input, "title", &val ) )
@@ -1406,7 +1544,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 var_Change( p_input, "title", VLC_VAR_GETCHOICES, &val_list, NULL );
                 if( val_list.p_list->i_count > 0 )
                 {
-                    mvnprintw( y++, 0, COLS, " Title    : %d/%d", val.i_int, val_list.p_list->i_count );
+                    mvnprintw( y++, 0, COLS, _(" Title    : %d/%d"), val.i_int, val_list.p_list->i_count );
                 }
                 var_Change( p_input, "title", VLC_VAR_FREELIST, &val_list, NULL );
             }
@@ -1417,7 +1555,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 var_Change( p_input, "chapter", VLC_VAR_GETCHOICES, &val_list, NULL );
                 if( val_list.p_list->i_count > 0 )
                 {
-                    mvnprintw( y++, 0, COLS, " Chapter  : %d/%d", val.i_int, val_list.p_list->i_count );
+                    mvnprintw( y++, 0, COLS, _(" Chapter  : %d/%d"), val.i_int, val_list.p_list->i_count );
                 }
                 var_Change( p_input, "chapter", VLC_VAR_FREELIST, &val_list, NULL );
             }
@@ -1429,13 +1567,16 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     }
     else
     {
-        mvnprintw( y++, 0, COLS, "Source: <no current item> %s", psz_state );
+        mvnprintw( y++, 0, COLS, _(" Source: <no current item> %s"), psz_state );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
-        DrawEmptyLine( p_sys->w, y++, 0, COLS );
+        mvnprintw( y++, 0, COLS, _(" [ h for help ]") );
         DrawEmptyLine( p_sys->w, y++, 0, COLS );
     }
+    free( psz_state );
+    if( p_sys->b_color )
+        wcolor_set( p_sys->w, C_DEFAULT, NULL );
 
-    DrawBox( p_sys->w, y, 0, 3, COLS, "" );
+    DrawBox( p_sys->w, y, 0, 3, COLS, "", p_sys->b_color );
     DrawEmptyLine( p_sys->w, y+1, 1, COLS-2);
     DrawLine( p_sys->w, y+1, 1, (int)(p_intf->p_sys->f_slider/100.0 * (COLS -2)) );
     y += 3;
@@ -1450,61 +1591,92 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     {
         /* Help box */
         int l = 0;
-        DrawBox( p_sys->w, y++, 0, h, COLS, " Help " );
+        DrawBox( p_sys->w, y++, 0, h, COLS, _(" Help "), p_sys->b_color );
 
-        MainBoxWrite( p_intf, l++, 1, "[Display]" );
-        MainBoxWrite( p_intf, l++, 1, "     h,H         Show/Hide help box" );
-        MainBoxWrite( p_intf, l++, 1, "     i           Show/Hide info box" );
-        MainBoxWrite( p_intf, l++, 1, "     m           Show/Hide metadata box" );
-        MainBoxWrite( p_intf, l++, 1, "     L           Show/Hide messages box" );
-        MainBoxWrite( p_intf, l++, 1, "     P           Show/Hide playlist box" );
-        MainBoxWrite( p_intf, l++, 1, "     B           Show/Hide filebrowser" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Display]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     h,H         Show/Hide help box") );
+        MainBoxWrite( p_intf, l++, 1, _("     i           Show/Hide info box") );
+        MainBoxWrite( p_intf, l++, 1, _("     m           Show/Hide metadata box") );
+        MainBoxWrite( p_intf, l++, 1, _("     L           Show/Hide messages box") );
+        MainBoxWrite( p_intf, l++, 1, _("     P           Show/Hide playlist box") );
+        MainBoxWrite( p_intf, l++, 1, _("     B           Show/Hide filebrowser") );
+        MainBoxWrite( p_intf, l++, 1, _("     c           Switch color on/off") );
+        MainBoxWrite( p_intf, l++, 1, _("     Esc         Close Add/Search entry") );
         MainBoxWrite( p_intf, l++, 1, "" );
 
-        MainBoxWrite( p_intf, l++, 1, "[Global]" );
-        MainBoxWrite( p_intf, l++, 1, "     q, Q        Quit" );
-        MainBoxWrite( p_intf, l++, 1, "     s           Stop" );
-        MainBoxWrite( p_intf, l++, 1, "     <space>     Pause/Play" );
-        MainBoxWrite( p_intf, l++, 1, "     f           Toggle Fullscreen" );
-        MainBoxWrite( p_intf, l++, 1, "     n, p        Next/Previous playlist item" );
-        MainBoxWrite( p_intf, l++, 1, "     [, ]        Next/Previous title" );
-        MainBoxWrite( p_intf, l++, 1, "     <, >        Next/Previous chapter" );
-        MainBoxWrite( p_intf, l++, 1, "     <right>     Seek +1%%" );
-        MainBoxWrite( p_intf, l++, 1, "     <left>      Seek -1%%" );
-        MainBoxWrite( p_intf, l++, 1, "     a           Volume Up" );
-        MainBoxWrite( p_intf, l++, 1, "     z           Volume Down" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Global]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     q, Q, Esc   Quit") );
+        MainBoxWrite( p_intf, l++, 1, _("     s           Stop") );
+        MainBoxWrite( p_intf, l++, 1, _("     <space>     Pause/Play") );
+        MainBoxWrite( p_intf, l++, 1, _("     f           Toggle Fullscreen") );
+        MainBoxWrite( p_intf, l++, 1, _("     n, p        Next/Previous playlist item") );
+        MainBoxWrite( p_intf, l++, 1, _("     [, ]        Next/Previous title") );
+        MainBoxWrite( p_intf, l++, 1, _("     <, >        Next/Previous chapter") );
+        MainBoxWrite( p_intf, l++, 1, _("     <right>     Seek +1%%") );
+        MainBoxWrite( p_intf, l++, 1, _("     <left>      Seek -1%%") );
+        MainBoxWrite( p_intf, l++, 1, _("     a           Volume Up") );
+        MainBoxWrite( p_intf, l++, 1, _("     z           Volume Down") );
         MainBoxWrite( p_intf, l++, 1, "" );
 
-        MainBoxWrite( p_intf, l++, 1, "[Playlist]" );
-        MainBoxWrite( p_intf, l++, 1, "     r           Toggle Random playing" );
-        MainBoxWrite( p_intf, l++, 1, "     l           Toggle Loop Playlist" );
-        MainBoxWrite( p_intf, l++, 1, "     R           Toggle Repeat item" );
-        MainBoxWrite( p_intf, l++, 1, "     o           Order Playlist by title" );
-        MainBoxWrite( p_intf, l++, 1, "     O           Reverse order Playlist by title" );
-        MainBoxWrite( p_intf, l++, 1, "     g           Go to the current playing item" );
-        MainBoxWrite( p_intf, l++, 1, "     /           Look for an item" );
-        MainBoxWrite( p_intf, l++, 1, "     A           Add an entry" );
-        MainBoxWrite( p_intf, l++, 1, "     D, <del>    Delete an entry" );
-        MainBoxWrite( p_intf, l++, 1, "     <backspace> Delete an entry" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Playlist]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     r           Toggle Random playing") );
+        MainBoxWrite( p_intf, l++, 1, _("     l           Toggle Loop Playlist") );
+        MainBoxWrite( p_intf, l++, 1, _("     R           Toggle Repeat item") );
+        MainBoxWrite( p_intf, l++, 1, _("     o           Order Playlist by title") );
+        MainBoxWrite( p_intf, l++, 1, _("     O           Reverse order Playlist by title") );
+        MainBoxWrite( p_intf, l++, 1, _("     g           Go to the current playing item") );
+        MainBoxWrite( p_intf, l++, 1, _("     /           Look for an item") );
+        MainBoxWrite( p_intf, l++, 1, _("     A           Add an entry") );
+        MainBoxWrite( p_intf, l++, 1, _("     D, <del>    Delete an entry") );
+        MainBoxWrite( p_intf, l++, 1, _("     <backspace> Delete an entry") );
+        MainBoxWrite( p_intf, l++, 1, _("     e           Eject (if stopped)") );
         MainBoxWrite( p_intf, l++, 1, "" );
 
-        MainBoxWrite( p_intf, l++, 1, "[Filebrowser]" );
-        MainBoxWrite( p_intf, l++, 1, "     <enter>     Add the selected file to the playlist" );
-        MainBoxWrite( p_intf, l++, 1, "     <space>     Add the selected directory to the playlist" );
-        MainBoxWrite( p_intf, l++, 1, "     .           Show/Hide hidden files" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Filebrowser]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     <enter>     Add the selected file to the playlist") );
+        MainBoxWrite( p_intf, l++, 1, _("     <space>     Add the selected directory to the playlist") );
+        MainBoxWrite( p_intf, l++, 1, _("     .           Show/Hide hidden files") );
         MainBoxWrite( p_intf, l++, 1, "" );
 
-        MainBoxWrite( p_intf, l++, 1, "[Boxes]" );
-        MainBoxWrite( p_intf, l++, 1, "     <up>,<down>     Navigate through the box line by line" );
-        MainBoxWrite( p_intf, l++, 1, "     <pgup>,<pgdown> Navigate through the box page by page" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Boxes]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     <up>,<down>     Navigate through the box line by line") );
+        MainBoxWrite( p_intf, l++, 1, _("     <pgup>,<pgdown> Navigate through the box page by page") );
         MainBoxWrite( p_intf, l++, 1, "" );
 
-        MainBoxWrite( p_intf, l++, 1, "[Player]" );
-        MainBoxWrite( p_intf, l++, 1, "     <up>,<down>     Seek +/-5%%" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Player]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     <up>,<down>     Seek +/-5%%") );
         MainBoxWrite( p_intf, l++, 1, "" );
 
-        MainBoxWrite( p_intf, l++, 1, "[Miscellaneous]" );
-        MainBoxWrite( p_intf, l++, 1, "     Ctrl-l          Refresh the screen" );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_CATEGORY, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("[Miscellaneous]") );
+        if( p_sys->b_color )
+            wcolor_set( p_sys->w, C_DEFAULT, NULL );
+        MainBoxWrite( p_intf, l++, 1, _("     Ctrl-l          Refresh the screen") );
 
         p_sys->i_box_lines_total = l;
         if( p_sys->i_box_start >= p_sys->i_box_lines_total )
@@ -1525,7 +1697,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     {
         /* Info box */
         int l = 0;
-        DrawBox( p_sys->w, y++, 0, h, COLS, " Information " );
+        DrawBox( p_sys->w, y++, 0, h, COLS, _(" Information "), p_sys->b_color );
 
         if( p_input )
         {
@@ -1535,19 +1707,23 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 info_category_t *p_category = input_GetItem(p_input)->pp_categories[i];
                 if( y >= y_end ) break;
-                MainBoxWrite( p_intf, l++, 1, "  [%s]", p_category->psz_name );
+                if( p_sys->b_color )
+                    wcolor_set( p_sys->w, C_CATEGORY, NULL );
+                MainBoxWrite( p_intf, l++, 1, _("  [%s]"), p_category->psz_name );
+                if( p_sys->b_color )
+                    wcolor_set( p_sys->w, C_DEFAULT, NULL );
                 for( j = 0; j < p_category->i_infos; j++ )
                 {
                     info_t *p_info = p_category->pp_infos[j];
                     if( y >= y_end ) break;
-                    MainBoxWrite( p_intf, l++, 1, "      %s: %s", p_info->psz_name, p_info->psz_value );
+                    MainBoxWrite( p_intf, l++, 1, _("      %s: %s"), p_info->psz_name, p_info->psz_value );
                 }
             }
             vlc_mutex_unlock( &input_GetItem(p_input)->lock );
         }
         else
         {
-            MainBoxWrite( p_intf, l++, 1, "No item currently playing" );
+            MainBoxWrite( p_intf, l++, 1, _("No item currently playing") );
         }
         p_sys->i_box_lines_total = l;
         if( p_sys->i_box_start >= p_sys->i_box_lines_total )
@@ -1576,7 +1752,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         strcat( &psz_title[1], VLC_META_INFO_CAT );
         psz_title[i_len + 1] = ' ';
         psz_title[i_len + 2] = '\0';
-        DrawBox( p_sys->w, y++, 0, h, COLS, psz_title );
+        DrawBox( p_sys->w, y++, 0, h, COLS, psz_title, p_sys->b_color );
 
         if( p_input )
         {
@@ -1629,7 +1805,11 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                         default:
                             psz_meta_title = ""; break;
                     }
+                    if( p_sys->b_color )
+                        wcolor_set( p_sys->w, C_CATEGORY, NULL );
                     MainBoxWrite( p_intf, l++, 1, "  [%s]", psz_meta_title );
+                    if( p_sys->b_color )
+                        wcolor_set( p_sys->w, C_DEFAULT, NULL );
                     MainBoxWrite( p_intf, l++, 1, "      %s", psz_meta );
                 }
             }
@@ -1637,7 +1817,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         }
         else
         {
-            MainBoxWrite( p_intf, l++, 1, "No item currently playing" );
+            MainBoxWrite( p_intf, l++, 1, _("No item currently playing") );
         }
         p_sys->i_box_lines_total = l;
         if( p_sys->i_box_start >= p_sys->i_box_lines_total )
@@ -1660,7 +1840,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         int i_stop;
         int i_start;
 
-        DrawBox( p_sys->w, y++, 0, h, COLS, " Logs " );
+        DrawBox( p_sys->w, y++, 0, h, COLS, _(" Logs "), p_sys->b_color );
 
         i_start = p_intf->p_sys->p_sub->i_start;
 
@@ -1682,9 +1862,15 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 break;
             }
+            if( p_sys->b_color )
+                wcolor_set( p_sys->w, 
+                    p_sys->p_sub->p_msg[i_stop].i_type + C_INFO,
+                    NULL );
             mvnprintw( y + h-2-i_line, 1, COLS - 2, "   [%s] %s",
                       ppsz_type[p_sys->p_sub->p_msg[i_stop].i_type],
                       p_sys->p_sub->p_msg[i_stop].psz_msg );
+            if( p_sys->b_color )
+                wcolor_set( p_sys->w, C_DEFAULT, NULL );
         }
 
         vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
@@ -1697,7 +1883,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         /* Filebrowser box */
         int        i_start, i_stop;
         int        i_item;
-        DrawBox( p_sys->w, y++, 0, h, COLS, " Browse " );
+        DrawBox( p_sys->w, y++, 0, h, COLS, _(" Browse "), p_sys->b_color );
 
         if( p_sys->i_box_bidx >= p_sys->i_dir_entries ) p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
         if( p_sys->i_box_bidx < 0 ) p_sys->i_box_bidx = 0;
@@ -1735,8 +1921,13 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 attrset( A_REVERSE );
             }
+            if( p_sys->b_color && !p_sys->pp_dir_entries[i_item]->b_file )
+                wcolor_set( p_sys->w, C_FOLDER, NULL );
             mvnprintw( y++, 1, COLS - 2, " %c %s", p_sys->pp_dir_entries[i_item]->b_file == VLC_TRUE ? ' ' : '+',
                             p_sys->pp_dir_entries[i_item]->psz_path );
+            if( p_sys->b_color && !p_sys->pp_dir_entries[i_item]->b_file )
+                wcolor_set( p_sys->w, C_DEFAULT, NULL );
+
             if( b_selected )
             {
                 attroff( A_REVERSE );
@@ -1756,16 +1947,16 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         switch( p_sys->i_current_view )
         {
             case VIEW_ONELEVEL:
-                psz_title = strdup( " Playlist (All, one level) " );
+                psz_title = strdup( _(" Playlist (All, one level) ") );
                 break;
             case VIEW_CATEGORY:
-                psz_title = strdup( " Playlist (By category) " );
+                psz_title = strdup( _(" Playlist (By category) ") );
                 break;
             default:
-                psz_title = strdup( " Playlist (Manually added) " );
+                psz_title = strdup( _(" Playlist (Manually added) ") );
         }
 
-        DrawBox( p_sys->w, y++, 0, h, COLS, psz_title );
+        DrawBox( p_sys->w, y++, 0, h, COLS, psz_title, p_sys->b_color );
 
         if( p_sys->b_need_update || p_sys->pp_plist == NULL )
         {
@@ -1823,8 +2014,12 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 attrset( A_REVERSE );
             }
+            if( p_sys->b_color )
+                wcolor_set( p_sys->w, i_item % 3 + C_PLAYLIST_1, NULL );
             mvnprintw( y++, 1, COLS - 2, "%c%s", c,
                        p_sys->pp_plist[i_item]->psz_display );
+            if( p_sys->b_color )
+                wcolor_set( p_sys->w, C_DEFAULT, NULL );
             if( b_selected )
             {
                 attroff( A_REVERSE );
@@ -1845,11 +2040,11 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 p_sys->psz_old_search != NULL )
             {
                 /* Searching next entry */
-                mvnprintw( 7, 1, COLS-2, "Find: %s", p_sys->psz_old_search );
+                mvnprintw( 7, 1, COLS-2, _("Find: %s"), p_sys->psz_old_search );
             }
             else
             {
-                mvnprintw( 7, 1, COLS-2, "Find: %s", p_sys->psz_search_chain );
+                mvnprintw( 7, 1, COLS-2, _("Find: %s"), p_sys->psz_search_chain );
             }
         }
     }
@@ -1858,7 +2053,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         if( p_sys->psz_open_chain )
         {
             DrawEmptyLine( p_sys->w, 7, 1, COLS-2 );
-            mvnprintw( 7, 1, COLS-2, "Open: %s", p_sys->psz_open_chain );
+            mvnprintw( 7, 1, COLS-2, _("Open: %s"), p_sys->psz_open_chain );
         }
     }
 
@@ -2260,13 +2455,15 @@ static void PlayPause( intf_thread_t *p_intf )
 /****************************************************************************
  *
  ****************************************************************************/
-static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title )
+static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title, vlc_bool_t b_color )
 {
     int i;
     int i_len;
 
     if( w > 3 && h > 2 )
     {
+        if( b_color )
+            wcolor_set( win, C_BOX, NULL );
         if( title == NULL ) title = "";
         i_len = strlen( title );
 
@@ -2287,6 +2484,8 @@ static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title 
         mvwaddch( win, y+h-1, x,     ACS_LLCORNER );
         mvwhline( win, y+h-1, x+1,   ACS_HLINE, w - 2 );
         mvwaddch( win, y+h-1, x+w-1, ACS_LRCORNER );
+        if( b_color )
+            wcolor_set( win, C_DEFAULT, NULL );
     }
 }
 
