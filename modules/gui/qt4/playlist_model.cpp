@@ -63,6 +63,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
     parentItem = parent;
     i_id = _i_id; i_input_id = _i_input_id;
     model = m;
+    i_type = -1; /* Avoid segfault */
 
     if( parentItem == NULL )
     {
@@ -170,7 +171,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     char psz_duration[MSTRTIME_MAX_SIZE];
     assert( p_item->p_input->i_id == i_input_id );
 
-    type = p_item->p_input->i_type;
+    i_type = p_item->p_input->i_type;
     current = iscurrent;
 
     strings.clear();
@@ -203,7 +204,9 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                 if( psz_title )
                 {
                     ADD_META( p_item, Title );
-                } else {
+                }
+                else if( psz_name )
+                {
                     strings.append( qfu( psz_name ) );
                 }
                 free( psz_title );
@@ -255,7 +258,7 @@ PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
     i_cached_input_id = -1;
     i_popup_item = i_popup_parent = -1;
 
-#define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) );
+#define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
     ADD_ICON( FILE, ":/pixmaps/type_file.png" );
     ADD_ICON( DIRECTORY, ":/pixmaps/type_directory.png" );
@@ -265,6 +268,7 @@ PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
     ADD_ICON( NET, ":/pixmaps/type_net.png" );
     ADD_ICON( PLAYLIST, ":/pixmaps/type_playlist.png" );
     ADD_ICON( NODE, ":/pixmaps/type_node.png" );
+#undef ADD_ICON
 
     rootItem = NULL;
     addCallbacks();
@@ -458,8 +462,9 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     }
     else if( role == Qt::DecorationRole && index.column() == 0  )
     {
-        if( item->type >= 0 )
-            return QVariant( PLModel::icons[item->type] );
+        /* Use to segfault here because i_type wasn't always initialized */
+        if( item->i_type >= 0 )
+            return QVariant( PLModel::icons[item->i_type] );
     }
     else if( role == Qt::FontRole )
     {
@@ -960,44 +965,39 @@ void PLModel::viewchanged( int meta )
        switch( meta )
        {
        case VLC_META_ENGINE_TITLE:
-           index=0;
-           break;
+           index=0; break;
        case VLC_META_ENGINE_DURATION:
-           index=1;
-           break;
+           index=1; break;
        case VLC_META_ENGINE_ARTIST:
-           index=2;
-           break;
+           index=2; break;
        case VLC_META_ENGINE_GENRE:
-           index=3;
-           break;
+           index=3; break;
        case VLC_META_ENGINE_COPYRIGHT:
-           index=4;
-           break;
+           index=4; break;
        case VLC_META_ENGINE_COLLECTION:
-           index=5;
-           break;
+           index=5; break;
        case VLC_META_ENGINE_SEQ_NUM:
-           index=6;
-           break;
+           index=6; break;
        case VLC_META_ENGINE_DESCRIPTION:
-           index=7;
-           break;
+           index=7; break;
        default:
            break;
        }
-       emit layoutAboutToBeChanged();
+       /* UNUSED        emit layoutAboutToBeChanged(); */
        index = __MIN( index , rootItem->strings.count() );
        QModelIndex parent = createIndex( 0, 0, rootItem );
+
        if( rootItem->i_showflags & meta )
+           /* Removing columns */
        {
-           beginRemoveColumns( parent , index, index+1 );
+           beginRemoveColumns( parent, index, index+1 );
            rootItem->i_showflags &= ~( meta );
            rootItem->updateview();
            endRemoveColumns();
        }
        else
        {
+           /* Adding columns */
            beginInsertColumns( createIndex( 0, 0, rootItem), index, index+1 );
            rootItem->i_showflags |= meta;
            rootItem->updateview();
@@ -1111,3 +1111,4 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
+

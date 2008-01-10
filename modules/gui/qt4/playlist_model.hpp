@@ -62,7 +62,7 @@ protected:
     QList<PLItem*> children;
     QList<QString> strings;
     bool current;
-    int type;
+    int i_type;
     int i_id;
     int i_input_id;
     int i_showflags;
