@@ -69,21 +69,22 @@ static const vlc_fourcc_t pi_allowed_chromas[] = {
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    static int hack = 0;
+    static int hack = 1;
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    if( hack )
+    hack++;
+    if( hack > MAX_CHROMAS )
     {
-        msg_Err( p_this, "Preventing chain chroma reccursion" );
+        hack--;
+        msg_Err( p_this, "Preventing chain chroma reccursion (already %d long)",
+                 hack );
         return VLC_EGENERIC;
     }
-
-    hack = 1;
 
     chroma_sys_t *p_sys = (chroma_sys_t *)malloc( sizeof( chroma_sys_t ) );
     if( !p_sys )
     {
-        hack = 0;
+        hack--;
         return VLC_ENOMEM;
     }
     memset( p_sys, 0, sizeof( chroma_sys_t ) );
@@ -123,12 +124,13 @@ static int Activate( vlc_object_t *p_this )
         p_sys->i_chroma = pi_allowed_chromas[i];
         p_vout->chroma.pf_convert = Chain;
         p_vout->chroma.p_sys = p_sys;
-        hack = 0;
+        hack--;
+        printf("Init: p_sys->p_tmp= %p\n", p_sys->p_tmp );
         return VLC_SUCCESS;
     }
 
     free( p_sys );
-    hack = 0;
+    hack--;
     return VLC_EGENERIC;
 }
 
@@ -150,6 +152,7 @@ static void Destroy( vlc_object_t *p_this )
         free( chroma.p_sys->p_tmp );
     }
     free( chroma.p_sys );
+    chroma.p_sys = NULL;
 }
 
 /*****************************************************************************
@@ -176,6 +179,10 @@ static void Chain( vout_thread_t *p_vout, picture_t *p_source,
         p_tmp->p_sys = NULL;
     }
 
+    vout_chroma_t chroma = p_vout->chroma;
+    p_vout->chroma = p_sys->chroma1;
     p_sys->chroma1.pf_convert( p_vout, p_source, p_sys->p_tmp );
+    p_vout->chroma = p_sys->chroma2;
     p_sys->chroma2.pf_convert( p_vout, p_sys->p_tmp, p_dest );
+    p_vout->chroma = chroma;
 }
