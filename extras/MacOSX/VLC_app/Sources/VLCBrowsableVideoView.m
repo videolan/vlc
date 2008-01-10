@@ -184,7 +184,13 @@
 }
 
 - (void)drawRect:(NSRect)rect
-{    
+{
+    if( [[[self layer] sublayers] count] )
+    {
+        /* Don't draw the empty view if we have a video output on screen */
+        [super drawRect:rect];
+        return;
+    }
     NSColor * bottomGradient = [NSColor colorWithCalibratedWhite:0.10 alpha:1.0];
     NSColor * topGradient    = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
 	NSGradient * gradient = [[NSGradient alloc] initWithStartingColor:bottomGradient endingColor:topGradient];
