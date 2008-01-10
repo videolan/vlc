@@ -381,7 +381,7 @@ static struct
     /* Raw data types, not in V4L2 spec but still in videodev2.h and supported
      * by VLC */
     { V4L2_PIX_FMT_YUV420,  VLC_FOURCC('I','4','2','0') },
-    { V4L2_PIX_FMT_RGB444,  VLC_FOURCC('R','V','3','2') },
+    /* FIXME { V4L2_PIX_FMT_RGB444,  VLC_FOURCC('R','V','3','2') }, */
 
     /* Compressed data types */
     { V4L2_PIX_FMT_MJPEG,   VLC_FOURCC('M','J','P','G') },
