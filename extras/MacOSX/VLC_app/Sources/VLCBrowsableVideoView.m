@@ -183,6 +183,14 @@
         [self displayMenu];
 }
 
+- (void)drawRect:(NSRect)rect
+{    
+    NSColor * bottomGradient = [NSColor colorWithCalibratedWhite:0.10 alpha:1.0];
+    NSColor * topGradient    = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
+	NSGradient * gradient = [[NSGradient alloc] initWithStartingColor:bottomGradient endingColor:topGradient];
+    [gradient drawInRect:self.bounds angle:90.0];
+}
+
 
 /* Event handling */
 
