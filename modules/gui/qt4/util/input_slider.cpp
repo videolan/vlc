@@ -75,6 +75,10 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
     setToolTip( psz_length );
 }
 
+/* This work is derived from Amarok's work under GPLv2+
+    - Mark Kretschmann
+    - Gábor Lehel
+   */
 #define WLENGTH   90 // px
 #define WHEIGHT   25  // px
 #define SOUNDMIN  0   // %
