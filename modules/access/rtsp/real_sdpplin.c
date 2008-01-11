@@ -95,7 +95,7 @@ static int filter(const char *in, const char *filter, char **out) {
 
   if (!in) return 0;
 
-  len = (strchr(in,'\n')) ? strchr(in,'\n')-in : strlen(in);
+  len = (strchr(in,'\n')) ? (size_t)(strchr(in,'\n')-in) : strlen(in);
   if (!strncmp(in,filter,flen)) {
     if(in[flen]=='"') flen++;
     if(in[len-1]==13) len--;
