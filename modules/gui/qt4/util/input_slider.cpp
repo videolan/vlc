@@ -188,6 +188,13 @@ void SoundSlider::paintEvent(QPaintEvent *e)
     const QRectF boundsO( 0, 0, pixOutside.width(), pixOutside.height() );
     painter.drawPixmap( boundsO, pixOutside, boundsO );
 
+    painter.setPen( palette().color( QPalette::Active, QPalette::Mid ) );
+    QFont font; font.setPixelSize( 9 );
+    painter.setFont( font );
+    const QRect rect( 0, 0, 34, 15 );
+    painter.drawText( rect, Qt::AlignRight | Qt::AlignVCenter,
+                      QString::number( value() ) + '%' );
+
     painter.end();
 }
 
