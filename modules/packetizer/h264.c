@@ -532,6 +532,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
 #define OUTPUT \
     do {                                                      \
+        if( !p_sys->b_header && p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I) \
+            break;                                            \
+                                                              \
         if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->p_sps && p_sys->p_pps ) \
         { \
             block_t *p_sps = block_Duplicate( p_sys->p_sps ); \
