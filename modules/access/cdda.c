@@ -35,6 +35,7 @@
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_access.h>
+#include <vlc_meta.h>
 
 #include <vlc_codecs.h> /* For WAVEHEADER */
 #include "vcd/cdrom.h"
@@ -468,24 +469,19 @@ static int GetTracks( access_t *p_access,
         /* If we have CDDB info, change the name */
         if( p_sys->p_disc )
         {
-            const char *psz_result;
             cddb_track_t *t = cddb_disc_get_track( p_sys->p_disc, i );
             if( t!= NULL )
             {
                 if( cddb_track_get_title( t )  != NULL )
                 {
-                    input_ItemAddInfo( p_input_item, _(VLC_META_INFO_CAT),
-                                            _(VLC_META_TITLE),
-                                            "%s", cddb_track_get_title( t ) );
                     if( p_input_item->psz_name )
                         free( p_input_item->psz_name );
                     p_input_item->psz_name = strdup( cddb_track_get_title( t ) );
+                    input_item_SetTitle( p_input_item, cddb_track_get_title( t ) );
                 }
-                psz_result = cddb_track_get_artist( t );
-                if( psz_result )
+                if( cddb_track_get_artist( t ) != NULL )
                 {
-                    input_ItemAddInfo( p_input_item, _(VLC_META_INFO_CAT),
-                                       _(VLC_META_ARTIST), "%s", psz_result );
+                    input_item_SetArtist( p_input_item, cddb_track_get_artist( t ) );
                 }
             }
         }
