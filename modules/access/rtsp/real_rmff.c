@@ -35,157 +35,184 @@
  * writes header data to a buffer
  */
 
-static void rmff_dump_fileheader(rmff_fileheader_t *fileheader, char *buffer) {
+static int rmff_dump_fileheader(rmff_fileheader_t *fileheader, uint8_t *buffer, int bufsize) {
+    if (!fileheader) return 0;
+    if (bufsize < RMFF_FILEHEADER_SIZE)
+        return -1;
 
-  if (!fileheader) return;
-  fileheader->object_id=BE_32(&fileheader->object_id);
-  fileheader->size=BE_32(&fileheader->size);
-  fileheader->object_version=BE_16(&fileheader->object_version);
-  fileheader->file_version=BE_32(&fileheader->file_version);
-  fileheader->num_headers=BE_32(&fileheader->num_headers);
+    fileheader->object_id=BE_32(&fileheader->object_id);
+    fileheader->size=BE_32(&fileheader->size);
+    fileheader->object_version=BE_16(&fileheader->object_version);
+    fileheader->file_version=BE_32(&fileheader->file_version);
+    fileheader->num_headers=BE_32(&fileheader->num_headers);
 
-  memcpy(buffer, fileheader, 8);
-  memcpy(&buffer[8], &fileheader->object_version, 2);
-  memcpy(&buffer[10], &fileheader->file_version, 8);
+    memcpy(buffer, fileheader, 8);
+    memcpy(&buffer[8], &fileheader->object_version, 2);
+    memcpy(&buffer[10], &fileheader->file_version, 8);
 
-  fileheader->size=BE_32(&fileheader->size);
-  fileheader->object_version=BE_16(&fileheader->object_version);
-  fileheader->file_version=BE_32(&fileheader->file_version);
-  fileheader->num_headers=BE_32(&fileheader->num_headers);
-  fileheader->object_id=BE_32(&fileheader->object_id);
+    fileheader->size=BE_32(&fileheader->size);
+    fileheader->object_version=BE_16(&fileheader->object_version);
+    fileheader->file_version=BE_32(&fileheader->file_version);
+    fileheader->num_headers=BE_32(&fileheader->num_headers);
+    fileheader->object_id=BE_32(&fileheader->object_id);
+
+    return RMFF_FILEHEADER_SIZE;
 }
 
-static void rmff_dump_prop(rmff_prop_t *prop, char *buffer) {
+static int rmff_dump_prop(rmff_prop_t *prop, uint8_t *buffer, int bufsize) {
 
-  if (!prop) return;
-  prop->object_id=BE_32(&prop->object_id);
-  prop->size=BE_32(&prop->size);
-  prop->object_version=BE_16(&prop->object_version);
-  prop->max_bit_rate=BE_32(&prop->max_bit_rate);
-  prop->avg_bit_rate=BE_32(&prop->avg_bit_rate);
-  prop->max_packet_size=BE_32(&prop->max_packet_size);
-  prop->avg_packet_size=BE_32(&prop->avg_packet_size);
-  prop->num_packets=BE_32(&prop->num_packets);
-  prop->duration=BE_32(&prop->duration);
-  prop->preroll=BE_32(&prop->preroll);
-  prop->index_offset=BE_32(&prop->index_offset);
-  prop->data_offset=BE_32(&prop->data_offset);
-  prop->num_streams=BE_16(&prop->num_streams);
-  prop->flags=BE_16(&prop->flags);
+    if (!prop) return 0;
+    
+    if (bufsize < RMFF_PROPHEADER_SIZE)
+        return -1;
 
-  memcpy(buffer, prop, 8);
-  memcpy(&buffer[8], &prop->object_version, 2);
-  memcpy(&buffer[10], &prop->max_bit_rate, 36);
-  memcpy(&buffer[46], &prop->num_streams, 2);
-  memcpy(&buffer[48], &prop->flags, 2);
+    prop->object_id=BE_32(&prop->object_id);
+    prop->size=BE_32(&prop->size);
+    prop->object_version=BE_16(&prop->object_version);
+    prop->max_bit_rate=BE_32(&prop->max_bit_rate);
+    prop->avg_bit_rate=BE_32(&prop->avg_bit_rate);
+    prop->max_packet_size=BE_32(&prop->max_packet_size);
+    prop->avg_packet_size=BE_32(&prop->avg_packet_size);
+    prop->num_packets=BE_32(&prop->num_packets);
+    prop->duration=BE_32(&prop->duration);
+    prop->preroll=BE_32(&prop->preroll);
+    prop->index_offset=BE_32(&prop->index_offset);
+    prop->data_offset=BE_32(&prop->data_offset);
+    prop->num_streams=BE_16(&prop->num_streams);
+    prop->flags=BE_16(&prop->flags);
 
-  prop->size=BE_32(&prop->size);
-  prop->object_version=BE_16(&prop->object_version);
-  prop->max_bit_rate=BE_32(&prop->max_bit_rate);
-  prop->avg_bit_rate=BE_32(&prop->avg_bit_rate);
-  prop->max_packet_size=BE_32(&prop->max_packet_size);
-  prop->avg_packet_size=BE_32(&prop->avg_packet_size);
-  prop->num_packets=BE_32(&prop->num_packets);
-  prop->duration=BE_32(&prop->duration);
-  prop->preroll=BE_32(&prop->preroll);
-  prop->index_offset=BE_32(&prop->index_offset);
-  prop->data_offset=BE_32(&prop->data_offset);
-  prop->num_streams=BE_16(&prop->num_streams);
-  prop->flags=BE_16(&prop->flags);
-  prop->object_id=BE_32(&prop->object_id);
+    memcpy(buffer, prop, 8);
+    memcpy(&buffer[8], &prop->object_version, 2);
+    memcpy(&buffer[10], &prop->max_bit_rate, 36);
+    memcpy(&buffer[46], &prop->num_streams, 2);
+    memcpy(&buffer[48], &prop->flags, 2);
+
+    prop->size=BE_32(&prop->size);
+    prop->object_version=BE_16(&prop->object_version);
+    prop->max_bit_rate=BE_32(&prop->max_bit_rate);
+    prop->avg_bit_rate=BE_32(&prop->avg_bit_rate);
+    prop->max_packet_size=BE_32(&prop->max_packet_size);
+    prop->avg_packet_size=BE_32(&prop->avg_packet_size);
+    prop->num_packets=BE_32(&prop->num_packets);
+    prop->duration=BE_32(&prop->duration);
+    prop->preroll=BE_32(&prop->preroll);
+    prop->index_offset=BE_32(&prop->index_offset);
+    prop->data_offset=BE_32(&prop->data_offset);
+    prop->num_streams=BE_16(&prop->num_streams);
+    prop->flags=BE_16(&prop->flags);
+    prop->object_id=BE_32(&prop->object_id);
+
+    return RMFF_PROPHEADER_SIZE;
 }
 
-static void rmff_dump_mdpr(rmff_mdpr_t *mdpr, char *buffer) {
+static int rmff_dump_mdpr(rmff_mdpr_t *mdpr, uint8_t *buffer, int bufsize) {
 
-  int s1, s2, s3;
+    int s1, s2, s3;
 
-  if (!mdpr) return;
-  mdpr->object_id=BE_32(&mdpr->object_id);
-  mdpr->size=BE_32(&mdpr->size);
-  mdpr->object_version=BE_16(&mdpr->object_version);
-  mdpr->stream_number=BE_16(&mdpr->stream_number);
-  mdpr->max_bit_rate=BE_32(&mdpr->max_bit_rate);
-  mdpr->avg_bit_rate=BE_32(&mdpr->avg_bit_rate);
-  mdpr->max_packet_size=BE_32(&mdpr->max_packet_size);
-  mdpr->avg_packet_size=BE_32(&mdpr->avg_packet_size);
-  mdpr->start_time=BE_32(&mdpr->start_time);
-  mdpr->preroll=BE_32(&mdpr->preroll);
-  mdpr->duration=BE_32(&mdpr->duration);
+    if (!mdpr) return 0;
+    if (bufsize < RMFF_MDPRHEADER_SIZE + mdpr->type_specific_len +
+            mdpr->stream_name_size + mdpr->mime_type_size)
+    return -1;
 
-  memcpy(buffer, mdpr, 8);
-  memcpy(&buffer[8], &mdpr->object_version, 2);
-  memcpy(&buffer[10], &mdpr->stream_number, 2);
-  memcpy(&buffer[12], &mdpr->max_bit_rate, 28);
-  memcpy(&buffer[40], &mdpr->stream_name_size, 1);
-  s1=mdpr->stream_name_size;
-  memcpy(&buffer[41], mdpr->stream_name, s1);
+    mdpr->object_id=BE_32(&mdpr->object_id);
+    mdpr->size=BE_32(&mdpr->size);
+    mdpr->object_version=BE_16(&mdpr->object_version);
+    mdpr->stream_number=BE_16(&mdpr->stream_number);
+    mdpr->max_bit_rate=BE_32(&mdpr->max_bit_rate);
+    mdpr->avg_bit_rate=BE_32(&mdpr->avg_bit_rate);
+    mdpr->max_packet_size=BE_32(&mdpr->max_packet_size);
+    mdpr->avg_packet_size=BE_32(&mdpr->avg_packet_size);
+    mdpr->start_time=BE_32(&mdpr->start_time);
+    mdpr->preroll=BE_32(&mdpr->preroll);
+    mdpr->duration=BE_32(&mdpr->duration);
 
-  memcpy(&buffer[41+s1], &mdpr->mime_type_size, 1);
-  s2=mdpr->mime_type_size;
-  memcpy(&buffer[42+s1], mdpr->mime_type, s2);
+    memcpy(buffer, mdpr, 8);
+    memcpy(&buffer[8], &mdpr->object_version, 2);
+    memcpy(&buffer[10], &mdpr->stream_number, 2);
+    memcpy(&buffer[12], &mdpr->max_bit_rate, 28);
+    memcpy(&buffer[40], &mdpr->stream_name_size, 1);
+    s1=mdpr->stream_name_size;
+    memcpy(&buffer[41], mdpr->stream_name, s1);
 
-  mdpr->type_specific_len=BE_32(&mdpr->type_specific_len);
-  memcpy(&buffer[42+s1+s2], &mdpr->type_specific_len, 4);
-  mdpr->type_specific_len=BE_32(&mdpr->type_specific_len);
-  s3=mdpr->type_specific_len;
-  memcpy(&buffer[46+s1+s2], mdpr->type_specific_data, s3);
+    memcpy(&buffer[41+s1], &mdpr->mime_type_size, 1);
+    s2=mdpr->mime_type_size;
+    memcpy(&buffer[42+s1], mdpr->mime_type, s2);
 
-  mdpr->size=BE_32(&mdpr->size);
-  mdpr->stream_number=BE_16(&mdpr->stream_number);
-  mdpr->max_bit_rate=BE_32(&mdpr->max_bit_rate);
-  mdpr->avg_bit_rate=BE_32(&mdpr->avg_bit_rate);
-  mdpr->max_packet_size=BE_32(&mdpr->max_packet_size);
-  mdpr->avg_packet_size=BE_32(&mdpr->avg_packet_size);
-  mdpr->start_time=BE_32(&mdpr->start_time);
-  mdpr->preroll=BE_32(&mdpr->preroll);
-  mdpr->duration=BE_32(&mdpr->duration);
-  mdpr->object_id=BE_32(&mdpr->object_id);
+    mdpr->type_specific_len=BE_32(&mdpr->type_specific_len);
+    memcpy(&buffer[42+s1+s2], &mdpr->type_specific_len, 4);
+    mdpr->type_specific_len=BE_32(&mdpr->type_specific_len);
+    s3=mdpr->type_specific_len;
+    memcpy(&buffer[46+s1+s2], mdpr->type_specific_data, s3);
 
+    mdpr->size=BE_32(&mdpr->size);
+    mdpr->stream_number=BE_16(&mdpr->stream_number);
+    mdpr->max_bit_rate=BE_32(&mdpr->max_bit_rate);
+    mdpr->avg_bit_rate=BE_32(&mdpr->avg_bit_rate);
+    mdpr->max_packet_size=BE_32(&mdpr->max_packet_size);
+    mdpr->avg_packet_size=BE_32(&mdpr->avg_packet_size);
+    mdpr->start_time=BE_32(&mdpr->start_time);
+    mdpr->preroll=BE_32(&mdpr->preroll);
+    mdpr->duration=BE_32(&mdpr->duration);
+    mdpr->object_id=BE_32(&mdpr->object_id);
+
+    return RMFF_MDPRHEADER_SIZE + s1 + s2 + s3;
 }
 
-static void rmff_dump_cont(rmff_cont_t *cont, char *buffer) {
+static int rmff_dump_cont(rmff_cont_t *cont, uint8_t *buffer, int bufsize) {
 
-  int p;
+    int p;
 
-  if (!cont) return;
-  cont->object_id=BE_32(&cont->object_id);
-  cont->size=BE_32(&cont->size);
-  cont->object_version=BE_16(&cont->object_version);
+    if (!cont) return 0;
+    
+    if (bufsize < RMFF_CONTHEADER_SIZE + cont->title_len + cont->author_len + \
+            cont->copyright_len + cont->comment_len)
+        return -1;
 
-  memcpy(buffer, cont, 8);
-  memcpy(&buffer[8], &cont->object_version, 2);
+    cont->object_id=BE_32(&cont->object_id);
+    cont->size=BE_32(&cont->size);
+    cont->object_version=BE_16(&cont->object_version);
 
-  cont->title_len=BE_16(&cont->title_len);
-  memcpy(&buffer[10], &cont->title_len, 2);
-  cont->title_len=BE_16(&cont->title_len);
-  memcpy(&buffer[12], cont->title, cont->title_len);
-  p=12+cont->title_len;
+    memcpy(buffer, cont, 8);
+    memcpy(&buffer[8], &cont->object_version, 2);
 
-  cont->author_len=BE_16(&cont->author_len);
-  memcpy(&buffer[p], &cont->author_len, 2);
-  cont->author_len=BE_16(&cont->author_len);
-  memcpy(&buffer[p+2], cont->author, cont->author_len);
-  p+=2+cont->author_len;
+    cont->title_len=BE_16(&cont->title_len);
+    memcpy(&buffer[10], &cont->title_len, 2);
+    cont->title_len=BE_16(&cont->title_len);
+    memcpy(&buffer[12], cont->title, cont->title_len);
+    p=12+cont->title_len;
 
-  cont->copyright_len=BE_16(&cont->copyright_len);
-  memcpy(&buffer[p], &cont->copyright_len, 2);
-  cont->copyright_len=BE_16(&cont->copyright_len);
-  memcpy(&buffer[p+2], cont->copyright, cont->copyright_len);
-  p+=2+cont->copyright_len;
+    cont->author_len=BE_16(&cont->author_len);
+    memcpy(&buffer[p], &cont->author_len, 2);
+    cont->author_len=BE_16(&cont->author_len);
+    memcpy(&buffer[p+2], cont->author, cont->author_len);
+    p+=2+cont->author_len;
 
-  cont->comment_len=BE_16(&cont->comment_len);
-  memcpy(&buffer[p], &cont->comment_len, 2);
-  cont->comment_len=BE_16(&cont->comment_len);
-  memcpy(&buffer[p+2], cont->comment, cont->comment_len);
+    cont->copyright_len=BE_16(&cont->copyright_len);
+    memcpy(&buffer[p], &cont->copyright_len, 2);
+    cont->copyright_len=BE_16(&cont->copyright_len);
+    memcpy(&buffer[p+2], cont->copyright, cont->copyright_len);
+    p+=2+cont->copyright_len;
 
-  cont->size=BE_32(&cont->size);
-  cont->object_version=BE_16(&cont->object_version);
-  cont->object_id=BE_32(&cont->object_id);
+    cont->comment_len=BE_16(&cont->comment_len);
+    memcpy(&buffer[p], &cont->comment_len, 2);
+    cont->comment_len=BE_16(&cont->comment_len);
+    memcpy(&buffer[p+2], cont->comment, cont->comment_len);
+
+    cont->size=BE_32(&cont->size);
+    cont->object_version=BE_16(&cont->object_version);
+    cont->object_id=BE_32(&cont->object_id);
+
+    return RMFF_CONTHEADER_SIZE + cont->title_len + cont->author_len + \
+        cont->copyright_len + cont->comment_len;
 }
 
-static void rmff_dump_dataheader(rmff_data_t *data, char *buffer) {
+static int rmff_dump_dataheader(rmff_data_t *data, uint8_t *buffer, int bufsize) {
 
-  if (!data) return;
+  if (!data) return 0;
+  
+  if (bufsize < RMFF_DATAHEADER_SIZE)
+      return -1;
+
 
   data->object_id=BE_32(&data->object_id);
   data->size=BE_32(&data->size);
@@ -202,33 +229,50 @@ static void rmff_dump_dataheader(rmff_data_t *data, char *buffer) {
   data->size=BE_32(&data->size);
   data->object_version=BE_16(&data->object_version);
   data->object_id=BE_32(&data->object_id);
+
+  return RMFF_DATAHEADER_SIZE;
 }
 
-int rmff_dump_header(rmff_header_t *h, char *buffer, int max) {
+int rmff_dump_header(rmff_header_t *h, void *buf_gen, int max) {
+    uint8_t *buffer = buf_gen;
 
-  int written=0;
-  rmff_mdpr_t **stream=h->streams;
+    int written=0, size;
+    rmff_mdpr_t **stream=h->streams;
 
-  rmff_dump_fileheader(h->fileheader, &buffer[written]);
-  written+=h->fileheader->size;
-  rmff_dump_prop(h->prop, &buffer[written]);
-  written+=h->prop->size;
-  rmff_dump_cont(h->cont, &buffer[written]);
-  written+=h->cont->size;
-  if (stream)
-  {
-    while(*stream)
-    {
-      rmff_dump_mdpr(*stream, &buffer[written]);
-      written+=(*stream)->size;
-      stream++;
+    if ((size=rmff_dump_fileheader(h->fileheader, &buffer[written], max)) < 0)
+        return -1;
+    
+    written += size;
+    max -= size;
+
+    if ((size=rmff_dump_prop(h->prop, &buffer[written], max)) < 0)
+        return -1;
+    
+    written += size;
+    max -= size;
+
+    if ((size=rmff_dump_cont(h->cont, &buffer[written], max)) < 0)
+        return -1;
+
+    written += size;
+    max -= size;
+
+    if (stream) {
+        while(*stream) {
+            if ((size=rmff_dump_mdpr(*stream, &buffer[written], max)) < 0)
+                return -1;
+            written += size;
+            max -= size;
+            stream++;
+        }
     }
-  }
 
-  rmff_dump_dataheader(h->data, &buffer[written]);
-  written+=18;
+    if ((size=rmff_dump_dataheader(h->data, &buffer[written], max)) < 0)
+        return -1;
+    
+    written+=size;
 
-  return written;
+    return written;
 }
 
 void rmff_dump_pheader(rmff_pheader_t *h, char *data) {
