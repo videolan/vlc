@@ -91,6 +91,7 @@ struct decoder_sys_t
 
     vlc_bool_t   b_sps;
     vlc_bool_t   b_pps;
+    vlc_bool_t   b_header;
 
     /* avcC data */
     int i_avcC_length_size;
@@ -184,6 +185,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_pps   = VLC_FALSE;
     p_sys->p_sps   = 0;
     p_sys->p_pps   = 0;
+    p_sys->b_header= VLC_FALSE;
 
     p_sys->slice.i_nal_type = -1;
     p_sys->slice.i_nal_ref_idc = -1;
@@ -249,6 +251,7 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
         memcpy( (uint8_t*)p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
         memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
+        p_sys->b_header = VLC_TRUE;
 
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
@@ -543,6 +546,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             p_sps->i_pts = p_sys->p_frame->i_pts;           \
             block_ChainAppend( &p_sps, p_pps );               \
             block_ChainAppend( &p_sps, p_sys->p_frame );      \
+            p_sys->b_header = VLC_TRUE;                       \
             p_pic = block_ChainGather( p_sps );               \
         } else { \
             p_pic = block_ChainGather( p_sys->p_frame ); \
