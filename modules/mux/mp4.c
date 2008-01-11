@@ -181,7 +181,7 @@ static int Open( vlc_object_t *p_this )
     sout_mux_sys_t  *p_sys;
     bo_t            *box;
 
-    msg_Dbg( p_mux, "Mp4 muxer opend" );
+    msg_Dbg( p_mux, "Mp4 muxer opened" );
     config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_mux->pf_control   = Control;
