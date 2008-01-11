@@ -531,9 +531,11 @@ void MainInterface::debug()
 QSize MainInterface::sizeHint() const
 {
     int nwidth  = controls->sizeHint().width();
-    int nheight = controls->size().height()
-                + menuBar()->size().height()
-                + statusBar()->size().height();
+    int nheight = controls->isVisible() ?
+                  controls->size().height()
+                  + menuBar()->size().height()
+                  + statusBar()->size().height()
+                  : 0 ;
 
     msg_Dbg( p_intf, "1 %i %i", nheight, nwidth );
     if( VISIBLE( bgWidget ) )
@@ -757,7 +759,7 @@ void MainInterface::toggleMinimalView()
     TOGGLEV( menuBar() );
     TOGGLEV( controls );
     TOGGLEV( statusBar() );
-    updateGeometry();
+    doComponentsUpdate();
 }
 
 /* Video widget cannot do this synchronously as it runs in another thread */
