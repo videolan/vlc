@@ -233,16 +233,23 @@ sdpplin_t *sdpplin_parse(char *data) {
     free( desc );
     return NULL;
   }
+
+  desc->stream = NULL;
+
   memset(desc, 0, sizeof(sdpplin_t));
 
   while (data && *data) {
     handled=0;
 
     if (filter(data, "m=", &buf)) {
-      stream=sdpplin_parse_stream(&data);
-      lprintf("got data for stream id %u\n", stream->stream_id);
-      desc->stream[stream->stream_id]=stream;
-      continue;
+        if ( !desc->stream ) {
+            fprintf(stderr, "sdpplin.c: stream identifier found before stream count, skipping.");
+            continue;
+        }
+        stream=sdpplin_parse_stream(&data);
+        lprintf("got data for stream id %u\n", stream->stream_id);
+        desc->stream[stream->stream_id]=stream;
+        continue;
     }
     if(filter(data,"a=Title:buffer;",&buf)) {
       decoded=b64_decode(buf, decoded, &len);
