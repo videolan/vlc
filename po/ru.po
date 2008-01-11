@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2008-01-07 21:06+0100\n"
-"PO-Revision-Date: 2006-08-29 20:10+0700\n"
-"Last-Translator: Vladimir Yermolayev <init@siptelecom.ru>\n"
+"PO-Revision-Date: 2008-01-10 17:32+0300\n"
+"Last-Translator: Andrew Zaikin <andrew.zaikin@gmail.com>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -14048,9 +14048,8 @@ msgid "Marquee"
 msgstr "Бегущая строка"
 
 #: modules/gui/macosx/sfilters.m:74
-#, fuzzy
 msgid "Save settings"
-msgstr "Настройки видео"
+msgstr "Сохранить настройки"
 
 #: modules/gui/macosx/sfilters.m:76 modules/gui/macosx/sfilters.m:80
 #: modules/gui/macosx/sfilters.m:87
@@ -14080,9 +14079,8 @@ msgid "Size:"
 msgstr "Размер:"
 
 #: modules/gui/macosx/sfilters.m:83 modules/gui/macosx/sfilters.m:88
-#, fuzzy
 msgid "Color:"
-msgstr "Цвет"
+msgstr "Цвет:"
 
 #: modules/gui/macosx/sfilters.m:84
 #, fuzzy
@@ -14136,12 +14134,10 @@ msgid "You can change this option in VLC's update window later on."
 msgstr ""
 
 #: modules/gui/macosx/update.m:111
-#, fuzzy
 msgid "Yes"
 msgstr "Да"
 
 #: modules/gui/macosx/update.m:111
-#, fuzzy
 msgid "No"
 msgstr "Нет"
 
@@ -15097,9 +15093,8 @@ msgid "Muxer:"
 msgstr "Мультиплексор"
 
 #: modules/gui/pda/pda_interface.c:994
-#, fuzzy
 msgid "URL:"
-msgstr "URL"
+msgstr "URL:"
 
 #: modules/gui/pda/pda_interface.c:1003
 #, fuzzy
@@ -15129,14 +15124,12 @@ msgid "PS"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1049
-#, fuzzy
 msgid "TS"
-msgstr "RTSP"
+msgstr "TS"
 
 #: modules/gui/pda/pda_interface.c:1050
-#, fuzzy
 msgid "MPEG1"
-msgstr "MJPEG"
+msgstr "MPEG1"
 
 #: modules/gui/pda/pda_interface.c:1051
 msgid "AVI"
@@ -15191,9 +15184,8 @@ msgid "vorb"
 msgstr "Стоп"
 
 #: modules/gui/pda/pda_interface.c:1119
-#, fuzzy
 msgid "bits/s"
-msgstr "Следующий файл"
+msgstr "бит/c"
 
 #: modules/gui/pda/pda_interface.c:1132
 #, fuzzy
@@ -15315,9 +15307,8 @@ msgid "A to B"
 msgstr " в "
 
 #: modules/gui/qt4/components/interface_widgets.cpp:276
-#, fuzzy
 msgid "Frame by Frame"
-msgstr "Частота кадров"
+msgstr "Кадр за Кадром"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:290
 #, fuzzy
@@ -15325,14 +15316,12 @@ msgid "Take a snapshot"
 msgstr "Сделать стоп-кадр"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:456
-#, fuzzy
 msgid "Transparent"
-msgstr "Прозрачность"
+msgstr "Прозрачный"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:548
-#, fuzzy
 msgid "Show playlist"
-msgstr "Сохранить плейлист"
+msgstr "Показать плейлист"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:553
 #, fuzzy
@@ -15364,14 +15353,12 @@ msgid "Select one or multiple files, or a folder"
 msgstr "Выберите файл для сохранения"
 
 #: modules/gui/qt4/components/open_panels.cpp:104
-#, fuzzy
 msgid "File names:"
-msgstr "Имя файла"
+msgstr "Имена файла:"
 
 #: modules/gui/qt4/components/open_panels.cpp:106
-#, fuzzy
 msgid "Filter:"
-msgstr "Фильтры"
+msgstr "Фильтр:"
 
 #: modules/gui/qt4/components/open_panels.cpp:147
 #: modules/gui/wxwidgets/dialogs/open.cpp:1296
@@ -15413,9 +15400,8 @@ msgid "Auto connnection"
 msgstr "Автоматически восстанавливать соединение"
 
 #: modules/gui/qt4/components/open_panels.cpp:686
-#, fuzzy
 msgid "Radio device name"
-msgstr "Аудио устройство"
+msgstr "Имя Радио устройства"
 
 #: modules/gui/qt4/components/open_panels.cpp:737
 #: modules/gui/qt4/components/open_panels.cpp:831
@@ -15465,9 +15451,8 @@ msgid "Set"
 msgstr "Коэффициент квантования"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid "Hotkey for "
-msgstr "Горячие клавиши"
+msgstr "Горячие клавиши для "
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1137
 msgid "Press the new keys for "
@@ -15554,14 +15539,12 @@ msgid "Spatializer"
 msgstr "spatial"
 
 #: modules/gui/qt4/dialogs/extended.cpp:56
-#, fuzzy
 msgid "Audio effects"
-msgstr "Аудио кодеки"
+msgstr "Аудио эффекты"
 
 #: modules/gui/qt4/dialogs/extended.cpp:59
-#, fuzzy
 msgid "Video Effects"
-msgstr "Аудио кодеки"
+msgstr "Видео эффекты"
 
 #: modules/gui/qt4/dialogs/extended.cpp:64
 #, fuzzy
@@ -15574,9 +15557,8 @@ msgid "Go to time"
 msgstr "Перейти к Заголовку"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:46
-#, fuzzy
 msgid "&Go"
-msgstr "Нет"
+msgstr "&Вперед"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:47
 #: modules/gui/qt4/dialogs/open.cpp:105
@@ -15641,19 +15623,16 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/dialogs/help.cpp:160
-#, fuzzy
 msgid "General Info"
-msgstr "Общие"
+msgstr "Общая информация"
 
 #: modules/gui/qt4/dialogs/help.cpp:161
-#, fuzzy
 msgid "Authors"
-msgstr "Модули..."
+msgstr "Авторы"
 
 #: modules/gui/qt4/dialogs/help.cpp:162
-#, fuzzy
 msgid "Thanks"
-msgstr "Дорожки"
+msgstr "Благодарности"
 
 #: modules/gui/qt4/dialogs/help.cpp:163
 #, fuzzy
@@ -15661,9 +15640,8 @@ msgid "Distribution License"
 msgstr "Видео фильтр расширения"
 
 #: modules/gui/qt4/dialogs/help.cpp:199
-#, fuzzy
 msgid "&Update List"
-msgstr "Обновления"
+msgstr "&Обновленить Список"
 
 #: modules/gui/qt4/dialogs/help.cpp:205
 #, fuzzy
@@ -15687,15 +15665,15 @@ msgstr ""
 msgid "Login"
 msgstr "Имя пользователя"
 
+#: modules/gui/qt4/dialogs/mediainfo.cpp:50
 #: modules/gui/qt4/dialogs/mediainfo.cpp:52
 #, fuzzy
 msgid "Media information"
 msgstr "Мета-данные"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:58
-#, fuzzy
 msgid "&General"
-msgstr "Общие"
+msgstr "&Общие"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:60
 #, fuzzy
@@ -15703,19 +15681,16 @@ msgid "&Extra Metadata"
 msgstr "Мета-данные"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:62
-#, fuzzy
 msgid "&Codec Details"
-msgstr "Показать всё"
+msgstr "Параметры &Кодека"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:66
-#, fuzzy
 msgid "&Statistics"
-msgstr "Статистика"
+msgstr "&Статистика"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:72
-#, fuzzy
 msgid "&Save Metadata"
-msgstr "Мета-данные"
+msgstr "&Сохранить Мета-данные"
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:78
 #, fuzzy
@@ -15723,9 +15698,8 @@ msgid "Location :"
 msgstr "Латинский"
 
 #: modules/gui/qt4/dialogs/messages.cpp:46
-#, fuzzy
 msgid "&Save as..."
-msgstr "Сохранить как..."
+msgstr "&Сохранить как..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:55
 #, fuzzy
@@ -15748,19 +15722,16 @@ msgid "&File"
 msgstr "&Файл"
 
 #: modules/gui/qt4/dialogs/open.cpp:80
-#, fuzzy
 msgid "&Disc"
-msgstr "Диск"
+msgstr "&Диск"
 
 #: modules/gui/qt4/dialogs/open.cpp:81
-#, fuzzy
 msgid "&Network"
-msgstr "Сеть"
+msgstr "&Сеть"
 
 #: modules/gui/qt4/dialogs/open.cpp:83
-#, fuzzy
 msgid "Capture &Device"
-msgstr "Открыть устройство..."
+msgstr "Устройство &видеозахвата"
 
 #: modules/gui/qt4/dialogs/open.cpp:97 modules/gui/qt4/dialogs/open.cpp:117
 #: modules/gui/qt4/dialogs/open.cpp:199
@@ -15773,9 +15744,8 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs/open.cpp:119 modules/gui/qt4/dialogs/open.cpp:189
 #: modules/gui/qt4/dialogs/sout.cpp:126
-#, fuzzy
 msgid "&Stream"
-msgstr "Поток"
+msgstr "&Поток"
 
 #: modules/gui/qt4/dialogs/open.cpp:121
 #, fuzzy
@@ -15789,9 +15759,8 @@ msgstr "Тип инверсии"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:62
 #: modules/gui/qt4/ui/video_effects.ui:41
-#, fuzzy
 msgid "Basic"
-msgstr "Башкирский"
+msgstr "Базовый"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:76
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:208
@@ -15800,9 +15769,8 @@ msgid "&Save"
 msgstr "Сохранить"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:78
-#, fuzzy
 msgid "&Reset Preferences"
-msgstr "Сбросить настройки"
+msgstr "&Сбросить настройки"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:326
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:294
@@ -15816,46 +15784,39 @@ msgstr ""
 #: modules/gui/qt4/dialogs_provider.cpp:362
 #, fuzzy
 msgid "Open playlist file"
-msgstr "Открыть плейлист"
+msgstr "Открыть файл плейлиста"
 
 #: modules/gui/qt4/dialogs_provider.cpp:373
-#, fuzzy
 msgid "Choose a filename to save playlist"
-msgstr "Вы должны выбрать файл для сохранения потока"
+msgstr "Выбор имени для записи плейлиста"
 
 #: modules/gui/qt4/dialogs_provider.cpp:375
-#, fuzzy
 msgid "XSPF playlist (*.xspf);; "
-msgstr "Экспорт плейлиста в XSPF"
+msgstr "XSPF плейлист (*.xspf);;"
 
 #: modules/gui/qt4/dialogs_provider.cpp:376
 msgid "M3U playlist (*.m3u);; Any (*.*) "
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.hpp:39
-#, fuzzy
 msgid "Media Files"
-msgstr "Поток: %s"
+msgstr "Медиа Файлы"
 
 #: modules/gui/qt4/dialogs_provider.hpp:44
-#, fuzzy
 msgid "Video Files"
-msgstr "Видео фильтры"
+msgstr "Видео файлы"
 
 #: modules/gui/qt4/dialogs_provider.hpp:49
-#, fuzzy
 msgid "Audio Files"
-msgstr "Аудио фильтры"
+msgstr "Аудио файлы"
 
 #: modules/gui/qt4/dialogs_provider.hpp:54
-#, fuzzy
 msgid "Playlist Files"
-msgstr "Вид плейлиста"
+msgstr "Файлы плейлистов"
 
 #: modules/gui/qt4/dialogs_provider.hpp:59
-#, fuzzy
 msgid "Subtitles Files"
-msgstr "Файл субтитров"
+msgstr "Файлы субтитров"
 
 #: modules/gui/qt4/dialogs_provider.hpp:64
 #, fuzzy
@@ -15897,9 +15858,8 @@ msgid "Repeat delay:"
 msgstr "Следующий файл"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:105
-#, fuzzy
 msgid " days"
-msgstr "Воспр."
+msgstr " дней"
 
 #: modules/gui/qt4/main_interface.cpp:451
 #, fuzzy
@@ -15934,19 +15894,16 @@ msgid "Paused"
 msgstr "Приостановлено"
 
 #: modules/gui/qt4/menus.cpp:173
-#, fuzzy
 msgid "&Media"
-msgstr "Поток: %s"
+msgstr "&Медиа"
 
 #: modules/gui/qt4/menus.cpp:174
-#, fuzzy
 msgid "&Playlist"
-msgstr "Плейлист"
+msgstr "Плей&лист"
 
 #: modules/gui/qt4/menus.cpp:175
-#, fuzzy
 msgid "&Tools"
-msgstr "Инструмент"
+msgstr "&Инструменты"
 
 #: modules/gui/qt4/menus.cpp:176 modules/gui/wxwidgets/interface.cpp:634
 msgid "&Audio"
@@ -15957,18 +15914,16 @@ msgid "&Video"
 msgstr "&Видео"
 
 #: modules/gui/qt4/menus.cpp:178
-#, fuzzy
 msgid "&Playback"
-msgstr "Воспроизведение"
+msgstr "Вос&произведение"
 
 #: modules/gui/qt4/menus.cpp:180 modules/gui/wxwidgets/interface.cpp:637
 msgid "&Help"
 msgstr "&Помощь"
 
 #: modules/gui/qt4/menus.cpp:193
-#, fuzzy
 msgid "&Open File..."
-msgstr "Открыть файл..."
+msgstr "&Открыть Файл..."
 
 #: modules/gui/qt4/menus.cpp:197 modules/gui/qt4/menus.cpp:524
 #: modules/gui/wxwidgets/menus.cpp:129
@@ -15978,7 +15933,7 @@ msgstr "Открыть &диск..."
 #: modules/gui/qt4/menus.cpp:199 modules/gui/qt4/menus.cpp:526
 #, fuzzy
 msgid "Open &Network..."
-msgstr "Открыть сеть..."
+msgstr "Открыть &Сетевой Ресурс..."
 
 #: modules/gui/qt4/menus.cpp:201 modules/gui/qt4/menus.cpp:528
 #: modules/gui/wxwidgets/menus.cpp:131
@@ -15986,9 +15941,8 @@ msgid "Open &Capture Device..."
 msgstr "Открыть устройство..."
 
 #: modules/gui/qt4/menus.cpp:206
-#, fuzzy
 msgid "&Streaming..."
-msgstr "Поток"
+msgstr "&Потоковое Вещание"
 
 #: modules/gui/qt4/menus.cpp:209
 msgid "Conve&rt / Save..."
@@ -15997,52 +15951,43 @@ msgstr ""
 #: modules/gui/qt4/menus.cpp:213 modules/gui/qt4/menus.cpp:708
 #, fuzzy
 msgid "&Quit"
-msgstr "Выход"
+msgstr "&Выход"
 
 #: modules/gui/qt4/menus.cpp:224
-#, fuzzy
 msgid "Show Playlist"
-msgstr "Сохранить плейлист"
+msgstr "Показать Плейлист"
 
 #: modules/gui/qt4/menus.cpp:232
-#, fuzzy
 msgid "Undock from interface"
-msgstr "Открыть окно списка для воспроизведения"
+msgstr "Отдельным Окном"
 
 #: modules/gui/qt4/menus.cpp:233
-#, fuzzy
 msgid "Ctrl+U"
-msgstr "Ctrl"
+msgstr "Ctrl+U"
 
 #: modules/gui/qt4/menus.cpp:253
-#, fuzzy
 msgid "Ctrl+L"
-msgstr "Ctrl"
+msgstr "Ctrl+L"
 
 #: modules/gui/qt4/menus.cpp:264
-#, fuzzy
 msgid "Add Interfaces"
-msgstr "Добавить интерфейс"
+msgstr "Добавить Интерфейсы"
 
 #: modules/gui/qt4/menus.cpp:271
-#, fuzzy
 msgid "Minimal View..."
-msgstr "Минимальный интерфейс"
+msgstr "Минимальный Интерфейс"
 
 #: modules/gui/qt4/menus.cpp:272
-#, fuzzy
 msgid "Ctrl+H"
-msgstr "Ctrl"
+msgstr "Ctrl+H"
 
 #: modules/gui/qt4/menus.cpp:278
-#, fuzzy
 msgid "Advanced controls"
-msgstr "Расширенные параметры"
+msgstr "Дополнительные элементы управления"
 
 #: modules/gui/qt4/menus.cpp:284
-#, fuzzy
 msgid "Visualizations selector"
-msgstr "Показать движение векторов"
+msgstr "Выбор визуализатора"
 
 #: modules/gui/qt4/menus.cpp:329
 #, fuzzy
@@ -16050,33 +15995,28 @@ msgid "Switch to skins"
 msgstr "Выбрать оболочку"
 
 #: modules/gui/qt4/menus.cpp:460
-#, fuzzy
 msgid "Help..."
-msgstr "Помощь"
+msgstr "Помощь..."
 
 #: modules/gui/qt4/menus.cpp:518
-#, fuzzy
 msgid "Tools"
-msgstr "Инструмент"
+msgstr "Инструменты"
 
 #: modules/gui/qt4/menus.cpp:522 modules/gui/wxwidgets/menus.cpp:127
 msgid "Open &File..."
 msgstr "Открыть &файл..."
 
 #: modules/gui/qt4/menus.cpp:692
-#, fuzzy
 msgid "Hide VLC media player in taskbar"
-msgstr "VLC media player"
+msgstr "Скрыть VLC медиа плеер в панели задач"
 
 #: modules/gui/qt4/menus.cpp:698
-#, fuzzy
 msgid "Show VLC media player"
-msgstr "VLC media player"
+msgstr "Показать VLC медиа плеер"
 
 #: modules/gui/qt4/menus.cpp:706
-#, fuzzy
 msgid "&Open Media"
-msgstr "Открыть файл"
+msgstr "&Открыть Медиа"
 
 #: modules/gui/qt4/menus.cpp:740 modules/gui/wxwidgets/menus.cpp:575
 #: modules/gui/wxwidgets/menus.cpp:602
@@ -16160,9 +16100,8 @@ msgid "Show all the advanced options in the dialogs"
 msgstr "Показать дополнительные параметры"
 
 #: modules/gui/qt4/qt4.cpp:90
-#, fuzzy
 msgid "Windows opacity between 0.1 and 1."
-msgstr "Множитель коэффициента квантования между I и P-кадрами."
+msgstr "Прозрачность окон между 0.1 и 1."
 
 #: modules/gui/qt4/qt4.cpp:91
 msgid ""
@@ -16225,19 +16164,16 @@ msgid "Qt interface"
 msgstr "Открыть окно списка для воспроизведения"
 
 #: modules/gui/qt4/ui/equalizer.ui:43
-#, fuzzy
 msgid "2 pass"
 msgstr "2 прохода"
 
 #: modules/gui/qt4/ui/equalizer.ui:63
-#, fuzzy
 msgid "Preset"
-msgstr "Загрузить"
+msgstr "Предустановка"
 
 #: modules/gui/qt4/ui/open_capture.ui:17
-#, fuzzy
 msgid "Capture Mode"
-msgstr "Кодеки главы"
+msgstr "Режим Захвата"
 
 #: modules/gui/qt4/ui/open_capture.ui:30
 #, fuzzy
@@ -16245,9 +16181,8 @@ msgid "Select the capture device type"
 msgstr "Выбрать каталог для сохранения"
 
 #: modules/gui/qt4/ui/open_capture.ui:44
-#, fuzzy
 msgid "Card Selection"
-msgstr "&Выделение"
+msgstr "Выбор Карты"
 
 #: modules/gui/qt4/ui/open_capture.ui:51 modules/gui/qt4/ui/open_net.ui:105
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
@@ -16259,37 +16194,32 @@ msgid "Access advanced options to tweak the device"
 msgstr ""
 
 #: modules/gui/qt4/ui/open_disk.ui:20
-#, fuzzy
 msgid "Disc selection"
-msgstr "Неправильное выделение"
+msgstr "Выбор диска"
 
 #: modules/gui/qt4/ui/open_disk.ui:59
-#, fuzzy
 msgid "Select the device or the VIDEO_TS folder"
-msgstr "Открыть каталог VIDEO_TS"
+msgstr "Открыть устройство или каталог VIDEO_TS"
 
 #: modules/gui/qt4/ui/open_disk.ui:69
-#, fuzzy
 msgid "Disk device"
-msgstr "Устройство"
+msgstr "Диск"
 
 #: modules/gui/qt4/ui/open_disk.ui:139
 msgid "Disable DVD Menus (for compatibility)"
 msgstr ""
 
 #: modules/gui/qt4/ui/open_disk.ui:142
-#, fuzzy
 msgid "No DVD Menus"
-msgstr "Использовать DVD меню"
+msgstr "Выключить DVD меню"
 
 #: modules/gui/qt4/ui/open_disk.ui:152
 msgid "Starting position"
 msgstr "Начальная позиция"
 
 #: modules/gui/qt4/ui/open_disk.ui:213
-#, fuzzy
 msgid "Audio and Subtitles"
-msgstr "Форматированные субтитры"
+msgstr "Аудио и Субтитры"
 
 #: modules/gui/qt4/ui/open_file.ui:26
 #, fuzzy
@@ -16297,38 +16227,32 @@ msgid "Choose one or more media file to open"
 msgstr "Выберите файл для сохранения"
 
 #: modules/gui/qt4/ui/open_file.ui:49
-#, fuzzy
 msgid "Add a subtitle file"
 msgstr "Подключить файл субтитров"
 
 #: modules/gui/qt4/ui/open_file.ui:52
-#, fuzzy
 msgid "Use a sub&amp;titles file"
-msgstr "Подключить файл субтитров"
+msgstr "Использовать &субтитры"
 
 #: modules/gui/qt4/ui/open_file.ui:126
-#, fuzzy
 msgid "Alignment:"
-msgstr "Выравнивание данных"
+msgstr "Положение:"
 
 #: modules/gui/qt4/ui/open_file.ui:178
-#, fuzzy
 msgid "Select the subtitle file"
-msgstr "Следующий файл"
+msgstr "Выбор файла субтитров"
 
 #: modules/gui/qt4/ui/open_net.ui:26
-#, fuzzy
 msgid "Network Protocol"
-msgstr "Сетевая синхронизация"
+msgstr "Сетевой Протокол"
 
 #: modules/gui/qt4/ui/open_net.ui:38
 msgid "Set the protocol for the URL"
 msgstr ""
 
 #: modules/gui/qt4/ui/open_net.ui:45
-#, fuzzy
 msgid "Protocol"
-msgstr "Протокол:"
+msgstr "Протокол"
 
 #: modules/gui/qt4/ui/open_net.ui:52
 msgid "Set the port used"
