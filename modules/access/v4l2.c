@@ -185,13 +185,23 @@ static void AccessClose( vlc_object_t * );
 #endif
 #define AUDIO_VOLUME_TEXT N_( "Volume" )
 #define AUDIO_VOLUME_LONGTEXT N_( \
-    "Volume of the audio input (if supported by v4l2 driver)." )
+    "Volume of the audio input (if supported by the v4l2 driver)." )
 #define AUDIO_BALANCE_TEXT N_( "Balance" )
 #define AUDIO_BALANCE_LONGTEXT N_( \
-    "Balance of the audio input (if supported by v4l2 driver)." )
+    "Balance of the audio input (if supported by the v4l2 driver)." )
 #define AUDIO_MUTE_TEXT N_( "Mute" )
 #define AUDIO_MUTE_LONGTEXT N_( \
-    "Mute audio input (if supported by v4l2 driver)." )
+    "Mute audio input (if supported by the v4l2 driver)." )
+#define AUDIO_BASS_TEXT N_( "Bass" )
+#define AUDIO_BASS_LONGTEXT N_( \
+    "Bass level of the audio input (if supported by the v4l2 driver)." )
+#define AUDIO_TREBLE_TEXT N_( "Treble" )
+#define AUDIO_TREBLE_LONGTEXT N_( \
+    "Treble level of the audio input (if supported by the v4l2 driver)." )
+#define AUDIO_LOUDNESS_TEXT N_( "Loudness" )
+#define AUDIO_LOUDNESS_LONGTEXT N_( \
+    "Loudness of the audio input (if supported by the v4l2 driver)." )
+
 #define STEREO_TEXT N_( "Stereo" )
 #define STEREO_LONGTEXT N_( \
     "Capture the audio stream in stereo." )
@@ -317,6 +327,12 @@ vlc_module_begin();
                 AUDIO_BALANCE_LONGTEXT, VLC_TRUE );
     add_bool( CFG_PREFIX "audio-mute", VLC_FALSE, NULL, AUDIO_MUTE_TEXT,
               AUDIO_MUTE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-bass", -1, NULL, AUDIO_BASS_TEXT,
+                AUDIO_BASS_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-treble", -1, NULL, AUDIO_TREBLE_TEXT,
+                AUDIO_TREBLE_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-loudness", -1, NULL, AUDIO_LOUDNESS_TEXT,
+                AUDIO_LOUDNESS_LONGTEXT, VLC_TRUE );
     add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, VLC_TRUE );
 
