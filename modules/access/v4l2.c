@@ -34,10 +34,6 @@
  * http://www.alsa-project.org
  */
 
-/*
- * TODO: Tuner partial implementation.
- */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -221,6 +217,16 @@ static void AccessClose( vlc_object_t * );
     "To list available controls, increase verbosity (-vvv) " \
     "or use the v4l2-ctl application." )
 
+#define TUNER_TEXT N_("Tuner id")
+#define TUNER_LONGTEXT N_( \
+    "Tuner id (see debug output)." )
+#define FREQUENCY_TEXT N_("Frequency")
+#define FREQUENCY_LONGTEXT N_( \
+    "Tuner frequency in Hz or kHz (see debug output)" )
+#define TUNER_AUDIO_MODE_TEXT N_("Audio mode")
+#define TUNER_AUDIO_MODE_LONGTEXT N_( \
+    "Tuner audio mono/stereo and track selection." )
+
 typedef enum {
     IO_METHOD_READ,
     IO_METHOD_MMAP,
@@ -236,6 +242,18 @@ static int i_iomethod_list[] =
     { IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
 static const char *psz_iomethod_list_text[] =
     { N_("READ"), N_("MMAP"),  N_("USERPTR") };
+
+static int i_tuner_audio_modes_list[] =
+    { V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
+      V4L2_TUNER_MODE_LANG1, V4L2_TUNER_MODE_LANG2,
+      V4L2_TUNER_MODE_SAP, V4L2_TUNER_MODE_LANG1_LANG2 };
+static const char *psz_tuner_audio_modes_list_text[] =
+    { N_( "Mono" ),
+      N_( "Stereo" ),
+      N_( "Primary language (Analog TV tuners only)" ),
+      N_( "Secondary language (Analog TV tuners only)" ),
+      N_( "Second audio program (Analog TV tuners only)" ),
+      N_( "Primary language left, Secondary language right" ) };
 
 #define FIND_VIDEO 1
 #define FIND_AUDIO 2
@@ -282,6 +300,16 @@ vlc_module_begin();
                 SAMPLERATE_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+
+    set_section( N_( "Tuner" ), NULL );
+    add_integer( CFG_PREFIX "tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT,
+                 VLC_TRUE );
+    add_integer( CFG_PREFIX "tuner-frequency", -1, NULL, FREQUENCY_TEXT,
+                 FREQUENCY_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "tuner-audio-mode", -1, NULL, TUNER_AUDIO_MODE_TEXT,
+                 TUNER_AUDIO_MODE_LONGTEXT, VLC_TRUE );
+        change_integer_list( i_tuner_audio_modes_list,
+                             psz_tuner_audio_modes_list_text, 0 );
 
     set_section( N_( "Controls" ),
                  N_( "v4l2 driver controls, if supported by your v4l2 driver." ) );
@@ -341,6 +369,7 @@ vlc_module_begin();
     set_callbacks( DemuxOpen, DemuxClose );
 
     add_submodule();
+    add_shortcut( "v4l2c" );
     set_description( _("Video4Linux2 Compressed A/V") );
     set_capability( "access2", 0 );
     /* use these when open as access_demux fails; VLC will use another demux */
@@ -545,6 +574,12 @@ struct demux_sys_t
     int i_alsa_chunk_size;
 #endif
 
+    /* Tuner */
+    int i_cur_tuner;
+    int i_frequency;
+    int i_audio_mode;
+
+    /* Controls */
     char *psz_set_ctrls;
 };
 
@@ -680,7 +715,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 #endif
 
     if( FindMainDevice( p_this, p_sys, FIND_VIDEO|FIND_AUDIO,
-        VLC_TRUE, !strcmp( p_demux->psz_access, "v4l2" ) ) != VLC_SUCCESS )
+        VLC_TRUE, !strncmp( p_demux->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
     {
         DemuxClose( p_this );
         return VLC_EGENERIC;
@@ -717,6 +752,10 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->b_stereo = var_CreateGetBool( p_obj, "v4l2-stereo" );
 
     p_sys->i_pts = var_CreateGetInteger( p_obj, "v4l2-caching" );
+
+    p_sys->i_cur_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
+    p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
+    p_sys->i_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
 
     p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
@@ -936,6 +975,23 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                 p_sys->i_pts = strtol( psz_parser + strlen( "caching=" ),
                                        &psz_parser, 0 );
             }
+            else if( !strncmp( psz_parser, "tuner=", strlen( "tuner=" ) ) )
+            {
+                p_sys->i_cur_tuner = strtol( psz_parser + strlen( "tuner=" ),
+                                         &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "tuner-frequency=", strlen( "tuner-frequency=" ) ) )
+            {
+                p_sys->i_frequency = strtol( psz_parser
+                                          + strlen( "tuner-frequency=" ),
+                                          &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "tuner-audio-mode=", strlen( "tuner-audio-mode=" ) ) )
+            {
+                p_sys->i_audio_mode = strtol( psz_parser
+                                          + strlen( "tuner-audio-mode=" ),
+                                          &psz_parser, 0 );
+            }
             else if( !strncmp( psz_parser, "set-ctrls=", strlen( "set-ctrls=" )) )
             {
                 int  i_len;
@@ -1071,7 +1127,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
 #ifdef HAVE_ALSA
-    if( p_sys->p_alsa_pcm ) 
+    if( p_sys->p_alsa_pcm )
     {
         snd_pcm_close( p_sys->p_alsa_pcm );
         p_sys->i_fd_audio = -1;
@@ -1128,7 +1184,7 @@ static int AccessOpen( vlc_object_t * p_this )
     ParseMRL( p_sys, p_access->psz_path, (vlc_object_t *) p_access );
 
     if( FindMainDevice( p_this, p_sys, FIND_VIDEO,
-        VLC_FALSE, !strcmp( p_access->psz_access, "v4l2" ) ) != VLC_SUCCESS )
+        VLC_FALSE, !strncmp( p_access->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
     {
         AccessClose( p_this );
         return VLC_EGENERIC;
@@ -1760,6 +1816,47 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
     {
         msg_Err( p_obj, "cannot open device (%m)" );
         goto open_failed;
+    }
+
+    /* Tune the tuner */
+    if( p_sys->i_frequency >= 0 )
+    {
+        if( p_sys->i_cur_tuner < 0 || p_sys->i_cur_tuner >= p_sys->i_tuner )
+        {
+            msg_Err( p_obj, "invalid tuner %d.", p_sys->i_cur_tuner );
+            goto open_failed;
+        }
+        struct v4l2_frequency frequency;
+        memset( &frequency, 0, sizeof( frequency ) );
+        frequency.tuner = p_sys->i_cur_tuner;
+        frequency.type = p_sys->p_tuners[p_sys->i_cur_tuner].type;
+        frequency.frequency = p_sys->i_frequency / 62.5;
+        if( ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
+        {
+            msg_Err( p_obj, "cannot set tuner frequency (%m)" );
+            goto open_failed;
+        }
+        msg_Dbg( p_obj, "Tuner frequency set" );
+    }
+
+    /* Set the tuner's audio mode */
+    if( p_sys->i_audio_mode >= 0 )
+    {
+        if( p_sys->i_cur_tuner < 0 || p_sys->i_cur_tuner >= p_sys->i_tuner )
+        {
+            msg_Err( p_obj, "invalid tuner %d.", p_sys->i_cur_tuner );
+            goto open_failed;
+        }
+        struct v4l2_tuner tuner;
+        memset( &tuner, 0, sizeof( tuner ) );
+        tuner.index = p_sys->i_cur_tuner;
+        tuner.audmode = p_sys->i_audio_mode;
+        if( ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
+        {
+            msg_Err( p_obj, "cannot set tuner audio mode (%m)" );
+            goto open_failed;
+        }
+        msg_Dbg( p_obj, "Tuner audio mode set" );
     }
 
     /* Select standard */
@@ -2592,6 +2689,21 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                 p_sys->p_tuners[i_index].capability &
                                         V4L2_TUNER_CAP_LOW ?
                                         "Hz" : "kHz" );
+
+            struct v4l2_frequency frequency;
+            memset( &frequency, 0, sizeof( frequency ) );
+            if( ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
+            {
+                msg_Err( p_obj, "cannot get tuner frequency (%m)" );
+                goto open_failed;
+            }
+            msg_Dbg( p_obj, "tuner %i (%s) frequency: %.1f %s",
+                     i_index,
+                     p_sys->p_tuners[i_index].name,
+                     frequency.frequency * 62.5,
+                     p_sys->p_tuners[i_index].capability &
+                             V4L2_TUNER_CAP_LOW ?
+                             "Hz" : "kHz" );
         }
     }
 
@@ -2982,7 +3094,7 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
 
     /* A list of available controls (aka the variable name) will be
      * stored as choices in the "allcontrols" variable. We'll thus be able
-     * to use those to create an appropriate interface 
+     * to use those to create an appropriate interface
      * A list of available controls that can be changed mid-stream will
      * be stored in the "controls" variable */
     var_Create( p_obj, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
@@ -3106,7 +3218,7 @@ static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         while( *psz_parser == ',' || *psz_parser == ' ' )
             psz_parser++;
- 
+
         psz_delim = strchr( psz_parser, ',' );
         if( psz_delim == NULL )
             psz_delim = strchr( psz_parser, '}' );
