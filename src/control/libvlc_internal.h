@@ -295,9 +295,6 @@ VLC_EXPORT (void, libvlc_media_instance_destroy,
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_item,
                         ( struct libvlc_instance_t *, input_item_t *, libvlc_exception_t * ) );
 
-VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
-                        ( libvlc_media_descriptor_t * ) );
-
 VLC_EXPORT (void, libvlc_media_descriptor_set_state,
                         ( libvlc_media_descriptor_t *, libvlc_state_t, libvlc_exception_t * ) );
 

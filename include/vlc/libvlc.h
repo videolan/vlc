@@ -186,6 +186,8 @@ VLC_PUBLIC_API void libvlc_media_descriptor_release(
 VLC_PUBLIC_API char * libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
                                                        libvlc_exception_t * p_e );
 
+VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t * );
+
 /**
  * Read the meta of the media descriptor.
  * \param p_meta_desc the media descriptor to read
