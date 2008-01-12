@@ -64,6 +64,8 @@ static int Activate( vlc_object_t *p_this )
 
     switch( p_vout->render.i_chroma )
     {
+        case VLC_FOURCC('Y','8','0','0'):
+            p_vout->render.i_chroma = VLC_FOURCC('G','R','E','Y');
         case VLC_FOURCC('G','R','E','Y'):
             switch( p_vout->output.i_chroma )
             {

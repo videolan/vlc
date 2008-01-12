@@ -101,6 +101,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
         /* Packed YUV */
         case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('Y','8','0','0'):
         case VLC_FOURCC('U','Y','V','Y'):
         case VLC_FOURCC('H','D','Y','C'):
 

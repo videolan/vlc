@@ -438,6 +438,9 @@ static int Open( vlc_object_t * p_this )
                         case 9:
                             tk->i_codec = VLC_FOURCC( 'Y', 'V', 'U', '9' ); /* <- TODO check that */
                             break;
+                        case 8:
+                            tk->i_codec = VLC_FOURCC('Y','8','0','0');
+                            break;
                     }
                     es_format_Init( &fmt, VIDEO_ES, tk->i_codec );
 
