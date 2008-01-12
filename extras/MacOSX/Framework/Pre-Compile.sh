@@ -99,7 +99,7 @@ if test "${ACTION}" = "build"; then
     ##########################
     
     ##########################
-    # Build the library folder (Same as VLCKit.framework/lib in Makefile)
+    # Build the library folder
     echo "Building library folder..."
     for linked_lib in ${linked_libs} ; do
         case "${linked_lib}" in
@@ -114,9 +114,12 @@ if test "${ACTION}" = "build"; then
                 ;;
         esac
     done
-    # Build the share folder
+
+    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc-control.dylib" ${target_lib} "library"
+    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc.dylib" ${target_lib} "library"
+
     ##########################
-    # Build the library folder (Same as VLCKit.framework/lib in Makefile)
+    # Build the share folder
     echo "Building share folder..."
     pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks"
     mkdir -p ${target_share}
