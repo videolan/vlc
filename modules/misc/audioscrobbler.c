@@ -30,10 +30,6 @@
  * Preamble
  *****************************************************************************/
 
-#if defined( WIN32 )
-#include <time.h>
-#endif
-
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_meta.h>
@@ -58,7 +54,7 @@ typedef struct audioscrobbler_song_t
     char        *psz_n;             /**< track number     */
     int         i_l;                /**< track length     */
     char        *psz_m;             /**< musicbrainz id   */
-    time_t      date;               /**< date since epoch */
+    mtime_t     date;               /**< date since epoch */
 } audioscrobbler_song_t;
 
 struct intf_sys_t
@@ -69,7 +65,7 @@ struct intf_sys_t
     vlc_mutex_t             lock;               /**< p_sys mutex            */
 
     /* data about audioscrobbler session */
-    time_t                  next_exchange;      /**< when can we send data  */
+    mtime_t                 next_exchange;      /**< when can we send data  */
     unsigned int            i_interval;         /**< waiting interval (secs)*/
 
     /* submission of played songs */
@@ -89,8 +85,8 @@ struct intf_sys_t
     /* data about song currently playing */
     audioscrobbler_song_t   p_current_song;     /**< song being played      */
 
-    time_t                  time_pause;         /**< time when vlc paused   */
-    time_t                  time_total_pauses;  /**< total time in pause    */
+    mtime_t                 time_pause;         /**< time when vlc paused   */
+    mtime_t                 time_total_pauses;  /**< total time in pause    */
 
     vlc_bool_t              b_submit;           /**< do we have to submit ? */
 
@@ -116,7 +112,7 @@ static int Handshake        ( intf_thread_t * );
 static int ReadMetaData     ( intf_thread_t * );
 static void DeleteSong      ( audioscrobbler_song_t* );
 static int ParseURL         ( char *, char **, char **, int * );
-static void HandleInterval  ( time_t *, unsigned int * );
+static void HandleInterval  ( mtime_t *, unsigned int * );
 
 /*****************************************************************************
  * Module descriptor
@@ -266,10 +262,9 @@ static void Run( intf_thread_t *p_intf )
     {
         /* waiting for data to submit, if waiting interval is elapsed */
         vlc_object_lock( p_intf );
-        if( time( NULL ) < p_sys->next_exchange )
+        if( mdate() < p_sys->next_exchange )
         {
-            mtime_t deadline = (mtime_t)p_sys->next_exchange * (mtime_t)1000000;
-            b_die = ( vlc_object_timedwait( p_intf, deadline) < 0 );
+            b_die = ( vlc_object_timedwait( p_intf, p_sys->next_exchange ) < 0 );
         }
         else
             b_die = vlc_object_wait( p_intf );
@@ -281,7 +276,7 @@ static void Run( intf_thread_t *p_intf )
             return;
         }
         /* we are signaled each time there is a song to submit */
-        else if( time( NULL ) < p_sys->next_exchange )
+        else if( mdate() < p_sys->next_exchange )
             continue;
 
         /* handshake if needed */
@@ -310,7 +305,7 @@ static void Run( intf_thread_t *p_intf )
                     msg_Dbg( p_intf, "Handshake successfull :)" );
                     p_sys->b_handshaked = VLC_TRUE;
                     p_sys->i_interval = 0;
-                    time( &p_sys->next_exchange );
+                    p_sys->next_exchange = mdate();
                     break;
 
                 case VLC_AUDIOSCROBBLER_EFATAL:
@@ -349,7 +344,7 @@ static void Run( intf_thread_t *p_intf )
                     "&l%%5B%d%%5D=%d&b%%5B%d%%5D=%s"
                     "&n%%5B%d%%5D=%s&m%%5B%d%%5D=%s",
                     i_song, p_song->psz_a,           i_song, p_song->psz_t,
-                    i_song, (uintmax_t)p_song->date, i_song, i_song,
+                    i_song, (uintmax_t)(p_song->date / 1000000), i_song, i_song,
                     i_song, p_song->i_l,             i_song, p_song->psz_b,
                     i_song, p_song->psz_n,           i_song, p_song->psz_m
             ) )
@@ -438,7 +433,7 @@ static void Run( intf_thread_t *p_intf )
                 DeleteSong( &p_sys->p_queue[i] );
             p_sys->i_songs = 0;
             p_sys->i_interval = 0;
-            time( &p_sys->next_exchange );
+            p_sys->next_exchange = mdate();
             msg_Dbg( p_intf, "Submission successful!" );
         }
         else
@@ -476,9 +471,9 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
             return VLC_ENOMEM;
     }
     else if( oldval.i_int == PLAYING_S && newval.i_int == PAUSE_S )
-        time( &p_sys->time_pause );
+        p_sys->time_pause = mdate();
     else if( oldval.i_int == PAUSE_S && newval.i_int == PLAYING_S )
-        p_sys->time_total_pauses += time( NULL ) - p_sys->time_pause;
+        p_sys->time_total_pauses += ( mdate() - p_sys->time_pause );
 
     return VLC_SUCCESS;
 }
@@ -537,7 +532,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     p_sys->time_total_pauses = 0;
-    time( &p_sys->p_current_song.date );
+    p_sys->p_current_song.date = mdate();
 
     var_AddCallback( p_input, "state", PlayingChange, p_intf );
     p_sys->b_state_cb = VLC_TRUE;
@@ -556,7 +551,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
  *****************************************************************************/
 static int AddToQueue ( intf_thread_t *p_this )
 {
-    time_t                      played_time;
+    mtime_t                     played_time;
     intf_sys_t                  *p_sys = p_this->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -568,9 +563,10 @@ static int AddToQueue ( intf_thread_t *p_this )
     }
 
     /* wait for the user to listen enough before submitting */
-    time ( &played_time );
+    played_time = mdate();
     played_time -= p_sys->p_current_song.date;
     played_time -= p_sys->time_total_pauses;
+    played_time /= 1000000; /* µs → s */
     if( ( played_time < 240 ) &&
         ( played_time < ( p_sys->p_current_song.i_l / 2 ) ) )
     {
@@ -696,7 +692,7 @@ static int ParseURL( char *psz_url, char **psz_host, char **psz_file,
 static int Handshake( intf_thread_t *p_this )
 {
     char                *psz_username, *psz_password;
-    time_t              timestamp;
+    mtime_t             timestamp;
     char                psz_timestamp[33];
 
     struct md5_s        p_struct_md5;
@@ -731,7 +727,7 @@ static int Handshake( intf_thread_t *p_this )
         return VLC_ENOVAR;
     }
 
-    time( &timestamp );
+    timestamp = mdate();
 
     /* generates a md5 hash of the password */
     InitMD5( &p_struct_md5 );
@@ -747,7 +743,7 @@ static int Handshake( intf_thread_t *p_this )
         return VLC_ENOMEM;
     }
 
-    snprintf( psz_timestamp, 33, "%llu", (uintmax_t)timestamp );
+    snprintf( psz_timestamp, 33, "%llu", (uintmax_t)(timestamp / 1000000) );
 
     /* generates a md5 hash of :
      * - md5 hash of the password, plus
@@ -1005,7 +1001,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
 }
 
-static void HandleInterval( time_t *next, unsigned int *i_interval )
+static void HandleInterval( mtime_t *next, unsigned int *i_interval )
 {
     if( *i_interval == 0 )
     {
@@ -1019,6 +1015,6 @@ static void HandleInterval( time_t *next, unsigned int *i_interval )
         if( *i_interval > 60*120 )
             *i_interval = 60*120;
     }
-    *next = time( NULL ) + *i_interval;
+    *next = mdate() + ( *i_interval * 1000000 );
 }
 
