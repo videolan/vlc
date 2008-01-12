@@ -52,7 +52,7 @@
     vout_thread_t * p_vout;
 }
 
-+ (void)resetVout: (vout_thread_t *)p_vout;
++ (void)resetVout: (vout_thread_t *) p_vout;
 - (id) initWithVout: (vout_thread_t *) p_vout;
 @end
 
@@ -321,10 +321,8 @@ static void Unlock( vout_thread_t * p_vout )
 }
 
 /* This function will reset the o_vout_view. It's useful to go fullscreen. */
-+ (void)resetVout:(NSData *)arg
++ (void)resetVout:(vout_thread_t *) p_vout
 {
-    vout_thread_t * p_vout = [arg pointerValue];
-
     if( p_vout->b_fullscreen )
     {
         /* Save window size and position */
@@ -397,9 +395,8 @@ static void Unlock( vout_thread_t * p_vout )
     /* Swap buffers only during the vertical retrace of the monitor.
        http://developer.apple.com/documentation/GraphicsImaging/
        Conceptual/OpenGL/chap5/chapter_5_section_44.html */
-    long params[] = { 1 };
-    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
-                     params );
+    GLint params[] = { 1 };
+    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval, params );
     return self;
 }
 
@@ -1049,16 +1046,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
 
 static int aglLock( vout_thread_t * p_vout )
 {
-#warning the following check is incorrect, needs testing!
-#ifdef __ppc__
-    /*
-     * before 10.4, we set the AGL context as current and
-     * then we retrieve and use the matching CGL context
-     */
-    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
-    return kCGLNoError != CGLLockContext( CGLGetCurrentContext() );
-#else
-    /* since 10.4, this is the safe way to get the underlying CGL context */
+	/* get the underlying CGL context */
     CGLContextObj cglContext;
     if( aglGetCGLContext(p_vout->p_sys->agl_ctx, (void**)&cglContext) )
     {
@@ -1069,26 +1057,16 @@ static int aglLock( vout_thread_t * p_vout )
         }
     }
     return 1;
-#endif
 }
 
 static void aglUnlock( vout_thread_t * p_vout )
 {
-#warning the following check is incorrect, needs testing!
-#ifdef __ppc__
-    /*
-     * before 10.4, we assume that the AGL context is current.
-     * therefore, we use the current CGL context
-     */
-    CGLUnlockContext( CGLGetCurrentContext() );
-#else
-    /* since 10.4, this is the safe way to get the underlying CGL context */
+	/* get the underlying CGL context */
     CGLContextObj cglContext;
     if( aglGetCGLContext(p_vout->p_sys->agl_ctx, (void**)&cglContext) )
     {
         CGLUnlockContext( cglContext );
     }
-#endif
 }
 
 
