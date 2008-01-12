@@ -636,8 +636,8 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_event_detach( p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaTimeChanged,            self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaInstanceTimeChanged,     HandleMediaTimeChanged,            self, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaPositionChanged,      self, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstanceTimeChanged,     HandleMediaTimeChanged,          self, NULL );
 }
 
 - (void)mediaPlayerTimeChanged:(NSNumber *)newTime
