@@ -35,7 +35,7 @@
 #ifdef DEBUG_HIERARCHICAL_VIEW
 # define trace( fmt, ... ) printf( "[HIERARCHICAL_NODE] %s(): " fmt, __FUNCTION__, ##__VA_ARGS__ )
 #else
-# define trace( ... )
+# define trace( ... ) {}
 #endif
 
 struct libvlc_media_list_view_private_t
@@ -187,7 +187,9 @@ items_subitems_added( const libvlc_event_t * p_event, void * user_data )
         }
     }
     else
+    {
         trace("item already added\n");
+    }
 }
 
 static void
