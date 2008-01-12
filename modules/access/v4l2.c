@@ -36,7 +36,6 @@
 
 /*
  * TODO: Tuner partial implementation.
- * TODO: Add more MPEG stream params
  */
 
 /*****************************************************************************
@@ -49,6 +48,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 
+#include <ctype.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -183,6 +183,15 @@ static void AccessClose( vlc_object_t * );
     "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, " \
     "3 for ALSA or OSS (ALSA is prefered)." )
 #endif
+#define AUDIO_VOLUME_TEXT N_( "Volume" )
+#define AUDIO_VOLUME_LONGTEXT N_( \
+    "Volume of the audio input (if supported by v4l2 driver)." )
+#define AUDIO_BALANCE_TEXT N_( "Balance" )
+#define AUDIO_BALANCE_LONGTEXT N_( \
+    "Balance of the audio input (if supported by v4l2 driver)." )
+#define AUDIO_MUTE_TEXT N_( "Mute" )
+#define AUDIO_MUTE_LONGTEXT N_( \
+    "Mute audio input (if supported by v4l2 driver)." )
 #define STEREO_TEXT N_( "Stereo" )
 #define STEREO_LONGTEXT N_( \
     "Capture the audio stream in stereo." )
@@ -194,6 +203,13 @@ static void AccessClose( vlc_object_t * );
 #define CACHING_LONGTEXT N_( \
     "Caching value for V4L2 captures. This " \
     "value should be set in milliseconds." )
+#define S_CTRLS_TEXT N_("v4l2 driver controls")
+#define S_CTRLS_LONGTEXT N_( \
+    "Set the v4l2 driver controls to the values specified using a comma " \
+    "separated list optionally encapsulated by curly braces " \
+    "(e.g.: {video_bitrate=6000000,audio_crc=0,stream_type=3} ). " \
+    "To list available controls, increase verbosity (-vvv) " \
+    "or use the v4l2-ctl application." )
 
 typedef enum {
     IO_METHOD_READ,
@@ -295,6 +311,14 @@ vlc_module_begin();
                  HCENTER_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "vcenter", -1, NULL, VCENTER_TEXT,
                  VCENTER_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-volume", -1, NULL, AUDIO_VOLUME_TEXT,
+                AUDIO_VOLUME_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-balance", -1, NULL, AUDIO_BALANCE_TEXT,
+                AUDIO_BALANCE_LONGTEXT, VLC_TRUE );
+    add_bool( CFG_PREFIX "audio-mute", VLC_FALSE, NULL, AUDIO_MUTE_TEXT,
+              AUDIO_MUTE_LONGTEXT, VLC_TRUE );
+    add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
+              S_CTRLS_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "v4l2" );
     set_capability( "access_demux", 10 );
@@ -315,6 +339,7 @@ vlc_module_end();
 static void CommonClose( vlc_object_t *, demux_sys_t * );
 static void ParseMRL( demux_sys_t *, char *, vlc_object_t * );
 static void GetV4L2Params( demux_sys_t *, vlc_object_t * );
+static void SetAvailControlsByString( vlc_object_t *, demux_sys_t *, int );
 
 static int DemuxControl( demux_t *, int, va_list );
 static int AccessControl( access_t *, int, va_list );
@@ -503,6 +528,8 @@ struct demux_sys_t
     size_t i_alsa_frame_size;
     int i_alsa_chunk_size;
 #endif
+
+    char *psz_set_ctrls;
 };
 
 static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
@@ -674,6 +701,8 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->b_stereo = var_CreateGetBool( p_obj, "v4l2-stereo" );
 
     p_sys->i_pts = var_CreateGetInteger( p_obj, "v4l2-caching" );
+
+    p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
     p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
     p_sys->i_fd_video = -1;
@@ -891,9 +920,33 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                 p_sys->i_pts = strtol( psz_parser + strlen( "caching=" ),
                                        &psz_parser, 0 );
             }
+            else if( !strncmp( psz_parser, "set-ctrls=", strlen( "set-ctrls=" )) )
+            {
+                int  i_len;
+
+                psz_parser += strlen( "set-ctrls=" );
+                if( strchr( psz_parser, ':' ) )
+                {
+                    i_len = strchr( psz_parser, ':' ) - psz_parser;
+                }
+                else
+                {
+                    i_len = strlen( psz_parser );
+                }
+
+                p_sys->psz_set_ctrls = strndup( psz_parser, i_len );
+
+                psz_parser += i_len;
+            }
             else
             {
-                msg_Warn( p_obj, "unknown option" );
+                char *psz_unk = strchr( psz_parser, ':' );
+                if (psz_unk)
+                    psz_unk = strndup( psz_parser, psz_unk - psz_parser );
+                else
+                    psz_unk = strdup( psz_parser);
+                msg_Warn( p_obj, "unknown option %s", psz_unk );
+                free (psz_unk);
             }
 
             while( *psz_parser && *psz_parser != ':' )
@@ -1019,6 +1072,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     free( p_sys->p_tuners );
     free( p_sys->p_codecs );
     free( p_sys->psz_requested_chroma );
+    free( p_sys->psz_set_ctrls );
 
     free( p_sys );
 }
@@ -1722,6 +1776,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
     /* if MPEG encoder card, no need to do anything else after this */
     ControlList( p_obj, i_fd,
                   var_GetBool( p_obj, "v4l2-controls-reset" ), b_demux );
+    SetAvailControlsByString( p_obj, p_sys, i_fd );
     if( VLC_FALSE == b_demux)
     {
         return i_fd;
@@ -2717,6 +2772,12 @@ static vlc_bool_t ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
     return VLC_FALSE;
 }
 
+static void name2var( unsigned char *name )
+{
+    for( ; *name; name++ )
+        *name = (*name == ' ') ? '_' : tolower( *name );
+}
+
 /*****************************************************************************
  * Print a user-class v4l2 control's details, create the relevant variable,
  * change the value if needed.
@@ -2752,12 +2813,8 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
     }
     else
     {
-        char *psz_buf;
         psz_name = strdup( (const char *)queryctrl.name );
-        for( psz_buf = psz_name; *psz_buf; psz_buf++ )
-        {
-            if( *psz_buf == ' ' ) *psz_buf = '-';
-        }
+        name2var( (unsigned char *)psz_name );
         i_val = -1;
     }
 
@@ -2863,7 +2920,11 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
     var_Change( p_obj, psz_name, VLC_VAR_SETTEXT, &val, NULL );
     val.i_int = queryctrl.id;
     val2.psz_string = (char *)psz_name;
-    var_Change( p_obj, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
+    var_Change( p_obj, "allcontrols", VLC_VAR_ADDCHOICE, &val, &val2 );
+    /* bad things happen changing MPEG mid-stream
+     * so don't add to Ext Settings GUI */
+    if( V4L2_CTRL_ID2CLASS( queryctrl.id ) != V4L2_CTRL_CLASS_MPEG )
+        var_Change( p_obj, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
 
     switch( var_Type( p_obj, psz_name ) & VLC_VAR_TYPE )
     {
@@ -2904,9 +2965,12 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
     memset( &queryctrl, 0, sizeof( queryctrl ) );
 
     /* A list of available controls (aka the variable name) will be
-     * stored as choices in the "controls" variable. We'll thus be able
-     * to use those to create an appropriate interface */
+     * stored as choices in the "allcontrols" variable. We'll thus be able
+     * to use those to create an appropriate interface 
+     * A list of available controls that can be changed mid-stream will
+     * be stored in the "controls" variable */
     var_Create( p_obj, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_obj, "allcontrols", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
 
     var_Create( p_obj, "controls-update", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
 
@@ -2932,6 +2996,12 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
         queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
         while( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
+            if( queryctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS )
+            {
+                msg_Dbg( p_obj, "%s", queryctrl.name );
+                queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
+                continue;
+            }
             switch( V4L2_CTRL_ID2CLASS( queryctrl.id ) )
             {
                 case V4L2_CTRL_CLASS_USER:
@@ -2939,6 +3009,7 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
                              queryctrl.name, queryctrl.id );
                     break;
                 case V4L2_CTRL_CLASS_MPEG:
+                    name2var( queryctrl.name );
                     msg_Dbg( p_obj, "Available MPEG control: %s (%x)",
                              queryctrl.name, queryctrl.id );
                     break;
@@ -2991,6 +3062,79 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
     }
 
     return VLC_SUCCESS;
+}
+
+static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
+                                      int i_fd )
+{
+    char *psz_parser = p_sys->psz_set_ctrls;
+    vlc_value_t val, text, name;
+
+    if( psz_parser == NULL )
+        return;
+
+    if( *psz_parser == '{' )
+        psz_parser++;
+
+    int i_ret = var_Change( p_obj, "allcontrols", VLC_VAR_GETCHOICES,
+                            &val, &text );
+    if( i_ret < 0 )
+    {
+        msg_Err( p_obj, "Oops, can't find 'allcontrols' variable." );
+        return;
+    }
+
+    while( *psz_parser && *psz_parser != '}' )
+    {
+        char *psz_delim, *psz_assign;
+
+        while( *psz_parser == ',' || *psz_parser == ' ' )
+            psz_parser++;
+ 
+        psz_delim = strchr( psz_parser, ',' );
+        if( psz_delim == NULL )
+            psz_delim = strchr( psz_parser, '}' );
+        if( psz_delim == NULL )
+            psz_delim = psz_parser + strlen( psz_parser );
+
+        psz_assign = memchr( psz_parser, '=', psz_delim - psz_parser );
+        if( psz_assign == NULL )
+        {
+            char *psz_name = strndup( psz_parser, psz_delim - psz_parser );
+            msg_Err( p_obj, "%s missing '='", psz_name );
+            free( psz_name );
+            psz_parser = psz_delim + 1;
+            continue;
+        }
+
+        for( int i = 0;
+             i < val.p_list->i_count ;//&& psz_parser < psz_assign;
+             i++ )
+        {
+            const char *psz_var = text.p_list->p_values[i].psz_string;
+            int i_cid = val.p_list->p_values[i].i_int;
+            var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &name, NULL );
+            const char *psz_name = name.psz_string;
+
+            int i_availstrlen = strlen( psz_name );
+            int i_parsestrlen = psz_assign - psz_parser;
+            int i_maxstrlen = __MAX( i_availstrlen, i_parsestrlen);
+
+            if( !strncasecmp( psz_name, psz_parser, i_maxstrlen ) )
+            {
+                Control( p_obj, i_fd, psz_name, i_cid,
+                         strtol( ++psz_assign, &psz_parser, 0) );
+            }
+        }
+
+        if( psz_parser < psz_assign )
+        {
+            char *psz_name = strndup( psz_parser, psz_assign - psz_parser );
+            msg_Err( p_obj, "Control %s not available", psz_name );
+            free( psz_name );
+            psz_parser = ( *psz_delim ) ? ( psz_delim + 1 ) : psz_delim;
+        }
+    }
 }
 
 /*****************************************************************************
@@ -3064,6 +3208,8 @@ static int Control( vlc_object_t *p_obj, int i_fd,
 {
     struct v4l2_queryctrl queryctrl;
     struct v4l2_control control;
+    struct v4l2_ext_control ext_control;
+    struct v4l2_ext_controls ext_controls;
 
     if( i_value == -1 )
         return VLC_SUCCESS;
@@ -3075,25 +3221,54 @@ static int Control( vlc_object_t *p_obj, int i_fd,
     if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
         || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
     {
-        msg_Dbg( p_obj, "%s (%x) control is not supported.", psz_name,
-                 i_cid );
+        msg_Dbg( p_obj, "%s (%x) control is not supported.", psz_name, i_cid );
         return VLC_EGENERIC;
     }
 
     memset( &control, 0, sizeof( control ) );
+    memset( &ext_control, 0, sizeof( ext_control ) );
+    memset( &ext_controls, 0, sizeof( ext_controls ) );
     control.id = i_cid;
+    ext_control.id = i_cid;
+    ext_controls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    ext_controls.count = 1;
+    ext_controls.controls = &ext_control;
 
     if( i_value >= 0 )
     {
-        control.value = i_value;
-        if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+        if( V4L2_CTRL_ID2CLASS( i_cid ) == V4L2_CTRL_CLASS_USER )
         {
-            msg_Err( p_obj, "unable to set %s to %d (%m)", psz_name,
-                     i_value );
-            return VLC_EGENERIC;
+            control.value = i_value;
+            if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+            {
+                msg_Err( p_obj, "unable to set %s (%x) to %d (%m)",
+                         psz_name, i_cid, i_value );
+                return VLC_EGENERIC;
+            }
+        }
+        else
+        {
+            ext_control.value = i_value;
+            if( ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
+            {
+                msg_Err( p_obj, "unable to set %s (%x) to %d (%m)",
+                         psz_name, i_cid, i_value );
+                return VLC_EGENERIC;
+            }
         }
     }
-    if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+
+    int i_ret;
+
+    if( V4L2_CTRL_ID2CLASS( i_cid ) == V4L2_CTRL_CLASS_USER )
+        i_ret = ioctl( i_fd, VIDIOC_G_CTRL, &control );
+    else
+    {
+        i_ret = ioctl( i_fd, VIDIOC_G_EXT_CTRLS, &ext_controls );
+        control.value = ext_control.value;
+    }
+
+    if( i_ret >= 0 )
     {
         vlc_value_t val;
         msg_Dbg( p_obj, "video %s: %d", psz_name, control.value );
