@@ -86,8 +86,10 @@ static void AccessClose( vlc_object_t * );
     "I41N, I422, I420, I411, I410, MJPG)")
 #define INPUT_TEXT N_( "Input" )
 #define INPUT_LONGTEXT N_( \
-    "Input of the card to use (Usually, 0 = tuner, " \
-    "1 = composite, 2 = svideo)." )
+    "Input of the card to use (see debug)." )
+#define AUDIO_INPUT_TEXT N_( "Audio input" )
+#define AUDIO_INPUT_LONGTEXT N_( \
+    "Audio input of the card to use (see debug)." )
 #define IOMETHOD_TEXT N_( "IO Method" )
 #define IOMETHOD_LONGTEXT N_( \
     "IO Method (READ, MMAP, USERPTR)." )
@@ -280,6 +282,8 @@ vlc_module_begin();
                 VLC_TRUE );
     add_integer( CFG_PREFIX "input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
                 VLC_TRUE );
+    add_integer( CFG_PREFIX "audio-input", 0, NULL, AUDIO_INPUT_TEXT,
+                 AUDIO_INPUT_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, VLC_TRUE );
         change_integer_list( i_iomethod_list, psz_iomethod_list_text, 0 );
@@ -540,6 +544,7 @@ struct demux_sys_t
     int i_audio;
     /* V4L2 devices cannot have more than 32 audio inputs */
     struct v4l2_audio p_audios[32];
+    int i_selected_audio_input;
 
     int i_tuner;
     struct v4l2_tuner *p_tuners;
@@ -735,6 +740,8 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
         i_standards_list[var_CreateGetInteger( p_obj, "v4l2-standard" )];
 
     p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
+    p_sys->i_selected_audio_input =
+        var_CreateGetInteger( p_obj, "v4l2-audio-input" );
 
     p_sys->io = var_CreateGetInteger( p_obj, "v4l2-io" );
 
@@ -860,6 +867,11 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
             else if( !strncmp( psz_parser, "input=", strlen( "input=" ) ) )
             {
                 p_sys->i_selected_input = strtol( psz_parser + strlen( "input=" ),
+                                       &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "audio-input=", strlen( "audio-input=" ) ) )
+            {
+                p_sys->i_selected_audio_input = strtol( psz_parser + strlen( "audio-input=" ),
                                        &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "fps=", strlen( "fps=" ) ) )
@@ -1873,7 +1885,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
 
     /* Select input */
 
-    if( p_sys->i_selected_input > p_sys->i_input )
+    if( p_sys->i_selected_input >= p_sys->i_input )
     {
         msg_Warn( p_obj, "invalid input. Using the default one" );
         p_sys->i_selected_input = 0;
@@ -1884,6 +1896,19 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
         msg_Err( p_obj, "cannot set input (%m)" );
         goto open_failed;
     }
+
+    if( p_sys->i_selected_audio_input >= p_sys->i_audio )
+    {
+        msg_Warn( p_obj, "invalid audio input. Using the default one" );
+        p_sys->i_selected_audio_input = 0;
+    }
+
+    if( ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
+    {
+        msg_Err( p_obj, "cannot set audio input (%m)" );
+        goto open_failed;
+    }
+
 
     /* TODO: Move the resolution stuff up here */
     /* if MPEG encoder card, no need to do anything else after this */
@@ -2582,13 +2607,14 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 msg_Err( p_obj, "cannot get video input characteristics (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_obj, "video input %i (%s) has type: %s",
+            msg_Dbg( p_obj, "video input %i (%s) has type: %s %c",
                                 i_index,
                                 p_sys->p_inputs[i_index].name,
                                 p_sys->p_inputs[i_index].type
                                         == V4L2_INPUT_TYPE_TUNER ?
                                         "Tuner adapter" :
-                                        "External analog input" );
+                                        "External analog input",
+                                i_index == p_sys->i_selected_input ? '*' : ' ' );
         }
     }
 
@@ -2615,9 +2641,10 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 msg_Err( p_obj, "cannot get video input standards (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_obj, "video standard %i is: %s",
+            msg_Dbg( p_obj, "video standard %i is: %s %c",
                                 i_standard,
-                                p_sys->p_standards[i_standard].name);
+                                p_sys->p_standards[i_standard].name,
+                                (unsigned)i_standard == p_sys->i_selected_standard_id ? '*' : ' ' );
         }
     }
 
@@ -2639,12 +2666,16 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 goto open_failed;
             }
 
-            msg_Dbg( p_obj, "audio device %i (%s) is %s",
+            msg_Dbg( p_obj, "audio input %i (%s) is %s %s %c",
                                 p_sys->i_audio,
                                 p_sys->p_audios[p_sys->i_audio].name,
                                 p_sys->p_audios[p_sys->i_audio].capability &
                                                     V4L2_AUDCAP_STEREO ?
-                                        "Stereo" : "Mono" );
+                                        "Stereo" : "Mono",
+                                p_sys->p_audios[p_sys->i_audio].capability &
+                                                    V4L2_AUDCAP_AVL ?
+                                    "(Automatic Volume Level supported)" : "",
+                                p_sys->i_audio == p_sys->i_selected_audio_input ? '*' : ' ' );
 
             p_sys->i_audio++;
         }
@@ -3070,7 +3101,7 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
             break;
     }
 
-    if (b_demux)
+    if( b_demux )
         var_AddCallback( p_obj, psz_name,
                         DemuxControlCallback, (void*)queryctrl.id );
     else
