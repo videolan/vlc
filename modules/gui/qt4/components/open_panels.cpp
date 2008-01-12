@@ -40,6 +40,7 @@
 #include <QCompleter>
 #include <QDirModel>
 #include <QScrollArea>
+#include <QUrl>
 
 /**************************************************************************
  * Open Files and subtitles                                               *
@@ -498,6 +499,9 @@ void NetOpenPanel::updateMRL() {
             emit methodChanged("udp-caching");
         }
     }
+
+    // Encode the boring stuffs
+    mrl = QUrl( mrl ).toEncoded();
     if( ui.timeShift->isEnabled() && ui.timeShift->isChecked() ) {
         mrl += " :access-filter=timeshift";
     }
