@@ -511,9 +511,10 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         return;
     }
 
-    p_input_thread = input_CreateThread( p_mi->p_libvlc_instance->p_libvlc_int,
-                                         p_mi->p_md->p_input_item );
-    p_mi->i_input_id = p_input_thread->i_object_id;
+    p_mi->i_input_id = input_Read( p_mi->p_libvlc_instance->p_libvlc_int,
+                                         p_mi->p_md->p_input_item, VLC_FALSE );
+
+    p_input_thread = libvlc_get_input_thread( p_mi, p_e ); /* Released in _release() */
 
     if( p_mi->drawable )
     {
@@ -527,9 +528,6 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     var_AddCallback( p_input_thread, "pausable", input_state_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
-
-    /* will be released in media_instance_release() */
-    vlc_object_yield( p_input_thread );
 
     vlc_mutex_unlock( &p_mi->object_lock );
 }
