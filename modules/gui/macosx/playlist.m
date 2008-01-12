@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2007 the VideoLAN team
+* Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -25,7 +25,6 @@
 
 /* TODO
  * add 'icons' for different types of nodes? (http://www.cocoadev.com/index.pl?IconAndTextInTableCell)
- * create toggle buttons for the shuffle, repeat one, repeat all functions.
  * reimplement enable/disable item
  * create a new 'tool' button (see the gear button in the Finder window) for 'actions'
    (adding service discovery, other views, new node/playlist, save node/playlist) stuff like that
@@ -376,8 +375,8 @@
         @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
-    /* this uses private Apple API which works fine until 10.4,
-     * but keep checking in the future!
+    /* This uses private Apple API which works fine until 10.4.
+     * We need to keep checking in the future!
      * These methods are being added artificially to NSOutlineView's interface above */
     o_ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
     o_descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
@@ -422,8 +421,6 @@
     free( ppsz_name );
 
     vlc_object_release( p_playlist );
-
-    //[self playlistUpdated];
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification
@@ -445,12 +442,8 @@
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [o_mi_services setTitle: _NS("Services discovery")];
-    [o_status_field setStringValue: [NSString stringWithFormat:
-                        _NS("No items in the playlist")]];
+    [o_status_field setStringValue: _NS("No items in the playlist")];
 
-#if 0
-    [o_search_button setTitle: _NS("Search")];
-#endif
     [o_search_field setToolTip: _NS("Search in Playlist")];
     [o_mi_addNode setTitle: _NS("Add Folder to Playlist")];
 
@@ -542,14 +535,6 @@
     {
         [o_array insertObject: [NSValue valueWithPointer: p_temp_item] atIndex: 0];
         p_temp_item = p_temp_item->p_parent;
-        /*for (i = 0 ; i < p_temp_item->i_parents ; i++)
-        {
-            if( p_temp_item->pp_parents[i]->i_view == i_current_view )
-            {
-                p_temp_item = p_temp_item->pp_parents[i]->p_parent;
-                break;
-            }
-        }*/
     }
 
     for( j = 0; j < [o_array count] - 1; j++ )
@@ -563,12 +548,6 @@
         }
 
     }
-
-    i_row = [o_outline_view rowForItem:[o_outline_dict
-            objectForKey:[NSString stringWithFormat: @"%p", p_item]]];
-
-    [o_outline_view selectRow: i_row byExtendingSelection: NO];
-    [o_outline_view scrollRowToVisible: i_row];
 
     vlc_object_release( p_playlist );
 
@@ -669,8 +648,7 @@
 
 - (IBAction)savePlaylist:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Yield( p_intf );
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
 
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString * o_name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
@@ -795,7 +773,7 @@
             }
             else
             {
-                msg_Dbg( p_intf, "preparse of nodes not yet implemented" );
+                msg_Dbg( p_intf, "preparsing nodes not implemented" );
             }
         }
     }
@@ -891,8 +869,7 @@
 
     if( [o_outline_view selectedRow] > -1 )
     {
-        p_item = [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
-                                                                pointerValue];
+        p_item = [[o_outline_view itemAtRow: [o_outline_view selectedRow]] pointerValue];
     }
     else
     /*If no item is selected, sort the whole playlist*/
@@ -1403,7 +1380,9 @@
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
                                                     [o_value pointerValue]]];
+#ifdef DEBUG
     msg_Dbg( VLCIntf, "adding item %p", [o_value pointerValue] );
+#endif
     return o_value;
 
 }
