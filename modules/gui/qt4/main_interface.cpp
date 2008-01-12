@@ -51,6 +51,7 @@
 #include <QToolBar>
 #include <QGroupBox>
 #include <QDate>
+#include <QProgressBar>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -163,9 +164,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
 
+    pgBar = new QProgressBar;
+    pgBar->hide();
+
     /* and adding those */
     statusBar()->addWidget( nameLabel, 8 );
     statusBar()->addPermanentWidget( speedLabel, 0 );
+    statusBar()->addPermanentWidget( pgBar, 0 );
     statusBar()->addPermanentWidget( timeLabel, 0 );
 
     /* timeLabel behaviour:

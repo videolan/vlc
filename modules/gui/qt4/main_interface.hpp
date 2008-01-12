@@ -49,6 +49,7 @@ class SpeedControlWidget;
 class QMenu;
 class QSize;
 class QDockWidet;
+class QProgressBar;
 
 enum{
     CONTROLS_HIDDEN = 0x0,
@@ -59,6 +60,10 @@ enum{
 class MainInterface : public QVLCMW
 {
     Q_OBJECT;
+
+    friend class VolumeClickHandler;
+    friend class InteractionDialog;
+
 public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
@@ -85,7 +90,6 @@ protected:
     void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
 
-    friend class VolumeClickHandler;
 private:
     QSettings           *settings;
     QSystemTrayIcon     *sysTray;
@@ -95,6 +99,7 @@ private:
     ControlsWidget      *controls;
     QMenu               *speedControlMenu;
     SpeedControlWidget  *speedControl;
+    QProgressBar        *pgBar;
 
     void handleMainUi( QSettings* );
     void privacy();

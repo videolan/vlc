@@ -23,6 +23,7 @@
 
 #include "dialogs/errors.hpp"
 #include "dialogs/interaction.hpp"
+#include "main_interface.hpp"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -98,8 +99,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         panel->setLayout( grid );
         layout->addWidget( panel );
     }
-    else if( p_dialog->i_flags & DIALOG_USER_PROGRESS ||
-             /* TEMPORARY ! */ p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+    else if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
         dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
         layout->setMargin( 2 );
@@ -111,6 +111,11 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         progressBar->setTextVisible( true );
         progressBar->setOrientation( Qt::Horizontal );
         layout->addWidget( progressBar );
+    }
+    else if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
+    {
+        progressBar = p_intf->p_sys->p_mi->pgBar;
+        progressBar->show();
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
@@ -170,13 +175,18 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
 
 void InteractionDialog::update()
 {
-    if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
+    if( p_dialog->i_flags & DIALOG_USER_PROGRESS ||
+        p_dialog->i_flags & DIALOG_INTF_PROGRESS )
     {
         assert( progressBar );
-        progressBar->setValue( (int)(p_dialog->val.f_float*10) );
+        progressBar->setValue( (int)( p_dialog->val.f_float * 10 ) );
         description->setText( qfu( p_dialog->psz_description ) );
         msg_Dbg( p_intf, "Setting progress to %i", progressBar->value() );
     }
+
+    if( ( p_dialog->i_flags & DIALOG_INTF_PROGRESS ) &&
+        ( p_dialog->val.f_float >= 100.0 ) )
+        progressBar->hide();
 }
 
 InteractionDialog::~InteractionDialog()
@@ -223,3 +233,4 @@ void InteractionDialog::Finish( int i_ret )
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     playlist_Signal( THEPL );
 }
+

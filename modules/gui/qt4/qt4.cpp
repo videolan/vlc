@@ -283,6 +283,7 @@ static void Init( intf_thread_t *p_intf )
     else
     /*if( p_intf->pf_show_dialog )*/
         vlc_thread_ready( p_intf );
+
 #ifdef ENABLE_NLS
     // Translation - get locale
     QLocale ql = QLocale::system();
