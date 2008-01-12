@@ -889,14 +889,26 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     SET( vlc_meta_SetAlbum );
                     break;
 
+                case FOURCC_0xa9trk: /* Track */
+                    SET( vlc_meta_SetTracknum );
+                    break;
+
+                case FOURCC_0xa9cmt: /* Commment */
+                    SET( vlc_meta_SetDescription );
+                    break;
+
+                case FOURCC_0xa9url: /* URL */
+                    SET( vlc_meta_SetURL );
+                    break;
+
+                case FOURCC_0xa9enc: /* Encoded By */
+                    SET( vlc_meta_SetEncodedBy );
+                    break;
+                    
                 case FOURCC_0xa9swr:
                 case FOURCC_0xa9inf: /* Information */
                 case FOURCC_0xa9dir: /* Director */
                 case FOURCC_0xa9dis: /* Disclaimer */
-                case FOURCC_0xa9enc: /* Encoded By */
-                case FOURCC_0xa9trk: /* Track */
-                case FOURCC_0xa9cmt: /* Commment */
-                case FOURCC_0xa9url: /* URL */
                 case FOURCC_0xa9req: /* Requirements */
                 case FOURCC_0xa9fmt: /* Original Format */
                 case FOURCC_0xa9dsa: /* Display Source As */
