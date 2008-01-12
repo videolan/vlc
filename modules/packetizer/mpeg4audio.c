@@ -750,7 +750,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
     }
     /* Wait for the configuration */
     if( !p_sys->b_latm_cfg )
-        return -1;
+        return 0;
 
     /* FIXME do we need to split the subframe into independant packet ? */
     if( p_sys->latm.i_sub_frames > 1 )
