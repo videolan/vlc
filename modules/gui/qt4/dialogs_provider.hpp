@@ -147,7 +147,9 @@ public slots:
     void prefsDialog();
     void extendedDialog();
     void messagesDialog();
+#ifdef ENABLE_VLM
     void vlmDialog();
+#endif
     void helpDialog();
 #ifdef UPDATE_CHECK
     void updateDialog();

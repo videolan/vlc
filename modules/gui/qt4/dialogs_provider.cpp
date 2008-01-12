@@ -43,12 +43,10 @@
 #include "dialogs/extended.hpp"
 #include "dialogs/sout.hpp"
 #include "dialogs/open.hpp"
-#include "dialogs/vlm.hpp"
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
 #include "dialogs/vlm.hpp"
-
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -114,8 +112,10 @@ void DialogsProvider::customEvent( QEvent *event )
            bookmarksDialog(); break;
         case INTF_DIALOG_EXTENDED:
            extendedDialog(); break;
+#ifdef ENABLE_VLM
         case INTF_DIALOG_VLM:
            vlmDialog(); break;
+#endif
         case INTF_DIALOG_INTERACTION:
            doInteraction( de->p_arg ); break;
         case INTF_DIALOG_POPUPMENU:
@@ -169,10 +169,12 @@ void DialogsProvider::gotoTimeDialog()
     GotoTimeDialog::getInstance( p_intf )->toggleVisible();
 }
 
+#ifdef ENABLE_VLM
 void DialogsProvider::vlmDialog()
 {
     VLMDialog::getInstance( p_intf )->toggleVisible();
 }
+#endif
 
 void DialogsProvider::helpDialog()
 {

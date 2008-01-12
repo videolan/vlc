@@ -301,8 +301,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
 
     addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","", 
                       SLOT( bookmarksDialog() ), "Ctrl+B" );
+#ifdef ENABLE_VLM
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", "", SLOT( vlmDialog() ),
         "Ctrl+V" );
+#endif
 
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( "Preferences..." ), "",
