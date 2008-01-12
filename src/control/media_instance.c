@@ -589,6 +589,15 @@ void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
 }
 
 /**************************************************************************
+ * Get Drawable
+ **************************************************************************/
+libvlc_drawable_t
+libvlc_media_instance_get_drawable ( libvlc_media_instance_t *p_mi, libvlc_exception_t *p_e )
+{
+    return p_mi->drawable;
+}
+
+/**************************************************************************
  * Getters for stream information
  **************************************************************************/
 libvlc_time_t libvlc_media_instance_get_length(

@@ -445,6 +445,8 @@ VLC_PUBLIC_API void libvlc_media_instance_pause ( libvlc_media_instance_t *, lib
 VLC_PUBLIC_API void libvlc_media_instance_stop ( libvlc_media_instance_t *, libvlc_exception_t * );
 
 VLC_PUBLIC_API void libvlc_media_instance_set_drawable ( libvlc_media_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_drawable_t
+                    libvlc_media_instance_get_drawable ( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /** \bug This might go away ... to be replaced by a broader system */
 VLC_PUBLIC_API libvlc_time_t libvlc_media_instance_get_length     ( libvlc_media_instance_t *, libvlc_exception_t *);
