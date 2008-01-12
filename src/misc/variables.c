@@ -1043,6 +1043,7 @@ void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
     int  i_name_len, i_type;
     vlc_bool_t b_isno = VLC_FALSE;
     vlc_value_t val;
+    val.psz_string = NULL;
 
     if( psz_value ) i_name_len = psz_value - psz_option;
     else i_name_len = strlen( psz_option );
