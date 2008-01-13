@@ -41,12 +41,12 @@
 #include "dialogs/mediainfo.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"
+#include "dialogs/vlm.hpp"
 #include "dialogs/sout.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
-#include "dialogs/vlm.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 

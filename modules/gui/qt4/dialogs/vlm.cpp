@@ -23,9 +23,9 @@
  * Foundation, Inc., 51 Franklin street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef ENABLE_VLM
-
 #include "dialogs/vlm.hpp"
+
+#ifdef ENABLE_VLM
 #include "dialogs/open.hpp"
 #include "dialogs/sout.hpp"
 
@@ -626,5 +626,4 @@ void VLMWrapper::EditVod( const QString name, const QString input,
         vlm_MessageDelete( message );
     }
 }
-
 #endif

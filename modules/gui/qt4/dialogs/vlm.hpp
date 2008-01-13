@@ -25,9 +25,9 @@
 #ifndef _VLM_DIALOG_H_
 #define _VLM_DIALOG_H_
 
-#ifdef ENABLE_VLM
-
 #include <vlc/vlc.h>
+
+#ifdef ENABLE_VLM
 #include <vlc_vlm.h>
 
 #include "ui/vlm.h"
@@ -199,5 +199,7 @@ private:
 
 };
 
-#endif /* ENABLE_VLM*/
 #endif
+
+#endif
+
