@@ -112,6 +112,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
                  "works on many platforms.\n\n" )
             + qtr( "You are using the new Qt4 Interface.\n" )
             + qtr( "Compiled by " ) + qfu( VLC_CompileBy() )+ "@"
+            + qfu( VLC_CompileHost() ) + "."
             + qfu( VLC_CompileDomain() ) + ".\n"
             + "Compiler: " + qfu( VLC_Compiler() ) + ".\n"
             + qtr( "Based on SVN revision: " ) + qfu( VLC_Changeset() )
