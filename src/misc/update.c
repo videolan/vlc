@@ -1007,7 +1007,7 @@ typedef struct
 {
     VLC_COMMON_MEMBERS
     update_t *p_update;
-    void (*pf_callback)( void * );
+    void (*pf_callback)( void *, vlc_bool_t );
     void *p_data;
 } update_check_thread_t;
 
@@ -1021,7 +1021,7 @@ void update_CheckReal( update_check_thread_t *p_uct );
  * \param p_data pointer to some datas to give to the callback
  * \returns nothing
  */
-void update_Check( update_t *p_update, void (*pf_callback)( void* ), void *p_data )
+void update_Check( update_t *p_update, void (*pf_callback)( void*, vlc_bool_t ), void *p_data )
 {
     assert( p_update );
 
@@ -1044,9 +1044,8 @@ void update_CheckReal( update_check_thread_t *p_uct )
     b_ret = GetUpdateFile( p_uct->p_update );
     vlc_mutex_unlock( &p_uct->p_update->lock );
 
-    /* FIXME: return b_ret in pf_callback */
-    if( b_ret && p_uct->pf_callback )
-        (p_uct->pf_callback)( p_uct->p_data );
+    if( p_uct->pf_callback )
+        (p_uct->pf_callback)( p_uct->p_data, b_ret );
 
     vlc_object_destroy( p_uct );
 }

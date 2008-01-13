@@ -180,10 +180,16 @@ void AboutDialog::close()
  * UpdateDialog
  *****************************************************************************/
 /* callback to get information from the core */
-static void UpdateCallback( void *data )
+static void UpdateCallback( void *data, vlc_bool_t b_ret )
 {
     UpdateDialog* UDialog = (UpdateDialog *)data;
-    QEvent *event = new QEvent( QEvent::User );
+    QEvent* event;
+
+    if( b_ret )
+        event = new QEvent( (QEvent::Type)UDOkEvent );
+    else
+        event = new QEvent( (QEvent::Type)UDErrorEvent );
+
     QApplication::postEvent( UDialog, event );
 }
 
@@ -254,22 +260,30 @@ void UpdateDialog::UpdateOrDownload()
 /* Handle the events */
 void UpdateDialog::customEvent( QEvent *event )
 {
-    updateNotify();
+    if( event->type() == UDOkEvent )
+        updateNotify( true );
+    else
+        updateNotify( false );
 }
 
 /* Notify the end of the update_Check */
-void UpdateDialog::updateNotify()
+void UpdateDialog::updateNotify( bool b_result )
 {
-    if( update_CompareReleaseToCurrent( p_update ) == UpdateReleaseStatusNewer )
+    /* The update finish without errors */
+    if( b_result )
     {
-        b_checked = true;
-        updateButton->setText( "Download" );
-        updateLabel->setText( qtr( "There is a new version of vlc :\n" ) + qfu( p_update->release.psz_desc )  );
+        if( update_CompareReleaseToCurrent( p_update ) == UpdateReleaseStatusNewer )
+        {
+            b_checked = true;
+            updateButton->setText( "Download" );
+            updateLabel->setText( qtr( "There is a new version of vlc :\n" ) + qfu( p_update->release.psz_desc )  );
+        }
+        else
+            updateLabel->setText( qtr( "You have the latest version of vlc" ) );
     }
     else
-    {
-        updateLabel->setText( qtr( "You have the latest version of vlc" ) );
-    }
+        updateLabel->setText( qtr( "An error occure while checking for updates" ) );
+
     adjustSize();
     updateButton->setEnabled( true );
 }

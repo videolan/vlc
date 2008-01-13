@@ -75,6 +75,9 @@ public slots:
 
 #ifdef UPDATE_CHECK
 
+static int UDOkEvent = QEvent::User + 1;
+static int UDErrorEvent = QEvent::User + 2;
+
 class UpdateDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -86,7 +89,7 @@ public:
         return instance;
     }
     virtual ~UpdateDialog();
-    void updateNotify();
+    void updateNotify( bool );
 
 private:
     UpdateDialog( intf_thread_t * );
