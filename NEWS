@@ -19,11 +19,9 @@ Important notes:
      and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
  * This version of VLC contains a new interface for Windows and Linux. This
    interface lacks a few features that used to be present in VLC 0.8.6:
-   - "Streaming wizard" and "VLM control". These features will be replaced
+   - "Streaming wizard". These features will be replaced
      by a better alternative in the next version. If you absolutely need these
      features, we advise you to keep VLC 0.8.6
-   - Similarly, "Bookmarks" will be reintroduced in an improved version at a
-     later point
   * The behavior of --sout-keep has changed. It's now activated by default.
   * The marq, mosaic and logo commands in the rc interface changed. They
     now require a target name as their first argument. Example:
