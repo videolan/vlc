@@ -114,7 +114,6 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 // TODO: Documentation
 @interface VLCMediaPlayer (Private)
 - (id)initWithDrawable:(id)aDrawable;
-- (void)setDrawable:(id)aDrawable;
 
 - (void)registerObservers;
 - (void)unregisterObservers;
@@ -212,6 +211,27 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 - (void)setVideoLayer:(VLCVideoLayer *)aVideoLayer
 {
     [self setDrawable: aVideoLayer];
+}
+
+- (void)setDrawable:(id)aDrawable
+{
+    // Make sure that this instance has been associated with the drawing canvas.
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_instance_set_drawable ((libvlc_media_instance_t *)instance, 
+                                        (libvlc_drawable_t)aDrawable, 
+                                        &ex);
+    catch_exception( &ex );
+}
+
+- (id)drawable
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_drawable_t ret = libvlc_media_instance_get_drawable ((libvlc_media_instance_t *)instance, 
+                                        &ex);
+    catch_exception( &ex );
+    return (id)ret;
 }
 
 - (void)setVideoAspectRatio:(char *)value
@@ -508,6 +528,11 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     [self setRate: -rate];
 }
 
++ (NSSet *)keyPathsForValuesAffectingIsPlaying
+{
+    return [NSSet setWithObjects:@"state", nil];
+}
+
 - (BOOL)isPlaying
 {
     VLCMediaPlayerState state = [self state];
@@ -575,6 +600,8 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     catch_exception( &ex );
     return ret;
 }
+
+
 @end
 
 @implementation VLCMediaPlayer (Private)
@@ -601,17 +628,6 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
         [self setDrawable:aDrawable];
     }
     return self;
-}
-
-- (void)setDrawable:(id)aDrawable
-{
-    // Make sure that this instance has been associated with the drawing canvas.
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_media_instance_set_drawable ((libvlc_media_instance_t *)instance, 
-                                        (libvlc_drawable_t)aDrawable, 
-                                        &ex);
-    catch_exception( &ex );
 }
 
 - (void)registerObservers

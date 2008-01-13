@@ -93,6 +93,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setVideoView:(VLCVideoView *)aVideoView;
 - (void)setVideoLayer:(VLCVideoLayer *)aVideoLayer;
 
+@property (retain) id drawable; /* The videoView or videoLayer */
+
 - (void)setVideoAspectRatio:(char *)value;
 - (char *)videoAspectRatio;
 - (void)setVideoSubTitles:(int)value;
