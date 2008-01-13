@@ -24,6 +24,7 @@
 
 #import "VLCLibrary.h"
 #import "VLCMediaListAspect.h"
+#import "VLCStreamOutput.h"
 
 /**
  * Bridges functionality between libvlc and VLCMediaList implementation.
@@ -83,6 +84,8 @@ extern void __catch_exception( void * e, const char * function, const char * fil
  */
 - (id)initWithLibVLCMediaDescriptor:(void *)md;
 
++ (id)mediaWithMedia:(VLCMedia *)media andLibVLCOptions:(NSDictionary *)options;
+
 /**
  * Returns the receiver's internal media descriptor pointer.
  * \return The receiver's internal media descriptor pointer.
@@ -100,6 +103,8 @@ extern void __catch_exception( void * e, const char * function, const char * fil
  * \param value
  */
 - (void)setLength:(VLCTime *)value;
+
+
 @end
 
 /**
@@ -170,4 +175,8 @@ extern void __catch_exception( void * e, const char * function, const char * fil
  * \return Newly created audio object using specified VLCLibrary instance.
  */
 - (id)initWithLibrary:(VLCLibrary *)library;
+@end
+
+@interface VLCStreamOutput (LibVLCBridge)
+- (NSString *)representedLibVLCOptions;
 @end

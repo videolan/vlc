@@ -1,0 +1,138 @@
+//
+//  VLCStreamOutput.m
+//  VLCKit
+//
+//  Created by Pierre d'Herbemont on 1/12/08.
+//  Copyright 2008 __MyCompanyName__. All rights reserved.
+//
+
+#import "VLCStreamOutput.h"
+#import "VLCLibVLCBridging.h"
+
+
+@implementation VLCStreamOutput
+- (id)initWithOptionDictionary:(NSDictionary *)dictionary
+{
+    if( self = [super init] )
+    {
+        options = [NSMutableDictionary dictionaryWithDictionary:dictionary];
+    }
+    return self;
+}
+- (NSString *)description
+{
+    return [self representedLibVLCOptions];
+}
++ (id)streamOutputWithOptionDictionary:(NSDictionary *)dictionary
+{
+    return [[[self alloc] initWithOptionDictionary:dictionary] autorelease];
+}
++ (id)rtpBroadcastStreamOutputWithSAPAnnounce:(NSString *)announceName
+{
+    return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"ts", @"muxer",
+                                                @"file", @"access",
+                                                @"sap", @"sdp",
+                                                [announceName copy], @"name",
+                                                @"239.255.1.1", @"destination", nil
+                                            ], @"rtpOptions",
+                                            nil
+                                            ]
+                                        ];
+}
+
++ (id)rtpBroadcastStreamOutput
+{
+    return [self rtpBroadcastStreamOutputWithSAPAnnounce:@"Helloworld!"];
+}
+
++ (id)ipodStreamOutputWithFilePath:(NSString *)filePath
+{
+    return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"x264", @"videoCodec",
+                                                @"768",  @"videoBitrate",
+                                                @"mp4a", @"audioCodec",
+                                                @"128", @"audioBitrate",
+                                                @"2",   @"channels",
+                                                @"320", @"width",
+                                                @"240", @"canvasHeight",
+                                                @"Yes", @"audio-sync",
+                                                nil
+                                            ], @"transcodingOptions",
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"mp4", @"muxer",
+                                                @"file", @"access",
+                                                [filePath copy], @"destination", nil
+                                            ], @"outputOptions",
+                                            nil
+                                            ]
+                                        ];
+}
+@end
+
+@implementation VLCStreamOutput (LibVLCBridge)
+- (NSString *)representedLibVLCOptions
+{
+    NSString * representedOptions;
+    NSMutableArray * subOptions = [NSMutableArray array];
+    NSMutableArray * optionsAsArray = [NSMutableArray array];
+    NSDictionary * transcodingOptions = [options objectForKey:@"transcodingOptions"];
+    if( transcodingOptions )
+    {
+        NSString * videoCodec = [transcodingOptions objectForKey:@"videoCodec"];
+        NSString * audioCodec = [transcodingOptions objectForKey:@"audioCodec"];
+        NSString * videoBitrate = [transcodingOptions objectForKey:@"videoBitrate"];
+        NSString * audioBitrate = [transcodingOptions objectForKey:@"audioBitrate"];
+        NSString * channels = [transcodingOptions objectForKey:@"channels"];
+        NSString * height = [transcodingOptions objectForKey:@"height"];
+        NSString * canvasHeight = [transcodingOptions objectForKey:@"canvasHeight"];
+        NSString * width = [transcodingOptions objectForKey:@"width"];
+        NSString * audioSync = [transcodingOptions objectForKey:@"audioSync"];
+        if( videoCodec )   [subOptions addObject:[NSString stringWithFormat:@"vcodec=%@", videoCodec]];
+        if( videoBitrate ) [subOptions addObject:[NSString stringWithFormat:@"vb=%@", videoBitrate]];
+        if( width ) [subOptions addObject:[NSString stringWithFormat:@"width=%@", width]];
+        if( height ) [subOptions addObject:[NSString stringWithFormat:@"height=%@", height]];
+        if( canvasHeight ) [subOptions addObject:[NSString stringWithFormat:@"canvas-height=%@", canvasHeight]];
+        if( audioCodec )   [subOptions addObject:[NSString stringWithFormat:@"acodec=%@", audioCodec]];
+        if( audioBitrate ) [subOptions addObject:[NSString stringWithFormat:@"ab=%@", audioBitrate]];
+        if( channels ) [subOptions addObject:[NSString stringWithFormat:@"channels=%@", channels]];
+        if( audioSync ) [subOptions addObject:[NSString stringWithFormat:@"audioSync", width]];
+        [optionsAsArray addObject: [NSString stringWithFormat:@"transcode{%@}", [subOptions componentsJoinedByString:@","]]];
+        [subOptions removeAllObjects];
+    }
+    
+    NSDictionary * outputOptions = [options objectForKey:@"outputOptions"];
+    if( outputOptions )
+    {
+        NSString * muxer = [outputOptions objectForKey:@"muxer"];
+        NSString * destination = [outputOptions objectForKey:@"destination"];
+        NSString * url = [outputOptions objectForKey:@"url"];
+        NSString * access = [outputOptions objectForKey:@"access"];
+        if( muxer )       [subOptions addObject:[NSString stringWithFormat:@"muxer=%@", muxer]];
+        if( destination ) [subOptions addObject:[NSString stringWithFormat:@"dst=\"%@\"", [destination stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]]];
+        if( url ) [subOptions addObject:[NSString stringWithFormat:@"url=\"%@\"", [url stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]]];
+        if( access )      [subOptions addObject:[NSString stringWithFormat:@"access=%@", access]];
+        [optionsAsArray addObject:[NSString stringWithFormat:@"std{%@}", [subOptions componentsJoinedByString:@","]]];
+        [subOptions removeAllObjects];
+    }
+
+    NSDictionary * rtpOptions = [options objectForKey:@"rtpOptions"];
+    if( rtpOptions )
+    {
+        NSString * muxer = [rtpOptions objectForKey:@"muxer"];
+        NSString * destination = [rtpOptions objectForKey:@"destination"];
+        NSString * sdp = [rtpOptions objectForKey:@"sdp"];
+        NSString * name = [rtpOptions objectForKey:@"name"];
+        if( muxer )       [subOptions addObject:[NSString stringWithFormat:@"muxer=%@", muxer]];
+        if( destination ) [subOptions addObject:[NSString stringWithFormat:@"dst=%@", destination]];
+        if( sdp )      [subOptions addObject:[NSString stringWithFormat:@"sdp=%@", sdp]];
+        if( name )      [subOptions addObject:[NSString stringWithFormat:@"name=\"%@\"", name]];
+        [optionsAsArray addObject:[NSString stringWithFormat:@"rtp{%@}", [subOptions componentsJoinedByString:@","]]];
+        [subOptions removeAllObjects];
+    }
+    representedOptions = [optionsAsArray componentsJoinedByString:@":"];
+    return representedOptions;
+}
+@end

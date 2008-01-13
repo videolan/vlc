@@ -78,7 +78,8 @@ static void * DestroySharedLibraryAtExit( void )
         
         const char * lib_vlc_params[] = { 
             "-I", "dummy", "--vout=opengllayer", 
-            "--no-video-title-show"
+            "--no-video-title-show", "--no-sout-keep", "-vvv", "--encoder=ffmpeg"
+            //, "--control=motion", "--motion-use-rotate", "--video-filter=rotate"
         };
         
         instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );

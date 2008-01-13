@@ -35,6 +35,8 @@
 #import <VLCKit/VLCTime.h>
 #import <VLCKit/VLCVideoView.h>
 #import <VLCKit/VLCVideoLayer.h>
+#import <VLCKit/VLCStreamSession.h>
+#import <VLCKit/VLCStreamOutput.h>
 
 @class VLCMedia;
 @class VLCMediaLibrary;
