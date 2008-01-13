@@ -3334,9 +3334,9 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                 int i;
                 for( i = 0; controls[i].psz_name != NULL; i++ )
                     if( controls[i].i_cid == queryctrl.id ) break;
+                name2var( queryctrl.name );
                 Control( p_obj, i_fd,
-                         controls[i].psz_name ? controls[i].psz_name
-                                              : (const char *)queryctrl.name,
+                         controls[i].psz_name ? : (const char *)queryctrl.name,
                          queryctrl.id, queryctrl.default_value );
             }
             queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
@@ -3364,9 +3364,9 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                     int i;
                     for( i = 0; controls[i].psz_name != NULL; i++ )
                         if( controls[i].i_cid == queryctrl.id ) break;
+                    name2var( queryctrl.name );
                     Control( p_obj, i_fd,
-                             controls[i].psz_name ? controls[i].psz_name
-                                                  : (const char *)queryctrl.name,
+                             controls[i].psz_name ? : (const char *)queryctrl.name,
                              queryctrl.id, queryctrl.default_value );
                 }
             }
@@ -3388,6 +3388,7 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                 if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
                  && queryctrl.default_value != control.value )
                 {
+                    name2var( queryctrl.name );
                     Control( p_obj, i_fd, (const char *)queryctrl.name,
                              queryctrl.id, queryctrl.default_value );
                 }
@@ -3429,13 +3430,16 @@ static int Control( vlc_object_t *p_obj, int i_fd,
     memset( &ext_controls, 0, sizeof( ext_controls ) );
     control.id = i_cid;
     ext_control.id = i_cid;
-    ext_controls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    ext_controls.ctrl_class = V4L2_CTRL_ID2CLASS( i_cid );
     ext_controls.count = 1;
     ext_controls.controls = &ext_control;
 
+    int i_ret = -1;
+
     if( i_value >= 0 )
     {
-        if( V4L2_CTRL_ID2CLASS( i_cid ) == V4L2_CTRL_CLASS_USER )
+        ext_control.value = i_value;
+        if( ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
         {
             control.value = i_value;
             if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
@@ -3444,27 +3448,13 @@ static int Control( vlc_object_t *p_obj, int i_fd,
                          psz_name, i_cid, i_value );
                 return VLC_EGENERIC;
             }
+            i_ret = ioctl( i_fd, VIDIOC_G_CTRL, &control );
         }
         else
         {
-            ext_control.value = i_value;
-            if( ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
-            {
-                msg_Err( p_obj, "unable to set %s (%x) to %d (%m)",
-                         psz_name, i_cid, i_value );
-                return VLC_EGENERIC;
-            }
+            i_ret = ioctl( i_fd, VIDIOC_G_EXT_CTRLS, &ext_controls );
+            control.value = ext_control.value;
         }
-    }
-
-    int i_ret;
-
-    if( V4L2_CTRL_ID2CLASS( i_cid ) == V4L2_CTRL_CLASS_USER )
-        i_ret = ioctl( i_fd, VIDIOC_G_CTRL, &control );
-    else
-    {
-        i_ret = ioctl( i_fd, VIDIOC_G_EXT_CTRLS, &ext_controls );
-        control.value = ext_control.value;
     }
 
     if( i_ret >= 0 )
