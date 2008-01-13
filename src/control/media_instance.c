@@ -27,6 +27,19 @@
 #include "libvlc_internal.h"
 #include "libvlc.h"
 
+static int
+input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval,
+                     void * p_userdata );
+static int
+input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval,
+                     void * p_userdata );
+static int
+input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval,
+                     void * p_userdata );
+
 static const libvlc_state_t vlc_to_libvlc_state_array[] =
 {
     [INIT_S]        = libvlc_Opening,
@@ -69,16 +82,18 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
 
-    /* release for initial p_input_thread yield (see _new()) */
-    vlc_object_release( p_input_thread );
-
     /* No one is tracking this input_thread appart us. Destroy it */
     if( p_mi->b_own_its_input_thread )
     {
+        var_DelCallback( p_input_thread, "state", input_state_changed, p_mi );
+        var_DelCallback( p_input_thread, "seekable", input_state_changed, p_mi );
+        var_DelCallback( p_input_thread, "pausable", input_state_changed, p_mi );
+        var_DelCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
+        var_DelCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
         /* We owned this one */
-        input_StopThread( p_input_thread );
-        var_Destroy( p_input_thread, "drawable" );
-        input_DestroyThread( p_input_thread );
+        //input_StopThread( p_input_thread );
+        //var_Destroy( p_input_thread, "drawable" );
+        //input_DestroyThread( p_input_thread );
     }
     else
     {
@@ -87,6 +102,9 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
          * revert that here. This will be deleted with the playlist API */
         vlc_object_release( p_input_thread );
     }
+
+    /* release for initial p_input_thread yield (see _new()) */
+    vlc_object_release( p_input_thread );
 }
 
 /*
@@ -152,7 +170,7 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
             break;
         case ERROR_S:
             libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Error, NULL);
-            event.type = libvlc_MediaInstanceReachedEnd; /* Because ERROR_S is buggy */
+            event.type = libvlc_MediaInstanceEncounteredError;
             break;
         default:
             return VLC_SUCCESS;
@@ -268,6 +286,8 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
  
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaInstanceReachedEnd, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstanceEncounteredError, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaInstancePaused, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
@@ -493,11 +513,14 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
     if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) )
     {
+        printf(")))))))))))))))))))p_input_thread %p\n", p_input_thread);
         /* A thread alread exists, send it a play message */
         input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
         return;
     }
+
+    printf(")))))))))))))))))))p_input_thread NOT\n");
 
     /* Ignore previous exception */
     libvlc_exception_clear( p_e );
@@ -514,7 +537,15 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     p_mi->i_input_id = input_Read( p_mi->p_libvlc_instance->p_libvlc_int,
                                          p_mi->p_md->p_input_item, VLC_FALSE );
 
-    p_input_thread = libvlc_get_input_thread( p_mi, p_e ); /* Released in _release() */
+    /* Released in _release() */
+    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->p_libvlc_instance->p_libvlc_int,
+                                                      p_mi->i_input_id );
+
+    if( !p_input_thread )
+    {
+        return;
+        vlc_mutex_unlock( &p_mi->object_lock );
+    }
 
     if( p_mi->drawable )
     {
