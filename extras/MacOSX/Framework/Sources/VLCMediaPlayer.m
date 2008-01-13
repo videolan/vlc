@@ -90,6 +90,8 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         newState = VLCMediaPlayerStatePaused;
     else if( event->type == libvlc_MediaInstanceReachedEnd )
         newState = VLCMediaPlayerStateStopped;
+    else if( event->type == libvlc_MediaInstanceEncounteredError )
+        newState = VLCMediaPlayerStateError;
     else
     {
         NSLog(@"%s: Unknown event", __FUNCTION__);
@@ -416,8 +418,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setMedia:(VLCMedia *)value
 {
-    // We only know how to play media files...not media resources with subitems
-    if (media != value && [media subitems] == nil)
+    if (media != value)
     {
         if (media && [media compare:value] == NSOrderedSame)
             return;
@@ -480,7 +481,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)stop
 {
-    if( [NSThread isMainThread] )
+    if( 0 && [NSThread isMainThread] )
     {
         /* Hack because we create a dead lock here, when the vout is stopped
          * and tries to recontact us on the main thread */
@@ -492,20 +493,13 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
     // Return if there is no media available or if the system is not in play status 
     // or pause status.
-    if (!media || (![self isPlaying] && [self state] != VLCMediaPlayerStatePaused))
+    if (!media)
         return;
     
-    // The following is not implemented in the core, should I fix it or just
-    // compensate?
-    //    libvlc_exception_t ex;
-    //    libvlc_exception_init( &ex );
-    //    libvlc_media_instance_stop((libvlc_media_instance_t *)instance, &ex);
-    //    catch_exception( &ex );
-    
-    // Pause and reposition to the begining of the stream.
-    [self pause];
-    [self setTime:0];
-    // TODO: Should we pause this or destroy the media instance so that it appears as being "stopped"?
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_instance_stop((libvlc_media_instance_t *)instance, &ex);
+    catch_exception( &ex );
 }
 
 - (void)fastForward

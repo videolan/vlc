@@ -15,7 +15,7 @@
 {
     if( self = [super init] )
     {
-        options = [NSMutableDictionary dictionaryWithDictionary:dictionary];
+        options = [[NSMutableDictionary dictionaryWithDictionary:dictionary] retain];
     }
     return self;
 }
@@ -51,10 +51,10 @@
 {
     return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
                                             [NSDictionary dictionaryWithObjectsAndKeys:
-                                                @"x264", @"videoCodec",
-                                                @"768",  @"videoBitrate",
+                                                @"mp4v", @"videoCodec",
+                                                @"1024",  @"videoBitrate",
                                                 @"mp4a", @"audioCodec",
-                                                @"128", @"audioBitrate",
+                                                @"192", @"audioBitrate",
                                                 @"2",   @"channels",
                                                 @"320", @"width",
                                                 @"240", @"canvasHeight",
@@ -63,6 +63,60 @@
                                             ], @"transcodingOptions",
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"mp4", @"muxer",
+                                                @"file", @"access",
+                                                [filePath copy], @"destination", nil
+                                            ], @"outputOptions",
+                                            nil
+                                            ]
+                                        ];
+}
+
++ (id)mpeg4StreamOutputWithFilePath:(NSString *)filePath
+{
+    return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"mp4v", @"videoCodec",
+                                                @"1024",  @"videoBitrate",
+                                                @"mp4a", @"audioCodec",
+                                                @"192", @"audioBitrate",
+                                                nil
+                                            ], @"transcodingOptions",
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"mp4", @"muxer",
+                                                @"file", @"access",
+                                                [filePath copy], @"destination", nil
+                                            ], @"outputOptions",
+                                            nil
+                                            ]
+                                        ];
+}
+
++ (id)streamOutputWithFilePath:(NSString *)filePath
+{
+    return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"ps", @"muxer",
+                                                @"file", @"access",
+                                                [filePath copy], @"destination", nil
+                                            ], @"outputOptions",
+                                            nil
+                                            ]
+                                        ];
+}
+
++ (id)mpeg2StreamOutputWithFilePath:(NSString *)filePath;
+{
+    return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"mp2v", @"videoCodec",
+                                                @"1024", @"videoBitrate",
+                                                @"mp2a",   @"audioCodec",
+                                                @"128",   @"audioBitrate",
+                                                @"Yes",   @"audio-sync",
+                                                nil
+                                            ], @"transcodingOptions",
+                                            [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"mpeg", @"muxer",
                                                 @"file", @"access",
                                                 [filePath copy], @"destination", nil
                                             ], @"outputOptions",
@@ -90,6 +144,8 @@
         NSString * canvasHeight = [transcodingOptions objectForKey:@"canvasHeight"];
         NSString * width = [transcodingOptions objectForKey:@"width"];
         NSString * audioSync = [transcodingOptions objectForKey:@"audioSync"];
+        NSString * videoEncoder = [transcodingOptions objectForKey:@"videoEncoder"];
+        if( videoEncoder )   [subOptions addObject:[NSString stringWithFormat:@"venc=%@", videoEncoder]];
         if( videoCodec )   [subOptions addObject:[NSString stringWithFormat:@"vcodec=%@", videoCodec]];
         if( videoBitrate ) [subOptions addObject:[NSString stringWithFormat:@"vb=%@", videoBitrate]];
         if( width ) [subOptions addObject:[NSString stringWithFormat:@"width=%@", width]];
@@ -110,7 +166,7 @@
         NSString * destination = [outputOptions objectForKey:@"destination"];
         NSString * url = [outputOptions objectForKey:@"url"];
         NSString * access = [outputOptions objectForKey:@"access"];
-        if( muxer )       [subOptions addObject:[NSString stringWithFormat:@"muxer=%@", muxer]];
+        if( muxer )       [subOptions addObject:[NSString stringWithFormat:@"mux=%@", muxer]];
         if( destination ) [subOptions addObject:[NSString stringWithFormat:@"dst=\"%@\"", [destination stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]]];
         if( url ) [subOptions addObject:[NSString stringWithFormat:@"url=\"%@\"", [url stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]]];
         if( access )      [subOptions addObject:[NSString stringWithFormat:@"access=%@", access]];
