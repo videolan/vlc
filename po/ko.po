@@ -13300,7 +13300,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:319
 msgid "Back"
-msgstr ""
+msgstr "이전"
 
 #: modules/gui/macosx/wizard.m:322 modules/gui/macosx/wizard.m:325
 #: modules/gui/macosx/wizard.m:1266
