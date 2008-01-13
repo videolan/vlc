@@ -156,6 +156,11 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)pause;
 
 /**
+ * Stop the playing.
+ */
+- (void)stop;
+
+/**
  * Fast forwards through the feed at the standard 1x rate.
  */
 - (void)fastForward;

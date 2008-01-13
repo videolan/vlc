@@ -22,5 +22,8 @@ extern NSString * VLCDefaultStreamOutputRTP;
 + (id)rtpBroadcastStreamOutputWithSAPAnnounce:(NSString *)announceName;
 + (id)rtpBroadcastStreamOutput;
 + (id)ipodStreamOutputWithFilePath:(NSString *)filePath;
++ (id)streamOutputWithFilePath:(NSString *)filePath;
++ (id)mpeg2StreamOutputWithFilePath:(NSString *)filePath;
++ (id)mpeg4StreamOutputWithFilePath:(NSString *)filePath;
 
 @end

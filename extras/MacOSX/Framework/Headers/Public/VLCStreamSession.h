@@ -15,6 +15,8 @@
 @interface VLCStreamSession : VLCMediaPlayer {
     VLCStreamOutput * streamOutput;
     VLCMedia * originalMedia;
+    int reattemptedConnections;
+    BOOL isComplete;
 }
 
 + (id)streamSession;
