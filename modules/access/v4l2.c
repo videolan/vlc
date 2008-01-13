@@ -1897,16 +1897,23 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
         goto open_failed;
     }
 
-    if( p_sys->i_selected_audio_input >= p_sys->i_audio )
-    {
-        msg_Warn( p_obj, "invalid audio input. Using the default one" );
-        p_sys->i_selected_audio_input = 0;
-    }
+    /* Set audio input */
 
-    if( ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
+    if( p_sys->i_audio > 0 )
     {
-        msg_Err( p_obj, "cannot set audio input (%m)" );
-        goto open_failed;
+        if( p_sys->i_selected_audio_input < 0
+         || p_sys->i_selected_audio_input >= p_sys->i_audio )
+        {
+            msg_Warn( p_obj, "invalid audio input. Using the default one" );
+            p_sys->i_selected_audio_input = 0;
+        }
+
+        if( ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
+        {
+            msg_Err( p_obj, "cannot set audio input (%m)" );
+            goto open_failed;
+        }
+        msg_Dbg( p_obj, "Audio input set to %d", p_sys->i_selected_audio_input );
     }
 
 
