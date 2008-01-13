@@ -557,7 +557,7 @@ dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
 LIBS_save="${LIBS}"
 AH_TEMPLATE(HAVE_GETADDRINFO, [Define to 1 if you have the `getaddrinfo' function.])
-AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${LIBS_socket}])
+AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)], 1, [${LIBS_socket}])
 
 dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
 dnl are
@@ -890,14 +890,14 @@ AC_ARG_ENABLE(hal,
 if test "${enable_hal}" != "no"
 then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
-    [ AC_DEFINE( HAVE_HAL_1, [] , [Define if you have the new HAL library API])
-      AC_DEFINE( HAVE_HAL, [], [Define if you have the HAL library] )
+    [ AC_DEFINE( HAVE_HAL_1, 1 , [Define if you have the new HAL library API])
+      AC_DEFINE( HAVE_HAL, 1, [Define if you have the HAL library] )
       VLC_ADD_PLUGINS([hal probe_hal]) 
       VLC_ADD_LIBS([libvlc hal probe_hal],[$HAL_LIBS])
       VLC_ADD_CFLAGS([libvlc hal probe_hal],[$HAL_CFLAGS])],   
     dnl No hal 0.5 Test for 0.2
     [ PKG_CHECK_MODULES( HAL, hal >= 0.2.97, 
-       [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
+       [AC_DEFINE(HAVE_HAL, 1, [Define if you have the HAL library])
         VLC_ADD_PLUGINS([hal])
         VLC_ADD_LIBS([libvlc hal],[$HAL_LIBS])
         VLC_ADD_CFLAGS([libvlc hal],[$HAL_CFLAGS])],
@@ -1668,7 +1668,7 @@ AC_ARG_ENABLE(shout,
   [  --enable-shout          libshout output plugin (default disabled)])
 if test "${enable_shout}" = "yes"; then
   PKG_CHECK_MODULES(SHOUT, shout >= 2.1,
-    [AC_DEFINE(HAVE_SHOUT, [], [Define if you have the libshout library])
+    [AC_DEFINE(HAVE_SHOUT, 1, [Define if you have the libshout library])
      VLC_ADD_PLUGINS([access_output_shout])
      VLC_ADD_LIBS([access_output_shout],[$SHOUT_LIBS])
      VLC_ADD_CFLAGS([access_output_shout],[$SHOUT_CFLAGS])],
@@ -1705,7 +1705,7 @@ then
       ])
     ])
   if test "x${have_lua}" = "xyes" ;  then
-     AC_DEFINE(HAVE_LUA, [], [Define if you have the lua library])
+     AC_DEFINE(HAVE_LUA, 1, [Define if you have the lua library])
      VLC_ADD_PLUGINS([lua])
      VLC_ADD_LIBS([lua],[$LUA_LIBS])
      VLC_ADD_CFLAGS([lua],[$LUA_CFLAGS])
@@ -2237,7 +2237,7 @@ if test "${enable_smb}" != "no"; then
         AC_MSG_ERROR([cannot find libsmbclient headers])
      fi ])
   AC_CHECK_MEMBER([struct _SMBCCTX.close_fn],
-    AC_DEFINE([HAVE__SMBCCTX_CLOSE_FN], [1], [Define if samba has _SMBCCTX.close_fn]),,
+    AC_DEFINE([HAVE__SMBCCTX_CLOSE_FN], 1, [Define if samba has _SMBCCTX.close_fn]),,
     [#include <libsmbclient.h>])
 fi
 
@@ -2451,13 +2451,13 @@ if test "${enable_libcdio}" != "no"
 then
   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.78.2,
      have_libcdio=yes
-     AC_DEFINE(HAVE_LIBCDIO, [], 
+     AC_DEFINE(HAVE_LIBCDIO, 1, 
      [Define if you have libcdio 0.78.2 or greater installed]),
      [AC_MSG_WARN(CD Reading and information library not found)])
 
   PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.22,
      [have_libvcdinfo=yes
-     AC_DEFINE(HAVE_VCDINFO, [], 
+     AC_DEFINE(HAVE_VCDINFO, 1, 
      [Define if you have libvcdinfo 0.7.22 or greater installed])],
      [AC_MSG_WARN(VCD information library not found)])
 fi
@@ -2475,7 +2475,7 @@ if test "${enable_cddax}" = "yes"
 then
   if test "$have_libcdio" = "yes"
   then
-    AC_DEFINE(HAVE_CDDAX, [], [Define for the audio CD plugin using libcdio])
+    AC_DEFINE(HAVE_CDDAX, 1, [Define for the audio CD plugin using libcdio])
     VLC_ADD_LIBS([cddax],[$LIBCDIO_LIBS])
     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     VLC_ADD_PLUGINS([cddax])
@@ -2490,7 +2490,7 @@ then
   if test "$enable_libcddb" != "no"; then
     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
       HAVE_LIBCDDB=yes 
-      AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
+      AC_DEFINE(HAVE_LIBCDDB, 1, [Define this if you have libcddb installed])
       VLC_ADD_LIBS([cddax],[$LIBCDDB_LIBS])
       VLC_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
       ],
@@ -2522,7 +2522,7 @@ then
 
   if test "$have_libvcdinfo" = "yes"
   then
-    AC_DEFINE(HAVE_VCDX, [], 
+    AC_DEFINE(HAVE_VCDX, 1, 
     [Define for the VCD plugin using libcdio/libvcdinfo])
     VLC_ADD_LIBS([vcdx],[$VCDINFO_LIBS])
     VLC_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
@@ -2585,7 +2585,7 @@ then
   if test "$enable_libcddb" != "no"; then
     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
       HAVE_LIBCDDB=yes 
-      AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
+      AC_DEFINE(HAVE_LIBCDDB, 1, [Define this if you have libcddb installed])
       VLC_ADD_LIBS([cdda],[$LIBCDDB_LIBS])
       VLC_ADD_CFLAGS([cdda],[$LIBCDDB_CFLAGS])
       ],:
@@ -5530,8 +5530,8 @@ if test "${enable_bonjour}" != "no"
 then
   PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.3,
     [PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.6,
-       [AC_DEFINE(HAVE_AVAHI_06, [], [Define if you have avahi-client 0.6 or greater])],)
-      AC_DEFINE(HAVE_AVAHI_CLIENT, [], [Define if you have the avahi-client library])
+       [AC_DEFINE(HAVE_AVAHI_06, 1, [Define if you have avahi-client 0.6 or greater])],)
+      AC_DEFINE(HAVE_AVAHI_CLIENT, 1, [Define if you have the avahi-client library])
       VLC_ADD_LIBS([bonjour access_output_http],[$BONJOUR_LIBS])
       VLC_ADD_CFLAGS([bonjour access_output_http],[$BONJOUR_CFLAGS])
       VLC_ADD_PLUGINS([bonjour]) ],
@@ -5614,7 +5614,7 @@ then
     AC_MSG_ERROR([libgcrypt is required for update checking system])
   fi
   VLC_ADD_LIBS([libvlc], [-lgcrypt])
-  AC_DEFINE([UPDATE_CHECK], [1], [Define if you want to use the VLC update mechanism])
+  AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
 
 dnl
