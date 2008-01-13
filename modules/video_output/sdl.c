@@ -59,8 +59,10 @@ struct vout_sys_t
     int i_width;
     int i_height;
 
+#if SDL_VERSION_ATLEAST(1,2,10)
     unsigned int i_desktop_width;
     unsigned int i_desktop_height;
+#endif
 
     /* For YUV output */
     SDL_Overlay * p_overlay;   /* An overlay we keep to grab the XVideo port */
@@ -211,8 +213,11 @@ static int Open ( vlc_object_t *p_this )
     SDL_EnableUNICODE(1);
 
     /* Get the desktop resolution */
+#if SDL_VERSION_ATLEAST(1,2,10)
+    /* FIXME: SDL has a problem with virtual desktop */
     p_vout->p_sys->i_desktop_width = SDL_GetVideoInfo()->current_w;
     p_vout->p_sys->i_desktop_height = SDL_GetVideoInfo()->current_h;
+#endif
 
     /* Create the cursor */
     p_vout->p_sys->b_cursor = 1;
@@ -742,10 +747,17 @@ static int OpenDisplay( vout_thread_t *p_vout )
     uint32_t i_chroma = 0;
 
     /* Set main window's size */
+#if SDL_VERSION_ATLEAST(1,2,10)
     p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->p_sys->i_desktop_width :
                                                     p_vout->i_window_width;
     p_vout->p_sys->i_height = p_vout->b_fullscreen ? p_vout->p_sys->i_desktop_height :
                                                      p_vout->i_window_height;
+#else
+    p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->output.i_width :
+                                                    p_vout->i_window_width;
+    p_vout->p_sys->i_height = p_vout->b_fullscreen ? p_vout->output.i_height :
+                                                     p_vout->i_window_height;
+#endif
 
     /* Initialize flags and cursor */
     i_flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;
