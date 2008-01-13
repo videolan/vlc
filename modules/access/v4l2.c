@@ -3310,20 +3310,22 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
 {
     struct v4l2_queryctrl queryctrl;
     int i_cid;
-
     memset( &queryctrl, 0, sizeof( queryctrl ) );
 
-    /* public controls */
-    for( i_cid = V4L2_CID_BASE;
-         i_cid < V4L2_CID_LASTP1;
-         i_cid ++ )
+    queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
+    if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
     {
-        queryctrl.id = i_cid;
-        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+        /* Extended control API supported */
+        queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
+        while( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
-            struct v4l2_control control;
-            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+            if( queryctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS
+             || V4L2_CTRL_ID2CLASS( queryctrl.id ) == V4L2_CTRL_CLASS_MPEG )
+            {
+                queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
                 continue;
+            }
+            struct v4l2_control control;
             memset( &control, 0, sizeof( control ) );
             control.id = queryctrl.id;
             if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
@@ -3337,31 +3339,62 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                                               : (const char *)queryctrl.name,
                          queryctrl.id, queryctrl.default_value );
             }
+            queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
         }
     }
-
-    /* private controls */
-    for( i_cid = V4L2_CID_PRIVATE_BASE;
-         ;
-         i_cid ++ )
+    else
     {
-        queryctrl.id = i_cid;
-        if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+
+        /* public controls */
+        for( i_cid = V4L2_CID_BASE;
+             i_cid < V4L2_CID_LASTP1;
+             i_cid ++ )
         {
-            struct v4l2_control control;
-            if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                continue;
-            memset( &control, 0, sizeof( control ) );
-            control.id = queryctrl.id;
-            if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
-             && queryctrl.default_value != control.value )
+            queryctrl.id = i_cid;
+            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
             {
-                Control( p_obj, i_fd, (const char *)queryctrl.name,
-                         queryctrl.id, queryctrl.default_value );
+                struct v4l2_control control;
+                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                    continue;
+                memset( &control, 0, sizeof( control ) );
+                control.id = queryctrl.id;
+                if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+                 && queryctrl.default_value != control.value )
+                {
+                    int i;
+                    for( i = 0; controls[i].psz_name != NULL; i++ )
+                        if( controls[i].i_cid == queryctrl.id ) break;
+                    Control( p_obj, i_fd,
+                             controls[i].psz_name ? controls[i].psz_name
+                                                  : (const char *)queryctrl.name,
+                             queryctrl.id, queryctrl.default_value );
+                }
             }
         }
-        else
-            break;
+
+        /* private controls */
+        for( i_cid = V4L2_CID_PRIVATE_BASE;
+             ;
+             i_cid ++ )
+        {
+            queryctrl.id = i_cid;
+            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            {
+                struct v4l2_control control;
+                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+                    continue;
+                memset( &control, 0, sizeof( control ) );
+                control.id = queryctrl.id;
+                if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+                 && queryctrl.default_value != control.value )
+                {
+                    Control( p_obj, i_fd, (const char *)queryctrl.name,
+                             queryctrl.id, queryctrl.default_value );
+                }
+            }
+            else
+                break;
+        }
     }
     return VLC_SUCCESS;
 }
