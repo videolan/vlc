@@ -2584,7 +2584,7 @@ static void EITDecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
     const int c = ( mp == 14 || mp == 15 ) ? 1 : 0;
 
     *p_y = 1900 + yp + c*1;
-    *p_m = mp - 1 + c*12;
+    *p_m = mp - 1 - c*12;
     *p_d = i_mjd - 14956 - (int)(yp*365.25) - (int)(mp*30.6001);
 }
 #define CVT_FROM_BCD(v) ((((v) >> 4)&0xf)*10 + ((v)&0xf))
