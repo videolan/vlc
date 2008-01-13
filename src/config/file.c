@@ -595,19 +595,20 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                         : (p_item->orig.psz != NULL);
 
                 config_Write (file, p_item->psz_text, N_("string"),
-                              modified, p_item->psz_name, "%s",
+                              !modified, p_item->psz_name, "%s",
                               psz_value ? psz_value : "");
 
-                if (b_retain)
-                    break;
+                if ( !b_retain )
+                {
 
-                free ((char *)p_item->saved.psz);
-                if( (psz_value && p_item->orig.psz &&
-                     strcmp( psz_value, p_item->orig.psz )) ||
-                    !psz_value || !p_item->orig.psz)
-                    p_item->saved.psz = strdupnull (psz_value);
-                else
-                    p_item->saved.psz = NULL;
+                    free ((char *)p_item->saved.psz);
+                    if( (psz_value && p_item->orig.psz &&
+                         strcmp( psz_value, p_item->orig.psz )) ||
+                        !psz_value || !p_item->orig.psz)
+                        p_item->saved.psz = strdupnull (psz_value);
+                    else
+                        p_item->saved.psz = NULL;
+                }
             }
 
             if (!b_retain)
