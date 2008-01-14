@@ -47,8 +47,10 @@ initvlc( void )
 {
     PyObject* p_module;
 
-    vlcInput_Type.tp_new = PyType_GenericNew;
-    vlcInput_Type.tp_alloc = PyType_GenericAlloc;
+    vlcMediaInstance_Type.tp_new = PyType_GenericNew;
+    vlcMediaInstance_Type.tp_alloc = PyType_GenericAlloc;
+    vlcMediaDescriptor_Type.tp_new = PyType_GenericNew;
+    vlcMediaDescriptor_Type.tp_alloc = PyType_GenericAlloc;
 
     p_module = Py_InitModule3( "vlc", vlc_methods,
                                "VLC media player embedding module." );
@@ -62,7 +64,9 @@ initvlc( void )
         return;
     if( PyType_Ready( &vlcInstance_Type ) < 0 )
         return;
-    if( PyType_Ready( &vlcInput_Type ) < 0 )
+    if( PyType_Ready( &vlcMediaInstance_Type ) < 0 )
+        return;
+    if( PyType_Ready( &vlcMediaDescriptor_Type ) < 0 )
         return;
 
     /* Exceptions */
@@ -115,9 +119,12 @@ initvlc( void )
     Py_INCREF( &vlcInstance_Type );
     PyModule_AddObject( p_module, "Instance",
                         ( PyObject * )&vlcInstance_Type );
-    Py_INCREF( &vlcInput_Type );
-    PyModule_AddObject( p_module, "Input",
-                        ( PyObject * )&vlcInput_Type );
+    Py_INCREF( &vlcMediaInstance_Type );
+    PyModule_AddObject( p_module, "MediaInstance",
+                        ( PyObject * )&vlcMediaInstance_Type );
+    Py_INCREF( &vlcMediaDescriptor_Type );
+    PyModule_AddObject( p_module, "MediaDescriptor",
+                        ( PyObject * )&vlcMediaDescriptor_Type );
 
     /* Constants */
     PyModule_AddIntConstant( p_module, "AbsolutePosition",
@@ -133,6 +140,7 @@ initvlc( void )
                              mediacontrol_SampleCount );
     PyModule_AddIntConstant( p_module, "MediaTime",
                              mediacontrol_MediaTime );
+
     PyModule_AddIntConstant( p_module, "PlayingStatus",
                              mediacontrol_PlayingStatus );
     PyModule_AddIntConstant( p_module, "PauseStatus",
@@ -147,6 +155,7 @@ initvlc( void )
                              mediacontrol_EndStatus );
     PyModule_AddIntConstant( p_module, "UndefinedStatus",
                              mediacontrol_UndefinedStatus );
+    
 }
 
 
@@ -159,7 +168,7 @@ void * fast_memcpy( void * to, const void * from, size_t len )
 /* Horrible hack... Please do not look.  Temporary workaround for the
    forward declaration mess of python types (cf vlcglue.h). If we do a
    separate compilation, we have to declare some types as extern. But
-   the recommended way to forward declare types in python is
+   the recommended way to forward declared types in python is
    static... I am sorting the mess but in the meantime, this will
    produce a working python module.
 */
@@ -167,3 +176,4 @@ void * fast_memcpy( void * to, const void * from, size_t len )
 #include "vlc_position.c"
 #include "vlc_instance.c"
 #include "vlc_input.c"
+#include "vlc_mediadescriptor.c"

@@ -113,21 +113,33 @@ typedef struct
 } PyPosition;
 
 /**********************************************************************
- * vlc.Input Object
+ * vlc.MediaInstance Object
  **********************************************************************/
 typedef struct
 {
     PyObject_HEAD
-    libvlc_media_instance_t* p_md;
-} vlcInput;
+    libvlc_media_instance_t* p_mi;
+} vlcMediaInstance;
+
+/**********************************************************************
+ * vlc.MediaDescriptor Object
+ **********************************************************************/
+typedef struct
+{
+    PyObject_HEAD
+    libvlc_media_descriptor_t* p_md;
+} vlcMediaDescriptor;
 
 /* Forward declarations */
 staticforward PyTypeObject MediaControl_Type;
 staticforward PyTypeObject PyPosition_Type;
 staticforward PyTypeObject vlcInstance_Type;
-staticforward PyTypeObject vlcInput_Type;
+staticforward PyTypeObject vlcMediaInstance_Type;
+staticforward PyTypeObject vlcMediaDescriptor_Type;
 
-#define LIBVLC_INPUT ((vlcInput*)self)
+#define LIBVLC_INSTANCE ((vlcInstance*)self)
+#define LIBVLC_MEDIAINSTANCE ((vlcMediaInstance*)self)
+#define LIBVLC_MEDIADESCRIPTOR ((vlcMediaDescriptor*)self)
 
 #define LIBVLC_TRY libvlc_exception_init( &ex );
 
