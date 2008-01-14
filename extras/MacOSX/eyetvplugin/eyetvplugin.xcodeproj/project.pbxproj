@@ -122,7 +122,6 @@
 			mainGroup = 089C166AFE841209C02AAC07 /* VLC EyeTV Plug-In */;
 			projectDirPath = "";
 			projectRoot = "";
-			shouldCheckCompatibility = 1;
 			targets = (
 				8D57630D048677EA00EA77CD /* VLC EyeTV Plug-In */,
 			);

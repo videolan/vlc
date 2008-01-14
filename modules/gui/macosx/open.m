@@ -83,7 +83,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     p_list = [NSMutableArray arrayWithCapacity: 1];
  
     next_media = IOIteratorNext( media_iterator );
-    if( next_media != nil )
+    if( next_media )
     {
         char psz_buf[0x32];
         size_t dev_path_length;
@@ -116,7 +116,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
  
             IOObjectRelease( next_media );
  
-        } while( ( next_media = IOIteratorNext( media_iterator ) ) != nil );
+        } while( ( next_media = IOIteratorNext( media_iterator ) ) );
     }
  
     IOObjectRelease( media_iterator );
@@ -237,11 +237,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     /* wake up with the correct EyeTV GUI */
     if( [[[VLCMain sharedInstance] getEyeTVController] isEyeTVrunning] == YES )
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
-    else if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
     {
-        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
-        [self setupChannelInfo];
+        if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
+        {
+            [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
+            [self setupChannelInfo];
+        }
+        else 
+            [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
     }
     else
         [o_eyetv_tabView selectTabViewItemWithIdentifier:@"noeyetv"];
@@ -410,6 +413,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else if( [o_label isEqualToString: _NS("Network")] )
     {
         [self openNetInfoChanged: nil];
+    }
+    else if( [o_label isEqualToString: _NS("EyeTV")] )
+    {
+        [o_mrl setStringValue: @"eyetv://"];
     }
 }
 
@@ -797,12 +804,23 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)eyetvSwitchChannel:(id)sender
 {
     if( sender == o_eyetv_nextProgram_btn )
-        [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: YES]];
+    {
+        int chanNum = [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: YES];
+        [o_eyetv_channels_pop selectItemWithTag:chanNum];
+        [o_mrl setStringValue: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
+    }
     else if( sender == o_eyetv_previousProgram_btn )
-        [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO]];
+    {
+        int chanNum = [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO];
+        [o_eyetv_channels_pop selectItemWithTag:chanNum];
+        [o_mrl setStringValue: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
+    }
     else if( sender == o_eyetv_channels_pop )
-        [[[VLCMain sharedInstance] getEyeTVController] selectChannel:
-            [[sender selectedItem] tag]];
+    {
+        int chanNum = [[sender selectedItem] tag];
+        [[[VLCMain sharedInstance] getEyeTVController] selectChannel:chanNum];
+        [o_mrl setStringValue: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
+    }
     else
         msg_Err( VLCIntf, "eyetvSwitchChannel sent by unknown object" );
 }
@@ -865,9 +883,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if( channels ) 
     {
         NSString *channel;
-        [[[o_eyetv_channels_pop menu] addItemWithTitle: _NS("Tuner")
-                                                   action: nil
-                                            keyEquivalent: @""] setTag:x++];
         [[o_eyetv_channels_pop menu] addItem: [NSMenuItem separatorItem]];
         while( channel = [channels nextObject] )
         {
@@ -875,7 +890,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
              * additionally, we save a bit of time */
             [[[o_eyetv_channels_pop menu] addItemWithTitle: channel
                                                    action: nil
-                                            keyEquivalent: @""] setTag:x++];
+                                            keyEquivalent: @""] setTag:++x];
         }
         /* make Tuner the default */
         [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] getEyeTVController] currentChannel]];
@@ -884,8 +899,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     /* clean up GUI */
     [o_eyetv_chn_bgbar setHidden: YES];
     [o_eyetv_chn_status_txt setHidden: YES];
-
-    [o_mrl setStringValue: @"eyetv:"];
 }
 
 - (IBAction)subsChanged:(id)sender

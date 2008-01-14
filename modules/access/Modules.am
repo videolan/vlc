@@ -1,3 +1,8 @@
+# Automake forgets to add a proper tag to libtool with Objective-C files.
+# Moreocer Libtool should default tag to CC when none is specified but
+# obviously does not. Here is a fix for that.
+LIBTOOL=@LIBTOOL@ --tag=CC
+
 SOURCES_access_file = file.c
 SOURCES_access_directory = directory.c
 SOURCES_access_dv = dv.c
@@ -7,7 +12,7 @@ SOURCES_access_http = http.c
 SOURCES_access_ftp = ftp.c
 SOURCES_access_smb = smb.c
 SOURCES_access_gnomevfs = gnomevfs.c
-SOURCES_access_eyetv = eyetv.c
+SOURCES_access_eyetv = eyetv.m
 SOURCES_dvdnav = dvdnav.c
 SOURCES_dvdread = dvdread.c
 SOURCES_dc1394 = dc1394.c

@@ -132,8 +132,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         script = [[NSAppleScript alloc] initWithSource:
                     @"tell application \"EyeTV\"\n"
                        "channel_up\n"
-                       "volume_change level 0\n"
-                       "tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
                        "get current channel\n"
                      "end tell"];
         msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel up" );
@@ -143,8 +141,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         script = [[NSAppleScript alloc] initWithSource:
                     @"tell application \"EyeTV\"\n"
                        "channel_down\n"
-                       "volume_change level 0\n"
-                       "tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
                        "get current channel\n"
                      "end tell"];
         msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel down" );
@@ -172,25 +168,21 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         case -2: // Composite
             script = [[NSAppleScript alloc] initWithSource:
                         @"tell application \"EyeTV\"\n"
-                         "  input_change input source composite video input"
-                         "  volume_change level 0\n"
-                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                         "  input_change input source composite video input\n"
+                         "  show player_window\n"
                          "end tell"];
             break;
         case -1: // S-Video
             script = [[NSAppleScript alloc] initWithSource:
                         @"tell application \"EyeTV\"\n"
-                         "  input_change input source S video input"
-                         "  volume_change level 0\n"
-                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                         "  input_change input source S video input\n"
+                         "  show player_window\n"
                          "end tell"];
             break;
-        case 0: // Tuner
+        case 0: // Last
             script = [[NSAppleScript alloc] initWithSource:
                         @"tell application \"EyeTV\"\n"
-                         "  input_change input source tuner input"
-                         "  volume_change level 0\n"
-                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                         "  show player_window\n"
                          "end tell"];
             break;
         default:
@@ -198,9 +190,8 @@ static VLCEyeTVController *_o_sharedInstance = nil;
             {
                 NSString *channel_change = [NSString stringWithFormat:
                     @"tell application \"EyeTV\"\n"
-                    @"  channel_change channel number %d\n"
-                     "  volume_change level 0\n"
-                     "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                     "  channel_change channel number %d\n"
+                     "  show player_window\n"
                      "end tell", theChannelNum];
                 script = [[NSAppleScript alloc] initWithSource:channel_change];
             }
