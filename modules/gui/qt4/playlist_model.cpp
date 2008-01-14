@@ -51,79 +51,44 @@ static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
  * Playlist item implementation
  *************************************************************************/
 
-/**
- * Column strings
- *      Title
- *      Artist
- *      Duration
- */
+/*
+   Playlist item is just a wrapper, an abstraction of the playlist_item
+   in order to be managed by PLModel
+
+   PLItem have a parent, and id and a input Id
+*/
+
 
 void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 {
-    parentItem = parent;
-    i_id = _i_id; i_input_id = _i_input_id;
-    model = m;
-    i_type = -1; /* Avoid segfault */
+    parentItem = parent;          /* Can be NULL */
+    i_id       = _i_id;           /* Playlist item specific id */
+    i_input_id = _i_input_id;     /* Identifier of the input */
+    model      = m;               /* PLModel (QAbsmodel) */
+    i_type     = -1;              /* Item type - Avoid segfault */
+    b_current  = false;
 
+    assert( model );
+
+    /* No parent, should be the main one */
     if( parentItem == NULL )
     {
         i_showflags = config_GetInt( model->p_intf , "qt-pl-showflags" );
         updateview();
-    } else {
+    }
+    else
+    {
         i_showflags = parentItem->i_showflags;
         //Add empty string and update() handles data appending
-        strings.append( "" );
+        item_col_strings.append( "" );
     }
 }
 
-void PLItem::updateview( void )
-{
-    strings.clear();
-
-    if( model->i_depth == 1 )  //left window for playlist etc.
-    {
-        strings.append( "" );
-        return;
-    }
-
-    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index = i_index*2 )
-    {
-        if( i_showflags & i_index )
-        {
-            switch( i_index )
-            {
-            case VLC_META_ENGINE_ARTIST:
-                strings.append( qtr( VLC_META_ARTIST ) );
-                break;
-            case VLC_META_ENGINE_TITLE:
-                strings.append( qtr( VLC_META_TITLE ) );
-                break;
-            case VLC_META_ENGINE_DESCRIPTION:
-                strings.append( qtr( VLC_META_DESCRIPTION ) );
-                break;
-            case VLC_META_ENGINE_DURATION:
-                strings.append( qtr( "Duration" ) );
-                break;
-            case VLC_META_ENGINE_GENRE:
-                strings.append( qtr( VLC_META_GENRE ) );
-                break;
-            case VLC_META_ENGINE_COLLECTION:
-                strings.append( qtr( VLC_META_COLLECTION ) );
-                break;
-            case VLC_META_ENGINE_SEQ_NUM:
-                strings.append( qtr( VLC_META_SEQ_NUM ) );
-                break;
-            case VLC_META_ENGINE_RATING:
-                strings.append( qtr( VLC_META_RATING ) );
-                break;
-            default:
-                break;
-            }
-        }
-    }
-}
-
-
+/*
+   Constructors
+   Call the above function init
+   So far the first constructor isn't used...
+   */
 PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 {
     init( _i_id, _i_input_id, parent, m );
@@ -140,9 +105,59 @@ PLItem::~PLItem()
     children.clear();
 }
 
+/* Column manager */
+void PLItem::updateview()
+{
+    item_col_strings.clear();
+
+    if( model->i_depth == 1 )  /* Selector Panel */
+    {
+        item_col_strings.append( "" );
+        return;
+    }
+
+    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index *= 2 )
+    {
+        if( i_showflags & i_index )
+        {
+            switch( i_index )
+            {
+            case VLC_META_ENGINE_ARTIST:
+                item_col_strings.append( qtr( VLC_META_ARTIST ) );
+                break;
+            case VLC_META_ENGINE_TITLE:
+                item_col_strings.append( qtr( VLC_META_TITLE ) );
+                break;
+            case VLC_META_ENGINE_DESCRIPTION:
+                item_col_strings.append( qtr( VLC_META_DESCRIPTION ) );
+                break;
+            case VLC_META_ENGINE_DURATION:
+                item_col_strings.append( qtr( "Duration" ) );
+                break;
+            case VLC_META_ENGINE_GENRE:
+                item_col_strings.append( qtr( VLC_META_GENRE ) );
+                break;
+            case VLC_META_ENGINE_COLLECTION:
+                item_col_strings.append( qtr( VLC_META_COLLECTION ) );
+                break;
+            case VLC_META_ENGINE_SEQ_NUM:
+                item_col_strings.append( qtr( VLC_META_SEQ_NUM ) );
+                break;
+            case VLC_META_ENGINE_RATING:
+                item_col_strings.append( qtr( VLC_META_RATING ) );
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
+/* So far signal is always true.
+   Using signal false would not call PLModel... Why ?
+ */
 void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 {
-    assert( model );
     if( signal )
         model->beginInsertRows( model->index( this , 0 ), i_pos, i_pos );
     children.insert( i_pos, item );
@@ -152,43 +167,48 @@ void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 
 void PLItem::remove( PLItem *removed )
 {
-    assert( model && parentItem );
+    assert( parentItem ); /* parentItem isn't always defined on the left pane
+                             This will BOOM */
+
     int i_index = parentItem->children.indexOf( removed );
     model->beginRemoveRows( model->index( parentItem, 0 ), i_index, i_index );
     parentItem->children.removeAt( i_index );
     model->endRemoveRows();
 }
 
+/* This function is used to get one's parent's row number in the model */
 int PLItem::row() const
 {
     if( parentItem )
-        return parentItem->children.indexOf( const_cast<PLItem*>(this) );
+        return parentItem->children.indexOf( const_cast<PLItem*>(this) ); // Why this ? I don't think we ever inherit PLItem
     return 0;
 }
 
+/* update the PL Item, get the good names and so on */
 void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     char psz_duration[MSTRTIME_MAX_SIZE];
+    char *psz_meta;
+
     assert( p_item->p_input->i_id == i_input_id );
 
     i_type = p_item->p_input->i_type;
-    current = iscurrent;
+    b_current = iscurrent;
 
-    strings.clear();
+    item_col_strings.clear();
 
-    if( model->i_depth == 1 )  //left window for playlist etc.
+    if( model->i_depth == 1 )  /* Selector Panel */
     {
-        strings.append( qfu( p_item->p_input->psz_name ) );
+        item_col_strings.append( qfu( p_item->p_input->psz_name ) );
         return;
     }
 
-    char *psz_meta;
 #define ADD_META( item, meta ) \
-      psz_meta = input_item_Get ## meta ( item->p_input ); \
-      strings.append( qfu( psz_meta ) ); \
-      free( psz_meta );
+    psz_meta = input_item_Get ## meta ( item->p_input ); \
+    item_col_strings.append( qfu( psz_meta ) ); \
+    free( psz_meta );
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index = i_index * 2 )
+    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index *= 2 )
     {
         if( parentItem->i_showflags & i_index )
         {
@@ -207,7 +227,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                 }
                 else if( psz_name )
                 {
-                    strings.append( qfu( psz_name ) );
+                    item_col_strings.append( qfu( psz_name ) );
                 }
                 free( psz_title );
                 free( psz_name );
@@ -218,7 +238,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
             case VLC_META_ENGINE_DURATION:
                 secstotimestr( psz_duration,
                     input_item_GetDuration( p_item->p_input ) / 1000000 );
-                strings.append( QString( psz_duration ) );
+                item_col_strings.append( QString( psz_duration ) );
                 break;
             case VLC_META_ENGINE_GENRE:
                 ADD_META( p_item, Genre );
@@ -244,20 +264,31 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
  * Playlist model implementation
  *************************************************************************/
 
-PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
-                    playlist_item_t * p_root, int _i_depth, QObject *parent )
-                                    : QAbstractItemModel( parent )
+/*
+  This model is called two times, for the selector and the standard panel
+*/
+PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
+                  intf_thread_t *_p_intf,   /* main Qt p_intf */
+                  playlist_item_t * p_root,
+                  /*playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
+                    and THEPL->p_root_category for SelectPL */
+                  int _i_depth,             /* -1 for StandPL, 1 for SelectPL */
+                  QObject *parent )         /* Basic Qt parent */
+                  : QAbstractItemModel( parent )
 {
     i_depth = _i_depth;
     assert( i_depth == 1 || i_depth == -1 );
-    p_intf = _p_intf;
-    p_playlist= _p_playlist;
+    p_intf            = _p_intf;
+    p_playlist        = _p_playlist;
     i_items_to_append = 0;
     b_need_update     = false;
     i_cached_id       = -1;
     i_cached_input_id = -1;
-    i_popup_item = i_popup_parent = -1;
+    i_popup_item      = i_popup_parent = -1;
 
+    rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
+
+    /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
     ADD_ICON( FILE, ":/pixmaps/type_file.png" );
@@ -270,7 +301,6 @@ PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
     ADD_ICON( NODE, ":/pixmaps/type_node.png" );
 #undef ADD_ICON
 
-    rootItem = NULL;
     addCallbacks();
     rebuild( p_root );
 }
@@ -283,7 +313,7 @@ PLModel::~PLModel()
 
 Qt::DropActions PLModel::supportedDropActions() const
 {
-    return Qt::CopyAction;
+    return Qt::CopyAction; /* Why not Qt::MoveAction */
 }
 
 Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
@@ -295,6 +325,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
         return Qt::ItemIsDropEnabled | defaultFlags;
 }
 
+/* A list of model indexes are a playlist */
 QStringList PLModel::mimeTypes() const
 {
     QStringList types;
@@ -316,6 +347,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
     return mimeData;
 }
 
+/* Drop operation */
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                            int row, int column, const QModelIndex &target )
 {
@@ -399,12 +431,14 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
     return true;
 }
 
+/* remove item with its id */
 void PLModel::removeItem( int i_id )
 {
-    PLItem *item = FindById( rootItem,i_id );
+    PLItem *item = FindById( rootItem, i_id );
     if( item ) item->remove( item );
 }
 
+/* callbacks and slots */
 void PLModel::addCallbacks()
 {
     /* Some global changes happened -> Rebuild all */
@@ -437,6 +471,7 @@ void PLModel::activateItem( const QModelIndex &index )
     activateItem( p_item );
     PL_UNLOCK;
 }
+
 /* Must be entered with lock */
 void PLModel::activateItem( playlist_item_t *p_item )
 {
@@ -448,7 +483,8 @@ void PLModel::activateItem( playlist_item_t *p_item )
         p_parent = p_parent->p_parent;
     }
     if( p_parent )
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_parent, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+                          p_parent, p_item );
 }
 
 /****************** Base model mandatory implementations *****************/
@@ -468,7 +504,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     }
     else if( role == Qt::FontRole )
     {
-        if( item->current == true )
+        if( item->b_current == true )
         {
             QFont f; f.setBold( true ); return QVariant( f );
         }
@@ -479,7 +515,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 bool PLModel::isCurrent( const QModelIndex &index )
 {
     assert( index.isValid() );
-    return static_cast<PLItem*>(index.internalPointer())->current;
+    return static_cast<PLItem*>(index.internalPointer())->b_current;
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -528,10 +564,15 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
     if( !index.isValid() ) return QModelIndex();
 
     PLItem *childItem = static_cast<PLItem*>(index.internalPointer());
-    if( !childItem ) { msg_Err( p_playlist, "NULL CHILD" ); return QModelIndex(); }
+    if( !childItem )
+    {
+        msg_Err( p_playlist, "NULL CHILD" );
+        return QModelIndex();
+    }
+
     PLItem *parentItem = childItem->parent();
     if( !parentItem || parentItem == rootItem ) return QModelIndex();
-    if( ! parentItem->parentItem )
+    if( !parentItem->parentItem )
     {
         msg_Err( p_playlist, "No parent parent, trying row 0 " );
         msg_Err( p_playlist, "----- PLEASE REPORT THIS ------" );
@@ -543,7 +584,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
 
 int PLModel::columnCount( const QModelIndex &i) const
 {
-    return rootItem->strings.count();
+    return rootItem->item_col_strings.count();
 }
 
 int PLModel::childrenCount( const QModelIndex &parent ) const
@@ -984,7 +1025,7 @@ void PLModel::viewchanged( int meta )
            break;
        }
        /* UNUSED        emit layoutAboutToBeChanged(); */
-       index = __MIN( index , rootItem->strings.count() );
+       index = __MIN( index , rootItem->item_col_strings.count() );
        QModelIndex parent = createIndex( 0, 0, rootItem );
 
        if( rootItem->i_showflags & meta )

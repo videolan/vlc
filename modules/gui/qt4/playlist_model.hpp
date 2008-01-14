@@ -39,6 +39,7 @@ class QSignalMapper;
 
 class PLItem
 {
+    friend class PLModel;
 public:
     PLItem( int, int, PLItem *parent , PLModel * );
     PLItem( playlist_item_t *, PLItem *parent, PLModel * );
@@ -52,23 +53,23 @@ public:
         insertChild( item, children.count(), signal );
     };
     void remove( PLItem *removed );
+
     PLItem *child( int row ) { return children.value( row ); };
     int childCount() const { return children.count(); };
-    QString columnString( int col ) { return strings.value( col ); };
+    QString columnString( int col ) { return item_col_strings.value( col ); };
     PLItem *parent() { return parentItem; };
 
     void update( playlist_item_t *, bool );
 protected:
     QList<PLItem*> children;
-    QList<QString> strings;
-    bool current;
+    QList<QString> item_col_strings;
+    bool b_current;
     int i_type;
     int i_id;
     int i_input_id;
     int i_showflags;
 
-    void updateview( void );
-    friend class PLModel;
+    void updateview();
 private:
     void init( int, int, PLItem *, PLModel * );
     PLItem *parentItem;
@@ -99,6 +100,8 @@ public:
 class PLModel : public QAbstractItemModel
 {
     Q_OBJECT
+
+friend class PLItem;
 
 public:
     PLModel( playlist_t *, intf_thread_t *,
@@ -198,7 +201,6 @@ private slots:
     void popupExplore();
 #endif
     void viewchanged( int );
-friend class PLItem;
 };
 
 #endif
