@@ -27,6 +27,7 @@
 #import "VLCVideoView.h"
 #import "VLCVideoLayer.h"
 #import "VLCTime.h"
+#import "VLCAudio.h"
 
 /* Notification Messages */
 extern NSString * VLCMediaPlayerTimeChanged;

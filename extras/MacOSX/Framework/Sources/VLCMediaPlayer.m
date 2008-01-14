@@ -238,7 +238,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (VLCAudio *)audio
 {
-    return [VLCLibrary audio];
+    return [[VLCLibrary sharedLibrary] audio];
 }
 
 - (void)setVideoAspectRatio:(char *)value
