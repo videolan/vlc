@@ -180,13 +180,14 @@ vlcMediaDescriptor_get_meta( PyObject *self, PyObject *args )
 
     if( !PyArg_ParseTuple( args, "s", &psz_meta ) )
         return NULL;
-    while( !meta_names[i_loop] )
+    while( meta_names[i_loop] )
     {
         if( !strncmp(meta_names[i_loop], psz_meta, strlen(meta_names[i_loop])) )
         {
             i_index = i_loop;
             break;
         }
+        i_loop++;
     }
     if( i_index < 0 )
     {
