@@ -236,6 +236,11 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return (id)ret;
 }
 
+- (VLCAudio *)audio
+{
+    return [VLCLibrary audio];
+}
+
 - (void)setVideoAspectRatio:(char *)value
 {
     libvlc_video_set_aspect_ratio( instance, value, NULL );

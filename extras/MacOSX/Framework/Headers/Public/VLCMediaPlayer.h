@@ -108,6 +108,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
 @property float rate;
 
+@property (readonly) VLCAudio * audio;
+
 /* Video Information */
 - (NSSize)videoSize;
 - (BOOL)hasVideoOut;
