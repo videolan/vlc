@@ -32,12 +32,12 @@
 #include <vlc_access.h>
 
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_tls.h>
 #include <vlc_strings.h>
+#include <vlc_input.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -317,9 +317,6 @@ connect:
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
         p_sys->psz_location && *p_sys->psz_location )
     {
-        playlist_t * p_playlist;
-        input_item_t *p_input_item;
-
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
         /* Do not accept redirection outside of HTTP works */
@@ -333,14 +330,13 @@ connect:
         if( p_sys->i_code == 301 )
         {
             /* Permanent redirection: Change the URI */
-            p_playlist = pl_Yield( p_access );
-            PL_LOCK;
-
-            p_input_item = p_playlist->status.p_item->p_input;
-            input_item_SetURI( p_input_item, p_sys->psz_location );
-
-            PL_UNLOCK;
-            pl_Release( p_access );
+            input_thread_t * p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+            if( p_input )
+            {
+                input_item_t * p_input_item = input_GetItem(p_input);
+                input_item_SetURI( p_input_item, p_sys->psz_location );
+                vlc_object_release( p_input );
+            }
         }
         free( p_access->psz_path );
         p_access->psz_path = strdup( p_sys->psz_location );
