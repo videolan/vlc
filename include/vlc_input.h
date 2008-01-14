@@ -106,6 +106,11 @@ static inline void input_ItemCopyOptions( input_item_t *p_parent,
     for( i = 0 ; i< p_parent->i_options; i++ )
     {
         char *psz_option= strdup( p_parent->ppsz_options[i] );
+        if( !strcmp( psz_option, "meta-file" ) )
+        {
+            free( psz_option );
+            continue;
+        }
         p_child->i_options++;
         p_child->ppsz_options = (char **)realloc( p_child->ppsz_options,
                                                   p_child->i_options *
