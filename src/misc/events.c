@@ -210,6 +210,10 @@ void vlc_event_send( vlc_event_manager_t * p_em,
  
     /* Call the function attached */
     cached_listener = array_of_cached_listeners;
+
+    if( !listeners_group )
+        return;
+
     vlc_mutex_lock( &p_em->event_sending_lock );
 
     /* Track item removed from *this* thread, with a simple flag */
