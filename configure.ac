@@ -6165,6 +6165,7 @@ AC_CONFIG_FILES([
   modules/access/mms/Makefile
   modules/access/cdda/Makefile
   modules/access/rtsp/Makefile
+  modules/access/v4l2/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
