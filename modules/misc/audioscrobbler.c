@@ -30,6 +30,10 @@
  * Preamble
  *****************************************************************************/
 
+#if defined( WIN32 ) 
+#include <time.h> 
+#endif 
+
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_meta.h>
@@ -54,7 +58,7 @@ typedef struct audioscrobbler_song_t
     char        *psz_n;             /**< track number     */
     int         i_l;                /**< track length     */
     char        *psz_m;             /**< musicbrainz id   */
-    mtime_t     date;               /**< date since epoch */
+    time_t      date;               /**< date since epoch */
 } audioscrobbler_song_t;
 
 struct intf_sys_t
@@ -258,7 +262,7 @@ static void Run( intf_thread_t *p_intf )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     /* main loop */
-    while( !p_intf->b_die && !p_intf->p_libvlc->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         /* waiting for data to submit, if waiting interval is elapsed */
         vlc_object_lock( p_intf );
@@ -344,7 +348,7 @@ static void Run( intf_thread_t *p_intf )
                     "&l%%5B%d%%5D=%d&b%%5B%d%%5D=%s"
                     "&n%%5B%d%%5D=%s&m%%5B%d%%5D=%s",
                     i_song, p_song->psz_a,           i_song, p_song->psz_t,
-                    i_song, (uintmax_t)(p_song->date / 1000000), i_song, i_song,
+                    i_song, (uintmax_t)p_song->date, i_song, i_song,
                     i_song, p_song->i_l,             i_song, p_song->psz_b,
                     i_song, p_song->psz_n,           i_song, p_song->psz_m
             ) )
@@ -532,7 +536,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     p_sys->time_total_pauses = 0;
-    p_sys->p_current_song.date = mdate();
+    time( &p_sys->p_current_song.date );
 
     var_AddCallback( p_input, "state", PlayingChange, p_intf );
     p_sys->b_state_cb = VLC_TRUE;
@@ -692,7 +696,7 @@ static int ParseURL( char *psz_url, char **psz_host, char **psz_file,
 static int Handshake( intf_thread_t *p_this )
 {
     char                *psz_username, *psz_password;
-    mtime_t             timestamp;
+    time_t              timestamp;
     char                psz_timestamp[33];
 
     struct md5_s        p_struct_md5;
@@ -727,7 +731,7 @@ static int Handshake( intf_thread_t *p_this )
         return VLC_ENOVAR;
     }
 
-    timestamp = mdate();
+    time( &timestamp );
 
     /* generates a md5 hash of the password */
     InitMD5( &p_struct_md5 );
@@ -743,7 +747,7 @@ static int Handshake( intf_thread_t *p_this )
         return VLC_ENOMEM;
     }
 
-    snprintf( psz_timestamp, 33, "%llu", (uintmax_t)(timestamp / 1000000) );
+    snprintf( psz_timestamp, 33, "%llu", (uintmax_t)timestamp );
 
     /* generates a md5 hash of :
      * - md5 hash of the password, plus
