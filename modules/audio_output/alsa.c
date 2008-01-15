@@ -762,9 +762,12 @@ static int ALSAThread( aout_instance_t * p_aout )
 
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_mutex_lock( &p_sys->lock );
-    while( !p_sys->start_date )
+    while( !p_sys->start_date && !p_aout->b_die )
         vlc_cond_wait( &p_sys->wait, &p_sys->lock );
     vlc_mutex_unlock( &p_sys->lock );
+
+    if( p_aout->b_die )
+    	goto cleanup;
 
     mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
@@ -773,6 +776,7 @@ static int ALSAThread( aout_instance_t * p_aout )
         ALSAFill( p_aout );
     }
 
+cleanup:
     snd_pcm_drop( p_sys->p_snd_pcm );
     free( p_aout->output.p_sys->p_status );
     return 0;
