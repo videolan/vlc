@@ -169,6 +169,7 @@ case "${host_os}" in
     CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
+    LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names"; LDFLAGS="${LDFLAGS_save}"
     VLC_ADD_LDFLAGS([mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
@@ -5346,7 +5347,7 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         MacOS X support (default enabled on MacOS X)])
 if test "x${enable_macosx}" = "xyes"
 then
-  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,CoreFoundation])
+  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
