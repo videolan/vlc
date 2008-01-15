@@ -74,6 +74,7 @@ NSString * VLCMediaMetaChanged              = @"VLCMediaMetaChanged";
 /* Operations */
 - (void)fetchMetaInformationFromLibVLCWithType:(NSString*)metaType;
 - (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL;
+- (void)setArtwork:(NSImage *)art;
 
 /* Callback Methods */
 - (void)metaChanged:(NSString *)metaType;
@@ -496,13 +497,15 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     // If anything was found, lets save it to the meta data dictionary
     if (art)
     {
-        @synchronized(metaDictionary) 
-        {
-            [metaDictionary setObject:art forKey:VLCMetaInformationArtwork];
-        }
+        [self performSelectorOnMainThread:@selector(setArtwork:) withObject:art waitUntilDone:NO];
     }
 
     [pool release];
+}
+
+- (void)setArtwork:(NSImage *)art
+{
+    [metaDictionary setObject:art forKey:@"artwork"];
 }
 
 - (void)metaChanged:(NSString *)metaType
