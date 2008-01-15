@@ -237,7 +237,7 @@ modules/access/dvb/linux_dvb.c
 modules/access/dv.c
 modules/access/dvdnav.c
 modules/access/dvdread.c
-modules/access/eyetv.c
+modules/access/eyetv.m
 modules/access/fake.c
 modules/access/file.c
 modules/access_filter/bandwidth.c
@@ -285,7 +285,7 @@ modules/access/screen/x11.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
-modules/access/v4l2.c
+modules/access/v4l2/v4l2.c
 modules/access/v4l.c
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
@@ -640,6 +640,8 @@ modules/gui/qt4/components/preferences_widgets.cpp
 modules/gui/qt4/components/preferences_widgets.hpp
 modules/gui/qt4/components/simple_preferences.cpp
 modules/gui/qt4/components/simple_preferences.hpp
+modules/gui/qt4/dialogs/bookmarks.cpp
+modules/gui/qt4/dialogs/bookmarks.hpp
 modules/gui/qt4/dialogs/errors.cpp
 modules/gui/qt4/dialogs/errors.hpp
 modules/gui/qt4/dialogs/extended.cpp
