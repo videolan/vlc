@@ -22,14 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLCLUA_H
+#ifndef VLC_LUA_H
 #define VLC_LUA_H
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#ifndef  _GNU_SOURCE
-#   define  _GNU_SOURCE
-#endif
 
 #include <vlc/vlc.h>
 #include <vlc_input.h>
