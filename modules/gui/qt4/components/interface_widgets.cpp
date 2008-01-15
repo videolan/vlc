@@ -171,18 +171,9 @@ void BackgroundWidget::update( QString url )
             label->setPixmap( QPixmap( ":/vlc128.png" ) );
         return;
     }
-
-    QString arturl = url.replace( "file://",QString("" ) );
-    if( arturl.isNull() )
-    {
-        if( QDate::currentDate().dayOfYear() >= 354 )
-            label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
-        else
-            label->setPixmap( QPixmap( ":/vlc128.png" ) );
-    }
     else
     {
-        label->setPixmap( QPixmap( arturl ) );
+        label->setPixmap( QPixmap( url ) );
         msg_Dbg( p_intf, "changing input b_need_update done ");
     }
 }

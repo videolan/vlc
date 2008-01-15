@@ -191,8 +191,8 @@ void InputManager::update()
     free( psz_art );
     if( artUrl != url )
     {
-        emit artChanged( url );
-        artUrl = url;
+        artUrl = url.replace( "file://",QString("" ) );
+        emit artChanged( artUrl );
     }
 }
 
