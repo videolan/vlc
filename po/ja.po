@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-01-07 21:06+0100\n"
+"POT-Creation-Date: 2008-01-15 00:38+0000\n"
 "PO-Revision-Date: 2008-01-15 05:22+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -72,7 +72,7 @@ msgstr "ホットキー設定"
 #: modules/gui/macosx/extended.m:70 modules/gui/macosx/intf.m:673
 #: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:97
 #: modules/gui/macosx/wizard.m:378
-#: modules/gui/qt4/components/info_panels.cpp:507
+#: modules/gui/qt4/components/info_panels.cpp:514
 #: modules/gui/qt4/components/simple_preferences.cpp:70
 #: modules/gui/qt4/ui/sout.ui:631
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:338
@@ -131,7 +131,7 @@ msgstr "その他のオーディオとモジュールの設定です。"
 #: src/libvlc-module.c:1448 modules/gui/macosx/extended.m:69
 #: modules/gui/macosx/intf.m:686 modules/gui/macosx/output.m:160
 #: modules/gui/macosx/playlistinfo.m:86 modules/gui/macosx/wizard.m:379
-#: modules/gui/qt4/components/info_panels.cpp:508
+#: modules/gui/qt4/components/info_panels.cpp:515
 #: modules/gui/qt4/components/simple_preferences.cpp:71
 #: modules/gui/qt4/ui/sout.ui:542
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:292
@@ -337,7 +337,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:323 modules/gui/macosx/intf.m:618
 #: modules/gui/pda/pda_interface.c:1262
 #: modules/gui/qt4/dialogs/playlist.cpp:45
-#: modules/gui/qt4/main_interface.cpp:133
+#: modules/gui/qt4/main_interface.cpp:134
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:208
 #: modules/gui/wxwidgets/interface.cpp:696
 #: modules/gui/wxwidgets/interface.cpp:707
@@ -355,7 +355,7 @@ msgstr ""
 msgid "General playlist behaviour"
 msgstr "再生一覧を開く"
 
-#: include/vlc_config_cat.h:192 modules/gui/macosx/playlist.m:447
+#: include/vlc_config_cat.h:192 modules/gui/macosx/playlist.m:444
 msgid "Services discovery"
 msgstr "サービスの検出"
 
@@ -394,7 +394,7 @@ msgid "Other advanced settings"
 msgstr "その他の高度な設定"
 
 #: include/vlc_config_cat.h:207 modules/gui/macosx/open.m:164
-#: modules/gui/macosx/open.m:410 modules/gui/pda/pda_interface.c:546
+#: modules/gui/macosx/open.m:413 modules/gui/pda/pda_interface.c:546
 #: modules/gui/qt4/ui/sprefs_input.ui:46
 #: modules/gui/wxwidgets/dialogs/open.cpp:507
 msgid "Network"
@@ -463,8 +463,8 @@ msgid ""
 msgstr ""
 "\n"
 "警告：もし、GUIがアクセスできないなら、DOSのコマンド・プロンプトを開いて、VLC"
-"がインストールされているディレクトリーに移動し、\"vlc -I win32\"を実行してくだ"
-"さい。\n"
+"がインストールされているディレクトリーに移動し、\"vlc -I win32\"を実行してく"
+"ださい。\n"
 
 #: include/vlc_intf_strings.h:33 modules/gui/wxwidgets/menus.cpp:126
 msgid "Quick &Open File..."
@@ -521,10 +521,10 @@ msgstr "VLC メディアプレイヤーについて..."
 #: modules/gui/macosx/intf.m:654 modules/gui/macosx/intf.m:733
 #: modules/gui/macosx/intf.m:740 modules/gui/macosx/intf.m:1633
 #: modules/gui/macosx/intf.m:1634 modules/gui/macosx/intf.m:1635
-#: modules/gui/macosx/intf.m:1636 modules/gui/macosx/playlist.m:439
+#: modules/gui/macosx/intf.m:1636 modules/gui/macosx/playlist.m:436
 #: modules/gui/pda/pda_interface.c:260 modules/gui/pda/pda_interface.c:261
 #: modules/gui/qt4/components/interface_widgets.cpp:524
-#: modules/gui/qt4/menus.cpp:500 modules/gui/qt4/menus.cpp:504
+#: modules/gui/qt4/menus.cpp:502 modules/gui/qt4/menus.cpp:506
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:289
 #: modules/gui/wxwidgets/interface.cpp:694
@@ -538,8 +538,9 @@ msgstr "再生"
 msgid "Fetch information"
 msgstr "情報の取得"
 
-#: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:440
+#: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:437
 #: modules/gui/pda/pda_interface.c:1252
+#: modules/gui/qt4/dialogs/bookmarks.cpp:42
 #: modules/gui/qt4/ui/podcast_configuration.ui:59
 #: modules/gui/qt4/ui/streampanel.ui:50
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:284
@@ -625,7 +626,7 @@ msgstr "再生一覧の保存..."
 msgid "Load playlist file..."
 msgstr "再生一覧の保存..."
 
-#: include/vlc_intf_strings.h:81 modules/gui/macosx/playlist.m:452
+#: include/vlc_intf_strings.h:81
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:329
 msgid "Search"
 msgstr "検索"
@@ -742,7 +743,7 @@ msgid ""
 "b> VLC media player.</p></body></html>"
 msgstr ""
 
-#: include/vlc_meta.h:167 modules/gui/macosx/playlist.m:1111
+#: include/vlc_meta.h:167 modules/gui/macosx/playlist.m:1088
 msgid "Meta-information"
 msgstr "メタ情報"
 
@@ -813,12 +814,12 @@ msgid "Audio Channels"
 msgstr "オーディオチャンネル"
 
 #: src/audio_output/output.c:101 src/audio_output/output.c:136
-#: modules/access/v4l2.c:186 modules/access/v4l.c:124
-#: modules/audio_output/alsa.c:188 modules/audio_output/alsa.c:219
-#: modules/audio_output/directx.c:462 modules/audio_output/oss.c:201
-#: modules/audio_output/portaudio.c:406 modules/audio_output/sdl.c:179
-#: modules/audio_output/sdl.c:196 modules/audio_output/waveout.c:417
-#: modules/codec/twolame.c:66
+#: modules/access/v4l2/v4l2.c:203 modules/access/v4l2/v4l2.c:254
+#: modules/access/v4l.c:124 modules/audio_output/alsa.c:190
+#: modules/audio_output/alsa.c:221 modules/audio_output/directx.c:462
+#: modules/audio_output/oss.c:201 modules/audio_output/portaudio.c:406
+#: modules/audio_output/sdl.c:179 modules/audio_output/sdl.c:196
+#: modules/audio_output/waveout.c:417 modules/codec/twolame.c:66
 msgid "Stereo"
 msgstr "ステレオ"
 
@@ -874,7 +875,7 @@ msgid "string"
 msgstr "文字列"
 
 #: src/control/media_list.c:227 src/playlist/engine.c:125
-#: src/playlist/loadsave.c:149
+#: src/playlist/loadsave.c:141
 msgid "Media Library"
 msgstr ""
 
@@ -1048,7 +1049,7 @@ msgid "Bits per sample"
 msgstr "ビット/サンプル"
 
 #: src/input/es_out.c:2065 modules/access_output/shout.c:86
-#: modules/access/pvr.c:92 modules/gui/qt4/components/open_panels.cpp:709
+#: modules/access/pvr.c:92 modules/gui/qt4/components/open_panels.cpp:713
 msgid "Bitrate"
 msgstr "ビットレート"
 
@@ -1095,14 +1096,14 @@ msgstr ""
 #: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:668
 #: modules/gui/macosx/intf.m:669 modules/gui/macosx/open.m:170
 #: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:305
+#: modules/gui/qt4/components/open_panels.cpp:306
 #: modules/gui/qt4/ui/open_disk.ui:184
 #: modules/gui/wxwidgets/dialogs/open.cpp:761
 #: modules/gui/wxwidgets/dialogs/open.cpp:1662 modules/mux/asf.c:47
 msgid "Title"
 msgstr "タイトル"
 
-#: src/input/meta.c:43 modules/gui/macosx/playlist.m:1111
+#: src/input/meta.c:43 modules/gui/macosx/playlist.m:1088
 msgid "Artist"
 msgstr "アーティスト"
 
@@ -1124,6 +1125,7 @@ msgid "Track number"
 msgstr "トラック番号です。"
 
 #: src/input/meta.c:48 modules/gui/macosx/bookmarks.m:97
+#: modules/gui/qt4/dialogs/bookmarks.cpp:54
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:195
 msgid "Description"
 msgstr "説明"
@@ -1239,22 +1241,22 @@ msgstr "前のチャプター"
 msgid "Media: %s"
 msgstr "メディア: %s"
 
-#: src/interface/interaction.c:266 src/interface/interaction.c:362
-#: modules/demux/avi/avi.c:589 modules/gui/beos/InterfaceWindow.cpp:157
+#: src/interface/interaction.c:266 src/interface/interaction.c:364
+#: modules/demux/avi/avi.c:592 modules/gui/beos/InterfaceWindow.cpp:157
 #: modules/gui/macosx/bookmarks.m:105 modules/gui/macosx/controls.m:58
 #: modules/gui/macosx/interaction.m:128 modules/gui/macosx/interaction.m:132
 #: modules/gui/macosx/interaction.m:135 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/playlistinfo.m:60 modules/gui/macosx/prefs.m:119
 #: modules/gui/macosx/prefs.m:139 modules/gui/macosx/wizard.m:320
-#: modules/gui/qt4/components/open_panels.cpp:1101
-#: modules/gui/qt4/components/preferences_widgets.cpp:1142
+#: modules/gui/qt4/components/open_panels.cpp:1099
+#: modules/gui/qt4/components/preferences_widgets.cpp:1152
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:35
 msgid "Cancel"
 msgstr "取り消し"
 
-#: src/interface/interaction.c:361
-#: modules/gui/qt4/components/open_panels.cpp:1100
-#: modules/gui/qt4/main_interface.cpp:504
+#: src/interface/interaction.c:363
+#: modules/gui/qt4/components/open_panels.cpp:1098
+#: modules/gui/qt4/main_interface.cpp:509
 msgid "Ok"
 msgstr "OK"
 
@@ -1825,7 +1827,7 @@ msgstr "なし"
 #: modules/access/cdda/info.c:816 modules/access/cdda/info.c:858
 #: modules/access/vcdx/access.c:472 modules/access/vcdx/info.c:286
 #: modules/access/vcdx/info.c:287
-#: modules/gui/qt4/components/open_panels.cpp:329
+#: modules/gui/qt4/components/open_panels.cpp:330
 #: modules/gui/wxwidgets/dialogs/open.cpp:1709
 #: modules/gui/wxwidgets/dialogs/open.cpp:1727
 msgid "Track"
@@ -2352,10 +2354,10 @@ msgstr ""
 #: src/video_output/vout_intf.c:209 src/video_output/vout_intf.c:227
 #: modules/access/dshow/dshow.cpp:73 modules/access/dshow/dshow.cpp:75
 #: modules/access/dshow/dshow.cpp:78 modules/access/dshow/dshow.cpp:84
-#: modules/access/v4l2.c:207 modules/audio_output/alsa.c:98
+#: modules/access/v4l2/v4l2.c:241 modules/audio_output/alsa.c:100
 #: modules/gui/fbosd.c:170 modules/gui/macosx/prefs_widgets.m:1273
 #: modules/gui/macosx/sfilters.m:120 modules/gui/macosx/vout.m:203
-#: modules/gui/qt4/components/preferences_widgets.cpp:502
+#: modules/gui/qt4/components/preferences_widgets.cpp:512
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:269
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:319
 #: modules/video_filter/marq.c:54 modules/video_filter/rss.c:61
@@ -3564,7 +3566,7 @@ msgstr "スローモーションに使うホットキーを選択"
 #: modules/gui/macosx/wizard.m:309 modules/gui/macosx/wizard.m:321
 #: modules/gui/macosx/wizard.m:1617
 #: modules/gui/qt4/components/interface_widgets.cpp:527
-#: modules/gui/qt4/menus.cpp:511 modules/gui/qt4/ui/streampanel.ui:129
+#: modules/gui/qt4/menus.cpp:513 modules/gui/qt4/ui/streampanel.ui:129
 #: modules/gui/wxwidgets/interface.cpp:710
 #: modules/gui/wxwidgets/interface.cpp:1537
 #: modules/gui/wxwidgets/menus.cpp:261 modules/misc/notify/notify.c:291
@@ -3580,7 +3582,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:609 modules/gui/macosx/intf.m:658
 #: modules/gui/macosx/intf.m:736 modules/gui/macosx/intf.m:742
 #: modules/gui/qt4/components/interface_widgets.cpp:526
-#: modules/gui/qt4/menus.cpp:509 modules/gui/wxwidgets/interface.cpp:709
+#: modules/gui/qt4/menus.cpp:511 modules/gui/wxwidgets/interface.cpp:709
 #: modules/gui/wxwidgets/interface.cpp:1536
 #: modules/gui/wxwidgets/menus.cpp:260 modules/misc/notify/notify.c:289
 msgid "Previous"
@@ -3595,7 +3597,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:734 modules/gui/macosx/intf.m:741
 #: modules/gui/pda/pda_interface.c:272 modules/gui/pda/pda_interface.c:273
 #: modules/gui/qt4/components/interface_widgets.cpp:528
-#: modules/gui/qt4/menus.cpp:507 modules/gui/qt4/ui/streampanel.ui:122
+#: modules/gui/qt4/menus.cpp:509 modules/gui/qt4/ui/streampanel.ui:122
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:88
 #: modules/gui/wxwidgets/interface.cpp:693
 #: modules/gui/wxwidgets/interface.cpp:704
@@ -3728,7 +3730,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1191 modules/control/hotkeys.c:240
 #: modules/gui/beos/InterfaceWindow.cpp:274 modules/gui/macosx/intf.m:779
-#: modules/gui/qt4/menus.cpp:537
+#: modules/gui/qt4/menus.cpp:539
 msgid "Quit"
 msgstr "終了"
 
@@ -3842,9 +3844,9 @@ msgstr "音量を下げる"
 msgid "Select the key to decrease audio volume."
 msgstr ""
 
-#: src/libvlc-module.c:1217 modules/gui/macosx/controls.m:952
-#: modules/gui/macosx/intf.m:676 modules/gui/macosx/intf.m:737
-#: modules/gui/macosx/intf.m:746
+#: src/libvlc-module.c:1217 modules/access/v4l2/v4l2.c:190
+#: modules/gui/macosx/controls.m:952 modules/gui/macosx/intf.m:676
+#: modules/gui/macosx/intf.m:737 modules/gui/macosx/intf.m:746
 #: modules/gui/qt4/components/interface_widgets.cpp:567
 msgid "Mute"
 msgstr "ミュートする"
@@ -4385,9 +4387,9 @@ msgstr "メタデータ"
 msgid "Decoders"
 msgstr "デコーダ"
 
-#: src/libvlc-module.c:1681 modules/access/v4l2.c:91
+#: src/libvlc-module.c:1681 modules/access/v4l2/v4l2.c:87
 #: modules/gui/macosx/playlistinfo.m:80
-#: modules/gui/qt4/components/info_panels.cpp:509
+#: modules/gui/qt4/components/info_panels.cpp:516
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:267
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:379
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
@@ -5123,7 +5125,7 @@ msgstr "縁取り"
 msgid "Aspect-ratio"
 msgstr "アスペクト比"
 
-#: modules/access/bda/bda.c:39 modules/access/cdda.c:58
+#: modules/access/bda/bda.c:39 modules/access/cdda.c:59
 #: modules/access/dshow/dshow.cpp:90 modules/access/dvb/access.c:73
 #: modules/access/dv.c:66 modules/access/dvdnav.c:66
 #: modules/access/dvdread.c:60 modules/access/fake.c:38
@@ -5132,7 +5134,7 @@ msgstr "アスペクト比"
 #: modules/access/jack.c:57 modules/access/mms/mms.c:44
 #: modules/access/pvr.c:55 modules/access/screen/screen.c:34
 #: modules/access/smb.c:59 modules/access/tcp.c:36 modules/access/udp.c:58
-#: modules/access/v4l2.c:193 modules/access/v4l.c:72
+#: modules/access/v4l2/v4l2.c:210 modules/access/v4l.c:72
 #: modules/access/vcd/vcd.c:40
 msgid "Caching value in ms"
 msgstr "キャッシング値 (ミリ秒)"
@@ -5146,7 +5148,7 @@ msgstr ""
 "定します。"
 
 #: modules/access/bda/bda.c:44 modules/access/dvb/access.c:78
-#: modules/gui/qt4/components/open_panels.cpp:736
+#: modules/gui/qt4/components/open_panels.cpp:740
 msgid "Adapter card to tune"
 msgstr ""
 
@@ -5161,8 +5163,8 @@ msgid "Device number to use on adapter"
 msgstr ""
 
 #: modules/access/bda/bda.c:51 modules/access/dvb/access.c:84
-#: modules/gui/qt4/components/open_panels.cpp:758
-#: modules/gui/qt4/components/open_panels.cpp:845
+#: modules/gui/qt4/components/open_panels.cpp:762
+#: modules/gui/qt4/components/open_panels.cpp:849
 msgid "Transponder/multiplex frequency"
 msgstr ""
 
@@ -5502,7 +5504,7 @@ msgstr ""
 msgid "VLC could not get a new block of size: %i."
 msgstr ""
 
-#: modules/access/cdda.c:60
+#: modules/access/cdda.c:61
 #, fuzzy
 msgid ""
 "Default caching value for Audio CDs. This value should be set in "
@@ -5511,47 +5513,47 @@ msgstr ""
 "udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
 "定します。"
 
-#: modules/access/cdda.c:64 modules/gui/macosx/open.m:178
-#: modules/gui/macosx/open.m:526 modules/gui/macosx/open.m:614
+#: modules/access/cdda.c:65 modules/gui/macosx/open.m:178
+#: modules/gui/macosx/open.m:533 modules/gui/macosx/open.m:621
 #: modules/gui/qt4/ui/open_disk.ui:79
 #: modules/gui/wxwidgets/dialogs/open.cpp:700
 msgid "Audio CD"
 msgstr "オーディオ CD"
 
-#: modules/access/cdda.c:65
+#: modules/access/cdda.c:66
 msgid "Audio CD input"
 msgstr "オーディオ CD 入力"
 
-#: modules/access/cdda.c:71
+#: modules/access/cdda.c:72
 msgid "[cdda:][device][@[track]]"
 msgstr "[cdda:][device][@[track]]"
 
-#: modules/access/cdda.c:83
+#: modules/access/cdda.c:84
 #, fuzzy
 msgid "CDDB Server"
 msgstr "CDDB サーバー"
 
-#: modules/access/cdda.c:83
+#: modules/access/cdda.c:84
 #, fuzzy
 msgid "Address of the CDDB server to use."
 msgstr "電子メールアドレスを CDDB サーバーに報告する"
 
-#: modules/access/cdda.c:86
+#: modules/access/cdda.c:87
 #, fuzzy
 msgid "CDDB port"
 msgstr "CDDB サーバーポート"
 
-#: modules/access/cdda.c:86
+#: modules/access/cdda.c:87
 #, fuzzy
 msgid "CDDB Server port to use."
 msgstr "CDDB サーバーポート"
 
-#: modules/access/cdda.c:440
+#: modules/access/cdda.c:441
 #, fuzzy
 msgid "Audio CD - Track "
 msgstr "オーディオトラック"
 
-#: modules/access/cdda.c:457
+#: modules/access/cdda.c:458
 #, fuzzy, c-format
 msgid "Audio CD - Track %i"
 msgstr "オーディオトラック"
@@ -5781,12 +5783,12 @@ msgstr ""
 #: modules/access/cdda/info.c:329 modules/access/cdda/info.c:334
 #: modules/access/cdda/info.c:338 modules/access/dvdread.c:83
 #: modules/access/vcdx/info.c:88 modules/gui/macosx/open.m:163
-#: modules/gui/macosx/open.m:406 modules/gui/wxwidgets/dialogs/open.cpp:505
+#: modules/gui/macosx/open.m:409 modules/gui/wxwidgets/dialogs/open.cpp:505
 msgid "Disc"
 msgstr "ディスク"
 
 #: modules/access/cdda/info.c:329 modules/access/cdda/info.c:397
-#: modules/gui/macosx/playlist.m:129 modules/gui/qt4/playlist_model.cpp:104
+#: modules/gui/macosx/playlist.m:128 modules/gui/qt4/playlist_model.cpp:135
 #: modules/gui/qt4/qt4.hpp:38
 msgid "Duration"
 msgstr "持続期間"
@@ -5886,8 +5888,8 @@ msgid ""
 msgstr "ファイル・ストリームの既定のキャッシング値を変更できます。単位はミリ秒"
 
 #: modules/access/dshow/dshow.cpp:94 modules/access/v4l.c:76
-#: modules/gui/qt4/components/open_panels.cpp:546
-#: modules/gui/qt4/components/open_panels.cpp:591
+#: modules/gui/qt4/components/open_panels.cpp:550
+#: modules/gui/qt4/components/open_panels.cpp:595
 msgid "Video device name"
 msgstr "ビデオデバイス名"
 
@@ -5897,9 +5899,9 @@ msgid ""
 "don't specify anything, the default device will be used."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:99 modules/access/v4l2.c:166
-#: modules/access/v4l.c:80 modules/gui/qt4/components/open_panels.cpp:552
-#: modules/gui/qt4/components/open_panels.cpp:597
+#: modules/access/dshow/dshow.cpp:99 modules/access/v4l2/v4l2.c:164
+#: modules/access/v4l.c:80 modules/gui/qt4/components/open_panels.cpp:556
+#: modules/gui/qt4/components/open_panels.cpp:601
 msgid "Audio device name"
 msgstr "オーディオデバイス名"
 
@@ -5910,7 +5912,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:104
-#: modules/gui/qt4/components/open_panels.cpp:810
+#: modules/gui/qt4/components/open_panels.cpp:814
 msgid "Video size"
 msgstr "ビデオサイズ"
 
@@ -5921,7 +5923,7 @@ msgid ""
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:109 modules/access/v4l2.c:85
+#: modules/access/dshow/dshow.cpp:109 modules/access/v4l2/v4l2.c:81
 #: modules/access/v4l.c:84
 msgid "Video input chroma format"
 msgstr "ビデオ入力のクロマフォーマット"
@@ -6046,7 +6048,7 @@ msgid "DirectShow input"
 msgstr "DirectShow 入力"
 
 #: modules/access/dshow/dshow.cpp:174 modules/access/dshow/dshow.cpp:179
-#: modules/audio_output/alsa.c:107 modules/video_output/msw/directx.c:172
+#: modules/audio_output/alsa.c:109 modules/video_output/msw/directx.c:172
 msgid "Refresh list"
 msgstr "一覧の再描画"
 
@@ -6302,7 +6304,18 @@ msgstr ""
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr ""
 
-#: modules/access/eyetv.c:44
+#: modules/access/eyetv.m:49
+#, fuzzy
+msgid "Channel number"
+msgstr "チャンネル名"
+
+#: modules/access/eyetv.m:51
+msgid ""
+"EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
+"for Composite input"
+msgstr ""
+
+#: modules/access/eyetv.m:55
 #, fuzzy
 msgid "EyeTV access module"
 msgstr "アクセスモジュール"
@@ -6313,8 +6326,8 @@ msgid ""
 "Caching value for fake streams. This value should be set in milliseconds."
 msgstr "ファイル・ストリームの既定のキャッシング値を変更できます。単位はミリ秒"
 
-#: modules/access/fake.c:42 modules/access/pvr.c:81 modules/access/v4l2.c:104
-#: modules/access/v4l.c:135
+#: modules/access/fake.c:42 modules/access/pvr.c:81
+#: modules/access/v4l2/v4l2.c:102 modules/access/v4l.c:135
 msgid "Framerate"
 msgstr "フレームレート"
 
@@ -6378,7 +6391,7 @@ msgstr "FTP 入力"
 #: modules/audio_output/file.c:108 modules/gui/beos/InterfaceWindow.cpp:261
 #: modules/gui/beos/MediaControlView.cpp:1232
 #: modules/gui/beos/PlayListWindow.cpp:84 modules/gui/macosx/open.m:162
-#: modules/gui/macosx/open.m:402 modules/gui/macosx/output.m:142
+#: modules/gui/macosx/open.m:405 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:364 modules/gui/qt4/ui/sout.ui:50
 #: modules/gui/qt4/ui/sprefs_audio.ui:221
@@ -6413,7 +6426,7 @@ msgid ""
 msgstr ""
 
 #: modules/access_filter/bandwidth.c:40
-#: modules/gui/qt4/components/open_panels.cpp:864
+#: modules/gui/qt4/components/open_panels.cpp:868
 #, fuzzy
 msgid "Bandwidth"
 msgstr "ビデオの幅"
@@ -6736,7 +6749,7 @@ msgid "File stream output"
 msgstr "ファイルストリーム出力"
 
 #: modules/access_output/http.c:60 modules/gui/qt4/ui/sprefs_audio.ui:300
-#: modules/misc/audioscrobbler.c:125
+#: modules/misc/audioscrobbler.c:121
 msgid "Username"
 msgstr "ユーザー名"
 
@@ -6745,8 +6758,8 @@ msgid "User name that will be requested to access the stream."
 msgstr ""
 
 #: modules/access_output/http.c:63 modules/control/telnet.c:78
-#: modules/gui/qt4/dialogs/interaction.cpp:93
-#: modules/gui/qt4/ui/sprefs_audio.ui:307 modules/misc/audioscrobbler.c:127
+#: modules/gui/qt4/dialogs/interaction.cpp:94
+#: modules/gui/qt4/ui/sprefs_audio.ui:307 modules/misc/audioscrobbler.c:123
 #: modules/misc/notify/growl.c:60
 msgid "Password"
 msgstr "パスワード"
@@ -6852,7 +6865,7 @@ msgstr ""
 msgid "Bitrate information of the transcoded stream. "
 msgstr "ストリームをナビゲートする"
 
-#: modules/access_output/shout.c:89 modules/access/v4l2.c:189
+#: modules/access_output/shout.c:89 modules/access/v4l2/v4l2.c:206
 #: modules/access/v4l.c:121
 #, fuzzy
 msgid "Samplerate"
@@ -6964,8 +6977,8 @@ msgid "PVR radio device"
 msgstr "PVR ラジオデバイス"
 
 #: modules/access/pvr.c:66 modules/access/v4l.c:95
-#: modules/gui/qt4/components/open_panels.cpp:559
-#: modules/gui/qt4/components/open_panels.cpp:693
+#: modules/gui/qt4/components/open_panels.cpp:563
+#: modules/gui/qt4/components/open_panels.cpp:697
 #, fuzzy
 msgid "Norm"
 msgstr "なし"
@@ -6974,8 +6987,9 @@ msgstr "なし"
 msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
 msgstr ""
 
-#: modules/access/pvr.c:70 modules/access/v4l2.c:98 modules/access/v4l.c:101
-#: modules/demux/rawvid.c:43 modules/video_filter/mosaic.c:94
+#: modules/access/pvr.c:70 modules/access/v4l2/v4l2.c:96
+#: modules/access/v4l.c:101 modules/demux/rawvid.c:43
+#: modules/video_filter/mosaic.c:94
 msgid "Width"
 msgstr "幅"
 
@@ -6983,8 +6997,9 @@ msgstr "幅"
 msgid "Width of the stream to capture (-1 for autodetection)."
 msgstr ""
 
-#: modules/access/pvr.c:74 modules/access/v4l2.c:101 modules/access/v4l.c:104
-#: modules/demux/rawvid.c:47 modules/video_filter/mosaic.c:92
+#: modules/access/pvr.c:74 modules/access/v4l2/v4l2.c:99
+#: modules/access/v4l.c:104 modules/demux/rawvid.c:47
+#: modules/video_filter/mosaic.c:92
 msgid "Height"
 msgstr "高さ"
 
@@ -6992,9 +7007,9 @@ msgstr "高さ"
 msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr ""
 
-#: modules/access/pvr.c:78 modules/access/v4l.c:88
-#: modules/gui/qt4/components/open_panels.cpp:566
-#: modules/gui/qt4/components/open_panels.cpp:700
+#: modules/access/pvr.c:78 modules/access/v4l2/v4l2.c:225
+#: modules/access/v4l.c:88 modules/gui/qt4/components/open_panels.cpp:570
+#: modules/gui/qt4/components/open_panels.cpp:704
 msgid "Frequency"
 msgstr "周波数"
 
@@ -7002,7 +7017,8 @@ msgstr "周波数"
 msgid "Frequency to capture (in kHz), if applicable."
 msgstr ""
 
-#: modules/access/pvr.c:82 modules/access/v4l2.c:105 modules/access/v4l.c:136
+#: modules/access/pvr.c:82 modules/access/v4l2/v4l2.c:103
+#: modules/access/v4l.c:136
 msgid "Framerate to capture, if applicable (-1 for autodetect)."
 msgstr ""
 
@@ -7055,8 +7071,9 @@ msgstr "オーディオビットレート"
 msgid "Bitmask that will get used by the audio part of the card."
 msgstr ""
 
-#: modules/access/pvr.c:105 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:616 modules/gui/wxwidgets/interface.cpp:1402
+#: modules/access/pvr.c:105 modules/access/v4l2/v4l2.c:184
+#: modules/access/vcdx/info.c:97 modules/gui/macosx/intf.m:616
+#: modules/gui/wxwidgets/interface.cpp:1402
 msgid "Volume"
 msgstr "音量"
 
@@ -7077,15 +7094,18 @@ msgstr ""
 msgid "Automatic"
 msgstr "自動"
 
-#: modules/access/pvr.c:115 modules/access/v4l2.c:207 modules/access/v4l.c:142
+#: modules/access/pvr.c:115 modules/access/v4l2/v4l2.c:241
+#: modules/access/v4l.c:142
 msgid "SECAM"
 msgstr "SECAM"
 
-#: modules/access/pvr.c:115 modules/access/v4l2.c:207 modules/access/v4l.c:142
+#: modules/access/pvr.c:115 modules/access/v4l2/v4l2.c:241
+#: modules/access/v4l.c:142
 msgid "PAL"
 msgstr "PAL"
 
-#: modules/access/pvr.c:115 modules/access/v4l2.c:207 modules/access/v4l.c:142
+#: modules/access/pvr.c:115 modules/access/v4l2/v4l2.c:241
+#: modules/access/v4l.c:142
 msgid "NTSC"
 msgstr "NTSC"
 
@@ -7240,7 +7260,7 @@ msgstr ""
 "定します。"
 
 #: modules/access/udp.c:72 modules/gui/macosx/open.m:185
-#: modules/gui/macosx/open.m:728 modules/gui/wxwidgets/dialogs/open.cpp:805
+#: modules/gui/macosx/open.m:735 modules/gui/wxwidgets/dialogs/open.cpp:805
 msgid "UDP/RTP"
 msgstr ""
 
@@ -7248,28 +7268,29 @@ msgstr ""
 msgid "UDP/RTP input"
 msgstr "UDP/RTP 入力"
 
-#: modules/access/v4l2.c:78 modules/gui/macosx/open.m:169
-#: modules/gui/qt4/components/open_panels.cpp:680
+#: modules/access/v4l2/v4l2.c:74 modules/gui/macosx/open.m:169
+#: modules/gui/qt4/components/open_panels.cpp:684
 #: modules/gui/wxwidgets/dialogs/open.cpp:724
 msgid "Device name"
 msgstr "デバイス名"
 
-#: modules/access/v4l2.c:80
+#: modules/access/v4l2/v4l2.c:76
 msgid ""
 "Name of the device to use. If you don't specify anything, /dev/video0 will "
 "be used."
 msgstr ""
 
-#: modules/access/v4l2.c:82 modules/gui/qt4/components/open_panels.cpp:604
+#: modules/access/v4l2/v4l2.c:78
+#: modules/gui/qt4/components/open_panels.cpp:608
 #: modules/stream_out/standard.c:84
 msgid "Standard"
 msgstr "標準"
 
-#: modules/access/v4l2.c:84
+#: modules/access/v4l2/v4l2.c:80
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr ""
 
-#: modules/access/v4l2.c:87
+#: modules/access/v4l2/v4l2.c:83
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
 "I420 or I422 for raw images, MJPEG for M-JPEG compressed input) (Complete "
@@ -7277,58 +7298,66 @@ msgid ""
 "I420, I411, I410, MJPG)"
 msgstr ""
 
-#: modules/access/v4l2.c:93
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+#: modules/access/v4l2/v4l2.c:89
+msgid "Input of the card to use (see debug)."
 msgstr ""
 
-#: modules/access/v4l2.c:95
+#: modules/access/v4l2/v4l2.c:90 modules/access/v4l2/v4l2.c:296
+#, fuzzy
+msgid "Audio input"
+msgstr "オーディオ CD 入力"
+
+#: modules/access/v4l2/v4l2.c:92
+msgid "Audio input of the card to use (see debug)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:93
 #, fuzzy
 msgid "IO Method"
 msgstr "出力方法"
 
-#: modules/access/v4l2.c:97
+#: modules/access/v4l2/v4l2.c:95
 msgid "IO Method (READ, MMAP, USERPTR)."
 msgstr ""
 
-#: modules/access/v4l2.c:100
+#: modules/access/v4l2/v4l2.c:98
 msgid "Force width (-1 for autodetect)."
 msgstr ""
 
-#: modules/access/v4l2.c:103
+#: modules/access/v4l2/v4l2.c:101
 msgid "Force height (-1 for autodetect)."
 msgstr ""
 
-#: modules/access/v4l2.c:108
+#: modules/access/v4l2/v4l2.c:106
 #, fuzzy
 msgid "Reset v4l2 controls"
 msgstr "拡張制御"
 
-#: modules/access/v4l2.c:110
+#: modules/access/v4l2/v4l2.c:108
 msgid "Reset controls to defaults provided by the v4l2 driver."
 msgstr ""
 
-#: modules/access/v4l2.c:111 modules/access/v4l.c:107
+#: modules/access/v4l2/v4l2.c:109 modules/access/v4l.c:107
 #: modules/gui/macosx/extended.m:103 modules/gui/qt4/ui/video_effects.ui:242
 #: modules/gui/wxwidgets/extrapanel.cpp:234
 msgid "Brightness"
 msgstr "ブライトネス"
 
-#: modules/access/v4l2.c:113
+#: modules/access/v4l2/v4l2.c:111
 msgid "Brightness of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:114 modules/access/v4l.c:116
+#: modules/access/v4l2/v4l2.c:112 modules/access/v4l.c:116
 #: modules/gui/macosx/extended.m:104 modules/gui/qt4/ui/video_effects.ui:235
 #: modules/gui/wxwidgets/extrapanel.cpp:229
 msgid "Contrast"
 msgstr "コントラスト"
 
-#: modules/access/v4l2.c:116
+#: modules/access/v4l2/v4l2.c:114
 msgid "Contrast of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:117 modules/gui/macosx/extended.m:107
+#: modules/access/v4l2/v4l2.c:115 modules/gui/macosx/extended.m:107
 #: modules/gui/qt4/ui/video_effects.ui:249
 #: modules/gui/qt4/ui/video_effects.ui:367
 #: modules/gui/wxwidgets/extrapanel.cpp:239
@@ -7336,229 +7365,329 @@ msgstr ""
 msgid "Saturation"
 msgstr "持続期間"
 
-#: modules/access/v4l2.c:119
+#: modules/access/v4l2/v4l2.c:117
 msgid "Saturation of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:120 modules/access/v4l.c:110
+#: modules/access/v4l2/v4l2.c:118 modules/access/v4l.c:110
 #: modules/gui/macosx/extended.m:106 modules/gui/qt4/ui/video_effects.ui:256
 #: modules/gui/wxwidgets/extrapanel.cpp:224
 #, fuzzy
 msgid "Hue"
 msgstr "閉じる"
 
-#: modules/access/v4l2.c:122
+#: modules/access/v4l2/v4l2.c:120
 msgid "Hue of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:123
+#: modules/access/v4l2/v4l2.c:121
 #, fuzzy
 msgid "Black level"
 msgstr "最大レベル"
 
-#: modules/access/v4l2.c:125
+#: modules/access/v4l2/v4l2.c:123
 msgid "Black level of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:126
+#: modules/access/v4l2/v4l2.c:124
 msgid "Auto white balance"
 msgstr ""
 
-#: modules/access/v4l2.c:128
+#: modules/access/v4l2/v4l2.c:126
 msgid ""
 "Automatically set the white balance of the video input (if supported by the "
 "v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:130
+#: modules/access/v4l2/v4l2.c:128
 msgid "Do white balance"
 msgstr ""
 
-#: modules/access/v4l2.c:132
+#: modules/access/v4l2/v4l2.c:130
 msgid ""
 "Trigger a white balancing action, useless if auto white balance is activated "
 "(if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:134
+#: modules/access/v4l2/v4l2.c:132
 msgid "Red balance"
 msgstr ""
 
-#: modules/access/v4l2.c:136
+#: modules/access/v4l2/v4l2.c:134
 msgid "Red balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:137
+#: modules/access/v4l2/v4l2.c:135
 msgid "Blue balance"
 msgstr ""
 
-#: modules/access/v4l2.c:139
+#: modules/access/v4l2/v4l2.c:137
 msgid "Blue balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:140 modules/gui/macosx/extended.m:105
+#: modules/access/v4l2/v4l2.c:138 modules/gui/macosx/extended.m:105
 #: modules/gui/qt4/ui/video_effects.ui:228
 #: modules/gui/wxwidgets/extrapanel.cpp:244
 msgid "Gamma"
 msgstr "ガンマ"
 
-#: modules/access/v4l2.c:142
+#: modules/access/v4l2/v4l2.c:140
 msgid "Gamma of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:143
+#: modules/access/v4l2/v4l2.c:141
 msgid "Exposure"
 msgstr ""
 
-#: modules/access/v4l2.c:145
+#: modules/access/v4l2/v4l2.c:143
 msgid "Exposure of the video input (if supported by the v4L2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:146
+#: modules/access/v4l2/v4l2.c:144
 #, fuzzy
 msgid "Auto gain"
 msgstr "自動"
 
-#: modules/access/v4l2.c:148
+#: modules/access/v4l2/v4l2.c:146
 msgid ""
 "Automatically set the video input's gain (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:150
+#: modules/access/v4l2/v4l2.c:148
 #, fuzzy
 msgid "Gain"
 msgstr "イタリア語"
 
-#: modules/access/v4l2.c:152
+#: modules/access/v4l2/v4l2.c:150
 msgid "Video input's gain (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:153
+#: modules/access/v4l2/v4l2.c:151
 #, fuzzy
 msgid "Horizontal flip"
 msgstr "水平"
 
-#: modules/access/v4l2.c:155
+#: modules/access/v4l2/v4l2.c:153
 msgid "Flip the video horizontally (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:156
+#: modules/access/v4l2/v4l2.c:154
 #, fuzzy
 msgid "Vertical flip"
 msgstr "垂直"
 
-#: modules/access/v4l2.c:158
+#: modules/access/v4l2/v4l2.c:156
 msgid "Flip the video vertically (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:159
+#: modules/access/v4l2/v4l2.c:157
 #, fuzzy
 msgid "Horizontal centering"
 msgstr "水平"
 
-#: modules/access/v4l2.c:161
+#: modules/access/v4l2/v4l2.c:159
 msgid ""
 "Set the camera's horizontal centering (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:162
+#: modules/access/v4l2/v4l2.c:160
 #, fuzzy
 msgid "Vertical centering"
 msgstr "垂直オフセット"
 
-#: modules/access/v4l2.c:164
+#: modules/access/v4l2/v4l2.c:162
 msgid "Set the camera's vertical centering (if supported by the v4l2 driver)."
 msgstr ""
 
-#: modules/access/v4l2.c:169
+#: modules/access/v4l2/v4l2.c:167
 msgid ""
 "Name of the audio device to use. If you don't specify anything, \"/dev/dsp\" "
 "will be used for OSS."
 msgstr ""
 
-#: modules/access/v4l2.c:173
+#: modules/access/v4l2/v4l2.c:171
 msgid ""
 "Name of the audio device to use. If you don't specify anything, \"/dev/dsp\" "
 "will be used for OSS, \"hw\" for Alsa."
 msgstr ""
 
-#: modules/access/v4l2.c:177
+#: modules/access/v4l2/v4l2.c:175
 #, fuzzy
 msgid "Audio method"
 msgstr "オーディオメニュー"
 
-#: modules/access/v4l2.c:180
+#: modules/access/v4l2/v4l2.c:178
 msgid "Audio method to use: 0 to disable audio, 1 for OSS."
 msgstr ""
 
-#: modules/access/v4l2.c:183
+#: modules/access/v4l2/v4l2.c:181
 msgid ""
 "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, 3 for ALSA "
 "or OSS (ALSA is prefered)."
 msgstr ""
 
-#: modules/access/v4l2.c:188 modules/access/v4l.c:126
+#: modules/access/v4l2/v4l2.c:186
+msgid "Volume of the audio input (if supported by the v4l2 driver)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:187
+#, fuzzy
+msgid "Balance"
+msgstr "ダンス"
+
+#: modules/access/v4l2/v4l2.c:189
+msgid "Balance of the audio input (if supported by the v4l2 driver)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:192
+msgid "Mute audio input (if supported by the v4l2 driver)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:193 modules/meta_engine/id3genres.h:69
+msgid "Bass"
+msgstr "バス"
+
+#: modules/access/v4l2/v4l2.c:195
+msgid "Bass level of the audio input (if supported by the v4l2 driver)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:196
+#, fuzzy
+msgid "Treble"
+msgstr "有効"
+
+#: modules/access/v4l2/v4l2.c:198
+msgid "Treble level of the audio input (if supported by the v4l2 driver)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:199
+msgid "Loudness"
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:201
+msgid "Loudness of the audio input (if supported by the v4l2 driver)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:205 modules/access/v4l.c:126
 msgid "Capture the audio stream in stereo."
 msgstr ""
 
-#: modules/access/v4l2.c:191
+#: modules/access/v4l2/v4l2.c:208
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, "
 "48000)"
 msgstr ""
 
-#: modules/access/v4l2.c:195
+#: modules/access/v4l2/v4l2.c:212
 #, fuzzy
 msgid ""
 "Caching value for V4L2 captures. This value should be set in milliseconds."
 msgstr "ファイル・ストリームの既定のキャッシング値を変更できます。単位はミリ秒"
 
-#: modules/access/v4l2.c:212
+#: modules/access/v4l2/v4l2.c:214
+#, fuzzy
+msgid "v4l2 driver controls"
+msgstr "v412 制御"
+
+#: modules/access/v4l2/v4l2.c:216
+msgid ""
+"Set the v4l2 driver controls to the values specified using a comma separated "
+"list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
+"audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
+"(-vvv) or use the v4l2-ctl application."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:222
+#, fuzzy
+msgid "Tuner id"
+msgstr "チューナー:"
+
+#: modules/access/v4l2/v4l2.c:224
+msgid "Tuner id (see debug output)."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:227
+msgid "Tuner frequency in Hz or kHz (see debug output)"
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:228
+#, fuzzy
+msgid "Audio mode"
+msgstr "オーディオコーデック"
+
+#: modules/access/v4l2/v4l2.c:230
+msgid "Tuner audio mono/stereo and track selection."
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:246
 msgid "READ"
 msgstr ""
 
-#: modules/access/v4l2.c:212
+#: modules/access/v4l2/v4l2.c:246
 msgid "MMAP"
 msgstr ""
 
-#: modules/access/v4l2.c:212
+#: modules/access/v4l2/v4l2.c:246
 msgid "USERPTR"
 msgstr ""
 
-#: modules/access/v4l2.c:224
+#: modules/access/v4l2/v4l2.c:253 modules/audio_output/alsa.c:184
+#: modules/audio_output/directx.c:475 modules/audio_output/oss.c:221
+#: modules/audio_output/portaudio.c:398 modules/audio_output/sdl.c:180
+#: modules/audio_output/sdl.c:199 modules/audio_output/waveout.c:430
+msgid "Mono"
+msgstr "モノラル"
+
+#: modules/access/v4l2/v4l2.c:255
+msgid "Primary language (Analog TV tuners only)"
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:256
+msgid "Secondary language (Analog TV tuners only)"
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:257
+msgid "Second audio program (Analog TV tuners only)"
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:258
+msgid "Primary language left, Secondary language right"
+msgstr ""
+
+#: modules/access/v4l2/v4l2.c:270
 #, fuzzy
 msgid "Video4Linux2"
 msgstr "Video4Linux"
 
-#: modules/access/v4l2.c:225
+#: modules/access/v4l2/v4l2.c:271
 #, fuzzy
 msgid "Video4Linux2 input"
 msgstr "Video4Linux 入力"
 
-#: modules/access/v4l2.c:229
+#: modules/access/v4l2/v4l2.c:275
 #, fuzzy
 msgid "Video input"
 msgstr "ビデオオプション"
 
-#: modules/access/v4l2.c:248
+#: modules/access/v4l2/v4l2.c:308 modules/access/v4l.c:119
 #, fuzzy
-msgid "Audio input"
-msgstr "オーディオ CD 入力"
+msgid "Tuner"
+msgstr "チューナー:"
 
-#: modules/access/v4l2.c:260
+#: modules/access/v4l2/v4l2.c:318
 msgid "Controls"
 msgstr "コントロール"
 
-#: modules/access/v4l2.c:261
+#: modules/access/v4l2/v4l2.c:319
 msgid "v4l2 driver controls, if supported by your v4l2 driver."
 msgstr ""
 
-#: modules/access/v4l2.c:304
+#: modules/access/v4l2/v4l2.c:377
 #, fuzzy
 msgid "Video4Linux2 Compressed A/V"
 msgstr "Video4Linux入力モジュール"
 
-#: modules/access/v4l2.c:2916
+#: modules/access/v4l2/v4l2.c:3146
 #, fuzzy
 msgid "Reset controls to default"
 msgstr "リモート制御インターフェース"
@@ -7637,11 +7766,6 @@ msgstr "ASCIIアート・ビデオ出力モジュール"
 msgid "Contrast of the video input."
 msgstr ""
 
-#: modules/access/v4l.c:119 modules/gui/macosx/open.m:868
-#, fuzzy
-msgid "Tuner"
-msgstr "チューナー:"
-
 #: modules/access/v4l.c:120
 msgid "Tuner to use, if there are several ones."
 msgstr ""
@@ -7695,7 +7819,7 @@ msgstr ""
 "定します。"
 
 #: modules/access/vcd/vcd.c:46 modules/gui/macosx/open.m:177
-#: modules/gui/macosx/open.m:520 modules/gui/macosx/open.m:606
+#: modules/gui/macosx/open.m:527 modules/gui/macosx/open.m:613
 #: modules/gui/wxwidgets/dialogs/open.cpp:699
 msgid "VCD"
 msgstr "VCD"
@@ -7720,7 +7844,7 @@ msgstr ""
 #: modules/access/vcdx/access.c:281 modules/access/vcdx/access.c:364
 #: modules/access/vcdx/access.c:690 modules/access/vcdx/info.c:290
 #: modules/access/vcdx/info.c:291
-#: modules/gui/qt4/components/open_panels.cpp:317
+#: modules/gui/qt4/components/open_panels.cpp:318
 msgid "Entry"
 msgstr "エントリ"
 
@@ -8318,19 +8442,19 @@ msgstr "ダミーの S/PDIF オーディオミキサー"
 msgid "Trivial audio mixer"
 msgstr "微妙なオーディオ・ミキサー・モジュール"
 
-#: modules/audio_output/alsa.c:81
+#: modules/audio_output/alsa.c:83
 msgid "default"
 msgstr "標準"
 
-#: modules/audio_output/alsa.c:101
+#: modules/audio_output/alsa.c:103
 msgid "ALSA audio output"
 msgstr "ALSA オーディオ出力"
 
-#: modules/audio_output/alsa.c:105
+#: modules/audio_output/alsa.c:107
 msgid "ALSA Device Name"
 msgstr "ALSA デバイス名"
 
-#: modules/audio_output/alsa.c:125 modules/audio_output/auhal.c:126
+#: modules/audio_output/alsa.c:127 modules/audio_output/auhal.c:126
 #: modules/audio_output/auhal.c:970 modules/audio_output/directx.c:398
 #: modules/audio_output/oss.c:128 modules/audio_output/portaudio.c:392
 #: modules/audio_output/sdl.c:174 modules/audio_output/sdl.c:192
@@ -8339,50 +8463,43 @@ msgstr "ALSA デバイス名"
 msgid "Audio Device"
 msgstr "オーディオデバイス"
 
-#: modules/audio_output/alsa.c:182 modules/audio_output/directx.c:475
-#: modules/audio_output/oss.c:221 modules/audio_output/portaudio.c:398
-#: modules/audio_output/sdl.c:180 modules/audio_output/sdl.c:199
-#: modules/audio_output/waveout.c:430
-msgid "Mono"
-msgstr "モノラル"
-
-#: modules/audio_output/alsa.c:195 modules/audio_output/directx.c:448
+#: modules/audio_output/alsa.c:197 modules/audio_output/directx.c:448
 #: modules/audio_output/oss.c:177 modules/audio_output/portaudio.c:417
 #: modules/audio_output/waveout.c:402
 msgid "2 Front 2 Rear"
 msgstr "フロント 2, リア 2"
 
-#: modules/audio_output/alsa.c:243 modules/audio_output/directx.c:521
+#: modules/audio_output/alsa.c:245 modules/audio_output/directx.c:521
 #: modules/audio_output/oss.c:245 modules/audio_output/waveout.c:446
 msgid "A/52 over S/PDIF"
 msgstr "A/52 over S/PDIF"
 
-#: modules/audio_output/alsa.c:322
+#: modules/audio_output/alsa.c:324
 #, fuzzy
 msgid "No Audio Device"
 msgstr "オーディオデバイス"
 
-#: modules/audio_output/alsa.c:323
+#: modules/audio_output/alsa.c:325
 msgid "No audio device name was given. You might want to enter \"default\"."
 msgstr ""
 
-#: modules/audio_output/alsa.c:430 modules/audio_output/alsa.c:469
-#: modules/audio_output/alsa.c:481 modules/audio_output/auhal.c:240
+#: modules/audio_output/alsa.c:432 modules/audio_output/alsa.c:471
+#: modules/audio_output/alsa.c:483 modules/audio_output/auhal.c:240
 #, fuzzy
 msgid "Audio output failed"
 msgstr "オーディオ出力 URL"
 
-#: modules/audio_output/alsa.c:431 modules/audio_output/alsa.c:482
+#: modules/audio_output/alsa.c:433 modules/audio_output/alsa.c:484
 #, c-format
 msgid "VLC could not open the ALSA device \"%s\" (%s)."
 msgstr ""
 
-#: modules/audio_output/alsa.c:470
+#: modules/audio_output/alsa.c:472
 #, c-format
 msgid "The audio device \"%s\" is already in use."
 msgstr ""
 
-#: modules/audio_output/alsa.c:934
+#: modules/audio_output/alsa.c:950
 #, fuzzy
 msgid "Unknown soundcard"
 msgstr "不明のビデオ"
@@ -11356,12 +11473,12 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr ""
 
-#: modules/demux/avi/avi.c:585
+#: modules/demux/avi/avi.c:588
 #, fuzzy
 msgid "AVI Index"
 msgstr "インデックス"
 
-#: modules/demux/avi/avi.c:586
+#: modules/demux/avi/avi.c:589
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it?\n"
@@ -11369,16 +11486,16 @@ msgid ""
 "This might take a long time."
 msgstr ""
 
-#: modules/demux/avi/avi.c:589
+#: modules/demux/avi/avi.c:592
 #, fuzzy
 msgid "Repair"
 msgstr "ネパール語"
 
-#: modules/demux/avi/avi.c:589
+#: modules/demux/avi/avi.c:592
 msgid "Don't repair"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2303 modules/demux/avi/avi.c:2326
+#: modules/demux/avi/avi.c:2306 modules/demux/avi/avi.c:2329
 #, fuzzy
 msgid "Fixing AVI Index..."
 msgstr "インデックス"
@@ -12181,10 +12298,10 @@ msgstr "BeOS標準APIモジュール"
 msgid "Open files from all sub-folders as well?"
 msgstr ""
 
-#: modules/gui/beos/InterfaceWindow.cpp:157 modules/gui/macosx/open.m:471
-#: modules/gui/macosx/open.m:662 modules/gui/macosx/open.m:775
-#: modules/gui/macosx/open.m:918 modules/gui/qt4/dialogs/open.cpp:69
-#: modules/gui/qt4/menus.cpp:521 modules/gui/wxwidgets/interface.cpp:692
+#: modules/gui/beos/InterfaceWindow.cpp:157 modules/gui/macosx/open.m:478
+#: modules/gui/macosx/open.m:669 modules/gui/macosx/open.m:782
+#: modules/gui/macosx/open.m:931 modules/gui/qt4/dialogs/open.cpp:69
+#: modules/gui/qt4/menus.cpp:523 modules/gui/wxwidgets/interface.cpp:692
 #: modules/gui/wxwidgets/interface.cpp:703 modules/gui/wxwidgets/menus.cpp:351
 #: modules/gui/wxwidgets/menus.cpp:407
 msgid "Open"
@@ -12205,8 +12322,8 @@ msgid "Messages"
 msgstr "メッセージ"
 
 #: modules/gui/beos/InterfaceWindow.cpp:263
-#: modules/gui/beos/PlayListWindow.cpp:86 modules/gui/macosx/open.m:470
-#: modules/gui/macosx/open.m:774 modules/gui/macosx/open.m:917
+#: modules/gui/beos/PlayListWindow.cpp:86 modules/gui/macosx/open.m:477
+#: modules/gui/macosx/open.m:781 modules/gui/macosx/open.m:930
 #: modules/gui/qt4/ui/open_file.ui:20 modules/gui/wxwidgets/dialogs.cpp:443
 #: modules/gui/wxwidgets/dialogs/open.cpp:1263
 msgid "Open File"
@@ -12257,14 +12374,14 @@ msgstr "ウィンドウ"
 #: modules/gui/macosx/controls.m:59 modules/gui/macosx/extended.m:622
 #: modules/gui/macosx/interaction.m:133 modules/gui/macosx/interaction.m:134
 #: modules/gui/macosx/interaction.m:174 modules/gui/macosx/open.m:159
-#: modules/gui/macosx/open.m:282 modules/gui/macosx/output.m:138
+#: modules/gui/macosx/open.m:285 modules/gui/macosx/output.m:138
 #: modules/gui/macosx/playlistinfo.m:59 modules/gui/macosx/update.m:89
 #: modules/gui/macosx/wizard.m:599 modules/gui/macosx/wizard.m:663
 #: modules/gui/macosx/wizard.m:1055 modules/gui/macosx/wizard.m:1140
 #: modules/gui/macosx/wizard.m:1147 modules/gui/macosx/wizard.m:1672
 #: modules/gui/macosx/wizard.m:1680 modules/gui/macosx/wizard.m:1861
 #: modules/gui/macosx/wizard.m:1872 modules/gui/macosx/wizard.m:1885
-#: modules/gui/qt4/components/preferences_widgets.cpp:1141
+#: modules/gui/qt4/components/preferences_widgets.cpp:1151
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:34
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:205
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
@@ -12288,7 +12405,7 @@ msgid "playlist"
 msgstr "再生一覧"
 
 #: modules/gui/beos/PlayListWindow.cpp:95
-#: modules/gui/qt4/dialogs/extended.cpp:69 modules/gui/qt4/dialogs/vlm.cpp:124
+#: modules/gui/qt4/dialogs/extended.cpp:69 modules/gui/qt4/dialogs/vlm.cpp:126
 msgid "Close"
 msgstr "閉じる"
 
@@ -12300,7 +12417,7 @@ msgid "Edit"
 msgstr "編集"
 
 #: modules/gui/beos/PlayListWindow.cpp:102 modules/gui/macosx/intf.m:651
-#: modules/gui/macosx/playlist.m:442
+#: modules/gui/macosx/playlist.m:439
 msgid "Select All"
 msgstr "すべてを選択"
 
@@ -12341,7 +12458,7 @@ msgid "Path"
 msgstr "パス"
 
 #: modules/gui/beos/PlayListWindow.cpp:146 modules/gui/macosx/bookmarks.m:106
-#: modules/gui/macosx/playlist.m:127
+#: modules/gui/macosx/playlist.m:126
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:97
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:72
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:373
@@ -12354,7 +12471,7 @@ msgid "Apply"
 msgstr "適用"
 
 #: modules/gui/beos/PreferencesWindow.cpp:253 modules/gui/macosx/output.m:526
-#: modules/gui/macosx/playlist.m:680 modules/gui/macosx/prefs.m:118
+#: modules/gui/macosx/playlist.m:658 modules/gui/macosx/prefs.m:118
 #: modules/gui/qt4/ui/vlm.ui:197
 msgid "Save"
 msgstr "保存"
@@ -12682,7 +12799,7 @@ msgstr "インデックス"
 msgid "Bookmarks"
 msgstr "ブックマーク"
 
-#: modules/gui/macosx/bookmarks.m:91
+#: modules/gui/macosx/bookmarks.m:91 modules/gui/qt4/dialogs/bookmarks.cpp:41
 #: modules/gui/qt4/ui/podcast_configuration.ui:49
 #: modules/gui/qt4/ui/vlm.ui:183
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:159
@@ -12691,12 +12808,13 @@ msgstr "追加する"
 
 #: modules/gui/macosx/bookmarks.m:92 modules/gui/macosx/intf.m:650
 #: modules/gui/qt4/components/playlist/standardpanel.cpp:151
-#: modules/gui/qt4/components/preferences_widgets.cpp:1007
-#: modules/gui/qt4/ui/vlm.ui:190 modules/gui/wxwidgets/dialogs/messages.cpp:77
+#: modules/gui/qt4/components/preferences_widgets.cpp:1017
+#: modules/gui/qt4/dialogs/bookmarks.cpp:43 modules/gui/qt4/ui/vlm.ui:190
+#: modules/gui/wxwidgets/dialogs/messages.cpp:77
 msgid "Clear"
 msgstr "消去する"
 
-#: modules/gui/macosx/bookmarks.m:94
+#: modules/gui/macosx/bookmarks.m:94 modules/gui/qt4/dialogs/bookmarks.cpp:44
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:167
 #: modules/video_filter/extract.c:70
 msgid "Extract"
@@ -12704,12 +12822,13 @@ msgstr "展開する"
 
 #: modules/gui/macosx/bookmarks.m:101 modules/gui/macosx/bookmarks.m:107
 #: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:280
+#: modules/gui/qt4/dialogs/bookmarks.cpp:56
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:198
 msgid "Time"
 msgstr "時間"
 
-#: modules/gui/macosx/bookmarks.m:134 modules/gui/macosx/playlist.m:676
+#: modules/gui/macosx/bookmarks.m:134 modules/gui/macosx/playlist.m:654
 msgid "Untitled"
 msgstr "タイトルなし"
 
@@ -12836,7 +12955,7 @@ msgstr "転送"
 #: modules/gui/macosx/embeddedwindow.m:130 modules/gui/macosx/intf.m:1623
 #: modules/gui/macosx/intf.m:1624 modules/gui/macosx/intf.m:1625
 #: modules/gui/macosx/intf.m:1626 modules/gui/pda/pda_interface.c:248
-#: modules/gui/pda/pda_interface.c:249 modules/gui/qt4/menus.cpp:497
+#: modules/gui/pda/pda_interface.c:249 modules/gui/qt4/menus.cpp:499
 #: modules/gui/wxwidgets/interface.cpp:695
 #: modules/gui/wxwidgets/interface.cpp:706
 #: modules/gui/wxwidgets/interface.cpp:1238
@@ -13047,14 +13166,14 @@ msgstr "VLC - 制御"
 
 #: modules/gui/macosx/intf.m:606 modules/gui/macosx/intf.m:1549
 #: modules/gui/pda/pda_interface.c:210 modules/gui/pda/pda_interface.c:1353
-#: modules/gui/qt4/main_interface.cpp:354
-#: modules/gui/qt4/main_interface.cpp:358
-#: modules/gui/qt4/main_interface.cpp:892
-#: modules/gui/qt4/main_interface.cpp:894
-#: modules/gui/qt4/main_interface.cpp:958
-#: modules/gui/qt4/main_interface.cpp:973
+#: modules/gui/qt4/main_interface.cpp:359
+#: modules/gui/qt4/main_interface.cpp:363
+#: modules/gui/qt4/main_interface.cpp:899
+#: modules/gui/qt4/main_interface.cpp:901
+#: modules/gui/qt4/main_interface.cpp:965
 #: modules/gui/qt4/main_interface.cpp:980
-#: modules/gui/qt4/main_interface.cpp:997
+#: modules/gui/qt4/main_interface.cpp:987
+#: modules/gui/qt4/main_interface.cpp:1004
 msgid "VLC media player"
 msgstr "VLC メディアプレイヤー"
 
@@ -13067,7 +13186,7 @@ msgstr "クラッシュログを開く"
 msgid "Check for Update..."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:628 modules/gui/qt4/menus.cpp:308
+#: modules/gui/macosx/intf.m:628 modules/gui/qt4/menus.cpp:310
 msgid "Preferences..."
 msgstr "設定..."
 
@@ -13190,7 +13309,7 @@ msgid "Bring All to Front"
 msgstr "すべてを前に"
 
 #: modules/gui/macosx/intf.m:723 modules/gui/qt4/dialogs/help.cpp:53
-#: modules/gui/qt4/menus.cpp:534
+#: modules/gui/qt4/menus.cpp:536
 msgid "Help"
 msgstr "ヘルプ"
 
@@ -13350,9 +13469,9 @@ msgid "Media Resource Locator (MRL)"
 msgstr "メディア・リソース・ロケータ (MRL)"
 
 #: modules/gui/macosx/open.m:166 modules/gui/macosx/open.m:172
-#: modules/gui/macosx/open.m:270 modules/gui/macosx/output.m:145
+#: modules/gui/macosx/open.m:273 modules/gui/macosx/output.m:145
 #: modules/gui/macosx/prefs_widgets.m:1165 modules/gui/macosx/sfilters.m:75
-#: modules/gui/qt4/components/preferences_widgets.cpp:247
+#: modules/gui/qt4/components/preferences_widgets.cpp:254
 #: modules/gui/qt4/ui/open_disk.ui:62 modules/gui/qt4/ui/open_file.ui:181
 #: modules/gui/qt4/ui/open.ui:147 modules/gui/qt4/ui/sout.ui:77
 #: modules/gui/qt4/ui/sprefs_audio.ui:205
@@ -13379,11 +13498,11 @@ msgstr "ファイルとしてではなく、パイプとして扱う"
 msgid "No DVD menus"
 msgstr "DVD メニューを使用"
 
-#: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:509
+#: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:516
 msgid "VIDEO_TS directory"
 msgstr "VIDEO_TS ディレクトリー"
 
-#: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:622
+#: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:629
 #: modules/gui/wxwidgets/dialogs/open.cpp:698
 msgid "DVD"
 msgstr "DVD"
@@ -13397,12 +13516,12 @@ msgstr "DVD"
 msgid "Address"
 msgstr "アドレス"
 
-#: modules/gui/macosx/open.m:186 modules/gui/macosx/open.m:740
+#: modules/gui/macosx/open.m:186 modules/gui/macosx/open.m:747
 #: modules/gui/wxwidgets/dialogs/open.cpp:806
 msgid "UDP/RTP Multicast"
 msgstr "UDP/RTP マルチキャスト"
 
-#: modules/gui/macosx/open.m:187 modules/gui/macosx/open.m:753
+#: modules/gui/macosx/open.m:187 modules/gui/macosx/open.m:760
 msgid "HTTP/FTP/MMS/RTSP"
 msgstr "HTTP/FTP/MMS/RTSP"
 
@@ -13412,70 +13531,74 @@ msgstr "HTTP/FTP/MMS/RTSP"
 msgid "Allow timeshifting"
 msgstr "タイムシフトを許可する"
 
-#: modules/gui/macosx/open.m:268
+#: modules/gui/macosx/open.m:271
 msgid "Load subtitles file:"
 msgstr "読み込む字幕ファイル:"
 
-#: modules/gui/macosx/open.m:269 modules/gui/macosx/output.m:137
+#: modules/gui/macosx/open.m:272 modules/gui/macosx/output.m:137
 #: modules/gui/wxwidgets/dialogs/open.cpp:437
 msgid "Settings..."
 msgstr "設定..."
 
-#: modules/gui/macosx/open.m:271
+#: modules/gui/macosx/open.m:274
 msgid "Override parametters"
 msgstr ""
 
-#: modules/gui/macosx/open.m:272
+#: modules/gui/macosx/open.m:275
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:215
 #: modules/stream_out/bridge.c:40 modules/stream_out/display.c:40
 #: modules/video_filter/mosaic.c:154
 msgid "Delay"
 msgstr "ディレイ"
 
-#: modules/gui/macosx/open.m:274
-#: modules/gui/qt4/components/info_panels.cpp:526
+#: modules/gui/macosx/open.m:277
+#: modules/gui/qt4/components/info_panels.cpp:533
 msgid "FPS"
 msgstr "FPS"
 
-#: modules/gui/macosx/open.m:276
+#: modules/gui/macosx/open.m:279
 msgid "Subtitles encoding"
 msgstr "字幕エンコンコード中"
 
-#: modules/gui/macosx/open.m:278 modules/gui/qt4/ui/sprefs_subtitles.ui:138
+#: modules/gui/macosx/open.m:281 modules/gui/qt4/ui/sprefs_subtitles.ui:138
 msgid "Font size"
 msgstr "フォントサイズ"
 
-#: modules/gui/macosx/open.m:280
+#: modules/gui/macosx/open.m:283
 msgid "Subtitles alignment"
 msgstr "字幕の位置"
 
-#: modules/gui/macosx/open.m:283
+#: modules/gui/macosx/open.m:286
 msgid "Font Properties"
 msgstr "フォントのプロパティ"
 
-#: modules/gui/macosx/open.m:284
+#: modules/gui/macosx/open.m:287
 msgid "Subtitle File"
 msgstr "字幕ファイル"
 
-#: modules/gui/macosx/open.m:557 modules/gui/macosx/open.m:609
-#: modules/gui/macosx/open.m:617 modules/gui/macosx/open.m:625
+#: modules/gui/macosx/open.m:417
+msgid "EyeTV"
+msgstr ""
+
+#: modules/gui/macosx/open.m:564 modules/gui/macosx/open.m:616
+#: modules/gui/macosx/open.m:624 modules/gui/macosx/open.m:632
 msgid "No %@s found"
 msgstr "%@s は見つかりません"
 
-#: modules/gui/macosx/open.m:661
+#: modules/gui/macosx/open.m:668
 msgid "Open VIDEO_TS Directory"
 msgstr "VIDEO_TSディレクトリーを開く"
 
-#: modules/gui/macosx/open.m:853
+#: modules/gui/macosx/open.m:871
 msgid "Retrieving Channel Info..."
 msgstr ""
 
-#: modules/gui/macosx/open.m:859
+#: modules/gui/macosx/open.m:877
 #, fuzzy
 msgid "Composite input"
 msgstr "入力の選択"
 
-#: modules/gui/macosx/open.m:862
+#: modules/gui/macosx/open.m:880
 #, fuzzy
 msgid "S-Video input"
 msgstr "ビデオオプション"
@@ -13567,7 +13690,7 @@ msgid "Save File"
 msgstr "ファイルの保存"
 
 #: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:347
-#: modules/gui/macosx/playlist.m:443
+#: modules/gui/macosx/playlist.m:440
 msgid "Information"
 msgstr "情報"
 
@@ -13577,7 +13700,7 @@ msgstr "情報"
 msgid "URI"
 msgstr "URI"
 
-#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/playlist.m:128
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/playlist.m:127
 #: modules/gui/macosx/wizard.m:350 modules/gui/wince/playlist.cpp:671
 #: modules/mux/asf.c:49
 msgid "Author"
@@ -13589,44 +13712,44 @@ msgid "Advanced Information"
 msgstr "高度なオプション"
 
 #: modules/gui/macosx/playlistinfo.m:81
-#: modules/gui/qt4/components/info_panels.cpp:512
+#: modules/gui/qt4/components/info_panels.cpp:519
 msgid "Read at media"
 msgstr ""
 
 #: modules/gui/macosx/playlistinfo.m:82
-#: modules/gui/qt4/components/info_panels.cpp:514
+#: modules/gui/qt4/components/info_panels.cpp:521
 msgid "Input bitrate"
 msgstr "入力ビットレート"
 
 #: modules/gui/macosx/playlistinfo.m:83
-#: modules/gui/qt4/components/info_panels.cpp:516
+#: modules/gui/qt4/components/info_panels.cpp:523
 #, fuzzy
 msgid "Demuxed"
 msgstr "demuxモジュール"
 
 #: modules/gui/macosx/playlistinfo.m:84
-#: modules/gui/qt4/components/info_panels.cpp:517
+#: modules/gui/qt4/components/info_panels.cpp:524
 msgid "Stream bitrate"
 msgstr "ストリームビットレート"
 
 #: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:98
-#: modules/gui/qt4/components/info_panels.cpp:520
-#: modules/gui/qt4/components/info_panels.cpp:534
+#: modules/gui/qt4/components/info_panels.cpp:527
+#: modules/gui/qt4/components/info_panels.cpp:541
 msgid "Decoded blocks"
 msgstr "デコード済みブロック数"
 
 #: modules/gui/macosx/playlistinfo.m:88
-#: modules/gui/qt4/components/info_panels.cpp:522
+#: modules/gui/qt4/components/info_panels.cpp:529
 msgid "Displayed frames"
 msgstr "表示したフレーム数"
 
 #: modules/gui/macosx/playlistinfo.m:89
-#: modules/gui/qt4/components/info_panels.cpp:524
+#: modules/gui/qt4/components/info_panels.cpp:531
 msgid "Lost frames"
 msgstr "紛失したフレーム数"
 
 #: modules/gui/macosx/playlistinfo.m:92 modules/gui/macosx/wizard.m:361
-#: modules/gui/qt4/components/info_panels.cpp:510
+#: modules/gui/qt4/components/info_panels.cpp:517
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:316
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:139
 #: modules/video_filter/deinterlace.c:135
@@ -13634,12 +13757,12 @@ msgid "Streaming"
 msgstr "ストリーミング"
 
 #: modules/gui/macosx/playlistinfo.m:93
-#: modules/gui/qt4/components/info_panels.cpp:528
+#: modules/gui/qt4/components/info_panels.cpp:535
 msgid "Sent packets"
 msgstr "送信パケット"
 
 #: modules/gui/macosx/playlistinfo.m:94
-#: modules/gui/qt4/components/info_panels.cpp:529
+#: modules/gui/qt4/components/info_panels.cpp:536
 msgid "Sent bytes"
 msgstr "送信バイト"
 
@@ -13648,83 +13771,83 @@ msgid "Send rate"
 msgstr "送信速度"
 
 #: modules/gui/macosx/playlistinfo.m:99
-#: modules/gui/qt4/components/info_panels.cpp:536
+#: modules/gui/qt4/components/info_panels.cpp:543
 msgid "Played buffers"
 msgstr "再生されたバッファ"
 
 #: modules/gui/macosx/playlistinfo.m:100
-#: modules/gui/qt4/components/info_panels.cpp:538
+#: modules/gui/qt4/components/info_panels.cpp:545
 msgid "Lost buffers"
 msgstr "紛失したバッファ"
 
-#: modules/gui/macosx/playlist.m:438
+#: modules/gui/macosx/playlist.m:435
 msgid "Save Playlist..."
 msgstr "再生一覧の保存..."
 
-#: modules/gui/macosx/playlist.m:441
+#: modules/gui/macosx/playlist.m:438
 msgid "Expand Node"
 msgstr "ノードを展開する"
 
-#: modules/gui/macosx/playlist.m:444
+#: modules/gui/macosx/playlist.m:441
 msgid "Get Stream Information"
 msgstr "ストリーム情報を取得する"
 
-#: modules/gui/macosx/playlist.m:445
+#: modules/gui/macosx/playlist.m:442
 msgid "Sort Node by Name"
 msgstr "名前でノードをソートする"
 
-#: modules/gui/macosx/playlist.m:446
+#: modules/gui/macosx/playlist.m:443
 msgid "Sort Node by Author"
 msgstr "著者でノードをソートする"
 
-#: modules/gui/macosx/playlist.m:449 modules/gui/macosx/playlist.m:492
-#: modules/gui/macosx/playlist.m:1395
+#: modules/gui/macosx/playlist.m:445 modules/gui/macosx/playlist.m:485
+#: modules/gui/macosx/playlist.m:1372
 msgid "No items in the playlist"
 msgstr "再生一覧に項目がありません"
 
-#: modules/gui/macosx/playlist.m:454
+#: modules/gui/macosx/playlist.m:447
 msgid "Search in Playlist"
 msgstr "再生一覧で検索する"
 
-#: modules/gui/macosx/playlist.m:455
+#: modules/gui/macosx/playlist.m:448
 msgid "Add Folder to Playlist"
 msgstr "再生一覧にフォルダーを追加する"
 
-#: modules/gui/macosx/playlist.m:457
+#: modules/gui/macosx/playlist.m:450
 msgid "File Format:"
 msgstr "ファイル形式:"
 
-#: modules/gui/macosx/playlist.m:458
+#: modules/gui/macosx/playlist.m:451
 msgid "Extended M3U"
 msgstr "拡張 M3U"
 
-#: modules/gui/macosx/playlist.m:459
+#: modules/gui/macosx/playlist.m:452
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr ""
 
-#: modules/gui/macosx/playlist.m:486 modules/gui/macosx/playlist.m:1388
+#: modules/gui/macosx/playlist.m:479 modules/gui/macosx/playlist.m:1365
 #, fuzzy, c-format
 msgid "%i items in the playlist"
 msgstr "デフォルトで再生一覧に追加"
 
-#: modules/gui/macosx/playlist.m:494 modules/gui/macosx/playlist.m:1399
+#: modules/gui/macosx/playlist.m:487 modules/gui/macosx/playlist.m:1376
 #, fuzzy
 msgid "1 item in the playlist"
 msgstr "デフォルトで再生一覧に追加"
 
-#: modules/gui/macosx/playlist.m:679
+#: modules/gui/macosx/playlist.m:657
 msgid "Save Playlist"
 msgstr "再生一覧を保存する"
 
-#: modules/gui/macosx/playlist.m:1356
+#: modules/gui/macosx/playlist.m:1333
 msgid "New Node"
 msgstr "新規ノード"
 
-#: modules/gui/macosx/playlist.m:1357
+#: modules/gui/macosx/playlist.m:1334
 msgid "Please enter a name for the new node."
 msgstr "新規ノードの名前を入力してください。"
 
-#: modules/gui/macosx/playlist.m:1365
+#: modules/gui/macosx/playlist.m:1342
 msgid "Empty Folder"
 msgstr "空のフォルダー"
 
@@ -13876,7 +13999,8 @@ msgstr "更新の確認中です..."
 #: modules/gui/macosx/update.m:235
 #, c-format
 msgid "The latest VLC media player release is %s (%i MB to download)."
-msgstr "最新の VLC メディアプレイヤーのリリースは %s です(ダウンロードは %i MB)。"
+msgstr ""
+"最新の VLC メディアプレイヤーのリリースは %s です(ダウンロードは %i MB)。"
 
 #: modules/gui/macosx/update.m:250
 msgid "This version of VLC is outdated."
@@ -14478,11 +14602,11 @@ msgstr "Mac OS X インターフェース"
 msgid "Minimal Mac OS X OpenGL video output (opens a borderless window)"
 msgstr ""
 
-#: modules/gui/ncurses.c:105
+#: modules/gui/ncurses.c:110
 msgid "Filebrowser starting point"
 msgstr ""
 
-#: modules/gui/ncurses.c:107
+#: modules/gui/ncurses.c:112
 #, fuzzy
 msgid ""
 "This option allows you to specify the directory the ncurses filebrowser will "
@@ -14491,10 +14615,327 @@ msgstr ""
 "ファイルを見つけるときにオープンされるインタフェースの既定のパスを設定しま"
 "す。"
 
-#: modules/gui/ncurses.c:112
+#: modules/gui/ncurses.c:117
 #, fuzzy
 msgid "Ncurses interface"
 msgstr "ncurses インタフェース"
+
+#: modules/gui/ncurses.c:1488
+#, fuzzy
+msgid "[Repeat] "
+msgstr "繰り返し:"
+
+#: modules/gui/ncurses.c:1489
+#, fuzzy
+msgid "[Random] "
+msgstr "ランダム"
+
+#: modules/gui/ncurses.c:1490
+#, fuzzy
+msgid "[Loop]"
+msgstr "ループ"
+
+#: modules/gui/ncurses.c:1502
+#, c-format
+msgid " Source   : %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1509
+#, c-format
+msgid " State    : Playing %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1513
+#, c-format
+msgid " State    : Opening/Connecting %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1517
+#, c-format
+msgid " State    : Buffering %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1521
+#, c-format
+msgid " State    : Paused %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1535
+#, c-format
+msgid " Position : %s/%s (%.2f%%)"
+msgstr ""
+
+#: modules/gui/ncurses.c:1539
+#, fuzzy, c-format
+msgid " Volume   : %i%%"
+msgstr "音量: %d%%"
+
+#: modules/gui/ncurses.c:1547
+#, fuzzy, c-format
+msgid " Title    : %d/%d"
+msgstr "タイトル %d (%d)"
+
+#: modules/gui/ncurses.c:1558
+#, fuzzy, c-format
+msgid " Chapter  : %d/%d"
+msgstr "チャプター %d"
+
+#: modules/gui/ncurses.c:1570
+#, c-format
+msgid " Source: <no current item> %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1572
+#, fuzzy
+msgid " [ h for help ]"
+msgstr "+----[ ヘルプの終り ]"
+
+#: modules/gui/ncurses.c:1594
+#, fuzzy
+msgid " Help "
+msgstr "ヘルプ"
+
+#: modules/gui/ncurses.c:1598
+#, fuzzy
+msgid "[Display]"
+msgstr "表示"
+
+#: modules/gui/ncurses.c:1601
+msgid "     h,H         Show/Hide help box"
+msgstr ""
+
+#: modules/gui/ncurses.c:1602
+msgid "     i           Show/Hide info box"
+msgstr ""
+
+#: modules/gui/ncurses.c:1603
+msgid "     m           Show/Hide metadata box"
+msgstr ""
+
+#: modules/gui/ncurses.c:1604
+msgid "     L           Show/Hide messages box"
+msgstr ""
+
+#: modules/gui/ncurses.c:1605
+msgid "     P           Show/Hide playlist box"
+msgstr ""
+
+#: modules/gui/ncurses.c:1606
+msgid "     B           Show/Hide filebrowser"
+msgstr ""
+
+#: modules/gui/ncurses.c:1607
+msgid "     c           Switch color on/off"
+msgstr ""
+
+#: modules/gui/ncurses.c:1608
+msgid "     Esc         Close Add/Search entry"
+msgstr ""
+
+#: modules/gui/ncurses.c:1613
+#, fuzzy
+msgid "[Global]"
+msgstr "全体のゲイン"
+
+#: modules/gui/ncurses.c:1616
+msgid "     q, Q, Esc   Quit"
+msgstr ""
+
+#: modules/gui/ncurses.c:1617
+msgid "     s           Stop"
+msgstr ""
+
+#: modules/gui/ncurses.c:1618
+msgid "     <space>     Pause/Play"
+msgstr ""
+
+#: modules/gui/ncurses.c:1619
+#, fuzzy
+msgid "     f           Toggle Fullscreen"
+msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#: modules/gui/ncurses.c:1620
+#, fuzzy
+msgid "     n, p        Next/Previous playlist item"
+msgstr "| prev  . . . . . . . . . . 前の再生一覧の項目"
+
+#: modules/gui/ncurses.c:1621
+msgid "     [, ]        Next/Previous title"
+msgstr ""
+
+#: modules/gui/ncurses.c:1622
+msgid "     <, >        Next/Previous chapter"
+msgstr ""
+
+#: modules/gui/ncurses.c:1623
+#, c-format
+msgid "     <right>     Seek +1%%"
+msgstr ""
+
+#: modules/gui/ncurses.c:1624
+#, c-format
+msgid "     <left>      Seek -1%%"
+msgstr ""
+
+#: modules/gui/ncurses.c:1625
+msgid "     a           Volume Up"
+msgstr ""
+
+#: modules/gui/ncurses.c:1626
+msgid "     z           Volume Down"
+msgstr ""
+
+#: modules/gui/ncurses.c:1631
+#, fuzzy
+msgid "[Playlist]"
+msgstr "再生一覧"
+
+#: modules/gui/ncurses.c:1634
+#, fuzzy
+msgid "     r           Toggle Random playing"
+msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+
+#: modules/gui/ncurses.c:1635
+msgid "     l           Toggle Loop Playlist"
+msgstr ""
+
+#: modules/gui/ncurses.c:1636
+msgid "     R           Toggle Repeat item"
+msgstr ""
+
+#: modules/gui/ncurses.c:1637
+#, fuzzy
+msgid "     o           Order Playlist by title"
+msgstr "| next . . . . . . . . . . . .  次の再生一覧項目"
+
+#: modules/gui/ncurses.c:1638
+msgid "     O           Reverse order Playlist by title"
+msgstr ""
+
+#: modules/gui/ncurses.c:1639
+msgid "     g           Go to the current playing item"
+msgstr ""
+
+#: modules/gui/ncurses.c:1640
+msgid "     /           Look for an item"
+msgstr ""
+
+#: modules/gui/ncurses.c:1641
+msgid "     A           Add an entry"
+msgstr ""
+
+#: modules/gui/ncurses.c:1642
+msgid "     D, <del>    Delete an entry"
+msgstr ""
+
+#: modules/gui/ncurses.c:1643
+msgid "     <backspace> Delete an entry"
+msgstr ""
+
+#: modules/gui/ncurses.c:1644
+msgid "     e           Eject (if stopped)"
+msgstr ""
+
+#: modules/gui/ncurses.c:1649
+#, fuzzy
+msgid "[Filebrowser]"
+msgstr "フィルター"
+
+#: modules/gui/ncurses.c:1652
+msgid "     <enter>     Add the selected file to the playlist"
+msgstr ""
+
+#: modules/gui/ncurses.c:1653
+msgid "     <space>     Add the selected directory to the playlist"
+msgstr ""
+
+#: modules/gui/ncurses.c:1654
+msgid "     .           Show/Hide hidden files"
+msgstr ""
+
+#: modules/gui/ncurses.c:1659
+msgid "[Boxes]"
+msgstr ""
+
+#: modules/gui/ncurses.c:1662
+msgid "     <up>,<down>     Navigate through the box line by line"
+msgstr ""
+
+#: modules/gui/ncurses.c:1663
+msgid "     <pgup>,<pgdown> Navigate through the box page by page"
+msgstr ""
+
+#: modules/gui/ncurses.c:1668
+#, fuzzy
+msgid "[Player]"
+msgstr "再生"
+
+#: modules/gui/ncurses.c:1671
+#, c-format
+msgid "     <up>,<down>     Seek +/-5%%"
+msgstr ""
+
+#: modules/gui/ncurses.c:1676
+#, fuzzy
+msgid "[Miscellaneous]"
+msgstr "その他"
+
+#: modules/gui/ncurses.c:1679
+msgid "     Ctrl-l          Refresh the screen"
+msgstr ""
+
+#: modules/gui/ncurses.c:1700
+#, fuzzy
+msgid " Information "
+msgstr "情報"
+
+#: modules/gui/ncurses.c:1712
+#, c-format
+msgid "  [%s]"
+msgstr ""
+
+#: modules/gui/ncurses.c:1719
+#, c-format
+msgid "      %s: %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:1726 modules/gui/ncurses.c:1820
+#, fuzzy
+msgid "No item currently playing"
+msgstr "再生一覧に項目がありません"
+
+#: modules/gui/ncurses.c:1843
+#, fuzzy
+msgid " Logs "
+msgstr "ロゴ"
+
+#: modules/gui/ncurses.c:1886
+#, fuzzy
+msgid " Browse "
+msgstr "参照..."
+
+#: modules/gui/ncurses.c:1950
+msgid " Playlist (All, one level) "
+msgstr ""
+
+#: modules/gui/ncurses.c:1953
+#, fuzzy
+msgid " Playlist (By category) "
+msgstr "CDDB カテゴリ"
+
+#: modules/gui/ncurses.c:1956
+msgid " Playlist (Manually added) "
+msgstr ""
+
+#: modules/gui/ncurses.c:2043 modules/gui/ncurses.c:2047
+#, c-format
+msgid "Find: %s"
+msgstr ""
+
+#: modules/gui/ncurses.c:2056
+#, fuzzy, c-format
+msgid "Open: %s"
+msgstr "開く:"
 
 #: modules/gui/pda/pda.c:57
 msgid "Autoplay selected file"
@@ -14892,8 +15333,8 @@ msgstr "SLP アナウンス:"
 msgid "Announce Channel:"
 msgstr "アナウンスチャンネル:"
 
-#: modules/gui/pda/pda_interface.c:1247 modules/gui/qt4/dialogs/help.cpp:193
-#: modules/gui/qt4/menus.cpp:463 modules/gui/qt4/ui/video_effects.ui:998
+#: modules/gui/pda/pda_interface.c:1247 modules/gui/qt4/dialogs/help.cpp:200
+#: modules/gui/qt4/menus.cpp:465 modules/gui/qt4/ui/video_effects.ui:998
 msgid "Update"
 msgstr "更新"
 
@@ -14958,22 +15399,22 @@ msgid "dB"
 msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:344
-msgid "Extra metadata and other information are shown in this list.\n"
+msgid "Extra metadata and other information are shown in this panel.\n"
 msgstr ""
 
-#: modules/gui/qt4/components/info_panels.cpp:409
+#: modules/gui/qt4/components/info_panels.cpp:416
 msgid ""
 "Information about what your media or stream is made of.\n"
 " Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
 
-#: modules/gui/qt4/components/info_panels.cpp:483
+#: modules/gui/qt4/components/info_panels.cpp:490
 msgid ""
 "Various statistics about the current media or stream.\n"
 " Played and streamed info are shown."
 msgstr ""
 
-#: modules/gui/qt4/components/info_panels.cpp:531
+#: modules/gui/qt4/components/info_panels.cpp:538
 #, fuzzy
 msgid "Sent bitrates"
 msgstr "送信バイト"
@@ -15032,118 +15473,118 @@ msgstr "次のトラック"
 msgid "Revert to normal play speed"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:86
+#: modules/gui/qt4/components/open_panels.cpp:87
 msgid "Select one or multiple files, or a folder"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:104
+#: modules/gui/qt4/components/open_panels.cpp:105
 #, fuzzy
 msgid "File names:"
 msgstr "ファイル名"
 
-#: modules/gui/qt4/components/open_panels.cpp:106
+#: modules/gui/qt4/components/open_panels.cpp:107
 #, fuzzy
 msgid "Filter:"
 msgstr "フィルター"
 
-#: modules/gui/qt4/components/open_panels.cpp:147
+#: modules/gui/qt4/components/open_panels.cpp:148
 #: modules/gui/wxwidgets/dialogs/open.cpp:1296
 msgid "Open subtitles file"
 msgstr "字幕ファイルを開く"
 
-#: modules/gui/qt4/components/open_panels.cpp:394
+#: modules/gui/qt4/components/open_panels.cpp:395
 #, fuzzy
 msgid "Open a device or a VIDEO_TS directory"
 msgstr "VIDEO_TSディレクトリーを開く"
 
-#: modules/gui/qt4/components/open_panels.cpp:627
+#: modules/gui/qt4/components/open_panels.cpp:631
 #, fuzzy
 msgid "Channels :"
 msgstr "チャンネル"
 
-#: modules/gui/qt4/components/open_panels.cpp:640
+#: modules/gui/qt4/components/open_panels.cpp:644
 #, fuzzy
 msgid "Selected ports :"
 msgstr "選択済み:"
 
-#: modules/gui/qt4/components/open_panels.cpp:643
+#: modules/gui/qt4/components/open_panels.cpp:647
 msgid ".*"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:648
+#: modules/gui/qt4/components/open_panels.cpp:652
 msgid "Input caching :"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:658
+#: modules/gui/qt4/components/open_panels.cpp:662
 #, fuzzy
 msgid "Use VLC pace"
 msgstr "SAP キャッシュを使う"
 
-#: modules/gui/qt4/components/open_panels.cpp:662
+#: modules/gui/qt4/components/open_panels.cpp:666
 #, fuzzy
 msgid "Auto connnection"
 msgstr "自動再接続"
 
-#: modules/gui/qt4/components/open_panels.cpp:686
+#: modules/gui/qt4/components/open_panels.cpp:690
 #, fuzzy
 msgid "Radio device name"
 msgstr "オーディオデバイス名"
 
-#: modules/gui/qt4/components/open_panels.cpp:737
-#: modules/gui/qt4/components/open_panels.cpp:831
+#: modules/gui/qt4/components/open_panels.cpp:741
+#: modules/gui/qt4/components/open_panels.cpp:835
 #, fuzzy
 msgid "DVB Type:"
 msgstr "タイプ"
 
-#: modules/gui/qt4/components/open_panels.cpp:767
-#: modules/gui/qt4/components/open_panels.cpp:855
+#: modules/gui/qt4/components/open_panels.cpp:771
+#: modules/gui/qt4/components/open_panels.cpp:859
 #, fuzzy
 msgid "Transponder symbol rate"
 msgstr "衛星 既定転送シンボル・レート"
 
-#: modules/gui/qt4/components/open_panels.cpp:1071
+#: modules/gui/qt4/components/open_panels.cpp:1076
 #: modules/gui/qt4/ui/open_capture.ui:61
 #: modules/gui/wxwidgets/dialogs/open.cpp:259
 msgid "Advanced options..."
 msgstr "高度なオプション..."
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:290
+#: modules/gui/qt4/components/preferences_widgets.cpp:299
 msgid "Select File"
 msgstr "ファイルの選択"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:319
+#: modules/gui/qt4/components/preferences_widgets.cpp:328
 #, fuzzy
 msgid "Select Directory"
 msgstr "ディレクトリーを選択する"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:993
+#: modules/gui/qt4/components/preferences_widgets.cpp:1003
 msgid "Select an action to change the associated hotkey"
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1001
+#: modules/gui/qt4/components/preferences_widgets.cpp:1011
 #, fuzzy
 msgid "Action"
 msgstr "アプリケーション"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1002
+#: modules/gui/qt4/components/preferences_widgets.cpp:1012
 msgid "Shortcut"
 msgstr "ショートカット"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1008
+#: modules/gui/qt4/components/preferences_widgets.cpp:1018
 #, fuzzy
 msgid "Set"
 msgstr "選択"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1134
+#: modules/gui/qt4/components/preferences_widgets.cpp:1144
 #, fuzzy
 msgid "Hotkey for "
 msgstr "ホットキー"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1137
+#: modules/gui/qt4/components/preferences_widgets.cpp:1147
 msgid "Press the new keys for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1171
+#: modules/gui/qt4/components/preferences_widgets.cpp:1181
 msgid "Warning: the  key is already assigned to \""
 msgstr ""
 
@@ -15174,12 +15615,23 @@ msgstr "字幕と OSD の設定"
 msgid "Configure Hotkeys"
 msgstr "ホットキーの設定"
 
+#: modules/gui/qt4/dialogs/bookmarks.cpp:37
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
+msgid "Edit bookmark"
+msgstr "ブックマーク編集"
+
+#: modules/gui/qt4/dialogs/bookmarks.cpp:55
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:101
+#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:197
+msgid "Bytes"
+msgstr "バイト"
+
 #: modules/gui/qt4/dialogs/errors.cpp:38
 msgid "Errors"
 msgstr "エラー"
 
 #: modules/gui/qt4/dialogs/errors.cpp:46 modules/gui/qt4/dialogs/help.cpp:60
-#: modules/gui/qt4/dialogs/help.cpp:87 modules/gui/qt4/dialogs/help.cpp:198
+#: modules/gui/qt4/dialogs/help.cpp:87 modules/gui/qt4/dialogs/help.cpp:205
 #: modules/gui/qt4/dialogs/mediainfo.cpp:74
 #: modules/gui/qt4/dialogs/messages.cpp:44
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
@@ -15277,64 +15729,69 @@ msgstr "新しい Qt4 インターフェースを使用します。\n"
 msgid "Compiled by "
 msgstr "コメディ"
 
-#: modules/gui/qt4/dialogs/help.cpp:117 modules/gui/wince/interface.cpp:501
+#: modules/gui/qt4/dialogs/help.cpp:118 modules/gui/wince/interface.cpp:501
 #: modules/gui/wxwidgets/interface.cpp:961
 msgid "Based on SVN revision: "
 msgstr "次の SVN リビジョンが基本です: "
 
-#: modules/gui/qt4/dialogs/help.cpp:119
+#: modules/gui/qt4/dialogs/help.cpp:120
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by the law; "
 "read the distribution tab.\n"
 "\n"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:143
+#: modules/gui/qt4/dialogs/help.cpp:144
 msgid ""
 "We would like to thank the whole community, the testers, our users and the "
 "following people (and the missing ones...) for their collaboration to "
 "provide the best software."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:160
+#: modules/gui/qt4/dialogs/help.cpp:161
 msgid "General Info"
 msgstr "一般情報"
 
-#: modules/gui/qt4/dialogs/help.cpp:161
+#: modules/gui/qt4/dialogs/help.cpp:162
 msgid "Authors"
 msgstr "作成者"
 
-#: modules/gui/qt4/dialogs/help.cpp:162
+#: modules/gui/qt4/dialogs/help.cpp:163
 msgid "Thanks"
 msgstr "ありがとう"
 
-#: modules/gui/qt4/dialogs/help.cpp:163
+#: modules/gui/qt4/dialogs/help.cpp:164
 msgid "Distribution License"
 msgstr "配布ライセンス"
 
-#: modules/gui/qt4/dialogs/help.cpp:199
+#: modules/gui/qt4/dialogs/help.cpp:206
 msgid "&Update List"
 msgstr "一覧を更新する (&U)"
 
-#: modules/gui/qt4/dialogs/help.cpp:205
+#: modules/gui/qt4/dialogs/help.cpp:212
 #, fuzzy
 msgid "Checking for the update..."
 msgstr "更新を確認します..."
 
-#: modules/gui/qt4/dialogs/help.cpp:240
+#: modules/gui/qt4/dialogs/help.cpp:247
 #, fuzzy
 msgid "Select a directory ..."
 msgstr "ディレクトリーを選択する"
 
-#: modules/gui/qt4/dialogs/help.cpp:266
+#: modules/gui/qt4/dialogs/help.cpp:279
 msgid "There is a new version of vlc :\n"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:270
+#: modules/gui/qt4/dialogs/help.cpp:282
 msgid "You have the latest version of vlc"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/interaction.cpp:89
+#: modules/gui/qt4/dialogs/help.cpp:285
+#, fuzzy
+msgid "An error occure while checking for updates"
+msgstr "自動的に更新を確認する"
+
+#: modules/gui/qt4/dialogs/interaction.cpp:90
 msgid "Login"
 msgstr "ログイン"
 
@@ -15450,20 +15907,20 @@ msgid ""
 "Are you sure you want to continue?"
 msgstr ""
 
-#: modules/gui/qt4/dialogs_provider.cpp:362
+#: modules/gui/qt4/dialogs_provider.cpp:364
 msgid "Open playlist file"
 msgstr "再生一覧を開く"
 
-#: modules/gui/qt4/dialogs_provider.cpp:373
+#: modules/gui/qt4/dialogs_provider.cpp:375
 #, fuzzy
 msgid "Choose a filename to save playlist"
 msgstr "ストリームの出力先の選択"
 
-#: modules/gui/qt4/dialogs_provider.cpp:375
+#: modules/gui/qt4/dialogs_provider.cpp:377
 msgid "XSPF playlist (*.xspf);; "
 msgstr "XSPF 再生一覧 (*.xspf);; "
 
-#: modules/gui/qt4/dialogs_provider.cpp:376
+#: modules/gui/qt4/dialogs_provider.cpp:378
 msgid "M3U playlist (*.m3u);; Any (*.*) "
 msgstr ""
 
@@ -15507,37 +15964,37 @@ msgstr "ファイルを保存する"
 msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/vlm.cpp:75
+#: modules/gui/qt4/dialogs/vlm.cpp:77
 msgid "Hours/Minutes/Seconds:"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/vlm.cpp:77
+#: modules/gui/qt4/dialogs/vlm.cpp:79
 msgid "Day Month Year:"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/vlm.cpp:79
+#: modules/gui/qt4/dialogs/vlm.cpp:81
 msgid "Repeat:"
 msgstr "繰り返し:"
 
-#: modules/gui/qt4/dialogs/vlm.cpp:81
+#: modules/gui/qt4/dialogs/vlm.cpp:83
 #, fuzzy
 msgid "Repeat delay:"
 msgstr "再生一覧を開く"
 
-#: modules/gui/qt4/dialogs/vlm.cpp:105
+#: modules/gui/qt4/dialogs/vlm.cpp:107
 #, fuzzy
 msgid " days"
 msgstr "ディレイ"
 
-#: modules/gui/qt4/main_interface.cpp:451
+#: modules/gui/qt4/main_interface.cpp:456
 msgid "Privacy and Network policies"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:455
+#: modules/gui/qt4/main_interface.cpp:460
 msgid "Privacy and Network Warning"
 msgstr "プライバシーとネットワークの警告"
 
-#: modules/gui/qt4/main_interface.cpp:458
+#: modules/gui/qt4/main_interface.cpp:463
 msgid ""
 "<p>The <i>VideoLAN Team</i> doesn't like when an application goes online "
 "without authorization.</p>\n"
@@ -15550,11 +16007,11 @@ msgid ""
 "access on the web.</p>\n"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:959
+#: modules/gui/qt4/main_interface.cpp:966
 msgid "Control menu for the player"
 msgstr "プレイヤーのメニュー制御"
 
-#: modules/gui/qt4/main_interface.cpp:1008
+#: modules/gui/qt4/main_interface.cpp:1015
 #: modules/gui/wxwidgets/input_manager.cpp:270
 msgid "Paused"
 msgstr "一時停止"
@@ -15591,16 +16048,16 @@ msgstr "ヘルプ (&H)"
 msgid "&Open File..."
 msgstr "ファイルを開く (&O)..."
 
-#: modules/gui/qt4/menus.cpp:197 modules/gui/qt4/menus.cpp:524
+#: modules/gui/qt4/menus.cpp:197 modules/gui/qt4/menus.cpp:526
 #: modules/gui/wxwidgets/menus.cpp:129
 msgid "Open &Disc..."
 msgstr "ディスクを開く (&D)..."
 
-#: modules/gui/qt4/menus.cpp:199 modules/gui/qt4/menus.cpp:526
+#: modules/gui/qt4/menus.cpp:199 modules/gui/qt4/menus.cpp:528
 msgid "Open &Network..."
 msgstr "ネットワークを開く (&N)..."
 
-#: modules/gui/qt4/menus.cpp:201 modules/gui/qt4/menus.cpp:528
+#: modules/gui/qt4/menus.cpp:201 modules/gui/qt4/menus.cpp:530
 #: modules/gui/wxwidgets/menus.cpp:131
 msgid "Open &Capture Device..."
 msgstr "キャプチャデバイスを開く (&C)..."
@@ -15613,7 +16070,7 @@ msgstr "ストリーミング (&S)..."
 msgid "Conve&rt / Save..."
 msgstr "変換 / 保存する (&R)..."
 
-#: modules/gui/qt4/menus.cpp:213 modules/gui/qt4/menus.cpp:708
+#: modules/gui/qt4/menus.cpp:213 modules/gui/qt4/menus.cpp:710
 msgid "&Quit"
 msgstr "終了する (&Q)"
 
@@ -15661,41 +16118,41 @@ msgstr "高度なオプション"
 msgid "Visualizations selector"
 msgstr "ビジュアル化モーションベクター"
 
-#: modules/gui/qt4/menus.cpp:329
+#: modules/gui/qt4/menus.cpp:331
 #, fuzzy
 msgid "Switch to skins"
 msgstr "スキン選択"
 
-#: modules/gui/qt4/menus.cpp:460
+#: modules/gui/qt4/menus.cpp:462
 #, fuzzy
 msgid "Help..."
 msgstr "ヘルプ"
 
-#: modules/gui/qt4/menus.cpp:518
+#: modules/gui/qt4/menus.cpp:520
 #, fuzzy
 msgid "Tools"
 msgstr "ツール"
 
-#: modules/gui/qt4/menus.cpp:522 modules/gui/wxwidgets/menus.cpp:127
+#: modules/gui/qt4/menus.cpp:524 modules/gui/wxwidgets/menus.cpp:127
 msgid "Open &File..."
 msgstr "ファイルを開く(&F)..."
 
-#: modules/gui/qt4/menus.cpp:692
+#: modules/gui/qt4/menus.cpp:694
 #, fuzzy
 msgid "Hide VLC media player in taskbar"
 msgstr "VLC メディアプレイヤー"
 
-#: modules/gui/qt4/menus.cpp:698
+#: modules/gui/qt4/menus.cpp:700
 #, fuzzy
 msgid "Show VLC media player"
 msgstr "VLC メディアプレイヤー"
 
-#: modules/gui/qt4/menus.cpp:706
+#: modules/gui/qt4/menus.cpp:708
 #, fuzzy
 msgid "&Open Media"
 msgstr "ディスクメディアを開く"
 
-#: modules/gui/qt4/menus.cpp:740 modules/gui/wxwidgets/menus.cpp:575
+#: modules/gui/qt4/menus.cpp:742 modules/gui/wxwidgets/menus.cpp:575
 #: modules/gui/wxwidgets/menus.cpp:602
 msgid "Empty"
 msgstr "空"
@@ -16580,7 +17037,9 @@ msgstr "再生一覧を開く"
 msgid ""
 "All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF playlist|*."
 "xspf"
-msgstr "すべての再生一覧 |*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U ファイル|*.m3u|XSPF 再生一覧|*.xspf"
+msgstr ""
+"すべての再生一覧 |*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U ファイル|*.m3u|XSPF 再生"
+"一覧|*.xspf"
 
 #: modules/gui/skins2/src/dialogs.cpp:240
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:929
@@ -16666,7 +17125,9 @@ msgstr ""
 msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
 "\n"
-msgstr "(c) 1996-2006 VideoLAN チーム\n\n"
+msgstr ""
+"(c) 1996-2006 VideoLAN チーム\n"
+"\n"
 
 #: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:960
 msgid "Compiler: "
@@ -16720,15 +17181,6 @@ msgstr "WinCE インターフェースモジュール"
 #: modules/gui/wince/wince.cpp:69
 msgid "WinCE dialogs provider"
 msgstr "WinCE ダイアログ提供"
-
-#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
-msgid "Edit bookmark"
-msgstr "ブックマーク編集"
-
-#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:101
-#: modules/gui/wxwidgets/dialogs/bookmarks.cpp:197
-msgid "Bytes"
-msgstr "バイト"
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:105
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:78
@@ -17069,7 +17521,7 @@ msgstr "ノードを追加する"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:828
 #, c-format
 msgid "%i items in playlist"
-msgstr "再生一覧に %s 個の項目"
+msgstr "再生一覧に %i 個の項目"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:819
 #: modules/gui/wxwidgets/playlist_manager.cpp:431
@@ -17951,10 +18403,6 @@ msgstr "ゴスペル"
 msgid "Alternative rock"
 msgstr "オルタナティブロック"
 
-#: modules/meta_engine/id3genres.h:69
-msgid "Bass"
-msgstr "バス"
-
 #: modules/meta_engine/id3genres.h:70
 msgid "Soul"
 msgstr "ソウル"
@@ -18125,39 +18573,39 @@ msgstr "ミュージカル"
 msgid "MusicBrainz meta data"
 msgstr "説明メタデータ"
 
-#: modules/misc/audioscrobbler.c:126
+#: modules/misc/audioscrobbler.c:122
 msgid "The username of your last.fm account"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:128
+#: modules/misc/audioscrobbler.c:124
 msgid "The password of your last.fm account"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:152
+#: modules/misc/audioscrobbler.c:148
 #, fuzzy
 msgid "Audioscrobbler"
 msgstr "オーディオエンコーダー"
 
-#: modules/misc/audioscrobbler.c:153
+#: modules/misc/audioscrobbler.c:149
 msgid "Submission of played songs to last.fm"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:295
+#: modules/misc/audioscrobbler.c:296
 msgid "Last.fm username not set"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:296
+#: modules/misc/audioscrobbler.c:297
 msgid ""
 "Please set a username or disable the audioscrobbler plugin, and restart "
 "VLC.\n"
 "Visit http://www.last.fm/join/ to get an account."
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:805
+#: modules/misc/audioscrobbler.c:807
 msgid "last.fm: Authentication failed"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:806
+#: modules/misc/audioscrobbler.c:808
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
@@ -21905,12 +22353,12 @@ msgstr ""
 msgid "QT Embedded video output"
 msgstr "QT 埋め込みビデオモジュール"
 
-#: modules/video_output/sdl.c:107
+#: modules/video_output/sdl.c:109
 #, fuzzy
 msgid "SDL chroma format"
 msgstr "XVimage色彩フォーマット"
 
-#: modules/video_output/sdl.c:109
+#: modules/video_output/sdl.c:111
 #, fuzzy
 msgid ""
 "Force the SDL renderer to use a specific chroma format instead of trying to "
@@ -21919,7 +22367,7 @@ msgstr ""
 "最も効果的なものを使ってパフォーマンスを改善するかわりに、特定の色彩フォー"
 "マットを使用するためのXVideoレンダラを強制的に指定します。"
 
-#: modules/video_output/sdl.c:119
+#: modules/video_output/sdl.c:121
 #, fuzzy
 msgid "Simple DirectMedia Layer video output"
 msgstr "シンプル DirectMedia レイヤ・モジュール"
@@ -22704,10 +23152,6 @@ msgstr "スペクトラム解析"
 #, fuzzy
 #~ msgid "ISO-9660 Volume Set"
 #~ msgstr "音量設定"
-
-#, fuzzy
-#~ msgid "By category"
-#~ msgstr "CDDB カテゴリ"
 
 #~ msgid "Segment filename"
 #~ msgstr "分割ファイル名"
@@ -23698,12 +24142,6 @@ msgstr "スペクトラム解析"
 
 #~ msgid "Error loading pixmap file: %s"
 #~ msgstr "ピックスマップ・ファイル %s のロードでエラーが発生しました。"
-
-#~ msgid "Title %d (%d)"
-#~ msgstr "タイトル %d (%d)"
-
-#~ msgid "Chapter %d"
-#~ msgstr "チャプター %d"
 
 #, fuzzy
 #~ msgid "Disk type"
