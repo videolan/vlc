@@ -136,7 +136,8 @@ enum
     BOX_SEARCH,
     BOX_OPEN,
     BOX_BROWSE,
-    BOX_META
+    BOX_META,
+    BOX_OBJECTS
 };
 enum
 {
@@ -806,7 +807,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         }
     }
     else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
-             p_sys->i_box_type == BOX_META )
+             p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_OBJECTS )
     {
         switch( i_key )
         {
@@ -1067,6 +1068,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_NONE;
             else
                 p_sys->i_box_type = BOX_BROWSE;
+            return 1;
+        case 'x':
+            if( p_sys->i_box_type == BOX_OBJECTS )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_OBJECTS;
             return 1;
         case 'c':
             p_sys->b_color = !p_sys->b_color;
@@ -1452,6 +1459,28 @@ static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt
     mvnprintw( p_sys->i_box_y + l - p_sys->i_box_start, x, COLS - x - 1, "%s", p_buf );
 }
 
+static void DumpObject( intf_thread_t *p_intf, int *l, vlc_object_t *p_obj, int i_level )
+{
+    vlc_object_yield( p_obj );
+
+    if( p_obj->psz_object_name )
+        MainBoxWrite( p_intf, (*l)++, 1 + 2 * i_level, "%s \"%s\" (%d)",
+                p_obj->psz_object_type, p_obj->psz_object_name,
+                p_obj->i_object_id );
+    else
+        MainBoxWrite( p_intf, (*l)++, 1 + 2 * i_level, "%s (%d)",
+                p_obj->psz_object_type, p_obj->i_object_id );
+    int i;
+    for( i = 0; i < p_obj->i_children ; i++ )
+    {
+        MainBoxWrite( p_intf, *l, 1 + 2 * i_level, 
+            i == p_obj->i_children - 1 ? "`-" : "|-" );
+        DumpObject( p_intf, l, p_obj->pp_children[i], i_level + 1 );
+    }
+
+    vlc_object_release( p_obj );
+}
+
 static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
@@ -1604,6 +1633,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, _("     L           Show/Hide messages box") );
         MainBoxWrite( p_intf, l++, 1, _("     P           Show/Hide playlist box") );
         MainBoxWrite( p_intf, l++, 1, _("     B           Show/Hide filebrowser") );
+        MainBoxWrite( p_intf, l++, 1, _("     x           Show/Hide objects box") );
         MainBoxWrite( p_intf, l++, 1, _("     c           Switch color on/off") );
         MainBoxWrite( p_intf, l++, 1, _("     Esc         Close Add/Search entry") );
         MainBoxWrite( p_intf, l++, 1, "" );
@@ -1934,6 +1964,21 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             }
         }
 
+    }
+    else if( p_sys->i_box_type == BOX_OBJECTS )
+    {
+        int l = 0;
+        DrawBox( p_sys->w, y++, 0, h, COLS, _(" Objects "), p_sys->b_color );
+        DumpObject( p_intf, &l, VLC_OBJECT( p_intf->p_libvlc ), 0 );
+
+        p_sys->i_box_lines_total = l;
+        if( p_sys->i_box_start >= p_sys->i_box_lines_total )
+            p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+
+        if( l - p_sys->i_box_start < p_sys->i_box_lines )
+            y += l - p_sys->i_box_start;
+        else
+            y += p_sys->i_box_lines;
     }
     else if( p_sys->i_box_type == BOX_PLAYLIST ||
                p_sys->i_box_type == BOX_SEARCH ||
