@@ -161,8 +161,9 @@ static volatile mtime_t cached_time = 0;
 /**
  * Return high precision date
  *
- * Uses the gettimeofday() function when possible (1 MHz resolution) or the
- * ftime() function (1 kHz resolution).
+ * Use a 1 MHz clock when possible, or 1 kHz
+ *
+ * Beware ! It doesn't reflect the actual date (since epoch), but can be the machine's uptime or anything (when monotonic clock is used)
  */
 mtime_t mdate( void )
 {
