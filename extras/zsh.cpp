@@ -27,7 +27,7 @@
 #include <utility>
 #include <iostream>
 #include <algorithm>
-typedef std::multimap<std::string, std::string> mmap;
+typedef std::multimap<std::string, std::string> mumap;
 typedef std::multimap<int, std::string> mcmap;
 
 typedef std::pair<std::string, std::string> mpair;
@@ -35,15 +35,20 @@ typedef std::pair<int, std::string> mcpair;
 
 #include <vlc/vlc.h>
 
-void ParseModules( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 );
-void PrintModuleList( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 );
-void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 );
+/* evil hack */
+#undef __PLUGIN__
+#undef __BUILTIN__
+#include <../src/modules/modules.h>
+
+void ParseModules( libvlc_int_t *p_libvlc, mumap &mods, mcmap &mods2 );
+void PrintModuleList( libvlc_int_t *p_libvlc, mumap &mods, mcmap &mods2 );
+void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 );
 void PrintOption( char *psz_option, char i_short, char *psz_exlusive,
                    char *psz_text, char *psz_longtext, char *psz_args );
 
-int main( int i_argc, char **ppsz_argv )
+int main( int i_argc, const char **ppsz_argv )
 {
-    mmap mods;
+    mumap mods;
     mcmap mods2;
     /* Create a libvlc structure */
     int i_ret = VLC_Create();
@@ -107,7 +112,7 @@ int main( int i_argc, char **ppsz_argv )
 
 }
 
-void ParseModules( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
+void ParseModules( libvlc_int_t *p_libvlc, mumap &mods, mcmap &mods2 )
 {
     vlc_list_t      *p_list = NULL;;
     module_t        *p_module;
@@ -151,7 +156,7 @@ void ParseModules( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
     }
 }
 
-void PrintModuleList( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
+void PrintModuleList( libvlc_int_t *p_libvlc, mumap &mods, mcmap &mods2 )
 {
     vlc_list_t      *p_list = NULL;;
     module_t        *p_module;
@@ -195,7 +200,7 @@ void PrintModuleList( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
     return;
 }
 
-void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
+void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
 {
     char *psz_arguments = strdup( "" );
     char *psz_exclusive;
@@ -207,14 +212,14 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
 #define DUP( x ) strdup( x ? x : "" )
 
     //Skip deprecated options
-    if( p_item->psz_current )
+    if( p_item->b_removed )
         return;
 
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
     {
-        std::pair<mmap::iterator, mmap::iterator> range = mods.equal_range( p_item->psz_type );
+        std::pair<mumap::iterator, mumap::iterator> range = mods.equal_range( p_item->psz_type );
         std::string list = (*range.first).second;
         ++range.first;
         while( range.first != range.second )

@@ -1,2 +1,4 @@
+BUILDDIR ?= ..
+
 zsh: zsh.cpp
-	g++ -I.. -I../include zsh.cpp ../src/.libs/libvlc.so -o zsh `top_builddir=.. ../vlc-config vlc builtin --cflags --libs`
+	g++ ${CXXFLAGS} -I${BUILDDIR} -I${BUILDDIR}/include -I../include zsh.cpp ${BUILDDIR}/src/.libs/libvlc.so -o zsh `top_builddir=${BUILDDIR} ${BUILDDIR}/vlc-config vlc builtin --cflags --libs`
