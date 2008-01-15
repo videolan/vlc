@@ -362,6 +362,7 @@ Section "Media player (required)" SEC01
   !insertmacro InstallFolder osdmenu
   !insertmacro InstallFolder skins
   !insertmacro InstallFolder http
+  !insertmacro InstallFolder share
 
   WriteIniStr "$INSTDIR\${PRODUCT_GROUP} Website.url" "InternetShortcut" "URL" \
     "${PRODUCT_WEB_SITE}"
