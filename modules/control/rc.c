@@ -27,7 +27,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>
 #include <signal.h>
@@ -96,6 +95,10 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Menu         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static int  Statistics   ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+
+static int updateStatistics( intf_thread_t *, input_item_t *);
 #ifdef UPDATE_CHECK
 static void checkUpdates( intf_thread_t *p_intf );
 #endif
@@ -119,6 +122,7 @@ struct intf_sys_t
     /* status changes */
     vlc_mutex_t       status_lock;
     playlist_status_t i_last_state;
+    vlc_bool_t        b_statistics;
 
 #ifdef WIN32
     HANDLE hConsoleIn;
@@ -319,6 +323,7 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys->psz_unix_path = psz_unix_path;
     vlc_mutex_init( p_intf, &p_intf->p_sys->status_lock );
     p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
+    p_intf->p_sys->b_statistics = VLC_FALSE;
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
@@ -419,6 +424,9 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "voldown", STRING, VolumeMove )
     ADD( "adev", STRING, AudioConfig )
     ADD( "achan", STRING, AudioConfig )
+
+    /* misc menu commands */
+    ADD( "stats", BOOL, Statistics )
 
 #undef ADD
 }
@@ -574,9 +582,15 @@ static void Run( intf_thread_t *p_intf )
             }
         }
 
+        if( p_input && p_intf->p_sys->b_statistics )
+        {
+            vlc_mutex_lock( &input_GetItem(p_input)->lock );
+            updateStatistics( p_intf, input_GetItem(p_input) );
+            vlc_mutex_unlock( &input_GetItem(p_input)->lock );
+        }
+
         /* Is there something to do? */
         if( !b_complete ) continue;
-
 
         /* Skip heading spaces */
         psz_cmd = p_buffer;
@@ -874,6 +888,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| normal . . . . . . . . . .  normal playing of stream"));
     msg_rc(_("| f [on|off] . . . . . . . . . . . . toggle fullscreen"));
     msg_rc(_("| info . . . . .  information about the current stream"));
+    msg_rc(_("| stats  . . . . . . . .  show statistical information"));
     msg_rc(_("| get_time . . seconds elapsed since stream's beginning"));
     msg_rc(_("| is_playing . . . .  1 if a stream plays, 0 otherwise"));
     msg_rc(_("| get_title . . . . .  the title of the current stream"));
@@ -1912,6 +1927,88 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     i_error = VLC_SUCCESS;
     if( val.psz_string ) free( val.psz_string );
     return i_error;
+}
+
+static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
+    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    input_thread_t *p_input = NULL;
+    int i_error;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+        return VLC_ENOOBJ;
+
+    if( !strcmp( psz_cmd, "stats" ) )
+    {
+        p_intf->p_sys->b_statistics = !p_intf->p_sys->b_statistics;
+        if( p_intf->p_sys->b_statistics )
+            msg_rc(_("statistics update on"));
+        else
+            msg_rc(_("statistics update off"));
+    }
+    /*
+     * sanity check
+     */
+    else
+    {
+        msg_rc(_("Unknown command!") );
+    }
+
+    vlc_object_release( p_input );
+    i_error = VLC_SUCCESS;
+    return i_error;
+}
+
+static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
+{
+    if( !p_item ) return VLC_EGENERIC;
+
+    vlc_mutex_lock( &p_item->p_stats->lock );
+    msg_rc( "+----[ begin of statistical info ]" );
+
+    /* Input */
+    msg_rc(_("+-[Incoming]"));
+    msg_rc(_("| input bytes read : %8.0f kB"),
+            (float)(p_item->p_stats->i_read_bytes)/1000 );
+    msg_rc(_("| input bitrate    :   %6.0f kb/s"),
+            (float)(p_item->p_stats->f_input_bitrate)*8000 );
+    msg_rc(_("| demux bytes read : %8.0f kB"),
+            (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+    msg_rc(_("| demux bitrate    :   %6.0f kb/s"),
+            (float)(p_item->p_stats->f_demux_bitrate)*8000 );
+    msg_rc("|");
+    /* Video */
+    msg_rc(_("+-[Video Decoding]"));
+    msg_rc(_("| video decoded    :    %5i"),
+            p_item->p_stats->i_decoded_video );
+    msg_rc(_("| frames displayed :    %5i"),
+            p_item->p_stats->i_displayed_pictures );
+    msg_rc(_("| frames lost      :    %5i"),
+            p_item->p_stats->i_lost_pictures );
+    msg_rc("|");
+    /* Audio*/
+    msg_rc(_("+-[Audio Decoding]"));
+    msg_rc(_("| audio decoded    :    %5i"),
+            p_item->p_stats->i_decoded_audio );
+    msg_rc(_("| buffers played   :    %5i"),
+            p_item->p_stats->i_played_abuffers );
+    msg_rc(_("| buffers lost     :    %5i"),
+            p_item->p_stats->i_lost_abuffers );
+    msg_rc("|");
+    /* Sout */
+    msg_rc(_("+-[Streaming]"));
+    msg_rc(_("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
+    msg_rc(_("| bytes sent       : %8.0f kB"),
+            (float)(p_item->p_stats->i_sent_bytes)/1000 );
+    msg_rc(_("| sending bitrate  :   %6.0f kb/s"),
+            (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
+    msg_rc("|");
+    msg_rc( "+----[ end of statistical info ]" );
+    vlc_mutex_unlock( &p_item->p_stats->lock );
+
+    return VLC_SUCCESS;
 }
 
 #ifdef WIN32
