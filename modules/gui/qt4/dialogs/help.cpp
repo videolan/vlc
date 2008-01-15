@@ -221,6 +221,9 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     /* create the update structure and the callback */
     p_update = update_New( _p_intf );
     b_checked = false;
+
+    /* Check for updates */
+    UpdateOrDownload();
 }
 
 UpdateDialog::~UpdateDialog()
