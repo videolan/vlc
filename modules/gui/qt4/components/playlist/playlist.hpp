@@ -28,10 +28,11 @@
 
 #include <vlc/vlc.h>
 #include "qt4.hpp"
+#include "dialogs_provider.hpp"
 
 #include <QSplitter>
+#include <QLabel>
 
-class QLabel;
 class PLSelector;
 class PLPanel;
 class QPushButton;
@@ -60,5 +61,15 @@ signals:
     void rootChanged( int );
     void artSet( QString );
 };
+
+class ArtLabel : public QLabel
+{
+    Q_OBJECT
+    void mouseDoubleClickEvent( QMouseEvent *event )
+    {
+        THEDP->mediaInfoDialog();
+    }
+};
+
 
 #endif

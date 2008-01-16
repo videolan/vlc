@@ -49,13 +49,14 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     leftW->addWidget( selector );
 
     /* Art label */
-    art = new QLabel( "" );
+    art = new ArtLabel;
     art->setMinimumHeight( 128 );
     art->setMinimumWidth( 128 );
     art->setMaximumHeight( 128 );
     art->setMaximumWidth( 128 );
     art->setScaledContents( true );
     art->setPixmap( QPixmap( ":/noart.png" ) );
+    art->setToolTip( qtr( "Double click to get the media informations" ) );
     leftW->addWidget( art );
 
     /* Initialisation of the playlist */
