@@ -95,6 +95,7 @@ vlc_module_begin();
                 MUX_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
                 DST_LONGTEXT, VLC_FALSE );
+        change_unsafe();
 
     add_bool( SOUT_CFG_PREFIX "sap", VLC_FALSE, NULL, SAP_TEXT, SAP_LONGTEXT,
               VLC_TRUE );

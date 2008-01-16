@@ -191,7 +191,7 @@ struct module_config_t
     vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
     vlc_bool_t   b_unsaveable;                    /* Config should be saved */
 
-    vlc_bool_t   b_safe;
+    vlc_bool_t   b_unsafe;
 };
 
 /*****************************************************************************
@@ -282,7 +282,7 @@ enum vlc_config_properties
     VLC_CONFIG_OLDNAME,
     /* former option name (args=const char *) */
 
-    VLC_CONFIG_SAFE,
+    VLC_CONFIG_UNSAFE,
     /* tag as modifiable by untrusted input item "sources" (args=none) */
 };
 
@@ -472,8 +472,8 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
 #define change_unsaveable() \
     vlc_config_set (p_config, VLC_CONFIG_VOLATILE)
 
-#define change_safe() \
-    vlc_config_set (p_config, VLC_CONFIG_SAFE)
+#define change_unsafe() \
+    vlc_config_set (p_config, VLC_CONFIG_UNSAFE)
 
 /****************************************************************************
  * config_chain_t:

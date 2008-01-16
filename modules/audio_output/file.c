@@ -116,6 +116,7 @@ vlc_module_begin();
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, VLC_TRUE );
     add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
+        change_unsafe();
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );
 
     set_capability( "audio output", 0 );

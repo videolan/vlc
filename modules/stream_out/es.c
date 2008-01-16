@@ -93,10 +93,13 @@ vlc_module_begin();
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
                 DEST_LONGTEXT, VLC_TRUE );
+        change_unsafe();
     add_string( SOUT_CFG_PREFIX "dst-audio", "", NULL, DESTA_TEXT,
                 DESTA_LONGTEXT, VLC_TRUE );
+        change_unsafe();
     add_string( SOUT_CFG_PREFIX "dst-video", "", NULL, DESTV_TEXT,
                 DESTV_LONGTEXT, VLC_TRUE );
+        change_unsafe();
 
     set_callbacks( Open, Close );
 vlc_module_end();

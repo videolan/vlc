@@ -29,6 +29,8 @@
 
 #include "libvlc.h"
 
+#include "vlc_interface.h"
+
 /*****************************************************************************
  * Private types
  *****************************************************************************/
@@ -1089,6 +1091,35 @@ void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
 
     if( ( i_type != VLC_VAR_BOOL ) &&
         ( !psz_value || !*psz_value ) ) goto cleanup; /* Invalid value */
+
+    /* check if option is unsafe */
+    {
+        module_config_t *p_config = config_FindConfig( p_obj, psz_name );
+        if( p_config->b_unsafe )
+        {
+            int policy = config_GetInt( p_obj, "security-policy" );
+            switch( policy )
+            {
+                case 0: /* block */
+                    msg_Err( p_obj, "option %s is unsafe and is blocked by security policy", psz_name );
+                    return;
+                case 1: /* allow */
+                    break;
+                case 2: /* prompt */
+                {
+                    char description[256];
+                    snprintf(description, sizeof(description), _("playlist item is making use of the following unsafe option '%s', which may be harmful if used in a malicious way, authorize it ?"), psz_name);
+                    if( DIALOG_OK_YES != intf_UserYesNo( p_obj, _("WARNING: Unsafe Playlist"), description, _("Yes"), _("No"), NULL) )
+                    {
+                        msg_Err( p_obj, "option %s is unsafe and is blocked by security policy", psz_name );
+                        return;
+                    }
+                }
+                default:
+                    ;
+            }
+        }
+    }
 
     /* Create the variable in the input object.
      * Children of the input object will be able to retreive this value

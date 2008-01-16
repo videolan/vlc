@@ -407,8 +407,8 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             break;
         }
 
-        case VLC_CONFIG_SAFE:
-            item->b_safe = VLC_TRUE;
+        case VLC_CONFIG_UNSAFE:
+            item->b_unsafe = VLC_TRUE;
             ret = 0;
             break;
     }
