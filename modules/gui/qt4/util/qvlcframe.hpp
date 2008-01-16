@@ -58,7 +58,10 @@ protected:
     {
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
-        resize( settings.value( "size", defSize ).toSize() );
+        /* never trust any saved size ;-) */
+        QSize newSize = settings.value( "size", defSize ).toSize();
+        if( newSize.isValid() )
+           resize( newSize );
         move( settings.value( "pos", defPos ).toPoint() );
         settings.endGroup();
     }
@@ -66,7 +69,10 @@ protected:
     {
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
-        settings.setValue ("size", size() );
+        /* only save valid sizes ... */
+        QSize currentsize = size();
+        if( currentsize.isValid() )
+           settings.setValue ("size", currentsize );
         settings.setValue( "pos", pos() );
         settings.endGroup();
     }
@@ -156,18 +162,27 @@ protected:
         move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
         settings.endGroup();
     }
+
     void readSettings( QString name )
     {
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
         mainSize = settings.value( "size", QSize( 0,0 ) ).toSize();
+        if( !mainSize.isValid() )
+        {
+           mainSize = QSize(0,0);
+        }
         settings.endGroup();
     }
+
     void writeSettings( QString name )
     {
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
-        settings.setValue ("size", size() );
+        /* only save valid sizes ... */
+        QSize currentsize = size();
+        if( currentsize.isValid() )
+            settings.setValue ("size", currentsize );
         settings.setValue( "pos", pos() );
         settings.endGroup();
     }

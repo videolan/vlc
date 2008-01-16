@@ -293,7 +293,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     move( settings->value( "pos", QPoint( 0, 0 ) ).toPoint() );
 
-    resize( settings->value( "size", QSize( 350, 60 ) ).toSize() );
+    QSize newSize = settings->value( "size", QSize( 350, 60 ) ).toSize();
+    if( newSize.isValid() )
+    {
+        resize( newSize );
+    }
+    else
+    {
+        msg_Warn( p_intf, "Invalid size in constructor" );
+    }
 
     int tgPlay = settings->value( "playlist-visible", 0 ).toInt();
     settings->endGroup();
@@ -738,8 +746,11 @@ void MainInterface::togglePlaylist()
         settings->endGroup();
         settings->beginGroup( "playlist" );
         dockPL->move( settings->value( "pos", QPoint( 0,0 ) ).toPoint() );
-        dockPL->resize( settings->value( "size", QSize( 400, 300 ) ).toSize() );
+        QSize newSize = settings->value( "size", QSize( 400, 300 ) ).toSize();
+        if( newSize.isValid() )
+            dockPL->resize( newSize );
         settings->endGroup();
+
         dockPL->show();
         playlistVisible = true;
     }
