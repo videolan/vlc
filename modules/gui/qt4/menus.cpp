@@ -297,9 +297,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         SLOT( mediaInfoDialog() ), "Ctrl+I" );
     addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) , "",
         ":/pixmaps/menus_info_16px.png", SLOT( mediaCodecDialog() ), "Ctrl+J" );
-
-
-    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","", 
+    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","",
                       SLOT( bookmarksDialog() ), "Ctrl+B" );
 #ifdef ENABLE_VLM
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", "", SLOT( vlmDialog() ),

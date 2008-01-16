@@ -205,7 +205,7 @@ void DialogsProvider::mediaCodecDialog()
 
 void DialogsProvider::bookmarksDialog()
 {
-    BookmarksDialog::getInstance( p_intf )->toggleVisible(); 
+    BookmarksDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::podcastConfigureDialog()
