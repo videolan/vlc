@@ -811,3 +811,6 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 <ivoire> my parents push me out of the computer :(
   -- #videolan
 %
+VLC development is NOT about being a sed god.
+  -- courmisch
+%
