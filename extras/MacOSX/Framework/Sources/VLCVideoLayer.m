@@ -53,7 +53,19 @@
 @implementation VLCVideoLayer
 @synthesize hasVideo;
 
+- (BOOL)fillScreen
+{
+    return [self.layoutManager fillScreenEntirely];
+}
+
+- (void)setFillScreen:(BOOL)fillScreen
+{
+    [self.layoutManager setFillScreenEntirely:fillScreen];
+    [self setNeedsLayout];
+}
+
 @end
+
 /******************************************************************************
  * Implementation VLCVideoLayer  (Private)
  */

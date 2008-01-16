@@ -29,4 +29,5 @@
     BOOL hasVideo;
 }
 @property (readonly) BOOL hasVideo;
+@property BOOL fillScreen;
 @end
