@@ -17,7 +17,6 @@ nodist_SOURCES_qt4 = \
 		menus.moc.cpp \
 		dialogs_provider.moc.cpp \
 		input_manager.moc.cpp \
-		playlist_model.moc.cpp \
 		dialogs/playlist.moc.cpp \
         dialogs/bookmarks.moc.cpp \
 		dialogs/mediainfo.moc.cpp \
@@ -39,6 +38,7 @@ nodist_SOURCES_qt4 = \
 		components/simple_preferences.moc.cpp \
 		components/open_panels.moc.cpp \
 		components/interface_widgets.moc.cpp \
+		components/playlist/playlist_model.moc.cpp \
 		components/playlist/playlist.moc.cpp \
 		components/playlist/panels.moc.cpp \
 		components/playlist/selector.moc.cpp \
@@ -86,7 +86,6 @@ SOURCES_qt4 = 	qt4.cpp \
 		main_interface.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
-		playlist_model.cpp \
 		dialogs/playlist.cpp \
         dialogs/bookmarks.cpp \
 		dialogs/preferences.cpp \
@@ -108,6 +107,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/simple_preferences.cpp \
 		components/open_panels.cpp \
 		components/interface_widgets.cpp \
+		components/playlist/playlist_model.cpp \
 		components/playlist/standardpanel.cpp \
 		components/playlist/playlist.cpp \
 		components/playlist/selector.cpp \
@@ -120,7 +120,6 @@ noinst_HEADERS = \
 	main_interface.hpp \
 	dialogs_provider.hpp \
 	input_manager.hpp \
-	playlist_model.hpp \
 	dialogs/playlist.hpp \
     dialogs/bookmarks.hpp \
 	dialogs/mediainfo.hpp \
@@ -142,6 +141,7 @@ noinst_HEADERS = \
 	components/simple_preferences.hpp \
 	components/open_panels.hpp \
 	components/interface_widgets.hpp \
+	components/playlist/playlist_model.hpp \
 	components/playlist/panels.hpp \
 	components/playlist/playlist.hpp \
 	components/playlist/selector.hpp \

@@ -28,7 +28,7 @@
 #include <QApplication>
 
 #include "qt4.hpp"
-#include "playlist_model.hpp"
+#include "components/playlist/playlist_model.hpp"
 #include "dialogs/mediainfo.hpp"
 #include <vlc_intf_strings.h>
 

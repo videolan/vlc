@@ -23,7 +23,7 @@
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
-#include "playlist_model.hpp"
+#include "components/playlist/playlist_model.hpp"
 #include "components/playlist/panels.hpp"
 #include "util/customwidgets.hpp"
 

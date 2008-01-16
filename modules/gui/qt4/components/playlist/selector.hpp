@@ -27,7 +27,7 @@
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <QString>
-#include <playlist_model.hpp>
+#include "components/playlist/playlist_model.hpp"
 
 class QTreeView;
 class PlaylistWidget;
