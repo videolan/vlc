@@ -306,8 +306,8 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
         int index = [[args objectForKey:@"index"] intValue];
         VLCMedia * media = [args objectForKey:@"media"];
         /* Sanity check */
-        if( index && index >= [cachedMedia count] )
-            index = [cachedMedia count] - 1;
+        if( index && index > [cachedMedia count] )
+            index = [cachedMedia count];
         [cachedMedia insertObject:media atIndex:index];
     }
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];

@@ -264,8 +264,8 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         [node setMedia:media];
         [node setChildren:[self childrenAtIndex:index]];
         /* Sanity check */
-        if( index && index >= [cachedNode count] )
-            index = [cachedNode count] - 1;
+        if( index && index > [cachedNode count] )
+            index = [cachedNode count];
         [cachedNode insertObject:node atIndex:index];
     }
     [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"node"];
