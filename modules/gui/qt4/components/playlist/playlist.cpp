@@ -59,11 +59,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     leftW->addWidget( art );
 
     /* Initialisation of the playlist */
-    playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
-                                                THEPL->p_local_category );
+    playlist_item_t *p_root =
+                  playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
 
-    rightPanel = qobject_cast<PLPanel *>( new StandardPLPanel( this,
-                              p_intf, THEPL, p_root ) );
+    rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root );
 
     /* Connect the activation of the selector to a redefining of the PL */
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
