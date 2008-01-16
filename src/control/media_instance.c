@@ -82,6 +82,9 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
 
+    /* release for initial p_input_thread yield (see _new()) */
+    vlc_object_release( p_input_thread );
+
     /* No one is tracking this input_thread appart us. Destroy it */
     if( p_mi->b_own_its_input_thread )
     {
@@ -91,8 +94,8 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
         var_DelCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
         /* We owned this one */
-        //input_StopThread( p_input_thread );
-        //var_Destroy( p_input_thread, "drawable" );
+        input_StopThread( p_input_thread );
+        var_Destroy( p_input_thread, "drawable" );
         //input_DestroyThread( p_input_thread );
     }
     else
@@ -103,8 +106,6 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
         vlc_object_release( p_input_thread );
     }
 
-    /* release for initial p_input_thread yield (see _new()) */
-    vlc_object_release( p_input_thread );
 }
 
 /*
@@ -454,6 +455,9 @@ void libvlc_media_instance_set_media_descriptor(
 
     release_input_thread( p_mi );
 
+    if( p_mi->p_md )
+        libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL );
+
     libvlc_media_descriptor_release( p_mi->p_md );
 
     if( !p_md )
@@ -513,14 +517,11 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
     if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) )
     {
-        printf(")))))))))))))))))))p_input_thread %p\n", p_input_thread);
         /* A thread alread exists, send it a play message */
         input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
         return;
     }
-
-    printf(")))))))))))))))))))p_input_thread NOT\n");
 
     /* Ignore previous exception */
     libvlc_exception_clear( p_e );
