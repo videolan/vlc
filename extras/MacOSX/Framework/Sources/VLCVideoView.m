@@ -62,6 +62,10 @@
 - (void)addVoutLayer:(CALayer *)aLayer;
 @end
 
+@interface VLCVideoView ()
+@property (readwrite) BOOL hasVideo;
+@end
+
 /******************************************************************************
  * Implementation VLCVideoView 
  */
@@ -77,6 +81,7 @@
         [self setStretchesVideo:NO];
         [self setAutoresizesSubviews:YES];
         [self setFillScreen: NO];
+        self.hasVideo = NO;
         layoutManager = [[VLCVideoLayoutManager layoutManager] retain];
     }
     return self;
@@ -105,6 +110,7 @@
 
 @synthesize delegate;
 @synthesize backColor;
+@synthesize hasVideo;
 
 - (BOOL)fillScreen
 {
@@ -141,10 +147,12 @@
 
     [aLayer setNeedsLayout];
     [aLayer setNeedsDisplay];
+
     [rootLayer setNeedsDisplayOnBoundsChange:YES];
     [rootLayer setNeedsDisplay];
     [rootLayer layoutIfNeeded];
     [CATransaction commit];
+    self.hasVideo = YES;
 }
 
 - (void)removeVoutLayer:(CALayer*)voutLayer
@@ -152,6 +160,7 @@
     [CATransaction begin];
     [voutLayer removeFromSuperlayer];
     [CATransaction commit];
+    self.hasVideo = NO;
 }
 
 @end

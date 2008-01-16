@@ -42,19 +42,24 @@
 - (void)addVoutLayer:(CALayer *)aLayer;
 @end
 
+@interface VLCVideoLayer ()
+@property (readwrite) BOOL hasVideo;
+@end
+
 /******************************************************************************
  * Implementation VLCVideoLayer 
  */
 
 @implementation VLCVideoLayer
+@synthesize hasVideo;
 
 @end
-
 /******************************************************************************
  * Implementation VLCVideoLayer  (Private)
  */
 
 @implementation VLCVideoLayer (Private)
+
 
 /* This is called by the libvlc module 'opengllayer' as soon as there is one 
  * vout available
@@ -73,6 +78,7 @@
     [self setNeedsDisplayOnBoundsChange:YES];
 
     [CATransaction commit];
+    self.hasVideo = YES;
 }
 
 - (void)removeVoutLayer:(CALayer*)voutLayer
@@ -80,6 +86,7 @@
     [CATransaction begin];
     [voutLayer removeFromSuperlayer];
     [CATransaction commit];
+    self.hasVideo = NO;
 }
 
 @end

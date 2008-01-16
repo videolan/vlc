@@ -25,4 +25,8 @@
 #import <QuartzCore/QuartzCore.h>
 
 @interface VLCVideoLayer : CALayer
+{
+    BOOL hasVideo;
+}
+@property (readonly) BOOL hasVideo;
 @end

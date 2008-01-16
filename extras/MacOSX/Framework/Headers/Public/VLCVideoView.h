@@ -31,11 +31,11 @@
     NSColor * backColor;
     BOOL stretchesVideo;
     id layoutManager;
-    // TODO: Allow for view to report transparency to do some cool effects
-    // with the video?
+    BOOL hasVideo;
 }
 
 @property (assign) id delegate;
 @property (copy) NSColor *backColor;
 @property BOOL fillScreen;
+@property (readonly) BOOL hasVideo;
 @end
