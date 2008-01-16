@@ -633,6 +633,8 @@ modules/gui/qt4/components/open_panels.hpp
 modules/gui/qt4/components/playlist/panels.hpp
 modules/gui/qt4/components/playlist/playlist.cpp
 modules/gui/qt4/components/playlist/playlist.hpp
+modules/gui/qt4/components/playlist/playlist_model.cpp
+modules/gui/qt4/components/playlist/playlist_model.hpp
 modules/gui/qt4/components/playlist/selector.cpp
 modules/gui/qt4/components/playlist/selector.hpp
 modules/gui/qt4/components/playlist/standardpanel.cpp
@@ -676,8 +678,6 @@ modules/gui/qt4/main_interface.cpp
 modules/gui/qt4/main_interface.hpp
 modules/gui/qt4/menus.cpp
 modules/gui/qt4/menus.hpp
-modules/gui/qt4/playlist_model.cpp
-modules/gui/qt4/playlist_model.hpp
 modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
 modules/gui/qt4/ui/equalizer.ui
