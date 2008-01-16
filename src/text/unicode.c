@@ -563,6 +563,50 @@ int utf8_lstat( const char *filename, struct stat *buf)
 }
 
 /**
+ * utf8_unlink: Calls unlink() after conversion of file name to OS locale
+ *
+ * @param filename a UTF-8 string with the name of the file you want to delete.
+ * @return A 0 return value indicates success. A -1 return value indicates an
+ *        error, and an error code is stored in errno
+ */
+int utf8_unlink( const char *filename )
+{
+#if defined (WIN32) || defined (UNDER_CE)
+    if( GetVersion() < 0x80000000 )
+    {
+        /* for Windows NT and above */
+        wchar_t wpath[MAX_PATH + 1];
+
+        if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
+        {
+            errno = ENOENT;
+            return -1;
+        }
+        wpath[MAX_PATH] = L'\0';
+
+        /*
+         * unlink() cannot open files with non-“ANSI” characters on Windows.
+         * We use _wunlink() instead.
+         */
+        return _wunlink( wpath );
+    }
+#endif
+    const char *local_name = ToLocale( filename );
+
+    if( local_name == NULL )
+    {
+        errno = ENOENT;
+        return -1;
+    }
+
+    int ret = unlink( local_name );
+    LocaleFree( local_name );
+    return ret;
+}
+
+
+
+/**
  * utf8_*printf: *printf with conversion from UTF-8 to local encoding
  */
 static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
