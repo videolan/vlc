@@ -44,7 +44,6 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     QGridLayout *main_layout = new QGridLayout( this );
     setWindowTitle( qtr( "Preferences" ) );
-    resize( 750, 550 );
 
     /* Create Panels */
     tree_panel = new QWidget;
@@ -112,6 +111,8 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     BUTTONACT( small, setSmall() );
     BUTTONACT( all, setAdvanced() );
+
+    resize( 750, sizeHint().height() );
 }
 
 void PrefsDialog::setAdvanced()
