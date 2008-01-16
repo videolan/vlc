@@ -108,9 +108,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS DSP device"), NULL, VLC_FALSE );
-        change_safe(); /* if we specify a normal file it won't be overwritten */
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );

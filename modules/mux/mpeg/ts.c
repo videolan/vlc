@@ -178,72 +178,51 @@ vlc_module_begin();
 
     add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL,VPID_TEXT, VPID_LONGTEXT,
                                   VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT,
                  APID_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "pid-spu", 0, NULL, SPUPID_TEXT,
                  SPUPID_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, NULL, PMTPID_TEXT,
                  PMTPID_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
                  TSID_LONGTEXT, VLC_TRUE );
-        change_safe();
 #ifdef HAVE_DVBPSI_SDT
     add_integer( SOUT_CFG_PREFIX "netid", 0, NULL, NETID_TEXT,
                  NETID_LONGTEXT, VLC_TRUE );
-        change_safe();
 #endif
     add_string( SOUT_CFG_PREFIX "program-pmt", NULL, NULL, PMTPROG_TEXT,
                 PMTPROG_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
               VLC_TRUE );
-        change_safe();
     add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, VLC_TRUE );
-        change_safe();
 #ifdef HAVE_DVBPSI_SDT
     add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, VLC_TRUE );
-        change_safe();
 #endif
     add_bool( SOUT_CFG_PREFIX "alignment", VLC_TRUE, NULL, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, KEYF_TEXT,
               KEYF_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_integer( SOUT_CFG_PREFIX "pcr", 70, NULL, PCR_TEXT, PCR_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "dts-delay", 400, NULL, DTS_TEXT,
                  DTS_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, ACRYPT_TEXT,
               ACRYPT_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( SOUT_CFG_PREFIX "crypt-video", VLC_TRUE, NULL, VCRYPT_TEXT,
               VCRYPT_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
                 VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     set_callbacks( Open, Close );
 vlc_module_end();

@@ -76,17 +76,13 @@ vlc_module_begin();
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, NULL, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, VLC_FALSE );
-        change_safe();
         change_integer_list( pi_stereo_values, ppsz_stereo_descriptions, 0 );
     add_bool( ENC_CFG_PREFIX "vbr", 0, NULL, ENC_VBR_TEXT,
               ENC_VBR_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( ENC_CFG_PREFIX "psy", 3, NULL, ENC_PSY_TEXT,
                  ENC_PSY_LONGTEXT, VLC_FALSE );
-        change_safe();
 vlc_module_end();
 
 static const char *ppsz_enc_options[] = {

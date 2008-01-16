@@ -69,37 +69,27 @@ vlc_module_begin();
 
     add_bool( "mod-noisereduction", VLC_TRUE, NULL, N_("Noise reduction"),
               NOISE_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_bool( "mod-reverb", VLC_FALSE, NULL, N_("Reverb"),
               REVERB_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer_with_range( "mod-reverb-level", 0, 0, 100, NULL,
              N_("Reverberation level"), REVERB_LEVEL_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer_with_range( "mod-reverb-delay", 40, 0, 1000, NULL,
              N_("Reverberation delay"), REVERB_DELAY_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_bool( "mod-megabass", VLC_FALSE, NULL, N_("Mega bass"),
                     MEGABASS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer_with_range( "mod-megabass-level", 0, 0, 100, NULL,
               N_("Mega bass level"), MEGABASS_LEVEL_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer_with_range( "mod-megabass-range", 10, 10, 100, NULL,
               N_("Mega bass cutoff"), MEGABASS_RANGE_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_bool( "mod-surround", VLC_FALSE, NULL, N_("Surround"), N_("Surround"),
                VLC_FALSE );
-        change_safe();
     add_integer_with_range( "mod-surround-level", 0, 0, 100, NULL,
               N_("Surround level"), SURROUND_LEVEL_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer_with_range( "mod-surround-delay", 5, 0, 1000, NULL,
               N_("Surround delay (ms)"), SURROUND_DELAY_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     set_callbacks( Open, Close );
     add_shortcut( "mod" );

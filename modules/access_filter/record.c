@@ -57,7 +57,6 @@ vlc_module_begin();
 
     add_directory( "record-path", NULL, NULL,
                    RECORD_PATH_TXT, RECORD_PATH_LONGTXT, VLC_TRUE );
-        change_safe();
 
     set_callbacks( Open, Close );
 

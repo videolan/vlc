@@ -73,16 +73,12 @@ vlc_module_begin();
     add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
                 PRESET_LONGTEXT, VLC_FALSE );
         change_string_list( preset_list, preset_list_text, 0 );
-        change_safe();
     add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT,
                 BANDS_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "equalizer-2pass", 0, NULL, TWOPASS_TEXT,
               TWOPASS_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_float( "equalizer-preamp", 12.0, NULL, PREAMP_TEXT,
                PREAMP_LONGTEXT, VLC_TRUE );
-        change_safe();
     set_callbacks( Open, Close );
     add_shortcut( "equalizer" );
 vlc_module_end();

@@ -207,16 +207,12 @@ vlc_module_begin();
 
     add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBR_TEXT,
                  ENC_MAXBR_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( ENC_CFG_PREFIX "min-bitrate", 0, NULL, ENC_MINBR_TEXT,
                  ENC_MINBR_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_bool( ENC_CFG_PREFIX "cbr", 0, NULL, ENC_CBR_TEXT,
                  ENC_CBR_LONGTEXT, VLC_FALSE );
-        change_safe();
 #endif
 
 vlc_module_end();

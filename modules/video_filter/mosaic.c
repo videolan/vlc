@@ -182,65 +182,49 @@ vlc_module_begin();
 
     add_integer( CFG_PREFIX "alpha", 255, NULL,
                  ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_integer( CFG_PREFIX "height", 100, NULL,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( CFG_PREFIX "width", 100, NULL,
                  WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_integer( CFG_PREFIX "align", 5, NULL,
                  ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE);
-        change_safe();
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
 
     add_integer( CFG_PREFIX "xoffset", 0, NULL,
                  XOFFSET_TEXT, XOFFSET_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( CFG_PREFIX "yoffset", 0, NULL,
                  YOFFSET_TEXT, YOFFSET_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_integer( CFG_PREFIX "borderw", 0, NULL,
                  BORDERW_TEXT, BORDERW_LONGTEXT, VLC_TRUE );
-        change_safe();
         add_deprecated_alias( CFG_PREFIX "vborder" );
     add_integer( CFG_PREFIX "borderh", 0, NULL,
                  BORDERH_TEXT, BORDERH_LONGTEXT, VLC_TRUE );
-        change_safe();
         add_deprecated_alias( CFG_PREFIX "hborder" );
 
     add_integer( CFG_PREFIX "position", 0, NULL,
                  POS_TEXT, POS_LONGTEXT, VLC_FALSE );
-        change_safe();
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer( CFG_PREFIX "rows", 2, NULL,
                  ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( CFG_PREFIX "cols", 2, NULL,
                  COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_bool( CFG_PREFIX "keep-aspect-ratio", 0, NULL,
               AR_TEXT, AR_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_bool( CFG_PREFIX "keep-picture", 0, NULL,
               KEEP_TEXT, KEEP_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_string( CFG_PREFIX "order", "", NULL,
                 ORDER_TEXT, ORDER_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_string( CFG_PREFIX "offsets", "", NULL,
                 OFFSETS_TEXT, OFFSETS_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
-        change_safe();
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {

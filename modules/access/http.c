@@ -80,19 +80,14 @@ vlc_module_begin();
 
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 VLC_FALSE );
-        change_safe();
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
                 AGENT_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,
               CONTINUOUS_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_obsolete_string("http-user");
     add_obsolete_string("http-pwd");
     add_shortcut( "http" );

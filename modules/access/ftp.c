@@ -71,16 +71,12 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
                 VLC_FALSE );
-        change_safe();
     add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
                 PASS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
                 ACCOUNT_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_shortcut( "ftp" );
     set_callbacks( InOpen, InClose );
 

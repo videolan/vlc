@@ -56,11 +56,8 @@ vlc_module_begin ();
 
     add_bool ("dump-force", VLC_FALSE, NULL, FORCE_TEXT,
               FORCE_LONGTEXT, VLC_FALSE);
-        change_safe();
     add_integer ("dump-margin", DEFAULT_MARGIN, NULL, MARGIN_TEXT,
                  MARGIN_LONGTEXT, VLC_FALSE);
-        change_safe();
-
 vlc_module_end();
 
 static ssize_t Read (access_t *access, uint8_t *buffer, size_t len);

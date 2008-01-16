@@ -94,16 +94,11 @@ vlc_module_begin();
     add_shortcut( "directory" );
     add_shortcut( "dir" );
     add_shortcut( "file" );
-
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, VLC_FALSE );
-        change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
-        change_safe();
-
+      change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
     add_string( "ignore-filetypes", "m3u,db,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
                 NULL, IGNORE_TEXT, IGNORE_LONGTEXT, VLC_FALSE );
-        change_safe();
-
     set_callbacks( Open, Close );
 
     add_submodule();

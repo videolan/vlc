@@ -70,21 +70,15 @@ vlc_module_begin();
 
     add_string( SOUT_CFG_PREFIX "title", "", NULL, TITLE_TEXT, TITLE_LONGTEXT,
                                  VLC_TRUE );
-        change_safe();
     add_string( SOUT_CFG_PREFIX "author",   "", NULL, AUTHOR_TEXT,
                                  AUTHOR_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( SOUT_CFG_PREFIX "copyright","", NULL, COPYRIGHT_TEXT,
                                  COPYRIGHT_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( SOUT_CFG_PREFIX "comment",  "", NULL, COMMENT_TEXT,
                                  COMMENT_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( SOUT_CFG_PREFIX "rating",  "", NULL, RATING_TEXT,
                                  RATING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "sout-asf-packet-size", 4096, NULL, PACKETSIZE_TEXT, PACKETSIZE_LONGTEXT, VLC_TRUE );
-        change_safe();
 
 vlc_module_end();
 

@@ -126,30 +126,22 @@ vlc_module_begin();
 
     add_string( "sap-addr", NULL, NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "sap-ipv4", 1 , NULL,
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "sap-ipv6", 1 , NULL,
               SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "sap-timeout", 1800, NULL,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "sap-parse", 1 , NULL,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "sap-strict", 0 , NULL,
                SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, VLC_TRUE );
-        change_safe();
 #if 0
     add_bool( "sap-cache", 0 , NULL,
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
-        change_safe();
 #endif
     add_bool( "sap-timeshift", 0 , NULL,
               SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );

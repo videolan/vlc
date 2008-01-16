@@ -117,18 +117,14 @@ vlc_module_begin();
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  VLC_FALSE );
-        change_safe();
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
-        change_safe();
         change_string_list( ppsz_encodings, 0, 0 );
     add_bool( "subsdec-autodetect-utf8", VLC_TRUE, NULL,
               AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_bool( "subsdec-formatted", VLC_TRUE, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
                  VLC_FALSE );
-        change_safe();
 vlc_module_end();
 
 /*****************************************************************************

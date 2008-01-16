@@ -69,10 +69,8 @@ vlc_module_begin();
 
     add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
                  DTS_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( SOUT_CFG_PREFIX "pes-max-size", PES_PAYLOAD_SIZE_MAX, NULL,
                  PES_SIZE_TEXT, PES_SIZE_LONGTEXT, VLC_TRUE );
-        change_safe();
 vlc_module_end();
 
 /*****************************************************************************

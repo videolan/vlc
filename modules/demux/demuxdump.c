@@ -53,7 +53,6 @@ vlc_module_begin();
               FILE_LONGTEXT, VLC_FALSE );
     add_bool( "demuxdump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT,
               VLC_FALSE );
-        change_safe();
     set_callbacks( Open, Close );
     add_shortcut( "dump" );
 vlc_module_end();

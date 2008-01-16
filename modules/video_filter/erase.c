@@ -65,11 +65,8 @@ vlc_module_begin();
 
     add_file( CFG_PREFIX "mask", NULL, NULL,
               MASK_TEXT, MASK_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     add_shortcut( "erase" );
     set_callbacks( Create, Destroy );

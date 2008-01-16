@@ -161,23 +161,18 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
               VLC_TRUE );
-        change_safe();
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
               VLC_TRUE );
-        change_safe();
     add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT,
               TRIPLEBUF_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                 VLC_TRUE );
-        change_safe();
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
 
     add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
               VLC_TRUE );
-        change_safe();
 
     set_description( _("DirectX video output") );
     set_capability( "video output", 100 );

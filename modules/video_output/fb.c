@@ -92,18 +92,13 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               VLC_FALSE );
-        change_safe(); /* ioctl() prevents doing bad things */
     add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
-        change_safe();
     add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );

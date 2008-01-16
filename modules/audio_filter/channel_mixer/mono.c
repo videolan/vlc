@@ -112,12 +112,9 @@ vlc_module_begin();
 
     add_bool( MONO_CFG "downmix", VLC_FALSE, NULL, MONO_DOWNMIX_TEXT,
               MONO_DOWNMIX_LONGTEXT, VLC_FALSE );
-        change_safe();
-
     add_integer( MONO_CFG "channel", -1, NULL, MONO_CHANNEL_TEXT,
         MONO_CHANNEL_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-        change_safe();
 
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );

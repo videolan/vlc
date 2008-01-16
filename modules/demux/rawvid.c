@@ -64,17 +64,12 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "rawvideo" );
     add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 );
-        change_safe();
     add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 );
-        change_safe();
     add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
-        change_safe();
     add_string( "rawvid-aspect-ratio", NULL, NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
-        change_safe();
 vlc_module_end();
 
 /*****************************************************************************

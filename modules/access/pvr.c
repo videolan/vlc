@@ -129,52 +129,36 @@ vlc_module_begin();
 
     add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( "pvr-device", "/dev/video0", NULL, DEVICE_TEXT,
                  DEVICE_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_string( "pvr-radio-device", "/dev/radio0", NULL, RADIO_DEVICE_TEXT,
                  RADIO_DEVICE_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NULL, NORM_TEXT,
                  NORM_LONGTEXT, VLC_FALSE );
-        change_safe();
-        change_integer_list( i_norm_list, psz_norm_list_text, 0 );
+       change_integer_list( i_norm_list, psz_norm_list_text, 0 );
     add_integer( "pvr-width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "pvr-height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( "pvr-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                  VLC_FALSE );
-        change_safe();
     add_integer( "pvr-framerate", -1, NULL, FRAMERATE_TEXT, FRAMERATE_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( "pvr-keyint", -1, NULL, KEYINT_TEXT, KEYINT_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( "pvr-bframes", -1, NULL, FRAMERATE_TEXT, FRAMERATE_LONGTEXT,
                  VLC_TRUE );
-        change_safe();
     add_integer( "pvr-bitrate", -1, NULL, BITRATE_TEXT, BITRATE_LONGTEXT,
                  VLC_FALSE );
-        change_safe();
     add_integer( "pvr-bitrate-peak", -1, NULL, BITRATE_PEAK_TEXT,
                  BITRATE_PEAK_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "pvr-bitrate-mode", -1, NULL, BITRATE_MODE_TEXT,
                  BITRATE_MODE_LONGTEXT, VLC_TRUE );
-        change_safe();
         change_integer_list( i_bitrates, psz_bitrates_list_text, 0 );
     add_integer( "pvr-audio-bitmask", -1, NULL, BITMASK_TEXT,
                  BITMASK_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "pvr-audio-volume", -1, NULL, VOLUME_TEXT,
                  VOLUME_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_integer( "pvr-channel", -1, NULL, CHAN_TEXT, CHAN_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     set_callbacks( Open, Close );
 vlc_module_end();

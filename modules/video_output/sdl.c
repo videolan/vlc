@@ -122,7 +122,6 @@ vlc_module_begin();
     set_capability( "video output", 60 );
     add_shortcut( "sdl" );
     add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
-        change_safe();
     set_callbacks( Open, Close );
 #if defined( __i386__ ) || defined( __x86_64__ )
     /* On i386, SDL is linked against svgalib */

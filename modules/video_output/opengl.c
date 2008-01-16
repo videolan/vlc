@@ -189,33 +189,25 @@ vlc_module_begin();
     add_shortcut( "opengl" );
     add_float( "opengl-cube-speed", 2.0, NULL, SPEED_TEXT,
                     SPEED_LONGTEXT, VLC_TRUE );
-        change_safe();
 #ifdef OPENGL_MORE_EFFECT
     add_integer_with_range( "opengl-accuracy", 4, 1, 10, NULL, ACCURACY_TEXT,
                     ACCURACY_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_float_with_range( "opengl-pov-x", 0.0, -1.0, 1.0, NULL, POV_X_TEXT,
                     POV_X_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_float_with_range( "opengl-pov-y", 0.0, -1.0, 1.0, NULL, POV_Y_TEXT,
                     POV_Y_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_float_with_range( "opengl-pov-z", -1.0, -1.0, 1.0, NULL, POV_Z_TEXT,
                     POV_Z_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_float( "opengl-cylinder-radius", -100.0, NULL, RADIUS_TEXT,
                     RADIUS_LONGTEXT, VLC_TRUE );
-        change_safe();
 
 #endif
     /* Allow opengl provider plugin selection */
     add_string( "opengl-provider", "default", NULL, PROVIDER_TEXT, 
                     PROVIDER_LONGTEXT, VLC_TRUE );
-        change_safe();
     set_callbacks( CreateVout, DestroyVout );
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_FALSE );
-        change_safe();
         change_string_list( ppsz_effects, ppsz_effects_text, 0 );
 vlc_module_end();
 

@@ -92,13 +92,10 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
         ANGLE_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( "dvdread-css-method", NULL, NULL, CSSMETHOD_TEXT,
                 CSSMETHOD_LONGTEXT, VLC_TRUE );
-        change_safe();
         change_string_list( psz_css_list, psz_css_list_text, 0 );
     set_capability( "access_demux", 0 );
     add_shortcut( "dvd" );

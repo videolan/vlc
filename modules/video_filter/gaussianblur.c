@@ -59,7 +59,6 @@ vlc_module_begin();
 
     add_float( FILTER_PREFIX "sigma", 2., NULL, SIGMA_TEXT, SIGMA_LONGTEXT,
                VLC_FALSE );
-        change_safe();
 
     set_callbacks( Create, Destroy );
 vlc_module_end();

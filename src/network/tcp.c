@@ -265,38 +265,45 @@ next_ai: /* failure */
  *****************************************************************************/
 int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 {
-    vlc_bool_t b_block = (i_wait < 0);
+    int timeout = (i_wait < 0) ? -1 : i_wait / 1000;
+    int evfd;
 
     assert( pi_fd != NULL );
 
-    while( !p_this->b_die )
+    vlc_object_lock (p_this);
+    evfd = vlc_object_waitpipe (p_this);
+
+    while (vlc_object_alive (p_this))
     {
         unsigned n = 0;
         while (pi_fd[n] != -1)
             n++;
-        struct pollfd ufd[n];
+        struct pollfd ufd[n + 1];
 
         /* Initialize file descriptor set */
-        for (unsigned i = 0; i < n; i++)
+        for (unsigned i = 0; i <= n; i++)
         {
-            ufd[i].fd = pi_fd[i];
+            ufd[i].fd = (i < n) ? pi_fd[i] : evfd;
             ufd[i].events = POLLIN;
             ufd[i].revents = 0;
         }
 
-        switch (poll (ufd, n, b_block ? 500 : i_wait / 1000))
+        vlc_object_unlock (p_this);
+        switch (poll (ufd, n, timeout))
         {
             case -1:
                 if (net_errno != EINTR)
-                {
                     msg_Err (p_this, "poll error: %m");
-                }
-                return -1;
-
             case 0:
-                if (b_block)
-                    continue;
-                return -1;
+                return -1; /* NOTE: p_this already unlocked */
+        }
+        vlc_object_lock (p_this);
+
+        if (ufd[n].revents)
+        {
+            vlc_object_wait (p_this);
+            errno = EINTR;
+            break;
         }
 
         for (unsigned i = 0; i < n; i++)
@@ -319,11 +326,12 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
              */
             memmove (pi_fd + i, pi_fd + i + 1, n - (i + 1));
             pi_fd[n - 1] = sfd;
+            vlc_object_unlock (p_this);
             msg_Dbg (p_this, "accepted socket %d (from socket %d)", fd, sfd);
             return fd;
         }
     }
-
+    vlc_object_unlock (p_this);
     return -1;
 }
 

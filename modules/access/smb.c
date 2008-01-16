@@ -78,16 +78,12 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "smb-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_string( "smb-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
                 VLC_FALSE );
-        change_safe();
     add_string( "smb-pwd", NULL, NULL, PASS_TEXT,
                 PASS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_string( "smb-domain", NULL, NULL, DOMAIN_TEXT,
                 DOMAIN_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_shortcut( "smb" );
     set_callbacks( Open, Close );
 vlc_module_end();

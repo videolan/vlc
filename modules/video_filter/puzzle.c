@@ -75,13 +75,10 @@ vlc_module_begin();
 
     add_integer_with_range( CFG_PREFIX "rows", 4, 1, 128, NULL,
                             ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_integer_with_range( CFG_PREFIX "cols", 4, 1, 128, NULL,
                             COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_bool( CFG_PREFIX "black-slot", 0, NULL,
               BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, VLC_FALSE );
-        change_safe();
 
     set_callbacks( Create, Destroy );
 vlc_module_end();

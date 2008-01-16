@@ -81,13 +81,10 @@ vlc_module_begin();
 
     add_integer( "headphone-dim", 10, NULL, HEADPHONE_DIM_TEXT,
                  HEADPHONE_DIM_LONGTEXT, VLC_FALSE );
-        change_safe();
     add_bool( "headphone-compensate", 0, NULL, HEADPHONE_COMPENSATE_TEXT,
               HEADPHONE_COMPENSATE_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_bool( "headphone-dolby", 0, NULL, HEADPHONE_DOLBY_TEXT,
               HEADPHONE_DOLBY_LONGTEXT, VLC_TRUE );
-        change_safe();
 
     set_capability( "audio filter", 0 );
     set_callbacks( Create, Destroy );

@@ -66,7 +66,6 @@ vlc_module_begin();
     set_shortname( "EsounD" );
     set_capability( "audio output", 50 );
     add_string( "esdserver", "", NULL, N_("Esound server"), NULL, VLC_FALSE );
-        change_safe();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     set_callbacks( Open, Close );

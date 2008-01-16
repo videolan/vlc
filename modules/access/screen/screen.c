@@ -63,14 +63,11 @@ vlc_module_begin();
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-        change_safe();
     add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
-        change_safe();
 
 #ifdef WIN32
     add_integer( "screen-fragment-size", 0, NULL, FRAGS_TEXT,
         FRAGS_LONGTEXT, VLC_TRUE );
-        change_safe();
 #endif
 
     set_capability( "access_demux", 0 );
