@@ -996,7 +996,9 @@ void filename_sanitize( char *str )
         switch( *str )
         {
             case '/':
-#ifdef WIN32
+#if defined( __APPLE__ )
+            case ':':
+#elif defined( WIN32 )
             case '\\':
             case '*':
             case '"':
@@ -1031,7 +1033,10 @@ void path_sanitize( char *str )
 #endif
     while( *str )
     {
-#ifdef WIN32
+#if defined( __APPLE__ )
+        if( *str == ':' )
+            *str = '_';
+#elif defined( WIN32 )
         switch( *str )
         {
             case '*':
