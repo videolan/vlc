@@ -283,6 +283,7 @@ enum vlc_config_properties
     /* former option name (args=const char *) */
 
     VLC_CONFIG_SAFE,
+    /* usable by external plugins (args=none) */
 };
 
 
