@@ -50,6 +50,7 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf,
     layout->setSpacing( 0 ); layout->setMargin( 0 );
     layout->addWidget( view );
     setLayout( layout );
+
     /* select the first item */
     view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
 }

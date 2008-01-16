@@ -65,8 +65,14 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     rightPanel = qobject_cast<PLPanel *>( new StandardPLPanel( this,
                               p_intf, THEPL, p_root ) );
 
-    /* Connects */
+    /* Connect the activation of the selector to a redefining of the PL */
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
+
+    /* Connect the activated() to the rootChanged() signal
+       This will be used by StandardPLPanel to setCurrentRootId, that will 
+       change the label of the addButton  */
+    connect( selector, SIGNAL( activated( int ) ),
+             this, SIGNAL( rootChanged( int ) ) );
 
     CONNECT( THEMIM->getIM(), artChanged( QString ) , this, setArt( QString ) );
     /* Forward removal requests from the selector to the main panel */
@@ -74,8 +80,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
              shouldRemove( int ),
              qobject_cast<StandardPLPanel *>( rightPanel ), removeItem( int ) );
 
-    connect( selector, SIGNAL( activated( int ) ),
-             this, SIGNAL( rootChanged( int ) ) );
     emit rootChanged( p_root->i_id );
 
     /* Add the two sides of the QSplitter */

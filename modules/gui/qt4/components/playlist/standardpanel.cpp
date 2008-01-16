@@ -294,6 +294,8 @@ void StandardPLPanel::doPopup( QModelIndex index, QPoint point )
     model->popup( index, point, list );
 }
 
+/* Set the root of the new Playlist */
+/* This activated by the selector selection */
 void StandardPLPanel::setRoot( int i_root_id )
 {
     playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_root_id,

@@ -34,6 +34,8 @@
 
 #include "pixmaps/type_unknown.xpm"
 
+#define DEPTH_PL -1
+#define DEPTH_SEL 1
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
 static int PlaylistChanged( vlc_object_t *, const char *,
@@ -61,7 +63,7 @@ static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
 
 void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 {
-    parentItem = parent;          /* Can be NULL */
+    parentItem = parent;          /* Can be NULL, but only for the rootItem */
     i_id       = _i_id;           /* Playlist item specific id */
     i_input_id = _i_input_id;     /* Identifier of the input */
     model      = m;               /* PLModel (QAbsmodel) */
@@ -73,7 +75,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
     /* No parent, should be the main one */
     if( parentItem == NULL )
     {
-        i_showflags = config_GetInt( model->p_intf , "qt-pl-showflags" );
+        i_showflags = config_GetInt( model->p_intf, "qt-pl-showflags" );
         updateview();
     }
     else
@@ -82,6 +84,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
         //Add empty string and update() handles data appending
         item_col_strings.append( "" );
     }
+    msg_Dbg( model->p_intf, "PLItem created: %i", model->i_depth );
 }
 
 /*
@@ -167,13 +170,14 @@ void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 
 void PLItem::remove( PLItem *removed )
 {
-    assert( parentItem ); /* parentItem isn't always defined on the left pane
-                             This will BOOM */
-
-    int i_index = parentItem->children.indexOf( removed );
-    model->beginRemoveRows( model->index( parentItem, 0 ), i_index, i_index );
-    parentItem->children.removeAt( i_index );
-    model->endRemoveRows();
+    if( model->i_depth == DEPTH_SEL || parentItem )
+    {
+        int i_index = parentItem->children.indexOf( removed );
+        model->beginRemoveRows( model->index( parentItem, 0 ),
+                                i_index, i_index );
+        parentItem->children.removeAt( i_index );
+        model->endRemoveRows();
+    }
 }
 
 /* This function is used to get one's parent's row number in the model */
@@ -277,7 +281,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
                   : QAbstractItemModel( parent )
 {
     i_depth = _i_depth;
-    assert( i_depth == 1 || i_depth == -1 );
+    assert( i_depth == DEPTH_SEL || i_depth == DEPTH_PL );
     p_intf            = _p_intf;
     p_playlist        = _p_playlist;
     i_items_to_append = 0;
@@ -738,9 +742,8 @@ void PLModel::ProcessItemRemoval( int i_id )
     if( i_id <= 0 ) return;
     if( i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
-    PLItem *item = FindById( rootItem, i_id );
-    if( item )
-        item->remove( item );
+
+    removeItem( i_id );
 }
 
 void PLModel::ProcessItemAppend( playlist_add_t *p_add )
@@ -756,7 +759,7 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
 
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_TRUE );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
-    if( i_depth == 1 && p_item->p_parent &&
+    if( i_depth == DEPTH_SEL && p_item->p_parent &&
                         p_item->p_parent->i_id != rootItem->i_id )
         goto end;
 
@@ -836,7 +839,7 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
         PLItem *newItem =  new PLItem( p_node->pp_children[i], root, this );
         root->appendChild( newItem, false );
         UpdateTreeItem( newItem, false, true );
-        if( i_depth != 1 && p_node->pp_children[i]->i_children != -1 )
+        if( i_depth == DEPTH_PL && p_node->pp_children[i]->i_children != -1 )
             UpdateNodeChildren( p_node->pp_children[i], newItem );
     }
 }
@@ -855,7 +858,7 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
 {
     if ( !p_item )
         return;
-    if( !force && i_depth == 1 && p_item->p_parent &&
+    if( !force && i_depth == DEPTH_SEL && p_item->p_parent &&
                                  p_item->p_parent->i_id != rootItem->i_id )
         return;
     item->update( p_item, p_item == p_playlist->status.p_item );
