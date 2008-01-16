@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  *
- * $Id: core.c 14187 2006-02-07 16:37:40Z courmisch $
+ * $Id$
  *
  * Authors: Cl�ent Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>
