@@ -263,12 +263,14 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (NSComparisonResult)compare:(VLCMedia *)media
 {
-    if (self == media)
+    libvlc_media_descriptor_t * anOtherMd = [media libVLCMediaDescriptor];
+    /* We can release, we'll just use ptr */
+    libvlc_media_descriptor_release(anOtherMd);
+    if (self == media || p_md == anOtherMd)
         return NSOrderedSame;
     else if (!media)
         return NSOrderedDescending;
-    else
-        return [[[self url] absoluteString] compare:[[media url] absoluteString]];
+    return NSOrderedAscending;
 }
 
 @synthesize delegate;
