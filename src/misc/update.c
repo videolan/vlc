@@ -42,7 +42,6 @@
 #include <vlc_stream.h>
 #include <vlc_interface.h>
 
-#include <unistd.h> /* unlink() */
 
 /*****************************************************************************
  * Misc defines
@@ -1241,7 +1240,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     }
     else
     {
-        unlink( psz_destfile ); /* FIXME: use (and write) utf8_unlink() ? */
+        utf8_unlink( psz_destfile );
         goto end;
     }
 
@@ -1263,7 +1262,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     if( !p_hash )
     {
         msg_Err( p_udt, "Unable to hash %s", psz_destfile );
-        unlink( psz_destfile );
+        utf8_unlink( psz_destfile );
         goto end;
     }
 
@@ -1271,7 +1270,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         p_hash[1] != sign.hash_verification[1] )
     {
         msg_Err( p_udt, "Bad SHA1 hash for %s", psz_destfile );
-        unlink( psz_destfile );
+        utf8_unlink( psz_destfile );
         goto end;
     }
 
@@ -1280,7 +1279,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     {
         msg_Err( p_udt, "BAD SIGNATURE for %s", psz_destfile );
         free( p_hash );
-        unlink( psz_destfile );
+        utf8_unlink( psz_destfile );
         goto end;
     }
 
