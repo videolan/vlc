@@ -607,6 +607,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
 
     i_res = (int)result;
+    if(result == WAIT_TIMEOUT)
+       return WAIT_TIMEOUT; /* this error is perfectly normal */
 
 #elif defined( WIN32 )
     DWORD result;
@@ -695,6 +697,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
+    if(result == WAIT_TIMEOUT)
+       return WAIT_TIMEOUT; /* this error is perfectly normal */
 
     i_res = (int)result;
 
