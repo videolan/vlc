@@ -56,6 +56,7 @@ vlc_module_begin();
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
                   DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_submodule();
     set_description( _("Philips OGT (SVCD subtitle) packetizer") );

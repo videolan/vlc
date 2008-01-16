@@ -64,8 +64,10 @@ vlc_module_begin();
 
     add_bool( "avi-interleaved", 0, NULL,
               INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "avi-index", 0, NULL,
               INDEX_TEXT, INDEX_LONGTEXT, VLC_FALSE );
+        change_safe();
         change_integer_list( pi_index, ppsz_indexes, 0 );
 
     set_callbacks( Open, Close );

@@ -82,14 +82,18 @@ vlc_module_begin();
 
     add_integer_with_range( CFG_PREFIX "u", 120, 0, 255, NULL,
                             BLUESCREENU_TEXT, BLUESCREENU_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer_with_range( CFG_PREFIX "v", 90, 0, 255, NULL,
                             BLUESCREENV_TEXT, BLUESCREENV_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer_with_range( CFG_PREFIX "ut", 17, 0, 255, NULL,
                             BLUESCREENUTOL_TEXT, BLUESCREENUTOL_LONGTEXT,
                             VLC_FALSE );
+        change_safe();
     add_integer_with_range( CFG_PREFIX "vt", 17, 0, 255, NULL,
                             BLUESCREENVTOL_TEXT, BLUESCREENVTOL_LONGTEXT,
                             VLC_FALSE );
+        change_safe();
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {

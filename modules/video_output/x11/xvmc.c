@@ -131,17 +131,25 @@ extern void E_(Deactivate) ( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "XVMC" );
     add_string( "xvmc-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "xvmc-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
+        change_safe();
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
+        change_safe();
 #endif
 #ifdef HAVE_XINERAMA
     add_integer ( "xvmc-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, VLC_TRUE );
+        change_safe();
 #endif
     add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, VLC_FALSE );
+        change_safe();
 
     set_description( _("XVMC extension video output") );
     set_capability( "video output", 160 );

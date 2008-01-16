@@ -97,20 +97,28 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_ACO );
     add_string( SOUT_CFG_PREFIX "user", "", NULL,
                 USER_TEXT, USER_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "pwd", "", NULL,
                 PASS_TEXT, PASS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "mime", "", NULL,
                 MIME_TEXT, MIME_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL,
                 CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "key", NULL, NULL,
                 KEY_TEXT, KEY_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "ca", NULL, NULL,
                 CA_TEXT, CA_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
                 CRL_TEXT, CRL_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( SOUT_CFG_PREFIX "bonjour", VLC_FALSE, NULL,
               BONJOUR_TEXT, BONJOUR_LONGTEXT, VLC_TRUE);
+        change_safe();
     set_callbacks( Open, Close );
 vlc_module_end();
 

@@ -109,21 +109,29 @@ static int MouseEvent( vlc_object_t *, char const *,
 
 vlc_module_begin();
     add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT,
                  VLC_FALSE );
+        change_safe();
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT,
         OSD_FILE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT,
         OSD_PATH_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( OSD_CFG "timeout", 15, NULL, TIMEOUT_TEXT,
         TIMEOUT_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
         OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,
         OSD_UPDATE_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer_with_range( OSD_CFG "alpha", 255, 0, 255, NULL,
         OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     set_capability( "sub filter", 100 );
     set_description( _("On Screen Display menu") );

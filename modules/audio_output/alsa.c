@@ -105,6 +105,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA Device Name"), NULL, VLC_FALSE );
+        change_safe();
         change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
 

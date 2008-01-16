@@ -93,8 +93,10 @@ vlc_module_begin();
         add_obsolete_integer( "gnutls-dh-bits" );
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT, NULL,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, VLC_TRUE );
+            change_safe();
         add_integer( "gnutls-cache-size", CACHE_SIZE, NULL, CACHE_SIZE_TEXT,
                     CACHE_SIZE_LONGTEXT, VLC_TRUE );
+            change_safe();
 vlc_module_end();
 
 

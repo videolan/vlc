@@ -75,6 +75,7 @@ vlc_module_begin();
 
     add_integer_with_range( FILTER_PREFIX "component", 0xFF0000, 1, 0xFFFFFF,
                  NULL, COMPONENT_TEXT, COMPONENT_LONGTEXT, VLC_FALSE );
+        change_safe();
         change_integer_list( pi_component_values, ppsz_component_descriptions, 0 );
 
     set_callbacks( Create, Destroy );

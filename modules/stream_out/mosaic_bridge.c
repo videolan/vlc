@@ -147,17 +147,23 @@ vlc_module_begin();
 
     add_string( CFG_PREFIX "id", "Id", NULL, ID_TEXT, ID_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
     add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
                 RATIO_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( CFG_PREFIX "chroma", 0, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
 
     add_module_list( CFG_PREFIX "vfilter", "video filter2",
                      NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, VLC_FALSE );
+        change_safe();
 
     set_callbacks( Open, Close );
 vlc_module_end();

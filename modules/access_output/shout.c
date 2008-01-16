@@ -110,25 +110,35 @@ vlc_module_begin();
     add_shortcut( "shout" );
     add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream", NULL,
                 NAME_TEXT, NAME_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "description",
                  "Live stream from VLC media player", NULL,
                 DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_bool(   SOUT_CFG_PREFIX "mp3", VLC_FALSE, NULL,
                 MP3_TEXT, MP3_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "genre", "Alternative", NULL,
                 GENRE_TEXT, GENRE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "url", "http://www.videolan.org/vlc", NULL,
                 URL_TEXT, URL_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "bitrate", "", NULL,
                 BITRATE_TEXT, BITRATE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "samplerate", "", NULL,
                 SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "channels", "", NULL,
                 CHANNELS_TEXT, CHANNELS_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( SOUT_CFG_PREFIX "quality", "", NULL,
                 QUALITY_TEXT, QUALITY_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_bool(   SOUT_CFG_PREFIX "public", VLC_FALSE, NULL,
                 PUBLIC_TEXT, PUBLIC_LONGTEXT, VLC_TRUE );
+        change_safe();
     set_callbacks( Open, Close );
 vlc_module_end();
 

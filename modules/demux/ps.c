@@ -57,6 +57,7 @@ vlc_module_begin();
 
     add_bool( "ps-trust-timestamps", VLC_TRUE, NULL, TIME_TEXT,
                  TIME_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_submodule();
     set_description( _("MPEG-PS demuxer") );

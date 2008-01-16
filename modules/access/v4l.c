@@ -149,42 +149,63 @@ vlc_module_begin();
 
     add_integer( "v4l-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( "v4l-vdev", "/dev/video", 0, VDEV_TEXT, VDEV_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
     add_string( "v4l-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
     add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
+        change_safe();
     add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-samplerate", 44100, NULL, SAMPLERATE_TEXT,
                 SAMPLERATE_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
                 VLC_TRUE );
+        change_safe();
     add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
         change_integer_list( i_norm_list, psz_norm_list_text, 0 );
     add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
     add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "v4l-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
             VLC_TRUE );
+        change_safe();
     add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                 VLC_TRUE );
+        change_safe();
     add_integer( "v4l-brightness", -1, NULL, BRIGHTNESS_TEXT,
                 BRIGHTNESS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-colour", -1, NULL, COLOUR_TEXT, COLOUR_LONGTEXT,
                 VLC_TRUE );
+        change_safe();
     add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-contrast", -1, NULL, CONTRAST_TEXT, CONTRAST_LONGTEXT,
                 VLC_TRUE );
+        change_safe();
     add_bool( "v4l-mjpeg", VLC_FALSE, NULL, MJPEG_TEXT, MJPEG_LONGTEXT,
             VLC_TRUE );
+        change_safe();
     add_integer( "v4l-decimation", 1, NULL, DECIMATION_TEXT,
             DECIMATION_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "v4l-quality", 100, NULL, QUALITY_TEXT, QUALITY_LONGTEXT,
             VLC_TRUE );
+        change_safe();
 
     add_shortcut( "v4l" );
     set_capability( "access_demux", 10 );

@@ -112,11 +112,14 @@ vlc_module_begin();
     add_string( "audiofile-format", "s16", NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
         change_string_list( format_list, 0, 0 );
+        change_safe();
     add_integer( "audiofile-channels", 0, NULL,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     set_capability( "audio output", 0 );
     add_shortcut( "file" );

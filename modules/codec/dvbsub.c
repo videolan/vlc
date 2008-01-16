@@ -90,9 +90,12 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_integer( DVBSUB_CFG_PREFIX "position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+        change_safe();
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer( DVBSUB_CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( DVBSUB_CFG_PREFIX "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+        change_safe();
 
 #   define ENC_CFG_PREFIX "sout-dvbsub-"
     add_submodule();
@@ -101,7 +104,9 @@ vlc_module_begin();
     set_callbacks( OpenEncoder, CloseEncoder );
 
     add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_obsolete_integer( ENC_CFG_PREFIX "timeout" ); /* Suppressed since 0.8.5 */
 vlc_module_end();
 

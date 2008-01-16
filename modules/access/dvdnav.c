@@ -84,10 +84,13 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dvdnav-angle", 1, NULL, ANGLE_TEXT,
         ANGLE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "dvdnav-menu", VLC_TRUE, NULL,
         MENU_TEXT, MENU_LONGTEXT, VLC_FALSE );
+        change_safe();
     set_capability( "access_demux", 5 );
     add_shortcut( "dvd" );
     add_shortcut( "dvdnav" );

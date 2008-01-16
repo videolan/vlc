@@ -59,10 +59,14 @@ vlc_module_begin();
 
     add_integer( "fake-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "fake-duration", 0, NULL, DURATION_TEXT, DURATION_LONGTEXT,
                  VLC_TRUE );
+        change_safe();
 
     add_shortcut( "fake" );
     set_capability( "access_demux", 0 );

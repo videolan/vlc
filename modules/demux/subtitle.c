@@ -69,12 +69,15 @@ vlc_module_begin();
     add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "sub-delay", 0, NULL,
                N_("Subtitles delay"),
                SUB_DELAY_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
                 SUB_TYPE_LONGTEXT, VLC_TRUE );
         change_string_list( ppsz_sub_type, NULL, NULL );
+        change_safe();
     set_callbacks( Open, Close );
 
     add_shortcut( "subtitle" );

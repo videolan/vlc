@@ -57,12 +57,15 @@ vlc_module_begin();
 
     add_bool( "playlist-autostart", 1, NULL,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, VLC_FALSE );
+        change_safe();
 
     add_integer( "parent-item", 0, NULL, NULL, NULL, VLC_TRUE );
         change_internal();
+        change_safe();
 
     add_bool( "playlist-skip-ads", 1, NULL,
               SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, VLC_FALSE );
+        change_safe();
 
     set_shortname( _("Playlist") );
     set_description( _("Playlist") );
@@ -106,6 +109,7 @@ vlc_module_begin();
         set_callbacks( E_(Import_Shoutcast), E_(Close_Shoutcast) );
         add_bool( "shoutcast-show-adult", VLC_FALSE, NULL,
                    SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_submodule();
         set_description( _("ASX playlist import") );
         add_shortcut( "asx-open" );

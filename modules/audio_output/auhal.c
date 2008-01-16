@@ -136,6 +136,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     set_callbacks( Open, Close );
     add_integer( "macosx-audio-device", 0, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE );
+        change_safe();
 vlc_module_end();
 
 /*****************************************************************************

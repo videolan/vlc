@@ -114,10 +114,14 @@ vlc_module_begin();
     set_callbacks( CreateOpenGL, DestroyOpenGL );
 
     add_string( "glx-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "glx-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "glx-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
+        change_safe();
 #ifdef HAVE_XINERAMA
     add_integer ( "glx-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, VLC_TRUE );
+        change_safe();
 #endif
 vlc_module_end();
 

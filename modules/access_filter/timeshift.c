@@ -64,9 +64,14 @@ vlc_module_begin();
 
     add_integer( "timeshift-granularity", 50, NULL, GRANULARITY_TEXT,
                  GRANULARITY_LONGTEXT, VLC_TRUE );
+        change_safe();
+
     add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_bool( "timeshift-force", VLC_FALSE, NULL, FORCE_TEXT, FORCE_LONGTEXT,
-              VLC_FALSE );
+      VLC_FALSE );
+        change_safe();
+
 vlc_module_end();
 
 /*****************************************************************************

@@ -75,6 +75,7 @@ vlc_module_begin();
 
     add_string( CFG_PREFIX "type", "90", NULL,
                           TYPE_TEXT, TYPE_LONGTEXT, VLC_FALSE);
+        change_safe();
         change_string_list( type_list, type_list_text, 0);
 
     add_shortcut( "transform" );

@@ -48,6 +48,7 @@ vlc_module_begin();
     add_shortcut( "m4v" );
     add_shortcut( "mp4v" );
     add_float( "m4v-fps", 25, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
+        change_safe();
 vlc_module_end();
 
 /*****************************************************************************

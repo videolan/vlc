@@ -50,6 +50,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "realrtsp-caching", 3000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
     set_capability( "access2", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "realrtsp" );

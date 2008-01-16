@@ -104,28 +104,37 @@ vlc_module_begin();
 
     add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
                                              GEOMETRY_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT,
                                    AUTOCROP_LONGTEXT, VLC_FALSE );
+        change_safe();
 
 #ifdef BEST_AUTOCROP
     add_integer_with_range( "autocrop-ratio-max", 2405, 0, RATIO_MAX, NULL,
                             RATIOMAX_TEXT, RATIOMAX_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, NULL, RATIO_TEXT,
                             RATIO_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "autocrop-time", 25, NULL, TIME_TEXT,
                  TIME_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "autocrop-diff", 16, NULL, DIFF_TEXT,
                                             DIFF_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_integer( "autocrop-non-black-pixels", 3, NULL,
                  NBP_TEXT, NBP_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_integer_with_range( "autocrop-skip-percent", 17, 0, 100, NULL,
                             SKIP_TEXT, SKIP_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_integer_with_range( "autocrop-luminance-threshold", 40, 0, 128, NULL,
                             LUM_TEXT, LUM_LONGTEXT, VLC_TRUE );
+        change_safe();
 #endif //BEST_AUTOCROP
 
     add_shortcut( "crop" );

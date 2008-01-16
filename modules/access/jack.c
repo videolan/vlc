@@ -74,10 +74,13 @@ vlc_module_begin();
 
      add_integer( "jack-input-caching", DEFAULT_PTS_DELAY / 1000, NULL,
          CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
      add_bool( "jack-input-use-vlc-pace", VLC_FALSE, NULL,
          PACE_TEXT, PACE_LONGTEXT, VLC_TRUE );
+        change_safe();
      add_bool( "jack-input-auto-connect", VLC_FALSE, NULL,
          PACE_TEXT, PACE_LONGTEXT, VLC_TRUE );
+        change_safe();
 
      add_shortcut( "jack" );
      set_callbacks( Open, Close );

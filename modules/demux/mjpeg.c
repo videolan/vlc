@@ -52,6 +52,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     add_float( "mjpeg-fps", 0.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
+        change_safe();
 vlc_module_end();
 
 /*****************************************************************************

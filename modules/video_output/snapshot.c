@@ -79,9 +79,13 @@ vlc_module_begin( );
     set_capability( "video output", 1 );
 
     add_integer( "snapshot-width", 320, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "snapshot-height", 200, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( "snapshot-chroma", "RV32", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "snapshot-cache-size", 50, NULL, CACHE_TEXT, CACHE_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     set_callbacks( Create, Destroy );
 vlc_module_end();

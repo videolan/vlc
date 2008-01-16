@@ -70,12 +70,16 @@ vlc_module_begin();
 
     add_integer( "mms-caching", 19 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_bool( "mms-all", 0, NULL, ALL_TEXT, ALL_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  VLC_FALSE );
+        change_safe();
     add_string( "mmsh-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                     VLC_FALSE );
+        change_safe();
 
     add_shortcut( "mms" );
     add_shortcut( "mmsu" );

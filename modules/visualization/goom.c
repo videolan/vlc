@@ -72,10 +72,13 @@ vlc_module_begin();
     set_capability( "visualization", 0 );
     add_integer( "goom-width", 320, NULL,
                  WIDTH_TEXT, RES_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "goom-height", 240, NULL,
                  HEIGHT_TEXT, RES_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "goom-speed", 6, NULL,
                  SPEED_TEXT, SPEED_LONGTEXT, VLC_FALSE );
+        change_safe();
     set_callbacks( Open, Close );
     add_shortcut( "goom" );
 vlc_module_end();

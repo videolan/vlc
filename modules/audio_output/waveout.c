@@ -143,6 +143,7 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
+        change_safe();
     set_callbacks( Open, Close );
 vlc_module_end();
 

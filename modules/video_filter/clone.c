@@ -68,7 +68,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer( CFG_PREFIX "count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string ( CFG_PREFIX "vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_shortcut( "clone" );
     set_callbacks( Create, Destroy );

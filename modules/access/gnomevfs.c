@@ -50,6 +50,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "gnomevfs-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
     set_capability( "access2", 10 );
     add_shortcut( "gnomevfs" );
     set_callbacks( Open, Close );

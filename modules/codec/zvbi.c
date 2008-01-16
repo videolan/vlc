@@ -104,12 +104,16 @@ vlc_module_begin();
 
     add_integer( "vbi-page", 100, NULL,
                  PAGE_TEXT, PAGE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_bool( "vbi-opaque", VLC_TRUE, NULL,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
+        change_safe();
     add_bool( "vbi-text", VLC_FALSE, NULL,
               TELX_TEXT, TELX_LONGTEXT, VLC_FALSE );
+        change_safe();
 vlc_module_end();
 
 /****************************************************************************

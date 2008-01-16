@@ -40,6 +40,7 @@ vlc_module_begin();
     set_callbacks (Open, Close);
     add_file ("soundfont", "", NULL,
               SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT, VLC_FALSE);
+        change_safe();
 vlc_module_end();
 
 

@@ -123,33 +123,39 @@ vlc_module_begin();
     add_integer ( MODULE_STRING "-debug", 0, CDDADebugCB,
                   N_("Additional debug"),
                   DEBUG_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_integer( MODULE_STRING "-caching",
                  DEFAULT_PTS_DELAY / MILLISECONDS_PER_SEC, NULL,
                  N_("Caching value in microseconds"),
                  CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_integer( MODULE_STRING "-blocks-per-read",
                  DEFAULT_BLOCKS_PER_READ, CDDABlocksPerReadCB,
                  N_("Number of blocks per CD read"),
                  BLOCKS_PER_READ_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_string( MODULE_STRING "-title-format",
                 "Track %T. %t", NULL,
                 N_("Format to use in playlist \"title\" field when no CDDB"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
+        change_safe();
 
 #if LIBCDIO_VERSION_NUM >= 73
     add_bool( MODULE_STRING "-analog-output", VLC_FALSE, NULL,
               N_("Use CD audio controls and output?"),
               N_("If set, audio controls and audio jack output are used"),
               VLC_FALSE );
+        change_safe();
 #endif
 
     add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, CDTextEnabledCB,
               N_("Do CD-Text lookups?"),
               N_("If set, get CD-Text information"),
               VLC_FALSE );
+        change_safe();
 
     add_bool( MODULE_STRING "-navigation-mode", VLC_TRUE,
 #if FIXED
@@ -161,6 +167,7 @@ vlc_module_begin();
               N_("Tracks are navigated via Navagation rather than "
          "a playlist entries"),
               VLC_FALSE );
+        change_safe();
 
 #if LIBCDIO_VERSION_NUM >= 72
       add_string( MODULE_STRING "-paranoia", NULL, NULL,
@@ -168,6 +175,7 @@ vlc_module_begin();
         PARANOIA_LONGTEXT,
         VLC_FALSE );
       change_string_list( psz_paranoia_list, psz_paranoia_list_text, 0 );
+        change_safe();
 #endif /* LIBCDIO_VERSION_NUM >= 72 */
 
 #ifdef HAVE_LIBCDDB
@@ -176,55 +184,65 @@ vlc_module_begin();
                 "Track %T. %t - %p %A", NULL,
                 N_("Format to use in playlist \"title\" field when using CDDB"),
                 CDDB_TITLE_FMT_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     add_bool( MODULE_STRING "-cddb-enabled", VLC_TRUE, CDDBEnabledCB,
               N_("CDDB lookups"),
               N_("If set, lookup CD-DA track information using the CDDB "
                  "protocol"),
               VLC_FALSE );
+        change_safe();
 
     add_string( MODULE_STRING "-cddb-server", "freedb.freedb.org", NULL,
                 N_("CDDB server"),
                 N_( "Contact this CDDB server look up CD-DA information"),
         VLC_TRUE );
+        change_safe();
 
     add_integer( MODULE_STRING "-cddb-port", 8880, NULL,
                  N_("CDDB server port"),
                  N_("CDDB server uses this port number to communicate on"),
                  VLC_TRUE );
+        change_safe();
 
     add_string( MODULE_STRING "-cddb-email", "me@home", NULL,
                 N_("email address reported to CDDB server"),
                 N_("email address reported to CDDB server"),
         VLC_TRUE );
+        change_safe();
 
     add_bool( MODULE_STRING "-cddb-enable-cache", VLC_TRUE, NULL,
               N_("Cache CDDB lookups?"),
               N_("If set cache CDDB information about this CD"),
               VLC_FALSE );
+        change_safe();
 
     add_bool( MODULE_STRING "-cddb-httpd", VLC_FALSE, NULL,
               N_("Contact CDDB via the HTTP protocol?"),
               N_("If set, the CDDB server gets information via the CDDB HTTP "
                  "protocol"),
               VLC_TRUE );
+        change_safe();
 
     add_integer( MODULE_STRING "-cddb-timeout", 10, NULL,
                  N_("CDDB server timeout"),
                  N_("Time (in seconds) to wait for a response from the "
                     "CDDB server"),
                  VLC_FALSE );
+        change_safe();
 
     add_string( MODULE_STRING "-cddb-cachedir", "~/.cddbslave", NULL,
                 N_("Directory to cache CDDB requests"),
                 N_("Directory to cache CDDB requests"),
         VLC_TRUE );
+    /* XXX:  change_safe(); ?*/
 
     add_bool( MODULE_STRING "-cdtext-prefer", VLC_TRUE, CDTextPreferCB,
               N_("Prefer CD-Text info to CDDB info?"),
               N_("If set, CD-Text information will be preferred "
          "to CDDB information when both are available"),
               VLC_FALSE );
+        change_safe();
 #endif /*HAVE_LIBCDDB*/
 
 vlc_module_end();

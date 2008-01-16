@@ -112,6 +112,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_integer( "portaudio-device", 0, NULL,
                  DEVICE_TEXT, DEVICE_LONGTEXT, VLC_FALSE );
+        change_safe();
     set_capability( "audio output", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();

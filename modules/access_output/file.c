@@ -72,6 +72,7 @@ vlc_module_begin();
     add_shortcut( "stream" );
     add_bool( SOUT_CFG_PREFIX "append", 0, NULL, APPEND_TEXT,APPEND_LONGTEXT,
               VLC_TRUE );
+        change_safe();
     set_callbacks( Open, Close );
 vlc_module_end();
 

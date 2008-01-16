@@ -80,12 +80,15 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  VLC_TRUE );
+        change_safe();
     add_obsolete_integer( SOUT_CFG_PREFIX "late" );
     add_obsolete_bool( SOUT_CFG_PREFIX "raw" );
     add_bool( SOUT_CFG_PREFIX "auto-mcast", VLC_FALSE, NULL, AUTO_MCAST_TEXT,
               AUTO_MCAST_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );

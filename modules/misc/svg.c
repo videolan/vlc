@@ -67,12 +67,13 @@ static char *svg_GetTemplate( vlc_object_t *p_this );
         "for automatic string conversion" )
 
 vlc_module_begin();
- set_category( CAT_INPUT);
- set_category( SUBCAT_INPUT_SCODEC );
- set_capability( "text renderer", 99 );
- add_shortcut( "svg" );
- add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, VLC_TRUE );
- set_callbacks( Create, Destroy );
+    set_category( CAT_INPUT);
+    set_category( SUBCAT_INPUT_SCODEC );
+    set_capability( "text renderer", 99 );
+    add_shortcut( "svg" );
+    add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, VLC_TRUE );
+        change_safe();
+    set_callbacks( Create, Destroy );
 vlc_module_end();
 
 /**

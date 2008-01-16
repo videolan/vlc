@@ -159,28 +159,35 @@ vlc_module_begin();
 
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
               VLC_FALSE );
+        change_safe();
 
     add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_TRUE );
+        change_safe();
 
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "freetype-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, VLC_FALSE );
+        change_safe();
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
 
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, VLC_FALSE );
+        change_safe();
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
     add_integer( "freetype-effect", 2, NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_FALSE );
+        change_safe();
         change_integer_list( pi_effects, ppsz_effects_text, 0 );
 
     add_bool( "freetype-yuvp", 0, NULL, YUVP_TEXT,
               YUVP_LONGTEXT, VLC_TRUE );
+        change_safe();
     set_capability( "text renderer", 100 );
     add_shortcut( "text" );
     set_callbacks( Create, Destroy );

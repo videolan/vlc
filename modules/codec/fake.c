@@ -89,24 +89,33 @@ vlc_module_begin();
 
     add_file( "fake-file", "", NULL, FILE_TEXT,
                 FILE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "fake-file-reload", 0, NULL, RELOAD_TEXT,
                 RELOAD_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_integer( "fake-width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "fake-height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "fake-keep-ar", 0, NULL, KEEP_AR_TEXT, KEEP_AR_LONGTEXT,
               VLC_TRUE );
+        change_safe();
     add_string( "fake-aspect-ratio", "", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "fake-deinterlace", 0, NULL, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, VLC_FALSE );
+        change_safe();
     add_string( "fake-deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
                 VLC_FALSE );
+        change_safe();
         change_string_list( ppsz_deinterlace_type, 0, 0 );
     add_string( "fake-chroma", "I420", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
+        change_safe();
 vlc_module_end();
 
 struct decoder_sys_t

@@ -77,14 +77,20 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
+        change_safe();
     add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
+        change_safe();
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
+        change_safe();
 #endif
 #ifdef HAVE_XINERAMA
     add_integer ( "xvideo-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, VLC_TRUE );
+        change_safe();
 #endif
 
     set_description( _("XVideo extension video output") );

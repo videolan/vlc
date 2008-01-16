@@ -65,6 +65,7 @@ vlc_module_begin();
 
     add_integer_with_range( FILTER_PREFIX "angle", 30, 0, 359, NULL,
         ANGLE_TEXT, ANGLE_LONGTEXT, VLC_FALSE );
+        change_safe();
 
     add_shortcut( "rotate" );
     set_callbacks( Create, Destroy );
