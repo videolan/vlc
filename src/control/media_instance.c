@@ -153,7 +153,7 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_event_type_t type = newval.i_int;
 
     if( strcmp( psz_cmd, "state" ) )
-        type = var_GetBool( p_this, "state" );
+        type = var_GetInteger( p_this, "state" );
 
     switch ( type )
     {
