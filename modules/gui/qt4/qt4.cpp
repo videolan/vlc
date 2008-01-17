@@ -320,8 +320,7 @@ static void Init( intf_thread_t *p_intf )
     /* And quit */
     MainInputManager::killInstance();
     DialogsProvider::killInstance();
-    // This can occasion double free. to check
-    //delete p_intf->p_sys->p_mi;
+    delete p_intf->p_sys->p_mi;
     delete app;
 }
 
