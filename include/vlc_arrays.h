@@ -290,11 +290,6 @@ typedef struct vlc_array_t
     void ** pp_elems;
 } vlc_array_t;
 
-static inline vlc_array_t * vlc_array_new( void )
-{
-    return (vlc_array_t *)calloc( 1, sizeof(vlc_array_t) );
-}
-
 static inline void vlc_array_init( vlc_array_t * p_array )
 {
     memset( p_array, 0, sizeof(vlc_array_t) );
@@ -304,6 +299,13 @@ static inline void vlc_array_clear( vlc_array_t * p_array )
 {
     free( p_array->pp_elems );
     memset( p_array, 0, sizeof(vlc_array_t) );
+}
+
+static inline vlc_array_t * vlc_array_new( void )
+{
+    vlc_array_t * ret = malloc( sizeof(vlc_array_t) );
+    vlc_array_init( ret );
+    return ret;
 }
 
 static inline void vlc_array_destroy( vlc_array_t * p_array )
