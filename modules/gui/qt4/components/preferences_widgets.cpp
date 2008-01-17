@@ -1016,6 +1016,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 
     QPushButton *clearButton = new QPushButton( qtr( "Clear" ) );
     QPushButton *setButton = new QPushButton( qtr( "Set" ) );
+    setButton->setDefault( true );
     finish();
 
     gLayout->addWidget( label, 0, 0, 1, 4 );
@@ -1036,15 +1037,17 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 void KeySelectorControl::finish()
 {
     if( label )
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip( qtr( p_item->psz_longtext ) ) );
 
     /* Fill the table */
     table->setColumnCount( 2 );
     table->setAlternatingRowColors( true );
 
+    /* Get the main Module */
     module_t *p_main = module_Find( p_this, "main" );
     assert( p_main );
 
+    /* Access to the module_config_t */
     unsigned confsize;
     module_config_t *p_config;
 
@@ -1054,15 +1057,24 @@ void KeySelectorControl::finish()
     {
         module_config_t *p_item = p_config + i;
 
-        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
-            strstr( p_item->psz_name , "key-" ) && !EMPTY_STR( p_item->psz_text ) )
+        /* If we are a key option not empty */
+        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name
+            && strstr( p_item->psz_name , "key-" )
+            && !EMPTY_STR( p_item->psz_text ) )
         {
+            /*
+               Each tree item has:
+                - QString text in column 0
+                - QString name in data of column 0
+                - KeyValue in String in column 1
+                - KeyValue in int in column 1
+             */
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
             treeItem->setText( 0, qtr( p_item->psz_text ) );
-            treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
             treeItem->setData( 0, Qt::UserRole,
-                                  QVariant::fromValue( (void*)p_item ) );
-            values += p_item;
+                               QVariant( qfu( p_item->psz_name ) ) );
+            treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
+            treeItem->setData( 1, Qt::UserRole, QVariant( p_item->value.i ) );
             table->addTopLevelItem( treeItem );
         }
     }
@@ -1078,9 +1090,11 @@ void KeySelectorControl::finish()
     CONNECT( shortcutValue, pressed(), this, selectKey() );
 }
 
+/* Show the key selected from the table in the keySelector */
 void KeySelectorControl::select1Key( QTreeWidgetItem *keyItem )
 {
     shortcutValue->setText( keyItem->text( 1 ) );
+    shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toInt() );
 }
 
 void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
@@ -1092,28 +1106,32 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
        and the shortcutValue is clicked */
     if( !keyItem ) return;
 
-    module_config_t *p_keyItem = static_cast<module_config_t*>
-                          (keyItem->data( 0, Qt::UserRole ).value<void*>());
-
-    KeyInputDialog *d = new KeyInputDialog( values, p_keyItem->psz_text, widget );
+    /* Launch a small dialog to ask for a new key */
+    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), widget );
     d->exec();
+
     if( d->result() == QDialog::Accepted )
     {
-        p_keyItem->value.i = d->keyValue;
+        int newValue = d->keyValue;
+        shortcutValue->setText( VLCKeyToString( newValue ) );
+        shortcutValue->setValue( newValue );
+
         if( d->conflicts )
         {
+            QTreeWidgetItem *it;
             for( int i = 0; i < table->topLevelItemCount() ; i++ )
             {
-                QTreeWidgetItem *it = table->topLevelItem(i);
-                module_config_t *p_item = static_cast<module_config_t*>
-                              (it->data( 0, Qt::UserRole ).value<void*>());
-                if( p_keyItem != p_item && p_item->value.i == d->keyValue )
-                    p_item->value.i = 0;
-                shortcutValue->setText( VLCKeyToString( p_item->value.i ) );
+                it = table->topLevelItem(i);
+                if( ( keyItem != it )
+                        && ( it->data( 1, Qt::UserRole ).toInt() == newValue ) )
+                {
+                    it->setData( 1, Qt::UserRole, QVariant( -1 ) );
+                    it->setText( 1, qtr( "Unset" ) );
+                }
             }
+            /* We already made an OK once. */
+            setTheKey();
         }
-        else
-            shortcutValue->setText( VLCKeyToString( p_keyItem->value.i ) );
     }
     delete d;
 }
@@ -1121,30 +1139,35 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
 void KeySelectorControl::setTheKey()
 {
     table->currentItem()->setText( 1, shortcutValue->text() );
+    table->currentItem()->setData( 1, Qt::UserRole, shortcutValue->getValue() );
 }
 
 void KeySelectorControl::doApply()
 {
-    foreach( module_config_t *p_current, values )
+    QTreeWidgetItem *it;
+    for( int i = 0; i < table->topLevelItemCount() ; i++ )
     {
-        config_PutInt( p_this, p_current->psz_name, p_current->value.i );
+        it = table->topLevelItem(i);
+        if( it->data( 1, Qt::UserRole ).toInt() >= 0 )
+            config_PutInt( p_this,
+                           qtu( it->data( 0, Qt::UserRole ).toString() ),
+                           it->data( 1, Qt::UserRole ).toInt() );
     }
 }
 
-KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
-                                const char * _keyToChange,
+KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
+                                QString keyToChange,
                                 QWidget *_parent ) :
                                 QDialog( _parent ), keyValue(0)
 {
     setModal( true );
-    values = _values;
     conflicts = false;
-    keyToChange = _keyToChange;
 
-    setWindowTitle( qtr( "Hotkey for " ) + qfu( keyToChange)  );
+    table = _table;
+    setWindowTitle( qtr( "Hotkey for " ) + keyToChange );
 
     vLayout = new QVBoxLayout( this );
-    selected = new QLabel( qtr("Press the new keys for ") + qfu( keyToChange ) );
+    selected = new QLabel( qtr( "Press the new keys for " ) + keyToChange );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
     buttonBox = new QDialogButtonBox;
@@ -1152,6 +1175,7 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
     QPushButton *cancel = new QPushButton( qtr("Cancel") );
     buttonBox->addButton( ok, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
+    ok->setDefault( true );
 
     vLayout->addWidget( buttonBox );
     buttonBox->hide();
@@ -1162,27 +1186,18 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
 
 void KeyInputDialog::checkForConflicts( int i_vlckey )
 {
-    conflicts = false;
-    module_config_t *p_current = NULL;
-    /* Search for conflicts */
-    foreach( p_current, values )
-    {
-        if( p_current->value.i == i_vlckey && strcmp( p_current->psz_text,
-                                                    keyToChange ) )
-        {
-            conflicts = true;
-            break;
-        }
-    }
+     QList<QTreeWidgetItem *> conflictList =
+         table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly, 1 );
 
-    if( conflicts )
+    if( conflictList.size() )
     {
         QLabel *warning = new QLabel(
-          qtr("Warning: the  key is already assigned to \"") +
-          qfu( p_current->psz_text ) + "\"" );
-        warning->setWordWrap( true );
+          qtr("Warning: the key is already assigned to \"") +
+          conflictList[0]->text( 0 ) + "\"" );
         vLayout->insertWidget( 1, warning );
         buttonBox->show();
+
+        conflicts = true;
     }
     else accept();
 }
@@ -1191,7 +1206,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 {
     if( e->key() == Qt::Key_Tab ) return;
     int i_vlck = qtEventToVLCKey( e );
-    selected->setText( VLCKeyToString( i_vlck ) );
+    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
 }
@@ -1199,7 +1214,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
     int i_vlck = qtWheelEventToVLCKey( e );
-    selected->setText( VLCKeyToString( i_vlck ) );
+    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
 }
@@ -1208,3 +1223,4 @@ void KeyShortcutEdit::mousePressEvent( QMouseEvent *)
 {
     emit pressed();
 }
+

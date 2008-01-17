@@ -412,27 +412,14 @@ private slot:
 /**********************************************************************
  * Key selector widget
  **********************************************************************/
-class KeyInputDialog : public QDialog
-{
-public:
-    KeyInputDialog( QList<module_config_t *> &, const char *, QWidget * );
-    int keyValue;
-    bool conflicts;
-private:
-    void checkForConflicts( int i_vlckey );
-    void keyPressEvent( QKeyEvent *);
-    void wheelEvent( QWheelEvent *);
-    QLabel *selected;
-    QVBoxLayout *vLayout;
-    const char *keyToChange;
-    QList<module_config_t*> values;
-    QDialogButtonBox *buttonBox;
-};
-
 class KeyShortcutEdit: public QLineEdit
 {
     Q_OBJECT
+public:
+    void setValue( int _value ){ value = _value; }
+    int getValue(){ return value; }
 private:
+    int value;
     virtual void mousePressEvent( QMouseEvent *event );
 signals:
     void pressed();
@@ -461,4 +448,19 @@ private slots:
     void select1Key( QTreeWidgetItem *);
 };
 
+class KeyInputDialog : public QDialog
+{
+public:
+    KeyInputDialog( QTreeWidget *, QString, QWidget * );
+    int keyValue;
+    bool conflicts;
+private:
+    QTreeWidget *table;
+    void checkForConflicts( int i_vlckey );
+    void keyPressEvent( QKeyEvent *);
+    void wheelEvent( QWheelEvent *);
+    QLabel *selected;
+    QVBoxLayout *vLayout;
+    QDialogButtonBox *buttonBox;
+};
 #endif
