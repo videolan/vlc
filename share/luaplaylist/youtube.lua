@@ -87,7 +87,7 @@ function parse()
         if not base_yt_url then
             base_yt_url = "http://youtube.com/"
         end
-        art_url = get_arturl( vlc.path, video_id )
+        arturl = get_arturl( vlc.path, video_id )
         if t then
             return { { path = base_yt_url .. "get_video?video_id="..video_id.."&t="..t; name = name; description = description; artist = artist; arturl = arturl } }
         else
@@ -99,7 +99,7 @@ function parse()
             name = get_url_param( vlc.path, "title" )
         end
         video_id = get_url_param( vlc.path, "video_id" )
-        art_url = get_arturl( vlc.path, video_id )
+        arturl = get_arturl( vlc.path, video_id )
         if not string.match( vlc.path, "t=" ) then
             -- This sucks, we're missing "t" which is now mandatory. Let's
             -- try using another url
