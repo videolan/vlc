@@ -292,8 +292,7 @@ typedef struct vlc_array_t
 
 static inline vlc_array_t * vlc_array_new( void )
 {
-    return calloc( 1, sizeof(vlc_array_t) );
-    
+    return (vlc_array_t *)calloc( 1, sizeof(vlc_array_t) );
 }
 
 static inline void vlc_array_init( vlc_array_t * p_array )
@@ -491,7 +490,7 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
 
     ppsz_ret = (char**)malloc(sizeof(char *) * (count + 1));
     assert( ppsz_ret );
- 
+
     count = 0;
     for( i = 0; i < p_dict->i_size; i++ )
     {
@@ -554,7 +553,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
             struct vlc_dictionary_t new_dict;
             int i_new_size = ( (p_dict->i_size+2) * 3) / 2; /* XXX: this need tuning */
             int i;
- 
+
             vlc_dictionary_init( &new_dict, i_new_size );
             for( i = 0; i < p_dict->i_size; i++ )
             {
