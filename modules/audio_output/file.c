@@ -101,7 +101,7 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('s','p','i','f') };
 
 #define FILE_TEXT N_("Output file")
-#define FILE_LONGTEXT N_("File to which the audio samples will be written to.")
+#define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")
 
 vlc_module_begin();
     set_description( _("File audio output") );
@@ -154,7 +154,11 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_aout->output.p_sys->p_file = utf8_fopen( psz_name, "wb" );
+    if( !strcmp( psz_name, "-" ) )
+        p_aout->output.p_sys->p_file = stdout;
+    else
+        p_aout->output.p_sys->p_file = utf8_fopen( psz_name, "wb" );
+
     free( psz_name );
     if ( p_aout->output.p_sys->p_file == NULL )
     {
@@ -182,7 +186,8 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Err( p_aout, "cannot understand the format string (%s)",
                  psz_format );
-        fclose( p_aout->output.p_sys->p_file );
+        if( p_aout->output.p_sys->p_file != stdout )
+            fclose( p_aout->output.p_sys->p_file );
         free( p_aout->output.p_sys );
         return VLC_EGENERIC;
     }
@@ -309,7 +314,8 @@ static void Close( vlc_object_t * p_this )
         }
     }
 
-    fclose( p_aout->output.p_sys->p_file );
+    if( p_aout->output.p_sys->p_file != stdout )
+        fclose( p_aout->output.p_sys->p_file );
     free( p_aout->output.p_sys );
 }
 
