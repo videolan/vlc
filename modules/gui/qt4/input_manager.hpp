@@ -28,6 +28,23 @@
 #include <vlc_input.h>
 
 #include <QObject>
+#include <QEvent>
+
+static int PositionUpdate_Type = QEvent::User + 6;
+static int ItemChanged_Type = QEvent::User + 7;
+static int ItemRateChanged_Type = QEvent::User + 8;
+static int ItemTitleChanged_Type = QEvent::User + 9;
+static int ItemStateChanged_Type = QEvent::User + 10;
+
+class IMEvent : public QEvent
+{
+public:
+    IMEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
+    { i_id = id ; } ;
+    virtual ~IMEvent() {};
+
+    int i_id;
+};
 
 class InputManager : public QObject
 {
@@ -42,6 +59,14 @@ public:
     bool hasVideo() { return b_has_video; }
     bool b_has_audio, b_has_video, b_had_audio, b_had_video;
 private:
+    void customEvent( QEvent * );
+    void addCallbacks( void );
+    void delCallbacks( void );
+    void UpdateRate( void );
+    void UpdateMeta( void );
+    void UpdateStatus( void );
+    void UpdateTitle( void );
+    void UpdatePosition( void );
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
     int             i_old_playing_status;
@@ -99,6 +124,7 @@ public:
     InputManager *getIM() { return im; };
 
 private:
+    void customEvent( QEvent * );
     MainInputManager( intf_thread_t * );
 
     InputManager            *im;
@@ -111,7 +137,7 @@ public slots:
     void next();
     void prev();
 private slots:
-    void updateInput();
+    //void updateInput();
 signals:
     void inputChanged( input_thread_t * );
 };
