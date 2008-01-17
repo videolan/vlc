@@ -35,6 +35,7 @@ static int ItemChanged_Type = QEvent::User + 7;
 static int ItemRateChanged_Type = QEvent::User + 8;
 static int ItemTitleChanged_Type = QEvent::User + 9;
 static int ItemStateChanged_Type = QEvent::User + 10;
+static int VolumeChanged_Type = QEvent::User + 11;
 
 class IMEvent : public QEvent
 {
@@ -75,7 +76,6 @@ private:
     int             i_rate;
 public slots:
     void togglePlayPause();
-    void update(); ///< Periodic updates
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
     void slower();
@@ -140,6 +140,7 @@ private slots:
     //void updateInput();
 signals:
     void inputChanged( input_thread_t * );
+    void volumeChanged( void );
 };
 
 #endif

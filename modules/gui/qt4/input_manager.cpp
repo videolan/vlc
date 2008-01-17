@@ -39,6 +39,8 @@ static int ItemRateChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int ItemTitleChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
+static int VolumeChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 
 /**********************************************************************
  * InputManager implementation
@@ -174,6 +176,16 @@ static int InputChanged( vlc_object_t *p_this, const char *psz_var,
     MainInputManager *im = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
+    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
+}
+
+static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    MainInputManager *im = (MainInputManager*)param;
+
+    IMEvent *event = new IMEvent( VolumeChanged_Type, newval.i_int );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
@@ -329,11 +341,6 @@ void InputManager::UpdateMeta( void )
 
 }
 
-void InputManager::update()
-{
-
-}
-
 void InputManager::sliderUpdate( float new_pos )
 {
     if( hasInput() ) var_SetFloat( p_input, "position", new_pos );
@@ -464,6 +471,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
     im = new InputManager( this, p_intf );
     var_AddCallback( THEPL, "playlist-current", InputChanged, this );
     var_AddCallback( THEPL, "activity", InputChanged, this );
+    var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
              im,   setInput( input_thread_t * ) );
@@ -476,6 +484,7 @@ MainInputManager::~MainInputManager()
        vlc_object_release( p_input );
        emit inputChanged( NULL );
     }
+    var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
     var_DelCallback( THEPL, "playlist-current", InputChanged, this );
     var_DelCallback( THEPL, "activity", InputChanged, this );
 }
@@ -483,8 +492,14 @@ MainInputManager::~MainInputManager()
 void MainInputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    if ( type != ItemChanged_Type )
+    if ( type != ItemChanged_Type && type != VolumeChanged_Type )
         return;
+
+    if( type == VolumeChanged_Type )
+    {
+        emit volumeChanged();
+        return;
+    }
     
     if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
@@ -551,6 +566,8 @@ void MainInputManager::togglePlayPause()
     getIM()->togglePlayPause();
 }
 
+
+
 static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param )
 {
@@ -566,3 +583,4 @@ static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
     im->b_has_video = true;
     return VLC_SUCCESS;
 }
+

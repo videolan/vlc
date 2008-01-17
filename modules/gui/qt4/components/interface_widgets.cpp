@@ -581,6 +581,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
+    CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
 }
 
 ControlsWidget::~ControlsWidget()
@@ -655,7 +656,7 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
     else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-medium.png" ) );
 }
 
-void ControlsWidget::updateOnTimer()
+void ControlsWidget::updateVolume()
 {
     /* Audio part */
     audio_volume_t i_volume;

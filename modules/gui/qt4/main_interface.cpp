@@ -889,8 +889,6 @@ void MainInterface::updateOnTimer()
         need_components_update = false;
     }
 #endif
-
-    controls->updateOnTimer();
 }
 
 /*****************************************************************************

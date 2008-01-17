@@ -152,7 +152,6 @@ public:
     void enableVideo( bool );
 public slots:
     void setNavigation( int );
-    void updateOnTimer();
 protected:
     friend class MainInterface;
     friend class VolumeClickHandler;
@@ -176,6 +175,7 @@ private slots:
     void prev();
     void next();
     void updateVolume( int );
+    void updateVolume( void );
     void fullscreen();
     void extSettings();
     void faster();
