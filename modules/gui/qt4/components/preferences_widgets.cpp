@@ -1204,7 +1204,8 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
 
 void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 {
-    if( e->key() == Qt::Key_Tab ) return;
+    if( e->key() == Qt::Key_Tab ||
+        ( e->modifiers() > 0 && e->modifiers() != Qt::KeypadModifier ) ) return;
     int i_vlck = qtEventToVLCKey( e );
     selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
     checkForConflicts( i_vlck );
