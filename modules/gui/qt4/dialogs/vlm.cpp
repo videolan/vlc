@@ -161,7 +161,8 @@ void VLMDialog::showScheduleWidget( int i )
 
 void VLMDialog::selectVLMItem( int i )
 {
-    ui.vlmItemScroll->ensureWidgetVisible( vlmItems.at( i ) );
+    if( i >= 0 )
+        ui.vlmItemScroll->ensureWidgetVisible( vlmItems.at( i ) );
 }
 
 bool VLMDialog::isNameGenuine( QString name )
@@ -228,6 +229,7 @@ void VLMDialog::addVLMItem()
 
     vlmItemLayout->insertWidget( vlmItemCount, vlmAwidget );
     vlmItems.append( vlmAwidget );
+    clearWidgets();
 }
 
 void VLMDialog::clearWidgets()
@@ -265,7 +267,6 @@ void VLMDialog::removeVLMItem( VLMAWidget *vlmObj )
     int index = vlmItems.indexOf( vlmObj );
     if( index < 0 ) return;
 
-    //FIXME, this is going to segfault if the focus in on the ListWidget
     delete ui.vlmListItem->takeItem( index );
     vlmItems.removeAt( index );
     delete vlmObj;
