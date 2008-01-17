@@ -140,7 +140,12 @@ struct access_sys_t
     vlc_bool_t b_reconnect;
     vlc_bool_t b_continuous;
     vlc_bool_t b_pace_control;
+    
+    vlc_array_t * cookies;
 };
+
+/* */
+static int OpenWithRedirectionStatus( vlc_object_t *p_this, vlc_bool_t b_is_from_redirection );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -152,14 +157,27 @@ static int Connect( access_t *, int64_t );
 static int Request( access_t *p_access, int64_t i_tell );
 static void Disconnect( access_t * );
 
+/* Small Cookie utilities. Cookies support is partial. */
+static char * cookie_get_content( const char * cookie );
+static char * cookie_get_domain( const char * cookie );
+static char * cookie_get_name( const char * cookie );
+static void cookie_append( vlc_array_t * cookies, char * cookie );
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
+    return OpenWithRedirectionStatus( p_this, VLC_FALSE );
+}
+
+static int OpenWithRedirectionStatus( vlc_object_t *p_this, vlc_bool_t b_is_from_redirection )
+{
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz, *p;
+
+    vlc_array_t * saved_cookies = b_is_from_redirection ? p_access->p_sys->cookies : vlc_array_new();
 
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
@@ -182,7 +200,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
-
+    p_sys->cookies = saved_cookies;
 
     /* Parse URI - remove spaces */
     p = psz = strdup( p_access->psz_path );
@@ -318,6 +336,8 @@ connect:
         p_sys->psz_location && *p_sys->psz_location )
     {
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
+        printf("redirection to %s", p_sys->psz_location );
+
 
         /* Do not accept redirection outside of HTTP works */
         if( strncmp( p_sys->psz_location, "http", 4 )
@@ -326,17 +346,6 @@ connect:
         {
             msg_Err( p_access, "insecure redirection ignored" );
             goto error;
-        }
-        if( p_sys->i_code == 301 )
-        {
-            /* Permanent redirection: Change the URI */
-            input_thread_t * p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
-            if( p_input )
-            {
-                input_item_t * p_input_item = input_GetItem(p_input);
-                input_item_SetURI( p_input_item, p_sys->psz_location );
-                vlc_object_release( p_input );
-            }
         }
         free( p_access->psz_path );
         p_access->psz_path = strdup( p_sys->psz_location );
@@ -352,7 +361,7 @@ connect:
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return Open( p_this );
+        return OpenWithRedirectionStatus( p_this, VLC_TRUE );
     }
 
     if( p_sys->b_mms )
@@ -448,6 +457,12 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_user_agent );
 
     Disconnect( p_access );
+
+    int i;
+    for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
+        free(vlc_array_item_at_index( p_sys->cookies, i ));
+    vlc_array_destroy( p_sys->cookies );
+
     free( p_sys );
 }
 
@@ -932,6 +947,26 @@ static int Request( access_t *p_access, int64_t i_tell )
                     "Range: bytes="I64Fd"-\r\n", i_tell );
     }
 
+    /* Cookies */
+    int i;
+    for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
+    {
+        const char * cookie = vlc_array_item_at_index( p_sys->cookies, i );
+        char * psz_cookie_content = cookie_get_content( cookie );
+        char * psz_cookie_domain = cookie_get_domain( cookie );
+        if( psz_cookie_content &&
+             /* Check to see if we are in the right domain */
+            ( !psz_cookie_domain || strstr( p_sys->url.psz_host, psz_cookie_domain ))
+          )
+        {
+            msg_Dbg( p_access, "Sending Cookie %s", psz_cookie_content );
+            if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookie_content ) < 0 )
+                msg_Err( p_access, "failed to send Cookie" );
+        }
+        free( psz_cookie_content );
+        free( psz_cookie_domain );
+    }
+
     /* Authentication */
     if( p_sys->url.psz_username || p_sys->url.psz_password )
     {
@@ -1184,6 +1219,10 @@ static int Request( access_t *p_access, int64_t i_tell )
                  !strncasecmp( psz, "x-audiocast", 11 ) )
         {
             msg_Dbg( p_access, "Meta-Info: %s: %s", psz, p );
+        } else if( !strcasecmp( psz, "Set-Cookie" ) )
+        {
+            msg_Dbg( p_access, "Accepting Cookie: %s", p );
+            cookie_append( p_sys->cookies, strdup(p) );
         }
 
         free( psz );
@@ -1215,3 +1254,96 @@ static void Disconnect( access_t *p_access )
     }
 
 }
+
+/*****************************************************************************
+ * Cookies (FIXME: we may want to rewrite that using a nice structure to hold
+ * them) (FIXME: only support the "domain=" param)
+ *****************************************************************************/
+
+/* Get the NAME=VALUE part of the Cookie */
+static char * cookie_get_content( const char * cookie )
+{
+    char * ret = strdup( cookie );
+    if( !ret ) return NULL;
+    char * str = ret;
+    /* Look for a ';' */
+    while( *str && *str != ';' ) str++;
+    /* Replace it by a end-char */
+    if( *str == ';' ) *str = 0;
+    return ret;
+}
+
+/* Get the domain where the cookie is stored */
+static char * cookie_get_domain( const char * cookie )
+{
+    const char * str = cookie;
+    static const char domain[] = "domain=";
+    if( !str )
+        return NULL;
+    /* Look for a ';' */
+    while( *str )
+    {
+        if( !strncmp( str, domain, sizeof(domain) - 1 /* minus \0 */ ) )
+        {
+            str += sizeof(domain) - 1 /* minus \0 */;
+            char * ret = strdup( str );
+            /* Now remove the next ';' if present */
+            char * ret_iter = ret;
+            while( *ret_iter && *ret_iter != ';' ) ret_iter++;
+            if( *ret_iter == ';' )
+                *ret_iter = 0;
+            return ret;
+        }
+        /* Go to next ';' field */
+        while( *str && *str != ';' ) str++;
+        if( *str == ';' ) str++;
+        /* skip blank */
+        while( *str && *str == ' ' ) str++;
+    }
+    return NULL;
+}
+
+/* Get NAME in the NAME=VALUE field */
+static char * cookie_get_name( const char * cookie )
+{
+    char * ret = cookie_get_content( cookie ); /* NAME=VALUE */
+    if( !ret ) return NULL;
+    char * str = ret;
+    while( *str && *str != '=' ) str++;
+    *str = 0;
+    return ret;
+}
+
+/* Add a cookie in cookies, checking to see how it should be added */
+static void cookie_append( vlc_array_t * cookies, char * cookie )
+{
+    int i;
+    char * cookie_name = cookie_get_name( cookie );
+    char * cookie_domain = cookie_get_domain( cookie );
+    for( i = 0; i < vlc_array_count( cookies ); i++ )
+    {
+        char * current_cookie = vlc_array_item_at_index( cookies, i );
+        char * current_cookie_name = cookie_get_name( current_cookie );
+        char * current_cookie_domain = cookie_get_domain( current_cookie );
+        if(!strcmp( cookie_name, current_cookie_name ) &&
+           !strcmp( cookie_domain, current_cookie_domain ))
+        {
+            /* Remove previous value for this cookie */
+            free( current_cookie );
+            vlc_array_remove( cookies, i );
+
+            /* Clean */
+            free( cookie_name );
+            free( cookie_domain );
+            free( current_cookie_name );
+            free( current_cookie_domain );
+            break;
+        }
+        free( current_cookie_name );
+        free( current_cookie_domain );
+    }
+    free( cookie_name );
+    free( cookie_domain );
+    vlc_array_append( cookies, cookie );
+}
+
