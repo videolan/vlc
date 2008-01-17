@@ -105,5 +105,4 @@ void GotoTimeDialog::close()
     }
     this->toggleVisible();
     timeEdit->setTime( QTime( 0, 0, 0) );
-    // THEMIM->getIM()->update();
 }
