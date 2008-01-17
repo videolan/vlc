@@ -352,6 +352,7 @@ MainInterface::~MainInterface()
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;
+    p_intf->p_sys->p_mi = NULL;
 }
 
 /*****************************
