@@ -303,7 +303,7 @@ static inline void vlc_array_clear( vlc_array_t * p_array )
 
 static inline vlc_array_t * vlc_array_new( void )
 {
-    vlc_array_t * ret = malloc( sizeof(vlc_array_t) );
+    vlc_array_t * ret = (vlc_array_t *)malloc( sizeof(vlc_array_t) );
     vlc_array_init( ret );
     return ret;
 }
