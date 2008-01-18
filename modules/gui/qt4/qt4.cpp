@@ -53,8 +53,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALWAYS_VIDEO_TEXT N_( "Always show video area" )
-#define ALWAYS_VIDEO_LONGTEXT N_( "Start VLC with a cone image, and display it" \
+#define ALWAYS_VIDEO_TEXT N_( "Always an area for information when there " \
+                              "is no video played" )
+#define ALWAYS_VIDEO_LONGTEXT N_( "Start VLC with a cone image, and " \
+                                  "use this zone to show information as " \
+                                  "lyrics, album arts or visualisation " \
                                   " when there is no video track." )
 
 #define ADVANCED_PREFS_TEXT N_( "Show advanced prefs over simple ones" )
@@ -129,24 +132,25 @@ vlc_module_begin();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
 
-        add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
-                  NOTIFICATION_LONGTEXT, VLC_FALSE );
-        add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
-                  OPACITY_LONGTEXT, VLC_FALSE );
-
         add_bool( "qt-always-video", VLC_FALSE, NULL, ALWAYS_VIDEO_TEXT,
                 ALWAYS_VIDEO_LONGTEXT, VLC_TRUE );
+        add_bool( "qt-minimal-view", VLC_FALSE, NULL, MINIMAL_TEXT,
+                MINIMAL_TEXT, VLC_TRUE );
+
+        add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
+                  NOTIFICATION_LONGTEXT, VLC_FALSE );
+
+        add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
+                  OPACITY_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-blingbling", VLC_TRUE, NULL, BLING_TEXT,
+                  BLING_TEXT, VLC_FALSE );
+
         add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
                 SYSTRAY_LONGTEXT, VLC_FALSE);
         add_bool( "qt-start-minimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
                 MINIMIZED_LONGTEXT, VLC_TRUE);
-        add_bool( "qt-minimal-view", VLC_FALSE, NULL, MINIMAL_TEXT,
-                MINIMAL_TEXT, VLC_TRUE );
-
         add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, VLC_FALSE );
-        add_bool( "qt-blingbling", VLC_TRUE, NULL, BLING_TEXT,
-                  BLING_TEXT, VLC_FALSE );
 
         add_bool( "qt-volume-complete", VLC_FALSE, NULL, COMPLETEVOL_TEXT,
                 COMPLETEVOL_LONGTEXT, VLC_TRUE );
@@ -169,6 +173,8 @@ vlc_module_begin();
                 VLC_META_ENGINE_DURATION|VLC_META_ENGINE_COLLECTION,
                 NULL, SHOWFLAGS_TEXT,
                 SHOWFLAGS_LONGTEXT, VLC_TRUE );
+            change_autosave();
+
         add_bool( "privacy-ask", VLC_TRUE, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
                 VLC_FALSE );
         set_callbacks( OpenDialogs, Close );
