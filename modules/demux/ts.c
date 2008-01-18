@@ -594,7 +594,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_meta = VLC_TRUE;
     p_sys->b_dvb_control = VLC_TRUE;
     p_sys->i_dvb_program = 0;
-    p_sys->i_dvb_start = 0;;
+    p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
 
     for( i = 0; i < 8192; i++ )
