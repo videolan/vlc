@@ -123,7 +123,9 @@ private:
 
 private slots:
     void snapshot();
+#if 0
     void frame();
+#endif
     void fromAtoB();
     void record();
     void AtoBLoop( float, int, int );

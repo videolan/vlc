@@ -259,12 +259,13 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     timeA = timeB = 0;
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, AtoBLoop( float, int, int ) );
-
+#if 0
     frameButton = new QPushButton( "Fr" );
     frameButton->setMaximumSize( QSize( 26, 26 ) );
     frameButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( frameButton );
     BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by Frame" ), frame() );
+#endif
 
     recordButton = new QPushButton( "R" );
     recordButton->setMaximumSize( QSize( 26, 26 ) );
@@ -293,7 +294,9 @@ void AdvControlsWidget::enableInput( bool enable )
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
+#if 0
     frameButton->setEnabled( enable );
+#endif
 }
 
 void AdvControlsWidget::snapshot()
@@ -337,8 +340,10 @@ void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
 /* FIXME Record function */
 void AdvControlsWidget::record(){}
 
+#if 0
 //FIXME Frame by frame function
 void AdvControlsWidget::frame(){}
+#endif
 
 /*****************************
  * DA Control Widget !
