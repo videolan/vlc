@@ -147,10 +147,10 @@ void X11TimerLoop::waitNextTimer()
 
 bool X11TimerLoop::sleep( int delay )
 {
-    struct pollfd ufd = {
-        .fd = m_connectionNumber,
-        .events = POLLIN,
-    };
+    struct pollfd ufd;
+    memset( &ufd, 0, sizeof (ufd) );
+    ufd.fd = m_connectionNumber;
+    ufd.events = POLLIN;
 
     // Wait for an X11 event, or timeout
     // TODO: use VLC object waitpipe?
