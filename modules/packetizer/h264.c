@@ -247,14 +247,16 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = NULL;
 
         /* Set the new extradata */
+        p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
         p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
         if( p_dec->fmt_out.p_extra )
         {
-            p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
             memcpy( (uint8_t*)p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
             memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
             p_sys->b_header = VLC_TRUE;
         }
+        else p_dec->fmt_out.i_extra = 0;
+
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
     }
@@ -485,10 +487,10 @@ static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret,
     uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
 
+    *pp_ret = dst;
+
     if( dst )
     {
-        *pp_ret = dst;
-
         while( src < end )
         {
             if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
