@@ -165,12 +165,20 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     input_FindArtInCache( p_playlist, p_item );
 
     char *psz_arturl = input_item_GetArtURL( p_item );
-    if( psz_arturl && !strncmp( psz_arturl, "file://", strlen( "file://" ) ) )
+    if( psz_arturl )
     {
+        /* We already have an URL */
+        if( !strncmp( psz_arturl, "file://", strlen( "file://" ) ) )
+        {
+            free( psz_arturl );
+            return 0; /* Art is in cache, no need to go further */
+        }
+
         free( psz_arturl );
-        return 0; /* Art is in cache, no need to go further */
+        
+        /* Art need to be put in cache */
+        return 1;
     }
-    free( psz_arturl );
 
     PL_LOCK;
     p_playlist->p_private = p_item;
