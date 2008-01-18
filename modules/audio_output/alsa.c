@@ -585,20 +585,6 @@ static int Open( vlc_object_t *p_this )
                 p_aout->output.output.i_rate );
         }
 
-        /* Set buffer size. */
-#ifdef HAVE_ALSA_NEW_API
-        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
-                                    p_hw, &i_buffer_size ) ) < 0 )
-#else
-        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
-                                    p_hw, i_buffer_size ) ) < 0 )
-#endif
-        {
-            msg_Err( p_aout, "unable to set buffer size (%s)",
-                         snd_strerror( i_snd_rc ) );
-            goto error;
-        }
-
         /* Set period size. */
 #ifdef HAVE_ALSA_NEW_API
         if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
@@ -613,6 +599,20 @@ static int Open( vlc_object_t *p_this )
             goto error;
         }
         p_aout->output.i_nb_samples = i_period_size;
+
+/* Set buffer size. */
+#ifdef HAVE_ALSA_NEW_API
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
+                                    p_hw, &i_buffer_size ) ) < 0 )
+#else
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
+                                    p_hw, i_buffer_size ) ) < 0 )
+#endif
+        {
+            msg_Err( p_aout, "unable to set buffer size (%s)",
+                         snd_strerror( i_snd_rc ) );
+            goto error;
+        }
 
         /* Commit hardware parameters. */
         if ( ( i_snd_rc = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw ) ) < 0 )

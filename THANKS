@@ -148,6 +148,7 @@ Mateus Krepsky Ludwich <mateus @t csp dot com d.t br> - rc interface mosaic-orde
 Mathias C. Berens | welcome-soft <berens at welcome-soft.de> - German translation
 Mathias Kretschmer <mathias at research.att.com> - IP Multicast support
 Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solaris 9
+Matthias P. Nowak <mpnowak at broadpark dot no> - ALSA 5.1 fix
 Matthieu Lochegnies <prof at tocard dot org> - MPEG audio emphasis fix
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Meelad Zakaria <meelad at farsiweb dot info> - Persian localisation
