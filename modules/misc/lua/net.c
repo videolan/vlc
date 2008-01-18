@@ -135,6 +135,9 @@ int vlclua_net_select( lua_State *L )
     fd_set *fds_write = (fd_set*)luaL_checkuserdata( L, 3, sizeof( fd_set ) );
     double f_timeout = luaL_checknumber( L, 4 );
     struct timeval timeout;
+
+    if( i_nfds > FD_SETSIZE )
+        i_nfds = FD_SETSIZE;
     timeout.tv_sec = (int)f_timeout;
     timeout.tv_usec = (int)(1e6*(f_timeout-(double)((int)f_timeout)));
     i_ret = select( i_nfds, fds_read, fds_write, 0, &timeout );
@@ -168,7 +171,12 @@ int vlclua_fd_set( lua_State *L )
 {
     fd_set *fds = (fd_set*)luaL_checkuserdata( L, 1, sizeof( fd_set ) );
     int i_fd = luaL_checkint( L, 2 );
-    FD_SET( i_fd, fds );
+    /* FIXME: we should really use poll() instead here, but that breaks the
+     * VLC/LUA API*/
+#ifndef WIN32
+    if( i_fd < FD_SETSIZE )
+#endif
+        FD_SET( i_fd, fds );
     return 0;
 }
 int vlclua_fd_zero( lua_State *L )
