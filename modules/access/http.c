@@ -71,6 +71,9 @@ static void Close( vlc_object_t * );
     "You should not globally enable this option as it will break all other " \
     "types of HTTP streams." )
 
+#define FORWARD_COOKIES_TEXT N_("Forward Cookies")
+#define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies Across http redirections ")
+
 vlc_module_begin();
     set_description( _("HTTP input") );
     set_capability( "access2", 0 );
@@ -88,6 +91,8 @@ vlc_module_begin();
               RECONNECT_LONGTEXT, VLC_TRUE );
     add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,
               CONTINUOUS_LONGTEXT, VLC_TRUE );
+    add_bool( "http-forward-cookies", 0, NULL, FORWARD_COOKIES_TEXT,
+              FORWARD_COOKIES_LONGTEXT, VLC_TRUE );
     add_obsolete_string("http-user");
     add_obsolete_string("http-pwd");
     add_shortcut( "http" );
@@ -176,8 +181,9 @@ static int OpenWithRedirectionStatus( vlc_object_t *p_this, vlc_bool_t b_is_from
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz, *p;
-
-    vlc_array_t * saved_cookies = b_is_from_redirection ? p_access->p_sys->cookies : vlc_array_new();
+    /* Only forward an store cookies if the corresponding option is activated */
+    vlc_bool_t   b_forward_cookies = var_CreateGetBool( p_access, "http-forward-cookies" );
+    vlc_array_t * saved_cookies = b_forward_cookies ? (b_is_from_redirection ? p_access->p_sys->cookies : vlc_array_new()) : NULL;
 
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
@@ -200,6 +206,7 @@ static int OpenWithRedirectionStatus( vlc_object_t *p_this, vlc_bool_t b_is_from
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
+
     p_sys->cookies = saved_cookies;
 
     /* Parse URI - remove spaces */
@@ -458,10 +465,13 @@ static void Close( vlc_object_t *p_this )
 
     Disconnect( p_access );
 
-    int i;
-    for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
-        free(vlc_array_item_at_index( p_sys->cookies, i ));
-    vlc_array_destroy( p_sys->cookies );
+    if( p_sys->cookies )
+    {
+        int i;
+        for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
+            free(vlc_array_item_at_index( p_sys->cookies, i ));
+        vlc_array_destroy( p_sys->cookies );
+    }
 
     free( p_sys );
 }
@@ -948,23 +958,26 @@ static int Request( access_t *p_access, int64_t i_tell )
     }
 
     /* Cookies */
-    int i;
-    for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
+    if( p_sys->cookies )
     {
-        const char * cookie = vlc_array_item_at_index( p_sys->cookies, i );
-        char * psz_cookie_content = cookie_get_content( cookie );
-        char * psz_cookie_domain = cookie_get_domain( cookie );
-        if( psz_cookie_content &&
-             /* Check to see if we are in the right domain */
-            ( !psz_cookie_domain || strstr( p_sys->url.psz_host, psz_cookie_domain ))
-          )
+        int i;
+        for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
         {
-            msg_Dbg( p_access, "Sending Cookie %s", psz_cookie_content );
-            if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookie_content ) < 0 )
-                msg_Err( p_access, "failed to send Cookie" );
+            const char * cookie = vlc_array_item_at_index( p_sys->cookies, i );
+            char * psz_cookie_content = cookie_get_content( cookie );
+            char * psz_cookie_domain = cookie_get_domain( cookie );
+            if( psz_cookie_content &&
+                 /* Check to see if we are in the right domain */
+                ( !psz_cookie_domain || strstr( p_sys->url.psz_host, psz_cookie_domain ))
+              )
+            {
+                msg_Dbg( p_access, "Sending Cookie %s", psz_cookie_content );
+                if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookie_content ) < 0 )
+                    msg_Err( p_access, "failed to send Cookie" );
+            }
+            free( psz_cookie_content );
+            free( psz_cookie_domain );
         }
-        free( psz_cookie_content );
-        free( psz_cookie_domain );
     }
 
     /* Authentication */
@@ -1221,8 +1234,13 @@ static int Request( access_t *p_access, int64_t i_tell )
             msg_Dbg( p_access, "Meta-Info: %s: %s", psz, p );
         } else if( !strcasecmp( psz, "Set-Cookie" ) )
         {
-            msg_Dbg( p_access, "Accepting Cookie: %s", p );
-            cookie_append( p_sys->cookies, strdup(p) );
+            if( p_sys->cookies )
+            {
+                msg_Dbg( p_access, "Accepting Cookie: %s", p );
+                cookie_append( p_sys->cookies, strdup(p) );
+            }
+            else
+                msg_Dbg( p_access, "We have a Cookie we won't remember: %s", p );
         }
 
         free( psz );
