@@ -53,8 +53,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALWAYS_VIDEO_TEXT N_( "Always an area for information when there " \
-                              "is no video played" )
+#define ALWAYS_VIDEO_TEXT N_( "Always show an area for information when " \
+                              "no video is played" )
 #define ALWAYS_VIDEO_LONGTEXT N_( "Start VLC with a cone image, and " \
                                   "use this zone to show information as " \
                                   "lyrics, album arts or visualisation " \
