@@ -612,6 +612,9 @@ ModuleListConfigControl::~ModuleListConfigControl()
 \
        cbl->psz_module = strdup( module_GetObjName( p_parser ) ); \
        modules.push_back( cbl ); \
+\
+       if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
+            cbl->checkBox->setChecked( true ); \
 }
 
 
