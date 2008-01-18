@@ -26,6 +26,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 
 #include "x11_timer.hpp"
 #include "x11_factory.hpp"
@@ -146,20 +147,14 @@ void X11TimerLoop::waitNextTimer()
 
 bool X11TimerLoop::sleep( int delay )
 {
-    // Timeout delay
-    struct timeval tv;
-    tv.tv_sec = delay / 1000;
-    tv.tv_usec = 1000 * (delay % 1000);
-
-    // FD set for select()
-    fd_set rfds;
-    FD_ZERO( &rfds );
-    FD_SET( m_connectionNumber, &rfds );
+    struct pollfd ufd = {
+        .fd = m_connectionNumber,
+        .events = POLLIN,
+    };
 
     // Wait for an X11 event, or timeout
-    int num = select( m_connectionNumber + 1, &rfds, NULL, NULL, &tv );
-
-    return ( num > 0 );
+    // TODO: use VLC object waitpipe?
+    return poll( &ufd, 1, delay ) > 0;
 }
 
 
