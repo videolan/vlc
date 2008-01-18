@@ -259,6 +259,8 @@ static void Init( intf_thread_t *p_intf )
      * disables icon theme use because that makes Cleanlooks style bug
      * because it asks gconf for some settings that timeout because of threads
      * see commits 21610 21622 21654 for reference */
+
+    /* If you are under KDE, Xfce or e17, you should comment this line */
     QApplication::setDesktopSettingsAware( false );
 #endif
 
@@ -302,6 +304,7 @@ static void Init( intf_thread_t *p_intf )
         msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
     app->installTranslator( &qtTranslator );
 #endif  //ENABLE_NLS
+
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )
     {
