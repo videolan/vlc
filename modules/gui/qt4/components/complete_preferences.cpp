@@ -434,10 +434,10 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if( box )
             {
                 box->setLayout( boxlayout );
-                layout->addWidget( box, i_line, 0, 1, 2 );
+                layout->addWidget( box, i_line, 0, 1, -1 );
                 i_line++;
             }
-            box = new QGroupBox( qtr(p_item->psz_text) );
+            box = new QGroupBox( qtr( p_item->psz_text ) );
             boxlayout = new QGridLayout();
         }
         /* Only one hotkey control */
@@ -471,7 +471,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     if( box )
     {
         box->setLayout( boxlayout );
-        layout->addWidget( box, i_line, 0, 1, 2 );
+        layout->addWidget( box, i_line, 0, 1, -1 );
     }
 
     module_Put( p_module );
