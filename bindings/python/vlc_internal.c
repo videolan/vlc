@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "vlc_internal.h"
+#include "../../src/libvlc.h"
 
 /**************************************************************************
  * VLC Module
@@ -259,7 +260,6 @@ vlcObject_find_name( PyObject *self, PyObject *args )
     vlcObject *p_retval;
     vlc_object_t *p_obj;
     char *psz_name;
-    int i_object_type;
 
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
@@ -284,8 +284,10 @@ vlcObject_info( PyObject *self, PyObject *args )
 {
     PyObject *p_retval;
     vlc_object_t *p_obj;
-
+    vlc_object_internals_t *p_priv;
+    
     p_obj = VLCSELF->p_object;
+    p_priv = vlc_internals( p_obj );
 
     /* Return information about the object as a dict. */
     p_retval = PyDict_New();
@@ -297,12 +299,11 @@ vlcObject_info( PyObject *self, PyObject *args )
     PyDict_SetItemString( p_retval, "object-name",
                           Py_BuildValue( "s", p_obj->psz_object_name ) );
     PyDict_SetItemString( p_retval, "thread",
-                          PyBool_FromLong( p_obj->b_thread ) );
+                          PyBool_FromLong( p_priv->b_thread ) );
     PyDict_SetItemString( p_retval, "thread-id",
-                          PyLong_FromLongLong( p_obj->thread_id ) );
+                          PyLong_FromLongLong( p_priv->thread_id ) );
     PyDict_SetItemString( p_retval, "refcount",
-                          PyInt_FromLong( p_obj->i_refcount ) );
-
+                          PyInt_FromLong( p_priv->i_refcount ) );
     return p_retval;
 }
 
@@ -527,14 +528,17 @@ vlcObject_var_list( PyObject *self, PyObject *args )
     PyObject *p_retval;
     Py_ssize_t i_size;
     Py_ssize_t i_index;
+    vlc_object_internals_t *p_priv;
 
-    i_size = VLCSELF->p_object->i_vars;
+    p_priv = vlc_internals( VLCSELF->p_object );
+    i_size = p_priv->i_vars;
     p_retval = PyTuple_New( i_size );
+
 
     for ( i_index = 0 ; i_index < i_size ; i_index++ )
     {
         PyTuple_SetItem( p_retval, i_index,
-                         Py_BuildValue( "s", VLCSELF->p_object->p_vars[i_index].psz_name ) );
+                         Py_BuildValue( "s", p_priv->p_vars[i_index].psz_name ) );
     }
 
     return p_retval;
