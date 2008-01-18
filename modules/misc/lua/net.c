@@ -136,8 +136,10 @@ int vlclua_net_select( lua_State *L )
     double f_timeout = luaL_checknumber( L, 4 );
     struct timeval timeout;
 
+#ifndef WIN32
     if( i_nfds > FD_SETSIZE )
         i_nfds = FD_SETSIZE;
+#endif
     timeout.tv_sec = (int)f_timeout;
     timeout.tv_usec = (int)(1e6*(f_timeout-(double)((int)f_timeout)));
     i_ret = select( i_nfds, fds_read, fds_write, 0, &timeout );
@@ -172,7 +174,8 @@ int vlclua_fd_set( lua_State *L )
     fd_set *fds = (fd_set*)luaL_checkuserdata( L, 1, sizeof( fd_set ) );
     int i_fd = luaL_checkint( L, 2 );
     /* FIXME: we should really use poll() instead here, but that breaks the
-     * VLC/LUA API*/
+     * VLC/LUA API. On Windows, overflow protection is built-in FD_SET, not
+     * on POSIX. In both cases, run-time behavior will however be wrong. */
 #ifndef WIN32
     if( i_fd < FD_SETSIZE )
 #endif
