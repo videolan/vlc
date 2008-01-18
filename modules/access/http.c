@@ -1351,8 +1351,6 @@ static void cookie_append( vlc_array_t * cookies, char * cookie )
             vlc_array_remove( cookies, i );
 
             /* Clean */
-            free( cookie_name );
-            free( cookie_domain );
             free( current_cookie_name );
             free( current_cookie_domain );
             break;
