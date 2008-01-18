@@ -47,6 +47,7 @@
 #endif
 
 #include <vlc_network.h>
+#include <poll.h>
 #include "vlc_url.h"
 #include "asf.h"
 #include "buffer.h"
@@ -967,14 +968,13 @@ static int NetFillBuffer( access_t *p_access )
 
 #else
     access_sys_t    *p_sys = p_access->p_sys;
-    struct timeval  timeout;
-    fd_set          fds_r, fds_e;
     int             i_ret;
+    struct pollfd   ufd[2];
+    unsigned        timeout, nfd;
 
     /* FIXME when using udp */
     ssize_t i_tcp, i_udp;
     ssize_t i_tcp_read, i_udp_read;
-    int i_handle_max;
     int i_try = 0;
 
     i_tcp = MMS_BUFFER_SIZE/2 - p_sys->i_buffer_tcp;
@@ -988,14 +988,7 @@ static int NetFillBuffer( access_t *p_access )
         i_udp = 0;  /* there isn't udp socket */
     }
 
-    i_handle_max = 0;
-
-    if( i_tcp > 0 )
-        i_handle_max = __MAX( i_handle_max, p_sys->i_handle_tcp );
-    if( i_udp > 0 )
-        i_handle_max = __MAX( i_handle_max, p_sys->i_handle_udp );
-
-    if( i_handle_max == 0 )
+    if( ( i_udp <= 0 ) && ( i_tcp <= 0 ) )
     {
         msg_Warn( p_access, "nothing to read %d:%d", (int)i_tcp, (int)i_udp );
         return 0;
@@ -1011,23 +1004,24 @@ static int NetFillBuffer( access_t *p_access )
         i_try++;
 
         /* Initialize file descriptor set */
-        FD_ZERO( &fds_r );
-        FD_ZERO( &fds_e );
+        memset (ufd, 0, sizeof (ufd));
+        nfd = 0;
 
         if( i_tcp > 0 )
         {
-            FD_SET( p_sys->i_handle_tcp, &fds_r );
-            FD_SET( p_sys->i_handle_tcp, &fds_e );
+            ufd[nfd].fd = p_sys->i_handle_tcp;
+            ufd[nfd].events = POLLIN;
+            nfd++;
         }
         if( i_udp > 0 )
         {
-            FD_SET( p_sys->i_handle_udp, &fds_r );
-            FD_SET( p_sys->i_handle_udp, &fds_e );
+            ufd[nfd].fd = p_sys->i_handle_tcp;
+            ufd[nfd].events = POLLIN;
+            nfd++;
         }
 
         /* We'll wait 0.5 second if nothing happens */
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
+        timeout = 500;
 
         if( i_try > 3 && (p_sys->i_buffer_tcp > 0 || p_sys->i_buffer_udp > 0) )
         {
@@ -1038,18 +1032,18 @@ static int NetFillBuffer( access_t *p_access )
 
         //msg_Dbg( p_access, "NetFillBuffer: trying again (select)" );
 
-    } while( !(i_ret = select(i_handle_max +1, &fds_r, 0, &fds_e, &timeout)) ||
+    } while( !(i_ret = poll( ufd, nfd, timeout)) ||
              (i_ret < 0 && errno == EINTR) );
 
     if( i_ret < 0 )
     {
-        msg_Err( p_access, "network select error (%m)" );
+        msg_Err( p_access, "network poll error (%m)" );
         return -1;
     }
 
     i_tcp_read = i_udp_read = 0;
 
-    if( i_tcp > 0 && FD_ISSET( p_sys->i_handle_tcp, &fds_r ) )
+    if( ( i_tcp > 0 ) && ufd[0].revents )
     {
         i_tcp_read =
             recv( p_sys->i_handle_tcp,
@@ -1057,7 +1051,7 @@ static int NetFillBuffer( access_t *p_access )
                   i_tcp + MMS_BUFFER_SIZE/2, 0 );
     }
 
-    if( i_udp > 0 && FD_ISSET( p_sys->i_handle_udp, &fds_r ) )
+    if( i_udp > 0 && ufd[i_tcp > 0].revents )
     {
         i_udp_read = recv( p_sys->i_handle_udp,
                            p_sys->buffer_udp + p_sys->i_buffer_udp,
