@@ -145,12 +145,12 @@ struct access_sys_t
     vlc_bool_t b_reconnect;
     vlc_bool_t b_continuous;
     vlc_bool_t b_pace_control;
-    
+
     vlc_array_t * cookies;
 };
 
 /* */
-static int OpenWithRedirectionStatus( vlc_object_t *p_this, vlc_bool_t b_is_from_redirection );
+static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -173,17 +173,17 @@ static void cookie_append( vlc_array_t * cookies, char * cookie );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    return OpenWithRedirectionStatus( p_this, VLC_FALSE );
+    return OpenWithCookies( p_this, NULL );
 }
 
-static int OpenWithRedirectionStatus( vlc_object_t *p_this, vlc_bool_t b_is_from_redirection )
+static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz, *p;
     /* Only forward an store cookies if the corresponding option is activated */
     vlc_bool_t   b_forward_cookies = var_CreateGetBool( p_access, "http-forward-cookies" );
-    vlc_array_t * saved_cookies = b_forward_cookies ? (b_is_from_redirection ? p_access->p_sys->cookies : vlc_array_new()) : NULL;
+    vlc_array_t * saved_cookies = b_forward_cookies ? (cookies ?: vlc_array_new()) : NULL;
 
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
@@ -365,10 +365,11 @@ connect:
         free( p_sys->psz_user_agent );
 
         Disconnect( p_access );
+        cookies = p_sys->cookies;
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return OpenWithRedirectionStatus( p_this, VLC_TRUE );
+        return OpenWithCookies( p_this, cookies );
     }
 
     if( p_sys->b_mms )
