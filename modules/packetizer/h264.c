@@ -245,14 +245,16 @@ static int Open( vlc_object_t *p_this )
         /* FIXME: FFMPEG isn't happy at all if you leave this */
         if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
         p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = NULL;
- 
-        /* Set the new extradata */
-        p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
-        p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
-        memcpy( (uint8_t*)p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
-        memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
-        p_sys->b_header = VLC_TRUE;
 
+        /* Set the new extradata */
+        p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
+        if( p_dec->fmt_out.p_extra )
+        {
+            p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
+            memcpy( (uint8_t*)p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
+            memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
+            p_sys->b_header = VLC_TRUE;
+        }
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
     }
@@ -483,22 +485,24 @@ static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret,
     uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
 
-    *pp_ret = dst;
-
-    while( src < end )
+    if( dst )
     {
-        if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
-            src[2] == 0x03 )
+        *pp_ret = dst;
+
+        while( src < end )
         {
-            *dst++ = 0x00;
-            *dst++ = 0x00;
+            if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
+                src[2] == 0x03 )
+            {
+                *dst++ = 0x00;
+                *dst++ = 0x00;
 
-            src += 3;
-            continue;
+                src += 3;
+                continue;
+            }
+            *dst++ = *src++;
         }
-        *dst++ = *src++;
     }
-
     *pi_ret = dst - *pp_ret;
 }
 
@@ -519,7 +523,6 @@ static inline int bs_read_se( bs_t *s )
 
     return val&0x01 ? (val+1)/2 : -(val/2);
 }
-
 
 /*****************************************************************************
  * ParseNALBlock: parses annexB type NALs
@@ -578,8 +581,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     }
     else if( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
     {
-        uint8_t *dec;
-        int i_dec, i_first_mb, i_slice_type;
+        uint8_t *dec = NULL;
+        int i_dec = 0, i_first_mb, i_slice_type;
         slice_t slice;
         vlc_bool_t b_pic;
         bs_t s;
@@ -646,7 +649,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             if( p_sys->i_pic_order_present_flag && !slice.i_field_pic_flag )
                 slice.i_delta_pic_order_cnt_bottom = bs_read_se( &s );
         }
-        else if( p_sys->i_pic_order_cnt_type == 1 && !p_sys->i_delta_pic_order_always_zero_flag )
+        else if( (p_sys->i_pic_order_cnt_type == 1) &&
+                 (!p_sys->i_delta_pic_order_always_zero_flag) )
         {
             slice.i_delta_pic_order_cnt0 = bs_read_se( &s );
             if( p_sys->i_pic_order_present_flag && !slice.i_field_pic_flag )
@@ -661,7 +665,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             slice.i_field_pic_flag != p_sys->slice.i_field_pic_flag ||
             slice.i_nal_ref_idc != p_sys->slice.i_nal_ref_idc )
             b_pic = VLC_TRUE;
-        if( slice.i_bottom_field_flag != -1 && p_sys->slice.i_bottom_field_flag != -1 && slice.i_bottom_field_flag != p_sys->slice.i_bottom_field_flag )
+        if( (slice.i_bottom_field_flag != -1) &&
+            (p_sys->slice.i_bottom_field_flag != -1) &&
+            (slice.i_bottom_field_flag != p_sys->slice.i_bottom_field_flag) )
             b_pic = VLC_TRUE;
         if( p_sys->i_pic_order_cnt_type == 0 &&
             ( slice.i_pic_order_cnt_lsb != p_sys->slice.i_pic_order_cnt_lsb ||
@@ -687,8 +693,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     }
     else if( i_nal_type == NAL_SPS )
     {
-        uint8_t *dec;
-        int     i_dec;
+        uint8_t *dec = NULL;
+        int     i_dec = 0;
         bs_t s;
         int i_tmp;
 
