@@ -967,10 +967,13 @@ static int Request( access_t *p_access, int64_t i_tell )
             const char * cookie = vlc_array_item_at_index( p_sys->cookies, i );
             char * psz_cookie_content = cookie_get_content( cookie );
             char * psz_cookie_domain = cookie_get_domain( cookie );
-            if( psz_cookie_content &&
-                 /* Check to see if we are in the right domain */
-                ( !psz_cookie_domain || strstr( p_sys->url.psz_host, psz_cookie_domain ))
-              )
+            
+            assert( psz_cookie_content );
+
+            /* FIXME: This is clearly not conforming to the rfc */
+            vlc_bool_t is_in_right_domain = (!psz_cookie_domain || strstr( p_sys->url.psz_host, psz_cookie_domain ));
+
+            if( is_in_right_domain )
             {
                 msg_Dbg( p_access, "Sending Cookie %s", psz_cookie_content );
                 if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookie_content ) < 0 )
@@ -1337,15 +1340,29 @@ static char * cookie_get_name( const char * cookie )
 static void cookie_append( vlc_array_t * cookies, char * cookie )
 {
     int i;
+
+    if( !cookie )
+        return;
+
     char * cookie_name = cookie_get_name( cookie );
+
+    /* Don't send invalid cookies */
+    if( !cookie_name )
+        return;
+
     char * cookie_domain = cookie_get_domain( cookie );
     for( i = 0; i < vlc_array_count( cookies ); i++ )
     {
         char * current_cookie = vlc_array_item_at_index( cookies, i );
         char * current_cookie_name = cookie_get_name( current_cookie );
         char * current_cookie_domain = cookie_get_domain( current_cookie );
-        if(!strcmp( cookie_name, current_cookie_name ) &&
-           !strcmp( cookie_domain, current_cookie_domain ))
+
+        assert( current_cookie_name );
+
+        vlc_bool_t is_domain_matching = ( cookie_domain && current_cookie_domain &&
+                                         !strcmp( cookie_domain, current_cookie_domain ) );
+
+        if( is_domain_matching && !strcmp( cookie_name, current_cookie_name )  )
         {
             /* Remove previous value for this cookie */
             free( current_cookie );
