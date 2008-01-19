@@ -100,6 +100,7 @@ private:
 private slots:
     void lastfm_Changed( int );
     void updateAudioOptions( int );
+    void assoDialog();
 };
 
 #endif

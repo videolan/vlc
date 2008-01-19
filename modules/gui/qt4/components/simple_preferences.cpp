@@ -396,9 +396,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #if defined( WIN32 ) || defined (__APPLE__)
             CONFIG_GENERIC( "language", StringList, NULL, language );
+            BUTTONACT( ui.assoButton, assoDialog );
 #else
             ui.language->hide();
             ui.languageLabel->hide();
+            ui.assoName->hide();
+            ui.assoButton->hide();
 #endif
 
             /* interface */
@@ -620,4 +623,9 @@ void SPrefsPanel::lastfm_Changed( int i_state )
         config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
     else if( i_state == Qt::Unchecked )
         config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+}
+
+void SPrefsPanel::assoDialog()
+{
+
 }

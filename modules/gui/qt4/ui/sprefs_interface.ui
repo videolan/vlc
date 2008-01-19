@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
-    <height>535</height>
+    <width>485</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -136,18 +136,38 @@
      <property name="title" >
       <string>_("Instances")</string>
      </property>
-     <layout class="QVBoxLayout" >
-      <item>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
        <widget class="QCheckBox" name="OneInterfaceMode" >
         <property name="text" >
          <string>_("Allow only one instance")</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0" colspan="2" >
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode" >
         <property name="text" >
          <string>_("Enqueue files in playlist when in one instance mode")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="assoName" >
+        <property name="text" >
+         <string>_("File associations:")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QPushButton" name="assoButton" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>_("Association Setup")</string>
         </property>
        </widget>
       </item>
