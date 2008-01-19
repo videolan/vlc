@@ -289,7 +289,6 @@ static void Init( intf_thread_t *p_intf )
         p_mi->show();
     }
     else
-    /*if( p_intf->pf_show_dialog )*/
         vlc_thread_ready( p_intf );
 
 #ifdef ENABLE_NLS
@@ -327,8 +326,18 @@ static void Init( intf_thread_t *p_intf )
     app->exec();
 
     /* And quit */
-    MainInputManager::killInstance();
+
+    /* Destroy first the main interface because it is connected to some slots
+       in the MainInputManager */
+    if( p_intf->p_sys->p_mi ) delete p_intf->p_sys->p_mi;
+
+    /* Destroy then other windows, because some are connected to some slots
+       in the MainInputManager */
     DialogsProvider::killInstance();
+
+    /* Destroy the MainInputManager */
+    MainInputManager::killInstance();
+
     delete app;
 }
 

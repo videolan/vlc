@@ -112,7 +112,7 @@ public:
     static void killInstance()
     {
         if( instance ) delete instance;
-        instance=NULL;
+        instance = NULL;
     }
     virtual ~DialogsProvider();
     QTimer *fixed_timer;

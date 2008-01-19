@@ -1132,9 +1132,7 @@ void MainInterface::wheelEvent( QWheelEvent *e )
 void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
-    vlc_object_kill( p_intf );
-    QApplication::closeAllWindows();
-    QApplication::quit();
+    THEDP->quit();
 }
 
 /*****************************************************************************

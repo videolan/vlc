@@ -213,7 +213,6 @@ void InputManager::customEvent( QEvent *event )
          delInput();
          return;
     }
-         
 
     IMEvent *ime = static_cast<IMEvent *>(event);
 
@@ -288,7 +287,7 @@ void InputManager::UpdateRate( void )
          i_rate = i_new_rate;
          /* Update rate */
          emit rateChanged( i_rate );
-     } 
+     }
 }
 
 void InputManager::UpdateMeta( void )
@@ -479,8 +478,8 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
 
 MainInputManager::~MainInputManager()
 {
-    if( p_input ) 
-    { 
+    if( p_input )
+    {
        vlc_object_release( p_input );
        emit inputChanged( NULL );
     }
@@ -500,7 +499,7 @@ void MainInputManager::customEvent( QEvent *event )
         emit volumeChanged();
         return;
     }
-    
+
     if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
         vlc_mutex_lock( &p_intf->change_lock );

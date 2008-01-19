@@ -42,6 +42,11 @@ public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
                                      int _action_flag = 0, bool modal = false  );
 
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance = NULL;
+    }
     virtual ~OpenDialog();
 
     void showTab( int );
