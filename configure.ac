@@ -5805,6 +5805,7 @@ then
             MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
         fi
         if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
+            AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
             VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt -lXpm])
         fi
         VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
@@ -5847,6 +5848,7 @@ then
          [],
          [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE -lXpm]
         ])
+        AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
         LDFLAGS="${LDFLAGS_save}"
       fi
 
