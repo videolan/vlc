@@ -335,6 +335,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t *pi64;
     vlc_bool_t *pb_bool;
     int i_ret;
+    va_list args_save;
+
+    va_copy ( args_save, args );
+    va_end ( args_save );
 
     switch( i_query )
     {
@@ -368,7 +372,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     (p_sys->i_pts + p_sys->i_time_offset) < 8000000 )
                     return VLC_EGENERIC;
 
-                pi64 = (int64_t *)va_arg( args, int64_t * );
+                pi64 = (int64_t *)va_arg( args_save, int64_t * );
                 *pi64 = (p_sys->i_pts + p_sys->i_time_offset) / f_pos;
                 return VLC_SUCCESS;
             }
