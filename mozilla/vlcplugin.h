@@ -52,6 +52,7 @@
 #   include <X11/Xlib.h>
 #   include <X11/Intrinsic.h>
 #   include <X11/StringDefs.h>
+#   include <X11/X.h>
 #endif
 
 class VlcPlugin
@@ -87,6 +88,14 @@ public:
 
 #if XP_UNIX
     int                 setSize(unsigned width, unsigned height);
+    Window              getVideoWindow()
+                            { return npvideo; };
+    void                setVideoWindow(Window window)
+                            { npvideo = window; };
+    Window              getControlWindow()
+                            { return npcontrol; };
+    void                setControlWindow(Window window)
+                            { npcontrol = window; };
 #endif
 
     uint16    i_npmode; /* either NP_EMBED or NP_FULL */
@@ -113,6 +122,7 @@ private:
 #endif
 #if XP_UNIX
     unsigned int     i_width, i_height;
+    Window           npvideo, npcontrol;
 #endif
 };
 
@@ -151,6 +161,7 @@ private:
     "video/x-ms-asf:asf,asx:Windows Media Video;" \
     "application/x-mplayer2::Windows Media;" \
     "video/x-ms-wmv:wmv:Windows Media;" \
+    "video/x-ms-wvx:wvx:Windows Media Video;" \
     /* Google VLC */ \
     "application/x-google-vlc-plugin::Google VLC plugin;" \
     /* WAV audio */ \

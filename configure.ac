@@ -5805,7 +5805,7 @@ then
             MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
         fi
         if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
-            VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt])
+            VLC_ADD_LIBS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt -lXpm])
         fi
         VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
         VLC_ADD_LDFLAGS([mozilla],[${MOZILLA_LDFLAGS}])
@@ -5842,10 +5842,10 @@ then
         AC_CHECK_LIB(Xt,XtStrings,
          [
            VLC_ADD_CPPFLAGS([mozilla],[${X_CFLAGS}])
-           VLC_ADD_LIBS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE])
+           VLC_ADD_LIBS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE -lXpm])
          ],
          [],
-         [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE]
+         [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE -lXpm]
         ])
         LDFLAGS="${LDFLAGS_save}"
       fi

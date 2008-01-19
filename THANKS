@@ -84,6 +84,7 @@ Farzaneh Sarafraz <farzaneh at farsiweb dot info> - Persian localisation
 Fouzia Bourai <fbourai at cerist dot dz> - Arabic localisation
 François Seingier <francois.seingier at club-internet.fr> - TTL setting in the wx stream output dialog
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
+Frans van Veen <f.m.j.c.vanveen at student.hhs.nl> - Mozilla plugin toolbar
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Gabor Kelemen <kelemeng at gnome dot hu> - Hungarian translation
 Geoffrey Roussel <meka321 at hotmail dot com> - Christmas easter egg Artwork
@@ -103,8 +104,8 @@ Ilkka Ollakka - SDP bitrate patch, various VLM fixes, transcode afilter/vfilter 
 Jan David Mol <jjdmol at gmail.com> - Suggested some flags for ffmpeg building
 Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
-Javier Varela <tonxabar at hotmail.com> - Spanish translation
-Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
+Jasper Alias <j.alias at student.hhs.nl>- Mozilla plugin toolbar
+Javier Varela <tonxabar at hotmail.com> - Spanish translation Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
 Jean-Baptiste Le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX), Universal Binary Script
 Jean-Philippe Grimaldi <jeanphi at via.ecp.fr> - bug fixes
 Dugal Harris <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
