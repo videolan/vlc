@@ -39,6 +39,10 @@
 #include <vlc_strings.h>
 #include <vlc_input.h>
 
+#ifdef HAVE_ZLIB_H
+#   include <zlib.h>
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -130,6 +134,14 @@ struct access_sys_t
     vlc_bool_t b_mms;
     vlc_bool_t b_icecast;
     vlc_bool_t b_ssl;
+#ifdef HAVE_ZLIB_H
+    vlc_bool_t b_compressed;
+    struct
+    {
+        z_stream   stream;
+        uint8_t   *p_buffer;
+    } inflate;
+#endif
 
     vlc_bool_t b_chunked;
     int64_t    i_chunk;
@@ -154,6 +166,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
+static ssize_t ReadCompressed( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, int64_t );
 static int Control( access_t *, int, va_list );
 
@@ -187,6 +200,9 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
 
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
+#ifdef HAVE_ZLIB_H
+    p_access->pf_read = ReadCompressed;
+#endif
     p_sys->fd = -1;
     p_sys->b_proxy = VLC_FALSE;
     p_sys->i_version = 1;
@@ -199,6 +215,16 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
     p_sys->psz_user_agent = NULL;
     p_sys->b_pace_control = VLC_TRUE;
     p_sys->b_ssl = VLC_FALSE;
+#ifdef HAVE_ZLIB_H
+    p_sys->b_compressed = VLC_FALSE;
+    /* 15 is the max windowBits, +32 to enable optional gzip decoding */
+    if( inflateInit2( &p_sys->inflate.stream, 32+15 ) != Z_OK )
+        msg_Warn( p_access, "Error during zlib initialisation: %s",
+                  p_sys->inflate.stream.msg );
+    if( zlibCompileFlags() & (1<<17) )
+        msg_Warn( p_access, "Your zlib was compiled without gzip support." );
+    p_sys->inflate.p_buffer = NULL;
+#endif
     p_sys->p_tls = NULL;
     p_sys->p_vs = NULL;
     p_sys->i_icy_meta = 0;
@@ -474,6 +500,11 @@ static void Close( vlc_object_t *p_this )
         vlc_array_destroy( p_sys->cookies );
     }
 
+#ifdef HAVE_ZLIB_H
+    inflateEnd( &p_sys->inflate.stream );
+    free( p_sys->inflate.p_buffer );
+#endif
+
     free( p_sys );
 }
 
@@ -538,7 +569,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         }
     }
 
-    if( p_sys->b_continuous && i_len > p_sys->i_remaining )
+    if( p_sys->b_continuous && (ssize_t)i_len > p_sys->i_remaining )
     {
         /* Only ask for the remaining length */
         int i_new_len = p_sys->i_remaining;
@@ -691,6 +722,42 @@ static int ReadICYMeta( access_t *p_access )
 
     return VLC_SUCCESS;
 }
+
+#ifdef HAVE_ZLIB_H
+static ssize_t ReadCompressed( access_t *p_access, uint8_t *p_buffer,
+                               size_t i_len )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if( p_sys->b_compressed )
+    {
+        int i_ret;
+
+        if( !p_sys->inflate.p_buffer )
+            p_sys->inflate.p_buffer = malloc( 256 * 1024 );
+
+        if( p_sys->inflate.stream.avail_in == 0 )
+        {
+            ssize_t i_read = Read( p_access, p_sys->inflate.p_buffer + p_sys->inflate.stream.avail_in, 256 * 1024 );
+            if( i_read <= 0 ) return i_read;
+            p_sys->inflate.stream.next_in = p_sys->inflate.p_buffer;
+            p_sys->inflate.stream.avail_in = i_read;
+        }
+
+        p_sys->inflate.stream.avail_out = i_len;
+        p_sys->inflate.stream.next_out = p_buffer;
+
+        i_ret = inflate( &p_sys->inflate.stream, Z_SYNC_FLUSH );
+        msg_Warn( p_access, "inflate return value: %d, %s", i_ret, p_sys->inflate.stream.msg );
+
+        return i_len - p_sys->inflate.stream.avail_out;
+    }
+    else
+    {
+        return Read( p_access, p_buffer, i_len );
+    }
+}
+#endif
 
 /*****************************************************************************
  * Seek: close and re-open a connection at the right place
@@ -967,7 +1034,7 @@ static int Request( access_t *p_access, int64_t i_tell )
             const char * cookie = vlc_array_item_at_index( p_sys->cookies, i );
             char * psz_cookie_content = cookie_get_content( cookie );
             char * psz_cookie_domain = cookie_get_domain( cookie );
-            
+
             assert( psz_cookie_content );
 
             /* FIXME: This is clearly not conforming to the rfc */
@@ -1145,13 +1212,15 @@ static int Request( access_t *p_access, int64_t i_tell )
 
                 if( p_sys->url.i_port == ( p_sys->b_ssl ? 443 : 80 ) )
                 {
-                    asprintf(&psz_new_loc, "http%s://%s%s", psz_http_ext,
-                             p_sys->url.psz_host, p);
+                    if( asprintf(&psz_new_loc, "http%s://%s%s", psz_http_ext,
+                                 p_sys->url.psz_host, p) < 0 )
+                        goto error;
                 }
                 else
                 {
-                    asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
-                             p_sys->url.psz_host, p_sys->url.i_port, p);
+                    if( asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
+                                 p_sys->url.psz_host, p_sys->url.i_port, p) < 0 )
+                        goto error;
                 }
             }
             else
@@ -1167,6 +1236,16 @@ static int Request( access_t *p_access, int64_t i_tell )
             if( p_sys->psz_mime ) free( p_sys->psz_mime );
             p_sys->psz_mime = strdup( p );
             msg_Dbg( p_access, "Content-Type: %s", p_sys->psz_mime );
+        }
+        else if( !strcasecmp( psz, "Content-Encoding" ) )
+        {
+            msg_Dbg( p_access, "Content-Encoding: %s", p );
+            if( strcasecmp( p, "identity" ) )
+#ifdef HAVE_ZLIB_H
+                p_sys->b_compressed = VLC_TRUE;
+#else
+                msg_Warn( p_access, "Compressed content not supported. Rebuild with zlib support." );
+#endif
         }
         else if( !strcasecmp( psz, "Pragma" ) )
         {

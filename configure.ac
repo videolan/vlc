@@ -521,6 +521,10 @@ AC_CHECK_FUNCS(gethostbyname,,[
   ])
 ])
 
+AC_CHECK_HEADERS(zlib.h, [
+  VLC_ADD_LIBS([access_http],[-lz])
+])
+
 dnl Check for socklen_t
 AC_CACHE_CHECK([for socklen_t], ac_cv_type_socklen_t,
   [AC_TRY_COMPILE(
