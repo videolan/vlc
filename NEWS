@@ -1,5 +1,7 @@
 $Id$
 
+CVE IDs pending: 2008-0295, 2008-0296, 2007-6681, 2007-6682, 2007-6683
+
 Changes between 0.8.6 and 0.9.0-svn (not released yet):
 -------------------------------------------------------
 
@@ -34,7 +36,7 @@ Important notes:
      New: '#rtp{dst=239.255.1.2,sap}'
  * You now need to append --m3u-extvlcopt to your command line to enable
    EXTVLCOPT options parsing in m3u playlists. Note that only a limited set
-   of options is available to m3u playlists.
+   of options is available to m3u playlists (CVE-2007-6683).
 
 Changes:
 --------
@@ -191,7 +193,7 @@ Windows and Mac OS Binaries
  * FLAC Security Update (CVE-2007-4619) to prevent multiple integer overflows 
 
 Active X plugin:
- * Security update (VideoLAN-SA-0703)
+ * Security update (VideoLAN-SA-0703, CVE-2007-6262)
  
 Mac OS X Interface & Port:
  * Apple Remote support on Mac OS X 10.5 Leopard with enhanced functionality
@@ -208,6 +210,7 @@ Other changes:
  * The automatic updating facility was removed
  * You now need to append --m3u-extvlcopt to your command line to enable
    EXTVLCOPT options parsing in m3u playlists.
+ * RTSP server remote denial of service fixed (CVE-2007-6684).
 
 
 Changes between 0.8.6b and 0.8.6c:
@@ -222,10 +225,11 @@ Various bugfixes, notably:
  * MKV demuxer crash (related to seeking)
 
 CDDA / Vorbis / Theora / SAP plugins:
- * Security updates (VideoLAN-SA-0702, CVE-2007-3316)
+ * Security updates (VideoLAN-SA-0702, CVE-2007-3316, US-CERT VU#200928)
 
 Demuxers:
  * Fixed a problem with detecting embedded subtitles (GAB2 format) in AVI
+ * Prevent WAV file integer overflow (CVE-2007-3467 & CVE-2007-3468)
 
 Decoders:
  * Updated FLAC API compatibility
@@ -266,7 +270,7 @@ Changes between 0.8.6 and 0.8.6a:
 ---------------------------------
 
 CDDA / VCDX plugins:
- * Security updates (VideoLAN-SA-0701)
+ * Security updates (VideoLAN-SA-0701, CVE-2007-0017)
 
 Mac OS X Interface:
  * Fullscreen controller improvements
