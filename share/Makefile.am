@@ -21,7 +21,8 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
-	$(DIST_osdmenu_minimal)
+	$(DIST_osdmenu_minimal) \
+	$(DIST_mozilla)
 
 nobase_pkgdata_DATA = skins2/default.vlt
 nobase_dist_data_DATA = applications/vlc.desktop
@@ -351,3 +352,17 @@ DIST_http_lua = \
 	http-lua/vlm.html \
 	http-lua/vlm_export.html \
 	http-lua/flash.html
+
+DIST_mozilla = \
+	mozilla/fullscreen.xpm \
+	mozilla/pause.xpm \
+	mozilla/play.xpm \
+	mozilla/skip_next.xpm \
+	mozilla/skip_previous.xpm \
+	mozilla/stop.xpm \
+	mozilla/time_icon.xpm \
+	mozilla/time_line.xpm \
+	mozilla/volume_knob.xpm \
+	mozilla/volume_max.xpm \
+	mozilla/volume_mute.xpm \
+	mozilla/volume_slider_bar.xpm
