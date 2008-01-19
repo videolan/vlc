@@ -148,6 +148,11 @@ void PrefsDialog::setAdvanced()
     }
     advanced_panel->show();
 
+    /* Select the first Item of the preferences. Maybe you want to select a specified
+       category... */
+    advanced_tree->setCurrentIndex(
+            advanced_tree->model()->index( 0, 0, QModelIndex() ) );
+
     all->setChecked( true );
 }
 
