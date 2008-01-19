@@ -338,7 +338,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     va_list args_save;
 
     va_copy ( args_save, args );
-    va_end ( args_save );
 
     switch( i_query )
     {
@@ -356,13 +355,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
 
-        default:
+        case DEMUX_GET_LENGTH:
             i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
             /* No bitrate, we can't have it precisely, but we can compute
              * a raw approximation with time/position */
-            if( i_ret && i_query == DEMUX_GET_LENGTH &&!p_sys->i_bitrate_avg )
+            if( i_ret && !p_sys->i_bitrate_avg )
             {
                 float f_pos = (double)(uint64_t)( stream_Tell( p_demux->s ) ) /
                               (double)(uint64_t)( stream_Size( p_demux->s ) );
@@ -376,6 +375,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *pi64 = (p_sys->i_pts + p_sys->i_time_offset) / f_pos;
                 return VLC_SUCCESS;
             }
+            va_end( args_save );
+            return i_ret;
+
+        default:
+            i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
+                                            p_sys->i_bitrate_avg, 1, i_query,
+                                            args );
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
                 (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
