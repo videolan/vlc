@@ -29,7 +29,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#ifdef XP_UNIX
 #include <X11/xpm.h>
+#endif
 
 /* Mozilla stuff */
 #ifdef HAVE_MOZILLA_CONFIG_H
