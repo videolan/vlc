@@ -67,14 +67,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* retrieve last known path used in file browsing */
     char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
-    if( EMPTY_STR( psz_filepath ) )
-    {
-        psz_filepath = p_intf->p_libvlc->psz_homedir;
-    }
 
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-            qfu( psz_filepath ), fileTypes );
+            qfu( EMPTY_STR( psz_filepath ) ? psz_filepath : p_intf->p_libvlc->psz_homedir ), fileTypes );
     delete psz_filepath;
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
