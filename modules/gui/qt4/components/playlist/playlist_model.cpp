@@ -84,7 +84,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
         //Add empty string and update() handles data appending
         item_col_strings.append( "" );
     }
-    msg_Dbg( model->p_intf, "PLItem created: %i", model->i_depth );
+    msg_Dbg( model->p_intf, "PLItem created of type: %i", model->i_depth );
 }
 
 /*
