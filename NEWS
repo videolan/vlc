@@ -1,7 +1,5 @@
 $Id$
 
-CVE IDs pending: 2008-0295, 2008-0296, 2007-6681, 2007-6682, 2007-6683
-
 Changes between 0.8.6 and 0.9.0-svn (not released yet):
 -------------------------------------------------------
 
@@ -178,6 +176,7 @@ New Localizations:
  * Persian
  * Polish
 
+TODO: Add 0.8.6e changelog here
 
 Changes between 0.8.6c and 0.8.6d:
 ----------------------------------
