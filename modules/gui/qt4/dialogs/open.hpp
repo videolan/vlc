@@ -79,7 +79,7 @@ private:
     int i_action_flag;
     QStringList SeparateEntries( QString );
 
-    QPushButton *cancelButton, *selectButton;
+    QToolButton *cancelButton, *selectButton;
     QToolButton *playButton;
 
     void finish( bool );

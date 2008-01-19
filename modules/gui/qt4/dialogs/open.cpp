@@ -93,7 +93,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     buttonSizePolicy.setVerticalStretch( 0 );
 
     /* Play Button */
-    playButton = new QToolButton( this );
+    playButton = new QToolButton;
     playButton->setText( qtr( "&Play" ) );
     playButton->setSizePolicy( buttonSizePolicy );
     playButton->setMinimumSize( QSize( 90, 0 ) );
@@ -101,12 +101,12 @@ OpenDialog::OpenDialog( QWidget *parent,
     playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
 
     /* Cancel Button */
-    cancelButton = new QPushButton();
+    cancelButton = new QToolButton;
     cancelButton->setText( qtr( "&Cancel" ) );
     cancelButton->setSizePolicy( buttonSizePolicy );
 
     /* Select Button */
-    selectButton = new QPushButton;
+    selectButton = new QToolButton;
     selectButton->setText( qtr( "Select" ) );
     selectButton->setSizePolicy( buttonSizePolicy );
 
