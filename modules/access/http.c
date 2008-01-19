@@ -369,8 +369,6 @@ connect:
         p_sys->psz_location && *p_sys->psz_location )
     {
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
-        printf("redirection to %s", p_sys->psz_location );
-
 
         /* Do not accept redirection outside of HTTP works */
         if( strncmp( p_sys->psz_location, "http", 4 )
