@@ -55,7 +55,7 @@ struct shout_item_t
 /* WARN: We support only two levels */
 
 static const struct shout_item_t p_frenchtv_canalplus[] = {
-    item( N_("Les Guignols"), "http://www.canalplus.fr/index.php?pid=1784" ),
+    itemWithOption( N_("Les Guignols"), "http://www.canalplus.fr/index.php?pid=1784", "http-forward-cookies" ),
     endItem()
 };
     
