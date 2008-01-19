@@ -987,26 +987,35 @@ package-macosx:
 # Place a link to the application folder
 	ln -s /Applications $(top_builddir)/vlc-${VERSION}/Applications ;
 
-# Create disk image 
+# Create disk image (temporarily taken from the 0.8.6-bugfix branch to provide reliable NBs)
 	echo "Creating disk image" ;
 	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
-	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-${VERSION}" \
-	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDRW \
-	  -scrub -imagekey zlib-level=9 -attach ;
+	hdiutil create -srcfolder "$(top_builddir)/vlc-${VERSION}" \
+	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDZO \
+	  -scrub -imagekey zlib-level=9 ;
+	echo "Disk image creation completed:" ;
+	ls -la "$(top_builddir)/vlc-${VERSION}.dmg" ; echo ;
+
+# Create disk image 
+#	echo "Creating disk image" ;
+#	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
+#	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-${VERSION}" \
+#	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDRW \
+#	  -scrub -imagekey zlib-level=9 -attach ;
 
 # Make sure the root window of the dmg will pop up when the dmg is mounted.
 # Note: We dont mount in /Volumes to be sure we won't collide with an other
 # finder mounted dmg with the same name.
-	echo "Make sure the root window of the dmg will pop up when the dmg is mounted" ;
+#	echo "Make sure the root window of the dmg will pop up when the dmg is mounted" ;
 #	mkdir -p $(top_builddir)/vlcmnt ;
 #	hdiutil attach -nokernel -readwrite -noverify -noautoopen -private "$(top_builddir)/vlc-${VERSION}.dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
-	bless --folder "$(top_builddir)/vlcmnt/vlc-${VERSION}/" --openfolder "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
-	sleep 1 # Make sure operation completes
+#	bless --folder "$(top_builddir)/vlcmnt/vlc-${VERSION}/" --openfolder "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
+#	sleep 1 # Make sure operation completes
 #	cd "$(srcdir)"
 
 # Unmount the image now
-	hdiutil detach "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
-	rm -R $(top_builddir)/vlcmnt ;
+#	hdiutil detach "$(top_builddir)/vlcmnt/vlc-${VERSION}" ;
+#	rm -R $(top_builddir)/vlcmnt ;
 
 # Make sure the image is not writable
 # Note: We can't directly create a read only dmg as we do the bless stuff
