@@ -84,7 +84,7 @@ typedef struct {
 typedef struct {
     int  width;
     int  height;
-    u_int32_t type;
+    uint32_t type;
     int64_t date;
     int  size;
     char *data;
