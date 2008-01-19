@@ -31,7 +31,9 @@
 #include <stdlib.h>
 
 #ifdef XP_UNIX
+#ifndef __APPLE__
 #include <X11/xpm.h>
+#endif
 #endif
 
 /* Mozilla stuff */
