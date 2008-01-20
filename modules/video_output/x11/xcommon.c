@@ -499,7 +499,7 @@ void E_(Deactivate) ( vlc_object_t *p_this )
 #ifdef HAVE_XSP
     DisablePixelDoubling(p_vout);
 #endif
-    
+
     DestroyCursor( p_vout );
     EnableXScreenSaver( p_vout );
     DestroyWindow( p_vout, &p_vout->p_sys->original_window );
@@ -2248,7 +2248,28 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 #ifdef HAVE_XSP
         EnablePixelDoubling( p_vout );
 #endif
-        
+
+        /* Activate the window (give it the focus) */
+        XClientMessageEvent event;
+
+        memset( &event, 0, sizeof( XClientMessageEvent ) );
+
+        event.type = ClientMessage;
+        event.message_type =
+           XInternAtom( p_vout->p_sys->p_display, "_NET_ACTIVE_WINDOW", False );
+        event.display = p_vout->p_sys->p_display;
+        event.window = p_vout->p_sys->p_win->base_window;
+        event.format = 32;
+        event.data.l[ 0 ] = 1; /* source indication (1 = from an application */
+        event.data.l[ 1 ] = 0; /* timestamp */
+        event.data.l[ 2 ] = 0; /* requestor's currently active window */
+        /* XXX: window manager would be more likely to obey if we already have
+         * an active window (and give it to the event), such as an interface */
+
+        XSendEvent( p_vout->p_sys->p_display,
+                    DefaultRootWindow( p_vout->p_sys->p_display ),
+                    False, SubstructureRedirectMask,
+                    (XEvent*)&event );
     }
     else
     {
@@ -3109,10 +3130,11 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
 
     p_args.p_atom = NULL;
 
-    p_vout->p_sys->b_net_wm_state_fullscreen = VLC_FALSE;
-    p_vout->p_sys->b_net_wm_state_above = VLC_FALSE;
-    p_vout->p_sys->b_net_wm_state_below = VLC_FALSE;
-    p_vout->p_sys->b_net_wm_state_stays_on_top = VLC_FALSE;
+    p_vout->p_sys->b_net_wm_state_fullscreen =
+    p_vout->p_sys->b_net_wm_state_above =
+    p_vout->p_sys->b_net_wm_state_below =
+    p_vout->p_sys->b_net_wm_state_stays_on_top =
+        VLC_FALSE;
 
     net_wm_supported =
         XInternAtom( p_vout->p_sys->p_display, "_NET_SUPPORTED", False );
