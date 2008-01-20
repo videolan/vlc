@@ -164,9 +164,6 @@ static void Run( intf_thread_t *p_intf )
 
     while( !intf_ShouldDie( p_intf ) )
     {
-        struct timeval timeout;
-        fd_set fds_r;
-
         /* Update the input */
         if( p_intf->p_sys->p_input == NULL )
         {
@@ -192,10 +189,8 @@ static void Run( intf_thread_t *p_intf )
          */
 
         /* Initialize file descriptor set and timeout (0.5s) */
-        FD_ZERO( &fds_r );
-        FD_SET( i_socket, &fds_r );
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
+        /* FIXME: arbitrary tick */
+        struct pollfd ufd = { .fd = i_socket, .events = POLLIN, };
 
         if( b_master )
         {
@@ -204,7 +199,7 @@ static void Run( intf_thread_t *p_intf )
             int i_struct_size, i_read, i_ret;
 
             /* Don't block */
-            i_ret = select( i_socket + 1, &fds_r, 0, 0, &timeout );
+            i_ret = poll( &ufd, 1, 500 );
             if( i_ret == 0 ) continue;
             if( i_ret < 0 )
             {
@@ -259,7 +254,7 @@ static void Run( intf_thread_t *p_intf )
             }
 
             /* Don't block */
-            i_ret = select(i_socket + 1, &fds_r, 0, 0, &timeout);
+            i_ret = poll( &ufd, 1, 500 );
             if( i_ret == 0 ) continue;
             if( i_ret < 0 )
             {
