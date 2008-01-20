@@ -143,6 +143,7 @@ public slots:
     void togglePlaylist();
     void toggleUpdateSystrayMenu();
     void toggleAdvanced();
+    void toggleFullScreen();
 
     /* Manage the Video Functions from the vout threads */
     void releaseVideoSlot( void * );

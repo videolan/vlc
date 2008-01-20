@@ -274,6 +274,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
         if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
 
+        /* FullScreen View */
+        action = menu->addAction( qtr( "Toggle Fullscreen Interface" ), mi,
+                SLOT( toggleFullScreen() ), qtr( "F11" ) );
+
         /* Advanced Controls */
         action = menu->addAction( qtr( "Advanced controls" ), mi,
                 SLOT( toggleAdvanced() ) );

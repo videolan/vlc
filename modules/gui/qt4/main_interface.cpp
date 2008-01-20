@@ -1135,6 +1135,14 @@ void MainInterface::closeEvent( QCloseEvent *e )
     THEDP->quit();
 }
 
+void MainInterface::toggleFullScreen( void )
+{
+    if( isFullScreen() )
+        showNormal();
+    else
+        showFullScreen();
+}
+
 /*****************************************************************************
  * Callbacks
  *****************************************************************************/
