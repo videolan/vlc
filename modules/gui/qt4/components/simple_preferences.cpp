@@ -421,7 +421,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel, artFetcher );
             CONFIG_GENERIC( "fetch-meta", Bool, NULL, metaFetcher );
+#ifdef UPDATE_CHECK
             CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, qtUpdates );
+#endif
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC( "embeded-video", Bool, NULL, embedVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,

@@ -514,8 +514,9 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
 
     CONFIG_GENERIC( "album-art", IntegerList ); line++;
     CONFIG_GENERIC_NOBOOL( "fetch-meta", Bool ); line++;
+#ifdef UPDATE_CHECK
     CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool );
-
+#endif
     QPushButton *ok = new QPushButton( qtr( "Ok" ) );
 
     gLayout->addWidget( ok, 2, 2 );
