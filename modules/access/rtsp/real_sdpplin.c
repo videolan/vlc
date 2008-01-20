@@ -24,6 +24,7 @@
  */
  
 #include "real.h"
+#define BUFLEN 32000
 
 /*
  * Decodes base64 strings (based upon b64 package)
@@ -88,7 +89,7 @@ static char *nl(char *data) {
   return (nlptr) ? nlptr + 1 : NULL;
 }
 
-static int filter(const char *in, const char *filter, char **out) {
+static int filter(const char *in, const char *filter, char **out, size_t outlen) {
 
   int flen=strlen(filter);
   size_t len;
@@ -100,6 +101,11 @@ static int filter(const char *in, const char *filter, char **out) {
     if(in[flen]=='"') flen++;
     if(in[len-1]==13) len--;
     if(in[len-1]=='"') len--;
+    if( len-flen+1 > outlen )
+    {
+        printf("Discarding end of string to avoid overflow");
+        len=outlen+flen-1;
+    }
     memcpy(*out, in+flen, len-flen+1);
     (*out)[len-flen]=0;
     return len-flen;
@@ -110,8 +116,8 @@ static int filter(const char *in, const char *filter, char **out) {
 static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
 
   sdpplin_stream_t *desc = malloc(sizeof(sdpplin_stream_t));
-  char      *buf = malloc(32000);
-  char      *decoded = malloc(32000);
+  char      *buf = malloc(BUFLEN);
+  char      *decoded = malloc(BUFLEN);
   int       handled;
 
   if( !desc ) return NULL;
@@ -120,7 +126,7 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
   if( !buf ) goto error;
   if( !decoded ) goto error;
 
-  if (filter(*data, "m=", &buf)) {
+  if (filter(*data, "m=", &buf, BUFLEN)) {
     desc->id = strdup(buf);
   } else {
     lprintf("sdpplin: no m= found.\n");
@@ -131,53 +137,53 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
   while (*data && **data && *data[0]!='m') {
     handled=0;
 
-    if(filter(*data,"a=control:streamid=",&buf)) {
+    if(filter(*data,"a=control:streamid=",&buf, BUFLEN)) {
       desc->stream_id=atoi(buf);
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=MaxBitRate:integer;",&buf)) {
+    if(filter(*data,"a=MaxBitRate:integer;",&buf, BUFLEN)) {
       desc->max_bit_rate=atoi(buf);
       if (!desc->avg_bit_rate)
         desc->avg_bit_rate=desc->max_bit_rate;
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=MaxPacketSize:integer;",&buf)) {
+    if(filter(*data,"a=MaxPacketSize:integer;",&buf, BUFLEN)) {
       desc->max_packet_size=atoi(buf);
       if (!desc->avg_packet_size)
         desc->avg_packet_size=desc->max_packet_size;
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=StartTime:integer;",&buf)) {
+    if(filter(*data,"a=StartTime:integer;",&buf, BUFLEN)) {
       desc->start_time=atoi(buf);
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=Preroll:integer;",&buf)) {
+    if(filter(*data,"a=Preroll:integer;",&buf, BUFLEN)) {
       desc->preroll=atoi(buf);
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=length:npt=",&buf)) {
+    if(filter(*data,"a=length:npt=",&buf, BUFLEN)) {
       desc->duration=(uint32_t)(atof(buf)*1000);
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=StreamName:string;",&buf)) {
+    if(filter(*data,"a=StreamName:string;",&buf, BUFLEN)) {
       desc->stream_name=strdup(buf);
       desc->stream_name_size=strlen(desc->stream_name);
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=mimetype:string;",&buf)) {
+    if(filter(*data,"a=mimetype:string;",&buf, BUFLEN)) {
       desc->mime_type=strdup(buf);
       desc->mime_type_size=strlen(desc->mime_type);
       handled=1;
       *data=nl(*data);
     }
-    if(filter(*data,"a=OpaqueData:buffer;",&buf)) {
+    if(filter(*data,"a=OpaqueData:buffer;",&buf, BUFLEN)) {
       decoded = b64_decode(buf, decoded, &(desc->mlti_data_size));
       if ( decoded != NULL ) {
           desc->mlti_data = malloc(sizeof(char)*desc->mlti_data_size);
@@ -187,7 +193,7 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
           lprintf("mlti_data_size: %i\n", desc->mlti_data_size);
       }
     }
-    if(filter(*data,"a=ASMRuleBook:string;",&buf)) {
+    if(filter(*data,"a=ASMRuleBook:string;",&buf, BUFLEN)) {
       desc->asm_rule_book=strdup(buf);
       handled=1;
       *data=nl(*data);
@@ -218,8 +224,8 @@ sdpplin_t *sdpplin_parse(char *data) {
 
   sdpplin_t        *desc = malloc(sizeof(sdpplin_t));
   sdpplin_stream_t *stream;
-  char             *buf=malloc(3200);
-  char             *decoded=malloc(3200);
+  char             *buf=malloc(BUFLEN);
+  char             *decoded=malloc(BUFLEN);
   int              handled;
   int              len;
 
@@ -241,7 +247,7 @@ sdpplin_t *sdpplin_parse(char *data) {
   while (data && *data) {
     handled=0;
 
-    if (filter(data, "m=", &buf)) {
+    if (filter(data, "m=", &buf, BUFLEN)) {
         if ( !desc->stream ) {
             fprintf(stderr, "sdpplin.c: stream identifier found before stream count, skipping.");
             continue;
@@ -251,7 +257,7 @@ sdpplin_t *sdpplin_parse(char *data) {
         desc->stream[stream->stream_id]=stream;
         continue;
     }
-    if(filter(data,"a=Title:buffer;",&buf)) {
+    if(filter(data,"a=Title:buffer;",&buf, BUFLEN)) {
       decoded=b64_decode(buf, decoded, &len);
 	  if ( decoded != NULL ) {
           desc->title=strdup(decoded);
@@ -259,7 +265,7 @@ sdpplin_t *sdpplin_parse(char *data) {
           data=nl(data);
       }
     }
-    if(filter(data,"a=Author:buffer;",&buf)) {
+    if(filter(data,"a=Author:buffer;",&buf, BUFLEN)) {
       decoded=b64_decode(buf, decoded, &len);
 	  if ( decoded != NULL ) {
           desc->author=strdup(decoded);
@@ -267,7 +273,7 @@ sdpplin_t *sdpplin_parse(char *data) {
           data=nl(data);
       }
     }
-    if(filter(data,"a=Copyright:buffer;",&buf)) {
+    if(filter(data,"a=Copyright:buffer;",&buf, BUFLEN)) {
       decoded=b64_decode(buf, decoded, &len);
 	  if ( decoded != NULL ) {
           desc->copyright=strdup(decoded);
@@ -275,7 +281,7 @@ sdpplin_t *sdpplin_parse(char *data) {
           data=nl(data);
       }
     }
-    if(filter(data,"a=Abstract:buffer;",&buf)) {
+    if(filter(data,"a=Abstract:buffer;",&buf, BUFLEN)) {
       decoded=b64_decode(buf, decoded, &len);
       if ( decoded != NULL ) {
            desc->abstract=strdup(decoded);
@@ -283,13 +289,13 @@ sdpplin_t *sdpplin_parse(char *data) {
            data=nl(data);
       }
     }
-    if(filter(data,"a=StreamCount:integer;",&buf)) {
+    if(filter(data,"a=StreamCount:integer;",&buf, BUFLEN)) {
       desc->stream_count=atoi(buf);
       desc->stream = malloc(sizeof(sdpplin_stream_t*)*desc->stream_count);
       handled=1;
       data=nl(data);
     }
-    if(filter(data,"a=Flags:integer;",&buf)) {
+    if(filter(data,"a=Flags:integer;",&buf, BUFLEN)) {
       desc->flags=atoi(buf);
       handled=1;
       data=nl(data);
