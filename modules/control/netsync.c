@@ -38,7 +38,7 @@
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
-#ifdef HAVE_POLL_H
+#ifdef HAVE_POLL
 #   include <poll.h>
 #endif
 

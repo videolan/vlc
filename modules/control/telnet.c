@@ -43,7 +43,7 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
-#ifdef HAVE_POLL_H
+#ifdef HAVE_POLL
 #   include <poll.h>
 #endif
 
