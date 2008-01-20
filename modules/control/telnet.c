@@ -43,9 +43,11 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
+#ifdef HAVE_POLL_H
+#   include <poll.h>
+#endif
 
 #include <vlc_network.h>
-#include <poll.h>
 #include <vlc_url.h>
 #include <vlc_vlm.h>
 

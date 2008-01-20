@@ -38,6 +38,9 @@
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
+#ifdef HAVE_POLL_H
+#   include <poll.h>
+#endif
 
 #include <vlc_network.h>
 

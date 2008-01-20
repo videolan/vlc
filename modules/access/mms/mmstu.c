@@ -45,9 +45,11 @@
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
+#ifdef HAVE_POLL_H
+#   include <poll.h>
+#endif
 
 #include <vlc_network.h>
-#include <poll.h>
 #include "vlc_url.h"
 #include "asf.h"
 #include "buffer.h"
