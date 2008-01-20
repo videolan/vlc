@@ -842,21 +842,21 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     libvlc_media_instance_release(p_md);
 
     /* load icons */
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/play.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/play.xpm",
                         &p_playIcon, NULL, NULL);
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/pause.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
                         &p_pauseIcon, NULL, NULL);
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/stop.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
                         &p_stopIcon, NULL, NULL );
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/time_line.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
                         &p_timeline, NULL, NULL);
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/time_icon.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
                         &p_timeKnob, NULL, NULL);
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/fullscreen.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
                         &p_fscreen, NULL, NULL);
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/volume_max.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
                         &p_muteIcon, NULL, NULL);
-    XpmReadFileToImage( p_display, "/usr/share/vlc/mozilla/volume_mute.xpm",
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
                         &p_unmuteIcon, NULL, NULL);
 
 #if 1 /* DEBUG */
