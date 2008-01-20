@@ -990,9 +990,8 @@ package-macosx:
 # Create disk image (temporarily taken from the 0.8.6-bugfix branch to provide reliable NBs)
 	echo "Creating disk image" ;
 	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
-	hdiutil create -srcfolder "$(top_builddir)/vlc-${VERSION}" \
-	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDZO \
-	  -scrub -imagekey zlib-level=9 ;
+	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-${VERSION}" \
+	  "$(top_builddir)/vlc-${VERSION}.dmg" -scrub ;
 	echo "Disk image creation completed:" ;
 	ls -la "$(top_builddir)/vlc-${VERSION}.dmg" ; echo ;
 
