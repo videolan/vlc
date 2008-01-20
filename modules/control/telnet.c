@@ -30,6 +30,7 @@
 #include <vlc_interface.h>
 #include <vlc_input.h>
 
+#include <stdbool.h>
 #include <sys/stat.h>
 
 #include <errno.h>
@@ -44,6 +45,7 @@
 #endif
 
 #include <vlc_network.h>
+#include <poll.h>
 #include <vlc_url.h>
 #include <vlc_vlm.h>
 
@@ -237,82 +239,71 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
-    struct timeval  timeout;
     char           *psz_password;
+    unsigned        nlisten = 0;
+
+    for (const int *pfd = p_sys->pi_fd; *pfd != -1; pfd++)
+        nlisten++; /* How many listening sockets do we have? */
 
     psz_password = config_GetPsz( p_intf, "telnet-password" );
 
     while( !intf_ShouldDie( p_intf ) )
     {
-        fd_set fds_read, fds_write;
-        int    i_handle_max = 0;
-        int    i_ret, i_len, fd, i;
+        unsigned ncli = p_sys->i_clients;
+        struct pollfd ufd[ncli + nlisten];
 
-        /* if a new client wants to communicate */
-        fd = net_Accept( p_intf, p_sys->pi_fd, p_sys->i_clients > 0 ? 0 : -1 );
-        if( fd != -1 )
-        {
-            telnet_client_t *cl = malloc( sizeof( telnet_client_t ));
-            if( cl )
-            {
-                memset( cl, 0, sizeof(telnet_client_t) );
-                cl->i_tel_cmd = 0;
-                cl->fd = fd;
-                cl->buffer_write = NULL;
-                cl->p_buffer_write = cl->buffer_write;
-                Write_message( cl, NULL,
-                               "Password: \xff\xfb\x01" , WRITE_MODE_PWD );
-
-                TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
-            }
-            else
-            {
-                net_Close( fd );
-                continue;
-            }
-        }
-
-        /* to do a proper select */
-        FD_ZERO( &fds_read );
-        FD_ZERO( &fds_write );
-
-        for( i = 0 ; i < p_sys->i_clients ; i++ )
+        for (unsigned i = 0; i < ncli; i++)
         {
             telnet_client_t *cl = p_sys->clients[i];
 
+            ufd[i].fd = cl->fd;
             if( (cl->i_mode == WRITE_MODE_PWD) || (cl->i_mode == WRITE_MODE_CMD) )
-            {
-                FD_SET( cl->fd , &fds_write );
-            }
+                ufd[i].events = POLLOUT;
             else
-            {
-                FD_SET( cl->fd , &fds_read );
-            }
-            i_handle_max = __MAX( i_handle_max, cl->fd );
+                ufd[i].events = POLLIN;
+            ufd[i].revents = 0;
         }
 
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500*1000;
-
-        i_ret = select( i_handle_max + 1, &fds_read, &fds_write, 0, &timeout );
-        if( (i_ret == -1) && (errno != EINTR) )
+        for (unsigned i = 0; i < nlisten; i++)
         {
-            msg_Warn( p_intf, "cannot select sockets" );
-            msleep( 1000 );
-            continue;
+            ufd[ncli + i].fd = p_sys->pi_fd[i];
+            ufd[ncli + i].events = POLLIN;
+            ufd[ncli + i].revents = 0;
         }
-        else if( i_ret <= 0 )
+
+        /* FIXME: arbitrary tick */
+        switch (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), 500))
         {
-            continue;
+            case -1:
+                if (net_errno != EINTR)
+                {
+                    msg_Err (p_intf, "network poll error");
+                    msleep (1000);
+                    continue;
+                }
+            case 0:
+                continue;
         }
 
         /* check if there is something to do with the socket */
-        for( i = 0 ; i < p_sys->i_clients ; i++ )
+        for (unsigned i = 0; i < ncli; i++)
         {
             telnet_client_t *cl = p_sys->clients[i];
 
-            if( FD_ISSET(cl->fd , &fds_write) && (cl->i_buffer_write > 0) )
+            if (ufd[i].revents & (POLLERR|POLLHUP))
             {
+            drop:
+                net_Close( cl->fd );
+                TAB_REMOVE( p_intf->p_sys->i_clients ,
+                            p_intf->p_sys->clients , cl );
+                free( cl );
+                continue;
+            }
+
+            if (ufd[i].revents & POLLOUT && (cl->i_buffer_write > 0))
+            {
+                ssize_t i_len;
+
                 i_len = send( cl->fd, cl->p_buffer_write ,
                               cl->i_buffer_write, 0 );
                 if( i_len > 0 )
@@ -321,10 +312,10 @@ static void Run( intf_thread_t *p_intf )
                     cl->i_buffer_write -= i_len;
                 }
             }
-            else if( FD_ISSET( cl->fd, &fds_read) )
+            if (ufd[i].revents & POLLIN)
             {
-                int i_end = 0;
-                int i_recv;
+                bool end = false;
+                ssize_t i_recv;
 
                 while( ((i_recv=recv( cl->fd, cl->p_buffer_read, 1, 0 )) > 0) &&
                        ((cl->p_buffer_read - cl->buffer_read) < 999) )
@@ -338,7 +329,7 @@ static void Run( intf_thread_t *p_intf )
                             break;
                         case '\n':
                             *cl->p_buffer_read = '\n';
-                            i_end = 1;
+                            end = true;
                             break;
                         case TEL_IAC: // telnet specific command
                             cl->i_tel_cmd = 1;
@@ -369,7 +360,7 @@ static void Run( intf_thread_t *p_intf )
                         break;
                     }
 
-                    if( i_end != 0 ) break;
+                    if( end ) break;
                 }
 
                 if( (cl->p_buffer_read - cl->buffer_read) == 999 )
@@ -378,18 +369,13 @@ static void Run( intf_thread_t *p_intf )
                                    cl->i_mode + 2 );
                 }
 
-                if( i_recv == 0  || ( i_recv == -1 &&  errno != EAGAIN && errno != 0 ) )
-                {
-                    net_Close( cl->fd );
-                    TAB_REMOVE( p_intf->p_sys->i_clients ,
-                                p_intf->p_sys->clients , cl );
-                    free( cl );
-                }
+                if (i_recv <= 0)
+                    goto drop;
             }
         }
 
         /* and now we should bidouille the data we received / send */
-        for( i = 0 ; i < p_sys->i_clients ; i++ )
+        for(int i = 0 ; i < p_sys->i_clients ; i++ )
         {
             telnet_client_t *cl = p_sys->clients[i];
 
@@ -492,6 +478,35 @@ static void Run( intf_thread_t *p_intf )
 
                 }
             }
+        }
+
+        /* handle new connections */
+        for (unsigned i = 0; i < nlisten; i++)
+        {
+            int fd;
+
+            if (ufd[ncli + i].revents == 0)
+                continue;
+
+            fd = accept (ufd[ncli + i].fd, NULL, NULL);
+            if (fd == -1)
+                continue;
+
+            telnet_client_t *cl = malloc( sizeof( telnet_client_t ));
+            if (cl == NULL)
+            {
+                net_Close (fd);
+                continue;
+            }
+
+            memset( cl, 0, sizeof(telnet_client_t) );
+            cl->i_tel_cmd = 0;
+            cl->fd = fd;
+            cl->buffer_write = NULL;
+            cl->p_buffer_write = cl->buffer_write;
+            Write_message( cl, NULL,
+                           "Password: \xff\xfb\x01" , WRITE_MODE_PWD );
+            TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
         }
     }
     if( psz_password )
