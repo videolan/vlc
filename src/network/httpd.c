@@ -2516,9 +2516,8 @@ static void httpd_HostThread( httpd_host_t *host )
                 continue;
 
             /* */
-            int kludge[] = { ufd[nfd].fd, -1 };
-            int fd = net_Accept( host, kludge, 0 );
-            if( fd < 0 )
+            int fd = accept (ufd[nfd].fd, NULL, NULL);
+            if (fd == -1)
                 continue;
 
             if( p_tls != NULL )
