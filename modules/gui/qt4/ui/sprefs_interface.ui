@@ -200,7 +200,7 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QCheckBox" name="metaFetcher" >
         <property name="text" >
-         <string>_("Fetch the metadata from Internet")</string>
+         <string>_("Fetch the metadata from the Internet")</string>
         </property>
        </widget>
       </item>
