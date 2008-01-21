@@ -72,7 +72,7 @@ protected:
     friend class PlaylistWidget;
 private:
     QTreeView *view;
-    QPushButton *repeatButton , *randomButton,*addButton;
+    QPushButton *repeatButton, *randomButton, *addButton, *gotoPlayingButton;
     ClickLineEdit *searchLine;
     int currentRootId;
     QSignalMapper *ContextUpdateMapper;
@@ -84,6 +84,7 @@ private slots:
     void handleExpansion( const QModelIndex& );
     void toggleRandom();
     void toggleRepeat();
+    void gotoPlayingItem();
     void doPopup( QModelIndex index, QPoint point );
     void search( QString search );
     void clearFilter();

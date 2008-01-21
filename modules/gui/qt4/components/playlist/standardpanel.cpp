@@ -133,6 +133,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
 
+    /* Goto */
+    gotoPlayingButton = new QPushButton( qtr( "X" ), this );
+    BUTTONACT( gotoPlayingButton, gotoPlayingItem() );
+    buttons->addWidget( gotoPlayingButton );
+
     /* A Spacer and the search possibilities */
     QSpacerItem *spacer = new QSpacerItem( 10, 20 );
     buttons->addItem( spacer );
@@ -191,6 +196,11 @@ void StandardPLPanel::toggleRandom()
                 QIcon( ":/pixmaps/playlist_shuffle_off.png" ) :
                 QIcon( ":/pixmaps/playlist_shuffle_on.png" ) );
     randomButton->setToolTip( prev ? qtr( I_PL_NORANDOM ) : qtr(I_PL_RANDOM ) );
+}
+
+void StandardPLPanel::gotoPlayingItem()
+{
+    view->scrollTo( view->currentIndex() );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex &index )
