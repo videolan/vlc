@@ -555,25 +555,25 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
 
         vlc_spin_lock (&internals->spin);
         signaled = internals->b_signaled;
-        if ((!signaled) && (internals->pipes[0] == -1))
+        if (internals->pipes[0] == -1)
         {
             internals->pipes[0] = pfd[0];
             internals->pipes[1] = pfd[1];
         }
+        else
+            race = VLC_TRUE;
     }
     vlc_spin_unlock (&internals->spin);
 
-    if (race || signaled)
-    {
+    if (race)
+    {   /* Race condition: two threads call pipe() - unlikely */
         close (pfd[0]);
         close (pfd[1]);
-
-        if (signaled)
-        {   /* vlc_object_signal() was already invoked! */
-            errno = EINTR;
-            return -1;
-        }
     }
+
+    if (signaled)
+        /* Race condition: lc_object_signal() already invoked! */
+        while (write (internals->pipes[1], &(char){ 0 }, 1) < 0);
 
     return internals->pipes[0];
 }

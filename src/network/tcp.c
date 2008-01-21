@@ -286,10 +286,9 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 
     assert( pi_fd != NULL );
 
-    vlc_object_lock (p_this);
     evfd = vlc_object_waitpipe (p_this);
 
-    while (vlc_object_alive (p_this))
+    for (;;)
     {
         unsigned n = 0;
         while (pi_fd[n] != -1)
@@ -303,8 +302,9 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             ufd[i].events = POLLIN;
             ufd[i].revents = 0;
         }
+        if (evfd == -1)
+            n--; /* avoid EBADF */
 
-        vlc_object_unlock (p_this);
         switch (poll (ufd, n, timeout))
         {
             case -1:
@@ -313,11 +313,9 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             case 0:
                 return -1; /* NOTE: p_this already unlocked */
         }
-        vlc_object_lock (p_this);
 
         if (ufd[n].revents)
         {
-            vlc_object_wait (p_this);
             errno = EINTR;
             break;
         }
@@ -338,11 +336,9 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
              */
             memmove (pi_fd + i, pi_fd + i + 1, n - (i + 1));
             pi_fd[n - 1] = sfd;
-            vlc_object_unlock (p_this);
             return fd;
         }
     }
-    vlc_object_unlock (p_this);
     return -1;
 }
 

@@ -258,7 +258,8 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
  *****************************************************************************
  * Reads from a network socket.
  * If waitall is true, then we repeat until we have read the right amount of
- * data; in that case, a short count means EOF has been reached.
+ * data; in that case, a short count means EOF has been reached or the VLC
+ * object has been signaled.
  *****************************************************************************/
 ssize_t
 __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
@@ -270,27 +271,17 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         { .fd = -1, .events = POLLIN },
     };
 
-    vlc_object_lock (p_this);
-    ufd[1].fd = vlc_object_waitpipe (p_this);
-
     while (i_buflen > 0)
     {
         int val;
 
-        if (!vlc_object_alive (p_this))
+        ufd[1].fd = vlc_object_waitpipe (p_this);
+        if (ufd[1].fd == -1)
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            WSASetLastError (WSAEINTR);
-#else
-            errno = EINTR;
-#endif
-            goto error;
         }
         ufd[0].revents = ufd[1].revents = 0;
 
-        vlc_object_unlock (p_this);
         val = poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1);
-        vlc_object_lock (p_this);
 
         if (val < 0)
             goto error;
@@ -298,9 +289,16 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         if (ufd[1].revents)
         {
             msg_Dbg (p_this, "socket %d polling interrupted", fd);
-            vlc_object_wait (p_this);
-            msg_Dbg (p_this, "socket %d polling restarting", fd);
-            continue;
+            if (i_total == 0)
+            {
+#if defined(WIN32) || defined(UNDER_CE)
+                WSASetLastError (WSAEINTR);
+#else
+                errno = EINTR;
+#endif
+                goto error;
+            }
+            break;
         }
 
         assert (ufd[0].revents);
@@ -378,13 +376,10 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             break;
     }
 
-    vlc_object_unlock (p_this);
     return i_total;
 
 error:
     msg_Err (p_this, "Read error: %m");
-
-    vlc_object_unlock (p_this);
     return -1;
 }
 
