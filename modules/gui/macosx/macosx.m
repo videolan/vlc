@@ -84,6 +84,10 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define RECENT_ITEMS_LONGTEXT N_("By default, VLC keeps a list of the last 10 items. " \
                                  "This feature can be disabled here.")
 
+#define EQ_KEEP_TEXT N_("Keep current Equalizer settings")
+#define EQ_KEEP_LONGTEXT N_("By default, VLC keeps the last equalizer settings before " \
+                            "termination. This feature can be disabled here.")
+
 vlc_module_begin();
     set_description( _("Mac OS X interface") );
     set_capability( "interface", 100 );
@@ -95,6 +99,8 @@ vlc_module_begin();
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
               VLC_FALSE );
     add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
+              VLC_FALSE );
+    add_bool( "macosx-eq-keep", 1, NULL, EQ_KEEP_TEXT, EQ_KEEP_LONGTEXT,
               VLC_FALSE );
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
               VLC_FALSE );

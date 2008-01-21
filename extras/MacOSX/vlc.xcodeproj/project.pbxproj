@@ -975,8 +975,8 @@
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		2A16E03F06C4F08700C87B09 /* equalizer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = equalizer.h; path = ../../modules/gui/macosx/equalizer.h; sourceTree = SOURCE_ROOT; };
-		2A16E04006C4F08700C87B09 /* equalizer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = equalizer.m; path = ../../modules/gui/macosx/equalizer.m; sourceTree = SOURCE_ROOT; };
+		2A16E03F06C4F08700C87B09 /* equalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = equalizer.h; path = ../../modules/gui/macosx/equalizer.h; sourceTree = SOURCE_ROOT; };
+		2A16E04006C4F08700C87B09 /* equalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = equalizer.m; path = ../../modules/gui/macosx/equalizer.m; sourceTree = SOURCE_ROOT; };
 		2A16E07E06C5074F00C87B09 /* equalizerdrawer_active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = equalizerdrawer_active.png; path = Resources/equalizerdrawer_active.png; sourceTree = "<group>"; };
 		2A16E07F06C5074F00C87B09 /* equalizerdrawer_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = equalizerdrawer_blue.png; path = Resources/equalizerdrawer_blue.png; sourceTree = "<group>"; };
 		2AEF857609A5FEC900130822 /* fspanel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fspanel.h; path = ../../modules/gui/macosx/fspanel.h; sourceTree = SOURCE_ROOT; };
@@ -1137,7 +1137,7 @@
 		CCCB86D90ACFDFB300CF1E10 /* fs_stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop.png; path = Resources/fs_stop.png; sourceTree = "<group>"; };
 		CCCB86DA0ACFDFB300CF1E10 /* fs_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_background.png; path = Resources/fs_background.png; sourceTree = "<group>"; };
 		CCF3C64B0923B99D00401862 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SFilters.nib; sourceTree = "<group>"; };
-		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
+		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
 		CCF3C6510923B9D100401862 /* sfilters.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = sfilters.m; path = ../../modules/gui/macosx/sfilters.m; sourceTree = SOURCE_ROOT; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
