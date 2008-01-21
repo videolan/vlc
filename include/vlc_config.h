@@ -101,6 +101,7 @@
  *****************************************************************************/
 
 /* Volume */
+/* If you are coding an interface, please see src/audio_output/intf.c */
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_STEP                32
 #define AOUT_VOLUME_MAX                 1024
