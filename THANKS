@@ -194,6 +194,7 @@ Roman Bednarek <roman at mikronika.com.pl> - MPL2 subtitles support
 Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs, multipass x264 patch
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
+Sidney Doria <ssdoria qt gmail.com> - Brazilian Portuguese localisation
 Simon Damkjær Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
 Stefán Freyr Stefánsson <stefan.freyr -at- gmail.com> - Qt4 speed slider
 Steve Lhomme <steve dot lhomme at free dot fr> - MSVC fixes and Matroska enhancements

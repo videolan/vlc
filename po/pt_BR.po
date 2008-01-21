@@ -1,10 +1,17 @@
+# Brazilian Portuguese Translation for VLC.
+# Copyright (C) 2003-2008 the VideoLAN team
+# $Id$
+#
+# André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003.
+# Sidney Doria <sidney at  dsc.ufcg.edu d0t br>, 2008
+
 msgid ""
 msgstr ""
 "Project-Id-Version: pt_BR\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2008-01-21 22:07+0000\n"
 "PO-Revision-Date: 2008-01-21 14:06-0300\n"
-"Last-Translator: Sidney Doria <sidney@dsc.ufcg.edu.br>\n"
+"Last-Translator: Sidney Doria <sidney a7  dsc.ufcg.edu d0t br>\n"
 "Language-Team: Brazilian Portuguese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1328,7 +1335,7 @@ msgstr "Movimentos do mouse"
 #: src/libvlc-common.c:283 src/libvlc-common.c:418 src/modules/cache.c:188
 #: src/modules/cache.c:501
 msgid "C"
-msgstr "C"
+msgstr "pt_BR"
 
 #: src/libvlc-common.c:1531
 msgid " (default enabled)"
