@@ -814,3 +814,8 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 VLC development is NOT about being a sed god.
   -- courmisch
 %
+<Meuuh> no one reads my documentation
+<Dnumgis> Meuuh: they see your name on it and naturally assume it must be out
+          dated
+  -- #videolan
+%
