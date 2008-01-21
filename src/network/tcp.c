@@ -258,6 +258,22 @@ next_ai: /* failure */
 }
 
 
+int net_AcceptSingle (vlc_object_t *obj, int lfd)
+{
+    int fd = accept (lfd, NULL, NULL);
+    if (fd == -1)
+    {
+        if (net_errno != EAGAIN)
+            msg_Err (obj, "accept failed (from socket %d): %m", lfd);
+        return -1;
+    }
+
+    msg_Dbg (obj, "accepted socket %d (from socket %d)", fd, lfd);
+    net_SetupSocket (fd);
+    return 0;
+}
+
+
 /*****************************************************************************
  * __net_Accept:
  *****************************************************************************
@@ -312,13 +328,9 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
                 continue;
 
             int sfd = ufd[i].fd;
-            int fd = accept (sfd, NULL, NULL);
+            int fd = net_AcceptSingle (p_this, sfd);
             if (fd == -1)
-            {
-                msg_Err (p_this, "accept failed (%m)");
                 continue;
-            }
-            net_SetupSocket (fd);
 
             /*
              * Move listening socket to the end to let the others in the
@@ -327,7 +339,6 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             memmove (pi_fd + i, pi_fd + i + 1, n - (i + 1));
             pi_fd[n - 1] = sfd;
             vlc_object_unlock (p_this);
-            msg_Dbg (p_this, "accepted socket %d (from socket %d)", fd, sfd);
             return fd;
         }
     }

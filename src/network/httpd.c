@@ -2509,17 +2509,19 @@ static void httpd_HostThread( httpd_host_t *host )
         {
             httpd_client_t *cl;
             int i_state = -1;
+            int fd = ufd[nfd].fd;
 
-            assert (ufd[nfd].fd == host->fds[nfd]);
+            assert (fd == host->fds[nfd]);
 
             if( ufd[nfd].revents == 0 )
                 continue;
 
             /* */
-            int fd = accept (ufd[nfd].fd, NULL, NULL);
+            fd = accept (fd, NULL, NULL);
             if (fd == -1)
                 continue;
 
+            net_SetupSocket (fd);
             if( p_tls != NULL )
             {
                 switch( tls_ServerSessionHandshake( p_tls, fd ) )

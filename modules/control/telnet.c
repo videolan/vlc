@@ -490,7 +490,7 @@ static void Run( intf_thread_t *p_intf )
             if (ufd[ncli + i].revents == 0)
                 continue;
 
-            fd = accept (ufd[ncli + i].fd, NULL, NULL);
+            fd = net_AcceptSingle (VLC_OBJECT(p_intf), ufd[ncli + i].fd);
             if (fd == -1)
                 continue;
 

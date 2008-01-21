@@ -86,6 +86,9 @@ static inline int __net_ConnectTCP (vlc_object_t *obj, const char *host, int por
     return __net_Connect (obj, host, port, SOCK_STREAM, IPPROTO_TCP);
 }
 
+
+VLC_EXPORT( int, net_AcceptSingle, (vlc_object_t *obj, int lfd) );
+
 #define net_Accept(a, b, c) __net_Accept(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 
