@@ -567,11 +567,7 @@ vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
     int fd = obj->p_internals->pipes[0];
     if( fd != -1 )
     {
-        if( read( fd, &(char){ 0 }, 1 ) == 0 )
-        {
-            close( fd );
-            obj->p_internals->pipes[1] = -1;
-        }
+        while (read (fd, &(char){ 0 }, 1  < 0));
         return obj->b_die;
     }
 
@@ -659,13 +655,6 @@ void __vlc_object_kill( vlc_object_t *p_this )
     if( p_this->i_object_type == VLC_OBJECT_LIBVLC )
         for( int i = 0; i < p_this->i_children ; i++ )
             vlc_object_kill( p_this->pp_children[i] );
-
-    int fd = p_this->p_internals->pipes[1];
-    if( fd != -1 )
-    {
-        close( fd ); /* closing a pipe makes it readable too */
-        p_this->p_internals->pipes[1] = -1;
-    }
 
     vlc_object_signal_unlocked( p_this );
     vlc_mutex_unlock( &p_this->object_lock );
