@@ -1,12 +1,13 @@
 # ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
-# Copyright (C) 2003 - 2006 the VideoLAN team
+# Copyright © 2003 - 2008 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Rafaël Carré <funman@videolanorg>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -109,7 +110,7 @@ LIVEDOTCOM_URL=http://live555.com/liveMedia/public/live555-$(LIVEDOTCOM_VERSION)
 #GOOM_URL=$(VIDEOLAN)/testing/contrib/goom-macosx-altivec-bin.tar.gz
 GOOM2k4_VERSION=2k4-0
 GOOM2k4_URL=$(SF)/goom/goom-$(GOOM2k4_VERSION)-src.tar.gz
-LIBCACA_VERSION=0.9
+LIBCACA_VERSION=0.99.beta13b
 LIBCACA_URL=http://libcaca.zoy.org/files/libcaca-$(LIBCACA_VERSION).tar.gz
 LIBDCA_VERSION=0.0.5
 LIBDCA_URL=ftp://ftp.videolan.org/pub/videolan/libdca/$(LIBDCA_VERSION)/libdca-$(LIBDCA_VERSION).tar.bz2
