@@ -459,11 +459,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             panel->setLayout( gLayout );
             int line = 0;
 
-            KeySelectorControl *ksCtrl =
-                        new KeySelectorControl( VLC_OBJECT(p_intf), p_config ,
+            control = new KeySelectorControl( VLC_OBJECT(p_intf), p_config ,
                                                 this, gLayout, line );
 
             panel_label->setText( qtr( "Configure Hotkeys" ) );
+            controls.append( control );
 
             break;
         }
