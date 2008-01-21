@@ -353,6 +353,7 @@ static void Init( intf_thread_t *p_intf )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
+    config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     delete p_intf->p_sys->psz_filepath;
 
     delete app;
