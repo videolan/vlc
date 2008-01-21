@@ -195,6 +195,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_mutex_init( p_new, &p_new->object_lock );
     vlc_cond_init( p_new, &p_new->object_wait );
     vlc_mutex_init( p_new, &p_priv->var_lock );
+    vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
     if( i_type == VLC_OBJECT_GLOBAL )
@@ -443,6 +444,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
+    vlc_spin_destroy( &p_priv->spin );
     if( p_priv->pipes[0] != -1 )
         close( p_priv->pipes[0] );
     if( p_priv->pipes[1] != -1 )
@@ -532,24 +534,48 @@ error:
  * Assuming the pipe is readable, vlc_object_wait() will not block.
  * Also note that, as with vlc_object_wait(), there may be spurious wakeups.
  *
- * @param obj object that would be signaled (object lock MUST hold)
+ * @param obj object that would be signaled
  * @return a readable pipe descriptor, or -1 on error.
  */
 int __vlc_object_waitpipe( vlc_object_t *obj )
 {
-    int *pipes = obj->p_internals->pipes;
-    vlc_assert_locked( &obj->object_lock );
+    int pfd[2] = { -1, -1 };
+    struct vlc_object_internals_t *internals = obj->p_internals;
+    vlc_bool_t race = VLC_FALSE, signaled = VLC_FALSE;
 
-    if( pipes[1] == -1 )
+    vlc_spin_lock (&internals->spin);
+    if (internals->pipes[0] == -1)
     {
-        /* This can only ever happen if someone killed us without locking */
-        assert( pipes[0] == -1 );
+        /* This can only ever happen if someone killed us without locking: */
+        assert (internals->pipes[1] == -1);
+        vlc_spin_unlock (&internals->spin);
 
-        if( pipe( pipes ) )
+        if (pipe (pfd))
             return -1;
+
+        vlc_spin_lock (&internals->spin);
+        signaled = internals->b_signaled;
+        if ((!signaled) && (internals->pipes[0] == -1))
+        {
+            internals->pipes[0] = pfd[0];
+            internals->pipes[1] = pfd[1];
+        }
+    }
+    vlc_spin_unlock (&internals->spin);
+
+    if (race || signaled)
+    {
+        close (pfd[0]);
+        close (pfd[1]);
+
+        if (signaled)
+        {   /* vlc_object_signal() was already invoked! */
+            errno = EINTR;
+            return -1;
+        }
     }
 
-    return pipes[0];
+    return internals->pipes[0];
 }
 
 
@@ -562,16 +588,19 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
  */
 vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
 {
+    int fd;
+
     vlc_assert_locked( &obj->object_lock );
 
-    int fd = obj->p_internals->pipes[0];
-    if( fd != -1 )
+    fd = obj->p_internals->pipes[0];
+    if (fd != -1)
     {
-        while (read (fd, &(char){ 0 }, 1  < 0));
+        while (read (fd, &(char){ 0 }, 1)  < 0);
         return obj->b_die;
     }
 
     vlc_cond_wait( &obj->object_wait, &obj->object_lock );
+    obj->p_internals->b_signaled = VLC_FALSE;
     return obj->b_die;
 }
 
@@ -633,9 +662,16 @@ vlc_bool_t __vlc_object_alive( vlc_object_t *obj )
  */
 void __vlc_object_signal_unlocked( vlc_object_t *obj )
 {
-    vlc_assert_locked( &obj->object_lock );
+    struct vlc_object_internals_t *internals = obj->p_internals;
+    int fd;
 
-    int fd = obj->p_internals->pipes[1];
+    vlc_assert_locked (&obj->object_lock);
+
+    vlc_spin_lock (&internals->spin);
+    fd = internals->pipes[1];
+    internals->b_signaled = VLC_TRUE;
+    vlc_spin_unlock (&internals->spin);
+
     if( fd != -1 )
         while( write( fd, &(char){ 0 }, 1 ) < 0 );
 
