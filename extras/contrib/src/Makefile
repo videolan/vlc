@@ -1295,6 +1295,11 @@ libcaca-$(LIBCACA_VERSION).tar.gz:
 
 libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_DARWIN_OS
+	#remove me at next libcaca upgrade
+	patch -p0 < Patches/caca_driver_cocoa.diff
+	patch -p0 < Patches/caca_macosx.diff
+endif
 
 .caca: libcaca
 ifdef HAVE_WIN32
