@@ -35,7 +35,7 @@
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
-VLC_EXPORT( void, __vlc_threads_error, ( vlc_object_t *) );
+VLC_EXPORT( void, vlc_threads_error, ( vlc_object_t *) );
 VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_init_recursive, ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
@@ -50,8 +50,9 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 /*****************************************************************************
  * vlc_threads_error: Signalize an error in the threading system
  *****************************************************************************/
-#define vlc_threads_error( P_THIS )                                          \
-    __vlc_threads_error( VLC_OBJECT(P_THIS) )
+#ifdef NDEBUG
+# define vlc_threads_error( P_THIS ) (void)0
+#endif
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system

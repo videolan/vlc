@@ -83,8 +83,7 @@ vlc_threadvar_t msg_context_global_key;
  * This is especially useful to debug those errors, as this is a nice symbol
  * on which you can break.
  *****************************************************************************/
-void
-__vlc_threads_error( vlc_object_t *p_this )
+void vlc_threads_error( vlc_object_t *p_this )
 {
      msg_Err( p_this, "Error detected. Put a breakpoint in '%s' to debug.",
             __func__ );
