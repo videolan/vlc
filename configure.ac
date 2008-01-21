@@ -4631,6 +4631,13 @@ then
     VLC_ADD_PLUGINS([caca])
     VLC_ADD_CFLAGS([caca],[`${CACA_CONFIG} --cflags`])
     VLC_ADD_LIBS([caca],[`${CACA_CONFIG} --plugin-libs`])
+    AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h>
+                                        caca_event_t ev;]],
+                                        [[ev.type = 0;]]
+                       )],
+                       [],
+      [AC_DEFINE(CACA_EVENT_OPAQUE, [1], ["Define if struct caca_event is opaque and must not be accessed directly"])]
+    )
   fi
 fi
 

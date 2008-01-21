@@ -304,14 +304,22 @@ static int Manage( vout_thread_t *p_vout )
         vlc_value_t val;
 
 #ifdef CACA_API_VERSION_1
+#ifdef CACA_EVENT_OPAQUE
+        switch( caca_get_event_type( &ev ) )
+#else
         switch( ev.type )
+#endif /* CACA_EVENT_OPAQUE */
 #else
         switch( ev )
 #endif
         {
         case CACA_EVENT_KEY_RELEASE:
 #ifdef CACA_API_VERSION_1
+#ifdef CACA_EVENT_OPAQUE
+            switch( caca_get_event_key_ch( &ev ) )
+#else
             switch( ev.data.key.ch )
+#endif /* CACA_EVENT_OPAQUE */
 #else
             switch( ev & 0x00ffffff )
 #endif
@@ -334,10 +342,22 @@ static int Manage( vout_thread_t *p_vout )
             break;
 #ifdef CACA_API_VERSION_1
         case  CACA_EVENT_MOUSE_MOTION:
-            val.i_int = ev.data.mouse.x * p_vout->render.i_width
+            val.i_int =
+#ifdef CACA_EVENT_OPAQUE
+                caca_get_event_mouse_x( &ev )
+#else
+                ev.data.mouse.x
+#endif /* CACA_EVENT_OPAQUE */
+                * p_vout->render.i_width
                          / cucul_get_canvas_width( p_vout->p_sys->p_cv );
             var_Set( p_vout, "mouse-x", val );
-            val.i_int = ev.data.mouse.y * p_vout->render.i_height
+            val.i_int =
+#ifdef CACA_EVENT_OPAQUE
+                caca_get_event_mouse_y( &ev ) 
+#else
+                ev.data.mouse.y
+#endif /* CACA_EVENT_OPAQUE */
+                * p_vout->render.i_height
                          / cucul_get_canvas_height( p_vout->p_sys->p_cv );
             var_Set( p_vout, "mouse-y", val );
             val.b_bool = VLC_TRUE;
