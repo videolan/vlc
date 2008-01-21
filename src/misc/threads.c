@@ -77,6 +77,7 @@ static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 vlc_threadvar_t msg_context_global_key;
 
+#ifndef NDEBUG
 /*****************************************************************************
  * vlc_threads_error: Report an error from the threading mecanism
  *****************************************************************************
@@ -88,6 +89,7 @@ void vlc_threads_error( vlc_object_t *p_this )
      msg_Err( p_this, "Error detected. Put a breakpoint in '%s' to debug.",
             __func__ );
 }
+#endif
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
