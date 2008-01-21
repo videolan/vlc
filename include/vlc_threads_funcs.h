@@ -813,7 +813,7 @@ typedef struct
  */
 static inline int vlc_spin_init (vlc_spinlock_t *spin)
 {
-    return pthread_spin_init (&spin, PTHREAD_PROCESS_PRIVATE);
+    return pthread_spin_init (&spin->spin, PTHREAD_PROCESS_PRIVATE);
 }
 
 /**
@@ -842,7 +842,12 @@ static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
 #else
 /* Fallback to plain mutexes if spinlocks are not available */
 typedef vlc_mutex_t vlc_spinlock_t;
-# define vlc_spin_init    vlc_mutex_init
+
+static inline int vlc_spin_init (vlc_spinlock_t *spin)
+{
+    return vlc_mutex_init (NULL, spin);
+}
+
 # define vlc_spin_lock    vlc_mutex_lock
 # define vlc_spin_unlock  vlc_mutex_unlock
 # define vlc_spin_destroy vlc_mutex_destroy

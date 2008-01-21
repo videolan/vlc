@@ -58,6 +58,7 @@
 #   define LIBVLC_USE_PTHREAD 1
 #   define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
 
+#   include <unistd.h> /* _POSIX_SPIN_LOCKS */
 #   include <pthread.h>
     /* Needed for pthread_cond_timedwait */
 #   include <errno.h>
