@@ -70,11 +70,14 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-            qfu( EMPTY_STR( psz_filepath ) ? psz_filepath : p_intf->p_libvlc->psz_homedir ), fileTypes );
+            qfu( EMPTY_STR( psz_filepath ) ?
+                 psz_filepath : p_intf->p_libvlc->psz_homedir ), fileTypes );
     delete psz_filepath;
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
+    dialogBox->setViewMode( config_GetInt( p_intf, "qt-open-detail" ) ?
+            QFileDialog::Detail : QFileDialog::List );
 
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );

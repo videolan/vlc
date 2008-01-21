@@ -194,7 +194,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
     if( config_GetInt( p_intf, "qt-start-minimized") )
     {
-        if( b_systrayAvailable ){
+        if( b_systrayAvailable )
+        {
             b_createSystray = true;
             hide(); //FIXME BUG HERE
         }
@@ -442,7 +443,7 @@ inline void MainInterface::privacy()
     /**
      * Ask for the network policy on FIRST STARTUP
      **/
-    if( config_GetInt( p_intf, "privacy-ask") )
+    if( config_GetInt( p_intf, "qt-privacy-ask") )
     {
         QList<ConfigControl *> controls;
         if( privacyDialog( controls ) == QDialog::Accepted )
@@ -454,7 +455,7 @@ inline void MainInterface::privacy()
                 c->doApply( p_intf );
             }
 
-            config_PutInt( p_intf,  "privacy-ask" , 0 );
+            config_PutInt( p_intf,  "qt-privacy-ask" , 0 );
             config_SaveConfigFile( p_intf, NULL );
         }
     }

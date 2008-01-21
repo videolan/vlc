@@ -118,6 +118,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
+#define VIEWDETAIL_TEXT N_( "Show the opening dialog view in detail mode" )
+
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
@@ -177,8 +179,13 @@ vlc_module_begin();
                 SHOWFLAGS_LONGTEXT, VLC_TRUE );
             change_autosave();
 
-        add_bool( "privacy-ask", VLC_TRUE, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
+        add_bool( "qt-open-detail", VLC_FALSE, NULL, VIEWDETAIL_TEXT,
+                VIEWDETAIL_TEXT, VLC_FALSE );
+
+        add_bool( "qt-privacy-ask", VLC_TRUE, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
                 VLC_FALSE );
+
+
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 
@@ -269,7 +276,7 @@ static void Init( intf_thread_t *p_intf )
      * see commits 21610 21622 21654 for reference */
 
     /* If you are under KDE, Xfce or e17, you should comment this line */
-    QApplication::setDesktopSettingsAware( false );
+//    QApplication::setDesktopSettingsAware( false );
 #endif
 
     /* Start the QApplication here */
