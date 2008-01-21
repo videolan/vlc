@@ -106,10 +106,8 @@ static int init_libgcrypt (void)
 {
     int retval;
 #ifndef WIN32
-    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     static pthread_once_t once = PTHREAD_ONCE_INIT;
 
-    pthread_mutex_lock (&mutex);
     pthread_once (&once, initonce_libgcrypt);
 #else
 # warning FIXME: This is not thread-safe.
@@ -118,10 +116,6 @@ static int init_libgcrypt (void)
 #endif
 
     retval = libgcrypt_usable ? 0 : -1;
-
-#ifndef WIN32
-    pthread_mutex_unlock (&mutex);
-#endif
 
     return retval;
 
