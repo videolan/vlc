@@ -183,6 +183,7 @@ public slots:
     void saveAPlaylist();
 
     void switchToSkins();
+    void switchToWx();
     void quit();
 };
 

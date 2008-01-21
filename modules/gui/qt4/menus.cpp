@@ -332,6 +332,11 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
         menu->addSeparator();
         menu->addAction( qtr( "Switch to skins" ), THEDP, SLOT( switchToSkins() ),
                 QString( "Ctrl+Z" ) );
+        if( module_Exists( VLC_OBJECT( p_intf ), "wxwidgets" ) )
+        {
+            menu->addAction( qtr( "Switch to WxWidgets" ), THEDP,
+                    SLOT( switchToWx() ) );
+        }
     }
 
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );

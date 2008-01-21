@@ -509,3 +509,8 @@ void DialogsProvider::switchToSkins()
 {
     var_SetString( p_intf, "intf-switch", "skins2" );
 }
+
+void DialogsProvider::switchToWx()
+{
+    var_SetString( p_intf, "intf-switch", "wxwidgets" );
+}
