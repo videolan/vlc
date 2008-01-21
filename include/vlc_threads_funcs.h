@@ -802,6 +802,52 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
     return p_ret;
 }
 
+# if defined (_POSIX_SPIN_LOCKS) && ((_POSIX_SPIN_LOCKS - 0) > 0)
+typedef struct
+{
+    pthread_spinlock_t  spin;
+} vlc_spinlock_t;
+
+/**
+ * Initializes a spinlock.
+ */
+static inline int vlc_spin_init (vlc_spinlock_t *spin)
+{
+    return pthread_spin_init (&spin, PTHREAD_PROCESS_PRIVATE);
+}
+
+/**
+ * Acquires a spinlock.
+ */
+static inline int vlc_spin_lock (vlc_spinlock_t *spin)
+{
+    return pthread_spin_lock (&spin->spin);
+}
+
+/**
+ * Releases a spinlock.
+ */
+static inline int vlc_spin_unlock (vlc_spinlock_t *spin)
+{
+    return pthread_spin_unlock (&spin->spin);
+}
+
+/**
+ * Deinitializes a spinlock.
+ */
+static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
+{
+    return pthread_spin_destroy (&spin->spin);
+}
+#else
+/* Fallback to plain mutexes if spinlocks are not available */
+typedef vlc_mutex_t vlc_spinlock_t;
+# define vlc_spin_init    vlc_mutex_init
+# define vlc_spin_lock    vlc_mutex_lock
+# define vlc_spin_unlock  vlc_mutex_unlock
+# define vlc_spin_destroy vlc_mutex_destroy
+#endif
+
 /*****************************************************************************
  * vlc_thread_create: create a thread
  *****************************************************************************/
