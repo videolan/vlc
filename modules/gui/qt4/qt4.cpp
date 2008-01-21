@@ -331,6 +331,12 @@ static void Init( intf_thread_t *p_intf )
     /* Last settings */
     app->setQuitOnLastWindowClosed( false );
 
+    /*        retrieve last known path used in file browsing */
+    char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
+    p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
+                           : p_intf->p_libvlc->psz_homedir;
+    delete psz_path;
+
     /* Launch */
     app->exec();
 
@@ -346,6 +352,8 @@ static void Init( intf_thread_t *p_intf )
 
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
+
+    delete p_intf->p_sys->psz_filepath;
 
     delete app;
 }

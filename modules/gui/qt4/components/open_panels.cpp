@@ -65,14 +65,9 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace( QString(";*"), QString(" *"));
 
-    /* retrieve last known path used in file browsing */
-    char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
-
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-            qfu( EMPTY_STR( psz_filepath ) ?
-                 psz_filepath : p_intf->p_libvlc->psz_homedir ), fileTypes );
-    delete psz_filepath;
+            qfu( p_intf->p_sys->psz_filepath ), fileTypes );
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
@@ -138,7 +133,9 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
 }
 
-FileOpenPanel::~FileOpenPanel(){}
+FileOpenPanel::~FileOpenPanel()
+{
+}
 
 /* Show a fileBrowser to select a subtitle */
 void FileOpenPanel::browseFileSub()
@@ -178,15 +175,7 @@ void FileOpenPanel::updateMRL()
 void FileOpenPanel::accept()
 {
     //TODO set the completer
-    const char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
-    if( ( NULL == psz_filepath )
-      || strcmp( psz_filepath, qtu( dialogBox->directory().absolutePath() )) )
-    {
-        /* set dialog box current directory as last known path */
-        config_PutPsz( p_intf, "qt-filedialog-path",
-                       qtu( dialogBox->directory().absolutePath() ) );
-    }
-    delete psz_filepath;
+    p_intf->p_sys->psz_filepath = qtu( dialogBox->directory().absolutePath() );
 }
 
 void FileOpenBox::accept()

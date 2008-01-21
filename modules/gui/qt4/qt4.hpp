@@ -51,8 +51,8 @@ struct intf_sys_t
     msg_subscription_t *p_sub; ///< Subscription to the message bank
 
     VideoWidget *p_video;
-    int i_saved_height, i_saved_width;
 
+    char *psz_filepath;
     QMenu * p_popup_menu;
 };
 
