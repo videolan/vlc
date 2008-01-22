@@ -38,10 +38,7 @@
 #   include <sys/time.h>
 #endif
 
-#if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
-#   include <pth.h>
-
-#elif defined( ST_INIT_IN_ST_H )                            /* State threads */
+#if defined( ST_INIT_IN_ST_H )                            /* State threads */
 #   include <st.h>
 
 #elif defined( UNDER_CE )
@@ -130,24 +127,7 @@
  * Type definitions
  *****************************************************************************/
 
-#if defined( PTH_INIT_IN_PTH_H )
-typedef pth_t            vlc_thread_t;
-typedef struct
-{
-    pth_mutex_t mutex;
-    vlc_object_t * p_this;
-} vlc_mutex_t;
-typedef struct
-{
-    pth_cond_t cond;
-    vlc_object_t * p_this;
-} vlc_cond_t;
-typedef struct
-{
-    int handle;
-} vlc_threadvar_t;
-
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
 typedef st_thread_t      vlc_thread_t;
 typedef struct
 {

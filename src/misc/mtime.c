@@ -35,11 +35,6 @@
 #include <assert.h>
 #include <errno.h>
 
-
-#if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
-#   include <pth.h>
-#endif
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* select() */
 #endif
@@ -330,9 +325,6 @@ void msleep( mtime_t delay )
 
 #elif defined( HAVE_KERNEL_OS_H )
     snooze( delay );
-
-#elif defined( PTH_INIT_IN_PTH_H )
-    pth_usleep( delay );
 
 #elif defined( ST_INIT_IN_ST_H )
     st_usleep( delay );

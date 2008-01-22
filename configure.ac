@@ -742,25 +742,6 @@ dnl Check for cthreads under GNU/Hurd for instance
 AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
 
 dnl
-dnl  GNU portable threads
-dnl
-AC_ARG_ENABLE(pth,
-  [  --enable-pth            GNU Pth support (default disabled)],
-  [ if test "${enable_pth}" = "yes"; then
-    AC_CHECK_LIB(pth,pth_init)
-    AC_MSG_CHECKING(for pth_init in pth.h)
-    AC_EGREP_HEADER(pth_init,pth.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
-                Define if <pth.h> defines pth_init)
-      THREAD_LIB="-lpth"
-    ],[
-      AC_MSG_RESULT(no)
-    ])
-    fi
-])
-
-dnl
 dnl  State Threads
 dnl
 AC_ARG_ENABLE(st,
@@ -782,7 +763,7 @@ AC_ARG_ENABLE(st,
 VLC_ADD_LIBS([libvlc plugin],[${THREAD_LIB}])
 
 dnl Don't link with rt when using GNU-pth
-if test "${THREAD_LIB}" != "-lpth" && test "${THREAD_LIB}" != "-lst"; then
+if test "${THREAD_LIB}" != "-lst"; then
   AC_CHECK_LIB(rt, clock_nanosleep, [
     VLC_ADD_LIBS([libvlc],[-lrt])
     AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])

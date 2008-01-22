@@ -100,10 +100,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( PTH_INIT_IN_PTH_H )
-    i_result = ( pth_mutex_acquire( &p_mutex->mutex, FALSE, NULL ) == FALSE );
-
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_lock( p_mutex->mutex );
 
 #elif defined( UNDER_CE )
@@ -179,10 +176,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( PTH_INIT_IN_PTH_H )
-    i_result = ( pth_mutex_release( &p_mutex->mutex ) == FALSE );
-
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_unlock( p_mutex->mutex );
 
 #elif defined( UNDER_CE )
@@ -265,10 +259,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( PTH_INIT_IN_PTH_H )
-    i_result = ( pth_cond_notify( &p_condvar->cond, FALSE ) == FALSE );
-
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
     i_result = st_cond_signal( p_condvar->cond );
 
 #elif defined( UNDER_CE )
@@ -400,11 +391,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( PTH_INIT_IN_PTH_H )
-    i_result = ( pth_cond_await( &p_condvar->cond, &p_mutex->mutex, NULL )
-                 == FALSE );
-
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
     st_mutex_unlock( p_mutex->mutex );
     i_result = st_cond_wait( p_condvar->cond );
     st_mutex_lock( p_mutex->mutex );
@@ -588,9 +575,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     int i_res;
     unsigned long int i_thread = 0;
 
-#if defined( PTH_INIT_IN_PTH_H )
-#   error Unimplemented
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
 #   error Unimplemented
 #elif defined( UNDER_CE )
     mtime_t delay_ms = (deadline - mdate())/1000;
@@ -753,9 +738,7 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 {
     int i_ret;
 
-#if defined( PTH_INIT_IN_PTH_H )
-    return pth_key_setdata( p_tls->handle, p_value );
-#elif  defined( ST_INIT_IN_ST_H )
+#if  defined( ST_INIT_IN_ST_H )
     return st_thread_setspecific( p_tls->handle, p_value );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     return -1;
@@ -780,9 +763,7 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 {
     void* p_ret;
 
-#if defined( PTH_INIT_IN_PTH_H )
-    p_ret = pth_key_getdata( p_handle->key );
-#elif defined( ST_INIT_IN_ST_H )
+#if defined( ST_INIT_IN_ST_H )
     p_ret = st_thread_getspecific( p_handle->key );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_ret = NULL;
