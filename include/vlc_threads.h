@@ -59,9 +59,6 @@
     /* This is not prototyped under Linux, though it exists. */
     int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 
-#elif defined( HAVE_CTHREADS_H )                                  /* GNUMach */
-#   include <cthreads.h>
-
 #else
 #   error no threads available on your system !
 
@@ -213,37 +210,6 @@ typedef struct
     pthread_key_t handle;
 } vlc_threadvar_t;
 
-#elif defined( HAVE_CTHREADS_H )
-typedef cthread_t       vlc_thread_t;
-
-/* Those structs are the ones defined in /include/cthreads.h but we need
- * to handle (&foo) where foo is a (mutex_t) while they handle (foo) where
- * foo is a (mutex_t*) */
-typedef struct
-{
-    spin_lock_t held;
-    spin_lock_t lock;
-    char *name;
-    struct cthread_queue queue;
-
-    vlc_object_t * p_this;
-} vlc_mutex_t;
-
-typedef struct
-{
-    spin_lock_t lock;
-    struct cthread_queue queue;
-    char *name;
-    struct cond_imp *implications;
-
-    vlc_object_t * p_this;
-} vlc_cond_t;
-
-typedef struct
-{
-    cthread_key_t handle;
-} vlc_threadvar_t;
-
 #endif
 
-#endif
+#endif /* !_VLC_THREADS_H */

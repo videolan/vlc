@@ -140,10 +140,6 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
         errno = i_result;
     }
 
-#elif defined( HAVE_CTHREADS_H )
-    mutex_lock( p_mutex->mutex );
-    i_result = 0;
-
 #endif
 
     if( i_result )
@@ -210,10 +206,6 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         errno = i_result;
     }
-
-#elif defined( HAVE_CTHREADS_H )
-    mutex_unlock( p_mutex );
-    i_result = 0;
 
 #endif
 
@@ -347,14 +339,6 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         errno = i_result;
     }
-
-#elif defined( HAVE_CTHREADS_H )
-    /* condition_signal() */
-    if ( p_condvar->queue.head || p_condvar->implications )
-    {
-        cond_signal( (condition_t)p_condvar );
-    }
-    i_result = 0;
 
 #endif
 
@@ -527,10 +511,6 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
         errno = i_result;
     }
 
-#elif defined( HAVE_CTHREADS_H )
-    condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
-    i_result = 0;
-
 #endif
 
     if( i_result )
@@ -688,8 +668,6 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
         errno = i_res;
     }
 
-#elif defined( HAVE_CTHREADS_H )
-#   error Unimplemented
 #endif
 
     if( i_res )
@@ -731,8 +709,6 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_setspecific( p_tls->handle, p_value );
 
-#elif defined( HAVE_CTHREADS_H )
-    i_ret = cthread_setspecific( p_tls->handle, p_value );
 #endif
 
     return i_ret;
@@ -753,11 +729,6 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     p_ret = pthread_getspecific( p_tls->handle );
 
-#elif defined( HAVE_CTHREADS_H )
-    if ( !cthread_getspecific( p_tls->handle, &p_ret ) )
-    {
-        p_ret = NULL;
-    }
 #endif
 
     return p_ret;

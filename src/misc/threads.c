@@ -70,7 +70,6 @@ static int i_win9x_cv = 1;
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
-#elif defined( HAVE_CTHREADS_H )
 #endif
 
 vlc_threadvar_t msg_context_global_key;
@@ -114,7 +113,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_lock( &once_mutex );
-#elif defined( HAVE_CTHREADS_H )
 #endif
 
     if( i_status == VLC_THREADS_UNINITIALIZED )
@@ -145,7 +143,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-#elif defined( HAVE_CTHREADS_H )
 #endif
 
         p_root = vlc_object_create( p_libvlc_global, VLC_OBJECT_GLOBAL );
@@ -180,8 +177,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
     while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_unlock( &once_mutex );
-#elif defined( HAVE_CTHREADS_H )
-    while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #endif
 
     if( i_status != VLC_THREADS_READY )
@@ -205,7 +200,6 @@ int __vlc_threads_end( vlc_object_t *p_this )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_lock( &once_mutex );
-#elif defined( HAVE_CTHREADS_H )
 #endif
 
     if( i_initializations == 0 )
@@ -223,7 +217,6 @@ int __vlc_threads_end( vlc_object_t *p_this )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_unlock( &once_mutex );
-#elif defined( HAVE_CTHREADS_H )
 #endif
     return VLC_SUCCESS;
 }
@@ -299,10 +292,6 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     }
 # endif
     return pthread_mutex_init( &p_mutex->mutex, NULL );
-
-#elif defined( HAVE_CTHREADS_H )
-    mutex_init( p_mutex );
-    return 0;
 
 #endif
 }
@@ -381,9 +370,6 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         errno = i_result;
     }
-
-#elif defined( HAVE_CTHREADS_H )
-    return 0;
 
 #endif
 
@@ -490,15 +476,6 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     pthread_condattr_destroy (&attr);
     return ret;
 
-#elif defined( HAVE_CTHREADS_H )
-    /* condition_init() */
-    spin_lock_init( &p_condvar->lock );
-    cthread_queue_init( &p_condvar->queue );
-    p_condvar->name = 0;
-    p_condvar->implications = 0;
-
-    return 0;
-
 #endif
 }
 
@@ -536,9 +513,6 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
         errno = i_result;
     }
 
-#elif defined( HAVE_CTHREADS_H )
-    return 0;
-
 #endif
 
     if( i_result )
@@ -569,8 +543,6 @@ int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret =  pthread_key_create( &p_tls->handle, NULL );
-#elif defined( HAVE_CTHREADS_H )
-    i_ret = cthread_keycreate( &p_tls-handle );
 #endif
     return i_ret;
 }
@@ -670,10 +642,6 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         i_priority = 0;
     }
 #endif
-
-#elif defined( HAVE_CTHREADS_H )
-    p_priv->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
-    i_ret = 0;
 
 #endif
 
@@ -863,10 +831,6 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_join( p_priv->thread_id, NULL );
-
-#elif defined( HAVE_CTHREADS_H )
-    cthread_join( p_priv->thread_id );
-    i_ret = 1;
 
 #endif
 

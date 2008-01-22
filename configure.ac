@@ -738,12 +738,8 @@ if test "${THREAD_LIB}" = "error"; then
   THREAD_LIB=""
 fi
 
-dnl Check for cthreads under GNU/Hurd for instance
-AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
-
 VLC_ADD_LIBS([libvlc plugin],[${THREAD_LIB}])
 
-dnl Don't link with rt when using GNU-pth
 AC_CHECK_LIB(rt, clock_nanosleep, [
   VLC_ADD_LIBS([libvlc],[-lrt])
   AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
@@ -837,7 +833,7 @@ AC_EGREP_HEADER(timespec,sys/time.h,[
 
 dnl Check for threads library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
+AC_CHECK_HEADERS(pthread.h kernel/scheduler.h kernel/OS.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Find where are the X headers and libraries
