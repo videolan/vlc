@@ -297,6 +297,10 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 
     if( p_this == NULL )
     {
+#ifndef NDEBUG
+        if( i_type == VLC_MSG_DBG )
+            return;
+#endif
         utf8_vfprintf( stderr, psz_format, _args );
         return;
     }
