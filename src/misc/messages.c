@@ -246,7 +246,7 @@ void __msg_GenericVa( vlc_object_t *p_this, int i_queue,
     { \
         va_list args; \
         va_start( args, psz_format ); \
-        QueueMsg( (vlc_object_t *)p_this,MSG_QUEUE_NORMAL, FN_TYPE, "unknown", \
+        QueueMsg( p_this,MSG_QUEUE_NORMAL, FN_TYPE, "unknown", \
                   psz_format, args ); \
         va_end( args ); \
     } \
