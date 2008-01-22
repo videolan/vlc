@@ -224,6 +224,7 @@ void InputManager::customEvent( QEvent *event )
     else if ( type == ItemChanged_Type )
     {
         UpdateMeta();
+        UpdateTitle();
     }
     else if ( type == ItemRateChanged_Type )
     {
@@ -255,6 +256,7 @@ void InputManager::UpdateTitle( void )
      /* Update navigation status */
      vlc_value_t val; val.i_int = 0;
      var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+     msg_Dbg( p_intf, "updateTitle called" );
      if( val.i_int > 0 )
      {
          val.i_int = 0;
