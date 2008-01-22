@@ -153,6 +153,7 @@ int __aout_VolumeInfos( vlc_object_t * p_object, audio_volume_t * pi_soft )
 int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
+    vlc_value_t val;
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     int i_result = 0, i_volume = 0, i_volume_step = 0;
@@ -196,6 +197,7 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
 int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
                      audio_volume_t * pi_volume )
 {
+    vlc_value_t val;
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     int i_result = 0, i_volume = 0, i_volume_step = 0;
