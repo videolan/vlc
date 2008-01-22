@@ -107,9 +107,6 @@ GCRY_THREAD_OPTION_PTHREAD_IMPL;
  * gcrypt thread option VLC implementation
  */
 
-# define NEED_THREAD_CONTEXT 1
-static vlc_object_t *__p_gcry_data = NULL;
-
 static int gcry_vlc_mutex_init( void **p_sys )
 {
     int i_val;
@@ -118,7 +115,7 @@ static int gcry_vlc_mutex_init( void **p_sys )
     if( p_lock == NULL)
         return ENOMEM;
 
-    i_val = vlc_mutex_init( __p_gcry_data, p_lock );
+    i_val = vlc_mutex_init( NULL, p_lock );
     if( i_val )
         free( p_lock );
     else
@@ -167,12 +164,6 @@ static int gnutls_Init (vlc_object_t *p_this)
     int ret = VLC_EGENERIC;
 
     vlc_mutex_t *lock = var_AcquireMutex ("gnutls_mutex");
-
-    /* This should probably be removed/fixed. It will screw up with multiple
-     * LibVLC instances. */
-#ifdef NEED_THREAD_CONTEXT
-    __p_gcry_data = VLC_OBJECT (p_this->p_libvlc);
-#endif
 
     gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
     if (gnutls_global_init ())
