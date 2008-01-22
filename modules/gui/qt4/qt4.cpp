@@ -276,7 +276,7 @@ static void Init( intf_thread_t *p_intf )
      * see commits 21610 21622 21654 for reference */
 
     /* If you are under KDE, Xfce or e17, you should comment this line */
-//    QApplication::setDesktopSettingsAware( false );
+    QApplication::setDesktopSettingsAware( false );
 #endif
 
     /* Start the QApplication here */
