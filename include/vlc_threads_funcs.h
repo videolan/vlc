@@ -771,7 +771,50 @@ static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
 {
     return pthread_spin_destroy (&spin->spin);
 }
+
+#elif defined( WIN32 )
+
+typedef CRITICAL_SECTION vlc_spinlock_t;
+
+/**
+ * Initializes a spinlock.
+ */
+static inline int vlc_spin_init (vlc_spinlock_t *spin)
+{
+    return !InitializeCriticalSectionAndSpinCount(spin, 4000);
+}
+
+/**
+ * Acquires a spinlock.
+ */
+static inline int vlc_spin_lock (vlc_spinlock_t *spin)
+{
+    EnterCriticalSection(spin);
+    return 0;
+}
+
+/**
+ * Releases a spinlock.
+ */
+static inline int vlc_spin_unlock (vlc_spinlock_t *spin)
+{
+    LeaveCriticalSection(spin);
+    return 0;
+}
+
+/**
+ * Deinitializes a spinlock.
+ */
+static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
+{
+    DeleteCriticalSection(spin);
+    return 0;
+}
+
+
 #else
+
+
 /* Fallback to plain mutexes if spinlocks are not available */
 typedef vlc_mutex_t vlc_spinlock_t;
 
