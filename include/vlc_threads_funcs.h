@@ -142,7 +142,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
 
 #endif
 
-    if( i_result )
+    if( i_result && p_mutex->p_this )
     {
         msg_Err( p_mutex->p_this,
                  "thread %li: mutex_lock failed at %s:%d (%d:%m)",
@@ -209,7 +209,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
 
 #endif
 
-    if( i_result )
+    if( i_result && p_mutex->p_this )
     {
         msg_Err( p_mutex->p_this,
                  "thread %li: mutex_unlock failed at %s:%d (%d:%m)",
