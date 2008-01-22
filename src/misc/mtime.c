@@ -326,9 +326,6 @@ void msleep( mtime_t delay )
 #elif defined( HAVE_KERNEL_OS_H )
     snooze( delay );
 
-#elif defined( ST_INIT_IN_ST_H )
-    st_usleep( delay );
-
 #elif defined( WIN32 ) || defined( UNDER_CE )
     Sleep( (int) (delay / 1000) );
 

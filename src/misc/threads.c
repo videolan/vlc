@@ -44,8 +44,7 @@ static volatile unsigned i_initializations = 0;
 static volatile int i_status = VLC_THREADS_UNINITIALIZED;
 static vlc_object_t *p_root;
 
-#if defined( ST_INIT_IN_ST_H )
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
 #elif defined( WIN32 )
 
 /* following is only available on NT/2000/XP and above */
@@ -104,8 +103,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
 
     /* If we have lazy mutex initialization, use it. Otherwise, we just
      * hope nothing wrong happens. */
-#if defined( ST_INIT_IN_ST_H )
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
 #elif defined( WIN32 )
     if( IsDebuggerPresent() )
     {
@@ -126,10 +124,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
         /* We should be safe now. Do all the initialization stuff we want. */
         p_libvlc_global->b_ready = VLC_FALSE;
 
-#if defined( ST_INIT_IN_ST_H )
-        i_ret = st_init();
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
         /* Nothing to initialize */
 
 #elif defined( WIN32 )
@@ -177,9 +172,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
 
     /* If we have lazy mutex initialization support, unlock the mutex;
      * otherwize, do a naive wait loop. */
-#if defined( ST_INIT_IN_ST_H )
-    while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( WIN32 )
     while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
@@ -207,8 +200,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
 int __vlc_threads_end( vlc_object_t *p_this )
 {
     (void)p_this;
-#if defined( ST_INIT_IN_ST_H )
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
 #elif defined( WIN32 )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -226,8 +218,7 @@ int __vlc_threads_end( vlc_object_t *p_this )
         vlc_object_destroy( p_root );
     }
 
-#if defined( ST_INIT_IN_ST_H )
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
 #elif defined( WIN32 )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -245,11 +236,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     assert( p_this );
     p_mutex->p_this = p_this;
 
-#if defined( ST_INIT_IN_ST_H )
-    p_mutex->mutex = st_mutex_new();
-    return ( p_mutex->mutex == NULL ) ? errno : 0;
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     InitializeCriticalSection( &p_mutex->csection );
     return 0;
 
@@ -363,10 +350,7 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
     /* In case of error : */
     int i_thread = -1;
 
-#if defined( ST_INIT_IN_ST_H )
-    i_result = st_mutex_destroy( p_mutex->mutex );
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     DeleteCriticalSection( &p_mutex->csection );
     return 0;
 
@@ -420,11 +404,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 {
     p_condvar->p_this = p_this;
 
-#if defined( ST_INIT_IN_ST_H )
-    p_condvar->cond = st_cond_new();
-    return ( p_condvar->cond == NULL ) ? errno : 0;
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
@@ -531,10 +511,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
     /* In case of error : */
     int i_thread = -1;
 
-#if defined( ST_INIT_IN_ST_H )
-    i_result = st_cond_destroy( p_condvar->cond );
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     i_result = !CloseHandle( p_condvar->event );
 
 #elif defined( WIN32 )
@@ -585,8 +562,6 @@ int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
 #if defined( HAVE_KERNEL_SCHEDULER_H )
     msg_Err( p_this, "TLS not implemented" );
     i_ret VLC_EGENERIC;
-#elif defined( ST_INIT_IN_ST_H )
-    i_ret = st_key_create( &p_tls->handle, NULL );
 #elif defined( UNDER_CE ) || defined( WIN32 )
 #elif defined( WIN32 )
     p_tls->handle = TlsAlloc();
@@ -616,11 +591,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 
     vlc_mutex_lock( &p_this->object_lock );
 
-#if defined( ST_INIT_IN_ST_H )
-    p_priv->thread_id = st_thread_create( func, p_data, 1, 0 );
-    i_ret = 0;
-
-#elif defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
     {
         /* When using the MSVCRT C library you have to use the _beginthreadex
          * function instead of CreateThread, otherwise you'll end up with
@@ -749,8 +720,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
                                int i_line, int i_priority )
 {
     vlc_object_internals_t *p_priv = p_this->p_internals;
-#if defined( ST_INIT_IN_ST_H )
-#elif defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
     if( !p_priv->thread_id.hThread )
         p_priv->thread_id.hThread = GetCurrentThread();
     if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
@@ -887,10 +857,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
 
     int i_ret = 0;
 
-#if defined( ST_INIT_IN_ST_H )
-    i_ret = st_thread_join( p_priv->thread_id, NULL );
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#if defined( HAVE_KERNEL_SCHEDULER_H )
     int32_t exit_value;
     i_ret = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
 

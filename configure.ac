@@ -741,49 +741,27 @@ fi
 dnl Check for cthreads under GNU/Hurd for instance
 AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
 
-dnl
-dnl  State Threads
-dnl
-AC_ARG_ENABLE(st,
-  [  --enable-st             State Threads (default disabled)],
-  [ if test "${enable_st}" = "yes"; then
-    AC_CHECK_LIB(st,st_init)
-    AC_MSG_CHECKING(for st_init in st.h)
-    AC_EGREP_HEADER(st_init,st.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(ST_INIT_IN_ST_H, 1,
-                Define if <st.h> defines st_init)
-      THREAD_LIB="-lst"
-    ],[
-      AC_MSG_RESULT(yes)
-    ])
-    fi
-])
-
 VLC_ADD_LIBS([libvlc plugin],[${THREAD_LIB}])
 
 dnl Don't link with rt when using GNU-pth
-if test "${THREAD_LIB}" != "-lst"; then
-  AC_CHECK_LIB(rt, clock_nanosleep, [
-    VLC_ADD_LIBS([libvlc],[-lrt])
-    AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
-  ], [
-    dnl HP/UX port
-    AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlc],[-lrt])])
-  ])
+AC_CHECK_LIB(rt, clock_nanosleep, [
+  VLC_ADD_LIBS([libvlc],[-lrt])
+  AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
+], [
+  dnl HP/UX port
+  AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlc],[-lrt])])
+])
 
-  have_nanosleep=false
-  AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
-    AC_CHECK_LIB(rt,nanosleep,
-      [VLC_ADD_LIBS([libvlc],[-lrt]) have_nanosleep=:],
-      [AC_CHECK_LIB(posix4,nanosleep,
-          [VLC_ADD_LIBS([libvlc],[-lposix4]) have_nanosleep=:])]
-    )
-  ])
-  if ${have_nanosleep}; then
-    AC_DEFINE(HAVE_NANOSLEEP, 1,
-              Define if nanosleep is available.)
-  fi
+have_nanosleep=false
+AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
+  AC_CHECK_LIB(rt,nanosleep,
+    [VLC_ADD_LIBS([libvlc],[-lrt]) have_nanosleep=:],
+    [AC_CHECK_LIB(posix4,nanosleep,
+        [VLC_ADD_LIBS([libvlc],[-lposix4]) have_nanosleep=:])]
+  )
+])
+if ${have_nanosleep}; then
+  AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if nanosleep is available.])
 fi
 
 dnl Check for misc headers

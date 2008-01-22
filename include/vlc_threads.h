@@ -38,10 +38,7 @@
 #   include <sys/time.h>
 #endif
 
-#if defined( ST_INIT_IN_ST_H )                            /* State threads */
-#   include <st.h>
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
                                                                 /* WinCE API */
 #elif defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
@@ -127,24 +124,7 @@
  * Type definitions
  *****************************************************************************/
 
-#if defined( ST_INIT_IN_ST_H )
-typedef st_thread_t      vlc_thread_t;
-typedef struct
-{
-    st_mutex_t mutex;
-    vlc_object_t * p_this;
-} vlc_mutex_t;
-typedef struct
-{
-    st_cond_t cond;
-    vlc_object_t * p_this;
-} vlc_cond_t;
-typedef struct
-{
-    int handle;
-} vlc_threadvar_t;
-
-#elif defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
 typedef struct
 {
     /* thread id */

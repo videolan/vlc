@@ -100,10 +100,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( ST_INIT_IN_ST_H )
-    i_result = st_mutex_lock( p_mutex->mutex );
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     EnterCriticalSection( &p_mutex->csection );
     i_result = 0;
 
@@ -176,10 +173,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( ST_INIT_IN_ST_H )
-    i_result = st_mutex_unlock( p_mutex->mutex );
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     LeaveCriticalSection( &p_mutex->csection );
     i_result = 0;
 
@@ -259,10 +253,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( ST_INIT_IN_ST_H )
-    i_result = st_cond_signal( p_condvar->cond );
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     PulseEvent( p_condvar->event );
     i_result = 0;
 
@@ -391,12 +382,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     /* In case of error : */
     unsigned long int i_thread = 0;
 
-#if defined( ST_INIT_IN_ST_H )
-    st_mutex_unlock( p_mutex->mutex );
-    i_result = st_cond_wait( p_condvar->cond );
-    st_mutex_lock( p_mutex->mutex );
-
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     p_condvar->i_waiting_threads++;
     LeaveCriticalSection( &p_mutex->csection );
     WaitForSingleObject( p_condvar->event, INFINITE );
@@ -575,9 +561,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     int i_res;
     unsigned long int i_thread = 0;
 
-#if defined( ST_INIT_IN_ST_H )
-#   error Unimplemented
-#elif defined( UNDER_CE )
+#if defined( UNDER_CE )
     mtime_t delay_ms = (deadline - mdate())/1000;
 
     DWORD result;
@@ -738,9 +722,7 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 {
     int i_ret;
 
-#if  defined( ST_INIT_IN_ST_H )
-    return st_thread_setspecific( p_tls->handle, p_value );
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#if defined( HAVE_KERNEL_SCHEDULER_H )
     return -1;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
@@ -763,9 +745,7 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 {
     void* p_ret;
 
-#if defined( ST_INIT_IN_ST_H )
-    p_ret = st_thread_getspecific( p_handle->key );
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#if defined( HAVE_KERNEL_SCHEDULER_H )
     p_ret = NULL;
 #elif defined( UNDER_CE ) || defined( WIN32 )
     p_ret = TlsGetValue( p_tls->handle );
