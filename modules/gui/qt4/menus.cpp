@@ -172,7 +172,8 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr( "&Media" ) );
     BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
-    BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ), qtr( "&Tools" ) );
+    BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ),
+             qtr( "&Tools" ) );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 2 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 1 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "&Playback" ), 3 );
@@ -330,8 +331,8 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     if( !p_intf->pf_show_dialog )
     {
         menu->addSeparator();
-        menu->addAction( qtr( "Switch to skins" ), THEDP, SLOT( switchToSkins() ),
-                QString( "Ctrl+Z" ) );
+        menu->addAction( qtr( "Switch to skins" ), THEDP,
+                SLOT( switchToSkins() ), QString( "Ctrl+Z" ) );
 #ifdef HAVE_WX
         if( module_Exists( VLC_OBJECT( p_intf ), "wxwidgets" ) )
         {
