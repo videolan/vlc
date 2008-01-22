@@ -155,48 +155,6 @@ struct public_key_t
 
 typedef struct public_key_t public_key_t;
 
-/* We trust this public key, and by extension, also keys signed by it. */
-static uint8_t videolan_public_key_longid[8] = {
-  0x90, 0x28, 0x17, 0xE4, 0xAA, 0x5F, 0x4D, 0xE6 
-};
-
-static uint8_t videolan_public_key[] = {
-"-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
-"Version: GnuPG v2.0.4 (FreeBSD)\n"
-"\n"
-"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\n"
-"=qrc1\n"
-"-----END PGP PUBLIC KEY BLOCK-----\n"
-};
-
 enum
 {
     UpdateReleaseStatusOlder,

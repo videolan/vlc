@@ -39,6 +39,7 @@
 #include <assert.h>
 
 #include <vlc_update.h>
+#include <vlc_pgpkey.h>
 #include <vlc_stream.h>
 #include <vlc_interface.h>
 
@@ -265,10 +266,9 @@ static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
     char *p_ipos = p_ibuf;
     uint8_t *p_opos = p_obuf;
     int i_end = 0;
-
     int i_header_skipped = 0;
 
-    while( !i_end && p_ipos < p_ibuf + i_ibuf_len )
+    while( !i_end && p_ipos < p_ibuf + i_ibuf_len && *p_ipos != '=' )
     {
         if( *p_ipos == '\r' || *p_ipos == '\n' )
         {
@@ -304,9 +304,7 @@ static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
             p_ipos[i_line_len] = '\0';
 
         p_opos += vlc_b64_decode_binary_to_buffer(  p_opos,
-                                                    p_obuf - p_opos + i_obuf_len,
-                                                    p_ipos );
-
+                        p_obuf - p_opos + i_obuf_len, p_ipos );
         p_ipos += i_line_len + 1;
     }
 
@@ -346,21 +344,30 @@ static int download_signature(  vlc_object_t *p_this,
         return VLC_ENOMEM;
 
     int64_t i_size = stream_Size( p_stream );
+    /* FIXME: a signature can be less than 65 bytes, if r & s numbers
+     * do not have 160 significant bits.
+     */
     if( i_size < 65 )
     {
         stream_Delete( p_stream );
+        msg_Dbg( p_this, "Signature too small" );
         return VLC_EGENERIC;
     }
     else if( i_size == 65 ) /* binary format signature */
     {
+        msg_Dbg( p_this, "Downloading unarmored signature" );
         int i_read = stream_Read( p_stream, p_sig, (int)i_size );
         stream_Delete( p_stream );
         if( i_read != i_size )
+        {
+            msg_Dbg( p_this, "Couldn't read full signature" );
             return VLC_EGENERIC;
+        }
         else
             return VLC_SUCCESS;
     }
 
+    msg_Dbg( p_this, "Downloading armored signature" );
     char *p_buf = (char*)malloc( i_size );
     if( !p_buf )
     {
@@ -374,6 +381,7 @@ static int download_signature(  vlc_object_t *p_this,
 
     if( i_read != i_size )
     {
+        msg_Dbg( p_this, "Couldn't read full signature" );
         free( p_buf );
         return VLC_EGENERIC;
     }
@@ -382,7 +390,10 @@ static int download_signature(  vlc_object_t *p_this,
     free( p_buf );
 
     if( i_bytes != 65 )
+    {
+        msg_Dbg( p_this, "Unarmoring failed: signature is %d bytes", i_bytes );
         return VLC_EGENERIC;
+    }
     else
         return VLC_SUCCESS;
 }
@@ -650,6 +661,7 @@ static public_key_t *download_key( vlc_object_t *p_this, const uint8_t *p_longid
 
     if( i_read != (int)i_size )
     {
+        msg_Dbg( p_this, "Couldn't read full GPG key" );
         free( p_buf );
         return NULL;
     }
@@ -666,6 +678,7 @@ static public_key_t *download_key( vlc_object_t *p_this, const uint8_t *p_longid
 
     if( i_error != VLC_SUCCESS )
     {
+        msg_Dbg( p_this, "Couldn't parse GPG key" );
         free( p_pkey );
         return NULL;
     }
@@ -1248,7 +1261,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     if( download_signature( VLC_OBJECT( p_udt ), &sign,
             p_update->release.psz_url ) != VLC_SUCCESS )
     {
-        msg_Err( p_udt, "Couldn't download signature of status file" );
+        msg_Err( p_udt, "Couldn't download signature of downloaded file" );
         goto end;
     }
 
