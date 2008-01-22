@@ -293,14 +293,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Check for short help option */
-    if( config_GetInt( p_libvlc, "help" ) )
+    if( config_GetInt( p_libvlc, "help" ) > 0 )
     {
         Help( p_libvlc, "help" );
         b_exit = VLC_TRUE;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for version option */
-    else if( config_GetInt( p_libvlc, "version" ) )
+    else if( config_GetInt( p_libvlc, "version" ) > 0 )
     {
         Version();
         b_exit = VLC_TRUE;
@@ -315,7 +315,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_libvlc->psz_configfile = config_GetCustomConfigFile( p_libvlc );
 
     /* Check for plugins cache options */
-    if( config_GetInt( p_libvlc, "reset-plugins-cache" ) )
+    if( config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0 )
     {
         libvlc_global.p_module_bank->b_cache_delete = VLC_TRUE;
     }
@@ -450,20 +450,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for long help option */
-    else if( config_GetInt( p_libvlc, "longhelp" ) )
+    else if( config_GetInt( p_libvlc, "longhelp" ) > 0 )
     {
         Help( p_libvlc, "longhelp" );
         b_exit = VLC_TRUE;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for module list option */
-    else if( config_GetInt( p_libvlc, "list" ) )
+    else if( config_GetInt( p_libvlc, "list" ) > 0 )
     {
         ListModules( p_libvlc, VLC_FALSE );
         b_exit = VLC_TRUE;
         i_ret = VLC_EEXITSUCCESS;
     }
-    else if( config_GetInt( p_libvlc, "list-verbose" ) )
+    else if( config_GetInt( p_libvlc, "list-verbose" ) > 0 )
     {
         ListModules( p_libvlc, VLC_TRUE );
         b_exit = VLC_TRUE;
@@ -471,13 +471,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Check for config file options */
-    if( config_GetInt( p_libvlc, "reset-config" ) )
+    if( config_GetInt( p_libvlc, "reset-config" ) > 0 )
     {
         config_ResetAll( p_libvlc );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
         config_SaveConfigFile( p_libvlc, NULL );
     }
-    if( config_GetInt( p_libvlc, "save-config" ) )
+    if( config_GetInt( p_libvlc, "save-config" ) > 0 )
     {
         config_LoadConfigFile( p_libvlc, NULL );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
@@ -525,7 +525,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_DBUS_3
     dbus_threads_init_default();
 
-    if( config_GetInt( p_libvlc, "one-instance" ) )
+    if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
     {
         /* Initialise D-Bus interface, check for other instances */
         DBusConnection  *p_conn = NULL;
@@ -599,7 +599,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                         exit( VLC_ENOMEM );
                     }
                     b_play = TRUE;
-                    if( config_GetInt( p_libvlc, "playlist-enqueue" ) )
+                    if( config_GetInt( p_libvlc, "playlist-enqueue" ) > 0 )
                         b_play = FALSE;
                     if ( !dbus_message_iter_append_basic( &dbus_args,
                                 DBUS_TYPE_BOOLEAN, &b_play ) )
@@ -649,7 +649,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
 
     var_Create( p_libvlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    if( config_GetInt( p_libvlc, "quiet" ) )
+    if( config_GetInt( p_libvlc, "quiet" ) > 0 )
     {
         val.i_int = -1;
         var_Set( p_libvlc, "verbose", val );
@@ -657,7 +657,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_AddCallback( p_libvlc, "verbose", VerboseCallback, NULL );
     var_Change( p_libvlc, "verbose", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
 
-    p_libvlc->b_color = p_libvlc->b_color && config_GetInt( p_libvlc, "color" );
+    if( p_libvlc->b_color )
+        p_libvlc->b_color = config_GetInt( p_libvlc, "color" ) > 0;
 
     /*
      * Output messages that may still be in the queue
@@ -720,7 +721,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         p_libvlc->pf_memset = memset;
     }
 
-    p_libvlc->b_stats = config_GetInt( p_libvlc, "stats" );
+    p_libvlc->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
     p_libvlc->i_timers = 0;
     p_libvlc->pp_timers = NULL;
     vlc_mutex_init( p_libvlc, &p_libvlc->timer_lock );
@@ -803,12 +804,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_DBUS_3
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
-    if( config_GetInt( p_libvlc, "one-instance" ) )
+    if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
         VLC_AddIntf( 0, "dbus,none", VLC_FALSE, VLC_FALSE );
 
     /* Prevents the power management daemon to suspend the computer
      * when VLC is active */
-    if( config_GetInt( p_libvlc, "inhibit" ) )
+    if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
         VLC_AddIntf( 0, "inhibit,none", VLC_FALSE, VLC_FALSE );
 #endif
 
@@ -817,18 +818,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Currently, only for X
      */
 #ifdef HAVE_X11_XLIB_H
-    if( config_GetInt( p_libvlc, "disable-screensaver" ) == 1 )
+    if( config_GetInt( p_libvlc, "disable-screensaver" ) )
     {
         VLC_AddIntf( 0, "screensaver,none", VLC_FALSE, VLC_FALSE );
     }
 #endif
 
-    if( config_GetInt( p_libvlc, "file-logging" ) == 1 )
+    if( config_GetInt( p_libvlc, "file-logging" ) > 0 )
     {
         VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
     }
 #ifdef HAVE_SYSLOG_H
-    if( config_GetInt( p_libvlc, "syslog" ) == 1 )
+    if( config_GetInt( p_libvlc, "syslog" ) > 0 )
     {
         const char *psz_logmode = "logmode=syslog";
         libvlc_InternalAddIntf( p_libvlc, "logger,none", VLC_FALSE, VLC_FALSE,
@@ -836,18 +837,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
-    if( config_GetInt( p_libvlc, "show-intf" ) == 1 )
+    if( config_GetInt( p_libvlc, "show-intf" ) > 0 )
     {
         VLC_AddIntf( 0, "showintf,none", VLC_FALSE, VLC_FALSE );
     }
 
-    if( config_GetInt( p_libvlc, "network-synchronisation") == 1 )
+    if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
     {
         VLC_AddIntf( 0, "netsync,none", VLC_FALSE, VLC_FALSE );
     }
 
 #ifdef WIN32
-    if( config_GetInt( p_libvlc, "prefer-system-codecs") == 1 )
+    if( config_GetInt( p_libvlc, "prefer-system-codecs") > 0 )
     {
         char *psz_codecs = config_GetPsz( p_playlist, "codec" );
         if( psz_codecs )
@@ -980,7 +981,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     char* psz_pidfile = NULL;
 
     if( libvlc_global.p_module_bank )
-    if( config_GetInt( p_libvlc, "daemon" ) )
+    if( config_GetInt( p_libvlc, "daemon" ) > 0 )
     {
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
         if( psz_pidfile != NULL )
@@ -1307,10 +1308,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     int i_index;
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
     int i_width_description = i_width + PADDING_SPACES - 1;
-    vlc_bool_t b_advanced    = config_GetInt( p_this, "advanced" );
-    vlc_bool_t b_description = config_GetInt( p_this, "help-verbose" );
+    vlc_bool_t b_advanced    = config_GetInt( p_this, "advanced" ) > 0;
+    vlc_bool_t b_description = config_GetInt( p_this, "help-verbose" ) > 0;
     vlc_bool_t b_description_hack;
-    vlc_bool_t b_color       = config_GetInt( p_this, "color" );
+    vlc_bool_t b_color       = config_GetInt( p_this, "color" ) > 0;
     vlc_bool_t b_has_advanced = VLC_FALSE;
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
@@ -1712,7 +1713,7 @@ static void ListModules( libvlc_int_t *p_this, vlc_bool_t b_verbose )
     char psz_spaces[22];
     int i_index;
 
-    vlc_bool_t b_color = config_GetInt( p_this, "color" );
+    vlc_bool_t b_color = config_GetInt( p_this, "color" ) > 0;
 
     memset( psz_spaces, ' ', 22 );
 
