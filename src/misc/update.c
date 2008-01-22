@@ -663,7 +663,6 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
     fclose( f );
     gcry_md_final( hd );
 
-    /* FIXME: is it always padded to 20 bytes ? */
     return( (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1) );
 }
 
