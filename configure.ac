@@ -5194,6 +5194,7 @@ then
     if test "${ac_cv_wx_headers}" = "yes"
     then
       VLC_ADD_PLUGINS([wxwidgets])
+      AC_DEFINE([HAVE_WX], 1, [Define to 1 if you have WxWidgets library.])
       ALIASES="${ALIASES} wxvlc"
     fi
     CPPFLAGS="${CPPFLAGS_save}"
@@ -5213,6 +5214,7 @@ AS_IF([test "${enable_qt4}" != "no" &&
   (test "${SYS}" != "darwin" || test "${enable_qt4}" = "yes")], [
   PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.2.0],
     [ VLC_ADD_PLUGINS([qt4])
+      AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
       ALIASES="${ALIASES} qvlc"
       enableqt4=true
       VLC_ADD_LIBS([qt4],[$QT4_LIBS])
