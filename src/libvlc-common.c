@@ -214,8 +214,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Announce who we are - Do it only for first instance ? */
     msg_Dbg( p_libvlc, COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
-    if( strcmp( p_libvlc->psz_object_name, "cvlc" ) ) /* Not running with cvlc */
-        msg_Info( p_libvlc, "Running vlc with the default interface. Use 'cvlc' to use vlc without interface.");
 
     /* Initialize mutexes */
     vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
@@ -1059,6 +1057,14 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
 
     if( !p_libvlc )
         return VLC_EGENERIC;
+
+    if( !psz_module ) /* requesting the default interface */
+    {
+        char *psz_interface = config_GetPsz( p_libvlc, "intf" );
+        if( !psz_interface || !*psz_interface ) /* "intf" has not been set */
+            msg_Info( p_libvlc, _("Running vlc with the default interface. Use 'cvlc' to use vlc without interface.") );
+        free( psz_interface );
+    }
 
 #ifndef WIN32
     if( libvlc_global.b_daemon && b_block && !psz_module )
