@@ -726,7 +726,6 @@ char *config_GetHomeDir( void )
  *   - on windows that's the App Data directory;
  *   - on other OSes it's the same as the home directory.
  */
-char *config_GetUserDir( void );
 char *config_GetUserDir( void )
 {
     return GetDir( VLC_TRUE );
