@@ -170,6 +170,9 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                     (audio_volume_t) i_volume );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t) i_volume;
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_object->p_libvlc, "volume-change", val );
+
     if ( p_aout == NULL ) return 0;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
@@ -208,6 +211,9 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
     var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
     var_SetInteger( p_object->p_libvlc, "saved-volume", (audio_volume_t) i_volume );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t) i_volume;
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_object->p_libvlc, "volume-change", val );
 
     if ( p_aout == NULL ) return 0;
 
