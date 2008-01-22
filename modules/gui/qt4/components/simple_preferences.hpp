@@ -64,6 +64,9 @@ class QLineEdit;
 class QRadioButton;
 class QCheckBox;
 class QString;
+#if WIN32
+class QListWidgetItem;
+#endif
 
 class SPrefsCatList : public QWidget
 {
@@ -96,11 +99,18 @@ private:
     QList<QWidget *> optionWidgets;
     QString qs_filter;
 
+#if WIN32
+    QList<QListWidgetItem *> listAsso;
+#endif
+
 /* Display only the options for the selected audio output */
 private slots:
     void lastfm_Changed( int );
     void updateAudioOptions( int );
+#ifdef WIN32
     void assoDialog();
+    void saveAsso();
+#endif
 };
 
 #endif

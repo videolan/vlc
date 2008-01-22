@@ -403,6 +403,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.assoName->hide();
             ui.assoButton->hide();
 #endif
+            BUTTONACT( ui.assoButton, assoDialog() );
 
             /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
@@ -627,7 +628,68 @@ void SPrefsPanel::lastfm_Changed( int i_state )
         config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
 }
 
+#ifdef WIN32
+
+#include <QListWidget>
+#include <QDialogButtonBox>
+#include "util/registry.hpp"
+
 void SPrefsPanel::assoDialog()
+{
+    QDialog *d = new QDialog( this );
+    QGridLayout *assoLayout = new QGridLayout( d );
+
+    QListWidget *filetypeList = new QListWidget;
+    assoLayout->addWidget( filetypeList, 0, 0, 1, 4 );
+
+    QListWidgetItem *currentItem;
+
+#define addType( ext ) \
+    currentItem = new QListWidgetItem( ext, filetypeList ); \
+    currentItem->setCheckState( Qt::Checked ); \
+    listAsso.append( currentItem );
+
+    addType( ".avi" );
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox( d );
+    QPushButton *closeButton = new QPushButton( qtr( "&Apply" ) );
+    QPushButton *clearButton = new QPushButton( qtr( "&Cancel" ) );
+    buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( clearButton, QDialogButtonBox::ActionRole );
+
+    assoLayout->addWidget( buttonBox, 1, 2, 1, 2 );
+
+    CONNECT( closeButton, clicked(), this, saveAsso() );
+    CONNECT( clearButton, clicked(), d, reject() );
+    d->exec();
+    delete d;
+}
+
+void addAsso( char *psz_ext )
 {
 
 }
+
+void delAsso( char *psz_ext )
+{
+
+}
+void SPrefsPanel::saveAsso()
+{
+    for( int i = 0; i < listAsso.size(); i ++ )
+    {
+        if( listAsso[i]->checkState() > 0 )
+        {
+            addAsso( qtu( listAsso[i]->text() ) );
+        }
+        else
+        {
+            delAsso( qtu( listAsso[i]->text() ) );
+        }
+    }
+    /* Gruik ? Naaah */
+    qobject_cast<QDialog *>(listAsso[0]->listWidget()->parent())->accept();
+}
+
+#endif /* WIN32 */
+
