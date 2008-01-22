@@ -371,7 +371,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 #ifdef __GLIBC__
         fprintf( stderr, "main warning: can't store message (%m): " );
 #else
-        char *psz_err[1001];
+        char psz_err[1001];
 #ifndef WIN32
         /* we're not using GLIBC, so we are sure that the error description
          * will be stored in the buffer we provide to strerror_r() */
