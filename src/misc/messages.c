@@ -295,11 +295,15 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
     int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
 #endif
 
-    if( p_this == NULL || p_this->i_flags & OBJECT_FLAGS_QUIET ||
-        (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
+    if( p_this == NULL )
     {
+        utf8_vfprintf( stderr, psz_format, _args );
         return;
     }
+
+    if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
+        (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
+        return;
 
 #ifndef __GLIBC__
     /* Expand %m to strerror(errno) - only once */
