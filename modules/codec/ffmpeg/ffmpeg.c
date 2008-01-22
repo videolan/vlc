@@ -486,9 +486,15 @@ static struct
     { VLC_FOURCC('U','Y','V','Y'), PIX_FMT_UYVY422 },
 
     /* Packed RGB formats */
+#if defined(WORDS_BIGENDIAN)
+    { VLC_FOURCC('R','V','1','5'), PIX_FMT_BGR555 },
+    { VLC_FOURCC('R','V','1','6'), PIX_FMT_BGR565 },
+    { VLC_FOURCC('R','V','2','4'), PIX_FMT_BGR24 },
+#else
     { VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555 },
     { VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565 },
     { VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24 },
+#endif
     { VLC_FOURCC('R','V','3','2'), PIX_FMT_RGBA32 },
 #if defined(PIX_FMT_RGBA)
     { VLC_FOURCC('R','G','B','A'), PIX_FMT_RGBA },
