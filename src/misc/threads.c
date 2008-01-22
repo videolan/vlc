@@ -226,7 +226,6 @@ int __vlc_threads_end( vlc_object_t *p_this )
  *****************************************************************************/
 int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 {
-    assert( p_this );
     p_mutex->p_this = p_this;
 
 #if defined( UNDER_CE )
