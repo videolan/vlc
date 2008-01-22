@@ -1,7 +1,7 @@
 /*****************************************************************************
  * update.c: VLC update checking and downloading
  *****************************************************************************
- * Copyright © 2005-2007 the VideoLAN team
+ * Copyright © 2005-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -25,7 +25,7 @@
 
 /**
  *   \file
- *   This file contains functions related to VLC and plugins update management
+ *   This file contains functions related to VLC update management
  */
 
 /*****************************************************************************
@@ -56,7 +56,7 @@
  *      * Z is the revision number
  *      * e is an OPTIONAL extra letter
  *      * AKA "0.8.6d" or "0.9.0"
- * Second line is an url to the last binary
+ * Second line is an url of the binary for this last version
  * Third line is a description of the update (it MAY be extended to several lines, but for now it is only one line)
  */
 
@@ -116,7 +116,7 @@ static inline int scalar_number( uint8_t *p, int header_len )
 static int parse_public_key_packet( public_key_packet_t *p_key, uint8_t *p_buf,
                                     size_t i_packet_len )
 {
-    if( i_packet_len != 418 )
+    if( i_packet_len > 418 )
         return VLC_EGENERIC;
 
     p_key->version   = *p_buf++;
@@ -130,21 +130,41 @@ static int parse_public_key_packet( public_key_packet_t *p_key, uint8_t *p_buf,
     if( p_key->algo != PUBLIC_KEY_ALGO_DSA )
         return VLC_EGENERIC;
 
-    memcpy( p_key->p, p_buf, 2+128 ); p_buf += 2+128;
-    if( mpi_len( p_key->p ) != 128 )
+    int i_p_len = mpi_len( p_buf );
+    if( i_p_len > 128 )
         return VLC_EGENERIC;
+    else
+    {
+        memcpy( p_key->p, p_buf, 2+i_p_len ); p_buf += 2+i_p_len;
+        if( i_p_len < 128 )
+            memmove( p_key->q, p_key->p + 2+i_p_len, 2+20 + 2+128 + 2+128 );
+    }
 
-    memcpy( p_key->q, p_buf, 2+20 );  p_buf += 2+20;
-    if( mpi_len( p_key->q ) != 20 )
+    int i_q_len = mpi_len( p_buf );
+    if( i_q_len > 20 )
         return VLC_EGENERIC;
+    else
+    {
+        memcpy( p_key->q, p_buf, 2+i_q_len );  p_buf += 2+i_q_len;
+        if( i_p_len < 20 )
+            memmove( p_key->g, p_key->q + 2+i_q_len, 2+128 + 2+128 );
+    }
 
-    memcpy( p_key->g, p_buf, 2+128 ); p_buf += 2+128;
-    if( mpi_len( p_key->g ) != 128 )
+    int i_g_len = mpi_len( p_buf );
+    if( i_g_len > 128 )
         return VLC_EGENERIC;
-
-    memcpy( p_key->y, p_buf, 2+128 ); p_buf += 2+128;
-    if( mpi_len( p_key->y ) != 128 )
+    else
+    {
+        memcpy( p_key->g, p_buf, 2+i_g_len ); p_buf += 2+i_g_len;
+        if( i_g_len < 128 )
+            memmove( p_key->y, p_key->g + 2+i_g_len, 2+128 );
+    }
+    
+    int i_y_len = mpi_len( p_buf );
+    if( i_y_len > 128 )
         return VLC_EGENERIC;
+    else
+        memcpy( p_key->y, p_buf, 2+i_y_len );
 
     return VLC_SUCCESS;
 }
@@ -213,20 +233,30 @@ static int parse_signature_v4_packet( signature_packet_v4_t *p_sig,
 
     memcpy( p_sig->hash_verification, p_buf, 2 ); p_buf += 2;
 
-    memcpy( p_sig->r, p_buf, 22 ); p_buf += 22;
-    if( mpi_len( p_sig->r ) != 20 )
+    int i_r_len = mpi_len( p_buf );
+    if( i_r_len > 20 )
     {
         free( p_sig->hashed_data );
         free( p_sig->unhashed_data );
         return VLC_EGENERIC;
     }
+    else
+    {
+        memcpy( p_sig->r, p_buf, 2 + i_r_len );
+        p_buf += 2 + i_r_len;
+    }
 
-    memcpy( p_sig->s, p_buf, 22 );
-    if( mpi_len( p_sig->s ) != 20 )
+    int i_s_len = mpi_len( p_buf );
+    if( i_s_len > 20 )
     {
         free( p_sig->hashed_data );
         free( p_sig->unhashed_data );
         return VLC_EGENERIC;
+    }
+    else
+    {
+        memcpy( p_sig->s, p_buf, 2 + i_s_len );
+        p_buf += 2 + i_s_len;
     }
 
     return VLC_SUCCESS;
@@ -344,16 +374,7 @@ static int download_signature(  vlc_object_t *p_this,
         return VLC_ENOMEM;
 
     int64_t i_size = stream_Size( p_stream );
-    /* FIXME: a signature can be less than 65 bytes, if r & s numbers
-     * do not have 160 significant bits.
-     */
-    if( i_size < 65 )
-    {
-        stream_Delete( p_stream );
-        msg_Dbg( p_this, "Signature too small" );
-        return VLC_EGENERIC;
-    }
-    else if( i_size == 65 ) /* binary format signature */
+    if( i_size <= 65 ) /* binary format signature */
     {
         msg_Dbg( p_this, "Downloading unarmored signature" );
         int i_read = stream_Read( p_stream, p_sig, (int)i_size );
@@ -389,13 +410,25 @@ static int download_signature(  vlc_object_t *p_this,
     int i_bytes = pgp_unarmor( p_buf, i_size, (uint8_t*)p_sig, 65 );
     free( p_buf );
 
-    if( i_bytes != 65 )
+    if( i_bytes > 65 )
     {
-        msg_Dbg( p_this, "Unarmoring failed: signature is %d bytes", i_bytes );
+        msg_Dbg( p_this, "Signature is too big: %d bytes", i_bytes );
         return VLC_EGENERIC;
     }
     else
+    {
+        int i_r_len = mpi_len( p_sig->r );
+        if( i_r_len > 20 )
+        {
+            msg_Dbg( p_this, "Signature invalid" );
+            return VLC_EGENERIC;
+        }
+        else if( i_r_len < 20 )
+            /* move s to the right place if r is less than 20 bytes */
+            memmove( p_sig->s, p_sig->r + 2 + i_r_len, 20 + 2 );
+
         return VLC_SUCCESS;
+    }
 }
 
 /*
@@ -417,19 +450,26 @@ static int verify_signature( vlc_object_t *p_this, uint8_t *p_r, uint8_t *p_s,
     gcry_sexp_t key_sexp, hash_sexp, sig_sexp;
     key_sexp = hash_sexp = sig_sexp = NULL;
 
-    if( gcry_mpi_scan( &p, GCRYMPI_FMT_USG, p_key->p + 2, 128, NULL ) ||
-        gcry_mpi_scan( &q, GCRYMPI_FMT_USG, p_key->q + 2, 20, NULL ) ||
-        gcry_mpi_scan( &g, GCRYMPI_FMT_USG, p_key->g + 2, 128, NULL ) ||
-        gcry_mpi_scan( &y, GCRYMPI_FMT_USG, p_key->y + 2, 128, NULL ) ||
+    int i_p_len = mpi_len( p_key->p );
+    int i_q_len = mpi_len( p_key->q );
+    int i_g_len = mpi_len( p_key->g );
+    int i_y_len = mpi_len( p_key->y );
+    if( gcry_mpi_scan( &p, GCRYMPI_FMT_USG, p_key->p + 2, i_p_len, NULL ) ||
+        gcry_mpi_scan( &q, GCRYMPI_FMT_USG, p_key->q + 2, i_q_len, NULL ) ||
+        gcry_mpi_scan( &g, GCRYMPI_FMT_USG, p_key->g + 2, i_g_len, NULL ) ||
+        gcry_mpi_scan( &y, GCRYMPI_FMT_USG, p_key->y + 2, i_y_len, NULL ) ||
         gcry_sexp_build( &key_sexp, &erroff, key_sexp_s, p, q, g, y ) )
         goto problem;
 
-    if( gcry_mpi_scan( &r, GCRYMPI_FMT_USG, p_r + 2, 20, NULL ) ||
-        gcry_mpi_scan( &s, GCRYMPI_FMT_USG, p_s + 2, 20, NULL ) ||
+    int i_r_len = mpi_len( p_r );
+    int i_s_len = mpi_len( p_s );
+    if( gcry_mpi_scan( &r, GCRYMPI_FMT_USG, p_r + 2, i_r_len, NULL ) ||
+        gcry_mpi_scan( &s, GCRYMPI_FMT_USG, p_s + 2, i_s_len, NULL ) ||
         gcry_sexp_build( &sig_sexp, &erroff, sig_sexp_s, r, s ) )
         goto problem;
 
-    if( gcry_mpi_scan( &hash, GCRYMPI_FMT_USG, p_hash, 20, NULL ) ||
+    int i_hash_len = 20;
+    if( gcry_mpi_scan( &hash, GCRYMPI_FMT_USG, p_hash, i_hash_len, NULL ) ||
         gcry_sexp_build( &hash_sexp, &erroff, hash_sexp_s, hash ) )
         goto problem;
 
@@ -623,6 +663,7 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
     fclose( f );
     gcry_md_final( hd );
 
+    /* FIXME: is it always padded to 20 bytes ? */
     return( (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1) );
 }
 
@@ -704,7 +745,23 @@ static uint8_t *key_sign_hash( public_key_t *p_pkey )
     gcry_md_putc( hd, (418 >> 8) & 0xff );
     gcry_md_putc( hd, 418 & 0xff );
 
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key, 418 );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key, 6 ); /* version,timestamp,algo */
+
+    int i_p_len = mpi_len( p_pkey->key.p );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.p, 2 );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.p + 2, i_p_len );
+
+    int i_g_len = mpi_len( p_pkey->key.g );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.g, 2 );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.g + 2, i_g_len );
+
+    int i_q_len = mpi_len( p_pkey->key.q );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.q, 2 );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.q + 2, i_q_len );
+
+    int i_y_len = mpi_len( p_pkey->key.y );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.y, 2 );
+    gcry_md_write( hd, (uint8_t*)&p_pkey->key.y + 2, i_y_len );
 
     gcry_md_putc( hd, 0xb4 );
 
@@ -1261,13 +1318,25 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     if( download_signature( VLC_OBJECT( p_udt ), &sign,
             p_update->release.psz_url ) != VLC_SUCCESS )
     {
+        utf8_unlink( psz_destfile );
+
+        intf_UserFatal( p_udt, VLC_TRUE, _("File can not be verified"),
+            _("It was not possible to downlaod a cryptographic signature for "
+              "downloaded file \"%s\", and so VLC deleted it."),
+            psz_destfile );
         msg_Err( p_udt, "Couldn't download signature of downloaded file" );
         goto end;
     }
 
     if( sign.type != BINARY_SIGNATURE )
     {
+        utf8_unlink( psz_destfile );
         msg_Err( p_udt, "Invalid signature type" );
+        intf_UserFatal( p_udt, VLC_TRUE, _("Invalid signature"),
+            _("The cryptographic signature for downloaded file \"%s\" was "
+              "invalid and couldn't be used to securely verify it, and so "
+              "VLC deleted it."),
+            psz_destfile );
         goto end;
     }
 
@@ -1276,23 +1345,35 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     {
         msg_Err( p_udt, "Unable to hash %s", psz_destfile );
         utf8_unlink( psz_destfile );
+        intf_UserFatal( p_udt, VLC_TRUE, _("File not verifiable"),
+            _("It was not possible to securely verify downloaded file \"%s\", "
+              "and so VLC deleted it."),
+            psz_destfile );
+
         goto end;
     }
 
     if( p_hash[0] != sign.hash_verification[0] ||
         p_hash[1] != sign.hash_verification[1] )
     {
-        msg_Err( p_udt, "Bad SHA1 hash for %s", psz_destfile );
         utf8_unlink( psz_destfile );
+        intf_UserFatal( p_udt, VLC_TRUE, _("File corrupted"),
+            _("Downloaded file \"%s\" was corrupted, and so VLC deleted it."),
+             psz_destfile );
+        msg_Err( p_udt, "Bad SHA1 hash for %s", psz_destfile );
+        free( p_hash );
         goto end;
     }
 
     if( verify_signature( VLC_OBJECT(p_udt), sign.r, sign.s,
                 &p_update->p_pkey->key, p_hash ) != VLC_SUCCESS )
     {
+        utf8_unlink( psz_destfile );
+        intf_UserFatal( p_udt, VLC_TRUE, _("File corrupted"),
+            _("Downloaded file \"%s\" was corrupted, and so VLC deleted it."),
+             psz_destfile );
         msg_Err( p_udt, "BAD SIGNATURE for %s", psz_destfile );
         free( p_hash );
-        utf8_unlink( psz_destfile );
         goto end;
     }
 
