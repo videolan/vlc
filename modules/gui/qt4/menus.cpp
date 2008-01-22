@@ -262,7 +262,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
     if( with_intf )
     {
         QMenu *intfmenu = InterfacesMenu( p_intf, NULL );
-        intfmenu->setTitle( qtr( "Add Interfaces" ) );
+        intfmenu->setTitle( qtr( "Interfaces" ) );
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
@@ -962,7 +962,8 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             case VLC_VAR_STRING:
                 var_Get( p_object, psz_var, &val );
                 another_val.psz_string = strdup( CURVAL.psz_string );
-                menutext = qfu( CURTEXT ? CURTEXT : another_val.psz_string );
+                menutext = qfu( "Add " ) /* If this function is more used, FIX*/
+                         + qfu( CURTEXT ? CURTEXT : another_val.psz_string );
                 CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
                         p_object->i_object_id, another_val, i_type,
                         NOTCOMMAND && val.psz_string &&
