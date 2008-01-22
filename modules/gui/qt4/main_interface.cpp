@@ -152,7 +152,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_remainingTime = false;
     timeLabel = new TimeLabel;
     timeLabel->setText( " --:--/--:-- " );
-    timeLabel->setAlignment( Qt::AlignRight );
+    timeLabel->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
