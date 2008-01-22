@@ -52,7 +52,7 @@ struct intf_sys_t
 
     VideoWidget *p_video;
 
-    char *psz_filepath;
+    const char *psz_filepath;
     QMenu * p_popup_menu;
 };
 
