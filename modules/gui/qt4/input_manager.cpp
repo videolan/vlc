@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Ilkka Ollakka  <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -226,7 +227,7 @@ void InputManager::customEvent( QEvent *event )
     }
     else if ( type == ItemRateChanged_Type )
     {
-       UpdatePosition();
+       UpdateRate();
     }
     else if ( type == ItemTitleChanged_Type )
     {

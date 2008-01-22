@@ -59,7 +59,6 @@ private slots:
     void setArt( QString );
 signals:
     void rootChanged( int );
-    void artSet( QString );
 };
 
 class ArtLabel : public QLabel
