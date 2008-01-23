@@ -21,7 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "qt4.hpp"
 #include "util/input_slider.hpp"
 
 #include <QPaintEvent>
@@ -37,13 +36,14 @@ InputSlider::InputSlider( QWidget *_parent ) : QSlider( _parent )
 InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
                                  QSlider( q, _parent )
 {
-    mymove = false;
+    b_sliding = false;
     setMinimum( 0 );
     setMouseTracking(true);
     setMaximum( 1000 );
     setSingleStep( 2 );
     setPageStep( 10 );
     setTracking( true );
+    secstotimestr( psz_length, 0 );
     CONNECT( this, valueChanged(int), this, userDrag( int ) );
 }
 
@@ -53,39 +53,50 @@ void InputSlider::setPosition( float pos, int a, int b )
         setEnabled( false );
     else
         setEnabled( true );
-    mymove = true;
-    setValue( (int)(pos * 1000.0 ) );
-    mymove = false;
+
+    if( !b_sliding )
+        setValue( (int)(pos * 1000.0 ) );
     inputLength = b;
 }
 
 void InputSlider::userDrag( int new_value )
 {
-    float f_pos = (float)(new_value)/1000.0;
-    if( !mymove )
+    if( b_sliding )
     {
+        float f_pos = (float)(new_value)/1000.0;
         emit sliderDragged( f_pos );
     }
 }
 
+void InputSlider::mouseReleaseEvent( QMouseEvent *event )
+{
+    b_sliding = false;
+}
+
 void InputSlider::mousePressEvent(QMouseEvent* event)
 {
-    if( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+    b_sliding = true ;
+    if( event->button() != Qt::LeftButton &&
+        event->button() != Qt::MidButton )
     {
         QSlider::mousePressEvent( event );
         return;
     }
 
     QMouseEvent newEvent( event->type(), event->pos(), event->globalPos(),
-            Qt::MouseButton( event->button() ^ Qt::LeftButton ^ Qt::MidButton ),
-            Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
-            event->modifiers() );
+        Qt::MouseButton( event->button() ^ Qt::LeftButton ^ Qt::MidButton ),
+        Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
+        event->modifiers() );
     QSlider::mousePressEvent( &newEvent );
 }
 
 void InputSlider::mouseMoveEvent(QMouseEvent *event)
 {
-    char psz_length[MSTRTIME_MAX_SIZE];
+    if( b_sliding )
+    {
+        QSlider::mouseMoveEvent( event );
+    }
+
     secstotimestr( psz_length, ( event->x() * inputLength) / size().width() );
     setToolTip( psz_length );
 }

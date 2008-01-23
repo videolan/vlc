@@ -24,6 +24,8 @@
 #ifndef _INPUTSLIDER_H_
 #define _INPUTSLIDER_H_
 
+#include "qt4.hpp"
+
 #include <QSlider>
 #include <QMouseEvent>
 
@@ -37,9 +39,11 @@ public:
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent* event);
+    virtual void mouseReleaseEvent(QMouseEvent* event);
 private:
-    bool mymove;
+    bool b_sliding;
     int inputLength;
+    char psz_length[MSTRTIME_MAX_SIZE];
 public slots:
     void setPosition( float, int, int );
 private slots:
