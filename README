@@ -14,7 +14,6 @@ ABOUT-NLS          - Notes on the Free Translation Project.
 AUTHORS            - Main VLC authors.
 COPYING            - The GPL license.
 ChangeLog          - The vlc ChangeLog.
-FAQ                - Commonly asked questions.
 HACKING            - Hacking vlc.
 INSTALL            - Installation instructions.
 INSTALL.win32      - Installation instructions for the Win32 version of vlc.
