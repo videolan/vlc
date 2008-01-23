@@ -1003,21 +1003,20 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
         p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
         if( p_playlist )
         {
-            char cmd[5] = "";
+            char cmd[6];
             switch( p_playlist->status.i_status )
             {
             case PLAYLIST_STOPPED:
-                strncpy( &cmd[0], "stop", 4);
-                cmd[4] = '\0';
+                strcpy( cmd, "stop" );
                 break;
             case PLAYLIST_RUNNING:
-                strncpy( &cmd[0], "play", 4);
-                cmd[4] = '\0';
+                strcpy( cmd, "play" );
                 break;
             case PLAYLIST_PAUSED:
-                strncpy( &cmd[0], "pause", 5);
-                cmd[5] = '\0';
+                strcpy( cmd, "pause" );
                 break;
+            default:
+                cmd[0] = '\0';
             } /* var_GetInteger( p_input, "state" )  */
             msg_rc( STATUS_CHANGE "( %s state: %d )", &cmd[0], newval.i_int );
             vlc_object_release( p_playlist );
