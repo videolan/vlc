@@ -115,7 +115,7 @@ static int gcry_vlc_mutex_init( void **p_sys )
     if( p_lock == NULL)
         return ENOMEM;
 
-    i_val = vlc_mutex_init( NULL, p_lock );
+    i_val = vlc_mutex_init( (vlc_object_t *)NULL, p_lock );
     if( i_val )
         free( p_lock );
     else
