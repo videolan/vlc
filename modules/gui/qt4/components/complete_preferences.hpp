@@ -24,6 +24,10 @@
 #ifndef _PREFSTREE_H_
 #define _PREFSTREE_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 

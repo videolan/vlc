@@ -26,10 +26,15 @@
 #ifndef _INFOPANELS_H_
 #define _INFOPANELS_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_meta.h>
 
 #include <QWidget>
+#include <QLabel>
 
 #ifdef HAVE_LIMITS_H
 #   include <limits.h>
@@ -46,7 +51,6 @@ class QTreeWidgetItem;
 class QTreeView;
 class QSpinBox;
 class QLineEdit;
-class QLabel;
 
 class MetaPanel: public QWidget
 {
@@ -156,4 +160,13 @@ public slots:
     void update( input_item_t * );
     void clear();
 };
+class ArtCover : public QLabel
+{
+    Q_OBJECT
+    void mouseDoubleClickEvent( QMouseEvent *event )
+    {
+        fprintf(stderr, "**************************" );
+    }
+};
+
 #endif

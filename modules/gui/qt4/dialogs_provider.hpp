@@ -25,10 +25,15 @@
 #ifndef _DIALOGS_PROVIDER_H_
 #define _DIALOGS_PROVIDER_H_
 
+#ifdef HAVE_CONFIG_H 
+# include "config.h" 
+#endif
+
 #include <assert.h>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 
+#include "qt4.hpp"
 #include "dialogs/interaction.hpp"
 
 #include <QObject>

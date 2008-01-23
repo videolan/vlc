@@ -26,6 +26,10 @@
 #ifndef _PREFERENCESWIDGETS_H_
 #define _PREFERENCESWIDGETS_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #include "qt4.hpp"

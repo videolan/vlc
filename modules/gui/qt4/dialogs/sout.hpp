@@ -24,6 +24,10 @@
 #ifndef _SOUT_DIALOG_H_
 #define _SOUT_DIALOG_H_
 
+#ifdef HAVE_CONFIG_H 
+# include "config.h" 
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_streaming.h>
 

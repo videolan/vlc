@@ -26,6 +26,10 @@
 #ifndef _PLAYLISTWIDGET_H_
 #define _PLAYLISTWIDGET_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"

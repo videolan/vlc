@@ -24,6 +24,10 @@
 #ifndef _PLSEL_H_
 #define _PLSEL_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <QString>
