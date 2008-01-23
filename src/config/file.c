@@ -21,6 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include "../libvlc.h"
 #include "vlc_charset.h"
@@ -33,7 +37,7 @@
 #   include <limits.h>
 #endif
 
-#include "config.h"
+#include "configuration.h"
 #include "modules/modules.h"
 
 static char *ConfigKeyToString( int );

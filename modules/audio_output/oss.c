@@ -31,6 +31,10 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <unistd.h>                                      /* write(), close() */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #ifdef HAVE_ALLOCA_H

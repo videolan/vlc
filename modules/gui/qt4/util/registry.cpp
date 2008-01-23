@@ -1,5 +1,10 @@
 // License GPLv2 or later
 // COde by atmo
+//
+#error your license text is wrong and copyright is missing
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "registry.hpp"
 

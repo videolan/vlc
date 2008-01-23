@@ -21,14 +21,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "libvlc_internal.h"
+
 #include <vlc/libvlc.h>
 #include <vlc_input.h>
 #include <vlc_meta.h>
 
 /* For the preparser */
 #include <vlc_playlist.h>
-
-#include "libvlc_internal.h"
 
 static const vlc_meta_type_t libvlc_to_vlc_meta[] =
 {

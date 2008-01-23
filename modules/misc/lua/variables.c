@@ -28,6 +28,10 @@
 #   define  _GNU_SOURCE
 #endif
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #include <lua.h>        /* Low level lua C API */

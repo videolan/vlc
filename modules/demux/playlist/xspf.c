@@ -26,6 +26,10 @@
  * \brief XSPF playlist import functions
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 

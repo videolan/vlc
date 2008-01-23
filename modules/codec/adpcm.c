@@ -27,6 +27,10 @@
  *
  * Documentation: http://www.pcisys.net/~melanson/codecs/adpcm.txt
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
 #include <vlc_codec.h>

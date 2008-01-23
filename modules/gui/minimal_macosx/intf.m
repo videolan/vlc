@@ -30,6 +30,10 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #include <vlc_keys.h>

@@ -22,6 +22,10 @@
 
 /*** We need your help to complete this file!! Look for FIXME ***/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #ifndef WIN32

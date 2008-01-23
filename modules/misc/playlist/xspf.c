@@ -26,6 +26,10 @@
  * \file modules/misc/playlist/xspf.c
  * \brief XSPF playlist export functions
  */
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>

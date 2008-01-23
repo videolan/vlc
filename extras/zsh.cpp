@@ -33,6 +33,10 @@ typedef std::multimap<int, std::string> mcmap;
 typedef std::pair<std::string, std::string> mpair;
 typedef std::pair<int, std::string> mcpair;
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 /* evil hack */

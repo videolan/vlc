@@ -20,11 +20,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
 #include <vlc_events.h>
 #include "playlist_internal.h"
-#include "config/config.h"
+#include "config/configuration.h"
 #include <vlc_charset.h>
 
 #include <sys/types.h>

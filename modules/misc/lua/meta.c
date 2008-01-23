@@ -29,6 +29,10 @@
 #   define  _GNU_SOURCE
 #endif
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>

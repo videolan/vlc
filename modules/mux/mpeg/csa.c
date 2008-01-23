@@ -27,6 +27,10 @@
  * author and the license. If there is a problem with it please e-mail me.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #include "csa.h"

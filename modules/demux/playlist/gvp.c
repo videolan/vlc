@@ -48,6 +48,10 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 

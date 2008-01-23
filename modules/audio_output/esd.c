@@ -27,6 +27,10 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <unistd.h>                                      /* write(), close() */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
 

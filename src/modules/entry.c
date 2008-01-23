@@ -18,12 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <assert.h>
 #include <stdarg.h>
 
 #include "modules/modules.h"
-#include "config/config.h"
+#include "config/configuration.h"
 #include "libvlc.h"
 
 static const char default_name[] = "unnamed";

@@ -302,7 +302,7 @@ SOURCES_libvlc_common = \
 	misc/threads.c \
 	misc/stats.c \
 	misc/cpu.c \
-	config/config.h \
+	config/configuration.h \
 	config/core.c \
 	config/chain.c \
 	config/file.c \

@@ -194,6 +194,10 @@ then
     cat > "$file.$$.bak" << EOF
 /* This file was created automatically by glade2 and fixed by bootstrap */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 EOF
     sed -e 1,7d \

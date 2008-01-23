@@ -29,6 +29,10 @@
  *  This file contain functions to eject CD and DVD drives
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H

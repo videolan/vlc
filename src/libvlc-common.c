@@ -32,12 +32,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include "control/libvlc_internal.h"
 #include <vlc_input.h>
 
 #include "modules/modules.h"
-#include "config/config.h"
+#include "config/configuration.h"
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */

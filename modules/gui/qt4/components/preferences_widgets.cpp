@@ -30,6 +30,9 @@
  *  - Improvements over WX
  *      - Validator for modulelist
  */
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "components/preferences_widgets.hpp"
 #include "util/customwidgets.hpp"

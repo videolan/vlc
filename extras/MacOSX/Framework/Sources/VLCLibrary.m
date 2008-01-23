@@ -25,6 +25,10 @@
 #import "VLCLibrary.h"
 #import "VLCLibVLCBridging.h"
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
 

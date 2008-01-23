@@ -29,24 +29,14 @@
  * This file is a collection of common definitions and types
  */
 
+#ifndef PACKAGE
+/* Temporary regression test */
+#error You probably forgot to include config.h!!
+#endif
+
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
-#if defined( __BORLANDC__ )
-#   undef PACKAGE
-#endif
-
-#include "config.h"
-
-#if defined(PACKAGE)
-#   undef PACKAGE_NAME
-#   define PACKAGE_NAME PACKAGE
-#endif
-#if defined(VERSION)
-#   undef PACKAGE_VERSION
-#   define PACKAGE_VERSION VERSION
-#endif
-
 #if defined( __BORLANDC__ )
 #   undef HAVE_VARIADIC_MACROS
 #   undef HAVE_STDINT_H

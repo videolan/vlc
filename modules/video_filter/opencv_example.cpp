@@ -30,6 +30,10 @@
 #include <highgui.h>
 
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_decoder.h>
 #include <vlc_filter.h>

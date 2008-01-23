@@ -25,6 +25,10 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_bits.h>
 #include <vlc_block.h>

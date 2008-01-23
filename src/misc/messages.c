@@ -28,6 +28,10 @@
  * Preamble
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 #include <stdarg.h>                                       /* va_list for BSD */

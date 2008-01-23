@@ -1,4 +1,8 @@
 #include "../pyunit.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 
 PyObject *threadvar_test( PyObject *self, PyObject *args )

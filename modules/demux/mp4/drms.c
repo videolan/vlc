@@ -30,6 +30,10 @@
 #endif
 
 #ifdef __LIBVLC__
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #   include <vlc/vlc.h>
 #   include <vlc_md5.h>
 #   include "libmp4.h"

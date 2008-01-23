@@ -27,6 +27,10 @@
  *  This file contains functions to dectect subtitle files.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>
