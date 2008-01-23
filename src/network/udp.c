@@ -623,12 +623,12 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
 
-    msg_Dbg( p_this, "net: connecting to %s port %d", psz_host, i_port );
+    msg_Dbg( p_this, "net: connecting to [%s]:%d", psz_host, i_port );
 
     i_val = vlc_getaddrinfo( p_this, psz_host, i_port, &hints, &res );
     if( i_val )
     {
-        msg_Err( p_this, "cannot resolve %s port %d : %s", psz_host, i_port,
+        msg_Err( p_this, "cannot resolve [%s]:%d : %s", psz_host, i_port,
                  vlc_gai_strerror( i_val ) );
         return -1;
     }
