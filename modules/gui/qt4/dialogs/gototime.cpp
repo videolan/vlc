@@ -36,7 +36,8 @@
 
 GotoTimeDialog *GotoTimeDialog::instance = NULL;
 
-GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
+GotoTimeDialog::GotoTimeDialog( QWidget *parent, intf_thread_t *_p_intf)
+               : QVLCDialog( parent, _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowTitle( qtr( "Go to time" ) );

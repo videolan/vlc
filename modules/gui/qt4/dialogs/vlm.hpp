@@ -63,22 +63,22 @@ class VLMAWidget;
 class VLMWrapper;
 
 
-class VLMDialog : public QVLCFrame
+class VLMDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
     static VLMDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-             instance = new VLMDialog( p_intf );
+             instance = new VLMDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
         return instance;
     };
     virtual ~VLMDialog();
 
     VLMWrapper *vlmWrapper;
-vlm_t *p_vlm;
+    vlm_t *p_vlm;
 private:
-    VLMDialog( intf_thread_t * );
+    VLMDialog( QWidget *, intf_thread_t * );
     static VLMDialog *instance;
     Ui::Vlm ui;
 

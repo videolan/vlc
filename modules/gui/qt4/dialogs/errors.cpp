@@ -33,7 +33,8 @@
 
 ErrorsDialog *ErrorsDialog::instance = NULL;
 
-ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+ErrorsDialog::ErrorsDialog( QWidget *parent, intf_thread_t *_p_intf ) 
+            : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "Errors" ) );
     resize( 500 , 300 );

@@ -28,20 +28,20 @@
 
 class QTimeEdit;
 
-class GotoTimeDialog : public QVLCFrame
+class GotoTimeDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
     static GotoTimeDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new GotoTimeDialog( p_intf );
+            instance = new GotoTimeDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
         return instance;
     }
     virtual ~GotoTimeDialog();
 
 private:
-    GotoTimeDialog( intf_thread_t * );
+    GotoTimeDialog( QWidget *, intf_thread_t * );
     static GotoTimeDialog *instance;
     QTimeEdit *timeEdit;
 private slots:

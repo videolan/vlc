@@ -40,7 +40,8 @@
 
 PrefsDialog *PrefsDialog::instance = NULL;
 
-PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
+            : QVLCDialog( parent, _p_intf )
 {
     QGridLayout *main_layout = new QGridLayout( this );
     setWindowTitle( qtr( "Preferences" ) );

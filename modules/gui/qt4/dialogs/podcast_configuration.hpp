@@ -27,20 +27,21 @@
 #include "util/qvlcframe.hpp"
 #include "ui/podcast_configuration.h"
 
-class PodcastConfigDialog : public QVLCFrame
+class PodcastConfigDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
     static PodcastConfigDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance )
-            instance = new PodcastConfigDialog( p_intf );
+            instance = new PodcastConfigDialog( (QWidget *)p_intf->p_sys->p_mi, 
+                                                p_intf );
         return instance;
     }
     virtual ~PodcastConfigDialog();
 
 private:
-    PodcastConfigDialog( intf_thread_t * );
+    PodcastConfigDialog( QWidget *, intf_thread_t * );
     static PodcastConfigDialog *instance;
     Ui::PodcastConfiguration ui;
 public slots:

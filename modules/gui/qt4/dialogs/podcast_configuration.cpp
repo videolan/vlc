@@ -25,8 +25,8 @@
 
 PodcastConfigDialog *PodcastConfigDialog::instance = NULL;
 
-PodcastConfigDialog::PodcastConfigDialog( intf_thread_t *_p_intf)
-                : QVLCFrame( _p_intf )
+PodcastConfigDialog::PodcastConfigDialog( QWidget *parent, intf_thread_t *_p_intf)
+                    : QVLCDialog( parent, _p_intf )
 
 {
     ui.setupUi( this );

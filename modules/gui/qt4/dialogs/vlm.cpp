@@ -51,7 +51,7 @@ static const char *psz_type[] = { "Broadcast", "Schedule", "VOD" };
 
 VLMDialog *VLMDialog::instance = NULL;
 
-VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( parent, _p_intf )
 {
     p_vlm = vlm_New( p_intf );
 

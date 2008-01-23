@@ -48,7 +48,8 @@
 
 HelpDialog *HelpDialog::instance = NULL;
 
-HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+HelpDialog::HelpDialog( QWidget *parent, intf_thread_t *_p_intf )
+           : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "Help" ) );
     resize( 600, 560 );

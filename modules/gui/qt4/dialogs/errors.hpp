@@ -31,14 +31,14 @@ class QCheckBox;
 class QGridLayout;
 class QTextEdit;
 
-class ErrorsDialog : public QVLCFrame
+class ErrorsDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
     static ErrorsDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new ErrorsDialog( p_intf );
+            instance = new ErrorsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
         return instance;
     }
     virtual ~ErrorsDialog() {};
@@ -46,7 +46,7 @@ public:
     void addError( QString, QString );
     void addWarning( QString, QString );
 private:
-    ErrorsDialog( intf_thread_t * );
+    ErrorsDialog( QWidget *parent, intf_thread_t * );
     static ErrorsDialog *instance;
     void add( bool, QString, QString );
 

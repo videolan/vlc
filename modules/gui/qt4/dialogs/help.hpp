@@ -34,20 +34,20 @@ class QLabel;
 class QEvent;
 class QPushButton;
 
-class HelpDialog : public QVLCFrame
+class HelpDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
     static HelpDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new HelpDialog( p_intf );
+            instance = new HelpDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
         return instance;
     }
     virtual ~HelpDialog();
 
 private:
-    HelpDialog( intf_thread_t * );
+    HelpDialog( QWidget *, intf_thread_t * );
     static HelpDialog *instance;
 public slots:
     void close();

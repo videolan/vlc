@@ -43,14 +43,14 @@ class QListWidget;
 class QListWidgetItem;
 class QLabel;
 
-class PrefsDialog : public QVLCFrame
+class PrefsDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static PrefsDialog * getInstance( intf_thread_t *_p_intf )
+    static PrefsDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance )
-            instance = new PrefsDialog( _p_intf );
+            instance = new PrefsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
         return instance;
     }
     virtual ~PrefsDialog() {};
@@ -60,7 +60,7 @@ public:
 #endif
 
 private:
-    PrefsDialog( intf_thread_t * );
+    PrefsDialog( QWidget *, intf_thread_t * );
     QGridLayout *main_layout;
 
     QWidget *main_panel;
