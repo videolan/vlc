@@ -24,9 +24,10 @@
 #ifndef _INPUTSLIDER_H_
 #define _INPUTSLIDER_H_
 
-#include "util/directslider.hpp"
+#include <QSlider>
+#include <QMouseEvent>
 
-class InputSlider : public DirectSlider
+class InputSlider : public QSlider
 {
     Q_OBJECT
 public:
@@ -34,7 +35,8 @@ public:
     InputSlider( Qt::Orientation q,QWidget *_parent );
     virtual ~InputSlider()   {};
 protected:
-    void mouseMoveEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent* event);
 private:
     bool mymove;
     int inputLength;

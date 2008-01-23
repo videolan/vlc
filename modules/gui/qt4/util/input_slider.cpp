@@ -29,13 +29,13 @@
 #include <QBitmap>
 #include <QStyle>
 
-InputSlider::InputSlider( QWidget *_parent ) : DirectSlider( _parent )
+InputSlider::InputSlider( QWidget *_parent ) : QSlider( _parent )
 {
     InputSlider::InputSlider( Qt::Horizontal, _parent );
 }
 
 InputSlider::InputSlider( Qt::Orientation q,QWidget *_parent ) :
-                                 DirectSlider( q, _parent )
+                                 QSlider( q, _parent )
 {
     mymove = false;
     setMinimum( 0 );
@@ -66,6 +66,21 @@ void InputSlider::userDrag( int new_value )
     {
         emit sliderDragged( f_pos );
     }
+}
+
+void InputSlider::mousePressEvent(QMouseEvent* event)
+{
+    if( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+    {
+        QSlider::mousePressEvent( event );
+        return;
+    }
+
+    QMouseEvent newEvent( event->type(), event->pos(), event->globalPos(),
+            Qt::MouseButton( event->button() ^ Qt::LeftButton ^ Qt::MidButton ),
+            Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
+            event->modifiers() );
+    QSlider::mousePressEvent( &newEvent );
 }
 
 void InputSlider::mouseMoveEvent(QMouseEvent *event)

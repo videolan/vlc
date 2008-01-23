@@ -146,7 +146,6 @@ noinst_HEADERS = \
 	components/playlist/playlist.hpp \
 	components/playlist/selector.hpp \
 	util/input_slider.hpp \
-	util/directslider.hpp \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp
 

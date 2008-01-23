@@ -476,7 +476,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
-             im,   setInput( input_thread_t * ) );
+             im, setInput( input_thread_t * ) );
 }
 
 MainInputManager::~MainInputManager()
