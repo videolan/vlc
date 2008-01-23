@@ -132,7 +132,7 @@ static int Open( vlc_object_t *p_this )
     int           i_port       = 0;
     char          *psz_src = NULL;
 
-    psz_address = var_GetNonEmptyString(p_intf->p_libvlc, "http-host");
+    psz_address = var_CreateGetNonEmptyString( p_intf, "http-host" );
     if( psz_address != NULL )
     {
         char *psz_parser = strchr( psz_address, ':' );
