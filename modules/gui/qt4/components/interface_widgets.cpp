@@ -515,7 +515,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlButLayout->addWidget( nextButton );
 
     /* Add this block to the main layout */
-    controlLayout->addLayout( controlButLayout, 3, 3, 1, 3, Qt::AlignBottom );
+    controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
 
     BUTTON_SET_ACT_I( playButton, "", play.png, qtr( "Play" ), play() );
     BUTTON_SET_ACT_I( prevButton, "" , previous.png,
