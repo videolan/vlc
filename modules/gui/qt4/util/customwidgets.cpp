@@ -145,6 +145,7 @@ int qtEventToVLCKey( QKeyEvent *e )
         HANDLE( Key_Delete, KEY_DELETE );
         HANDLE( Key_VolumeDown, KEY_VOLUME_DOWN);
         HANDLE( Key_VolumeUp, KEY_VOLUME_UP );
+        HANDLE( Key_VolumeMute, KEY_VOLUME_MUTE );
         HANDLE( Key_MediaPlay, KEY_MEDIA_PLAY_PAUSE );
         HANDLE( Key_MediaStop, KEY_MEDIA_STOP );
         HANDLE( Key_MediaPrevious, KEY_MEDIA_PREV_TRACK );
