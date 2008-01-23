@@ -263,28 +263,32 @@ static void Run( intf_thread_t *p_intf )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     /* main loop */
-    while( !intf_ShouldDie( p_intf ) )
+    for( ;; )
     {
-        vlc_bool_t b_die;
+        vlc_bool_t b_die = VLC_FALSE, b_wait = VLC_FALSE;
 
-        /* waiting for data to submit, if waiting interval is elapsed */
-        if( mdate() < p_sys->next_exchange )
+        vlc_object_lock( p_intf );
+        if( vlc_object_alive( p_intf ) )
         {
-            vlc_object_lock( p_intf );
-            b_die = ( vlc_object_timedwait( p_intf, p_sys->next_exchange ) < 0 );
-            vlc_object_unlock( p_intf );
+           if( mdate() < p_sys->next_exchange )
+                /* wait until we can resubmit, i.e.  */
+                b_wait = !vlc_object_timedwait( p_intf,
+                                                p_sys->next_exchange );
+            else
+                /* wait for data to submit */
+                /* we are signaled each time there is a song to submit */
+               vlc_object_wait( p_intf );
         }
-        else
-            b_die = vlc_object_lock_and_wait( p_intf );
+        b_die = !vlc_object_alive( p_intf );
+        vlc_object_unlock( p_intf );
 
         if( b_die )
         {
             msg_Dbg( p_intf, "audioscrobbler is dying");
             return;
         }
-        /* we are signaled each time there is a song to submit */
-        else if( mdate() < p_sys->next_exchange )
-            continue;
+        if( b_wait )
+            continue; /* holding on until next_exchange */
 
         /* handshake if needed */
         if( p_sys->b_handshaked == VLC_FALSE )
