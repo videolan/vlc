@@ -396,7 +396,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #if defined( WIN32 ) || defined (__APPLE__)
             CONFIG_GENERIC( "language", StringList, NULL, language );
-            BUTTONACT( ui.assoButton, assoDialog );
+            BUTTONACT( ui.assoButton, assoDialog() );
 #else
             ui.language->hide();
             ui.languageLabel->hide();
