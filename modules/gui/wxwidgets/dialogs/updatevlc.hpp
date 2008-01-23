@@ -21,6 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
+
 #ifdef UPDATE_CHECK
 
 #ifndef _WXVLC_UPDATEVLC_H_

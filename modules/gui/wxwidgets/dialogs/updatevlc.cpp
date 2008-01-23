@@ -21,12 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef UPDATE_CHECK
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "updatevlc.hpp"
+
+#ifdef UPDATE_CHECK
 #include <wx/imaglist.h>
 
 #include "bitmaps/update_ascii.xpm"
