@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#ifdef WIN32
+
 #include "registry.hpp"
 
 QVLCRegistry::QVLCRegistry( HKEY rootKey )
@@ -185,3 +187,4 @@ double QVLCRegistry::ReadRegistryDouble( char *path, char *valueName, double def
     return default_value;
 }
 
+#endif /* WIN32 */
