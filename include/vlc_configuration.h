@@ -191,7 +191,7 @@ struct module_config_t
     vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
     vlc_bool_t   b_unsaveable;                    /* Config should be saved */
 
-    vlc_bool_t   b_unsafe;
+    vlc_bool_t   b_safe;
 };
 
 /*****************************************************************************

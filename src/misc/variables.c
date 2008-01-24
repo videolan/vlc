@@ -1099,7 +1099,7 @@ void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
     /* check if option is unsafe */
     {
         module_config_t *p_config = config_FindConfig( p_obj, psz_name );
-        if( p_config->b_unsafe )
+        if( p_config->b_safe )
         {
             int policy = config_GetInt( p_obj, "security-policy" );
             switch( policy )
