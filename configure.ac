@@ -526,16 +526,22 @@ AC_CHECK_HEADERS(zlib.h, [
 ])
 
 dnl Check for socklen_t
-AC_CACHE_CHECK([for socklen_t], ac_cv_type_socklen_t,
-  [AC_TRY_COMPILE(
-     [#include <sys/types.h>
-      #include <sys/socket.h>],
-     [socklen_t len = 42; return len;],
-     ac_cv_type_socklen_t=yes,
-     ac_cv_type_socklen_t=no)])
-if test "${ac_cv_type_socklen_t}" != "no"; then
-  AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define if <sys/socket.h> defines socklen_t.])
-fi
+AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
+AC_CACHE_CHECK([for socklen_t in sys/socket.h],
+ac_cv_type_socklen_t,
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#elif HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif]], [[socklen_t len; len = 0;]])],
+ac_cv_type_socklen_t=yes,
+ac_cv_type_socklen_t=no)])
+AS_IF([test "$ac_cv_type_socklen_t" = no],
+ [AC_DEFINE(socklen_t, int)])
 
 dnl Check for struct sockaddr_storage
 AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.])

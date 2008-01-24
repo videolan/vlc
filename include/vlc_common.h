@@ -142,10 +142,6 @@ typedef uint8_t             yuv_data_t;
 /* Audio volume */
 typedef uint16_t            audio_volume_t;
 
-#ifndef HAVE_SOCKLEN_T
-typedef int                 socklen_t;
-#endif
-
 /**
  * High precision date or time interval
  *
