@@ -228,7 +228,7 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
 {
     stream_t *s = vlc_stream_create( VLC_OBJECT(p_access) );
     stream_sys_t *p_sys;
-    char *psz_list;
+    char *psz_list = NULL;
 
     if( !s ) return NULL;
 
@@ -241,6 +241,11 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     s->pf_destroy = AStreamDestroy;
 
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
+    if( p_sys == NULL )
+    {
+        msg_Err( s, "Out of memory when allocating stream_sys_t" );
+        goto error;
+    }
 
     /* UTF16 and UTF32 text file conversion */
     s->i_char_width = 1;
@@ -271,11 +276,22 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     if( (psz_list = var_CreateGetString( s, "input-list" )) && *psz_list )
     {
         access_entry_t *p_entry = malloc( sizeof(access_entry_t) );
+        if( p_entry == NULL )
+        {
+            msg_Err( s, "Out of memory when allocating access_entry_t" );
+            goto error;
+        }
         char *psz_name, *psz_parser = psz_name = psz_list;
 
         p_sys->p_list_access = p_access;
         p_entry->i_size = p_access->info.i_size;
         p_entry->psz_path = strdup( p_access->psz_path );
+        if( p_entry->psz_path == NULL )
+        {
+            msg_Err( s, "Out of memory when duplicating p_access->psz_path" );
+            free( p_entry );
+            goto error;
+        }
         TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
         msg_Dbg( p_access, "adding file `%s', ("I64Fd" bytes)",
                  p_entry->psz_path, p_access->info.i_size );
@@ -302,6 +318,11 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
                          psz_name, p_tmp->info.i_size );
 
                 p_entry = malloc( sizeof(access_entry_t) );
+                if( p_entry == NULL )
+                {
+                    msg_Err( p_access, "Out of memory when allocating access_entry_t" );
+                    goto error;
+                }
                 p_entry->i_size = p_tmp->info.i_size;
                 p_entry->psz_path = psz_name;
                 TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
@@ -313,7 +334,7 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
             if( psz_name ) psz_name++;
         }
     }
-    if( psz_list ) free( psz_list );
+    FREENULL( psz_list );
 
     /* Peek */
     p_sys->i_peek = 0;
@@ -352,6 +373,12 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
         p_sys->stream.i_offset = 0;
         p_sys->stream.i_tk     = 0;
         p_sys->stream.p_buffer = malloc( STREAM_CACHE_SIZE );
+        if( p_sys->stream.p_buffer == NULL )
+        {
+            msg_Err( s, "Out of memory when allocating stream cache (%d bytes)",
+                        STREAM_CACHE_SIZE );
+            goto error;
+        }
         p_sys->stream.i_used   = 0;
         access2_Control( p_access, ACCESS_GET_MTU,
                          &p_sys->stream.i_read_size );
@@ -390,6 +417,10 @@ error:
     {
         free( p_sys->stream.p_buffer );
     }
+    while( p_sys->i_list > 0 )
+        free( p_sys->list[--(p_sys->i_list)] );
+    free( p_sys->list );
+    free( psz_list );
     free( s->p_sys );
     vlc_object_detach( s );
     vlc_object_destroy( s );
@@ -1488,7 +1519,7 @@ char * stream_ReadLine( stream_t *s )
                     var_SetString( p_input, "subsdec-encoding", "UTF-8" );
                     vlc_object_release( p_input );
                 }
-                if( psz_encoding ) free( psz_encoding );
+                free( psz_encoding );
             }
         }
 
@@ -1560,6 +1591,11 @@ char * stream_ReadLine( stream_t *s )
         {
             i_data = (psz_eol - (char *)p_data) + 1;
             p_line = realloc( p_line, i_line + i_data + s->i_char_width ); /* add \0 */
+            if( !p_line )
+            {
+                msg_Err( s, "Out of memory when reallocating p_line" );
+                goto error;
+            }
             i_data = stream_Read( s, &p_line[i_line], i_data );
             if( i_data <= 0 ) break; /* Hmmm */
             i_line += i_data - s->i_char_width; /* skip \n */;
@@ -1571,6 +1607,11 @@ char * stream_ReadLine( stream_t *s )
 
         /* Read data (+1 for easy \0 append) */
         p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + s->i_char_width );
+        if( !p_line )
+        {
+            msg_Err( s, "Out of memory when reallocating p_line" );
+            goto error;
+        }
         i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
         if( i_data <= 0 ) break; /* Hmmm */
         i_line += i_data;
@@ -1594,7 +1635,11 @@ char * stream_ReadLine( stream_t *s )
 
             /* iconv */
             psz_new_line = malloc( i_line );
-
+            if( psz_new_line == NULL )
+            {
+                msg_Err( s, "Out of memory when allocating psz_new_line" );
+                goto error;
+            }
             i_in = i_out = (size_t)i_line;
             p_in = p_line;
             p_out = psz_new_line;
@@ -1619,8 +1664,10 @@ char * stream_ReadLine( stream_t *s )
         return p_line;
     }
 
+error:
+
     /* We failed to read any data, probably EOF */
-    if( p_line ) free( p_line );
+    free( p_line );
     if( s->conv != (vlc_iconv_t)(-1) ) vlc_iconv_close( s->conv );
     return NULL;
 }
