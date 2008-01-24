@@ -119,6 +119,7 @@ E_(vlc_entry) ( module_t *p_module );
 
 #define vlc_module_end( )                                                     \
         }                                                                     \
+        (void)p_config;                                                       \
         return VLC_SUCCESS;                                                   \
                                                                               \
     error:                                                                    \
