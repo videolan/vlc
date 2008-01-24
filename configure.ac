@@ -533,6 +533,7 @@ ac_cv_type_socklen_t,
 [#include <sys/types.h>
 #ifdef WIN32
 # include <winsock2.h>
+# include <ws2tcpip.h>
 #else
 # include <sys/socket.h>
 #endif]], [[socklen_t len; len = 0;]])],
