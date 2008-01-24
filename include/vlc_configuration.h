@@ -282,7 +282,7 @@ enum vlc_config_properties
     VLC_CONFIG_OLDNAME,
     /* former option name (args=const char *) */
 
-    VLC_CONFIG_UNSAFE,
+    VLC_CONFIG_SAFE,
     /* tag as modifiable by untrusted input item "sources" (args=none) */
 };
 
@@ -472,8 +472,10 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
 #define change_unsaveable() \
     vlc_config_set (p_config, VLC_CONFIG_VOLATILE)
 
-#define change_unsafe() \
-    vlc_config_set (p_config, VLC_CONFIG_UNSAFE)
+#define change_unsafe() (void)0 /* no-op */
+
+#define change_safe() \
+    vlc_config_set (p_config, VLC_CONFIG_SAFE)
 
 /****************************************************************************
  * config_chain_t:
