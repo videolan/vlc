@@ -32,7 +32,6 @@
 extern "C" {
 # endif
 
-#include <assert.h>
 #include <vlc_input.h>
 #include <vlc_events.h>
 #include <vlc_services_discovery.h>
