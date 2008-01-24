@@ -21,6 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #ifndef _WXVLC_WIDGETS_H_
 #define _WXVLC_WIDGETS_H_
 

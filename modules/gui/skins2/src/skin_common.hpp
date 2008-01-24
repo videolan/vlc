@@ -22,6 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #ifndef SKIN_COMMON_HPP
 #define SKIN_COMMON_HPP
 
