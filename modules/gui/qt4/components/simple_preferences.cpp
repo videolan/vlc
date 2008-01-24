@@ -667,26 +667,41 @@ void SPrefsPanel::assoDialog()
     delete d;
 }
 
-void addAsso( char *psz_ext )
+void addAsso( QVLCRegistry *qvReg, char *psz_ext )
 {
+    char psz_VLC[] = "VLC";
 
+    char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
+    if( strlen( psz_value ) > 0 )
+        qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
+
+    qvReg->WriteRegistryString( psz_ext, "", strcat( psz_VLC, psz_ext ) );
 }
 
-void delAsso( char *psz_ext )
+void delAsso( QVLCRegistry *qvReg, char *psz_ext )
 {
+    char psz_VLC[] = "VLC";
+    char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
 
+    if( !strcmp( strcat( psz_VLC, psz_ext ), psz_value ) )
+    {
+        qvReg->WriteRegistryString( psz_ext, "",
+            qvReg->ReadRegistryString( psz_ext, "VLC.backup", "" ) );
+        // qvReg->DeletKey( psz_ext, "VLC.backup" );
+    }
 }
 void SPrefsPanel::saveAsso()
 {
     for( int i = 0; i < listAsso.size(); i ++ )
     {
+        QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
         if( listAsso[i]->checkState() > 0 )
         {
-            addAsso( qtu( listAsso[i]->text() ) );
+            addAsso( qvReg, qtu( listAsso[i]->text() ) );
         }
         else
         {
-            delAsso( qtu( listAsso[i]->text() ) );
+            delAsso( qvReg, qtu( listAsso[i]->text() ) );
         }
     }
     /* Gruik ? Naaah */

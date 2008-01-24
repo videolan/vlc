@@ -37,6 +37,9 @@
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_interface.h"
+#ifdef WIN32
+#include "util/registry.hpp"
+#endif
 
 enum {
     SPrefsInterface = 0,
