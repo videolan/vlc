@@ -33,9 +33,6 @@
 
 #include <stdarg.h>
 
-int vlc_mutex_lock(  vlc_mutex_t * ) ;
-int vlc_mutex_unlock(  vlc_mutex_t * ) ;
-
 /**
  * \defgroup messages Messages
  * This library provides basic functions for threads to interact with user
