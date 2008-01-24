@@ -530,13 +530,11 @@ AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
 AC_CACHE_CHECK([for socklen_t in sys/socket.h],
 ac_cv_type_socklen_t,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-[#if HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-#if HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-#elif HAVE_WINSOCK2_H
+[#include <sys/types.h>
+#ifdef WIN32
 # include <winsock2.h>
+#else
+# include <sys/socket.h>
 #endif]], [[socklen_t len; len = 0;]])],
 ac_cv_type_socklen_t=yes,
 ac_cv_type_socklen_t=no)])
