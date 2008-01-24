@@ -33,6 +33,7 @@
 #include <vlc/vlc.h>
 
 #include <errno.h>
+#include <assert.h>
 
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>

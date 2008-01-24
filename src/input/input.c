@@ -33,6 +33,7 @@
 
 #include <ctype.h>
 #include <limits.h>
+#include <assert.h>
 
 #include "input_internal.h"
 

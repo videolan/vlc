@@ -70,6 +70,7 @@
 # include <fcntl.h>
 # include <errno.h> /* ENOSYS */
 #endif
+#include <assert.h>
 
 /*****************************************************************************
  * Local prototypes

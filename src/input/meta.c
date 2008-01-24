@@ -36,6 +36,7 @@
 #include "../playlist/playlist_internal.h"
 #include <errno.h>
 #include <limits.h>                                             /* PATH_MAX */
+#include <assert.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>

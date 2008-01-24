@@ -32,6 +32,7 @@
 
 #include <errno.h>                                                  /* errno */
 #include <stdbool.h>
+#include <assert.h>
 
 #ifdef HAVE_LIMITS_H
 #   include <limits.h>

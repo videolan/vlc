@@ -40,6 +40,7 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
+#include <assert.h>
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>

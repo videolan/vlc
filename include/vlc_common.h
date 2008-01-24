@@ -53,7 +53,6 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <stdarg.h>
-#include <assert.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -598,6 +597,8 @@ struct gc_object_t
 {
             VLC_GC_MEMBERS
 };
+
+#include <assert.h> /* FIXME: should not be included here */
 
 static inline void __vlc_gc_incref( gc_object_t * p_gc )
 {
