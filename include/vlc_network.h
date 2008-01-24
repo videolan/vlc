@@ -45,9 +45,7 @@ extern const char *net_strerror( int val );
 #       define IPV6_V6ONLY 27
 #   endif
 #else
-#   if HAVE_SYS_SOCKET_H
-#      include <sys/socket.h>
-#   endif
+#   include <sys/socket.h>
 #   if HAVE_NETINET_IN_H
 #      include <netinet/in.h>
 #   endif
