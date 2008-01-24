@@ -41,7 +41,6 @@
 #   undef HAVE_VARIADIC_MACROS
 #   undef HAVE_STDINT_H
 #   undef HAVE_INTTYPES_H
-#   undef off_t
 #elif defined( _MSC_VER )
 #   pragma warning( disable : 4244 )
 #endif
@@ -1243,11 +1242,6 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
  *  the very beginning of the universe */
 extern vlc_threadvar_t msg_context_global_key;
 
-
-#if defined( __BORLANDC__ )
-#   undef PACKAGE
-#   define PACKAGE
-#endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   define DIR_SEP_CHAR '\\'
