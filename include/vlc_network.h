@@ -32,12 +32,7 @@
 # define __VLC_NETWORK_H
 
 #if defined( WIN32 )
-#   if defined(UNDER_CE) && defined(sockaddr_storage)
-#       undef sockaddr_storage
-#   endif
-#   if defined(UNDER_CE)
-#       define HAVE_STRUCT_ADDRINFO
-#   else
+#   if !defined(UNDER_CE)
 #       define _NO_OLDNAMES 1
 #       include <io.h>
 #   endif
