@@ -149,7 +149,7 @@ noinst_HEADERS = \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
-	util/registry.cpp
+	util/registry.hpp
 
 EXTRA_DIST += \
 	res.qrc \
