@@ -34,10 +34,6 @@
 
 #include <stdio.h>
 
-#if defined(DEBUG) && defined(HAVE_SYS_TIME_H)
-#   include <sys/time.h>
-#endif
-
 #if defined( UNDER_CE )
                                                                 /* WinCE API */
 #elif defined( WIN32 )
@@ -56,6 +52,10 @@
 #   include <pthread.h>
     /* Needed for pthread_cond_timedwait */
 #   include <errno.h>
+#   ifdef DEBUG
+#      include <time.h>
+#   endif
+
     /* This is not prototyped under Linux, though it exists. */
     int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 
