@@ -25,14 +25,13 @@
 #ifndef _VLM_DIALOG_H_
 #define _VLM_DIALOG_H_
 
-#ifdef HAVE_CONFIG_H
 # include "config.h"
-#endif
 
 #include <vlc/vlc.h>
 
-#ifdef ENABLE_VLM
 #include <vlc_vlm.h>
+
+#ifdef ENABLE_VLM
 
 #include "ui/vlm.h"
 #include "util/qvlcframe.hpp"

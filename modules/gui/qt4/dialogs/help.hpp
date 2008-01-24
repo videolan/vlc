@@ -24,11 +24,7 @@
 #ifndef _HELP_DIALOG_H_
 #define _HELP_DIALOG_H_
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <vlc/vlc.h>
+#include "config.h"
 
 #include "util/qvlcframe.hpp"
 

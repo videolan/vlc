@@ -112,7 +112,8 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/playlist/playlist.cpp \
 		components/playlist/selector.cpp \
 		util/input_slider.cpp \
-		util/customwidgets.cpp
+		util/customwidgets.cpp \
+		util/registry.cpp
 
 noinst_HEADERS = \
 	qt4.hpp \
@@ -147,7 +148,8 @@ noinst_HEADERS = \
 	components/playlist/selector.hpp \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \
-	util/qvlcframe.hpp
+	util/qvlcframe.hpp \
+	util/registry.cpp
 
 EXTRA_DIST += \
 	res.qrc \
