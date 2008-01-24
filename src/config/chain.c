@@ -320,7 +320,7 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                  msg_Warn( p_this, "Option %s is obsolete. Use %s instead.",
                            name, psz_name );
             }
-            if( p_conf->b_safe )
+            if( !p_conf->b_safe )
             {
                 int policy = config_GetInt( p_this, "security-policy" );
                 switch( policy )
