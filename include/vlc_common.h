@@ -126,10 +126,6 @@ typedef int                 ptrdiff_t;
 #   endif
 #endif
 
-#if (defined( WIN32 ) || defined( UNDER_CE )) && !defined( _SSIZE_T_ )
-typedef int                 ssize_t;
-#endif
-
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;
 
