@@ -515,7 +515,6 @@ struct buffer_t
 {
     void *  start;
     size_t  length;
-    void *  orig_userp;
 };
 
 struct demux_sys_t
@@ -1128,7 +1127,7 @@ static void DemuxClose( vlc_object_t *p_this )
         case IO_METHOD_USERPTR:
             for( i = 0; i < p_sys->i_nbuffers; ++i )
             {
-               free( p_sys->p_buffers[i].orig_userp );
+               free( p_sys->p_buffers[i].start );
             }
             break;
         }
@@ -1756,7 +1755,7 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
     struct v4l2_requestbuffers req;
     unsigned int i_page_size;
 
-    i_page_size = getpagesize();
+    i_page_size = sysconf(_SC_PAGESIZE);
     i_buffer_size = ( i_buffer_size + i_page_size - 1 ) & ~( i_page_size - 1);
 
     memset( &req, 0, sizeof(req) );
@@ -1780,8 +1779,7 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < 4; ++p_sys->i_nbuffers )
     {
         p_sys->p_buffers[p_sys->i_nbuffers].length = i_buffer_size;
-        p_sys->p_buffers[p_sys->i_nbuffers].start =
-            vlc_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].orig_userp,
+        posix_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].start,
                 /* boundary */ i_page_size, i_buffer_size );
 
         if( !p_sys->p_buffers[p_sys->i_nbuffers].start )
