@@ -655,11 +655,8 @@ VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, const char *, ... )
 /**
  * Same as __vlc_OSDMessage() but with automatic casting
  */
-#if defined(HAVE_VARIADIC_MACROS)
-#    define vout_OSDMessage( obj, chan, fmt, args...) __vout_OSDMessage( VLC_OBJECT(obj), chan, fmt, ## args )
-#else
-#    define vout_OSDMessage __vout_OSDMessage
-#endif
+#define vout_OSDMessage( obj, chan, ...) \
+      __vout_OSDMessage( VLC_OBJECT(obj), chan, __VA_ARGS__ )
 
 /**
  * Display a slider on the video output.

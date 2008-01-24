@@ -38,7 +38,6 @@
  * Required vlc headers
  *****************************************************************************/
 #if defined( __BORLANDC__ )
-#   undef HAVE_VARIADIC_MACROS
 #   undef HAVE_STDINT_H
 #   undef HAVE_INTTYPES_H
 #elif defined( _MSC_VER )

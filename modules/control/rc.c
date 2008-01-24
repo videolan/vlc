@@ -134,10 +134,7 @@ struct intf_sys_t
 #endif
 };
 
-#ifdef HAVE_VARIADIC_MACROS
-#   define msg_rc( psz_format, args... ) \
-      __msg_rc( p_intf, psz_format, ## args )
-#endif
+#define msg_rc( ... ) __msg_rc( p_intf, __VA_ARGS__ )
 
 static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {

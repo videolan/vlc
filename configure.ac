@@ -1125,20 +1125,6 @@ dnl     VLC_ADD_LDFLAGS([plugin mozilla],[-shared])
 dnl   ])
 dnl ])
 
-dnl Check for variadic macros
-AC_CACHE_CHECK([for variadic cpp macros],
-    [ac_cv_cpp_variadic_macros],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(
-         [#include <stdio.h>
-          #define a(b,c...) printf(b,##c)],
-         [a("foo");a("%s","bar");a("%s%s","baz","quux");],
-         ac_cv_cpp_variadic_macros=yes,
-         ac_cv_cpp_variadic_macros=no)])
-if test "${ac_cv_cpp_variadic_macros}" != "no"; then
-    AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
-fi
-
 dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
     [ac_cv_c_attribute_aligned],

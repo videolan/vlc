@@ -136,67 +136,18 @@ VLC_EXPORT( void, __msg_Err,     ( vlc_object_t *, const char *, ... ) ATTRIBUTE
 VLC_EXPORT( void, __msg_Warn,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 
-#ifdef HAVE_VARIADIC_MACROS
-
-#   define msg_Info( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL,VLC_MSG_INFO, MODULE_STRING, \
-                     psz_format, ## args )
-
-#   define msg_Err( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_ERR, MODULE_STRING, \
-                     psz_format, ## args )
-
-#   define msg_Warn( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_WARN, MODULE_STRING, \
-                     psz_format, ## args )
-
-#   define msg_Dbg( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_DBG, MODULE_STRING, \
-                     psz_format, ## args )
-
-#elif defined(_MSC_VER) /* To avoid warnings and even errors with c++ files */
-
-inline void msg_Info( void *p_this, const char *psz_format, ... )
-{
-  va_list ap;
-  va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL,VLC_MSG_INFO, MODULE_STRING,
-                   psz_format, ap );
-  va_end(ap);
-}
-inline void msg_Err( void *p_this, const char *psz_format, ... )
-{
-  va_list ap;
-  va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this,MSG_QUEUE_NORMAL, VLC_MSG_ERR, MODULE_STRING,
-                   psz_format, ap );
-  va_end(ap);
-}
-inline void msg_Warn( void *p_this, const char *psz_format, ... )
-{
-  va_list ap;
-  va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL, VLC_MSG_WARN, MODULE_STRING,
-                   psz_format, ap );
-  va_end(ap);
-}
-inline void msg_Dbg( void *p_this, const char *psz_format, ... )
-{
-  va_list ap;
-  va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL, VLC_MSG_DBG, MODULE_STRING,
-                   psz_format, ap );
-  va_end(ap);
-}
-
-#else /* _MSC_VER */
-
-#   define msg_Info __msg_Info
-#   define msg_Err __msg_Err
-#   define msg_Warn __msg_Warn
-#   define msg_Dbg __msg_Dbg
-
-#endif /* HAVE_VARIADIC_MACROS */
+#define msg_Info( p_this, ... ) \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_INFO, \
+                     MODULE_STRING, __VA_ARGS__ )
+#define msg_Err( p_this, ... ) \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_ERR, \
+                     MODULE_STRING, __VA_ARGS__ )
+#define msg_Warn( p_this, ... ) \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_WARN, \
+                     MODULE_STRING, __VA_ARGS__ )
+#define msg_Dbg( p_this, ... ) \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_DBG, \
+                     MODULE_STRING, __VA_ARGS__ )
 
 #define msg_Create(a) __msg_Create(VLC_OBJECT(a))
 #define msg_Flush(a) __msg_Flush(VLC_OBJECT(a))
