@@ -1079,16 +1079,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     if( !event.GetDirection() ) return;
 
     /* Check valid address */
-    if( i_method == 1
-     && !net_AddressIsMulticast( (vlc_object_t *)p_intf,
-                                 address_txtctrl->GetValue().mb_str(wxConvUTF8)) )
-    {
-        wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR_MSG ),
-                      wxICON_WARNING | wxOK, this->p_parent );
-        event.Veto();
-
-    }
-    else if( i_method == 0 && address_txtctrl->GetValue().IsEmpty() )
+    if( i_method == 0 && address_txtctrl->GetValue().IsEmpty() )
     {
         wxMessageBox( wxU( NO_ADDRESS_TEXT ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this->p_parent );

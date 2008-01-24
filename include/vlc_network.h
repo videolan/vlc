@@ -286,34 +286,6 @@ net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
 }
 
 
-
-/**
- * net_AddressIsMulticast
- * @return VLC_FALSE iff the psz_addr does not specify a multicast address,
- * or the address is not a valid address.
- */
-static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, const char *psz_addr )
-{
-    struct addrinfo hints, *res;
-
-    memset (&hints, 0, sizeof (hints));
-    hints.ai_socktype = SOCK_DGRAM; /* UDP */
-    hints.ai_flags = AI_NUMERICHOST;
-
-    int i = vlc_getaddrinfo (p_object, psz_addr, 0,
-                             &hints, &res);
-    if (i)
-    {
-        msg_Err (p_object, "invalid address \"%s\" for net_AddressIsMulticast (%s)",
-                 psz_addr, vlc_gai_strerror (i));
-        return VLC_FALSE;
-    }
-
-    vlc_bool_t b = net_SockAddrIsMulticast (res->ai_addr, res->ai_addrlen);
-    vlc_freeaddrinfo (res);
-    return b;
-}
-
 static inline int net_GetSockAddress( int fd, char *address, int *port )
 {
     struct sockaddr_storage addr;
