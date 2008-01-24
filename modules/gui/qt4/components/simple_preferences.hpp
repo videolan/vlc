@@ -116,7 +116,7 @@ private:
 private slots:
     void lastfm_Changed( int );
     void updateAudioOptions( int ); 
-#ifdef SYS_MINGW32
+#ifdef WIN32
     void assoDialog();
     void saveAsso();
 #endif

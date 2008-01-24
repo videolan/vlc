@@ -71,7 +71,7 @@ resources.cpp: res.qrc
 	$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
-	$(MOC) $(CPPFLAGS) -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+	$(MOC) $(DEFS) $(CPPFLAGS) -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
 
 .ui.h:
 	mkdir -p -- ui
