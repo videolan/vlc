@@ -29,9 +29,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>
+#include <assert.h>
 
 #include <QuickTime/QuickTime.h>
 
@@ -704,8 +704,11 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->i_size = p_vout->output.i_width * p_vout->output.i_height * 2;
 
             /* Allocate the memory buffer */
-            p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
-                                          16, p_pic->p_sys->i_size );
+            p_pic->p_orig_data =
+            p_pic->p_data = malloc( p_pic->p_sys->i_size );
+            /* Memory is always 16-bytes aligned on OSX, so it does not
+             * posix_memalign() */
+            assert( (((uintptr_t)p_pic->p_data) % 16) == 0 );
 
             p_pic->p[0].p_pixels = p_pic->p_data;
             p_pic->p[0].i_lines = p_vout->output.i_height;
@@ -724,8 +727,12 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
  
             /* Allocate the memory buffer */
-            p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
-                                          16, p_vout->output.i_width * p_vout->output.i_height * 3 / 2 );
+            p_pic->p_orig_data =
+            p_pic->p_data = malloc( p_vout->output.i_width
+                                     * p_vout->output.i_height * 3 / 2 );
+            /* Memory is always 16-bytes aligned on OSX, so it does not
+             * posix_memalign() */
+            assert( (((uintptr_t)p_pic->p_data) % 16) == 0 );
 
             /* Y buffer */
             p_pic->Y_PIXELS = p_pic->p_data;

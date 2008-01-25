@@ -818,34 +818,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 /* */
 #define VLC_UNUSED(x) (void)(x)
 
-/* Alignment of critical dynamic data structure
- *
- * Not all platforms support memalign so we provide a vlc_memalign wrapper
- * void *vlc_memalign( size_t align, size_t size, void **pp_orig )
- * *pp_orig is the pointer that has to be freed afterwards.
- */
-#if 0
-#ifdef HAVE_POSIX_MEMALIGN
-#   define vlc_memalign(align,size,pp_orig) \
-    ( !posix_memalign( pp_orig, align, size ) ? *(pp_orig) : NULL )
-#endif
-#endif
-#ifdef HAVE_MEMALIGN
-    /* Some systems have memalign() but no declaration for it */
-    void * memalign( size_t align, size_t size );
-
-#   define vlc_memalign(pp_orig,align,size) \
-    ( *(pp_orig) = memalign( align, size ) )
-
-#else /* We don't have any choice but to align manually */
-#   define vlc_memalign(pp_orig,align,size) \
-    (( *(pp_orig) = malloc( size + align - 1 )) \
-        ? (void *)( (((unsigned long)*(pp_orig)) + (unsigned long)(align-1) ) \
-                       & (~(unsigned long)(align-1)) ) \
-        : NULL )
-
-#endif
-
 /* Stuff defined in src/extras/libc.c */
 #ifndef HAVE_STRDUP
 #   define strdup vlc_strdup
