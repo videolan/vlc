@@ -56,9 +56,6 @@
 #      include <time.h>
 #   endif
 
-    /* This is not prototyped under Linux, though it exists. */
-    int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
-
 #else
 #   error no threads available on your system !
 

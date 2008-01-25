@@ -225,6 +225,11 @@ int __vlc_threads_end( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+#ifdef __linux__
+/* This is not prototyped under Linux, though it exists. */
+int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
+#endif
+
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
