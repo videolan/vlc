@@ -39,8 +39,6 @@ class QGroupBox;
 class QRadioButton;
 class QWidget;
 class QCheckBox;
-class QListWidget;
-class QListWidgetItem;
 class QLabel;
 
 class PrefsDialog : public QVLCDialog
