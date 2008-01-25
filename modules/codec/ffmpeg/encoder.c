@@ -342,6 +342,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else
             p_sys->i_hq = FF_MB_DECISION_RD;
     }
+    else
+        p_sys->i_hq = FF_MB_DECISION_RD;
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_enc, ENC_CFG_PREFIX "qmin", &val );
@@ -440,6 +442,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if ( p_sys->b_strict_rc )
         {
             p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
+            p_context->rc_min_rate = p_enc->fmt_out.i_bitrate;
             p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
             /* This is from ffmpeg's ffmpeg.c : */
             p_context->rc_initial_buffer_occupancy
@@ -495,8 +498,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         if( p_sys->i_qmin > 0 )
             p_context->mb_qmin = p_context->qmin = p_sys->i_qmin;
+            p_context->mb_lmin = p_context->lmin = p_sys->i_qmin * FF_QP2LAMBDA;
         if( p_sys->i_qmax > 0 )
             p_context->mb_qmax = p_context->qmax = p_sys->i_qmax;
+            p_context->mb_lmax = p_context->lmax = p_sys->i_qmax * FF_QP2LAMBDA;
         p_context->max_qdiff = 3;
 
         p_context->mb_decision = p_sys->i_hq;
@@ -757,9 +762,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.top_field_first = !!p_pict->b_top_field_first;
 
     /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
-    if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ||
-        p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
-        p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'm', 'p', '4', 'v' ) )
     {
         frame.pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
 
