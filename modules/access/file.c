@@ -513,11 +513,12 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
         case ACCESS_GET_META:
+        case ACCESS_GET_PRIVATE_ID_STATE:
         case ACCESS_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
 
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
+            msg_Warn( p_access, "unimplemented query %d in control", i_query );
             return VLC_EGENERIC;
 
     }
