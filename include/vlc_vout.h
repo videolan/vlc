@@ -284,6 +284,10 @@ struct subpicture_t
                                                 video_format_t *, picture_t * );
     void ( *pf_destroy_region ) ( vlc_object_t *, subpicture_region_t * );
 
+    void ( *pf_pre_render ) ( video_format_t *, spu_t *, subpicture_t *, mtime_t );
+    subpicture_region_t * ( *pf_update_regions ) ( video_format_t *, spu_t *,
+                                                   subpicture_t *, mtime_t );
+
     /** Private data - the subtitle plugin might want to put stuff here to
      * keep track of the subpicture */
     subpicture_sys_t *p_sys;                              /* subpicture data */

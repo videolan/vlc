@@ -519,9 +519,20 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 {
     int i_source_video_width;
     int i_source_video_height;
+    subpicture_t *p_subpic_v = p_subpic;
 
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
+
+    for( p_subpic_v = p_subpic;
+            p_subpic_v != NULL && p_subpic_v->i_status != FREE_SUBPICTURE;
+            p_subpic_v = p_subpic_v->p_next )
+    {
+        if( p_subpic_v->pf_pre_render )
+        {
+            p_subpic_v->pf_pre_render( p_fmt, p_spu, p_subpic_v, mdate() );
+        }
+    }
 
     if( i_scale_width_orig <= 0 )
         i_scale_width_orig = 1;
@@ -534,7 +545,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     /* Check i_status again to make sure spudec hasn't destroyed the subpic */
     while( ( p_subpic != NULL ) && ( p_subpic->i_status != FREE_SUBPICTURE ) )
     {
-        subpicture_region_t *p_region = p_subpic->p_region;
+        subpicture_region_t *p_region;
         int pi_scale_width[ SCALE_SIZE ];
         int pi_scale_height[ SCALE_SIZE ];
         int pi_subpic_x[ SCALE_SIZE ];
@@ -553,6 +564,18 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         for( k = 0; k < SCALE_SIZE ; k++ )
             pi_subpic_x[ k ] = p_subpic->i_x;
+
+        if( p_subpic->pf_update_regions )
+        {
+            if ( p_subpic->p_region ) {
+                spu_DestroyRegion( p_spu, p_subpic->p_region );
+            }
+            p_subpic->p_region = p_region = p_subpic->pf_update_regions( p_fmt, p_spu, p_subpic, mdate() );
+        }
+        else
+        {
+            p_region = p_subpic->p_region;
+        }
 
         /* Load the blending module */
         if( !p_spu->p_blend && p_region )
