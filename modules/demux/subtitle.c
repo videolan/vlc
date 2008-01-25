@@ -137,21 +137,21 @@ struct demux_sys_t
     int64_t     i_length;
 };
 
-static int  ParseMicroDvd   ( demux_t *, subtitle_t * );
-static int  ParseSubRip     ( demux_t *, subtitle_t * );
-static int  ParseSubViewer  ( demux_t *, subtitle_t * );
-static int  ParseSSA        ( demux_t *, subtitle_t * );
-static int  ParseVplayer    ( demux_t *, subtitle_t * );
-static int  ParseSami       ( demux_t *, subtitle_t * );
-static int  ParseDVDSubtitle( demux_t *, subtitle_t * );
-static int  ParseMPL2       ( demux_t *, subtitle_t * );
+static int  ParseMicroDvd   ( demux_t *, subtitle_t *, int );
+static int  ParseSubRip     ( demux_t *, subtitle_t *, int );
+static int  ParseSubViewer  ( demux_t *, subtitle_t *, int );
+static int  ParseSSA        ( demux_t *, subtitle_t *, int );
+static int  ParseVplayer    ( demux_t *, subtitle_t *, int );
+static int  ParseSami       ( demux_t *, subtitle_t *, int );
+static int  ParseDVDSubtitle( demux_t *, subtitle_t *, int );
+static int  ParseMPL2       ( demux_t *, subtitle_t *, int );
 
 static struct
 {
     const char *psz_type_name;
     int  i_type;
     const char *psz_name;
-    int  (*pf_read)( demux_t *, subtitle_t* );
+    int  (*pf_read)( demux_t *, subtitle_t*, int );
 } sub_read_subtitle_function [] =
 {
     { "microdvd",   SUB_TYPE_MICRODVD,    "MicroDVD",    ParseMicroDvd },
@@ -182,7 +182,7 @@ static int Open ( vlc_object_t *p_this )
     es_format_t    fmt;
     float          f_fps;
     char           *psz_type;
-    int  (*pf_read)( demux_t *, subtitle_t* );
+    int  (*pf_read)( demux_t *, subtitle_t*, int );
     int            i, i_max;
 
     if( !p_demux->b_force )
@@ -373,7 +373,8 @@ static int Open ( vlc_object_t *p_this )
             }
         }
 
-        if( pf_read( p_demux, &p_sys->subtitle[p_sys->i_subtitles] ) )
+        if( pf_read( p_demux, &p_sys->subtitle[p_sys->i_subtitles],
+                     p_sys->i_subtitles ) )
             break;
 
         p_sys->i_subtitles++;
@@ -698,7 +699,8 @@ static void TextPreviousLine( text_t *txt )
  *      {n1}{n2}Line1|Line2|Line3....
  *  where n1 and n2 are the video frame number (n2 can be empty)
  */
-static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
+static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle,
+                          int i_idx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
@@ -843,7 +845,8 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
 }
 /* ParseSubRip
  */
-static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
+static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle,
+                         int i_idx )
 {
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d,%d --> %d:%d:%d,%d",
@@ -851,7 +854,8 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
 }
 /* ParseSubViewer
  */
-static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
+static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
+                            int i_idx )
 {
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d.%d,%d:%d:%d.%d",
@@ -860,7 +864,8 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
 
 /* ParseSSA
  */
-static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
+static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
+                      int i_idx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
@@ -870,6 +875,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
         const char *s = TextGetLine( txt );
         int h1, m1, s1, c1, h2, m2, s2, c2;
         char *psz_text;
+        char temp[16];
 
         if( !s )
             return VLC_EGENERIC;
@@ -885,15 +891,18 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
          * Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
          * Dialogue: Layer#,0:02:40.65,0:02:41.79,Wolf main,Cher,0000,0000,0000,,Et les enregistrements de ses ondes delta ?
          */
-        psz_text = malloc( 2 + strlen( s ) + 1 );
+
+        /* The output text is - at least, not removing numbers - 18 chars shorter than the input text. */
+        psz_text = malloc( strlen(s) );
         if( !psz_text )
             return VLC_ENOMEM;
 
         if( sscanf( s,
-                    "Dialogue: %*[^,],%d:%d:%d.%d,%d:%d:%d.%d,%[^\r\n]",
+                    "Dialogue: %15[^,],%d:%d:%d.%d,%d:%d:%d.%d,%[^\r\n]",
+                    temp,
                     &h1, &m1, &s1, &c1,
                     &h2, &m2, &s2, &c2,
-                    psz_text ) == 9 )
+                    psz_text ) == 10 )
         {
             /* The dec expects: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
             /* (Layer comes from ASS specs ... it's empty for SSA.) */
@@ -905,10 +914,12 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
             }
             else
             {
+                int i_layer = ( p_sys->i_type == SUB_TYPE_ASS ) ? atoi( temp ) : 0;
+
                 /* ReadOrder, Layer, %s(rest of fields) */
-                memmove( &psz_text[2], psz_text, strlen(psz_text)+1 );
-                psz_text[0] = ',';
-                psz_text[1] = ',';
+                snprintf( temp, sizeof(temp), "%d,%d,", i_idx, i_layer );
+                memmove( psz_text + strlen(temp), psz_text, strlen(psz_text)+1 );
+                memcpy( psz_text, temp, strlen(temp) );
             }
 
             p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
@@ -944,7 +955,8 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
  *  or
  *      h:m:s Line1|Line2|Line3....
  */
-static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle )
+static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle,
+                          int i_idx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
@@ -1009,7 +1021,7 @@ static char *ParseSamiSearch( text_t *txt,
         }
     }
 }
-static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
+static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
@@ -1106,7 +1118,8 @@ static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
  *      LANG support would be cool
  *      CODEPAGE is probably mandatory FIXME
  */
-static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle )
+static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle,
+                             int i_idx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
@@ -1170,7 +1183,7 @@ static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle )
  *     [n1][n2]Line1|Line2|Line3...
  *  where n1 and n2 are the video frame number (n2 can be empty)
  */
-static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle )
+static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
