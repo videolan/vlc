@@ -73,7 +73,7 @@
 #if defined( __PLUGIN__ ) && ( defined( WIN32 ) || defined( UNDER_CE ) )
 #   define DLL_SYMBOL              __declspec(dllexport)
 #   define CDECL_SYMBOL            __cdecl
-#elif HAVE_ATTRIBUTE_VISIBILITY
+#elif defined (HAVE_ATTRIBUTE_VISIBILITY)
 #   define DLL_SYMBOL __attribute__((visibility("default")))
 #   define CDECL_SYMBOL
 #else
