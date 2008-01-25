@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlm.cpp : VLM Management
  ****************************************************************************
- * Copyright ( C ) 2006 the VideoLAN team
+ * Copyright © 2008 the VideoLAN team
  * $Id: sout.cpp 21875 2007-09-08 16:01:33Z jb $
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
@@ -22,6 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -46,6 +47,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QDateTimeEdit>
+#include <QDateTime>
 #include <QSpinBox>
 #include <QHeaderView>
 #include <QScrollArea>
@@ -88,6 +90,7 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
 
     time = new QDateTimeEdit( QTime::currentTime() );
     time->setAlignment( Qt::AlignRight );
+    time->setDisplayFormat( "hh:mm:ss" );
     schetimelayout->addWidget( time, 0, 1, 1, 3 );
 
     date = new QDateTimeEdit( QDate::currentDate() );
@@ -197,7 +200,10 @@ void VLMDialog::addVLMItem()
     QString outputText = ui.outputLedit->text();
     bool b_checked = ui.enableCheck->isChecked();
     bool b_looped = ui.loopBCast->isChecked();
-
+    QDateTime schetime = time->dateTime();
+    QDateTime schedate = date->dateTime();
+    int repeatnum = scherepeatnumber->value();
+    int repeatdays = repeatDays->value();
     VLMAWidget * vlmAwidget;
 
     switch( type )
@@ -205,8 +211,9 @@ void VLMDialog::addVLMItem()
     case QVLM_Broadcast:
         typeShortName = "Bcast";
         vlmAwidget = new VLMBroadcast( name, inputText, outputText,
-                                  b_checked, b_looped, this );
-        VLMWrapper::AddBroadcast( name, inputText, outputText, b_checked, b_looped );
+                                       b_checked, b_looped, this );
+        VLMWrapper::AddBroadcast( name, inputText, outputText, b_checked,
+                                  b_looped );
     break;
     case QVLM_VOD:
         typeShortName = "VOD";
@@ -217,7 +224,10 @@ void VLMDialog::addVLMItem()
     case QVLM_Schedule:
         typeShortName = "Sched";
         vlmAwidget = new VLMSchedule( name, inputText, outputText,
-                                      b_checked, this );
+                                      schetime, schedate, repeatnum,
+                                      repeatdays, b_checked, this );
+        VLMWrapper::AddSchedule( name, inputText, outputText, schetime,
+                                 schedate, repeatnum, repeatdays, b_checked);
         break;
     default:
         msg_Warn( p_intf, "Something bad happened" );
@@ -269,7 +279,6 @@ void VLMDialog::removeVLMItem( VLMAWidget *vlmObj )
 {
     int index = vlmItems.indexOf( vlmObj );
     if( index < 0 ) return;
-
     delete ui.vlmListItem->takeItem( index );
     vlmItems.removeAt( index );
     delete vlmObj;
@@ -298,7 +307,8 @@ void VLMDialog::startModifyVLMItem( VLMAWidget *vlmObj )
         ui.muxLedit->setText( (qobject_cast<VLMVod *>(vlmObj))->mux );
         break;
     case QVLM_Schedule:
-        //(qobject_cast<VLMSchedule *>)
+        time->setDateTime( ( qobject_cast<VLMSchedule *>(vlmObj))->schetime );
+        date->setDateTime( ( qobject_cast<VLMSchedule *>(vlmObj))->schedate );
         break;
     }
 
@@ -325,6 +335,10 @@ void VLMDialog::saveModifications()
             (qobject_cast<VLMVod *>(vlmObj))->mux = ui.muxLedit->text();
             break;
         case QVLM_Schedule:
+            (qobject_cast<VLMSchedule *>(vlmObj))->schetime = time->dateTime();
+            (qobject_cast<VLMSchedule *>(vlmObj))->schedate = date->dateTime();
+            (qobject_cast<VLMSchedule *>(vlmObj))->rNumber = scherepeatnumber->value();
+            (qobject_cast<VLMSchedule *>(vlmObj))->rDays = repeatDays->value();
             break;
            //           vlmObj->
         }
@@ -470,14 +484,24 @@ void VLMBroadcast::stop()
  * VLMSchedule
  ****************/
 VLMSchedule::VLMSchedule( QString name, QString input, QString output,
-                            bool enabled, VLMDialog *parent)
+                          QDateTime _schetime, QDateTime _schedate,
+                          int _scherepeatnumber, int _repeatDays,
+                          bool enabled, VLMDialog *parent )
             : VLMAWidget( name, input, output, enabled, parent, QVLM_Schedule )
 {
     nameLabel->setText( "Schedule: " + name );
+    schetime = _schetime;
+    schedate = _schedate;
+    rNumber = _scherepeatnumber;
+    rDays = _repeatDays;
+    type = QVLM_Schedule;
+    update();
 }
 
 void VLMSchedule::update()
 {
+   VLMWrapper::EditSchedule( name, input, output, schetime, schedate,
+                             rNumber, rDays, b_enabled);
 }
 
 /****************
@@ -630,4 +654,65 @@ void VLMWrapper::EditVod( const QString name, const QString input,
         vlm_MessageDelete( message );
     }
 }
+
+void VLMWrapper::AddSchedule( const QString name, const QString input,
+                              const QString output, QDateTime _schetime,
+                              QDateTime _schedate,
+                              int _scherepeatnumber, int _repeatDays,
+                              bool b_enabled, const QString mux )
+{
+    vlm_message_t *message;
+    QString command = "new \"" + name + "\" schedule";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    EditSchedule(  name, input, output, _schetime, _schedate,
+            _scherepeatnumber, _repeatDays, b_enabled, mux );
+}
+
+void VLMWrapper::EditSchedule( const QString name, const QString input,
+                          const QString output, QDateTime _schetime,
+                          QDateTime _schedate, int _scherepeatnumber,
+                          int _repeatDays, bool b_enabled,
+                          const QString mux )
+{
+    vlm_message_t *message;
+    QString command = "setup \"" + name + "\" input \"" + input + "\"";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+
+    if( !output.isEmpty() )
+    {
+        command = "setup \"" + name + "\" output \"" + output + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+
+    if( b_enabled )
+    {
+        command = "setup \"" + name + "\" enabled";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+
+    if( !mux.isEmpty() )
+    {
+        command = "setup \"" + name + "\" mux \"" + mux + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+    }
+
+    command = "setup \"" + name + "\" date \"" +
+        _schedate.toString( "yyyy/MM/dd" )+ "-" +
+        _schetime.toString( "hh:mm:ss" ) + "\"";
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
+    if( _scherepeatnumber > 0 )
+    {
+       command = "setup \"" + name + "\" repeat \"" + _scherepeatnumber + "\"";
+       vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+       vlm_MessageDelete( message );
+    }
+}
+
+
 #endif

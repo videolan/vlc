@@ -37,6 +37,7 @@
 
 #include "ui/vlm.h"
 #include "util/qvlcframe.hpp"
+#include <QDateTime>
 
 enum{
     QVLM_Broadcast,
@@ -122,9 +123,17 @@ public:
     static void EditBroadcast( const QString, const QString, const QString,
                        bool b_enabled = true,
                        bool b_loop = false );
+    static void EditSchedule( const QString, const QString, const QString,
+                       QDateTime _schetime, QDateTime _schedate,
+                       int _scherepeatnumber, int _repeatDays,
+                       bool b_enabled = true, QString mux = "" );
     static void AddVod( const QString, const QString, const QString,
                        bool b_enabled = true, QString mux = "" );
     static void EditVod( const QString, const QString, const QString,
+                       bool b_enabled = true, QString mux = "" );
+    static void AddSchedule( const QString, const QString, const QString,
+                       QDateTime _schetime, QDateTime _schedate,
+                       int _scherepeatnumber, int _repeatDays,
                        bool b_enabled = true, QString mux = "" );
 
     static void ControlBroadcast( const QString, int, unsigned int seek = 0 );
@@ -196,12 +205,18 @@ private:
 
 class VLMSchedule : public VLMAWidget
 {
+    Q_OBJECT
     friend class VLMDialog;
 public:
-    VLMSchedule( QString name, QString input, QString output, bool _enable, VLMDialog *parent );
+    VLMSchedule( QString name, QString input, QString output,
+            QDateTime schetime, QDateTime schedate, int repeatnumber,
+            int repeatdays, bool enabled, VLMDialog *parent );
     void update();
 private:
-
+    QDateTime schetime;
+    QDateTime schedate;
+    int rNumber;
+    int rDays;
 };
 
 #endif
