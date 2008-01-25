@@ -57,11 +57,16 @@ static int  Manage    ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
 static int  Control   ( vout_thread_t *, int, va_list );
 
+static int  NewPicture     ( vout_thread_t *, picture_t * );
+static void FreePicture    ( vout_thread_t *, picture_t * );
+
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
 static void SwitchDisplay  ( int i_signal );
 static void TextMode       ( int i_tty );
 static void GfxMode        ( int i_tty );
+
+#define MAX_DIRECTBUFFERS 1
 
 /*****************************************************************************
  * Module descriptor
@@ -90,6 +95,12 @@ static void GfxMode        ( int i_tty );
     "Select the resolution for the framebuffer. Currently it supports " \
     "the values 0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)" )
 
+#define HW_ACCEL_TEXT N_("Framebuffer uses hw acceleration.")
+#define HW_ACCEL_LONGTEXT N_( \
+    "If your framebuffer supports hardware acceleration or does double buffering " \
+    "in hardware then you must disable this option. It then does double buffering " \
+    "in software." )
+
 vlc_module_begin();
     set_shortname( "Framebuffer" );
     set_category( CAT_VIDEO );
@@ -103,6 +114,8 @@ vlc_module_begin();
                 ASPECT_RATIO_LONGTEXT, VLC_TRUE );
     add_integer( "fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  VLC_TRUE );
+    add_bool( "fb-hw-accel", VLC_TRUE, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
+              VLC_TRUE );
     set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );
@@ -133,6 +146,7 @@ struct vout_sys_t
     vlc_bool_t                  b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *p_palette;              /* original palette */
+    vlc_bool_t                  b_hw_accel;          /* has hardware support */
 
     /* Video information */
     uint32_t i_width;
@@ -145,6 +159,11 @@ struct vout_sys_t
     /* Video memory */
     byte_t *    p_video;                                      /* base adress */
     size_t      i_page_size;                                    /* page size */
+};
+
+struct picture_sys_t
+{
+    byte_t *    p_data;                                       /* base adress */
 };
 
 /*****************************************************************************
@@ -178,6 +197,9 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
     p_vout->pf_control = Control;
+
+    /* Does the framebuffer uses hw acceleration? */
+    p_sys->b_hw_accel = p_sys->b_tty = var_CreateGetBool( p_vout, "fb-hw-accel" );
 
     /* Set tty and fb devices */
     p_sys->i_tty = 0; /* 0 == /dev/tty0 == current console */
@@ -354,6 +376,102 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+
+/*****************************************************************************
+ * Destroy: destroy FB video thread output method
+ *****************************************************************************
+ * Terminate an output method created by Create
+ *****************************************************************************/
+static void Destroy( vlc_object_t *p_this )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    CloseDisplay( p_vout );
+
+    if( p_vout->p_sys->b_tty )
+    {
+        /* Reset the terminal */
+        ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
+
+        /* Remove signal handlers */
+        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
+        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
+
+        /* Reset the keyboard state */
+        tcsetattr( 0, 0, &p_vout->p_sys->old_termios );
+
+        /* Return to text mode */
+        TextMode( p_vout->p_sys->i_tty );
+    }
+
+    /* Destroy structure */
+    free( p_vout->p_sys );
+}
+
+/*****************************************************************************
+ * NewPicture: allocate a picture
+ *****************************************************************************
+ * Returns 0 on success, -1 otherwise
+ *****************************************************************************/
+static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
+    if( p_pic->p_sys == NULL )
+    {
+        return VLC_ENOMEM;
+    }
+
+    /* Fill in picture_t fields */
+    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
+                      p_vout->output.i_width, p_vout->output.i_height,
+                      p_vout->output.i_aspect );
+
+    p_pic->p_sys->p_data = malloc( p_vout->p_sys->i_page_size );
+    if( !p_pic->p_sys->p_data )
+    {
+        free( p_pic->p_sys );
+        p_pic->p_sys = NULL;
+        return VLC_ENOMEM;
+    }
+
+    p_pic->p->p_pixels = (uint8_t*) p_pic->p_sys->p_data;
+
+    p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
+    p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
+    p_pic->p->i_visible_lines = p_vout->p_sys->var_info.yres;
+
+    if( p_vout->p_sys->var_info.xres_virtual )
+    {
+        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres_virtual
+                             * p_vout->p_sys->i_bytes_per_pixel;
+    }
+    else
+    {
+        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
+                             * p_vout->p_sys->i_bytes_per_pixel;
+    }
+
+    p_pic->p->i_visible_pitch = p_vout->p_sys->var_info.xres
+                                 * p_vout->p_sys->i_bytes_per_pixel;
+    p_pic->i_planes = 1;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * FreePicture: destroy a picture allocated with NewPicture
+ *****************************************************************************
+ * Destroy Image AND associated data.
+ *****************************************************************************/
+static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    free( p_pic->p_sys->p_data );
+    free( p_pic->p_sys );
+    p_pic->p_sys = NULL;
+}
+
 /*****************************************************************************
  * Init: initialize framebuffer video thread output method
  *****************************************************************************/
@@ -361,7 +479,7 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_index;
-    picture_t *p_pic;
+    picture_t *p_pic = NULL;
 
     I_OUTPUTPICTURES = 0;
 
@@ -425,52 +543,86 @@ static int Init( vout_thread_t *p_vout )
     /* Clear the screen */
     memset( p_sys->p_video, 0, p_sys->i_page_size );
 
-    /* Try to initialize 1 direct buffer */
-    p_pic = NULL;
-
-    /* Find an empty picture slot */
-    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+    if( !p_sys->b_hw_accel )
     {
-        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+        /* Try to initialize up to MAX_DIRECTBUFFERS direct buffers */
+        while( I_OUTPUTPICTURES < MAX_DIRECTBUFFERS )
         {
-            p_pic = p_vout->p_picture + i_index;
-            break;
+            p_pic = NULL;
+
+            /* Find an empty picture slot */
+            for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+            {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+                {
+                    p_pic = p_vout->p_picture + i_index;
+                    break;
+                }
+            }
+
+            /* Allocate the picture */
+            if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
+            {
+                break;
+            }
+
+            p_pic->i_status = DESTROYED_PICTURE;
+            p_pic->i_type   = DIRECT_PICTURE;
+
+            PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+            I_OUTPUTPICTURES++;
         }
-    }
-
-    /* Allocate the picture */
-    if( p_pic == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* We know the chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    p_pic->p->p_pixels = p_vout->p_sys->p_video;
-    p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
-    p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
-    p_pic->p->i_visible_lines = p_vout->p_sys->var_info.yres;
-
-    if( p_vout->p_sys->var_info.xres_virtual )
-    {
-        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres_virtual
-                             * p_vout->p_sys->i_bytes_per_pixel;
     }
     else
     {
-        p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
-                             * p_vout->p_sys->i_bytes_per_pixel;
+        /* Try to initialize 1 direct buffer */
+        p_pic = NULL;
+
+        /* Find an empty picture slot */
+        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+
+        /* Allocate the picture */
+        if( p_pic == NULL )
+        {
+            return VLC_EGENERIC;
+        }
+
+        /* We know the chroma, allocate a buffer which will be used
+        * directly by the decoder */
+        p_pic->p->p_pixels = p_vout->p_sys->p_video;
+        p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
+        p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
+        p_pic->p->i_visible_lines = p_vout->p_sys->var_info.yres;
+
+        if( p_vout->p_sys->var_info.xres_virtual )
+        {
+            p_pic->p->i_pitch = p_vout->p_sys->var_info.xres_virtual
+                                * p_vout->p_sys->i_bytes_per_pixel;
+        }
+        else
+        {
+            p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
+                                * p_vout->p_sys->i_bytes_per_pixel;
+        }
+
+        p_pic->p->i_visible_pitch = p_vout->p_sys->var_info.xres
+                                    * p_vout->p_sys->i_bytes_per_pixel;
+        p_pic->i_planes = 1;
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
+
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+        I_OUTPUTPICTURES++;
     }
-
-    p_pic->p->i_visible_pitch = p_vout->p_sys->var_info.xres
-                                 * p_vout->p_sys->i_bytes_per_pixel;
-    p_pic->i_planes = 1;
-    p_pic->i_status = DESTROYED_PICTURE;
-    p_pic->i_type   = DIRECT_PICTURE;
-
-    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-    I_OUTPUTPICTURES++;
 
     return VLC_SUCCESS;
 }
@@ -480,39 +632,20 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
+    if( !p_vout->p_sys->b_hw_accel )
+    {
+        int i_index;
+
+        /* Free the direct buffers we allocated */
+        for( i_index = I_OUTPUTPICTURES ; i_index ; )
+        {
+            i_index--;
+            FreePicture( p_vout, PP_OUTPUTPICTURE[ i_index ] );
+        }
+
+    }
     /* Clear the screen */
     memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
-}
-
-/*****************************************************************************
- * Destroy: destroy FB video thread output method
- *****************************************************************************
- * Terminate an output method created by Create
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    CloseDisplay( p_vout );
-
-    if( p_vout->p_sys->b_tty )
-    {
-        /* Reset the terminal */
-        ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
-
-        /* Remove signal handlers */
-        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-
-        /* Reset the keyboard state */
-        tcsetattr( 0, 0, &p_vout->p_sys->old_termios );
-
-        /* Return to text mode */
-        TextMode( p_vout->p_sys->i_tty );
-    }
-
-    /* Destroy structure */
-    free( p_vout->p_sys );
 }
 
 /*****************************************************************************
@@ -608,6 +741,12 @@ static int panned=0;
                    FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
             panned++;
         }
+    }
+
+    if( !p_vout->p_sys->b_hw_accel )
+    {
+        p_vout->p_libvlc->pf_memcpy( p_vout->p_sys->p_video, p_pic->p->p_pixels,
+                                     p_vout->p_sys->i_page_size );
     }
 }
 
@@ -835,7 +974,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
  * This function activates or deactivates the output of the thread. It is
  * called by the VT driver, on terminal change.
  *****************************************************************************/
-static void SwitchDisplay(int i_signal)
+static void SwitchDisplay( int i_signal )
 {
 #if 0
     vout_thread_t *p_vout;
