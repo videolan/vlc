@@ -47,9 +47,10 @@ function parse()
             name = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ (.*) %w+ %w+ %w+ %w+ Videos\..*$", "%1" ) )
             description = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ .* %w+ %w+ %w+ %w+ Videos\. ([^\"]*)\".*$", "%1" ) )
         end
-        if string.match( line, "<link rel=\"thumbnail\"" )
+        if string.match( line, "\\\"videoPreview\\\"" )
         then
-            arturl = string.gsub( line, "^.*\"thumbnail\" type=\"([^\"]*)\".*$", "http://%1" ) -- looks like the dailymotion people mixed up type and href here ...
+            arturl = string.gsub( line, "^.*\\\"videoPreview\\\":\\\"([^\"]*).*$", "%1" )
+            arturl = string.gsub( arturl, "\\", "" )
         end
         if path and name and description and arturl then break end
     end
