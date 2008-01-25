@@ -106,7 +106,6 @@ private:
 
     QList<QWidget *> optionWidgets;
     QString qs_filter;
-    
 
 #ifdef WIN32
     QList<QListWidgetItem *> listAsso;
@@ -116,7 +115,7 @@ private:
 private slots:
     void lastfm_Changed( int );
     void updateAudioOptions( int ); 
-#ifdef WIN32
+#ifdef SYS_MINGW32
     void assoDialog();
     void saveAsso();
 #endif
