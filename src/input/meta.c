@@ -429,7 +429,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     }
 
     psz_type = strrchr( psz_arturl, '.' );
-    if( strlen( psz_type ) > 5 )
+    if( psz_type && strlen( psz_type ) > 5 )
         psz_type = NULL; /* remove extension if it's > to 4 characters */
 
     /* Warning: psz_title, psz_artist, psz_album may change in ArtCache*() */
