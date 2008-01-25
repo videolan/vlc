@@ -46,7 +46,7 @@
 #define I_MENU_BOOKMARK N_("Bookmarks...")
 #define I_MENU_VLM N_("VLM Configuration...")
 
-#define I_MENU_ABOUT N_("About VLC media player...")
+#define I_MENU_ABOUT N_("About...")
 
 /* Playlist popup */
 #define I_POP_PLAY N_("Play")

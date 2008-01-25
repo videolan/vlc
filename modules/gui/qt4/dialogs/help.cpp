@@ -56,7 +56,6 @@ HelpDialog::HelpDialog( QWidget *parent, intf_thread_t *_p_intf )
            : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "Help" ) );
-    resize( 600, 560 );
 
     QGridLayout *layout = new QGridLayout( this );
     QTextBrowser *helpBrowser = new QTextBrowser( this );
@@ -85,6 +84,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "About" ) );
     resize( 600, 500 );
+    setMinimumSize( 600, 500 );
 
     QGridLayout *layout = new QGridLayout( this );
     QTabWidget *tab = new QTabWidget( this );
@@ -94,7 +94,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     closeButton->setDefault( true );
 
     QLabel *introduction = new QLabel(
-            qtr( "Information about VLC media player." ) );
+            qtr( "VLC media player " VERSION_MESSAGE ) );
     QLabel *iconVLC = new QLabel;
     if( QDate::currentDate().dayOfYear() >= 354 )
         iconVLC->setPixmap( QPixmap( ":/vlc48-christmas.png" ) );
@@ -108,24 +108,19 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     /* Main Introduction */
     QWidget *infoWidget = new QWidget( this );
     QHBoxLayout *infoLayout = new QHBoxLayout( infoWidget );
-    QLabel *infoLabel = new QLabel( "VLC media player " VERSION_MESSAGE "\n\n"
-            "(c) " COPYRIGHT_YEARS " - the VideoLAN Team\n\n" +
-            qtr( "VLC media player is a free media player, made by the "
-                 "VideoLAN Team.\nIt is a standalone multimedia player, "
-                 "encoder and streamer, that can read from many supports "
-                 "(files, CDs, DVDs, networks, capture cards...) and that "
-                 "works on many platforms.\n\n" )
-            + qtr( "You are using the Qt4 Interface.\n" )
-            + qtr( "Compiled by " ) + qfu( VLC_CompileBy() )+ "@"
-            + qfu( VLC_CompileHost() ) + "."
+    QLabel *infoLabel = new QLabel(
+            qtr( "VLC media player is a free media player, "
+                "encoder and streamer that can read from files, "
+                "CDs, DVDs, network streams, capture cards and even more!\n"
+                "Also, VLC works on essentially every popular platform.\n\n" )
+            + qtr( "This version of VLC was compiled by:\n " )
+            + qfu( VLC_CompileBy() )+ "@" + qfu( VLC_CompileHost() ) + "."
             + qfu( VLC_CompileDomain() ) + ".\n"
             + "Compiler: " + qfu( VLC_Compiler() ) + ".\n"
-            + qtr( "Based on SVN revision: " ) + qfu( VLC_Changeset() )
-            + ".\n\n"
-            + qtr( "This program comes with NO WARRANTY, to the extent "
-                "permitted by the law; read the distribution tab.\n\n" )
-            + "The VideoLAN team <videolan@videolan.org> \n"
-              "http://www.videolan.org/\n" );
+            + qtr( "Based on SVN revision: " ) + qfu( VLC_Changeset() ) + ".\n"
+            + qtr( "You are using the Qt4 Interface.\n\n" )
+            + qtr( "Copyright (c) " COPYRIGHT_YEARS " by the VideoLAN Team.\n" )
+            + "vlc@videolan.org, http://www.videolan.org" ); 
     infoLabel->setWordWrap( infoLabel );
 
     QLabel *iconVLC2 = new QLabel;
@@ -138,7 +133,6 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     /* GPL License */
     QTextEdit *licenseEdit = new QTextEdit( this );
-    licenseEdit->setFontFamily( "Monospace" );
     licenseEdit->setText( qfu( psz_license ) );
     licenseEdit->setReadOnly( true );
 
@@ -163,10 +157,10 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     authorsEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
-    tab->addTab( infoWidget, qtr( "General Info" ) );
+    tab->addTab( infoWidget, qtr( "About" ) );
     tab->addTab( authorsEdit, qtr( "Authors" ) );
     tab->addTab( thanksWidget, qtr("Thanks") );
-    tab->addTab( licenseEdit, qtr("Distribution License") );
+    tab->addTab( licenseEdit, qtr("License") );
 
     BUTTONACT( closeButton, close() );
 }
