@@ -31,7 +31,6 @@
 #include <QApplication>
 #include <QSettings>
 #include <QMainWindow>
-#include <QPlastiqueStyle>
 #include <QPushButton>
 #include <QKeyEvent>
 
