@@ -34,16 +34,18 @@ public:
     QVLCRegistry(HKEY rootKey);
     ~QVLCRegistry(void);
 
-    void WriteRegistryInt(char *path, char *valueName, int value);
-    void WriteRegistryString(char *path, char *valueName, char *value);
-    void WriteRegistryDouble(char *path, char *valueName, double value);
+    void WriteRegistryInt( const char *path, const char *valueName, int value);
+    void WriteRegistryString( const char *path, const char *valueName, const char *value);
+    void WriteRegistryDouble( const char *path, const char *valueName, double value);
 
-    int ReadRegistryInt(char *path, char *valueName, int default_value);
-    char * ReadRegistryString(char *path, char *valueName, char *default_value);
-    double ReadRegistryDouble(char *path, char *valueName, double default_value);
+    int ReadRegistryInt( const char *path, const char *valueName, int default_value);
+    char * ReadRegistryString( const char *path, const char *valueName, char *default_value);
+    double ReadRegistryDouble( const char *path, const char *valueName, double default_value);
 
-    bool RegistryKeyExists(char *path);
-    bool RegistryValueExists(char *path, char *valueName);
+    bool RegistryKeyExists( const char *path);
+    bool RegistryValueExists( const char *path, const char *valueName);
+    int DeleteValue( char *path, char *valueName );
+    long DeleteKey( char *path, char *keyName ); 
 };
 
 #endif

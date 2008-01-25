@@ -638,6 +638,7 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 
 void SPrefsPanel::assoDialog()
 {
+
     QDialog *d = new QDialog( this );
     QGridLayout *assoLayout = new QGridLayout( d );
 
@@ -665,17 +666,46 @@ void SPrefsPanel::assoDialog()
     CONNECT( clearButton, clicked(), d, reject() );
     d->exec();
     delete d;
+    listAsso.clear();
 }
 
 void addAsso( QVLCRegistry *qvReg, char *psz_ext )
 {
-    char psz_VLC[] = "VLC";
+    std::string s_path( "VLC" ); s_path += psz_ext;
+    std::string s_path2 = s_path;
 
+    /* Save a backup if already assigned */
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
-    if( strlen( psz_value ) > 0 )
+    
+    if( psz_value && strlen( psz_value ) > 0 )
         qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
+    delete psz_value;
+        
+    /* Put a "link" to VLC.EXT as default */
+    qvReg->WriteRegistryString( psz_ext, "", s_path.c_str() );
+    
+    /* Create the needed Key if they weren't done in the installer */
+    if( !qvReg->RegistryKeyExists( s_path.c_str() ) )
+    {
+        qvReg->WriteRegistryString( psz_ext, "", s_path.c_str() );
+        qvReg->WriteRegistryString( s_path.c_str(), "", "Media file" );
+        qvReg->WriteRegistryString( s_path.append( "\\shell" ).c_str() , "", "Play" );
 
-    qvReg->WriteRegistryString( psz_ext, "", strcat( psz_VLC, psz_ext ) );
+        /* Get the installer path */
+        QVLCRegistry *qvReg2 = new QVLCRegistry( HKEY_LOCAL_MACHINE );
+        std::string str_temp; str_temp.assign( 
+            qvReg2->ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" ) );
+        
+        if( str_temp.size() )
+        {
+            qvReg->WriteRegistryString( s_path.append( "\\Play\\command" ).c_str(),
+                "", str_temp.append(" --started-from-file \"%1\"" ).c_str() );
+
+            qvReg->WriteRegistryString( s_path2.append( "\\DefaultIcon" ).c_str(), 
+                        "", str_temp.append(",0").c_str() );
+        }
+        delete qvReg2;
+    }
 }
 
 void delAsso( QVLCRegistry *qvReg, char *psz_ext )
@@ -683,18 +713,24 @@ void delAsso( QVLCRegistry *qvReg, char *psz_ext )
     char psz_VLC[] = "VLC";
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
 
-    if( !strcmp( strcat( psz_VLC, psz_ext ), psz_value ) )
+    if( psz_value && !strcmp( strcat( psz_VLC, psz_ext ), psz_value ) )
     {
-        qvReg->WriteRegistryString( psz_ext, "",
-            qvReg->ReadRegistryString( psz_ext, "VLC.backup", "" ) );
-        // qvReg->DeletKey( psz_ext, "VLC.backup" );
+        free( psz_value );
+        psz_value = qvReg->ReadRegistryString( psz_ext, "VLC.backup", "" );
+        if( psz_value )
+            qvReg->WriteRegistryString( psz_ext, "", psz_value );
+
+        //qvReg->DeletKey( psz_ext, "VLC.backup" );
+        
     }
+    delete( psz_value );
 }
 void SPrefsPanel::saveAsso()
 {
     for( int i = 0; i < listAsso.size(); i ++ )
     {
         QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
+        
         if( listAsso[i]->checkState() > 0 )
         {
             addAsso( qvReg, qtu( listAsso[i]->text() ) );

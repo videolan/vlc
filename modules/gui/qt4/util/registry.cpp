@@ -38,7 +38,7 @@ QVLCRegistry::~QVLCRegistry( void )
 {
 }
 
-bool QVLCRegistry::RegistryKeyExists( char *path )
+bool QVLCRegistry::RegistryKeyExists( const char *path )
 {
     HKEY keyHandle;
     if(  RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
@@ -49,7 +49,7 @@ bool QVLCRegistry::RegistryKeyExists( char *path )
     return false;
 }
 
-bool QVLCRegistry::RegistryValueExists( char *path, char *valueName )
+bool QVLCRegistry::RegistryValueExists( const char *path, const char *valueName )
 {
     HKEY keyHandle;
     bool temp = false;
@@ -68,7 +68,7 @@ bool QVLCRegistry::RegistryValueExists( char *path, char *valueName )
     return temp;
 }
 
-void QVLCRegistry::WriteRegistryInt( char *path, char *valueName, int value )
+void QVLCRegistry::WriteRegistryInt( const char *path, const char *valueName, int value )
 {
     HKEY keyHandle;
 
@@ -81,7 +81,7 @@ void QVLCRegistry::WriteRegistryInt( char *path, char *valueName, int value )
     }
 }
 
-void QVLCRegistry::WriteRegistryString( char *path, char *valueName, char *value )
+void QVLCRegistry::WriteRegistryString( const char *path, const char *valueName, const char *value )
 {
     HKEY keyHandle;
 
@@ -94,7 +94,7 @@ void QVLCRegistry::WriteRegistryString( char *path, char *valueName, char *value
     }
 }
 
-void QVLCRegistry::WriteRegistryDouble( char *path, char *valueName, double value )
+void QVLCRegistry::WriteRegistryDouble( const char *path, const char *valueName, double value )
 {
     HKEY keyHandle;
     if( RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
@@ -105,7 +105,7 @@ void QVLCRegistry::WriteRegistryDouble( char *path, char *valueName, double valu
     }
 }
 
-int QVLCRegistry::ReadRegistryInt( char *path, char *valueName, int default_value ) {
+int QVLCRegistry::ReadRegistryInt( const char *path, const char *valueName, int default_value ) {
     HKEY keyHandle;
     int tempValue;
     DWORD size1;
@@ -128,7 +128,7 @@ int QVLCRegistry::ReadRegistryInt( char *path, char *valueName, int default_valu
     return default_value;
 }
 
-char * QVLCRegistry::ReadRegistryString( char *path, char *valueName, char *default_value )
+char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName, char *default_value )
 {
     HKEY keyHandle;
     char *tempValue = NULL;
@@ -161,7 +161,7 @@ char * QVLCRegistry::ReadRegistryString( char *path, char *valueName, char *defa
     return default_value;
 }
 
-double QVLCRegistry::ReadRegistryDouble( char *path, char *valueName, double default_value )
+double QVLCRegistry::ReadRegistryDouble( const char *path, const char *valueName, double default_value )
 {
     HKEY keyHandle;
     double tempValue;
@@ -185,6 +185,35 @@ double QVLCRegistry::ReadRegistryDouble( char *path, char *valueName, double def
         RegCloseKey( keyHandle );
     }
     return default_value;
+}
+
+int QVLCRegistry::DeleteValue( char *path, char *valueName ) 
+{
+    HKEY keyHandle; 
+    long result;
+    if( (result = RegOpenKeyEx(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
+    {
+        result = RegDeleteValue(keyHandle, valueName);
+        RegCloseKey(keyHandle);
+    }
+    //ERROR_SUCCESS = ok everything else you have a problem*g*,  
+    return result;
+}
+
+long QVLCRegistry::DeleteKey( char *path, char *keyName ) 
+{
+    HKEY keyHandle; 
+    long result;
+    if( (result = RegOpenKeyEx(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
+    {
+         // be warned the key "keyName" will not be deleted if there are subkeys below him, values
+        // I think are ok and will be recusively deleted, but not keys...
+        // for this case we have to do a little bit more work!
+        result = RegDeleteKey(keyHandle, keyName);
+        RegCloseKey(keyHandle);
+    }
+    //ERROR_SUCCESS = ok everything else you have a problem*g*,  
+    return result;
 }
 
 #endif /* WIN32 */
