@@ -46,6 +46,7 @@ include/vlc_network.h
 include/vlc_objects.h
 include/vlc_osd.h
 include/vlc_os_specific.h
+include/vlc_pgpkey.h
 include/vlc_playlist.h
 include/vlc_plugin.h
 include/vlc_rand.h
@@ -75,7 +76,7 @@ src/audio_output/mixer.c
 src/audio_output/output.c
 src/config/chain.c
 src/config/cmdline.c
-src/config/config.h
+src/config/configuration.h
 src/config/core.c
 src/config/file.c
 src/config/intf.c
@@ -189,6 +190,7 @@ src/stream_output/sap.c
 src/stream_output/sdp.c
 src/stream_output/stream_output.c
 src/stream_output/stream_output.h
+src/test/headers.c
 src/test/i18n_atof.c
 src/test/url.c
 src/test/utf8.c
@@ -699,10 +701,11 @@ modules/gui/qt4/ui/video_effects.ui
 modules/gui/qt4/ui/vlm.ui
 modules/gui/qt4/util/customwidgets.cpp
 modules/gui/qt4/util/customwidgets.hpp
-modules/gui/qt4/util/directslider.hpp
 modules/gui/qt4/util/input_slider.cpp
 modules/gui/qt4/util/input_slider.hpp
 modules/gui/qt4/util/qvlcframe.hpp
+modules/gui/qt4/util/registry.cpp
+modules/gui/qt4/util/registry.hpp
 modules/gui/skins2/commands/async_queue.cpp
 modules/gui/skins2/commands/async_queue.hpp
 modules/gui/skins2/commands/cmd_add_item.cpp
