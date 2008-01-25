@@ -483,7 +483,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #  endif
 #else
 #  ifdef __cplusplus
-#    if HAVE_ATTRIBUTE_VISIBILITY
+#    ifdef HAVE_ATTRIBUTE_VISIBILITY
 #      define VLC_PUBLIC_API __attribute__((visibility("default")))
 #      define VLC_PRIVATE_API __attribute__((visibility("default")))
 #      define   VLC_EXPORT( type, name, args ) extern "C" __attribute__((visibility("default"))) type name args
@@ -494,7 +494,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #      define VLC_INTERNAL( type, name, args ) extern "C" type name args
 #    endif
 #  else
-#    if HAVE_ATTRIBUTE_VISIBILITY
+#    ifdef HAVE_ATTRIBUTE_VISIBILITY
 #      define VLC_PUBLIC_API extern __attribute__((visibility("default")))
 #      define VLC_PRIVATE_API extern __attribute__((visibility("default")))
 #      define   VLC_EXPORT( type, name, args ) __attribute__((visibility("default"))) type name args
