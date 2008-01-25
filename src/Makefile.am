@@ -379,7 +379,7 @@ check_PROGRAMS = \
 	test_control \
 	$(NULL)
 
-dist_check_SCRIPTS = check_symbols check_headers
+dist_check_SCRIPTS = check_symbols
 TESTS = $(check_PROGRAMS) $(dist_check_SCRIPTS)
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
