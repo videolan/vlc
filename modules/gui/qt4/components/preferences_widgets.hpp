@@ -312,6 +312,7 @@ public slots:
     virtual void updateField();
 };
 
+#if 0
 class FontConfigControl : public FileConfigControl
 {
     Q_OBJECT;
@@ -324,6 +325,7 @@ public:
 public slots:
     virtual void updateField();
 };
+#endif
 
 class ModuleConfigControl : public VStringConfigControl
 {

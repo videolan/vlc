@@ -44,7 +44,6 @@
 #include <QGridLayout>
 #include <QSlider>
 #include <QFileDialog>
-#include <QFontDialog>
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QSignalMapper>
@@ -135,10 +134,12 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new DirectoryConfigControl( p_this, p_item, parent, l,
                                                 line, false );
         break;
+#if 0
     case CONFIG_ITEM_FONT:
         p_control = new FontConfigControl( p_this, p_item, parent, l,
                                            line, false );
         break;
+#endif
     case CONFIG_ITEM_KEY:
         p_control = new KeySelectorControl( p_this, p_item, parent, l, line );
         break;
@@ -337,6 +338,9 @@ void DirectoryConfigControl::updateField()
     text->setText( dir );
 }
 
+#if 0
+#include <QFontDialog>
+
 /********* String / Font **********/
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QWidget *_p_widget,
@@ -357,6 +361,7 @@ void FontConfigControl::updateField()
     if( !ok ) return;
     text->setText( font.family() );
 }
+#endif
 
 /********* String / choice list **********/
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
