@@ -98,6 +98,8 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
 PLModel::~PLModel()
 {
+    config_PutInt( p_intf, "qt-pl-showflags", rootItem->i_showflags );
+    config_SaveConfigFile( p_intf, NULL );
     delCallbacks();
     delete rootItem;
 }
@@ -835,8 +837,6 @@ void PLModel::viewchanged( int meta )
            endInsertColumns();
        }
        rebuild();
-       config_PutInt( p_intf, "qt-pl-showflags", rootItem->i_showflags );
-       config_SaveConfigFile( p_intf, NULL );
    }
 }
 

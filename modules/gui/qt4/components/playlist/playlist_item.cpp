@@ -29,7 +29,6 @@
 
 #include "qt4.hpp"
 #include "components/playlist/playlist_model.hpp"
-#include "dialogs/mediainfo.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/type_unknown.xpm"
@@ -60,7 +59,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
     /* No parent, should be the main one */
     if( parentItem == NULL )
     {
-        i_showflags = config_GetInt( model->p_intf, "qt-pl-showflags" );
+        i_showflags = model->shownFlags();
         updateColumnHeaders();
     }
     else
@@ -98,7 +97,7 @@ void PLItem::updateColumnHeaders()
 {
     item_col_strings.clear();
 
-    if( model->i_depth == 1 )  /* Selector Panel */
+    if( model->i_depth == DEPTH_SEL )  /* Selector Panel */
     {
         item_col_strings.append( "" );
         return;
@@ -175,6 +174,13 @@ int PLItem::row() const
 }
 
 /* update the PL Item, get the good names and so on */
+/* This function may not be the best way to do it
+   It destroys everything and gets everything again instead of just
+   building the necessary columns.
+   This does extra work if you re-display the same column. Slower...
+   On the other hand, this way saves memory.
+   There must be a more clever way.
+   */
 void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     char psz_duration[MSTRTIME_MAX_SIZE];
