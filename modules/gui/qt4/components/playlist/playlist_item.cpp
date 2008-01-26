@@ -56,11 +56,18 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
 
     assert( model );              /* We need a model */
 
-    /* No parent, should be the main one */
+    /* No parent, should be the 2 main ones */
     if( parentItem == NULL )
     {
-        i_showflags = model->shownFlags();
-        updateColumnHeaders();
+        if( model->i_depth == DEPTH_SEL )  /* Selector Panel */
+        {
+            item_col_strings.append( "" );
+        }
+        else
+        {
+            i_showflags = config_GetInt( model->p_intf, "qt-pl-showflags" );
+            updateColumnHeaders();
+        }
     }
     else
     {
@@ -68,7 +75,6 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
         //Add empty string and update() handles data appending
         item_col_strings.append( "" );
     }
-    msg_Dbg( model->p_intf, "PLItem created of type: %i", model->i_depth );
 }
 
 /*
@@ -96,12 +102,6 @@ PLItem::~PLItem()
 void PLItem::updateColumnHeaders()
 {
     item_col_strings.clear();
-
-    if( model->i_depth == DEPTH_SEL )  /* Selector Panel */
-    {
-        item_col_strings.append( "" );
-        return;
-    }
 
     for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index *= 2 )
     {

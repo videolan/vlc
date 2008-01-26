@@ -114,7 +114,7 @@ public:
                       int row, int column, const QModelIndex &target );
     QStringList mimeTypes() const;
 
-    int shownFlags() {  return rootItem->i_showflags;  }
+    int shownFlags() { return rootItem->i_showflags;  }
 
 private:
     void addCallbacks();
