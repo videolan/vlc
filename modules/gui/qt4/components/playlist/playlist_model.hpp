@@ -31,54 +31,22 @@
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
+#include "playlist_item.hpp"
 
 #include <QModelIndex>
 #include <QObject>
 #include <QEvent>
 #include <QMimeData>
 #include <QSignalMapper>
+#include <QAbstractItemModel>
+#include <QVariant>
 
-class PLModel;
 class QSignalMapper;
 
-class PLItem
-{
-    friend class PLModel;
-public:
-    PLItem( int, int, PLItem *parent , PLModel * );
-    PLItem( playlist_item_t *, PLItem *parent, PLModel * );
-    ~PLItem();
+class PLItem;
 
-    int row() const;
-    void insertChild( PLItem *, int p, bool signal = true );
-
-    void appendChild( PLItem *item, bool signal = true )
-    {
-        insertChild( item, children.count(), signal );
-    };
-    void remove( PLItem *removed );
-
-    PLItem *child( int row ) { return children.value( row ); };
-    int childCount() const { return children.count(); };
-    QString columnString( int col ) { return item_col_strings.value( col ); };
-    PLItem *parent() { return parentItem; };
-
-    void update( playlist_item_t *, bool );
-protected:
-    QList<PLItem*> children;
-    QList<QString> item_col_strings;
-    bool b_current;
-    int i_type;
-    int i_id;
-    int i_input_id;
-    int i_showflags;
-
-    void updateview();
-private:
-    void init( int, int, PLItem *, PLModel * );
-    PLItem *parentItem;
-    PLModel *model;
-};
+#define DEPTH_PL -1
+#define DEPTH_SEL 1
 
 static int ItemUpdate_Type = QEvent::User + 2;
 static int ItemDelete_Type = QEvent::User + 3;
@@ -90,16 +58,16 @@ class PLEvent : public QEvent
 public:
     PLEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
     { i_id = id; p_add = NULL; };
+
     PLEvent(  playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
     { p_add = a; };
+
     virtual ~PLEvent() {};
 
     int i_id;
     playlist_add_t *p_add;
 };
 
-#include <QAbstractItemModel>
-#include <QVariant>
 
 class PLModel : public QAbstractItemModel
 {
@@ -147,6 +115,7 @@ public:
     QStringList mimeTypes() const;
 
     int shownFlags() {  return rootItem->i_showflags;  }
+
 private:
     void addCallbacks();
     void delCallbacks();
@@ -189,12 +158,14 @@ private:
     int i_cached_input_id;
 signals:
     void shouldRemove( int );
+
 public slots:
     void activateItem( const QModelIndex &index );
     void activateItem( playlist_item_t *p_item );
     void setRandom( bool );
     void setLoop( bool );
     void setRepeat( bool );
+
 private slots:
     void popupPlay();
     void popupDel();
@@ -204,6 +175,7 @@ private slots:
 #ifdef WIN32
     void popupExplore();
 #endif
+
     void viewchanged( int );
 };
 
