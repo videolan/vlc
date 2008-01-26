@@ -225,19 +225,22 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                 ADD_META( p_item, Artist );
                 break;
             case VLC_META_ENGINE_TITLE:
-                char *psz_title, *psz_name;
+                char *psz_title;
                 psz_title = input_item_GetTitle( p_item->p_input );
-                psz_name = input_item_GetName( p_item->p_input );
                 if( psz_title )
                 {
                     ADD_META( p_item, Title );
+                    free( psz_title );
                 }
-                else if( psz_name )
+                else
                 {
-                    item_col_strings.append( qfu( psz_name ) );
+                    psz_title = input_item_GetName( p_item->p_input );
+                    if( psz_title )
+                    {
+                        item_col_strings.append( qfu( psz_title ) );
+                    }
+                    free( psz_title );
                 }
-                free( psz_title );
-                free( psz_name );
                 break;
             case VLC_META_ENGINE_DESCRIPTION:
                 ADD_META( p_item, Description );
