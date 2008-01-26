@@ -819,3 +819,8 @@ VLC development is NOT about being a sed god.
           dated
   -- #videolan
 %
+<j-b> You don't have humour ?
+<kneer0w> what i do have is a pms'ing girlfriend sitting right next to me
+          expecting this movie to work
+  -- #videolan
+%
