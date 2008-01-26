@@ -548,28 +548,28 @@ void SPrefsPanel::apply()
         {
             msg_Dbg( p_intf, "Adjusting all cache values at: %i", i_comboValue );
             CaC( "udp-caching" );
-            if (module_Exists (p_intf, "dvdread"))
+            if (module_Exists (p_intf, "dvdread" ))
                 CaC( "dvdread-caching" );
-            if (module_Exists (p_intf, "dvdnav"))
+            if (module_Exists (p_intf, "dvdnav" ))
                 CaC( "dvdnav-caching" );
             CaC( "tcp-caching" ); CaC( "vcd-caching" );
             CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
             CaC( "screen-caching" );
             CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
             CaCi( "http-caching", 4 );
-            if (module_Exists (p_intf, "access_realrtsp"))
+            if (module_Exists (p_intf, "access_realrtsp" ))
                 CaCi( "realrtsp-caching", 10 );
             CaCi( "mms-caching", 19 );
             #ifdef WIN32
             CaC( "dshow-caching" );
             #else
-            if (module_Exists (p_intf, "v4l"))
+            if (module_Exists (p_intf, "v4l" ))
                 CaC( "v4l-caching" );
-            if (module_Exists (p_intf, "access_jack"))
+            if (module_Exists (p_intf, "access_jack" ))
             CaC( "jack-input-caching" );
-            if (module_Exists (p_intf, "v4l2"))
+            if (module_Exists (p_intf, "v4l2" ))
                 CaC( "v4l2-caching" );
-            if (module_Exists (p_intf, "pvr"))
+            if (module_Exists (p_intf, "pvr" ))
                 CaC( "pvr-caching" );
             #endif
             //CaCi( "dv-caching" ) too short...
@@ -631,28 +631,90 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 }
 
 #ifdef WIN32
-
 #include <QListWidget>
 #include <QDialogButtonBox>
+#include <QHeaderView>
 #include "util/registry.hpp"
+
+bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
+                           QTreeWidgetItem* parent, QVLCRegistry *qvReg )
+{
+    bool b_temp;
+    const char* psz_VLC = "VLC";
+    current = new QTreeWidgetItem( parent, QStringList( psz_ext ) );
+
+    if( strstr( qvReg->ReadRegistryString( psz_ext, "", ""  ), psz_VLC ) )
+    {
+        current->setCheckState( 0, Qt::Checked );
+        b_temp = false;
+    }
+    else
+    {
+        current->setCheckState( 0, Qt::Unchecked );
+        b_temp = true;
+    }
+    listAsso.append( current );
+    return b_temp;
+}
 
 void SPrefsPanel::assoDialog()
 {
-
     QDialog *d = new QDialog( this );
     QGridLayout *assoLayout = new QGridLayout( d );
 
-    QListWidget *filetypeList = new QListWidget;
+    QTreeWidget *filetypeList = new QTreeWidget;
     assoLayout->addWidget( filetypeList, 0, 0, 1, 4 );
+    filetypeList->header()->hide();
 
-    QListWidgetItem *currentItem;
+    QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
 
-#define addType( ext ) \
-    currentItem = new QListWidgetItem( ext, filetypeList ); \
-    currentItem->setCheckState( Qt::Checked ); \
-    listAsso.append( currentItem );
+    QTreeWidgetItem *audioType = new QTreeWidgetItem( QStringList( qtr( "Audio Files" ) ) );
+    QTreeWidgetItem *videoType = new QTreeWidgetItem( QStringList( qtr( "Video Files" ) ) );
+    QTreeWidgetItem *otherType = new QTreeWidgetItem( QStringList( qtr( "Playlist Files" ) ) );
 
-    addType( ".avi" );
+    filetypeList->addTopLevelItem( audioType );
+    filetypeList->addTopLevelItem( videoType );
+    filetypeList->addTopLevelItem( otherType );
+
+    audioType->setExpanded( true ); audioType->setCheckState( 0, Qt::Unchecked );
+    videoType->setExpanded( true ); videoType->setCheckState( 0, Qt::Unchecked );
+    otherType->setExpanded( true ); otherType->setCheckState( 0, Qt::Unchecked );
+
+    QTreeWidgetItem *currentItem;
+
+    int i_temp = 0;
+#define aTa( name ) i_temp += addType( name, currentItem, audioType, qvReg )
+#define aTv( name ) i_temp += addType( name, currentItem, videoType, qvReg )
+#define aTo( name ) i_temp += addType( name, currentItem, otherType, qvReg )
+
+    aTa( ".a52" ); aTa( ".aac" ); aTa( ".ac3" ); aTa( ".dts" ); aTa( ".flac" );
+    aTa( ".m4a" ); aTa( ".m4p" ); aTa( ".mka" ); aTa( ".mod" ); aTa( ".mp1" );
+    aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".ogg" ); aTa( ".spx" ); aTa( ".wav" );
+    aTa( ".wma" ); aTa( ".xm" );
+    audioType->setCheckState( 0, ( i_temp > 0 ) ? 
+                              ( ( i_temp == audioType->childCount() ) ?
+                               Qt::Checked : Qt::PartiallyChecked )
+                            : Qt::Unchecked );
+
+    i_temp = 0;
+    aTv( ".asf" ); aTv( ".avi" ); aTv( ".divx" ); aTv( ".dv" ); aTv( ".flv" );
+    aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2v" ); aTv( ".m4v" ); aTv( ".mkv" );
+    aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp4" ); aTv( ".mpeg" );
+    aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
+    aTv( ".mxf" ); aTv( ".ogm" ); aTv( ".ps" ); aTv( ".ts" );
+    aTv( ".vob" ); aTv( ".wmv" );
+    videoType->setCheckState( 0, ( i_temp > 0 ) ? 
+                              ( ( i_temp == audioType->childCount() ) ?
+                               Qt::Checked : Qt::PartiallyChecked )
+                            : Qt::Unchecked );
+
+    i_temp = 0;
+    aTo( ".asx" ); aTo( ".b4s" ); aTo( ".m3u" ); aTo( ".pls" ); aTo( ".vlc" );
+    aTo( ".xspf" );
+    otherType->setCheckState( 0, ( i_temp > 0 ) ? 
+                              ( ( i_temp == audioType->childCount() ) ?
+                               Qt::Checked : Qt::PartiallyChecked )
+                            : Qt::Unchecked );
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox( d );
     QPushButton *closeButton = new QPushButton( qtr( "&Apply" ) );
@@ -664,8 +726,10 @@ void SPrefsPanel::assoDialog()
 
     CONNECT( closeButton, clicked(), this, saveAsso() );
     CONNECT( clearButton, clicked(), d, reject() );
+    d->resize( 300, 400 );
     d->exec();
     delete d;
+    delete qvReg;
     listAsso.clear();
 }
 
@@ -720,28 +784,28 @@ void delAsso( QVLCRegistry *qvReg, char *psz_ext )
         if( psz_value )
             qvReg->WriteRegistryString( psz_ext, "", psz_value );
 
-        //qvReg->DeletKey( psz_ext, "VLC.backup" );
-        
+        qvReg->DeleteKey( psz_ext, "VLC.backup" );
     }
     delete( psz_value );
 }
 void SPrefsPanel::saveAsso()
 {
+    QVLCRegistry * qvReg;
     for( int i = 0; i < listAsso.size(); i ++ )
     {
-        QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
-        
-        if( listAsso[i]->checkState() > 0 )
+        qvReg  = new QVLCRegistry( HKEY_CLASSES_ROOT );
+        if( listAsso[i]->checkState( 0 ) > 0 )
         {
-            addAsso( qvReg, qtu( listAsso[i]->text() ) );
+            addAsso( qvReg, qtu( listAsso[i]->text( 0 ) ) );
         }
         else
         {
-            delAsso( qvReg, qtu( listAsso[i]->text() ) );
+            delAsso( qvReg, qtu( listAsso[i]->text( 0 ) ) );
         }
     }
     /* Gruik ? Naaah */
-    qobject_cast<QDialog *>(listAsso[0]->listWidget()->parent())->accept();
+    qobject_cast<QDialog *>(listAsso[0]->treeWidget()->parent())->accept();
+    delete qvReg;
 }
 
 #endif /* WIN32 */

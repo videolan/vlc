@@ -73,7 +73,7 @@ class QCheckBox;
 class QString;
 
 #ifdef WIN32
-class QListWidgetItem;
+class QTreeWidgetItem;
 #endif
 
 class SPrefsCatList : public QWidget
@@ -108,7 +108,8 @@ private:
     QString qs_filter;
 
 #ifdef WIN32
-    QList<QListWidgetItem *> listAsso;
+    QList<QTreeWidgetItem *> listAsso;
+    bool addType( const char * psz_ext, QTreeWidgetItem*, QTreeWidgetItem*, QVLCRegistry* );
 #endif
 
 /* Display only the options for the selected audio output */
