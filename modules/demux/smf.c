@@ -573,5 +573,22 @@ static int Demux (demux_t *p_demux)
  *****************************************************************************/
 static int Control (demux_t *p_demux, int i_query, va_list args)
 {
-    return demux2_vaControlHelper (p_demux->s, 0, -1, 0, 1, i_query, args);
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    switch (i_query)
+    {
+        case DEMUX_GET_TIME:
+        {
+            *(va_arg (args, int64_t *)) = date_Get (&p_sys->pts);
+            return 0;
+        }
+#if 0
+        /* TODO: */
+        case DEMUX_SET_TIME:
+        case DEMUX_GET_POSITION:
+        case DEMUX_SET_POSITION:
+        case DEMUX_GET_LENGTH:
+#endif
+    }
+    return VLC_EGENERIC;
 }
