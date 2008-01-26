@@ -373,6 +373,7 @@ modules/codec/cmml/xtag.c
 modules/codec/cmml/xtag.h
 modules/codec/cmml/xurl.c
 modules/codec/cmml/xurl.h
+modules/codec/csri.c
 modules/codec/cvdsub.c
 modules/codec/dirac.c
 modules/codec/dmo/buffer.c
@@ -635,6 +636,8 @@ modules/gui/qt4/components/open_panels.hpp
 modules/gui/qt4/components/playlist/panels.hpp
 modules/gui/qt4/components/playlist/playlist.cpp
 modules/gui/qt4/components/playlist/playlist.hpp
+modules/gui/qt4/components/playlist/playlist_item.cpp
+modules/gui/qt4/components/playlist/playlist_item.hpp
 modules/gui/qt4/components/playlist/playlist_model.cpp
 modules/gui/qt4/components/playlist/playlist_model.hpp
 modules/gui/qt4/components/playlist/selector.cpp

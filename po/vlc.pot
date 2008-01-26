@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2008-01-25 15:49+0000\n"
+"POT-Creation-Date: 2008-01-25 20:37-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -490,8 +490,8 @@ msgstr ""
 msgid "VLM Configuration..."
 msgstr ""
 
-#: include/vlc_intf_strings.h:49
-msgid "About VLC media player..."
+#: include/vlc_intf_strings.h:49 modules/gui/wxwidgets/interface.cpp:623
+msgid "About..."
 msgstr ""
 
 #: include/vlc_intf_strings.h:52 modules/gui/macosx/embeddedwindow.m:50
@@ -931,8 +931,8 @@ msgstr ""
 
 #: src/input/decoder.c:163 src/input/decoder.c:175 src/input/decoder.c:377
 #: modules/codec/ffmpeg/encoder.c:219 modules/codec/ffmpeg/encoder.c:227
-#: modules/codec/ffmpeg/encoder.c:239 modules/codec/ffmpeg/encoder.c:595
-#: modules/codec/ffmpeg/encoder.c:604 modules/stream_out/es.c:370
+#: modules/codec/ffmpeg/encoder.c:239 modules/codec/ffmpeg/encoder.c:600
+#: modules/codec/ffmpeg/encoder.c:609 modules/stream_out/es.c:370
 #: modules/stream_out/es.c:384
 msgid "Streaming / Transcoding failed"
 msgstr ""
@@ -5508,7 +5508,7 @@ msgstr ""
 
 #: modules/access/cdda/info.c:329 modules/access/cdda/info.c:397
 #: modules/gui/macosx/playlist.m:128
-#: modules/gui/qt4/components/playlist/playlist_model.cpp:141
+#: modules/gui/qt4/components/playlist/playlist_item.cpp:123
 #: modules/gui/qt4/qt4.hpp:42
 msgid "Duration"
 msgstr ""
@@ -8220,6 +8220,14 @@ msgstr ""
 msgid "CMML annotations decoder"
 msgstr ""
 
+#: modules/codec/csri.c:70
+msgid "Subtitles (advanced)"
+msgstr ""
+
+#: modules/codec/csri.c:71
+msgid "Wrapper for subtitle renderers using CSRI/asa"
+msgstr ""
+
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr ""
@@ -8384,11 +8392,11 @@ msgstr ""
 msgid "Deinterlace module to use."
 msgstr ""
 
-#: modules/codec/fake.c:76 modules/video_output/fb.c:80
+#: modules/codec/fake.c:76 modules/video_output/fb.c:85
 msgid "Chroma used."
 msgstr ""
 
-#: modules/codec/fake.c:78 modules/video_output/fb.c:82
+#: modules/codec/fake.c:78 modules/video_output/fb.c:87
 msgid "Force use of a specific chroma for output. Default is I420."
 msgstr ""
 
@@ -8411,7 +8419,7 @@ msgstr ""
 msgid "VLC could not find encoder \"%s\"."
 msgstr ""
 
-#: modules/codec/ffmpeg/encoder.c:596 modules/codec/ffmpeg/encoder.c:605
+#: modules/codec/ffmpeg/encoder.c:601 modules/codec/ffmpeg/encoder.c:610
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -11474,51 +11482,51 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr ""
 
-#: modules/demux/ts.c:3320
+#: modules/demux/ts.c:3321
 msgid "Teletext subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3330
+#: modules/demux/ts.c:3331
 msgid "Teletext hearing impaired subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3425
+#: modules/demux/ts.c:3426
 msgid "subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3429
+#: modules/demux/ts.c:3430
 msgid "4:3 subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3433
+#: modules/demux/ts.c:3434
 msgid "16:9 subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3437
+#: modules/demux/ts.c:3438
 msgid "2.21:1 subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3441 modules/demux/ts.c:3593 modules/demux/ts.c:3634
+#: modules/demux/ts.c:3442 modules/demux/ts.c:3594 modules/demux/ts.c:3635
 msgid "hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3445
+#: modules/demux/ts.c:3446
 msgid "4:3 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3449
+#: modules/demux/ts.c:3450
 msgid "16:9 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3453
+#: modules/demux/ts.c:3454
 msgid "2.21:1 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3589 modules/demux/ts.c:3630
+#: modules/demux/ts.c:3590 modules/demux/ts.c:3631
 msgid "clean effects"
 msgstr ""
 
-#: modules/demux/ts.c:3597 modules/demux/ts.c:3638
+#: modules/demux/ts.c:3598 modules/demux/ts.c:3639
 msgid "visual impaired commentary"
 msgstr ""
 
@@ -11612,7 +11620,8 @@ msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:274
 #: modules/gui/pda/pda_interface.c:298 modules/gui/pda/pda_interface.c:299
-#: modules/gui/pda/pda_interface.c:1360 modules/gui/qt4/dialogs/help.cpp:86
+#: modules/gui/pda/pda_interface.c:1360 modules/gui/qt4/dialogs/help.cpp:85
+#: modules/gui/qt4/dialogs/help.cpp:160
 msgid "About"
 msgstr ""
 
@@ -11784,19 +11793,19 @@ msgstr ""
 msgid "Take Screen Shot"
 msgstr ""
 
-#: modules/gui/fbosd.c:106 modules/video_output/fb.c:71
+#: modules/gui/fbosd.c:106 modules/video_output/fb.c:76
 msgid "Framebuffer device"
 msgstr ""
 
-#: modules/gui/fbosd.c:108 modules/video_output/fb.c:73
+#: modules/gui/fbosd.c:108 modules/video_output/fb.c:78
 msgid "Framebuffer device to use for rendering (usually /dev/fb0)."
 msgstr ""
 
-#: modules/gui/fbosd.c:110 modules/video_output/fb.c:84
+#: modules/gui/fbosd.c:110 modules/video_output/fb.c:89
 msgid "Video aspect ratio"
 msgstr ""
 
-#: modules/gui/fbosd.c:112 modules/video_output/fb.c:86
+#: modules/gui/fbosd.c:112 modules/video_output/fb.c:91
 msgid "Aspect ratio of the video image (4:3, 16:9). Default is square pixels."
 msgstr ""
 
@@ -12043,7 +12052,7 @@ msgid "VLC was brought to you by:"
 msgstr ""
 
 #: modules/gui/macosx/about.m:113 modules/gui/macosx/about.m:176
-#: modules/gui/macosx/intf.m:726
+#: modules/gui/macosx/intf.m:726 modules/gui/qt4/dialogs/help.cpp:163
 msgid "License"
 msgstr ""
 
@@ -14485,7 +14494,7 @@ msgstr ""
 msgid "Announce Channel:"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1247 modules/gui/qt4/dialogs/help.cpp:205
+#: modules/gui/pda/pda_interface.c:1247 modules/gui/qt4/dialogs/help.cpp:199
 #: modules/gui/qt4/menus.cpp:479 modules/gui/qt4/ui/video_effects.ui:998
 msgid "Update"
 msgstr ""
@@ -14756,11 +14765,26 @@ msgstr ""
 msgid "Configure Hotkeys"
 msgstr ""
 
-#: modules/gui/qt4/components/simple_preferences.cpp:658
+#: modules/gui/qt4/components/simple_preferences.cpp:670
+#: modules/gui/qt4/dialogs_provider.hpp:54
+msgid "Audio Files"
+msgstr ""
+
+#: modules/gui/qt4/components/simple_preferences.cpp:671
+#: modules/gui/qt4/dialogs_provider.hpp:49
+msgid "Video Files"
+msgstr ""
+
+#: modules/gui/qt4/components/simple_preferences.cpp:672
+#: modules/gui/qt4/dialogs_provider.hpp:59
+msgid "Playlist Files"
+msgstr ""
+
+#: modules/gui/qt4/components/simple_preferences.cpp:719
 msgid "&Apply"
 msgstr ""
 
-#: modules/gui/qt4/components/simple_preferences.cpp:659
+#: modules/gui/qt4/components/simple_preferences.cpp:720
 #: modules/gui/qt4/dialogs/gototime.cpp:51
 #: modules/gui/qt4/dialogs/open.cpp:108
 #: modules/gui/qt4/dialogs/preferences.cpp:80
@@ -14791,8 +14815,8 @@ msgstr ""
 msgid "Errors"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/errors.cpp:50 modules/gui/qt4/dialogs/help.cpp:65
-#: modules/gui/qt4/dialogs/help.cpp:92 modules/gui/qt4/dialogs/help.cpp:210
+#: modules/gui/qt4/dialogs/errors.cpp:50 modules/gui/qt4/dialogs/help.cpp:64
+#: modules/gui/qt4/dialogs/help.cpp:92 modules/gui/qt4/dialogs/help.cpp:204
 #: modules/gui/qt4/dialogs/mediainfo.cpp:77
 #: modules/gui/qt4/dialogs/messages.cpp:47
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
@@ -14852,83 +14876,74 @@ msgid "Go to time:"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/help.cpp:97
-msgid "Information about VLC media player."
+msgid "VLC media player "
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:113
+#: modules/gui/qt4/dialogs/help.cpp:112
 msgid ""
-"VLC media player is a free media player, made by the VideoLAN Team.\n"
-"It is a standalone multimedia player, encoder and streamer, that can read "
-"from many supports (files, CDs, DVDs, networks, capture cards...) and that "
-"works on many platforms.\n"
+"VLC media player is a free media player, encoder and streamer that can read "
+"from files, CDs, DVDs, network streams, capture cards and even more!\n"
+"Also, VLC works on essentially every popular platform.\n"
 "\n"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:118
-msgid "You are using the Qt4 Interface.\n"
+#: modules/gui/qt4/dialogs/help.cpp:116
+msgid ""
+"This version of VLC was compiled by:\n"
+" "
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:119 modules/gui/wince/interface.cpp:502
-#: modules/gui/wxwidgets/interface.cpp:958
-msgid "Compiled by "
-msgstr ""
-
-#: modules/gui/qt4/dialogs/help.cpp:123 modules/gui/wince/interface.cpp:505
+#: modules/gui/qt4/dialogs/help.cpp:120 modules/gui/wince/interface.cpp:505
 #: modules/gui/wxwidgets/interface.cpp:961
 msgid "Based on SVN revision: "
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:125
+#: modules/gui/qt4/dialogs/help.cpp:121
 msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by the law; "
-"read the distribution tab.\n"
+"You are using the Qt4 Interface.\n"
 "\n"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:149
+#: modules/gui/qt4/dialogs/help.cpp:122
+msgid "Copyright (c) "
+msgstr ""
+
+#: modules/gui/qt4/dialogs/help.cpp:143
 msgid ""
 "We would like to thank the whole community, the testers, our users and the "
 "following people (and the missing ones...) for their collaboration to "
 "provide the best software."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:166
-msgid "General Info"
-msgstr ""
-
-#: modules/gui/qt4/dialogs/help.cpp:167
+#: modules/gui/qt4/dialogs/help.cpp:161
 msgid "Authors"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:168
+#: modules/gui/qt4/dialogs/help.cpp:162
 msgid "Thanks"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:169
-msgid "Distribution License"
-msgstr ""
-
-#: modules/gui/qt4/dialogs/help.cpp:211
+#: modules/gui/qt4/dialogs/help.cpp:205
 msgid "&Update List"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:217
+#: modules/gui/qt4/dialogs/help.cpp:211
 msgid "Checking for the update..."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:255
+#: modules/gui/qt4/dialogs/help.cpp:249
 msgid "Select a directory ..."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:287
+#: modules/gui/qt4/dialogs/help.cpp:281
 msgid "There is a new version of vlc :\n"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:290
+#: modules/gui/qt4/dialogs/help.cpp:284
 msgid "You have the latest version of vlc"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:293
+#: modules/gui/qt4/dialogs/help.cpp:287
 msgid "An error occure while checking for updates"
 msgstr ""
 
@@ -15060,18 +15075,6 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.hpp:44
 msgid "Media Files"
-msgstr ""
-
-#: modules/gui/qt4/dialogs_provider.hpp:49
-msgid "Video Files"
-msgstr ""
-
-#: modules/gui/qt4/dialogs_provider.hpp:54
-msgid "Audio Files"
-msgstr ""
-
-#: modules/gui/qt4/dialogs_provider.hpp:59
-msgid "Playlist Files"
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.hpp:64
@@ -16203,6 +16206,10 @@ msgid ""
 "\n"
 msgstr ""
 
+#: modules/gui/wince/interface.cpp:502 modules/gui/wxwidgets/interface.cpp:958
+msgid "Compiled by "
+msgstr ""
+
 #: modules/gui/wince/interface.cpp:504 modules/gui/wxwidgets/interface.cpp:960
 msgid "Compiler: "
 msgstr ""
@@ -17041,10 +17048,6 @@ msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:621
 msgid "Online Help"
-msgstr ""
-
-#: modules/gui/wxwidgets/interface.cpp:623
-msgid "About..."
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:626
@@ -20784,27 +20787,38 @@ msgstr ""
 msgid "DirectFB video output http://www.directfb.org/"
 msgstr ""
 
-#: modules/video_output/fb.c:75
+#: modules/video_output/fb.c:80
 msgid "Run fb on current tty."
 msgstr ""
 
-#: modules/video_output/fb.c:77
+#: modules/video_output/fb.c:82
 msgid ""
 "Run framebuffer on current TTY device (default enabled). (disable tty "
 "handling with caution)"
 msgstr ""
 
-#: modules/video_output/fb.c:88
+#: modules/video_output/fb.c:93
 msgid "Framebuffer resolution to use."
 msgstr ""
 
-#: modules/video_output/fb.c:90
+#: modules/video_output/fb.c:95
 msgid ""
 "Select the resolution for the framebuffer. Currently it supports the values "
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)"
 msgstr ""
 
-#: modules/video_output/fb.c:106
+#: modules/video_output/fb.c:98
+msgid "Framebuffer uses hw acceleration."
+msgstr ""
+
+#: modules/video_output/fb.c:100
+msgid ""
+"If your framebuffer supports hardware acceleration or does double buffering "
+"in hardware then you must disable this option. It then does double buffering "
+"in software."
+msgstr ""
+
+#: modules/video_output/fb.c:119
 msgid "GNU/Linux console framebuffer video output"
 msgstr ""
 
