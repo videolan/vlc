@@ -631,7 +631,6 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 }
 
 #ifdef WIN32
-#include <QListWidget>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include "util/registry.hpp"
