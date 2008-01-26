@@ -225,7 +225,8 @@ void OpenDialog::toggleAdvancedPanel()
     {
         ui.advancedFrame->hide();
         //FIXME: Clear Bug here. Qt ?
-        resize( size().width(), size().height() - ui.advancedFrame->height() );
+        if( size().isValid() )
+            resize( size().width(), size().height() - ui.advancedFrame->height() );
     }
     else
     {
