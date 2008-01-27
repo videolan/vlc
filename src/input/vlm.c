@@ -36,6 +36,8 @@
 #include <ctype.h>                                              /* tolower() */
 #include <assert.h>
 
+#include <vlc_vlm.h>
+
 #ifdef ENABLE_VLM
 
 #ifndef WIN32
@@ -50,7 +52,6 @@
 #include <vlc_input.h>
 #include "input_internal.h"
 #include <vlc_stream.h>
-#include <vlc_vlm.h>
 #include "vlm_internal.h"
 #include <vlc_vod.h>
 #include <vlc_charset.h>
@@ -2926,31 +2927,38 @@ vlm_t *__vlm_New( vlc_object_t *a )
     msg_Err( a, "VideoLAN manager support is disabled" );
     return NULL;
 }
+
 void vlm_Delete( vlm_t *a )
 {
-    ;
+    (void)a;
 }
-int vlm_ExecuteCommand( vlm_t *a, char *b, vlm_message_t **c )
+
+int vlm_ExecuteCommand( vlm_t *a, const char *b, vlm_message_t **c )
 {
-    return -1;
+    abort();
 }
+
 vlm_message_t *vlm_MessageNew( const char *psz_name,
                                const char *psz_format, ... )
 {
+    (void)psz_name; (void)psz_format;
     return NULL;
 }
+
 vlm_message_t *vlm_MessageAdd( vlm_message_t *p_message,
                                vlm_message_t *p_child )
 {
-    return NULL;
+    abort();
 }
+
 void vlm_MessageDelete( vlm_message_t *a )
 {
-    ;
+    (void)a;
 }
 
 int vlm_Control( vlm_t *p_vlm, int i_query, ... )
 {
+    (void)p_vlm; (void)i_query;
     return VLC_EGENERIC;
 }
 

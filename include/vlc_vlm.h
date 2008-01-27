@@ -29,10 +29,6 @@
 #ifndef _VLC_VLM_H
 #define _VLC_VLM_H 1
 
-#ifdef __cpluplus
-extern "C" {
-#endif
-
 #include <vlc_input.h>
 
 /* VLM media */
@@ -150,6 +146,10 @@ struct vlm_message_t
     vlm_message_t **child;
 };
 
+
+#ifdef __cpluplus
+extern "C" {
+#endif
 
 #define vlm_New( a ) __vlm_New( VLC_OBJECT(a) )
 VLC_EXPORT( vlm_t *, __vlm_New, ( vlc_object_t * ) );
