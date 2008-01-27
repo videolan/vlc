@@ -1299,6 +1299,9 @@ ifdef HAVE_DARWIN_OS
 	#remove me at next libcaca upgrade
 	patch -p0 < Patches/caca_driver_cocoa.diff
 	patch -p0 < Patches/caca_macosx.diff
+ifndef HAVE_DARWIN_OS_ON_INTEL
+	patch -p0 < Patches/caca-osx-ppc.patch
+endif
 endif
 
 .caca: libcaca

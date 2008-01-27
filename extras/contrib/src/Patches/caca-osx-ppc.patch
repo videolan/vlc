@@ -1,0 +1,29 @@
+--- libcaca/configure.orig	2008-01-27 20:10:40.000000000 +0100
++++ libcaca/configure	2008-01-27 20:12:15.000000000 +0100
+@@ -23285,22 +23285,16 @@
+   if test "${ac_cv_my_have_cocoa}" = "yes"; then
+     case x${target} in
+     xpowerpc*darwin*)
+-      # 10.3 needed to link with X11
+-      MACOSX_SDK=/Developer/SDKs/MacOSX10.3.9.sdk
+-      GCC_VERSION=3.3
+       ARCH="-arch ppc"
+-      MACOSX_SDK_CFLAGS="-nostdinc -isystem ${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION} -isystem ${MACOSX_SDK}/usr/include"
+-      MACOSX_SDK_CXXFLAGS="-nostdinc++ -I${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION}/c++ -I${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION}/c++/ppc-darwin -I${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION}/c++/backward"
+-      MACOSX_SDK_LDFLAGS="-L${MACOSX_SDK}/usr/lib/gcc/darwin -L${MACOSX_SDK}/usr/lib/gcc/darwin/${GCC_VERSION} -L${MACOSX_SDK}/usr/lib"
+       ;;
+     x*86*darwin*)
+-      MACOSX_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+-      GCC_VERSION=4.0
+       ARCH="-arch i386"
+-      MACOSX_SDK_CFLAGS="-isysroot ${MACOSX_SDK}"
+-      MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CFLAGS}"
+       ;;
+     esac
++    MACOSX_SDK=/Developer/SDKs/MacOSX10.4u.sdk
++    GCC_VERSION=4.0
++    MACOSX_SDK_CFLAGS="-isysroot ${MACOSX_SDK}"
++    MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CFLAGS}"
+     CC=gcc-${GCC_VERSION}
+     CXX=g++-${GCC_VERSION}
+     MACOSX_SDK_FRAMEWORKS="-F${MACOSX_SDK}/System/Library/Frameworks"
