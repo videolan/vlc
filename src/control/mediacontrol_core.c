@@ -67,7 +67,7 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
     if( !retval )
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
 
-    retval->p_instance = libvlc_new( argc, argv, &ex );
+    retval->p_instance = libvlc_new( argc, (const char**)argv, &ex );
     HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
     retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
     return retval;
