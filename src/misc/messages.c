@@ -317,7 +317,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
     /* Expand %m to strerror(errno) - only once */
     char buf[strlen( psz_format ) + 2001], *ptr;
     strcpy( buf, psz_format );
-    ptr = psz_format = buf;
+    ptr = (char*)buf;
+    psz_format = (const char*) buf;
 
     for( ;; )
     {
