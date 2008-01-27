@@ -42,7 +42,7 @@ module_t *vlc_module_create (vlc_object_t *obj)
 
     module->b_reentrant = module->b_unloadable = VLC_TRUE;
     module->psz_object_name = module->psz_longname = default_name;
-    module->psz_capability = "";
+    module->psz_capability = (char*)"";
     module->i_score = 1;
     module->i_config_items = module->i_bool_items = 0;
 
