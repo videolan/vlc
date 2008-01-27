@@ -822,22 +822,16 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #ifndef HAVE_STRDUP
 #   define strdup vlc_strdup
     VLC_EXPORT( char *, vlc_strdup, ( const char *s ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_strdup NULL
 #endif
 
 #if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 #   define vasprintf vlc_vasprintf
     VLC_EXPORT( int, vlc_vasprintf, (char **, const char *, va_list ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_vasprintf NULL
 #endif
 
 #if !defined(HAVE_ASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 #   define asprintf vlc_asprintf
     VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_asprintf NULL
 #endif
 
 #ifndef HAVE_STRNDUP
@@ -849,29 +843,16 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #       define strndup vlc_strndup
         VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
 #   endif
-#elif !defined(__PLUGIN__)
-#   define vlc_strndup NULL
-#endif
-
-#ifndef HAVE_STRNLEN
-#   define strnlen vlc_strnlen
-    VLC_EXPORT( size_t, vlc_strnlen, ( const char *, size_t ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_strnlen NULL
 #endif
 
 #ifndef HAVE_STRLCPY
 #   define strlcpy vlc_strlcpy
     VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_strlcpy NULL
 #endif
 
 #ifndef HAVE_ATOF
 #   define atof vlc_atof
     VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_atof NULL
 #endif
 
 #ifndef HAVE_STRTOF
@@ -883,15 +864,11 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #ifndef HAVE_ATOLL
 #   define atoll vlc_atoll
     VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_atoll NULL
 #endif
 
 #ifndef HAVE_STRTOLL
 #   define strtoll vlc_strtoll
     VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_strtoll NULL
 #endif
 
 #if defined(SYS_BEOS) \
@@ -902,8 +879,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     } lldiv_t;
 #   define lldiv vlc_lldiv
     VLC_EXPORT( lldiv_t, vlc_lldiv, ( long long numer, long long denom ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_lldiv NULL
 #endif
 
 #ifndef HAVE_SCANDIR
@@ -912,16 +887,11 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     struct dirent;
     VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
     VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_scandir NULL
-#   define vlc_alphasort NULL
 #endif
 
 #ifndef HAVE_GETENV
 #   define getenv vlc_getenv
     VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_getenv NULL
 #endif
 
 #ifndef HAVE_STRCASECMP
@@ -930,12 +900,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
         VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
 #   else
 #       define strcasecmp stricmp
-#       if !defined(__PLUGIN__)
-#           define vlc_strcasecmp NULL
-#       endif
 #   endif
-#elif !defined(__PLUGIN__)
-#   define vlc_strcasecmp NULL
 #endif
 
 #ifndef HAVE_STRNCASECMP
@@ -944,12 +909,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
         VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
 #   else
 #       define strncasecmp strnicmp
-#       if !defined(__PLUGIN__)
-#           define vlc_strncasecmp NULL
-#       endif
 #   endif
-#elif !defined(__PLUGIN__)
-#   define vlc_strncasecmp NULL
 #endif
 
 #ifndef HAVE_STRCASESTR
@@ -958,12 +918,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
         VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #   else
 #       define strcasestr stristr
-#       if !defined(__PLUGIN__)
-#           define vlc_strcasestr NULL
-#       endif
 #   endif
-#elif !defined(__PLUGIN__)
-#   define vlc_strcasestr NULL
 #endif
 
 #ifndef HAVE_DIRENT_H
@@ -990,12 +945,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
     VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
     VLC_INTERNAL( long, vlc_telldir, ( void * ) );
-#else
-#   if !defined(__PLUGIN__)
-#       define vlc_opendir  NULL
-#       define vlc_readdir  NULL
-#       define vlc_closedir NULL
-#   endif
 #endif
 
 #if defined (WIN32)
@@ -1015,8 +964,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define rewinddir vlc_rewinddir
 #   define seekdir vlc_seekdir
 #   define telldir vlc_telldir
-#elif !defined(__PLUGIN__)
-#   define vlc_wclosedir NULL
 #endif
 
 /* Format type specifiers for 64 bits numbers */
