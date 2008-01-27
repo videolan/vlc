@@ -1,10 +1,10 @@
 /*****************************************************************************
  * sfilter.m: MacOS X Subpicture filters dialogue
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix Paul Kühne <fkuehne -at -videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 #import "sfilters.h"
-#import "intf.h"
 #import <vlc_vout.h>
 
 /* TODO:
@@ -215,8 +214,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     /* retrieve the time settings */
     x = 0;
     tempInt = config_GetInt( p_intf, "time-color" );
-    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String],
-        NULL, 0) != tempInt )
+    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String], NULL, 0) != tempInt )
     {
         x = (x + 1);
  
@@ -484,38 +482,20 @@ static VLCsFilters *_o_sharedInstance = nil;
 {
     if( sender == o_marq_enabled_ckb )
     {
-        if( [o_marq_enabled_ckb state] == NSOnState )
-        {
-            [self changeFiltersString:(char *)"marq" onOrOff:VLC_TRUE];
-        }
-        else
-        {
-            [self changeFiltersString:(char *)"marq" onOrOff:VLC_FALSE];
-        }
+        [self changeFiltersString:"marq" onOrOff: [o_marq_enabled_ckb state]];
+
         [self enableMarq];
     }
     if( sender == o_logo_enabled_ckb )
     {
-        if( [o_logo_enabled_ckb state] == NSOnState )
-        {
-            [self changeFiltersString:(char *)"logo" onOrOff:VLC_TRUE];
-        }
-        else
-        {
-            [self changeFiltersString:(char *)"logo" onOrOff:VLC_FALSE];
-        }
+        [self changeFiltersString:"logo" onOrOff: [o_logo_enabled_ckb state]];
+
         [self enableLogo];
     }
     if( sender == o_time_enabled_ckb )
     {
-        if( [o_time_enabled_ckb state] == NSOnState )
-        {
-            [self changeFiltersString:(char *)"time" onOrOff:VLC_TRUE];
-        }
-        else
-        {
-            [self changeFiltersString:(char *)"time" onOrOff:VLC_FALSE];
-        }
+        [self changeFiltersString:"time" onOrOff: [o_time_enabled_ckb state]];
+
         [self enableTime];
     }
 }

@@ -1,10 +1,10 @@
 /*****************************************************************************
  * sfilter.h: MacOS X Subpicture filters dialogue
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "intf.h"
 #import <vlc/vlc.h>
 
 @interface VLCsFilters : NSObject

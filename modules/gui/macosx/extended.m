@@ -27,7 +27,6 @@
  *****************************************************************************/
 
 #import "extended.h"
-#import "intf.h"
 #import "vout.h"
 #import <vlc_aout.h>
 #import <vlc_vout.h>

@@ -35,7 +35,6 @@
  *****************************************************************************/
 
 #import "bookmarks.h"
-#import "intf.h"
 #import "wizard.h"
 #import <vlc_interface.h>
 
