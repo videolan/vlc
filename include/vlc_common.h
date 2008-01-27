@@ -37,10 +37,7 @@
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
-#if defined( __BORLANDC__ )
-#   undef HAVE_STDINT_H
-#   undef HAVE_INTTYPES_H
-#elif defined( _MSC_VER )
+#if defined( _MSC_VER )
 #   pragma warning( disable : 4244 )
 #endif
 
