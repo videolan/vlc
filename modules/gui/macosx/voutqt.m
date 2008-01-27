@@ -704,8 +704,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->i_size = p_vout->output.i_width * p_vout->output.i_height * 2;
 
             /* Allocate the memory buffer */
-            p_pic->p_orig_data =
-            p_pic->p_data = malloc( p_pic->p_sys->i_size );
+            p_pic->p_data_orig = p_pic->p_data = malloc( p_pic->p_sys->i_size );
             /* Memory is always 16-bytes aligned on OSX, so it does not
              * posix_memalign() */
             assert( (((uintptr_t)p_pic->p_data) % 16) == 0 );
@@ -727,8 +726,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
  
             /* Allocate the memory buffer */
-            p_pic->p_orig_data =
-            p_pic->p_data = malloc( p_vout->output.i_width
+            p_pic->p_data_orig = p_pic->p_data = malloc( p_vout->output.i_width
                                      * p_vout->output.i_height * 3 / 2 );
             /* Memory is always 16-bytes aligned on OSX, so it does not
              * posix_memalign() */
