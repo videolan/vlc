@@ -38,7 +38,9 @@
 
 #undef OSD_MENU_DEBUG
 
+#if 0
 static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -90,9 +92,9 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
         char *psz_ext = strrchr( p_menu->psz_file, '.' );
 
         if( psz_ext && !strcmp( psz_ext, ".cfg") )
-            psz_type = "import-osd";
+            psz_type = (char*)"import-osd";
         else
-            psz_type = "import-osd-xml";
+            psz_type = (char*)"import-osd-xml";
 
         p_menu->p_parser = module_Need( p_menu, "osd parser",
                                         psz_type, VLC_TRUE );
