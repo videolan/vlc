@@ -84,7 +84,7 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 #define vlc_mutex_lock( P_MUTEX )                                           \
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
-#if defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#if defined(LIBVLC_USE_PTHREAD)
 static inline unsigned long int CAST_PTHREAD_TO_INT (pthread_t th)
 {
      union { pthread_t th; unsigned long int i; } v = { };
@@ -129,7 +129,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
         i_result = acquire_sem( p_mutex->lock );
     }
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
 #   define vlc_assert_locked( m ) \
            assert (pthread_mutex_lock (&((m)->mutex)) == EDEADLK)
 
@@ -199,7 +199,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
         return B_OK;
     }
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
     i_result = pthread_mutex_unlock( &p_mutex->mutex );
     if ( i_result )
     {
@@ -332,7 +332,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
         i_result = 0;
     }
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
     i_result = pthread_cond_signal( &p_condvar->cond );
     if ( i_result )
     {
@@ -478,7 +478,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
     i_result = 0;
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
 
 #   ifdef DEBUG
     /* In debug mode, timeout */
@@ -654,7 +654,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #   error Unimplemented
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
     lldiv_t d = lldiv( deadline, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
@@ -706,7 +706,7 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
 #elif defined( UNDER_CE ) || defined( WIN32 )
     i_ret = ( TlsSetValue( p_tls->handle, p_value ) != 0 );
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
     i_ret = pthread_setspecific( p_tls->handle, p_value );
 
 #endif
@@ -726,7 +726,7 @@ static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 #elif defined( UNDER_CE ) || defined( WIN32 )
     p_ret = TlsGetValue( p_tls->handle );
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#elif defined(LIBVLC_USE_PTHREAD)
     p_ret = pthread_getspecific( p_tls->handle );
 
 #endif

@@ -764,15 +764,9 @@ AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
 if ${have_nanosleep}; then
   AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if nanosleep is available.])
 fi
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" 
 
 dnl Check for misc headers
-AC_MSG_CHECKING(for pthread_cond_t in pthread.h)
-AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(PTHREAD_COND_T_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_cond_t.)],[
-  AC_MSG_RESULT(no)])
-
 AC_MSG_CHECKING(for strncasecmp in strings.h)
 AC_EGREP_HEADER(strncasecmp,strings.h,[
   AC_MSG_RESULT(yes)

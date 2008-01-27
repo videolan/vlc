@@ -44,7 +44,7 @@
 #   include <kernel/scheduler.h>
 #   include <byteorder.h>
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
+#else                                         /* pthreads (like Linux & BSD) */
 #   define LIBVLC_USE_PTHREAD 1
 #   define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
 
@@ -55,9 +55,6 @@
 #   ifdef DEBUG
 #      include <time.h>
 #   endif
-
-#else
-#   error no threads available on your system !
 
 #endif
 
@@ -82,7 +79,7 @@
 #   define VLC_THREAD_PRIORITY_OUTPUT 15
 #   define VLC_THREAD_PRIORITY_HIGHEST 15
 
-#elif defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#elif defined(LIBVLC_USE_PTHREAD)
 #   define VLC_THREAD_PRIORITY_LOW 0
 #   define VLC_THREAD_PRIORITY_INPUT 20
 #   define VLC_THREAD_PRIORITY_AUDIO 10
@@ -189,7 +186,7 @@ typedef struct
 } vlc_threadvar_t;
 
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#else
 typedef pthread_t       vlc_thread_t;
 typedef struct
 {

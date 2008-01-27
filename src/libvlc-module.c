@@ -1813,13 +1813,13 @@ vlc_module_begin();
         change_unsafe();
         change_need_restart();
 
-#if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
     add_bool( "rt-priority", VLC_FALSE, NULL, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, VLC_TRUE );
         change_need_restart();
 #endif
 
-#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#if !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
     add_integer( "rt-offset", 0, NULL, RT_OFFSET_TEXT,
                  RT_OFFSET_LONGTEXT, VLC_TRUE );
         change_need_restart();
