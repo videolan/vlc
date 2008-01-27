@@ -91,33 +91,33 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Create( p_aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         text.psz_string = _("Visualizations");
         var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
-        val.psz_string = ""; text.psz_string = _("Disable");
+        val.psz_string = (char*)""; text.psz_string = _("Disable");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = "spectrometer"; text.psz_string = _("Spectrometer");
+        val.psz_string = (char*)"spectrometer"; text.psz_string = _("Spectrometer");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = "scope"; text.psz_string = _("Scope");
+        val.psz_string = (char*)"scope"; text.psz_string = _("Scope");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = "spectrum"; text.psz_string = _("Spectrum");
+        val.psz_string = (char*)"spectrum"; text.psz_string = _("Spectrum");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
 
         /* Look for goom plugin */
         if( module_Exists( VLC_OBJECT(p_aout), "goom" ) )
         {
-            val.psz_string = "goom"; text.psz_string = "Goom";
+            val.psz_string = (char*)"goom"; text.psz_string = (char*)"Goom";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
         /* Look for galaktos plugin */
         if( module_Exists( VLC_OBJECT(p_aout), "galaktos" ) )
         {
-            val.psz_string = "galaktos"; text.psz_string = "GaLaktos";
+            val.psz_string = (char*)"galaktos"; text.psz_string = (char*)"GaLaktos";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
         if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
         {
             var_Set( p_aout, "visual", val );
-            if( val.psz_string ) free( val.psz_string );
+            free( val.psz_string );
         }
         var_AddCallback( p_aout, "visual", VisualizationCallback, NULL );
     }
@@ -135,7 +135,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             text.psz_string = _("Equalizer");
             var_Change( p_aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL );
 
-            val.psz_string = ""; text.psz_string = _("Disable");
+            val.psz_string = (char*)""; text.psz_string = _("Disable");
             var_Change( p_aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text );
 
             for( i = 0; i < p_config->i_list; i++ )
