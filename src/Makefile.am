@@ -52,6 +52,7 @@ HEADERS_include = \
 	../include/vlc_es_out.h \
 	../include/vlc_events.h \
 	../include/vlc_filter.h \
+	../include/vlc_fixups.h \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
