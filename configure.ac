@@ -470,13 +470,13 @@ CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcd
 dnl Check for system libs needed
 need_libc=false
 
-AC_CHECK_FUNCS(gettimeofday strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork bsearch lstat strlcpy)
-
 dnl Check for usual libc functions
-AC_CHECK_FUNCS(strdup strndup strnlen atof)
+AC_CHECK_FUNCS([gettimeofday strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork bsearch lstat strlcpy strdup strndup strnlen atof lldiv])
 AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
+
+AH_BOTTOM([#include <vlc_fixups.h>])
 
 AS_IF([test "${SYS}" = "linux"], [
   AC_CHECK_FUNCS(tee)

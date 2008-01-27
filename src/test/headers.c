@@ -24,6 +24,8 @@
 /* One thing we don't check is the CPPFLAGS - these MUST be exposed publicly,
  * e.g. using pkg-config or the broken old vlc-config. */
 
+#define PACKAGE "vlc"
+
 #include <vlc/vlc.h>
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_structures.h>

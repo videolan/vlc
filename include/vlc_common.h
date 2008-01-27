@@ -816,57 +816,14 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #define VLC_UNUSED(x) (void)(x)
 
 /* Stuff defined in src/extras/libc.c */
-#ifndef HAVE_STRDUP
-#   define strdup vlc_strdup
-    VLC_EXPORT( char *, vlc_strdup, ( const char *s ) );
-#endif
-
-#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
-#   define vasprintf vlc_vasprintf
-    VLC_EXPORT( int, vlc_vasprintf, (char **, const char *, va_list ) );
-#endif
-
-#if !defined(HAVE_ASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
-#   define asprintf vlc_asprintf
-    VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
-#endif
-
-#ifndef HAVE_STRNDUP
-#   if defined(STRNDUP_IN_GNOME_H) && \
-        (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
-         defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main))
-        /* Do nothing: gnome.h defines strndup for us */
-#   else
-#       define strndup vlc_strndup
-        VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
-#   endif
-#endif
-
-#ifndef HAVE_STRLCPY
-#   define strlcpy vlc_strlcpy
-    VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
-#endif
-
-#ifndef HAVE_ATOF
-#   define atof vlc_atof
-    VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
-#endif
-
-#ifndef HAVE_STRTOF
-#   ifdef HAVE_STRTOD
-#       define strtof strtod
-#   endif
-#endif
-
-#ifndef HAVE_ATOLL
-#   define atoll vlc_atoll
-    VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
-#endif
-
-#ifndef HAVE_STRTOLL
-#   define strtoll vlc_strtoll
-    VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
-#endif
+VLC_EXPORT( char *, vlc_strdup, ( const char *s ) );
+VLC_EXPORT( int, vlc_vasprintf, (char **, const char *, va_list ) );
+VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
+VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
+VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
+VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
+VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
 
 #if defined(SYS_BEOS) \
  || (defined (__FreeBSD__) && (__FreeBSD__ < 5))
@@ -874,49 +831,18 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
         long long quot; /* Quotient. */
         long long rem;  /* Remainder. */
     } lldiv_t;
-#   define lldiv vlc_lldiv
-    VLC_EXPORT( lldiv_t, vlc_lldiv, ( long long numer, long long denom ) );
 #endif
+VLC_EXPORT( lldiv_t, vlc_lldiv, ( long long numer, long long denom ) );
 
-#ifndef HAVE_SCANDIR
-#   define scandir vlc_scandir
-#   define alphasort vlc_alphasort
-    struct dirent;
-    VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
-    VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
-#endif
+struct dirent;
+VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
+VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
 
-#ifndef HAVE_GETENV
-#   define getenv vlc_getenv
-    VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );
-#endif
+VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );
 
-#ifndef HAVE_STRCASECMP
-#   ifndef HAVE_STRICMP
-#       define strcasecmp vlc_strcasecmp
-        VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
-#   else
-#       define strcasecmp stricmp
-#   endif
-#endif
-
-#ifndef HAVE_STRNCASECMP
-#   ifndef HAVE_STRNICMP
-#       define strncasecmp vlc_strncasecmp
-        VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
-#   else
-#       define strncasecmp strnicmp
-#   endif
-#endif
-
-#ifndef HAVE_STRCASESTR
-#   ifndef HAVE_STRISTR
-#       define strcasestr vlc_strcasestr
-        VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
-#   else
-#       define strcasestr stristr
-#   endif
-#endif
+VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
+VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
+VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 
 #ifndef HAVE_DIRENT_H
     typedef void DIR;
