@@ -824,6 +824,7 @@ VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
 VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
 VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
 VLC_EXPORT( int64_t, vlc_strtoll, ( const char *nptr, char **endptr, int base ) );
+VLC_EXPORT( size_t, vlc_strnlen, ( const char *, size_t ) );
 
 #if defined(SYS_BEOS) \
  || (defined (__FreeBSD__) && (__FreeBSD__ < 5))
