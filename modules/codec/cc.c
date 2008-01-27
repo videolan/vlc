@@ -51,10 +51,6 @@
 #include <errno.h>
 #include <string.h>
 
-#if !defined( strnlen )
-#define strnlen vlc_strnlen
-#endif
-
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/

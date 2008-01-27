@@ -40,6 +40,10 @@
 # define strndup vlc_strndup
 #endif
 
+#ifndef HAVE_STRNLEN
+# define strnlen vlc_strnlen
+#endif
+
 #ifndef HAVE_STRLCPY
 # define strlcpy vlc_strlcpy
 #endif

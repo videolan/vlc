@@ -436,6 +436,7 @@ vlc_strdup
 vlc_strlcpy
 vlc_strncasecmp
 vlc_strndup
+vlc_strnlen
 vlc_strtoll
 vlc_submodule_create
 __vlc_thread_create
