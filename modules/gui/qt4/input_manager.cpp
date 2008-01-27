@@ -35,6 +35,8 @@ static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param );
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
+static int InputChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 static int InterfaceChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
 static int ItemStateChanged( vlc_object_t *, const char *,
@@ -139,26 +141,24 @@ void InputManager::customEvent( QEvent *event )
 
     IMEvent *ime = static_cast<IMEvent *>(event);
 
-    if ( type == PositionUpdate_Type )
+    switch( type )
     {
+    case PositionUpdate_Type:
         UpdatePosition();
-    }
-    else if ( type == ItemChanged_Type )
-    {
+        break;
+    case ItemChanged_Type:
         UpdateMeta();
         UpdateTitle();
-    }
-    else if ( type == ItemRateChanged_Type )
-    {
-       UpdateRate();
-    }
-    else if ( type == ItemTitleChanged_Type )
-    {
-       UpdateTitle();
-    }
-    else if (type == ItemStateChanged_Type )
-    {
+        break;
+    case ItemRateChanged_Type:
+        UpdateRate();
+        break;
+    case ItemTitleChanged_Type:
+        UpdateTitle();
+        break;
+    case ItemStateChanged_Type:
        UpdateStatus();
+       break;
     }
 }
 

@@ -188,6 +188,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 
     assert( p_item->p_input->i_id == i_input_id );
 
+    /* Useful for the model */
     i_type = p_item->p_input->i_type;
     b_current = iscurrent;
 
@@ -254,7 +255,6 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                 break;
             }
         }
-
     }
 #undef ADD_META
 }
