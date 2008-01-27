@@ -251,11 +251,10 @@ void InputManager::UpdateMeta( void )
         {
             text.sprintf( "%s - %s", psz_artist, psz_name );
         }
-        free( psz_artist );
-    }
-    else
-    {
-        text.sprintf( "%s", psz_name );
+        else
+        {
+            text.sprintf( "%s", psz_name );
+        }    free( psz_artist );
     }
     free( psz_name );
     free( psz_nowplaying );
@@ -405,9 +404,9 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
     p_input = NULL;
     im = new InputManager( this, p_intf );
 
-    var_AddCallback( THEPL, "playlist-current", ItemChanged, this );
-    var_AddCallback( THEPL, "intf-change", ItemChanged, this );
+    var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
     var_AddCallback( THEPL, "playlist-current", InputChanged, this );
+    var_AddCallback( THEPL, "intf-change", ItemChanged, this );
     var_AddCallback( THEPL, "activity", InputChanged, this );
     /* src/input/input.c:2076*/
     var_AddCallback( THEPL, "item-change", ItemChanged, this );
@@ -436,8 +435,8 @@ MainInputManager::~MainInputManager()
 
 void MainInputManager::customEvent( QEvent *event )
 {
-    msg_Dbg( p_intf, "New Event" );
     int type = event->type();
+    msg_Dbg( p_intf, "New MIM Event, type: %i", type );
     if ( type != ItemChanged_Type && type != VolumeChanged_Type )
         return;
 
@@ -447,6 +446,7 @@ void MainInputManager::customEvent( QEvent *event )
         return;
     }
 
+    /* Should be ItemChanged */
     if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
         vlc_mutex_lock( &p_intf->change_lock );
@@ -474,7 +474,8 @@ void MainInputManager::customEvent( QEvent *event )
         }
         vlc_mutex_unlock( &p_intf->change_lock );
     }
-    else {
+    else
+    {
         /* we are working as a dialogs provider */
         playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf,
                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -512,7 +513,9 @@ void MainInputManager::togglePlayPause()
     getIM()->togglePlayPause();
 }
 
-/* Static functions */
+/* Static callbacks */
+
+/* IM */
 static int InterfaceChanged( vlc_object_t *p_this, const char *psz_var,
                            vlc_value_t oldval, vlc_value_t newval, void *param )
 {
@@ -557,6 +560,34 @@ static int ItemTitleChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    InputManager *im = (InputManager*)param;
+
+    IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
+    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
+}
+
+
+static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    im->b_has_audio = true;
+    return VLC_SUCCESS;
+}
+
+static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
+                        vlc_value_t n, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    im->b_has_video = true;
+    return VLC_SUCCESS;
+}
+
+/* MIM */
 static int InputChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
@@ -574,32 +605,6 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
 
     IMEvent *event = new IMEvent( VolumeChanged_Type, newval.i_int );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
-    return VLC_SUCCESS;
-}
-
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
-{
-    InputManager *im = (InputManager*)param;
-
-    IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
-    QApplication::postEvent( im, static_cast<QEvent*>(event) );
-    return VLC_SUCCESS;
-}
-
-static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
-                        vlc_value_t n, void *param )
-{
-    InputManager *im = (InputManager*)param;
-    im->b_has_audio = true;
-    return VLC_SUCCESS;
-}
-
-static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
-                        vlc_value_t n, void *param )
-{
-    InputManager *im = (InputManager*)param;
-    im->b_has_video = true;
     return VLC_SUCCESS;
 }
 
