@@ -444,7 +444,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
                 case 0xFF: /* SMF Meta Event */
                     if (HandleMeta (p_demux, tr))
                         return -1;
-                    /* We MUST NOT pass this event to forward. It would be
+                    /* We MUST NOT pass this event forward. It would be
                      * confused as a MIDI Reset real-time event. */
                     goto skip;
                 case 0xF1:
