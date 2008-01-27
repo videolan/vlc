@@ -773,14 +773,6 @@ AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
             Define if <pthread.h> defines pthread_cond_t.)],[
   AC_MSG_RESULT(no)])
 
-AC_MSG_CHECKING(for pthread_once in pthread.h)
-AC_EGREP_HEADER(pthread_once,pthread.h,[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_once.)],[
-  AC_MSG_RESULT(no)])
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
-
 AC_MSG_CHECKING(for strncasecmp in strings.h)
 AC_EGREP_HEADER(strncasecmp,strings.h,[
   AC_MSG_RESULT(yes)
