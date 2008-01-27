@@ -103,9 +103,20 @@ void InputManager::delInput()
 
 void InputManager::addCallbacks( void )
 {
+    /* We don't care about:
+       - spu-es
+       - chapter
+       - programs
+       - audio-delay
+       - spu-delay
+       - bookmark
+       - position, time, length, because they are included in intf-change
+     */
     /* src/input/input.c:1629 */
     var_AddCallback( p_input, "state", ItemStateChanged, this );
+    /* src/input/es-out.c:550 */
     var_AddCallback( p_input, "audio-es", ChangeAudio, this );
+    /* src/input/es-out.c:551 */
     var_AddCallback( p_input, "video-es", ChangeVideo, this );
     /* src/input/input.c:1765 */
     var_AddCallback( p_input, "rate", ItemRateChanged, this );
@@ -217,74 +228,74 @@ void InputManager::UpdateRate( void )
 
 void InputManager::UpdateMeta( void )
 {
-     /* Update text */
-     QString text;
-     char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
-     char *psz_nowplaying =
-         input_item_GetNowPlaying( input_GetItem( p_input ) );
-     char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-     if( EMPTY_STR( psz_name ) )
-     {
-         free( psz_name );
-         psz_name = input_item_GetName( input_GetItem( p_input ) );
-     }
-     if( !EMPTY_STR( psz_nowplaying ) )
-     {
-         text.sprintf( "%s - %s", psz_nowplaying, psz_name );
-     }
-     else if( !EMPTY_STR( psz_artist ) )
-     {
-         text.sprintf( "%s - %s", psz_artist, psz_name );
-     }
-     else
-     {
-         text.sprintf( "%s", psz_name );
-     }
-     free( psz_name );
-     free( psz_nowplaying );
-     free( psz_artist );
-     if( old_name != text )
-     {
-         emit nameChanged( text );
-         old_name=text;
-     }
+    /* Update text, name and nowplaying */
+    QString text;
 
-     QString url;
-     char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
-     url.sprintf("%s", psz_art );
-     free( psz_art );
-     if( artUrl != url )
-     {
-         artUrl = url.replace( "file://",QString("" ) );
-         emit artChanged( artUrl );
-     }
+    char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
+    if( EMPTY_STR( psz_name ) )
+    {
+        free( psz_name );
+        psz_name = input_item_GetName( input_GetItem( p_input ) );
+    }
+
+    char *psz_nowplaying =
+        input_item_GetNowPlaying( input_GetItem( p_input ) );
+    if( !EMPTY_STR( psz_nowplaying ) )
+    {
+        text.sprintf( "%s - %s", psz_nowplaying, psz_name );
+    }
+    else
+    {
+        char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
+        if( !EMPTY_STR( psz_artist ) )
+        {
+            text.sprintf( "%s - %s", psz_artist, psz_name );
+        }
+        free( psz_artist );
+    }
+    else
+    {
+        text.sprintf( "%s", psz_name );
+    }
+    free( psz_name );
+    free( psz_nowplaying );
+
+    if( old_name != text )
+    {
+        emit nameChanged( text );
+        old_name=text;
+    }
+
+    /* Update meta */
+    QString url;
+    char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
+    url.sprintf("%s", psz_art );
+    free( psz_art );
+    if( artUrl != url )
+    {
+        artUrl = url.replace( "file://",QString("" ) );
+        emit artChanged( artUrl );
+    }
+
+    /* Update ZVBI status */
 #ifdef ZVBI_COMPILED
-     /* Update teletext status*/
-     emit teletextEnabled( true );/* FIXME */
+    /* Update teletext status*/
+    emit teletextEnabled( true );/* FIXME */
 #endif
-
 }
 
+/* User update of the slider */
 void InputManager::sliderUpdate( float new_pos )
 {
-    if( hasInput() ) var_SetFloat( p_input, "position", new_pos );
+    if( hasInput() )
+        var_SetFloat( p_input, "position", new_pos );
 }
 
 void InputManager::togglePlayPause()
 {
     vlc_value_t state;
     var_Get( p_input, "state", &state );
-    state.i_int = ( ( state.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S );
-    msg_Dbg( p_input, "state : %d", state.i_int );
-    /*{
-        /* A stream is being played, pause it */
-       /* state.i_int = PAUSE_S;
-    }
-    else
-    {
-        /* Stream is paused, resume it */
-        /*state.i_int = PLAYING_S;
-    }*/
+    state.i_int = ( state.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S;
     var_Set( p_input, "state", state );
     emit statusChanged( state.i_int );
 }
