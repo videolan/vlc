@@ -438,7 +438,7 @@ static int download_signature(  vlc_object_t *p_this,
 /*
  * Verify an OpenPGP signature made on some SHA-1 hash, with some DSA public key
  */
-static int verify_signature( vlc_object_t *p_this, uint8_t *p_r, uint8_t *p_s,
+static int verify_signature( uint8_t *p_r, uint8_t *p_s,
         public_key_packet_t *p_key, uint8_t *p_hash )
 {
     /* the data to be verified (a SHA-1 hash) */
@@ -998,8 +998,7 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
             goto error;
         }
 
-        if( verify_signature( VLC_OBJECT(p_update->p_libvlc),
-                    p_new_pkey->sig.r, p_new_pkey->sig.s,
+        if( verify_signature( p_new_pkey->sig.r, p_new_pkey->sig.s,
                     &p_update->p_pkey->key, p_hash ) == VLC_SUCCESS )
         {
             free( p_hash );
@@ -1050,8 +1049,8 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
         goto error;
     }
 
-    if( verify_signature( VLC_OBJECT(p_update->p_libvlc),
-            sign.r, sign.s, &p_update->p_pkey->key, p_hash ) != VLC_SUCCESS )
+    if( verify_signature( sign.r, sign.s, &p_update->p_pkey->key, p_hash )
+            != VLC_SUCCESS )
     {
         msg_Err( p_update->p_libvlc, "BAD SIGNATURE for status file" );
         free( p_hash );
@@ -1368,8 +1367,8 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         goto end;
     }
 
-    if( verify_signature( VLC_OBJECT(p_udt), sign.r, sign.s,
-                &p_update->p_pkey->key, p_hash ) != VLC_SUCCESS )
+    if( verify_signature( sign.r, sign.s, &p_update->p_pkey->key, p_hash )
+            != VLC_SUCCESS )
     {
         utf8_unlink( psz_destfile );
         intf_UserFatal( p_udt, VLC_TRUE, _("File corrupted"),
