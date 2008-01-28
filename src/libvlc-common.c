@@ -98,7 +98,7 @@
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
 static libvlc_global_data_t   libvlc_global;
-#define p_libvlc_global (&libvlc_global)
+static libvlc_global_data_t *p_libvlc_global = &libvlc_global;
 static libvlc_int_t *    p_static_vlc = NULL;
 static volatile unsigned int i_instances = 0;
 
@@ -139,12 +139,7 @@ libvlc_global_data_t *vlc_global( void )
  *****************************************************************************/
 libvlc_int_t * vlc_current_object( int i_object )
 {
-    if( i_object )
-    {
-         return vlc_object_get( p_libvlc_global, i_object );
-    }
-
-    return p_static_vlc;
+    return i_object ? vlc_object_get( i_object ) : p_static_vlc;
 }
 
 
