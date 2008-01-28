@@ -411,6 +411,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED(p_pic);
     caca_refresh_display( p_vout->p_sys->p_dp );
 }
 

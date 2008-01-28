@@ -339,4 +339,5 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
 static void End( vout_thread_t *p_vout )
 {
+    VLC_UNUSED(p_vout);
 }
