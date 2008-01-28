@@ -515,13 +515,7 @@ fribidi-$(FRIBIDI_VERSION).tar.gz:
 
 fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 < Patches/fribidi.patch.real
-ifdef HAVE_WIN32
-	patch -p0 <Patches/fribidi-win32.patch
-endif
-ifdef HAVE_UCLIBC
-	patch -p0 < Patches/fribidi-uclibc.patch
-endif
+	patch -p0 < Patches/fribidi.patch
 
 .fribidi: fribidi .iconv
 	(cd $<; rm -f configure; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
