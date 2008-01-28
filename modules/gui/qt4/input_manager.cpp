@@ -50,6 +50,9 @@ static int VolumeChanged( vlc_object_t *, const char *,
 
 /**********************************************************************
  * InputManager implementation
+ **********************************************************************
+ * The Input Manager can be the main one around the playlist
+ * But can also be used for VLM dialog or similar
  **********************************************************************/
 
 InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
@@ -66,6 +69,9 @@ InputManager::~InputManager()
     delInput();
 }
 
+/* Define the Input used.
+   Add the callbacks on input
+   p_input is yield once here */
 void InputManager::setInput( input_thread_t *_p_input )
 {
     delInput();
@@ -84,6 +90,9 @@ void InputManager::setInput( input_thread_t *_p_input )
     }
 }
 
+/* delete Input if it ever existed.
+   Delete the callbacls on input
+   p_input is released once here */
 void InputManager::delInput()
 {
     if( p_input )
@@ -102,6 +111,7 @@ void InputManager::delInput()
     }
 }
 
+/* Add the callbacks on Input. Self explanatory */
 void InputManager::addCallbacks()
 {
     /* We don't care about:
@@ -127,6 +137,7 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "intf-change", InterfaceChanged, this );
 }
 
+/* Delete the callbacks on Input. Self explanatory */
 void InputManager::delCallbacks()
 {
     var_DelCallback( p_input, "audio-es", ChangeAudio, this );
@@ -137,15 +148,16 @@ void InputManager::delCallbacks()
     var_DelCallback( p_input, "intf-change", InterfaceChanged, this );
 }
 
+/* Convert the event from the callbacks in actions */
 void InputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    if ( type != PositionUpdate_Type &&  type != ItemChanged_Type &&
-         type != ItemRateChanged_Type && type != ItemTitleChanged_Type &&
+    if ( type != PositionUpdate_Type &&
+         type != ItemChanged_Type &&
+         type != ItemRateChanged_Type &&
+         type != ItemTitleChanged_Type &&
          type != ItemStateChanged_Type )
         return;
-
-    msg_Dbg( p_intf, "New IM Event, type: %i", type );
 
     /* Delete the input */
     if( !p_input || p_input->b_dead || p_input->b_die )
@@ -154,6 +166,7 @@ void InputManager::customEvent( QEvent *event )
          return;
     }
 
+    /* Actions */
     switch( type )
     {
     case PositionUpdate_Type:
@@ -293,6 +306,7 @@ void InputManager::sliderUpdate( float new_pos )
         var_SetFloat( p_input, "position", new_pos );
 }
 
+/* User togglePlayPause */
 void InputManager::togglePlayPause()
 {
     vlc_value_t state;
@@ -397,7 +411,8 @@ void InputManager::setRate( int new_rate )
 
 /**********************************************************************
  * MainInputManager implementation. Wrap an input manager and
- * take care of updating the main playlist input
+ * take care of updating the main playlist input.
+ * Used in the main playlist Dialog
  **********************************************************************/
 MainInputManager * MainInputManager::instance = NULL;
 
@@ -407,15 +422,16 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     p_input = NULL;
     im = new InputManager( this, p_intf );
 
-    // No necessary, I think
-    //var_AddCallback( THEPL, "intf-change", ItemChanged, im );
-
     var_AddCallback( THEPL, "item-change", PLItemChanged, this );
     var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
-    var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
 
+    var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
+
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
+
+    // No necessary, I think TODO REMOVE ME at the end
+    //var_AddCallback( THEPL, "intf-change", ItemChanged, im );
 
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
@@ -435,7 +451,7 @@ MainInputManager::~MainInputManager()
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", PLItemChanged, this );
 
-//    var_DelCallback( THEPL, "intf-change", ItemChanged, this );
+    var_DelCallback( THEPL, "playlist-current", ItemChanged, im );
 }
 
 void MainInputManager::customEvent( QEvent *event )
@@ -450,8 +466,7 @@ void MainInputManager::customEvent( QEvent *event )
         return;
     }
 
-    msg_Dbg( p_intf, "New MIM Event, type: %i", type );
-    /* Should be PLItemChanged */
+    /* Should be PLItemChanged Event */
     if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
         vlc_mutex_lock( &p_intf->change_lock );
