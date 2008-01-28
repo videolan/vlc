@@ -51,7 +51,7 @@ static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
 static vlc_bool_t osd_isVisible( osd_menu_t *p_osd );
 static osd_menu_t *osd_ParserLoad( vlc_object_t *, const char * );
-static void osd_ParserUnload( vlc_object_t *, osd_menu_t * );
+static void osd_ParserUnload( osd_menu_t * );
 
 static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 {
@@ -83,7 +83,7 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
     if( !p_menu->p_image || !p_menu->psz_file )
     {
         msg_Err( p_this, "unable to load images, aborting .." );
-        osd_ParserUnload( p_this, p_menu );
+        osd_ParserUnload( p_menu );
         return NULL;
     }
     else
@@ -100,14 +100,14 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
                                         psz_type, VLC_TRUE );
         if( !p_menu->p_parser )
         {
-            osd_ParserUnload( p_this, p_menu );
+            osd_ParserUnload( p_menu );
             return NULL;
         }
     }
     return p_menu;
 }
 
-static void osd_ParserUnload( vlc_object_t *p_this, osd_menu_t *p_menu )
+static void osd_ParserUnload( osd_menu_t *p_menu )
 {
     if( p_menu->p_image )
         image_HandlerDelete( p_menu->p_image );
@@ -240,7 +240,7 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     var_Destroy( p_osd, "osd-menu-visible" );
     var_Destroy( p_osd, "osd-menu-update" );
 
-    osd_ParserUnload( p_this, p_osd );
+    osd_ParserUnload( p_osd );
     p_osd = NULL;
     vlc_mutex_unlock( lockval.p_address );
 }
