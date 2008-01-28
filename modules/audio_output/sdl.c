@@ -229,6 +229,7 @@ static int Open ( vlc_object_t *p_this )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
+    VLC_UNUSED(p_aout);
 }
 
 /*****************************************************************************
@@ -236,6 +237,7 @@ static void Play( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Close ( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
     SDL_PauseAudio( 1 );
     SDL_CloseAudio();
     SDL_QuitSubSystem( SDL_INIT_AUDIO );
