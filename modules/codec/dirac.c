@@ -173,7 +173,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
     if( p_pic == NULL ) return NULL;
-    p_pic->b_progressive = !p_sys->p_dirac->src_params.interlace;
+    p_pic->b_progressive = !p_sys->p_dirac->src_params.source_sampling;
     p_pic->b_top_field_first = p_sys->p_dirac->src_params.topfieldfirst;
 
     p_pic->i_nb_fields = 2;
@@ -368,7 +368,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_in.video.i_frame_rate;
     p_sys->ctx.src_params.frame_rate.denominator =
         p_enc->fmt_in.video.i_frame_rate_base;
-    p_sys->ctx.src_params.interlace = 0;
+    p_sys->ctx.src_params.source_sampling = 0;
     p_sys->ctx.src_params.topfieldfirst = 0;
 
     var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
