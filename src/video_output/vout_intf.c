@@ -1197,6 +1197,8 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    VLC_UNUSED(newval); VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_Control( p_vout, VOUT_SNAPSHOT );
     return VLC_SUCCESS;
@@ -1205,6 +1207,8 @@ static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int TitleShowCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     p_vout->b_title_show = newval.b_bool;
     return VLC_SUCCESS;
@@ -1213,6 +1217,7 @@ static int TitleShowCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int TitleTimeoutCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     p_vout->i_title_timeout = (mtime_t) newval.i_int;
     return VLC_SUCCESS;
@@ -1221,6 +1226,8 @@ static int TitleTimeoutCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int TitlePositionCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     p_vout->i_title_position = newval.i_int;
     return VLC_SUCCESS;

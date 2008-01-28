@@ -1393,7 +1393,8 @@ static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
 static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    (void)p_object; (void)oldval; (void)newval;
+    VLC_UNUSED(p_object); VLC_UNUSED(oldval);
+    VLC_UNUSED(newval); VLC_UNUSED(psz_var);
 
     spu_t *p_spu = (spu_t *)p_data;
     vlc_mutex_lock( &p_spu->subpicture_lock );
