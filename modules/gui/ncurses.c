@@ -2203,6 +2203,8 @@ static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
 static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_variable);
+    VLC_UNUSED(oval); VLC_UNUSED(nval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
     playlist_t *p_playlist = pl_Get( p_intf );
     p_intf->p_sys->b_need_update = VLC_TRUE;
@@ -2542,7 +2544,7 @@ static void DrawEmptyLine( WINDOW *win, int y, int x, int w )
 {
     if( w > 0 )
     {
-        mvhline( y, x, ' ', w );
+        mvwhline( win, y, x, ' ', w );
     }
 }
 
@@ -2551,7 +2553,7 @@ static void DrawLine( WINDOW *win, int y, int x, int w )
     if( w > 0 )
     {
         attrset( A_REVERSE );
-        mvhline( y, x, ' ', w );
+        mvwhline( win, y, x, ' ', w );
         attroff( A_REVERSE );
     }
 }
