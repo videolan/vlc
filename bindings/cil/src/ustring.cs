@@ -30,7 +30,7 @@ namespace VideoLAN.LibVLC
      * Managed class for UTF-8 nul-terminated character arrays
      */
     [StructLayout (LayoutKind.Sequential)]
-    public sealed struct U8String
+    public struct U8String
     {
         public byte[] mb_str;
 
