@@ -81,11 +81,6 @@ void InputManager::setInput( input_thread_t *_p_input )
     if( p_input )
     {
         vlc_object_yield( p_input );
-        vlc_value_t val;
-        var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        b_has_video = val.i_int > 0;
-        var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        b_has_audio = val.i_int > 0;
         emit statusChanged( PLAYING_S );
         addCallbacks();
     }
@@ -292,6 +287,13 @@ void InputManager::UpdateMeta( void )
         artUrl = url.replace( "file://",QString("" ) );
         emit artChanged( artUrl );
     }
+
+    /* Has Audio, has Video Tracks ? */
+    vlc_value_t val;
+    var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    b_has_audio = val.i_int > 0;
+    var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    b_has_video = val.i_int > 0;
 
     /* Update ZVBI status */
 #ifdef ZVBI_COMPILED
