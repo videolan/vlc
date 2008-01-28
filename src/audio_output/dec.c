@@ -261,8 +261,7 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 /*****************************************************************************
  * aout_DecNewBuffer : ask for a new empty buffer
  *****************************************************************************/
-aout_buffer_t * aout_DecNewBuffer( aout_instance_t * p_aout,
-                                   aout_input_t * p_input,
+aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
                                    size_t i_nb_samples )
 {
     aout_buffer_t * p_buffer;

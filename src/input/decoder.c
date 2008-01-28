@@ -1094,8 +1094,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
             p_sys->audio.i_bytes_per_frame;
     }
 
-    p_buffer = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input,
-                                  i_samples );
+    p_buffer = aout_DecNewBuffer( p_sys->p_aout_input, i_samples );
 
     return p_buffer;
 }
