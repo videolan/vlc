@@ -115,11 +115,16 @@ static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
 
+#ifndef MODULE_NAME_IS_glx
 static IMAGE_TYPE *CreateImage    ( vout_thread_t *,
                                     Display *, EXTRA_ARGS, int, int );
+#endif
+
 #ifdef HAVE_SYS_SHM_H
+#ifndef MODULE_NAME_IS_glx
 static IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
                                     Display *, EXTRA_ARGS_SHM, int, int );
+#endif
 static int i_shm_major = 0;
 #endif
 
@@ -1613,8 +1618,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( !p_vout->b_fullscreen )
     {
-        p_win->owner_window =
-            (Window)vout_RequestWindow( p_vout, &p_win->i_x, &p_win->i_y,
+        p_win->owner_window = (Window)vout_RequestWindow( p_vout, &p_win->i_x, &p_win->i_y,
                                         &p_win->i_width, &p_win->i_height );
 
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
@@ -1682,7 +1686,8 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             XSetWMNormalHints( p_vout->p_sys->p_display,
                                p_win->base_window, &xsize_hints );
             XSetCommand( p_vout->p_sys->p_display, p_win->base_window,
-                         p_vout->p_libvlc->ppsz_argv, p_vout->p_libvlc->i_argc );
+                         (char**)p_vout->p_libvlc->ppsz_argv,
+                         p_vout->p_libvlc->i_argc );
 
             if( !var_GetBool( p_vout, "video-deco") )
             {
@@ -1970,7 +1975,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             for( i_plane = 0; i_plane < p_pic->p_sys->p_image->num_planes;
                  i_plane++ )
             {
-                p_pic->p[i_plane].p_pixels = p_pic->p_sys->p_image->data
+                p_pic->p[i_plane].p_pixels = (uint8_t*)p_pic->p_sys->p_image->data
                     + p_pic->p_sys->p_image->offsets[i_plane];
                 p_pic->p[i_plane].i_pitch =
                     p_pic->p_sys->p_image->pitches[i_plane];
@@ -1979,9 +1984,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             {
                 /* U and V inverted compared to I420
                  * Fixme: this should be handled by the vout core */
-                p_pic->U_PIXELS = p_pic->p_sys->p_image->data
+                p_pic->U_PIXELS = (uint8_t*)p_pic->p_sys->p_image->data
                     + p_pic->p_sys->p_image->offsets[2];
-                p_pic->V_PIXELS = p_pic->p_sys->p_image->data
+                p_pic->V_PIXELS = (uint8_t*)p_pic->p_sys->p_image->data
                     + p_pic->p_sys->p_image->offsets[1];
             }
             break;
@@ -1995,7 +2000,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_pic->p->i_lines = p_pic->p_sys->p_image->height;
             p_pic->p->i_visible_lines = p_pic->p_sys->p_image->height;
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+            p_pic->p->p_pixels = (uint8_t*)p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->xoffset;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
 
@@ -2015,6 +2020,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_planes = 0;
             return -1;
     }
+#else
+
+    VLC_UNUSED(p_vout); VLC_UNUSED(p_pic);
 
 #endif /* !MODULE_NAME_IS_glx */
 
@@ -2800,6 +2808,8 @@ static int InitDisplay( vout_thread_t *p_vout )
     return VLC_SUCCESS;
 }
 
+#ifndef MODULE_NAME_IS_glx
+
 #ifdef HAVE_SYS_SHM_H
 /*****************************************************************************
  * CreateShmImage: create an XImage or XvImage using shared memory extension
@@ -2959,6 +2969,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     return p_image;
 }
 
+#endif
 /*****************************************************************************
  * X11ErrorHandler: replace error handler so we can intercept some of them
  *****************************************************************************/
@@ -2980,8 +2991,10 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
         return 0;
     }
 
+#ifdef HAVE_SYS_SHM_H
     if( event->request_code == i_shm_major ) /* MIT-SHM */
         return i_shm_major = 0;
+#endif
 
     XSetErrorHandler(NULL);
     return (XSetErrorHandler(X11ErrorHandler))( display, event );
