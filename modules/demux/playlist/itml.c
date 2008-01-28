@@ -2,7 +2,7 @@
  * itml.c : iTunes Music Library import functions
  *******************************************************************************
  * Copyright (C) 2007 the VideoLAN team
- * $Id: $
+ * $Id$
  *
  * Authors: Yoann Peronneau <yoann@videolan.org>
  *
@@ -130,6 +130,7 @@ int Demux( demux_t *p_demux )
 /** \brief dummy function for demux callback interface */
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }
 
@@ -138,6 +139,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  */
 static vlc_bool_t parse_plist_node COMPLEX_INTERFACE
 {
+    VLC_UNUSED(p_track); VLC_UNUSED(psz_element);
     char *psz_name = NULL;
     char *psz_value = NULL;
     vlc_bool_t b_version_found = VLC_FALSE;
@@ -301,6 +303,7 @@ static vlc_bool_t parse_dict COMPLEX_INTERFACE
 
 static vlc_bool_t parse_plist_dict COMPLEX_INTERFACE
 {
+    VLC_UNUSED(p_track); VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     xml_elem_hnd_t pl_elements[] =
         { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_tracks_dict} },
           {"array",   SIMPLE_CONTENT,  {NULL} },
@@ -319,6 +322,7 @@ static vlc_bool_t parse_plist_dict COMPLEX_INTERFACE
 
 static vlc_bool_t parse_tracks_dict COMPLEX_INTERFACE
 {
+    VLC_UNUSED(p_track); VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     xml_elem_hnd_t tracks_elements[] =
         { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_track_dict} },
           {"key",     SIMPLE_CONTENT,  {NULL} },
@@ -336,6 +340,7 @@ static vlc_bool_t parse_tracks_dict COMPLEX_INTERFACE
 
 static vlc_bool_t parse_track_dict COMPLEX_INTERFACE
 {
+    VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     input_item_t *p_new_input = NULL;
     int i_ret = -1;
     char *psz_uri = NULL;
@@ -483,6 +488,8 @@ static vlc_bool_t add_meta( input_item_t *p_input_item,
  */
 static vlc_bool_t skip_element COMPLEX_INTERFACE
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(p_playlist); VLC_UNUSED(p_input_item);
+    VLC_UNUSED(p_track); VLC_UNUSED(p_handlers);
     char *psz_endname;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )

@@ -145,6 +145,7 @@ int Demux( demux_t *p_demux )
 /** \brief dummy function for demux callback interface */
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }
 
@@ -327,6 +328,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
  */
 static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE
 {
+    VLC_UNUSED(psz_element);
     char *psz_name=NULL;
     int i_node;
     int i_ntracks = 0;
@@ -851,6 +853,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
  */
 static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
 {
+    VLC_UNUSED(p_playlist); VLC_UNUSED(psz_element);
     input_item_t *p_new_input = NULL;
     char *psz_name = NULL;
     char *psz_value = NULL;
@@ -911,6 +914,7 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
  */
 static vlc_bool_t skip_element COMPLEX_INTERFACE
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(p_playlist); VLC_UNUSED(p_input_item);
     char *psz_endname;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )

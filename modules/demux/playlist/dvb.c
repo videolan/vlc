@@ -91,6 +91,7 @@ int E_(Import_DVB)( vlc_object_t *p_this )
  *****************************************************************************/
 void E_(Close_DVB)( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
 }
 
 /*****************************************************************************
@@ -306,5 +307,6 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }

@@ -79,6 +79,7 @@ int E_(Import_IFO)( vlc_object_t *p_this )
  *****************************************************************************/
 void E_(Close_IFO)( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
 }
 
 static int Demux( demux_t *p_demux )
@@ -105,5 +106,6 @@ static int Demux( demux_t *p_demux )
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }
