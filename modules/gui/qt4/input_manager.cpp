@@ -148,6 +148,7 @@ void InputManager::delCallbacks()
 void InputManager::customEvent( QEvent *event )
 {
     int type = event->type();
+    msg_Dbg( p_intf, "New IM Event of type: %i", type );
     if ( type != PositionUpdate_Type &&
          type != ItemChanged_Type &&
          type != ItemRateChanged_Type &&
@@ -200,7 +201,6 @@ void InputManager::UpdateTitle( void )
      /* Update navigation status */
      vlc_value_t val; val.i_int = 0;
      var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
-     msg_Dbg( p_intf, "updateTitle called" );
      if( val.i_int > 0 )
      {
          val.i_int = 0;
@@ -460,6 +460,7 @@ MainInputManager::~MainInputManager()
 void MainInputManager::customEvent( QEvent *event )
 {
     int type = event->type();
+    msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     if ( type != ItemChanged_Type && type != VolumeChanged_Type )
         return;
 
