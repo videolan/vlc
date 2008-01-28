@@ -563,6 +563,7 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
                        uint8_t *_p_request,
                        uint8_t **_pp_data, int *pi_data )
 {
+    VLC_UNUSED(p_file);
     char *p_request = (char *)_p_request;
     char **pp_data = (char **)_pp_data;
     FILE *f;
@@ -607,6 +608,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
                           char *psz_remote_addr, char *psz_remote_host,
                           uint8_t **_pp_data, int *pi_data )
 {
+    VLC_UNUSED(p_handler); VLC_UNUSED(_p_in);
     char *p_url = (char *)_p_url;
     char *p_request = (char *)_p_request;
     char **pp_data = (char **)_pp_data;
@@ -834,6 +836,10 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
                           char *psz_remote_addr, char *psz_remote_host,
                           uint8_t **pp_data, int *pi_data )
 {
+    VLC_UNUSED(p_handler); VLC_UNUSED(_p_url); VLC_UNUSED(i_type); 
+    VLC_UNUSED(p_in); VLC_UNUSED(i_in); VLC_UNUSED(psz_remote_addr); 
+    VLC_UNUSED(psz_remote_host); 
+
     char *psz_art = NULL;
     intf_thread_t *p_intf = p_args->file.p_intf;
     intf_sys_t *p_sys = p_intf->p_sys;

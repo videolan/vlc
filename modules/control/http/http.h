@@ -208,8 +208,7 @@ mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
                                  playlist_t *p_pl );
 /** This function creates a set variable with the contents of the Stream
  * and media info box */
-mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
-                             input_thread_t *p_input );
+mvar_t *E_(mvar_InfoSetNew)( char *name, input_thread_t *p_input );
 /** This function creates a set variable with the input parameters */
 mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
                                  input_thread_t *p_input,

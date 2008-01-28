@@ -1024,7 +1024,7 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                         }
                         else if( !strcmp( m.param2, "information" ) )
                         {
-                            index = E_(mvar_InfoSetNew)( p_intf, m.param1,
+                            index = E_(mvar_InfoSetNew)( m.param1,
                                                      p_intf->p_sys->p_input );
                         }
                         else if( !strcmp( m.param2, "program" )

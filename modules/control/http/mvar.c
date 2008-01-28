@@ -291,8 +291,7 @@ mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
     return s;
 }
 
-mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
-                             input_thread_t *p_input )
+mvar_t *E_(mvar_InfoSetNew)( char *name, input_thread_t *p_input )
 {
     mvar_t *s = E_(mvar_New)( name, "set" );
     int i, j;
