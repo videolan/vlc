@@ -185,6 +185,8 @@ set_current_playing_item( libvlc_media_list_player_t * p_mlp,
                           libvlc_media_list_path_t path,
                           libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     libvlc_media_descriptor_t * p_md;
     
     p_md = libvlc_media_list_item_at_path( p_mlp->p_mlist, path ); 
@@ -263,6 +265,8 @@ void libvlc_media_list_player_set_media_instance(
                                      libvlc_media_instance_t * p_mi,
                                      libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     vlc_mutex_lock( &p_mlp->object_lock );
 
     if( p_mlp->p_mi )

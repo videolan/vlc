@@ -435,6 +435,8 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
                                          libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     char * psz_meta;
 
     /* XXX: locking */
@@ -497,6 +499,8 @@ void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
                                       const libvlc_tag_t tag,
                                       libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     struct libvlc_tags_storage_t * p_ts;
 
     if( !tag || !key )
@@ -528,6 +532,8 @@ void libvlc_media_descriptor_remove_tag( libvlc_media_descriptor_t *p_md,
                                          const libvlc_tag_t tag,
                                          libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     struct libvlc_tags_storage_t * p_ts;
     int i;
 
@@ -559,6 +565,8 @@ int libvlc_media_descriptor_tags_count_for_key( libvlc_media_descriptor_t *p_md,
                                                  const char * key,
                                                  libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     struct libvlc_tags_storage_t * p_ts;
 
     if( !key )
@@ -580,6 +588,8 @@ libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
                                               const char * key,
                                               libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     struct libvlc_tags_storage_t * p_ts;
 
     if( !key )
@@ -600,6 +610,8 @@ libvlc_media_list_t *
 libvlc_media_descriptor_subitems( libvlc_media_descriptor_t * p_md,
                                   libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     if( p_md->p_subitems )
         libvlc_media_list_retain( p_md->p_subitems );
     return p_md->p_subitems;
@@ -612,6 +624,8 @@ libvlc_event_manager_t *
 libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
                                        libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     return p_md->p_event_manager;
 }
 
@@ -622,6 +636,8 @@ vlc_int64_t
 libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
                                       libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     if( p_md && p_md->p_input_item)
     {
         return input_item_GetDuration( p_md->p_input_item );
@@ -639,6 +655,8 @@ vlc_bool_t
 libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
                                        libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     if( p_md && p_md->p_input_item)
     {
         return input_item_IsPreparsed( p_md->p_input_item );
@@ -659,6 +677,8 @@ libvlc_media_descriptor_set_user_data( libvlc_media_descriptor_t * p_md,
                                        void * p_new_user_data,
                                        libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     if( p_md )
     {
         p_md->p_user_data = p_new_user_data;
@@ -674,6 +694,8 @@ void *
 libvlc_media_descriptor_get_user_data( libvlc_media_descriptor_t * p_md,
                                        libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     if( p_md )
     {
         return p_md->p_user_data;

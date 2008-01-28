@@ -52,6 +52,8 @@ static inline void playlist_mark_locked( libvlc_instance_t *p_instance,
 void libvlc_playlist_loop( libvlc_instance_t *p_instance, vlc_bool_t loop,
                            libvlc_exception_t *p_e)
 {
+    VLC_UNUSED(p_e);
+
     assert( PL );
     var_SetBool( PL, "loop", loop );
 }
@@ -60,6 +62,8 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                            int i_options, char **ppsz_options,
                            libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     int did_lock = 0;
     assert( PL );
     ///\todo Handle additionnal options
@@ -124,6 +128,8 @@ void libvlc_playlist_stop( libvlc_instance_t *p_instance,
 void libvlc_playlist_clear( libvlc_instance_t *p_instance,
                             libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     assert( PL );
     playlist_Clear( PL, playlist_was_locked( p_instance ) );
 }
@@ -187,6 +193,8 @@ int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
 int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
                                libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     assert( PL );
     return playlist_IsPlaying( PL );
 }
@@ -194,6 +202,8 @@ int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
 int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
                                  libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     assert( PL );
     return playlist_CurrentSize( PL );
 }

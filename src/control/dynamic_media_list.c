@@ -251,6 +251,8 @@ libvlc_dynamic_media_list_media_list(
                                 libvlc_dynamic_media_list_t * p_dmlist,
                                 libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     libvlc_media_list_retain( p_dmlist->p_mlist );
     return p_dmlist->p_mlist;
 }

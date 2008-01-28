@@ -55,6 +55,8 @@ static aout_instance_t *GetAOut( libvlc_instance_t *p_instance,
 void libvlc_audio_toggle_mute( libvlc_instance_t *p_instance,
                                libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     aout_VolumeMute( p_instance->p_libvlc_int, NULL );
 }
 
@@ -87,6 +89,8 @@ void libvlc_audio_set_mute( libvlc_instance_t *p_instance, vlc_bool_t mute,
 int libvlc_audio_get_volume( libvlc_instance_t *p_instance,
                              libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     audio_volume_t i_volume;
 
     aout_VolumeGet( p_instance->p_libvlc_int, &i_volume );

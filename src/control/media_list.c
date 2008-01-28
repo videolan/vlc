@@ -397,6 +397,8 @@ void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
                                      int index,
                                      libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     libvlc_media_descriptor_t * p_md;
 
     p_md = vlc_array_item_at_index( &p_mlist->items, index );
@@ -418,6 +420,8 @@ libvlc_media_list_item_at_index( libvlc_media_list_t * p_mlist,
                                  int index,
                                  libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     libvlc_media_descriptor_t * p_md;
     p_md = vlc_array_item_at_index( &p_mlist->items, index );
     libvlc_media_descriptor_retain( p_md );
@@ -434,6 +438,8 @@ int libvlc_media_list_index_of_item( libvlc_media_list_t * p_mlist,
                                      libvlc_media_descriptor_t * p_searched_md,
                                      libvlc_exception_t * p_e )
 {
+    VLC_UNUSED(p_e);
+
     libvlc_media_descriptor_t * p_md;
     int i;
     for ( i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
