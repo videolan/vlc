@@ -399,12 +399,13 @@ void InputManager::setRate( int new_rate )
  **********************************************************************/
 MainInputManager * MainInputManager::instance = NULL;
 
-MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
-                                                p_intf( _p_intf )
+MainInputManager::MainInputManager( intf_thread_t *_p_intf )
+                 : QObject(NULL), p_intf( _p_intf )
 {
     p_input = NULL;
     im = new InputManager( this, p_intf );
 
+    // No necessary, I think
     //var_AddCallback( THEPL, "intf-change", ItemChanged, im );
     //var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
 
@@ -465,7 +466,6 @@ void MainInputManager::customEvent( QEvent *event )
             p_input = THEPL->p_input;
             if( p_input && !( p_input->b_die || p_input->b_dead) )
             {
-                im->setInput( p_input );
                 emit inputChanged( p_input );
             }
             else
@@ -482,12 +482,12 @@ void MainInputManager::customEvent( QEvent *event )
         if( p_playlist )
         {
             p_input = p_playlist->p_input;
-            vlc_object_yield( p_input );
             emit inputChanged( p_input );
         }
     }
 }
 
+/* Playlist Control functions */
 void MainInputManager::stop()
 {
    playlist_Stop( THEPL );
