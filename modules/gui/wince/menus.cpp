@@ -493,7 +493,7 @@ void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
             continue;
         }
 
-        p_object = (vlc_object_t *)vlc_object_get( p_intf, pi_objects[i] );
+        p_object = (vlc_object_t *)vlc_object_get( pi_objects[i] );
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
@@ -764,7 +764,7 @@ void OnMenuEvent( intf_thread_t *p_intf, int id )
     if( p_menuitemext )
     {
         vlc_object_t *p_object = (vlc_object_t *)
-            vlc_object_get( p_intf, p_menuitemext->i_object_id );
+            vlc_object_get( p_menuitemext->i_object_id );
         if( p_object == NULL ) return;
 
         var_Set( p_object, p_menuitemext->psz_var, p_menuitemext->val );

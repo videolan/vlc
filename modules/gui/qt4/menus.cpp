@@ -54,10 +54,10 @@ static QActionGroup *currentGroup;
 // Add static entries to menus
 void addDPStaticEntry( QMenu *menu,
                        const QString text,
-                       char *help,
-                       char *icon,
+                       const char *help,
+                       const char *icon,
                        const char *member,
-                       char *shortcut )
+                       const char *shortcut )
 {
     if( !EMPTY_STR( icon ) > 0 )
     {
@@ -78,8 +78,8 @@ void addDPStaticEntry( QMenu *menu,
 void addMIMStaticEntry( intf_thread_t *p_intf,
                         QMenu *menu,
                         const QString text,
-                        char *help,
-                        char *icon,
+                        const char *help,
+                        const char *icon,
                         const char *member )
 {
     if( strlen( icon ) > 0 )
@@ -775,7 +775,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
             continue;
         }
 
-        p_object = ( vlc_object_t * )vlc_object_get( p_intf, objects[i] );
+        p_object = ( vlc_object_t * )vlc_object_get( objects[i] );
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
@@ -1046,8 +1046,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
-    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_get( p_intf,
-            itemData->i_object_id );
+    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_get( itemData->i_object_id );
     if( p_object == NULL ) return;
 
     var_Set( p_object, itemData->psz_var, itemData->val );

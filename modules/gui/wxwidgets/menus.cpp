@@ -591,8 +591,7 @@ void Menu::Populate( ArrayOfStrings & ras_varnames,
             continue;
         }
 
-        p_object = (vlc_object_t *)vlc_object_get( p_intf,
-                                                   rai_objects[i] );
+        p_object = (vlc_object_t *)vlc_object_get( rai_objects[i] );
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
@@ -1026,8 +1025,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
         wxMenuItemExt *p_menuitemext = (wxMenuItemExt *)p_menuitem;
         vlc_object_t *p_object;
 
-        p_object = (vlc_object_t *)vlc_object_get( p_intf,
-                                       p_menuitemext->i_object_id );
+        p_object = (vlc_object_t *)vlc_object_get( p_menuitemext->i_object_id );
         if( p_object == NULL ) return;
 
         wxMutexGuiLeave(); // We don't want deadlocks

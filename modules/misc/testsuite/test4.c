@@ -306,7 +306,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
     for( i = MAXLOOK * i_level; i--; )
     {
         int id = (int) (MAXOBJ * i_level * 1.0 * rand() / (RAND_MAX));
-        vlc_object_get( p_this, pp_objects[id]->i_object_id );
+        vlc_object_get( pp_objects[id]->i_object_id );
         vlc_object_release( p_this );
     }
 

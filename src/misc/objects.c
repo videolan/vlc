@@ -708,7 +708,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
  * This function looks for the object whose i_object_id field is i_id. We
  * use a dichotomy so that lookups are in log2(n).
  *****************************************************************************/
-void * __vlc_object_get( vlc_object_t *p_this, int i_id )
+void * vlc_object_get( int i_id )
 {
     int i_max, i_middle;
     vlc_object_t **pp_objects;
@@ -1074,11 +1074,11 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
             char *end;
             int i_id = strtol( newval.psz_string, &end, 0 );
             if( end != newval.psz_string )
-                p_object = vlc_object_get( p_this, i_id );
+                p_object = vlc_object_get( i_id );
             else
             {
                 /* try using the object's name to find it */
-                vlc_object_t *p_libvlc = vlc_object_get( p_this, 1 );
+                vlc_object_t *p_libvlc = vlc_object_get( 1 );
                 if( p_libvlc )
                 {
                     /* Look in p_libvlc's children tree */

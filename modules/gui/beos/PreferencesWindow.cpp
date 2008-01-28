@@ -425,7 +425,7 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
     module_t * p_module = NULL;
     if( fType == TYPE_MODULE )
     {
-        p_module = (module_t *) vlc_object_get( p_intf, fObjectId );
+        p_module = (module_t *) vlc_object_get( fObjectId );
     }
     else
     {

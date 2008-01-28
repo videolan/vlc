@@ -416,7 +416,7 @@ __vlc_object_destroy
 __vlc_object_detach
 __vlc_object_find
 __vlc_object_find_name
-__vlc_object_get
+vlc_object_get
 __vlc_object_kill
 __vlc_object_lock
 __vlc_object_release

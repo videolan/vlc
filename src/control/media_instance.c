@@ -71,9 +71,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     if( !p_mi || p_mi->i_input_id == -1 )
         return;
 
-    p_input_thread = (input_thread_t*)vlc_object_get(
-                                             p_mi->p_libvlc_instance->p_libvlc_int,
-                                             p_mi->i_input_id );
+    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
 
     p_mi->i_input_id = -1;
 
@@ -128,9 +126,7 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
         RAISENULL( "Input is NULL" );
     }
 
-    p_input_thread = (input_thread_t*)vlc_object_get(
-                                             p_mi->p_libvlc_instance->p_libvlc_int,
-                                             p_mi->i_input_id );
+    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
     if( !p_input_thread )
     {
         vlc_mutex_unlock( &p_mi->object_lock );
@@ -149,6 +145,7 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata )
 {
+    VLC_UNUSED(oldval);
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
     libvlc_event_type_t type = newval.i_int;
@@ -190,6 +187,7 @@ input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata )
 {
+    VLC_UNUSED(oldval);
     libvlc_media_instance_t * p_mi = p_userdata;
     vlc_value_t val;
 
@@ -222,6 +220,7 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata )
 {
+    VLC_UNUSED(oldval);
     libvlc_media_instance_t * p_mi = p_userdata;
     vlc_value_t val;
 
@@ -540,8 +539,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
                                          p_mi->p_md->p_input_item, VLC_FALSE );
 
     /* Released in _release() */
-    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->p_libvlc_instance->p_libvlc_int,
-                                                      p_mi->i_input_id );
+    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
 
     if( !p_input_thread )
     {

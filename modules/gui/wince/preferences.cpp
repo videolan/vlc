@@ -705,7 +705,7 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
     else
     {
         /* Get a pointer to the module */
-        p_module = (module_t *)vlc_object_get( p_intf,  i_object_id );
+        p_module = (module_t *)vlc_object_get( i_object_id );
         if( p_module->i_object_type != VLC_OBJECT_MODULE )
         {
             /* 0OOoo something went really bad */

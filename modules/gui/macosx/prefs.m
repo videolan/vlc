@@ -550,7 +550,7 @@ static VLCTreeItem *o_root_item = nil;
         /* Get a pointer to the module */
         if( i_object_category == -1 )
         {
-            p_parser = (module_t *) vlc_object_get( p_intf, i_object_id );
+            p_parser = (module_t *) vlc_object_get( i_object_id );
             if( !p_parser || ((vlc_object_t*)p_parser)->i_object_type != VLC_OBJECT_MODULE )
             {
                 /* 0OOoo something went really bad */

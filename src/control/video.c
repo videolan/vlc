@@ -147,9 +147,7 @@ libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
     var_SetInteger( p_vout, "snapshot-width", i_width );
     var_SetInteger( p_vout, "snapshot-height", i_height );
 
-    p_input_thread = (input_thread_t*)vlc_object_get(
-                                 p_mi->p_libvlc_instance->p_libvlc_int,
-                                 p_mi->i_input_id );
+    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
     if( !p_input_thread )
     {
         libvlc_exception_raise( p_e, "Input does not exist" );
@@ -278,6 +276,8 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
 
 libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
+    VLC_UNUSED(p_e);
+
     libvlc_drawable_t result;
  
     result = var_GetInteger( p_instance->p_libvlc_int, "drawable" );

@@ -900,7 +900,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         if( config_data->i_type == TYPE_MODULE )
         {
             p_module = (module_t *)
-                vlc_object_get( p_intf, config_data->i_object_id );
+                vlc_object_get( config_data->i_object_id );
         }
         else
         {
