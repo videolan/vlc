@@ -83,7 +83,7 @@ void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
     if( p_log && p_log->p_messages )
     {
         msg_Unsubscribe(p_log->p_instance->p_libvlc_int, p_log->p_messages);
-        libvlc_release( p_log->p_instance, p_e );
+        libvlc_release( p_log->p_instance );
         free(p_log);
     }
     else
