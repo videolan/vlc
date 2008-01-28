@@ -1038,7 +1038,6 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 ifdef SVN
 ffmpeg:
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
-	(cd "$@" && patch -p1 < ../Patches/ffmpeg-svn-avdevices.patch)
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
@@ -1079,7 +1078,7 @@ else
 .ffmpeg: ffmpeg .faac .lame
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
