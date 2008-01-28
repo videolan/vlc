@@ -833,6 +833,12 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
  */
 int net_SetCSCov (int fd, int sendcov, int recvcov)
 {
+#if !defined( UDPLITE_RECV_CSCOV ) && !defined( DCCP_SOCKOPT_SEND_CSCOV )
+    VLC_UNUSED(sendcov);
+    VLC_UNUSED(recvcov);
+    return VLC_EGENERIC;
+#endif
+
     int type;
 
     if (getsockopt (fd, SOL_SOCKET, SO_TYPE,
