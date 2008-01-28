@@ -384,8 +384,7 @@ static int Open( vlc_object_t *p_this )
             msg_Dbg (p_stream, "Generated SDP:\n%s", psz_sdp);
 
             p_sys->p_session =
-                sout_AnnounceRegisterSDP (p_sout, SOUT_CFG_PREFIX, psz_sdp,
-                                          dhost, p_method);
+                sout_AnnounceRegisterSDP (p_sout, psz_sdp, dhost, p_method);
             sout_MethodRelease (p_method);
         }
         free (dhost);

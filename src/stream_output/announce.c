@@ -60,9 +60,8 @@ struct announce_method_t
  * \return the new session descriptor structure
  */
 session_descriptor_t *
-sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *cfgpref,
-                          const char *psz_sdp, const char *psz_dst,
-                          announce_method_t *p_method )
+sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *psz_sdp,
+                            const char *psz_dst, announce_method_t *p_method )
 {
     session_descriptor_t *p_session;
     announce_handler_t *p_announce = (announce_handler_t*)

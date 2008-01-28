@@ -1251,7 +1251,7 @@ static int SapSetup( sout_stream_t *p_stream )
     if( ( p_sys->i_es > 0 || p_sys->p_mux ) && p_sys->psz_sdp && *p_sys->psz_sdp )
     {
         announce_method_t *p_method = sout_SAPMethod();
-        p_sys->p_session = sout_AnnounceRegisterSDP( p_sout, SOUT_CFG_PREFIX,
+        p_sys->p_session = sout_AnnounceRegisterSDP( p_sout,
                                                      p_sys->psz_sdp,
                                                      p_sys->psz_destination,
                                                      p_method );
@@ -1314,6 +1314,7 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
                           httpd_file_t *f, uint8_t *p_request,
                           uint8_t **pp_data, int *pi_data )
 {
+    VLC_UNUSED(f); VLC_UNUSED(p_request);
     sout_stream_sys_t *p_sys = (sout_stream_sys_t*)p_args;
 
     vlc_mutex_lock( &p_sys->lock_sdp );
