@@ -189,6 +189,8 @@ static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval,
                        void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
+    VLC_UNUSED(newval);
     services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)p_data;
     p_sys->b_update = VLC_TRUE;
     return VLC_SUCCESS;

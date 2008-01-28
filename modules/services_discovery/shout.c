@@ -244,4 +244,5 @@ static void Run( services_discovery_t *p_sd )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
 }

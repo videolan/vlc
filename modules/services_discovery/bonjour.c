@@ -121,6 +121,11 @@ static void resolve_callback(
 {
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
+    
+    VLC_UNUSED(interface); VLC_UNUSED(host_name);
+#ifdef HAVE_AVAHI_06
+    VLC_UNUSED(flags);
+#endif
 
 #ifdef HAVE_AVAHI_06
     if( event == AVAHI_RESOLVER_FAILURE )
@@ -216,6 +221,10 @@ static void browse_callback(
 #endif
     void* userdata )
 {
+    VLC_UNUSED(b);
+#ifdef HAVE_AVAHI_06
+    VLC_UNUSED(flags);
+#endif
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     if( event == AVAHI_BROWSER_NEW )

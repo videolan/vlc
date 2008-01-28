@@ -191,7 +191,7 @@ static void Close( vlc_object_t *p_this )
 
 static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
 #ifdef HAVE_HAL_1
-                ,char* psz_device
+                , const char* psz_device
 #endif
                     )
 {
@@ -212,7 +212,7 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
 #endif
 }
 
-static void AddDvd( services_discovery_t *p_sd, char *psz_device )
+static void AddDvd( services_discovery_t *p_sd, const char *psz_device )
 {
     char *psz_name;
     char *psz_uri;
@@ -247,7 +247,7 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 }
 
 #ifdef HAVE_HAL_1
-static void DelItem( services_discovery_t *p_sd, char* psz_udi )
+static void DelItem( services_discovery_t *p_sd, const char* psz_udi )
 {
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
@@ -267,7 +267,7 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
 }
 #endif
 
-static void AddCdda( services_discovery_t *p_sd, char *psz_device )
+static void AddCdda( services_discovery_t *p_sd, const char *psz_device )
 {
     char *psz_uri;
     char *psz_blockdevice;
@@ -294,7 +294,7 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
     vlc_gc_decref( p_input );
 }
 
-static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
+static void ParseDevice( services_discovery_t *p_sd, const char *psz_device )
 {
     char *psz_disc_type;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
@@ -381,11 +381,13 @@ static void Run( services_discovery_t *p_sd )
 #ifdef HAVE_HAL_1
 void DeviceAdded( LibHalContext *p_ctx, const char *psz_udi )
 {
-        ParseDevice( p_sd_global, (char*) psz_udi );
+    VLC_UNUSED(p_ctx);
+    ParseDevice( p_sd_global, psz_udi );
 }
 void DeviceRemoved( LibHalContext *p_ctx, const char *psz_udi )
 {
-        DelItem( p_sd_global, (char*) psz_udi );
+    VLC_UNUSED(p_ctx);
+    DelItem( p_sd_global, psz_udi );
 }
 #endif
 
