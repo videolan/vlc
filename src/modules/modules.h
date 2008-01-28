@@ -163,6 +163,6 @@ void module_Unload (module_handle_t);
 void   CacheMerge (vlc_object_t *, module_t *, module_t *);
 void   CacheLoad  (vlc_object_t * );
 void   CacheSave  (vlc_object_t * );
-module_cache_t * CacheFind (vlc_object_t *, const char *, int64_t, int64_t);
+module_cache_t * CacheFind (const char *, int64_t, int64_t);
 
 #endif /* !__LIBVLC_MODULES_H */

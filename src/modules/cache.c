@@ -700,7 +700,7 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 /*****************************************************************************
  * CacheFind: finds the cache entry corresponding to a file
  *****************************************************************************/
-module_cache_t *CacheFind( vlc_object_t *p_this, const char *psz_file,
+module_cache_t *CacheFind( const char *psz_file,
                            int64_t i_time, int64_t i_size )
 {
     module_cache_t **pp_cache;

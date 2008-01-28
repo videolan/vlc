@@ -1084,7 +1084,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
      * Check our plugins cache first then load plugin if needed
      */
     p_cache_entry =
-        CacheFind( p_this, psz_file, i_file_time, i_file_size );
+        CacheFind( psz_file, i_file_time, i_file_size );
 
     if( !p_cache_entry )
     {
