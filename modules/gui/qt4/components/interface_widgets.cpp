@@ -590,6 +590,10 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
+
+    CONNECT( THEMIM->getIM(), statusChanged( int ), this, updateInput() );
+
+    updateInput();
 }
 
 ControlsWidget::~ControlsWidget()
@@ -678,11 +682,13 @@ void ControlsWidget::updateVolume()
         volumeSlider->setValue( i_volume );
         b_my_volume = false;
     }
+}
 
+void ControlsWidget::updateInput()
+{
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
-    //enableVideo( THEMIM->getIM()->hasVideo() );
-    enableVideo( true );
+    enableVideo( THEMIM->getIM()->hasVideo() );
 }
 
 void ControlsWidget::setStatus( int status )

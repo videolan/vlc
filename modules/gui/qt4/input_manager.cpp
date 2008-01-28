@@ -475,6 +475,7 @@ void MainInputManager::customEvent( QEvent *event )
         {
             im->delInput();
             emit inputChanged( NULL );
+            p_input = NULL;
         }
 
         if( !p_input )

@@ -182,6 +182,7 @@ private slots:
     void next();
     void updateVolume( int );
     void updateVolume( void );
+    void updateInput();
     void fullscreen();
     void extSettings();
     void faster();
