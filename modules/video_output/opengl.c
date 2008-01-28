@@ -145,7 +145,7 @@ static int SendEvents    ( vlc_object_t *, char const *,
 
 #ifdef OPENGL_MORE_EFFECT
 static float Z_Compute   ( float, int, float, float );
-static void Transform    ( float, int, float, float, int, int, int, int, double *, double * );
+static void Transform    ( int, float, float, int, int, int, int, double *, double * );
 
 /*****************************************************************************
  * Module descriptor
@@ -699,6 +699,7 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED(p_pic);
     vout_sys_t *p_sys = p_vout->p_sys;
 
     /* On Win32/GLX, we do this the usual way:
@@ -763,7 +764,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  *   Transform: Calculate the distorted grid coordinates
  *****************************************************************************/
-static void Transform(float p, int distortion, float width, float height,int i, int j, int i_visible_width, int i_visible_height, double *ix,double *iy)
+static void Transform( int distortion, float width, float height,int i, int j, int i_visible_width, int i_visible_height, double *ix, double *iy )
 {
     double x,y,xnew,ynew;
     double r,theta,rnew,thetanew;
@@ -872,6 +873,7 @@ static float Z_Compute(float p, int distortion, float x, float y)
  *****************************************************************************/
 static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED(p_pic);
     vout_sys_t *p_sys = p_vout->p_sys;
     float f_width, f_height, f_x, f_y;
 
@@ -954,7 +956,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                 int i_k = ((i_m % 4) == 1) || ((i_m % 4) == 2);
                 int i_l = ((i_m % 4) == 2) || ((i_m % 4) == 3);
 
-                Transform(f_p, i_distortion, f_width, f_height, i_i + i_k * i_n_x, i_j + i_l * i_n_y, p_vout->fmt_out.i_visible_width, p_vout->fmt_out.i_visible_height, &d_x, &d_y);
+                Transform( i_distortion, f_width, f_height, i_i + i_k * i_n_x, i_j + i_l * i_n_y, p_vout->fmt_out.i_visible_width, p_vout->fmt_out.i_visible_height, &d_x, &d_y);
                 glTexCoord2f(f_x + d_x, f_y + d_y);
                 d_x =  - 1.0 + 2.0 * ((double)(i_k * i_n_x + i_i) / (double)p_vout->fmt_out.i_visible_width);
                 d_y =    1.0 - 2.0 * (((double)i_l * i_n_y + i_j) / (double)p_vout->fmt_out.i_visible_height);
@@ -1106,5 +1108,6 @@ static int InitTextures( vout_thread_t *p_vout )
 static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     return var_Set( (vlc_object_t *)_p_vout, psz_var, newval );
 }
