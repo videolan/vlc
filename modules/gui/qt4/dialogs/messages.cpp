@@ -161,7 +161,7 @@ bool MessagesDialog::save()
     QString saveLogFileName = QFileDialog::getSaveFileName(
             this, qtr( "Choose a filename to save the logs under..." ),
             qfu( p_intf->p_libvlc->psz_homedir ),
-            "Texts / Logs (*.log *.txt);; All (*.*) " );
+            qtr( "Texts / Logs (*.log *.txt);; All (*.*) ") );
 
     if( !saveLogFileName.isNull() )
     {
