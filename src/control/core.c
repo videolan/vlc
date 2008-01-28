@@ -146,7 +146,7 @@ void libvlc_retain( libvlc_instance_t *p_instance )
     vlc_mutex_unlock( &p_instance->instance_lock );
 }
 
-void libvlc_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+void libvlc_release( libvlc_instance_t *p_instance )
 {
     vlc_mutex_t *lock = &p_instance->instance_lock;
     int refs;

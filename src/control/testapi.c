@@ -71,10 +71,8 @@ static void test_core (const char ** argv, int argc)
     catch ();
 
     libvlc_retain (vlc);
-    libvlc_release (vlc, &ex);
-    catch ();
-    libvlc_release (vlc, &ex);
-    catch ();
+    libvlc_release (vlc);
+    libvlc_release (vlc);
 }
 
 static void test_media_list (const char ** argv, int argc)

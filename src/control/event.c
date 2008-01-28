@@ -103,7 +103,7 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
     FOREACH_END()
     ARRAY_RESET( p_em->listeners_groups );
 
-    libvlc_release( p_em->p_libvlc_instance, NULL );
+    libvlc_release( p_em->p_libvlc_instance );
     free( p_em );
 }
 

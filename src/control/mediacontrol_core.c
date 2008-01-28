@@ -76,10 +76,7 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
 void
 mediacontrol_exit( mediacontrol_Instance *self )
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-
-    libvlc_release( self->p_instance, &ex );
+    libvlc_release( self->p_instance );
 }
 
 libvlc_instance_t*

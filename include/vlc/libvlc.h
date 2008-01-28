@@ -123,7 +123,7 @@ VLC_PUBLIC_API int libvlc_get_vlc_id( libvlc_instance_t *p_instance );
  * if it reaches zero.
  * \param p_instance the instance to destroy
  */
-VLC_PUBLIC_API void libvlc_release( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_release( libvlc_instance_t * );
 
 /**
  * Increments the reference count of a libvlc instance.

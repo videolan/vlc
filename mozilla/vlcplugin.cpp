@@ -269,7 +269,7 @@ VlcPlugin::~VlcPlugin()
     if( libvlc_log )
         libvlc_log_close(libvlc_log, NULL);
     if( libvlc_instance )
-        libvlc_release(libvlc_instance, NULL );
+        libvlc_release(libvlc_instance);
 }
 
 /*****************************************************************************
