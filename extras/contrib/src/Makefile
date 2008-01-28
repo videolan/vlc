@@ -688,7 +688,6 @@ DISTCLEAN_PKG += libogg-$(OGG_VERSION).tar.gz
 #	cvs -d $(OGG_CVSROOT) login
 #	cvs -d $(OGG_CVSROOT) co vorbis
 #	(cd $@; ./autogen.sh)
-#	patch -p0 < Patches/vorbis.patch
 
 libvorbis-$(VORBIS_VERSION).tar.gz:
 	$(WGET) $(VORBIS_URL)
@@ -1471,7 +1470,6 @@ wxWidgets-$(WXWIDGETS_VERSION).tar.gz:
 wxwidgets: wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	(cd wxwidgets; patch -p0 < ../Patches/wxwidgets_uri.patch)
-#	(cd wxwidgets; patch -p1 <../Patches/wxMSW-win32.patch)
 
 .wxwidgets: wxwidgets
 	(cd wxwidgets; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-optimise --disable-debug --enable-unicode --disable-threads --disable-gif --disable-pcx --disable-iff --disable-pnm --without-zlib  --without-libpng --without-libjpeg --without-libtiff --without-regex  --disable-zipstream --disable-fs_zip --enable-no_rtti  --enable-no_exceptions --disable-exceptions --disable-stl --disable-html --without-expat --disable-protocols --disable-protocol --disable-xrc --disable-sound --disable-dialupman --disable-mediactrl  --disable-joystick --disable-grid --disable-datepick --disable-postscript--disable-filesystem --disable-fileproto --disable-ipc --disable-sockets --disable-precomp-headers && make && make install)
