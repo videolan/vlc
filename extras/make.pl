@@ -37,6 +37,8 @@ while(<STDIN>)
         $line =~ /^srcdir=.*/ ||
         $line =~ /^.* (lib[A-z0-9-_]*plugin.so).*/ ||
 	$line =~ /^\sgcc\s-std=.*/ ||
+    $line =~ /^\sg\+\+\s.*/ ||
+#    $line =~ /^.*moc.*/ ||
 	$line =~ /^.*libtool.*\-o\s(lib.*\.la).*/ ||
         $line =~ /^.*rm\s\-f\s(.*)/ ||
 	$line =~ /^rm\s-fr\s(.*)/ ||
