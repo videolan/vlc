@@ -98,13 +98,7 @@ static void * DestroySharedLibraryAtExit( void )
 - (void)dealloc 
 {
     if( instance ) 
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
-        
-        libvlc_release( instance, &ex );
-        libvlc_exception_clear( &ex );
-    }
+        libvlc_release( instance );
     
     if( self == sharedLibrary ) 
         sharedLibrary = nil;
