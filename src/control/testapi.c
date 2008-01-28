@@ -103,7 +103,7 @@ static void test_media_list (const char ** argv, int argc)
 
     libvlc_media_list_release (ml);
 
-    libvlc_release (vlc, &ex);
+    libvlc_release (vlc);
     catch ();
 }
 
