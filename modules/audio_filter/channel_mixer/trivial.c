@@ -111,6 +111,7 @@ static void SparseCopy( int32_t * p_dest, const int32_t * p_src, size_t i_len,
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    VLC_UNUSED(p_aout);
     int i_input_nb = aout_FormatNbChannels( &p_filter->input );
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
     int32_t * p_dest = (int32_t *)p_out_buf->p_buffer;

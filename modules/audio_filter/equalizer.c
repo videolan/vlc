@@ -122,7 +122,7 @@ static void DoWork( aout_instance_t *, aout_filter_t *,
 
 #define EQZ_IN_FACTOR (0.25)
 static int  EqzInit( aout_filter_t *, int );
-static void EqzFilter( aout_instance_t *,aout_filter_t *, float *, float *,
+static void EqzFilter( aout_filter_t *, float *, float *,
                         int, int );
 static void EqzClean( aout_filter_t * );
 
@@ -197,10 +197,11 @@ static void Close( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    VLC_UNUSED(p_aout);
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
-    EqzFilter( p_aout, p_filter, (float*)p_out_buf->p_buffer,
+    EqzFilter( p_filter, (float*)p_out_buf->p_buffer,
                (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
                aout_FormatNbChannels( &p_filter->input ) );
 }
@@ -385,8 +386,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     return VLC_SUCCESS;
 }
 
-static void EqzFilter( aout_instance_t *p_aout,
-                       aout_filter_t *p_filter, float *out, float *in,
+static void EqzFilter( aout_filter_t *p_filter, float *out, float *in,
                        int i_samples, int i_channels )
 {
     aout_filter_sys_t *p_sys = p_filter->p_sys;
@@ -469,6 +469,7 @@ static void EqzClean( aout_filter_t *p_filter )
 static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
 
@@ -525,6 +526,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
 
     if( newval.f_float < -20.0 )
@@ -539,6 +541,7 @@ static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
     char *psz_bands = newval.psz_string;
 

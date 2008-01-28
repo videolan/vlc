@@ -242,6 +242,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *Float32toS24( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     float *p_in = (float *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
@@ -270,6 +271,7 @@ static block_t *Float32toS24( filter_t *p_filter, block_t *p_block )
 
 static block_t *Float32toS16( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     float *p_in = (float *)p_block->p_buffer;
     int16_t *p_out = (int16_t *)p_in;
@@ -298,6 +300,7 @@ static block_t *Float32toS16( filter_t *p_filter, block_t *p_block )
 
 static block_t *Float32toU16( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     float *p_in = (float *)p_block->p_buffer;
     uint16_t *p_out = (uint16_t *)p_in;
@@ -357,6 +360,7 @@ static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
 
 static block_t *S24toS16( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
@@ -498,6 +502,7 @@ static block_t *S16toS24( filter_t *p_filter, block_t *p_block )
 
 static block_t *S16toS8( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     int16_t *p_in = (int16_t *)p_block->p_buffer;
     int8_t *p_out = (int8_t *)p_in;
@@ -510,6 +515,7 @@ static block_t *S16toS8( filter_t *p_filter, block_t *p_block )
 }
 static block_t *S16toU8( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     int16_t *p_in = (int16_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
@@ -522,6 +528,7 @@ static block_t *S16toU8( filter_t *p_filter, block_t *p_block )
 }
 static block_t *S16toU16( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     int16_t *p_in = (int16_t *)p_block->p_buffer;
     uint16_t *p_out = (uint16_t *)p_in;
@@ -534,6 +541,7 @@ static block_t *S16toU16( filter_t *p_filter, block_t *p_block )
 
 static block_t *U16toS8( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint16_t *p_in = (uint16_t *)p_block->p_buffer;
     int8_t *p_out = (int8_t *)p_in;
@@ -546,6 +554,7 @@ static block_t *U16toS8( filter_t *p_filter, block_t *p_block )
 }
 static block_t *U16toU8( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint16_t *p_in = (uint16_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
@@ -558,6 +567,7 @@ static block_t *U16toU8( filter_t *p_filter, block_t *p_block )
 }
 static block_t *U16toS16( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint16_t *p_in = (uint16_t *)p_block->p_buffer;
     int16_t *p_out = (int16_t *)p_in;
@@ -570,6 +580,7 @@ static block_t *U16toS16( filter_t *p_filter, block_t *p_block )
 
 static block_t *S8toU8( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     int8_t *p_in = (int8_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
@@ -581,6 +592,7 @@ static block_t *S8toU8( filter_t *p_filter, block_t *p_block )
 }
 static block_t *U8toS8( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     int8_t *p_out = (int8_t *)p_in;
@@ -722,6 +734,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
  *****************************************************************************/
 static block_t *Swap16( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     uint8_t tmp;
@@ -739,6 +752,7 @@ static block_t *Swap16( filter_t *p_filter, block_t *p_block )
 
 static block_t *Swap24( filter_t *p_filter, block_t *p_block )
 {
+    VLC_UNUSED(p_filter);
     int i;
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     uint8_t tmp;

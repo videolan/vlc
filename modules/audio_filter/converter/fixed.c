@@ -133,6 +133,7 @@ static inline int16_t s24_to_s16_pcm(vlc_fixed_t sample)
 static void Do_F32ToS16( aout_instance_t * p_aout, aout_filter_t * p_filter,
                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    VLC_UNUSED(p_aout);
     int i;
     vlc_fixed_t * p_in = (vlc_fixed_t *)p_in_buf->p_buffer;
     int16_t * p_out = (int16_t *)p_out_buf->p_buffer;
@@ -175,6 +176,7 @@ static int Create_S16ToF32( vlc_object_t *p_this )
 static void Do_S16ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    VLC_UNUSED(p_aout);
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
@@ -220,6 +222,7 @@ static int Create_U8ToF32( vlc_object_t *p_this )
 static void Do_U8ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                         aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    VLC_UNUSED(p_aout);
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
