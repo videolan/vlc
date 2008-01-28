@@ -275,7 +275,7 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
 
     msg_Dbg (obj, "accepted socket %d (from socket %d)", fd, lfd);
     net_SetupSocket (fd);
-    return 0;
+    return fd;
 }
 
 
