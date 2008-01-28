@@ -154,7 +154,7 @@ index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_m
 }
 
 static vlc_bool_t
-item_is_already_added( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md )
+item_is_already_added( libvlc_media_descriptor_t * p_md )
 {
     libvlc_media_list_t * p_submlist;
 
@@ -176,7 +176,7 @@ items_subitems_added( const libvlc_event_t * p_event, void * user_data )
     libvlc_media_list_view_t * p_mlv = user_data;
     int index;
     p_md = p_event->p_obj;
-    if( !item_is_already_added( p_mlv, p_md ) )
+    if( !item_is_already_added( p_md ) )
     {
         index = index_of_item( p_mlv, p_md );
         trace("%d\n", index);
