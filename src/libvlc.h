@@ -109,7 +109,6 @@ struct vlc_object_internals_t
     vlc_bool_t      b_thread;
 
     /* Objects thread synchronization */
-    vlc_bool_t      b_signaled;
     int             pipes[2];
     vlc_spinlock_t  spin;
 

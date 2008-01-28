@@ -450,10 +450,10 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
     vlc_spin_destroy( &p_priv->spin );
-    if( p_priv->pipes[0] != -1 )
-        close( p_priv->pipes[0] );
     if( p_priv->pipes[1] != -1 )
         close( p_priv->pipes[1] );
+    if( p_priv->pipes[0] != -1 )
+        close( p_priv->pipes[0] );
 
     /* global is not dynamically allocated by vlc_object_create */
     if( p_this->i_object_type != VLC_OBJECT_GLOBAL )
@@ -528,25 +528,22 @@ error:
 #endif /* WIN32 */
 
 /**
- * Returns the readable end of a pipe that becomes readable whenever
- * an object is signaled. This can be used to wait for VLC object events
- * inside select(), poll() loops or frameworks providing an event loop.
+ * Returns the readable end of a pipe that becomes readable once termination
+ * of the object is requested (vlc_object_kill()).
+ * This can be used to wake-up out of a select() or poll() event loop, such
+ * typically when doing network I/O.
  *
  * Note that the pipe will remain the same for the lifetime of the object.
- * DO NOT close it yourself. Ever.
+ * DO NOT read the pipe nor close it yourself. Ever.
  *
- * DO NOT try to read from the pipe either: call vlc_object_wait() instead.
- * Assuming the pipe is readable, vlc_object_wait() will not block.
- * Also note that, as with vlc_object_wait(), there may be spurious wakeups.
- *
- * @param obj object that would be signaled
+ * @param obj object that would be "killed"
  * @return a readable pipe descriptor, or -1 on error.
  */
 int __vlc_object_waitpipe( vlc_object_t *obj )
 {
     int pfd[2] = { -1, -1 };
     struct vlc_object_internals_t *internals = obj->p_internals;
-    vlc_bool_t race = VLC_FALSE, signaled = VLC_FALSE;
+    vlc_bool_t killed = VLC_FALSE;
 
     vlc_spin_lock (&internals->spin);
     if (internals->pipes[0] == -1)
@@ -559,26 +556,34 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
             return -1;
 
         vlc_spin_lock (&internals->spin);
-        signaled = internals->b_signaled;
         if (internals->pipes[0] == -1)
         {
             internals->pipes[0] = pfd[0];
             internals->pipes[1] = pfd[1];
+            pfd[0] = pfd[1] = -1;
         }
-        else
-            race = VLC_TRUE;
+        killed = obj->b_die;
     }
     vlc_spin_unlock (&internals->spin);
 
-    if (race)
-    {   /* Race condition: two threads call pipe() - unlikely */
-        close (pfd[0]);
-        close (pfd[1]);
+    if (killed)
+    {
+        /* Race condition: vlc_object_kill() already invoked! */
+        int fd;
+
+        vlc_spin_lock (&internals->spin);
+        fd = internals->pipes[1];
+        internals->pipes[1] = -1;
+        vlc_spin_unlock (&internals->spin);
+        if (fd != -1)
+            close (fd);
     }
 
-    if (signaled)
-        /* Race condition: lc_object_signal() already invoked! */
-        while (write (internals->pipes[1], &(char){ 0 }, 1) < 0);
+    /* Race condition: two threads call pipe() - unlikely */
+    if (pfd[0] != -1)
+        close (pfd[0]);
+    if (pfd[1] != -1)
+        close (pfd[1]);
 
     return internals->pipes[0];
 }
@@ -593,19 +598,8 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
  */
 vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
 {
-    int fd;
-
     vlc_assert_locked( &obj->object_lock );
-
-    fd = obj->p_internals->pipes[0];
-    if (fd != -1)
-    {
-        while (read (fd, &(char){ 0 }, 1)  < 0);
-        return obj->b_die;
-    }
-
     vlc_cond_wait( &obj->object_wait, &obj->object_lock );
-    obj->p_internals->b_signaled = VLC_FALSE;
     return obj->b_die;
 }
 
@@ -667,19 +661,7 @@ vlc_bool_t __vlc_object_alive( vlc_object_t *obj )
  */
 void __vlc_object_signal_unlocked( vlc_object_t *obj )
 {
-    struct vlc_object_internals_t *internals = obj->p_internals;
-    int fd;
-
     vlc_assert_locked (&obj->object_lock);
-
-    vlc_spin_lock (&internals->spin);
-    fd = internals->pipes[1];
-    internals->b_signaled = VLC_TRUE;
-    vlc_spin_unlock (&internals->spin);
-
-    if( fd != -1 )
-        while( write( fd, &(char){ 0 }, 1 ) < 0 );
-
     vlc_cond_signal( &obj->object_wait );
 }
 
@@ -690,8 +672,19 @@ void __vlc_object_signal_unlocked( vlc_object_t *obj )
  */
 void __vlc_object_kill( vlc_object_t *p_this )
 {
+    struct vlc_object_internals_t *internals = p_this->p_internals;
+    int fd;
+
     vlc_mutex_lock( &p_this->object_lock );
     p_this->b_die = VLC_TRUE;
+
+    vlc_spin_lock (&internals->spin);
+    fd = internals->pipes[1];
+    internals->pipes[1] = -1;
+    vlc_spin_unlock (&internals->spin);
+
+    if( fd != -1 )
+        close (fd);
 
     if( p_this->i_object_type == VLC_OBJECT_LIBVLC )
         for( int i = 0; i < p_this->i_children ; i++ )
