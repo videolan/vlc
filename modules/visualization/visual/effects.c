@@ -45,6 +45,8 @@
 int dummy_Run( visual_effect_t * p_effect, aout_instance_t *p_aout,
                aout_buffer_t * p_buffer , picture_t * p_picture)
 {
+    VLC_UNUSED(p_effect); VLC_UNUSED(p_aout); VLC_UNUSED(p_buffer);
+    VLC_UNUSED(p_picture);
     return 0;
 }
 
@@ -786,6 +788,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               aout_buffer_t * p_buffer , picture_t * p_picture)
 {
+    VLC_UNUSED(p_aout);
     int i_index;
     float *p_sample ;
     uint8_t *ppp_area[2][3];
