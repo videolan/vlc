@@ -35,7 +35,7 @@ static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param );
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
-static int InputChanged( vlc_object_t *, const char *,
+static int PLItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int InterfaceChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
@@ -90,18 +90,19 @@ void InputManager::delInput()
     {
         delCallbacks();
         vlc_object_release( p_input );
+        i_old_playing_status = END_S;
+
+        old_name=qfu("");
+        artUrl = qfu("");
+        emit positionUpdated( 0.0, 0 ,0 );
+        emit statusChanged( END_S );
+        emit nameChanged( "" );
+        emit artChanged( "" );
         p_input = NULL;
     }
-    i_old_playing_status = END_S;
-    old_name=qfu("");
-    artUrl = qfu("");
-    emit positionUpdated( 0.0, 0 ,0 );
-    emit statusChanged( END_S );
-    emit nameChanged( "" );
-    emit artChanged( "" );
 }
 
-void InputManager::addCallbacks( void )
+void InputManager::addCallbacks()
 {
     /* We don't care about:
        - spu-es
@@ -126,7 +127,7 @@ void InputManager::addCallbacks( void )
     var_AddCallback( p_input, "intf-change", InterfaceChanged, this );
 }
 
-void InputManager::delCallbacks( void )
+void InputManager::delCallbacks()
 {
     var_DelCallback( p_input, "audio-es", ChangeAudio, this );
     var_DelCallback( p_input, "video-es", ChangeVideo, this );
@@ -144,13 +145,12 @@ void InputManager::customEvent( QEvent *event )
          type != ItemStateChanged_Type )
         return;
 
+    /* Delete the input */
     if( !p_input || p_input->b_dead || p_input->b_die )
     {
          delInput();
          return;
     }
-
-    IMEvent *ime = static_cast<IMEvent *>(event);
 
     switch( type )
     {
@@ -254,7 +254,8 @@ void InputManager::UpdateMeta( void )
         else
         {
             text.sprintf( "%s", psz_name );
-        }    free( psz_artist );
+        }
+        free( psz_artist );
     }
     free( psz_name );
     free( psz_nowplaying );
@@ -265,7 +266,7 @@ void InputManager::UpdateMeta( void )
         old_name=text;
     }
 
-    /* Update meta */
+    /* Update Art meta */
     QString url;
     char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
     url.sprintf("%s", psz_art );
@@ -404,12 +405,12 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf ) : QObject(NULL),
     p_input = NULL;
     im = new InputManager( this, p_intf );
 
-    var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
-    var_AddCallback( THEPL, "playlist-current", InputChanged, this );
-    var_AddCallback( THEPL, "intf-change", ItemChanged, this );
-    var_AddCallback( THEPL, "activity", InputChanged, this );
-    /* src/input/input.c:2076*/
-    var_AddCallback( THEPL, "item-change", ItemChanged, this );
+    //var_AddCallback( THEPL, "intf-change", ItemChanged, im );
+    //var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
+
+    var_AddCallback( THEPL, "item-change", PLItemChanged, this );
+    var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
+    var_AddCallback( THEPL, "activity", PLItemChanged, this );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
 
@@ -425,12 +426,14 @@ MainInputManager::~MainInputManager()
        vlc_object_release( p_input );
        emit inputChanged( NULL );
     }
+
     var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
-    var_DelCallback( THEPL, "playlist-current", InputChanged, this );
-    var_DelCallback( THEPL, "activity", InputChanged, this );
-    var_DelCallback( THEPL, "playlist-current", ItemChanged, this );
-    var_DelCallback( THEPL, "intf-change", ItemChanged, this );
-    var_DelCallback( THEPL, "item-change", ItemChanged, this );
+
+    var_DelCallback( THEPL, "playlist-current", PLItemChanged, this );
+    var_DelCallback( THEPL, "activity", PLItemChanged, this );
+    var_DelCallback( THEPL, "item-change", PLItemChanged, this );
+
+//    var_DelCallback( THEPL, "intf-change", ItemChanged, this );
 }
 
 void MainInputManager::customEvent( QEvent *event )
@@ -446,15 +449,13 @@ void MainInputManager::customEvent( QEvent *event )
         return;
     }
 
-    /* Should be ItemChanged */
+    /* Should be PLItemChanged */
     if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
         vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || p_input->b_die ) )
         {
-            var_DelCallback( p_input, "state", InputChanged, this );
-            vlc_object_release( p_input );
-            p_input = NULL;
+            im->delInput();
             emit inputChanged( NULL );
         }
 
@@ -464,8 +465,7 @@ void MainInputManager::customEvent( QEvent *event )
             p_input = THEPL->p_input;
             if( p_input && !( p_input->b_die || p_input->b_dead) )
             {
-                vlc_object_yield( p_input );
-                var_AddCallback( p_input, "state", InputChanged, this );
+                im->setInput( p_input );
                 emit inputChanged( p_input );
             }
             else
@@ -588,7 +588,7 @@ static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
 }
 
 /* MIM */
-static int InputChanged( vlc_object_t *p_this, const char *psz_var,
+static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     MainInputManager *im = (MainInputManager*)param;
