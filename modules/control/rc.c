@@ -103,7 +103,7 @@ static int  Statistics   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
 static int updateStatistics( intf_thread_t *, input_item_t *);
-#ifdef UPDATE_CHECK
+#if 0 && defined( UPDATE_CHECK )
 static void checkUpdates( intf_thread_t *p_intf );
 #endif
 
@@ -613,7 +613,7 @@ static void Run( intf_thread_t *p_intf )
         }
         else
         {
-            psz_arg = "";
+            psz_arg = (char*)"";
         }
 
         /* module specfic commands: @<module name> <command> <args...> */
@@ -767,7 +767,7 @@ static void Run( intf_thread_t *p_intf )
 
             Help( p_intf, b_longhelp );
         }
-#ifdef UPDATE_CHECK
+#if 0 && defined( UPDATE_CHECK )
         else if( !strcmp( psz_cmd, "check-updates" ) )
         {
             checkUpdates( p_intf );
@@ -942,7 +942,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| @name mosaic-cols #. . . . . . . . . . .number of cols"));
         msg_rc(_("| @name mosaic-order id(,id)* . . . . order of pictures "));
         msg_rc(_("| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
-#ifdef UPDATE_CHECK
+#if 0 && defined( UPDATE_CHECK )
         msg_rc(  "| ");
         msg_rc(_("| check-updates [newer] [equal] [older]\n"
                  "|               [undef] [info] [source] [binary] [plugin]"));
@@ -963,6 +963,8 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
 static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
     input_thread_t *p_input = NULL;
 
@@ -981,6 +983,7 @@ static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
 static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
 
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
@@ -993,6 +996,7 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
 static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
     playlist_t    *p_playlist = NULL;
     input_thread_t *p_input = NULL;
@@ -1031,6 +1035,8 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
 static int RateChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
     input_thread_t *p_input = NULL;
 
@@ -1052,6 +1058,7 @@ static int RateChanged( vlc_object_t *p_this, char const *psz_cmd,
 static int Input( vlc_object_t *p_this, char const *psz_cmd,
                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input;
     vlc_value_t     val;
@@ -1288,6 +1295,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
 static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     vlc_value_t val;
 
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
@@ -1501,6 +1509,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 static int Quit( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     playlist_t *p_playlist;
 
     p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -1516,6 +1526,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
 static int Intf( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_newintf = NULL;
 
     p_newintf = intf_Create( p_this->p_libvlc, newval.psz_string, 0, NULL );
@@ -1534,6 +1545,7 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
 static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input = NULL;
     int i_error = VLC_EGENERIC;
@@ -1601,6 +1613,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
 static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     audio_volume_t i_volume;
     input_thread_t *p_input = NULL;
@@ -1652,6 +1665,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
 static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input = NULL;
     vout_thread_t * p_vout;
@@ -1778,6 +1792,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
 static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input = NULL;
     aout_instance_t * p_aout;
@@ -1872,6 +1887,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
 static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t    *p_playlist = NULL;
     vlc_value_t val;
@@ -1932,6 +1948,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
 static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(newval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input = NULL;
     int i_error;
@@ -2208,7 +2225,7 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 /*****************************************************************************
  * checkUpdates : check for updates
  ****************************************************************************/
-#ifdef UPDATE_CHECK
+#if 0 && defined( UPDATE_CHECK )
 static void checkUpdates( intf_thread_t *p_intf )
 {
     /*TODO: - modify this to delete p_update to avoid a memory leak !

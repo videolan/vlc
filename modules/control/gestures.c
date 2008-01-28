@@ -544,6 +544,7 @@ static void EndThread( intf_thread_t * p_intf )
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     vlc_value_t val;
     int pattern = 0;
 

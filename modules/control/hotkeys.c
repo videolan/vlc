@@ -828,6 +828,7 @@ static int GetKey( intf_thread_t *p_intf)
 static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
     if ( !newval.i_int )
     {
@@ -857,6 +858,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     libvlc_int_t *p_libvlc = (libvlc_int_t *)p_this;
     struct hotkey *p_hotkeys = p_libvlc->p_hotkeys;
     mtime_t i_date;
