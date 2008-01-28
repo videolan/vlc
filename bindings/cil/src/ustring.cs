@@ -36,6 +36,7 @@ namespace VideoLAN.LibVLC
 
         public U8String (string value)
         {
+            mb_str = null;
             if (value == null)
                 return;
 
@@ -47,6 +48,7 @@ namespace VideoLAN.LibVLC
 
         public U8String (IntPtr ptr)
         {
+            mb_str = null;
             if (ptr == IntPtr.Zero)
                 return;
 
