@@ -145,6 +145,8 @@ void InputManager::customEvent( QEvent *event )
          type != ItemStateChanged_Type )
         return;
 
+    msg_Dbg( p_intf, "New IM Event, type: %i", type );
+
     /* Delete the input */
     if( !p_input || p_input->b_dead || p_input->b_die )
     {
@@ -407,10 +409,10 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 
     // No necessary, I think
     //var_AddCallback( THEPL, "intf-change", ItemChanged, im );
-    //var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
 
     var_AddCallback( THEPL, "item-change", PLItemChanged, this );
     var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
+    var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
@@ -440,7 +442,6 @@ MainInputManager::~MainInputManager()
 void MainInputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    msg_Dbg( p_intf, "New MIM Event, type: %i", type );
     if ( type != ItemChanged_Type && type != VolumeChanged_Type )
         return;
 
@@ -450,6 +451,7 @@ void MainInputManager::customEvent( QEvent *event )
         return;
     }
 
+    msg_Dbg( p_intf, "New MIM Event, type: %i", type );
     /* Should be PLItemChanged */
     if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
@@ -591,20 +593,20 @@ static int ChangeVideo( vlc_object_t *p_this, const char *var, vlc_value_t o,
 static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    MainInputManager *im = (MainInputManager*)param;
+    MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
-    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    QApplication::postEvent( mim, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
 
 static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    MainInputManager *im = (MainInputManager*)param;
+    MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( VolumeChanged_Type, newval.i_int );
-    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    QApplication::postEvent( mim, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
 
