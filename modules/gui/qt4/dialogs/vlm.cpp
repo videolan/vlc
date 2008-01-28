@@ -51,6 +51,7 @@
 #include <QSpinBox>
 #include <QHeaderView>
 #include <QScrollArea>
+#include <QFileDialog>
 
 static const char *psz_type[] = { "Broadcast", "Schedule", "VOD" };
 
@@ -129,8 +130,12 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
         new QSpacerItem( 10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vlmItemLayout->addItem( spacer );
 
+    QPushButton *exportButton = new QPushButton( qtr( "Export" ) );
+    ui.buttonBox->addButton( exportButton, QDialogButtonBox::ActionRole );
+
     QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
     ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+
 
     showScheduleWidget( QVLM_Broadcast );
 
@@ -143,6 +148,7 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
              this, selectVLMItem( int ) );
 
     BUTTONACT( closeButton, close() );
+    BUTTONACT( exportButton, exportVLMConf() );
     BUTTONACT( ui.addButton, addVLMItem() );
     BUTTONACT( ui.clearButton, clearWidgets() );
     BUTTONACT( ui.saveButton, saveModifications() );
@@ -243,6 +249,30 @@ void VLMDialog::addVLMItem()
     vlmItemLayout->insertWidget( vlmItemCount, vlmAwidget );
     vlmItems.append( vlmAwidget );
     clearWidgets();
+}
+
+// FIXME : VOD are not exported to the file
+bool VLMDialog::exportVLMConf()
+{
+    QString saveVLMConfFileName = QFileDialog::getSaveFileName(
+            this, qtr( "Choose a filename to save the VLM configuration..." ),
+            qfu( p_intf->p_libvlc->psz_homedir ),
+            qtr( "VLM conf (*.vlm) ;; All (*.*)" ) );
+
+    if( !saveVLMConfFileName.isEmpty() )
+    {
+        vlm_message_t *message;
+        QString command = "save \"" + saveVLMConfFileName + "\"";
+        vlm_ExecuteCommand( p_vlm , qtu( command ) , &message );
+        vlm_MessageDelete( message );
+        return true;
+    }
+    return false;
+}
+
+// TODO : import configuration file
+bool VLMDialog::importVLMConf()
+{
 }
 
 void VLMDialog::clearWidgets()

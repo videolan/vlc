@@ -109,6 +109,8 @@ private slots:
     void selectVLMItem( int );
     void selectInput();
     void selectOutput();
+    bool exportVLMConf();
+    bool importVLMConf();
 };
 
 class VLMWrapper
