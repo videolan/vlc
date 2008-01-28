@@ -426,7 +426,6 @@ MainInputManager::~MainInputManager()
 {
     if( p_input )
     {
-       vlc_object_release( p_input );
        emit inputChanged( NULL );
     }
 
