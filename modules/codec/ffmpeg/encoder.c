@@ -496,12 +496,25 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if( p_sys->i_vtolerance > 0 )
             p_context->bit_rate_tolerance = p_sys->i_vtolerance;
 
+        /* usually if someone sets bitrate, he likes more to get that bitrate over quality 
+         * should help 'normal' user to get asked bitrate
+         */
+        if( p_enc->fmt_out.i_bitrate > 0 && p_sys->i_qmax == 0 && p_sys->i_qmin == 0 )
+        {
+            p_sys->i_qmax = 51;
+            p_sys->i_qmin = 10;
+        }
+
         if( p_sys->i_qmin > 0 )
+        {
             p_context->mb_qmin = p_context->qmin = p_sys->i_qmin;
             p_context->mb_lmin = p_context->lmin = p_sys->i_qmin * FF_QP2LAMBDA;
+        }
         if( p_sys->i_qmax > 0 )
+        {
             p_context->mb_qmax = p_context->qmax = p_sys->i_qmax;
             p_context->mb_lmax = p_context->lmax = p_sys->i_qmax * FF_QP2LAMBDA;
+        }
         p_context->max_qdiff = 3;
 
         p_context->mb_decision = p_sys->i_hq;
