@@ -61,12 +61,16 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+
+/* ugly kludge to avoid "null format string" warnings,
+ * even if we handle NULL format string in vlm_MessageNew() */
+static const char *vlm_NULL = NULL;
+
 /* */
 static int vlm_ControlInternal( vlm_t *, int, ... );
 
 /* */
 static vlm_message_t *vlm_Show( vlm_t *, vlm_media_sys_t *, vlm_schedule_sys_t *, const char * );
-static vlm_message_t *vlm_Help( vlm_t *, char * );
 
 static vlm_schedule_sys_t *vlm_ScheduleSearch( vlm_t *, const char * );
 
@@ -78,7 +82,7 @@ static int ExecuteCommand( vlm_t *, const char *, vlm_message_t ** );
 static int Manage( vlc_object_t * );
 
 static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name );
-static void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_sys_t *sched, const char *psz_name );
+static void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_sys_t *sched );
 static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
                               const char *psz_value );
 
@@ -371,7 +375,7 @@ static int ExecuteDel( vlm_t *p_vlm, const char *psz_name, vlm_message_t **pp_st
 
     if( p_schedule != NULL )
     {
-        vlm_ScheduleDelete( p_vlm, p_schedule, NULL );
+        vlm_ScheduleDelete( p_vlm, p_schedule );
     }
     else if( p_media != NULL )
     {
@@ -396,7 +400,7 @@ static int ExecuteDel( vlm_t *p_vlm, const char *psz_name, vlm_message_t **pp_st
         return VLC_EGENERIC;
     }
 
-    *pp_status = vlm_MessageNew( "del", NULL );
+    *pp_status = vlm_MessageNew( "del", vlm_NULL );
     return VLC_SUCCESS;
 }
 
@@ -424,9 +428,52 @@ static int ExecuteShow( vlm_t *p_vlm, const char *psz_name, vlm_message_t **pp_s
     return VLC_SUCCESS;
 }
 
-static int ExecuteHelp( vlm_t *p_vlm, vlm_message_t **pp_status )
+static int ExecuteHelp( vlm_message_t *p_status )
 {
-    *pp_status = vlm_Help( p_vlm, NULL );
+    vlm_message_t *message_child;
+
+#define MessageAdd( a ) \
+        vlm_MessageAdd( p_status, vlm_MessageNew( a, vlm_NULL ) );
+#define MessageAddChild( a ) \
+        vlm_MessageAdd( message_child, vlm_MessageNew( a, vlm_NULL ) );
+
+    p_status = vlm_MessageNew( "help", vlm_NULL );
+
+    message_child = MessageAdd( "Commands Syntax:" );
+    MessageAddChild( "new (name) vod|broadcast|schedule [properties]" );
+    MessageAddChild( "setup (name) (properties)" );
+    MessageAddChild( "show [(name)|media|schedule]" );
+    MessageAddChild( "del (name)|all|media|schedule" );
+    MessageAddChild( "control (name) [instance_name] (command)" );
+    MessageAddChild( "save (config_file)" );
+    MessageAddChild( "export" );
+    MessageAddChild( "load (config_file)" );
+
+    message_child = MessageAdd( "Media Proprieties Syntax:" );
+    MessageAddChild( "input (input_name)" );
+    MessageAddChild( "inputdel (input_name)|all" );
+    MessageAddChild( "inputdeln input_number" );
+    MessageAddChild( "output (output_name)" );
+    MessageAddChild( "option (option_name)[=value]" );
+    MessageAddChild( "enabled|disabled" );
+    MessageAddChild( "loop|unloop (broadcast only)" );
+    MessageAddChild( "mux (mux_name)" );
+
+    message_child = MessageAdd( "Schedule Proprieties Syntax:" );
+    MessageAddChild( "enabled|disabled" );
+    MessageAddChild( "append (command_until_rest_of_the_line)" );
+    MessageAddChild( "date (year)/(month)/(day)-(hour):(minutes):"
+                     "(seconds)|now" );
+    MessageAddChild( "period (years_aka_12_months)/(months_aka_30_days)/"
+                     "(days)-(hours):(minutes):(seconds)" );
+    MessageAddChild( "repeat (number_of_repetitions)" );
+
+    message_child = MessageAdd( "Control Commands Syntax:" );
+    MessageAddChild( "play [input_number]" );
+    MessageAddChild( "pause" );
+    MessageAddChild( "stop" );
+    MessageAddChild( "seek [+-](percentage) | [+-](seconds)s | [+-](miliseconds)ms" );
+
     return VLC_SUCCESS;
 }
 
@@ -603,7 +650,7 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
         *pp_status = vlm_MessageNew( "control", "unknown error" );
         return VLC_SUCCESS;
     }
-    *pp_status = vlm_MessageNew( "control", NULL );
+    *pp_status = vlm_MessageNew( "control", vlm_NULL );
     return VLC_SUCCESS;
 }
 
@@ -634,7 +681,7 @@ static int ExecuteSave( vlm_t *p_vlm, const char *psz_file, vlm_message_t **pp_s
     free( psz_save );
     fclose( f );
 
-    *pp_status = vlm_MessageNew( "save", NULL );
+    *pp_status = vlm_MessageNew( "save", vlm_NULL );
     return VLC_SUCCESS;
 
 error:
@@ -689,7 +736,7 @@ static int ExecuteLoad( vlm_t *p_vlm, const char *psz_url, vlm_message_t **pp_st
 
     free( psz_buffer );
 
-    *pp_status = vlm_MessageNew( "load", NULL );
+    *pp_status = vlm_MessageNew( "load", vlm_NULL );
     return VLC_SUCCESS;
 }
 
@@ -732,7 +779,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
             if( i + 1 >= i_property )
             {
                 if( b_new )
-                    vlm_ScheduleDelete( p_vlm, p_schedule, NULL );
+                    vlm_ScheduleDelete( p_vlm, p_schedule );
                 return ExecuteSyntaxError( psz_cmd, pp_status );
             }
 
@@ -740,7 +787,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
             i++;
         }
     }
-    *pp_status = vlm_MessageNew( psz_cmd, NULL );
+    *pp_status = vlm_MessageNew( psz_cmd, vlm_NULL );
     return VLC_SUCCESS;
 }
 
@@ -863,7 +910,7 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
     i_result = vlm_ControlInternal( p_vlm, VLM_CHANGE_MEDIA, p_cfg );
     vlm_media_Delete( p_cfg );
 
-    *pp_status = vlm_MessageNew( psz_cmd, NULL );
+    *pp_status = vlm_MessageNew( psz_cmd, vlm_NULL );
     return i_result;
 
 error:
@@ -967,7 +1014,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
         /* support for comments */
         if( i_command == 0 && *psz_command == '#')
         {
-            p_message = vlm_MessageNew( "", NULL );
+            p_message = vlm_MessageNew( "", vlm_NULL );
             goto success;
         }
 
@@ -1001,12 +1048,12 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 #define IF_EXECUTE( name, check, cmd ) if( !strcmp(ppsz_command[0], name ) ) { if( (check) ) goto syntax_error;  if( (cmd) ) goto error; goto success; }
     if( i_command == 0 )
     {
-        p_message = vlm_MessageNew( "", NULL );
+        p_message = vlm_MessageNew( "", vlm_NULL );
         goto success;
     }
     else IF_EXECUTE( "del",     (i_command != 2),   ExecuteDel(p_vlm, ppsz_command[1], &p_message) )
     else IF_EXECUTE( "show",    (i_command > 2),    ExecuteShow(p_vlm, i_command > 1 ? ppsz_command[1] : NULL, &p_message) )
-    else IF_EXECUTE( "help",    (i_command != 1),   ExecuteHelp(p_vlm, &p_message) )
+    else IF_EXECUTE( "help",    (i_command != 1),   ExecuteHelp( p_message) )
     else IF_EXECUTE( "control", (i_command < 3),    ExecuteControl(p_vlm, ppsz_command[1], i_command - 2, &ppsz_command[2], &p_message) )
     else IF_EXECUTE( "save",    (i_command != 2),   ExecuteSave(p_vlm, ppsz_command[1], &p_message) )
     else IF_EXECUTE( "export",  (i_command != 1),   ExecuteExport(p_vlm, &p_message) )
@@ -1094,8 +1141,7 @@ static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name )
 }
 
 /* for now, simple delete. After, del with options (last arg) */
-static void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_sys_t *sched,
-                         const char *psz_name )
+static void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_sys_t *sched )
 {
     if( sched == NULL ) return;
 
@@ -1380,14 +1426,14 @@ vlm_message_t *vlm_MessageAdd( vlm_message_t *p_message,
 /*****************************************************************************
  * Misc utility functions
  *****************************************************************************/
-static vlm_message_t *vlm_ShowMedia( vlm_t *p_vlm, vlm_media_sys_t *p_media )
+static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
 {
     vlm_media_t *p_cfg = &p_media->cfg;
     vlm_message_t *p_msg;
     vlm_message_t *p_msg_sub;
     int i;
 
-    p_msg = vlm_MessageNew( p_cfg->psz_name, 0 );
+    p_msg = vlm_MessageNew( p_cfg->psz_name, vlm_NULL );
     vlm_MessageAdd( p_msg,
                     vlm_MessageNew( "type", p_cfg->b_vod ? "vod" : "broadcast" ) );
     vlm_MessageAdd( p_msg,
@@ -1400,7 +1446,7 @@ static vlm_message_t *vlm_ShowMedia( vlm_t *p_vlm, vlm_media_sys_t *p_media )
         vlm_MessageAdd( p_msg,
                         vlm_MessageNew( "loop", p_cfg->broadcast.b_loop ? "yes" : "no" ) );
 
-    p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "inputs", NULL ) );
+    p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "inputs", vlm_NULL ) );
     for( i = 0; i < p_cfg->i_input; i++ )
     {
         char *psz_tmp;
@@ -1413,11 +1459,11 @@ static vlm_message_t *vlm_ShowMedia( vlm_t *p_vlm, vlm_media_sys_t *p_media )
     vlm_MessageAdd( p_msg,
                     vlm_MessageNew( "output", p_cfg->psz_output ? p_cfg->psz_output : "" ) );
 
-    p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "options", 0 ) );
+    p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "options", vlm_NULL ) );
     for( i = 0; i < p_cfg->i_option; i++ )
-        vlm_MessageAdd( p_msg_sub, vlm_MessageNew( p_cfg->ppsz_option[i], 0 ) );
+        vlm_MessageAdd( p_msg_sub, vlm_MessageNew( p_cfg->ppsz_option[i], vlm_NULL ) );
 
-    p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "instances", NULL ) );
+    p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "instances", vlm_NULL ) );
     for( i = 0; i < p_media->i_instance; i++ )
     {
         vlm_media_instance_sys_t *p_instance = p_media->instance[i];
@@ -1429,7 +1475,7 @@ static vlm_message_t *vlm_ShowMedia( vlm_t *p_vlm, vlm_media_sys_t *p_media )
         if( p_instance->p_input )
             var_Get( p_instance->p_input, "state", &val );
 
-        p_msg_instance = vlm_MessageAdd( p_msg_sub, vlm_MessageNew( "instance" , NULL ) );
+        p_msg_instance = vlm_MessageAdd( p_msg_sub, vlm_MessageNew( "instance" , vlm_NULL ) );
 
         vlm_MessageAdd( p_msg_instance,
                         vlm_MessageNew( "name" , p_instance->psz_name ? p_instance->psz_name : "default" ) );
@@ -1469,9 +1515,9 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
 {
     if( media != NULL )
     {
-        vlm_message_t *p_msg = vlm_MessageNew( "show", NULL );
+        vlm_message_t *p_msg = vlm_MessageNew( "show", vlm_NULL );
         if( p_msg )
-            vlm_MessageAdd( p_msg, vlm_ShowMedia( vlm, media ) );
+            vlm_MessageAdd( p_msg, vlm_ShowMedia( media ) );
         return p_msg;
     }
 
@@ -1483,9 +1529,9 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         vlm_message_t *msg_child;
         char buffer[100];
 
-        msg = vlm_MessageNew( "show", NULL );
+        msg = vlm_MessageNew( "show", vlm_NULL );
         msg_schedule =
-            vlm_MessageAdd( msg, vlm_MessageNew( schedule->psz_name, 0 ) );
+            vlm_MessageAdd( msg, vlm_MessageNew( schedule->psz_name, vlm_NULL ) );
 
         vlm_MessageAdd( msg_schedule, vlm_MessageNew("type", "schedule") );
 
@@ -1553,12 +1599,12 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         vlm_MessageAdd( msg_schedule, vlm_MessageNew( "repeat", buffer ) );
 
         msg_child =
-            vlm_MessageAdd( msg_schedule, vlm_MessageNew("commands", 0) );
+            vlm_MessageAdd( msg_schedule, vlm_MessageNew("commands", vlm_NULL ) );
 
         for( i = 0; i < schedule->i_command; i++ )
         {
            vlm_MessageAdd( msg_child,
-                           vlm_MessageNew( schedule->command[i], NULL ) );
+                           vlm_MessageNew( schedule->command[i], vlm_NULL ) );
         }
 
         return msg;
@@ -1583,12 +1629,12 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
 
         asprintf( &psz_count, "( %d broadcast - %d vod )", i_broadcast, i_vod);
 
-        p_msg = vlm_MessageNew( "show", NULL );
+        p_msg = vlm_MessageNew( "show", vlm_NULL );
         p_msg_child = vlm_MessageAdd( p_msg, vlm_MessageNew( "media", psz_count ) );
         free( psz_count );
 
         for( i = 0; i < vlm->i_media; i++ )
-            vlm_MessageAdd( p_msg_child, vlm_ShowMedia( vlm, vlm->media[i] ) );
+            vlm_MessageAdd( p_msg_child, vlm_ShowMedia( vlm->media[i] ) );
 
         return p_msg;
     }
@@ -1599,8 +1645,8 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         vlm_message_t *msg;
         vlm_message_t *msg_child;
 
-        msg = vlm_MessageNew( "show", NULL );
-        msg_child = vlm_MessageAdd( msg, vlm_MessageNew( "schedule", NULL ) );
+        msg = vlm_MessageNew( "show", vlm_NULL );
+        msg_child = vlm_MessageAdd( msg, vlm_MessageNew( "schedule", vlm_NULL ) );
 
         for( i = 0; i < vlm->i_schedule; i++ )
         {
@@ -1609,7 +1655,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
             mtime_t i_time, i_next_date;
 
             msg_schedule = vlm_MessageAdd( msg_child,
-                                           vlm_MessageNew( s->psz_name, 0 ) );
+                                           vlm_MessageNew( s->psz_name, vlm_NULL ) );
             vlm_MessageAdd( msg_schedule,
                             vlm_MessageNew( "enabled", s->b_enabled ?
                                             "yes" : "no" ) );
@@ -1668,62 +1714,8 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
 
     else
     {
-        return vlm_MessageNew( "show", NULL );
+        return vlm_MessageNew( "show", vlm_NULL );
     }
-}
-
-static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
-{
-    vlm_message_t *message, *message_child;
-
-#define MessageAdd( a ) \
-        vlm_MessageAdd( message, vlm_MessageNew( a, NULL ) );
-#define MessageAddChild( a ) \
-        vlm_MessageAdd( message_child, vlm_MessageNew( a, NULL ) );
-
-    if( psz_filter == NULL )
-    {
-        message = vlm_MessageNew( "help", NULL );
-
-        message_child = MessageAdd( "Commands Syntax:" );
-        MessageAddChild( "new (name) vod|broadcast|schedule [properties]" );
-        MessageAddChild( "setup (name) (properties)" );
-        MessageAddChild( "show [(name)|media|schedule]" );
-        MessageAddChild( "del (name)|all|media|schedule" );
-        MessageAddChild( "control (name) [instance_name] (command)" );
-        MessageAddChild( "save (config_file)" );
-        MessageAddChild( "export" );
-        MessageAddChild( "load (config_file)" );
-
-        message_child = MessageAdd( "Media Proprieties Syntax:" );
-        MessageAddChild( "input (input_name)" );
-        MessageAddChild( "inputdel (input_name)|all" );
-        MessageAddChild( "inputdeln input_number" );
-        MessageAddChild( "output (output_name)" );
-        MessageAddChild( "option (option_name)[=value]" );
-        MessageAddChild( "enabled|disabled" );
-        MessageAddChild( "loop|unloop (broadcast only)" );
-        MessageAddChild( "mux (mux_name)" );
-
-        message_child = MessageAdd( "Schedule Proprieties Syntax:" );
-        MessageAddChild( "enabled|disabled" );
-        MessageAddChild( "append (command_until_rest_of_the_line)" );
-        MessageAddChild( "date (year)/(month)/(day)-(hour):(minutes):"
-                         "(seconds)|now" );
-        MessageAddChild( "period (years_aka_12_months)/(months_aka_30_days)/"
-                         "(days)-(hours):(minutes):(seconds)" );
-        MessageAddChild( "repeat (number_of_repetitions)" );
-
-        message_child = MessageAdd( "Control Commands Syntax:" );
-        MessageAddChild( "play [input_number]" );
-        MessageAddChild( "pause" );
-        MessageAddChild( "stop" );
-        MessageAddChild( "seek [+-](percentage) | [+-](seconds)s | [+-](miliseconds)ms" );
-
-        return message;
-    }
-
-    return vlm_MessageNew( "help", NULL );
 }
 
 /*****************************************************************************
@@ -2767,7 +2759,7 @@ static int vlm_ControlMediaInstanceClear( vlm_t *p_vlm, int64_t id )
 static int vlm_ControlScheduleClear( vlm_t *p_vlm )
 {
     while( p_vlm->i_schedule > 0 )
-        vlm_ScheduleDelete( p_vlm, p_vlm->schedule[0], NULL );
+        vlm_ScheduleDelete( p_vlm, p_vlm->schedule[0] );
 
     return VLC_SUCCESS;
 }
