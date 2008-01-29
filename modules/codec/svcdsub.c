@@ -113,15 +113,15 @@ struct decoder_sys_t
   uint16_t i_image;       /* image number in the subtitle stream */
   uint8_t  i_packet;      /* packet number for above image number */
 
-  int     i_spu_size;     /* goal for subtitle_data_pos while gathering,
+  size_t   i_spu_size;     /* goal for subtitle_data_pos while gathering,
                              size of used subtitle_data later */
 
   uint16_t i_image_offset;      /* offset from subtitle_data to compressed
                                    image data */
-  int i_image_length;           /* size of the compressed image data */
-  int second_field_offset;      /* offset of odd raster lines */
-  int metadata_offset;          /* offset to data describing the image */
-  int metadata_length;          /* length of metadata */
+  size_t i_image_length;           /* size of the compressed image data */
+  size_t second_field_offset;      /* offset of odd raster lines */
+  size_t metadata_offset;          /* offset to data describing the image */
+  size_t metadata_length;          /* length of metadata */
 
   mtime_t i_duration;   /* how long to display the image, 0 stands
                            for "until next subtitle" */

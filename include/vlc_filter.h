@@ -81,8 +81,8 @@ struct filter_t
     /* Video output callbacks */
     picture_t     * ( * pf_vout_buffer_new) ( filter_t * );
     void            ( * pf_vout_buffer_del) ( filter_t *, picture_t * );
-    void            ( * pf_picture_link)    ( filter_t *, picture_t * );
-    void            ( * pf_picture_unlink)  ( filter_t *, picture_t * );
+    void            ( * pf_picture_link)    ( picture_t * );
+    void            ( * pf_picture_unlink)  ( picture_t * );
 
     /* SPU output callbacks */
     subpicture_t *  ( * pf_sub_buffer_new) ( filter_t * );

@@ -108,7 +108,7 @@ static long STDCALL GetBufferAndLength( IMediaBuffer *This,
     CMediaBuffer *p_mb = (CMediaBuffer *)This;
 
     if( !ppBuffer && !pcbLength ) return E_POINTER;
-    if( ppBuffer ) *ppBuffer = p_mb->p_block->p_buffer;
+    if( ppBuffer ) *ppBuffer = (char*)p_mb->p_block->p_buffer;
     if( pcbLength ) *pcbLength = p_mb->p_block->i_buffer;
     return S_OK;
 }

@@ -68,8 +68,8 @@ struct decoder_sys_t
 {
     enum adpcm_codec_e codec;
 
-    int                 i_block;
-    int                 i_samplesperblock;
+    size_t              i_block;
+    size_t              i_samplesperblock;
 
     audio_date_t        end_date;
 };
@@ -618,7 +618,7 @@ static void DecodeAdpcmDk4( decoder_t *p_dec, int16_t *p_sample,
 {
     decoder_sys_t *p_sys  = p_dec->p_sys;
     adpcm_ima_wav_channel_t channel[2];
-    int                     i_nibbles;
+    size_t                  i_nibbles;
     int                     b_stereo;
 
     b_stereo = p_dec->fmt_in.audio.i_channels == 2 ? 1 : 0;

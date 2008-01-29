@@ -223,7 +223,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_state = STATE_NOSYNC;
     p_sys->b_stream_info = VLC_FALSE;
     p_sys->p_block=NULL;
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
 
 #ifdef USE_LIBFLAC
     /* Take care of flac init */
@@ -586,6 +586,7 @@ static FLAC__StreamDecoderReadStatus
 DecoderReadCallback( const FLAC__StreamDecoder *decoder, FLAC__byte buffer[],
                      unsigned *bytes, void *client_data )
 {
+    VLC_UNUSED(decoder);
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -613,6 +614,7 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
                       const FLAC__Frame *frame,
                       const FLAC__int32 *const buffer[], void *client_data )
 {
+    VLC_UNUSED(decoder);
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -648,6 +650,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                                      const FLAC__StreamMetadata *metadata,
                                      void *client_data )
 {
+    VLC_UNUSED(decoder);
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -697,6 +700,7 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
                                   FLAC__StreamDecoderErrorStatus status,
                                   void *client_data )
 {
+    VLC_UNUSED(decoder);
     decoder_t *p_dec = (decoder_t *)client_data;
 
     switch( status )
@@ -1344,6 +1348,7 @@ static void EncoderMetadataCallback( const FLAC__StreamEncoder *encoder,
                                      const FLAC__StreamMetadata *metadata,
                                      void *client_data )
 {
+    VLC_UNUSED(encoder);
     encoder_t *p_enc = (encoder_t *)client_data;
 
     msg_Err( p_enc, "MetadataCallback: %i", metadata->type );
@@ -1359,6 +1364,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
                       unsigned bytes, unsigned samples,
                       unsigned current_frame, void *client_data )
 {
+    VLC_UNUSED(encoder); VLC_UNUSED(current_frame);
     encoder_t *p_enc = (encoder_t *)client_data;
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_block;

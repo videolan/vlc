@@ -133,7 +133,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
 
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     /* Set output properties */

@@ -278,7 +278,7 @@ static void cinepak_LoadCodebook( cinepak_codebook_t *p_codebook,
 
 static void cinepak_Getv4( cinepak_context_t *p_context,
                            int i_strip, int i_x, int i_y,
-                           int i_x2, int i_y2, uint8_t *p_data )
+                           uint8_t *p_data )
 {
     uint8_t i_index[4];
     int i,j;
@@ -325,7 +325,7 @@ static void cinepak_Getv4( cinepak_context_t *p_context,
 
 static void cinepak_Getv1( cinepak_context_t *p_context,
                            int i_strip, int i_x,  int i_y,
-                           int i_x2, int i_y2, uint8_t *p_data )
+                           uint8_t *p_data )
 {
     uint8_t i_index;
     int i,j;
@@ -587,7 +587,6 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
                                            i_strip,
                                            i_strip_x1 + i_x,
                                            i_strip_y1 + i_y,
-                                           i_strip_x2, i_strip_y2,
                                            p_data );
                             p_data += 4;
                             i_chunk_size -= 4;
@@ -598,7 +597,6 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
                                            i_strip,
                                            i_strip_x1 + i_x,
                                            i_strip_y1 + i_y,
-                                           i_strip_x2, i_strip_y2,
                                            p_data );
                             p_data++;
                             i_chunk_size--;
@@ -646,7 +644,6 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
                                                i_strip,
                                                i_strip_x1 + i_x,
                                                i_strip_y1 + i_y,
-                                               i_strip_x2, i_strip_y2,
                                                p_data );
                                 p_data += 4;
                                 i_chunk_size -= 4;
@@ -658,7 +655,6 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
                                                i_strip,
                                                i_strip_x1 + i_x,
                                                i_strip_y1 + i_y,
-                                               i_strip_x2, i_strip_y2,
                                                p_data );
                                 p_data++;
                                 i_chunk_size--;
@@ -684,7 +680,6 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
                                    i_strip,
                                    i_strip_x1 + i_x,
                                    i_strip_y1 + i_y,
-                                   i_strip_x2, i_strip_y2,
                                    p_data );
                     p_data++;
                     i_chunk_size--;

@@ -79,8 +79,8 @@ void E_(CloseScaler)( vlc_object_t * );
 
 /* Postprocessing module */
 void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );
-int E_(InitPostproc)( decoder_t *, void *, int, int, int );
-int E_(PostprocPict)( decoder_t *, void *, picture_t *, struct AVFrame * );
+int E_(InitPostproc)( void *, int, int, int );
+int E_(PostprocPict)( void *, picture_t *, struct AVFrame * );
 void E_(ClosePostproc)( decoder_t *, void * );
 
 /*****************************************************************************

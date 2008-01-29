@@ -43,7 +43,7 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    int i_raw_size;
+    size_t i_raw_size;
     vlc_bool_t b_invert;
 
     /*

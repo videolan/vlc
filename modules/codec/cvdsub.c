@@ -80,16 +80,16 @@ struct decoder_sys_t
 
   block_t  *p_spu;   /* Bytes of the packet. */
 
-  int     i_spu_size;     /* goal for subtitle_data_pos while gathering,
+  size_t   i_spu_size;     /* goal for subtitle_data_pos while gathering,
                              size of used subtitle_data later */
 
   uint16_t i_image_offset;      /* offset from subtitle_data to compressed
                                    image data */
-  int i_image_length;           /* size of the compressed image data */
-  int first_field_offset;       /* offset of even raster lines */
-  int second_field_offset;      /* offset of odd raster lines */
-  int metadata_offset;          /* offset to data describing the image */
-  int metadata_length;          /* length of metadata */
+  size_t i_image_length;           /* size of the compressed image data */
+  size_t first_field_offset;       /* offset of even raster lines */
+  size_t second_field_offset;      /* offset of odd raster lines */
+  size_t metadata_offset;          /* offset to data describing the image */
+  size_t metadata_length;          /* length of metadata */
 
   mtime_t i_duration;   /* how long to display the image, 0 stands
                            for "until next subtitle" */

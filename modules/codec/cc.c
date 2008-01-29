@@ -226,8 +226,6 @@ static subpicture_t *Convert( decoder_t *, block_t * );
 
 static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     if( pp_block && *pp_block )
     {
         Push( p_dec, *pp_block );

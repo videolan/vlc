@@ -209,7 +209,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
     p_sys->b_latm_cfg = VLC_FALSE;
 
@@ -368,7 +368,7 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
 /****************************************************************************
  * LOAS helpers
  ****************************************************************************/
-static int LOASSyncInfo( decoder_t *p_dec, uint8_t p_header[LOAS_HEADER_SIZE], unsigned int *pi_header_size )
+static int LOASSyncInfo( uint8_t p_header[LOAS_HEADER_SIZE], unsigned int *pi_header_size )
 {
     *pi_header_size = 3;
     return ( ( p_header[1] & 0x1f ) << 8 ) + p_header[2];
@@ -999,7 +999,7 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
                 }
 
                 /* Check if frame is valid and get frame info */
-                p_sys->i_frame_size = LOASSyncInfo( p_dec, p_header, &p_sys->i_header_size );
+                p_sys->i_frame_size = LOASSyncInfo( p_header, &p_sys->i_header_size );
             }
 
             if( p_sys->i_frame_size <= 0 )

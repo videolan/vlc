@@ -88,7 +88,7 @@ struct decoder_sys_t
      */
     block_bytestream_t bytestream;
     int i_state;
-    int i_offset;
+    size_t i_offset;
     uint8_t p_startcode[3];
 
     /* Sequence header and extension */
@@ -166,7 +166,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
     p_sys->p_startcode[0] = 0;
     p_sys->p_startcode[1] = 0;
     p_sys->p_startcode[2] = 1;

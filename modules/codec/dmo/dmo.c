@@ -54,7 +54,7 @@
 
 #ifdef LOADER
 /* Not Needed */
-long CoInitialize( void *pvReserved ) { return -1; }
+long CoInitialize( void *pvReserved ) { VLC_UNUSED(pvReserved); return -1; }
 void CoUninitialize( void ) { }
 
 /* A few prototypes */

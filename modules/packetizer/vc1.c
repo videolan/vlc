@@ -61,7 +61,7 @@ struct decoder_sys_t
      */
     block_bytestream_t bytestream;
     int i_state;
-    int i_offset;
+    size_t i_offset;
     uint8_t p_startcode[3];
 
     /* Current sequence header */
@@ -137,7 +137,7 @@ static int Open( vlc_object_t *p_this )
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
 
     p_sys->i_state = STATE_NOSYNC;
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
     p_sys->p_startcode[0] = 0x00;
     p_sys->p_startcode[1] = 0x00;
     p_sys->p_startcode[2] = 0x01;
@@ -427,8 +427,8 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
         if( i_ridu > 4 && (ridu[0]&0x80) == 0 ) /* for advanced profile, the first bit is 1 */
         {
             video_format_t *p_v = &p_dec->fmt_in.video;
-            const int i_potential_width  = GetWBE( &ridu[0] );
-            const int i_potential_height = GetWBE( &ridu[2] );
+            const size_t i_potential_width  = GetWBE( &ridu[0] );
+            const size_t i_potential_height = GetWBE( &ridu[2] );
 
             if( i_potential_width >= 2  && i_potential_width <= 8192 &&
                 i_potential_height >= 2 && i_potential_height <= 8192 )
@@ -494,7 +494,7 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
                         {64,33}, {160,99},{ 0, 0}, { 0, 0}
                     };
                     int i_ar = bs_read( &s, 4 );
-                    int i_ar_w, i_ar_h;
+                    unsigned i_ar_w, i_ar_h;
 
                     if( i_ar == 15 )
                     {

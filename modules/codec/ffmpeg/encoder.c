@@ -163,7 +163,7 @@ static const uint16_t mpa_bitrate_tab[2][15] =
 static const uint16_t mpa_freq_tab[6] =
 { 44100, 48000, 32000, 22050, 24000, 16000 };
 
-static const int16_t mpeg4_default_intra_matrix[64] = {
+static const uint16_t mpeg4_default_intra_matrix[64] = {
   8, 17, 18, 19, 21, 23, 25, 27,
  17, 18, 19, 21, 23, 25, 27, 28,
  20, 21, 22, 23, 24, 26, 28, 30,
@@ -174,7 +174,7 @@ static const int16_t mpeg4_default_intra_matrix[64] = {
  27, 28, 30, 32, 35, 38, 41, 45,
 };
 
-static const int16_t mpeg4_default_non_intra_matrix[64] = {
+static const uint16_t mpeg4_default_non_intra_matrix[64] = {
  16, 17, 18, 19, 20, 21, 22, 23,
  17, 18, 19, 20, 21, 22, 23, 24,
  18, 19, 20, 21, 22, 23, 24, 25,

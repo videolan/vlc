@@ -119,10 +119,8 @@ static void history_Dump( history_t *p_history )
             fprintf( stderr, "HISTORY: [%d] NULL\n", i );
         else
         {
-            char *psz_uri = input_item_GetURI( p_item );
             fprintf( stderr, "HISTORY: [%d] %p (%p->%s)\n", i, p_item,
-                     psz_uri, psz_uri );
-            free( psz_uri );
+                     p_item->psz_uri, p_item->psz_uri );
         }
     }
 }

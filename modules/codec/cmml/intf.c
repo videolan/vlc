@@ -78,6 +78,10 @@ struct navigation_history_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+
+int          E_(OpenIntf)               ( vlc_object_t * );
+void         E_(CloseIntf)              ( vlc_object_t * );
+
 static int   InitThread                 ( intf_thread_t * );
 static int   MouseEvent                 ( vlc_object_t *, char const *,
                                           vlc_value_t, vlc_value_t, void * );
@@ -400,6 +404,9 @@ static int InitThread( intf_thread_t * p_intf )
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    VLC_UNUSED(p_data);
     /* TODO: handle mouse clicks on the anchor text */
 
     return VLC_SUCCESS;
@@ -411,6 +418,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
     vlc_mutex_lock( &p_intf->change_lock );
 
@@ -576,6 +585,7 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
 
     return psz_return_value;
 #else
+    VLC_UNUSED(p_intf);
     void *p;
 
     /* Suppress warning messages about unused functions */
@@ -616,6 +626,8 @@ static
 int GoBackCallback( vlc_object_t *p_this, char const *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t *) p_data;
     GoBack( p_intf );
     return VLC_SUCCESS;
@@ -625,6 +637,8 @@ static
 int GoForwardCallback( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t *) p_data;
     GoForward( p_intf );
     return VLC_SUCCESS;
@@ -635,6 +649,8 @@ int FollowAnchorCallback( vlc_object_t *p_this, char const *psz_var,
                           vlc_value_t oldval, vlc_value_t newval,
                           void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t *) p_data;
     FollowAnchor( p_intf );
     return VLC_SUCCESS;

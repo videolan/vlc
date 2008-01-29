@@ -388,6 +388,7 @@ static int FakeCallback( vlc_object_t *p_this, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval,
                          void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     decoder_t *p_dec = (decoder_t *)p_data;
 
     if( !strcmp( psz_var, "fake-file" ) )

@@ -122,8 +122,7 @@ void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
 /*****************************************************************************
  * InitPostproc:
  *****************************************************************************/
-int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
-                      int i_width, int i_height, int pix_fmt )
+int E_(InitPostproc)( void *p_data, int i_width, int i_height, int pix_fmt )
 {
     video_postproc_sys_t *p_sys = (video_postproc_sys_t *)p_data;
     unsigned i_cpu = vlc_CPU();
@@ -173,8 +172,7 @@ int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
 /*****************************************************************************
  * PostprocPict:
  *****************************************************************************/
-int E_(PostprocPict)( decoder_t *p_dec, void *p_data,
-                      picture_t *p_pic, AVFrame *p_ff_pic )
+int E_(PostprocPict)( void *p_data, picture_t *p_pic, AVFrame *p_ff_pic )
 {
     video_postproc_sys_t *p_sys = (video_postproc_sys_t *)p_data;
 
@@ -224,6 +222,7 @@ void E_(ClosePostproc)( decoder_t *p_dec, void *p_data )
 static int PPQCallback( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     decoder_t *p_dec = (decoder_t *)p_this;
     video_postproc_sys_t *p_sys = (video_postproc_sys_t *)p_data;
 

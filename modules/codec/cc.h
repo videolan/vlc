@@ -66,6 +66,7 @@ static inline void cc_Init( cc_data_t *c )
 }
 static inline void cc_Exit( cc_data_t *c )
 {
+    VLC_UNUSED(c);
     return;
 }
 static inline void cc_Flush( cc_data_t *c )

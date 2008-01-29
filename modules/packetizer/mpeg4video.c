@@ -66,7 +66,7 @@ struct decoder_sys_t
      */
     block_bytestream_t bytestream;
     int i_state;
-    int i_offset;
+    size_t i_offset;
     uint8_t p_startcode[3];
 
     /*
@@ -167,7 +167,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
     p_sys->p_startcode[0] = 0;
     p_sys->p_startcode[1] = 0;
     p_sys->p_startcode[2] = 1;
@@ -367,7 +367,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     if( p_frag->p_buffer[3] >= 0x20 && p_frag->p_buffer[3] <= 0x2f )
     {
         /* Copy the complete VOL */
-        if( p_dec->fmt_out.i_extra != p_frag->i_buffer )
+        if( (size_t)p_dec->fmt_out.i_extra != p_frag->i_buffer )
         {
             p_dec->fmt_out.p_extra =
                 realloc( p_dec->fmt_out.p_extra, p_frag->i_buffer );

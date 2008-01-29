@@ -87,7 +87,7 @@ struct decoder_sys_t
     block_bytestream_t bytestream;
 
     int     i_state;
-    int     i_offset;
+    size_t  i_offset;
     uint8_t startcode[4];
 
     vlc_bool_t b_slice;
@@ -182,7 +182,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->startcode[1] = 0;
     p_sys->startcode[2] = 0;
     p_sys->startcode[3] = 1;
-    p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->bytestream = block_BytestreamInit();
     p_sys->b_slice = VLC_FALSE;
     p_sys->p_frame = NULL;
     p_sys->b_sps   = VLC_FALSE;

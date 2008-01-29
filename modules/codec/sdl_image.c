@@ -185,7 +185,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             uint8_t r, g, b;
             for ( i = 0; i < p_surface->h; i++ )
             {
-                p_src = p_surface->pixels + i * p_surface->pitch;
+                p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
                 p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( j = 0; j < p_surface->w; j++ )
                 {
@@ -221,7 +221,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             uint8_t r, g, b;
             for ( i = 0; i < p_surface->h; i++ )
             {
-                p_src = p_surface->pixels + i * p_surface->pitch;
+                p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
                 p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( j = 0; j < p_surface->w; j++ )
                 {
@@ -242,7 +242,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             uint8_t r, g, b, a;
             for ( i = 0; i < p_surface->h; i++ )
             {
-                p_src = p_surface->pixels + i * p_surface->pitch;
+                p_src = (uint8_t*)p_surface->pixels + i * p_surface->pitch;
                 p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( j = 0; j < p_surface->w; j++ )
                 {

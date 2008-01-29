@@ -247,9 +247,12 @@ static picture_t *video_new_buffer_filter( filter_t *p_filter )
 
 static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 {
-    (void)p_filter;
-    if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
-    if( p_pic ) free( p_pic );
+    VLC_UNUSED(p_filter);
+    if( p_pic )
+    {
+        free( p_pic->p_data_orig );
+        free( p_pic );
+    }
 }
 
 /*****************************************************************************

@@ -283,7 +283,7 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         return NULL;
     }
-    else if( i_used > p_block->i_buffer )
+    else if( (size_t)i_used > p_block->i_buffer )
     {
         i_used = p_block->i_buffer;
     }

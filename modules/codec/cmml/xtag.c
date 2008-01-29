@@ -81,6 +81,15 @@ struct _XTagParser {
   char * end;
 };
 
+XTag * xtag_free (XTag * xtag);
+XTag * xtag_new_parse (const char * s, int n);
+char * xtag_get_name (XTag * xtag);
+char * xtag_get_pcdata (XTag * xtag);
+char * xtag_get_attribute (XTag * xtag, char * attribute);
+XTag * xtag_first_child (XTag * xtag, char * name);
+XTag * xtag_next_child (XTag * xtag, char * name);
+int    xtag_snprint (char * buf, int n, XTag * xtag);
+
 /* Character classes */
 #define X_NONE           0
 #define X_WHITESPACE  1<<0

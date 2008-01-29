@@ -39,6 +39,7 @@ static char *xurl_strdup( const char *psz_string );
 #define xurl_strdup strdup
 #endif
 
+char        *XURL_FindQuery             ( char *psz_url );
 static char *XURL_FindHostname          ( char *psz_url );
 static char *XURL_FindPath              ( char *psz_url );
 static char *XURL_FindFragment          ( char *psz_url );
@@ -257,7 +258,6 @@ char *XURL_FindFragment( char *psz_url )
 
     return pc_return_value;
 }
-
 
 char *XURL_FindQuery( char *psz_url )
 {

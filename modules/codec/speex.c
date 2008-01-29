@@ -96,7 +96,7 @@ static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static void *ProcessPacket( decoder_t *, ogg_packet *, block_t ** );
 
 static aout_buffer_t *DecodePacket( decoder_t *, ogg_packet * );
-static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
+static block_t *SendPacket( decoder_t *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
@@ -486,8 +486,8 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 	     */
 	    speex_bits_rewind( &p_sys->bits );
 	    speex_bits_write( &p_sys->bits, 
-	        p_new_block->p_buffer, 
-		i_bytes_in_speex_frame );
+	        (char*)p_new_block->p_buffer, 
+		    (int)i_bytes_in_speex_frame );
 
 	    /*
 	     * Move the remaining part of the original packet (subsequent
@@ -506,11 +506,11 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 		 */
 	        i_bytes_in_speex_frame--;
 	        speex_bits_write( &p_sys->bits, 
-		    p_block->p_buffer, 
-		    p_block->i_buffer - i_bytes_in_speex_frame );
-    	        p_block = block_Realloc( p_block, 
+		        (char*)p_block->p_buffer, 
+		        p_block->i_buffer - i_bytes_in_speex_frame );
+            p_block = block_Realloc( p_block, 
 	            0, 
-		    p_block->i_buffer-i_bytes_in_speex_frame );
+		        p_block->i_buffer-i_bytes_in_speex_frame );
 	        *pp_block = p_block;
 	    }
 	    else
@@ -519,11 +519,11 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 	    }
 
 	    free( p_frame_holder );
-	    return SendPacket( p_dec, p_oggpacket /*Not used*/, p_new_block);
+	    return SendPacket( p_dec, p_new_block);
 	}
 	else
 	{
-            return SendPacket( p_dec, p_oggpacket, p_block );
+            return SendPacket( p_dec, p_block );
 	}
     }
     else
@@ -636,8 +636,8 @@ static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block
       Decode the input and ensure that no errors 
       were encountered.
     */
-    i_decode_ret = 
-        speex_decode_int( p_sys->p_state,&p_sys->bits,p_aout_buffer->p_buffer );
+    i_decode_ret = speex_decode_int( p_sys->p_state, &p_sys->bits, 
+            (spx_int16_t*)p_aout_buffer->p_buffer );
     if ( i_decode_ret < 0 )
     {
         msg_Err( p_dec, "Decoding failed. Perhaps we have a bad stream?" );
@@ -724,8 +724,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 /*****************************************************************************
  * SendPacket: send an ogg packet to the stream output.
  *****************************************************************************/
-static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
-                            block_t *p_block )
+static block_t *SendPacket( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 

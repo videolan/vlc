@@ -2,7 +2,7 @@
  * cdg.c: CDG decoder module
  *****************************************************************************
  * Copyright (C) 2007 Laurent Aimar
- * $Id: $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir # via.ecp.fr>
  *
@@ -194,8 +194,9 @@ static void ScreenFill( decoder_sys_t *p_cdg, int sx, int sy, int dx, int dy, in
 static int DecodeMemoryPreset( decoder_sys_t *p_cdg, const uint8_t *p_data )
 {
     const int i_color = p_data[0]&0x0f;
+#if 0
     const int i_repeat= p_data[1]&0x0f;
-
+#endif
     /* if i_repeat > 0 we could ignore it if we have a reliable stream */
     ScreenFill( p_cdg, 0, 0, CDG_SCREEN_WIDTH, CDG_SCREEN_HEIGHT, i_color );
     return 0;

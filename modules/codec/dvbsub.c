@@ -1700,7 +1700,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 /* FIXME: this routine is a hack to convert VLC_FOURCC('Y','U','V','A')
  *        into VLC_FOURCC('Y','U','V','P')
  */
-static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
+static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 {
     subpicture_region_t *p_region = NULL;
 
@@ -1920,7 +1920,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     p_region = p_subpic->p_region;
     if( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','A') )
     {
-        p_temp = YuvaYuvp( p_enc, p_subpic );
+        p_temp = YuvaYuvp( p_subpic );
         if( !p_temp )
         {
             msg_Err( p_enc, "no picture in subpicture" );
@@ -2318,14 +2318,11 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     }
 }
 
-static void encode_pixel_line_2bp( encoder_t *p_enc, bs_t *s,
-                                   subpicture_region_t *p_region,
+static void encode_pixel_line_2bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line );
-static void encode_pixel_line_4bp( encoder_t *p_enc, bs_t *s,
-                                   subpicture_region_t *p_region,
+static void encode_pixel_line_4bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line );
-static void encode_pixel_line_8bp( encoder_t *p_enc, bs_t *s,
-                                   subpicture_region_t *p_region,
+static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line );
 static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
                                subpicture_region_t *p_region,
@@ -2347,17 +2344,17 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
 
         case 4:
             bs_write( s, 8, 0x10 ); /* 2 bit/pixel code string */
-            encode_pixel_line_2bp( p_enc, s, p_region, i_line );
+            encode_pixel_line_2bp( s, p_region, i_line );
             break;
 
         case 16:
             bs_write( s, 8, 0x11 ); /* 4 bit/pixel code string */
-            encode_pixel_line_4bp( p_enc, s, p_region, i_line );
+            encode_pixel_line_4bp( s, p_region, i_line );
             break;
 
         case 256:
             bs_write( s, 8, 0x12 ); /* 8 bit/pixel code string */
-            encode_pixel_line_8bp( p_enc, s, p_region, i_line );
+            encode_pixel_line_8bp( s, p_region, i_line );
             break;
 
         default:
@@ -2370,8 +2367,7 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
     }
 }
 
-static void encode_pixel_line_2bp( encoder_t *p_enc, bs_t *s,
-                                   subpicture_region_t *p_region,
+static void encode_pixel_line_2bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
@@ -2462,8 +2458,7 @@ static void encode_pixel_line_2bp( encoder_t *p_enc, bs_t *s,
     bs_align_0( s );
 }
 
-static void encode_pixel_line_4bp( encoder_t *p_enc, bs_t *s,
-                                   subpicture_region_t *p_region,
+static void encode_pixel_line_4bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
@@ -2561,8 +2556,7 @@ static void encode_pixel_line_4bp( encoder_t *p_enc, bs_t *s,
     bs_align_0( s );
 }
 
-static void encode_pixel_line_8bp( encoder_t *p_enc, bs_t *s,
-                                   subpicture_region_t *p_region,
+static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;

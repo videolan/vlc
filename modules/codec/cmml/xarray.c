@@ -32,6 +32,10 @@
 #include <string.h>
 #include "xarray.h"
 
+/* local prototypes */
+XSTATIC XArray * xarray_New (unsigned int);
+
+
 #define XARRAY_ASSERT_NOT_NULL(xarray) \
     { \
         if (xarray == NULL) return XARRAY_ENULLPOINTER; \
@@ -39,9 +43,7 @@
 
 #define XARRAY_BOUNDS_CHECK(xarray, index) \
     { \
-        if (index < 0) \
-            return XARRAY_ENEGATIVEINDEX; \
-        else if (xarray->last_valid_element != -1 && \
+        if (xarray->last_valid_element != -1 && \
                  (int) index > xarray->last_valid_element) \
             return XARRAY_EINDEXTOOLARGE; \
     }
@@ -61,7 +63,7 @@ XSTATIC XArray * xarray_New (unsigned int initial_size_hint)
     new_xarray = (XArray *) malloc (sizeof(XArray));
     if (new_xarray == NULL) return NULL;
 
-    if (initial_size_hint <= 0)
+    if (initial_size_hint == 0)
         initial_size = XARRAY_DEFAULT_SIZE;
     else
         initial_size = initial_size_hint;

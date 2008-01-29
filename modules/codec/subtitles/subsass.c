@@ -151,10 +151,7 @@ void ParseSSAString( decoder_t *p_dec,
  * ParseColor: SSA stores color in BBGGRR, in ASS it uses AABBGGRR
  * The string value in the string can be a pure integer, or hexadecimal &HBBGGRR
  *****************************************************************************/
-static void ParseColor( decoder_t *p_dec,
-                        char *psz_color,
-                        int *pi_color,
-                        int *pi_alpha )
+static void ParseColor( char *psz_color, int *pi_color, int *pi_alpha )
 {
     int i_color = 0;
     if( !strncasecmp( psz_color, "&H", 2 ) )
@@ -243,8 +240,8 @@ void ParseSSAHeader( decoder_t *p_dec )
                     p_style->font_style.psz_fontname = strdup( psz_temp_fontname );
                     p_style->font_style.i_font_size = i_font_size;
 
-                    ParseColor( p_dec, psz_temp_color1, &p_style->font_style.i_font_color, NULL );
-                    ParseColor( p_dec, psz_temp_color4, &p_style->font_style.i_shadow_color, NULL );
+                    ParseColor( psz_temp_color1, &p_style->font_style.i_font_color, NULL );
+                    ParseColor( psz_temp_color4, &p_style->font_style.i_shadow_color, NULL );
                     p_style->font_style.i_outline_color = p_style->font_style.i_shadow_color;
                     p_style->font_style.i_font_alpha = p_style->font_style.i_outline_alpha
                                                      = p_style->font_style.i_shadow_alpha = 0x00;
@@ -304,11 +301,11 @@ void ParseSSAHeader( decoder_t *p_dec )
                     p_style->font_style.psz_fontname = strdup( psz_temp_fontname );
                     p_style->font_style.i_font_size = i_font_size;
                     msg_Dbg( p_dec, psz_temp_color1 );
-                    ParseColor( p_dec, psz_temp_color1, &p_style->font_style.i_font_color,
+                    ParseColor( psz_temp_color1, &p_style->font_style.i_font_color,
                                 &p_style->font_style.i_font_alpha );
-                    ParseColor( p_dec, psz_temp_color3, &p_style->font_style.i_outline_color,
+                    ParseColor( psz_temp_color3, &p_style->font_style.i_outline_color,
                                 &p_style->font_style.i_outline_alpha );
-                    ParseColor( p_dec, psz_temp_color4, &p_style->font_style.i_shadow_color,
+                    ParseColor( psz_temp_color4, &p_style->font_style.i_shadow_color,
                                 &p_style->font_style.i_shadow_alpha );
 
                     p_style->font_style.i_style_flags = 0;

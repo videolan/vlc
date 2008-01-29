@@ -1463,7 +1463,7 @@ static int EncoderOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void EncoderClose ( vlc_object_t *p_this )
 {
-    return;
+    VLC_UNUSED(p_this);
 }
 
 /*****************************************************************************

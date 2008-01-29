@@ -205,7 +205,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 
     if( p_sys->p_pp && p_sys->b_pp && !p_sys->b_pp_init )
     {
-        E_(InitPostproc)( p_dec, p_sys->p_pp, p_context->width,
+        E_(InitPostproc)( p_sys->p_pp, p_context->width,
                           p_context->height, p_context->pix_fmt );
         p_sys->b_pp_init = VLC_TRUE;
     }
@@ -805,7 +805,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         int i_src_stride, i_dst_stride;
 
         if( p_sys->p_pp && p_sys->b_pp )
-            E_(PostprocPict)( p_dec, p_sys->p_pp, p_pic, p_ff_pic );
+            E_(PostprocPict)( p_sys->p_pp, p_pic, p_ff_pic );
         else
         {
             for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
