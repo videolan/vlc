@@ -502,7 +502,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if( p_enc->fmt_out.i_bitrate > 0 && p_sys->i_qmax == 0 && p_sys->i_qmin == 0 )
         {
             p_sys->i_qmax = 51;
-            p_sys->i_qmin = 10;
+            p_sys->i_qmin = 3;
         }
 
         if( p_sys->i_qmin > 0 )
