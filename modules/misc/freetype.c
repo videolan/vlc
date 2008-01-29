@@ -39,7 +39,6 @@
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 #include <vlc_input.h>
-#include <vlc_mtime.h>
 
 #ifdef HAVE_LINUX_LIMITS_H
 #   include <linux/limits.h>
