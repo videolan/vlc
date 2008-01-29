@@ -209,7 +209,8 @@ static struct
     { ".jpg",   "image/jpeg" },
     { ".jpeg",  "image/jpeg" },
     { ".png",   "image/png" },
-    { ".mpjpeg","multipart/x-mixed-replace; boundary=This Random String" },
+    /* same as modules/mux/mpjpeg.c here: */
+    { ".mpjpeg","multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a" },
 
     /* media mime */
     { ".avi",   "video/avi" },
