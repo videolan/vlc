@@ -271,7 +271,7 @@ static void Close( vlc_object_t * p_this )
     }
 
     /* rewrite header */
-    if( !sout_AccessOutSeek( p_mux->p_access, 0 ) )
+    if( sout_AccessOutSeek( p_mux->p_access, 0 ) == VLC_SUCCESS )
     {
         out = asf_header_create( p_mux, VLC_FALSE );
         sout_AccessOutWrite( p_mux->p_access, out );
@@ -581,6 +581,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
  *****************************************************************************/
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    VLC_UNUSED(p_input);
     msg_Dbg( p_mux, "removing input" );
     return VLC_SUCCESS;
 }

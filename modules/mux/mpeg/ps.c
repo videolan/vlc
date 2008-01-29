@@ -231,29 +231,30 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
     char **ppsz;
 
-   switch( i_query )
-   {
-       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
-           return VLC_SUCCESS;
+    switch( i_query )
+    {
+        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_TRUE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_ADD_STREAM_WAIT:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_FALSE;
-           return VLC_SUCCESS;
+        case MUX_GET_ADD_STREAM_WAIT:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_FALSE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_MIME:
-           ppsz = (char**)va_arg( args, char ** );
-           *ppsz = strdup( "video/mpeg" );
-           return VLC_SUCCESS;
+        case MUX_GET_MIME:
+            ppsz = (char**)va_arg( args, char ** );
+            *ppsz = strdup( "video/mpeg" );
+            return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
-   }
+    }
 }
 
 /*****************************************************************************
@@ -794,7 +795,7 @@ static void MuxWritePSM( sout_mux_t *p_mux, block_t **p_buf, mtime_t i_dts )
     /* CRC32 */
     {
         uint32_t i_crc = 0xffffffff;
-        for( i = 0; i < p_hdr->i_buffer; i++ )
+        for( i = 0; (size_t)i < p_hdr->i_buffer; i++ )
         i_crc = (i_crc << 8) ^
             p_sys->crc32_table[((i_crc >> 24) ^ p_hdr->p_buffer[i]) & 0xff];
 
@@ -810,8 +811,7 @@ static void MuxWritePSM( sout_mux_t *p_mux, block_t **p_buf, mtime_t i_dts )
 static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 {
     mtime_t i_dts;
-    int     i_stream;
-    int     i;
+    int     i_stream, i;
 
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {

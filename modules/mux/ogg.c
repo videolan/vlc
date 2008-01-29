@@ -67,8 +67,8 @@ static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 static int MuxBlock ( sout_mux_t *, sout_input_t * );
 
-static block_t *OggCreateHeader( sout_mux_t *, mtime_t );
-static block_t *OggCreateFooter( sout_mux_t *, mtime_t );
+static block_t *OggCreateHeader( sout_mux_t * );
+static block_t *OggCreateFooter( sout_mux_t * );
 
 /*****************************************************************************
  * Misc declarations
@@ -136,8 +136,7 @@ typedef struct
 static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 {
     mtime_t i_dts;
-    int     i_stream;
-    int     i;
+    int     i_stream, i;
 
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {
@@ -256,7 +255,7 @@ static void Close( vlc_object_t * p_this )
 
         /* Close the current ogg stream */
         msg_Dbg( p_mux, "writing footer" );
-        block_ChainAppend( &p_og, OggCreateFooter( p_mux, 0 ) );
+        block_ChainAppend( &p_og, OggCreateFooter( p_mux ) );
 
         /* Remove deleted logical streams */
         for( i = 0; i < p_sys->i_del_streams; i++ )
@@ -282,6 +281,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
     char **ppsz;
 
@@ -583,7 +583,7 @@ static block_t *OggStreamPageOut( sout_mux_t *p_mux,
     return p_og_first;
 }
 
-static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
+static block_t *OggCreateHeader( sout_mux_t *p_mux )
 {
     block_t *p_hdr = NULL;
     block_t *p_og = NULL;
@@ -778,13 +778,13 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
     return p_hdr;
 }
 
-static block_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
+static block_t *OggCreateFooter( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     block_t *p_hdr = NULL;
     block_t *p_og;
     ogg_packet    op;
-    int i;
+    int     i;
 
     /* flush all remaining data */
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
@@ -886,7 +886,7 @@ static int Mux( sout_mux_t *p_mux )
             int i;
 
             msg_Dbg( p_mux, "writing footer" );
-            block_ChainAppend( &p_og, OggCreateFooter( p_mux, 0 ) );
+            block_ChainAppend( &p_og, OggCreateFooter( p_mux ) );
 
             /* Remove deleted logical streams */
             for( i = 0; i < p_sys->i_del_streams; i++ )
@@ -903,7 +903,7 @@ static int Mux( sout_mux_t *p_mux )
         p_sys->i_streams = p_mux->i_nb_inputs;
         p_sys->i_del_streams = 0;
         p_sys->i_add_streams = 0;
-        block_ChainAppend( &p_og, OggCreateHeader( p_mux, i_dts ) );
+        block_ChainAppend( &p_og, OggCreateHeader( p_mux ) );
 
         /* Write header and/or footer */
         OggSetDate( p_og, i_dts, 0 );

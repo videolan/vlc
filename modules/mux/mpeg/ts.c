@@ -307,8 +307,7 @@ static inline block_t *BufferChainPeek( sout_buffer_chain_t *c )
     return b;
 }
 
-static inline void BufferChainClean( sout_instance_t *p_sout,
-                                     sout_buffer_chain_t *c )
+static inline void BufferChainClean( sout_buffer_chain_t *c )
 {
     block_t *b;
 
@@ -857,29 +856,30 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
     char **ppsz;
 
-   switch( i_query )
-   {
-       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
-           return VLC_SUCCESS;
+    switch( i_query )
+    {
+        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_TRUE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_ADD_STREAM_WAIT:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_FALSE;
-           return VLC_SUCCESS;
+        case MUX_GET_ADD_STREAM_WAIT:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_FALSE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_MIME:
-           ppsz = (char**)va_arg( args, char ** );
-           *ppsz = strdup( "video/mpeg" );  /* FIXME not sure */
-           return VLC_SUCCESS;
+        case MUX_GET_MIME:
+            ppsz = (char**)va_arg( args, char ** );
+            *ppsz = strdup( "video/mpeg" );  /* FIXME not sure */
+            return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
-   }
+    }
 }
 
 /*****************************************************************************
@@ -1221,7 +1221,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     /* Empty all data in chain_pes */
-    BufferChainClean( p_mux->p_sout, &p_stream->chain_pes );
+    BufferChainClean( &p_stream->chain_pes );
 
     if( p_stream->lang )
     {
@@ -1374,8 +1374,7 @@ static int Mux( sout_mux_t *p_mux )
                             if ( ( i_spu_delay >= I64C(100000000) ) ||
                                  ( i_spu_delay < I64C(10000) ) )
                             {
-                                BufferChainClean( p_mux->p_sout,
-                                                  &p_stream->chain_pes );
+                                BufferChainClean( &p_stream->chain_pes );
                                 p_stream->i_pes_dts = 0;
                                 p_stream->i_pes_used = 0;
                                 p_stream->i_pes_length = 0;
@@ -1417,16 +1416,14 @@ static int Mux( sout_mux_t *p_mux )
                                   p_pcr_stream->i_pes_dts );
                         block_Release( p_data );
 
-                        BufferChainClean( p_mux->p_sout,
-                                          &p_stream->chain_pes );
+                        BufferChainClean( &p_stream->chain_pes );
                         p_stream->i_pes_dts = 0;
                         p_stream->i_pes_used = 0;
                         p_stream->i_pes_length = 0;
 
                         if( p_input->p_fmt->i_cat != SPU_ES )
                         {
-                            BufferChainClean( p_mux->p_sout,
-                                              &p_pcr_stream->chain_pes );
+                            BufferChainClean( &p_pcr_stream->chain_pes );
                             p_pcr_stream->i_pes_dts = 0;
                             p_pcr_stream->i_pes_used = 0;
                             p_pcr_stream->i_pes_length = 0;

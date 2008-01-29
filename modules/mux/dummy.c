@@ -103,21 +103,22 @@ static void Close( vlc_object_t * p_this )
 
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
 
-   switch( i_query )
-   {
-       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
-           return VLC_SUCCESS;
+    switch( i_query )
+    {
+        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_TRUE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_ADD_STREAM_WAIT:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_FALSE;
-           return VLC_SUCCESS;
+        case MUX_GET_ADD_STREAM_WAIT:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_FALSE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_MIME:   /* Unknown */
+        case MUX_GET_MIME:   /* Unknown */
         default:
             return VLC_EGENERIC;
    }
@@ -125,12 +126,14 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    VLC_UNUSED(p_input);
     msg_Dbg( p_mux, "adding input" );
     return VLC_SUCCESS;
 }
 
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    VLC_UNUSED(p_input);
     msg_Dbg( p_mux, "removing input" );
     return VLC_SUCCESS;
 }

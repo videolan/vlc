@@ -173,8 +173,8 @@ static block_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
 
-static block_t *ConvertSUBT( sout_mux_t *, mp4_stream_t *, block_t *);
-static block_t *ConvertAVC1( sout_mux_t *, mp4_stream_t *, block_t * );
+static block_t *ConvertSUBT( block_t *);
+static block_t *ConvertAVC1( block_t * );
 
 /*****************************************************************************
  * Open:
@@ -366,24 +366,25 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
 
-   switch( i_query )
-   {
-       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_FALSE;
-           return VLC_SUCCESS;
+    switch( i_query )
+    {
+        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_FALSE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_ADD_STREAM_WAIT:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
-           return VLC_SUCCESS;
+        case MUX_GET_ADD_STREAM_WAIT:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_TRUE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_MIME:   /* Not needed, as not streamable */
+        case MUX_GET_MIME:   /* Not needed, as not streamable */
         default:
             return VLC_EGENERIC;
-   }
+    }
 }
 
 /*****************************************************************************
@@ -444,6 +445,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
  *****************************************************************************/
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    VLC_UNUSED(p_input);
     msg_Dbg( p_mux, "removing input" );
     return VLC_SUCCESS;
 }
@@ -451,8 +453,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 {
     mtime_t i_dts;
-    int     i_stream;
-    int     i;
+    int     i_stream, i;
 
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {
@@ -514,11 +515,11 @@ again:
         p_data  = block_FifoGet( p_input->p_fifo );
         if( p_stream->fmt.i_codec == VLC_FOURCC( 'h', '2', '6', '4' ) )
         {
-            p_data = ConvertAVC1( p_mux, p_stream, p_data );
+            p_data = ConvertAVC1( p_data );
         }
         else if( p_stream->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
         {
-            p_data = ConvertSUBT( p_mux, p_stream, p_data );
+            p_data = ConvertSUBT( p_data );
         }
         if( p_data == NULL ) goto again;
 
@@ -653,7 +654,7 @@ again:
 /*****************************************************************************
  *
  *****************************************************************************/
-static block_t *ConvertSUBT( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
+static block_t *ConvertSUBT( block_t *p_block )
 {
     p_block = block_Realloc( p_block, 2, p_block->i_buffer );
 
@@ -667,7 +668,7 @@ static block_t *ConvertSUBT( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_blo
     return p_block;
 }
 
-static block_t *ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
+static block_t *ConvertAVC1( block_t *p_block )
 {
     uint8_t *last = p_block->p_buffer;  /* Assume it starts with 0x00000001 */
     uint8_t *dat  = &p_block->p_buffer[4];
@@ -882,7 +883,7 @@ static bo_t *GetDamrTag( mp4_stream_t *p_stream )
     return damr;
 }
 
-static bo_t *GetD263Tag( mp4_stream_t *p_stream )
+static bo_t *GetD263Tag( void )
 {
     bo_t *d263;
 
@@ -1184,7 +1185,7 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     return soun;
 }
 
-static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+static bo_t *GetVideBox( mp4_stream_t *p_stream )
 {
 
     bo_t *vide;
@@ -1278,7 +1279,7 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
     case VLC_FOURCC('H','2','6','3'):
         {
-            bo_t *d263 = GetD263Tag( p_stream );
+            bo_t *d263 = GetD263Tag();
 
             box_fix( d263 );
             box_gather( vide, d263 );
@@ -1307,7 +1308,7 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     return vide;
 }
 
-static bo_t *GetTextBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+static bo_t *GetTextBox( void )
 {
 
     bo_t *text = box_new( "text" );
@@ -1365,12 +1366,12 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     }
     else if( p_stream->fmt.i_cat == VIDEO_ES )
     {
-        bo_t *vide = GetVideBox( p_mux, p_stream );
+        bo_t *vide = GetVideBox( p_stream );
         box_gather( stsd, vide );
     }
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
-        box_gather( stsd, GetTextBox( p_mux, p_stream ) );
+        box_gather( stsd, GetTextBox() );
     }
     box_fix( stsd );
 

@@ -218,6 +218,7 @@ static void Close( vlc_object_t * p_this )
 
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
     char **ppsz;
 
@@ -404,8 +405,7 @@ static int Mux      ( sout_mux_t *p_mux )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     avi_stream_t    *p_stream;
-    int i_stream;
-    int i;
+    int i_stream, i;
 
     if( p_sys->b_write_header )
     {
@@ -660,9 +660,7 @@ static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
 
     AVI_BOX_EXIT( 0 );
 }
-static int avi_HeaderAdd_strh( sout_mux_t   *p_mux,
-                               buffer_out_t *p_bo,
-                               avi_stream_t *p_stream )
+static int avi_HeaderAdd_strh( buffer_out_t *p_bo, avi_stream_t *p_stream )
 {
     AVI_BOX_ENTER( "strh" );
 
@@ -729,9 +727,7 @@ static int avi_HeaderAdd_strh( sout_mux_t   *p_mux,
     AVI_BOX_EXIT( 0 );
 }
 
-static int avi_HeaderAdd_strf( sout_mux_t *p_mux,
-                               buffer_out_t *p_bo,
-                               avi_stream_t *p_stream )
+static int avi_HeaderAdd_strf( buffer_out_t *p_bo, avi_stream_t *p_stream )
 {
     AVI_BOX_ENTER( "strf" );
 
@@ -775,14 +771,12 @@ static int avi_HeaderAdd_strf( sout_mux_t *p_mux,
     AVI_BOX_EXIT( 0 );
 }
 
-static int avi_HeaderAdd_strl( sout_mux_t *p_mux,
-                               buffer_out_t *p_bo,
-                               avi_stream_t *p_stream )
+static int avi_HeaderAdd_strl( buffer_out_t *p_bo, avi_stream_t *p_stream )
 {
     AVI_BOX_ENTER_LIST( "strl" );
 
-    avi_HeaderAdd_strh( p_mux, p_bo, p_stream );
-    avi_HeaderAdd_strf( p_mux, p_bo, p_stream );
+    avi_HeaderAdd_strh( p_bo, p_stream );
+    avi_HeaderAdd_strf( p_bo, p_stream );
 
     AVI_BOX_EXIT( 0 );
 }
@@ -812,7 +806,7 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     avi_HeaderAdd_avih( p_mux, &bo );
     for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
-        avi_HeaderAdd_strl( p_mux, &bo, &p_sys->stream[i_stream] );
+        avi_HeaderAdd_strl( &bo, &p_sys->stream[i_stream] );
     }
 
     i_junk = HDR_SIZE - bo.i_buffer - 8 - 12;

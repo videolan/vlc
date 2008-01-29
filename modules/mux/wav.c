@@ -130,29 +130,30 @@ static void Close( vlc_object_t * p_this )
 
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_mux);
     vlc_bool_t *pb_bool;
     char **ppsz;
 
-   switch( i_query )
-   {
-       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_FALSE;
-           return VLC_SUCCESS;
+    switch( i_query )
+    {
+        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_FALSE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_ADD_STREAM_WAIT:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
-           return VLC_SUCCESS;
+        case MUX_GET_ADD_STREAM_WAIT:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb_bool = VLC_TRUE;
+            return VLC_SUCCESS;
 
-       case MUX_GET_MIME:
-           ppsz = (char**)va_arg( args, char ** );
-           *ppsz = strdup( "audio/wav" );
-           return VLC_SUCCESS;
+        case MUX_GET_MIME:
+            ppsz = (char**)va_arg( args, char ** );
+            *ppsz = strdup( "audio/wav" );
+            return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
-   }
+    }
 }
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
@@ -263,10 +264,11 @@ static block_t *GetHeader( sout_mux_t *p_mux )
 
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    VLC_UNUSED(p_input);
     msg_Dbg( p_mux, "removing input" );
 
     msg_Dbg( p_mux, "writing header data" );
-    if( !sout_AccessOutSeek( p_mux->p_access, 0 ) )
+    if( sout_AccessOutSeek( p_mux->p_access, 0 ) == VLC_SUCCESS )
     {
         sout_AccessOutWrite( p_mux->p_access, GetHeader( p_mux ) );
     }
