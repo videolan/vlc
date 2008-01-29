@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dbus.c : D-Bus control interface
  *****************************************************************************
- * Copyright © 2006-2007 Rafaël Carré
+ * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007 Mirsal Ennaime
  * $Id$
  *
@@ -31,7 +31,7 @@
  *  extract:
  *   "If you use this low-level API directly, you're signing up for some pain."
  *
- * MPRIS Specification (still drafting on Oct, 23 of 2007):
+ * MPRIS Specification (still drafting on Jan, 23 of 2008):
  *      http://wiki.xmms2.xmms.se/index.php/MPRIS
  */
 
@@ -53,6 +53,8 @@
 #include <vlc_meta.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
+#include <vlc_demux.h>
+#include <vlc_access.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -74,10 +76,23 @@ static int StatusChangeEmit( vlc_object_t *, const char *, vlc_value_t,
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
 static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, vlc_bool_t );
 
+/* GetCaps() capabilities */
+enum
+{
+     CAPS_NONE                  = 0,
+     CAPS_CAN_GO_NEXT           = 1 << 0,
+     CAPS_CAN_GO_PREV           = 1 << 1,
+     CAPS_CAN_PAUSE             = 1 << 2,
+     CAPS_CAN_PLAY              = 1 << 3,
+     CAPS_CAN_SEEK              = 1 << 4,
+     CAPS_CAN_PROVIDE_METADATA  = 1 << 5
+};
+
 struct intf_sys_t
 {
     DBusConnection *p_conn;
     vlc_bool_t      b_meta_read;
+    dbus_int32_t    i_caps;
 };
 
 /*****************************************************************************
@@ -284,10 +299,63 @@ DBUS_METHOD( GetCurrentMetadata )
     REPLY_SEND;
 }
 
+DBUS_METHOD( GetCaps )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    playlist_t* p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    PL_LOCK;
+    
+    dbus_int32_t i_caps = CAPS_NONE;
+
+    /* FIXME:
+     * Every capability should be checked in a callback, modifying p_sys->i_caps
+     * so we can send a signal whenever it changes.
+     * When it is done, GetCaps method will just return p_sys->i_caps
+     */
+
+    if( p_playlist->items.i_size > 0 )
+        i_caps |= CAPS_CAN_PLAY | CAPS_CAN_GO_PREV | CAPS_CAN_GO_NEXT;
+
+    if( p_playlist->p_input )
+    {
+        access_t *p_access = (access_t*)vlc_object_find( p_playlist->p_input, 
+            VLC_OBJECT_ACCESS, FIND_CHILD );
+        if( p_access )
+        {
+            vlc_bool_t b_can_pause;
+            if( !access2_Control( p_access, ACCESS_CAN_PAUSE, &b_can_pause ) &&
+                    b_can_pause )
+                i_caps |= CAPS_CAN_PAUSE;
+            vlc_object_release( p_access );
+        }
+        demux_t *p_demux = (demux_t*)vlc_object_find( p_playlist->p_input,
+            VLC_OBJECT_DEMUX, FIND_CHILD );
+        if( p_demux )
+        {   /* XXX: is: demux can seek and access can not a possibility ? */
+            vlc_bool_t b_can_seek;
+            if( !stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek ) &&
+                    b_can_seek )
+                i_caps |= CAPS_CAN_SEEK;
+            vlc_object_release( p_demux );
+        }
+    }
+
+    if( ((intf_thread_t*)p_this)->p_sys->b_meta_read )
+        i_caps |= CAPS_CAN_PROVIDE_METADATA;
+
+    PL_UNLOCK;
+
+    ADD_INT32( &i_caps );
+
+    REPLY_SEND;
+}
+
 /* Media Player information */
 
 DBUS_METHOD( Identity )
 {
+    VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
     char *psz_identity;
@@ -533,6 +601,7 @@ DBUS_METHOD( Random )
 
 DBUS_METHOD( handle_introspect_root )
 { /* handles introspection of root object */
+    VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
     ADD_STRING( &psz_introspection_xml_data_root );
@@ -541,6 +610,7 @@ DBUS_METHOD( handle_introspect_root )
 
 DBUS_METHOD( handle_introspect_player )
 {
+    VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
     ADD_STRING( &psz_introspection_xml_data_player );
@@ -549,6 +619,7 @@ DBUS_METHOD( handle_introspect_player )
 
 DBUS_METHOD( handle_introspect_tracklist )
 {
+    VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
     ADD_STRING( &psz_introspection_xml_data_tracklist );
@@ -582,7 +653,7 @@ DBUS_METHOD( handle_player )
 {
     if( dbus_message_is_method_call( p_from,
                 DBUS_INTERFACE_INTROSPECTABLE, "Introspect" ) )
-    return handle_introspect_player( p_conn, p_from, p_this );
+        return handle_introspect_player( p_conn, p_from, p_this );
 
     /* here D-Bus method's names are associated to an handler */
 
@@ -599,6 +670,7 @@ DBUS_METHOD( handle_player )
     METHOD_FUNC( "PositionGet",             PositionGet );
     METHOD_FUNC( "GetStatus",               GetStatus );
     METHOD_FUNC( "GetMetadata",             GetCurrentMetadata );
+    METHOD_FUNC( "GetCaps",                 GetCaps );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
@@ -638,6 +710,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->b_meta_read = VLC_FALSE;
+    p_sys->i_caps = CAPS_NONE;
 
     dbus_error_init( &error );
 
@@ -773,6 +846,7 @@ DBUS_SIGNAL( StatusChangeSignal )
 static int StateChange( vlc_object_t *p_this, const char* psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
 
@@ -804,6 +878,8 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
 static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = p_data;
 
     if( p_intf->b_dead )
@@ -859,6 +935,39 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
         p_sys->b_meta_read = VLC_TRUE;
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
+
+    dbus_int32_t i_caps = CAPS_NONE;
+
+    if( p_playlist->items.i_size > 0 )
+        i_caps |= CAPS_CAN_PLAY | CAPS_CAN_GO_PREV | CAPS_CAN_GO_NEXT;
+
+    if( p_playlist->p_input )
+    {
+        access_t *p_access = (access_t*)vlc_object_find( p_playlist->p_input,
+            VLC_OBJECT_ACCESS, FIND_CHILD );
+        if( p_access )
+        {
+            vlc_bool_t b_can_pause;
+            if( !access2_Control( p_access, ACCESS_CAN_PAUSE, &b_can_pause ) &&
+                    b_can_pause )
+                i_caps |= CAPS_CAN_PAUSE;
+            vlc_object_release( p_access );
+        }
+        demux_t *p_demux = (demux_t*)vlc_object_find( p_playlist->p_input,
+            VLC_OBJECT_DEMUX, FIND_CHILD );
+        if( p_demux )
+        {   /* XXX: is: demux can seek and access can not a possibility ? */
+            vlc_bool_t b_can_seek;
+            if( !stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek ) &&
+                    b_can_seek )
+                i_caps |= CAPS_CAN_SEEK;
+            vlc_object_release( p_demux );
+        }
+    }
+
+    if( ((intf_thread_t*)p_this)->p_sys->b_meta_read )
+        i_caps |= CAPS_CAN_PROVIDE_METADATA;
+
 
     var_AddCallback( p_input, "state", StateChange, p_intf );
 

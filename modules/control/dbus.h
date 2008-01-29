@@ -33,7 +33,6 @@
 
 /* MACROS */
 
-/* DBus related */
 #define DBUS_METHOD( method_function ) \
     static DBusHandlerResult method_function \
             ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
@@ -141,6 +140,9 @@ const char* psz_introspection_xml_data_player =
 "    </method>\n"
 "    <method name=\"GetMetadata\">\n"
 "      <arg type=\"a{sv}\" direction=\"out\" />\n"
+"    </method>\n"
+"    <method name=\"GetCaps\">\n"
+"      <arg type=\"i\" direction=\"out\" />\n"
 "    </method>\n"
 "    <signal name=\"TrackChange\">\n"
 "      <arg type=\"a{sv}\"/>\n"
