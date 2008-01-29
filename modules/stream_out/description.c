@@ -150,6 +150,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  block_t *p_buffer )
 {
+    VLC_UNUSED(id);
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     block_ChainRelease( p_buffer );

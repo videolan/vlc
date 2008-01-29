@@ -313,7 +313,7 @@ static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 static int  transcode_audio_new    ( sout_stream_t *, sout_stream_id_t * );
-static void transcode_audio_close  ( sout_stream_t *, sout_stream_id_t * );
+static void transcode_audio_close  ( sout_stream_id_t * );
 static int  transcode_audio_process( sout_stream_t *, sout_stream_id_t *,
                                      block_t *, block_t ** );
 
@@ -335,7 +335,7 @@ static picture_t *video_new_buffer_filter( filter_t * );
 static void video_del_buffer_filter( filter_t *, picture_t * );
 
 static int  transcode_spu_new    ( sout_stream_t *, sout_stream_id_t * );
-static void transcode_spu_close  ( sout_stream_t *, sout_stream_id_t * );
+static void transcode_spu_close  ( sout_stream_id_t * );
 static int  transcode_spu_process( sout_stream_t *, sout_stream_id_t *,
                                    block_t *, block_t ** );
 
@@ -1003,7 +1003,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         if( !id->id )
         {
-            transcode_audio_close( p_stream, id );
+            transcode_audio_close( id );
             goto error;
         }
 
@@ -1063,7 +1063,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         if( !id->id )
         {
-            transcode_spu_close( p_stream, id );
+            transcode_spu_close( id );
             goto error;
         }
     }
@@ -1138,7 +1138,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         switch( id->p_decoder->fmt_in.i_cat )
         {
         case AUDIO_ES:
-            transcode_audio_close( p_stream, id );
+            transcode_audio_close( id );
             break;
         case VIDEO_ES:
             transcode_video_close( p_stream, id );
@@ -1147,7 +1147,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
             if( p_sys->b_osd )
                 transcode_osd_close( p_stream, id );
             else
-                transcode_spu_close( p_stream, id );
+                transcode_spu_close( id );
             break;
         }
     }
@@ -1419,7 +1419,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         msg_Err( p_stream, "no audio filter found (%4.4s->%4.4s)",
                  (char *)&fmt_last.i_codec,
                  (char *)&id->p_encoder->fmt_in.i_codec );
-        transcode_audio_close( p_stream, id );
+        transcode_audio_close( id );
         return VLC_EGENERIC;
     }
 
@@ -1467,7 +1467,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         if( !id->p_encoder->p_module )
         {
             msg_Err( p_stream, "cannot find encoder (%s)", p_sys->psz_aenc );
-            transcode_audio_close( p_stream, id );
+            transcode_audio_close( id );
             return VLC_EGENERIC;
         }
         id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
@@ -1478,7 +1478,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                  " %i to %i channels", fmt_last.audio.i_channels,
                  id->p_encoder->fmt_in.audio.i_channels );
 
-        transcode_audio_close( p_stream, id );
+        transcode_audio_close( id );
         return VLC_EGENERIC;
 #endif
     }
@@ -1493,7 +1493,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;
         id->p_encoder->fmt_out.audio.i_rate = fmt_last.audio.i_rate;
 #else
-        transcode_audio_close( p_stream, id );
+        transcode_audio_close( id );
         return VLC_EGENERIC;
 #endif
     }
@@ -1505,8 +1505,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     return VLC_SUCCESS;
 }
 
-static void transcode_audio_close( sout_stream_t *p_stream,
-                                   sout_stream_id_t *id )
+static void transcode_audio_close( sout_stream_id_t *id )
 {
     int i;
 
@@ -1650,8 +1649,9 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 
 static void audio_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
 {
+    VLC_UNUSED(p_dec);
     if( p_buffer && p_buffer->p_sys ) block_Release( p_buffer->p_sys );
-    if( p_buffer ) free( p_buffer );
+    free( p_buffer );
 }
 
 /*
@@ -2643,30 +2643,38 @@ static picture_t *video_new_buffer_filter( filter_t *p_filter )
 
 static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
 {
-    if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
-    if( p_pic && p_pic->p_sys ) free( p_pic->p_sys );
-    if( p_pic ) free( p_pic );
+    VLC_UNUSED(p_this);
+    if( p_pic )
+    {
+        free( p_pic->p_data_orig );
+        free( p_pic->p_sys );
+        free( p_pic );
+    }
 }
 
 static void video_del_buffer_decoder( decoder_t *p_decoder, picture_t *p_pic )
 {
+    VLC_UNUSED(p_decoder);
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
 }
 
 static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 {
+    VLC_UNUSED(p_filter);
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
 }
 
 static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
+    VLC_UNUSED(p_dec);
     p_pic->i_refcount++;
 }
 
 static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
+    VLC_UNUSED(p_dec);
     video_release_buffer( p_pic );
 }
 
@@ -2729,7 +2737,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_t *id)
+static void transcode_spu_close( sout_stream_id_t *id)
 {
     /* Close decoder */
     if( id->p_decoder->p_module )

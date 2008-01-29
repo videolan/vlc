@@ -198,6 +198,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
  *****************************************************************************/
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
+    VLC_UNUSED(p_stream);
     id->b_used = VLC_FALSE;
     return VLC_SUCCESS;
 }

@@ -270,6 +270,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
+    VLC_UNUSED(id);
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
     bridged_es_t *p_es;
 

@@ -32,6 +32,11 @@
 
 #include "rtp.h"
 
+int
+rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
+                        const uint8_t *p_data, int i_data, int64_t i_pts,
+                        int64_t i_dts, vlc_bool_t b_last, int64_t i_length );
+
 int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
                        block_t *in )
 {

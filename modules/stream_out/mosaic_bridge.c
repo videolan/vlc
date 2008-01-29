@@ -103,7 +103,7 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 inline static void video_del_buffer_decoder( decoder_t *, picture_t * );
 inline static void video_del_buffer_filter( filter_t *, picture_t * );
-static void video_del_buffer( vlc_object_t *, picture_t * );
+static void video_del_buffer( picture_t * );
 
 inline static picture_t *video_new_buffer_decoder( decoder_t * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
@@ -428,6 +428,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
+    VLC_UNUSED(id);
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bridge_t *p_bridge;
     bridged_es_t *p_es;
@@ -810,16 +811,18 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
 inline static void video_del_buffer_decoder( decoder_t *p_this,
                                              picture_t *p_pic )
 {
-    video_del_buffer( VLC_OBJECT( p_this ), p_pic );
+    VLC_UNUSED(p_this);
+    video_del_buffer( p_pic );
 }
 
 inline static void video_del_buffer_filter( filter_t *p_this,
                                             picture_t *p_pic )
 {
-    video_del_buffer( VLC_OBJECT( p_this ), p_pic );
+    VLC_UNUSED(p_this);
+    video_del_buffer( p_pic );
 }
 
-static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
+static void video_del_buffer( picture_t *p_pic )
 {
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
@@ -834,11 +837,13 @@ static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
 
 static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
+    VLC_UNUSED(p_dec);
     p_pic->i_refcount++;
 }
 
 static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
+    VLC_UNUSED(p_dec);
     video_release_buffer_decoder( p_pic );
 }
 
@@ -850,6 +855,7 @@ static int MosaicBridgeCallback( vlc_object_t *p_this, char const *psz_var,
                                  vlc_value_t oldval, vlc_value_t newval,
                                  void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     sout_stream_t *p_stream = (sout_stream_t *)p_data;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_ret = VLC_SUCCESS;

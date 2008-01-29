@@ -79,11 +79,13 @@ static void Close( vlc_object_t * p_this )
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
+    VLC_UNUSED(p_stream); VLC_UNUSED(p_fmt);
     return malloc( 0 );
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
+    VLC_UNUSED(p_stream);
     free( id );
 
     return VLC_SUCCESS;
