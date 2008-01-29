@@ -375,7 +375,7 @@ static void Run( intf_thread_t *p_intf )
                                    cl->i_mode + 2 );
                 }
 
-                if (i_recv <= 0)
+                if (i_recv <= 0 && ( end || errno != EAGAIN ) )
                     goto drop;
             }
         }
