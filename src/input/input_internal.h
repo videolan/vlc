@@ -413,7 +413,7 @@ void    input_ClockSetRate( input_thread_t *, input_clock_t *cl, int i_rate );
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
 int subtitles_Filter( const char *);
 
-void MRLSplit( vlc_object_t *, char *, const char **, const char **, char ** );
+void MRLSplit( char *, const char **, const char **, char ** );
 
 static inline void input_ChangeState( input_thread_t *p_input, int state )
 {

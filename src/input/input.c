@@ -2181,8 +2181,7 @@ static int InputSourceInit( input_thread_t *p_input,
     /* Split uri */
     if( !p_input->b_preparsing )
     {
-        MRLSplit( VLC_OBJECT(p_input), psz_dup,
-                  &psz_access, &psz_demux, &psz_path );
+        MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
 
         msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
                  psz_mrl, psz_access, psz_demux, psz_path );
@@ -2398,8 +2397,7 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 const char *psz_a, *psz_d;
                 psz_buf = strdup( in->p_access->psz_path );
-                MRLSplit( VLC_OBJECT(p_input), psz_buf,
-                          &psz_a, &psz_d, &psz_real_path );
+                MRLSplit( psz_buf, &psz_a, &psz_d, &psz_real_path );
             }
             else
             {
@@ -2790,8 +2788,7 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
  *****************************************************************************/
-void MRLSplit( vlc_object_t *p_input, char *psz_dup,
-               const char **ppsz_access, const char **ppsz_demux,
+void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
                char **ppsz_path )
 {
     const char *psz_access = "";
