@@ -126,6 +126,7 @@ static luaL_Reg p_reg_parse[] =
 static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
                             lua_State * L, void * user_data )
 {
+    VLC_UNUSED(user_data);
     demux_t * p_demux = (demux_t *)p_this;
 
     p_demux->p_sys->psz_filename = strdup(psz_filename);
@@ -284,5 +285,6 @@ static int Demux( demux_t *p_demux )
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }

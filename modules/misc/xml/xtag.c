@@ -113,8 +113,10 @@ static void CatalogAdd( xml_t *, const char *, const char *, const char * );
 
 static XTag *xtag_new_parse( const char *, int );
 static char *xtag_get_name( XTag * );
+#if 0
 static char *xtag_get_pcdata( XTag * );
 static char *xtag_get_attribute( XTag *, char * );
+#endif
 static XTag *xtag_first_child( XTag *, char * );
 static XTag *xtag_next_child( XTag *, char * );
 static XTag *xtag_free( XTag * );
@@ -141,6 +143,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
     return;
 }
 
@@ -149,12 +152,15 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void CatalogLoad( xml_t *p_xml, const char *psz_filename )
 {
+    VLC_UNUSED(psz_filename);
     msg_Dbg( p_xml, "catalog support not implemented" );
 }
 
 static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
                           const char *psz_arg2, const char *psz_filename )
 {
+    VLC_UNUSED(p_xml); VLC_UNUSED(psz_arg1); VLC_UNUSED(psz_arg2);
+    VLC_UNUSED(psz_filename);
 }
 
 /*****************************************************************************
@@ -231,6 +237,7 @@ static void ReaderDelete( xml_reader_t *p_reader )
 
 static int ReaderUseDTD ( xml_reader_t *p_reader, vlc_bool_t b_use )
 {
+    VLC_UNUSED(p_reader); VLC_UNUSED(b_use);
     return VLC_EGENERIC;
 }
 
@@ -836,6 +843,7 @@ static char *xtag_get_name( XTag *xtag )
     return xtag ? xtag->name : NULL;
 }
 
+#if 0
 static char *xtag_get_pcdata( XTag *xtag )
 {
     XList *l;
@@ -872,6 +880,7 @@ static char *xtag_get_attribute( XTag *xtag, char *attribute )
 
     return NULL;
 }
+#endif
 
 static XTag *xtag_first_child( XTag *xtag, char *name )
 {

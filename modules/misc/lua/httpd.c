@@ -111,6 +111,7 @@ static int vlclua_httpd_handler_callback(
      char *psz_remote_addr, char *psz_remote_host,
      uint8_t **pp_data, int *pi_data )
 {
+    VLC_UNUSED(p_handler);
     lua_State *L = p_sys->L;
 
     /* function data */
@@ -198,6 +199,7 @@ static int vlclua_httpd_file_callback(
     httpd_file_sys_t *p_sys, httpd_file_t *p_file, uint8_t *psz_request,
     uint8_t **pp_data, int *pi_data )
 {
+    VLC_UNUSED(p_file);
     lua_State *L = p_sys->L;
 
     /* function data */

@@ -196,6 +196,7 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+    VLC_UNUSED(p_vout);
     return( 0 );
 }
 
@@ -204,6 +205,7 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED(p_vout); VLC_UNUSED(p_pic);
     /* No need to do anything, the fake direct buffers stay as they are */
 }
 
@@ -212,6 +214,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED(p_vout); VLC_UNUSED(p_pic);
     /* No need to do anything, the fake direct buffers stay as they are */
 }
 
@@ -221,5 +224,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 static void SetPalette ( vout_thread_t *p_vout,
                          uint16_t *red, uint16_t *green, uint16_t *blue )
 {
+    VLC_UNUSED(p_vout); VLC_UNUSED(red); VLC_UNUSED(green); VLC_UNUSED(blue);
     /* No need to do anything, the fake direct buffers stay as they are */
 }

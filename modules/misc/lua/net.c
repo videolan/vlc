@@ -134,7 +134,7 @@ int vlclua_net_recv( lua_State *L )
 int vlclua_net_select( lua_State *L )
 {
     int i_ret;
-    int i_nfds = luaL_checkint( L, 1 );
+    size_t i_nfds = luaL_checkint( L, 1 );
     fd_set *fds_read = (fd_set*)luaL_checkuserdata( L, 2, sizeof( fd_set ) );
     fd_set *fds_write = (fd_set*)luaL_checkuserdata( L, 3, sizeof( fd_set ) );
     double f_timeout = luaL_checknumber( L, 4 );
@@ -176,7 +176,7 @@ int vlclua_fd_isset( lua_State *L )
 int vlclua_fd_set( lua_State *L )
 {
     fd_set *fds = (fd_set*)luaL_checkuserdata( L, 1, sizeof( fd_set ) );
-    int i_fd = luaL_checkint( L, 2 );
+    size_t i_fd = luaL_checkint( L, 2 );
     /* FIXME: we should really use poll() instead here, but that breaks the
      * VLC/LUA API. On Windows, overflow protection is built-in FD_SET, not
      * on POSIX. In both cases, run-time behavior will however be wrong. */

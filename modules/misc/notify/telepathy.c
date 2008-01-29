@@ -166,6 +166,7 @@ static void Close( vlc_object_t *p_this )
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
+    VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
     char *psz_buf = NULL;
     input_thread_t *p_input;
@@ -237,6 +238,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 static int StateChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
     if( p_intf->b_dead )
         return VLC_EGENERIC;

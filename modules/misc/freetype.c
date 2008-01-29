@@ -39,12 +39,12 @@
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 #include <vlc_input.h>
+#include <vlc_mtime.h>
 
 #ifdef HAVE_LINUX_LIMITS_H
 #   include <linux/limits.h>
 #endif
 
-#include <time.h>
 #include <math.h>
 #include <errno.h>
 
@@ -504,10 +504,10 @@ static void FontBuilder( vlc_object_t *p_this )
 
     if( p_fontconfig )
     {
-        time_t    t1, t2;
+        mtime_t    t1, t2;
 
         msg_Dbg( p_this, "Building font database..." );
-        time( &t1 );
+        t1 = mdate();
         if(! FcConfigBuildFonts( p_fontconfig ))
         {
             /* Don't destroy the fontconfig object - we won't be able to do
@@ -517,11 +517,10 @@ static void FontBuilder( vlc_object_t *p_this )
             msg_Err( p_this, "fontconfig database can't be built. "
                                     "Font styling won't be available" );
         }
-        time( &t2 );
+        t2 = mdate();
 
         msg_Dbg( p_this, "Finished building font database." );
-        if( t1 > 0 && t2 > 0 )
-            msg_Dbg( p_this, "Took %ld seconds", t2 - t1 );
+        msg_Dbg( p_this, "Took %ld seconds", (long)((t2 - t1)/1000000) );
 
         lock = var_AcquireMutex( "fontbuilder" );
         var_SetBool( p_this, "build-done", VLC_TRUE );
@@ -742,7 +741,7 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, vlc_boo
                                 FT_BitmapGlyph  p_this_glyph, FT_Vector *p_this_glyph_pos,
                                 FT_BitmapGlyph  p_next_glyph, FT_Vector *p_next_glyph_pos,
                                 int i_glyph_tmax, int i_align_offset,
-                                uint8_t i_y, uint8_t i_u, uint8_t i_v, uint8_t i_alpha,
+                                uint8_t i_y, uint8_t i_u, uint8_t i_v,
                                 subpicture_region_t *p_region)
 {
     int y, x, z;
@@ -1044,7 +1043,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                                     p_line->pp_glyphs[i], &(p_line->p_glyph_pos[i]),
                                     p_line->pp_glyphs[i+1], &(p_line->p_glyph_pos[i+1]),
                                     i_glyph_tmax, i_align_offset,
-                                    i_y, i_u, i_v, i_alpha,
+                                    i_y, i_u, i_v,
                                     p_region);
             }
         }

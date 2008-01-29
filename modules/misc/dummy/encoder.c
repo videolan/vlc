@@ -56,6 +56,7 @@ int E_(OpenEncoder) ( vlc_object_t *p_this )
  ****************************************************************************/
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 {
+    VLC_UNUSED(p_enc); VLC_UNUSED(p_pict);
     return NULL;
 }
 
@@ -64,6 +65,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
  ****************************************************************************/
 static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_buf )
 {
+    VLC_UNUSED(p_enc); VLC_UNUSED(p_buf);
     return NULL;
 }
 
@@ -72,4 +74,5 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_buf )
  *****************************************************************************/
 void E_(CloseEncoder) ( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
 }

@@ -42,6 +42,7 @@
  *****************************************************************************/
 static int AccessRead( access_t *p_access, uint8_t *p, int i_size )
 {
+    VLC_UNUSED(p_access);
     memset( p, 0, i_size );
     return i_size;
 }

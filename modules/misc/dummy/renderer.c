@@ -46,5 +46,6 @@ int E_(OpenRenderer)( vlc_object_t *p_this )
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                        subpicture_region_t *p_region_in )
 {
+    VLC_UNUSED(p_filter); VLC_UNUSED(p_region_out); VLC_UNUSED(p_region_in);
     return VLC_EGENERIC;
 }

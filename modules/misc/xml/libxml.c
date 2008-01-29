@@ -87,6 +87,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
     return;
 }
 
@@ -95,6 +96,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void CatalogLoad( xml_t *p_xml, const char *psz_filename )
 {
+    VLC_UNUSED(p_xml);
     if( !psz_filename ) xmlInitializeCatalog();
     else xmlLoadCatalog( psz_filename );
 }
@@ -102,6 +104,7 @@ static void CatalogLoad( xml_t *p_xml, const char *psz_filename )
 static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
                           const char *psz_arg2, const char *psz_filename )
 {
+    VLC_UNUSED(p_xml);
     xmlCatalogAdd( (unsigned char*)psz_arg1, (unsigned char*)psz_arg2,
         (unsigned char*)psz_filename );
 }
@@ -113,6 +116,7 @@ static void ReaderErrorHandler( void *p_arg, const char *p_msg,
                                 xmlParserSeverities severity,
                                 xmlTextReaderLocatorPtr locator)
 {
+    VLC_UNUSED(severity);
     xml_reader_t *p_reader = (xml_reader_t *)p_arg;
     int line = xmlTextReaderLocatorLineNumber( locator );
     msg_Err( p_reader->p_xml, "XML parser error (line %d) : %s", line, p_msg );

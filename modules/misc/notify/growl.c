@@ -47,8 +47,7 @@ static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
 
 static int RegisterToGrowl( vlc_object_t *p_this );
-static int NotifyToGrowl( vlc_object_t *p_this, char *psz_type,
-                            char *psz_title, char *psz_desc );
+static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc );
 static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 #define GROWL_MAX_LENGTH 256
 
@@ -114,6 +113,8 @@ static void Close( vlc_object_t *p_this )
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
+    VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    VLC_UNUSED(param);
     char psz_tmp[GROWL_MAX_LENGTH];
     char *psz_title = NULL;
     char *psz_artist = NULL;
@@ -151,7 +152,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_artist );
     free( psz_album );
 
-    NotifyToGrowl( p_this, "Now Playing", "Now Playing", psz_tmp );
+    NotifyToGrowl( p_this, psz_tmp );
 
     vlc_object_release( p_input );
     return VLC_SUCCESS;
@@ -178,7 +179,7 @@ static int RegisterToGrowl( vlc_object_t *p_this )
 {
     uint8_t *psz_encoded = malloc(100);
     uint8_t i_defaults = 0;
-    char *psz_notifications[] = {"Now Playing", NULL};
+    static const char *psz_notifications[] = {"Now Playing", NULL};
     vlc_bool_t pb_defaults[] = {VLC_TRUE, VLC_FALSE};
     int i = 0, j;
     if( psz_encoded == NULL )
@@ -211,9 +212,9 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static int NotifyToGrowl( vlc_object_t *p_this, char *psz_type,
-                            char *psz_title, char *psz_desc )
+static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
 {
+    const char *psz_type = "Now Playing", *psz_title = "Now Playing";
     uint8_t *psz_encoded = malloc(GROWL_MAX_LENGTH + 42);
     uint16_t flags;
     int i = 0;

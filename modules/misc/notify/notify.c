@@ -136,6 +136,7 @@ static void Close( vlc_object_t *p_this )
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
+    VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
     char                psz_tmp[MAX_LENGTH];
     char                psz_notify[MAX_LENGTH];
     char                *psz_title      = NULL;
@@ -251,6 +252,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
 static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
 { /* libnotify callback, called when the "Next" button is pressed */
+    VLC_UNUSED(psz);
     notify_notification_close (notification, NULL);
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
     playlist_Next( p_playlist );
@@ -259,6 +261,7 @@ static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
 
 static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
 { /* libnotify callback, called when the "Previous" button is pressed */
+    VLC_UNUSED(psz);
     notify_notification_close (notification, NULL);
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
     playlist_Prev( p_playlist );
