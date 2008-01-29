@@ -245,10 +245,10 @@ static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
  * APEv1/2
  *****************************************************************************/
 #define APE_TAG_HEADERSIZE (32)
-static int GetAPEvXSize( const uint8_t *p_data, int i_data )
+static size_t GetAPEvXSize( const uint8_t *p_data, int i_data )
 {
     uint32_t flags;
-    int i_body;
+    size_t i_body;
 
     if( i_data < APE_TAG_HEADERSIZE ||
         ( GetDWLE( &p_data[8] ) != 1000 && GetDWLE( &p_data[8] ) != 2000 ) || /* v1/v2 only */
@@ -375,14 +375,14 @@ static void ParseAPEvXTag( demux_t *p_demux, const uint8_t *p_data, int i_data )
 static void CheckFooter( demux_t *p_demux )
 {
     const int64_t i_pos = stream_Size( p_demux->s );
-    const int i_peek = 128+APE_TAG_HEADERSIZE;
+    const size_t i_peek = 128+APE_TAG_HEADERSIZE;
     const uint8_t *p_peek;
     const uint8_t *p_peek_id3;
     int64_t i_id3v2_pos = -1;
     int64_t i_apevx_pos = -1;
     int i_id3v2_size;
     int i_apevx_size;
-    int i_id3v1_size;
+    size_t i_id3v1_size;
 
     if( i_pos < i_peek )
         return;
