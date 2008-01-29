@@ -42,7 +42,7 @@ static int  Create       ( vlc_object_t * );
 static void Destroy      ( vlc_object_t * );
 static picture_t *Filter ( filter_t *, picture_t * );
 static void RenderBlur   ( filter_sys_t *, picture_t *, picture_t * );
-static void Copy         ( filter_t *, uint8_t **, picture_t * );
+static void Copy         ( filter_t *, picture_t * );
 static int MotionBlurCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 
@@ -170,12 +170,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_sys->pp_planes[i_plane] = (uint8_t*)malloc(
                 p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
         }
-        Copy( p_filter, p_sys->pp_planes, p_pic );
+        Copy( p_filter, p_pic );
     }
 
     /* Get a new picture */
     RenderBlur( p_sys, p_pic, p_outpic );
-    Copy( p_filter, p_sys->pp_planes, p_outpic );
+    Copy( p_filter, p_outpic );
 
     RELEASE( p_pic );
     return p_outpic;
@@ -218,7 +218,7 @@ static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
     }
 }
 
-static void Copy( filter_t *p_filter, uint8_t **pp_planes, picture_t *p_pic )
+static void Copy( filter_t *p_filter, picture_t *p_pic )
 {
     int i_plane;
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
@@ -233,6 +233,7 @@ static int MotionBlurCallback( vlc_object_t *p_this, char const *psz_var,
                                vlc_value_t oldval, vlc_value_t newval,
                                void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     if( !strcmp( psz_var, FILTER_PREFIX "factor" ) )
         p_sys->i_factor = __MIN( 127, __MAX( 1, newval.i_int ) );

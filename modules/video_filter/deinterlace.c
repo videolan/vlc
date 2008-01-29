@@ -67,7 +67,7 @@ static void RenderBob    ( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderBlend  ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
-static void RenderX      ( vout_thread_t *, picture_t *, picture_t * );
+static void RenderX      ( picture_t *, picture_t * );
 
 static void MergeGeneric ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_C_ALTIVEC)
@@ -558,7 +558,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
         case DEINTERLACE_X:
-            RenderX( p_vout, pp_outpic[0], p_pic );
+            RenderX( pp_outpic[0], p_pic );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
             break;
     }
@@ -1942,8 +1942,7 @@ static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
 }
 #endif
 
-static void RenderX( vout_thread_t *p_vout,
-                     picture_t *p_outpic, picture_t *p_pic )
+static void RenderX( picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
 
@@ -2005,6 +2004,7 @@ static void RenderX( vout_thread_t *p_vout,
 static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
     vlc_value_t sentval = newval;
 
@@ -2031,6 +2031,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(p_data); VLC_UNUSED(oldval);
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     int i_old_mode = p_vout->p_sys->i_mode;
 
@@ -2111,6 +2112,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
@@ -2170,7 +2172,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_X:
-            RenderX( p_vout, p_pic_dst, p_pic );
+            RenderX( p_pic_dst, p_pic );
             break;
     }
 

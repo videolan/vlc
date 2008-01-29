@@ -834,6 +834,7 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
 static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
     vlc_value_t sentval = newval;
 
@@ -858,6 +859,7 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
 static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
@@ -871,6 +873,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
+    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     if( !strcmp( psz_var, "ratio-crop" ) )

@@ -247,7 +247,6 @@ static int RemoveVerticalSeam( filter_t *p_filter, picture_t *p_inpic, picture_t
     const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
     const int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
-    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
     int *p_energy = p_filter->p_sys->p_energy;
@@ -376,6 +375,7 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t oldval, vlc_value_t newval,
                                 void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     p_sys->i_crop = newval.i_int;
     return VLC_SUCCESS;

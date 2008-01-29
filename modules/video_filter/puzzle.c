@@ -472,6 +472,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+
     var_Set( (vlc_object_t *)p_data, psz_var, newval );
 
     return VLC_SUCCESS;
@@ -483,6 +485,7 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
 static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
@@ -494,6 +497,7 @@ static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval); VLC_UNUSED(newval);
     vout_thread_t *p_vout = (vout_thread_t*)p_data;
     int i_x, i_y;
     int i_v;
@@ -564,6 +568,7 @@ static int PuzzleCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     vout_sys_t *p_sys = (vout_sys_t *)p_data;
     if( !strcmp( psz_var, CFG_PREFIX "rows" ) )
     {

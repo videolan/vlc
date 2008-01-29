@@ -338,6 +338,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 static int OSDMenuVisibleEvent( vlc_object_t *p_this, char const *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
+    VLC_UNUSED(newval);
     filter_t *p_filter = (filter_t *) p_data;
 
     p_filter->p_sys->b_visible = VLC_TRUE;
@@ -348,6 +350,8 @@ static int OSDMenuVisibleEvent( vlc_object_t *p_this, char const *psz_var,
 static int OSDMenuUpdateEvent( vlc_object_t *p_this, char const *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
+    VLC_UNUSED(newval);
     filter_t *p_filter = (filter_t *) p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -607,6 +611,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
 
     if( !p_sys )
@@ -659,6 +664,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     vout_thread_t *p_vout = (vout_thread_t*)p_sys->p_vout;
     int i_x, i_y;

@@ -1925,6 +1925,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
 static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
 {
+    VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
     int i_vout;
     vlc_value_t sentval = newval;
@@ -1980,7 +1981,7 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
 static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     int i_row, i_col, i_vout = 0;
 

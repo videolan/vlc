@@ -604,6 +604,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
 static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     var_Set( (vlc_object_t *)p_data, psz_var, newval );
     return VLC_SUCCESS;
 }
@@ -614,6 +615,7 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t*)p_data;
     vout_sys_t *p_sys = p_vout->p_sys;
     vlc_value_t valb;
@@ -672,6 +674,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
@@ -909,6 +912,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     logo_list_t *p_logo_list = p_sys->p_logo_list;
 
