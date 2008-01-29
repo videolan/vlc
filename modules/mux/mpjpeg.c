@@ -62,6 +62,7 @@ static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 /* This pseudo-random sequence is unlikely to ever happen */
+/* This should be the same as in src/network/httpd.c */
 #define BOUNDARY "7b3cc56e5f51db803f790dad720ed50a"
 
 /*****************************************************************************
