@@ -810,6 +810,7 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 static void I420_IUYV( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
+    VLC_UNUSED(p_source); VLC_UNUSED(p_dest);
     /* FIXME: TODO ! */
     msg_Err( p_vout, "I420_IUYV unimplemented, please harass <sam@zoy.org>" );
 }
