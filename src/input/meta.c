@@ -575,7 +575,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
 }
 
 
-uint32_t input_CurrentMetaFlags( vlc_meta_t *p_meta )
+uint32_t input_CurrentMetaFlags( const vlc_meta_t *p_meta )
 {
     uint32_t i_meta = 0;
 
