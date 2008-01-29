@@ -212,7 +212,7 @@ static void longcount_stub(long long* z)
 #endif
 int LOADER_DEBUG=1; // active only if compiled with -DDETAILED_OUT
 //#define DETAILED_OUT
-static inline void dbgprintf(char* fmt, ...)
+static inline void dbgprintf(const char* fmt, ...)
 {
 #ifdef DETAILED_OUT
     if(LOADER_DEBUG)
