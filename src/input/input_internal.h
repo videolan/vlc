@@ -403,11 +403,11 @@ typedef struct
     int                     i_delta_cr_residue;
 } input_clock_t;
 
-void    input_ClockInit( input_thread_t *, input_clock_t *, vlc_bool_t b_master, int i_cr_average, int i_rate );
+void    input_ClockInit( input_clock_t *, vlc_bool_t b_master, int i_cr_average, int i_rate );
 void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
-void    input_ClockResetPCR( input_thread_t *, input_clock_t * );
+void    input_ClockResetPCR( input_clock_t * );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
-void    input_ClockSetRate( input_thread_t *, input_clock_t *cl, int i_rate );
+void    input_ClockSetRate( input_clock_t *cl, int i_rate );
 
 /* Subtitles */
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );

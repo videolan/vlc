@@ -145,7 +145,7 @@ static int          EsOutControl( es_out_t *, int i_query, va_list );
 
 static void         EsOutAddInfo( es_out_t *, es_out_id_t *es );
 
-static vlc_bool_t EsIsSelected( es_out_t *out, es_out_id_t *es );
+static vlc_bool_t EsIsSelected( es_out_id_t *es );
 static void EsSelect( es_out_t *out, es_out_id_t *es );
 static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update );
 static char *LanguageGetName( const char *psz_code );
@@ -362,7 +362,7 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
     EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
-        input_ClockSetRate( p_sys->p_input, &p_sys->pgrm[i]->clock, i_rate );
+        input_ClockSetRate( &p_sys->pgrm[i]->clock, i_rate );
 }
 
 void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
@@ -519,7 +519,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
 
         for( i = 0; i < p_sys->i_es; i++ )
         {
-            if( p_sys->es[i]->p_pgrm == old && EsIsSelected( out, p_sys->es[i] ) &&
+            if( p_sys->es[i]->p_pgrm == old && EsIsSelected( p_sys->es[i] ) &&
                 p_sys->i_mode != ES_OUT_MODE_ALL )
                 EsUnselect( out, p_sys->es[i], VLC_TRUE );
         }
@@ -585,7 +585,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    input_ClockInit( p_input, &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average, p_sys->i_rate );
+    input_ClockInit( &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average, p_sys->i_rate );
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -1008,7 +1008,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     return es;
 }
 
-static vlc_bool_t EsIsSelected( es_out_t *out, es_out_id_t *es )
+static vlc_bool_t EsIsSelected( es_out_id_t *es )
 {
     if( es->p_master )
     {
@@ -1033,7 +1033,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     vlc_value_t    val;
     const char     *psz_var;
 
-    if( EsIsSelected( out, es ) )
+    if( EsIsSelected( es ) )
     {
         msg_Warn( p_input, "ES 0x%x is already selected", es->i_id );
         return;
@@ -1113,7 +1113,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
     vlc_value_t    val;
     const char     *psz_var;
 
-    if( !EsIsSelected( out, es ) )
+    if( !EsIsSelected( es ) )
     {
         msg_Warn( p_input, "ES 0x%x is already unselected", es->i_id );
         return;
@@ -1198,7 +1198,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 
     if( p_sys->i_mode == ES_OUT_MODE_ALL || b_force )
     {
-        if( !EsIsSelected( out, es ) )
+        if( !EsIsSelected( es ) )
             EsSelect( out, es );
     }
     else if( p_sys->i_mode == ES_OUT_MODE_PARTIAL )
@@ -1210,7 +1210,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
         {
             if ( val.p_list->p_values[i].i_int == es->p_pgrm->i_id || b_force )
             {
-                if( !EsIsSelected( out, es ) )
+                if( !EsIsSelected( es ) )
                     EsSelect( out, es );
                 break;
             }
@@ -1311,19 +1311,19 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
             i_wanted  = es->i_channel;
         }
 
-        if( i_wanted == es->i_channel && !EsIsSelected( out, es ) )
+        if( i_wanted == es->i_channel && !EsIsSelected( es ) )
             EsSelect( out, es );
     }
 
     /* FIXME TODO handle priority here */
-    if( EsIsSelected( out, es ) )
+    if( EsIsSelected( es ) )
     {
         if( i_cat == AUDIO_ES )
         {
             if( p_sys->i_mode == ES_OUT_MODE_AUTO &&
                 p_sys->p_es_audio &&
                 p_sys->p_es_audio != es &&
-                EsIsSelected( out, p_sys->p_es_audio ) )
+                EsIsSelected( p_sys->p_es_audio ) )
             {
                 EsUnselect( out, p_sys->p_es_audio, VLC_FALSE );
             }
@@ -1334,7 +1334,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
             if( p_sys->i_mode == ES_OUT_MODE_AUTO &&
                 p_sys->p_es_sub &&
                 p_sys->p_es_sub != es &&
-                EsIsSelected( out, p_sys->p_es_sub ) )
+                EsIsSelected( p_sys->p_es_sub ) )
             {
                 EsUnselect( out, p_sys->p_es_sub, VLC_FALSE );
             }
@@ -1572,12 +1572,12 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_ES_STATE:
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
             b = (vlc_bool_t) va_arg( args, vlc_bool_t );
-            if( b && !EsIsSelected( out, es ) )
+            if( b && !EsIsSelected( es ) )
             {
                 EsSelect( out, es );
-                return EsIsSelected( out, es ) ? VLC_SUCCESS : VLC_EGENERIC;
+                return EsIsSelected( es ) ? VLC_SUCCESS : VLC_EGENERIC;
             }
-            else if( !b && EsIsSelected( out, es ) )
+            else if( !b && EsIsSelected( es ) )
             {
                 EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
                 return VLC_SUCCESS;
@@ -1588,7 +1588,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
             pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
 
-            *pb = EsIsSelected( out, es );
+            *pb = EsIsSelected( es );
             return VLC_SUCCESS;
 
         case ES_OUT_SET_ACTIVE:
@@ -1616,7 +1616,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 /* Reapply policy mode */
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
-                    if( EsIsSelected( out, p_sys->es[i] ) )
+                    if( EsIsSelected( p_sys->es[i] ) )
                     {
                         EsUnselect( out, p_sys->es[i],
                                     p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
@@ -1642,7 +1642,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             {
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
-                    if( EsIsSelected( out, p_sys->es[i] ) )
+                    if( EsIsSelected( p_sys->es[i] ) )
                         EsUnselect( out, p_sys->es[i],
                                     p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
@@ -1652,7 +1652,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
                     if( p_sys->es[i]->fmt.i_cat == AUDIO_ES &&
-                        EsIsSelected( out, p_sys->es[i] ) )
+                        EsIsSelected( p_sys->es[i] ) )
                         EsUnselect( out, p_sys->es[i],
                                     p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
@@ -1662,7 +1662,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
                     if( p_sys->es[i]->fmt.i_cat == VIDEO_ES &&
-                        EsIsSelected( out, p_sys->es[i] ) )
+                        EsIsSelected( p_sys->es[i] ) )
                         EsUnselect( out, p_sys->es[i],
                                     p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
@@ -1672,7 +1672,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
                     if( p_sys->es[i]->fmt.i_cat == SPU_ES &&
-                        EsIsSelected( out, p_sys->es[i] ) )
+                        EsIsSelected( p_sys->es[i] ) )
                         EsUnselect( out, p_sys->es[i],
                                     p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
@@ -1769,7 +1769,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_RESET_PCR:
             for( i = 0; i < p_sys->i_pgrm; i++ )
-                input_ClockResetPCR( p_sys->p_input, &p_sys->pgrm[i]->clock );
+                input_ClockResetPCR( &p_sys->pgrm[i]->clock );
             return VLC_SUCCESS;
 
         case ES_OUT_GET_TS:

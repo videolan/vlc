@@ -118,8 +118,7 @@ static void ClockNewRef( input_clock_t *cl,
  * input_ClockInit: reinitializes the clock reference after a stream
  *                  discontinuity
  *****************************************************************************/
-void input_ClockInit( input_thread_t *p_input,
-                      input_clock_t *cl, vlc_bool_t b_master, int i_cr_average, int i_rate )
+void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average, int i_rate )
 {
     cl->i_synchro_state = SYNCHRO_START;
 
@@ -169,7 +168,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
          * warning from the stream control facilities (dd-edited
          * stream ?). */
         msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
-        input_ClockInit( p_input, cl, cl->b_master, cl->i_cr_average, cl->i_rate );
+        input_ClockInit( cl, cl->b_master, cl->i_cr_average, cl->i_rate );
         /* Feed synchro with a new reference point. */
         msg_Warn( p_input, "feeding synchro with a new reference point trying to recover from clock gap" );
         ClockNewRef( cl, i_clock,
@@ -215,7 +214,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
 /*****************************************************************************
  * input_ClockResetPCR:
  *****************************************************************************/
-void input_ClockResetPCR( input_thread_t * p_input, input_clock_t *cl )
+void input_ClockResetPCR( input_clock_t *cl )
 {
     cl->i_synchro_state =  SYNCHRO_REINIT;
     cl->last_pts = 0;
@@ -237,7 +236,7 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
 /*****************************************************************************
  * input_ClockSetRate:
  *****************************************************************************/
-void input_ClockSetRate( input_thread_t *p_input, input_clock_t *cl, int i_rate )
+void input_ClockSetRate( input_clock_t *cl, int i_rate )
 {
     /* Move the reference point */
     if( cl->i_synchro_state == SYNCHRO_OK )
