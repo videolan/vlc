@@ -5,9 +5,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>485</width>
-    <height>578</height>
+    <width>483</width>
+    <height>583</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
@@ -29,59 +35,14 @@
       <string>_("Native or Skins")</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="3" column="0" colspan="3" >
-       <widget class="Line" name="line" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1" colspan="2" >
-       <widget class="QLabel" name="skinsLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape" >
-         <enum>QFrame::NoFrame</enum>
-        </property>
+      <item row="0" column="0" >
+       <widget class="QRadioButton" name="qt4" >
         <property name="text" >
-         <string>_("This is VLC's skinnable interface. You can download skins at &lt;a href="http://www.videolan.org/vlc/skins.php">http://www.videolan.org/vlc/skins.php&lt;/a> to customize your player.")</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignBottom|Qt::AlignJustify</set>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-        <property name="margin" >
-         <number>10</number>
-        </property>
-        <property name="openExternalLinks" >
-         <bool>true</bool>
+         <string>_("Native")</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" >
-       <widget class="QPushButton" name="skinBrowse" >
-        <property name="text" >
-         <string>_("Browse...")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>_("Skin File")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1" >
-       <widget class="QLineEdit" name="fileSkin" />
-      </item>
-      <item row="0" column="1" colspan="2" >
+      <item row="0" column="1" colspan="3" >
        <widget class="QLabel" name="defaultLabel" >
         <property name="frameShape" >
          <enum>QFrame::NoFrame</enum>
@@ -100,10 +61,24 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="qt4" >
+      <item row="1" column="1" colspan="3" >
+       <widget class="QCheckBox" name="qtAlwaysVideo" >
         <property name="text" >
-         <string>_("Native")</string>
+         <string>_("Always display the video")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2" >
+       <widget class="QCheckBox" name="embedVideo" >
+        <property name="text" >
+         <string>_("Integrate video in interface")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3" >
+       <widget class="Line" name="line" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -114,19 +89,69 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QCheckBox" name="qtAlwaysVideo" >
+      <item rowspan="3" row="4" column="1" colspan="3" >
+       <widget class="QLabel" name="skinsLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
+        </property>
         <property name="text" >
-         <string>_("Always display the video")</string>
+         <string>_("This is VLC's skinnable interface. You can download skins at &lt;a href="http://www.videolan.org/vlc/skins.php">http://www.videolan.org/vlc/skins.php&lt;/a> to customize your player.")</string>
+        </property>
+        <property name="textFormat" >
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="scaledContents" >
+         <bool>true</bool>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="openExternalLinks" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QCheckBox" name="embedVideo" >
+      <item row="5" column="0" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item rowspan="2" row="6" column="0" >
+       <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>_("Integrate video in interface")</string>
+         <string>_("Skin File")</string>
         </property>
        </widget>
+      </item>
+      <item row="7" column="2" colspan="2" >
+       <widget class="QPushButton" name="skinBrowse" >
+        <property name="text" >
+         <string>_("Browse...")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1" >
+       <widget class="QLineEdit" name="fileSkin" />
       </item>
      </layout>
     </widget>
