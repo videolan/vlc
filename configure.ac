@@ -16,7 +16,7 @@ AC_CONFIG_AUX_DIR(autotools)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.9 check-news dist-bzip2 no-dist-gzip -Wall])
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
 dnl Too many people are not aware of maintainer mode:

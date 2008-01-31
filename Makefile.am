@@ -42,6 +42,13 @@ DISTCHECK_CONFIGURE_FLAGS = --disable-dvd --disable-mad --disable-libmpeg2 \
 	--disable-ffmpeg --disable-faad --disable-wxwidgets --disable-skins2
 
 ACLOCAL_AMFLAGS = -I m4
+AUTOMAKE_OPTIONS = \
+	1.9 \
+	-Wall \
+	check-news \
+	std-options \
+	dist-bzip2 \
+	no-dist-gzip
 
 ###############################################################################
 # MacOS X project
