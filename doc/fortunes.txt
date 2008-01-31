@@ -824,3 +824,10 @@ VLC development is NOT about being a sed god.
           expecting this movie to work
   -- #videolan
 %
+< alesan> ok my wife is yelling I have to go to bed with her
+< alesan> uff
+< alesan> see you tomorrow
+< alesan> :(
+< dionoea> poor guy ...
+  -- #videolan
+%
