@@ -92,10 +92,10 @@ QString OptionFromWidgetName( QObject *obj )
     return option;
 }
 
-ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
-                           QWidget( _parent ) , p_intf( _p_intf )
+ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
+                           p_intf( _p_intf )
 {
-    ui.setupUi( this );
+    ui.setupUi( _parent );
 
 #define SETUP_VFILTER( widget ) \
     { \

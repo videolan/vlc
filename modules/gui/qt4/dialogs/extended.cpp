@@ -45,6 +45,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QTabWidget *mainTabW = new QTabWidget( this );
     mainTabW->setTabPosition( QTabWidget::West );
 
+    /* AUDIO effects */
     QWidget *audioWidget = new QWidget;
     QHBoxLayout *audioLayout = new QHBoxLayout( audioWidget );
     QTabWidget *audioTab = new QTabWidget( audioWidget );
@@ -58,8 +59,16 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     mainTabW->addTab( audioWidget, qtr( "Audio effects" ) );
 
-    ExtVideo *videoEffect = new ExtVideo( p_intf, mainTabW );
-    mainTabW->addTab( videoEffect, qtr( "Video Effects" ) );
+    /* Video Effects */
+    QWidget *videoWidget = new QWidget;
+    QHBoxLayout *videoLayout = new QHBoxLayout( videoWidget );
+    QTabWidget *videoTab = new QTabWidget( videoWidget );
+
+    ExtVideo *videoEffect = new ExtVideo( p_intf, videoTab );
+    videoLayout->addWidget( videoTab );
+    videoTab->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
+
+    mainTabW->addTab( videoWidget, qtr( "Video Effects" ) );
 
     if( module_Exists( p_intf, "v4l2" ) )
     {

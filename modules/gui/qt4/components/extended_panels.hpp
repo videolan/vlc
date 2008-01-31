@@ -36,16 +36,17 @@
 #include "ui/video_effects.h"
 #include "ui/v4l2.h"
 
+#include <QTabWidget>
 #define BANDS 10
 #define NUM_SP_CTRL 5
 
 class QSignalMapper;
 
-class ExtVideo: public QWidget
+class ExtVideo: public QObject
 {
     Q_OBJECT
 public:
-    ExtVideo( intf_thread_t *, QWidget * );
+    ExtVideo( intf_thread_t *, QTabWidget * );
     virtual ~ExtVideo();
     /*void gotoConf( QObject* );*/
 private:
