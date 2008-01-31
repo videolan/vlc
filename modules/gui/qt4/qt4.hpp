@@ -41,6 +41,10 @@
 #define VLC_META_ENGINE_DURATION   0x00000002
 #define VLC_META_DURATION          N_( "Duration" )
 
+#define QT_NORMAL_MODE 0
+#define QT_ALWAYS_VIDEO_MODE 1
+#define QT_MINIMAL_MODE 2
+
 class QApplication;
 class QMenu;
 class MainInterface;

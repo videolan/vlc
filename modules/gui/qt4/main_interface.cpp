@@ -22,6 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -102,6 +103,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /**
      *  Configuration and settings
+     *  Pre-building of interface
      **/
     settings = new QSettings( "vlc", "vlc-qt-interface" );
     settings->beginGroup( "MainWindow" );
@@ -113,13 +115,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     /* Set The Video In emebedded Mode or not */
-    videoEmbeddedFlag = false;
-    if( config_GetInt( p_intf, "embedded-video" ) ) videoEmbeddedFlag = true;
+    videoEmbeddedFlag = config_GetInt( p_intf, "embedded-video" );
 
     /* Are we in the enhanced always-video mode or not ? */
-    alwaysVideoFlag = false;
-    if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ) )
-        alwaysVideoFlag = true;
+    i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
 
     /* Set the other interface settings */
     //TODO: I don't like that code
@@ -211,17 +210,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( b_systrayAvailable && b_createSystray )
             createSystray();
 
-    if( config_GetInt( p_intf, "qt-minimal-view" ) )
-        toggleMinimalView();
-
     /********************
      * Input Manager    *
      ********************/
     MainInputManager::getInstance( p_intf );
 
-    /********************
-     * Various CONNECTs *
-     ********************/
+    /**************************
+     * Various CONNECTs on IM *
+     **************************/
     /* Connect the input manager to the GUI elements it manages */
 
     /* It is also connected to the control->slider, see the ControlsWidget */
@@ -295,6 +291,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
+
+    /* Size and placement of interface */
     move( settings->value( "pos", QPoint( 0, 0 ) ).toPoint() );
 
     QSize newSize = settings->value( "size", QSize( 350, 60 ) ).toSize();
@@ -307,6 +305,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         msg_Warn( p_intf, "Invalid size in constructor" );
     }
 
+    /* Playlist */
     int tgPlay = settings->value( "playlist-visible", 0 ).toInt();
     settings->endGroup();
 
@@ -315,8 +314,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         togglePlaylist();
     }
 
-    updateGeometry();
 
+   if( i_visualmode == QT_MINIMAL_MODE )
+           toggleMinimalView();
+
+   /* Update the geometry TODO: is it useful */
+    updateGeometry();
 }
 
 MainInterface::~MainInterface()
@@ -417,7 +420,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     #endif
 
     /* And video Outputs */
-    if( alwaysVideoFlag )
+    if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
+        i_visualmode == QT_MINIMAL_MODE )
     {
         bgWidget = new BackgroundWidget( p_intf );
         bgWidget->resize(

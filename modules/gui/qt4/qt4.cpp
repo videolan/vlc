@@ -57,16 +57,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALWAYS_VIDEO_TEXT N_( "Always show an area for information when " \
-                              "no video is played" )
-#define ALWAYS_VIDEO_LONGTEXT N_( "Start VLC with a cone image, and " \
-                                  "use this zone to show information as " \
-                                  "lyrics, album arts or visualisation " \
-                                  " when there is no video track." )
-
 #define ADVANCED_PREFS_TEXT N_( "Show advanced prefs over simple ones" )
-#define ADVANCED_PREFS_LONGTEXT N_( "Show advanced preferences and not simple " \
-                                    "preferences when opening the preferences " \
+#define ADVANCED_PREFS_LONGTEXT N_( "Show advanced preferences and not simple "\
+                                    "preferences when opening the preferences "\
                                     "dialog." )
 
 #define SYSTRAY_TEXT N_( "Systray icon" )
@@ -103,11 +96,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define SHOWFLAGS_TEXT N_( "Define what columns to show in playlist window" )
 #define SHOWFLAGS_LONGTEXT N_( "Enter the sum of the options that you want: \n" \
                                "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
-                               "Copyright: 16; Collection/album: 32; Rating: 256." )
+                           "Copyright: 16; Collection/album: 32; Rating: 256." )
 
 #define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
-
-#define MINIMAL_TEXT N_( "Start in minimal view (menus hidden)." )
 
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
 #define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
@@ -124,7 +115,24 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
+
 #define VIEWDETAIL_TEXT N_( "Show the opening dialog view in detail mode" )
+
+#define QT_MODE_TEXT N_( "Selection of the starting mode and look " )
+#define QT_MODE_LONGTEXT N_( "Start VLC with:\n" \
+                             " - normal mode\n"  \
+                             " - a zone always present to show information" \
+                                  "as lyrics, album arts...\n" \
+                             " - minimal mode with limited controls" )
+
+#define QT_NORMAL_MODE_TEXT N_( "Classic look" )
+#define QT_ALWAYS_VIDEO_MODE_TEXT N_( "Complete look with information area" )
+#define QT_MINIMAL_MODE_TEXT N_( "Minimal look with no menus" )
+
+static int i_mode_list[] =
+    { QT_NORMAL_MODE, QT_ALWAYS_VIDEO_MODE, QT_MINIMAL_MODE };
+static const char *psz_mode_list_text[] =
+    { QT_NORMAL_MODE_TEXT, QT_ALWAYS_VIDEO_MODE_TEXT, QT_MINIMAL_MODE_TEXT };
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
@@ -140,10 +148,9 @@ vlc_module_begin();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
 
-        add_bool( "qt-always-video", VLC_FALSE, NULL, ALWAYS_VIDEO_TEXT,
-                ALWAYS_VIDEO_LONGTEXT, VLC_TRUE );
-        add_bool( "qt-minimal-view", VLC_FALSE, NULL, MINIMAL_TEXT,
-                MINIMAL_TEXT, VLC_TRUE );
+        add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
+                     QT_MODE_TEXT, QT_MODE_LONGTEXT, VLC_FALSE );
+            change_integer_list( i_mode_list, psz_mode_list_text, 0 );
 
         add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
                   NOTIFICATION_LONGTEXT, VLC_FALSE );
@@ -192,7 +199,6 @@ vlc_module_begin();
 
         add_bool( "qt-privacy-ask", VLC_TRUE, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
                 VLC_FALSE );
-
 
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();

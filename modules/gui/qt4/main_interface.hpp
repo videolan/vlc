@@ -121,10 +121,10 @@ private:
     bool                 videoIsActive; ///< Having a video now / THEMIM->hasV
     bool                 videoEmbeddedFlag; ///< Want an external Video Window
     bool                 playlistVisible; ///< Is the playlist visible ?
-    bool                 alwaysVideoFlag; ///< Always show the background
     bool                 visualSelectorEnabled;
     bool                 notificationEnabled; /// Systray Notifications
     bool                 b_remainingTime; /* showing elapsed or remaining time */
+    int                  i_visualmode; ///< Visual Mode
 
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
