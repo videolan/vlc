@@ -35,6 +35,7 @@
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
 #include "main_interface.hpp"
+#include "dialogs/help.hpp" /* update */
 
 #ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
@@ -351,13 +352,14 @@ static void Init( intf_thread_t *p_intf )
         QSettings settings( "vlc", "vlc-qt-interface" );
         if( QDate::currentDate() > settings.value( "updatedate" ).toDate().addDays( interval ) )
         {
-            msg_Dbg( p_intf, "Someone said I need to update" );
-            //FIXME Call the updater.
+            msg_Dbg( p_intf, "Someone said I need to check updates" );
+            /* The constructor of the update Dialog will do the 1st request */
+            UpdateDialog::getInstance( p_intf );
             settings.setValue( "updatedate", QDate::currentDate() );
         }
     }
 #endif
-    
+
     /* Launch */
     app->exec();
 
