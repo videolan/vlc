@@ -109,22 +109,14 @@
  * void *vlc_memalign( size_t align, size_t size, void **pp_orig )
  * *pp_orig is the pointer that has to be freed afterwards.
  */
+static inline
+void *vlc_memalign (void **pp, size_t align, size_t size)
+{
 #if defined (HAVE_POSIX_MEMALIGN)
-static inline
-void *vlc_memalign (size_t align, size_t size, void **pp)
-{
     return posix_memalign (pp, align, size) ? NULL : *pp;
-}
 #elif defined (HAVE_MEMALIGN)
-static inline
-void *vlc_memalign (size_t align, size_t size, void **pp)
-{
     return *pp = memalign (align, size);
-}
-#else /* We don't have any choice but to align manually */
-static inline
-void *vlc_memalign (size_t align, size_t size, void **pp)
-{
+#else
     unsigned char *ptr;
 
     if (align < 1)
@@ -138,6 +130,6 @@ void *vlc_memalign (size_t align, size_t size, void **pp)
     *pp = ptr;
     ptr += align;
     return (void *)(((uintptr_t)ptr) & ~align);
-}
 #endif
+}
 
