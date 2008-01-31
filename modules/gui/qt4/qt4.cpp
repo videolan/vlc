@@ -210,6 +210,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     p_intf->pf_run = Run;
+#if 0
 #if defined Q_WS_X11 && defined HAVE_X11_XLIB_H
     /* Thanks for libqt4 calling exit() in QApplication::QApplication()
      * instead of returning an error, we have to check the X11 display */
@@ -220,6 +221,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     XCloseDisplay( p_display );
+#endif
 #endif
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
