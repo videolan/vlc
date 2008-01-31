@@ -210,38 +210,6 @@ endef
 #	$(INSTALL_NAME)
 #	touch $@
 
-ifdef HAVE_DARWIN_OS
-# the original libtoto.dylib is copied from contrib/lib to vlc-lib as
-# vlc_libtoto.dylib. a soft link to this library is created in contrib/lib
-# using the orginal dylib name. if libtoto.la also exists, the library named
-# in dlname is also changed to a soft-link to vlc-lib in order to support
-# libtool. to satisfy VLC.app dyld search, vlc_libtoto.dylib dyld id is changed
-# to @executable_path/lib/vlc_libtoto.dylib 
-
-define INSTALL_NAME
-	if which install_name_tool >/dev/null; then \
-		mkdir -p $(PREFIX)/vlc-lib ; \
-		libname='lib$(patsubst .%,%,$@)' ; \
-		dlname="$$libname.dylib" ; \
-		cp $(PREFIX)/lib/$$dlname \
-			$(PREFIX)/vlc-lib/vlc_$$dlname ; \
-		rm $(PREFIX)/lib/$$dlname ; \
-		ln -s $(PREFIX)/vlc-lib/vlc_$$dlname \
-			$(PREFIX)/lib/$$dlname ; \
-		if [ -f $(PREFIX)/lib/$$libname.la ]; then \
-			eval ltname=`sed -n 's/dlname=//p' $(PREFIX)/lib/$$libname.la`; \
-			rm $(PREFIX)/lib/$$ltname ; \
-			ln -s $(PREFIX)/vlc-lib/vlc_$$dlname \
-				$(PREFIX)/lib/$$ltname ; \
-		fi ; \
-		install_name_tool \
-			-id @executable_path/lib/vlc_$$dlname \
-			$(PREFIX)/vlc-lib/vlc_$$dlname ; \
-	fi
-endef
-
-endif
-
 ifeq ($(HOST),i586-pc-beos)
 # We test if the file actually exists, as sometimes (but not always)
 # libtool won't accept to build the shared library
@@ -1126,9 +1094,6 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 .dvdread: .dvdnav
 	$(INSTALL_NAME)
-ifdef HAVE_DARWIN_OS
-	install_name_tool -change $(PREFIX)/lib/libdvdread.4.dylib @executable_path/lib/vlc_libdvdread.dylib $(PREFIX)/vlc-lib/vlc_libdvdnav.dylib
-endif
 	touch $@
 
 CLEAN_FILE += .dvdread

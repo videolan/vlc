@@ -186,6 +186,9 @@ case "${host_os}" in
         echo "Building with Mac OS X defaults:"
         with_macosx_version_min="10.4"
         echo "  Assuming --with-macosx-version-min=10.4"
+        build_dir=`pwd`
+        echo "  Assuming --prefix=${build_dir}/vlc_install_dir"
+        ac_default_prefix="${build_dir}/vlc_install_dir"
         enable_macosx="yes"
         echo "  Assuming --enable-macosx"
         enable_faad="yes"

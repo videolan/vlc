@@ -547,7 +547,8 @@ VLC-release.app: vlc
 	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
 
-VLC.app: vlc
+VLC.app: vlc 
+	( cd src && make install )
 	@if test -e "$(top_builddir)/tmp"; then \
 	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
@@ -619,36 +620,15 @@ VLC.app: vlc
 	          $(top_builddir)/VLC.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
-	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/lib
 	$(INSTALL) $(top_builddir)/.libs/vlc \
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
-	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
-		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc.dylib
-	$(INSTALL) $(top_builddir)/src/.libs/libvlc-control.1.dylib \
-		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc-control.dylib
-	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-		   @executable_path/lib/libvlc.dylib \
-		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc-control.dylib
-	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-		   @executable_path/lib/libvlc.dylib \
-	       $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \
-        then install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-                                  @executable_path/lib/libvlc.dylib \
-                          "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)"; \
-	    ln -sfn "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
-			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
-	  fi ; done
-	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
-	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
-	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-		install_name_tool -change /usr/local/lib/libvlc.1.dylib @executable_path/lib/libvlc.dylib $${i}; \
-	    ln -sfn `pwd`/$${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/`basename $${i}` ; \
-	  done ; \
-	fi
+	   then ln -sfn "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
+				   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
+	  fi ; done && \
 	ln -sfn `pwd`/$(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
