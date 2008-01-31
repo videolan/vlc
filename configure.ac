@@ -172,7 +172,6 @@ case "${host_os}" in
     LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names"; LDFLAGS="${LDFLAGS_save}"
     VLC_ADD_LDFLAGS([mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([libvlc_control],[-Wl,dynamic_lookup])
     VLC_ADD_LDFLAGS([ffmpeg i420_rgb_mmx],[-Wl,-read_only_relocs,suppress])
