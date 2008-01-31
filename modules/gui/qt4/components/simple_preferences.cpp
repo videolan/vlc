@@ -425,7 +425,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel, artFetcher );
             CONFIG_GENERIC( "fetch-meta", Bool, NULL, metaFetcher );
 #ifdef UPDATE_CHECK
-            CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, qtUpdates );
+            CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, updatesBox );
+            CONFIG_GENERIC_NO_BOOL( "qt-updates-days", Integer, NULL,
+                    updatesDays );
+            CONNECT( ui.updatesBox, toggled( bool ),
+                     ui.updatesDays, setEnabled( bool ) );
+#else
+            ui.updatesBox.hide();
+            ui.updatesDays.hide();
 #endif
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC( "embeded-video", Bool, NULL, embedVideo );
