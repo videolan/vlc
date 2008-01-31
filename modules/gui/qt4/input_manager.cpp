@@ -302,6 +302,8 @@ void UpdateArt()
     if( artUrl != url )
     {
         artUrl = url.replace( "file://",QString("" ) );
+        /* Taglib seems to define a attachment://, It won't work yet */
+        artUrl = url.replace( "attachment://",QString("" ) );
         emit artChanged( artUrl );
         msg_Dbg( p_intf, "Art:  %s", qtu( artUrl ) );
     }
