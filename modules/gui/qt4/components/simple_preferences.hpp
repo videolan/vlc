@@ -61,7 +61,7 @@ enum {
     CachingHigher = 500
 };
 
-enum { alsaW = 0, ossW, directxW, fileW, audioOutCoB, normalizerChB };
+enum { alsaW = 0, ossW, directxW, fileW, audioOutCoB, normalizerChB, volLW };
 enum { recordChB, dumpChB, bandwidthChB, timeshiftChB, inputLE, cachingCoB };
 enum { skinRB, qtRB };
 
@@ -115,7 +115,8 @@ private:
 /* Display only the options for the selected audio output */
 private slots:
     void lastfm_Changed( int );
-    void updateAudioOptions( int ); 
+    void updateAudioOptions( int );
+    void updateAudioVolume( int );
 #ifdef SYS_MINGW32
     void assoDialog();
     void saveAsso();

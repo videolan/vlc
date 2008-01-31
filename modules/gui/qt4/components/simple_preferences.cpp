@@ -214,6 +214,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* General Audio Options */
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
+            CONNECT( ui.defaultVolume, valueChanged( int ),
+                    this, updateAudioVolume( int ) );
+
             CONFIG_GENERIC( "audio-language" , String , NULL,
                             preferredAudioLanguage );
 
@@ -258,6 +261,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.fileControl );
             optionWidgets.append( ui.outputModule );
             optionWidgets.append( ui.volNormBox );
+            optionWidgets.append( ui.volumeValue );
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
@@ -288,6 +292,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 ui.volNormBox->setChecked( b_normalizer );
                 ui.volNormSpin->setEnabled( b_normalizer );
             }
+
+            /* Volume Label */
+            updateAudioVolume( ui.defaultVolume->value() ); // First time init
 
         END_SPREFS_CAT;
 
@@ -501,6 +508,13 @@ void SPrefsPanel::updateAudioOptions( int number)
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
 }
 
+void SPrefsPanel::updateAudioVolume( int volume )
+{
+    qobject_cast<QSpinBox *>(optionWidgets[volLW])
+        ->setValue( volume * 100 / 256 );
+}
+
+
 /* Function called from the main Preferences dialog on each SPrefs Panel */
 void SPrefsPanel::apply()
 {
@@ -697,7 +711,7 @@ void SPrefsPanel::assoDialog()
     aTa( ".m4a" ); aTa( ".m4p" ); aTa( ".mka" ); aTa( ".mod" ); aTa( ".mp1" );
     aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".ogg" ); aTa( ".spx" ); aTa( ".wav" );
     aTa( ".wma" ); aTa( ".xm" );
-    audioType->setCheckState( 0, ( i_temp > 0 ) ? 
+    audioType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
@@ -709,7 +723,7 @@ void SPrefsPanel::assoDialog()
     aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
     aTv( ".mxf" ); aTv( ".ogm" ); aTv( ".ps" ); aTv( ".ts" );
     aTv( ".vob" ); aTv( ".wmv" );
-    videoType->setCheckState( 0, ( i_temp > 0 ) ? 
+    videoType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
@@ -717,7 +731,7 @@ void SPrefsPanel::assoDialog()
     i_temp = 0;
     aTo( ".asx" ); aTo( ".b4s" ); aTo( ".m3u" ); aTo( ".pls" ); aTo( ".vlc" );
     aTo( ".xspf" );
-    otherType->setCheckState( 0, ( i_temp > 0 ) ? 
+    otherType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
@@ -746,14 +760,14 @@ void addAsso( QVLCRegistry *qvReg, char *psz_ext )
 
     /* Save a backup if already assigned */
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
-    
+
     if( psz_value && strlen( psz_value ) > 0 )
         qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
     delete psz_value;
-        
+
     /* Put a "link" to VLC.EXT as default */
     qvReg->WriteRegistryString( psz_ext, "", s_path.c_str() );
-    
+
     /* Create the needed Key if they weren't done in the installer */
     if( !qvReg->RegistryKeyExists( s_path.c_str() ) )
     {
@@ -763,15 +777,15 @@ void addAsso( QVLCRegistry *qvReg, char *psz_ext )
 
         /* Get the installer path */
         QVLCRegistry *qvReg2 = new QVLCRegistry( HKEY_LOCAL_MACHINE );
-        std::string str_temp; str_temp.assign( 
+        std::string str_temp; str_temp.assign(
             qvReg2->ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" ) );
-        
+
         if( str_temp.size() )
         {
             qvReg->WriteRegistryString( s_path.append( "\\Play\\command" ).c_str(),
                 "", str_temp.append(" --started-from-file \"%1\"" ).c_str() );
 
-            qvReg->WriteRegistryString( s_path2.append( "\\DefaultIcon" ).c_str(), 
+            qvReg->WriteRegistryString( s_path2.append( "\\DefaultIcon" ).c_str(),
                         "", str_temp.append(",0").c_str() );
         }
         delete qvReg2;

@@ -60,12 +60,37 @@
         <property name="layoutDirection" >
          <enum>Qt::LeftToRight</enum>
         </property>
+        <property name="maximum" >
+         <number>400</number>
+        </property>
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="3" >
+      <item row="0" column="3" >
+       <widget class="QSpinBox" name="volumeValue" >
+        <property name="toolTip" >
+         <string>_("256 corresponds to 100%, 1024 to 400%)</string>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="readOnly" >
+         <bool>true</bool>
+        </property>
+        <property name="buttonSymbols" >
+         <enum>QAbstractSpinBox::NoButtons</enum>
+        </property>
+        <property name="suffix" >
+         <string> %</string>
+        </property>
+        <property name="maximum" >
+         <number>400</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="4" >
        <widget class="QCheckBox" name="spdifBox" >
         <property name="text" >
          <string>_("Use S/PDIF when available")</string>
@@ -79,7 +104,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2" >
+      <item row="2" column="1" colspan="3" >
        <widget class="QComboBox" name="detectionDolby" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
@@ -105,7 +130,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="2" >
+      <item row="3" column="1" colspan="3" >
        <widget class="QLineEdit" name="preferredAudioLanguage" />
       </item>
      </layout>
