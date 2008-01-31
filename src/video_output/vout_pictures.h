@@ -123,7 +123,7 @@ void *vlc_memalign (void **pp, size_t align, size_t size)
         return NULL;
 
     align--;
-    ptr = malloc (size + --align);
+    ptr = malloc (size + align);
     if (ptr == NULL)
         return NULL;
 
