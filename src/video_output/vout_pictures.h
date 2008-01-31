@@ -109,25 +109,35 @@
  * void *vlc_memalign( size_t align, size_t size, void **pp_orig )
  * *pp_orig is the pointer that has to be freed afterwards.
  */
-#if 0
-#ifdef HAVE_POSIX_MEMALIGN
-#   define vlc_memalign(align,size,pp_orig) \
-    ( !posix_memalign( pp_orig, align, size ) ? *(pp_orig) : NULL )
-#endif
-#endif
-#ifdef HAVE_MEMALIGN
-    /* Some systems have memalign() but no declaration for it */
-    void * memalign( size_t align, size_t size );
-
-#   define vlc_memalign(pp_orig,align,size) \
-    ( *(pp_orig) = memalign( align, size ) )
-
+#if defined (HAVE_POSIX_MEMALIGN)
+static inline
+void *vlc_memalign (size_t align, size_t size, void **pp)
+{
+    return posix_memalign (pp, align, size) ? NULL : *pp;
+}
+#elif defined (HAVE_MEMALIGN)
+static inline
+void *vlc_memalign (size_t align, size_t size, void **pp)
+{
+    return *pp = memalign (align, size);
+}
 #else /* We don't have any choice but to align manually */
-#   define vlc_memalign(pp_orig,align,size) \
-    (( *(pp_orig) = malloc( size + align - 1 )) \
-        ? (void *)( (((unsigned long)*(pp_orig)) + (unsigned long)(align-1) ) \
-                       & (~(unsigned long)(align-1)) ) \
-        : NULL )
+static inline
+void *vlc_memalign (size_t align, size_t size, void **pp)
+{
+    unsigned char *ptr;
 
+    if (align < 1)
+        return NULL;
+
+    align--;
+    ptr = malloc (size + --align);
+    if (ptr == NULL)
+        return NULL;
+
+    *pp = ptr;
+    ptr += align;
+    return (void *)(((uintptr_t)ptr) & ~align);
+}
 #endif
 
