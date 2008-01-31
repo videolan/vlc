@@ -380,9 +380,6 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/gettext-macosx.patch 
-endif
 ifdef HAVE_WIN32
 	patch -p0 < Patches/gettext-win32.patch
 endif
