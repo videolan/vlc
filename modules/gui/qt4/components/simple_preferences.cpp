@@ -236,7 +236,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.outputModule, currentIndexChanged( int ),
                      this, updateAudioOptions( int ) );
 
-#ifndef WIN32
+#ifdef WIN32
+            CONFIG_GENERIC( "directx-audio-device", IntegerList,
+                    ui.DirectXLabel, DirectXDevice );
+#else
             if( module_Exists( p_intf, "alsa" ) )
             {
                 CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel,
@@ -247,9 +250,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
                                  OSSBrowse );
             }
-#else
-            CONFIG_GENERIC( "directx-audio-device", IntegerList,
-                    ui.DirectXLabel, DirectXDevice );
 #endif
         // File exists everywhere
             CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
@@ -445,7 +445,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "embeded-video", Bool, NULL, embedVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
                     skinBrowse );
-#if defined( WIN32 ) || defined( HAVE_DBUS_3 )
+#if defined( WIN32 ) || defined( HAVE_DBUS_3 ) || defined(__APPLE__)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
                     EnqueueOneInterfaceMode );
@@ -499,11 +499,11 @@ void SPrefsPanel::updateAudioOptions( int number)
     QString value = qobject_cast<QComboBox *>(optionWidgets[audioOutCoB])
                                             ->itemData( number ).toString();
 
-#ifndef WIN32
+#ifdef WIN32
+    optionWidgets[directxW]->setVisible( ( value == "directx" ) );
+#else
     optionWidgets[ossW]->setVisible( ( value == "oss" ) );
     optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
-#else
-    optionWidgets[directxW]->setVisible( ( value == "directx" ) );
 #endif
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
 }

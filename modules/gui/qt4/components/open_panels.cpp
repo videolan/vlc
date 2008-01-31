@@ -530,7 +530,106 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
-#ifndef WIN32
+#ifdef WIN32
+    /*********************
+     * DirectShow Stuffs *
+     *********************/
+    if( module_Exists( p_intf, "dshow" ) ){
+    addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
+
+    /* dshow Main */
+    int line = 0;
+    module_config_t *p_config = 
+        config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
+    vdevDshowW = new StringListConfigControl( 
+        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
+    line++;
+
+    p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
+    adevDshowW = new StringListConfigControl( 
+        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
+    line++;
+
+    /* dshow Properties */
+    QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
+    dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
+
+    dshowVSizeLine = new QLineEdit;
+    dshowPropLayout->addWidget( dshowVSizeLine, 0, 1);
+    dshowPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            1, 0, 3, 1 );
+
+    /* dshow CONNECTs */
+    CuMRL( vdevDshowW->combo, currentIndexChanged ( int ) );
+    CuMRL( adevDshowW->combo, currentIndexChanged ( int ) );
+    CuMRL( dshowVSizeLine, textChanged( QString ) );
+    }
+
+    /**************
+     * BDA Stuffs *
+     **************/
+    if( module_Exists( p_intf, "bda" ) ){
+    addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow" );
+
+    /* bda Main */
+    QLabel *bdaTypeLabel = new QLabel( qtr( "DVB Type:" ) );
+
+    bdas = new QRadioButton( "DVB-S" );
+    bdas->setChecked( true );
+    bdac = new QRadioButton( "DVB-C" );
+    bdat = new QRadioButton( "DVB-T" );
+
+    bdaDevLayout->addWidget( bdaTypeLabel, 0, 0 );
+    bdaDevLayout->addWidget( bdas, 0, 1 );
+    bdaDevLayout->addWidget( bdac, 0, 2 );
+    bdaDevLayout->addWidget( bdat, 0, 3 );
+
+    /* bda Props */
+    QLabel *bdaFreqLabel =
+                    new QLabel( qtr( "Transponder/multiplex frequency" ) );
+    bdaPropLayout->addWidget( bdaFreqLabel, 0, 0 );
+
+    bdaFreq = new QSpinBox;
+    bdaFreq->setAlignment( Qt::AlignRight );
+    bdaFreq->setSuffix(" kHz");
+    bdaFreq->setSingleStep( 1000 );
+    setSpinBoxFreq( bdaFreq )
+    bdaPropLayout->addWidget( bdaFreq, 0, 1 );
+
+    bdaSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
+
+    bdaSrate = new QSpinBox;
+    bdaSrate->setAlignment( Qt::AlignRight );
+    bdaSrate->setSuffix(" kHz");
+    setSpinBoxFreq( bdaSrate );
+    bdaPropLayout->addWidget( bdaSrate, 1, 1 );
+
+    bdaBandLabel = new QLabel( qtr( "Bandwidth" ) );
+    bdaPropLayout->addWidget( bdaBandLabel, 2, 0 );
+
+    bdaBandBox = new QComboBox;
+    setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
+    bdaPropLayout->addWidget( bdaBandBox, 2, 1 );
+
+    bdaBandLabel->hide();
+    bdaBandBox->hide();
+    bdaPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            2, 0, 2, 1 );
+
+    /* bda CONNECTs */
+    CuMRL( bdaFreq, valueChanged ( int ) );
+    CuMRL( bdaSrate, valueChanged ( int ) );
+    CuMRL( bdaBandBox,  currentIndexChanged ( int ) );
+    BUTTONACT( bdas, updateButtons() );
+    BUTTONACT( bdat, updateButtons() );
+    BUTTONACT( bdac, updateButtons() );
+    BUTTONACT( bdas, updateMRL() );
+    BUTTONACT( bdat, updateMRL() );
+    BUTTONACT( bdac, updateMRL() );
+    }
+
+#else /* WIN32 */
     /*******
      * V4L *
      *******/
@@ -780,105 +879,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( dvbc, updateButtons() );
     }
 
-#else /*!WIN32 */
-
-    /*********************
-     * DirectShow Stuffs *
-     *********************/
-    if( module_Exists( p_intf, "dshow" ) ){
-    addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
-
-    /* dshow Main */
-    int line = 0;
-    module_config_t *p_config = 
-        config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
-    vdevDshowW = new StringListConfigControl( 
-        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
-    line++;
-
-    p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
-    adevDshowW = new StringListConfigControl( 
-        VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
-    line++;
-
-    /* dshow Properties */
-    QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
-    dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
-
-    dshowVSizeLine = new QLineEdit;
-    dshowPropLayout->addWidget( dshowVSizeLine, 0, 1);
-    dshowPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
-            1, 0, 3, 1 );
-
-    /* dshow CONNECTs */
-    CuMRL( vdevDshowW->combo, currentIndexChanged ( int ) );
-    CuMRL( adevDshowW->combo, currentIndexChanged ( int ) );
-    CuMRL( dshowVSizeLine, textChanged( QString ) );
-    }
-
-    /**************
-     * BDA Stuffs *
-     **************/
-    if( module_Exists( p_intf, "bda" ) ){
-    addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow" );
-
-    /* bda Main */
-    QLabel *bdaTypeLabel = new QLabel( qtr( "DVB Type:" ) );
-
-    bdas = new QRadioButton( "DVB-S" );
-    bdas->setChecked( true );
-    bdac = new QRadioButton( "DVB-C" );
-    bdat = new QRadioButton( "DVB-T" );
-
-    bdaDevLayout->addWidget( bdaTypeLabel, 0, 0 );
-    bdaDevLayout->addWidget( bdas, 0, 1 );
-    bdaDevLayout->addWidget( bdac, 0, 2 );
-    bdaDevLayout->addWidget( bdat, 0, 3 );
-
-    /* bda Props */
-    QLabel *bdaFreqLabel =
-                    new QLabel( qtr( "Transponder/multiplex frequency" ) );
-    bdaPropLayout->addWidget( bdaFreqLabel, 0, 0 );
-
-    bdaFreq = new QSpinBox;
-    bdaFreq->setAlignment( Qt::AlignRight );
-    bdaFreq->setSuffix(" kHz");
-    bdaFreq->setSingleStep( 1000 );
-    setSpinBoxFreq( bdaFreq )
-    bdaPropLayout->addWidget( bdaFreq, 0, 1 );
-
-    bdaSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
-    bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
-
-    bdaSrate = new QSpinBox;
-    bdaSrate->setAlignment( Qt::AlignRight );
-    bdaSrate->setSuffix(" kHz");
-    setSpinBoxFreq( bdaSrate );
-    bdaPropLayout->addWidget( bdaSrate, 1, 1 );
-
-    bdaBandLabel = new QLabel( qtr( "Bandwidth" ) );
-    bdaPropLayout->addWidget( bdaBandLabel, 2, 0 );
-
-    bdaBandBox = new QComboBox;
-    setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
-    bdaPropLayout->addWidget( bdaBandBox, 2, 1 );
-
-    bdaBandLabel->hide();
-    bdaBandBox->hide();
-    bdaPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
-            2, 0, 2, 1 );
-
-    /* bda CONNECTs */
-    CuMRL( bdaFreq, valueChanged ( int ) );
-    CuMRL( bdaSrate, valueChanged ( int ) );
-    CuMRL( bdaBandBox,  currentIndexChanged ( int ) );
-    BUTTONACT( bdas, updateButtons() );
-    BUTTONACT( bdat, updateButtons() );
-    BUTTONACT( bdac, updateButtons() );
-    BUTTONACT( bdas, updateMRL() );
-    BUTTONACT( bdat, updateMRL() );
-    BUTTONACT( bdac, updateMRL() );
-    }
 #endif
 
 
@@ -918,7 +918,28 @@ void CaptureOpenPanel::updateMRL()
             ui.deviceCombo->currentIndex() ).toInt();
     switch( i_devicetype )
     {
-#ifndef WIN32
+#ifdef WIN32
+    case BDA_DEVICE:
+        if( bdas->isChecked() ) mrl = "dvb-s://";
+        else if(  bdat->isChecked() ) mrl = "dvb-t://";
+        else if(  bdac->isChecked() ) mrl = "dvb-c://";
+        else return;
+        mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
+        if( bdas->isChecked() || bdac->isChecked() )
+            mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
+        else
+            mrl += " :dvb-bandwidth=" +
+                QString("%1").arg( bdaBandBox->itemData(
+                    bdaBandBox->currentIndex() ).toInt() );
+        break;
+    case DSHOW_DEVICE:
+        mrl = "dshow://";
+        mrl += " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
+        mrl += " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
+        if( dshowVSizeLine->isModified() ) 
+            mrl += " :dshow-size=" + dshowVSizeLine->text(); 
+        break;
+#else
     case V4L_DEVICE:
         mrl = "v4l://";
         mrl += " :v4l-vdev=" + v4lVideoDevice->text();
@@ -962,27 +983,6 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :dvb-frequency=" + QString("%1").arg( dvbFreq->value() );
         mrl += " :dvb-srate=" + QString("%1").arg( dvbSrate->value() );
         break;
-#else
-    case BDA_DEVICE:
-        if( bdas->isChecked() ) mrl = "dvb-s://";
-        else if(  bdat->isChecked() ) mrl = "dvb-t://";
-        else if(  bdac->isChecked() ) mrl = "dvb-c://";
-        else return;
-        mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
-        if( bdas->isChecked() || bdac->isChecked() )
-            mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
-        else
-            mrl += " :dvb-bandwidth=" +
-                QString("%1").arg( bdaBandBox->itemData(
-                    bdaBandBox->currentIndex() ).toInt() );
-        break;
-    case DSHOW_DEVICE:
-        mrl = "dshow://";
-        mrl += " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
-        mrl += " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
-        if( dshowVSizeLine->isModified() ) 
-            mrl += " :dshow-size=" + dshowVSizeLine->text(); 
-        break;
 #endif
     case SCREEN_DEVICE:
         mrl = "screen://";
@@ -1011,12 +1011,7 @@ void CaptureOpenPanel::updateButtons()
     msg_Dbg( p_intf, "Capture Type: %i", i_devicetype );
     switch( i_devicetype )
     {
-#ifndef WIN32
-    case DVB_DEVICE:
-        if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
-        if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
-        break;
-#else
+#ifdef WIN32
     case BDA_DEVICE:
         if( bdas->isChecked() || bdac->isChecked() )
         {
@@ -1032,6 +1027,11 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->show();
             bdaBandLabel->show();
         }
+        break;
+#else
+    case DVB_DEVICE:
+        if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
+        if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
         break;
 #endif
     case SCREEN_DEVICE:

@@ -31,7 +31,7 @@
 #include <vector>
 
 /* Folder vs. Directory */
-#ifdef WIN32
+#if defined( WIN32 ) || defined(__APPLE__)
 #define I_OPEN_FOLDER "Open &Folder..."
 #else
 #define I_OPEN_FOLDER "Open D&irectory..."
