@@ -174,6 +174,7 @@ WXWIDGETS_VERSION=2.6.4
 WXWIDGETS_URL=$(SF)/wxwindows/wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 QT4_VERSION=4.3.3
 QT4_URL=$(VIDEOLAN)/testing/contrib/qt4-$(QT4_VERSION)-win32-bin.tar.gz
+QT4_MAC_URL=ftp://ftp.trolltech.com/qt/source/qt-mac-opensource-src-$(QT4_VERSION).tar.gz
 QT4T_VERSION=4.3.2
 QT4T_URL=ftp://ftp.trolltech.com/pub/qt/source/qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 ZLIB_VERSION=1.2.3

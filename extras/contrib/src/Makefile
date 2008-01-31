@@ -1532,6 +1532,24 @@ CLEAN_PKG += Qt
 DISTCLEAN_PKG += qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 
 # ***************************************************************************
+# qt4 (source-code compilation for Mac)
+# ***************************************************************************
+
+qt-mac-opensource-src-$(QT4_VERSION).tar.gz:
+	$(WGET) $(QT4_MAC_URL)
+
+qt4_mac: qt-mac-opensource-src-$(QT4_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.qt4_mac: qt4_mac
+	(cd qt4_mac; ./configure -prefix $(PREFIX) -release -fast -no-qt3support -sdk $(MACOSX_SDK) -no-framework && make && make install)
+	touch $@
+
+CLEAN_FILE += .qt4_mac
+CLEAN_PKG += qt4_mac
+DISTCLEAN_PKG += qt-mac-opensource-src-$(QT4_VERSION).tar.gz
+
+# ***************************************************************************
 # zlib
 # ***************************************************************************
 
