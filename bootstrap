@@ -17,8 +17,6 @@ fi
 ###
 ###  Get a sane environment, just in case
 ###
-LANG=C
-export LANG
 CYGWIN=binmode
 export CYGWIN
 
@@ -60,12 +58,7 @@ fi
 
 # Check for autoconf
 rm -f m4/autoconf260.m4
-case "$(autoconf --version|head -n 1)" in
-  *2.5[012345678]*)
-    echo "$0: you need autoconf version 2.59 or later (2.60 recommanded)."
-    exit 1
-    ;;
-
+case "$(autoreconf --version|head -n 1)" in
   *2.59*)
     echo "Enabling provisional autoconf 2.59 work-around. Update autoconf ASAP."
     echo "Press Enter to continue"
@@ -74,63 +67,6 @@ case "$(autoconf --version|head -n 1)" in
     ;;
 esac
 
-# Check for automake
-amvers="no"
-for v in "-1.10" "110" "-1.9" "19"; do
-  if automake${v} --version >/dev/null 2>&1; then
-    amsuff="${v}"
-    amvers="`echo ${v} | sed -e 's/^-//'`"
-    break
-  fi
-done
-
-if test "${amvers}" = "no" && automake --version > /dev/null 2>&1; then
-  amvers="`automake --version | sed -e '1s/[^0-9]*//' -e q`"
-  amsuff=""
-fi
-
-case "${amvers}" in
-  no|1.[012345678]|1.[0123456].*|1[0123456]|1.[0123456]-*)
-    set +x
-    echo "$0: you need automake version 1.9 or later"
-    exit 1
-    ;;
-esac
-
-# Check for libtool
-libtoolize="no"
-if test -x extras/contrib/bin/libtoolize; then
-  libtoolize="extras/contrib/bin/libtoolize"
-elif glibtoolize --version >/dev/null 2>&1; then
-  libtoolize="glibtoolize"
-elif libtoolize --version >/dev/null 2>&1; then
-  libtoolize="libtoolize"
-fi
-
-if test "$libtoolize" = "no"; then
-  set +x
-  echo "$0: you need libtool"
-  exit 1
-fi
-
-# Check for gettext
-if gettextize --version >/dev/null 2>&1; then
-# Autopoint is available from 0.11.3, but we need 0.11.5
-if expr `gettextize --version |cut -d' ' -f2- | sed -e '1s/[^0-9]*//' -e q` \
-        '>=' 0.11.5 >/dev/null 2>&1; then
-  # We have gettext, and a recent version! Everything is cool.
-  autopoint=autopoint
-  GETTEXT=yes
-else
-  # User's gettext is too old. try to continue anyway.
-  autopoint=:
-  GETTEXT=old
-fi;else
-  set +x
-  echo "$0: you need gettextize (package gettext-devel or gettext)"
-  exit 1
-fi
-
 # Check for pkg-config
 if pkg-config --version >/dev/null 2>&1; then
   # We have pkg-config, everything is cool.
@@ -138,11 +74,6 @@ if pkg-config --version >/dev/null 2>&1; then
 else
   PKGCONFIG=no
 fi
-
-aclocal=aclocal${amsuff}
-automake=automake${amsuff}
-autoconf=autoconf
-autoheader=autoheader
 
 ##
 ## Generate the modules makefile, by parsing modules/**/Modules.am
@@ -160,13 +91,6 @@ EOF
 if [ "${PKGCONFIG}" = "no" ]; then cat >> m4/private.m4 << EOF
 dnl  User does not have pkg-config, so assume package was not found
 AC_DEFUN([PKG_CHECK_MODULES],[ifelse([\$4], , :, [\$4])])
-
-EOF
-fi
-
-if [ "${GETTEXT}" != "yes" ]; then cat >> m4/private.m4 << EOF
-dnl  User does not have gettext, so this is a no-op
-AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])
 
 EOF
 fi
@@ -199,54 +123,20 @@ EOF
 ###
 set -x
 
-# remove autotools cruft
-rm -f aclocal.m4 configure config.log config.h config.h.in
-rm -Rf autom4te*.cache
-# remove old autotools extra cruft
-rm -f config.guess config.sub missing mkinstalldirs depcomp install-sh
-# remove new autotools extra cruft
-rm -Rf autotools
-mkdir autotools
-# remove libtool cruft
-rm -f ltmain.sh libtool ltconfig
-# remove gettext cruft
-rm -f ABOUT-NLS
-rm -Rf intl
-# remove vlc cruft
-rm -f stamp-builtin stamp-h* mozilla/stamp-pic
-
 # Automake complains if these are not present
-rm -f vlc-config.in && printf "" > vlc-config.in
-if [ "$GETTEXT" != "yes" ]; then
-  test -d intl || mkdir intl
-  printf "" > intl/Makefile.am
-  printf "" > ABOUT-NLS
-fi
+echo > vlc-config.in
+mkdir -p intl
 
-# Libtoolize directory
-${libtoolize} --copy --force
-if test -f "ltmain.sh"; then
-  echo "$0: working around a minor libtool issue"
-  mv ltmain.sh autotools/
-fi
-
-# Do the rest
-echo $PATH
-which autopoint
-autopoint --version
-
-${autopoint} -f
+autoreconf --install --force ${ACLOCAL_ARGS}
 rm -f po/Makevars.template
-${aclocal} ${ACLOCAL_ARGS}
-${autoconf}
-${autoheader}
-${automake} --add-missing --copy -Wall
+echo > ABOUT-NLS
 
 ##
 ##  files which need to be regenerated
 ##
 rm -f vlc-config.in vlc-config
 rm -f src/misc/modules_builtin.h
+rm -f stamp-builtin stamp-h* mozilla/stamp-pic
 
 # Shut up
 set +x
@@ -254,17 +144,6 @@ set +x
 ##
 ##  Tell the user about gettext, pkg-config and sed
 ##
-if [ "${GETTEXT}" = "old" ]; then
-  cat << EOF
-
-==========================================================
-NOTE: you have an old version of gettext installed on your
-system. The vlc build will work, but if your system does not
-have libintl you will not have internationalization support.
-We suggest upgrading to gettext 0.11.5 or later.
-EOF
-fi
-
 if [ "$PKGCONFIG" = "no" ]; then
   cat << EOF
 
