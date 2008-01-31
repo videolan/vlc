@@ -828,6 +828,7 @@ VLC development is NOT about being a sed god.
 < alesan> uff
 < alesan> see you tomorrow
 < alesan> :(
+-!- alesan [n=alesan@***.telecomitalia.it] has quit
 < dionoea> poor guy ...
   -- #videolan
 %
