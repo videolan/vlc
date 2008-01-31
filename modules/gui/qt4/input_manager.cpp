@@ -292,7 +292,7 @@ void InputManager::UpdateMeta()
 #endif
 }
 
-void UpdateArt()
+void InputManager::UpdateArt()
 {
     /* Update Art meta */
     QString url;
