@@ -105,11 +105,13 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                "Copyright: 16; Collection/album: 32; Rating: 256." )
 
 #define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
+
 #define MINIMAL_TEXT N_( "Start in minimal view (menus hidden)." )
 
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
 #define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
                             "versions of the software. It runs once a week." )
+#define UPDATER_DAYS_TEXT N_("Number of days between two checks")
 
 #define COMPLETEVOL_TEXT N_( "Allow the volume to be set to 400%" )
 #define COMPLETEVOL_LONGTEXT N_( "Allow the volume to have range from 0% to " \
@@ -173,6 +175,8 @@ vlc_module_begin();
 #ifdef UPDATE_CHECK
         add_bool( "qt-updates-notif", VLC_TRUE, NULL, UPDATER_TEXT,
                 UPDATER_LONGTEXT, VLC_FALSE );
+        add_integer( "qt-updates-days", 14, NULL, UPDATER_DAYS_TEXT,
+                UPDATER_DAYS_TEXT, VLC_FALSE );
 #endif
 
         add_integer( "qt-pl-showflags",
@@ -303,6 +307,7 @@ static void Init( intf_thread_t *p_intf )
     else
         vlc_thread_ready( p_intf );
 
+
 #ifdef ENABLE_NLS
     // Translation - get locale
     QLocale ql = QLocale::system();
@@ -339,6 +344,20 @@ static void Init( intf_thread_t *p_intf )
     p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? psz_path
                            : p_intf->p_libvlc->psz_homedir;
 
+#ifdef UPDATE_CHECK
+    if( config_GetInt( p_intf, "qt-updates-notif" ) )
+    {
+        int interval = config_GetInt( p_intf, "qt-updates-days" );
+        QSettings settings( "vlc", "vlc-qt-interface" );
+        if( QDate::currentDate() > settings.value( "updatedate" ).toDate().addDays( interval ) )
+        {
+            msg_Dbg( p_intf, "Someone said I need to update" );
+            //FIXME Call the updater.
+            settings.setValue( "updatedate", QDate::currentDate() );
+        }
+    }
+#endif
+    
     /* Launch */
     app->exec();
 
