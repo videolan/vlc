@@ -65,13 +65,14 @@ public:
     bool b_has_audio, b_has_video, b_had_audio, b_had_video;
 private:
     void customEvent( QEvent * );
-    void addCallbacks( void );
-    void delCallbacks( void );
-    void UpdateRate( void );
-    void UpdateMeta( void );
-    void UpdateStatus( void );
-    void UpdateTitle( void );
-    void UpdatePosition( void );
+    void addCallbacks();
+    void delCallbacks();
+    void UpdateRate();
+    void UpdateMeta();
+    void UpdateStatus();
+    void UpdateTitle();
+    void UpdatePosition();
+    void UpdateArt();
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
     int             i_old_playing_status;
@@ -144,7 +145,7 @@ private slots:
     //void updateInput();
 signals:
     void inputChanged( input_thread_t * );
-    void volumeChanged( void );
+    void volumeChanged();
 };
 
 #endif

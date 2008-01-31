@@ -148,7 +148,7 @@ void InputManager::delCallbacks()
 void InputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    msg_Dbg( p_intf, "New IM Event of type: %i", type );
+    //msg_Dbg( p_intf, "New IM Event of type: %i", type );
     if ( type != PositionUpdate_Type &&
          type != ItemChanged_Type &&
          type != ItemRateChanged_Type &&
@@ -172,6 +172,7 @@ void InputManager::customEvent( QEvent *event )
     case ItemChanged_Type:
         UpdateMeta();
         UpdateTitle();
+        UpdateArt();
         break;
     case ItemRateChanged_Type:
         UpdateRate();
@@ -185,7 +186,7 @@ void InputManager::customEvent( QEvent *event )
     }
 }
 
-void InputManager::UpdatePosition( void )
+void InputManager::UpdatePosition()
 {
      /* Update position */
      int i_length, i_time; /* Int is enough, since we store seconds */
@@ -196,7 +197,7 @@ void InputManager::UpdatePosition( void )
      emit positionUpdated( f_pos, i_time, i_length );
 }
 
-void InputManager::UpdateTitle( void )
+void InputManager::UpdateTitle()
 {
      /* Update navigation status */
      vlc_value_t val; val.i_int = 0;
@@ -213,7 +214,7 @@ void InputManager::UpdateTitle( void )
      }
 }
 
-void InputManager::UpdateStatus( void )
+void InputManager::UpdateStatus()
 {
      /* Update playing status */
      vlc_value_t val; val.i_int = 0;
@@ -225,7 +226,7 @@ void InputManager::UpdateStatus( void )
      }
 }
 
-void InputManager::UpdateRate( void )
+void InputManager::UpdateRate()
 {
      /* Update Rate */
      int i_new_rate = var_GetInteger( p_input, "rate");
@@ -237,7 +238,7 @@ void InputManager::UpdateRate( void )
      }
 }
 
-void InputManager::UpdateMeta( void )
+void InputManager::UpdateMeta()
 {
     /* Update text, name and nowplaying */
     QString text;
@@ -277,17 +278,6 @@ void InputManager::UpdateMeta( void )
         old_name=text;
     }
 
-    /* Update Art meta */
-    QString url;
-    char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
-    url.sprintf("%s", psz_art );
-    free( psz_art );
-    if( artUrl != url )
-    {
-        artUrl = url.replace( "file://",QString("" ) );
-        emit artChanged( artUrl );
-    }
-
     /* Has Audio, has Video Tracks ? */
     vlc_value_t val;
     var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
@@ -300,6 +290,21 @@ void InputManager::UpdateMeta( void )
     /* Update teletext status*/
     emit teletextEnabled( true );/* FIXME */
 #endif
+}
+
+void UpdateArt()
+{
+    /* Update Art meta */
+    QString url;
+    char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
+    url.sprintf("%s", psz_art );
+    free( psz_art );
+    if( artUrl != url )
+    {
+        artUrl = url.replace( "file://",QString("" ) );
+        emit artChanged( artUrl );
+        msg_Dbg( p_intf, "Art:  %s", qtu( artUrl ) );
+    }
 }
 
 /* User update of the slider */
@@ -460,7 +465,7 @@ MainInputManager::~MainInputManager()
 void MainInputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
+    //msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     if ( type != ItemChanged_Type && type != VolumeChanged_Type )
         return;
 
