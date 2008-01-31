@@ -439,7 +439,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                      ui.updatesDays, setEnabled( bool ) );
 #else
             ui.updatesBox->hide();
-            ui.updatesDays->hide(); */
+            ui.updatesDays->hide();
 #endif
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC( "embeded-video", Bool, NULL, embedVideo );
