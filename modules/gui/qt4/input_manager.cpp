@@ -171,6 +171,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemChanged_Type:
         UpdateMeta();
+        UpdateTracks();
         UpdateTitle();
         UpdateArt();
         break;
@@ -182,6 +183,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemStateChanged_Type:
        UpdateStatus();
+       UpdateTracks();
        break;
     }
 }
@@ -277,7 +279,10 @@ void InputManager::UpdateMeta()
         emit nameChanged( text );
         old_name=text;
     }
+}
 
+void InputManager::UpdateTracks()
+{
     /* Has Audio, has Video Tracks ? */
     vlc_value_t val;
     var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );

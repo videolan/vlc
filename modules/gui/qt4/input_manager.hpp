@@ -72,6 +72,7 @@ private:
     void UpdateStatus();
     void UpdateTitle();
     void UpdatePosition();
+    void UpdateTracks();
     void UpdateArt();
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
