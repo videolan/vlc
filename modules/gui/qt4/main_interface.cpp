@@ -175,6 +175,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addPermanentWidget( pgBar, 0 );
     statusBar()->addPermanentWidget( timeLabel, 0 );
 
+
     /* timeLabel behaviour:
        - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and
@@ -314,6 +315,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         togglePlaylist();
     }
 
+    show();
 
    if( i_visualmode == QT_MINIMAL_MODE )
            toggleMinimalView();
