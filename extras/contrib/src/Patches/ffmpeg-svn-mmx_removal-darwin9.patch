@@ -20,7 +20,7 @@ Index: libswscale/yuv2rgb.c
      {117504, 138453, 13954, 34903}, /* no sequence_display_extension */
 Index: libswscale/swscale.c
 ===================================================================
---- libswscale/swscale.c	(revision 25527)
+--- libswscale/swscale.c	(revision 25943)
 +++ libswscale/swscale.c	(working copy)
 @@ -875,9 +875,7 @@
  
@@ -48,10 +48,10 @@ Index: libswscale/swscale.c
  
  #undef HAVE_MMX
  #undef HAVE_MMX2
-@@ -1544,13 +1544,6 @@
+@@ -1544,15 +1544,8 @@
  #if defined(RUNTIME_CPUDETECT) && defined (CONFIG_GPL)
  #if defined(ARCH_X86)
-     // ordered per speed fasterst first
+     // ordered per speed fastest first
 -    if (flags & SWS_CPU_CAPS_MMX2)
 -        return swScale_MMX2;
 -    else if (flags & SWS_CPU_CAPS_3DNOW)
@@ -59,9 +59,13 @@ Index: libswscale/swscale.c
 -    else if (flags & SWS_CPU_CAPS_MMX)
 -        return swScale_MMX;
 -    else
-         return swScale_C;
- 
+-        return swScale_C;
+-
++    /* VLC Hack: only C */
++    return swScale_C;
  #else
+ #ifdef ARCH_POWERPC
+     if (flags & SWS_CPU_CAPS_ALTIVEC)
 Index: libswscale/rgb2rgb.c
 ===================================================================
 --- libswscale/rgb2rgb.c	(revision 25527)
