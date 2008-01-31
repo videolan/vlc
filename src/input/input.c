@@ -2807,7 +2807,7 @@ void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
 #if defined( WIN32 ) || defined( UNDER_CE )
         else if( ( psz - psz_dup == 1 ) && isalpha( psz_dup[0] ) )
         {
-            msg_Dbg( p_input, "drive letter %c: found in source", *psz_dup );
+            //msg_Dbg( p_input, "drive letter %c: found in source", *psz_dup );
             psz = NULL;
         }
 #endif
