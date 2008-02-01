@@ -10,6 +10,16 @@ if test "${ACTION}" = ""; then
     # Debug --
 fi
 
+# Hack to use that script with the current VLC-release.app
+if test "${ACTION}" = "VLC-release.app"; then
+    TARGET_BUILD_DIR="${build_dir}"
+    FULL_PRODUCT_NAME="VLC-release.app"
+    CONTENTS_FOLDER_PATH="${FULL_PRODUCT_NAME}/Contents/MacOS"
+    VLC_BUILD_DIR="${build_dir}"
+    VLC_SRC_DIR="${src_dir}"
+    ACTION="build"
+fi
+
 if test "${ACTION}" = "build"; then    
     vlc_config="${VLC_SRC_DIR}/vlc-config"
     lib="lib"
@@ -22,49 +32,61 @@ if test "${ACTION}" = "build"; then
     linked_libs=" "
     
     ##########################
-    # @function install_library(src_lib, dest_dir)
+    # @function install_library(src_lib, dest_dir, type, lib_install_prefix, destination_name)
     # @description Installs the specified library into the destination folder, automatically changes the references to dependencies
     # @param src_lib     source library to copy to the destination directory
     # @param dest_dir    destination directory where the src_lib should be copied to
     install_library() {    
         if [ ${3} = "library" ]; then
             install_name="@loader_path/lib"
-        else
+        elif [ ${3} = "module" ]; then
             install_name="@loader_path/modules"
         fi
         
-        if [ "${4}" != "" ]; then
-            lib_dest="${2}/${4}"
+        if [ "${5}" != "" ]; then
+            lib_dest="${2}/${5}"
         else
             lib_dest="${2}/`basename ${1}`"
         fi
+
+        if [ "${4}" != "" ]; then
+            lib_install_prefix="${4}"
+        else
+            lib_install_prefix="@loader_path/../lib"
+        fi
         
         if test -e ${1} && ((! test -e ${lib_dest}) || test ${1} -nt ${lib_dest} ); then
-            mkdir -p ${2}
             
+            mkdir -p ${2}
+
             # Lets copy the library from the source folder to our new destination folder
-            cp ${1} ${lib_dest}
+            install -m 644 ${1} ${lib_dest}
 
             # Update the dynamic library so it will know where to look for the other libraries
             echo "Installing ${3} `basename ${lib_dest}`"
 
-            # Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory
-            install_name_tool -change /usr/local/lib/libvlc.1.dylib @loader_path/../lib/libvlc.dylib ${lib_dest}
-            install_name_tool -change @executable_path/lib/vlc_libintl.dylib @loader_path/../lib/vlc_libintl.dylib ${lib_dest}
-            install_name_tool -id "${install_name}/`basename ${lib_dest}`" ${lib_dest}
-
+            if [ "${3}" != "bin" ]; then
+                # Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory
+                install_name_tool -id "${install_name}/`basename ${lib_dest}`" ${lib_dest} > /dev/null
+            fi
+    
             # Iterate through each installed library and modify the references to other dynamic libraries to match the framework's library directory
             for linked_lib in `otool -L ${lib_dest}  | grep '(' | sed 's/\((.*)\)//'`; do
-                ref_lib=`echo "${linked_lib}" | sed 's:executable_path/:loader_path/../:'`
-                
-                if test "${ref_lib}" != "${linked_lib}"; then
-                    install_name_tool -change ${linked_lib} ${ref_lib} ${lib_dest}
-                fi
-                if test `echo "${ref_lib}" | grep "^@loader_path"`; then
-                    linked_libs="${linked_libs} ${ref_lib}"
-                fi;
+                name=`basename ${linked_lib}`
+                case "${linked_lib}" in
+                    */vlc_install_dir/lib/* | */extras/contrib/lib/*)
+                        if test -e ${linked_lib}; then
+                            install_name_tool -change ${linked_lib} "${lib_install_prefix}/${name}" ${lib_dest}
+                            linked_libs="${linked_libs} ${ref_lib}"
+
+                            install_library ${linked_lib} ${target_lib} "library"
+                        fi
+                        ;;
+                    *)
+                        ;;
+                esac
             done
-        fi
+         fi
     }
     # @function install_library
     ##########################
@@ -103,20 +125,27 @@ if test "${ACTION}" = "build"; then
     echo "Building library folder..."
     for linked_lib in ${linked_libs} ; do
         case "${linked_lib}" in
-            @loader_path/../lib/*)
-                ref_lib=`echo ${linked_lib} | sed 's:@loader_path/../lib/::'`
-                if test -e ${VLC_BUILD_DIR}/extras/contrib/vlc-lib/${ref_lib}; then
-                    src_lib=${VLC_BUILD_DIR}/extras/contrib/vlc-lib/${ref_lib}
-                elif test -e ${VLC_BUILD_DIR}/src/.libs/${ref_lib}; then
-                    src_lib=${VLC_BUILD_DIR}/src/.libs/${ref_lib}
+            */extras/contrib/lib/*.dylib)
+                if test -e ${linked_lib}; then
+                    install_library ${linked_lib} ${target_lib} "library"
                 fi
-                install_library ${src_lib} ${target_lib} "library"
+                ;;
+            */vlc_install_dir/lib/*.dylib)
+                if test -e ${linked_lib}; then
+                    install_library ${linked_lib} ${target_lib} "library"
+                fi
                 ;;
         esac
     done
 
     install_library "${VLC_BUILD_DIR}/src/.libs/libvlc-control.dylib" ${target_lib} "library"
     install_library "${VLC_BUILD_DIR}/src/.libs/libvlc.dylib" ${target_lib} "library"
+
+    ##########################
+    # Hack for VLC-release.app
+    if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+        install_library "${VLC_BUILD_DIR}/.libs/vlc" "${target}" "bin" "@loader_path/lib"
+    fi
 
     ##########################
     # Build the share folder
