@@ -334,15 +334,31 @@ Index: libavcodec/i386/simple_idct_mmx.c
  }
 Index: libavcodec/i386/cavsdsp_mmx.c
 ===================================================================
---- libavcodec/i386/cavsdsp_mmx.c	(revision 11270)
+--- libavcodec/i386/cavsdsp_mmx.c	(revision 11727)
 +++ libavcodec/i386/cavsdsp_mmx.c	(working copy)
-@@ -23,9 +23,15 @@
+@@ -23,9 +23,31 @@
   */
  
  #include "dsputil.h"
 -#include "dsputil_mmx.h"
  #include "common.h"
  
++#define SUMSUB_BA( a, b ) \
++"paddw "#b", "#a" \n\t"\
++"paddw "#b", "#b" \n\t"\
++"psubw "#a", "#b" \n\t"
++
++#define SBUTTERFLY(a,b,t,n,m)\
++"mov" #m " " #a ", " #t "         \n\t" /* abcd */\
++"punpckl" #n " " #b ", " #a "     \n\t" /* aebf */\
++"punpckh" #n " " #b ", " #t "     \n\t" /* cgdh */\
++
++#define TRANSPOSE4(a,b,c,d,t)\
++SBUTTERFLY(a,b,t,wd,q) /* a=aebf t=cgdh */\
++SBUTTERFLY(c,d,b,wd,q) /* c=imjn b=kolp */\
++SBUTTERFLY(a,c,d,dq,q) /* a=aeim d=bfjn */\
++SBUTTERFLY(t,b,c,dq,q) /* t=cgko c=dhlp */
++
 +DECLARE_ALIGNED_8(static const uint64_t,ff_pw_4 ) = 0x0004000400040004ULL;	 
 +DECLARE_ALIGNED_8(static const uint64_t,ff_pw_5 ) = 0x0005000500050005ULL;	 
 +DECLARE_ALIGNED_8(static const uint64_t,ff_pw_7 ) = 0x0007000700070007ULL;	 
