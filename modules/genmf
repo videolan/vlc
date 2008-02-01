@@ -95,7 +95,7 @@ mostlyclean-local:
 install-exec-local: all-modules
 	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
 	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
-	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) printf " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
   	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install-libvlcLTLIBRARIES || exit \$\$? ; \
 	fi
@@ -103,7 +103,7 @@ install-exec-local: all-modules
 uninstall-local:
 	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
 	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
-	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) printf " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
 	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall-libvlcLTLIBRARIES || exit \$\$?; \
 	fi
