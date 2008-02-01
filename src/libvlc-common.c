@@ -1824,6 +1824,10 @@ static void ShowConsole( vlc_bool_t b_dofile )
     if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
 
     AllocConsole();
+    /* Use the ANSI code page (e.g. Windows-1252) as expected by the LibVLC
+     * Unicode/locale subsystem. By default, we have the obsolecent OEM code
+     * page (e.g. CP437 or CP850). */
+    SetConsoleOutputCP (GetACP ());
 
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
