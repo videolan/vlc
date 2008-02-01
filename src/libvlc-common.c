@@ -1868,34 +1868,21 @@ static void PauseConsole( void )
  *****************************************************************************/
 static int ConsoleWidth( void )
 {
-    int i_width = 80;
+    unsigned i_width = 80;
 
 #ifndef WIN32
-    char buf[20];
-    char *psz_parser = NULL;
-    FILE *file = NULL;
-    int i_ret;
-
-    file = popen( "stty size 2>/dev/null", "r" );
-    if( file )
+    FILE *file = popen( "stty size 2>/dev/null", "r" );
+    if (file != NULL)
     {
-        i_ret = fread( buf, 1, 20, file );
-        if( i_ret > 0 )
-        {
-            buf[19] = '\0';
-            psz_parser = strchr( buf, ' ' );
-            if( psz_parser )
-            {
-                i_ret = atoi( psz_parser + 1 );
-                if( i_ret >= 80 )
-                {
-                    i_width = i_ret;
-                }
-            }
-        }
-
+        if (fscanf (file, "%*u %u", &i_width) <= 0)
+            i_width = 80;
         pclose( file );
     }
+#else
+    CONSOLE_SCREEN_BUFFER_INFO buf;
+
+    if (GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &buf))
+        i_width = buf.dwSize.X;
 #endif
 
     return i_width;
