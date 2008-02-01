@@ -386,6 +386,7 @@ TESTS = $(check_PROGRAMS) $(dist_check_SCRIPTS)
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
 test_i18n_atof_SOURCES = test/i18n_atof.c text/charset.c
+test_i18n_atof_LDADD = libvlc.la
 test_i18n_atof_CFLAGS = $(CFLAGS_tests)
 
 test_url_SOURCES = test/url.c
