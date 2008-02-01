@@ -353,6 +353,7 @@ vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
 # VLC-release.app is the old VLC.app target
 VLC-release.app: vlc
+	( cd  src && make  )
 	@if test -e "$(top_builddir)/tmp"; then \
 	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
@@ -424,32 +425,7 @@ VLC-release.app: vlc
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/lib
-	$(INSTALL) $(top_builddir)/.libs/vlc \
-		   $(top_builddir)/VLC-release.app/Contents/MacOS/VLC
-	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
-		   $(top_builddir)/VLC-release.app/Contents/MacOS/lib/libvlc.dylib
-	$(INSTALL) $(top_builddir)/src/.libs/libvlc-control.1.dylib \
-		   $(top_builddir)/VLC-release.app/Contents/MacOS/lib/libvlc-control.dylib
-	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-		   @executable_path/lib/libvlc.dylib \
-		   $(top_builddir)/VLC-release.app/Contents/MacOS/lib/libvlc-control.dylib
-	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-		   @executable_path/lib/libvlc.dylib \
-	       $(top_builddir)/VLC-release.app/Contents/MacOS/VLC
-	ln -sf ./VLC $(top_builddir)/VLC-release.app/Contents/MacOS/clivlc
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/modules
-	for i in `$(VLC_CONFIG) --target plugin` ; do \
-	  if test -n "$$i" ; \
-	    then $(INSTALL) "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
-			   "$(top_builddir)/VLC-release.app/Contents/MacOS/modules" ; \
-	  fi ; done
-	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
-	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/lib ; \
-	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/`basename $${i}` ; \
-	  done ; \
-	fi
+	ACTION="VLC-release.app" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/MacOSX/Framework/Pre-Compile.sh
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist
 	for i in $(srcdir)/share/luaplaylist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist/`basename $${i}` ; \
