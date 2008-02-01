@@ -1444,11 +1444,11 @@ DISTCLEAN_PKG += wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 # qt4 (win32 binary)
 # ***************************************************************************
 
-qt4-$(QT4_VERSION)-win32-bin.tar.gz:
+qt4-$(QT4_VERSION)-win32-bin.tar.bz2:
 	$(WGET) $(QT4_URL)
 
-qt4: qt4-$(QT4_VERSION)-win32-bin.tar.gz
-	$(EXTRACT_GZ)
+qt4: qt4-$(QT4_VERSION)-win32-bin.tar.bz2
+	$(EXTRACT_BZ2)
 
 .qt4: qt4
 	(cd qt4;mkdir -p $(PREFIX)/bin; mkdir -p $(PREFIX)/include;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib)
@@ -2250,6 +2250,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 CLEAN_FILE += .pthreads
 CLEAN_PKG += pthreads
 DISTCLEAN_PKG += pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
+
 # ***************************************************************************
 # ncurses library (with wide chars support)
 # ***************************************************************************
@@ -2268,6 +2269,25 @@ CLEAN_FILE += .ncurses
 CLEAN_PKG += ncurses
 DISTCLEAN_PKG += ncurses-$(NCURSES_VERSION).tar.gz
 
+# ***************************************************************************
+# asa library (ASS/SSA support)
+# ***************************************************************************
+
+asa.git.tar.gz:
+	$(WGET) "http://git.spaceboyz.net/asa.git/?p=asa.git;a=snapshot;" -O asa.git.tar.gz
+
+asa: asa.git.tar.gz
+	$(EXTRACT_GZ)
+
+.asa: asa
+	(cd $<; ./bootstrap; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .asa
+CLEAN_PKG += asa
+DISTCLEAN_PKG += asa.git.tar.gz
+
+#
 # ***************************************************************************
 # Some cleaning
 # ***************************************************************************
