@@ -79,9 +79,6 @@
         <property name="readOnly" >
          <bool>true</bool>
         </property>
-        <property name="buttonSymbols" >
-         <enum>QAbstractSpinBox::NoButtons</enum>
-        </property>
         <property name="suffix" >
          <string> %</string>
         </property>
@@ -168,18 +165,6 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QWidget" native="1" name="alsaControl" >
         <layout class="QHBoxLayout" >
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="alsaLabel" >
            <property name="minimumSize" >
@@ -209,18 +194,6 @@
       <item row="2" column="0" colspan="2" >
        <widget class="QWidget" native="1" name="DirectXControl" >
         <layout class="QHBoxLayout" >
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="DirectXLabel" >
            <property name="sizePolicy" >
@@ -256,18 +229,6 @@
       <item row="3" column="0" colspan="2" >
        <widget class="QWidget" native="1" name="OSSControl" >
         <layout class="QHBoxLayout" >
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="OSSLabel" >
            <property name="minimumSize" >
@@ -297,18 +258,6 @@
       <item row="4" column="0" colspan="2" >
        <widget class="QWidget" native="1" name="fileControl" >
         <layout class="QHBoxLayout" >
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="fileLabel" >
            <property name="minimumSize" >
