@@ -332,7 +332,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
     if( !combobox ) return;
     QString option = OptionFromWidgetName( widget );
     module_config_t *p_item = config_FindConfig( VLC_OBJECT( p_intf ),
-                                                 option.toStdString().c_str() );
+                                                 qtu( option ) );
     if( p_item )
     {
         int i_type = p_item->i_type & CONFIG_ITEM;
@@ -350,7 +350,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
     else
     {
         msg_Err( p_intf, "Couldn't find option \"%s\".",
-                 option.toStdString().c_str() );
+                 qtu( option ) );
     }
 }
 
@@ -363,7 +363,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
 
     vlc_object_t *p_obj = ( vlc_object_t * )
         vlc_object_find_name( p_intf->p_libvlc,
-                              module.toStdString().c_str(),
+                              qtu( module ),
                               FIND_CHILD );
     int i_type;
     vlc_value_t val;
@@ -373,27 +373,27 @@ void ExtVideo::setWidgetValue( QObject *widget )
 #if 0
         msg_Dbg( p_intf,
                  "Module instance %s not found, looking in config values.",
-                 module.toStdString().c_str() );
+                 qtu( module ) );
 #endif
-        i_type = config_GetType( p_intf, option.toStdString().c_str() ) & 0xf0;
+        i_type = config_GetType( p_intf, qtu( option ) ) & 0xf0;
         switch( i_type )
         {
             case VLC_VAR_INTEGER:
             case VLC_VAR_BOOL:
-                val.i_int = config_GetInt( p_intf, option.toStdString().c_str() );
+                val.i_int = config_GetInt( p_intf, qtu( option ) );
                 break;
             case VLC_VAR_FLOAT:
-                val.f_float = config_GetFloat( p_intf, option.toStdString().c_str() );
+                val.f_float = config_GetFloat( p_intf, qtu( option ) );
                 break;
             case VLC_VAR_STRING:
-                val.psz_string = config_GetPsz( p_intf, option.toStdString().c_str() );
+                val.psz_string = config_GetPsz( p_intf, qtu( option ) );
                 break;
         }
     }
     else
     {
-        i_type = var_Type( p_obj, option.toStdString().c_str() ) & 0xf0;
-        var_Get( p_obj, option.toStdString().c_str(), &val );
+        i_type = var_Type( p_obj, qtu( option ) ) & 0xf0;
+        var_Get( p_obj, qtu( option ), &val );
         vlc_object_release( p_obj );
     }
 
@@ -443,8 +443,8 @@ void ExtVideo::setWidgetValue( QObject *widget )
     else
         msg_Err( p_intf,
                  "Module %s's %s variable is of an unsupported type ( %d )",
-                 module.toStdString().c_str(),
-                 option.toStdString().c_str(),
+                 qtu( module ),
+                 qtu( option ),
                  i_type );
 }
 
@@ -457,21 +457,21 @@ void ExtVideo::updateFilterOptions()
 
     vlc_object_t *p_obj = ( vlc_object_t * )
         vlc_object_find_name( p_intf->p_libvlc,
-                              module.toStdString().c_str(),
+                              qtu( module ),
                               FIND_CHILD );
     if( !p_obj )
     {
-        msg_Err( p_intf, "Module %s not found.", module.toStdString().c_str() );
+        msg_Err( p_intf, "Module %s not found.", qtu( module ) );
         return;
     }
 
-    int i_type = var_Type( p_obj, option.toStdString().c_str() );
+    int i_type = var_Type( p_obj, qtu( option ) );
     bool b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     if( !b_is_command )
     {
         msg_Warn( p_intf, "Module %s's %s variable isn't a command. You'll need to restart the filter to take change into account.",
-                 module.toStdString().c_str(),
-                 option.toStdString().c_str() );
+                 qtu( module ),
+                 qtu( option ) );
         /* FIXME: restart automatically somewhere near the end of this function */
     }
 
@@ -496,13 +496,13 @@ void ExtVideo::updateFilterOptions()
         else if( lineedit ) i_int = lineedit->text().toInt( NULL,16 );
         else if( combobox ) i_int = combobox->itemData( combobox->currentIndex() ).toInt();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
-        config_PutInt( p_intf, option.toStdString().c_str(), i_int );
+        config_PutInt( p_intf, qtu( option ), i_int );
         if( b_is_command )
         {
             if( i_type == VLC_VAR_INTEGER )
-                var_SetInteger( p_obj, option.toStdString().c_str(), i_int );
+                var_SetInteger( p_obj, qtu( option ), i_int );
             else
-                var_SetBool( p_obj, option.toStdString().c_str(), i_int );
+                var_SetBool( p_obj, qtu( option ), i_int );
         }
     }
     else if( i_type == VLC_VAR_FLOAT )
@@ -513,27 +513,27 @@ void ExtVideo::updateFilterOptions()
         else if( doublespinbox ) f_float = doublespinbox->value();
         else if( lineedit ) f_float = lineedit->text().toDouble();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
-        config_PutFloat( p_intf, option.toStdString().c_str(), f_float );
+        config_PutFloat( p_intf, qtu( option ), f_float );
         if( b_is_command )
-            var_SetFloat( p_obj, option.toStdString().c_str(), f_float );
+            var_SetFloat( p_obj, qtu( option ), f_float );
     }
     else if( i_type == VLC_VAR_STRING )
     {
         char *psz_string = NULL;
         if( lineedit ) psz_string = strdup( qtu( lineedit->text() ) );
         else if( combobox ) psz_string = strdup( qtu( combobox->itemData(
-                                         combobox->currentIndex() ).toString() ) );
+                                       combobox->currentIndex() ).toString() ) );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
-        config_PutPsz( p_intf, option.toStdString().c_str(), psz_string );
+        config_PutPsz( p_intf, qtu( option ), psz_string );
         if( b_is_command )
-            var_SetString( p_obj, option.toStdString().c_str(), psz_string );
+            var_SetString( p_obj, qtu( option ), psz_string );
         free( psz_string );
     }
     else
         msg_Err( p_intf,
                  "Module %s's %s variable is of an unsupported type ( %d )",
-                 module.toStdString().c_str(),
-                 option.toStdString().c_str(),
+                 qtu( module ),
+                 qtu( option ),
                  i_type );
 
     vlc_object_release( p_obj );
@@ -736,7 +736,7 @@ void ExtV4l2::ValueChange( int value )
     vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( p_intf, "v4l2", FIND_ANYWHERE );
     if( p_obj )
     {
-        char *psz_var = strdup( s->objectName().toStdString().c_str() );
+        char *psz_var = strdup( qtu( s->objectName() ) );
         int i_type = var_Type( p_obj, psz_var );
         switch( i_type & VLC_VAR_TYPE )
         {
