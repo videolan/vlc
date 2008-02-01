@@ -569,7 +569,7 @@ dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
 LIBS_save="${LIBS}"
 AH_TEMPLATE(HAVE_GETADDRINFO, [Define to 1 if you have the `getaddrinfo' function.])
-AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)], 1, [${LIBS_socket}])
+AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${LIBS_socket}])
 
 dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
 dnl are
