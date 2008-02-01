@@ -2012,6 +2012,7 @@ SDL_image-$(SDL_IMAGE_VERSION).tar.gz:
 SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz 
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/SDL_image.patch
+	patch -p0 < Patches/SDL_image-CVE-2006-4484.patch
 
 .SDL_image: SDL_image .SDL .png .jpeg .tiff
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-tif --disable-sdltest && make && make install)
