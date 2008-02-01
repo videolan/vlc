@@ -886,12 +886,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     /*  where to locate the logo: */
     if( p_sys->pos < 0 )
     {   /*  set to an absolute xy */
-        p_spu->p_region->i_align = OSD_ALIGN_RIGHT | OSD_ALIGN_TOP;
+        p_region->i_align = OSD_ALIGN_RIGHT | OSD_ALIGN_TOP;
         p_spu->b_absolute = VLC_TRUE;
     }
     else
     {   /* set to one of the 9 relative locations */
-        p_spu->p_region->i_align = p_sys->pos;
+        p_region->i_align = p_sys->pos;
         p_spu->b_absolute = VLC_FALSE;
     }
 
