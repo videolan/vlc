@@ -1828,6 +1828,7 @@ static void ShowConsole( vlc_bool_t b_dofile )
      * Unicode/locale subsystem. By default, we have the obsolecent OEM code
      * page (e.g. CP437 or CP850). */
     SetConsoleOutputCP (GetACP ());
+    SetConsoleTitle ("VLC media player version "PACKAGE_VERSION);
 
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
