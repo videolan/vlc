@@ -117,6 +117,8 @@ httpd_UrlNew
 httpd_UrlNewUnique
 __image_HandlerCreate
 image_HandlerDelete
+inet_ntop
+inet_pton
 InitMD5
 input_AddSubtitles
 input_Control
@@ -255,6 +257,7 @@ playlist_ServicesDiscoveryRemove
 playlist_TreeMove
 __pl_Release
 __pl_Yield
+poll
 resolve_xml_special_chars
 sdp_AddAttribute
 sdp_AddMedia
@@ -375,6 +378,7 @@ vlc_b64_decode_binary_to_buffer
 vlc_b64_encode
 vlc_b64_encode_binary
 VLC_Changeset
+vlc_closedir
 VLC_CompileBy
 VLC_CompileDomain
 VLC_CompileHost
@@ -384,8 +388,8 @@ __vlc_cond_init
 vlc_config_create
 vlc_config_set
 vlc_CPU
+vlc_dgettext
 vlc_error
-VLC_Error
 __vlc_event_attach
 vlc_event_detach
 vlc_event_manager_fini
@@ -426,8 +430,10 @@ __vlc_object_unlock
 __vlc_object_wait
 __vlc_object_waitpipe
 __vlc_object_yield
+vlc_opendir
 vlc_parse_cmdline
 vlc_rand_bytes
+vlc_readdir
 vlc_scandir
 vlc_sdp_Start
 vlc_strcasecmp
@@ -448,6 +454,7 @@ __vlc_threadvar_create
 vlc_ureduce
 vlc_vasprintf
 VLC_Version
+vlc_wclosedir
 vlc_wraptext
 vlm_Control
 vlm_Delete
