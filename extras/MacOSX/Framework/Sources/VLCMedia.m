@@ -132,6 +132,7 @@ static void HandleMediaMetaChanged(const libvlc_event_t * event, void * self)
 static void HandleMediaStateChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
     [[VLCEventManager sharedManager] callOnMainThreadObject:self
                                                  withMethod:@selector(setStateAsNumber:)
                                        withArgumentAsObject:[NSNumber numberWithInt:
@@ -263,14 +264,11 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (NSComparisonResult)compare:(VLCMedia *)media
 {
-    libvlc_media_descriptor_t * anOtherMd = [media libVLCMediaDescriptor];
-    /* We can release, we'll just use ptr */
-    libvlc_media_descriptor_release(anOtherMd);
-    if (self == media || p_md == anOtherMd)
+    if (self == media)
         return NSOrderedSame;
-    else if (!media)
+    if (!media)
         return NSOrderedDescending;
-    return NSOrderedAscending;
+    return p_md == [media libVLCMediaDescriptor] ? NSOrderedSame : NSOrderedAscending;
 }
 
 @synthesize delegate;
