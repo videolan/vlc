@@ -5,7 +5,8 @@
 rm -f libvlc-headers.sym
 
 cat ${srcdir}/../include/vlc_*.h | \
-sed -n -e 's/^VLC_EXPORT\s*([^,]*,\s*\([a-zA-Z0-9_]*\)\s*,.*$/\1/p' | \
+sed -n -e 's/^\s*VLC_EXPORT\s*([^,]*,\([^,]*\).*).*/\1/p' | \
+sed -e 's/[^a-zA-Z0-9_]*//' | \
 sort -du > libvlc-headers.sym
 
 if ! diff -u ${srcdir}/libvlc.sym libvlc-headers.sym; then
