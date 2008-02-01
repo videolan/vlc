@@ -2274,7 +2274,7 @@ DISTCLEAN_PKG += ncurses-$(NCURSES_VERSION).tar.gz
 # ***************************************************************************
 
 asa.git.tar.gz:
-	$(WGET) "http://git.spaceboyz.net/asa.git/?p=asa.git;a=snapshot;" -O asa.git.tar.gz
+	$(WGET) $(ASA_URL) -O $@
 
 asa: asa.git.tar.gz
 	$(EXTRACT_GZ)

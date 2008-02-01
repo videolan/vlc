@@ -208,3 +208,4 @@ LUA_VERSION=5.1
 LUA_URL=http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
 NCURSES_VERSION=5.6
 NCURSES_URL=$(GNU)/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
+ASA_URL="http://git.spaceboyz.net/asa.git/?p=asa.git;a=snapshot;"
