@@ -524,7 +524,9 @@ static int Open( vlc_object_t * p_this )
                 msg_Dbg( p_demux, "stream[%d] iavs with handler %4.4s", i, (char *)&p_strh->i_handler );
                 if( p_strh->i_handler == FOURCC_dvsd ||
                     p_strh->i_handler == FOURCC_dvhd ||
-                    p_strh->i_handler == FOURCC_dvsl )
+                    p_strh->i_handler == FOURCC_dvsl ||
+                    p_strh->i_handler == FOURCC_dv25 ||
+                    p_strh->i_handler == FOURCC_dv50 )
                 {
                     tk->p_out_muxed = stream_DemuxNew( p_demux, (char *)"rawdv", p_demux->out );
                     if( !tk->p_out_muxed )

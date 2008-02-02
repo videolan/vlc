@@ -370,3 +370,5 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define FOURCC_dvsd         VLC_FOURCC('d','v','s','d')
 #define FOURCC_dvhd         VLC_FOURCC('d','v','h','d')
 #define FOURCC_dvsl         VLC_FOURCC('d','v','s','l')
+#define FOURCC_dv25         VLC_FOURCC('d','v','2','5')
+#define FOURCC_dv50         VLC_FOURCC('d','v','5','0')
