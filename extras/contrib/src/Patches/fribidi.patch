@@ -76,3 +76,13 @@ diff -u fribidi.orig/configure.ac fribidi/configure.ac
  
  # Generate output
  AC_CONFIG_FILES([fribidi.pc
+--- fribidi.orig/fribidi.pc.in	2008-02-02 23:06:05.000000000 +0000
++++ fribidi/fribidi.pc.in	2008-02-02 23:06:39.000000000 +0000
+@@ -7,7 +7,6 @@
+ 
+ Name: @PACKAGE_NAME@
+ Description: Unicode Bidirectional Algorithm Library
+-Requires: @MISC_PACKAGES@
+ Version: @VERSION@
+ Libs: -L${libdir} -lfribidi
+ Cflags: -I${includedir}/@PACKAGE@
