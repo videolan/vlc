@@ -103,7 +103,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
 #define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
                             "versions of the software. It runs once a week." )
-#define UPDATER_DAYS_TEXT N_("Number of days between two checks")
+#define UPDATER_DAYS_TEXT N_("Number of days between two update checks")
 
 #define COMPLETEVOL_TEXT N_( "Allow the volume to be set to 400%" )
 #define COMPLETEVOL_LONGTEXT N_( "Allow the volume to have range from 0% to " \
