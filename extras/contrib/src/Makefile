@@ -1890,6 +1890,9 @@ gecko-sdk: gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 	$(EXTRACT_GZ)
 
 .gecko: gecko-sdk
+	rm -rf ../gecko-sdk
+	mv gecko-sdk ..
+	mkdir gecko-sdk #creating an empty dir is faster than copying the whole dir
 	(cd $<)
 	touch $@
 
