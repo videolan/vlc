@@ -5156,7 +5156,7 @@ AS_IF([test "${enable_qt4}" != "no" &&
       AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
       ALIASES="${ALIASES} qvlc"
       enableqt4=true
-      if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin"; then
+      if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin" -a "${SYS}" != "darwin"; then
           VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
       else
           VLC_ADD_LIBS([qt4],[$QT4_LIBS])
