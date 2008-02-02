@@ -113,7 +113,7 @@ static inline int scalar_number( uint8_t *p, int header_len )
 /* number of data bytes in a MPI */
 #define mpi_len( mpi ) ( ( scalar_number( mpi, 2 ) + 7 ) / 8 )
 
-/* 
+/*
  * fill a public_key_packet_t structure from public key packet data
  * verify that it is a version 4 public key packet, using DSA
  */
@@ -163,7 +163,7 @@ static int parse_public_key_packet( public_key_packet_t *p_key, uint8_t *p_buf,
         if( i_g_len < 128 )
             memmove( p_key->y, p_key->g + 2+i_g_len, 2+128 );
     }
-    
+
     int i_y_len = mpi_len( p_buf );
     if( i_y_len > 128 )
         return VLC_EGENERIC;
@@ -205,7 +205,7 @@ static int parse_signature_v4_packet( signature_packet_v4_t *p_sig,
     size_t i_pos = 6;
     size_t i_hashed_data_len = scalar_number( p_sig->hashed_data_len, 2 );
     i_pos += i_hashed_data_len;
-    if( i_pos > i_sig_len - 48 ) /* r & s are 44 bytes in total, 
+    if( i_pos > i_sig_len - 48 ) /* r & s are 44 bytes in total,
                               * + the unhashed data length (2 bytes)
                               * + the hash verification (2 bytes) */
         return VLC_EGENERIC;
@@ -322,7 +322,7 @@ static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
             p_ipos += i_line_len + 1;
             continue;
         }
-        
+
         if( !strncmp( p_ipos, "Version:", 8 ) )
         {
             p_ipos += i_line_len + 1;
@@ -358,7 +358,7 @@ static int pgp_unarmor( char *p_ibuf, size_t i_ibuf_len,
 
 /*
  * Download the signature associated to a document or a binary file.
- * We're given the file's url, we just append ".asc" to it and download 
+ * We're given the file's url, we just append ".asc" to it and download
  */
 static int download_signature(  vlc_object_t *p_this,
                                 signature_packet_v3_t *p_sig,
@@ -399,7 +399,7 @@ static int download_signature(  vlc_object_t *p_this,
         stream_Delete( p_stream );
         return VLC_ENOMEM;
     }
-    
+
     int i_read = stream_Read( p_stream, p_buf, (int)i_size );
 
     stream_Delete( p_stream );
@@ -410,7 +410,7 @@ static int download_signature(  vlc_object_t *p_this,
         free( p_buf );
         return VLC_EGENERIC;
     }
-    
+
     int i_bytes = pgp_unarmor( p_buf, i_size, (uint8_t*)p_sig, 65 );
     free( p_buf );
 
@@ -614,7 +614,7 @@ static int parse_public_key( const uint8_t *p_key_data, size_t i_key_len, public
                 memcpy( p_key->psz_username, pos, i_packet_len );
                 p_key->psz_username[i_packet_len] = '\0';
                 break;
-            
+
             default:
                 break;
         }
@@ -655,7 +655,7 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
     {
         fclose( f );
         return NULL;
-    } 
+    }
 
     size_t i_read;
     while( ( i_read = fread( buffer, 1, sizeof(buffer), f ) ) > 0 )
@@ -835,7 +835,7 @@ update_t *__update_New( vlc_object_t *p_this )
 
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
-    
+
     p_update->p_pkey = NULL;
 
     return p_update;
@@ -948,10 +948,10 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
     stream_Delete( p_stream );
     p_stream = NULL;
 
-    /* Now that we know the status is valid, we must download its signature 
+    /* Now that we know the status is valid, we must download its signature
      * to authenticate it */
     signature_packet_v3_t sign;
-    if( download_signature( VLC_OBJECT( p_update->p_libvlc ), &sign, 
+    if( download_signature( VLC_OBJECT( p_update->p_libvlc ), &sign,
             UPDATE_VLC_STATUS_URL ) != VLC_SUCCESS )
     {
         msg_Err( p_update->p_libvlc, "Couldn't download signature of status file" );
@@ -1053,17 +1053,17 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
             != VLC_SUCCESS )
     {
         msg_Err( p_update->p_libvlc, "BAD SIGNATURE for status file" );
-        free( p_hash );
         goto error;
     }
     else
     {
         msg_Info( p_update->p_libvlc, "Status file authenticated" );
-        free( p_hash );
+        gcry_md_close( hd );
         return VLC_TRUE;
     }
 
 error:
+    gcry_md_close( hd );
     if( p_stream )
         stream_Delete( p_stream );
     free( psz_version_line );
