@@ -349,8 +349,7 @@ nvlc: make-alias
 
 if HAVE_DARWIN
 # Create the MacOS X app
-vlc_app_DATA = VLC.app
-vlc_appdir = $(bindir)
+noinst_DATA = VLC.app
 # VLC-release.app is the old VLC.app target
 VLC-release.app: vlc
 	( cd  src && make  )
