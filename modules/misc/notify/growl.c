@@ -139,15 +139,34 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_name );
 
     /* Playing something ... */
-    psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-    if( psz_artist == NULL ) psz_artist = strdup( "" );
-    psz_album = input_item_GetAlbum( input_GetItem( p_input ) ) ;
-    if( psz_album == NULL ) psz_album = strdup( "" );
-    psz_title = input_item_GetTitle( input_GetItem( p_input ) );
-    if( psz_title == NULL )
+    input_item_t *p_item = input_GetItem( p_input );
+
+    psz_title = input_item_GetTitle( p_item );
+    if( psz_title == NULL || EMPTY_STR( psz_title ) )
+    {
+        free( psz_title );
         psz_title = input_item_GetName( input_GetItem( p_input ) );
-    snprintf( psz_tmp, GROWL_MAX_LENGTH, "%s %s %s",
-              psz_title, psz_artist, psz_album );
+        if( psz_title == NULL || EMPTY_STR( psz_title ) )
+        {
+            free( psz_title );
+            vlc_object_release( p_input );
+            return VLC_SUCCESS;
+        }
+    }
+
+    psz_artist = input_item_GetArtist( p_item );
+    if( EMPTY_STR( psz_artist ) ) FREENULL( psz_artist );
+    psz_album = input_item_GetAlbum( p_item ) ;
+    if( EMPTY_STR( psz_album ) ) FREENULL( psz_album );
+
+    if( psz_artist && psz_album )
+        snprintf( psz_tmp, GROWL_MAX_LENGTH, "%s\n%s [%s]",
+                psz_title, psz_artist, psz_album );
+    else if( psz_artist )
+        snprintf( psz_tmp, GROWL_MAX_LENGTH, "%s\n%s", psz_title, psz_artist );
+    else
+        snprintf( psz_tmp, GROWL_MAX_LENGTH, "%s", psz_title );
+
     free( psz_title );
     free( psz_artist );
     free( psz_album );
