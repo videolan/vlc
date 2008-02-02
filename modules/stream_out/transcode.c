@@ -2283,7 +2283,11 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
                 id->pp_filter[id->i_filter]->p_module =
                     module_Need( id->pp_filter[id->i_filter],
+#if ( (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) )
+                                 "video filter2", "scale", VLC_TRUE );
+#else
                                  "crop padd", 0, 0 );
+#endif
                 if( id->pp_filter[id->i_filter]->p_module )
                 {
                     id->pp_filter[id->i_filter]->p_owner =
