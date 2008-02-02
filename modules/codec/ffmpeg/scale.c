@@ -115,6 +115,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     }
 
     swscale_fast_memcpy = p_filter->p_libvlc->pf_memcpy;
+
     /* Set CPU capabilities */
     i_cpu = vlc_CPU();
     p_sys->i_cpu_mask = 0;
@@ -122,7 +123,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     {
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_MMX;
     }
-#if 0
+#if (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0))
     if( i_cpu & CPU_CAPABILITY_MMXEXT )
     {
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_MMX2;
