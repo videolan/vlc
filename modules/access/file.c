@@ -450,8 +450,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
     /* FIXME: i_size should really be unsigned */
     if ((uint64_t)i_pos > (uint64_t)p_access->info.i_size)
     {
-        /* This should only happen with corrupted files.
-         * But it also seems to happen with buggy demuxes (ASF) */
+        /* This should only happen with corrupted/truncated files. */
         msg_Err (p_access, "seeking too far (0x"I64Fx" / 0x"I64Fx")",
                  i_pos, p_access->info.i_size);
         i_pos = p_access->info.i_size;
