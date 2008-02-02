@@ -76,10 +76,10 @@ AC_ARG_WITH(contrib,
    if test "`grep HOST ${topdir}/extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"; then
       if test "${with_contrib}" = "yes"; then
         AC_MSG_RESULT([no])
-	AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
+        AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
       else
         AC_MSG_RESULT([no])
-	AC_MSG_WARN([ not using the libs in extras/contrib as it is not the same host])
+        AC_MSG_WARN([ not using the libs in extras/contrib as it is not the same host])
       fi
      else
   if test -d ${topdir}/extras/contrib/lib; then
@@ -358,9 +358,9 @@ dnl for program foo on win32
 case "${build_os}" in
     cygwin|msys)
         ac_executable_extensions=".exe"
- 	;;
+    ;;
     *)
- 	;;
+    ;;
 esac
 
 dnl 
@@ -1698,10 +1698,10 @@ AS_IF([test "${enable_notify}" != "no" -a "${SYS}" != "mingw32"], [
       [
         VLC_ADD_PLUGINS([notify])
         VLC_ADD_CFLAGS(notify, [$NOTIFY_CFLAGS])
-	VLC_ADD_LIBS(notify, [$NOTIFY_LIBS])
+        VLC_ADD_LIBS(notify, [$NOTIFY_LIBS])
       ],[
-	AS_IF([test "${enable_notify}" = "yes"],[
-	       AC_MSG_WARN( libnotify not found) ])
+    AS_IF([test "${enable_notify}" = "yes"],[
+        AC_MSG_WARN( libnotify not found) ])
       ])
   ])
 
@@ -1722,9 +1722,9 @@ AC_ARG_ENABLE(musicbrainz,
   [  --enable-musicbrainz    MusicBrainz support (default disabled) ])
   AS_IF([test "${enable_musicbrainz}" = "yes"],[
       PKG_CHECK_MODULES(MUSICBRAINZ, libmusicbrainz,
-  	[ VLC_ADD_PLUGINS([musicbrainz])
-	  VLC_ADD_LIBS([musicbrainz],[$MUSICBRAINZ_LIBS]) 
-	  VLC_ADD_CFLAGS([musicbrainz],[$MUSICBRAINZ_CFLAGS])  ],
+    [ VLC_ADD_PLUGINS([musicbrainz])
+      VLC_ADD_LIBS([musicbrainz],[$MUSICBRAINZ_LIBS])
+      VLC_ADD_CFLAGS([musicbrainz],[$MUSICBRAINZ_CFLAGS])  ],
        [AC_MSG_WARN(MusicBrainz library not found)])
    ])
 
@@ -5156,7 +5156,11 @@ AS_IF([test "${enable_qt4}" != "no" &&
       AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
       ALIASES="${ALIASES} qvlc"
       enableqt4=true
-      VLC_ADD_LIBS([qt4],[$QT4_LIBS])
+      if test "${SYS}" != "mingw32" -o "${SYS}" != "mingwce" -o "${SYS}" != "cygwin"; then
+          VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
+      else
+          VLC_ADD_LIBS([qt4],[$QT4_LIBS])
+      fi
       VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR=\\\\\\\"$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/\\\\\\\"])
       AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
