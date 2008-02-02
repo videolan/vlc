@@ -905,10 +905,8 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
 
         /* Refill a block */
         if( AStreamRefillBlock( s ) )
-        {
-            msg_Err( s, "cannot pre fill buffer" );
             return VLC_EGENERIC;
-        }
+
         /* Update stat */
         p_sys->stat.i_seek_time += i_end - i_start;
         p_sys->stat.i_seek_count++;
@@ -917,15 +915,13 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     else
     {
         /* Read enough data */
-        while( p_sys->block.i_start + p_sys->block.i_size < i_pos )
+        while( p_sys->block.i_start + p_sys->block.i_size <= i_pos )
         {
             if( AStreamRefillBlock( s ) )
-            {
-                msg_Err( s, "can't read enough data in seek" );
                 return VLC_EGENERIC;
-            }
+
             while( p_sys->block.p_current &&
-                   p_sys->i_pos + p_sys->block.p_current->i_buffer < i_pos )
+                   p_sys->i_pos + p_sys->block.p_current->i_buffer <= i_pos )
             {
                 p_sys->i_pos += p_sys->block.p_current->i_buffer;
                 p_sys->block.p_current = p_sys->block.p_current->p_next;
@@ -935,7 +931,6 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
         p_sys->block.i_offset = i_pos - p_sys->i_pos;
         p_sys->i_pos = i_pos;
 
-        /* TODO read data */
         return VLC_SUCCESS;
     }
 
