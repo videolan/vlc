@@ -108,33 +108,33 @@ endef
 
 VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
-	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS"
-	$(INSTALL) "$(srcdir)/.libs/npvlc.dylib" "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
+	$(INSTALL) -d "$@/Contents/MacOS/lib"
+	$(INSTALL) ".libs/npvlc.dylib" "$@/Contents/MacOS/VLC Plugin"
 	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS/lib"; \
 	install_name_tool -change "$(libdir)/libvlc.1.dylib" \
 	    "@executable_path/lib/libvlc.dylib" \
-	    "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
+	    "$@/Contents/MacOS/VLC Plugin"
 	install_name_tool -change "$(libdir)/libvlc-control.1.dylib" \
 	    "@executable_path/lib/libvlc-control.dylib" \
-	    "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
+	    "$@/Contents/MacOS/VLC Plugin"
 	$(INSTALL) "$(top_builddir)/src/.libs/libvlc.1.dylib" \
-	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc.dylib"
+	    "$@/Contents/MacOS/lib/libvlc.dylib"
 	$(INSTALL) "$(top_builddir)/src/.libs/libvlc-control.1.dylib" \
-	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"
+	    "$@/Contents/MacOS/lib/libvlc-control.dylib"
 	install_name_tool -change "$(libdir)/libvlc.1.dylib" \
 	    "@executable_path/lib/libvlc.dylib" \
-	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"
-	dylib="$(srcdir)/$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
-	dylib="$(srcdir)/$@/Contents/MacOS/lib/libvlc.dylib"; $(FIXEXECPATH) ;
-	dylib="$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"; $(FIXEXECPATH) ;
-	$(INSTALL) -d "$(srcdir)/$@/Contents/Resources"
-	$(INSTALL) npvlc.rsrc "$(srcdir)/$@/Contents/Resources/VLC Plugin.rsrc"
-	cp -r "$(top_srcdir)/extras/MacOSX/plugin/English.lproj" "$(srcdir)/$@/Contents/Resources/"
-	$(INSTALL) "$(top_srcdir)/extras/MacOSX/plugin/Info.plist" "$(srcdir)/$@/Contents/Info.plist"
-	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS/modules"
+	    "$@/Contents/MacOS/lib/libvlc-control.dylib"
+	dylib="$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
+	dylib="$@/Contents/MacOS/lib/libvlc.dylib"; $(FIXEXECPATH) ;
+	dylib="$@/Contents/MacOS/lib/libvlc-control.dylib"; $(FIXEXECPATH) ;
+	$(INSTALL) -d "$@/Contents/Resources"
+	$(INSTALL) npvlc.rsrc "$@/Contents/Resources/VLC Plugin.rsrc"
+	cp -r "$(top_srcdir)/extras/MacOSX/plugin/English.lproj" "$@/Contents/Resources/"
+	$(INSTALL) "$(top_srcdir)/extras/MacOSX/plugin/Info.plist" "$@/Contents/Info.plist"
+	$(INSTALL) -d "$@/Contents/MacOS/modules"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
-	    dylib="$(srcdir)/$@/Contents/MacOS/modules/`basename $$i$(LIBEXT)`"; \
+	    dylib="$@/Contents/MacOS/modules/`basename $$i$(LIBEXT)`"; \
 	    $(INSTALL) "`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" "$$dylib"; \
 	    install_name_tool -change "$(libdir)/libvlc.1.dylib" \
 	        "@executable_path/lib/libvlc.dylib" "$$dylib"; \
@@ -143,7 +143,7 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	done
 	if test -d $(top_srcdir)/extras/contrib/vlc-lib; then \
 	  for i in $(top_srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    dylib="$(srcdir)/$@/Contents/MacOS/lib/`basename $${i}`" ; \
+	    dylib="$@/Contents/MacOS/lib/`basename $${i}`" ; \
 	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
 	    $(FIXEXECPATH); \
 	  done ; \
