@@ -5510,39 +5510,20 @@ fi
 AC_ARG_WITH(,[Misc options:])
 
 dnl
-dnl TLS/SSL
-dnl
-AC_ARG_ENABLE(gnutls,
-  [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
-
-AS_IF([test "${enable_gnutls}" != "no"], [
-  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.3.3], [have_gnutls="yes"], [have_gnutls="no"])
-
-  AS_IF([test "${have_gnutls}" = "yes"], [
-    VLC_ADD_PLUGINS([gnutls])
-    VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
-    AS_IF([test "${SYS}" = "mingw32"], [
-      dnl pkg-config --libs gnutls omits these
-      VLC_ADD_LIBS([gnutls], [-lz])
-      VLC_ADD_LIBS([gnutls], [${LTLIBINTL}])
-    ])
-    AC_CHECK_LIB([gcrypt], [gcry_control], [
-      VLC_ADD_LIBS([gnutls], [-lgcrypt -lgpg-error])
-    ], [], [-lgpg-error])
-    VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
-  ], [
-    AS_IF([test "${enable_gnutls}" = "yes"], [
-      AC_MSG_ERROR([gnutls not present or too old (version 1.2.9 required)])
-    ])
-  ])
-])
-
-dnl
 dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
   [  --enable-libgcrypt      libgcrypts support (default enabled)])
-if test "${enable_libgcrypt}" != "no" -a "${enable_gnutls}" != "no"
+
+GCRYPT_PATH="${PATH}"
+AC_ARG_WITH(libgcrypt-config-path,
+[    --with-libgcrypt-config-path=PATH libgcrypt-config path (default search in \$PATH)],
+   [ if test "${with_libgcrypt_config_path}" != "no"
+     then
+       GCRYPT_PATH="${with_libgcrypt_config_path}:${PATH}"
+     fi ])
+
+if test "${enable_libgcrypt}" != "no"
 then
   dnl Workaround for cross-compiling since AM_PATH_LIBGRYPT doesn't dectect
   dnl it and looks for libgcrypt headers in the wrong place.
@@ -5554,6 +5535,39 @@ then
   fi
 fi
 AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
+AS_IF([test "${have_libgcrypt}" = "yes"],[
+	# look for libgcrypt-config
+	AC_PATH_PROG(GCRYPT_CONFIG, "libgcrypt-config", no, ${GCRYPT_PATH})
+	GCRYPT_CFLAGS=`${GCRYPT_CONFIG} --cflags`
+	GCRYPT_LIBS=`${GCRYPT_CONFIG} --libs`
+])
+
+dnl
+dnl TLS/SSL
+dnl
+AC_ARG_ENABLE(gnutls,
+  [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
+
+AS_IF([test "${enable_gnutls}" != "no"], [
+  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.3.3], [
+    VLC_ADD_PLUGINS([gnutls])
+    VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
+    AS_IF([test "${SYS}" = "mingw32"], [
+      dnl pkg-config --libs gnutls omits these
+      VLC_ADD_LIBS([gnutls], [-lz])
+      VLC_ADD_LIBS([gnutls], [${LTLIBINTL}])
+    ])
+    AS_IF([test "${have_libgcrypt}" = "yes"],[
+      VLC_ADD_LIBS([gnutls], ${GCRYPT_LIBS})
+      VLC_ADD_CFLAGS([gnutls], ${GCRYPT_CFLAGS})
+    ], [-lgpg-error])
+    VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
+  ], [
+    AS_IF([test "${enable_gnutls}" = "yes"], [
+      AC_MSG_ERROR([gnutls not present or too old (version 1.2.9 required)])
+    ])
+  ])
+])
 
 dnl
 dnl update checking system
@@ -5566,7 +5580,8 @@ then
   then
     AC_MSG_ERROR([libgcrypt is required for update checking system])
   fi
-  VLC_ADD_LIBS([libvlc], [-lgcrypt])
+  VLC_ADD_LIBS([libvlc], ${GCRYPT_LIBS})
+  VLC_ADD_CFLAGS([libvlc], ${GCRYPT_CFLAGS})
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
 
