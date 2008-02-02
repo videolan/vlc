@@ -39,6 +39,8 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include <string>
+
 #define ICON_HEIGHT 64
 #define BUTTON_HEIGHT 74
 
