@@ -539,14 +539,14 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* dshow Main */
     int line = 0;
-    module_config_t *p_config = 
+    module_config_t *p_config =
         config_FindConfig( VLC_OBJECT(p_intf), "dshow-vdev" );
-    vdevDshowW = new StringListConfigControl( 
+    vdevDshowW = new StringListConfigControl(
         VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
     line++;
 
     p_config = config_FindConfig( VLC_OBJECT(p_intf), "dshow-adev" );
-    adevDshowW = new StringListConfigControl( 
+    adevDshowW = new StringListConfigControl(
         VLC_OBJECT(p_intf), p_config, this, false, dshowDevLayout, line );
     line++;
 
@@ -631,6 +631,41 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 #else /* WIN32 */
     /*******
+     * V4L2*
+     *******/
+    if( module_Exists( p_intf, "v4l2" ) ){
+    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2" );
+
+    /* V4l Main panel */
+    QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
+    v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
+
+    v4l2VideoDevice = new QLineEdit;
+    v4l2DevLayout->addWidget( v4l2VideoDevice, 0, 1 );
+
+    QLabel *v4l2AudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
+    v4l2DevLayout->addWidget( v4l2AudioDeviceLabel, 1, 0 );
+
+    v4l2AudioDevice = new QLineEdit;
+    v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
+
+    /* v4l2 Props panel */
+    QLabel *v4l2StdLabel = new QLabel( qtr( "Standard" ) );
+    v4l2PropLayout->addWidget( v4l2StdLabel, 0 , 0 );
+
+    v4l2StdBox = new QComboBox;
+    setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
+    v4l2PropLayout->addWidget( v4l2StdBox, 0 , 1 );
+    v4l2PropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
+            1, 0, 3, 1 );
+
+    /* v4l2 CONNECTs */
+    CuMRL( v4l2VideoDevice, textChanged( QString ) );
+    CuMRL( v4l2AudioDevice, textChanged( QString ) );
+    CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
+    }
+
+    /*******
      * V4L *
      *******/
     if( module_Exists( p_intf, "v4l" ) ){
@@ -673,41 +708,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CuMRL( v4lAudioDevice, textChanged( QString ) );
     CuMRL( v4lFreq, valueChanged ( int ) );
     CuMRL( v4lNormBox,  currentIndexChanged ( int ) );
-    }
-
-    /*******
-     * V4L2*
-     *******/
-    if( module_Exists( p_intf, "v4l2" ) ){
-    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2" );
-
-    /* V4l Main panel */
-    QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
-    v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
-
-    v4l2VideoDevice = new QLineEdit;
-    v4l2DevLayout->addWidget( v4l2VideoDevice, 0, 1 );
-
-    QLabel *v4l2AudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
-    v4l2DevLayout->addWidget( v4l2AudioDeviceLabel, 1, 0 );
-
-    v4l2AudioDevice = new QLineEdit;
-    v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
-
-    /* v4l2 Props panel */
-    QLabel *v4l2StdLabel = new QLabel( qtr( "Standard" ) );
-    v4l2PropLayout->addWidget( v4l2StdLabel, 0 , 0 );
-
-    v4l2StdBox = new QComboBox;
-    setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
-    v4l2PropLayout->addWidget( v4l2StdBox, 0 , 1 );
-    v4l2PropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
-            1, 0, 3, 1 );
-
-    /* v4l2 CONNECTs */
-    CuMRL( v4l2VideoDevice, textChanged( QString ) );
-    CuMRL( v4l2AudioDevice, textChanged( QString ) );
-    CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
     }
 
     /*******
@@ -936,8 +936,8 @@ void CaptureOpenPanel::updateMRL()
         mrl = "dshow://";
         mrl += " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
         mrl += " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
-        if( dshowVSizeLine->isModified() ) 
-            mrl += " :dshow-size=" + dshowVSizeLine->text(); 
+        if( dshowVSizeLine->isModified() )
+            mrl += " :dshow-size=" + dshowVSizeLine->text();
         break;
 #else
     case V4L_DEVICE:
@@ -1068,12 +1068,17 @@ void CaptureOpenPanel::advancedDialog()
 
     /* A main Layout with a Frame */
     QVBoxLayout *mainLayout = new QVBoxLayout( adv );
-    //TODO QScrollArea
     QFrame *advFrame = new QFrame;
-    mainLayout->addWidget( advFrame );
+    QScrollArea *scroll = new QScrollArea;
+    mainLayout->addWidget( scroll );
 
     /* GridLayout inside the Frame */
     QGridLayout *gLayout = new QGridLayout( advFrame );
+    gLayout->setSizeConstraint( QLayout::SetFixedSize );
+
+    scroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    scroll->setWidgetResizable( true );
+    scroll->setWidget( advFrame );
 
     /* Create the options inside the FrameLayout */
     for( int n = 0; n < i_confsize; n++ )
