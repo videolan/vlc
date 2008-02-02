@@ -34,6 +34,8 @@
 extern "C" {
 # endif
 
+#include <stdint.h>
+
 /**
  * A position may have different origins:
  *  - absolute counts from the movie start
@@ -85,7 +87,7 @@ typedef struct {
     int  width;
     int  height;
     uint32_t type;
-    int64_t date;
+    vlc_int64_t date;
     int  size;
     char *data;
 } mediacontrol_RGBPicture;
@@ -120,8 +122,8 @@ typedef struct {
 typedef struct {
     mediacontrol_PlayerStatus streamstatus;
     char *url;         /* The URL of the current media stream */
-    int64_t position;  /* actual location in the stream (in ms) */
-    int64_t length;    /* total length of the stream (in ms) */
+    vlc_int64_t position;  /* actual location in the stream (in ms) */
+    vlc_int64_t length;    /* total length of the stream (in ms) */
 } mediacontrol_StreamInformation;
 
 
