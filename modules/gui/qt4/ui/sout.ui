@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>678</height>
+    <width>770</width>
+    <height>821</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -533,7 +533,7 @@
        <bool>true</bool>
       </property>
       <attribute name="title" >
-       <string>_("Video Codec")</string>
+       <string>_("Video codec")</string>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -622,7 +622,7 @@
      </widget>
      <widget class="QWidget" name="audioCodec" >
       <attribute name="title" >
-       <string>_("Audio Codec")</string>
+       <string>_("Audio codec")</string>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >

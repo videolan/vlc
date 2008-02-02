@@ -13,9 +13,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>10</number>
    </property>
@@ -25,12 +22,6 @@
       <string>_("On Screen Display")</string>
      </property>
      <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
       <item>
        <widget class="QCheckBox" name="OSDBox" >
         <property name="text" >
@@ -50,9 +41,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -61,16 +50,10 @@
       <string>_("Subtitles languages")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>_("Subtitles preferred language")</string>
+         <string>_("Preferred Subtitle language")</string>
         </property>
        </widget>
       </item>
@@ -103,12 +86,6 @@
       <string>_("Display Settings")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
       <item row="3" column="1" colspan="2" >
        <widget class="QComboBox" name="effect" />
       </item>
@@ -125,7 +102,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>_("Font Color")</string>
+         <string>_("Font color")</string>
         </property>
        </widget>
       </item>

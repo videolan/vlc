@@ -1,14 +1,11 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>BroadcastPanel</class>
  <widget class="QWidget" name="BroadcastPanel" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>627</width>
+    <width>745</width>
     <height>373</height>
    </rect>
   </property>
@@ -16,14 +13,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
    <item rowspan="3" row="0" column="0" colspan="3" >
-    <widget class="QTreeWidget" name="inputList" />
+    <widget class="QTreeWidget" name="inputList" >
+     <column>
+      <property name="text" >
+       <string>1</string>
+      </property>
+     </column>
+    </widget>
    </item>
    <item rowspan="2" row="2" column="3" >
     <widget class="QGroupBox" name="statsBox" >
@@ -38,12 +35,6 @@
       <string>Stuff</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
       <item>
        <widget class="QPushButton" name="deleteButton" >
         <property name="text" >
@@ -67,12 +58,6 @@
       <string>_("Control")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
       <item row="0" column="0" >
        <widget class="QRadioButton" name="manualRadio" >
         <property name="text" >
@@ -103,12 +88,6 @@
       <string>_("Status")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
       <item>
        <widget class="QPushButton" name="playPauseButton" >
         <property name="text" >
@@ -150,27 +129,26 @@
    <item row="3" column="0" >
     <widget class="QPushButton" name="addInputButton" >
      <property name="text" >
-      <string>_("Add input")</string>
+      <string>_("Add Input")</string>
      </property>
     </widget>
    </item>
    <item row="3" column="1" >
     <widget class="QPushButton" name="editInputButton" >
      <property name="text" >
-      <string>_("Edit input")</string>
+      <string>_("Edit Input")</string>
      </property>
     </widget>
    </item>
    <item row="3" column="2" >
     <widget class="QPushButton" name="clearInputsButton" >
      <property name="text" >
-      <string>_("Clear list")</string>
+      <string>_("Clear List")</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

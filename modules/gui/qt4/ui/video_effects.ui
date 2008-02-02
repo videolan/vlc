@@ -5,12 +5,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
+    <width>517</width>
     <height>320</height>
    </rect>
   </property>
   <property name="currentIndex" >
-   <number>1</number>
+   <number>5</number>
   </property>
   <widget class="QWidget" name="tab" >
    <attribute name="title" >
@@ -29,7 +29,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QComboBox" name="transformTypeCombo" />
        </item>
       </layout>
@@ -47,7 +47,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QLabel" name="label_29" >
          <property name="text" >
           <string>_("Sigma")</string>
@@ -226,7 +226,7 @@
     <string>_("Color fun")</string>
    </attribute>
    <layout class="QGridLayout" >
-   <item row="1" column="1" >
+    <item row="1" column="1" >
      <widget class="QGroupBox" name="extractEnable" >
       <property name="title" >
        <string>_("Color extraction")</string>
@@ -238,7 +238,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QLabel" name="label_6" >
          <property name="text" >
           <string>_("Color")</string>
@@ -258,7 +258,7 @@
     <item row="0" column="1" >
      <widget class="QCheckBox" name="invertEnable" >
       <property name="text" >
-       <string>_("Color invert")</string>
+       <string>_("Invert colors")</string>
       </property>
      </widget>
     </item>
@@ -274,7 +274,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="2" column="0" >
+       <item row="2" column="0" >
         <widget class="QLabel" name="label_14" >
          <property name="text" >
           <string>_("Similarity")</string>
@@ -326,7 +326,7 @@
     <string>_("Some random name")</string>
    </attribute>
    <layout class="QGridLayout" >
-   <item row="1" column="0" >
+    <item row="1" column="0" >
      <widget class="QCheckBox" name="magnifyEnable" >
       <property name="text" >
        <string>_("Magnification")</string>
@@ -345,7 +345,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="1" >
+       <item row="0" column="1" >
         <widget class="QDial" name="rotateAngleDial" >
          <property name="maximum" >
           <number>359</number>
@@ -389,7 +389,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="1" >
+       <item row="0" column="1" >
         <widget class="QSpinBox" name="puzzleRowsSpin" >
          <property name="minimum" >
           <number>1</number>
@@ -440,7 +440,7 @@
     <string>_("Image modification")</string>
    </attribute>
    <layout class="QGridLayout" >
-   <item row="2" column="0" >
+    <item row="2" column="0" >
      <widget class="QCheckBox" name="waveEnable" >
       <property name="text" >
        <string>_("Waves")</string>
@@ -487,7 +487,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QLabel" name="label_25" >
          <property name="text" >
           <string>_("Factor")</string>
@@ -531,7 +531,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QLabel" name="label_18" >
          <property name="text" >
           <string>_("Mode")</string>
@@ -565,7 +565,7 @@
     <string>_("Find a name")</string>
    </attribute>
    <layout class="QGridLayout" >
-   <item rowspan="2" row="0" column="1" >
+    <item rowspan="2" row="0" column="1" >
      <widget class="QGroupBox" name="eraseEnable" >
       <property name="title" >
        <string>_("Logo erase")</string>
@@ -577,7 +577,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="1" column="0" >
+       <item row="1" column="0" >
         <widget class="QLabel" name="label_16" >
          <property name="text" >
           <string>_("Top")</string>
@@ -622,7 +622,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QLabel" name="label_9" >
          <property name="text" >
           <string>_("Number of clones")</string>
@@ -654,7 +654,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="0" column="0" >
+       <item row="0" column="0" >
         <widget class="QLabel" name="label_31" >
          <property name="text" >
           <string>_("Rows")</string>
@@ -698,7 +698,7 @@
     <string>_("Overlay")</string>
    </attribute>
    <layout class="QGridLayout" >
-   <item row="0" column="0" >
+    <item row="0" column="0" >
      <widget class="QGroupBox" name="marqEnable" >
       <property name="title" >
        <string>_("Add text")</string>
@@ -710,7 +710,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="1" column="0" >
+       <item row="1" column="0" >
         <widget class="QLabel" name="label_24" >
          <property name="text" >
           <string>_("Position")</string>
@@ -745,7 +745,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-      <item row="3" column="0" >
+       <item row="3" column="0" >
         <widget class="QLabel" name="label_22" >
          <property name="text" >
           <string>_("Transparency")</string>
@@ -808,7 +808,7 @@
     <string>_("Advanced video filter controls")</string>
    </attribute>
    <layout class="QGridLayout" >
-   <item row="2" column="1" colspan="2" >
+    <item row="2" column="1" colspan="2" >
      <widget class="QLineEdit" name="subpictureFilterText" />
     </item>
     <item row="2" column="0" >
