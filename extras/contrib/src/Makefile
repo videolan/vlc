@@ -1635,7 +1635,7 @@ ifdef HAVE_DARWIN_OS_ON_INTEL
 	(patch -p0 < Patches/libpng-darwin-mactel.patch)
 endif
 
-.png: libpng 
+.png: libpng .zlib
 ifdef HAVE_DARWIN_OS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 else
