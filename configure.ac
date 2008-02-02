@@ -4147,55 +4147,36 @@ AC_ARG_ENABLE(fribidi,
   [  --enable-fribidi        fribidi support (default enabled)])
 if test "${enable_freetype}" != "no"
 then
-  FREETYPE_PATH="${PATH}"
-  AC_ARG_WITH(freetype-config-path,
-    [    --with-freetype-config-path=PATH freetype-config path (default search in \$PATH)],
-    [ if test "${with_freetype_config_path}" != "no"
-      then
-        FREETYPE_PATH="${with_freetype_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
-
-  if test "${FREETYPE_CONFIG}" != "no"
-  then
-    VLC_ADD_PLUGINS([freetype])
-    VLC_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
-    VLC_ADD_LIBS([freetype],[`${FREETYPE_CONFIG} --libs`])
-    if test "${SYS}" = "mingw32"; then
-       VLC_ADD_LIBS([freetype],[-lxml2])
-    fi
+   PKG_CHECK_MODULES(FREETYPE, freetype2,[  
+      VLC_ADD_PLUGINS([freetype])
+      have_freetype=yes     
+      VLC_ADD_CFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
+      VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
+      if test "${SYS}" = "mingw32"; then
+        VLC_ADD_LIBS([freetype skins2],[-lxml2])
+     fi
     AC_CHECK_HEADERS(fontconfig/fontconfig.h,
       [VLC_ADD_CFLAGS([freetype],[-DHAVE_FONTCONFIG])
        VLC_ADD_LIBS([freetype],[-lfontconfig])])
     AC_CHECK_HEADERS(Carbon/Carbon.h,
       [VLC_ADD_LDFLAGS([freetype],[-Wl,-framework,Carbon])])
-  elif test "${enable_freetype}" =  "yes"
-  then
+  ],[
+  have_freetype=no
+  AS_IF([ test "${enable_freetype}" =  "yes"],[
     AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
 from http://www.freetype.org/, or configure with --disable-freetype. Have a nice day.
+      ])
     ])
-  fi
+  ])
 
   dnl fribidi support
   if test "${enable_fribidi}" != "no"
   then
-    FRIBIDI_PATH="${PATH}"
-    AC_ARG_WITH(fribidi-config-path,
-      [    --with-fribidi-config-path=PATH fribidi-config path (default search in \$PATH)],
-      [ if test "${with_fribidi_config_path}" != "no"
-        then
-          FRIBIDI_PATH="${with_fribidi_config_path}:${PATH}"
-        fi ])
-    AC_PATH_PROG(FRIBIDI_CONFIG, fribidi-config, no, ${FRIBIDI_PATH})
-
-    if test "${FRIBIDI_CONFIG}" != "no"
-    then
-      VLC_ADD_CFLAGS([freetype], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
-      VLC_ADD_CPPFLAGS([skins2], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
-      VLC_ADD_LIBS([freetype], [`${FRIBIDI_CONFIG} --libs`])
-      VLC_ADD_LIBS([skins2], [`${FRIBIDI_CONFIG} --libs`])
+    PKG_CHECK_MODULES(FRIBIDI, fribidi, [
+      VLC_ADD_CFLAGS([freetype skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
+      VLC_ADD_LIBS([freetype skins2], [${FRIBIDI_LIBS}])
+    ])
     fi
-  fi
 fi
 
 dnl
@@ -4870,10 +4851,7 @@ if test "${enable_skins2}" = "yes" ||
   skins2_missing_lib="no"
 
   dnl freetype
-  if test "${FREETYPE_CONFIG}" != "no"; then
-    VLC_ADD_CPPFLAGS([skins2],[`${FREETYPE_CONFIG} --cflags`])
-    VLC_ADD_LIBS([skins2],[`${FREETYPE_CONFIG} --libs`])
-  else
+  if test "${have_freetype}" != "yes"; then
     skins2_missing_lib="yes"
     if test "${enable_skins2}" = "yes"; then
       AC_MSG_ERROR([Could not find freetype (required for skins2)])
