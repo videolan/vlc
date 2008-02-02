@@ -667,7 +667,10 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
     fclose( f );
     gcry_md_final( hd );
 
-    return( (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1) );
+    uint8_t *p_hash = (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1);
+    p_hash = strdup( p_hash );
+    gcry_md_close( hd );
+    return p_hash;
 }
 
 /*
@@ -803,10 +806,12 @@ static uint8_t *key_sign_hash( public_key_t *p_pkey )
     if( p_hash[0] != p_pkey->sig.hash_verification[0] ||
         p_hash[1] != p_pkey->sig.hash_verification[1] )
     {
-        free( p_hash );
+        gcry_md_close( hd );
         return NULL;
     }
 
+    p_hash = strdup( p_hash );
+    gcry_md_close( hd );
     return p_hash;
 }
 
@@ -1045,7 +1050,6 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
         p_hash[1] != sign.hash_verification[1] )
     {
         msg_Warn( p_update->p_libvlc, "Bad SHA1 hash for status file" );
-        free( p_hash );
         goto error;
     }
 
