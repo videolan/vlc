@@ -43,9 +43,7 @@
 
 #include "components/preferences_widgets.hpp"
 
-#ifdef HAVE_LIMITS_H
-#   include <limits.h>
-#endif
+#include <limits.h>
 
 #define setSpinBoxFreq( spinbox ){ spinbox->setRange ( 0, INT_MAX ); \
     spinbox->setAccelerated( true ); }

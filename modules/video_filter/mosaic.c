@@ -33,10 +33,7 @@
 #include <vlc_vout.h>
 
 #include <math.h>
-
-#ifdef HAVE_LIMITS_H
-#   include <limits.h> /* INT_MAX */
-#endif
+#include <limits.h> /* INT_MAX */
 
 #include "vlc_filter.h"
 #include "vlc_image.h"

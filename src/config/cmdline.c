@@ -31,10 +31,7 @@
 #include "vlc_charset.h"
 
 #include <errno.h>                                                  /* errno */
-
-#ifdef HAVE_LIMITS_H
-#   include <limits.h>
-#endif
+#include <limits.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>                                          /* getuid() */

@@ -46,9 +46,7 @@
 #   include <fcntl.h>
 #endif
 
-#ifdef HAVE_LIMITS_H
-#   include <limits.h> /* PATH_MAX */
-#endif
+#include <limits.h> /* PATH_MAX */
 
 
 #include "dummy.h"

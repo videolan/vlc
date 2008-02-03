@@ -63,9 +63,7 @@
 #endif
 
 /* In Solaris (and perhaps others) PATH_MAX is in limits.h. */
-#ifdef HAVE_LIMITS_H
-#   include <limits.h>
-#endif
+#include <limits.h>
 
 #ifdef __APPLE__
 #   include <mach/mach.h>

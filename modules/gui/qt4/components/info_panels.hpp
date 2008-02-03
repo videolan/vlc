@@ -36,9 +36,7 @@
 #include <QWidget>
 #include <QLabel>
 
-#ifdef HAVE_LIMITS_H
-#   include <limits.h>
-#endif
+#include <limits.h>
 
 #define setSpinBounds( spinbox ) {               \
     spinbox->setRange( 0, INT_MAX );             \
