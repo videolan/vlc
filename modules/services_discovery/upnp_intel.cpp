@@ -44,7 +44,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
-#include "vlc_strings.h"
 
 
 // VLC handle
@@ -397,8 +396,6 @@ IXML_Document* parseBrowseResult( IXML_Document* doc )
 
     const char* resultString = ixmlNode_getNodeValue( textNode );
     char* resultXML = strdup( resultString );
-
-    resolve_xml_special_chars( resultXML );
 
     IXML_Document* browseDoc = ixmlParseBuffer( resultXML );
 
