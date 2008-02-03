@@ -188,9 +188,9 @@ Remco Poortinga <poortinga at telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
 Richard Hosking <richard at hovis.net> - v4l2 support
 Rob Casey <rob dot casey AT swishgroup dot com dot au> - Amino RTSP fix
-Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
 Roman Bednarek <roman at mikronika.com.pl> - MPL2 subtitles support
+Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs, multipass x264 patch
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
