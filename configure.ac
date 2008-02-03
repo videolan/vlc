@@ -718,7 +718,7 @@ if test "${ac_cv_have_plugins}" = "no"; then
     ac_cv_my_have_dlopen=yes,
     AC_CHECK_LIB(dl, dlopen,
       ac_cv_my_have_dlopen=yes
-      VLC_ADD_LIBS([libvlc],[-ldl]),
+      VLC_ADD_LIBS([libvlc realaudio],[-ldl]),
       AC_CHECK_LIB(svld, dlopen,
         ac_cv_my_have_dlopen=yes
         VLC_ADD_LIBS([libvlc],[-lsvld]))))
@@ -5640,7 +5640,7 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/libs/loader])
     VLC_ADD_LIBS([quicktime],[../../libs/loader/libloader.la -lpthread])
     VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/libs/loader -DLOADER])
-    VLC_ADD_LIBS([realaudio],[../../libs/loader/libloader.la -ldl -lpthread])
+    VLC_ADD_LIBS([realaudio],[../../libs/loader/libloader.la])
   ])
 
 dnl
