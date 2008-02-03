@@ -40,10 +40,6 @@
 #include <vlc_xml.h>
 #include <vlc_input.h>
 
-#ifdef HAVE_LINUX_LIMITS_H
-#   include <linux/limits.h>
-#endif
-
 #include <math.h>
 #include <errno.h>
 

@@ -27,10 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_LINUX_LIMITS_H
-#   include <linux/limits.h>
-#endif
-
 #include "config.h"
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
