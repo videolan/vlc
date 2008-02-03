@@ -37,30 +37,6 @@ Index: libavcodec/i386/motion_est_mmx.c
 +        : "r" (blk1 - len), "r" (blk1 -len + stride), "r" (blk2 - len), "r" ((long)stride), "m" (round_tab[0])
      );
  }
- 
-Index: libavcodec/i386/dsputil_h264_template_mmx.c
-===================================================================
---- libavcodec/i386/dsputil_h264_template_mmx.c	(revision 11834)
-+++ libavcodec/i386/dsputil_h264_template_mmx.c	(working copy)
-@@ -192,8 +192,8 @@
-         "pxor   %%mm7, %%mm7        \n\t"
-         "movd %5, %%mm2             \n\t"
-         "movd %6, %%mm3             \n\t"
--        "movq "MANGLE(ff_pw_8)", %%mm4\n\t"
--        "movq "MANGLE(ff_pw_8)", %%mm5\n\t"
-+        "movq %7, %%mm4\n\t"
-+        "movq %7, %%mm5\n\t"
-         "punpcklwd %%mm2, %%mm2     \n\t"
-         "punpcklwd %%mm3, %%mm3     \n\t"
-         "punpcklwd %%mm2, %%mm2     \n\t"
-@@ -250,7 +250,7 @@
-         "sub $2, %2                 \n\t"
-         "jnz 1b                     \n\t"
-         : "+r"(dst), "+r"(src), "+r"(h)
--        : "r"((long)stride), "m"(*ff_pw_32), "m"(x), "m"(y)
-+        : "r"((long)stride), "m"(ff_pw_32), "m"(x), "m"(y), "m"(ff_pw_8)
-     );
- }
   
 Index: libavcodec/i386/dsputil_mmx.c
 ===================================================================
