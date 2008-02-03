@@ -81,8 +81,13 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     char            *psz_socks;
     int             i_realport, i_val, i_handle = -1;
 
+    int evfd = vlc_object_waitpipe (p_this);
+    if (evfd == -1)
+        return -1;
+
     if( i_port == 0 )
         i_port = 80; /* historical VLC thing */
+
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_STREAM;
@@ -158,9 +163,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
-            socklen_t i_val_size = sizeof( i_val );
-            div_t d;
-            vlc_value_t timeout;
+            int timeout, val;
 
             if( net_errno != EINPROGRESS )
             {
@@ -169,62 +172,47 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             }
             msg_Dbg( p_this, "connection: %m" );
 
-            var_Create( p_this, "ipv4-timeout",
-                        VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_Get( p_this, "ipv4-timeout", &timeout );
-            if( timeout.i_int < 0 )
+            timeout = var_CreateGetInteger (p_this, "ipv4-timeout");
+            if (timeout < 0)
             {
                 msg_Err( p_this, "invalid negative value for ipv4-timeout" );
-                timeout.i_int = 0;
-            }
-            d = div( timeout.i_int, 100 );
-
-            for (;;)
-            {
-                struct pollfd ufd = { .fd = fd, .events = POLLOUT };
-                int i_ret;
-
-                if( p_this->b_die )
-                {
-                    msg_Dbg( p_this, "connection aborted" );
-                    net_Close( fd );
-                    vlc_freeaddrinfo( res );
-                    return -1;
-                }
-
-                /*
-                 * We'll wait 0.1 second if nothing happens
-                 * NOTE:
-                 * time out will be shortened if we catch a signal (EINTR)
-                 */
-                i_ret = poll (&ufd, 1, (d.quot > 0) ? 100 : d.rem);
-                if( i_ret == 1 )
-                    break;
-
-                if( ( i_ret == -1 ) && ( net_errno != EINTR ) )
-                {
-                    msg_Err( p_this, "connection polling error: %m" );
-                    goto next_ai;
-                }
-
-                if( d.quot <= 0 )
-                {
-                    msg_Warn( p_this, "connection timed out" );
-                    goto next_ai;
-                }
-
-                d.quot--;
+                timeout = 0;
             }
 
-#if !defined( SYS_BEOS ) && !defined( UNDER_CE )
-            if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
-                            &i_val_size ) == -1 || i_val != 0 )
+            struct pollfd ufd[2] = {
+                { .fd = fd,   .events = POLLOUT },
+                { .fd = evfd, .events = POLLIN },
+            };
+
+            do
+                /* NOTE: timeout screwed up if we catch a signal (EINTR) */
+                val = poll (ufd, sizeof (ufd) / sizeof (ufd[0]), timeout);
+            while ((val == -1) && (net_errno == EINTR));
+
+            switch (val)
             {
-                errno = i_val;
-                msg_Err( p_this, "connection failed: %m" );
+                 case -1: /* error */
+                     msg_Err (p_this, "connection polling error: %m");
+                     goto next_ai;
+
+                 case 0: /* timeout */
+                     msg_Warn (p_this, "connection timed out");
+                     goto next_ai;
+
+                 default: /* something happended */
+                     if (ufd[1].revents)
+                         goto next_ai; /* LibVLC object killed */
+            }
+
+            /* There is NO WAY around checking SO_ERROR.
+             * Don't ifdef it out!!! */
+            if (getsockopt (fd, SOL_SOCKET, SO_ERROR, &val,
+                            &(socklen_t){ sizeof (val) }) || val)
+            {
+                errno = val;
+                msg_Err (p_this, "connection failed: %m");
                 goto next_ai;
             }
-#endif
         }
 
         msg_Dbg( p_this, "connection succeeded (socket = %d)", fd );
@@ -287,11 +275,12 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
 int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 {
     int timeout = (i_wait < 0) ? -1 : i_wait / 1000;
-    int evfd;
+    int evfd = vlc_object_waitpipe (p_this);
+
+    if (evfd == -1)
+        return -1;
 
     assert( pi_fd != NULL );
-
-    evfd = vlc_object_waitpipe (p_this);
 
     for (;;)
     {
