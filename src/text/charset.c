@@ -37,7 +37,7 @@
 #include <vlc/vlc.h>
 
 #if !defined WIN32
-# if HAVE_LANGINFO_CODESET
+# ifdef HAVE_LANGINFO_CODESET
 #  include <langinfo.h>
 # endif
 # include <locale.h>
