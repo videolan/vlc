@@ -97,6 +97,7 @@ struct intf_sys_t
 {
     intf_thread_t *p_intf;      /* The main intf object */
     id o_prefs;                 /* VLCPrefs       */
+    id o_sprefs;                /* VLCSimplePrefs */
     id o_about;                 /* VLAboutBox     */
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
@@ -161,6 +162,7 @@ struct intf_sys_t
 
     IBOutlet id o_mi_about;
     IBOutlet id o_mi_prefs;
+    IBOutlet id o_mi_sprefs;
     IBOutlet id o_mi_checkForUpdate;
     IBOutlet id o_mi_add_intf;
     IBOutlet id o_mu_add_intf;
@@ -309,6 +311,8 @@ struct intf_sys_t
 - (void)controlTintChanged;
 
 - (id)getControls;
+- (id)getSimplePreferences;
+- (id)getPreferences;
 - (id)getPlaylist;
 - (id)getInfo;
 - (id)getWizard;

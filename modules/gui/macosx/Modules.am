@@ -31,6 +31,8 @@ SOURCES_macosx = \
 	prefs.h \
 	prefs_widgets.h \
 	prefs_widgets.m \
+	simple_prefs.h \
+	simple_prefs.m \
 	output.h \
 	output.m \
 	vout.m \

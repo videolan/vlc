@@ -2,6 +2,7 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = MPSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
+        {CLASS = NSDatePicker; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
             ACTIONS = {showPanel = id; }; 
             CLASS = VLAboutBox; 
@@ -439,6 +440,54 @@
                 "o_save_btn" = id; 
                 "o_title" = id; 
                 "o_tree" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {audioSettingChanged = id; buttonAction = id; interfaceSettingChanged = id; }; 
+            CLASS = VLCSimplePrefs; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_audio_dolby_pop" = id; 
+                "o_audio_dolby_txt" = id; 
+                "o_audio_effects_box" = id; 
+                "o_audio_enable_ckb" = id; 
+                "o_audio_general_box" = id; 
+                "o_audio_headphone_ckb" = id; 
+                "o_audio_lang_fld" = id; 
+                "o_audio_lang_txt" = id; 
+                "o_audio_last_box" = id; 
+                "o_audio_last_ckb" = id; 
+                "o_audio_lastpwd_fld" = id; 
+                "o_audio_lastpwd_txt" = id; 
+                "o_audio_lastuser_fld" = id; 
+                "o_audio_lastuser_txt" = id; 
+                "o_audio_norm_ckb" = id; 
+                "o_audio_norm_fld" = id; 
+                "o_audio_spdif_ckb" = id; 
+                "o_audio_view" = id; 
+                "o_audio_visual_pop" = id; 
+                "o_audio_visual_txt" = id; 
+                "o_audio_vol_fld" = id; 
+                "o_audio_vol_sld" = id; 
+                "o_audio_vol_txt" = id; 
+                "o_intf_art_pop" = id; 
+                "o_intf_art_txt" = id; 
+                "o_intf_black_ckb" = id; 
+                "o_intf_embvout_ckb" = id; 
+                "o_intf_fspanel_ckb" = id; 
+                "o_intf_lang_pop" = id; 
+                "o_intf_lang_txt" = id; 
+                "o_intf_meta_ckb" = id; 
+                "o_intf_network_box" = id; 
+                "o_intf_view" = id; 
+                "o_sprefs_basicFull_matrix" = id; 
+                "o_sprefs_basic_box" = id; 
+                "o_sprefs_cancel_btn" = id; 
+                "o_sprefs_controls_box" = id; 
+                "o_sprefs_reset_btn" = id; 
+                "o_sprefs_save_btn" = id; 
+                "o_sprefs_win" = id; 
             }; 
             SUPERCLASS = NSObject; 
         }

@@ -49,6 +49,7 @@
 #import "update.h"
 #import "AppleRemote.h"
 #import "eyetv.h"
+#import "simple_prefs.h"
 
 #import <vlc_input.h>
 
@@ -808,7 +809,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         o_str = [[[NSString alloc] initWithUTF8String: psz] autorelease];
 
-        if ( o_str == NULL )
+        if( o_str == NULL )
         {
             msg_Err( VLCIntf, "could not translate: %s", psz );
             return( @"" );
@@ -826,7 +827,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 /* When user click in the Dock icon our double click in the finder */
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
 {    
-    if (!hasVisibleWindows)
+    if(!hasVisibleWindows)
         [o_window makeKeyAndOrderFront:self];
 
     return YES;
@@ -836,7 +837,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
 #ifdef UPDATE_CHECK
     /* Check for update silently on startup */
-    if ( !nib_update_loaded )
+    if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
     // FIXME
@@ -864,7 +865,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)computerWillSleep: (NSNotification *)notification
 {
     /* Pause */
-    if ( p_intf->p_sys->i_play_status == PLAYING_S )
+    if( p_intf->p_sys->i_play_status == PLAYING_S )
     {
         vlc_value_t val;
         val.i_int = config_GetInt( p_intf, "key-play-pause" );
@@ -876,7 +877,7 @@ static VLCMain *_o_sharedMainInstance = nil;
    increase/decrease as long as the user holds the left/right, plus/minus button */
 - (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
 {
-    if (b_remote_button_hold)
+    if(b_remote_button_hold)
     {
         switch([buttonIdentifierNumber intValue])
         {
@@ -893,7 +894,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 [o_controls volumeDown: self];
             break;
         }
-        if (b_remote_button_hold)
+        if(b_remote_button_hold)
         {
             /* trigger event */
             [self performSelector:@selector(executeHoldActionForRemoteButton:)
@@ -911,7 +912,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     switch( buttonIdentifier )
     {
         case kRemoteButtonPlay:
-            if (count >= 2) {
+            if(count >= 2) {
                 [o_controls toogleFullscreen:self];
             } else {
                 [o_controls play: self];
@@ -957,7 +958,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                           allowLossyConversion: NO];
     char * psz_string;
 
-    if ( o_data == nil )
+    if( o_data == nil )
     {
         o_data = [id dataUsingEncoding: NSUTF8StringEncoding
                      allowLossyConversion: YES];
@@ -1007,7 +1008,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                                             effectiveRange: &effectiveRange];
         charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
                                     actualGlyphRange: &effectiveRange];
-        if ([o_wrapped lineRangeForRange:
+        if([o_wrapped lineRangeForRange:
                 NSMakeRange(charRange.location + breaksInserted, charRange.length)].length > charRange.length) {
             [o_wrapped insertString: @"\n" atIndex: NSMaxRange(charRange) + breaksInserted];
             breaksInserted++;
@@ -1081,62 +1082,79 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)getControls
 {
-    if ( o_controls )
-    {
+    if( o_controls )
         return o_controls;
-    }
+
     return nil;
+}
+
+- (id)getSimplePreferences
+{
+    if( !o_sprefs )
+        return nil;
+
+    if( !nib_prefs_loaded )
+        nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: self];
+
+    return o_sprefs;
+}
+
+- (id)getPreferences
+{
+    if( !o_prefs )
+        return nil;
+
+    if( !nib_prefs_loaded )
+        nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: self];
+
+    return o_prefs;
 }
 
 - (id)getPlaylist
 {
     if( o_playlist )
         return o_playlist;
+
     return nil;
 }
 
 - (id)getInfo
 {
-    if ( o_info )
-    {
+    if( o_info )
         return o_info;
-    }
+
     return nil;
 }
 
 - (id)getWizard
 {
-    if ( o_wizard )
-    {
+    if( o_wizard )
         return o_wizard;
-    }
+
     return nil;
 }
 
 - (id)getBookmarks
 {
-    if ( o_bookmarks )
-    {
+    if( o_bookmarks )
         return o_bookmarks;
-    }
+
     return nil;
 }
 
 - (id)getEmbeddedList
 {
     if( o_embedded_list )
-    {
         return o_embedded_list;
-    }
+
     return nil;
 }
 
 - (id)getInteractionList
 {
     if( o_interaction_list )
-    {
         return o_interaction_list;
-    }
+
     return nil;
 }
 
@@ -1145,7 +1163,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( o_main_pgbar )
         return o_main_pgbar;
 
-    msg_Err( p_intf, "main interface progress bar item wasn't found" );
     return nil;
 }
 
@@ -1165,6 +1182,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     if( o_eyetv )
         return o_eyetv;
+
     return nil;
 }
 
@@ -1437,7 +1455,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                     FIND_ANYWHERE );
-        if ( p_aout != NULL )
+        if( p_aout != NULL )
         {
             [o_controls setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
                 var: "audio-channels" selector: @selector(toggleVar:)];
@@ -1453,7 +1471,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                             FIND_ANYWHERE );
 
-        if ( p_vout != NULL )
+        if( p_vout != NULL )
         {
             vlc_object_t * p_dec_obj;
 
@@ -1473,7 +1491,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                                                  (vlc_object_t *)p_vout,
                                                  VLC_OBJECT_DECODER,
                                                  FIND_PARENT );
-            if ( p_dec_obj != NULL )
+            if( p_dec_obj != NULL )
             {
                [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:
                     (vlc_object_t *)p_dec_obj var:"ffmpeg-pp-q" selector:
@@ -1729,7 +1747,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                  returnedValue );
 
     /* save the prefs if they were changed in the extended panel */
-    if (o_extended && [o_extended getConfigChanged])
+    if(o_extended && [o_extended getConfigChanged])
     {
         [o_extended savePrefs];
     }
@@ -1834,7 +1852,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenFile:(id)sender
 {
-    if ( !nib_open_loaded )
+    if( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1846,7 +1864,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenFileGeneric:(id)sender
 {
-    if ( !nib_open_loaded )
+    if( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1858,7 +1876,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenDisc:(id)sender
 {
-    if ( !nib_open_loaded )
+    if( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1870,7 +1888,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenNet:(id)sender
 {
-    if ( !nib_open_loaded )
+    if( !nib_open_loaded )
     {
         nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
         [o_open awakeFromNib];
@@ -1882,7 +1900,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showWizard:(id)sender
 {
-    if ( !nib_wizard_loaded )
+    if( !nib_wizard_loaded )
     {
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
         [o_wizard initStrings];
@@ -1896,11 +1914,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showExtended:(id)sender
 {
-    if ( o_extended == nil )
+    if( o_extended == nil )
     {
         o_extended = [[VLCExtended alloc] init];
     }
-    if ( !nib_extended_loaded )
+    if( !nib_extended_loaded )
     {
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
         [o_extended initStrings];
@@ -1912,11 +1930,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showSFilters:(id)sender
 {
-    if ( o_sfilters == nil )
+    if( o_sfilters == nil )
     {
         o_sfilters = [[VLCsFilters alloc] init];
     }
-    if ( !nib_sfilters_loaded )
+    if( !nib_sfilters_loaded )
     {
         nib_sfilters_loaded = [NSBundle loadNibNamed:@"SFilters" owner:self];
         [o_sfilters initStrings];
@@ -1929,13 +1947,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (IBAction)showBookmarks:(id)sender
 {
     /* we need the wizard-nib for the bookmarks's extract functionality */
-    if ( !nib_wizard_loaded )
+    if( !nib_wizard_loaded )
     {
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
         [o_wizard initStrings];
     }
  
-    if ( !nib_bookmarks_loaded )
+    if( !nib_bookmarks_loaded )
         nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
 
     [o_bookmarks showBookmarks];
@@ -1962,17 +1980,23 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( !nib_prefs_loaded )
         nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: self];
 
-    [o_prefs showPrefs];
+    if( sender == o_mi_sprefs )
+    {
+        o_sprefs = [[VLCSimplePrefs alloc] init];
+        [o_sprefs showSimplePrefs];
+    }
+    else
+        [o_prefs showPrefs];
 }
 
 #ifdef UPDATE_CHECK
 - (IBAction)checkForUpdate:(id)sender
-{/* FIXME
+{
     if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
     [o_update showUpdateWindow];
-*/}
+}
 #endif
 
 - (IBAction)viewHelp:(id)sender
@@ -2030,7 +2054,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                                     stringByExpandingTildeInPath];
 
 
-    if ( [[NSFileManager defaultManager] fileExistsAtPath: o_path ] )
+    if( [[NSFileManager defaultManager] fileExistsAtPath: o_path ] )
     {
         [[NSWorkspace sharedWorkspace] openFile: o_path
                                     withApplication: @"Console"];
@@ -2084,14 +2108,14 @@ static VLCMain *_o_sharedMainInstance = nil;
         b_restore_size = true;
         b_small_window = YES; /* we know we are small, make sure this is actually set (see case below) */
         /* make large */
-        if ( o_size_with_playlist.height > 200 )
+        if( o_size_with_playlist.height > 200 )
         {
             o_rect.size.height = o_size_with_playlist.height;
         } else {
             o_rect.size.height = 500;
         }
  
-        if ( o_size_with_playlist.width > [o_window minSize].width )
+        if( o_size_with_playlist.width > [o_window minSize].width )
         {
             o_rect.size.width = o_size_with_playlist.width;
         } else {
@@ -2105,10 +2129,10 @@ static VLCMain *_o_sharedMainInstance = nil;
                                                 [o_window minSize].height;
 
         NSRect screenRect = [[o_window screen] visibleFrame];
-        if ( !NSContainsRect( screenRect, o_rect ) ) {
-            if ( NSMaxX(o_rect) > NSMaxX(screenRect) )
+        if( !NSContainsRect( screenRect, o_rect ) ) {
+            if( NSMaxX(o_rect) > NSMaxX(screenRect) )
                 o_rect.origin.x = ( NSMaxX(screenRect) - o_rect.size.width );
-            if ( NSMinY(o_rect) < NSMinY(screenRect) )
+            if( NSMinY(o_rect) < NSMinY(screenRect) )
                 o_rect.origin.y = ( NSMinY(screenRect) );
         }
 
@@ -2125,7 +2149,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         o_rect.origin.y = [o_window frame].origin.y +
             [o_window frame].size.height - [o_window minSize].height;
 
-        if ( b_restore_size )
+        if( b_restore_size )
             o_rect = o_restore_rect;
 
         [o_playlist_view setAutoresizesSubviews: NO];
