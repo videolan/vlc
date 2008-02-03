@@ -40,9 +40,9 @@ Index: libavcodec/i386/motion_est_mmx.c
  
 Index: libavcodec/i386/dsputil_h264_template_mmx.c
 ===================================================================
---- libavcodec/i386/dsputil_h264_template_mmx.c	(revision 11270)
+--- libavcodec/i386/dsputil_h264_template_mmx.c	(revision 11834)
 +++ libavcodec/i386/dsputil_h264_template_mmx.c	(working copy)
-@@ -188,8 +188,8 @@
+@@ -192,8 +192,8 @@
          "pxor   %%mm7, %%mm7        \n\t"
          "movd %5, %%mm2             \n\t"
          "movd %6, %%mm3             \n\t"
@@ -53,15 +53,15 @@ Index: libavcodec/i386/dsputil_h264_template_mmx.c
          "punpcklwd %%mm2, %%mm2     \n\t"
          "punpcklwd %%mm3, %%mm3     \n\t"
          "punpcklwd %%mm2, %%mm2     \n\t"
-@@ -246,7 +246,7 @@
+@@ -250,7 +250,7 @@
          "sub $2, %2                 \n\t"
          "jnz 1b                     \n\t"
          : "+r"(dst), "+r"(src), "+r"(h)
--        : "r"((long)stride), "m"(ff_pw_32), "m"(x), "m"(y)
+-        : "r"((long)stride), "m"(*ff_pw_32), "m"(x), "m"(y)
 +        : "r"((long)stride), "m"(ff_pw_32), "m"(x), "m"(y), "m"(ff_pw_8)
      );
  }
- 
+  
 Index: libavcodec/i386/dsputil_mmx.c
 ===================================================================
 --- libavcodec/i386/dsputil_mmx.c	(revision 11270)
