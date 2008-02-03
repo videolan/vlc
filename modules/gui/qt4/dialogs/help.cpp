@@ -217,8 +217,8 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     BUTTONACT( updateButton, UpdateOrDownload() );
     BUTTONACT( closeButton, close() );
 
-    /* create the update structure and the callback */
-    p_update = update_New( _p_intf );
+    /* Create the update structure */
+    initUpdate();
     b_checked = false;
 
     /* Check for updates */
@@ -290,5 +290,10 @@ void UpdateDialog::updateNotify( bool b_result )
     updateButton->setEnabled( true );
 }
 
+/* Initialise the p_update struct */
+void UpdateDialog::initUpdate()
+{
+    p_update = update_New( p_intf );
+}
 
 #endif
