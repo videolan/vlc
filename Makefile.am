@@ -5,10 +5,9 @@
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-#  - intl (gettext) is needed by src and modules
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
-SUBDIRS = intl po libs/loader libs/srtp src modules \
+SUBDIRS = po libs/loader libs/srtp src modules \
 		mozilla bindings activex share doc
 DIST_SUBDIRS = $(SUBDIRS) m4 ipkg
 

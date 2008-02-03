@@ -393,17 +393,13 @@ dnl
 dnl Gettext stuff
 dnl
 AM_GNU_GETTEXT_VERSION(0.16.1)
-AM_GNU_GETTEXT
-AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
-  AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, [Define if we use the local libintl])
-  AM_CPPFLAGS="${AM_CPPFLAGS} -I\$(top_builddir)/intl"
-], [
-  VLC_ADD_LIBS([libvlc vlc], [${LTLIBINTL}])
-])
+AM_GNU_GETTEXT([external])
+VLC_ADD_LIBS([libvlc vlc], [${LTLIBINTL}])
 
 dnl
 dnl Iconv stuff
 dnl
+AM_ICONV
 AS_IF([test "$am_cv_func_iconv" != "yes"],
 	[AC_MSG_ERROR([libiconv is needed for VLC to work properly])])
 VLC_ADD_CFLAGS([libvlc],[${INCICONV}])
@@ -6102,7 +6098,6 @@ AC_CONFIG_FILES([
   bindings/java/src/Makefile
   bindings/python/Makefile
   doc/Makefile
-  intl/Makefile
   ipkg/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
