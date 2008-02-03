@@ -102,18 +102,6 @@ typedef uint8_t                 byte_t;
 #define INT64_MAX (9223372036854775807LL)
 #endif
 
-/* ptrdiff_t definition */
-#ifdef HAVE_STDDEF_H
-#   include <stddef.h>
-#else
-#   include <malloc.h>
-#   ifndef _PTRDIFF_T
-#       define _PTRDIFF_T
-/* Not portable in a 64-bit environment. */
-typedef int                 ptrdiff_t;
-#   endif
-#endif
-
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   include <malloc.h>
 #   ifndef PATH_MAX

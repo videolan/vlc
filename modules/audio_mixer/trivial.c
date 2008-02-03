@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include <stddef.h>
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
 
