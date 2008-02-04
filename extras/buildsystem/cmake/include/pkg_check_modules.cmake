@@ -1,4 +1,3 @@
-# From KDELibs - BSD Licence
 # - a pkg-config module for CMake
 #
 # Usage:
@@ -23,10 +22,10 @@
 #   <XPREFIX>_LIBRARIES      ... only the libraries (w/o the '-l')
 #   <XPREFIX>_LIBRARY_DIRS   ... the paths of the libraries (w/o the '-L')
 #   <XPREFIX>_LDFLAGS        ... all required linker flags
-#   <XPREFIX>_LDFLAGS_OTHERS ... all other linker flags
+#   <XPREFIX>_LDFLAGS_OTHER  ... all other linker flags
 #   <XPREFIX>_INCLUDE_DIRS   ... the '-I' preprocessor flags (w/o the '-I')
 #   <XPREFIX>_CFLAGS         ... all required cflags
-#   <XPREFIX>_CFLAGS_OTHERS  ... the other compiler flags
+#   <XPREFIX>_CFLAGS_OTHER   ... the other compiler flags
 #
 #   <XPREFIX> = <PREFIX>        for common case
 #   <XPREFIX> = <PREFIX>_STATIC for static linking
@@ -329,7 +328,7 @@ endmacro(pkg_check_modules)
 ###
 macro(pkg_search_module _prefix _module0)
   # check cached value
-  if (NOT DEFINED __pkg_config_checked_${_prefix} OR __pkg_config_checked_${_prefix} LESS ${PKG_CONFIG_VERSION})
+  if (NOT DEFINED __pkg_config_checked_${_prefix} OR __pkg_config_checked_${_prefix} LESS ${PKG_CONFIG_VERSION} OR NOT ${_prefix}_FOUND)
     set(_pkg_modules_found 0)
     _pkgconfig_parse_options(_pkg_modules_alt _pkg_is_required "${_module0}" ${ARGN})
 
@@ -353,7 +352,7 @@ macro(pkg_search_module _prefix _module0)
     endif(NOT ${_prefix}_FOUND)
     
     _pkgconfig_set(__pkg_config_checked_${_prefix} ${PKG_CONFIG_VERSION})
-  endif(NOT DEFINED __pkg_config_checked_${_prefix} OR __pkg_config_checked_${_prefix} LESS ${PKG_CONFIG_VERSION})  
+  endif(NOT DEFINED __pkg_config_checked_${_prefix} OR __pkg_config_checked_${_prefix} LESS ${PKG_CONFIG_VERSION} OR NOT ${_prefix}_FOUND)  
 endmacro(pkg_search_module)
 
 ### Local Variables:
