@@ -1,6 +1,6 @@
 include_directories( . )
 
-add_definitions(-Dasm=__asm__ -D_INTL_REDIRECT_MACROS -DMACOSX_DEPLOYMENT_TARGET=10.4 -mmacosx-version-min=10.4)
+add_definitions(-Dasm=__asm__ -D_INTL_REDIRECT_MACROS)
 
 # vlc
 add_executable(vlc vlc.c)
