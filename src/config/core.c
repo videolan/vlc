@@ -29,6 +29,7 @@
 #include "../libvlc.h"
 #include "vlc_keys.h"
 #include "vlc_charset.h"
+#include "vlc_configuration.h"
 
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
