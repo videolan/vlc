@@ -17,7 +17,7 @@ EXTRA_DIST = \
 	INSTALL.wince \
 	extras/package/win32/vlc.exe.manifest \
 	MAINTAINERS \
-	README.MacOSX.rtf \
+	extras/package/macosx/README.MacOSX.rtf \
 	vlc-config.in.in \
 	extras/package/rpm/vlc.fedora.spec \
 	extras/package/rpm/vlc.mandriva.spec \
@@ -356,12 +356,12 @@ VLC-release.app: vlc
 	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/MacOSX"; \
+	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/package/macosx"; \
 	fi
 	rm -Rf $(top_builddir)/VLC-release.app
-	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
-	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/MacOSX
-	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
+	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/package/macosx/
+	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx
+	for i in AUTHORS COPYING extras/package/macosx/README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
@@ -423,7 +423,7 @@ VLC-release.app: vlc
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
-	ACTION="VLC-release.app" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/MacOSX/Framework/Pre-Compile.sh
+	ACTION="VLC-release.app" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/Framework/Pre-Compile.sh
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist
 	for i in $(srcdir)/share/luaplaylist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist/`basename $${i}` ; \
@@ -527,12 +527,12 @@ VLC.app: vlc
 	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/MacOSX"; \
+	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/package/macosx"; \
 	fi
 	rm -Rf $(top_builddir)/VLC.app
-	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
-	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/MacOSX
-	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
+	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/package/macosx/
+	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx
+	for i in AUTHORS COPYING extras/package/macosx/README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
