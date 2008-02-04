@@ -211,15 +211,15 @@ EXTRA_DIST += \
 # Various utilities ( editor syntax files, D-Bus controller ... )
 ##############################################################################
 EXTRA_DIST += \
-	extras/Makefile \
-	extras/zsh.cpp \
-	extras/emacs.init \
-	extras/vlc.vim \
-	extras/make.pl \
-	extras/valgrind.suppressions \
-	extras/m4/autoconf260.m4 \
-	extras/mpris.py \
-	extras/mpris.glade
+	extras/analyser/Makefile \
+	extras/analyser/zsh.cpp \
+	extras/analyser/emacs.init \
+	extras/analyser/vlc.vim \
+	extras/analyser/valgrind.suppressions \
+	extras/buildsystem/autotools/make.pl \
+	extras/buildsystem/autotools/m4/autoconf260.m4 \
+	extras/misc/mpris.py \
+	extras/misc/mpris.glade
 
 dist-hook:
 	distdir=$(distdir) srcdir=$(srcdir) $(SHELL) $(srcdir)/toolbox --dist-contrib
@@ -257,7 +257,7 @@ bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
 # Ugly kludge so that automake defines $(CXXLINK)
-nodist_EXTRA_vlc_SOURCES = extras/zsh.cpp src/misc/darwin_specific.m
+nodist_EXTRA_vlc_SOURCES = extras/analyser/zsh.cpp src/misc/darwin_specific.c
 
 vlc_DEPENDENCIES = $(DATA_win32_rc)
 
