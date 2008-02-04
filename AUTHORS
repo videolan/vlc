@@ -125,6 +125,7 @@ C: dionoea
 D: Video Filters: mosaic, gradient and edge detection, magnify, rss
 D: Podcast demux
 D: HTTP interface pages
+D: Lua (interface,meta fetcher, playlist, ...) modules
 S: France
 
 N: Renaud Dartus
