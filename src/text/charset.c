@@ -66,7 +66,7 @@ typedef struct VLCCharsetAlias
  * a lot of basic aliases (check it first by iconv -l).
  *
  */
-#if (defined OS2 || !HAVE_LANGINFO_CODESET) && !defined WIN32
+#if (defined OS2 || !defined(HAVE_LANGINFO_CODESET)) && !defined WIN32
 static const char* vlc_encoding_from_language( const char *l )
 {
     /* check for language (and perhaps country) codes */
