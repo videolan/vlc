@@ -1,0 +1,19 @@
+PROJECT(vlc)
+
+# Our own include
+include( ${CMAKE_SOURCE_DIR}/cmake/vlc_module_funcs.cmake )
+
+# Config
+include( ${CMAKE_SOURCE_DIR}/cmake/config.cmake )
+
+add_definitions(-DHAVE_CONFIG_H)
+add_definitions(-D__LIBVLC__)
+add_definitions(-I.) # Hack
+add_definitions(-std=c99) # Hack
+
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# Sources
+add_subdirectory(src)
+add_subdirectory(modules)
+

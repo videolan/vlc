@@ -1,0 +1,9 @@
+To use CMake:
+First, as CMake isn't the default on vlc populate its CMakeLists files:
+$ cd vlc && sh ./extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh
+
+Now you can use CMake as usual:
+$ cd vlc && cmake . (or ccmake . if you want a graphical view of the settings)
+$ make [VERBOSE=1 if you want more details]
+$ make install
+
