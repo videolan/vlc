@@ -1,6 +1,9 @@
 include_directories( . )
 
 add_definitions(-Dasm=__asm__ -D_INTL_REDIRECT_MACROS)
+add_definitions(-DLOCALEDIR=\\"${CMAKE_INSTALL_PREFIX}/locale\\")
+add_definitions(-DDATA_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/vlc\\")
+add_definitions(-DPLUGIN_PATH=\\"${CMAKE_INSTALL_PREFIX}/lib/vlc\\")
 
 # vlc
 add_executable(vlc vlc.c)
