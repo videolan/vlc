@@ -227,8 +227,6 @@ if(${LIBCDDB_FOUND})
   vlc_add_module_compile_flag(cdda ${LIBCDDB_CFLAGS} )
 endif(${LIBCDDB_FOUND})
 
-set( MODULES_CFLAGS, "-std=c99" )
-
 ###########################################################
 # Final configuration
 ###########################################################
