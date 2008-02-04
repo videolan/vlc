@@ -3819,6 +3819,40 @@ AS_IF( [test "${enable_telx}" = "yes"],[
   ])
 
 dnl
+dnl asa/csri subtitle rendering module
+dnl
+AC_ARG_ENABLE(csri,
+  [  --enable-csri          Subtitle support using CSRI / asa (default disabled)])
+AS_IF( [test "${enable_csri}" != "no"], [
+  PKG_CHECK_MODULES(CSRI,
+      csri >= 0.1.0,
+      [
+        VLC_ADD_LDFLAGS([csri],[$CSRI_LIBS])
+        VLC_ADD_CFLAGS([csri],[$CSRI_CFLAGS])
+        VLC_ADD_PLUGINS([csri])
+      ],[
+        AC_MSG_WARN([CSRI helper library not found])
+      ])
+  ])
+
+dnl
+dnl asa demuxer
+dnl
+AC_ARG_ENABLE(asademux,
+  [  --enable-asademux      asa subtitle demuxing (default disabled)])
+AS_IF( [test "${enable_asa}" != "no"], [
+  PKG_CHECK_MODULES(PCRE,
+      libpcre >= 6.5,
+      [
+        VLC_ADD_LDFLAGS([asademux],[$PCRE_LIBS])
+        VLC_ADD_CFLAGS([asademux],[$PCRE_CFLAGS])
+        VLC_ADD_PLUGINS([asademux])
+      ],[
+        AC_MSG_WARN([PCRE library not found (required for asademux)])
+      ])
+  ])
+
+dnl
 dnl  CMML plugin
 dnl
 AC_ARG_ENABLE(cmml,
