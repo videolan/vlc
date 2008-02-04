@@ -78,6 +78,7 @@ find_library(HAVE_ICONV iconv)
 set( ICONV_CONST " " )
 
 check_library_exists(dl dlopen "" HAVE_DL_DLOPEN)
+check_library_exists(rt clock_nanosleep "" HAVE_CLOCK_NANOSLEEP)
 
 ###########################################################
 # Other check
