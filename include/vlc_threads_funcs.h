@@ -479,32 +479,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     i_result = 0;
 
 #elif defined(LIBVLC_USE_PTHREAD)
-
-#   ifdef DEBUG
-    /* In debug mode, timeout */
-    struct timespec timeout = {
-        (mdate() / 1000000) + THREAD_COND_TIMEOUT,
-        0 /* 1Hz precision is sufficient here :-) */
-    };
-
-    i_result = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex,
-                                       &timeout );
-
-    if( i_result == ETIMEDOUT )
-    {
-        errno = ETIMEDOUT;
-        msg_Dbg( p_condvar->p_this,
-                  "thread %li: possible condition deadlock "
-                  "at %s:%d (%m)", CAST_PTHREAD_TO_INT(pthread_self()),
-                  psz_file, i_line );
-
-        i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
-    }
-
-#   else
     i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
-#   endif
-
     if ( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
