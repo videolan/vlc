@@ -11,6 +11,7 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_type.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/pkg_check_modules.cmake )
 
 ###########################################################
+# Headers checks
 ###########################################################
 
 vlc_check_include_files (malloc.h stdbool.h locale.h)
@@ -25,21 +26,8 @@ vlc_check_include_files (kernel/OS.h)
 vlc_check_include_files (mach-o/dyld.h)
 
 
-check_symbol_exists(ntohl "sys/param.h" NTOHL_IN_SYS_PARAM_H)
-check_symbol_exists(scandir "dirent.h" HAVE_SCANDIR)
-check_symbol_exists(scandir "dirent.h" HAVE_SCANDIR)
-check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
-
-check_symbol_exists(getnameinfo "sys/types.h;sys/socket.h;netdb.h" HAVE_GETNAMEINFO)
-check_symbol_exists(getaddrinfo "sys/types.h;sys/socket.h;netdb.h" HAVE_GETADDRINFO)
-if(NOT HAVE_GETADDRINFO)
-    check_library_exists(getaddrinfo nsl "" HAVE_GETADDRINFO)
-endif(NOT HAVE_GETADDRINFO)
-
-find_library(HAVE_ICONV iconv)
-set( ICONV_CONST " " )
-
 ###########################################################
+# Functions/structures checks
 ###########################################################
 
 set(CMAKE_EXTRA_INCLUDE_FILES string.h)
@@ -63,25 +51,30 @@ check_c_source_compiles(
 int main() { char* cs = nl_langinfo(CODESET); }"
 HAVE_LANGINFO_CODESET)
 
-###########################################################
-###########################################################
-
 vlc_check_type("struct addrinfo" "sys/socket.h;netdb.h")
 if(HAVE_STRUCT_ADDRINFO)
   set(HAVE_ADDRINFO ON)
 endif(HAVE_STRUCT_ADDRINFO)
 vlc_check_type("struct timespec" "time.h")
 
-###########################################################
-#include (CheckVariableExists)
-###########################################################
-
-###########################################################
-###########################################################
 check_c_source_compiles (
 "#include <stdint.h> \n #ifdef UINTMAX \n #error no uintmax
  #endif
  int main() { return 0;}" HAVE_STDINT_H_WITH_UINTMAX)
+
+check_symbol_exists(ntohl "sys/param.h" NTOHL_IN_SYS_PARAM_H)
+check_symbol_exists(scandir "dirent.h" HAVE_SCANDIR)
+check_symbol_exists(scandir "dirent.h" HAVE_SCANDIR)
+check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
+
+check_symbol_exists(getnameinfo "sys/types.h;sys/socket.h;netdb.h" HAVE_GETNAMEINFO)
+check_symbol_exists(getaddrinfo "sys/types.h;sys/socket.h;netdb.h" HAVE_GETADDRINFO)
+if(NOT HAVE_GETADDRINFO)
+    check_library_exists(getaddrinfo nsl "" HAVE_GETADDRINFO)
+endif(NOT HAVE_GETADDRINFO)
+
+find_library(HAVE_ICONV iconv)
+set( ICONV_CONST " " )
 
 ###########################################################
 # Other check
@@ -198,9 +191,6 @@ vlc_enable_modules(packetizer_mpeg4video packetizer_mpeg4audio)
 vlc_enable_modules(packetizer_vc1)
 vlc_enable_modules(spatializer)
 
-vlc_disable_modules(asf)
-
-# This module will be disabled but listed in options
 if(NOT mingwce)
    set(enabled ON)
 endif(NOT mingwce)
@@ -215,17 +205,26 @@ vlc_register_modules(${enabled} converter_float a52tospdif dtstospdif audio_form
 set(enabled)
 
 if(NOT WIN32)
-   vlc_register_modules(${enabled} screensaver motion)
+   vlc_enable_modules(screensaver)
 endif(NOT WIN32)
 
+# Following modules will be disabled but listed in options
 
-# vlc_disable_module()
+vlc_disable_modules(asf)
 
+# This module is disabled because the CMakeList.txt which
+# is generated isn't correct. We'll put that back
+# when cmake will be accepted as default build system
+vlc_disable_modules(motion)
+
+###########################################################
+# libraries
+###########################################################
 
 pkg_check_modules(LIBCDDB libcddb>=0.9.5)
 if(${LIBCDDB_FOUND})
-  #vlc_add_library(cdda ${LIBCDDB_LIBRARIES})
-  vlc_add_compile_flag(cdda ${LIBCDDB_CFLAGS} )
+  vlc_module_add_link_libraries(cdda ${LIBCDDB_LIBRARIES})
+  vlc_add_module_compile_flag(cdda ${LIBCDDB_CFLAGS} )
 endif(${LIBCDDB_FOUND})
 
 set( MODULES_CFLAGS, "-std=c99" )

@@ -8,7 +8,7 @@ MACRO(vlc_add_module module_name)
             set(VLC_${module_name}_LINK_LIBRARIES "VLC_${module_name}_LINK_LIBRARIES libvlc")
         endif(WIN32)
         set_target_properties( vlc_${module_name} PROPERTIES COMPILE_FLAGS
-                "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR}" )
+                "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}" )
         if (VLC_${module_name}_LINK_LIBRARIES)
             target_link_libraries( vlc_${module_name} ${VLC_${module_name}_LINK_LIBRARIES})
         endif (VLC_${module_name}_LINK_LIBRARIES)
@@ -40,4 +40,8 @@ ENDMACRO(vlc_set_module_properties)
 MACRO(vlc_module_add_link_libraries module_name)
     set(VLC_${module_name}_LINK_LIBRARIES ${VLC_${module_name}_LINK_LIBRARIES} ${ARGN})
 ENDMACRO(vlc_module_add_link_libraries)
+
+MACRO(vlc_add_module_compile_flag module_name)
+    set(VLC_${module_name}_COMPILE_FLAG ${VLC_${module_name}_LINK_LIBRARIES} ${ARGN})
+ENDMACRO(vlc_add_module_compile_flag)
 
