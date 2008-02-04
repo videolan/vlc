@@ -188,4 +188,4 @@ COMMAND sh "rm -f misc/revision.c misc/revision.c.tmp &&
 # SET_TARGET_PROPERTIES
 
 set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
-    "-std=c99 -I. -Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Wmissing-prototypes" )
+    "-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Wmissing-prototypes" )
