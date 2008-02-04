@@ -1,20 +1,28 @@
 PROJECT(vlc)
 
-# Our own include
-include( ${CMAKE_SOURCE_DIR}/cmake/vlc_module_funcs.cmake )
+# Set the module path
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-# Config
-include( ${CMAKE_SOURCE_DIR}/cmake/config.cmake )
+# Our own include
+include( vlc_module_funcs )
+
+# Our config
+include( config )
 
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
 add_definitions(-I. -std=gnu99)
+
 # Needed for glibc:
 add_definitions(-D_GNU_SOURCE)
 
+# Our main include directories
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 
-# Sources
+# our sources:
 add_subdirectory(src)
 add_subdirectory(modules)
+
+
+
 

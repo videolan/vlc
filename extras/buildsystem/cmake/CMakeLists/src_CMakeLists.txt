@@ -177,6 +177,8 @@ if(APPLE)
   target_link_libraries(libvlc ${CARBON_FRAMEWORK})
 endif(APPLE)
 
+target_link_libraries(libvlc ${Dlopen_LIBRARY})
+
 ##########################################################
 # revision.c
 

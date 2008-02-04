@@ -22,6 +22,8 @@ vlc_check_include_files (netinet/in.h netinet/udplite.h)
 vlc_check_include_files (netdb.h fcntl.h sys/time.h poll.h)
 vlc_check_include_files (errno.h time.h)
 
+vlc_check_include_files (dlfcn.h dl.h)
+
 vlc_check_include_files (kernel/OS.h)
 vlc_check_include_files (mach-o/dyld.h)
 
@@ -77,7 +79,6 @@ find_library(HAVE_ICONV iconv)
 # FIXME: this will break on *BSD:
 set( ICONV_CONST " " )
 
-check_library_exists(dl dlopen "" HAVE_DL_DLOPEN)
 check_library_exists(rt clock_nanosleep "" HAVE_CLOCK_NANOSLEEP)
 
 ###########################################################
@@ -232,7 +233,9 @@ if(${LIBCDDB_FOUND})
   vlc_add_module_compile_flag(cdda ${LIBCDDB_CFLAGS} )
 endif(${LIBCDDB_FOUND})
 
+include (FindDlopen)
+set(HAVE_DL_DLOPEN ${Dlopen_FOUND})
+
 ###########################################################
 # Final configuration
 ###########################################################
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
