@@ -11,16 +11,16 @@ then
 fi
 
 echo "Installing CMakeLists.txt"
-ln -s $cmake_dir/CMakeLists/root_CMakeLists.txt CMakeLists.txt
+ln -sf $cmake_dir/CMakeLists/root_CMakeLists.txt CMakeLists.txt
 
 echo "Installing src/CMakeLists.txt"
-ln -s ../$cmake_dir/CMakeLists/src_CMakeLists.txt src/CMakeLists.txt
+ln -sf ../$cmake_dir/CMakeLists/src_CMakeLists.txt src/CMakeLists.txt
 
 echo "Installing include/config.h.cmake"
-ln -s $cmake_dir/config.h.cmake include/config.h.cmake
+ln -sf $cmake_dir/config.h.cmake include/config.h.cmake
 
 echo "Installing cmake/"
-ln -s $cmake_dir/include cmake
+ln -sf $cmake_dir/include cmake
 
 echo "Generating CMakeLists for modules/"
 sh $cmake_dir/scripts/convert_modules_to_cmake.sh modules
