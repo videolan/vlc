@@ -9,6 +9,8 @@ include( ${CMAKE_SOURCE_DIR}/cmake/config.cmake )
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
 add_definitions(-I. -std=gnu99)
+# Needed for glibc:
+add_definitions(-D_GNU_SOURCE)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 
