@@ -351,11 +351,11 @@ if HAVE_DARWIN
 noinst_DATA = VLC.app
 # VLC-release.app is the old VLC.app target
 VLC-release.app: vlc
-	( cd  src && make install )
-	@if test -e "$(top_builddir)/tmp"; then \
-	  rm -Rf $(top_builddir)/tmp \
-	fi \
-    mkdir -p "$(top_builddir)/tmp/extras/package/macosx"; \
+	( cd src && make install )
+	if test -e $(top_builddir)/tmp ; then
+	  rm -Rf $(top_builddir)/tmp
+	fi
+	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"; \
 	rm -Rf $(top_builddir)/VLC-release.app
 	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/package/macosx/
 	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx
@@ -521,8 +521,8 @@ VLC-release.app: vlc
 
 VLC.app: vlc 
 	( cd src && make install )
-	if test -e "$(top_builddir)/tmp"; then
-	  rm -Rf "$(top_builddir)/tmp"
+	if test -e $(top_builddir)/tmp ; then
+	  rm -Rf $(top_builddir)/tmp
 	fi
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"; \
 	rm -Rf $(top_builddir)/VLC.app
