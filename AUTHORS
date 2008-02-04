@@ -156,6 +156,13 @@ C: colin
 D: initial MacOS X port
 S: France
 
+N: Pierre d'Herbemont
+E: pdherbemont#videolan.org
+C: pdherbemont
+D: Mac OS X Framework
+D: LibVLC enhancements
+S: France
+
 N: Boris Dorès
 E: babal(at)via.ecp.fr
 C: babal
