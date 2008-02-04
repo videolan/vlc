@@ -3,6 +3,7 @@ include (CheckTypeSize)
 include (CheckCSourceCompiles)
 include (CheckSymbolExists)
 include (CheckLibraryExists)
+include (FindThreads)
 
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_include_files.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_functions_exist.cmake )
