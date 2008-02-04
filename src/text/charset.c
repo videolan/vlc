@@ -239,7 +239,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 
 #if !(defined WIN32 || defined OS2 || defined __APPLE__)
 
-# if HAVE_LANGINFO_CODESET
+# ifdef HAVE_LANGINFO_CODESET
     /* Most systems support nl_langinfo( CODESET ) nowadays.  */
     psz_codeset = nl_langinfo( CODESET );
     if( !strcmp( psz_codeset, "ANSI_X3.4-1968" ) )
@@ -253,7 +253,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
      * (like SunOS 4 or DJGPP) have only the C locale.  Therefore we don't
      * use setlocale here; it would return "C" when it doesn't support the
      * locale name the user has set. Darwin's setlocale is broken. */
-#  if HAVE_SETLOCALE && !__APPLE__
+#  if defined (HAVE_SETLOCALE) && !defined (__APPLE__)
     psz_locale = setlocale( LC_ALL, NULL );
 #  endif
     if( psz_locale == NULL || psz_locale[0] == '\0' )
