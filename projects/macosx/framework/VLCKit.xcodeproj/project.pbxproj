@@ -422,14 +422,14 @@
 			files = (
 			);
 			inputPaths = (
-				$SRCROOT/../../contrib/bootstrap,
+				$SRCROOT/../../../extras/contrib/bootstrap,
 			);
 			outputPaths = (
-				$SRCROOT/../../contrib/config.mak,
+				$SRCROOT/../../../extras/contrib/config.mak,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../contrib && ./bootstrap";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../../extras/contrib && ./bootstrap";
 			showEnvVarsInLog = 0;
 		};
 		633BD6EB0D2ADF280012A314 /* ShellScript */ = {
@@ -443,7 +443,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../contrib && make";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../../extras/contrib && make";
 			showEnvVarsInLog = 0;
 		};
 		63FFDBCD0D2AE2AE0092FC96 /* ShellScript */ = {
