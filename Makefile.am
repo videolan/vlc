@@ -770,7 +770,7 @@ endif
 
 package-win32-base-debug: package-win-common
 # Copy relevant files
-	cp "$(top_builddir)/vlc.win32.nsi" "$(top_builddir)/vlc-$(VERSION)/"
+	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(top_builddir)/vlc-$(VERSION)/"
 
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/plugins"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
