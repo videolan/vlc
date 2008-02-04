@@ -74,7 +74,10 @@ if(NOT HAVE_GETADDRINFO)
 endif(NOT HAVE_GETADDRINFO)
 
 find_library(HAVE_ICONV iconv)
+# FIXME: this will break on *BSD:
 set( ICONV_CONST " " )
+
+check_library_exists(dl dlopen "" HAVE_DL_DLOPEN)
 
 ###########################################################
 # Other check
@@ -152,6 +155,7 @@ command_to_configvar( "whoami" VLC_COMPILE_BY )
 command_to_configvar( "hostname" VLC_COMPILE_HOST )
 command_to_configvar( "hostname" VLC_COMPILE_DOMAIN )
 command_to_configvar( "${CMAKE_C_COMPILER} --version" VLC_COMPILER )
+# FIXME: WTF? this is not the configure line!
 command_to_configvar( "${CMAKE_C_COMPILER} --version" CONFIGURE_LINE )
 set( VLC_COMPILER "${CMAKE_C_COMPILER}" )
 
