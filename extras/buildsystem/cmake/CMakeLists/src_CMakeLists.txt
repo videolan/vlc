@@ -161,6 +161,7 @@ set( SOURCES_libvlc_control
 
 add_library(libvlc-control SHARED ${SOURCES_libvlc_control})
 install_targets(/lib libvlc-control)
+target_link_libraries(libvlc-control libvlc)
 
 ##########################################################
 # Libraries

@@ -8,7 +8,7 @@ include( ${CMAKE_SOURCE_DIR}/cmake/config.cmake )
 
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
-add_definitions(-I. -std=c99)
+add_definitions(-I. -std=gnu99)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
