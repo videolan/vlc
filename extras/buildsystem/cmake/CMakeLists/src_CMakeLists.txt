@@ -172,7 +172,7 @@ target_link_libraries(libvlc-control libvlc)
 # Libraries
 
 # iconv
-target_link_libraries(libvlc ${HAVE_ICONV})
+target_link_libraries(libvlc ${LIBICONV})
 
 # Carbon
 if(APPLE)
