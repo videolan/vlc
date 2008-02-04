@@ -326,7 +326,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifndef WIN32
     if( config_GetInt( p_libvlc, "daemon" ) )
     {
-#if HAVE_DAEMON
+#ifdef HAVE_DAEMON
         char *psz_pidfile = NULL;
 
         if( daemon( 1, 0) != 0 )
