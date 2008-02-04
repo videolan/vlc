@@ -134,7 +134,8 @@ endif(SYS_DARWIN)
 
 add_library(libvlc SHARED ${SOURCES_libvlc})
 install_targets(/lib libvlc)
-set_target_properties(libvlc PROPERTIES LINK_FLAGS "${LIBICONV}")
+set_target_properties(libvlc PROPERTIES LINK_FLAGS
+	"-z defs --as-needed -lm ${LIBRT} ${LIBICONV} ${CMAKE_THREAD_LIBS_INIT}")
 set_target_properties(libvlc PROPERTIES SOVERSION 1.0.0)
 
 # libvlc-control
@@ -241,5 +242,6 @@ set(about)
 # SET_TARGET_PROPERTIES
 
 set_target_properties(libvlc libvlc-control PROPERTIES PREFIX "")
+set_target_properties(libvlc-control PROPERTIES LINK_FLAGS "-z defs --as-needed")
 set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
     "-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Wmissing-prototypes" )

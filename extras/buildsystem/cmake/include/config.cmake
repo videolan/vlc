@@ -80,13 +80,16 @@ set(LIBICONV "")
 vlc_check_functions_exist(iconv)
 
 if(NOT HAVE_ICONV)
-    set(LIBICONV "iconv")
+    set(LIBICONV "-liconv")
     check_library_exists(iconv iconv "" HAVE_ICONV)
 endif(NOT HAVE_ICONV)
 # FIXME: this will break on *BSD:
 set( ICONV_CONST "" )
 
 check_library_exists(rt clock_nanosleep "" HAVE_CLOCK_NANOSLEEP)
+if (HAVE_CLOCK_NANOSLEEP)
+    set(LIBRT "-lrt")
+endif (HAVE_CLOCK_NANOSLEEP)
 
 ###########################################################
 # Other check
