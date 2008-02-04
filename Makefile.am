@@ -8,21 +8,21 @@
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
 SUBDIRS = po libs/loader libs/srtp src modules \
-		mozilla bindings activex share doc
-DIST_SUBDIRS = $(SUBDIRS) m4 ipkg
+		projects/mozilla bindings projects/activex share doc
+DIST_SUBDIRS = $(SUBDIRS) extras/buildsystem/autotools/m4 extras/package/ipkg
 
 EXTRA_DIST = \
 	HACKING \
 	INSTALL.win32 \
 	INSTALL.wince \
-	vlc.exe.manifest \
+	extras/package/win32/vlc.exe.manifest \
 	MAINTAINERS \
 	README.MacOSX.rtf \
 	vlc-config.in.in \
-	vlc.fedora.spec \
-	vlc.mandriva.spec \
-	vlc.altlinux.spec \
-	vlc.win32.nsi.in
+	extras/package/rpm/vlc.fedora.spec \
+	extras/package/rpm/vlc.mandriva.spec \
+	extras/package/rpm/vlc.altlinux.spec \
+	extras/package/win32/vlc.win32.nsi.in
 
 dist_noinst_SCRIPTS = bootstrap toolbox
 
@@ -54,158 +54,158 @@ AUTOMAKE_OPTIONS = \
 ###############################################################################
 
 EXTRA_DIST += \
-	extras/MacOSX/Resources/English.lproj/MainMenu.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/About.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/About.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/About.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Open.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Open.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Open.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Preferences.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Preferences.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Preferences.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Wizard.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Wizard.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Extended.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Extended.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Extended.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/SFilters.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/SFilters.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/SFilters.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Update.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Update.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Update.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Interaction.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Interaction.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Interaction.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/InteractionErrorPanel.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/InteractionErrorPanel.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/InteractionErrorPanel.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
-	extras/MacOSX/Resources/a52.icns \
-	extras/MacOSX/Resources/aac.icns \
-	extras/MacOSX/Resources/asf.icns \
-	extras/MacOSX/Resources/asx.icns \
-	extras/MacOSX/Resources/avi.icns \
-	extras/MacOSX/Resources/bin.icns \
-	extras/MacOSX/Resources/cue.icns \
-	extras/MacOSX/Resources/dat.icns \
-	extras/MacOSX/Resources/divx.icns \
-	extras/MacOSX/Resources/dv.icns \
-	extras/MacOSX/Resources/generic.icns \
-	extras/MacOSX/Resources/m3u.icns \
-	extras/MacOSX/Resources/mov.icns \
-	extras/MacOSX/Resources/mp3.icns \
-	extras/MacOSX/Resources/mp4.icns \
-	extras/MacOSX/Resources/mpeg.icns \
-	extras/MacOSX/Resources/mpeg1.icns \
-	extras/MacOSX/Resources/mpeg2.icns \
-	extras/MacOSX/Resources/mpeg4.icns \
-	extras/MacOSX/Resources/mpg.icns \
-	extras/MacOSX/Resources/ogg.icns \
-	extras/MacOSX/Resources/ogm.icns \
-	extras/MacOSX/Resources/pls.icns \
-	extras/MacOSX/Resources/srt.icns \
-	extras/MacOSX/Resources/sub.icns \
-	extras/MacOSX/Resources/vlc.icns \
-	extras/MacOSX/Resources/vob.icns \
-	extras/MacOSX/Resources/wma.icns \
-	extras/MacOSX/Resources/wmv.icns \
-	extras/MacOSX/Resources/pause.png \
-	extras/MacOSX/Resources/pause_blue.png \
-	extras/MacOSX/Resources/play.png \
-	extras/MacOSX/Resources/play_blue.png \
-	extras/MacOSX/Resources/stop.png \
-	extras/MacOSX/Resources/stop_blue.png \
-	extras/MacOSX/Resources/display.png \
-	extras/MacOSX/Resources/display_slider.png \
-	extras/MacOSX/Resources/display_track.png \
-	extras/MacOSX/Resources/equalizerdrawer_active.png \
-	extras/MacOSX/Resources/equalizerdrawer_blue.png \
-	extras/MacOSX/Resources/fullscreen_active.png \
-	extras/MacOSX/Resources/fullscreen_blue.png \
-	extras/MacOSX/Resources/next_active.png \
-	extras/MacOSX/Resources/next_blue.png \
-	extras/MacOSX/Resources/playlistdrawer_active.png \
-	extras/MacOSX/Resources/playlistdrawer_blue.png \
-	extras/MacOSX/Resources/previous_active.png \
-	extras/MacOSX/Resources/previous_blue.png \
-	extras/MacOSX/Resources/skip_forward_active.png \
-	extras/MacOSX/Resources/skip_forward_blue.png \
-	extras/MacOSX/Resources/skip_previous_active.png \
-	extras/MacOSX/Resources/skip_previous_blue.png \
-	extras/MacOSX/Resources/volume_high.png \
-	extras/MacOSX/Resources/volume_low.png \
-	extras/MacOSX/Resources/volumeslider_blue.png \
-	extras/MacOSX/Resources/volumeslider_normal.png \
-	extras/MacOSX/Resources/volumetrack.png \
-	extras/MacOSX/Resources/about_bg.png \
-	extras/MacOSX/Resources/skip_forward_active_embedded.png \
-	extras/MacOSX/Resources/play_embedded.png \
-	extras/MacOSX/Resources/pause_embedded.png \
-	extras/MacOSX/Resources/skip_previous_active_embedded.png \
-	extras/MacOSX/Resources/pause_embedded_blue.png \
-	extras/MacOSX/Resources/play_embedded_blue.png \
-	extras/MacOSX/Resources/skip_forward_embedded_blue.png \
-	extras/MacOSX/Resources/skip_previous_embedded_blue.png \
-	extras/MacOSX/Resources/vlc.scriptSuite \
-	extras/MacOSX/Resources/vlc.scriptTerminology \
-	extras/MacOSX/Resources/README \
-	extras/MacOSX/Resources/add_embedded.png \
-	extras/MacOSX/Resources/add_embedded_blue.png \
-	extras/MacOSX/Resources/repeat_embedded.png \
-	extras/MacOSX/Resources/repeat_embedded_blue.png \
-	extras/MacOSX/Resources/repeat_single_embedded_blue.png \
-	extras/MacOSX/Resources/shuffle_embedded.png \
-	extras/MacOSX/Resources/shuffle_embedded_blue.png \
-	extras/MacOSX/Resources/fs_volume_slider_knob_highlight.png \
-	extras/MacOSX/Resources/fs_volume_slider_knob.png \
-	extras/MacOSX/Resources/fs_volume_slider_bar.png \
-	extras/MacOSX/Resources/fs_volume_mute_highlight.png \
-	extras/MacOSX/Resources/fs_volume_mute.png \
-	extras/MacOSX/Resources/fs_volume_max_highlight.png \
-	extras/MacOSX/Resources/fs_volume_max.png \
-	extras/MacOSX/Resources/fs_time_slider_knob_highlight.png \
-	extras/MacOSX/Resources/fs_time_slider_knob.png \
-	extras/MacOSX/Resources/fs_time_slider.png \
-	extras/MacOSX/Resources/fs_stop_highlight.png \
-	extras/MacOSX/Resources/fs_stop.png \
-	extras/MacOSX/Resources/fs_skip_previous_highlight.png \
-	extras/MacOSX/Resources/fs_skip_previous.png \
-	extras/MacOSX/Resources/fs_skip_next_highlight.png \
-	extras/MacOSX/Resources/fs_skip_next.png \
-	extras/MacOSX/Resources/fs_rewind_highlight.png \
-	extras/MacOSX/Resources/fs_rewind.png \
-	extras/MacOSX/Resources/fs_play_highlight.png \
-	extras/MacOSX/Resources/fs_play.png \
-	extras/MacOSX/Resources/fs_pause_highlight.png \
-	extras/MacOSX/Resources/fs_pause.png \
-	extras/MacOSX/Resources/fs_forward_highlight.png \
-	extras/MacOSX/Resources/fs_forward.png \
-	extras/MacOSX/Resources/fs_exit_fullscreen_highlight.png \
-	extras/MacOSX/Resources/fs_exit_fullscreen.png \
-	extras/MacOSX/Resources/fs_background.png \
-	extras/MacOSX/fullscreen_panel.svg \
-	extras/MacOSX/ub.sh \
-	extras/MacOSX/vlc.xcodeproj/project.pbxproj \
-	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
-	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
-	extras/MacOSX/Delete_Preferences.app/Contents/MacOS/applet \
-	extras/MacOSX/Delete_Preferences.app/Contents/Resources/description.rtfd/TXT.rtf \
-	extras/MacOSX/Delete_Preferences.app/Contents/Resources/applet.icns \
-	extras/MacOSX/Delete_Preferences.app/Contents/Resources/applet.rsrc \
-	extras/MacOSX/Delete_Preferences.app/Contents/Resources/Scripts/main.scpt \
-	extras/MacOSX/plugin/Info.plist \
-	extras/MacOSX/plugin/InstallerInfo.plist \
-	extras/MacOSX/plugin/InstallerDescription.plist \
-	extras/MacOSX/plugin/pbdevelopment.plist \
-	extras/MacOSX/plugin/English.lproj/InfoPlist.strings
+	extras/package/macosx/Resources/English.lproj/MainMenu.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/MainMenu.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/About.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/About.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/About.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Open.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Open.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Open.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Preferences.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Preferences.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Preferences.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Wizard.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Wizard.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Extended.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Extended.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Extended.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/SFilters.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/SFilters.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/SFilters.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Update.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Update.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Update.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/Interaction.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/Interaction.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Interaction.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/InfoPlist.strings \
+	extras/package/macosx/Resources/a52.icns \
+	extras/package/macosx/Resources/aac.icns \
+	extras/package/macosx/Resources/asf.icns \
+	extras/package/macosx/Resources/asx.icns \
+	extras/package/macosx/Resources/avi.icns \
+	extras/package/macosx/Resources/bin.icns \
+	extras/package/macosx/Resources/cue.icns \
+	extras/package/macosx/Resources/dat.icns \
+	extras/package/macosx/Resources/divx.icns \
+	extras/package/macosx/Resources/dv.icns \
+	extras/package/macosx/Resources/generic.icns \
+	extras/package/macosx/Resources/m3u.icns \
+	extras/package/macosx/Resources/mov.icns \
+	extras/package/macosx/Resources/mp3.icns \
+	extras/package/macosx/Resources/mp4.icns \
+	extras/package/macosx/Resources/mpeg.icns \
+	extras/package/macosx/Resources/mpeg1.icns \
+	extras/package/macosx/Resources/mpeg2.icns \
+	extras/package/macosx/Resources/mpeg4.icns \
+	extras/package/macosx/Resources/mpg.icns \
+	extras/package/macosx/Resources/ogg.icns \
+	extras/package/macosx/Resources/ogm.icns \
+	extras/package/macosx/Resources/pls.icns \
+	extras/package/macosx/Resources/srt.icns \
+	extras/package/macosx/Resources/sub.icns \
+	extras/package/macosx/Resources/vlc.icns \
+	extras/package/macosx/Resources/vob.icns \
+	extras/package/macosx/Resources/wma.icns \
+	extras/package/macosx/Resources/wmv.icns \
+	extras/package/macosx/Resources/pause.png \
+	extras/package/macosx/Resources/pause_blue.png \
+	extras/package/macosx/Resources/play.png \
+	extras/package/macosx/Resources/play_blue.png \
+	extras/package/macosx/Resources/stop.png \
+	extras/package/macosx/Resources/stop_blue.png \
+	extras/package/macosx/Resources/display.png \
+	extras/package/macosx/Resources/display_slider.png \
+	extras/package/macosx/Resources/display_track.png \
+	extras/package/macosx/Resources/equalizerdrawer_active.png \
+	extras/package/macosx/Resources/equalizerdrawer_blue.png \
+	extras/package/macosx/Resources/fullscreen_active.png \
+	extras/package/macosx/Resources/fullscreen_blue.png \
+	extras/package/macosx/Resources/next_active.png \
+	extras/package/macosx/Resources/next_blue.png \
+	extras/package/macosx/Resources/playlistdrawer_active.png \
+	extras/package/macosx/Resources/playlistdrawer_blue.png \
+	extras/package/macosx/Resources/previous_active.png \
+	extras/package/macosx/Resources/previous_blue.png \
+	extras/package/macosx/Resources/skip_forward_active.png \
+	extras/package/macosx/Resources/skip_forward_blue.png \
+	extras/package/macosx/Resources/skip_previous_active.png \
+	extras/package/macosx/Resources/skip_previous_blue.png \
+	extras/package/macosx/Resources/volume_high.png \
+	extras/package/macosx/Resources/volume_low.png \
+	extras/package/macosx/Resources/volumeslider_blue.png \
+	extras/package/macosx/Resources/volumeslider_normal.png \
+	extras/package/macosx/Resources/volumetrack.png \
+	extras/package/macosx/Resources/about_bg.png \
+	extras/package/macosx/Resources/skip_forward_active_embedded.png \
+	extras/package/macosx/Resources/play_embedded.png \
+	extras/package/macosx/Resources/pause_embedded.png \
+	extras/package/macosx/Resources/skip_previous_active_embedded.png \
+	extras/package/macosx/Resources/pause_embedded_blue.png \
+	extras/package/macosx/Resources/play_embedded_blue.png \
+	extras/package/macosx/Resources/skip_forward_embedded_blue.png \
+	extras/package/macosx/Resources/skip_previous_embedded_blue.png \
+	extras/package/macosx/Resources/vlc.scriptSuite \
+	extras/package/macosx/Resources/vlc.scriptTerminology \
+	extras/package/macosx/Resources/README \
+	extras/package/macosx/Resources/add_embedded.png \
+	extras/package/macosx/Resources/add_embedded_blue.png \
+	extras/package/macosx/Resources/repeat_embedded.png \
+	extras/package/macosx/Resources/repeat_embedded_blue.png \
+	extras/package/macosx/Resources/repeat_single_embedded_blue.png \
+	extras/package/macosx/Resources/shuffle_embedded.png \
+	extras/package/macosx/Resources/shuffle_embedded_blue.png \
+	extras/package/macosx/Resources/fs_volume_slider_knob_highlight.png \
+	extras/package/macosx/Resources/fs_volume_slider_knob.png \
+	extras/package/macosx/Resources/fs_volume_slider_bar.png \
+	extras/package/macosx/Resources/fs_volume_mute_highlight.png \
+	extras/package/macosx/Resources/fs_volume_mute.png \
+	extras/package/macosx/Resources/fs_volume_max_highlight.png \
+	extras/package/macosx/Resources/fs_volume_max.png \
+	extras/package/macosx/Resources/fs_time_slider_knob_highlight.png \
+	extras/package/macosx/Resources/fs_time_slider_knob.png \
+	extras/package/macosx/Resources/fs_time_slider.png \
+	extras/package/macosx/Resources/fs_stop_highlight.png \
+	extras/package/macosx/Resources/fs_stop.png \
+	extras/package/macosx/Resources/fs_skip_previous_highlight.png \
+	extras/package/macosx/Resources/fs_skip_previous.png \
+	extras/package/macosx/Resources/fs_skip_next_highlight.png \
+	extras/package/macosx/Resources/fs_skip_next.png \
+	extras/package/macosx/Resources/fs_rewind_highlight.png \
+	extras/package/macosx/Resources/fs_rewind.png \
+	extras/package/macosx/Resources/fs_play_highlight.png \
+	extras/package/macosx/Resources/fs_play.png \
+	extras/package/macosx/Resources/fs_pause_highlight.png \
+	extras/package/macosx/Resources/fs_pause.png \
+	extras/package/macosx/Resources/fs_forward_highlight.png \
+	extras/package/macosx/Resources/fs_forward.png \
+	extras/package/macosx/Resources/fs_exit_fullscreen_highlight.png \
+	extras/package/macosx/Resources/fs_exit_fullscreen.png \
+	extras/package/macosx/Resources/fs_background.png \
+	extras/package/macosx/fullscreen_panel.svg \
+	extras/package/macosx/ub.sh \
+	extras/package/macosx/vlc.xcodeproj/project.pbxproj \
+	extras/package/macosx/Delete_Preferences.app/Contents/Info.plist \
+	extras/package/macosx/Delete_Preferences.app/Contents/PkgInfo \
+	extras/package/macosx/Delete_Preferences.app/Contents/MacOS/applet \
+	extras/package/macosx/Delete_Preferences.app/Contents/Resources/description.rtfd/TXT.rtf \
+	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.icns \
+	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.rsrc \
+	extras/package/macosx/Delete_Preferences.app/Contents/Resources/Scripts/main.scpt \
+	extras/package/macosx/plugin/Info.plist \
+	extras/package/macosx/plugin/InstallerInfo.plist \
+	extras/package/macosx/plugin/InstallerDescription.plist \
+	extras/package/macosx/plugin/pbdevelopment.plist \
+	extras/package/macosx/plugin/English.lproj/InfoPlist.strings
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
@@ -359,8 +359,8 @@ VLC-release.app: vlc
 	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/MacOSX"; \
 	fi
 	rm -Rf $(top_builddir)/VLC-release.app
-	cp -R $(srcdir)/extras/MacOSX/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
-	cp -R $(srcdir)/extras/MacOSX/Resources $(top_builddir)/tmp/extras/MacOSX
+	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
+	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/MacOSX
 	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -417,9 +417,9 @@ VLC-release.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	cd $(top_builddir)/tmp/extras/package/macosx && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
 	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
@@ -530,8 +530,8 @@ VLC.app: vlc
 	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras/MacOSX"; \
 	fi
 	rm -Rf $(top_builddir)/VLC.app
-	cp -R $(srcdir)/extras/MacOSX/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
-	cp -R $(srcdir)/extras/MacOSX/Resources $(top_builddir)/tmp/extras/MacOSX
+	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/MacOSX/
+	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/MacOSX
 	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -588,9 +588,9 @@ VLC.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
+	cd $(top_builddir)/tmp/extras/package/macosx && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
 	    cd ../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
@@ -645,7 +645,7 @@ package-win-common:
 
 # Copy relevant files
 	cp "$(top_builddir)/.libs/vlc$(EXEEXT)" "$(top_builddir)/vlc-$(VERSION)/"
-	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-$(VERSION)/"
+	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(top_builddir)/vlc-$(VERSION)/"
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "vlc-$(VERSION)/"
 	cp "$(top_builddir)/src/.libs/libvlc-control$(LIBEXT)" "vlc-$(VERSION)/"
 
@@ -741,13 +741,13 @@ package-win-common:
 
 if BUILD_MOZILLA
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/mozilla"
-	cp $(top_builddir)/mozilla/.libs/npvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/mozilla/ ;
+	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/mozilla/ ;
 endif
 
 if BUILD_ACTIVEX
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/activex"
-	cp $(srcdir)/activex/README.TXT  $(top_builddir)/vlc-$(VERSION)/activex/ ;
-	cp $(srcdir)/activex/test.html  $(top_builddir)/vlc-$(VERSION)/activex/ ;
+	cp $(srcdir)/projects/activex/README.TXT  $(top_builddir)/vlc-$(VERSION)/activex/ ;
+	cp $(srcdir)/projects/activex/test.html  $(top_builddir)/vlc-$(VERSION)/activex/ ;
 	unix2dos $(top_builddir)/vlc-$(VERSION)/activex/* ;
 
 	cp $(top_builddir)/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/activex/ ;
@@ -940,9 +940,9 @@ package-macosx:
 	cd "$(srcdir)" && mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/ && \
           mkdir -p $(top_builddir)/vlc-$(VERSION)/.background/ && \
           cp AUTHORS COPYING ChangeLog README THANKS NEWS $(top_builddir)/vlc-$(VERSION)/Goodies/ && \
-          cp -R extras/MacOSX/Delete_Preferences.app $(top_builddir)/vlc-$(VERSION)/Goodies/Delete\ VLC\ Preferences.app && \
+          cp -R  extras/package/macosx/Delete_Preferences.app $(top_builddir)/vlc-$(VERSION)/Goodies/Delete\ VLC\ Preferences.app && \
 	  cp README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf && \
-	  cp extras/MacOSX/Resources/about_bg.png $(top_builddir)/vlc-$(VERSION)/.background/background.png ;
+	  cp extras/package/macosx/Resources/about_bg.png $(top_builddir)/vlc-$(VERSION)/.background/background.png ;
 
 # Place a link to the application folder
 	ln -s /Applications $(top_builddir)/vlc-$(VERSION)/Applications ;
@@ -995,12 +995,12 @@ if BUILD_MOZILLA
 # Create Installer
 	rm -rf "$(top_builddir)/macosx-plugin-instdata/"; true
 	mkdir -p "$(top_builddir)/macosx-plugin-instdata"
-	cp -R "$(top_builddir)/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
+	cp -R "$(top_builddir)/projects/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
 	rm -rf "$(top_builddir)/VLC Internet Plug-In.pkg"
 	PATH=/Developer/usr/bin:/Developer/Tools:$$PATH packagemaker -build -ds -p "$(top_builddir)/VLC Internet Plug-In.pkg" \
 	-f "$(top_builddir)/macosx-plugin-instdata" \
-	-i "$(srcdir)/extras/MacOSX/plugin/InstallerInfo.plist" \
-	-d "$(srcdir)/extras/MacOSX/plugin/InstallerDescription.plist"; true
+	-i "$(srcdir)/extras/package/macosx/plugin/InstallerInfo.plist" \
+	-d "$(srcdir)/extras/package/macosx/plugin/InstallerDescription.plist"; true
 	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
 
 # Create disk image 

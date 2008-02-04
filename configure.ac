@@ -6090,20 +6090,20 @@ dnl Create vlc-config.in
 VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
-  vlc.win32.nsi
+  extras/package/win32/vlc.win32.nsi
   Makefile
-  activex/Makefile
-  activex/axvlc.inf
+  projects/activex/Makefile
+  projects/activex/axvlc.inf
   bindings/Makefile
   bindings/java/Makefile
   bindings/java/src/Makefile
   bindings/python/Makefile
   doc/Makefile
-  ipkg/Makefile
+  extras/package/ipkg/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
   modules/Makefile
-  mozilla/Makefile
+  projects/mozilla/Makefile
   m4/Makefile
   po/Makefile.in
   share/Makefile
@@ -6204,7 +6204,7 @@ rm -f compile
 echo '#! /bin/sh' >compile
 
 echo "PATH=$PATH LANG=C make \$@ 2>&1| \\" >> compile
-echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/make.pl' >> compile
+echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/autotools/make.pl' >> compile
 chmod a+x compile
 
 printf "
