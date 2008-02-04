@@ -216,7 +216,7 @@ EXTRA_DIST += \
 	extras/analyser/emacs.init \
 	extras/analyser/vlc.vim \
 	extras/analyser/valgrind.suppressions \
-	extras/buildsystem/autotools/make.pl \
+	extras/buildsystem/make.pl \
 	extras/buildsystem/autotools/m4/autoconf260.m4 \
 	extras/misc/mpris.py \
 	extras/misc/mpris.glade
