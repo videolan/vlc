@@ -201,7 +201,7 @@ static const char* vlc_charset_aliases( const char *psz_name )
 }
 
 /* Returns charset from "language_COUNTRY.charset@modifier" string */
-#if (defined OS2 || !HAVE_LANGINFO_CODESET) && !defined WIN32
+#if (defined OS2 || !defined(HAVE_LANGINFO_CODESET)) && !defined WIN32
 static void vlc_encoding_from_locale( char *psz_locale, char *psz_charset )
 {
     char *psz_dot = strchr( psz_locale, '.' );
