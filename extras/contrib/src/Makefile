@@ -1936,7 +1936,7 @@ mozilla-source-$(MOZILLA_VERSION).tar.bz2:
 mozilla: mozilla-source-$(MOZILLA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
-.mozilla-macosx: mozilla-macosx
+.mozilla-macosx: mozilla
 	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=mac --enable-standalone-modules=xpcom,plugin && make && make install)
 	touch $@
 
