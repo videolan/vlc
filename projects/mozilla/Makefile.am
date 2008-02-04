@@ -129,8 +129,8 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	dylib="$@/Contents/MacOS/lib/libvlc-control.dylib"; $(FIXEXECPATH) ;
 	$(INSTALL) -d "$@/Contents/Resources"
 	$(INSTALL) npvlc.rsrc "$@/Contents/Resources/VLC Plugin.rsrc"
-	cp -r "$(top_srcdir)/extras/MacOSX/plugin/English.lproj" "$@/Contents/Resources/"
-	$(INSTALL) "$(top_srcdir)/extras/MacOSX/plugin/Info.plist" "$@/Contents/Info.plist"
+	cp -r "$(top_srcdir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
+	$(INSTALL) "$(top_srcdir)/extras/package/macosx/plugin/Info.plist" "$@/Contents/Info.plist"
 	$(INSTALL) -d "$@/Contents/MacOS/modules"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
