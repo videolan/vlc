@@ -98,7 +98,6 @@ if(APPLE)
             "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
         set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS
             "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -undefined dynamic_lookup")
-    MESSAGE( "Using ${CMAKE_SHARED_MODULE_LINK_C_FLAGS}" )
 
     set(HAVE_DL_DYLD ON INTERNAL)
     set(SYS_DARWIN 1)
