@@ -248,7 +248,7 @@ endif(NOT APPLE)
 target_link_libraries(libvlc ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES})
 target_link_libraries(libvlc ${LIBM})
 
-set_target_properties(libvlc PROPERTIES SOVERSION 1.0.0)
+set_target_properties(libvlc PROPERTIES SOVERSION 1)
 set_target_properties(libvlc libvlc-control PROPERTIES PREFIX "")
 set_target_properties(libvlc libvlc-control PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
