@@ -314,6 +314,9 @@
 #cmakedefine HAVE___FSETLOCKING
 #cmakedefine HAVE___VA_COPY
 #cmakedefine ICONV_CONST ${ICONV_CONST}
+#ifndef ICONV_CONST
+# define ICONV_CONST
+#endif
 #cmakedefine INTDIV0_RAISES_SIGFPE
 #cmakedefine LIBEXT "${LIBEXT}"
 #cmakedefine NDEBUG
