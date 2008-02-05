@@ -414,7 +414,7 @@ VLC-release.app: vlc
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	cd $(top_builddir)/tmp/extras/package/macosx && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../ && \
+	    cd ../../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
@@ -446,28 +446,28 @@ VLC-release.app: vlc
 	$(INSTALL) -m 644 $(srcdir)/share/http-lua/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/.hosts
 	for i in $(srcdir)/share/http-lua/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/dialogs/* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/dialogs/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/js/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/js/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/old/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/old/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/old/admin/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/old/admin/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/old/vlm/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/old/vlm/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/images/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/images/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http-lua/requests/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/requests/`basename $${i}` ; \
-	done ; \
+	done
 	$(INSTALL) -m 644 $(srcdir)/share/http-lua/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/requests/readme.txt
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
@@ -480,28 +480,28 @@ VLC-release.app: vlc
 	$(INSTALL) -m 644 $(srcdir)/share/http/old/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/.hosts
 	for i in $(srcdir)/share/http/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/dialogs/* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/js/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/old/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/old/admin/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/admin/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/old/vlm/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/vlm/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/images/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images/`basename $${i}` ; \
-	done ; \
+	done
 	for i in $(srcdir)/share/http/requests/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/`basename $${i}` ; \
-	done ; \
+	done
 	$(INSTALL) -m 644 $(srcdir)/share/http/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/readme.txt
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
@@ -581,9 +581,9 @@ VLC.app: vlc
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	cd $(top_builddir)/tmp/extras/package/macosx && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../ && \
+	    cd ../../../../ && \
 	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC.app; \
+	          $(top_builddir)/VLC.app
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	$(INSTALL) $(top_builddir)/.libs/vlc \
@@ -599,7 +599,7 @@ VLC.app: vlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
-	  ln -sfn `pwd`/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	  ln -sfn `pwd`/$(srcdir)/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	  ln -sf ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
