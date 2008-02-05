@@ -189,6 +189,7 @@ set(COPYRIGHT_YEARS "2001-2007")
 OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
 OPTION( ENABLE_VLM             "Enable vlm" ON )
 OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
+OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" ON )
 
 set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
 set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
