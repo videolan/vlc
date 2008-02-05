@@ -114,7 +114,7 @@ if(APPLE)
             "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -undefined dynamic_lookup")
 
     set(SYS_DARWIN 1)
-
+    add_definitions(-std=gnu99) # Hack for obj-c files to be compiled with gnu99
     vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext)
 
     vlc_find_frameworks(Cocoa Carbon OpenGL AGL IOKit Quicktime
