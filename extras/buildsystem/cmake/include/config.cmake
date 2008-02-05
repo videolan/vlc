@@ -92,6 +92,11 @@ if (HAVE_CLOCK_NANOSLEEP)
     set(LIBRT "rt")
 endif (HAVE_CLOCK_NANOSLEEP)
 
+check_library_exists(m pow "" HAVE_LIBM)
+if (HAVE_LIBM)
+    set (LIBM "m")
+endif (HAVE_LIBM)
+
 ###########################################################
 # Other check
 ###########################################################

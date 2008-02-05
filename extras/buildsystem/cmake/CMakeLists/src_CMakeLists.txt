@@ -179,8 +179,6 @@ if(APPLE)
   target_link_libraries(libvlc ${CARBON_FRAMEWORK})
 endif(APPLE)
 
-target_link_libraries(libvlc ${Dlopen_LIBRARY})
-
 ##########################################################
 # revision.c
 
@@ -245,6 +243,7 @@ if(NOT APPLE)
 endif(NOT APPLE)
 
 target_link_libraries(libvlc ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES})
+target_link_libraries(libvlc ${LIBM})
 
 set_target_properties(libvlc PROPERTIES SOVERSION 1.0.0)
 set_target_properties(libvlc libvlc-control PROPERTIES PREFIX "")
