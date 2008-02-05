@@ -12,6 +12,7 @@ MACRO(vlc_add_module module_name)
         if (VLC_${module_name}_LINK_LIBRARIES)
             target_link_libraries( vlc_${module_name} ${VLC_${module_name}_LINK_LIBRARIES})
         endif (VLC_${module_name}_LINK_LIBRARIES)
+        install_targets(/modules vlc_${module_name})
     endif(ENABLE_VLC_MODULE_${module_name})
 ENDMACRO(vlc_add_module)
 

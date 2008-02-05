@@ -9,7 +9,7 @@ add_definitions(-DPLUGIN_PATH=\\"${CMAKE_INSTALL_PREFIX}/lib/vlc\\")
 add_executable(vlc vlc.c)
 target_link_libraries(vlc libvlc)
 
-install_programs(/bin FILES vlc)
+install_targets(/bin vlc)
 
 # libvlc
 
