@@ -315,7 +315,7 @@
 #cmakedefine HAVE___VA_COPY
 #cmakedefine ICONV_CONST ${ICONV_CONST}
 #cmakedefine INTDIV0_RAISES_SIGFPE
-#cmakedefine LIBEXT
+#cmakedefine LIBEXT "${LIBEXT}"
 #cmakedefine NDEBUG
 #cmakedefine NO_MINUS_C_MINUS_O
 #cmakedefine NTOHL_IN_SYS_PARAM_H
@@ -420,3 +420,4 @@
 #cmakedefine glthread_once_singlethreaded  libintl_once_singlethreaded
 #include <vlc_fixups.h>
 #endif
+

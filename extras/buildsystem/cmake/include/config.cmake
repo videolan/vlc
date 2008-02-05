@@ -107,7 +107,6 @@ if(APPLE)
         set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS
             "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -undefined dynamic_lookup")
 
-    set(HAVE_DL_DYLD ON INTERNAL)
     set(SYS_DARWIN 1)
 
     vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext)
@@ -181,8 +180,12 @@ set(COPYRIGHT_YEARS "2001-2007")
 # Options
 ###########################################################
 
-OPTION( ENABLE_HTTPD "Enable httpd server" ON )
-OPTION( ENABLE_VLM   "Enable vlm" ON )
+OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
+OPTION( ENABLE_VLM             "Enable vlm" ON )
+OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
+
+set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
+set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
 
 ###########################################################
 # Modules: Following are all listed in options
@@ -249,3 +252,5 @@ set(HAVE_DL_DLOPEN ${Dlopen_FOUND})
 ###########################################################
 # Final configuration
 ###########################################################
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
+

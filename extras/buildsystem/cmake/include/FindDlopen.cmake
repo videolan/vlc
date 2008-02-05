@@ -9,12 +9,11 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 
 
-# Assume dlopen is not found.
-if (Dlopen_SEARCHED)
+if (NOT Dlopen_SEARCHED)
     include(CheckLibraryExists)
 
-    set(Dlopen_SEARCHED TRUE)
-    set(Dlopen_FOUND FALSE)
+    set(Dlopen_SEARCHED TRUE CACHE INTERNAL "")
+    set(Dlopen_FOUND FALSE CACHE INTERNAL "")
 
     foreach (library c c_r dl)
       if (NOT Dlopen_FOUND)
@@ -22,7 +21,7 @@ if (Dlopen_SEARCHED)
 
         if (Dlopen_IN_${library})
           set(Dlopen_LIBRARIES ${library} CACHE STRING "Library containing dlopen")
-          set(Dlopen_FOUND TRUE)
+          set(Dlopen_FOUND TRUE CACHE INTERNAL "")
         endif (Dlopen_IN_${library})
 
       endif (NOT Dlopen_FOUND)
@@ -39,4 +38,4 @@ if (Dlopen_SEARCHED)
     endif (Dlopen_FOUND)
 
     mark_as_advanced(Dlopen_LIBRARIES)
-endif(Dlopen_SEARCHED)
+endif(NOT Dlopen_SEARCHED)
