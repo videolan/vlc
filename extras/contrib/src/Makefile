@@ -159,7 +159,7 @@ endif
 endif
 
 ifdef HAVE_AMR
-FFMPEGCONF+= --enable-libamr --enable-libamr-nb --enable-libamr-wb
+FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
 endif
 
 DATE=`date +%Y-%m-%d`
