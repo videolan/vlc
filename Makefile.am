@@ -352,7 +352,7 @@ noinst_DATA = VLC.app
 # VLC-release.app is the old VLC.app target
 VLC-release.app: vlc
 	( cd src && make install )
-	then rm -Rf "$(top_builddir)/tmp"
+	rm -Rf "$(top_builddir)/tmp"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC-release.app
 	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/package/macosx/
