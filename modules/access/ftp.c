@@ -99,7 +99,7 @@ vlc_module_end();
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static ssize_t Write( sout_access_out_t *, block_t * );
 static int Seek( access_t *, int64_t );
-static int OutSeek( sout_access_out_t *, int64_t );
+static int OutSeek( sout_access_out_t *, off_t );
 static int Control( access_t *, int, va_list );
 
 struct access_sys_t
@@ -668,7 +668,7 @@ static int ftp_ReadCommand( vlc_object_t *p_access, access_sys_t *p_sys,
 }
 
 static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
-                            off_t i_start )
+                            int64_t i_start )
 {
     char psz_ipv4[16], *psz_ip = p_sys->sz_epsv_ip;
     int  i_answer;

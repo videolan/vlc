@@ -756,7 +756,7 @@ static void GetHeader( access_t *p_access )
 /*****************************************************************************
  * Start stream
  ****************************************************************************/
-static int Start( access_t *p_access, off_t i_pos )
+static int Start( access_t *p_access, int64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int  i_streams = 0;
