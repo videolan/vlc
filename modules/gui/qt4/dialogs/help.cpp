@@ -218,7 +218,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     BUTTONACT( closeButton, close() );
 
     /* Create the update structure */
-    initUpdate();
+    p_update = update_New( p_intf );
     b_checked = false;
 
     /* Check for updates */
@@ -241,13 +241,15 @@ void UpdateDialog::UpdateOrDownload()
     if( !b_checked )
     {
         updateButton->setEnabled( false );
+        msg_Dbg( p_intf, "Launching an update Request" );
         update_Check( p_update, UpdateCallback, this );
     }
     else
     {
         updateButton->setEnabled( false );
-        QString dest_dir = QFileDialog::getExistingDirectory( this, qtr( "Select a directory ..." ),
-                                                              qfu( p_update->p_libvlc->psz_homedir ) );
+        QString dest_dir = QFileDialog::getExistingDirectory( this,
+                                 qtr( "Select a directory ..." ),
+                                 qfu( p_update->p_libvlc->psz_homedir ) );
 
         if( dest_dir != "" )
         {
@@ -278,22 +280,19 @@ void UpdateDialog::updateNotify( bool b_result )
         {
             b_checked = true;
             updateButton->setText( "Download" );
-            updateLabel->setText( qtr( "There is a new version of vlc :\n" ) + qfu( p_update->release.psz_desc )  );
+            updateLabel->setText( qtr( "There is a new version of vlc :\n" ) 
+                                + qfu( p_update->release.psz_desc )  );
         }
         else
             updateLabel->setText( qtr( "You have the latest version of vlc" ) );
     }
     else
-        updateLabel->setText( qtr( "An error occure while checking for updates" ) );
+        updateLabel->setText(
+                        qtr( "An error occured while checking for updates" ) );
 
     adjustSize();
     updateButton->setEnabled( true );
 }
 
-/* Initialise the p_update struct */
-void UpdateDialog::initUpdate()
-{
-    p_update = update_New( p_intf );
-}
-
 #endif
+

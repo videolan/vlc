@@ -92,7 +92,6 @@ public:
     }
     virtual ~UpdateDialog();
     void updateNotify( bool );
-    void initUpdate();
 
 private:
     UpdateDialog( intf_thread_t * );
