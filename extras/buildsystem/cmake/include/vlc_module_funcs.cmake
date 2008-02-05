@@ -3,7 +3,7 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_add_compile_flag.cmake )
 MACRO(vlc_add_module module_name)
     if(ENABLE_VLC_MODULE_${module_name})
         add_library( ${module_name}_plugin MODULE ${ARGN} )
-        set(VLC_${module_name}_LINK_LIBRARIES "VLC_${module_name}_LINK_LIBRARIES libvlc")
+        set(VLC_${module_name}_LINK_LIBRARIES "${VLC_${module_name}_LINK_LIBRARIES};libvlc")
         set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
                 "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}" )
         if (VLC_${module_name}_LINK_LIBRARIES)
