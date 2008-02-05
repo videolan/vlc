@@ -742,7 +742,7 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/projects/activex/test.html  $(top_builddir)/vlc-$(VERSION)/activex/ ;
 	unix2dos $(top_builddir)/vlc-$(VERSION)/activex/* ;
 
-	cp $(top_builddir)/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/activex/ ;
+	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-$(VERSION)/activex/ ;
 endif
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
