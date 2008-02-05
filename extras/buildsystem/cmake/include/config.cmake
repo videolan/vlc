@@ -20,6 +20,7 @@ vlc_check_include_files (stddef.h stdlib.h sys/stat.h)
 vlc_check_include_files (stdio.h stdint.h inttypes.h)
 vlc_check_include_files (signal.h unistd.h dirent.h)
 vlc_check_include_files (netinet/in.h netinet/udplite.h)
+vlc_check_include_files (arpa/inet.h net/if.h)
 vlc_check_include_files (netdb.h fcntl.h sys/time.h poll.h)
 vlc_check_include_files (errno.h time.h)
 
