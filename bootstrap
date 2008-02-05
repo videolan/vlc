@@ -63,7 +63,7 @@ case "$(autoreconf --version|head -n 1)" in
     echo "Enabling provisional autoconf 2.59 work-around. Update autoconf ASAP."
     echo "Press Enter to continue"
     read
-    cp -f extras/m4/autoconf260.m4 m4/
+    cp -f extras/buildsystem/autotools/m4/autoconf260.m4 m4/
     ;;
 esac
 
