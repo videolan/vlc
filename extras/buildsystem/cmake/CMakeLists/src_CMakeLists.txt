@@ -244,7 +244,7 @@ if(NOT APPLE)
    set(LINK_FLAGS "-z defs --as-needed")
 endif(NOT APPLE)
 
-target_link_libraries(libvlc ${LIBRT} ${LIBICONV})
+target_link_libraries(libvlc ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES})
 
 set_target_properties(libvlc PROPERTIES SOVERSION 1.0.0)
 set_target_properties(libvlc libvlc-control PROPERTIES PREFIX "")
