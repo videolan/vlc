@@ -9,9 +9,11 @@ include( vlc_module_funcs )
 # Our config
 include( config )
 
+# Global definitions
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
-add_definitions(-I. -std=gnu99)
+add_definitions(-I.)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 
 # Needed for glibc:
 add_definitions(-D_GNU_SOURCE)
