@@ -2,17 +2,17 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_add_compile_flag.cmake )
 
 MACRO(vlc_add_module module_name)
     if(ENABLE_VLC_MODULE_${module_name})
-        add_library( vlc_${module_name} MODULE ${ARGN} )
-       # On win32 we need to have all the symbol resolved at link time
+        add_library( ${module_name}_plugin MODULE ${ARGN} )
+        # On win32 we need to have all the symbol resolved at link time
         if(WIN32)
             set(VLC_${module_name}_LINK_LIBRARIES "VLC_${module_name}_LINK_LIBRARIES libvlc")
         endif(WIN32)
-        set_target_properties( vlc_${module_name} PROPERTIES COMPILE_FLAGS
+        set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
                 "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}" )
         if (VLC_${module_name}_LINK_LIBRARIES)
-            target_link_libraries( vlc_${module_name} ${VLC_${module_name}_LINK_LIBRARIES})
+            target_link_libraries( ${module_name}_plugin ${VLC_${module_name}_LINK_LIBRARIES})
         endif (VLC_${module_name}_LINK_LIBRARIES)
-        install_targets(/modules vlc_${module_name})
+        install_targets(/modules ${module_name}_plugin)
     endif(ENABLE_VLC_MODULE_${module_name})
 ENDMACRO(vlc_add_module)
 
@@ -31,11 +31,11 @@ MACRO(vlc_disable_modules module_names)
 ENDMACRO(vlc_disable_modules)
 
 MACRO(vlc_set_module_properties module_name)
-    set_target_properties(vlc_${module_name} ${ARGN})
+    set_target_properties(${module_name}_plugin ${ARGN})
 ENDMACRO(vlc_set_module_properties)
 
 MACRO(vlc_set_module_properties module_name)
-    set_target_properties(vlc_${module_name} ${ARGN})
+    set_target_properties(${module_name}_plugin ${ARGN})
 ENDMACRO(vlc_set_module_properties)
 
 MACRO(vlc_module_add_link_libraries module_name)
