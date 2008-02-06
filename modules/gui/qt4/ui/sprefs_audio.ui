@@ -71,7 +71,7 @@
       <item row="0" column="3" >
        <widget class="QSpinBox" name="volumeValue" >
         <property name="toolTip" >
-         <string>_("256 corresponds to 100%, 1024 to 400%)</string>
+         <string>_("256 corresponds to 100%, 1024 to 400%")</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
