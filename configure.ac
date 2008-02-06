@@ -392,7 +392,7 @@ lt_cv_deplibs_check_method=pass_all
 dnl
 dnl Gettext stuff
 dnl
-AM_GNU_GETTEXT_VERSION(0.15)
+AM_GNU_GETTEXT_VERSION(0.16.1)
 AM_GNU_GETTEXT([external])
 VLC_ADD_LIBS([libvlc vlc], [${LTLIBINTL}])
 
