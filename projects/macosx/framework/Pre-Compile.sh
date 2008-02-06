@@ -21,7 +21,6 @@ if test "${ACTION}" = "VLC-release.app"; then
 fi
 
 if test "${ACTION}" = "build"; then    
-    vlc_config="${VLC_SRC_DIR}/vlc-config"
     lib="lib"
     modules="modules"
     share="share"
@@ -74,7 +73,7 @@ if test "${ACTION}" = "build"; then
             for linked_lib in `otool -L ${lib_dest}  | grep '(' | sed 's/\((.*)\)//'`; do
                 name=`basename ${linked_lib}`
                 case "${linked_lib}" in
-                    */vlc_install_dir/lib/* | */extras/contrib/lib/*)
+                    */vlc_build_dir/lib/*  | *vlc* | */extras/contrib/lib/*)
                         if test -e ${linked_lib}; then
                             install_name_tool -change ${linked_lib} "${lib_install_prefix}/${name}" ${lib_dest}
                             linked_libs="${linked_libs} ${ref_lib}"
@@ -92,14 +91,22 @@ if test "${ACTION}" = "build"; then
     ##########################
 
     ##########################
+    # Hack for VLC-release.app
+    if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+        install_library "${VLC_BUILD_DIR}/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
+        prefix=".libs/"
+    else
+        prefix=""
+    fi
+
+    ##########################
     # Build the modules folder (Same as VLCKit.framework/modules in Makefile)
     echo "Building modules folder..."
     # Figure out what modules are available to install
-    for module in `top_builddir="${VLC_BUILD_DIR}" ${vlc_config} --target plugin` ; do
+    for module in `find ${VLC_BUILD_DIR}/modules -name *.so` ; do
         # Check to see that the reported module actually exists
         if test -n ${module}; then
-            module_src="`dirname ${module}`/.libs/`basename ${module}`.dylib"
-            install_library ${module_src} ${target_modules} "module"
+            install_library ${module} ${target_modules} "module"
         fi
     done
     # Build the modules folder
@@ -122,7 +129,7 @@ if test "${ACTION}" = "build"; then
     
     ##########################
     # Build the library folder
-    echo "Building library folder..."
+    echo "Building library folder... ${linked_libs}"
     for linked_lib in ${linked_libs} ; do
         case "${linked_lib}" in
             */extras/contrib/lib/*.dylib)
@@ -138,20 +145,15 @@ if test "${ACTION}" = "build"; then
         esac
     done
 
-    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc-control.dylib" ${target_lib} "library"
-    install_library "${VLC_BUILD_DIR}/src/.libs/libvlc.dylib" ${target_lib} "library"
 
-    ##########################
-    # Hack for VLC-release.app
-    if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-        install_library "${VLC_BUILD_DIR}/.libs/vlc" "${target}" "bin" "@loader_path/lib"
-    fi
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc-control.dylib" ${target_lib} "library"
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" ${target_lib} "library"
 
     ##########################
     # Build the share folder
     echo "Building share folder..."
     pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks"
     mkdir -p ${target_share}
-    $pbxcp ${VLC_BUILD_DIR}/share/luameta ${target_share}
-    $pbxcp ${VLC_BUILD_DIR}/share/luaplaylist ${target_share}
+    $pbxcp ${VLC_SRC_DIR}/share/luameta ${target_share}
+    $pbxcp ${VLC_SRC_DIR}/share/luaplaylist ${target_share}
 fi

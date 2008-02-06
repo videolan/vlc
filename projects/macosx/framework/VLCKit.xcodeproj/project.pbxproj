@@ -352,7 +352,7 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = ../../..;
+			buildWorkingDirectory = "$(SYMROOT)/vlc_build_dir";
 			dependencies = (
 			);
 			name = "vlc-core";
@@ -453,14 +453,13 @@
 			);
 			inputPaths = (
 				$SRCROOT/../../../bootstrap,
-				$SRCROOT/../../../configure.ac,
+				$SRCROOT/../../../CMakeLists.txt,
 			);
 			outputPaths = (
-				$SRCROOT/../../../configure,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../.. && ./bootstrap && ./configure --enable-debug --disable-nls\n";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ntop_srcdir=`pwd`/../../..\nmkdir -p $SYMROOT/vlc_build_dir\nrm -Rf $top_srcdir/CMakeCache.txt\ncd $SYMROOT/vlc_build_dir && cmake $top_srcdir";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
@@ -565,7 +564,7 @@
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				PRODUCT_NAME = VLCKit;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				VLC_BUILD_DIR = "$(VLC_SRC_DIR)";
+				VLC_BUILD_DIR = "$(SYMROOT)/vlc_build_dir";
 				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
 				VLC_SRC_DIR = ../../..;
 				WRAPPER_EXTENSION = framework;
