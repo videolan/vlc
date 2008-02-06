@@ -1062,7 +1062,7 @@
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28703E2EB1C0059A3A7 /* vout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = vout.h; path = ../../../modules/gui/macosx/vout.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28803E2EB1C0059A3A7 /* vout.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = vout.m; path = ../../../modules/gui/macosx/vout.m; sourceTree = SOURCE_ROOT; };
-		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = ../../../README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
+		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
 		8EE1AF9F044465080059A3A7 /* about.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = about.h; path = ../../../modules/gui/macosx/about.h; sourceTree = SOURCE_ROOT; };
 		8EE1AFA0044465080059A3A7 /* about.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = about.m; path = ../../../modules/gui/macosx/about.m; sourceTree = SOURCE_ROOT; };
 		C2F2A6FA0958A6E600018C74 /* skip_forward_active_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_forward_active_embedded.png; path = Resources/skip_forward_active_embedded.png; sourceTree = "<group>"; };

@@ -355,9 +355,10 @@ VLC-release.app: vlc
 	rm -Rf "$(top_builddir)/tmp"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC-release.app
-	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/package/macosx/
-	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx
-	for i in AUTHORS COPYING extras/package/macosx/README.MacOSX.rtf THANKS; do \
+	for i in vlc.xcodeproj Resources README.MacOSX.rtf; do \
+	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
+	done
+	for i in AUTHORS COPYING THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
@@ -522,9 +523,10 @@ VLC.app: vlc
 	rm -Rf $(top_builddir)/tmp
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC.app
-	cp -R $(srcdir)/extras/package/macosx/vlc.xcodeproj $(top_builddir)/tmp/extras/package/macosx/
-	cp -R $(srcdir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx
-	for i in AUTHORS COPYING extras/package/macosx/README.MacOSX.rtf THANKS; do \
+	for i in vlc.xcodeproj Resources README.MacOSX.rtf; do \
+	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
+	done
+	for i in AUTHORS COPYING THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
