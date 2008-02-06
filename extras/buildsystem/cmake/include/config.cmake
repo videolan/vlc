@@ -12,6 +12,16 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_type.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/pkg_check_modules.cmake )
 
 ###########################################################
+# Contribs
+###########################################################
+
+OPTION( ENABLE_CONTRIB "Attempt to use VLC contrib system to get the third-party libraries" ON )
+if(ENABLE_CONTRIB)
+  add_definitions(-I${CMAKE_SOURCE_DIR}/extras/contrib/include)
+  add_definitions(-L${CMAKE_SOURCE_DIR}/extras/contrib/lib)
+endif(ENABLE_CONTRIB)
+
+###########################################################
 # Headers checks
 ###########################################################
 
