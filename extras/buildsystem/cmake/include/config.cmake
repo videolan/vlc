@@ -151,17 +151,16 @@ if(APPLE)
         COMMAND rm -Rf ${CMAKE_CURRENT_BINARY_DIR}/tmp
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/tmp/modules/gui/macosx
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx
-        COMMAND cp -R ${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/vlc.xcodeproj ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx
-        COMMAND cp -R ${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/Resources ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx
-        COMMAND cp -R ${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/README.MacOSX.rtf ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx
-        COMMAND for i in AUTHORS COPYING THANKS\;do cp ${CMAKE_CURRENT_SOURCE_DIR}/$$i ${CMAKE_CURRENT_BINARY_DIR}/tmp/ \; done
+        COMMAND for i in vlc.xcodeproj Resources README.MacOSX.rtf\; do cp -R ${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/$$i ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx\; done
+        COMMAND for i in AUTHORS COPYING THANKS\;do cp ${CMAKE_CURRENT_SOURCE_DIR}/$$i ${CMAKE_CURRENT_BINARY_DIR}/tmp\; done
         COMMAND for i in AppleRemote.h AppleRemote.m about.h about.m applescript.h applescript.m controls.h controls.m equalizer.h equalizer.m intf.h intf.m macosx.m misc.h misc.m open.h open.m output.h output.m playlist.h playlist.m playlistinfo.h playlistinfo.m prefs_widgets.h prefs_widgets.m prefs.h prefs.m vout.h voutqt.m voutgl.m wizard.h wizard.m extended.h extended.m bookmarks.h bookmarks.m sfilters.h sfilters.m update.h update.m interaction.h interaction.m embeddedwindow.h embeddedwindow.m fspanel.h fspanel.m vout.m\; do cp ${CMAKE_CURRENT_SOURCE_DIR}/modules/gui/macosx/$$i ${CMAKE_CURRENT_BINARY_DIR}/tmp/modules/gui/macosx\; done
         COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx && xcodebuild -target vlc | grep -vE '^\([ \\t]|$$\)' && cd ../../../../ && cp ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx/build/Default/VLC.bundle/Contents/Info.plist ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents && cp -R ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx/build/Default/VLC.bundle/Contents/Resources/English.lproj ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/Resources
         COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/Resources ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents
         COMMAND find -d ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/Resources -type d -name \\.svn -exec rm -rf {} "\;"
         COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/modules
         COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/modules
-        COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/share ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/share
+        COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/share #remove the link if it exists
+        COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/share ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/share
         COMMAND find ${CMAKE_CURRENT_BINARY_DIR}/modules -name *.so -exec sh -c \"ln -s {} ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/modules/\\`basename {}\\`\" "\;"
         COMMAND ln -sf VLC ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/MacOS/clivlc #useless?
         COMMAND printf "APPLVLC#" > ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/PkgInfo
