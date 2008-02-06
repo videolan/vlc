@@ -180,6 +180,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemTitleChanged_Type:
         UpdateTitle();
+        UpdateMeta();
         break;
     case ItemStateChanged_Type:
        UpdateStatus();
