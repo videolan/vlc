@@ -37,6 +37,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 63FFDBD50D2AE3250092FC96 /* Build configuration list for PBXAggregateTarget "vlc-configure" */;
 			buildPhases = (
+				631A90420D5A007D0014A2CE /* ShellScript */,
 				63FFDBCD0D2AE2AE0092FC96 /* ShellScript */,
 			);
 			dependencies = (
@@ -416,6 +417,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		631A90420D5A007D0014A2CE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+				$SRCROOT/../../../CMakeLists.txt,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ntop_srcdir=`pwd`/../../..\ncd $top_srcdir && ./extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh";
+			showEnvVarsInLog = 0;
+		};
 		633BD6E30D2ADF030012A314 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,7 +468,6 @@
 			files = (
 			);
 			inputPaths = (
-				$SRCROOT/../../../bootstrap,
 				$SRCROOT/../../../CMakeLists.txt,
 			);
 			outputPaths = (
