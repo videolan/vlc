@@ -479,7 +479,7 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_demux, "cannot find any /moov/trak" );
         goto error;
     }
-    msg_Dbg( p_demux, "find %d track%c",
+    msg_Dbg( p_demux, "found %d track%c",
                         p_sys->i_tracks,
                         p_sys->i_tracks ? 's':' ' );
 
@@ -1151,6 +1151,12 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
         for( i_chunk = p_stsc->data.p_stsc->i_first_chunk[i_index] - 1;
              i_chunk < i_last; i_chunk++ )
         {
+            if( i_chunk >= p_demux_track->i_chunk_count )
+            {
+                msg_Warn( p_demux, "corrupted chunk table" );
+                return VLC_EGENERIC;
+            }
+
             p_demux_track->chunk[i_chunk].i_sample_description_index =
                     p_stsc->data.p_stsc->i_sample_description_index[i_index];
             p_demux_track->chunk[i_chunk].i_sample_count =
