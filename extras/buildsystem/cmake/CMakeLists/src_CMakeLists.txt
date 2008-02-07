@@ -253,3 +253,21 @@ set_target_properties(libvlc libvlc-control PROPERTIES PREFIX "")
 set_target_properties(libvlc libvlc-control PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
     "-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Wmissing-prototypes -I${CMAKE_BINARY_DIR}/src -I${CMAKE_BINARY_DIR}/include" )
+
+##########################################################
+# Tests
+
+add_executable(testapi   control/testapi.c)
+add_executable(i18n_atof test/i18n_atof.c)
+add_executable(url       test/url.c)
+add_executable(utf8      test/utf8.c)
+
+target_link_libraries(testapi   libvlc-control)
+target_link_libraries(i18n_atof libvlc)
+target_link_libraries(url       libvlc)
+target_link_libraries(utf8      libvlc)
+
+add_test(testapi   ${EXECUTABLE_OUTPUT_PATH}/testapi)
+add_test(i18n_atof ${EXECUTABLE_OUTPUT_PATH}/i18n_atof)
+add_test(url       ${EXECUTABLE_OUTPUT_PATH}/url)
+add_test(utf8      ${EXECUTABLE_OUTPUT_PATH}/utf8)
