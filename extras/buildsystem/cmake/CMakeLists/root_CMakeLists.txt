@@ -14,6 +14,7 @@ include( config )
 # Global definitions
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
+add_definitions(-DDATA_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/vlc\\")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
