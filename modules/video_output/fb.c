@@ -483,6 +483,10 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
+
     p_vout->fmt_out = p_vout->fmt_in;
     if( p_sys->i_chroma == 0 )
     {
