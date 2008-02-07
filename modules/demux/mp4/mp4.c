@@ -1116,6 +1116,10 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
     }
     p_demux_track->chunk = calloc( p_demux_track->i_chunk_count,
                                    sizeof( mp4_chunk_t ) );
+    if( p_demux_track->chunk == NULL )
+    {
+        return VLC_ENOMEM;
+    }
 
     /* first we read chunk offset */
     for( i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
