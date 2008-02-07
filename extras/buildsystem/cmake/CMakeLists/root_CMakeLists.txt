@@ -37,6 +37,10 @@ configure_file(
 add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
+# Target to reinstall the CMake files (until cmake gets defaulted)
+add_custom_target(recmake
+COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && sh "${CMAKE_CURRENT_SOURCE_DIR}/extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh")
+
 # Enable CPack: Automatic package creation
 
 set(README "${CMAKE_CURRENT_SOURCE_DIR}/README")
