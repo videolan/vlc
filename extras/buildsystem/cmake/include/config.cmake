@@ -12,14 +12,16 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_type.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/pkg_check_modules.cmake )
 
 ###########################################################
-# Contribs
+# Options
 ###########################################################
 
-OPTION( ENABLE_CONTRIB "Attempt to use VLC contrib system to get the third-party libraries" ON )
-if(ENABLE_CONTRIB)
-  add_definitions(-I${CMAKE_SOURCE_DIR}/extras/contrib/include)
-  add_definitions(-L${CMAKE_SOURCE_DIR}/extras/contrib/lib)
-endif(ENABLE_CONTRIB)
+OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
+OPTION( ENABLE_VLM             "Enable vlm" ON )
+OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
+OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" ON )
+
+set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
+set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
 
 ###########################################################
 # Headers checks
@@ -118,10 +120,13 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_test_inline.cmake )
 if(APPLE)
     include( ${CMAKE_SOURCE_DIR}/cmake/vlc_find_frameworks.cmake )
 
+    if(ENABLE_NO_SYMBOL_CHECK)
+        set(DYNAMIC_LOOKUP "-undefined dynamic_lookup" CACHE INTERNAL)
+    endif(ENABLE_NO_SYMBOL_CHECK)
     set(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
-            "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
-        set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS
-            "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -undefined dynamic_lookup")
+     "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} ${DYNAMIC_LOOKUP}")
+    set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS
+     "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} ${DYNAMIC_LOOKUP}")
 
     set(SYS_DARWIN 1)
     add_definitions(-std=gnu99) # Hack for obj-c files to be compiled with gnu99
@@ -172,7 +177,7 @@ if(APPLE)
         COMMAND mkdir ${MacOS}/modules
         COMMAND rm -f ${MacOS}/share #remove the link if it exists
         COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/share ${MacOS}/share
-        COMMAND find ${CMAKE_CURRENT_BINARY_DIR}/modules -name *.so -exec sh -c \"ln -s {} ${MacOS}/modules/\\`basename {}\\`\" "\;"
+        COMMAND ln -s ${CMAKE_CURRENT_BINARY_DIR}/modules ${MacOS}/modules
         COMMAND find ${CMAKE_BINARY_DIR}/po -name *.gmo -exec sh -c \"mkdir -p ${MacOS}/locale/\\`basename {}|sed s/\\.gmo//\\`/LC_MESSAGES\; ln -s {} ${MacOS}/locale/\\`basename {}|sed s/\\.gmo//\\`/LC_MESSAGES/vlc.mo\" "\;"
         COMMAND ln -sf VLC ${MacOS}/clivlc #useless?
         COMMAND printf "APPLVLC#" > ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/PkgInfo
@@ -207,17 +212,7 @@ set(VERSION_MESSAGE "vlc-0.9.0-svn")
 set(COPYRIGHT_MESSAGE "Copyright © the VideoLAN team")
 set(COPYRIGHT_YEARS "2001-2008")
 
-###########################################################
-# Options
-###########################################################
 
-OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
-OPTION( ENABLE_VLM             "Enable vlm" ON )
-OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
-OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" ON )
-
-set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
-set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
 
 ###########################################################
 # Modules: Following are all listed in options
@@ -241,6 +236,8 @@ vlc_enable_modules(packetizer_mpegvideo packetizer_h264)
 vlc_enable_modules(packetizer_mpeg4video packetizer_mpeg4audio)
 vlc_enable_modules(packetizer_vc1)
 vlc_enable_modules(spatializer)
+
+vlc_enable_modules(ffmpeg)
 
 if(NOT mingwce)
    set(enabled ON)
@@ -271,15 +268,41 @@ vlc_disable_modules(motion)
 ###########################################################
 # libraries
 ###########################################################
+OPTION( ENABLE_CONTRIB "Attempt to use VLC contrib system to get the third-party libraries" ON )
+if(ENABLE_CONTRIB)
+  set( CONTRIB_INCLUDE ${CMAKE_SOURCE_DIR}/extras/contrib/include)
+  set( CONTRIB_LIB ${CMAKE_SOURCE_DIR}/extras/contrib/lib)
+  set( CONTRIB_PROGRAM ${CMAKE_SOURCE_DIR}/extras/contrib/bin)
+  set( CMAKE_LIBRARY_PATH ${CONTRIB_LIB} ${CMAKE_LIBRARY_PATH} )
+  set( CMAKE_PROGRAM_PATH ${CONTRIB_PROGRAM} ${CMAKE_PROGRAM_PATH} )
+  set( CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_MODULE_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
+  add_definitions(-I${CONTRIB_INCLUDE})
+endif(ENABLE_CONTRIB)
 
+set(CMAKE_REQUIRED_INCLUDES ${CONTRIB_INCLUDE})
+
+#fixme: use find_package(cddb 0.9.5)
 pkg_check_modules(LIBCDDB libcddb>=0.9.5)
 if(${LIBCDDB_FOUND})
   vlc_module_add_link_libraries(cdda ${LIBCDDB_LIBRARIES})
   vlc_add_module_compile_flag(cdda ${LIBCDDB_CFLAGS} )
 endif(${LIBCDDB_FOUND})
 
-include (FindDlopen)
+find_package(Dlopen)
 set(HAVE_DL_DLOPEN ${Dlopen_FOUND})
+
+find_package(FFmpeg)
+vlc_check_include_files (ffmpeg/avcodec.h)
+vlc_check_include_files (postproc/postprocess.h)
+vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS} )
+vlc_module_add_link_libraries(ffmpeg ${FFmpeg_LIBRARIES})
+
+set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
 # Final configuration
