@@ -104,15 +104,18 @@ if(NOT HAVE_GETADDRINFO)
     check_library_exists(getaddrinfo nsl "" HAVE_GETADDRINFO)
 endif(NOT HAVE_GETADDRINFO)
 
-set(LIBICONV "")
 vlc_check_functions_exist(iconv)
-
 if(NOT HAVE_ICONV)
     set(LIBICONV "iconv")
     check_library_exists(iconv iconv "" HAVE_ICONV)
 endif(NOT HAVE_ICONV)
-# FIXME: this will break on *BSD:
-set( ICONV_CONST "" )
+CHECK_C_SOURCE_COMPILES(" #include <iconv.h>
+ int main() { return iconv(0, (char **)0, 0, (char**)0, 0); }" ICONV_NO_CONST)
+if( ICONV_NO_CONST )
+  set( ICONV_CONST "const" )
+else( ICONV_NO_CONST )
+  set( ICONV_CONST " ")
+endif( ICONV_NO_CONST )
 
 check_library_exists(rt clock_nanosleep "" HAVE_CLOCK_NANOSLEEP)
 if (HAVE_CLOCK_NANOSLEEP)
