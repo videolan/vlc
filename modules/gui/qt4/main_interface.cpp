@@ -924,14 +924,6 @@ void MainInterface::updateOnTimer()
         QApplication::closeAllWindows();
         QApplication::quit();
     }
-
-    /* For some weird reasons, we have to resize the intf after intf-show
-       Of course this is wrong, but I can't fix it now */
-    if( p_intf->p_sys->p_mi->b_toUpdate )
-    {
-        doComponentsUpdate();
-        p_intf->p_sys->p_mi->b_toUpdate = false;
-    }
 }
 
 /*****************************************************************************
