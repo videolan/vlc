@@ -81,6 +81,8 @@ set(CMAKE_EXTRA_INCLUDE_FILES libc.h)
 vlc_check_functions_exist(fork)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
+check_library_exists(poll poll "" HAVE_POLL)
+
 check_c_source_compiles(
 "#include <langinfo.h>
 int main() { char* cs = nl_langinfo(CODESET); }"
@@ -327,6 +329,15 @@ if(Lua_FOUND)
   vlc_add_module_compile_flag(lua ${Lua_CFLAGS} )
   vlc_module_add_link_libraries(lua ${Lua_LIBRARIES})
 endif(Lua_FOUND)
+
+find_package(Qt4)
+if(Qt4_FOUND)
+  set(HAVE_QT4 TRUE)
+  vlc_check_include_files (qt.h)
+  vlc_enable_modules(qt4)
+  vlc_add_module_compile_flag(qt4 ${Qt4_CFLAGS} )
+  vlc_module_add_link_libraries(qt4 ${Qt4_LIBRARIES} Qt4)
+endif(Qt4_FOUND)
 
 set(CMAKE_REQUIRED_INCLUDES)
 
