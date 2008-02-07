@@ -35,6 +35,10 @@ OPTION( ENABLE_VLM             "Enable vlm" ON )
 OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
 OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" ON )
 
+IF (NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING  "build type determining compiler flags" FORCE )
+endif(NOT CMAKE_BUILD_TYPE )
+
 set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
 set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
 
