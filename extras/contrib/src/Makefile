@@ -2246,7 +2246,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-static && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && cp -v *.a $(PREFIX)/lib/)
+	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a $(PREFIX)/lib/)
 	$(INSTALL_NAME)
 	touch $@
 
