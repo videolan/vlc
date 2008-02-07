@@ -39,9 +39,6 @@ export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
 export PKG_CONFIG_PATH
 export PKG_CONFIG_LIBDIR = $(PREFIX)/lib/pkgconfig
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
-# following is required for configure scripts that check dyld libraries
-# by building and running a test app 
-export DYLD_LIBRARY_PATH := $(DYLD_LIBRARY_PATH):$(PREFIX)/vlc-lib
 export MACOSX_DEPLOYMENT_TARGET = $(SDK_TARGET)
 export LIBRARY_PATH := $(PREFIX)/lib:$(LIBRARY_PATH)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
@@ -260,6 +257,24 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
 CLEAN_FILE += .autoconf
 CLEAN_PKG += autoconf
 DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
+
+# ***************************************************************************
+# CMake
+# ***************************************************************************
+
+cmake-$(CMAKE_VERSION).tar.gz:
+	$(WGET) $(CMAKE_URL)
+
+cmake: cmake-$(CMAKE_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.cmake: cmake
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .cmake
+CLEAN_PKG += cmake
+DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 
 # ***************************************************************************
 # libtool
