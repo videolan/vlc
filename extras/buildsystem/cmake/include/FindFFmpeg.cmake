@@ -6,7 +6,7 @@
 #  FFmpeg_CFLAGS - Link these to use FFmpeg.
 
 
-#if (NOT FFmpeg_SEARCHED)
+if (NOT FFmpeg_SEARCHED)
     include(CheckLibraryExists)
 
     set(FFmpeg_SEARCHED TRUE CACHE INTERNAL "")
@@ -45,4 +45,4 @@
     endif (FFmpeg_FOUND)
 
     mark_as_advanced(FFmpeg_LIBRARIES)
-#endif(NOT FFmpeg_SEARCHED)
+endif(NOT FFmpeg_SEARCHED)
