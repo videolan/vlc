@@ -35,6 +35,8 @@
 
 static libvlc_exception_t ex;
 
+#define log( ... ) printf( "testapi: " __VA_ARGS__ );
+
 static void catch (void)
 {
     if (libvlc_exception_raised (&ex))
@@ -55,6 +57,8 @@ static void test_core (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
     int id;
+
+    log ("Testing core\n");
 
     libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv, &ex);
@@ -80,6 +84,8 @@ static void test_media_list (const char ** argv, int argc)
     libvlc_instance_t *vlc;
     libvlc_media_descriptor_t *md;
     libvlc_media_list_t *ml;
+
+    log ("Testing media_list\n");
 
     libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv, &ex);
@@ -107,9 +113,48 @@ static void test_media_list (const char ** argv, int argc)
     catch ();
 }
 
+static void test_file_playback (const char ** argv, int argc, const char * file)
+{
+    libvlc_instance_t *vlc;
+    libvlc_media_descriptor_t *md;
+    libvlc_media_instance_t *mi;
+
+    log ("Testing playback of %s\n", file);
+
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (argc, argv, &ex);
+    catch ();
+
+    md = libvlc_media_descriptor_new (vlc, file, &ex);
+    catch ();
+
+    mi = libvlc_media_instance_new_from_media_descriptor (md, &ex);
+    catch ();
+    
+    libvlc_media_descriptor_release (md);
+
+    libvlc_media_instance_play (mi, &ex);
+    catch ();
+
+    /* FIXME: Do something clever */
+    sleep(1);
+
+    assert( libvlc_media_instance_get_state (mi, &ex) != libvlc_Error );
+    catch ();
+
+    libvlc_media_instance_stop (mi, &ex);
+    catch ();
+
+    libvlc_media_instance_release (mi);
+    catch ();
+
+    libvlc_release (vlc);
+    catch ();
+}
+
 int main (int argc, char *argv[])
 {
-    const char *args[argc + 3];
+    const char *args[argc + 5];
     int nlibvlc_args = sizeof (args) / sizeof (args[0]);
 
     alarm (30); /* Make sure "make check" does not get stuck */
@@ -118,11 +163,19 @@ int main (int argc, char *argv[])
     args[1] = "-I";
     args[2] = "-dummy";
     args[3] = "--plugin-path=../modules";
+    args[4] = "--vout=dummy";
+    args[5] = "--aout=dummy";
     for (int i = 1; i < argc; i++)
         args[i + 3] = argv[i];
 
     test_core (args, nlibvlc_args);
 
     test_media_list (args, nlibvlc_args);
+
+    /* FIXME try to play all streams from a list. We may want to create an other test category for that. */
+    test_file_playback (args, nlibvlc_args, "ftp://streams.videolan.org/streams-videolan/reference/mp4/aac_adts.mp4");
+    test_file_playback (args, nlibvlc_args, "ftp://streams.videolan.org/streams-videolan/reference/flv/flash5_004.flv");
+    /* ... */
+    
     return 0;
 }
