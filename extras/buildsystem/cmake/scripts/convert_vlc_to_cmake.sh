@@ -19,6 +19,9 @@ ln -sf ../$cmake_dir/CMakeLists/src_CMakeLists.txt src/CMakeLists.txt
 echo "Installing modules/CMakeLists.txt"
 ln -s ../$cmake_dir/CMakeLists/modules_CMakeLists.txt modules/CMakeLists.txt
 
+echo "Installing po/CMakeLists.txt"
+ln -s ../$cmake_dir/CMakeLists/po_CMakeLists.txt po/CMakeLists.txt
+
 echo "Installing include/config.h.cmake"
 ln -sf ../$cmake_dir/config.h.cmake include/config.h.cmake
 

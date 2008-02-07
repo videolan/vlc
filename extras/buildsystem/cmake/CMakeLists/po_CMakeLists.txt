@@ -1,0 +1,84 @@
+#TODO:
+# disable NLS on demand
+# installation
+# update-po
+# rebuild *.po if vlc.pot has changed (include POTFILES.in)
+
+
+#FIXME: detection ?
+set( GMSGFMT            msgfmt )
+set( MSGFMT             msgfmt )
+set( XGETTEXT           xgettext )
+set( MSGMERGE_UPDATE    msgmerge --update )
+set( MSGINIT            msginit )
+set( MSGCONV            msgconv )
+set( MSGFILTER          msgfilter )
+
+set( POFILES
+    af
+	ar
+	bn
+	ca
+	co
+	cs
+	da
+	de
+	el
+	en_GB
+	es
+	eu
+	fa
+	fi
+	fr
+	fur
+	gl
+	he
+	hi
+	hu
+	it
+	ja
+	ka
+	ko
+	lt
+	lv
+	ms
+	my
+	ne
+	nl
+	no
+	oc
+	pa
+	pl
+	ps
+	pt_BR
+	pt_PT
+	ro
+	ru
+	sk
+	sl
+	sq
+	sv
+	tet
+	th
+	tl
+	tr
+	zh_CN
+	zh_TW
+)
+
+FOREACH( pofile ${POFILES} )
+    set( po-target ${po-target} ${pofile}.gmo )
+ENDFOREACH( pofile)
+
+ADD_CUSTOM_TARGET( all-po ALL
+    DEPENDS ${po-target}
+)
+
+foreach( pofile ${POFILES} )
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${pofile}.gmo
+        COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/${pofile}.gmo
+        COMMAND ${GMSGFMT} -c --statistics -o ${CMAKE_CURRENT_BINARY_DIR}/t-${pofile}.gmo ${CMAKE_CURRENT_SOURCE_DIR}/${pofile}.po
+        COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/t-${pofile}.gmo ${CMAKE_CURRENT_BINARY_DIR}/${pofile}.gmo
+        DEPENDS ${pofile}.po
+    )
+endforeach( pofile )
