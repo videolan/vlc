@@ -12,6 +12,21 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_type.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/pkg_check_modules.cmake )
 
 ###########################################################
+# VERSION
+###########################################################
+
+set(VLC_VERSION_MAJOR 0)
+set(VLC_VERSION_MINOR 9)
+set(VLC_VERSION_PATCH 0)
+set(VLC_VERSION_EXTRA "-svn")
+
+set(PACKAGE "vlc")
+set(PACKAGE_STRING "vlc")
+set(VERSION_MESSAGE "vlc-${VLC_VERSION_MAJOR}.${VLC_VERSION_MINOR}.${VLC_VERSION_PATCH}${VLC_VERSION_EXTRA}")
+set(COPYRIGHT_MESSAGE "Copyright © the VideoLAN team")
+set(COPYRIGHT_YEARS "2001-2008")
+
+###########################################################
 # Options
 ###########################################################
 
@@ -187,7 +202,7 @@ if(APPLE)
 endif(APPLE)
 
 ###########################################################
-# version and info setup
+# info
 ###########################################################
 
 macro(command_to_configvar command var)
@@ -206,11 +221,6 @@ command_to_configvar( "${CMAKE_C_COMPILER} --version" VLC_COMPILER )
 command_to_configvar( "${CMAKE_C_COMPILER} --version" CONFIGURE_LINE )
 set( VLC_COMPILER "${CMAKE_C_COMPILER}" )
 
-set(PACKAGE "vlc")
-set(PACKAGE_STRING "vlc")
-set(VERSION_MESSAGE "vlc-0.9.0-svn")
-set(COPYRIGHT_MESSAGE "Copyright © the VideoLAN team")
-set(COPYRIGHT_YEARS "2001-2008")
 
 
 

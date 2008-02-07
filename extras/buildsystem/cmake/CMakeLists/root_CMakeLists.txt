@@ -28,3 +28,22 @@ add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(po)
 
+# Enable CPack: Automatic package creation
+
+set(README "${CMAKE_CURRENT_SOURCE_DIR}/README")
+set(LICENCE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+
+if(APPLE)
+set(README "${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/README.MacOSX.rtf")
+set(LICENCE "") # FIXME: Mac OS X's Package Maker doesn't allow non .*
+endif(APPLE)
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VLC Media Player")
+set(CPACK_PACKAGE_VENDOR "VideoLAN Team")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${README})
+set(CPACK_RESOURCE_FILE_LICENSE ${LICENCE})
+set(CPACK_PACKAGE_VERSION_MAJOR "${VLC_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${VLC_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${VLC_VERSION_PATCH}${VLC_VERSION_EXTRA}")
+
+include(CPack)
