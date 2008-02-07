@@ -1,5 +1,7 @@
 PROJECT(vlc)
 
+ENABLE_TESTING()
+
 # Set the module path
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -12,8 +14,8 @@ include( config )
 # Global definitions
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
-add_definitions(-I.)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Needed for glibc:
 add_definitions(-D_GNU_SOURCE)
@@ -25,6 +27,4 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(po)
-
-
 
