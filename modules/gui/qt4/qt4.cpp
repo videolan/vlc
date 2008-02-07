@@ -290,7 +290,7 @@ static void Init( intf_thread_t *p_intf )
      * see commits 21610 21622 21654 for reference */
 
     /* If you don't have a gconftool-2 binary, you should comment this line */
-    QApplication::setDesktopSettingsAware( false );
+//    QApplication::setDesktopSettingsAware( false );
 #endif
 
     /* Start the QApplication here */
@@ -309,7 +309,8 @@ static void Init( intf_thread_t *p_intf )
     {
         MainInterface *p_mi = new MainInterface( p_intf );
         p_intf->p_sys->p_mi = p_mi;
-        p_mi->show();
+        /* We don't show it because it is done in the MainInterface constructor
+        p_mi->show(); */
     }
     else
         vlc_thread_ready( p_intf );

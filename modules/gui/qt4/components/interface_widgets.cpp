@@ -58,13 +58,23 @@ static int DoControl( intf_thread_t *, void *, int, va_list );
 
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
+    /* Init */
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
     hide(); setMinimumSize( 16, 16 );
+    videoSize.rwidth() = -1;
+    videoSize.rheight() = -1;
 
-   // CONNECT( this, askResize( int, int ), this, SetSizing( int, int ) );
+    /* Black background is more coherent for a Video Widget IMVHO */
+    QPalette plt =  palette();
+    plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
+    plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
+    setPalette( plt );
+
+    /* The core can ask through a callback to show the video */
     CONNECT( this, askVideoWidgetToShow(), this, show() );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+    /* The core can ask through a callback to resize the video */
+   // CONNECT( this, askResize( int, int ), this, SetSizing( int, int ) );
 }
 
 VideoWidget::~VideoWidget()
@@ -88,11 +98,12 @@ VideoWidget::~VideoWidget()
 }
 
 /**
- * Request the video to avoid the conflicts 
+ * Request the video to avoid the conflicts
  **/
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
                            unsigned int *pi_width, unsigned int *pi_height )
 {
+    msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
     emit askVideoWidgetToShow();
     if( p_vout )
     {
@@ -104,19 +115,30 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
 }
 
 /* Set the Widget to the correct Size */
+/* Function has to be called by the parent
+   Parent has to care about resizing himself*/
 void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
-    resize( w, h );
-    //updateGeometry(); // Needed for deinterlace
-    msg_Dbg( p_intf, "%i %i", sizeHint().height(), sizeHint().width() );
-    //emit askResize();
+    msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
+    videoSize.rwidth() = w;
+    videoSize.rheight() = h;
+    updateGeometry(); // Needed for deinterlace
 }
 
 void VideoWidget::release( void *p_win )
 {
+    msg_Dbg( p_intf, "Video is non needed anymore" );
     p_vout = NULL;
+    videoSize.rwidth() = 0;
+    videoSize.rheight() = 0;
+    hide();
+    updateGeometry(); // Needed for deinterlace
 }
 
+QSize VideoWidget::sizeHint() const
+{
+    return videoSize;
+}
 
 /**********************************************************************
  * Background Widget. Show a simple image background. Currently,

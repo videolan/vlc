@@ -32,9 +32,10 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
-
 #include <vlc_aout.h>
+
 #include "qt4.hpp"
+#include "main_interface.hpp"
 
 #include <QWidget>
 #include <QFrame>
@@ -50,6 +51,8 @@ class QHBoxLayout;
 class VideoWidget : public QFrame
 {
     Q_OBJECT
+friend class MainInterface;
+
 public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
@@ -59,11 +62,13 @@ public:
     void  release( void * );
     int   control( void *, int, va_list );
 
+    virtual QSize sizeHint() const;
 private:
     intf_thread_t *p_intf;
     vout_thread_t *p_vout;
 
     vlc_mutex_t lock;
+    QSize videoSize;
 
 signals:
     void askVideoWidgetToShow();

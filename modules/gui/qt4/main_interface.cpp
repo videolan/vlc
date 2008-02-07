@@ -93,21 +93,21 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* Variables initialisation */
     // need_components_update = false;
-    bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
+    bgWidget = NULL; 
+    videoWidget = NULL; 
+    playlistWidget = NULL;
+    sysTray = NULL;
     videoIsActive = false;
-    input_name = "";
     playlistVisible = false;
+    input_name = "";
 
     /* Ask for privacy */
-    privacy();
+    askForPrivacy();
 
     /**
      *  Configuration and settings
      *  Pre-building of interface
      **/
-    settings = new QSettings( "vlc", "vlc-qt-interface" );
-    settings->beginGroup( "MainWindow" );
-
     /* Main settings */
     setFocusPolicy( Qt::StrongFocus );
     setAcceptDrops( true );
@@ -121,10 +121,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
 
     /* Set the other interface settings */
+    settings = new QSettings( "vlc", "vlc-qt-interface" );
+    settings->beginGroup( "MainWindow" );
+
     //TODO: I don't like that code
     visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
-    notificationEnabled = config_GetInt( p_intf, "qt-notification" )
-                          ? true : false;
+    notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
 
     /**************************
      *  UI and Widgets design
@@ -132,83 +134,26 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setVLCWindowsTitle();
     handleMainUi( settings );
 
+#if 0
     /* Create a Dock to get the playlist */
-    dockPL = new QDockWidget( qtr( "Playlist" ), this );
+/*    dockPL = new QDockWidget( qtr( "Playlist" ), this );
     dockPL->setSizePolicy( QSizePolicy::Preferred,
                            QSizePolicy::Expanding );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
                            | Qt::BottomDockWidgetArea );
-    dockPL->hide();
+    dockPL->hide();*/
+#endif
 
     /************
      * Menu Bar
      ************/
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
 
-    /****************
-     *  Status Bar  *
-     ****************/
-    /* Widgets Creation*/
-    b_remainingTime = false;
-    timeLabel = new TimeLabel;
-    timeLabel->setText( " --:--/--:-- " );
-    timeLabel->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
-    nameLabel = new QLabel;
-    nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
-                                      | Qt::TextSelectableByKeyboard );
-    speedLabel = new QLabel( "1.00x" );
-    speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+    /* StatusBar Creation */
+    createStatusBar();
 
-    /* Styling those labels */
-    timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
-
-    pgBar = new QProgressBar;
-    pgBar->hide();
-
-    /* and adding those */
-    statusBar()->addWidget( nameLabel, 8 );
-    statusBar()->addPermanentWidget( speedLabel, 0 );
-    statusBar()->addPermanentWidget( pgBar, 0 );
-    statusBar()->addPermanentWidget( timeLabel, 0 );
-
-    /* timeLabel behaviour:
-       - double clicking opens the goto time dialog
-       - right-clicking and clicking just toggle between remaining and
-         elapsed time.*/
-    CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
-    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
-    CONNECT( timeLabel, timeLabelDoubleClicked(), this, toggleTimeDisplay() );
-
-    /* Speed Label behaviour:
-       - right click gives the vertical speed slider */
-    CONNECT( speedLabel, customContextMenuRequested( QPoint ),
-             this, showSpeedMenu( QPoint ) );
-
-    /**********************
-     * Systray Management *
-     **********************/
-    sysTray = NULL;
-    bool b_createSystray = false;
-    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
-    if( config_GetInt( p_intf, "qt-start-minimized") )
-    {
-        if( b_systrayAvailable )
-        {
-            b_createSystray = true;
-            hide(); //FIXME BUG HERE
-        }
-        else msg_Warn( p_intf, "You can't minize if you haven't a system "
-                "tray bar" );
-    }
-    if( config_GetInt( p_intf, "qt-system-tray") )
-        b_createSystray = true;
-
-    if( b_systrayAvailable && b_createSystray )
-            createSystray();
 
     /********************
      * Input Manager    *
@@ -259,8 +204,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                  updateSystrayTooltipStatus( int ) );
     }
 
+    /* END CONNECTS ON IM */
+
+
     /** OnTimeOut **/
-    // TODO
+    /* TODO Remove this function, but so far, there is no choice because there
+       is no intf-should-die variable */
     ON_TIMEOUT( updateOnTimer() );
     //ON_TIMEOUT( debug() );
 
@@ -282,45 +231,41 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     }
 
     /* VideoWidget connect mess to avoid different threads speaking to each other */
-    CONNECT( this, askReleaseVideo( void * ), this, releaseVideoSlot( void * ) );
+    CONNECT( this, askReleaseVideo( void * ),
+             this, releaseVideoSlot( void * ) );
     CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
              videoWidget, SetSizing( unsigned int, unsigned int ) );
+
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
-    CONNECT( dockPL, topLevelChanged( bool ), this, doComponentsUpdate() );
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
-
 
     /* Size and placement of interface */
     move( settings->value( "pos", QPoint( 0, 0 ) ).toPoint() );
 
     QSize newSize = settings->value( "size", QSize( 350, 60 ) ).toSize();
     if( newSize.isValid() )
-    {
         resize( newSize );
-    }
     else
-    {
         msg_Warn( p_intf, "Invalid size in constructor" );
-    }
 
     /* Playlist */
-    int tgPlay = settings->value( "playlist-visible", 0 ).toInt();
+    if( settings->value( "playlist-visible", 0 ).toInt() ) togglePlaylist();
     settings->endGroup();
-
-    if( tgPlay )
-    {
-        togglePlaylist();
-    }
 
     show();
 
-   if( i_visualmode == QT_MINIMAL_MODE )
-           toggleMinimalView();
+    if( i_visualmode == QT_MINIMAL_MODE )
+        toggleMinimalView();
 
-   /* Update the geometry TODO: is it useful */
+    /* Update the geometry TODO: is it useful ?*/
     updateGeometry();
+
+    /*****************************************************
+     * End everything by creating the Systray Management *
+     *****************************************************/
+    initSystray();
 }
 
 MainInterface::~MainInterface()
@@ -332,7 +277,7 @@ MainInterface::~MainInterface()
         ExtendedDialog::getInstance( p_intf )->savingSettings();
 
     settings->beginGroup( "MainWindow" );
-    settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
+//    settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
     settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
@@ -367,6 +312,71 @@ MainInterface::~MainInterface()
  *   Main UI handling        *
  *****************************/
 
+inline void MainInterface::createStatusBar()
+{
+    /****************
+     *  Status Bar  *
+     ****************/
+    /* Widgets Creation*/
+    b_remainingTime = false;
+    timeLabel = new TimeLabel;
+    timeLabel->setText( " --:--/--:-- " );
+    timeLabel->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
+    nameLabel = new QLabel;
+    nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
+                                      | Qt::TextSelectableByKeyboard );
+    speedLabel = new QLabel( "1.00x" );
+    speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+
+    /* Styling those labels */
+    timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
+
+    pgBar = new QProgressBar;
+    pgBar->hide();
+
+    /* and adding those */
+    statusBar()->addWidget( nameLabel, 8 );
+    statusBar()->addPermanentWidget( speedLabel, 0 );
+    statusBar()->addPermanentWidget( pgBar, 0 );
+    statusBar()->addPermanentWidget( timeLabel, 0 );
+
+    /* timeLabel behaviour:
+       - double clicking opens the goto time dialog
+       - right-clicking and clicking just toggle between remaining and
+         elapsed time.*/
+    CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
+    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+    CONNECT( timeLabel, timeLabelDoubleClicked(), this, toggleTimeDisplay() );
+
+    /* Speed Label behaviour:
+       - right click gives the vertical speed slider */
+    CONNECT( speedLabel, customContextMenuRequested( QPoint ),
+             this, showSpeedMenu( QPoint ) );
+}
+
+inline void MainInterface::initSystray()
+{
+    bool b_createSystray = false;
+    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
+    if( config_GetInt( p_intf, "qt-start-minimized") )
+    {
+        if( b_systrayAvailable )
+        {
+            b_createSystray = true;
+            hide();
+        }
+        else msg_Err( p_intf, "You can't minimize if you haven't a system "
+                "tray bar" );
+    }
+    if( config_GetInt( p_intf, "qt-system-tray") )
+        b_createSystray = true;
+
+    if( b_systrayAvailable && b_createSystray )
+            createSystray();
+}
+
 /**
  * Give the decorations of the Main Window a correct Name.
  * If nothing is given, set it to VLC...
@@ -392,7 +402,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
-   // main->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
+    main->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
@@ -443,10 +453,10 @@ void MainInterface::handleMainUi( QSettings *settings )
     }
 
     /* Finish the sizing */
-    updateGeometry();
+    main->updateGeometry();
 }
 
-inline void MainInterface::privacy()
+inline void MainInterface::askForPrivacy()
 {
     /**
      * Ask for the network policy on FIRST STARTUP
@@ -535,12 +545,6 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     return privacy->exec();
 }
 
-//FIXME remove me at the end...
-void MainInterface::debug()
-{
-    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
-    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-}
 
 /**********************************************************************
  * Handling of sizing of the components
@@ -554,6 +558,7 @@ void MainInterface::debug()
    ask _parent->isFloating()...
    If you think this would be better, please FIXME it...
 */
+#if 0
 QSize MainInterface::sizeHint() const
 {
     int nwidth  = controls->sizeHint().width();
@@ -576,16 +581,16 @@ QSize MainInterface::sizeHint() const
         nwidth  = videoWidget->size().width();
         msg_Dbg( p_intf, "2 %i %i", nheight, nwidth );
     }
-    if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
+/*    if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
     {
         nheight += dockPL->size().height();
         nwidth = __MAX( nwidth, dockPL->size().width() );
         msg_Dbg( p_intf, "3 %i %i", nheight, nwidth );
-    }
+    }*/
     msg_Dbg( p_intf, "4 %i %i", nheight, nwidth );
     return QSize( nwidth, nheight );
 }
-
+#endif
 #if 0
 /* FIXME This is dead code and need to be removed AT THE END */
 void MainInterface::resizeEvent( QResizeEvent *e )
@@ -606,6 +611,25 @@ void MainInterface::resizeEvent( QResizeEvent *e )
     }
 }
 #endif
+
+void MainInterface::requestLayoutUpdate()
+{
+    emit askUpdate();
+}
+
+//FIXME remove me at the end...
+void MainInterface::debug()
+{
+    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
+    if( videoWidget->isVisible() )
+    {
+//    sleep( 10 );
+    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
+    }
+    adjustSize();
+}
 
 /****************************************************************************
  * Small right-click menu for rate control
@@ -635,6 +659,12 @@ private:
     bool onTop;
 };
 
+/**
+ * README
+ * README
+ * Thou shall not call/resize/hide widgets from on another thread.
+ * This is wrong, and this is TEH reason to emit signals on those Video Functions
+ **/
 /* function called from ::DoRequest in order to show a nice VideoWidget
     at the good size */
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
@@ -687,22 +717,21 @@ void MainInterface::releaseVideoSlot( void *p_win )
     if( bgWidget )// WORONG
         bgWidget->show();
 
+    adjustSize();
     videoIsActive = false;
-    emit askUpdate();
 }
 
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
 {
-    int i_ret = VLC_EGENERIC;
+    int i_ret = VLC_SUCCESS;
     switch( i_query )
     {
         case VOUT_GET_SIZE:
         {
             unsigned int *pi_width  = va_arg( args, unsigned int * );
             unsigned int *pi_height = va_arg( args, unsigned int * );
-            *pi_width = videoWidget->width();
-            *pi_height = videoWidget->height();
-            i_ret = VLC_SUCCESS;
+            *pi_width = videoWidget->videoSize.width();
+            *pi_height = videoWidget->videoSize.height();
             break;
         }
         case VOUT_SET_SIZE:
@@ -711,18 +740,16 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
             unsigned int i_height = va_arg( args, unsigned int );
             emit askVideoToResize( i_width, i_height );
             emit askUpdate();
-            updateGeometry();
-            i_ret = VLC_SUCCESS;
             break;
         }
         case VOUT_SET_STAY_ON_TOP:
         {
             int i_arg = va_arg( args, int );
             QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
-            i_ret = VLC_SUCCESS;
             break;
         }
         default:
+            i_ret = VLC_EGENERIC;
             msg_Warn( p_intf, "unsupported control query" );
             break;
     }
@@ -737,6 +764,8 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
  **/
 void MainInterface::togglePlaylist()
 {
+    THEDP->playlistDialog();
+#if 0
     /* CREATION
     If no playlist exist, then create one and attach it to the DockPL*/
     if( !playlistWidget )
@@ -774,13 +803,14 @@ void MainInterface::togglePlaylist()
        resize( sizeHint() );
        playlistVisible = !playlistVisible;
     }
+    #endif
 }
 
 /* Function called from the menu to undock the playlist */
 void MainInterface::undockPlaylist()
 {
-    dockPL->setFloating( true );
-    resize( sizeHint() );
+//    dockPL->setFloating( true );
+    adjustSize();
 }
 
 void MainInterface::toggleMinimalView()
@@ -795,9 +825,9 @@ void MainInterface::toggleMinimalView()
 /* Well, could it, actually ? Probably dangerous ... */
 void MainInterface::doComponentsUpdate()
 {
-    resize( sizeHint() );
     msg_Dbg( p_intf, "Updating the geometry" );
-    updateGeometry();
+//    resize( sizeHint() );
+    debug();
 }
 
 /* toggling advanced controls buttons */
@@ -888,18 +918,20 @@ void MainInterface::setRate( int rate )
 
 void MainInterface::updateOnTimer()
 {
+    /* No event for dying */
     if( intf_ShouldDie( p_intf ) )
     {
         QApplication::closeAllWindows();
         QApplication::quit();
     }
-#if 0
-    if( need_components_update )
+
+    /* For some weird reasons, we have to resize the intf after intf-show
+       Of course this is wrong, but I can't fix it now */
+    if( p_intf->p_sys->p_mi->b_toUpdate )
     {
         doComponentsUpdate();
-        need_components_update = false;
+        p_intf->p_sys->p_mi->b_toUpdate = false;
     }
-#endif
 }
 
 /*****************************************************************************
@@ -1195,7 +1227,7 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
     msg_Dbg( p_this, "Intf Show Requested" ); // DEBUG to track the non disparition of the menu...
-    //p_intf->p_sys->b_intf_show = VLC_TRUE;
+    p_intf->p_sys->p_mi->requestLayoutUpdate();
 
     return VLC_SUCCESS;
 }

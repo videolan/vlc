@@ -74,14 +74,17 @@ public:
                         unsigned int *pi_height );
     void releaseVideo( void * );
     int controlVideo( void *p_window, int i_query, va_list args );
+    void requestLayoutUpdate();
 
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
     int getControlsVisibilityStatus();
 
-    /* Sizehint() */
+    bool b_toUpdate;
+#if 0    /* Sizehint() */
     QSize sizeHint() const;
+#endif
 protected:
 //    void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
@@ -102,12 +105,15 @@ private:
     QProgressBar        *pgBar;
 
     void handleMainUi( QSettings* );
-    void privacy();
+    void askForPrivacy();
     int  privacyDialog( QList<ConfigControl *> controls );
 
     /* Systray */
     void handleSystray();
     void createSystray();
+
+    void createStatusBar();
+    void initSystray();
 
     /* Video */
     VideoWidget         *videoWidget;
