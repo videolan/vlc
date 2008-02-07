@@ -136,7 +136,7 @@ if(APPLE)
     include( ${CMAKE_SOURCE_DIR}/cmake/vlc_find_frameworks.cmake )
 
     if(ENABLE_NO_SYMBOL_CHECK)
-        set(DYNAMIC_LOOKUP "-undefined dynamic_lookup" CACHE INTERNAL)
+        set(DYNAMIC_LOOKUP "-undefined dynamic_lookup" CACHE INTERNAL STRING)
     endif(ENABLE_NO_SYMBOL_CHECK)
     set(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
      "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} ${DYNAMIC_LOOKUP}")
@@ -188,9 +188,7 @@ if(APPLE)
         COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx && xcodebuild -target vlc | grep -vE '^\([ \\t]|$$\)' && cd ../../../../ && cp ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx/build/Default/VLC.bundle/Contents/Info.plist ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents && cp -R ${CMAKE_CURRENT_BINARY_DIR}/tmp/extras/package/macosx/build/Default/VLC.bundle/Contents/Resources/English.lproj ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/Resources
         COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/extras/package/macosx/Resources ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents
         COMMAND find -d ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/Resources -type d -name \\.svn -exec rm -rf {} "\;"
-        COMMAND rm -rf ${MacOS}/modules ${MacOS}/locale
-        COMMAND mkdir ${MacOS}/modules
-        COMMAND rm -f ${MacOS}/share #remove the link if it exists
+        COMMAND rm -rf ${MacOS}/modules ${MacOS}/locale ${MacOS}/share
         COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/share ${MacOS}/share
         COMMAND ln -s ${CMAKE_CURRENT_BINARY_DIR}/modules ${MacOS}/modules
         COMMAND find ${CMAKE_BINARY_DIR}/po -name *.gmo -exec sh -c \"mkdir -p ${MacOS}/locale/\\`basename {}|sed s/\\.gmo//\\`/LC_MESSAGES\; ln -s {} ${MacOS}/locale/\\`basename {}|sed s/\\.gmo//\\`/LC_MESSAGES/vlc.mo\" "\;"
@@ -222,8 +220,6 @@ command_to_configvar( "${CMAKE_C_COMPILER} --version" CONFIGURE_LINE )
 set( VLC_COMPILER "${CMAKE_C_COMPILER}" )
 
 
-
-
 ###########################################################
 # Modules: Following are all listed in options
 ###########################################################
@@ -246,8 +242,6 @@ vlc_enable_modules(packetizer_mpegvideo packetizer_h264)
 vlc_enable_modules(packetizer_mpeg4video packetizer_mpeg4audio)
 vlc_enable_modules(packetizer_vc1)
 vlc_enable_modules(spatializer)
-
-vlc_enable_modules(ffmpeg)
 
 if(NOT mingwce)
    set(enabled ON)
@@ -289,8 +283,8 @@ if(ENABLE_CONTRIB)
   set( CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${CONTRIB_LIB}" )
   set( CMAKE_SHARED_MODULE_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
   set( CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
   add_definitions(-I${CONTRIB_INCLUDE})
 endif(ENABLE_CONTRIB)
 
@@ -307,10 +301,21 @@ find_package(Dlopen)
 set(HAVE_DL_DLOPEN ${Dlopen_FOUND})
 
 find_package(FFmpeg)
-vlc_check_include_files (ffmpeg/avcodec.h)
-vlc_check_include_files (postproc/postprocess.h)
-vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS} )
-vlc_module_add_link_libraries(ffmpeg ${FFmpeg_LIBRARIES})
+if(FFmpeg_FOUND)
+  vlc_check_include_files (ffmpeg/avcodec.h)
+  vlc_check_include_files (postproc/postprocess.h)
+  vlc_enable_modules(ffmpeg)
+  vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS} )
+  vlc_module_add_link_libraries(ffmpeg ${FFmpeg_LIBRARIES})
+endif(FFmpeg_FOUND)
+
+find_package(Lua)
+if(Lua_FOUND)
+  set(HAVE_LUA TRUE)
+  vlc_enable_modules(lua)
+  vlc_add_module_compile_flag(lua ${Lua_CFLAGS} )
+  vlc_module_add_link_libraries(lua ${Lua_LIBRARIES})
+endif(Lua_FOUND)
 
 set(CMAKE_REQUIRED_INCLUDES)
 
