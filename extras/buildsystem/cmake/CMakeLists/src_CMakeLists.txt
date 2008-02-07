@@ -135,6 +135,16 @@ endif(SYS_DARWIN)
 add_library(libvlc SHARED ${SOURCES_libvlc})
 install_targets(/lib libvlc)
 
+set_target_properties(libvlc PROPERTIES OUTPUT_NAME vlc)
+set_target_properties(libvlc PROPERTIES SOVERSION 1)
+set_target_properties(libvlc PROPERTIES VERSION 1.0.0)
+
+target_link_libraries(libvlc ${LIBM})
+target_link_libraries(libvlc ${LIBRT})
+target_link_libraries(libvlc ${LIBICONV})
+target_link_libraries(libvlc ${Dlopen_LIBRARIES})
+
+
 # libvlc-control
 set( SOURCES_libvlc_control
      control/libvlc_internal.h
@@ -165,13 +175,15 @@ set( SOURCES_libvlc_control
 
 add_library(libvlc-control SHARED ${SOURCES_libvlc_control})
 install_targets(/lib libvlc-control)
+
+set_target_properties(libvlc-control PROPERTIES OUTPUT_NAME vlc-control)
+set_target_properties(libvlc-control PROPERTIES SOVERSION 0)
+set_target_properties(libvlc PROPERTIES VERSION 0.0.0)
+
 target_link_libraries(libvlc-control libvlc)
 
 ##########################################################
 # Libraries
-
-# iconv
-target_link_libraries(libvlc ${LIBICONV})
 
 # Carbon
 if(APPLE)
@@ -245,11 +257,6 @@ if(NOT APPLE)
    set(LINK_FLAGS "-z defs --as-needed")
 endif(NOT APPLE)
 
-target_link_libraries(libvlc ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES})
-target_link_libraries(libvlc ${LIBM})
-
-set_target_properties(libvlc PROPERTIES SOVERSION 1)
-set_target_properties(libvlc libvlc-control PROPERTIES PREFIX "")
 set_target_properties(libvlc libvlc-control PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
     "-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Wmissing-prototypes -I${CMAKE_BINARY_DIR}/src -I${CMAKE_BINARY_DIR}/include" )
