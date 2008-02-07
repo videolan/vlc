@@ -125,7 +125,6 @@ set -x
 
 # Automake complains if these are not present
 echo > vlc-config.in
-mkdir -p intl
 cp -f INSTALL INSTALL.svn
 
 autoreconf --install --force ${ACLOCAL_ARGS}
