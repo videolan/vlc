@@ -3,7 +3,6 @@ include (CheckTypeSize)
 include (CheckCSourceCompiles)
 include (CheckSymbolExists)
 include (CheckLibraryExists)
-include (FindThreads)
 
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_include_files.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_functions_exist.cmake )
@@ -33,11 +32,17 @@ set(COPYRIGHT_YEARS "2001-2008")
 OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
 OPTION( ENABLE_VLM             "Enable vlm" ON )
 OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
+OPTION( UPDATE_CHECK           "Enable automatic new version checking" OFF )
 OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" ON )
 
 IF (NOT CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING  "build type determining compiler flags" FORCE )
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING  "build type determining compiler flags" FORCE )
 endif(NOT CMAKE_BUILD_TYPE )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DEBUG ON)
+    set(NDEBUG ON)
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 set( HAVE_DYNAMIC_PLUGINS ${ENABLE_DYNAMIC_PLUGINS})
 set( LIBEXT ${CMAKE_SHARED_MODULE_SUFFIX})
@@ -53,24 +58,33 @@ vlc_check_include_files (signal.h unistd.h dirent.h)
 vlc_check_include_files (netinet/in.h netinet/udplite.h)
 vlc_check_include_files (arpa/inet.h net/if.h)
 vlc_check_include_files (netdb.h fcntl.h sys/time.h poll.h)
-vlc_check_include_files (errno.h time.h)
+vlc_check_include_files (errno.h time.h alloca.h)
+vlc_check_include_files (limits.h)
+
+vlc_check_include_files (string.h strings.h getopt.h)
 
 vlc_check_include_files (dlfcn.h dl.h)
 
 vlc_check_include_files (kernel/OS.h)
+vlc_check_include_files (memory.h)
 vlc_check_include_files (mach-o/dyld.h)
 
+vlc_check_include_files (pthread.h)
+
+find_package (Threads)
 
 ###########################################################
 # Functions/structures checks
 ###########################################################
-
+set(CMAKE_REQUIRED_LIBRARIES c)
 set(CMAKE_EXTRA_INCLUDE_FILES string.h)
 vlc_check_functions_exist(strcpy strcasecmp)
 vlc_check_functions_exist(strcasestr strdup)
 vlc_check_functions_exist(strndup stricmp strnicmp)
 vlc_check_functions_exist(atof strtoll atoll lldiv)
-vlc_check_functions_exist(strlcpy)
+vlc_check_functions_exist(strlcpy stristr strnlen strsep)
+vlc_check_functions_exist(strtod strtof strtol stroul)
+vlc_check_functions_exist(stroull)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES stdio.h)
@@ -80,6 +94,26 @@ set(CMAKE_EXTRA_INCLUDE_FILES)
 set(CMAKE_EXTRA_INCLUDE_FILES libc.h)
 vlc_check_functions_exist(fork)
 set(CMAKE_EXTRA_INCLUDE_FILES)
+
+set(CMAKE_EXTRA_INCLUDE_FILES stdlib.h)
+vlc_check_functions_exist(putenv getenv setenv)
+vlc_check_functions_exist(putenv getenv setenv)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
+set(CMAKE_EXTRA_INCLUDE_FILES stdio.h)
+vlc_check_functions_exist(snprintf asprintf)
+vlc_check_functions_exist(putenv getenv setenv)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
+set(CMAKE_EXTRA_INCLUDE_FILES unistd.h)
+vlc_check_functions_exist(isatty getcwd getuid)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
+set(CMAKE_EXTRA_INCLUDE_FILES sys/stat.h)
+vlc_check_functions_exist(lstat fstat stat)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
+set(CMAKE_REQUIRED_LIBRARIES)
 
 check_library_exists(poll poll "" HAVE_POLL)
 
@@ -99,10 +133,15 @@ check_c_source_compiles (
  #endif
  int main() { return 0;}" HAVE_STDINT_H_WITH_UINTMAX)
 
-check_symbol_exists(ntohl "sys/param.h" NTOHL_IN_SYS_PARAM_H)
-check_symbol_exists(scandir "dirent.h" HAVE_SCANDIR)
-check_symbol_exists(scandir "dirent.h" HAVE_SCANDIR)
+check_symbol_exists(ntohl "sys/param.h"  NTOHL_IN_SYS_PARAM_H)
+check_symbol_exists(scandir "dirent.h"   HAVE_SCANDIR)
+check_symbol_exists(scandir "dirent.h"   HAVE_SCANDIR)
 check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
+check_symbol_exists(alloca "alloca.h"    HAVE_ALLOCA)
+
+check_symbol_exists(va_copy "stdarg.h"   HAVE_VACOPY)
+check_symbol_exists(__va_copy "stdarg.h" HAVE___VA_COPY)
+
 
 check_symbol_exists(getnameinfo "sys/types.h;sys/socket.h;netdb.h" HAVE_GETNAMEINFO)
 check_symbol_exists(getaddrinfo "sys/types.h;sys/socket.h;netdb.h" HAVE_GETADDRINFO)
@@ -135,6 +174,16 @@ if (HAVE_LIBM)
     set (LIBM "m")
 endif (HAVE_LIBM)
 
+check_symbol_exists(connect "sys/types.h;sys/socket.h" HAVE_CONNECT)
+if(NOT HAVE_CONNECT)
+    check_library_exists(connect socket HAVE_CONNECT)
+    if(NOT HAVE_CONNECT)
+        vlc_module_add_link_libraries(libvlc connect)
+        vlc_module_add_link_libraries(cdda   connect)
+        vlc_module_add_link_libraries(cddax  connect)
+    endif(HAVE_CONNECT)
+endif(NOT HAVE_CONNECT)
+
 ###########################################################
 # Other check
 ###########################################################
@@ -157,6 +206,13 @@ if(APPLE)
     set(SYS_DARWIN 1)
     add_definitions(-std=gnu99) # Hack for obj-c files to be compiled with gnu99
     vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext)
+
+    vlc_check_include_files (ApplicationServices/ApplicationServices.h)
+    vlc_check_include_files (Carbon/Carbon.h)
+    vlc_check_include_files (CoreAudio/CoreAudio.h)
+
+   # check_symbol_exists (CFLocaleCopyCurrent "CoreFoundation/CoreFoundation.h" "" HAVE_CFLOCALECOPYCURRENT)
+   # check_symbol_exists (CFPreferencesCopyAppValue "CoreFoundation/CoreFoundation.h" "" HAVE_CFPREFERENCESCOPYAPPVALUE)
 
     vlc_find_frameworks(Cocoa Carbon OpenGL AGL IOKit Quicktime
                         WebKit QuartzCore Foundation ApplicationServices)
@@ -326,6 +382,7 @@ find_package(Lua)
 if(Lua_FOUND)
   set(HAVE_LUA TRUE)
   vlc_enable_modules(lua)
+  vlc_check_include_files (lua.h lualib.h)
   vlc_add_module_compile_flag(lua ${Lua_CFLAGS} )
   vlc_module_add_link_libraries(lua ${Lua_LIBRARIES})
 endif(Lua_FOUND)
