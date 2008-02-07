@@ -71,6 +71,7 @@ HEADERS_include = \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_playlist.h \
+	../include/vlc_plugin.h \
 	../include/vlc_rand.h \
 	../include/vlc_services_discovery.h \
 	../include/vlc_sout.h \
@@ -307,6 +308,7 @@ SOURCES_libvlc_common = \
 	config/core.c \
 	config/chain.c \
 	config/file.c \
+	config/intf.c \
 	config/cmdline.c \
 	misc/events.c \
 	misc/image.c \
