@@ -36,6 +36,9 @@
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>
 #endif
+#ifdef HAVE_MACH_O_DYLD_H
+#   include <mach-o/dyld.h>
+#endif
 
 /* CFLocaleCopyAvailableLocaleIdentifiers is present only on post-10.4 */
 extern CFArrayRef CFLocaleCopyAvailableLocaleIdentifiers(void) __attribute__((weak_import));
@@ -101,6 +104,13 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
         }
     }
 
+    if( !p_char )
+    {
+        char path[MAXPATHLEN+1];
+        uint32_t path_len = MAXPATHLEN;
+        if ( !_NSGetExecutablePath(path, &path_len) )
+            p_char = strdup(path);
+    }
     if( !p_char )
     {
         /* We are not linked to the VLC.framework, return the executable path */
