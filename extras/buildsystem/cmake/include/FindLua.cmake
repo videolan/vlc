@@ -12,7 +12,7 @@ if (NOT Lua_SEARCHED)
     set(Lua_SEARCHED TRUE CACHE INTERNAL "")
     set(Lua_FOUND FALSE CACHE INTERNAL "")
 
-    pkg_check_modules(Lua lua>=5.1)
+    pkg_check_modules(Lua lua>=5.1 lua5.1)
 
     if (NOT Lua_FOUND)
         find_library( Lua_LIBRARY NAMES lua5.1 lua51 lua)
