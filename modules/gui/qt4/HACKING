@@ -1,0 +1,37 @@
+Small Hacking file for the Qt Interface
+
+If you ever code for Qt4 interface, please read this before.
+
+** Code Convetions **
+
+Please respect VLC code conventions here:
+ - NO trailing spaces
+ - NO tab
+ - Indentation is 4 spaces
+ - Braces ARE indented
+ - Space before and after operators
+ - Case labels are on the same column as the switch
+
+Refer to http://wiki.videolan.org/Code_Conventions it should be up to date
+
+** Naming **
+This naming is stupid and inconsistent :D
+
+Try to prefix with psz_, i_, b_, ui_ for the normal basic C/C++ styles.
+
+If you have spare time, prefix QString with qs_.
+
+Use aPointerName over a_pointer_name for long names.
+
+** QVLCFrame vs QVLCDialog **
+
+A QVLCFrame is just a QWidget, without any parent and used as a Qt::Windows
+A QVLCDialog is a QDialog.
+
+This mean that the QVLCDialog is centered on the parent and ABOVE it, will be destroyed by the parent automatically.
+This also mean that you have to destroy the QVLCFrame and to save its position/size.
+
+So if your dialog is a dialog you are used to keep during a playing of a video, then use a QVLCFrame, else use a QVLCDialog, if this is something you do over anything else.
+
+QVLCFrame: extended panel, messages...
+QVLCDialog: preferences, open...
