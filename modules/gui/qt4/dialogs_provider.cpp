@@ -77,6 +77,7 @@ DialogsProvider::~DialogsProvider()
     MediaInfoDialog::killInstance();
     MessagesDialog::killInstance();
     ExtendedDialog::killInstance();
+    BookmarksDialog::killInstance();
     fixed_timer->stop();
 }
 

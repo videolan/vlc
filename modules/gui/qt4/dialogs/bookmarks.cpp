@@ -77,10 +77,12 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     BUTTONACT( clearButton, clear() );
     BUTTONACT( extractButton, extract() );
 
+    readSettings( "Bookmarks" );
 }
 
 BookmarksDialog::~BookmarksDialog()
 {
+    writeSettings( "Bookmarks" );
 }
 
 void BookmarksDialog::update()

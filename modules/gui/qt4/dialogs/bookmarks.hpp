@@ -40,8 +40,12 @@ public:
             instance = new BookmarksDialog( p_intf );
         return instance;
     }
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance = NULL;
+    }
     virtual ~BookmarksDialog();
-    static bool exists() { return ( instance != NULL ) ; }
 private:
     BookmarksDialog( intf_thread_t * );
     static BookmarksDialog *instance;
