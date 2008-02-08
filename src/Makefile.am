@@ -8,7 +8,7 @@ NULL =
 EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c ../include/vlc_about.h
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES) libvlc.sym
 
 ###############################################################################
 # Headers
