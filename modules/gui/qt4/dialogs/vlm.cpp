@@ -292,7 +292,7 @@ void VLMDialog::clearWidgets()
 
 void VLMDialog::selectInput()
 {
-    OpenDialog *o = OpenDialog::getInstance( this, p_intf, 0, true );
+    OpenDialog *o = OpenDialog::getInstance( this, p_intf, SELECT, true );
     o->exec();
     ui.inputLedit->setText( o->getMRL() );
 }
