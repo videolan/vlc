@@ -45,9 +45,9 @@ AUTOMAKE_OPTIONS = \
 	1.9 \
 	-Wall \
 	check-news \
-	std-options \
 	dist-bzip2 \
 	no-dist-gzip
+#	std-options
 
 ###############################################################################
 # MacOS X project
@@ -322,6 +322,7 @@ endif
 
 ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc
 bin_SCRIPTS += $(ALIASES)
+CLEANFILES += $(ALIASES)
 EXTRA_SCRIPTS = $(ALL_ALIASES)
 
 dist_noinst_SCRIPTS += make-alias
