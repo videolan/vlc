@@ -74,10 +74,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     BUTTONACT( clearButton, clear() );
     BUTTONACT( saveLogButton, save() );
     ON_TIMEOUT( updateLog() );
-}
 
-MessagesDialog::~MessagesDialog()
-{
+    readSettings( "Messages" );
 }
 
 void MessagesDialog::updateLog()

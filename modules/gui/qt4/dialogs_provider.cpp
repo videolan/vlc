@@ -72,8 +72,10 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 
 DialogsProvider::~DialogsProvider()
 {
+    msg_Dbg( p_intf, "Destroying the Dialog Provider" );
     PlaylistDialog::killInstance();
     MediaInfoDialog::killInstance();
+    MessagesDialog::killInstance();
     fixed_timer->stop();
 }
 

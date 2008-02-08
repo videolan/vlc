@@ -42,7 +42,13 @@ public:
             instance = new MessagesDialog( p_intf );
         return instance;
     }
-    virtual ~MessagesDialog();
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance = NULL;
+    }
+
+    virtual ~MessagesDialog(){ writeSettings( "messages" ); };
 
 private:
     MessagesDialog( intf_thread_t * );
