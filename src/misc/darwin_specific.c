@@ -40,6 +40,10 @@
 #   include <mach-o/dyld.h>
 #endif
 
+#ifndef MAXPATHLEN
+# define MAXPATHLEN 1024
+#endif
+
 /* CFLocaleCopyAvailableLocaleIdentifiers is present only on post-10.4 */
 extern CFArrayRef CFLocaleCopyAvailableLocaleIdentifiers(void) __attribute__((weak_import));
 
@@ -75,18 +79,18 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
     char i_dummy;
     char *p_char = NULL;
     char *p_oldchar = &i_dummy;
-    int i;
+    unsigned int i;
 
     /* Get the full program path and name */
 
     /* First try to see if we are linked to the framework */
     for (i = 0; i < _dyld_image_count(); i++)
     {
-        char * psz_img_name = _dyld_get_image_name(i);
+        const char * psz_img_name = _dyld_get_image_name(i);
         /* Check for "VLCKit.framework/Versions/Current/VLCKit",
          * as well as "VLCKit.framework/Versions/A/VLCKit" and
          * "VLC.framework/Versions/B/VLCKit" */
-        if( p_char = strstr( psz_img_name, "VLCKit.framework/Versions/" ))
+        if( (p_char = strstr( psz_img_name, "VLCKit.framework/Versions/" )) )
         {
             /* Look for the next forward slash */
             p_char += 26; /* p_char += strlen(" VLCKit.framework/Versions/" ) */
