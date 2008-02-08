@@ -830,7 +830,6 @@ SpeedControlWidget::~SpeedControlWidget()
 
 void SpeedControlWidget::mouseDoubleClickEvent( QMouseEvent * event )
 {
-    msg_Dbg( p_intf, "coin coin" );
     resetRate();
 }
 
