@@ -82,7 +82,7 @@ static void AppThread( vlc_object_t *p_appthread );
 /*****************************************************************************
  * system_Init: create a BApplication object and fill in program path.
  *****************************************************************************/
-void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
     vlc_global()->p_appthread =
             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
@@ -95,7 +95,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( libvlc_int_t *, int *pi_argc, char *ppsz_argv[] )
+void system_Configure( libvlc_int_t *, int *pi_argc, const char *ppsz_argv[] )
 {
 }
 

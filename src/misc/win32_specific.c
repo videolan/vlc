@@ -45,7 +45,7 @@
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
-void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
     WSADATA Data;
 
@@ -139,7 +139,7 @@ typedef struct
   char data[0];
 } vlc_ipc_data_t;
 
-void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
 #if !defined( UNDER_CE )
     /* Raise default priority of the current process */

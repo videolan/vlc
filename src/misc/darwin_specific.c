@@ -74,12 +74,13 @@ static CFArrayRef copy_all_locale_indentifiers(void)
 /*****************************************************************************
  * system_Init: fill in program path & retrieve language
  *****************************************************************************/
-void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
     char i_dummy;
     char *p_char = NULL;
     char *p_oldchar = &i_dummy;
     unsigned int i;
+    (void)pi_argc;
 
     /* Get the full program path and name */
 
@@ -174,9 +175,11 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
-
+    (void)p_this;
+    (void)pi_argc;
+    (void)ppsz_argv;
 }
 
 /*****************************************************************************
@@ -184,6 +187,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_End( libvlc_int_t *p_this )
 {
+    (void)p_this;
     free( vlc_global()->psz_vlcpath );
 
     if ( vlc_global()->iconv_macosx != (vlc_iconv_t)-1 )
