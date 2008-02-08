@@ -476,7 +476,7 @@ QMenu *QVLCMenu::HelpMenu()
     addDPStaticEntry( menu, qtr( "Help..." ) , "",
         ":/pixmaps/menus_help_16px.png", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
-    addDPStaticEntry( menu, qtr( "Update" ) , "", "", SLOT( updateDialog() ), "");
+    addDPStaticEntry( menu, qtr( "Check for updates..." ) , "", "", SLOT( updateDialog() ), "");
 #endif
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( I_MENU_ABOUT ), "", "", SLOT( aboutDialog() ),
