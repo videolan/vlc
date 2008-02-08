@@ -216,11 +216,20 @@ static void Close( vlc_object_t * );
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
 #define ME_TEXT N_("Integer pixel motion estimation method")
+#if X264_BUILD >= 58 /* r728 */
+#define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
+    " - dia: diamond search, radius 1 (fast)\n" \
+    " - hex: hexagonal search, radius 2\n" \
+    " - umh: uneven multi-hexagon search (better but slower)\n" \
+    " - esa: exhaustive search (extremely slow, primarily for testing)\n" \
+    " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n" )
+#else
 #define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
     " - dia: diamond search, radius 1 (fast)\n" \
     " - hex: hexagonal search, radius 2\n" \
     " - umh: uneven multi-hexagon search (better but slower)\n" \
     " - esa: exhaustive search (extremely slow, primarily for testing)\n" )
+#endif
 
 #if X264_BUILD >= 24
 #define MERANGE_TEXT N_("Maximum motion vector search range")
@@ -345,11 +354,18 @@ static void Close( vlc_object_t * );
 #define AUD_TEXT N_("Access unit delimiters")
 #define AUD_LONGTEXT N_( "Generate access unit delimiter NAL units.")
 
-#if X264_BUILD >= 24
+#if X264_BUILD >= 24 && X264_BUILD < 58
 static const char *enc_me_list[] =
   { "dia", "hex", "umh", "esa" };
 static const char *enc_me_list_text[] =
   { N_("dia"), N_("hex"), N_("umh"), N_("esa") };
+#endif
+
+#if X264_BUILD >= 58 /* r728 */
+static const char *enc_me_list[] =
+  { "dia", "hex", "umh", "esa", "tesa" };
+static const char *enc_me_list_text[] =
+  { N_("dia"), N_("hex"), N_("umh"), N_("esa"), N_("tesa") };
 #endif
 
 static const char *enc_analyse_list[] =
@@ -917,6 +933,12 @@ static int  Open ( vlc_object_t *p_this )
     {
         p_sys->param.analyse.i_me_method = X264_ME_ESA;
     }
+    #if X264_BUILD >= 58 /* r728 */
+        else if( !strcmp( val.psz_string, "tesa" ) )
+        {
+            p_sys->param.analyse.i_me_method = X264_ME_TESA;
+        }
+    #endif
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "merange", &val );
