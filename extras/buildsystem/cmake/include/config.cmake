@@ -113,6 +113,10 @@ set(CMAKE_EXTRA_INCLUDE_FILES sys/stat.h)
 vlc_check_functions_exist(lstat fstat stat)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
+set(CMAKE_EXTRA_INCLUDE_FILES arpa/inet.h)
+vlc_check_functions_exist(inet_pton inet_aton inet_ntop inet_pton)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
 set(CMAKE_REQUIRED_LIBRARIES)
 
 check_library_exists(poll poll "" HAVE_POLL)
