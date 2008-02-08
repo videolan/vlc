@@ -71,7 +71,7 @@ FOREACH( pofile ${POFILES} )
 ENDFOREACH( pofile)
 
 ADD_CUSTOM_TARGET( all-po ALL
-    DEPENDS ${po-target}
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${po-target}
 )
 
 foreach( pofile ${POFILES} )
