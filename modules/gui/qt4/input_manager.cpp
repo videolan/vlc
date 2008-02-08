@@ -156,6 +156,9 @@ void InputManager::customEvent( QEvent *event )
          type != ItemStateChanged_Type )
         return;
 
+    if( type != PositionUpdate_Type )
+        msg_Dbg( p_intf, "New Event: type %i", type );
+
     /* Delete the input */
     if( !p_input || p_input->b_dead || p_input->b_die )
     {
