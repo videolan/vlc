@@ -398,7 +398,23 @@ if(QT4_FOUND)
   vlc_check_include_files (qt.h)
   vlc_enable_modules(qt4)
   vlc_add_module_compile_flag(qt4 ${QT_CFLAGS} )
-  vlc_module_add_link_libraries(qt4 ${QT_LIBRARIES} Qt4)
+  vlc_module_add_link_libraries(qt4 ${QT_LIBRARIES})
+  # Define our own qt4_wrap_ui macro to match wanted behaviour
+  MACRO (VLC_QT4_WRAP_UI outfiles )
+    FOREACH (it ${ARGN})
+     string(REPLACE ".ui" ".h" outfile "${it}")
+      GET_FILENAME_COMPONENT(infile ${it} ABSOLUTE)
+      SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile})
+      ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
+        COMMAND mkdir -p `dirname ${outfile}`
+        COMMAND ${QT_UIC_EXECUTABLE}
+        ARGS -o ${outfile} ${infile}
+        MAIN_DEPENDENCY ${infile})
+      SET(${outfiles} ${${outfiles}} ${outfile})
+    ENDFOREACH (it)
+
+  ENDMACRO (VLC_QT4_WRAP_UI)
+
 endif(QT4_FOUND)
 
 find_package(OpenGL)
