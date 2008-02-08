@@ -400,6 +400,13 @@ if(Qt4_FOUND)
   vlc_module_add_link_libraries(qt4 ${Qt4_LIBRARIES} Qt4)
 endif(Qt4_FOUND)
 
+find_package(OpenGL)
+if(OPENGL_FOUND)
+  vlc_enable_modules(opengl)
+  vlc_add_module_compile_flag(opengl ${OPENGL_CFLAGS})
+  vlc_module_add_link_libraries(opengl ${OPENGL_LIBRARIES})
+endif(OPENGL_FOUND)
+
 set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
