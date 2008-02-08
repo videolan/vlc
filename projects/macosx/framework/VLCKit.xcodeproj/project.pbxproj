@@ -423,13 +423,14 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/../../../extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh",
 			);
 			outputPaths = (
 				$SRCROOT/../../../CMakeLists.txt,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ntop_srcdir=`pwd`/../../..\ncd $top_srcdir && ./extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh";
+			shellScript = "top_srcdir=`pwd`/../../..\n\nif test $ACTION = \"clean\"\nthen\n    rm -f $top_srcdir/CMakeLists.txt\n    exit 0\nfi\n\ncd $top_srcdir && ./extras/buildsystem/cmake/scripts/convert_vlc_to_cmake.sh";
 			showEnvVarsInLog = 0;
 		};
 		633BD6E30D2ADF030012A314 /* ShellScript */ = {
@@ -471,6 +472,7 @@
 				$SRCROOT/../../../CMakeLists.txt,
 			);
 			outputPaths = (
+				$SYMROOT/vlc_build_dir/CMakeCache.txt,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
