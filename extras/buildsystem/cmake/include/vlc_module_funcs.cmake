@@ -8,6 +8,7 @@ MACRO(vlc_add_module module_name)
         endif( NOT ${ENABLE_NO_SYMBOL_CHECK} )
         set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
                 "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}" )
+        set_target_properties( ${module_name}_plugin PROPERTIES LINK_FLAGS "${VLC_${module_name}_LINK_FLAGS}" )
         if (VLC_${module_name}_LINK_LIBRARIES)
             target_link_libraries( ${module_name}_plugin ${VLC_${module_name}_LINK_LIBRARIES})
         endif (VLC_${module_name}_LINK_LIBRARIES)
@@ -41,6 +42,10 @@ ENDMACRO(vlc_set_module_properties)
 MACRO(vlc_set_module_properties module_name)
     set_target_properties(${module_name}_plugin ${ARGN})
 ENDMACRO(vlc_set_module_properties)
+
+MACRO(vlc_module_add_link_flags module_name)
+    set(VLC_${module_name}_LINK_FLAGS ${VLC_${module_name}_LINK_FLAGS} ${ARGN})
+ENDMACRO(vlc_module_add_link_flags)
 
 MACRO(vlc_module_add_link_libraries module_name)
     set(VLC_${module_name}_LINK_LIBRARIES ${VLC_${module_name}_LINK_LIBRARIES} ${ARGN})

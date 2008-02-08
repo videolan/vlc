@@ -216,6 +216,9 @@ if(APPLE)
     add_definitions(-std=gnu99) # Hack for obj-c files to be compiled with gnu99
     vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext)
 
+    # On Pre-10.5
+    vlc_module_add_link_flags (ffmpeg "-read_only_relocs warning")
+
     vlc_check_include_files (ApplicationServices/ApplicationServices.h)
     vlc_check_include_files (Carbon/Carbon.h)
     vlc_check_include_files (CoreAudio/CoreAudio.h)
