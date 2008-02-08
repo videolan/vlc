@@ -53,7 +53,9 @@ public:
 protected:
     intf_thread_t *p_intf;
 
-    void readSettings( QString name, QSize defSize, QPoint defPos )
+    void readSettings( QString name,
+                       QSize defSize = QSize( 0, 0 ),
+                       QPoint defPos = QPoint( 0, 0 ) )
     {
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
@@ -157,7 +159,6 @@ protected:
         QSettings settings( "vlc", "vlc-qt-interface" );
         settings.beginGroup( name );
         QSize s =  settings.value( "size", defSize ).toSize() ;
-        fprintf( stderr, "%i %i ", s.width(), s.height() );
         move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
         settings.endGroup();
     }
