@@ -247,6 +247,8 @@ public:
     SpeedControlWidget( intf_thread_t *);
     virtual ~SpeedControlWidget();
     void updateControls( int );
+protected:
+    virtual void mouseDoubleClickEvent( QMouseEvent * event );
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;

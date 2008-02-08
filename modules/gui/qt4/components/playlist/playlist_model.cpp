@@ -25,18 +25,19 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-#include <QIcon>
-#include <QFont>
-#include <QMenu>
-#include <QApplication>
-
 #include "qt4.hpp"
 #include "components/playlist/playlist_model.hpp"
 #include "dialogs/mediainfo.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/type_unknown.xpm"
+
+#include <assert.h>
+#include <QIcon>
+#include <QFont>
+#include <QMenu>
+#include <QApplication>
+#include <QSettings>
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 

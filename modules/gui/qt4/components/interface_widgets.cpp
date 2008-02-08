@@ -828,6 +828,12 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
 SpeedControlWidget::~SpeedControlWidget()
 {}
 
+void SpeedControlWidget::mouseDoubleClickEvent( QMouseEvent * event )
+{
+    msg_Dbg( p_intf, "coin coin" );
+    resetRate();
+}
+
 #define RATE_SLIDER_MAXIMUM 3.0
 #define RATE_SLIDER_MINIMUM 0.3
 #define RATE_SLIDER_LENGTH 100.0
