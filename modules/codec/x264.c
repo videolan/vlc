@@ -515,7 +515,7 @@ vlc_module_begin();
         change_string_list( direct_pred_list, direct_pred_list_text, 0 );
 
 #if X264_BUILD >= 52 /* r573 */
-    add_integer( SOUT_CFG_PREFIX "direct-8x8", 0, NULL, DIRECT_PRED_SIZE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "direct-8x8", -1, NULL, DIRECT_PRED_SIZE_TEXT,
                  DIRECT_PRED_SIZE_LONGTEXT, VLC_FALSE );
         change_integer_range( -1, 1 );
 #endif
