@@ -79,7 +79,9 @@ DialogsProvider::~DialogsProvider()
     ExtendedDialog::killInstance();
     BookmarksDialog::killInstance();
     HelpDialog::killInstance();
+#ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
+#endif
 
     fixed_timer->stop();
 }
