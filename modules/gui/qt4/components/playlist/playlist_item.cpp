@@ -1,10 +1,11 @@
 /*****************************************************************************
  * playlist_item.cpp : Manage playlist item
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright © 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +66,8 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
         }
         else
         {
-            i_showflags = config_GetInt( model->p_intf, "qt-pl-showflags" );
+            QSettings settings( "vlc", "vlc-qt-interface" );
+            i_showflags = settings.value( "qt-pl-showflags" ).toInt();
             updateColumnHeaders();
         }
     }

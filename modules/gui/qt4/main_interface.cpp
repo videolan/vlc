@@ -474,6 +474,7 @@ inline void MainInterface::askForPrivacy()
             }
 
             config_PutInt( p_intf,  "qt-privacy-ask" , 0 );
+            /* We have to save here because the user may not launch Prefs */
             config_SaveConfigFile( p_intf, NULL );
         }
     }

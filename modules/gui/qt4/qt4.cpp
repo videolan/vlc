@@ -1,7 +1,7 @@
 /*****************************************************************************
  * qt4.cpp : QT4 interface
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright © 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -93,11 +93,6 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
-#define SHOWFLAGS_TEXT N_( "Define what columns to show in playlist window" )
-#define SHOWFLAGS_LONGTEXT N_( "Enter the sum of the options that you want: \n" \
-                               "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
-                           "Copyright: 16; Collection/album: 32; Rating: 256." )
-
 #define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
 
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
@@ -186,13 +181,6 @@ vlc_module_begin();
         add_integer( "qt-updates-days", 14, NULL, UPDATER_DAYS_TEXT,
                 UPDATER_DAYS_TEXT, VLC_FALSE );
 #endif
-
-        add_integer( "qt-pl-showflags",
-                VLC_META_ENGINE_ARTIST|VLC_META_ENGINE_TITLE|
-                VLC_META_ENGINE_DURATION|VLC_META_ENGINE_COLLECTION,
-                NULL, SHOWFLAGS_TEXT,
-                SHOWFLAGS_LONGTEXT, VLC_TRUE );
-            change_autosave();
 
         add_bool( "qt-open-detail", VLC_FALSE, NULL, VIEWDETAIL_TEXT,
                 VIEWDETAIL_TEXT, VLC_FALSE );

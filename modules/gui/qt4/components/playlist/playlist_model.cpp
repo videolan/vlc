@@ -98,8 +98,8 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
 PLModel::~PLModel()
 {
-    config_PutInt( p_intf, "qt-pl-showflags", rootItem->i_showflags );
-    config_SaveConfigFile( p_intf, NULL );
+    QSettings settings( "vlc", "vlc-qt-interface" );
+    settings.setValue( "qt-pl-showflags", rootItem->i_showflags );
     delCallbacks();
     delete rootItem;
 }
