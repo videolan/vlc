@@ -474,7 +474,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ntop_srcdir=`pwd`/../../..\nmkdir -p $SYMROOT/vlc_build_dir\nrm -Rf $top_srcdir/CMakeCache.txt\ncd $SYMROOT/vlc_build_dir && cmake $top_srcdir";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ntop_srcdir=`pwd`/../../..\nmkdir -p $SYMROOT/vlc_build_dir\nrm -Rf $top_srcdir/CMakeCache.txt\ncd $SYMROOT/vlc_build_dir && $top_srcdir/extras/contrib/bin/cmake $top_srcdir";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
