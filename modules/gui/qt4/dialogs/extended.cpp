@@ -85,11 +85,8 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     readSettings( "EPanel", QSize( 400, 280 ), QPoint( 450, 0 ) );
 }
 
-void ExtendedDialog::savingSettings()
+ExtendedDialog::~ExtendedDialog()
 {
     writeSettings( "EPanel" );
 }
-
-ExtendedDialog::~ExtendedDialog()
-{}
 

@@ -36,9 +36,12 @@ public:
             instance = new ExtendedDialog( p_intf );
         return instance;
     }
+    static void killInstance()
+    {
+        if( instance ) delete instance;
+        instance = NULL;
+    }
     virtual ~ExtendedDialog();
-    static bool exists(){ return ( instance != NULL ) ; }
-    void savingSettings();
 private:
     ExtendedDialog( intf_thread_t * );
     static ExtendedDialog *instance;

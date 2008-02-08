@@ -273,8 +273,6 @@ MainInterface::~MainInterface()
     msg_Dbg( p_intf, "Destroying the main interface" );
 
     if( playlistWidget ) playlistWidget->savingSettings( settings );
-    if( ExtendedDialog::exists() )
-        ExtendedDialog::getInstance( p_intf )->savingSettings();
 
     settings->beginGroup( "MainWindow" );
 //    settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
