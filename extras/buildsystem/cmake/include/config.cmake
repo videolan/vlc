@@ -369,6 +369,24 @@ endif(${LIBCDDB_FOUND})
 find_package(Dlopen)
 set(HAVE_DL_DLOPEN ${Dlopen_FOUND})
 
+# Advanced Linux Sound Architecture (ALSA)
+pkg_check_modules(ALSA alsa>=1.0.0-rc4)
+if (${ALSA_FOUND})
+  set (HAVE_ALSA_NEW_API "1")
+else (${ALSA_FOUND})
+  pkg_check_modules(ALSA alsa)
+endif (${ALSA_FOUND})
+
+if (${ALSA_FOUND})
+  set (HAVE_ALSA "1")
+  vlc_enable_modules(alsa)
+  vlc_add_module_compile_flag(alsa ${ALSA_CFLAGS})
+  vlc_module_add_link_libraries(alsa ${ALSA_LIBRARIES})
+endif (${ALSA_FOUND})
+
+# Open Sound System (OSS)
+# TODO
+
 find_package(FFmpeg)
 if(FFmpeg_FOUND)
   vlc_check_include_files (ffmpeg/avcodec.h)
