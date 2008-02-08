@@ -73,7 +73,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* TODO List id3genres.h is not includable yet ? */
     genre_text = new QLineEdit;
     metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
-    metaLayout->addWidget( genre_text, line, 1, 1, 4 );
+    metaLayout->addWidget( genre_text, line, 1, 1, 3 );
 
     /* Number - on the same line */
     metaLayout->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
@@ -98,10 +98,10 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( rating_text, line, 6, 1, 1 );
     */
     /* Language on the same line */
-    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 7, 1, 2 );
+    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 5, 1, 2 );
     language_text = new QLineEdit;
     language_text->setReadOnly( true );
-    metaLayout->addWidget( language_text, line,  9, 1, 1 );
+    metaLayout->addWidget( language_text, line,  7, 1, 3 );
     line++;
 
     /* ART_URL */
@@ -112,7 +112,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover->setMaximumWidth( 128 );
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    metaLayout->addWidget( art_cover, line, 8, 4, 2 );
+    metaLayout->addWidget( art_cover, line, 8, 4, 2, Qt::AlignRight );
 
 /* Settings is unused */
 /*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
@@ -139,6 +139,8 @@ MetaPanel::MetaPanel( QWidget *parent,
     /*  ADD_META( TRACKID )  Useless ? */
     /*  ADD_URI - DO not show it, done outside */
 
+    metaLayout->setColumnStretch( 1, 2 );
+    metaLayout->setColumnMinimumWidth ( 1, 80 );
 #undef ADD_META
 #undef ADD_META_2
 
