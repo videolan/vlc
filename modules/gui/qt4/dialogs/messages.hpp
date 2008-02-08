@@ -31,6 +31,8 @@ class QSpinBox;
 class QGridLayout;
 class QLabel;
 class QTextEdit;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 class MessagesDialog : public QVLCFrame
 {
@@ -55,11 +57,15 @@ private:
     static MessagesDialog *instance;
     QSpinBox *verbosityBox;
     QTextEdit *messages;
+    QTreeWidget *modulesTree;
 private slots:
     void updateLog();
+    void updateTree();
     void close();
     void clear();
     bool save();
+private:
+    void buildTree( QTreeWidgetItem *, vlc_object_t * );
 };
 
 #endif

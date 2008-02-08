@@ -35,6 +35,9 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QTabWidget>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 MessagesDialog *MessagesDialog::instance = NULL;
 
@@ -43,11 +46,25 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     setWindowTitle( qtr( "Messages" ) );
     resize( 600, 450 );
 
-    QGridLayout *layout = new QGridLayout( this );
+    /* General widgets */
+    QGridLayout *mainLayout = new QGridLayout( this );
+    QTabWidget  *mainTab = new QTabWidget( this );
+    mainTab->setTabPosition( QTabWidget::North );
+
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    closeButton->setDefault( true );
+    BUTTONACT( closeButton, close() );
+
+    mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
+    mainLayout->addWidget( closeButton, 1, 5 );
+
+
+    /* Messages */
+    QWidget     *msgWidget = new QWidget;
+    QGridLayout *msgLayout = new QGridLayout( msgWidget );
+
     QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
     QPushButton *saveLogButton = new QPushButton( qtr( "&Save as..." ) );
-    closeButton->setDefault( true );
 
     verbosityBox = new QSpinBox();
     verbosityBox->setRange( 0, 2 );
@@ -62,18 +79,35 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     messages->setGeometry( 0, 0, 440, 600 );
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
-    layout->addWidget( messages, 0, 0, 1, 0 );
-    layout->addWidget( verbosityLabel, 1, 0, 1, 1 );
-    layout->addWidget( verbosityBox, 1, 1 );
-    layout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 1, 2 );
-    layout->addWidget( saveLogButton, 1, 3 );
-    layout->addWidget( clearButton, 1, 4 );
-    layout->addWidget( closeButton, 1, 5 );
+    msgLayout->addWidget( messages, 0, 0, 1, 0 );
+    msgLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
+    msgLayout->addWidget( verbosityBox, 1, 1 );
+    msgLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 1, 2 );
+    msgLayout->addWidget( saveLogButton, 1, 3 );
+    msgLayout->addWidget( clearButton, 1, 4 );
 
-    BUTTONACT( closeButton, close() );
     BUTTONACT( clearButton, clear() );
     BUTTONACT( saveLogButton, save() );
     ON_TIMEOUT( updateLog() );
+
+    mainTab->addTab( msgWidget, qtr( "Messages" ) );
+
+    /* Module tree */
+    QWidget     *treeWidget = new QWidget;
+    QGridLayout *treeLayout = new QGridLayout( treeWidget );
+
+    modulesTree = new QTreeWidget();
+    modulesTree->setGeometry( 0, 0, 440, 600 );
+
+    QPushButton *updateButton = new QPushButton( qtr( "&Update" ) );
+
+    treeLayout->addWidget( modulesTree, 0, 0, 1, 0 );
+    treeLayout->addWidget( updateButton, 1, 6 );
+
+    BUTTONACT( updateButton, updateTree() );
+
+    mainTab->addTab( treeWidget, qtr( "Modules tree" ) );
+
 
     readSettings( "Messages" );
 }
@@ -142,6 +176,36 @@ void MessagesDialog::updateLog()
         p_sub->i_start = i_start;
         vlc_mutex_unlock( p_sub->p_lock );
     }
+}
+
+void MessagesDialog::buildTree( QTreeWidgetItem *parentItem, vlc_object_t *p_obj )
+{
+    vlc_object_yield( p_obj );
+    QTreeWidgetItem *item;
+
+    if( parentItem )
+        item = new QTreeWidgetItem( parentItem );
+    else
+        item = new QTreeWidgetItem( modulesTree );
+
+    if( p_obj->psz_object_name )
+        item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" + qfu( p_obj->psz_object_name ) + "\" (" + QString::number(p_obj->i_object_id) + ")\n" );
+    else
+        item->setText( 0, qfu( p_obj->psz_object_type ) + " (" + QString::number(p_obj->i_object_id) + ")\n" );
+
+    for( int i=0; i < p_obj->i_children; i++ )
+    {
+        buildTree( item, p_obj->pp_children[i]);
+    }
+
+    vlc_object_release( p_obj );
+}
+
+void MessagesDialog::updateTree()
+{
+    modulesTree->clear();
+
+    buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
 }
 
 void MessagesDialog::close()
