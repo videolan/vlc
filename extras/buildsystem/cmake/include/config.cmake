@@ -181,7 +181,7 @@ if(NOT HAVE_CONNECT)
         vlc_module_add_link_libraries(libvlc connect)
         vlc_module_add_link_libraries(cdda   connect)
         vlc_module_add_link_libraries(cddax  connect)
-    endif(HAVE_CONNECT)
+    endif(NOT HAVE_CONNECT)
 endif(NOT HAVE_CONNECT)
 
 ###########################################################
