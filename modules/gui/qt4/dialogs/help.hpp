@@ -36,41 +36,46 @@ class QLabel;
 class QEvent;
 class QPushButton;
 
-class HelpDialog : public QVLCDialog
+class HelpDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
     static HelpDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new HelpDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
+            instance = new HelpDialog( p_intf );
         return instance;
     }
+    static void killInstance()
+    { if( instance ) delete instance; instance = NULL;}
     virtual ~HelpDialog();
 
 private:
-    HelpDialog( QWidget *, intf_thread_t * );
+    HelpDialog( intf_thread_t * );
     static HelpDialog *instance;
 public slots:
     void close();
 };
 
 
-class AboutDialog : public QVLCFrame
+class AboutDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
     static AboutDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new AboutDialog( p_intf );
+            instance = new AboutDialog( (QWidget *)p_intf->p_sys->p_mi,
+                                        p_intf );
         return instance;
     }
-    virtual ~AboutDialog();
 
 private:
-    AboutDialog( intf_thread_t * );
+    AboutDialog( QWidget *, intf_thread_t * );
+    virtual ~AboutDialog();
+
     static AboutDialog *instance;
+
 public slots:
     void close();
 };
@@ -90,12 +95,17 @@ public:
             instance = new UpdateDialog( p_intf );
         return instance;
     }
-    virtual ~UpdateDialog();
+    static void killInstance()
+    { if( instance ) delete instance; instance = NULL;}
+
     void updateNotify( bool );
 
 private:
     UpdateDialog( intf_thread_t * );
+    virtual ~UpdateDialog();
+
     static UpdateDialog *instance;
+
     update_t *p_update;
     QPushButton *updateButton;
     QLabel *updateLabel;

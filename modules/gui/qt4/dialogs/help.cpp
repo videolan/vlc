@@ -52,8 +52,8 @@
 
 HelpDialog *HelpDialog::instance = NULL;
 
-HelpDialog::HelpDialog( QWidget *parent, intf_thread_t *_p_intf )
-           : QVLCDialog( parent, _p_intf )
+HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+
 {
     setWindowTitle( qtr( "Help" ) );
     setMinimumSize( 250, 300 );
@@ -69,20 +69,23 @@ HelpDialog::HelpDialog( QWidget *parent, intf_thread_t *_p_intf )
     layout->addWidget( closeButton, 1, 3 );
 
     BUTTONACT( closeButton, close() );
-    resize( 400, 450 );
+    readSettings( "Help", QSize( 400, 450 ) );
 }
 
 HelpDialog::~HelpDialog()
 {
+    writeSettings( "Help" );
 }
+
 void HelpDialog::close()
 {
-    this->toggleVisible();
+    toggleVisible();
 }
 
 AboutDialog *AboutDialog::instance = NULL;
 
-AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
+AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
+            : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "About" ) );
     resize( 600, 500 );
@@ -170,9 +173,10 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 AboutDialog::~AboutDialog()
 {
 }
+
 void AboutDialog::close()
 {
-    this->toggleVisible();
+    toggleVisible();
 }
 
 #ifdef UPDATE_CHECK
@@ -199,7 +203,6 @@ UpdateDialog *UpdateDialog::instance = NULL;
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Update" ) );
-    resize( 120, 80 );
 
     QGridLayout *layout = new QGridLayout( this );
 
@@ -223,6 +226,8 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     p_update = update_New( p_intf );
     b_checked = false;
 
+    readSettings( "Update", QSize( 120, 80 ) );
+
     /* Check for updates */
     UpdateOrDownload();
 }
@@ -230,6 +235,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 UpdateDialog::~UpdateDialog()
 {
     update_Delete( p_update );
+    writeSettings( "Update" );
 }
 
 void UpdateDialog::close()
