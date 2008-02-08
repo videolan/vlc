@@ -16,7 +16,7 @@ if (NOT FFmpeg_SEARCHED)
 
     if (NOT FFmpeg_FOUND)
         set(FFmpeg_LIBRARIES "")
-        foreach (library ffmpeg avcodec avformat avutil postproc)
+        foreach (library ffmpeg avcodec avformat avutil postproc swscale)
             find_library( ${library}_LIBRARY ${library} )
             set( ${library}_LIBRARY_FOUND NOT ${${library}_LIBRARY} )
             if (${library}_LIBRARY_FOUND)
