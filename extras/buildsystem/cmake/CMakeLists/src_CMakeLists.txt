@@ -260,7 +260,7 @@ if(NOT APPLE)
    set(LINK_FLAGS "-z defs --as-needed")
 endif(NOT APPLE)
 
-set_target_properties(libvlc libvlc-control PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
+set_target_properties(libvlc libvlc-control PROPERTIES LDFLAGS "${LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
     "-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Wmissing-prototypes -I${CMAKE_BINARY_DIR}/src -I${CMAKE_BINARY_DIR}/include" )
 
