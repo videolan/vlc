@@ -35,23 +35,23 @@ if test "${ACTION}" = "build"; then
     # @description Installs the specified library into the destination folder, automatically changes the references to dependencies
     # @param src_lib     source library to copy to the destination directory
     # @param dest_dir    destination directory where the src_lib should be copied to
-    install_library() {    
+    install_library() { 
+   
         if [ ${3} = "library" ]; then
-            install_name="@loader_path/lib"
+            local install_name="@loader_path/lib"
         elif [ ${3} = "module" ]; then
-            install_name="@loader_path/modules"
+            local install_name="@loader_path/modules"
         fi
-        
         if [ "${5}" != "" ]; then
-            lib_dest="${2}/${5}"
+            local lib_dest="${2}/${5}"
         else
-            lib_dest="${2}/`basename ${1}`"
+            local lib_dest="${2}/`basename ${1}`"
         fi
 
         if [ "${4}" != "" ]; then
-            lib_install_prefix="${4}"
+            local lib_install_prefix="${4}"
         else
-            lib_install_prefix="@loader_path/../lib"
+            local lib_install_prefix="@loader_path/../lib"
         fi
         
         if test -e ${1} && ((! test -e ${lib_dest}) || test ${1} -nt ${lib_dest} ); then
@@ -71,17 +71,14 @@ if test "${ACTION}" = "build"; then
     
             # Iterate through each installed library and modify the references to other dynamic libraries to match the framework's library directory
             for linked_lib in `otool -L ${lib_dest}  | grep '(' | sed 's/\((.*)\)//'`; do
-                name=`basename ${linked_lib}`
+                local name=`basename ${linked_lib}`
                 case "${linked_lib}" in
-                    */vlc_build_dir/lib/*  | *vlc* | */extras/contrib/lib/*)
+                    */vlc_build_dir/*  | *vlc* | */extras/contrib/lib/*)
                         if test -e ${linked_lib}; then
-                            install_name_tool -change ${linked_lib} "${lib_install_prefix}/${name}" ${lib_dest}
+                            install_name_tool -change "$linked_lib" "${lib_install_prefix}/${name}" "${lib_dest}"
                             linked_libs="${linked_libs} ${ref_lib}"
-
                             install_library ${linked_lib} ${target_lib} "library"
                         fi
-                        ;;
-                    *)
                         ;;
                 esac
             done
