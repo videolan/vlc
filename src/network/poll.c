@@ -65,7 +65,7 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout)
         tv.tv_usec = d.rem * 1000;
     }
 
-    val = select (val + 1, &rdset, &wrset, NULL,
+    val = select (val + 1, &rdset, &wrset, &exset,
                   (timeout >= 0) ? &tv : NULL);
     if (val == -1)
         return -1;
