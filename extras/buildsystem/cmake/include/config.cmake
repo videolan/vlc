@@ -216,7 +216,8 @@ if(APPLE)
 
     set(SYS_DARWIN 1)
     add_definitions(-std=gnu99) # Hack for obj-c files to be compiled with gnu99
-    vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext auhal)
+    vlc_enable_modules(macosx minimal_macosx opengllayer
+                       access_eyetv quartztext auhal)
 
     # On Pre-10.5
     vlc_module_add_link_flags (ffmpeg "-read_only_relocs warning")
