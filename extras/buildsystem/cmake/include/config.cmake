@@ -179,7 +179,7 @@ endif (HAVE_LIBM)
 
 check_symbol_exists(connect "sys/types.h;sys/socket.h" HAVE_CONNECT)
 if(NOT HAVE_CONNECT)
-    check_library_exists(connect socket HAVE_CONNECT)
+    check_library_exists(connect socket "" HAVE_CONNECT)
     if(NOT HAVE_CONNECT)
         vlc_module_add_link_libraries(libvlc connect)
         vlc_module_add_link_libraries(cdda   connect)
@@ -292,7 +292,7 @@ macro(command_to_configvar command var)
   COMMAND sh -c "${command}"
   OUTPUT_VARIABLE ${var}
   OUTPUT_STRIP_TRAILING_WHITESPACE)
- string( REPLACE "\n" "\\n" ${var} ${${var}})
+ string( REPLACE "\n" "\\n" ${var} "${${var}}")
 endmacro(command_to_configvar)
 
 command_to_configvar( "whoami" VLC_COMPILE_BY )
