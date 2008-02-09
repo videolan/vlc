@@ -460,6 +460,13 @@ if(Matroska_FOUND)
   vlc_module_add_link_libraries(mkv ${Matroska_LIBRARIES})
 endif(Matroska_FOUND)
 
+find_package(Live555 0.7.7)
+if(Live555_FOUND)
+  vlc_enable_modules(live555)
+  vlc_add_module_compile_flag(live555 ${Live555_CFLAGS})
+  vlc_module_add_link_libraries(live555 ${Live555_LIBRARIES})
+endif(Live555_FOUND)
+
 set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
