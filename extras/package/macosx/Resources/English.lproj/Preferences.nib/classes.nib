@@ -473,8 +473,6 @@
                 "o_audio_vol_txt" = id; 
                 "o_intf_art_pop" = id; 
                 "o_intf_art_txt" = id; 
-                "o_intf_black_ckb" = id; 
-                "o_intf_embvout_ckb" = id; 
                 "o_intf_fspanel_ckb" = id; 
                 "o_intf_lang_pop" = id; 
                 "o_intf_lang_txt" = id; 

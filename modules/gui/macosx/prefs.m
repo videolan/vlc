@@ -271,182 +271,192 @@ static VLCTreeItem *o_root_item = nil;
     if( [ o_children count] == 0 )
     {
         intf_thread_t   *p_intf = VLCIntf;
-        int             i_index = 0;
+        vlc_list_t      *p_list;
+        module_t        *p_module = NULL;
+        module_t        *p_parser;
         module_config_t *p_item,
                         *p_end;
-        
-        /* Build the tree for the main module */
-        const module_t *p_module = NULL;
-        vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                            FIND_ANYWHERE );
-        if( !p_list ) return NULL;
-        for( unsigned i = 0; p_module == NULL; i++ )
-        {
-            assert (i < (unsigned)p_list->i_count);
-            
-            const module_t *p_main = (module_t *)p_list->p_values[i].p_object;
-            if( strcmp( module_GetObjName( p_main ), "main" ) == 0 )
-                p_module = p_main;
-        }
-        
-        VLCTreeItem *p_last_category = NULL;
-        unsigned int i_confsize;
-        module_config_t *const p_config = module_GetConfig (p_module, &i_confsize);
-        p_end = p_item + i_confsize;
-        
-        for (size_t i = 0; i < i_confsize; i++)
-        {
-            p_item = p_config + i;
-            
-            NSString *o_child_name;
-            NSString *o_child_title;
-            NSString *o_child_help;
+        int             i_index = 0;
 
-            switch( p_item->i_type )
+        /* List the modules */
+        p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+        if( !p_list ) return nil;
+
+        /* get parser */
+        p_parser = (module_t *)p_list->p_values[i_index].p_object;
+
+        if( [[self getName] isEqualToString: @"main"] )
+        {
+            /*
+            * Find the main module
+            */
+            for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
-                case CONFIG_CATEGORY:
-                    if( p_item->value.i == -1 ) break;
-
-                    o_child_name = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryNameGet( p_item->value.i )];
-                    o_child_title = o_child_name;
-                    o_child_help = [[VLCMain sharedInstance]
-                            localizedString: config_CategoryHelpGet( p_item->value.i )];
-                    p_last_category = [VLCTreeItem alloc];
-                    [o_children addObject:[p_last_category
-                            initWithName: o_child_name
-                               withTitle: o_child_title
-                                withHelp: o_child_help
-                                      ID: p_item->value.i
-                                  parent:self
-                                children:[[NSMutableArray alloc]
-                                initWithCapacity:10]
-                           whithCategory: p_item - module_GetConfig( p_module, &i_confsize )]];
+                p_module = (module_t *)p_list->p_values[i_index].p_object;
+                if( !strcmp( module_GetObjName( p_module ), "main" ) )
                     break;
-                case CONFIG_SUBCATEGORY:
-                    if( p_item->value.i == -1 ) break;
-                    
-                    /* Special cases: move the main subcategories to the parent cat*/
-                    if( p_item->value.i != SUBCAT_PLAYLIST_GENERAL &&
-                        p_item->value.i != SUBCAT_VIDEO_GENERAL &&
-                        p_item->value.i != SUBCAT_INPUT_GENERAL &&
-                        p_item->value.i != SUBCAT_INTERFACE_GENERAL &&
-                        p_item->value.i != SUBCAT_SOUT_GENERAL &&
-                        p_item->value.i != SUBCAT_ADVANCED_MISC &&
-                        p_item->value.i != SUBCAT_AUDIO_GENERAL )
+            }
+            if( p_module == NULL )
+            {
+                msg_Err( p_intf,
+                    "could not load the preferences" );
+                return nil;
+            }
+            if( i_index < p_list->i_count )
+            {
+                /* We found the main module */
+                /* Enumerate config categories and store a reference so we can
+                 * generate their config panel them when it is asked by the user. */
+                VLCTreeItem *p_last_category = NULL;
+                unsigned int i_confsize;
+                p_item = module_GetConfig( p_parser, &i_confsize );
+                p_end = p_item + i_confsize;
+                o_children = [[NSMutableArray alloc] initWithCapacity:10];
+                if( p_item ) do
+                {
+                    NSString *o_child_name;
+                    NSString *o_child_title;
+                    NSString *o_child_help;
+                    switch( p_item->i_type )
                     {
+                    case CONFIG_CATEGORY:
+                        if( p_item->value.i == -1 ) break;
+
                         o_child_name = [[VLCMain sharedInstance]
-                                localizedString: config_CategoryNameGet( p_item->value.i ) ];
+                            localizedString: config_CategoryNameGet( p_item->value.i )];
                         o_child_title = o_child_name;
                         o_child_help = [[VLCMain sharedInstance]
+                            localizedString: config_CategoryHelpGet( p_item->value.i )];
+                        p_last_category = [VLCTreeItem alloc];
+                        [o_children addObject:[p_last_category
+                            initWithName: o_child_name
+                            withTitle: o_child_title
+                            withHelp: o_child_help
+                            ID: p_item->value.i
+                            parent:self
+                            children:[[NSMutableArray alloc]
+                                initWithCapacity:10]
+                            whithCategory: p_item - module_GetConfig( p_module, &i_confsize )]];
+                        break;
+                    case CONFIG_SUBCATEGORY:
+                        if( p_item->value.i == -1 ) break;
+
+                        if( p_item->value.i != SUBCAT_PLAYLIST_GENERAL &&
+                            p_item->value.i != SUBCAT_VIDEO_GENERAL &&
+                            p_item->value.i != SUBCAT_INPUT_GENERAL &&
+                            p_item->value.i != SUBCAT_INTERFACE_GENERAL &&
+                            p_item->value.i != SUBCAT_SOUT_GENERAL &&
+                            p_item->value.i != SUBCAT_ADVANCED_MISC &&
+                            p_item->value.i != SUBCAT_AUDIO_GENERAL )
+                        {
+                            o_child_name = [[VLCMain sharedInstance]
+                                localizedString: config_CategoryNameGet( p_item->value.i ) ];
+                            o_child_title = o_child_name;
+                            o_child_help = [[VLCMain sharedInstance]
                                 localizedString: config_CategoryHelpGet( p_item->value.i ) ];
-                        
-                        [p_last_category->o_children
+
+                            [p_last_category->o_children
                                 addObject:[[VLCTreeItem alloc]
                                 initWithName: o_child_name
-                                   withTitle: o_child_title
-                                    withHelp: o_child_help
-                                          ID: p_item->value.i
-                                      parent:p_last_category
-                                    children:[[NSMutableArray alloc]
+                                withTitle: o_child_title
+                                withHelp: o_child_help
+                                ID: p_item->value.i
+                                parent:p_last_category
+                                children:[[NSMutableArray alloc]
                                     initWithCapacity:10]
-                               whithCategory: p_item - module_GetConfig( p_module, &i_confsize )]];
-                        continue;
+                                whithCategory: p_item - module_GetConfig( p_parser, &i_confsize )]];
+                        }
+ 
+                        break;
+                    default:
+                        break;
                     }
-                    break;
+                } while( p_item < p_end && p_item++ );
+            }
 
-                default:
-                    break;
-            }
-        }
-        module_PutConfig (p_config);
-        
-        /* Build the tree of plugins */
-        /* Build a tree of the plugins */
-        /* Add the capabilities */
-        for( i_index = 0; i_index < p_list->i_count; i_index++ )
-        {
-            unsigned int confsize;
-            p_module = (module_t *)p_list->p_values[i_index].p_object;
-            
-            /* Exclude the main module */
-            if( !strcmp( module_GetObjName( p_module ), "main" ) )
-                continue;
-            
-            /* Exclude empty plugins (submodules don't have config */
-            /* options, they are stored in the parent module) */
-            // Does not work
-            //                if( modules_IsSubModule( p_module ) )
-            //                    continue;
-            p_item = module_GetConfig( p_module, &confsize );
-            
-            if( !p_item ) continue;
-            int i_category = -1;
-            int i_subcategory = -1;
-            int i_options = 0;
-            do
+            /* Build a tree of the plugins */
+            /* Add the capabilities */
+            for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
-                if( p_item->i_type == CONFIG_CATEGORY )
-                    i_category = p_item->value.i;
-                else if( p_item->i_type == CONFIG_SUBCATEGORY )
-                    i_subcategory = p_item->value.i;
-                
-                if( p_item->i_type & CONFIG_ITEM )
-                    i_options ++;
-                if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
-                    break;
-            } while( p_item < p_end && p_item++ );
-            if( !i_options ) continue;
-            
-            /* Find the right category item */
-            
-            long cookie;
-            vlc_bool_t b_found = VLC_FALSE;
-            unsigned int i;
-            VLCTreeItem* p_category_item, * p_subcategory_item;
-            for (i = 0 ; i < [o_children count] ; i++)
-            {
-                p_category_item = [o_children objectAtIndex: i];
-                if( p_category_item->i_object_id == i_category )
+                unsigned int confsize;
+                p_module = (module_t *)p_list->p_values[i_index].p_object;
+
+                /* Exclude the main module */
+                if( !strcmp( module_GetObjName( p_module ), "main" ) )
+                    continue;
+
+                /* Exclude empty plugins (submodules don't have config */
+                /* options, they are stored in the parent module) */
+// Does not work
+//                if( modules_IsSubModule( p_module ) )
+//                    continue;
+                p_item = module_GetConfig( p_module, &confsize );
+
+                if( !p_item ) continue;
+                int i_category = -1;
+                int i_subcategory = -1;
+                int i_options = 0;
+                do
                 {
-                    b_found = VLC_TRUE;
-                    break;
+                    if( p_item->i_type == CONFIG_CATEGORY )
+                        i_category = p_item->value.i;
+                    else if( p_item->i_type == CONFIG_SUBCATEGORY )
+                        i_subcategory = p_item->value.i;
+
+                    if( p_item->i_type & CONFIG_ITEM )
+                        i_options ++;
+                    if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
+                        break;
+                } while( p_item < p_end && p_item++ );
+                if( !i_options ) continue;
+
+                /* Find the right category item */
+
+                long cookie;
+                vlc_bool_t b_found = VLC_FALSE;
+                unsigned int i;
+                VLCTreeItem* p_category_item, * p_subcategory_item;
+                for (i = 0 ; i < [o_children count] ; i++)
+                {
+                    p_category_item = [o_children objectAtIndex: i];
+                    if( p_category_item->i_object_id == i_category )
+                    {
+                        b_found = VLC_TRUE;
+                        break;
+                    }
                 }
-            }
-            if( !b_found ) continue;
-            
-            /* Find subcategory item */
-            b_found = VLC_FALSE;
-            cookie = -1;
-            for (i = 0 ; i < [p_category_item->o_children count] ; i++)
-            {
-                p_subcategory_item = [p_category_item->o_children
+                if( !b_found ) continue;
+
+                /* Find subcategory item */
+                b_found = VLC_FALSE;
+                cookie = -1;
+                for (i = 0 ; i < [p_category_item->o_children count] ; i++)
+                {
+                    p_subcategory_item = [p_category_item->o_children
                                             objectAtIndex: i];
-                if( p_subcategory_item->i_object_id == i_subcategory )
-                {
-                    b_found = VLC_TRUE;
-                    break;
+                    if( p_subcategory_item->i_object_id == i_subcategory )
+                    {
+                        b_found = VLC_TRUE;
+                        break;
+                    }
                 }
-            }
-            if( !b_found )
-                p_subcategory_item = p_category_item;
-            
-            [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc]
+                if( !b_found )
+                    p_subcategory_item = p_category_item;
+
+                [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc]
                     initWithName:[[VLCMain sharedInstance]
                         localizedString: module_GetName( p_module, VLC_FALSE ) ]
-                       withTitle:[[VLCMain sharedInstance]
+                    withTitle:[[VLCMain sharedInstance]
                         localizedString:  module_GetLongName( p_module ) ]
-                        withHelp: @""
-                              ID: ((vlc_object_t*)p_module)->i_object_id
-                          parent:p_subcategory_item
-                        children:IsALeafNode
-                   whithCategory: -1]];
-            }
-        
-            vlc_list_release( p_list );
+                    withHelp: @""
+                    ID: ((vlc_object_t*)p_module)->i_object_id
+                    parent:p_subcategory_item
+                    children:IsALeafNode
+                    whithCategory: -1]];
+                }
         }
-            
-
+        vlc_list_release( p_list );
+    }
     return o_children;
 }
 
