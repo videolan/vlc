@@ -41,6 +41,7 @@ endif(NOT CMAKE_BUILD_TYPE )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(DEBUG ON)
+    add_declarations(-DDEBUG=1)
     set(NDEBUG OFF)
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
