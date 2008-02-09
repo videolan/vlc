@@ -357,7 +357,7 @@ VLC_EXPORT( void, __stats_ComputeGlobalStats, (vlc_object_t*,global_stats_t*));
 /*********
  * Timing
  ********/
-#ifdef DEBUG
+#ifndef NDEBUG
 #define stats_TimerStart(a,b,c) __stats_TimerStart( VLC_OBJECT(a), b,c )
 #define stats_TimerStop(a,b) __stats_TimerStop( VLC_OBJECT(a), b )
 #define stats_TimerDump(a,b) __stats_TimerDump( VLC_OBJECT(a), b )
