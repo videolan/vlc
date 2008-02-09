@@ -1,8 +1,7 @@
 /* Controller */
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLC.h>
-#import <VLC/VLCMediaPlayer.h>
+#import <VLCKit/VLCKit.h>
 
 @interface Controller : NSObject
 {

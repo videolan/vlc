@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <VLC/VLC.h>
 #include <stdio.h>
 
 int main(int argc, char *argv[])
