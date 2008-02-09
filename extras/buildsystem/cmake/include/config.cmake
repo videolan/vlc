@@ -213,7 +213,7 @@ if(APPLE)
 
     set(SYS_DARWIN 1)
     add_definitions(-std=gnu99) # Hack for obj-c files to be compiled with gnu99
-    vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext)
+    vlc_enable_modules(macosx minimal_macosx access_eyetv quartztext auhal)
 
     # On Pre-10.5
     vlc_module_add_link_flags (ffmpeg "-read_only_relocs warning")
@@ -226,7 +226,8 @@ if(APPLE)
    # check_symbol_exists (CFPreferencesCopyAppValue "CoreFoundation/CoreFoundation.h" "" HAVE_CFPREFERENCESCOPYAPPVALUE)
 
     vlc_find_frameworks(Cocoa Carbon OpenGL AGL IOKit Quicktime
-                        WebKit QuartzCore Foundation ApplicationServices)
+                        WebKit QuartzCore Foundation ApplicationServices
+                        CoreAudio AudioUnit AudioToolbox)
     vlc_module_add_link_libraries(macosx
         ${Cocoa_FRAMEWORKS}
         ${IOKit_FRAMEWORKS}
@@ -248,6 +249,11 @@ if(APPLE)
     vlc_module_add_link_libraries(quartztext
          ${Carbon_FRAMEWORKS}
          ${ApplicationServices_FRAMEWORKS} )
+    vlc_module_add_link_libraries(auhal
+         ${Carbon_FRAMEWORKS}
+         ${CoreAudio_FRAMEWORKS}
+         ${AudioUnit_FRAMEWORKS}
+         ${AudioToolbox_FRAMEWORKS} )
     vlc_module_add_link_libraries(mp4 ${IOKit_FRAMEWORKS} )
     vlc_module_add_link_libraries(mkv ${IOKit_FRAMEWORKS} )
 
@@ -473,4 +479,3 @@ set(CMAKE_REQUIRED_INCLUDES)
 # Final configuration
 ###########################################################
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
-
