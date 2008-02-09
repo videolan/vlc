@@ -172,10 +172,5 @@ int main (int argc, char *argv[])
 
     test_media_list (args, nlibvlc_args);
 
-    /* FIXME try to play all streams from a list. We may want to create an other test category for that. */
-    test_file_playback (args, nlibvlc_args, "ftp://streams.videolan.org/streams-videolan/reference/mp4/aac_adts.mp4");
-    test_file_playback (args, nlibvlc_args, "ftp://streams.videolan.org/streams-videolan/reference/flv/flash5_004.flv");
-    /* ... */
-    
     return 0;
 }
