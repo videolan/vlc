@@ -38,6 +38,7 @@
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QHeaderView>
 
 MessagesDialog *MessagesDialog::instance = NULL;
 
@@ -98,6 +99,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     modulesTree = new QTreeWidget();
     modulesTree->setGeometry( 0, 0, 440, 600 );
+    modulesTree->header()->hide();
 
     QPushButton *updateButton = new QPushButton( qtr( "&Update" ) );
 
