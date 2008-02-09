@@ -425,6 +425,7 @@ if(QT4_FOUND)
   vlc_enable_modules(qt4)
   vlc_add_module_compile_flag(qt4 ${QT_CFLAGS} )
   vlc_module_add_link_libraries(qt4 ${QT_LIBRARIES})
+
   # Define our own qt4_wrap_ui macro to match wanted behaviour
   MACRO (VLC_QT4_WRAP_UI outfiles )
     FOREACH (it ${ARGN})
@@ -438,7 +439,6 @@ if(QT4_FOUND)
         MAIN_DEPENDENCY ${infile})
       SET(${outfiles} ${${outfiles}} ${outfile})
     ENDFOREACH (it)
-
   ENDMACRO (VLC_QT4_WRAP_UI)
 
 endif(QT4_FOUND)
@@ -452,6 +452,14 @@ if(OPENGL_FOUND)
   vlc_add_module_compile_flag(opengl ${OPENGL_CFLAGS})
   vlc_module_add_link_libraries(opengl ${OPENGL_LIBRARIES})
 endif(OPENGL_FOUND)
+
+find_package(Matroska 0.7.7)
+if(Matroska_FOUND)
+  vlc_enable_modules(mkv)
+  vlc_check_include_files (matroska/KaxAttachments.h)
+  vlc_check_include_files (matroska/KaxVersion.h)
+  vlc_module_add_link_libraries(mkv ${Matroska_LIBRARIES})
+endif(Matroska_FOUND)
 
 set(CMAKE_REQUIRED_INCLUDES)
 
