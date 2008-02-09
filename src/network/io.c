@@ -271,18 +271,17 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 {
     size_t i_total = 0;
     struct pollfd ufd[2] = {
-        { .fd = fd, .events = POLLIN },
-        { .fd = -1, .events = POLLIN },
+        { .fd = fd,                           .events = POLLIN },
+        { .fd = vlc_object_waitpipe (p_this), .events = POLLIN },
     };
+
+    if (ufd[1].fd == -1)
+        return -1; /* vlc_object_waitpipe() sets errno */
 
     while (i_buflen > 0)
     {
         int val;
 
-        ufd[1].fd = vlc_object_waitpipe (p_this);
-        if (ufd[1].fd == -1)
-        {
-        }
         ufd[0].revents = ufd[1].revents = 0;
 
         val = poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1);
