@@ -345,3 +345,66 @@ Index: libavcodec/i386/cavsdsp_mmx.c
  /*****************************************************************************
   *
   * inverse transform
+Index: libavcodec/i386/flacdsp_mmx.c
+===================================================================
+--- libavcodec/i386/flacdsp_mmx.c	(revision 11888)
++++ libavcodec/i386/flacdsp_mmx.c	(working copy)
+@@ -26,7 +26,6 @@
+     double c = 2.0 / (len-1.0);
+     int n2 = len>>1;
+     long i = -n2*sizeof(int32_t);
+-    long j =  n2*sizeof(int32_t);
+     asm volatile(
+         "movsd   %0,     %%xmm7 \n\t"
+         "movapd  %1,     %%xmm6 \n\t"
+@@ -54,7 +53,7 @@
+         "sub      $8,      %1       \n\t"\
+         "add      $8,      %0       \n\t"\
+         "jl 1b                      \n\t"\
+-        :"+&r"(i), "+&r"(j)\
++        :"+&r"(i)\
+         :"r"(w_data+n2), "r"(data+n2)\
+     );
+     if(len&1)
+@@ -84,9 +83,11 @@
+         long i = -len*sizeof(double);
+         if(j == lag-2) {
+             asm volatile(
+-                "movsd     %6,     %%xmm0 \n\t"
+-                "movsd     %6,     %%xmm1 \n\t"
+-                "movsd     %6,     %%xmm2 \n\t"
++                "movsd     %0,     %%xmm0 \n\t"
++                "movsd     %0,     %%xmm1 \n\t"
++                "movsd     %0,     %%xmm2 \n\t"
++                :: "m"(*ff_pd_1) );
++            asm volatile(
+                 "1:                       \n\t"
+                 "movapd   (%4,%0), %%xmm3 \n\t"
+                 "movupd -8(%5,%0), %%xmm4 \n\t"
+@@ -109,12 +110,14 @@
+                 "movsd     %%xmm1, %2     \n\t"
+                 "movsd     %%xmm2, %3     \n\t"
+                 :"+&r"(i), "=m"(autoc[j]), "=m"(autoc[j+1]), "=m"(autoc[j+2])
+-                :"r"(data1+len), "r"(data1+len-j), "m"(*ff_pd_1)
++                :"r"(data1+len), "r"(data1+len-j)
+             );
+         } else {
+             asm volatile(
+-                "movsd     %5,     %%xmm0 \n\t"
+-                "movsd     %5,     %%xmm1 \n\t"
++                "movsd     %0,     %%xmm0 \n\t"
++                "movsd     %0,     %%xmm1 \n\t"
++                :: "m"(*ff_pd_1) );
++            asm volatile(
+                 "1:                       \n\t"
+                 "movapd   (%3,%0), %%xmm3 \n\t"
+                 "movupd -8(%4,%0), %%xmm4 \n\t"
+@@ -131,7 +134,7 @@
+                 "movsd     %%xmm0, %1     \n\t"
+                 "movsd     %%xmm1, %2     \n\t"
+                 :"+&r"(i), "=m"(autoc[j]), "=m"(autoc[j+1])
+-                :"r"(data1+len), "r"(data1+len-j), "m"(*ff_pd_1)
++                :"r"(data1+len), "r"(data1+len-j)
+             );
+         }
+     }
