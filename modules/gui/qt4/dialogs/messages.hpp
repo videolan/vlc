@@ -56,15 +56,20 @@ private:
     MessagesDialog( intf_thread_t * );
     static MessagesDialog *instance;
     QSpinBox *verbosityBox;
+    QLabel *verbosityLabel;
     QTextEdit *messages;
     QTreeWidget *modulesTree;
+    QPushButton *clearButton;
+    QPushButton *saveLogButton;
+
 private slots:
+    void updateTab( int );
     void updateLog();
-    void updateTree();
     void close();
     void clear();
     bool save();
 private:
+    void updateTree();
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 };
 

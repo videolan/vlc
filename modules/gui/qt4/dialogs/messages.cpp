@@ -54,18 +54,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
-    BUTTONACT( closeButton, close() );
-
-    mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
-    mainLayout->addWidget( closeButton, 1, 5 );
-
-
-    /* Messages */
-    QWidget     *msgWidget = new QWidget;
-    QGridLayout *msgLayout = new QGridLayout( msgWidget );
-
-    QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
-    QPushButton *saveLogButton = new QPushButton( qtr( "&Save as..." ) );
+    clearButton = new QPushButton( qtr( "&Clear" ) );
+    saveLogButton = new QPushButton( qtr( "&Save as..." ) );
 
     verbosityBox = new QSpinBox();
     verbosityBox->setRange( 0, 2 );
@@ -73,7 +63,25 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     verbosityBox->setWrapping( true );
     verbosityBox->setMaximumWidth( 50 );
 
-    QLabel *verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
+    verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
+
+
+    mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
+    mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
+    mainLayout->addWidget( verbosityBox, 1, 1 );
+    mainLayout->addWidget( saveLogButton, 1, 3 );
+    mainLayout->addWidget( clearButton, 1, 4 );
+    mainLayout->addWidget( closeButton, 1, 5 );
+
+    BUTTONACT( closeButton, close() );
+    BUTTONACT( clearButton, clear() );
+    BUTTONACT( saveLogButton, save() );
+    CONNECT( mainTab, currentChanged( int ), this, updateTab( int ) );
+ 
+
+    /* Messages */
+    QWidget     *msgWidget = new QWidget;
+    QGridLayout *msgLayout = new QGridLayout( msgWidget );
 
     messages = new QTextEdit();
     messages->setReadOnly( true );
@@ -81,36 +89,42 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
     msgLayout->addWidget( messages, 0, 0, 1, 0 );
-    msgLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
-    msgLayout->addWidget( verbosityBox, 1, 1 );
-    msgLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ), 1, 2 );
-    msgLayout->addWidget( saveLogButton, 1, 3 );
-    msgLayout->addWidget( clearButton, 1, 4 );
-
-    BUTTONACT( clearButton, clear() );
-    BUTTONACT( saveLogButton, save() );
+    mainTab->addTab( msgWidget, qtr( "Messages" ) );
     ON_TIMEOUT( updateLog() );
 
-    mainTab->addTab( msgWidget, qtr( "Messages" ) );
 
-    /* Module tree */
+    /* Modules tree */
     QWidget     *treeWidget = new QWidget;
     QGridLayout *treeLayout = new QGridLayout( treeWidget );
 
     modulesTree = new QTreeWidget();
     modulesTree->header()->hide();
 
-    QPushButton *updateButton = new QPushButton( qtr( "&Update" ) );
-
     treeLayout->addWidget( modulesTree, 0, 0, 1, 0 );
-    treeLayout->addWidget( updateButton, 1, 6 );
-
-    BUTTONACT( updateButton, updateTree() );
-
     mainTab->addTab( treeWidget, qtr( "Modules tree" ) );
 
 
+    /* General action */
     readSettings( "Messages" );
+}
+
+void MessagesDialog::updateTab( int index )
+{
+    if( index == 1 )
+    {
+        verbosityLabel->hide();
+        verbosityBox->hide();
+        clearButton->hide();
+        saveLogButton->hide();
+        updateTree();
+    }
+    else
+    {
+        verbosityLabel->show();
+        verbosityBox->show();
+        clearButton->show();
+        saveLogButton->show();
+    }
 }
 
 void MessagesDialog::updateLog()
