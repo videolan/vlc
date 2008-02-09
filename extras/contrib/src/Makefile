@@ -1198,6 +1198,14 @@ else
 endif
 endif
 endif
+	cp $</groupsock/libgroupsock.a $(PREFIX)/lib
+	cp $</liveMedia/libliveMedia.a $(PREFIX)/lib
+	cp $</UsageEnvironment/libUsageEnvironment.a $(PREFIX)/lib
+	cp $</BasicUsageEnvironment/libBasicUsageEnvironment.a $(PREFIX)/lib
+	cp $</groupsock/include/*.hh $</groupsock/include/*.h $(PREFIX)/include
+	cp $</liveMedia/include/*.hh $(PREFIX)/include
+	cp $</UsageEnvironment/include/*.hh $(PREFIX)/include
+	cp $</BasicUsageEnvironment/include/*.hh $(PREFIX)/include
 	touch $@
 
 CLEAN_FILE += .live
