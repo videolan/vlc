@@ -2,7 +2,7 @@
 * simple_prefs.m: Simple Preferences for Mac OS X
 *****************************************************************************
 * Copyright (C) 2008 the VideoLAN team
-* $Id:$
+* $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
 *
@@ -21,8 +21,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-#import "intf.h"
-#import <vlc/vlc.h>
 #import "simple_prefs.h"
 #import "prefs.h"
 
@@ -63,16 +61,16 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     [self initStrings];
 
+    [self resetControls];
+    
+    /* setup the toolbar */
     o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
-
     [o_sprefs_toolbar setAllowsUserCustomization: NO];
     [o_sprefs_toolbar setAutosavesConfiguration: NO];
     [o_sprefs_toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
     [o_sprefs_toolbar setSizeMode: NSToolbarSizeModeRegular];
-
     [o_sprefs_toolbar setDelegate: self];
-
-    [o_sprefs_win setToolbar: o_sprefs_toolbar];    
+    [o_sprefs_win setToolbar: o_sprefs_toolbar];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_sprefs_toolbar 
@@ -129,13 +127,100 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, nil];
 }
 
 - (void)initStrings
 {
     [o_sprefs_reset_btn setEnabled: NO];
     msg_Warn( p_intf, "localisation of the simple preferences not implemented!" );
+}
+
+- (void)resetControls
+{
+    module_config_t *p_item;
+    int i, y;
+    char *psz_tmp;
+
+    /**********************
+     * interface settings *
+     **********************/
+    [o_intf_lang_pop removeAllItems];
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "language" );
+    for( i = 0; p_item->ppsz_list[i] != nil; i++ )
+    {
+        [o_intf_lang_pop addItemWithTitle: _NS( p_item->ppsz_list_text[i] )];
+        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
+            y = i;
+    }
+    [o_intf_lang_pop selectItemAtIndex: y];
+
+    [o_intf_art_pop removeAllItems];
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "album-art" );
+    for( i = 0; i < p_item->i_list; i++ )
+        [o_intf_art_pop addItemWithTitle: _NS( p_item->ppsz_list_text[i] )];
+    [o_intf_art_pop selectItemAtIndex: 0];
+    [o_intf_art_pop selectItemAtIndex: p_item->value.i];
+
+    [o_intf_meta_ckb setState: config_GetInt( p_intf, "fetch-meta" )];
+    [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
+
+
+    /******************
+     * audio settings *
+     ******************/
+    [o_audio_enable_ckb setState: config_GetInt( p_intf, "audio" )];
+    [o_audio_vol_fld setIntValue: config_GetInt( p_intf, "volume" )];
+    [o_audio_vol_sld setIntValue: config_GetInt( p_intf, "volume" )];
+
+    [o_audio_spdif_ckb setState: config_GetInt( p_intf, "spdif" )];
+
+    [o_audio_dolby_pop removeAllItems];
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "force-dolby-surround" );
+    for( i = 0; i < p_item->i_list; i++ )
+        [o_audio_dolby_pop addItemWithTitle: _NS( p_item->ppsz_list_text[i] )];
+    [o_audio_dolby_pop selectItemAtIndex: 0];
+    [o_audio_dolby_pop selectItemAtIndex: p_item->value.i];
+    
+    [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" )]];
+
+    [o_audio_headphone_ckb setState: config_GetInt( p_intf, "headphone-dolby" )];
+    
+    psz_tmp = config_GetPsz( p_intf, "audio-filter" );
+    if( psz_tmp )
+        [o_audio_norm_ckb setState: (int)strstr( psz_tmp, "normvol" )];
+    [o_audio_norm_fld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
+    
+    // visualizer
+    msg_Warn( p_intf, "visualizer not implemented!" );
+    
+    /* Last.FM is optional */
+    if( module_Exists( p_intf, "audioscrobbler" ) )
+    {
+        [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" )]];
+        [o_audio_lastpwd_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" )]];
+        
+        if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+            [o_audio_last_ckb setState: NSOnState];
+        else
+            [o_audio_last_ckb setState: NSOffState];
+    }
+
+    /******************
+     * video settings *
+     ******************/
+    
+    /*******************
+     * codecs settings *
+     *******************/
+
+    /*********************
+     * subtitle settings *
+     *********************/
+    
+    /********************
+     * hotkeys settings *
+     ********************/
 }
 
 - (void)showSimplePrefs
@@ -156,7 +241,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_sprefs_win orderOut: sender];
     else if( sender == o_sprefs_save_btn )
     {
-        msg_Warn( p_intf, "sprefs saving not implemented, your changes have no effect!" );
+        [self saveChangedSettings];
         [o_sprefs_win orderOut: sender];
     }
     else if( sender == o_sprefs_reset_btn )
@@ -169,7 +254,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     {
         [o_sprefs_win orderOut: self];
         [[[VLCMain sharedInstance] getPreferences] showPrefs];
-        /* TODO: reset our selector controls here */
+        [self resetControls];
     }
     else
         msg_Err( p_intf, "unknown buttonAction sender" );
@@ -182,7 +267,100 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( i_return == NSAlertAlternateReturn )
     {
         config_ResetAll( p_intf );
-        /* TODO: we need to reset our views here */
+        [self resetControls];
+    }
+}
+
+- (void)saveChangedSettings
+{
+    module_config_t *p_item;
+    char *psz_tmp;
+    int i;
+    
+    /**********************
+     * interface settings *
+     **********************/
+    if( b_intfSettingChanged )
+    {
+        p_item = config_FindConfig( VLC_OBJECT(p_intf), "language" );
+        if( [o_intf_lang_pop indexOfSelectedItem] >= 0 )
+            config_PutPsz( p_intf, "language", strdup( p_item->ppsz_list[[o_intf_lang_pop indexOfSelectedItem]] ) );
+        else
+            config_PutPsz( p_intf, "language", strdup( [[VLCMain sharedInstance] delocalizeString: [o_intf_lang_pop stringValue]] ) );
+
+        p_item = config_FindConfig( VLC_OBJECT(p_intf), "album-art" );
+        if( [o_intf_art_pop indexOfSelectedItem] >= 0 )
+            config_PutInt( p_intf, "album-art", p_item->pi_list[[o_intf_art_pop indexOfSelectedItem]] );
+        else
+            config_PutInt( p_intf, "album-art", [o_intf_art_pop intValue] );
+
+        config_PutInt( p_intf, "fetch-meta", [o_intf_meta_ckb state] );
+        config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
+
+        /* okay, let's save our changes to vlcrc */
+        i = config_SaveConfigFile( p_intf, "main" );
+        i = config_SaveConfigFile( p_intf, "macosx" );
+
+        if( i != 0 )
+            msg_Err( p_intf, "An error occured while saving the Audio settings using SimplePrefs" );
+
+        b_intfSettingChanged = NO;
+    }
+    
+    /******************
+     * audio settings *
+     ******************/
+    if( b_audioSettingChanged )
+    {
+        config_PutInt( p_intf, "audio", [o_audio_enable_ckb state] );
+        config_PutInt( p_intf, "volume", [o_audio_vol_sld intValue] );
+        config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
+
+        p_item = config_FindConfig( VLC_OBJECT(p_intf), "force-dolby-surround" );
+        if( [o_audio_dolby_pop indexOfSelectedItem] >= 0 )
+            config_PutInt( p_intf, "force-dolby-surround", p_item->pi_list[[o_audio_dolby_pop indexOfSelectedItem]] );
+        else
+            config_PutInt( p_intf, "force-dolby-surround", [o_audio_dolby_pop intValue] );
+
+        config_PutPsz( p_intf, "audio-language", [[o_audio_lang_fld stringValue] UTF8String] );
+        config_PutInt( p_intf, "headphone-dolby", [o_audio_headphone_ckb state] );
+
+        psz_tmp = config_GetPsz( p_intf, "audio-filter" );
+        if(! psz_tmp)
+            config_PutPsz( p_intf, "audio-filter", "volnorm" );
+        else if( (int)strstr( psz_tmp, "normvol" ) == NO )
+        {
+            /* work-around a GCC 4.0.1 bug */
+            psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
+            config_PutPsz( p_intf, "audio-filter", psz_tmp );
+        }
+        else
+        {
+            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
+            config_PutPsz( p_intf, "audio-filter", psz_tmp );
+        }
+        config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
+
+        msg_Warn( p_intf, "visualizer not implemented!" );
+
+        if( [o_audio_last_ckb state] == NSOnState )
+            config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+        else
+            config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+
+        config_PutPsz( p_intf, "lastfm-username", [[o_audio_lastuser_fld stringValue] UTF8String] );
+        config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastuser_fld stringValue] UTF8String] );
+
+        /* okay, let's save our changes to vlcrc */
+        i = config_SaveConfigFile( p_intf, "main" );
+        i = i + config_SaveConfigFile( p_intf, "audioscrobbler" );
+        i = i + config_SaveConfigFile( p_intf, "volnorm" );
+
+        if( i != 0 )
+            msg_Err( p_intf, "An error occured while saving the Audio settings using SimplePrefs" );
+        b_audioSettingChanged = NO;
     }
 }
 
@@ -224,6 +402,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (IBAction)interfaceSettingChanged:(id)sender
 {
+    b_intfSettingChanged = YES;
 }
 
 - (void)showInterfaceSettings
@@ -234,6 +413,13 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (IBAction)audioSettingChanged:(id)sender
 {
+    if( sender == o_audio_vol_sld )
+        [o_audio_vol_fld setIntValue: [o_audio_vol_sld intValue]];
+    
+    if( sender == o_audio_vol_fld )
+        [o_audio_vol_sld setIntValue: [o_audio_vol_fld intValue]];
+    
+    b_audioSettingChanged = YES;
 }
 
 - (void)showAudioSettings

@@ -2,7 +2,7 @@
 * simple_prefs.h: Simple Preferences for Mac OS X
 *****************************************************************************
 * Copyright (C) 2008 the VideoLAN team
-* $Id:$
+* $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
 *
@@ -22,6 +22,8 @@
 *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "intf.h"
+#import <vlc/vlc.h>
 
 @interface VLCSimplePrefs : NSObject
 {
@@ -50,8 +52,6 @@
     IBOutlet id o_audio_vol_txt;
     IBOutlet id o_intf_art_pop;
     IBOutlet id o_intf_art_txt;
-    IBOutlet id o_intf_black_ckb;
-    IBOutlet id o_intf_embvout_ckb;
     IBOutlet id o_intf_fspanel_ckb;
     IBOutlet id o_intf_lang_pop;
     IBOutlet id o_intf_lang_txt;
@@ -80,15 +80,18 @@
       itemForItemIdentifier: (NSString *)o_itemIdent 
   willBeInsertedIntoToolbar: (BOOL)b_willBeInserted;
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar;
-- (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar;
+- (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar;
 
 - (void)initStrings;
+- (void)resetControls;
 - (void)showSimplePrefs;
 
 - (IBAction)buttonAction:(id)sender;
 - (void)sheetDidEnd:(NSWindow *)o_sheet 
          returnCode:(int)i_return
         contextInfo:(void *)o_context;
+
+- (void)saveChangedSettings;
 
 /* interface */
 - (IBAction)interfaceSettingChanged:(id)sender;
