@@ -18,10 +18,12 @@ set(VLC_VERSION_MAJOR 0)
 set(VLC_VERSION_MINOR 9)
 set(VLC_VERSION_PATCH 0)
 set(VLC_VERSION_EXTRA "-svn")
+set(VLC_VERSION ${VLC_VERSION_MAJOR}.${VLC_VERSION_MINOR}.${VLC_VERSION_PATCH}${VLC_VERSION_EXTRA})
 
 set(PACKAGE "vlc")
+set(PACKAGE_VERSION "${VLC_VERSION}")
 set(PACKAGE_STRING "vlc")
-set(VERSION_MESSAGE "vlc-${VLC_VERSION_MAJOR}.${VLC_VERSION_MINOR}.${VLC_VERSION_PATCH}${VLC_VERSION_EXTRA}")
+set(VERSION_MESSAGE "vlc-${VLC_VERSION}")
 set(COPYRIGHT_MESSAGE "Copyright © the VideoLAN team")
 set(COPYRIGHT_YEARS "2001-2008")
 
@@ -467,12 +469,18 @@ if(Matroska_FOUND)
   vlc_module_add_link_libraries(mkv ${Matroska_LIBRARIES})
 endif(Matroska_FOUND)
 
-find_package(Live555 0.7.7)
+find_package(Live555)
 if(Live555_FOUND)
   vlc_enable_modules(live555)
   vlc_add_module_compile_flag(live555 ${Live555_CFLAGS})
   vlc_module_add_link_libraries(live555 ${Live555_LIBRARIES})
 endif(Live555_FOUND)
+
+find_package(Curses)
+if(CURSES_LIBRARIES)
+  vlc_enable_modules(ncurses)
+  vlc_module_add_link_libraries(ncurses ${CURSES_LIBRARIES})
+endif(CURSES_LIBRARIES)
 
 set(CMAKE_REQUIRED_INCLUDES)
 
