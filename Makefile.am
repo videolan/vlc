@@ -392,6 +392,8 @@ VLC-release.app: vlc
 	    prefs_widgets.m \
 	    prefs.h \
 	    prefs.m \
+	    simple_prefs.h \
+	    simple_prefs.m \
 	    vout.h \
 	    voutqt.m \
 	    voutgl.m \
@@ -560,6 +562,8 @@ VLC.app: vlc
 	    prefs_widgets.m \
 	    prefs.h \
 	    prefs.m \
+	    simple_prefs.h \
+	    simple_prefs.m \
 	    vout.h \
 	    voutqt.m \
 	    voutgl.m \
