@@ -52,7 +52,7 @@
 #   include <pthread.h>
     /* Needed for pthread_cond_timedwait */
 #   include <errno.h>
-#   ifdef DEBUG
+#   ifndef NDEBUG
 #      include <time.h>
 #   endif
 

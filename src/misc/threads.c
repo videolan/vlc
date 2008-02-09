@@ -281,7 +281,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     return B_OK;
 
 #elif defined( LIBVLC_USE_PTHREAD )
-# if defined(DEBUG)
+# ifndef NDEBUG
     {
         /* Create error-checking mutex to detect problems more easily. */
         pthread_mutexattr_t attr;
@@ -298,7 +298,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
         pthread_mutexattr_destroy( &attr );
         return( i_result );
     }
-# endif
+# endif /* NDEBUG */
     return pthread_mutex_init( &p_mutex->mutex, NULL );
 
 #endif
@@ -318,7 +318,7 @@ int __vlc_mutex_init_recursive( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     int                 i_result;
 
     pthread_mutexattr_init( &attr );
-# if defined(DEBUG)
+# ifndef NDEBUG
     /* Create error-checking mutex to detect problems more easily. */
 #   if defined(SYS_LINUX)
     pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
