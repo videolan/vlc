@@ -249,8 +249,8 @@ if(APPLE)
     vlc_module_add_link_libraries(quartztext
          ${Carbon_FRAMEWORKS}
          ${ApplicationServices_FRAMEWORKS} )
-    vlc_module_add_link_libraries(mp4
-         ${IOKit_FRAMEWORKS} )
+    vlc_module_add_link_libraries(mp4 ${IOKit_FRAMEWORKS} )
+    vlc_module_add_link_libraries(mkv ${IOKit_FRAMEWORKS} )
 
     add_executable(VLC MACOSX_BUNDLE src/vlc.c)
     target_link_libraries(VLC libvlc)
