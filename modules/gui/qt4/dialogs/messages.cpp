@@ -98,7 +98,6 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QGridLayout *treeLayout = new QGridLayout( treeWidget );
 
     modulesTree = new QTreeWidget();
-    modulesTree->setGeometry( 0, 0, 440, 600 );
     modulesTree->header()->hide();
 
     QPushButton *updateButton = new QPushButton( qtr( "&Update" ) );
@@ -191,9 +190,12 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem, vlc_object_t *p_obj
         item = new QTreeWidgetItem( modulesTree );
 
     if( p_obj->psz_object_name )
-        item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" + qfu( p_obj->psz_object_name ) + "\" (" + QString::number(p_obj->i_object_id) + ")\n" );
+        item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
+                       qfu( p_obj->psz_object_name ) + "\" (" +
+                       QString::number(p_obj->i_object_id) + ")\n" );
     else
-        item->setText( 0, qfu( p_obj->psz_object_type ) + " (" + QString::number(p_obj->i_object_id) + ")\n" );
+        item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
+                       QString::number(p_obj->i_object_id) + ")\n" );
 
     for( int i=0; i < p_obj->i_children; i++ )
     {
