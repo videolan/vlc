@@ -33,7 +33,7 @@ OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
 OPTION( ENABLE_VLM             "Enable vlm" ON )
 OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
 OPTION( UPDATE_CHECK           "Enable automatic new version checking" OFF )
-OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" ON )
+OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" OFF )
 
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING  "build type determining compiler flags" FORCE )
