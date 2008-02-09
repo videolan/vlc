@@ -114,7 +114,7 @@ vlc_check_functions_exist(lstat fstat stat)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES arpa/inet.h)
-vlc_check_functions_exist(inet_pton inet_aton inet_ntop inet_pton)
+vlc_check_functions_exist(inet_aton inet_ntop inet_pton)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_REQUIRED_LIBRARIES)
@@ -138,7 +138,6 @@ check_c_source_compiles (
  int main() { return 0;}" HAVE_STDINT_H_WITH_UINTMAX)
 
 check_symbol_exists(ntohl "sys/param.h"  NTOHL_IN_SYS_PARAM_H)
-check_symbol_exists(scandir "dirent.h"   HAVE_SCANDIR)
 check_symbol_exists(scandir "dirent.h"   HAVE_SCANDIR)
 check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
 check_symbol_exists(alloca "alloca.h"    HAVE_ALLOCA)
