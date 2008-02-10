@@ -45,7 +45,7 @@ public:
     bool RegistryKeyExists( const char *path);
     bool RegistryValueExists( const char *path, const char *valueName);
     int DeleteValue( char *path, char *valueName );
-    long DeleteKey( char *path, char *keyName ); 
+    long DeleteKey( char *path, char *keyName );
 };
 
 #endif

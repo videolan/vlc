@@ -34,7 +34,7 @@ public:
     static PodcastConfigDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance )
-            instance = new PodcastConfigDialog( (QWidget *)p_intf->p_sys->p_mi, 
+            instance = new PodcastConfigDialog( (QWidget *)p_intf->p_sys->p_mi,
                                                 p_intf );
         return instance;
     }

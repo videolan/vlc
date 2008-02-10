@@ -325,7 +325,7 @@ void StandardPLPanel::removeItem( int i_id )
     model->removeItem( i_id );
 }
 
-/* Delete and Suppr key remove the selection 
+/* Delete and Suppr key remove the selection
    FilterKey function and code function */
 void StandardPLPanel::keyPressEvent( QKeyEvent *e )
 {

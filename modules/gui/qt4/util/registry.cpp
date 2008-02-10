@@ -187,22 +187,22 @@ double QVLCRegistry::ReadRegistryDouble( const char *path, const char *valueName
     return default_value;
 }
 
-int QVLCRegistry::DeleteValue( char *path, char *valueName ) 
+int QVLCRegistry::DeleteValue( char *path, char *valueName )
 {
-    HKEY keyHandle; 
+    HKEY keyHandle;
     long result;
     if( (result = RegOpenKeyEx(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
     {
         result = RegDeleteValue(keyHandle, valueName);
         RegCloseKey(keyHandle);
     }
-    //ERROR_SUCCESS = ok everything else you have a problem*g*,  
+    //ERROR_SUCCESS = ok everything else you have a problem*g*,
     return result;
 }
 
-long QVLCRegistry::DeleteKey( char *path, char *keyName ) 
+long QVLCRegistry::DeleteKey( char *path, char *keyName )
 {
-    HKEY keyHandle; 
+    HKEY keyHandle;
     long result;
     if( (result = RegOpenKeyEx(m_RootKey, path, 0, KEY_WRITE, &keyHandle)) == ERROR_SUCCESS)
     {
@@ -212,7 +212,7 @@ long QVLCRegistry::DeleteKey( char *path, char *keyName )
         result = RegDeleteKey(keyHandle, keyName);
         RegCloseKey(keyHandle);
     }
-    //ERROR_SUCCESS = ok everything else you have a problem*g*,  
+    //ERROR_SUCCESS = ok everything else you have a problem*g*,
     return result;
 }
 

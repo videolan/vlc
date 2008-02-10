@@ -24,8 +24,8 @@
 #ifndef _INTERACTION_H_
 #define _INTERACTION_H_
 
-#ifdef HAVE_CONFIG_H 
-# include "config.h" 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
 #endif
 
 #include <vlc/vlc.h>

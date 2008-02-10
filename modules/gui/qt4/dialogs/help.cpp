@@ -125,7 +125,7 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             + qtr( "Based on SVN revision: " ) + qfu( VLC_Changeset() ) + ".\n"
             + qtr( "You are using the Qt4 Interface.\n\n" )
             + qtr( "Copyright (c) " COPYRIGHT_YEARS " by the VideoLAN Team.\n" )
-            + "vlc@videolan.org, http://www.videolan.org" ); 
+            + "vlc@videolan.org, http://www.videolan.org" );
     infoLabel->setWordWrap( infoLabel );
 
     QLabel *iconVLC2 = new QLabel;
@@ -288,7 +288,7 @@ void UpdateDialog::updateNotify( bool b_result )
         {
             b_checked = true;
             updateButton->setText( "Download" );
-            updateLabel->setText( qtr( "There is a new version of vlc :\n" ) 
+            updateLabel->setText( qtr( "There is a new version of vlc :\n" )
                                 + qfu( p_update->release.psz_desc )  );
         }
         else

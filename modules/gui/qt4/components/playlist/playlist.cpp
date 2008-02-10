@@ -72,7 +72,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
     /* Connect the activated() to the rootChanged() signal
-       This will be used by StandardPLPanel to setCurrentRootId, that will 
+       This will be used by StandardPLPanel to setCurrentRootId, that will
        change the label of the addButton  */
     connect( selector, SIGNAL( activated( int ) ),
              this, SIGNAL( rootChanged( int ) ) );
