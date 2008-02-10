@@ -42,42 +42,15 @@
 
 MessagesDialog *MessagesDialog::instance = NULL;
 
-MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
+MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
+               : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Messages" ) );
-    resize( 600, 450 );
 
     /* General widgets */
     QGridLayout *mainLayout = new QGridLayout( this );
     QTabWidget  *mainTab = new QTabWidget( this );
     mainTab->setTabPosition( QTabWidget::North );
-
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    closeButton->setDefault( true );
-    clearButton = new QPushButton( qtr( "&Clear" ) );
-    saveLogButton = new QPushButton( qtr( "&Save as..." ) );
-
-    verbosityBox = new QSpinBox();
-    verbosityBox->setRange( 0, 2 );
-    verbosityBox->setValue( config_GetInt( p_intf, "verbose" ) );
-    verbosityBox->setWrapping( true );
-    verbosityBox->setMaximumWidth( 50 );
-
-    verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
-
-
-    mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
-    mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
-    mainLayout->addWidget( verbosityBox, 1, 1 );
-    mainLayout->addWidget( saveLogButton, 1, 3 );
-    mainLayout->addWidget( clearButton, 1, 4 );
-    mainLayout->addWidget( closeButton, 1, 5 );
-
-    BUTTONACT( closeButton, close() );
-    BUTTONACT( clearButton, clear() );
-    BUTTONACT( saveLogButton, save() );
-    CONNECT( mainTab, currentChanged( int ), this, updateTab( int ) );
- 
 
     /* Messages */
     QWidget     *msgWidget = new QWidget;
@@ -103,9 +76,35 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     treeLayout->addWidget( modulesTree, 0, 0, 1, 0 );
     mainTab->addTab( treeWidget, qtr( "Modules tree" ) );
 
+    /* Buttons and general layout */
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    closeButton->setDefault( true );
+    clearButton = new QPushButton( qtr( "&Clear" ) );
+    saveLogButton = new QPushButton( qtr( "&Save as..." ) );
+
+    verbosityBox = new QSpinBox();
+    verbosityBox->setRange( 0, 2 );
+    verbosityBox->setValue( config_GetInt( p_intf, "verbose" ) );
+    verbosityBox->setWrapping( true );
+    verbosityBox->setMaximumWidth( 50 );
+
+    verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
+
+    mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
+    mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
+    mainLayout->addWidget( verbosityBox, 1, 1 );
+    mainLayout->addWidget( saveLogButton, 1, 3 );
+    mainLayout->addWidget( clearButton, 1, 4 );
+    mainLayout->addWidget( closeButton, 1, 5 );
+
+    BUTTONACT( closeButton, hide() );
+    BUTTONACT( clearButton, clear() );
+    BUTTONACT( saveLogButton, save() );
+    CONNECT( mainTab, currentChanged( int ),
+             this, updateTab( int ) );
 
     /* General action */
-    readSettings( "Messages" );
+    readSettings( "Messages", QSize( 600, 450 ) );
 }
 
 void MessagesDialog::updateTab( int index )
@@ -193,7 +192,8 @@ void MessagesDialog::updateLog()
     }
 }
 
-void MessagesDialog::buildTree( QTreeWidgetItem *parentItem, vlc_object_t *p_obj )
+void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
+                                vlc_object_t *p_obj )
 {
     vlc_object_yield( p_obj );
     QTreeWidgetItem *item;
@@ -211,6 +211,8 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem, vlc_object_t *p_obj
         item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
                        QString::number(p_obj->i_object_id) + ")" );
 
+    item->setExpanded( true );
+
     for( int i=0; i < p_obj->i_children; i++ )
     {
         buildTree( item, p_obj->pp_children[i]);
@@ -224,11 +226,6 @@ void MessagesDialog::updateTree()
     modulesTree->clear();
 
     buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
-}
-
-void MessagesDialog::close()
-{
-    hide();
 }
 
 void MessagesDialog::clear()

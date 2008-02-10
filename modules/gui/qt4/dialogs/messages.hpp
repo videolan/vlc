@@ -65,7 +65,6 @@ private:
 private slots:
     void updateTab( int );
     void updateLog();
-    void close();
     void clear();
     bool save();
 private:
