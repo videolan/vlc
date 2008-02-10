@@ -591,12 +591,12 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 #endif
         p_priv->thread_id.id = (DWORD)threadId;
         p_priv->thread_id.hThread = (HANDLE)hThread;
-    ResumeThread((HANDLE)hThread);
+        ResumeThread((HANDLE)hThread);
     }
 
     i_ret = ( p_priv->thread_id.hThread ? 0 : 1 );
 
-    if( i_ret && i_priority )
+    if( !i_ret && i_priority )
     {
         if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
         {
