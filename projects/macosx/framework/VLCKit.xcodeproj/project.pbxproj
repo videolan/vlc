@@ -475,7 +475,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo $ACTION\nif test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nif ! test -e $SYMROOT/vlc_build_dir/CMakeCache.txt\nthen\n\techo \"$SYMROOT/vlc_build_dir/CMakeCache.txt exists\"\n\tmkdir -p $SYMROOT/vlc_build_dir\n\trm -Rf $top_srcdir/CMakeCache.txt\n\tcd $SYMROOT/vlc_build_dir && $top_srcdir/extras/contrib/bin/cmake $top_srcdir -DENABLE_NO_SYMBOL_CHECK=ON$top_srcdir\nfi";
+			shellScript = "echo $ACTION\nif test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nif ! test -e $SYMROOT/vlc_build_dir/CMakeCache.txt\nthen\n\tmkdir -p $SYMROOT/vlc_build_dir\n\trm -Rf $top_srcdir/CMakeCache.txt\n\tcd $SYMROOT/vlc_build_dir && $top_srcdir/extras/contrib/bin/cmake $top_srcdir -DENABLE_NO_SYMBOL_CHECK=ON\nfi";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
