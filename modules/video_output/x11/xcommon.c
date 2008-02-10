@@ -2666,9 +2666,6 @@ static int InitDisplay( vout_thread_t *p_vout )
 
     if( config_GetInt( p_vout, MODULE_STRING "-shm" ) )
     {
-#   ifdef __APPLE__
-        /* FIXME: As of 2001-03-16, XFree4 for MacOS X does not support Xshm */
-#   else
         int major, evt, err;
 
         if( XQueryExtension( p_vout->p_sys->p_display, "MIT-SHM", &major,
@@ -2688,22 +2685,11 @@ static int InitDisplay( vout_thread_t *p_vout )
                      major, minor, pixmaps ? "" : "out",
                      p_vout->p_sys->i_shm_opcode );
         }
-
-#   endif
-
-        if( !p_vout->p_sys->i_shm_opcode )
-        {
-            msg_Warn( p_vout, "XShm video extension is unavailable" );
-        }
+        else
+            msg_Warn( p_vout, "XShm video extension not available" );
     }
     else
-    {
-        msg_Dbg( p_vout, "disabling XShm video extension" );
-    }
-
-#else
-    msg_Warn( p_vout, "XShm video extension is unavailable" );
-
+        msg_Dbg( p_vout, "XShm video extension disabled" );
 #endif
 
 #ifdef MODULE_NAME_IS_xvideo
