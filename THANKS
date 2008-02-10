@@ -19,7 +19,7 @@ Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
-Andre Weber <WeberAndre at gmx d0t de> - Qt4 patches
+Andre Weber <WeberAndre at gmx d0t de> - Qt4 patches, AAC ordering pathes
 Andres Krapf <dae at via.ecp.fr> - FreeBSD port and tests, KDE interface
 Andrew Zaikin <andrew dot zaikin at gmail dot com> - Config saving fixes
 Andrey Brilevskiy <director at macwest.ru> - Russian translation
@@ -194,6 +194,7 @@ Roman Bednarek <roman at mikronika.com.pl> - MPL2 subtitles support
 Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
 Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs, multipass x264 patch
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX improvements
+Sebastian Jenny <jenny - sebastian &t gmail - com > - AAC decoding channel ordering fix.
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
 Sidney Doria <ssdoria qt gmail.com> - Brazilian Portuguese localisation
 Simon Damkjær Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
