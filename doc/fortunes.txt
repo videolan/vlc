@@ -832,3 +832,8 @@ VLC development is NOT about being a sed god.
 < dionoea> poor guy ...
   -- #videolan
 %
+< d_anny> do u guys know how to remove cygwin
+< j-b> d_anny: suicide
+< d_anny> j-b: suicide , a command in cygwin ?
+  -- #videolan
+%
