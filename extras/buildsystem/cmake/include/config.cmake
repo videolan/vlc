@@ -483,6 +483,16 @@ if(CURSES_LIBRARIES)
   vlc_module_add_link_libraries(ncurses ${CURSES_LIBRARIES})
 endif(CURSES_LIBRARIES)
 
+find_package(X11)
+if(X11_FOUND)
+  vlc_enable_modules(x11 panoramix)
+  vlc_check_include_files (X11/Xlib.h)
+  vlc_check_include_files (gl/glu.h)
+  vlc_check_include_files (gl/glx.h)
+  vlc_module_add_link_libraries(x11       ${X11_LIBRARIES})
+  vlc_module_add_link_libraries(panoramix ${X11_LIBRARIES})
+endif(X11_FOUND)
+
 set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
