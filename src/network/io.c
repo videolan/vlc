@@ -392,30 +392,32 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                      const uint8_t *p_data, size_t i_data )
 {
     size_t i_total = 0;
+    struct pollfd ufd[2] = {
+        { .fd = fd,                           .events = POLLOUT },
+        { .fd = vlc_object_waitpipe (p_this), .events = POLLIN  },
+    };
+
+    if (ufd[1].fd == -1)
+        return -1;
 
     while( i_data > 0 )
     {
-        if( p_this->b_die )
-            break;
+        ssize_t val;
 
-        struct pollfd ufd[1];
-        memset (ufd, 0, sizeof (ufd));
-        ufd[0].fd = fd;
-        ufd[0].events = POLLOUT;
+        ufd[0].revents = ufd[1].revents = 0;
 
-        int val = poll (ufd, 1, 500);
-        switch (val)
+        if (poll (ufd, 1, -1) == -1)
         {
-            case -1:
-               msg_Err (p_this, "Write error: %m");
-               goto out;
-
-            case 0:
-                continue;
+            if (errno != EINTR)
+            {
+                msg_Err (p_this, "Write error: %m");
+                goto out;
+            }
+            continue;
         }
 
         if ((ufd[0].revents & (POLLERR|POLLNVAL|POLLHUP)) && (i_total > 0))
-            return i_total; // error will be dequeued separately on next call
+            break; // error will be dequeued separately on next call
 
         if (p_vs != NULL)
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
