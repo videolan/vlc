@@ -206,10 +206,10 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem, vlc_object_t *p_obj
     if( p_obj->psz_object_name )
         item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
                        qfu( p_obj->psz_object_name ) + "\" (" +
-                       QString::number(p_obj->i_object_id) + ")\n" );
+                       QString::number(p_obj->i_object_id) + ")" );
     else
         item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
-                       QString::number(p_obj->i_object_id) + ")\n" );
+                       QString::number(p_obj->i_object_id) + ")" );
 
     for( int i=0; i < p_obj->i_children; i++ )
     {
