@@ -263,10 +263,14 @@ static int Open( vlc_object_t *p_this )
 
     if( ( psz_src == NULL ) || ( *psz_src == '\0' ) )
     {
-        static char const* ppsz_paths[] = {
+        const char *data_path = config_GetDataDir ();
+        char buf[strlen (data_path) + sizeof ("/http")];
+        snprintf (buf, sizeof (buf), "%s/http", data_path);
+
+        const char const* ppsz_paths[] = {
             "share/http",
             "../share/http",
-            DATA_PATH"/http",
+            buf,
             NULL
         };
         unsigned i;

@@ -432,8 +432,8 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
             || !S_ISDIR( stat_info.st_mode ) )
         {
             free(ppsz_dir_list[1]);
-            if( asprintf( &ppsz_dir_list[1],
-                          DATA_PATH DIR_SEP "%s", luadirname ) < 0 )
+            if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "%s",
+                          config_GetDataDir (), luadirname ) < 0 )
                 return VLC_ENOMEM;
         }
     }

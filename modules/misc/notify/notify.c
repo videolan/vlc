@@ -219,7 +219,13 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         free( psz_arturl );
     }
     else /* else we show state-of-the art logo */
-        pix = gdk_pixbuf_new_from_file( DATA_PATH "/vlc48x48.png", &p_error );
+    {
+        const char *data_path = config_GetDataDir ();
+        char buf[strlen (data_path) + sizeof ("/vlc48x48.png")];
+
+        snprintf (buf, sizeof (buf), "%s/vlc48x48.png", data_path);
+        pix = gdk_pixbuf_new_from_file( buf, &p_error );
+    }
 
     /* we need to replace '&' with '&amp;' because '&' is a keyword of
      * notification-daemon parser */

@@ -74,7 +74,7 @@ bool X11Factory::init()
     m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_datadir +
                               + "/skins2" );
     m_resourcePath.push_back( (string)"share/skins2" );
-    m_resourcePath.push_back( (string)DATA_PATH + "/skins2" );
+    m_resourcePath.push_back( (string)config_GetDataDir () + "/skins2" );
 
     return true;
 }
