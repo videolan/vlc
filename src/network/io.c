@@ -284,7 +284,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 
         if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
         {
-            if (errno =! EINTR)
+            if (errno != EINTR)
                 goto error;
             continue;
         }
@@ -306,6 +306,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         {
             if (ufd[1].revents)
             {
+                assert (p_this->b_die);
                 msg_Dbg (p_this, "socket %d polling interrupted", fd);
 #if defined(WIN32) || defined(UNDER_CE)
                 WSASetLastError (WSAEINTR);
@@ -411,7 +412,7 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
             if (errno != EINTR)
             {
                 msg_Err (p_this, "Write error: %m");
-                goto out;
+                goto error;
             }
             continue;
         }
@@ -423,6 +424,15 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                 break;
             if (ufd[1].revents)
                 break;
+        }
+        else
+        {
+            if (ufd[1].revents)
+            {
+                assert (p_this->b_die);
+                errno = EINTR;
+                goto error;
+            }
         }
 
         if (p_vs != NULL)
@@ -445,10 +455,10 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         i_total += val;
     }
 
-out:
     if ((i_total > 0) || (i_data == 0))
         return i_total;
 
+error:
     return -1;
 }
 
