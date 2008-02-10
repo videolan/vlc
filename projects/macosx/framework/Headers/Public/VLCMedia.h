@@ -189,7 +189,7 @@ typedef enum VLCMediaState
  * available.  Use lengthWaitUntilDate: to wait for a specified length of time.
  * \see lengthWaitUntilDate
  */
-@property (readonly) VLCTime * length;
+@property (retain, readonly) VLCTime * length;
 
 /**
  * Returns a VLCTime object describing the length of the media resource,
@@ -209,17 +209,17 @@ typedef enum VLCMediaState
 /**
  * The URL for the receiver's media resource.
  */
-@property (readonly) NSURL * url;
+@property (retain, readonly) NSURL * url;
 
 /**
  * The receiver's sub list.
  */
-@property (readonly) VLCMediaList * subitems;
+@property (retain, readonly) VLCMediaList * subitems;
 
 /**
  * The receiver's meta data as a NSDictionary object.
  */
-@property (readonly) NSDictionary * metaDictionary;
+@property (retain, readonly) NSDictionary * metaDictionary;
 
 /**
  * The receiver's state, such as Playing, Error, NothingSpecial, Buffering.

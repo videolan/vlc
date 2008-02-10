@@ -358,7 +358,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     p_md = libvlc_media_descriptor_duplicate( [media libVLCMediaDescriptor] );
     for( NSString * key in [options allKeys] )
     {
-        NSLog(@"Adding %@", [NSString stringWithFormat:@"--%@ %@", key, [options objectForKey:key]]);
         libvlc_media_descriptor_add_option(p_md, [[NSString stringWithFormat:@"%@=#%@", key, [options objectForKey:key]] UTF8String], NULL);
     }
     return [VLCMedia mediaWithLibVLCMediaDescriptor:p_md];
@@ -460,9 +459,13 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     }
 
     state = LibVLCStateToMediaState(libvlc_media_descriptor_get_state( p_md, NULL ));
+
     /* Force VLCMetaInformationTitle, that will trigger preparsing
      * And all the other meta will be added through the libvlc event system */
     [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
+
+    /* Force VLCMetaInformationArtworkURL, that will trigger artwork fetching */
+    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
 }
 
 - (void)fetchMetaInformationFromLibVLCWithType:(NSString *)metaType
@@ -472,7 +475,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     NSString * oldValue = [metaDictionary valueForKey:metaType];
     free(psz_value);
 
-    if ( !(newValue && oldValue && [oldValue compare:newValue] == NSOrderedSame) )
+    if ( newValue != oldValue && !(oldValue && newValue && [oldValue compare:newValue] == NSOrderedSame) )
     {
         if ([metaType isEqualToString:VLCMetaInformationArtworkURL])
         {
@@ -489,22 +492,32 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 - (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    // Go ahead and load up the art work
-    NSURL * artUrl = [NSURL URLWithString:[anURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    NSImage * art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease]; 
-        
-    // If anything was found, lets save it to the meta data dictionary
-    if (art)
+    NSImage * art = nil;
+
+    if( anURL )
     {
-        [self performSelectorOnMainThread:@selector(setArtwork:) withObject:art waitUntilDone:NO];
+        // Go ahead and load up the art work
+        NSURL * artUrl = [NSURL URLWithString:[anURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+
+        // Don't attempt to fetch artwork from remote. Core will do that alone
+        if ([artUrl isFileURL])
+            art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease]; 
     }
+
+    // If anything was found, lets save it to the meta data dictionary
+    [self performSelectorOnMainThread:@selector(setArtwork:) withObject:art waitUntilDone:NO];
 
     [pool release];
 }
 
 - (void)setArtwork:(NSImage *)art
 {
+    if (!art)
+    {
+        [metaDictionary removeObjectForKey:@"artwork"];
+        return;
+    }
+
     [metaDictionary setObject:art forKey:@"artwork"];
 }
 

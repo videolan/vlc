@@ -94,7 +94,11 @@
     [self setNeedsDisplayOnBoundsChange:YES];
 
     [CATransaction commit];
+
+    /* Trigger by hand, as it doesn't go through else. Assumed bug from Cocoa */
+    [self willChangeValueForKey:@"hasVideo"];
     self.hasVideo = YES;
+    [self didChangeValueForKey:@"hasVideo"];
 }
 
 - (void)removeVoutLayer:(CALayer*)voutLayer
@@ -102,7 +106,11 @@
     [CATransaction begin];
     [voutLayer removeFromSuperlayer];
     [CATransaction commit];
+    
+    /* Trigger by hand, as it doesn't go through else. Assumed bug from Cocoa */
+    [self willChangeValueForKey:@"hasVideo"];
     self.hasVideo = NO;
+    [self didChangeValueForKey:@"hasVideo"];
 }
 
 @end

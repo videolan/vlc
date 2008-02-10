@@ -82,7 +82,7 @@ static void * DestroySharedLibraryAtExit( void )
         
         const char * lib_vlc_params[] = { 
             "-I", "dummy", "--vout=opengllayer", 
-            "--no-video-title-show", "--no-sout-keep", "-vvv"
+            "--no-video-title-show", "--no-sout-keep"
             //, "--control=motion", "--motion-use-rotate", "--video-filter=rotate"
         };
         
