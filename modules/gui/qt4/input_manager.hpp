@@ -76,6 +76,7 @@ private:
     void UpdateArt();
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
+    int             i_input_id;
     int             i_old_playing_status;
     QString         old_name;
     QString         artUrl;

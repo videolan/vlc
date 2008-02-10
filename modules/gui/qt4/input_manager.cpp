@@ -78,11 +78,19 @@ void InputManager::setInput( input_thread_t *_p_input )
     delInput();
     p_input = _p_input;
     b_had_audio = b_had_video = b_has_audio = b_has_video = false;
-    if( p_input )
+    if( p_input && !( p_input->b_dead || p_input->b_die ) )
     {
         vlc_object_yield( p_input );
         emit statusChanged( PLAYING_S );
+        UpdateMeta();
+        UpdateTracks();
+        UpdateTitle();
+        UpdateArt();
         addCallbacks();
+        i_input_id = input_GetItem( p_input )->i_id; 
+    } else {
+        p_input = NULL;
+        i_input_id = 0;
     }
 }
 
@@ -97,6 +105,7 @@ void InputManager::delInput()
         vlc_object_release( p_input );
         i_old_playing_status = END_S;
 
+        i_input_id = 0;
         old_name=qfu("");
         artUrl = qfu("");
         emit positionUpdated( 0.0, 0 ,0 );
@@ -148,6 +157,7 @@ void InputManager::delCallbacks()
 void InputManager::customEvent( QEvent *event )
 {
     int type = event->type();
+    IMEvent *ple = static_cast<IMEvent *>(event);
     //msg_Dbg( p_intf, "New IM Event of type: %i", type );
     if ( type != PositionUpdate_Type &&
          type != ItemChanged_Type &&
@@ -155,16 +165,14 @@ void InputManager::customEvent( QEvent *event )
          type != ItemTitleChanged_Type &&
          type != ItemStateChanged_Type )
         return;
-
+    
+    if( !p_input || p_input->b_die || p_input->b_dead )
+        return;
+    if( type != PositionUpdate_Type && ( i_input_id != ple->i_id )  )
+        return;
     if( type != PositionUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", type );
 
-    /* Delete the input */
-    if( !p_input || p_input->b_dead || p_input->b_die )
-    {
-         delInput();
-         return;
-    }
 
     /* Actions */
     switch( type )
@@ -442,10 +450,9 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     im = new InputManager( this, p_intf );
 
     var_AddCallback( THEPL, "item-change", PLItemChanged, this );
+    var_AddCallback( THEPL, "item-change", ItemChanged, im );
     var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
-
-    var_AddCallback( THEPL, "playlist-current", ItemChanged, im );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
 
@@ -461,16 +468,18 @@ MainInputManager::~MainInputManager()
 {
     if( p_input )
     {
+       var_DelCallback( p_input, "state", PLItemChanged, this );
+       vlc_object_release( p_input );
        emit inputChanged( NULL );
     }
 
     var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
 
-    var_DelCallback( THEPL, "playlist-current", PLItemChanged, this );
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
+    var_DelCallback( THEPL, "item-change", ItemChanged, im );
     var_DelCallback( THEPL, "item-change", PLItemChanged, this );
 
-    var_DelCallback( THEPL, "playlist-current", ItemChanged, im );
+    var_DelCallback( THEPL, "playlist-current", PLItemChanged, this );
 }
 
 void MainInputManager::customEvent( QEvent *event )
@@ -492,9 +501,12 @@ void MainInputManager::customEvent( QEvent *event )
         vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || p_input->b_die ) )
         {
-            im->delInput();
+            var_DelCallback( p_input, "state", PLItemChanged, this );
+            vlc_object_release( p_input );
             emit inputChanged( NULL );
             p_input = NULL;
+            vlc_mutex_unlock( &p_intf->change_lock );
+            return;
         }
 
         if( !p_input )
@@ -503,6 +515,8 @@ void MainInputManager::customEvent( QEvent *event )
             p_input = THEPL->p_input;
             if( p_input && !( p_input->b_die || p_input->b_dead) )
             {
+                vlc_object_yield( p_input );
+                var_AddCallback( p_input, "state", PLItemChanged, this );
                 emit inputChanged( p_input );
             }
             else
