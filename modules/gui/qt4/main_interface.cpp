@@ -912,6 +912,7 @@ void MainInterface::setRate( int rate )
     str.setNum( ( 1000 / (double)rate ), 'f', 2 );
     str.append( "x" );
     speedLabel->setText( str );
+    speedLabel->setToolTip( str );
     speedControl->updateControls( rate );
 }
 
