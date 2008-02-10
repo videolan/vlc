@@ -2696,23 +2696,6 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 }
 
 
-static inline vlc_bool_t IsValidAccess( const char *psz )
-{
-    char c;
-
-    while( ( c = *psz ) != '\0' )
-    {
-        if( c == ':' )
-            return VLC_TRUE;
-
-        if( ( !isascii( c ) || !isalnum( c ) ) && c != '-' && ( c != '/' ) )
-            return VLC_FALSE;
-        psz++;
-    }
-    /* should not happen though */
-    return VLC_FALSE;
-}
-
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               int i_new, input_attachment_t **pp_new )
 {
@@ -2791,52 +2774,32 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
 void MRLSplit( char *psz_dup, const char **ppsz_access, const char **ppsz_demux,
                char **ppsz_path )
 {
-    const char *psz_access = "";
-    const char *psz_demux  = "";
+    char *psz_access = NULL;
+    char *psz_demux  = NULL;
     char *psz_path;
-    char *psz;
 
-    psz = strchr( psz_dup, ':' );
-
-    if( psz != NULL )
+    /* Either there is an access/demux specification before ://
+     * or we have a plain local file path. */
+    psz_path = strstr( psz_dup, "://" );
+    if( psz_path != NULL )
     {
-        /* Guess whether ':' is part of a local filename, or separates
-         * access/demux from path */
-        if( !IsValidAccess( psz_dup ) )
-            psz = NULL;
-#if defined( WIN32 ) || defined( UNDER_CE )
-        else if( ( psz - psz_dup == 1 ) && isalpha( psz_dup[0] ) )
-        {
-            //msg_Dbg( p_input, "drive letter %c: found in source", *psz_dup );
-            psz = NULL;
-        }
-#endif
-    }
+        *psz_path = '\0';
+        psz_path += 3; /* skips "://" */
 
-    if( psz != NULL )
-    {
-        *psz++ = '\0';
-        if( psz[0] == '/' && psz[1] == '/' ) psz += 2;
-
-        psz_path = psz;
-
-        psz = strchr( psz_dup, '/' );
-        if( psz )
-        {
-            *psz++ = '\0';
-            psz_demux = psz;
-        }
-
+        /* Separate access from demux (<access>/<demux>://<path>) */
         psz_access = psz_dup;
+        psz_demux = strchr( psz_access, '/' );
+        if( psz_demux )
+            *psz_demux++ = '\0';
     }
     else
     {
         psz_path = psz_dup;
     }
 
-    *ppsz_access = psz_access;
-    *ppsz_demux = psz_demux;
-    *ppsz_path = psz_path;
+    *ppsz_access = psz_access ? psz_access : "";
+    *ppsz_demux = psz_demux ? psz_demux : "";
+    *ppsz_path = psz_path ? psz_path : "";
 }
 
 /*****************************************************************************
