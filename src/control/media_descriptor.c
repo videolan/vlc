@@ -217,10 +217,6 @@ static void preparse_if_needed( libvlc_media_descriptor_t *p_md )
         playlist_PreparseEnqueue(
                 p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
                 p_md->p_input_item );
-        playlist_AskForArtEnqueue(
-                p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
-                p_md->p_input_item );
-
         p_md->b_preparsed = VLC_TRUE;
     }
 }
@@ -445,6 +441,13 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
 
     psz_meta = input_item_GetMeta( p_md->p_input_item,
                                    libvlc_to_vlc_meta[e_meta] );
+    
+    if( e_meta == libvlc_meta_ArtworkURL && !psz_meta )
+    {
+        playlist_AskForArtEnqueue(
+                p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
+                p_md->p_input_item );
+    }
 
     /* Should be integrated in core */
     if( !psz_meta && e_meta == libvlc_meta_Title && p_md->p_input_item->psz_name )
