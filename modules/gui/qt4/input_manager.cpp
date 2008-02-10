@@ -87,8 +87,10 @@ void InputManager::setInput( input_thread_t *_p_input )
         UpdateTitle();
         UpdateArt();
         addCallbacks();
-        i_input_id = input_GetItem( p_input )->i_id; 
-    } else {
+        i_input_id = input_GetItem( p_input )->i_id;
+    }
+    else
+    {
         p_input = NULL;
         i_input_id = 0;
     }
@@ -165,7 +167,7 @@ void InputManager::customEvent( QEvent *event )
          type != ItemTitleChanged_Type &&
          type != ItemStateChanged_Type )
         return;
-    
+
     if( !p_input || p_input->b_die || p_input->b_dead )
         return;
     if( type != PositionUpdate_Type && ( i_input_id != ple->i_id )  )
