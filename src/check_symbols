@@ -20,3 +20,4 @@ fi
 #	exit 1
 #fi
 
+rm -f libvlc-headers.sym
