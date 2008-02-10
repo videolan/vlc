@@ -248,8 +248,11 @@ static void Close( vlc_object_t *p_this )
     p_intf->b_dead = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->object_lock );
 
-    if( p_intf->pf_show_dialog )
+    if( p_intf->p_sys->b_isDialogProvider )
     {
+        DialogEvent *event = new DialogEvent( INTF_DIALOG_EXIT, 0, NULL );
+        QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
+
         vlc_thread_join( p_intf );
     }
 
@@ -309,10 +312,12 @@ static void Init( intf_thread_t *p_intf )
         p_intf->p_sys->p_mi = p_mi;
         /* We don't show it because it is done in the MainInterface constructor
         p_mi->show(); */
+        p_intf->p_sys->b_isDialogProvider = false;
     }
     else
     {
         vlc_thread_ready( p_intf );
+        p_intf->p_sys->b_isDialogProvider = true;
     }
 
 
@@ -342,7 +347,7 @@ static void Init( intf_thread_t *p_intf )
     }
 
     /* Explain to the core how to show a dialog :D */
-    //p_intf->pf_show_dialog = ShowDialog;
+    p_intf->pf_show_dialog = ShowDialog;
 
     /* Last settings */
     app->setQuitOnLastWindowClosed( false );
@@ -357,7 +362,8 @@ static void Init( intf_thread_t *p_intf )
     {
         int interval = config_GetInt( p_intf, "qt-updates-days" );
         QSettings settings( "vlc", "vlc-qt-interface" );
-        if( QDate::currentDate() > settings.value( "updatedate" ).toDate().addDays( interval ) )
+        if( QDate::currentDate() >
+                settings.value( "updatedate" ).toDate().addDays( interval ) )
         {
             msg_Dbg( p_intf, "Someone said I need to check updates" );
             /* The constructor of the update Dialog will do the 1st request */
@@ -387,7 +393,6 @@ static void Init( intf_thread_t *p_intf )
 
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
-
 }
 
 /*****************************************************************************

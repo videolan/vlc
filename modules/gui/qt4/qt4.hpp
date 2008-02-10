@@ -56,6 +56,8 @@ struct intf_sys_t
     QApplication *p_app;
     MainInterface *p_mi;
 
+    bool b_isDialogProvider;
+
     playlist_t *p_playlist;
     msg_subscription_t *p_sub; ///< Subscription to the message bank
 
