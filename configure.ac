@@ -3840,7 +3840,7 @@ dnl asa demuxer
 dnl
 AC_ARG_ENABLE(asademux,
   [  --enable-asademux      asa subtitle demuxing (default disabled)])
-AS_IF( [test "${enable_asa}" != "no"], [
+AS_IF( [test "${enable_asademux}" != "no"], [
   PKG_CHECK_MODULES(PCRE,
       libpcre >= 6.5,
       [
