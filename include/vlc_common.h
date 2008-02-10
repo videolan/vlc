@@ -487,7 +487,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #    else
 #      define VLC_PUBLIC_API extern
 #      define VLC_PRIVATE_API extern
-#      define   VLC_EXPORT( type, name, args ) type name args
+#      define   VLC_EXPORT( type, name, args ) extern type name args
 #      define VLC_INTERNAL( type, name, args ) type name args
 #    endif
 #  endif
