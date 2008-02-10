@@ -197,7 +197,7 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    p_intf->pf_run = Run;
+
 #if defined Q_WS_X11 && defined HAVE_X11_XLIB_H
     /* Thanks for libqt4 calling exit() in QApplication::QApplication()
      * instead of returning an error, we have to check the X11 display */
@@ -209,6 +209,7 @@ static int Open( vlc_object_t *p_this )
     }
     XCloseDisplay( p_display );
 #endif
+
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
     {
@@ -217,9 +218,12 @@ static int Open( vlc_object_t *p_this )
     }
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
 
+    p_intf->pf_run = Run;
+
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
 
+    /* We support play on start */
     p_intf->b_play = VLC_TRUE;
 
     return VLC_SUCCESS;
@@ -239,9 +243,15 @@ static int OpenDialogs( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     vlc_mutex_lock( &p_intf->object_lock );
     p_intf->b_dead = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->object_lock );
+
+    if( p_intf->pf_show_dialog )
+    {
+        vlc_thread_join( p_intf );
+    }
 
     vlc_object_release( p_intf->p_sys->p_playlist );
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
@@ -301,7 +311,9 @@ static void Init( intf_thread_t *p_intf )
         p_mi->show(); */
     }
     else
+    {
         vlc_thread_ready( p_intf );
+    }
 
 
 #ifdef ENABLE_NLS
@@ -330,7 +342,7 @@ static void Init( intf_thread_t *p_intf )
     }
 
     /* Explain to the core how to show a dialog :D */
-    p_intf->pf_show_dialog = ShowDialog;
+    //p_intf->pf_show_dialog = ShowDialog;
 
     /* Last settings */
     app->setQuitOnLastWindowClosed( false );
@@ -371,10 +383,11 @@ static void Init( intf_thread_t *p_intf )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
+    delete app;
+
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
 
-    delete app;
 }
 
 /*****************************************************************************
