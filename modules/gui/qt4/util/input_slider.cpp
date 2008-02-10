@@ -203,10 +203,10 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     }
     else
     {
-        setToolTip( QString("%1  \%" )
-                .arg( (int)( event->x() - paddingL ) * maximum() / WLENGTH ) );
+        int i = ( event->x() - paddingL ) * maximum() / WLENGTH;
+        i = __MIN( __MAX( 0, i ), maximum() );
+        setToolTip( QString("%1  \%" ).arg( i ) );
     }
-
 }
 
 void SoundSlider::changeValue( int x )
