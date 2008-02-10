@@ -280,7 +280,8 @@ MainInterface::~MainInterface()
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
     settings->setValue( "pos", pos() );
-    settings->setValue( "size", size() );
+    if( !videoIsActive )
+        settings->setValue( "size", size() );
     if( bgWidget )
         settings->setValue( "backgroundSize", bgWidget->size() );
 
