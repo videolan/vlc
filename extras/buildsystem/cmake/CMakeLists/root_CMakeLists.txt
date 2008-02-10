@@ -14,7 +14,6 @@ include( config )
 # Global definitions
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
-add_definitions(-DDATA_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/vlc\\")
 # Large file support for Solaris and Linux:
 add_definitions(-D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE)
 # Thread safety:

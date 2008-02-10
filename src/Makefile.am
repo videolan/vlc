@@ -145,7 +145,8 @@ endif
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 nodist_libvlc_la_SOURCES = misc/revision.c
-libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
+libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
+	-DDATA_PATH=\"$(pkgdatadir)\"
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
 libvlc_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
