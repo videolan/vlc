@@ -19,7 +19,7 @@ Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
-André Weber <WeberAndre at gmx d0t de> - Qt4 patches, AAC ordering patches
+André Weber <WeberAndre at gmx d0t de> - Qt4, AAC ordering, Win32 threads patches
 Andres Krapf <dae at via.ecp.fr> - FreeBSD port and tests, KDE interface
 Andrew Zaikin <andrew dot zaikin at gmail dot com> - Config saving fixes
 Andrey Brilevskiy <director at macwest.ru> - Russian translation
@@ -209,6 +209,7 @@ Tim 'O Callaghan <tim.ocallaghan at limestudios dot com> - pvr input cleaning pa
 Tim Schuerewegen <ma054331 at skynet dot be> - contrib fixes
 Thomas Graf <tgraf at europe.com> - gettext support, German translation
 Thomas L. Wood <twood at lucent.com> - fixed a bug in QuantMatrixExtension
+Thomas Mühlgrabner <muehltom &t cable d0t vol dot at> - AAC fixes.
 Thomas Parmelan <tom+vlc at ankh.fr.EU.org> - mosaic user-defined offsets for substreams
 Tom Bigelajzen <tombigel at yahoo d0t com> - Interface icons and help with web design
 Tong Ka Man <kmtong at cwbase dot com> - playlist_Clear addition
