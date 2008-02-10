@@ -882,7 +882,7 @@ void PLModel::popupSave()
 #include <shellapi.h>
 void PLModel::popupExplore()
 {
-    ShellExecuteW( NULL, L"explore", L"C:\\", NULL, NULL, SW_SHOWNORMAL );
+    ShellExecute( NULL, "explore", "C:\\", NULL, NULL, SW_SHOWNORMAL );
 }
 #endif
 
