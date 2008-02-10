@@ -575,6 +575,8 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
         fd = internals->pipes[1];
         internals->pipes[1] = -1;
         vlc_spin_unlock (&internals->spin);
+
+        msg_Dbg (obj, "waitpipe: object already dying");
         if (fd != -1)
             close (fd);
     }
@@ -684,7 +686,10 @@ void __vlc_object_kill( vlc_object_t *p_this )
     vlc_spin_unlock (&internals->spin);
 
     if( fd != -1 )
+    {
+        msg_Dbg (p_this, "waitpipe: object killed");
         close (fd);
+    }
 
     if( p_this->i_object_type == VLC_OBJECT_LIBVLC )
         for( int i = 0; i < p_this->i_children ; i++ )
