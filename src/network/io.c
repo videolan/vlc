@@ -280,31 +280,14 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 
     while (i_buflen > 0)
     {
-        int val;
-
         ufd[0].revents = ufd[1].revents = 0;
 
-        val = poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1);
-
-        if (val < 0)
-            goto error;
-
-        if (ufd[1].revents)
+        if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
         {
-            msg_Dbg (p_this, "socket %d polling interrupted", fd);
-            if (i_total == 0)
-            {
-#if defined(WIN32) || defined(UNDER_CE)
-                WSASetLastError (WSAEINTR);
-#else
-                errno = EINTR;
-#endif
+            if (errno =! EINTR)
                 goto error;
-            }
-            break;
+            continue;
         }
-
-        assert (ufd[0].revents);
 
 #ifndef POLLRDHUP /* This is nice but non-portable */
 # define POLLRDHUP 0
@@ -316,7 +299,24 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
              * bad idea™. */
             if (ufd[0].revents & (POLLERR|POLLNVAL|POLLRDHUP))
                 break;
+            if (ufd[1].revents)
+                break;
         }
+        else
+        {
+            if (ufd[1].revents)
+            {
+                msg_Dbg (p_this, "socket %d polling interrupted", fd);
+#if defined(WIN32) || defined(UNDER_CE)
+                WSASetLastError (WSAEINTR);
+#else
+                errno = EINTR;
+#endif
+                goto error;
+            }
+        }
+
+        assert (ufd[0].revents);
 
         ssize_t n;
         if (vs != NULL)
@@ -416,8 +416,14 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
             continue;
         }
 
-        if ((ufd[0].revents & (POLLERR|POLLNVAL|POLLHUP)) && (i_total > 0))
-            break; // error will be dequeued separately on next call
+        if (i_total > 0)
+        {
+            /* Errors will be dequeued separately, upon next call. */
+            if (ufd[0].revents & (POLLERR|POLLNVAL|POLLHUP))
+                break;
+            if (ufd[1].revents)
+                break;
+        }
 
         if (p_vs != NULL)
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
