@@ -27,7 +27,10 @@
 #import <VLCKit/VLCKit.h>
 #import "VLCAppAdditions.h"
 
-@interface VLCBrowsableVideoView : VLCVideoView {
+@class VLCMainWindowController;
+@class VLCMediaListLayer;
+
+@interface VLCBrowsableVideoView : NSView {
     BOOL            menuDisplayed;
     NSArray *       itemsTree;
     NSRange         displayedItems;
@@ -50,6 +53,9 @@
     NSViewAnimation * fullScreenAnim1;
     NSViewAnimation * fullScreenAnim2;
     NSView * tempFullScreenView;
+    IBOutlet VLCMainWindowController * mainWindowController;
+    VLCVideoLayer * videoLayer;
+    VLCMediaListLayer * mediaListLayer;
 }
 
 /* Binds an nsarray to that property. But don't forget the set the access keys. */
@@ -60,6 +66,9 @@
 @property (readonly, retain) id selectedObject;
 
 @property (readwrite) BOOL fullScreen;
+@property (readonly) BOOL hasVideo;
+
+@property (readonly) VLCVideoLayer * videoLayer;
 
 /* Set up a specific action to do, on items that don't have node.
  * action first argument is the browsableVideoView. You can get the selected object,
@@ -70,4 +79,6 @@
 - (void)toggleMenu;
 - (void)displayMenu;
 - (void)hideMenu;
+
+- (IBAction)backToMediaListView:(id)sender;
 @end

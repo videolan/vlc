@@ -28,6 +28,8 @@
 
 #import "VLCBrowsableVideoView.h"
 #import "VLCAppAdditions.h"
+#import "VLCMediaListLayer.h"
+#import "VLCMainWindowController.h"
 
 /* TODO: We may want to clean up the private functions a bit... */
 
@@ -60,6 +62,7 @@
 
 @end
 
+#pragma mark -
 /******************************************************************************
  * VLCBrowsableVideoView
  */
@@ -71,6 +74,7 @@
 @synthesize selectedObject;
 @synthesize target;
 @synthesize action;
+@synthesize videoLayer;
 
 - (NSArray *)itemsTree {
     return itemsTree;
@@ -105,6 +109,39 @@
     }
 }
 
+- (BOOL)hasVideo
+{
+    return videoLayer.hasVideo;
+}
+
+/* Binded to VideoLayer's hasVideo */
+- (void)setHasVideo:(BOOL)hasVideo
+{
+    if( hasVideo )
+    {
+        [CATransaction begin];
+        [videoLayer removeFromSuperlayer];
+        [self.layer addSublayer:videoLayer];
+        videoLayer.frame = [self layer].bounds;
+        [videoLayer setAutoresizingMask:kCALayerWidthSizable|kCALayerHeightSizable];
+        [mediaListLayer removeFromSuperlayer];
+        [CATransaction commit];
+    }
+    else
+    {
+        [CATransaction begin];
+        [mediaListLayer removeFromSuperlayer];
+        [self.layer addSublayer:mediaListLayer];
+        mediaListLayer.frame = [self layer].bounds;
+        [mediaListLayer setAutoresizingMask:kCALayerWidthSizable|kCALayerHeightSizable];
+        [videoLayer removeFromSuperlayer];
+        [CATransaction commit];
+
+    }
+    [[self layer] setNeedsDisplay];
+    [self setNeedsDisplay:YES];
+}
+
 /* Initializer */
 - (void)awakeFromNib
 {
@@ -118,18 +155,113 @@
     selectedPath = [[NSIndexPath alloc] init];
     tempFullScreenView = [[NSView alloc] init];
     fullScreen = NO;
-    /* Observe our bindings */
-    //[self displayMenu];
-    //[self changeSelectedIndex:0];
+
+    videoLayer = [[VLCVideoLayer layer] retain];
+    [videoLayer addObserver:self forKeyPath:@"hasVideo" options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    
+    [videoLayer setDelegate:self];
+    NSAssert( mainWindowController, @"No mainWindowController" );
+    [mainWindowController.mediaPlayer setVideoLayer: videoLayer];
+    mediaListLayer = [[VLCMediaListLayer layerWithMediaArrayController:mainWindowController.mediaArrayController] retain];
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSURLPboardType, @"VLCMediaURLType", nil]];
+    [mainWindowController.mediaArrayController setSelectsInsertedObjects:YES];
+    [mainWindowController.mediaArrayController setAvoidsEmptySelection:YES];
+    [[self layer] addSublayer:mediaListLayer];
+    mediaListLayer.frame = [self layer].bounds;
+    [mediaListLayer setAutoresizingMask:kCALayerWidthSizable|kCALayerHeightSizable];
+
+    [[self layer] setNeedsDisplay];
+
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if([keyPath isEqualToString:@"hasVideo"])
+    {
+        [self setHasVideo:[object hasVideo]];
+        return;
+    }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (void)dealloc
 {
+    /* Previously registered in */
+    [videoLayer removeObserver:self forKeyPath:@"hasVideo"];
+
+    [mediaListLayer release];
+    [videoLayer release];
     [tempFullScreenView release];
     [selectedPath release];
     [super dealloc];
 }
 
+#pragma mark -
+/* Drag and drop */
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *pboard;
+ 
+    pboard = [sender draggingPasteboard];
+ 
+    if ( [[pboard types] containsObject:NSFilenamesPboardType] &&
+        ![mainWindowController.mediaArrayController.contentMediaList isReadOnly] )
+    {
+        self.layer.borderColor = CGColorCreateGenericGray(0.5, 0.5);
+        self.layer.cornerRadius = 10.f;
+        self.layer.borderWidth = 10.0;
+        return NSDragOperationCopy;
+    }
+    return NSDragOperationNone;
+}
+
+- (void)draggingEnded:(id < NSDraggingInfo >)sender
+{
+    [CATransaction begin];
+    [CATransaction setValue:[NSNumber numberWithFloat:0.1] forKey:kCATransactionAnimationDuration];
+    self.layer.borderWidth = 0.;
+    [CATransaction commit];
+    [CATransaction begin];
+    [mainWindowController.mediaArrayController setFilterPredicate:nil];
+    [mainWindowController.mediaArrayController setSelectionIndex:[mainWindowController.mediaArrayController.contentMediaList count] - 1];
+    [CATransaction commit];
+}
+
+- (void)draggingExited:(id < NSDraggingInfo >)sender
+{
+    self.layer.borderWidth = 0.;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *pboard;
+    NSDragOperation sourceDragMask;
+ 
+    sourceDragMask = [sender draggingSourceOperationMask];
+    pboard = [sender draggingPasteboard];
+ 
+    if ( [[pboard types] containsObject:NSFilenamesPboardType] )
+    {
+        NSArray *files = [pboard propertyListForType:NSFilenamesPboardType];
+        VLCMediaList * mediaList = mainWindowController.mediaArrayController.contentMediaList;
+        if( [mediaList isReadOnly] )
+            return NO;
+
+        [CATransaction begin];
+        for( NSString * filePath in files )
+            [mediaList addMedia:[VLCMedia mediaWithPath:filePath]];
+        [CATransaction commit];
+    }
+    return YES;
+}
+
+- (void)showDrag
+{
+
+}
+
+#pragma mark -
 /* Hiding/Displaying the menu */
 
 - (void)hideMenu
@@ -184,21 +316,30 @@
         [self displayMenu];
 }
 
-- (void)drawRect:(NSRect)rect
+- (IBAction)backToMediaListView:(id)sender
 {
-    if( [[[self layer] sublayers] count] )
-    {
-        /* Don't draw the empty view if we have a video output on screen */
-        [super drawRect:rect];
-        return;
-    }
-    NSColor * bottomGradient = [NSColor colorWithCalibratedWhite:0.10 alpha:1.0];
-    NSColor * topGradient    = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
-	NSGradient * gradient = [[NSGradient alloc] initWithStartingColor:bottomGradient endingColor:topGradient];
-    [gradient drawInRect:self.bounds angle:90.0];
+    [mainWindowController.mediaPlayer stop];
+    [self setHasVideo: NO];
 }
 
+#pragma mark -
+/* drawRect */
 
+- (void)drawRect:(NSRect)rect
+{
+    if( [self hasVideo] )
+    {
+        [[NSColor blackColor] set];
+        NSRectFill(rect);
+        return;
+    }
+    NSColor * topGradient = [NSColor colorWithCalibratedWhite:.0f alpha:1.0];
+    NSColor * bottomGradient   = [NSColor colorWithCalibratedWhite:0.35f alpha:1.0];
+	NSGradient * gradient = [[NSGradient alloc] initWithColorsAndLocations:bottomGradient, 0.f, topGradient, 0.65f, topGradient, 1.f, nil];
+    [gradient drawInRect:self.bounds angle:100.0];
+}
+
+#pragma mark -
 /* Event handling */
 
 - (BOOL)acceptsFirstResponder
@@ -218,10 +359,32 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    if([theEvent clickCount] != 2)
+    if([theEvent clickCount] == 1)
+    {
+        NSRect rect1 = [self bounds];
+        NSRect rect2 = [self bounds];
+        rect1.origin.x += [self bounds].size.width * 4./5.;
+        rect1.size.width /= 5.;
+        rect2.size.width /= 5.;
+        if(NSPointInRect([self convertPoint:[theEvent locationInWindow] fromView:nil], rect1))
+        {
+            [mainWindowController.mediaArrayController selectNext:self];
+        }
+        else if(NSPointInRect([self convertPoint:[theEvent locationInWindow] fromView:nil], rect2))
+        {
+            [mainWindowController.mediaArrayController selectPrevious:self];
+        }
         return;
-
-    self.fullScreen = !self.fullScreen;
+    }
+    if([theEvent clickCount] == 2)
+    {
+        [mainWindowController mediaListViewItemDoubleClicked:self];
+        return;
+    }
+    if([theEvent clickCount] == 3)
+    {
+        self.fullScreen = !self.fullScreen;
+    }
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -237,7 +400,7 @@
         else
             [self hideMenu];
     }
-    else if(!menuDisplayed)
+    else if(!menuDisplayed && [[theEvent charactersIgnoringModifiers] characterAtIndex:0] ==  NSRightArrowFunctionKey)
     {
         [self displayMenu];
     }
@@ -264,9 +427,11 @@
 
 @end
 
+#pragma mark -
 /******************************************************************************
  * VLCBrowsableVideoView (Private)
  */
+
 @implementation VLCBrowsableVideoView (Private)
 + (CAScrollLayer *)menuLayer
 {
@@ -489,6 +654,8 @@
 
 
 @end
+
+#pragma mark -
 
 @implementation VLCBrowsableVideoView (FullScreenTransition)
 

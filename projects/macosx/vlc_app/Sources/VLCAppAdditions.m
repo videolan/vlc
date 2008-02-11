@@ -86,10 +86,21 @@
 
 /* Split view that supports slider animation */
 @implementation VLCOneSplitView
-@synthesize fixedCursorDuringResize;
+- (CGFloat)dividerThickness
+{
+    return 1.;
+}
+- (void)drawDividerInRect:(NSRect)aRect
+{
+    [self lockFocus];
+    [[NSColor blackColor] set];
+    NSRectFill(aRect);
+    [self unlockFocus];
+}
 - (float)sliderPosition
 {
-    return [[[self subviews] objectAtIndex:0] frame].size.height;
+    NSSize size = [[[self subviews] objectAtIndex:0] frame].size;
+    return [self isVertical] ? size.width : size.height;
 }
 - (void)setSliderPosition:(float)newPosition
 {
@@ -102,26 +113,6 @@
         return [CABasicAnimation animation];
     }
     return [super defaultAnimationForKey: key];
-}
-- (void)adjustSubviews
-{
-    if( !fixedCursorDuringResize )
-    {
-        [super adjustSubviews];
-        return;
-    }
-    NSRect frame0 = [[[self subviews] objectAtIndex:0] frame];
-    NSRect frame1 = [[[self subviews] objectAtIndex:1] frame];
-    frame1.size.height = [self bounds].size.height - frame0.size.height - [self dividerThickness];
-    if( frame1.size.height < 0. )
-    {
-        float delta = -frame1.size.height;
-        frame1.size.height = 0.;
-        frame0.size.height -= delta;
-        frame1.origin.y = frame0.size.height + [self dividerThickness];
-        [[[self subviews] objectAtIndex:1] setFrame: frame0];
-    }
-    [[[self subviews] objectAtIndex:1] setFrame: frame1];
 }
 @end
 
@@ -326,4 +317,18 @@ static NSMutableArray *blackoutWindows = NULL;
     return YES;
 }
 @end
+
+/*****************************************************************************
+ * NSImage (VLCAppAdditions)
+ *
+ *  Make the image view move the window by mouse down by default
+ *****************************************************************************/
+
+@implementation NSImage (VLCAppAdditions)
+- (CGImageRef)CGImage
+{
+    return [[NSBitmapImageRep imageRepWithData:[NSBitmapImageRep TIFFRepresentationOfImageRepsInArray: [self representations]]] CGImage];
+}
+@end
+
 

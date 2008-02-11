@@ -62,6 +62,9 @@
     NSArray *droppedItems = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
     if( !droppedItems )
         droppedItems = [[info draggingPasteboard] propertyListForType:NSURLPboardType];
+
+    NSAssert( contentMediaList, @"No contentMediaList" );
+
     for (i = 0; i < [droppedItems count]; i++)
     {
         NSString * filename = [droppedItems objectAtIndex:i];

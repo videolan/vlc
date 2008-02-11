@@ -55,9 +55,7 @@
  *****************************************************************************/
 @interface VLCOneSplitView : NSSplitView
 {
-    BOOL fixedCursorDuringResize;
 }
-@property (assign) BOOL fixedCursorDuringResize;
 - (float)sliderPosition;
 - (void)setSliderPosition:(float)newPosition;
 @end
@@ -121,4 +119,14 @@
 
 @interface NSImageView (VLCAppAdditions)
 - (BOOL)mouseDownCanMoveWindow;
+@end
+
+/*****************************************************************************
+ * NSImage (VLCAppAdditions)
+ *
+ *  Make the image view move the window by mouse down by default
+ *****************************************************************************/
+
+@interface NSImage (VLCAppAdditions)
+- (CGImageRef)CGImage;
 @end

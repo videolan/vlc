@@ -26,7 +26,7 @@
 #import <Cocoa/Cocoa.h>
 #import <VLCKit/VLCKit.h>
 #import "VLCAppAdditions.h"
-#import "VLCMainWindow.h"
+#import "VLCMainWindowController.h"
 
 
 @interface VLCFullScreenControllerWindow : NSPanel
@@ -49,7 +49,7 @@
     BOOL active;
     
     /* Owner */
-    IBOutlet VLCMainWindow   * mainWindow;
+    IBOutlet VLCMainWindowController   * mainWindowController;
 
     /* Draging the window using its content */
     NSPoint mouseClic;

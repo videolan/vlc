@@ -36,3 +36,7 @@
 }
 @end
 
+@interface VLCSelectionIndexToDescriptionTransformer : NSValueTransformer {
+}
+@end
+

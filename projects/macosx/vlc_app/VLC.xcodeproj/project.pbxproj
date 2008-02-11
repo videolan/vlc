@@ -13,7 +13,8 @@
 			buildPhases = (
 			);
 			dependencies = (
-				632F3CC60D318E3A003BBC56 /* PBXTargetDependency */,
+				63E930B80D5F43FA006B31CD /* PBXTargetDependency */,
+				63E930B60D5F43E9006B31CD /* PBXTargetDependency */,
 			);
 			name = "vlc-contrib-core-framework-app";
 			productName = "vlc-contrib-core-framework-app";
@@ -24,7 +25,7 @@
 			buildPhases = (
 			);
 			dependencies = (
-				632F3C260D316FAD003BBC56 /* PBXTargetDependency */,
+				63E930BA0D5F4404006B31CD /* PBXTargetDependency */,
 				632F3C280D316FB5003BBC56 /* PBXTargetDependency */,
 			);
 			name = "vlc-framework-app";
@@ -33,7 +34,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		632F3C380D31711C003BBC56 /* VLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 632F3C230D316F37003BBC56 /* VLCKit.framework */; };
 		632F3E260D326FF0003BBC56 /* pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 632F3E250D326FF0003BBC56 /* pause.png */; };
 		633BD4BC0D2A90470012A314 /* VLCValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 633BD4AA0D2A90470012A314 /* VLCValueTransformer.m */; };
 		633BD4BD0D2A90470012A314 /* VLCMediaArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633BD4AC0D2A90470012A314 /* VLCMediaArrayController.m */; };
@@ -46,6 +46,9 @@
 		633BD4C40D2A90470012A314 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 633BD4BA0D2A90470012A314 /* ImageAndTextCell.m */; };
 		633BD4DA0D2A90C80012A314 /* dialog-error.png in Resources */ = {isa = PBXBuildFile; fileRef = 633BD4D80D2A90C80012A314 /* dialog-error.png */; };
 		633BD4DB0D2A90C80012A314 /* applications-internet.png in Resources */ = {isa = PBXBuildFile; fileRef = 633BD4D90D2A90C80012A314 /* applications-internet.png */; };
+		63541FA90D3BA1DB001F6433 /* VLCMediaLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 63541FA80D3BA1DB001F6433 /* VLCMediaLayer.m */; };
+		635422050D3BE019001F6433 /* VLCMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 635422040D3BE019001F6433 /* VLCMainWindowController.m */; };
+		635424930D3C1394001F6433 /* VLCMediaListLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 635424920D3C1394001F6433 /* VLCMediaListLayer.m */; };
 		63874B190D25960600F738AD /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63874B170D25960600F738AD /* MainWindow.xib */; };
 		638B823B0D35294500128F2B /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 638B823A0D35294500128F2B /* QuickTime.framework */; };
 		638F47110D216C8F008E4912 /* type_playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = 638F47100D216C8F008E4912 /* type_playlist.png */; };
@@ -88,6 +91,7 @@
 		63E768D80D3507EF00258089 /* fs_volume_slider_bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 63E768BD0D3507EF00258089 /* fs_volume_slider_bar.png */; };
 		63E768D90D3507EF00258089 /* fs_volume_slider_knob_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 63E768BE0D3507EF00258089 /* fs_volume_slider_knob_highlight.png */; };
 		63E76A530D35225700258089 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E76A520D35225700258089 /* Carbon.framework */; };
+		63E930C60D5F4463006B31CD /* VLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E930B20D5F430E006B31CD /* VLCKit.framework */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -95,20 +99,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		632F3C220D316F37003BBC56 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = VLCKit;
-		};
-		632F3C250D316FAD003BBC56 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = VLCKit;
-		};
 		632F3C270D316FB5003BBC56 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -116,12 +106,33 @@
 			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = VLC;
 		};
-		632F3CC50D318E3A003BBC56 /* PBXContainerItemProxy */ = {
+		63E930B10D5F430E006B31CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = VLCKit;
+		};
+		63E930B50D5F43E9006B31CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
+			remoteInfo = VLC;
+		};
+		63E930B70D5F43FA006B31CD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 633BD6D20D2ADE040012A314;
 			remoteInfo = "vlc-contrib-core-framework";
+		};
+		63E930B90D5F4404006B31CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = VLCKit;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -155,7 +166,13 @@
 		633BD4BB0D2A90470012A314 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageAndTextCell.h; path = Sources/ImageAndTextCell.h; sourceTree = "<group>"; };
 		633BD4D80D2A90C80012A314 /* dialog-error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dialog-error.png"; path = "Icons/dialog-error.png"; sourceTree = "<group>"; };
 		633BD4D90D2A90C80012A314 /* applications-internet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "applications-internet.png"; path = "Icons/applications-internet.png"; sourceTree = "<group>"; };
-		633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = VLCKit.xcodeproj; path = ../Framework/VLCKit.xcodeproj; sourceTree = SOURCE_ROOT; };
+		633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = VLCKit.xcodeproj; path = ../framework/VLCKit.xcodeproj; sourceTree = SOURCE_ROOT; };
+		63541FA70D3BA1DB001F6433 /* VLCMediaLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaLayer.h; path = Sources/VLCMediaLayer.h; sourceTree = "<group>"; };
+		63541FA80D3BA1DB001F6433 /* VLCMediaLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMediaLayer.m; path = Sources/VLCMediaLayer.m; sourceTree = "<group>"; };
+		635422030D3BE019001F6433 /* VLCMainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMainWindowController.h; path = Sources/VLCMainWindowController.h; sourceTree = "<group>"; };
+		635422040D3BE019001F6433 /* VLCMainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMainWindowController.m; path = Sources/VLCMainWindowController.m; sourceTree = "<group>"; };
+		635424910D3C1394001F6433 /* VLCMediaListLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaListLayer.h; path = Sources/VLCMediaListLayer.h; sourceTree = "<group>"; };
+		635424920D3C1394001F6433 /* VLCMediaListLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMediaListLayer.m; path = Sources/VLCMediaListLayer.m; sourceTree = "<group>"; };
 		63874B180D25960600F738AD /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		638B823A0D35294500128F2B /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		638F47100D216C8F008E4912 /* type_playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = type_playlist.png; path = ../../../modules/gui/qt4/pixmaps/type_playlist.png; sourceTree = SOURCE_ROOT; };
@@ -208,7 +225,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				632F3C380D31711C003BBC56 /* VLCKit.framework in Frameworks */,
+				63E930C60D5F4463006B31CD /* VLCKit.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				63E380DF0D1C6FD800FD6958 /* QuartzCore.framework in Frameworks */,
 				63A742B30D2759C1002D41A0 /* ExceptionHandling.framework in Frameworks */,
@@ -293,14 +310,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		632F3C1B0D316F37003BBC56 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				632F3C230D316F37003BBC56 /* VLCKit.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		633BD4620D2A8DF30012A314 /* Internals */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,6 +348,10 @@
 				633BD4B30D2A90470012A314 /* VLCBrowsableVideoView.m */,
 				63E768810D3503E200258089 /* VLCFullScreenControllerWindow.h */,
 				63E768820D3503E200258089 /* VLCFullScreenControllerWindow.m */,
+				63541FA70D3BA1DB001F6433 /* VLCMediaLayer.h */,
+				63541FA80D3BA1DB001F6433 /* VLCMediaLayer.m */,
+				635424910D3C1394001F6433 /* VLCMediaListLayer.h */,
+				635424920D3C1394001F6433 /* VLCMediaListLayer.m */,
 			);
 			name = Video;
 			sourceTree = "<group>";
@@ -372,6 +385,8 @@
 			children = (
 				633BD4B00D2A90470012A314 /* VLCMainWindow.h */,
 				633BD4AD0D2A90470012A314 /* VLCMainWindow.m */,
+				635422030D3BE019001F6433 /* VLCMainWindowController.h */,
+				635422040D3BE019001F6433 /* VLCMainWindowController.m */,
 			);
 			name = "Window Management";
 			sourceTree = "<group>";
@@ -446,6 +461,14 @@
 			name = FullScreenControllerWindow;
 			sourceTree = "<group>";
 		};
+		63E930AA0D5F430E006B31CD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				63E930B20D5F430E006B31CD /* VLCKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -480,7 +503,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 632F3C1B0D316F37003BBC56 /* Products */;
+					ProductGroup = 63E930AA0D5F430E006B31CD /* Products */;
 					ProjectRef = 633BD69D0D2ACE520012A314 /* VLCKit.xcodeproj */;
 				},
 			);
@@ -494,11 +517,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		632F3C230D316F37003BBC56 /* VLCKit.framework */ = {
+		63E930B20D5F430E006B31CD /* VLCKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = VLCKit.framework;
-			remoteRef = 632F3C220D316F37003BBC56 /* PBXContainerItemProxy */;
+			remoteRef = 63E930B10D5F430E006B31CD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -569,7 +592,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$SYMROOT\" == \"$PROJECT_DIR/build\"\nthen\n\tVLCFRAMEWORK=\"$SRCROOT/../Framework/build/$CONFIGURATION/VLCKit.framework\"\nelse\n\tVLCFRAMEWORK=\"$SYMROOT/$CONFIGURATION/VLCKit.framework\"\nfi\n/Developer/Library/PrivateFrameworks/DevToolsCore.framewo../../../extras/package/macosx/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $VLCFRAMEWORK $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n\n\n";
+			shellScript = "if test \"$SYMROOT\" == \"$PROJECT_DIR/build\"\nthen\n\tVLCFRAMEWORK=\"$SRCROOT/../Framework/build/$CONFIGURATION/VLCKit.framework\"\nelse\n\tVLCFRAMEWORK=\"$SYMROOT/$CONFIGURATION/VLCKit.framework\"\nfi\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $VLCFRAMEWORK $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -589,26 +612,34 @@
 				633BD4C30D2A90470012A314 /* VLCAppAdditions.m in Sources */,
 				633BD4C40D2A90470012A314 /* ImageAndTextCell.m in Sources */,
 				63E768830D3503E200258089 /* VLCFullScreenControllerWindow.m in Sources */,
+				63541FA90D3BA1DB001F6433 /* VLCMediaLayer.m in Sources */,
+				635422050D3BE019001F6433 /* VLCMainWindowController.m in Sources */,
+				635424930D3C1394001F6433 /* VLCMediaListLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		632F3C260D316FAD003BBC56 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = VLCKit;
-			targetProxy = 632F3C250D316FAD003BBC56 /* PBXContainerItemProxy */;
-		};
 		632F3C280D316FB5003BBC56 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D1107260486CEB800E47090 /* VLC */;
 			targetProxy = 632F3C270D316FB5003BBC56 /* PBXContainerItemProxy */;
 		};
-		632F3CC60D318E3A003BBC56 /* PBXTargetDependency */ = {
+		63E930B60D5F43E9006B31CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D1107260486CEB800E47090 /* VLC */;
+			targetProxy = 63E930B50D5F43E9006B31CD /* PBXContainerItemProxy */;
+		};
+		63E930B80D5F43FA006B31CD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "vlc-contrib-core-framework";
-			targetProxy = 632F3CC50D318E3A003BBC56 /* PBXContainerItemProxy */;
+			targetProxy = 63E930B70D5F43FA006B31CD /* PBXContainerItemProxy */;
+		};
+		63E930BA0D5F4404006B31CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = VLCKit;
+			targetProxy = 63E930B90D5F4404006B31CD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

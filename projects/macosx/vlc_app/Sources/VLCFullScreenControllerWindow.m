@@ -82,10 +82,10 @@
     hideWindowTimer = nil;
 
     /* WindowView setup */
-    [[mainWindow.videoView window] setAcceptsMouseMovedEvents:YES];
-    [[mainWindow.videoView window] makeFirstResponder:mainWindow.videoView];
-    [mainWindow.videoView setPostsBoundsChangedNotifications: YES];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoViewDidChangeBounds:) name:NSViewBoundsDidChangeNotification object:(id)mainWindow.videoView];
+    [[mainWindowController.videoView window] setAcceptsMouseMovedEvents:YES];
+    [[mainWindowController.videoView window] makeFirstResponder:mainWindowController.videoView];
+    [mainWindowController.videoView setPostsBoundsChangedNotifications: YES];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoViewDidChangeBounds:) name:NSViewBoundsDidChangeNotification object:(id)mainWindowController.videoView];
 
     /* Make sure we can know when the mouse is inside us */
     [[self contentView] addTrackingRect:[[self contentView] bounds] owner:self userData:nil assumeInside:NO];
@@ -102,35 +102,35 @@
     [mediaPositionSlider setBackgroundImage:[NSImage imageNamed:@"fs_time_slider.png"]];
     [mediaPositionSlider setNeedsDisplay:YES];
 
-    [mediaPositionSlider bind:@"enabled" toObject:mainWindow.mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
-    [mediaPositionSlider bind:@"enabled2" toObject:mainWindow.mediaPlayer withKeyPath:@"seekable" options: nil];
+    [mediaPositionSlider bind:@"enabled" toObject:mainWindowController.mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
+    [mediaPositionSlider bind:@"enabled2" toObject:mainWindowController.mediaPlayer withKeyPath:@"seekable" options: nil];
 
-    [mediaPositionSlider bind:@"value" toObject:mainWindow.mediaPlayer withKeyPath:@"position" options:
+    [mediaPositionSlider bind:@"value" toObject:mainWindowController.mediaPlayer withKeyPath:@"position" options:
         [NSDictionary dictionaryWithObjectsAndKeys:@"Float10000FoldTransformer", NSValueTransformerNameBindingOption,
                                                   [NSNumber numberWithBool:NO], NSConditionallySetsEnabledBindingOption, nil ]];
 
 
-    [fillScreenButton bind:@"value" toObject:mainWindow.videoView withKeyPath:@"fillScreen" options: nil];
-    [fullScreenButton bind:@"value" toObject:mainWindow.videoView withKeyPath:@"fullScreen" options: nil];
+    [fillScreenButton bind:@"value" toObject:mainWindowController.videoView withKeyPath:@"videoLayer.fillScreen" options: nil];
+    [fullScreenButton bind:@"value" toObject:mainWindowController.videoView withKeyPath:@"fullScreen" options: nil];
 
-    [mediaReadingProgressText bind:@"value" toObject:mainWindow.mediaPlayer withKeyPath:@"time.stringValue" options: nil];
-    [mediaDescriptionText bind:@"value" toObject:mainWindow.mediaPlayer withKeyPath:@"description" options: nil];
+    [mediaReadingProgressText bind:@"value" toObject:mainWindowController.mediaPlayer withKeyPath:@"time.stringValue" options: nil];
+    [mediaDescriptionText bind:@"value" toObject:mainWindowController.mediaPlayer withKeyPath:@"description" options: nil];
 
-    /* mediaPlayer */
-    [mediaPlayerPlayPauseStopButton bind:@"enabled" toObject:mainWindow.mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
-    [mediaPlayerPlayPauseStopButton bind:@"state"   toObject:mainWindow.mediaPlayer withKeyPath:@"playing" options: nil];
-    [mediaPlayerPlayPauseStopButton bind:@"alternateImage" toObject:mainWindow.mediaPlayer withKeyPath:@"stateAsFullScreenButtonAlternateImage" options: nil];
-    [mediaPlayerPlayPauseStopButton bind:@"image"   toObject:mainWindow.mediaPlayer withKeyPath:@"stateAsFullScreenButtonImage" options: nil];
-    [mediaPlayerBackwardPrevButton  bind:@"enabled" toObject:mainWindow.mediaPlayer withKeyPath:@"playing" options: nil];
-    [mediaPlayerForwardNextButton   bind:@"enabled" toObject:mainWindow.mediaPlayer withKeyPath:@"playing" options: nil];
-    [mediaPlayerForwardNextButton   setTarget:mainWindow.mediaPlayer];
+    /* mainWindowController.mediaPlayer */
+    [mediaPlayerPlayPauseStopButton bind:@"enabled" toObject:mainWindowController.mediaPlayer withKeyPath:@"media" options: [NSDictionary dictionaryWithObject:@"NonNilAsBoolTransformer" forKey:NSValueTransformerNameBindingOption]];
+    [mediaPlayerPlayPauseStopButton bind:@"state"   toObject:mainWindowController.mediaPlayer withKeyPath:@"playing" options: nil];
+    [mediaPlayerPlayPauseStopButton bind:@"alternateImage" toObject:mainWindowController.mediaPlayer withKeyPath:@"stateAsFullScreenButtonAlternateImage" options: nil];
+    [mediaPlayerPlayPauseStopButton bind:@"image"   toObject:mainWindowController.mediaPlayer withKeyPath:@"stateAsFullScreenButtonImage" options: nil];
+    [mediaPlayerBackwardPrevButton  bind:@"enabled" toObject:mainWindowController.mediaPlayer withKeyPath:@"playing" options: nil];
+    [mediaPlayerForwardNextButton   bind:@"enabled" toObject:mainWindowController.mediaPlayer withKeyPath:@"playing" options: nil];
+    [mediaPlayerForwardNextButton   setTarget:mainWindowController.mediaPlayer];
     [mediaPlayerForwardNextButton   setAction:@selector(fastForward)];
-    [mediaPlayerBackwardPrevButton  setTarget:mainWindow.mediaPlayer];
+    [mediaPlayerBackwardPrevButton  setTarget:mainWindowController.mediaPlayer];
     [mediaPlayerBackwardPrevButton  setAction:@selector(rewind)];
-    [mediaPlayerPlayPauseStopButton setTarget:mainWindow.mediaPlayer];
+    [mediaPlayerPlayPauseStopButton setTarget:mainWindowController.mediaPlayer];
     [mediaPlayerPlayPauseStopButton setAction:@selector(pause)];
 
-    [self bind:@"fullScreen" toObject:mainWindow.videoView withKeyPath:@"fullScreen" options: nil];
+    [self bind:@"fullScreen" toObject:mainWindowController.videoView withKeyPath:@"fullScreen" options: nil];
     
     active = NO;
 }
@@ -208,7 +208,7 @@
 
 - (void)updateTrackingRect
 {
-    VLCVideoView * videoView = mainWindow.videoView;
+    VLCBrowsableVideoView * videoView = mainWindowController.videoView;
 
     if( videoViewTrackingArea )
     {

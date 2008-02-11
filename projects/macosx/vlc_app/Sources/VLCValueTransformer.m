@@ -93,3 +93,25 @@
 
 @end
 
+@implementation VLCSelectionIndexToDescriptionTransformer
+
++ (Class)transformedValueClass
+{
+    return [NSNumber class];
+}
+
++ (BOOL)allowsReverseTransformation
+{
+    return NO;
+}
+
+- (NSString *)transformedValue:(id)value
+{
+    if( ![value isKindOfClass:[NSNumber class]])
+        return @"";
+
+    return [value intValue] == NSNotFound ? @"" : [NSString stringWithFormat:@"%@ of ", value];
+}
+
+@end
+

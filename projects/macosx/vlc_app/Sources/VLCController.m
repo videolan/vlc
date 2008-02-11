@@ -52,6 +52,9 @@
     VLCURLToRepresentedFileNameTransformer *urlToRepresentedFileName;
     urlToRepresentedFileName = [[[VLCURLToRepresentedFileNameTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer:(id)urlToRepresentedFileName forName:@"URLToRepresentedFileNameTransformer"];
+    VLCSelectionIndexToDescriptionTransformer *indexToDescription;
+    indexToDescription = [[[VLCSelectionIndexToDescriptionTransformer alloc] init] autorelease];
+    [NSValueTransformer setValueTransformer:(id)indexToDescription forName:@"SelectionIndexToDescriptionTransformer"];
 
     /***********************************
      * categories: Main content
@@ -59,17 +62,8 @@
     NSArray * mediaDiscoverers = [NSArray arrayWithObjects:
         [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease],
         [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
-        [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease], nil];
-
-    NSArray * playlists = [NSMutableArray arrayWithObjects:[VLCMedia mediaAsNodeWithName:@"Default Playlist"], nil];
-
-    NSDictionary * playlistsAsDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                [@"Playlists" uppercaseString], @"descriptionInCategoriesList",
-                                @"Playlists", @"descriptionInVideoView",
-                                [NSNumber numberWithBool:NO], @"selectableInCategoriesList",
-                                playlists, @"childrenInCategoriesList",
-                                playlists, @"childrenInVideoView",
-                                nil];
+        [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
+        [[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] autorelease], nil];
 
     self.categories = [NSArray arrayWithObjects:
                     [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -79,7 +73,7 @@
                         mediaDiscoverers, @"childrenInCategoriesList",
                         mediaDiscoverers, @"childrenInVideoView",
                         nil],
-                    playlistsAsDictionary,
+                    [VLCMedia mediaAsNodeWithName:@"Playlist"],
                     nil];
 
     /* Execution will continue in applicationDidFinishLaunching */

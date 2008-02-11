@@ -23,60 +23,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "VLCController.h"
-#import "VLCMediaArrayController.h"
-#import "VLCAppAdditions.h"
-#import "VLCBrowsableVideoView.h"
 
 @interface VLCMainWindow : NSWindow {
-    /* IB elements */
-    IBOutlet id mediaListItemFetchedStatus;
-    IBOutlet id mediaListItemsCount;
-    IBOutlet id mediaListSearchField;
-
-    IBOutlet NSOutlineView * categoriesListView;
-    IBOutlet NSTableView * mediaListView;
-
-    IBOutlet VLCBrowsableVideoView * videoView;
-    IBOutlet id fillScreenButton;
-    IBOutlet id fullScreenButton;
-    IBOutlet NSSlider * mediaReadingProgressSlider;
-    IBOutlet NSTextField * mediaReadingProgressText;
-    IBOutlet NSTextField * mediaDescriptionText;
-
-    IBOutlet NSSlider * mediaSoundVolume;
-
-    IBOutlet NSButton * mediaPlayerForwardNextButton;
-    IBOutlet NSButton * mediaPlayerBackwardPrevButton;
-    IBOutlet NSButton * mediaPlayerPlayPauseStopButton;
-
-    IBOutlet id navigatorViewToggleButton;
-    IBOutlet VLCOneSplitView * mainSplitView;
-    IBOutlet NSView * navigatorView;
-    IBOutlet NSView * videoPlayerAndControlView;
-    IBOutlet NSView * controlView;
-
-    IBOutlet NSButton * addPlaylistButton;
-    IBOutlet NSButton * removePlaylistButton;
-
-    /* Toolbar */
-    IBOutlet NSView * toolbarMediaAudioVolume;
-    IBOutlet NSView * toolbarMediaDescription;
-    IBOutlet NSView * toolbarMediaControl;
-
-    IBOutlet VLCMediaPlayer * mediaPlayer;
-
-    IBOutlet VLCController * controller; /* This is a VLCController binded to the File's Owner of the nib */
-
-    /* Controllers */
-    NSTreeController * categoriesTreeController;
-    VLCMediaArrayController * mediaArrayController;
-    
-    /* Window state */
-    CGFloat navigatorHeight;
 }
 
-@property BOOL navigatorViewVisible;
-@property (readonly) VLCMediaPlayer * mediaPlayer;
-@property (readonly) VLCBrowsableVideoView * videoView;
 @end
