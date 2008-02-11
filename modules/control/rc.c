@@ -126,7 +126,6 @@ struct intf_sys_t
     /* status changes */
     vlc_mutex_t       status_lock;
     playlist_status_t i_last_state;
-    vlc_bool_t        b_statistics;
 
 #ifdef WIN32
     HANDLE hConsoleIn;
@@ -324,7 +323,6 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys->psz_unix_path = psz_unix_path;
     vlc_mutex_init( p_intf, &p_intf->p_sys->status_lock );
     p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
-    p_intf->p_sys->b_statistics = VLC_FALSE;
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
@@ -581,13 +579,6 @@ static void Run( intf_thread_t *p_intf )
                 i_oldpos = i_newpos;
                 msg_rc( "pos: %d%%", i_newpos );
             }
-        }
-
-        if( p_input && p_intf->p_sys->b_statistics )
-        {
-            vlc_mutex_lock( &input_GetItem(p_input)->lock );
-            updateStatistics( p_intf, input_GetItem(p_input) );
-            vlc_mutex_unlock( &input_GetItem(p_input)->lock );
         }
 
         /* Is there something to do? */
@@ -1959,11 +1950,9 @@ static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "stats" ) )
     {
-        p_intf->p_sys->b_statistics = !p_intf->p_sys->b_statistics;
-        if( p_intf->p_sys->b_statistics )
-            msg_rc(_("statistics update on"));
-        else
-            msg_rc(_("statistics update off"));
+        vlc_mutex_lock( &input_GetItem(p_input)->lock );
+        updateStatistics( p_intf, input_GetItem(p_input) );
+        vlc_mutex_unlock( &input_GetItem(p_input)->lock );
     }
     /*
      * sanity check
