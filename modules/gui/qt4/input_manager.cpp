@@ -451,7 +451,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     p_input = NULL;
     im = new InputManager( this, p_intf );
 
-    var_AddCallback( THEPL, "item-change", PLItemChanged, this );
+//    var_AddCallback( THEPL, "item-change", PLItemChanged, this );
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
     var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
@@ -479,7 +479,7 @@ MainInputManager::~MainInputManager()
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
-    var_DelCallback( THEPL, "item-change", PLItemChanged, this );
+//    var_DelCallback( THEPL, "item-change", PLItemChanged, this );
 
     var_DelCallback( THEPL, "playlist-current", PLItemChanged, this );
 }
