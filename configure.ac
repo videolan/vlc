@@ -3741,10 +3741,10 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([x264],[-I${real_x264_tree}])
       VLC_ADD_LIBS([x264],[-L${real_x264_tree}])
-      LDFLAGS="${LDFLAGS_save} ${LIBS_x264} ${THREAD_LIB}"
-      AC_CHECK_LIB(x264, x264_encoder_open, [
-        VLC_ADD_BUILTINS([x264])
-        VLC_ADD_LIBS([x264],[-lx264])
+      PKG_CHECK_MODULES(X264,x264, [
+        VLC_ADD_PLUGINS([x264])
+        VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
+        VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
       ],[
         AC_MSG_ERROR([the specified tree hasn't been compiled])
       ])
@@ -3754,11 +3754,11 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have x264.h])
     fi
   else
-    LDFLAGS="${LDFLAGS_save} ${LIBS_x264} ${THREAD_LIB}"
     AC_CHECK_HEADERS(x264.h, [
-      AC_CHECK_LIB(x264, x264_encoder_open, [
+      PKG_CHECK_MODULES(X264,x264, [
         VLC_ADD_PLUGINS([x264])
-        VLC_ADD_LIBS([x264],[-lx264])
+        VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
+        VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
       ],[
         if test "${enable_x264}" = "yes"; then
             AC_MSG_ERROR([Could not find libx264 on your system: you may get it from http://www.videolan.org/x264.html])

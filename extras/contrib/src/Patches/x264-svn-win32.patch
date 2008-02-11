@@ -1,8 +1,16 @@
 Index: configure
 ===================================================================
---- configure	(revision 672)
+--- configure	(revision 736)
 +++ configure	(working copy)
-@@ -339,13 +339,13 @@
+@@ -338,6 +338,7 @@
+ # autodetect options that weren't forced nor disabled
+ 
+ libpthread=""
++extradef=""
+ if test "$pthread" = "auto" ; then
+     pthread="no"
+     case $SYS in
+@@ -345,16 +346,18 @@
              pthread="yes"
              ;;
          MINGW|CYGWIN)
@@ -19,7 +27,12 @@ Index: configure
                  pthread="yes"
                  libpthread="-lpthreadGC2 -lwsock32"
                  CFLAGS="$CFLAGS -DPTW32_STATIC_LIB"
-@@ -428,6 +428,10 @@
++		extradef="-DPTW32_STATIC_LIB"
++
+             fi
+             ;;
+         *)
+@@ -438,6 +441,10 @@
  ASFLAGS=$ASFLAGS
  GTK=$gtk
  EXE=$EXE
@@ -30,11 +43,20 @@ Index: configure
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  DEVNULL=$DEVNULL
+@@ -480,7 +487,7 @@
+ Description: H.264 (MPEG4 AVC) encoder library
+ Version: $(grep POINTVER < config.h | sed -e 's/.* "//; s/".*//')
+ Libs: $pclibs
+-Cflags: -I$includedir
++Cflags: -I$includedir $extradef
+ EOF
+ 
+ 
 Index: Makefile
 ===================================================================
---- Makefile	(revision 672)
+--- Makefile	(revision 736)
 +++ Makefile	(working copy)
-@@ -73,8 +73,8 @@
+@@ -74,8 +74,8 @@
  default: $(DEP) x264$(EXE)
  
  libx264.a: .depend $(OBJS) $(OBJASM)
@@ -45,7 +67,7 @@ Index: Makefile
  
  $(SONAME): .depend $(OBJS) $(OBJASM)
  	$(CC) -shared -o $@ $(OBJS) $(OBJASM) -Wl,-soname,$(SONAME) $(LDFLAGS)
-@@ -93,7 +93,7 @@
+@@ -94,7 +94,7 @@
  %.o: %.asm
  	$(AS) $(ASFLAGS) -o $@ $<
  # delete local/anonymous symbols, so they don't show up in oprofile
@@ -54,7 +76,7 @@ Index: Makefile
  
  .depend: config.mak
  	rm -f .depend
-@@ -146,14 +146,14 @@
+@@ -149,14 +149,14 @@
  	rm -rf test/
  	$(MAKE) -C gtk distclean
  
