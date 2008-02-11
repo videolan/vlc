@@ -3823,7 +3823,7 @@ dnl asa/csri subtitle rendering module
 dnl
 AC_ARG_ENABLE(csri,
   [  --enable-csri          Subtitle support using CSRI / asa (default disabled)])
-AS_IF( [test "${enable_csri}" != "no"], [
+AS_IF( [test "${enable_csri}" = "yes"], [
   PKG_CHECK_MODULES(CSRI,
       csri >= 0.1.0,
       [
@@ -3840,7 +3840,7 @@ dnl asa demuxer
 dnl
 AC_ARG_ENABLE(asademux,
   [  --enable-asademux      asa subtitle demuxing (default disabled)])
-AS_IF( [test "${enable_asademux}" != "no"], [
+AS_IF( [test "${enable_asademux}" = "yes"], [
   PKG_CHECK_MODULES(PCRE,
       libpcre >= 6.5,
       [
