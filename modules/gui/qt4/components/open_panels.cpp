@@ -104,7 +104,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     listLabel[2]->setText( qtr( "Filter:" ) );
 
     dialogBox->layout()->setMargin( 0 );
-    dialogBox->layout()->setSizeConstraint( QLayout::SetMinimumSize );
+    dialogBox->layout()->setSizeConstraint( QLayout::SetNoConstraint );
 
     /** END of QFileDialog tweaking **/
 
@@ -248,6 +248,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.audioCDRadioButton, updateButtons() );
     BUTTONACT( ui.dvdsimple, updateButtons() );
     BUTTONACT( ui.browseDiscButton, browseDevice() );
+    BUTTONACT( ui.ejectButton, eject() );
 
     CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
     CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
@@ -388,6 +389,11 @@ void DiscOpenPanel::browseDevice()
         ui.deviceCombo->setEditText( dir );
     }
     updateMRL();
+}
+
+void DiscOpenPanel::eject()
+{
+    intf_Eject( p_intf, qtu( ui.deviceCombo->currentText() ) );
 }
 
 void DiscOpenPanel::accept()

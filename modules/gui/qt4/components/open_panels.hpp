@@ -151,6 +151,7 @@ public slots:
 private slots:
     void browseDevice();
     void updateButtons() ;
+    void eject();
 };
 
 
