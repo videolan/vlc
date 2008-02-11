@@ -69,8 +69,8 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m )
         else
         {
             QSettings settings( "vlc", "vlc-qt-interface" );
-            i_showflags = settings.value( "qt-pl-showflags" ).toInt();
-            if( i_showflags < 1) 
+            i_showflags = settings.value( "qt-pl-showflags", 39 ).toInt();
+            if( i_showflags < 1)
                 i_showflags = 39; //reasonable default to show something;
             updateColumnHeaders();
         }
