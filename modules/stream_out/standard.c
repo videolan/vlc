@@ -31,7 +31,6 @@
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 
-
 #include <vlc_network.h>
 #include "vlc_url.h"
 
@@ -172,12 +171,12 @@ static int Open( vlc_object_t *p_this )
     psz_mux = *val.psz_string ? val.psz_string : NULL;
     if( !*val.psz_string ) free( val.psz_string );
 
-
     var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
     psz_url = *val.psz_string ? val.psz_string : NULL;
     if( !*val.psz_string ) free( val.psz_string );
 
     p_sys = p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
+    if( !p_sys ) return VLC_ENOMEM;
     p_stream->p_sys->p_session = NULL;
 
     msg_Dbg( p_this, "creating `%s/%s://%s'", psz_access, psz_mux, psz_url );
