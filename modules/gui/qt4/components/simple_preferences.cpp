@@ -435,8 +435,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
 
-            CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel, artFetcher );
+            CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
+                                                      artFetcher );
             CONFIG_GENERIC( "fetch-meta", Bool, NULL, metaFetcher );
+            CONFIG_GENERIC( "security-policy", IntegerList,
+                            ui.netPolicyLabel, netPolicyBox );
 #ifdef UPDATE_CHECK
             CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, updatesBox );
             CONFIG_GENERIC_NO_BOOL( "qt-updates-days", Integer, NULL,

@@ -537,6 +537,8 @@ int MainInterface::privacyDialog( QList<ConfigControl *> controls )
     CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool ); line++;
     CONFIG_GENERIC_NOBOOL( "qt-updates-days", Integer ); line++;
 #endif
+    CONFIG_GENERIC( "security-policy", IntegerList ); line++;
+
     QPushButton *ok = new QPushButton( qtr( "Ok" ) );
 
     gLayout->addWidget( ok, 2, 2 );
