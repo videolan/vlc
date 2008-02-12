@@ -1287,7 +1287,11 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     while( ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
                                    !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
-        fwrite( p_buffer, i_read, 1, p_file );
+        if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
+        {
+            msg_Err( p_udt, "Failed to write into %s", psz_destfile );
+            break;
+        }
 
         l_downloaded += i_read;
         psz_downloaded = size_str( l_downloaded );
