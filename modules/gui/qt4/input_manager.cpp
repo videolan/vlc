@@ -159,9 +159,8 @@ void InputManager::delCallbacks()
 void InputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-        msg_Dbg( p_intf, "New Event: type %i", type );
     IMEvent *ple = static_cast<IMEvent *>(event);
-    //msg_Dbg( p_intf, "New IM Event of type: %i", type );
+
     if ( type != PositionUpdate_Type &&
          type != ItemChanged_Type &&
          type != ItemRateChanged_Type &&
@@ -176,7 +175,6 @@ void InputManager::customEvent( QEvent *event )
         return;
     if( type != PositionUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", type );
-
 
     /* Actions */
     switch( type )
