@@ -456,6 +456,7 @@ static int Connect( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     Authenticator authenticator;
+    vlc_bool_t b_firstpass = VLC_TRUE;
 
     char *psz_user    = NULL;
     char *psz_pwd     = NULL;
@@ -541,8 +542,20 @@ describe:
         if( var_GetBool( p_demux, "rtsp-http" ) )
             sscanf( psz_error, "%*s %*s HTTP GET %*s HTTP/%*u.%*u %3u %*s",
                     &i_code );
-        else sscanf( psz_error, "%*sRTSP/%*s%3u", &i_code );
+        else
+        {
+            const char *psz_tmp = strstr( psz_error, "RTSP" );
+            sscanf( psz_tmp, "RTSP/%*s%3u", &i_code );
+        }
         msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
+
+        if( b_firstpass )
+        {   /* describeURL always returns an "RTSP/1.0 401 Unauthorized" the
+             * first time. This is a workaround to avoid asking for a
+             * user/passwd the first time the code passess here. */
+            i_code = 0;
+            b_firstpass = VLC_FALSE;
+        }
 
         if( i_code == 401 )
         {
