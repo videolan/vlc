@@ -26,6 +26,7 @@
 
 #include "util/qvlcframe.hpp"
 
+class QTabWidget;
 class QPushButton;
 class QSpinBox;
 class QGridLayout;
@@ -55,19 +56,21 @@ public:
 private:
     MessagesDialog( intf_thread_t * );
     static MessagesDialog *instance;
+    QTabWidget *mainTab;
     QSpinBox *verbosityBox;
     QLabel *verbosityLabel;
     QTextEdit *messages;
     QTreeWidget *modulesTree;
-    QPushButton *clearButton;
+    QPushButton *clearUpdateButton;
     QPushButton *saveLogButton;
 
 private slots:
     void updateTab( int );
     void updateLog();
-    void clear();
+    void clearOrUpdate();
     bool save();
 private:
+    void clear();
     void updateTree();
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 };

@@ -49,8 +49,9 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     /* General widgets */
     QGridLayout *mainLayout = new QGridLayout( this );
-    QTabWidget  *mainTab = new QTabWidget( this );
+    mainTab = new QTabWidget( this );
     mainTab->setTabPosition( QTabWidget::North );
+
 
     /* Messages */
     QWidget     *msgWidget = new QWidget;
@@ -76,10 +77,11 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     treeLayout->addWidget( modulesTree, 0, 0, 1, 0 );
     mainTab->addTab( treeWidget, qtr( "Modules tree" ) );
 
+
     /* Buttons and general layout */
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
-    clearButton = new QPushButton( qtr( "&Clear" ) );
+    clearUpdateButton = new QPushButton( qtr( "&Clear" ) );
     saveLogButton = new QPushButton( qtr( "&Save as..." ) );
 
     verbosityBox = new QSpinBox();
@@ -94,11 +96,11 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
     mainLayout->addWidget( verbosityBox, 1, 1 );
     mainLayout->addWidget( saveLogButton, 1, 3 );
-    mainLayout->addWidget( clearButton, 1, 4 );
+    mainLayout->addWidget( clearUpdateButton, 1, 4 );
     mainLayout->addWidget( closeButton, 1, 5 );
 
     BUTTONACT( closeButton, hide() );
-    BUTTONACT( clearButton, clear() );
+    BUTTONACT( clearUpdateButton, clearOrUpdate() );
     BUTTONACT( saveLogButton, save() );
     CONNECT( mainTab, currentChanged( int ),
              this, updateTab( int ) );
@@ -109,19 +111,21 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
 void MessagesDialog::updateTab( int index )
 {
+    /* Second tab : modules tree */
     if( index == 1 )
     {
         verbosityLabel->hide();
         verbosityBox->hide();
-        clearButton->hide();
+        clearUpdateButton->setText( qtr( "&Update" ) );
         saveLogButton->hide();
         updateTree();
     }
+    /* First tab : messages */
     else
     {
         verbosityLabel->show();
         verbosityBox->show();
-        clearButton->show();
+        clearUpdateButton->setText( qtr( "&Clear" ) );
         saveLogButton->show();
     }
 }
@@ -219,6 +223,14 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     }
 
     vlc_object_release( p_obj );
+}
+
+void MessagesDialog::clearOrUpdate()
+{
+    if( mainTab->currentIndex() )
+        updateTree();
+    else
+        clear();
 }
 
 void MessagesDialog::updateTree()
