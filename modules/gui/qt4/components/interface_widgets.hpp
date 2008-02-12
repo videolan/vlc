@@ -91,7 +91,7 @@ private:
     QLabel *label;
     virtual void contextMenuEvent( QContextMenuEvent *event );
     intf_thread_t *p_intf;
-
+    virtual void resizeEvent( QResizeEvent * event );
 public slots:
     void toggle(){ TOGGLEV( this ); }
     void update( QString );
@@ -252,6 +252,8 @@ protected:
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;
+public slots:
+    void setEnable( bool );
 private slots:
     void updateRate( int );
     void resetRate();

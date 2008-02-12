@@ -904,6 +904,10 @@ void MainInterface::setStatus( int status )
 {
     /* Forward the status to the controls to toggle Play/Pause */
     controls->setStatus( status );
+
+    controls->updateInput();
+    speedControl->setEnable( THEMIM->getIM()->hasInput() );
+
     /* And in the systray for the menu */
     if( sysTray )
         QVLCMenu::updateSystrayMenu( this, p_intf );

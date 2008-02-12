@@ -148,11 +148,11 @@ QSize VideoWidget::sizeHint() const
 #define MAX_BG_SIZE 400
 #define MIN_BG_SIZE 64
 
-BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
-                                        QWidget( NULL ), p_intf( _p_i )
+BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
+                 :QWidget( NULL ), p_intf( _p_i )
 {
     /* We should use that one to take the more size it can */
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+//    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 
     /* A dark background */
     setAutoFillBackground( true );
@@ -179,11 +179,18 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     backgroundLayout->setColumnStretch( 2, 1 );
 
     CONNECT( THEMIM->getIM(), artChanged( QString ), this, update( QString ) );
-    resize( 300, 150 );
 }
 
 BackgroundWidget::~BackgroundWidget()
 {
+}
+
+void BackgroundWidget::resizeEvent( QResizeEvent * event )
+{
+    if( event->size().height() <= MIN_BG_SIZE )
+        label->hide();
+    else
+        label->show();
 }
 
 void BackgroundWidget::update( QString url )
@@ -613,7 +620,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
 
-    CONNECT( THEMIM->getIM(), statusChanged( int ), this, updateInput() );
 
     updateInput();
 }
@@ -827,6 +833,11 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
 
 SpeedControlWidget::~SpeedControlWidget()
 {}
+
+void SpeedControlWidget::setEnable( bool b_enable )
+{
+    speedSlider->setEnabled( b_enable );
+}
 
 void SpeedControlWidget::mouseDoubleClickEvent( QMouseEvent * event )
 {
