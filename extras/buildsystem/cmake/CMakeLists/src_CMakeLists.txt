@@ -1,4 +1,3 @@
-include_directories( . )
 
 add_definitions(-Dasm=__asm__ -D_INTL_REDIRECT_MACROS)
 add_definitions(-DLOCALEDIR=\\"${CMAKE_INSTALL_PREFIX}/locale\\")
@@ -7,8 +6,6 @@ add_definitions(-DPLUGIN_PATH=\\"${CMAKE_INSTALL_PREFIX}/lib/vlc\\")
 # vlc
 add_executable(vlc vlc.c)
 target_link_libraries(vlc libvlc)
-
-install_targets(/bin vlc)
 
 # libvlc
 
@@ -132,16 +129,12 @@ if(SYS_DARWIN)
 endif(SYS_DARWIN)
 
 add_library(libvlc SHARED ${SOURCES_libvlc})
-install_targets(/lib libvlc)
 
-set_target_properties(libvlc PROPERTIES OUTPUT_NAME vlc)
-set_target_properties(libvlc PROPERTIES SOVERSION 1)
-set_target_properties(libvlc PROPERTIES VERSION 1.0.0)
+set_target_properties(libvlc PROPERTIES
+        OUTPUT_NAME vlc
+        SOVERSION 1 VERSION 1.0.0)
 
-target_link_libraries(libvlc ${LIBM})
-target_link_libraries(libvlc ${LIBRT})
-target_link_libraries(libvlc ${LIBICONV})
-target_link_libraries(libvlc ${Dlopen_LIBRARIES})
+target_link_libraries(libvlc ${LIBM} ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES})
 
 
 # libvlc-control
@@ -173,13 +166,18 @@ set( SOURCES_libvlc_control
      control/tag_query.c )
 
 add_library(libvlc-control SHARED ${SOURCES_libvlc_control})
-install_targets(/lib libvlc-control)
 
 set_target_properties(libvlc-control PROPERTIES OUTPUT_NAME vlc-control)
 set_target_properties(libvlc-control PROPERTIES SOVERSION 0)
 set_target_properties(libvlc PROPERTIES VERSION 0.0.0)
 
 target_link_libraries(libvlc-control libvlc)
+
+##########################################################
+# Install
+
+install(TARGETS libvlc libvlc-control DESTINATION lib)
+install(TARGETS vlc DESTINATION bin)
 
 ##########################################################
 # Libraries
