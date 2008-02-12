@@ -5488,6 +5488,19 @@ then
 fi
 
 dnl
+dnl  AtmoLight (homebrew AmbiLight)
+dnl
+if test "${SYS}" = "mingw32" -o "${SYS}" = "linux"; then
+   AC_ARG_ENABLE(atmo,
+[  --disable-atmo	AtmoLight (homebrew philips ambilight) (default enabled)])
+   if test "${enable_atmo}" != "no"; then
+      AC_LANG_PUSH(C++)
+      VLC_ADD_PLUGINS([atmo])
+      AC_LANG_POP(C++)
+   fi
+fi
+
+dnl
 dnl  Bonjour services discovery
 dnl
 AC_ARG_ENABLE(bonjour,
@@ -6210,6 +6223,7 @@ AC_CONFIG_FILES([
   modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
+  modules/video_filter/atmo/Makefile
   modules/video_output/Makefile
   modules/video_output/msw/Makefile
   modules/video_output/qte/Makefile

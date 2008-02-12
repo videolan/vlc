@@ -19,7 +19,7 @@ Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
-André Weber <WeberAndre at gmx d0t de> - Qt4, AAC ordering, Win32 threads patches
+André Weber <WeberAndre at gmx d0t de> - Qt4, AAC ordering, Win32 threads patches, video filter module for thehomebrewAmbiLight (AtmoLight)
 Andres Krapf <dae at via.ecp.fr> - FreeBSD port and tests, KDE interface
 Andrew Zaikin <andrew dot zaikin at gmail dot com> - Config saving fixes
 Andrey Brilevskiy <director at macwest.ru> - Russian translation
