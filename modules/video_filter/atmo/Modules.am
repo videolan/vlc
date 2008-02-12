@@ -1,0 +1,2 @@
+SOURCES_atmo = atmo.cpp AtmoDefs.h AtmoCalculations.cpp AtmoCalculations.h AtmoConfig.cpp AtmoConfig.h AtmoConnection.cpp AtmoConnection.h AtmoDynData.cpp AtmoDynData.h AtmoExternalCaptureInput.cpp AtmoExternalCaptureInput.h AtmoInput.cpp AtmoInput.h AtmoLiveView.cpp AtmoLiveView.h AtmoOutputFilter.cpp AtmoOutputFilter.h AtmoSerialConnection.cpp AtmoSerialConnection.h AtmoThread.cpp AtmoThread.h AtmoTools.cpp AtmoTools.h AtmoZoneDefinition.cpp AtmoZoneDefinition.h 
+
