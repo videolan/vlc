@@ -31,15 +31,17 @@
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 
+#include "qt4.hpp"
+
 #include <QObject>
 #include <QEvent>
 
-static int const PositionUpdate_Type = QEvent::User + 6;
-static int const ItemChanged_Type = QEvent::User + 7;
-static int const ItemRateChanged_Type = QEvent::User + 8;
-static int const ItemTitleChanged_Type = QEvent::User + 9;
-static int const ItemStateChanged_Type = QEvent::User + 10;
-static int const VolumeChanged_Type = QEvent::User + 11;
+static int const PositionUpdate_Type = QEvent::User + IMEventType + 1;
+static int const ItemChanged_Type = QEvent::User + IMEventType + 2;
+static int const ItemStateChanged_Type = QEvent::User + IMEventType + 3;
+static int const ItemTitleChanged_Type = QEvent::User + IMEventType + 4;
+static int const ItemRateChanged_Type = QEvent::User + IMEventType + 5;
+static int const VolumeChanged_Type = QEvent::User + IMEventType + 6;
 
 class IMEvent : public QEvent
 {

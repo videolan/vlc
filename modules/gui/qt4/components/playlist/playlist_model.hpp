@@ -33,6 +33,8 @@
 #include <vlc_playlist.h>
 #include "playlist_item.hpp"
 
+#include "qt4.hpp"
+
 #include <QModelIndex>
 #include <QObject>
 #include <QEvent>
@@ -48,10 +50,10 @@ class PLItem;
 #define DEPTH_PL -1
 #define DEPTH_SEL 1
 
-static int ItemUpdate_Type = QEvent::User + 2;
-static int ItemDelete_Type = QEvent::User + 3;
-static int ItemAppend_Type = QEvent::User + 4;
-static int PLUpdate_Type = QEvent::User + 5;
+static int ItemUpdate_Type = QEvent::User + PLEventType + 2;
+static int ItemDelete_Type = QEvent::User + PLEventType + 3;
+static int ItemAppend_Type = QEvent::User + PLEventType + 4;
+static int PLUpdate_Type   = QEvent::User + PLEventType + 5;
 
 class PLEvent : public QEvent
 {

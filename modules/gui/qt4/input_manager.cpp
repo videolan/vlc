@@ -159,6 +159,7 @@ void InputManager::delCallbacks()
 void InputManager::customEvent( QEvent *event )
 {
     int type = event->type();
+        msg_Dbg( p_intf, "New Event: type %i", type );
     IMEvent *ple = static_cast<IMEvent *>(event);
     //msg_Dbg( p_intf, "New IM Event of type: %i", type );
     if ( type != PositionUpdate_Type &&
@@ -170,7 +171,8 @@ void InputManager::customEvent( QEvent *event )
 
     if( !p_input || p_input->b_die || p_input->b_dead )
         return;
-    if( type != PositionUpdate_Type && ( i_input_id != ple->i_id )  )
+    if( ( type != PositionUpdate_Type && type != ItemRateChanged_Type )
+         && ( i_input_id != ple->i_id ) )
         return;
     if( type != PositionUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", type );
@@ -196,9 +198,9 @@ void InputManager::customEvent( QEvent *event )
         UpdateMeta();
         break;
     case ItemStateChanged_Type:
-       UpdateStatus();
-       UpdateTracks();
-       break;
+        UpdateStatus();
+        UpdateTracks();
+        break;
     }
 }
 
@@ -303,6 +305,8 @@ void InputManager::UpdateTracks()
     b_has_audio = val.i_int > 0;
     var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
     b_has_video = val.i_int > 0;
+
+    msg_Dbg( p_input, "I have audio-video: %i %i", b_has_audio, b_has_video );
 
     /* Update ZVBI status */
 #ifdef ZVBI_COMPILED
@@ -487,10 +491,10 @@ MainInputManager::~MainInputManager()
 void MainInputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    //msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     if ( type != ItemChanged_Type && type != VolumeChanged_Type )
         return;
 
+    // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     if( type == VolumeChanged_Type )
     {
         emit volumeChanged();

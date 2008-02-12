@@ -104,10 +104,16 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
-static int DialogEvent_Type = QEvent::User + 1;
-//static int PLUndockEvent_Type = QEvent::User + 2;
-//static int PLDockEvent_Type = QEvent::User + 3;
-static int SetVideoOnTopEvent_Type = QEvent::User + 4;
+enum {
+DialogEventType = 0,
+IMEventType     = 100,
+PLEventType     = 200
+};
+
+static int DialogEvent_Type = QEvent::User + DialogEventType + 1;
+//static int PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
+//static int PLDockEvent_Type = QEvent::User + DialogEventType + 3;
+static int SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4;
 
 class DialogEvent : public QEvent
 {
