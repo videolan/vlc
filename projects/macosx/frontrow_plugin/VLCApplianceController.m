@@ -195,7 +195,7 @@
             playerController = [[VLCPlayerController alloc] init];
         }
         
-        playerController.path = path;
+        playerController.media = [VLCMedia mediaWithPath:path];
         controller = playerController;
 #endif
     }

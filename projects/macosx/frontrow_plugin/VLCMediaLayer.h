@@ -17,7 +17,7 @@
     VLCMediaPlayer * _player;
 }
 
-@property(retain, nonatomic) NSURL * url;
+@property(retain, nonatomic) VLCMedia * media;
 
 @property(readonly) VLCMediaPlayer * player;
 

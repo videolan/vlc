@@ -7,6 +7,7 @@
 //
 
 #import "VLCPlayerController.h"
+
 #import <BackRow/BREvent.h>
 #import <BackRow/BRLayer.h>
 #import <BackRow/BRControllerStack.h>
@@ -27,14 +28,14 @@
     return self;
 }
 
-- (NSString*)path
+- (VLCMedia *)media
 {
-    return [_mediaLayer.url path];
+    return [_mediaLayer media];
 }
 
-- (void)setPath:(NSString*)path
+- (void)setMedia:(VLCMedia *)media
 {
-    _mediaLayer.url = [NSURL fileURLWithPath:path];
+    _mediaLayer.media = media;
 }
 
 - (void)brEventAction:(BREvent*)event

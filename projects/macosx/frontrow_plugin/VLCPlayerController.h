@@ -9,12 +9,13 @@
 #import <Cocoa/Cocoa.h>
 #import <BackRow/BRMediaPlayerController.h>
 #import "VLCMediaLayer.h"
+#import <VLCKit/VLCKit.h>
 
 @interface VLCPlayerController : BRController
 {
     VLCMediaLayer * _mediaLayer;
 }
 
-@property(retain) NSString * path;
+@property(retain) VLCMedia * media;
 
 @end

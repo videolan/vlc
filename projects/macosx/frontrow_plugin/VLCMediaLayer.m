@@ -23,7 +23,7 @@
     [super dealloc];
 }
 
-- (void)setUrl:(NSURL*)url
+- (void)setMedia:(VLCMedia*)media
 {
 #if 0
     if(_videoLayer != nil) {
@@ -56,19 +56,23 @@
     }
 #endif
     
-    NSLog(@"playing url: %@", url);
+    NSLog(@"playing media: %@", media);
     
-    VLCMedia * media = [VLCMedia mediaWithURL:url];
     [_player setMedia:media];
 }
 
-- (NSURL*)url
+- (VLCMedia *)media
+{
+    return [_player media];
+}
+
+- (VLCMedia *)url
 {
     if(_player == nil) {
         return nil;
     }
     else {
-        return [[_player media] url];
+        return [_player media];
     }
 }
 

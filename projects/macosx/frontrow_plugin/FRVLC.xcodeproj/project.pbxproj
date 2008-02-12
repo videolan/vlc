@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6322C2AC0D609FEC00B020BB /* VLCMediaListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6322C2AB0D609FEC00B020BB /* VLCMediaListController.m */; };
 		63F954120D5B9B4C00616D1F /* VLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63F954110D5B9B4C00616D1F /* VLCKit.framework */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
@@ -42,24 +43,14 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		A79488020C9089F800B97E56 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* FRVLC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FRVLC_Prefix.pch; sourceTree = "<group>"; };
+		6322C2AA0D609FEC00B020BB /* VLCMediaListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCMediaListController.h; sourceTree = "<group>"; };
+		6322C2AB0D609FEC00B020BB /* VLCMediaListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaListController.m; sourceTree = "<group>"; };
 		63F954110D5B9B4C00616D1F /* VLCKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLCKit.framework; path = ../framework/build/Debug/VLCKit.framework; sourceTree = SOURCE_ROOT; };
 		8D5B49B6048680CD000E48DA /* VLC.frappliance */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.frappliance; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -147,6 +138,8 @@
 				A730338A0C8796BA00DA8E0A /* VLCAppliance.m */,
 				A70B95850C8F889500D5A5FF /* VLCApplianceController.h */,
 				A70B95860C8F889500D5A5FF /* VLCApplianceController.m */,
+				6322C2AA0D609FEC00B020BB /* VLCMediaListController.h */,
+				6322C2AB0D609FEC00B020BB /* VLCMediaListController.m */,
 				A70B959A0C8F936500D5A5FF /* VLCPlayerController.h */,
 				A70B959B0C8F936500D5A5FF /* VLCPlayerController.m */,
 			);
@@ -208,11 +201,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB913A08733D840010E9CD /* Build configuration list for PBXNativeTarget "FRVLC" */;
 			buildPhases = (
+				63F956E80D5B9D4800616D1F /* ShellScript */,
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
-				A79488020C9089F800B97E56 /* CopyFiles */,
-				63F956E80D5B9D4800616D1F /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -285,7 +277,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$SYMROOT\" == \"$PROJECT_DIR/build\"\nthen\n\tVLCFRAMEWORK=\"$SRCROOT/../Framework/build/$CONFIGURATION/VLCKit.framework\"\nelse\n\tVLCFRAMEWORK=\"$SYMROOT/$CONFIGURATION/VLCKit.framework\"\nfi\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $VLCFRAMEWORK $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n\n\n";
+			shellScript = "if test \"$SYMROOT\" == \"$PROJECT_DIR/build\"\nthen\n\tVLCFRAMEWORK=\"$SRCROOT/../Framework/build/$CONFIGURATION/VLCKit.framework\"\nelse\n\tVLCFRAMEWORK=\"$SYMROOT/$CONFIGURATION/VLCKit.framework\"\nfi\nmkdir -p $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -resolve-src-symlinks $VLCFRAMEWORK $BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH\n\n\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -300,6 +292,7 @@
 				A70B958A0C8F88CF00D5A5FF /* VLCDebug.m in Sources */,
 				A70B959C0C8F936500D5A5FF /* VLCPlayerController.m in Sources */,
 				A7E542900C960B5500EBBC34 /* VLCMediaLayer.m in Sources */,
+				6322C2AC0D609FEC00B020BB /* VLCMediaListController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,7 +336,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = FRVLC_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "$(SYSTEM)/Library/CoreServices/Front\\ Row.app/PlugIns";
 				PRODUCT_NAME = VLC;
 				WRAPPER_EXTENSION = frappliance;
 				ZERO_LINK = YES;
@@ -365,7 +358,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = FRVLC_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "$(SYSTEM)/Library/CoreServices/Front\\ Row.app/PlugIns";
 				PRODUCT_NAME = VLC;
 				WRAPPER_EXTENSION = frappliance;
 			};
