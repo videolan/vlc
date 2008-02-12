@@ -309,11 +309,15 @@ static int  Open ( vlc_object_t *p_this )
                                       i_sdp_max - i_sdp - 1 );
 
             if( p_demux->b_die || p_demux->b_error )
+            {
+                free( p_sdp );
                 goto error;
+            }
 
             if( i_read < 0 )
             {
                 msg_Err( p_demux, "failed to read SDP" );
+                free( p_sdp );
                 goto error;
             }
 
@@ -627,6 +631,12 @@ static int SessionsSetup( demux_t *p_demux )
         Boolean bInit;
         live_track_t *tk;
 
+        if( p_demux->b_die || p_demux->b_error )
+        {
+            delete iter;
+            return VLC_EGENERIC;
+        }
+
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
             i_buffer = 100000;
@@ -701,7 +711,11 @@ static int SessionsSetup( demux_t *p_demux )
             }
 
             tk = (live_track_t*)malloc( sizeof( live_track_t ) );
-            if( !tk ) return VLC_ENOMEM;
+            if( !tk )
+            {
+                delete iter;
+                return VLC_ENOMEM;
+            }
             tk->p_demux     = p_demux;
             tk->sub         = sub;
             tk->p_es        = NULL;
@@ -714,7 +728,11 @@ static int SessionsSetup( demux_t *p_demux )
             tk->i_pts       = 0;
             tk->i_buffer    = 65536;
             tk->p_buffer    = (uint8_t *)malloc( 65536 );
-            if( !tk->p_buffer ) return VLC_ENOMEM;
+            if( !tk->p_buffer )
+            {
+                delete iter;
+                return VLC_ENOMEM;
+            }
 
             /* Value taken from mplayer */
             if( !strcmp( sub->mediumName(), "audio" ) )
