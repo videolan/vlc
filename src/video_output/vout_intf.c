@@ -347,6 +347,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
         var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     }
 
+    /* update triggered every time the vout's crop parameters are changed */
+    var_Create( p_vout, "crop-update", VLC_VAR_VOID ); 
+
     /* Add custom crop ratios */
     psz_buf = config_GetPsz( p_vout, "custom-crop-ratios" );
     AddCustomRatios( p_vout, "crop", psz_buf );
@@ -1100,6 +1103,8 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
              p_vout->fmt_in.i_x_offset, p_vout->fmt_in.i_y_offset,
              p_vout->fmt_in.i_visible_width,
              p_vout->fmt_in.i_visible_height );
+
+    var_SetVoid( p_vout, "crop-update" );
 
     return VLC_SUCCESS;
 }
