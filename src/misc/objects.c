@@ -505,8 +505,8 @@ static int pipe (int fd[2])
         goto error;
 
     closesocket (l);
-    shutdown (a, 0);
-    shutdown (c, 1);
+    //shutdown (a, 0);
+    //shutdown (c, 1);
     fd[0] = c;
     fd[1] = a;
     return 0;
