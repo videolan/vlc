@@ -113,6 +113,7 @@ flat_media_list_view_children_at_index( libvlc_media_list_view_t * p_mlv,
                                         int index,
                                         libvlc_exception_t * p_e )
 {
+    (void)p_mlv; (void)index; (void)p_e;
     return NULL;
 }
 
@@ -174,6 +175,7 @@ libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
                                         flat_media_list_view_count,
                                         flat_media_list_view_item_at_index,
                                         flat_media_list_view_children_at_index,
+                                        libvlc_media_list_flat_view,
                                         flat_media_list_view_release,
                                         p_this_view_data,
                                         p_e );

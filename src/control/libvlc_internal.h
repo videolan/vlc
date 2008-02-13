@@ -124,6 +124,7 @@ struct libvlc_media_list_t
     vlc_bool_t                  b_read_only;
 };
 
+typedef libvlc_media_list_view_t * (*libvlc_media_list_view_constructor_func_t)( libvlc_media_list_t * p_mlist, libvlc_exception_t * p_e ) ;
 typedef void (*libvlc_media_list_view_release_func_t)( libvlc_media_list_view_t * p_mlv ) ;
 
 typedef int (*libvlc_media_list_view_count_func_t)( libvlc_media_list_view_t * p_mlv,
@@ -158,6 +159,7 @@ struct libvlc_media_list_view_t
     libvlc_media_list_view_item_at_index_func_t      pf_item_at_index;
     libvlc_media_list_view_children_at_index_func_t  pf_children_at_index;
 
+    libvlc_media_list_view_constructor_func_t         pf_constructor;
     libvlc_media_list_view_release_func_t            pf_release;
 
     /* Notification callback */
@@ -326,6 +328,7 @@ VLC_EXPORT ( libvlc_media_list_view_t *, libvlc_media_list_view_new,
                             libvlc_media_list_view_count_func_t pf_count,
                             libvlc_media_list_view_item_at_index_func_t pf_item_at_index,
                             libvlc_media_list_view_children_at_index_func_t pf_children_at_index,
+                            libvlc_media_list_view_constructor_func_t pf_constructor,
                             libvlc_media_list_view_release_func_t pf_release,
                             void * this_view_data,
                             libvlc_exception_t * p_e ) );

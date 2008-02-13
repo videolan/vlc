@@ -287,6 +287,7 @@ libvlc_media_list_hierarchical_node_view( libvlc_media_list_t * p_mlist,
                                         hierarch_node_media_list_view_count,
                                         hierarch_node_media_list_view_item_at_index,
                                         hierarch_node_media_list_view_children_at_index,
+                                        libvlc_media_list_hierarchical_node_view,
                                         hierarch_node_media_list_view_release,
                                         NULL,
                                         p_e );

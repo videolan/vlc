@@ -294,6 +294,7 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
                             libvlc_media_list_view_count_func_t pf_count,
                             libvlc_media_list_view_item_at_index_func_t pf_item_at_index,
                             libvlc_media_list_view_children_at_index_func_t pf_children_at_index,
+                            libvlc_media_list_view_constructor_func_t pf_constructor,
                             libvlc_media_list_view_release_func_t pf_release,
                             void * this_view_data,
                             libvlc_exception_t * p_e )
@@ -322,6 +323,7 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
     p_mlv->pf_count             = pf_count;
     p_mlv->pf_item_at_index     = pf_item_at_index;
     p_mlv->pf_children_at_index = pf_children_at_index;
+    p_mlv->pf_constructor       = pf_constructor;
     p_mlv->pf_release           = pf_release;
 
     p_mlv->p_this_view_data = this_view_data;
@@ -422,6 +424,27 @@ libvlc_media_list_view_parent_media_list( libvlc_media_list_view_t * p_mlv,
     libvlc_media_list_retain( p_mlv->p_mlist );
     vlc_mutex_unlock( &p_mlv->object_lock );
     return p_mlist;
+}
+
+/**************************************************************************
+ *       libvlc_media_list_view_children_for_item (Public)
+ **************************************************************************/
+libvlc_media_list_view_t *
+libvlc_media_list_view_children_for_item( libvlc_media_list_view_t * p_mlv,
+                                          libvlc_media_descriptor_t * p_md,
+                                          libvlc_exception_t * p_e)
+{
+    (void)p_e;
+    libvlc_media_list_t * p_mlist;
+    libvlc_media_list_view_t * ret;
+
+    p_mlist = libvlc_media_descriptor_subitems(p_md, p_e);
+    if(!p_mlist) return NULL;
+
+    ret = p_mlv->pf_constructor( p_mlist, p_e );
+    libvlc_media_list_release( p_mlist );
+
+    return ret;
 }
 
 /* Limited to four args, because it should be enough */
