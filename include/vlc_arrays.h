@@ -431,18 +431,21 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
 {
     int i;
     struct vlc_dictionary_entry_t * p_current, * p_next;
-    for( i = 0; i < p_dict->i_size; i++ )
+    if( p_dict->p_entries )
     {
-        p_current = p_dict->p_entries[i];
-        while( p_current )
+        for( i = 0; i < p_dict->i_size; i++ )
         {
-            p_next = p_dict->p_entries[i]->p_next;
-            free( p_dict->p_entries[i]->psz_key );
-            free( p_current );
-            p_current = p_next;
+            p_current = p_dict->p_entries[i];
+            while( p_current )
+            {
+                p_next = p_dict->p_entries[i]->p_next;
+                free( p_dict->p_entries[i]->psz_key );
+                free( p_current );
+                p_current = p_next;
+            }
         }
+        free( p_dict->p_entries );
     }
-    free( p_dict->p_entries );
     p_dict->i_size = 0;
 }
 
@@ -460,7 +463,10 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
     if( !p_entry )
         return kVLCDictionaryNotFound;
 
-    /* Make sure we return the right item. (Hash collision)  */
+    if( p_entry && !p_entry->p_next )
+        return p_entry->p_value;
+
+    /* Make sure we return the right item. (Hash collision) */
     do {
         if( !strcmp( psz_key, p_entry->psz_key ) )
             return p_entry->p_value;
@@ -475,6 +481,10 @@ vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
 {
     struct vlc_dictionary_entry_t * p_entry;
     int i, count = 0;
+
+    if( !p_dict->p_entries )
+        return 0;
+
     for( i = 0; i < p_dict->i_size; i++ )
     {
         for( p_entry = p_dict->p_entries[i]; p_entry; p_entry = p_entry->p_next ) count++;
@@ -569,7 +579,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
             }
             vlc_dictionary_clear( p_dict );
             p_dict->i_size = new_dict.i_size;
-            p_dict->p_entries= new_dict.p_entries;
+            p_dict->p_entries = new_dict.p_entries;
         }
     }
 }
