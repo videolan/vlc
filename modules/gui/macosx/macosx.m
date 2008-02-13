@@ -51,9 +51,6 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define EMBEDDED_TEXT N_("Embedded video output")
-#define EMBEDDED_LONGTEXT N_( "Display the video in the controller window instead of a in separate window.")
-
 #define VDEV_TEXT N_("Video device")
 #define VDEV_LONGTEXT N_("Number of the screen to use by default to display " \
                          "videos in 'fullscreen'. The screen number correspondance can be found in "\
@@ -98,8 +95,6 @@ vlc_module_begin();
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-    add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
-              VLC_FALSE );
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
               VLC_FALSE );
     add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,

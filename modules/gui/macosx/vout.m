@@ -722,7 +722,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-background", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-black", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-embedded", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
 
     /* We only wait for NSApp to initialise if we're not embedded (as in the
@@ -750,7 +749,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             if ( VLCIntf && !(p_vout->b_fullscreen) &&
                         !(var_GetBool( p_vout, "macosx-background" )) &&
-                        var_GetBool( p_vout, "macosx-embedded") )
+                        var_GetBool( p_vout, "video-embeded") )
             {
                 o_return = [[[VLCMain sharedInstance] getEmbeddedList]
                                                             getEmbeddedVout];
@@ -1031,7 +1030,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
     b_black = NO;
-    b_embedded = var_GetBool( p_vout, "macosx-embedded" );
+    b_embedded = var_GetBool( p_vout, "video-embeded" );
 
     /* Find out on which screen to open the window */
     o_screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
