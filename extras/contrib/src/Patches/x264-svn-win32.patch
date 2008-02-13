@@ -103,7 +103,7 @@ Index: encoder/encoder.c
              h->param.b_pre_scenecut = 1;
  #endif
      }
-+    x264_log( h, X264_LOG_DEBUG, "using threads = %d\n", h->param.i_threads );
++    x264_log( h, X264_LOG_INFO, "using threads=%d\n", h->param.i_threads );
  
      if( h->param.b_interlaced )
      {
