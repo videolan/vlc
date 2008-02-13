@@ -46,7 +46,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
     p_md = libvlc_media_descriptor_new_from_input_item(
             p_mdis->p_libvlc_instance,
             p_item, NULL );
-    
+
     /* If we have a category, that mean we have to group the items having
      * that category in a media_list. */
     if( psz_cat )
@@ -57,12 +57,13 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
             libvlc_media_descriptor_t * p_catmd;
             p_catmd = libvlc_media_descriptor_new_as_node( p_mdis->p_libvlc_instance, psz_cat, NULL );
             p_mlist = libvlc_media_descriptor_subitems( p_catmd, NULL );
-            
+            p_mlist->b_read_only = VLC_TRUE;
+
             /* Insert the newly created mlist in our dictionary */
-            vlc_dictionary_value_for_key( &p_mdis->catname_to_submedialist, psz_cat );
+            vlc_dictionary_insert( &p_mdis->catname_to_submedialist, psz_cat, p_mlist );
             
             /* Insert the md into the root list */
-            libvlc_media_list_add_media_descriptor( p_mdis->p_mlist, p_catmd, NULL );
+            _libvlc_media_list_add_media_descriptor( p_mdis->p_mlist, p_catmd, NULL );
 
             /* We don't release the mlist cause the dictionary
              * doesn't retain the object. But we release the md. */
@@ -71,7 +72,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
     }
 
     libvlc_media_list_lock( p_mdis->p_mlist );
-    _libvlc_media_list_add_media_descriptor( p_mdis->p_mlist, p_md, NULL );
+    _libvlc_media_list_add_media_descriptor( p_mlist, p_md, NULL );
     libvlc_media_list_unlock( p_mdis->p_mlist );
 }
 
