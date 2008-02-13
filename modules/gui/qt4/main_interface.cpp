@@ -324,7 +324,7 @@ inline void MainInterface::createStatusBar()
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
-    speedLabel = new QLabel( "1.00x" );
+    speedLabel = new SpeedLabel( p_intf, "1.00x" );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
 
     /* Styling those labels */

@@ -36,6 +36,7 @@
 
 #include "qt4.hpp"
 #include "main_interface.hpp"
+#include "input_manager.hpp"
 
 #include <QWidget>
 #include <QFrame>
@@ -238,6 +239,21 @@ signals:
     void timeLabelDoubleClicked();
 };
 
+class SpeedLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    SpeedLabel( intf_thread_t *_p_intf, const QString text ): QLabel( text)
+    { p_intf = _p_intf; }
+
+protected:
+    virtual void mouseDoubleClickEvent ( QMouseEvent * event )
+    {
+        THEMIM->getIM()->setRate( INPUT_RATE_DEFAULT );
+    }
+private:
+    intf_thread_t *p_intf;
+};
 
 /******************** Speed Control Widgets ****************/
 class SpeedControlWidget : public QFrame
@@ -247,8 +263,6 @@ public:
     SpeedControlWidget( intf_thread_t *);
     virtual ~SpeedControlWidget();
     void updateControls( int );
-protected:
-    virtual void mouseDoubleClickEvent( QMouseEvent * event );
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;
