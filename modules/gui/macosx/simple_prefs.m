@@ -27,6 +27,7 @@
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
 static NSString* VLCAudioSettingToolbarIdentifier = @"Audio Settings Item Identifier";
+static NSString* VLCVideoSettingToolbarIdentifier = @"Video Settings Item Identifier";
 
 @implementation VLCSimplePrefs
 
@@ -111,35 +112,50 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_toolbarItem setEnabled: YES];
         [o_toolbarItem setAutovalidates: YES];
     }
+    else if( [o_itemIdent isEqual: VLCVideoSettingToolbarIdentifier] )
+    {
+        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
+        
+        [o_toolbarItem setLabel: _NS("Video")];
+        [o_toolbarItem setPaletteLabel: _NS("General Video settings")];
+        
+        [o_toolbarItem setToolTip: _NS("General Video settings")];
+        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Video_64"]];
+        
+        [o_toolbarItem setTarget: self];
+        [o_toolbarItem setAction: @selector(showVideoSettings)];
+        
+        [o_toolbarItem setEnabled: YES];
+        [o_toolbarItem setAutovalidates: YES];
+    }
     
     return o_toolbarItem;
 }
 
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, nil];
 }
 
 - (void)initStrings
 {
-    [o_sprefs_reset_btn setEnabled: NO];
     msg_Warn( p_intf, "localisation of the simple preferences not implemented!" );
 }
 
 - (void)resetControls
 {
     module_config_t *p_item;
-    int i, y;
+    int i, y = 0;
     char *psz_tmp;
 
     /**********************
@@ -164,6 +180,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [o_intf_meta_ckb setState: config_GetInt( p_intf, "fetch-meta" )];
     [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
+    [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embeded-video" )];
 
 
     /******************
@@ -209,7 +226,28 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     /******************
      * video settings *
      ******************/
-    
+    [o_video_enable_ckb setState: config_GetInt( p_intf, "video" )];
+    [o_video_fullscreen_ckb setState: config_GetInt( p_intf, "fullscreen" )];
+    [o_video_onTop_ckb setState: config_GetInt( p_intf, "video-on-top" )];
+    [o_video_skipFrames_ckb setState: config_GetInt( p_intf, "skip-frames" )];
+    [o_video_black_ckb setState: config_GetInt( p_intf, "macosx-black" )];
+
+    msg_Warn( p_intf, "vout module and display device selectors not implemented!" );
+
+    if( config_GetPsz( p_intf, "snapshot-path" ) != NULL )
+        [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" )]];
+    [o_video_snap_prefix_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-prefix" )]];
+    [o_video_snap_seqnum_ckb setState: config_GetInt( p_intf, "snapshot-sequential" )];
+    [o_video_snap_format_pop removeAllItems];
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "snapshot-format" );
+    for( i = 0; p_item->ppsz_list[i] != nil; i++ )
+    {
+        [o_video_snap_format_pop addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]]];
+        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
+            y = i;
+    }
+    [o_video_snap_format_pop selectItemAtIndex: y];
+
     /*******************
      * codecs settings *
      *******************/
@@ -296,13 +334,17 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         config_PutInt( p_intf, "fetch-meta", [o_intf_meta_ckb state] );
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
+        config_PutInt( p_intf, "video-embeded", [o_intf_embedded_ckb state] );
 
         /* okay, let's save our changes to vlcrc */
         i = config_SaveConfigFile( p_intf, "main" );
         i = config_SaveConfigFile( p_intf, "macosx" );
 
         if( i != 0 )
-            msg_Err( p_intf, "An error occured while saving the Audio settings using SimplePrefs" );
+        {
+            msg_Err( p_intf, "An error occured while saving the Interface settings using SimplePrefs" );
+            i = 0;
+        }
 
         b_intfSettingChanged = NO;
     }
@@ -345,13 +387,17 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         msg_Warn( p_intf, "visualizer not implemented!" );
 
-        if( [o_audio_last_ckb state] == NSOnState )
-            config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
-        else
-            config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+        /* Last.FM is optional */
+        if( module_Exists( p_intf, "audioscrobbler" ) )
+        {            
+            if( [o_audio_last_ckb state] == NSOnState )
+                config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+            else
+                config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
 
-        config_PutPsz( p_intf, "lastfm-username", [[o_audio_lastuser_fld stringValue] UTF8String] );
-        config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastuser_fld stringValue] UTF8String] );
+            config_PutPsz( p_intf, "lastfm-username", [[o_audio_lastuser_fld stringValue] UTF8String] );
+            config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastuser_fld stringValue] UTF8String] );
+        }
 
         /* okay, let's save our changes to vlcrc */
         i = config_SaveConfigFile( p_intf, "main" );
@@ -359,14 +405,47 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         i = i + config_SaveConfigFile( p_intf, "volnorm" );
 
         if( i != 0 )
+        {
             msg_Err( p_intf, "An error occured while saving the Audio settings using SimplePrefs" );
+            i = 0;
+        }
         b_audioSettingChanged = NO;
+    }
+    
+    /******************
+     * video settings *
+     ******************/
+    if( b_videoSettingChanged )
+    {
+        config_PutInt( p_intf, "video", [o_video_enable_ckb state] );
+        config_PutInt( p_intf, "fullscreen", [o_video_fullscreen_ckb state] );
+        config_PutInt( p_intf, "video-on-top", [o_video_onTop_ckb state] );
+        config_PutInt( p_intf, "skip-frames", [o_video_skipFrames_ckb state] );
+        config_PutInt( p_intf, "macosx-black", [o_video_black_ckb state] );
+
+        msg_Warn( p_intf, "vout module and display device selectors not implemented!" );
+
+        config_PutPsz( p_intf, "snapshot-path", [[o_video_snap_folder_fld stringValue] UTF8String] );
+        config_PutPsz( p_intf, "snapshot-prefix", [[o_video_snap_prefix_fld stringValue] UTF8String] );
+        config_PutInt( p_intf, "snapshot-sequential", [o_video_snap_seqnum_ckb state] );
+
+        if( [o_video_snap_format_pop indexOfSelectedItem] >= 0 )
+            config_PutPsz( p_intf, "snapshot-format", [[[o_video_snap_format_pop selectedItem] title] UTF8String] );
+
+        i = config_SaveConfigFile( p_intf, "main" );
+        i = i + config_SaveConfigFile( p_intf, "macosx" );
+        
+        if( i != 0 )
+        {
+            msg_Err( p_intf, "An error occured while saving the Video settings using SimplePrefs" );
+            i = 0;
+        }
+        b_videoSettingChanged = NO;
     }
 }
 
 - (void)showSettingsForCategory: (id)o_new_category_view
 {
-    msg_Dbg( p_intf, "switching to another category" );
     NSRect o_win_rect, o_view_rect, o_old_view_rect;
     o_win_rect = [o_sprefs_win frame];
     o_view_rect = [o_new_category_view frame];
@@ -426,5 +505,43 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     msg_Dbg( p_intf, "showing audio settings" );
     [self showSettingsForCategory: o_audio_view];
+}
+
+- (IBAction)videoSettingChanged:(id)sender
+{
+    if( sender == o_video_snap_folder_btn )
+    {
+        o_selectFolderPanel = [[NSOpenPanel alloc] init];
+        [o_selectFolderPanel setCanChooseDirectories: YES];
+        [o_selectFolderPanel setCanChooseFiles: NO];
+        [o_selectFolderPanel setResolvesAliases: YES];
+        [o_selectFolderPanel setAllowsMultipleSelection: NO];
+        [o_selectFolderPanel setMessage: _NS("Choose the Folder to save your video snapshots to.")];
+        [o_selectFolderPanel setCanCreateDirectories: YES];
+        [o_selectFolderPanel setPrompt: _NS("Choose")];
+        [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win 
+                                      modalDelegate: self 
+                                     didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
+                                        contextInfo: nil];
+    }
+    else
+        b_videoSettingChanged = YES;
+}
+
+- (void)savePanelDidEnd:(NSOpenPanel * )panel returnCode: (int)returnCode contextInfo: (void *)contextInfo
+{
+    if( returnCode == NSOKButton )
+    {
+        [o_video_snap_folder_fld setStringValue: [o_selectFolderPanel filename]];
+        b_videoSettingChanged = YES;
+    }
+
+    [o_selectFolderPanel release];
+}
+
+- (void)showVideoSettings
+{
+    msg_Dbg( p_intf, "showing video settings" );
+    [self showSettingsForCategory: o_video_view];
 }
 @end

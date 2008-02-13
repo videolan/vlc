@@ -393,6 +393,7 @@ static VLCTreeItem *o_root_item = nil;
                 p_item = module_GetConfig( p_module, &confsize );
 
                 if( !p_item ) continue;
+                if( !p_item->i_type ) break;
                 int i_category = -1;
                 int i_subcategory = -1;
                 int i_options = 0;

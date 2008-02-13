@@ -50,14 +50,17 @@
     IBOutlet id o_audio_vol_fld;
     IBOutlet id o_audio_vol_sld;
     IBOutlet id o_audio_vol_txt;
+
     IBOutlet id o_intf_art_pop;
     IBOutlet id o_intf_art_txt;
+    IBOutlet id o_intf_embedded_ckb;
     IBOutlet id o_intf_fspanel_ckb;
     IBOutlet id o_intf_lang_pop;
     IBOutlet id o_intf_lang_txt;
     IBOutlet id o_intf_meta_ckb;
     IBOutlet id o_intf_network_box;
     IBOutlet id o_intf_view;
+
     IBOutlet id o_sprefs_basic_box;
     IBOutlet id o_sprefs_basicFull_matrix;
     IBOutlet id o_sprefs_cancel_btn;
@@ -66,16 +69,40 @@
     IBOutlet id o_sprefs_save_btn;
     IBOutlet id o_sprefs_win;
 
+    IBOutlet id o_video_black_ckb;
+    IBOutlet id o_video_device_pop;
+    IBOutlet id o_video_device_txt;
+    IBOutlet id o_video_display_box;
+    IBOutlet id o_video_enable_ckb;
+    IBOutlet id o_video_fullscreen_ckb;
+    IBOutlet id o_video_onTop_ckb;
+    IBOutlet id o_video_output_pop;
+    IBOutlet id o_video_output_txt;
+    IBOutlet id o_video_skipFrames_ckb;
+    IBOutlet id o_video_snap_box;
+    IBOutlet id o_video_snap_folder_btn;
+    IBOutlet id o_video_snap_folder_fld;
+    IBOutlet id o_video_snap_folder_txt;
+    IBOutlet id o_video_snap_format_pop;
+    IBOutlet id o_video_snap_format_txt;
+    IBOutlet id o_video_snap_prefix_fld;
+    IBOutlet id o_video_snap_prefix_txt;
+    IBOutlet id o_video_snap_seqnum_ckb;
+    IBOutlet id o_video_view;
+
     BOOL b_audioSettingChanged;
     BOOL b_intfSettingChanged;
+    BOOL b_videoSettingChanged;
     id o_currentlyShownCategoryView;
     
     NSToolbar *o_sprefs_toolbar;
+    NSOpenPanel *o_selectFolderPanel;
     
     intf_thread_t *p_intf;
 }
 + (VLCSimplePrefs *)sharedInstance;
 
+/* toolbar */
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_toolbar 
       itemForItemIdentifier: (NSString *)o_itemIdent 
   willBeInsertedIntoToolbar: (BOOL)b_willBeInserted;
@@ -102,6 +129,8 @@
 - (void)showAudioSettings;
 
 /* video */
+- (IBAction)videoSettingChanged:(id)sender;
+- (void)showVideoSettings;
 
 /* subtitles */
 
