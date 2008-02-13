@@ -1178,15 +1178,17 @@ int update_CompareReleaseToCurrent( update_t *p_update )
 static char *size_str( long int l_size )
 {
     char *psz_tmp = NULL;
+    int i_retval = 0;
     if( l_size >> 30 )
-        asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
+        i_retval = asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
     else if( l_size >> 20 )
-        asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
+        i_retval = asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
     else if( l_size >> 10 )
-        asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
+        i_retval = asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
     else
-        asprintf( &psz_tmp, "%ld B", l_size );
-    return psz_tmp;
+        i_retval = asprintf( &psz_tmp, "%ld B", l_size );
+
+    return i_retval == -1 ? NULL : psz_tmp;
 }
 
 
