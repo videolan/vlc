@@ -138,6 +138,8 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "video-es", ChangeVideo, this );
     /* src/input/input.c:1765 */
     var_AddCallback( p_input, "rate", ItemRateChanged, this );
+    var_AddCallback( p_input, "rate-faster", ItemRateChanged, this );
+    var_AddCallback( p_input, "rate-slower", ItemRateChanged, this );
     /* src/input/input.c:2003 */
     var_AddCallback( p_input, "title", ItemTitleChanged, this );
     /* src/input/input.c:734 for timers update*/
@@ -151,6 +153,8 @@ void InputManager::delCallbacks()
     var_DelCallback( p_input, "video-es", ChangeVideo, this );
     var_DelCallback( p_input, "state", ItemStateChanged, this );
     var_DelCallback( p_input, "rate", ItemRateChanged, this );
+    var_DelCallback( p_input, "rate-faster", ItemRateChanged, this );
+    var_DelCallback( p_input, "rate-slower", ItemRateChanged, this );
     var_DelCallback( p_input, "title", ItemTitleChanged, this );
     var_DelCallback( p_input, "intf-change", InterfaceChanged, this );
 }
@@ -599,7 +603,7 @@ static int ItemRateChanged( vlc_object_t *p_this, const char *psz_var,
                             vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     InputManager *im = (InputManager*)param;
-
+    
     IMEvent *event = new IMEvent( ItemRateChanged_Type, 0 );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
