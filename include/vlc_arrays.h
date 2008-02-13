@@ -457,13 +457,10 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
     int i_pos = DictHash( psz_key, p_dict->i_size );
     struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
 
-    if( p_entry && !p_entry->p_next )
-        return p_entry->p_value;
-
     if( !p_entry )
         return kVLCDictionaryNotFound;
 
-    /* Hash collision */
+    /* Make sure we return the right item. (Hash collision)  */
     do {
         if( !strcmp( psz_key, p_entry->psz_key ) )
             return p_entry->p_value;
