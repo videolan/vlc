@@ -43,19 +43,30 @@
 @end
 
 @implementation VLCMediaListAspectNode
+- (id)init
+{
+    if(self = [super init])
+    {
+        media = nil;
+        children = nil;        
+    }
+    return self;
+}
+- (void)dealloc
+{
+    [media release];
+    [children release];
+    [super dealloc];
+}
+
 @synthesize media;
 @synthesize children;
 
 - (BOOL)isLeaf
 {
-    return self.children == NULL;
+    return self.children == nil;
 }
 
--(void)dealloc
-{
-    [self.children release];
-    [super dealloc];
-}
 @end
 
 @implementation VLCMediaListAspect (KeyValueCodingCompliance)
@@ -113,6 +124,24 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         [parentMediaList release];
     [super dealloc];
 }
+
+- (void)release
+{
+    @synchronized(self)
+    {
+        if([self retainCount] <= 1)
+        {
+            /* We must make sure we won't receive new event after an upcoming dealloc
+             * We also may receive a -retain in some event callback that may occcur
+             * Before libvlc_event_detach. So this can't happen in dealloc */
+            libvlc_event_manager_t * p_em = libvlc_media_list_view_event_manager(p_mlv);
+            libvlc_event_detach(p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, NULL);
+        }
+        [super release];
+    }
+}
+
 - (NSString *)description
 {
     NSMutableString * content = [NSMutableString string];
@@ -155,6 +184,12 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 {
     VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
     [node setMedia:[self mediaAtIndex: index]];
+    libvlc_media_list_view_t * p_sub_mlv = libvlc_media_list_view_children_for_item([self libVLCMediaListView], [node.media libVLCMediaDescriptor], NULL);
+    if( p_sub_mlv )
+    {
+        [node setChildren:[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_sub_mlv]];
+        libvlc_media_list_view_release(p_sub_mlv);
+    }
     return node;
 }
 
@@ -218,6 +253,8 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
             VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
             [node setMedia:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
             [node setChildren: p_sub_mlv ? [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_sub_mlv] : nil];
+            if( p_sub_mlv ) NSAssert(![node isLeaf], @"Not leaf");
+
             [cachedNode addObject:node];
             libvlc_media_descriptor_release(p_md);
             if( p_sub_mlv ) libvlc_media_list_view_release(p_sub_mlv);
@@ -266,7 +303,17 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         VLCMedia * media = [args objectForKey:@"media"];
         VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
         [node setMedia:media];
-        [node setChildren:[self childrenAtIndex:index]];
+
+        /* Set the sub media list view we enventually have */
+        libvlc_media_list_view_t * p_sub_mlv = libvlc_media_list_view_children_for_item([self libVLCMediaListView], [media libVLCMediaDescriptor], NULL);
+
+        if( p_sub_mlv )
+        {
+            [node setChildren:[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView: p_sub_mlv]];
+            libvlc_media_list_view_release(p_sub_mlv);
+            NSAssert(![node isLeaf], @"Not leaf");
+        }
+
         /* Sanity check */
         if( index && index > [cachedNode count] )
             index = [cachedNode count];
