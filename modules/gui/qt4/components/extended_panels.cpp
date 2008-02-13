@@ -253,8 +253,9 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
         if( !psz_parser )
         {
             psz_parser = psz_string;
-            asprintf( &psz_string, ( *psz_string ) ? "%s:%s" : "%s%s",
-                            psz_string, psz_name );
+            if( asprintf( &psz_string, ( *psz_string ) ? "%s:%s" : "%s%s",
+                            psz_string, psz_name ) == -1 )
+                return;
             free( psz_parser );
         }
         else
