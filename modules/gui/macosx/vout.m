@@ -749,7 +749,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             if ( VLCIntf && !(p_vout->b_fullscreen) &&
                         !(var_GetBool( p_vout, "macosx-background" )) &&
-                        var_GetBool( p_vout, "video-embeded") )
+                        var_GetBool( p_vout, "embedded-video") )
             {
                 o_return = [[[VLCMain sharedInstance] getEmbeddedList]
                                                             getEmbeddedVout];
@@ -1030,7 +1030,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
     b_black = NO;
-    b_embedded = var_GetBool( p_vout, "video-embeded" );
+    b_embedded = var_GetBool( p_vout, "embedded-video" );
 
     /* Find out on which screen to open the window */
     o_screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];

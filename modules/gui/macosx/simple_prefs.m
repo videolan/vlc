@@ -180,7 +180,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [o_intf_meta_ckb setState: config_GetInt( p_intf, "fetch-meta" )];
     [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
-    [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embeded-video" )];
+    [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embedded-video" )];
 
 
     /******************
@@ -305,6 +305,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( i_return == NSAlertAlternateReturn )
     {
         config_ResetAll( p_intf );
+        b_intfSettingChanged, b_videoSettingChanged, b_audioSettingChanged = YES;
         [self resetControls];
     }
 }

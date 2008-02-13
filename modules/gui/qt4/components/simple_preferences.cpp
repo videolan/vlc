@@ -451,7 +451,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.updatesDays->hide();
 #endif
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
-            CONFIG_GENERIC( "embeded-video", Bool, NULL, embedVideo );
+            CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
                     skinBrowse );
 #if defined( WIN32 ) || defined( HAVE_DBUS_3 ) || defined(__APPLE__)
