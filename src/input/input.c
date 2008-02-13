@@ -116,6 +116,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  *  - can-pause
  * * For intf callback upon changes
  *  - intf-change
+ *  - rate-change for when playback rate changes
  * TODO explain when Callback is called
  * TODO complete this list (?)
  *****************************************************************************/
@@ -1768,6 +1769,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             {
                 val.i_int = i_rate;
                 var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
+                var_SetBool( p_input, "rate-change", VLC_TRUE );
 
                 p_input->p->i_rate  = i_rate;
 

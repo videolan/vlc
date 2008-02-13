@@ -137,9 +137,7 @@ void InputManager::addCallbacks()
     /* src/input/es-out.c:551 */
     var_AddCallback( p_input, "video-es", ChangeVideo, this );
     /* src/input/input.c:1765 */
-    var_AddCallback( p_input, "rate", ItemRateChanged, this );
-    var_AddCallback( p_input, "rate-faster", ItemRateChanged, this );
-    var_AddCallback( p_input, "rate-slower", ItemRateChanged, this );
+    var_AddCallback( p_input, "rate-change", ItemRateChanged, this );
     /* src/input/input.c:2003 */
     var_AddCallback( p_input, "title", ItemTitleChanged, this );
     /* src/input/input.c:734 for timers update*/
@@ -152,9 +150,7 @@ void InputManager::delCallbacks()
     var_DelCallback( p_input, "audio-es", ChangeAudio, this );
     var_DelCallback( p_input, "video-es", ChangeVideo, this );
     var_DelCallback( p_input, "state", ItemStateChanged, this );
-    var_DelCallback( p_input, "rate", ItemRateChanged, this );
-    var_DelCallback( p_input, "rate-faster", ItemRateChanged, this );
-    var_DelCallback( p_input, "rate-slower", ItemRateChanged, this );
+    var_DelCallback( p_input, "rate-change", ItemRateChanged, this );
     var_DelCallback( p_input, "title", ItemTitleChanged, this );
     var_DelCallback( p_input, "intf-change", InterfaceChanged, this );
 }

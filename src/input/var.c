@@ -194,9 +194,14 @@ void input_ControlVarInit ( input_thread_t *p_input )
     {
         /* Special "intf-change" variable, it allows intf to set up a callback
          * to be notified of some changes.
+         *
+         * Add rate-change to inform about rate changin
+         *
          * TODO list all changes warn by this callbacks */
         var_Create( p_input, "intf-change", VLC_VAR_BOOL );
         var_SetBool( p_input, "intf-change", VLC_TRUE );
+        var_Create( p_input, "rate-change", VLC_VAR_BOOL );
+        var_SetBool( p_input, "rate-change", VLC_TRUE );
     }
 #undef ADD_CALLBACK
 }
