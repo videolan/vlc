@@ -715,7 +715,8 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg ( p_enc, "x264 core:%d", X264_BUILD );
+    /* X264_POINTVER or X264_VERSION are not available */
+    msg_Dbg ( p_enc, "version x264 0.%d.X", X264_BUILD );
 
 #if X264_BUILD < 37
     if( p_enc->fmt_in.video.i_width % 16 != 0 ||
