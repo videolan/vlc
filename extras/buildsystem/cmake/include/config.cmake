@@ -120,6 +120,10 @@ set(CMAKE_EXTRA_INCLUDE_FILES arpa/inet.h)
 vlc_check_functions_exist(inet_aton inet_ntop inet_pton)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
+set(CMAKE_EXTRA_INCLUDE_FILES sys/mman.h)
+vlc_check_functions_exist(mmap)
+set(CMAKE_EXTRA_INCLUDE_FILES)
+
 set(CMAKE_REQUIRED_LIBRARIES)
 
 check_library_exists(poll poll "" HAVE_POLL)
@@ -490,6 +494,23 @@ if(X11_FOUND)
   vlc_module_add_link_libraries(x11       ${X11_LIBRARIES})
   vlc_module_add_link_libraries(panoramix ${X11_LIBRARIES})
 endif(X11_FOUND)
+
+find_package(Mpeg2)
+if(Mpeg2_FOUND)
+  vlc_enable_modules(libmpeg2)
+  check_include_files ("stdint.h;mpeg2dec/mpeg2.h" HAVE_MPEG2DEC_MPEG2_H)
+  vlc_module_add_link_libraries(libmpeg2 ${Mpeg2_LIBRARIES})
+endif(Mpeg2_FOUND)
+
+find_package(Dvbpsi)
+if(Dvbpsi_FOUND)
+  vlc_enable_modules(ts)
+  set(CMAKE_REQUIRED_INCLUDES ${CONTRIB_INCLUDE})
+  check_include_files ("stdint.h;dvbpsi/dvbpsi.h;dvbpsi/demux.h;dvbpsi/descriptor.h;dvbpsi/pat.h;dvbpsi/pmt.h;dvbpsi/sdt.h;dvbpsi/dr.h" HAVE_DVBPSI_DR_H)
+  vlc_module_add_link_libraries(ts ${Dvbpsi_LIBRARIES})
+endif(Dvbpsi_FOUND)
+
+
 
 set(CMAKE_REQUIRED_INCLUDES)
 
