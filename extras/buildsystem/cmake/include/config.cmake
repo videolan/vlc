@@ -109,7 +109,7 @@ vlc_check_functions_exist(putenv getenv setenv)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES unistd.h)
-vlc_check_functions_exist(isatty getcwd getuid)
+vlc_check_functions_exist(isatty getcwd getuid swab)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 set(CMAKE_EXTRA_INCLUDE_FILES sys/stat.h)
