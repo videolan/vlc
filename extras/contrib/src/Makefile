@@ -1320,11 +1320,12 @@ x264-$(X264_VERSION).tar.gz:
 ifdef SVN
 x264: 
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
+	patch -p0 < Patches/x264-svn-info-threads.patch
 ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
 ifdef HAVE_DARWIN_OS
-	(cd $@; patch -p 0 < ../Patches/x264-svn-darwin.patch )
+	(cd $@; patch -p0 < ../Patches/x264-svn-darwin.patch )
 endif
 else
 

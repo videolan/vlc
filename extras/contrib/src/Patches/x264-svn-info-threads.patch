@@ -1,0 +1,12 @@
+Index: x264/encoder/encoder.c
+===================================================================
+--- x264/encoder/encoder.c	(revision 736)
++++ x264/encoder/encoder.c	(working copy)
+@@ -360,6 +360,7 @@
+             h->param.b_pre_scenecut = 1;
+ #endif
+     }
++    x264_log( h, X264_LOG_INFO, "using threads=%d\n", h->param.i_threads );
+ 
+     if( h->param.b_interlaced )
+     {
