@@ -28,7 +28,7 @@
 - (id)applianceController
 {
     // Disabled until we properly display a menu for that. You can test it by uncommenting those lines, and comment the following line.
-    // VLCMediaListAspect * mediaListAspect = [[[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] discoveredMedia] hierarchicalAspect];
+    // VLCMediaListAspect * mediaListAspect = [[[[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] discoveredMedia] retain] hierarchicalAspect];
     // VLCApplianceController * controller = [[VLCMediaListController alloc] initWithMediaListAspect:mediaListAspect];
 
     VLCApplianceController * controller = [[VLCApplianceController alloc] initWithPath:[NSHomeDirectory() stringByAppendingPathComponent:@"Movies"]];

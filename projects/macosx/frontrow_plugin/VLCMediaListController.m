@@ -12,6 +12,7 @@
 #import <BackRow/BRListControl.h>
 #import <BackRow/BRTextMenuItemLayer.h>
 #import <BackRow/BRControllerStack.h>
+#import <BackRow/BRHeaderControl.h>
 
 @interface VLCMediaListController ()
 
@@ -25,13 +26,22 @@
 
 - initWithMediaListAspect:(VLCMediaListAspect *)aMediaListAspect
 {
-    self = [super init];
-        
-    self.mediaListAspect = aMediaListAspect;
-    [self.mediaListAspect addObserver:self forKeyPath:@"media" options:NSKeyValueChangeRemoval|NSKeyValueChangeInsertion|NSKeyValueChangeSetting context:nil];
-    [[self list] setDatasource:self];
-    isReloading = NO;
+    return [self initWithMediaListAspect:aMediaListAspect andTitle:nil];
+}
 
+- initWithMediaListAspect:(VLCMediaListAspect *)aMediaListAspect andTitle:(NSString *)title
+{
+    if( self = [super init] )
+    {
+        self.mediaListAspect = aMediaListAspect;
+        [self.mediaListAspect addObserver:self forKeyPath:@"media" options:NSKeyValueChangeRemoval|NSKeyValueChangeInsertion|NSKeyValueChangeSetting context:nil];
+        [[self list] setDatasource:self];
+        isReloading = NO;
+        if(title)
+        {
+            [[self header] setTitle: title];
+        }
+    }
     return self;
 }
 
@@ -48,7 +58,7 @@
         if(!isReloading)
         {
             isReloading = YES;
-            [self performSelector:@selector(reload) withObject:nil afterDelay:2.];
+            [self performSelector:@selector(reload) withObject:nil afterDelay: [[self list] itemCount] > 10 ? 2. : [[self list] itemCount] ? 0.3 : 0.0];
         }
     }
     else {
@@ -103,7 +113,7 @@
     BOOL isDirectory = ![[mediaListAspect nodeAtIndex:row] isLeaf];
     
     BRTextMenuItemLayer * item = nil;
-    
+
     if(isDirectory) {
         item = [BRTextMenuItemLayer folderMenuItem];
     }
@@ -118,12 +128,13 @@
 
 - (void)itemSelected:(NSInteger)row
 {
-    BOOL isDirectory = ![[mediaListAspect nodeAtIndex:row] isLeaf];
+    VLCMediaListAspectNode * node = [mediaListAspect nodeAtIndex:row];
+    BOOL isDirectory = ![node isLeaf];
     
     BRController * controller = nil;
     
     if(isDirectory) {
-        controller = [[[VLCMediaListController alloc] initWithMediaListAspect:[[mediaListAspect nodeAtIndex:row] children]] autorelease];
+        controller = [[[VLCMediaListController alloc] initWithMediaListAspect:[node children] andTitle:[[node media] valueForKeyPath:@"metaDictionary.title"]] autorelease];
     }
     else {
         static VLCPlayerController * playerController = nil;

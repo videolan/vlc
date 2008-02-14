@@ -45,14 +45,12 @@
         _videoLayer = [VLCVideoLayer layer];
         _videoLayer.frame = self.bounds;
         _videoLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
+        _videoLayer.fillScreen = YES;
         [self addSublayer:_videoLayer];
     }
     
     if(_player == nil) {
         _player = [[VLCMediaPlayer alloc] initWithVideoLayer:_videoLayer];
-    }
-    else {
-        [_player pause];
     }
 #endif
     

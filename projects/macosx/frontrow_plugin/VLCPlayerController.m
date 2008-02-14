@@ -68,6 +68,18 @@
             [player setPosition:position];
             break;
         }
+        case BREventUpUsage:
+        {
+            NSLog(@"UP");
+            [[[VLCLibrary sharedLibrary] audio] setVolume:[[[VLCLibrary sharedLibrary] audio] volume]+20];
+            break;
+        }
+        case BREventDownUsage:
+        {
+            NSLog(@"DOWN");
+            [[[VLCLibrary sharedLibrary] audio] setVolume:[[[VLCLibrary sharedLibrary] audio] volume]-20];
+            break;
+        }
         case BREventMenuUsage:
             [[self stack] popController];
         default:

@@ -17,5 +17,5 @@
 }
 
 - initWithMediaListAspect:(VLCMediaListAspect *)mediaListAspect;
-
+- initWithMediaListAspect:(VLCMediaListAspect *)aMediaListAspect andTitle:(NSString *)title;
 @end
