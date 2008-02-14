@@ -1165,12 +1165,13 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.cpu &= ~X264_CPU_SSE2;
     }
 
+    /* BUILD 29 adds support for multi-threaded encoding while BUILD 49 (r543)
+       also adds support for threads = 0 for automatically selecting an optimal
+       value (cores * 1.5) based on detected CPUs. Default behavior for x264 is
+       threads = 1, however VLC usage differs and uses threads = 0 (auto) by
+       default unless ofcourse transcode threads is explicitly specified.. */
 #if X264_BUILD >= 29
-    /* As of r543 x264 will autodetect the number of cpus and will set
-       the number of threads accordingly unless ofcourse the number of
-       threads is explicitly specified... */
-    if( p_enc->i_threads >= 1 )
-        p_sys->param.i_threads = p_enc->i_threads;
+    p_sys->param.i_threads = p_enc->i_threads;
 #endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "stats", &val );
@@ -1188,7 +1189,9 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.rc.b_stat_read = val.i_int & 2;
     }
 
-    /* We need to initialize pthreadw32 before we open the encoder, but only oncce for the whole application. Since pthreadw32 doesn't keep a refcount, do it ouurselves */
+    /* We need to initialize pthreadw32 before we open the encoder,
+       but only oncce for the whole application. Since pthreadw32
+       doesn't keep a refcount, do it ourselves. */
 #ifdef PTW32_STATIC_LIB
     vlc_value_t lock, count;
 
