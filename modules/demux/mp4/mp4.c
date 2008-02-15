@@ -485,6 +485,8 @@ static int Open( vlc_object_t * p_this )
 
     /* allocate memory */
     p_sys->track = calloc( p_sys->i_tracks, sizeof( mp4_track_t ) );
+    if( p_sys->track == NULL )
+        goto error;
     memset( p_sys->track, 0, p_sys->i_tracks * sizeof( mp4_track_t ) );
 
     /* Search the first chap reference (like quicktime) */
@@ -1232,6 +1234,8 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         p_demux_track->i_sample_size = 0;
         p_demux_track->p_sample_size =
             calloc( p_demux_track->i_sample_count, sizeof( uint32_t ) );
+        if( p_demux_track->p_sample_size == NULL )
+            return VLC_ENOMEM;
 
         for( i_sample = 0; i_sample < p_demux_track->i_sample_count; i_sample++ )
         {
