@@ -690,7 +690,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         {
             p_region->i_y = p_sys->pi_y_offsets[i_real_index];
         }
-        else if( fmt_out.i_height < row_inner_height
+        else if( fmt_out.i_height > row_inner_height
             || p_sys->b_ar || p_sys->b_keep )
         {
             /* we don't have to center the video since it takes the
