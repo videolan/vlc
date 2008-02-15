@@ -64,7 +64,7 @@ int main (void)
     };
     const int size = sizeof(our_keys)/sizeof(our_keys[0]);
     char ** keys;
-    int j, i = 0;
+    int i = 0;
 
     vlc_dictionary_t dict;
     vlc_dictionary_init( &dict, 0 );
