@@ -438,8 +438,8 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
             p_current = p_dict->p_entries[i];
             while( p_current )
             {
-                p_next = p_dict->p_entries[i]->p_next;
-                free( p_dict->p_entries[i]->psz_key );
+                p_next = p_current->p_next;
+                free( p_current->psz_key );
                 free( p_current );
                 p_current = p_next;
             }
@@ -462,9 +462,6 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
 
     if( !p_entry )
         return kVLCDictionaryNotFound;
-
-    if( p_entry && !p_entry->p_next )
-        return p_entry->p_value;
 
     /* Make sure we return the right item. (Hash collision) */
     do {
@@ -523,36 +520,14 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
         vlc_dictionary_init( p_dict, 1 );
 
     int i_pos = DictHash( psz_key, p_dict->i_size );
-    struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+    struct vlc_dictionary_entry_t * p_entry;
 
-    if( !p_entry )
-    {
-        p_entry = p_dict->p_entries[i_pos] = (struct vlc_dictionary_entry_t *)malloc(
-                sizeof(struct vlc_dictionary_entry_t));
-        assert( p_entry );
-
-        p_entry->psz_key = strdup( psz_key );
-        assert( p_entry->psz_key );
-        p_entry->p_value = p_value;
-        p_dict->p_entries[i_pos]->p_next = NULL;
-        return;
-    }
-    if( p_entry->p_value == kVLCDictionaryNotFound )
-    {
-        /* This one is fine, just high jack */
-        p_entry->psz_key = strdup( psz_key );
-        p_entry->p_value = p_value;
-        return;
-    }
-
-    /* Hash collision here */
     p_entry = (struct vlc_dictionary_entry_t *)malloc(sizeof(struct vlc_dictionary_entry_t));
     assert( p_entry );
     p_entry->psz_key = strdup( psz_key );
     p_entry->p_value = p_value;
     p_entry->p_next = p_dict->p_entries[i_pos];
     p_dict->p_entries[i_pos] = p_entry;
-
     if( rebuild )
     {
         /* Count how many items there was */
@@ -564,12 +539,11 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
             struct vlc_dictionary_t new_dict;
             int i_new_size = ( (p_dict->i_size+2) * 3) / 2; /* XXX: this need tuning */
             int i;
-
             vlc_dictionary_init( &new_dict, i_new_size );
             for( i = 0; i < p_dict->i_size; i++ )
             {
                 p_entry = p_dict->p_entries[i];
-                while( p_entry );
+                while( p_entry )
                 {
                     __vlc_dictionary_insert( &new_dict, p_entry->psz_key,
                                              p_entry->p_value,
@@ -577,6 +551,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
                     p_entry = p_entry->p_next;
                 }
             }
+
             vlc_dictionary_clear( p_dict );
             p_dict->i_size = new_dict.i_size;
             p_dict->p_entries = new_dict.p_entries;
@@ -602,14 +577,6 @@ vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char
 
     if( !p_entry )
         return; /* Not found, nothing to do */
-
-    if( !p_entry->p_next )
-    {
-        free( p_entry->psz_key );
-        free( p_entry );
-        p_dict->p_entries[i_pos] = NULL;
-        return;
-    }
 
     /* Hash collision */
     p_prev = NULL;
