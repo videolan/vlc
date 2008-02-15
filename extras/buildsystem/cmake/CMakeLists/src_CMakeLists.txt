@@ -268,17 +268,21 @@ set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
 ##########################################################
 # Tests
 
-add_executable(testapi   control/testapi.c)
-add_executable(i18n_atof test/i18n_atof.c)
-add_executable(url       test/url.c)
-add_executable(utf8      test/utf8.c)
+add_executable(testapi    control/testapi.c)
+add_executable(i18n_atof  test/i18n_atof.c)
+add_executable(url        test/url.c)
+add_executable(utf8       test/utf8.c)
+add_executable(dictionary test/dictionary.c)
 
-target_link_libraries(testapi   libvlc-control)
-target_link_libraries(i18n_atof libvlc)
-target_link_libraries(url       libvlc)
-target_link_libraries(utf8      libvlc)
+target_link_libraries(testapi    libvlc-control)
+target_link_libraries(i18n_atof  libvlc)
+target_link_libraries(url        libvlc)
+target_link_libraries(utf8       libvlc)
+target_link_libraries(dictionary libvlc)
 
-add_test(testapi   ${EXECUTABLE_OUTPUT_PATH}/testapi)
-add_test(i18n_atof ${EXECUTABLE_OUTPUT_PATH}/i18n_atof)
-add_test(url       ${EXECUTABLE_OUTPUT_PATH}/url)
-add_test(utf8      ${EXECUTABLE_OUTPUT_PATH}/utf8)
+add_test(testapi    ${EXECUTABLE_OUTPUT_PATH}/testapi)
+add_test(i18n_atof  ${EXECUTABLE_OUTPUT_PATH}/i18n_atof)
+add_test(url        ${EXECUTABLE_OUTPUT_PATH}/url)
+add_test(utf8       ${EXECUTABLE_OUTPUT_PATH}/utf8)
+add_test(dictionary ${EXECUTABLE_OUTPUT_PATH}/dictionary)
+
