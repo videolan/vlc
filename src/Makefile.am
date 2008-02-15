@@ -376,6 +376,7 @@ misc/revision.c:
 # Unit/regression test
 ###############################################################################
 check_PROGRAMS = \
+	test_dictionary \
 	test_i18n_atof \
 	test_url \
 	test_utf8 \
@@ -387,6 +388,10 @@ dist_check_SCRIPTS = check_symbols
 TESTS = $(check_PROGRAMS) $(dist_check_SCRIPTS)
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
+
+test_dictionary_SOURCES = test/dictionary.c
+test_dictionary_LDADD = libvlc.la
+test_dictionary_CFLAGS = $(CFLAGS_tests)
 
 test_i18n_atof_SOURCES = test/i18n_atof.c text/charset.c
 test_i18n_atof_LDADD = libvlc.la
