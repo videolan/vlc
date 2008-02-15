@@ -1317,6 +1317,9 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
     memset( psz_spaces_longtext, ' ', LINE_START+2 );
     psz_spaces_longtext[LINE_START+2] = '\0';
+#ifdef WIN32
+    b_color = VLC_FALSE; // don't put color control codes in a .txt file
+#endif
 
     if( b_color )
     {
