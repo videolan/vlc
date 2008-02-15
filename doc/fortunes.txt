@@ -837,3 +837,16 @@ VLC development is NOT about being a sed god.
 < d_anny> j-b: suicide , a command in cygwin ?
   -- #videolan
 %
+<jkernsjr> guys..thats what I get when I try to run vlc as root
+<thresh> vlc -I dummy
+<jkernsjr> thanks for calling me dummy
+<jkernsjr> makes me feel warm and fuzzy
+<thresh> n/p
+<Meuuh> sorry, this is already in the fortunes
+<jkernsjr> still won't start
+<jkernsjr> and now I see dummy is one of the options
+<thresh> :)
+<jkernsjr> I really thought you were calling me dummy..sorry
+<Meuuh> ha, NOW you can go into the fortunes
+  -- #videolan
+%
