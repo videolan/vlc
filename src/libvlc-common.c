@@ -105,7 +105,8 @@ static volatile unsigned int i_instances = 0;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if defined (__APPLE__) || defined (WIN32)
+#if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
+    ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 static void SetLanguage   ( char const * );
 #endif
 static inline int LoadMessages (void);
@@ -1117,7 +1118,8 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     return VLC_SUCCESS;
 };
 
-#if defined (__APPLE__) || defined (WIN32)
+#if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
+    ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 /*****************************************************************************
  * SetLanguage: set the interface language.
  *****************************************************************************
