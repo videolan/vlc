@@ -430,6 +430,8 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
 
+    artFetched = NO;
+
     char * p_url = libvlc_media_descriptor_get_mrl( p_md, &ex );
     catch_exception( &ex );
 
@@ -463,9 +465,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     /* Force VLCMetaInformationTitle, that will trigger preparsing
      * And all the other meta will be added through the libvlc event system */
     [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
-
-    /* Force VLCMetaInformationArtworkURL, that will trigger artwork fetching */
-    [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
 }
 
 - (void)fetchMetaInformationFromLibVLCWithType:(NSString *)metaType
@@ -544,6 +543,17 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 - (void)setStateAsNumber:(NSNumber *)newStateAsNumber
 {
     [self setState: [newStateAsNumber intValue]];
+}
+
+- (id)valueForKeyPath:(NSString *)keyPath
+{
+    if( ![metaDictionary objectForKey:@"artwork"] && [keyPath isEqualToString:@"metaDictionary.artwork"])
+    {
+        artFetched = YES;
+        /* Force the retrieval of the artwork now that someone asked for it */
+        [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
+    }
+    return [super valueForKeyPath:keyPath];
 }
 @end
 
