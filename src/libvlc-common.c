@@ -1696,9 +1696,15 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         }
     }
 
-    if( b_has_advanced )
-        utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " %s\n", _( "Note:" ),
-        _( "add --advanced to your command line to see advanced options." ) );
+    if( b_has_advanced ) 
+    {
+        if( b_color )
+            utf8_fprintf( stdout, "\n" WHITE "%s" GRAY " %s\n", _( "Note:" ),
+           _( "add --advanced to your command line to see advanced options."));
+        else
+            utf8_fprintf( stdout, "\n %s %s\n", _( "Note:" ),
+           _( "add --advanced to your command line to see advanced options."));
+    }
 
     /* Release the module list */
     vlc_list_release( p_list );
