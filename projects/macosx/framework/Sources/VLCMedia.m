@@ -547,7 +547,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (id)valueForKeyPath:(NSString *)keyPath
 {
-    if( ![metaDictionary objectForKey:@"artwork"] && [keyPath isEqualToString:@"metaDictionary.artwork"])
+    if( !artFetched && [keyPath isEqualToString:@"metaDictionary.artwork"])
     {
         artFetched = YES;
         /* Force the retrieval of the artwork now that someone asked for it */
