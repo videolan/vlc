@@ -195,9 +195,9 @@ static CGSize kArtworkSize = { 256., 256. };
     self.artistLayer.string = artist ? artist : @"No Artist";
     NSString * genre = [self.media.metaDictionary objectForKey:@"genre"];
     self.genreLayer.string = genre ? genre : @"No Genre";
-    if( [self.media.metaDictionary objectForKey:@"artwork"] )
+    if( [self.media valueForKeyPath:@"metaDictionary.artwork"] )
     {
-        self.artworkLayer.contents = (id)[[self.media.metaDictionary objectForKey:@"artwork"] CGImage];
+        self.artworkLayer.contents = (id)[[self.media valueForKeyPath:@"metaDictionary.artwork"] CGImage];
         self.artworkLayer.contentsGravity = kCAGravityResizeAspect;
         self.artworkLayer.borderWidth = 0.;
         self.artworkLayer.backgroundColor = nil;
