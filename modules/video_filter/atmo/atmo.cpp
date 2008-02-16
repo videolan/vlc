@@ -1612,7 +1612,7 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename)
     bmp_fileheader.bfSize = sizeof(BITMAPFILEHEADER) +
                             sizeof(BITMAPINFOHEADER) +
                             bmp_info.bmiHeader.biSizeImage;
-    bmp_fileheader.bfType = 'MB';
+    bmp_fileheader.bfType = VLC_TWOCC('M','B');
     bmp_fileheader.bfOffBits = sizeof(BITMAPFILEHEADER) +
                                sizeof(BITMAPINFOHEADER);
 

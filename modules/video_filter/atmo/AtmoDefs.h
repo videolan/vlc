@@ -25,6 +25,14 @@
     typedef int ATMO_BOOL;
 #   define ATMO_TRUE   1
 #   define ATMO_FALSE  0
+#   define MakeWord(ch1,ch2)  ((((int)(ch1)&255)<<8) | \
+                           ((int)(ch2)&255))
+
+#   define MakeDword(ch1,ch2,ch3,ch4) ((((DWORD)(ch1)&255) << 24) | \
+                                   (((DWORD)(ch2)&255) << 16) | \
+                                   (((DWORD)(ch3)&255) << 8) | \
+                                   (((DWORD)(ch4)&255)))
+
 
 #endif
 
@@ -56,10 +64,9 @@ typedef struct
 
 
 
-#define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \
-                  (((DWORD)(ch4) & 0xFF00) << 8) |    \
-                  (((DWORD)(ch4) & 0xFF0000) >> 8) |  \
-                  (((DWORD)(ch4) & 0xFF000000) >> 24))
+
+
+
 
 // maximal Anzahl Kanäle...
 #define ATMO_NUM_CHANNELS   5

@@ -13,6 +13,7 @@
 #include "AtmoOutputFilter.h"
 
 
+
 CAtmoOutputFilter::CAtmoOutputFilter(CAtmoConfig *atmoConfig)
 {
    this->m_pAtmoConfig = atmoConfig;
@@ -93,6 +94,7 @@ void CAtmoOutputFilter::MeanFilter(ATMO_BOOL init)
   static tColorPacket filter_output_old;
   static int filter_length_old;
   char reinitialize = 0;
+  long int tmp;
 
   if (init) // Initialization
   {
@@ -120,15 +122,21 @@ void CAtmoOutputFilter::MeanFilter(ATMO_BOOL init)
     // calculate the mean-value filters
     mean_sums.channel[ch].r +=
          (long int)(filter_input.channel[ch].r - mean_values.channel[ch].r); // red
-    mean_values.channel[ch].r = mean_sums.channel[ch].r / ((long int)filter_length_old / 20);
+    tmp = mean_sums.channel[ch].r / ((long int)filter_length_old / 20);
+    if(tmp<0) tmp = 0; else { if(tmp>255) tmp = 255; }
+    mean_values.channel[ch].r = (unsigned char)tmp;
 
     mean_sums.channel[ch].g +=
         (long int)(filter_input.channel[ch].g - mean_values.channel[ch].g); // green
-    mean_values.channel[ch].g = mean_sums.channel[ch].g / ((long int)filter_length_old / 20);
+    tmp = mean_sums.channel[ch].g / ((long int)filter_length_old / 20);
+    if(tmp<0) tmp = 0; else { if(tmp>255) tmp = 255; }
+    mean_values.channel[ch].g = (unsigned char)tmp;
 
     mean_sums.channel[ch].b +=
         (long int)(filter_input.channel[ch].b - mean_values.channel[ch].b); // blue
-    mean_values.channel[ch].b = mean_sums.channel[ch].b / ((long int)filter_length_old / 20);
+    tmp = mean_sums.channel[ch].b / ((long int)filter_length_old / 20);
+    if(tmp<0) tmp = 0; else { if(tmp>255) tmp = 255; }
+    mean_values.channel[ch].b = (unsigned char)tmp;
 
     // check, if there is a jump -> check if differences between actual values and filter values are too big
 

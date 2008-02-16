@@ -103,8 +103,11 @@ int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
         fclose(bmp);
         return ATMO_LOAD_GRADIENT_FAILED_SIZE;
     }
-
-    if(bmpFileHeader.bfType != 'MB')
+#ifdef _ATMO_VLC_PLUGIN_
+    if(bmpFileHeader.bfType != VLC_TWOCC('M','B'))
+#else
+    if(bmpFileHeader.bfType != MakeWord('M','B'))
+#endif
     {
         fclose(bmp);
         return ATMO_LOAD_GRADIENT_FAILED_HEADER;
@@ -206,7 +209,7 @@ void CAtmoZoneDefinition::UpdateWeighting(int *destWeight,
           {
              destWeight[index] = 0;
           } else {
-             destWeight[index] = (int)(255.0 * (float)pow( ((float)m_BasicWeight[index])/255.0 , newEdgeWeightning));
+   		     destWeight[index] = (int)(255.0 * (float)pow( ((float)m_BasicWeight[index])/255.0 , newEdgeWeightning));
           }
           index++;
       }

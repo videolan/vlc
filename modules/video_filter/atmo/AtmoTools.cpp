@@ -261,8 +261,13 @@ void CAtmoTools::SaveBitmap(HDC hdc,HBITMAP hBmp,char *fileName) {
      bmpFileHeader.bfReserved1=0;
      bmpFileHeader.bfReserved2=0;
      bmpFileHeader.bfSize=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+bmpInfo.bmiHeader.biSizeImage;
-     bmpFileHeader.bfType='MB';
+#ifdef _ATMO_VLC_PLUGIN_
+     bmpFileHeader.bfType = VLC_TWOCC('M','B');
+#else
+     bmpFileHeader.bfType = MakeWord('M','B');
+#endif
      bmpFileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
+
 
      FILE *fp = NULL;
      fp = fopen(fileName,"wb");

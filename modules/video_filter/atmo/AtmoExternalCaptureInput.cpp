@@ -219,7 +219,11 @@ void CAtmoExternalCaptureInput::CalcColors() {
 
           // HSVI = HSV Image allready in right format just copy the easiest task
           // und weiterverarbeiten lassen
-          if(m_CurrentFrameHeader.biCompression ==  FCC('HSVI'))
+#ifdef _ATMO_VLC_PLUGIN_
+          if(m_CurrentFrameHeader.biCompression ==  VLC_FOURCC('H','S','V','I'))
+#else
+          if(m_CurrentFrameHeader.biCompression ==  MakeDword('H','S','V','I'))
+#endif
           {
               memcpy( &HSV_Img, m_pCurrentFramePixels, CAP_WIDTH * CAP_HEIGHT * sizeof(tHSVColor));
           }
