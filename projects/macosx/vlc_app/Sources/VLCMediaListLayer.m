@@ -215,7 +215,8 @@
         /* It is ok to scroll five layers */
         if( selectedIndex - index < 5  )
         {
-            [self changeSelectedLayerToPreviousIndex];
+            while( index < selectedIndex  )
+                [self changeSelectedLayerToPreviousIndex];
             return;
         }
         [self changeSelectedLayerToPreviousIndex];
@@ -227,7 +228,8 @@
     {
         if( index - selectedIndex < 5  )
         {
-            [self changeSelectedLayerToNextIndex];
+            while( index > selectedIndex  )
+                [self changeSelectedLayerToNextIndex];
             return;
         }
         [self changeSelectedLayerToNextIndex];
