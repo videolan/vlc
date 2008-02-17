@@ -32,6 +32,10 @@
 #ifndef _VLC_THREADFUNCS_H_
 #define _VLC_THREADFUNCS_H_
 
+#if defined( WIN32 ) && !defined ETIMEDOUT
+#  define ETIMEDOUT 10060 /* This is the value in winsock.h. */
+#endif
+
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
@@ -615,7 +619,6 @@ static inline void vlc_spin_unlock (vlc_spinlock_t *spin)
 static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 {
     DeleteCriticalSection(spin);
-    return 0;
 }
 
 
