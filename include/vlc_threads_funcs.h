@@ -35,24 +35,16 @@
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
-VLC_EXPORT( void, vlc_threads_error, ( vlc_object_t *) );
 VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_init_recursive, ( vlc_object_t *, vlc_mutex_t * ) );
-VLC_EXPORT( int,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
+VLC_EXPORT( void,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );
-VLC_EXPORT( int,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
+VLC_EXPORT( void,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
 VLC_EXPORT( int, __vlc_threadvar_create, (vlc_object_t *, vlc_threadvar_t * ) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( void * ), int, vlc_bool_t ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
-
-/*****************************************************************************
- * vlc_threads_error: Signalize an error in the threading system
- *****************************************************************************/
-#ifdef NDEBUG
-# define vlc_threads_error( P_THIS ) (void)0
-#endif
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -85,71 +77,37 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
 #if defined(LIBVLC_USE_PTHREAD)
-static inline unsigned long int CAST_PTHREAD_TO_INT (pthread_t th)
-{
-     union { pthread_t th; unsigned long int i; } v = { };
-     v.th = th;
-     return v.i;
-}
+VLC_EXPORT(void, vlc_pthread_fatal, (const char *action, int error, const char *file, unsigned line));
+
+# define VLC_THREAD_ASSERT( action ) \
+    if (val) \
+        vlc_pthread_fatal (action, val, psz_file, i_line)
+#else
+# define VLC_THREAD_ASSERT (void)0
 #endif
 
-static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
+static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
                                     vlc_mutex_t * p_mutex )
 {
-    int i_result;
-    /* In case of error : */
-    unsigned long int i_thread = 0;
-
 #if defined( UNDER_CE )
     EnterCriticalSection( &p_mutex->csection );
-    i_result = 0;
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
-    {
         WaitForSingleObject( p_mutex->mutex, INFINITE );
-    }
     else
-    {
         EnterCriticalSection( &p_mutex->csection );
-    }
-    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( p_mutex == NULL )
-    {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_mutex->init < 2000 )
-    {
-        i_result = B_NO_INIT;
-    }
-    else
-    {
-        i_result = acquire_sem( p_mutex->lock );
-    }
+    acquire_sem( p_mutex->lock );
 
 #elif defined(LIBVLC_USE_PTHREAD)
 #   define vlc_assert_locked( m ) \
            assert (pthread_mutex_lock (&((m)->mutex)) == EDEADLK)
-
-    i_result = pthread_mutex_lock( &p_mutex->mutex );
-    if ( i_result )
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_result;
-    }
+    int val = pthread_mutex_lock( &p_mutex->mutex );
+    VLC_THREAD_ASSERT ("locking mutex");
 
 #endif
-
-    if( i_result )
-    {
-        msg_Err( p_mutex->p_this,
-                 "thread %li: mutex_lock failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_result );
-        vlc_threads_error( p_mutex->p_this );
-    }
-    return i_result;
 }
 
 #ifndef vlc_assert_locked
@@ -162,62 +120,26 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
 #define vlc_mutex_unlock( P_MUTEX )                                         \
     __vlc_mutex_unlock( __FILE__, __LINE__, P_MUTEX )
 
-static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
+static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
                                       vlc_mutex_t *p_mutex )
 {
-    int i_result;
-    /* In case of error : */
-    unsigned long int i_thread = 0;
-
 #if defined( UNDER_CE )
     LeaveCriticalSection( &p_mutex->csection );
-    i_result = 0;
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
-    {
         ReleaseMutex( p_mutex->mutex );
-    }
     else
-    {
         LeaveCriticalSection( &p_mutex->csection );
-    }
-    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( p_mutex == NULL )
-    {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_mutex->init < 2000 )
-    {
-        i_result = B_NO_INIT;
-    }
-    else
-    {
-        release_sem( p_mutex->lock );
-        return B_OK;
-    }
+    release_sem( p_mutex->lock );
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    i_result = pthread_mutex_unlock( &p_mutex->mutex );
-    if ( i_result )
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_result;
-    }
+    int val = pthread_mutex_unlock( &p_mutex->mutex );
+    VLC_THREAD_ASSERT ("unlocking mutex");
 
 #endif
-
-    if( i_result )
-    {
-        msg_Err( p_mutex->p_this,
-                 "thread %li: mutex_unlock failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_result );
-        vlc_threads_error( p_mutex->p_this );
-    }
-
-    return i_result;
 }
 
 /*****************************************************************************
@@ -238,16 +160,11 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
 #define vlc_cond_signal( P_COND )                                           \
     __vlc_cond_signal( __FILE__, __LINE__, P_COND )
 
-static inline int __vlc_cond_signal( const char * psz_file, int i_line,
-                                     vlc_cond_t *p_condvar )
+static inline void __vlc_cond_signal( const char * psz_file, int i_line,
+                                      vlc_cond_t *p_condvar )
 {
-    int i_result;
-    /* In case of error : */
-    unsigned long int i_thread = 0;
-
 #if defined( UNDER_CE )
     PulseEvent( p_condvar->event );
-    i_result = 0;
 
 #elif defined( WIN32 )
     /* Release one waiting thread if one is available. */
@@ -255,11 +172,9 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
      * by a mutex. This will prevent another thread from stealing the signal */
     if( !p_condvar->semaphore )
     {
-        /*
-        ** PulseEvent() only works if none of the waiting threads is suspended.
-        ** this is particularily problematic under a debug session. 
-        ** as documented in http://support.microsoft.com/kb/q173260/
-        */
+        /* PulseEvent() only works if none of the waiting threads is suspended.
+         * This is particularily problematic under a debug session.
+         * as documented in http://support.microsoft.com/kb/q173260/ */
         PulseEvent( p_condvar->event );
     }
     else if( p_condvar->i_win9x_cv == 1 )
@@ -293,64 +208,34 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
-    i_result = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( p_condvar == NULL )
+    while( p_condvar->thread != -1 )
     {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_condvar->init < 2000 )
-    {
-        i_result = B_NO_INIT;
-    }
-    else
-    {
-        while( p_condvar->thread != -1 )
-        {
-            thread_info info;
-            if( get_thread_info(p_condvar->thread, &info) == B_BAD_VALUE )
-            {
-                return 0;
-            }
+        thread_info info;
+        if( get_thread_info(p_condvar->thread, &info) == B_BAD_VALUE )
+            return;
 
-            if( info.state != B_THREAD_SUSPENDED )
-            {
-                /* The  waiting thread is not suspended so it could
-                 * have been interrupted beetwen the unlock and the
-                 * suspend_thread line. That is why we sleep a little
-                 * before retesting p_condver->thread. */
-                snooze( 10000 );
-            }
-            else
-            {
-                /* Ok, we have to wake up that thread */
-                resume_thread( p_condvar->thread );
-                return 0;
-            }
+        if( info.state != B_THREAD_SUSPENDED )
+        {
+            /* The  waiting thread is not suspended so it could
+             * have been interrupted beetwen the unlock and the
+             * suspend_thread line. That is why we sleep a little
+             * before retesting p_condver->thread. */
+            snooze( 10000 );
         }
-        i_result = 0;
+        else
+        {
+            /* Ok, we have to wake up that thread */
+            resume_thread( p_condvar->thread );
+        }
     }
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    i_result = pthread_cond_signal( &p_condvar->cond );
-    if ( i_result )
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_result;
-    }
+    int val = pthread_cond_signal( &p_condvar->cond );
+    VLC_THREAD_ASSERT ("signaling condition variable");
 
 #endif
-
-    if( i_result )
-    {
-        msg_Err( p_condvar->p_this,
-                 "thread %li: cond_signal failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_result );
-        vlc_threads_error( p_condvar->p_this );
-    }
-
-    return i_result;
 }
 
 /*****************************************************************************
@@ -359,13 +244,9 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
 #define vlc_cond_wait( P_COND, P_MUTEX )                                     \
     __vlc_cond_wait( __FILE__, __LINE__, P_COND, P_MUTEX  )
 
-static inline int __vlc_cond_wait( const char * psz_file, int i_line,
-                                   vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
+static inline void __vlc_cond_wait( const char * psz_file, int i_line,
+                                    vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
 {
-    int i_result;
-    /* In case of error : */
-    unsigned long int i_thread = 0;
-
 #if defined( UNDER_CE )
     p_condvar->i_waiting_threads++;
     LeaveCriticalSection( &p_mutex->csection );
@@ -374,8 +255,6 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
-
-    i_result = 0;
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )
@@ -451,22 +330,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
 
-    i_result = 0;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( p_condvar == NULL )
-    {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_mutex == NULL )
-    {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_condvar->init < 2000 )
-    {
-        i_result = B_NO_INIT;
-    }
-
     /* The p_condvar->thread var is initialized before the unlock because
      * it enables to identify when the thread is interrupted beetwen the
      * unlock line and the suspend_thread line */
@@ -476,27 +340,12 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     p_condvar->thread = -1;
 
     vlc_mutex_lock( p_mutex );
-    i_result = 0;
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
-    if ( i_result )
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_result;
-    }
+    int val = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
+    VLC_THREAD_ASSERT ("waiting on condition");
 
 #endif
-
-    if( i_result )
-    {
-        msg_Err( p_condvar->p_this,
-                 "thread %li: cond_wait failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_result );
-        vlc_threads_error( p_condvar->p_this );
-    }
-
-    return i_result;
 }
 
 
@@ -513,9 +362,6 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
                                         vlc_mutex_t *p_mutex,
                                         mtime_t deadline )
 {
-    int i_res;
-    unsigned long int i_thread = 0;
-
 #if defined( UNDER_CE )
     mtime_t delay_ms = (deadline - mdate())/1000;
 
@@ -531,9 +377,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
 
-    i_res = (int)result;
     if(result == WAIT_TIMEOUT)
-       return WAIT_TIMEOUT; /* this error is perfectly normal */
+       return ETIMEDOUT; /* this error is perfectly normal */
 
 #elif defined( WIN32 )
     DWORD result;
@@ -623,37 +468,23 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
     if(result == WAIT_TIMEOUT)
-       return WAIT_TIMEOUT; /* this error is perfectly normal */
-
-    i_res = (int)result;
+       return ETIMEDOUT; /* this error is perfectly normal */
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #   error Unimplemented
+
 #elif defined(LIBVLC_USE_PTHREAD)
     lldiv_t d = lldiv( deadline, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
-    i_res = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex, &ts );
-    if( i_res == ETIMEDOUT )
+    int val = pthread_cond_timedwait (&p_condvar->cond, &p_mutex->mutex, &ts);
+    if (val == ETIMEDOUT)
         return ETIMEDOUT; /* this error is perfectly normal */
-    else
-    if ( i_res ) /* other errors = bug */
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_res;
-    }
+    VLC_THREAD_ASSERT ("timed-waiting on condition");
 
 #endif
 
-    if( i_res )
-    {
-        msg_Err( p_condvar->p_this,
-                 "thread %li: cond_wait failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_res );
-        vlc_threads_error( p_condvar->p_this );
-    }
-
-    return i_res;
+    return 0;
 }
 
 /*****************************************************************************
@@ -726,25 +557,28 @@ static inline int vlc_spin_init (vlc_spinlock_t *spin)
 /**
  * Acquires a spinlock.
  */
-static inline int vlc_spin_lock (vlc_spinlock_t *spin)
+static inline void vlc_spin_lock (vlc_spinlock_t *spin)
 {
-    return pthread_spin_lock (&spin->spin);
+    int val = pthread_spin_lock (&spin->spin);
+    assert (val == 0);
 }
 
 /**
  * Releases a spinlock.
  */
-static inline int vlc_spin_unlock (vlc_spinlock_t *spin)
+static inline void vlc_spin_unlock (vlc_spinlock_t *spin)
 {
-    return pthread_spin_unlock (&spin->spin);
+    int val = pthread_spin_unlock (&spin->spin);
+    assert (val == 0);
 }
 
 /**
  * Deinitializes a spinlock.
  */
-static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
+static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 {
-    return pthread_spin_destroy (&spin->spin);
+    int val = pthread_spin_destroy (&spin->spin);
+    assert (val == 0);
 }
 
 #elif defined( WIN32 )
@@ -762,25 +596,23 @@ static inline int vlc_spin_init (vlc_spinlock_t *spin)
 /**
  * Acquires a spinlock.
  */
-static inline int vlc_spin_lock (vlc_spinlock_t *spin)
+static inline void vlc_spin_lock (vlc_spinlock_t *spin)
 {
     EnterCriticalSection(spin);
-    return 0;
 }
 
 /**
  * Releases a spinlock.
  */
-static inline int vlc_spin_unlock (vlc_spinlock_t *spin)
+static inline void vlc_spin_unlock (vlc_spinlock_t *spin)
 {
     LeaveCriticalSection(spin);
-    return 0;
 }
 
 /**
  * Deinitializes a spinlock.
  */
-static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
+static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 {
     DeleteCriticalSection(spin);
     return 0;
@@ -788,7 +620,6 @@ static inline int vlc_spin_destroy (vlc_spinlock_t *spin)
 
 
 #else
-
 
 /* Fallback to plain mutexes if spinlocks are not available */
 typedef vlc_mutex_t vlc_spinlock_t;

@@ -78,19 +78,39 @@ static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 vlc_threadvar_t msg_context_global_key;
 
-#ifndef NDEBUG
-/*****************************************************************************
- * vlc_threads_error: Report an error from the threading mecanism
- *****************************************************************************
- * This is especially useful to debug those errors, as this is a nice symbol
- * on which you can break.
- *****************************************************************************/
-void vlc_threads_error( vlc_object_t *p_this )
+#if defined(LIBVLC_USE_PTHREAD)
+static inline unsigned long vlc_threadid (void)
 {
-     msg_Err( p_this, "Error detected. Put a breakpoint in '%s' to debug.",
-            __func__ );
+     union { pthread_t th; unsigned long int i; } v = { };
+     v.th = pthread_self ();
+     return v.i;
+}
+
+
+/*****************************************************************************
+ * vlc_thread_fatal: Report an error from the threading layer
+ *****************************************************************************
+ * This is mostly meant for debugging.
+ *****************************************************************************/
+void vlc_pthread_fatal (const char *action, int error,
+                        const char *file, unsigned line)
+{
+    char buf[1000];
+    const char *msg;
+
+    fprintf (stderr, "LibVLC fatal error %s in thread %lu at %s:%u: %d\n",
+             action, vlc_threadid (), file, line, error);
+    fflush (stderr);
+
+    /* Sometimes strerror_r() crashes too, so make sure we print an error
+     * message before we invoke it */
+    msg = strerror_r (error, buf, sizeof (buf));
+    fprintf (stderr, " %s\n", msg ? msg : "(null)");
+    fflush (stderr);
+    abort ();
 }
 #endif
+
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -309,6 +329,8 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
  *****************************************************************************/
 int __vlc_mutex_init_recursive( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 {
+    p_mutex->p_this = p_this;
+
 #if defined( WIN32 )
     /* Create mutex returns a recursive mutex */
     p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -341,54 +363,28 @@ int __vlc_mutex_init_recursive( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_destroy: destroy a mutex, inner version
  *****************************************************************************/
-int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex )
+void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 {
-    int i_result;
-    /* In case of error : */
-    int i_thread = -1;
-
 #if defined( UNDER_CE )
     DeleteCriticalSection( &p_mutex->csection );
-    return 0;
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
-    {
         CloseHandle( p_mutex->mutex );
-    }
     else
-    {
         DeleteCriticalSection( &p_mutex->csection );
-    }
-    return 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex->init == 9999 )
-    {
         delete_sem( p_mutex->lock );
-    }
 
     p_mutex->init = 0;
-    return B_OK;
 
 #elif defined( LIBVLC_USE_PTHREAD )
-    i_result = pthread_mutex_destroy( &p_mutex->mutex );
-    if( i_result )
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_result;
-    }
+    int val = pthread_mutex_destroy( &p_mutex->mutex );
+    VLC_THREAD_ASSERT ("destroying mutex");
 
 #endif
-
-    if( i_result )
-    {
-        msg_Err( p_mutex->p_this,
-                 "thread %d: mutex_destroy failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_result );
-        vlc_threads_error( p_mutex->p_this );
-    }
-    return i_result;
 }
 
 /*****************************************************************************
@@ -490,47 +486,31 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 /*****************************************************************************
  * vlc_cond_destroy: destroy a condition, inner version
  *****************************************************************************/
-int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
+void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
 {
-    int i_result;
-    /* In case of error : */
-    int i_thread = -1;
-
 #if defined( UNDER_CE )
-    i_result = !CloseHandle( p_condvar->event );
+    CloseHandle( p_condvar->event );
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )
-        i_result = !CloseHandle( p_condvar->event );
+        CloseHandle( p_condvar->event );
     else
-        i_result = !CloseHandle( p_condvar->event )
-          || !CloseHandle( p_condvar->semaphore );
+    {
+        CloseHandle( p_condvar->event );
+        CloseHandle( p_condvar->semaphore );
+    }
 
     if( p_condvar->semaphore != NULL )
         DeleteCriticalSection( &p_condvar->csection );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;
-    return 0;
 
 #elif defined( LIBVLC_USE_PTHREAD )
-    i_result = pthread_cond_destroy( &p_condvar->cond );
-    if( i_result )
-    {
-        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        errno = i_result;
-    }
+    int val = pthread_cond_destroy( &p_condvar->cond );
+    VLC_THREAD_ASSERT ("destroying condition");
 
 #endif
-
-    if( i_result )
-    {
-        msg_Err( p_condvar->p_this,
-                 "thread %d: cond_destroy failed at %s:%d (%d:%m)",
-                 i_thread, psz_file, i_line, i_result );
-        vlc_threads_error( p_condvar->p_this );
-    }
-    return i_result;
 }
 
 /*****************************************************************************
@@ -681,7 +661,6 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         errno = i_ret;
         msg_Err( p_this, "%s thread could not be created at %s:%d (%m)",
                          psz_name, psz_file, i_line );
-        vlc_threads_error( p_this );
         vlc_mutex_unlock( &p_this->object_lock );
     }
 
@@ -782,7 +761,6 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
                          (unsigned int)p_priv->thread_id.id,
              psz_file, i_line, GetLastError() );
-        vlc_threads_error( p_this );
         p_priv->b_thread = VLC_FALSE;
         return;
     }
@@ -847,7 +825,6 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         errno = i_ret;
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%m)",
                          (unsigned int)p_priv->thread_id, psz_file, i_line );
-        vlc_threads_error( p_this );
     }
     else
     {
