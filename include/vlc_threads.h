@@ -133,8 +133,6 @@ typedef struct
     HANDLE              mutex;
     /* Win95/98/ME implementation */
     CRITICAL_SECTION    csection;
-
-    vlc_object_t * p_this;
 } vlc_mutex_t;
 
 typedef struct
@@ -147,8 +145,6 @@ typedef struct
     HANDLE              semaphore;
     CRITICAL_SECTION    csection;
     int                 i_win9x_cv;
-
-    vlc_object_t * p_this;
 } vlc_cond_t;
 
 typedef struct
@@ -167,16 +163,12 @@ typedef struct
 {
     int32_t         init;
     sem_id          lock;
-
-    vlc_object_t * p_this;
 } vlc_mutex_t;
 
 typedef struct
 {
     int32_t         init;
     thread_id       thread;
-
-    vlc_object_t * p_this;
 } vlc_cond_t;
 
 typedef struct
@@ -189,12 +181,10 @@ typedef pthread_t       vlc_thread_t;
 typedef struct
 {
     pthread_mutex_t mutex;
-    vlc_object_t * p_this;
 } vlc_mutex_t;
 typedef struct
 {
     pthread_cond_t cond;
-    vlc_object_t * p_this;
 } vlc_cond_t;
 
 typedef struct

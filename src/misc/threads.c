@@ -253,10 +253,8 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
-int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
+int __vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
-    p_mutex->p_this = p_this;
-
 #if defined( UNDER_CE )
     InitializeCriticalSection( &p_mutex->csection );
     return 0;
@@ -327,10 +325,8 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_init: initialize a recursive mutex (Do not use)
  *****************************************************************************/
-int __vlc_mutex_init_recursive( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
+int __vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
-    p_mutex->p_this = p_this;
-
 #if defined( WIN32 )
     /* Create mutex returns a recursive mutex */
     p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -353,9 +349,7 @@ int __vlc_mutex_init_recursive( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     pthread_mutexattr_destroy( &attr );
     return( i_result );
 #else
-    msg_Err(p_this, "no recursive mutex found. Falling back to regular mutex.\n"
-                    "Expect hangs\n")
-    return __vlc_mutex_init( p_this, p_mutex );
+# error Unimplemented!
 #endif
 }
 
@@ -390,10 +384,8 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
 /*****************************************************************************
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
-int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
+int __vlc_cond_init( vlc_cond_t *p_condvar )
 {
-    p_condvar->p_this = p_this;
-
 #if defined( UNDER_CE )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
@@ -516,14 +508,12 @@ void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condva
 /*****************************************************************************
  * vlc_tls_create: create a thread-local variable
  *****************************************************************************/
-int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
+int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
 {
     int i_ret = -1;
-    (void)p_this;
 
 #if defined( HAVE_KERNEL_SCHEDULER_H )
-    msg_Err( p_this, "TLS not implemented" );
-    i_ret VLC_EGENERIC;
+# error Unimplemented!
 #elif defined( UNDER_CE ) || defined( WIN32 )
 #elif defined( WIN32 )
     p_tls->handle = TlsAlloc();

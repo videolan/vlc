@@ -35,12 +35,12 @@
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
-VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
-VLC_EXPORT( int,  __vlc_mutex_init_recursive, ( vlc_object_t *, vlc_mutex_t * ) );
+VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_mutex_t * ) );
+VLC_EXPORT( int,  __vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
 VLC_EXPORT( void,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
-VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );
+VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_cond_t * ) );
 VLC_EXPORT( void,  __vlc_cond_destroy,  ( const char *, int, vlc_cond_t * ) );
-VLC_EXPORT( int, __vlc_threadvar_create, (vlc_object_t *, vlc_threadvar_t * ) );
+VLC_EXPORT( int, __vlc_threadvar_create, (vlc_threadvar_t * ) );
 VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( void * ), int, vlc_bool_t ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
@@ -62,13 +62,13 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
 #define vlc_mutex_init( P_THIS, P_MUTEX )                                   \
-    __vlc_mutex_init( VLC_OBJECT(P_THIS), P_MUTEX )
+    __vlc_mutex_init( P_MUTEX )
 
 /*****************************************************************************
  * vlc_mutex_init: initialize a recursive mutex (Don't use it)
  *****************************************************************************/
 #define vlc_mutex_init_recursive( P_THIS, P_MUTEX )                         \
-    __vlc_mutex_init_recursive( VLC_OBJECT(P_THIS), P_MUTEX )
+    __vlc_mutex_init_recursive( P_MUTEX )
 
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex
@@ -152,7 +152,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
 #define vlc_cond_init( P_THIS, P_COND )                                     \
-    __vlc_cond_init( VLC_OBJECT(P_THIS), P_COND )
+    __vlc_cond_init( P_COND )
 
 /*****************************************************************************
  * vlc_cond_signal: start a thread on condition completion
@@ -497,7 +497,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
  * vlc_threadvar_create: create a thread-local variable
  *****************************************************************************/
 #define vlc_threadvar_create( PTHIS, P_TLS )                                 \
-   __vlc_threadvar_create( PTHIS, P_TLS )
+   __vlc_threadvar_create( P_TLS )
 
 /*****************************************************************************
  * vlc_threadvar_set: create: set the value of a thread-local variable
