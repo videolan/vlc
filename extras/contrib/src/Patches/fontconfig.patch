@@ -53,8 +53,8 @@
 +      
 +             return p_dir_in;
 +         }
-+         if( *p_dir_out[ strlen( *p_dir_out ) - 1 ] != '\\' )
-+             strcat( *p_dir_out, "\\" );
++         if( (*p_dir_out)[ rc - 1 ] != '\\' )
++             strcpy( (*p_dir_out)+rc, "\\" );
 +         strcat( *p_dir_out, "fonts" );
 +  
 +         return *p_dir_out;
