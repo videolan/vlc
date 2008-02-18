@@ -298,7 +298,7 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx cddax sdl_image],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync gnutls growl flac ts audioscrobbler lua],[-lws2_32])
+        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
@@ -332,9 +332,9 @@ case "${host_os}" in
     LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
     dnl Check for BONE
     if test -f /boot/beos/system/lib/libbind.so; then
-        VLC_ADD_LIBS([access_file access_ftp access_mms access_output_udp telnet netsync sap libvlc growl],[-lbind -lsocket])
+        VLC_ADD_LIBS([access_file access_ftp access_mms access_output_udp telnet netsync sap libvlc growl_udp],[-lbind -lsocket])
     else
-        VLC_ADD_LIBS([access_file access_ftp access_mms access_output_udp telnet netsync sap libvlc growl],[-lnet])
+        VLC_ADD_LIBS([access_file access_ftp access_mms access_output_udp telnet netsync sap libvlc growl_udp],[-lnet])
     fi
 
     dnl Ugly check for Zeta
@@ -506,7 +506,7 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp sap access_output_udp stream_out_standard growl],[-lsocket])
+    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp sap access_output_udp stream_out_standard growl_udp],[-lsocket])
   ])
 ])
 
@@ -1680,7 +1680,11 @@ dnl
 AC_ARG_ENABLE(growl,
   [  --enable-growl          growl notification plugin (default enabled)])
 AS_IF([test "${enable_growl}" != "no"], [
-    VLC_ADD_PLUGINS([growl])
+    VLC_ADD_PLUGINS([growl_udp])
+    AC_CHECK_HEADERS(Growl/GrowlDefines.h, [
+      VLC_ADD_PLUGINS([growl])
+      VLC_ADD_LDFLAGS([growl], [-Wl,-framework,Growl,-framework,AppKit])
+    ])
   ]
 )
 
@@ -5322,7 +5326,7 @@ then
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QTKit])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_LDFLAGS([opengllayer],                      [-Wl,-framework,QuartzCore])
-  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer], [-fobjc-exceptions] )
+  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
 
   VLC_ADD_PLUGINS([access_eyetv])
   VLC_ADD_BUILTINS([macosx minimal_macosx])

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * growl.c : growl notification plugin
+ * growl_udp.c : growl UDP notification plugin
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -68,8 +68,8 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( "Growl" );
-    set_description( _("Growl Notification Plugin") );
+    set_shortname( "Growl-UDP" );
+    set_description( _("Growl UDP Notification Plugin") );
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,
                 SERVER_TEXT, SERVER_LONGTEXT, VLC_FALSE );

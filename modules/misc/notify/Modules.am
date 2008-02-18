@@ -1,5 +1,11 @@
+# Automake forgets to add a proper tag to libtool with Objective-C files.
+# Moreocer Libtool should default tag to CC when none is specified but
+# obviously does not. Here is a fix for that.
+LIBTOOL=@LIBTOOL@ --tag=CC
+
 SOURCES_msn = msn.c
-SOURCES_growl = growl.c
+SOURCES_growl = growl.m
+SOURCES_growl_udp = growl_udp.c
 SOURCES_notify = notify.c
 SOURCES_xosd = xosd.c
 SOURCES_telepathy = telepathy.c
