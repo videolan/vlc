@@ -596,9 +596,6 @@ VLC.app: vlc
 	$(INSTALL) $(top_builddir)/.libs/vlc \
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
-	if test -d $(top_builddir)/extras/contrib/vlc-lib ; then \
-        ln -sfn `pwd`/$(srcdir)/extras/contrib/vlc-lib $(top_builddir)/VLC.app/Contents/MacOS/lib; \
-    fi
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \
