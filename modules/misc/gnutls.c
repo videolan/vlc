@@ -129,22 +129,22 @@ static int gcry_vlc_mutex_init( void **p_sys )
 
 static int gcry_vlc_mutex_destroy( void **p_sys )
 {
-    int i_val;
     vlc_mutex_t *p_lock = (vlc_mutex_t *)*p_sys;
-
-    i_val = vlc_mutex_destroy( p_lock );
+    vlc_mutex_destroy( p_lock );
     free( p_lock );
-    return i_val;
+    return VLC_SUCCESS;
 }
 
 static int gcry_vlc_mutex_lock( void **p_sys )
 {
-    return vlc_mutex_lock( (vlc_mutex_t *)*p_sys );
+    vlc_mutex_lock( (vlc_mutex_t *)*p_sys );
+    return VLC_SUCCESS;
 }
 
 static int gcry_vlc_mutex_unlock( void **lock )
 {
-    return vlc_mutex_unlock( (vlc_mutex_t *)*lock );
+    vlc_mutex_unlock( (vlc_mutex_t *)*lock );
+    return VLC_SUCCESS;
 }
 
 static struct gcry_thread_cbs gcry_threads_vlc =
