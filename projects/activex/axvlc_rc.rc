@@ -32,7 +32,7 @@ BEGIN
   END
 END
 
-INPLACE-PICT BITMAP DISCARDABLE "inplace.bmp"
+1 BITMAP DISCARDABLE "inplace.bmp"
 
 1 TYPELIB "axvlc.tlb"
 

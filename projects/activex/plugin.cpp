@@ -106,7 +106,7 @@ VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance, REFCLSID 
         _inplace_wndclass_atom = 0;
     }
 
-    HBITMAP hbitmap = (HBITMAP)LoadImage(getHInstance(), TEXT("INPLACE-PICT"), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+    HBITMAP hbitmap = (HBITMAP)LoadImage(getHInstance(), MAKEINTRESOURCE(1), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     if( NULL != hbitmap )
     {
         PICTDESC pictDesc;
@@ -433,7 +433,7 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         /*
         ** default initialization options
         */
-        char *ppsz_argv[32] = { "vlc" };
+        const char *ppsz_argv[32] = { "vlc" };
         int   ppsz_argc = 1;
 
         char p_progpath[MAX_PATH];
