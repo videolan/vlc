@@ -50,7 +50,8 @@ public:
             instance = new SoutDialog( parent, p_intf, transcode_only );
         else
         {
-            instance->setParent( parent );
+            /* Recenter the dialog on the parent */
+            instance->setParent( parent, Qt::Dialog );
             if( transcode_only != instance->b_transcode_only )
             {
                 instance->toggleSout();
