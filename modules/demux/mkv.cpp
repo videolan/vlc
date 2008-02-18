@@ -6035,7 +6035,7 @@ bool dvd_chapter_codec_c::Enter()
             binary *p_data = (*index)->GetBuffer();
             size_t i_size = *p_data++;
             // avoid reading too much from the buffer
-            i_size = min( i_size, ((*index)->GetSize() - 1) >> 3 );
+            i_size = __MIN( i_size, ((*index)->GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "Matroska DVD enter command" );
@@ -6058,7 +6058,7 @@ bool dvd_chapter_codec_c::Leave()
             binary *p_data = (*index)->GetBuffer();
             size_t i_size = *p_data++;
             // avoid reading too much from the buffer
-            i_size = min( i_size, ((*index)->GetSize() - 1) >> 3 );
+            i_size = __MIN( i_size, ((*index)->GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "Matroska DVD leave command" );
