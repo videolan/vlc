@@ -283,14 +283,14 @@ static int Demux( demux_t * p_demux )
             {
                 if( p_stream->fmt.i_codec == VLC_FOURCC('t','h','e','o') &&
                         oggpacket.bytes >= 7 &&
-                        ! memcmp( oggpacket.packet, "\x80theora", 6 ) )
+                        ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
                     Ogg_ReadTheoraHeader( p_stream, &oggpacket );
                     p_stream->secondary_header_packets = 0;
                 }
                 else if( p_stream->fmt.i_codec == VLC_FOURCC('v','o','r','b') &&
                         oggpacket.bytes >= 7 &&
-                        ! memcmp( oggpacket.packet, "\x01vorbis", 6 ) )
+                        ! memcmp( oggpacket.packet, "\x01vorbis", 7 ) )
                 {
                     Ogg_ReadVorbisHeader( p_stream, &oggpacket );
                     p_stream->secondary_header_packets = 0;
@@ -782,13 +782,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                 /* Check for Vorbis header */
                 if( oggpacket.bytes >= 7 &&
-                    ! memcmp( oggpacket.packet, "\x01vorbis", 6 ) )
+                    ! memcmp( oggpacket.packet, "\x01vorbis", 7 ) )
                 {
                     Ogg_ReadVorbisHeader( p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found vorbis header" );
                 }
                 /* Check for Speex header */
-                else if( oggpacket.bytes >= 7 &&
+                else if( oggpacket.bytes >= 5 &&
                     ! memcmp( oggpacket.packet, "Speex", 5 ) )
                 {
                     Ogg_ReadSpeexHeader( p_stream, &oggpacket );
@@ -832,7 +832,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
-                         ! memcmp( oggpacket.packet, "\x80theora", 6 ) )
+                         ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
                     Ogg_ReadTheoraHeader( p_stream, &oggpacket );
 
