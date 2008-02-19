@@ -27,6 +27,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #define MAX_PIDS            256
 #define MAX_ACTIVE_PIDS     256
@@ -36,7 +37,8 @@
 #pragma push
 #pragma pack(1)
 
-typedef struct
+/* Structure for TS-Packets */
+typedef struct 
 {
     uint32_t    sync_byte : 8,
                 transport_error_indicator : 1,
@@ -46,13 +48,7 @@ typedef struct
                 transport_scrambling_control : 2,
                 adaptation_field_control : 2,
                 continuity_counter : 4;
-} TransportStreamHeader;
-
-/* Structure for TS-Packets */
-typedef struct 
-{
-    TransportStreamHeader   header;
-    uint8_t                 payload[184];
+    uint8_t     payload[184];
 
 } TransportStreamPacket;
 
@@ -67,11 +63,11 @@ typedef struct
     EyeTVPluginDeviceID         activeDeviceID;
     long                        activePIDsCount; 
     EyeTVPluginPIDInfo          activePIDs[MAX_ACTIVE_PIDS];
-    long                        seenPIDs[MAX_ACTIVE_PIDS];
 } VLCEyeTVPluginGlobals_t;
 
+/* following globals limits us to one VLC instance using EyeTV */
 static int i_deviceCount;
-static int vlcSock;
+static int i_vlcSock;
 
 #pragma mark -
 
@@ -83,7 +79,7 @@ static long VLCEyeTVPluginInitialize(VLCEyeTVPluginGlobals_t** globals, long api
     
     /* init our own storage */
     i_deviceCount = 0;
-    vlcSock = -1;
+    i_vlcSock = -1;
     
     /* notify a potential VLC instance about our initialisation */
     CFNotificationCenterPostNotification( CFNotificationCenterGetDistributedCenter(),
@@ -125,22 +121,13 @@ static long VLCEyeTVPluginTerminate(VLCEyeTVPluginGlobals_t *globals)
                                              (void *)VLCEyeTVPluginGlobalNotificationReceived );
     
     /* close data connection */
-    if( vlcSock != -1 )
+    if( i_vlcSock != -1 )
     {
-        close( vlcSock );
-        vlcSock = -1;
+        close( i_vlcSock );
+        i_vlcSock = -1;
     }
     
-    if( globals ) 
-    {
-        long i;
-        for( i=0; i<globals->activePIDsCount; ++i )
-        {
-            printf("activePID: %ld, count=%ld\n", globals->activePIDs[i].pid, globals->seenPIDs[i] );
-        }
-        free( globals );
-    }
-
+    free( globals );
     return result;
 }
 
@@ -201,7 +188,7 @@ void VLCEyeTVPluginGlobalNotificationReceived( CFNotificationCenterRef center,
     /* VLC wants us to start sending data */
     if( CFStringCompare( name, CFSTR( "VLCAccessStartDataSending" ), 0) == kCFCompareEqualTo )
     {
-        if( vlcSock == -1 )
+        if( i_vlcSock == -1 )
         {
             int peerSock;
          
@@ -220,7 +207,8 @@ void VLCEyeTVPluginGlobalNotificationReceived( CFNotificationCenterRef center,
                 if( connect(peerSock, (struct sockaddr *)&peerAddr, sizeof(struct sockaddr_un)) != -1 )
                 {
                     printf("data sending switched on\n");
-                    vlcSock = peerSock;
+					
+                    i_vlcSock = peerSock;
                 }
                 else
                     printf("connect data socket failed (errno=%d)\n", errno );
@@ -233,10 +221,10 @@ void VLCEyeTVPluginGlobalNotificationReceived( CFNotificationCenterRef center,
     /* VLC wants us to stop sending data */
     if( CFStringCompare( name, CFSTR( "VLCAccessStopDataSending" ), 0) == kCFCompareEqualTo )
     {
-        if( vlcSock != -1 )
+        if( i_vlcSock != -1 )
         {
-            close( vlcSock );
-            vlcSock = -1;
+            close( i_vlcSock );
+            i_vlcSock = -1;
             printf( "data sending switched off\n" );
         }
     }
@@ -282,10 +270,10 @@ static long VLCEyeTVPluginDeviceRemoved(VLCEyeTVPluginGlobals_t *globals, EyeTVP
                                               /*userInfo*/ NULL, 
                                               TRUE );
     }
-    if( (vlcSock != -1) && (deviceID == globals->activeDeviceID) )
+    if( (i_vlcSock != -1) && (deviceID == globals->activeDeviceID) )
     {
-        close(vlcSock);
-        vlcSock = -1;
+        close(i_vlcSock);
+        i_vlcSock = -1;
         printf( "data sending switched off\n" );
     }
     
@@ -300,64 +288,97 @@ static long VLCEyeTVPluginPacketsArrived(VLCEyeTVPluginGlobals_t *globals, EyeTV
     if( globals ) 
     {
         /* check if data connection is active */
-        if( vlcSock != -1 )
+        if( i_vlcSock != -1 )
         {
             if( deviceID == globals->activeDeviceID ) 
             {
                 long pidCount = globals->activePIDsCount;
                 if( pidCount )
                 {
+                    uint8_t packetBuffer[sizeof(TransportStreamPacket)*20];
+                    int packetBufferSize = 0;
                     while( packetsCount )
                     {
                         /* apply PID filtering, only PIDs in active service for device are sent through */
-                        long pid = (ntohl(**packets) & 0x001FFF00L)>>8;
-						long i;
-                        for( i=0; i<pidCount; ++i )
+                        long pid = ntohl(**packets)>>8 & 0x1FFFL;
+                        /* ignore NULL packets */
+                        if( 0x1FFFL != pid )
                         {
-                            if( globals->activePIDs[i].pid == pid )
+                            long i;
+                            for( i=0; i<pidCount; ++i )
                             {
-                                ssize_t sent = write(vlcSock, *packets, sizeof(TransportStreamPacket));
-                                if( sent != sizeof(TransportStreamPacket) )
+                                if( globals->activePIDs[i].pid == pid )
                                 {
-                                    if( sent == -1 )
-                                        printf("data sending failed (errno=%d)\n", errno);
+                                    if( packetBufferSize <= (sizeof(packetBuffer)-sizeof(TransportStreamPacket)) )
+                                    {
+                                        /* copy packet in our buffer */
+                                        memcpy(packetBuffer+packetBufferSize, *packets, sizeof(TransportStreamPacket));
+                                        packetBufferSize += sizeof(TransportStreamPacket);
+                                    }
                                     else
-                                        printf("data sending incomplete (sent=%d)\n", sent);
-                                    close(vlcSock);
-                                    vlcSock = -1;
-                                    return 0;
-                                }
-								++(globals->seenPIDs[i]);
-#if 0
-                                if( i > 0 )
-                                {
-                                   /* if we assume that consecutive packets should have the same PID, it would therefore
-                                      speed up filtering to reorder activePIDs list based on pid occurrences */
-                                    EyeTVPluginPIDInfo swap = globals->activePIDs[i];
-                                    memmove(globals->activePIDs+1, globals->activePIDs, sizeof(EyeTVPluginPIDInfo)*i);
-                                    globals->activePIDs[0] = swap;
-                                }
+                                    {
+                                        /* flush buffer to VLC */
+                                        ssize_t sent = write(i_vlcSock, packetBuffer, packetBufferSize);
+                                        if( sent != packetBufferSize )
+                                        {
+                                            if( sent == -1 )
+                                                printf("data sending failed (errno=%d)\n", errno);
+                                            else
+                                                printf("data sending incomplete (sent=%d)\n", sent);
+                                            close(i_vlcSock);
+                                            i_vlcSock = -1;
+                                            return 0;
+                                        }
+                                        packetBufferSize = 0;
+                                    }
+                                    if( i > 0 )
+                                    {
+                                       /* if we assume that consecutive packets would have the same PID in most cases,
+                                          it would therefore speed up filtering to reorder activePIDs list based on pid
+                                          occurrences */
+                                        EyeTVPluginPIDInfo swap = globals->activePIDs[i];
+                                        do
+                                        {
+                                            register int c = i--;
+                                            globals->activePIDs[c] = globals->activePIDs[i];
+                                        }
+                                        while( i );
+                                        globals->activePIDs[i] = swap;
+                                    }
 
-                                if( pid && filterPidInfo.pidType != kEyeTVPIDType_PMT )
-                                {
-                                    /* to save on CPU, prevent EyeTV from mirroring that program by blocking video & audio packets
-                                       by changing PID to NULL PID */
+                                    if( pid && globals->activePIDs[0].pidType != kEyeTVPIDType_PMT )
+                                    {
+                                        /* to save on CPU, prevent EyeTV from mirroring that program by blocking video & audio packets
+                                           by changing all packets but PAT and PMT to NULL PID */
 #if defined(WORDS_BIGENDIAN)
-                                    **packets |= 0x001FFF00L;
+                                        **packets |= 0x001FFF00L;
 #else
-                                    **packets |= 0x00FFF800L;
+                                        **packets |= 0x00FFF800L;
 #endif
+                                    }
+                                    /* done filtering on this packet, move on to next packet */
+                                    break;
                                 }
-#endif
-                                /* done filtering on this packet, move on to next packet */
-                                break;
                             }
                         }
-                        if( i == pidCount )
-                            printf("unexpected PID %ld\n", pid);
+                        --packetsCount;
+                        ++packets;
                     }
-                    --packetsCount;
-                    ++packets;
+                    if( packetBufferSize )
+                    {
+                        /* flush buffer to VLC */
+                        ssize_t sent = write(i_vlcSock, packetBuffer, packetBufferSize);
+                        if( sent != packetBufferSize )
+                        {
+                            if( sent == -1 )
+                                printf("data sending failed (errno=%d)\n", errno);
+                            else
+                                printf("data sending incomplete (sent=%d)\n", sent);
+                            close(i_vlcSock);
+                            i_vlcSock = -1;
+                            return 0;
+                        }
+                    }
                 }
             }
         }
@@ -401,10 +422,10 @@ static long VLCEyeTVPluginServiceChanged(VLCEyeTVPluginGlobals_t *globals,
         globals->activeDeviceID = deviceID;
         globals->activePIDsCount = pidsCount;
 
+        /* need active PIDs for packet filtering */
         for( i = 0; i < pidsCount; i++ )
         {
             globals->activePIDs[i] = pidList[i];
-            globals->seenPIDs[i] = 0;
             printf("Active PID: %ld, type: %ld\n", pidList[i].pid, pidList[i].pidType);
         }
     }
