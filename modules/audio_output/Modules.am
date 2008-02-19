@@ -10,3 +10,4 @@ SOURCES_hd1000a = hd1000a.cpp
 SOURCES_portaudio = portaudio.c
 SOURCES_auhal = auhal.c
 SOURCES_jack = jack.c
+SOURCES_pulse = pulse.c

@@ -144,6 +144,7 @@ Marián Hikaník <podnety _at_ mojepreklady _dot_ net> - Slovak localisation
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy at beosmail.com> - BeOS CSS support
+Martin Hamrle <hamrle 47 post d0t cz> - PulseAudio output module
 Martin Kahr <martin --at-- martinkahr dot com> - Apple Remote support
 Matej Urbančič <matej.urban at gmail.com> - Slovenian translation
 Mateus Krepsky Ludwich <mateus @t csp dot com d.t br> - rc interface mosaic-order callback

@@ -4650,6 +4650,20 @@ AC_ARG_ENABLE(esd,
    fi])
 
 dnl
+dnl  Pulseaudio module
+dnl
+AC_ARG_ENABLE(pulse,
+  [  --enable-pulse          Pulseaudio support (default enabled)])
+  if test "${enable_pulse}" != "no"
+   then
+     PKG_CHECK_MODULES(PULSE, libpulse,
+       [ VLC_ADD_PLUGINS([pulse])
+        VLC_ADD_CFLAGS([pulse],[${PULSE_CFLAGS}])
+        VLC_ADD_LDFLAGS([pulse],[${PULSE_LIBS}])]:,
+       [AC_MSG_WARN(pulsaudio library not found)])
+   fi
+
+dnl
 dnl  Portaudio module
 dnl
 AC_ARG_ENABLE(portaudio,
