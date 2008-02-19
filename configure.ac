@@ -4659,7 +4659,7 @@ AC_ARG_ENABLE(pulse,
      PKG_CHECK_MODULES(PULSE, libpulse,
        [ VLC_ADD_PLUGINS([pulse])
         VLC_ADD_CFLAGS([pulse],[${PULSE_CFLAGS}])
-        VLC_ADD_LDFLAGS([pulse],[${PULSE_LIBS}])]:,
+        VLC_ADD_LDFLAGS([pulse],[${PULSE_LIBS}])],
        [AC_MSG_WARN(pulsaudio library not found)])
    fi
 
