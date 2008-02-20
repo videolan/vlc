@@ -1989,15 +1989,15 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_prefs showPrefs];
 }
 
-#ifdef UPDATE_CHECK
 - (IBAction)checkForUpdate:(id)sender
 {
+#ifdef UPDATE_CHECK
     if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
     [o_update showUpdateWindow];
-}
 #endif
+}
 
 - (IBAction)viewHelp:(id)sender
 {

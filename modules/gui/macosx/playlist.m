@@ -924,9 +924,9 @@
             NSMutableString *o_temp, *o_temp2;
             o_temp = [NSMutableString stringWithString: o_uri];
             o_temp2 = [NSMutableString stringWithUTF8String: mounts[i_index].f_mntfromname];
-            [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:nil range:NSMakeRange(0, [o_temp length]) ];
-            [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:nil range:NSMakeRange(0, [o_temp2 length]) ];
-            [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:nil range:NSMakeRange(0, [o_temp2 length]) ];
+            [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
+            [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp2 length]) ];
+            [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp2 length]) ];
 
             if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
             {
@@ -951,9 +951,9 @@
         statfs( [o_uri fileSystemRepresentation], buf );
         psz_dev = strdup(buf->f_mntfromname);
         o_temp = [NSMutableString stringWithUTF8String: psz_dev ];
-        [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:nil range:NSMakeRange(0, [o_temp length]) ];
-        [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:nil range:NSMakeRange(0, [o_temp length]) ];
-        [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:nil range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NSLiteralSearch range:NSMakeRange(0, [o_temp length]) ];
         o_uri = o_temp;
     }
 
