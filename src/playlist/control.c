@@ -299,11 +299,9 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
     {
         /* Shuffle the array */
         srand( (unsigned int)mdate() );
-        int swap = 0;
         int j;
         for( j = p_playlist->current.i_size - 1; j > 0; j-- )
         {
-            swap++;
             int i = rand() % (j+1); /* between 0 and j */
             playlist_item_t *p_tmp;
             p_tmp = ARRAY_VAL(p_playlist->current, i);
