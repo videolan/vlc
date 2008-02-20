@@ -1102,6 +1102,12 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, vlc_bool_t ),
 
     update_check_thread_t *p_uct = vlc_object_create( p_update->p_libvlc,
                                             sizeof( update_check_thread_t ) );
+    if( !p_uct )
+    {
+        msg_Err( p_update->p_libvlc, "out of memory" );
+        return;
+    }
+
     p_uct->p_update = p_update;
     p_uct->pf_callback = pf_callback;
     p_uct->p_data = p_data;
@@ -1217,6 +1223,11 @@ void update_Download( update_t *p_update, char *psz_destdir )
 
     update_download_thread_t *p_udt = vlc_object_create( p_update->p_libvlc,
                                                       sizeof( update_download_thread_t ) );
+    if( !p_udt )
+    {
+        msg_Err( p_update->p_libvlc, "out of memory" );
+        return;
+    }
 
     p_udt->p_update = p_update;
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
