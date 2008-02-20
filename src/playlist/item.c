@@ -89,7 +89,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
                     p_item_in_category, VLC_TRUE );
             p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
         }
- 
+
         playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
                 PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
                 NULL, NULL,  VLC_TRUE );
@@ -100,7 +100,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
                           VLC_TRUE, p_item_in_category, NULL );
         }
     }
- 
+
     PL_UNLOCK;
 
 }
@@ -122,7 +122,7 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
                       vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
                       p_item );
- 
+
 }
 
 /*****************************************************************************
@@ -171,7 +171,13 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
  * Playlist item destruction
  ***************************************************************************/
 
-/** Delete a playlist item and detach its input item */
+/**
+ * Delete item
+ *
+ * Delete a playlist item and detach its input item
+ * \param p_item item to delete
+ * \return VLC_SUCCESS
+*/
 int playlist_ItemDelete( playlist_item_t *p_item )
 {
     uninstall_input_item_observer( p_item );
@@ -181,7 +187,16 @@ int playlist_ItemDelete( playlist_item_t *p_item )
     return VLC_SUCCESS;
 }
 
-/** Remove an input item when it appears from a root playlist item */
+/**
+ * Delete input item
+ *
+ * Remove an input item when it appears from a root playlist item
+ * \param p_playlist playlist object
+ * \param i_input_id id of the input to delete
+ * \param p_root root playlist item
+ * \param b_do_stop must stop or not the playlist
+ * \return VLC_SUCCESS or VLC_EGENERIC
+*/
 static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                             playlist_item_t *p_root, vlc_bool_t b_do_stop )
 {
@@ -204,7 +219,16 @@ static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
     return VLC_EGENERIC;
 }
 
-/** Remove an input item when it appears from a root playlist item */
+/**
+ * Delete input item
+ *
+ * Remove an input item when it appears from a root playlist item
+ * \param p_playlist playlist object
+ * \param i_input_id id of the input to delete
+ * \param p_root root playlist item
+ * \param b_locked TRUE if the playlist is locked
+ * \return VLC_SUCCESS or VLC_EGENERIC
+ */
 int playlist_DeleteInputInParent( playlist_t *p_playlist, int i_input_id,
                                   playlist_item_t *p_root, vlc_bool_t b_locked )
 {
@@ -216,7 +240,15 @@ int playlist_DeleteInputInParent( playlist_t *p_playlist, int i_input_id,
     return i_ret;
 }
 
-/** Remove an input item from ONELEVEL and CATEGORY */
+/**
+ * Delete from input
+ *
+ * Remove an input item from ONELEVEL and CATEGORY
+ * \param p_playlist playlist object
+ * \param i_input_id id of the input to delete
+ * \param b_locked TRUE if the playlist is locked
+ * \return VLC_SUCCESS or VLC_ENOITEM
+ */
 int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                               vlc_bool_t b_locked )
 {
@@ -231,6 +263,13 @@ int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                             VLC_SUCCESS : VLC_ENOITEM;
 }
 
+/**
+ * Clear the playlist
+ *
+ * \param p_playlist playlist object
+ * \param b_locked TRUE if the playlist is locked
+ * \return nothing
+ */
 void playlist_Clear( playlist_t * p_playlist, vlc_bool_t b_locked )
 {
     if( !b_locked ) PL_LOCK;
@@ -239,8 +278,15 @@ void playlist_Clear( playlist_t * p_playlist, vlc_bool_t b_locked )
     if( !b_locked ) PL_UNLOCK;
 }
 
-/** Remove a playlist item from the playlist, given its id
- * This function is to be used only by the playlist */
+/**
+ * Delete playlist item
+ *
+ * Remove a playlist item from the playlist, given its id
+ * This function is to be used only by the playlist
+ * \param p_playlist playlist object
+ * \param i_id id of the item do delete
+ * \return VLC_SUCCESS or an error
+ */
 int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,
@@ -252,7 +298,10 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
 /***************************************************************************
  * Playlist item addition
  ***************************************************************************/
-/** Add an item to the playlist or the media library
+/**
+ * Playlist add
+ *
+ * Add an item to the playlist or the media library
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
@@ -261,6 +310,7 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
+ * \param b_locked TRUE if the playlist is locked
  * \return The id of the playlist item
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
@@ -285,6 +335,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \param ppsz_options an array of options
  * \param i_options the number of options
  * \param b_playlist TRUE for playlist, FALSE for media library
+ * \param b_locked TRUE if the playlist is locked
  * \return The id of the playlist item
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
@@ -306,7 +357,19 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     return i_id;
 }
 
-/** Add an input item to the playlist node */
+/**
+ * Add an input item to the playlist node
+ *
+ * \param p_playlist the playlist to add into
+ * \param p_input the input item to add
+ * \param i_mode the mode used when adding
+ * \param i_pos the position in the playlist where to add. If this is
+ *        PLAYLIST_END the item will be added at the end of the playlist
+ *        regardless of its size
+ * \param b_playlist TRUE for playlist, FALSE for media library
+ * \param b_locked TRUE if the playlist is locked
+ * \return VLC_SUCCESS or VLC_ENOMEM
+*/
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
                        int i_mode, int i_pos, vlc_bool_t b_playlist,
                        vlc_bool_t b_locked )
@@ -339,8 +402,23 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     return VLC_SUCCESS;
 }
 
-/** Add an input item to p_direct_parent in the category tree, and to the
- *  matching top category in onelevel **/
+/**
+ * Add input
+ *
+ * Add an input item to p_direct_parent in the category tree, and to the
+ * matching top category in onelevel
+ * \param p_playlist the playlist to add into
+ * \param p_input the input item to add
+ * \param p_direct_parent the parent item to add into
+ * \param i_mode the mode used when adding
+ * \param i_pos the position in the playlist where to add. If this is
+ *        PLAYLIST_END the item will be added at the end of the playlist
+ *        regardless of its size
+ * \param i_cat id of the items category
+ * \param i_one id of the item onelevel category
+ * \param b_locked TRUE if the playlist is locked
+ * \return VLC_SUCCESS or VLC_ENOMEM
+ */
 int playlist_BothAddInput( playlist_t *p_playlist,
                            input_item_t *p_input,
                            playlist_item_t *p_direct_parent,
@@ -387,7 +465,19 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     return VLC_SUCCESS;
 }
 
-/** Add an input item to a given node */
+/**
+ * Add an input item to a given node
+ *
+ * \param p_playlist the playlist to add into
+ * \param p_input the input item to add
+ * \param p_parent the parent item to add into
+ * \param i_mode the mode used when addin
+ * \param i_pos the position in the playlist where to add. If this is
+ *        PLAYLIST_END the item will be added at the end of the playlist
+ *        regardless of its size
+ * \param b_locked TRUE if the playlist is locked
+ * \return the new playlist item
+ */
 playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
                                          input_item_t *p_input,
                                          playlist_item_t *p_parent,
