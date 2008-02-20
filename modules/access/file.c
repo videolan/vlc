@@ -86,10 +86,6 @@ static void Close( vlc_object_t * );
 #define CACHING_LONGTEXT N_( \
     "Caching value for files. This " \
     "value should be set in milliseconds." )
-#define CAT_TEXT N_("Concatenate with additional files")
-#define CAT_LONGTEXT N_( \
-    "Play split files as if they were part of a unique file. " \
-    "You need to specify a comma-separated list of files." )
 
 vlc_module_begin();
     set_description( _("File input") );
