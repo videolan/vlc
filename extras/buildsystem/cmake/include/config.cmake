@@ -334,6 +334,7 @@ vlc_enable_modules(packetizer_mpegvideo packetizer_h264)
 vlc_enable_modules(packetizer_mpeg4video packetizer_mpeg4audio)
 vlc_enable_modules(packetizer_vc1)
 vlc_enable_modules(spatializer)
+vlc_enable_modules(asf)
 
 if(NOT mingwce)
    set(enabled ON)
@@ -351,10 +352,6 @@ set(enabled)
 if(NOT WIN32)
    vlc_enable_modules(screensaver)
 endif(NOT WIN32)
-
-# Following modules will be disabled but listed in options
-
-vlc_disable_modules(asf)
 
 # This module is disabled because the CMakeList.txt which
 # is generated isn't correct. We'll put that back
