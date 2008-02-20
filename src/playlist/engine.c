@@ -101,7 +101,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_doing_ml = VLC_FALSE;
 
     p_playlist->b_auto_preparse =
-                        var_CreateGetBool( p_playlist, "auto-preparse") ;
+                        var_CreateGetBool( p_playlist, "auto-preparse" ) ;
 
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL,
                                     0, NULL );
@@ -157,6 +157,13 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     return p_playlist;
 }
 
+/**
+ * Destroy playlist
+ *
+ * Destroy a playlist structure.
+ * \param p_playlist the playlist object
+ * \return nothing
+ */
 void playlist_Destroy( playlist_t *p_playlist )
 {
     var_Destroy( p_playlist, "intf-change" );
@@ -223,7 +230,13 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
 
-/** Main loop for the playlist */
+/**
+ * Main loop
+ *
+ * Main loop for the playlist
+ * \param p_playlist the playlist object
+ * \return nothing
+ */
 void playlist_MainLoop( playlist_t *p_playlist )
 {
     playlist_item_t *p_item = NULL;
@@ -233,7 +246,7 @@ void playlist_MainLoop( playlist_t *p_playlist )
     if( p_playlist->b_reset_currently_playing &&
         mdate() - p_playlist->last_rebuild_date > 30000 ) // 30 ms
     {
-        ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random"),
+        ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random" ),
                              p_playlist->status.p_item );
         p_playlist->last_rebuild_date = mdate();
     }
@@ -281,7 +294,7 @@ check_input:
                  p_playlist->status.p_item = NULL;
             }
 
-            i_activity= var_GetInteger( p_playlist, "activity") ;
+            i_activity= var_GetInteger( p_playlist, "activity" );
             var_SetInteger( p_playlist, "activity", i_activity -
                             DEFAULT_INPUT_ACTIVITY );
             goto check_input;
@@ -318,14 +331,14 @@ check_input:
          *  - No request, stopped status -> collect garbage
          *  - Request, running requested -> start new item
          *  - Request, stopped requested -> collect garbage
-         */
-         if( p_playlist->request.i_status != PLAYLIST_STOPPED )
-         {
-             msg_Dbg( p_playlist, "starting new item" );
-             p_item = playlist_NextItem( p_playlist );
+        */
+        if( p_playlist->request.i_status != PLAYLIST_STOPPED )
+        {
+            msg_Dbg( p_playlist, "starting new item" );
+            p_item = playlist_NextItem( p_playlist );
 
-             if( p_item == NULL )
-             {
+            if( p_item == NULL )
+            {
                 msg_Dbg( p_playlist, "nothing to play" );
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
                 PL_UNLOCK;
@@ -362,7 +375,14 @@ check_input:
     PL_UNLOCK;
 }
 
-/** Playlist dying last loop */
+
+/**
+ * Last loop
+ *
+ * The playlist is dying so do the last loop
+ * \param p_playlist the playlist object
+ * \return nothing
+*/
 void playlist_LastLoop( playlist_t *p_playlist )
 {
     vlc_object_t *p_obj;
@@ -458,7 +478,13 @@ void playlist_LastLoop( playlist_t *p_playlist )
     PL_UNLOCK;
 }
 
-/** Main loop for preparser queue */
+/**
+ * Preparse loop
+ *
+ * Main loop for preparser queue
+ * \param p_obj items to preparse
+ * \return nothing
+ */
 void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
@@ -513,7 +539,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             if( !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o ) )
             {
                 preparse_item_t p;
-                PL_DEBUG("need to fetch meta for %s", p_current->psz_name );
+                PL_DEBUG( "need to fetch meta for %s", p_current->psz_name );
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_FALSE;
                 vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
@@ -560,7 +586,13 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
     }
 }
 
-/** Main loop for secondary preparser queue */
+/**
+ * Fetcher loop
+ *
+ * Main loop for secondary preparser queue
+ * \param p_obj items to preparse
+ * \return nothing
+ */
 void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
@@ -589,7 +621,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
         {
             if( !b_fetch_art )
             {
-                /* If the user doesn't want us to fetch meta automatically 
+                /* If the user doesn't want us to fetch meta automatically
                  * abort here. */
                 if( p_playlist->p_fetcher->b_fetch_meta )
                 {
@@ -607,7 +639,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                     INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                                  p_playlist->p_fetcher->i_waiting,
                                  0, p );
-                    PL_DEBUG("meta fetched for %s, get art", p_item->psz_name);
+                    PL_DEBUG( "meta fetched for %s, get art", p_item->psz_name );
                     vlc_mutex_unlock( &p_obj->object_lock );
                     continue;
                 }
@@ -636,7 +668,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                 i_ret = input_ArtFind( p_playlist, p_item );
                 if( i_ret == 1 )
                 {
-                    PL_DEBUG("downloading art for %s", p_item->psz_name );
+                    PL_DEBUG( "downloading art for %s", p_item->psz_name );
                     if( input_DownloadAndCacheArt( p_playlist, p_item ) )
                         input_item_SetArtNotFound( p_item, VLC_TRUE );
                     else {
@@ -647,13 +679,13 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                 }
                 else if( i_ret == 0 ) /* Was in cache */
                 {
-                    PL_DEBUG("found art for %s in cache", p_item->psz_name );
+                    PL_DEBUG( "found art for %s in cache", p_item->psz_name );
                     input_item_SetArtFetched( p_item, VLC_TRUE );
                     var_SetInteger( p_playlist, "item-change", p_item->i_id );
                 }
                 else
                 {
-                    PL_DEBUG("art not found for %s", p_item->psz_name );
+                    PL_DEBUG( "art not found for %s", p_item->psz_name );
                     input_item_SetArtNotFound( p_item, VLC_TRUE );
                 }
                 vlc_gc_decref( p_item );
