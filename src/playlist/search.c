@@ -115,9 +115,6 @@ playlist_item_t * playlist_ItemGetByInputId( playlist_t *p_playlist,
 
 static vlc_bool_t playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
                                                      playlist_item_t *p_root,
-                                                     const char *psz_string );
-static vlc_bool_t playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
-                                                     playlist_item_t *p_root,
                                                      const char *psz_string )
 {
    int i;
