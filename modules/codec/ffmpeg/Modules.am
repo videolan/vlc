@@ -25,5 +25,6 @@ SOURCES_ffmpegaltivec = \
 	postprocess.c \
 	demux.c \
 	mux.c \
+	scale.c \
 	$(NULL)
 
