@@ -53,9 +53,6 @@
 #   include <unistd.h>
 #   include <poll.h>
 #endif
-#ifdef HAVE_MMAP
-#   include <sys/mman.h>
-#endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   ifdef lseek
@@ -108,15 +105,11 @@ vlc_module_end();
 static int  Seek( access_t *, int64_t );
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int  Control( access_t *, int, va_list );
-#ifdef HAVE_MMAP
-static block_t *mmapBlock( access_t * );
-#endif
 
 static int  open_file( access_t *, const char * );
 
 struct access_sys_t
 {
-    uint64_t     pagemask;
     unsigned int i_nb_reads;
     vlc_bool_t   b_kfir;
 
@@ -198,50 +191,14 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef HAVE_SYS_STAT_H
     p_access->info.i_size = st.st_size;
-    if (!S_ISREG (st.st_mode) && !S_ISBLK (st.st_mode)
-     && (!S_ISCHR (st.st_mode) || (st.st_size == 0)))
+    if (!S_ISREG (st.st_mode)
+     && !S_ISBLK (st.st_mode)
+     && !S_ISCHR (st.st_mode))
         p_sys->b_seekable = VLC_FALSE;
-
-# ifdef HAVE_MMAP
-    p_sys->pagemask = sysconf (_SC_PAGE_SIZE) - 1;
-
-    /* Autodetect mmap() support */
-    if (p_sys->b_pace_control && S_ISREG (st.st_mode) && (st.st_size > 0))
-    {
-        /* TODO: Do not allow PROT_WRITE, we should not need it.
-         * However, this far, "block" ownership seems such that whoever
-         * "receives" a block can freely modify its content. Hence we _may_
-         * need PROT_WRITE not to default memory protection.
-         * NOTE: With MAP_PRIVATE, changes are not committed to the underlying
-         * file, write open permission is not required.
-         */
-        void *addr = mmap (NULL, 1, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
-        if (addr != MAP_FAILED)
-        {
-            /* Does the file system support mmap? */
-            munmap (addr, 1);
-            p_access->pf_read = NULL;
-            p_access->pf_block = mmapBlock;
-            msg_Dbg (p_this, "mmap enabled");
-        }
-        else
-            msg_Dbg (p_this, "mmap disabled (%m)");
-    }
-    else
-        msg_Dbg (p_this, "mmap disabled (non regular file)");
-# endif
 #else
     p_sys->b_seekable = !b_stdin;
 # warning File size not known!
 #endif
-
-    if (p_sys->b_seekable && (p_access->info.i_size == 0))
-    {
-        /* FIXME that's bad because all others access will be probed */
-        msg_Err (p_access, "file is empty, aborting");
-        Close (p_this);
-        return VLC_EGENERIC;
-    }
 
     return VLC_SUCCESS;
 }
@@ -349,116 +306,16 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     return i_ret;
 }
 
-#ifdef HAVE_MMAP
-# define MMAP_SIZE (1 << 20)
-
-static block_t *mmapBlock (access_t *p_access)
-{
-    access_sys_t *p_sys = p_access->p_sys;
-
-    const int flags = MAP_SHARED;
-    off_t offset = p_access->info.i_pos & ~p_sys->pagemask;
-    size_t align = p_access->info.i_pos & p_sys->pagemask;
-    size_t length = (MMAP_SIZE > p_sys->pagemask) ? MMAP_SIZE : (p_sys->pagemask + 1);
-    void *addr;
-
-#ifndef NDEBUG
-    int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
-    if (dbgpos != p_access->info.i_pos)
-        msg_Err (p_access, "position: 0x%08llx instead of 0x%08llx",
-                 p_access->info.i_pos, dbgpos);
-#endif
-
-    if (p_access->info.i_pos >= p_access->info.i_size)
-    {
-        /* End of file - check if file size changed... */
-        struct stat st;
-
-        if ((fstat (p_sys->fd, &st) == 0)
-         && (st.st_size != p_access->info.i_size))
-        {
-            p_access->info.i_size = st.st_size;
-            p_access->info.i_update |= INPUT_UPDATE_SIZE;
-        }
-
-        /* Really at end of file then */
-        if (p_access->info.i_pos >= p_access->info.i_size)
-        {
-            p_access->info.b_eof = VLC_TRUE;
-            msg_Dbg (p_access, "at end of memory mapped file");
-            return NULL;
-        }
-    }
-
-    if (offset + length > p_access->info.i_size)
-        /* Don't mmap beyond end of file */
-        length = p_access->info.i_size - offset;
-
-    assert (offset <= p_access->info.i_pos);               /* and */
-    assert (p_access->info.i_pos < p_access->info.i_size); /* imply */
-    assert (offset < p_access->info.i_size);               /* imply */
-    assert (length > 0);
-
-    addr = mmap (NULL, length, PROT_READ, flags, p_sys->fd, offset);
-    if (addr == MAP_FAILED)
-    {
-        msg_Err (p_access, "memory mapping failed (%m)");
-        intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
-                        _("VLC could not read the file."));
-        msleep( INPUT_ERROR_SLEEP );
-        return NULL;
-    }
-
-    p_access->info.i_pos = offset + length;
-
-    block_t *block = block_mmap_Alloc (addr, length);
-    if (block == NULL)
-        return NULL;
-
-    block->p_buffer += align;
-    block->i_buffer -= align;
-
-#ifndef NDEBUG
-    msg_Dbg (p_access, "mapped 0x%lx bytes at %p from offset 0x%lx",
-             (unsigned long)length, addr, (unsigned long)offset);
-
-    /* Compare normal I/O with memory mapping */
-    char *buf = malloc (block->i_buffer);
-    ssize_t i_read = read (p_sys->fd, buf, block->i_buffer);
-
-    if (i_read != (ssize_t)block->i_buffer)
-        msg_Err (p_access, "read %u instead of %u bytes", (unsigned)i_read,
-                 (unsigned)block->i_buffer);
-    if (memcmp (buf, block->p_buffer, block->i_buffer))
-        msg_Err (p_access, "inconsistent data buffer");
-    free (buf);
-#endif
-
-    return block;
-}
-#endif
 
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
 static int Seek (access_t *p_access, int64_t i_pos)
 {
-    /* FIXME: i_size should really be unsigned */
-    if ((uint64_t)i_pos > (uint64_t)p_access->info.i_size)
-    {
-        /* This should only happen with corrupted/truncated files. */
-        msg_Err (p_access, "seeking too far (0x"I64Fx" / 0x"I64Fx")",
-                 i_pos, p_access->info.i_size);
-        i_pos = p_access->info.i_size;
-    }
-
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = VLC_FALSE;
 
-#if defined (HAVE_MMAP) && defined (NDEBUG)
-    if (p_access->pf_block == NULL)
-#endif
-        lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
+    lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
     return VLC_SUCCESS;
 }
 
