@@ -319,10 +319,7 @@ check_input:
          *  - Request, running requested -> start new item
          *  - Request, stopped requested -> collect garbage
          */
-         if( (!p_playlist->request.b_request &&
-              p_playlist->status.i_status != PLAYLIST_STOPPED) ||
-              ( p_playlist->request.b_request &&
-                p_playlist->request.i_status != PLAYLIST_STOPPED ) )
+         if( p_playlist->request.i_status != PLAYLIST_STOPPED )
          {
              msg_Dbg( p_playlist, "starting new item" );
              p_item = playlist_NextItem( p_playlist );
