@@ -477,7 +477,7 @@ AC_FUNC_ALLOCA
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
-AC_CHECK_FUNC(mmap, [VLC_ADD_PLUGINS([access_mmap])])
+AC_CHECK_FUNCS(mmap, [VLC_ADD_PLUGINS([access_mmap])])
 
 AS_IF([test "${SYS}" = "linux"], [
   AC_CHECK_FUNCS(tee)
