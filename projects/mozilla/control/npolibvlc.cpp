@@ -1445,7 +1445,7 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     }
                     else if( NPVARIANT_IS_STRING(args[1]) )
                     {
-                        name = stringValue(NPVARIANT_TO_STRING(args[0]));
+                        name = stringValue(NPVARIANT_TO_STRING(args[1]));
                     }
                     else
                     {
