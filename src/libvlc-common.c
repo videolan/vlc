@@ -216,6 +216,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
     /* Initialize mutexes */
+    vlc_mutex_init( p_libvlc, &p_libvlc->timer_lock );
     vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
 #ifdef __APPLE__
     vlc_mutex_init( p_libvlc, &p_libvlc->quicktime_lock );
@@ -724,7 +725,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_libvlc->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
     p_libvlc->i_timers = 0;
     p_libvlc->pp_timers = NULL;
-    vlc_mutex_init( p_libvlc, &p_libvlc->timer_lock );
 
     /*
      * Initialize hotkey handling
