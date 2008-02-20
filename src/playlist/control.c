@@ -252,21 +252,29 @@ static void PreparseEnqueueItemSub( playlist_t *p_playlist,
  * Playback logic
  *****************************************************************************/
 
-static void ResyncCurrentIndex(playlist_t *p_playlist, playlist_item_t *p_cur )
+/**
+ * Synchronise the current index of the playlist
+ * to match the index of the current item.
+ *
+ * \param p_playlist the playlist structure
+ * \param p_cur the current playlist item
+ * \return nothing
+ */
+static void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur )
 {
-     PL_DEBUG("resyncing on %s", PLI_NAME(p_cur) );
+     PL_DEBUG( "resyncing on %s", PLI_NAME( p_cur ) );
      /* Simply resync index */
      int i;
      p_playlist->i_current_index = -1;
      for( i = 0 ; i< p_playlist->current.i_size; i++ )
      {
-          if( ARRAY_VAL(p_playlist->current, i) == p_cur )
+          if( ARRAY_VAL( p_playlist->current, i ) == p_cur )
           {
               p_playlist->i_current_index = i;
               break;
           }
      }
-     PL_DEBUG("%s is at %i", PLI_NAME(p_cur), p_playlist->i_current_index );
+     PL_DEBUG( "%s is at %i", PLI_NAME( p_cur ), p_playlist->i_current_index );
 }
 
 void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
@@ -275,9 +283,9 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
     playlist_item_t *p_next = NULL;
     stats_TimerStart( p_playlist, "Items array build",
                       STATS_TIMER_PLAYLIST_BUILD );
-    PL_DEBUG("rebuilding array of current - root %s",
-              PLI_NAME(p_playlist->status.p_node) );
-    ARRAY_RESET(p_playlist->current);
+    PL_DEBUG( "rebuilding array of current - root %s",
+              PLI_NAME( p_playlist->status.p_node ) );
+    ARRAY_RESET( p_playlist->current );
     p_playlist->i_current_index = -1;
     while( 1 )
     {
@@ -304,6 +312,7 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
         {
             int i = rand() % (j+1); /* between 0 and j */
             playlist_item_t *p_tmp;
+            /* swap the two items */
             p_tmp = ARRAY_VAL(p_playlist->current, i);
             ARRAY_VAL(p_playlist->current,i) = ARRAY_VAL(p_playlist->current,j);
             ARRAY_VAL(p_playlist->current,j) = p_tmp;
@@ -313,8 +322,13 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
     stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_BUILD );
 }
 
-/** This function calculates the next playlist item, depending
- *  on the playlist course mode (forward, backward, random, view,...). */
+/**
+ * Compute the next playlist item depending on
+ * the playlist course mode (forward, backward, random, view,...).
+ *
+ * \param p_playlist the playlist object
+ * \return nothing
+ */
 playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
 {
     playlist_item_t *p_new = NULL;
@@ -342,7 +356,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     }
     if( !p_playlist->request.b_request && b_playstop == VLC_TRUE )
     {
-        msg_Dbg( p_playlist,"stopping (play and stop)");
+        msg_Dbg( p_playlist,"stopping (play and stop)" );
         return NULL;
     }
 
@@ -376,7 +390,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             p_playlist->b_reset_currently_playing = VLC_TRUE;
         }
 
-        /* If we are asked for a node, dont take it */
+        /* If we are asked for a node, don't take it */
         if( i_skip == 0 && ( p_new == NULL || p_new->i_children != -1 ) )
             i_skip++;
 
@@ -452,12 +466,18 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     return p_new;
 }
 
-/** Start the input for an item */
+/**
+ * Start the input for an item
+ *
+ * \param p_playlist the playlist objetc
+ * \param p_item the item to play
+ * \return nothing
+ */
 int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
     vlc_value_t val;
     input_item_t *p_input = p_item->p_input;
-    int i_activity = var_GetInteger( p_playlist, "activity") ;
+    int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
     msg_Dbg( p_playlist, "creating new input thread" );
 
@@ -488,7 +508,7 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         psz_arturl = input_item_GetArtURL( p_input );
         psz_name = input_item_GetName( p_input );
 
-        /* p_input->p_meta should not be null after a successfull CreateThread*/
+        /* p_input->p_meta should not be null after a successfull CreateThread */
         b_has_art = !EMPTY_STR( psz_arturl );
 
         if( !b_has_art )
@@ -501,9 +521,9 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
 
     val.i_int = p_input->i_id;
-    vlc_mutex_unlock( &p_playlist->object_lock);
-    var_Set( p_playlist, "playlist-current", val);
-    vlc_mutex_lock( &p_playlist->object_lock);
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    var_Set( p_playlist, "playlist-current", val );
+    vlc_mutex_lock( &p_playlist->object_lock );
 
     return VLC_SUCCESS;
 }
