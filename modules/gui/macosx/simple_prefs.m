@@ -335,7 +335,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         config_PutInt( p_intf, "fetch-meta", [o_intf_meta_ckb state] );
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
-        config_PutInt( p_intf, "video-embeded", [o_intf_embedded_ckb state] );
+        config_PutInt( p_intf, "embedded-video", [o_intf_embedded_ckb state] );
 
         /* okay, let's save our changes to vlcrc */
         i = config_SaveConfigFile( p_intf, "main" );

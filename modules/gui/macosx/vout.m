@@ -722,7 +722,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-background", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-black", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
+    var_Create( p_vout, "embedded-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* We only wait for NSApp to initialise if we're not embedded (as in the
      * case of the Mozilla plugin).  We can tell whether we're embedded or not

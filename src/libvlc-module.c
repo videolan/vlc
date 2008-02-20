@@ -1467,6 +1467,9 @@ vlc_module_begin();
         change_short('f');
     add_bool( "embedded-video", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
               VLC_TRUE );
+#ifdef __APPLE__
+       add_deprecated_alias( "macosx-embedded" ); /*deprecated since 0.9.0 */
+#endif
     add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, VLC_TRUE );
     /* Used in vout_synchro */
