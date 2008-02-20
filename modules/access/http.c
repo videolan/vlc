@@ -953,6 +953,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
                     i_status = 0;
 
                 free( psz );
+
+                if( p_access->b_die || p_access->b_error )
+                {
+                    Disconnect( p_access );
+                    return -1;
+                }
             }
             while( i_status );
         }
@@ -1171,13 +1177,18 @@ static int Request( access_t *p_access, int64_t i_tell )
             goto error;
         }
 
+        if( p_access->b_die || p_access->b_error )
+        {
+            free( psz );
+            goto error;
+        }
+
         /* msg_Dbg( p_input, "Line=%s", psz ); */
         if( *psz == '\0' )
         {
             free( psz );
             break;
         }
-
 
         if( ( p = strchr( psz, ':' ) ) == NULL )
         {
