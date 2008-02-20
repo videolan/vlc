@@ -883,7 +883,7 @@ static void EmptyRelease( update_t *p_update )
 
 /**
  * Get the update file and parse it
- * *p_update has to be locked when calling this function
+ * p_update has to be locked when calling this function
  *
  * \param p_update pointer to update struct
  * \return VLC_TRUE if the update is valid and authenticated
@@ -1198,7 +1198,7 @@ static char *size_str( long int l_size )
 }
 
 
-/*
+/**
  * Struct to launch the download in a thread
  */
 typedef struct
@@ -1222,7 +1222,7 @@ void update_Download( update_t *p_update, char *psz_destdir )
     assert( p_update );
 
     update_download_thread_t *p_udt = vlc_object_create( p_update->p_libvlc,
-                                                      sizeof( update_download_thread_t ) );
+                                        sizeof( update_download_thread_t ) );
     if( !p_udt )
     {
         msg_Err( p_update->p_libvlc, "out of memory" );
@@ -1291,7 +1291,8 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         goto end;
 
     psz_size = size_str( l_size );
-    if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",  p_update->release.psz_url, psz_size, 0.0 ) != -1 )
+    if( asprintf( &psz_status, "%s\nDownloading... O.O/%s %.1f%% done",
+        p_update->release.psz_url, psz_size, 0.0 ) != -1 )
     {
         i_progress = intf_UserProgress( p_udt, "Downloading ...", psz_status, 0.0, 0 );
         free( psz_status );
@@ -1310,8 +1311,9 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         psz_downloaded = size_str( l_downloaded );
         f_progress = 100.0*(float)l_downloaded/(float)l_size;
 
-        if( asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done", p_update->release.psz_url,
-                      psz_downloaded, psz_size, f_progress ) != -1 )
+        if( asprintf( &psz_status, "%s\nDonwloading... %s/%s %.1f%% done",
+                      p_update->release.psz_url, psz_downloaded, psz_size,
+                      f_progress ) != -1 )
         {
             intf_ProgressUpdate( p_udt, i_progress, psz_status, f_progress, 0 );
             free( psz_status );
@@ -1325,7 +1327,8 @@ void update_DownloadReal( update_download_thread_t *p_udt )
 
     if( !intf_ProgressIsCancelled( p_udt, i_progress ) )
     {
-        if( asprintf( &psz_status, "%s\nDone %s (100.0%%)", p_update->release.psz_url, psz_size ) != -1 )
+        if( asprintf( &psz_status, "%s\nDone %s (100.0%%)",
+            p_update->release.psz_url, psz_size ) != -1 )
         {
             intf_ProgressUpdate( p_udt, i_progress, psz_status, 100.0, 0 );
             free( psz_status );
