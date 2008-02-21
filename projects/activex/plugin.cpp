@@ -106,7 +106,7 @@ VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance, REFCLSID 
         _inplace_wndclass_atom = 0;
     }
 
-    HBITMAP hbitmap = (HBITMAP)LoadImage(getHInstance(), MAKEINTRESOURCE(1), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+    HBITMAP hbitmap = (HBITMAP)LoadImage(getHInstance(), MAKEINTRESOURCE(2), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     if( NULL != hbitmap )
     {
         PICTDESC pictDesc;
