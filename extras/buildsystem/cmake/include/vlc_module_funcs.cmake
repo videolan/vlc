@@ -6,8 +6,9 @@ MACRO(vlc_add_module module_name)
         if( NOT ${ENABLE_NO_SYMBOL_CHECK} )
             vlc_module_add_link_libraries( ${module_name} libvlc )
         endif( NOT ${ENABLE_NO_SYMBOL_CHECK} )
-        set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
-                "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}" )
+        vlc_get_module_compile_flags(compile_flags ${module_name})
+	set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
+                 "${compile_flags}" )
         set_target_properties( ${module_name}_plugin PROPERTIES LINK_FLAGS "${VLC_${module_name}_LINK_FLAGS}" )
         if (VLC_${module_name}_LINK_LIBRARIES)
             target_link_libraries( ${module_name}_plugin ${VLC_${module_name}_LINK_LIBRARIES})
@@ -15,6 +16,10 @@ MACRO(vlc_add_module module_name)
         install_targets(/modules ${module_name}_plugin)
     endif(ENABLE_VLC_MODULE_${module_name})
 ENDMACRO(vlc_add_module)
+
+MACRO(vlc_get_module_compile_flags var module_name)
+    set(${var} "-D__PLUGIN__ -DMODULE_NAME=${module_name} -DMODULE_NAME_IS_${module_name} -I${CMAKE_CURRENT_SOURCE_DIR} ${VLC_${module_name}_COMPILE_FLAG}")
+ENDMACRO(vlc_get_module_compile_flags)
 
 MACRO(vlc_register_modules module_state)
     foreach( module_name ${ARGN} )

@@ -434,7 +434,7 @@ if(QT4_FOUND)
   vlc_check_include_files (qt.h)
   vlc_enable_modules(qt4)
   vlc_add_module_compile_flag(qt4 ${QT_CFLAGS} )
-  vlc_module_add_link_libraries(qt4 ${QT_LIBRARIES})
+  vlc_module_add_link_libraries(qt4 ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
   # Define our own qt4_wrap_ui macro to match wanted behaviour
   MACRO (VLC_QT4_WRAP_UI outfiles )
@@ -450,6 +450,22 @@ if(QT4_FOUND)
       SET(${outfiles} ${${outfiles}} ${outfile})
     ENDFOREACH (it)
   ENDMACRO (VLC_QT4_WRAP_UI)
+
+  MACRO (VLC_QT4_GENERATE_MOC outfiles flags )
+    FOREACH (it ${ARGN})
+     string(REPLACE ".hpp" ".moc.cpp" outfile "${it}")
+      GET_FILENAME_COMPONENT(infile ${it} ABSOLUTE)
+      SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile})
+      ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
+        COMMAND mkdir -p `dirname ${outfile}`
+        COMMAND ${QT_MOC_EXECUTABLE}
+        ARGS ${flags} -f -o ${outfile} ${infile}
+	MAIN_DEPENDENCY ${infile}
+	VERBATIM)
+      SET(${outfiles} ${${outfiles}} ${outfile})
+    ENDFOREACH (it)
+  ENDMACRO (VLC_QT4_GENERATE_MOC)
+
 
 endif(QT4_FOUND)
 
@@ -514,4 +530,5 @@ set(CMAKE_REQUIRED_INCLUDES)
 ###########################################################
 # Final configuration
 ###########################################################
+add_definitions(-DHAVE_CONFIG_H)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
