@@ -2055,16 +2055,8 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_drms_box && p_drms_box->data.p_sample_soun->p_drms )
     {
-        int i_ret;
-        if( config_GetInt( p_stream, "france" ) )
-        {
-            i_ret = -7;
-        }
-        else
-        {
-            i_ret= drms_init( p_drms_box->data.p_sample_soun->p_drms,
+        int i_ret = drms_init( p_drms_box->data.p_sample_soun->p_drms,
                                p_box->i_type, p_peek, i_read );
-        }
         if( i_ret )
         {
             const char *psz_error;
@@ -2077,7 +2069,6 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
                 case -4: psz_error = "could not get SCI data"; break;
                 case -5: psz_error = "no user key found in SCI data"; break;
                 case -6: psz_error = "invalid user key"; break;
-                case -7: psz_error = "you live in France"; break;
                 default: psz_error = "unknown error"; break;
             }
             if MP4_BOX_TYPE_ASCII()
