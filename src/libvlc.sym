@@ -364,7 +364,6 @@ __var_Create
 __var_DelCallback
 __var_Destroy
 __var_Get
-__var_OptionParse
 __var_Set
 __var_TriggerCallback
 __var_Type

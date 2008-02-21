@@ -124,9 +124,6 @@ VLC_EXPORT( int, __var_Type, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
 VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
-#define var_OptionParse(a,b) __var_OptionParse( VLC_OBJECT( a ) , b )
-VLC_EXPORT( void, __var_OptionParse, ( vlc_object_t *, const char * ) );
-
 #define var_Command(a,b,c,d,e) __var_Command( VLC_OBJECT( a ), b, c, d, e )
 VLC_EXPORT( int, __var_Command, ( vlc_object_t *, const char *, const char *, const char *, char ** ) );
 

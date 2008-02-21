@@ -177,4 +177,9 @@ struct module_config_t
 extern module_config_t libvlc_config[];
 extern const size_t libvlc_config_count;
 
+/*
+ * Variables stuff
+ */
+void var_OptionParse (vlc_object_t *, const char *);
+
 #endif
