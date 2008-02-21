@@ -1043,7 +1043,7 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
  * \param psz_option the option to parse
  * \return nothing
  */
-void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
+void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
 {
     char *psz_name, *psz_value = strchr( psz_option, '=' );
     int  i_name_len, i_type;
