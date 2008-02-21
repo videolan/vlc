@@ -104,7 +104,7 @@ libvlc_exception_get_message( const libvlc_exception_t *p_exception );
 /**
  * Create an initialized libvlc instance.
  * \param argc the number of arguments
- * \param argv command-line-type arguments
+ * \param argv command-line-type arguments (argv[0] must be the path of calling program)
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API libvlc_instance_t *
