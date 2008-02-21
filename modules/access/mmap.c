@@ -131,7 +131,9 @@ static int Open (vlc_object_t *p_this)
     p_sys->fd = fd;
 
     p_access->info.i_size = st.st_size;
+#ifdef HAVE_POSIX_FADVISE    
     posix_fadvise (fd, 0, 0, POSIX_FADV_SEQUENTIAL);
+#endif 
 
     return VLC_SUCCESS;
 
@@ -212,7 +214,9 @@ static block_t *Block (access_t *p_access)
         msleep (INPUT_ERROR_SLEEP);
         return NULL;
     }
+#ifdef HAVE_POSIX_MADVISE    
     posix_madvise (addr, length, POSIX_MADV_SEQUENTIAL);
+#endif
 
     block_t *block = block_mmap_Alloc (addr, length);
     if (block == NULL)
