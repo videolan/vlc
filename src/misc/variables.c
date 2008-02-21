@@ -1045,27 +1045,28 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
  */
 void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
 {
-    char *psz_name, *psz_value = strchr( psz_option, '=' );
-    int  i_name_len, i_type;
+    char *psz_name, *psz_value;
+    int  i_type;
     vlc_bool_t b_isno = VLC_FALSE;
     vlc_value_t val;
-    val.psz_string = NULL;
 
-    if( psz_value ) i_name_len = psz_value - psz_option;
-    else i_name_len = strlen( psz_option );
+    val.psz_string = NULL;
 
     /* It's too much of a hassle to remove the ':' when we parse
      * the cmd line :) */
     if( psz_option[0] == ':' )
-    {
         psz_option++;
-        i_name_len--;
-    }
 
-    if( i_name_len == 0 ) return;
+    if( !psz_option[0] )
+        return;
 
-    psz_name = strndup( psz_option, i_name_len );
-    if( psz_value ) psz_value++;
+    psz_name = strdup( psz_option );
+    if( psz_name == NULL )
+        return;
+
+    psz_value = strchr( psz_name, '=' );
+    if( psz_value != NULL )
+        *psz_value++ = '\0';
 
     /* FIXME: :programs should be handled generically */
     if( !strcmp( psz_name, "programs" ) )
@@ -1088,10 +1089,8 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
 
         b_isno = VLC_TRUE;
         i_type = config_GetType( p_obj, psz_name );
-
-        if( !i_type ) goto cleanup;  /* Option doesn't exist */
     }
-    else if( !i_type ) goto cleanup; /* Option doesn't exist */
+    if( !i_type ) goto cleanup; /* Option doesn't exist */
 
     if( ( i_type != VLC_VAR_BOOL ) &&
         ( !psz_value || !*psz_value ) ) goto cleanup; /* Invalid value */
@@ -1116,7 +1115,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
                     if( DIALOG_OK_YES != intf_UserYesNo( p_obj, _("WARNING: Unsafe Playlist"), description, _("Yes"), _("No"), NULL) )
                     {
                         msg_Err( p_obj, "option %s is unsafe and is blocked by security policy", psz_name );
-                        return;
+                        goto cleanup;
                     }
                 }
                 default:
@@ -1183,12 +1182,11 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
 
     default:
         goto cleanup;
-        break;
     }
 
     var_Set( p_obj, psz_name, val );
 
-  cleanup:
+cleanup:
     free( psz_name );
 }
 
