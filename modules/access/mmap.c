@@ -211,6 +211,7 @@ static block_t *Block (access_t *p_access)
         msleep (INPUT_ERROR_SLEEP);
         return NULL;
     }
+    posix_madvise (addr, length, POSIX_MADV_SEQUENTIAL);
 
     block_t *block = block_mmap_Alloc (addr, length);
     if (block == NULL)
