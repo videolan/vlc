@@ -1189,8 +1189,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
     var_Set( p_obj, psz_name, val );
 
   cleanup:
-    if( psz_name ) free( psz_name );
-    return;
+    free( psz_name );
 }
 
 
