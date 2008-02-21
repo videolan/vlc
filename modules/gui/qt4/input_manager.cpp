@@ -93,6 +93,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     {
         p_input = NULL;
         i_input_id = 0;
+        emit rateChanged( INPUT_RATE_DEFAULT );
     }
 }
 
