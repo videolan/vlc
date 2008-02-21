@@ -342,7 +342,8 @@ void libvlc_media_descriptor_add_option(
                                    libvlc_exception_t *p_e )
 {
     (void)p_e;
-    input_ItemAddOptionNoDup( p_md->p_input_item, ppsz_option );
+    input_ItemAddOpt( p_md->p_input_item, ppsz_option,
+                      VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
 
 /**************************************************************************

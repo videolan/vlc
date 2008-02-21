@@ -115,33 +115,25 @@ static void input_ItemDestroy ( gc_object_t *p_this )
     free( p_input );
 }
 
-void input_ItemAddOption( input_item_t *p_input,
-                          const char *psz_option )
+void input_ItemAddOpt( input_item_t *p_input, const char *psz_option,
+                       unsigned flags )
 {
-    if( !psz_option ) return;
+    if( psz_option == NULL )
+        return;
+
     vlc_mutex_lock( &p_input->lock );
+    if (flags & VLC_INPUT_OPTION_UNIQUE)
+    {
+        for (int i = 0 ; i < p_input->i_options; i++)
+            if( !strcmp( p_input->ppsz_options[i], psz_option ) )
+                goto out;
+    }
+
     INSERT_ELEM( p_input->ppsz_options, p_input->i_options,
                  p_input->i_options, strdup( psz_option ) );
+out:
     vlc_mutex_unlock( &p_input->lock );
 }
-
-void input_ItemAddOptionNoDup( input_item_t *p_input,
-                               const char *psz_option )
-{
-    int i;
-    if( !psz_option ) return ;
-    vlc_mutex_lock( &p_input->lock );
-    for( i = 0 ; i< p_input->i_options; i++ )
-    {
-        if( !strcmp( p_input->ppsz_options[i], psz_option ) )
-        {
-            vlc_mutex_unlock(& p_input->lock );
-            return;
-        }
-    }
-    TAB_APPEND( p_input->i_options, p_input->ppsz_options, strdup( psz_option));    vlc_mutex_unlock( &p_input->lock );
-}
-
 
 int input_ItemAddInfo( input_item_t *p_i,
                             const char *psz_cat,

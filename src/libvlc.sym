@@ -130,8 +130,7 @@ input_DecoderNew
 input_DestroyThread
 input_GetItem
 input_ItemAddInfo
-input_ItemAddOption
-input_ItemAddOptionNoDup
+input_ItemAddOpt
 input_ItemGetById
 input_ItemGetInfo
 __input_ItemNewExt

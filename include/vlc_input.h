@@ -142,8 +142,16 @@ static inline void input_ItemAddSubItem( input_item_t *p_parent,
     vlc_event_send( &p_parent->event_manager, &event );
 }
 
-VLC_EXPORT( void, input_ItemAddOption,( input_item_t *, const char * ) );
-VLC_EXPORT( void, input_ItemAddOptionNoDup,( input_item_t *, const char * ) );
+#define VLC_INPUT_OPTION_UNIQUE  0x1
+#define VLC_INPUT_OPTION_TRUSTED 0x2
+
+VLC_EXPORT( void, input_ItemAddOpt, ( input_item_t *, const char *str, unsigned flags ) );
+
+static inline
+void input_ItemAddOption (input_item_t *item, const char *str)
+{
+    input_ItemAddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
+}
 
 static inline void input_ItemClean( input_item_t *p_i )
 {
