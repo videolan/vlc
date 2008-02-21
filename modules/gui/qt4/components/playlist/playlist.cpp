@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.cpp : Custom widgets for the playlist
  ****************************************************************************
- * Copyright © 2006 the VideoLAN team
+ * Copyright © 2007-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -28,7 +29,7 @@
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 #include "components/playlist/playlist.hpp"
-#include "input_manager.hpp" /* art */
+#include "input_manager.hpp" /* art signal */
 
 #include <QSettings>
 #include <QLabel>
@@ -51,6 +52,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     selector = new PLSelector( this, p_intf, THEPL );
     leftW->addWidget( selector );
 
+    QWidget *artContainer = new QWidget;
+    QHBoxLayout *artContLay = new QHBoxLayout( artContainer );
+
     /* Art label */
     art = new ArtLabel;
     art->setMinimumHeight( 128 );
@@ -60,7 +64,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     art->setScaledContents( true );
     art->setPixmap( QPixmap( ":/noart.png" ) );
     art->setToolTip( qtr( "Double click to get the media informations" ) );
-    leftW->addWidget( art );
+    artContLay->addWidget( art, 1 );
+
+    leftW->addWidget( artContainer );
 
     /* Initialisation of the playlist */
     playlist_item_t *p_root =
