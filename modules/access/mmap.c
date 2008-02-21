@@ -131,6 +131,7 @@ static int Open (vlc_object_t *p_this)
     p_sys->fd = fd;
 
     p_access->info.i_size = st.st_size;
+    posix_fadvise (fd, 0, 0, POSIX_FADV_SEQUENTIAL);
 
     return VLC_SUCCESS;
 
