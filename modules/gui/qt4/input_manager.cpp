@@ -171,8 +171,8 @@ void InputManager::customEvent( QEvent *event )
 
     if( !p_input || p_input->b_die || p_input->b_dead )
         return;
-    if( ( type != PositionUpdate_Type && type != ItemRateChanged_Type )
-         && ( i_input_id != ple->i_id ) )
+    if( ( type != PositionUpdate_Type && type != ItemRateChanged_Type ) &&
+        ( i_input_id != ple->i_id ) )
         return;
     if( type != PositionUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", type );
@@ -205,54 +205,54 @@ void InputManager::customEvent( QEvent *event )
 
 void InputManager::UpdatePosition()
 {
-     /* Update position */
-     int i_length, i_time; /* Int is enough, since we store seconds */
-     float f_pos;
-     i_length = var_GetTime(  p_input , "length" ) / 1000000;
-     i_time = var_GetTime(  p_input , "time") / 1000000;
-     f_pos = var_GetFloat(  p_input , "position" );
-     emit positionUpdated( f_pos, i_time, i_length );
+    /* Update position */
+    int i_length, i_time; /* Int is enough, since we store seconds */
+    float f_pos;
+    i_length = var_GetTime(  p_input , "length" ) / 1000000;
+    i_time = var_GetTime(  p_input , "time") / 1000000;
+    f_pos = var_GetFloat(  p_input , "position" );
+    emit positionUpdated( f_pos, i_time, i_length );
 }
 
 void InputManager::UpdateTitle()
 {
-     /* Update navigation status */
-     vlc_value_t val; val.i_int = 0;
-     var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
-     if( val.i_int > 0 )
-     {
-         val.i_int = 0;
-         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
-         emit navigationChanged( (val.i_int > 0) ? 1 : 2 );
-     }
-     else
-     {
-         emit navigationChanged( 0 );
-     }
+    /* Update navigation status */
+    vlc_value_t val; val.i_int = 0;
+    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( val.i_int > 0 )
+    {
+        val.i_int = 0;
+        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        emit navigationChanged( (val.i_int > 0) ? 1 : 2 );
+    }
+    else
+    {
+        emit navigationChanged( 0 );
+    }
 }
 
 void InputManager::UpdateStatus()
 {
-     /* Update playing status */
-     vlc_value_t val; val.i_int = 0;
-     var_Get( p_input, "state", &val );
-     if( i_old_playing_status != val.i_int )
-     {
-         i_old_playing_status = val.i_int;
-         emit statusChanged( val.i_int );
-     }
+    /* Update playing status */
+    vlc_value_t val; val.i_int = 0;
+    var_Get( p_input, "state", &val );
+    if( i_old_playing_status != val.i_int )
+    {
+        i_old_playing_status = val.i_int;
+        emit statusChanged( val.i_int );
+    }
 }
 
 void InputManager::UpdateRate()
 {
-     /* Update Rate */
-     int i_new_rate = var_GetInteger( p_input, "rate");
-     if( i_new_rate != i_rate )
-     {
-         i_rate = i_new_rate;
-         /* Update rate */
-         emit rateChanged( i_rate );
-     }
+    /* Update Rate */
+    int i_new_rate = var_GetInteger( p_input, "rate");
+    if( i_new_rate != i_rate )
+    {
+        i_rate = i_new_rate;
+        /* Update rate */
+        emit rateChanged( i_rate );
+    }
 }
 
 void InputManager::UpdateMeta()
@@ -394,10 +394,8 @@ void InputManager::telexGotoPage( int page )
 
 void InputManager::telexToggle( bool b_enabled )
 {
-    int i_page = 0;
+    int i_page = b_enabled ? 100 : 0 ;
 
-    if( b_enabled )
-        i_page = 100;
     telexGotoPage( i_page );
 }
 
