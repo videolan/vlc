@@ -155,12 +155,6 @@ static void Close (vlc_object_t * p_this)
 static block_t *Block (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
-#ifndef NDEBUG
-    int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
-    if (dbgpos != p_access->info.i_pos)
-        msg_Err (p_access, "position: 0x%08llx instead of 0x%08llx",
-                 p_access->info.i_pos, dbgpos);
-#endif
 
     if ((uint64_t)p_access->info.i_pos >= (uint64_t)p_access->info.i_size)
     {
@@ -182,6 +176,13 @@ static block_t *Block (access_t *p_access)
             return NULL;
         }
     }
+
+#ifndef NDEBUG
+    int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
+    if (dbgpos != p_access->info.i_pos)
+        msg_Err (p_access, "position: 0x%08llx instead of 0x%08llx",
+                 p_access->info.i_pos, dbgpos);
+#endif
 
     const uintptr_t page_mask = p_sys->page_size - 1;
     /* Start the mapping on a page boundary: */
@@ -243,6 +244,10 @@ static block_t *Block (access_t *p_access)
 
 static int Seek (access_t *p_access, int64_t i_pos)
 {
+#ifndef NDEBUG
+    lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
+#endif
+
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = VLC_FALSE;
     return VLC_SUCCESS;
