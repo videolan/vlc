@@ -504,9 +504,15 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
  *****************************************************************************/
 
 /**
+ * Item to node
+ *
  * Transform an item to a node. Return the node in the category tree, or NULL
  * if not found there
  * This function must be entered without the playlist lock
+ * \param p_playlist the playlist object
+ * \param p_item the item to transform
+ * \param b_locked TRUE if the playlist is locked
+ * \return the item transform in a node
  */
 playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                       playlist_item_t *p_item,
@@ -576,7 +582,13 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
     }
 }
 
-/** Find an item within a root, given its input id.
+/**
+ * Find an item within a root, given its input id.
+ *
+ * \param p_playlist the playlist object
+ * \param i_input_id id of the input
+ * \param p_root root playlist item
+ * \param b_items_only TRUE if we want the item himself
  * \return the first found item, or NULL if not found
  */
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
@@ -688,12 +700,21 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     return i_ret;
 }
 
-/** Send a notification that an item has been added to a node */
+/**
+ * Send notification
+ *
+ * Send a notification that an item has been added to a node
+ * \param p_playlist the playlist object
+ * \param i_item_id id of the item added
+ * \param i_node_id id of the node in wich the item was added
+ * \param b_signal TRUE if the function must send a signal
+ * \return nothing
+ */
 void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
                              int i_node_id, vlc_bool_t b_signal )
 {
     vlc_value_t val;
-    playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
+    playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t) );
     p_add->i_item = i_item_id;
     p_add->i_node = i_node_id;
     val.p_address = p_add;
@@ -708,7 +729,13 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
  * Playlist item accessors
  *****************************************************************************/
 
-/** Set the name of a playlist item */
+/**
+ * Set the name of a playlist item
+ *
+ * \param p_item the item
+ * \param psz_name the name
+ * \return VLC_SUCCESS or VLC_EGENERIC
+ */
 int playlist_ItemSetName( playlist_item_t *p_item, const char *psz_name )
 {
     if( psz_name && p_item )
