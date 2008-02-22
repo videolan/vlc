@@ -266,5 +266,10 @@ then
     mkdir "${distdir}/extras/contrib/src/Patches"
   fi
   cp ${srcdir}/extras/contrib/src/Patches/* "${distdir}/extras/contrib/src/Patches/"
+  if test ! -d "${distdir}/extras/contrib/src/Distributions"
+  then
+    mkdir "${distdir}/extras/contrib/src/Distributions"
+  fi
+  cp ${srcdir}/extras/contrib/src/Distributions/* "${distdir}/extras/contrib/src/Distributions/"
 fi
 
