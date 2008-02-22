@@ -4658,7 +4658,7 @@ AC_ARG_ENABLE(pulse,
   [  --enable-pulse          Pulseaudio support (default enabled)])
   if test "${enable_pulse}" != "no"
    then
-     PKG_CHECK_MODULES(PULSE, libpulse,
+     PKG_CHECK_MODULES(PULSE, libpulse >= 0.9.8,
        [ VLC_ADD_PLUGINS([pulse])
         VLC_ADD_CFLAGS([pulse],[${PULSE_CFLAGS}])
         VLC_ADD_LDFLAGS([pulse],[${PULSE_LIBS}])],
