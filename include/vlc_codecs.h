@@ -242,12 +242,24 @@ typedef struct
 #define WAVE_FORMAT_DK3                 0x0061
 #define WAVE_FORMAT_DK4                 0x0062
 
+/* At least FFmpeg use that ID: from libavformat/riff.c ('Vo' == 0x566f)
+ * { CODEC_ID_VORBIS, ('V'<<8)+'o' }, //HACK/FIXME, does vorbis in WAV/AVI have an (in)official id?
+ */
+#define WAVE_FORMAT_VORBIS              0x566f
+
+/* It seems that these IDs are used by braindead & obsolete VorbisACM encoder
+ * (Windows only)
+ * A few info is available except VorbisACM source (remember, Windows only)
+ * (available on http://svn.xiph.org), but it seems that vo3+ at least is
+ * made of Vorbis data encapsulated in Ogg container...
+ */
 #define WAVE_FORMAT_VORB_1              0x674f
-#define WAVE_FORMAT_VORB_1PLUS          0x676f
 #define WAVE_FORMAT_VORB_2              0x6750
-#define WAVE_FORMAT_VORB_2PLUS          0x6770
 #define WAVE_FORMAT_VORB_3              0x6751
+#define WAVE_FORMAT_VORB_1PLUS          0x676f
+#define WAVE_FORMAT_VORB_2PLUS          0x6770
 #define WAVE_FORMAT_VORB_3PLUS          0x6771
+
 #define WAVE_FORMAT_SPEEX               0xa109 /* Speex audio */
 
 
@@ -323,6 +335,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_DIVIO_AAC,  VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_AAC,        VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio" },
     { WAVE_FORMAT_FFMPEG_AAC, VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio" },
+    { WAVE_FORMAT_VORBIS,     VLC_FOURCC( 'v', 'o', 'r', 'b' ), "Vorbis Audio" }, 
     { WAVE_FORMAT_VORB_1,     VLC_FOURCC( 'v', 'o', 'r', '1' ), "Vorbis 1 Audio" },
     { WAVE_FORMAT_VORB_1PLUS, VLC_FOURCC( 'v', 'o', '1', '+' ), "Vorbis 1+ Audio" },
     { WAVE_FORMAT_VORB_2,     VLC_FOURCC( 'v', 'o', 'r', '2' ), "Vorbis 2 Audio" },

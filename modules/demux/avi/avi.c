@@ -130,6 +130,9 @@ typedef struct
     unsigned int    i_idxposc;  /* numero of chunk */
     unsigned int    i_idxposb;  /* byte in the current chunk */
 
+    /* extra information given to the decoder */
+    void            *p_extra;
+
     /* For VBR audio only */
     unsigned int    i_blockno;
     unsigned int    i_blocksize;
@@ -351,6 +354,12 @@ static int Open( vlc_object_t * p_this )
     for( i = 0 ; i < i_track; i++ )
     {
         avi_track_t           *tk     = malloc( sizeof( avi_track_t ) );
+        if( !tk )
+        {
+            msg_Err( p_demux, "Out of memory" );
+            goto error;
+        }
+
         avi_chunk_list_t      *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
         avi_chunk_strh_t      *p_strh = AVI_ChunkFind( p_strl, AVIFOURCC_strh, 0 );
         avi_chunk_STRING_t    *p_strn = AVI_ChunkFind( p_strl, AVIFOURCC_strn, 0 );
@@ -358,18 +367,7 @@ static int Open( vlc_object_t * p_this )
         avi_chunk_strf_vids_t *p_vids = NULL;
         es_format_t fmt;
 
-        tk->b_activated = VLC_FALSE;
-        tk->p_index     = 0;
-        tk->i_idxnb     = 0;
-        tk->i_idxmax    = 0;
-        tk->i_idxposc   = 0;
-        tk->i_idxposb   = 0;
-
-        tk->i_blockno   = 0;
-        tk->i_blocksize = 0;
-
-        tk->p_es        = NULL;
-        tk->p_out_muxed = NULL;
+        memset( tk, 0, sizeof( avi_track_t ) );
 
         p_vids = (avi_chunk_strf_vids_t*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
         p_auds = (avi_chunk_strf_auds_t*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
@@ -392,7 +390,9 @@ static int Open( vlc_object_t * p_this )
                 tk->i_cat   = AUDIO_ES;
                 tk->i_codec = AVI_FourccGetCodec( AUDIO_ES,
                                                   p_auds->p_wf->wFormatTag );
-                if( ( tk->i_blocksize = p_auds->p_wf->nBlockAlign ) == 0 )
+                if( tk->i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+                    tk->i_blocksize = 0; /* fix vorbis VBR decoding */
+                else if( ( tk->i_blocksize = p_auds->p_wf->nBlockAlign ) == 0 )
                 {
                     if( p_auds->p_wf->wFormatTag == 1 )
                     {
@@ -411,12 +411,85 @@ static int Open( vlc_object_t * p_this )
                 fmt.audio.i_blockalign      = p_auds->p_wf->nBlockAlign;
                 fmt.audio.i_bitspersample   = p_auds->p_wf->wBitsPerSample;
                 fmt.b_packetized            = !tk->i_blocksize;
+
+                msg_Dbg( p_demux,
+                    "stream[%d] audio(0x%x) %d channels %dHz %dbits",
+                    i, p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
+                    p_auds->p_wf->nSamplesPerSec, 
+                    p_auds->p_wf->wBitsPerSample );
+
                 fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
                     p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
-                fmt.p_extra = &p_auds->p_wf[1];
-                msg_Dbg( p_demux, "stream[%d] audio(0x%x) %d channels %dHz %dbits",
-                         i, p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
-                         p_auds->p_wf->nSamplesPerSec, p_auds->p_wf->wBitsPerSample);
+                fmt.p_extra = tk->p_extra = malloc( fmt.i_extra );
+                if( !fmt.p_extra ) goto error;
+                memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
+
+                /* Rewrite the vorbis headers from Xiph-like format
+                 * to VLC internal format
+                 *
+                 * Xiph format:
+                 *  - 1st byte == N, is the number of packets - 1
+                 *  - Following bytes are the size of the N first packets:
+                 *      while( *p == 0xFF ) { size += 0xFF; p++ } size += *p;
+                 *      (the size of the last packet is the size of remaining
+                 *      data in the buffer)
+                 *  - Finally, all the packets concatenated
+                 *
+                 * VLC format:
+                 *  - Size of the packet on 16 bits (big endian) FIXME: should be 32 bits to be safe
+                 *  - The packet itself
+                 *  - Size of the next packet, and so on ...
+                 */
+
+                if( tk->i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+                {
+                    uint8_t *p_extra = fmt.p_extra; 
+                    size_t i_extra = fmt.i_extra;
+
+                    if( i_extra <= 1 ) break;
+                    if( *p_extra++ != 2 ) break; /* 3 packets - 1 = 2 */
+                    i_extra--;
+
+                    size_t i_identifier_len = 0;
+                    while( *p_extra == 0xFF )
+                    {
+                        i_identifier_len += 0xFF;
+                        p_extra++;
+                        if( --i_extra <= 1 ) break;
+                    }
+                    i_identifier_len += *p_extra++;
+                    if( i_identifier_len > --i_extra ) break;
+
+                    size_t i_comment_len = 0;
+                    while( *p_extra == 0xFF )
+                    {
+                        i_comment_len += 0xFF;
+                        p_extra++;
+                        if( --i_extra <= 1 ) break;
+                    }
+                    i_comment_len += *p_extra++;
+                    if( i_comment_len > --i_extra ) break;
+                    size_t i_cookbook_len = i_extra;
+
+                    size_t i_headers_size = 3  * 2 + i_identifier_len +
+                                            i_comment_len + i_cookbook_len;
+                    uint8_t *p_out = malloc( i_headers_size );
+                    if( !p_out ) goto error;
+                    free( fmt.p_extra );
+                    fmt.p_extra = tk->p_extra = p_out;
+                    fmt.i_extra = i_headers_size;
+                    #define copy_packet( len ) \
+                        *p_out++ = len >> 8; \
+                        *p_out++ = len & 0xFF; \
+                        memcpy( p_out, p_extra, len ); \
+                        p_out += len; \
+                        p_extra += len;
+                    copy_packet( i_identifier_len );
+                    copy_packet( i_comment_len );
+                    copy_packet( i_cookbook_len );
+                    #undef copy_packet
+                    break;
+                }
                 break;
 
             case( AVIFOURCC_vids ):
@@ -689,11 +762,12 @@ static void Close ( vlc_object_t * p_this )
         {
             if( p_sys->track[i]->p_out_muxed )
                 stream_DemuxDelete( p_sys->track[i]->p_out_muxed );
-            FREENULL( p_sys->track[i]->p_index );
+            free( p_sys->track[i]->p_index );
+            free( p_sys->track[i]->p_extra );
             free( p_sys->track[i] );
         }
     }
-    FREENULL( p_sys->track );
+    free( p_sys->track );
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     vlc_meta_Delete( p_sys->meta );
 
