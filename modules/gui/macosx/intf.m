@@ -125,6 +125,27 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * KillerThread: Thread that kill the application
+ *****************************************************************************/
+static void * KillerThread( void *user_data )
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    intf_thread_t *p_intf = user_data;
+    
+    vlc_object_lock ( p_intf );
+    while( vlc_object_alive( p_intf ) )
+        vlc_object_wait( p_intf );
+    vlc_object_unlock( p_intf );
+
+    msg_Dbg( p_intf, "Killing the Mac OS X module\n" );
+
+    /* We are dead, terminate */
+    [NSApp terminate: nil];
+    [o_pool release];
+    return NULL;
+}
+/*****************************************************************************
  * Run: main loop
  *****************************************************************************/
 jmp_buf jmpbuffer;
@@ -156,6 +177,10 @@ static void Run( intf_thread_t *p_intf )
 
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
+
+    /* Setup a thread that will monitor the module killing */
+    pthread_t killer_thread;
+    pthread_create( &killer_thread, NULL, KillerThread, p_intf );
 
     /* Install a jmpbuffer to where we can go back before the NSApp exit
      * see applicationWillTerminate: */
