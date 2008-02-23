@@ -68,7 +68,7 @@ if ENABLE_QT4
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 endif
 
-resources.cpp: res.qrc
+resources.cpp: vlc.qrc
 	$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
