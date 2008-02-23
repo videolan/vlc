@@ -43,7 +43,8 @@ if(QT4_FOUND)
     set(MOC_FLAGS "-DHAVE_CONFIG_H ${MOC_FLAGS}")
     vlc_qt4_generate_moc(qt4_MOCS ${MOC_FLAGS} ${qt4_HEADERS})
     vlc_qt4_wrap_ui(qt4_UIS_H ${qt4_UIS})
+    qt4_add_resources(qt4_SRCS vlc.qrc)
 endif(QT4_FOUND)
 
-vlc_add_module(qt4 ${qt4_SOURCES} ${qt4_MOCS} ${qt4_UIS})
+vlc_add_module(qt4 ${qt4_SOURCES} ${qt4_SRCS} ${qt4_MOCS} ${qt4_UIS})
 
