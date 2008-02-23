@@ -129,7 +129,7 @@ private:
 /*******************************************************************************
  * Plugin properties.
  ******************************************************************************/
-#define PLUGIN_NAME         "VLC Multimedia Plugin"
+#define PLUGIN_NAME         "VLC Multimedia Plug-in"
 #define PLUGIN_DESCRIPTION \
     "Version %s, copyright 1996-2007 The VideoLAN Team" \
     "<br><a href=\"http://www.videolan.org/\">http://www.videolan.org/</a>"
@@ -155,7 +155,7 @@ private:
     "application/x-ogg:ogg:Ogg stream;" \
     "application/ogg:ogg:Ogg stream;" \
     /* VLC */ \
-    "application/x-vlc-plugin:vlc:VLC plugin;" \
+    "application/x-vlc-plugin:vlc:VLC plug-in;" \
     /* Windows Media */ \
     "video/x-ms-asf-plugin:asf,asx:Windows Media Video;" \
     "video/x-ms-asf:asf,asx:Windows Media Video;" \
@@ -163,7 +163,7 @@ private:
     "video/x-ms-wmv:wmv:Windows Media;" \
     "video/x-ms-wvx:wvx:Windows Media Video;" \
     /* Google VLC */ \
-    "application/x-google-vlc-plugin::Google VLC plugin;" \
+    "application/x-google-vlc-plugin::Google VLC plug-in;" \
     /* WAV audio */ \
     "audio/wav:wav:WAV audio;" \
     "audio/x-wav:wav:WAV audio;" \

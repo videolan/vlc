@@ -15,7 +15,7 @@ resource 'STR#' (126)
     {
         "Version 0.9.0, copyright 1996-2007 The VideoLAN Team"
         "<BR><A HREF='http://www.videolan.org'>http://www.videolan.org</A>",
-        "VLC Multimedia Plugin"
+        "VLC Multimedia Plug-in"
     };
 };
 
@@ -43,14 +43,14 @@ resource 'STR#' (127)
         "Ogg stream",
         "Ogg stream",
         /* VLC */
-        "VLC plugin",
+        "VLC plug-in",
         /* Windows Media */
         "Windows Media video",
         "Windows Media video",
-        "Windows Media plugin",
+        "Windows Media plug-in",
         "Windows Media video",
         /* Google VLC */
-        "Google VLC plugin",
+        "Google VLC plug-in",
         /* WAV audio */
         "WAV audio",
         "WAV audio",
