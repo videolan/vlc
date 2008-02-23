@@ -291,7 +291,16 @@ static void *SigHandler (void *data)
             /* If user asks again more than 2 seconds later, die badly */
             pthread_sigmask (SIG_UNBLOCK, exitset, NULL);
             fprintf (stderr, "user insisted too much, dying badly\n");
+#ifdef __APPLE__
+            /* On Mac OS X, use exit(-1) as it doesn't trigger
+             * backtrace generation, whereas abort() does.
+             * The backtrace generation trigger a Crash Dialog
+             * And takes way too much time, which is not what
+             * we want. */
+            exit (-1);
+#else
             abort ();
+#endif
         }
         pthread_setcancelstate (state, NULL);
     }
