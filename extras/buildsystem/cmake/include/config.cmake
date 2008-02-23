@@ -209,6 +209,10 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_test_inline.cmake )
 if(APPLE)
     include( ${CMAKE_SOURCE_DIR}/cmake/vlc_find_frameworks.cmake )
 
+    # Mac OS X (10.4 and 10.5)  can't poll a tty properly
+    # So we deactivate its uses
+    set(HAVE_POLL OFF)
+
     if(ENABLE_NO_SYMBOL_CHECK)
         set(DYNAMIC_LOOKUP "-undefined dynamic_lookup")
     else(ENABLE_NO_SYMBOL_CHECK)
