@@ -260,12 +260,8 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 # ***************************************************************************
 # CMake
 # ***************************************************************************
-
-cmake-$(CMAKE_VERSION).tar.gz:
-	$(WGET) $(CMAKE_URL)
-
-cmake: cmake-$(CMAKE_VERSION).tar.gz
-	$(EXTRACT_GZ)
+cmake: 
+	cvs -d :pserver:anonymous:cmake@www.cmake.org:/cvsroot/CMake co cmake
 
 .cmake: cmake
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
@@ -273,7 +269,6 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 
 CLEAN_FILE += .cmake
 CLEAN_PKG += cmake
-DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 
 # ***************************************************************************
 # libtool
