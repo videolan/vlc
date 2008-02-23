@@ -456,16 +456,19 @@ if(QT4_FOUND)
   ENDMACRO (VLC_QT4_WRAP_UI)
 
   MACRO (VLC_QT4_GENERATE_MOC outfiles flags )
+    string(REGEX MATCHALL "[^\\ ]+" flags_list ${flags})
     FOREACH (it ${ARGN})
-     string(REPLACE ".hpp" ".moc.cpp" outfile "${it}")
+      string(REPLACE ".hpp" ".moc.cpp" outfile "${it}")
       GET_FILENAME_COMPONENT(infile ${it} ABSOLUTE)
       SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile})
       ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
         COMMAND mkdir -p `dirname ${outfile}`
-        COMMAND ${QT_MOC_EXECUTABLE}
-        ARGS ${flags} -f -o ${outfile} ${infile}
-	MAIN_DEPENDENCY ${infile}
-	VERBATIM)
+        COMMAND ${QT_MOC_EXECUTABLE} 
+        ARGS ${flags_list}
+        ARGS -I ${CMAKE_BINARY_DIR}/include
+        ARGS -o ${outfile} ${infile}
+        MAIN_DEPENDENCY ${it}
+        )
       SET(${outfiles} ${${outfiles}} ${outfile})
     ENDFOREACH (it)
   ENDMACRO (VLC_QT4_GENERATE_MOC)
@@ -534,5 +537,4 @@ set(CMAKE_REQUIRED_INCLUDES)
 ###########################################################
 # Final configuration
 ###########################################################
-add_definitions(-DHAVE_CONFIG_H)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)

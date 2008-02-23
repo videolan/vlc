@@ -7,7 +7,7 @@ MACRO(vlc_add_module module_name)
             vlc_module_add_link_libraries( ${module_name} libvlc )
         endif( NOT ${ENABLE_NO_SYMBOL_CHECK} )
         vlc_get_module_compile_flags(compile_flags ${module_name})
-	set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
+        set_target_properties( ${module_name}_plugin PROPERTIES COMPILE_FLAGS
                  "${compile_flags}" )
         set_target_properties( ${module_name}_plugin PROPERTIES LINK_FLAGS "${VLC_${module_name}_LINK_FLAGS}" )
         if (VLC_${module_name}_LINK_LIBRARIES)
