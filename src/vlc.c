@@ -274,19 +274,18 @@ static void *SigHandler (void *data)
          * signals to a libvlc structure having been destroyed */
 
         pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
-        if (abort_time == 0)
+        if (abort_time == 0 || time (NULL) > abort_time)
         {
             time (&abort_time);
             abort_time += 2;
 
             fprintf (stderr, "signal %d received, terminating vlc - do it "
-                            "again in case it gets stuck\n", i_signal);
+                            "again quickly in case it gets stuck\n", i_signal);
 
             /* Acknowledge the signal received */
             Kill ();
         }
-        else
-        if (time (NULL) <= abort_time)
+        else /* time (NULL) <= abort_time */
         {
             /* If user asks again more than 2 seconds later, die badly */
             pthread_sigmask (SIG_UNBLOCK, exitset, NULL);
