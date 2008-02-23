@@ -107,6 +107,7 @@ set( SOURCES_libvlc_common
     config/core.c
     config/chain.c
     config/file.c
+    config/intf.c
     config/cmdline.c
     misc/events.c
     misc/image.c
