@@ -155,7 +155,7 @@ noinst_HEADERS = \
 	util/registry.hpp
 
 EXTRA_DIST += \
-	res.qrc \
+	vlc.qrc \
 	ui/equalizer.ui \
 	ui/v4l2.ui \
 	ui/video_effects.ui \

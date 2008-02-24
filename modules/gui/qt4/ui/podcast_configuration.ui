@@ -49,7 +49,7 @@
       <string>_("Add")</string>
      </property>
      <property name="icon" >
-      <iconset resource="../res.qrc" >:/pixmaps/play.png</iconset>
+      <iconset resource="../vlc.qrc" >:/pixmaps/play.png</iconset>
      </property>
     </widget>
    </item>
@@ -59,7 +59,7 @@
       <string>_("Delete")</string>
      </property>
      <property name="icon" >
-      <iconset resource="../res.qrc" >:/pixmaps/vlc_quit_16px.png</iconset>
+      <iconset resource="../vlc.qrc" >:/pixmaps/vlc_quit_16px.png</iconset>
      </property>
     </widget>
    </item>
@@ -73,7 +73,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../res.qrc" />
+  <include location="../vlc.qrc" />
  </resources>
  <connections>
   <connection>
