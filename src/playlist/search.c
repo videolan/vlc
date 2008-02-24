@@ -46,7 +46,8 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id,
     int i;
     if( !b_locked ) PL_LOCK;
     ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
-    if( i != -1 ) {
+    if( i != -1 )
+    {
         if( !b_locked ) PL_UNLOCK;
         return ARRAY_VAL( p_playlist->all_items, i );
     }
@@ -86,7 +87,15 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
     return NULL;
 }
 
-/** Find the playlist item matching the input id under the given node */
+/**
+ * Get input by item id
+ *
+ * Find the playlist item matching the input id under the given node
+ * \param p_playlist the playlist
+ * \param i_input_id the id of the input to find
+ * \param p_root the root node of the search
+ * \return the playlist item or NULL on failure
+ */
 playlist_item_t * playlist_ItemGetByInputId( playlist_t *p_playlist,
                                              int i_input_id,
                                              playlist_item_t *p_root )
@@ -121,7 +130,6 @@ static vlc_bool_t playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
    vlc_bool_t b_match = VLC_FALSE;
    for( i = 0 ; i < p_root->i_children ; i ++ )
    {
-
         playlist_item_t *p_item = p_root->pp_children[i];
         if( p_item->i_children > -1 )
         {
@@ -157,7 +165,7 @@ static vlc_bool_t playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
 int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                                const char *psz_string )
 {
-   p_playlist->b_reset_currently_playing = VLC_TRUE;
+    p_playlist->b_reset_currently_playing = VLC_TRUE;
     playlist_LiveSearchUpdateInternal( p_playlist, p_root, psz_string );
     vlc_cond_signal( &p_playlist->object_wait );
     return VLC_SUCCESS;
