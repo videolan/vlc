@@ -332,20 +332,6 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 
     QMenu *menu = Populate( p_intf, current, varnames, objects );
 
-    if( !p_intf->pf_show_dialog )
-    {
-        menu->addSeparator();
-        menu->addAction( qtr( "Switch to skins" ), THEDP,
-                SLOT( switchToSkins() ), QString( "Ctrl+Z" ) );
-#ifdef HAVE_WX
-        if( module_Exists( VLC_OBJECT( p_intf ), "wxwidgets" ) )
-        {
-            menu->addAction( qtr( "Switch to WxWidgets" ), THEDP,
-                    SLOT( switchToWx() ) );
-        }
-#endif
-    }
-
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
     THEDP->menusUpdateMapper->setMapping( menu, 4 );
     return menu;
@@ -817,8 +803,6 @@ static bool IsMenuEmpty( const char *psz_var,
 
     if( ( i_type & VLC_VAR_TYPE ) != VLC_VAR_VARIABLE )
     {
-        /* Very evil hack ! intf-switch can have only one value */
-        if( !strcmp( psz_var, "intf-switch" ) ) return false;
         if( val.i_int == 1 && b_root ) return true;
         else return false;
     }

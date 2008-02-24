@@ -51,8 +51,6 @@
  *****************************************************************************/
 static void RunInterface( intf_thread_t *p_intf );
 
-static int SwitchIntfCallback( vlc_object_t *, char const *,
-                               vlc_value_t , vlc_value_t , void * );
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
@@ -204,48 +202,8 @@ void intf_Destroy( intf_thread_t *p_intf )
  *****************************************************************************/
 static void RunInterface( intf_thread_t *p_intf )
 {
-    static const char *ppsz_interfaces[] =
-    {
-        "skins2", "Skins 2",
-#ifndef WIN32
-        "wxwidgets", "wxWidgets",
-#endif
-        NULL, NULL
-    };
-    const char **ppsz_parser;
-
-    vlc_list_t *p_list;
-    int i;
     vlc_value_t val, text;
     char *psz_intf;
-
-    /* Variable used for interface switching */
-    p_intf->psz_switch_intf = NULL;
-    var_Create( p_intf, "intf-switch", VLC_VAR_STRING |
-                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Switch interface");
-    var_Change( p_intf, "intf-switch", VLC_VAR_SETTEXT, &text, NULL );
-
-    /* Only fill the list with available modules */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( ppsz_parser = ppsz_interfaces; *ppsz_parser; ppsz_parser += 2 )
-    {
-        for( i = 0; i < p_list->i_count; i++ )
-        {
-            module_t *p_module = (module_t *)p_list->p_values[i].p_object;
-            if( !strcmp( p_module->psz_object_name, ppsz_parser[0] ) )
-            {
-                val.psz_string = (char *)ppsz_parser[0];
-                text.psz_string = (char *)_(ppsz_parser[1]);
-                var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE,
-                            &val, &text );
-                break;
-            }
-        }
-    }
-    vlc_list_release( p_list );
-
-    var_AddCallback( p_intf, "intf-switch", SwitchIntfCallback, NULL );
 
     /* Variable used for interface spawning */
     var_Create( p_intf, "intf-add", VLC_VAR_STRING |
@@ -300,20 +258,6 @@ static void RunInterface( intf_thread_t *p_intf )
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
     }
     while( p_intf->p_module );
-}
-
-static int SwitchIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    (void)psz_cmd; (void)oldval; (void)p_data;
-
-    p_intf->psz_switch_intf =
-        malloc( strlen(newval.psz_string) + sizeof(",none") );
-    sprintf( p_intf->psz_switch_intf, "%s,none", newval.psz_string );
-    vlc_object_kill( p_intf );
-
-    return VLC_SUCCESS;
 }
 
 static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,

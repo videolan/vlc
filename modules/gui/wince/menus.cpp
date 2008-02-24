@@ -443,8 +443,6 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
         vlc_object_find( p_intf, VLC_OBJECT_INTF, FIND_PARENT );
     if( p_object != NULL )
     {
-        ppsz_varnames[i] = "intf-switch";
-        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "intf-add";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );

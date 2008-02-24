@@ -206,16 +206,6 @@ int IntfAutoMenuBuilder( intf_thread_t *p_intf, ArrayOfInts &ri_objects,
                                                 FIND_PARENT );
     if( p_object != NULL )
     {
-        if( is_popup )
-        {
-#ifndef WIN32
-            PUSH_VAR( "intf-switch" );
-#endif
-        }
-        else
-        {
-            PUSH_VAR( "intf-switch" );
-        }
         PUSH_VAR( "intf-add" );
         PUSH_VAR( "intf-skins" );
         vlc_object_release( p_object );
@@ -527,7 +517,6 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
                                                 FIND_PARENT );
     if( p_object != NULL )
     {
-        PUSH_VAR( "intf-switch" );
         PUSH_VAR( "intf-add" );
         vlc_object_release( p_object );
     }
@@ -651,8 +640,6 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object,
 
     if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE )
     {
-        /* Very evil hack ! intf-switch can have only one value */
-        if( !strcmp( psz_var, "intf-switch" ) ) return FALSE;
         if( val.i_int == 1 && b_root ) return TRUE;
         else return FALSE;
     }

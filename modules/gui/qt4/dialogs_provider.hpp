@@ -187,8 +187,6 @@ public slots:
     void openAPlaylist();
     void saveAPlaylist();
 
-    void switchToSkins();
-    void switchToWx();
     void quit();
 };
 
