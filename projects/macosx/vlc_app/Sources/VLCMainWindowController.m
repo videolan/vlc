@@ -35,6 +35,7 @@
 @synthesize mediaPlayer;
 @synthesize videoView;
 @synthesize mediaArrayController;
+@synthesize categoriesTreeController;
 
 - (void)awakeFromNib
 {
@@ -45,9 +46,10 @@
      */
 
     NSAssert( mediaPlayer, @"No mediaPlayer" );
-    
+    [self willChangeValueForKey:@"categoriesTreeController"];
     categoriesTreeController = [[NSTreeController alloc] init];
-    
+    [self didChangeValueForKey:@"categoriesTreeController"];
+
     /***********************************
      * CategoriesList OutlineView content
      */

@@ -58,7 +58,7 @@
     IBOutlet VLCBrowsableVideoView * videoView;
 
     /* Controllers */
-    IBOutlet NSTreeController * categoriesTreeController;
+    NSTreeController * categoriesTreeController;
     IBOutlet VLCMediaArrayController * mediaArrayController;
     IBOutlet VLCMediaPlayer * mediaPlayer;
     IBOutlet VLCController * controller; /* This is a VLCController binded to the File's Owner of the nib */
@@ -74,6 +74,7 @@
 @property (readonly) VLCMediaPlayer * mediaPlayer;
 @property (readonly) VLCBrowsableVideoView * videoView;
 @property (readonly) VLCMediaArrayController * mediaArrayController;
+@property (readonly) NSTreeController * categoriesTreeController;
 
 - (IBAction)mediaListViewItemDoubleClicked:(id)sender;
 - (void)videoViewItemClicked:(id)sender;
