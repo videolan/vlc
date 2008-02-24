@@ -1465,10 +1465,10 @@ DISTCLEAN_PKG += wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 qt4-$(QT4_VERSION)-win32-bin.tar.bz2:
 	$(WGET) $(QT4_URL)
 
-qt4: qt4-$(QT4_VERSION)-win32-bin.tar.bz2
+qt4_win32: qt4-$(QT4_VERSION)-win32-bin.tar.bz2
 	$(EXTRACT_BZ2)
 
-.qt4: qt4
+.qt4_win32: qt4_win32
 	(cd qt4;mkdir -p $(PREFIX)/bin; mkdir -p $(PREFIX)/include;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib)
 ifeq ($(BUILD),i686-pc-cygwin)
 	(cd qt4;cp bin/*.exe $(PREFIX)/bin)
@@ -1477,8 +1477,8 @@ else
 endif
 	touch $@
 
-CLEAN_FILE += .qt4
-CLEAN_PKG += qt4
+CLEAN_FILE += .qt4_win32
+CLEAN_PKG += qt4_win32
 DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
 
 # ***************************************************************************
@@ -1488,7 +1488,7 @@ DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
 qt-win-opensource-$(QT4T_VERSION)-mingw.exe:
 	wget $(QT4T_URL)
 
-Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
+Qt_win32: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 	mkdir Qt
 	7z -oQt x qt-win-opensource-$(QT4T_VERSION)-mingw.exe \$$OUTDIR/bin\ /bin \$$OUTDIR/bin\ /lib \$$OUTDIR/bin\ /include/QtCore \$$OUTDIR/bin\ /include/QtGui \$$OUTDIR/bin\ /src/gui \$$OUTDIR/bin\ /src/corelib \$$OUTDIR/bin\ /translations
 	mv Qt/\$$OUTDIR/bin\ /* Qt/ && rmdir Qt/\$$OUTDIR/bin\  Qt/\$$OUTDIR
@@ -1500,7 +1500,7 @@ Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtCore.pc.in > Qt/lib/pkgconfig/QtCore.pc
 	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtGui.pc.in > Qt/lib/pkgconfig/QtGui.pc
 
-.Qt: Qt
+.Qt_win32: Qt_win32
 	mkdir -p $(PREFIX)/bin $(PREFIX)/include/qt4/src $(PREFIX)/lib/pkgconfig $(PREFIX)/share/qt4/translations
 	cp Qt/bin/moc.exe Qt/bin/rcc.exe Qt/bin/uic.exe $(PREFIX)/bin
 	cp -r Qt/include/QtCore Qt/include/QtGui $(PREFIX)/include/qt4
@@ -1510,8 +1510,8 @@ Qt: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 	cp Qt/translations/* $(PREFIX)/share/qt4/translations 
 	touch $@
 
-CLEAN_FILE += .Qt
-CLEAN_PKG += Qt
+CLEAN_FILE += .Qt_win32
+CLEAN_PKG += Qt_win32
 DISTCLEAN_PKG += qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 
 # ***************************************************************************

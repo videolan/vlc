@@ -4,7 +4,7 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .flac .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
         .live .goom2k4 .caca .mod .x264  .xml .twolame \
         .png .gpg-error .gcrypt .gnutls .mpcdec \
-        .dvdnav .dvbpsi .wxwidgets .qt4 .dirac .SDL_image \
+        .dvdnav .dvbpsi .wxwidgets .qt4_win32 .dirac .SDL_image \
         .dx_headers .dshow_headers .gecko-win32 .unicows .dca \
         .lua .tag .fontconfig .portaudio \
         .aclocal
