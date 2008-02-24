@@ -304,21 +304,30 @@
 
 -(void)hideDialog
 {
-    msg_Dbg( p_intf, "hide event" );
+    msg_Dbg( p_intf, "hide event %p", self );
     if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
     {
-        [NSApp endSheet: o_prog_win];
-        [o_prog_win close];
+        if(![o_prog_win isVisible])
+        {
+            [NSApp endSheet: o_prog_win];
+            [o_prog_win close];
+        }
     }
     if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
-        [NSApp endSheet: o_auth_win];
-        [o_auth_win close];
+        if(![o_auth_win isVisible])
+        {
+            [NSApp endSheet: o_auth_win];
+            [o_auth_win close];
+        }
     }
     if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
-        [NSApp endSheet: o_input_win];
-        [o_input_win close];
+        if(![o_input_win isVisible])
+        {
+            [NSApp endSheet: o_input_win];
+            [o_input_win close];
+        }
     }
     if( p_dialog->i_flags & DIALOG_INTF_PROGRESS )
     {
