@@ -25,6 +25,7 @@
   - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/testing/vlc-X.X.X/
   - generate md5 hashes and gpg signature of these files
+    (use gpg --sign --detach --armor --force-v3-sigs)
 
  * Contribs
   - Put a copy of the libraries or svn snapshot in vlc-X.X.X/contrib
@@ -37,6 +38,7 @@
     Build in the "buildbeos" chroot on altair.
     # add the .zip files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/beos/
    generate md5 hashes and gpg signature of these files
+   (use gpg --sign --detach --armor --force-v3-sigs)
 
  * Win32 Packages
     make the packages using the nightly builds configure/options/... , don't forget --enable-update-check
@@ -44,10 +46,12 @@
     kind of suxxs)
     add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
    generate md5 hashes and gpg signature of these files
+   (use gpg --sign --detach --armor --force-v3-sigs)
 
  * OS X packages
    configure with --enable-update-check
    generate md5 hashes and gpg signature of these files
+   (use gpg --sign --detach --armor --force-v3-sigs)
 
  * Commit changes ... it never works the first time
 

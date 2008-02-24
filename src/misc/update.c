@@ -22,7 +22,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
+/*
+ * XXX: should use v4 signatures for binary files (already used for public key)
+ */
 /**
  *   \file
  *   This file contains functions related to VLC update management
@@ -414,7 +416,12 @@ static int download_signature(  vlc_object_t *p_this,
     int i_bytes = pgp_unarmor( p_buf, i_size, (uint8_t*)p_sig, 65 );
     free( p_buf );
 
-    if( i_bytes > 65 )
+    if( i_bytes == 0 )
+    {
+        msg_Dbg( p_this, "Unarmoring failed" );
+        return VLC_EGENERIC;
+    }
+    else if( i_bytes > 65 )
     {
         msg_Dbg( p_this, "Signature is too big: %d bytes", i_bytes );
         return VLC_EGENERIC;
@@ -424,7 +431,8 @@ static int download_signature(  vlc_object_t *p_this,
         int i_r_len = mpi_len( p_sig->r );
         if( i_r_len > 20 )
         {
-            msg_Dbg( p_this, "Signature invalid" );
+            msg_Dbg( p_this, "Invalid signature, r number too big: %d bytes",
+                                i_r_len );
             return VLC_EGENERIC;
         }
         else if( i_r_len < 20 )
@@ -667,8 +675,10 @@ static uint8_t *hash_sha1_from_file( const char *psz_file,
     fclose( f );
     gcry_md_final( hd );
 
-    uint8_t *p_hash = (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1);
-    p_hash = strdup( p_hash );
+    uint8_t *p_tmp = (uint8_t*) gcry_md_read( hd, GCRY_MD_SHA1);
+    uint8_t *p_hash = malloc( 20 );
+    if( p_hash )
+        memcpy( p_hash, p_tmp, 20 );
     gcry_md_close( hd );
     return p_hash;
 }
@@ -801,16 +811,19 @@ static uint8_t *key_sign_hash( public_key_t *p_pkey )
 
     gcry_md_final( hd );
 
-    uint8_t *p_hash = gcry_md_read( hd, GCRY_MD_SHA1);
+    uint8_t *p_tmp = gcry_md_read( hd, GCRY_MD_SHA1);
 
-    if( p_hash[0] != p_pkey->sig.hash_verification[0] ||
-        p_hash[1] != p_pkey->sig.hash_verification[1] )
+    if( !p_tmp ||
+        p_tmp[0] != p_pkey->sig.hash_verification[0] ||
+        p_tmp[1] != p_pkey->sig.hash_verification[1] )
     {
         gcry_md_close( hd );
         return NULL;
     }
 
-    p_hash = strdup( p_hash );
+    uint8_t *p_hash = malloc( 20 );
+    if( p_hash )
+        memcpy( p_hash, p_tmp, 20 );
     gcry_md_close( hd );
     return p_hash;
 }
