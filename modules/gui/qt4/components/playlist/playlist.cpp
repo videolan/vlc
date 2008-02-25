@@ -42,8 +42,10 @@
  * Playlist Widget. The embedded playlist
  **********************************************************************/
 
-PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidget *_parent ) :
-                                p_intf ( _p_i ), parent( _parent )
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
+                                QSettings *settings,
+                                QWidget *_parent )
+               : p_intf ( _p_i ), parent( _parent )
 {
     /* Left Part and design */
     QSplitter *leftW = new QSplitter( Qt::Vertical, this );
@@ -52,8 +54,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     selector = new PLSelector( this, p_intf, THEPL );
     leftW->addWidget( selector );
 
+    /* Create a Container for the Art Label
+       in order to have a beautiful resizing for the selector above it */
     QWidget *artContainer = new QWidget;
     QHBoxLayout *artContLay = new QHBoxLayout( artContainer );
+    artContLay->setMargin( 0 );
+    artContLay->setSpacing( 0 );
+    artContainer->setMaximumHeight( 128 );
 
     /* Art label */
     art = new ArtLabel;
@@ -64,6 +71,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     art->setScaledContents( true );
     art->setPixmap( QPixmap( ":/noart.png" ) );
     art->setToolTip( qtr( "Double click to get the media informations" ) );
+
     artContLay->addWidget( art, 1 );
 
     leftW->addWidget( artContainer );
@@ -83,13 +91,15 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     connect( selector, SIGNAL( activated( int ) ),
              this, SIGNAL( rootChanged( int ) ) );
 
-    CONNECT( THEMIM->getIM(), artChanged( QString ) , this, setArt( QString ) );
     /* Forward removal requests from the selector to the main panel */
     CONNECT( qobject_cast<PLSelector *>( selector )->model,
              shouldRemove( int ),
              qobject_cast<StandardPLPanel *>( rightPanel ), removeItem( int ) );
 
     emit rootChanged( p_root->i_id );
+
+    /* art */
+    CONNECT( THEMIM->getIM(), artChanged( QString ) , this, setArt( QString ) );
 
     /* Add the two sides of the QSplitter */
     addWidget( leftW );
@@ -98,7 +108,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
     QList<int> sizeList;
     sizeList << 180 << 420 ;
     setSizes( sizeList );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
+    //setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
     setStretchFactor( 0, 0 );
     setStretchFactor( 1, 3 );
     leftW->setMaximumWidth( 250 );
@@ -114,7 +124,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QSettings *settings, QWidge
 
 void PlaylistWidget::setArt( QString url )
 {
-    if( url.isNull() )
+    if( url.isEmpty() )
     {
         art->setPixmap( QPixmap( ":/noart.png" ) );
     }

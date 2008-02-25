@@ -27,6 +27,7 @@
 
 #include "components/playlist/selector.hpp"
 #include "qt4.hpp"
+
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QTreeView>
