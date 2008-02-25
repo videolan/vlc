@@ -42,6 +42,7 @@
  **************************************************************************/
 void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
+    (void)p_instance;(void)p_e;
     /* Will certainly be used to install libvlc_instance event */
 }
 
@@ -52,6 +53,7 @@ void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
  **************************************************************************/
 void libvlc_event_fini( libvlc_instance_t *p_instance )
 {
+    (void)p_instance;
 }
 
 /**************************************************************************
@@ -75,7 +77,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
     p_em->p_obj = p_obj;
     p_em->p_libvlc_instance = p_libvlc_inst;
     libvlc_retain( p_libvlc_inst );
-    ARRAY_INIT( p_em->listeners_groups );
+    vlc_array_init( &p_em->listeners_groups );
     vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->object_lock );
     vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->event_sending_lock );
     return p_em;
@@ -88,21 +90,23 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
  **************************************************************************/
 void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
 {
-    libvlc_event_listeners_group_t * listeners_group;
-    libvlc_event_listener_t * listener;
+    libvlc_event_listeners_group_t * p_lg;
+    int i,j ;
 
     vlc_mutex_destroy( &p_em->event_sending_lock );
     vlc_mutex_destroy( &p_em->object_lock );
 
-    FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
-        FOREACH_ARRAY( listener, listeners_group->listeners )
-            free( listener );
-        FOREACH_END()
-        ARRAY_RESET( listeners_group->listeners );
-        free( listeners_group );
-    FOREACH_END()
-    ARRAY_RESET( p_em->listeners_groups );
+    for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
+    {
+        p_lg = vlc_array_item_at_index( &p_em->listeners_groups, i );
 
+        for( j = 0; j < vlc_array_count(&p_lg->listeners); j++)
+            free( vlc_array_item_at_index( &p_em->listeners_groups, i ) );
+
+        vlc_array_clear( &p_lg->listeners );
+        free( p_lg );
+    }
+    vlc_array_clear( &p_em->listeners_groups );
     libvlc_release( p_em->p_libvlc_instance );
     free( p_em );
 }
@@ -126,10 +130,10 @@ void libvlc_event_manager_register_event_type(
     }
 
     listeners_group->event_type = event_type;
-    ARRAY_INIT( listeners_group->listeners );
+    vlc_array_init( &listeners_group->listeners );
 
     vlc_mutex_lock( &p_em->object_lock );
-    ARRAY_APPEND( p_em->listeners_groups, listeners_group );
+    vlc_array_append( &p_em->listeners_groups, listeners_group );
     vlc_mutex_unlock( &p_em->object_lock );
 }
 
@@ -153,14 +157,16 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     /* Here a read/write lock would be nice */
 
     vlc_mutex_lock( &p_em->object_lock );
-    FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
+    for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
+    {
+        listeners_group = vlc_array_item_at_index(&p_em->listeners_groups, i);
         if( listeners_group->event_type == p_event->type )
         {
-            if( listeners_group->listeners.i_size <= 0 )
+            if( vlc_array_count( &listeners_group->listeners ) <= 0 )
                 break;
 
             /* Cache a copy of the listener to avoid locking issues */
-            i_cached_listeners = listeners_group->listeners.i_size;
+            i_cached_listeners = vlc_array_count(&listeners_group->listeners);
             array_listeners_cached = malloc(sizeof(libvlc_event_listener_t)*(i_cached_listeners));
             if( !array_listeners_cached )
             {
@@ -169,13 +175,15 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             }
 
             listener_cached = array_listeners_cached;
-            FOREACH_ARRAY( listener, listeners_group->listeners )
-                memcpy( listener_cached, listener, sizeof(libvlc_event_listener_t));
+            for( i = 0; i < vlc_array_count(&listeners_group->listeners); i++)
+            {
+                listener = vlc_array_item_at_index(&listeners_group->listeners, i);
+                memcpy( listener_cached, listener, sizeof(libvlc_event_listener_t) );
                 listener_cached++;
-            FOREACH_END()
+            }
             break;
         }
-    FOREACH_END()
+    }
 
     vlc_mutex_unlock( &p_em->object_lock );
 
@@ -261,6 +269,8 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
 {
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
+    int i;
+
     listener = malloc(sizeof(libvlc_event_listener_t));
     if( !listener )
     {
@@ -273,14 +283,16 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
     listener->pf_callback = pf_callback;
 
     vlc_mutex_lock( &p_event_manager->object_lock );
-    FOREACH_ARRAY( listeners_group, p_event_manager->listeners_groups )
+    for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++ )
+    {
+        listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
         if( listeners_group->event_type == listener->event_type )
         {
-            ARRAY_APPEND( listeners_group->listeners, listener );
+            vlc_array_append( &listeners_group->listeners, listener );
             vlc_mutex_unlock( &p_event_manager->object_lock );
             return;
         }
-    FOREACH_END()
+    }
     vlc_mutex_unlock( &p_event_manager->object_lock );
 
     free(listener);
@@ -318,31 +330,34 @@ void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
 {
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
+    int i;
 
     if( lockstate == libvlc_UnLocked )
         vlc_mutex_lock( &p_event_manager->event_sending_lock );
     vlc_mutex_lock( &p_event_manager->object_lock );
-    FOREACH_ARRAY( listeners_group, p_event_manager->listeners_groups )
+    for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++)
+    {
+        listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
         if( listeners_group->event_type == event_type )
         {
-            FOREACH_ARRAY( listener, listeners_group->listeners )
+            for( i = 0; i < vlc_array_count(&listeners_group->listeners); i++)
+            {
+                listener = vlc_array_item_at_index(&listeners_group->listeners, i);
                 if( listener->event_type == event_type &&
                     listener->pf_callback == pf_callback &&
                     listener->p_user_data == p_user_data )
                 {
                     /* that's our listener */
                     free( listener );
-                    ARRAY_REMOVE( listeners_group->listeners,
-                        fe_idx /* This comes from the macro (and that's why
-                                  I hate macro) */ );
+                    vlc_array_remove( &listeners_group->listeners, i );
                     vlc_mutex_unlock( &p_event_manager->object_lock );
                     if( lockstate == libvlc_UnLocked )
                         vlc_mutex_unlock( &p_event_manager->event_sending_lock );
                     return;
                 }
-            FOREACH_END()
+            }
         }
-    FOREACH_END()
+    }
     vlc_mutex_unlock( &p_event_manager->object_lock );
     if( lockstate == libvlc_UnLocked )
         vlc_mutex_unlock( &p_event_manager->event_sending_lock );
