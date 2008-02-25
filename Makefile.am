@@ -313,14 +313,16 @@ qvlc: make-alias
 nvlc: make-alias
 	$(MKALIAS) ncurses
 
-noinst_SCRIPTS = vlc
+#noinst_SCRIPTS = vlc
 
-vlc: core
-	rm -f -- vlc vlc.tmp
-	echo '#! /bin/sh' > vlc.tmp
-	echo 'exec "$$(dirname "$$0")/src/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
-	chmod +x vlc.tmp
-	mv -f -- vlc.tmp vlc
+vlc$(EXEEXT): core
+	rm -f vlc
+	ln -s src/vlc$(EXEEXT)
+#	rm -f -- vlc vlc.tmp
+#	echo '#! /bin/sh' > vlc.tmp
+#	echo 'exec "$$(dirname "$$0")/src/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
+#	chmod +x vlc.tmp
+#	mv -f -- vlc.tmp vlc
 
 if HAVE_DARWIN
 # Create the MacOS X app
