@@ -1,8 +1,56 @@
+###########################################################
+# System Includes
+###########################################################
 include( CheckIncludeFile )
 include (CheckTypeSize)
 include (CheckCSourceCompiles)
 include (CheckSymbolExists)
 include (CheckLibraryExists)
+
+###########################################################
+# Options
+###########################################################
+# Options moved before the custom macro includes because those macros need path values, if the ENABLE_CONTRIB
+# has been set.
+
+OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
+OPTION( ENABLE_VLM             "Enable vlm" ON )
+OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
+OPTION( UPDATE_CHECK           "Enable automatic new version checking" OFF )
+OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" OFF )
+OPTION( ENABLE_CONTRIB         "Attempt to use VLC contrib system to get the third-party libraries" ON )
+
+if(ENABLE_CONTRIB)
+
+  set( CONTRIB_INCLUDE ${CMAKE_SOURCE_DIR}/extras/contrib/include)
+  set( CONTRIB_LIB ${CMAKE_SOURCE_DIR}/extras/contrib/lib)
+  set( CONTRIB_PROGRAM ${CMAKE_SOURCE_DIR}/extras/contrib/bin)
+  set( CMAKE_LIBRARY_PATH ${CONTRIB_LIB} ${CMAKE_LIBRARY_PATH} )
+  set( CMAKE_PROGRAM_PATH ${CONTRIB_PROGRAM} ${CMAKE_PROGRAM_PATH} )
+  set( CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_MODULE_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
+  set( CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
+
+  # include extras/contrib/include in the header search pathes
+  include_directories(${CONTRIB_INCLUDE})
+  set( CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${CONTRIB_INCLUDE} )
+  
+  # include the extras/contrib/bin to the search path, otherwise, when finding programs it will automatically
+  # default to system applications (e.g. we should favor the extras/contrib/bin/pkg-config over the system defined
+  # one).
+  if(WIN32)
+    set( ENV{PATH} "${CONTRIB_PROGRAM};$ENV{PATH}" )
+  else(WIN32)
+    set( ENV{PATH} "${CONTRIB_PROGRAM}:$ENV{PATH}" )
+  endif(WIN32)
+endif(ENABLE_CONTRIB)
+
+###########################################################
+# Custom Macro Includes
+###########################################################
 
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_include_files.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_functions_exist.cmake )
@@ -11,7 +59,7 @@ include( ${CMAKE_SOURCE_DIR}/cmake/vlc_check_type.cmake )
 include( ${CMAKE_SOURCE_DIR}/cmake/pkg_check_modules.cmake )
 
 ###########################################################
-# VERSION
+# Versioning
 ###########################################################
 
 set(VLC_VERSION_MAJOR 0)
@@ -32,14 +80,8 @@ set(PACKAGE_VERSION_MINOR "${VLC_VERSION_MINOR}")
 set(PACKAGE_VERSION_REVISION "${VLC_VERSION_PATCH}")
 
 ###########################################################
-# Options
+# Preflight Checks
 ###########################################################
-
-OPTION( ENABLE_HTTPD           "Enable httpd server" ON )
-OPTION( ENABLE_VLM             "Enable vlm" ON )
-OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
-OPTION( UPDATE_CHECK           "Enable automatic new version checking" OFF )
-OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" OFF )
 
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING  "build type determining compiler flags" FORCE )
@@ -83,6 +125,7 @@ find_package (Threads)
 ###########################################################
 # Functions/structures checks
 ###########################################################
+
 set(CMAKE_REQUIRED_LIBRARIES c)
 set(CMAKE_EXTRA_INCLUDE_FILES string.h)
 vlc_check_functions_exist(strcpy strcasecmp)
@@ -201,11 +244,13 @@ endif(NOT HAVE_CONNECT)
 ###########################################################
 # Other check
 ###########################################################
+
 include( ${CMAKE_SOURCE_DIR}/cmake/vlc_test_inline.cmake )
 
 ###########################################################
 # Platform check
 ###########################################################
+
 if(APPLE)
     include( ${CMAKE_SOURCE_DIR}/cmake/vlc_find_frameworks.cmake )
 
@@ -319,7 +364,6 @@ command_to_configvar( "${CMAKE_C_COMPILER} --version" VLC_COMPILER )
 command_to_configvar( "${CMAKE_C_COMPILER} --version" CONFIGURE_LINE )
 set( VLC_COMPILER "${CMAKE_C_COMPILER}" )
 
-
 ###########################################################
 # Modules: Following are all listed in options
 ###########################################################
@@ -369,23 +413,8 @@ vlc_disable_modules(motion)
 ###########################################################
 # libraries
 ###########################################################
-OPTION( ENABLE_CONTRIB "Attempt to use VLC contrib system to get the third-party libraries" ON )
-if(ENABLE_CONTRIB)
-  set( CONTRIB_INCLUDE ${CMAKE_SOURCE_DIR}/extras/contrib/include)
-  set( CONTRIB_LIB ${CMAKE_SOURCE_DIR}/extras/contrib/lib)
-  set( CONTRIB_PROGRAM ${CMAKE_SOURCE_DIR}/extras/contrib/bin)
-  set( CMAKE_LIBRARY_PATH ${CONTRIB_LIB} ${CMAKE_LIBRARY_PATH} )
-  set( CMAKE_PROGRAM_PATH ${CONTRIB_PROGRAM} ${CMAKE_PROGRAM_PATH} )
-  set( CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_SHARED_MODULE_CREATE_C_FLAGS "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -L${CONTRIB_LIB}" )
-  set( CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -L${CONTRIB_LIB}" )
-  add_definitions(-I${CONTRIB_INCLUDE})
-endif(ENABLE_CONTRIB)
 
-set(CMAKE_REQUIRED_INCLUDES ${CONTRIB_INCLUDE})
+include_directories(${CONTRIB_INCLUDE})
 
 #fixme: use find_package(cddb 0.9.5)
 pkg_check_modules(LIBCDDB libcddb>=0.9.5)
@@ -417,6 +446,11 @@ endif (${ALSA_FOUND})
 
 find_package(FFmpeg)
 if(FFmpeg_FOUND)
+  set( CMAKE_REQUIRED_FLAGS_saved ${CMAKE_REQUIRED_FLAGS} )
+  set( CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${FFmpeg_CFLAGS}" )
+  
+  #set( CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${CONTRIB_INCLUDE}/ffmpeg )
+  
   vlc_check_include_files (ffmpeg/avcodec.h)
   vlc_check_include_files (ffmpeg/avutil.h)
   vlc_check_include_files (ffmpeg/swscale.h)
@@ -424,6 +458,9 @@ if(FFmpeg_FOUND)
   vlc_enable_modules(ffmpeg)
   vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS} )
   vlc_module_add_link_libraries(ffmpeg ${FFmpeg_LIBRARIES})
+  
+  set( CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_saved} )
+  set( CMAKE_REQUIRED_FLAGS_saved )
 endif(FFmpeg_FOUND)
 
 find_package(Lua)
@@ -529,16 +566,14 @@ endif(Mpeg2_FOUND)
 find_package(Dvbpsi)
 if(Dvbpsi_FOUND)
   vlc_enable_modules(ts)
-  set(CMAKE_REQUIRED_INCLUDES ${CONTRIB_INCLUDE})
   check_include_files ("stdint.h;dvbpsi/dvbpsi.h;dvbpsi/demux.h;dvbpsi/descriptor.h;dvbpsi/pat.h;dvbpsi/pmt.h;dvbpsi/sdt.h;dvbpsi/dr.h" HAVE_DVBPSI_DR_H)
   vlc_module_add_link_libraries(ts ${Dvbpsi_LIBRARIES})
 endif(Dvbpsi_FOUND)
-
-
 
 set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
 # Final configuration
 ###########################################################
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
