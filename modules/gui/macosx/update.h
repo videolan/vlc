@@ -53,7 +53,7 @@
 
 - (void)showUpdateWindow;
 - (void)checkForUpdate;
-- (void)updateManagement: (vlc_bool_t) b_success;
+- (void)setUpToDate: (BOOL)uptodate;
 - (void)performDownload:(NSString *)path;
 
 + (VLCUpdate *)sharedInstance;

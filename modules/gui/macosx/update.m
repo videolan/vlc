@@ -167,12 +167,11 @@ static VLCUpdate *_o_sharedInstance = nil;
     [self setShouldCheckUpdate: [sender state]];
 }
 
-- (void)updateManagement:(vlc_bool_t)b_success
+- (void)setUpToDate:(BOOL)uptodate
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-    if( !b_success ||
-        update_CompareReleaseToCurrent( p_u ) != UpdateReleaseStatusNewer )
+    if( uptodate )
     {
         [o_fld_status setStringValue: _NS("This version of VLC is the latest available.")];
         [o_btn_DownloadNow setEnabled: NO];
@@ -196,7 +195,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 static void updateCallback( void * p_data, vlc_bool_t b_success )
 {
-    [(id)p_data updateManagement: b_success];
+    [(id)p_data setUpToDate: b_success && update_CompareReleaseToCurrent( ((VLCUpdate*)p_data)->p_u ) == UpdateReleaseStatusNewer ];
 }
 
 - (void)checkForUpdate
