@@ -51,7 +51,9 @@
 #include <QLabel>
 #include <QSlider>
 #include <QWidgetAction>
+#if 0
 #include <QDockWidget>
+#endif
 #include <QToolBar>
 #include <QGroupBox>
 #include <QDate>
@@ -902,6 +904,7 @@ void MainInterface::setName( QString name )
 
 void MainInterface::setStatus( int status )
 {
+    msg_Dbg( p_intf, "I was here, updating your status" );
     /* Forward the status to the controls to toggle Play/Pause */
     controls->setStatus( status );
 

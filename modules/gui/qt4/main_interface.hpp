@@ -48,7 +48,7 @@ class ControlsWidget;
 class SpeedControlWidget;
 class QMenu;
 class QSize;
-class QDockWidet;
+//class QDockWidet;
 class QProgressBar;
 
 enum{
@@ -121,7 +121,7 @@ private:
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
-    QDockWidget         *dockPL;
+//    QDockWidget         *dockPL;
 
     bool                 videoIsActive; ///< Having a video now / THEMIM->hasV
     bool                 videoEmbeddedFlag; ///< Want an external Video Window
