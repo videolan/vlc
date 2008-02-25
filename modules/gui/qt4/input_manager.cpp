@@ -60,9 +60,12 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
     i_old_playing_status = END_S;
-    old_name = "";
-    p_input = NULL;
-    i_rate = 0;
+    b_had_audio  = b_had_video = b_has_audio = b_has_video = false;
+    old_name     = "";
+    artUrl       = "";
+    p_input      = NULL;
+    i_rate       = 0;
+    i_input_id   = 0;
 }
 
 InputManager::~InputManager()
@@ -84,7 +87,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         emit statusChanged( PLAYING_S );
         UpdateMeta();
         UpdateTracks();
-        UpdateTitle();
+        UpdateNavigation();
         UpdateArt();
         addCallbacks();
         i_input_id = input_GetItem( p_input )->i_id;
@@ -169,11 +172,12 @@ void InputManager::customEvent( QEvent *event )
          type != ItemStateChanged_Type )
         return;
 
-    if( !p_input || p_input->b_die || p_input->b_dead )
-        return;
+    if( !hasInput() ) return;
+
     if( ( type != PositionUpdate_Type && type != ItemRateChanged_Type ) &&
         ( i_input_id != ple->i_id ) )
         return;
+
     if( type != PositionUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", type );
 
@@ -185,20 +189,21 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemChanged_Type:
         UpdateMeta();
+        UpdateNavigation();
         UpdateTracks();
-        UpdateTitle();
+        UpdateStatus();
         UpdateArt();
         break;
     case ItemRateChanged_Type:
         UpdateRate();
         break;
     case ItemTitleChanged_Type:
-        UpdateTitle();
+        UpdateNavigation();
         UpdateMeta();
         break;
     case ItemStateChanged_Type:
-        UpdateStatus();
         UpdateTracks();
+        UpdateStatus();
         break;
     }
 }
@@ -214,7 +219,7 @@ void InputManager::UpdatePosition()
     emit positionUpdated( f_pos, i_time, i_length );
 }
 
-void InputManager::UpdateTitle()
+void InputManager::UpdateNavigation()
 {
     /* Update navigation status */
     vlc_value_t val; val.i_int = 0;

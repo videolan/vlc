@@ -36,12 +36,12 @@
 #include <QObject>
 #include <QEvent>
 
-static int const PositionUpdate_Type = QEvent::User + IMEventType + 1;
-static int const ItemChanged_Type = QEvent::User + IMEventType + 2;
+static int const PositionUpdate_Type   = QEvent::User + IMEventType + 1;
+static int const ItemChanged_Type      = QEvent::User + IMEventType + 2;
 static int const ItemStateChanged_Type = QEvent::User + IMEventType + 3;
 static int const ItemTitleChanged_Type = QEvent::User + IMEventType + 4;
-static int const ItemRateChanged_Type = QEvent::User + IMEventType + 5;
-static int const VolumeChanged_Type = QEvent::User + IMEventType + 6;
+static int const ItemRateChanged_Type  = QEvent::User + IMEventType + 5;
+static int const VolumeChanged_Type    = QEvent::User + IMEventType + 6;
 
 class IMEvent : public QEvent
 {
@@ -65,17 +65,8 @@ public:
     bool hasAudio() { return b_has_audio; }
     bool hasVideo() { return b_has_video; }
     bool b_has_audio, b_has_video, b_had_audio, b_had_video;
+
 private:
-    void customEvent( QEvent * );
-    void addCallbacks();
-    void delCallbacks();
-    void UpdateRate();
-    void UpdateMeta();
-    void UpdateStatus();
-    void UpdateTitle();
-    void UpdatePosition();
-    void UpdateTracks();
-    void UpdateArt();
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
     int             i_input_id;
@@ -83,10 +74,22 @@ private:
     QString         old_name;
     QString         artUrl;
     int             i_rate;
+
+    void customEvent( QEvent * );
+    void addCallbacks();
+    void delCallbacks();
+    void UpdateRate();
+    void UpdateMeta();
+    void UpdateStatus();
+    void UpdateNavigation();
+    void UpdatePosition();
+    void UpdateTracks();
+    void UpdateArt();
+
 public slots:
-    void togglePlayPause();
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
+    void togglePlayPause();
     void slower();
     void faster();
     void normalRate();
@@ -99,6 +102,7 @@ public slots:
     void telexToggle( bool );
     void telexSetTransparency( bool );
 #endif
+
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
@@ -106,12 +110,12 @@ signals:
     void nameChanged( QString );
     /// Used to signal whether we should show navigation buttons
     void navigationChanged( int );
-#ifdef ZVBI_COMPILED
-    void teletextEnabled( bool );
-#endif
     /// Play/pause status
     void statusChanged( int );
     void artChanged( QString );
+#ifdef ZVBI_COMPILED
+    void teletextEnabled( bool );
+#endif
 };
 
 class MainInputManager : public QObject
@@ -129,24 +133,24 @@ public:
         if( instance ) delete instance;
     }
     virtual ~MainInputManager();
+
     input_thread_t *getInput() { return p_input; };
     InputManager *getIM() { return im; };
 
 private:
-    void customEvent( QEvent * );
     MainInputManager( intf_thread_t * );
+    void customEvent( QEvent * );
 
     InputManager            *im;
-    intf_thread_t           *p_intf;
     input_thread_t          *p_input;
+
+    intf_thread_t           *p_intf;
     static MainInputManager *instance;
 public slots:
     void togglePlayPause();
     void stop();
     void next();
     void prev();
-private slots:
-    //void updateInput();
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();
