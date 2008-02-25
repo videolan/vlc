@@ -28,12 +28,12 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_httpd.h>
 
 #ifdef ENABLE_HTTPD
 
 #include <assert.h>
 
-#include <vlc_httpd.h>
 #include <vlc_network.h>
 #include <vlc_tls.h>
 #include <vlc_acl.h>
@@ -2578,14 +2578,17 @@ static void httpd_HostThread( httpd_host_t *host )
 #else /* ENABLE_HTTPD */
 
 /* We just define an empty wrapper */
-httpd_host_t *httpd_TLSHostNew( vlc_object_t *a, char *b, int c,
-                                tls_server_t *d )
+httpd_host_t *httpd_TLSHostNew( vlc_object_t *a, const char *b, 
+                                int c,
+                                const char *e, const char *f,
+                                const char *g, const char* h)
 {
     msg_Err( a, "HTTP daemon support is disabled" );
     return NULL;
 }
 
-httpd_host_t *httpd_HostNew( vlc_object_t *a, char *b, int c )
+httpd_host_t *httpd_HostNew( vlc_object_t *a, const char *b,
+                             int c )
 {
     msg_Err( a, "HTTP daemon support is disabled" );
     return NULL;
@@ -2595,15 +2598,15 @@ void httpd_HostDelete( httpd_host_t *a )
 {
 }
 
-httpd_url_t *httpd_UrlNew( httpd_host_t *host, char *psz_url,
-                           char *psz_user, char *psz_password,
+httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
+                           const char *psz_user, const char *psz_password,
                            const vlc_acl_t *p_acl )
 {
     return NULL;
 }
 
-httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, char *psz_url,
-                                 char *psz_user, char *psz_password,
+httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
+                                 const char *psz_user, const char *psz_password,
                                  const vlc_acl_t *p_acl )
 {
     return NULL;
@@ -2619,12 +2622,12 @@ void httpd_UrlDelete( httpd_url_t *a )
 {
 }
 
-char* httpd_ClientIP( httpd_client_t *cl, char *psz_ip )
+char* httpd_ClientIP( const httpd_client_t *cl, char *psz_ip )
 {
     return NULL;
 }
 
-char* httpd_ServerIP( httpd_client_t *cl, char *psz_ip )
+char* httpd_ServerIP( const httpd_client_t *cl, char *psz_ip )
 {
     return NULL;
 }
@@ -2637,13 +2640,16 @@ void httpd_ClientModeBidir( httpd_client_t *a )
 {
 }
 
-void httpd_FileDelete( httpd_file_t *a )
+httpd_file_sys_t *httpd_FileDelete( httpd_file_t *file )
 {
+        return NULL;
 }
 
-httpd_file_t *httpd_FileNew( httpd_host_t *a, char *b, char *c, char *d,
-                             char *e, httpd_file_callback_t f,
-                             httpd_file_sys_t *g )
+httpd_file_t *httpd_FileNew( httpd_host_t *host,
+                             const char *psz_url, const char *psz_mime,
+                             const char *psz_user, const char *psz_password,
+                             const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill,
+                             httpd_file_sys_t *p_sys )
 {
     return NULL;
 }
@@ -2658,16 +2664,17 @@ httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
     return NULL;
 }
 
-void httpd_HandlerDelete( httpd_handler_t *handler )
+httpd_handler_sys_t *httpd_HandlerDelete( httpd_handler_t *handler )
 {
+        return NULL;
 }
 
 void httpd_RedirectDelete( httpd_redirect_t *a )
 {
 }
 
-httpd_redirect_t *httpd_RedirectNew( httpd_host_t *a,
-                                     char *b, char *c )
+httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, const char *psz_url_dst,
+                                     const char *psz_url_src )
 {
     return NULL;
 }
@@ -2686,8 +2693,10 @@ int httpd_StreamSend ( httpd_stream_t *a, uint8_t *b, int c )
     return 0;
 }
 
-httpd_stream_t *httpd_StreamNew( httpd_host_t *a, char *b, char *c,
-                                 char *d, char *e )
+httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
+                                 const char *psz_url, const char *psz_mime,
+                                 const char *psz_user, const char *psz_password,
+                                 const vlc_acl_t *p_acl )
 {
     return NULL;
 }
@@ -2700,7 +2709,7 @@ void httpd_MsgAdd  ( httpd_message_t *a, const char *b, const char *c, ... )
 {
 }
 
-const char *httpd_MsgGet ( httpd_message_t *a, const char *b )
+const char *httpd_MsgGet( const httpd_message_t *msg, const char *name )
 {
     return "";
 }
