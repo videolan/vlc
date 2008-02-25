@@ -81,12 +81,20 @@ static const char * ppsz_event_type_to_name[] =
 #endif
 
 static vlc_bool_t
+listeners_are_equal( vlc_event_listener_t * listener1,
+                     vlc_event_listener_t * listener2 )
+{
+    return listener1->pf_callback == listener2->pf_callback &&
+           listener1->p_user_data == listener2->p_user_data;
+}
+
+static vlc_bool_t
 group_contains_listener( vlc_event_listeners_group_t * group,
                          vlc_event_listener_t * searched_listener )
 {
     vlc_event_listener_t * listener;
     FOREACH_ARRAY( listener, group->listeners )
-        if( searched_listener == listener )
+        if( listeners_are_equal(searched_listener, listener) )
             return VLC_TRUE;
     FOREACH_END()
     return VLC_FALSE;
