@@ -358,16 +358,22 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
     int i_delay = 0;
 
+    /* FIXME: ugly hack - we cannot use the message queue after
+         * msg_Destroy(). */
+    vlc_object_t *logger = p_this;
+    if( p_this->p_libvlc == p_this )
+        logger = NULL;
+
     if( p_this->i_children )
     {
-        msg_Err( p_this, "cannot delete object (%i, %s) with children" ,
+        msg_Err( logger, "cannot delete object (%i, %s) with children" ,
                  p_this->i_object_id, p_this->psz_object_name );
         return;
     }
 
     if( p_this->p_parent )
     {
-        msg_Err( p_this, "cannot delete object (%i, %s) with a parent",
+        msg_Err( logger, "cannot delete object (%i, %s) with a parent",
                  p_this->i_object_id, p_this->psz_object_name );
         return;
     }
@@ -379,21 +385,21 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         /* Don't warn immediately ... 100ms seems OK */
         if( i_delay == 2 )
         {
-            msg_Warn( p_this,
+            msg_Warn( logger,
                   "refcount is %u, delaying before deletion (id=%d,type=%d)",
                   p_priv->i_refcount, p_this->i_object_id,
                   p_this->i_object_type );
         }
         else if( i_delay == 10 )
         {
-            msg_Err( p_this,
+            msg_Err( logger,
                   "refcount is %u, delaying again (id=%d,type=%d)",
                   p_priv->i_refcount, p_this->i_object_id,
                   p_this->i_object_type );
         }
         else if( i_delay == 20 )
         {
-            msg_Err( p_this,
+            msg_Err( logger,
                   "waited too long, cancelling destruction (id=%d,type=%d)",
                   p_this->i_object_id, p_this->i_object_type );
             return;
