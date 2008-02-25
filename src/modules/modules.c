@@ -839,9 +839,9 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     /* Yes, there are two NULLs because we replace one with "plugin-path". */
 #if defined( WIN32 ) || defined( UNDER_CE )
-    const char *path[] = { "modules", "", "plugins", NULL, NULL };
+    const char *path[] = { "plugins", NULL, NULL };
 #else
-    const char *path[] = { "modules", PLUGIN_PATH, "plugins", NULL, NULL };
+    const char *path[] = { PLUGIN_PATH, NULL, NULL };
 #endif
 
     const char *const *ppsz_path;
