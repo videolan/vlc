@@ -68,7 +68,7 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/vldXvMC.h>
 
-#include "../../codec/xxmc/accel_xvmc.h"
+#include "../../codec/xvmc/accel_xvmc.h"
 #include "xcommon.h"
 #include "../../codec/spudec/spudec.h"
 #include <unistd.h>
