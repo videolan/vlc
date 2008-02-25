@@ -245,50 +245,15 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
 libvlc:
-	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
+	cd src && $(MAKE) $(AM_MAKEFLAGS) src/libvlc.la
 
-.PHONY: libvlc
+core: libvlc vlc$(EXEEXT)
 
-###############################################################################
-# Building vlc
-###############################################################################
-
-bin_PROGRAMS = vlc
-
-vlc_SOURCES = src/vlc.c
-# Ugly kludge so that automake defines $(CXXLINK)
-nodist_EXTRA_vlc_SOURCES = extras/analyser/zsh.cpp src/misc/darwin_specific.c
-
-vlc_DEPENDENCIES = $(DATA_win32_rc)
-
-vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL) `$(VLC_CONFIG) -libs vlc`
-vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-if !HAVE_PLUGINS
-vlc_LDFLAGS += `$(VLC_CONFIG) --target plugin | sed -e 's/\_plugin /_plugin.la /g'`
-endif
-
-vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-LIB_libvlc = libvlc.la
-LIBVLC = src/$(LIB_libvlc)
+.PHONY: libvlc core
 
 #To get some nice output
 nice:
 	$(top_builddir)/compile
-
-core: libvlc vlc$(EXEEXT)
-
-.PHONY: core
-
-vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
-	@rm -f vlc$(EXEEXT)
-	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
-	  c++) cmd="$(CXXLINK)" ;; \
-	  objc) cmd="$(OBJCLINK)" ;; \
-	  c|*) cmd="$(LINK)" ;; \
-	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)" ; \
-	echo $$cmd ; \
-	eval $$cmd
 
 if HAVE_BEOS
 noinst_DATA = vlc-bundle
@@ -615,15 +580,6 @@ VLC.app: vlc
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
 endif
-
-if HAVE_WIN32
-DATA_win32_rc = $(noinst_share_vlc_win32_rc_DATA)
-noinst_share_vlc_win32_rc_DATA = share/vlc_win32_rc.$(OBJEXT)
-noinst_share_vlc_win32_rcdir = $(libdir)
-share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
-	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir)/share -i $< -o $@
-endif
-
 
 ###############################################################################
 # Building architecture-specific binary packages

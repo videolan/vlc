@@ -129,6 +129,7 @@ modules/modules.c: modules/builtin.h
 	grep N: $(top_srcdir)/AUTHORS | cut -d" " -f 2- | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }' >> "$@.tmp"
 	echo ";" >> "$@.tmp"
 	mv -f -- "$@.tmp" "$@"
+
 ###############################################################################
 # Building libvlc
 ###############################################################################
@@ -371,6 +372,39 @@ misc/revision.c:
 	REVISION="$$(LANG=C svnversion "$(top_srcdir)" 2>/dev/null || echo exported)" ; \
 	echo "const char psz_vlc_changeset[] = \"$$REVISION\";" >> $@.tmp
 	mv -f $@.tmp $@
+
+
+###############################################################################
+# Building vlc
+###############################################################################
+
+bin_PROGRAMS = vlc
+# 
+vlc_SOURCES = vlc.c
+vlc_DEPENDENCIES = $(DATA_win32_rc)
+
+vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
+vlc_LDADD = $(DATA_win32_rc) libvlc.la $(LTLIBINTL) `$(VLC_CONFIG) -libs vlc`
+
+vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
+	@rm -f vlc$(EXEEXT)
+	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
+	  c++) cmd="$(CXXLINK)" ;; \
+	  objc) cmd="$(OBJCLINK)" ;; \
+	  c|*) cmd="$(LINK)" ;; \
+	esac ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)" ; \
+	echo $$cmd ; \
+	eval $$cmd
+
+if HAVE_WIN32
+DATA_win32_rc = $(noinst_share_vlc_win32_rc_DATA)
+noinst_DATA = vlc_win32_rc.$(OBJEXT)
+
+vlc_win32_rc.$(OBJEXT): $(top_srcdir)/share/vlc_win32_rc.rc
+	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir)/share -i $< -o $@
+endif
 
 ###############################################################################
 # Unit/regression test
