@@ -245,9 +245,10 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
 libvlc:
-	cd src && $(MAKE) $(AM_MAKEFLAGS) src/libvlc.la
+	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
 
-core: libvlc vlc$(EXEEXT)
+core:
+	cd src && $(MAKE) $(AM_MAKEFLAGS) vlc
 
 .PHONY: libvlc core
 
@@ -311,6 +312,15 @@ qvlc: make-alias
 
 nvlc: make-alias
 	$(MKALIAS) ncurses
+
+noinst_SCRIPTS = vlc
+
+vlc: core
+	rm -f -- vlc vlc.tmp
+	echo '#! /bin/sh' > vlc.tmp
+	echo 'exec "$$(dirname "$$0")/src/vlc$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
+	chmod +x vlc.tmp
+	mv -f -- vlc.tmp vlc
 
 if HAVE_DARWIN
 # Create the MacOS X app
