@@ -44,10 +44,6 @@ MACRO(vlc_set_module_properties module_name)
     set_target_properties(${module_name}_plugin ${ARGN})
 ENDMACRO(vlc_set_module_properties)
 
-MACRO(vlc_set_module_properties module_name)
-    set_target_properties(${module_name}_plugin ${ARGN})
-ENDMACRO(vlc_set_module_properties)
-
 MACRO(vlc_module_add_link_flags module_name)
     set(VLC_${module_name}_LINK_FLAGS ${VLC_${module_name}_LINK_FLAGS} ${ARGN})
 ENDMACRO(vlc_module_add_link_flags)
