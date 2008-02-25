@@ -224,7 +224,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
 
     if( ((code == mpeg2dec->xvmc_last_slice_code + 1 ||
         code == mpeg2dec->xvmc_last_slice_code)) &&
-        code <= mpeg2dec->xxmc_mb_pic_height )
+        (unsigned int)code <= mpeg2dec->xxmc_mb_pic_height )
     {
         /*
          * Send this slice to the output plugin. May stall for a long
@@ -246,7 +246,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
             mpeg2dec->xvmc_last_slice_code=-1;
             return;
         }
-        if (code == mpeg2dec->xxmc_mb_pic_height)
+        if ( (unsigned int)code == mpeg2dec->xxmc_mb_pic_height)
         {
             /*
              * We've encountered the last slice of this frame.
