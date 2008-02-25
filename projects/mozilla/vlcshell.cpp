@@ -52,7 +52,13 @@
 #undef X11_RESIZE_DEBUG
 
 #define WINDOW_TEXT "Video is loading..."
-#define CONTROL_HEIGHT 45
+
+#ifndef __MAX
+#   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
+#endif
+#ifndef __MIN
+#   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
+#endif
 
 /*****************************************************************************
  * Unix-only declarations
@@ -497,11 +503,11 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             int i_blackColor = BlackPixel(p_display, DefaultScreen(p_display));
 
             Window video = XCreateSimpleWindow( p_display, parent, 0, 0,
-                           window->width, window->height - CONTROL_HEIGHT, 0,
+                           window->width, window->height - p_plugin->i_control_height, 0,
                            i_blackColor, i_blackColor );
             Window controls = XCreateSimpleWindow( p_display, parent, 0,
-                            window->height - CONTROL_HEIGHT-1, window->width,
-                            CONTROL_HEIGHT-1, 0, i_blackColor, i_blackColor );
+                            window->height - p_plugin->i_control_height-1, window->width,
+                            p_plugin->i_control_height-1, 0, i_blackColor, i_blackColor );
 
             XMapWindow( p_display, parent );
             XMapWindow( p_display, video );
@@ -774,14 +780,14 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     XGCValues gcv;
 
     /* Toolbar */
-    XImage *p_playIcon = NULL;
-    XImage *p_pauseIcon = NULL;
-    XImage *p_stopIcon = NULL;
+    XImage *p_btnPlay = NULL;
+    XImage *p_btnPause = NULL;
+    XImage *p_btnStop = NULL;
     XImage *p_timeline = NULL;
-    XImage *p_timeKnob = NULL;
-    XImage *p_fscreen = NULL;
-    XImage *p_muteIcon = NULL;
-    XImage *p_unmuteIcon = NULL;
+    XImage *p_btnTime = NULL;
+    XImage *p_btnFullscreen = NULL;
+    XImage *p_btnMute = NULL;
+    XImage *p_btnUnmute = NULL;
 
     libvlc_media_instance_t *p_md = NULL;
     float f_position = 0;
@@ -792,17 +798,55 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     Window control = p_plugin->getControlWindow();
     Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
 
+    /* load icons */
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/play.xpm",
+                        &p_btnPlay, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnPlay->height );
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
+                        &p_btnPause, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnPause->height );
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
+                        &p_btnStop, NULL, NULL );
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnStop->height );
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
+                        &p_timeline, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_timeline->height );
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
+                        &p_btnTime, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnTime->height );
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
+                        &p_btnFullscreen, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnFullscreen->height);
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
+                        &p_btnMute, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnMute->height);
+    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
+                        &p_btnUnmute, NULL, NULL);
+    p_plugin->i_control_height = __MAX( p_plugin->i_control_height,
+                                        p_btnUnmute->height);
+
+    if( !p_btnPlay || !p_btnPause || !p_btnStop || !p_timeline ||
+        !p_btnTime || !p_btnFullscreen || !p_btnMute || !p_btnUnmute )
+        fprintf(stderr, "Error: some button images not found in %s\n", DATA_PATH );
+
     gcv.foreground = BlackPixel( p_display, 0 );
     gc = XCreateGC( p_display, video, GCForeground, &gcv );
 
     XFillRectangle( p_display, video, gc,
-                    0, 0, window.width, window.height - CONTROL_HEIGHT );
+                    0, 0, window.width, window.height - p_plugin->i_control_height );
 
     gcv.foreground = WhitePixel( p_display, 0 );
     XChangeGC( p_display, gc, GCForeground, &gcv );
 
     XDrawString( p_display, video, gc,
-                 window.width / 2 - 40, (window.height - CONTROL_HEIGHT) / 2,
+                 window.width / 2 - 40, (window.height - p_plugin->i_control_height) / 2,
                  WINDOW_TEXT, strlen(WINDOW_TEXT) );
 
     /* RedrawToolbar */
@@ -810,7 +854,7 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     gc = XCreateGC( p_display, control, GCForeground, &gcv );
 
     XFillRectangle( p_display, control, gc,
-                    0, 0, window.width, CONTROL_HEIGHT );
+                    0, 0, window.width, p_plugin->i_control_height );
 
 
     gcv.foreground = WhitePixel( p_display, 0 );
@@ -841,108 +885,55 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     }
     libvlc_media_instance_release(p_md);
 
-    /* load icons */
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/play.xpm",
-                        &p_playIcon, NULL, NULL);
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
-                        &p_pauseIcon, NULL, NULL);
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
-                        &p_stopIcon, NULL, NULL );
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
-                        &p_timeline, NULL, NULL);
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
-                        &p_timeKnob, NULL, NULL);
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
-                        &p_fscreen, NULL, NULL);
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
-                        &p_muteIcon, NULL, NULL);
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
-                        &p_unmuteIcon, NULL, NULL);
-
-#if 1 /* DEBUG */
-    if( !p_playIcon )
-    {
-        fprintf(stderr, "Error: playImage not found\n");
-    }
-    if( !p_pauseIcon )
-    {
-        fprintf(stderr, "Error: pauseImage not found\n");
-    }
-    if( !p_stopIcon )
-    {
-        fprintf(stderr, "Error: stopImage not found\n");
-    }
-    if( !p_timeline )
-    {
-        fprintf(stderr, "Error: TimeLineImage not found\n");
-    }
-    if( !p_timeKnob )
-    {
-        fprintf(stderr, "Error: TimeIcon not found\n");
-    }
-    if( !p_fscreen )
-    {
-        fprintf(stderr, "Error: FullscreenImage not found\n");
-    }
-    if( !p_muteIcon )
-    {
-        fprintf(stderr, "Error: MuteImage not found\n");
-    }
-    if( !p_unmuteIcon )
-    {
-        fprintf(stderr, "Error: UnMuteImage not found\n");
-    }
-#endif
-
     /* position icons */
-    if( p_pauseIcon && (i_playing == 1) )
+    if( p_btnPause && (i_playing == 1) )
     {
-        XPutImage( p_display, control, gc, p_pauseIcon, 0, 0, 4, 14,
-                   p_pauseIcon->width, p_pauseIcon->height );
+        XPutImage( p_display, control, gc, p_btnPause, 0, 0, 4, 14,
+                   p_btnPause->width, p_btnPause->height );
     }
-    else if( p_playIcon )
+    else if( p_btnPlay )
     {
-        XPutImage( p_display, control, gc, p_playIcon, 0, 0, 4, 14,
-                   p_playIcon->width, p_playIcon->height );
+        XPutImage( p_display, control, gc, p_btnPlay, 0, 0, 4, 14,
+                   p_btnPlay->width, p_btnPlay->height );
     }
 
-    if( p_stopIcon )
-        XPutImage( p_display, control, gc, p_stopIcon, 0, 0, 39, 14,
-                   p_stopIcon->width, p_stopIcon->height );
-    if( p_fscreen )
-        XPutImage( p_display, control, gc, p_fscreen, 0, 0, 67, 21,
-                   p_fscreen->width, p_fscreen->height );
+    if( p_btnStop )
+        XPutImage( p_display, control, gc, p_btnStop, 0, 0, 39, 14,
+                   p_btnStop->width, p_btnStop->height );
+    if( p_btnFullscreen )
+        XPutImage( p_display, control, gc, p_btnFullscreen, 0, 0, 67, 21,
+                   p_btnFullscreen->width, p_btnFullscreen->height );
 
-    if( p_unmuteIcon && b_mute )
+    if( p_btnUnmute && b_mute )
     {
-        XPutImage( p_display, control, gc, p_unmuteIcon, 0, 0, 94, 30,
-                 p_unmuteIcon->width, p_unmuteIcon->height );
+        XPutImage( p_display, control, gc, p_btnUnmute, 0, 0, 94, 30,
+                   p_btnUnmute->width, p_btnUnmute->height );
     }
-    else if( p_muteIcon )
+    else if( p_btnMute )
     {
-        XPutImage( p_display, control, gc, p_muteIcon, 0, 0, 94, 30,
-                   p_muteIcon->width, p_muteIcon->height );
+        XPutImage( p_display, control, gc, p_btnMute, 0, 0, 94, 30,
+                   p_btnMute->width, p_btnMute->height );
     }
 
     if( p_timeline )
         XPutImage( p_display, control, gc, p_timeline, 0, 0, 4, 4,
                    (window.width-8), p_timeline->height );
-    if( p_timeKnob && (f_position > 0) )
+    if( p_btnTime && (f_position > 0) )
     {
         f_position = (((float)window.width-8)/100)*f_position;
-        XPutImage( p_display, control, gc, p_timeKnob, 0, 0, (4+f_position), 2,
-                   p_timeKnob->width, p_timeKnob->height );
+        XPutImage( p_display, control, gc, p_btnTime, 0, 0, (4+f_position), 2,
+                   p_btnTime->width, p_btnTime->height );
     }
 
     /* Cleanup */
-    if( p_playIcon )   XDestroyImage( p_playIcon );
-    if( p_pauseIcon )  XDestroyImage( p_pauseIcon );
-    if( p_stopIcon )   XDestroyImage( p_stopIcon );
-    if( p_timeline )   XDestroyImage( p_timeline );
-    if( p_timeKnob )   XDestroyImage( p_timeKnob );
-    if( p_fscreen )    XDestroyImage( p_fscreen );
-    if( p_muteIcon )   XDestroyImage( p_muteIcon );
-    if( p_unmuteIcon ) XDestroyImage( p_unmuteIcon );
+    if( p_btnPlay )  XDestroyImage( p_btnPlay );
+    if( p_btnPause ) XDestroyImage( p_btnPause );
+    if( p_btnStop )  XDestroyImage( p_btnStop );
+    if( p_timeline ) XDestroyImage( p_timeline );
+    if( p_btnTime )  XDestroyImage( p_btnTime );
+    if( p_btnFullscreen ) XDestroyImage( p_btnFullscreen );
+    if( p_btnMute )  XDestroyImage( p_btnMute );
+    if( p_btnUnmute ) XDestroyImage( p_btnUnmute );
 
     XFreeGC( p_display, gc );
 }
@@ -957,69 +948,71 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
     int i_xPos = event->xbutton.x;
     int i_yPos = event->xbutton.y;
 
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_media_instance_t *p_md =
-            libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
-    libvlc_exception_clear( &ex );
-
-    /* jump in the movie */
-    if( i_yPos <= (i_height-30) )
+    if( p_plugin )
     {
-        vlc_int64_t f_length;
+        libvlc_exception_t ex;
         libvlc_exception_init( &ex );
-        f_length = libvlc_media_instance_get_length( p_md, &ex ) / 100;
+        libvlc_media_instance_t *p_md =
+                libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
         libvlc_exception_clear( &ex );
 
-        f_length = (float)f_length *
-                   ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
+        /* jump in the movie */
+        if( i_yPos <= (i_height-30) )
+        {
+            vlc_int64_t f_length;
+            libvlc_exception_init( &ex );
+            f_length = libvlc_media_instance_get_length( p_md, &ex ) / 100;
+            libvlc_exception_clear( &ex );
 
-        libvlc_exception_init( &ex );
-        libvlc_media_instance_set_time( p_md, f_length, &ex );
-        libvlc_exception_clear( &ex );
+            f_length = (float)f_length *
+                    ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
+
+            libvlc_exception_init( &ex );
+            libvlc_media_instance_set_time( p_md, f_length, &ex );
+            libvlc_exception_clear( &ex );
+        }
+
+        /* play/pause toggle */
+        if( (i_yPos > (i_height-30)) && (i_xPos > 4) && (i_xPos <= 39) )
+        {
+            int i_playing;
+            libvlc_exception_init( &ex );
+            i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
+            libvlc_exception_clear( &ex );
+
+            libvlc_exception_init( &ex );
+            if( i_playing == 1 )
+                libvlc_playlist_pause( p_plugin->getVLC(), &ex );
+            else
+                libvlc_playlist_play( p_plugin->getVLC(), -1, 0, NULL, &ex );
+            libvlc_exception_clear( &ex );
+        }
+
+        /* stop */
+        if( (i_yPos > (i_height-30)) && (i_xPos > 39) && (i_xPos < 67) )
+        {
+            libvlc_exception_init( &ex );
+            libvlc_playlist_stop( p_plugin->getVLC(), &ex );
+            libvlc_exception_clear( &ex );
+        }
+
+        /* fullscreen */
+        if( (i_yPos > (i_height-30)) && (i_xPos >= 67) && (i_xPos < 94) )
+        {
+            libvlc_exception_init( &ex );
+            libvlc_set_fullscreen( p_md, 1, &ex );
+            libvlc_exception_clear( &ex );
+        }
+
+        /* mute toggle */
+        if( (i_yPos > (i_height-30)) && (i_xPos >= 94) && (i_xPos < 109))
+        {
+            libvlc_exception_init( &ex );
+            libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
+            libvlc_exception_clear( &ex );
+        }
+        libvlc_media_instance_release( p_md );
     }
-
-    /* play/pause toggle */
-    if( (i_yPos > (i_height-30)) && (i_xPos > 4) && (i_xPos <= 39) )
-    {
-        int i_playing;
-        libvlc_exception_init( &ex );
-        i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
-        libvlc_exception_clear( &ex );
-
-        libvlc_exception_init( &ex );
-        if( i_playing == 1 )
-            libvlc_playlist_pause( p_plugin->getVLC(), &ex );
-        else
-            libvlc_playlist_play( p_plugin->getVLC(), -1, 0, NULL, &ex );
-        libvlc_exception_clear( &ex );
-    }
-
-    /* stop */
-    if( (i_yPos > (i_height-30)) && (i_xPos > 39) && (i_xPos < 67) )
-    {
-        libvlc_exception_init( &ex );
-        libvlc_playlist_stop( p_plugin->getVLC(), &ex );
-        libvlc_exception_clear( &ex );
-    }
-
-    /* fullscreen */
-    if( (i_yPos > (i_height-30)) && (i_xPos >= 67) && (i_xPos < 94) )
-    {
-        libvlc_exception_init( &ex );
-        libvlc_set_fullscreen( p_md, 1, &ex );
-        libvlc_exception_clear( &ex );
-    }
-
-    /* mute toggle */
-    if( (i_yPos > (i_height-30)) && (i_xPos >= 94) && (i_xPos < 109))
-    {
-        libvlc_exception_init( &ex );
-        libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
-        libvlc_exception_clear( &ex );
-    }
-    libvlc_media_instance_release( p_md );
-
     Redraw( w, closure, event );
 }
 
@@ -1047,14 +1040,13 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     }
 #endif /* X11_RESIZE_DEBUG */
 
-    if( ! p_plugin->setSize(window.width, (window.height - CONTROL_HEIGHT)) )
+    if( ! p_plugin->setSize(window.width, (window.height - p_plugin->i_control_height)) )
     {
         /* size already set */
         return;
     }
 
-
-    i_ret = XResizeWindow( p_display, drawable, window.width, (window.height - CONTROL_HEIGHT) );
+    i_ret = XResizeWindow( p_display, drawable, window.width, (window.height - p_plugin->i_control_height) );
 
 #ifdef X11_RESIZE_DEBUG
     fprintf( stderr,
@@ -1086,7 +1078,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
 #endif /* X11_RESIZE_DEBUG */
 
         i_ret = XResizeWindow( p_display, base_window,
-                window.width, ( window.height - CONTROL_HEIGHT ) );
+                window.width, ( window.height - p_plugin->i_control_height ) );
 
 #ifdef X11_RESIZE_DEBUG
         fprintf( stderr,
@@ -1102,4 +1094,3 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
 }
 
 #endif /* XP_UNIX */
-

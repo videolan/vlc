@@ -105,6 +105,10 @@ public:
     int      b_autoplay;
     char *   psz_target;
 
+#if XP_UNIX
+    /* toolbar */
+    int     i_control_height;
+#endif
 private:
     /* VLC reference */
     libvlc_instance_t   *libvlc_instance;
@@ -123,6 +127,7 @@ private:
 #if XP_UNIX
     unsigned int     i_width, i_height;
     Window           npvideo, npcontrol;
+
 #endif
 };
 
