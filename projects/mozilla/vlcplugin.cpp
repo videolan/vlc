@@ -44,7 +44,9 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     i_npmode(mode),
     b_stream(0),
     b_autoplay(1),
+#if XP_UNIX
     i_control_height(45),
+#endif
     psz_target(NULL),
     libvlc_instance(NULL),
     libvlc_log(NULL),
