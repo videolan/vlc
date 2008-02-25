@@ -53,6 +53,17 @@
 #   include <X11/Intrinsic.h>
 #   include <X11/StringDefs.h>
 #   include <X11/X.h>
+
+#   ifndef __APPLE__
+#       include <X11/xpm.h>
+#   endif
+#endif
+
+#ifndef __MAX
+#   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
+#endif
+#ifndef __MIN
+#   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
 class VlcPlugin
@@ -96,6 +107,10 @@ public:
                             { return npcontrol; };
     void                setControlWindow(Window window)
                             { npcontrol = window; };
+
+    void                showToolbar();
+    void                hideToolbar();
+    void                redrawToolbar();
 #endif
 
     uint16    i_npmode; /* either NP_EMBED or NP_FULL */
@@ -128,6 +143,16 @@ private:
     unsigned int     i_width, i_height;
     Window           npvideo, npcontrol;
 
+    XImage *p_btnPlay;
+    XImage *p_btnPause;
+    XImage *p_btnStop;
+    XImage *p_timeline;
+    XImage *p_btnTime;
+    XImage *p_btnFullscreen;
+    XImage *p_btnMute;
+    XImage *p_btnUnmute;
+
+    int i_last_position;
 #endif
 };
 
