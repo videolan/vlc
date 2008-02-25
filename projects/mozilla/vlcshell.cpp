@@ -999,9 +999,17 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
         /* fullscreen */
         if( (i_yPos > (i_height-30)) && (i_xPos >= 67) && (i_xPos < 94) )
         {
+            int i_playing;
             libvlc_exception_init( &ex );
-            libvlc_set_fullscreen( p_md, 1, &ex );
+            i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
             libvlc_exception_clear( &ex );
+
+            if( i_playing == 1 )
+            {
+                libvlc_exception_init( &ex );
+                libvlc_set_fullscreen( p_md, 1, &ex );
+                libvlc_exception_clear( &ex );
+            }
         }
 
         /* mute toggle */
