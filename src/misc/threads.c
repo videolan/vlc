@@ -95,17 +95,16 @@ static inline unsigned long vlc_threadid (void)
 void vlc_pthread_fatal (const char *action, int error,
                         const char *file, unsigned line)
 {
-    char buf[1000];
     const char *msg;
 
     fprintf (stderr, "LibVLC fatal error %s in thread %lu at %s:%u: %d\n",
              action, vlc_threadid (), file, line, error);
     fflush (stderr);
 
-    /* Sometimes strerror_r() crashes too, so make sure we print an error
+    /* Sometimes strerror() crashes too, so make sure we print an error
      * message before we invoke it */
-    msg = strerror_r (error, buf, sizeof (buf));
-    fprintf (stderr, " %s\n", msg ? msg : "(null)");
+    msg = strerror (error);
+    fprintf (stderr, "Error description was: \"%s\"\n", msg ? msg : "(null)");
     fflush (stderr);
     abort ();
 }
