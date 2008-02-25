@@ -109,7 +109,7 @@ void vlc_pthread_fatal (const char *action, int error,
     char buf[1000];
     const char *msg;
 
-    switch (sterror_r (error, buf, sizeof (buf)))
+    switch (strerror_r (error, buf, sizeof (buf)))
     {
         case 0:
             msg = buf;
