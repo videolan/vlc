@@ -83,14 +83,11 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
     vlc_list_t *p_list;
     struct option *p_longopts;
     int i_modules_index;
+    const char **argv_copy = NULL;
 
     /* Short options */
     module_config_t *pp_shortopts[256];
     char *psz_shortopts;
-
-    /* Set default configuration and copy arguments */
-    p_this->p_libvlc->i_argc    = *pi_argc;
-    p_this->p_libvlc->ppsz_argv = ppsz_argv;
 
 #ifdef __APPLE__
     /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
@@ -154,8 +151,8 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
      * us, ignoring the arity of the options */
     if( b_ignore_errors )
     {
-        ppsz_argv = (const char**)malloc( *pi_argc * sizeof(char *) );
-        if( ppsz_argv == NULL )
+        argv_copy = (const char**)malloc( *pi_argc * sizeof(char *) );
+        if( argv_copy == NULL )
         {
             msg_Err( p_this, "out of memory" );
             free( psz_shortopts );
@@ -163,8 +160,8 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             vlc_list_release( p_list );
             return -1;
         }
-        memcpy( ppsz_argv, p_this->p_libvlc->ppsz_argv,
-                *pi_argc * sizeof(char *) );
+        memcpy( argv_copy, ppsz_argv, *pi_argc * sizeof(char *) );
+        ppsz_argv = argv_copy;
     }
 
     i_shortopts = 0;
@@ -422,7 +419,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
         free( (char *)p_longopts[i_index].name );
     free( p_longopts );
     free( psz_shortopts );
-    if( b_ignore_errors ) free( ppsz_argv );
+    free( argv_copy );
 
     return 0;
 }

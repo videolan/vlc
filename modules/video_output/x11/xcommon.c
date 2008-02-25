@@ -1681,13 +1681,14 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
         if( !p_vout->b_fullscreen )
         {
+            const char *argv[] = { "vlc", NULL };
+
             /* Set window manager hints and properties: size hints, command,
              * window's name, and accepted protocols */
             XSetWMNormalHints( p_vout->p_sys->p_display,
                                p_win->base_window, &xsize_hints );
             XSetCommand( p_vout->p_sys->p_display, p_win->base_window,
-                         (char**)p_vout->p_libvlc->ppsz_argv,
-                         p_vout->p_libvlc->i_argc );
+                         (char**)argv, 1 );
 
             if( !var_GetBool( p_vout, "video-deco") )
             {
