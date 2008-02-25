@@ -96,7 +96,7 @@ GotoTimeDialog::~GotoTimeDialog()
 void GotoTimeDialog::cancel()
 {
     timeEdit->setTime( QTime( 0, 0, 0) );
-    this->toggleVisible();
+    toggleVisible();
 }
 
 void GotoTimeDialog::close()
@@ -107,6 +107,6 @@ void GotoTimeDialog::close()
             ( QTime( 0, 0, 0 ).msecsTo( timeEdit->time() ) ) * 1000;
         var_SetTime( THEMIM->getInput(), "time", i_time );
     }
-    this->toggleVisible();
+    toggleVisible();
     timeEdit->setTime( QTime( 0, 0, 0) );
 }

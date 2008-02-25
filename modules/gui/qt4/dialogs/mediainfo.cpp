@@ -202,7 +202,7 @@ void MediaInfoDialog::clear()
 
 void MediaInfoDialog::close()
 {
-    this->toggleVisible();
+    toggleVisible();
 
     /* if dialog is closed, revert editing if not saved */
     if( MP->isInEditMode() )
