@@ -1034,7 +1034,7 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
 
     gcry_md_hd_t hd;
     if( gcry_md_open( &hd, GCRY_MD_SHA1, 0 ) )
-        goto error;
+        goto error_hd;
 
     gcry_md_write( hd, psz_version_line, strlen( psz_version_line ) );
     FREENULL( psz_version_line );
@@ -1063,14 +1063,14 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
         p_hash[1] != sign.hash_verification[1] )
     {
         msg_Warn( p_update->p_libvlc, "Bad SHA1 hash for status file" );
-        goto error;
+        goto error_hd;
     }
 
     if( verify_signature( sign.r, sign.s, &p_update->p_pkey->key, p_hash )
             != VLC_SUCCESS )
     {
         msg_Err( p_update->p_libvlc, "BAD SIGNATURE for status file" );
-        goto error;
+        goto error_hd;
     }
     else
     {
@@ -1079,8 +1079,9 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
         return VLC_TRUE;
     }
 
-error:
+error_hd:
     gcry_md_close( hd );
+error:
     if( p_stream )
         stream_Delete( p_stream );
     free( psz_version_line );
