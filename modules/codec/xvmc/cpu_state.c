@@ -33,8 +33,8 @@
 # include "mmx.h"
 #endif
 
-void (* mpeg2_cpu_state_save) (cpu_state_t * state) = NULL;
-void (* mpeg2_cpu_state_restore) (cpu_state_t * state) = NULL;
+void (* mpeg2_cpu_state_save) (cpu_state_t * state) = 0;
+void (* mpeg2_cpu_state_restore) (cpu_state_t * state) = 0;
 
 static void state_restore_mmx (cpu_state_t * state)
 {
