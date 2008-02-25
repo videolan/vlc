@@ -433,8 +433,8 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         /*
         ** default initialization options
         */
-        const char *ppsz_argv[32] = { "vlc" };
-        int   ppsz_argc = 1;
+        const char *ppsz_argv[32] = { };
+        int   ppsz_argc = 0;
 
         char p_progpath[MAX_PATH];
         {
