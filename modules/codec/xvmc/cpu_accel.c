@@ -33,7 +33,7 @@ static inline uint32_t arch_accel( void )
     int AMD;
     uint32_t caps;
 
-#if !defined(PIC) && !defined(__PIC__)
+#if defined(__x86_64__) || (!defined(PIC) && !defined(__PIC__))
 #define cpuid(op,eax,ebx,ecx,edx) \
     __asm__ ("cpuid"        \
          : "=a" (eax),      \
@@ -42,7 +42,7 @@ static inline uint32_t arch_accel( void )
            "=d" (edx)       \
          : "a" (op)         \
          : "cc")
-#else /* PIC version : save ebx */
+#else /* PIC version : save ebx (not needed on x86_64) */
 #define cpuid(op,eax,ebx,ecx,edx) \
     __asm__ ("push %%ebx\n\t"   \
          "cpuid\n\t"            \
@@ -56,6 +56,7 @@ static inline uint32_t arch_accel( void )
          : "cc")
 #endif
 
+#ifndef __x86_64__ /* x86_64 supports the cpuid op */
     __asm__ ("pushf\n\t"
         "pushf\n\t"
         "pop %0\n\t"
@@ -73,6 +74,7 @@ static inline uint32_t arch_accel( void )
 
     if (eax == ebx) /* no cpuid */
         return 0;
+#endif
 
     cpuid (0x00000000, eax, ebx, ecx, edx);
     if (!eax) /* vendor string only */
