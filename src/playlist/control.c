@@ -511,7 +511,7 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         /* p_input->p_meta should not be null after a successfull CreateThread */
         b_has_art = !EMPTY_STR( psz_arturl );
 
-        if( !b_has_art )
+        if( !b_has_art || strncmp( psz_arturl, "attachment://", 15 ) )
         {
             PL_DEBUG( "requesting art for %s", psz_name );
             playlist_AskForArtEnqueue( p_playlist, p_input );
