@@ -381,7 +381,7 @@ misc/revision.c:
 bin_PROGRAMS = vlc
 # 
 vlc_SOURCES = vlc.c
-vlc_DEPENDENCIES = $(DATA_win32_rc)
+vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
