@@ -798,13 +798,14 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
 
 module_config_t *module_GetConfig (const module_t *module, unsigned *restrict psize)
 {
+    unsigned i,j;
     unsigned size = module->confsize;
     module_config_t *config = malloc (size * sizeof (*config));
 
     assert (psize != NULL);
     *psize = 0;
 
-    for (unsigned i = 0, j = 0; i < size; i++)
+    for (i = 0, j = 0; i < size; i++)
     {
         const module_config_t *item = module->p_config + i;
         if (item->b_internal /* internal option */
@@ -814,8 +815,9 @@ module_config_t *module_GetConfig (const module_t *module, unsigned *restrict ps
 
         if (config != NULL)
             memcpy (config + j, item, sizeof (*config));
-        *psize = ++j;
+        j++;
     }
+    *psize = j;
 
     return config;
 }
