@@ -14,6 +14,13 @@ Please respect VLC code conventions here:
 
 Refer to http://wiki.videolan.org/Code_Conventions it should be up to date
 
+** Include order **
+
+- VLC include/*.h includes
+- Other VLC .h includes (gruiking :D)
+- Qt4 module includes
+- Qt includes
+
 ** Naming **
 This naming is stupid and inconsistent :D
 
