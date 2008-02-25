@@ -106,6 +106,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                  "can distort the audio, since it uses " \
                                  "software amplification." )
 
+#define SAVEVOL_TEXT N_( "Automatically save the volume on exit" )
+
 #define BLING_TEXT N_( "Use non native buttons and volume slider" )
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
@@ -164,6 +166,8 @@ vlc_module_begin();
 
         add_bool( "qt-volume-complete", VLC_FALSE, NULL, COMPLETEVOL_TEXT,
                 COMPLETEVOL_LONGTEXT, VLC_TRUE );
+        add_bool( "qt-autosave-volume", VLC_FALSE, NULL, SAVEVOL_TEXT,
+                SAVEVOL_TEXT, VLC_TRUE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_TEXT, VLC_TRUE );
             change_autosave();
@@ -291,7 +295,7 @@ static void Init( intf_thread_t *p_intf )
      * see commits 21610 21622 21654 for reference */
 
     /* If you don't have a gconftool-2 binary, you should comment this line */
-//    QApplication::setDesktopSettingsAware( false );
+    QApplication::setDesktopSettingsAware( false );
 #endif
 
     /* Start the QApplication here */

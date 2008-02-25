@@ -61,21 +61,37 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="3" >
-       <widget class="QCheckBox" name="qtAlwaysVideo" >
+      <item row="1" column="1" >
+       <widget class="QLabel" name="label" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text" >
-         <string>_("Always display the video")</string>
+         <string>_("Display Mode")</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2" >
+      <item row="1" column="2" colspan="2" >
+       <widget class="QComboBox" name="displayModeBox" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="3" >
        <widget class="QCheckBox" name="embedVideo" >
         <property name="text" >
          <string>_("Integrate video in interface")</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="3" >
+      <item row="3" column="0" colspan="4" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -89,7 +105,7 @@
         </property>
        </widget>
       </item>
-      <item rowspan="3" row="4" column="1" colspan="3" >
+      <item rowspan="2" row="4" column="1" colspan="3" >
        <widget class="QLabel" name="skinsLabel" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
@@ -136,22 +152,22 @@
         </property>
        </spacer>
       </item>
-      <item rowspan="2" row="6" column="0" >
+      <item row="6" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>_("Skin File")</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="2" colspan="2" >
+      <item row="6" column="1" colspan="2" >
+       <widget class="QLineEdit" name="fileSkin" />
+      </item>
+      <item row="6" column="3" >
        <widget class="QPushButton" name="skinBrowse" >
         <property name="text" >
          <string>_("Browse...")</string>
         </property>
        </widget>
-      </item>
-      <item row="7" column="1" >
-       <widget class="QLineEdit" name="fileSkin" />
       </item>
      </layout>
     </widget>
@@ -257,7 +273,6 @@
  <tabstops>
   <tabstop>language</tabstop>
   <tabstop>qt4</tabstop>
-  <tabstop>qtAlwaysVideo</tabstop>
   <tabstop>skins</tabstop>
   <tabstop>fileSkin</tabstop>
   <tabstop>skinBrowse</tabstop>

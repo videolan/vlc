@@ -93,10 +93,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="4" >
+      <item row="1" column="0" >
        <widget class="QCheckBox" name="spdifBox" >
         <property name="text" >
          <string>_("Use S/PDIF when available")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3" >
+       <widget class="QCheckBox" name="saveVolBox" >
+        <property name="text" >
+         <string>_("Save volume on exit")</string>
         </property>
        </widget>
       </item>

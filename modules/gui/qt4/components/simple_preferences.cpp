@@ -74,7 +74,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                   spref_cone_Interface_64.png, 0 );
     ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png, 1 );
     ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png, 2 );
-    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"),
+    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles & OSD"),
                   spref_cone_Subtitles_64.png, 3 );
     ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
                   spref_cone_Input_64.png, 4 );
@@ -84,7 +84,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     layout->setMargin( 0 );
     layout->setSpacing( 1 );
 
-    this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     setLayout( layout );
 
 }
@@ -223,6 +223,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             preferredAudioLanguage );
 
             CONFIG_GENERIC( "spdif", Bool, NULL, spdifBox );
+            CONFIG_GENERIC( "qt-autosave-volume", Bool, NULL, saveVolBox );
             CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
                             detectionDolby );
 
@@ -435,11 +436,19 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
 
+            CONFIG_GENERIC( "qt-display-mode", IntegerList, NULL,
+                            displayModeBox );
+            CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
+            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
+                    skinBrowse );
+
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
                                                       artFetcher );
             CONFIG_GENERIC( "fetch-meta", Bool, NULL, metaFetcher );
             CONFIG_GENERIC( "security-policy", IntegerList,
                             ui.netPolicyLabel, netPolicyBox );
+
+            /* UPDATE options */
 #ifdef UPDATE_CHECK
             CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, updatesBox );
             CONFIG_GENERIC_NO_BOOL( "qt-updates-days", Integer, NULL,
@@ -450,10 +459,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.updatesBox->hide();
             ui.updatesDays->hide();
 #endif
-            CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
-            CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
-            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
-                    skinBrowse );
+            /* ONE INSTANCE options */
 #if defined( WIN32 ) || defined( HAVE_DBUS_3 ) || defined(__APPLE__)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
