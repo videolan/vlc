@@ -178,7 +178,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     backgroundLayout->setColumnStretch( 0, 1 );
     backgroundLayout->setColumnStretch( 2, 1 );
 
-    CONNECT( THEMIM->getIM(), artChanged( QString ), this, update( QString ) );
+    CONNECT( THEMIM->getIM(), artChanged( QString ), this, updateArt( QString ) );
 }
 
 BackgroundWidget::~BackgroundWidget()
@@ -193,9 +193,9 @@ void BackgroundWidget::resizeEvent( QResizeEvent * event )
         label->show();
 }
 
-void BackgroundWidget::update( QString url )
+void BackgroundWidget::updateArt( QString url )
 {
-    if( url.isNull() )
+    if( url.isEmpty() )
     {
         if( QDate::currentDate().dayOfYear() >= 354 )
             label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
@@ -616,10 +616,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
                               VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
+    /* Force the update at build time in order to have a muted icon if needed */
+    updateVolume( volumeSlider->value() );
+
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
-
 
     updateInput();
 }
@@ -716,7 +718,7 @@ void ControlsWidget::updateInput()
 {
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
-    enableVideo( THEMIM->getIM()->hasVideo() );
+    enableVideo( THEMIM->getIM()->hasVideo() && THEMIM->getIM()->hasInput() );
 }
 
 void ControlsWidget::setStatus( int status )

@@ -95,7 +95,7 @@ private:
     virtual void resizeEvent( QResizeEvent * event );
 public slots:
     void toggle(){ TOGGLEV( this ); }
-    void update( QString );
+    void updateArt( QString );
 };
 
 class VisualSelector : public QFrame
