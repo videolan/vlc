@@ -106,12 +106,14 @@ static void   UndupModule      ( module_t * );
 
 static void module_LoadMain( vlc_object_t *p_this );
 
-/*****************************************************************************
- * module_InitBank: create the module bank.
- *****************************************************************************
- * This function creates a module bank structure which will be filled later
+/**
+ * Init bank
+ *
+ * Creates a module bank structure which will be filled later
  * on with all the modules found.
- *****************************************************************************/
+ * \param p_this vlc object structure
+ * \return nothing
+ */
 void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
@@ -149,12 +151,14 @@ void __module_InitBank( vlc_object_t *p_this )
 }
 
 
-/*****************************************************************************
- * module_EndBank: empty the module bank.
- *****************************************************************************
- * This function unloads all unused plugin modules and empties the module
+/**
+ * End bank
+ *
+ * Unloads all unused plugin modules and empties the module
  * bank in case of success.
- *****************************************************************************/
+ * \param p_this vlc object structure
+ * \return nothing
+ */
 void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next = NULL;
@@ -179,6 +183,7 @@ void __module_EndBank( vlc_object_t *p_this )
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc_global, "libvlc" );
 
+    /* Save the configuration */
     config_AutoSaveConfigFile( p_this );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -188,8 +193,9 @@ void __module_EndBank( vlc_object_t *p_this )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
         {
-            DeleteModule( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module,
-                          p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->b_used );
+            DeleteModule(
+                    p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module,
+                    p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->b_used );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
             p_bank->pp_loaded_cache[p_bank->i_loaded_cache] = NULL;
@@ -236,14 +242,16 @@ void __module_EndBank( vlc_object_t *p_this )
     p_libvlc_global->p_module_bank = NULL;
 }
 
-/*****************************************************************************
- * module_LoadMain: load the main program info into the module bank.
- *****************************************************************************
- * This function fills the module bank structure with the main module infos.
+/**
+ * Load the main program info into the module bank.
+ *
+ * Fills the module bank structure with the main module infos.
  * This is very useful as it will allow us to consider the main program just
  * as another module, and for instance the configuration options of main will
  * be available in the module bank structure just as for every other module.
- *****************************************************************************/
+ * \param p_this vlc object structure
+ * \return nothing
+ */
 static void module_LoadMain( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
@@ -265,11 +273,13 @@ static void module_LoadMain( vlc_object_t *p_this )
     AllocateBuiltinModule( p_this, vlc_entry__main );
 }
 
-/*****************************************************************************
- * module_LoadBuiltins: load all modules which we built with.
- *****************************************************************************
- * This function fills the module bank structure with the builtin modules.
- *****************************************************************************/
+/**
+ * Load all modules which we built with.
+ *
+ * Fills the module bank structure with the builtin modules.
+ * \param p_this vlc object structure
+ * \return nothing
+ */
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
     vlc_value_t lockval;
@@ -292,11 +302,14 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
     ALLOCATE_ALL_BUILTINS();
 }
 
-/*****************************************************************************
- * module_LoadPlugins: load all plugin modules we can find.
- *****************************************************************************
- * This function fills the module bank structure with the plugin modules.
- *****************************************************************************/
+/**
+ * Load all plugins
+ *
+ * Load all plugin modules we can find.
+ * Fills the module bank structure with the plugin modules.
+ * \param p_this vlc object structure
+ * \return nothing
+ */
 void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -328,43 +341,65 @@ void __module_LoadPlugins( vlc_object_t * p_this )
 #endif
 }
 
-/*****************************************************************************
- * module_IsCapable: checks whether a module implements a capability.
- *****************************************************************************/
+/**
+ * Checks whether a module implements a capability.
+ *
+ * \param m the module
+ * \param cap the capability to check
+ * \return TRUE if the module have the capability
+ */
 vlc_bool_t module_IsCapable( const module_t *m, const char *cap )
 {
     return !strcmp( m->psz_capability, cap );
 }
 
-/*****************************************************************************
- * module_GetObjName: internal name of a module.
- *****************************************************************************/
+/**
+ * Get the internal name of a module
+ *
+ * \param m the module
+ * \return the module name
+ */
 const char *module_GetObjName( const module_t *m )
 {
     return m->psz_object_name;
 }
 
-/*****************************************************************************
- * module_GetName: human-friendly name of a module.
- *****************************************************************************/
+/**
+ * Get the human-friendly name of a module.
+ *
+ * \param m the module
+ * \param long_name TRUE to have the long name of the module
+ * \return the short or long name of the module
+ */
 const char *module_GetName( const module_t *m, vlc_bool_t long_name )
 {
     if( long_name && ( m->psz_longname != NULL) )
         return m->psz_longname;
- 
+
     return m->psz_shortname ?: m->psz_object_name;
 }
 
+/**
+ * Get the help for a module
+ *
+ * \param m the module
+ * \return the help
+ */
 const char *module_GetHelp( const module_t *m )
 {
     return m->psz_help;
 }
 
-/*****************************************************************************
- * module_Need: return the best module function, given a capability list.
- *****************************************************************************
- * This function returns the module that best fits the asked capabilities.
- *****************************************************************************/
+/**
+ * module Need
+ *
+ * Return the best module function, given a capability list.
+ * \param p_this the vlc object
+ * \param psz_capability list of capabilities needed
+ * \param psz_name name of the module asked
+ * \param b_strict TRUE yto use the strict mode
+ * \return the module or NULL in case of a failure
+ */
 module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
                           const char *psz_name, vlc_bool_t b_strict )
 {
@@ -669,12 +704,15 @@ found_shortcut:
     return p_module;
 }
 
-/*****************************************************************************
- * module_Unneed: decrease the usage count of a module.
- *****************************************************************************
+/**
+ * Module unneed
+ *
  * This function must be called by the thread that called module_Need, to
  * decrease the reference count and allow for hiding of modules.
- *****************************************************************************/
+ * \param p_this vlc object structure
+ * \param p_module the module structure
+ * \return nothing
+ */
 void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 {
     /* Use the close method */
@@ -690,9 +728,13 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
     return;
 }
 
-/*****************************************************************************
- * module_Find: get a pointer to a module_t given it's name.
- *****************************************************************************/
+/**
+ * Get a pointer to a module_t given it's name.
+ *
+ * \param p_this vlc object structure
+ * \param psz_name the name of the module
+ * \return a pointer to the module or NULL in case of a failure
+ */
 module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
 {
     vlc_list_t *p_list;
@@ -715,21 +757,26 @@ module_t *__module_Find( vlc_object_t *p_this, const char * psz_name )
 }
 
 
-/*****************************************************************************
- * module_Put: release a module_t pointer from module_Find().
- *****************************************************************************/
-void module_Put ( module_t *module )
+/**
+ * Release a module_t pointer from module_Find().
+ *
+ * \param module the module to release
+ * \return nothing
+ */
+void module_Put( module_t *module )
 {
-    vlc_object_release ( module );
+    vlc_object_release( module );
 }
 
 
-/*****************************************************************************
- * module_Exists: tell if a module exists.
- *****************************************************************************
- * This function is a boolean function that tells if a module exist or not.
- *****************************************************************************/
-vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
+/**
+ * Tell if a module exists and release it in thic case
+ *
+ * \param p_this vlc object structure
+ * \param psz_name th name of the module
+ * \return TRUE if the module exists
+ */
+vlc_bool_t __module_Exists( vlc_object_t *p_this, const char * psz_name )
 {
     module_t *p_module = __module_Find( p_this, psz_name );
     if( p_module )
@@ -743,20 +790,27 @@ vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
     }
 }
 
-/*****************************************************************************
- * module_GetModuleNamesForCapability: Return a NULL terminated array with the
- * names of the modules that have a certain capability.
+/**
+ * GetModuleNamesForCapability
+ *
+ * Return a NULL terminated array with the names of the modules
+ * that have a certain capability.
  * Free after uses both the string and the table.
- *****************************************************************************/
+ * \param p_this vlc object structure
+ * \param psz_capability the capability asked
+ * \param pppsz_longname an pointer to an array of string to contain
+    the long names of the modules. If set to NULL the function don't use it.
+ * \return the NULL terminated array
+ */
 char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
-                                               const char * psz_capability,
+                                               const char *psz_capability,
                                                char ***pppsz_longname )
 {
     vlc_list_t *p_list;
     int i, j, count = 0;
-    char ** psz_ret;
+    char **psz_ret;
 
-    /* Do it in two passes */
+    /* Do it in two passes : count the number of modules before */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     for( i = 0 ; i < p_list->i_count; i++)
     {
@@ -765,6 +819,8 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
         if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
             count++;
     }
+    /* FIXME: must check the return value and modify the calling functions
+              to test for a NULL : potential segfault */
     psz_ret = malloc( sizeof(char*) * (count+1) );
     if( pppsz_longname )
         *pppsz_longname = malloc( sizeof(char*) * (count+1) );
@@ -795,26 +851,32 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
     return psz_ret;
 }
 
-
-module_config_t *module_GetConfig (const module_t *module, unsigned *restrict psize)
+/**
+ * Get the configuration of a module
+ *
+ * \param module the module
+ * \param psize the size of the configuration returned
+ * \return the configuration as an array
+ */
+module_config_t *module_GetConfig( const module_t *module, unsigned *restrict psize )
 {
     unsigned i,j;
     unsigned size = module->confsize;
-    module_config_t *config = malloc (size * sizeof (*config));
+    module_config_t *config = malloc( size * sizeof( *config ) );
 
-    assert (psize != NULL);
+    assert( psize != NULL );
     *psize = 0;
 
-    for (i = 0, j = 0; i < size; i++)
+    for( i = 0, j = 0; i < size; i++ )
     {
         const module_config_t *item = module->p_config + i;
-        if (item->b_internal /* internal option */
+        if( item->b_internal /* internal option */
          || item->b_unsaveable /* non-modifiable option */
-         || item->b_removed /* removed option */)
+         || item->b_removed /* removed option */ )
             continue;
 
-        if (config != NULL)
-            memcpy (config + j, item, sizeof (*config));
+        if( config != NULL )
+            memcpy( config + j, item, sizeof( *config ) );
         j++;
     }
     *psize = j;
@@ -822,9 +884,15 @@ module_config_t *module_GetConfig (const module_t *module, unsigned *restrict ps
     return config;
 }
 
-void module_PutConfig (module_config_t *config)
+/**
+ * Release the configuration
+ *
+ * \param the configuration
+ * \return nothing
+ */
+void module_PutConfig( module_config_t *config )
 {
-    free (config);
+    free( config );
 }
 
 /*****************************************************************************
@@ -850,11 +918,11 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     char *userpath = config_GetPsz( p_this, "plugin-path" );
     path[sizeof(path)/sizeof(path[0]) - 2] = userpath;
 
-    for (ppsz_path = path; *ppsz_path != NULL; ppsz_path++)
+    for( ppsz_path = path; *ppsz_path != NULL; ppsz_path++ )
     {
         char *psz_fullpath;
 
-        if (!**ppsz_path) continue;
+        if( !**ppsz_path ) continue;
 
 #if defined( SYS_BEOS ) || defined( __APPLE__ ) || defined( WIN32 )
 
@@ -1022,7 +1090,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     i_dirlen = strlen( psz_dir );
 
     /* Parse the directory and try to load all files it contains. */
-    while( !p_this->p_libvlc->b_die && (file = readdir( dir )) )
+    while( !p_this->p_libvlc->b_die && ( file = readdir( dir ) ) )
     {
         struct stat statbuf;
         unsigned int i_len;
