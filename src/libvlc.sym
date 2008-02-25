@@ -330,7 +330,6 @@ stream_vaControl
 __str_format
 __str_format_meta
 str_format_time
-system_VLCPath
 tls_ClientCreate
 tls_ClientDelete
 ToLocale

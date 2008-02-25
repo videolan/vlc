@@ -67,7 +67,6 @@ HEADERS_include = \
 	../include/vlc_mtime.h \
 	../include/vlc_network.h \
 	../include/vlc_objects.h \
-	../include/vlc_os_specific.h \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_playlist.h \

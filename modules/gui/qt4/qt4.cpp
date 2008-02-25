@@ -334,7 +334,7 @@ static void Init( intf_thread_t *p_intf )
 #if !defined( WIN32 )
     QString path =  QString( QT4LOCALEDIR );
 #else
-    QString path = QString( QString(system_VLCPath()) + DIR_SEP +
+    QString path = QString( QString(config_GetDataDir()) + DIR_SEP +
                             "locale" + DIR_SEP );
 #endif
     // files depending on locale

@@ -32,6 +32,26 @@ extern const size_t libvlc_hotkeys_size;
 
 
 /*
+ * OS-specific initialization
+ */
+void system_Init      ( libvlc_int_t *, int *, const char *[] );
+void system_Configure ( libvlc_int_t *, int *, const char *[] );
+void system_End       ( libvlc_int_t * );
+
+#if defined( SYS_BEOS )
+/* Nothing at the moment, create beos_specific.h when needed */
+#elif defined( __APPLE__ )
+/* Nothing at the moment, create darwin_specific.h when needed */
+#elif defined( WIN32 ) || defined( UNDER_CE )
+VLC_EXPORT( const char * , system_VLCPath, (void));
+#else
+# define system_Init( a, b, c )      (void)0
+# define system_Configure( a, b, c ) (void)0
+# define system_End( a )             (void)0
+#endif
+
+
+/*
  * Threads subsystem
  */
 int __vlc_threads_init( vlc_object_t * );

@@ -1055,7 +1055,6 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 /*****************************************************************************
  * Additional vlc stuff
  *****************************************************************************/
-#include "vlc_os_specific.h"
 #include "vlc_messages.h"
 #include "vlc_variables.h"
 #include "vlc_objects.h"

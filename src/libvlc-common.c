@@ -75,8 +75,6 @@
 #   include <hal/libhal.h>
 #endif
 
-#include "vlc_os_specific.h"
-
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
