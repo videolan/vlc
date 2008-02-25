@@ -31,7 +31,6 @@
 #include <QDate>
 
 #include "qt4.hpp"
-#include <vlc_os_specific.h>
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
 #include "main_interface.hpp"
