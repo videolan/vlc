@@ -572,7 +572,7 @@ void VlcPlugin::redrawToolbar()
         XPutImage( p_display, control, gc, p_btnPause, 0, 0, 4, 14,
                    p_btnPause->width, p_btnPause->height );
     }
-    else if( p_btnPlay ) 
+    else if( p_btnPlay )
     {
         XPutImage( p_display, control, gc, p_btnPlay, 0, 0, 4, 14,
                    p_btnPlay->width, p_btnPlay->height );
