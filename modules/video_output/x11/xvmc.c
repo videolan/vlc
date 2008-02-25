@@ -242,7 +242,7 @@ static void colorToPalette( const uint32_t *icolor, unsigned char *palette_p,
                             unsigned num_xvmc_components, char *xvmc_components )
 {
     const clut_t *color = (const clut_t *) icolor;
-    int i;
+    unsigned int i;
 
     for (i=0; i<num_xvmc_components; ++i)
     {
@@ -262,7 +262,7 @@ void xx44_to_xvmc_palette( const xx44_palette_t *p,unsigned char *xvmc_palette,
                            unsigned first_xx44_entry, unsigned num_xx44_entries,
                            unsigned num_xvmc_components, char *xvmc_components )
 {
-    int i;
+    unsigned int i;
     const uint32_t *cluts = p->cluts + first_xx44_entry;
 
     for( i=0; i<num_xx44_entries; ++i )
@@ -278,7 +278,7 @@ void xx44_to_xvmc_palette( const xx44_palette_t *p,unsigned char *xvmc_palette,
 
 static int xx44_paletteIndex( xx44_palette_t *p, int color, uint32_t clut )
 {
-    int i;
+    unsigned int i;
     uint32_t *cluts = p->cluts;
     int tmp;
 
@@ -310,8 +310,9 @@ static void memblend_xx44( uint8_t *mem, uint8_t val,
 {
     uint8_t masked_val = val & mask;
 
-    if (size < 0)
-        return;
+/* size_t is unsigned, therefore always positive
+   if (size < 0)
+        return;*/
 
     while(size--)
     {
@@ -338,7 +339,6 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
     int clip_right;
     int i_len, i_color;
     uint16_t *p_source = NULL;
-    uint16_t i_colprecomp, i_destalpha;
 
     if (!sub_img)
         return;
@@ -349,7 +349,6 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
     y_off = sub_img->i_y;
     alphamask = (ia44) ? 0x0F : 0xF0;
     p_source = (uint16_t *)sub_img->p_sys->p_data;
-    i_colprecomp, i_destalpha;
 
     dst_y = dst_img + dst_pitch*y_off + x_off;
 
@@ -834,16 +833,16 @@ static int xxmc_setup_subpictures( vout_thread_t *p_vout,
         sp = xxmc_xvmc_alloc_subpicture( p_vout, &p_vout->p_sys->context,
                                          width, height,
                                          curCap->subPicType.id );
-        if( !sp == NULL )
-            return VLC_EGENERIC;
-
-        init_xx44_palette( &p_vout->p_sys->palette, sp->num_palette_entries );
-        p_vout->p_sys->xvmc_palette = (char *) malloc( sp->num_palette_entries
-                                                       * sp->entry_bytes );
-        xxmc_xvmc_free_subpicture( p_vout, sp);
-        if( !p_vout->p_sys->xvmc_palette )
-            return VLC_EGENERIC;
-        p_vout->p_sys->hwSubpictures = 1;
+        if( sp )
+        {
+            init_xx44_palette( &p_vout->p_sys->palette, sp->num_palette_entries );
+            p_vout->p_sys->xvmc_palette = (char *) malloc( sp->num_palette_entries
+                    * sp->entry_bytes );
+            xxmc_xvmc_free_subpicture( p_vout, sp);
+            if( !p_vout->p_sys->xvmc_palette )
+                return VLC_EGENERIC;
+            p_vout->p_sys->hwSubpictures = 1;
+        }
     }
     return VLC_SUCCESS;
 }
@@ -1036,7 +1035,7 @@ void xxmc_dispose_context( vout_thread_t *p_vout )
 static int xxmc_find_context( vout_thread_t *p_vout, vlc_xxmc_t *xxmc,
         unsigned int width, unsigned int height )
 {
-    int i, k;
+    unsigned int i, k;
     vlc_bool_t found = VLC_FALSE;
     xvmc_capabilities_t *curCap = NULL;
     unsigned int request_mpeg_flags, request_accel_flags;
@@ -1434,7 +1433,7 @@ void xvmc_vld_slice( picture_t *picture )
     picture->p_sys->xxmc_data.result =
             XvMCPutSlice2( p_vout->p_sys->p_display,
                            &p_vout->p_sys->context,
-                            picture->p_sys->xxmc_data.slice_data,
+                            (char *)picture->p_sys->xxmc_data.slice_data,
                             picture->p_sys->xxmc_data.slice_data_size,
                             picture->p_sys->xxmc_data.slice_code );
 
