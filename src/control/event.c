@@ -31,6 +31,28 @@
  * Private functions
  */
 
+static vlc_bool_t
+listeners_are_equal( libvlc_event_listener_t * listener1,
+                     libvlc_event_listener_t * listener2 )
+{
+    return listener1->event_type  == listener2->event_type &&
+           listener1->pf_callback == listener2->pf_callback &&
+           listener1->p_user_data == listener2->p_user_data;
+}
+
+static vlc_bool_t
+group_contains_listener( libvlc_event_listeners_group_t * group,
+                         libvlc_event_listener_t * searched_listener )
+{
+    int i;
+    for( i = 0; i < vlc_array_count(&group->listeners); i++ )
+    {
+        if( listeners_are_equal(searched_listener, vlc_array_item_at_index(&group->listeners, i)) )
+            return VLC_TRUE;
+    }
+    return VLC_FALSE;
+}
+
 /*
  * Internal libvlc functions
  */
@@ -79,7 +101,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
     libvlc_retain( p_libvlc_inst );
     vlc_array_init( &p_em->listeners_groups );
     vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->object_lock );
-    vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->event_sending_lock );
+    vlc_mutex_init_recursive( p_libvlc_inst->p_libvlc_int, &p_em->event_sending_lock );
     return p_em;
 }
 
@@ -185,17 +207,33 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
         }
     }
 
+    if( !listeners_group )
+    {
+        free( array_listeners_cached );
+        return;
+    }
+
     vlc_mutex_unlock( &p_em->object_lock );
 
-    /* Here a read/write lock would be *especially* nice,
-     * We would be able to send event without blocking */
-    /* The only reason for this lock is to be able to wait the
-     * End of events sending with libvlc_event_manager_lock_event_sending.
-     * This can be useful to make sure a callback is completely detached. */
     vlc_mutex_lock( &p_em->event_sending_lock );
     listener_cached = array_listeners_cached;
+    listeners_group->b_sublistener_removed = VLC_FALSE;
     for( i = 0; i < i_cached_listeners; i++ )
     {
+        if( listeners_group->b_sublistener_removed )
+        {
+            /* If a callback was removed, this gets called */
+            vlc_bool_t valid_listener;
+            vlc_mutex_lock( &p_em->object_lock );
+            valid_listener = group_contains_listener( listeners_group, listener_cached );
+            vlc_mutex_unlock( &p_em->object_lock );
+            if( !valid_listener )
+            {
+                listener_cached++;
+                continue;
+            }
+        }
+        
         listener_cached->pf_callback( p_event, listener_cached->p_user_data );
         listener_cached++;
     }
