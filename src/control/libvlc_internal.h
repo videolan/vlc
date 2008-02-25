@@ -272,14 +272,15 @@ typedef struct libvlc_event_listener_t
 typedef struct libvlc_event_listeners_group_t
 {
     libvlc_event_type_t event_type;
-    DECL_ARRAY(libvlc_event_listener_t *) listeners;
+    vlc_array_t listeners;
+    vlc_bool_t b_sublistener_removed;
 } libvlc_event_listeners_group_t;
 
 typedef struct libvlc_event_manager_t
 {
     void * p_obj;
     struct libvlc_instance_t * p_libvlc_instance;
-    DECL_ARRAY(libvlc_event_listeners_group_t *) listeners_groups;
+    vlc_array_t listeners_groups;
     vlc_mutex_t object_lock;
     vlc_mutex_t event_sending_lock;
 } libvlc_event_sender_t;
