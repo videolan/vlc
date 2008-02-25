@@ -1,10 +1,11 @@
 /*****************************************************************************
  * update.h: MacOS X Check-For-Update window
  *****************************************************************************
- * Copyright (C) 2005-2007 the VideoLAN team
+ * Copyright © 2005-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +22,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #ifdef UPDATE_CHECK
 #import <Cocoa/Cocoa.h>
 #import <vlc_update.h>
@@ -30,16 +35,14 @@
     IBOutlet id o_btn_DownloadNow;
     IBOutlet id o_btn_okay;
     IBOutlet id o_fld_releaseNote;
-    IBOutlet id o_fld_source;
-    IBOutlet id o_fld_currentVersionAndSize;
+    IBOutlet id o_fld_currentVersion;
     IBOutlet id o_fld_status;
     IBOutlet id o_update_window;
     IBOutlet id o_bar_checking;
     IBOutlet id o_chk_updateOnStartup;
 
-    NSString * o_urlOfBinary;
     update_t * p_u;
-    intf_thread_t * p_intf;
+    vlc_bool_t b_checked;
 }
 
 - (IBAction)download:(id)sender;
@@ -49,8 +52,8 @@
 - (BOOL)shouldCheckForUpdate;
 
 - (void)showUpdateWindow;
-- (void)initInterface;
 - (void)checkForUpdate;
+- (void)updateManagement: (vlc_bool_t) b_success;
 - (void)performDownload:(NSString *)path;
 
 + (VLCUpdate *)sharedInstance;

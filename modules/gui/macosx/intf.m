@@ -32,6 +32,10 @@
 #include <string.h>
 #include <vlc_keys.h>
 
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #import "intf.h"
 #import "fspanel.h"
 #import "vout.h"
@@ -420,7 +424,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_interaction_list = [[VLCInteractionList alloc] init];
     o_sfilters = nil;
 #ifdef UPDATE_CHECK
-    //FIXME o_update = [[VLCUpdate alloc] init];
+    o_update = [[VLCUpdate alloc] init];
 #endif
 
     i_lastShownVolume = -1;
@@ -865,9 +869,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
 
-    // FIXME
-    //if([o_update shouldCheckForUpdate])
-    //    [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
+    if([o_update shouldCheckForUpdate])
+        [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
 #endif
 
     /* Handle sleep notification */
@@ -2019,8 +2022,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 #ifdef UPDATE_CHECK
     if( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
-
     [o_update showUpdateWindow];
+#else
+    msg_Err( VLCIntf, "Updates checking was not enabled in this build" );
 #endif
 }
 
