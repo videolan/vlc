@@ -95,23 +95,35 @@ static inline unsigned long vlc_threadid (void)
 void vlc_pthread_fatal (const char *action, int error,
                         const char *file, unsigned line)
 {
-    char buf[1000];
-    const char *msg;
-
     fprintf (stderr, "LibVLC fatal error %s in thread %lu at %s:%u: %d\n",
              action, vlc_threadid (), file, line, error);
     fflush (stderr);
 
     /* Sometimes strerror_r() crashes too, so make sure we print an error
      * message before we invoke it */
-#ifdef __GLIBC__ && _POSIX_C_SOURCE < 200112L && _XOPEN_SOURCE < 600 && _GNU_SOURCE
-    /* use GNU prototype */
-    msg = strerror_r (error, buf, sizeof (buf));
+#ifdef __GLIBC__
+    /* Avoid the strerror_r() prototype brain damage in glibc */
+    errno = error;
+    fprintf (stderr, " Error message: %m\n");
 #else
-    msg = buf;
-    if (!strerror_r (error, buf, sizeof (buf)))
+    char buf[1000];
+    const char *msg;
+
+    switch (sterror_r (error, buf, sizeof (buf)))
+    {
+        case 0:
+            msg = buf;
+            break;
+        case ERANGE: /* should never happen */
+            msg = "unknwon (too big to display)";
+            break;
+        default:
+            msg = "unknown (invalid error number)";
+            break;
+    }
+    fprintf (stderr, " Error message: %s\n", msg);
 #endif
-        fprintf (stderr, "Error description: \"%s\"\n", msg ? msg : "(null)");
+
     fflush (stderr);
     abort ();
 }
