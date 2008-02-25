@@ -23,6 +23,7 @@
 
 #include "xxmc-config.h"
 
+#include <stddef.h>
 #include <inttypes.h>
 
 #include "mpeg2.h"
@@ -33,8 +34,8 @@
 # include "mmx.h"
 #endif
 
-void (* mpeg2_cpu_state_save) (cpu_state_t * state) = 0;
-void (* mpeg2_cpu_state_restore) (cpu_state_t * state) = 0;
+void (* mpeg2_cpu_state_save) (cpu_state_t * state) = NULL;
+void (* mpeg2_cpu_state_restore) (cpu_state_t * state) = NULL;
 
 static void state_restore_mmx (cpu_state_t * state)
 {

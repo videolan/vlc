@@ -23,6 +23,7 @@
 
 #include <stddef.h>
 #include <inttypes.h>
+#include <stdlib.h>
 
 #include "mpeg2.h"
 

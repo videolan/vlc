@@ -95,22 +95,22 @@
 /* #undef MPEG2DEC_GPROF */
 
 /* Name of package */
-#define PACKAGE "mpeg2dec"
+/*#define PACKAGE "mpeg2dec"*/
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
+/*#define PACKAGE_BUGREPORT ""*/
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME ""
+/*#define PACKAGE_NAME ""*/
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING ""
+/*#define PACKAGE_STRING ""*/
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME ""
+/*#define PACKAGE_TARNAME ""*/
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION ""
+/*#define PACKAGE_VERSION ""*/
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #define RETSIGTYPE void
