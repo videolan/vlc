@@ -810,7 +810,7 @@ static int xxmc_setup_subpictures( vout_thread_t *p_vout,
             XLockDisplay( p_vout->p_sys->p_display );
             msg_Dbg(p_vout, "xxmc_setup_subpictures");
 #ifdef HAVE_SYS_SHM_H
-            if( p_vout->p_sys->b_shm )
+            if( p_vout->p_sys->i_shm_opcode )
             {
                 /* Create image using XShm extension */
                 p_vout->p_sys->subImage = CreateShmImage( p_vout,
@@ -841,7 +841,7 @@ static int xxmc_setup_subpictures( vout_thread_t *p_vout,
         p_vout->p_sys->xvmc_palette = (char *) malloc( sp->num_palette_entries
                                                        * sp->entry_bytes );
         xxmc_xvmc_free_subpicture( p_vout, sp);
-        if( !p_vout->p_sys->xvmc_pallette )
+        if( !p_vout->p_sys->xvmc_palette )
             return VLC_EGENERIC;
         p_vout->p_sys->hwSubpictures = 1;
     }
@@ -970,7 +970,7 @@ static XvMCSurface *xxmc_xvmc_alloc_surface( vout_thread_t *p_vout,
         if( !handler->surfInUse[i] )
         {
             XVMCLOCKDISPLAY( p_vout->p_sys->p_display );
-            if( Success != XvMCCreateSurface( p_vout->p_sys->p_display
+            if( Success != XvMCCreateSurface( p_vout->p_sys->p_display,
                                               context,
                                               handler->surfaces + i) )
             {
@@ -1317,7 +1317,7 @@ static void dispose_ximage( vout_thread_t *p_vout, XShmSegmentInfo *shminfo,
                 XvImage *myimage )
 {
 # ifdef HAVE_SYS_SHM_H
-    if( p_vout->p_sys->b_shm )
+    if( p_vout->p_sys->i_shm_opcode )
     {
         XShmDetach( p_vout->p_sys->p_display, shminfo );
         XFree( myimage );
@@ -1340,11 +1340,11 @@ static void dispose_ximage( vout_thread_t *p_vout, XShmSegmentInfo *shminfo,
 
 void xvmc_vld_frame( picture_t *picture )
 {
-    vout_sys_t *p_sys = picture->p_sys;
+    picture_sys_t *p_sys  = picture->p_sys;
     vout_thread_t *p_vout = p_sys->p_vout;
-    vlc_vld_frame_t *vft = &(p_sys->xxmc_data.vld_frame);
-    picture_t *ff = (picture_t *) vft->forward_reference_picture;
-    picture_t *bf = (picture_t *) vft->backward_reference_picture;
+    vlc_vld_frame_t *vft  = &(p_sys->xxmc_data.vld_frame);
+    picture_t *ff         = (picture_t *) vft->forward_reference_picture;
+    picture_t *bf         = (picture_t *) vft->backward_reference_picture;
     XvMCMpegControl ctl;
     XvMCSurface *fs=0, *bs=0;
     XvMCQMatrix qmx;
@@ -1418,7 +1418,7 @@ void xvmc_vld_frame( picture_t *picture )
 
 void xvmc_vld_slice( picture_t *picture )
 {
-    vout_sys_t *p_sys     = picture->p_sys;
+    picture_sys_t *p_sys  = picture->p_sys;
     vout_thread_t *p_vout = p_sys->p_vout;
 
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
