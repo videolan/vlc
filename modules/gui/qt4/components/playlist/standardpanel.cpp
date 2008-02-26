@@ -275,13 +275,13 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
 
     ADD_META_ACTION( TITLE );
-    ADD_META_ACTION( ARTIST );
     ADD_META_ACTION( DURATION );
-    ADD_META_ACTION( COLLECTION );
+    ADD_META_ACTION( ARTIST );
     ADD_META_ACTION( GENRE );
+    ADD_META_ACTION( COLLECTION );
     ADD_META_ACTION( SEQ_NUM );
-    ADD_META_ACTION( RATING );
     ADD_META_ACTION( DESCRIPTION );
+    ADD_META_ACTION( RATING );
 
 #undef ADD_META_ACTION
 
