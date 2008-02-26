@@ -724,8 +724,8 @@ void PLModel::sort( int column, Qt::SortOrder order )
         switch( column )
         {
         case 0: i_mode = SORT_TITLE_NODES_FIRST;break;
-        case 1: i_mode = SORT_ARTIST;break;
-        case 2: i_mode = SORT_DURATION; break;
+        case 1: i_mode = SORT_DURATION; break;
+        case 2: i_mode = SORT_ARTIST;break;
         default: i_mode = SORT_TITLE_NODES_FIRST; break;
         }
         if( p_root )
