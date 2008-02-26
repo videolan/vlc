@@ -367,67 +367,22 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->i_children )
     {
-<<<<<<< .mine
         fprintf( stderr,
                   "ERROR: cannot delete object (%i, %s) with children\n",
                   p_this->i_object_id, p_this->psz_object_name );
         fflush(stderr);
         abort();
-=======
-        msg_Err( logger, "cannot delete object (%i, %s) with children" ,
-                 p_this->i_object_id, p_this->psz_object_name );
-        return;
->>>>>>> .r25344
     }
 
     if( p_this->p_parent )
     {
-<<<<<<< .mine
         fprintf( stderr,
                   "ERROR: cannot delete object (%i, %s) with a parent\n",
                   p_this->i_object_id, p_this->psz_object_name );
         fflush(stderr);
         abort();
-=======
-        msg_Err( logger, "cannot delete object (%i, %s) with a parent",
-                 p_this->i_object_id, p_this->psz_object_name );
-        return;
->>>>>>> .r25344
     }
 
-<<<<<<< .mine
-=======
-    while( p_priv->i_refcount > 0 )
-    {
-        i_delay++;
-
-        /* Don't warn immediately ... 100ms seems OK */
-        if( i_delay == 2 )
-        {
-            msg_Warn( logger,
-                  "refcount is %u, delaying before deletion (id=%d,type=%d)",
-                  p_priv->i_refcount, p_this->i_object_id,
-                  p_this->i_object_type );
-        }
-        else if( i_delay == 10 )
-        {
-            msg_Err( logger,
-                  "refcount is %u, delaying again (id=%d,type=%d)",
-                  p_priv->i_refcount, p_this->i_object_id,
-                  p_this->i_object_type );
-        }
-        else if( i_delay == 20 )
-        {
-            msg_Err( logger,
-                  "waited too long, cancelling destruction (id=%d,type=%d)",
-                  p_this->i_object_id, p_this->i_object_type );
-            return;
-        }
-
-        msleep( 100000 );
-    }
-
->>>>>>> .r25344
     /* Destroy the associated variables, starting from the end so that
      * no memmove calls have to be done. */
     while( p_priv->i_vars )
