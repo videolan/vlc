@@ -468,6 +468,7 @@ static void InteractionInit( playlist_t *p_playlist )
         return;
     }
 
+    p_interaction->psz_object_name = "interaction";
     p_interaction->i_dialogs = 0;
     p_interaction->pp_dialogs = NULL;
     p_interaction->p_intf = NULL;
