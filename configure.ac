@@ -797,7 +797,10 @@ AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, int)
 ])
 
-AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])])
+dnl don't attemp to use poll on darwin, it can't poll a tty. select will do a better job.
+if test "${SYS}" != "darwin"; then
+  AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])])
+fi
 
 dnl Check for dirent
 need_dirent=false
@@ -5332,7 +5335,7 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         MacOS X support (default enabled on MacOS X)])
 if test "x${enable_macosx}" = "xyes"
 then
-  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
+#  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
@@ -5344,7 +5347,7 @@ then
   VLC_ADD_LDFLAGS([opengllayer],                      [-Wl,-framework,QuartzCore])
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
 
-  VLC_ADD_PLUGINS([access_eyetv])
+#  VLC_ADD_PLUGINS([access_eyetv])
   VLC_ADD_BUILTINS([macosx minimal_macosx])
  
   ORIGCFLAGS=$CFLAGS
