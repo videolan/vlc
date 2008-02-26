@@ -75,14 +75,15 @@ static void * GetSymbol        ( module_handle_t, const char * );
 static char * GetWindowsError  ( void );
 #endif
 
-/*****************************************************************************
- * module_Call: call an entry point.
- *****************************************************************************
- * This function calls a symbol given its name and a module structure. The
- * symbol MUST refer to a function returning int and taking a module_t* as
- * an argument.
- *****************************************************************************/
-int module_Call( module_t * p_module )
+/**
+ * module Call
+ *
+ * Call a symbol given its name and a module structure. The symbol MUST
+ * refer to a function returning int and taking a module_t* as an argument.
+ * \param p_module the modules
+ * \return 0 if it pass and -1 in case of a failure
+ */
+int module_Call( module_t *p_module )
 {
     static const char psz_name[] = "vlc_entry" MODULE_SUFFIX;
     int (* pf_symbol) ( module_t * p_module );
@@ -126,12 +127,14 @@ int module_Call( module_t * p_module )
     return 0;
 }
 
-/*****************************************************************************
- * module_Load: loads a dynamic library
- *****************************************************************************
- * This function loads a dynamically linked library using a system dependant
- * method. Will return 0 on success as well as the module handle.
- *****************************************************************************/
+/**
+ * Load a dynamically linked library using a system dependant method.
+ *
+ * \param p_this vlc object
+ * \param psz_file library file
+ * \param p_handle the module handle returned
+ * \return 0 on success as well as the module handle.
+ */
 int module_Load( vlc_object_t *p_this, const char *psz_file,
                  module_handle_t *p_handle )
 {
@@ -233,13 +236,15 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     return 0;
 }
 
-/*****************************************************************************
+/**
  * CloseModule: unload a dynamic library
- *****************************************************************************
+ *
  * This function unloads a previously opened dynamically linked library
  * using a system dependant method. No return value is taken in consideration,
  * since some libraries sometimes refuse to close properly.
- *****************************************************************************/
+ * \param handle handle of the library
+ * \return nothing
+ */
 void module_Unload( module_handle_t handle )
 {
 #if defined(HAVE_DL_DYLD)
@@ -263,13 +268,16 @@ void module_Unload( module_handle_t handle )
     return;
 }
 
-/*****************************************************************************
+/**
  * GetSymbol: get a symbol from a dynamic library
- *****************************************************************************
+ *
  * This function queries a loaded library for a symbol specified in a
  * string, and returns a pointer to it. We don't check for dlerror() or
  * similar functions, since we want a non-NULL symbol anyway.
- *****************************************************************************/
+ * \param handle handle to the module
+ * \param psz_function function name
+ * \return nothing
+ */
 static void * _module_getsymbol( module_handle_t, const char * );
 
 static void * GetSymbol( module_handle_t handle, const char * psz_function )
