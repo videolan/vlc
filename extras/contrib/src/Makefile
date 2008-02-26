@@ -260,10 +260,16 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 # ***************************************************************************
 # CMake
 # ***************************************************************************
-CMake: 
-	cvs -d :pserver:anonymous:cmake@www.cmake.org:/cvsroot/CMake co cmake
+# cmake-$(CMAKE_VERSION).tar.gz:
+# 	$(WGET) $(CMAKE_URL)
+# 	
+# cmake: cmake-$(CMAKE_VERSION).tar.gz
+# 	$(EXTRACT_GZ)
+	
+cmake: 
+	cvs -d :pserver:anonymous:cmake@www.cmake.org:/cvsroot/CMake co -d cmake CMake
 
-.cmake: CMake
+.cmake: cmake
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
