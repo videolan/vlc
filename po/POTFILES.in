@@ -46,7 +46,6 @@ include/vlc_mtime.h
 include/vlc_network.h
 include/vlc_objects.h
 include/vlc_osd.h
-include/vlc_os_specific.h
 include/vlc_pgpkey.h
 include/vlc_playlist.h
 include/vlc_plugin.h
@@ -252,6 +251,7 @@ modules/access/ftp.c
 modules/access/gnomevfs.c
 modules/access/http.c
 modules/access/jack.c
+modules/access/mmap.c
 modules/access/mms/asf.c
 modules/access/mms/asf.h
 modules/access/mms/buffer.c
