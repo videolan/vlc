@@ -65,9 +65,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     vlc_mutex_init( p_playlist, &p_playlist->p_stats->lock );
     p_playlist->p_stats_computer = NULL;
 
-    // Interaction
-    p_playlist->p_interaction = NULL;
-
     // Preparse
     p_playlist->p_preparse = vlc_object_create( p_playlist,
                                   sizeof( playlist_preparse_t ) );
