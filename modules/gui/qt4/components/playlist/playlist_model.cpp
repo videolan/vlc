@@ -729,9 +729,12 @@ void PLModel::sort( int column, Qt::SortOrder order )
         default: i_mode = SORT_TITLE_NODES_FIRST; break;
         }
         if( p_root )
+        {
             playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
+            p_playlist->b_reset_currently_playing = VLC_TRUE;
+        }
     }
     PL_UNLOCK;
     rebuild();
