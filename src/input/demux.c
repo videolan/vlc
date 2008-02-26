@@ -174,7 +174,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         free( p_demux->psz_path );
         free( p_demux->psz_demux );
         free( p_demux->psz_access );
-        vlc_object_destroy( p_demux );
+        vlc_object_release( p_demux );
         return NULL;
     }
 
@@ -193,7 +193,7 @@ void demux2_Delete( demux_t *p_demux )
     free( p_demux->psz_demux );
     free( p_demux->psz_access );
 
-    vlc_object_destroy( p_demux );
+    vlc_object_release( p_demux );
 }
 
 /*****************************************************************************
@@ -340,7 +340,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     if( ( p_sys->p_fifo = block_FifoNew( s ) ) == NULL )
     {
         msg_Err( s, "out of memory" );
-        vlc_object_destroy( s );
+        vlc_object_release( s );
         free( p_sys );
         return NULL;
     }
@@ -348,7 +348,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     if( vlc_thread_create( s, "stream out", DStreamThread,
                            VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
     {
-        vlc_object_destroy( s );
+        vlc_object_release( s );
         free( p_sys );
         return NULL;
     }
@@ -381,7 +381,7 @@ void stream_DemuxDelete( stream_t *s )
     free( p_sys->psz_name );
     free( p_sys );
 
-    vlc_object_destroy( s );
+    vlc_object_release( s );
 }
 
 

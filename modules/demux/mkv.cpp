@@ -2693,7 +2693,7 @@ void demux_sys_t::StopUiThread()
     {
         vlc_object_kill( p_ev );
         vlc_thread_join( p_ev );
-        vlc_object_destroy( p_ev );
+        vlc_object_release( p_ev );
 
         p_ev = NULL;
 

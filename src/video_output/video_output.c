@@ -405,7 +405,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     {
         msg_Err( p_vout, "no suitable vout module" );
         vlc_object_detach( p_vout );
-        vlc_object_destroy( p_vout );
+        vlc_object_release( p_vout );
         return NULL;
     }
 
@@ -459,7 +459,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
         vlc_object_detach( p_vout );
-        vlc_object_destroy( p_vout );
+        vlc_object_release( p_vout );
         return NULL;
     }
 
@@ -472,7 +472,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         vlc_thread_join( p_vout );
 
         vlc_object_detach( p_vout );
-        vlc_object_destroy( p_vout );
+        vlc_object_release( p_vout );
         return NULL;
     }
 
@@ -503,7 +503,7 @@ void vout_Destroy( vout_thread_t *p_vout )
     config_ChainDestroy( p_vout->p_cfg );
 
     /* Free structure */
-    vlc_object_destroy( p_vout );
+    vlc_object_release( p_vout );
 #ifndef __APPLE__
     /* This is a dirty hack for mostly Linux, where there is no way to get the GUI
        back if you closed it while playing video. This is solved in Mac OS X,
@@ -1001,7 +1001,7 @@ static void RunThread( vout_thread_t *p_vout)
                     msg_Err( p_vout, "no video filter found (%s)",
                              p_vout->psz_vfilters[i] );
                     vlc_object_detach( p_vfilter );
-                    vlc_object_destroy( p_vfilter );
+                    vlc_object_release( p_vfilter );
                 }
             }
             p_vout->b_vfilter_change = VLC_FALSE;
@@ -1451,7 +1451,7 @@ static void SuxorRestartVideoES( suxor_thread_t *p_this )
 
     vlc_object_release( p_this->p_input );
 
-    vlc_object_destroy( p_this );
+    vlc_object_release( p_this );
 }
 
 /*****************************************************************************
@@ -1629,7 +1629,7 @@ static void RemoveVideoFilters2( vout_thread_t *p_vout )
         }
 
         free( p_vout->pp_vfilters[i]->p_owner );
-        vlc_object_destroy( p_vout->pp_vfilters[i] );
+        vlc_object_release( p_vout->pp_vfilters[i] );
     }
     p_vout->i_vfilters = 0;
 }

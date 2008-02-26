@@ -162,7 +162,7 @@ int spu_ParseChain( spu_t *p_spu )
             msg_Dbg( p_spu, "no sub filter found" );
             config_ChainDestroy( p_spu->pp_filter[p_spu->i_filter]->p_cfg );
             vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
-            vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
+            vlc_object_release( p_spu->pp_filter[p_spu->i_filter] );
         }
 
         if( p_spu->i_filter >= 10 )
@@ -203,7 +203,7 @@ void spu_Destroy( spu_t *p_spu )
             module_Unneed( p_spu->p_blend, p_spu->p_blend->p_module );
 
         vlc_object_detach( p_spu->p_blend );
-        vlc_object_destroy( p_spu->p_blend );
+        vlc_object_release( p_spu->p_blend );
     }
 
     if( p_spu->p_text )
@@ -212,7 +212,7 @@ void spu_Destroy( spu_t *p_spu )
             module_Unneed( p_spu->p_text, p_spu->p_text->p_module );
 
         vlc_object_detach( p_spu->p_text );
-        vlc_object_destroy( p_spu->p_text );
+        vlc_object_release( p_spu->p_text );
     }
 
     if( p_spu->p_scale )
@@ -221,13 +221,13 @@ void spu_Destroy( spu_t *p_spu )
             module_Unneed( p_spu->p_scale, p_spu->p_scale->p_module );
 
         vlc_object_detach( p_spu->p_scale );
-        vlc_object_destroy( p_spu->p_scale );
+        vlc_object_release( p_spu->p_scale );
     }
 
     spu_DeleteChain( p_spu );
 
     vlc_mutex_destroy( &p_spu->subpicture_lock );
-    vlc_object_destroy( p_spu );
+    vlc_object_release( p_spu );
 }
 
 static void spu_DeleteChain( spu_t *p_spu )
@@ -241,7 +241,7 @@ static void spu_DeleteChain( spu_t *p_spu )
         free( p_spu->pp_filter[p_spu->i_filter]->p_owner );
         config_ChainDestroy( p_spu->pp_filter[p_spu->i_filter]->p_cfg );
         vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
-        vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
+        vlc_object_release( p_spu->pp_filter[p_spu->i_filter] );
     }
 }
 

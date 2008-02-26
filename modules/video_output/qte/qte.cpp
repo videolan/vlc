@@ -191,7 +191,7 @@ static void Close ( vlc_object_t *p_this )
         CloseDisplay(p_vout);
 
         vlc_thread_join( p_vout->p_sys->p_event );
-        vlc_object_destroy( p_vout->p_sys->p_event );
+        vlc_object_release( p_vout->p_sys->p_event );
     }
 
 #ifdef NEED_QTE_MAIN
@@ -541,7 +541,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                             VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE) )
     {
         msg_Err( p_vout, "cannot create QT Embedded Thread" );
-        vlc_object_destroy( p_vout->p_sys->p_event );
+        vlc_object_release( p_vout->p_sys->p_event );
         p_vout->p_sys->p_event = NULL;
         return -1;
     }

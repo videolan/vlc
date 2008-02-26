@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
     if( i_handle == -1 )
     {
          msg_Err( p_access, "failed to create raw UDP socket" );
-         vlc_object_destroy (p_sys->p_thread);
+         vlc_object_release (p_sys->p_thread);
          free (p_sys);
          return VLC_EGENERIC;
     }
@@ -271,7 +271,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
         net_Close (i_handle);
-        vlc_object_destroy( p_sys->p_thread );
+        vlc_object_release( p_sys->p_thread );
         free (p_sys);
         return VLC_EGENERIC;
     }
@@ -316,7 +316,7 @@ static void Close( vlc_object_t * p_this )
     net_Close( p_sys->p_thread->i_handle );
 
     vlc_object_detach( p_sys->p_thread );
-    vlc_object_destroy( p_sys->p_thread );
+    vlc_object_release( p_sys->p_thread );
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol--;
 

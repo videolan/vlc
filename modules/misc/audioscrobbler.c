@@ -249,7 +249,7 @@ static void Unload( intf_thread_t *p_this )
     if( p_this->p_module )
         module_Unneed( p_this, p_this->p_module );
     vlc_mutex_destroy( &p_this->change_lock );
-    vlc_object_destroy( p_this );
+    vlc_object_release( p_this );
 }
 
 /*****************************************************************************

@@ -1032,7 +1032,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     vlc_mutex_destroy( &p_libvlc->timer_lock );
 
     if( b_release ) vlc_object_release( p_libvlc );
-    vlc_object_destroy( p_libvlc );
+    vlc_object_release( p_libvlc );
     p_libvlc = NULL;
 
     /* Stop thread system: last one out please shut the door!

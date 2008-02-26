@@ -343,7 +343,7 @@ static int Init( vout_thread_t *p_vout )
         msg_Err( p_vout, "can't open internal opencv filter: %s", p_vout->p_sys->psz_inner_name );
         p_vout->p_sys->psz_inner_name = NULL;
         vlc_object_detach( p_sys->p_opencv );
-        vlc_object_destroy( p_sys->p_opencv );
+        vlc_object_release( p_sys->p_opencv );
         p_sys->p_opencv = NULL;
     }
 
@@ -389,7 +389,7 @@ static void End( vout_thread_t *p_vout )
         if( p_vout->p_sys->p_opencv->p_module )
             module_Unneed( p_vout->p_sys->p_opencv, p_vout->p_sys->p_opencv->p_module );
         vlc_object_detach( p_vout->p_sys->p_opencv );
-        vlc_object_destroy( p_vout->p_sys->p_opencv );
+        vlc_object_release( p_vout->p_sys->p_opencv );
         p_vout->p_sys->p_opencv = NULL;
     }
 

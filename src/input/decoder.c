@@ -183,7 +183,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         DecoderUnsupportedCodec( p_dec, fmt->i_codec );
 
         DeleteDecoder( p_dec );
-        vlc_object_destroy( p_dec );
+        vlc_object_release( p_dec );
         return NULL;
     }
 
@@ -214,7 +214,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
             msg_Err( p_dec, "cannot spawn decoder thread" );
             module_Unneed( p_dec, p_dec->p_module );
             DeleteDecoder( p_dec );
-            vlc_object_destroy( p_dec );
+            vlc_object_release( p_dec );
             return NULL;
         }
     }
@@ -265,7 +265,7 @@ void input_DecoderDelete( decoder_t *p_dec )
     DeleteDecoder( p_dec );
 
     /* Delete the decoder */
-    vlc_object_destroy( p_dec );
+    vlc_object_release( p_dec );
 }
 
 /**
@@ -382,7 +382,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, vlc_bool_t b_decode, int i_channe
         {
             DecoderUnsupportedCodec( p_dec, fcc[i_channel] );
             DeleteDecoder( p_cc );
-            vlc_object_destroy( p_cc );
+            vlc_object_release( p_cc );
             return VLC_EGENERIC;
         }
 
@@ -404,7 +404,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, vlc_bool_t b_decode, int i_channe
             vlc_object_kill( p_cc );
             module_Unneed( p_cc, p_cc->p_module );
             DeleteDecoder( p_cc );
-            vlc_object_destroy( p_cc );
+            vlc_object_release( p_cc );
         }
     }
     return VLC_SUCCESS;
@@ -526,7 +526,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             {
                 es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
                 vlc_object_detach( p_dec->p_owner->p_packetizer );
-                vlc_object_destroy( p_dec->p_owner->p_packetizer );
+                vlc_object_release( p_dec->p_owner->p_packetizer );
             }
         }
     }
@@ -1028,7 +1028,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
         es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_out );
         vlc_object_detach( p_dec->p_owner->p_packetizer );
-        vlc_object_destroy( p_dec->p_owner->p_packetizer );
+        vlc_object_release( p_dec->p_owner->p_packetizer );
     }
 
     vlc_mutex_destroy( &p_dec->p_owner->lock_cc );

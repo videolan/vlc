@@ -105,7 +105,7 @@ static int Open( vlc_object_t *p_this )
     if( vlc_thread_create( p_qte_main, "qte_main", QteMain,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
-        vlc_object_destroy( p_qte_main );
+        vlc_object_release( p_qte_main );
         i_refcount--;
         vlc_mutex_unlock( lock );
         return VLC_ETHREAD;
@@ -145,7 +145,7 @@ static void Close( vlc_object_t *p_this )
     msg_Dbg( p_this, "Detaching qte_main" );
     vlc_object_detach( p_qte_main );
 
-    vlc_object_destroy( p_qte_main );
+    vlc_object_release( p_qte_main );
     p_qte_main = NULL;
 
     vlc_mutex_unlock( lock );

@@ -546,7 +546,7 @@ static void CloseBlending( intf_thread_t *p_intf )
                            p_intf->p_sys->p_blend->p_module );
 
         vlc_object_detach( p_intf->p_sys->p_blend );
-        vlc_object_destroy( p_intf->p_sys->p_blend );
+        vlc_object_release( p_intf->p_sys->p_blend );
     }
 }
 #endif
@@ -597,7 +597,7 @@ static void CloseTextRenderer( intf_thread_t *p_intf )
                            p_intf->p_sys->p_text->p_module );
 
         vlc_object_detach( p_intf->p_sys->p_text );
-        vlc_object_destroy( p_intf->p_sys->p_text );
+        vlc_object_release( p_intf->p_sys->p_text );
     }
 }
 #if 0
@@ -636,7 +636,7 @@ static int CloseScaling( intf_thread_t *p_intf )
                            p_intf->p_sys->p_scale->p_module );
 
         vlc_object_detach( p_intf->p_sys->p_scale );
-        vlc_object_destroy( p_intf->p_sys->p_scale );
+        vlc_object_release( p_intf->p_sys->p_scale );
     }
 }
 #endif

@@ -374,7 +374,7 @@ static int OpenAudio( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         CloseHandle( p_aout->output.p_sys->p_notif->event );
-        vlc_object_destroy( p_aout->output.p_sys->p_notif );
+        vlc_object_release( p_aout->output.p_sys->p_notif );
         p_aout->output.p_sys->p_notif = NULL;
         goto error;
     }
@@ -594,7 +594,7 @@ static void CloseAudio( vlc_object_t *p_this )
         if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );
 
         vlc_thread_join( p_sys->p_notif );
-        vlc_object_destroy( p_sys->p_notif );
+        vlc_object_release( p_sys->p_notif );
     }
 
     /* release the secondary buffer */

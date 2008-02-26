@@ -80,7 +80,7 @@ void aout_Delete( aout_instance_t * p_aout )
     vlc_mutex_destroy( &p_aout->output_fifo_lock );
 
     /* Free structure. */
-    vlc_object_destroy( p_aout );
+    vlc_object_release( p_aout );
 }
 
 

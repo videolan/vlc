@@ -472,7 +472,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_out )
     {
         msg_Err( p_stream, "cannot create chain" );
-        vlc_object_destroy( p_sys );
+        vlc_object_release( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -884,7 +884,7 @@ static void Close( vlc_object_t * p_this )
     }
     if( p_sys->psz_osdenc ) free( p_sys->psz_osdenc );
 
-    vlc_object_destroy( p_sys );
+    vlc_object_release( p_sys );
 }
 
 struct sout_stream_id_t
@@ -1113,7 +1113,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( id->p_decoder )
     {
         vlc_object_detach( id->p_decoder );
-        vlc_object_destroy( id->p_decoder );
+        vlc_object_release( id->p_decoder );
         id->p_decoder = NULL;
     }
 
@@ -1121,7 +1121,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         vlc_object_detach( id->p_encoder );
         es_format_Clean( &id->p_encoder->fmt_out );
-        vlc_object_destroy( id->p_encoder );
+        vlc_object_release( id->p_encoder );
         id->p_encoder = NULL;
     }
 
@@ -1157,7 +1157,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( id->p_decoder )
     {
         vlc_object_detach( id->p_decoder );
-        vlc_object_destroy( id->p_decoder );
+        vlc_object_release( id->p_decoder );
         id->p_decoder = NULL;
     }
 
@@ -1165,7 +1165,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         vlc_object_detach( id->p_encoder );
         es_format_Clean( &id->p_encoder->fmt_out );
-        vlc_object_destroy( id->p_encoder );
+        vlc_object_release( id->p_encoder );
         id->p_encoder = NULL;
     }
     free( id );
@@ -1301,7 +1301,7 @@ static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
     else
     {
         vlc_object_detach( p_filter );
-        vlc_object_destroy( p_filter );
+        vlc_object_release( p_filter );
         p_filter = 0;
     }
 
@@ -1525,14 +1525,14 @@ static void transcode_audio_close( sout_stream_id_t *id )
         vlc_object_detach( id->pp_filter[i] );
         if( id->pp_filter[i]->p_module )
             module_Unneed( id->pp_filter[i], id->pp_filter[i]->p_module );
-        vlc_object_destroy( id->pp_filter[i] );
+        vlc_object_release( id->pp_filter[i] );
     }
     for( i = 0; i < id->i_ufilter; i++ )
     {
         vlc_object_detach( id->pp_ufilter[i] );
         if( id->pp_ufilter[i]->p_module )
             module_Unneed( id->pp_ufilter[i], id->pp_ufilter[i]->p_module );
-        vlc_object_destroy( id->pp_ufilter[i] );
+        vlc_object_release( id->pp_ufilter[i] );
     }
 }
 
@@ -2110,7 +2110,7 @@ static void transcode_video_close( sout_stream_t *p_stream,
                                   id->pp_filter[i]->p_owner->pp_pics[j] );
         }
         free( id->pp_filter[i]->p_owner );
-        vlc_object_destroy( id->pp_filter[i] );
+        vlc_object_release( id->pp_filter[i] );
         id->pp_filter[i] = NULL;
     }
 
@@ -2128,7 +2128,7 @@ static void transcode_video_close( sout_stream_t *p_stream,
                                   id->pp_ufilter[i]->p_owner->pp_pics[j] );
         }
         free( id->pp_ufilter[i]->p_owner );
-        vlc_object_destroy( id->pp_ufilter[i] );
+        vlc_object_release( id->pp_ufilter[i] );
         id->pp_ufilter[i] = NULL;
     }
 }
@@ -2242,7 +2242,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 {
                     msg_Dbg( p_stream, "no video filter found" );
                     vlc_object_detach( id->pp_filter[id->i_filter] );
-                    vlc_object_destroy( id->pp_filter[id->i_filter] );
+                    vlc_object_release( id->pp_filter[id->i_filter] );
                 }
             }
 
@@ -2302,7 +2302,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 {
                     msg_Dbg( p_stream, "no video filter found" );
                     vlc_object_detach( id->pp_filter[id->i_filter] );
-                    vlc_object_destroy( id->pp_filter[id->i_filter] );
+                    vlc_object_release( id->pp_filter[id->i_filter] );
 
                     p_pic->pf_release( p_pic );
                     transcode_video_close( p_stream, id );
@@ -2341,7 +2341,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 {
                     msg_Dbg( p_stream, "no video filter found" );
                     vlc_object_detach( id->pp_ufilter[id->i_ufilter] );
-                    vlc_object_destroy( id->pp_ufilter[id->i_ufilter] );
+                    vlc_object_release( id->pp_ufilter[id->i_ufilter] );
                     id->pp_ufilter[id->i_ufilter] = NULL;
                 }
             }

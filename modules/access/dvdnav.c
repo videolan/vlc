@@ -357,7 +357,7 @@ static void Close( vlc_object_t *p_this )
     /* stop the event handler */
     vlc_object_kill( p_sys->p_ev );
     vlc_thread_join( p_sys->p_ev );
-    vlc_object_destroy( p_sys->p_ev );
+    vlc_object_release( p_sys->p_ev );
 
     var_Destroy( p_sys->p_input, "highlight-mutex" );
     var_Destroy( p_sys->p_input, "highlight" );

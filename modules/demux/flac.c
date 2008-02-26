@@ -152,7 +152,7 @@ static int Open( vlc_object_t * p_this )
     {
         if( p_sys->p_packetizer->fmt_in.p_extra )
             free( p_sys->p_packetizer->fmt_in.p_extra );
-        vlc_object_destroy( p_sys->p_packetizer );
+        vlc_object_release( p_sys->p_packetizer );
 
         msg_Err( p_demux, "cannot find flac packetizer" );
         return VLC_EGENERIC;
@@ -193,7 +193,7 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->p_packetizer->fmt_in.p_extra );
 
     /* Delete the decoder */
-    vlc_object_destroy( p_sys->p_packetizer );
+    vlc_object_release( p_sys->p_packetizer );
     if( p_sys->p_meta )
         vlc_meta_Delete( p_sys->p_meta );
     free( p_sys );

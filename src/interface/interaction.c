@@ -71,7 +71,7 @@ void intf_InteractionDestroy( interaction_t *p_interaction )
         DialogDestroy( p_dialog );
         REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
     }
-    vlc_object_destroy( p_interaction );
+    vlc_object_release( p_interaction );
 }
 
 /**

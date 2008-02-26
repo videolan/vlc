@@ -95,7 +95,6 @@ struct vlc_object_t
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
-VLC_EXPORT( void, __vlc_object_destroy, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
 VLC_EXPORT( void *, vlc_object_get, ( int ) );
@@ -110,10 +109,6 @@ VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 
 #define vlc_object_create(a,b) \
     __vlc_object_create( VLC_OBJECT(a), b )
-
-#define vlc_object_destroy(a) do { \
-    __vlc_object_destroy( VLC_OBJECT(a) ); \
-    (a) = NULL; } while(0)
 
 #define vlc_object_detach(a) \
     __vlc_object_detach( VLC_OBJECT(a) )

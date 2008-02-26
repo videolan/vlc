@@ -77,7 +77,7 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     if( p_sd->p_module == NULL )
     {
         msg_Err( p_super, "no suitable services discovery module" );
-        vlc_object_destroy( p_sd );
+        vlc_object_release( p_sd );
         return NULL;
     }
     p_sd->psz_module = strdup( psz_module_name );
@@ -98,7 +98,7 @@ void services_discovery_Destroy ( services_discovery_t * p_sd )
     free( p_sd->psz_localized_name );
 
     vlc_object_detach( p_sd );
-    vlc_object_destroy( p_sd );
+    vlc_object_release( p_sd );
 }
 
 /***********************************************************************
@@ -111,7 +111,7 @@ int services_discovery_Start ( services_discovery_t * p_sd )
                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE))
     {
         msg_Err( p_sd, "cannot create services discovery thread" );
-        vlc_object_destroy( p_sd );
+        vlc_object_release( p_sd );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;

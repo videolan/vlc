@@ -137,7 +137,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
                            Manage, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         vlc_mutex_destroy( &p_vlm->lock );
-        vlc_object_destroy( p_vlm );
+        vlc_object_release( p_vlm );
         return NULL;
     }
 
@@ -198,7 +198,7 @@ void vlm_Delete( vlm_t *p_vlm )
 
     vlc_mutex_destroy( &p_vlm->lock );
 
-    vlc_object_destroy( p_vlm );
+    vlc_object_release( p_vlm );
     vlc_mutex_unlock( lockval.p_address );
 }
 
@@ -2367,7 +2367,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         {
             msg_Err( p_vlm, "cannot find vod server" );
             vlc_object_detach( p_vlm->p_vod );
-            vlc_object_destroy( p_vlm->p_vod );
+            vlc_object_release( p_vlm->p_vod );
             p_vlm->p_vod = 0;
             return VLC_EGENERIC;
         }
@@ -2435,7 +2435,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
     {
         module_Unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
         vlc_object_detach( p_vlm->p_vod );
-        vlc_object_destroy( p_vlm->p_vod );
+        vlc_object_release( p_vlm->p_vod );
         p_vlm->p_vod = NULL;
     }
     return VLC_SUCCESS;

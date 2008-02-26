@@ -111,7 +111,7 @@ static int Open( vlc_object_t *p_this )
     if( vlc_thread_create( p_gtk_main, "gtk_main", GtkMain,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
-        vlc_object_destroy( p_gtk_main );
+        vlc_object_release( p_gtk_main );
         i_refcount--;
         vlc_mutex_unlock( lock );
         return VLC_ETHREAD;
@@ -143,7 +143,7 @@ static void Close( vlc_object_t *p_this )
     gtk_main_quit();
     vlc_thread_join( p_gtk_main );
 
-    vlc_object_destroy( p_gtk_main );
+    vlc_object_release( p_gtk_main );
     p_gtk_main = NULL;
 
     vlc_mutex_unlock( lock );

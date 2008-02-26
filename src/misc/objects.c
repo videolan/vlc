@@ -92,6 +92,8 @@ static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
 static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
+static void vlc_object_destroy( vlc_object_t *p_this );
+
 /*****************************************************************************
  * Local structure lock
  *****************************************************************************/
@@ -189,7 +191,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         vlc_mutex_unlock( &structure_lock );
     }
 
-    p_priv->i_refcount = 0;
+    p_priv->i_refcount = 1;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
@@ -347,16 +349,15 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
 /**
  ****************************************************************************
- * Destroy a vlc object
+ * Destroy a vlc object (Internal)
  *
  * This function destroys an object that has been previously allocated with
  * vlc_object_create. The object's refcount must be zero and it must not be
  * attached to other objects in any way.
  *****************************************************************************/
-void __vlc_object_destroy( vlc_object_t *p_this )
+static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-    int i_delay = 0;
 
     /* FIXME: ugly hack - we cannot use the message queue after
          * msg_Destroy(). */
@@ -366,18 +367,36 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->i_children )
     {
+<<<<<<< .mine
+        fprintf( stderr,
+                  "ERROR: cannot delete object (%i, %s) with children\n",
+                  p_this->i_object_id, p_this->psz_object_name );
+        fflush(stderr);
+        abort();
+=======
         msg_Err( logger, "cannot delete object (%i, %s) with children" ,
                  p_this->i_object_id, p_this->psz_object_name );
         return;
+>>>>>>> .r25344
     }
 
     if( p_this->p_parent )
     {
+<<<<<<< .mine
+        fprintf( stderr,
+                  "ERROR: cannot delete object (%i, %s) with a parent\n",
+                  p_this->i_object_id, p_this->psz_object_name );
+        fflush(stderr);
+        abort();
+=======
         msg_Err( logger, "cannot delete object (%i, %s) with a parent",
                  p_this->i_object_id, p_this->psz_object_name );
         return;
+>>>>>>> .r25344
     }
 
+<<<<<<< .mine
+=======
     while( p_priv->i_refcount > 0 )
     {
         i_delay++;
@@ -408,6 +427,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         msleep( 100000 );
     }
 
+>>>>>>> .r25344
     /* Destroy the associated variables, starting from the end so that
      * no memmove calls have to be done. */
     while( p_priv->i_vars )
@@ -423,10 +443,34 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     if( p_this->i_object_type == VLC_OBJECT_GLOBAL )
     {
         libvlc_global_data_t *p_global = (libvlc_global_data_t *)p_this;
+
+        /* Remove ourselves */
+        int i_index = FindIndex( p_this, p_global->pp_objects,
+                             p_global->i_objects );
+        REMOVE_ELEM( p_global->pp_objects,
+                     p_global->i_objects, i_index );
+
+        /* Test for leaks */
+        if( p_global->i_objects > 0 )
+        {
+            int i;
+            for( i = 0; i < p_global->i_objects; i++ )
+            {
+                /* We are leaking this object */
+                fprintf( stderr,
+                      "ERROR: We are leaking object (id:%i, type:%s, name:%s)\n",
+                      p_global->pp_objects[i]->i_object_id,
+                      p_global->pp_objects[i]->psz_object_type,
+                      p_global->pp_objects[i]->psz_object_name );
+                fflush(stderr);
+            }
+            /* Strongly abort, cause we want these to be fixed */
+            abort();
+        }
+
         /* We are the global object ... no need to lock. */
         free( p_global->pp_objects );
         p_global->pp_objects = NULL;
-        p_global->i_objects--;
 
         vlc_mutex_destroy( &structure_lock );
     }
@@ -884,20 +928,37 @@ void __vlc_object_yield( vlc_object_t *p_this )
     vlc_mutex_unlock( &structure_lock );
 }
 
-static inline void Release( vlc_object_t *obj )
-{
-    assert( obj->p_internals->i_refcount > 0 );
-    obj->p_internals->i_refcount--;
-}
-
 /*****************************************************************************
  * decrement an object refcount
+ * And destroy the object if its refcount reach zero.
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
+    vlc_bool_t b_should_destroy;
+
     vlc_mutex_lock( &structure_lock );
-    Release( p_this );
+
+    assert( p_this->p_internals->i_refcount > 0 );
+    p_this->p_internals->i_refcount--;
+    b_should_destroy = (p_this->p_internals->i_refcount == 0);
+
     vlc_mutex_unlock( &structure_lock );
+
+    if( b_should_destroy )
+        vlc_object_destroy( p_this );
+}
+
+/* Version without the lock */
+static void vlc_object_release_locked( vlc_object_t *p_this )
+{
+    vlc_bool_t b_should_destroy;
+
+    assert( p_this->p_internals->i_refcount > 0 );
+    p_this->p_internals->i_refcount--;
+    b_should_destroy = (p_this->p_internals->i_refcount == 0);
+
+    if( b_should_destroy )
+        vlc_object_destroy( p_this );
 }
 
 /**
@@ -1221,7 +1282,7 @@ void vlc_list_release( vlc_list_t *p_list )
     vlc_mutex_lock( &structure_lock );
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        Release( p_list->p_values[i_index].p_object );
+        vlc_object_release_locked( p_list->p_values[i_index].p_object );
     }
     vlc_mutex_unlock( &structure_lock );
 

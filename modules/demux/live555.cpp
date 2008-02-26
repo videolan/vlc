@@ -398,7 +398,7 @@ error:
         vlc_object_kill( p_sys->p_timeout );
         vlc_thread_join( p_sys->p_timeout );
         vlc_object_detach( p_sys->p_timeout );
-        vlc_object_destroy( p_sys->p_timeout );
+        vlc_object_release( p_sys->p_timeout );
     }
     if( p_sys->scheduler ) delete p_sys->scheduler;
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
@@ -439,7 +439,7 @@ static void Close( vlc_object_t *p_this )
         vlc_object_kill( p_sys->p_timeout );
         vlc_thread_join( p_sys->p_timeout );
         vlc_object_detach( p_sys->p_timeout );
-        vlc_object_destroy( p_sys->p_timeout );
+        vlc_object_release( p_sys->p_timeout );
     }
     if( p_sys->scheduler ) delete p_sys->scheduler;
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
@@ -1033,7 +1033,7 @@ static int Play( demux_t *p_demux )
                                    VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
             {
                 msg_Err( p_demux, "cannot spawn liveMedia timeout thread" );
-                vlc_object_destroy( p_sys->p_timeout );
+                vlc_object_release( p_sys->p_timeout );
             }
             msg_Dbg( p_demux, "spawned timeout thread" );
             vlc_object_attach( p_sys->p_timeout, p_demux );

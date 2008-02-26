@@ -73,7 +73,7 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
     if (srv->p_module == NULL)
     {
         msg_Err (srv, "TLS server plugin not available");
-        vlc_object_destroy (srv);
+        vlc_object_release (srv);
         return NULL;
     }
 
@@ -94,7 +94,7 @@ void tls_ServerDelete (tls_server_t *srv)
 
     module_Unneed (srv, srv->p_module);
     vlc_object_detach (srv);
-    vlc_object_destroy (srv);
+    vlc_object_release (srv);
 }
 
 
@@ -189,7 +189,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     if (cl->p_module == NULL)
     {
         msg_Err (cl, "TLS client plugin not available");
-        vlc_object_destroy (cl);
+        vlc_object_release (cl);
         return NULL;
     }
 
@@ -208,7 +208,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     msg_Err (cl, "TLS client session handshake error");
 
     module_Unneed (cl, cl->p_module);
-    vlc_object_destroy (cl);
+    vlc_object_release (cl);
     return NULL;
 }
 
@@ -224,5 +224,5 @@ void tls_ClientDelete (tls_session_t *cl)
 
     module_Unneed (cl, cl->p_module);
     vlc_object_detach (cl);
-    vlc_object_destroy (cl);
+    vlc_object_release (cl);
 }

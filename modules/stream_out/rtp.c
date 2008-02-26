@@ -1210,7 +1210,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
     vlc_object_detach( id );
-    vlc_object_destroy( id );
+    vlc_object_release( id );
     return VLC_SUCCESS;
 }
 

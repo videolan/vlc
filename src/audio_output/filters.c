@@ -58,7 +58,7 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
     if ( p_filter->p_module == NULL )
     {
         vlc_object_detach( p_filter );
-        vlc_object_destroy( p_filter );
+        vlc_object_release( p_filter );
         return NULL;
     }
 
@@ -122,7 +122,7 @@ static void ReleaseFilter( aout_filter_t * p_filter )
 {
     module_Unneed( p_filter, p_filter->p_module );
     vlc_object_detach( p_filter );
-    vlc_object_destroy( p_filter );
+    vlc_object_release( p_filter );
 }
 
 /*****************************************************************************
@@ -273,7 +273,7 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
     {
         module_Unneed( pp_filters[i], pp_filters[i]->p_module );
         vlc_object_detach( pp_filters[i] );
-        vlc_object_destroy( pp_filters[i] );
+        vlc_object_release( pp_filters[i] );
     }
 }
 

@@ -1036,7 +1036,7 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
             vlc_thread_join( pp_contexts[i] );
             vlc_mutex_destroy( &pp_contexts[i]->lock );
             vlc_cond_destroy( &pp_contexts[i]->cond );
-            vlc_object_destroy( pp_contexts[i] );
+            vlc_object_release( pp_contexts[i] );
         }
 
         free( pp_contexts );

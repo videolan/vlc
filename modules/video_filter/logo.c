@@ -417,7 +417,7 @@ static int Init( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "can't open blending filter, aborting" );
         vlc_object_detach( p_sys->p_blend );
-        vlc_object_destroy( p_sys->p_blend );
+        vlc_object_release( p_sys->p_blend );
         return VLC_EGENERIC;
     }
 
@@ -498,7 +498,7 @@ static void End( vout_thread_t *p_vout )
     if( p_sys->p_blend->p_module )
         module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );
     vlc_object_detach( p_sys->p_blend );
-    vlc_object_destroy( p_sys->p_blend );
+    vlc_object_release( p_sys->p_blend );
 }
 
 /*****************************************************************************

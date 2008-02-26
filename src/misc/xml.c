@@ -46,7 +46,7 @@ xml_t *__xml_Create( vlc_object_t *p_this )
     if( !p_xml->p_module )
     {
         vlc_object_detach( p_xml );
-        vlc_object_destroy( p_xml );
+        vlc_object_release( p_xml );
         msg_Err( p_this, "XML provider not found" );
         return NULL;
     }
@@ -61,5 +61,5 @@ void xml_Delete( xml_t *p_xml )
 {
     module_Unneed( p_xml, p_xml->p_module );
     vlc_object_detach( p_xml );
-    vlc_object_destroy( p_xml );
+    vlc_object_release( p_xml );
 }

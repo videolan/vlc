@@ -423,7 +423,7 @@ error:
     free( psz_list );
     free( s->p_sys );
     vlc_object_detach( s );
-    vlc_object_destroy( s );
+    vlc_object_release( s );
     return NULL;
 }
 
@@ -452,7 +452,7 @@ static void AStreamDestroy( stream_t *s )
     }
 
     free( s->p_sys );
-    vlc_object_destroy( s );
+    vlc_object_release( s );
 }
 
 static void UStreamDestroy( stream_t *s )

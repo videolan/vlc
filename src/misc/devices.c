@@ -50,7 +50,7 @@ void devices_ProbeCreate( vlc_object_t *p_this )
     if( p_probe->p_module == NULL )
     {
         msg_Err( p_this, "no devices probing module could be loaded" );
-        vlc_object_destroy( p_probe );
+        vlc_object_release( p_probe );
         return;
     }
 

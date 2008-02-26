@@ -413,7 +413,6 @@ __vlc_mutex_init_recursive
 __vlc_object_alive
 __vlc_object_attach
 __vlc_object_create
-__vlc_object_destroy
 __vlc_object_detach
 __vlc_object_find
 __vlc_object_find_name

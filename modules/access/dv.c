@@ -271,7 +271,7 @@ static void Close( vlc_object_t *p_this )
             p_sys->p_ev->pp_last = &p_sys->p_frame;
             vlc_mutex_unlock( &p_sys->p_ev->lock );
         }
-        vlc_object_destroy( p_sys->p_ev );
+        vlc_object_release( p_sys->p_ev );
     }
 
     if( p_sys->p_frame )

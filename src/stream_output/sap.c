@@ -185,7 +185,7 @@ void announce_SAPHandlerDestroy( sap_handler_t *p_sap )
     }
 
     /* Free the structure */
-    vlc_object_destroy( p_sap );
+    vlc_object_release( p_sap );
 }
 
 /**

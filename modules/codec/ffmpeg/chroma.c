@@ -300,7 +300,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     if( !p_sys->p_swscaler->p_module || !p_sys->p_swscaler->p_owner )
     {
         vlc_object_detach( p_sys->p_swscaler );
-        vlc_object_destroy( p_sys->p_swscaler );
+        vlc_object_release( p_sys->p_swscaler );
         free( p_vout->chroma.p_sys );
         return VLC_EGENERIC;
     }
@@ -355,7 +355,7 @@ void E_(CloseChroma)( vlc_object_t *p_this )
         free( p_sys->p_swscaler->p_owner );
         module_Unneed( p_sys->p_swscaler, p_sys->p_swscaler->p_module );
         vlc_object_detach( p_sys->p_swscaler );
-        vlc_object_destroy( p_sys->p_swscaler );
+        vlc_object_release( p_sys->p_swscaler );
         p_sys->p_swscaler= NULL;
     }
     free( p_vout->chroma.p_sys );

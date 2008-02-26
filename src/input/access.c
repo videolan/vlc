@@ -108,7 +108,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
         free( p_access->psz_access );
         free( p_access->psz_path );
         free( p_access->psz_demux );
-        vlc_object_destroy( p_access );
+        vlc_object_release( p_access );
         return NULL;
     }
 
@@ -151,6 +151,6 @@ void access2_Delete( access_t *p_access )
         access2_Delete( p_access->p_source );
     }
 
-    vlc_object_destroy( p_access );
+    vlc_object_release( p_access );
 }
 

@@ -187,7 +187,7 @@ int announce_HandlerDestroy( announce_handler_t *p_announce )
     }
 
     /* Free the structure */
-    vlc_object_destroy( p_announce );
+    vlc_object_release( p_announce );
 
     return VLC_SUCCESS;
 }

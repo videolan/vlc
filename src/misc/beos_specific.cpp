@@ -108,7 +108,7 @@ void system_End( libvlc_int_t *p_this )
     be_app->PostMessage( REALLY_QUIT );
 
     vlc_thread_join( vlc_global()->p_appthread );
-    vlc_object_destroy( vlc_global()->p_appthread );
+    vlc_object_release( vlc_global()->p_appthread );
 
     free( vlc_global()->psz_vlcpath );
 }

@@ -936,7 +936,7 @@ gnutls_SessionClose (tls_server_t *p_server, tls_session_t *p_session)
     gnutls_deinit( p_sys->session );
 
     vlc_object_detach( p_session );
-    vlc_object_destroy( p_session );
+    vlc_object_release( p_session );
 
     free( p_sys );
 }
@@ -960,7 +960,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session->p_sys = malloc( sizeof(struct tls_session_sys_t) );
     if( p_session->p_sys == NULL )
     {
-        vlc_object_destroy( p_session );
+        vlc_object_release( p_session );
         return NULL;
     }
 
@@ -1016,7 +1016,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 error:
     free( p_session->p_sys );
     vlc_object_detach( p_session );
-    vlc_object_destroy( p_session );
+    vlc_object_release( p_session );
     return NULL;
 }
 

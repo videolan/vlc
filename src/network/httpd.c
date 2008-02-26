@@ -1124,7 +1124,7 @@ error:
     {
         vlc_object_release( httpd );
         vlc_object_detach( httpd );
-        vlc_object_destroy( httpd );
+        vlc_object_release( httpd );
     }
     vlc_mutex_unlock( lockval.p_address );
 
@@ -1132,7 +1132,7 @@ error:
     {
         net_ListenClose( host->fds );
         vlc_mutex_destroy( &host->lock );
-        vlc_object_destroy( host );
+        vlc_object_release( host );
     }
 
     if( p_tls != NULL )
@@ -1188,14 +1188,14 @@ void httpd_HostDelete( httpd_host_t *host )
     free( host->psz_hostname );
 
     vlc_mutex_destroy( &host->lock );
-    vlc_object_destroy( host );
+    vlc_object_release( host );
 
     vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
         msg_Dbg( httpd, "no host left, stopping httpd" );
         vlc_object_detach( httpd );
-        vlc_object_destroy( httpd );
+        vlc_object_release( httpd );
     }
     vlc_mutex_unlock( lockval.p_address );
 }

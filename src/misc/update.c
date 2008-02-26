@@ -1142,7 +1142,7 @@ void update_CheckReal( update_check_thread_t *p_uct )
     if( p_uct->pf_callback )
         (p_uct->pf_callback)( p_uct->p_data, b_ret );
 
-    vlc_object_destroy( p_uct );
+    vlc_object_release( p_uct );
 }
 
 /**
@@ -1430,7 +1430,7 @@ end:
     free( p_buffer );
     free( psz_size );
 
-    vlc_object_destroy( p_udt );
+    vlc_object_release( p_udt );
 }
 
 #endif

@@ -118,7 +118,7 @@ static void osd_ParserUnload( osd_menu_t *p_menu )
         module_Unneed( p_menu, p_menu->p_parser );
 
     vlc_object_detach( p_menu );
-    vlc_object_destroy( p_menu );
+    vlc_object_release( p_menu );
 }
 
 /**
@@ -216,7 +216,7 @@ error:
         free( p_osd->psz_file );
 
     vlc_object_detach( p_osd );
-    vlc_object_destroy( p_osd );
+    vlc_object_release( p_osd );
     vlc_mutex_unlock( lockval.p_address );
     return NULL;
 }

@@ -206,7 +206,7 @@ static int OpenVideo( vlc_object_t *p_this )
                            E_(EventThread), 0, 1 ) )
     {
         msg_Err( p_vout, "cannot create Vout EventThread" );
-        vlc_object_destroy( p_vout->p_sys->p_event );
+        vlc_object_release( p_vout->p_sys->p_event );
         p_vout->p_sys->p_event = NULL;
         goto error;
     }
@@ -282,7 +282,7 @@ static void CloseVideo( vlc_object_t *p_this )
         }
 
         vlc_thread_join( p_vout->p_sys->p_event );
-        vlc_object_destroy( p_vout->p_sys->p_event );
+        vlc_object_release( p_vout->p_sys->p_event );
     }
 
     vlc_mutex_destroy( &p_vout->p_sys->lock );

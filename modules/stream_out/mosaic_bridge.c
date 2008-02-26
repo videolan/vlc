@@ -308,7 +308,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Err( p_stream, "cannot find decoder" );
         vlc_object_detach( p_sys->p_decoder );
-        vlc_object_destroy( p_sys->p_decoder );
+        vlc_object_release( p_sys->p_decoder );
         return NULL;
     }
 
@@ -417,7 +417,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                       "no video filter matching name \"%s\" found",
                       psz_name );
             vlc_object_detach( *pp_vfilter );
-            vlc_object_destroy( *pp_vfilter );
+            vlc_object_release( *pp_vfilter );
             p_sys->i_vfilters--;
         }
     }
@@ -448,7 +448,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( p_sys->p_decoder->p_module )
             module_Unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
         vlc_object_detach( p_sys->p_decoder );
-        vlc_object_destroy( p_sys->p_decoder );
+        vlc_object_release( p_sys->p_decoder );
 
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
         {
@@ -470,7 +470,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         vlc_object_detach( *pp_vfilter );
         if( (*pp_vfilter)->p_module )
             module_Unneed( *pp_vfilter, (*pp_vfilter)->p_module );
-        vlc_object_destroy( *pp_vfilter );
+        vlc_object_release( *pp_vfilter );
     }
     free( p_sys->pp_vfilters );
 

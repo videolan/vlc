@@ -181,7 +181,7 @@ static int Callback( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_kill( pp_objects[i] );
         vlc_thread_join( pp_objects[i] );
         vlc_object_detach( pp_objects[i] );
-        vlc_object_destroy( pp_objects[i] );
+        vlc_object_release( pp_objects[i] );
     }
 
     /* Clean our mess */
@@ -313,7 +313,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
     printf( " - destroying the objects (LIFO)\n" );
     for( i = MAXOBJ * i_level; i--; )
     {
-        vlc_object_destroy( pp_objects[i] );
+        vlc_object_release( pp_objects[i] );
     }
 
     printf( "done (%fs).\n", (mdate() - start) / 1000000.0 );
@@ -393,7 +393,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
     {
         pp_objects[i]->b_die = VLC_TRUE;
         vlc_thread_join( pp_objects[i] );
-        vlc_object_destroy( pp_objects[i] );
+        vlc_object_release( pp_objects[i] );
     }
 
     printf( "done (%fs).\n", (mdate() - start) / 1000000.0 );
@@ -428,7 +428,7 @@ static void * Dummy( vlc_object_t *p_this )
 
     for( i = MAXOBJ/MAXTH; i--; )
     {
-        vlc_object_destroy( pp_objects[i] );
+        vlc_object_release( pp_objects[i] );
     }
 
     return NULL;

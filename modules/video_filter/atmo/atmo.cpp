@@ -942,7 +942,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
                 VLC_FALSE ) )
             {
                 msg_Err( p_filter, "cannot create FadeToColorThread" );
-                vlc_object_destroy( p_sys->p_fadethread );
+                vlc_object_release( p_sys->p_fadethread );
                 p_sys->p_fadethread = NULL;
                 vlc_mutex_unlock( &p_sys->filter_lock );
 
@@ -953,7 +953,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
                 /* wait for the thread... */
                 vlc_thread_join(p_sys->p_fadethread);
 
-                vlc_object_destroy(p_sys->p_fadethread);
+                vlc_object_release(p_sys->p_fadethread);
 
                 p_sys->p_fadethread = NULL;
             }
@@ -1841,7 +1841,7 @@ static void CheckAndStopFadeThread(filter_t *p_filter)
 
         vlc_thread_join(p_sys->p_fadethread);
 
-        vlc_object_destroy(p_sys->p_fadethread);
+        vlc_object_release(p_sys->p_fadethread);
         p_sys->p_fadethread = NULL;
     }
     vlc_mutex_unlock( &p_sys->filter_lock );
@@ -1897,7 +1897,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
                     VLC_FALSE) )
                 {
                     msg_Err( p_filter, "cannot create FadeToColorThread" );
-                    vlc_object_destroy( p_sys->p_fadethread );
+                    vlc_object_release( p_sys->p_fadethread );
                     p_sys->p_fadethread = NULL;
                 }
             }

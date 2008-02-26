@@ -251,7 +251,7 @@ int __vlc_threads_end( vlc_object_t *p_this )
     if( i_initializations == 0 )
     {
         i_status = VLC_THREADS_UNINITIALIZED;
-        vlc_object_destroy( p_root );
+        vlc_object_release( p_root );
     }
 
 #if defined( UNDER_CE )

@@ -232,7 +232,7 @@ static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name
         module_Need( location, "packetizer", NULL, 0 ); \
     if( location->p_module == NULL ) \
     { \
-        vlc_object_destroy( location ); \
+        vlc_object_release( location ); \
         msg_Err( p_demux, "cannot find packetizer for " # msg ); \
         free( p_sys ); \
         return VLC_EGENERIC; \
@@ -240,7 +240,7 @@ static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name
 
 #define DESTROY_PACKETIZER( location ) \
     if( location->p_module ) module_Unneed( location, location->p_module ); \
-    vlc_object_destroy( location );
+    vlc_object_release( location );
 
 /**
  * @}

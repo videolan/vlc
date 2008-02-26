@@ -101,7 +101,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     {
         msg_Err( p_intf, "no suitable interface module" );
         free( p_intf->psz_intf );
-        vlc_object_destroy( p_intf );
+        vlc_object_release( p_intf );
         return NULL;
     }
 
@@ -191,7 +191,7 @@ void intf_Destroy( intf_thread_t *p_intf )
     vlc_mutex_destroy( &p_intf->change_lock );
 
     /* Free structure */
-    vlc_object_destroy( p_intf );
+    vlc_object_release( p_intf );
 }
 
 

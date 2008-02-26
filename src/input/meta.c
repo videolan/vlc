@@ -104,11 +104,11 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
     p_me->p_module = module_Need( p_me, "meta fetcher", 0, VLC_FALSE );
     if( !p_me->p_module )
     {
-        vlc_object_destroy( p_me );
+        vlc_object_release( p_me );
         return VLC_EGENERIC;
     }
     module_Unneed( p_me, p_me->p_module );
-    vlc_object_destroy( p_me );
+    vlc_object_release( p_me );
 
     input_item_SetMetaFetched( p_item, VLC_TRUE );
 

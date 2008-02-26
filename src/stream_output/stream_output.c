@@ -120,7 +120,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         FREENULL( p_sout->psz_chain );
 
         vlc_object_detach( p_sout );
-        vlc_object_destroy( p_sout );
+        vlc_object_release( p_sout );
         return NULL;
     }
 
@@ -148,7 +148,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     vlc_mutex_destroy( &p_sout->lock );
 
     /* *** free structure *** */
-    vlc_object_destroy( p_sout );
+    vlc_object_release( p_sout );
 }
 
 /*****************************************************************************
@@ -333,7 +333,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
         free( p_access->psz_access );
         free( p_access->psz_path );
         vlc_object_detach( p_access );
-        vlc_object_destroy( p_access );
+        vlc_object_release( p_access );
         return( NULL );
     }
 
@@ -355,7 +355,7 @@ void sout_AccessOutDelete( sout_access_out_t *p_access )
 
     free( p_access->psz_path );
 
-    vlc_object_destroy( p_access );
+    vlc_object_release( p_access );
 }
 
 /*****************************************************************************
@@ -446,7 +446,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
         FREENULL( p_mux->psz_mux );
 
         vlc_object_detach( p_mux );
-        vlc_object_destroy( p_mux );
+        vlc_object_release( p_mux );
         return NULL;
     }
 
@@ -505,7 +505,7 @@ void sout_MuxDelete( sout_mux_t *p_mux )
 
     config_ChainDestroy( p_mux->p_cfg );
 
-    vlc_object_destroy( p_mux );
+    vlc_object_release( p_mux );
 }
 
 /*****************************************************************************
@@ -856,7 +856,7 @@ void sout_StreamDelete( sout_stream_t *p_stream )
     config_ChainDestroy( p_stream->p_cfg );
 
     msg_Dbg( p_stream, "destroying chain done" );
-    vlc_object_destroy( p_stream );
+    vlc_object_release( p_stream );
 }
 
 static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )

@@ -88,7 +88,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     p_snapshot = ( snapshot_t* ) p_cache->p_private;
     vlc_object_unlock( p_cache );
-    vlc_object_destroy( p_cache );
+    vlc_object_release( p_cache );
 
     if( p_snapshot )
     {

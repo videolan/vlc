@@ -74,7 +74,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( !p_playlist->p_preparse )
     {
         msg_Err( p_playlist, "unable to create preparser" );
-        vlc_object_destroy( p_playlist );
+        vlc_object_release( p_playlist );
         return;
     }
     p_playlist->p_preparse->i_waiting = 0;
@@ -86,7 +86,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     {
         msg_Err( p_playlist, "cannot spawn preparse thread" );
         vlc_object_detach( p_playlist->p_preparse );
-        vlc_object_destroy( p_playlist->p_preparse );
+        vlc_object_release( p_playlist->p_preparse );
         return;
     }
 
@@ -96,7 +96,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( !p_playlist->p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
-        vlc_object_destroy( p_playlist );
+        vlc_object_release( p_playlist );
         return;
     }
     p_playlist->p_fetcher->i_waiting = 0;
@@ -114,7 +114,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
         vlc_object_detach( p_playlist->p_fetcher );
-        vlc_object_destroy( p_playlist->p_fetcher );
+        vlc_object_release( p_playlist->p_fetcher );
         return;
     }
 
@@ -123,7 +123,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
-        vlc_object_destroy( p_playlist );
+        vlc_object_release( p_playlist );
         return;
     }
 
@@ -152,7 +152,7 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
         vlc_thread_join( p_playlist->p_preparse );
         free( p_playlist->p_preparse->pp_waiting );
         vlc_object_detach( p_playlist->p_preparse );
-        vlc_object_destroy( p_playlist->p_preparse );
+        vlc_object_release( p_playlist->p_preparse );
     }
 
     // Kill meta fetcher
@@ -162,7 +162,7 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
         vlc_thread_join( p_playlist->p_fetcher );
         free( p_playlist->p_fetcher->p_waiting );
         vlc_object_detach( p_playlist->p_fetcher );
-        vlc_object_destroy( p_playlist->p_fetcher );
+        vlc_object_release( p_playlist->p_fetcher );
     }
 
     // Wait for thread to complete

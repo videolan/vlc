@@ -408,7 +408,7 @@ static int Create( vlc_object_t *p_this )
         }
         else
         {
-            vlc_object_destroy( p_fontbuilder );
+            vlc_object_release( p_fontbuilder );
         }
     }
     else

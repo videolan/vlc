@@ -672,7 +672,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );
 
-    vlc_object_destroy( p_dec );
+    vlc_object_release( p_dec );
     p_dec = NULL;
 }
 
@@ -755,7 +755,7 @@ static void DeleteEncoder( encoder_t * p_enc )
     es_format_Clean( &p_enc->fmt_in );
     es_format_Clean( &p_enc->fmt_out );
 
-    vlc_object_destroy( p_enc );
+    vlc_object_release( p_enc );
     p_enc = NULL;
 }
 
@@ -799,6 +799,6 @@ static void DeleteFilter( filter_t * p_filter )
     es_format_Clean( &p_filter->fmt_in );
     es_format_Clean( &p_filter->fmt_out );
 
-    vlc_object_destroy( p_filter );
+    vlc_object_release( p_filter );
     p_filter = NULL;
 }

@@ -269,7 +269,7 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
 
 error:
     if( p_sys->poll_thread != NULL )
-        vlc_object_destroy( p_sys->poll_thread );
+        vlc_object_release( p_sys->poll_thread );
     if( p_sys->client != NULL )
         avahi_client_free( p_sys->client );
     if( p_sys->simple_poll != NULL )
@@ -295,7 +295,7 @@ void bonjour_stop_service( void *_p_sys )
 
     vlc_object_kill( p_sys->poll_thread );
     vlc_thread_join( p_sys->poll_thread );
-    vlc_object_destroy( p_sys->poll_thread );
+    vlc_object_release( p_sys->poll_thread );
 
     if( p_sys->group != NULL )
         avahi_entry_group_free( p_sys->group );

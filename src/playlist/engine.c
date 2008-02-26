@@ -180,7 +180,7 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_detach( p_playlist );
-    vlc_object_destroy( p_playlist );
+    vlc_object_release( p_playlist );
 }
 
 /* Destroy remaining objects */

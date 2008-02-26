@@ -495,7 +495,7 @@ static void Close( vlc_object_t *p_this )
     /* wake up the audio thread */
     SetEvent( p_sys->event );
     vlc_thread_join( p_sys->p_notif );
-    vlc_object_destroy( p_sys->p_notif );
+    vlc_object_release( p_sys->p_notif );
     CloseHandle( p_sys->event );
 
     /* Close the device */

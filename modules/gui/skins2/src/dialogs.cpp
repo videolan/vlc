@@ -116,7 +116,7 @@ Dialogs::~Dialogs()
         vlc_object_detach( m_pProvider );
 
         module_Unneed( m_pProvider, m_pModule );
-        vlc_object_destroy( m_pProvider );
+        vlc_object_release( m_pProvider );
     }
 
     /* Unregister callbacks */
@@ -170,7 +170,7 @@ bool Dialogs::init()
     if( m_pModule == NULL )
     {
         msg_Err( getIntf(), "no suitable dialogs provider found (hint: compile the wxWidgets plugin, and make sure it is loaded properly)" );
-        vlc_object_destroy( m_pProvider );
+        vlc_object_release( m_pProvider );
         m_pProvider = NULL;
         return false;
     }

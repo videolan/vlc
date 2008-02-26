@@ -234,11 +234,11 @@ void __module_EndBank( vlc_object_t *p_this )
 
             /* We just free the module by hand. Niahahahahaha. */
             vlc_object_detach( p_next );
-            vlc_object_destroy( p_next );
+            vlc_object_release( p_next );
         }
     }
 
-    vlc_object_destroy( p_libvlc_global->p_module_bank );
+    vlc_object_release( p_libvlc_global->p_module_bank );
     p_libvlc_global->p_module_bank = NULL;
 }
 
@@ -1260,7 +1260,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     if( module_Call( p_module ) != 0 )
     {
         /* We couldn't call module_init() */
-        vlc_object_destroy( p_module );
+        vlc_object_release( p_module );
         module_Unload( handle );
         return NULL;
     }
@@ -1362,7 +1362,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
         msg_Err( p_this, "failed calling entry point in builtin module" );
-        vlc_object_destroy( p_module );
+        vlc_object_release( p_module );
         return -1;
     }
 
@@ -1406,11 +1406,11 @@ static int DeleteModule( module_t * p_module, vlc_bool_t b_detach )
     {
         vlc_object_t *p_this = p_module->pp_children[0];
         vlc_object_detach( p_this );
-        vlc_object_destroy( p_this );
+        vlc_object_release( p_this );
     }
 
     config_Free( p_module );
-    vlc_object_destroy( p_module );
+    vlc_object_release( p_module );
     p_module = NULL;
     return 0;
 }

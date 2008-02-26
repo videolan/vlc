@@ -313,7 +313,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                          psz_parser );
 
                 vlc_object_detach( p_filter );
-                vlc_object_destroy( p_filter );
+                vlc_object_release( p_filter );
 
                 psz_parser = psz_next;
                 continue;
@@ -332,7 +332,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
                     module_Unneed( p_filter, p_filter->p_module );
                     vlc_object_detach( p_filter );
-                    vlc_object_destroy( p_filter );
+                    vlc_object_release( p_filter );
 
                     psz_parser = psz_next;
                     continue;
