@@ -796,52 +796,52 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 
 void PLModel::viewchanged( int meta )
 {
-   if( rootItem )
-   {
-       int index=0;
-       switch( meta )
-       {
-       case VLC_META_ENGINE_TITLE:
-           index=0; break;
-       case VLC_META_ENGINE_DURATION:
-           index=1; break;
-       case VLC_META_ENGINE_ARTIST:
-           index=2; break;
-       case VLC_META_ENGINE_GENRE:
-           index=3; break;
-       case VLC_META_ENGINE_COPYRIGHT:
-           index=4; break;
-       case VLC_META_ENGINE_COLLECTION:
-           index=5; break;
-       case VLC_META_ENGINE_SEQ_NUM:
-           index=6; break;
-       case VLC_META_ENGINE_DESCRIPTION:
-           index=7; break;
-       default:
-           break;
-       }
-       /* UNUSED        emit layoutAboutToBeChanged(); */
-       index = __MIN( index , rootItem->item_col_strings.count() );
-       QModelIndex parent = createIndex( 0, 0, rootItem );
+    if( rootItem )
+    {
+        int index=0;
+        switch( meta )
+        {
+        case VLC_META_ENGINE_TITLE:
+            index=0; break;
+        case VLC_META_ENGINE_DURATION:
+            index=1; break;
+        case VLC_META_ENGINE_ARTIST:
+            index=2; break;
+        case VLC_META_ENGINE_GENRE:
+            index=3; break;
+        case VLC_META_ENGINE_COPYRIGHT:
+            index=4; break;
+        case VLC_META_ENGINE_COLLECTION:
+            index=5; break;
+        case VLC_META_ENGINE_SEQ_NUM:
+            index=6; break;
+        case VLC_META_ENGINE_DESCRIPTION:
+            index=7; break;
+        default:
+            break;
+        }
+        /* UNUSED        emit layoutAboutToBeChanged(); */
+        index = __MIN( index, rootItem->item_col_strings.count() );
+        QModelIndex parent = createIndex( 0, 0, rootItem );
 
-       if( rootItem->i_showflags & meta )
-           /* Removing columns */
-       {
-           beginRemoveColumns( parent, index, index+1 );
-           rootItem->i_showflags &= ~( meta );
-           rootItem->updateColumnHeaders();
-           endRemoveColumns();
-       }
-       else
-       {
-           /* Adding columns */
-           beginInsertColumns( createIndex( 0, 0, rootItem), index, index+1 );
-           rootItem->i_showflags |= meta;
-           rootItem->updateColumnHeaders();
-           endInsertColumns();
-       }
-       rebuild();
-   }
+        if( rootItem->i_showflags & meta )
+            /* Removing columns */
+        {
+            beginRemoveColumns( parent, index, index+1 );
+            rootItem->i_showflags &= ~( meta );
+            rootItem->updateColumnHeaders();
+            endRemoveColumns();
+        }
+        else
+        {
+            /* Adding columns */
+            beginInsertColumns( createIndex( 0, 0, rootItem), index, index+1 );
+            rootItem->i_showflags |= meta;
+            rootItem->updateColumnHeaders();
+            endInsertColumns();
+        }
+        rebuild();
+    }
 }
 
 void PLModel::popupDel()
