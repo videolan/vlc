@@ -148,9 +148,6 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_event_t event;
     libvlc_event_type_t type = newval.i_int;
 
-    if( strcmp( psz_cmd, "state" ) )
-        type = var_GetInteger( p_this, "state" );
-
     switch ( type )
     {
         case END_S:
@@ -172,6 +169,40 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
         default:
             return VLC_SUCCESS;
     }
+
+    libvlc_event_send( p_mi->p_event_manager, &event );
+    return VLC_SUCCESS;
+}
+
+static int
+input_seakable_changed( vlc_object_t * p_this, char const * psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval,
+                        void * p_userdata )
+{
+    VLC_UNUSED(oldval);
+    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_event_t event;
+
+    libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+    event.type = libvlc_MediaInstanceSeekableChanged;
+    event.u.media_instance_seekable_changed.new_seekable = newval.b_bool;
+
+    libvlc_event_send( p_mi->p_event_manager, &event );
+    return VLC_SUCCESS;
+}
+
+static int
+input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval,
+                        void * p_userdata )
+{
+    VLC_UNUSED(oldval);
+    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_event_t event;
+
+    libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+    event.type = libvlc_MediaInstancePausableChanged;
+    event.u.media_instance_pausable_changed.new_pausable = newval.b_bool;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -295,6 +326,10 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
             libvlc_MediaInstancePositionChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaInstanceTimeChanged, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstanceSeekableChanged, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstancePausableChanged, p_e );
 
     return p_mi;
 }
@@ -552,8 +587,8 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         var_Set( p_input_thread, "drawable", val );
     }
     var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
-    var_AddCallback( p_input_thread, "seekable", input_state_changed, p_mi );
-    var_AddCallback( p_input_thread, "pausable", input_state_changed, p_mi );
+    var_AddCallback( p_input_thread, "seekable", input_seekable_changed, p_mi );
+    var_AddCallback( p_input_thread, "pausable", input_pausable_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
 

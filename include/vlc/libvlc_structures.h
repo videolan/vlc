@@ -321,6 +321,8 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaInstanceEncounteredError,
     libvlc_MediaInstanceTimeChanged,
     libvlc_MediaInstancePositionChanged,
+    libvlc_MediaInstanceSeekableChanged,
+    libvlc_MediaInstancePausableChanged,
 
     libvlc_MediaListItemAdded,
     libvlc_MediaListWillAddItem,
@@ -389,6 +391,14 @@ typedef struct libvlc_event_t
         {
             libvlc_time_t new_time;
         } media_instance_time_changed;
+        struct
+        {
+            libvlc_time_t new_seekable;
+        } media_instance_seekable_changed;
+        struct
+        {
+            libvlc_time_t new_pausable;
+        } media_instance_pausable_changed;
 
         /* media list */
         struct
