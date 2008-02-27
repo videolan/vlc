@@ -75,6 +75,12 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+typedef enum vlc_lock_state_t
+{
+    vlc_Locked,
+    vlc_Unlocked
+} vlc_lock_state_t;
+
 static int  DumpCommand( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 
@@ -93,6 +99,7 @@ static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
+static void vlc_object_release_locked( vlc_object_t *p_this, vlc_lock_state_t locked );
 
 /*****************************************************************************
  * Local structure lock
@@ -365,6 +372,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if( (vlc_object_t *)p_this->p_libvlc == p_this )
         logger = NULL;
 
+    /* Sanity checks */
     if( p_this->i_children )
     {
         int i;
@@ -412,12 +420,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     {
         libvlc_global_data_t *p_global = (libvlc_global_data_t *)p_this;
 
-        /* Remove ourselves */
-        int i_index = FindIndex( p_this, p_global->pp_objects,
-                             p_global->i_objects );
-        REMOVE_ELEM( p_global->pp_objects,
-                     p_global->i_objects, i_index );
-
         /* Test for leaks */
         if( p_global->i_objects > 0 )
         {
@@ -441,22 +443,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         p_global->pp_objects = NULL;
 
         vlc_mutex_destroy( &structure_lock );
-    }
-    else
-    {
-        libvlc_global_data_t *p_libvlc_global = vlc_global();
-        int i_index;
-
-        vlc_mutex_lock( &structure_lock );
-
-        /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
-         * useless to try and recover anything if pp_objects gets smashed. */
-        i_index = FindIndex( p_this, p_libvlc_global->pp_objects,
-                             p_libvlc_global->i_objects );
-        REMOVE_ELEM( p_libvlc_global->pp_objects,
-                     p_libvlc_global->i_objects, i_index );
-
-        vlc_mutex_unlock( &structure_lock );
     }
 
 #if defined(WIN32) || defined(UNDER_CE)
@@ -902,28 +888,36 @@ void __vlc_object_yield( vlc_object_t *p_this )
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
-    vlc_bool_t b_should_destroy;
-
-    vlc_mutex_lock( &structure_lock );
-
-    assert( p_this->p_internals->i_refcount > 0 );
-    p_this->p_internals->i_refcount--;
-    b_should_destroy = (p_this->p_internals->i_refcount == 0);
-
-    vlc_mutex_unlock( &structure_lock );
-
-    if( b_should_destroy )
-        vlc_object_destroy( p_this );
+    vlc_object_release_locked( p_this, vlc_Unlocked );
 }
 
 /* Version without the lock */
-static void vlc_object_release_locked( vlc_object_t *p_this )
+static void vlc_object_release_locked( vlc_object_t *p_this, vlc_lock_state_t locked )
 {
     vlc_bool_t b_should_destroy;
+
+    if(locked == vlc_Unlocked) vlc_mutex_lock( &structure_lock );
 
     assert( p_this->p_internals->i_refcount > 0 );
     p_this->p_internals->i_refcount--;
     b_should_destroy = (p_this->p_internals->i_refcount == 0);
+
+    if( b_should_destroy )
+    {
+        /* Make sure this object can't be obtained via vlc_find_object now that
+         * it is freed */
+        libvlc_global_data_t *p_libvlc_global = vlc_global();
+        int i_index;
+
+        /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
+         * useless to try and recover anything if pp_objects gets smashed. */
+        i_index = FindIndex( p_this, p_libvlc_global->pp_objects,
+                             p_libvlc_global->i_objects );
+        REMOVE_ELEM( p_libvlc_global->pp_objects,
+                     p_libvlc_global->i_objects, i_index );
+    }
+
+    if(locked == vlc_Unlocked) vlc_mutex_unlock( &structure_lock );
 
     if( b_should_destroy )
         vlc_object_destroy( p_this );
@@ -1250,7 +1244,7 @@ void vlc_list_release( vlc_list_t *p_list )
     vlc_mutex_lock( &structure_lock );
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        vlc_object_release_locked( p_list->p_values[i_index].p_object );
+        vlc_object_release_locked( p_list->p_values[i_index].p_object, vlc_Locked );
     }
     vlc_mutex_unlock( &structure_lock );
 
