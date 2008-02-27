@@ -730,8 +730,8 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
                 p_sys->block.i_offset = 0;
                 p_sys->block.p_current = p_sys->block.p_current->p_next;
             }
-            /*Get a new block */
-            if( AStreamRefillBlock( s ) )
+            /*Get a new block if needed */
+            if( !p_sys->block.p_current && AStreamRefillBlock( s ) )
             {
                 break;
             }
@@ -915,13 +915,13 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     else
     {
         /* Read enough data */
-        while( p_sys->block.i_start + p_sys->block.i_size <= i_pos )
+        while( p_sys->block.i_start + p_sys->block.i_size < i_pos )
         {
             if( AStreamRefillBlock( s ) )
                 return VLC_EGENERIC;
 
             while( p_sys->block.p_current &&
-                   p_sys->i_pos + p_sys->block.p_current->i_buffer <= i_pos )
+                   p_sys->i_pos + p_sys->block.p_current->i_buffer < i_pos )
             {
                 p_sys->i_pos += p_sys->block.p_current->i_buffer;
                 p_sys->block.p_current = p_sys->block.p_current->p_next;
