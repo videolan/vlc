@@ -1038,6 +1038,7 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
+	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-configure.patch)
 
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
