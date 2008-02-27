@@ -42,7 +42,7 @@
 
 #ifdef HAVE_FFMPEG_SWSCALE_H
 #   include <ffmpeg/swscale.h>
-#elif defined(HAVE_LIBSWSCALE_TREE) || defined(HAVE_SWSCALE_H)
+#elif defined(HAVE_LIBSWSCALE_TREE)
 #   include <swscale.h>
 #endif
 
