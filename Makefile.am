@@ -313,7 +313,7 @@ qvlc: make-alias
 nvlc: make-alias
 	$(MKALIAS) ncurses
 
-#noinst_SCRIPTS = vlc
+noinst_SCRIPTS = vlc$(EXEEXT)
 
 vlc$(EXEEXT): core
 	rm -f vlc
