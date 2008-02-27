@@ -75,12 +75,6 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-typedef enum vlc_lock_state_t
-{
-    vlc_Locked,
-    vlc_Unlocked
-} vlc_lock_state_t;
-
 static int  DumpCommand( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 
@@ -99,7 +93,6 @@ static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
-static void vlc_object_release_locked( vlc_object_t *p_this, vlc_lock_state_t locked );
 
 /*****************************************************************************
  * Local structure lock
@@ -888,15 +881,9 @@ void __vlc_object_yield( vlc_object_t *p_this )
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
-    vlc_object_release_locked( p_this, vlc_Unlocked );
-}
-
-/* Version without the lock */
-static void vlc_object_release_locked( vlc_object_t *p_this, vlc_lock_state_t locked )
-{
     vlc_bool_t b_should_destroy;
 
-    if(locked == vlc_Unlocked) vlc_mutex_lock( &structure_lock );
+    vlc_mutex_lock( &structure_lock );
 
     assert( p_this->p_internals->i_refcount > 0 );
     p_this->p_internals->i_refcount--;
@@ -917,7 +904,7 @@ static void vlc_object_release_locked( vlc_object_t *p_this, vlc_lock_state_t lo
                      p_libvlc_global->i_objects, i_index );
     }
 
-    if(locked == vlc_Unlocked) vlc_mutex_unlock( &structure_lock );
+    vlc_mutex_unlock( &structure_lock );
 
     if( b_should_destroy )
         vlc_object_destroy( p_this );
@@ -1241,12 +1228,10 @@ void vlc_list_release( vlc_list_t *p_list )
 {
     int i_index;
 
-    vlc_mutex_lock( &structure_lock );
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        vlc_object_release_locked( p_list->p_values[i_index].p_object, vlc_Locked );
+        vlc_object_release( p_list->p_values[i_index].p_object );
     }
-    vlc_mutex_unlock( &structure_lock );
 
     free( p_list->p_values );
     free( p_list );
