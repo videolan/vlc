@@ -163,6 +163,7 @@ private:
 
 class IntegerListConfigControl : public VIntConfigControl
 {
+Q_OBJECT
 public:
     IntegerListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                               bool, QGridLayout*, int& );
@@ -173,9 +174,12 @@ public:
     virtual void hide() { combo->hide(); if( label ) label->hide(); }
     virtual void show() { combo->show(); if( label ) label->show(); }
 private:
-    void finish( bool );
+    void finish(module_config_t *, bool );
     QLabel *label;
     QComboBox *combo;
+private slots:
+    void actionRequested( int );
+
 };
 
 class BoolConfigControl : public VIntConfigControl
@@ -384,7 +388,7 @@ public:
     virtual void show() { combo->show(); if( label ) label->show(); }
 	QComboBox *combo;
 private:
-    void finish( bool );
+    void finish(module_config_t *, bool );
     QLabel *label;
 private slots:
     void actionRequested( int );

@@ -36,7 +36,6 @@
 
 #include "components/preferences_widgets.hpp"
 #include "util/customwidgets.hpp"
-
 #include <vlc_keys.h>
 
 #include <QString>
@@ -373,7 +372,10 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     combo = new QComboBox();
     combo->setMinimumWidth( MINWIDTH_BOX );
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
-    finish( bycat );
+
+    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+
+    finish( p_module_config, bycat );
     if( !l )
     {
         l = new QGridLayout();
@@ -410,17 +412,20 @@ void StringListConfigControl::actionRequested( int i_action )
     /* Supplementary check for boundaries */
     if( i_action < 0 || i_action >= p_item->i_action ) return;
 
+    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+    if(!p_module_config) return;
+
     vlc_value_t val;
     val.psz_string =
         qtu( (combo->itemData( combo->currentIndex() ).toString() ) );
 
-    p_item->ppf_action[i_action]( p_this, getName(), val, val, 0 );
+    p_module_config->ppf_action[i_action]( p_this, getName(), val, val, 0 );
 
-    if( p_item->b_dirty )
+    if( p_module_config->b_dirty )
     {
         combo->clear();
-        finish( true );
-        p_item->b_dirty = VLC_FALSE;
+        finish( p_module_config, true );
+        p_module_config->b_dirty = VLC_FALSE;
     }
 }
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
@@ -429,26 +434,31 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 {
     combo = _combo;
     label = _label;
-    finish( bycat );
+
+    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+
+    finish( p_module_config, bycat );
 }
 
-void StringListConfigControl::finish( bool bycat )
+void StringListConfigControl::finish(module_config_t *p_module_config, bool bycat )
 {
     combo->setEditable( false );
 
-    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+    if(!p_module_config) return;
+
+    for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
     {
-        combo->addItem( qfu(p_item->ppsz_list_text ?
-                            p_item->ppsz_list_text[i_index] :
-                            p_item->ppsz_list[i_index] ),
-                        QVariant( p_item->ppsz_list[i_index] ) );
-        if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                          p_item->ppsz_list[i_index] ) )
+        combo->addItem( qfu(p_module_config->ppsz_list_text ?
+                            p_module_config->ppsz_list_text[i_index] :
+                            p_module_config->ppsz_list[i_index] ),
+                        QVariant( p_module_config->ppsz_list[i_index] ) );
+        if( p_item->value.psz && !strcmp( p_module_config->value.psz,
+                                          p_module_config->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    combo->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
 }
 
 QString StringListConfigControl::getValue()
@@ -826,7 +836,10 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
     combo->setMinimumWidth( MINWIDTH_BOX );
-    finish( bycat );
+
+    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+
+    finish( p_module_config, bycat );
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
@@ -838,6 +851,25 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
         l->addWidget( label, line, 0 );
         l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
     }
+
+    if( p_item->i_action )
+    {
+        QSignalMapper *signalMapper = new QSignalMapper(this);
+
+        /* Some stringLists like Capture listings have action associated */
+        for( int i = 0; i < p_item->i_action; i++ )
+        {
+            QPushButton *button =
+                new QPushButton( qfu( p_item->ppsz_action_text[i] ));
+            CONNECT( button, clicked(), signalMapper, map() );
+            signalMapper->setMapping( button, i );
+            l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i,
+                    Qt::AlignRight );
+        }
+        CONNECT( signalMapper, mapped( int ),
+                this, actionRequested( int ) );
+    }
+
 }
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
@@ -845,23 +877,50 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
 {
     combo = _combo;
     label = _label;
-    finish( bycat );
+
+    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+
+    finish( p_module_config, bycat );
 }
 
-void IntegerListConfigControl::finish( bool bycat )
+void IntegerListConfigControl::finish(module_config_t *p_module_config, bool bycat )
 {
     combo->setEditable( false );
 
-    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+    if(!p_module_config) return;
+
+    for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
     {
-        combo->addItem( qtr(p_item->ppsz_list_text[i_index] ),
-                        QVariant( p_item->pi_list[i_index] ) );
-        if( p_item->value.i == p_item->pi_list[i_index] )
+        combo->addItem( qtr(p_module_config->ppsz_list_text[i_index] ),
+                        QVariant( p_module_config->pi_list[i_index] ) );
+        if( p_module_config->value.i == p_module_config->pi_list[i_index] )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    combo->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
+}
+
+void IntegerListConfigControl::actionRequested( int i_action )
+{
+    /* Supplementary check for boundaries */
+    if( i_action < 0 || i_action >= p_item->i_action ) return;
+
+    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+    if(!p_module_config) return;
+
+
+    vlc_value_t val;
+    val.i_int = combo->itemData( combo->currentIndex() ).toInt();
+
+    p_module_config->ppf_action[i_action]( p_this, getName(), val, val, 0 );
+
+    if( p_module_config->b_dirty )
+    {
+        combo->clear();
+        finish( p_module_config, true );
+        p_module_config->b_dirty = VLC_FALSE;
+    }
 }
 
 int IntegerListConfigControl::getValue()
