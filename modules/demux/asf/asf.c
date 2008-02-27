@@ -89,7 +89,7 @@ struct demux_sys_t
     asf_object_file_properties_t *p_fp;
 
     unsigned int        i_track;
-    asf_track_t         *track[128];
+    asf_track_t         *track[128]; /* track number is stored on 7 bits */
 
     int64_t             i_data_begin;
     int64_t             i_data_end;
@@ -149,7 +149,11 @@ static int Demux( demux_t *p_demux )
         mtime_t i_time_begin = GetMoviePTS( p_sys );
         int i_result;
 
-        if( p_demux->b_die ) break;
+        if( p_demux->b_die )
+            break;
+        if( p_sys->i_data_end >= 0 &&
+                stream_Tell( p_demux->s ) >= p_sys->i_data_end )
+            return 0; /* EOF */
 
         /* Check if we have concatenated files */
         if( stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
@@ -426,12 +430,16 @@ static int DemuxPacket( demux_t *p_demux )
     GETVALUE2b( i_packet_flags >> 1, i_packet_sequence, 0 );
     GETVALUE2b( i_packet_flags >> 3, i_packet_padding_length, 0 );
 
+    if( i_packet_padding_length > i_packet_length )
+    {
+        msg_Warn( p_demux, "Too large padding: %d", i_packet_padding_length );
+        goto loop_error_recovery;
+    }
+
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-//        i_packet_size_left = i_packet_length;   // XXX data really read
-    /* FIXME I have to do that for some file, I don't known why */
-    i_packet_size_left = i_data_packet_min;
+    i_packet_size_left = i_packet_length - i_packet_padding_length;
 
     if( b_packet_multiple_payload )
     {
@@ -512,11 +520,10 @@ static int DemuxPacket( demux_t *p_demux )
         }
         else
         {
-            i_payload_data_length = i_packet_length -
-                                        i_packet_padding_length - i_skip;
+            i_payload_data_length = i_packet_length - i_skip;
         }
 
-        if( i_payload_data_length < 0 || i_skip + i_payload_data_length > i_packet_size_left )
+        if( i_payload_data_length < 0 || i_payload_data_length > i_packet_size_left )
         {
             break;
         }
@@ -616,13 +623,23 @@ static int DemuxPacket( demux_t *p_demux )
 
     if( i_packet_size_left > 0 )
     {
+        msg_Warn( p_demux, "Didn't read %d bytes in the packet",
+                            i_packet_size_left );
         if( stream_Read( p_demux->s, NULL, i_packet_size_left )
                                                          < i_packet_size_left )
         {
-            msg_Warn( p_demux, "cannot skip data, EOF ?" );
+            msg_Err( p_demux, "cannot skip data, EOF ?" );
             return 0;
         }
     }
+
+    if( i_packet_padding_length > 0 )
+        if( stream_Read( p_demux->s, NULL, i_packet_padding_length )
+                                                    < i_packet_padding_length )
+        {
+            msg_Err( p_demux, "cannot skip padding data, EOF ?" );
+            return 0;
+        }
 
     return 1;
 

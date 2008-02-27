@@ -134,6 +134,7 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
 
 static void ASF_FreeObject_Null( asf_object_t *pp_obj )
 {
+    VLC_UNUSED(pp_obj);
     return;
 }
 
@@ -270,7 +271,7 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     int           i_peek;
     const uint8_t *p_peek;
 
-    if( ( i_peek = stream_Peek( s, &p_peek,  104) ) < 104 )
+    if( ( i_peek = stream_Peek( s, &p_peek,  104 ) ) < 104 )
     {
        return VLC_EGENERIC;
     }
@@ -278,9 +279,10 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     p_fp->i_file_size = GetQWLE( p_peek + 40 );
     p_fp->i_creation_date = GetQWLE( p_peek + 48 );
     p_fp->i_data_packets_count = GetQWLE( p_peek + 56 );
-    p_fp->i_play_duration = GetQWLE( p_peek + 64 );
-    p_fp->i_send_duration = GetQWLE( p_peek + 72 );
-    p_fp->i_preroll = GetQWLE( p_peek + 80 );
+    p_fp->i_send_duration = GetQWLE( p_peek + 64 );
+    p_fp->i_play_duration = GetQWLE( p_peek + 72 );
+    p_fp->i_preroll = GetDWLE( p_peek + 80 );
+    p_fp->i_unknown = GetDWLE( p_peek + 84 );
     p_fp->i_flags = GetDWLE( p_peek + 88 );
     p_fp->i_min_data_packet_size = GetDWLE( p_peek + 92 );
     p_fp->i_max_data_packet_size = GetDWLE( p_peek + 96 );
@@ -290,13 +292,13 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     msg_Dbg( s,
             "read \"file properties object\" file_id:" GUID_FMT
             " file_size:"I64Fd" creation_date:"I64Fd" data_packets_count:"
-            I64Fd" play_duration:"I64Fd" send_duration:"I64Fd" preroll:"
-            I64Fd" flags:%d min_data_packet_size:%d max_data_packet_size:%d "
-            "max_bitrate:%d",
+            I64Fd" send_duration:"I64Fd" play_duration:"I64Fd" preroll:%d"
+            "unknown:%d flags:%d min_data_packet_size:%d "
+            "max_data_packet_size:%d max_bitrate:%d",
             GUID_PRINT( p_fp->i_file_id ), p_fp->i_file_size,
             p_fp->i_creation_date, p_fp->i_data_packets_count,
-            p_fp->i_play_duration, p_fp->i_send_duration,
-            p_fp->i_preroll, p_fp->i_flags,
+            p_fp->i_send_duration, p_fp->i_play_duration,
+            p_fp->i_preroll, p_fp->i_unknown, p_fp->i_flags,
             p_fp->i_min_data_packet_size, p_fp->i_max_data_packet_size,
             p_fp->i_max_bitrate );
 #endif
