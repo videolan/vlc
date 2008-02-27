@@ -33,6 +33,14 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata );
 static int
+input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval,
+                        void * p_userdata );
+static int
+input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval,
+                        void * p_userdata );
+static int
 input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata );
@@ -83,8 +91,8 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     if( p_mi->b_own_its_input_thread )
     {
         var_DelCallback( p_input_thread, "state", input_state_changed, p_mi );
-        var_DelCallback( p_input_thread, "seekable", input_state_changed, p_mi );
-        var_DelCallback( p_input_thread, "pausable", input_state_changed, p_mi );
+        var_DelCallback( p_input_thread, "seekable", input_seekable_changed, p_mi );
+        var_DelCallback( p_input_thread, "pausable", input_pausable_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
 
@@ -144,6 +152,8 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
                      void * p_userdata )
 {
     VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_cmd);
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
     libvlc_event_type_t type = newval.i_int;
@@ -175,11 +185,13 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
 }
 
 static int
-input_seakable_changed( vlc_object_t * p_this, char const * psz_cmd,
+input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval,
                         void * p_userdata )
 {
     VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_cmd);
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
 
@@ -197,6 +209,8 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         void * p_userdata )
 {
     VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_cmd);
     libvlc_media_instance_t * p_mi = p_userdata;
     libvlc_event_t event;
 
