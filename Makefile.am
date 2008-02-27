@@ -570,7 +570,7 @@ VLC.app: vlc
 	          $(top_builddir)/VLC.app
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
-	$(INSTALL) $(top_builddir)/.libs/vlc \
+	$(INSTALL) $(top_builddir)/src/.libs/vlc \
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
@@ -611,7 +611,7 @@ package-win-common:
 	fi
 
 # Copy relevant files
-	cp "$(top_builddir)/.libs/vlc$(EXEEXT)" "$(top_builddir)/vlc-$(VERSION)/"
+	cp "$(top_builddir)/src/.libs/vlc$(EXEEXT)" "$(top_builddir)/vlc-$(VERSION)/"
 	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(top_builddir)/vlc-$(VERSION)/"
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "vlc-$(VERSION)/"
 	cp "$(top_builddir)/src/.libs/libvlc-control$(LIBEXT)" "vlc-$(VERSION)/"
