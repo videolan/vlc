@@ -28,6 +28,9 @@ static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar I
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
 static NSString* VLCAudioSettingToolbarIdentifier = @"Audio Settings Item Identifier";
 static NSString* VLCVideoSettingToolbarIdentifier = @"Video Settings Item Identifier";
+static NSString* VLCOSDSettingToolbarIdentifier = @"Subtitles Settings Item Identifier";
+static NSString* VLCInputSettingToolbarIdentifier = @"Input Settings Item Identifier";
+static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Identifier";
 
 @implementation VLCSimplePrefs
 
@@ -115,41 +118,76 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     else if( [o_itemIdent isEqual: VLCVideoSettingToolbarIdentifier] )
     {
         o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
-        
+
         [o_toolbarItem setLabel: _NS("Video")];
         [o_toolbarItem setPaletteLabel: _NS("General Video settings")];
-        
+
         [o_toolbarItem setToolTip: _NS("General Video settings")];
         [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Video_64"]];
-        
+
         [o_toolbarItem setTarget: self];
         [o_toolbarItem setAction: @selector(showVideoSettings)];
-        
+
         [o_toolbarItem setEnabled: YES];
         [o_toolbarItem setAutovalidates: YES];
     }
-    
+    else if( [o_itemIdent isEqual: VLCOSDSettingToolbarIdentifier] )
+    {
+        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
+
+        [o_toolbarItem setLabel: _NS("Subtitles & OSD")];
+        [o_toolbarItem setPaletteLabel: _NS("Subtitles & OSD settings")];
+
+        [o_toolbarItem setToolTip: _NS("Subtitles & OSD settings")];
+        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Subtitles_64"]];
+
+        [o_toolbarItem setTarget: self];
+        [o_toolbarItem setAction: @selector(showOSDSettings)];
+
+        [o_toolbarItem setEnabled: YES];
+        [o_toolbarItem setAutovalidates: YES];
+    }
+    else if( [o_itemIdent isEqual: VLCInputSettingToolbarIdentifier] )
+    {
+        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
+
+        [o_toolbarItem setLabel: _NS("Input & Codecs")];
+        [o_toolbarItem setPaletteLabel: _NS("Input & Codec settings")];
+
+        [o_toolbarItem setToolTip: _NS("Input & Codec settings")];
+        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Input_64"]];
+
+        [o_toolbarItem setTarget: self];
+        [o_toolbarItem setAction: @selector(showInputSettings)];
+
+        [o_toolbarItem setEnabled: YES];
+        [o_toolbarItem setAutovalidates: YES];
+    }
+
     return o_toolbarItem;
 }
 
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
+        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
+        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, nil];
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
+        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, nil];
 }
 
 - (void)initStrings
 {
-    msg_Warn( p_intf, "localisation of the simple preferences not implemented!" );
+    msg_Warn( p_intf, "localisation of the simple preferences is not implemented!" );
 }
 
 - (void)resetControls
@@ -158,30 +196,42 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     int i, y = 0;
     char *psz_tmp;
 
+    #define SetupIntList( object, name ) \
+    [object removeAllItems]; \
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+    for( i = 0; i < p_item->i_list; i++ ) \
+    { \
+        if( p_item->ppsz_list_text[i] != NULL) \
+            [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
+        else \
+            [object addItemWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]]]; \
+    } \
+    if( p_item->value.i < [object numberOfItems] ) \
+        [object selectItemAtIndex: p_item->value.i]; \
+    else \
+        [object selectItemAtIndex: 0]
+
+    #define SetupStringList( object, name ) \
+        [object removeAllItems]; \
+        y = 0; \
+        p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+        for( i = 0; p_item->ppsz_list[i] != nil; i++ ) \
+        { \
+            [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
+            if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) ) \
+                y = i; \
+        } \
+        [object selectItemAtIndex: y]
+
     /**********************
      * interface settings *
      **********************/
-    [o_intf_lang_pop removeAllItems];
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), "language" );
-    for( i = 0; p_item->ppsz_list[i] != nil; i++ )
-    {
-        [o_intf_lang_pop addItemWithTitle: _NS( p_item->ppsz_list_text[i] )];
-        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
-            y = i;
-    }
-    [o_intf_lang_pop selectItemAtIndex: y];
-
-    [o_intf_art_pop removeAllItems];
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), "album-art" );
-    for( i = 0; i < p_item->i_list; i++ )
-        [o_intf_art_pop addItemWithTitle: _NS( p_item->ppsz_list_text[i] )];
-    [o_intf_art_pop selectItemAtIndex: 0];
-    [o_intf_art_pop selectItemAtIndex: p_item->value.i];
+    SetupStringList( o_intf_lang_pop, "language" );
+    SetupIntList( o_intf_art_pop, "album-art" );
 
     [o_intf_meta_ckb setState: config_GetInt( p_intf, "fetch-meta" )];
     [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
     [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embedded-video" )];
-
 
     /******************
      * audio settings *
@@ -192,13 +242,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [o_audio_spdif_ckb setState: config_GetInt( p_intf, "spdif" )];
 
-    [o_audio_dolby_pop removeAllItems];
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), "force-dolby-surround" );
-    for( i = 0; i < p_item->i_list; i++ )
-        [o_audio_dolby_pop addItemWithTitle: _NS( p_item->ppsz_list_text[i] )];
-    [o_audio_dolby_pop selectItemAtIndex: 0];
-    [o_audio_dolby_pop selectItemAtIndex: p_item->value.i];
-    
+    SetupIntList( o_audio_dolby_pop, "force-dolby-surround" );
+
     [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" )]];
 
     [o_audio_headphone_ckb setState: config_GetInt( p_intf, "headphone-dolby" )];
@@ -216,7 +261,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     {
         [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" )]];
         [o_audio_lastpwd_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" )]];
-        
+
         if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
             [o_audio_last_ckb setState: NSOnState];
         else
@@ -238,7 +283,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" )]];
     [o_video_snap_prefix_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-prefix" )]];
     [o_video_snap_seqnum_ckb setState: config_GetInt( p_intf, "snapshot-sequential" )];
-    [o_video_snap_format_pop removeAllItems];
+    
     p_item = config_FindConfig( VLC_OBJECT(p_intf), "snapshot-format" );
     for( i = 0; p_item->ppsz_list[i] != nil; i++ )
     {
@@ -248,14 +293,99 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
     [o_video_snap_format_pop selectItemAtIndex: y];
 
-    /*******************
-     * codecs settings *
-     *******************/
+    /***************************
+     * input & codecs settings *
+     ***************************/
+    [o_input_serverport_fld setIntValue: config_GetInt( p_intf, "server-port" )];
+    if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
+        [o_input_httpproxy_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy" )]];
+    [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "ffmpeg-pp-q" )];
+
+    SetupIntList( o_input_avi_pop, "avi-index" );
+
+    [o_input_rtsp_ckb setState: config_GetInt( p_intf, "rtsp-tcp" )];
+
+    psz_tmp = config_GetPsz( p_intf, "access-filter" );
+    if( psz_tmp )
+    {
+        [o_input_record_ckb setState: (int)strstr( psz_tmp, "record" )];
+        [o_input_dump_ckb setState: (int)strstr( psz_tmp, "dump" )];
+        [o_input_bandwidth_ckb setState: (int)strstr( psz_tmp, "bandwidth" )];
+        [o_input_timeshift_ckb setState: (int)strstr( psz_tmp, "timeshift" )];
+    }
+
+    [o_input_cachelevel_pop removeAllItems];
+    [o_input_cachelevel_pop addItemsWithTitles: 
+        [NSArray arrayWithObjects: _NS("Custom"), _NS("Lowest latency"), _NS("Low latency"), _NS("Normal"),
+            _NS("High latency"), _NS("Higher latency"), nil]];
+    [[o_input_cachelevel_pop itemAtIndex: 0] setTag: 0];
+    [[o_input_cachelevel_pop itemAtIndex: 1] setTag: 100];
+    [[o_input_cachelevel_pop itemAtIndex: 2] setTag: 200];
+    [[o_input_cachelevel_pop itemAtIndex: 3] setTag: 300];
+    [[o_input_cachelevel_pop itemAtIndex: 4] setTag: 400];
+    [[o_input_cachelevel_pop itemAtIndex: 5] setTag: 500];
+    
+#define TestCaC( name ) \
+    b_cache_equal =  b_cache_equal && \
+        ( i_cache == config_GetInt( p_intf, name ) )
+
+#define TestCaCi( name, int ) \
+        b_cache_equal = b_cache_equal &&  \
+        ( ( i_cache * int ) == config_GetInt( p_intf, name ) )
+
+    /* Select the accurate value of the PopupButton */
+    bool b_cache_equal = true;
+    int i_cache = config_GetInt( p_intf, "file-caching");
+    
+    TestCaC( "udp-caching" );
+    if( module_Exists (p_intf, "dvdread") )
+        TestCaC( "dvdread-caching" );
+    if( module_Exists (p_intf, "dvdnav") )
+        TestCaC( "dvdnav-caching" );
+    TestCaC( "tcp-caching" );
+    TestCaC( "fake-caching" ); 
+    TestCaC( "cdda-caching" );
+    TestCaC( "screen-caching" ); 
+    TestCaC( "vcd-caching" );
+    TestCaCi( "rtsp-caching", 4 ); 
+    TestCaCi( "ftp-caching", 2 );
+    TestCaCi( "http-caching", 4 );
+    if(module_Exists (p_intf, "access_realrtsp"))
+        TestCaCi( "realrtsp-caching", 10 );
+    TestCaCi( "mms-caching", 19 );
+    if( b_cache_equal )
+        [o_input_cachelevel_pop selectItemWithTag: i_cache];
+    else
+        [o_input_cachelevel_pop selectItemWithTitle: _NS("Custom")];
 
     /*********************
      * subtitle settings *
      *********************/
+    [o_osd_osd_ckb setState: config_GetInt( p_intf, "osd" )];
     
+    [o_osd_encoding_pop removeAllItems];
+    y = 0;
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-encoding" );
+    for( i = 0; p_item->ppsz_list[i] != nil; i++ )
+    {
+        if( p_item->ppsz_list[i] != "" )
+            [o_osd_encoding_pop addItemWithTitle: _NS( p_item->ppsz_list[i] )];
+        else
+            [o_osd_encoding_pop addItemWithTitle: @" "];
+
+        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
+            y = i;
+    }
+    [o_osd_encoding_pop selectItemAtIndex: y];
+    
+    [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" )]];
+    if( config_GetPsz( p_intf, "freetype-font" ) != NULL )
+        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "freetype-font" )]];
+
+    SetupIntList( o_osd_font_color_pop, "freetype-color" );
+    SetupIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
+    SetupIntList( o_osd_font_effect_pop, "freetype-effect" );
+
     /********************
      * hotkeys settings *
      ********************/
@@ -305,7 +435,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( i_return == NSAlertAlternateReturn )
     {
         config_ResetAll( p_intf );
-        b_intfSettingChanged, b_videoSettingChanged, b_audioSettingChanged = YES;
+        b_intfSettingChanged = b_videoSettingChanged = b_audioSettingChanged = YES;
         [self resetControls];
     }
 }
@@ -316,22 +446,27 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     char *psz_tmp;
     int i;
     
+#define SaveIntList( object, name ) \
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+    if( [object indexOfSelectedItem] >= 0 ) \
+        config_PutInt( p_intf, name, p_item->pi_list[[object indexOfSelectedItem]] ); \
+    else \
+        config_PutInt( p_intf, name, [object intValue] ) \
+                    
+#define SaveStringList( object, name ) \
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+    if( [object indexOfSelectedItem] >= 0 ) \
+        config_PutPsz( p_intf, name, strdup( p_item->ppsz_list[[object indexOfSelectedItem]] ) ); \
+    else \
+        config_PutPsz( p_intf, name, strdup( [[VLCMain sharedInstance] delocalizeString: [object stringValue]] ) )
+
     /**********************
      * interface settings *
      **********************/
     if( b_intfSettingChanged )
     {
-        p_item = config_FindConfig( VLC_OBJECT(p_intf), "language" );
-        if( [o_intf_lang_pop indexOfSelectedItem] >= 0 )
-            config_PutPsz( p_intf, "language", strdup( p_item->ppsz_list[[o_intf_lang_pop indexOfSelectedItem]] ) );
-        else
-            config_PutPsz( p_intf, "language", strdup( [[VLCMain sharedInstance] delocalizeString: [o_intf_lang_pop stringValue]] ) );
-
-        p_item = config_FindConfig( VLC_OBJECT(p_intf), "album-art" );
-        if( [o_intf_art_pop indexOfSelectedItem] >= 0 )
-            config_PutInt( p_intf, "album-art", p_item->pi_list[[o_intf_art_pop indexOfSelectedItem]] );
-        else
-            config_PutInt( p_intf, "album-art", [o_intf_art_pop intValue] );
+        SaveStringList( o_intf_lang_pop, "language" );
+        SaveIntList( o_intf_art_pop, "album-art" );
 
         config_PutInt( p_intf, "fetch-meta", [o_intf_meta_ckb state] );
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
@@ -359,11 +494,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         config_PutInt( p_intf, "volume", [o_audio_vol_sld intValue] );
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
-        p_item = config_FindConfig( VLC_OBJECT(p_intf), "force-dolby-surround" );
-        if( [o_audio_dolby_pop indexOfSelectedItem] >= 0 )
-            config_PutInt( p_intf, "force-dolby-surround", p_item->pi_list[[o_audio_dolby_pop indexOfSelectedItem]] );
-        else
-            config_PutInt( p_intf, "force-dolby-surround", [o_audio_dolby_pop intValue] );
+        SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );
 
         config_PutPsz( p_intf, "audio-language", [[o_audio_lang_fld stringValue] UTF8String] );
         config_PutInt( p_intf, "headphone-dolby", [o_audio_headphone_ckb state] );
@@ -390,7 +521,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         /* Last.FM is optional */
         if( module_Exists( p_intf, "audioscrobbler" ) )
-        {            
+        {    
             if( [o_audio_last_ckb state] == NSOnState )
                 config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
             else
@@ -435,7 +566,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         i = config_SaveConfigFile( p_intf, "main" );
         i = i + config_SaveConfigFile( p_intf, "macosx" );
-        
+
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occured while saving the Video settings using SimplePrefs" );
@@ -443,6 +574,118 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         }
         b_videoSettingChanged = NO;
     }
+    
+    /***************************
+     * input & codecs settings *
+     ***************************/
+    if( b_inputSettingChanged )
+    {
+        config_PutInt( p_intf, "server-port", [o_input_serverport_fld intValue] );
+        config_PutPsz( p_intf, "http-proxy", [[o_input_httpproxy_fld stringValue] UTF8String] );
+        config_PutInt( p_intf, "ffmpeg-pp-q", [o_input_postproc_fld intValue] );
+
+        SaveIntList( o_input_avi_pop, "avi-index" );
+
+        config_PutInt( p_intf, "rtsp-tcp", [o_input_rtsp_ckb state] );
+
+        #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
+        #define CaC( name ) CaCi( name, 1 )
+        msg_Dbg( p_intf, "Adjusting all cache values at: %i", [[o_input_cachelevel_pop selectedItem] tag] );
+        CaC( "udp-caching" );
+        if( module_Exists (p_intf, "dvdread" ) )
+        {
+            CaC( "dvdread-caching" );
+            i = i + config_SaveConfigFile( p_intf, "dvdread" );
+        }
+        if( module_Exists (p_intf, "dvdnav" ) )
+        {
+            CaC( "dvdnav-caching" );
+            i = i + config_SaveConfigFile( p_intf, "dvdnav" );
+        }
+        CaC( "tcp-caching" ); CaC( "vcd-caching" );
+        CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
+        CaC( "screen-caching" );
+        CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
+        CaCi( "http-caching", 4 );
+        if( module_Exists (p_intf, "access_realrtsp" ) )
+        {
+            CaCi( "realrtsp-caching", 10 );
+            i = i + config_SaveConfigFile( p_intf, "access_realrtsp" );
+        }
+        CaCi( "mms-caching", 19 );
+
+        #define SaveAccessFilter( object, name ) \
+        if( [object state] == NSOnState ) \
+        { \
+            if( b_first ) \
+            { \
+                [o_temp appendString: name]; \
+                b_first = NO; \
+            } \
+            else \
+                [o_temp appendFormat: @":%@", name]; \
+        }
+
+        BOOL b_first = YES;
+        NSMutableString *o_temp = [[NSMutableString alloc] init];
+        SaveAccessFilter( o_input_record_ckb, @"record" );
+        SaveAccessFilter( o_input_dump_ckb, @"dump" );
+        SaveAccessFilter( o_input_bandwidth_ckb, @"bandwidth" );
+        SaveAccessFilter( o_input_timeshift_ckb, @"timeshift" );
+        config_PutPsz( p_intf, "access-filter", [o_temp UTF8String] );
+        [o_temp release];
+
+        i = config_SaveConfigFile( p_intf, "main" );
+        i = i + config_SaveConfigFile( p_intf, "ffmpeg" );
+        i = i + config_SaveConfigFile( p_intf, "access_http" );
+        i = i + config_SaveConfigFile( p_intf, "access_file" );
+        i = i + config_SaveConfigFile( p_intf, "access_tcp" );
+        i = i + config_SaveConfigFile( p_intf, "access_fake" );
+        i = i + config_SaveConfigFile( p_intf, "cdda" );
+        i = i + config_SaveConfigFile( p_intf, "screen" );
+        i = i + config_SaveConfigFile( p_intf, "vcd" );
+        i = i + config_SaveConfigFile( p_intf, "access_ftp" );
+        i = i + config_SaveConfigFile( p_intf, "access_mms" );
+        i = i + config_SaveConfigFile( p_intf, "live555" );
+
+        if( i != 0 )
+        {
+            msg_Err( p_intf, "An error occured while saving the Input settings using SimplePrefs" );
+            i = 0;
+        }
+        b_inputSettingChanged = NO;
+    }
+    
+    /**********************
+     * subtitles settings *
+     **********************/
+    if( b_osdSettingChanged )
+    {
+        config_PutInt( p_intf, "osd", [o_osd_osd_ckb state] );
+
+        if( [o_osd_encoding_pop indexOfSelectedItem] >= 0 )
+            config_PutPsz( p_intf, "subsdec-encoding", [[[o_osd_encoding_pop selectedItem] title] UTF8String] );
+
+        config_PutPsz( p_intf, "sub-language", [[o_osd_lang_fld stringValue] UTF8String] );
+        config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
+
+        SaveIntList( o_osd_font_color_pop, "freetype-color" );
+        SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
+        SaveIntList( o_osd_font_effect_pop, "freetype-effect" );
+
+        i = config_SaveConfigFile( p_intf, NULL );
+
+        if( i != 0 )
+        {
+            msg_Err( p_intf, "An error occured while saving the OSD/Subtitle settings using SimplePrefs" );
+            i = 0;
+        }
+        b_osdSettingChanged = NO;
+    }
+    
+    /********************
+     * hotkeys settings *
+     ********************/
 }
 
 - (void)showSettingsForCategory: (id)o_new_category_view
@@ -456,7 +699,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         /* restore our window's height, if we've shown another category previously */
         o_old_view_rect = [o_currentlyShownCategoryView frame];
         o_win_rect.size.height = o_win_rect.size.height - o_old_view_rect.size.height;
-        
+
         /* remove our previous category view */
         [o_currentlyShownCategoryView removeFromSuperviewWithoutNeedingDisplay];
     }
@@ -517,13 +760,13 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_selectFolderPanel setCanChooseFiles: NO];
         [o_selectFolderPanel setResolvesAliases: YES];
         [o_selectFolderPanel setAllowsMultipleSelection: NO];
-        [o_selectFolderPanel setMessage: _NS("Choose the Folder to save your video snapshots to.")];
+        [o_selectFolderPanel setMessage: _NS("Choose the folder to save your video snapshots to.")];
         [o_selectFolderPanel setCanCreateDirectories: YES];
         [o_selectFolderPanel setPrompt: _NS("Choose")];
         [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win 
                                       modalDelegate: self 
                                      didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
-                                        contextInfo: nil];
+                                        contextInfo: o_video_snap_folder_btn];
     }
     else
         b_videoSettingChanged = YES;
@@ -533,8 +776,16 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     if( returnCode == NSOKButton )
     {
-        [o_video_snap_folder_fld setStringValue: [o_selectFolderPanel filename]];
-        b_videoSettingChanged = YES;
+        if( contextInfo == o_video_snap_folder_btn )
+        {
+            [o_video_snap_folder_fld setStringValue: [o_selectFolderPanel filename]];
+            b_videoSettingChanged = YES;
+        }
+        else if( contextInfo == o_osd_font_btn )
+        {
+            [o_osd_font_fld setStringValue: [o_selectFolderPanel filename]];
+            b_osdSettingChanged = YES;
+        }
     }
 
     [o_selectFolderPanel release];
@@ -545,4 +796,44 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     msg_Dbg( p_intf, "showing video settings" );
     [self showSettingsForCategory: o_video_view];
 }
+
+- (IBAction)osdSettingChanged:(id)sender
+{
+    if( sender == o_osd_font_btn )
+    {
+        o_selectFolderPanel = [[NSOpenPanel alloc] init];
+        [o_selectFolderPanel setCanChooseDirectories: NO];
+        [o_selectFolderPanel setCanChooseFiles: YES];
+        [o_selectFolderPanel setResolvesAliases: YES];
+        [o_selectFolderPanel setAllowsMultipleSelection: NO];
+        [o_selectFolderPanel setMessage: _NS("Choose the font to display your Subtitles with.")];
+        [o_selectFolderPanel setCanCreateDirectories: NO];
+        [o_selectFolderPanel setPrompt: _NS("Choose")];
+        [o_selectFolderPanel setAllowedFileTypes: [NSArray arrayWithObjects: @"dfont", @"ttf", @"otf", @"FFIL", nil]];
+        [o_selectFolderPanel beginSheetForDirectory: @"/System/Library/Fonts/" file: nil modalForWindow: o_sprefs_win 
+                                      modalDelegate: self 
+                                     didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
+                                        contextInfo: o_osd_font_btn];
+    }
+    else
+        b_osdSettingChanged = YES;
+}
+
+- (void)showOSDSettings
+{
+    msg_Dbg( p_intf, "showing OSD settings" );
+    [self showSettingsForCategory: o_osd_view];
+}
+
+- (IBAction)inputSettingChanged:(id)sender
+{
+    b_inputSettingChanged = YES;
+}
+
+- (void)showInputSettings
+{
+    msg_Dbg( p_intf, "showing Input Settings" );
+    [self showSettingsForCategory: o_input_view];
+}
+
 @end

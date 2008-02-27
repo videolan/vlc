@@ -51,6 +51,27 @@
     IBOutlet id o_audio_vol_sld;
     IBOutlet id o_audio_vol_txt;
 
+    IBOutlet id o_input_access_box;
+    IBOutlet id o_input_avi_pop;
+    IBOutlet id o_input_avi_txt;
+    IBOutlet id o_input_bandwidth_ckb;
+    IBOutlet id o_input_cachelevel_pop;
+    IBOutlet id o_input_cachelevel_txt;
+    IBOutlet id o_input_caching_box;
+    IBOutlet id o_input_dump_ckb;
+    IBOutlet id o_input_httpproxy_fld;
+    IBOutlet id o_input_httpproxy_txt;
+    IBOutlet id o_input_mux_box;
+    IBOutlet id o_input_net_box;
+    IBOutlet id o_input_postproc_fld;
+    IBOutlet id o_input_postproc_txt;
+    IBOutlet id o_input_record_ckb;
+    IBOutlet id o_input_rtsp_ckb;
+    IBOutlet id o_input_serverport_fld;
+    IBOutlet id o_input_serverport_txt;
+    IBOutlet id o_input_timeshift_ckb;
+    IBOutlet id o_input_view;
+
     IBOutlet id o_intf_art_pop;
     IBOutlet id o_intf_art_txt;
     IBOutlet id o_intf_embedded_ckb;
@@ -60,6 +81,25 @@
     IBOutlet id o_intf_meta_ckb;
     IBOutlet id o_intf_network_box;
     IBOutlet id o_intf_view;
+
+    IBOutlet id o_osd_encoding_pop;
+    IBOutlet id o_osd_encoding_txt;
+    IBOutlet id o_osd_font_box;
+    IBOutlet id o_osd_font_btn;
+    IBOutlet id o_osd_font_color_pop;
+    IBOutlet id o_osd_font_color_txt;
+    IBOutlet id o_osd_font_effect_pop;
+    IBOutlet id o_osd_font_effect_txt;
+    IBOutlet id o_osd_font_fld;
+    IBOutlet id o_osd_font_size_pop;
+    IBOutlet id o_osd_font_size_txt;
+    IBOutlet id o_osd_font_txt;
+    IBOutlet id o_osd_lang_box;
+    IBOutlet id o_osd_lang_fld;
+    IBOutlet id o_osd_lang_txt;
+    IBOutlet id o_osd_osd_box;
+    IBOutlet id o_osd_osd_ckb;
+    IBOutlet id o_osd_view;
 
     IBOutlet id o_sprefs_basic_box;
     IBOutlet id o_sprefs_basicFull_matrix;
@@ -93,11 +133,13 @@
     BOOL b_audioSettingChanged;
     BOOL b_intfSettingChanged;
     BOOL b_videoSettingChanged;
+    BOOL b_osdSettingChanged;
+    BOOL b_inputSettingChanged;
     id o_currentlyShownCategoryView;
-    
+
     NSToolbar *o_sprefs_toolbar;
     NSOpenPanel *o_selectFolderPanel;
-    
+
     intf_thread_t *p_intf;
 }
 + (VLCSimplePrefs *)sharedInstance;
@@ -132,9 +174,13 @@
 - (IBAction)videoSettingChanged:(id)sender;
 - (void)showVideoSettings;
 
-/* subtitles */
+/* OSD / subtitles */
+- (IBAction)osdSettingChanged:(id)sender;
+- (void)showOSDSettings;
 
 /* input & codecs */
+- (IBAction)inputSettingChanged:(id)sender;
+- (void)showInputSettings;
 
 /* hotkeys */
 
