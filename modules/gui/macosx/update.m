@@ -173,12 +173,14 @@ static VLCUpdate *_o_sharedInstance = nil;
 
     if( uptodate )
     {
+        [o_fld_releaseNote setString: [NSString string]];
+        [o_fld_currentVersion setStringValue: [NSString string]];
         [o_fld_status setStringValue: _NS("This version of VLC is the latest available.")];
         [o_btn_DownloadNow setEnabled: NO];
     }
     else
     {
-        [o_fld_releaseNote setString: [NSString stringWithUTF8String: (p_u->release.psz_desc)]];
+        [o_fld_releaseNote setString: [NSString stringWithUTF8String: (p_u->release.psz_desc ? p_u->release.psz_desc : "" )]];
         [o_fld_status setStringValue: _NS("This version of VLC is outdated.")];
         [o_fld_currentVersion setStringValue: [NSString stringWithFormat:
             _NS("The current release is %d.%d.%d%c."), p_u->release.i_major,
@@ -195,7 +197,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 static void updateCallback( void * p_data, vlc_bool_t b_success )
 {
-    [(id)p_data setUpToDate: b_success && update_CompareReleaseToCurrent( ((VLCUpdate*)p_data)->p_u ) == UpdateReleaseStatusNewer ];
+    [(id)p_data setUpToDate: !b_success || update_CompareReleaseToCurrent( ((VLCUpdate*)p_data)->p_u ) == UpdateReleaseStatusNewer ];
 }
 
 - (void)checkForUpdate
