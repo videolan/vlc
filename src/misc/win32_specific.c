@@ -38,6 +38,7 @@
 #if !defined( UNDER_CE )
 #   include <io.h>
 #   include <fcntl.h>
+#   include  <mmsystem.h>
 #endif
 
 #include <winsock.h>
@@ -94,6 +95,8 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 #if !defined( UNDER_CE )
     _fmode = _O_BINARY;
     _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
+
+    timeBeginPeriod(5);
 #endif
 
     /* Call mdate() once to make sure it is initialized properly */
@@ -369,6 +372,10 @@ void system_End( libvlc_int_t *p_this )
         free( vlc_global()->psz_vlcpath );
         vlc_global()->psz_vlcpath = NULL;
     }
+
+#if !defined( UNDER_CE )
+    timeEndPeriod(5);
+#endif
 
     WSACleanup();
 }

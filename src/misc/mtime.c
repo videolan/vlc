@@ -49,7 +49,13 @@
 
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   include <windows.h>
+#   include <mmsystem.h>
 #endif
+
+#if defined( UNDER_CE )
+#   include <windows.h>
+#endif
+
 #if defined(HAVE_SYS_TIME_H)
 #   include <sys/time.h>
 #endif
@@ -211,6 +217,30 @@ mtime_t mdate( void )
         freq = ( QueryPerformanceFrequency( &buf ) &&
                  (buf.QuadPart == I64C(1193182) || buf.QuadPart == I64C(3579545) ) )
                ? buf.QuadPart : 0;
+
+#if defined( WIN32 )
+        /* on windows 2000, XP and Vista detect if there are two
+           cores there - that makes QueryPerformanceFrequency in
+           any case not trustable?
+           (may also be true, for single cores with adaptive
+            CPU frequency and active power management?)
+        */
+        HINSTANCE h_Kernel32 = LoadLibraryA("kernel32.dll");
+        if(h_Kernel32)
+        {
+            void WINAPI (*pf_GetSystemInfo)(LPSYSTEM_INFO*);
+            pf_GetSystemInfo = (void WINAPI (*)(LPSYSTEM_INFO*))
+                                GetProcAddress(h_Kernel32, "GetSystemInfo");
+            if(pf_GetSystemInfo)
+            {
+               SYSTEM_INFO system_info;
+               pf_GetSystemInfo(&system_info);
+               if(system_info.dwNumberOfProcessors > 1)
+                  freq = 0;
+            }
+            FreeLibrary(h_Kernel32);
+        }
+#endif
     }
 
     if( freq != 0 )
@@ -226,9 +256,9 @@ mtime_t mdate( void )
     }
     else
     {
-        /* Fallback on GetTickCount() which has a milisecond resolution
-         * (actually, best case is about 10 ms resolution)
-         * GetTickCount() only returns a DWORD thus will wrap after
+        /* Fallback on timeGetTime() which has a milisecond resolution
+         * (actually, best case is about 5 ms resolution)
+         * timeGetTime() only returns a DWORD thus will wrap after
          * about 49.7 days so we try to detect the wrapping. */
 
         static CRITICAL_SECTION date_lock;
@@ -238,14 +268,23 @@ mtime_t mdate( void )
         if( i_wrap_counts == -1 )
         {
             /* Initialization */
+#if defined( WIN32 )
+            i_previous_time = I64C(1000) * timeGetTime();
+#else
             i_previous_time = I64C(1000) * GetTickCount();
+#endif
             InitializeCriticalSection( &date_lock );
             i_wrap_counts = 0;
         }
 
         EnterCriticalSection( &date_lock );
+#if defined( WIN32 )
+        res = I64C(1000) *
+            (i_wrap_counts * I64C(0x100000000) + timeGetTime());
+#else
         res = I64C(1000) *
             (i_wrap_counts * I64C(0x100000000) + GetTickCount());
+#endif
         if( i_previous_time > res )
         {
             /* Counter wrapped */
@@ -331,7 +370,7 @@ void msleep( mtime_t delay )
     snooze( delay );
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    Sleep( (int) (delay / 1000) );
+    Sleep( (DWORD) (delay / 1000) );
 
 #elif defined( HAVE_NANOSLEEP )
     struct timespec ts_delay;
