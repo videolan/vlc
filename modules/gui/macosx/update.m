@@ -22,17 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#   include "config.h"
-#endif
-
 #ifdef UPDATE_CHECK
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #import "update.h"
-#import "intf.h"
 
 static NSString * kPrefUpdateOnStartup = @"UpdateOnStartup";
 static NSString * kPrefUpdateLastTimeChecked = @"UpdateLastTimeChecked";
@@ -173,8 +168,8 @@ static VLCUpdate *_o_sharedInstance = nil;
 
     if( uptodate )
     {
-        [o_fld_releaseNote setString: [NSString string]];
-        [o_fld_currentVersion setStringValue: [NSString string]];
+        [o_fld_releaseNote setString: @""];
+        [o_fld_currentVersion setStringValue: @""];
         [o_fld_status setStringValue: _NS("This version of VLC is the latest available.")];
         [o_btn_DownloadNow setEnabled: NO];
     }
@@ -212,7 +207,7 @@ static void updateCallback( void * p_data, vlc_bool_t b_success )
 
 - (void)performDownload:(NSString *)path
 {
-    update_Download( p_u, (char*)[path UTF8String] );
+    update_Download( p_u, [path UTF8String] );
     [o_btn_DownloadNow setEnabled: NO];
     [o_update_window orderOut: self];
     update_Delete( p_u );
