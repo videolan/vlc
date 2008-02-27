@@ -78,11 +78,6 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     if( !p_input_thread )
         return;
  
-    /* release for previous vlc_object_get */
-    vlc_object_release( p_input_thread );
-
-    /* release for initial p_input_thread yield (see _new()) */
-    vlc_object_release( p_input_thread );
 
     /* No one is tracking this input_thread appart us. Destroy it */
     if( p_mi->b_own_its_input_thread )
@@ -92,10 +87,11 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
         var_DelCallback( p_input_thread, "pausable", input_state_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
+
         /* We owned this one */
         input_StopThread( p_input_thread );
+
         var_Destroy( p_input_thread, "drawable" );
-        //input_DestroyThread( p_input_thread );
     }
     else
     {
@@ -105,6 +101,8 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
         vlc_object_release( p_input_thread );
     }
 
+    /* release for previous vlc_object_get */
+    vlc_object_release( p_input_thread );
 }
 
 /*
@@ -536,9 +534,8 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     }
 
     p_mi->i_input_id = input_Read( p_mi->p_libvlc_instance->p_libvlc_int,
-                                         p_mi->p_md->p_input_item, VLC_FALSE );
+                                   p_mi->p_md->p_input_item, VLC_FALSE );
 
-    /* Released in _release() */
     p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
 
     if( !p_input_thread )
@@ -560,6 +557,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
 
+    vlc_object_release( p_input_thread );
     vlc_mutex_unlock( &p_mi->object_lock );
 }
 
@@ -616,6 +614,7 @@ void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
                                          libvlc_drawable_t drawable,
                                          libvlc_exception_t *p_e )
 {
+    (void)p_e;
     p_mi->drawable = drawable;
 }
 
@@ -625,6 +624,7 @@ void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
 libvlc_drawable_t
 libvlc_media_instance_get_drawable ( libvlc_media_instance_t *p_mi, libvlc_exception_t *p_e )
 {
+    (void)p_e;
     return p_mi->drawable;
 }
 
