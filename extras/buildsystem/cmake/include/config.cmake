@@ -339,6 +339,7 @@ if(APPLE)
         COMMAND find ${CMAKE_BINARY_DIR}/po -name *.gmo -exec sh -c \"mkdir -p ${MacOS}/locale/\\`basename {}|sed s/\\.gmo//\\`/LC_MESSAGES\; ln -s {} ${MacOS}/locale/\\`basename {}|sed s/\\.gmo//\\`/LC_MESSAGES/vlc.mo\" "\;"
         COMMAND ln -sf VLC ${MacOS}/clivlc #useless?
         COMMAND printf "APPLVLC#" > ${CMAKE_CURRENT_BINARY_DIR}/VLC.app/Contents/PkgInfo
+        COMMAND rm -Rf ${CMAKE_CURRENT_BINARY_DIR}/tmp
     )
     set( MacOS )
 
@@ -446,17 +447,18 @@ endif (${ALSA_FOUND})
 
 find_package(FFmpeg)
 if(FFmpeg_FOUND)
+  string(REPLACE ";" " " FFmpeg_CFLAGS "${FFmpeg_CFLAGS}")
   set( CMAKE_REQUIRED_FLAGS_saved ${CMAKE_REQUIRED_FLAGS} )
-  set( CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${FFmpeg_CFLAGS}" )
-  
-  #set( CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${CONTRIB_INCLUDE}/ffmpeg )
-  
+  set( CMAKE_REQUIRED_FLAGS ${FFmpeg_CFLAGS} )
+
   vlc_check_include_files (ffmpeg/avcodec.h)
   vlc_check_include_files (ffmpeg/avutil.h)
   vlc_check_include_files (ffmpeg/swscale.h)
+  vlc_check_include_files (swscale.h)
+  
   check_include_files ("stdint.h;postproc/postprocess.h" HAVE_POSTPROC_POSTPROCESS_H)
   vlc_enable_modules(ffmpeg)
-  vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS} )
+  vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS})
   vlc_module_add_link_libraries(ffmpeg ${FFmpeg_LIBRARIES})
   
   set( CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_saved} )
