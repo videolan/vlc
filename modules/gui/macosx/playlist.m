@@ -165,13 +165,10 @@
         p_item = (playlist_item_t *)[item pointerValue];
     }
     if( p_item )
-            i_return = p_item->i_children;
+        i_return = p_item->i_children;
     vlc_object_release( p_playlist );
 
-    if( i_return <= 0 )
-        i_return = 0;
-
-    return i_return;
+    return i_return > 0 ? i_return : 0;
 }
 
 /* return the child at index for the Obj-C pointer item */ /* DONE */
@@ -1405,7 +1402,10 @@
         /* Refuse to move items that are not in the General Node
            (Service Discovery) */
         if( ![self isItem: [o_item pointerValue] inNode:
-                        p_playlist->p_local_category checkItemExistence: NO])
+                        p_playlist->p_local_category checkItemExistence: NO] &&
+            ( var_CreateGetBool( p_playlist, "media-library" ) &&
+            ![self isItem: [o_item pointerValue] inNode:
+                        p_playlist->p_ml_category checkItemExistence: NO]) )
         {
             vlc_object_release(p_playlist);
             return NO;
@@ -1461,8 +1461,8 @@
     /* We refuse to drop an item in anything else than a child of the General
        Node. We still accept items that would be root nodes of the outlineview
        however, to allow drop in an empty playlist. */
-    if( !([self isItem: [item pointerValue] inNode: p_playlist->p_local_category
-                                    checkItemExistence: NO] || item == nil) )
+    if( !( ([self isItem: [item pointerValue] inNode: p_playlist->p_local_category checkItemExistence: NO] || 
+        ( var_CreateGetBool( p_playlist, "media-library" ) && [self isItem: [item pointerValue] inNode: p_playlist->p_ml_category checkItemExistence: NO] ) ) || item == nil ) )
     {
         vlc_object_release( p_playlist );
         return NSDragOperationNone;
