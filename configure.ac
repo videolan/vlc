@@ -3980,7 +3980,7 @@ fi
 
 dnl
 dnl  XVMC module
-dnl  (enabled by default except on win32)
+dnl  (disabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvmc,
   [  --enable-xvmc           XVMC support (default disabled)])
@@ -3990,7 +3990,7 @@ if test "${enable_xvmc}" = "yes" &&
   CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
   AC_CHECK_HEADERS(X11/extensions/vldXvMC.h, [
     VLC_ADD_PLUGINS([xvmc])
-    VLC_ADD_LIBS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+    VLC_ADD_LIBS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXvMCW -lXv -lXinerama])
     VLC_ADD_CPPFLAGS([xvmc],[${X_CFLAGS}])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
