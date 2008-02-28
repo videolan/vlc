@@ -339,7 +339,7 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
     int clip_right;
     int i_len, i_color;
     uint16_t *p_source = NULL;
-
+#if 0
     if (!sub_img)
         return;
 
@@ -468,6 +468,7 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
         }
         dst_y += dst_pitch;
     }
+#endif
 }
 
 int xxmc_xvmc_surface_valid( vout_thread_t *p_vout, XvMCSurface *surf )

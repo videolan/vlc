@@ -430,6 +430,7 @@ int E_(Activate) ( vlc_object_t *p_this )
         E_(Deactivate)( p_vout );
         return VLC_EGENERIC;
     }
+    subpicture_t sub_pic;
     sub_pic.p_sys = NULL;
     p_vout->p_sys->last_date = 0;
 #endif
@@ -597,11 +598,11 @@ static void RenderVideo( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
 
+#if 0
     vlc_mutex_lock( &p_vout->lastsubtitle_lock );
-
-    if (p_vout->p_last_subtitle != NULL)
+    if (p_vout->p_sys->p_last_subtitle != NULL)
     {
-        if( p_vout->p_sys->p_last_subtitle_save != p_vout->p_last_subtitle )
+        if( p_vout->p_sys->p_last_subtitle_save != p_vout->p_sys->p_last_subtitle )
         {
             p_vout->p_sys->new_subpic =
                 xxmc_xvmc_alloc_subpicture( p_vout, &p_vout->p_sys->context,
@@ -755,6 +756,7 @@ static void RenderVideo( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->p_sys->p_last_subtitle_save = p_vout->p_last_subtitle;
 
     vlc_mutex_unlock( &p_vout->lastsubtitle_lock );
+#endif
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 
     vlc_mutex_unlock( &p_vout->p_sys->lock );
@@ -965,20 +967,21 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef MODULE_NAME_IS_xvmc
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
-    vlc_xxmc_t *xxmc = &p_picture->p_sys->xxmc_data;
+    vlc_xxmc_t *xxmc = &p_pic->p_sys->xxmc_data;
     if( !xxmc->decoded ||
-        !xxmc_xvmc_surface_valid( p_vout, p_picture->p_sys->xvmc_surf ) )
+        !xxmc_xvmc_surface_valid( p_vout, p_pic->p_sys->xvmc_surf ) )
     {
       msg_Dbg( p_vout, "DisplayVideo decoded=%d\tsurfacevalid=%d",
                xxmc->decoded,
-               xxmc_xvmc_surface_valid( p_vout, p_picture->p_sys->xvmc_surf ) );
+               xxmc_xvmc_surface_valid( p_vout, p_pic->p_sys->xvmc_surf ) );
       vlc_mutex_unlock( &p_vout->p_sys->lock );
       xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
       return;
     }
 
-    src_width = p_vout->output.i_width;
-    src_height = p_vout->output.i_height;
+    int src_width = p_vout->output.i_width;
+    int src_height = p_vout->output.i_height;
+    int src_x, src_y;
 
     if( p_vout->p_sys->xvmc_crop_style == 1 )
     {
@@ -1007,17 +1010,18 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         src_y = 0;
     }
 
+    int first_field;
     if( p_vout->p_sys->xvmc_deinterlace_method > 0 )
     {   /* BOB DEINTERLACE */
-        if( (p_picture->p_sys->nb_display == 0) ||
+        if( (p_pic->p_sys->nb_display == 0) ||
             (p_vout->p_sys->xvmc_deinterlace_method == 1) )
         {
-            first_field = (p_picture->b_top_field_first) ?
+            first_field = (p_pic->b_top_field_first) ?
                                 XVMC_BOTTOM_FIELD : XVMC_TOP_FIELD;
         }
         else
         {
-            first_field = (p_picture->b_top_field_first) ?
+            first_field = (p_pic->b_top_field_first) ?
                                 XVMC_TOP_FIELD : XVMC_BOTTOM_FIELD;
         }
     }
@@ -1027,10 +1031,10 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
      }
 
     XVMCLOCKDISPLAY( p_vout->p_sys->p_display );
-    XvMCFlushSurface( p_vout->p_sys->p_display, p_picture->p_sys->xvmc_surf );
+    XvMCFlushSurface( p_vout->p_sys->p_display, p_pic->p_sys->xvmc_surf );
     /* XvMCSyncSurface(p_vout->p_sys->p_display, p_picture->p_sys->xvmc_surf); */
     XvMCPutSurface( p_vout->p_sys->p_display,
-                    p_picture->p_sys->xvmc_surf,
+                    p_pic->p_sys->xvmc_surf,
                     p_vout->p_sys->p_win->video_window,
                     src_x,
                     src_y,
@@ -1045,29 +1049,29 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
     if( p_vout->p_sys->xvmc_deinterlace_method == 2 )
     {   /* BOB DEINTERLACE */
-        if( p_picture->p_sys->nb_display == 0 )/* && ((t2-t1) < 15000)) */
+        if( p_pic->p_sys->nb_display == 0 )/* && ((t2-t1) < 15000)) */
         {
-            mtime_t last_date = p_picture->date;
+            mtime_t last_date = p_pic->date;
 
             vlc_mutex_lock( &p_vout->picture_lock );
             if( !p_vout->p_sys->last_date )
             {
-                p_picture->date += 20000;
+                p_pic->date += 20000;
             }
             else
             {
-                p_picture->date = ((3 * p_picture->date -
+                p_pic->date = ((3 * p_pic->date -
                                     p_vout->p_sys->last_date) / 2 );
             }
             p_vout->p_sys->last_date = last_date;
-            p_picture->b_force = 1;
-            p_picture->p_sys->nb_display = 1;
+            p_pic->b_force = 1;
+            p_pic->p_sys->nb_display = 1;
             vlc_mutex_unlock( &p_vout->picture_lock );
         }
         else
         {
-            p_picture->p_sys->nb_display = 0;
-            p_picture->b_force = 0;
+            p_pic->p_sys->nb_display = 0;
+            p_pic->b_force = 0;
         }
     }
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
@@ -1902,7 +1906,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->p_sys->xvmc_surf = NULL;
     p_pic->p_sys->xxmc_data.decoded = 0;
     p_pic->p_sys->xxmc_data.proc_xxmc_update_frame = xxmc_do_update_frame;
-    p_pic->p_accel_data = &p_pic->p_sys->xxmc_data;
+    //    p_pic->p_accel_data = &p_pic->p_sys->xxmc_data;
     p_pic->p_sys->nb_display = 0;
 #endif
 
@@ -3081,6 +3085,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             vlc_mutex_lock( &p_vout->p_sys->lock );
             if( i_query == VOUT_REPARENT ) d = (Drawable)va_arg( args, int );
             if( !d )
+            {
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 #endif
@@ -3088,6 +3093,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                              p_vout->p_sys->original_window.base_window,
                              DefaultRootWindow( p_vout->p_sys->p_display ),
                              0, 0 );
+            }
             else
             XReparentWindow( p_vout->p_sys->p_display,
                              p_vout->p_sys->original_window.base_window,
