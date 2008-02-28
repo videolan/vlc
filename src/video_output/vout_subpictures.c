@@ -291,7 +291,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     if( !p_region ) return NULL;
 
     memset( p_region, 0, sizeof(subpicture_region_t) );
-    p_region->i_alpha = 0xff
+    p_region->i_alpha = 0xff;
     p_region->p_next = NULL;
     p_region->p_cache = NULL;
     p_region->fmt = *p_fmt;
