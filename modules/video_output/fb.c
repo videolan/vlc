@@ -199,7 +199,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_control = Control;
 
     /* Does the framebuffer uses hw acceleration? */
-    p_sys->b_hw_accel = p_sys->b_tty = var_CreateGetBool( p_vout, "fb-hw-accel" );
+    p_sys->b_hw_accel = var_CreateGetBool( p_vout, "fb-hw-accel" );
 
     /* Set tty and fb devices */
     p_sys->i_tty = 0; /* 0 == /dev/tty0 == current console */
