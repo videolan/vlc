@@ -34,8 +34,8 @@
 #include <vlc_sout.h>
 
 /* ffmpeg header */
-#ifdef HAVE_FFMPEG_AVFORMAT_H
-#   include <ffmpeg/avformat.h>
+#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+#   include <libavformat/avformat.h>
 #elif defined(HAVE_LIBAVFORMAT_TREE)
 #   include <avformat.h>
 #endif
@@ -45,7 +45,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
 
 static const char *ppsz_mux_options[] = {
     "mux", NULL
@@ -505,4 +505,4 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     return 0;
 }
 
-#endif /* HAVE_FFMPEG_AVFORMAT_H */
+#endif /* HAVE_LIBAVFORMAT_AVFORMAT_H */

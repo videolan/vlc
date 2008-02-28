@@ -38,7 +38,7 @@
 #include <vlc_network.h>
 
 #define HAVE_MMX
-#ifdef HAVE_FFMPEG_AVCODEC_H
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>

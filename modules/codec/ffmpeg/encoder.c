@@ -41,8 +41,8 @@
 
 /* ffmpeg header */
 #define HAVE_MMX 1
-#ifdef HAVE_FFMPEG_AVCODEC_H
-#   include <ffmpeg/avcodec.h>
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#   include <libavcodec/avcodec.h>
 #else
 #   include <avcodec.h>
 #endif

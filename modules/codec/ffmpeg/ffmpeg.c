@@ -34,8 +34,8 @@
 
 /* ffmpeg header */
 #define HAVE_MMX 1
-#ifdef HAVE_FFMPEG_AVCODEC_H
-#   include <ffmpeg/avcodec.h>
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#   include <libavcodec/avcodec.h>
 #else
 #   include <avcodec.h>
 #endif
@@ -74,7 +74,7 @@ static const char *nloopf_list_text[] =
 static const char *enc_hq_list[] = { "rd", "bits", "simple" };
 static const char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
 
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
@@ -196,7 +196,7 @@ vlc_module_begin();
     add_integer( ENC_CFG_PREFIX "chroma-elim-threshold", 0, NULL,
                  ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, VLC_TRUE );
 
-#if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
     /* demux submodule */
     add_submodule();
     set_description( _("FFmpeg demuxer" ) );
@@ -212,7 +212,7 @@ vlc_module_begin();
     set_callbacks( E_(OpenMux), E_(CloseMux) );
 #endif
 
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
     /* video filter submodule */
     add_submodule();
     set_description( _("Video scaling filter") );
