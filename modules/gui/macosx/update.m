@@ -22,12 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#import "update.h"
+
 #ifdef UPDATE_CHECK
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#import "update.h"
 
 static NSString * kPrefUpdateOnStartup = @"UpdateOnStartup";
 static NSString * kPrefUpdateLastTimeChecked = @"UpdateLastTimeChecked";

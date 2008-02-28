@@ -22,10 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #ifdef UPDATE_CHECK
 #import <Cocoa/Cocoa.h>
 #import "intf.h"
 #import <vlc_update.h>
+
 
 @interface VLCUpdate : NSObject
 {
