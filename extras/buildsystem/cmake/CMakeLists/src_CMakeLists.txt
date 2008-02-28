@@ -269,21 +269,21 @@ set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
 ##########################################################
 # Tests
 
-add_executable(testapi    control/testapi.c)
-add_executable(i18n_atof  test/i18n_atof.c)
-add_executable(url        test/url.c)
-add_executable(utf8       test/utf8.c)
-add_executable(dictionary test/dictionary.c)
+add_executable(test_control    control/testapi.c)
+add_executable(test_i18n_atof  test/i18n_atof.c)
+add_executable(test_url        test/url.c)
+add_executable(test_utf8       test/utf8.c)
+add_executable(test_dictionary test/dictionary.c)
 
-target_link_libraries(testapi    libvlc-control)
-target_link_libraries(i18n_atof  libvlc)
-target_link_libraries(url        libvlc)
-target_link_libraries(utf8       libvlc)
-target_link_libraries(dictionary libvlc)
+target_link_libraries(test_control    libvlc-control)
+target_link_libraries(test_i18n_atof  libvlc)
+target_link_libraries(test_url        libvlc)
+target_link_libraries(test_utf8       libvlc)
+target_link_libraries(test_dictionary libvlc)
 
-add_test(testapi    ${CMAKE_CURRENT_BINARY_DIR}/testapi)
-add_test(i18n_atof  ${CMAKE_CURRENT_BINARY_DIR}/i18n_atof)
-add_test(url        ${CMAKE_CURRENT_BINARY_DIR}/url)
-add_test(utf8       ${CMAKE_CURRENT_BINARY_DIR}/utf8)
-add_test(dictionary ${CMAKE_CURRENT_BINARY_DIR}/dictionary)
+add_test(test_control    ${CMAKE_CURRENT_BINARY_DIR}/testapi)
+add_test(test_i18n_atof  ${CMAKE_CURRENT_BINARY_DIR}/i18n_atof)
+add_test(test_url        ${CMAKE_CURRENT_BINARY_DIR}/url)
+add_test(test_utf8       ${CMAKE_CURRENT_BINARY_DIR}/utf8)
+add_test(test_dictionary ${CMAKE_CURRENT_BINARY_DIR}/dictionary)
 
