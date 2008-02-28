@@ -962,6 +962,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->pf_packetize = rtp_packetize_l8;
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_FOURCC( 'm', 'p', '3', ' ' ):
             id->i_payload_type = 14;
             id->psz_enc = "MPA";
             id->pf_packetize = rtp_packetize_mpa;

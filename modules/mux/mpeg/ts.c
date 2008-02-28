@@ -956,6 +956,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             switch( p_input->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p','g', 'a' ):
+                case VLC_FOURCC( 'm', 'p', '3', ' ' ):
                     p_stream->i_stream_type =
                         p_input->p_fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
                     p_stream->i_stream_id = 0xc0;
