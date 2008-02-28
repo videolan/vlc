@@ -211,6 +211,7 @@ struct subpicture_region_t
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
     int             i_align;                  /**< alignment within a region */
+    int             i_alpha;                               /**< transparency */
 
     char            *psz_text;       /**< text string comprising this region */
     char            *psz_html;       /**< HTML version of subtitle (NULL = use psz_text) */
