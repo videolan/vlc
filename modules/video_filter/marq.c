@@ -74,7 +74,8 @@ struct filter_sys_t
 
     text_style_t *p_style; /* font control */
 
-    time_t last_time;
+    mtime_t last_time;
+    mtime_t i_refresh;
 
     vlc_bool_t b_need_update;
 };
@@ -104,6 +105,10 @@ struct filter_sys_t
 #define TIMEOUT_LONGTEXT N_("Number of milliseconds the marquee must remain " \
                             "displayed. Default value is " \
                             "0 (remains forever).")
+#define REFRESH_TEXT N_("Refresh period in ms")
+#define REFRESH_LONGTEXT N_("Number of milliseconds between string updates. " \
+                            "This is mainly usefull when using meta data " \
+                            "or time format string sequences.")
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
     "overlayed text. 0 = transparent, 255 = totally opaque. " )
@@ -161,6 +166,8 @@ vlc_module_begin();
     set_section( N_("Misc"), NULL );
     add_integer( CFG_PREFIX "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  VLC_FALSE );
+    add_integer( CFG_PREFIX "refresh", 1000, NULL, REFRESH_TEXT,
+                 REFRESH_LONGTEXT, VLC_FALSE );
 
     set_description( _("Marquee display") );
     add_shortcut( "time" );
@@ -174,7 +181,8 @@ vlc_module_begin();
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
-    "marquee", "x", "y", "position", "color", "size", "timeout", NULL
+    "marquee", "x", "y", "position", "color", "size", "timeout", "refresh",
+    NULL
 };
 
 /*****************************************************************************
@@ -206,6 +214,7 @@ static int CreateFilter( vlc_object_t *p_this )
     CREATE_VAR( i_xoff, Integer, "marq-x" );
     CREATE_VAR( i_yoff, Integer, "marq-y" );
     CREATE_VAR( i_timeout,Integer, "marq-timeout" );
+    CREATE_VAR( i_refresh,Integer, "marq-refresh" );
     CREATE_VAR( i_pos, Integer, "marq-position" );
     CREATE_VAR( psz_marquee, String, "marq-marquee" );
     CREATE_VAR( p_style->i_font_alpha, Integer, "marq-opacity" );
@@ -216,7 +225,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
-    p_sys->last_time = ((time_t)-1);
+    p_sys->last_time = 0;
     p_sys->b_need_update = VLC_TRUE;
 
     return VLC_SUCCESS;
@@ -258,9 +267,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
     video_format_t fmt;
-    time_t t;
 
-    if( p_sys->last_time == time( NULL ) )
+    if( p_sys->last_time + p_sys->i_refresh*1000 > date )
     {
         return NULL;
     }
@@ -286,7 +294,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-    t = p_sys->last_time = time( NULL );
+    p_sys->last_time = date;
 
     if( strchr( p_sys->psz_marquee, '%' ) || strchr( p_sys->psz_marquee, '$' ) )
     {
@@ -359,6 +367,10 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     else if ( !strncmp( psz_var, "marq-timeout", 12 ) )
     {
         p_sys->i_timeout = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "marq-refresh", 12 ) )
+    {
+        p_sys->i_refresh = newval.i_int;
     }
     else if ( !strncmp( psz_var, "marq-position", 8 ) )
     /* willing to accept a match against marq-pos */
