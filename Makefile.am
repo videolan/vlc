@@ -316,7 +316,7 @@ nvlc: make-alias
 noinst_SCRIPTS = vlc$(EXEEXT)
 
 vlc$(EXEEXT): core
-	rm -f vlc
+	rm -f vlc$(EXEEXT)
 	ln -s src/vlc$(EXEEXT)
 #	rm -f -- vlc vlc.tmp
 #	echo '#! /bin/sh' > vlc.tmp
