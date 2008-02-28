@@ -719,6 +719,18 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                         INSERT_STRING( input_item_GetEncodedBy( p_item ) );
                     }
                     break;
+                case 'f':
+                    if( p_item && p_item->p_stats )
+                    {
+                        snprintf( buf, 10, "%d",
+                                  p_item->p_stats->i_displayed_pictures );
+                    }
+                    else
+                    {
+                        sprintf( buf, b_empty_if_na ? "" : "-" );
+                    }
+                    INSERT_STRING_NO_FREE( buf );
+                    break;
                 case 'g':
                     if( p_item )
                     {
