@@ -151,7 +151,6 @@ struct sout_access_out_sys_t
 };
 
 #define DEFAULT_PORT 1234
-#define RTP_HEADER_LENGTH 12
 
 /*****************************************************************************
  * Open: open the file
