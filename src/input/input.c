@@ -2192,10 +2192,11 @@ static int InputSourceInit( input_thread_t *p_input,
         if( !psz_access ||
             (strncmp( psz_access, "udp", 3 ) &&
              strncmp( psz_access, "rtp", 3 )) )
-
-        /* Find optional titles and seekpoints */
-        MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
+        {
+            /* Find optional titles and seekpoints */
+            MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
                      &in->i_seekpoint_start, &in->i_seekpoint_end );
+        }
 
         if( psz_forced_demux && *psz_forced_demux )
         {
