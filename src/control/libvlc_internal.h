@@ -358,8 +358,6 @@ VLC_EXPORT (libvlc_event_manager_t *, libvlc_event_manager_new, ( void * p_obj, 
 VLC_EXPORT (void, libvlc_event_manager_release, ( libvlc_event_manager_t * p_em ) );
 
 VLC_EXPORT (void, libvlc_event_manager_register_event_type, ( libvlc_event_manager_t * p_em, libvlc_event_type_t event_type, libvlc_exception_t * p_e ) );
-VLC_EXPORT (void, libvlc_event_detach_lock_state, ( libvlc_event_manager_t *p_event_manager, libvlc_event_type_t event_type, libvlc_callback_t pf_callback,
-                                                    void *p_user_data, libvlc_lock_state_t lockstate, libvlc_exception_t *p_e ) );
 
 VLC_EXPORT (void, libvlc_event_send, ( libvlc_event_manager_t * p_em, libvlc_event_t * p_event ) );
 

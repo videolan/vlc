@@ -345,33 +345,16 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
  * Remove a callback for an event.
  **************************************************************************/
 void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
-                          libvlc_event_type_t event_type,
-                          libvlc_callback_t pf_callback,
-                          void *p_user_data,
-                          libvlc_exception_t *p_e )
-{
-    libvlc_event_detach_lock_state( p_event_manager, event_type, pf_callback,
-                                    p_user_data, libvlc_UnLocked, p_e );
-}
-
-/**************************************************************************
- *       libvlc_event_detach_no_lock (internal) :
- *
- * Remove a callback for an event.
- **************************************************************************/
-void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
                                      libvlc_event_type_t event_type,
                                      libvlc_callback_t pf_callback,
                                      void *p_user_data,
-                                     libvlc_lock_state_t lockstate,
                                      libvlc_exception_t *p_e )
 {
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
     int i, j;
 
-    if( lockstate == libvlc_UnLocked )
-        vlc_mutex_lock( &p_event_manager->event_sending_lock );
+    vlc_mutex_lock( &p_event_manager->event_sending_lock );
     vlc_mutex_lock( &p_event_manager->object_lock );
     for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++)
     {
@@ -386,19 +369,22 @@ void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
                     listener->p_user_data == p_user_data )
                 {
                     /* that's our listener */
+                    
+                    /* Mark this group as edited so that libvlc_event_send
+                     * will recheck what listener to call */
+                    listeners_group->b_sublistener_removed = VLC_FALSE;
+
                     free( listener );
                     vlc_array_remove( &listeners_group->listeners, j );
                     vlc_mutex_unlock( &p_event_manager->object_lock );
-                    if( lockstate == libvlc_UnLocked )
-                        vlc_mutex_unlock( &p_event_manager->event_sending_lock );
+                    vlc_mutex_unlock( &p_event_manager->event_sending_lock );
                     return;
                 }
             }
         }
     }
     vlc_mutex_unlock( &p_event_manager->object_lock );
-    if( lockstate == libvlc_UnLocked )
-        vlc_mutex_unlock( &p_event_manager->event_sending_lock );
+    vlc_mutex_unlock( &p_event_manager->event_sending_lock );
 
     libvlc_exception_raise( p_e,
             "This object event manager doesn't know about '%s,%p,%p' event observer",
