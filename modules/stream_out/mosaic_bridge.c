@@ -784,6 +784,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
     }
 
     p_pic = malloc( sizeof(picture_t) );
+    if( !p_pic ) return NULL;
     fmt_out->video.i_chroma = fmt_out->i_codec;
     vout_AllocatePicture( p_this, p_pic,
                           fmt_out->video.i_chroma,
