@@ -36,8 +36,10 @@
 #include <vlc_meta.h>
 
 /* ffmpeg header */
-#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
 #   include <libavformat/avformat.h>
+#elif defined(HAVE_FFMPEG_AVFORMAT_H)
+#   include <ffmpeg/avformat.h>
 #elif defined(HAVE_LIBAVFORMAT_TREE)
 #   include <avformat.h>
 #endif
@@ -47,7 +49,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 
 /*****************************************************************************
  * demux_sys_t: demux descriptor

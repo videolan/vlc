@@ -87,6 +87,10 @@
 #cmakedefine HAVE_ERRNO_H
 #cmakedefine HAVE_FAAD_H
 #cmakedefine HAVE_FCNTL_H
+#cmakedefine HAVE_FFMPEG_AVCODEC_H 
+#cmakedefine HAVE_FFMPEG_AVFORMAT_H 
+#cmakedefine HAVE_FFMPEG_AVUTIL_H 
+#cmakedefine HAVE_FFMPEG_SWSCALE_H
 #cmakedefine HAVE_LIBAVCODEC_AVCODEC_H
 #cmakedefine HAVE_LIBAVFORMAT_AVFORMAT_H
 #cmakedefine HAVE_LIBAVUTIL_AVUTIL_H

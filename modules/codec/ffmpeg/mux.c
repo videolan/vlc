@@ -45,7 +45,7 @@
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
-#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 
 static const char *ppsz_mux_options[] = {
     "mux", NULL

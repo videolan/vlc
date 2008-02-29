@@ -31,8 +31,10 @@
 #include <vlc_codec.h>
 
 /* ffmpeg header */
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#if defined(HAVE_LIBAVCODEC_AVCODEC_H)
 #   include <libavcodec/avcodec.h>
+#elif defined(HAVE_FFMPEG_AVCODEC_H)
+#   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
 #endif
