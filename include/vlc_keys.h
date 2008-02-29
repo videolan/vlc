@@ -140,6 +140,16 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Backspace", KEY_BACKSPACE },
     { "Mouse Wheel Up", KEY_MOUSEWHEELUP },
     { "Mouse Wheel Down", KEY_MOUSEWHEELDOWN },
+    { "0", '0' },
+    { "1", '1' },
+    { "2", '2' },
+    { "3", '3' },
+    { "4", '4' },
+    { "5", '5' },
+    { "6", '6' },
+    { "7", '7' },
+    { "8", '8' },
+    { "9", '9' },
     { "a", 'a' },
     { "b", 'b' },
     { "c", 'c' },
@@ -319,5 +329,10 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_MENU_UP               89
 #define ACTIONID_MENU_DOWN             90
 #define ACTIONID_MENU_SELECT           91
+/* Zoom */
+#define ACTIONID_ZOOM_QUARTER          92
+#define ACTIONID_ZOOM_HALF             93
+#define ACTIONID_ZOOM_ORIGINAL         94
+#define ACTIONID_ZOOM_DOUBLE           95
 
 #endif

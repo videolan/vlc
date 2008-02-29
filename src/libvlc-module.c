@@ -1232,6 +1232,12 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
 #define AUDIODELAY_UP_KEY_LONGTEXT N_("Select the key to increase the audio delay.")
 #define AUDIODELAY_DOWN_KEY_TEXT N_("Audio delay down")
 #define AUDIODELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the audio delay.")
+
+#define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
+#define ZOOM_HALF_KEY_TEXT N_("1:2 Half")
+#define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
+#define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
+
 #define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
 #define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
 #define PLAY_BOOKMARK3_KEY_TEXT N_("Play playlist bookmark 3")
@@ -2045,6 +2051,12 @@ vlc_module_begin();
 #   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'l'
 #   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
 
+/* the macosx-interface already has bindings */
+#   define KEY_ZOOM_QUARTER       KEY_UNSET 
+#   define KEY_ZOOM_HALF          KEY_UNSET
+#   define KEY_ZOOM_ORIGINAL      KEY_UNSET
+#   define KEY_ZOOM_DOUBLE        KEY_UNSET
+
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2
 #   define KEY_SET_BOOKMARK3      KEY_MODIFIER_COMMAND|KEY_F3
@@ -2140,6 +2152,11 @@ vlc_module_begin();
 #   define KEY_UNCROP_BOTTOM      KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'k'
 #   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'l'
 #   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
+
+#   define KEY_ZOOM_QUARTER       KEY_MODIFIER_CTRL|'1'
+#   define KEY_ZOOM_HALF          KEY_MODIFIER_CTRL|'2'
+#   define KEY_ZOOM_ORIGINAL      KEY_MODIFIER_CTRL|'3'
+#   define KEY_ZOOM_DOUBLE        KEY_MODIFIER_CTRL|'4'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
@@ -2319,6 +2336,16 @@ vlc_module_begin();
     add_key( "key-loop", KEY_LOOP, NULL,
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, VLC_FALSE );
 
+    set_section ( N_("Zoom" ), NULL );
+    add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER, NULL, 
+        ZOOM_QUARTER_KEY_TEXT,  NULL, VLC_FALSE );
+    add_key( "key-zoom-half",     KEY_ZOOM_HALF, NULL, 
+        ZOOM_HALF_KEY_TEXT,     NULL, VLC_FALSE );
+    add_key( "key-zoom-original", KEY_ZOOM_ORIGINAL, NULL, 
+        ZOOM_ORIGINAL_KEY_TEXT, NULL, VLC_FALSE );
+    add_key( "key-zoom-double",   KEY_ZOOM_DOUBLE, NULL, 
+        ZOOM_DOUBLE_KEY_TEXT,   NULL, VLC_FALSE );
+    
     set_section ( N_("Jump sizes" ), NULL );
     add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
                                     JIEXTRASHORT_LONGTEXT, VLC_FALSE );
@@ -2539,6 +2566,10 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-title-next", ACTIONID_TITLE_NEXT, 0, 0, 0, 0 },
     { "key-chapter-prev", ACTIONID_CHAPTER_PREV, 0, 0, 0, 0 },
     { "key-chapter-next", ACTIONID_CHAPTER_NEXT, 0, 0, 0, 0 },
+    { "key-zoom-quarter", ACTIONID_ZOOM_QUARTER, 0, 0, 0, 0 },
+    { "key-zoom-half", ACTIONID_ZOOM_HALF, 0, 0, 0, 0 },
+    { "key-zoom-original", ACTIONID_ZOOM_ORIGINAL, 0, 0, 0, 0 },
+    { "key-zoom-double", ACTIONID_ZOOM_DOUBLE, 0, 0, 0, 0 },
     { "key-set-bookmark1", ACTIONID_SET_BOOKMARK1, 0, 0, 0, 0 },
     { "key-set-bookmark2", ACTIONID_SET_BOOKMARK2, 0, 0, 0, 0 },
     { "key-set-bookmark3", ACTIONID_SET_BOOKMARK3, 0, 0, 0, 0 },

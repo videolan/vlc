@@ -352,6 +352,24 @@ static void Run( intf_thread_t *p_intf )
             val.b_bool = !val.b_bool;
             var_Set( p_playlist, "random", val );
         }
+        else if( i_action == ACTIONID_ZOOM_QUARTER || 
+                 i_action == ACTIONID_ZOOM_HALF ||
+                 i_action == ACTIONID_ZOOM_ORIGINAL || 
+                 i_action == ACTIONID_ZOOM_DOUBLE )
+        {
+            if( p_vout )
+            {
+                if( i_action == ACTIONID_ZOOM_QUARTER )
+                    val.f_float = 0.25;
+                if( i_action == ACTIONID_ZOOM_HALF )
+                    val.f_float = 0.5;
+                if( i_action == ACTIONID_ZOOM_ORIGINAL )
+                    val.f_float = 1;
+                if( i_action == ACTIONID_ZOOM_DOUBLE )
+                    val.f_float = 2;
+                var_Set( p_vout, "zoom", val );
+            }
+        }
         else if( i_action == ACTIONID_PLAY_PAUSE )
         {
             val.i_int = PLAYING_S;

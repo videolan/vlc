@@ -137,6 +137,11 @@ struct vlc_object_internals_t
     vlc_bool_t      b_attached;
 };
 
+#define ZOOM_SECTION N_("Zoom")
+#define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
+#define ZOOM_HALF_KEY_TEXT N_("1:2 Half")
+#define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
+#define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
 
 static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
 {
