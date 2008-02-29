@@ -1351,6 +1351,10 @@ static struct
     { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,
       AUDIO_ES, "MPEG AAC Audio" },
 
+    /* AC-3 Audio (Dolby Digital) */
+    { VLC_FOURCC('a','c','-','3'), CODEC_ID_AC3,
+      AUDIO_ES, "AC-3 Audio (Dolby Digital)" },
+
     /* 4X Technologies */
     { VLC_FOURCC('4','x','m','a'), CODEC_ID_ADPCM_4XM,
       AUDIO_ES, "4X Technologies Audio" },
