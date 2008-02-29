@@ -1134,7 +1134,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_out_bytes = i_in_bytes * sizeof( uint32_t );
         i_out_bytes_left = i_out_bytes;
         p_out_buffer = (char *)psz_unicode;
-        i_ret = vlc_iconv( iconv_handle, (const char**)&p_in_buffer, &i_in_bytes,
+        i_ret = vlc_iconv( iconv_handle, (const char**)&p_in_buffer,
+                           &i_in_bytes,
                            &p_out_buffer, &i_out_bytes_left );
 
         vlc_iconv_close( iconv_handle );
@@ -1152,7 +1153,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #if defined(HAVE_FRIBIDI)
     {
         uint32_t *p_fribidi_string;
-        int start_pos, pos = 0;
+        int32_t start_pos, pos = 0;
 
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
         if( !p_fribidi_string )
@@ -1162,9 +1163,10 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
 
         /* Do bidi conversion line-by-line */
-        while(pos < i_string_length)
+        while( pos < i_string_length )
         {
-            while(pos < i_string_length) {
+            while( pos < i_string_length ) 
+            {
                 i_char = psz_unicode[pos];
                 if (i_char != '\r' && i_char != '\n')
                     break;
@@ -1172,7 +1174,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                 ++pos;
             }
             start_pos = pos;
-            while(pos < i_string_length) {
+            while( pos < i_string_length )
+            {
                 i_char = psz_unicode[pos];
                 if (i_char == '\r' || i_char == '\n')
                     break;
@@ -1181,8 +1184,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
             if (pos > start_pos)
             {
                 FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
-                fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos, pos - start_pos,
-                                &base_dir, (FriBidiChar*)p_fribidi_string + start_pos, 0, 0, 0);
+                fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos,
+                                pos - start_pos,
+                                &base_dir,
+                                (FriBidiChar*)p_fribidi_string + start_pos,
+                                0, 0, 0);
             }
         }
 
