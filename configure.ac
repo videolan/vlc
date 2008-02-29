@@ -3058,10 +3058,9 @@ dnl Trying with pkg-config
      VLC_SAVE_FLAGS
      CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS}"
      CFLAGS="${CFLAGS} ${FFMPEG_CFLAGS}"
-     AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
-     AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
-     AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avformat.h)
-     
+     AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
+     AC_CHECK_HEADERS(ffmpeg/avformat.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avformat.h.])] )
+     AC_CHECK_HEADERS(ffmpeg/avutil.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avutil.h.])] )
      dnl newer ffmpeg have a separate libpostproc
      PKG_CHECK_MODULES(POSTPROC, libpostproc,[
        VLC_ADD_CFLAGS([ffmpeg],[${POSTPROC_CFLAGS}]) 
@@ -3069,7 +3068,7 @@ dnl Trying with pkg-config
        ],[ true ])
      CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
      CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
-     AC_CHECK_HEADERS(postproc/postprocess.h)
+     AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
      if test "${SYS}" = "darwin"; then
         VLC_ADD_BUILTINS([ffmpeg])
      else
@@ -3089,8 +3088,9 @@ dnl Trying with pkg-config
      PKG_CHECK_MODULES(SWSCALE,[libswscale],[
        VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}])
        VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
+dnl    AC_CHECK_HEADERS(ffmpeg/swscale.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/swscale.h.])])
        AC_CHECK_LIB(swscale, sws_getContext,
-         [AC_CHECK_HEADERS([ffmpeg/avutil.h libavutil/avutil.h ffmpeg/swscale.h libswscale/swscale.h])],[],[-lavutil -lm])
+         [AC_CHECK_HEADERS([ffmpeg/avutil.h, ffmpeg/swscale.h])],[],[-lavutil -lm])
        ],[ true ])
      VLC_RESTORE_FLAGS
     ],[
@@ -3100,10 +3100,10 @@ dnl Trying with pkg-config
     dnl
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg} ${LIBS_ffmpeg}"
-      AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
-      AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
-      AC_CHECK_HEADERS(postproc/postprocess.h)
+      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
+      AC_CHECK_HEADERS(ffmpeg/avformat.h)
+      AC_CHECK_HEADERS(ffmpeg/avutil.h)
+      AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
 
       AC_CHECK_LIB(avutil, av_crc_init, [
         VLC_ADD_LIBS([ffmpeg],[-lavutil])
@@ -3128,24 +3128,11 @@ dnl Trying with pkg-config
       CPPFLAGS="${CPPFLAGS_save}"
 
       AC_CHECK_LIB(swscale, sws_getContext, [
-        AC_CHECK_HEADERS(libswscale/swscale.h ffmpeg/swscale.h)
+        AC_CHECK_HEADERS(ffmpeg/swscale.h)
         VLC_ADD_LIBS([ffmpeg],[-lswscale]) ], [], [-lavcodec $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
     ])
-    
-    if test "$ac_cv_header_libavcodec_avcodec_h" = "no" && test "$ac_cv_header_ffmpeg_avcodec_h" = "no"; then
-        AC_MSG_ERROR([Missing header file libavcodec/avcodec.h.])
-    fi
-    if test "$ac_cv_header_libavformat_avformat_h" = "no" && test $"ac_cv_header_ffmpeg_avformat_h" = "no"; then
-        AC_MSG_ERROR([Missing header file libavformat/avformat.h.])
-    fi
-    if test "$ac_cv_header_libavutil_avutil_h" = "no" && test "$ac_cv_header_ffmpeg_avutil_h" = "no"; then
-        AC_MSG_ERROR([Missing header file libavutil/avutil.h.])
-    fi
-    if test "$ac_cv_header_libswscale_swscale_h" = "no" && test "$ac_cv_header_ffmpeg_swscale_h" = "no"; then
-        AC_MSG_ERROR([Missing header file libswscale/swscale.h.])
-    fi
   fi
 fi
 

@@ -451,9 +451,10 @@ if(FFmpeg_FOUND)
   set( CMAKE_REQUIRED_FLAGS_saved ${CMAKE_REQUIRED_FLAGS} )
   set( CMAKE_REQUIRED_FLAGS ${FFmpeg_CFLAGS} )
 
-  vlc_check_include_files (libavcodec/avcodec.h ffmpeg/avcodec.h)
-  vlc_check_include_files (libavutil/avutil.h ffmpeg/avutil.h)
-  vlc_check_include_files (libswscale/swscale.h ffmpeg/swscale.h)
+  vlc_check_include_files (ffmpeg/avcodec.h)
+  vlc_check_include_files (ffmpeg/avutil.h)
+  vlc_check_include_files (ffmpeg/swscale.h)
+  check_include_files (swscale.h HAVE_LIBSWSCALE_TREE)
   
   check_include_files ("stdint.h;postproc/postprocess.h" HAVE_POSTPROC_POSTPROCESS_H)
   vlc_enable_modules(ffmpeg)

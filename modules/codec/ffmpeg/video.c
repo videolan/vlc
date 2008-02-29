@@ -35,9 +35,7 @@
 #include <vlc_input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
 
 /* ffmpeg header */
-#if defined(HAVE_LIBAVCODEC_AVCODEC_H)
-#   include <libavcodec/avcodec.h>
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
+#ifdef HAVE_FFMPEG_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
@@ -845,7 +843,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
                 dest_pic.data[i] = p_pic->p[i].p_pixels;
                 dest_pic.linesize[i] = p_pic->p[i].i_pitch;
             }
-#if !defined(HAVE_LIBSWSCALE_SWSCALE_H) && !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
+#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
             img_convert( &dest_pic, PIX_FMT_YUV420P,
                          (AVPicture *)p_ff_pic,
                          p_sys->p_context->pix_fmt,
