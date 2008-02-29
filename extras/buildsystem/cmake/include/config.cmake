@@ -468,6 +468,11 @@ if(FFmpeg_FOUND)
   vlc_check_include_files (ffmpeg/avutil.h libavutil/avutil.h)
   vlc_check_include_files (ffmpeg/swscale.h libswscale/swscale.h)
   vlc_check_include_files (postproc/postprocess.h libpostproc/postprocess.h)
+  
+  message( STATUS "avcodec found ${HAVE_FFMPEG_AVCODEC_H} || ${HAVE_LIBAVCODEC_AVCODEC_H}")
+  message( STATUS "avutil found ${HAVE_FFMPEG_AVUTIL_H} || ${HAVE_LIBAVUTIL_AVUTIL_H}")
+  message( STATUS "swscale found ${HAVE_FFMPEG_SWSCALE_H} || ${HAVE_LIBSWSCALE_SWSCALE_H}")
+  message( STATUS "postprocess found ${HAVE_POSTPROC_POSTPROCESS_H} || ${HAVE_LIBPOSTPROC_POSTPROCESS_H}")
 
   vlc_enable_modules(ffmpeg)
   vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS})
