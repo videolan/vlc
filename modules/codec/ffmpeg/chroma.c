@@ -32,12 +32,14 @@
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
+#if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 #include <vlc_filter.h>
 #endif
 
 /* ffmpeg header */
-#ifdef HAVE_FFMPEG_AVCODEC_H
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#   include <libavcodec/avcodec.h>
+#elif defined(HAVE_FFMPEG_AVCODEC_H)
 #   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
@@ -45,7 +47,7 @@
 
 #include "ffmpeg.h"
 
-#if !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
+#if !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE)
 void E_(InitLibavcodec) ( vlc_object_t *p_object );
 static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
 
@@ -361,4 +363,4 @@ void E_(CloseChroma)( vlc_object_t *p_this )
     free( p_vout->chroma.p_sys );
 }
 
-#endif /* !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE) */
+#endif /* !defined(HAVE_LIBSWSCALE_SWSCALE_H)  && !defined(HAVE_FFMPEG_SWSCALE_H) && !defined(HAVE_LIBSWSCALE_TREE) */

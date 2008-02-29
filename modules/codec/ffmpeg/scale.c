@@ -34,13 +34,17 @@
 #include <vlc_filter.h>
 
 /* ffmpeg headers */
-#ifdef HAVE_FFMPEG_AVCODEC_H
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#   include <libavcodec/avcodec.h>
+#elif defined(HAVE_FFMPEG_AVCODEC_H)
 #   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
 #endif
 
-#ifdef HAVE_FFMPEG_SWSCALE_H
+#ifdef HAVE_LIBSWSCALE_SWSCALE_H
+#   include <libswscale/swscale.h>
+#elif defined(HAVE_FFMPEG_SWSCALE_H)
 #   include <ffmpeg/swscale.h>
 #elif defined(HAVE_LIBSWSCALE_TREE)
 #   include <swscale.h>
@@ -49,7 +53,7 @@
 #include "ffmpeg.h"
 
 /* Version checking */
-#if ( (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) && (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)) )
+#if ( (defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) && (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)) )
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor
