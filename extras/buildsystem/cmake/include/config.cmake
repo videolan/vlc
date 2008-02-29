@@ -467,8 +467,8 @@ if(FFmpeg_FOUND)
   vlc_check_include_files (ffmpeg/avcodec.h libavcodec/avcodec.h)
   vlc_check_include_files (ffmpeg/avutil.h libavutil/avutil.h)
   vlc_check_include_files (ffmpeg/swscale.h libswscale/swscale.h)
-  
-  check_include_files ("stdint.h;postproc/postprocess.h" HAVE_POSTPROC_POSTPROCESS_H)
+  vlc_check_include_files (postproc/postprocess.h libpostproc/postprocess.h)
+
   vlc_enable_modules(ffmpeg)
   vlc_add_module_compile_flag(ffmpeg ${FFmpeg_CFLAGS})
   vlc_module_add_link_libraries(ffmpeg ${FFmpeg_LIBRARIES})
