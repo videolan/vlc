@@ -368,7 +368,7 @@ void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
 {
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
-    int i;
+    int i, j;
 
     if( lockstate == libvlc_UnLocked )
         vlc_mutex_lock( &p_event_manager->event_sending_lock );
@@ -378,16 +378,16 @@ void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
         listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
         if( listeners_group->event_type == event_type )
         {
-            for( i = 0; i < vlc_array_count(&listeners_group->listeners); i++)
+            for( j = 0; j < vlc_array_count(&listeners_group->listeners); j++)
             {
-                listener = vlc_array_item_at_index(&listeners_group->listeners, i);
+                listener = vlc_array_item_at_index(&listeners_group->listeners, j);
                 if( listener->event_type == event_type &&
                     listener->pf_callback == pf_callback &&
                     listener->p_user_data == p_user_data )
                 {
                     /* that's our listener */
                     free( listener );
-                    vlc_array_remove( &listeners_group->listeners, i );
+                    vlc_array_remove( &listeners_group->listeners, j );
                     vlc_mutex_unlock( &p_event_manager->object_lock );
                     if( lockstate == libvlc_UnLocked )
                         vlc_mutex_unlock( &p_event_manager->event_sending_lock );
