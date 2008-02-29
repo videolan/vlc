@@ -580,11 +580,11 @@ endif(Mpeg2_FOUND)
 
 find_package(Dvbpsi)
 if(Dvbpsi_FOUND)
-  vlc_register_modules(${ENABLE_STREAM_OUT} sout_ts)
+  vlc_register_modules(${ENABLE_STREAM_OUT} mux_ts)
   vlc_enable_modules(ts)
   check_include_files ("stdint.h;dvbpsi/dvbpsi.h;dvbpsi/demux.h;dvbpsi/descriptor.h;dvbpsi/pat.h;dvbpsi/pmt.h;dvbpsi/sdt.h;dvbpsi/dr.h" HAVE_DVBPSI_DR_H)
   vlc_module_add_link_libraries(ts      ${Dvbpsi_LIBRARIES})
-  vlc_module_add_link_libraries(sout_ts ${Dvbpsi_LIBRARIES})
+  vlc_module_add_link_libraries(mux_ts  ${Dvbpsi_LIBRARIES})
   vlc_module_add_link_libraries(dvb     ${Dvbpsi_LIBRARIES})
 endif(Dvbpsi_FOUND)
 
