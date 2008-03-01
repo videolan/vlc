@@ -2332,7 +2332,7 @@ unknown:
 /****                   "Higher level" Functions                          ****/
 /**** ------------------------------------------------------------------- ****/
 
-static struct
+static const struct
 {
     uint32_t i_type;
     int  (*MP4_ReadBox_function )( stream_t *p_stream, MP4_Box_t *p_box );
