@@ -1663,14 +1663,6 @@ static void MP4_FreeBox_stdp( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_stdp->i_priority );
 }
 
-static void MP4_FreeBox_padb( MP4_Box_t *p_box )
-{
-    FREENULL( p_box->data.p_padb->i_reserved1 );
-    FREENULL( p_box->data.p_padb->i_pad2 );
-    FREENULL( p_box->data.p_padb->i_reserved2 );
-    FREENULL( p_box->data.p_padb->i_pad1 );
-}
-
 static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
 {
     int code = 0;
@@ -1693,10 +1685,7 @@ static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
     for( i = 0; i < i_read / 2 ; i++ )
     {
         if( i >= count )
-        {
-            MP4_FreeBox_padb( p_box );
             goto error;
-        }
         p_box->data.p_padb->i_reserved1[i] = ( (*p_peek) >> 7 )&0x01;
         p_box->data.p_padb->i_pad2[i] = ( (*p_peek) >> 4 )&0x07;
         p_box->data.p_padb->i_reserved1[i] = ( (*p_peek) >> 3 )&0x01;
@@ -1713,6 +1702,14 @@ static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
     code = 1;
 error:
     MP4_READBOX_EXIT( code );
+}
+
+static void MP4_FreeBox_padb( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_padb->i_reserved1 );
+    FREENULL( p_box->data.p_padb->i_pad2 );
+    FREENULL( p_box->data.p_padb->i_reserved2 );
+    FREENULL( p_box->data.p_padb->i_pad1 );
 }
 
 static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2584,7 +2581,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
 
     if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
     {
-        free( p_box );
+        MP4_BoxFree( p_stream, p_box );
         return NULL;
     }
 
