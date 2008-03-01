@@ -1,0 +1,2 @@
+SOURCES_dynamicoverlay = dynamicoverlay.c dynamicoverlay_buffer.c dynamicoverlay_queue.c
+noinst_HEADERS = dynamicoverlay.h dynamicoverlay_commands.h
