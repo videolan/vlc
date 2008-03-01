@@ -42,6 +42,10 @@
 #define FILE_MMAP_LONGTEXT N_( \
     "Try to use memory mapping to read files and block devices." )
 
+#ifndef NDEBUG
+/*# define MMAP_DEBUG 1*/
+#endif
+
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -179,7 +183,7 @@ static block_t *Block (access_t *p_access)
         }
     }
 
-#ifndef NDEBUG
+#ifdef MMAP_DEBUG
     int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
     if (dbgpos != p_access->info.i_pos)
         msg_Err (p_access, "position: 0x%08llx instead of 0x%08llx",
@@ -225,7 +229,7 @@ static block_t *Block (access_t *p_access)
     block->p_buffer += inner_offset;
     block->i_buffer -= inner_offset;
 
-#ifndef NDEBUG
+#ifdef MMAP_DEBUG
     msg_Dbg (p_access, "mapped 0x%lx bytes at %p from offset 0x%lx",
              (unsigned long)length, addr, (unsigned long)outer_offset);
 
@@ -248,7 +252,7 @@ static block_t *Block (access_t *p_access)
 
 static int Seek (access_t *p_access, int64_t i_pos)
 {
-#ifndef NDEBUG
+#ifdef MMAP_DEBUG
     lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
 #endif
 
