@@ -1984,10 +1984,14 @@ static int MP4_ReadBox_rdrf( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GETVERSIONFLAGS( p_box->data.p_rdrf );
     MP4_GETFOURCC( p_box->data.p_rdrf->i_ref_type );
     MP4_GET4BYTES( i_len );
+    i_len++;
+
     if( i_len > 0 )
     {
         uint32_t i;
-        p_box->data.p_rdrf->psz_ref = malloc( i_len  + 1);
+        p_box->data.p_rdrf->psz_ref = malloc( i_len );
+        i_len--;
+
         for( i = 0; i < i_len; i++ )
         {
             MP4_GET1BYTE( p_box->data.p_rdrf->psz_ref[i] );
