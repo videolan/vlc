@@ -1,0 +1,7 @@
+*.cache
+ABOUT-NLS
+aclocal.m4
+autotools
+config.*
+configure
+Makefile.in
