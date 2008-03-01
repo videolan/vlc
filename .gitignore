@@ -1,5 +1,9 @@
 *~
 *.cache
+*.lo
+*.la
+.deps
+.libs
 ABOUT-NLS
 aclocal.m4
 autotools
