@@ -68,8 +68,11 @@
     {       \
         const int __i_copy__ = strnlen( (char*)p_peek, i_read-1 );  \
         p_str = malloc( __i_copy__+1 );               \
-        if( __i_copy__ > 0 ) memcpy( p_str, p_peek, __i_copy__ );   \
-        p_str[__i_copy__] = 0;      \
+        if( p_str ) \
+        { \
+             memcpy( p_str, p_peek, __i_copy__ ); \
+             p_str[__i_copy__] = 0; \
+        } \
         p_peek += __i_copy__ + 1;   \
         i_read -= __i_copy__ + 1;   \
     }       \
@@ -588,6 +591,7 @@ static int MP4_ReadBox_mdhd( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
 {
     int32_t i_reserved;
+    int code = 0;
 
     MP4_READBOX_ENTER( MP4_Box_data_hdlr_t );
 
@@ -603,7 +607,9 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( i_read > 0 )
     {
-        p_box->data.p_hdlr->psz_name = malloc( i_read + 1 );
+        uint8_t *psz = p_box->data.p_hdlr->psz_name = malloc( i_read + 1 );
+        if( psz == NULL )
+            goto error;
 
         /* Yes, I love .mp4 :( */
         if( p_box->data.p_hdlr->i_predefined == VLC_FOURCC( 'm', 'h', 'l', 'r' ) )
@@ -614,12 +620,12 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
             MP4_GET1BYTE( i_len );
             i_copy = __MIN( i_read, i_len );
 
-            memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_copy );
+            memcpy( psz, p_peek, i_copy );
             p_box->data.p_hdlr->psz_name[i_copy] = '\0';
         }
         else
         {
-            memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_read );
+            memcpy( psz, p_peek, i_read );
             p_box->data.p_hdlr->psz_name[i_read] = '\0';
         }
     }
@@ -630,7 +636,10 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
                    p_box->data.p_hdlr->psz_name );
 
 #endif
-    MP4_READBOX_EXIT( 1 );
+    code = 1;
+
+error:
+    MP4_READBOX_EXIT( code );
 }
 
 static void MP4_FreeBox_hdlr( MP4_Box_t *p_box )
@@ -891,8 +900,11 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 
             MP4_GET1BYTE( i_len );
             es_descriptor.psz_URL = malloc( i_len + 1 );
-            memcpy( es_descriptor.psz_URL, p_peek, i_len );
-            es_descriptor.psz_URL[i_len] = 0;
+            if( es_descriptor.psz_URL )
+            {
+                memcpy( es_descriptor.psz_URL, p_peek, i_len );
+                es_descriptor.psz_URL[i_len] = 0;
+            }
             p_peek += i_len;
             i_read -= i_len;
         }
@@ -947,8 +959,9 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 
     es_descriptor.p_decConfigDescr->i_decoder_specific_info_len = i_len;
     es_descriptor.p_decConfigDescr->p_decoder_specific_info = malloc( i_len );
-    memcpy( es_descriptor.p_decConfigDescr->p_decoder_specific_info,
-            p_peek, i_len );
+    if( es_descriptor.p_decConfigDescr->p_decoder_specific_info )
+        memcpy( es_descriptor.p_decConfigDescr->p_decoder_specific_info,
+                p_peek, i_len );
 
     MP4_READBOX_EXIT( 1 );
 
@@ -976,8 +989,9 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
     p_avcC->i_avcC = i_read;
     if( p_avcC->i_avcC > 0 )
     {
-        p_avcC->p_avcC = malloc( p_avcC->i_avcC );
-        memcpy( p_avcC->p_avcC, p_peek, i_read );
+        uint8_t * p = p_avcC->p_avcC = malloc( p_avcC->i_avcC );
+        if( p )
+            memcpy( p, p_peek, i_read );
     }
 
     MP4_GET1BYTE( p_avcC->i_version );
