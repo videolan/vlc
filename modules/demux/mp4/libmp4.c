@@ -2115,21 +2115,24 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    uint16_t i_length, i_dummy;
+    uint16_t i16;
+    size_t i_length;
 
     MP4_READBOX_ENTER( MP4_Box_data_0xa9xxx_t );
 
     p_box->data.p_0xa9xxx->psz_text = NULL;
 
-    MP4_GET2BYTES( i_length );
+    MP4_GET2BYTES( i16 );
+    i_length = i16 + 1;
 
     if( i_length > 0 )
     {
-        MP4_GET2BYTES( i_dummy );
-        if( i_length > i_read ) i_length = i_read;
+        MP4_GET2BYTES( i16 );
+        if( i_length >= i_read ) i_length = i_read + 1;
 
-        p_box->data.p_0xa9xxx->psz_text = malloc( i_length + 1 );
+        p_box->data.p_0xa9xxx->psz_text = malloc( i_length );
 
+        i_length--;
         memcpy( p_box->data.p_0xa9xxx->psz_text,
                 p_peek, i_length );
         p_box->data.p_0xa9xxx->psz_text[i_length] = '\0';
@@ -2160,7 +2163,7 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
             MP4_GET4BYTES( i_version );
             MP4_GET4BYTES( i_reserved );
             // version should be 0, flags should be 1 for text, 0 for data
-            if( i_version == 0x00000001 )
+            if( ( i_version == 0x00000001 ) && (i_data_len >= 12 ) )
             {
                 // the rest is the text
                 i_data_len -= 12;
