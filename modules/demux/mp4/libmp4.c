@@ -377,12 +377,16 @@ static int MP4_ReadBox_ftyp( stream_t *p_stream, MP4_Box_t *p_box )
     if( ( p_box->data.p_ftyp->i_compatible_brands_count = i_read / 4 ) )
     {
         unsigned int i;
-        p_box->data.p_ftyp->i_compatible_brands =
-            calloc( p_box->data.p_ftyp->i_compatible_brands_count, sizeof(uint32_t));
+        uint32_t *tab = p_box->data.p_ftyp->i_compatible_brands =
+            calloc( p_box->data.p_ftyp->i_compatible_brands_count,
+                    sizeof(uint32_t));
+
+        if( tab == NULL )
+            p_box->data.p_ftyp->i_compatible_brands_count = 0;
 
         for( i =0; i < p_box->data.p_ftyp->i_compatible_brands_count; i++ )
         {
-            MP4_GETFOURCC( p_box->data.p_ftyp->i_compatible_brands[i] );
+            MP4_GETFOURCC( tab[i] );
         }
     }
     else
