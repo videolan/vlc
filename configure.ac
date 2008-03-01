@@ -1200,7 +1200,7 @@ dnl
 VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 vc1 demux_cdg cdg ps pva avi asf mp4 rawdv rawvid nsv real aiff mjpeg demuxdump flacsys tta])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec subsusf t140 dvbsub cc mpeg_audio lpcm a52 dts cinepak flac])
-VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise grain extract sharpen seamcarving croppadd])
+VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise grain extract sharpen seamcarving croppadd dynamicoverlay])
 VLC_ADD_PLUGINS([converter_fixed mono])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
@@ -6294,6 +6294,7 @@ AC_CONFIG_FILES([
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
   modules/video_filter/atmo/Makefile
+  modules/video_filter/dynamicoverlay/Makefile
   modules/video_output/Makefile
   modules/video_output/msw/Makefile
   modules/video_output/qte/Makefile
