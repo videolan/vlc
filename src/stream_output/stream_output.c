@@ -52,7 +52,7 @@
  *****************************************************************************/
 #define sout_stream_url_to_chain( p, s ) \
     _sout_stream_url_to_chain( VLC_OBJECT(p), s )
-static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
+static char *_sout_stream_url_to_chain( vlc_object_t *, const char * );
 
 /*
  * Generic MRL parser
@@ -859,29 +859,49 @@ void sout_StreamDelete( sout_stream_t *p_stream )
     vlc_object_release( p_stream );
 }
 
-static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
+static char *_sout_stream_url_to_chain( vlc_object_t *p_this,
+                                        const char *psz_url )
 {
     mrl_t       mrl;
-    char        *psz_chain, *p;
+    char        *psz_chain;
+    const char  *fmt = "standard{mux=\"%s\",access=\"%s\",dst=\"%s\"}";
+    static const char rtpfmt[] = "rtp{mux=\"%s\",proto=\"%s\",dst=\"%s\"}";
 
     mrl_Parse( &mrl, psz_url );
-    p = psz_chain = malloc( 500 + strlen( mrl.psz_way ) +
-                                  strlen( mrl.psz_access ) +
-                                  strlen( mrl.psz_name ) );
 
-
-    if( config_GetInt( p_this, "sout-display" ) )
+    /* Check if the URLs goes #rtp - otherwise we'll use #standard */
+    if (strcmp (mrl.psz_access, "rtp") == 0)
     {
-        p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\","
-                      "access=\"%s\",dst=\"%s\"}}",
-                      mrl.psz_way, mrl.psz_access, mrl.psz_name );
+        /* For historical reasons, rtp:// means RTP over UDP */
+        strcpy (mrl.psz_access, "udp");
+        fmt = rtpfmt;
     }
     else
     {
-        p += sprintf( p, "std{mux=\"%s\",access=\"%s\",dst=\"%s\"}",
-                      mrl.psz_way, mrl.psz_access, mrl.psz_name );
+        static const char list[] = "dccp\0sctp\0tcp\0udplite\0";
+        for (const char *a = list; *a; a += strlen (a) + 1)
+             if (strcmp (a, mrl.psz_access) == 0)
+             {
+                 fmt = rtpfmt;
+                 break;
+             }
+    }
+
+    /* Convert the URL to a basic sout chain */
+    if (asprintf (&psz_chain, fmt,
+                  mrl.psz_way, mrl.psz_access, mrl.psz_name) == -1)
+        psz_chain = NULL;
+
+    /* Duplicate and wrap if sout-display is on */
+    if (psz_chain && (config_GetInt( p_this, "sout-display" ) > 0))
+    {
+        char *tmp;
+        if (asprintf (&tmp, "duplicate{dst=display,dst=%s}", tmp) == -1)
+            tmp = NULL;
+        free (psz_chain);
+        psz_chain = tmp;
     }
 
     mrl_Clean( &mrl );
-    return( psz_chain );
+    return psz_chain;
 }
