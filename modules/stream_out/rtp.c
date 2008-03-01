@@ -121,15 +121,17 @@
     "This sends and receives RTCP packet multiplexed over the same port " \
     "as RTP packets." )
 
-#define DCCP_TEXT N_("DCCP transport")
-#define DCCP_LONGTEXT N_( \
-    "This enables DCCP instead of UDP as a transport for RTP." )
-#define TCP_TEXT N_("TCP transport")
-#define TCP_LONGTEXT N_( \
-    "This enables TCP instead of UDP as a transport for RTP." )
-#define UDP_LITE_TEXT N_("UDP-Lite transport")
-#define UDP_LITE_LONGTEXT N_( \
-    "This enables UDP-Lite instead of UDP as a transport for RTP." )
+#define PROTO_TEXT N_("Transport protocol")
+#define PROTO_LONGTEXT N_( \
+    "This selects which transport protocol to use for RTP." )
+
+static const char *const ppsz_protos[] = {
+    "dccp", "sctp", "tcp", "udp", "udplite",
+};
+
+static const char *const ppsz_protocols[] = {
+    "DCCP", "SCTP", "TCP", "UDP", "UDP-Lite",
+};
 
 #define RFC3016_TEXT N_("MP4A LATM")
 #define RFC3016_LONGTEXT N_( \
@@ -168,6 +170,9 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT,
                 PHONE_LONGTEXT, VLC_TRUE );
 
+    add_string( SOUT_CFG_PREFIX "proto", "udp", NULL, PROTO_TEXT,
+                PROTO_LONGTEXT, VLC_FALSE );
+        change_string_list( ppsz_protos, ppsz_protocols, NULL );
     add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, PORT_TEXT,
                  PORT_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "port-audio", 1230, NULL, PORT_AUDIO_TEXT,
@@ -177,16 +182,8 @@ vlc_module_begin();
 
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
                  TTL_LONGTEXT, VLC_TRUE );
-
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", VLC_FALSE, NULL,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, VLC_FALSE );
-
-    add_bool( SOUT_CFG_PREFIX "dccp", VLC_FALSE, NULL,
-              DCCP_TEXT, DCCP_LONGTEXT, VLC_FALSE );
-    add_bool( SOUT_CFG_PREFIX "tcp", VLC_FALSE, NULL,
-              TCP_TEXT, TCP_LONGTEXT, VLC_FALSE );
-    add_bool( SOUT_CFG_PREFIX "udplite", VLC_FALSE, NULL,
-              UDP_LITE_TEXT, UDP_LITE_LONGTEXT, VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
                  RFC3016_LONGTEXT, VLC_FALSE );
@@ -200,7 +197,7 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
     "description", "url", "email", "phone",
-    "rtcp-mux", "dccp", "tcp", "udplite",
+    "proto", "rtcp-mux",
     "mp4a-latm", NULL
 };
 
@@ -310,7 +307,6 @@ struct sout_stream_id_t
     int64_t           i_caching;
 };
 
-
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -369,23 +365,39 @@ static int Open( vlc_object_t *p_this )
 
     /* Transport protocol */
     p_sys->proto = IPPROTO_UDP;
+    psz = var_GetNonEmptyString (p_stream, SOUT_CFG_PREFIX"proto");
 
-    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "dccp" ) )
+    if ((psz == NULL) || !strcasecmp (psz, "udp"))
+        (void)0; /* default */
+    else
+    if (!strcasecmp (psz, "dccp"))
     {
         p_sys->proto = IPPROTO_DCCP;
         p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
     }
 #if 0
     else
-    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "tcp" ) )
+    if (!strcasecmp (psz, "sctp"))
     {
         p_sys->proto = IPPROTO_TCP;
         p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
     }
-    else
 #endif
-    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "udplite" ) )
+#if 0
+    else
+    if (!strcasecmp (psz, "tcp"))
+    {
+        p_sys->proto = IPPROTO_TCP;
+        p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
+    }
+#endif
+    else
+    if (!strcasecmp (psz, "udplite") || !strcasecmp (psz, "udp-lite"))
         p_sys->proto = IPPROTO_UDPLITE;
+    else
+        msg_Warn (p_this, "unknown or unsupported transport protocol \"%s\"",
+                  psz);
+    free (psz);
 
     if( ( p_sys->psz_destination == NULL ) && !b_rtsp )
     {
