@@ -784,8 +784,6 @@ static void RunThread( vout_thread_t *p_vout)
         }
 
         i_loops++;
-        if( i_loops % 20 == 0 )
-        {
             if( !p_input )
             {
                 p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
@@ -802,7 +800,6 @@ static void RunThread( vout_thread_t *p_vout)
                 i_displayed = i_lost = 0;
                 vlc_mutex_unlock( &p_input->p->counters.counters_lock );
             }
-        }
 #if 0
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
