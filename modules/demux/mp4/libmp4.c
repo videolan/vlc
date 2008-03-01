@@ -1683,8 +1683,7 @@ static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
 
 
     MP4_GET4BYTES( p_box->data.p_padb->i_sample_count );
-    count = p_box->data.p_padb->i_sample_count;
-    count = (count + 1) / 2;
+    count = (p_box->data.p_padb->i_sample_count + 1) / 2;
 
     p_box->data.p_padb->i_reserved1 = calloc( count, sizeof(uint16_t) );
     p_box->data.p_padb->i_pad2 = calloc( count, sizeof(uint16_t) );
