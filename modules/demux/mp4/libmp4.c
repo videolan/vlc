@@ -136,6 +136,8 @@ static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
     /* made by 0xXXXXXXXX-0011-0010-8000-00aa00389b71
             where XXXXXXXX is the fourcc */
     /* FIXME implement this */
+    (void)p_uuid;
+    (void)i_fourcc;
 }
 
 /* some functions for mp4 encoding of variables */
@@ -319,6 +321,7 @@ static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
 static void MP4_FreeBox_Common( MP4_Box_t *p_box )
 {
     /* Up to now do nothing */
+    (void)p_box;
 }
 
 static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2799,7 +2802,8 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
         return;
     }
 
-    vasprintf( &psz_path, psz_fmt, args );
+    if( vasprintf( &psz_path, psz_fmt, args ) == -1 )
+        psz_path = NULL;
 
     if( !psz_path || !psz_path[0] )
     {
