@@ -67,7 +67,7 @@
     if( (i_read > 0) && (p_peek[0]) )   \
     {       \
         const int __i_copy__ = strnlen( (char*)p_peek, i_read-1 );  \
-        p_str = calloc( sizeof(char), __i_copy__+1 );               \
+        p_str = malloc( __i_copy__+1 );               \
         if( __i_copy__ > 0 ) memcpy( p_str, p_peek, __i_copy__ );   \
         p_str[__i_copy__] = 0;      \
         p_peek += __i_copy__ + 1;   \
@@ -603,7 +603,7 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( i_read > 0 )
     {
-        p_box->data.p_hdlr->psz_name = calloc( sizeof( char ), i_read + 1 );
+        p_box->data.p_hdlr->psz_name = malloc( i_read + 1 );
 
         /* Yes, I love .mp4 :( */
         if( p_box->data.p_hdlr->i_predefined == VLC_FOURCC( 'm', 'h', 'l', 'r' ) )
@@ -890,7 +890,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
             unsigned int i_len;
 
             MP4_GET1BYTE( i_len );
-            es_descriptor.psz_URL = calloc( sizeof(char), i_len + 1 );
+            es_descriptor.psz_URL = malloc( i_len + 1 );
             memcpy( es_descriptor.psz_URL, p_peek, i_len );
             es_descriptor.psz_URL[i_len] = 0;
             p_peek += i_len;
