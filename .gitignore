@@ -7,6 +7,12 @@
 ABOUT-NLS
 aclocal.m4
 autotools
+compile
 config.*
 configure
+libtool
+Makefile
 Makefile.in
+stamp-*
+vlc-config
+vlc-config.in
