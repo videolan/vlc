@@ -6,6 +6,7 @@ WARNING: You are strongly encouraged to use cmake-2.5 (cvs version)
 
 Now you can use CMake as usual:
 $ cd vlc && mkdir build && cd build && cmake .. (or ccmake .. if you want a graphical view of the settings)
+(This will create a build directory)
 $ make [VERBOSE=1 if you want more details]
 $ make install
 
