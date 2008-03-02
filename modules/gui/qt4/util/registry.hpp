@@ -2,7 +2,7 @@
  * registry.hpp: Windows Registry Manipulation
  ****************************************************************************
  * Copyright (C) 2008 the VideoLAN team
- * $Id: input_slider.cpp 24525 2008-01-23 21:50:58Z courmisch $
+ * $Id$
  *
  * Authors: Andre Weber <WeberAndre # gmx - de>
  *

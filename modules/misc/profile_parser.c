@@ -2,7 +2,7 @@
  * profile_parser.c : VLC Streaming Profile parser
  *****************************************************************************
  * Copyright (C) 2003-2006 the VideoLAN team
- * $Id: rtsp.c 16204 2006-08-03 16:58:10Z zorglub $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>

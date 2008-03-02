@@ -4,7 +4,7 @@
  * Copyright (C) 2003-2004 the VideoLAN team
  * Copyright © 2007 Rémi Denis-Courmont
  *
- * $Id: rtp.c 21407 2007-08-22 20:10:41Z courmisch $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

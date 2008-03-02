@@ -2,7 +2,7 @@
  * vlc_mediadescriptor.c: vlc.MediaDescriptor binding
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
- * $Id: vlc_input.c 22643 2007-10-17 13:30:02Z funman $
+ * $Id$
  *
  * Authors: Olivier Aubert <oaubert at liris.cnrs.fr>
  *

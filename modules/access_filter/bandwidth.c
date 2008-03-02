@@ -2,7 +2,7 @@
  * bandwidth.c
  *****************************************************************************
  * Copyright © 2007 Rémi Denis-Courmont
- * $Id: dump.c 19948 2007-04-26 19:53:53Z courmisch $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

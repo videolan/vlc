@@ -2,7 +2,7 @@
  * vlc_internal.h: Header for the Python vlcinternal binding
  *****************************************************************************
  * Copyright (C) 1998-2004 the VideoLAN team
- * $Id:$
+ * $Id$
  *
  * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
  *
