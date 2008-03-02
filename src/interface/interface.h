@@ -2,7 +2,7 @@
  * interface.h: Internal interface prototypes and structures
  *****************************************************************************
  * Copyright (C) 1998-2006 the VideoLAN team
- * $Id: interface.c 17743 2006-11-13 15:43:19Z courmisch $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Clément Stenac <zorglub@videolan.org>

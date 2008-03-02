@@ -3,7 +3,7 @@
  *              FYI: http://www.mozilla.org/projects/plugins/npruntime.html
  *****************************************************************************
  * Copyright (C) 2002-2005 the VideoLAN team
- * $Id: RuntimeNPObject.h 14466 2006-02-22 23:34:54Z dionoea $
+ * $Id$
  *
  * Authors: Damien Fouilleul <damien.fouilleul@laposte.net>
  *

@@ -4,7 +4,7 @@
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
- * $Id: VLCBrowsableVideoView.m 24179 2008-01-07 21:00:49Z pdherbemont $
+ * $Id$
  *
  * Authors:  Jérôme Decoodt <djc at videolan dot org>
  *           Felix Kühne <fkuehne at videolan dot org>
