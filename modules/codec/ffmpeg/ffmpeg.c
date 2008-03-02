@@ -198,7 +198,12 @@ vlc_module_begin();
     add_integer( ENC_CFG_PREFIX "chroma-elim-threshold", 0, NULL,
                  ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, VLC_TRUE );
 
+    /* Audio AAC encoder profile */
+    add_string( ENC_CFG_PREFIX "aac-profile", "main", NULL,
+                ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, VLC_TRUE );
+
 #if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
+
     /* demux submodule */
     add_submodule();
     set_description( _("FFmpeg demuxer" ) );

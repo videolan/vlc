@@ -141,6 +141,7 @@ struct encoder_sys_t
     int        i_quality; /* for VBR */
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
     int        i_luma_elim, i_chroma_elim;
+    int        i_aac_profile; /* AAC profile to use.*/
 
     /* Used to work around stupid timestamping behaviour in libavcodec */
     uint64_t i_framenum;
@@ -153,7 +154,7 @@ static const char *ppsz_enc_options[] = {
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
     "p-masking", "border-masking", "luma-elim-threshold",
-    "chroma-elim-threshold", NULL
+    "chroma-elim-threshold", "aac-profile", NULL
 };
 
 static const uint16_t mpa_bitrate_tab[2][15] =
@@ -186,7 +187,6 @@ static const uint16_t mpeg4_default_non_intra_matrix[64] = {
  22, 23, 24, 26, 27, 28, 30, 31,
  23, 24, 25, 27, 28, 30, 31, 33,
 };
-
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder
@@ -333,6 +333,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_sys->i_quality = (int)(FF_QP2LAMBDA * val.f_float + 0.5);
 
     var_Get( p_enc, ENC_CFG_PREFIX "hq", &val );
+    p_sys->i_hq = FF_MB_DECISION_RD;
     if( val.psz_string && *val.psz_string )
     {
         if( !strcmp( val.psz_string, "rd" ) )
@@ -344,8 +345,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else
             p_sys->i_hq = FF_MB_DECISION_RD;
     }
-    else
-        p_sys->i_hq = FF_MB_DECISION_RD;
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_enc, ENC_CFG_PREFIX "qmin", &val );
@@ -371,6 +370,26 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_sys->i_luma_elim = val.i_int;
     var_Get( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold", &val );
     p_sys->i_chroma_elim = val.i_int;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "aac-profile", &val );
+    p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
+    if( val.psz_string && *val.psz_string )
+    {
+        if( !strncmp( val.psz_string, "main", 4 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_MAIN;
+        else if( !strncmp( val.psz_string, "low", 3 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
+#if 0    /* Not supported by FAAC encoder */
+        else if( !strncmp( val.psz_string, "ssr", 3 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_SSR;
+#endif
+        else  if( !strncmp( val.psz_string, "ltp", 3 ) )
+            p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
+        else
+            p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
+msg_Info( p_enc, "AAC profile %s", val.psz_string );
+    }
+    if( val.psz_string ) free( val.psz_string );
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
@@ -536,6 +555,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec  = AOUT_FMT_S16_NE;
         p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
         p_context->channels    = p_enc->fmt_in.audio.i_channels;
+
+        if( p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '4', 'a') )
+            p_context->profile     = p_sys->i_aac_profile;
     }
 
     /* Misc parameters */
