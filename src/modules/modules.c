@@ -819,11 +819,20 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
         if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
             count++;
     }
-    /* FIXME: must check the return value and modify the calling functions
-              to test for a NULL : potential segfault */
+
     psz_ret = malloc( sizeof(char*) * (count+1) );
     if( pppsz_longname )
         *pppsz_longname = malloc( sizeof(char*) * (count+1) );
+    if( !psz_ret || ( pppsz_longname && *pppsz_longname == NULL ) )
+    {
+        msg_Err( p_this, "out of memory" );
+        free( psz_ret );
+        free( *pppsz_longname );
+        *pppsz_longname = NULL;
+        vlc_list_release( p_list );
+        return NULL;
+    }
+
     j = 0;
     for( i = 0 ; i < p_list->i_count; i++)
     {
