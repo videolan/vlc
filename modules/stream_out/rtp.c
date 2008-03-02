@@ -398,6 +398,7 @@ static int Open( vlc_object_t *p_this )
         msg_Warn (p_this, "unknown or unsupported transport protocol \"%s\"",
                   psz);
     free (psz);
+    var_Create (p_this, "dccp-service", VLC_VAR_STRING);
 
     if( ( p_sys->psz_destination == NULL ) && !b_rtsp )
     {
@@ -775,11 +776,9 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         {
             if( id->listen_fd != NULL )
                 sdp_AddAttribute( &psz_sdp, "setup", "passive" );
-#if 0
             if( p_sys->proto == IPPROTO_DCCP )
                 sdp_AddAttribute( &psz_sdp, "dccp-service-code", 
                                   "SC:RTP%c", toupper( mime_major[0] ) );
-#endif
         }
     }
 
@@ -898,8 +897,19 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( p_sys->psz_destination != NULL )
         switch( p_sys->proto )
         {
-            case IPPROTO_TCP:
             case IPPROTO_DCCP:
+            {
+                const char *code;
+                switch (id->i_cat)
+                {
+                    case VIDEO_ES: code = "RTPV";     break;
+                    case AUDIO_ES: code = "RTPARTPV"; break;
+                    case SPU_ES:   code = "RTPTRPTV"; break;
+                    default:       code = "RTPORTPV"; break;
+                }
+                var_SetString (p_stream, "dccp-service", code);
+            }   /* fall through */
+            case IPPROTO_TCP:
                 id->listen_fd = net_Listen( VLC_OBJECT(p_stream),
                                             p_sys->psz_destination, i_port,
                                             p_sys->proto );
