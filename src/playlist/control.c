@@ -2,7 +2,7 @@
  * control.c : Handle control of the playlist & running through it
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
- * $Id: /local/vlc/0.8.6-playlist-vlm/src/playlist/playlist.c 13741 2006-03-21T19:29:39.792444Z zorglub  $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>

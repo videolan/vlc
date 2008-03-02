@@ -320,30 +320,6 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                  msg_Warn( p_this, "Option %s is obsolete. Use %s instead.",
                            name, psz_name );
             }
-            if( !p_conf->b_safe )
-            {
-                int policy = config_GetInt( p_this, "security-policy" );
-                switch( policy )
-                {
-                    case 0: /* block */
-                        msg_Err( p_this, "option %s is unsafe and is blocked by security policy", psz_name );
-                        return;
-                    case 1: /* allow */
-                        break;
-                    case 2: /* prompt */
-                    {
-                        char description[256];
-                        snprintf(description, sizeof(description), _("playlist item is making use of the following unsafe option '%s', which may be harmful if used in a malicious way, authorize it ?"), psz_name);
-                        if( DIALOG_OK_YES != intf_UserYesNo( p_this, _("WARNING: Unsafe Playlist"), description, _("Yes"), _("No"), NULL) )
-                        {
-                            msg_Err( p_this, "option %s is unsafe and is blocked by security policy", psz_name );
-                            return;
-                        }
-                    }
-                    default:
-                        ;
-                }
-            }
         }
         /* </Check if the option is deprecated> */
 

@@ -2,7 +2,9 @@
 share/*
 bin/*
 lib/*
-
+include/*
+man/*
+sbin/*
 # Ignore fetched contrib
 src/*
 # But not our files

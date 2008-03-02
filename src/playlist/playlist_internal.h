@@ -2,7 +2,7 @@
  * playlist_internal.h : Functions for use by the playlist
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
- * $Id: vlc_playlist.h 16505 2006-09-03 21:53:38Z zorglub $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
