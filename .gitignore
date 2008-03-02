@@ -2,8 +2,13 @@
 *.cache
 *.lo
 *.la
+*.m4
+*.mak
+*.moc.cpp
+*.vlt
 .deps
 .libs
+.dirstamp
 ABOUT-NLS
 aclocal.m4
 autotools
@@ -16,3 +21,10 @@ Makefile.in
 stamp-*
 vlc-config
 vlc-config.in
+qvlc
+rvlc
+svlc
+cvlc
+qvlc
+vlc
+src/vlc-vlc.o
