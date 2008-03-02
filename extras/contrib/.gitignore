@@ -1,0 +1,13 @@
+# Ignore install path
+share/*
+bin/*
+lib/*
+
+# Ignore fetched contrib
+src/*
+# But not our files
+!src/Distributions
+!src/Patches
+!src/package.make
+!src/Makefile
+
