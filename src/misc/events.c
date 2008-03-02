@@ -2,7 +2,6 @@
  * events.c: events interface
  * This library provides an interface to the send and receive events.
  * It is more lightweight than variable based callback.
- * Methode
  *****************************************************************************
  * Copyright (C) 1998-2005 the VideoLAN team
  * $Id$
