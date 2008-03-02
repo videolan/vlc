@@ -68,6 +68,12 @@
 # define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
+#ifdef HAVE_LINUX_DCCP_H
+/* TODO: use glibc instead of linux-kernel headers */
+# include <linux/dccp.h>
+# define SOL_DCCP 269
+#endif
+
 extern int rootwrap_bind (int family, int socktype, int protocol,
                           const struct sockaddr *addr, size_t alen);
 
@@ -116,6 +122,16 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
     if (family == AF_INET6)
         setsockopt (fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
                     &(int){ PROTECTION_LEVEL_UNRESTRICTED }, sizeof (int));
+#endif
+
+#ifdef DCCP_SOCKOPT_SERVICE
+    char *dccps = var_CreateGetNonEmptyString (p_this, "dccp-service");
+    if (dccps != NULL)
+    {
+        setsockopt (fd, SOL_DCCP, DCCP_SOCKOPT_SERVICE, dccps,
+                    (strlen (dccps) + 3) & ~3);
+        free (dccps);
+    }
 #endif
 
     return fd;

@@ -232,6 +232,8 @@ static int Open( vlc_object_t *p_this )
 
         case IPPROTO_DCCP:
 #ifdef SOCK_DCCP
+            var_Create( p_access, "dccp-service", VLC_VAR_STRING );
+            var_SetString( p_access, "dccp-service", "RTPV" );
             p_sys->fd = net_Connect( p_access, psz_server_addr, i_server_port,
                                      SOCK_DCCP, IPPROTO_DCCP );
 #else
