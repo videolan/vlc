@@ -5,6 +5,7 @@
 *.m4
 *.mak
 *.moc.cpp
+*.o
 *.vlt
 .deps
 .libs
@@ -27,4 +28,3 @@ svlc
 cvlc
 qvlc
 vlc
-src/vlc-vlc.o
