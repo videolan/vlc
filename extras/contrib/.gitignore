@@ -5,6 +5,9 @@ lib/*
 include/*
 man/*
 sbin/*
+etc/*
+gecko-sdk/*
+*.bak
 # Ignore fetched contrib
 src/*
 # But not our files
@@ -12,4 +15,3 @@ src/*
 !src/Patches
 !src/package.mak
 !src/Makefile
-
