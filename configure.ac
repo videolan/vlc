@@ -3762,7 +3762,6 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have x264.h])
     fi
   else
-    AC_CHECK_HEADERS(x264.h, [
       PKG_CHECK_MODULES(X264,x264, [
         VLC_ADD_PLUGINS([x264])
         VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
@@ -3772,7 +3771,6 @@ if test "${enable_x264}" != "no"; then
             AC_MSG_ERROR([Could not find libx264 on your system: you may get it from http://www.videolan.org/x264.html])
           fi
       ])
-    ])
     LDFLAGS="${LDFLAGS_save}"
   fi
 fi
