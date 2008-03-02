@@ -8,6 +8,6 @@ src/*
 # But not our files
 !src/Distributions
 !src/Patches
-!src/package.make
+!src/package.mak
 !src/Makefile
 
