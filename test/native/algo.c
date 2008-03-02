@@ -2,7 +2,7 @@
  * algo.c : Algorithms test
  *****************************************************************************
  * Copyright (C) 2006 VideoLAN
- * $Id: i18n.c 16157 2006-07-29 13:32:12Z zorglub $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
