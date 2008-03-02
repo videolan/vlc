@@ -892,6 +892,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     int                  i;
 
     p_input->p_sys = p_stream = malloc( sizeof( ts_stream_t ) );
+    if( !p_input->p_sys )
+        return VLC_ENOMEM;
 
     /* Init this new stream */
     if ( p_sys->b_es_id_pid )
@@ -1021,6 +1023,13 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     p_stream->i_langs = 1+p_input->p_fmt->i_extra_languages;
     p_stream->lang = malloc(p_stream->i_langs*3);
+    if( !p_stream->lang )
+    {
+        msg_Err( p_mux, "cannot add new stream, out of memory" );
+        p_stream->i_langs = 0;
+        free( p_stream );
+        return VLC_ENOMEM;
+    }
     i = 1;
     p_stream->lang[0] =
     p_stream->lang[1] =
@@ -1058,7 +1067,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             char *psz = p_input->p_fmt->p_extra_languages[i-1].psz_language;
             const iso639_lang_t *pl = NULL;
- 
+
             if( strlen( psz ) == 2 )
             {
                 pl = GetLang_1( psz );
@@ -1085,17 +1094,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         i++;
     }
 
-    /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-    p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra;
-    if( p_stream->i_decoder_specific_info > 0 )
-    {
-        p_stream->p_decoder_specific_info =
-            malloc( p_stream->i_decoder_specific_info );
-        memcpy( p_stream->p_decoder_specific_info,
-                p_input->p_fmt->p_extra,
-                p_input->p_fmt->i_extra );
-    }
-
     /* Create decoder specific info for subt */
     if( p_stream->i_codec == VLC_FOURCC( 's', 'u','b', 't' ) )
     {
@@ -1104,44 +1102,64 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_decoder_specific_info = 55;
         p_stream->p_decoder_specific_info = p =
             malloc( p_stream->i_decoder_specific_info );
+        if( p )
+        {
+            p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
+            p[1] = 0x00;    /* flags: 1b: associated video info flag
+                                    3b: reserved
+                                    1b: duration flag
+                                    3b: reserved */
+            p[2] = 52;      /* remaining size */
 
-        p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
-        p[1] = 0x00;    /* flags: 1b: associated video info flag
-                                  3b: reserved
-                                  1b: duration flag
-                                  3b: reserved */
-        p[2] = 52;      /* remaining size */
+            p += 3;
 
-        p += 3;
+            p[0] = p[1] = p[2] = p[3] = 0; p+=4;    /* display flags */
+            *p++ = 0;  /* horizontal justification (-1: left, 0 center, 1 right) */
+            *p++ = 1;  /* vertical   justification (-1: top, 0 center, 1 bottom) */
 
-        p[0] = p[1] = p[2] = p[3] = 0; p+=4;    /* display flags */
-        *p++ = 0;  /* horizontal justification (-1: left, 0 center, 1 right) */
-        *p++ = 1;  /* vertical   justification (-1: top, 0 center, 1 bottom) */
+            p[0] = p[1] = p[2] = 0x00; p+=3;/* background rgb */
+            *p++ = 0xff;                    /* background a */
 
-        p[0] = p[1] = p[2] = 0x00; p+=3;/* background rgb */
-        *p++ = 0xff;                    /* background a */
+            p[0] = p[1] = 0; p += 2;        /* text box top */
+            p[0] = p[1] = 0; p += 2;        /* text box left */
+            p[0] = p[1] = 0; p += 2;        /* text box bottom */
+            p[0] = p[1] = 0; p += 2;        /* text box right */
 
-        p[0] = p[1] = 0; p += 2;        /* text box top */
-        p[0] = p[1] = 0; p += 2;        /* text box left */
-        p[0] = p[1] = 0; p += 2;        /* text box bottom */
-        p[0] = p[1] = 0; p += 2;        /* text box right */
+            p[0] = p[1] = 0; p += 2;        /* start char */
+            p[0] = p[1] = 0; p += 2;        /* end char */
+            p[0] = p[1] = 0; p += 2;        /* default font id */
 
-        p[0] = p[1] = 0; p += 2;        /* start char */
-        p[0] = p[1] = 0; p += 2;        /* end char */
-        p[0] = p[1] = 0; p += 2;        /* default font id */
+            *p++ = 0;                       /* font style flags */
+            *p++ = 12;                      /* font size */
 
-        *p++ = 0;                       /* font style flags */
-        *p++ = 12;                      /* font size */
+            p[0] = p[1] = p[2] = 0x00; p+=3;/* foreground rgb */
+            *p++ = 0x00;                    /* foreground a */
 
-        p[0] = p[1] = p[2] = 0x00; p+=3;/* foreground rgb */
-        *p++ = 0x00;                    /* foreground a */
-
-        p[0] = p[1] = p[2] = 0; p[3] = 22; p += 4;
-        memcpy( p, "ftab", 4 ); p += 4;
-        *p++ = 0; *p++ = 1;             /* entry count */
-        p[0] = p[1] = 0; p += 2;        /* font id */
-        *p++ = 9;                       /* font name length */
-        memcpy( p, "Helvetica", 9 );    /* font name */
+            p[0] = p[1] = p[2] = 0; p[3] = 22; p += 4;
+            memcpy( p, "ftab", 4 ); p += 4;
+            *p++ = 0; *p++ = 1;             /* entry count */
+            p[0] = p[1] = 0; p += 2;        /* font id */
+            *p++ = 9;                       /* font name length */
+            memcpy( p, "Helvetica", 9 );    /* font name */
+        }
+        else p_stream->i_decoder_specific_info = 0;
+    }
+    else
+    {
+        /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
+        p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra;
+        if( p_stream->i_decoder_specific_info > 0 )
+        {
+            p_stream->p_decoder_specific_info =
+                malloc( p_stream->i_decoder_specific_info );
+            if( p_stream->p_decoder_specific_info )
+            {
+                memcpy( p_stream->p_decoder_specific_info,
+                        p_input->p_fmt->p_extra,
+                        p_input->p_fmt->i_extra );
+            }
+            else p_stream->i_decoder_specific_info = 0;
+        }
     }
 
     /* Init pes chain */
@@ -2233,7 +2251,14 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #endif
 
     if( p_sys->dvbpmt == NULL )
+    {
         p_sys->dvbpmt = malloc( p_sys->i_num_pmt * sizeof(dvbpsi_pmt_t) );
+        if( !p_sys->dvbpmt )
+        {
+            msg_Err( p_mux, "cannot generate a new pmt, out of memory" );
+            return;
+        }
+    }
 #ifdef HAVE_DVBPSI_SDT
     if( p_sys->b_sdt )
         dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid );
