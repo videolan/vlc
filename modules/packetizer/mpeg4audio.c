@@ -140,7 +140,6 @@ struct decoder_sys_t
 };
 
 enum {
-
     STATE_NOSYNC,
     STATE_SYNC,
     STATE_HEADER,
@@ -249,6 +248,11 @@ static int OpenPacketizer( vlc_object_t *p_this )
         p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra = malloc( p_dec->fmt_in.i_extra );
+        if( !p_dec->fmt_out.p_extra )
+        {
+            p_dec->fmt_out.i_extra = 0;
+            return VLC_ENOMEM;
+        }
         memcpy( p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
                 p_dec->fmt_in.i_extra );
 
@@ -352,8 +356,13 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
     /* Build the decoder specific info header */
     if( !p_dec->fmt_out.i_extra )
     {
-        p_dec->fmt_out.i_extra = 2;
         p_dec->fmt_out.p_extra = malloc( 2 );
+        if( !p_dec->fmt_out.p_extra )
+        {
+            p_dec->fmt_out.i_extra = 0;
+            return 0;
+        }
+        p_dec->fmt_out.i_extra = 2;
         ((uint8_t *)p_dec->fmt_out.p_extra)[0] =
             (i_profile + 1) << 3 | (i_sample_rate_idx >> 1);
         ((uint8_t *)p_dec->fmt_out.p_extra)[1] =
@@ -365,6 +374,7 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
 
     return i_frame_size - *pi_header_size;
 }
+
 /****************************************************************************
  * LOAS helpers
  ****************************************************************************/
@@ -373,6 +383,7 @@ static int LOASSyncInfo( uint8_t p_header[LOAS_HEADER_SIZE], unsigned int *pi_he
     *pi_header_size = 3;
     return ( ( p_header[1] & 0x1f ) << 8 ) + p_header[2];
 }
+
 static int Mpeg4GAProgramConfigElement( bs_t *s )
 {
     /* TODO compute channels count ? */
@@ -405,6 +416,7 @@ static int Mpeg4GAProgramConfigElement( bs_t *s )
     bs_skip( s, i_comment * 8 );
     return 0;
 }
+
 static int Mpeg4GASpecificConfig( mpeg4_cfg_t *p_cfg, bs_t *s )
 {
     p_cfg->i_frame_length = bs_read1(s) ? 960 : 1024;
@@ -436,6 +448,7 @@ static int Mpeg4GASpecificConfig( mpeg4_cfg_t *p_cfg, bs_t *s )
     }
     return 0;
 }
+
 static int Mpeg4ReadAudioObjectType( bs_t *s )
 {
     int i_type = bs_read( s, 5 );
@@ -443,6 +456,7 @@ static int Mpeg4ReadAudioObjectType( bs_t *s )
         i_type += bs_read( s, 6 );
     return i_type;
 }
+
 static int Mpeg4ReadAudioSamplerate( bs_t *s )
 {
     int i_index = bs_read( s, 4 );
@@ -450,6 +464,7 @@ static int Mpeg4ReadAudioSamplerate( bs_t *s )
         return pi_sample_rates[i_index];
     return bs_read( s, 24 );
 }
+
 static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t *p_extra, bs_t *s, int i_max_size )
 {
 #if 0
@@ -479,7 +494,7 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
 
     memset( p_cfg, 0, sizeof(*p_cfg) );
     *pi_extra = 0;
-    
+
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType( s );
     p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate( s );
 
@@ -565,6 +580,7 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
     default:
         break;
     }
+
     if( p_cfg->extension.i_object_type != 5 && i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 16 && 
         bs_read( s, 11 ) == 0x2b7 )
     {
@@ -733,7 +749,8 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
     /* Read the stream mux configuration if present */
     if( !bs_read1( &s ) )
     {
-        if( !LatmReadStreamMuxConfiguration( &p_sys->latm, &s ) && p_sys->latm.i_streams > 0 )
+        if( !LatmReadStreamMuxConfiguration( &p_sys->latm, &s ) &&
+            p_sys->latm.i_streams > 0 )
         {
             const latm_stream_t *st = &p_sys->latm.stream[0];
 
@@ -746,6 +763,11 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
             {
                 p_dec->fmt_out.i_extra = st->i_extra;
                 p_dec->fmt_out.p_extra = malloc( st->i_extra );
+                if( !p_dec->fmt_out.p_extra )
+                {
+                    p_dec->fmt_out.i_extra = 0;
+                    return 0;
+                }
                 memcpy( p_dec->fmt_out.p_extra, st->extra, st->i_extra );
             }
 
@@ -789,7 +811,9 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                     {
                         pi_payload[i_program][i_layer] = st->i_frame_length / 8; /* XXX not correct */
                     }
-                    else if( st->i_frame_length_type == 3 || st->i_frame_length_type == 5 || st->i_frame_length_type == 7 )
+                    else if( ( st->i_frame_length_type == 3 ) ||
+                             ( st->i_frame_length_type == 5 ) ||
+                             ( st->i_frame_length_type == 7 ) )
                     {
                         bs_skip( &s, 2 ); // muxSlotLengthCoded
                         pi_payload[i_program][i_layer] = 0; /* TODO */
@@ -856,7 +880,9 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                 {
                     pi_payload[i_program][i_layer] = st->i_frame_length / 8; /* XXX not correct */
                 }
-                else if( st->i_frame_length_type == 3 || st->i_frame_length_type == 5 || st->i_frame_length_type == 7 )
+                else if( ( st->i_frame_length_type == 3 ) ||
+                         ( st->i_frame_length_type == 5 ) ||
+                         ( st->i_frame_length_type == 7 ) )
                 {
                     bs_read( &s, 2 ); // muxSlotLengthCoded
                 }
@@ -1015,6 +1041,12 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_NEXT_SYNC:
             /* TODO: If p_block == NULL, flush the buffer without checking the
              * next sync word */
+            if( p_sys->bytestream.p_block == NULL )
+            {
+                p_sys->i_state = STATE_NOSYNC;
+                block_BytestreamFlush( &p_sys->bytestream );
+                return NULL;
+            }
 
             /* Check if next expected frame contains the sync word */
             if( block_PeekOffsetBytes( &p_sys->bytestream, p_sys->i_frame_size
@@ -1025,9 +1057,11 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
-            assert( p_sys->i_type == TYPE_ADTS || p_sys->i_type == TYPE_LOAS );
-            if( ( p_sys->i_type == TYPE_ADTS && ( p_header[0] != 0xff || (p_header[1] & 0xf6) != 0xf0 ) ) ||
-                ( p_sys->i_type == TYPE_LOAS && ( p_header[0] != 0x56 || (p_header[1] & 0xe0) != 0xe0 ) ) )
+            assert( (p_sys->i_type == TYPE_ADTS) || (p_sys->i_type == TYPE_LOAS) );
+            if( ( ( p_sys->i_type == TYPE_ADTS ) &&
+                  ( p_header[0] != 0xff || (p_header[1] & 0xf6) != 0xf0 ) ) ||
+                ( ( p_sys->i_type == TYPE_LOAS ) &&
+                  ( p_header[0] != 0x56 || (p_header[1] & 0xe0) != 0xe0 ) ) )
             {
                 msg_Dbg( p_dec, "emulated sync word "
                          "(no sync on following frame)" );
@@ -1104,7 +1138,6 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
     return NULL;
 }
 
-
 /*****************************************************************************
  * SetupBuffer:
  *****************************************************************************/
@@ -1151,5 +1184,3 @@ static void ClosePacketizer( vlc_object_t *p_this )
 
     free( p_dec->p_sys );
 }
-
-
