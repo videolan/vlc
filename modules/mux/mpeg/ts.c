@@ -1025,7 +1025,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->lang = malloc(p_stream->i_langs*3);
     if( !p_stream->lang )
     {
-        msg_Err( p_mux, "cannot add new stream, out of memory" );
         p_stream->i_langs = 0;
         free( p_stream );
         return VLC_ENOMEM;
@@ -2255,7 +2254,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         p_sys->dvbpmt = malloc( p_sys->i_num_pmt * sizeof(dvbpsi_pmt_t) );
         if( !p_sys->dvbpmt )
         {
-            msg_Err( p_mux, "cannot generate a new pmt, out of memory" );
             return;
         }
     }
