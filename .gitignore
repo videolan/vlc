@@ -6,6 +6,7 @@
 *.mak
 *.moc.cpp
 *.o
+*.pc
 *.vlt
 .deps
 .libs

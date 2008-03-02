@@ -130,6 +130,18 @@ modules/modules.c: modules/builtin.h
 	mv -f -- "$@.tmp" "$@"
 
 ###############################################################################
+# pkg-config integration
+###############################################################################
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = vlc-control.pc
+CLEANFILES += $(pkgconfig_DATA)
+
+vlc-control.pc: vlc-control.pc.in $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	$(SHELL) ./config.status --file=src/vlc-control.pc
+
+###############################################################################
 # Building libvlc
 ###############################################################################
 
