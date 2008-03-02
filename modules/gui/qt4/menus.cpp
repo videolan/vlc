@@ -428,6 +428,9 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     char **ppsz_longnames;
     char **ppsz_names = services_discovery_GetServicesNames( p_intf,
                                                              &ppsz_longnames );
+    if( !ppsz_names )
+        return menu;
+
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {

@@ -1408,6 +1408,9 @@ wxMenu *Playlist::SDMenu()
     char **ppsz_longnames;
     char **ppsz_names = services_discovery_GetServicesNames( p_playlist,
                                                              &ppsz_longnames );
+    if( !ppsz_names )
+        return p_sd_menu;
+
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
 
     int i_number = 0;
