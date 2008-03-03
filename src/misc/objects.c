@@ -93,6 +93,7 @@ static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
+static void vlc_object_yield_locked( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Local structure lock
@@ -732,8 +733,8 @@ void * vlc_object_get( int i_id )
                 /* This happens when there are only two remaining objects */
                 if( pp_objects[i_middle+1]->i_object_id == i_id )
                 {
+                    vlc_object_yield_locked( pp_objects[i_middle+1] );
                     vlc_mutex_unlock( &structure_lock );
-                    pp_objects[i_middle+1]->p_internals->i_refcount++;
                     return pp_objects[i_middle+1];
                 }
                 break;
@@ -741,8 +742,8 @@ void * vlc_object_get( int i_id )
         }
         else
         {
+            vlc_object_yield_locked( pp_objects[i_middle] );
             vlc_mutex_unlock( &structure_lock );
-            pp_objects[i_middle]->p_internals->i_refcount++;
             return pp_objects[i_middle];
         }
 
@@ -771,10 +772,13 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
     vlc_mutex_lock( &structure_lock );
 
+    /* Avoid obvious freed object uses */
+    assert( p_this->p_internals->i_refcount > 0 );
+
     /* If we are of the requested type ourselves, don't look further */
     if( !(i_mode & FIND_STRICT) && p_this->i_object_type == i_type )
     {
-        p_this->p_internals->i_refcount++;
+        vlc_object_yield_locked( p_this );
         vlc_mutex_unlock( &structure_lock );
         return p_this;
     }
@@ -822,12 +826,15 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &structure_lock );
 
+    /* Avoid obvious freed object uses */
+    assert( p_this->p_internals->i_refcount > 0 );
+
     /* If have the requested name ourselves, don't look further */
     if( !(i_mode & FIND_STRICT)
         && p_this->psz_object_name
         && !strcmp( p_this->psz_object_name, psz_name ) )
     {
-        p_this->p_internals->i_refcount++;
+        vlc_object_yield_locked( p_this );
         vlc_mutex_unlock( &structure_lock );
         return p_this;
     }
@@ -866,12 +873,25 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
  ****************************************************************************
  * increment an object refcount
  *****************************************************************************/
+
+/* When the structure_lock is locked */
+static void vlc_object_yield_locked( vlc_object_t *p_this )
+{
+    /* Avoid obvious freed object uses */
+    assert( p_this->p_internals->i_refcount > 0 );
+
+    /* Increment the counter */
+    p_this->p_internals->i_refcount++;
+}
+
+/* Public function */
 void __vlc_object_yield( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &structure_lock );
-    p_this->p_internals->i_refcount++;
+    vlc_object_yield_locked( p_this );
     vlc_mutex_unlock( &structure_lock );
 }
+
 
 /*****************************************************************************
  * decrement an object refcount
@@ -921,6 +941,9 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 
     vlc_mutex_lock( &structure_lock );
 
+    /* Avoid obvious freed object uses */
+    assert( p_this->p_internals->i_refcount > 0 );
+
     /* Attach the parent to its child */
     p_this->p_parent = p_parent;
 
@@ -948,6 +971,10 @@ void __vlc_object_detach( vlc_object_t *p_this )
     if( !p_this ) return;
 
     vlc_mutex_lock( &structure_lock );
+
+    /* Avoid obvious freed object uses */
+    assert( p_this->p_internals->i_refcount > 0 );
+
     if( !p_this->p_parent )
     {
         msg_Err( p_this, "object is not attached" );
@@ -981,6 +1008,9 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     vlc_mutex_lock( &structure_lock );
+
+    /* Avoid obvious freed object uses */
+    assert( p_this->p_internals->i_refcount > 0 );
 
     /* Look for the objects */
     switch( i_mode & 0x000f )
@@ -1290,7 +1320,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         {
             if( p_tmp->i_object_type == i_type )
             {
-                p_tmp->p_internals->i_refcount++;
+                vlc_object_yield_locked( p_tmp );
                 return p_tmp;
             }
             else
@@ -1306,7 +1336,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
             p_tmp = p_this->pp_children[i];
             if( p_tmp->i_object_type == i_type )
             {
-                p_tmp->p_internals->i_refcount++;
+                vlc_object_yield_locked( p_tmp );
                 return p_tmp;
             }
             else if( p_tmp->i_children )
@@ -1344,7 +1374,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
-                p_tmp->p_internals->i_refcount++;
+                vlc_object_yield_locked( p_tmp );
                 return p_tmp;
             }
             else
@@ -1361,7 +1391,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
-                p_tmp->p_internals->i_refcount++;
+                vlc_object_yield_locked( p_tmp );
                 return p_tmp;
             }
             else if( p_tmp->i_children )
@@ -1562,7 +1592,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    p_object->p_internals->i_refcount++;
+    vlc_object_yield_locked( p_object );
 
     p_list->p_values[i_index].p_object = p_object;
 
@@ -1584,7 +1614,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    p_object->p_internals->i_refcount++;
+    vlc_object_yield_locked( p_object );
 
     p_list->p_values[p_list->i_count].p_object = p_object;
     p_list->i_count++;
