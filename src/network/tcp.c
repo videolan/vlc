@@ -85,10 +85,6 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     if (evfd == -1)
         return -1;
 
-    if( i_port == 0 )
-        i_port = 80; /* historical VLC thing */
-
-
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_STREAM;
 
