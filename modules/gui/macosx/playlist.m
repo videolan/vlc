@@ -382,6 +382,11 @@
 
     char ** ppsz_name;
     char ** ppsz_services = services_discovery_GetServicesNames( p_playlist, &ppsz_name );
+    if( !ppsz_services )
+    {
+        vlc_object_release( p_playlist );
+        return;
+    }
     
     for( i = 0; ppsz_services[i]; i++ )
     {
