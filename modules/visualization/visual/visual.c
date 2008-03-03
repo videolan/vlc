@@ -231,6 +231,8 @@ static int Open( vlc_object_t *p_this )
         int  i;
 
         p_effect = malloc( sizeof( visual_effect_t ) );
+        if( !p_effect )
+            break;
         p_effect->i_width = p_sys->i_width;
         p_effect->i_height= p_sys->i_height;
         p_effect->i_nb_chans = aout_FormatNbChannels( &p_filter->input);
