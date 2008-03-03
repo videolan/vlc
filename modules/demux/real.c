@@ -1127,6 +1127,8 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             i_subpacket_h = GetWBE( p_peek ); p_peek += 2;              /* 1 */
             i_frame_size = GetWBE( p_peek ); p_peek += 2;      /* frame size */
             i_subpacket_size = GetWBE( p_peek ); p_peek += 2;  /* subpacket_size */
+            if( !i_subpacket_size || !i_frame_size || !i_coded_frame_size )
+                 return VLC_EGENERIC;
             p_peek += 2;                                               /* ?? */
 
             if( i_version == 5 ) p_peek += 6;                 /* 0, srate, 0 */
