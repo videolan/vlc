@@ -7,10 +7,13 @@ man/*
 sbin/*
 etc/*
 gecko-sdk/*
+doc/*
+info/*
 *.bak
 # Ignore fetched contrib
 src/*
 # But not our files
+!Makefile
 !src/Distributions
 !src/Patches
 !src/package.mak

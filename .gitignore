@@ -1,4 +1,5 @@
 *~
+*.app
 *.cache
 *.lo
 *.la
@@ -28,4 +29,6 @@ rvlc
 svlc
 cvlc
 qvlc
+nvlc
 vlc
+vlc_install_dir/*
