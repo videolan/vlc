@@ -1240,17 +1240,15 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 tk->i_subpackets =
                     i_subpacket_h * i_frame_size / tk->i_subpacket_size;
                 tk->p_subpackets =
-                    malloc( tk->i_subpackets * sizeof(block_t *) );
+                    calloc( tk->i_subpackets, sizeof(block_t *) );
             }
             else if( fmt.i_codec == VLC_FOURCC('2','8','_','8') )
             {
                 tk->i_subpackets =
                     i_subpacket_h * i_frame_size / tk->i_coded_frame_size;
                 tk->p_subpackets =
-                    malloc( tk->i_subpackets * sizeof(block_t *) );
+                    calloc( tk->i_subpackets, sizeof(block_t *) );
             }
-
-            for( i = 0; i < tk->i_subpackets; i++ ) tk->p_subpackets[i] = NULL;
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
 
