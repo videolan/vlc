@@ -157,6 +157,7 @@ static char *locale_fast (const char *string, vlc_bool_t from)
     WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, out, len, NULL, NULL);
     return out;
 #else
+    VLC_UNUSED(from);
     return (char *)string;
 #endif
 }
@@ -171,6 +172,7 @@ static inline char *locale_dup (const char *string, vlc_bool_t from)
 #elif defined (USE_MB2MB)
     return locale_fast (string, from);
 #else
+    VLC_UNUSED(from);
     return strdup (string);
 #endif
 }
@@ -183,6 +185,8 @@ void LocaleFree (const char *str)
         free ((char *)str);
 #elif defined (USE_MB2MB)
     free ((char *)str);
+#else
+    VLC_UNUSED(str);
 #endif
 }
 
