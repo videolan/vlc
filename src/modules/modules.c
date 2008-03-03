@@ -825,7 +825,6 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
         *pppsz_longname = malloc( sizeof(char*) * (count+1) );
     if( !psz_ret || ( pppsz_longname && *pppsz_longname == NULL ) )
     {
-        msg_Err( p_this, "out of memory" );
         free( psz_ret );
         free( *pppsz_longname );
         *pppsz_longname = NULL;
