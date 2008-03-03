@@ -70,7 +70,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
 
-#   if defined __GLIBC__ && defined ENABLE_NLS
+#   ifdef __GLIBC__
     if (dlsym (RTLD_NEXT, "inet6_rth_add") && !dlsym (RTLD_NEXT, "qsort_r"))
     {
         /* Way too many Linux users have glibc 2.5-2.7 that keeps crashing
