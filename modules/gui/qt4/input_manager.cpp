@@ -112,13 +112,14 @@ void InputManager::delInput()
         i_old_playing_status = END_S;
 
         i_input_id = 0;
-        old_name=qfu("");
-        artUrl = qfu("");
+        old_name   = "";
+        artUrl     = "";
+        p_input    = NULL;
         emit positionUpdated( 0.0, 0 ,0 );
         emit statusChanged( END_S );
         emit nameChanged( "" );
         emit artChanged( "" );
-        p_input = NULL;
+        emit rateChanged( INPUT_RATE_DEFAULT );
     }
 }
 
