@@ -230,6 +230,8 @@ struct vout_sys_t
 
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     int                 i_xvport;
+    vlc_bool_t          b_paint_colourkey;
+    int                 i_colourkey;
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
 
@@ -336,8 +338,6 @@ struct vout_sys_t
     osso_context_t      *p_octx;
     int                 i_backlight_on_counter;
 #endif
-
- 
 };
 
 /*****************************************************************************

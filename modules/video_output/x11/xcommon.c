@@ -1434,6 +1434,22 @@ static int ManageVideo( vout_thread_t *p_vout )
             if( ((XExposeEvent *)&xevent)->count == 0 )
             {
                 /* (if this is the last a collection of expose events...) */
+
+#if defined(MODULE_NAME_IS_xvideo)
+                x11_window_t *p_win = p_vout->p_sys->p_win;
+
+                /* Paint the colour key if needed */
+                if( p_vout->p_sys->b_paint_colourkey &&
+                    xevent.xexpose.window == p_win->video_window )
+                {
+                    XSetForeground( p_vout->p_sys->p_display,
+                                    p_win->gc, p_vout->p_sys->i_colourkey );
+                    XFillRectangle( p_vout->p_sys->p_display,
+                                    p_win->video_window, p_win->gc, 0, 0,
+                                    p_win->i_width, p_win->i_height );
+                }
+#endif 
+
 #if 0
                 if( p_vout->p_libvlc->p_input_bank->pp_input[0] != NULL )
                 {
@@ -1622,8 +1638,9 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( !p_vout->b_fullscreen )
     {
-        p_win->owner_window = (Window)vout_RequestWindow( p_vout, &p_win->i_x, &p_win->i_y,
-                                        &p_win->i_width, &p_win->i_height );
+        p_win->owner_window = (Window)
+            vout_RequestWindow( p_vout, &p_win->i_x, &p_win->i_y,
+                                &p_win->i_width, &p_win->i_height );
 
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
         xsize_hints.base_height = xsize_hints.height = p_win->i_height;
@@ -2551,6 +2568,7 @@ static int XVideoGetPort( vout_thread_t *p_vout,
         {
             XvAttribute     *p_attr;
             int             i_attr, i_num_attributes;
+            Atom            autopaint = None, colorkey = None;
 
             /* If this is not the format we want, or at least a
              * similar one, forget it */
@@ -2587,7 +2605,8 @@ static int XVideoGetPort( vout_thread_t *p_vout,
                      ( p_formats[ i_format ].format == XvPacked ) ?
                          "packed" : "planar" );
 
-            /* Make sure XV_AUTOPAINT_COLORKEY is set */
+            /* Use XV_AUTOPAINT_COLORKEY if supported, otherwise we will
+             * manually paint the colour key */
             p_attr = XvQueryPortAttributes( p_vout->p_sys->p_display,
                                             i_selected_port,
                                             &i_num_attributes );
@@ -2596,14 +2615,23 @@ static int XVideoGetPort( vout_thread_t *p_vout,
             {
                 if( !strcmp( p_attr[i_attr].name, "XV_AUTOPAINT_COLORKEY" ) )
                 {
-                    const Atom autopaint =
-                        XInternAtom( p_vout->p_sys->p_display,
-                                     "XV_AUTOPAINT_COLORKEY", False );
+                    autopaint = XInternAtom( p_vout->p_sys->p_display,
+                                             "XV_AUTOPAINT_COLORKEY", False );
                     XvSetPortAttribute( p_vout->p_sys->p_display,
                                         i_selected_port, autopaint, 1 );
-                    break;
+                }
+                if( !strcmp( p_attr[i_attr].name, "XV_COLORKEY" ) )
+                {
+                    /* Find out the default colour key */
+                    colorkey = XInternAtom( p_vout->p_sys->p_display,
+                                            "XV_COLORKEY", False );
+                    XvGetPortAttribute( p_vout->p_sys->p_display,
+                                        i_selected_port, colorkey,
+                                        &p_vout->p_sys->i_colourkey );
                 }
             }
+            p_vout->p_sys->b_paint_colourkey =
+                autopaint == None && colorkey != None;
 
             if( p_attr != NULL )
             {
