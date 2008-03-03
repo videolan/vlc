@@ -1009,7 +1009,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         {
             psz_path = "/";
         }
-        if( p_sys->url.i_port != 80)
+        if( p_sys->url.i_port != (pvs ? 443 : 80) )
         {
             net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                         "GET %s HTTP/1.%d\r\nHost: %s:%d\r\n",
