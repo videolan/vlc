@@ -359,26 +359,24 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    /* FIXME: ugly hack - we cannot use the message queue after
-         * msg_Destroy(). */
-    vlc_object_t *logger = p_this;
-    if( (vlc_object_t *)p_this->p_libvlc == p_this )
-        logger = NULL;
-
     /* Sanity checks */
     if( p_this->i_children )
     {
         int i;
 
-        fprintf( stderr, "ERROR: cannot delete object (%i, %s) with %d children\n",
-                          p_this->i_object_id, p_this->psz_object_name, p_this->i_children );
+        fprintf( stderr,
+                 "ERROR: cannot delete object (%i, %s) with %d children\n",
+                 p_this->i_object_id, p_this->psz_object_name,
+                 p_this->i_children );
 
         for( i = 0; i < p_this->i_children; i++ )
         {
-            fprintf( stderr, "ERROR: Remaining children object (id:%i, type:%s, name:%s)\n",
-                              p_this->pp_children[i]->i_object_id,
-                              p_this->pp_children[i]->psz_object_type,
-                              p_this->pp_children[i]->psz_object_name );
+            fprintf( stderr,
+                     "ERROR: Remaining children object "
+                     "(id:%i, type:%s, name:%s)\n",
+                     p_this->pp_children[i]->i_object_id,
+                     p_this->pp_children[i]->psz_object_type,
+                     p_this->pp_children[i]->psz_object_name );
         }
         fflush(stderr);
         abort();
@@ -386,13 +384,13 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->p_parent )
     {
-        fprintf( stderr, "ERROR: cannot delete object (id:%i, type:%s, name:%s) with a parent (id:%i, type:%s, name:%s)\n",
-                          p_this->i_object_id,
-                          p_this->psz_object_type,
-                          p_this->psz_object_name,
-                          p_this->p_parent->i_object_id,
-                          p_this->p_parent->psz_object_type,
-                          p_this->p_parent->psz_object_name );
+        fprintf( stderr,
+                 "ERROR: cannot delete object (id:%i, type:%s, name:%s) "
+                 "with a parent (id:%i, type:%s, name:%s)\n",
+                 p_this->i_object_id, p_this->psz_object_type,
+                 p_this->psz_object_name, p_this->p_parent->i_object_id,
+                 p_this->p_parent->psz_object_type,
+                 p_this->p_parent->psz_object_name );
         fflush(stderr);
         abort();
     }
@@ -421,10 +419,10 @@ static void vlc_object_destroy( vlc_object_t *p_this )
             {
                 /* We are leaking this object */
                 fprintf( stderr,
-                      "ERROR: We are leaking object (id:%i, type:%s, name:%s)\n",
-                      p_global->pp_objects[i]->i_object_id,
-                      p_global->pp_objects[i]->psz_object_type,
-                      p_global->pp_objects[i]->psz_object_name );
+                         "ERROR: leaking object (id:%i, type:%s, name:%s)\n",
+                         p_global->pp_objects[i]->i_object_id,
+                         p_global->pp_objects[i]->psz_object_type,
+                         p_global->pp_objects[i]->psz_object_name );
                 fflush(stderr);
             }
             /* Strongly abort, cause we want these to be fixed */
