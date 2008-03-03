@@ -136,6 +136,7 @@ int decoder_GetInputAttachments( decoder_t *p_dec,
  */
 mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
+    VLC_UNUSED(p_dec);
     return i_ts;
 }
 
