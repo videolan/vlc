@@ -817,10 +817,9 @@ static int HeaderRead( demux_t *p_demux )
                 stream_Read( p_demux->s, psz, i_len );
                 psz[i_len] = '\0';
 
+                EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - title=`%s'", psz );
-                EnsureUTF8( psz );
-                asprintf( &p_sys->psz_title, psz );
-                free( psz );
+                p_sys->psz_title = psz;
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -832,10 +831,9 @@ static int HeaderRead( demux_t *p_demux )
                 stream_Read( p_demux->s, psz, i_len );
                 psz[i_len] = '\0';
 
+                EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - author=`%s'", psz );
-                EnsureUTF8( psz );
-                asprintf( &p_sys->psz_artist, psz );
-                free( psz );
+                p_sys->psz_artist = psz;
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -847,10 +845,9 @@ static int HeaderRead( demux_t *p_demux )
                 stream_Read( p_demux->s, psz, i_len );
                 psz[i_len] = '\0';
 
+                EnsureUTF8( psz );
                 msg_Dbg( p_demux, "    - copyright=`%s'", psz );
-                EnsureUTF8( psz );
-                asprintf( &p_sys->psz_copyright, psz );
-                free( psz );
+                p_sys->psz_copyright = psz;
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -862,10 +859,9 @@ static int HeaderRead( demux_t *p_demux )
                 stream_Read( p_demux->s, psz, i_len );
                 psz[i_len] = '\0';
 
-                msg_Dbg( p_demux, "    - comment=`%s'", psz );
                 EnsureUTF8( psz );
-                asprintf( &p_sys->psz_description, psz );
-                free( psz );
+                msg_Dbg( p_demux, "    - comment=`%s'", psz );
+                p_sys->psz_description = psz;
                 i_skip -= i_len;
             }
             i_skip -= 2;
@@ -1048,10 +1044,9 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 memcpy( psz, p_peek, i_len );
                 psz[i_len] = '\0';
 
-                msg_Dbg( p_demux, "    - title=`%s'", psz );
                 EnsureUTF8( psz );
-                asprintf( &p_sys->psz_title, psz );
-                free( psz );
+                msg_Dbg( p_demux, "    - title=`%s'", psz );
+                p_sys->psz_title = psz;
             }
             p_peek += i_len;
 
@@ -1063,10 +1058,9 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 memcpy( psz, p_peek, i_len );
                 psz[i_len] = '\0';
 
-                msg_Dbg( p_demux, "    - artist=`%s'", psz );
                 EnsureUTF8( psz );
-                asprintf( &p_sys->psz_artist, psz );
-                free( psz );
+                msg_Dbg( p_demux, "    - artist=`%s'", psz );
+                p_sys->psz_artist = psz;
             }
             p_peek += i_len;
 
@@ -1078,10 +1072,9 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 memcpy( psz, p_peek, i_len );
                 psz[i_len] = '\0';
 
-                msg_Dbg( p_demux, "    - Copyright=`%s'", psz );
                 EnsureUTF8( psz );
-                asprintf( &p_sys->psz_copyright, psz );
-                free( psz );
+                msg_Dbg( p_demux, "    - Copyright=`%s'", psz );
+                p_sys->psz_copyright = psz;
             }
             p_peek += i_len;
 
@@ -1093,10 +1086,9 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 memcpy( psz, p_peek, i_len );
                 psz[i_len] = '\0';
 
-                msg_Dbg( p_demux, "    - Comment=`%s'", psz );
                 EnsureUTF8( psz );
-                asprintf( &p_sys->psz_description, psz );
-                free( psz );
+                msg_Dbg( p_demux, "    - Comment=`%s'", psz );
+                p_sys->psz_description = psz;
             }
             /* This might be unusefull */
             p_peek += i_len;
