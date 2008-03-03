@@ -373,7 +373,21 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     combo->setMinimumWidth( MINWIDTH_BOX );
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
-    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+    module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
+    if(p_module_config && p_module_config->pf_update_list) 
+    {
+       vlc_value_t val;
+       val.psz_string = strdup(p_module_config->value.psz);
+       
+       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+
+       // assume in a×y case that dirty was set to VLC_TRUE
+       // because lazy programmes will use the same callback for
+       // this, like the one behind the refresh push button?
+       p_module_config->b_dirty = VLC_FALSE;
+
+       if(val.psz_string) free(val.psz_string);
+    }
 
     finish( p_module_config, bycat );
     if( !l )
@@ -473,6 +487,17 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
                       config_FindConfig( VLC_OBJECT(p_intf), configname );
     if( p_config )
     {
+       if(p_config->pf_update_list) 
+        {
+            vlc_value_t val;
+            val.i_int = p_config->value.i;
+            p_config->pf_update_list(VLC_OBJECT(p_intf), configname, val, val, NULL);
+            // assume in any case that dirty was set to VLC_TRUE
+            // because lazy programmes will use the same callback for
+            // this, like the one behind the refresh push button?
+            p_config->b_dirty = VLC_FALSE;
+        }
+
         for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
         {
             combo->addItem( qfu( p_config->ppsz_list_text[i_index] ),
@@ -837,7 +862,20 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     combo = new QComboBox();
     combo->setMinimumWidth( MINWIDTH_BOX );
 
-    module_config_t *p_module_config = config_FindConfig( p_this, getName() );
+    module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
+    if(p_module_config && p_module_config->pf_update_list) 
+    {
+       vlc_value_t val;
+       val.i_int = p_module_config->value.i;
+       
+       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+
+       // assume in any case that dirty was set to VLC_TRUE
+       // because lazy programmes will use the same callback for
+       // this, like the one behind the refresh push button?
+       p_module_config->b_dirty = VLC_FALSE;
+    }
+
 
     finish( p_module_config, bycat );
     if( !l )

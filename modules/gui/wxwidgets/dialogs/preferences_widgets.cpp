@@ -563,7 +563,26 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
     combo = new wxComboBox( this, -1, wxT(""),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY );
-    UpdateCombo( p_item );
+
+    // was required to do so - because local p_item is a memcpy of
+    // this one, so it won't see the change done by pf_updat_list
+    module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
+    if(p_module_config && p_module_config->pf_update_list)
+    {
+       vlc_value_t val;
+       val.psz_string = strdup(p_module_config->value.psz);
+
+       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+
+       // assume in a×y case that dirty was set to VLC_TRUE
+       // because lazy programmes will use the same callback for
+       // this, like the one behind the refresh push button?
+       p_module_config->b_dirty = VLC_FALSE;
+
+       if(val.psz_string) free(val.psz_string);
+    }
+
+    UpdateCombo( p_module_config );
 
     combo->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -793,7 +812,21 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *p_this,
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY );
 
-    UpdateCombo( p_item );
+    module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
+    if(p_module_config && p_module_config->pf_update_list)
+    {
+       vlc_value_t val;
+       val.i_int = p_module_config->value.i;
+
+       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+
+       // assume in any case that dirty was set to VLC_TRUE
+       // because lazy programmes will use the same callback for
+       // this, like the one behind the refresh push button?
+       p_module_config->b_dirty = VLC_FALSE;
+    }
+
+    UpdateCombo( p_module_config );
 
     combo->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );

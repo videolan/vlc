@@ -169,6 +169,7 @@ struct module_config_t
     int         *pi_list;                              /* Idem for integers */
     char       **ppsz_list_text;          /* Friendly names for list values */
     int          i_list;                               /* Options list size */
+    vlc_callback_t pf_update_list; /*callback to initialize dropdownlists */
 
     /* Actions list */
     vlc_callback_t *ppf_action;    /* List of possible actions for a config */
@@ -435,19 +436,22 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
     vlc_config_set (p_config, VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (char *)), \
                     (const char *const *)(list), \
-                    (const char *const *)(list_text))
+                    (const char *const *)(list_text), \
+                    list_update_func)
 
 #define change_integer_list( list, list_text, list_update_func ) \
     vlc_config_set (p_config, VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (int)), \
                     (const int *)(list), \
-                    (const char *const *)(list_text))
+                    (const char *const *)(list_text), \
+                    list_update_func)
 
 #define change_float_list( list, list_text, list_update_func ) \
     vlc_config_set (p_config, VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (float)), \
                     (const float *)(list), \
-                    (const char *const *)(list_text))
+                    (const char *const *)(list_text), \
+                    list_update_func)
 
 #define change_integer_range( minv, maxv ) \
     vlc_config_set (p_config, VLC_CONFIG_RANGE, (int)(minv), (int)(maxv))

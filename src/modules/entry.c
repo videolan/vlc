@@ -368,6 +368,7 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             }
 
             item->i_list = len;
+            item->pf_update_list = va_arg (ap, vlc_callback_t);
             ret = 0;
             break;
         }
