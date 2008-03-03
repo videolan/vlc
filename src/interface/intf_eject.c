@@ -100,6 +100,7 @@ static int EjectSCSI ( int i_fd );
  */
 int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
+    VLC_UNUSED(p_this);
     int i_ret = VLC_SUCCESS;
 
 #ifdef __APPLE__
