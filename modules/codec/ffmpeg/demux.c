@@ -312,7 +312,7 @@ static int Demux( demux_t *p_demux )
     memcpy( p_frame->p_buffer, pkt.data, pkt.size );
 
     i_start_time = ( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE ) ?
-        p_sys->ic->start_time : 0;
+        ( p_sys->ic->start_time / AV_TIME_BASE )  : 0;
 
     p_frame->i_dts = ( pkt.dts == (int64_t)AV_NOPTS_VALUE ) ?
         0 : (pkt.dts - i_start_time) * 1000000 *
