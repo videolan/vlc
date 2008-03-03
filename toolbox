@@ -221,7 +221,7 @@ if test "${action}" = "distclean"
 then
   set -x
   # a naive sanity check to make sure we are in a VLC tree
-  test -f vlc.mandriva.spec -a -f vlc.win32.nsi.in || exit 1
+  test -f vlc-config.in.in -a -f src/libvlc.c || exit 1
   # let's rock!
   find . -false -path './extras/contrib/*' -type f '(' -name '*.[oa]' -o -name '*.l[oa]' -o -name '*.so' -o -name '*.sl' -o -name '*.dylib' -o -name '*.dll' -o -name .dirstamp -o '(' '(' ! -path '\./doc/developer/Makefile\.in' ')' -a -name Makefile.in ')' -o -name 'stamp-h*' -o -name '*~' -o -name '*.bak' -o -name '*.moc.cpp' ')' -exec rm -f '{}' ';'
   (cd autotools && find . -maxdepth 1 -name '[a-z]*' -exec rm -f '{}' ';')
