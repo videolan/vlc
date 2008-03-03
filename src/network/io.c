@@ -54,7 +54,6 @@
 #   include <poll.h>
 #endif
 
-#include <vlc_common.h>
 #include <vlc_network.h>
 
 #ifndef INADDR_ANY
