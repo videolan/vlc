@@ -875,6 +875,9 @@ module_config_t *module_GetConfig( const module_t *module, unsigned *restrict ps
     assert( psize != NULL );
     *psize = 0;
 
+    if( !config )
+        return NULL;
+
     for( i = 0, j = 0; i < size; i++ )
     {
         const module_config_t *item = module->p_config + i;
@@ -883,8 +886,7 @@ module_config_t *module_GetConfig( const module_t *module, unsigned *restrict ps
          || item->b_removed /* removed option */ )
             continue;
 
-        if( config != NULL )
-            memcpy( config + j, item, sizeof( *config ) );
+        memcpy( config + j, item, sizeof( *config ) );
         j++;
     }
     *psize = j;
