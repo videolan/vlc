@@ -62,6 +62,11 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     // Stats
     p_playlist->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
+    if( !p_playlist->p_stats )
+    {
+        vlc_object_release( p_playlist );
+        return;
+    }
     vlc_mutex_init( p_playlist, &p_playlist->p_stats->lock );
     p_playlist->p_stats_computer = NULL;
 
