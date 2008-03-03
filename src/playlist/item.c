@@ -715,6 +715,9 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
 {
     vlc_value_t val;
     playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t) );
+    if( !p_add )
+        return;
+
     p_add->i_item = i_item_id;
     p_add->i_node = i_node_id;
     val.p_address = p_add;
