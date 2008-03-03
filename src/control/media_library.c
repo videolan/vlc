@@ -122,6 +122,7 @@ void
 libvlc_media_library_save( libvlc_media_library_t * p_mlib,
                            libvlc_exception_t * p_e )
 {
+    (void)p_mlib;
     libvlc_exception_raise( p_e, "Not supported" );
 }
 
