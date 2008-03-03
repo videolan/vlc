@@ -442,11 +442,11 @@ void rootwrap (void)
 int rootwrap_bind (int family, int socktype, int protocol,
                    const struct sockaddr *addr, size_t alen)
 {
-    VLC_UNUSED(family);
-    VLC_UNUSED(socktype);
-    VLC_UNUSED(protocol);
-    VLC_UNUSED(addr);
-    VLC_UNUSED(alen);
+    (void)family;
+    (void)socktype;
+    (void)protocol;
+    (void)addr;
+    (void)alen;
     return -1;
 }
 
