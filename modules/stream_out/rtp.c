@@ -1209,13 +1209,10 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     vlc_mutex_unlock( &p_sys->lock_es );
 
     /* Release port */
-    if( id->i_port > 0 )
-    {
-        if( id->i_cat == AUDIO_ES && p_sys->i_port_audio == 0 )
-            p_sys->i_port_audio = id->i_port;
-        else if( id->i_cat == VIDEO_ES && p_sys->i_port_video == 0 )
-            p_sys->i_port_video = id->i_port;
-    }
+    if( id->i_port == var_GetInteger( p_stream, "port-audio" ) )
+        p_sys->i_port_audio = id->i_port;
+    if( id->i_port == var_GetInteger( p_stream, "port-video" ) )
+        p_sys->i_port_video = id->i_port;
 
     free( id->psz_fmtp );
 
