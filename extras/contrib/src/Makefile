@@ -1486,7 +1486,7 @@ endif
 
 CLEAN_FILE += .qt4_win32
 CLEAN_PKG += qt4_win32
-DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
+DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.bz2
 
 # ***************************************************************************
 # qt4 (trolltech binaries)
