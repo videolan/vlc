@@ -2181,13 +2181,12 @@ static int InputSourceInit( input_thread_t *p_input,
     if( !p_input ) return VLC_EGENERIC;
 
     /* Split uri */
+    MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
+
+    msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
+             psz_mrl, psz_access, psz_demux, psz_path );
     if( !p_input->b_preparsing )
     {
-        MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
-
-        msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
-                 psz_mrl, psz_access, psz_demux, psz_path );
-
         /* Hack to allow udp://@:port syntax */
         if( !psz_access ||
             (strncmp( psz_access, "udp", 3 ) &&
@@ -2227,12 +2226,14 @@ static int InputSourceInit( input_thread_t *p_input,
     }
     else
     {
-        psz_path = psz_dup;
-        if( !strncmp( psz_path, "file://", 7 ) )
-            psz_path += 7;
+        /* Preparsing is only for file:// */
+        if( psz_demux && *psz_demux )
+            goto error;
+        if( !psz_access || !*psz_access ) /* path without scheme:// */
+            psz_access = "file";
+        if( strcmp( psz_access, "file" ) )
+            goto error;
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
-        psz_demux = "";
-        psz_access = "file";
     }
 
     if( in->p_demux )
