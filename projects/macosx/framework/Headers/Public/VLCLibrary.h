@@ -27,6 +27,10 @@
 #import "VLCMediaList.h"
 #import "VLCMedia.h"
 
+
+extern void * CreateSharedLibraryOnStartup( void ) __attribute__((constructor));
+extern void * DestroySharedLibraryAtExit( void ) __attribute__((destructor));
+
 @class VLCAudio;
 
 /**
