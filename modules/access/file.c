@@ -380,16 +380,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
 static char *expand_path (const access_t *p_access, const char *path)
 {
-    if (strncmp (path, "~/", 2) == 0)
-    {
-        char *res;
-
-         // TODO: we should also support the ~cmassiot/ syntax
-         if (asprintf (&res, "%s/%s", p_access->p_libvlc->psz_homedir, path + 2) == -1)
-             return NULL;
-         return res;
-    }
-
 #if defined(WIN32)
     if (!strcasecmp (p_access->psz_access, "file")
       && ('/' == path[0]) && path[1] && (':' == path[2]) && ('/' == path[3]))
