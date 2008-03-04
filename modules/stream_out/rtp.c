@@ -217,7 +217,7 @@ static void SDPHandleUrl( sout_stream_t *, char * );
 
 static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
-static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
+static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t * );
 
 struct sout_stream_sys_t
 {
@@ -1312,7 +1312,7 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
                           httpd_file_t *, uint8_t *p_request,
                           uint8_t **pp_data, int *pi_data );
 
-static int HttpSetup( sout_stream_t *p_stream, vlc_url_t *url)
+static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t *url)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
