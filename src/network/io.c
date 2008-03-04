@@ -125,12 +125,15 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 #endif
 
 #ifdef DCCP_SOCKOPT_SERVICE
-    char *dccps = var_CreateGetNonEmptyString (p_this, "dccp-service");
-    if (dccps != NULL)
+    if (socktype == SOL_DCCP)
     {
-        setsockopt (fd, SOL_DCCP, DCCP_SOCKOPT_SERVICE, dccps,
-                    (strlen (dccps) + 3) & ~3);
-        free (dccps);
+        char *dccps = var_CreateGetNonEmptyString (p_this, "dccp-service");
+        if (dccps != NULL)
+        {
+            setsockopt (fd, SOL_DCCP, DCCP_SOCKOPT_SERVICE, dccps,
+                        (strlen (dccps) + 3) & ~3);
+            free (dccps);
+        }
     }
 #endif
 
