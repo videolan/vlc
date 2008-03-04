@@ -811,17 +811,21 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
         /* jump in the movie */
         if( i_yPos <= (i_height-30) )
         {
-            vlc_int64_t f_length;
-            libvlc_exception_init( &ex );
-            f_length = libvlc_media_instance_get_length( p_md, &ex ) / 100;
-            libvlc_exception_clear( &ex );
+            /* if a movie is loaded */
+            if( p_md )
+            {
+                vlc_int64_t f_length;
+                libvlc_exception_init( &ex );
+                f_length = libvlc_media_instance_get_length( p_md, &ex ) / 100;
+                libvlc_exception_clear( &ex );
 
-            f_length = (float)f_length *
-                    ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
+                f_length = (float)f_length *
+                        ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
 
-            libvlc_exception_init( &ex );
-            libvlc_media_instance_set_time( p_md, f_length, &ex );
-            libvlc_exception_clear( &ex );
+                libvlc_exception_init( &ex );
+                libvlc_media_instance_set_time( p_md, f_length, &ex );
+                libvlc_exception_clear( &ex );
+            }
         }
 
         /* play/pause toggle */
