@@ -618,9 +618,6 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     int             i_val, i_handle = -1;
     vlc_bool_t      b_unreach = VLC_FALSE;
 
-    if( i_port == 0 )
-        i_port = 1234; /* historical VLC thing */
-
     if( i_hlim < 1 )
         i_hlim = var_CreateGetInteger( p_this, "ttl" );
 
