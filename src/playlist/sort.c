@@ -197,10 +197,6 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             {
                 DO_META_SORT( Description );
             }
-            else if( i_mode == SORT_RATING )
-            {
-                DO_META_SORT( Rating );
-            }
             else if( i_mode == SORT_ID )
             {
                 i_test = pp_items[i]->i_id - pp_items[i_small]->i_id;
