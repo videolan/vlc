@@ -820,7 +820,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
                 libvlc_exception_clear( &ex );
 
                 f_length = (float)f_length *
-                        ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
+                           ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
 
                 libvlc_exception_init( &ex );
                 libvlc_media_instance_set_time( p_md, f_length, &ex );
@@ -860,7 +860,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
             libvlc_exception_clear( &ex );
 
-            if( i_playing == 1 )
+            if( (i_playing == 1) && p_md )
             {
                 libvlc_exception_init( &ex );
                 libvlc_set_fullscreen( p_md, 1, &ex );
@@ -875,7 +875,8 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
             libvlc_exception_clear( &ex );
         }
-        libvlc_media_instance_release( p_md );
+        
+        if( p_md ) libvlc_media_instance_release( p_md );
     }
     Redraw( w, closure, event );
 }
