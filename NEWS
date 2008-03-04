@@ -30,8 +30,8 @@ Important notes:
     These new commands are also available in the telnet interface.
  * The "rtp" access output module has been removed:
    Please use the RTP stream output instead, e.g.:
-     Old: '#std{access=rtp,dst=239.255.1.2,sap}'
-     New: '#rtp{dst=239.255.1.2,sap}'
+     Old: '#std{access=rtp,mux=ts,dst=239.255.1.2:5004,sap}'
+     New: '#rtp{mux=ts,dst=239.255.1.2,port=5004,sap}'
  * You now need to append --m3u-extvlcopt to your command line to enable
    EXTVLCOPT options parsing in m3u playlists. Note that only a limited set
    of options is available to m3u playlists (CVE-2007-6683).

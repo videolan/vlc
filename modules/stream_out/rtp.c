@@ -173,11 +173,11 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "proto", "udp", NULL, PROTO_TEXT,
                 PROTO_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_protos, ppsz_protocols, NULL );
-    add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, PORT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port", 50004, NULL, PORT_TEXT,
                  PORT_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "port-audio", 1230, NULL, PORT_AUDIO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-audio", 50000, NULL, PORT_AUDIO_TEXT,
                  PORT_AUDIO_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "port-video", 1232, NULL, PORT_VIDEO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-video", 50002, NULL, PORT_VIDEO_TEXT,
                  PORT_VIDEO_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
