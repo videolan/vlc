@@ -139,6 +139,9 @@ void PLItem::updateColumnHeaders()
             case VLC_META_ENGINE_RATING:
                 item_col_strings.append( qtr( VLC_META_RATING ) );
                 break;
+            case VLC_META_ENGINE_TRACKID:
+                item_col_strings.append( qtr( VLC_META_TRACKID ) );
+                break;
             default:
                 break;
             }
@@ -257,6 +260,10 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                 break;
             case VLC_META_ENGINE_RATING:
                 ADD_META( p_item, Rating );
+                break;
+            case VLC_META_ENGINE_TRACKID:
+                item_col_strings.append( QString::number( p_item->i_id ) );
+                break;
             default:
                 break;
             }

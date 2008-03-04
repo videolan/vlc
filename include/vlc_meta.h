@@ -206,8 +206,9 @@ struct meta_export_t
 #define VLC_META_ENGINE_DATE            0x00000200
 #define VLC_META_ENGINE_URL             0x00000400
 #define VLC_META_ENGINE_LANGUAGE        0x00000800
+#define VLC_META_ENGINE_TRACKID         0x00001000
 
-#define VLC_META_ENGINE_ART_URL         0x00001000
+#define VLC_META_ENGINE_ART_URL         0x00002000
 
 #if 0 /* unused (yet?) */
 #define VLC_META_ENGINE_MB_ARTIST_ID    0x00002000

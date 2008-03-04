@@ -736,6 +736,7 @@ void PLModel::sort( int column, Qt::SortOrder order )
     CHECK_COLUMN( SEQ_NUM );
     CHECK_COLUMN( DESCRIPTION );
     CHECK_COLUMN( RATING );
+    CHECK_COLUMN( TRACKID );
 
 #undef CHECK_COLUMN;
 
@@ -756,6 +757,7 @@ next:
         case VLC_META_ENGINE_SEQ_NUM:    i_mode = SORT_TRACK_NUMBER;     break;
         case VLC_META_ENGINE_DESCRIPTION:i_mode = SORT_DESCRIPTION;      break;
         case VLC_META_ENGINE_RATING:     i_mode = SORT_RATING;           break;
+        case VLC_META_ENGINE_TRACKID:    i_mode = SORT_ID;               break;
         default:                         i_mode = SORT_TITLE_NODES_FIRST;break;
         }
         if( p_root )
@@ -847,6 +849,10 @@ void PLModel::viewchanged( int meta )
             index=6; break;
         case VLC_META_ENGINE_DESCRIPTION:
             index=7; break;
+        case VLC_META_ENGINE_RATING:
+            index=8; break;
+        case VLC_META_ENGINE_TRACKID:
+            index=9; break;
         default:
             break;
         }

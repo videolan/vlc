@@ -282,6 +282,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     ADD_META_ACTION( SEQ_NUM );
     ADD_META_ACTION( DESCRIPTION );
     ADD_META_ACTION( RATING );
+    ADD_META_ACTION( TRACKID );
 
 #undef ADD_META_ACTION
 

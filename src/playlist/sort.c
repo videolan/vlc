@@ -199,6 +199,10 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             {
                 DO_META_SORT( Rating );
             }
+            else if( i_mode == SORT_ID )
+            {
+                i_test = pp_items[i]->i_id - pp_items[i_small]->i_id;
+            }
             else if( i_mode == SORT_TITLE_NODES_FIRST )
             {
                 /* Alphabetic sort, all nodes first */
