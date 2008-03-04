@@ -422,10 +422,9 @@ static inline void input_ChangeState( input_thread_t *p_input, int state )
 
 /* Access */
 
-#define access2_New( a, b, c, d, e ) __access2_New(VLC_OBJECT(a), b, c, d, e )
+#define access2_New( a, b, c, d ) __access2_New(VLC_OBJECT(a), b, c, d )
 access_t * __access2_New( vlc_object_t *p_obj, const char *psz_access,
-                          const char *psz_demux, const char *psz_path,
-                          vlc_bool_t b_quick );
+                          const char *psz_demux, const char *psz_path );
 access_t * access2_FilterNew( access_t *p_source,
                               const char *psz_access_filter );
 void access2_Delete( access_t * );

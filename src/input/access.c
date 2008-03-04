@@ -34,7 +34,7 @@
  *****************************************************************************/
 static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_access,
                                       const char *psz_demux, const char *psz_path,
-                                      access_t *p_source, vlc_bool_t b_quick )
+                                      access_t *p_source )
 {
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
@@ -55,22 +55,11 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     }
     else
     {
+        msg_Dbg( p_obj, "creating access '%s' path='%s'",
+                 psz_access, psz_path );
         p_access->psz_path   = strdup( psz_path );
-        if( b_quick )
-        {
-            if( strncmp( psz_path, "file://", 7 ) == 0 )
-                p_access->psz_access = strdup( "" );
-            else
-                p_access->psz_access = strdup( "file" );
-        }
-        else
-            p_access->psz_access = strdup( psz_access );
-
+        p_access->psz_access = strdup( psz_access );
         p_access->psz_demux  = strdup( psz_demux );
-
-        if( !b_quick )
-            msg_Dbg( p_obj, "creating access '%s' path='%s'",
-                     psz_access, psz_path );
     }
 
     p_access->pf_read    = NULL;
@@ -119,10 +108,10 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
  * access2_New:
  *****************************************************************************/
 access_t *__access2_New( vlc_object_t *p_obj, const char *psz_access,
-                         const char *psz_demux, const char *psz_path, vlc_bool_t b_quick )
+                         const char *psz_demux, const char *psz_path )
 {
     return access2_InternalNew( p_obj, psz_access, psz_demux,
-                                psz_path, NULL, b_quick );
+                                psz_path, NULL );
 }
 
 /*****************************************************************************
@@ -131,7 +120,7 @@ access_t *__access2_New( vlc_object_t *p_obj, const char *psz_access,
 access_t *access2_FilterNew( access_t *p_source, const char *psz_access_filter )
 {
     return access2_InternalNew( VLC_OBJECT(p_source), psz_access_filter,
-                                NULL, NULL, p_source, VLC_FALSE );
+                                NULL, NULL, p_source );
 }
 
 /*****************************************************************************
