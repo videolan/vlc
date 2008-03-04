@@ -439,7 +439,7 @@ static int DemuxPacket( demux_t *p_demux )
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-    i_packet_size_left = i_packet_length - i_packet_padding_length;
+    i_packet_size_left = i_packet_length;
 
     if( b_packet_multiple_payload )
     {
@@ -520,7 +520,8 @@ static int DemuxPacket( demux_t *p_demux )
         }
         else
         {
-            i_payload_data_length = i_packet_length - i_skip;
+            i_payload_data_length = i_packet_length -
+                                    i_packet_padding_length - i_skip;
         }
 
         if( i_payload_data_length < 0 || i_payload_data_length > i_packet_size_left )
@@ -623,8 +624,13 @@ static int DemuxPacket( demux_t *p_demux )
 
     if( i_packet_size_left > 0 )
     {
-        msg_Warn( p_demux, "Didn't read %d bytes in the packet",
-                            i_packet_size_left );
+        if( i_packet_size_left > i_packet_padding_length )
+            msg_Warn( p_demux, "Didn't read %d bytes in the packet",
+                            i_packet_size_left - i_packet_padding_length );
+        else if( i_packet_size_left < i_packet_padding_length )
+            msg_Warn( p_demux, "Read %d too much bytes in the packet",
+                            i_packet_padding_length - i_packet_size_left );
+
         if( stream_Read( p_demux->s, NULL, i_packet_size_left )
                                                          < i_packet_size_left )
         {
@@ -632,14 +638,6 @@ static int DemuxPacket( demux_t *p_demux )
             return 0;
         }
     }
-
-    if( i_packet_padding_length > 0 )
-        if( stream_Read( p_demux->s, NULL, i_packet_padding_length )
-                                                    < i_packet_padding_length )
-        {
-            msg_Err( p_demux, "cannot skip padding data, EOF ?" );
-            return 0;
-        }
 
     return 1;
 
