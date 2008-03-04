@@ -88,7 +88,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         /* setup the creator / revision field */
         if( VLC_Changeset() != "exported" )
             [o_revision_field setStringValue:
-                [NSString stringWithFormat: _NS("Compiled by %s, based on SVN revision %s"), 
+                [NSString stringWithFormat: _NS("Compiled by %s, based on Git commit %s"),
                     VLC_CompileBy(), VLC_Changeset()]];
         else
             [o_revision_field setStringValue: 

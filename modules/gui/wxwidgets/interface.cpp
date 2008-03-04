@@ -958,7 +958,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
        wxU(_("Compiled by "))+ wxU(VLC_CompileBy())+ wxU("@") +
        wxU(VLC_CompileHost())+ wxT(".")+ wxU(VLC_CompileDomain())+ wxT(".\n") +
        wxU(_("Compiler: "))+ wxU(VLC_Compiler())+wxT( ".\n") +
-       wxU(_("Based on SVN revision: "))+wxU(VLC_Changeset())+wxT(".\n\n") +
+       wxU(_("Based on Git commit: "))+wxU(VLC_Changeset())+wxT(".\n\n") +
 #ifdef __WXMSW__
         wxU( vlc_wraptext(LICENSE_MSG,WRAPCOUNT) ) + wxT("\n\n") +
 #else

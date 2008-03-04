@@ -1810,7 +1810,7 @@ static void Version( void )
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
     utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
     if( strcmp( VLC_Changeset(), "exported" ) )
-        utf8_fprintf( stdout, _("Based upon svn changeset [%s]\n"),
+        utf8_fprintf( stdout, _("Based upon Git commit [%s]\n"),
                  VLC_Changeset() );
     utf8_fprintf( stdout, LICENSE_MSG );
 
