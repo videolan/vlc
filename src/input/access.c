@@ -39,10 +39,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
     if( p_access == NULL )
-    {
-        msg_Err( p_obj, "vlc_object_create() failed" );
         return NULL;
-    }
 
     /* Parse URL */
     p_access->p_source = p_source;
@@ -50,17 +47,15 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     {
         msg_Dbg( p_obj, "creating access filter '%s'", psz_access );
         p_access->psz_access = strdup( p_source->psz_access );
-        p_access->psz_path   = strdup( p_source->psz_path );
-        p_access->psz_demux   = strdup( p_source->psz_demux );
     }
     else
     {
         msg_Dbg( p_obj, "creating access '%s' path='%s'",
                  psz_access, psz_path );
         p_access->psz_path   = strdup( psz_path );
-        p_access->psz_access = strdup( psz_access );
-        p_access->psz_demux  = strdup( psz_demux );
     }
+    p_access->psz_access = strdup( psz_access );
+    p_access->psz_demux  = strdup( psz_demux );
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
@@ -79,16 +74,9 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     /* Before module_Need (for var_Create...) */
     vlc_object_attach( p_access, p_obj );
 
-    if( p_source )
-    {
-        p_access->p_module =
-            module_Need( p_access, "access_filter", psz_access, VLC_TRUE );
-    }
-    else
-    {
-        p_access->p_module =
-            module_Need( p_access, "access2", p_access->psz_access, VLC_TRUE );
-    }
+    p_access->p_module =
+         module_Need( p_access, p_source ? "access_filter" : "access2",
+                      psz_access, VLC_TRUE );
 
     if( p_access->p_module == NULL )
     {
@@ -120,7 +108,8 @@ access_t *__access2_New( vlc_object_t *p_obj, const char *psz_access,
 access_t *access2_FilterNew( access_t *p_source, const char *psz_access_filter )
 {
     return access2_InternalNew( VLC_OBJECT(p_source), psz_access_filter,
-                                NULL, NULL, p_source );
+                                p_source->psz_demux, p_source->psz_path,
+                                p_source );
 }
 
 /*****************************************************************************
