@@ -117,7 +117,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 }
 
 
-#define DO_META_SORT( node ) { \
+#define DO_META_SORT_ADV( node, integer ) { \
     char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
     char *psz_b = input_item_GetMeta( pp_items[i_small]->p_input, vlc_meta_##node ); \
     /* Nodes go first */ \
@@ -144,11 +144,13 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     } \
     else \
     { \
-        i_test = strcmp( psz_a, psz_b ); \
+        if( !integer ) i_test = strcmp( psz_a, psz_b ); \
+        else           i_test = atoi( psz_a ) - atoi( psz_b ); \
     } \
     free( psz_a ); \
     free( psz_b ); \
 }
+#define DO_META_SORT( node ) DO_META_SORT_ADV( node, VLC_FALSE )
 
     for( i_position = 0; i_position < i_items -1 ; i_position ++ )
     {
@@ -189,7 +191,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             }
             else if( i_mode == SORT_TRACK_NUMBER )
             {
-                DO_META_SORT( TrackNumber );
+                DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
             }
             else if( i_mode == SORT_DESCRIPTION )
             {
@@ -234,5 +236,8 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
         pp_items[i_position] = pp_items[i_small];
         pp_items[i_small] = p_temp;
     }
+#undef DO_META_SORT
+#undef DO_META_SORT_ADV
+
     return VLC_SUCCESS;
 }
