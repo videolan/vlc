@@ -2303,17 +2303,6 @@ static int InputSourceInit( input_thread_t *p_input,
                                         psz_access, psz_demux, psz_path,
                                         p_input->b_preparsing );
         }
-        /* access failed, maybe our access detection was wrong.
-         * Retry with the full name */
-        if( in->p_access == NULL && strchr( psz_mrl, ':' ) )
-        {
-            msg_Dbg( p_input, "retrying with access `' demux `' path `%s'",
-                     psz_mrl );
-            psz_demux =  "" ; 
-            in->p_access = access2_New( p_input,
-                                         "", "", psz_mrl,
-                                         p_input->b_preparsing );
-        }
         if( in->p_access == NULL )
         {
             msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
