@@ -71,7 +71,7 @@ def get_cflags():
 def get_ldflags():
     vlcconfig=get_vlcconfig()
     if vlcconfig is None:
-        return [ '-lvlc', '-lvlc-control' ]
+        return [ '-lvlc-control' ]
     else:
 	ldflags = []
 	if os.sys.platform == 'darwin':
