@@ -2201,7 +2201,7 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             psz_demux = psz_forced_demux;
         }
-        else if( !psz_demux || *psz_demux == '\0' )
+        else if( *psz_demux == '\0' )
         {
             /* special hack for forcing a demuxer with --demux=module
              * (and do nothing with a list) */
@@ -2227,9 +2227,9 @@ static int InputSourceInit( input_thread_t *p_input,
     else
     {
         /* Preparsing is only for file:// */
-        if( psz_demux && *psz_demux )
+        if( *psz_demux )
             goto error;
-        if( !psz_access || !*psz_access ) /* path without scheme:// */
+        if( !*psz_access ) /* path without scheme:// */
             psz_access = "file";
         if( strcmp( psz_access, "file" ) )
             goto error;
