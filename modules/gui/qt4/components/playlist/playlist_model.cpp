@@ -715,18 +715,48 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
 /******* Volume III: Sorting and searching ********/
 void PLModel::sort( int column, Qt::SortOrder order )
 {
+    int i_index = -1;
+    int i_flag = 0;
+
+#define CHECK_COLUMN( meta )                        \
+{                                                   \
+    if( ( shownFlags() & VLC_META_ENGINE_##meta ) ) \
+        i_index++;                                  \
+    if( column == i_index )                         \
+    {                                               \
+        i_flag = VLC_META_ENGINE_##meta;            \
+        goto next;                                  \
+    }                                               \
+}
+    CHECK_COLUMN( TITLE );
+    CHECK_COLUMN( DURATION );
+    CHECK_COLUMN( ARTIST );
+    CHECK_COLUMN( GENRE );
+    CHECK_COLUMN( COLLECTION );
+    CHECK_COLUMN( SEQ_NUM );
+    CHECK_COLUMN( DESCRIPTION );
+    CHECK_COLUMN( RATING );
+
+#undef CHECK_COLUMN;
+
+next:
     PL_LOCK;
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         rootItem->i_id,
                                                         VLC_TRUE );
         int i_mode;
-        switch( column )
+        switch( i_flag )
         {
-        case 0: i_mode = SORT_TITLE_NODES_FIRST;break;
-        case 1: i_mode = SORT_DURATION; break;
-        case 2: i_mode = SORT_ARTIST;break;
-        default: i_mode = SORT_TITLE_NODES_FIRST; break;
+        case VLC_META_ENGINE_TITLE:      i_mode = SORT_TITLE_NODES_FIRST;break;
+        case VLC_META_ENGINE_DURATION:   i_mode = SORT_DURATION;         break;
+        case VLC_META_ENGINE_ARTIST:     i_mode = SORT_ARTIST;           break;
+        case VLC_META_ENGINE_GENRE:      i_mode = SORT_GENRE;            break;
+        case VLC_META_ENGINE_COLLECTION: i_mode = SORT_ALBUM;            break;
+        case VLC_META_ENGINE_SEQ_NUM:    i_mode = SORT_TRACK_NUMBER;     break;
+        case VLC_META_ENGINE_DESCRIPTION:i_mode = SORT_DESCRIPTION;      break;
+        case VLC_META_ENGINE_RATING:     i_mode = SORT_RATING;           break;
+        default:                         i_mode = SORT_TITLE_NODES_FIRST;break;
         }
         if( p_root )
         {

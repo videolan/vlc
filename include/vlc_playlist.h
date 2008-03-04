@@ -259,6 +259,9 @@ struct playlist_add_t
 #define SORT_DURATION 6
 #define SORT_TITLE_NUMERIC 7
 #define SORT_ALBUM 8
+#define SORT_TRACK_NUMBER 9
+#define SORT_DESCRIPTION 10
+#define SORT_RATING 11
 
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1

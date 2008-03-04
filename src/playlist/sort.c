@@ -115,7 +115,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     free( psz_i ); \
     free( psz_ismall ); \
 }
- 
+
 
 #define DO_META_SORT( node ) { \
     char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
@@ -179,9 +179,25 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             {
                 DO_META_SORT( Artist );
             }
+            else if( i_mode == SORT_GENRE )
+            {
+                DO_META_SORT( Genre );
+            }
             else if( i_mode == SORT_ALBUM )
             {
                 DO_META_SORT( Album );
+            }
+            else if( i_mode == SORT_TRACK_NUMBER )
+            {
+                DO_META_SORT( TrackNumber );
+            }
+            else if( i_mode == SORT_DESCRIPTION )
+            {
+                DO_META_SORT( Description );
+            }
+            else if( i_mode == SORT_RATING )
+            {
+                DO_META_SORT( Rating );
             }
             else if( i_mode == SORT_TITLE_NODES_FIRST )
             {
