@@ -1384,10 +1384,10 @@ const char vlc_usage[] = N_(
     "\n  [dvd://][device][@raw_device]  DVD device"
     "\n  [vcd://][device]               VCD device"
     "\n  [cdda://][device]              Audio CD device"
-    "\n  udp:[[<source address>]@[<bind address>][:<bind port>]]"
+    "\n  udp://[[<source address>]@[<bind address>][:<bind port>]]"
     "\n                                 UDP stream sent by a streaming server"
-    "\n  vlc:pause:<seconds>            Special item to pause the playlist for a certain time"
-    "\n  vlc:quit                       Special item to quit VLC"
+    "\n  vlc://pause:<seconds>          Special item to pause the playlist for a certain time"
+    "\n  vlc://quit                     Special item to quit VLC"
     "\n");
 
 /*
