@@ -144,7 +144,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     } \
     else \
     { \
-        i_test = strcmp( psz_b, psz_a ); \
+        i_test = strcmp( psz_a, psz_b ); \
     } \
     free( psz_a ); \
     free( psz_b ); \
