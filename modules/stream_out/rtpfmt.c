@@ -1,5 +1,5 @@
 /*****************************************************************************
- * rtp.c: rtp stream output module
+ * rtpfmt.c: RTP payload formats
  *****************************************************************************
  * Copyright (C) 2003-2004 the VideoLAN team
  * Copyright © 2007 Rémi Denis-Courmont
