@@ -332,7 +332,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 #else
                 errno = EINTR;
 #endif
-                goto error;
+                goto silent;
             }
         }
 
@@ -403,6 +403,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
 
 error:
     msg_Err (p_this, "Read error: %m");
+silent:
     return -1;
 }
 
