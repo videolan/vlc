@@ -134,6 +134,7 @@ Kenneth Self <kens at campoz DoT. fslife _dOt co dOT- uk> - BDA capture plugin
 Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation 
 kty0ne - WinAmp 5 skin for VLC
 K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
+Koehler, Vitally <vkoehler AT telekom de> -  solves the problem of audio packet losses by the playback of MPEG2 transport stream.
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
 Leo Spalteholz <leo dot spalteholz at gmail dot com> - Qt interface design
