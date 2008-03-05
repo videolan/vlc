@@ -151,9 +151,12 @@ static int Demux( demux_t *p_demux )
 
         if( p_demux->b_die )
             break;
+#if 0
+        /* FIXME: returns EOF too early for some mms streams */
         if( p_sys->i_data_end >= 0 &&
                 stream_Tell( p_demux->s ) >= p_sys->i_data_end )
             return 0; /* EOF */
+#endif
 
         /* Check if we have concatenated files */
         if( stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
@@ -439,7 +442,8 @@ static int DemuxPacket( demux_t *p_demux )
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-    i_packet_size_left = i_packet_length;
+    /* FIXME I have to do that for some file, I don't known why */
+    i_packet_size_left = i_data_packet_min /*i_packet_length*/ ;
 
     if( b_packet_multiple_payload )
     {
