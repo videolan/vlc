@@ -1,0 +1,5 @@
+SOURCES_access_rtmp = \
+        access.c \
+        rtmp_amf_flv.c \
+        rtmp_amf_flv.h \
+        $(NULL)

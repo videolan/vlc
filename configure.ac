@@ -3308,6 +3308,15 @@ if test "${enable_realrtsp}" = "yes"; then
 fi
 
 dnl
+dnl  RTMP plugin
+dnl
+AC_ARG_ENABLE(rtmp,
+  [  --enable-rtmp           RTMP module (default disabled)])
+if test "${enable_rtmp}" = "yes"; then
+  VLC_ADD_PLUGINS([access_rtmp])
+fi
+
+dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
@@ -6185,6 +6194,7 @@ AC_CONFIG_FILES([
   modules/access/mms/Makefile
   modules/access/cdda/Makefile
   modules/access/rtsp/Makefile
+  modules/access/rtmp/Makefile
   modules/access/v4l2/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile

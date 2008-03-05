@@ -161,6 +161,7 @@ Meelad Zakaria <meelad at farsiweb dot info> - Persian localisation
 Michael Mondragon <mammon at lokmail.net> - ncurses compilation fix
 Michał Trzebiatowski <hippie_1968 at hotmail dot com> - Polish translation
 Mickael Hoerdt <hoerdt at clarinet.u-strasbg.fr> - IPv6 SSM multicast patch
+Miguel Angel Cabrera <macabrera at solaiemes.com> - RTMP access patch
 Mike Schrag <mschrag at pobox dot com> - directx device selection
 Mikko Hirvonen <masse at astro dot helsinki dot fi> - Firefox-1.5.x development configure patch
 Michel Lanners <mlan at cpu.lu> - fixed typos and AltiVec detection
