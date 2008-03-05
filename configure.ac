@@ -1202,7 +1202,7 @@ VLC_ADD_PLUGINS([playlist export nsc xtag])
 VLC_ADD_PLUGINS([i420_rgb grey_yuv rawvideo blend scale image logo magnify puzzle colorthres])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au ty voc xa nuv smf])
 VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
-VLC_ADD_PLUGINS([access_http access_mms access_ftp])
+VLC_ADD_PLUGINS([access_http access_mms access_ftp access_rtmp])
 VLC_ADD_PLUGINS([access_filter_bandwidth])
 VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
@@ -3305,15 +3305,6 @@ AC_ARG_ENABLE(realrtsp,
   [  --enable-realrtsp       Real RTSP module (default disabled)])
 if test "${enable_realrtsp}" = "yes"; then
   VLC_ADD_PLUGINS([access_realrtsp])
-fi
-
-dnl
-dnl  RTMP plugin
-dnl
-AC_ARG_ENABLE(rtmp,
-  [  --enable-rtmp           RTMP module (default disabled)])
-if test "${enable_rtmp}" = "yes"; then
-  VLC_ADD_PLUGINS([access_rtmp])
 fi
 
 dnl
