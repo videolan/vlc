@@ -124,12 +124,25 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
     case PIX_FMT_YUV422:
         return VLC_FOURCC('Y','U','Y','2');
 
+#if defined(WORDS_BIGENDIAN)
+    case PIX_FMT_BGR8:
+        return VLC_FOURCC('R','G','B','8');
+    case PIX_FMT_BGR555:
+        return VLC_FOURCC('R','V','1','5');
+    case PIX_FMT_BGR565:
+        return VLC_FOURCC('R','V','1','6');
+    case PIX_FMT_BGR24:
+        return VLC_FOURCC('R','V','2','4');
+#else
+    case PIX_FMT_RGB8:
+        return VLC_FOURCC('R','G','B','8');
     case PIX_FMT_RGB555:
         return VLC_FOURCC('R','V','1','5');
     case PIX_FMT_RGB565:
         return VLC_FOURCC('R','V','1','6');
     case PIX_FMT_RGB24:
         return VLC_FOURCC('R','V','2','4');
+#endif
     case PIX_FMT_RGBA32:
         return VLC_FOURCC('R','V','3','2');
 #ifdef PIX_FMT_RGBA
@@ -141,7 +154,6 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
 
     case PIX_FMT_YUV410P:
     case PIX_FMT_YUV411P:
-    case PIX_FMT_BGR24:
     default:
         return 0;
     }
@@ -838,7 +850,12 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         {
         case PIX_FMT_YUV410P:
         case PIX_FMT_YUV411P:
+        case PIX_FMT_RGB32:
+        case PIX_FMT_RGB24:
+        case PIX_FMT_RGB8:
+        case PIX_FMT_BGR32:
         case PIX_FMT_BGR24:
+        case PIX_FMT_BGR8:
         case PIX_FMT_PAL8:
             for( i = 0; i < p_pic->i_planes; i++ )
             {
