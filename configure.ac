@@ -6271,9 +6271,14 @@ dnl for a in `./vlc-config --target plugin` ; do echo $a; done | sed -e 's,modul
 dnl Shortcut to nice compile message
 rm -f compile
 echo '#! /bin/sh' >compile
-
-echo "PATH=$PATH LANG=C make \$@ 2>&1| \\" >> compile
-echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl' >> compile
+echo rm -f .error\$\$ >>compile
+echo ERROR=0 >>compile
+echo export PATH=$PATH LANG=C >>compile
+echo "(make \$@ 2>&1 || touch .error\$\$)| \\" >>compile
+echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl' >>compile
+echo test -f .error\$\$ \&\& ERROR=1 >>compile
+echo rm -f .error\$\$ >>compile
+echo exit \$ERROR >>compile
 chmod a+x compile
 
 printf "
