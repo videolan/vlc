@@ -115,7 +115,7 @@
 
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
  * will be considered as bogus and be trashed */
-#define AOUT_MAX_ADVANCE_TIME           (mtime_t)(DEFAULT_PTS_DELAY * 3)
+#define AOUT_MAX_ADVANCE_TIME           (mtime_t)(DEFAULT_PTS_DELAY * 5)
 
 /* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
  * will cause the calling thread to sleep */
