@@ -31,6 +31,13 @@ If you want to build VLC from sources, you can do it in several ways:
   NOTE: This is the PREFERRED way of building VLC natively (the others
   are not as much tested so expect more difficulties with them).
 
+  Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
+
+- On GNU/Linux, using the mingw32 cross-compiler.
+  This method is  preferred over all the others.
+
+UNSUPPORTED METHODS
+-------------------
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
   (MSYS is a minimal build environment to compile Unixish projects under
   windoze. It provides all the common Unix tools like sh, gmake...)
@@ -45,9 +52,6 @@ If you want to build VLC from sources, you can do it in several ways:
   ( NOTE: if you want to run vlc under the msvc debugger, you need to run it
     with the --fast-mutex --win9x-cv-method=1 options because the debugger
     usually loses signals sent by PulseEvent() )
-
-- or on GNU/Linux, using the mingw32 cross-compiler.
-  This method is  preferred over all the others.
 
 Getting the right compiler tools
 ================================
