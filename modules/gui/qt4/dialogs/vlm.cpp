@@ -130,6 +130,9 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
         new QSpacerItem( 10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vlmItemLayout->addItem( spacer );
 
+    QPushButton *importButton = new QPushButton( qtr(  "Import" ) );
+    ui.buttonBox->addButton( importButton, QDialogButtonBox::ActionRole );
+
     QPushButton *exportButton = new QPushButton( qtr( "Export" ) );
     ui.buttonBox->addButton( exportButton, QDialogButtonBox::ActionRole );
 
@@ -149,6 +152,7 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
 
     BUTTONACT( closeButton, close() );
     BUTTONACT( exportButton, exportVLMConf() );
+    BUTTONACT( importButton, importVLMConf() );
     BUTTONACT( ui.addButton, addVLMItem() );
     BUTTONACT( ui.clearButton, clearWidgets() );
     BUTTONACT( ui.saveButton, saveModifications() );
@@ -270,9 +274,23 @@ bool VLMDialog::exportVLMConf()
     return false;
 }
 
-// TODO : import configuration file
+
 bool VLMDialog::importVLMConf()
 {
+    QString openVLMConfFileName = QFileDialog::getOpenFileName(
+            this, qtr( "Choose a VLM configuration file to open..." ),
+            qfu( p_intf->p_libvlc->psz_homedir ),
+            qtr( "VLM conf (*.vlm) ;; All (*.*)" ) );
+
+    if( !openVLMConfFileName.isEmpty() )
+    {
+        vlm_message_t *message;
+        QString command = "load \"" + openVLMConfFileName + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ) , &message );
+        vlm_MessageDelete( message );
+        return true;
+    }
+    return false;
 }
 
 void VLMDialog::clearWidgets()
