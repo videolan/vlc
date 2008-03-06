@@ -1,4 +1,4 @@
-List of vlc plugins (333)
+List of vlc plugins (346)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52sys: A/52 decapsulation demuxer.
@@ -18,6 +18,7 @@ $Id$
  * access_gnomevfs: GnomeVFS access
  * access_http: HTTP Network access module
  * access_jack: JACK audio input module
+ * access_mmap: mmap file access
  * access_mms: MMS over TCP, UDP and HTTP access module
  * access_output_dummy: dummy access_output module
  * access_output_file: File access_output module
@@ -25,6 +26,7 @@ $Id$
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
+ * access_rtmp: RTMP network access
  * access_smb: SMB shares access module
  * access_tcp: TCP Network access module
  * access_udp: UDP Network access module 
@@ -38,7 +40,9 @@ $Id$
  * aout_sdl: audio output module using the SDL library.
  * araw: Pseudo audio decoder for raw PCM
  * arts: ArTS audio output
+ * asademux: ASS/SSA subtitles demuxer
  * asf: ASF demuxer
+ * atmo: Ambilight-like video-output
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
@@ -55,6 +59,7 @@ $Id$
  * cdda: input module to read audio CDs
  * cddax: input module to read audio CDs via libcdio
  * cdg: CD-G decoder
+ * chroma_chain: chain for chroma conversions
  * cinepak: Cinepack video decoder
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
@@ -62,6 +67,7 @@ $Id$
  * converter_fixed: Fixed-point audio format conversions
  * converter_float: Floating-point audio format conversions
  * crop: Crop video filter
+ * csri: common subtitle interface decoder
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
  * dc1394: firewire input module
@@ -140,6 +146,7 @@ $Id$
  * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2.
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2.
  * i420_yuy2_sse2: sse2 accelerated version of i420_yuy2.
+ * i422_i420: 4:2:2 to 4:2:0 conversion functions
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions.
  * i422_yuy2_mmx: MMX accelerated version of i422_yuy2.
  * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2.
@@ -208,6 +215,7 @@ $Id$
  * opencv_example: OpenCV example (face identification)
  * opencv_wrapper: OpenCV wrapper video filter
  * opengl: a opengl video output that uses opengl provider modules
+ * opengllayer: a simple openGL video output
  * opie: interface for Opie using QT/Embedded library.
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface.
@@ -228,6 +236,7 @@ $Id$
  * profile_parser: Streaming Profile parser
  * ps: input module for MPEG PS decapsulation.
  * psychedelic: Psychedelic video filter
+ * pulse: PulseAudio audio output module
  * puzzle: puzzle video filter
  * pva: PVA demuxer
  * pvr: input module to read from a PVR card
@@ -340,4 +349,6 @@ $Id$
  * xvid: Decoder for the Xvid codec, using libxvidcore
  * xvideo: video output module using the XVideo API.
  * xvmc: XVMC video output and decoder
+ * yuy2_i420: yuy2 to 4:2:0 conversions functions
+ * yuy2_i422: yuy2 to 4:2:2 conversions functions
  * zvbi: Teletext decoder using libzbvi
