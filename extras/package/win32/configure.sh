@@ -23,6 +23,7 @@ CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
       --enable-livedotcom --with-livedotcom-tree=/usr/win32/live.com \
       --enable-dca \
       --enable-mkv \
+      --enable-x264 \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
       --enable-goom \
