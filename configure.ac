@@ -298,13 +298,13 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx cddax sdl_image],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua],[-lws2_32])
+        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([libvlc vlc],[-e WinMainCRTStartup])
-        VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
+        VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync],[-lws2])
    fi
     ;;
   *nto*)
@@ -508,7 +508,7 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp sap access_output_udp stream_out_standard growl_udp],[-lsocket])
+    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp stream_out_standard growl_udp],[-lsocket])
   ])
 ])
 
