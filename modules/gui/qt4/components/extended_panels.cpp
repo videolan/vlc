@@ -1076,7 +1076,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
     }
     else
     {
-        psz_af = config_GetPsz( p_aout, "audio-filter" );
+        psz_af = config_GetPsz( p_intf, "audio-filter" );
         for( int i = 0; i < NUM_SP_CTRL ; i++ )
         {
             controlVars[i] = config_GetFloat( p_intf, psz_control_names[i] );
