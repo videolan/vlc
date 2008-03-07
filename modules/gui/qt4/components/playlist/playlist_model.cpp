@@ -737,7 +737,7 @@ void PLModel::sort( int column, Qt::SortOrder order )
     CHECK_COLUMN( DESCRIPTION );
     CHECK_COLUMN( TRACKID );
 
-#undef CHECK_COLUMN;
+#undef CHECK_COLUMN
 
 next:
     PL_LOCK;
