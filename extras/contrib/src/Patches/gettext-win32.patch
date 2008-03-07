@@ -1,62 +1,19 @@
---- gettext/gettext-runtime/intl/localename.c.orig	2006-11-22 12:14:26.041794800 +0000
-+++ gettext/gettext-runtime/intl/localename.c	2006-11-22 12:25:50.425554800 +0000
-@@ -494,10 +494,10 @@
- # define SUBLANG_AZERI_CYRILLIC 0x02
- # endif
- # ifndef SUBLANG_BENGALI_INDIA
--# define SUBLANG_BENGALI_INDIA 0x00
-+# define SUBLANG_BENGALI_INDIA 0x01
- # endif
- # ifndef SUBLANG_BENGALI_BANGLADESH
--# define SUBLANG_BENGALI_BANGLADESH 0x01
-+# define SUBLANG_BENGALI_BANGLADESH 0x02
- # endif
- # ifndef SUBLANG_CHINESE_MACAU
- # define SUBLANG_CHINESE_MACAU 0x05
-@@ -590,16 +590,16 @@
- # define SUBLANG_NEPALI_INDIA 0x02
- # endif
- # ifndef SUBLANG_PUNJABI_INDIA
--# define SUBLANG_PUNJABI_INDIA 0x00
-+# define SUBLANG_PUNJABI_INDIA 0x01
- # endif
- # ifndef SUBLANG_PUNJABI_PAKISTAN
--# define SUBLANG_PUNJABI_PAKISTAN 0x01
-+# define SUBLANG_PUNJABI_PAKISTAN 0x02
- # endif
- # ifndef SUBLANG_ROMANIAN_ROMANIA
--# define SUBLANG_ROMANIAN_ROMANIA 0x00
-+# define SUBLANG_ROMANIAN_ROMANIA 0x01
- # endif
- # ifndef SUBLANG_ROMANIAN_MOLDOVA
--# define SUBLANG_ROMANIAN_MOLDOVA 0x01
-+# define SUBLANG_ROMANIAN_MOLDOVA 0x02
- # endif
- # ifndef SUBLANG_SERBIAN_LATIN
- # define SUBLANG_SERBIAN_LATIN 0x02
-@@ -608,10 +608,10 @@
- # define SUBLANG_SERBIAN_CYRILLIC 0x03
- # endif
- # ifndef SUBLANG_SINDHI_INDIA
--# define SUBLANG_SINDHI_INDIA 0x00
-+# define SUBLANG_SINDHI_INDIA 0x01
- # endif
- # ifndef SUBLANG_SINDHI_PAKISTAN
--# define SUBLANG_SINDHI_PAKISTAN 0x01
-+# define SUBLANG_SINDHI_PAKISTAN 0x02
- # endif
- # ifndef SUBLANG_SPANISH_GUATEMALA
- # define SUBLANG_SPANISH_GUATEMALA 0x04
-@@ -674,10 +674,10 @@
- # define SUBLANG_TAMAZIGHT_LATIN 0x02
- # endif
- # ifndef SUBLANG_TIGRINYA_ETHIOPIA
--# define SUBLANG_TIGRINYA_ETHIOPIA 0x00
-+# define SUBLANG_TIGRINYA_ETHIOPIA 0x01
- # endif
- # ifndef SUBLANG_TIGRINYA_ERITREA
--# define SUBLANG_TIGRINYA_ERITREA 0x01
-+# define SUBLANG_TIGRINYA_ERITREA 0x02
- # endif
- # ifndef SUBLANG_URDU_PAKISTAN
- # define SUBLANG_URDU_PAKISTAN 0x01
+--- gettext-0.17/gettext-runtime/intl/Makefile.in	2007-11-04 21:21:12.000000000 +0000
++++ gettext/gettext-runtime/intl/Makefile.in	2008-03-07 18:14:53.000000000 +0000
+@@ -280,15 +280,7 @@
+ # so that they work with the sed-3.02 that is shipped with MSYS. We can use
+ # GNU bash's $'\n' syntax to obtain such a newline.
+ libintl.res: $(srcdir)/libintl.rc
+-	nl=$$'\n'; \
+-	sed_extract_major='/^[0-9]/{'$${nl}'s/^\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+-	sed_extract_minor='/^[0-9][0-9]*[.][0-9]/{'$${nl}'s/^[0-9]*[.]\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+-	sed_extract_subminor='/^[0-9][0-9]*[.][0-9][0-9]*[.][0-9]/{'$${nl}'s/^[0-9]*[.][0-9]*[.]\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+-	$(WINDRES) \
+-	  "-DPACKAGE_VERSION_STRING=\\\"$(VERSION)\\\"" \
+-	  "-DPACKAGE_VERSION_MAJOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_major"` \
+-	  "-DPACKAGE_VERSION_MINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_minor"` \
+-	  "-DPACKAGE_VERSION_SUBMINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_subminor"` \
++	$(WINDRES) `$(top_srcdir)/../windows/windres-options --escape $(VERSION)`\
+ 	  -i $(srcdir)/libintl.rc -o libintl.res --output-format=coff
+ 
+ ref-add.sed: $(srcdir)/ref-add.sin
