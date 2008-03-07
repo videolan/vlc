@@ -127,7 +127,7 @@ set -x
 echo > vlc-config.in
 cp -f INSTALL INSTALL.svn
 
-AUTOPOINT=true autoreconf --install --force --verbose ${ACLOCAL_ARGS}
+autoreconf --install --force --verbose ${ACLOCAL_ARGS}
 rm -f po/Makevars.template
 echo > ABOUT-NLS
 mv -f INSTALL.svn INSTALL
