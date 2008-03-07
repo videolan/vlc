@@ -164,6 +164,7 @@ VLMDialog::~VLMDialog()
 {
    /* FIXME :you have to destroy vlm here to close
     * but we shouldn't destroy vlm here in case somebody else wants it */
+    msg_Dbg( p_intf, "Destroying VLM Dialog" );
     if( p_vlm )
         vlm_Delete( p_vlm );
 }
