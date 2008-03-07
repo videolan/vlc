@@ -82,26 +82,6 @@ static int Open( vlc_object_t *p_this )
     int length_path, length_media_name;
     int i;
 
-    /*DOWN:
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->pf_read = Read;
-    p_access->pf_block = Block;
-    p_access->pf_control = Control;
-    p_access->pf_seek = Seek;
-    do
-    {
-        p_access->p_sys = (access_sys_t *) malloc( sizeof( access_sys_t ) );
-        if( !p_access->p_sys )
-            return VLC_ENOMEM;
-    } while(0);
-    p_sys = p_access->p_sys;
-    memset( p_sys, 0, sizeof( access_sys_t ) );
-    */
     STANDARD_READ_ACCESS_INIT
 
     /* Parse URI - remove spaces */
@@ -114,14 +94,18 @@ static int Open( vlc_object_t *p_this )
     if( !p_access->psz_access ||
         strncmp( p_access->psz_access, "rtmp", 4 ))
     {   
-        msg_Warn( p_access, "invalid protocol" );
-        goto error;
+         msg_Warn( p_access, "invalid protocol" );
+         vlc_UrlClean( &p_sys->url );
+         free( p_sys );
+         return VLC_EGENERIC;
     }
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
          msg_Warn( p_access, "invalid host" );
-         goto error;
+         vlc_UrlClean( &p_sys->url );
+         free( p_sys );
+         return VLC_EGENERIC;
     }
 
     if( p_sys->url.i_port <= 0 )
@@ -129,7 +113,9 @@ static int Open( vlc_object_t *p_this )
 
     if ( p_sys->url.psz_path == NULL ) {
         msg_Warn( p_access, "invalid path" );
-        goto error;
+        vlc_UrlClean( &p_sys->url );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
     length_path = strlen( p_sys->url.psz_path );
@@ -147,8 +133,49 @@ static int Open( vlc_object_t *p_this )
                  p_sys->url.psz_username, p_sys->url.psz_password );
     }
 
+    p_sys->p_thread =
+        vlc_object_create( p_access, sizeof( rtmp_control_thread_t ) );
+    if( !p_sys->p_thread )
+    {
+        msg_Err( p_access, "out of memory" );
+        vlc_UrlClean( &p_sys->url );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    vlc_object_attach( p_sys->p_thread, p_access );
+    p_sys->p_thread->b_die = 0;
+    p_sys->p_thread->b_error= 0;
+    p_sys->p_thread->p_fifo_media = block_FifoNew( p_access );
+    p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
+    p_sys->p_thread->has_audio = 0;
+    p_sys->p_thread->has_video = 0;
+    p_sys->p_thread->metadata_received = 0;
+    p_sys->p_thread->first_media_packet = 1;
+    p_sys->p_thread->flv_tag_previous_tag_size = 0x00000000; /* FLV_TAG_FIRST_PREVIOUS_TAG_SIZE */
+    for(i = 0; i < 64; i++)
+    {
+        memset( &p_sys->p_thread->rtmp_headers_recv[i], 0, sizeof( rtmp_packet_t ) );
+        p_sys->p_thread->rtmp_headers_send[i].length_header = -1;
+        p_sys->p_thread->rtmp_headers_send[i].stream_index = -1;
+        p_sys->p_thread->rtmp_headers_send[i].timestamp = -1;
+        p_sys->p_thread->rtmp_headers_send[i].timestamp_relative = -1;
+        p_sys->p_thread->rtmp_headers_send[i].length_encoded = -1;
+        p_sys->p_thread->rtmp_headers_send[i].length_body = -1;
+        p_sys->p_thread->rtmp_headers_send[i].content_type = -1;
+        p_sys->p_thread->rtmp_headers_send[i].src_dst = -1;
+        p_sys->p_thread->rtmp_headers_send[i].body = NULL;
+    }
+
+    vlc_cond_init( p_sys->p_thread, &p_sys->p_thread->wait );
+    vlc_mutex_init( p_sys->p_thread, &p_sys->p_thread->lock );    
+
+    p_sys->p_thread->result_connect = 1;
+    p_sys->p_thread->result_play = 1;
+
     /* Open connection */
     p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host, p_sys->url.i_port );
+    p_sys->p_thread->fd = p_sys->fd;
     if( p_sys->fd == -1 )
     {
         int *p_fd_listen;
@@ -162,142 +189,65 @@ static int Open( vlc_object_t *p_this )
         if( p_fd_listen == NULL )
         {
             msg_Warn( p_access, "cannot listen to %s port %i", p_sys->url.psz_host, p_sys->url.i_port );
-            goto error;
+            vlc_UrlClean( &p_sys->url );
+            net_Close( p_sys-> fd );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
 
         p_sys->fd = net_Accept( p_access, p_fd_listen, -1 );
 
         net_ListenClose( p_fd_listen );
 
-        switch( rtmp_handshake_passive( p_this ) )
+        if( rtmp_handshake_passive( p_this ) < 0 )
         {
-            case -1:
-                goto error;
-            case 0:
-                break;
-            default:
-                msg_Err( p_access, "You should not be here" );
-                abort();
+            msg_Err( p_access, "Passive handshake failed");
+            vlc_UrlClean( &p_sys->url );
+            net_Close( p_sys-> fd );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
 
-        p_sys->p_thread =
-            vlc_object_create( p_access, sizeof( rtmp_control_thread_t ) );
-        if( !p_sys->p_thread )
-        {
-            msg_Err( p_access, "out of memory" );
-            goto error;
-        }
-
-        vlc_object_attach( p_sys->p_thread, p_access );
-        p_sys->p_thread->b_die = 0;
-        p_sys->p_thread->b_error= 0;
-        p_sys->p_thread->fd = p_sys->fd;
-        p_sys->p_thread->p_fifo_media = block_FifoNew( p_access );
-        p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
-        p_sys->p_thread->has_audio = 0;
-        p_sys->p_thread->has_video = 0;
-        p_sys->p_thread->metadata_received = 0;
-        p_sys->p_thread->first_media_packet = 1;
-        p_sys->p_thread->flv_tag_previous_tag_size = 0x00000000; /* FLV_TAG_FIRST_PREVIOUS_TAG_SIZE */
-        for(i = 0; i < 64; i++)
-        {
-            memset( &p_sys->p_thread->rtmp_headers_recv[i], 0, sizeof( rtmp_packet_t ) );
-            p_sys->p_thread->rtmp_headers_send[i].length_header = -1;
-            p_sys->p_thread->rtmp_headers_send[i].stream_index = -1;
-            p_sys->p_thread->rtmp_headers_send[i].timestamp = -1;
-            p_sys->p_thread->rtmp_headers_send[i].timestamp_relative = -1;
-            p_sys->p_thread->rtmp_headers_send[i].length_encoded = -1;
-            p_sys->p_thread->rtmp_headers_send[i].length_body = -1;
-            p_sys->p_thread->rtmp_headers_send[i].content_type = -1;
-            p_sys->p_thread->rtmp_headers_send[i].src_dst = -1;
-            p_sys->p_thread->rtmp_headers_send[i].body = NULL;
-        }
-
-        vlc_cond_init( p_sys->p_thread, &p_sys->p_thread->wait );
-        vlc_mutex_init( p_sys->p_thread, &p_sys->p_thread->lock );
-
-        p_sys->p_thread->result_connect = 1;
-        p_sys->p_thread->result_play = 1;
         p_sys->p_thread->result_publish = 1;
 
-        if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
-                               VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
-        {
-            msg_Err( p_access, "cannot spawn rtmp control thread" );
-            goto error2;
-        }
     }
     else
     {
+        msg_Dbg( p_access, "using active connection");
         p_sys->active = 1;
 
-        switch( rtmp_handshake_active( p_this ) )
+        if( rtmp_handshake_active( p_this ) < 0 )
         {
-            case -1:
-                goto error;
-            case 0:
-                break;
-            default:
-                msg_Err( p_access, "You should not be here" );
-                abort();
+            msg_Err( p_access, "Active handshake failed");
+            vlc_UrlClean( &p_sys->url );
+            net_Close( p_sys-> fd );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
 
-        p_sys->p_thread =
-            vlc_object_create( p_access, sizeof( rtmp_control_thread_t ) );
-        if( !p_sys->p_thread )
-        {
-            msg_Err( p_access, "out of memory" );
-            goto error;
-        }
-
-        vlc_object_attach( p_sys->p_thread, p_access );
-        p_sys->p_thread->b_die = 0;
-        p_sys->p_thread->b_error= 0;
-        p_sys->p_thread->fd = p_sys->fd;
-        p_sys->p_thread->p_fifo_media = block_FifoNew( p_access );
-        p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
-        p_sys->p_thread->has_audio = 0;
-        p_sys->p_thread->has_video = 0;
-        p_sys->p_thread->metadata_received = 0;
-        p_sys->p_thread->first_media_packet = 1;
-        p_sys->p_thread->flv_tag_previous_tag_size = 0x00000000; /* FLV_TAG_FIRST_PREVIOUS_TAG_SIZE */
-        for(i = 0; i < 64; i++)
-        {
-            memset( &p_sys->p_thread->rtmp_headers_recv[i], 0, sizeof( rtmp_packet_t ) );
-            p_sys->p_thread->rtmp_headers_send[i].length_header = -1;
-            p_sys->p_thread->rtmp_headers_send[i].stream_index = -1;
-            p_sys->p_thread->rtmp_headers_send[i].timestamp = -1;
-            p_sys->p_thread->rtmp_headers_send[i].timestamp_relative = -1;
-            p_sys->p_thread->rtmp_headers_send[i].length_encoded = -1;
-            p_sys->p_thread->rtmp_headers_send[i].length_body = -1;
-            p_sys->p_thread->rtmp_headers_send[i].content_type = -1;
-            p_sys->p_thread->rtmp_headers_send[i].src_dst = -1;
-            p_sys->p_thread->rtmp_headers_send[i].body = NULL;
-        }
-
-        vlc_cond_init( p_sys->p_thread, &p_sys->p_thread->wait );
-        vlc_mutex_init( p_sys->p_thread, &p_sys->p_thread->lock );    
-
-        p_sys->p_thread->result_connect = 1;
-        p_sys->p_thread->result_play = 1;
         p_sys->p_thread->result_publish = 0;
+    }
 
-        if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
-                               VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
-        {
-            msg_Err( p_access, "cannot spawn rtmp control thread" );
-            goto error2;
-        }
+    if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
+                           VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
+    {
+        msg_Err( p_access, "cannot spawn rtmp control thread" );
+        vlc_UrlClean( &p_sys->url );
+        net_Close( p_sys-> fd );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
-        switch( rtmp_connect_active( p_this ) )
+    if( p_sys->active ) 
+    {
+        msg_Dbg( p_access, "Activation active connection");
+        if( rtmp_connect_active( p_this ) < 0)
         {
-            case -1:
-                goto error2;
-            case 0:
-                break;
-            default:
-                msg_Err( p_access, "You should not be here" );
-                abort();
+            msg_Err( p_access, "Active connection failed");
+            vlc_UrlClean( &p_sys->url );
+            net_Close( p_sys-> fd );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
     }
 
@@ -305,9 +255,11 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys->flv_packet = NULL;
     p_access->p_sys->read_packet = 1;
 
+    msg_Dbg( p_access, "waiting for buffer to fill");
     /* Wait until enough data is received for extracting metadata */
     while( block_FifoCount( p_access->p_sys->p_thread->p_fifo_media ) < 10 )
     {
+        msg_Dbg( p_access, "waiting for buffer to fill");
         msleep(1000);
         continue;
     }
@@ -316,14 +268,6 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_access, "rtmp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
-
-error2:
-
-error:
-    vlc_UrlClean( &p_sys->url );
-    net_Close( p_sys-> fd );
-    free( p_sys );
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -335,12 +279,12 @@ static void Close( vlc_object_t * p_this )
     access_sys_t *p_sys = p_access->p_sys;
     int i;
 
-msg_Warn(p_access, "Close");
+    msg_Warn(p_access, "Close");
 
-//    p_sys->p_thread->b_die = VLC_TRUE;
-vlc_object_kill( p_sys->p_thread );
-block_FifoWake( p_sys->p_thread->p_fifo_media );
-block_FifoWake( p_sys->p_thread->p_empty_blocks );
+    vlc_object_kill( p_sys->p_thread );
+    block_FifoWake( p_sys->p_thread->p_fifo_media );
+    block_FifoWake( p_sys->p_thread->p_empty_blocks );
+    /*
     for( i = 0; i < 5; i++ )
     {
         block_t *p_dummy = block_New( p_access, 256 );
@@ -358,7 +302,7 @@ block_FifoWake( p_sys->p_thread->p_empty_blocks );
         p_dummy->i_length = 0;
         memset( p_dummy->p_buffer, 0, p_dummy->i_buffer );
         block_FifoPut( p_sys->p_thread->p_empty_blocks, p_dummy );
-    }
+    }*/
     vlc_thread_join( p_sys->p_thread );
 
     vlc_cond_destroy( &p_sys->p_thread->wait );
@@ -371,7 +315,6 @@ block_FifoWake( p_sys->p_thread->p_empty_blocks );
 
     var_Destroy( p_access, "rtmp-caching" );
 
-    vlc_object_detach( p_sys->p_thread );
 
     vlc_UrlClean( &p_sys->url );
     free( p_sys->psz_application );
