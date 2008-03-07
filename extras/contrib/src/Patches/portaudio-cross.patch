@@ -1,6 +1,6 @@
-diff -ruN portaudio/Makefile.in portaudio.n/Makefile.in
---- portaudio/Makefile.in	2007-10-24 17:29:04.000000000 +0200
-+++ portaudio.n/Makefile.in	2007-12-18 05:43:27.000000000 +0100
+diff -uN portaudio/Makefile.in portaudio.new/Makefile.in
+--- portaudio/Makefile.in	2008-01-01 23:02:42.000000000 +0100
++++ portaudio.new/Makefile.in	2008-03-07 05:22:21.000000000 +0100
 @@ -120,7 +120,7 @@
  SUBDIRS =
  @ENABLE_CXX_TRUE@SUBDIRS += bindings/cpp
@@ -10,10 +10,10 @@ diff -ruN portaudio/Makefile.in portaudio.n/Makefile.in
  
  tests: bin-stamp $(TESTS)
  
-diff -ruN portaudio/configure.in portaudio.n/configure.in
---- portaudio/configure.in	2007-11-13 22:22:56.000000000 +0100
-+++ portaudio.n/configure.in	2007-12-18 05:43:14.000000000 +0100
-@@ -95,9 +95,10 @@
+diff -uN portaudio/configure.in portaudio.new/configure.in
+--- portaudio/configure.in	2008-01-27 03:03:30.000000000 +0100
++++ portaudio.new/configure.in	2008-03-07 05:38:44.000000000 +0100
+@@ -99,9 +99,10 @@
  
  dnl sizeof checks: we will need a 16-bit and a 32-bit type
  
@@ -27,3 +27,21 @@ diff -ruN portaudio/configure.in portaudio.n/configure.in
  
  save_LIBS="${LIBS}"
  AC_CHECK_LIB(rt, clock_gettime, [rt_libs=" -lrt"])
+@@ -235,7 +236,7 @@
+             #CFLAGS="$CFLAGS -I$VC98 -DPA_NO_WMME -DPA_NO_ASIO";
+             CFLAGS="$CFLAGS -I\$(top_srcdir)/src/common -I$DXDIR/include -DPA_NO_WMME -DPA_NO_DS -DPA_NO_ASIO";
+         else   # WMME default
+-            OTHER_OBJS="src/hostapi/wmme/pa_win_wmme.o src/os/win/pa_win_hostapis.o src/os/win/pa_win_util.o";
++            OTHER_OBJS="src/hostapi/wmme/pa_win_wmme.o src/os/win/pa_win_waveformat.o src/os/win/pa_win_waveformat.o src/os/win/pa_win_hostapis.o src/os/win/pa_win_util.o";
+             LIBS="-lwinmm -lm -lstdc++ -lole32 -luuid";
+             PADLL="portaudio.dll";
+ 	    THREAD_CFLAGS="-mthreads"
+@@ -248,7 +249,7 @@
+   cygwin* )
+ 	dnl Cygwin configuration
+ 
+-	OTHER_OBJS="src/hostapi/wmme/pa_win_wmme.o src/os/win/pa_win_hostapis.o src/os/win/pa_win_util.o";
++	OTHER_OBJS="src/hostapi/wmme/pa_win_wmme.o src/os/win/pa_win_waveformat.o src/os/win/pa_win_waveformat.o src/os/win/pa_win_hostapis.o src/os/win/pa_win_util.o";
+ 	CFLAGS="$CFLAGS -DPA_NO_DS -DPA_NO_WDMKS -DPA_NO_ASIO -DPA_NO_WASAPI"
+ 	LIBS="-lwinmm -lm";
+ 	PADLL="portaudio.dll";
