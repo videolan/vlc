@@ -134,8 +134,10 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
     case PIX_FMT_BGR24:
         return VLC_FOURCC('R','V','2','4');
 #else
+#if defined(PIX_FMT_RGB8)
     case PIX_FMT_RGB8:
         return VLC_FOURCC('R','G','B','8');
+#endif
     case PIX_FMT_RGB555:
         return VLC_FOURCC('R','V','1','5');
     case PIX_FMT_RGB565:
@@ -852,10 +854,16 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         case PIX_FMT_YUV411P:
         case PIX_FMT_RGB32:
         case PIX_FMT_RGB24:
+#if defined(PIX_FMT_RGB8)
         case PIX_FMT_RGB8:
+#endif
+#if defined(PIX_FMT_BRG32)
         case PIX_FMT_BGR32:
+#endif
         case PIX_FMT_BGR24:
+#if defined(PIX_FMT_BGR8)
         case PIX_FMT_BGR8:
+#endif
         case PIX_FMT_PAL8:
             for( i = 0; i < p_pic->i_planes; i++ )
             {

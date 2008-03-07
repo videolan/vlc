@@ -498,7 +498,9 @@ static struct
     { VLC_FOURCC('R','V','1','6'), PIX_FMT_BGR565 },
     { VLC_FOURCC('R','V','2','4'), PIX_FMT_BGR24 },
 #else
+#if defined(PIX_FMT_RGB8)
     { VLC_FOURCC('R','G','B','8'), PIX_FMT_RGB8 },
+#endif
     { VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555 },
     { VLC_FOURCC('R','V','1','6'), PIX_FMT_RGB565 },
     { VLC_FOURCC('R','V','2','4'), PIX_FMT_RGB24 },
