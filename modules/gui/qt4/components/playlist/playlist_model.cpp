@@ -93,7 +93,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/pixmaps/type_node.png" );
 #undef ADD_ICON
 
-    addCallbacks();
     rebuild( p_root );
 }
 
