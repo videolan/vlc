@@ -30,5 +30,5 @@ noinst_HEADERS = com.h driver.h ext.h ldt_keeper.h loader.h registry.h \
 libloader_la_SOURCES = ldt_keeper.c pe_image.c module.c ext.c win32.c \
 	driver.c pe_resource.c resource.c registry.c afl.c vfl.c \
 	wrapper.S stubs.s kludge.c
-libloader_la_LIBADD = -ldl -lpthread
+libloader_la_LIBADD = -lpthread
 
