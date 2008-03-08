@@ -1361,7 +1361,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         utf8_unlink( psz_destfile );
 
         intf_UserFatal( p_udt, VLC_TRUE, _("File can not be verified"),
-            _("It was not possible to downlaod a cryptographic signature for "
+            _("It was not possible to download a cryptographic signature for "
               "downloaded file \"%s\", and so VLC deleted it."),
             psz_destfile );
         msg_Err( p_udt, "Couldn't download signature of downloaded file" );
