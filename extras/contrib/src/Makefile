@@ -1785,7 +1785,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $<; ./autogen.sh)
 endif
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared --disable-languages && make && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
@@ -1806,7 +1806,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-ciphers=aes,des && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160 --enable-publickey-digests=dsa && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $<; $(HOSTCC) ./configure --host=$(HOST) --build=$(BUILD) --prefix=$(PREFIX) --disable-asm CFLAGS="$(CFLAGS)" && make && make install)
