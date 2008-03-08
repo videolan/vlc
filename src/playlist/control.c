@@ -122,14 +122,6 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         }
         break;
 
-    case PLAYLIST_AUTOPLAY:
-        // AUTOPLAY is an ugly hack for initial status.
-        // Hopefully it will disappear
-        p_playlist->status.i_status = PLAYLIST_RUNNING;
-        p_playlist->request.p_node = p_playlist->status.p_node;
-        p_playlist->request.b_request = VLC_FALSE;
-        break;
-
     case PLAYLIST_PAUSE:
         val.i_int = 0;
         if( p_playlist->p_input )
