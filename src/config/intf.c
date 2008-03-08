@@ -26,45 +26,6 @@
 #endif
 
 #include <vlc/vlc.h>
-#include "../libvlc.h"
-#include "vlc_keys.h"
-#include "vlc_charset.h"
-
-#include <errno.h>                                                  /* errno */
-#include <assert.h>
-#include <limits.h>
-
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>                                          /* getuid() */
-#endif
-
-#ifdef HAVE_GETOPT_LONG
-#   ifdef HAVE_GETOPT_H
-#       include <getopt.h>                                       /* getopt() */
-#   endif
-#else
-#   include "../extras/getopt.h"
-#endif
-
-#if defined(HAVE_GETPWUID)
-#   include <pwd.h>                                            /* getpwuid() */
-#endif
-
-#if defined( HAVE_SYS_STAT_H )
-#   include <sys/stat.h>
-#endif
-#if defined( HAVE_SYS_TYPES_H )
-#   include <sys/types.h>
-#endif
-#if defined( WIN32 )
-#   if !defined( UNDER_CE )
-#       include <direct.h>
-#   endif
-#include <tchar.h>
-#endif
-
-#include "configuration.h"
-#include "modules/modules.h"
 
 /* Adds an extra interface to the configuration */
 void __config_AddIntf( vlc_object_t *p_this, const char *psz_intf )
