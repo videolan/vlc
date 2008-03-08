@@ -390,14 +390,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
         {
             if( colors[j] != j ) continue;
             if( color_x_min[j] == -1 ) continue;
-#define max( a, b ) ( a > b ? a : b )
-#define min( a, b ) ( a < b ? a : b )
-            if( max( color_x_min[i], color_x_min[j] ) < min( color_x_max[i], color_x_max[j] ) && max( color_y_min[i], color_y_min[j] ) < min( color_y_max[i], color_y_max[j] ) )
+            if( __MAX( color_x_min[i], color_x_min[j] ) < __MIN( color_x_max[i], color_x_max[j] ) &&
+                __MAX( color_y_min[i], color_y_min[j] ) < __MIN( color_y_max[i], color_y_max[j] ) )
             {
-                color_x_min[i] = min( color_x_min[i], color_x_min[j] );
-                color_x_max[i] = max( color_x_max[i], color_x_max[j] );
-                color_y_min[i] = min( color_y_min[i], color_y_min[j] );
-                color_y_max[i] = max( color_y_max[i], color_y_max[j] );
+                color_x_min[i] = __MIN( color_x_min[i], color_x_min[j] );
+                color_x_max[i] = __MAX( color_x_max[i], color_x_max[j] );
+                color_y_min[i] = __MIN( color_y_min[i], color_y_min[j] );
+                color_y_max[i] = __MAX( color_y_max[i], color_y_max[j] );
                 color_x_min[j] = -1;
                 j = 0;
             }
