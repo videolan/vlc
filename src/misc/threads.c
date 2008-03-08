@@ -753,7 +753,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     FILETIME create_ft, exit_ft, kernel_ft, user_ft;
     int64_t real_time, kernel_time, user_time;
     HANDLE hThread;
- 
+
     /*
     ** object will close its thread handle when destroyed, duplicate it here
     ** to be on the safe side
@@ -766,7 +766,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
             FALSE,
             DUPLICATE_SAME_ACCESS) )
     {
-        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
+        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%i)",
                          (unsigned int)p_priv->thread_id.id,
              psz_file, i_line, GetLastError() );
         p_priv->b_thread = VLC_FALSE;
