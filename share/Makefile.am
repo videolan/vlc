@@ -268,6 +268,7 @@ DIST_lua= \
 	luaintf/modules/host.lua \
 	luaintf/modules/httpd.lua \
 	luaintf/modules/acl.lua \
+	luaintf/modules/sandbox.lua \
 	luaintf/telnet.lua \
 	luaintf/dummy.lua
 
