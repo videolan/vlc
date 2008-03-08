@@ -556,7 +556,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
  * GetTmpFilePath:
  *****************************************************************************/
 #ifdef WIN32
-#define getpid() GetCurrentProcessId()
+#define getpid() (int)GetCurrentProcessId()
 #endif
 static char *GetTmpFilePath( access_t *p_access )
 {
