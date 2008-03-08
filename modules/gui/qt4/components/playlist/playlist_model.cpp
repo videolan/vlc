@@ -727,6 +727,8 @@ void PLModel::sort( int column, Qt::SortOrder order )
         goto next;                                  \
     }                                               \
 }
+
+    CHECK_COLUMN( TRACKID );
     CHECK_COLUMN( TITLE );
     CHECK_COLUMN( DURATION );
     CHECK_COLUMN( ARTIST );
@@ -734,7 +736,6 @@ void PLModel::sort( int column, Qt::SortOrder order )
     CHECK_COLUMN( COLLECTION );
     CHECK_COLUMN( SEQ_NUM );
     CHECK_COLUMN( DESCRIPTION );
-    CHECK_COLUMN( TRACKID );
 
 #undef CHECK_COLUMN
 
@@ -747,6 +748,7 @@ next:
         int i_mode;
         switch( i_flag )
         {
+        case VLC_META_ENGINE_TRACKID:    i_mode = SORT_ID;               break;
         case VLC_META_ENGINE_TITLE:      i_mode = SORT_TITLE_NODES_FIRST;break;
         case VLC_META_ENGINE_DURATION:   i_mode = SORT_DURATION;         break;
         case VLC_META_ENGINE_ARTIST:     i_mode = SORT_ARTIST;           break;
@@ -754,7 +756,6 @@ next:
         case VLC_META_ENGINE_COLLECTION: i_mode = SORT_ALBUM;            break;
         case VLC_META_ENGINE_SEQ_NUM:    i_mode = SORT_TRACK_NUMBER;     break;
         case VLC_META_ENGINE_DESCRIPTION:i_mode = SORT_DESCRIPTION;      break;
-        case VLC_META_ENGINE_TRACKID:    i_mode = SORT_ID;               break;
         default:                         i_mode = SORT_TITLE_NODES_FIRST;break;
         }
         if( p_root )
@@ -830,23 +831,23 @@ void PLModel::viewchanged( int meta )
         int index=0;
         switch( meta )
         {
-        case VLC_META_ENGINE_TITLE:
-            index=0; break;
-        case VLC_META_ENGINE_DURATION:
-            index=1; break;
-        case VLC_META_ENGINE_ARTIST:
-            index=2; break;
-        case VLC_META_ENGINE_GENRE:
-            index=3; break;
-        case VLC_META_ENGINE_COPYRIGHT:
-            index=4; break;
-        case VLC_META_ENGINE_COLLECTION:
-            index=5; break;
-        case VLC_META_ENGINE_SEQ_NUM:
-            index=6; break;
-        case VLC_META_ENGINE_DESCRIPTION:
-            index=7; break;
         case VLC_META_ENGINE_TRACKID:
+            index=0; break;
+        case VLC_META_ENGINE_TITLE:
+            index=1; break;
+        case VLC_META_ENGINE_DURATION:
+            index=2; break;
+        case VLC_META_ENGINE_ARTIST:
+            index=3; break;
+        case VLC_META_ENGINE_GENRE:
+            index=4; break;
+        case VLC_META_ENGINE_COPYRIGHT:
+            index=5; break;
+        case VLC_META_ENGINE_COLLECTION:
+            index=6; break;
+        case VLC_META_ENGINE_SEQ_NUM:
+            index=7; break;
+        case VLC_META_ENGINE_DESCRIPTION:
             index=8; break;
         default:
             break;

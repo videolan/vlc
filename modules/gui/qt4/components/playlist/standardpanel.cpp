@@ -274,6 +274,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
     CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
 
+    ADD_META_ACTION( TRACKID );
     ADD_META_ACTION( TITLE );
     ADD_META_ACTION( DURATION );
     ADD_META_ACTION( ARTIST );
@@ -281,7 +282,6 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     ADD_META_ACTION( COLLECTION );
     ADD_META_ACTION( SEQ_NUM );
     ADD_META_ACTION( DESCRIPTION );
-    ADD_META_ACTION( TRACKID );
 
 #undef ADD_META_ACTION
 

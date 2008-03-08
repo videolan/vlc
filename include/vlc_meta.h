@@ -166,6 +166,7 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 /* Shortcuts for the AddInfo */
 #define VLC_META_INFO_CAT           N_("Meta-information")
 #define VLC_META_TITLE              input_MetaTypeToLocalizedString( vlc_meta_Title )
+#define VLC_META_DURATION           N_( "Duration" )
 #define VLC_META_ARTIST             input_MetaTypeToLocalizedString( vlc_meta_Artist )
 #define VLC_META_GENRE              input_MetaTypeToLocalizedString( vlc_meta_Genre )
 #define VLC_META_COPYRIGHT          input_MetaTypeToLocalizedString( vlc_meta_Copyright )
@@ -195,18 +196,19 @@ struct meta_export_t
     const char *psz_file;
 };
 
-#define VLC_META_ENGINE_TITLE           0x00000001
-#define VLC_META_ENGINE_ARTIST          0x00000004
-#define VLC_META_ENGINE_GENRE           0x00000008
-#define VLC_META_ENGINE_COPYRIGHT       0x00000010
-#define VLC_META_ENGINE_COLLECTION      0x00000020
-#define VLC_META_ENGINE_SEQ_NUM         0x00000040
-#define VLC_META_ENGINE_DESCRIPTION     0x00000080
-#define VLC_META_ENGINE_RATING          0x00000100
-#define VLC_META_ENGINE_DATE            0x00000200
-#define VLC_META_ENGINE_URL             0x00000400
-#define VLC_META_ENGINE_LANGUAGE        0x00000800
-#define VLC_META_ENGINE_TRACKID         0x00001000
+#define VLC_META_ENGINE_TRACKID         0x00000001
+#define VLC_META_ENGINE_TITLE           0x00000002
+#define VLC_META_ENGINE_DURATION        0x00000004
+#define VLC_META_ENGINE_ARTIST          0x00000008
+#define VLC_META_ENGINE_GENRE           0x00000010
+#define VLC_META_ENGINE_COPYRIGHT       0x00000020
+#define VLC_META_ENGINE_COLLECTION      0x00000040
+#define VLC_META_ENGINE_SEQ_NUM         0x00000080
+#define VLC_META_ENGINE_DESCRIPTION     0x00000100
+#define VLC_META_ENGINE_RATING          0x00000200
+#define VLC_META_ENGINE_DATE            0x00000400
+#define VLC_META_ENGINE_URL             0x00000800
+#define VLC_META_ENGINE_LANGUAGE        0x00001000
 
 #define VLC_META_ENGINE_ART_URL         0x00002000
 

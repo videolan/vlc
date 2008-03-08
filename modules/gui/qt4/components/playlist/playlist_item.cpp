@@ -115,6 +115,9 @@ void PLItem::updateColumnHeaders()
         {
             switch( i_index )
             {
+            case VLC_META_ENGINE_TRACKID:
+                item_col_strings.append( qtr( VLC_META_TRACKID ) );
+                break;
             case VLC_META_ENGINE_ARTIST:
                 item_col_strings.append( qtr( VLC_META_ARTIST ) );
                 break;
@@ -135,9 +138,6 @@ void PLItem::updateColumnHeaders()
                 break;
             case VLC_META_ENGINE_SEQ_NUM:
                 item_col_strings.append( qtr( VLC_META_SEQ_NUM ) );
-                break;
-            case VLC_META_ENGINE_TRACKID:
-                item_col_strings.append( qtr( VLC_META_TRACKID ) );
                 break;
             default:
                 break;
