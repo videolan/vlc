@@ -287,8 +287,8 @@ static void Init( intf_thread_t *p_intf )
 
     Q_INIT_RESOURCE( vlc );
 
-#if !defined(WIN32) && !defined(__APPLE__)
-    /* KLUDGE:
+#if !defined(WIN32) && !defined(__APPLE__) && QT_VERSION < 0x040400
+    /* KLUDGE for QT4 < 4.4.0 (which use libgconf to avoid that)
      * disables icon theme use because that makes Cleanlooks style bug
      * because it asks gconf for some settings that timeout because of threads
      * see commits 21610 21622 21654 for reference */
