@@ -450,7 +450,7 @@ ifdef HAVE_WIN32
   endif
 else
   ifdef HAVE_DARWIN_OS
-	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-confdir=/etc/fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data))
+	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/var/cache/fontconfig --with-confdir=/etc/fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
   else
 	(cd $<; autoreconf && $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
   endif
@@ -572,6 +572,24 @@ libid3tag: libid3tag-$(LIBID3TAG_VERSION).tar.gz
 CLEAN_FILE += .id3tag
 CLEAN_PKG += libid3tag
 DISTCLEAN_PKG += libid3tag-$(LIBID3TAG_VERSION).tar.gz
+
+# ***************************************************************************
+# pcre
+# ***************************************************************************
+
+pcre-$(PCRE_VERSION).tar.bz2:
+	$(WGET) $(PCRE_URL)
+
+pcre: pcre-$(PCRE_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.pcre: pcre
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared && $(HOSTCC) make && make install )
+	touch $@
+
+CLEAN_FILE += .pcre
+CLEAN_PKG += pcre
+DISTCLEAN_PKG += pcre-$(PCRE_VERSION).tar.bz2
 
 # ***************************************************************************
 # lua
@@ -2309,9 +2327,11 @@ asa.git.tar.gz:
 
 asa: asa.git.tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/asa-git.diff
 
-.asa: asa
+.asa: asa .fontconfig .pcre
 	(cd $<; ./bootstrap; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .asa

@@ -212,3 +212,5 @@ LUA_URL=http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
 NCURSES_VERSION=5.6
 NCURSES_URL=$(GNU)/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
 ASA_URL="http://git.spaceboyz.net/asa.git/?p=asa.git;a=snapshot;"
+PCRE_VERSION=7.6
+PCRE_URL=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.bz2
