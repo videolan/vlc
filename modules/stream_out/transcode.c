@@ -2327,7 +2327,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     id->i_filter++;
             }
 
-#if (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+            /* Take care of the scaling and chroma conversions */
             if( ( id->p_decoder->fmt_out.video.i_chroma !=
                   id->p_encoder->fmt_in.video.i_chroma ) ||
                 ( id->p_decoder->fmt_out.video.i_width !=
@@ -2337,67 +2337,63 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out,
-                            &id->p_encoder->fmt_in,
-                            NULL, "scale" );
+                        &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                                                    /* FIXME don't take croppadding changes into account */
+                        NULL, "scale" );
                 if( !id->pp_filter[id->i_filter] )
                 {
-                    p_pic->pf_release( p_pic );
-                    transcode_video_close( p_stream, id );
-                    id->b_transcode = false;
-                    return VLC_EGENERIC;
+                    es_format_t fmt_middle;
+                    es_format_Copy( &fmt_middle, &id->p_decoder->fmt_out );
+                    fmt_middle.video.i_chroma = id->p_encoder->fmt_in.video.i_chroma;
+
+                    /* Try doing the chroma conversion first ... */
+                    if( id->p_decoder->fmt_out.video.i_chroma !=
+                        id->p_encoder->fmt_in.video.i_chroma )
+                    {
+                        id->pp_filter[id->i_filter] =
+                            transcode_video_filter_new( p_stream,
+                                &id->p_decoder->fmt_out, &fmt_middle,
+                                NULL, "chroma" ); /* FIXME: doesn't exist yet */
+                        if( !id->pp_filter[id->i_filter] )
+                        {
+                            es_format_Clean( &fmt_middle );
+                            p_pic->pf_release( p_pic );
+                            transcode_video_close( p_stream, id );
+                            id->b_transcode = false;
+                            return VLC_EGENERIC;
+                        }
+                        id->i_filter++;
+                    }
+
+                    /* ... and then the scaling */
+                    if( ( id->p_decoder->fmt_out.video.i_width !=
+                          id->p_encoder->fmt_out.video.i_width ) ||
+                        ( id->p_decoder->fmt_out.video.i_height !=
+                          id->p_encoder->fmt_out.video.i_height ) )
+                    {
+                        id->pp_filter[id->i_filter] =
+                            transcode_video_filter_new( p_stream,
+                                &fmt_middle, &id->p_encoder->fmt_in,
+                                            /* FIXME don't take croppadding changes into account */
+                                NULL, "scale" );
+                        if( !id->pp_filter[id->i_filter] )
+                        {
+                            es_format_Clean( &fmt_middle );
+                            p_pic->pf_release( p_pic );
+                            transcode_video_close( p_stream, id );
+                            id->b_transcode = false;
+                            return VLC_EGENERIC;
+                        }
+                        id->i_filter++;
+                    }
+                    es_format_Clean( &fmt_middle );
                 }
-                id->i_filter++;
-            }
-#if 0 /* FIXME: */
-            /* we don't do chroma conversion or scaling in croppad */
-//             es_format_t fmt_in, fmt_out;
-//             es_format_Copy( &fmt_out, &id->p_encoder->fmt_in );
-//             es_format_Copy( &fmt_in, &id->p_encoder->fmt_in );
-
-            if( ( id->p_decoder->fmt_out.video.i_chroma ==
-                  id->p_encoder->fmt_in.video.i_chroma ) &&
-
-                ( ( (int)id->p_decoder->fmt_out.video.i_width !=
-                    p_sys->i_crop_width ) ||
-                  ( p_sys->i_crop_width != p_sys->i_nopadd_width ) ||
-                  ( p_sys->i_nopadd_width !=
-                    (int)id->p_encoder->fmt_out.video.i_width ) ||
-
-                  ( (int)id->p_decoder->fmt_out.video.i_height !=
-                    p_sys->i_crop_height ) ||
-                  ( p_sys->i_crop_height != p_sys->i_nopadd_height ) ||
-                  ( p_sys->i_nopadd_height !=
-                    (int)id->p_encoder->fmt_out.video.i_height ) ) )
-            {
-                id->pp_filter[id->i_filter] =
-                    transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out,
-                            &id->p_encoder->fmt_in,
-                            NULL, "croppadd" );
-                if( id->pp_filter[id->i_filter] )
-                {
-                    /* Set crop and padding information */
-                    id->pp_filter[id->i_filter]->fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
-                    id->pp_filter[id->i_filter]->fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
-                    id->pp_filter[id->i_filter]->fmt_in.video.i_visible_width = p_sys->i_crop_width;
-                    id->pp_filter[id->i_filter]->fmt_in.video.i_visible_height = p_sys->i_crop_height;
-
-                    id->pp_filter[id->i_filter]->fmt_out.video.i_x_offset = p_sys->i_dst_x_offset;
-                    id->pp_filter[id->i_filter]->fmt_out.video.i_y_offset = p_sys->i_dst_y_offset;
-                    id->pp_filter[id->i_filter]->fmt_out.video.i_visible_width = p_sys->i_nopadd_width;
-                    id->pp_filter[id->i_filter]->fmt_out.video.i_visible_height = p_sys->i_nopadd_height;
-
+                else
                     id->i_filter++;
-                }
             }
-#endif
-#else
-            /* Check if we need a filter for chroma conversion or resizing */
-            if( id->p_decoder->fmt_out.video.i_chroma !=
-                id->p_encoder->fmt_in.video.i_chroma ||
 
-                (int)id->p_decoder->fmt_out.video.i_width != p_sys->i_crop_width ||
+            /* Take care of croping and padding */
+            if( (int)id->p_decoder->fmt_out.video.i_width != p_sys->i_crop_width ||
                 p_sys->i_crop_width != p_sys->i_nopadd_width ||
                 p_sys->i_nopadd_width != (int)id->p_encoder->fmt_out.video.i_width ||
 
@@ -2405,11 +2401,27 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 p_sys->i_crop_height != p_sys->i_nopadd_height ||
                 p_sys->i_nopadd_height != (int)id->p_encoder->fmt_out.video.i_height)
             {
+                /* Set crop and padding information */
+                es_format_t fmt_in, fmt_out;
+                es_format_Copy( &fmt_in, &id->p_encoder->fmt_in );
+                fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
+                fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
+                fmt_in.video.i_visible_width = p_sys->i_crop_width;
+                fmt_in.video.i_visible_height = p_sys->i_crop_height;
+
+                es_format_Copy( &fmt_in, &id->p_encoder->fmt_in );
+                fmt_out.video.i_x_offset = p_sys->i_dst_x_offset;
+                fmt_out.video.i_y_offset = p_sys->i_dst_y_offset;
+                fmt_out.video.i_visible_width = id->p_encoder->fmt_in.video.i_width;// p_sys->i_nopadd_width;
+                fmt_out.video.i_visible_height = id->p_encoder->fmt_in.video.i_height; // p_sys->i_nopadd_height;
+
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out,
-                            &id->p_encoder->fmt_in,
-                            NULL, "crop padd" );
+                            &fmt_in, &fmt_out, NULL, "croppadd" );
+
+                es_format_Clean( &fmt_in );
+                es_format_Clean( &fmt_out );
+
                 if( !id->pp_filter[id->i_filter] )
                 {
                     p_pic->pf_release( p_pic );
@@ -2418,20 +2430,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     return VLC_EGENERIC;
                 }
 
-                /* Set crop and padding information */ 
-                id->pp_filter[id->i_filter]->fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
-                id->pp_filter[id->i_filter]->fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
-                id->pp_filter[id->i_filter]->fmt_in.video.i_visible_width = p_sys->i_crop_width;
-                id->pp_filter[id->i_filter]->fmt_in.video.i_visible_height = p_sys->i_crop_height;
-
-                id->pp_filter[id->i_filter]->fmt_out.video.i_x_offset = p_sys->i_dst_x_offset;
-                id->pp_filter[id->i_filter]->fmt_out.video.i_y_offset = p_sys->i_dst_y_offset;
-                id->pp_filter[id->i_filter]->fmt_out.video.i_visible_width = p_sys->i_nopadd_width;
-                id->pp_filter[id->i_filter]->fmt_out.video.i_visible_height = p_sys->i_nopadd_height;
-
                 id->i_filter++;
             }
-#endif
+
             for( i = 0; (i < p_sys->i_vfilters) && (id->i_ufilter < TRANSCODE_FILTERS); i++ )
             {
                 id->pp_ufilter[id->i_ufilter] =
