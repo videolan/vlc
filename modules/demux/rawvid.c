@@ -62,7 +62,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "Raw Video" );
     set_description( _("Raw video demuxer") );
-    set_capability( "demux2", 3 );
+    set_capability( "demux2", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
@@ -184,13 +184,13 @@ static int Open( vlc_object_t * p_this )
         /* TODO: handle interlacing */
 
 #define READ_FRAC( key, num, den ) \
-        buf = strchr( psz+9, key );\
+        buf = strstr( psz+9, key );\
         if( buf )\
         {\
-            char *end = strchr( buf, ' ' );\
+            char *end = strchr( buf+1, ' ' );\
             char *sep;\
             if( end ) *end = '\0';\
-            sep = strchr( buf, ':' );\
+            sep = strchr( buf+1, ':' );\
             if( sep )\
             {\
                 *sep = '\0';\
@@ -200,42 +200,46 @@ static int Open( vlc_object_t * p_this )
             {\
                 den = 1;\
             }\
-            num = atoi( buf+1 );\
+            num = atoi( buf+2 );\
             if( sep ) *sep = ':';\
             if( end ) *end = ' ';\
         }
-        READ_FRAC( 'W', i_width, a )
-        READ_FRAC( 'H', i_height, a )
-        READ_FRAC( 'F', a, b )
+        READ_FRAC( " W", i_width, a )
+        READ_FRAC( " H", i_height, a )
+        READ_FRAC( " F", a, b )
         p_sys->f_fps = (double)a/(double)b;
-        READ_FRAC( 'A', a, b )
+        READ_FRAC( " A", a, b )
         if( b != 0 ) i_aspect = a * VOUT_ASPECT_FACTOR / b;
 
-        buf = strchr( psz+9, 'C' );
+        buf = strstr( psz+9, " C" );
         if( buf )
         {
-            char *end = strchr( buf, ' ' );
+            char *end = strchr( buf+1, ' ' );
             if( end ) *end = '\0';
-            buf++;
-            if( !strncmp( buf, "C420jpeg", 8 ) )
+            buf+=2;
+            if( !strncmp( buf, "420jpeg", 7 ) )
             {
                 psz_chroma = strdup( "I420" );
             }
-            else if( !strncmp( buf, "C420paldv", 9 ) )
+            else if( !strncmp( buf, "420paldv", 8 ) )
             {
                 psz_chroma = strdup( "I420" );
             }
-            else if( !strncmp( buf, "C420", 4 ) )
+            else if( !strncmp( buf, "420", 3 ) )
             {
                 psz_chroma = strdup( "I420" );
             }
-            else if( !strncmp( buf, "C422", 4 ) )
+            else if( !strncmp( buf, "422", 3 ) )
             {
                 psz_chroma = strdup( "I422" );
             }
-            else if( !strncmp( buf, "C444", 4 ) )
+            else if( !strncmp( buf, "444", 3 ) )
             {
                 psz_chroma = strdup( "I444" );
+            }
+            else if( !strncmp( buf, "mono", 3 ) )
+            {
+                psz_chroma = strdup( "GREY" );
             }
             else
             {
