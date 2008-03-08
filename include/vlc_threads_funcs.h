@@ -94,9 +94,13 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
                                     vlc_mutex_t * p_mutex )
 {
 #if defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     EnterCriticalSection( &p_mutex->csection );
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     if( p_mutex->mutex )
         WaitForSingleObject( p_mutex->mutex, INFINITE );
     else
@@ -128,9 +132,13 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
                                       vlc_mutex_t *p_mutex )
 {
 #if defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     LeaveCriticalSection( &p_mutex->csection );
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     if( p_mutex->mutex )
         ReleaseMutex( p_mutex->mutex );
     else
@@ -168,9 +176,13 @@ static inline void __vlc_cond_signal( const char * psz_file, int i_line,
                                       vlc_cond_t *p_condvar )
 {
 #if defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     PulseEvent( p_condvar->event );
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     /* Release one waiting thread if one is available. */
     /* For this trick to work properly, the vlc_cond_signal must be surrounded
      * by a mutex. This will prevent another thread from stealing the signal */
@@ -261,6 +273,8 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     if( !p_condvar->semaphore )
     {
         /* Increase our wait count */
@@ -385,6 +399,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
        return ETIMEDOUT; /* this error is perfectly normal */
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     DWORD result;
 
     mtime_t delay_ms = (deadline - mdate())/1000;
