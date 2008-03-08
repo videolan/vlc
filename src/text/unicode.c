@@ -337,6 +337,8 @@ FILE *utf8_fopen (const char *filename, const char *mode)
 int utf8_mkdir( const char *dirname, mode_t mode )
 {
 #if defined (UNDER_CE) || defined (WIN32)
+    VLC_UNUSED( mode );
+
     wchar_t wname[MAX_PATH + 1];
     char mod[MAX_PATH + 1];
     int i;
