@@ -585,6 +585,14 @@ static int vlclua_playlist_search( lua_State *L )
     return 1;
 }
 
+static int vlclua_playlist_current( lua_State *L )
+{
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    lua_pushinteger( L, var_GetInteger( p_playlist, "playlist-current" ) );
+    vlc_object_release( p_playlist );
+    return 1;
+}
+
 static int vlc_sort_key_from_string( const char *psz_name )
 {
     static const struct
@@ -794,6 +802,7 @@ static luaL_Reg p_reg_playlist[] =
     { "get", vlclua_playlist_get },
     { "search", vlclua_playlist_search },
     { "sort", vlclua_playlist_sort },
+    { "current", vlclua_playlist_current },
 
     { "stats", vlclua_input_stats },
 
