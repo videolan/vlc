@@ -141,7 +141,7 @@ public interface LibVlc extends Library
     
     void libvlc_playlist_loop(LibVlcInstance instance, int loop, libvlc_exception_t exception);
     
-    void libvlc_playlist_play(LibVlcInstance instance, int itemIndex, int optionsCount, String[][] options, libvlc_exception_t exception);
+    void libvlc_playlist_play(LibVlcInstance instance, int itemIndex, int optionsCount, String[] options, libvlc_exception_t exception);
     
     void libvlc_playlist_pause(LibVlcInstance instance, libvlc_exception_t exception);
     
@@ -301,5 +301,7 @@ public interface LibVlc extends Library
 
     void libvlc_event_detach(LibVlcEventManager event_manager, int event_type, LibVlcCallback callback,
         Pointer userData, libvlc_exception_t excecption);
+
+    void libvlc_toggle_fullscreen(LibVlcMediaInstance instance, libvlc_exception_t exception);
 
 }

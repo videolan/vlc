@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LibVlcImpl.java: VLC Java Bindings, sample LibVlc use.
+ * ${file_name}: VLC Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2007 the VideoLAN team
  *
