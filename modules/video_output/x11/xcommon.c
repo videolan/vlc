@@ -122,7 +122,7 @@ static IMAGE_TYPE *CreateImage    ( vout_thread_t *,
 
 #ifdef HAVE_SYS_SHM_H
 #ifndef MODULE_NAME_IS_glx
-static IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
+IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
                                     Display *, EXTRA_ARGS_SHM, int, int );
 #endif
 static int i_shm_major = 0;
@@ -2838,7 +2838,7 @@ static int InitDisplay( vout_thread_t *p_vout )
  * document by J.Corbet and K.Packard. Most of the parameters were copied from
  * there. See http://ftp.xfree86.org/pub/XFree86/4.0/doc/mit-shm.TXT
  *****************************************************************************/
-static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
+IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
                                     Display* p_display, EXTRA_ARGS_SHM,
                                     int i_width, int i_height )
 {
