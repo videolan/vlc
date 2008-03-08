@@ -188,6 +188,9 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             else if( i_mode == SORT_ALBUM )
             {
                 DO_META_SORT( Album );
+                /* Sort by tracknumber if albums are the same */
+                if( i_test == 0 )
+                    DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
             }
             else if( i_mode == SORT_TRACK_NUMBER )
             {
