@@ -23,6 +23,8 @@
 
 --[==========================================================================[
 Configuration options:
+ * host: A host to listen on.
+ * dir: Directory to use a the http interface's root.
  * no_error_detail: If set, do not print the Lua error message when generating
                     a page fails.
  * no_index: If set, don't build directory indexes
@@ -188,7 +190,7 @@ local function find_datadir(name)
     end
     error("Unable to find the `"..name.."' directory.")
 end
-http_dir = find_datadir("http-lua")
+http_dir = config.dir or find_datadir("http-lua")
 
 do
     local oldpath = package.path
@@ -260,7 +262,8 @@ local function load_dir(dir,root,parent_acl)
     end
 end
 
-h = httpd.new("localhost",8080)
+local u = vlc.net.url_parse( config.host or "localhost:8080" )
+h = httpd.new(u.host,u.port)
 load_dir( http_dir )
 
 while not die do die = vlc.lock_and_wait() end -- everything happens in callbacks
