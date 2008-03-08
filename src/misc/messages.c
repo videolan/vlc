@@ -42,6 +42,10 @@
 
 #include <errno.h>                                                  /* errno */
 
+#ifdef WIN32
+#   include <vlc_network.h>          /* 'net_strerror' and 'WSAGetLastError' */
+#endif
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                   /* close(), write() */
 #endif
