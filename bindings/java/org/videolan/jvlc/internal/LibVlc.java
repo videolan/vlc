@@ -137,6 +137,35 @@ public interface LibVlc extends Library
 
     int libvlc_audio_set_volume(LibVlcInstance instance, int volume, libvlc_exception_t exception);
 
+    // playlist
+    
+    void libvlc_playlist_loop(LibVlcInstance instance, int loop, libvlc_exception_t exception);
+    
+    void libvlc_playlist_play(LibVlcInstance instance, int itemIndex, int optionsCount, String[][] options, libvlc_exception_t exception);
+    
+    void libvlc_playlist_pause(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    void libvlc_playlist_stop(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    int libvlc_playlist_isplaying(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    int libvlc_playlist_items_count(LibVlcInstance instance, libvlc_exception_t exception);
+
+    void libvlc_playlist_next(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    void libvlc_playlist_prev(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    void libvlc_playlist_clear(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    int libvlc_playlist_add(LibVlcInstance instance, String uri, String name, libvlc_exception_t exception);
+    
+    int libvlc_playlist_delete_item(LibVlcInstance instance, int itemIndex, libvlc_exception_t exception);
+    
+    LibVlcMediaInstance libvlc_playlist_get_media_instance(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    int libvlc_media_instance_is_seekable(LibVlcMediaInstance instance, libvlc_exception_t exception);
+    
+    int libvlc_media_instance_can_pause(LibVlcMediaInstance instance, libvlc_exception_t exception);
     // media descriptor
 
     LibVlcMediaDescriptor libvlc_media_descriptor_new(LibVlcInstance libvlc_instance, String mrl,
