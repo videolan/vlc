@@ -401,7 +401,7 @@ bool Instance::OnInit()
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            playlist_Control( p_playlist, PLAYLIST_AUTOPLAY, VLC_FALSE );
+            playlist_Control( p_playlist, PLAYLIST_PLAY, VLC_FALSE );
             vlc_object_release( p_playlist );
         }
     }

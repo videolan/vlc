@@ -347,7 +347,7 @@ static void Init( intf_thread_t *p_intf )
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )
     {
-        playlist_Control( THEPL, PLAYLIST_AUTOPLAY, VLC_FALSE );
+        playlist_Control( THEPL, PLAYLIST_PLAY, VLC_FALSE );
     }
 
     /* Explain to the core how to show a dialog :D */
