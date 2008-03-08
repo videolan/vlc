@@ -1833,7 +1833,6 @@ vlc_module_begin();
               ONEINSTANCE_DBUS_LONGTEXT, VLC_TRUE );
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
-        change_unsaveable();
 
     add_bool( "inhibit", 1, NULL, INHIBIT_TEXT,
               INHIBIT_LONGTEXT, VLC_TRUE );

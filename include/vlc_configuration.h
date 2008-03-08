@@ -190,7 +190,7 @@ struct module_config_t
 
     /* Option values loaded from config file */
     vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
-    vlc_bool_t   b_unsaveable;                    /* Config should be saved */
+    vlc_bool_t   b_unsaveable;                /* Config should not be saved */
 
     vlc_bool_t   b_safe;
 };
