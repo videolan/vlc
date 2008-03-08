@@ -35,7 +35,9 @@
 #include <vlc_codec_synchro.h>
 
 #include <unistd.h>
-#include <mcheck.h>
+#ifdef __GLIBC__
+    #include <mcheck.h>
+#endif
 
 #include "mpeg2.h"
 #include "attributes.h"
@@ -117,7 +119,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     FILE *f_wd_dec; 
 
     msg_Dbg(p_dec, "OpenDecoder Entering");
+#ifdef __GLIBC__
     mtrace();
+#endif
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','v') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','1') &&
         /* Pinnacle hardware-mpeg1 */
