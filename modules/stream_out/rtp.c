@@ -64,8 +64,8 @@
  * Module descriptor
  *****************************************************************************/
 
-#define DST_TEXT N_("Destination")
-#define DST_LONGTEXT N_( \
+#define DEST_TEXT N_("Destination")
+#define DEST_LONGTEXT N_( \
     "This is the output URL that will be used." )
 #define SDP_TEXT N_("SDP")
 #define SDP_LONGTEXT N_( \
@@ -151,8 +151,8 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );
 
-    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
-                DST_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
+                DEST_LONGTEXT, VLC_TRUE );
         change_unsafe();
     add_string( SOUT_CFG_PREFIX "sdp", "", NULL, SDP_TEXT,
                 SDP_LONGTEXT, VLC_TRUE );
