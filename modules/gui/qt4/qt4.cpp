@@ -294,7 +294,8 @@ static void Init( intf_thread_t *p_intf )
      * see commits 21610 21622 21654 for reference */
 
     /* If you don't have a gconftool-2 binary, you should comment this line */
-    QApplication::setDesktopSettingsAware( false );
+    if( strcmp( qVersion(), "4.4.0" ) < 0 ) /* fixed in Qt 4.4.0 */
+        QApplication::setDesktopSettingsAware( false );
 #endif
 
     /* Start the QApplication here */
