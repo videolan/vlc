@@ -11,6 +11,7 @@
 *.so
 *.pc
 *.vlt
+*.class
 .deps
 .libs
 .dirstamp
