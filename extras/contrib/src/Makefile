@@ -441,7 +441,7 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 	patch -p0 < Patches/fontconfig.patch
 	patch -p0 < Patches/fontconfig-nodocs.patch
 
-.fontconfig: fontconfig
+.fontconfig: fontconfig .xml .freetype
 ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
 	(cd $<; autoreconf && LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
@@ -584,7 +584,7 @@ pcre: pcre-$(PCRE_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .pcre: pcre
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared && $(HOSTCC) make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install )
 	touch $@
 
 CLEAN_FILE += .pcre
@@ -2329,8 +2329,10 @@ asa: asa.git.tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/asa-git.diff
 
-.asa: asa .fontconfig .pcre
-	(cd $<; ./bootstrap; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+.asa: asa .fontconfig .pcre .iconv
+	(cd $<; ./bootstrap; $(HOSTCC) CFLAGS="$(CFLAGS) -DPCRE_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX))
+	(cd $</lib/import; echo "Please copy a ./prepare file you built for your host into asa/lib/import"; echo "When you are finished, press enter." ; echo "If you are building on Windows, press enter." ; read i ; make)
+	(cd $<; make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
