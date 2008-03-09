@@ -136,8 +136,11 @@ set_target_properties(libvlc PROPERTIES
         OUTPUT_NAME vlc
         SOVERSION 1 VERSION 1.0.0)
 
+if(UPDATE_CHECK)
+target_link_libraries(libvlc ${LIBM} ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES} "-lgcrypt")
+else(UPDATE_CHECK)
 target_link_libraries(libvlc ${LIBM} ${LIBRT} ${LIBICONV} ${Dlopen_LIBRARIES})
-
+endif(UPDATE_CHECK)
 
 # libvlc-control
 set( SOURCES_libvlc_control
