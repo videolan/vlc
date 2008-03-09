@@ -837,14 +837,26 @@ DBUS_SIGNAL( TrackListChangeSignal )
 /*****************************************************************************
  * TrackListChangeEmit: Emits the TrackListChange signal
  *****************************************************************************/
-/* FIXME: It is not called on tracklist reorder and seems to be called
- * twice on element addition / removal */
+/* FIXME: It is not called on tracklist reordering */
 static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
-    VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    VLC_UNUSED(oldval);
     intf_thread_t *p_intf = p_data;
+
+    if( !strcmp( psz_var, "item-append" ) || !strcmp( psz_var, "item-remove" ) )
+    {
+        /* don't signal when items are added/removed in p_category */
+        playlist_t *p_playlist = (playlist_t*)p_this;
+        playlist_add_t *p_add = newval.p_address;
+        playlist_item_t *p_item;
+        p_item = playlist_ItemGetById( p_playlist, p_add->i_node, VLC_TRUE );
+        assert( p_item );
+        while( p_item->p_parent )
+            p_item = p_item->p_parent;
+        if( p_item == p_playlist->p_root_category )
+            return VLC_SUCCESS;
+    }
 
     if( p_intf->b_dead )
         return VLC_SUCCESS;
