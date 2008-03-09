@@ -302,6 +302,16 @@ public interface LibVlc extends Library
 
     int libvlc_audio_set_volume(LibVlcInstance instance, int volume, libvlc_exception_t exception);
 
+    int libvlc_audio_get_track_count(LibVlcMediaInstance mediaInstance,  libvlc_exception_t exception );
+
+    int libvlc_audio_get_track(LibVlcMediaInstance mediaInstance, libvlc_exception_t exception );
+    
+    void libvlc_audio_set_track(LibVlcMediaInstance mediaInstance, int channel, libvlc_exception_t exception);
+    
+    int libvlc_audio_get_channel(LibVlcInstance instance, libvlc_exception_t exception );
+    
+    void libvlc_audio_set_channel(LibVlcInstance instance, int channel, libvlc_exception_t exception);
+    
     // playlist
 
     void libvlc_playlist_loop(LibVlcInstance instance, int loop, libvlc_exception_t exception);
