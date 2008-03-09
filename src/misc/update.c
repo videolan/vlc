@@ -1368,6 +1368,18 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         goto end;
     }
 
+    if( memcmp( sign.issuer_longid, p_update->p_pkey->longid, 8 ) )
+    {
+        utf8_unlink( psz_destfile );
+        msg_Err( p_udt, "Invalid signature issuer" );
+        intf_UserFatal( p_udt, VLC_TRUE, _("Invalid signature"),
+            _("The cryptographic signature for downloaded file \"%s\" was "
+              "invalid and couldn't be used to securely verify it, and so "
+              "VLC deleted it."),
+            psz_destfile );
+        goto end;
+    }
+
     if( sign.type != BINARY_SIGNATURE )
     {
         utf8_unlink( psz_destfile );
