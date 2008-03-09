@@ -34,6 +34,10 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
+/**
+ * The playlist is deprecated and will be removed. Use MediaList and MediaListPlayer instead.
+ */
+@Deprecated
 public class Playlist {
     
     
