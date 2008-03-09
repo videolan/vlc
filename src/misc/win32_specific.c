@@ -288,7 +288,7 @@ static void IPCHelperThread( vlc_object_t *p_this )
                   NULL );                               /* sent to WM_CREATE */
 
     SetWindowLong( ipcwindow, GWL_WNDPROC, (LONG)WMCOPYWNDPROC );
-    SetWindowLong( ipcwindow, GWL_USERDATA, (LONG)p_this );
+    SetWindowLongPtr( ipcwindow, GWL_USERDATA, (LONG_PTR)p_this );
 
     /* Signal the creation of the thread and events queue */
     vlc_thread_ready( p_this );
