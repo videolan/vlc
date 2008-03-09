@@ -23,31 +23,49 @@
  * 
  */
 
+import java.awt.Canvas;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.videolan.jvlc.JVLCPanel;
+import javax.swing.JPanel;
+
 import org.videolan.jvlc.JVLC;
+import org.videolan.jvlc.Playlist;
 import org.videolan.jvlc.VLCException;
 
-class VLCPlayerFrame  extends Frame {
-    public VLCPlayerFrame() {
+
+class VLCPlayerFrame extends Frame
+{
+
+    private Playlist playlist;
+
+    public Canvas jvcanvas;
+
+    public VLCPlayerFrame()
+    {
         initComponents();
     }
-    
-    private void initComponents() {
 
-        java.awt.GridBagConstraints gridBagConstraints;	
+    private void initComponents()
+    {
 
-        fullScreenButton    = new javax.swing.JButton();
-        jTextField1         = new javax.swing.JTextField();
-        setButton           = new javax.swing.JButton();
-        pauseButton         = new javax.swing.JButton();
-        stopButton          = new javax.swing.JButton();
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        jvcc   = new JVLCPanel();
-        jvlc = jvcc.getJVLCObject();
+        fullScreenButton = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        setButton = new javax.swing.JButton();
+        pauseButton = new javax.swing.JButton();
+        stopButton = new javax.swing.JButton();
+
+        jvcc = new JPanel();
+        jvcanvas = new java.awt.Canvas();
+        jvcanvas.setSize(200, 200);
+        jvcc.add(jvcanvas);
+        
+        jvlc = new JVLC();
+        
+        playlist = new Playlist(jvlc);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -55,11 +73,14 @@ class VLCPlayerFrame  extends Frame {
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        add( jvcc , gridBagConstraints);
-        
+        add(jvcc, gridBagConstraints);
+
         fullScreenButton.setText("FullScreen");
-        fullScreenButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        fullScreenButton.addActionListener(new java.awt.event.ActionListener()
+        {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 fullScreenButtonActionPerformed(evt);
             }
         });
@@ -68,8 +89,7 @@ class VLCPlayerFrame  extends Frame {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add( fullScreenButton, gridBagConstraints);
-
+        add(fullScreenButton, gridBagConstraints);
 
         jTextField1.setText("file://a.avi");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -79,10 +99,12 @@ class VLCPlayerFrame  extends Frame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(jTextField1, gridBagConstraints);
 
-
         setButton.setText("Set item");
-        setButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        setButton.addActionListener(new java.awt.event.ActionListener()
+        {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 setButtonActionPerformed(evt);
             }
         });
@@ -92,10 +114,12 @@ class VLCPlayerFrame  extends Frame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(setButton, gridBagConstraints);
 
-
         pauseButton.setText("Play/Pause");
-        pauseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        pauseButton.addActionListener(new java.awt.event.ActionListener()
+        {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 pauseButtonActionPerformed(evt);
             }
         });
@@ -106,8 +130,11 @@ class VLCPlayerFrame  extends Frame {
         add(pauseButton, gridBagConstraints);
 
         stopButton.setText("Stop");
-        stopButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        stopButton.addActionListener(new java.awt.event.ActionListener()
+        {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 stopButtonActionPerformed(evt);
             }
         });
@@ -116,67 +143,89 @@ class VLCPlayerFrame  extends Frame {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(stopButton, gridBagConstraints);
-      
+
         pack();
-       
-        
-        
+
     }
 
-    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            //mci.stop(new Position(10000, PositionOrigin.ABSOLUTE, PositionKey.MEDIATIME));
-	    jvlc.playlist.stop();
-        } catch (Exception e) {
+    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {
+        try
+        {
+            playlist.stop();
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
-	}
+        }
     }
 
-    private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            //System.out.println(mci.getMediaPosition(PositionOrigin.ABSOLUTE, PositionKey.BYTECOUNT));
-	    jvlc.playlist.togglePause();
-        } catch (Exception e) {
+    private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {
+        try
+        {
+            playlist.togglePause();
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
-	}
+        }
     }
 
-    private void setButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-			jvlc.playlist.add("file://a.avi", "a.avi");
-			jvlc.playlist.play(-1, null);
-		} catch (VLCException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    private void setButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {
+        try
+        {
+            jvlc.setVideoOutput(jvcanvas);
+            playlist.add(jTextField1.getText(), "a.avi");
+            playlist.play();
+        }
+        catch (VLCException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    private void fullScreenButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        //jvlc.fullScreen();
+    private void fullScreenButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {
+        // jvlc.fullScreen();
     }
-    
+
     private javax.swing.JButton setButton;
+
     private javax.swing.JButton pauseButton;
+
     private javax.swing.JButton stopButton;
+
     private javax.swing.JButton fullScreenButton;
+
     private javax.swing.JTextField jTextField1;
-    private JVLCPanel jvcc;
+
+    private JPanel jvcc;
+
     public JVLC jvlc;
-    //MediaControlInstance mci;
-    
+    // MediaControlInstance mci;
+
 }
 
 
-public class VlcClient {
+public class VlcClient
+{
 
-    public static void main(String[] args) {
-	Frame f = new  VLCPlayerFrame();
-	f.setBounds(0, 0, 500, 500);
-	f.addWindowListener( new WindowAdapter() {
-		public void windowClosing(WindowEvent ev) {
-		    System.exit(0);
-		}
-	    } );
-	f.setVisible(true);
+    public static void main(String[] args)
+    {
+        Frame f = new VLCPlayerFrame();
+        f.setBounds(0, 0, 500, 500);
+        f.addWindowListener(new WindowAdapter()
+        {
+
+            @Override
+            public void windowClosing(WindowEvent ev)
+            {
+                System.exit(0);
+            }
+        });
+        f.setVisible(true);
     }
 }

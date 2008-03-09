@@ -2,33 +2,40 @@
             First of all, this is a *developers* only version
 
 
-Usage
------
+Compiling JVLC
+--------------
 
- In order to use these bindings you have to compile vlc from source. I
-recommend you to take the latest version from videolan svn repository
-(or use at least revison 18443) by doing:
+ In order to use these bindings you have to compile vlc from source, be sure
+to use the latest git version (see http://wiki.videolan.org/Git for instructions
+on how to get the latest vlc version).
 
-svn co svn://svn.videolan.org/vlc/trunk vlc-trunk
+ JVLC depends on JNA, you can download JNA from http://jna.dev.java.net .
 
- bootstrap, clean, set environment variables, configure and build:
+ JVLC is developed using the Sun JDK version 6, but version 5 should be fine too.
 
-./bootstrap
+ Until the build.xml will be ready, you may compile jvlc issueing from the bindings
+java folder:
 
-export JAVA_HOME=/path/to/jvm 
-(for example i have JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun)
+mkdir output
+javac -d output -cp <path-to>/jna.jar -g org/videolan/jvlc/internal/*.java org/videolan/jvlc/event/*.java  org/videolan/jvlc/*.java VLCExample.java VlcClient.java
 
-./configure --enable-java-bindings && make && make install
+ where <path-to> is the folder where the file jna.jar is contained
+ and in the output folder you'll find the compiled classes.
+
+ You may also import jvlc in eclipse running the createEclipseProject.sh script.
+
+
+Running JVLC Example
+--------------------
 
  To run a Java VLC example issue (be sure you have an a.avi and a.mp3 files
 in your user.dir folder):
 
-java -Djava.library.path=/usr/local/lib VLCExample
+java -cp .:<path-to>jna.jar -Djna.library.path=/usr/local/lib VLCExample
+
 
 (if you have specified a prefix in configure, change /usr/local/lib to 
 PREFIX/lib)
 
- Be sure your ldconfig can find libjawt.so and libmawt.so or you will
-get linking errors when you run the program.
 
  Happy playing.

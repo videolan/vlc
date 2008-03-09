@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MediaInstance.java: VLC Java Bindings
+ * MediaInstance.java: VLC Java Bindings Media Instance
  *****************************************************************************
- * Copyright (C) 1998-2007 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  *
  * Authors: Filippo Carone <filippo@carone.org>
  *
@@ -25,135 +25,172 @@
 
 package org.videolan.jvlc;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+import org.videolan.jvlc.event.MediaInstanceCallback;
+import org.videolan.jvlc.event.MediaInstanceListener;
+import org.videolan.jvlc.internal.LibVlc;
+import org.videolan.jvlc.internal.LibVlcEventType;
+import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
+
 
 public class MediaInstance
 {
-    private long _media_instance;
 
-    private native long _new_media_instance();
-    private native long _new_from_media_descriptor(MediaDescriptor mediaDescriptor);
-    private native void _instance_release(long mediaInstance);
-    private native void _instance_retain();
-    private native void _set_media_descriptor();
-    private native MediaDescriptor _get_media_descriptor();
-    private native EventManager _event_manager();
-    private native void _play();
-    private native void _stop();
-    private native void _pause();
-    private native void _set_drawable();
-    private native long _get_length();
-    private native long _get_time();
-    private native void _set_time(long time);
-    private native float _get_position();
-    private native void _set_position(float position);
-    private native boolean _will_play();
-    private native float _get_rate();
-    private native void _set_rate(float rate);
-    private native void _get_state();
-    private native boolean _has_vout();
-    private native float _get_fps();
-    
-    public MediaInstance()
+    private final LibVlcMediaInstance instance;
+
+    private final LibVlc libvlc;
+
+    private final LibVlcEventManager eventManager;
+
+    private List<MediaInstanceCallback> callbacks = new ArrayList<MediaInstanceCallback>();
+
+    private MediaDescriptor mediaDescriptor;
+
+    MediaInstance(JVLC jvlc, LibVlcMediaInstance instance)
     {
-        this._media_instance = _new_media_instance();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        this.instance = instance;
+        libvlc = jvlc.getLibvlc();
+        eventManager = libvlc.libvlc_media_instance_event_manager(instance, exception);
     }
-    
+
     public MediaInstance(MediaDescriptor mediaDescriptor)
     {
-        this._media_instance = _new_from_media_descriptor(mediaDescriptor);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc = mediaDescriptor.getLibvlc();
+        instance = libvlc.libvlc_media_instance_new_from_media_descriptor(mediaDescriptor.getInstance(), exception);
+        eventManager = libvlc.libvlc_media_instance_event_manager(instance, exception);
+        this.mediaDescriptor = mediaDescriptor;
     }
-    
+
     public MediaDescriptor getMediaDescriptor()
     {
-        return _get_media_descriptor();
+        return mediaDescriptor;
     }
-    
-    public void setMediaDescriptor(MediaDescriptor mediaDescriptor)
-    {
-        _new_from_media_descriptor(mediaDescriptor);
-    }
-    
-    public EventManager getEventManager()
-    {
-        return _event_manager();
-    }
-    
+
     public void play()
     {
-        _play();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_instance_play(instance, exception);
     }
-    
+
     public void stop()
     {
-        _stop();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_instance_stop(instance, exception);
     }
-    
+
     public void pause()
     {
-        _pause();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_instance_pause(instance, exception);
     }
 
     public long getLength()
     {
-        return _get_length();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_instance_get_length(instance, exception);
     }
-    
+
     public long getTime()
     {
-        return _get_time();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_instance_get_time(instance, exception);
     }
-    
+
     public void setTime(long time)
     {
-        _set_time(time);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_instance_set_time(instance, time, exception);
     }
-    
+
     public float getPosition()
     {
-        return _get_position();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_instance_get_position(instance, exception);
     }
-    
+
     public void setPosition(float position)
     {
-        _set_position(position);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_instance_set_position(instance, position, exception);
     }
-    
+
     public boolean willPlay()
     {
-        return _will_play();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return (libvlc.libvlc_media_instance_will_play(instance, exception) == 1);
     }
-    
+
     public float getRate()
     {
-        return _get_rate();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_instance_get_rate(instance, exception);
     }
-    
+
     public void setRate(float rate)
     {
-        _set_rate(rate);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_instance_set_rate(instance, rate, exception);
     }
-    
+
     public boolean hasVideoOutput()
     {
-        return _has_vout();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return (libvlc.libvlc_media_instance_has_vout(instance, exception) == 1);
     }
-    
+
     public float getFPS()
     {
-        return _get_fps();
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_instance_get_fps(instance, exception);
     }
-    
+
+    public void addListener(final MediaInstanceListener listener)
+    {
+        MediaInstanceCallback callback = new MediaInstanceCallback(this, listener);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        for (LibVlcEventType event : EnumSet.range(
+            LibVlcEventType.libvlc_MediaInstancePlayed,
+            LibVlcEventType.libvlc_MediaInstanceTimeChanged))
+        {
+            libvlc.libvlc_event_attach(eventManager, event.ordinal(), callback, null, exception);
+        }
+        callbacks.add(callback);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void finalize() throws Throwable
     {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        for (MediaInstanceCallback callback : callbacks)
+        {
+            for (LibVlcEventType event : EnumSet.range(
+                LibVlcEventType.libvlc_MediaInstancePlayed,
+                LibVlcEventType.libvlc_MediaInstancePositionChanged))
+            {
+                libvlc.libvlc_event_detach(eventManager, event.ordinal(), callback, null, exception);
+            }
+        }
+        libvlc.libvlc_media_instance_release(instance);
         super.finalize();
-        _instance_release(_media_instance);
     }
-    
-    
-    
-    
+
+    /**
+     * Returns the instance.
+     * @return the instance
+     */
+    LibVlcMediaInstance getInstance()
+    {
+        return instance;
+    }
+
 }

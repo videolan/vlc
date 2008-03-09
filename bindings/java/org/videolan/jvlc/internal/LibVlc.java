@@ -28,15 +28,18 @@ package org.videolan.jvlc.internal;
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;
+import com.sun.jna.Union;
 
 
 public interface LibVlc extends Library
 {
 
     LibVlc INSTANCE = (LibVlc) Native.loadLibrary("libvlc-control", LibVlc.class);
+    LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
 
     public static class libvlc_exception_t extends Structure
     {
@@ -46,6 +49,168 @@ public interface LibVlc extends Library
         public int code;
 
         public String message;
+    }
+
+    public static class libvlc_event_t extends Structure
+    {
+
+        public int type;
+
+        public Pointer obj;
+
+        public event_type_specific event_type_specific;
+
+    }
+
+    public class media_descriptor_meta_changed extends Structure
+    {
+
+        public Pointer meta_type;
+    }
+
+    public class media_descriptor_subitem_added extends Structure
+    {
+
+        public LibVlcMediaDescriptor new_child;
+    }
+
+    public class media_descriptor_duration_changed extends Structure
+    {
+
+        public NativeLong new_duration;
+    }
+
+    public class media_descriptor_preparsed_changed extends Structure
+    {
+
+        public int new_status;
+    }
+
+    public class media_descriptor_freed extends Structure
+    {
+
+        public LibVlcMediaDescriptor md;
+    }
+
+    public class media_descriptor_state_changed extends Structure
+    {
+
+        // @todo: check this one
+        public int new_state;
+    }
+
+    /* media instance */
+
+    public class media_instance_position_changed extends Structure
+    {
+
+        public float new_position;
+    }
+
+    public class media_instance_time_changed extends Structure
+    {
+
+        // @todo: check this one
+        public long new_time;
+    }
+
+    /* media list */
+    public class media_list_item_added extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    public class media_list_will_add_item extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    public class media_list_item_deleted extends Structure
+    {
+        
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    public class media_list_will_delete_item extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    /* media list view */
+    public class media_list_view_item_added extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    public class media_list_view_will_add_item extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    public class media_list_view_item_deleted extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    public class media_list_view_will_delete_item extends Structure
+    {
+
+        public LibVlcMediaDescriptor item;
+
+        public int index;
+    }
+
+    /* media discoverer */
+    public class media_media_discoverer_started extends Structure
+    {
+
+        public Pointer unused;
+    }
+
+    public class media_media_discoverer_ended extends Structure
+    {
+
+        public Pointer unused;
+    }
+
+    public class event_type_specific extends Union
+    {
+        public media_descriptor_meta_changed media_descriptor_meta_changed;
+        public media_descriptor_subitem_added media_descriptor_subitem_added;
+        public media_descriptor_duration_changed media_descriptor_duration_changed;
+        public media_descriptor_preparsed_changed media_descriptor_preparsed_changed;
+        public media_descriptor_freed media_descriptor_freed;
+        public media_descriptor_state_changed media_descriptor_state_changed;
+        public media_instance_position_changed media_instance_position_changed;
+        public media_instance_time_changed media_instance_time_changed;
+        public media_list_item_added media_list_item_added;
+        public media_list_will_add_item media_list_will_add_item;
+        public media_list_item_deleted media_list_item_deleted;
+        public media_list_will_delete_item media_list_will_delete_item;
+        public media_list_view_item_added media_list_view_item_added;
+        public media_list_view_will_add_item media_list_view_will_add_item;
+        public media_list_view_item_deleted media_list_view_item_deleted;
+        public media_list_view_will_delete_item media_list_view_will_delete_item;
     }
 
     public class LibVlcInstance extends PointerType
@@ -138,34 +303,36 @@ public interface LibVlc extends Library
     int libvlc_audio_set_volume(LibVlcInstance instance, int volume, libvlc_exception_t exception);
 
     // playlist
-    
+
     void libvlc_playlist_loop(LibVlcInstance instance, int loop, libvlc_exception_t exception);
-    
-    void libvlc_playlist_play(LibVlcInstance instance, int itemIndex, int optionsCount, String[] options, libvlc_exception_t exception);
-    
+
+    void libvlc_playlist_play(LibVlcInstance instance, int itemIndex, int optionsCount, String[] options,
+        libvlc_exception_t exception);
+
     void libvlc_playlist_pause(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     void libvlc_playlist_stop(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     int libvlc_playlist_isplaying(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     int libvlc_playlist_items_count(LibVlcInstance instance, libvlc_exception_t exception);
 
     void libvlc_playlist_next(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     void libvlc_playlist_prev(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     void libvlc_playlist_clear(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     int libvlc_playlist_add(LibVlcInstance instance, String uri, String name, libvlc_exception_t exception);
-    
+
     int libvlc_playlist_delete_item(LibVlcInstance instance, int itemIndex, libvlc_exception_t exception);
-    
+
     LibVlcMediaInstance libvlc_playlist_get_media_instance(LibVlcInstance instance, libvlc_exception_t exception);
-    
+
     int libvlc_media_instance_is_seekable(LibVlcMediaInstance instance, libvlc_exception_t exception);
-    
+
     int libvlc_media_instance_can_pause(LibVlcMediaInstance instance, libvlc_exception_t exception);
+
     // media descriptor
 
     LibVlcMediaDescriptor libvlc_media_descriptor_new(LibVlcInstance libvlc_instance, String mrl,
@@ -204,7 +371,7 @@ public interface LibVlc extends Library
     void libvlc_media_instance_set_time(LibVlcMediaInstance instance, long time, libvlc_exception_t exception);
 
     float libvlc_media_instance_get_position(LibVlcMediaInstance instance, libvlc_exception_t exception);
-    
+
     void libvlc_media_instance_set_position(LibVlcMediaInstance instance, float position, libvlc_exception_t exception);
 
     int libvlc_media_instance_will_play(LibVlcMediaInstance instance, libvlc_exception_t exception);
@@ -218,7 +385,7 @@ public interface LibVlc extends Library
     float libvlc_media_instance_get_fps(LibVlcMediaInstance instance2, libvlc_exception_t exception);
 
     void libvlc_media_instance_release(LibVlcMediaInstance instance);
-    
+
     LibVlcEventManager libvlc_media_instance_event_manager(LibVlcMediaInstance media_instance,
         libvlc_exception_t exception);
 
@@ -293,7 +460,7 @@ public interface LibVlc extends Library
     public static interface LibVlcCallback extends Callback
     {
 
-        void callback(int libvlc_event_t, Pointer userData);
+        void callback(libvlc_event_t libvlc_event, Pointer userData);
     }
 
     void libvlc_event_attach(LibVlcEventManager event_manager, int event_type, LibVlcCallback callback,

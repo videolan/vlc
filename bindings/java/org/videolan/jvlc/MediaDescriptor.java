@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MediaDescriptor.java: VLC Java Bindings
+ * MediaDescriptor.java: VLC Java Bindings Media Descriptor
  *****************************************************************************
- * Copyright (C) 1998-2007 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  *
  * Authors: Filippo Carone <filippo@carone.org>
  *
@@ -25,23 +25,80 @@
 
 package org.videolan.jvlc;
 
+import org.videolan.jvlc.internal.LibVlc;
+import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
+import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
+
 
 public class MediaDescriptor
 {
-    private long mediaDescriptor;
+    private LibVlcMediaDescriptor instance;
+    private LibVlc libvlc;
+    private LibVlcEventManager eventManager;
     
-    public MediaDescriptor(long mediaDescriptor)
+    /**
+     * @param jvlc The jvlc instance to create the media descriptor for.
+     * @param media The media string
+     */
+    public MediaDescriptor(JVLC jvlc, String media)
     {
-        this.mediaDescriptor = mediaDescriptor;
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc = jvlc.getLibvlc();
+        instance = libvlc.libvlc_media_descriptor_new(jvlc.getInstance(), media, exception);
+        eventManager = libvlc.libvlc_media_descriptor_event_manager(instance, exception);
+    }
+
+    MediaDescriptor(JVLC jvlc, LibVlcMediaDescriptor instance)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc = jvlc.getLibvlc();
+        this.instance = instance;
+        eventManager = libvlc.libvlc_media_descriptor_event_manager(instance, exception);
+    }
+
+    public void addOption(String option)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_media_descriptor_add_option(instance, option, exception );
+    }
+    
+    public String getMrl()
+    {
+        return libvlc.libvlc_media_descriptor_get_mrl(instance);
+    }
+    
+    public MediaInstance getMediaInstance()
+    {
+        return new MediaInstance(this);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void finalize() throws Throwable
+    {
+        libvlc.libvlc_media_descriptor_release(instance);
+        super.finalize();
     }
 
     
     /**
-     * Returns the mediaDescriptor.
-     * @return the mediaDescriptor
+     * Returns the instance.
+     * @return the instance
      */
-    public long getMediaDescriptor()
+    LibVlcMediaDescriptor getInstance()
     {
-        return mediaDescriptor;
+        return instance;
+    }
+    
+    /**
+     * Returns the libvlc.
+     * @return the libvlc
+     */
+    LibVlc getLibvlc()
+    {
+        return libvlc;
     }
 }

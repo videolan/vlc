@@ -36,6 +36,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.libvlc_event_t;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 import com.sun.jna.Pointer;
@@ -68,7 +69,7 @@ public class LibVlcImpl
         {
 
             @Override
-            public void callback(int libvlc_event_t, Pointer pointer)
+            public void callback(libvlc_event_t libvlc_event_t, Pointer pointer)
             {
                 System.out.println("Playing started.");
             }
@@ -78,7 +79,7 @@ public class LibVlcImpl
         {
 
             @Override
-            public void callback(int libvlc_event_t, Pointer pointer)
+            public void callback(libvlc_event_t libvlc_event_t, Pointer pointer)
             {
                 synchronized (lock)
                 {

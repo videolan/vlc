@@ -1,7 +1,7 @@
 /*****************************************************************************
- * EventManager.java: VLC Java Bindings
+ * MediaInstancePlayListener.java: VLC Java Bindings
  *****************************************************************************
- * Copyright (C) 1998-2007 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  *
  * Authors: Filippo Carone <filippo@carone.org>
  *
@@ -23,10 +23,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-package org.videolan.jvlc;
+package org.videolan.jvlc.event;
+
+import org.videolan.jvlc.MediaInstance;
 
 
-public class EventManager
+public interface MediaInstanceListener
 {
 
+    void played(MediaInstance mediaInstance);
+    
+    void paused(MediaInstance mediaInstance);
+    
+    void endReached(MediaInstance mediaInstance);
+    
+    void timeChanged(MediaInstance mediaInstance, long newTime);
+    
+    void positionChanged(MediaInstance mediaInstance);
+    
 }

@@ -5973,17 +5973,15 @@ AC_ARG_ENABLE(java-bindings,
   [  --enable-java-bindings  Enable Java bindings (default disabled)])
 if test "${enable_java_bindings}" = "yes"
 then
-  AS_IF([test "x${JAVA_HOME}" == "x"],
-	[AC_MSG_ERROR([Please set the JAVA_HOME variable to your JDK environment])])
-  AC_PROG_JAVAC
-  AC_PROG_JAVA
-  PLUGINS_BINDINGS="${PLUGINS_BINDINGS} java"
-  if test "${JAVAC}" == "javac${EXEEXT}"
-  then
-    JAVAC="javac${EXEEXT} -cp ./ "
-  fi
+        echo ""
+        echo "****** WARNING **** WARNING ***** WARNING *************"
+        echo "*** To compile the java bindings go to the 
+        echo "*** bindings/java folder and run ant.
+	echo "*** This configuration will continue, so you will be
+	echo "*** able to compile VideoLAN as usual.
+        echo "*******************************************************"
+        echo ""
 fi
-AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
 
 dnl
 dnl  test plugins
@@ -6162,8 +6160,6 @@ AC_CONFIG_FILES([
   projects/activex/Makefile
   projects/activex/axvlc.inf
   bindings/Makefile
-  bindings/java/Makefile
-  bindings/java/src/Makefile
   bindings/python/Makefile
   doc/Makefile
   extras/package/ipkg/Makefile

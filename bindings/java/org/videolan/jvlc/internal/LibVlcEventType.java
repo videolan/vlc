@@ -36,5 +36,8 @@ public enum LibVlcEventType {
     libvlc_MediaDescriptorStateChanged,
     libvlc_MediaInstancePlayed,
     libvlc_MediaInstancePaused,
-    libvlc_MediaInstanceReachedEnd;
+    libvlc_MediaInstanceReachedEnd,
+    libvlc_MediaInstanceEncounteredError,
+    libvlc_MediaInstanceTimeChanged,
+    libvlc_MediaInstancePositionChanged;
 }

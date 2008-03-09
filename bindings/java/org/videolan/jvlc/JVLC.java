@@ -2,14 +2,14 @@
  * JVLC.java: Main Java Class, represents a libvlc_instance_t object
  *****************************************************************************
  *
- * Copyright (C) 1998-2006 the VideoLAN team
+ * Copyright (C) 1998-2008 the VideoLAN team
  * 
  * Author: Filippo Carone <filippo@carone.org>
  *         Philippe Morin <phmorin@free.fr>
  *
  * Created on 28-feb-2006
  *
- * $Id$
+ * $Id: JVLC.java 20141 2007-05-16 19:31:35Z littlejohn $
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
@@ -27,147 +27,90 @@
  * 
  */
 
-
 package org.videolan.jvlc;
 
-public class JVLC implements Runnable {
-    
-    static {
-        System.loadLibrary("jvlc" );
-    }
-    
-    /**
-     * These are set as final since they live along the jvlc object
-     */
-    private final long		_instance;
-    
-    public  final Playlist	playlist;
-    public	final Video		video;
-    public	final Audio		audio;
-    public	final Input		input;
-    public	final VLM		vlm;
-    
-    private boolean beingDestroyed = false;
+import org.videolan.jvlc.internal.LibVlc;
+import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
+import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
-    /**
-     * This is the time in millis VLC checks for internal status 
-     */
-    private long resolution = 50;
+import com.sun.jna.Native;
+
+import java.awt.Canvas;
+
+public class JVLC
+{
+
+    private final LibVlcInstance instance;
+
+    private final LibVlc libvlc = LibVlc.SYNC_INSTANCE;
     
-	private boolean inputPlaying = false;
-	private boolean inputVout = false;
-    
-    public JVLC() {
+    public JVLC()
+    {
         String[] args = new String[1];
         args[0] = "jvlc";
-        
-        _instance	= createInstance( args );
-        playlist	= new Playlist	( _instance );
-        video		= new Video		( _instance );
-        audio		= new Audio		( _instance );
-        input		= new Input		( _instance );
-        vlm			= new VLM		( _instance );
-        new Thread(this).start();
+        instance = createInstance(args);
     }
-    
-    public JVLC(String[] args) {
-	String[] myargs = new String[args.length + 1];
-	myargs[0] = "jvlc";
-	System.arraycopy( args, 0, myargs, 1, args.length );
-        _instance	= createInstance( myargs );
-        playlist	= new Playlist	( _instance );
-        video		= new Video		( _instance );
-        audio		= new Audio		( _instance );
-        input		= new Input		( _instance );
-        vlm			= new VLM		( _instance );
-        
-        new Thread(this).start();
-    }
-    
-    
-    /**
-     * Destroys the current instance of jvlc, cleaning up objects.
-     * This is unreversible.
-     */
-    public void destroy() {
-    	if (!beingDestroyed)
-    	{
-    		beingDestroyed = true;
-    		_destroy();
-    	}
-    }
- 
 
-	/*
-     * Core methods
-     */
-    private native long createInstance( String[] args );
-    private native void _destroy();   
+    public JVLC(String[] args)
+    {
+        String[] myargs = new String[args.length + 1];
+        myargs[0] = "jvlc";
+        System.arraycopy(args, 0, myargs, 1, args.length);
+        instance = createInstance(myargs);
+    }
 
-    public long getInstance() throws VLCException {
-        return _instance;
+    public MediaInstance play(String media)
+    {
+        MediaDescriptor mediaDescriptor = new MediaDescriptor(this, media);
+        MediaInstance mediaInstance = new MediaInstance(mediaDescriptor);
+        mediaInstance.play();
+        return mediaInstance;
+    }
+
+    public void setVideoOutput(Canvas canvas)
+    {
+        long drawable = Native.getComponentID(canvas);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_video_set_parent(instance, drawable, exception );
     }
 
     /*
-     * Getters and setters
+     * Core methods
      */
-	public Playlist getPlaylist() throws VLCException {
-		return playlist;
-	}
-    
+    private LibVlcInstance createInstance(String[] args)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_exception_init(exception);
 
+        return libvlc.libvlc_new(args.length, args, exception);
+    }
 
-	/**
-	 * Checks if the input is playing.
-	 * @return True if there is a playing input.
-	 */
-	public boolean isInputPlaying() {
-		return inputPlaying;
-	}
+    /**
+     * Returns the _instance.
+     * @return the _instance
+     */
+    LibVlcInstance getInstance()
+    {
+        return instance;
+    }
 
-	/**
-	 * Checks if the input has spawned a video window.
-	 * @return True if there is a video window.
-	 */
-	public boolean hasVout() {
-		return inputVout;
-	}
+    /**
+     * Returns the libvlc.
+     * @return the libvlc
+     */
+    LibVlc getLibvlc()
+    {
+        return libvlc;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 * 
-	 * In this thread we check the playlist and input status.
-	 */
-	public void run() {
-		try {
-			while (!beingDestroyed) {
-				try {
-					while (playlist.isRunning()) {
-						inputPlaying = input.isPlaying();
-						inputVout = input.hasVout();        
-						Thread.sleep(resolution);
-					} // while playlist running
-				} catch (VLCException e) {
-					// it is non-sense to show the stacktrace here
-					// e.printStackTrace();
-				}
-				inputPlaying = false;
-				inputVout = false;
-				Thread.sleep(resolution);
-			} // while ! being destroyed
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#finalize()
-	 */
-	protected void finalize() throws Throwable {
-		destroy();
-		super.finalize();
-	}
-
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#finalize()
+     */
+    @Override
+    protected void finalize() throws Throwable
+    {
+        libvlc.libvlc_release(instance);
+        super.finalize();
+    }
 }
-
