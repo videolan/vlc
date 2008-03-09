@@ -413,7 +413,7 @@ void MainInterface::handleMainUi( QSettings *settings )
                    config_GetInt( p_intf, "qt-blingbling" ) );
 
     /* Add the controls Widget to the main Widget */
-    mainLayout->insertWidget( 0, controls );
+    mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
 
     /* Create the Speed Control Widget */
     speedControl = new SpeedControlWidget( p_intf );
