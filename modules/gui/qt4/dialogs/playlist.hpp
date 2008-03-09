@@ -25,6 +25,7 @@
 #define _PLAYLIST_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
+#include "../components/playlist/playlist.hpp"
 
 #include <QModelIndex>
 
@@ -36,6 +37,10 @@ class QSettings;
 class PlaylistDialog : public QVLCMW
 {
     Q_OBJECT;
+private:
+    PlaylistWidget *playlistWidget;
+    QSettings *settings;
+
 public:
     static PlaylistDialog * getInstance( intf_thread_t *p_intf )
     {

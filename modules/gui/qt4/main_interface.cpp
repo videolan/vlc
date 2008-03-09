@@ -138,14 +138,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 #if 0
     /* Create a Dock to get the playlist */
-/*    dockPL = new QDockWidget( qtr( "Playlist" ), this );
+    dockPL = new QDockWidget( qtr( "Playlist" ), this );
     dockPL->setSizePolicy( QSizePolicy::Preferred,
                            QSizePolicy::Expanding );
     dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
     dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
                            | Qt::RightDockWidgetArea
                            | Qt::BottomDockWidgetArea );
-    dockPL->hide();*/
+    dockPL->hide();
 #endif
 
     /************
@@ -244,13 +244,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, doComponentsUpdate() );
 
     /* Size and placement of interface */
-    move( settings->value( "pos", QPoint( 0, 0 ) ).toPoint() );
+    QVLCTools::restoreWidgetPosition(settings,this,QSize(350,60));
 
-    QSize newSize = settings->value( "size", QSize( 350, 60 ) ).toSize();
-    if( newSize.isValid() )
-        resize( newSize );
-    else
-        msg_Warn( p_intf, "Invalid size in constructor" );
 
     /* Playlist */
     if( settings->value( "playlist-visible", 0 ).toInt() ) togglePlaylist();
@@ -274,16 +269,19 @@ MainInterface::~MainInterface()
 {
     msg_Dbg( p_intf, "Destroying the main interface" );
 
-    if( playlistWidget ) playlistWidget->savingSettings( settings );
+    if( playlistWidget )
+        playlistWidget->savingSettings( settings );
 
     settings->beginGroup( "MainWindow" );
-//    settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
+
+    // settings->setValue( "playlist-floats", (int)(dockPL->isFloating()) );
     settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
-    settings->setValue( "pos", pos() );
+
     if( !videoIsActive )
-        settings->setValue( "size", size() );
+        QVLCTools::saveWidgetPosition(settings, this);
+
     if( bgWidget )
         settings->setValue( "backgroundSize", bgWidget->size() );
 

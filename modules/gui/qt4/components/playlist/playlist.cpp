@@ -115,11 +115,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
     setCollapsible( 1, false );
 
     /* In case we want to keep the splitter informations */
-    settings->beginGroup( "playlist" );
+    // components shall never write there setting to a fixed location, may infer
+    // with other uses of the same component...
+    // settings->beginGroup( "playlist" );
     restoreState( settings->value("splitterSizes").toByteArray());
-    resize( settings->value("size", QSize(600, 300)).toSize());
-    move( settings->value("pos", QPoint( 0, 400)).toPoint());
-    settings->endGroup();
 }
 
 void PlaylistWidget::setArt( QString url )
@@ -145,10 +144,6 @@ PlaylistWidget::~PlaylistWidget()
 
 void PlaylistWidget::savingSettings( QSettings *settings )
 {
-    settings->beginGroup( "playlist" );
-    settings->setValue( "pos", parent->pos() );
-    settings->setValue( "size", parent->size() );
     settings->setValue( "splitterSizes", saveState() );
-    settings->endGroup();
 }
 

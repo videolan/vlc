@@ -49,15 +49,28 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     QHBoxLayout *l = new QHBoxLayout( centralWidget() );
-    QSettings *settings = new QSettings( "vlc", "vlc-qt-interface" );
-    PlaylistWidget *plw = new PlaylistWidget( p_intf, settings, this );
-    l->addWidget( plw );
 
-    readSettings( "playlist", QSize( 600,700 ) );
+    settings = new QSettings( "vlc", "vlc-qt-interface" );
+    settings->beginGroup("playlistdialog");
+
+    playlistWidget = new PlaylistWidget( p_intf, settings, this );
+    l->addWidget( playlistWidget );
+
+    readSettings( settings, QSize( 600,700 ) );
+
+    settings->endGroup();
 }
 
 PlaylistDialog::~PlaylistDialog()
-{}
+{
+    settings->beginGroup("playlistdialog");
+
+    writeSettings(settings);
+    playlistWidget->savingSettings(settings);
+
+    settings->endGroup();
+    delete settings;
+}
 
 void PlaylistDialog::dropEvent( QDropEvent *event )
 {

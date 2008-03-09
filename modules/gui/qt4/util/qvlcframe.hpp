@@ -33,10 +33,87 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QKeyEvent>
+#include <QDesktopWidget>
 
 #include "qt4.hpp"
 #include <vlc/vlc.h>
 #include <vlc_charset.h>
+
+class QVLCTools
+{
+   public:
+       /*
+        use this function to save a widgets screen position
+        only for windows / dialogs which are floating, if a
+        window is docked into an other - don't all this function
+        or it may write garbage to position info!
+       */
+       static void saveWidgetPosition(QSettings *settings, QWidget *widget)
+       {
+         settings->setValue("geometry", widget->saveGeometry());
+       }
+       static void saveWidgetPosition(QString configName, QWidget *widget)
+       {
+         QSettings *settings = new QSettings("vlc", "vlc-qt-interface");
+         settings->beginGroup( configName );
+         QVLCTools::saveWidgetPosition(settings, widget);
+         settings->endGroup();
+         delete settings;
+       }
+
+
+       /*
+         use this method only for restoring window state of non docked
+         windows!
+       */
+       static vlc_bool_t restoreWidgetPosition(QSettings *settings,
+                                           QWidget *widget,
+                                           QSize defSize = QSize( 0, 0 ),
+                                           QPoint defPos = QPoint( 0, 0 ))
+       {
+          if(!widget->restoreGeometry(settings->value("geometry")
+                                      .toByteArray()))
+          {
+            widget->move(defPos);
+            widget->resize(defSize);
+
+            if(defPos.x() == 0 && defPos.y()==0)
+               centerWidgetOnScreen(widget);
+            return VLC_TRUE;
+          }
+          return VLC_FALSE;
+       }
+
+       static vlc_bool_t restoreWidgetPosition(QString configName,
+                                           QWidget *widget,
+                                           QSize defSize = QSize( 0, 0 ),
+                                           QPoint defPos = QPoint( 0, 0 ) )
+       {
+         QSettings *settings = new QSettings( "vlc", "vlc-qt-interface" );
+         settings->beginGroup( configName );
+         vlc_bool_t defaultUsed = QVLCTools::restoreWidgetPosition(settings,
+                                                                   widget,
+                                                                   defSize,
+                                                                   defPos);
+         settings->endGroup();
+         delete settings;
+
+         return defaultUsed;
+       }
+
+      /*
+        call this method for a window or dialog to show it centred on
+        current screen
+      */
+      static void centerWidgetOnScreen(QWidget *widget)
+      {
+         QDesktopWidget * const desktop = QApplication::desktop();
+         QRect screenRect = desktop->screenGeometry(widget);
+         QPoint p1 = widget->frameGeometry().center();
+
+         widget->move ( screenRect.center() - p1 );
+      }
+};
 
 class QVLCFrame : public QWidget
 {
@@ -57,26 +134,14 @@ protected:
                        QSize defSize = QSize( 0, 0 ),
                        QPoint defPos = QPoint( 0, 0 ) )
     {
-        QSettings settings( "vlc", "vlc-qt-interface" );
-        settings.beginGroup( name );
-        /* never trust any saved size ;-) */
-        QSize newSize = settings.value( "size", defSize ).toSize();
-        if( newSize.isValid() )
-           resize( newSize );
-        move( settings.value( "pos", defPos ).toPoint() );
-        settings.endGroup();
+        QVLCTools::restoreWidgetPosition(name, this, defSize, defPos);
     }
+
     void writeSettings( QString name )
     {
-        QSettings settings( "vlc", "vlc-qt-interface" );
-        settings.beginGroup( name );
-        /* only save valid sizes ... */
-        QSize currentsize = size();
-        if( currentsize.isValid() )
-           settings.setValue ("size", currentsize );
-        settings.setValue( "pos", pos() );
-        settings.endGroup();
+        QVLCTools::saveWidgetPosition(name, this);
     }
+
     virtual void cancel()
     {
         hide();
@@ -156,36 +221,34 @@ protected:
 
     void readSettings( QString name, QSize defSize )
     {
-        QSettings settings( "vlc", "vlc-qt-interface" );
-        settings.beginGroup( name );
-        QSize s =  settings.value( "size", defSize ).toSize() ;
-        move( settings.value( "pos", QPoint( 0,0 ) ).toPoint() );
-        settings.endGroup();
+        QVLCTools::restoreWidgetPosition(name, this, defSize);
     }
 
     void readSettings( QString name )
     {
-        QSettings settings( "vlc", "vlc-qt-interface" );
-        settings.beginGroup( name );
-        mainSize = settings.value( "size", QSize( 0,0 ) ).toSize();
-        if( !mainSize.isValid() )
-        {
-           mainSize = QSize(0,0);
-        }
-        settings.endGroup();
+        QVLCTools::restoreWidgetPosition(name, this);
     }
 
-    void writeSettings( QString name )
+    void readSettings( QSettings *settings )
     {
-        QSettings settings( "vlc", "vlc-qt-interface" );
-        settings.beginGroup( name );
-        /* only save valid sizes ... */
-        QSize currentsize = size();
-        if( currentsize.isValid() )
-            settings.setValue ("size", currentsize );
-        settings.setValue( "pos", pos() );
-        settings.endGroup();
+        QVLCTools::restoreWidgetPosition(settings, this);
     }
+
+    void readSettings( QSettings *settings, QSize defSize)
+    {
+        QVLCTools::restoreWidgetPosition(settings, this, defSize);
+    }
+
+    void writeSettings(QString name )
+    {
+        QVLCTools::saveWidgetPosition(name, this);
+    }
+
+    void writeSettings(QSettings *settings )
+    {
+        QVLCTools::saveWidgetPosition(settings, this);
+    }
+
 };
 
 #endif
