@@ -190,6 +190,9 @@ const char* psz_introspection_xml_data_tracklist =
 "    <method name=\"Random\">\n"
 "      <arg type=\"b\" direction=\"in\" />\n"
 "    </method>\n"
+"    <signal name=\"TrackListChange\">\n"
+"      <arg type=\"i\" />\n"
+"    </signal>\n"
 "  </interface>\n"
 "</node>\n"
 ;

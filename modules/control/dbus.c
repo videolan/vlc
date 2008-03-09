@@ -2,7 +2,7 @@
  * dbus.c : D-Bus control interface
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007 Mirsal Ennaime
+ * Copyright © 2007-2008 Mirsal Ennaime
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
@@ -71,6 +71,9 @@ static int TrackChange( vlc_object_t *, const char *, vlc_value_t,
                         vlc_value_t, void * );
 
 static int StatusChangeEmit( vlc_object_t *, const char *, vlc_value_t,
+                        vlc_value_t, void * );
+
+static int TrackListChangeEmit( vlc_object_t *, const char *, vlc_value_t,
                         vlc_value_t, void * );
 
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
@@ -749,6 +752,9 @@ static int Open( vlc_object_t *p_this )
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
     var_AddCallback( p_playlist, "playlist-current", TrackChange, p_intf );
+    var_AddCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "item-append", TrackListChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "item-deleted", TrackListChangeEmit, p_intf );
     var_AddCallback( p_playlist, "random", StatusChangeEmit, p_intf );
     var_AddCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
     var_AddCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
@@ -776,6 +782,9 @@ static void Close   ( vlc_object_t *p_this )
 
     PL_LOCK;
     var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
+    var_DelCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "item-append", TrackListChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "item-deleted", TrackListChangeEmit, p_intf );
     var_DelCallback( p_playlist, "random", StatusChangeEmit, p_intf );
     var_DelCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
     var_DelCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
@@ -809,6 +818,40 @@ static void Run          ( intf_thread_t *p_intf )
     }
 }
 
+/******************************************************************************
+ * TrackListChange: tracklist order / length change signal 
+ *****************************************************************************/
+DBUS_SIGNAL( TrackListChangeSignal )
+{ /* emit the new tracklist lengh */
+    SIGNAL_INIT("TrackListChange");
+    OUT_ARGUMENTS;
+
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_data );
+    dbus_int32_t i_elements = p_playlist->items.i_size / 2;
+    pl_Release( p_playlist );
+
+    ADD_INT32( &i_elements );
+    SIGNAL_SEND;
+}
+
+/*****************************************************************************
+ * TrackListChangeEmit: Emits the TrackListChange signal
+ *****************************************************************************/
+/* FIXME: It is not called on tracklist reorder and seems to be called
+ * twice on element addition / removal */
+static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
+            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
+    VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    intf_thread_t *p_intf = p_data;
+
+    if( p_intf->b_dead )
+        return VLC_SUCCESS;
+
+    TrackListChangeSignal( p_intf->p_sys->p_conn, p_data );
+    return VLC_SUCCESS;
+}
 /*****************************************************************************
  * TrackChange: Playlist item change callback
  *****************************************************************************/
