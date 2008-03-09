@@ -468,7 +468,7 @@ if(FFmpeg_FOUND)
   vlc_check_include_files (ffmpeg/avutil.h libavutil/avutil.h)
   vlc_check_include_files (ffmpeg/swscale.h libswscale/swscale.h)
   check_c_source_compiles( "#include <stdint.h>\n#include <postproc/postprocess.h>\nint main(){return 0;}" HAVE_POSTPROC_POSTPROCESS_H )
-  check_c_source_compiles( "#include <stdint.h>\n#include <libpostproc/postprocess.h>\nint main(){return 0;}" HAVE_LIBPOSTPROC_POSTPROCESS_H )
+  vlc_check_include_files (libpostproc/postprocess.h)
   
   message( STATUS "avcodec found ${HAVE_FFMPEG_AVCODEC_H} || ${HAVE_LIBAVCODEC_AVCODEC_H}")
   message( STATUS "avutil found ${HAVE_FFMPEG_AVUTIL_H} || ${HAVE_LIBAVUTIL_AVUTIL_H}")
