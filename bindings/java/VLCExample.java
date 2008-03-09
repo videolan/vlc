@@ -71,28 +71,21 @@ public class VLCExample
             Thread.sleep(100);
         }
 
-        try
-        {
-            Video video = new Video(jvlc);
-            System.out.print(video.getWidth(mediaInstance));
-            System.out.print("x");
-            System.out.println(video.getHeight(mediaInstance));
-            System.out.print("Fullscreen... ");
-            video.setFullscreen(mediaInstance, true);
-            Thread.sleep(3000);
-            System.out.println("real size.");
-            video.setFullscreen(mediaInstance, false);
-            System.out.print("Taking snapshot... ");
-            video.getSnapshot(mediaInstance, System.getProperty("user.dir") + "/snap.png", 0, 0);
-            System.out.println("taken. (see " + System.getProperty("user.dir") + "/snap.png )");
-            Thread.sleep(2000);
-            System.out.println("Resizing to 300x300");
-            video.setSize(300, 300);
-        }
-        catch (VLCException e)
-        {
-            e.printStackTrace();
-        }
+        Video video = new Video(jvlc);
+        System.out.print(video.getWidth(mediaInstance));
+        System.out.print("x");
+        System.out.println(video.getHeight(mediaInstance));
+        System.out.print("Fullscreen... ");
+        video.setFullscreen(mediaInstance, true);
+        Thread.sleep(3000);
+        System.out.println("real size.");
+        video.setFullscreen(mediaInstance, false);
+        System.out.print("Taking snapshot... ");
+        video.getSnapshot(mediaInstance, System.getProperty("user.dir") + "/snap.png", 0, 0);
+        System.out.println("taken. (see " + System.getProperty("user.dir") + "/snap.png )");
+        Thread.sleep(2000);
+        System.out.println("Resizing to 300x300");
+        video.setSize(300, 300);
 
         System.out.print("Muting...");
         Audio audio = new Audio(jvlc);
