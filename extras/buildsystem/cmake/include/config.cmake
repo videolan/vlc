@@ -63,9 +63,9 @@ include( ${CMAKE_SOURCE_DIR}/cmake/pkg_check_modules.cmake )
 # Versioning
 ###########################################################
 
-set(VLC_VERSION_MAJOR 0)
-set(VLC_VERSION_MINOR 9)
-set(VLC_VERSION_PATCH 0)
+set(VLC_VERSION_MAJOR "0")
+set(VLC_VERSION_MINOR "9")
+set(VLC_VERSION_PATCH "0")
 set(VLC_VERSION_EXTRA "-svn")
 set(VLC_VERSION ${VLC_VERSION_MAJOR}.${VLC_VERSION_MINOR}.${VLC_VERSION_PATCH}${VLC_VERSION_EXTRA})
 
