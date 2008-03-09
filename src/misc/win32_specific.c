@@ -309,7 +309,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
         vlc_object_t *p_this;
         playlist_t *p_playlist;
 
-        p_this = (vlc_object_t *)GetWindowLong( hwnd, GWL_USERDATA );
+        p_this = (vlc_object_t *)GetWindowLongPtr( hwnd, GWL_USERDATA );
 
         if( !p_this ) return 0;
 
