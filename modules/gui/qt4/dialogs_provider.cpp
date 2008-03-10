@@ -501,6 +501,17 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         qdialog = (InteractionDialog*)(p_dialog->p_private);
         if( qdialog )
             qdialog->update();
+        else
+        {
+            /* The INTERACT_NEW message was forgotten
+               so we must create the dialog and update it*/
+            qdialog = new InteractionDialog( p_intf, p_dialog );
+            p_dialog->p_private = (void*)qdialog;
+            if( !(p_dialog->i_status == ANSWERED_DIALOG) )
+                qdialog->show();
+            if( qdialog )
+                qdialog->update();
+        }
         break;
     case INTERACT_HIDE:
         qdialog = (InteractionDialog*)(p_dialog->p_private);
