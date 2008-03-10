@@ -58,6 +58,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog );
 
 /**
  * Destroy the interaction system
+ *
  * \param The interaction object to destroy
  * \return nothing
  */
@@ -179,12 +180,15 @@ void intf_InteractionManage( playlist_t *p_playlist )
         vasprintf( &p_new->psz_description, psz_format, args ); \
         va_end( args );
 
-/** Send an error message, both in a blocking and non-blocking way
- *  \param p_this     Parent vlc_object
- *  \param b_blocking Is this dialog blocking or not?
- *  \param psz_title  Title for the dialog
- *  \param psz_format The message to display
- *  */
+/**
+ * Send an error message, both in a blocking and non-blocking way
+ *
+ * \param p_this     Parent vlc_object
+ * \param b_blocking Is this dialog blocking or not?
+ * \param psz_title  Title for the dialog
+ * \param psz_format The message to display
+ * \return           VLC_SUCCESS or VLC_EGENERIC
+ */
 int __intf_UserFatal( vlc_object_t *p_this, vlc_bool_t b_blocking,
                        const char *psz_title,
                        const char *psz_format, ... )
@@ -203,11 +207,14 @@ int __intf_UserFatal( vlc_object_t *p_this, vlc_bool_t b_blocking,
     return DialogSend( p_this, p_new );
 }
 
-/** Helper function to send an warning, which is always shown non-blocking
- *  \param p_this     Parent vlc_object
- *  \param psz_title  Title for the dialog
- *  \param psz_format The message to display
- *  */
+/**
+ * Helper function to send a warning, which is always shown non-blocking
+ *
+ * \param p_this     Parent vlc_object
+ * \param psz_title  Title for the dialog
+ * \param psz_format The message to display
+ * \return           VLC_SUCCESS or VLC_EGENERIC
+ */
 int __intf_UserWarn( vlc_object_t *p_this,
                      const char *psz_title,
                      const char *psz_format, ... )
@@ -223,14 +230,16 @@ int __intf_UserWarn( vlc_object_t *p_this,
     return DialogSend( p_this, p_new );
 }
 
-/** Helper function to ask a yes-no-cancel question
- *  \param p_this           Parent vlc_object
- *  \param psz_title        Title for the dialog
- *  \param psz_description  A description
- *  \param psz_default      caption for the default button
- *  \param psz_alternate    caption for the alternate button
- *  \param psz_other        caption for the optional 3rd button (== cancel)
- *  \return                 Clicked button code
+/**
+ * Helper function to ask a yes-no-cancel question
+ *
+ * \param p_this           Parent vlc_object
+ * \param psz_title        Title for the dialog
+ * \param psz_description  A description
+ * \param psz_default      caption for the default button
+ * \param psz_alternate    caption for the alternate button
+ * \param psz_other        caption for the optional 3rd button (== cancel)
+ * \return                 Clicked button code
  */
 int __intf_UserYesNo( vlc_object_t *p_this,
                       const char *psz_title,
@@ -252,13 +261,15 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     return DialogSend( p_this, p_new );
 }
 
-/** Helper function to create a dialogue showing a progress-bar with some info
- *  \param p_this           Parent vlc_object
- *  \param psz_title        Title for the dialog (NULL implies main intf )
- *  \param psz_status       Current status
- *  \param f_position       Current position (0.0->100.0)
- *  \param i_timeToGo       Time (in sec) to go until process is finished
- *  \return                 Dialog id, to give to UserProgressUpdate
+/**
+ * Helper function to create a dialogue showing a progress-bar with some info
+ *
+ * \param p_this           Parent vlc_object
+ * \param psz_title        Title for the dialog (NULL implies main intf )
+ * \param psz_status       Current status
+ * \param f_position       Current position (0.0->100.0)
+ * \param i_timeToGo       Time (in sec) to go until process is finished
+ * \return                 Dialog id, to give to UserProgressUpdate
  */
 int __intf_Progress( vlc_object_t *p_this, const char *psz_title,
                      const char *psz_status, float f_pos, int i_time )
@@ -281,13 +292,15 @@ int __intf_Progress( vlc_object_t *p_this, const char *psz_title,
     return p_new->i_id;
 }
 
-/** Update a progress bar in a dialogue
- *  \param p_this           Parent vlc_object
- *  \param i_id             Identifier of the dialog
- *  \param psz_status       New status
- *  \param f_position       New position (0.0->100.0)
- *  \param i_timeToGo       Time (in sec) to go until process is finished
- *  \return                 nothing
+/**
+ * Update a progress bar in a dialogue
+ *
+ * \param p_this           Parent vlc_object
+ * \param i_id             Identifier of the dialog
+ * \param psz_status       New status
+ * \param f_position       New position (0.0->100.0)
+ * \param i_timeToGo       Time (in sec) to go until process is finished
+ * \return                 nothing
  */
 void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
                             const char *psz_status, float f_pos, int i_time )
@@ -318,11 +331,13 @@ void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
     playlist_Signal( pl_Get( p_this ) );
 }
 
-/** Helper function to communicate dialogue cancellations between the
- *  interface module and the caller
- *  \param p_this           Parent vlc_object
- *  \param i_id             Identifier of the dialogue
- *  \return                 Either true or false
+/**
+ * Helper function to communicate dialogue cancellations between the
+ * interface module and the caller
+ *
+ * \param p_this           Parent vlc_object
+ * \param i_id             Identifier of the dialogue
+ * \return                 Either true or false
  */
 vlc_bool_t __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
 {
@@ -345,13 +360,15 @@ vlc_bool_t __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
     return b_cancel;
 }
 
-/** Helper function to make a login/password dialogue
- *  \param p_this           Parent vlc_object
- *  \param psz_title        Title for the dialog
- *  \param psz_description  A description
- *  \param ppsz_login       Returned login
- *  \param ppsz_password    Returned password
- *  \return                 Clicked button code
+/**
+ * Helper function to make a login/password dialogue
+ *
+ * \param p_this           Parent vlc_object
+ * \param psz_title        Title for the dialog
+ * \param psz_description  A description
+ * \param ppsz_login       Returned login
+ * \param ppsz_password    Returned password
+ * \return                 Clicked button code
  */
 int __intf_UserLoginPassword( vlc_object_t *p_this,
                               const char *psz_title,
@@ -381,12 +398,14 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     return i_ret;
 }
 
-/** Helper function to make a dialogue asking the user for !password string
- *  \param p_this           Parent vlc_object
- *  \param psz_title        Title for the dialog
- *  \param psz_description  A description
- *  \param ppsz_usersString Returned login
- *  \return                 Clicked button code
+/**
+ * Helper function to make a dialogue asking the user for !password string
+ *
+ * \param p_this           Parent vlc_object
+ * \param psz_title        Title for the dialog
+ * \param psz_description  A description
+ * \param ppsz_usersString Returned login
+ * \return                 Clicked button code
  */
 int __intf_UserStringInput( vlc_object_t *p_this,
                               const char *psz_title,
@@ -411,7 +430,9 @@ int __intf_UserStringInput( vlc_object_t *p_this,
     return i_ret;
 }
 
-/** Hide an interaction dialog
+/**
+ * Hide an interaction dialog
+ *
  * \param p_this the parent vlc object
  * \param i_id the id of the item to hide
  * \return nothing
@@ -542,7 +563,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
     if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT ) return VLC_EGENERIC;
 
-    if( config_GetInt(p_this, "interact") ||
+    if( config_GetInt( p_this, "interact" ) ||
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
         p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
