@@ -619,8 +619,8 @@ package-win-common:
 	for file in AUTHORS MAINTAINERS THANKS ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-$(VERSION)/$${file}.txt" ; done;
 	for file in NEWS COPYING README; \
-	   do cp "$(srcdir)/$$file" "$(top_builddir)/vlc-$(VERSION)/$${file}.txt"; done
-	  unix2dos "$(top_builddir)/vlc-$(VERSION)/"*.txt
+	  do cp "$(srcdir)/$$file" "$(top_builddir)/vlc-$(VERSION)/$${file}.txt"; done
+	unix2dos "$(top_builddir)/vlc-$(VERSION)/"*.txt
 
 	mkdir $(top_builddir)/vlc-$(VERSION)/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
