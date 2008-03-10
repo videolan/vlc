@@ -971,6 +971,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_SET_GROUP:
+        case DEMUX_HAS_UNSUPPORTED_META:
+        case DEMUX_GET_ATTACHMENTS:
             return VLC_EGENERIC;
 
         default:
