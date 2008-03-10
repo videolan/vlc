@@ -397,7 +397,8 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
     i_height = GET2BYTES( p_data );
     i_frame_strips = GET2BYTES( p_data );
 
-    if( !i_frame_size || !i_width || !i_height )
+    if( !i_frame_size || !i_width || !i_height ||
+        i_width > 0xffff-3 || i_height > 0xffff-3)
     {
         /* Broken header */
         return( -1 );
