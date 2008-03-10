@@ -39,14 +39,6 @@
 #    include <unistd.h>                                          /* getuid() */
 #endif
 
-#ifdef HAVE_GETOPT_LONG
-#   ifdef HAVE_GETOPT_H
-#       include <getopt.h>                                       /* getopt() */
-#   endif
-#else
-#   include "../extras/getopt.h"
-#endif
-
 #if defined(HAVE_GETPWUID)
 #   include <pwd.h>                                            /* getpwuid() */
 #endif
@@ -70,11 +62,6 @@
 static inline char *strdupnull (const char *src)
 {
     return src ? strdup (src) : NULL;
-}
-
-static inline char *_strdupnull (const char *src)
-{
-    return src ? strdup (_(src)) : NULL;
 }
 
 /* Item types that use a string value (i.e. serialized in the module cache) */
@@ -729,6 +716,8 @@ char *config_GetHomeDir( void )
  *   - on windows that's the App Data directory;
  *   - on other OSes it's the same as the home directory.
  */
+char *config_GetUserDir( void ); /* XXX why does gcc wants a declaration ?
+                                  * --funman */
 char *config_GetUserDir( void )
 {
     return GetDir( VLC_TRUE );

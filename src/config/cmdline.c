@@ -28,14 +28,6 @@
 #include <vlc/vlc.h>
 #include "../libvlc.h"
 #include "vlc_keys.h"
-#include "vlc_charset.h"
-
-#include <errno.h>                                                  /* errno */
-#include <limits.h>
-
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>                                          /* getuid() */
-#endif
 
 #ifdef HAVE_GETOPT_LONG
 #   ifdef HAVE_GETOPT_H
@@ -43,23 +35,6 @@
 #   endif
 #else
 #   include "../extras/getopt.h"
-#endif
-
-#if defined(HAVE_GETPWUID)
-#   include <pwd.h>                                            /* getpwuid() */
-#endif
-
-#if defined( HAVE_SYS_STAT_H )
-#   include <sys/stat.h>
-#endif
-#if defined( HAVE_SYS_TYPES_H )
-#   include <sys/types.h>
-#endif
-#if defined( WIN32 )
-#   if !defined( UNDER_CE )
-#       include <direct.h>
-#   endif
-#include <tchar.h>
 #endif
 
 #include "configuration.h"
@@ -132,7 +107,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
     p_longopts = malloc( sizeof(struct option) * (i_opts + 1) );
     if( p_longopts == NULL )
     {
-        msg_Err( p_this, "out of memory" );
         vlc_list_release( p_list );
         return -1;
     }
@@ -140,7 +114,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
     psz_shortopts = malloc( sizeof( char ) * (2 * i_opts + 1) );
     if( psz_shortopts == NULL )
     {
-        msg_Err( p_this, "out of memory" );
         free( p_longopts );
         vlc_list_release( p_list );
         return -1;
@@ -154,7 +127,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
         argv_copy = (const char**)malloc( *pi_argc * sizeof(char *) );
         if( argv_copy == NULL )
         {
-            msg_Err( p_this, "out of memory" );
             free( psz_shortopts );
             free( p_longopts );
             vlc_list_release( p_list );

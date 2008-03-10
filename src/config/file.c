@@ -45,12 +45,6 @@ static inline char *strdupnull (const char *src)
     return src ? strdup (src) : NULL;
 }
 
-static inline char *_strdupnull (const char *src)
-{
-    return src ? strdup (_(src)) : NULL;
-}
-
-
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
     char *psz_filename = p_obj->p_libvlc->psz_configfile;
