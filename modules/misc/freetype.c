@@ -523,6 +523,8 @@ static void FontBuilder( vlc_object_t *p_this )
         FcConfigDestroy( p_fontconfig );
         vlc_mutex_unlock( lock );
     }
+    vlc_object_detach( p_this );
+    vlc_object_release( p_this );
 }
 
 #endif
