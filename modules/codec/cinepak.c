@@ -209,9 +209,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     msg_Dbg( p_dec, "cinepak decoder stopped" );
 
     for( i = 0; i < 3; i++ )
-    {
-        if( p_sys->context.p_pix[i] ) free( p_sys->context.p_pix[i] );
-    }
+        free( p_sys->context.p_pix[i] );
 
     free( p_sys );
 }

@@ -214,7 +214,7 @@ void E_(ClosePostproc)( decoder_t *p_dec, void *p_data )
 
     var_DelCallback( p_dec, "ffmpeg-pp-q", PPQCallback, p_sys );
 
-    if( p_sys ) free( p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************

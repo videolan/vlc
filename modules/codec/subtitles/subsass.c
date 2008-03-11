@@ -121,7 +121,7 @@ void ParseSSAString( decoder_t *p_dec,
         if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
             p_style = p_sys->pp_ssa_styles[i];
     }
-    if( psz_style ) free( psz_style );
+    free( psz_style );
 
     p_spu->p_region->psz_text = psz_new_subtitle;
     if( p_style == NULL )
@@ -353,7 +353,7 @@ void ParseSSAHeader( decoder_t *p_dec )
     }
 
 eof:
-    if( psz_header ) free( psz_header );
+    free( psz_header );
     return;
 }
 

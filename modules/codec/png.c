@@ -234,7 +234,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
  error:
 
-    if( p_row_pointers ) free( p_row_pointers );
+    free( p_row_pointers );
     png_destroy_read_struct( &p_png, &p_info, &p_end_info );
     block_Release( p_block ); *pp_block = NULL;
     return NULL;

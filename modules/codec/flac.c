@@ -316,7 +316,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     FLAC__stream_decoder_delete( p_sys->p_flac );
 #endif
 
-    if( p_sys->p_block ) free( p_sys->p_block );
+    free( p_sys->p_block );
     free( p_sys );
 }
 
@@ -1337,7 +1337,7 @@ static void CloseEncoder( vlc_object_t *p_this )
 
     FLAC__stream_encoder_delete( p_sys->p_flac );
 
-    if( p_sys->p_buffer ) free( p_sys->p_buffer );
+    free( p_sys->p_buffer );
     free( p_sys );
 }
 

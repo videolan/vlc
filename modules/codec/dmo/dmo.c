@@ -556,8 +556,8 @@ static int DecOpen( vlc_object_t *p_this )
     else
         date_Init( &p_sys->end_date, 25 /* FIXME */, 1 );
 
-    if( p_vih ) free( p_vih );
-    if( p_wf ) free( p_wf );
+    free( p_vih );
+    free( p_wf );
 
     return VLC_SUCCESS;
 
@@ -573,9 +573,9 @@ static int DecOpen( vlc_object_t *p_this )
     CoUninitialize();
 #endif /* LOADER */
 
-    if( p_vih ) free( p_vih );
-    if( p_wf )  free( p_wf );
-    if( p_sys ) free( p_sys );
+    free( p_vih );
+    free( p_wf );
+    free( p_sys );
 
     return VLC_EGENERIC;
 }
@@ -771,7 +771,7 @@ void DecoderClose( vlc_object_t *p_this )
     CoUninitialize();
 #endif
 
-    if( p_sys->p_buffer ) free( p_sys->p_buffer );
+    free( p_sys->p_buffer );
     free( p_sys );
 }
 
@@ -1400,7 +1400,7 @@ static int EncOpen( vlc_object_t *p_this )
     CoUninitialize();
 #endif /* LOADER */
 
-    if( p_sys ) free( p_sys );
+    free( p_sys );
 
     return VLC_EGENERIC;
 }

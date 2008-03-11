@@ -133,7 +133,7 @@ static void FreeFrameBuffer( dirac_decoder_t *p_dirac )
         int i;
         for( i = 0; i < 3; i++ )
         {
-            if( p_dirac->fbuf->buf[i] ) free( p_dirac->fbuf->buf[i] );
+            free( p_dirac->fbuf->buf[i] );
             p_dirac->fbuf->buf[i] = 0;
         }
     }

@@ -870,8 +870,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     while( p_region->i_object_defs )
     {
         int i = p_region->i_object_defs - 1;
-        if( p_region->p_object_defs[i].psz_text )
-            free( p_region->p_object_defs[i].psz_text );
+        free( p_region->p_object_defs[i].psz_text );
         if( !i )
             free( p_region->p_object_defs );
 
@@ -999,7 +998,7 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s )
     }
 
     p_sys->p_display = p_display;
-    if( p_old ) free( p_old );
+    free( p_old );
 
     if( i_processed_length != i_segment_length*8 )
     {
@@ -1413,7 +1412,7 @@ static void free_all( decoder_t *p_dec )
     dvbsub_region_t *p_reg, *p_reg_next;
     dvbsub_clut_t *p_clut, *p_clut_next;
 
-    if( p_sys->p_display ) free( p_sys->p_display );
+    free( p_sys->p_display );
 
     for( p_clut = p_sys->p_cluts; p_clut != NULL; p_clut = p_clut_next )
     {
@@ -1428,10 +1427,9 @@ static void free_all( decoder_t *p_dec )
 
         p_reg_next = p_reg->p_next;
         for( i = 0; i < p_reg->i_object_defs; i++ )
-            if( p_reg->p_object_defs[i].psz_text )
-                free( p_reg->p_object_defs[i].psz_text );
+            free( p_reg->p_object_defs[i].psz_text );
         if( p_reg->i_object_defs ) free( p_reg->p_object_defs );
-        if( p_reg->p_pixbuf ) free( p_reg->p_pixbuf );
+        free( p_reg->p_pixbuf );
         free( p_reg );
     }
     p_sys->p_regions = NULL;

@@ -283,12 +283,9 @@ static void CloseDecoder( vlc_object_t *p_this )
             if( !p_sys->pp_ssa_styles[i] )
                 continue;
 
-            if( p_sys->pp_ssa_styles[i]->psz_stylename )
-                free( p_sys->pp_ssa_styles[i]->psz_stylename );
-            if( p_sys->pp_ssa_styles[i]->font_style.psz_fontname )
-                free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
-            if( p_sys->pp_ssa_styles[i] )
-                free( p_sys->pp_ssa_styles[i] );
+            free( p_sys->pp_ssa_styles[i]->psz_stylename );
+            free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
+            free( p_sys->pp_ssa_styles[i] );
         }
         TAB_CLEAN( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
     }
@@ -302,8 +299,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
             if( p_sys->pp_images[i]->p_pic )
                 p_sys->pp_images[i]->p_pic->pf_release( p_sys->pp_images[i]->p_pic );
-            if( p_sys->pp_images[i]->psz_filename )
-                free( p_sys->pp_images[i]->psz_filename );
+            free( p_sys->pp_images[i]->psz_filename );
 
             free( p_sys->pp_images[i] );
         }
@@ -401,7 +397,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
-        if( psz_subtitle ) free( psz_subtitle );
+        free( psz_subtitle );
         return NULL;
     }
 
@@ -417,7 +413,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     if( !p_spu->p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        if( psz_subtitle ) free( psz_subtitle );
+        free( psz_subtitle );
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
         return NULL;
     }
@@ -456,7 +452,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->i_original_picture_width = p_sys->i_original_width;
         p_spu->i_original_picture_height = p_sys->i_original_height;
     }
-    if( psz_subtitle ) free( psz_subtitle );
+    free( psz_subtitle );
 
     return p_spu;
 }

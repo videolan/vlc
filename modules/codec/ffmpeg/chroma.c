@@ -224,7 +224,7 @@ struct filter_owner_sys_t
 
 static void PictureRelease( picture_t *p_pic )
 {
-    if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
+    free( p_pic->p_data_orig );
 }
 
 static picture_t *video_new_buffer_filter( filter_t *p_filter )

@@ -291,10 +291,10 @@ static void ParseText( decoder_t *p_dec, block_t *p_block )
 
     }
 
-    if( psz_subtitle ) free( psz_subtitle );
-    if( psz_cmml ) free( psz_cmml );
-    if( p_anchor ) free( p_anchor );
-    if( p_clip_parser ) free( p_clip_parser );
-    if( psz_url ) free( psz_url );
+    free( psz_subtitle );
+    free( psz_cmml );
+    free( p_anchor );
+    free( p_clip_parser );
+    free( psz_url );
 }
 

@@ -248,7 +248,7 @@ static void Close( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
 
     CloseDll( p_dec );
-    if( p_dec->p_sys->p_out ) free( p_dec->p_sys->p_out );
+    free( p_dec->p_sys->p_out );
     free( p_dec->p_sys );
 }
 

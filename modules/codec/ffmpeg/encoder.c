@@ -350,7 +350,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else
             p_sys->i_hq = FF_MB_DECISION_RD;
     }
-    if( val.psz_string ) free( val.psz_string );
+    else
+        p_sys->i_hq = FF_MB_DECISION_RD;
+    free( val.psz_string );
 
     var_Get( p_enc, ENC_CFG_PREFIX "qmin", &val );
     p_sys->i_qmin = val.i_int;
@@ -1084,8 +1086,8 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
     vlc_mutex_unlock( lock );
     av_free( p_sys->p_context );
 
-    if( p_sys->p_buffer ) free( p_sys->p_buffer );
-    if( p_sys->p_buffer_out ) free( p_sys->p_buffer_out );
+    free( p_sys->p_buffer );
+    free( p_sys->p_buffer_out );
 
     free( p_sys );
 }

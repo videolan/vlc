@@ -280,7 +280,7 @@ void E_(CloseDemux)( vlc_object_t *p_this )
     if( p_sys->ic ) av_close_input_file( p_sys->ic );
     if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
 
-    if( p_sys->io_buffer ) free( p_sys->io_buffer );
+    free( p_sys->io_buffer );
     free( p_sys );
 }
 

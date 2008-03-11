@@ -945,7 +945,7 @@ static int  Open ( vlc_object_t *p_this )
             p_sys->param.analyse.i_me_method = X264_ME_TESA;
         }
     #endif
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "merange", &val );
     if( val.i_int >= 0 && val.i_int <= 64 )
@@ -979,7 +979,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.analyse.i_direct_mv_pred = X264_DIRECT_PRED_AUTO;
     }
 #endif
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "psnr", &val );
     p_sys->param.analyse.b_psnr = val.b_bool;
@@ -1121,7 +1121,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.analyse.inter |= X264_ANALYSE_I8x8;
 #endif
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
 #if X264_BUILD >= 30
     var_Get( p_enc, SOUT_CFG_PREFIX "8x8dct", &val );
@@ -1343,8 +1343,7 @@ static void Close( vlc_object_t *p_this )
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
  
-    if( p_sys->psz_stat_name )
-        free( p_sys->psz_stat_name );
+    free( p_sys->psz_stat_name );
 
     x264_encoder_close( p_sys->h );
 
