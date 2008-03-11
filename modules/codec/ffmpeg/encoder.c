@@ -141,8 +141,9 @@ struct encoder_sys_t
     int        i_quality; /* for VBR */
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
     int        i_luma_elim, i_chroma_elim;
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     int        i_aac_profile; /* AAC profile to use.*/
-
+#endif
     /* Used to work around stupid timestamping behaviour in libavcodec */
     uint64_t i_framenum;
     mtime_t  pi_delay_pts[MAX_FRAME_DELAY];
@@ -154,7 +155,11 @@ static const char *ppsz_enc_options[] = {
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
     "p-masking", "border-masking", "luma-elim-threshold",
-    "chroma-elim-threshold", "aac-profile", NULL
+    "chroma-elim-threshold", 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
+     "aac-profile", 
+#endif
+     NULL
 };
 
 static const uint16_t mpa_bitrate_tab[2][15] =
@@ -371,6 +376,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     var_Get( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold", &val );
     p_sys->i_chroma_elim = val.i_int;
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     var_Get( p_enc, ENC_CFG_PREFIX "aac-profile", &val );
     p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
     if( val.psz_string && *val.psz_string )
@@ -392,6 +398,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         }
     }
     if( val.psz_string ) free( val.psz_string );
+#endif
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
@@ -558,10 +565,12 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
         p_context->channels    = p_enc->fmt_in.audio.i_channels;
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
         /* Ignore FF_PROFILE_UNKNOWN */
         if( ( p_sys->i_aac_profile >= FF_PROFILE_AAC_MAIN ) && 
             ( p_enc->fmt_out.i_codec == VLC_FOURCC('m','p','4','a') ) )
             p_context->profile = p_sys->i_aac_profile;
+#endif
     }
 
     /* Misc parameters */
