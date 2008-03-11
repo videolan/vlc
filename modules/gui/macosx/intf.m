@@ -56,6 +56,7 @@
 #import "simple_prefs.h"
 
 #import <vlc_input.h>
+#import <vlc_interface.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -2024,7 +2025,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
     [o_update showUpdateWindow];
 #else
-    msg_Err( VLCIntf, "Updates checking was not enabled in this build" );
+    msg_Err( VLCIntf, "Update checker wasn't enabled in this build" );
+    intf_UserFatal( VLCIntf, VLC_FALSE, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
 #endif
 }
 
