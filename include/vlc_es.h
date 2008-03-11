@@ -276,11 +276,11 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
             malloc(dst->i_extra_languages * sizeof(*dst->p_extra_languages ));
     for( i = 0; i < dst->i_extra_languages; i++ ) {
         if( src->p_extra_languages[i].psz_language )
-            dst->p_extra_languages[i].psz_language = strdup(src->p_extra_languages[i].psz_language);
+            dst->p_extra_languages[i].psz_language = strdup( src->p_extra_languages[i].psz_language );
         else
             dst->p_extra_languages[i].psz_language = NULL;
         if( src->p_extra_languages[i].psz_description )
-            dst->p_extra_languages[i].psz_description = strdup(src->p_extra_languages[i].psz_description);
+            dst->p_extra_languages[i].psz_description = strdup( src->p_extra_languages[i].psz_description );
         else
             dst->p_extra_languages[i].psz_description = NULL;
     }
@@ -288,28 +288,23 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
 
 static inline void es_format_Clean( es_format_t *fmt )
 {
-    if( fmt->psz_language ) free( fmt->psz_language );
-
-    if( fmt->psz_description ) free( fmt->psz_description );
+    free( fmt->psz_language );
+    free( fmt->psz_description );
 
     if( fmt->i_extra > 0 ) free( fmt->p_extra );
 
-    if( fmt->video.p_palette )
-        free( fmt->video.p_palette );
-
-    if( fmt->subs.psz_encoding ) free( fmt->subs.psz_encoding );
+    free( fmt->video.p_palette );
+    free( fmt->subs.psz_encoding );
 
     if( fmt->i_extra_languages > 0 && fmt->p_extra_languages )
     {
         int i;
         for( i = 0; i < fmt->i_extra_languages; i++ )
         {
-            if( fmt->p_extra_languages[i].psz_language )
-                free( fmt->p_extra_languages[i].psz_language );
-            if( fmt->p_extra_languages[i].psz_description )
-                free( fmt->p_extra_languages[i].psz_description );
+            free( fmt->p_extra_languages[i].psz_language );
+            free( fmt->p_extra_languages[i].psz_description );
         }
-        free(fmt->p_extra_languages);
+        free( fmt->p_extra_languages );
     }
 
     /* es_format_Clean can be called multiple times */
