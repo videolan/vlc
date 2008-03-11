@@ -723,10 +723,16 @@ void ControlsWidget::updateInput()
 
 void ControlsWidget::setStatus( int status )
 {
-    if( status == PLAYING_S ) // Playing
+    if( status == PLAYING_S ) /* Playing */
+    {
         playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
+        playButton->setToolTip( qtr( "Pause" ) );
+    }
     else
+    {
         playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+        playButton->setToolTip( qtr( "Play" ) );
+    }
 }
 
 /**
