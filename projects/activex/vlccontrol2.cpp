@@ -2172,7 +2172,7 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
                 psz_aspect = NULL;
                 return (NULL == *aspect) ? E_OUTOFMEMORY : NOERROR;
             }
-            if( psz_aspect ) free( psz_aspect );
+            free( psz_aspect );
             psz_aspect = NULL;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
@@ -2303,7 +2303,7 @@ STDMETHODIMP VLCVideo::get_crop(BSTR* geometry)
                 psz_geometry = NULL;
                 return (NULL == geometry) ? E_OUTOFMEMORY : NOERROR;
             }
-            if( psz_geometry ) free( psz_geometry );
+            free( psz_geometry );
             psz_geometry = NULL;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
