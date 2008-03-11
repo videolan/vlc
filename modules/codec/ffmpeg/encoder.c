@@ -386,8 +386,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else  if( !strncmp( val.psz_string, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
         else
+        {
+            msg_Warn( p_enc, "unknown AAC profile requested" );
             p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
-msg_Info( p_enc, "AAC profile %s", val.psz_string );
+        }
     }
     if( val.psz_string ) free( val.psz_string );
 
@@ -556,8 +558,10 @@ msg_Info( p_enc, "AAC profile %s", val.psz_string );
         p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
         p_context->channels    = p_enc->fmt_in.audio.i_channels;
 
-        if( p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '4', 'a') )
-            p_context->profile     = p_sys->i_aac_profile;
+        /* Ignore FF_PROFILE_UNKNOWN */
+        if( ( p_sys->i_aac_profile >= FF_PROFILE_AAC_MAIN ) && 
+            ( p_enc->fmt_out.i_codec == VLC_FOURCC('m','p','4','a') ) )
+            p_context->profile = p_sys->i_aac_profile;
     }
 
     /* Misc parameters */
