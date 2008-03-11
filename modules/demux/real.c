@@ -1244,6 +1244,14 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                     calloc( tk->i_subpackets, sizeof(block_t *) );
             }
 
+            /* Check if the calloc went correctly */
+            if( tk->p_subpackets == NULL )
+            {
+                tk->i_subpackets = 0;
+                msg_Err( p_demux, "Can't alloc subpacket" );
+                return VLC_EGENERIC;
+            }
+
             tk->p_es = es_out_Add( p_demux->out, &fmt );
 
             TAB_APPEND( p_sys->i_track, p_sys->track, tk );
