@@ -121,7 +121,7 @@ static inline void input_ItemCopyOptions( input_item_t *p_parent,
 
 static inline void input_item_SetName( input_item_t *p_item, const char *psz_name )
 {
-    if( p_item->psz_name ) free( p_item->psz_name );
+    free( p_item->psz_name );
     p_item->psz_name = strdup( psz_name );
 }
 
@@ -171,10 +171,7 @@ static inline void input_ItemClean( input_item_t *p_i )
         vlc_meta_Delete( p_i->p_meta );
 
     for( i = 0; i < p_i->i_options; i++ )
-    {
-        if( p_i->ppsz_options[i] )
-            free( p_i->ppsz_options[i] );
-    }
+        free( p_i->ppsz_options[i] );
     TAB_CLEAN( p_i->i_options, p_i->ppsz_options );
 
     for( i = 0; i < p_i->i_es; i++ )
@@ -193,15 +190,13 @@ static inline void input_ItemClean( input_item_t *p_i )
         {
             struct info_t *p_info = p_category->pp_infos[j];
 
-            if( p_info->psz_name )
-                free( p_info->psz_name);
-            if( p_info->psz_value )
-                free( p_info->psz_value );
+            free( p_info->psz_name);
+            free( p_info->psz_value );
             free( p_info );
         }
         TAB_CLEAN( p_category->i_infos, p_category->pp_infos );
 
-        if( p_category->psz_name ) free( p_category->psz_name );
+        free( p_category->psz_name );
         free( p_category );
     }
     TAB_CLEAN( p_i->i_categories, p_i->pp_categories );
@@ -263,8 +258,8 @@ static inline char * input_item_GetURI( input_item_t * p_i )
 static inline void input_item_SetURI( input_item_t * p_i, char * psz_uri )
 {
     vlc_mutex_lock( &p_i->lock );
-    if( p_i->psz_uri ) free( p_i->psz_uri );
-        p_i->psz_uri = strdup( psz_uri );
+    free( p_i->psz_uri );
+    p_i->psz_uri = strdup( psz_uri );
     vlc_mutex_unlock( &p_i->lock );
 }
 
@@ -439,7 +434,7 @@ static inline seekpoint_t *vlc_seekpoint_New( void )
 static inline void vlc_seekpoint_Delete( seekpoint_t *point )
 {
     if( !point ) return;
-    if( point->psz_name ) free( point->psz_name );
+    free( point->psz_name );
     free( point );
 }
 
@@ -490,13 +485,13 @@ static inline void vlc_input_title_Delete( input_title_t *t )
     if( t == NULL )
         return;
 
-    if( t->psz_name ) free( t->psz_name );
+    free( t->psz_name );
     for( i = 0; i < t->i_seekpoint; i++ )
     {
-        if( t->seekpoint[i]->psz_name ) free( t->seekpoint[i]->psz_name );
+        free( t->seekpoint[i]->psz_name );
         free( t->seekpoint[i] );
     }
-    if( t->seekpoint ) free( t->seekpoint );
+    free( t->seekpoint );
     free( t );
 }
 
@@ -570,8 +565,7 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
     free( a->psz_name );
     free( a->psz_mime );
     free( a->psz_description );
-    if( a->p_data )
-        free( a->p_data );
+    free( a->p_data );
     free( a );
 }
 /*****************************************************************************

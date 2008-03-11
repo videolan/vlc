@@ -83,7 +83,7 @@
 
 #define TAB_CLEAN( count, tab )                 \
   do {                                          \
-    if( tab ) free( tab );                      \
+    free( tab );                                \
     (count)= 0;                                 \
     (tab)= NULL;                                \
   } while(0)

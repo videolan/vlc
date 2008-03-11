@@ -182,8 +182,8 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
  *****************************************************************************/
 static inline void vlc_UrlClean( vlc_url_t *url )
 {
-    if( url->psz_buffer ) free( url->psz_buffer );
-    if( url->psz_host )   free( url->psz_host );
+    free( url->psz_buffer );
+    free( url->psz_host );
 
     url->psz_protocol = NULL;
     url->psz_username = NULL;

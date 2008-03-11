@@ -95,7 +95,7 @@ struct vlc_meta_t
 
 static inline void vlc_meta_Set( vlc_meta_t * p_meta, vlc_meta_type_t meta_type, const char * psz_val )
 {
-    if( p_meta->ppsz_meta[meta_type] ) free( p_meta->ppsz_meta[meta_type] );
+    free( p_meta->ppsz_meta[meta_type] );
     p_meta->ppsz_meta[meta_type] = psz_val ? strdup( psz_val ) : NULL;
 }
 
@@ -145,7 +145,7 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
     {
         if( src->ppsz_meta[i] )
         {
-            if( dst->ppsz_meta[i] ) free( dst->ppsz_meta[i] );
+            free( dst->ppsz_meta[i] );
             dst->ppsz_meta[i] = strdup( src->ppsz_meta[i] );
         }
     }
