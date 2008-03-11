@@ -215,7 +215,7 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
                  p_playlist->p_fetcher->i_waiting,
                  i, p );
     vlc_object_signal_unlocked( p_playlist->p_fetcher );
-    vlc_obj_unlock( p_playlist->p_fetcher );
+    vlc_object_unlock( p_playlist->p_fetcher );
     return VLC_SUCCESS;
 }
 
