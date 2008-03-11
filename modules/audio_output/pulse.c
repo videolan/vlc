@@ -115,14 +115,8 @@ static int Open ( vlc_object_t *p_this )
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
-    }
-    p_sys->started = 0;
-    p_sys->stream = NULL;
-    p_sys->mainloop = NULL;
-    p_sys->context = NULL;
+    memset( p_sys, 0, sizeof( aout_sys_t ) );
 
     PULSE_DEBUG( "Pulse start initialization");
 
