@@ -424,7 +424,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     p_bigbuffer = p_index = malloc( i_sizebuf+1 );
     if( !p_bigbuffer )
     {
-        msg_Err( p_this, "out of memory" );
         if( file ) fclose( file );
         vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
@@ -631,7 +630,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     vlc_list_t *p_list;
     int i_index, i_count;
 
-    if( !p_this ) return -1;
+    assert( p_this );
 
     /* Check if there's anything to save */
     vlc_mutex_lock( &p_this->p_libvlc->config_lock );
@@ -650,7 +649,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         {
             if( p_item->b_autosave && p_item->b_dirty ) break;
         }
-        break;
+        if( p_item < p_end ) break;
     }
     vlc_list_release( p_list );
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
