@@ -307,10 +307,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
 
     psz_next = config_ChainCreate( &p_access->psz_access, &p_access->p_cfg,
                                    psz_access );
-    if( psz_next )
-    {
-        free( psz_next );
-    }
+    free( psz_next );
     p_access->psz_path   = strdup( psz_name ? psz_name : "" );
     p_access->p_sout     = p_sout;
     p_access->p_sys = NULL;
@@ -419,7 +416,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
 
     p_mux->p_sout = p_sout;
     psz_next = config_ChainCreate( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
-    if( psz_next ) free( psz_next );
+    free( psz_next );
 
     p_mux->p_access     = p_access;
     p_mux->pf_control   = NULL;
@@ -539,11 +536,11 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
     TAB_APPEND( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input );
     if( p_mux->pf_addstream( p_mux, p_input ) < 0 )
     {
-            msg_Err( p_mux, "cannot add this stream" );
-            TAB_REMOVE( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input );
-            block_FifoRelease( p_input->p_fifo );
-            free( p_input );
-            return NULL;
+        msg_Err( p_mux, "cannot add this stream" );
+        TAB_REMOVE( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input );
+        block_FifoRelease( p_input->p_fifo );
+        free( p_input );
+        return NULL;
     }
 
     return p_input;

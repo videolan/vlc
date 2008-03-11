@@ -177,12 +177,12 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             var_Get( p_vout, "vout-filter", &val );
             psz_filter_chain = val.psz_string;
 
-            if( psz_filter_chain && !*psz_filter_chain )
+            if( !*psz_filter_chain )
             {
                 free( psz_filter_chain );
                 psz_filter_chain = NULL;
             }
-            if( p_vout->psz_filter_chain && !*p_vout->psz_filter_chain )
+            if( !*p_vout->psz_filter_chain )
             {
                 free( p_vout->psz_filter_chain );
                 p_vout->psz_filter_chain = NULL;
@@ -193,7 +193,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                 p_vout->b_filter_change = VLC_FALSE;
             }
 
-            if( psz_filter_chain ) free( psz_filter_chain );
+            free( psz_filter_chain );
         }
 
         if( ( p_vout->fmt_render.i_width != p_fmt->i_width ) ||
@@ -431,7 +431,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( var_Get( p_vout, "deinterlace-mode", &val ) == VLC_SUCCESS )
     {
         var_Set( p_vout, "deinterlace", val );
-        if( val.psz_string ) free( val.psz_string );
+        free( val.psz_string );
     }
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
 
@@ -498,7 +498,7 @@ void vout_Destroy( vout_thread_t *p_vout )
 
     var_Destroy( p_vout, "intf-change" );
 
-    if( p_vout->psz_filter_chain ) free( p_vout->psz_filter_chain );
+    free( p_vout->psz_filter_chain );
 
     config_ChainDestroy( p_vout->p_cfg );
 
@@ -1505,7 +1505,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     val.psz_string = psz_filter;
     var_Set( p_vout, "vout-filter", val );
-    if( psz_filter ) free( psz_filter );
+    free( psz_filter );
 
     return VLC_SUCCESS;
 }
@@ -1564,11 +1564,8 @@ static int ParseVideoFilter2Chain( vout_thread_t *p_vout, char *psz_vfilters )
         struct config_chain_t *p_cfg =
             p_vout->p_vfilters_cfg[p_vout->i_vfilters_cfg];
         config_ChainDestroy( p_cfg );
-        if( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] )
-        {
-            free( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
-            p_vout->psz_vfilters[p_vout->i_vfilters_cfg] = NULL;
-        }
+        free( p_vout->psz_vfilters[p_vout->i_vfilters_cfg] );
+        p_vout->psz_vfilters[p_vout->i_vfilters_cfg] = NULL;
     }
     p_vout->i_vfilters_cfg = 0;
     if( psz_vfilters && *psz_vfilters )

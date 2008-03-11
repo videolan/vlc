@@ -349,8 +349,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             psz_parser = psz_next;
         }
     }
-    if( psz_filters ) free( psz_filters );
-    if( psz_visual ) free( psz_visual );
+    free( psz_filters );
+    free( psz_visual );
 
     /* complete the filter chain if necessary */
     if ( !AOUT_FMTS_IDENTICAL( &chain_input_format, &chain_output_format ) )

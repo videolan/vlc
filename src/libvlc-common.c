@@ -420,7 +420,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
         libvlc_global.p_module_bank->b_cache_delete = b_cache_delete;
     }
-    if( psz_language ) free( psz_language );
+    free( psz_language );
 # endif
 #endif
 
@@ -752,7 +752,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         /* Add service discovery modules */
         playlist_ServicesDiscoveryAdd( p_playlist, psz_modules );
     }
-    if( psz_modules ) free( psz_modules );
+    free( psz_modules );
 
     /*
      * Load background interfaces
@@ -856,12 +856,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             if( psz_morecodecs )
             {
                 config_PutPsz( p_libvlc, "codec", psz_morecodecs);
-                free(psz_morecodecs);
+                free( psz_morecodecs );
             }
         }
         else
             config_PutPsz( p_libvlc, "codec", "dmo,quicktime");
-        free(psz_codecs);
+        free( psz_codecs );
     }
 #endif
 
@@ -896,7 +896,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         VLC_AddTarget( p_libvlc->i_object_id, val.psz_string, NULL, 0,
                        PLAYLIST_INSERT, 0 );
     }
-    if ( val.psz_string != NULL ) free( val.psz_string );
+    free( val.psz_string );
 
     return VLC_SUCCESS;
 }
@@ -991,7 +991,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
                         psz_pidfile );
             }
         }
-        free ( psz_pidfile );
+        free( psz_pidfile );
     }
 #endif
 
@@ -1072,7 +1072,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
          * We prefer the dummy interface if none is specified. */
         char *psz_interface = config_GetPsz( p_libvlc, "intf" );
         if( !psz_interface || !*psz_interface ) psz_module = "dummy";
-        if( psz_interface ) free( psz_interface );
+        free( psz_interface );
     }
 #endif
 

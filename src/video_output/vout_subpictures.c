@@ -172,7 +172,7 @@ int spu_ParseChain( spu_t *p_spu )
 
         free( psz_name );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     return VLC_SUCCESS;
 }
@@ -280,7 +280,7 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, vlc_bool_t b_attach )
  */
 static void RegionPictureRelease( picture_t *p_pic )
 {
-    if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
+    free( p_pic->p_data_orig );
 }
 subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
                                          video_format_t *p_fmt )
@@ -310,7 +310,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     if( !p_region->picture.i_planes )
     {
         free( p_region );
-        if( p_fmt->p_palette ) free( p_fmt->p_palette );
+        free( p_fmt->p_palette );
         return NULL;
     }
 
@@ -362,13 +362,11 @@ void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
     if( !p_region ) return;
     if( p_region->picture.pf_release )
         p_region->picture.pf_release( &p_region->picture );
-    if( p_region->fmt.p_palette ) free( p_region->fmt.p_palette );
+    free( p_region->fmt.p_palette );
     if( p_region->p_cache ) __spu_DestroyRegion( p_this, p_region->p_cache );
 
-    if( p_region->psz_text )
-        free( p_region->psz_text );
-    if( p_region->psz_html )
-        free( p_region->psz_html );
+    free( p_region->psz_text );
+    free( p_region->psz_html );
     //free( p_region->p_style ); FIXME --fenrir plugin does not allocate the memory for it. I think it might lead to segfault, video renderer can live longer than the decoder
     free( p_region );
 }
@@ -626,7 +624,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_text->p_module =
                     module_Need( p_spu->p_text, "text renderer", 0, 0 );
             }
-            if( psz_modulename ) free( psz_modulename );
+            free( psz_modulename );
         }
 
         if( p_spu->p_text )
@@ -1385,7 +1383,7 @@ static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
     (void)p_filter;
     if( p_pic )
     {
-        if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
+        free( p_pic->p_data_orig );
         free( p_pic );
     }
 }

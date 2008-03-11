@@ -359,7 +359,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Get( p_vout, "crop", &old_val );
     if( old_val.psz_string && *old_val.psz_string )
         var_Change( p_vout, "crop", VLC_VAR_TRIGGER_CALLBACKS, 0, 0 );
-    if( old_val.psz_string ) free( old_val.psz_string );
+    free( old_val.psz_string );
 
     /* Monitor pixel aspect-ratio */
     var_Create( p_vout, "monitor-par", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -392,7 +392,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
                  p_vout->i_par_num, p_vout->i_par_den );
         b_force_par = VLC_TRUE;
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
@@ -420,7 +420,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Get( p_vout, "aspect-ratio", &old_val );
     if( (old_val.psz_string && *old_val.psz_string) || b_force_par )
         var_Change( p_vout, "aspect-ratio", VLC_VAR_TRIGGER_CALLBACKS, 0, 0 );
-    if( old_val.psz_string ) free( old_val.psz_string );
+    free( old_val.psz_string );
 
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
@@ -481,7 +481,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
     var_Get( p_vout, "snapshot-path", &val );
-    if( val.psz_string && !*val.psz_string )
+    if( !*val.psz_string )
     {
         free( val.psz_string );
         val.psz_string = 0;
@@ -650,7 +650,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     var_Get( p_vout, "snapshot-format", &format );
     if( !format.psz_string || !*format.psz_string )
     {
-        if( format.psz_string ) free( format.psz_string );
+        free( format.psz_string );
         format.psz_string = strdup( "png" );
     }
 

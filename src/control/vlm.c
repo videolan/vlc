@@ -208,7 +208,7 @@ void libvlc_vlm_set_loop( libvlc_instance_t *p_instance, char *psz_name,
 void libvlc_vlm_set_output( libvlc_instance_t *p_instance, char *psz_name,
                             char *psz_output,  libvlc_exception_t *p_exception )
 {
-#define VLM_CHANGE_CODE { if( p_media->psz_output ) free( p_media->psz_output ); \
+#define VLM_CHANGE_CODE { free( p_media->psz_output ); \
                           p_media->psz_output = strdup( psz_output ); }
     VLM_CHANGE( "Unable to change %s output property", VLM_CHANGE_CODE );
 #undef VLM_CHANGE_CODE
@@ -244,8 +244,7 @@ void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
         free( p_media->ppsz_input[--p_media->i_input] );    \
     if( psz_input )                     \
         TAB_APPEND( p_media->i_input, p_media->ppsz_input, strdup(psz_input) ); \
-    if( p_media->psz_output )           \
-        free( p_media->psz_output );    \
+    free( p_media->psz_output );        \
     p_media->psz_output = psz_output ? strdup( psz_output ) : NULL; \
     while( p_media->i_option > 0 )     \
         free( p_media->ppsz_option[--p_media->i_option] );        \

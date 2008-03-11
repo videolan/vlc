@@ -897,11 +897,9 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
 int httpd_StreamHeader( httpd_stream_t *stream, uint8_t *p_data, int i_data )
 {
     vlc_mutex_lock( &stream->lock );
-    if( stream->p_header )
-    {
-        free( stream->p_header );
-        stream->p_header = NULL;
-    }
+    free( stream->p_header );
+    stream->p_header = NULL;
+
     stream->i_header = i_data;
     if( i_data > 0 )
     {
@@ -953,9 +951,9 @@ void httpd_StreamDelete( httpd_stream_t *stream )
 {
     httpd_UrlDelete( stream->url );
     vlc_mutex_destroy( &stream->lock );
-    if( stream->psz_mime ) free( stream->psz_mime );
-    if( stream->p_header ) free( stream->p_header );
-    if( stream->p_buffer ) free( stream->p_buffer );
+    free( stream->psz_mime );
+    free( stream->p_header );
+    free( stream->p_buffer );
     free( stream );
 }
 
@@ -1007,7 +1005,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         httpd = (httpd_t *)vlc_custom_create( p_this, sizeof (*httpd),
                                               VLC_OBJECT_HTTPD,
                                               psz_object_type );
-        if (httpd == NULL)
+        if( httpd == NULL )
         {
             vlc_mutex_unlock( lockval.p_address );
             free( psz_host );
@@ -1334,31 +1332,16 @@ void httpd_MsgClean( httpd_message_t *msg )
 {
     int i;
 
-    if( msg->psz_url )
-    {
-        free( msg->psz_url );
-    }
-    if( msg->psz_args )
-    {
-        free( msg->psz_args );
-    }
+    free( msg->psz_url );
+    free( msg->psz_args );
     for( i = 0; i < msg->i_name; i++ )
     {
         free( msg->name[i] );
         free( msg->value[i] );
     }
-    if( msg->name )
-    {
-        free( msg->name );
-    }
-    if( msg->value )
-    {
-        free( msg->value );
-    }
-    if( msg->p_body )
-    {
-        free( msg->p_body );
-    }
+    free( msg->name );
+    free( msg->value );
+    free( msg->p_body );
     httpd_MsgInit( msg );
 }
 
@@ -1448,11 +1431,8 @@ static void httpd_ClientClean( httpd_client_t *cl )
     httpd_MsgClean( &cl->answer );
     httpd_MsgClean( &cl->query );
 
-    if( cl->p_buffer )
-    {
-        free( cl->p_buffer );
-        cl->p_buffer = NULL;
-    }
+    free( cl->p_buffer );
+    cl->p_buffer = NULL;
 }
 
 static httpd_client_t *httpd_ClientNew( int fd, tls_session_t *p_tls, mtime_t now )
