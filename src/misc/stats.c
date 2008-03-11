@@ -409,7 +409,7 @@ void stats_CounterClean( counter_t *p_c )
             free( p_s );
             i--;
         }
-        if( p_c->psz_name ) free( p_c->psz_name );
+        free( p_c->psz_name );
         free( p_c );
     }
 }

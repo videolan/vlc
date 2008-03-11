@@ -303,7 +303,7 @@ void __config_PutPsz( vlc_object_t *p_this,
     }
 
     /* free old string */
-    if( oldval.psz_string ) free( oldval.psz_string );
+    free( oldval.psz_string );
 }
 
 /*****************************************************************************

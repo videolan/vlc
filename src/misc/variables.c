@@ -352,8 +352,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
         for( i = 0 ; i < p_var->choices.i_count ; i++ )
         {
             p_var->pf_free( &p_var->choices.p_values[i] );
-            if( p_var->choices_text.p_values[i].psz_string )
-                free( p_var->choices_text.p_values[i].psz_string );
+            free( p_var->choices_text.p_values[i].psz_string );
         }
         free( p_var->choices.p_values );
         free( p_var->choices_text.p_values );
@@ -366,7 +365,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     }
 
     free( p_var->psz_name );
-    if( p_var->psz_text ) free( p_var->psz_text );
+    free( p_var->psz_text );
 
     memmove( p_priv->p_vars + i_var,
              p_priv->p_vars + i_var + 1,
@@ -520,8 +519,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             }
 
             p_var->pf_free( &p_var->choices.p_values[i] );
-            if( p_var->choices_text.p_values[i].psz_string )
-                free( p_var->choices_text.p_values[i].psz_string );
+            free( p_var->choices_text.p_values[i].psz_string );
             REMOVE_ELEM( p_var->choices.p_values, p_var->choices.i_count, i );
             REMOVE_ELEM( p_var->choices_text.p_values,
                          p_var->choices_text.i_count, i );
@@ -537,10 +535,8 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 p_var->pf_free( &p_var->choices.p_values[i] );
             }
             for( i = 0 ; i < p_var->choices_text.i_count ; i++ )
-            {
-                if( p_var->choices_text.p_values[i].psz_string )
-                    free( p_var->choices_text.p_values[i].psz_string );
-            }
+                free( p_var->choices_text.p_values[i].psz_string );
+
             if( p_var->choices.i_count ) free( p_var->choices.p_values );
             if( p_var->choices_text.i_count ) free( p_var->choices_text.p_values );
 
@@ -620,8 +616,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             if( p_val2 && p_val2->p_list )
             {
                 for( i = 0; i < p_val2->p_list->i_count; i++ )
-                    if( p_val2->p_list->p_values[i].psz_string )
-                        free( p_val2->p_list->p_values[i].psz_string );
+                    free( p_val2->p_list->p_values[i].psz_string );
                 if( p_val2->p_list->i_count )
                 {
                     free( p_val2->p_list->p_values );
@@ -631,7 +626,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             }
             break;
         case VLC_VAR_SETTEXT:
-            if( p_var->psz_text ) free( p_var->psz_text );
+            free( p_var->psz_text );
             if( p_val && p_val->psz_string )
                 p_var->psz_text = strdup( p_val->psz_string );
             break;
@@ -1176,7 +1171,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
             INSERT_ELEM( p_list->pi_types, p_list->i_count,
                          p_list->i_count, VLC_VAR_INTEGER );
         }
-        if( psz_orig ) free( psz_orig );
+        free( psz_orig );
         break;
     }
 
@@ -1532,7 +1527,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
                 INSERT_ELEM( p_list->pi_types, p_list->i_count,
                              p_list->i_count, VLC_VAR_INTEGER );
             }
-            if( psz_orig ) free( psz_orig );
+            free( psz_orig );
             break;
         }
         default:

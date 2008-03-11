@@ -862,8 +862,7 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
         {
             MISSING( "output" );
 
-            if( p_cfg->psz_output != NULL )
-                free( p_cfg->psz_output );
+            free( p_cfg->psz_output );
             p_cfg->psz_output = *psz_value ? strdup( psz_value ) : NULL;
             i++;
         }
@@ -892,8 +891,7 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
             if( !p_cfg->b_vod )
                 ERROR( "invalid mux option for broadcast" );
 
-            if( p_cfg->vod.psz_mux )
-                free( p_cfg->vod.psz_mux );
+            free( p_cfg->vod.psz_mux );
             p_cfg->vod.psz_mux = *psz_value ? strdup( psz_value ) : NULL;
             i++;
         }
@@ -1147,7 +1145,7 @@ static void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_sys_t *sched )
 
     TAB_REMOVE( vlm->i_schedule, vlm->schedule, sched );
 
-    if( vlm->i_schedule == 0 && vlm->schedule ) free( vlm->schedule );
+    if( vlm->i_schedule == 0 ) free( vlm->schedule );
     free( sched->psz_name );
     while( sched->i_command )
     {
@@ -1401,11 +1399,11 @@ vlm_message_t *vlm_MessageNew( const char *psz_name,
 
 void vlm_MessageDelete( vlm_message_t *p_message )
 {
-    if( p_message->psz_name ) free( p_message->psz_name );
-    if( p_message->psz_value ) free( p_message->psz_value );
+    free( p_message->psz_name );
+    free( p_message->psz_value );
     while( p_message->i_child-- )
         vlm_MessageDelete( p_message->child[p_message->i_child] );
-    if( p_message->child ) free( p_message->child );
+    free( p_message->child );
     free( p_message );
 }
 
@@ -2530,8 +2528,7 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
         sout_DeleteInstance( p_instance->p_sout );
 
     input_ItemClean( &p_instance->item );
-    if( p_instance->psz_name )
-        free( p_instance->psz_name );
+    free( p_instance->psz_name );
     free( p_instance );
 }
 

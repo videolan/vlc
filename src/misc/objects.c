@@ -406,7 +406,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     free( p_priv->p_vars );
     vlc_mutex_destroy( &p_priv->var_lock );
 
-    if( p_this->psz_header ) free( p_this->psz_header );
+    free( p_this->psz_header );
 
     if( p_this->i_object_type == VLC_OBJECT_GLOBAL )
     {

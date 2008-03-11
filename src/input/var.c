@@ -328,7 +328,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 
             var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE,
                         &val2, &text2 );
-            if( text2.psz_string ) free( text2.psz_string );
+            free( text2.psz_string );
         }
 
     }
@@ -386,7 +386,7 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
         }
 
         var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, &text );
-        if( text.psz_string ) free( text.psz_string );
+        free( text.psz_string );
     }
 }
 

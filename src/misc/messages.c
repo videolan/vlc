@@ -189,7 +189,7 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
             if( QUEUE(i).pp_sub[j] == p_sub )
             {
                 REMOVE_ELEM( QUEUE(i).pp_sub, QUEUE(i).i_sub, j );
-                if( p_sub ) free( p_sub );
+                free( p_sub );
             }
         }
         vlc_mutex_unlock( & QUEUE(i).lock );
@@ -431,7 +431,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
                           p_obj->psz_header );
             }
         }
-        if( psz_old ) free( psz_old );
+        free( psz_old );
         p_obj = p_obj->p_parent;
     }
 
@@ -511,12 +511,9 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 
     if( p_queue->b_overflow )
     {
-        if( p_item->psz_module )
-            free( p_item->psz_module );
-        if( p_item->psz_msg )
-            free( p_item->psz_msg );
-        if( p_item->psz_header )
-            free( p_item->psz_header );
+        free( p_item->psz_module );
+        free( p_item->psz_msg );
+        free( p_item->psz_header );
     }
 
     vlc_mutex_unlock ( &p_queue->lock );
@@ -559,12 +556,9 @@ static void FlushMsg ( msg_queue_t *p_queue )
          i_index != i_stop;
          i_index = (i_index+1) % VLC_MSG_QSIZE )
     {
-        if( p_queue->msg[i_index].psz_msg )
-            free( p_queue->msg[i_index].psz_msg );
-        if( p_queue->msg[i_index].psz_module )
-            free( p_queue->msg[i_index].psz_module );
-        if( p_queue->msg[i_index].psz_header )
-            free( p_queue->msg[i_index].psz_header );
+        free( p_queue->msg[i_index].psz_msg );
+        free( p_queue->msg[i_index].psz_module );
+        free( p_queue->msg[i_index].psz_header );
     }
 
     /* Update the new start value */

@@ -439,7 +439,7 @@ static void AStreamDestroy( stream_t *s )
     if( p_sys->b_block ) block_ChainRelease( p_sys->block.p_first );
     else free( p_sys->stream.p_buffer );
 
-    if( p_sys->p_peek ) free( p_sys->p_peek );
+    free( p_sys->p_peek );
 
     if( p_sys->p_list_access && p_sys->p_list_access != p_sys->p_access )
         access2_Delete( p_sys->p_list_access );
@@ -448,7 +448,7 @@ static void AStreamDestroy( stream_t *s )
     {
         free( p_sys->list[p_sys->i_list]->psz_path );
         free( p_sys->list[p_sys->i_list] );
-        if( !p_sys->i_list ) free( p_sys->list );
+        free( p_sys->list );
     }
 
     free( s->p_sys );
@@ -1644,7 +1644,7 @@ char * stream_ReadLine( stream_t *s )
                 msg_Err( s, "iconv failed" );
                 msg_Dbg( s, "original: %d, in %d, out %d", i_line, (int)i_in, (int)i_out );
             }
-            if( p_line ) free( p_line );
+            free( p_line );
             p_line = psz_new_line;
             i_line = (size_t)i_line - i_out; /* does not include \0 */
         }

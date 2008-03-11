@@ -1053,8 +1053,8 @@ static int Init( input_thread_t * p_input )
                 }
                 free( subs[i] );
             }
-            if( subs ) free( subs );
-            if( psz_autopath ) free( psz_autopath );
+            free( subs );
+            free( psz_autopath );
         }
         free( psz_subtitle );
 
@@ -1292,7 +1292,7 @@ static void End( input_thread_t * p_input )
         InputSourceClean( p_input->p->slave[i] );
         free( p_input->p->slave[i] );
     }
-    if( p_input->p->slave ) free( p_input->p->slave );
+    free( p_input->p->slave );
 
     /* Unload all modules */
     if( p_input->p->p_es_out )
@@ -2698,8 +2698,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
                           sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
     for( i = 0; i < i_new; i++ )
         attachment[i_attachment++] = pp_new[i];
-    if( pp_new )
-        free( pp_new );
+    free( pp_new );
 
     /* */
     *pi_attachment = i_attachment;

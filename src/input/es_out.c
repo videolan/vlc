@@ -226,7 +226,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
                 msg_Dbg( p_input, "selected audio language[%d] %s",
                          i, p_sys->ppsz_audio_language[i] );
         }
-        if( val.psz_string ) free( val.psz_string );
+        free( val.psz_string );
 
         var_Get( p_input, "sub-language", &val );
         p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
@@ -236,7 +236,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
                 msg_Dbg( p_input, "selected subtitle language[%d] %s",
                          i, p_sys->ppsz_sub_language[i] );
         }
-        if( val.psz_string ) free( val.psz_string );
+        free( val.psz_string );
     }
     else
     {
@@ -276,10 +276,8 @@ void input_EsOutDelete( es_out_t *out )
         {
             input_DecoderDelete( p_sys->es[i]->p_dec );
         }
-        if( p_sys->es[i]->psz_language )
-            free( p_sys->es[i]->psz_language );
-        if( p_sys->es[i]->psz_language_code )
-            free( p_sys->es[i]->psz_language_code );
+        free( p_sys->es[i]->psz_language );
+        free( p_sys->es[i]->psz_language_code );
         es_format_Clean( &p_sys->es[i]->fmt );
 
         free( p_sys->es[i] );
@@ -297,19 +295,15 @@ void input_EsOutDelete( es_out_t *out )
         free( p_sys->ppsz_sub_language );
     }
 
-    if( p_sys->es )
-        free( p_sys->es );
+    free( p_sys->es );
 
     /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
     for( i = 0; i < p_sys->i_pgrm; i++ )
     {
         es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
-        if( p_pgrm->psz_now_playing )
-            free( p_pgrm->psz_now_playing );
-        if( p_pgrm->psz_publisher )
-            free( p_pgrm->psz_publisher );
-        if( p_pgrm->psz_name )
-            free( p_pgrm->psz_name );
+        free( p_pgrm->psz_now_playing );
+        free( p_pgrm->psz_publisher );
+        free( p_pgrm->psz_name );
         if( p_pgrm->p_epg )
             vlc_epg_Delete( p_pgrm->p_epg );
 
@@ -640,9 +634,9 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     /* If program is selected we need to unselect it */
     if( p_sys->p_pgrm == p_pgrm ) p_sys->p_pgrm = NULL;
 
-    if( p_pgrm->psz_name ) free( p_pgrm->psz_name );
-    if( p_pgrm->psz_now_playing ) free( p_pgrm->psz_now_playing );
-    if( p_pgrm->psz_publisher ) free( p_pgrm->psz_publisher );
+    free( p_pgrm->psz_name );
+    free( p_pgrm->psz_now_playing );
+    free( p_pgrm->psz_publisher );
     if( p_pgrm->p_epg )
         vlc_epg_Delete( p_pgrm->p_epg );
     free( p_pgrm );
@@ -719,7 +713,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
             /* TODO update epg name */
             free( psz_cat );
         }
-        if( p_pgrm->psz_name ) free( p_pgrm->psz_name );
+        free( p_pgrm->psz_name );
         p_pgrm->psz_name = strdup( psz_title );
 
         /* ugly but it works */
@@ -860,8 +854,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     free( psz_epg );
 #endif
     /* Update now playing */
-    if( p_pgrm->psz_now_playing )
-        free( p_pgrm->psz_now_playing );
+    free( p_pgrm->psz_now_playing );
     p_pgrm->psz_now_playing = NULL;
     if( p_epg->p_current && p_epg->p_current->psz_name && *p_epg->p_current->psz_name )
         p_pgrm->psz_now_playing = strdup( p_epg->p_current->psz_name );
@@ -1541,10 +1534,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
                 EsOutSelect( out, p_sys->es[i], VLC_FALSE );
         }
 
-    if( es->psz_language )
-        free( es->psz_language );
-    if( es->psz_language_code )
-        free( es->psz_language_code );
+    free( es->psz_language );
+    free( es->psz_language_code );
 
     es_format_Clean( &es->fmt );
 

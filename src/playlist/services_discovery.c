@@ -143,7 +143,7 @@ services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
 void
 services_discovery_SetLocalizedName ( services_discovery_t * p_sd, const char *psz )
 {
-    if(p_sd->psz_localized_name) free( p_sd->psz_localized_name );
+    free( p_sd->psz_localized_name );
     p_sd->psz_localized_name = strdup(psz);
 }
 
