@@ -871,6 +871,7 @@ void MediaServer::_buildPlaylist( Container* parent )
                                                item->getResource(),
                                                item->getTitle() );
         int i_cat;
+        /* FIXME: playlist_AddInput() can fail */
         playlist_BothAddInput( p_playlist, p_input, parentNode,
                                PLAYLIST_APPEND, PLAYLIST_END, &i_cat, NULL,
                                VLC_FALSE );

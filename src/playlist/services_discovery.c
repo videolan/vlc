@@ -234,8 +234,11 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
 
     p_new_item = playlist_NodeAddInput( p_parent->p_playlist, p_input, p_parent,
                                         PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
-    p_new_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_new_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
+    if( p_new_item )
+    {
+        p_new_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+        p_new_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
+    }
 }
 
  /* A new item has been removed from a certain sd */

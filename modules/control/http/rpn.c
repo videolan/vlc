@@ -848,7 +848,10 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                                    PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
                                    VLC_FALSE);
                 vlc_gc_decref( p_input );
-                msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                if( i_ret == VLC_SUCCESS )
+                    msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                else
+                    msg_Warn( p_intf, "adding mrl %s failed", mrl );
             }
             free( psz_uri );
             E_(SSPushN)( st, i_ret );

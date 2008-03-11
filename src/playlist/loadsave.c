@@ -101,6 +101,8 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     playlist_t *p_playlist = user_data;
     input_item_t *p_item = p_event->u.input_item_subitem_added.p_new_child;
 
+    /* playlist_AddInput() can fail, but we have no way to report that ..
+     * Any way when it has failed, either the playlist is dying, either OOM */
     playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
             VLC_FALSE, VLC_FALSE );
 }

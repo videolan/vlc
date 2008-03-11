@@ -415,7 +415,7 @@ static int Open( vlc_object_t * p_this )
                         asprintf( &psz_absolute, "%s://%s%s",
                                       p_demux->psz_access, psz_path, psz_ref );
 
-                        if( psz_ref ) free( psz_ref );
+                        free( psz_ref );
                         psz_ref = psz_absolute;
                         free( psz_path );
                     }
@@ -426,6 +426,7 @@ static int Open( vlc_object_t * p_this )
                         p_input = input_ItemNewExt( p_playlist, psz_ref, NULL,
                                             0, NULL, -1 );
                         input_ItemCopyOptions( p_current->p_input, p_input );
+                        /* FIXME: playlist_BothAddInput() can fail */
                         playlist_BothAddInput( p_playlist, p_input,
                                                p_item_in_category,
                                                PLAYLIST_APPEND, PLAYLIST_END,

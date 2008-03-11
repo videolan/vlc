@@ -500,20 +500,19 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 
     while( !p_playlist->b_die )
     {
-        vlc_mutex_lock( &p_obj->object_lock );
+        vlc_object_lock( p_obj );
         while( p_obj->i_waiting == 0 )
         {
-            vlc_cond_wait( &p_obj->object_wait, &p_obj->object_lock );
-            if( p_playlist->b_die )
+            if( vlc_object_wait( p_obj ) || p_playlist->b_die )
             {
-                vlc_mutex_unlock( &p_obj->object_lock );
+                vlc_object_unlock( p_obj );
                 return;
             }
         }
 
         p_current = p_obj->pp_waiting[0];
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
-        vlc_mutex_unlock( &p_obj->object_lock );
+        vlc_object_unlock( p_obj );
 
         PL_LOCK;
         if( p_current )
@@ -548,12 +547,12 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 PL_DEBUG( "need to fetch meta for %s", p_current->psz_name );
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_FALSE;
-                vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
+                vlc_object_lock( p_playlist->p_fetcher );
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
                              p_playlist->p_fetcher->i_waiting, p);
-                vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
-                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
+                vlc_object_signal_unlocked( p_playlist->p_fetcher );
+                vlc_object_unlock( p_playlist->p_fetcher );
             }
             /* We already have all needed meta, but we need art right now */
             else if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
@@ -563,12 +562,12 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_TRUE;
-                vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
+                vlc_object_lock( p_playlist->p_fetcher );
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
                              p_playlist->p_fetcher->i_waiting, p);
-                vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
-                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
+                vlc_object_signal_unlocked( p_playlist->p_fetcher );
+                vlc_object_unlock( p_playlist->p_fetcher );
             }
             else
             {
@@ -583,10 +582,10 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         else
             PL_UNLOCK;
 
-        vlc_mutex_lock( &p_obj->object_lock );
+        vlc_object_lock( p_obj );
         i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
-        vlc_mutex_unlock( &p_obj->object_lock );
+        vlc_object_unlock( p_obj );
         /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
     }

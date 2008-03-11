@@ -1002,6 +1002,7 @@
         }
 
         /* Add the item */
+        /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
              i_position == -1 ? PLAYLIST_END : i_position + i_item, VLC_TRUE,
          VLC_FALSE );
@@ -1042,6 +1043,7 @@
         }
 
         /* Add the item */
+        /* FIXME: playlist_NodeAddInput() can fail */
        playlist_NodeAddInput( p_playlist, p_input, p_node,
                                       PLAYLIST_INSERT,
                                       i_position == -1 ?

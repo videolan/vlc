@@ -90,11 +90,12 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
             p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
         }
 
-        playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
+        int i_ret = playlist_BothAddInput( p_playlist, p_child,
+                p_item_in_category,
                 PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
                 NULL, NULL,  VLC_TRUE );
 
-        if( b_play )
+        if( i_ret == VLC_SUCCESS && b_play )
         {
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           VLC_TRUE, p_item_in_category, NULL );
@@ -368,14 +369,14 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
  *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \param b_locked TRUE if the playlist is locked
- * \return VLC_SUCCESS or VLC_ENOMEM
+ * \return VLC_SUCCESS or VLC_ENOMEM or VLC_EGENERIC
 */
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
                        int i_mode, int i_pos, vlc_bool_t b_playlist,
                        vlc_bool_t b_locked )
 {
     playlist_item_t *p_item_cat, *p_item_one;
-
+    if( p_playlist->b_die ) return VLC_EGENERIC;
     if( !p_playlist->b_doing_ml )
         PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
                                              p_input->psz_uri );
@@ -417,7 +418,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
  * \param i_cat id of the items category
  * \param i_one id of the item onelevel category
  * \param b_locked TRUE if the playlist is locked
- * \return VLC_SUCCESS or VLC_ENOMEM
+ * \return VLC_SUCCESS if success, VLC_EGENERIC if fail, VLC_ENOMEM if OOM
  */
 int playlist_BothAddInput( playlist_t *p_playlist,
                            input_item_t *p_input,
@@ -428,6 +429,7 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     playlist_item_t *p_item_cat, *p_item_one, *p_up;
     int i_top;
     assert( p_input );
+    if( p_playlist->b_die ) return VLC_EGENERIC;
     if( !b_locked ) PL_LOCK;
 
     /* Add to category */
@@ -488,6 +490,8 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     assert( p_input );
     assert( p_parent && p_parent->i_children != -1 );
 
+    if( p_playlist->b_die )
+        return NULL;
     if( !b_locked ) PL_LOCK;
 
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );

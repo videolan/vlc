@@ -1423,9 +1423,12 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_item )
         {
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
-            playlist_AddInput( p_playlist, p_item,
+            if( playlist_AddInput( p_playlist, p_item,
                      PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
-                     VLC_FALSE );
+                     VLC_FALSE ) != VLC_SUCCESS );
+            {
+                return VLC_EGENERIC;
+            }
         }
     }
     else if( !strcmp( psz_cmd, "enqueue" ) &&
@@ -1436,9 +1439,12 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_item )
         {
             msg_rc( "trying to enqueue %s to playlist", newval.psz_string );
-            playlist_AddInput( p_playlist, p_item,
+            if( playlist_AddInput( p_playlist, p_item,
                                PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
-                               VLC_FALSE);
+                               VLC_FALSE ) != VLC_SUCCESS )
+            {
+                return VLC_EGENERIC;
+            }
         }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
@@ -1465,7 +1471,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( STATUS_CHANGE "( audio volume: %d )",
                     config_GetInt( p_intf, "volume" ));
 
-            vlc_mutex_lock( &p_playlist->object_lock );
+            PL_LOCK;
             switch( p_playlist->status.i_status )
             {
                 case PLAYLIST_STOPPED:
@@ -1481,7 +1487,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                     msg_rc( STATUS_CHANGE "( state unknown )" );
                     break;
             }
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            PL_UNLOCK;
         }
     }
 

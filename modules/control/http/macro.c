@@ -345,11 +345,15 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     }
                     else
                     {
-                        playlist_AddInput( p_sys->p_playlist, p_input,
+                        int i_ret = playlist_AddInput( p_sys->p_playlist,
+                                     p_input,
                                      PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
                                      VLC_FALSE);
                         vlc_gc_decref( p_input );
-                        msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                        if( i_ret == VLC_SUCCESS )
+                            msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                        else
+                            msg_Warn( p_intf, "adding mrl %s failed", mrl );
                     }
                     free( psz_uri );
 

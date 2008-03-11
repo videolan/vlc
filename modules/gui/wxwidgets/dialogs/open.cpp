@@ -1205,18 +1205,10 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             }
         }
 
-        if( b_start )
-        {
-            playlist_AddInput( p_playlist, p_input,
-                               PLAYLIST_APPEND | PLAYLIST_GO,
-                               PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-        }
-        else
-        {
-            playlist_AddInput( p_playlist, p_input,
-                                       PLAYLIST_APPEND|PLAYLIST_PREPARSE,
-                                       PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-        }
+        /* FIXME: playlist_AddInput() can fail */
+        playlist_AddInput( p_playlist, p_input,
+               PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
+               PLAYLIST_END, VLC_TRUE, VLC_FALSE );
     }
 
     vlc_object_release( p_playlist );

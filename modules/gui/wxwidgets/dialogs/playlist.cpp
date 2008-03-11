@@ -1289,9 +1289,11 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
         char *psz_utf8 = wxDnDFromLocale( filenames[i] );
         input_item_t *p_input = input_ItemNew( p->p_playlist,
                                               psz_utf8, psz_utf8 );
-        playlist_NodeAddInput( p->p_playlist, p_input,
-                               p_dest, PLAYLIST_PREPARSE, i_pos, VLC_FALSE );
+        int i_ret = ( playlist_NodeAddInput( p->p_playlist, p_input, p_dest,
+                PLAYLIST_PREPARSE, i_pos, VLC_FALSE ) != VLC_SUCCESS );
         wxDnDLocaleFree( psz_utf8 );
+        if( i_ret != VLC_SUCCESS )
+            return FALSE;
     }
 
     /* FIXME: having this Rebuild() is dirty */

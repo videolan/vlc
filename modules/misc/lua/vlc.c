@@ -748,14 +748,12 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     /* Append item to playlist */
                     if( p_parent ) /* Add to node */
                         input_ItemAddSubItem( p_parent, p_input );
-                    else if( b_play ) /* Play */
+                    else /* Play or Enqueue (preparse) */
+                        /* FIXME: playlist_AddInput() can fail */
                         playlist_AddInput( p_playlist, p_input,
-                                           PLAYLIST_APPEND | PLAYLIST_GO,
-                                           PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-                    else /* Enqueue */
-                        playlist_AddInput( p_playlist, p_input,
-                                           PLAYLIST_APPEND | PLAYLIST_PREPARSE,
-                                           PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                               PLAYLIST_APPEND | 
+                               ( b_play ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
+                               PLAYLIST_END, VLC_TRUE, VLC_FALSE );
                     i_count ++; /* increment counter */
                     vlc_gc_decref( p_input );
                     while( i_options > 0 )

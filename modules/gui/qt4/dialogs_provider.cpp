@@ -351,6 +351,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
                                         qtu( "directory://" + dir ), NULL,
                                         0, NULL, -1 );
 
+        /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, VLC_FALSE );

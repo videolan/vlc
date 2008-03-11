@@ -530,13 +530,15 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 {
                     if( p_current_input )
                         input_ItemCopyOptions( p_current_input, p_input );
-                    playlist_BothAddInput( p_playlist, p_input,
+                    int i_ret = playlist_BothAddInput( p_playlist, p_input,
                                            p_parent_category,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE|
                                            PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL,
                                            VLC_FALSE );
                     vlc_gc_decref( p_input );
+                    if( i_ret != VLC_SUCCESS )
+                        return VLC_EGENERIC;
                 }
             }
         }

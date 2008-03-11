@@ -316,18 +316,10 @@ void OpenDialog::finish( bool b_enqueue = false )
             }
 
             /* Switch between enqueuing and starting the item */
-            if( b_start )
-            {
-                playlist_AddInput( THEPL, p_input,
-                                   PLAYLIST_APPEND | PLAYLIST_GO,
-                                   PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-            }
-            else
-            {
-                playlist_AddInput( THEPL, p_input,
-                                   PLAYLIST_APPEND | PLAYLIST_PREPARSE,
-                                   PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-            }
+            /* FIXME: playlist_AddInput() can fail */
+            playlist_AddInput( THEPL, p_input,
+                PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
+                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
         }
     }
     else
