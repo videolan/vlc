@@ -262,7 +262,7 @@ static int Open( vlc_object_t * p_this )
 error:
     /* If we reach this, this aout has failed */
     var_Destroy( p_aout, "audio-device" );
-    if( p_sys ) free( p_sys );
+    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -432,7 +432,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
                                   "Utilities. Stereo mode is being used now.") );
             }
         }
-        if( layout ) free( layout );
+        free( layout );
     }
     else
     {
@@ -656,7 +656,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     if( err != noErr )
     {
         msg_Err( p_aout, "could not get number of streams: [%4.4s]", (char *)&err );
-        if( p_streams ) free( p_streams );
+        free( p_streams );
         return VLC_FALSE;
     }
 
@@ -691,7 +691,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
         if( err != noErr )
         {
             msg_Err( p_aout, "could not get the list of streamformats: [%4.4s]", (char *)&err );
-            if( p_format_list) free( p_format_list);
+            free( p_format_list );
             continue;
         }
 
@@ -761,9 +761,9 @@ static int OpenSPDIF( aout_instance_t * p_aout )
                 p_sys->stream_format = p_format_list[i_current_rate_format];
             else p_sys->stream_format = p_format_list[i_backup_rate_format]; /* And if we have to, any digital format will be just fine (highest rate possible) */
         }
-        if( p_format_list ) free( p_format_list );
+        free( p_format_list );
     }
-    if( p_streams ) free( p_streams );
+    free( p_streams );
 
     msg_Dbg( p_aout, STREAM_FORMAT_MSG( "original stream format: ", p_sys->sfmt_revert ) );
 
@@ -899,7 +899,7 @@ static void Close( vlc_object_t * p_this )
         if( err != noErr ) msg_Err( p_aout, "Could not release hogmode: [%4.4s]", (char *)&err );
     }
  
-    if( p_sys ) free( p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -1048,12 +1048,12 @@ static void Probe( aout_instance_t * p_aout )
     if( err )
         goto error;
 
-    if( p_devices ) free( p_devices );
+    free( p_devices );
     return;
 
 error:
     var_Destroy( p_aout, "audio-device" );
-    if( p_devices ) free( p_devices );
+    free( p_devices );
     return;
 }
 
@@ -1116,7 +1116,7 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
             b_return = VLC_TRUE;
     }
  
-    if( p_streams ) free( p_streams );
+    free( p_streams );
     return b_return;
 }
 
@@ -1171,7 +1171,7 @@ static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_
         }
     }
  
-    if( p_format_list ) free( p_format_list );
+    free( p_format_list );
     return b_return;
 }
 

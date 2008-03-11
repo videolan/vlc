@@ -179,10 +179,10 @@ static void Close( vlc_object_t *p_this )
     while( p_sys->i_devices_number > 0 )
     {
         p_udi_entry = p_sys->pp_devices[0];
-        if( p_udi_entry->psz_udi ) free( p_udi_entry->psz_udi );
+        free( p_udi_entry->psz_udi );
         TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
                 p_sys->pp_devices[0] );
-        if( p_udi_entry ) free( p_udi_entry );
+        free( p_udi_entry );
     }
     p_sys->pp_devices = NULL;
 #endif
@@ -258,8 +258,7 @@ static void DelItem( services_discovery_t *p_sd, const char* psz_udi )
         { /* delete the corresponding item */    
             services_discovery_RemoveItem( p_sd, p_sys->pp_devices[i]->p_item );
             vlc_gc_decref( p_sys->pp_devices[i]->p_item );
-            if( p_sys->pp_devices[i]->psz_udi )
-                free( p_sys->pp_devices[i]->psz_udi );
+            free( p_sys->pp_devices[i]->psz_udi );
             TAB_REMOVE( p_sys->i_devices_number, p_sys->pp_devices,
                     p_sys->pp_devices[i] );
         }

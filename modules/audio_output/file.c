@@ -146,7 +146,7 @@ static int Open( vlc_object_t * p_this )
     if( !psz_name || !*psz_name )
     {
         msg_Err( p_aout, "you need to specify an output file name" );
-        if( psz_name ) free( psz_name );
+        free( psz_name );
         return VLC_EGENERIC;
     }
 

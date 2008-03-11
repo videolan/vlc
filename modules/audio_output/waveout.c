@@ -276,7 +276,7 @@ static int Open( vlc_object_t *p_this )
                          "use default instead", psz_waveout_dev );
        }
     }
-    if(psz_waveout_dev) free( psz_waveout_dev );
+    free( psz_waveout_dev );
 
 
     WAVEOUTCAPS waveoutcaps;

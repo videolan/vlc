@@ -144,12 +144,9 @@ static void CloseDecoder( vlc_object_t *p_this )
             if( !p_sys->pp_ssa_styles[i] )
                 continue;
 
-            if( p_sys->pp_ssa_styles[i]->psz_stylename )
-                free( p_sys->pp_ssa_styles[i]->psz_stylename );
-            if( p_sys->pp_ssa_styles[i]->font_style.psz_fontname )
-                free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
-            if( p_sys->pp_ssa_styles[i] )
-                free( p_sys->pp_ssa_styles[i] );
+            free( p_sys->pp_ssa_styles[i]->psz_stylename );
+            free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
+            free( p_sys->pp_ssa_styles[i] );
         }
         TAB_CLEAN( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
     }
@@ -163,8 +160,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
             if( p_sys->pp_images[i]->p_pic )
                 p_sys->pp_images[i]->p_pic->pf_release( p_sys->pp_images[i]->p_pic );
-            if( p_sys->pp_images[i]->psz_filename )
-                free( p_sys->pp_images[i]->psz_filename );
+            free( p_sys->pp_images[i]->psz_filename );
 
             free( p_sys->pp_images[i] );
         }
@@ -217,7 +213,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
-        if( psz_subtitle ) free( psz_subtitle );
+        free( psz_subtitle );
         return NULL;
     }
 
@@ -233,7 +229,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     p_spu->i_original_picture_width = p_sys->i_original_width;
     p_spu->i_original_picture_height = p_sys->i_original_height;
 
-    if( psz_subtitle ) free( psz_subtitle );
+    free( psz_subtitle );
 
     return p_spu;
 }
@@ -635,8 +631,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             else if( !strcasecmp( "y", psz_name ) )
                                 p_sys->i_original_height = atoi( psz_value );
                         }
-                        if( psz_name )  free( psz_name );
-                        if( psz_value ) free( psz_value );
+                        free( psz_name );
+                        free( psz_value );
                     }
                 }
                 else if( !strcasecmp( "styles", psz_node ) && (i_style_level == 0) )
@@ -682,8 +678,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             if( !strcasecmp( "name", psz_name ) )
                                 p_style->psz_stylename = strdup( psz_value);
                         }
-                        if( psz_name )  free( psz_name );
-                        if( psz_value ) free( psz_value );
+                        free( psz_name );
+                        free( psz_value );
                     }
                 }
                 else if( !strcasecmp( "fontstyle", psz_node ) && (i_style_level == 2) )
@@ -697,8 +693,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         {
                             if( !strcasecmp( "face", psz_name ) )
                             {
-                                if( p_style->font_style.psz_fontname )
-                                    free( p_style->font_style.psz_fontname );
+                                free( p_style->font_style.psz_fontname );
                                 p_style->font_style.psz_fontname = strdup( psz_value );
                             }
                             else if( !strcasecmp( "size", psz_name ) )
@@ -788,8 +783,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                                 p_style->font_style.i_spacing = atoi( psz_value );
                             }
                         }
-                        if( psz_name )  free( psz_name );
-                        if( psz_value ) free( psz_value );
+                        free( psz_name );
+                        free( psz_value );
                     }
                 }
                 else if( !strcasecmp( "position", psz_node ) && (i_style_level == 2) )
@@ -849,8 +844,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                                 }
                             }
                         }
-                        if( psz_name )  free( psz_name );
-                        if( psz_value ) free( psz_value );
+                        free( psz_name );
+                        free( psz_value );
                     }
                 }
 
@@ -858,7 +853,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                 break;
         }
     }
-    if( p_style ) free( p_style );
+    free( p_style );
 }
 
 
