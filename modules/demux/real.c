@@ -149,8 +149,14 @@ static int Open( vlc_object_t *p_this )
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
+
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( p_sys == NULL )
+    {
+        return VLC_ENOMEM;
+    }
     memset( p_sys, 0, sizeof( demux_sys_t ) );
+
     p_sys->i_data_offset = 0;
     p_sys->i_track = 0;
     p_sys->track   = NULL;
@@ -1173,14 +1179,19 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         case VLC_FOURCC( 'r','a','a','c' ):
         case VLC_FOURCC( 'r','a','c','p' ):
+            fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
+
             if( fmt.i_extra > 0 ) { fmt.i_extra--; p_peek++; }
             if( fmt.i_extra > 0 )
             {
                 fmt.p_extra = malloc( fmt.i_extra );
+                if( fmt.p_extra == NULL )
+                {
+                    msg_Err( p_demux, "Error in the extra data" );
+                    return VLC_EGENERIC;
+                }
                 memcpy( fmt.p_extra, p_peek, fmt.i_extra );
             }
-
-            fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
             break;
 
         case VLC_FOURCC('s','i','p','r'):
@@ -1191,9 +1202,17 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                 fmt.audio.i_blockalign = i_subpacket_size;
             else
                 fmt.audio.i_blockalign = i_coded_frame_size;
-            if( !fmt.i_extra ) break;
-            fmt.p_extra = malloc( fmt.i_extra );
-            memcpy( fmt.p_extra, p_peek, fmt.i_extra );
+
+            if( fmt.i_extra > 0 )
+            {
+                fmt.p_extra = malloc( fmt.i_extra );
+                if( fmt.p_extra == NULL )
+                {
+                    msg_Err( p_demux, "Error in the extra data" );
+                    return VLC_EGENERIC;
+                }
+                memcpy( fmt.p_extra, p_peek, fmt.i_extra );
+            }
             break;
 
         case VLC_FOURCC('r','a','l','f'):
