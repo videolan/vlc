@@ -110,7 +110,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys )
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
 
     /* Read the metadata */
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'T', 'T', 'A', '1' ) );
@@ -130,7 +130,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_seektable )
     {
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     stream_Read( p_demux->s, p_seektable, i_seektable_size );
@@ -139,7 +139,7 @@ static int Open( vlc_object_t * p_this )
     {
         free( p_seektable );
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     for( i = 0; i < p_sys->i_totalframes; i++ )
@@ -155,7 +155,7 @@ static int Open( vlc_object_t * p_this )
         free( p_sys->pi_seektable );
         free( p_seektable );
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
     memcpy( (uint8_t*)fmt.p_extra, p_header, 22 );
     memcpy( (uint8_t*)fmt.p_extra+22, p_seektable, fmt.i_extra -22 );
