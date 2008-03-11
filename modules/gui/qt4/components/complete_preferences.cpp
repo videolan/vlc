@@ -55,13 +55,16 @@
 PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QTreeWidget( _parent ), p_intf( _p_intf )
 {
+    /* General Qt options */
     setColumnCount( 1 );
     setAlternatingRowColors( true );
     header()->hide();
+
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setTextElideMode( Qt::ElideNone );
     setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOn );
 
+    /* Nice icons */
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
     BI( audio, ":/pixmaps/advprefs_audio.png" );
     BI( video, ":/pixmaps/advprefs_video.png" );
@@ -77,6 +80,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
                                         FIND_ANYWHERE );
     if( !p_list ) return;
+
+    /* Find the main module */
     for( unsigned i = 0; p_module == NULL; i++ )
     {
         assert (i < (unsigned)p_list->i_count);
@@ -86,32 +91,40 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             p_module = p_main;
     }
 
+    /* Initialisation and get the confsize */
     PrefsItemData *data = NULL;
+    PrefsItemData *data_sub = NULL;
     QTreeWidgetItem *current_item = NULL;
     unsigned confsize;
     module_config_t *const p_config = module_GetConfig (p_module, &confsize);
 
-    for (size_t i = 0; i < confsize; i++)
+    /* Go through the list of conf */
+    for( size_t i = 0; i < confsize; i++ )
     {
-        module_config_t *p_item = p_config + i;
-
         const char *psz_help;
         QIcon icon;
+
+        /* Work on a new item */
+        module_config_t *p_item = p_config + i;
+
         switch( p_item->i_type )
         {
+        /* This is a category */
         case CONFIG_CATEGORY:
             if( p_item->value.i == -1 ) break;
+
+            /* PrefsItemData Init */
             data = new PrefsItemData();
-            data->name = QString( qtr( config_CategoryNameGet
-                                           ( p_item->value.i ) ) );
+            data->name = qtr( config_CategoryNameGet( p_item->value.i ) );
             psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
-                data->help = QString( qtr(psz_help) );
+                data->help = qtr( psz_help );
             else
                 data->help.clear();
             data->i_type = TYPE_CATEGORY;
             data->i_object_id = p_item->value.i;
 
+            /* This is a category, put a nice icon */
             switch( p_item->value.i )
             {
 #define CI(a,b) case a: icon = b##_icon;break
@@ -122,9 +135,10 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             CI( CAT_ADVANCED, advanced );
             CI( CAT_PLAYLIST, playlist );
             CI( CAT_INTERFACE, interface );
-#undef CI
             }
+#undef CI
 
+            /* Create a new QTreeItem to display it in the tree at top level */
             current_item = new QTreeWidgetItem();
             current_item->setText( 0, data->name );
             current_item->setIcon( 0 , icon );
@@ -133,6 +147,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                                    qVariantFromValue( data ) );
             addTopLevelItem( current_item );
             break;
+
+        /* This is a subcategory */
         case CONFIG_SUBCATEGORY:
             if( p_item->value.i == -1 ) break;
 
@@ -146,14 +162,13 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                   p_item->value.i == SUBCAT_PLAYLIST_GENERAL||
                   p_item->value.i == SUBCAT_AUDIO_GENERAL ) )
             {
-                // Data still contains the correct thing
+                /* Data still contains the correct thing */
                 data->i_type = TYPE_CATSUBCAT;
                 data->i_subcat_id = p_item->value.i;
-                data->name = QString( qtr( config_CategoryNameGet(
-                                            p_item->value.i )) );
+                data->name = qtr( config_CategoryNameGet( p_item->value.i ) );
                 psz_help = config_CategoryHelpGet( p_item->value.i );
                 if( psz_help )
-                    data->help = QString( qtr(psz_help) );
+                    data->help = qtr( psz_help );
                 else
                     data->help.clear();
                 current_item->setData( 0, Qt::UserRole,
@@ -161,35 +176,42 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                 continue;
             }
 
-            data = new PrefsItemData();
-            data->name = QString( qtr( config_CategoryNameGet(
-                                                        p_item->value.i)) );
+            /* Normal Subcategories */
+
+            /* Process the Data */
+            data_sub = new PrefsItemData();
+            data_sub->name = qtr( config_CategoryNameGet( p_item->value.i) );
             psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
-                data->help = QString( qtr(psz_help) );
+                data_sub->help = qtr( psz_help );
             else
-                data->help.clear();
-            data->i_type = TYPE_SUBCATEGORY;
-            data->i_object_id = p_item->value.i;
+                data_sub->help.clear();
+            data_sub->i_type = TYPE_SUBCATEGORY;
+            data_sub->i_object_id = p_item->value.i;
 
-            assert( current_item );
-
-            /* TODO : Choose the image */
+            /* Create a new TreeWidget */
             QTreeWidgetItem *subcat_item = new QTreeWidgetItem();
-            subcat_item->setText( 0, data->name );
-            //item->setIcon( 0 , XXX );
+            subcat_item->setText( 0, data_sub->name );
+            /* TODO : Choose the image */
+            //subcat_item->setIcon( 0 , XXX );
             subcat_item->setData( 0, Qt::UserRole,
-                                  qVariantFromValue(data) );
+                                  qVariantFromValue( data_sub ) );
             subcat_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+
+            /* Add it to the parent */
+            assert( current_item );
             current_item->addChild( subcat_item );
             break;
+
+        /* Other items don't need yet a place on the tree */
         }
     }
-    module_PutConfig (p_config);
+    module_PutConfig( p_config );
 
     /* Build the tree of plugins */
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
+        /* Take every module */
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         // Main module excluded
@@ -199,6 +221,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         bool b_options = false;
         module_config_t *const p_config = module_GetConfig (p_module, &confsize);
 
+        /* Loop through the configurations items */
         for (size_t i = 0; i < confsize; i++)
         {
             const module_config_t *p_item = p_config + i;
@@ -215,17 +238,24 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                 break;
         }
         module_PutConfig (p_config);
+
+        /* Dummy item, please proceed */
         if( !b_options || i_category == 0 || i_subcategory == 0 ) continue;
+
 
         // Locate the category item;
         QTreeWidgetItem *subcat_item = NULL;
         bool b_found = false;
+
         for( int i_cat_index = 0 ; i_cat_index < topLevelItemCount();
                                    i_cat_index++ )
         {
+            /* Get the treeWidgetItem that correspond to the category */
             QTreeWidgetItem *cat_item = topLevelItem( i_cat_index );
             PrefsItemData *data = cat_item->data( 0, Qt::UserRole ).
                                              value<PrefsItemData *>();
+
+            /* If we match the good category */
             if( data->i_object_id == i_category )
             {
                 for( int i_sc_index = 0; i_sc_index < cat_item->childCount();
