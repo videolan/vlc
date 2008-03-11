@@ -696,10 +696,10 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                 vlc_gc_decref( p_item );
            }
         }
-        vlc_mutex_lock( &p_obj->object_lock );
+        vlc_object_lock( p_obj );
         i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
-        vlc_mutex_unlock( &p_obj->object_lock );
+        vlc_object_unlock( p_obj );
         /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
     }

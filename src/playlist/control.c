@@ -206,7 +206,7 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     p.p_item = p_item;
     p.b_fetch_art = VLC_TRUE;
 
-    vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
+    vlc_object_lock( p_playlist->p_fetcher );
     for( i = 0; i < p_playlist->p_fetcher->i_waiting &&
          p_playlist->p_fetcher->p_waiting->b_fetch_art == VLC_TRUE;
          i++ );
@@ -214,8 +214,8 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                  p_playlist->p_fetcher->i_waiting,
                  i, p );
-    vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
-    vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
+    vlc_object_signal_unlocked( p_playlist->p_fetcher );
+    vlc_obj_unlock( p_playlist->p_fetcher );
     return VLC_SUCCESS;
 }
 
@@ -513,9 +513,9 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
 
     val.i_int = p_input->i_id;
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    PL_UNLOCK;
     var_Set( p_playlist, "playlist-current", val );
-    vlc_mutex_lock( &p_playlist->object_lock );
+    PL_LOCK;
 
     return VLC_SUCCESS;
 }
