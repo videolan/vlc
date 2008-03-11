@@ -72,7 +72,7 @@ void E_(Close_B4S)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->psz_prefix ) free( p_sys->psz_prefix );
+    free( p_sys->psz_prefix );
     if( p_sys->p_xml_reader ) xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
     if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
     free( p_sys );
@@ -97,7 +97,7 @@ static int Demux( demux_t *p_demux )
     if( !p_xml ) return -1;
 
     psz_elname = stream_ReadLine( p_demux->s );
-    if( psz_elname ) free( psz_elname );
+    free( psz_elname );
     psz_elname = 0;
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
@@ -119,7 +119,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_elname );
-        if( psz_elname ) free( psz_elname );
+        free( psz_elname );
         vlc_object_release( p_playlist );
         return -1;
     }
@@ -141,7 +141,7 @@ static int Demux( demux_t *p_demux )
         strcmp( psz_elname, "playlist" ) )
     {
         msg_Err( p_demux, "invalid child node %s", psz_elname );
-        if( psz_elname ) free( psz_elname );
+        free( psz_elname );
         return -1;
     }
     free( psz_elname ); psz_elname = 0;
@@ -183,7 +183,7 @@ static int Demux( demux_t *p_demux )
             case XML_READER_STARTELEM:
             {
                 // Read the element name
-                if( psz_elname ) free( psz_elname );
+                free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
                 if( !psz_elname ) return -1;
 

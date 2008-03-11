@@ -341,7 +341,7 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
         if( psz_out )
         {
             msg_Dbg( p_demux, "%s = %s", psz_bol, psz_out );
-            if( psz_out) free( psz_out );
+            free( psz_out );
         }
     }
     return VLC_SUCCESS;
@@ -359,7 +359,7 @@ static int Demux ( demux_t *p_demux )
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
         ParseLine( p_demux, psz_line );
-        if( psz_line ) free( psz_line );
+        free( psz_line );
     }
     return VLC_SUCCESS;
 }

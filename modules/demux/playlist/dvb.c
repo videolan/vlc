@@ -126,7 +126,7 @@ static int Demux( demux_t *p_demux )
         input_ItemAddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );
         while( i_options-- ) free( ppsz_options[i_options] );
-        if( ppsz_options ) free( ppsz_options );
+        free( ppsz_options );
 
         free( psz_line );
     }
@@ -280,7 +280,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
     {
         /* This isn't a valid channels file, cleanup everything */
         while( (*pi_options)-- ) free( (*pppsz_options)[*pi_options] );
-        if( *pppsz_options ) free( *pppsz_options );
+        free( *pppsz_options );
         *pppsz_options = 0; *pi_options = 0;
     }
 

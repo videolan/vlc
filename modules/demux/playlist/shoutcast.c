@@ -132,7 +132,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_eltname );
-        if( psz_eltname ) free( psz_eltname );
+        free( psz_eltname );
         return -1;
     }
 

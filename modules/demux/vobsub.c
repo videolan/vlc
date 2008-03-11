@@ -211,10 +211,9 @@ static void Close( vlc_object_t *p_this )
 
     /* Clean all subs from all tracks */
     for( i = 0; i < p_sys->i_tracks; i++ )
-    {
-        if( p_sys->track[i].p_subtitles ) free( p_sys->track[i].p_subtitles );
-    }
-    if( p_sys->track ) free( p_sys->track );
+        free( p_sys->track[i].p_subtitles );
+
+    free( p_sys->track );
 
     if( p_sys->p_vobsub_stream )
         stream_Delete( p_sys->p_vobsub_stream );
@@ -435,7 +434,7 @@ static int TextLoad( text_t *txt, stream_t *s )
 
     if( txt->i_line_count <= 0 )
     {
-        if( txt->line ) free( txt->line );
+        free( txt->line );
         return VLC_EGENERIC;
     }
 
@@ -446,10 +445,9 @@ static void TextUnload( text_t *txt )
     int i;
 
     for( i = 0; i < txt->i_line_count; i++ )
-    {
-        if( txt->line[i] ) free( txt->line[i] );
-    }
-    if( txt->line ) free( txt->line );
+        free( txt->line[i] );
+
+    free( txt->line );
     txt->i_line       = 0;
     txt->i_line_count = 0;
 }

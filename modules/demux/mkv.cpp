@@ -1048,35 +1048,17 @@ public:
                 delete tracks[i_track]->p_compression_data;
             }
             es_format_Clean( &tracks[i_track]->fmt );
-            if( tracks[i_track]->p_extra_data )
-                free( tracks[i_track]->p_extra_data );
-            if( tracks[i_track]->psz_codec )
-                free( tracks[i_track]->psz_codec );
+            free( tracks[i_track]->p_extra_data );
+            free( tracks[i_track]->psz_codec );
             delete tracks[i_track];
         }
 
-        if( psz_writing_application )
-        {
-            free( psz_writing_application );
-        }
-        if( psz_muxing_application )
-        {
-            free( psz_muxing_application );
-        }
-        if( psz_segment_filename )
-        {
-            free( psz_segment_filename );
-        }
-        if( psz_title )
-        {
-            free( psz_title );
-        }
-        if( psz_date_utc )
-        {
-            free( psz_date_utc );
-        }
-        if ( p_indexes )
-            free( p_indexes );
+        free( psz_writing_application );
+        free( psz_muxing_application );
+        free( psz_segment_filename );
+        free( psz_title );
+        free( psz_date_utc );
+        free( p_indexes );
 
         delete ep;
         delete segment;
@@ -1313,7 +1295,7 @@ public:
     {}
     virtual ~attachment_c()
     {
-        if( p_data ) free( p_data );
+        free( p_data );
     }
 
     std::string    psz_file_name;

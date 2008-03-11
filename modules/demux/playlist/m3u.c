@@ -212,11 +212,11 @@ static int Demux( demux_t *p_demux )
         {
             /* Cleanup state */
             while( i_options-- ) free( (char*)ppsz_options[i_options] );
-            if( ppsz_options ) free( ppsz_options );
+            free( ppsz_options );
             ppsz_options = NULL; i_options = 0;
-            if( psz_name ) free( psz_name );
+            free( psz_name );
             psz_name = NULL;
-            if ( psz_artist ) free( psz_artist );
+            free( psz_artist );
             psz_artist = NULL;
             i_parsed_duration = 0;
             i_duration = -1;

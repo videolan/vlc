@@ -183,20 +183,13 @@ void E_(Close_SGIMB)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    if( p_sys->psz_uri )
-        free( p_sys->psz_uri );
-    if( p_sys->psz_server )
-        free( p_sys->psz_server );
-    if( p_sys->psz_location )
-        free( p_sys->psz_location );
-    if( p_sys->psz_name )
-        free( p_sys->psz_name );
-    if( p_sys->psz_user )
-        free( p_sys->psz_user );
-    if( p_sys->psz_password )
-        free( p_sys->psz_password );
-    if( p_sys->psz_mcast_ip )
-        free( p_sys->psz_mcast_ip );
+    free( p_sys->psz_uri );
+    free( p_sys->psz_server );
+    free( p_sys->psz_location );
+    free( p_sys->psz_name );
+    free( p_sys->psz_user );
+    free( p_sys->psz_password );
+    free( p_sys->psz_mcast_ip );
     free( p_demux->p_sys );
     return;
 }
@@ -325,7 +318,7 @@ static int Demux ( demux_t *p_demux )
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
         ParseLine( p_demux, psz_line );
-        if( psz_line ) free( psz_line );
+        free( psz_line );
     }
 
     if( p_sys->psz_mcast_ip )
@@ -335,7 +328,7 @@ static int Demux ( demux_t *p_demux )
         char *temp;
 
         asprintf( &temp, "udp://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port );
-        if( p_sys->psz_uri ) free( p_sys->psz_uri );
+        free( p_sys->psz_uri );
         p_sys->psz_uri = strdup( temp );
         free( temp );
     }

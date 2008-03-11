@@ -61,7 +61,7 @@ static int StoreString( demux_t *p_demux, char **ppsz_string,
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned len = psz_source_end - psz_source_start;
 
-    if( *ppsz_string ) free( *ppsz_string );
+    free( *ppsz_string );
 
     char *buf = *ppsz_string = malloc ((len * (1 + !p_sys->b_utf8)) + 1);
     if (buf == NULL)
@@ -221,8 +221,8 @@ void E_(Close_ASX)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->psz_prefix ) free( p_sys->psz_prefix );
-    if( p_sys->psz_data ) free( p_sys->psz_data );
+    free( p_sys->psz_prefix );
+    free( p_sys->psz_data );
     free( p_sys );
 }
 

@@ -314,10 +314,10 @@ static void ASF_FreeObject_metadata( asf_object_t *p_obj )
 
     for( i = 0; i < p_meta->i_record_entries_count; i++ )
     {
-        if( p_meta->record[i].psz_name ) free( p_meta->record[i].psz_name );
-        if( p_meta->record[i].p_data ) free( p_meta->record[i].p_data );
+        free( p_meta->record[i].psz_name );
+        free( p_meta->record[i].p_data );
     }
-    if( p_meta->record ) free( p_meta->record );
+    free( p_meta->record );
 }
 
 static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )

@@ -497,11 +497,10 @@ static inline void ps_psm_destroy( ps_psm_t *p_psm )
 {
     while( p_psm->i_es-- )
     {
-        if( p_psm->es[p_psm->i_es]->i_descriptor )
-            free( p_psm->es[p_psm->i_es]->p_descriptor );
+        free( p_psm->es[p_psm->i_es]->p_descriptor );
         free( p_psm->es[p_psm->i_es] );
     }
-    if( p_psm->es ) free( p_psm->es );
+    free( p_psm->es );
 
     p_psm->es = 0;
     p_psm->i_es = 0;

@@ -1191,8 +1191,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
         p_ogg->i_bitrate -= p_stream->fmt.i_bitrate;
 
         ogg_stream_clear( &p_ogg->pp_stream[i_stream]->os );
-        if( p_ogg->pp_stream[i_stream]->p_headers)
-            free( p_ogg->pp_stream[i_stream]->p_headers );
+        free( p_ogg->pp_stream[i_stream]->p_headers );
 
         es_format_Clean( &p_stream->fmt );
 
@@ -1201,7 +1200,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
 #undef p_stream
 
     /* Reinit p_ogg */
-    if( p_ogg->pp_stream ) free( p_ogg->pp_stream );
+    free( p_ogg->pp_stream );
     p_ogg->pp_stream = NULL;
     p_ogg->i_streams = 0;
 }

@@ -400,9 +400,9 @@ error:
         vlc_object_detach( p_sys->p_timeout );
         vlc_object_release( p_sys->p_timeout );
     }
-    if( p_sys->scheduler ) delete p_sys->scheduler;
-    if( p_sys->p_sdp ) free( p_sys->p_sdp );
-    if( p_sys->psz_path ) free( p_sys->psz_path );
+    delete p_sys->scheduler;
+    free( p_sys->p_sdp );
+    free( p_sys->psz_path );
 
     vlc_UrlClean( &p_sys->url );
 
@@ -441,9 +441,9 @@ static void Close( vlc_object_t *p_this )
         vlc_object_detach( p_sys->p_timeout );
         vlc_object_release( p_sys->p_timeout );
     }
-    if( p_sys->scheduler ) delete p_sys->scheduler;
-    if( p_sys->p_sdp ) free( p_sys->p_sdp );
-    if( p_sys->psz_path ) free( p_sys->psz_path );
+    delete p_sys->scheduler;
+    free( p_sys->p_sdp );
+    free( p_sys->psz_path );
 
     vlc_UrlClean( &p_sys->url );
 
@@ -563,8 +563,8 @@ describe:
             int i_result;
             msg_Dbg( p_demux, "authentication failed" );
 
-            if( psz_user ) free( psz_user );
-            if( psz_pwd ) free( psz_pwd );
+            free( psz_user );
+            free( psz_pwd );
             psz_user = psz_pwd = NULL;
 
             i_result = intf_UserLoginPassword( p_demux, _("RTSP authentication"),
@@ -599,11 +599,11 @@ describe:
     }
 
     /* malloc-ated copy */
-    if( psz_url ) free( psz_url );
-    if( psz_user ) free( psz_user );
-    if( psz_pwd ) free( psz_pwd );
+    free( psz_url );
+    free( psz_user );
+    free( psz_pwd );
 
-    if( p_sys->p_sdp ) free( p_sys->p_sdp );
+    free( p_sys->p_sdp );
     p_sys->p_sdp = NULL;
     if( p_sdp ) p_sys->p_sdp = strdup( (char*)p_sdp );
     delete[] p_sdp;
@@ -1882,7 +1882,7 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
         psz += strlen(psz)+1;
     }
 
-    if( dup ) free( dup );
+    free( dup );
     return cfg;
 }
 

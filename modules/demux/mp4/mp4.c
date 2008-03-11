@@ -439,7 +439,7 @@ static int Open( vlc_object_t * p_this )
                     msg_Err( p_demux, "unknown ref type=%4.4s FIXME (send a bug report)",
                              (char*)&p_rdrf->data.p_rdrf->i_ref_type );
                 }
-                if( psz_ref ) free( psz_ref );
+                free( psz_ref );
             }
             if( b_play && p_item_in_category &&
                 p_item_in_category->i_children > 0 )

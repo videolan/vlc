@@ -75,7 +75,7 @@ void E_(Close_podcast)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->psz_prefix ) free( p_sys->psz_prefix );
+    free( p_sys->psz_prefix );
     if( p_sys->p_playlist ) vlc_object_release( p_sys->p_playlist );
     if( p_sys->p_xml_reader ) xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
     if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
@@ -134,7 +134,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_elname );
-        if( psz_elname ) free( psz_elname );
+        free( psz_elname );
         return -1;
     }
     free( psz_elname ); psz_elname = NULL;
@@ -153,7 +153,7 @@ static int Demux( demux_t *p_demux )
             case XML_READER_STARTELEM:
             {
                 // Read the element name
-                if( psz_elname ) free( psz_elname );
+                free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
                 if( !psz_elname ) return -1;
 

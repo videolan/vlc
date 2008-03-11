@@ -216,10 +216,10 @@ static void Close( vlc_object_t *p_this )
         free( tk );
     }
 
-    if( p_sys->psz_title ) free( p_sys->psz_title );
-    if( p_sys->psz_artist ) free( p_sys->psz_artist );
-    if( p_sys->psz_copyright ) free( p_sys->psz_copyright );
-    if( p_sys->psz_description ) free( p_sys->psz_description );
+    free( p_sys->psz_title );
+    free( p_sys->psz_artist );
+    free( p_sys->psz_copyright );
+    free( p_sys->psz_description );
 
     if( p_sys->i_track > 0 ) free( p_sys->track );
     free( p_sys );

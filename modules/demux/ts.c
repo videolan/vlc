@@ -692,10 +692,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->buffer = malloc( p_sys->i_packet_size * p_sys->i_ts_read );
         }
     }
-    if( val.psz_string )
-    {
-        free( val.psz_string );
-    }
+    free( val.psz_string );
 
     /* We handle description of an extra PMT */
     var_Create( p_demux, "ts-extra-pmt", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -773,10 +770,7 @@ static int Open( vlc_object_t *p_this )
             }
         }
     }
-    if( val.psz_string )
-    {
-        free( val.psz_string );
-    }
+    free( val.psz_string );
 
     var_Create( p_demux, "ts-csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-csa-ck", &val );
@@ -830,10 +824,7 @@ static int Open( vlc_object_t *p_this )
             }
         }
     }
-    if( val.psz_string )
-    {
-        free( val.psz_string );
-    }
+    free( val.psz_string );
 
     var_Create( p_demux, "ts-silent", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-silent", &val );
@@ -1494,7 +1485,7 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
                 dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
             free( pid->psi->prg[i] );
         }
-        if( pid->psi->prg ) free( pid->psi->prg );
+        free( pid->psi->prg );
         free( pid->psi );
     }
     else
@@ -2835,10 +2826,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                             strcat( psz_extra, psz_itm );
                             strcat( psz_extra, ")" );
                         }
-                        if( psz_dsc )
-                            free( psz_dsc );
-                        if( psz_itm )
-                            free( psz_itm );
+                        free( psz_dsc );
+                        free( psz_itm );
                     }
                 }
             }
@@ -2856,10 +2845,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
         if( p_evt->i_running_status == 0x04 && i_start > 0 )
             vlc_epg_SetCurrent( p_epg, i_start );
 
-        if( psz_name )
-            free( psz_name );
-        if( psz_text )
-            free( psz_text );
+        free( psz_name );
+        free( psz_text );
 
         free( psz_extra );
     }
@@ -3878,7 +3865,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pmt_rm[i] );
         }
 
-        if( pmt_rm ) free( pmt_rm );
+        free( pmt_rm );
     }
 
     /* now create programs */

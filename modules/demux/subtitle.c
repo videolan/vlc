@@ -323,7 +323,7 @@ static int Open ( vlc_object_t *p_this )
             s = NULL;
         }
 
-        if( s ) free( s );
+        free( s );
 
         /* It will nearly always work even for non seekable stream thanks the
          * caching system, and if it fails we lose just a few sub */
@@ -365,8 +365,7 @@ static int Open ( vlc_object_t *p_this )
                                               sizeof(subtitle_t) * i_max ) ) )
             {
                 msg_Err( p_demux, "out of memory");
-                if( p_sys->subtitle != NULL )
-                    free( p_sys->subtitle );
+                free( p_sys->subtitle );
                 TextUnload( &p_sys->txt );
                 free( p_sys );
                 return VLC_ENOMEM;
@@ -426,12 +425,8 @@ static void Close( vlc_object_t *p_this )
     int i;
 
     for( i = 0; i < p_sys->i_subtitles; i++ )
-    {
-        if( p_sys->subtitle[i].psz_text )
-            free( p_sys->subtitle[i].psz_text );
-    }
-    if( p_sys->subtitle )
-        free( p_sys->subtitle );
+        free( p_sys->subtitle[i].psz_text );
+    free( p_sys->subtitle );
 
     free( p_sys );
 }

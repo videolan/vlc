@@ -444,7 +444,7 @@ static int AVI_ChunkRead_strd( stream_t *s, avi_chunk_t *p_chk )
 
 static void AVI_ChunkFree_strd( avi_chunk_t *p_chk )
 {
-    if( p_chk->strd.p_data ) free( p_chk->strd.p_data );
+    free( p_chk->strd.p_data );
 }
 
 static int AVI_ChunkRead_idx1( stream_t *s, avi_chunk_t *p_chk )
