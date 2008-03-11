@@ -298,10 +298,19 @@ static int Open( vlc_object_t *p_this )
         }
     }
     else if( ( !strncmp( psz_access, "rtp", 3 ) ||
-               !strncmp( psz_access, "udp", 3 ) ) &&
-             strncmp( psz_mux, "ts", 2 ) )
+               !strncmp( psz_access, "udp", 3 ) ) )
     {
-        msg_Err( p_stream, "UDP and RTP are only valid with TS" );
+        if( !strncmp( psz_mux, "ffmpeg", 6 ) )
+        {   /* why would you use ffmpeg's ts muxer ? YOU DON'T LOVE VLC ??? */
+            char *psz_ffmpeg_mux = var_CreateGetString( p_this, "ffmpeg-mux" );
+            if( !psz_ffmpeg_mux || strncmp( psz_ffmpeg_mux, "mpegts", 6 ) )
+                msg_Err( p_stream, "UDP and RTP are only valid with TS" );
+            free( psz_ffmpeg_mux );
+        }
+        else if( strncmp( psz_mux, "ts", 2 ) )
+        {
+            msg_Err( p_stream, "UDP and RTP are only valid with TS" );
+        }
     }
     else if( strncmp( psz_access, "file", 4 ) &&
              ( !strncmp( psz_mux, "mov", 3 ) ||
