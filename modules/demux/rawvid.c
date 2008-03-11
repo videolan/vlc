@@ -165,6 +165,9 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_EGENERIC;
+
     p_sys->i_pcr = 1;
 
     p_sys->b_y4m = b_y4m;
