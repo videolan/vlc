@@ -109,6 +109,8 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_EGENERIC;
 
     /* Read the metadata */
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'T', 'T', 'A', '1' ) );
@@ -125,8 +127,20 @@ static int Open( vlc_object_t * p_this )
 
     i_seektable_size = sizeof(uint32_t)*p_sys->i_totalframes;
     p_seektable = (uint8_t *)malloc( i_seektable_size );
+    if( !p_seektable )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     stream_Read( p_demux->s, p_seektable, i_seektable_size );
-    p_sys->pi_seektable = (uint32_t *)malloc(i_seektable_size);
+    p_sys->pi_seektable = (uint32_t *)malloc( i_seektable_size );
+    if( !p_sys->pi_seektable )
+    {
+        free( p_seektable );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     for( i = 0; i < p_sys->i_totalframes; i++ )
         p_sys->pi_seektable[i] = GetDWLE( &p_seektable[i*4] );
@@ -136,6 +150,13 @@ static int Open( vlc_object_t * p_this )
     /* Store the header and Seektable for avcodec */
     fmt.i_extra = 22 + (p_sys->i_totalframes * 4) + 4;
     fmt.p_extra = malloc( fmt.i_extra );
+    if( !fmt.p_extra )
+    {
+        free( p_sys->pi_seektable );
+        free( p_seektable );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     memcpy( (uint8_t*)fmt.p_extra, p_header, 22 );
     memcpy( (uint8_t*)fmt.p_extra+22, p_seektable, fmt.i_extra -22 );
 
@@ -154,6 +175,7 @@ static void Close( vlc_object_t * p_this )
     demux_t        *p_demux = (demux_t*)p_this;
     demux_sys_t    *p_sys = p_demux->p_sys;
 
+    free( p_sys->pi_seektable );
     free( p_sys );
 }
 
