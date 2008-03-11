@@ -266,7 +266,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
     playlist_Signal( p_playlist );
 
-    if( psz_name ) free( psz_name );
+    free( psz_name );
     vlc_object_release( p_input );
     vlc_object_release( p_playlist );
 
@@ -455,7 +455,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
             psz_parser = ptr + 1;
         }
     }
-    if( psz_ignore ) free( psz_ignore );
+    free( psz_ignore );
 
     /* While we still have entries in the directory */
     for( i = 0; i < i_dir_content; i++ )
@@ -545,12 +545,12 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     }
 
     for( i = 0; i < i_extensions; i++ )
-        if( ppsz_extensions[i] ) free( ppsz_extensions[i] );
-    if( ppsz_extensions ) free( ppsz_extensions );
+        free( ppsz_extensions[i] );
+    free( ppsz_extensions );
 
     for( i = 0; i < i_dir_content; i++ )
-        if( pp_dir_content[i] ) free( pp_dir_content[i] );
-    if( pp_dir_content ) free( pp_dir_content );
+        free( pp_dir_content[i] );
+    free( pp_dir_content );
 
     return i_return;
 }

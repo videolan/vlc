@@ -243,7 +243,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys )
     {
-        if( p_sys->p_last) free( p_sys->p_last );
+        free( p_sys->p_last );
         free( p_sys );
     }
 }

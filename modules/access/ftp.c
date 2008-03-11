@@ -623,7 +623,7 @@ static int ftp_ReadCommand( vlc_object_t *p_access, access_sys_t *p_sys,
     if( psz_line == NULL || strlen( psz_line ) < 3 )
     {
         msg_Err( p_access, "cannot get answer" );
-        if( psz_line ) free( psz_line );
+        free( psz_line );
         if( pi_answer ) *pi_answer    = 500;
         if( ppsz_answer ) *ppsz_answer  = NULL;
         return -1;

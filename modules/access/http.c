@@ -356,14 +356,14 @@ connect:
                         psz_login, psz_password );
             if( psz_login ) p_sys->url.psz_username = strdup( psz_login );
             if( psz_password ) p_sys->url.psz_password = strdup( psz_password );
-            if( psz_login ) free( psz_login );
-            if( psz_password ) free( psz_password );
+            free( psz_login );
+            free( psz_password );
             goto connect;
         }
         else
         {
-            if( psz_login ) free( psz_login );
-            if( psz_password ) free( psz_password );
+            free( psz_login );
+            free( psz_password );
             goto error;
         }
     }
@@ -614,7 +614,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             {
                 /* read the empty line */
                 char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs );
-                if( psz ) free( psz );
+                free( psz );
             }
         }
     }
@@ -712,8 +712,7 @@ static int ReadICYMeta( access_t *p_access )
         if( !p_sys->psz_icy_title ||
             strcmp( p_sys->psz_icy_title, &p[1] ) )
         {
-            if( p_sys->psz_icy_title )
-                free( p_sys->psz_icy_title );
+            free( p_sys->psz_icy_title );
             p_sys->psz_icy_title = strdup( &p[1] );
             p_access->info.i_update |= INPUT_UPDATE_META;
 
@@ -1241,12 +1240,12 @@ static int Request( access_t *p_access, int64_t i_tell )
                 psz_new_loc = strdup( p );
             }
 
-            if( p_sys->psz_location ) free( p_sys->psz_location );
+            free( p_sys->psz_location );
             p_sys->psz_location = psz_new_loc;
         }
         else if( !strcasecmp( psz, "Content-Type" ) )
         {
-            if( p_sys->psz_mime ) free( p_sys->psz_mime );
+            free( p_sys->psz_mime );
             p_sys->psz_mime = strdup( p );
             msg_Dbg( p_access, "Content-Type: %s", p_sys->psz_mime );
         }
@@ -1264,7 +1263,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         {
             if( !strcasecmp( psz, "Pragma: features" ) )
                 p_sys->b_mms = VLC_TRUE;
-            if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
+            free( p_sys->psz_pragma );
             p_sys->psz_pragma = strdup( p );
             msg_Dbg( p_access, "Pragma: %s", p_sys->psz_pragma );
         }
@@ -1305,7 +1304,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         }
         else if( !strcasecmp( psz, "Icy-Name" ) )
         {
-            if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
+            free( p_sys->psz_icy_name );
             p_sys->psz_icy_name = strdup( p );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
 
@@ -1315,7 +1314,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         }
         else if( !strcasecmp( psz, "Icy-Genre" ) )
         {
-            if( p_sys->psz_icy_genre ) free( p_sys->psz_icy_genre );
+            free( p_sys->psz_icy_genre );
             p_sys->psz_icy_genre = strdup( p );
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
         }

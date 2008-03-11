@@ -610,7 +610,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
             {
                 msg_Dbg( p_this, "'%s' is a video device", p_sys->psz_device );
                 /* Device was a video device */
-                if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+                free( p_sys->psz_vdev );
                 p_sys->psz_vdev = p_sys->psz_device;
                 p_sys->psz_device = NULL;
                 p_sys->i_fd_video = OpenVideoDev( p_this, p_sys, b_demux );
@@ -653,7 +653,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
     {
         if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
         {
-            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            free( p_sys->psz_vdev );
             p_sys->psz_vdev = var_CreateGetString( p_this, "v4l2-dev" );
         }
 
@@ -862,7 +862,7 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                     i_len = strlen( psz_parser );
                 }
 
-                if( p_sys->psz_requested_chroma ) free( p_sys->psz_requested_chroma );
+                free( p_sys->psz_requested_chroma );
                 p_sys->psz_requested_chroma = strndup( psz_parser, i_len );
 
                 psz_parser += i_len;
@@ -1053,7 +1053,7 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
     {
         p_sys->psz_device = strdup( psz_dup );
     }
-    if( psz_dup ) free( psz_dup );
+    free( psz_dup );
 }
 
 /*****************************************************************************

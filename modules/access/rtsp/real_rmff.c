@@ -383,7 +383,7 @@ rmff_mdpr_t *rmff_new_mdpr(
 
   mdpr->type_specific_data = malloc(sizeof(char)*type_specific_len);
   if( !mdpr->type_specific_data ) {
-    if( mdpr->stream_name ) free( mdpr->stream_name );
+    free( mdpr->stream_name );
     free( mdpr );
     return NULL;
   }
@@ -609,15 +609,15 @@ void rmff_free_header(rmff_header_t *h)
 {
   if (!h) return;
 
-  if (h->fileheader) free(h->fileheader);
-  if (h->prop) free(h->prop);
-  if (h->data) free(h->data);
-  if (h->cont) {
-    free(h->cont->title);
-    free(h->cont->author);
-    free(h->cont->copyright);
-    free(h->cont->comment);
-    free(h->cont);
+  free( h->fileheader );
+  free( h->prop );
+  free( h->data );
+  if( h->cont ) {
+    free( h->cont->title );
+    free( h->cont->author );
+    free( h->cont->copyright );
+    free( h->cont->comment );
+    free( h->cont );
   }
   if (h->streams) {
     rmff_mdpr_t **s=h->streams;

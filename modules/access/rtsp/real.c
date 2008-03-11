@@ -480,7 +480,7 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
 
     if (!desc->stream[i]->mlti_data) {
       len = 0;
-      if( buf ) free( buf );
+      free( buf );
       buf = NULL;
     } else
       len=select_mlti_data(desc->stream[i]->mlti_data,
@@ -531,13 +531,13 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
   rmff_fix_header(header);
 
   if( desc ) sdpplin_free( desc );
-  if( buf ) free(buf);
+  free( buf );
   return header;
 
 error:
   if( desc ) sdpplin_free( desc );
   if( header ) rmff_free_header( header );
-  if( buf ) free( buf );
+  free( buf );
   return NULL;
 }
 
@@ -642,10 +642,10 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
         lprintf("real: got message from server:\n%s\n", alert);
     }
     printf( "bou\n");
-    rtsp_send_ok(rtsp_session);
-    if( challenge1 ) free(challenge1);
-    if( alert ) free(alert);
-    if( buf ) free(buf);
+    rtsp_send_ok( rtsp_session );
+    free( challenge1 );
+    free( alert );
+    free( buf );
     return NULL;
   }
 
@@ -724,19 +724,19 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   rtsp_schedule_field(rtsp_session, "Range: npt=0-");
   rtsp_request_play(rtsp_session,NULL);
 
-  if( challenge1 ) free( challenge1 );
-  if( session_id ) free( session_id );
-  if( description ) free(description);
-  if( subscribe ) free(subscribe);
-  if( buf ) free(buf);
+  free( challenge1 );
+  free( session_id );
+  free( description );
+  free( subscribe );
+  free( buf );
   return h;
 
 error:
   if( h ) rmff_free_header( h );
-  if( challenge1 ) free( challenge1 );
-  if( session_id ) free( session_id );
-  if( description ) free(description);
-  if( subscribe ) free(subscribe);
-  if( buf ) free(buf);
+  free( challenge1 );
+  free( session_id );
+  free( description );
+  free( subscribe );
+  free( buf );
   return NULL;
 }

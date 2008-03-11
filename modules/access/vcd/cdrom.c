@@ -162,7 +162,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
  *****************************************************************************/
 void ioctl_Close( vlc_object_t * p_this, vcddev_t *p_vcddev )
 {
-    if( p_vcddev->psz_dev ) free( p_vcddev->psz_dev );
+    free( p_vcddev->psz_dev );
 
     if( p_vcddev->i_vcdimage_handle != -1 )
     {
@@ -358,8 +358,8 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
                 if( *pp_sectors == NULL || p_fulltoc == NULL )
                 {
-                    if( *pp_sectors ) free( *pp_sectors );
-                    if( p_fulltoc ) free( p_fulltoc );
+                    free( *pp_sectors );
+                    free( p_fulltoc );
                     msg_Err( p_this, "out of memory" );
                     CloseHandle( hEvent );
                     return 0;
@@ -972,8 +972,8 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
 
 error:
     if( cuefile ) fclose( cuefile );
-    if( psz_cuefile ) free( psz_cuefile );
-    if( psz_vcdfile ) free( psz_vcdfile );
+    free( psz_cuefile );
+    free( psz_vcdfile );
 
     return i_ret;
 }
@@ -988,8 +988,7 @@ static void CloseVCDImage( vlc_object_t * p_this, vcddev_t *p_vcddev )
     else
         return;
 
-    if( p_vcddev->p_sectors )
-        free( p_vcddev->p_sectors );
+    free( p_vcddev->p_sectors );
 }
 
 #if defined( __APPLE__ )

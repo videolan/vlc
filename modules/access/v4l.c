@@ -431,14 +431,14 @@ static int Open( vlc_object_t *p_this )
             p_sys->fd_audio = OpenAudioDev( p_demux, p_sys->psz_device );
             if( p_sys->fd_audio >= 0 )
             {
-                if( p_sys->psz_adev ) free( p_sys->psz_adev );
+                free( p_sys->psz_adev );
                 p_sys->psz_adev = p_sys->psz_device;
                 p_sys->psz_device = NULL;
             }
         }
         else
         {
-            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            free( p_sys->psz_vdev );
             p_sys->psz_vdev = p_sys->psz_device;
             p_sys->psz_device = NULL;
         }
@@ -459,7 +459,7 @@ static int Open( vlc_object_t *p_this )
     {
         if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
         {
-            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            free( p_sys->psz_vdev );
             p_sys->psz_vdev = var_CreateGetString( p_demux, "v4l-vdev" );;
         }
 
@@ -474,7 +474,7 @@ static int Open( vlc_object_t *p_this )
     {
         if( !p_sys->psz_adev || !*p_sys->psz_adev )
         {
-            if( p_sys->psz_adev ) free( p_sys->psz_adev );
+            free( p_sys->psz_adev );
             p_sys->psz_adev = var_CreateGetString( p_demux, "v4l-adev" );;
         }
 
@@ -548,9 +548,9 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
 
-    if( p_sys->psz_device ) free( p_sys->psz_device );
-    if( p_sys->psz_vdev )   free( p_sys->psz_vdev );
-    if( p_sys->psz_adev )   free( p_sys->psz_adev );
+    free( p_sys->psz_device );
+    free( p_sys->psz_vdev );
+    free( p_sys->psz_adev );
     if( p_sys->fd_video >= 0 ) close( p_sys->fd_video );
     if( p_sys->fd_audio >= 0 ) close( p_sys->fd_audio );
     if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
@@ -866,7 +866,7 @@ static void ParseMRL( demux_t *p_demux )
     {
         p_sys->psz_device = strdup( psz_dup );
     }
-    if( psz_dup ) free( psz_dup );
+    free( psz_dup );
 }
 
 /*****************************************************************************

@@ -240,7 +240,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
       {
           char *buf = malloc( strlen(answer) );
           sscanf( answer, "%*s %s", buf );
-          if( rtsp->p_private->server ) free( rtsp->p_private->server );
+          free( rtsp->p_private->server );
           rtsp->p_private->server = buf;
       }
       if( !strncasecmp( answer, "Session:", 8 ) )
@@ -559,12 +559,12 @@ void rtsp_close( rtsp_client_t *rtsp )
         rtsp->pf_disconnect( rtsp->p_userdata );
     }
 
-    if( rtsp->p_private->path ) free( rtsp->p_private->path );
-    if( rtsp->p_private->host ) free( rtsp->p_private->host );
-    if( rtsp->p_private->mrl ) free( rtsp->p_private->mrl );
-    if( rtsp->p_private->session ) free( rtsp->p_private->session );
-    if( rtsp->p_private->user_agent ) free( rtsp->p_private->user_agent );
-    if( rtsp->p_private->server ) free( rtsp->p_private->server );
+    free( rtsp->p_private->path );
+    free( rtsp->p_private->host );
+    free( rtsp->p_private->mrl );
+    free( rtsp->p_private->session );
+    free( rtsp->p_private->user_agent );
+    free( rtsp->p_private->server );
     rtsp_free_answers( rtsp );
     rtsp_unschedule_all( rtsp );
     free( rtsp->p_private );
@@ -604,7 +604,7 @@ char *rtsp_search_answers( rtsp_client_t *rtsp, const char *tag )
 
 void rtsp_set_session( rtsp_client_t *rtsp, const char *id )
 {
-    if( rtsp->p_private->session ) free( rtsp->p_private->session );
+    free( rtsp->p_private->session );
     rtsp->p_private->session = strdup(id);
 }
 
@@ -647,7 +647,7 @@ void rtsp_unschedule_field( rtsp_client_t *rtsp, const char *string )
     {
       if( !strncmp(*ptr, string, strlen(string)) ) break;
     }
-    if( *ptr ) free( *ptr );
+    free( *ptr );
     ptr++;
     do
     {

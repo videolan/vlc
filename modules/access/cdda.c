@@ -154,7 +154,7 @@ static int Open( vlc_object_t *p_this )
         psz_name = var_CreateGetString( p_this, "cd-audio" );
         if( !psz_name || !*psz_name )
         {
-            if( psz_name ) free( psz_name );
+            free( psz_name );
             return VLC_EGENERIC;
         }
     }
@@ -478,8 +478,7 @@ static int GetTracks( access_t *p_access,
             {
                 if( cddb_track_get_title( t )  != NULL )
                 {
-                    if( p_input_item->psz_name )
-                        free( p_input_item->psz_name );
+                    free( p_input_item->psz_name );
                     p_input_item->psz_name = strdup( cddb_track_get_title( t ) );
                     input_item_SetTitle( p_input_item, cddb_track_get_title( t ) );
                 }

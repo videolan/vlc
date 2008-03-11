@@ -131,7 +131,7 @@ static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )
     if( psz ) strncpy( (char *)p_buffer, psz, i_buffer );
     else *p_buffer = 0;
 
-    if( psz ) free( psz );
+    free( psz );
     return 0;
 }
 
@@ -248,11 +248,11 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_access, "realrtsp-caching",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
-    if( psz_server ) free( psz_server );
+    free( psz_server );
     return VLC_SUCCESS;
 
  error:
-    if( psz_server ) free( psz_server );
+    free( psz_server );
     Close( p_this );
     return VLC_EGENERIC;
 }
@@ -266,7 +266,7 @@ static void Close( vlc_object_t * p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_sys->p_rtsp ) rtsp_close( p_sys->p_rtsp );
-    if( p_sys->p_rtsp ) free( p_sys->p_rtsp );
+    free( p_sys->p_rtsp );
     free( p_sys );
 }
 

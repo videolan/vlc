@@ -628,10 +628,8 @@ static void Close( vlc_object_t *p_this )
         dc1394_destroy_handle( p_sys->fd_video );
     CloseAudioDev( p_demux );
 
-    if( p_sys->camera_nodes )
-        free( p_sys->camera_nodes );
-    if( p_sys->audio_device )
-        free( p_sys->audio_device );
+    free( p_sys->camera_nodes );
+    free( p_sys->audio_device );
 
     free( p_sys );
 }
@@ -859,7 +857,7 @@ static int process_options( demux_t *p_demux )
                     "video size of 160x120 is actually disabled for lack of chroma "
                     "support. It will relased ASAP, until then try an higher size "
                     "(320x240 and 640x480 are fully supported)" );
-                free(psz_dup);
+                free( psz_dup );
                 return VLC_EGENERIC;
 #if 0
                 p_sys->frame_size = MODE_160x120_YUV444;
@@ -886,7 +884,7 @@ static int process_options( demux_t *p_demux )
                     " 160x120, 320x240, and 640x480. "
                     "Please specify one of them. You have specified %s.",
                     token );
-                free(psz_dup);
+                free( psz_dup );
                 return VLC_EGENERIC;
             }
             msg_Dbg( p_demux, "Requested video size : %s",token );
@@ -914,7 +912,7 @@ static int process_options( demux_t *p_demux )
                     " 1.875, 3.75, 7.5, 15, 30, 60. "
                     "Please specify one of them. You have specified %s.",
                     token);
-                free(psz_dup);
+                free( psz_dup );
                 return VLC_EGENERIC;
             }
             msg_Dbg( p_demux, "Requested frame rate : %s",token );
@@ -929,7 +927,7 @@ static int process_options( demux_t *p_demux )
                 msg_Err( p_demux, "Bad brightness value '%s', "
                                   "must be an unsigned integer.",
                                   token );
-                free(psz_dup);
+                free( psz_dup );
                 return VLC_EGENERIC;
             }
         }
@@ -958,7 +956,7 @@ static int process_options( demux_t *p_demux )
                 msg_Err( p_demux, "Bad camera number '%s', "
                                   "must be an unsigned integer.",
                                   token );
-                free(psz_dup);
+                free( psz_dup );
                 return VLC_EGENERIC;
             }
         }
@@ -980,7 +978,7 @@ static int process_options( demux_t *p_demux )
                 msg_Err(p_demux, "Bad capture method value '%s', "
                                  "it can be 'raw1394' or 'video1394'.",
                                 token );
-                free(psz_dup);
+                free( psz_dup );
                 return VLC_EGENERIC;
             }
         }
@@ -1011,7 +1009,7 @@ static int process_options( demux_t *p_demux )
             sscanf( token, "0x%llx", &p_sys->selected_uid );
         }
     }
-    if( psz_dup ) free( psz_dup );
+    free( psz_dup );
     return VLC_SUCCESS;
 }
 

@@ -333,12 +333,12 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     var_Create( p_this, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-vdev", &val );
     if( val.psz_string ) vdevname = string( val.psz_string );
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Create( p_this, "dshow-adev", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-adev", &val );
     if( val.psz_string ) adevname = string( val.psz_string );
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     static struct {char *psz_size; int  i_width; int  i_height;} size_table[] =
     { { "subqcif", 128, 96 }, { "qsif", 160, 120 }, { "qcif", 176, 144 },
@@ -370,7 +370,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
             msg_Dbg( p_this, "width x height %dx%d", i_width, i_height );
         }
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     p_sys->b_chroma = VLC_FALSE;
     var_Create( p_this, "dshow-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -381,7 +381,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                                val.psz_string[2], val.psz_string[3] );
         p_sys->b_chroma = VLC_TRUE;
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Create( p_this, "dshow-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner-channel",

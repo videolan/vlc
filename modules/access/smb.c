@@ -188,11 +188,11 @@ static int Open( vlc_object_t *p_this )
      * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
 
     if( !psz_user ) psz_user = var_CreateGetString( p_access, "smb-user" );
-    if( psz_user && !*psz_user ) { free( psz_user ); psz_user = 0; }
+    if( !*psz_user ) { free( psz_user ); psz_user = 0; }
     if( !psz_pwd ) psz_pwd = var_CreateGetString( p_access, "smb-pwd" );
-    if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = 0; }
+    if( !*psz_pwd ) { free( psz_pwd ); psz_pwd = 0; }
     if(!psz_domain) psz_domain = var_CreateGetString( p_access, "smb-domain" );
-    if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = 0; }
+    if( !*psz_domain ) { free( psz_domain ); psz_domain = 0; }
 
 #ifdef WIN32
     if( psz_user )
@@ -208,9 +208,9 @@ static int Open( vlc_object_t *p_this )
         asprintf( &psz_uri, "smb://%s", psz_path );
 #endif
 
-    if( psz_user ) free( psz_user );
-    if( psz_pwd ) free( psz_pwd );
-    if( psz_domain ) free( psz_domain );
+    free( psz_user );
+    free( psz_pwd );
+    free( psz_domain );
 
 #ifdef USE_CTX
     if( !(p_smb = smbc_new_context()) )

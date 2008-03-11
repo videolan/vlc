@@ -209,14 +209,14 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
       *data=nl(*data);
     }
   }
-  if( buf ) free(buf);
-  if( decoded )free(decoded);
+  free( buf );
+  free( decoded) ;
   return desc;
 
 error:
-  if( decoded ) free(decoded);
-  if( desc ) free( desc );
-  if( buf ) free( buf );
+  free( decoded );
+  free( desc );
+  free( buf );
   return NULL;
 }
 
@@ -312,8 +312,8 @@ sdpplin_t *sdpplin_parse(char *data) {
     }
   }
 
-  free(decoded);
-  free(buf);
+  free( decoded );
+  free( buf );
   return desc;
 }
 
@@ -325,36 +325,36 @@ void sdpplin_free(sdpplin_t *description) {
 
   for( i=0; i<description->stream_count; i++ ) {
     if( description->stream[i] ) {
-      if( description->stream[i]->id ) free( description->stream[i]->id );
-      if( description->stream[i]->bandwidth ) free( description->stream[i]->bandwidth );
-      if( description->stream[i]->range ) free( description->stream[i]->range );
-      if( description->stream[i]->length ) free( description->stream[i]->length );
-      if( description->stream[i]->rtpmap ) free( description->stream[i]->rtpmap );
-      if( description->stream[i]->mimetype ) free( description->stream[i]->mimetype );
-      if( description->stream[i]->stream_name ) free( description->stream[i]->stream_name );
-      if( description->stream[i]->mime_type ) free( description->stream[i]->mime_type );
-      if( description->stream[i]->mlti_data ) free( description->stream[i]->mlti_data );
-      if( description->stream[i]->rmff_flags ) free( description->stream[i]->rmff_flags );
-      if( description->stream[i]->asm_rule_book ) free( description->stream[i]->asm_rule_book );
+      free( description->stream[i]->id );
+      free( description->stream[i]->bandwidth );
+      free( description->stream[i]->range );
+      free( description->stream[i]->length );
+      free( description->stream[i]->rtpmap );
+      free( description->stream[i]->mimetype );
+      free( description->stream[i]->stream_name );
+      free( description->stream[i]->mime_type );
+      free( description->stream[i]->mlti_data );
+      free( description->stream[i]->rmff_flags );
+      free( description->stream[i]->asm_rule_book );
       free( description->stream[i] );
     }
   }
   if( description->stream_count ) free( description->stream );
 
-  if( description->owner ) free( description->owner );
-  if( description->session_name ) free( description->session_name );
-  if( description->session_info ) free( description->session_info );
-  if( description->uri ) free( description->uri );
-  if( description->email ) free( description->email );
-  if( description->phone ) free( description->phone );
-  if( description->connection ) free( description->connection );
-  if( description->bandwidth ) free( description->bandwidth );
-  if( description->title ) free( description->title );
-  if( description->author ) free( description->author );
-  if( description->copyright ) free( description->copyright );
-  if( description->keywords ) free( description->keywords );
-  if( description->asm_rule_book ) free( description->asm_rule_book );
-  if( description->abstract ) free( description->abstract );
-  if( description->range ) free( description->range );
+  free( description->owner );
+  free( description->session_name );
+  free( description->session_info );
+  free( description->uri );
+  free( description->email );
+  free( description->phone );
+  free( description->connection );
+  free( description->bandwidth );
+  free( description->title );
+  free( description->author );
+  free( description->copyright );
+  free( description->keywords );
+  free( description->asm_rule_book );
+  free( description->abstract );
+  free( description->range );
   free(description);
 }

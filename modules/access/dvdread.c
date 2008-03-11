@@ -229,7 +229,7 @@ static int Open( vlc_object_t *p_this )
 
         putenv( psz_env );
     }
-    if( psz_dvdcss_env ) free( psz_dvdcss_env );
+    free( psz_dvdcss_env );
 
     /* Open dvdread */
     if( !(p_dvdread = DVDOpen( psz_name )) )

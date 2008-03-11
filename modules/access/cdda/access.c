@@ -306,8 +306,8 @@ static block_t * CDDAReadBlocks( access_t * p_access )
                     msg_Err( p_access, "%s%s\n", psz_mes ? psz_mes: "",
                              psz_err ? psz_err: "" );
 
-                if( psz_err ) free( psz_err );
-                if( psz_mes ) free( psz_mes );
+                free( psz_err );
+                free( psz_mes );
                 if( !p_readbuf )
                 {
                     msg_Err( p_access, "paranoia read error on frame %i\n",
@@ -400,7 +400,7 @@ CDDARead( access_t * p_access, uint8_t *p_buffer, size_t i_len )
         {
             char *psz_title = CDDAFormatTitle( p_access, p_cdda->i_track );
             input_Control( p_cdda->p_input, INPUT_SET_NAME, psz_title );
-            free(psz_title);
+            free( psz_title );
         }
         else
         {
@@ -628,8 +628,7 @@ int CDDAOpen( vlc_object_t *p_this )
     if( !(p_cdio = cdio_open( psz_source, DRIVER_UNKNOWN )) )
     {
         msg_Warn( p_access, "could not open %s", psz_source );
-        if ( psz_source )
-            free( psz_source );
+        free( psz_source );
         return VLC_EGENERIC;
     }
 
@@ -809,7 +808,7 @@ int CDDAOpen( vlc_object_t *p_this )
 
  error:
     cdio_destroy( p_cdda->p_cdio );
-    if( psz_source) free( psz_source );
+    free( psz_source );
     if( p_cdda )
     {
         if ( p_cdda->p_input )
@@ -857,8 +856,8 @@ void CDDAClose (vlc_object_t *p_this )
         cdio_cddap_close_no_free_cdio( p_cdda->paranoia_cd );
 #endif
 
-    if( p_cdda->psz_mcn )    free( p_cdda->psz_mcn );
-    if( p_cdda->psz_source ) free( p_cdda->psz_source );
+    free( p_cdda->psz_mcn );
+    free( p_cdda->psz_source );
 
 #if LIBCDDB_VERSION_NUM >= 1
     libcddb_shutdown();
@@ -1006,7 +1005,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
                     char *psz_title = CDDAFormatTitle( p_access, i_track );
                     input_Control( p_cdda->p_input, INPUT_SET_NAME,
                                    psz_title );
-                    free(psz_title);
+                    free( psz_title );
                     p_cdda->i_track = i_track;
                     i_last_lsn = cdio_get_track_lsn( p_cdda->p_cdio,
                                                 CDIO_CDROM_LEADOUT_TRACK );
