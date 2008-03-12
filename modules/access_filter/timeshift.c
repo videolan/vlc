@@ -31,7 +31,6 @@
 
 #include <vlc/vlc.h>
 
-
 #include <errno.h>
 
 #include <vlc_access.h>
@@ -39,6 +38,10 @@
 #include <vlc_input.h>
 
 #include <unistd.h>
+
+#ifdef WIN32
+#  include <direct.h>                                        /* _wgetcwd  */
+#endif
 
 /*****************************************************************************
  * Module descriptor
