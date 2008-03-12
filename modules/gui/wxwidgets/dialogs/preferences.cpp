@@ -124,9 +124,9 @@ public:
     ConfigTreeData() { b_submodule = 0; panel = NULL; psz_name = NULL;
                        psz_help = NULL; }
     virtual ~ConfigTreeData() {
-                                 if( panel ) delete panel;
-                                 if( psz_name ) free( psz_name );
-                                 if( psz_help ) free( psz_help );
+                                 delete panel;
+                                 free( psz_name );
+                                 free( psz_help );
                               };
 
     vlc_bool_t b_submodule;
@@ -435,10 +435,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                                             GetItemData( current_item );
                     cd->i_type = TYPE_CATSUBCAT;
                     cd->i_subcat_id = p_item->value.i;
-                    if( cd->psz_name ) free( cd->psz_name );
+                    free( cd->psz_name );
                     cd->psz_name = strdup(  config_CategoryNameGet(
                                                       p_item->value.i ) );
-                    if( cd->psz_help ) free( cd->psz_help );
+                    free( cd->psz_help );
                     const char *psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
                     {

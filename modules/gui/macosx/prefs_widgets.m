@@ -416,7 +416,7 @@
 - (void)dealloc
 {
     if( o_label ) [o_label release];
-    if( psz_name ) free( psz_name );
+    free( psz_name );
     [super dealloc];
 }
 

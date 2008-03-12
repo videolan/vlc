@@ -310,7 +310,7 @@ void OpenDialog::FilePanel( HWND hwnd )
         sz_subsfile += psz_subsfile;
         subsfile_mrl.push_back( sz_subsfile );
     }
-    if( psz_subsfile ) free( psz_subsfile );
+    free( psz_subsfile );
 }
 
 void OpenDialog::NetPanel( HWND hwnd )

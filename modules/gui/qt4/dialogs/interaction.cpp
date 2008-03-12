@@ -190,6 +190,9 @@ void InteractionDialog::update()
     if( ( p_dialog->i_flags & DIALOG_INTF_PROGRESS ) &&
         ( p_dialog->val.f_float >= 100.0 ) )
         progressBar->hide();
+    if( ( p_dialog->i_flags & DIALOG_USER_PROGRESS ) &&
+        ( p_dialog->val.f_float >= 100.0 ) )
+        altButton->setText( qtr( "close" ) );
 }
 
 InteractionDialog::~InteractionDialog()

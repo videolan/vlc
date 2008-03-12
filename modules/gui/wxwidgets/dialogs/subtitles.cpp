@@ -77,7 +77,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     if( !psz_subsfile ) psz_subsfile = strdup("");
     file_combo = new wxComboBox( panel, -1, wxL2U(psz_subsfile),
                                  wxPoint(20,25), wxSize(300, -1) );
-    if( psz_subsfile ) free( psz_subsfile );
+    free( psz_subsfile );
     wxButton *browse_button = new wxButton( panel, FileBrowse_Event,
                                             wxU(_("Browse...")) );
     file_sizer->Add( file_combo, 1, wxALL, 5 );

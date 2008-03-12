@@ -386,7 +386,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
        // this, like the one behind the refresh push button?
        p_module_config->b_dirty = VLC_FALSE;
 
-       if(val.psz_string) free(val.psz_string);
+       free( val.psz_string );
     }
 
     finish( p_module_config, bycat );

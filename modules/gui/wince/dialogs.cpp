@@ -320,8 +320,8 @@ void DialogsProvider::OnOpenFileGeneric( intf_dialog_args_t *p_arg )
         }
         free( p_arg->psz_results );
     }
-    if( p_arg->psz_title ) free( p_arg->psz_title );
-    if( p_arg->psz_extensions ) free( p_arg->psz_extensions );
+    free( p_arg->psz_title );
+    free( p_arg->psz_extensions );
 
     free( p_arg );
 }

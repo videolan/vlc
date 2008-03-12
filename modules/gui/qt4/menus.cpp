@@ -960,7 +960,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                         NOTCOMMAND && val.psz_string &&
                         !strcmp( val.psz_string, CURVAL.psz_string ) );
 
-                if( val.psz_string ) free( val.psz_string );
+                free( val.psz_string );
                 break;
 
             case VLC_VAR_INTEGER:

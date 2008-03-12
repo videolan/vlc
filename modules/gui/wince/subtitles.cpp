@@ -116,7 +116,7 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             10, 10 + 15 + 10 - 3, rcClient.right - 2*10, 5*15 + 6,
             hwnd, NULL, hInst, NULL );
 
-        if( psz_subsfile ) free( psz_subsfile );
+        free( psz_subsfile );
 
         browse_button = CreateWindow( _T("BUTTON"), _T("Browse..."),
                         WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,

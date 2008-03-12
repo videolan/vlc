@@ -703,7 +703,7 @@ void Menu::CreateMenuItem( wxMenu *menu, const char *psz_var,
                       CreateChoicesMenu( psz_var, p_object, TRUE ),
                       wxT("")/* Nothing for now (maybe use a GETLONGTEXT) */ );
 
-        if( text.psz_string ) free( text.psz_string );
+        free( text.psz_string );
         return;
     }
 
@@ -733,7 +733,7 @@ void Menu::CreateMenuItem( wxMenu *menu, const char *psz_var,
         break;
     }
 
-    if( text.psz_string ) free( text.psz_string );
+    free( text.psz_string );
 }
 
 wxMenu *Menu::CreateChoicesMenu( const char *psz_var, vlc_object_t *p_object,
@@ -808,7 +808,7 @@ wxMenu *Menu::CreateChoicesMenu( const char *psz_var, vlc_object_t *p_object,
                        val_list.p_list->p_values[i].psz_string ) )
               menu->Check( i_item_id, TRUE );
 
-          if( val.psz_string ) free( val.psz_string );
+          free( val.psz_string );
           break;
 
         case VLC_VAR_INTEGER:
@@ -1043,7 +1043,7 @@ wxMenuItemExt::wxMenuItemExt( wxMenu* parentMenu, int id, const wxString& text,
 
 wxMenuItemExt::~wxMenuItemExt()
 {
-    if( psz_var ) free( psz_var );
-    if( ((i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING)
-        && val.psz_string ) free( val.psz_string );
+    free( psz_var );
+    if( ( i_val_type & VLC_VAR_TYPE ) == VLC_VAR_STRING )
+        free( val.psz_string );
 };

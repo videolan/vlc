@@ -579,7 +579,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
        // this, like the one behind the refresh push button?
        p_module_config->b_dirty = VLC_FALSE;
 
-       if(val.psz_string) free(val.psz_string);
+       free( val.psz_string );
     }
 
     UpdateCombo( p_module_config );
@@ -601,7 +601,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
 
 StringListConfigControl::~StringListConfigControl()
 {
-    if( psz_default_value ) free( psz_default_value );
+    free( psz_default_value );
 }
 
 void StringListConfigControl::UpdateCombo( module_config_t *p_item )

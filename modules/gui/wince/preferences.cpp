@@ -128,9 +128,9 @@ public:
 
     ConfigTreeData() { b_submodule = 0; panel = NULL; psz_section = NULL;
                        psz_help = NULL; }
-    virtual ~ConfigTreeData() { if( panel ) delete panel;
-                                if( psz_section) free(psz_section);
-                                if( psz_help) free(psz_help); }
+    virtual ~ConfigTreeData() { delete panel;
+                                free( psz_section );
+                                free( psz_help ); }
 
     vlc_bool_t b_submodule;
 

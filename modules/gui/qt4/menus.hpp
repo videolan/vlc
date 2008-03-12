@@ -58,9 +58,9 @@ public:
     }
     virtual ~MenuItemData()
     {
-        if( psz_var ) free( psz_var );
-        if( ((i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING)
-            && val.psz_string ) free( val.psz_string );
+        free( psz_var );
+        if( ( i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING )
+            free( val.psz_string );
     }
     int i_object_id;
     int i_val_type;

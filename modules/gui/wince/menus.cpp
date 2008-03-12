@@ -558,7 +558,7 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
         AppendMenu( hMenu, MF_STRING | MF_POPUP, (UINT)hMenuItem,
                     _FROMMB(text.psz_string ? text.psz_string : psz_var) );
         if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
-        if( text.psz_string ) free( text.psz_string );
+        free( text.psz_string );
         return;
     }
 
@@ -585,12 +585,12 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
         break;
 
     default:
-        if( text.psz_string ) free( text.psz_string );
+        free( text.psz_string );
         return;
     }
 
     if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
-    if( text.psz_string ) free( text.psz_string );
+    free( text.psz_string );
 }
 
 HMENU CreateChoicesMenu( intf_thread_t *p_intf,
@@ -802,9 +802,9 @@ MenuItemExt::MenuItemExt( intf_thread_t *p_intf, int _id, char *_psz_var,
 
 MenuItemExt::~MenuItemExt()
 {
-    if( psz_var ) free( psz_var );
-    if( ((i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING)
-        && val.psz_string ) free( val.psz_string );
+    free( psz_var );
+    if( ( i_val_type & VLC_VAR_TYPE ) == VLC_VAR_STRING )
+        free( val.psz_string );
 };
 
 void MenuItemExt::ClearList( vector<MenuItemExt*> *p_menu_list )

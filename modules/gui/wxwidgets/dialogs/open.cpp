@@ -444,7 +444,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
             sout_button->Enable();
             subsfile_mrl.Add( wxString(wxT("sout=")) + wxL2U(psz_sout) );
         }
-        if( psz_sout ) free( psz_sout );
+        free( psz_sout );
 
         common_opt_sizer->Add( sout_button, 1, wxALIGN_LEFT |
                                wxALIGN_CENTER_VERTICAL );
@@ -661,7 +661,7 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
                         0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     subfile_combo = new wxComboBox( panel, SubFileName_Event,
                                     wxL2U( psz_subsfile ) );
-    if( psz_subsfile ) free( psz_subsfile );
+    free( psz_subsfile );
     subbrowse_button = new wxButton( panel, SubFileBrowse_Event,
                                      wxU(_("Browse...")) );
     subfile_sizer->Add( subfile_combo, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5 );
@@ -1632,7 +1632,7 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
         break;
     }
 
-    free(psz_device);
+    free( psz_device );
     disc_probe->SetValue(FALSE);
 
     UpdateMRL( DISC_ACCESS );
@@ -1746,7 +1746,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     disc_title->SetValue( 0 ); i_disc_title = 0;
     disc_chapter->SetValue( 0 ); i_disc_chapter = 0;
 
-    if( psz_device ) free( psz_device );
+    free( psz_device );
 
     UpdateMRL( DISC_ACCESS );
 }

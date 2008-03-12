@@ -580,7 +580,7 @@ static int OpenTextRenderer( intf_thread_t *p_intf )
         p_intf->p_sys->p_text->p_module =
             module_Need( p_intf->p_sys->p_text, "text renderer", 0, 0 );
     }
-    if( psz_modulename ) free( psz_modulename );
+    free( psz_modulename );
 
     if( !p_intf->p_sys->p_text->p_module )
         return VLC_EGENERIC;
@@ -684,9 +684,12 @@ static picture_t *AllocatePicture( vlc_object_t *p_this,
 static void DeAllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                                video_format_t *p_fmt )
 {
-    if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
-    if( p_pic && p_pic->pf_release ) p_pic->pf_release( p_pic );
-    if( p_fmt && p_fmt->p_palette )
+    if( p_pic )
+    {
+        free( p_pic->p_data_orig );
+        if( p_pic->pf_release ) p_pic->pf_release( p_pic );
+    }
+    if( p_fmt )
     {
         free( p_fmt->p_palette );
         p_fmt->p_palette = NULL;

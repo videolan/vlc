@@ -899,8 +899,8 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
 
 wizTranscodeCodecPage::~wizTranscodeCodecPage()
 {
-    if( acodec ) free( acodec );
-    if( vcodec ) free( vcodec );
+    free( acodec );
+    free( vcodec );
 }
 
 void wizTranscodeCodecPage::OnEnableVideo(wxCommandEvent& event)
@@ -1605,7 +1605,7 @@ void WizardDialog::Run()
                       ":sout=#%smux=%s,dst=%s%s%s%s}", method,
                       mux, v6 ? "[" : "", address, v6 ? "]" : "",
                       psz_sap_option ?: "" );
-            if( psz_sap_option ) free( psz_sap_option );
+            free( psz_sap_option );
         }
 
         playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,

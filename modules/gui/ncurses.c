@@ -343,16 +343,16 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_dir_entries; i++ )
     {
         struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
-        if( p_dir_entry->psz_path ) free( p_dir_entry->psz_path );
+        free( p_dir_entry->psz_path );
         REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, i );
-        if( p_dir_entry ) free( p_dir_entry );
+        free( p_dir_entry );
     }
     p_sys->pp_dir_entries = NULL;
 
-    if( p_sys->psz_current_dir ) free( p_sys->psz_current_dir );
-    if( p_sys->psz_search_chain ) free( p_sys->psz_search_chain );
-    if( p_sys->psz_old_search ) free( p_sys->psz_old_search );
-    if( p_sys->psz_open_chain ) free( p_sys->psz_open_chain );
+    free( p_sys->psz_current_dir );
+    free( p_sys->psz_search_chain );
+    free( p_sys->psz_old_search );
+    free( p_sys->psz_open_chain );
 
     if( p_sys->p_input )
     {
@@ -948,11 +948,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 break;
             }
         }
-        if( p_sys->psz_old_search )
-        {
-            free( p_sys->psz_old_search );
-            p_sys->psz_old_search = NULL;
-        }
+        free( p_sys->psz_old_search );
+        p_sys->psz_old_search = NULL;
         SearchPlaylist( p_intf, p_sys->psz_search_chain );
         return 1;
     }
@@ -2361,7 +2358,7 @@ static void Eject( intf_thread_t *p_intf )
         intf_Eject( p_intf, psz_device );
     }
 
-    free(psz_device);
+    free( psz_device );
     return;
 }
 

@@ -623,7 +623,7 @@
         [self setupVarMenu: o_menu forMenuItem: o_mi target:p_object
                         var:psz_variable selector:pf_callback];
  
-        if( text.psz_string ) free( text.psz_string );
+        free( text.psz_string );
         return;
     }
 
@@ -645,12 +645,12 @@
         break;
 
     default:
-        if( text.psz_string ) free( text.psz_string );
+        free( text.psz_string );
         return;
     }
 
     if( ( i_type & VLC_VAR_TYPE ) == VLC_VAR_STRING ) free( val.psz_string );
-    if( text.psz_string ) free( text.psz_string );
+    free( text.psz_string );
 }
 
 

@@ -560,7 +560,7 @@ WindowSettings::WindowSettings( intf_thread_t *_p_intf )
         }
     }
 
-    if( psz_org ) free( psz_org );
+    free( psz_org );
     return;
 
 invalid:
@@ -572,7 +572,7 @@ invalid:
         position[i] = wxDefaultPosition;
         size[i] = wxDefaultSize;
     }
-    if( psz_org ) free( psz_org );
+    free( psz_org );
 }
 
 

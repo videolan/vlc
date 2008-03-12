@@ -427,8 +427,8 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
         }
         free( p_arg->psz_results );
     }
-    if( p_arg->psz_title ) free( p_arg->psz_title );
-    if( p_arg->psz_extensions ) free( p_arg->psz_extensions );
+    free( p_arg->psz_title );
+    free( p_arg->psz_extensions );
 
     free( p_arg );
 }
