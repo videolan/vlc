@@ -490,9 +490,9 @@ static int Open( vlc_object_t *p_this )
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_aenc, &p_sys->p_audio_cfg,
                                        val.psz_string );
-        if( psz_next ) free( psz_next );
+        free( psz_next );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "acodec", &val );
     p_sys->i_acodec = 0;
@@ -502,7 +502,7 @@ static int Open( vlc_object_t *p_this )
         memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
         p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "ab", &val );
     p_sys->i_abitrate = val.i_int;
@@ -545,7 +545,7 @@ static int Open( vlc_object_t *p_this )
             if( (psz_parser != NULL) && (*psz_parser != '\0') ) psz_parser++;
         }
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
     if( p_sys->i_afilters < TRANSCODE_FILTERS-1 )
     {
         p_sys->psz_afilters[p_sys->i_afilters] = NULL;
@@ -561,9 +561,9 @@ static int Open( vlc_object_t *p_this )
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_venc, &p_sys->p_video_cfg,
                                    val.psz_string );
-        if( psz_next ) free( psz_next );
+        free( psz_next );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "vcodec", &val );
     p_sys->i_vcodec = 0;
@@ -573,7 +573,7 @@ static int Open( vlc_object_t *p_this )
         memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
         p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "vb", &val );
     p_sys->i_vbitrate = val.i_int;
@@ -617,7 +617,7 @@ static int Open( vlc_object_t *p_this )
             if( psz_parser != NULL && *psz_parser != '\0' ) psz_parser++;
         }
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
     if( p_sys->i_vfilters < TRANSCODE_FILTERS-1 )
     {
         p_sys->psz_vfilters[p_sys->i_vfilters] = NULL;
@@ -636,9 +636,9 @@ static int Open( vlc_object_t *p_this )
         psz_next = config_ChainCreate( &p_sys->psz_deinterlace,
                                    &p_sys->p_deinterlace_cfg,
                                    val.psz_string );
-        if( psz_next ) free( psz_next );
+        free( psz_next );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "croptop", &val );
     p_sys->i_crop_top = val.i_int;
@@ -677,7 +677,7 @@ static int Open( vlc_object_t *p_this )
         else msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
 
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "threads", &val );
     p_sys->i_threads = val.i_int;
@@ -703,9 +703,9 @@ static int Open( vlc_object_t *p_this )
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_senc, &p_sys->p_spu_cfg,
                                    val.psz_string );
-        if( psz_next ) free( psz_next );
+        free( psz_next );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "scodec", &val );
     if( val.psz_string && *val.psz_string )
@@ -714,7 +714,7 @@ static int Open( vlc_object_t *p_this )
         memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
         p_sys->i_scodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     if( p_sys->i_scodec )
     {
@@ -732,7 +732,7 @@ static int Open( vlc_object_t *p_this )
         var_Set( p_sys->p_spu, "sub-filter", val );
         spu_Init( p_sys->p_spu );
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     /* OSD menu transcoding parameters */
     p_sys->psz_osdenc = NULL;
@@ -748,7 +748,7 @@ static int Open( vlc_object_t *p_this )
 
         psz_next = config_ChainCreate( &p_sys->psz_osdenc,
                                    &p_sys->p_osd_cfg, strdup( "dvbsub") );
-        if( psz_next ) free( psz_next );
+        free( psz_next );
 
         p_sys->i_osdcodec = VLC_FOURCC('Y','U','V','P' );
 
@@ -761,13 +761,13 @@ static int Open( vlc_object_t *p_this )
             var_Create( p_sys->p_spu, "sub-filter", VLC_VAR_STRING );
             var_Set( p_sys->p_spu, "sub-filter", osd_val );
             spu_Init( p_sys->p_spu );
-            if( osd_val.psz_string ) free( osd_val.psz_string );
+            free( osd_val.psz_string );
         }
         else
         {
             osd_val.psz_string = strdup("osdmenu");
             var_Set( p_sys->p_spu, "sub-filter", osd_val );
-            if( osd_val.psz_string ) free( osd_val.psz_string );
+            free( osd_val.psz_string );
         }
     }
 
@@ -797,76 +797,64 @@ static void Close( vlc_object_t * p_this )
     while( p_sys->i_afilters )
     {
         p_sys->i_afilters--;
-        if( p_sys->psz_afilters[p_sys->i_afilters] )
-            free( p_sys->psz_afilters[p_sys->i_afilters] );
-        if( p_sys->p_afilters_cfg[p_sys->i_afilters] )
-            free( p_sys->p_afilters_cfg[p_sys->i_afilters] );
+        free( p_sys->psz_afilters[p_sys->i_afilters] );
+        free( p_sys->p_afilters_cfg[p_sys->i_afilters] );
     }
 
     while( p_sys->p_audio_cfg != NULL )
     {
         config_chain_t *p_next = p_sys->p_audio_cfg->p_next;
 
-        if( p_sys->p_audio_cfg->psz_name )
-            free( p_sys->p_audio_cfg->psz_name );
-        if( p_sys->p_audio_cfg->psz_value )
-            free( p_sys->p_audio_cfg->psz_value );
+        free( p_sys->p_audio_cfg->psz_name );
+        free( p_sys->p_audio_cfg->psz_value );
         free( p_sys->p_audio_cfg );
 
         p_sys->p_audio_cfg = p_next;
     }
-    if( p_sys->psz_aenc ) free( p_sys->psz_aenc );
+    free( p_sys->psz_aenc );
 
     while( p_sys->i_vfilters )
     {
         p_sys->i_vfilters--;
-        if( p_sys->psz_vfilters[p_sys->i_vfilters] )
-            free( p_sys->psz_vfilters[p_sys->i_vfilters] );
-        if( p_sys->p_vfilters_cfg[p_sys->i_vfilters] )
-            free( p_sys->p_vfilters_cfg[p_sys->i_vfilters] );
+        free( p_sys->psz_vfilters[p_sys->i_vfilters] );
+        free( p_sys->p_vfilters_cfg[p_sys->i_vfilters] );
     }
 
     while( p_sys->p_video_cfg != NULL )
     {
         config_chain_t *p_next = p_sys->p_video_cfg->p_next;
 
-        if( p_sys->p_video_cfg->psz_name )
-            free( p_sys->p_video_cfg->psz_name );
-        if( p_sys->p_video_cfg->psz_value )
-            free( p_sys->p_video_cfg->psz_value );
+        free( p_sys->p_video_cfg->psz_name );
+        free( p_sys->p_video_cfg->psz_value );
         free( p_sys->p_video_cfg );
 
         p_sys->p_video_cfg = p_next;
     }
-    if( p_sys->psz_venc ) free( p_sys->psz_venc );
+    free( p_sys->psz_venc );
 
     while( p_sys->p_deinterlace_cfg != NULL )
     {
         config_chain_t *p_next = p_sys->p_deinterlace_cfg->p_next;
 
-        if( p_sys->p_deinterlace_cfg->psz_name )
-            free( p_sys->p_deinterlace_cfg->psz_name );
-        if( p_sys->p_deinterlace_cfg->psz_value )
-            free( p_sys->p_deinterlace_cfg->psz_value );
+        free( p_sys->p_deinterlace_cfg->psz_name );
+        free( p_sys->p_deinterlace_cfg->psz_value );
         free( p_sys->p_deinterlace_cfg );
 
         p_sys->p_deinterlace_cfg = p_next;
     }
-    if( p_sys->psz_deinterlace ) free( p_sys->psz_deinterlace );
+    free( p_sys->psz_deinterlace );
 
     while( p_sys->p_spu_cfg != NULL )
     {
         config_chain_t *p_next = p_sys->p_spu_cfg->p_next;
 
-        if( p_sys->p_spu_cfg->psz_name )
-            free( p_sys->p_spu_cfg->psz_name );
-        if( p_sys->p_spu_cfg->psz_value )
-            free( p_sys->p_spu_cfg->psz_value );
+        free( p_sys->p_spu_cfg->psz_name );
+        free( p_sys->p_spu_cfg->psz_value );
         free( p_sys->p_spu_cfg );
 
         p_sys->p_spu_cfg = p_next;
     }
-    if( p_sys->psz_senc ) free( p_sys->psz_senc );
+    free( p_sys->psz_senc );
 
     if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
 
@@ -874,15 +862,13 @@ static void Close( vlc_object_t * p_this )
     {
         config_chain_t *p_next = p_sys->p_osd_cfg->p_next;
 
-        if( p_sys->p_osd_cfg->psz_name )
-            free( p_sys->p_osd_cfg->psz_name );
-        if( p_sys->p_osd_cfg->psz_value )
-            free( p_sys->p_osd_cfg->psz_value );
+        free( p_sys->p_osd_cfg->psz_name );
+        free( p_sys->p_osd_cfg->psz_value );
         free( p_sys->p_osd_cfg );
 
         p_sys->p_osd_cfg = p_next;
     }
-    if( p_sys->psz_osdenc ) free( p_sys->psz_osdenc );
+    free( p_sys->psz_osdenc );
 
     vlc_object_release( p_sys );
 }
@@ -1608,7 +1594,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
 static void audio_release_buffer( aout_buffer_t *p_buffer )
 {
     if( p_buffer && p_buffer->p_sys ) block_Release( p_buffer->p_sys );
-    if( p_buffer ) free( p_buffer );
+    free( p_buffer );
 }
 
 static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )

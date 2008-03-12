@@ -2118,11 +2118,7 @@ static void box_fix( bo_t *box )
 
 static void box_free( bo_t *box )
 {
-    if( box->p_buffer )
-    {
-        free( box->p_buffer );
-    }
-
+    free( box->p_buffer );
     free( box );
 }
 

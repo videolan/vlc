@@ -86,8 +86,11 @@ static void ReleasePicture( picture_t *p_pic )
         }
         else
         {
-            if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
-            if( p_pic ) free( p_pic );
+            if( p_pic )
+            {
+                free( p_pic->p_data_orig );
+                free( p_pic );
+            }
         }
     }
 }
@@ -262,8 +265,7 @@ static void Close( vlc_object_t * p_this )
 
     p_stream->p_sout->i_out_pace_nocontrol--;
 
-    if ( p_sys->psz_id )
-        free( p_sys->psz_id );
+    free( p_sys->psz_id );
 
     free( p_sys );
 }
@@ -829,8 +831,7 @@ static void video_del_buffer( picture_t *p_pic )
     p_pic->i_status = DESTROYED_PICTURE;
     if ( p_pic->p_sys->b_dead )
     {
-        if ( p_pic->p_data_orig != NULL )
-            free( p_pic->p_data_orig );
+        free( p_pic->p_data_orig );
         free( p_pic->p_sys );
         free( p_pic );
     }

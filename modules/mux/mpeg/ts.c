@@ -558,7 +558,7 @@ static int Open( vlc_object_t *p_this )
                 psz = NULL;
         }
     }
-    if( val.psz_string != NULL) free( val.psz_string );
+    free( val.psz_string );
 
     p_sys->i_pat_version_number = rand() % 32;
     p_sys->pat.i_pid = 0;
@@ -623,7 +623,7 @@ static int Open( vlc_object_t *p_this )
             psz_sdttoken = psz_end;
         }
     }
-    if( val.psz_string != NULL ) free( val.psz_string );
+    free( val.psz_string );
 #else
     p_sys->b_sdt = VLC_FALSE;
 #endif
@@ -667,7 +667,7 @@ static int Open( vlc_object_t *p_this )
         for( i = 0; i < p_sys->i_num_pmt; i++ )
             p_sys->i_pmt_program_number[i] = i + 1;
     }
-    if( val.psz_string != NULL ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
     if( val.i_int )
@@ -813,7 +813,7 @@ static int Open( vlc_object_t *p_this )
             }
         }
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     var_Get( p_mux, SOUT_CFG_PREFIX "crypt-audio", &val );
     p_sys->b_crypt_audio = val.b_bool;
@@ -839,15 +839,11 @@ static void Close( vlc_object_t * p_this )
     }
     for( i = 0; i < MAX_PMT; i++ )
     {
-        if( p_sys->sdt_descriptors[i].psz_service_name != NULL )
-            free( p_sys->sdt_descriptors[i].psz_service_name );
-        if( p_sys->sdt_descriptors[i].psz_provider != NULL )
-            free( p_sys->sdt_descriptors[i].psz_provider );
+        free( p_sys->sdt_descriptors[i].psz_service_name );
+        free( p_sys->sdt_descriptors[i].psz_provider );
     }
 
-    if( p_sys->dvbpmt != NULL )  /* safety */
-        free ( p_sys->dvbpmt );
-
+    free( p_sys->dvbpmt );
     free( p_sys );
 }
 
@@ -1241,14 +1237,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* Empty all data in chain_pes */
     BufferChainClean( &p_stream->chain_pes );
 
-    if( p_stream->lang )
-    {
-        free(p_stream->lang);
-    }
-    if( p_stream->p_decoder_specific_info )
-    {
-        free( p_stream->p_decoder_specific_info );
-    }
+    free(p_stream->lang);
+    free( p_stream->p_decoder_specific_info );
     if( p_stream->i_stream_id == 0xfa ||
         p_stream->i_stream_id == 0xfb ||
         p_stream->i_stream_id == 0xfe )
