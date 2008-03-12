@@ -389,7 +389,8 @@ static int ParsePath( access_t *p_access, const char* psz_module,
     char*       psz_token;
     char*       psz_value;
     vlc_value_t v_value;
-    int         i_token_len, i_param_len, i_this_param;
+    size_t      i_token_len, i_param_len;
+    int         i_this_param;
     char        psz_full_name[128];
 
     if( i_param_count > MAXPARAM )
