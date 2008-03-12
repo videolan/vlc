@@ -1,7 +1,7 @@
 /*****************************************************************************
  * transcode.c: transcoding stream output module
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -1643,6 +1643,78 @@ static void audio_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
 /*
  * video
  */
+
+static filter_t *transcode_video_filter_new( sout_stream_t *p_stream,
+                                             es_format_t *p_fmt_in,
+                                             es_format_t *p_fmt_out,
+                                             config_chain_t  *p_cfg,
+                                             const char *psz_name )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    filter_t *p_filter;
+    int i;
+
+    if( !p_stream || !p_fmt_in || !p_fmt_out ) return NULL;
+
+    p_filter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
+    vlc_object_attach( p_filter, p_stream );
+
+    p_filter->pf_vout_buffer_new = video_new_buffer_filter;
+    p_filter->pf_vout_buffer_del = video_del_buffer_filter;
+
+    es_format_Copy( &p_filter->fmt_in,  p_fmt_in );
+    es_format_Copy( &p_filter->fmt_out, p_fmt_out );
+    p_filter->p_cfg = p_cfg;
+
+    p_filter->p_module = module_Need( p_filter, "video filter2",
+                                      psz_name, VLC_TRUE );
+    if( !p_filter->p_module )
+    {
+        msg_Dbg( p_stream, "no video filter found" );
+        vlc_object_detach( p_filter );
+        vlc_object_release( p_filter );
+        return NULL;
+    }
+
+    p_filter->p_owner = malloc( sizeof(filter_owner_sys_t) );
+    if( !p_filter->p_owner )
+    {
+        module_Unneed( p_filter,p_filter->p_module );
+        vlc_object_detach( p_filter );
+        vlc_object_release( p_filter );
+        return NULL;
+    }
+
+    for( i = 0; i < PICTURE_RING_SIZE; i++ )
+        p_filter->p_owner->pp_pics[i] = 0;
+    p_filter->p_owner->p_sys = p_sys;
+
+    return p_filter;
+}
+
+static void transcode_video_filter_close( sout_stream_t *p_stream,
+                                          filter_t *p_filter )
+{
+    int j;
+
+    if( !p_stream || !p_filter ) return;
+
+    vlc_object_detach( p_filter );
+    if( p_filter->p_module )
+        module_Unneed( p_filter, p_filter->p_module );
+
+    /* Clean-up pictures ring buffer */
+    for( j = 0; j < PICTURE_RING_SIZE; j++ )
+    {
+        if( p_filter->p_owner->pp_pics[j] )
+            video_del_buffer( VLC_OBJECT(p_filter),
+                              p_filter->p_owner->pp_pics[j] );
+    }
+    free( p_filter->p_owner );
+    vlc_object_release( p_filter );
+    p_filter = NULL;
+}
+
 static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -2048,7 +2120,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 static void transcode_video_close( sout_stream_t *p_stream,
                                    sout_stream_id_t *id )
 {
-    int i, j;
+    int i;
 
     if( p_stream->p_sys->i_threads >= 1 )
     {
@@ -2084,39 +2156,17 @@ static void transcode_video_close( sout_stream_t *p_stream,
     /* Close filters */
     for( i = 0; i < id->i_filter; i++ )
     {
-        vlc_object_detach( id->pp_filter[i] );
-        if( id->pp_filter[i]->p_module )
-            module_Unneed( id->pp_filter[i], id->pp_filter[i]->p_module );
-
-        /* Clean-up pictures ring buffer */
-        for( j = 0; j < PICTURE_RING_SIZE; j++ )
-        {
-            if( id->pp_filter[i]->p_owner->pp_pics[j] )
-                video_del_buffer( VLC_OBJECT(id->pp_filter[i]),
-                                  id->pp_filter[i]->p_owner->pp_pics[j] );
-        }
-        free( id->pp_filter[i]->p_owner );
-        vlc_object_release( id->pp_filter[i] );
+        transcode_video_filter_close( p_stream, id->pp_filter[i] );
         id->pp_filter[i] = NULL;
     }
+    id->i_filter = 0;
 
     for( i = 0; i < id->i_ufilter; i++ )
     {
-        vlc_object_detach( id->pp_ufilter[i] );
-        if( id->pp_ufilter[i]->p_module )
-            module_Unneed( id->pp_ufilter[i], id->pp_ufilter[i]->p_module );
-
-        /* Clean-up pictures ring buffer */
-        for( j = 0; j < PICTURE_RING_SIZE; j++ )
-        {
-            if( id->pp_ufilter[i]->p_owner->pp_pics[j] )
-                video_del_buffer( VLC_OBJECT(id->pp_ufilter[i]),
-                                  id->pp_ufilter[i]->p_owner->pp_pics[j] );
-        }
-        free( id->pp_ufilter[i]->p_owner );
-        vlc_object_release( id->pp_ufilter[i] );
+        transcode_video_filter_close( p_stream, id->pp_ufilter[i] );
         id->pp_ufilter[i] = NULL;
     }
+    id->i_ufilter = 0;
 }
 
 static int transcode_video_process( sout_stream_t *p_stream,
@@ -2199,39 +2249,79 @@ static int transcode_video_process( sout_stream_t *p_stream,
             if( p_stream->p_sys->b_deinterlace )
             {
                 id->pp_filter[id->i_filter] =
-                    vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-                vlc_object_attach( id->pp_filter[id->i_filter], p_stream );
+                    transcode_video_filter_new( p_stream,
+                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in, 
+                            p_sys->p_deinterlace_cfg,
+                            p_sys->psz_deinterlace );
 
-                id->pp_filter[id->i_filter]->pf_vout_buffer_new =
-                    video_new_buffer_filter;
-                id->pp_filter[id->i_filter]->pf_vout_buffer_del =
-                    video_del_buffer_filter;
+                if( id->pp_filter[id->i_filter] )
+                    id->i_filter++;
+            }
 
-                id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
-                id->pp_filter[id->i_filter]->fmt_out = id->p_decoder->fmt_out;
-                id->pp_filter[id->i_filter]->p_cfg = p_sys->p_deinterlace_cfg;
-                id->pp_filter[id->i_filter]->p_module =
-                    module_Need( id->pp_filter[id->i_filter],
-                                 "video filter2", p_sys->psz_deinterlace,
-                                 VLC_TRUE );
-                if( id->pp_filter[id->i_filter]->p_module )
+#if (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+            if( ( id->p_decoder->fmt_out.video.i_chroma !=
+                  id->p_encoder->fmt_in.video.i_chroma ) ||
+                ( id->p_decoder->fmt_out.video.i_width !=
+                  id->p_encoder->fmt_out.video.i_width ) ||
+                ( id->p_decoder->fmt_out.video.i_height !=
+                  id->p_encoder->fmt_out.video.i_height ) )
+            {
+                id->pp_filter[id->i_filter] =
+                    transcode_video_filter_new( p_stream,
+                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            NULL, "scale" );
+                if( !id->pp_filter[id->i_filter] )
                 {
-                    id->pp_filter[id->i_filter]->p_owner =
-                        malloc( sizeof(filter_owner_sys_t) );
-                    for( i = 0; i < PICTURE_RING_SIZE; i++ )
-                        id->pp_filter[id->i_filter]->p_owner->pp_pics[i] = 0;
-                    id->pp_filter[id->i_filter]->p_owner->p_sys = p_sys;
+                    p_pic->pf_release( p_pic );
+                    transcode_video_close( p_stream, id );
+                    id->b_transcode = VLC_FALSE;
+                    return VLC_EGENERIC;
+                }
+                id->i_filter++;
+            }
+#if 0 /* FIXME: */
+            /* we don't do chroma conversion or scaling in croppad */
+//             es_format_t fmt_in, fmt_out;
+//             es_format_Copy( &fmt_out, &id->p_encoder->fmt_in );
+//             es_format_Copy( &fmt_in, &id->p_encoder->fmt_in );
+
+            if( ( id->p_decoder->fmt_out.video.i_chroma ==
+                  id->p_encoder->fmt_in.video.i_chroma ) &&
+
+                ( ( (int)id->p_decoder->fmt_out.video.i_width !=
+                    p_sys->i_crop_width ) ||
+                  ( p_sys->i_crop_width != p_sys->i_nopadd_width ) ||
+                  ( p_sys->i_nopadd_width != 
+                    (int)id->p_encoder->fmt_out.video.i_width ) ||
+
+                  ( (int)id->p_decoder->fmt_out.video.i_height !=
+                    p_sys->i_crop_height ) ||
+                  ( p_sys->i_crop_height != p_sys->i_nopadd_height ) ||
+                  ( p_sys->i_nopadd_height != 
+                    (int)id->p_encoder->fmt_out.video.i_height ) ) )
+            {
+                id->pp_filter[id->i_filter] =
+                    transcode_video_filter_new( p_stream,
+                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            NULL, "croppadd" );
+                if( id->pp_filter[id->i_filter] )
+                {
+                    /* Set crop and padding information */
+                    id->pp_filter[id->i_filter]->fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
+                    id->pp_filter[id->i_filter]->fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
+                    id->pp_filter[id->i_filter]->fmt_in.video.i_visible_width = p_sys->i_crop_width;
+                    id->pp_filter[id->i_filter]->fmt_in.video.i_visible_height = p_sys->i_crop_height;
+
+                    id->pp_filter[id->i_filter]->fmt_out.video.i_x_offset = p_sys->i_dst_x_offset;
+                    id->pp_filter[id->i_filter]->fmt_out.video.i_y_offset = p_sys->i_dst_y_offset;
+                    id->pp_filter[id->i_filter]->fmt_out.video.i_visible_width = p_sys->i_nopadd_width;
+                    id->pp_filter[id->i_filter]->fmt_out.video.i_visible_height = p_sys->i_nopadd_height;
 
                     id->i_filter++;
                 }
-                else
-                {
-                    msg_Dbg( p_stream, "no video filter found" );
-                    vlc_object_detach( id->pp_filter[id->i_filter] );
-                    vlc_object_release( id->pp_filter[id->i_filter] );
-                }
             }
-
+#endif
+#else
             /* Check if we need a filter for chroma conversion or resizing */
             if( id->p_decoder->fmt_out.video.i_chroma !=
                 id->p_encoder->fmt_in.video.i_chroma ||
@@ -2245,18 +2335,18 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 p_sys->i_nopadd_height != (int)id->p_encoder->fmt_out.video.i_height)
             {
                 id->pp_filter[id->i_filter] =
-                    vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-                vlc_object_attach( id->pp_filter[id->i_filter], p_stream );
+                    transcode_video_filter_new( p_stream,
+                            &id->p_decoder->fmt_in, &id->p_encoder->fmt_in,
+                            NULL, "crop padd" );
+                if( !id->pp_filter[id->i_filter] )
+                {
+                    p_pic->pf_release( p_pic );
+                    transcode_video_close( p_stream, id );
+                    id->b_transcode = VLC_FALSE;
+                    return VLC_EGENERIC;
+                }
 
-                id->pp_filter[id->i_filter]->pf_vout_buffer_new =
-                    video_new_buffer_filter;
-                id->pp_filter[id->i_filter]->pf_vout_buffer_del =
-                    video_del_buffer_filter;
-
-                id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
-                id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
-                id->pp_filter[id->i_filter]->p_cfg = NULL;
-
+                /* Set crop and padding information */ 
                 id->pp_filter[id->i_filter]->fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
                 id->pp_filter[id->i_filter]->fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
                 id->pp_filter[id->i_filter]->fmt_in.video.i_visible_width = p_sys->i_crop_width;
@@ -2267,69 +2357,19 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 id->pp_filter[id->i_filter]->fmt_out.video.i_visible_width = p_sys->i_nopadd_width;
                 id->pp_filter[id->i_filter]->fmt_out.video.i_visible_height = p_sys->i_nopadd_height;
 
-                id->pp_filter[id->i_filter]->p_module =
-                    module_Need( id->pp_filter[id->i_filter],
-#if ( (defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) )
-                                 "video filter2", "scale", VLC_TRUE );
-#else
-                                 "crop padd", 0, 0 );
-#endif
-                if( id->pp_filter[id->i_filter]->p_module )
-                {
-                    id->pp_filter[id->i_filter]->p_owner =
-                        malloc( sizeof(filter_owner_sys_t) );
-                    for( i = 0; i < PICTURE_RING_SIZE; i++ )
-                        id->pp_filter[id->i_filter]->p_owner->pp_pics[i] = 0;
-                    id->pp_filter[id->i_filter]->p_owner->p_sys = p_sys;
-
-                    id->i_filter++;
-                }
-                else
-                {
-                    msg_Dbg( p_stream, "no video filter found" );
-                    vlc_object_detach( id->pp_filter[id->i_filter] );
-                    vlc_object_release( id->pp_filter[id->i_filter] );
-
-                    p_pic->pf_release( p_pic );
-                    transcode_video_close( p_stream, id );
-                    id->b_transcode = VLC_FALSE;
-                    return VLC_EGENERIC;
-                }
+                id->i_filter++;
             }
-
+#endif
             for( i = 0; (i < p_sys->i_vfilters) && (id->i_ufilter < TRANSCODE_FILTERS); i++ )
             {
                 id->pp_ufilter[id->i_ufilter] =
-                    vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-                vlc_object_attach( id->pp_ufilter[id->i_ufilter], p_stream );
-
-                id->pp_ufilter[id->i_ufilter]->pf_vout_buffer_new =
-                    video_new_buffer_filter;
-                id->pp_ufilter[id->i_ufilter]->pf_vout_buffer_del =
-                    video_del_buffer_filter;
-
-                id->pp_ufilter[id->i_ufilter]->fmt_in = id->p_encoder->fmt_in;
-                id->pp_ufilter[id->i_ufilter]->fmt_out = id->p_encoder->fmt_in;
-                id->pp_ufilter[id->i_ufilter]->p_cfg = p_sys->p_vfilters_cfg[i];
-                id->pp_ufilter[id->i_ufilter]->p_module =
-                    module_Need( id->pp_ufilter[id->i_ufilter],
-                          "video filter2", p_sys->psz_vfilters[i], VLC_TRUE );
-                if( id->pp_ufilter[id->i_ufilter]->p_module )
-                {
-                    id->pp_ufilter[id->i_ufilter]->p_owner =
-                        malloc( sizeof(filter_owner_sys_t) );
-                    for( i = 0; i < PICTURE_RING_SIZE; i++ )
-                        id->pp_ufilter[id->i_ufilter]->p_owner->pp_pics[i] = 0;
-                    id->pp_ufilter[id->i_ufilter]->p_owner->p_sys = p_sys;
+                    transcode_video_filter_new( p_stream,
+                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            p_sys->p_vfilters_cfg[i], p_sys->psz_vfilters[i] );
+                if( id->pp_ufilter[id->i_filter] )
                     id->i_ufilter++;
-                }
                 else
-                {
-                    msg_Dbg( p_stream, "no video filter found" );
-                    vlc_object_detach( id->pp_ufilter[id->i_ufilter] );
-                    vlc_object_release( id->pp_ufilter[id->i_ufilter] );
                     id->pp_ufilter[id->i_ufilter] = NULL;
-                }
             }
         }
 
