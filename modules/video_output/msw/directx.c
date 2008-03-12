@@ -527,11 +527,8 @@ static void CloseVideo( vlc_object_t *p_this )
             p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
     }
 
-    if( p_vout->p_sys )
-    {
-        free( p_vout->p_sys );
-        p_vout->p_sys = NULL;
-    }
+    free( p_vout->p_sys );
+    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************
@@ -837,7 +834,7 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
         if( ( !device.psz_string || !*device.psz_string ) &&
             hmon == p_vout->p_sys->hmonitor )
         {
-            if( device.psz_string ) free( device.psz_string );
+            free( device.psz_string );
         }
         else if( strcmp( psz_drivername, device.psz_string ) == 0 )
         {
@@ -863,11 +860,11 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
             }
 
             p_vout->p_sys->hmonitor = hmon;
-            if( device.psz_string ) free( device.psz_string );
+            free( device.psz_string );
         }
         else
         {
-            if( device.psz_string ) free( device.psz_string );
+            free( device.psz_string );
             return TRUE; /* Keep enumerating */
         }
 
@@ -1328,11 +1325,8 @@ static void DirectXCloseDDraw( vout_thread_t *p_vout )
         p_vout->p_sys->hddraw_dll = NULL;
     }
 
-    if( p_vout->p_sys->p_display_driver != NULL )
-    {
-        free( p_vout->p_sys->p_display_driver );
-        p_vout->p_sys->p_display_driver = NULL;
-    }
+    free( p_vout->p_sys->p_display_driver );
+    p_vout->p_sys->p_display_driver = NULL;
 
     p_vout->p_sys->hmonitor = NULL;
 }

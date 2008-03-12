@@ -495,7 +495,7 @@ static int Init( vout_thread_t *p_vout )
         p_sys->i_effect = OPENGL_EFFECT_NONE;
 #endif
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 
     if( p_sys->i_effect & ( OPENGL_EFFECT_CUBE |
                 OPENGL_EFFECT_TRANSPARENT_CUBE ) )
@@ -553,8 +553,8 @@ static void End( vout_thread_t *p_vout )
 
     /* Free the texture buffer*/
     glDeleteTextures( 2, p_sys->p_textures );
-    if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
-    if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
+    free( p_sys->pp_buffer[0] );
+    free( p_sys->pp_buffer[1] );
 
     if( p_sys->p_vout->pf_unlock )
     {

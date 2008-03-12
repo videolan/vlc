@@ -224,10 +224,10 @@ int E_(Activate) ( vlc_object_t *p_this )
         msg_Err( p_vout, "cannot open display %s",
                          XDisplayName( psz_display ) );
         free( p_vout->p_sys );
-        if( psz_display ) free( psz_display );
+        free( psz_display );
         return VLC_EGENERIC;
     }
-    if( psz_display ) free( psz_display );
+    free( psz_display );
 
     /* Replace error handler so we can intercept some non-fatal errors */
     XSetErrorHandler( X11ErrorHandler );
@@ -1698,7 +1698,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             XStoreName( p_vout->p_sys->p_display,
                         p_win->base_window, val.psz_string );
         }
-        if( val.psz_string ) free( val.psz_string );
+        free( val.psz_string );
 
         if( !p_vout->b_fullscreen )
         {

@@ -316,7 +316,7 @@ void E_(EventThread)( event_thread_t *p_event )
             var_Get( p_event->p_vout, "video-title", &val );
             if( !val.psz_string || !*val.psz_string ) /* Default video title */
             {
-                if( val.psz_string ) free( val.psz_string );
+                free( val.psz_string );
 
 #ifdef MODULE_NAME_IS_wingdi
                 val.psz_string = strdup( VOUT_TITLE " (WinGDI output)" );

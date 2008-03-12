@@ -255,8 +255,7 @@ static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    if( p_sys->p_pixels )
-        free( p_sys->p_pixels );
+    free( p_sys->p_pixels );
 }
 
 static void Destroy( vlc_object_t *p_this )
@@ -265,7 +264,7 @@ static void Destroy( vlc_object_t *p_this )
     vout_sys_t *p_sys = p_vout->p_sys;
 
     CloseDisplay( p_vout );
-    if( p_sys ) free( p_sys );
+    free( p_sys );
     p_sys = NULL;
 }
 

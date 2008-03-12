@@ -736,8 +736,8 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
         }
     }
 
-    if( p_hough ) free( p_hough );
-    if( p_smooth ) free( p_smooth );
+    free( p_hough );
+    free( p_smooth );
 }
 #undef p_pre_hough
 

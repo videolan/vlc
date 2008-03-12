@@ -238,8 +238,8 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->p_style ) free( p_sys->p_style );
-    if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
+    free( p_sys->p_style );
+    free( p_sys->psz_marquee );
 
     /* Delete the marquee variables */
 #define DEL_VAR(var) \
@@ -341,7 +341,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
 
     if( !strncmp( psz_var, "marq-marquee", 7 ) )
     {
-        if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
+        free( p_sys->psz_marquee );
         p_sys->psz_marquee = strdup( newval.psz_string );
     }
     else if ( !strncmp( psz_var, "marq-x", 6 ) )

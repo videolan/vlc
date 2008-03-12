@@ -138,7 +138,7 @@ class CAtmoConfig {
 
 #if defined(_ATMO_VLC_PLUGIN_)
         char *getSerialDevice()               { return m_devicename; }
-        void setSerialDevice(char *newdevice) { if(m_devicename) free(m_devicename); if(newdevice) m_devicename = strdup(newdevice); else m_devicename = NULL; }
+        void setSerialDevice(char *newdevice) { free( m_devicename ); if(newdevice) m_devicename = strdup(newdevice); else m_devicename = NULL; }
 #else
         int getComport()                    { return m_Comport; }
         void setComport(int value)          { m_Comport = value; }

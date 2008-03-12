@@ -264,7 +264,7 @@ static int Init( vout_thread_t *p_vout )
             msg_Err( p_vout, "failed to clone %i vout threads",
                      p_vout->p_sys->i_clones );
             p_vout->p_sys->i_clones = i_vout;
-            if( psz_default_vout ) free( psz_default_vout );
+            free( psz_default_vout );
             RemoveAllVout( p_vout );
             return VLC_EGENERIC;
         }
@@ -272,7 +272,7 @@ static int Init( vout_thread_t *p_vout )
         ADD_CALLBACKS( p_vout->p_sys->pp_vout[ i_vout ], SendEvents );
     }
 
-    if( psz_default_vout ) free( psz_default_vout );
+    free( psz_default_vout );
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     ADD_PARENT_CALLBACKS( SendEventsToChild );

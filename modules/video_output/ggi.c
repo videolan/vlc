@@ -395,7 +395,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     psz_display = config_GetPsz( p_vout, "ggi_display" );
 
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
-    if( psz_display ) free( psz_display );
+    free( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )
     {

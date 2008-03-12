@@ -348,8 +348,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     vlc_mutex_lock( &p_sys->lock );
 
-    if( p_sys->p_style ) free( p_sys->p_style );
-    if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
+    free( p_sys->p_style );
+    free( p_sys->psz_marquee );
     free( p_sys->psz_urls );
     FreeRSS( p_filter );
     vlc_mutex_unlock( &p_sys->lock );
@@ -740,11 +740,8 @@ static int FetchRSS( filter_t *p_filter)
                     return 1;
 
                 case XML_READER_STARTELEM:
-                    if( psz_eltname )
-                    {
-                        free( psz_eltname );
-                        psz_eltname = NULL;
-                    }
+                    free( psz_eltname );
+                    psz_eltname = NULL;
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
                     {
@@ -816,18 +813,15 @@ static int FetchRSS( filter_t *p_filter)
                         }
                         else
                         {
-                            if( psz_href ) free( psz_href );
+                            free( psz_href );
                         }
-                        if( psz_rel ) free( psz_rel );
+                        free( psz_rel );
                     }
                     break;
 
                 case XML_READER_ENDELEM:
-                    if( psz_eltname )
-                    {
-                        free( psz_eltname );
-                        psz_eltname = NULL;
-                    }
+                    free( psz_eltname );
+                    psz_eltname = NULL;
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
                     {
