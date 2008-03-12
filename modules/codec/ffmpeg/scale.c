@@ -53,7 +53,7 @@
 #include "ffmpeg.h"
 
 /* Version checking */
-#if ( (defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) && (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)) )
+#if ( (defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)) && (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)) )
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor
