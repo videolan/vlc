@@ -1338,6 +1338,19 @@ DISTCLEAN_PKG += libdca-$(LIBDCA_VERSION).tar.bz2
 x264-$(X264_VERSION).tar.gz:
 	$(WGET) $(X264_URL)
 
+ifdef GIT
+x264:
+	$(GIT) clone git://git.videolan.org/x264.git
+	patch -p0 < Patches/x264-svn-info-threads.patch
+ifdef HAVE_WIN32
+	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
+endif
+ifdef HAVE_DARWIN_OS
+	(cd $@; patch -p0 < ../Patches/x264-svn-darwin.patch )
+endif
+
+else
+
 ifdef SVN
 x264: 
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
