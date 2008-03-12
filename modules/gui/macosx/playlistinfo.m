@@ -189,7 +189,7 @@
 #define SET( foo, bar ) \
     char *psz_##foo = input_item_Get##bar ( p_item->p_input ); \
     [self setMeta: psz_##foo forLabel: o_##foo##_txt]; \
-    free( psz_##foo );
+    FREENULL( psz_##foo );
 
     /* fill the other fields */
     SET( title, Title );

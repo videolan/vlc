@@ -23,6 +23,7 @@
 
 #import "simple_prefs.h"
 #import "prefs.h"
+#import <vlc_keys.h>
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
@@ -57,8 +58,35 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     [o_currentlyShownCategoryView release];
     [o_sprefs_toolbar release];
-    
+
+    [o_hotkeySettings release];
+    [o_hotkeyDescriptions release];
+
     [super dealloc];
+}
+
+
+- (NSString *)OSXKeyToString:(int)val
+{
+    NSMutableString *o_temp_str = [[[NSMutableString alloc] init] autorelease];
+    if( val & KEY_MODIFIER_CTRL )
+        [o_temp_str appendString: @"Ctrl+"];
+    if( val & KEY_MODIFIER_ALT )
+        [o_temp_str appendString: @"Alt+"];
+    if( val & KEY_MODIFIER_SHIFT )
+        [o_temp_str appendString: @"Shift+"];
+    if( val & KEY_MODIFIER_COMMAND )
+        [o_temp_str appendString: @"Command+"];
+    
+    unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
+    for( unsigned int i = 0; i< i_keys; i++ )
+    {
+        if( vlc_keys[i].i_key_code == (val& ~KEY_MODIFIER) )
+        {
+            [o_temp_str appendString: [NSString stringWithUTF8String: vlc_keys[i].psz_key_string]];
+        }
+    }
+    return o_temp_str;
 }
 
 - (void)awakeFromNib
@@ -83,85 +111,44 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     NSToolbarItem *o_toolbarItem = nil;
     
+    #define CreateToolbarItem( o_name, o_desc, o_img, sel ) \
+    o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease]; \
+    \
+    [o_toolbarItem setLabel: o_name]; \
+    [o_toolbarItem setPaletteLabel: o_desc]; \
+    \
+    [o_toolbarItem setToolTip: o_desc]; \
+    [o_toolbarItem setImage: [NSImage imageNamed: o_img]]; \
+    \
+    [o_toolbarItem setTarget: self]; \
+    [o_toolbarItem setAction: @selector( sel )]; \
+    \
+    [o_toolbarItem setEnabled: YES]; \
+    [o_toolbarItem setAutovalidates: YES]
+    
     if( [o_itemIdent isEqual: VLCIntfSettingToolbarIdentifier] )
     {
-        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
-
-        [o_toolbarItem setLabel: _NS("Interface")];
-        [o_toolbarItem setPaletteLabel: _NS("Interface settings")];
-
-        [o_toolbarItem setToolTip: _NS("Interface settings")];
-        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Interface_64"]];
-
-        [o_toolbarItem setTarget: self];
-        [o_toolbarItem setAction: @selector(showInterfaceSettings)];
-
-        [o_toolbarItem setEnabled: YES];
-        [o_toolbarItem setAutovalidates: YES];
+        CreateToolbarItem( _NS("Interface"), _NS("Interface Settings"), @"spref_cone_Interface_64", showInterfaceSettings );
     }
     else if( [o_itemIdent isEqual: VLCAudioSettingToolbarIdentifier] )
     {
-        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
-
-        [o_toolbarItem setLabel: _NS("Audio")];
-        [o_toolbarItem setPaletteLabel: _NS("General Audio settings")];
-
-        [o_toolbarItem setToolTip: _NS("General Audio settings")];
-        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Audio_64"]];
-
-        [o_toolbarItem setTarget: self];
-        [o_toolbarItem setAction: @selector(showAudioSettings)];
-
-        [o_toolbarItem setEnabled: YES];
-        [o_toolbarItem setAutovalidates: YES];
+        CreateToolbarItem( _NS("Audio"), _NS("General Audio Settings"), @"spref_cone_Audio_64", showAudioSettings );
     }
     else if( [o_itemIdent isEqual: VLCVideoSettingToolbarIdentifier] )
     {
-        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
-
-        [o_toolbarItem setLabel: _NS("Video")];
-        [o_toolbarItem setPaletteLabel: _NS("General Video settings")];
-
-        [o_toolbarItem setToolTip: _NS("General Video settings")];
-        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Video_64"]];
-
-        [o_toolbarItem setTarget: self];
-        [o_toolbarItem setAction: @selector(showVideoSettings)];
-
-        [o_toolbarItem setEnabled: YES];
-        [o_toolbarItem setAutovalidates: YES];
+        CreateToolbarItem( _NS("Video"), _NS("General Video Settings"), @"spref_cone_Video_64", showVideoSettings );
     }
     else if( [o_itemIdent isEqual: VLCOSDSettingToolbarIdentifier] )
     {
-        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
-
-        [o_toolbarItem setLabel: _NS("Subtitles & OSD")];
-        [o_toolbarItem setPaletteLabel: _NS("Subtitles & OSD settings")];
-
-        [o_toolbarItem setToolTip: _NS("Subtitles & OSD settings")];
-        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Subtitles_64"]];
-
-        [o_toolbarItem setTarget: self];
-        [o_toolbarItem setAction: @selector(showOSDSettings)];
-
-        [o_toolbarItem setEnabled: YES];
-        [o_toolbarItem setAutovalidates: YES];
+        CreateToolbarItem( _NS("Subtitles & OSD"), _NS("Subtitles & OSD Settings"), @"spref_cone_Subtitles_64", showOSDSettings );
     }
     else if( [o_itemIdent isEqual: VLCInputSettingToolbarIdentifier] )
     {
-        o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease];
-
-        [o_toolbarItem setLabel: _NS("Input & Codecs")];
-        [o_toolbarItem setPaletteLabel: _NS("Input & Codec settings")];
-
-        [o_toolbarItem setToolTip: _NS("Input & Codec settings")];
-        [o_toolbarItem setImage: [NSImage imageNamed: @"spref_cone_Input_64"]];
-
-        [o_toolbarItem setTarget: self];
-        [o_toolbarItem setAction: @selector(showInputSettings)];
-
-        [o_toolbarItem setEnabled: YES];
-        [o_toolbarItem setAutovalidates: YES];
+        CreateToolbarItem( _NS("Input & Codecs"), _NS("Input & Codec settings"), @"spref_cone_Input_64", showInputSettings );
+    }
+    else if( [o_itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier] )
+    {
+        CreateToolbarItem( _NS("Hotkeys"), _NS("Hotkeys settings"), @"spref_cone_Hotkeys_64", showHotkeySettings );
     }
 
     return o_toolbarItem;
@@ -170,19 +157,19 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
 {
     return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
-        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
 {
     return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
-        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
     return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
-        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, nil];
+        VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, nil];
 }
 
 - (void)initStrings
@@ -389,6 +376,25 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     /********************
      * hotkeys settings *
      ********************/
+    struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
+    o_hotkeySettings = [[NSMutableArray alloc] init];
+    NSMutableArray *o_tempArray_desc = [[NSMutableArray alloc] init];
+    i = 1;
+
+    while( i < 100 )
+    {
+        p_item = config_FindConfig( VLC_OBJECT(p_intf), p_hotkeys[i].psz_action );
+        if( !p_item )
+            break;
+
+        [o_tempArray_desc addObject: _NS( p_item->psz_text )];
+        [o_hotkeySettings addObject: [self OSXKeyToString: p_item->value.i]];
+
+        i++;
+    }
+    o_hotkeyDescriptions = [[NSArray alloc] initWithArray: o_tempArray_desc copyItems: YES];
+    [o_tempArray_desc release];
+    [o_hotkeys_listbox reloadData];
 }
 
 - (void)showSimplePrefs
@@ -686,6 +692,27 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     /********************
      * hotkeys settings *
      ********************/
+    if( b_hotkeyChanged )
+    {
+        struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
+        i = 1;
+        while( i < [o_hotkeySettings count] ) // FIXME: this is ugly!
+        {
+            /* FIXME: this does only work for single keys!!! */
+            config_PutInt( p_intf, p_hotkeys[i].psz_action, StringToKey( (char *)[[o_hotkeySettings objectAtIndex: i] UTF8String] ) );
+
+            i++;
+        }        
+        
+        i = config_SaveConfigFile( p_intf, "main" );
+        
+        if( i != 0 )
+        {
+            msg_Err( p_intf, "An error occured while saving the Hotkey settings using SimplePrefs" );
+            i = 0;
+        }
+        b_hotkeyChanged = NO;
+    }
 }
 
 - (void)showSettingsForCategory: (id)o_new_category_view
@@ -834,6 +861,232 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     msg_Dbg( p_intf, "showing Input Settings" );
     [self showSettingsForCategory: o_input_view];
+}
+
+- (IBAction)hotkeySettingChanged:(id)sender
+{
+    if( sender == o_hotkeys_change_btn || sender == o_hotkeys_listbox )
+    {
+        [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""), 
+                                               [o_hotkeyDescriptions objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
+        [o_hotkeys_change_keys_lbl setStringValue: [o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]]];
+        [o_hotkeys_change_taken_lbl setStringValue: @""];
+        [o_hotkeys_change_win setInitialFirstResponder: [o_hotkeys_change_win contentView]];
+        [o_hotkeys_change_win makeFirstResponder: [o_hotkeys_change_win contentView]];
+        [NSApp runModalForWindow: o_hotkeys_change_win];
+    }
+    else if( sender == o_hotkeys_change_cancel_btn )
+    {
+        [NSApp stopModal];
+        [o_hotkeys_change_win close];
+    }
+    else if( sender == o_hotkeys_change_ok_btn )
+    {
+        int i_returnValue;
+        b_hotkeyChanged = YES;
+
+        i_returnValue = [o_hotkeySettings indexOfObject: [o_hotkeys_change_keys_lbl stringValue]];
+        if( i_returnValue != NSNotFound )
+            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: @"Unset"];        
+
+        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_hotkeys_change_keys_lbl stringValue]];
+
+        [NSApp stopModal];
+        [o_hotkeys_change_win close];
+
+        [o_hotkeys_listbox reloadData];
+    }
+    else if( sender == o_hotkeys_clear_btn )
+    {
+        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: @"Unset"];
+        [o_hotkeys_listbox reloadData];
+        b_hotkeyChanged = YES;
+    }
+}
+
+- (void)showHotkeySettings
+{
+    msg_Dbg( p_intf, "showing HotKey Settings" );
+    [self showSettingsForCategory: o_hotkeys_view];
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+    return [o_hotkeySettings count];
+}
+
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    if( [[aTableColumn identifier] isEqualToString: @"action"] )
+        return [o_hotkeyDescriptions objectAtIndex: rowIndex];
+    else if( [[aTableColumn identifier] isEqualToString: @"shortcut"] )
+        return [o_hotkeySettings objectAtIndex: rowIndex];
+    else
+    {
+        NSLog(@"unknown TableColumn identifier (%@)!", [aTableColumn identifier] );
+        return NULL;
+    }
+}
+
+- (void)changeHotkeyTo: (NSString *)o_theNewKey
+{
+    int i_returnValue;
+    if( o_theNewKey == @"invalid" || o_theNewKey == @""  )
+    {
+        [o_hotkeys_change_keys_lbl setStringValue: _NS("Invalid combination")];
+        [o_hotkeys_change_taken_lbl setStringValue: _NS("Regrettably, these keys cannot be assigned as hotkey shortcuts.")];
+        [o_hotkeys_change_ok_btn setEnabled: NO];
+    }
+    else
+    {
+        [o_hotkeys_change_keys_lbl setStringValue: o_theNewKey];
+
+        i_returnValue = [o_hotkeySettings indexOfObject: o_theNewKey];
+        if( i_returnValue != NSNotFound )
+            [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
+                                                         _NS("This combination is already taken by \"%@\"."),
+                                                         [o_hotkeyDescriptions objectAtIndex: i_returnValue]]];
+        else
+            [o_hotkeys_change_taken_lbl setStringValue: @""];
+
+        [o_hotkeys_change_ok_btn setEnabled: YES];
+    }
+}
+    
+@end
+
+/********************
+ * hotkeys settings *
+ ********************/
+
+@implementation VLCHotkeyChangeWindow
+
+- (void)keyDown:(NSEvent *)o_theEvent
+{
+    NSMutableString *o_temp = [[NSMutableString alloc] init];
+    
+    if( [o_theEvent modifierFlags] & NSShiftKeyMask )
+        [o_temp appendString: @"Shift+"];
+    
+    if( [o_theEvent modifierFlags] & NSControlKeyMask )
+        [o_temp appendString: @"Ctrl+"];
+    
+    if( [o_theEvent modifierFlags] & NSCommandKeyMask )
+        [o_temp appendString: @"Command+"];
+    
+    if( [o_theEvent modifierFlags] & NSAlternateKeyMask  )
+        [o_temp appendString: @"Alt+"];
+    
+    if( [o_theEvent modifierFlags] & NSFunctionKeyMask  )
+    {
+        unichar key = 0;
+        key = [[o_theEvent charactersIgnoringModifiers] characterAtIndex: 0];
+        
+        switch( key )
+        {
+            case 0x1b:
+                [o_temp appendString: @"Esc"];
+                break;
+            case NSF1FunctionKey:
+                [o_temp appendString: @"F1"];
+                break;
+            case NSF2FunctionKey:
+                [o_temp appendString: @"F2"];
+                break;
+            case NSF3FunctionKey:
+                [o_temp appendString: @"F3"];
+                break;
+            case NSF4FunctionKey:
+                [o_temp appendString: @"F4"];
+                break;
+            case NSF5FunctionKey:
+                [o_temp appendString: @"F5"];
+                break;
+            case NSF6FunctionKey:
+                [o_temp appendString: @"F6"];
+                break;
+            case NSF7FunctionKey:
+                [o_temp appendString: @"F7"];
+                break;
+            case NSF8FunctionKey:
+                [o_temp appendString: @"F8"];
+                break;
+            case NSF9FunctionKey:
+                [o_temp appendString: @"F9"];
+                break;
+            case NSF10FunctionKey:
+                [o_temp appendString: @"F10"];
+                break;
+            case NSF11FunctionKey:
+                [o_temp appendString: @"F11"];
+                break;
+            case NSF12FunctionKey:
+                [o_temp appendString: @"F12"];
+                break;
+            case NSInsertFunctionKey:
+                [o_temp appendString: @"Insert"];
+                break;
+            case NSHomeFunctionKey:
+                [o_temp appendString: @"Home"];
+                break;
+            case NSEndFunctionKey:
+                [o_temp appendString: @"End"];
+                break;
+            case NSPageUpFunctionKey:
+                [o_temp appendString: @"Page Up"];
+                break;
+            case NSPageDownFunctionKey:
+                [o_temp appendString: @"Page Down"];
+                break;
+            case NSMenuFunctionKey:
+                [o_temp appendString: @"Menu"];
+                break;
+            case NSTabCharacter:
+                [o_temp appendString: @"Tab"];
+                break;
+            case NSDeleteCharacter:
+                [o_temp appendString: @"Delete"];
+                break;
+            case NSBackspaceCharacter:
+                [o_temp appendString: @"Backspace"];
+                break;
+            case NSUpArrowFunctionKey:
+                [o_temp appendString: @"Up"];
+                break;
+            case NSDownArrowFunctionKey:
+                [o_temp appendString: @"Down"];
+                break;
+            case NSRightArrowFunctionKey:
+                [o_temp appendString: @"Right"];
+                break;
+            case NSLeftArrowFunctionKey:
+                [o_temp appendString: @"Left"];
+                break;
+            case NSEnterCharacter:
+                [o_temp appendString: @"Enter"];
+                break;
+            default:
+            {
+                msg_Warn( VLCIntf, "user pressed unknown function key" );
+                o_temp = @"invalid";
+                break;
+            }
+        }
+    }
+    else
+    {
+        if( [[o_theEvent charactersIgnoringModifiers] isEqualToString: @" "] )
+            [o_temp appendString: @"Space"];
+        else
+            [o_temp appendString: [o_theEvent charactersIgnoringModifiers]];        
+    }
+
+    /* FIXME: implement sanity checks here as we don't want the user to interfere with hard shortcuts in our main menu */
+    [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: o_temp];
+
+    NSLog( @"user pressed %@", o_temp );
+
+    [o_temp release];
 }
 
 @end

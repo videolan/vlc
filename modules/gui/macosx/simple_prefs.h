@@ -51,6 +51,18 @@
     IBOutlet id o_audio_vol_sld;
     IBOutlet id o_audio_vol_txt;
 
+    IBOutlet id o_hotkeys_change_btn;
+    IBOutlet id o_hotkeys_change_lbl;
+    IBOutlet id o_hotkeys_change_keys_lbl;
+    IBOutlet id o_hotkeys_change_taken_lbl;
+    IBOutlet id o_hotkeys_change_win;
+    IBOutlet id o_hotkeys_change_cancel_btn;
+    IBOutlet id o_hotkeys_change_ok_btn;
+    IBOutlet id o_hotkeys_clear_btn;
+    IBOutlet id o_hotkeys_lbl;
+    IBOutlet id o_hotkeys_listbox;
+    IBOutlet id o_hotkeys_view;
+
     IBOutlet id o_input_access_box;
     IBOutlet id o_input_avi_pop;
     IBOutlet id o_input_avi_txt;
@@ -135,14 +147,18 @@
     BOOL b_videoSettingChanged;
     BOOL b_osdSettingChanged;
     BOOL b_inputSettingChanged;
+    BOOL b_hotkeyChanged;
     id o_currentlyShownCategoryView;
 
     NSToolbar *o_sprefs_toolbar;
     NSOpenPanel *o_selectFolderPanel;
+    NSArray *o_hotkeyDescriptions;
+    NSMutableArray *o_hotkeySettings;
 
     intf_thread_t *p_intf;
 }
 + (VLCSimplePrefs *)sharedInstance;
+- (NSString *)OSXKeyToString:(int)val;
 
 /* toolbar */
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_toolbar 
@@ -183,5 +199,16 @@
 - (void)showInputSettings;
 
 /* hotkeys */
+- (IBAction)hotkeySettingChanged:(id)sender;
+- (void)showHotkeySettings;
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
+- (void)changeHotkeyTo: (NSString *)o_theNewKey;
+
+@end
+
+@interface VLCHotkeyChangeWindow : NSWindow
+
+- (void)keyDown:(NSEvent *)theEvent;
 
 @end
