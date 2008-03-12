@@ -2323,7 +2323,7 @@ DISTCLEAN_PKG += ncurses-$(NCURSES_VERSION).tar.gz
 # ***************************************************************************
 
 asa.git.tar.gz:
-	$(WGET) $(ASA_URL) -O $@
+	$(WGET) $(ASA_URL)
 
 asa: asa.git.tar.gz
 	$(EXTRACT_GZ)
