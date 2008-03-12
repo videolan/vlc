@@ -239,13 +239,15 @@ static int OpenPacketizer( vlc_object_t *p_this )
                 (( p_config[4] >> 2 ) & 0x01) ? 960 : 1024;
         }
 
+        p_dec->fmt_out.audio.i_channels =
+            (p_config[i_index == 0x0f ? 4 : 1] >> 3) & 0x0f;
+
         msg_Dbg( p_dec, "AAC %dHz %d samples/frame",
                  p_dec->fmt_out.audio.i_rate,
                  p_dec->fmt_out.audio.i_frame_length );
 
         aout_DateInit( &p_sys->end_date, p_dec->fmt_out.audio.i_rate );
 
-        p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra = malloc( p_dec->fmt_in.i_extra );
         if( !p_dec->fmt_out.p_extra )
@@ -333,25 +335,72 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
     vlc_bool_t b_crc;
 
     /* Fixed header between frames */
-    i_id = ( (p_buf[1] >> 3) & 0x01 ) ? 2 : 4;
+    i_id = ( (p_buf[1] >> 3) & 0x01) ? 2 : 4; /* MPEG-2 or 4 */
     b_crc = !(p_buf[1] & 0x01);
     i_profile = p_buf[2] >> 6;
     i_sample_rate_idx = (p_buf[2] >> 2) & 0x0f;
     *pi_sample_rate = pi_sample_rates[i_sample_rate_idx];
+    //private_bit = (p_buf[2] >> 1) & 0x01;
     *pi_channels = ((p_buf[2] & 0x01) << 2) | ((p_buf[3] >> 6) & 0x03);
+    //original_copy = (p_buf[3] >> 5) & 0x01;
+    //home = (p_buf[3] >> 4) & 0x01;
 
     /* Variable header */
+    //copyright_id_bit = (p_buf[3] >> 3) & 0x01;
+    //copyright_id_start = (p_buf[3] >> 2) & 0x01;
     i_frame_size = ((p_buf[3] & 0x03) << 11) | (p_buf[4] << 3) |
-                   ((p_buf[5] >> 5) & 0x7);
-    //i_raw_blocks_in_frame = (p_buf[6] & 0x02) + 1;
+                   ((p_buf[5] >> 5) /*& 0x7*/);
+    //uint16_t buffer_fullness = ((p_buf[5] & 0x1f) << 6) | (p_buf[6] >> 2);
+    unsigned short i_raw_blocks_in_frame = p_buf[6] & 0x03;
 
     if( !*pi_sample_rate || !*pi_channels || !i_frame_size )
     {
+        msg_Warn( p_dec, "Invalid ADTS header" );
         return 0;
     }
 
-    /* Fixme */
     *pi_frame_length = 1024;
+
+    if( i_raw_blocks_in_frame == 0 )
+    {
+        if( b_crc )
+        {
+            msg_Warn( p_dec, "ADTS CRC not supported" );
+            //uint16_t crc = (p_buf[7] << 8) | p_buf[8];
+        }
+    }
+    else
+    {
+        msg_Err( p_dec, "Multiple blocks per frame in ADTS not supported" );
+        return 0;
+#if 0
+        int i;
+        const uint8_t *p_pos = p_buf + 7;
+        uint16_t crc_block;
+        uint16_t i_block_pos[3];
+        if( b_crc )
+        {
+            for( i = 0 ; i < i_raw_blocks_in_frame ; i++ )
+            {   /* the 1st block's position is known ... */
+                i_block_pos[i] = (*p_pos << 8) | *(p_pos+1);
+                p_pos += 2;
+            }
+            crc_block = (*p_pos << 8) | *(p_pos+1);
+            p_pos += 2;
+        }
+        for( i = 0 ; i <= i_raw_blocks_in_frame ; i++ )
+        {
+            //read 1 block
+            if( b_crc )
+            {
+                msg_Err( p_dec, "ADTS CRC not supported" );
+                //uint16_t crc = (*p_pos << 8) | *(p_pos+1);
+                //p_pos += 2;
+            }
+        }
+#endif
+    }
+
 
     /* Build the decoder specific info header */
     if( !p_dec->fmt_out.i_extra )
