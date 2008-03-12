@@ -2250,7 +2250,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in, 
+                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
                             p_sys->p_deinterlace_cfg,
                             p_sys->psz_deinterlace );
 
@@ -2291,13 +2291,13 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 ( ( (int)id->p_decoder->fmt_out.video.i_width !=
                     p_sys->i_crop_width ) ||
                   ( p_sys->i_crop_width != p_sys->i_nopadd_width ) ||
-                  ( p_sys->i_nopadd_width != 
+                  ( p_sys->i_nopadd_width !=
                     (int)id->p_encoder->fmt_out.video.i_width ) ||
 
                   ( (int)id->p_decoder->fmt_out.video.i_height !=
                     p_sys->i_crop_height ) ||
                   ( p_sys->i_crop_height != p_sys->i_nopadd_height ) ||
-                  ( p_sys->i_nopadd_height != 
+                  ( p_sys->i_nopadd_height !=
                     (int)id->p_encoder->fmt_out.video.i_height ) ) )
             {
                 id->pp_filter[id->i_filter] =
