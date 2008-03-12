@@ -200,7 +200,7 @@ strings for settings menus and hints
 #define SATWINSIZE_TEXT     N_("Sat windowing")
 #define SATWINSIZE_LONGTEXT N_("used for statistics")
 
-#define MEANLENGTH_TEXT     N_("Filter length [ms]")
+#define MEANLENGTH_TEXT     N_("Filter length (ms)")
 #define MEANLENGTH_LONGTEXT N_("Time it takes until a color is complete "\
                                 "changed, removes flickering")
 #define MEANTHRESHOLD_TEXT     N_("Filter threshold")
