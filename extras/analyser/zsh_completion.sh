@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 # Helper script to install zsh completion for VLC media player
 # © 2008 Rafaël Carré <funman@videolanorg>
 
@@ -47,6 +47,8 @@ done
 
 echo "libvlc found !"
 
+LD_LIBRARY_PATH=$BUILDDIR/src/.libs
+
 if test -e ../../extras/contrib/config.mak -a ! "`grep HOST ../../extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "$HOST"; then
     echo "contribs found !"
     CPPFLAGS="-I../../extras/contrib/include"
@@ -58,11 +60,10 @@ fi
 
 ZSH_BUILD="$CXX $CPPFLAGS $CXXFLAGS -D__LIBVLC__ -DHAVE_CONFIG_H -I$BUILDDIR -I$BUILDDIR/include -I../../include zsh.cpp $LIBVLC -o zsh_gen"
 
-echo "Building zsh completion generator ...
-"
+echo "Building zsh completion generator ...  "
 echo $ZSH_BUILD
 echo
-$ZSH_BUILD || exit 1
+eval $ZSH_BUILD || exit 1
 
 echo "Generating zsh completion ..."
 if ! ./zsh_gen --plugin-path=$BUILDDIR >_vlc 2>/dev/null; then
@@ -83,7 +84,7 @@ echo "zsh completion is `echo \`wc -l _vlc\`` lines long !"
 test -z "$NOINSTALL" || exit 0
 #Distributors can run NOINSTALL=mg ./zsh_completion.sh
 
-if ! /usr/bin/which -s zsh; then
+if ! /usr/bin/which zsh >/dev/null 2>&1; then
     echo "ERROR: zsh not found, you'll have to copy the _vlc file manually"
     exit 1
 fi
