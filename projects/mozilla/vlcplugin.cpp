@@ -44,6 +44,7 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     i_npmode(mode),
     b_stream(0),
     b_autoplay(1),
+    b_show_toolbar(1),
 #if XP_UNIX
     i_control_height(45),
 #endif
@@ -166,7 +167,13 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         {
             progid = argv[i];
         }
+        else if( !strcmp( argn[i], "show_toolbar" ) )
+        {
+            b_show_toolbar = boolValue(argv[i]);
+        }
     }
+
+
 
     libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv, NULL);
     if( ! libvlc_instance )

@@ -118,6 +118,7 @@ public:
     /* plugin properties */
     int      b_stream;
     int      b_autoplay;
+    int      b_show_toolbar;
     char *   psz_target;
 
 #if XP_UNIX

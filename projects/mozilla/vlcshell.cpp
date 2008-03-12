@@ -94,7 +94,8 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
             return NPERR_NO_ERROR;
 
         case NPPVpluginDescriptionString:
-            snprintf( psz_desc, sizeof(psz_desc), PLUGIN_DESCRIPTION, VLC_Version() );
+            snprintf( psz_desc, sizeof(psz_desc), PLUGIN_DESCRIPTION,
+                      VLC_Version() );
             *((char **)value) = psz_desc;
             return NPERR_NO_ERROR;
 
@@ -220,7 +221,8 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                             libvlc_playlist_get_media_instance(p_vlc, NULL);
                         if( p_md )
                         {
-                            hasVout = libvlc_media_instance_has_vout(p_md, NULL);
+                            hasVout = libvlc_media_instance_has_vout(p_md,
+                                                                     NULL);
                             if( hasVout )
                             {
                                 libvlc_rectangle_t area;
@@ -228,7 +230,8 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                                 area.top = 0;
                                 area.right = npwindow.width;
                                 area.bottom = npwindow.height;
-                                libvlc_video_redraw_rectangle(p_md, &area, NULL);
+                                libvlc_video_redraw_rectangle(p_md, &area,
+                                                              NULL);
                             }
                             libvlc_media_instance_release(p_md);
                         }
@@ -242,7 +245,8 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                     ForeColor(blackColor);
                     PenMode( patCopy );
 
-                    /* seems that firefox forgets to set the following on occasion (reload) */
+                    /* seems that firefox forgets to set the following
+                     * on occasion (reload) */
                     SetOrigin(((NP_Port *)npwindow.window)->portx,
                               ((NP_Port *)npwindow.window)->porty);
 
@@ -360,6 +364,9 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
+    /* height used by bottom toolbar (pixels). 0 if hidden */
+    unsigned int i_toolbar_height;
+
     if( ! instance )
     {
         return NPERR_INVALID_INSTANCE_ERROR;
@@ -367,13 +374,23 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
     /* NPP_SetWindow may be called before NPP_New (Opera) */
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
-    if( ! p_plugin )
+    if( NULL == p_plugin )
     {
         /* we should probably show a splash screen here */
         return NPERR_NO_ERROR;
     }
 
     libvlc_instance_t *p_vlc = p_plugin->getVLC();
+
+
+    if( p_plugin->b_show_toolbar )
+    {
+        i_toolbar_height = p_plugin->i_control_height;
+    }
+    else
+    {
+        i_toolbar_height = 0;
+    }
 
     /*
      * PLUGIN DEVELOPERS:
@@ -401,8 +418,9 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         libvlc_rectangle_t view, clip;
 
         /*
-        ** browser sets port origin to top-left location of plugin relative to GrafPort
-        ** window origin is set relative to document, which of little use for drawing
+        ** browser sets port origin to top-left location of plugin
+        ** relative to GrafPort window origin is set relative to document,
+        ** which of little use for drawing
         */
         view.top     = ((NP_Port*) (window->window))->porty;
         view.left    = ((NP_Port*) (window->window))->portx;
@@ -483,25 +501,33 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         Window  parent   = (Window) window->window;
         if( !curwin.window || (parent != (Window)curwin.window) )
         {
-            Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+            Display *p_display = ( (NPSetWindowCallbackStruct *)
+                                   window->ws_info )->display;
 
             XResizeWindow( p_display, parent, window->width, window->height );
 
             int i_blackColor = BlackPixel(p_display, DefaultScreen(p_display));
 
+            /* create windows */
             Window video = XCreateSimpleWindow( p_display, parent, 0, 0,
-                           window->width, window->height - p_plugin->i_control_height, 0,
-                           i_blackColor, i_blackColor );
-            Window controls = XCreateSimpleWindow( p_display, parent, 0,
-                            window->height - p_plugin->i_control_height-1, window->width,
-                            p_plugin->i_control_height-1, 0, i_blackColor, i_blackColor );
+                           window->width, window->height - i_toolbar_height,
+                           0, i_blackColor, i_blackColor );
+            Window controls = (Window) NULL;
+            if( p_plugin->b_show_toolbar )
+            {
+                controls = XCreateSimpleWindow( p_display, parent,
+                                0, window->height - i_toolbar_height-1,
+                                window->width, i_toolbar_height-1,
+                                0, i_blackColor, i_blackColor );
+            }
 
             XMapWindow( p_display, parent );
             XMapWindow( p_display, video );
-            XMapWindow( p_display, controls );
+            if( controls ) { XMapWindow( p_display, controls ); }
 
             XFlush(p_display);
 
+            /* bind events */
             Widget w = XtWindowToWidget( p_display, parent );
 
             XtAddEventHandler( w, ExposureMask, FALSE,
@@ -529,7 +555,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             /* remember window */
             p_plugin->setWindow( *window );
             p_plugin->setVideoWindow( video );
-            p_plugin->setControlWindow( controls );
+            if( controls ) { p_plugin->setControlWindow( controls ); }
 
             Redraw( w, (XtPointer)p_plugin, NULL );
         }
@@ -628,7 +654,8 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
         return;
     }
 
-    if( libvlc_playlist_add( p_plugin->getVLC(), fname, stream->url, NULL ) != -1 )
+    if( libvlc_playlist_add( p_plugin->getVLC(), fname, stream->url, NULL )
+        != -1 )
     {
         if( p_plugin->b_autoplay )
         {
@@ -750,7 +777,8 @@ static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpa
         }
         default:
             /* delegate to default handler */
-            return CallWindowProc(p_plugin->getWindowProc(), p_hwnd, i_msg, wpar, lpar );
+            return CallWindowProc( p_plugin->getWindowProc(), p_hwnd,
+                                   i_msg, wpar, lpar );
     }
 }
 #endif /* XP_WIN */
@@ -765,29 +793,41 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     const NPWindow& window = p_plugin->getWindow();
     GC gc;
     XGCValues gcv;
+    /* height used to show the bottom toolbar in non-fullscreen mode */
+    unsigned int i_toolbar_height;
+
+    if( p_plugin->b_show_toolbar )
+    {
+        p_plugin->showToolbar();
+        i_toolbar_height = p_plugin->i_control_height;
+    }
+    else
+    {
+        i_toolbar_height = 0;
+    }
 
     Window video = p_plugin->getVideoWindow();
     Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
-
-    p_plugin->showToolbar();
 
     gcv.foreground = BlackPixel( p_display, 0 );
     gc = XCreateGC( p_display, video, GCForeground, &gcv );
 
     XFillRectangle( p_display, video, gc,
-                    0, 0, window.width, window.height - p_plugin->i_control_height );
+                    0, 0, window.width, window.height - i_toolbar_height);
 
     gcv.foreground = WhitePixel( p_display, 0 );
     XChangeGC( p_display, gc, GCForeground, &gcv );
 
     XDrawString( p_display, video, gc,
-                 window.width / 2 - 40, (window.height - p_plugin->i_control_height) / 2,
+                 window.width / 2 - 40, (window.height - i_toolbar_height) / 2,
                  WINDOW_TEXT, strlen(WINDOW_TEXT) );
     XFreeGC( p_display, gc );
 
-    p_plugin->redrawToolbar();
-
-    p_plugin->hideToolbar();
+    if( p_plugin->b_show_toolbar )
+    {
+        p_plugin->redrawToolbar();
+        p_plugin->hideToolbar();
+    }
 }
 
 static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
@@ -800,7 +840,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
     int i_xPos = event->xbutton.x;
     int i_yPos = event->xbutton.y;
 
-    if( p_plugin )
+    if( p_plugin && p_plugin->b_show_toolbar )
     {
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
@@ -875,7 +915,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
             libvlc_exception_clear( &ex );
         }
-        
+
         if( p_md ) libvlc_media_instance_release( p_md );
     }
     Redraw( w, closure, event );
@@ -892,6 +932,17 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     Window root_return, parent_return, * children_return;
     Window base_window;
     unsigned int i_nchildren;
+    /* height used for the bottom control bar, 0 if hidden */
+    unsigned int i_toolbar_height;
+
+    if( p_plugin->b_show_toolbar )
+    {
+        i_toolbar_height = p_plugin->i_control_height;
+    }
+    else
+    {
+        i_toolbar_height = 0;
+    }
 
 #ifdef X11_RESIZE_DEBUG
     XWindowAttributes attr;
@@ -905,13 +956,14 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     }
 #endif /* X11_RESIZE_DEBUG */
 
-    if( ! p_plugin->setSize(window.width, (window.height - p_plugin->i_control_height)) )
+    if( ! p_plugin->setSize(window.width, (window.height - i_toolbar_height)) )
     {
         /* size already set */
         return;
     }
 
-    i_ret = XResizeWindow( p_display, drawable, window.width, (window.height - p_plugin->i_control_height) );
+    i_ret = XResizeWindow( p_display, drawable,
+                           window.width, (window.height - i_toolbar_height) );
 
 #ifdef X11_RESIZE_DEBUG
     fprintf( stderr,
@@ -943,7 +995,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
 #endif /* X11_RESIZE_DEBUG */
 
         i_ret = XResizeWindow( p_display, base_window,
-                window.width, ( window.height - p_plugin->i_control_height ) );
+                window.width, ( window.height - i_toolbar_height ) );
 
 #ifdef X11_RESIZE_DEBUG
         fprintf( stderr,
