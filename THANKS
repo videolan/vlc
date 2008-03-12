@@ -97,6 +97,7 @@ Gregory Hazel <ghazel at gmail dot com> - wxWidgets fixes and improvements
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Han HoJoong <0demon0 at paran dot com> - Korean translation
+Hans Lambermont <hans dot lambermont at newtec dot eu> - Syslog improvements
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
 Hannes Domani <ssbssa at yahoo dot de> - Qt4 interfaces patches
 Harry Sintonen <sintonen at iki.fi> - fix for MKV demuxer

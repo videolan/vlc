@@ -97,7 +97,7 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
-static void FlushQueue        ( msg_subscription_t *, FILE *, int );
+static void FlushQueue        ( msg_subscription_t *, FILE *, int, int );
 static void TextPrint         ( const msg_item_t *, FILE * );
 static void HtmlPrint         ( const msg_item_t *, FILE * );
 #ifdef HAVE_SYSLOG_H
@@ -277,7 +277,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_intf->p_sys->p_file = NULL;
 #ifdef HAVE_SYSLOG_H
-        openlog( "VLC", 0, LOG_DAEMON );
+        openlog( "VLC", LOG_PID|LOG_NDELAY, LOG_DAEMON );
 #endif
     }
 
@@ -305,7 +305,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Flush the queue and unsubscribe from the message queue */
     FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
-                p_intf->p_sys->i_mode );
+                p_intf->p_sys->i_mode, p_intf->p_libvlc->i_verbose );
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     switch( p_intf->p_sys->i_mode )
@@ -343,7 +343,7 @@ static void Run( intf_thread_t *p_intf )
     while( !p_intf->b_die )
     {
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
-                    p_intf->p_sys->i_mode );
+                    p_intf->p_sys->i_mode, p_intf->p_libvlc->i_verbose );
 
         if( p_intf->p_sys->p_rrd )
             DoRRD( p_intf );
@@ -355,7 +355,8 @@ static void Run( intf_thread_t *p_intf )
 /*****************************************************************************
  * FlushQueue: flush the message queue into the log
  *****************************************************************************/
-static void FlushQueue( msg_subscription_t *p_sub, FILE *p_file, int i_mode )
+static void FlushQueue( msg_subscription_t *p_sub, FILE *p_file, int i_mode,
+                        int i_verbose )
 {
     int i_start, i_stop;
 
@@ -370,6 +371,22 @@ static void FlushQueue( msg_subscription_t *p_sub, FILE *p_file, int i_mode )
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
+            switch( p_sub->p_msg[i_start].i_type )
+            {
+            case VLC_MSG_ERR:
+                if( i_verbose < 0 ) continue;
+                break;
+            case VLC_MSG_INFO:
+                if( i_verbose < 0 ) continue;
+                break;
+            case VLC_MSG_WARN:
+                if( i_verbose < 1 ) continue;
+                break;
+            case VLC_MSG_DBG:
+                if( i_verbose < 2 ) continue;
+                break;
+            }
+
             switch( i_mode )
             {
             case MODE_HTML:
@@ -407,18 +424,16 @@ static void TextPrint( const msg_item_t *p_msg, FILE *p_file )
 #ifdef HAVE_SYSLOG_H
 static void SyslogPrint( const msg_item_t *p_msg )
 {
-    int i_priority = LOG_INFO;
-
-    if( p_msg->i_type  == 0 ) i_priority = LOG_INFO;
-    if( p_msg->i_type  == 1 ) i_priority = LOG_ERR;
-    if( p_msg->i_type  == 2 ) i_priority = LOG_WARNING;
-    if( p_msg->i_type  == 3 ) i_priority = LOG_DEBUG;
+    static const int i_prio[4] = { LOG_INFO, LOG_ERR, LOG_WARNING, LOG_DEBUG };
+    int i_priority = i_prio[p_msg->i_type];
 
     if( p_msg->psz_header )
-        syslog( i_priority, "%s %s: %s", p_msg->psz_header,
+        syslog( i_priority, "%s%s %s: %s", p_msg->psz_header,
+                ppsz_type[p_msg->i_type],
                 p_msg->psz_module, p_msg->psz_msg );
     else
-        syslog( i_priority, "%s: %s", p_msg->psz_module, p_msg->psz_msg );
+        syslog( i_priority, "%s%s: %s", p_msg->psz_module, 
+                ppsz_type[p_msg->i_type], p_msg->psz_msg );
  
 }
 #endif
