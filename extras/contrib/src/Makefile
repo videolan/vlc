@@ -1374,6 +1374,7 @@ else
 	rm x264/x264.c
 endif
 endif
+endif
 
 ifdef HAVE_WIN32
 .x264: x264 .pthreads
