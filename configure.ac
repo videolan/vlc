@@ -1062,12 +1062,17 @@ if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
 fi
 
 dnl Check for -fvisibility=hidden
+dnl Don't test on mingw32, because it is going to work with just a warning
+dnl even if it doesn't support it
+if test "${SYS}" != "mingw32"
+then
 AC_CACHE_CHECK([if \$CC accepts -fvisibility=hidden],
     [ac_cv_c_visibility_hidden],
     [CFLAGS="${CFLAGS_save} -fvisibility=hidden"
      AC_TRY_COMPILE([],,ac_cv_c_visibility_hidden=yes, ac_cv_c_visibility_hidden=no)])
 if test "${ac_cv_c_visibility_hidden}" != "no"; then
     VLC_ADD_CFLAGS([libvlc plugin],[-fvisibility=hidden])
+fi
 fi
 
 AM_CONDITIONAL(HAVE_COMPILER_EXPORT, [test "$SYS" = "mingw32" -o "${ac_cv_c_visibility_hidden}" != "no"])
@@ -3004,9 +3009,9 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
         VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libpostproc ${real_ffmpeg_tree}/libpostproc/libpostproc.a])
         VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}])
      else
-       dnl  The given libavcodec wasn't built with --enable-pp
+       dnl  The given libavcodec wasn't built with --enable-postproc
        AC_MSG_RESULT(no)
-       AC_MSG_ERROR([cannot find libpostproc.a in ${real_ffmpeg_tree}/[libavcodec/]libpostproc/. Make sure you configured ffmpeg with --enable-pp])
+       AC_MSG_ERROR([cannot find libpostproc.a in ${real_ffmpeg_tree}/[libavcodec/]libpostproc/. Make sure you configured ffmpeg with --enable-postproc])
      fi
    fi
    dnl  Use a custom libffmpeg
@@ -3118,7 +3123,7 @@ dnl Trying with pkg-config
 
       AC_CHECK_LIB(postproc, pp_postprocess, [
         VLC_ADD_LIBS([ffmpeg],[-lpostproc])],
-      AC_MSG_ERROR([Could not find libpostproc inside FFmpeg. You should configure FFmpeg with --enable-gpl --enable-pp.]),
+      AC_MSG_ERROR([Could not find libpostproc inside FFmpeg. You should configure FFmpeg with --enable-gpl --enable-postproc.]),
         [$LDAVUTIL])
 
       AC_CHECK_LIB(avformat, av_open_input_stream, [
@@ -3156,9 +3161,9 @@ then
       AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a, make sure you compiled libavcodecaltivec in ${with_ffmpeg_tree}])
     fi
     if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a"; then
-      dnl  The given libavcodecaltivec wasn't built with --enable-pp
+      dnl  The given libavcodecaltivec wasn't built with --enable-postproc
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+      AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-postproc])
     fi
     dnl  Use a custom libffmpeg
     AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a)
