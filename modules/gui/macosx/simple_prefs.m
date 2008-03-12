@@ -92,8 +92,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     [self initStrings];
-
-    [self resetControls];
     
     /* setup the toolbar */
     o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
@@ -405,6 +403,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_sprefs_toolbar setSelectedItemIdentifier: VLCIntfSettingToolbarIdentifier];
         [self showInterfaceSettings];
     }
+    
+    [self resetControls];
 
     [o_sprefs_win makeKeyAndOrderFront: self];
 }
