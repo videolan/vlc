@@ -385,7 +385,6 @@ int loadPresetByFile(char * filename) {
 int init_idle_preset() {
 
   preset_t * preset;
-  int i;
 
     /* Initialize idle preset struct */
   if ((preset = (preset_t*)malloc(sizeof(preset_t))) == NULL)
@@ -741,7 +740,6 @@ void reloadPerFrame(char * s, preset_t * preset) {
 preset_t * load_preset(char * pathname) {
 
   preset_t * preset;
-  int i;
 
   /* Initialize preset struct */
   if ((preset = (preset_t*)malloc(sizeof(preset_t))) == NULL)
