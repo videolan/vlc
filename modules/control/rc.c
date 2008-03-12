@@ -1270,7 +1270,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                         &val, &text );
             msg_rc( "+----[ end of %s ]", val_name.psz_string );
 
-            if( val_name.psz_string ) free( val_name.psz_string );
+            free( val_name.psz_string );
 
             i_error = VLC_SUCCESS;
         }
@@ -1778,7 +1778,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
                     &val, &text );
         msg_rc( "+----[ end of %s ]", val_name.psz_string );
 
-        if( val_name.psz_string ) free( val_name.psz_string );
+        free( val_name.psz_string );
 
         i_error = VLC_SUCCESS;
     }
@@ -1865,7 +1865,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
                     &val, &text );
         msg_rc( "+----[ end of %s ]", val_name.psz_string );
 
-        if( val_name.psz_string ) free( val_name.psz_string );
+        free( val_name.psz_string );
         i_error = VLC_SUCCESS;
     }
     else
@@ -1933,12 +1933,12 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
     {
         msg_rc( _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
-        if( val.psz_string ) free( val.psz_string );
-            return i_error;
+        free( val.psz_string );
+        return i_error;
     }
 
     i_error = VLC_SUCCESS;
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
     return i_error;
 }
 

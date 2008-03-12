@@ -230,7 +230,7 @@ static void Close( vlc_object_t *p_this )
         free( cl );
         p_sys->clients[i] = NULL;
     }
-    if( p_sys->clients != NULL ) free( p_sys->clients );
+    free( p_sys->clients );
 
     net_ListenClose( p_sys->pi_fd );
 
@@ -515,8 +515,7 @@ static void Run( intf_thread_t *p_intf )
             TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
         }
     }
-    if( psz_password )
-        free( psz_password );
+    free( psz_password );
 }
 
 static void Write_message( telnet_client_t *client, vlm_message_t *message,
@@ -526,7 +525,7 @@ static void Write_message( telnet_client_t *client, vlm_message_t *message,
 
     client->p_buffer_read = client->buffer_read;
     (client->p_buffer_read)[0] = 0; // if (cl->p_buffer_read)[0] = '\n'
-    if( client->buffer_write ) free( client->buffer_write );
+    free( client->buffer_write );
 
     /* generate the psz_message string */
     if( message )

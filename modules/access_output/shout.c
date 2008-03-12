@@ -263,10 +263,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( psz_name ) free( psz_name );
-    if( psz_description ) free( psz_description );
-    if( psz_genre ) free( psz_genre );
-    if( psz_url ) free( psz_url );
+    free( psz_name );
+    free( psz_description );
+    free( psz_genre );
+    free( psz_url );
 
     var_Get( p_access, SOUT_CFG_PREFIX "mp3", &val );
     if( val.b_bool == VLC_TRUE )

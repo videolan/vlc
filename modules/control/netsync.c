@@ -158,7 +158,7 @@ static void Run( intf_thread_t *p_intf )
     else
         i_socket = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, 0 );
 
-    if( psz_master ) free( psz_master );
+    free( psz_master );
 
     if( i_socket < 0 )
     {

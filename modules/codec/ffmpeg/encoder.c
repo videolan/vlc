@@ -399,7 +399,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_UNKNOWN;
         }
     }
-    if( val.psz_string ) free( val.psz_string );
+    free( val.psz_string );
 #endif
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )

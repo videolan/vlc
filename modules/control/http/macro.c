@@ -390,7 +390,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         }
                     }
 
-                    if( p_items ) free( p_items );
+                    free( p_items );
                     break;
                 }
                 case MVLC_KEEP:
@@ -432,7 +432,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         }
                     }
 
-                    if( p_items ) free( p_items );
+                    free( p_items );
                     break;
                 }
                 case MVLC_EMPTY:

@@ -626,8 +626,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
     }
 
     free( psz_dir );
-    if( ppsz_dir_content != NULL )
-        free( ppsz_dir_content );
+    free( ppsz_dir_content );
     return s;
 }
 
