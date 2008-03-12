@@ -43,8 +43,8 @@
 #define MUX_TEXT N_("Output muxer")
 #define MUX_LONGTEXT N_( \
     "Muxer to use for the stream." )
-#define DST_TEXT N_("Output destination")
-#define DST_LONGTEXT N_( \
+#define DEST_TEXT N_("Output destination")
+#define DEST_LONGTEXT N_( \
     "Destination (URL) to use for the stream." )
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
@@ -96,8 +96,8 @@ vlc_module_begin();
                 ACCESS_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_FALSE );
-    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
-                DST_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
+                DEST_LONGTEXT, VLC_FALSE );
         change_unsafe();
 
     add_bool( SOUT_CFG_PREFIX "sap", VLC_FALSE, NULL, SAP_TEXT, SAP_LONGTEXT,
