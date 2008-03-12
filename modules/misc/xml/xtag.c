@@ -185,7 +185,8 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
         i_pos += i_size;
         i_buffer += i_size;
         p_new = realloc( p_buffer, i_buffer );
-        if (!p_new) {
+        if( !p_new )
+        {
             msg_Err( p_xml, "out of memory" );
             free( p_buffer );
             return NULL;
@@ -744,15 +745,15 @@ static XTag *xtag_free( XTag *xtag )
 
     if( xtag == NULL ) return NULL;
 
-    if( xtag->name ) free( xtag->name );
-    if( xtag->pcdata ) free( xtag->pcdata );
+    free( xtag->name );
+    free( xtag->pcdata );
 
     for( l = xtag->attributes; l; l = l->next )
     {
         if( (attr = (XAttribute *)l->data) != NULL )
         {
-            if( attr->name ) free( attr->name );
-            if( attr->value ) free( attr->value );
+            free( attr->name );
+            free( attr->value );
             free( attr );
         }
     }

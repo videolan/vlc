@@ -109,7 +109,7 @@ void fft_perform(const sound_sample *input, float *output, fft_state *state) {
  * Free the state.
  */
 void fft_close(fft_state *state) {
-    if(state) free(state);
+    free( state );
 }
 
 /*****************************************************************************

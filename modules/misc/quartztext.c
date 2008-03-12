@@ -183,8 +183,7 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->p_fonts );
     }
 
-    if( p_sys->psz_font_name ) free( p_sys->psz_font_name );
-
+    free( p_sys->psz_font_name );
     free( p_sys );
 }
 
@@ -598,7 +597,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
         {
             if( !strcasecmp( "face", psz_name ) )
             {
-                if( psz_fontname ) free( psz_fontname );
+                free( psz_fontname );
                 psz_fontname = strdup( psz_value );
             }
             else if( !strcasecmp( "size", psz_name ) )

@@ -82,8 +82,8 @@ void osd_MenuFree( osd_menu_t *p_menu )
     msg_Dbg( p_menu, "freeing menu" );
     osd_ButtonFree( p_menu, p_menu->p_button );
 
-    if( p_menu->psz_path ) free( p_menu->psz_path );
-    if( p_menu->p_state ) free( p_menu->p_state );
+    free( p_menu->psz_path );
+    free( p_menu->p_state );
 
     p_menu->p_button = NULL;
     p_menu->p_last_button = NULL;
@@ -135,18 +135,15 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
         p_current = p_prev;
         if( p_current->p_next )
         {
-            if( p_current->p_next->psz_name )
-                free( p_current->p_next->psz_name );
-            if( p_current->p_next->psz_action )
-                free( p_current->p_next->psz_action );
-            if( p_current->p_next->psz_action_down )
-                free( p_current->p_next->psz_action_down );
-            if( p_current->p_feedback && p_current->p_feedback->p_data_orig )
-                free( p_current->p_feedback->p_data_orig );
+            free( p_current->p_next->psz_name );
+            free( p_current->p_next->psz_action );
+            free( p_current->p_next->psz_action_down );
             if( p_current->p_feedback )
+            {
+                free( p_current->p_feedback->p_data_orig );
                 free( p_current->p_feedback );
-
-            p_current->p_feedback = NULL;
+                p_current->p_feedback = NULL;
+            }
 
             /* Free all states first */
             if( p_current->p_next->p_states )
@@ -158,16 +155,14 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
 
         if( p_current->p_up )
         {
-            if( p_current->p_up->psz_name )
-                free( p_current->p_up->psz_name );
-            if( p_current->p_up->psz_action )
-                free( p_current->p_up->psz_action );
-            if( p_current->p_up->psz_action_down )
-                free( p_current->p_up->psz_action_down );
-            if( p_current->p_feedback && p_current->p_feedback->p_data_orig )
-                free( p_current->p_feedback->p_data_orig );
+            free( p_current->p_up->psz_name );
+            free( p_current->p_up->psz_action );
+            free( p_current->p_up->psz_action_down );
             if( p_current->p_feedback )
+            {
+                free( p_current->p_feedback->p_data_orig );
                 free( p_current->p_feedback );
+            }
 
             p_current->p_feedback = NULL;
 
@@ -183,14 +178,15 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
     {
         msg_Dbg( p_menu, "+ freeing button %s [%p]",
                  p_button->psz_action, p_button );
-        if( p_button->psz_name ) free( p_button->psz_name );
-        if( p_button->psz_action ) free( p_button->psz_action );
-        if( p_button->psz_action_down ) free( p_button->psz_action_down );
-        if( p_current->p_feedback && p_current->p_feedback->p_data_orig )
-            free( p_current->p_feedback->p_data_orig );
+        free( p_button->psz_name );
+        free( p_button->psz_action );
+        free( p_button->psz_action_down );
         if( p_current->p_feedback )
+        {
+            free( p_current->p_feedback->p_data_orig );
             free( p_current->p_feedback );
-        p_current->p_feedback = NULL;
+            p_current->p_feedback = NULL;
+        }
 
         if( p_button->p_states )
             osd_StatesFree( p_menu, p_button->p_states );
@@ -268,12 +264,10 @@ void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
         {
             if( p_state->p_next->p_pic )
             {
-                if( p_state->p_next->p_pic->p_data_orig )
-                    free( p_state->p_next->p_pic->p_data_orig );
+                free( p_state->p_next->p_pic->p_data_orig );
                 free( p_state->p_next->p_pic );
             }
-            if( p_state->p_next->psz_state )
-                free( p_state->p_next->psz_state );
+            free( p_state->p_next->psz_state );
             free( p_state->p_next );
             p_state->p_next = NULL;
         }
@@ -285,11 +279,10 @@ void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
                  p_state->psz_state, p_states );
         if( p_states->p_pic )
         {
-            if( p_states->p_pic->p_data_orig )
-                free( p_states->p_pic->p_data_orig );
+            free( p_states->p_pic->p_data_orig );
             free( p_states->p_pic );
         }
-        if( p_state->psz_state ) free( p_state->psz_state );
+        free( p_state->psz_state );
         free( p_states );
         p_states = NULL;
     }

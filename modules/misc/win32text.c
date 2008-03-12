@@ -183,13 +183,13 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_default_font_size = val.i_int;
     if( SetFont( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
-    if( psz_fontfile ) free( psz_fontfile );
+    free( psz_fontfile );
     p_filter->pf_render_text = RenderText;
     p_filter->pf_render_html = NULL;
     return VLC_SUCCESS;
 
  error:
-    if( psz_fontfile ) free( psz_fontfile );
+    free( psz_fontfile );
     free( p_sys );
     return VLC_EGENERIC;
 }

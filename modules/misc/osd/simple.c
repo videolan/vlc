@@ -236,7 +236,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                     msg_Dbg( p_this, " + (menu up) hotkey down %s, file=%s%s",
                              &action[0], p_menu->psz_path, &file[0] );
 
-                    if( p_up->psz_action_down ) free( p_up->psz_action_down );
+                    free( p_up->psz_action_down );
                     p_up->psz_action_down = strdup( &action[0] );
 
                     /* Parse range contstruction :
@@ -335,8 +335,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
 
                 msg_Dbg( p_this, " + hotkey down %s, file=%s%s", 
                          &action[0], p_menu->psz_path, &file[0] );
-                if( p_current->psz_action_down ) 
-                    free( p_current->psz_action_down );
+                free( p_current->psz_action_down );
                 p_current->psz_action_down = strdup( &action[0] );
 
                 /* Parse range contstruction :

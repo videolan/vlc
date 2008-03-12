@@ -318,7 +318,7 @@ static int Create( vlc_object_t *p_this )
     psz_fontfile = val.psz_string;
     if( !psz_fontfile || !*psz_fontfile )
     {
-        if( psz_fontfile ) free( psz_fontfile );
+        free( psz_fontfile );
         psz_fontfile = (char *)malloc( PATH_MAX + 1 );
         if( !psz_fontfile )
         {
@@ -425,7 +425,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_default_font_size = val.i_int;
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
-    if( psz_fontfile ) free( psz_fontfile );
+    free( psz_fontfile );
 
     p_sys->pp_font_attachments = NULL;
     p_sys->i_font_attachments = 0;
@@ -444,7 +444,7 @@ static int Create( vlc_object_t *p_this )
  error:
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
-    if( psz_fontfile ) free( psz_fontfile );
+    free( psz_fontfile );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -1358,12 +1358,12 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     else
         RenderYUVA( p_filter, p_region_out, p_lines, result.x, result.y );
 
-    if( psz_unicode_orig ) free( psz_unicode_orig );
+    free( psz_unicode_orig );
     FreeLines( p_lines );
     return VLC_SUCCESS;
 
  error:
-    if( psz_unicode_orig ) free( psz_unicode_orig );
+    free( psz_unicode_orig );
     FreeLines( p_lines );
     return VLC_EGENERIC;
 }
@@ -1393,8 +1393,7 @@ static void DeleteStyle( ft_style_t *p_style )
 {
     if( p_style )
     {
-        if( p_style->psz_fontname )
-            free( p_style->psz_fontname );
+        free( p_style->psz_fontname );
         free( p_style );
     }
 }
@@ -1793,7 +1792,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
         {
             if( !strcasecmp( "face", psz_name ) )
             {
-                if( psz_fontname ) free( psz_fontname );
+                free( psz_fontname );
                 psz_fontname = strdup( psz_value );
             }
             else if( !strcasecmp( "size", psz_name ) )
@@ -1968,8 +1967,8 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                     (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
             }
         }
-        if( psz_name )  free( psz_name );
-        if( psz_value ) free( psz_value );
+        free( psz_name );
+        free( psz_value );
     }
 }
 
@@ -2291,12 +2290,12 @@ static int ProcessLines( filter_t *p_filter,
             ! p_levels )
         {
             msg_Err( p_filter, "out of memory" );
-            if( p_levels )           free( p_levels );
-            if( p_old_positions )    free( p_old_positions );
-            if( p_new_positions )    free( p_new_positions );
-            if( p_fribidi_string )   free( p_fribidi_string );
-            if( pp_char_styles_new ) free( pp_char_styles_new );
-            if( pi_karaoke_bar )     free( pi_karaoke_bar );
+            free( p_levels );
+            free( p_old_positions );
+            free( p_new_positions );
+            free( p_fribidi_string );
+            free( pp_char_styles_new );
+            free( pi_karaoke_bar );
 
             free( pp_char_styles );
             return VLC_ENOMEM;
@@ -2404,8 +2403,8 @@ static int ProcessLines( filter_t *p_filter,
              i_start_pos += pi_k_run_lengths[ k ];
         }
     }
-    if( p_levels )         free( p_levels );
-    if( p_new_positions )  free( p_new_positions );
+    free( p_levels );
+    free( p_new_positions );
 
     FT_Vector tmp_result;
 
@@ -2474,8 +2473,7 @@ static int ProcessLines( filter_t *p_filter,
 #if defined(HAVE_FRIBIDI)
                         free( psz_text );
 #endif
-                        if( pi_karaoke_bar )
-                            free( pi_karaoke_bar );
+                        free( pi_karaoke_bar );
                         return VLC_EGENERIC;
                     }
                     free( psz_fontfile );
@@ -2501,8 +2499,7 @@ static int ProcessLines( filter_t *p_filter,
 #if defined(HAVE_FRIBIDI)
                 free( psz_text );
 #endif
-                if( pi_karaoke_bar )
-                    free( pi_karaoke_bar );
+                free( pi_karaoke_bar );
                 return VLC_EGENERIC;
             }
             p_sys->i_use_kerning =
@@ -2520,8 +2517,7 @@ static int ProcessLines( filter_t *p_filter,
 #if defined(HAVE_FRIBIDI)
                 free( psz_text );
 #endif
-                if( pi_karaoke_bar )
-                    free( pi_karaoke_bar );
+                free( pi_karaoke_bar );
                 return VLC_ENOMEM;
             }
             memcpy( psz_unicode, psz_text + i_prev,
@@ -2540,8 +2536,7 @@ static int ProcessLines( filter_t *p_filter,
 #if defined(HAVE_FRIBIDI)
                         free( psz_text );
 #endif
-                        if( pi_karaoke_bar )
-                            free( pi_karaoke_bar );
+                        free( pi_karaoke_bar );
                         return VLC_ENOMEM;
                     }
                     /* New Color mode only works in YUVA rendering mode --
@@ -2575,8 +2570,7 @@ static int ProcessLines( filter_t *p_filter,
 #if defined(HAVE_FRIBIDI)
                     free( psz_text );
 #endif
-                    if( pi_karaoke_bar )
-                        free( pi_karaoke_bar );
+                    free( pi_karaoke_bar );
                     return VLC_EGENERIC;
                 }
 
@@ -2903,14 +2897,13 @@ static line_desc_t *NewLine( int i_count )
         ( p_line->pi_underline_offset == NULL ) ||
         ( p_line->pi_underline_thickness == NULL ) )
     {
-        if( p_line->pi_underline_thickness )
-            free( p_line->pi_underline_thickness );
-        if( p_line->pi_underline_offset ) free( p_line->pi_underline_offset );
-        if( p_line->p_fg_rgb ) free( p_line->p_fg_rgb );
-        if( p_line->p_bg_rgb ) free( p_line->p_bg_rgb );
-        if( p_line->p_fg_bg_ratio ) free( p_line->p_fg_bg_ratio );
-        if( p_line->p_glyph_pos ) free( p_line->p_glyph_pos );
-        if( p_line->pp_glyphs ) free( p_line->pp_glyphs );
+        free( p_line->pi_underline_thickness );
+        free( p_line->pi_underline_offset );
+        free( p_line->p_fg_rgb );
+        free( p_line->p_bg_rgb );
+        free( p_line->p_fg_bg_ratio );
+        free( p_line->p_glyph_pos );
+        free( p_line->pp_glyphs );
         free( p_line );
         return NULL;
     }

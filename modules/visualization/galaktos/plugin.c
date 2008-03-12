@@ -123,7 +123,7 @@ static int Open( vlc_object_t *p_this )
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         msg_Err( p_filter, "cannot lauch galaktos thread" );
-        if( p_thread->psz_title ) free( p_thread->psz_title );
+        free( p_thread->psz_title );
         vlc_object_detach( p_thread );
         vlc_object_release( p_thread );
         free( p_sys );
@@ -247,11 +247,8 @@ static void Thread( vlc_object_t *p_this )
         {
             vlc_object_kill( p_thread );
         }
-        if( p_thread->psz_title )
-        {
-            free( p_thread->psz_title );
-            p_thread->psz_title = NULL;
-        }
+        free( p_thread->psz_title );
+        p_thread->psz_title = NULL;
 
         if (++count%100==0)
         {

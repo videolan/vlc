@@ -257,7 +257,7 @@ static int Open( vlc_object_t *p_this )
 
     psz_url = config_GetPsz( p_vod, "rtsp-host" );
     vlc_UrlParse( &url, psz_url, 0 );
-    if( psz_url ) free( psz_url );
+    free( psz_url );
 
     if( url.i_port <= 0 ) url.i_port = 554;
 
@@ -310,9 +310,12 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys && p_sys->p_rtsp_host ) httpd_HostDelete( p_sys->p_rtsp_host );
-    if( p_sys && p_sys->psz_raw_mux ) free( p_sys->psz_raw_mux );
-    if( p_sys ) free( p_sys );
+    if( p_sys )
+    {
+        if( p_sys->p_rtsp_host ) httpd_HostDelete( p_sys->p_rtsp_host );
+        free( p_sys->psz_raw_mux );
+        free( p_sys );
+    }
     vlc_UrlClean( &url );
 
     return VLC_EGENERIC;
@@ -459,9 +462,9 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     TAB_CLEAN( p_media->i_rtsp, p_media->rtsp );
 
     httpd_UrlDelete( p_media->p_rtsp_url );
-    if( p_media->psz_rtsp_path ) free( p_media->psz_rtsp_path );
-    if( p_media->psz_rtsp_control_v6 ) free( p_media->psz_rtsp_control_v6 );
-    if( p_media->psz_rtsp_control_v4 ) free( p_media->psz_rtsp_control_v4 );
+    free( p_media->psz_rtsp_path );
+    free( p_media->psz_rtsp_control_v6 );
+    free( p_media->psz_rtsp_control_v4 );
 
     while( p_media->i_es )
         MediaDelES( p_vod, p_media, &p_media->es[0]->fmt );
@@ -469,12 +472,11 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 
     vlc_mutex_destroy( &p_media->lock );
 
-    if( p_media->psz_session_name ) free( p_media->psz_session_name );
-    if( p_media->psz_session_description )
-        free( p_media->psz_session_description );
-    if( p_media->psz_session_url ) free( p_media->psz_session_url );
-    if( p_media->psz_session_email ) free( p_media->psz_session_email );
-    if( p_media->psz_mux ) free( p_media->psz_mux );
+    free( p_media->psz_session_name );
+    free( p_media->psz_session_description );
+    free( p_media->psz_session_url );
+    free( p_media->psz_session_email );
+    free( p_media->psz_mux );
     free( p_media );
 }
 
@@ -486,7 +488,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     if( !p_es ) return VLC_ENOMEM;
     memset( p_es, 0, sizeof(media_es_t) );
 
-    if( p_media->psz_mux ) free( p_media->psz_mux );
+    free( p_media->psz_mux );
     p_media->psz_mux = NULL;
 
     /* TODO: update SDP, etc... */
@@ -587,10 +589,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                                   "sprop-parameter-sets=%s,%s;", hexa, p_64_sps,
                                   p_64_pps ) < 0 )
                         return VLC_ENOMEM;
-                if( p_64_sps )
-                    free( p_64_sps );
-                if( p_64_pps )
-                    free( p_64_pps );
+                free( p_64_sps );
+                free( p_64_pps );
             }
             if( !p_es->psz_fmtp )
                 p_es->psz_fmtp = strdup( "packetization-mode=1" );
@@ -740,8 +740,8 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
     TAB_REMOVE( p_media->i_es, p_media->es, p_es );
     vlc_mutex_unlock( &p_media->lock );
 
-    if( p_es->psz_rtpmap ) free( p_es->psz_rtpmap );
-    if( p_es->psz_fmtp ) free( p_es->psz_fmtp );
+    free( p_es->psz_rtpmap );
+    free( p_es->psz_fmtp );
     p_media->i_sdp_version++;
 
     if( p_es->p_rtsp_url ) httpd_UrlDelete( p_es->p_rtsp_url );
@@ -850,10 +850,8 @@ static void CommandThread( vlc_object_t *p_this )
 
     next:
         vlc_mutex_unlock( &p_sys->lock_media );
-        if( cmd.psz_session )
-            free( cmd.psz_session );
-        if( cmd.psz_arg )
-            free( cmd.psz_arg );
+        free( cmd.psz_session );
+        free( cmd.psz_arg );
     }
 }
 
@@ -899,8 +897,7 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 
     while( p_rtsp->i_es-- )
     {
-        if( p_rtsp->es[p_rtsp->i_es]->psz_ip )
-            free( p_rtsp->es[p_rtsp->i_es]->psz_ip );
+        free( p_rtsp->es[p_rtsp->i_es]->psz_ip );
         free( p_rtsp->es[p_rtsp->i_es] );
         if( !p_rtsp->i_es ) free( p_rtsp->es );
     }
@@ -958,7 +955,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( strstr( psz_transport, "MP2T/H2221/UDP" ) ||
                     strstr( psz_transport, "RAW/RAW/UDP" ) )
                 {
-                    if( p_media->psz_mux ) free( p_media->psz_mux );
+                    free( p_media->psz_mux );
                     p_media->psz_mux = NULL;
                     p_media->psz_mux = strdup( p_vod->p_sys->psz_raw_mux );
                     p_media->b_raw = VLC_TRUE;
@@ -1454,7 +1451,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 if( p_rtsp->es[i]->p_media_es == p_es )
                 {
-                    if( p_rtsp->es[i]->psz_ip ) free( p_rtsp->es[i]->psz_ip );
+                    free( p_rtsp->es[i]->psz_ip );
                     TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, p_rtsp->es[i] );
                     break;
                 }

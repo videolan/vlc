@@ -310,15 +310,11 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     fft_close( p_state );
 
-    if( p_s16_buff != NULL )
-    {
-        free( p_s16_buff );
-        p_s16_buff = NULL;
-    }
+    free( p_s16_buff );
+    p_s16_buff = NULL;
 
-    if(height) free(height);
-
-    if(psz_parse) free(psz_parse);
+    free( height );
+    free( psz_parse );
 
     return 0;
 }
@@ -768,15 +764,11 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     fft_close( p_state );
 
-    if( p_s16_buff != NULL )
-    {
-        free( p_s16_buff );
-        p_s16_buff = NULL;
-    }
+    free( p_s16_buff );
+    p_s16_buff = NULL;
 
-    if(height) free(height);
-
-    if(psz_parse) free(psz_parse);
+    free( height );
+    free( psz_parse );
 
     return 0;
 }

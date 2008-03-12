@@ -198,7 +198,7 @@ static int Open( vlc_object_t *p_this )
         vout_Destroy( p_thread->p_vout );
         vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
-        if( p_thread->psz_title ) free( p_thread->psz_title );
+        free( p_thread->psz_title );
         vlc_object_detach( p_thread );
         vlc_object_release( p_thread );
         free( p_sys );
@@ -354,11 +354,8 @@ static void Thread( vlc_object_t *p_this )
         plane = goom_update( p_plugin_info, p_data, 0, 0.0,
                              p_thread->psz_title, NULL );
 
-        if( p_thread->psz_title )
-        {
-            free( p_thread->psz_title );
-            p_thread->psz_title = NULL;
-        }
+        free( p_thread->psz_title );
+        p_thread->psz_title = NULL;
 
         while( !( p_pic = vout_CreatePicture( p_thread->p_vout, 0, 0, 0 ) ) &&
                !p_thread->b_die )
