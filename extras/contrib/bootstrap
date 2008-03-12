@@ -291,3 +291,17 @@ elif svn help >/dev/null 2>&1; then
 else
     echo "You do not have a subversion client installed." >&2
 fi
+
+if test -f /sw/bin/git; then
+    echo "GIT = /sw/bin/git" >> config.mak
+elif test -f /usr/local/bin/git; then
+    echo "GIT = /usr/local/bin/git" >> config.mak
+elif test -f /usr/bin/git; then
+    echo "GIT = /usr/bin/git" >> config.mak
+elif test -f /opt/local/bin/git; then
+    echo "GIT = /opt/local/bin/git" >> config.mak
+elif git help >/dev/null 2>&1; then
+    echo "GIT = `which git`" >> config.mak
+else
+    echo "You do not have a Git client installed." >&2
+fi
