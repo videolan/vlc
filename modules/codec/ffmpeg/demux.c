@@ -91,7 +91,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     demux_sys_t   *p_sys;
     AVProbeData   pd;
     AVInputFormat *fmt;
-    int i;
+    unsigned int i;
     vlc_bool_t b_avfmt_nofile;
 
     /* Init Probe data */
