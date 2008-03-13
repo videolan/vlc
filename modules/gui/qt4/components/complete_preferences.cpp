@@ -62,7 +62,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setTextElideMode( Qt::ElideNone );
-    setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOn );
 
     /* Nice icons */
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
