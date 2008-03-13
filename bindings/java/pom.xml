@@ -18,4 +18,20 @@
       </plugin>
     </plugins>
   </build> 
-</project>
+  <dependencies>
+    <dependency>
+      <groupId>com.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <id>jvlc</id>
+      <name>JVLC Maven Repository</name>
+      <url>http://jvlc.ihack.it/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories></project>
