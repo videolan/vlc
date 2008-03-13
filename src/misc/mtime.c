@@ -228,8 +228,8 @@ mtime_t mdate( void )
         HINSTANCE h_Kernel32 = LoadLibraryA("kernel32.dll");
         if(h_Kernel32)
         {
-            void WINAPI (*pf_GetSystemInfo)(LPSYSTEM_INFO*);
-            pf_GetSystemInfo = (void WINAPI (*)(LPSYSTEM_INFO*))
+            void WINAPI (*pf_GetSystemInfo)(LPSYSTEM_INFO);
+            pf_GetSystemInfo = (void WINAPI (*)(LPSYSTEM_INFO))
                                 GetProcAddress(h_Kernel32, "GetSystemInfo");
             if(pf_GetSystemInfo)
             {
