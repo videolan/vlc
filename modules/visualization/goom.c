@@ -216,6 +216,8 @@ static int Open( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    VLC_UNUSED( p_aout );
+
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     block_t *p_block;
 
