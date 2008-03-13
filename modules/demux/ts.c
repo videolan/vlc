@@ -3042,7 +3042,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
 
         if( p_es->i_type == 0x10 || p_es->i_type == 0x11 ||
-            p_es->i_type == 0x12 )
+            p_es->i_type == 0x12 || p_es->i_type == 0x0f )
         {
             /* MPEG-4 stream: search SL_DESCRIPTOR */
             dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;;
