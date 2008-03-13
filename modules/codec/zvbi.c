@@ -136,7 +136,7 @@ struct decoder_sys_t
     int                     i_align;
 
     /* Misc */
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
     image_handler_t         *p_image;
 #endif
 };
@@ -181,7 +181,7 @@ static int Open( vlc_object_t *p_this )
     }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
     p_sys->p_image = image_HandlerCreate( VLC_OBJECT(p_dec) );
     if( !p_sys->p_image )
     {
@@ -225,7 +225,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->b_text )
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('T','E','X','T');
     else
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('Y','U','V','A');
 #else
         p_dec->fmt_out.video.i_chroma = VLC_FOURCC('R','G','B','A');
@@ -246,7 +246,7 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
 
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
     if( p_sys->p_image ) image_HandlerDelete( p_sys->p_image );
 #endif
     if( p_sys->p_vbi_dec ) vbi_decoder_delete( p_sys->p_vbi_dec );
@@ -323,7 +323,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') :
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
                                    VLC_FOURCC('Y','U','V','A');
 #else
                                    VLC_FOURCC('R','G','B','A');
@@ -383,7 +383,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H)
+#if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
         video_format_t fmt_in;
         picture_t *p_pic, *p_dest;
 
