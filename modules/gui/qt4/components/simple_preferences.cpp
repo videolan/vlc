@@ -425,7 +425,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             char *psz_intf = config_GetPsz( p_intf, "intf" );
             if( psz_intf )
             {
-                msg_Dbg( p_intf, "Interface in config file: %s", psz_intf );
                 if( strstr( psz_intf, "skin" ) )
                     ui.skins->setChecked( true );
                 else if( strstr( psz_intf, "qt" ) )
@@ -533,8 +532,6 @@ void SPrefsPanel::updateAudioVolume( int volume )
 /* Function called from the main Preferences dialog on each SPrefs Panel */
 void SPrefsPanel::apply()
 {
-    msg_Dbg( p_intf, "Trying to save the %i simple panel", number );
-
     /* Generic save for ever panel */
     QList<ConfigControl *>::Iterator i;
     for( i = controls.begin() ; i != controls.end() ; i++ )
@@ -582,7 +579,6 @@ void SPrefsPanel::apply()
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
-            msg_Dbg( p_intf, "Adjusting all cache values at: %i", i_comboValue );
             CaC( "udp-caching" );
             if (module_Exists (p_intf, "dvdread" ))
                 CaC( "dvdread-caching" );

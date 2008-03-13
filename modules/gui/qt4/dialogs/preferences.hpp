@@ -61,6 +61,8 @@ private:
     PrefsDialog( QWidget *, intf_thread_t * );
     QGridLayout *main_layout;
 
+    void destroyPanels();
+
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
 

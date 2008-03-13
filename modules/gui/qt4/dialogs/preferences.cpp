@@ -82,7 +82,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     buttonsBox->addButton( save, QDialogButtonBox::AcceptRole );
     buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
-    buttonsBox->addButton( reset, QDialogButtonBox::ActionRole );
+    buttonsBox->addButton( reset, QDialogButtonBox::ResetRole );
 
     /* Layout  */
     main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
@@ -283,6 +283,14 @@ void PrefsDialog::save()
     /* Save to file */
     config_SaveConfigFile( p_intf, NULL );
 
+    destroyPanels();
+
+    hide();
+}
+
+void PrefsDialog::destroyPanels()
+{
+    msg_Dbg( p_intf, "Destroying the Panels" );
     /* Delete the other panel in order to force its reload after clicking
        on apply. In fact, if we don't do that, the preferences from the other
        panels won't be accurate, so we would have to recreate the whole dialog,
@@ -307,9 +315,8 @@ void PrefsDialog::save()
         }
         current_simple_panel  = NULL;
     }
-
-    hide();
 }
+
 
 /* Clean the preferences, dunno if it does something really */
 void PrefsDialog::cancel()
@@ -342,5 +349,7 @@ void PrefsDialog::reset()
     {
         config_ResetAll( p_intf );
         config_SaveConfigFile( p_intf, NULL );
+        /* FIXME reset the panels */
+        destroyPanels();
     }
 }
