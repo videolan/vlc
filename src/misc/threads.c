@@ -378,9 +378,13 @@ int __vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 {
 #if defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     DeleteCriticalSection( &p_mutex->csection );
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     if( p_mutex->mutex )
         CloseHandle( p_mutex->mutex );
     else
@@ -499,9 +503,13 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
 void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
 {
 #if defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     CloseHandle( p_condvar->event );
 
 #elif defined( WIN32 )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     if( !p_condvar->semaphore )
         CloseHandle( p_condvar->event );
     else
@@ -684,6 +692,8 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 {
     vlc_object_internals_t *p_priv = p_this->p_internals;
 #if defined( WIN32 ) || defined( UNDER_CE )
+    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
+
     if( !p_priv->thread_id.hThread )
         p_priv->thread_id.hThread = GetCurrentThread();
     if( !SetThreadPriority(p_priv->thread_id.hThread, i_priority) )
