@@ -87,12 +87,14 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     /* Layout  */
     main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
     main_layout->addWidget( types, 3, 0, 2, 1 );
-    main_layout->addWidget( main_panel, 0, 1, 4, 1 );
-    main_layout->addWidget( buttonsBox, 4, 1, 1 ,2 );
+    main_layout->addWidget( main_panel, 0, 1, 4, 2 );
+    main_layout->addWidget( buttonsBox, 4, 2, 1 ,1 );
 
     main_layout->setColumnMinimumWidth( 0, 150 );
+    main_layout->setColumnMinimumWidth( 1, 10 );
     main_layout->setColumnStretch( 0, 1 );
-    main_layout->setColumnStretch( 1, 3 );
+    main_layout->setColumnStretch( 1, 0 );
+    main_layout->setColumnStretch( 2, 3 );
 
     main_layout->setRowStretch( 2, 4 );
 
