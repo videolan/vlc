@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +33,7 @@
 static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
                                    playlist_item_t **pp_items, int i_mode,
                                    int i_type );
+static int playlist_cmp(const void *, const void *);
 
 /**
  * Sort a node.
@@ -78,15 +80,19 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
     return VLC_SUCCESS;
 }
 
+static int sort_mode = 0;
+static int sort_type = 0;
 
 static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
                                    playlist_item_t **pp_items, int i_mode,
                                    int i_type )
 {
-    int i , i_small , i_position;
+    int i_position;
     playlist_item_t *p_temp;
     vlc_value_t val;
     val.b_bool = VLC_TRUE;
+    sort_mode = i_mode;
+    sort_type = i_type;
 
     (void)p_playlist; // a bit surprising we don't need p_playlist!
 
@@ -107,10 +113,16 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 
         return VLC_SUCCESS;
     }
+    qsort(pp_items,i_items,sizeof(pp_items[0]),playlist_cmp);
+    return VLC_SUCCESS;
+}
 
-#define META_STRCASECMP_NAME( i, i_small ) { \
-    char *psz_i = input_item_GetName( pp_items[i]->p_input ); \
-    char *psz_ismall = input_item_GetName( pp_items[i_small]->p_input ); \
+static int playlist_cmp(const void *first, const void *second)
+{
+
+#define META_STRCASECMP_NAME( ) { \
+    char *psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input ); \
+    char *psz_ismall = input_item_GetName( (*(playlist_item_t **)second)->p_input ); \
     i_test = strcasecmp( psz_i, psz_ismall ); \
     free( psz_i ); \
     free( psz_ismall ); \
@@ -118,19 +130,19 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 
 
 #define DO_META_SORT_ADV( node, integer ) { \
-    char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
-    char *psz_b = input_item_GetMeta( pp_items[i_small]->p_input, vlc_meta_##node ); \
+    char *psz_a = input_item_GetMeta( (*(playlist_item_t **)first)->p_input, vlc_meta_##node ); \
+    char *psz_b = input_item_GetMeta( (*(playlist_item_t **)second)->p_input, vlc_meta_##node ); \
     /* Nodes go first */ \
-    if( pp_items[i]->i_children == -1 && pp_items[i_small]->i_children >= 0 ) \
+    if( (*(playlist_item_t **)first)->i_children == -1 && (*(playlist_item_t **)second)->i_children >= 0 ) \
         i_test = 1;\
-    else if( pp_items[i]->i_children >= 0 &&\
-             pp_items[i_small]->i_children == -1 ) \
+    else if( (*(playlist_item_t **)first)->i_children >= 0 &&\
+             (*(playlist_item_t **)second)->i_children == -1 ) \
        i_test = -1; \
     /* Both are nodes, sort by name */ \
-    else if( pp_items[i]->i_children >= 0 && \
-               pp_items[i_small]->i_children >= 0 ) \
+    else if( (*(playlist_item_t **)first)->i_children >= 0 && \
+               (*(playlist_item_t **)second)->i_children >= 0 ) \
     { \
-        META_STRCASECMP_NAME( i, i_small ) \
+        META_STRCASECMP_NAME( ) \
     } \
     /* Both are items */ \
     else if( psz_a == NULL && psz_b != NULL ) \
@@ -140,7 +152,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     /* No meta, sort by name */ \
     else if( psz_a == NULL && psz_b == NULL ) \
     { \
-        META_STRCASECMP_NAME( i, i_small ); \
+        META_STRCASECMP_NAME( ); \
     } \
     else \
     { \
@@ -152,91 +164,78 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 }
 #define DO_META_SORT( node ) DO_META_SORT_ADV( node, VLC_FALSE )
 
-    for( i_position = 0; i_position < i_items -1 ; i_position ++ )
-    {
-        i_small  = i_position;
-        for( i = i_position + 1 ; i< i_items ; i++)
+    int i_test = 0;
+
+    if( sort_mode == SORT_TITLE )
         {
-            int i_test = 0;
-
-            if( i_mode == SORT_TITLE )
-            {
-                META_STRCASECMP_NAME( i, i_small );
-            }
-            else if( i_mode == SORT_TITLE_NUMERIC )
-            {
-                char *psz_i = input_item_GetName( pp_items[i]->p_input );
-                char *psz_ismall =
-                        input_item_GetName( pp_items[i_small]->p_input );
-                i_test = atoi( psz_i ) - atoi( psz_ismall );
-                free( psz_i );
-                free( psz_ismall );
-            }
-            else if( i_mode == SORT_DURATION )
-            {
-                i_test = input_item_GetDuration( pp_items[i]->p_input ) -
-                         input_item_GetDuration( pp_items[i_small]->p_input );
-            }
-            else if( i_mode == SORT_ARTIST )
-            {
-                DO_META_SORT( Artist );
-            }
-            else if( i_mode == SORT_GENRE )
-            {
-                DO_META_SORT( Genre );
-            }
-            else if( i_mode == SORT_ALBUM )
-            {
-                DO_META_SORT( Album );
-                /* Sort by tracknumber if albums are the same */
-                if( i_test == 0 )
-                    DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
-            }
-            else if( i_mode == SORT_TRACK_NUMBER )
-            {
-                DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
-            }
-            else if( i_mode == SORT_DESCRIPTION )
-            {
-                DO_META_SORT( Description );
-            }
-            else if( i_mode == SORT_ID )
-            {
-                i_test = pp_items[i]->i_id - pp_items[i_small]->i_id;
-            }
-            else if( i_mode == SORT_TITLE_NODES_FIRST )
-            {
-                /* Alphabetic sort, all nodes first */
-
-                if( pp_items[i]->i_children == -1 &&
-                    pp_items[i_small]->i_children >= 0 )
-                {
-                    i_test = 1;
-                }
-                else if( pp_items[i]->i_children >= 0 &&
-                         pp_items[i_small]->i_children == -1 )
-                {
-                    i_test = -1;
-                }
-                else
-                {
-                    i_test = strcasecmp( pp_items[i]->p_input->psz_name,
-                                         pp_items[i_small]->p_input->psz_name );
-                }
-            }
-
-            if( ( i_type == ORDER_NORMAL  && i_test < 0 ) ||
-                ( i_type == ORDER_REVERSE && i_test > 0 ) )
-            {
-                i_small = i;
-            }
+            META_STRCASECMP_NAME( );
         }
-        p_temp = pp_items[i_position];
-        pp_items[i_position] = pp_items[i_small];
-        pp_items[i_small] = p_temp;
+    else if( sort_mode == SORT_TITLE_NUMERIC )
+    {
+        char *psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input );
+        char *psz_ismall =
+                input_item_GetName( (*(playlist_item_t **)second)->p_input );
+        i_test = atoi( psz_i ) - atoi( psz_ismall );
+        free( psz_i );
+        free( psz_ismall );
     }
+    else if( sort_mode == SORT_DURATION )
+    {
+        i_test = input_item_GetDuration( (*(playlist_item_t **)first)->p_input ) -
+                 input_item_GetDuration( (*(playlist_item_t **)second)->p_input );
+    }
+    else if( sort_mode == SORT_ARTIST )
+    {
+        DO_META_SORT( Artist );
+    }
+    else if( sort_mode == SORT_GENRE )
+    {
+        DO_META_SORT( Genre );
+    }
+    else if( sort_mode == SORT_ALBUM )
+    {
+        DO_META_SORT( Album );
+        /* Sort by tracknumber if albums are the same */
+        if( i_test == 0 )
+            DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
+    }
+    else if( sort_mode == SORT_TRACK_NUMBER )
+    {
+        DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
+    }
+    else if( sort_mode == SORT_DESCRIPTION )
+    {
+        DO_META_SORT( Description );
+    }
+    else if( sort_mode == SORT_ID )
+    {
+        i_test = (*(playlist_item_t **)first)->i_id - (*(playlist_item_t **)second)->i_id;
+    }
+    else if( sort_mode == SORT_TITLE_NODES_FIRST )
+    {
+        /* Alphabetic sort, all nodes first */
+
+        if( (*(playlist_item_t **)first)->i_children == -1 &&
+            (*(playlist_item_t **)second)->i_children >= 0 )
+        {
+            i_test = 1;
+        }
+        else if( (*(playlist_item_t **)first)->i_children >= 0 &&
+                 (*(playlist_item_t **)second)->i_children == -1 )
+        {
+            i_test = -1;
+        }
+        else
+        {
+            i_test = strcasecmp( (*(playlist_item_t **)first)->p_input->psz_name,
+                                 (*(playlist_item_t **)second)->p_input->psz_name );
+        }
+    }
+
+    if ( sort_type == ORDER_REVERSE ) 
+        i_test = i_test * -1;
 #undef DO_META_SORT
 #undef DO_META_SORT_ADV
 
-    return VLC_SUCCESS;
+    return i_test;
 }
