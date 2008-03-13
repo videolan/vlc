@@ -331,11 +331,11 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
                          unsigned int * pi_frame_length,
                          unsigned int * pi_header_size )
 {
-    int i_id, i_profile, i_sample_rate_idx, i_frame_size;
+    int i_profile, i_sample_rate_idx, i_frame_size;
     vlc_bool_t b_crc;
 
     /* Fixed header between frames */
-    i_id = ( (p_buf[1] >> 3) & 0x01) ? 2 : 4; /* MPEG-2 or 4 */
+    //int i_id = ( (p_buf[1] >> 3) & 0x01) ? 2 : 4; /* MPEG-2 or 4 */
     b_crc = !(p_buf[1] & 0x01);
     i_profile = p_buf[2] >> 6;
     i_sample_rate_idx = (p_buf[2] >> 2) & 0x0f;
