@@ -776,9 +776,9 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
             FALSE,
             DUPLICATE_SAME_ACCESS) )
     {
-        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%i)",
+        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%u)",
                          (unsigned int)p_priv->thread_id.id,
-             psz_file, i_line, GetLastError() );
+             psz_file, i_line, (unsigned int)GetLastError() );
         p_priv->b_thread = VLC_FALSE;
         return;
     }
