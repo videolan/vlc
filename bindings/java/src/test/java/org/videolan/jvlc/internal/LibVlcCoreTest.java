@@ -45,4 +45,12 @@ public class LibVlcCoreTest
         Assert.assertEquals(0, exception.raised);
     }
     
+    @Test
+    public void testRelease() throws Exception
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcInstance libvlcInstance = instance.libvlc_new(0, new String[] {}, exception);
+        instance.libvlc_release(libvlcInstance);
+    }
+    
 }
