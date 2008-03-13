@@ -226,8 +226,7 @@ void E_( MMSHClose )( access_t *p_access )
 
     Stop( p_access );
 
-    if( p_sys->p_header )
-        free( p_sys->p_header  );
+    free( p_sys->p_header  );
 
     vlc_UrlClean( &p_sys->proxy );
     vlc_UrlClean( &p_sys->url );
@@ -732,8 +731,7 @@ static void GetHeader( access_t *p_access )
 
     /* Read the asf header */
     p_sys->i_header = 0;
-    if( p_sys->p_header )
-        free( p_sys->p_header  );
+    free( p_sys->p_header  );
     p_sys->p_header = NULL;
     for( ;; )
     {

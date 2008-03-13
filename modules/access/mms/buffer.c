@@ -54,10 +54,7 @@ int var_buffer_reinitwrite( var_buffer_t *p_buf, int i_default_size )
     if( p_buf->i_size < i_default_size )
     {
         p_buf->i_size = i_default_size;
-        if( p_buf->p_data )
-        {
-            free( p_buf->p_data );
-        }
+        free( p_buf->p_data );
         p_buf->p_data = malloc( p_buf->i_size );
     }
     if( !p_buf->p_data )
@@ -151,10 +148,7 @@ void var_buffer_addUTF16( var_buffer_t *p_buf, const char *p_str )
 
 void var_buffer_free( var_buffer_t *p_buf )
 {
-    if( p_buf->p_data )
-    {
-        free( p_buf->p_data );
-    }
+    free( p_buf->p_data );
     p_buf->i_data = 0;
     p_buf->i_size = 0;
 }

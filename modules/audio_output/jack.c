@@ -214,10 +214,7 @@ static int Open( vlc_object_t *p_this )
                          psz_out, psz_in );
             }
         }
-        if( pp_in_ports )
-        {
-            free( pp_in_ports );
-        }
+        free( pp_in_ports );
     }
 
     msg_Dbg( p_aout, "JACK audio output initialized (%d channels, buffer "
@@ -233,14 +230,8 @@ error_out:
             jack_deactivate( p_sys->p_jack_client );
             jack_client_close( p_sys->p_jack_client );
         }
-        if( p_sys->p_jack_ports )
-        {
-            free( p_sys->p_jack_ports );
-        }
-        if( p_sys->p_jack_buffers )
-        {
-            free( p_sys->p_jack_buffers );
-        }
+        free( p_sys->p_jack_ports );
+        free( p_sys->p_jack_buffers );
         free( p_sys );
     }
     return status;

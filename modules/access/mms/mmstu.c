@@ -1099,10 +1099,7 @@ static int  mms_ParseCommand( access_t *p_access,
     int         i_length;
     uint32_t    i_id;
 
-    if( p_sys->p_cmd )
-    {
-        free( p_sys->p_cmd );
-    }
+    free( p_sys->p_cmd );
     p_sys->i_cmd = i_data;
     p_sys->p_cmd = malloc( i_data );
     memcpy( p_sys->p_cmd, p_data, i_data );

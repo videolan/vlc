@@ -225,7 +225,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
     msg_Dbg( p_dec, "file %s loaded successfully", psz_file );
 
-    if ( psz_file ) free( psz_file );
+    free( psz_file );
 
     if ( b_keep_ar )
     {
@@ -304,7 +304,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_handler = image_HandlerCreate( p_dec );
         p_image = image_Filter( p_handler, p_old, &fmt_out, val.psz_string );
         image_HandlerDelete( p_handler );
-        if ( val.psz_string != NULL ) free( val.psz_string );
+        free( val.psz_string );
 
         if ( p_image == NULL )
         {

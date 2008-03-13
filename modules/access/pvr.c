@@ -826,8 +826,7 @@ static int Open( vlc_object_t * p_this )
 
     if( psz_device )
     {
-        if( p_sys->psz_videodev )
-            free( p_sys->psz_videodev );
+        free( p_sys->psz_videodev );
         p_sys->psz_videodev = psz_device;
     }
 
@@ -1061,10 +1060,8 @@ static void Close( vlc_object_t * p_this )
         close( p_sys->i_fd );
     if ( p_sys->i_radio_fd != -1 )
         close( p_sys->i_radio_fd );
-    if ( p_sys->psz_videodev )
-        free( p_sys->psz_videodev );
-    if ( p_sys->psz_radiodev )
-        free( p_sys->psz_radiodev );
+    free( p_sys->psz_videodev );
+    free( p_sys->psz_radiodev );
     free( p_sys );
 }
 

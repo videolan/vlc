@@ -421,14 +421,14 @@ xtag_free (XTag * xtag)
 
   if (xtag == NULL) return NULL;
 
-  if (xtag->name) free (xtag->name);
-  if (xtag->pcdata) free (xtag->pcdata);
+  free( xtag->name );
+  free( xtag->pcdata );
 
   for (l = xtag->attributes; l; l = l->next) {
     if ((attr = (XAttribute *)l->data) != NULL) {
-      if (attr->name) free (attr->name);
-      if (attr->value) free (attr->value);
-      free (attr);
+      free( attr->name );
+      free( attr->value );
+      free( attr );
     }
   }
   xlist_free (xtag->attributes);

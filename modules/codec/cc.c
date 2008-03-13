@@ -334,8 +334,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     {
         msg_Warn( p_dec, "can't get spu buffer" );
         free( psz_subtitle );
-        if( psz_html )
-            free( psz_html );
+        free( psz_html );
         return NULL;
     }
 
@@ -352,8 +351,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
         free( psz_subtitle );
-        if( psz_html )
-            free( psz_html );
+        free( psz_html );
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
         return NULL;
     }
