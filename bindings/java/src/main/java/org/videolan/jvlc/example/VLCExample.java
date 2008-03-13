@@ -1,3 +1,5 @@
+package org.videolan.jvlc.example;
+
 import org.videolan.jvlc.Audio;
 import org.videolan.jvlc.JVLC;
 import org.videolan.jvlc.MediaDescriptor;
