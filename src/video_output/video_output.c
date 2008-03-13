@@ -177,12 +177,12 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             var_Get( p_vout, "vout-filter", &val );
             psz_filter_chain = val.psz_string;
 
-            if( !*psz_filter_chain )
+            if( psz_filter_chain && !*psz_filter_chain )
             {
                 free( psz_filter_chain );
                 psz_filter_chain = NULL;
             }
-            if( !*p_vout->psz_filter_chain )
+            if( p_vout->psz_filter_chain && !*p_vout->psz_filter_chain )
             {
                 free( p_vout->psz_filter_chain );
                 p_vout->psz_filter_chain = NULL;

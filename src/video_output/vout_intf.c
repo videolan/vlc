@@ -481,7 +481,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
     var_Get( p_vout, "snapshot-path", &val );
-    if( !*val.psz_string )
+    if( val.psz_string && !*val.psz_string )
     {
         free( val.psz_string );
         val.psz_string = 0;
