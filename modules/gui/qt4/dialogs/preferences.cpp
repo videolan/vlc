@@ -98,11 +98,12 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     main_layout->setRowStretch( 2, 4 );
 
+    main_layout->setMargin( 9 );
     setLayout( main_layout );
 
     /* Margins */
     tree_panel_l->setMargin( 1 );
-    main_panel_l->setMargin( 3 );
+    main_panel_l->setContentsMargins( 6, 0, 0, 3 );
 
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
