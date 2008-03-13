@@ -60,17 +60,13 @@ static inline void vlc_epg_Clean( vlc_epg_t *p_epg )
     for( i = 0; i < p_epg->i_event; i++ )
     {
         vlc_epg_event_t *p_evt = p_epg->pp_event[i];
-        if( p_evt->psz_name )
-            free( p_evt->psz_name );
-        if( p_evt->psz_short_description )
-            free( p_evt->psz_short_description );
-        if( p_evt->psz_description )
-            free( p_evt->psz_description );
+        free( p_evt->psz_name );
+        free( p_evt->psz_short_description );
+        free( p_evt->psz_description );
         free( p_evt );
     }
     TAB_CLEAN( p_epg->i_event, p_epg->pp_event );
-    if( p_epg->psz_name )
-        free( p_epg->psz_name );
+    free( p_epg->psz_name );
 }
 static inline void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
                                 const char *psz_name, const char *psz_short_description, const char *psz_description )

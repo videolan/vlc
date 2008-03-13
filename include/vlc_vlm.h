@@ -208,8 +208,7 @@ static inline void vlm_media_Copy( vlm_media_t *p_dst, vlm_media_t *p_src )
 static inline void vlm_media_Clean( vlm_media_t *p_media )
 {
     int i;
-    if( p_media->psz_name )
-        free( p_media->psz_name );
+    free( p_media->psz_name );
 
     for( i = 0; i < p_media->i_input; i++ )
         free( p_media->ppsz_input[i]) ;
@@ -219,13 +218,9 @@ static inline void vlm_media_Clean( vlm_media_t *p_media )
         free( p_media->ppsz_option[i]) ;
     TAB_CLEAN(p_media->i_option, p_media->ppsz_option );
 
-    if( p_media->psz_output )
-        free( p_media->psz_output );
+    free( p_media->psz_output );
     if( p_media->b_vod )
-    {
-        if( p_media->vod.psz_mux )
-            free( p_media->vod.psz_mux );
-    }
+        free( p_media->vod.psz_mux );
 }
 static inline vlm_media_t *vlm_media_New(void)
 {
@@ -260,8 +255,7 @@ static inline void vlm_media_instance_Init( vlm_media_instance_t *p_instance )
 }
 static inline void vlm_media_instance_Clean( vlm_media_instance_t *p_instance )
 {
-    if( p_instance->psz_name )
-        free( p_instance->psz_name );
+    free( p_instance->psz_name );
 }
 static inline vlm_media_instance_t *vlm_media_instance_New(void)
 {

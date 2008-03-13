@@ -64,8 +64,7 @@ free_args(int i_size, char** ppsz_args)
     int i_index;
 
     for ( i_index = 0; i_index < i_size; i_index++ )
-        if( ppsz_args[i_index] )
-            free(ppsz_args[i_index]);
+        free( ppsz_args[i_index] );
     free( ppsz_args );
 }
 
