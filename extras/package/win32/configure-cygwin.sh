@@ -16,7 +16,7 @@ CC="gcc -mno-cygwin" CXX="g++ -mno-cygwin" \
       --enable-twolame \
       --enable-quicktime \
       --enable-real \
-      --enable-dirac \
+      --disable-dirac \
       --enable-realrtsp \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --with-ffmpeg-config-path=/usr/win32/bin --with-ffmpeg-zlib \
@@ -39,4 +39,4 @@ CC="gcc -mno-cygwin" CXX="g++ -mno-cygwin" \
       --enable-activex \
       --disable-gnomevfs --disable-hal --disable-gtk \
       --disable-cddax --disable-vcdx \
-
+      --disable-taglib
