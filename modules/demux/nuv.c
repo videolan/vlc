@@ -316,8 +316,7 @@ static void Close( vlc_object_t * p_this )
     demux_t        *p_demux = (demux_t*)p_this;
     demux_sys_t    *p_sys = p_demux->p_sys;
 
-    if( p_sys->p_extra_f )
-        free( p_sys->p_extra_f );
+    free( p_sys->p_extra_f );
     demux_IndexClean( &p_sys->idx );
     free( p_sys );
 }
@@ -644,11 +643,8 @@ static void demux_IndexInit( demux_index_t *p_idx )
 }
 static void demux_IndexClean( demux_index_t *p_idx )
 {
-    if( p_idx->idx )
-    {
-        free( p_idx->idx );
-        p_idx->idx = NULL;
-    }
+    free( p_idx->idx );
+    p_idx->idx = NULL;
 }
 static void demux_IndexAppend( demux_index_t *p_idx,
                                int64_t i_time, int64_t i_offset )

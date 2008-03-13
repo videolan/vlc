@@ -1208,8 +1208,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->i_type == FOURCC_alac )
     {
-        if( p_box->data.p_sample_soun->p_qt_description )
-            free( p_box->data.p_sample_soun->p_qt_description );
+        free( p_box->data.p_sample_soun->p_qt_description );
 
         p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
         p_box->data.p_sample_soun->i_qt_description = i_read;

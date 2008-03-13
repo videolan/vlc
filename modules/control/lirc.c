@@ -123,8 +123,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     /* Destroy structure */
-    if( p_intf->p_sys->psz_file )
-        free( p_intf->p_sys->psz_file );
+    free( p_intf->p_sys->psz_file );
     lirc_freeconfig( p_intf->p_sys->config );
     lirc_deinit();
     free( p_intf->p_sys );

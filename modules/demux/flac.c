@@ -150,8 +150,7 @@ static int Open( vlc_object_t * p_this )
         module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
     if( !p_sys->p_packetizer->p_module )
     {
-        if( p_sys->p_packetizer->fmt_in.p_extra )
-            free( p_sys->p_packetizer->fmt_in.p_extra );
+        free( p_sys->p_packetizer->fmt_in.p_extra );
         vlc_object_release( p_sys->p_packetizer );
 
         msg_Err( p_demux, "cannot find flac packetizer" );
@@ -189,8 +188,7 @@ static void Close( vlc_object_t * p_this )
     /* Unneed module */
     module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
 
-    if( p_sys->p_packetizer->fmt_in.p_extra )
-        free( p_sys->p_packetizer->fmt_in.p_extra );
+    free( p_sys->p_packetizer->fmt_in.p_extra );
 
     /* Delete the decoder */
     vlc_object_release( p_sys->p_packetizer );
@@ -712,10 +710,8 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
         p_sys->i_cover_score = pi_cover_score[i_type];
     }
 error:
-    if( psz_mime )
-        free( psz_mime );
-    if( psz_description )
-        free( psz_description );
+    free( psz_mime );
+    free( psz_description );
 }
 #undef RM
 

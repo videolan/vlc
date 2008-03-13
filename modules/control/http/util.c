@@ -328,14 +328,8 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
         }
     }
 
-    if( user )
-    {
-        free( user );
-    }
-    if( password )
-    {
-        free( password );
-    }
+    free( user );
+    free( password );
 
     ACL_Destroy( p_acl );
     closedir( p_dir );

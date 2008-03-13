@@ -73,10 +73,7 @@ int E_(Import_PLS)( vlc_object_t *p_this )
 void E_(Close_PLS)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    if( p_demux->p_sys->psz_prefix )
-    {
-        free( p_demux->p_sys->psz_prefix );
-    }
+    free( p_demux->p_sys->psz_prefix );
     free( p_demux->p_sys );
 }
 
@@ -172,11 +169,8 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Warn( p_demux, "no file= part found for item %d", i_item );
             }
-            if( psz_name )
-            {
-                free( psz_name );
-                psz_name = NULL;
-            }
+            free( psz_name );
+            psz_name = NULL;
             i_duration = -1;
             i_item = i_new_item;
             i_new_item = 0;
@@ -184,8 +178,7 @@ static int Demux( demux_t *p_demux )
         if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) ||
             !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
         {
-            if( psz_mrl_orig )
-                free( psz_mrl_orig );
+            free( psz_mrl_orig );
             psz_mrl_orig =
             psz_mrl = E_(ProcessMRL)( psz_value, p_demux->p_sys->psz_prefix );
 
@@ -202,8 +195,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strncasecmp( psz_key, "title", sizeof("title") -1 ) )
         {
-            if( psz_name )
-                free( psz_name );
+            free( psz_name );
             psz_name = strdup( psz_value );
         }
         else if( !strncasecmp( psz_key, "length", sizeof("length") -1 ) )
@@ -234,11 +226,8 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "no file= part found for item %d", i_item );
     }
-    if( psz_name )
-    {
-        free( psz_name );
-        psz_name = NULL;
-    }
+    free( psz_name );
+    psz_name = NULL;
 
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */

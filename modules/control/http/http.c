@@ -201,8 +201,7 @@ static int Open( vlc_object_t *p_this )
             TAB_APPEND( p_sys->i_handlers, p_sys->pp_handlers, p_handler );
         }
     }
-    if( psz_src != NULL )
-        free( psz_src );
+    free( psz_src );
 #endif
 
     /* determine SSL configuration */
@@ -275,11 +274,8 @@ static int Open( vlc_object_t *p_this )
         };
         unsigned i;
 
-        if( psz_src != NULL )
-        {
-            free( psz_src );
-            psz_src = NULL;
-        }
+        free( psz_src );
+        psz_src = NULL;
 
         for( i = 0; ppsz_paths[i] != NULL; i++ )
             if( !DirectoryCheck( ppsz_paths[i] ) )
@@ -372,10 +368,7 @@ static void Close ( vlc_object_t *p_this )
         free( p_sys->pp_files[i]->name );
         free( p_sys->pp_files[i] );
     }
-    if( p_sys->pp_files )
-    {
-        free( p_sys->pp_files );
-    }
+    free( p_sys->pp_files );
     for( i = 0; i < p_sys->i_handlers; i++ )
     {
         http_association_t *p_handler = p_sys->pp_handlers[i];
@@ -794,8 +787,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
                 NULL );
     TAB_REMOVE( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
                 psz_file );
-    if( psz_cwd != NULL )
-        free( psz_cwd );
+    free( psz_cwd );
     while( i_env )
         TAB_REMOVE( i_env, ppsz_env, ppsz_env[0] );
 

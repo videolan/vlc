@@ -2399,12 +2399,9 @@ static void IODFree( iod_descriptor_t *p_iod )
             }
             else
             {
-                if( es_descr.dec_descr.p_decoder_specific_info != NULL )
-                {
-                    free( es_descr.dec_descr.p_decoder_specific_info );
-                    es_descr.dec_descr.p_decoder_specific_info = NULL;
-                    es_descr.dec_descr.i_decoder_specific_info_len = 0;
-                }
+                free( es_descr.dec_descr.p_decoder_specific_info );
+                es_descr.dec_descr.p_decoder_specific_info = NULL;
+                es_descr.dec_descr.i_decoder_specific_info_len = 0;
             }
         }
         es_descr.b_ok = 0;

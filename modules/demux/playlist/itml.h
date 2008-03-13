@@ -26,10 +26,10 @@
  */
 
 /* defines */
-#define FREE(v)        if (v) {free(v);v=NULL;}
-#define FREE_NAME()    if (psz_name) {free(psz_name);psz_name=NULL;}
-#define FREE_VALUE()   if (psz_value) {free(psz_value);psz_value=NULL;}
-#define FREE_KEY()     if (psz_key) {free(psz_key);psz_key=NULL;}
+#define FREE(v)        free(v);v=NULL;
+#define FREE_NAME()    free(psz_name);psz_name=NULL;
+#define FREE_VALUE()   free(psz_value);psz_value=NULL;
+#define FREE_KEY()     free(psz_key);psz_key=NULL;
 #define FREE_ATT()     FREE_NAME();FREE_VALUE()
 #define FREE_ATT_KEY() FREE_NAME();FREE_VALUE();FREE_KEY()
 

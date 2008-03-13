@@ -310,12 +310,8 @@ static void Close( vlc_object_t *p_this )
     int i;
 
     for( i = 0; i < p_sys->i_subtitles; i++ )
-    {
-        if( p_sys->subtitle[i].psz_text )
-            free( p_sys->subtitle[i].psz_text );
-    }
-    if( p_sys->subtitle )
-        free( p_sys->subtitle );
+        free( p_sys->subtitle[i].psz_text );
+    free( p_sys->subtitle );
 
     free( p_sys );
 }

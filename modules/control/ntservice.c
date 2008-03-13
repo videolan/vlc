@@ -196,7 +196,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
         strcat( psz_path, " --ntservice-extraintf " );
         strcat( psz_path, psz_extra );
     }
-    if( psz_extra ) free( psz_extra );
+    free( psz_extra );
 
     psz_extra = config_GetPsz( p_intf, "ntservice-options" );
     if( psz_extra && *psz_extra )
@@ -204,7 +204,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
         strcat( psz_path, " " );
         strcat( psz_path, psz_extra );
     }
-    if( psz_extra ) free( psz_extra );
+    free( psz_extra );
 
     SC_HANDLE service =
         CreateService( handle, p_sys->psz_service, p_sys->psz_service,
@@ -338,10 +338,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
             free( psz_temp );
         }
     }
-    if( psz_modules )
-    {
-        free( psz_modules );
-    }
+    free( psz_modules );
 
     /* Initialization complete - report running status */
     p_sys->status.dwCurrentState = SERVICE_RUNNING;

@@ -545,8 +545,7 @@ static void Close( vlc_object_t *p_this )
     XdsExit( &p_sys->xds );
     cc_Exit( &p_sys->cc );
     free( p_sys->rec_hdrs );
-    if( p_sys->seq_table )
-        free( p_sys->seq_table );
+    free( p_sys->seq_table );
     free(p_sys);
 }
 
@@ -1127,23 +1126,16 @@ static void XdsInit( xds_t *h )
 static void XdsExit( xds_t *h )
 {
     /* */
-    if( h->meta.psz_channel_name )
-        free( h->meta.psz_channel_name );
-    if( h->meta.psz_channel_call_letter )
-        free( h->meta.psz_channel_call_letter );
-    if( h->meta.psz_channel_number )
-        free( h->meta.psz_channel_number );
+    free( h->meta.psz_channel_name );
+    free( h->meta.psz_channel_call_letter );
+    free( h->meta.psz_channel_number );
 
     /* */
-    if( h->meta.current.psz_name )
-        free( h->meta.current.psz_name );
-    if( h->meta.current.psz_rating )
-        free( h->meta.current.psz_rating );
+    free( h->meta.current.psz_name );
+    free( h->meta.current.psz_rating );
     /* */
-    if( h->meta.future.psz_name )
-        free( h->meta.future.psz_name );
-    if( h->meta.future.psz_rating )
-        free( h->meta.future.psz_rating );
+    free( h->meta.future.psz_name );
+    free( h->meta.future.psz_rating );
 }
 static void XdsStringUtf8( char dst[2*32+1], const uint8_t *p_src, int i_src )
 {
@@ -1179,8 +1171,7 @@ static vlc_bool_t XdsChangeString( xds_t *h, char **ppsz_dst, const char *psz_ne
     if( *ppsz_dst == NULL && psz_new == NULL )
         return VLC_FALSE;
 
-    if( *ppsz_dst )
-        free( *ppsz_dst );
+    free( *ppsz_dst );
     if( psz_new )
         *ppsz_dst = strdup( psz_new );
     else
@@ -1641,8 +1632,7 @@ static void parse_master(demux_t *p_demux)
        entire table directly from the stream into memory in place. */
 
     /* clear the SEQ table */
-    if (p_sys->seq_table != NULL)
-        free(p_sys->seq_table);
+    free(p_sys->seq_table);
     
     /* parse header info */
     stream_Read(p_demux->s, mst_buf, 32);
@@ -1900,8 +1890,7 @@ static int get_chunk_header(demux_t *p_demux)
   
     /*msg_Dbg( p_demux, "chunk has %d records", i_num_recs );*/
 
-    if (p_sys->rec_hdrs)
-        free(p_sys->rec_hdrs);
+    free(p_sys->rec_hdrs);
 
     /* skip past the 4 bytes we "peeked" earlier */
     stream_Read( p_demux->s, NULL, 4 );
