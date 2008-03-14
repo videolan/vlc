@@ -277,7 +277,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_intf->p_sys->p_file = NULL;
 #ifdef HAVE_SYSLOG_H
-        openlog( "VLC", LOG_PID|LOG_NDELAY, LOG_DAEMON );
+        openlog( "vlc", LOG_PID|LOG_NDELAY, LOG_DAEMON );
 #endif
     }
 
