@@ -459,6 +459,7 @@ static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
+static block_t *Add_ADTS( block_t *, es_format_t * );
 static void TSSchedule  ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           mtime_t i_pcr_length, mtime_t i_pcr_dts );
 static void TSDate      ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
@@ -972,7 +973,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_stream_id = 0xbd;
                     break;
                 case VLC_FOURCC( 'm', 'p','4', 'a' ):
-                    p_stream->i_stream_type = 0x11;
+                    /* XXX: make that configurable in some way when LOAS
+                     * is implemented for AAC in TS */
+                    //p_stream->i_stream_type = 0x11; /* LOAS/LATM */
+                    p_stream->i_stream_type = 0x0f; /* ADTS */
                     p_stream->i_stream_id = 0xfa;
                     p_sys->i_mpeg4_streams++;
                     p_stream->i_es_id = p_stream->i_pid;
@@ -1395,7 +1399,13 @@ static int Mux( sout_mux_t *p_mux )
                     if( p_stream == p_pcr_stream || p_sys->b_data_alignment
                          || p_input->p_fmt->i_codec !=
                              VLC_FOURCC('m', 'p', 'g', 'a') )
+                    {
                         p_data = block_FifoGet( p_input->p_fifo );
+
+                        if( p_input->p_fmt->i_codec ==
+                                VLC_FOURCC('m', 'p', '4', 'a' ) )
+                            p_data = Add_ADTS( p_data, p_input->p_fmt );
+                    }
                     else
                         p_data = FixPES( p_mux, p_input->p_fifo );
 
@@ -1655,7 +1665,7 @@ static int Mux( sout_mux_t *p_mux )
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
 {
     block_t *p_data;
-    int i_size;
+    size_t i_size;
 
     p_data = block_FifoShow( p_fifo );
     i_size = p_data->i_buffer;
@@ -1712,6 +1722,58 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
         }
         return p_data;
     }
+}
+
+static block_t *Add_ADTS( block_t *p_data, es_format_t *p_fmt )
+{
+    uint8_t *p_extra = p_fmt->p_extra;
+
+    if( !p_data || p_fmt->i_extra < 2 || !p_extra )
+        return p_data; /* no data to construct the headers */
+
+    int i_index = ( (p_extra[0] << 1) | (p_extra[1] >> 7) ) & 0x0f;
+    int i_profile = (p_extra[0] >> 3) - 1; /* i_profile < 4 */
+
+    if( i_index == 0x0f && p_fmt->i_extra < 5 )
+        return p_data; /* not enough data */
+
+    int i_channels = (p_extra[i_index == 0x0f ? 4 : 1] >> 3) & 0x0f;
+
+#define ADTS_HEADER_SIZE 7 /* CRC needs 2 more bytes */
+
+
+    /* keep a copy in case block_Realloc() fails */
+    block_t *p_bak_block = block_Duplicate( p_data );
+    if( !p_bak_block ) /* OOM, block_Realloc() is likely to lose our block */
+        return p_data; /* the frame isn't correct but that's the best we have */
+
+    block_t *p_new_block = block_Realloc( p_data, ADTS_HEADER_SIZE,
+                                            p_data->i_buffer );
+    if( !p_new_block )
+        return p_bak_block; /* OOM, send the (incorrect) original frame */
+
+    block_Release( p_bak_block ); /* we don't need the copy anymore */
+
+
+    uint8_t *p_buffer = p_new_block->p_buffer;
+
+    /* fixed header */
+    p_buffer[0] = 0xff;
+    p_buffer[1] = 0xf1; /* 0xf0 | 0x00 | 0x00 | 0x01 */
+    p_buffer[2] = (i_profile << 6) | ((i_index & 0x0f) << 2) | ((i_channels >> 2) & 0x01) ;
+    p_buffer[3] = (i_channels << 6) | ((p_data->i_buffer >> 11) & 0x03);
+
+    /* variable header (starts at last 2 bits of 4th byte) */
+
+    int i_fullness = 0x7ff; /* 0x7ff means VBR */
+    /* XXX: We should check if it's CBR or VBR, but no known implementation
+     * do that, and it's a pain to calculate this field */
+
+    p_buffer[4] = p_data->i_buffer >> 3;
+    p_buffer[5] = ((p_data->i_buffer & 0x07) << 5) | ((i_fullness >> 6) & 0x1f);
+    p_buffer[6] = ((i_fullness & 0x3f) << 2) /* | 0xfc */;
+
+    return p_new_block;
 }
 
 static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
