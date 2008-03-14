@@ -103,7 +103,11 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     /* Margins */
     tree_panel_l->setMargin( 1 );
+#if HAS_QT43
     main_panel_l->setContentsMargins( 6, 0, 0, 3 );
+#else
+    main_panel_l->setMargin( 3 );
+#endif
 
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
