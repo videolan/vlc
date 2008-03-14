@@ -46,6 +46,14 @@
 #define DEST_TEXT N_("Output destination")
 #define DEST_LONGTEXT N_( \
     "Destination (URL) to use for the stream." )
+#define BIND_TEXT N_("address to bind to (helper setting for dst)")
+#define BIND_LONGTEXT N_( \
+  "address:port to bind vlc to listening incoming streams "\
+  "helper setting for dst,dst=bind+'/'+path" )
+#define PATH_TEXT N_("filename for stream (helper setting for dst)")
+#define PATH_LONGTEXT N_( \
+  "Filename for stream "\
+  "helper setting for dst, dst=bind+'/'+path" )
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
   "This allows you to specify a name for the session, that will be announced "\
@@ -98,6 +106,10 @@ vlc_module_begin();
                 MUX_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
                 DEST_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "bind", "", NULL, BIND_TEXT,
+                BIND_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "path", "", NULL, PATH_TEXT,
+                PATH_LONGTEXT, VLC_FALSE );
         change_unsafe();
 
     add_bool( SOUT_CFG_PREFIX "sap", VLC_FALSE, NULL, SAP_TEXT, SAP_LONGTEXT,
@@ -125,7 +137,8 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "access", "mux", "url", "dst",
-    "sap", "name", "group", "description", "url", "email", "phone", NULL
+    "sap", "name", "group", "description", "url", "email", "phone",
+    "bind", "path", NULL
 };
 
 #define DEFAULT_PORT 1234
@@ -152,6 +165,8 @@ static int Open( vlc_object_t *p_this )
     char *psz_mux;
     char *psz_access;
     char *psz_url;
+    char *psz_bind;
+    char *psz_path;
 
     vlc_value_t val;
 
@@ -171,8 +186,24 @@ static int Open( vlc_object_t *p_this )
     psz_mux = *val.psz_string ? val.psz_string : NULL;
     if( !*val.psz_string ) free( val.psz_string );
 
+    var_Get( p_stream, SOUT_CFG_PREFIX "bind", &val );
+    psz_bind = *val.psz_string ? val.psz_string : NULL;
+    if( !*val.psz_string ) free( val.psz_string);
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "path", &val );
+    psz_path = *val.psz_string ? val.psz_string : NULL;
+    if( !*val.psz_string ) free( val.psz_string);
+
+    if( psz_bind ) psz_url = psz_bind;
+    if( psz_url && psz_path ) 
+    {
+        if( asprintf( &psz_url,"%s/%s",psz_url,psz_path ) == -1 )
+            psz_url = NULL;
+        free( psz_path );
+    }
+
     var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
-    psz_url = *val.psz_string ? val.psz_string : NULL;
+    if( *val.psz_string ) psz_url = val.psz_string;
     if( !*val.psz_string ) free( val.psz_string );
 
     p_sys = p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
