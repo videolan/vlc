@@ -220,6 +220,25 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_rate > 0 )
         p_sys->i_input_rate = p_block->i_rate;
 
+    /* Remove ADTS header if we have decoder specific config */
+    if( p_dec->fmt_in.i_extra && p_block->i_buffer > 7 )
+    {
+        if( p_block->p_buffer[0] == 0xff &&
+            ( p_block->p_buffer[1] & 0xf0 ) == 0xf0 ) /* syncword */
+        {   /* ADTS header present */
+            size_t i_header_size; /* 7 bytes (+ 2 bytes for crc) */
+            i_header_size = 7 + ( ( p_block->p_buffer[1] & 0x01 ) ? 0 : 2 );
+            /* FIXME: multiple blocks per frame */
+            if( p_block->i_buffer > i_header_size )
+            {
+                memcpy( p_block->p_buffer,
+                        p_block->p_buffer + i_header_size,
+                        p_block->i_buffer - i_header_size );
+                p_block->i_buffer -= i_header_size;
+            }
+        }
+    }
+
     /* Append the block to the temporary buffer */
     if( p_sys->i_buffer_size < p_sys->i_buffer + p_block->i_buffer )
     {
