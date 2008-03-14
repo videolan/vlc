@@ -17,7 +17,13 @@
         </configuration>
       </plugin>
     </plugins>
-  </build> 
+  </build>
+  <licenses>
+  	<license>
+  		<name>GPLv2</name>
+  		<url>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</url>
+  	</license>
+  </licenses>
   <dependencies>
     <dependency>
       <groupId>com.jna</groupId>
