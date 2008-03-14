@@ -187,6 +187,11 @@ static int playlist_cmp(const void *first, const void *second)
     else if( sort_mode == SORT_ARTIST )
     {
         DO_META_SORT( Artist );
+        /* sort by artist, album, tracknumber */
+        if( i_test == 0 )
+            DO_META_SORT( Album );
+        if( i_test == 0 )
+            DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
     }
     else if( sort_mode == SORT_GENRE )
     {
