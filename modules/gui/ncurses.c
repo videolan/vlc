@@ -141,7 +141,8 @@ enum
     BOX_OPEN,
     BOX_BROWSE,
     BOX_META,
-    BOX_OBJECTS
+    BOX_OBJECTS,
+    BOX_STATS
 };
 enum
 {
@@ -811,7 +812,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         }
     }
     else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
-             p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_OBJECTS )
+             p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_STATS ||
+             p_sys->i_box_type == BOX_OBJECTS )
     {
         switch( i_key )
         {
@@ -1075,6 +1077,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_NONE;
             else
                 p_sys->i_box_type = BOX_OBJECTS;
+            return 1;
+        case 'S':
+            if( p_sys->i_box_type == BOX_STATS )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_STATS;
             return 1;
         case 'c':
             p_sys->b_color = !p_sys->b_color;
@@ -1635,6 +1643,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, _("     P           Show/Hide playlist box") );
         MainBoxWrite( p_intf, l++, 1, _("     B           Show/Hide filebrowser") );
         MainBoxWrite( p_intf, l++, 1, _("     x           Show/Hide objects box") );
+        MainBoxWrite( p_intf, l++, 1, _("     S           Show/Hide statistics box" ) );
         MainBoxWrite( p_intf, l++, 1, _("     c           Switch color on/off") );
         MainBoxWrite( p_intf, l++, 1, _("     Esc         Close Add/Search entry") );
         MainBoxWrite( p_intf, l++, 1, "" );
@@ -1980,6 +1989,67 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             y += l - p_sys->i_box_start;
         else
             y += p_sys->i_box_lines;
+    }
+    else if( p_sys->i_box_type == BOX_STATS )
+    {
+        DrawBox( p_sys->w, y++, 0, h, COLS, _(" Stats "), p_sys->b_color );
+
+        if( p_input )
+        {
+            input_item_t *p_item = input_GetItem( p_input );
+            assert( p_item );
+            vlc_mutex_lock( &p_item->lock );
+            vlc_mutex_lock( &p_item->p_stats->lock );
+
+            /* Input */
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
+            mvnprintw( y++, 1, COLS-2, _("+-[Incoming]"));
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+            mvnprintw( y++, 1, COLS-2, _("| input bytes read : %8.0f kB"),
+                    (float)(p_item->p_stats->i_read_bytes)/1000 );
+            mvnprintw( y++, 1, COLS-2, _("| input bitrate    :   %6.0f kb/s"),
+                    (float)(p_item->p_stats->f_input_bitrate)*8000 );
+            mvnprintw( y++, 1, COLS-2,_("| demux bytes read : %8.0f kB"),
+                    (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+            mvnprintw( y++, 1, COLS-2,_("| demux bitrate    :   %6.0f kb/s"),
+                    (float)(p_item->p_stats->f_demux_bitrate)*8000 );
+            mvnprintw( y++, 1, COLS-2,"|");
+            /* Video */
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
+            mvnprintw( y++, 1, COLS-2,_("+-[Video Decoding]"));
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+            mvnprintw( y++, 1, COLS-2,_("| video decoded    :    %5i"),
+                    p_item->p_stats->i_decoded_video );
+            mvnprintw( y++, 1, COLS-2,_("| frames displayed :    %5i"),
+                    p_item->p_stats->i_displayed_pictures );
+            mvnprintw( y++, 1, COLS-2,_("| frames lost      :    %5i"),
+                    p_item->p_stats->i_lost_pictures );
+            mvnprintw( y++, 1, COLS-2,"|");
+            /* Audio*/
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
+            mvnprintw( y++, 1, COLS-2,_("+-[Audio Decoding]"));
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+            mvnprintw( y++, 1, COLS-2,_("| audio decoded    :    %5i"),
+                    p_item->p_stats->i_decoded_audio );
+            mvnprintw( y++, 1, COLS-2,_("| buffers played   :    %5i"),
+                    p_item->p_stats->i_played_abuffers );
+            mvnprintw( y++, 1, COLS-2,_("| buffers lost     :    %5i"),
+                    p_item->p_stats->i_lost_abuffers );
+            mvnprintw( y++, 1, COLS-2,"|");
+            /* Sout */
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
+            mvnprintw( y++, 1, COLS-2,_("+-[Streaming]"));
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+            mvnprintw( y++, 1, COLS-2,_("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
+            mvnprintw( y++, 1, COLS-2,_("| bytes sent       : %8.0f kB"),
+                    (float)(p_item->p_stats->i_sent_bytes)/1000 );
+            mvnprintw( y++, 1, COLS-2,_("| sending bitrate  :   %6.0f kb/s"),
+                    (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
+            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+
+            vlc_mutex_unlock( &p_item->p_stats->lock );
+            vlc_mutex_unlock( &p_item->lock );
+        }
     }
     else if( p_sys->i_box_type == BOX_PLAYLIST ||
                p_sys->i_box_type == BOX_SEARCH ||
