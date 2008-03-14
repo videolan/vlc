@@ -36,7 +36,6 @@
 #include "components/open_panels.hpp"
 
 class QString;
-class QToolButton;
 class QTabWidget;
 
 class OpenDialog : public QVLCDialog
@@ -83,8 +82,8 @@ private:
     int i_action_flag;
     QStringList SeparateEntries( QString );
 
-    QToolButton *cancelButton, *selectButton;
-    QToolButton *playButton;
+    QPushButton *cancelButton, *selectButton;
+    QPushButton *playButton;
 
     void finish( bool );
 

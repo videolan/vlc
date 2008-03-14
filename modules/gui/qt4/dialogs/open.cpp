@@ -91,27 +91,14 @@ OpenDialog::OpenDialog( QWidget *parent,
     ui.slaveBrowseButton->hide();
 
     /* Buttons Creation */
-    QSizePolicy buttonSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
-    buttonSizePolicy.setHorizontalStretch( 0 );
-    buttonSizePolicy.setVerticalStretch( 0 );
-
     /* Play Button */
-    playButton = new QToolButton;
-    playButton->setText( qtr( "&Play" ) );
-    playButton->setSizePolicy( buttonSizePolicy );
-    playButton->setMinimumSize( QSize( 90, 0 ) );
-    playButton->setPopupMode( QToolButton::MenuButtonPopup );
-    playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    playButton = ui.playButton;
 
     /* Cancel Button */
-    cancelButton = new QToolButton;
-    cancelButton->setText( qtr( "&Cancel" ) );
-    cancelButton->setSizePolicy( buttonSizePolicy );
+    cancelButton = new QPushButton( qtr( "&Cancel" ) );
 
     /* Select Button */
-    selectButton = new QToolButton;
-    selectButton->setText( qtr( "Select" ) );
-    selectButton->setSizePolicy( buttonSizePolicy );
+    selectButton = new QPushButton( qtr( "Select" ) );
 
     /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open" );
@@ -124,10 +111,9 @@ OpenDialog::OpenDialog( QWidget *parent,
     openButtonMenu->addAction( qtr( "&Convert" ), this, SLOT( transcode() ) ,
                                     QKeySequence( "Alt+C" ) );
 
-    playButton->setMenu( openButtonMenu );
+    ui.menuButton->setMenu( openButtonMenu );
 
     /* Add the three Buttons */
-    ui.buttonsBox->addButton( playButton, QDialogButtonBox::ActionRole );
     ui.buttonsBox->addButton( selectButton, QDialogButtonBox::AcceptRole );
     ui.buttonsBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
@@ -183,6 +169,7 @@ void OpenDialog::setMenuAction()
     {
         playButton->hide();
         selectButton->show();
+        selectButton->setDefault( true );
     }
     else
     {
@@ -202,6 +189,7 @@ void OpenDialog::setMenuAction()
             playButton->setText( qtr( "&Play" ) );
         }
         playButton->show();
+        playButton->setDefault( true );
         selectButton->hide();
     }
 }
