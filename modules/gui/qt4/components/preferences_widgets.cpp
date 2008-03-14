@@ -374,11 +374,11 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
-    if(p_module_config && p_module_config->pf_update_list) 
+    if(p_module_config && p_module_config->pf_update_list)
     {
        vlc_value_t val;
        val.psz_string = strdup(p_module_config->value.psz);
-       
+
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
        // assume in a×y case that dirty was set to VLC_TRUE
@@ -462,7 +462,8 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
 
     for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
     {
-        combo->addItem( qfu(p_module_config->ppsz_list_text ?
+        combo->addItem( qfu((p_module_config->ppsz_list_text &&
+                            p_module_config->ppsz_list_text[i_index])?
                             p_module_config->ppsz_list_text[i_index] :
                             p_module_config->ppsz_list[i_index] ),
                         QVariant( p_module_config->ppsz_list[i_index] ) );
@@ -487,7 +488,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
                       config_FindConfig( VLC_OBJECT(p_intf), configname );
     if( p_config )
     {
-       if(p_config->pf_update_list) 
+       if(p_config->pf_update_list)
         {
             vlc_value_t val;
             val.i_int = p_config->value.i;
@@ -863,11 +864,11 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     combo->setMinimumWidth( MINWIDTH_BOX );
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
-    if(p_module_config && p_module_config->pf_update_list) 
+    if(p_module_config && p_module_config->pf_update_list)
     {
        vlc_value_t val;
        val.i_int = p_module_config->value.i;
-       
+
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
        // assume in any case that dirty was set to VLC_TRUE
