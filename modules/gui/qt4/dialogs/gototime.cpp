@@ -46,6 +46,7 @@ GotoTimeDialog::GotoTimeDialog( QWidget *parent, intf_thread_t *_p_intf)
     setWindowTitle( qtr( "Go to time" ) );
 
     QGridLayout *mainLayout = new QGridLayout( this );
+    mainLayout->setSizeConstraint( QLayout::SetFixedSize );
 
     QPushButton *gotoButton = new QPushButton( qtr( "&Go" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
