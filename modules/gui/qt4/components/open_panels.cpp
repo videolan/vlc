@@ -940,8 +940,8 @@ void CaptureOpenPanel::updateMRL()
         break;
     case DSHOW_DEVICE:
         mrl = "dshow://";
-        mrl += " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
-        mrl += " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
+        mrl+= " :dshow-vdev=" + QString("\"%1\"").arg( vdevDshowW->getValue() );
+        mrl+= " :dshow-adev=" + QString("\"%1\"").arg( adevDshowW->getValue() );
         if( dshowVSizeLine->isModified() )
             mrl += " :dshow-size=" + dshowVSizeLine->text();
         break;
