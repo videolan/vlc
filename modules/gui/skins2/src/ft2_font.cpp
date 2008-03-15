@@ -54,10 +54,7 @@ FT2Font::~FT2Font()
     {
         FT_Done_FreeType( m_lib );
     }
-    if( m_buffer )
-    {
-        free( m_buffer );
-    }
+    free( m_buffer );
 }
 
 

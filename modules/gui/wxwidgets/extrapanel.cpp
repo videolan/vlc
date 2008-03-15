@@ -357,7 +357,7 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
         hue_slider->Disable();
         gamma_slider->Disable();
     }
-    if( psz_filters ) free( psz_filters );
+    free( psz_filters );
 
     int i_value = config_GetInt( p_intf, "hue" );
     if( i_value > 0 && i_value < 360 )

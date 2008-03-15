@@ -264,22 +264,22 @@ DialogsProvider::~DialogsProvider()
     PopEventHandler(true);
 
     /* Clean up */
-    if( p_open_dialog )     delete p_open_dialog;
+    delete p_open_dialog;
     if( p_prefs_dialog )    p_prefs_dialog->Destroy();
-    if( p_file_dialog )     delete p_file_dialog;
-    if( p_playlist_dialog ) delete p_playlist_dialog;
-    if( p_messages_dialog ) delete p_messages_dialog;
-    if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
-    if( p_file_generic_dialog ) delete p_file_generic_dialog;
-    if( p_wizard_dialog ) delete p_wizard_dialog;
-    if( p_bookmarks_dialog ) delete p_bookmarks_dialog;
+    delete p_file_dialog;
+    delete p_playlist_dialog;
+    delete p_messages_dialog;
+    delete p_fileinfo_dialog;
+    delete p_file_generic_dialog;
+    delete p_wizard_dialog;
+    delete p_bookmarks_dialog;
 #ifdef UPDATE_CHECK
-    if( p_updatevlc_dialog ) delete p_updatevlc_dialog;
+    delete p_updatevlc_dialog;
 #endif
-    //if( p_vlm_dialog ) delete p_vlm_dialog;
+    //delete p_vlm_dialog;
 
 
-    if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
+    delete p_intf->p_sys->p_icon;
 
     /* We must set this here because on win32 this destructor will be
      * automatically called so we must not call it again on wxApp->OnExit().

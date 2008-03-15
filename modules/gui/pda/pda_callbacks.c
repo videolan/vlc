@@ -231,7 +231,7 @@ void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
                                 4, ppsz_text[3],
                                 -1);
 
-            if (ppsz_text[1]) free(ppsz_text[1]);
+            free(ppsz_text[1]);
         }
             /* kludge */
         for (i=0; i<n; i++)
@@ -260,7 +260,7 @@ void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
                                     4, ppsz_text[3],
                                     -1);
 
-                if (ppsz_text[1]) free(ppsz_text[1]);
+                free(ppsz_text[1]);
             }
         }
         free(pp_namelist);

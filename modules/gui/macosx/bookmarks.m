@@ -249,8 +249,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
 
     i = [o_tbl_dataTable selectedRow];
  
-    if( pp_bookmarks[i]->psz_name )
-        free( pp_bookmarks[i]->psz_name );
+    free( pp_bookmarks[i]->psz_name );
 
     pp_bookmarks[i]->psz_name = strdup([[o_edit_fld_name stringValue] UTF8String]);
     pp_bookmarks[i]->i_byte_offset = [[o_edit_fld_bytes stringValue] intValue];

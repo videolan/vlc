@@ -150,19 +150,10 @@ static void Close( vlc_object_t * p_this )
     for( i = 0; i < p_sys->i_nb_streams; i++ )
     {
         sout_StreamDelete( p_sys->pp_streams[i] );
-        if( p_sys->ppsz_select[i] )
-        {
-            free( p_sys->ppsz_select[i] );
-        }
+        free( p_sys->ppsz_select[i] );
     }
-    if( p_sys->pp_streams )
-    {
-        free( p_sys->pp_streams );
-    }
-    if( p_sys->ppsz_select )
-    {
-        free( p_sys->ppsz_select );
-    }
+    free( p_sys->pp_streams );
+    free( p_sys->ppsz_select );
 
     free( p_sys );
 }

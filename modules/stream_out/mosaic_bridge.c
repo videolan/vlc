@@ -456,8 +456,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         {
             if ( pp_ring[i] != NULL )
             {
-                if ( pp_ring[i]->p_data_orig != NULL )
-                    free( pp_ring[i]->p_data_orig );
+                free( pp_ring[i]->p_data_orig );
                 free( pp_ring[i]->p_sys );
                 free( pp_ring[i] );
             }
@@ -744,8 +743,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
             {
                 if ( pp_ring[i]->i_status == DESTROYED_PICTURE )
                 {
-                    if ( pp_ring[i]->p_data_orig != NULL )
-                        free( pp_ring[i]->p_data_orig );
+                    free( pp_ring[i]->p_data_orig );
                     free( pp_ring[i]->p_sys );
                     free( pp_ring[i] );
                 }

@@ -222,11 +222,8 @@ static void Run( intf_thread_t *p_intf )
                 vlc_object_release( p_playlist );
                 continue;
             }
-            if( psz_display )
-            {
-                free( psz_display );
-                psz_display = NULL;
-            }
+            free( psz_display );
+            psz_display = NULL;
             if( p_playlist->status.i_status == PLAYLIST_STOPPED )
             {
                 psz_display = strdup(_("Stop"));

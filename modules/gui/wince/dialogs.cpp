@@ -118,11 +118,11 @@ DialogsProvider::DialogsProvider( intf_thread_t *p_intf,
 DialogsProvider::~DialogsProvider()
 {
     /* Clean up */
-    if( p_open_dialog )     delete p_open_dialog;
-    if( p_playlist_dialog ) delete p_playlist_dialog;
-    if( p_messages_dialog ) delete p_messages_dialog;
-    if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
-    if( p_prefs_dialog )    delete p_prefs_dialog;
+    delete p_open_dialog;
+    delete p_playlist_dialog;
+    delete p_messages_dialog;
+    delete p_fileinfo_dialog;
+    delete p_prefs_dialog;
 
     if( h_gsgetfile_dll ) FreeLibrary( h_gsgetfile_dll );
 }

@@ -507,8 +507,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
 static void FreeString( svg_rendition_t *p_svg )
 {
-    if( p_svg->psz_text )
-        free( p_svg->psz_text );
+    free( p_svg->psz_text );
     /* p_svg->p_rendition is a GdkPixbuf, and its allocation is
        managed through ref. counting */
     if( p_svg->p_rendition )

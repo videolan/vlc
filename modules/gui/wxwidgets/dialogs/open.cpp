@@ -588,9 +588,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 OpenDialog::~OpenDialog()
 {
     /* Clean up */
-    if( file_dialog ) delete file_dialog;
-    if( sout_dialog ) delete sout_dialog;
-    if( subsfile_dialog ) delete subsfile_dialog;
+    delete file_dialog;
+    delete sout_dialog;
+    delete subsfile_dialog;
 }
 
 int OpenDialog::Show( int i_access_method, int i_arg )

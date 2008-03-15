@@ -129,11 +129,8 @@ static void Deactivate( vlc_object_t *p_this )
 #  endif
     }
 
-    if( p_intf->p_sys )
-    {
-        free( p_intf->p_sys );
-        p_intf->p_sys = NULL;
-    }
+    free( p_intf->p_sys );
+    p_intf->p_sys = NULL;
 #endif
 }
 

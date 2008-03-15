@@ -539,8 +539,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
         msg = wxString(wxU( psz_artist )) + wxT(" - ") +
               wxString(wxU(psz_name)) + duration;
     }
-    if( psz_artist )
-        free( psz_artist );
+    free( psz_artist );
     free( psz_name );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->p_input->i_type );

@@ -246,10 +246,7 @@ static void Run( intf_thread_t *p_intf )
     }
     delete pLoader;
 
-    if( skin_last )
-    {
-        free( skin_last );
-    }
+    free( skin_last );
 
     // Get the instance of OSLoop
     OSLoop *loop = OSFactory::instance( p_intf )->getOSLoop();
