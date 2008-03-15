@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>147</height>
+    <width>358</width>
+    <height>163</height>
    </rect>
   </property>
   <layout class="QGridLayout" >
@@ -18,7 +18,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2" colspan="2">
+   <item row="0" column="2" colspan="2" >
     <widget class="QComboBox" name="deviceCombo" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >

@@ -6,33 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>195</height>
+    <width>431</width>
+    <height>233</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
-   <item>
+  <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
       <string>_("Network Protocol")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="1" column="0" >
+     <item row="1" column="0" >
        <widget class="QComboBox" name="protocolCombo" >
         <property name="toolTip" >
          <string>_("Set the protocol for the URL")</string>
@@ -62,9 +50,7 @@
       <item row="0" column="1" >
        <widget class="QLabel" name="label_2" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -94,9 +80,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>0</vsizetype>
+      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -105,13 +89,7 @@
       <string>_("Options")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item>
+     <item>
        <widget class="QCheckBox" name="timeShift" >
         <property name="toolTip" >
          <string/>
