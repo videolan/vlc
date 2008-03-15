@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
+    <width>606</width>
     <height>300</height>
    </rect>
   </property>
@@ -31,9 +31,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="currentIndex" >
-      <number>-1</number>
-     </property>
     </widget>
    </item>
    <item row="1" column="0" colspan="3" >
@@ -48,12 +45,6 @@
    </item>
    <item row="2" column="0" colspan="3" >
     <widget class="QFrame" name="advancedFrame" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="MinimumExpanding" hsizetype="Minimum" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="frameShape" >
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -77,7 +68,7 @@
          <string> ms</string>
         </property>
         <property name="maximum" >
-         <number>999999</number>
+         <number>65535</number>
         </property>
        </widget>
       </item>
@@ -113,7 +104,7 @@
          <string> s</string>
         </property>
         <property name="maximum" >
-         <number>999999</number>
+         <number>65535</number>
         </property>
        </widget>
       </item>
@@ -131,11 +122,7 @@
        </spacer>
       </item>
       <item row="1" column="1" colspan="6" >
-       <widget class="Line" name="line" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
+       <widget class="Line" name="line" />
       </item>
       <item row="2" column="0" colspan="7" >
        <widget class="QCheckBox" name="slaveCheckbox" >
@@ -165,11 +152,7 @@
        </widget>
       </item>
       <item row="4" column="1" colspan="6" >
-       <widget class="Line" name="line" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
+       <widget class="Line" name="line" />
       </item>
       <item row="5" column="0" >
        <widget class="QLabel" name="advancedLabel" >
@@ -229,16 +212,13 @@
        <property name="contextMenuPolicy" >
         <enum>Qt::NoContextMenu</enum>
        </property>
-       <property name="autoDefault" >
-        <bool>true</bool>
-       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="playButton" >
        <property name="sizePolicy" >
         <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
-         <horstretch>0</horstretch>
+         <horstretch>1</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -260,9 +240,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
      <property name="standardButtons" >
       <set>QDialogButtonBox::NoButton</set>
      </property>
@@ -281,6 +258,7 @@
   <tabstop>slaveBrowseButton</tabstop>
   <tabstop>buttonsBox</tabstop>
  </tabstops>
+ <includes/>
  <resources/>
  <connections>
   <connection>
