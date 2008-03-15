@@ -3022,11 +3022,28 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    PKG_CONFIG_LIBDIR_save="$PKG_CONFIG_LIBDIR"
    export PKG_CONFIG_PATH=""
    export PKG_CONFIG_LIBDIR="${real_ffmpeg_tree}"
+   VLC_SAVE_FLAGS
 
-   PKG_CHECK_MODULES( [FFMPEG],[libavcodec libavformat libpostproc], [
+   PKG_CHECK_MODULES( [FFMPEG],[libavformat libavcodec libpostproc], [
         VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher], ${FFMPEG_CFLAGS})
         VLC_ADD_LIBS([ffmpeg stream_out_switcher], ${FFMPEG_LIBS})]
-      ,[])
+        AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
+      )
+   AS_IF([ test -f "${real_ffmpeg_tree}/libswscale/libswscale.a"],[
+     AC_DEFINE(HAVE_LIBSWSCALE_TREE, 1, [Define if you have ffmpeg's libswscale.])
+     PKG_CHECK_MODULES( [SWSCALE],[libswscale], [
+     VLC_ADD_LIBS([ffmpeg],[${SWSCALE_LIBS}])
+     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[${SWSCALE_CFLAGS}])])
+     ])
+   CPPFLAGS="${CPPFLAGS} ${FFMPEG_CFLAGS} ${SWSCALE_CFLAGS}"
+   CFLAGS="${CFLAGS} ${FFMPEG_CFLAGS} ${SWSCALE_CFLAGS}"
+   
+   AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h)
+   AC_CHECK_HEADERS(ffmpeg/avformat.h libavformat/avformat.h)
+   AC_CHECK_HEADERS(ffmpeg/avutil.h libavutil/avutil.h)
+   AC_CHECK_HEADERS([ffmpeg/swscale.h libswscale/swscale.h])
+
+   VLC_RESTORE_FLAGS
    AS_IF([test -n "${PKG_CONFIG_PATH_save}"],[
          export PKG_CONFIG_PATH="${PKG_CONFIG_PATH_save}"
    ],[
@@ -3043,17 +3060,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      VLC_ADD_BUILTINS([stream_out_switcher])
    fi
 
-   if test -f "${real_ffmpeg_tree}/libswscale/libswscale.a"; then
-     AC_DEFINE(HAVE_LIBSWSCALE_TREE, 1, [Define if you have ffmpeg's libswscale.])
-     VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libswscale ${real_ffmpeg_tree}/libswscale/libswscale.a])
-     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libswscale])
-   fi
 
-    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-      AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
-      VLC_ADD_LIBS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
-      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
-    fi
 else
 
 
