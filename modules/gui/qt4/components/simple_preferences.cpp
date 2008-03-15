@@ -411,7 +411,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.defaultLabel->setFont( italicFont );
             ui.skinsLabel->setFont( italicFont );
 
-#if defined( WIN32 ) || defined (__APPLE__)
+#if defined( WIN32 )
             CONFIG_GENERIC( "language", StringList, NULL, language );
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
