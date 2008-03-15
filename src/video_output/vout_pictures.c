@@ -936,7 +936,9 @@ void __vout_CopyPicture( vlc_object_t *p_this,
         {
             /* We need to proceed line by line */
             uint8_t *p_in = p_src->p[i].p_pixels;
+            assert( p_in );
             uint8_t *p_out = p_dest->p[i].p_pixels;
+            assert( p_out );
             int i_line;
 
             for( i_line = p_src->p[i].i_visible_lines; i_line--; )
