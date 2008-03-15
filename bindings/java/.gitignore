@@ -1,0 +1,12 @@
+.classpath
+.project
+.settings/
+core/.classpath
+core/.project
+core/.settings/
+core/target/
+samples/client/.classpath
+samples/client/.project
+samples/client/.settings/
+samples/client/target/
+target/
