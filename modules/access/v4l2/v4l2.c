@@ -2451,13 +2451,12 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
 static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
                             vlc_bool_t b_demux )
 {
-    char *psz_device = p_sys->psz_adev;
     int i_fd = 0;
     int i_format;
     /* OSS */
-    if( !psz_device ) psz_device = strdup( OSS_DEFAULT ); /* FIXME leak */
+    char* psz_oss_device_name = strdup( ( !p_sys->psz_adev ) ? OSS_DEFAULT : p_sys->psz_adev );
 
-    if( (i_fd = open( psz_device, O_RDONLY | O_NONBLOCK )) < 0 )
+    if( (i_fd = open( psz_oss_device_name, O_RDONLY | O_NONBLOCK )) < 0 )
     {
         msg_Err( p_this, "cannot open OSS audio device (%m)" );
         goto adev_fail;
@@ -2490,10 +2489,12 @@ static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
 
     if( !p_sys->psz_adev )
         p_sys->psz_adev = strdup( OSS_DEFAULT );
+    free( psz_oss_device_name );
     return i_fd;
 
  adev_fail:
 
+    free( psz_oss_device_name );
     if( i_fd >= 0 ) close( i_fd );
     return -1;
 
@@ -2893,11 +2894,11 @@ static vlc_bool_t ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
 {
     int i_fd = 0;
     int i_caps;
-    if( !psz_device ) psz_device = strdup( OSS_DEFAULT ); /* FIXME leak */
+    char* psz_oss_device_name = strdup( ( !psz_device ) ? OSS_DEFAULT : psz_device );
 
-    if( ( i_fd = open( psz_device, O_RDONLY | O_NONBLOCK ) ) < 0 )
+    if( ( i_fd = open( psz_oss_device_name, O_RDONLY | O_NONBLOCK ) ) < 0 )
     {
-        msg_Err( p_this, "cannot open device %s for OSS audio (%m)", psz_device );
+        msg_Err( p_this, "cannot open device %s for OSS audio (%m)", psz_oss_device_name );
         goto open_failed;
     }
 
@@ -2908,11 +2909,13 @@ static vlc_bool_t ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
         goto open_failed;
     }
 
+    free( psz_oss_device_name );
     if( i_fd >= 0 ) close( i_fd );
 
     return VLC_TRUE;
 
 open_failed:
+    free( psz_oss_device_name );
     if( i_fd >= 0 ) close( i_fd );
     return VLC_FALSE;
 }
