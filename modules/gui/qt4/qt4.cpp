@@ -384,7 +384,7 @@ static void Init( intf_thread_t *p_intf )
 
     /* Destroy first the main interface because it is connected to some slots
        in the MainInputManager */
-    if( p_intf->p_sys->p_mi ) delete p_intf->p_sys->p_mi;
+    delete p_intf->p_sys->p_mi;
 
     /* Destroy then other windows, because some are connected to some slots
        in the MainInputManager */

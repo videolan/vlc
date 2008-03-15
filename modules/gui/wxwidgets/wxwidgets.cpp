@@ -418,7 +418,7 @@ int Instance::OnExit()
     if( p_intf->pf_show_dialog )
     {
          /* We need to manually clean up the dialogs class */
-         if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
+         delete p_intf->p_sys->p_wxwindow;
     }
 
 #if (wxCHECK_VERSION(2,5,0))

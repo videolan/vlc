@@ -777,20 +777,20 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
                 {
                     msg_Dbg( p_vout, "using single-buffered overlay" );
                     bitmap_count = 2;
-                    if( bitmap[2] ) { delete bitmap[2]; bitmap[2] = NULL; }
+                    delete bitmap[2]; bitmap[2] = NULL;
                 }
             }
             else
             {
                 msg_Dbg( p_vout, "using simple overlay" );
                 bitmap_count = 1;
-                if( bitmap[1] ) { delete bitmap[1]; bitmap[1] = NULL; }
+                delete bitmap[1]; bitmap[1] = NULL;
             }
             break;
         }
         else
         {
-            if( bitmap[0] ) { delete bitmap[0]; bitmap[0] = NULL; }
+            delete bitmap[0]; bitmap[0] = NULL;
         }
     }
 
@@ -829,9 +829,9 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
 void
 VideoWindow::_FreeBuffers()
 {
-    if( bitmap[0] ) { delete bitmap[0]; bitmap[0] = NULL; }
-    if( bitmap[1] ) { delete bitmap[1]; bitmap[1] = NULL; }
-    if( bitmap[2] ) { delete bitmap[2]; bitmap[2] = NULL; }
+    delete bitmap[0]; bitmap[0] = NULL;
+    delete bitmap[1]; bitmap[1] = NULL;
+    delete bitmap[2]; bitmap[2] = NULL;
     fInitStatus = B_ERROR;
 }
 

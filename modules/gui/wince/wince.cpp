@@ -273,7 +273,7 @@ static void MainLoop( intf_thread_t *p_intf )
     }
 
  end:
-    if( intf ) delete intf;
+    delete intf;
 
 #ifndef UNDER_CE
     /* Uninitialize OLE/COM */

@@ -116,8 +116,8 @@ Interface::Interface( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 Interface::~Interface()
 {
-    if( timer ) delete timer;
-    if( video ) delete video;
+    delete timer;
+    delete video;
 }
 
 BOOL Interface::InitInstance()

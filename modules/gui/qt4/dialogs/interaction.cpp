@@ -197,8 +197,8 @@ void InteractionDialog::update()
 
 InteractionDialog::~InteractionDialog()
 {
-//    if( panel ) delete panel;
-    if( dialog ) delete dialog;
+//    delete panel;
+    delete dialog;
 }
 
 void InteractionDialog::defaultB()

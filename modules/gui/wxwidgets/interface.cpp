@@ -512,19 +512,19 @@ Interface::~Interface()
 
     PopEventHandler(true);
 
-    if( video_window ) delete video_window;
+    delete video_window;
 
 /* wxCocoa pretends to support this, but at least 2.6.x doesn't */
 #ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
-    if( p_systray ) delete p_systray;
+    delete p_systray;
 #endif
 #endif
 
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
-    if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
+    delete p_intf->p_sys->p_wxwindow;
 
 
     /* Clean up */

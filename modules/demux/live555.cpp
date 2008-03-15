@@ -530,7 +530,7 @@ describe:
 
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
-    if( psz_options ) delete [] psz_options;
+    delete [] psz_options;
 
     p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
                          var_GetBool( p_demux, "rtsp-kasenna" ) );
