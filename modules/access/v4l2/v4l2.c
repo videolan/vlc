@@ -2454,7 +2454,7 @@ static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
     int i_fd = 0;
     int i_format;
     /* OSS */
-    char* psz_oss_device_name = strdup( ( !p_sys->psz_adev ) ? OSS_DEFAULT : p_sys->psz_adev );
+    char* psz_oss_device_name = strdup( p_sys->psz_adev ? p_sys->psz_adev : OSS_DEFAULT );
 
     if( (i_fd = open( psz_oss_device_name, O_RDONLY | O_NONBLOCK )) < 0 )
     {
@@ -2894,7 +2894,7 @@ static vlc_bool_t ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
 {
     int i_fd = 0;
     int i_caps;
-    char* psz_oss_device_name = strdup( ( !psz_device ) ? OSS_DEFAULT : psz_device );
+    char* psz_oss_device_name = strdup( psz_device ? psz_device : OSS_DEFAULT );
 
     if( ( i_fd = open( psz_oss_device_name, O_RDONLY | O_NONBLOCK ) ) < 0 )
     {
