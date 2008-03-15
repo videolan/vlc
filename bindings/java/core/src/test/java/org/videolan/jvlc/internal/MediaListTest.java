@@ -74,4 +74,22 @@ public class MediaListTest
         libvlc.libvlc_media_list_add_media_descriptor(mediaList, libvlc_media_descriptor , exception);
         Assert.assertEquals(0, exception.raised);
     }
+    
+    @Test
+    public void mediaListCountTest()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
+        String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
+        LibVlcMediaDescriptor libvlc_media_descriptor = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, libvlc_media_descriptor , exception);
+        int result = libvlc.libvlc_media_list_count(mediaList, exception);
+        Assert.assertEquals(1, result);
+        Assert.assertEquals(0, exception.raised);
+        
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, libvlc_media_descriptor , exception);
+        result = libvlc.libvlc_media_list_count(mediaList, exception);
+        Assert.assertEquals(2, result);
+        Assert.assertEquals(0, exception.raised);
+    }
 }
