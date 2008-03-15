@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd ">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.videolan</groupId>
-  <artifactId>jvlc-parent</artifactId>
+  <parent>
+    <groupId>org.videolan</groupId>
+    <artifactId>jvlc-parent</artifactId>
+    <version>0.9.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>jvlc-samples</artifactId>
   <packaging>pom</packaging>
-  <name>JVLC</name>
-  <description>Java Bindings for VideoLAN</description>
+  <name>JVLC - Samples</name>
+  <description>Java Bindings for VideoLAN - Samples</description>
   <version>0.9.0-SNAPSHOT</version>
-  <licenses>
-    <license>
-      <name>GPLv2</name>
-      <url>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</url>
-    </license>
-  </licenses>
+
   <modules>
-    <module>core</module>
-    <module>samples</module>
+    <module>client</module>
   </modules>
+
 </project>
