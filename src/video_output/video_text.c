@@ -75,7 +75,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
 {
     subpicture_t *p_spu;
     video_format_t fmt;
-    (void)p_style; // FIXME: <-- why ask for this if it's unused?!?
+    /* (void)p_style; FIXME: <-- why ask for this if it's unused?!? */
 
     if( !psz_string ) return VLC_EGENERIC;
 
