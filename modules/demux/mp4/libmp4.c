@@ -826,9 +826,16 @@ error:
     MP4_READBOX_EXIT( code );
 }
 
+
+static void MP4_FreeBox_ctts( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_ctts->i_sample_count );
+    FREENULL( p_box->data.p_ctts->i_sample_offset );
+}
+
 static int MP4_ReadBox_ctts( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    unsigned int i;
+    unsigned int i, code = 0;
     MP4_READBOX_ENTER( MP4_Box_data_ctts_t );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_ctts );
@@ -839,26 +846,29 @@ static int MP4_ReadBox_ctts( stream_t *p_stream, MP4_Box_t *p_box )
         calloc( p_box->data.p_ctts->i_entry_count, sizeof(uint32_t) );
     p_box->data.p_ctts->i_sample_offset =
         calloc( p_box->data.p_ctts->i_entry_count, sizeof(uint32_t) );
+    if( ( p_box->data.p_ctts->i_sample_count == NULL )
+     || ( p_box->data.p_ctts->i_sample_offset == NULL ) )
+    {
+        MP4_FreeBox_ctts( p_box );
+        goto error;
+    }
 
     for( i = 0; (i < p_box->data.p_ctts->i_entry_count )&&( i_read >=8 ); i++ )
     {
         MP4_GET4BYTES( p_box->data.p_ctts->i_sample_count[i] );
         MP4_GET4BYTES( p_box->data.p_ctts->i_sample_offset[i] );
     }
+    code = 1;
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"ctts\" entry-count %d",
                       p_box->data.p_ctts->i_entry_count );
 
 #endif
-    MP4_READBOX_EXIT( 1 );
+error:
+    MP4_READBOX_EXIT( code );
 }
 
-static void MP4_FreeBox_ctts( MP4_Box_t *p_box )
-{
-    FREENULL( p_box->data.p_ctts->i_sample_count );
-    FREENULL( p_box->data.p_ctts->i_sample_offset );
-}
 
 static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
 {
