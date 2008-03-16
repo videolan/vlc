@@ -28,6 +28,21 @@
     <url>http://trac.videolan.org/jvlc</url>
   </issueManagement>
 
+  <distributionManagement>
+    <site>
+      <id>jvlc</id>
+      <url>http://jvlc.ihack.it/maven-site</url>
+      <name>JVLC Maven Site</name>
+    </site>
+  </distributionManagement>
+
+  <scm>
+    <connection>scm:git:git://git.videolan.org/vlc</connection>
+    <developerConnection>scm:git:git://git.videolan.org/vlc</developerConnection>
+    <tag>HEAD</tag>
+    <url>http://git.videolan.org/gitweb.cgi</url>
+  </scm>
+
   <developers>
     <developer>
       <name>Filippo Carone</name>
@@ -58,8 +73,25 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>2.0-beta-5</version>
+        <configuration>
+          <stagingSiteURL>
+            scp://jvlc.ihack.it//home/littlejohn/www/ihack.it/jvlc/maven-site/staging/${pom.artifactId}/
+          </stagingSiteURL>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -93,7 +125,7 @@
         <configuration>
           <links>
             <link>
-	      http://java.sun.com/j2se/1.5.0/docs/api/
+	          http://java.sun.com/j2se/1.5.0/docs/api/
             </link>
           </links>
         </configuration>
@@ -101,18 +133,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>dependencies</report>
-              <report>issue-tracking</report>
-              <report>project-team</report>
-              <report>license</report>
-            </reports>
-          </reportSet>
-        </reportSets>
       </plugin>
     </plugins>
+    
   </reporting>
 
   <modules>
