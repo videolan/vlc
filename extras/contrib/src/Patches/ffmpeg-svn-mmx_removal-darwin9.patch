@@ -1,28 +1,79 @@
-Index: libswscale/yuv2rgb.c
-===================================================================
---- libswscale/yuv2rgb.c	(revision 25527)
-+++ libswscale/yuv2rgb.c	(working copy)
-@@ -156,6 +156,7 @@
- };
- #endif
+diff --git a/libpostproc/postprocess.c b/libpostproc/postprocess.c
+index 572e607..4608d9d 100644
+--- a/libpostproc/postprocess.c
++++ b/libpostproc/postprocess.c
+@@ -563,10 +563,6 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride,
+ 
+ //Note: we have C, MMX, MMX2, 3DNOW version there is no 3DNOW+MMX2 one
+ //Plain C versions
+-#if !defined (HAVE_MMX) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_C
+-#endif
+-
+ #ifdef ARCH_POWERPC
+ #ifdef HAVE_ALTIVEC
+ #define COMPILE_ALTIVEC
+@@ -575,17 +571,8 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride,
+ 
+ #if defined(ARCH_X86)
+ 
+-#if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_MMX
+-#endif
+-
+-#if defined (HAVE_MMX2) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_MMX2
+-#endif
++#define COMPILE_C
+ 
+-#if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
+-#define COMPILE_3DNOW
+-#endif
+ #endif /* defined(ARCH_X86) */
+ 
+ #undef HAVE_MMX
+@@ -655,15 +642,7 @@ static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[]
+         // someone might exchange the CPU whithout restarting MPlayer ;)
+ #ifdef RUNTIME_CPUDETECT
+ #if defined(ARCH_X86)
+-        // ordered per speed fastest first
+-        if(c->cpuCaps & PP_CPU_CAPS_MMX2)
+-                postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+-        else if(c->cpuCaps & PP_CPU_CAPS_3DNOW)
+-                postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+-        else if(c->cpuCaps & PP_CPU_CAPS_MMX)
+-                postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+-        else
+-                postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
++        postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+ #else
+ #ifdef ARCH_POWERPC
+ #ifdef HAVE_ALTIVEC
+diff --git a/libswscale/rgb2rgb.c b/libswscale/rgb2rgb.c
+index faf3e95..d226e49 100644
+--- a/libswscale/rgb2rgb.c
++++ b/libswscale/rgb2rgb.c
+@@ -158,6 +158,7 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
+ #define RENAME(a) a ## _C
+ #include "rgb2rgb_template.c"
  
 +#if 0
- #ifdef HAVE_MMX
+ #if defined(ARCH_X86) && defined(CONFIG_GPL)
  
- /* hope these constant values are cache line aligned */
-@@ -201,6 +202,7 @@
- #include "yuv2rgb_template.c"
+ //MMX versions
+@@ -188,6 +189,7 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
+ #include "rgb2rgb_template.c"
  
- #endif /* defined(ARCH_X86) */
+ #endif //ARCH_X86 || ARCH_X86_64
 +#endif
  
- const int32_t Inverse_Table_6_9[8][4] = {
-     {117504, 138453, 13954, 34903}, /* no sequence_display_extension */
-Index: libswscale/swscale.c
-===================================================================
---- libswscale/swscale.c	(revision 25943)
-+++ libswscale/swscale.c	(working copy)
-@@ -875,9 +875,7 @@
+ /*
+  rgb15->rgb16 Original by Strepto/Astral
+diff --git a/libswscale/swscale.c b/libswscale/swscale.c
+index 5e3c0a9..359ef14 100644
+--- a/libswscale/swscale.c
++++ b/libswscale/swscale.c
+@@ -875,9 +875,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
  
  //Note: we have C, X86, MMX, MMX2, 3DNOW version therse no 3DNOW+MMX2 one
  //Plain C versions
@@ -32,7 +83,7 @@ Index: libswscale/swscale.c
  
  #ifdef ARCH_POWERPC
  #if (defined (HAVE_ALTIVEC) || defined (RUNTIME_CPUDETECT)) && defined (CONFIG_GPL)
-@@ -885,6 +883,7 @@
+@@ -885,6 +883,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
  #endif //HAVE_ALTIVEC
  #endif //ARCH_POWERPC
  
@@ -40,7 +91,7 @@ Index: libswscale/swscale.c
  #if defined(ARCH_X86)
  
  #if ((defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)) && defined (CONFIG_GPL)
-@@ -899,6 +898,7 @@
+@@ -899,6 +898,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
  #define COMPILE_3DNOW
  #endif
  #endif //ARCH_X86 || ARCH_X86_64
@@ -48,7 +99,7 @@ Index: libswscale/swscale.c
  
  #undef HAVE_MMX
  #undef HAVE_MMX2
-@@ -1544,15 +1544,8 @@
+@@ -1544,15 +1544,8 @@ static SwsFunc getSwsFunc(int flags){
  #if defined(RUNTIME_CPUDETECT) && defined (CONFIG_GPL)
  #if defined(ARCH_X86)
      // ordered per speed fastest first
@@ -66,74 +117,23 @@ Index: libswscale/swscale.c
  #else
  #ifdef ARCH_POWERPC
      if (flags & SWS_CPU_CAPS_ALTIVEC)
-Index: libswscale/rgb2rgb.c
-===================================================================
---- libswscale/rgb2rgb.c	(revision 25527)
-+++ libswscale/rgb2rgb.c	(working copy)
-@@ -171,6 +171,7 @@
- #define RENAME(a) a ## _C
- #include "rgb2rgb_template.c"
+diff --git a/libswscale/yuv2rgb.c b/libswscale/yuv2rgb.c
+index 8ece0f6..6dac051 100644
+--- a/libswscale/yuv2rgb.c
++++ b/libswscale/yuv2rgb.c
+@@ -156,6 +156,7 @@ const uint8_t  __attribute__((aligned(8))) dither_8x8_220[8][8]={
+ };
+ #endif
  
 +#if 0
- #if defined(ARCH_X86) && defined(CONFIG_GPL)
+ #ifdef HAVE_MMX
  
- //MMX versions
-@@ -201,6 +202,7 @@
- #include "rgb2rgb_template.c"
+ /* hope these constant values are cache line aligned */
+@@ -189,6 +190,7 @@ static volatile uint64_t attribute_used __attribute__((aligned(8))) r5Dither;
+ #include "yuv2rgb_template.c"
  
- #endif //ARCH_X86 || ARCH_X86_64
+ #endif /* defined(ARCH_X86) */
 +#endif
  
- /*
-  rgb15->rgb16 Original by Strepto/Astral
-Index: libpostproc/postprocess.c
-===================================================================
---- libpostproc/postprocess.c	(revision 11315)
-+++ libpostproc/postprocess.c	(working copy)
-@@ -566,10 +566,6 @@
- 
- //Note: we have C, MMX, MMX2, 3DNOW version there is no 3DNOW+MMX2 one
- //Plain C versions
--#if !defined (HAVE_MMX) || defined (RUNTIME_CPUDETECT)
--#define COMPILE_C
--#endif
--
- #ifdef ARCH_POWERPC
- #ifdef HAVE_ALTIVEC
- #define COMPILE_ALTIVEC
-@@ -578,17 +574,8 @@
- 
- #if defined(ARCH_X86)
- 
--#if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
--#define COMPILE_MMX
--#endif
-+#define COMPILE_C
- 
--#if defined (HAVE_MMX2) || defined (RUNTIME_CPUDETECT)
--#define COMPILE_MMX2
--#endif
--
--#if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
--#define COMPILE_3DNOW
--#endif
- #endif /* defined(ARCH_X86) */
- 
- #undef HAVE_MMX
-@@ -658,15 +645,7 @@
-         // someone might exchange the CPU whithout restarting MPlayer ;)
- #ifdef RUNTIME_CPUDETECT
- #if defined(ARCH_X86)
--        // ordered per speed fasterst first
--        if(c->cpuCaps & PP_CPU_CAPS_MMX2)
--                postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
--        else if(c->cpuCaps & PP_CPU_CAPS_3DNOW)
--                postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
--        else if(c->cpuCaps & PP_CPU_CAPS_MMX)
--                postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
--        else
--                postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
-+        postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
- #else
- #ifdef ARCH_POWERPC
- #ifdef HAVE_ALTIVEC
+ const int32_t Inverse_Table_6_9[8][4] = {
+     {117504, 138453, 13954, 34903}, /* no sequence_display_extension */
