@@ -1,7 +1,7 @@
 /*****************************************************************************
- * playlist.c : Playlist management functions
+ * thread.c : Playlist management functions
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright © 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -31,7 +31,6 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include "playlist_internal.h"
-#include "interface/interface.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -40,8 +39,6 @@ static void RunControlThread ( playlist_t * );
 static void RunPreparse( playlist_preparse_t * );
 static void RunFetcher( playlist_fetcher_t * );
 
-static void DestroyInteraction( playlist_t * );
-
 /*****************************************************************************
  * Main functions for the global thread
  *****************************************************************************/
@@ -49,7 +46,6 @@ static void DestroyInteraction( playlist_t * );
 /**
  * Create the main playlist thread
  * Additionally to the playlist, this thread controls :
- *    - Interaction
  *    - Statistics
  *    - VLM
  * \param p_parent
@@ -175,8 +171,6 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
     if( p_playlist->p_stats )
         free( p_playlist->p_stats );
 
-    DestroyInteraction( p_playlist );
-
     playlist_Destroy( p_playlist );
 
     return VLC_SUCCESS;
@@ -194,9 +188,6 @@ static void RunControlThread ( playlist_t *p_playlist )
     while( !p_playlist->b_die )
     {
         i_loops++;
-
-        if( p_playlist->p_interaction )
-            intf_InteractionManage( p_playlist );
 
         playlist_MainLoop( p_playlist );
         if( p_playlist->b_cant_sleep )
@@ -229,16 +220,4 @@ static void RunFetcher( playlist_fetcher_t *p_obj )
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
     playlist_FetcherLoop( p_obj );
-}
-
-/*****************************************************************************
- * Interaction functions
- *****************************************************************************/
-static void DestroyInteraction( playlist_t *p_playlist )
-{
-    if( p_playlist->p_interaction )
-    {
-        intf_InteractionDestroy( p_playlist->p_interaction );
-        p_playlist->p_interaction = NULL;
-    }
 }

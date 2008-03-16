@@ -151,11 +151,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->i_order = ORDER_NORMAL;
 
 
-    /* Interaction
-     * Init the interaction here, as playlist_MLLoad could trigger
-     * interaction init */
-    p_playlist->p_interaction = NULL;
-
     b_save = p_playlist->b_auto_preparse;
     p_playlist->b_auto_preparse = VLC_FALSE;
     playlist_MLLoad( p_playlist );

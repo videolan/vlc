@@ -237,7 +237,6 @@ struct playlist_t
     } request;
 
     // Playlist-unrelated fields
-    interaction_t       *p_interaction;    /**< Interaction manager */
     input_thread_t      *p_stats_computer; /**< Input thread computing stats */
     global_stats_t      *p_stats;          /**< Global statistics */
 };

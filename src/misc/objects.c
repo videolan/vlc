@@ -336,6 +336,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof( osd_menu_t );
             psz_type = "osd menu";
             break;
+        case VLC_OBJECT_INTERACTION:
+            i_size = sizeof( interaction_t );
+            psz_type = "interaction";
+            break;
         default:
             i_size = i_type > (int)sizeof(vlc_object_t)
                          ? i_type : (int)sizeof(vlc_object_t);
