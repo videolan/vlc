@@ -51,6 +51,7 @@
 #include <vlc_aout.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
+#include <vlc_es.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
 
@@ -2001,54 +2002,106 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             vlc_mutex_lock( &p_item->lock );
             vlc_mutex_lock( &p_item->p_stats->lock );
 
+            int i_audio = 0;
+            int i_video = 0;
+            int i;
+
+            if( !p_item->i_es )
+                i_video = i_audio = 1;
+            else
+                for( i = 0; i < p_item->i_es ; i++ )
+                {
+                    printf( "XXX %d\n", p_item->es[i]->i_cat );
+                    i_audio += ( p_item->es[i]->i_cat == AUDIO_ES );
+                    i_video += ( p_item->es[i]->i_cat == VIDEO_ES );
+                }
+
+            int l = 0;
+
+#define SHOW_ACS(x,c) \
+    if(l >= p_sys->i_box_start && l - p_sys->i_box_start < p_sys->i_box_lines) \
+        mvaddch( p_sys->i_box_y - p_sys->i_box_start + l, x, c )
+
             /* Input */
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
-            mvnprintw( y++, 1, COLS-2, _("+-[Incoming]"));
+            MainBoxWrite( p_intf, l, 1, _("+-[Incoming]"));
+            SHOW_ACS( 1, ACS_ULCORNER );  SHOW_ACS( 2, ACS_HLINE ); l++;
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-            mvnprintw( y++, 1, COLS-2, _("| input bytes read : %8.0f kB"),
+            MainBoxWrite( p_intf, l, 1, _("| input bytes read : %8.0f kB"),
                     (float)(p_item->p_stats->i_read_bytes)/1000 );
-            mvnprintw( y++, 1, COLS-2, _("| input bitrate    :   %6.0f kb/s"),
+            SHOW_ACS( 1, ACS_VLINE ); l++;
+            MainBoxWrite( p_intf, l, 1, _("| input bitrate    :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_input_bitrate)*8000 );
-            mvnprintw( y++, 1, COLS-2,_("| demux bytes read : %8.0f kB"),
+            MainBoxWrite( p_intf, l, 1, _("| demux bytes read : %8.0f kB"),
                     (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
-            mvnprintw( y++, 1, COLS-2,_("| demux bitrate    :   %6.0f kb/s"),
+            SHOW_ACS( 1, ACS_VLINE ); l++;
+            MainBoxWrite( p_intf, l, 1, _("| demux bitrate    :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_demux_bitrate)*8000 );
-            mvnprintw( y++, 1, COLS-2,"|");
+            SHOW_ACS( 1, ACS_VLINE ); l++; SHOW_ACS( 1, ACS_VLINE ); l++;
+
             /* Video */
-            if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
-            mvnprintw( y++, 1, COLS-2,_("+-[Video Decoding]"));
-            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-            mvnprintw( y++, 1, COLS-2,_("| video decoded    :    %5i"),
-                    p_item->p_stats->i_decoded_video );
-            mvnprintw( y++, 1, COLS-2,_("| frames displayed :    %5i"),
-                    p_item->p_stats->i_displayed_pictures );
-            mvnprintw( y++, 1, COLS-2,_("| frames lost      :    %5i"),
-                    p_item->p_stats->i_lost_pictures );
-            mvnprintw( y++, 1, COLS-2,"|");
+            if( i_video )
+            {
+                if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
+                MainBoxWrite( p_intf, l, 1, _("+-[Video Decoding]"));
+                SHOW_ACS( 1, ACS_LTEE );  SHOW_ACS( 2, ACS_HLINE ); l++;
+                if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+                MainBoxWrite( p_intf, l, 1, _("| video decoded    :    %5i"),
+                        p_item->p_stats->i_decoded_video );
+                SHOW_ACS( 1, ACS_VLINE ); l++;
+                MainBoxWrite( p_intf, l, 1, _("| frames displayed :    %5i"),
+                        p_item->p_stats->i_displayed_pictures );
+                SHOW_ACS( 1, ACS_VLINE ); l++;
+                MainBoxWrite( p_intf, l, 1, _("| frames lost      :    %5i"),
+                        p_item->p_stats->i_lost_pictures );
+                SHOW_ACS( 1, ACS_VLINE ); l++; SHOW_ACS( 1, ACS_VLINE ); l++;
+            }
             /* Audio*/
-            if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
-            mvnprintw( y++, 1, COLS-2,_("+-[Audio Decoding]"));
-            if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-            mvnprintw( y++, 1, COLS-2,_("| audio decoded    :    %5i"),
-                    p_item->p_stats->i_decoded_audio );
-            mvnprintw( y++, 1, COLS-2,_("| buffers played   :    %5i"),
-                    p_item->p_stats->i_played_abuffers );
-            mvnprintw( y++, 1, COLS-2,_("| buffers lost     :    %5i"),
-                    p_item->p_stats->i_lost_abuffers );
-            mvnprintw( y++, 1, COLS-2,"|");
+            if( i_audio )
+            {
+                if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
+                MainBoxWrite( p_intf, l, 1, _("+-[Audio Decoding]"));
+                SHOW_ACS( 1, ACS_LTEE );  SHOW_ACS( 2, ACS_HLINE ); l++;
+                if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+                MainBoxWrite( p_intf, l, 1, _("| audio decoded    :    %5i"),
+                        p_item->p_stats->i_decoded_audio );
+                SHOW_ACS( 1, ACS_VLINE ); l++;
+                MainBoxWrite( p_intf, l, 1, _("| buffers played   :    %5i"),
+                        p_item->p_stats->i_played_abuffers );
+                SHOW_ACS( 1, ACS_VLINE ); l++;
+                MainBoxWrite( p_intf, l, 1, _("| buffers lost     :    %5i"),
+                        p_item->p_stats->i_lost_abuffers );
+                SHOW_ACS( 1, ACS_VLINE ); l++; SHOW_ACS( 1, ACS_VLINE ); l++;
+            }
             /* Sout */
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
-            mvnprintw( y++, 1, COLS-2,_("+-[Streaming]"));
+            MainBoxWrite( p_intf, l, 1, _("+-[Streaming]"));
+            SHOW_ACS( 1, ACS_LTEE );  SHOW_ACS( 2, ACS_HLINE ); l++;
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-            mvnprintw( y++, 1, COLS-2,_("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
-            mvnprintw( y++, 1, COLS-2,_("| bytes sent       : %8.0f kB"),
+            MainBoxWrite( p_intf, l, 1, _("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
+            SHOW_ACS( 1, ACS_VLINE ); l++;
+            MainBoxWrite( p_intf, l, 1, _("| bytes sent       : %8.0f kB"),
                     (float)(p_item->p_stats->i_sent_bytes)/1000 );
-            mvnprintw( y++, 1, COLS-2,_("| sending bitrate  :   %6.0f kb/s"),
+            SHOW_ACS( 1, ACS_VLINE ); l++;
+            MainBoxWrite( p_intf, l, 1, _("\\ sending bitrate  :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
+            SHOW_ACS( 1, ACS_LLCORNER ); l++;
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
+
+#undef SHOW_ACS
+
+            p_sys->i_box_lines_total = l;
+            if( p_sys->i_box_start >= p_sys->i_box_lines_total )
+                p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+
+            if( l - p_sys->i_box_start < p_sys->i_box_lines )
+                y += l - p_sys->i_box_start;
+            else
+                y += p_sys->i_box_lines;
 
             vlc_mutex_unlock( &p_item->p_stats->lock );
             vlc_mutex_unlock( &p_item->lock );
+
         }
     }
     else if( p_sys->i_box_type == BOX_PLAYLIST ||
