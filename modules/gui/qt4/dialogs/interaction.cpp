@@ -184,7 +184,6 @@ void InteractionDialog::update()
         assert( progressBar );
         progressBar->setValue( (int)( p_dialog->val.f_float * 10 ) );
         description->setText( qfu( p_dialog->psz_description ) );
-        msg_Dbg( p_intf, "Setting progress to %i", progressBar->value() );
     }
 
     if( ( p_dialog->i_flags & DIALOG_INTF_PROGRESS ) &&
