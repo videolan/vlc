@@ -2,8 +2,8 @@
             First of all, this is a *developers* only version
 
 
-Compiling JVLC
---------------
+How to compile JVLC
+-------------------
 
  JVLC uses maven2 as a project the management tool, take a look at
 
@@ -19,7 +19,21 @@ mvn install
 
 mvn eclipse:eclipse
 
- and the import as an existing Java project.
+ and then import as an existing Java project.
+
+
+How to run the sample client
+----------------------------
+
+ 1. mvn install (in bindings/java)
+
+ 2. mvn package exec:java (in bindings/java/samples/client)
+
+
+How to create the jvlc site
+---------------------------
+
+ 1. mvn site
 
 
 
