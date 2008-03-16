@@ -2011,7 +2011,6 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             else
                 for( i = 0; i < p_item->i_es ; i++ )
                 {
-                    printf( "XXX %d\n", p_item->es[i]->i_cat );
                     i_audio += ( p_item->es[i]->i_cat == AUDIO_ES );
                     i_video += ( p_item->es[i]->i_cat == VIDEO_ES );
                 }
