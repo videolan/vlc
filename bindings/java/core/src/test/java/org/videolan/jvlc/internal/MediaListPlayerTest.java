@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaListPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
@@ -100,6 +99,17 @@ public class MediaListPlayerTest
         int result = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
         Assert.assertEquals(0, result);
         Assert.assertEquals(0, exception.raised);
+    }
+
+//    @Test
+    /**
+     * This test is disabled: see https://trac.videolan.org/vlc/ticket/1524
+     */
+    public void mediaListPlayerPlayNoItemTest()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
+        libvlc.libvlc_media_list_player_play(mediaListPlayer, exception);
     }
 
 }
