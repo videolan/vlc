@@ -124,6 +124,11 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
 {
     input_thread_t *p_input_thread;
 
+    if ( !p_mi )
+    {
+        RAISENULL( "Input is NULL" );
+    }
+
     vlc_mutex_lock( &p_mi->object_lock );
 
     if( !p_mi || p_mi->i_input_id == -1 )

@@ -92,10 +92,7 @@ public class MediaListPlayerTest
         Assert.assertEquals(0, exception.raised);
     }
     
-//    @Test
-    /**
-     * see Ticket #1522 on trac ( http://trac.videolan.org/vlc/ticket/1522 ) 
-     */
+    @Test
     public void mediaListPlayerIsPlayingTest()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
