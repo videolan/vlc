@@ -34,7 +34,7 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 public class LibVlcCoreTest
 {
 
-    private LibVlc instance = LibVlc.INSTANCE;
+    private LibVlc instance = LibVlc.SYNC_INSTANCE;
     
     @Test
     public void testNew() throws Exception

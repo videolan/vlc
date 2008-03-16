@@ -39,7 +39,7 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 public class MediaListTest
 {
 
-    private LibVlc libvlc = LibVlc.INSTANCE;
+    private LibVlc libvlc = LibVlc.SYNC_INSTANCE;
 
     private LibVlcInstance libvlcInstance;
 
