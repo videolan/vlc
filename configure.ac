@@ -392,7 +392,7 @@ lt_cv_deplibs_check_method=pass_all
 dnl
 dnl Gettext stuff
 dnl
-AM_GNU_GETTEXT_VERSION(0.17)
+AM_GNU_GETTEXT_VERSION(0.16.1)
 AM_GNU_GETTEXT([external])
 VLC_ADD_LIBS([libvlc vlc], [${LTLIBINTL}])
 
@@ -5987,10 +5987,11 @@ if test "${enable_java_bindings}" = "yes"
 then
         echo ""
         echo "****** WARNING **** WARNING ***** WARNING *************"
-        echo "*** To compile the java bindings go to the 
-        echo "*** bindings/java folder and run ant.
-	echo "*** This configuration will continue, so you will be
-	echo "*** able to compile VideoLAN as usual.
+        echo "*** To compile the java bindings go to the "
+        echo "*** bindings/java folder and run mvn install. "
+	echo "*** You need maven2 installed. "
+	echo "*** This configuration will continue, so you will be "
+	echo "*** able to compile VideoLAN as usual. "
         echo "*******************************************************"
         echo ""
 fi
