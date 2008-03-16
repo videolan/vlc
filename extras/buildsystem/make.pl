@@ -63,13 +63,13 @@ while(<STDIN>)
 	  $line =~ s/(.*):([0-9]*):\swarning\:(.*)/WARNING : $file$1: $lineno$2: $warn$3/g  ||
           $line =~ s/.*is\sdeprecated.*/WARNING : $line/g )
      {
-	print $warn.$line.$reset."\n";
+	print STDERR $warn.$line.$reset."\n";
      }
      # Error
      elsif (
 	  $line =~ s/(.*):([0-9]*):\serror\:(.*)/ERROR   : $file$1: $lineno$2: $error$3/g  )
      {
-	print $error.$line.$reset."\n";
+	print STDERR $error.$line.$reset."\n";
      }
      # Print unmatched lines
      else
