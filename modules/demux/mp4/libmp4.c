@@ -885,12 +885,24 @@ static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
     return( i_len );
 }
 
+
+static void MP4_FreeBox_esds( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_esds->es_descriptor.psz_URL );
+    if( p_box->data.p_esds->es_descriptor.p_decConfigDescr )
+    {
+        FREENULL( p_box->data.p_esds->es_descriptor.p_decConfigDescr->p_decoder_specific_info );
+        FREENULL( p_box->data.p_esds->es_descriptor.p_decConfigDescr );
+    }
+}
+
 static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 {
 #define es_descriptor p_box->data.p_esds->es_descriptor
     unsigned int i_len;
     unsigned int i_flags;
     unsigned int i_type;
+    unsigned int code = 0;
 
     MP4_READBOX_ENTER( MP4_Box_data_esds_t );
 
@@ -958,6 +970,11 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 
     es_descriptor.p_decConfigDescr =
             malloc( sizeof( MP4_descriptor_decoder_config_t ));
+    if( es_descriptor.p_decConfigDescr == NULL )
+    {
+        free( es_descriptor.psz_URL );
+        goto error;
+    }
 
     MP4_GET1BYTE( es_descriptor.p_decConfigDescr->i_objectTypeIndication );
     MP4_GET1BYTE( i_flags );
@@ -983,24 +1000,21 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 
     es_descriptor.p_decConfigDescr->i_decoder_specific_info_len = i_len;
     es_descriptor.p_decConfigDescr->p_decoder_specific_info = malloc( i_len );
-    if( es_descriptor.p_decConfigDescr->p_decoder_specific_info )
-        memcpy( es_descriptor.p_decConfigDescr->p_decoder_specific_info,
-                p_peek, i_len );
+    if( es_descriptor.p_decConfigDescr->p_decoder_specific_info == NULL )
+    {
+        MP4_FreeBox_esds( p_box );
+        goto error;
+    }
+    memcpy( es_descriptor.p_decConfigDescr->p_decoder_specific_info,
+            p_peek, i_len );
+    code = 1;
 
-    MP4_READBOX_EXIT( 1 );
+error:
+    MP4_READBOX_EXIT( code );
 
 #undef es_descriptor
 }
 
-static void MP4_FreeBox_esds( MP4_Box_t *p_box )
-{
-    FREENULL( p_box->data.p_esds->es_descriptor.psz_URL );
-    if( p_box->data.p_esds->es_descriptor.p_decConfigDescr )
-    {
-        FREENULL( p_box->data.p_esds->es_descriptor.p_decConfigDescr->p_decoder_specific_info );
-    }
-    FREENULL( p_box->data.p_esds->es_descriptor.p_decConfigDescr );
-}
 
 static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
 {
