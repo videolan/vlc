@@ -32,9 +32,29 @@
     <developer>
       <name>Filippo Carone</name>
       <id>littlejohn</id>
+      <roles>
+	<role>developer</role>
+	<role>project admin</role>
+      </roles>
+      <timezone>+1</timezone>
+      <email>littlejohn[at]videolan[dot]org</email>
+    </developer>
+    <developer>
+      <name>Philippe Morin</name>
+      <id>phmo95</id>
+      <roles>
+	<role>developer</role>
+      </roles>
+      <email>phmorin[at]free[dot]fr</email>
     </developer>
   </developers>
-
+  <contributors>
+    <contributor>
+      <name>Adrien Grand</name>
+      <email>jpountz[at]jpountz[dot]net</email>
+    </contributor>
+  </contributors>
+  
   <build>
     <plugins>
       <plugin>
@@ -60,7 +80,7 @@
         <configuration>
           <linkXref>true</linkXref>
           <sourceEncoding>utf-8</sourceEncoding>
-          <targetJdk>1.6</targetJdk>
+          <targetJdk>1.5</targetJdk>
         </configuration>
       </plugin>
       <plugin>
@@ -73,7 +93,7 @@
         <configuration>
           <links>
             <link>
-              http://java.sun.com/javase/6/docs/api/
+	      http://java.sun.com/j2se/1.5.0/docs/api/
             </link>
           </links>
         </configuration>
