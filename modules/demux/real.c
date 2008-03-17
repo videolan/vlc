@@ -1228,8 +1228,6 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
 
         if( fmt.i_codec != 0 )
         {
-            int i;
-
             msg_Dbg( p_demux, "        - extra data=%d", fmt.i_extra );
 
             tk = malloc( sizeof( real_track_t ) );
