@@ -40,6 +40,7 @@ get_next_path( libvlc_media_list_player_t * p_mlp )
     libvlc_media_list_path_t ret;
     libvlc_media_list_t * p_parent_of_playing_item;
     libvlc_media_list_t * p_sublist_of_playing_item;
+
     p_sublist_of_playing_item = libvlc_media_list_sublist_at_path(
                             p_mlp->p_mlist,
                             p_mlp->current_playing_item_path );
@@ -427,6 +428,12 @@ void libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
                                     libvlc_exception_t * p_e )
 {    
     libvlc_media_list_path_t path;
+
+    if (! p_mlp->p_mlist )
+    {
+        libvlc_exception_raise( p_e, "No more element to play" );
+        return;
+    }
     
     libvlc_media_list_lock( p_mlp->p_mlist );
 

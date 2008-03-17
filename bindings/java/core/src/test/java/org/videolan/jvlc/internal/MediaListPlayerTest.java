@@ -101,15 +101,13 @@ public class MediaListPlayerTest
         Assert.assertEquals(0, exception.raised);
     }
 
-//    @Test
-    /**
-     * This test is disabled: see https://trac.videolan.org/vlc/ticket/1524
-     */
+    @Test
     public void mediaListPlayerPlayNoItemTest()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         libvlc.libvlc_media_list_player_play(mediaListPlayer, exception);
+        Assert.assertEquals(1, exception.raised);
     }
 
 }
