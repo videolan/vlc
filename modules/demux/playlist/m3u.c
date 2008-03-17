@@ -113,8 +113,6 @@ static int Demux( demux_t *p_demux )
     const char**ppsz_options = NULL;
     int        i_options = 0;
     vlc_bool_t b_cleanup = VLC_FALSE;
-    vlc_bool_t b_enable_extvlcopt = var_CreateGetInteger( p_demux,
-                                                          "m3u-extvlcopt" );
     input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
@@ -154,22 +152,15 @@ static int Demux( demux_t *p_demux )
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
             {
-                if( b_enable_extvlcopt )
-                {
-                    /* VLC Option */
-                    char *psz_option;
-                    psz_parse += sizeof("EXTVLCOPT:") -1;
-                    if( !*psz_parse ) goto error;
+                /* VLC Option */
+                char *psz_option;
+                psz_parse += sizeof("EXTVLCOPT:") -1;
+                if( !*psz_parse ) goto error;
 
-                    psz_option = MaybeFromLocaleDup( psz_parse );
-                    if( psz_option )
-                        INSERT_ELEM( ppsz_options, i_options, i_options,
-                                     psz_option );
-                }
-                else
-                {
-                    msg_Err( p_demux, "m3u EXTVLCOPT parsing is disabled for security reasons. If you need it and trust the m3u playlist you are trying to open, please append --m3u-extvlcopt to your command line." );
-                }
+                psz_option = MaybeFromLocaleDup( psz_parse );
+                if( psz_option )
+                    INSERT_ELEM( ppsz_options, i_options, i_options,
+                                 psz_option );
             }
         }
         else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
