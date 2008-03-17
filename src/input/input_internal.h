@@ -226,6 +226,7 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     p_i->psz_uri = NULL;
     TAB_INIT( p_i->i_es, p_i->es );
     TAB_INIT( p_i->i_options, p_i->ppsz_options );
+    p_i->optflagv = NULL, p_i->optflagc = 0;
     TAB_INIT( p_i->i_categories, p_i->pp_categories );
 
     p_i->i_type = ITEM_TYPE_UNKNOWN;

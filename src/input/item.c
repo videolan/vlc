@@ -115,11 +115,13 @@ static void input_ItemDestroy ( gc_object_t *p_this )
     free( p_input );
 }
 
-void input_ItemAddOpt( input_item_t *p_input, const char *psz_option,
-                       unsigned flags )
+int input_ItemAddOpt( input_item_t *p_input, const char *psz_option,
+                      unsigned flags )
 {
+    int err = VLC_SUCCESS;
+
     if( psz_option == NULL )
-        return;
+        return VLC_EGENERIC;
 
     vlc_mutex_lock( &p_input->lock );
     if (flags & VLC_INPUT_OPTION_UNIQUE)
@@ -129,10 +131,20 @@ void input_ItemAddOpt( input_item_t *p_input, const char *psz_option,
                 goto out;
     }
 
+    uint8_t *flagv = realloc (p_input->optflagv, p_input->optflagc + 1);
+    if (flagv == NULL)
+    {
+        err = VLC_ENOMEM;
+        goto out;
+    }
+    p_input->optflagv = flagv;
+    flagv[p_input->optflagc++] = flags;
+
     INSERT_ELEM( p_input->ppsz_options, p_input->i_options,
                  p_input->i_options, strdup( psz_option ) );
 out:
     vlc_mutex_unlock( &p_input->lock );
+    return err;
 }
 
 int input_ItemAddInfo( input_item_t *p_i,
@@ -270,8 +282,6 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
         p_input->psz_name = strdup( p_input->psz_uri );
 
     p_input->i_duration = i_duration;
-    p_input->ppsz_options = NULL;
-    p_input->i_options = 0;
 
     for( int i = 0; i < i_options; i++ )
         input_ItemAddOption( p_input, ppsz_options[i] );

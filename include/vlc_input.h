@@ -66,6 +66,8 @@ struct input_item_t
 
     int        i_options;            /**< Number of input options */
     char       **ppsz_options;       /**< Array of input options */
+    uint8_t    *optflagv;            /**< Some flags of input options */
+    unsigned   optflagc;
 
     mtime_t    i_duration;           /**< Duration in milliseconds*/
 
@@ -116,6 +118,10 @@ static inline void input_ItemCopyOptions( input_item_t *p_parent,
                                                   p_child->i_options *
                                                   sizeof( char * ) );
         p_child->ppsz_options[p_child->i_options-1] = psz_option;
+        p_child->optflagc++;
+        p_child->optflagv = (uint8_t *)realloc( p_child->optflagv,
+                                                p_child->optflagc );
+        p_child->optflagv[p_child->optflagc - 1] = p_parent->optflagv[i];
     }
 }
 
@@ -142,15 +148,18 @@ static inline void input_ItemAddSubItem( input_item_t *p_parent,
     vlc_event_send( &p_parent->event_manager, &event );
 }
 
-#define VLC_INPUT_OPTION_UNIQUE  0x1
+/* Flags handled past input_ItemAddOpt() */
 #define VLC_INPUT_OPTION_TRUSTED 0x2
 
-VLC_EXPORT( void, input_ItemAddOpt, ( input_item_t *, const char *str, unsigned flags ) );
+/* Flags handled within input_ItemAddOpt() */
+#define VLC_INPUT_OPTION_UNIQUE  0x100
+
+VLC_EXPORT( int, input_ItemAddOpt, ( input_item_t *, const char *str, unsigned flags ) );
 
 static inline
-void input_ItemAddOption (input_item_t *item, const char *str)
+int input_ItemAddOption (input_item_t *item, const char *str)
 {
-    input_ItemAddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
+    return input_ItemAddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
 }
 
 static inline void input_ItemClean( input_item_t *p_i )
@@ -173,6 +182,7 @@ static inline void input_ItemClean( input_item_t *p_i )
     for( i = 0; i < p_i->i_options; i++ )
         free( p_i->ppsz_options[i] );
     TAB_CLEAN( p_i->i_options, p_i->ppsz_options );
+    free( p_i->optflagv);
 
     for( i = 0; i < p_i->i_es; i++ )
     {
