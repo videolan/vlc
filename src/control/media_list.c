@@ -456,7 +456,7 @@ int libvlc_media_list_index_of_item( libvlc_media_list_t * p_mlist,
  *
  * This indicates if this media list is read-only from a user point of view
  **************************************************************************/
-vlc_bool_t libvlc_media_list_is_readonly( libvlc_media_list_t * p_mlist )
+int libvlc_media_list_is_readonly( libvlc_media_list_t * p_mlist )
 {
     return p_mlist->b_read_only;
 }

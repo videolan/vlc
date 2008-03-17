@@ -109,7 +109,7 @@ void libvlc_tag_query_set_match_tag_and_key( libvlc_tag_query_t * p_q,
  *
  * Return true if the query p_q is matched in p_md
  **************************************************************************/
-vlc_bool_t
+int
 libvlc_tag_query_match( libvlc_tag_query_t * p_q,
                         libvlc_media_descriptor_t * p_md,
                         libvlc_exception_t * p_e )

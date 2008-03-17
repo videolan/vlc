@@ -60,8 +60,8 @@ void libvlc_audio_toggle_mute( libvlc_instance_t *p_instance,
     aout_VolumeMute( p_instance->p_libvlc_int, NULL );
 }
 
-vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *p_instance,
-                                  libvlc_exception_t *p_e )
+int libvlc_audio_get_mute( libvlc_instance_t *p_instance,
+                           libvlc_exception_t *p_e )
 {
     /*
      * If the volume level is 0, then the channel is muted
@@ -74,7 +74,7 @@ vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *p_instance,
     return VLC_FALSE;
 }
 
-void libvlc_audio_set_mute( libvlc_instance_t *p_instance, vlc_bool_t mute,
+void libvlc_audio_set_mute( libvlc_instance_t *p_instance, int mute,
                             libvlc_exception_t *p_e )
 {
     if ( mute ^ libvlc_audio_get_mute( p_instance, p_e ) )

@@ -836,9 +836,8 @@ float libvlc_media_instance_get_fps(
     return f_fps;
 }
 
-vlc_bool_t libvlc_media_instance_will_play(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e)
+int libvlc_media_instance_will_play( libvlc_media_instance_t *p_mi,
+                                     libvlc_exception_t *p_e)
 {
     input_thread_t *p_input_thread =
                             libvlc_get_input_thread ( p_mi, p_e);
@@ -914,9 +913,8 @@ libvlc_state_t libvlc_media_instance_get_state(
     return vlc_to_libvlc_state(val.i_int);
 }
 
-vlc_bool_t libvlc_media_instance_is_seekable(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_instance_is_seekable( libvlc_media_instance_t *p_mi,
+                                       libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
@@ -935,9 +933,8 @@ vlc_bool_t libvlc_media_instance_is_seekable(
     return val.b_bool;
 }
 
-vlc_bool_t libvlc_media_instance_can_pause(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_instance_can_pause( libvlc_media_instance_t *p_mi,
+                                     libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;

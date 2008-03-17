@@ -186,8 +186,8 @@ int libvlc_video_get_width( libvlc_media_instance_t *p_mi,
     return p_vout1->i_window_width;
 }
 
-vlc_bool_t libvlc_media_instance_has_vout( libvlc_media_instance_t *p_mi,
-                                  libvlc_exception_t *p_e )
+int libvlc_media_instance_has_vout( libvlc_media_instance_t *p_mi,
+                                     libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread(p_mi, p_e);
     vlc_bool_t has_vout = VLC_FALSE;

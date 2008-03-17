@@ -49,7 +49,7 @@ static inline void playlist_mark_locked( libvlc_instance_t *p_instance,
     vlc_mutex_unlock( &p_instance->instance_lock );
 }
 
-void libvlc_playlist_loop( libvlc_instance_t *p_instance, vlc_bool_t loop,
+void libvlc_playlist_loop( libvlc_instance_t *p_instance, int loop,
                            libvlc_exception_t *p_e)
 {
     VLC_UNUSED(p_e);

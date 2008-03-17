@@ -655,7 +655,7 @@ libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
 /**************************************************************************
  * Get preparsed status for media_descriptor object.
  **************************************************************************/
-vlc_bool_t
+int
 libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
                                        libvlc_exception_t * p_e )
 {

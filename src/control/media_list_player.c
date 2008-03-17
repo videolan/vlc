@@ -342,7 +342,7 @@ void libvlc_media_list_player_pause( libvlc_media_list_player_t * p_mlp,
 /**************************************************************************
  *        is_playing (Public)
  **************************************************************************/
-vlc_bool_t
+int
 libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
                                      libvlc_exception_t * p_e )
 {

@@ -236,7 +236,7 @@ VLC_PUBLIC_API libvlc_time_t
    libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
                                          libvlc_exception_t * p_e );
 
-VLC_PUBLIC_API vlc_bool_t
+VLC_PUBLIC_API int
    libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
                                          libvlc_exception_t * p_e );
 
@@ -262,7 +262,7 @@ VLC_PUBLIC_API void *
 /**
  * Set loop variable
  */
-VLC_PUBLIC_API void libvlc_playlist_loop( libvlc_instance_t* , vlc_bool_t,
+VLC_PUBLIC_API void libvlc_playlist_loop( libvlc_instance_t* , int,
                                           libvlc_exception_t * );
 
 /**
@@ -384,11 +384,11 @@ VLC_PUBLIC_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
 VLC_PUBLIC_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
                                 libvlc_instance_t *, libvlc_exception_t * );
 
-VLC_PUBLIC_API vlc_bool_t libvlc_media_instance_is_seekable(
+VLC_PUBLIC_API int libvlc_media_instance_is_seekable(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e );
 
-VLC_PUBLIC_API vlc_bool_t libvlc_media_instance_can_pause(
+VLC_PUBLIC_API int libvlc_media_instance_can_pause(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e );
 
@@ -457,7 +457,7 @@ VLC_PUBLIC_API void          libvlc_media_instance_set_position   ( libvlc_media
 VLC_PUBLIC_API void          libvlc_media_instance_set_chapter    ( libvlc_media_instance_t *, int, libvlc_exception_t *);
 VLC_PUBLIC_API int           libvlc_media_instance_get_chapter    (libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API int           libvlc_media_instance_get_chapter_count( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API vlc_bool_t    libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int    libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API float         libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API void          libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
 VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state   ( libvlc_media_instance_t *, libvlc_exception_t *);
@@ -467,7 +467,7 @@ VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state   ( libvlc_media_i
  * \param p_input the input
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API vlc_bool_t  libvlc_media_instance_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int  libvlc_media_instance_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API float       libvlc_media_instance_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
 
 
@@ -496,7 +496,7 @@ VLC_PUBLIC_API void
                                             char * psz_tag_key,
                                             libvlc_exception_t * );
 
-VLC_PUBLIC_API vlc_bool_t
+VLC_PUBLIC_API int
     libvlc_tag_query_match( libvlc_tag_query_t *, libvlc_media_descriptor_t *,
                             libvlc_exception_t * );
 
@@ -559,7 +559,7 @@ VLC_PUBLIC_API int
                                      libvlc_exception_t * );
 
 /* This indicates if this media list is read-only from a user point of view */
-VLC_PUBLIC_API vlc_bool_t
+VLC_PUBLIC_API int
     libvlc_media_list_is_readonly( libvlc_media_list_t * p_mlist );
 
 VLC_PUBLIC_API void
@@ -740,7 +740,7 @@ VLC_PUBLIC_API void
     libvlc_media_list_player_pause( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
 
-VLC_PUBLIC_API vlc_bool_t
+VLC_PUBLIC_API int
     libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
                                          libvlc_exception_t * p_e );
 
@@ -986,7 +986,7 @@ VLC_PUBLIC_API void libvlc_audio_toggle_mute( libvlc_instance_t *, libvlc_except
  * \param p_exception an initialized exception
  * \return the mute status (boolean)
  */
-VLC_PUBLIC_API vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
  * Set mute status
@@ -995,7 +995,7 @@ VLC_PUBLIC_API vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exc
  * \param p_exception an initialized exception
  * \return void
  */
-VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, vlc_bool_t , libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, int , libvlc_exception_t * );
 
 /**
  * Get current audio level
@@ -1076,7 +1076,7 @@ VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_
 VLC_PUBLIC_API libvlc_event_manager_t *
         libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
 
-VLC_PUBLIC_API vlc_bool_t
+VLC_PUBLIC_API int
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
 
 /**@} */
