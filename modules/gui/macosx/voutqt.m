@@ -459,7 +459,7 @@ static int ControlVideo( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
         case VOUT_SET_STAY_ON_TOP:
-            b_arg = va_arg( args, vlc_bool_t );
+            b_arg = (bool) va_arg( args, int );
             [p_vout->p_sys->o_vout_view setOnTop: b_arg];
             return VLC_SUCCESS;
 

@@ -1129,7 +1129,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
 #ifdef MODULE_NAME_IS_wingapi
     case VOUT_SET_FOCUS:
-        b_bool = va_arg( args, vlc_bool_t );
+        b_bool = (bool) va_arg( args, int );
         p_vout->p_sys->b_parent_focus = b_bool;
         if( b_bool ) GXResume();
         else if( !p_vout->p_sys->b_focus ) GXSuspend();

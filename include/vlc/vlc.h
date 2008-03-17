@@ -38,12 +38,14 @@
 
 # ifdef __cplusplus
 extern "C" {
+# else
+#  include <stdbool.h>
 # endif
 
 /*****************************************************************************
  * Our custom types
  *****************************************************************************/
-typedef int vlc_bool_t;
+typedef bool vlc_bool_t;
 typedef struct vlc_list_t vlc_list_t;
 typedef struct vlc_object_t vlc_object_t;
 
@@ -131,8 +133,8 @@ struct vlc_list_t
 /*****************************************************************************
  * Booleans
  *****************************************************************************/
-#define VLC_FALSE 0
-#define VLC_TRUE  1
+#define VLC_FALSE false
+#define VLC_TRUE  true
 
 /*****************************************************************************
  * Playlist

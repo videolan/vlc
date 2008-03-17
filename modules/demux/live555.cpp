@@ -1374,7 +1374,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             double d_npt = (double) p_sys->i_npt / I64C(1000000);
             int i;
 
-            b_bool = (vlc_bool_t)va_arg( args, vlc_bool_t );
+            b_bool = (bool)va_arg( args, int );
             if( p_sys->rtsp == NULL )
                 return VLC_EGENERIC;
 

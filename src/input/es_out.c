@@ -1562,7 +1562,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
     {
         case ES_OUT_SET_ES_STATE:
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            b = (vlc_bool_t) va_arg( args, vlc_bool_t );
+            b = (bool) va_arg( args, int );
             if( b && !EsIsSelected( es ) )
             {
                 EsSelect( out, es );
@@ -1584,7 +1584,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_SET_ACTIVE:
         {
-            b = (vlc_bool_t) va_arg( args, vlc_bool_t );
+            b = (bool) va_arg( args, int );
             p_sys->b_active = b;
             /* Needed ? */
             if( b )

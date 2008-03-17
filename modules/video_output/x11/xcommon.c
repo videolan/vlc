@@ -3139,7 +3139,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                 return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
 
-            b_arg = va_arg( args, vlc_bool_t );
+            b_arg = (bool) va_arg( args, int );
             vlc_mutex_lock( &p_vout->p_sys->lock );
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
