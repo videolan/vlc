@@ -91,7 +91,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     p_intf->b_should_run_on_first_thread = VLC_FALSE;
 
     for( i = 0 ; i< i_options; i++ )
-        var_OptionParse( p_this, ppsz_options[i] );
+        var_OptionParse( p_this, ppsz_options[i], true );
 
     /* Choose the best module */
     p_intf->psz_intf = strdup( psz_module );

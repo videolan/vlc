@@ -203,7 +203,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Parse input options */
     vlc_mutex_lock( &p_item->lock );
     for( i = 0; i < p_item->i_options; i++ )
-        var_OptionParse( VLC_OBJECT(p_input), p_item->ppsz_options[i] );
+        var_OptionParse( VLC_OBJECT(p_input), p_item->ppsz_options[i], true );
     vlc_mutex_unlock( &p_item->lock );
 
     /* Create Object Variables for private use only */

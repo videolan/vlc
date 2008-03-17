@@ -1036,9 +1036,11 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
  * option name and bar is the value of the option.
  * \param p_obj the object in which the variable must be created
  * \param psz_option the option to parse
+ * \param trusted whether the option is set by a trusted input or not
  * \return nothing
  */
-void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
+void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
+                      bool trusted )
 {
     char *psz_name, *psz_value;
     int  i_type;
@@ -1091,6 +1093,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
         ( !psz_value || !*psz_value ) ) goto cleanup; /* Invalid value */
 
     /* check if option is unsafe */
+    if( !trusted )
     {
         module_config_t *p_config = config_FindConfig( p_obj, psz_name );
         if( !p_config->b_safe )
