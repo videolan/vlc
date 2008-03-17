@@ -506,9 +506,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if( asprintf( &str, "%s=%s", psz_option, psz_value ) == -1 )
                 return VLC_ENOMEM;
 
-            input_ItemAddOpt( p_input->p->input.p_item, str,
-                              VLC_INPUT_OPTION_UNIQUE );
-            i = VLC_SUCCESS;
+            i = input_ItemAddOpt( p_input->p->input.p_item, str,
+                                  VLC_INPUT_OPTION_UNIQUE );
             free( str );
             return i;
         }
