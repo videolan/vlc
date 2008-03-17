@@ -498,38 +498,19 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_ADD_OPTION:
         {
-            char *psz_option = (char *)va_arg( args, char * );
-            char *psz_value = (char *)va_arg( args, char * );
+            const char *psz_option = va_arg( args, const char * );
+            const char *psz_value = va_arg( args, const char * );
+            char *str;
             int i;
 
-            vlc_mutex_lock( &p_input->p->input.p_item->lock );
-            /* Check if option already exists */
-            for( i = 0; i < p_input->p->input.p_item->i_options; i++ )
-            {
-                if( !strncmp( p_input->p->input.p_item->ppsz_options[i],
-                              psz_option, strlen( psz_option ) ) &&
-                    p_input->p->input.p_item->ppsz_options[i][strlen(psz_option)]
-                      == '=' )
-                {
-                    free( p_input->p->input.p_item->ppsz_options[i] );
-                    break;
-                }
-            }
-            if( i == p_input->p->input.p_item->i_options )
-            {
-                p_input->p->input.p_item->i_options++;
-                p_input->p->input.p_item->ppsz_options =
-                    realloc( p_input->p->input.p_item->ppsz_options,
-                             p_input->p->input.p_item->i_options *
-                             sizeof(char **) );
-            }
+            if( asprintf( &str, "%s=%s", psz_option, psz_value ) == -1 )
+                return VLC_ENOMEM;
 
-            if( asprintf( &p_input->p->input.p_item->ppsz_options[i],
-                          "%s=%s", psz_option, psz_value ) == -1 )
-                p_input->p->input.p_item->ppsz_options[i] = NULL;
-            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
-
-            return VLC_SUCCESS;
+            input_ItemAddOpt( p_input->p->input.p_item, str,
+                              VLC_INPUT_OPTION_UNIQUE );
+            i = VLC_SUCCESS;
+            free( str );
+            return i;
         }
 
         case INPUT_GET_BYTE_POSITION:
