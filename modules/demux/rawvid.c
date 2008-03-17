@@ -181,7 +181,7 @@ static int Open( vlc_object_t * p_this )
     {
         char *psz;
         char *buf;
-        int a, b;
+        int a, b = 1;
         psz = stream_ReadLine( p_demux->s );
 
         /* TODO: handle interlacing */
@@ -240,7 +240,7 @@ static int Open( vlc_object_t * p_this )
             {
                 psz_chroma = strdup( "I444" );
             }
-            else if( !strncmp( buf, "mono", 3 ) )
+            else if( !strncmp( buf, "mono", 4 ) )
             {
                 psz_chroma = strdup( "GREY" );
             }
