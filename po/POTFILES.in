@@ -130,7 +130,6 @@ src/input/vlm.c
 src/input/vlm_internal.h
 src/interface/interaction.c
 src/interface/interface.c
-src/interface/interface.h
 src/interface/intf_eject.c
 src/libvlc.c
 src/libvlc-common.c
@@ -270,6 +269,9 @@ modules/access_output/http.c
 modules/access_output/shout.c
 modules/access_output/udp.c
 modules/access/pvr.c
+modules/access/rtmp/access.c
+modules/access/rtmp/rtmp_amf_flv.c
+modules/access/rtmp/rtmp_amf_flv.h
 modules/access/rtsp/access.c
 modules/access/rtsp/real_asmrp.c
 modules/access/rtsp/real.c
@@ -1192,6 +1194,7 @@ modules/video_filter/bluescreen.c
 modules/video_filter/clone.c
 modules/video_filter/colorthres.c
 modules/video_filter/crop.c
+modules/video_filter/croppadd.c
 modules/video_filter/deinterlace.c
 modules/video_filter/erase.c
 modules/video_filter/extract.c
