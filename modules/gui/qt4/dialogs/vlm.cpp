@@ -162,11 +162,15 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
 
 VLMDialog::~VLMDialog()
 {
+    msg_Dbg( p_intf, "Destroying VLM Dialog" );
+    delete vlmWrapper;
+
    /* FIXME :you have to destroy vlm here to close
     * but we shouldn't destroy vlm here in case somebody else wants it */
-    msg_Dbg( p_intf, "Destroying VLM Dialog" );
     if( p_vlm )
+    {
         vlm_Delete( p_vlm );
+    }
 }
 
 void VLMDialog::showScheduleWidget( int i )
@@ -275,6 +279,57 @@ bool VLMDialog::exportVLMConf()
     return false;
 }
 
+void VLMDialog::mediasPopulator()
+{
+    if( p_vlm )
+    {
+        int i_nMedias;
+        QString typeShortName;
+        int vlmItemCount;
+        vlm_media_t ***ppp_dsc = (vlm_media_t ***)malloc( sizeof( vlm_media_t ) );
+
+        /* Get medias informations and numbers */
+        vlm_Control( p_vlm, VLM_GET_MEDIAS, ppp_dsc, &i_nMedias );
+
+        /* Loop on all of them */
+        for( int i = 0; i < i_nMedias; i++ )
+        {
+            VLMAWidget * vlmAwidget;
+            vlmItemCount = vlmItems.size();
+
+            QString mediaName = qfu( (*ppp_dsc)[i]->psz_name );
+            /* It may have several inputs, we take the first one by default
+                 - an evolution will be to manage these inputs in the gui */
+            QString inputText = qfu( (*ppp_dsc)[i]->ppsz_input[0] );
+
+            QString outputText = qfu( (*ppp_dsc)[i]->psz_output );
+
+            /* Schedule media is a quite especial, maybe there is another way to grab informations */
+            if( (*ppp_dsc)[i]->b_vod )
+            {
+                typeShortName = "VOD";
+                QString mux = qfu( (*ppp_dsc)[i]->vod.psz_mux );
+                vlmAwidget = new VLMVod( mediaName, inputText, outputText,
+                                    (*ppp_dsc)[i]->b_enabled, mux, this );
+            }
+            else
+            {
+                typeShortName = "Bcast";
+                vlmAwidget = new VLMBroadcast( mediaName, inputText, outputText,
+                                  (*ppp_dsc)[i]->b_enabled, (*ppp_dsc)[i]->broadcast.b_loop, this );
+            }
+            /* Add an Item of the Side List */
+            ui.vlmListItem->addItem( typeShortName + " : " + mediaName );
+            ui.vlmListItem->setCurrentRow( vlmItemCount - 1 );
+
+            /* Add a new VLMAWidget on the main List */
+            vlmItemLayout->insertWidget( vlmItemCount, vlmAwidget );
+            vlmItems.append( vlmAwidget );
+            clearWidgets();
+        }
+        free( ppp_dsc );
+    }
+}
 
 bool VLMDialog::importVLMConf()
 {
@@ -286,9 +341,19 @@ bool VLMDialog::importVLMConf()
     if( !openVLMConfFileName.isEmpty() )
     {
         vlm_message_t *message;
+        int status;
         QString command = "load \"" + openVLMConfFileName + "\"";
-        vlm_ExecuteCommand( p_vlm, qtu( command ) , &message );
+        status = vlm_ExecuteCommand( p_vlm, qtu( command ) , &message );
         vlm_MessageDelete( message );
+        if( status == 0 )
+        {
+            mediasPopulator();
+        }
+        else
+        {
+            msg_Dbg( p_intf, "Failed to import vlm configuration file : %s", qtu( command ) );
+            return false;
+        }
         return true;
     }
     return false;
@@ -587,7 +652,9 @@ VLMWrapper::VLMWrapper( vlm_t *_p_vlm )
 }
 
 VLMWrapper::~VLMWrapper()
-{}
+{
+    p_vlm = NULL;
+}
 
 void VLMWrapper::AddBroadcast( const QString name, QString input,
                                QString output,
@@ -684,12 +751,14 @@ void VLMWrapper::EditVod( const QString name, const QString input,
     QString command = "setup \"" + name + "\" input \"" + input + "\"";
     vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
     vlm_MessageDelete( message );
+
     if( !output.isEmpty() )
     {
         command = "setup \"" + name + "\" output \"" + output + "\"";
         vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
         vlm_MessageDelete( message );
     }
+
     if( b_enabled )
     {
         command = "setup \"" + name + "\" enabled";

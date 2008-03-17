@@ -98,6 +98,7 @@ private:
     QDateTimeEdit *time, *date, *repeatTime;
     QSpinBox *scherepeatnumber, *repeatDays;
     bool isNameGenuine( QString );
+    void mediasPopulator();
 public slots:
     void removeVLMItem( VLMAWidget * );
     void startModifyVLMItem( VLMAWidget * );
