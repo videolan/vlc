@@ -108,18 +108,17 @@ void InputManager::delInput()
     if( p_input )
     {
         delCallbacks();
-        vlc_object_release( p_input );
         i_old_playing_status = END_S;
-
         i_input_id = 0;
         old_name   = "";
         artUrl     = "";
-        p_input    = NULL;
         emit positionUpdated( 0.0, 0 ,0 );
         emit statusChanged( END_S );
         emit nameChanged( "" );
         emit artChanged( "" );
         emit rateChanged( INPUT_RATE_DEFAULT );
+        vlc_object_release( p_input );
+        p_input = NULL;
     }
 }
 
