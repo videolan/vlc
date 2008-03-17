@@ -111,6 +111,10 @@ public:
     void                showToolbar();
     void                hideToolbar();
     void                redrawToolbar();
+    void                getToolbarSize(unsigned int *width, unsigned int *height)
+                            { *width = i_tb_width; *height = i_tb_height; };
+    int                 setToolbarSize(unsigned int width, unsigned int height)
+                            { i_tb_width = width; i_tb_height = height; return 1; };
 #endif
 
     uint16    i_npmode; /* either NP_EMBED or NP_FULL */
@@ -118,13 +122,9 @@ public:
     /* plugin properties */
     int      b_stream;
     int      b_autoplay;
-    int      b_show_toolbar;
+    int      b_toolbar;
     char *   psz_target;
 
-#if XP_UNIX
-    /* toolbar */
-    int     i_control_height;
-#endif
 private:
     /* VLC reference */
     libvlc_instance_t   *libvlc_instance;
@@ -142,6 +142,7 @@ private:
 #endif
 #if XP_UNIX
     unsigned int     i_width, i_height;
+    unsigned int     i_tb_width, i_tb_height;
     Window           npvideo, npcontrol;
 
     XImage *p_btnPlay;
