@@ -5973,10 +5973,17 @@ dnl  Mediacontrol Python bindings
 dnl
 AC_ARG_ENABLE(python-bindings,
   [  --enable-python-bindings Enable Python bindings (default disabled)])
-dnl TODO: look for python dev headers
-AS_IF([test "${enable_python_bindings}" = "yes"],
-      PLUGINS_BINDINGS="${PLUGINS_BINDINGS} python"
-     ) 
+
+if test "${enable_python_bindings}" = "yes"; then
+  AC_PATH_PROG(PYTHON_CONFIG, python-config, no)
+  CFLAGS="${CFLAGS_save} `${PYTHON_CONFIG} --cflags`"
+  AC_CHECK_HEADER([Python.h],
+    PLUGINS_BINDINGS="${PLUGINS_BINDINGS} python",
+    AC_MSG_ERROR([You have to install python-dev to build the bindings]),
+    []
+  )
+  CFLAGS="${CFLAGS_save}"
+fi
 
 AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
 
