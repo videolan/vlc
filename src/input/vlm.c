@@ -2266,17 +2266,13 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             p_media->vod.item.psz_uri = strdup( p_cfg->ppsz_input[0] );
 
-            TAB_INIT( p_media->vod.item.i_options, p_media->vod.item.ppsz_options );
-
             asprintf( &psz_dup, "sout=%s", psz_output);
-            TAB_APPEND( p_media->vod.item.i_options, p_media->vod.item.ppsz_options, psz_dup );
+            input_ItemAddOption( &p_media->vod.item, psz_dup );
+            free( psz_dup );
             for( i = 0; i < p_cfg->i_option; i++ )
-            {
-                psz_dup = strdup( p_cfg->ppsz_option[i] );
-                TAB_APPEND( p_media->vod.item.i_options, p_media->vod.item.ppsz_options, psz_dup );
-            }
-            psz_dup = strdup( "no-sout-keep" );
-            TAB_APPEND( p_media->vod.item.i_options, p_media->vod.item.ppsz_options, psz_dup );
+                input_ItemAddOption( &p_media->vod.item,
+                                     p_cfg->ppsz_option[i] );
+            input_ItemAddOption( &p_media->vod.item, "no-sout-keep" );
 
             asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name );
 
@@ -2554,14 +2550,12 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     if( !p_instance )
     {
         vlm_media_t *p_cfg = &p_media->cfg;
-        char *psz_keep;
+        const char *psz_keep;
         int i;
 
         p_instance = vlm_MediaInstanceNew( p_vlm, psz_id );
         if( !p_instance )
             return VLC_ENOMEM;
-
-        TAB_INIT( p_instance->item.i_options, p_instance->item.ppsz_options );
 
         if( p_cfg->psz_output != NULL || psz_vod_output != NULL )
         {
@@ -2570,7 +2564,8 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
                       p_cfg->psz_output ? p_cfg->psz_output : "",
                       (p_cfg->psz_output && psz_vod_output) ? ":" : psz_vod_output ? "#" : "",
                       psz_vod_output ? psz_vod_output : "" );
-            TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_buffer );
+            input_ItemAddOption( &p_instance->item, psz_buffer );
+            free( psz_buffer );
         }
 
         for( i = 0; i < p_cfg->i_option; i++ )
@@ -2580,16 +2575,16 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             else if( !strcmp( p_cfg->ppsz_option[i], "nosout-keep" ) || !strcmp( p_cfg->ppsz_option[i], "no-sout-keep" ) )
                 p_instance->b_sout_keep = VLC_FALSE;
             else
-                TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, strdup( p_cfg->ppsz_option[i] ) );
+                input_ItemAddOption( &p_instance->item, p_cfg->ppsz_option[i] );
         }
         /* We force the right sout-keep value (avoid using the sout-keep from the global configuration)
          * FIXME implement input list for VOD (need sout-keep)
          * */
         if( !p_cfg->b_vod && p_instance->b_sout_keep )
-            psz_keep = strdup( "sout-keep" );
+            psz_keep = "sout-keep";
         else
-            psz_keep = strdup( "no-sout-keep" );
-        TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_keep );
+            psz_keep = "no-sout-keep";
+        input_ItemAddOption( &p_instance->item, psz_keep );
 
         TAB_APPEND( p_media->i_instance, p_media->instance, p_instance );
     }
