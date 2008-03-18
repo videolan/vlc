@@ -15,12 +15,10 @@ if HAVE_WIN32
 else
 	COMPILERARG=
 endif
-	srcdir="$(srcdir)" top_builddir="$(top_builddir)" python "$(srcdir)/setup.py" build $(COMPILERARG) "--build-base=$(top_builddir)/bindings/python" "--build-temp=$(top_builddir)/bindings/python"
+	srcdir="`cd $(srcdir);pwd`" top_builddir="$(abs_top_builddir)" python "$(srcdir)/setup.py" build $(COMPILERARG)
 
-# FIXME: python setup.py install does not have any option to install from a different build directory
-# so this will not work in a separate builddir
 install:
-	python $(srcdir)/setup.py install
+	top_builddir="$(abs_top_builddir)" srcdir="`cd $(srcdir);pwd`" python $(srcdir)/setup.py install
 
 clean:
 	$(RM) -rf build

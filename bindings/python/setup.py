@@ -92,12 +92,12 @@ source_files = [ 'vlc_module.c' ]
 
 # To compile in a local vlc tree
 vlclocal = Extension('vlc',
-                     sources = [ os.path.join( srcdir, f ) for f in source_files ],
-                     include_dirs = [ top_builddir,
-                                      os.path.join( srcdir, '..', '..', 'include' ),
-                                      srcdir,
-                                      '/usr/win32/include' ],
-                extra_objects = [ ],
+		sources = [ os.path.join( srcdir, f ) for f in source_files ],
+		include_dirs = [ top_builddir,
+			      os.path.join( srcdir, '..', '..', 'include' ),
+			      srcdir,
+			      '/usr/win32/include' ],
+		extra_objects = [ ],
                 extra_compile_args = get_cflags(),
 		extra_link_args = linkargs + get_ldflags(),
                 )
