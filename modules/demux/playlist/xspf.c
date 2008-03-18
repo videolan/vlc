@@ -718,7 +718,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
             return VLC_FALSE;
         }
-        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc:nop",
+        p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc://nop",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
