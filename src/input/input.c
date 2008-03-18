@@ -53,6 +53,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static void Destructor( input_thread_t * p_input );
+
 static  int Run  ( input_thread_t *p_input );
 static  int RunAndDestroy  ( input_thread_t *p_input );
 
@@ -281,9 +283,14 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Attach only once we are ready */
     vlc_object_attach( p_input, p_parent );
 
+    /* Set the destructor when we are sure we are initialized */
+    vlc_object_set_destructor( p_input, (vlc_destructor_t)Destructor );
+
     return p_input;
 }
 
+/* FIXME: This function should go away and only vlc_object_release()
+ * should be needed */
 static void Destroy( input_thread_t *p_input, sout_instance_t **pp_sout )
 {
     vlc_object_detach( p_input );
@@ -298,10 +305,21 @@ static void Destroy( input_thread_t *p_input, sout_instance_t **pp_sout )
         else if( priv->b_sout_keep )
             SoutKeep( priv->p_sout );
         else
+        {
             sout_DeleteInstance( priv->p_sout );
+            priv->p_sout = NULL;
+        }
     }
 
     vlc_object_release( p_input );
+}
+
+/**
+ * Input destructor (called when the object's refcount reaches 0).
+ */
+static void Destructor( input_thread_t * p_input )
+{
+    input_thread_private_t *priv = p_input->p;
     vlc_mutex_destroy( &priv->lock_control );
     free( priv );
 }
