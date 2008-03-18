@@ -64,7 +64,6 @@ static  int             Init    ( input_thread_t *p_input );
 static void             Error   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
-static void             Destroy( input_thread_t *p_input, sout_instance_t **pp_sout );
 
 static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t * );
 static void       ControlReduce( input_thread_t * );
@@ -169,6 +168,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout  = NULL;
+    p_input->p->b_owns_its_sout = VLC_TRUE;
     p_input->p->b_sout_keep  = VLC_FALSE;
     p_input->p->b_out_pace_control = VLC_FALSE;
     p_input->i_pts_delay = 0;
@@ -278,7 +278,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* */
     if( p_sout )
+    {
         p_input->p->p_sout = p_sout;
+        p_input->p->b_owns_its_sout = VLC_FALSE;
+    }
 
     /* Attach only once we are ready */
     vlc_object_attach( p_input, p_parent );
@@ -289,37 +292,21 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     return p_input;
 }
 
-/* FIXME: This function should go away and only vlc_object_release()
- * should be needed */
-static void Destroy( input_thread_t *p_input, sout_instance_t **pp_sout )
-{
-    vlc_object_detach( p_input );
-    input_thread_private_t *priv = p_input->p;
-
-    if( pp_sout )
-        *pp_sout = NULL;
-    if( priv->p_sout )
-    {
-        if( pp_sout )
-            *pp_sout = priv->p_sout;
-        else if( priv->b_sout_keep )
-            SoutKeep( priv->p_sout );
-        else
-        {
-            sout_DeleteInstance( priv->p_sout );
-            priv->p_sout = NULL;
-        }
-    }
-
-    vlc_object_release( p_input );
-}
-
 /**
  * Input destructor (called when the object's refcount reaches 0).
  */
 static void Destructor( input_thread_t * p_input )
 {
     input_thread_private_t *priv = p_input->p;
+
+    if( priv->b_owns_its_sout && priv->p_sout )
+    {
+        if( priv->b_sout_keep )
+            SoutKeep( priv->p_sout );
+        else
+            sout_DeleteInstance( priv->p_sout );
+    }
+
     vlc_mutex_destroy( &priv->lock_control );
     free( priv );
 }
@@ -363,7 +350,8 @@ input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
     {
         input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );
-        Destroy( p_input, &p_sout );
+        vlc_object_detach( p_input );
+        vlc_object_release( p_input );
         return NULL;
     }
 
@@ -406,7 +394,8 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
         {
             input_ChangeState( p_input, ERROR_S );
             msg_Err( p_input, "cannot create input thread" );
-            Destroy( p_input, NULL );
+            vlc_object_detach( p_input );
+            vlc_object_release( p_input );
             return VLC_EGENERIC;
         }
     }
@@ -433,7 +422,8 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     if( !Init( p_input ) )
         End( p_input );
 
-    Destroy( p_input, NULL );
+    vlc_object_detach( p_input );
+    vlc_object_release( p_input );
 
     return VLC_SUCCESS;
 }
@@ -482,6 +472,12 @@ void input_StopThread( input_thread_t *p_input )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
+sout_instance_t * input_DetachSout( input_thread_t *p_input )
+{
+    p_input->p->b_owns_its_sout = VLC_FALSE;
+    return p_input->p->p_sout;
+}
+
 /**
  * Clean up a dead input thread
  * This function does not return until the thread is effectively cancelled.
@@ -490,16 +486,12 @@ void input_StopThread( input_thread_t *p_input )
  */
 void input_DestroyThread( input_thread_t *p_input )
 {
-    input_DestroyThreadExtended( p_input, NULL );
-}
-
-void input_DestroyThreadExtended( input_thread_t *p_input, sout_instance_t **pp_sout )
-{
     /* Join the thread */
     vlc_thread_join( p_input );
 
     /* */
-    Destroy( p_input, pp_sout );
+    vlc_object_detach( p_input );
+    vlc_object_release( p_input );
 }
 
 /*****************************************************************************
@@ -595,7 +587,8 @@ static int RunAndDestroy( input_thread_t *p_input )
 
 exit:
     /* Release memory */
-    Destroy( p_input, NULL );
+    vlc_object_detach( p_input );
+    vlc_object_release( p_input );
     return 0;
 }
 

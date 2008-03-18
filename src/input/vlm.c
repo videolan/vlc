@@ -2282,7 +2282,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                     msleep( 100000 );
 
                 input_StopThread( p_input );
-                input_DestroyThreadExtended( p_input, NULL );
+                input_DestroyThread( p_input );
             }
             free( psz_output );
             free( psz_header );
@@ -2518,7 +2518,8 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
     if( p_instance->p_input )
     {
         input_StopThread( p_instance->p_input );
-        input_DestroyThreadExtended( p_instance->p_input, &p_instance->p_sout );
+        p_instance->p_sout = input_DetachSout( p_instance->p_input );
+        input_DestroyThread( p_instance->p_input );
     }
     if( p_instance->p_sout )
         sout_DeleteInstance( p_instance->p_sout );
@@ -2601,7 +2602,8 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         }
 
         input_StopThread( p_instance->p_input );
-        input_DestroyThreadExtended( p_instance->p_input, &p_instance->p_sout );
+        p_instance->p_sout = input_DetachSout( p_instance->p_input );
+        input_DestroyThread( p_instance->p_input );
         if( !p_instance->b_sout_keep && p_instance->p_sout )
         {
             sout_DeleteInstance( p_instance->p_sout );

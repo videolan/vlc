@@ -106,6 +106,7 @@ struct input_thread_private_t
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
     vlc_bool_t      b_sout_keep;
     vlc_bool_t      b_out_pace_control; /*     idem ? */
+    vlc_bool_t      b_owns_its_sout;
 
     /* Main input properties */
     input_source_t input;
@@ -342,7 +343,7 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 #define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
 input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, sout_instance_t * );
 
-void input_DestroyThreadExtended( input_thread_t *p_input, sout_instance_t ** );
+sout_instance_t * input_DetachSout( input_thread_t *p_input );
 
 /* var.c */
 void input_ControlVarInit ( input_thread_t * );
