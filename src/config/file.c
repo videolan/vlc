@@ -31,7 +31,6 @@
 #include "vlc_keys.h"
 
 #include <errno.h>                                                  /* errno */
-#include <stdbool.h>
 #include <assert.h>
 #include <limits.h>
 

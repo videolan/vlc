@@ -25,8 +25,6 @@
 #ifndef LIBVLC_LIBVLC_H
 # define LIBVLC_LIBVLC_H 1
 
-# include <stdbool.h>
-
 extern const char vlc_usage[];
 
 extern const struct hotkey libvlc_hotkeys[];
