@@ -215,7 +215,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2" >
+   <item row="2" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
       <string>_("Privacy / Network Interaction")</string>
@@ -254,16 +254,6 @@
          <string> days</string>
         </property>
        </widget>
-      </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="netPolicyLabel" >
-        <property name="text" >
-         <string>_("Network policy")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" colspan="2" >
-       <widget class="QComboBox" name="netPolicyBox" />
       </item>
      </layout>
     </widget>
