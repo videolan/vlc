@@ -977,14 +977,6 @@ static const char *ppsz_clock_descriptions[] =
 #define MINIMIZE_THREADS_LONGTEXT N_( \
      "This option minimizes the number of threads needed to run VLC.")
 
-#define SECURITY_POLICY_TEXT N_("Policy for handling unsafe options.")
-#define SECURITY_POLICY_LONGTEXT N_( \
-     "This option dictates the default policy when processing options " \
-     "which may be harmful when used in a malicious way.")
-
-static int pi_secpolicy_values[] = { 0, 1, 2 };
-static const char *ppsz_secpolicy_descriptions[] = { N_("Block"), N_("Allow"), N_("Prompt") };
-
 #define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
     "Additional path for VLC to look for its modules.")
@@ -1807,13 +1799,6 @@ vlc_module_begin();
     set_section( N_("Performance options"), NULL );
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
-        change_need_restart();
-
-    set_section( N_("Security options"), NULL );
-    add_integer( "security-policy", 2, NULL, SECURITY_POLICY_TEXT,
-              SECURITY_POLICY_LONGTEXT, VLC_TRUE );
-        change_integer_list( pi_secpolicy_values, ppsz_secpolicy_descriptions, 0 );
-        change_unsafe();
         change_need_restart();
 
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)

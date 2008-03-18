@@ -1098,27 +1098,9 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         module_config_t *p_config = config_FindConfig( p_obj, psz_name );
         if( !p_config->b_safe )
         {
-            int policy = config_GetInt( p_obj, "security-policy" );
-            switch( policy )
-            {
-                case 0: /* block */
-                    msg_Err( p_obj, "option %s is unsafe and is blocked by security policy", psz_name );
-                    return;
-                case 1: /* allow */
-                    break;
-                case 2: /* prompt */
-                {
-                    char description[256];
-                    snprintf(description, sizeof(description), _("playlist item is making use of the following unsafe option '%s', which may be harmful if used in a malicious way, authorize it ?"), psz_name);
-                    if( DIALOG_OK_YES != intf_UserYesNo( p_obj, _("WARNING: Unsafe Playlist"), description, _("Yes"), _("No"), NULL) )
-                    {
-                        msg_Err( p_obj, "option %s is unsafe and is blocked by security policy", psz_name );
-                        goto cleanup;
-                    }
-                }
-                default:
-                    ;
-            }
+            msg_Err( p_obj, "unsafe option \"%s\" has been ignored for "
+                            "security reasons", psz_name );
+            return;
         }
     }
 
