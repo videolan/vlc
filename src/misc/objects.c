@@ -911,6 +911,8 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
 /* When the structure_lock is locked */
 static void vlc_object_yield_locked( vlc_object_t *p_this )
 {
+    vlc_assert_locked (&structure_lock);
+
     /* Avoid obvious freed object uses */
     assert( p_this->p_internals->i_refcount > 0 );
 
