@@ -83,6 +83,12 @@
 #define OBJECT_FLAGS_QUIET       0x0002
 #define OBJECT_FLAGS_NOINTERACT  0x0004
 
+/* Types */
+typedef void (*vlc_destructor_t)(struct vlc_object_t *);
+
+/* Constants */
+VLC_PUBLIC_API const vlc_destructor_t kVLCDestructor;
+
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)
  *****************************************************************************/
@@ -96,6 +102,7 @@ struct vlc_object_t
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
+VLC_EXPORT( void, __vlc_object_set_destructor, ( vlc_object_t *, vlc_destructor_t ) );
 VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
 VLC_EXPORT( void *, vlc_object_get, ( int ) );
@@ -110,6 +117,9 @@ VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 
 #define vlc_object_create(a,b) \
     __vlc_object_create( VLC_OBJECT(a), b )
+
+#define vlc_object_set_destructor(a,b) \
+    __vlc_object_set_destructor( VLC_OBJECT(a), b )
 
 #define vlc_object_detach(a) \
     __vlc_object_detach( VLC_OBJECT(a) )

@@ -73,6 +73,12 @@
 #include <assert.h>
 
 /*****************************************************************************
+ * Constants
+ *****************************************************************************/
+
+const vlc_destructor_t kVLCDestructor = NULL;
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  DumpCommand( vlc_object_t *, char const *,
@@ -193,6 +199,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     }
 
     p_priv->i_refcount = 1;
+    p_priv->pf_destructor = kVLCDestructor;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
@@ -354,6 +361,24 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
 /**
  ****************************************************************************
+ * Set the destructor of a vlc object
+ *
+ * This function sets the destructor of the vlc object. It will be called
+ * when the object is destroyed when the its refcount reaches 0.
+ * (It is called by the internal function vlc_object_destroy())
+ *****************************************************************************/
+void __vlc_object_set_destructor( vlc_object_t *p_this,
+                                  vlc_destructor_t pf_destructor )
+{
+    vlc_object_internals_t *p_priv = vlc_internals(p_this );
+
+    vlc_mutex_lock( &structure_lock );
+    p_priv->pf_destructor = pf_destructor;
+    vlc_mutex_unlock( &structure_lock );
+}
+
+/**
+ ****************************************************************************
  * Destroy a vlc object (Internal)
  *
  * This function destroys an object that has been previously allocated with
@@ -399,6 +424,11 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         fflush(stderr);
         abort();
     }
+
+    /* Call the custom "subclass" destructor */
+    if( p_priv->pf_destructor )
+        p_priv->pf_destructor( p_this );
+
 
     /* Destroy the associated variables, starting from the end so that
      * no memmove calls have to be done. */

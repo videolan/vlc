@@ -133,8 +133,9 @@ struct vlc_object_internals_t
     vlc_spinlock_t  spin;
 
     /* Objects management */
-    unsigned        i_refcount;
-    vlc_bool_t      b_attached;
+    unsigned         i_refcount;
+    vlc_destructor_t pf_destructor;
+    vlc_bool_t       b_attached;
 };
 
 #define ZOOM_SECTION N_("Zoom")
