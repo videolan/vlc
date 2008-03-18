@@ -71,7 +71,7 @@ static const struct shout_item_t p_frenchtv[] = {
 static const struct shout_item_t p_items[] = {
     item(            N_("Shoutcast Radio"), "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml" ),
     item(            N_("Shoutcast TV"),    "http/shout-winamp://www.shoutcast.com/sbin/newtvlister.phtml?alltv=1" ),
-    itemWithOption ( N_("Freebox TV"),      "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u", "m3u-extvlcopt=1" ),
+    item(            N_("Freebox TV"),      "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u" ),
     itemWithChildren(N_("French TV"),        p_frenchtv ),
     endItem()
 };
