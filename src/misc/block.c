@@ -214,6 +214,8 @@ struct block_fifo_t
 
 block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
 {
+    (void)p_obj;
+
     block_fifo_t *p_fifo;
 
     p_fifo = malloc( sizeof( block_fifo_t ) );
