@@ -389,6 +389,9 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
+    /* Automatically detach the object from its parents */
+    if( p_this->p_parent ) vlc_object_detach( p_this );
+
     /* Sanity checks */
     if( p_this->i_children )
     {
@@ -408,19 +411,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
                      p_this->pp_children[i]->psz_object_type,
                      p_this->pp_children[i]->psz_object_name );
         }
-        fflush(stderr);
-        abort();
-    }
-
-    if( p_this->p_parent )
-    {
-        fprintf( stderr,
-                 "ERROR: cannot delete object (id:%i, type:%s, name:%s) "
-                 "with a parent (id:%i, type:%s, name:%s)\n",
-                 p_this->i_object_id, p_this->psz_object_type,
-                 p_this->psz_object_name, p_this->p_parent->i_object_id,
-                 p_this->p_parent->psz_object_type,
-                 p_this->p_parent->psz_object_name );
         fflush(stderr);
         abort();
     }
@@ -1007,9 +997,6 @@ void __vlc_object_detach( vlc_object_t *p_this )
     if( !p_this ) return;
 
     vlc_mutex_lock( &structure_lock );
-
-    /* Avoid obvious freed object uses */
-    assert( p_this->p_internals->i_refcount > 0 );
 
     if( !p_this->p_parent )
     {
