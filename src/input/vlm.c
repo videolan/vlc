@@ -66,6 +66,8 @@
  * even if we handle NULL format string in vlm_MessageNew() */
 static const char *vlm_NULL = NULL;
 
+static void vlm_Destructor( vlm_t *p_vlm );
+
 /* */
 static int vlm_ControlInternal( vlm_t *, int, ... );
 
@@ -130,7 +132,6 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
     p_vlm->i_vod = 0;
     p_vlm->p_vod = NULL;
-    vlc_object_yield( p_vlm );
     vlc_object_attach( p_vlm, p_this->p_libvlc );
 
     if( vlc_thread_create( p_vlm, "vlm thread",
@@ -162,6 +163,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     }
     free(psz_vlmconf);
 
+    vlc_object_set_destructor( p_vlm, (vlc_destructor_t)vlm_Destructor );
     vlc_mutex_unlock( lockval.p_address );
 
     return p_vlm;
@@ -172,23 +174,17 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
  *****************************************************************************/
 void vlm_Delete( vlm_t *p_vlm )
 {
-    vlc_value_t lockval;
-
-    var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
-    vlc_mutex_lock( lockval.p_address );
-
+    vlc_object_detach( p_vlm );
     vlc_object_release( p_vlm );
+}
 
-    if( p_vlm->p_internals->i_refcount > 0 )
-    {
-        vlc_mutex_unlock( lockval.p_address );
-        return;
-    }
-
+/*****************************************************************************
+ * vlm_Destructor:
+ *****************************************************************************/
+static void vlm_Destructor( vlm_t *p_vlm )
+{
     vlc_object_kill( p_vlm );
     vlc_thread_join( p_vlm );
-
-    vlc_object_detach( p_vlm );
 
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
@@ -197,9 +193,6 @@ void vlm_Delete( vlm_t *p_vlm )
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
 
     vlc_mutex_destroy( &p_vlm->lock );
-
-    vlc_object_release( p_vlm );
-    vlc_mutex_unlock( lockval.p_address );
 }
 
 /*****************************************************************************
