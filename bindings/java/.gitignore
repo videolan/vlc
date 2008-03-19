@@ -9,5 +9,6 @@ samples/client/.classpath
 samples/client/.project
 samples/client/.settings/*
 samples/client/target/*
+samples/target/*
 target/*
 
