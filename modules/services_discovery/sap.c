@@ -969,15 +969,19 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     if (subtype == NULL)
     {
         msg_Dbg (p_obj, "missing SDP media subtype: %s", sdp_proto);
-        p_sdp->i_media_type = 0;
+        free (sdp_proto);
+        return VLC_EGENERIC;
     }
     else
     {
         *subtype++ = '\0';
-        p_sdp->i_media_type = atoi (subtype);
+        /* FIXME: check for multiple payload types in RTP/AVP case.
+         * FIXME: check for "mpeg" subtype in raw udp case. */
+        if (!strcasecmp (sdp_proto, "udp"))
+            p_sdp->i_media_type = 33;
+        else
+            p_sdp->i_media_type = atoi (subtype);
     }
-    if (p_sdp->i_media_type == 0)
-         p_sdp->i_media_type = 33;
 
     /* RTP protocol, nul, VLC shortcut, nul, flags byte as follow:
      * 0x1: Connection-Oriented media. */
