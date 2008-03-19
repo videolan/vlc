@@ -152,9 +152,12 @@ static int Open( vlc_object_t * p_this )
     OSStatus                err = noErr;
     UInt32                  i_param_size = 0;
     struct aout_sys_t       *p_sys = NULL;
-    vlc_bool_t              b_alive = VLC_FALSE;
     vlc_value_t             val;
     aout_instance_t         *p_aout = (aout_instance_t *)p_this;
+
+    /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
+     * property size */
+    int                     b_alive = VLC_FALSE; 
 
     /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
@@ -217,8 +220,9 @@ static int Open( vlc_object_t * p_this )
 
     if( err != noErr )
     {
-        msg_Err( p_aout, "could not check whether device is alive: %4.4s", (char *)&err );
-        goto error;
+        /* Be tolerant, only give a warning here */
+        msg_Warn( p_aout, "could not check whether device [0x%x] is alive: %4.4s", p_sys->i_selected_dev, (char *)&err );
+        b_alive = VLC_FALSE;
     }
 
     if( b_alive == VLC_FALSE )
