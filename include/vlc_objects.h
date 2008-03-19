@@ -86,6 +86,9 @@
 /* Types */
 typedef void (*vlc_destructor_t)(struct vlc_object_t *);
 
+/* Constants */
+VLC_PUBLIC_API const vlc_destructor_t kVLCDestructor;
+
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)
  *****************************************************************************/
