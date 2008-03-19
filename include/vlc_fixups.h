@@ -103,3 +103,18 @@
 # endif
 #endif
 
+#ifndef HAVE_LOCALTIME_R
+/* If localtime_r() is not provided, we assume localtime() uses
+ * thread-specific storage. */
+# include <time.h>
+static struct tm *localtime_r (const time_t *timep, struct tm *result)
+{
+    struct tm *s = localtime (timep);
+    if (s == NULL)
+        return NULL;
+
+    *result = *s;
+    return result;
+}
+#endif
+

@@ -244,26 +244,6 @@ static int Seek (access_t *access, int64_t offset)
     return ret;
 }
 
-
-#ifndef HAVE_LOCALTIME_R
-static inline struct tm *localtime_r (const time_t *now, struct tm *res)
-{
-    struct tm *unsafe = localtime (now);
-    /*
-     * This is not thread-safe. Blame your C library.
-     * On Win32 there SHOULD be _localtime_s instead, but of course
-     * Cygwin and Mingw32 don't know about it. You're on your own if you
-     * use this platform.
-     */
-    if (unsafe == NULL)
-        return NULL;
-
-    memcpy (res, unsafe, sizeof (*res));
-    return res;
-}
-#endif
-
-
 static void Trigger (access_t *access)
 {
     access_sys_t *p_sys = access->p_sys;

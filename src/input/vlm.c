@@ -1536,13 +1536,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
             time_t i_time = (time_t)( schedule->i_date / 1000000 );
             char *psz_date;
 
-#ifdef HAVE_LOCALTIME_R
             localtime_r( &i_time, &date);
-#else
-            struct tm *p_date = localtime( &i_time );
-            date = *p_date;
-#endif
-
             asprintf( &psz_date, "%d/%d/%d-%d:%d:%d",
                       date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
                       date.tm_hour, date.tm_min, date.tm_sec );
@@ -1891,13 +1885,7 @@ static char *Save( vlm_t *vlm )
         struct tm date;
         time_t i_time = (time_t) ( schedule->i_date / 1000000 );
 
-#ifdef HAVE_LOCALTIME_R
         localtime_r( &i_time, &date);
-#else
-        struct tm *p_date = localtime( &i_time );
-        date = *p_date;
-#endif
-
         p += sprintf( p, "new %s schedule ", schedule->psz_name);
 
         if( schedule->b_enabled == VLC_TRUE )

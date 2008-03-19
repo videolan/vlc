@@ -618,23 +618,14 @@ char *str_format_time( const char *tformat )
 {
     char buffer[255];
     time_t curtime;
-#if defined(HAVE_LOCALTIME_R)
     struct tm loctime;
-#else
-    struct tm *loctime;
-#endif
 
     /* Get the current time.  */
     curtime = time( NULL );
 
     /* Convert it to local time representation.  */
-#if defined(HAVE_LOCALTIME_R)
     localtime_r( &curtime, &loctime );
     strftime( buffer, 255, tformat, &loctime );
-#else
-    loctime = localtime( &curtime );
-    strftime( buffer, 255, tformat, loctime );
-#endif
     return strdup( buffer );
 }
 
