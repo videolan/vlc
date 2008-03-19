@@ -473,6 +473,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         if ( p_sys->b_strict_rc )
         {
+            p_context->rc_qsquish = 1.0;
             p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
             p_context->rc_min_rate = p_enc->fmt_out.i_bitrate;
             p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
