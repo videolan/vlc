@@ -10,6 +10,8 @@ EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym vlc-control.pc.in
 BUILT_SOURCES = modules/builtin.h misc/revision.c ../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
 
+SUFFIXES = .pc.in .pc
+
 ###############################################################################
 # Headers
 ###############################################################################
@@ -134,12 +136,16 @@ modules/modules.c: modules/builtin.h
 ###############################################################################
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = vlc-control.pc
+pkgconfig_DATA = vlc-control.pc vlc-plugin.pc
 CLEANFILES += $(pkgconfig_DATA)
 
 vlc-control.pc: vlc-control.pc.in $(top_builddir)/config.status
 	cd $(top_builddir) && \
 	$(SHELL) ./config.status --file=src/vlc-control.pc
+
+.pc.in.pc: $(top_builddir)/config.status
+	cd "$(top_builddir)" && \
+	$(SHELL) ./config.status --file="src/$@"
 
 ###############################################################################
 # Building libvlc
