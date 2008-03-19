@@ -138,9 +138,16 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data) {
     handled=0;
 
     if(filter(*data,"a=control:streamid=",&buf, BUFLEN)) {
-      desc->stream_id=atoi(buf);
-      handled=1;
-      *data=nl(*data);
+        /* This way negative values are mapped to unfeasibly high
+         * values, and will be discarded afterward
+         */
+        unsigned long tmp = strtoul(buf, NULL, 10);
+        if ( tmp > UINT16_MAX )
+            lprintf("stream id out of bound: %lu\n", tmp);
+        else
+            desc->stream_id=tmp;
+        handled=1;
+        *data=nl(*data);
     }
     if(filter(*data,"a=MaxBitRate:integer;",&buf, BUFLEN)) {
       desc->max_bit_rate=atoi(buf);
@@ -254,7 +261,10 @@ sdpplin_t *sdpplin_parse(char *data) {
         }
         stream=sdpplin_parse_stream(&data);
         lprintf("got data for stream id %u\n", stream->stream_id);
-        desc->stream[stream->stream_id]=stream;
+        if ( stream->stream_id >= desc->stream_count )
+            lprintf("stream id %u is greater than stream count %u\n", stream->stream_id, desc->stream_count);
+        else
+            desc->stream[stream->stream_id]=stream;
         continue;
     }
     if(filter(data,"a=Title:buffer;",&buf, BUFLEN)) {
@@ -290,10 +300,17 @@ sdpplin_t *sdpplin_parse(char *data) {
       }
     }
     if(filter(data,"a=StreamCount:integer;",&buf, BUFLEN)) {
-      desc->stream_count=atoi(buf);
-      desc->stream = malloc(sizeof(sdpplin_stream_t*)*desc->stream_count);
-      handled=1;
-      data=nl(data);
+        /* This way negative values are mapped to unfeasibly high
+         * values, and will be discarded afterward
+         */
+        unsigned long tmp = strtoul(buf, NULL, 10);
+        if ( tmp > UINT16_MAX )
+            lprintf("stream count out of bound: %lu\n", tmp);
+        else
+            desc->stream_count = tmp;
+        desc->stream = malloc(sizeof(sdpplin_stream_t*)*desc->stream_count);
+        handled=1;
+        data=nl(data);
     }
     if(filter(data,"a=Flags:integer;",&buf, BUFLEN)) {
       desc->flags=atoi(buf);

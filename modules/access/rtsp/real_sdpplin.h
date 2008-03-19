@@ -31,7 +31,7 @@ typedef struct {
   char *id;
   char *bandwidth;
 
-  int stream_id;
+  uint16_t stream_id;
   char *range;
   char *length;
   char *rtpmap;
@@ -75,7 +75,7 @@ typedef struct {
 
   int flags;
   int is_real_data_type;
-  int stream_count;
+  uint16_t stream_count;
   char *title;
   char *author;
   char *copyright;
