@@ -312,7 +312,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_as_node(
     input_item_t * p_input_item;
     libvlc_media_descriptor_t * p_md;
 
-    p_input_item = input_ItemNew( p_instance->p_libvlc_int, "vlc:nop", psz_name );
+    p_input_item = input_ItemNew( p_instance->p_libvlc_int, "vlc://nop", psz_name );
 
     if (!p_input_item)
     {
