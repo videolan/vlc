@@ -24,6 +24,9 @@
  * This file is a collection of portability fixes
  */
 
+#ifndef LIBVLC_FIXUPS_H
+# define LIBVLC_FIXUPS_H 1
+
 #ifndef HAVE_STRDUP
 # define strdup vlc_strdup
 #endif
@@ -118,3 +121,4 @@ static struct tm *localtime_r (const time_t *timep, struct tm *result)
 }
 #endif
 
+#endif /* !LIBVLC_FIXUPS_H */
