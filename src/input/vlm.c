@@ -174,7 +174,6 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
  *****************************************************************************/
 void vlm_Delete( vlm_t *p_vlm )
 {
-    vlc_object_detach( p_vlm );
     vlc_object_release( p_vlm );
 }
 
