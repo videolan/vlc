@@ -1,4 +1,4 @@
-/*****************************************************************************
+Au/*****************************************************************************
  * open.cpp : Panels for the open dialogs
  ****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
@@ -161,7 +161,7 @@ void FileOpenPanel::updateMRL()
     }
 
     if( ui.subCheckBox->isChecked() ) {
-        mrl.append( " :sub-file=" + ui.subInput->text() );
+        mrl.append( " :sub-file=\"" + ui.subInput->text() + "\"" );
         int align = ui.alignSubComboBox->itemData(
                     ui.alignSubComboBox->currentIndex() ).toInt();
         mrl.append( " :subsdec-align=" + QString().setNum( align ) );
