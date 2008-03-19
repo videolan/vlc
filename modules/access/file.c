@@ -49,6 +49,7 @@
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
+#   include <ctype.h>
 #else
 #   include <unistd.h>
 #   include <poll.h>
@@ -377,36 +378,27 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-
-static char *expand_path (const access_t *p_access, const char *path)
-{
-#if defined(WIN32)
-    if (!strcasecmp (p_access->psz_access, "file")
-      && ('/' == path[0]) && path[1] && (':' == path[2]) && ('/' == path[3]))
-        // Explorer can open path such as file:/C:/ or file:///C:/
-        // hence remove leading / if found
-        return strdup (path + 1);
-#endif
-
-    return strdup (path);
-}
-
-
 /*****************************************************************************
  * open_file: Opens a specific file
  *****************************************************************************/
-static int open_file (access_t *p_access, const char *psz_name)
+static int open_file (access_t *p_access, const char *path)
 {
-    char *path = expand_path (p_access, psz_name);
+#if defined(WIN32)
+    if (!strcasecmp (p_access->psz_access, "file")
+      && ('/' == path[0]) && isalpha (path[1])
+      && (':' == path[2]) && ('/' == path[3]))
+        /* Explorer can open path such as file:/C:/ or file:///C:/
+         * hence remove leading / if found */
+        path++;
+#endif
 
 #ifdef UNDER_CE
     p_sys->fd = utf8_fopen( path, "rb" );
     if ( !p_sys->fd )
     {
-        msg_Err( p_access, "cannot open file %s", psz_name );
+        msg_Err( p_access, "cannot open file %s", path );
         intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"),
-                        _("VLC could not open the file \"%s\"."), psz_name );
-        free (path);
+                        _("VLC could not open the file \"%s\"."), path );
         return VLC_EGENERIC;
     }
 
@@ -416,12 +408,11 @@ static int open_file (access_t *p_access, const char *psz_name)
     fseek( p_sys->fd, 0, SEEK_SET );
 #else
     int fd = utf8_open (path, O_RDONLY | O_NONBLOCK /* O_LARGEFILE*/, 0666);
-    free (path);
     if (fd == -1)
     {
-        msg_Err (p_access, "cannot open file %s (%m)", psz_name);
+        msg_Err (p_access, "cannot open file %s (%m)", path);
         intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
-                        _("VLC could not open the file \"%s\"."), psz_name);
+                        _("VLC could not open the file \"%s\"."), path);
         return -1;
     }
 
