@@ -204,6 +204,11 @@ private:
     "audio/3gpp2:3g2,3gpp2:3GPP2 audio;" \
     "video/3gpp2:3g2,3gpp2:3GPP2 video;" \
     /* DIVX */ \
-    "video/divx:divx:DivX video;"
+    "video/divx:divx:DivX video;" \
+    /* FLV */ \
+    "video/flv:flv:FLV video;" \
+    "video/x-flv:flv:FLV video;"
+
+
 
 #endif

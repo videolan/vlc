@@ -62,6 +62,9 @@ resource 'STR#' (127)
         "3GPP2 video",
         /* DIVX */
         "DivX video",
+        /* FLV */
+        "FLV video",
+        "FLV video",
     };
 };
 
@@ -108,6 +111,10 @@ resource 'STR#' (128,"MIME Type")
         "video/3gpp2", "3g2,3gpp2",
         /* DIVX */
         "video/divx", "divx",
+        /* FLV */
+        "video/flv", "flv",
+        "video/x-flv", "flv",
+
     };
 };
 
