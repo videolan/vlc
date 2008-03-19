@@ -100,12 +100,6 @@ linkage="c"
 cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE -D_REENTRANT -D_THREAD_SAFE"
 
 #
-#  Gettext, data and plugin location
-#
-cppflags="${cppflags} -DLOCALEDIR=\"@datadir@/locale\""
-cppflags="${cppflags} -DPLUGIN_PATH=\"@libdir@/vlc\""
-
-#
 #  Various additional defines
 #
 if [ "${debug}" = yes ]; then
