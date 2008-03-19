@@ -139,10 +139,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = vlc-control.pc vlc-plugin.pc
 CLEANFILES += $(pkgconfig_DATA)
 
-vlc-control.pc: vlc-control.pc.in $(top_builddir)/config.status
-	cd $(top_builddir) && \
-	$(SHELL) ./config.status --file=src/vlc-control.pc
-
 .pc.in.pc: $(top_builddir)/config.status
 	cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
