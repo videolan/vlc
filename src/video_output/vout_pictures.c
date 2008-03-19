@@ -217,7 +217,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
 
-#ifdef DEBUG
+#ifndef NDEBUG
     /* Check if picture status is valid */
     if( (p_pic->i_status != RESERVED_PICTURE) &&
         (p_pic->i_status != RESERVED_DATED_PICTURE) &&

@@ -273,7 +273,7 @@ int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
 
     *pp_pes = p_pes = NULL;
 
-#ifdef DEBUG
+#ifndef NDEBUG
     memset( header, 0, 50 );
 #endif
 

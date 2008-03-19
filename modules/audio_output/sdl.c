@@ -94,7 +94,7 @@ static int Open ( vlc_object_t *p_this )
     /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet */
     i_flags |= SDL_INIT_EVENTTHREAD;
 #endif
-#ifdef DEBUG
+#ifndef NDEBUG
     /* In debug mode you may want vlc to dump a core instead of staying
      * stuck */
     i_flags |= SDL_INIT_NOPARACHUTE;

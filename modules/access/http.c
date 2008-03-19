@@ -332,7 +332,7 @@ connect:
             if( p_access->b_die || Connect( p_access, 0 ) )
                 goto error;
 
-#ifdef DEBUG
+#ifndef NDEBUG
         case 0:
             break;
 

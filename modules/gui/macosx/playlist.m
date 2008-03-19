@@ -1384,7 +1384,7 @@
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
                                                     [o_value pointerValue]]];
-#ifdef DEBUG
+#ifndef NDEBUG
     msg_Dbg( VLCIntf, "adding item %p", [o_value pointerValue] );
 #endif
     return o_value;
