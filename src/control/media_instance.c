@@ -74,18 +74,12 @@ static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
  */
 static void release_input_thread( libvlc_media_instance_t *p_mi )
 {
-    input_thread_t *p_input_thread;
+    input_thread_t * p_input_thread;
 
-    if( !p_mi || p_mi->i_input_id == -1 )
+    if( !p_mi || !p_mi->p_input_thread )
         return;
 
-    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
-
-    p_mi->i_input_id = -1;
-
-    if( !p_input_thread )
-        return;
- 
+    p_input_thread = p_mi->p_input_thread;
 
     /* No one is tracking this input_thread appart us. Destroy it */
     if( p_mi->b_own_its_input_thread )
@@ -101,13 +95,10 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
 
         var_Destroy( p_input_thread, "drawable" );
     }
-    else
-    {
-        vlc_object_release( p_input_thread );
-    }
 
-    /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
+
+    p_mi->p_input_thread = NULL;
 }
 
 /*
@@ -121,27 +112,21 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
 {
     input_thread_t *p_input_thread;
 
-    if ( !p_mi )
-    {
-        RAISENULL( "Input is NULL" );
-    }
-
+    if( !p_mi ) RAISENULL( "Media Instance is NULL" );
+    
     vlc_mutex_lock( &p_mi->object_lock );
 
-    if( !p_mi || p_mi->i_input_id == -1 )
+    if( !p_mi->p_input_thread )
     {
         vlc_mutex_unlock( &p_mi->object_lock );
         RAISENULL( "Input is NULL" );
     }
 
-    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
-    if( !p_input_thread )
-    {
-        vlc_mutex_unlock( &p_mi->object_lock );
-        RAISENULL( "Input does not exist" );
-    }
+    p_input_thread = p_mi->p_input_thread;
+    vlc_object_yield( p_input_thread );
 
     vlc_mutex_unlock( &p_mi->object_lock );
+
     return p_input_thread;
 }
 
@@ -308,7 +293,7 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
     p_mi->p_md = NULL;
     p_mi->drawable = 0;
     p_mi->p_libvlc_instance = p_libvlc_instance;
-    p_mi->i_input_id = -1;
+    p_mi->p_input_thread = NULL;
     /* refcount strategy:
      * - All items created by _new start with a refcount set to 1
      * - Accessor _release decrease the refcount by 1, if after that
@@ -401,11 +386,11 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
         return NULL;
     }
 
-    p_mi->i_input_id = p_input->i_object_id;
-    p_mi->b_own_its_input_thread = VLC_FALSE;
-
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input );
+
+    p_mi->p_input_thread = p_input;
+    p_mi->b_own_its_input_thread = VLC_FALSE;
 
     return p_mi;
 }
@@ -580,16 +565,19 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         return;
     }
 
-    p_mi->i_input_id = input_Read( p_mi->p_libvlc_instance->p_libvlc_int,
-                                   p_mi->p_md->p_input_item, VLC_FALSE );
+    int i_input_id = input_Read( p_mi->p_libvlc_instance->p_libvlc_int,
+                      p_mi->p_md->p_input_item, VLC_FALSE );
 
-    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
+    /* Released in input_release */
+    p_mi->p_input_thread = (input_thread_t*)vlc_object_get( i_input_id );
 
-    if( !p_input_thread )
+    if( !p_mi->p_input_thread )
     {
         return;
         vlc_mutex_unlock( &p_mi->object_lock );
     }
+
+    p_input_thread = p_mi->p_input_thread;
 
     if( p_mi->drawable )
     {
@@ -604,7 +592,6 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-change", input_time_changed, p_mi );
 
-    vlc_object_release( p_input_thread );
     vlc_mutex_unlock( &p_mi->object_lock );
 }
 

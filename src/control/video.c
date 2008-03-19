@@ -147,8 +147,8 @@ libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
     var_SetInteger( p_vout, "snapshot-width", i_width );
     var_SetInteger( p_vout, "snapshot-height", i_height );
 
-    p_input_thread = (input_thread_t*)vlc_object_get( p_mi->i_input_id );
-    if( !p_input_thread )
+    p_input_thread = p_mi->p_input_thread;
+    if( !p_mi->p_input_thread )
     {
         libvlc_exception_raise( p_e, "Input does not exist" );
         return;
@@ -159,7 +159,6 @@ libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
 
     vout_Control( p_vout, VOUT_SNAPSHOT );
     vlc_object_release( p_vout );
-    vlc_object_release( p_input_thread );
 }
 
 int libvlc_video_get_height( libvlc_media_instance_t *p_mi,
