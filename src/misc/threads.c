@@ -174,12 +174,12 @@ int __vlc_threads_init( vlc_object_t *p_this )
             HINSTANCE hInstLib;
 
             /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
-            hInstLib = LoadLibrary( "kernel32" );
+            hInstLib = LoadLibrary(_T("kernel32"));
             if( hInstLib )
             {
                 pf_SignalObjectAndWait =
                     (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
-                                                     "SignalObjectAndWait" );
+                                                  _T("SignalObjectAndWait") );
             }
         }
 

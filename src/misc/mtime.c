@@ -225,12 +225,12 @@ mtime_t mdate( void )
            (may also be true, for single cores with adaptive
             CPU frequency and active power management?)
         */
-        HINSTANCE h_Kernel32 = LoadLibraryA("kernel32.dll");
+        HINSTANCE h_Kernel32 = LoadLibrary(_T("kernel32.dll"));
         if(h_Kernel32)
         {
             void WINAPI (*pf_GetSystemInfo)(LPSYSTEM_INFO);
             pf_GetSystemInfo = (void WINAPI (*)(LPSYSTEM_INFO))
-                                GetProcAddress(h_Kernel32, "GetSystemInfo");
+                                GetProcAddress(h_Kernel32, _T("GetSystemInfo"));
             if(pf_GetSystemInfo)
             {
                SYSTEM_INFO system_info;
