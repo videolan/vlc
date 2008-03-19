@@ -388,8 +388,10 @@ misc/revision.c:
 # Building vlc
 ###############################################################################
 
+if BUILD_VLC
 bin_PROGRAMS = vlc
-# 
+endif
+
 vlc_SOURCES = vlc.c
 vlc_DEPENDENCIES = $(DATA_win32_rc) libvlc.la
 
@@ -397,6 +399,7 @@ vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
 vlc_LDADD = $(DATA_win32_rc) libvlc.la $(LTLIBINTL) `$(VLC_CONFIG) -libs vlc`
 
+if BUILD_VLC
 vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	@rm -f vlc$(EXEEXT)
 	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
@@ -414,6 +417,7 @@ noinst_DATA = vlc_win32_rc.$(OBJEXT)
 
 vlc_win32_rc.$(OBJEXT): $(top_srcdir)/share/vlc_win32_rc.rc
 	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(top_srcdir)/share -i $< -o $@
+endif
 endif
 
 ###############################################################################

@@ -5721,6 +5721,15 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LIBS([realaudio],[../../libs/loader/libloader.la])
   ])
 
+AC_ARG_WITH(,[Components:])
+
+dnl
+dnl  the VLC binary
+dnl
+AC_ARG_ENABLE(vlc,
+  [  --enable-vlc            build the VLC media player (default enabled)])
+AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
+
 dnl
 dnl  Microsoft ActiveX support
 dnl
@@ -6300,9 +6309,9 @@ echo exit \$ERROR >>compile
 chmod a+x compile
 
 printf "
-vlc configuration
+libvlc configuration
 --------------------
-vlc version           : ${VERSION}
+version               : ${VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
 build flavour         : "
@@ -6311,9 +6320,13 @@ test "${enable_cprof}" = "yes" && printf "cprof "
 test "${enable_gprof}" = "yes" && printf "gprof "
 test "${enable_optimizations}" = "yes" && printf "optim "
 test "${enable_release}" = "yes" && printf "release " || printf "devel "
-echo "
-vlc aliases           :${ALIASES}
-plugins/bindings      :${PLUGINS_BINDINGS}
+echo ""
+if test "${enable_vlc}" != "no"; then
+echo "vlc aliases           :${ALIASES}"
+else
+echo "build vlc executable  : no"
+fi
+echo "plugins/bindings      :${PLUGINS_BINDINGS}
 
 You can check which modules have been enabled 
 with \`./vlc-config --list plugin'.

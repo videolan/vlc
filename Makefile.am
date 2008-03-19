@@ -289,7 +289,9 @@ endif
 ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc
 bin_SCRIPTS += $(ALIASES)
 CLEANFILES += $(ALIASES)
+if BUILD_VLC
 EXTRA_SCRIPTS = $(ALL_ALIASES)
+endif
 
 dist_noinst_SCRIPTS += make-alias
 
@@ -313,7 +315,9 @@ qvlc: make-alias
 nvlc: make-alias
 	$(MKALIAS) ncurses
 
+if BUILD_VLC
 noinst_SCRIPTS = vlc$(EXEEXT)
+endif
 
 vlc$(EXEEXT): core
 	rm -f vlc$(EXEEXT)
@@ -326,7 +330,9 @@ vlc$(EXEEXT): core
 
 if HAVE_DARWIN
 # Create the MacOS X app
+if BUILD_VLC
 noinst_DATA = VLC.app
+endif
 # VLC-release.app is the old VLC.app target
 VLC-release.app: vlc
 	( cd src && make install )
