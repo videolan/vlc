@@ -25,6 +25,10 @@
 
 package org.videolan.jvlc;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
@@ -39,6 +43,8 @@ public class MediaList
     private final LibVlcMediaList instance;
 
     private final LibVlcEventManager eventManager;
+
+    private List<String> items = new ArrayList<String>();
 
     public MediaList(JVLC jvlc)
     {
@@ -56,6 +62,11 @@ public class MediaList
 
     public void addMediaDescriptor(MediaDescriptor descriptor)
     {
+        if (items.contains(descriptor.getMrl()))
+        {
+            return;
+        }
+        items.add(descriptor.getMrl());
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_add_media_descriptor(instance, descriptor.getInstance(), exception);
     }
@@ -79,10 +90,33 @@ public class MediaList
         return new MediaDescriptor(jvlc, descriptor);
     }
 
-    public void remove(int index)
+    /**
+     * @param index The index of the media to remove
+     * @return True if the media was successfully removed, false otherwise.
+     */
+    public boolean removeMedia(int index)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_remove_index(instance, index, exception);
+        if (exception.raised == 0)
+        {
+            items.remove(index);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param media The media descriptor mrl
+     */
+    public boolean removeMedia(String mrl)
+    {
+        int index = items.indexOf(mrl);
+        if (index == -1)
+        {
+            return false;
+        }
+        return removeMedia(index);
     }
 
     public void insertMediaDescriptor(MediaDescriptor descriptor, int index)
@@ -110,6 +144,20 @@ public class MediaList
     LibVlcMediaList getInstance()
     {
         return instance;
+    }
+
+    /**
+     * @param mediaDescriptor
+     */
+    public boolean removeMedia(MediaDescriptor mediaDescriptor)
+    {
+        String mrl = mediaDescriptor.getMrl();
+        int index = items.indexOf(mrl);
+        if (index == -1)
+        {
+            return false;
+        }
+        return removeMedia(index);
     }
 
 }

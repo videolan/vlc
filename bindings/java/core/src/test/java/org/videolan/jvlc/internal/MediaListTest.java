@@ -125,4 +125,41 @@ public class MediaListTest
         Assert.assertEquals(0, exception.raised);
     }
 
+    @Test
+    public void mediaListRemoveIndexTest()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
+        String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
+        LibVlcMediaDescriptor libvlc_media_descriptor = libvlc.libvlc_media_descriptor_new(
+            libvlcInstance,
+            mrl,
+            exception);
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, libvlc_media_descriptor, exception);
+        libvlc.libvlc_media_list_remove_index(mediaList, 0, exception);
+        Assert.assertEquals(0, exception.raised);
+    }
+
+    @Test
+    public void mediaListRemoveIndexTest2()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
+        String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
+        LibVlcMediaDescriptor libvlc_media_descriptor = libvlc.libvlc_media_descriptor_new(
+            libvlcInstance,
+            mrl,
+            exception);
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, libvlc_media_descriptor, exception);
+        libvlc.libvlc_media_list_remove_index(mediaList, 0, exception);
+        Assert.assertEquals(0, exception.raised);
+
+        libvlc_media_descriptor = libvlc.libvlc_media_descriptor_new(
+            libvlcInstance,
+            mrl,
+            exception);
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, libvlc_media_descriptor, exception);
+        libvlc.libvlc_media_list_remove_index(mediaList, 0, exception);
+    }   
+    
 }
