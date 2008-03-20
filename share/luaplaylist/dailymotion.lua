@@ -42,21 +42,32 @@ function parse()
             and resolutions:
             /A@@spark||/B@@spark-mini||/C@@vp6-hd||/D@@vp6||/E@@h264
             Not everybody can decode HD, not everybody has a 80x60 screen,
-            H264/MP4 is buggy , so i choose VP6
+            H264/MP4 is buggy , so i choose VP6 as the highest priority
 
             Ideally, VLC would propose the different streams available, codecs
             and resolutions (the resolutions are part of the URL)
+
+            For now we just built a list of preferred codecs : lowest value
+            means highest priority
          ]]
+            local pref = { ["vp6"]=0, ["spark"]=1, ["h264"]=2, ["vp6-hd"]=3, ["spark-mini"]=4 }
+            local available = {}
             for n in string.gmatch(videos, "[^|]+") do
                 i = string.find(n, "@@")
                 if i then
-                    video = string.sub( n, 0, i - 1)
-                    codec = string.sub( n, i + 2 )
-                    if video and codec and string.match(codec, "vp6") then
-                        path = "http://dailymotion.com" .. video
-                        break
-                    end
+                    available[string.sub(n, i+2)] = string.sub(n, 0, i-1)
                 end
+            end
+            local score = 666
+            local bestcodec
+            for codec,_ in pairs(available) do
+                if pref[codec] < score then
+                    bestcodec = codec
+                    score = pref[codec]
+                end
+            end
+            if bestcodec then
+                path = "http://dailymotion.com" .. available[bestcodec]
             end
         end
         if string.match( line, "<meta name=\"description\"" )
