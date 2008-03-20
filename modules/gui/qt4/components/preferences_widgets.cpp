@@ -184,7 +184,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
             VStringConfigControl *vscc =
                             qobject_cast<VStringConfigControl *>(this);
             assert( vscc );
-            config_PutPsz( p_intf, vscc->getName(), qta( vscc->getValue() ) );
+            config_PutPsz( p_intf, vscc->getName(), qtu( vscc->getValue() ) );
             break;
         }
         case CONFIG_ITEM_KEY:
@@ -381,7 +381,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in a×y case that dirty was set to VLC_TRUE
+       // assume in any case that dirty was set to VLC_TRUE
        // because lazy programmes will use the same callback for
        // this, like the one behind the refresh push button?
        p_module_config->b_dirty = VLC_FALSE;
@@ -466,7 +466,7 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
                             p_module_config->ppsz_list_text[i_index])?
                             p_module_config->ppsz_list_text[i_index] :
                             p_module_config->ppsz_list[i_index] ),
-                        QVariant( p_module_config->ppsz_list[i_index] ) );
+                   QVariant( qfu(p_module_config->ppsz_list[i_index] )) );
         if( p_item->value.psz && !strcmp( p_module_config->value.psz,
                                           p_module_config->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );

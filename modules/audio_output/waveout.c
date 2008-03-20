@@ -1193,11 +1193,11 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
         if(waveOutGetDevCaps(i, &caps, sizeof(WAVEOUTCAPS))
            == MMSYSERR_NOERROR)
         {
-          sprintf(sz_dev_name,psz_device_name_fmt,caps.szPname,
+          sprintf( sz_dev_name, psz_device_name_fmt, caps.szPname,
                                                caps.wMid,
                                                caps.wPid
                                               );
-          p_item->ppsz_list[j] = strdup( sz_dev_name );
+          p_item->ppsz_list[j] = FromLocaleDup( sz_dev_name );
           p_item->ppsz_list_text[j] = FromLocaleDup( sz_dev_name );
           p_item->i_list++;
           j++;
@@ -1232,12 +1232,18 @@ static uint32_t findDeviceID(char *psz_device_name)
         if(waveOutGetDevCaps(i, &caps, sizeof(WAVEOUTCAPS))
            == MMSYSERR_NOERROR)
         {
-            sprintf(sz_dev_name,psz_device_name_fmt,caps.szPname,
+            sprintf(sz_dev_name, psz_device_name_fmt, caps.szPname,
                                                caps.wMid,
                                                caps.wPid
                                               );
-            if(!stricmp(sz_dev_name,psz_device_name))
-               return i;
+            char *psz_temp = FromLocaleDup(sz_dev_name);
+
+            if( !stricmp(psz_temp, psz_device_name) )
+            {
+                LocaleFree( psz_temp );
+                return i;
+            }
+            LocaleFree( psz_temp );
         }
     }
 
