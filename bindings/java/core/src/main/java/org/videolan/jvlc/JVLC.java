@@ -29,13 +29,13 @@
 
 package org.videolan.jvlc;
 
+import java.awt.Canvas;
+
 import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 import com.sun.jna.Native;
-
-import java.awt.Canvas;
 
 public class JVLC
 {
@@ -43,12 +43,15 @@ public class JVLC
     private final LibVlcInstance instance;
 
     private final LibVlc libvlc = LibVlc.SYNC_INSTANCE;
+
+    private MediaList mediaList;
     
     public JVLC()
     {
         String[] args = new String[1];
         args[0] = "jvlc";
         instance = createInstance(args);
+        mediaList = new MediaList(this);
     }
 
     public JVLC(String[] args)
@@ -113,4 +116,14 @@ public class JVLC
         libvlc.libvlc_release(instance);
         super.finalize();
     }
+    
+    /**
+     * Returns the mediaList.
+     * @return the mediaList
+     */
+    public MediaList getMediaList()
+    {
+        return mediaList;
+    }
+    
 }
