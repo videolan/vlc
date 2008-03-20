@@ -89,7 +89,8 @@ enum
      CAPS_CAN_PAUSE             = 1 << 2,
      CAPS_CAN_PLAY              = 1 << 3,
      CAPS_CAN_SEEK              = 1 << 4,
-     CAPS_CAN_PROVIDE_METADATA  = 1 << 5
+     CAPS_CAN_PROVIDE_METADATA  = 1 << 5,
+     CAPS_CAN_HAS_TRACKLIST     = 1 << 6
 };
 
 struct intf_sys_t
@@ -308,7 +309,6 @@ DBUS_METHOD( GetCaps )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    UpdateCaps( (intf_thread_t*)p_this );
     ADD_INT32( &((intf_thread_t*)p_this)->p_sys->i_caps );
 
     REPLY_SEND;
@@ -884,6 +884,8 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
+    UpdateCaps( p_intf );
+
     if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
     {
         input_item_t *p_item = input_GetItem( (input_thread_t*)p_this );
@@ -899,7 +901,6 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     {
         StatusChangeSignal( p_sys->p_conn, (void*) p_intf );
     }
-
 
     return VLC_SUCCESS;
 }
@@ -969,8 +970,6 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
 
-    UpdateCaps( p_intf );
-
     var_AddCallback( p_input, "state", StateChange, p_intf );
 
     vlc_object_release( p_input );
@@ -982,7 +981,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
  ****************************************************************************/
 static int UpdateCaps( intf_thread_t* p_intf )
 {
-    dbus_int32_t i_caps = CAPS_NONE;
+    dbus_int32_t i_caps = CAPS_CAN_HAS_TRACKLIST;
     playlist_t* p_playlist = pl_Yield( (vlc_object_t*)p_intf );
     PL_LOCK;
     
