@@ -378,7 +378,7 @@ static vlc_bool_t parse_track_dict COMPLEX_INTERFACE
             !strncmp( psz_uri, "file://localhost/", 17 ) )
         {
             /* remove 'localhost/' */
-            strcpy( psz_uri + 7, psz_uri + 17 );
+            memmove( psz_uri + 7, psz_uri + 17, strlen( psz_uri ) - 9 );
             msg_Info( p_demux, "Adding '%s'", psz_uri );
 
             p_new_input = input_ItemNewExt( p_playlist, psz_uri,
