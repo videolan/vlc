@@ -305,6 +305,7 @@ case "${host_os}" in
         VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([libvlc vlc],[-e WinMainCRTStartup])
         VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync],[-lws2])
+        VLC_ADD_LIBS([libvlc],[-lmmtimer])
    fi
     ;;
   *nto*)
@@ -5219,17 +5220,21 @@ AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
 dnl
 dnl  WinCE GUI module
 dnl
-if test "${SYS}" = "mingwce"; then
-  VLC_ADD_BUILTINS([wince])
-  VLC_ADD_CXXFLAGS([wince],[])
-  VLC_ADD_LIBS([wince],[-lcommctrl -lcommdlg -laygshell])
-  dnl Gross hack
-  VLC_ADD_LIBS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
-elif test "${SYS}" = "mingw32"; then
-  VLC_ADD_CXXFLAGS([wince],[])
-  VLC_ADD_LIBS([wince],[-lcomctl32 -lcomdlg32 -lgdi32 -lole32])
-  dnl Gross hack
-  VLC_ADD_LIBS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
+AC_ARG_ENABLE(wince,
+  [  --enable-wince          Windows CE interface (default enabled with MinGW)])
+if test "${enable_wince}" != "no"; then
+  if test "${SYS}" = "mingwce"; then
+    VLC_ADD_BUILTINS([wince])
+    VLC_ADD_CXXFLAGS([wince],[])
+    VLC_ADD_LIBS([wince],[-lcommctrl -lcommdlg -laygshell])
+    dnl Gross hack
+    VLC_ADD_LIBS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
+  elif test "${SYS}" = "mingw32"; then
+    VLC_ADD_CXXFLAGS([wince],[])
+    VLC_ADD_LIBS([wince],[-lcomctl32 -lcomdlg32 -lgdi32 -lole32])
+    dnl Gross hack
+    VLC_ADD_LIBS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
+  fi
 fi
 
 dnl
