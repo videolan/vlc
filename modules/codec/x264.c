@@ -771,9 +771,17 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "qpstep", &val );
     if( val.i_int >= 0 && val.i_int <= 51 ) p_sys->param.rc.i_qp_step = val.i_int;
     var_Get( p_enc, SOUT_CFG_PREFIX "qpmin", &val );
-    if( val.i_int >= 0 && val.i_int <= 51 ) i_qmin = val.i_int;
+    if( val.i_int >= 0 && val.i_int <= 51 )
+    {
+        i_qmin = val.i_int;
+        p_sys->param.rc.i_qp_min = i_qmin;
+    }
     var_Get( p_enc, SOUT_CFG_PREFIX "qpmax", &val );
-    if( val.i_int >= 0 && val.i_int <= 51 ) i_qmax = val.i_int;
+    if( val.i_int >= 0 && val.i_int <= 51 )
+    {
+        i_qmax = val.i_int;
+        p_sys->param.rc.i_qp_max = i_qmax;
+    }
 
     var_Get( p_enc, SOUT_CFG_PREFIX "qp", &val );
     if( val.i_int >= 0 && val.i_int <= 51 )
@@ -781,6 +789,7 @@ static int  Open ( vlc_object_t *p_this )
         if( i_qmin > val.i_int ) i_qmin = val.i_int;
         if( i_qmax < val.i_int ) i_qmax = val.i_int;
 
+        p_sys->param.rc.i_rc_method = X264_RC_CQP;
 #if X264_BUILD >= 0x000a
         p_sys->param.rc.i_qp_constant = val.i_int;
         p_sys->param.rc.i_qp_min = i_qmin;
