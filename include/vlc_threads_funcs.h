@@ -581,6 +581,7 @@ static inline void vlc_spin_lock (vlc_spinlock_t *spin)
 {
     int val = pthread_spin_lock (&spin->spin);
     assert (val == 0);
+    (void)val;
 }
 
 /**
@@ -590,6 +591,7 @@ static inline void vlc_spin_unlock (vlc_spinlock_t *spin)
 {
     int val = pthread_spin_unlock (&spin->spin);
     assert (val == 0);
+    (void)val;
 }
 
 /**
@@ -599,6 +601,7 @@ static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 {
     int val = pthread_spin_destroy (&spin->spin);
     assert (val == 0);
+    (void)val;
 }
 
 #elif defined( WIN32 )
