@@ -76,7 +76,7 @@ static int TrackListChangeEmit( vlc_object_t *, const char *, vlc_value_t,
 
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
 static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, vlc_bool_t );
-static int UpdateCaps( intf_thread_t* );
+static int UpdateCaps( intf_thread_t*, vlc_bool_t );
 
 /* GetCaps() capabilities */
 enum
@@ -723,7 +723,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
     p_sys->p_conn = p_conn;
 
-    UpdateCaps( p_intf );
+    UpdateCaps( p_intf, VLC_FALSE );
 
     return VLC_SUCCESS;
 }
@@ -833,8 +833,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    /* We're called from the playlist, so that would cause locking issues */
-    /* UpdateCaps( p_intf ); */
+    UpdateCaps( p_intf, VLC_TRUE );
     TrackListChangeSignal( p_intf->p_sys->p_conn, p_data );
     return VLC_SUCCESS;
 }
@@ -882,7 +881,7 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf );
+    UpdateCaps( p_intf, VLC_FALSE );
 
     if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
     {
@@ -916,7 +915,7 @@ static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf );
+    UpdateCaps( p_intf, VLC_FALSE );
     StatusChangeSignal( p_intf->p_sys->p_conn, p_data );
     return VLC_SUCCESS;
 }
@@ -977,11 +976,12 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
 /*****************************************************************************
  * UpdateCaps: update p_sys->i_caps
  ****************************************************************************/
-static int UpdateCaps( intf_thread_t* p_intf )
+static int UpdateCaps( intf_thread_t* p_intf, vlc_bool_t b_playlist_locked )
 {
+    intf_sys_t* p_sys = p_intf->p_sys;
     dbus_int32_t i_caps = CAPS_CAN_HAS_TRACKLIST;
     playlist_t* p_playlist = pl_Yield( (vlc_object_t*)p_intf );
-    PL_LOCK;
+    if( !b_playlist_locked ) PL_LOCK;
     
     if( p_playlist->items.i_size > 0 )
         i_caps |= CAPS_CAN_PLAY | CAPS_CAN_GO_PREV | CAPS_CAN_GO_NEXT;
@@ -996,15 +996,15 @@ static int UpdateCaps( intf_thread_t* p_intf )
             i_caps |= CAPS_CAN_SEEK;
     }
 
-    PL_UNLOCK;
+    if( !b_playlist_locked ) PL_UNLOCK;
     pl_Release( p_playlist );
 
-    if( p_intf->p_sys->b_meta_read )
+    if( p_sys->b_meta_read )
         i_caps |= CAPS_CAN_PROVIDE_METADATA;
 
     if( i_caps != p_intf->p_sys->i_caps )
     {
-        p_intf->p_sys->i_caps = i_caps;
+        p_sys->i_caps = i_caps;
         CapsChangeSignal( p_intf->p_sys->p_conn, (vlc_object_t*)p_intf );
     }
 
