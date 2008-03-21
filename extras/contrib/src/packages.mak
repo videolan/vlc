@@ -25,8 +25,8 @@
 # ***************************************************************************
 
 PENGUIN=http://ftp.penguin.cz/pub/users/utx/amr
-GNU=http://ftp.heanet.ie/mirrors/ftp.gnu.org/gnu
-SF=http://heanet.dl.sourceforge.net/sourceforge
+GNU=ftp://ftp.esat.net/pub/gnu
+SF=http://switch.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://download.videolan.org/pub/videolan
 PERL_VERSION=5.8.8
 PERL_URL=http://ftp.funet.fi/pub/CPAN/src/perl-$(PERL_VERSION).tar.gz
@@ -185,7 +185,7 @@ QT4T_URL=ftp://ftp.trolltech.com/pub/qt/source/qt-win-opensource-$(QT4T_VERSION)
 ZLIB_VERSION=1.2.3
 ZLIB_URL=$(SF)/libpng/zlib-$(ZLIB_VERSION).tar.gz
 XML_VERSION=2.6.31
-XML_URL=ftp://xmlsoft.org/libxml2/libxml2-$(XML_VERSION).tar.gz
+XML_URL=http://xmlsoft.org/sources/libxml2-$(XML_VERSION).tar.gz
 DIRAC_VERSION=0.9.1
 DIRAC_URL=$(SF)/dirac/dirac-$(DIRAC_VERSION).tar.gz
 DX_HEADERS_URL=$(VIDEOLAN)/testing/contrib/win32-dx7headers.tgz

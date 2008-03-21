@@ -270,7 +270,7 @@ echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
 if wget --version >/dev/null 2>&1; then
-    echo "WGET = `which wget` -c" >> config.mak
+    echo "WGET = `which wget` -c --passive" >> config.mak
 elif which curl >/dev/null; then
     echo "WGET = `which curl` -L -O" >> config.mak
 else
