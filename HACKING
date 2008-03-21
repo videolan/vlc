@@ -14,7 +14,7 @@ First
 Requirements
 ____________
 
-You will need the following tools if you plan to use the SVN version of vlc:
+You will need the following tools if you plan to use the GIT version of vlc:
 
  - Autoconf version 2.60 or later
  - Automake version 1.9 or later
@@ -22,13 +22,13 @@ You will need the following tools if you plan to use the SVN version of vlc:
  - pkg-config
  - libgcrypt 1.2 (or compatible)
 
-After retrieving the SVN tree, you need to run the bootstrap script to
+After retrieving the GIT tree, you need to run the bootstrap script to
 generate all the files needed to build vlc. You can then run configure.
 Run ./configure --help for a description of the available options.
 
 If you do not have the correct version of these tools, or if they are
 simply not available for the operating system you plan to develop on,
-you can check out a SVN tree on an OS that provides these tools (such
+you can check out a GIT tree on an OS that provides these tools (such
 as a recent Linux distribution), run bootstrap, and then copy the whole
 tree to your retarded OS.
 
