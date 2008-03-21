@@ -59,6 +59,17 @@ public class MediaListPlayer
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_player_play(instance, exception);
+        try
+        {
+            while (jvlc.getLibvlc().libvlc_media_list_player_is_playing(instance, exception) == 0)
+            {
+                Thread.sleep(25);
+            }
+        }
+        catch(InterruptedException e)
+        {
+            //
+        }
     }
 
     public void stop()
@@ -73,17 +84,70 @@ public class MediaListPlayer
         jvlc.getLibvlc().libvlc_media_list_player_pause(instance, exception);
     }
 
-    
+    /**
+     * Plays the given descriptor and returns only when the player has started to play.
+     * @param descriptor The media descriptor to play
+     */
     public void playItem(MediaDescriptor descriptor)
+    {
+        playItem(descriptor, true);
+    }
+    
+    /**
+     * @param descriptor The media descriptor to play
+     * @param synchronous If true it does not return until the player is not playing.
+     */
+    public void playItem(MediaDescriptor descriptor, boolean synchronous)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_player_play_item(instance, descriptor.getInstance(), exception);
+        if (!synchronous)
+        {
+            return;
+        }
+        
+        try
+        {
+            while (jvlc.getLibvlc().libvlc_media_list_player_is_playing(instance, exception) == 0)
+            {
+                Thread.sleep(25);
+            }
+        }
+        catch(InterruptedException e)
+        {
+            //
+        }
+        
     }
 
+    /**
+     * Plays the item at the given index and returns only when the player has started to play.
+     * @param index The item index to play.
+     */
     public void playItem(int index)
+    {
+        playItem(index, true);
+    }
+    
+    /**
+     * @param index The item index to play.
+     * @param synchronous If true it does not return until the player is not playing.
+     */
+    public void playItem(int index, boolean synchronous)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_player_play_item_at_index(instance, index, exception);
+        try
+        {
+            while (jvlc.getLibvlc().libvlc_media_list_player_is_playing(instance, exception) == 0)
+            {
+                Thread.sleep(25);
+            }
+        }
+        catch(InterruptedException e)
+        {
+            //
+        }
     }
     
     public void setMediaInstance(MediaInstance mediaInstance)
