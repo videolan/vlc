@@ -484,7 +484,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occured while saving the Interface settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Interface settings using SimplePrefs" );
             i = 0;
         }
 
@@ -544,7 +544,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occured while saving the Audio settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs" );
             i = 0;
         }
         b_audioSettingChanged = NO;
@@ -575,7 +575,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occured while saving the Video settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Video settings using SimplePrefs" );
             i = 0;
         }
         b_videoSettingChanged = NO;
@@ -656,7 +656,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occured while saving the Input settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Input settings using SimplePrefs" );
             i = 0;
         }
         b_inputSettingChanged = NO;
@@ -683,7 +683,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occured while saving the OSD/Subtitle settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs" );
             i = 0;
         }
         b_osdSettingChanged = NO;
@@ -708,7 +708,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occured while saving the Hotkey settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Hotkey settings using SimplePrefs" );
             i = 0;
         }
         b_hotkeyChanged = NO;

@@ -296,7 +296,7 @@ void UpdateDialog::updateNotify( bool b_result )
     }
     else
         updateLabel->setText(
-                        qtr( "An error occured while checking for updates" ) );
+                        qtr( "An error occurred while checking for updates" ) );
 
     adjustSize();
     updateButton->setEnabled( true );

@@ -1216,7 +1216,7 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
 /*
   convert devicename to device ID for output
   if device not found return WAVE_MAPPER, so let
-  windows decide which prefered audio device
+  windows decide which preferred audio device
   should be used.
 */
 static uint32_t findDeviceID(char *psz_device_name)

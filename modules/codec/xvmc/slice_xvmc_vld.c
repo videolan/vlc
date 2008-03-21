@@ -270,7 +270,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
     else
     {
         /*
-         * An error has occured.
+         * An error has occurred.
          */
 
         //printf("VLD XvMC: Slice error: code=%d\tlast slice code=%d\tmb_pic_height=%d\n", code, mpeg2dec->xvmc_last_slice_code,mpeg2dec->xxmc_mb_pic_height);

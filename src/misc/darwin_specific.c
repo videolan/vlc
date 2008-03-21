@@ -144,7 +144,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         /*
            Retrieve the preferred language as chosen in  System Preferences.app
            (note that CFLocaleCopyCurrent() is not used because it returns the
-            prefered locale not language)
+            preferred locale not language)
         */
         CFArrayRef all_locales, preferred_locales;
         char psz_locale[50];

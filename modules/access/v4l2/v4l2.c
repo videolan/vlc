@@ -183,7 +183,7 @@ static void AccessClose( vlc_object_t * );
 #else
 #define AUDIO_METHOD_LONGTEXT N_( \
     "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, " \
-    "3 for ALSA or OSS (ALSA is prefered)." )
+    "3 for ALSA or OSS (ALSA is preferred)." )
 #endif
 #define AUDIO_VOLUME_TEXT N_( "Volume" )
 #define AUDIO_VOLUME_LONGTEXT N_( \

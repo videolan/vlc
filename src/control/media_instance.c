@@ -547,7 +547,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
     if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) )
     {
-        /* A thread alread exists, send it a play message */
+        /* A thread already exists, send it a play message */
         input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
         return;

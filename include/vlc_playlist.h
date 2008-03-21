@@ -120,7 +120,7 @@ TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
  * will maybe become useful again when we merge VLM;
  *
  * To delete an item, use playlist_DeleteFromInput( input_id ) which will
- * remove all occurences of the input in both trees
+ * remove all occurrences of the input in both trees
  *
  * @{
  */

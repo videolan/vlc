@@ -282,7 +282,7 @@
 
 
 /************************************************************************
- * Dynamic arrays with progressive allocation (Prefered API)
+ * Dynamic arrays with progressive allocation (Preferred API)
  ************************************************************************/
 typedef struct vlc_array_t
 {

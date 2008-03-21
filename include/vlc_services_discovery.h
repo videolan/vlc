@@ -72,7 +72,7 @@ VLC_EXPORT( void,                   services_discovery_Stop, ( services_discover
 /* Read info from discovery object */
 VLC_EXPORT( char *,                 services_discovery_GetLocalizedName, ( services_discovery_t * p_this ) );
 
-/* Receive event notification (prefered way to get new items) */
+/* Receive event notification (preferred way to get new items) */
 VLC_EXPORT( vlc_event_manager_t *,  services_discovery_EventManager, ( services_discovery_t * p_this ) );
 
 /* Used by services_discovery to post update about their items */
