@@ -99,7 +99,14 @@ public class MediaListTest
         mlist.addMediaDescriptor(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(new MediaDescriptor(jvlc, mrl));
         Assert.assertEquals(0, mlist.itemsCount());
-        
+    }
+    
+    @Test
+    public void mediaListRemoveNonExistingMedia()
+    {
+        MediaList mlist = new MediaList(jvlc);
+        boolean result = mlist.removeMedia(3);
+        Assert.assertFalse(result);
     }
     
     
