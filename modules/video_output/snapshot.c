@@ -55,6 +55,7 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
@@ -123,7 +124,7 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_vout, "snapshot-list-pointer", VLC_VAR_ADDRESS );
 
     p_vout->pf_init = Init;
-    p_vout->pf_end = NULL;
+    p_vout->pf_end = End;
     p_vout->pf_manage = NULL;
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
@@ -315,6 +316,14 @@ static int Init( vout_thread_t *p_vout )
     }
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * End: terminate video thread output method
+ *****************************************************************************/
+static void End( vout_thread_t *p_vout )
+{
+    (void)p_vout;
 }
 
 /*****************************************************************************
