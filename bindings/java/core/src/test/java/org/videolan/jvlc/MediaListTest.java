@@ -59,7 +59,7 @@ public class MediaListTest
         Assert.assertEquals(1, mlist.itemsCount());
         mlist.addMedia(mrl);
         Assert.assertEquals(1, mlist.itemsCount());
-        mlist.addMediaDescriptor(new MediaDescriptor(jvlc, mrl));
+        mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         Assert.assertEquals(1, mlist.itemsCount());
         mlist.addMedia("non-existing");
         Assert.assertEquals(2, mlist.itemsCount());
@@ -88,15 +88,15 @@ public class MediaListTest
         mlist.removeMedia(0);
         Assert.assertEquals(0, mlist.itemsCount());
         
-        mlist.addMediaDescriptor(new MediaDescriptor(jvlc, mrl));
+        mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(0);
         Assert.assertEquals(0, mlist.itemsCount());
         
-        mlist.addMediaDescriptor(new MediaDescriptor(jvlc, mrl));
+        mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(mrl);
         Assert.assertEquals(0, mlist.itemsCount());
         
-        mlist.addMediaDescriptor(new MediaDescriptor(jvlc, mrl));
+        mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(new MediaDescriptor(jvlc, mrl));
         Assert.assertEquals(0, mlist.itemsCount());
     }

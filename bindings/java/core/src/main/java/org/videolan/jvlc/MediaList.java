@@ -57,10 +57,10 @@ public class MediaList
     public void addMedia(String media)
     {
         MediaDescriptor descriptor = new MediaDescriptor(jvlc, media);
-        addMediaDescriptor(descriptor);
+        addMedia(descriptor);
     }
 
-    public void addMediaDescriptor(MediaDescriptor descriptor)
+    public void addMedia(MediaDescriptor descriptor)
     {
         if (items.contains(descriptor.getMrl()))
         {
