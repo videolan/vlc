@@ -226,5 +226,34 @@ public class MediaListPlayerTest
         libvlc.libvlc_media_list_player_set_media_instance(mediaListPlayer, mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
+    
+    @Test
+    public void mediaListPlayerNextNoItems()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
+        libvlc.libvlc_media_list_player_next(mediaListPlayer, exception);
+        Assert.assertEquals(1, exception.raised);
+    }
+    
+    /**
+     * fails, see https://trac.videolan.org/vlc/ticket/1535
+     */
+//    @Test
+    public void mediaListPlayerNext() throws Exception
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
+        LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
+        LibVlcMediaDescriptor mediaDescriptor = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, mediaDescriptor, exception);
+        libvlc.libvlc_media_list_add_media_descriptor(mediaList, mediaDescriptor, exception);
+        libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
+        libvlc.libvlc_media_list_player_play_item_at_index(mediaListPlayer, 0, exception);
+        Thread.sleep(150);
+        libvlc.libvlc_media_list_player_next(mediaListPlayer, exception);
+        Assert.assertEquals(0, exception.raised);
+    }
+    
 
 }

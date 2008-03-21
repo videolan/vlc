@@ -55,6 +55,10 @@ public class MediaListPlayer
         return jvlc.getLibvlc().libvlc_media_list_player_is_playing(instance, exception) == 1;
     }
 
+    
+    /**
+     * 
+     */
     public void play()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -82,6 +86,12 @@ public class MediaListPlayer
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_player_pause(instance, exception);
+    }
+    
+    public void next()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        jvlc.getLibvlc().libvlc_media_list_player_next(instance, exception);
     }
 
     /**
