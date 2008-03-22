@@ -45,6 +45,8 @@ struct libvlc_int_t
 
     playlist_t            *p_playlist;       ///< playlist object
 
+    vlc_object_t          *p_interaction;       ///< interface interaction object
+
     /* Messages */
     msg_bank_t             msg_bank;    ///< The message bank
     int                    i_verbose;   ///< info messages

@@ -38,15 +38,16 @@
 #include <vlc/vlc.h>
 
 #include <vlc_interface.h>
+#include "interface.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static interaction_t *          InteractionInit( libvlc_int_t * );
 static interaction_t *          InteractionGet( vlc_object_t * );
 static void                     InteractionSearchInterface( interaction_t * );
 static void                     InteractionLoop( vlc_object_t * );
 static void                     InteractionManage( interaction_t * );
+static void interaction_Destructor( vlc_object_t *p_interaction );
 
 static interaction_dialog_t    *DialogGetById( interaction_t* , int );
 static void                     DialogDestroy( interaction_dialog_t * );
@@ -346,27 +347,20 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
     vlc_object_release( p_interaction );
 }
 
-/**********************************************************************
- * The following functions are local
- **********************************************************************/
-
-/* Get the interaction object. Create it if needed */
-static interaction_t * InteractionGet( vlc_object_t *p_this )
+/**
+ * Create the initial interaction object
+ * (should only be used in libvlc_InternalInit, LibVLC private)
+ *
+ * \return a vlc_object_t that should be freed when done.
+ */
+vlc_object_t * interaction_Init( libvlc_int_t *p_libvlc )
 {
-    interaction_t *p_interaction =
-            vlc_object_find( p_this, VLC_OBJECT_INTERACTION, FIND_ANYWHERE );
+    interaction_t *p_interaction;
 
-    if( !p_interaction )
-        p_interaction = InteractionInit( p_this->p_libvlc );
-
-    return p_interaction;
-}
-
-/* Create the interaction object in the given playlist object */
-static interaction_t * InteractionInit( libvlc_int_t *p_libvlc )
-{
-    interaction_t *p_interaction =
-            vlc_object_create( p_libvlc, VLC_OBJECT_INTERACTION );
+    /* Make sure we haven't yet created an interaction object */
+    assert( vlc_object_find( p_libvlc, VLC_OBJECT_INTERACTION, FIND_ANYWHERE ) == NULL );
+    
+    p_interaction = vlc_object_create( p_libvlc, VLC_OBJECT_INTERACTION );
 
     if( p_interaction )
     {
@@ -387,12 +381,28 @@ static interaction_t * InteractionInit( libvlc_int_t *p_libvlc )
             vlc_object_release( p_interaction );
             p_interaction = NULL;
         }
-        else
-            vlc_object_yield( p_interaction );
     }
+    
+    vlc_object_set_destructor( p_interaction, interaction_Destructor );
 
-    return p_interaction;
+    return VLC_OBJECT( p_interaction );
 }
+
+static void interaction_Destructor( vlc_object_t *p_interaction )
+{
+    vlc_thread_join( p_interaction );
+}
+
+/**********************************************************************
+ * The following functions are local
+ **********************************************************************/
+
+/* Get the interaction object. Create it if needed */
+static interaction_t * InteractionGet( vlc_object_t *p_this )
+{
+    return vlc_object_find( p_this, VLC_OBJECT_INTERACTION, FIND_ANYWHERE );
+}
+
 
 /* Look for an interface suitable for interaction */
 static void InteractionSearchInterface( interaction_t *p_interaction )
@@ -550,9 +560,6 @@ static void InteractionLoop( vlc_object_t *p_this )
         DialogDestroy( p_dialog );
         REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
     }
-
-    vlc_object_detach( p_this );
-    vlc_object_release( p_this );
 }
 
 /**
