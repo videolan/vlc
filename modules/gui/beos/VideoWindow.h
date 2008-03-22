@@ -122,6 +122,7 @@ class VLCView : public BView
             vout_thread_t   *p_vout;
 
             bigtime_t        fLastMouseMovedTime;
+            int             fMouseHideTimeout;
             bool            fCursorHidden;
             bool            fCursorInside;
             bool            fIgnoreDoubleClick;

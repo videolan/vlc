@@ -342,6 +342,8 @@ int E_(Activate) ( vlc_object_t *p_this )
 
     /* Create blank cursor (for mouse cursor autohiding) */
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
+    p_vout->p_sys->i_mouse_hide_timeout =
+        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
     p_vout->p_sys->b_mouse_pointer_visible = 1;
     CreateCursor( p_vout );
 
@@ -1553,7 +1555,8 @@ static int ManageVideo( vout_thread_t *p_vout )
     }
 
     /* Autohide Cursour */
-    if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 )
+    if( mdate() - p_vout->p_sys->i_time_mouse_last_moved >
+        p_vout->p_sys->i_mouse_hide_timeout )
     {
         /* Hide the mouse automatically */
         if( p_vout->p_sys->b_mouse_pointer_visible )

@@ -287,6 +287,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    var_Create( p_vout, "mouse-hide-timeout",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
     p_vout->b_title_show = var_CreateGetBool( p_vout, "video-title-show" );
     p_vout->i_title_timeout =
         (mtime_t)var_CreateGetInteger( p_vout, "video-title-timeout" );

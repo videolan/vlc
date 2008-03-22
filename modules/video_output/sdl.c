@@ -77,6 +77,7 @@ struct vout_sys_t
     vlc_bool_t  b_cursor;
     vlc_bool_t  b_cursor_autohidden;
     mtime_t     i_lastmoved;
+    mtime_t     i_mouse_hide_timeout;
     mtime_t     i_lastpressed;                        /* to track dbl-clicks */
 };
 
@@ -227,6 +228,8 @@ static int Open ( vlc_object_t *p_this )
     p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = p_vout->p_sys->i_lastpressed = mdate();
+    p_vout->p_sys->i_mouse_hide_timeout =
+        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
 
     if( OpenDisplay( p_vout ) )
     {
@@ -625,7 +628,8 @@ static int Manage( vout_thread_t *p_vout )
 
     /* Pointer change */
     if( ! p_vout->p_sys->b_cursor_autohidden &&
-        ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
+        ( mdate() - p_vout->p_sys->i_lastmoved >
+            p_vout->p_sys->i_mouse_hide_timeout ) )
     {
         /* Hide the mouse automatically */
         p_vout->p_sys->b_cursor_autohidden = 1;

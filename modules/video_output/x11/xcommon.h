@@ -252,6 +252,7 @@ struct vout_sys_t
     /* Mouse pointer properties */
     vlc_bool_t          b_mouse_pointer_visible;
     mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
+    mtime_t             i_mouse_hide_timeout;      /* after time hide cursor */
     Cursor              blank_cursor;                   /* the hidden cursor */
     mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
     Pixmap              cursor_pixmap;

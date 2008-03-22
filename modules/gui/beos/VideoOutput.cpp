@@ -77,7 +77,6 @@ struct vout_sys_t
 
 };
 
-#define MOUSE_IDLE_TIMEOUT 2000000    // two seconds
 #define MIN_AUTO_VSYNC_REFRESH 61    // Hz
 
 /*****************************************************************************
@@ -984,6 +983,7 @@ VLCView::VLCView(BRect bounds, vout_thread_t *p_vout_instance )
       fIgnoreDoubleClick(false)
 {
     p_vout = p_vout_instance;
+    fMouseHideTimeout = var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
     SetViewColor(B_TRANSPARENT_32_BIT);
 }
 
@@ -1169,7 +1169,7 @@ VLCView::Pulse()
     if (!fCursorHidden)
     {
         if (fCursorInside
-            && mdate() - fLastMouseMovedTime > MOUSE_IDLE_TIMEOUT)
+            && mdate() - fLastMouseMovedTime > fMouseHideTimeout)
         {
             be_app->ObscureCursor();
             fCursorHidden = true;

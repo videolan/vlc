@@ -72,6 +72,7 @@ struct vout_sys_t
     /* Mouse */
     volatile vlc_bool_t b_cursor_hidden;
     volatile mtime_t    i_lastmoved;
+    mtime_t             i_mouse_hide_timeout;
 
     /* Misc */
     vlc_bool_t      b_on_top_change;

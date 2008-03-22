@@ -399,6 +399,12 @@ static const char *ppsz_align_descriptions[] =
 #define VIDEO_TITLE_POSITION_LONGTEXT N_( \
     "Place on video where to display the title (default bottom center).")
 
+#define MOUSE_HIDE_TIMEOUT_TEXT N_("Hide cursor and fullscreen " \
+                                   "controller after x miliseconds.")
+#define MOUSE_HIDE_TIMEOUT_LONGTEXT N_( \
+    "Hide mouse cursor and fullscreen controller after " \
+    "n miliseconds, default is 3000 ms (3 sec.)")
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -1485,6 +1491,9 @@ vlc_module_begin();
                  VIDEO_TITLE_TIMEOUT_LONGTEXT, VLC_FALSE );
     add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT, VLC_FALSE );
+    // autohide after 3s
+    add_integer( "mouse-hide-timeout", 3000, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
+                 MOUSE_HIDE_TIMEOUT_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Snapshot") , NULL );

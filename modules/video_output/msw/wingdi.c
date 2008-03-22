@@ -231,6 +231,8 @@ static int OpenVideo ( vlc_object_t *p_this )
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
+    p_vout->p_sys->i_mouse_hide_timeout =
+        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
 
     /* Set main window's size */
     p_vout->p_sys->i_window_width = p_vout->i_window_width;
@@ -565,7 +567,8 @@ static int Manage( vout_thread_t *p_vout )
      * Pointer change
      */
     if( p_vout->b_fullscreen && !p_vout->p_sys->b_cursor_hidden &&
-        (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 )
+        (mdate() - p_vout->p_sys->i_lastmoved) >
+            p_vout->p_sys->i_mouse_hide_timeout )
     {
         POINT point;
         HWND hwnd;

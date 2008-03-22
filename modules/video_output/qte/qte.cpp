@@ -390,7 +390,8 @@ static int Manage( vout_thread_t *p_vout )
 
     /* Pointer change */
 //    if( ! p_vout->p_sys->b_cursor_autohidden &&
-//        ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
+//        ( mdate() - p_vout->p_sys->i_lastmoved >
+//            p_vout->p_sys->i_mouse_hide_timeout ) )
 //    {
 //        /* Hide the mouse automatically */
 //        p_vout->p_sys->b_cursor_autohidden = 1;
