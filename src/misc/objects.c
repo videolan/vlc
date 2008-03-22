@@ -415,6 +415,10 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         abort();
     }
 
+
+    /* Send a kill to the object's thread if applicable */
+    vlc_object_kill( p_this );
+
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
