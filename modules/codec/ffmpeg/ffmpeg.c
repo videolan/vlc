@@ -588,6 +588,8 @@ static struct
       VIDEO_ES, "Sony HDV (MPEG-2 Video)" },
     { VLC_FOURCC('h','d','v','3'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "FCP HDV (MPEG-2 Video)" },
+    { VLC_FOURCC('h','d','v','5'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "HDV 720p25 (MPEG-2 Video)" },
     { VLC_FOURCC('m','x','5','n'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "MPEG2 IMX NTSC 525/60 50mb/s (FCP)" },
     { VLC_FOURCC('m','x','5','p'), CODEC_ID_MPEG2VIDEO,
@@ -1323,6 +1325,8 @@ static struct
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(48<<8)+0)
     /* MUSEPACK8 Audio */
     { VLC_FOURCC('M','P','C','K'), CODEC_ID_MUSEPACK8,
+      AUDIO_ES, "MUSEPACK8 Audio" },
+    { VLC_FOURCC('M','P','C','8'), CODEC_ID_MUSEPACK8,
       AUDIO_ES, "MUSEPACK8 Audio" },
 #endif
 
