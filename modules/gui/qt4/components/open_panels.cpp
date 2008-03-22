@@ -337,9 +337,9 @@ void DiscOpenPanel::updateMRL()
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )
-            mrl = "dvd://";
+            mrl = "\"dvd://";
         else
-            mrl = "dvdsimple://";
+            mrl = "\"dvdsimple://";
         mrl += ui.deviceCombo->currentText();
         emit methodChanged( "dvdnav-caching" );
 
@@ -352,7 +352,7 @@ void DiscOpenPanel::updateMRL()
 
     /* VCD */
     } else if ( ui.vcdRadioButton->isChecked() ) {
-        mrl = "vcd://" + ui.deviceCombo->currentText();
+        mrl = "\"vcd://" + ui.deviceCombo->currentText();
         emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
@@ -361,11 +361,13 @@ void DiscOpenPanel::updateMRL()
 
     /* CDDA */
     } else {
-        mrl = "cdda://" + ui.deviceCombo->currentText();
+        mrl = "\"cdda://" + ui.deviceCombo->currentText();
         if( ui.titleSpin->value() > 0 ) {
             QString("@%1").arg( ui.titleSpin->value() );
         }
     }
+
+    mrl += "\"";
 
     if ( ui.dvdRadioButton->isChecked() || ui.vcdRadioButton->isChecked() )
     {
