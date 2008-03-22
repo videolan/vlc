@@ -452,11 +452,15 @@ void NetOpenPanel::updateProtocol( int idx ) {
 void NetOpenPanel::updateMRL() {
     QString mrl = "";
     QString addr = ui.addressText->text();
+    addr = QUrl::toPercentEncoding( addr, ":/?#@!$&'()*+,;=" );
     int proto = ui.protocolCombo->currentIndex();
 
-    if( addr.contains( "://") && proto != 5 ) {
+    if( addr.contains( "://") && ( proto != 5 || proto != 6 ) )
+    {
         mrl = addr;
-    } else {
+    }
+    else
+    {
         switch( proto ) {
         case 0:
             mrl = "http://" + addr;
@@ -480,7 +484,8 @@ void NetOpenPanel::updateMRL() {
             break;
         case 5:
             mrl = "udp://@";
-            if( ui.ipv6->isEnabled() && ui.ipv6->isChecked() ) {
+            if( ui.ipv6->isEnabled() && ui.ipv6->isChecked() )
+            {
                 mrl += "[::]";
             }
             mrl += QString(":%1").arg( ui.portSpin->value() );
@@ -489,16 +494,18 @@ void NetOpenPanel::updateMRL() {
         case 6: /* UDP multicast */
             mrl = "udp://@";
             /* Add [] to IPv6 */
-            if ( addr.contains(':') && !addr.contains('[') ) {
+            if ( addr.contains(':') && !addr.contains('[') )
+            {
                 mrl += "[" + addr + "]";
-            } else mrl += addr;
+            }
+            else mrl += addr;
             mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
         }
     }
 
     // Encode the boring stuffs
-    mrl = QUrl( mrl ).toEncoded();
+
     if( ui.timeShift->isEnabled() && ui.timeShift->isChecked() ) {
         mrl += " :access-filter=timeshift";
     }
