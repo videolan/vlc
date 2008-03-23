@@ -61,6 +61,11 @@ public class JVLC
         System.arraycopy(args, 0, myargs, 1, args.length);
         instance = createInstance(myargs);
     }
+    
+    public JVLC(String args)
+    {
+        this(args.split(" "));
+    }
 
     public MediaInstance play(String media)
     {
