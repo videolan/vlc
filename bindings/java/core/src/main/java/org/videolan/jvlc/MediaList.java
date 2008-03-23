@@ -54,12 +54,18 @@ public class MediaList
         eventManager = jvlc.getLibvlc().libvlc_media_list_event_manager(instance, exception);
     }
 
-    public void addMedia(String media)
+    /**
+     * @param mrl The media resource locator to add to the media list.
+     */
+    public void addMedia(String mrl)
     {
-        MediaDescriptor descriptor = new MediaDescriptor(jvlc, media);
+        MediaDescriptor descriptor = new MediaDescriptor(jvlc, mrl);
         addMedia(descriptor);
     }
 
+    /**
+     * @param descriptor The media descriptor to add to the media list.
+     */
     public void addMedia(MediaDescriptor descriptor)
     {
         if (items.contains(descriptor.getMrl()))
@@ -71,27 +77,47 @@ public class MediaList
         jvlc.getLibvlc().libvlc_media_list_add_media_descriptor(instance, descriptor.getInstance(), exception);
     }
 
-    public int itemsCount()
+    /**
+     * @return The current number of items in the media list.
+     */
+    public int size()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         return jvlc.getLibvlc().libvlc_media_list_count(instance, exception);
     }
 
+    /**
+     * @param descriptor The media descriptor to get the index of.
+     * @return The index of the media descriptor, or -1 if not found.
+     */
     public int indexOf(MediaDescriptor descriptor)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         return jvlc.getLibvlc().libvlc_media_list_index_of_item(instance, descriptor.getInstance(), exception);
     }
 
+    /**
+     * @param index The index of the media descriptor to get.
+     * @return The media descriptor at the given index.
+     * @throws IndexOutOfBoundsException if index is bigger than size() or < 0, or there are no items in the media_list.
+     */
     public MediaDescriptor getMediaDescriptorAtIndex(int index)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
+        if (size() == 0)
+        {
+            throw new IndexOutOfBoundsException();
+        }
+        if (index < 0 || index > size())
+        {
+            throw new IndexOutOfBoundsException();
+        }
         LibVlcMediaDescriptor descriptor = jvlc.getLibvlc().libvlc_media_list_item_at_index(instance, index, exception);
         return new MediaDescriptor(jvlc, descriptor);
     }
 
     /**
-     * @param index The index of the media to remove
+     * @param index The index of the media to remove.
      * @return True if the media was successfully removed, false otherwise.
      */
     public boolean removeMedia(int index)
@@ -107,7 +133,7 @@ public class MediaList
     }
 
     /**
-     * @param media The media descriptor mrl
+     * @param media The media descriptor mrl.
      */
     public boolean removeMedia(String mrl)
     {
@@ -118,7 +144,36 @@ public class MediaList
         }
         return removeMedia(index);
     }
+    
+    /**
+     * @param mediaDescriptor The media descriptor to remove.
+     */
+    public boolean removeMedia(MediaDescriptor mediaDescriptor)
+    {
+        String mrl = mediaDescriptor.getMrl();
+        int index = items.indexOf(mrl);
+        if (index == -1)
+        {
+            return false;
+        }
+        return removeMedia(index);
+    }
+    
+    /**
+     * Removes all items from the media list.
+     */
+    public void clear()
+    {
+        for (int i = 0; i < size(); i++)
+        {
+            removeMedia(i);
+        }
+    }
 
+    /**
+     * @param descriptor The media descriptor to insert.
+     * @param index The index of the inserted media descriptor.
+     */
     public void insertMediaDescriptor(MediaDescriptor descriptor, int index)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -146,18 +201,6 @@ public class MediaList
         return instance;
     }
 
-    /**
-     * @param mediaDescriptor
-     */
-    public boolean removeMedia(MediaDescriptor mediaDescriptor)
-    {
-        String mrl = mediaDescriptor.getMrl();
-        int index = items.indexOf(mrl);
-        if (index == -1)
-        {
-            return false;
-        }
-        return removeMedia(index);
-    }
+
 
 }

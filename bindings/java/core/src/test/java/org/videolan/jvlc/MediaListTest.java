@@ -48,7 +48,7 @@ public class MediaListTest
     {
         MediaList mlist = new MediaList(jvlc);
         mlist.addMedia(mrl);
-        Assert.assertEquals(1, mlist.itemsCount());
+        Assert.assertEquals(1, mlist.size());
     }
     
     @Test
@@ -56,13 +56,13 @@ public class MediaListTest
     {
         MediaList mlist = new MediaList(jvlc);
         mlist.addMedia(mrl);
-        Assert.assertEquals(1, mlist.itemsCount());
+        Assert.assertEquals(1, mlist.size());
         mlist.addMedia(mrl);
-        Assert.assertEquals(1, mlist.itemsCount());
+        Assert.assertEquals(1, mlist.size());
         mlist.addMedia(new MediaDescriptor(jvlc, mrl));
-        Assert.assertEquals(1, mlist.itemsCount());
+        Assert.assertEquals(1, mlist.size());
         mlist.addMedia("non-existing");
-        Assert.assertEquals(2, mlist.itemsCount());
+        Assert.assertEquals(2, mlist.size());
     }
     
     @Test
@@ -70,9 +70,9 @@ public class MediaListTest
     {
         MediaList mlist = new MediaList(jvlc);
         mlist.addMedia(mrl);
-        Assert.assertEquals(1, mlist.itemsCount());
+        Assert.assertEquals(1, mlist.size());
         mlist.removeMedia(0);
-        Assert.assertEquals(0, mlist.itemsCount());
+        Assert.assertEquals(0, mlist.size());
     }
 
     @Test
@@ -80,25 +80,25 @@ public class MediaListTest
     {
         MediaList mlist = new MediaList(jvlc);
         mlist.addMedia(mrl);
-        Assert.assertEquals(1, mlist.itemsCount());
+        Assert.assertEquals(1, mlist.size());
         mlist.removeMedia(0);
-        Assert.assertEquals(0, mlist.itemsCount());
+        Assert.assertEquals(0, mlist.size());
         
         mlist.addMedia(mrl);
         mlist.removeMedia(0);
-        Assert.assertEquals(0, mlist.itemsCount());
+        Assert.assertEquals(0, mlist.size());
         
         mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(0);
-        Assert.assertEquals(0, mlist.itemsCount());
+        Assert.assertEquals(0, mlist.size());
         
         mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(mrl);
-        Assert.assertEquals(0, mlist.itemsCount());
+        Assert.assertEquals(0, mlist.size());
         
         mlist.addMedia(new MediaDescriptor(jvlc, mrl));
         mlist.removeMedia(new MediaDescriptor(jvlc, mrl));
-        Assert.assertEquals(0, mlist.itemsCount());
+        Assert.assertEquals(0, mlist.size());
     }
     
     @Test
@@ -109,5 +109,33 @@ public class MediaListTest
         Assert.assertFalse(result);
     }
     
+    @Test
+    public void mediaListIndexOfNonExistingMediaDescriptor()
+    {
+        MediaList mlist = new MediaList(jvlc);
+        MediaDescriptor md = new MediaDescriptor(jvlc, "dummy");
+        int result = mlist.indexOf(md);
+        Assert.assertEquals(-1, result);
+    }
     
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void mediaListGetMediaDesciptorAtInvalidIndex()
+    {
+        MediaList mlist = new MediaList(jvlc);
+        mlist.getMediaDescriptorAtIndex(5);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void mediaListGetMediaDesciptorAtInvalidIndex2()
+    {
+        MediaList mlist = new MediaList(jvlc);
+        mlist.getMediaDescriptorAtIndex(-5);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void mediaListGetMediaDesciptorAtInvalidIndex3()
+    {
+        MediaList mlist = new MediaList(jvlc);
+        mlist.getMediaDescriptorAtIndex(0);
+    }
 }
