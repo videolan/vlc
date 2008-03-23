@@ -503,7 +503,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     }
 
     fprintf( file, "\xEF\xBB\xBF###\n###  " COPYRIGHT_MESSAGE "\n###\n\n"
-       "###\n### lines begining with a '#' character are comments\n###\n\n" );
+       "###\n### lines beginning with a '#' character are comments\n###\n\n" );
 
     /* Look for the selected module, if NULL then save everything */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
