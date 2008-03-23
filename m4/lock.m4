@@ -1,5 +1,5 @@
-# lock.m4 serial 6 (gettext-0.16)
-dnl Copyright (C) 2005-2006 Free Software Foundation, Inc.
+# lock.m4 serial 7 (gettext-0.17)
+dnl Copyright (C) 2005-2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -35,7 +35,12 @@ AC_DEFUN([gl_LOCK_EARLY_BODY],
   AC_BEFORE([$0], [gl_ARGP])dnl
 
   AC_REQUIRE([AC_CANONICAL_HOST])
-  AC_REQUIRE([AC_GNU_SOURCE]) dnl needed for pthread_rwlock_t on glibc systems
+  dnl _GNU_SOURCE is needed for pthread_rwlock_t on glibc systems.
+  dnl AC_USE_SYSTEM_EXTENSIONS was introduced in autoconf 2.60 and obsoletes
+  dnl AC_GNU_SOURCE.
+  m4_ifdef([AC_USE_SYSTEM_EXTENSIONS],
+    [AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])],
+    [AC_REQUIRE([AC_GNU_SOURCE])])
   dnl Check for multithreading.
   AC_ARG_ENABLE(threads,
 AC_HELP_STRING([--enable-threads={posix|solaris|pth|win32}], [specify multithreading API])

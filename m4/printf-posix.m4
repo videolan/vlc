@@ -1,5 +1,5 @@
-# printf-posix.m4 serial 2 (gettext-0.13.1)
-dnl Copyright (C) 2003 Free Software Foundation, Inc.
+# printf-posix.m4 serial 3 (gettext-0.17)
+dnl Copyright (C) 2003, 2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -28,7 +28,7 @@ int main ()
 }], gt_cv_func_printf_posix=yes, gt_cv_func_printf_posix=no,
       [
         AC_EGREP_CPP(notposix, [
-#if defined __NetBSD__ || defined _MSC_VER || defined __MINGW32__ || defined __CYGWIN__
+#if defined __NetBSD__ || defined __BEOS__ || defined _MSC_VER || defined __MINGW32__ || defined __CYGWIN__
   notposix
 #endif
         ], gt_cv_func_printf_posix="guessing no",
