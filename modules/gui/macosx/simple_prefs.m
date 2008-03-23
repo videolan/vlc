@@ -217,7 +217,91 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (void)initStrings
 {
-    msg_Warn( p_intf, "localisation of the simple preferences is not implemented!" );
+    /* audio */
+    [o_audio_dolby_txt setStringValue: _NS("Force detection of Dolby Surround")];
+    [o_audio_effects_box setTitle: _NS("Effects")];
+    [o_audio_enable_ckb setTitle: _NS("Enable Audio")];
+    [o_audio_general_box setTitle: _NS("General Audio")];
+    [o_audio_headphone_ckb setTitle: _NS("Headphone surround effect")];
+    [o_audio_lang_txt setStringValue: _NS("Preferred Audio language")];
+    [o_audio_last_ckb setTitle: _NS("Enable Last.fm submissions")];
+    [o_audio_lastpwd_txt setStringValue: _NS("Password")];
+    [o_audio_lastuser_txt setStringValue: _NS("User name")];
+    [o_audio_norm_ckb setTitle: _NS("Volume normalizer")];
+    [o_audio_spdif_ckb setTitle: _NS("Use S/PDIF when available")];
+    [o_audio_visual_txt setStringValue: _NS("Visualization")];
+    [o_audio_vol_txt setStringValue: _NS("Default Volume")];
+
+    /* hotkeys */
+    [o_hotkeys_change_btn setTitle: _NS("Change")];
+    [o_hotkeys_change_win setTitle: _NS("Change Hotkey")];
+    [o_hotkeys_change_cancel_btn setTitle: _NS("Cancel")];
+    [o_hotkeys_change_ok_btn setTitle: _NS("OK")];
+    [o_hotkeys_clear_btn setTitle: _NS("Clear")];
+    [o_hotkeys_lbl setStringValue: _NS("Select an action to change the associated hotkey:")];
+    [[[o_hotkeys_listbox tableColumnWithIdentifier: @"action"] headerCell] setStringValue: _NS("Action")];
+    [[[o_hotkeys_listbox tableColumnWithIdentifier: @"shortcut"] headerCell] setStringValue: _NS("Shortcut")];
+
+    /* input */
+    [o_input_access_box setTitle: _NS("Access Filter")];
+    [o_input_avi_txt setStringValue: _NS("Repair AVI Files")];
+    [o_input_bandwidth_ckb setTitle: _NS("Bandwidth limiter")];
+    [o_input_cachelevel_txt setStringValue: _NS("Default Caching Level")];
+    [o_input_caching_box setTitle: _NS("Caching")];
+    [o_input_dump_ckb setTitle: _NS("Dump")];
+    [o_input_httpproxy_txt setStringValue: _NS("HTTP Proxy")];
+    [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
+    [o_input_net_box setTitle: _NS("Network")];
+    [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
+    [o_input_record_ckb setTitle: _NS("Record")];
+    [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
+    [o_input_serverport_txt setStringValue: _NS("Default Server Port")];
+    [o_input_timeshift_ckb setTitle: _NS("Timeshift")];
+
+    /* interface */
+    [o_intf_art_txt setStringValue: _NS("Album art download policy")];
+    [o_intf_embedded_ckb setTitle: _NS("Add controls to the video window")];
+    [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
+    [o_intf_lang_txt setStringValue: _NS("Language")];
+    [o_intf_meta_ckb setTitle: _NS("Fetch the metadata from the Internet")];
+    [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
+    
+    /* Subtitles and OSD */
+    [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
+    [o_osd_font_box setTitle: _NS("Display Settings")];
+    [o_osd_font_btn setTitle: _NS("Browse...")];
+    [o_osd_font_color_txt setStringValue: _NS("Font Color")];
+    [o_osd_font_effect_txt setStringValue: _NS("Effect")];
+    [o_osd_font_size_txt setStringValue: _NS("Font Size")];
+    [o_osd_font_txt setStringValue: _NS("Font")];
+    [o_osd_lang_box setTitle: _NS("Subtitle Languages")];
+    [o_osd_lang_txt setStringValue: _NS("Preferred Subtitle Language")];
+    [o_osd_osd_box setTitle: _NS("On Screen Display")];
+    [o_osd_osd_ckb setTitle: _NS("Enable OSD")];
+
+    /* generic stuff */
+    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
+    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
+    [o_sprefs_cancel_btn setTitle: _NS("Cancel")];
+    [o_sprefs_reset_btn setTitle: _NS("Reset Preferences")];
+    [o_sprefs_save_btn setTitle: _NS("Save")];
+    [o_sprefs_win setTitle: _NS("Preferences")];
+
+    /* video */
+    [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];
+    [o_video_device_txt setStringValue: _NS("Display device")];
+    [o_video_display_box setTitle: _NS("Display")];
+    [o_video_enable_ckb setTitle: _NS("Enable Video")];
+    [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
+    [o_video_onTop_ckb setTitle: _NS("Always on top")];
+    [o_video_output_txt setStringValue: _NS("Display device")];
+    [o_video_skipFrames_ckb setTitle: _NS("Skip frames")];
+    [o_video_snap_box setTitle: _NS("Video snapshots")];
+    [o_video_snap_folder_btn setTitle: _NS("Browse...")];
+    [o_video_snap_folder_txt setStringValue: _NS("Folder")];
+    [o_video_snap_format_txt setStringValue: _NS("Format")];
+    [o_video_snap_prefix_txt setStringValue: _NS("Prefix")];
+    [o_video_snap_seqnum_ckb setTitle: _NS("Sequential numbering")];
 }
 
 - (void)resetControls
