@@ -61,6 +61,10 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [o_hotkeySettings release];
     [o_hotkeyDescriptions release];
+    [o_hotkeysNonUseableKeys release];
+
+    if( o_keyInTransition )
+        [o_keyInTransition release];
 
     [super dealloc];
 }
@@ -70,20 +74,23 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     NSMutableString *o_temp_str = [[[NSMutableString alloc] init] autorelease];
     if( val & KEY_MODIFIER_CTRL )
-        [o_temp_str appendString: @"Ctrl+"];
+        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
     if( val & KEY_MODIFIER_ALT )
-        [o_temp_str appendString: @"Alt+"];
+        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
     if( val & KEY_MODIFIER_SHIFT )
-        [o_temp_str appendString: @"Shift+"];
+        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
     if( val & KEY_MODIFIER_COMMAND )
-        [o_temp_str appendString: @"Command+"];
-    
+        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
+
     unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
     for( unsigned int i = 0; i< i_keys; i++ )
     {
         if( vlc_keys[i].i_key_code == (val& ~KEY_MODIFIER) )
         {
-            [o_temp_str appendString: [NSString stringWithUTF8String: vlc_keys[i].psz_key_string]];
+            if( vlc_keys[i].psz_key_string )
+                [o_temp_str appendString: [NSString stringWithUTF8String: vlc_keys[i].psz_key_string]];
+            else
+                o_temp_str = @"Unset";
         }
     }
     return o_temp_str;
@@ -101,6 +108,44 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_toolbar setSizeMode: NSToolbarSizeModeRegular];
     [o_sprefs_toolbar setDelegate: self];
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
+    
+    /* setup useful stuff */
+    /* TODO: hard-code this instead of one-the-run generation */
+    o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects:
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'c'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'x'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'v'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'a'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|','],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'h'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'h'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'o'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'o'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'d'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'n'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'s'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'z'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'l'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'r'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'0'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'1'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'2'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'3'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'m'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'q'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'w'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'w'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'c'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'p'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'i'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'e'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'e'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'b'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|'m'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'?'],
+                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'?'],
+                                nil] retain];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_sprefs_toolbar 
@@ -386,7 +431,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
             break;
 
         [o_tempArray_desc addObject: _NS( p_item->psz_text )];
-        [o_hotkeySettings addObject: [self OSXKeyToString: p_item->value.i]];
+        [o_hotkeySettings addObject: [NSNumber numberWithInt: p_item->value.i]];
 
         i++;
     }
@@ -484,7 +529,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occurred while saving the Interface settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Interface settings using SimplePrefs (%i)", i );
             i = 0;
         }
 
@@ -544,7 +589,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs (%i)", i );
             i = 0;
         }
         b_audioSettingChanged = NO;
@@ -575,7 +620,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occurred while saving the Video settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Video settings using SimplePrefs (%i)", i );
             i = 0;
         }
         b_videoSettingChanged = NO;
@@ -656,7 +701,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occurred while saving the Input settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Input settings using SimplePrefs (%i)", i );
             i = 0;
         }
         b_inputSettingChanged = NO;
@@ -683,7 +728,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs (%i)", i );
             i = 0;
         }
         b_osdSettingChanged = NO;
@@ -696,19 +741,17 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     {
         struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
         i = 1;
-        while( i < [o_hotkeySettings count] ) // FIXME: this is ugly!
+        while( i < [o_hotkeySettings count] )
         {
-            /* FIXME: this does only work for single keys!!! */
-            config_PutInt( p_intf, p_hotkeys[i].psz_action, StringToKey( (char *)[[o_hotkeySettings objectAtIndex: i] UTF8String] ) );
-
+            config_PutInt( p_intf, p_hotkeys[i].psz_action, [[o_hotkeySettings objectAtIndex: i-1] intValue] );
             i++;
         }        
-        
+
         i = config_SaveConfigFile( p_intf, "main" );
-        
+
         if( i != 0 )
         {
-            msg_Err( p_intf, "An error occurred while saving the Hotkey settings using SimplePrefs" );
+            msg_Err( p_intf, "An error occurred while saving the Hotkey settings using SimplePrefs (%i)", i );
             i = 0;
         }
         b_hotkeyChanged = NO;
@@ -869,7 +912,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     {
         [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""), 
                                                [o_hotkeyDescriptions objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
-        [o_hotkeys_change_keys_lbl setStringValue: [o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]]];
+        [o_hotkeys_change_keys_lbl setStringValue: [self OSXKeyToString:[[o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]] intValue]]];
         [o_hotkeys_change_taken_lbl setStringValue: @""];
         [o_hotkeys_change_win setInitialFirstResponder: [o_hotkeys_change_win contentView]];
         [o_hotkeys_change_win makeFirstResponder: [o_hotkeys_change_win contentView]];
@@ -883,13 +926,21 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     else if( sender == o_hotkeys_change_ok_btn )
     {
         int i_returnValue;
+        if(! o_keyInTransition )
+        {
+            [NSApp stopModal];
+            [o_hotkeys_change_win close];
+            msg_Err( p_intf, "internal error prevented the hotkey switch" );
+            return;
+        }
+
         b_hotkeyChanged = YES;
 
-        i_returnValue = [o_hotkeySettings indexOfObject: [o_hotkeys_change_keys_lbl stringValue]];
+        i_returnValue = [o_hotkeySettings indexOfObject: o_keyInTransition];
         if( i_returnValue != NSNotFound )
-            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: @"Unset"];        
+            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [[NSNumber numberWithInt: 0] retain]];        
 
-        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_hotkeys_change_keys_lbl stringValue]];
+        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_keyInTransition retain]];
 
         [NSApp stopModal];
         [o_hotkeys_change_win close];
@@ -898,7 +949,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
     else if( sender == o_hotkeys_clear_btn )
     {
-        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: @"Unset"];
+        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [NSNumber numberWithInt: 0]];
         [o_hotkeys_listbox reloadData];
         b_hotkeyChanged = YES;
     }
@@ -920,18 +971,19 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( [[aTableColumn identifier] isEqualToString: @"action"] )
         return [o_hotkeyDescriptions objectAtIndex: rowIndex];
     else if( [[aTableColumn identifier] isEqualToString: @"shortcut"] )
-        return [o_hotkeySettings objectAtIndex: rowIndex];
+        return [self OSXKeyToString: [[o_hotkeySettings objectAtIndex: rowIndex] intValue]];
     else
     {
-        NSLog(@"unknown TableColumn identifier (%@)!", [aTableColumn identifier] );
+        msg_Err( p_intf, "unknown TableColumn identifier (%s)!", [[aTableColumn identifier] UTF8String] );
         return NULL;
     }
 }
 
-- (void)changeHotkeyTo: (NSString *)o_theNewKey
+- (void)changeHotkeyTo: (int)i_theNewKey
 {
     int i_returnValue;
-    if( o_theNewKey == @"invalid" || o_theNewKey == @""  )
+    i_returnValue = [o_hotkeysNonUseableKeys indexOfObject: [NSNumber numberWithInt: i_theNewKey]];
+    if( i_returnValue != NSNotFound || i_theNewKey == 0 )
     {
         [o_hotkeys_change_keys_lbl setStringValue: _NS("Invalid combination")];
         [o_hotkeys_change_taken_lbl setStringValue: _NS("Regrettably, these keys cannot be assigned as hotkey shortcuts.")];
@@ -939,13 +991,20 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     }
     else
     {
-        [o_hotkeys_change_keys_lbl setStringValue: o_theNewKey];
+        NSString *o_temp;
+        if( o_keyInTransition )
+            [o_keyInTransition release];
+        o_keyInTransition = [[NSNumber numberWithInt: i_theNewKey] retain];
 
-        i_returnValue = [o_hotkeySettings indexOfObject: o_theNewKey];
+        o_temp = [self OSXKeyToString: i_theNewKey];
+
+        [o_hotkeys_change_keys_lbl setStringValue: o_temp];
+
+        i_returnValue = [o_hotkeySettings indexOfObject: o_keyInTransition];
         if( i_returnValue != NSNotFound )
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
-                                                         [o_hotkeyDescriptions objectAtIndex: i_returnValue]]];
+                                                         [self OSXKeyToString:[[o_hotkeyDescriptions objectAtIndex: i_returnValue] intValue]]]];
         else
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
@@ -961,22 +1020,28 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 @implementation VLCHotkeyChangeWindow
 
+- (BOOL)resignFirstResponder
+{
+    /* We need to stay the first responder or we'll miss the user's input */
+    return NO;
+}
+
 - (void)keyDown:(NSEvent *)o_theEvent
 {
-    NSMutableString *o_temp = [[NSMutableString alloc] init];
-    
-    if( [o_theEvent modifierFlags] & NSShiftKeyMask )
-        [o_temp appendString: @"Shift+"];
-    
+    int i_nonReadableKey = 0;
+
     if( [o_theEvent modifierFlags] & NSControlKeyMask )
-        [o_temp appendString: @"Ctrl+"];
-    
-    if( [o_theEvent modifierFlags] & NSCommandKeyMask )
-        [o_temp appendString: @"Command+"];
-    
+        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_CTRL;
+
     if( [o_theEvent modifierFlags] & NSAlternateKeyMask  )
-        [o_temp appendString: @"Alt+"];
-    
+        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_ALT;
+
+    if( [o_theEvent modifierFlags] & NSShiftKeyMask )
+        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_SHIFT;
+
+    if( [o_theEvent modifierFlags] & NSCommandKeyMask )
+        i_nonReadableKey = i_nonReadableKey | KEY_MODIFIER_COMMAND;
+
     if( [o_theEvent modifierFlags] & NSFunctionKeyMask  )
     {
         unichar key = 0;
@@ -985,90 +1050,90 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         switch( key )
         {
             case 0x1b:
-                [o_temp appendString: @"Esc"];
+                i_nonReadableKey = i_nonReadableKey | KEY_ESC;
                 break;
             case NSF1FunctionKey:
-                [o_temp appendString: @"F1"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F1;
                 break;
             case NSF2FunctionKey:
-                [o_temp appendString: @"F2"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F2;
                 break;
             case NSF3FunctionKey:
-                [o_temp appendString: @"F3"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F3;
                 break;
             case NSF4FunctionKey:
-                [o_temp appendString: @"F4"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F4;
                 break;
             case NSF5FunctionKey:
-                [o_temp appendString: @"F5"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F5;
                 break;
             case NSF6FunctionKey:
-                [o_temp appendString: @"F6"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F6;
                 break;
             case NSF7FunctionKey:
-                [o_temp appendString: @"F7"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F7;
                 break;
             case NSF8FunctionKey:
-                [o_temp appendString: @"F8"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F8;
                 break;
             case NSF9FunctionKey:
-                [o_temp appendString: @"F9"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F9;
                 break;
             case NSF10FunctionKey:
-                [o_temp appendString: @"F10"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F10;
                 break;
             case NSF11FunctionKey:
-                [o_temp appendString: @"F11"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F11;
                 break;
             case NSF12FunctionKey:
-                [o_temp appendString: @"F12"];
+                i_nonReadableKey = i_nonReadableKey | KEY_F12;
                 break;
             case NSInsertFunctionKey:
-                [o_temp appendString: @"Insert"];
+                i_nonReadableKey = i_nonReadableKey | KEY_INSERT;
                 break;
             case NSHomeFunctionKey:
-                [o_temp appendString: @"Home"];
+                i_nonReadableKey = i_nonReadableKey | KEY_HOME;
                 break;
             case NSEndFunctionKey:
-                [o_temp appendString: @"End"];
+                i_nonReadableKey = i_nonReadableKey | KEY_END;
                 break;
             case NSPageUpFunctionKey:
-                [o_temp appendString: @"Page Up"];
+                i_nonReadableKey = i_nonReadableKey | KEY_PAGEUP;
                 break;
             case NSPageDownFunctionKey:
-                [o_temp appendString: @"Page Down"];
+                i_nonReadableKey = i_nonReadableKey | KEY_PAGEDOWN;
                 break;
             case NSMenuFunctionKey:
-                [o_temp appendString: @"Menu"];
+                i_nonReadableKey = i_nonReadableKey | KEY_MENU;
                 break;
             case NSTabCharacter:
-                [o_temp appendString: @"Tab"];
+                i_nonReadableKey = i_nonReadableKey | KEY_TAB;
                 break;
             case NSDeleteCharacter:
-                [o_temp appendString: @"Delete"];
+                i_nonReadableKey = i_nonReadableKey | KEY_DELETE;
                 break;
             case NSBackspaceCharacter:
-                [o_temp appendString: @"Backspace"];
+                i_nonReadableKey = i_nonReadableKey | KEY_BACKSPACE;
                 break;
             case NSUpArrowFunctionKey:
-                [o_temp appendString: @"Up"];
+                i_nonReadableKey = i_nonReadableKey | KEY_UP;
                 break;
             case NSDownArrowFunctionKey:
-                [o_temp appendString: @"Down"];
+                i_nonReadableKey = i_nonReadableKey | KEY_DOWN;
                 break;
             case NSRightArrowFunctionKey:
-                [o_temp appendString: @"Right"];
+                i_nonReadableKey = i_nonReadableKey | KEY_RIGHT;
                 break;
             case NSLeftArrowFunctionKey:
-                [o_temp appendString: @"Left"];
+                i_nonReadableKey = i_nonReadableKey | KEY_LEFT;
                 break;
             case NSEnterCharacter:
-                [o_temp appendString: @"Enter"];
+                i_nonReadableKey = i_nonReadableKey | KEY_ENTER;
                 break;
             default:
             {
                 msg_Warn( VLCIntf, "user pressed unknown function key" );
-                o_temp = @"invalid";
+                i_nonReadableKey = 0;
                 break;
             }
         }
@@ -1076,17 +1141,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     else
     {
         if( [[o_theEvent charactersIgnoringModifiers] isEqualToString: @" "] )
-            [o_temp appendString: @"Space"];
+            i_nonReadableKey = i_nonReadableKey | KEY_SPACE;
         else
-            [o_temp appendString: [o_theEvent charactersIgnoringModifiers]];        
+            i_nonReadableKey = i_nonReadableKey | StringToKey( (char *)[[[o_theEvent charactersIgnoringModifiers] lowercaseString] UTF8String] );
     }
 
-    /* FIXME: implement sanity checks here as we don't want the user to interfere with hard shortcuts in our main menu */
-    [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: o_temp];
-
-    NSLog( @"user pressed %@", o_temp );
-
-    [o_temp release];
+    [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: i_nonReadableKey];
 }
 
 @end
