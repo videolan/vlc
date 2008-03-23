@@ -366,6 +366,9 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 ifdef HAVE_WIN32
 	patch -p0 < Patches/gettext-win32.patch
 endif
+ifdef HAVE_DARWIN_OS
+	patch -p0 < Patches/gettext-macosx.patch
+endif
 
 .intl: gettext .iconv
 ifdef HAVE_WIN32
