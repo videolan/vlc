@@ -20,6 +20,7 @@ autotools
 compile
 config.*
 configure
+INSTALL.git
 libtool
 Makefile
 Makefile.in

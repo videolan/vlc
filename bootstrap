@@ -117,12 +117,12 @@ set -x
 
 # Automake complains if these are not present
 echo > vlc-config.in
-cp -f INSTALL INSTALL.svn
+cp -f INSTALL INSTALL.git
 
 autoreconf --install --force --verbose ${ACLOCAL_ARGS}
 rm -f po/Makevars.template
 echo > ABOUT-NLS
-mv -f INSTALL.svn INSTALL
+mv -f INSTALL.git INSTALL
 
 ##
 ##  files which need to be regenerated
