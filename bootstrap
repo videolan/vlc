@@ -111,7 +111,7 @@ set -x
 echo > vlc-config.in
 cp -f INSTALL INSTALL.git
 
-autoreconf --install --force --verbose ${ACLOCAL_ARGS}
+AUTOPOINT=true autoreconf --install --force --verbose ${ACLOCAL_ARGS}
 rm -f po/Makevars.template
 echo > ABOUT-NLS
 mv -f INSTALL.git INSTALL
