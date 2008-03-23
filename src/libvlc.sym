@@ -127,7 +127,6 @@ input_CurrentMetaFlags
 input_DecoderDecode
 input_DecoderDelete
 input_DecoderNew
-input_DestroyThread
 input_GetItem
 input_ItemAddInfo
 input_ItemAddOpt

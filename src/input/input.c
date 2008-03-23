@@ -478,22 +478,6 @@ sout_instance_t * input_DetachSout( input_thread_t *p_input )
     return p_input->p->p_sout;
 }
 
-/**
- * Clean up a dead input thread
- * This function does not return until the thread is effectively cancelled.
- *
- * \param the input thread to kill
- */
-void input_DestroyThread( input_thread_t *p_input )
-{
-    /* Join the thread */
-    vlc_thread_join( p_input );
-
-    /* */
-    vlc_object_detach( p_input );
-    vlc_object_release( p_input );
-}
-
 /*****************************************************************************
  * Run: main thread loop
  * This is the "normal" thread that spawns the input processing chain,

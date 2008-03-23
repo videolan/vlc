@@ -135,7 +135,7 @@ static void Close( vlc_object_t *p_this )
         if( p_sd->p_sys->pp_input[i] )
         {
             input_StopThread( p_sd->p_sys->pp_input[i] );
-            input_DestroyThread( p_sd->p_sys->pp_input[i] );
+            vlc_object_release( p_sd->p_sys->pp_input[i] );
             p_sd->p_sys->pp_input[i] = NULL;
         }
     }
@@ -175,7 +175,7 @@ static void Run( services_discovery_t *p_sd )
                 || p_sd->p_sys->pp_input[i]->b_error )
             {
                 input_StopThread( p_sd->p_sys->pp_input[i] );
-                input_DestroyThread( p_sd->p_sys->pp_input[i] );
+                vlc_object_release( p_sd->p_sys->pp_input[i] );
                 p_sd->p_sys->pp_input[i] = NULL;
                 REMOVE_ELEM( p_sys->pp_input, p_sys->i_input, i );
                 i--;

@@ -644,15 +644,18 @@ struct input_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+
+/* input_CreateThread
+ * Release the returned input_thread_t using vlc_object_release() */
 #define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
 VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item_t * ) );
+
 #define input_Preparse(a,b) __input_Preparse(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
 
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
 VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
-VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
 enum input_query_e
 {

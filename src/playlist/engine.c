@@ -273,11 +273,11 @@ check_input:
             p_playlist->p_input = NULL;
 
             /* Release the playlist lock, because we may get stuck
-             * in input_DestroyThread() for some time. */
+             * in vlc_object_release() for some time. */
             PL_UNLOCK;
 
             /* Destroy input */
-            input_DestroyThread( p_input );
+            vlc_object_release( p_input );
 
             PL_LOCK;
 
@@ -408,7 +408,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
             PL_UNLOCK;
 
             /* Destroy input */
-            input_DestroyThread( p_input );
+            vlc_object_release( p_input );
             continue;
         }
         else if( p_playlist->p_input->b_die )

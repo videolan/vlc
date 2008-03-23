@@ -92,12 +92,11 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
 
         /* We owned this one */
         input_StopThread( p_input_thread );
-        input_DestroyThread( p_input_thread );
 
         var_Destroy( p_input_thread, "drawable" );
     }
-    else
-        vlc_object_release( p_input_thread );
+
+    vlc_object_release( p_input_thread );
 
     p_mi->p_input_thread = NULL;
 }
@@ -422,7 +421,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
     }
     vlc_mutex_destroy( &p_mi->object_lock );
 
-    input_DestroyThread( p_input_thread );
+    vlc_object_release( p_input_thread );
 
     libvlc_media_descriptor_release( p_mi->p_md );
 
