@@ -572,11 +572,12 @@ static char *StripTags( char *psz_subtitle )
  */
 static char *CreateHtmlSubtitle( char *psz_subtitle )
 {
-    char    psz_tagStack[ ( strlen( psz_subtitle ) / 3 ) + 1 ];
+    char    psz_tag = malloc( ( strlen( psz_subtitle ) / 3 ) + 1 );
+    if( !psz_tag ) return NULL;
     size_t  i_buf_size     = strlen( psz_subtitle ) + 100;
     char   *psz_html_start = malloc( i_buf_size );
 
-    psz_tagStack[ 0 ] = '\0';
+    psz_tag[ 0 ] = '\0';
 
     if( psz_html_start != NULL )
     {
@@ -604,21 +605,21 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
                 else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
                 {
                     strcpy( psz_html, "<b>" );
-                    strcat( psz_tagStack, "b" );
+                    strcat( psz_tag, "b" );
                     psz_html += 3;
                     psz_subtitle += 3;
                 }
                 else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
                 {
                     strcpy( psz_html, "<i>" );
-                    strcat( psz_tagStack, "i" );
+                    strcat( psz_tag, "i" );
                     psz_html += 3;
                     psz_subtitle += 3;
                 }
                 else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
                 {
                     strcpy( psz_html, "<u>" );
-                    strcat( psz_tagStack, "u" );
+                    strcat( psz_tag, "u" );
                     psz_html += 3;
                     psz_subtitle += 3;
                 }
@@ -630,7 +631,7 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
                             "alpha=\"", NULL };
 
                     strcpy( psz_html, "<font " );
-                    strcat( psz_tagStack, "f" );
+                    strcat( psz_tag, "f" );
                     psz_html += 6;
                     psz_subtitle += 6;
 
@@ -668,12 +669,12 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
                 else if( !strncmp( psz_subtitle, "</", 2 ))
                 {
                     vlc_bool_t  b_match     = VLC_FALSE;
-                    int         i_len       = strlen( psz_tagStack ) - 1;
+                    int         i_len       = strlen( psz_tag ) - 1;
                     char       *psz_lastTag = NULL;
 
                     if( i_len >= 0 )
                     {
-                        psz_lastTag = psz_tagStack + i_len;
+                        psz_lastTag = psz_tag + i_len;
                         i_len = 0;
 
                         switch( *psz_lastTag )
@@ -772,7 +773,7 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
         strcpy( psz_html, "</text>" );
         psz_html += 7;
 
-        if( psz_tagStack[ 0 ] != '\0' )
+        if( psz_tag[ 0 ] != '\0' )
         {
             /* Not well formed -- kill everything */
             free( psz_html_start );
@@ -784,5 +785,6 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
             psz_html_start = realloc( psz_html_start,  psz_html - psz_html_start + 1 );
         }
     }
+    free( psz_tag );
     return psz_html_start;
 }
