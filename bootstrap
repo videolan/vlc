@@ -141,9 +141,8 @@ if [ "$PKGCONFIG" = "no" ]; then
   cat << EOF
 
 ==============================================================
-NOTE: you do not have the "pkg-config" utility on your system;
-detection of the Gtk-2.0 and GNOME 2.0 libraries will not be
-reliable.
+NOTE: "pkg-config" is missing from your system. Certain
+libraries may not be detected properly.
 EOF
 fi
 
