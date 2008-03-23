@@ -373,11 +373,11 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( module_Exists (p_intf, "dvdnav") )
         TestCaC( "dvdnav-caching" );
     TestCaC( "tcp-caching" );
-    TestCaC( "fake-caching" ); 
+    TestCaC( "fake-caching" );
     TestCaC( "cdda-caching" );
-    TestCaC( "screen-caching" ); 
+    TestCaC( "screen-caching" );
     TestCaC( "vcd-caching" );
-    TestCaCi( "rtsp-caching", 4 ); 
+    TestCaCi( "rtsp-caching", 4 );
     TestCaCi( "ftp-caching", 2 );
     TestCaCi( "http-caching", 4 );
     if(module_Exists (p_intf, "access_realrtsp"))
@@ -938,7 +938,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         i_returnValue = [o_hotkeySettings indexOfObject: o_keyInTransition];
         if( i_returnValue != NSNotFound )
-            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [[NSNumber numberWithInt: 0] retain]];        
+            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [[NSNumber numberWithInt: 0] retain]];
 
         [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_keyInTransition retain]];
 
