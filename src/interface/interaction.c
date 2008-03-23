@@ -47,7 +47,6 @@ static interaction_t *          InteractionGet( vlc_object_t * );
 static void                     InteractionSearchInterface( interaction_t * );
 static void                     InteractionLoop( vlc_object_t * );
 static void                     InteractionManage( interaction_t * );
-static void interaction_Destructor( vlc_object_t *p_interaction );
 
 static interaction_dialog_t    *DialogGetById( interaction_t* , int );
 static void                     DialogDestroy( interaction_dialog_t * );
@@ -383,14 +382,7 @@ vlc_object_t * interaction_Init( libvlc_int_t *p_libvlc )
         }
     }
     
-    vlc_object_set_destructor( p_interaction, interaction_Destructor );
-
     return VLC_OBJECT( p_interaction );
-}
-
-static void interaction_Destructor( vlc_object_t *p_interaction )
-{
-    vlc_thread_join( p_interaction );
 }
 
 /**********************************************************************

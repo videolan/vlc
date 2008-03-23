@@ -200,6 +200,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_priv->i_refcount = 1;
     p_priv->pf_destructor = kVLCDestructor;
+    p_priv->b_thread = VLC_FALSE;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
@@ -418,6 +419,10 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     /* Send a kill to the object's thread if applicable */
     vlc_object_kill( p_this );
+
+    /* If we are running on a thread, wait until it ends */
+    if( p_priv->b_thread )
+        vlc_thread_join( p_this );
 
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )
