@@ -572,7 +572,7 @@ static char *StripTags( char *psz_subtitle )
  */
 static char *CreateHtmlSubtitle( char *psz_subtitle )
 {
-    char    psz_tagStack[ 100 ];
+    char    psz_tagStack[ ( strlen( psz_subtitle ) / 3 ) + 1 ];
     size_t  i_buf_size     = strlen( psz_subtitle ) + 100;
     char   *psz_html_start = malloc( i_buf_size );
 
