@@ -30,16 +30,20 @@ ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
 # Check for contrib directory
 if test -d extras/contrib/bin; then
-  export PATH="`pwd`/extras/contrib/bin:$PATH"
+  PATH="`pwd`/extras/contrib/bin:$PATH"
   if test -d extras/contrib/share/aclocal; then
     ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
   fi
   if test ".`uname -s`" = ".Darwin"; then
-    export LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
-    export DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
+    LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
+    DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
+    export LD_LIBRARY_PATH
+    export DYLD_LIBRARY_PATH
   elif test ".`uname -s`" = ".BeOS"; then
-    export LIBRARY_PATH=./extras/contrib/lib:$LIBRARY_PATH
-    export BELIBRARIES=./extras/contrib/lib:$BELIBRARIES
+    LIBRARY_PATH=./extras/contrib/lib:$LIBRARY_PATH
+    BELIBRARIES=./extras/contrib/lib:$BELIBRARIES
+    export LIBRARY_PATH
+    export BELIBRARIES
   fi
 elif test ".`uname -s`" = ".Darwin"; then
   set +x
