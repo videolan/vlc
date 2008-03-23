@@ -1,17 +1,19 @@
-# lib-link.m4 serial 9 (gettext-0.16)
-dnl Copyright (C) 2001-2006 Free Software Foundation, Inc.
+# lib-link.m4 serial 13 (gettext-0.17)
+dnl Copyright (C) 2001-2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
 dnl From Bruno Haible.
 
-AC_PREREQ(2.50)
+AC_PREREQ(2.54)
 
 dnl AC_LIB_LINKFLAGS(name [, dependencies]) searches for libname and
 dnl the libraries corresponding to explicit and implicit dependencies.
 dnl Sets and AC_SUBSTs the LIB${NAME} and LTLIB${NAME} variables and
 dnl augments the CPPFLAGS variable.
+dnl Sets and AC_SUBSTs the LIB${NAME}_PREFIX variable to nonempty if libname
+dnl was found in ${LIB${NAME}_PREFIX}/$acl_libdirstem.
 AC_DEFUN([AC_LIB_LINKFLAGS],
 [
   AC_REQUIRE([AC_LIB_PREPARE_PREFIX])
@@ -24,13 +26,16 @@ AC_DEFUN([AC_LIB_LINKFLAGS],
     ac_cv_lib[]Name[]_libs="$LIB[]NAME"
     ac_cv_lib[]Name[]_ltlibs="$LTLIB[]NAME"
     ac_cv_lib[]Name[]_cppflags="$INC[]NAME"
+    ac_cv_lib[]Name[]_prefix="$LIB[]NAME[]_PREFIX"
   ])
   LIB[]NAME="$ac_cv_lib[]Name[]_libs"
   LTLIB[]NAME="$ac_cv_lib[]Name[]_ltlibs"
   INC[]NAME="$ac_cv_lib[]Name[]_cppflags"
+  LIB[]NAME[]_PREFIX="$ac_cv_lib[]Name[]_prefix"
   AC_LIB_APPENDTOVAR([CPPFLAGS], [$INC]NAME)
   AC_SUBST([LIB]NAME)
   AC_SUBST([LTLIB]NAME)
+  AC_SUBST([LIB]NAME[_PREFIX])
   dnl Also set HAVE_LIB[]NAME so that AC_LIB_HAVE_LINKFLAGS can reuse the
   dnl results of this search when this library appears as a dependency.
   HAVE_LIB[]NAME=yes
@@ -46,6 +51,8 @@ dnl sets and AC_SUBSTs HAVE_LIB${NAME}=yes and the LIB${NAME} and
 dnl LTLIB${NAME} variables and augments the CPPFLAGS variable, and
 dnl #defines HAVE_LIB${NAME} to 1. Otherwise, it sets and AC_SUBSTs
 dnl HAVE_LIB${NAME}=no and LIB${NAME} and LTLIB${NAME} to empty.
+dnl Sets and AC_SUBSTs the LIB${NAME}_PREFIX variable to nonempty if libname
+dnl was found in ${LIB${NAME}_PREFIX}/$acl_libdirstem.
 AC_DEFUN([AC_LIB_HAVE_LINKFLAGS],
 [
   AC_REQUIRE([AC_LIB_PREPARE_PREFIX])
@@ -82,17 +89,23 @@ AC_DEFUN([AC_LIB_HAVE_LINKFLAGS],
     CPPFLAGS="$ac_save_CPPFLAGS"
     LIB[]NAME=
     LTLIB[]NAME=
+    LIB[]NAME[]_PREFIX=
   fi
   AC_SUBST([HAVE_LIB]NAME)
   AC_SUBST([LIB]NAME)
   AC_SUBST([LTLIB]NAME)
+  AC_SUBST([LIB]NAME[_PREFIX])
   undefine([Name])
   undefine([NAME])
 ])
 
 dnl Determine the platform dependent parameters needed to use rpath:
-dnl libext, shlibext, hardcode_libdir_flag_spec, hardcode_libdir_separator,
-dnl hardcode_direct, hardcode_minus_L.
+dnl   acl_libext,
+dnl   acl_shlibext,
+dnl   acl_hardcode_libdir_flag_spec,
+dnl   acl_hardcode_libdir_separator,
+dnl   acl_hardcode_direct,
+dnl   acl_hardcode_minus_L.
 AC_DEFUN([AC_LIB_RPATH],
 [
   dnl Tell automake >= 1.10 to complain if config.rpath is missing.
@@ -109,12 +122,14 @@ AC_DEFUN([AC_LIB_RPATH],
     acl_cv_rpath=done
   ])
   wl="$acl_cv_wl"
-  libext="$acl_cv_libext"
-  shlibext="$acl_cv_shlibext"
-  hardcode_libdir_flag_spec="$acl_cv_hardcode_libdir_flag_spec"
-  hardcode_libdir_separator="$acl_cv_hardcode_libdir_separator"
-  hardcode_direct="$acl_cv_hardcode_direct"
-  hardcode_minus_L="$acl_cv_hardcode_minus_L"
+  acl_libext="$acl_cv_libext"
+  acl_shlibext="$acl_cv_shlibext"
+  acl_libname_spec="$acl_cv_libname_spec"
+  acl_library_names_spec="$acl_cv_library_names_spec"
+  acl_hardcode_libdir_flag_spec="$acl_cv_hardcode_libdir_flag_spec"
+  acl_hardcode_libdir_separator="$acl_cv_hardcode_libdir_separator"
+  acl_hardcode_direct="$acl_cv_hardcode_direct"
+  acl_hardcode_minus_L="$acl_cv_hardcode_minus_L"
   dnl Determine whether the user wants rpath handling at all.
   AC_ARG_ENABLE(rpath,
     [  --disable-rpath         do not hardcode runtime library paths],
@@ -124,20 +139,24 @@ AC_DEFUN([AC_LIB_RPATH],
 dnl AC_LIB_LINKFLAGS_BODY(name [, dependencies]) searches for libname and
 dnl the libraries corresponding to explicit and implicit dependencies.
 dnl Sets the LIB${NAME}, LTLIB${NAME} and INC${NAME} variables.
+dnl Also, sets the LIB${NAME}_PREFIX variable to nonempty if libname was found
+dnl in ${LIB${NAME}_PREFIX}/$acl_libdirstem.
 AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
 [
   AC_REQUIRE([AC_LIB_PREPARE_MULTILIB])
   define([NAME],[translit([$1],[abcdefghijklmnopqrstuvwxyz./-],
                                [ABCDEFGHIJKLMNOPQRSTUVWXYZ___])])
+  dnl Autoconf >= 2.61 supports dots in --with options.
+  define([N_A_M_E],[m4_if(m4_version_compare(m4_defn([m4_PACKAGE_VERSION]),[2.61]),[-1],[translit([$1],[.],[_])],[$1])])
   dnl By default, look in $includedir and $libdir.
   use_additional=yes
   AC_LIB_WITH_FINAL_PREFIX([
     eval additional_includedir=\"$includedir\"
     eval additional_libdir=\"$libdir\"
   ])
-  AC_LIB_ARG_WITH([lib$1-prefix],
-[  --with-lib$1-prefix[=DIR]  search for lib$1 in DIR/include and DIR/lib
-  --without-lib$1-prefix     don't search for lib$1 in includedir and libdir],
+  AC_LIB_ARG_WITH([lib]N_A_M_E[-prefix],
+[  --with-lib]N_A_M_E[-prefix[=DIR]  search for lib$1 in DIR/include and DIR/lib
+  --without-lib]N_A_M_E[-prefix     don't search for lib$1 in includedir and libdir],
 [
     if test "X$withval" = "Xno"; then
       use_additional=no
@@ -158,6 +177,7 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
   LIB[]NAME=
   LTLIB[]NAME=
   INC[]NAME=
+  LIB[]NAME[]_PREFIX=
   rpathdirs=
   ltrpathdirs=
   names_already_handled=
@@ -197,27 +217,53 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
           found_la=
           found_so=
           found_a=
+          eval libname=\"$acl_libname_spec\"    # typically: libname=lib$name
+          if test -n "$acl_shlibext"; then
+            shrext=".$acl_shlibext"             # typically: shrext=.so
+          else
+            shrext=
+          fi
           if test $use_additional = yes; then
-            if test -n "$shlibext" \
-               && { test -f "$additional_libdir/lib$name.$shlibext" \
-                    || { test "$shlibext" = dll \
-                         && test -f "$additional_libdir/lib$name.dll.a"; }; }; then
-              found_dir="$additional_libdir"
-              if test -f "$additional_libdir/lib$name.$shlibext"; then
-                found_so="$additional_libdir/lib$name.$shlibext"
+            dir="$additional_libdir"
+            dnl The same code as in the loop below:
+            dnl First look for a shared library.
+            if test -n "$acl_shlibext"; then
+              if test -f "$dir/$libname$shrext"; then
+                found_dir="$dir"
+                found_so="$dir/$libname$shrext"
               else
-                found_so="$additional_libdir/lib$name.dll.a"
-              fi
-              if test -f "$additional_libdir/lib$name.la"; then
-                found_la="$additional_libdir/lib$name.la"
-              fi
-            else
-              if test -f "$additional_libdir/lib$name.$libext"; then
-                found_dir="$additional_libdir"
-                found_a="$additional_libdir/lib$name.$libext"
-                if test -f "$additional_libdir/lib$name.la"; then
-                  found_la="$additional_libdir/lib$name.la"
+                if test "$acl_library_names_spec" = '$libname$shrext$versuffix'; then
+                  ver=`(cd "$dir" && \
+                        for f in "$libname$shrext".*; do echo "$f"; done \
+                        | sed -e "s,^$libname$shrext\\\\.,," \
+                        | sort -t '.' -n -r -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 \
+                        | sed 1q ) 2>/dev/null`
+                  if test -n "$ver" && test -f "$dir/$libname$shrext.$ver"; then
+                    found_dir="$dir"
+                    found_so="$dir/$libname$shrext.$ver"
+                  fi
+                else
+                  eval library_names=\"$acl_library_names_spec\"
+                  for f in $library_names; do
+                    if test -f "$dir/$f"; then
+                      found_dir="$dir"
+                      found_so="$dir/$f"
+                      break
+                    fi
+                  done
                 fi
+              fi
+            fi
+            dnl Then look for a static library.
+            if test "X$found_dir" = "X"; then
+              if test -f "$dir/$libname.$acl_libext"; then
+                found_dir="$dir"
+                found_a="$dir/$libname.$acl_libext"
+              fi
+            fi
+            if test "X$found_dir" != "X"; then
+              if test -f "$dir/$libname.la"; then
+                found_la="$dir/$libname.la"
               fi
             fi
           fi
@@ -227,26 +273,44 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
               case "$x" in
                 -L*)
                   dir=`echo "X$x" | sed -e 's/^X-L//'`
-                  if test -n "$shlibext" \
-                     && { test -f "$dir/lib$name.$shlibext" \
-                          || { test "$shlibext" = dll \
-                               && test -f "$dir/lib$name.dll.a"; }; }; then
-                    found_dir="$dir"
-                    if test -f "$dir/lib$name.$shlibext"; then
-                      found_so="$dir/lib$name.$shlibext"
-                    else
-                      found_so="$dir/lib$name.dll.a"
-                    fi
-                    if test -f "$dir/lib$name.la"; then
-                      found_la="$dir/lib$name.la"
-                    fi
-                  else
-                    if test -f "$dir/lib$name.$libext"; then
+                  dnl First look for a shared library.
+                  if test -n "$acl_shlibext"; then
+                    if test -f "$dir/$libname$shrext"; then
                       found_dir="$dir"
-                      found_a="$dir/lib$name.$libext"
-                      if test -f "$dir/lib$name.la"; then
-                        found_la="$dir/lib$name.la"
+                      found_so="$dir/$libname$shrext"
+                    else
+                      if test "$acl_library_names_spec" = '$libname$shrext$versuffix'; then
+                        ver=`(cd "$dir" && \
+                              for f in "$libname$shrext".*; do echo "$f"; done \
+                              | sed -e "s,^$libname$shrext\\\\.,," \
+                              | sort -t '.' -n -r -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 \
+                              | sed 1q ) 2>/dev/null`
+                        if test -n "$ver" && test -f "$dir/$libname$shrext.$ver"; then
+                          found_dir="$dir"
+                          found_so="$dir/$libname$shrext.$ver"
+                        fi
+                      else
+                        eval library_names=\"$acl_library_names_spec\"
+                        for f in $library_names; do
+                          if test -f "$dir/$f"; then
+                            found_dir="$dir"
+                            found_so="$dir/$f"
+                            break
+                          fi
+                        done
                       fi
+                    fi
+                  fi
+                  dnl Then look for a static library.
+                  if test "X$found_dir" = "X"; then
+                    if test -f "$dir/$libname.$acl_libext"; then
+                      found_dir="$dir"
+                      found_a="$dir/$libname.$acl_libext"
+                    fi
+                  fi
+                  if test "X$found_dir" != "X"; then
+                    if test -f "$dir/$libname.la"; then
+                      found_la="$dir/$libname.la"
                     fi
                   fi
                   ;;
@@ -282,12 +346,12 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
                   ltrpathdirs="$ltrpathdirs $found_dir"
                 fi
                 dnl The hardcoding into $LIBNAME is system dependent.
-                if test "$hardcode_direct" = yes; then
+                if test "$acl_hardcode_direct" = yes; then
                   dnl Using DIR/libNAME.so during linking hardcodes DIR into the
                   dnl resulting binary.
                   LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$found_so"
                 else
-                  if test -n "$hardcode_libdir_flag_spec" && test "$hardcode_minus_L" = no; then
+                  if test -n "$acl_hardcode_libdir_flag_spec" && test "$acl_hardcode_minus_L" = no; then
                     dnl Use an explicit option to hardcode DIR into the resulting
                     dnl binary.
                     LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$found_so"
@@ -318,13 +382,13 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
                     if test -z "$haveit"; then
                       LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }-L$found_dir"
                     fi
-                    if test "$hardcode_minus_L" != no; then
+                    if test "$acl_hardcode_minus_L" != no; then
                       dnl FIXME: Not sure whether we should use
                       dnl "-L$found_dir -l$name" or "-L$found_dir $found_so"
                       dnl here.
                       LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$found_so"
                     else
-                      dnl We cannot use $hardcode_runpath_var and LD_RUN_PATH
+                      dnl We cannot use $acl_hardcode_runpath_var and LD_RUN_PATH
                       dnl here, because this doesn't fit in flags passed to the
                       dnl compiler. So give up. No hardcoding. This affects only
                       dnl very old systems.
@@ -351,6 +415,7 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
             case "$found_dir" in
               */$acl_libdirstem | */$acl_libdirstem/)
                 basedir=`echo "X$found_dir" | sed -e 's,^X,,' -e "s,/$acl_libdirstem/"'*$,,'`
+                LIB[]NAME[]_PREFIX="$basedir"
                 additional_includedir="$basedir/include"
                 ;;
             esac
@@ -512,18 +577,18 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
     done
   done
   if test "X$rpathdirs" != "X"; then
-    if test -n "$hardcode_libdir_separator"; then
+    if test -n "$acl_hardcode_libdir_separator"; then
       dnl Weird platform: only the last -rpath option counts, the user must
       dnl pass all path elements in one option. We can arrange that for a
       dnl single library, but not when more than one $LIBNAMEs are used.
       alldirs=
       for found_dir in $rpathdirs; do
-        alldirs="${alldirs}${alldirs:+$hardcode_libdir_separator}$found_dir"
+        alldirs="${alldirs}${alldirs:+$acl_hardcode_libdir_separator}$found_dir"
       done
-      dnl Note: hardcode_libdir_flag_spec uses $libdir and $wl.
+      dnl Note: acl_hardcode_libdir_flag_spec uses $libdir and $wl.
       acl_save_libdir="$libdir"
       libdir="$alldirs"
-      eval flag=\"$hardcode_libdir_flag_spec\"
+      eval flag=\"$acl_hardcode_libdir_flag_spec\"
       libdir="$acl_save_libdir"
       LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$flag"
     else
@@ -531,7 +596,7 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
       for found_dir in $rpathdirs; do
         acl_save_libdir="$libdir"
         libdir="$found_dir"
-        eval flag=\"$hardcode_libdir_flag_spec\"
+        eval flag=\"$acl_hardcode_libdir_flag_spec\"
         libdir="$acl_save_libdir"
         LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$flag"
       done
@@ -580,7 +645,7 @@ AC_DEFUN([AC_LIB_LINKFLAGS_FROM_LIBS],
   AC_REQUIRE([AC_LIB_PREPARE_MULTILIB])
   $1=
   if test "$enable_rpath" != no; then
-    if test -n "$hardcode_libdir_flag_spec" && test "$hardcode_minus_L" = no; then
+    if test -n "$acl_hardcode_libdir_flag_spec" && test "$acl_hardcode_minus_L" = no; then
       dnl Use an explicit option to hardcode directories into the resulting
       dnl binary.
       rpathdirs=
@@ -614,16 +679,16 @@ AC_DEFUN([AC_LIB_LINKFLAGS_FROM_LIBS],
           done
         else
           dnl The linker is used for linking directly.
-          if test -n "$hardcode_libdir_separator"; then
+          if test -n "$acl_hardcode_libdir_separator"; then
             dnl Weird platform: only the last -rpath option counts, the user
             dnl must pass all path elements in one option.
             alldirs=
             for dir in $rpathdirs; do
-              alldirs="${alldirs}${alldirs:+$hardcode_libdir_separator}$dir"
+              alldirs="${alldirs}${alldirs:+$acl_hardcode_libdir_separator}$dir"
             done
             acl_save_libdir="$libdir"
             libdir="$alldirs"
-            eval flag=\"$hardcode_libdir_flag_spec\"
+            eval flag=\"$acl_hardcode_libdir_flag_spec\"
             libdir="$acl_save_libdir"
             $1="$flag"
           else
@@ -631,7 +696,7 @@ AC_DEFUN([AC_LIB_LINKFLAGS_FROM_LIBS],
             for dir in $rpathdirs; do
               acl_save_libdir="$libdir"
               libdir="$dir"
-              eval flag=\"$hardcode_libdir_flag_spec\"
+              eval flag=\"$acl_hardcode_libdir_flag_spec\"
               libdir="$acl_save_libdir"
               $1="${$1}${$1:+ }$flag"
             done

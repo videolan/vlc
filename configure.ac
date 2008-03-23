@@ -10,7 +10,7 @@ CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Grishenko"
 COPYRIGHT_YEARS="1996-2008"
 
-AC_PREREQ(2.59) dnl this really should be 2.59c
+AC_PREREQ(2.59c)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CANONICAL_BUILD
@@ -393,7 +393,7 @@ lt_cv_deplibs_check_method=pass_all
 dnl
 dnl Gettext stuff
 dnl
-AM_GNU_GETTEXT_VERSION(0.16.1)
+AM_GNU_GETTEXT_VERSION(0.17)
 AM_GNU_GETTEXT([external])
 VLC_ADD_LIBS([libvlc vlc], [${LTLIBINTL}])
 

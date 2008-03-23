@@ -4,7 +4,6 @@
 *.dylib
 *.lo
 *.la
-*.m4
 *.mak
 *.moc.cpp
 *.o

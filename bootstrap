@@ -56,17 +56,6 @@ elif test ".`uname -s`" = ".Darwin"; then
   exit 1
 fi
 
-# Check for autoconf
-rm -f m4/autoconf260.m4
-case "$(autoreconf --version|head -n 1)" in
-  *2.59*)
-    echo "Enabling provisional autoconf 2.59 work-around. Update autoconf ASAP."
-    echo "Press Enter to continue"
-    read
-    cp -f extras/buildsystem/autotools/m4/autoconf260.m4 m4/
-    ;;
-esac
-
 # Check for pkg-config
 if pkg-config --version >/dev/null 2>&1; then
   # We have pkg-config, everything is cool.
