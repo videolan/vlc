@@ -1356,6 +1356,8 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
 #define MENU_SELECT_KEY_LONGTEXT N_( \
         "Selecting current widget performs the associated action.")
 
+#define AUDI_DEVICE_CYCLE_KEY_TEXT N_("Cycle through audio devices")
+#define AUDI_DEVICE_CYCLE_KEY_LONGTEXT N_("Cycle through available audio devices")
 const char vlc_usage[] = N_(
     "Usage: %s [options] [stream] ..."
     "\nYou can specify multiple streams on the commandline. They will be enqueued in the playlist."
@@ -2192,6 +2194,7 @@ vlc_module_begin();
 #   define KEY_MENU_UP            KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_UP
 #   define KEY_MENU_DOWN          KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_DOWN
 #   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_ENTER
+#   define KEY_AUDIODEVICE_CYCLE  KEY_MODIFIER_ALT|'a'
 #endif
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, NULL, TOGGLE_FULLSCREEN_KEY_TEXT,
@@ -2272,6 +2275,8 @@ vlc_module_begin();
              AUDIODELAY_DOWN_KEY_TEXT, AUDIODELAY_DOWN_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-audio-track", KEY_AUDIO_TRACK, NULL, AUDIO_TRACK_KEY_TEXT,
              AUDIO_TRACK_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-audiodevice-cycle", KEY_STOP, NULL, AUDI_DEVICE_CYCLE_KEY_TEXT,
+             AUDI_DEVICE_CYCLE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK, NULL,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-aspect-ratio", KEY_ASPECT_RATIO, NULL,
@@ -2605,6 +2610,7 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-menu-up", ACTIONID_MENU_UP, 0, 0, 0, 0 },
     { "key-menu-down", ACTIONID_MENU_DOWN, 0, 0, 0, 0 },
     { "key-menu-select", ACTIONID_MENU_SELECT, 0, 0, 0, 0 },
+    { "key-audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, 0, 0, 0, 0 },
     { NULL, 0, 0, 0, 0, 0 }
 };
 

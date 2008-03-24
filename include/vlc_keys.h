@@ -334,5 +334,6 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_ZOOM_HALF             93
 #define ACTIONID_ZOOM_ORIGINAL         94
 #define ACTIONID_ZOOM_DOUBLE           95
-
+/* Cycle Through Audio Devices */
+#define ACTIONID_AUDIODEVICE_CYCLE     96
 #endif
