@@ -102,7 +102,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     if( p_block->pf_release != BlockRelease )
     {
         /* Special case when pf_release if overloaded
-         * TODO if used one day, them implement it in a smarter way */
+         * TODO if used one day, then implement it in a smarter way */
         block_t *p_dup = block_Duplicate( p_block );
         block_Release( p_block );
         if( !p_dup )
@@ -119,6 +119,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         return NULL;
     }
 
+    /* Adjust reserved header if there is enough room */
     if( p_block->p_buffer - i_prebody > p_sys->p_allocated_buffer &&
         p_block->p_buffer - i_prebody < p_sys->p_allocated_buffer +
         p_sys->i_allocated_buffer )
@@ -127,6 +128,8 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         p_block->i_buffer += i_prebody;
         i_prebody = 0;
     }
+
+    /* Adjust payload size if there is enough room */
     if( p_block->p_buffer + i_body < p_sys->p_allocated_buffer +
         p_sys->i_allocated_buffer )
     {
@@ -134,8 +137,10 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         i_body = 0;
     }
 
+    /* Not enough room, reallocate the buffer */
     if( i_body > 0 || i_prebody > 0 )
     {
+        /* FIXME: this is really dumb, we should use realloc() */
         block_t *p_rea = block_New( NULL, i_buffer_size );
 
         if( p_rea )
