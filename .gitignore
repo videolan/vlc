@@ -16,9 +16,8 @@
 .dirstamp
 ABOUT-NLS
 aclocal.m4
-autotools
-compile
-config.*
+config.h*
+config.log
 configure
 INSTALL.git
 libtool
