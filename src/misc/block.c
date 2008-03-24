@@ -69,16 +69,22 @@ static void BlockRelease( block_t *p_block )
     free( p_block );
 }
 
+/* Memory alignment */
+#define BLOCK_ALIGN        16
+/* Initial size of reserved header and footer */
 #define BLOCK_PADDING_SIZE 32
+/* Maximum size of reserved footer before we release with realloc() */
+#define BLOCK_WASTE_SIZE   2048
 
 block_t *block_Alloc( size_t i_size )
 {
     /* We do only one malloc
-     * TODO bench if doing 2 malloc but keeping a pool of buffer is better
+     * TODO: bench if doing 2 malloc but keeping a pool of buffer is better
+     * TODO: use memalign
      * 16 -> align on 16
      * 2 * BLOCK_PADDING_SIZE -> pre + post padding
      */
-    const size_t i_alloc = i_size + 2 * BLOCK_PADDING_SIZE + 16;
+    const size_t i_alloc = i_size + 2 * BLOCK_PADDING_SIZE + BLOCK_ALIGN;
     block_sys_t *p_sys = malloc( sizeof( *p_sys ) + i_alloc );
 
     if( p_sys == NULL )
@@ -88,7 +94,9 @@ block_t *block_Alloc( size_t i_size )
     p_sys->i_allocated_buffer = i_alloc;
 
     block_Init( &p_sys->self, p_sys->p_allocated_buffer + BLOCK_PADDING_SIZE
-                + 16 - ((uintptr_t)p_sys->p_allocated_buffer % 16 ), i_size );
+                + BLOCK_ALIGN
+                - ((uintptr_t)p_sys->p_allocated_buffer % BLOCK_ALIGN),
+                i_size );
     p_sys->self.pf_release    = BlockRelease;
 
     return &p_sys->self;
@@ -159,6 +167,24 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         block_Release( p_block );
 
         return p_rea;
+    }
+
+    /* We have a very large reserved footer now? Release some of it. */
+    if ((p_sys->p_allocated_buffer + p_sys->i_allocated_buffer) -
+        (p_block->p_buffer + p_block->i_buffer) > BLOCK_WASTE_SIZE)
+    {
+        const size_t news = p_block->i_buffer + 2 * BLOCK_PADDING_SIZE + 16;
+        block_sys_t *newb = realloc (p_sys, sizeof (*p_sys) + news);
+
+        if (newb != NULL)
+        {
+            p_sys = newb;
+            p_sys->i_allocated_buffer = news;
+            p_block = &p_sys->self;
+            p_block->p_buffer = p_sys->p_allocated_buffer + BLOCK_PADDING_SIZE
+                + BLOCK_ALIGN
+                - ((uintptr_t)p_sys->p_allocated_buffer % BLOCK_ALIGN);
+        }
     }
 
     return p_block;
