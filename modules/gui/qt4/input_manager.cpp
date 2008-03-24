@@ -581,7 +581,7 @@ static int InterfaceChanged( vlc_object_t *p_this, const char *psz_var,
     static int counter = 0;
     InputManager *im = (InputManager*)param;
 
-    counter = counter++ % 4;
+    counter = ++counter % 4;
     if(!counter)
         return VLC_SUCCESS;
     IMEvent *event = new IMEvent( PositionUpdate_Type, 0 );
@@ -590,7 +590,7 @@ static int InterfaceChanged( vlc_object_t *p_this, const char *psz_var,
 }
 
 static int ItemStateChanged( vlc_object_t *p_this, const char *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval, void *param )
+                           vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     InputManager *im = (InputManager*)param;
 
@@ -600,17 +600,17 @@ static int ItemStateChanged( vlc_object_t *p_this, const char *psz_var,
 }
 
 static int ItemRateChanged( vlc_object_t *p_this, const char *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval, void *param )
+                           vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     InputManager *im = (InputManager*)param;
-    
+
     IMEvent *event = new IMEvent( ItemRateChanged_Type, 0 );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
 
 static int ItemTitleChanged( vlc_object_t *p_this, const char *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval, void *param )
+                           vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     InputManager *im = (InputManager*)param;
 
