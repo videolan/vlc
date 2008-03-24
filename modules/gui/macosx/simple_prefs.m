@@ -24,6 +24,7 @@
 #import "simple_prefs.h"
 #import "prefs.h"
 #import <vlc_keys.h>
+#import "misc.h"
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
@@ -312,7 +313,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     int i, y = 0;
     char *psz_tmp;
 
-    #define SetupIntList( object, name ) \
+#define SetupIntList( object, name ) \
     [object removeAllItems]; \
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
     for( i = 0; i < p_item->i_list; i++ ) \
@@ -328,7 +329,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [object selectItemAtIndex: 0]; \
     [object setToolTip: _NS( p_item->psz_longtext )]
 
-    #define SetupStringList( object, name ) \
+#define SetupStringList( object, name ) \
     [object removeAllItems]; \
     y = 0; \
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
@@ -341,7 +342,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [object selectItemAtIndex: y]; \
     [object setToolTip: _NS( p_item->psz_longtext )]
     
-    #define SetupModuleList( object, name ) \
+#define SetupModuleList( object, name ) \
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE ); \
     [object removeAllItems]; \
@@ -404,6 +405,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         else
             [o_audio_last_ckb setState: NSOffState];
     }
+    else
+        [o_audio_last_ckb setEnabled: NO];
 
     /******************
      * video settings *
@@ -416,8 +419,22 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     SetupModuleList( o_video_output_pop, "vout" );
 
-    msg_Warn( p_intf, "display device selector not implemented!" );
     [o_video_device_pop removeAllItems];
+    i = 0;
+    y = [[NSScreen screens] count];
+    [o_video_device_pop addItemWithTitle: _NS("Default")];
+    [[o_video_device_pop lastItem] setTag: 0];
+    while( i < y )
+    {
+        NSRect s_rect = [[[NSScreen screens] objectAtIndex: i] frame];
+        [o_video_device_pop addItemWithTitle: 
+         [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
+                   (int)s_rect.size.width, (int)s_rect.size.height]];
+        [[o_video_device_pop lastItem] setTag: [[[NSScreen screens] objectAtIndex: i] displayID]];
+        i++;
+    }
+    [o_video_device_pop selectItemAtIndex: 0];
+    [o_video_device_pop selectItemWithTag: config_GetInt( p_intf, "macosx-vdev" )];
 
     if( config_GetPsz( p_intf, "snapshot-path" ) != NULL )
         [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" )]];
@@ -642,7 +659,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     } \
     vlc_list_release( p_list ); \
     if( [[[object selectedItem] title] isEqualToString: _NS( "Default" )] ) \
-        config_PutPsz( p_intf, name, "Default" )
+        config_PutPsz( p_intf, name, "" )
 
     /**********************
      * interface settings *
@@ -740,7 +757,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         config_PutInt( p_intf, "macosx-black", [o_video_black_ckb state] );
 
         SaveModuleList( o_video_output_pop, "vout" );
-        msg_Warn( p_intf, "display device selector not implemented!" );
+        config_PutInt( p_intf, "macosx-vdev", [[o_video_device_pop selectedItem] tag] );
 
         config_PutPsz( p_intf, "snapshot-path", [[o_video_snap_folder_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "snapshot-prefix", [[o_video_snap_prefix_fld stringValue] UTF8String] );
