@@ -109,11 +109,11 @@ set -x
 
 # Automake complains if these are not present
 echo > vlc-config.in
+echo > ABOUT-NLS
 cp -f INSTALL INSTALL.git
 
 AUTOPOINT=true autoreconf --install --force --verbose ${ACLOCAL_ARGS}
 rm -f po/Makevars.template
-echo > ABOUT-NLS
 mv -f INSTALL.git INSTALL
 
 ##
