@@ -294,7 +294,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_video_enable_ckb setTitle: _NS("Enable Video")];
     [o_video_fullscreen_ckb setTitle: _NS("Fullscreen")];
     [o_video_onTop_ckb setTitle: _NS("Always on top")];
-    [o_video_output_txt setStringValue: _NS("Display device")];
+    [o_video_output_txt setStringValue: _NS("Output module")];
     [o_video_skipFrames_ckb setTitle: _NS("Skip frames")];
     [o_video_snap_box setTitle: _NS("Video snapshots")];
     [o_video_snap_folder_btn setTitle: _NS("Browse...")];
@@ -307,6 +307,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)resetControls
 {
     module_config_t *p_item;
+    vlc_list_t *p_list;
+    module_t *p_parser;
     int i, y = 0;
     char *psz_tmp;
 
@@ -323,19 +325,41 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( p_item->value.i < [object numberOfItems] ) \
         [object selectItemAtIndex: p_item->value.i]; \
     else \
-        [object selectItemAtIndex: 0]
+        [object selectItemAtIndex: 0]; \
+    [object setToolTip: _NS( p_item->psz_longtext )]
 
     #define SetupStringList( object, name ) \
-        [object removeAllItems]; \
-        y = 0; \
-        p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
-        for( i = 0; p_item->ppsz_list[i] != nil; i++ ) \
+    [object removeAllItems]; \
+    y = 0; \
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+    for( i = 0; p_item->ppsz_list[i] != nil; i++ ) \
+    { \
+        [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
+        if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) ) \
+            y = i; \
+    } \
+    [object selectItemAtIndex: y]; \
+    [object setToolTip: _NS( p_item->psz_longtext )]
+    
+    #define SetupModuleList( object, name ) \
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE ); \
+    [object removeAllItems]; \
+    [object addItemWithTitle: _NS("Default")]; \
+    for( int i_index = 0; i_index < p_list->i_count; i_index++ ) \
+    { \
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ; \
+        \
+        if( module_IsCapable( p_parser, p_item->psz_type ) ) \
         { \
-            [object addItemWithTitle: _NS( p_item->ppsz_list_text[i] )]; \
-            if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) ) \
-                y = i; \
+            [object addItemWithTitle: [NSString stringWithUTF8String: module_GetLongName( p_parser )]]; \
+            \
+            if( p_item->value.psz && !strcmp( p_item->value.psz, module_GetObjName( p_parser ) ) ) \
+                [object selectItem: [object lastItem]]; \
         } \
-        [object selectItemAtIndex: y]
+    } \
+    vlc_list_release( p_list ); \
+    [object setToolTip: _NS(p_item->psz_longtext)]
 
     /**********************
      * interface settings *
@@ -366,10 +390,9 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( psz_tmp )
         [o_audio_norm_ckb setState: (int)strstr( psz_tmp, "normvol" )];
     [o_audio_norm_fld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
-    
-    // visualizer
-    msg_Warn( p_intf, "visualizer not implemented!" );
-    
+
+    SetupModuleList( o_audio_visual_pop, "audio-visual" );
+
     /* Last.FM is optional */
     if( module_Exists( p_intf, "audioscrobbler" ) )
     {
@@ -391,7 +414,10 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_video_skipFrames_ckb setState: config_GetInt( p_intf, "skip-frames" )];
     [o_video_black_ckb setState: config_GetInt( p_intf, "macosx-black" )];
 
-    msg_Warn( p_intf, "vout module and display device selectors not implemented!" );
+    SetupModuleList( o_video_output_pop, "vout" );
+
+    msg_Warn( p_intf, "display device selector not implemented!" );
+    [o_video_device_pop removeAllItems];
 
     if( config_GetPsz( p_intf, "snapshot-path" ) != NULL )
         [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" )]];
@@ -578,6 +604,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)saveChangedSettings
 {
     module_config_t *p_item;
+    vlc_list_t *p_list;
+    module_t *p_parser;
     char *psz_tmp;
     int i;
     
@@ -594,6 +622,27 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         config_PutPsz( p_intf, name, strdup( p_item->ppsz_list[[object indexOfSelectedItem]] ) ); \
     else \
         config_PutPsz( p_intf, name, strdup( [[VLCMain sharedInstance] delocalizeString: [object stringValue]] ) )
+
+#define SaveModuleList( object, name ) \
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), name ); \
+    \
+    p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE ); \
+    for( int i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ ) \
+    { \
+        p_parser = (module_t *)p_list->p_values[i_module_index].p_object; \
+        \
+        if( p_item->i_type == CONFIG_ITEM_MODULE && module_IsCapable( p_parser, p_item->psz_type ) ) \
+        { \
+            if( [[[object selectedItem] title] isEqualToString: _NS( module_GetLongName( p_parser ) )] ) \
+            { \
+                config_PutPsz( p_intf, name, strdup( module_GetObjName( p_parser ))); \
+                break; \
+            } \
+        } \
+    } \
+    vlc_list_release( p_list ); \
+    if( [[[object selectedItem] title] isEqualToString: _NS( "Default" )] ) \
+        config_PutPsz( p_intf, name, "Default" )
 
     /**********************
      * interface settings *
@@ -652,7 +701,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         }
         config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
 
-        msg_Warn( p_intf, "visualizer not implemented!" );
+        SaveModuleList( o_audio_visual_pop, "audio-visual" );
 
         /* Last.FM is optional */
         if( module_Exists( p_intf, "audioscrobbler" ) )
@@ -690,7 +739,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         config_PutInt( p_intf, "skip-frames", [o_video_skipFrames_ckb state] );
         config_PutInt( p_intf, "macosx-black", [o_video_black_ckb state] );
 
-        msg_Warn( p_intf, "vout module and display device selectors not implemented!" );
+        SaveModuleList( o_video_output_pop, "vout" );
+        msg_Warn( p_intf, "display device selector not implemented!" );
 
         config_PutPsz( p_intf, "snapshot-path", [[o_video_snap_folder_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "snapshot-prefix", [[o_video_snap_prefix_fld stringValue] UTF8String] );
