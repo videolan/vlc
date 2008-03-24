@@ -659,7 +659,8 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
     int b_empty_if_na = 0;
     char buf[10];
     int i_size = strlen( string ) + 1; /* +1 to store '\0' */
-    char *dst = malloc( i_size );
+    char *dst = strdup( string );
+    if( !dst ) return NULL;
     int d = 0;
 
     playlist_t *p_playlist = pl_Yield( p_object );
@@ -671,8 +672,6 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
         vlc_object_yield( p_input );
         p_item = input_GetItem(p_input);
     }
-
-    sprintf( dst, string );
 
     while( *s )
     {
