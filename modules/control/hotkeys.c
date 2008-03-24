@@ -516,7 +516,8 @@ static void Run( intf_thread_t *p_intf )
                 {
                     continue;
                 }
-                for( i = 1; i < i_count; i )
+ 
+                for( i = 0; i < i_count; i++ )
                 {
                     if( val.i_int == list.p_list->p_values[i].i_int )
                     {
@@ -528,29 +529,28 @@ static void Run( intf_thread_t *p_intf )
                     msg_Warn( p_aout,
                               "invalid current audio device, selecting 0" );
                     var_Set( p_aout, "audio-device",
-                             list.p_list->p_values[1] );
-                    i = 1;
+                             list.p_list->p_values[0] );
+                    i = 0;
            
                 }
                 else if( i == i_count -1 )
                 {
-                    var_Set( p_aout, "audio-device",
+                  var_Set( p_aout, "audio-device",
                              list.p_list->p_values[0] );
                     i = 0;
            
                 }
                 else
                 {
-                    var_Set( p_aout, "audio-device",
-                             list.p_list->p_values[i1] );
-                    i;
-        
+                  var_Set( p_aout, "audio-device",
+                             list.p_list->p_values[i+1] );                   
+                    i++;
                 }
                 vout_OSDMessage( VLC_OBJECT(p_input), 
                                  DEFAULT_CHAN,
                                  _("Audio Device: %s"),
-                                 list2.p_list->p_values[i].psz_string );
-       
+                                 list2.p_list->p_values[i].psz_string);
+                vlc_object_release( p_aout );        
             }
             else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
@@ -857,6 +857,7 @@ static void Run( intf_thread_t *p_intf )
             {
                 osd_MenuActivate( VLC_OBJECT(p_intf) );
             }
+
         }
         if( p_vout )
             vlc_object_release( p_vout );
