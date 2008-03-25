@@ -1351,7 +1351,7 @@ static void Close( vlc_object_t *p_this )
 {
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
- 
+
     free( p_sys->psz_stat_name );
 
     x264_encoder_close( p_sys->h );
@@ -1369,7 +1369,7 @@ static void Close( vlc_object_t *p_this )
     var_Set( p_enc->p_libvlc, "pthread_win32_count", count );
 
     if( count.i_int == 0 )
-    {   
+    {
         pthread_win32_thread_detach_np();
         pthread_win32_process_detach_np();
         msg_Dbg( p_enc, "pthread-win32 deinitialized" );

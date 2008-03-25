@@ -188,7 +188,7 @@ static int Open( vlc_object_t *p_this )
 
     /* buffer */
     p_sys->i_buffer = p_sys->i_buffer_size = 0;
-    p_sys->p_buffer = 0;
+    p_sys->p_buffer = NULL;
 
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
@@ -231,7 +231,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* FIXME: multiple blocks per frame */
             if( p_block->i_buffer > i_header_size )
             {
-                memcpy( p_block->p_buffer,
+                p_dec->p_libvlc->pf_memcpy( p_block->p_buffer,
                         p_block->p_buffer + i_header_size,
                         p_block->i_buffer - i_header_size );
                 p_block->i_buffer -= i_header_size;
@@ -246,9 +246,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_sys->p_buffer = realloc( p_sys->p_buffer, p_sys->i_buffer_size );
     }
 
-    if( p_block->i_buffer )
+    if( p_block->i_buffer > 0 )
     {
-        memcpy( &p_sys->p_buffer[p_sys->i_buffer],
+        p_dec->p_libvlc->pf_memcpy( &p_sys->p_buffer[p_sys->i_buffer],
                 p_block->p_buffer, p_block->i_buffer );
         p_sys->i_buffer += p_block->i_buffer;
         p_block->i_buffer = 0;
@@ -492,3 +492,4 @@ static void DoReordering( uint32_t *p_out, uint32_t *p_in, int i_samples,
                 ((uint16_t *)p_out)[i * i_nb_channels + pi_chan_table[j]] =
                     ((uint16_t *)p_in)[i * i_nb_channels + j];
 }
+
