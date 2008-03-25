@@ -270,6 +270,11 @@ static int Demux( demux_t *p_demux )
                 if( !psz_elname ) return -1;
                 if( !strcmp( psz_elname, "item" ) )
                 {
+                    if( psz_item_mrl == NULL )
+                    {
+                        msg_Err( p_demux, "invalid XML (no enclosure markup)" );
+                        return -1;
+                    }
                     p_input = input_ItemNewExt( p_playlist, psz_item_mrl,
                                                 psz_item_name, 0, NULL, -1 );
                     if( p_input == NULL ) break;
