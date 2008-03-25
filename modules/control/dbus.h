@@ -22,6 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/* MPRIS VERSION */
+#define VLC_MPRIS_VERSION_MAJOR     1
+#define VLC_MPRIS_VERSION_MINOR     0
+
 /* DBUS IDENTIFIERS */
 
 /* name registered on the session bus */
@@ -76,6 +80,7 @@
 #define ADD_BOOL( b ) DBUS_ADD( DBUS_TYPE_BOOLEAN, b )
 #define ADD_INT32( i ) DBUS_ADD( DBUS_TYPE_INT32, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
+#define ADD_UINT16( i ) DBUS_ADD( DBUS_TYPE_UINT16, i )
 
 /* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
 
@@ -93,6 +98,9 @@ const char* psz_introspection_xml_data_root =
 "  <interface name=\"org.freedesktop.MediaPlayer\">\n"
 "    <method name=\"Identity\">\n"
 "      <arg type=\"s\" direction=\"out\" />\n"
+"    </method>\n"
+"    <method name=\"MprisVersion\">\n"
+"      <arg type=\"(qq)\" direction=\"out\" />\n"
 "    </method>\n"
 "  </interface>\n"
 "</node>\n"

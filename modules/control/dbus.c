@@ -127,6 +127,22 @@ DBUS_METHOD( Quit )
     REPLY_SEND;
 }
 
+DBUS_METHOD( MprisVersion )
+{ /*implemented version of the mpris spec */
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    VLC_UNUSED( p_this );
+    dbus_uint16_t i_major = VLC_MPRIS_VERSION_MAJOR;
+    dbus_uint16_t i_minor = VLC_MPRIS_VERSION_MINOR;
+    DBusMessageIter version;
+
+    dbus_message_iter_open_container( &args, DBUS_TYPE_STRUCT, NULL, &version );
+    dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16, &i_major );
+    dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16, &i_minor );
+    dbus_message_iter_close_container( &args, &version );
+    REPLY_SEND;
+}
+
 DBUS_METHOD( PositionGet )
 { /* returns position in milliseconds */
     REPLY_INIT;
@@ -605,6 +621,7 @@ DBUS_METHOD( handle_root )
     /* here D-Bus method's names are associated to an handler */
 
     METHOD_FUNC( "Identity",                Identity );
+    METHOD_FUNC( "MprisVersion",            MprisVersion );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
