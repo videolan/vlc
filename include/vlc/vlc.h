@@ -374,7 +374,7 @@ VLC_DEPRECATED_API int     VLC_VariableType( int, char const *, int * );
  * \param i_pos the position at which to add the new target (PLAYLIST_END for end)
  * \return the item id on success and -1 on error
  */
-VLC_DEPRECATED_API int     VLC_AddTarget( int, char const *, const char **, int, int, int );
+VLC_PUBLIC_API int     VLC_AddTarget( int, char const *, const char **, int, int, int );
 
 /**
  * Start the playlist and play the currently selected playlist item
