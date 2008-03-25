@@ -28,9 +28,6 @@ pyoptions_to_args(PyObject *py_options, char*** pppsz_args)
 {
     Py_ssize_t i_size;
     Py_ssize_t  i_index;
-    char** ppsz_args = *pppsz_args;
- 
-    ppsz_args = NULL;
 
     Py_INCREF( py_options );
     if( ! PySequence_Check( py_options ) )
@@ -39,7 +36,9 @@ pyoptions_to_args(PyObject *py_options, char*** pppsz_args)
         return -1;
     }
     i_size = PySequence_Size( py_options );
-    ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
+
+    char **ppsz_args = *pppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
+
     if( ! ppsz_args )
     {
         PyErr_SetString( PyExc_MemoryError, "Out of memory" );
