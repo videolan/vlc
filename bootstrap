@@ -67,6 +67,14 @@ else
   PKGCONFIG=no
 fi
 
+# Check for autopoint (GNU gettext)
+export AUTOPOINT
+test "$AUTOPOINT" || AUTOPOINT=autopoint
+if ! "$AUTOPOINT" --dry-run --force >/dev/null 2>&1; then
+  AUTOPOINT=true
+  echo > ABOUT-NLS
+fi
+
 ##
 ## Generate the modules makefile, by parsing modules/**/Modules.am
 ##
@@ -112,8 +120,9 @@ echo > vlc-config.in
 echo > ABOUT-NLS
 cp -f INSTALL INSTALL.git
 
-AUTOPOINT=true autoreconf --install --force --verbose ${ACLOCAL_ARGS}
-rm -f po/Makevars.template
+autoreconf --install --force --verbose ${ACLOCAL_ARGS}
+rm -f po/Makevars.template ABOUT-NLS
+echo > ABOUT-NLS
 mv -f INSTALL.git INSTALL
 
 ##
@@ -129,6 +138,16 @@ set +x
 ##
 ##  Tell the user about gettext, pkg-config and sed
 ##
+if [ "$AUTOPOINT" = "true" ]; then
+  cat << EOF
+
+==============================================================
+NOTE: GNU gettext appears to be missing or out-of-date.
+Please install or update GNU gettext.
+Otherwise, you will not be able to build a source tarball.
+EOF
+fi
+
 if [ "$PKGCONFIG" = "no" ]; then
   cat << EOF
 
