@@ -992,7 +992,7 @@ static int UpdateCaps( intf_thread_t* p_intf )
     {
         access_t *p_access = (access_t*)vlc_object_find( p_playlist->p_input,
             VLC_OBJECT_ACCESS, FIND_CHILD );
-        if( p_access )
+        if( p_access && p_access->pf_control )
         {
             vlc_bool_t b_can_pause;
             if( !access2_Control( p_access, ACCESS_CAN_PAUSE, &b_can_pause ) &&
