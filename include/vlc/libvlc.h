@@ -691,31 +691,6 @@ VLC_PUBLIC_API libvlc_media_list_t *
 /** @} */
 
 /*****************************************************************************
- * Dynamic Media List (Deprecated)
- *****************************************************************************/
-/** defgroup libvlc_media_list MediaList
- * \ingroup libvlc
- * LibVLC Media List
- * @{ */
-
-VLC_DEPRECATED_API libvlc_dynamic_media_list_t *
-    libvlc_dynamic_media_list_new(  libvlc_media_list_t * p_mlist,
-                                    libvlc_tag_query_t * p_query,
-                                    libvlc_tag_t tag,
-                                    libvlc_exception_t * p_e );
-VLC_DEPRECATED_API void
-    libvlc_dynamic_media_list_release( libvlc_dynamic_media_list_t * p_dmlist );
-
-VLC_DEPRECATED_API void
-    libvlc_dynamic_media_list_retain( libvlc_dynamic_media_list_t * p_dmlist );
-
-VLC_DEPRECATED_API libvlc_media_list_t *
-    libvlc_dynamic_media_list_media_list( libvlc_dynamic_media_list_t * p_dmlist,
-                                          libvlc_exception_t * p_e );
-
-/** @} */
-
-/*****************************************************************************
  * Media Library
  *****************************************************************************/
 /** defgroup libvlc_media_library Media Library
