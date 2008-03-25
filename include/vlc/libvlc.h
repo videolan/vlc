@@ -293,7 +293,7 @@ VLC_PUBLIC_API void *
  * \param loop the loop attribute. 1 sets looping, 0 disables it
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_loop( libvlc_instance_t* , int,
+VLC_DEPRECATED_API void libvlc_playlist_loop( libvlc_instance_t* , int,
                                           libvlc_exception_t * );
 
 /**
@@ -310,7 +310,7 @@ VLC_PUBLIC_API void libvlc_playlist_loop( libvlc_instance_t* , int,
  * \param ppsz_options the options to add to the item
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_play( libvlc_instance_t*, int, int,
+VLC_DEPRECATED_API void libvlc_playlist_play( libvlc_instance_t*, int, int,
                                           char **, libvlc_exception_t * );
 
 /**
@@ -321,7 +321,7 @@ VLC_PUBLIC_API void libvlc_playlist_play( libvlc_instance_t*, int, int,
  * \param p_instance the playlist instance to pause
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_pause( libvlc_instance_t *,
+VLC_DEPRECATED_API void libvlc_playlist_pause( libvlc_instance_t *,
                                            libvlc_exception_t * );
 
 /**
@@ -331,7 +331,7 @@ VLC_PUBLIC_API void libvlc_playlist_pause( libvlc_instance_t *,
  * \param p_e an initialized exception pointer
  * \return 0 if the playlist is stopped or paused, 1 if it is running
  */
-VLC_PUBLIC_API int libvlc_playlist_isplaying( libvlc_instance_t *,
+VLC_DEPRECATED_API int libvlc_playlist_isplaying( libvlc_instance_t *,
                                               libvlc_exception_t * );
 
 /**
@@ -341,7 +341,7 @@ VLC_PUBLIC_API int libvlc_playlist_isplaying( libvlc_instance_t *,
  * \param p_e an initialized exception pointer
  * \return the number of items
  */
-VLC_PUBLIC_API int libvlc_playlist_items_count( libvlc_instance_t *,
+VLC_DEPRECATED_API int libvlc_playlist_items_count( libvlc_instance_t *,
                                                 libvlc_exception_t * );
 
 /**
@@ -349,14 +349,14 @@ VLC_PUBLIC_API int libvlc_playlist_items_count( libvlc_instance_t *,
  *
  * \param p_instance the playlist instance
  */
-VLC_PUBLIC_API void libvlc_playlist_lock( libvlc_instance_t * );
+VLC_DEPRECATED_API void libvlc_playlist_lock( libvlc_instance_t * );
 
 /**
  * Unlock the playlist.
  *
  * \param p_instance the playlist instance
  */
-VLC_PUBLIC_API void libvlc_playlist_unlock( libvlc_instance_t * );
+VLC_DEPRECATED_API void libvlc_playlist_unlock( libvlc_instance_t * );
 
 /**
  * Stop playing.
@@ -364,7 +364,7 @@ VLC_PUBLIC_API void libvlc_playlist_unlock( libvlc_instance_t * );
  * \param p_instance the playlist instance to stop
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_stop( libvlc_instance_t *,
+VLC_DEPRECATED_API void libvlc_playlist_stop( libvlc_instance_t *,
                                           libvlc_exception_t * );
 
 /**
@@ -374,7 +374,7 @@ VLC_PUBLIC_API void libvlc_playlist_stop( libvlc_instance_t *,
  * \param p_instance the playlist instance
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_next( libvlc_instance_t *,
+VLC_DEPRECATED_API void libvlc_playlist_next( libvlc_instance_t *,
                                           libvlc_exception_t * );
 
 /**
@@ -384,7 +384,7 @@ VLC_PUBLIC_API void libvlc_playlist_next( libvlc_instance_t *,
  * \param p_instance the playlist instance
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_prev( libvlc_instance_t *,
+VLC_DEPRECATED_API void libvlc_playlist_prev( libvlc_instance_t *,
                                           libvlc_exception_t * );
 
 /**
@@ -393,7 +393,7 @@ VLC_PUBLIC_API void libvlc_playlist_prev( libvlc_instance_t *,
  * \param p_instance the playlist instance
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_playlist_clear( libvlc_instance_t *,
+VLC_DEPRECATED_API void libvlc_playlist_clear( libvlc_instance_t *,
                                            libvlc_exception_t * );
 
 /**
@@ -406,7 +406,7 @@ VLC_PUBLIC_API void libvlc_playlist_clear( libvlc_instance_t *,
  * \param p_e an initialized exception pointer
  * \return the identifier of the new item
  */
-VLC_PUBLIC_API int libvlc_playlist_add( libvlc_instance_t *, const char *,
+VLC_DEPRECATED_API int libvlc_playlist_add( libvlc_instance_t *, const char *,
                                         const char *, libvlc_exception_t * );
 
 /**
@@ -421,7 +421,7 @@ VLC_PUBLIC_API int libvlc_playlist_add( libvlc_instance_t *, const char *,
  * \param p_e an initialized exception pointer
  * \return the identifier of the new item
  */
-VLC_PUBLIC_API int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
+VLC_DEPRECATED_API int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
                                                  const char *, int, const char **,
                                                  libvlc_exception_t * );
 
@@ -433,7 +433,7 @@ VLC_PUBLIC_API int libvlc_playlist_add_extended( libvlc_instance_t *, const char
  * \param p_e an initialized exception pointer
  * \return 0 in case of success, a non-zero value otherwise
  */
-VLC_PUBLIC_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
+VLC_DEPRECATED_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
                                                 libvlc_exception_t * );
 
 /** Get the input that is currently being played by the playlist.
@@ -442,16 +442,8 @@ VLC_PUBLIC_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
  * \param p_e an initialized exception pointern
  * \return a media instance object
  */
-VLC_PUBLIC_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
+VLC_DEPRECATED_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
                                 libvlc_instance_t *, libvlc_exception_t * );
-
-VLC_PUBLIC_API int libvlc_media_instance_is_seekable(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e );
-
-VLC_PUBLIC_API int libvlc_media_instance_can_pause(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e );
 
 /** @}*/
 
@@ -541,6 +533,13 @@ VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state   ( libvlc_media_i
 VLC_PUBLIC_API int  libvlc_media_instance_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API float       libvlc_media_instance_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
 
+VLC_PUBLIC_API int libvlc_media_instance_is_seekable(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e );
+
+VLC_PUBLIC_API int libvlc_media_instance_can_pause(
+                                 libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e );
 
 /** @} */
 
@@ -728,18 +727,18 @@ VLC_PUBLIC_API libvlc_media_list_t *
  * LibVLC Media List
  * @{ */
 
-VLC_PUBLIC_API libvlc_dynamic_media_list_t *
+VLC_DEPRECATED_API libvlc_dynamic_media_list_t *
     libvlc_dynamic_media_list_new(  libvlc_media_list_t * p_mlist,
                                     libvlc_tag_query_t * p_query,
                                     libvlc_tag_t tag,
                                     libvlc_exception_t * p_e );
-VLC_PUBLIC_API void
+VLC_DEPRECATED_API void
     libvlc_dynamic_media_list_release( libvlc_dynamic_media_list_t * p_dmlist );
 
-VLC_PUBLIC_API void
+VLC_DEPRECATED_API void
     libvlc_dynamic_media_list_retain( libvlc_dynamic_media_list_t * p_dmlist );
 
-libvlc_media_list_t *
+VLC_DEPRECATED_API libvlc_media_list_t *
     libvlc_dynamic_media_list_media_list( libvlc_dynamic_media_list_t * p_dmlist,
                                           libvlc_exception_t * p_e );
 
