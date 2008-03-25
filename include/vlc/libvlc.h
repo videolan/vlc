@@ -286,22 +286,27 @@ VLC_PUBLIC_API void *
  * @{
  */
 
-/** Create an empty Media Instance object
+/** 
+ * Create an empty Media Instance object
  *
  * \param p_libvlc_instance the libvlc instance in which the Media Instance
- *        should be (unused for now).
+ *        should be created.
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new( libvlc_instance_t *, libvlc_exception_t * );
 
-/** Create a Media Instance object from a Media Descriptor
+/**
+ * Create a Media Instance object from a Media Descriptor
+ *
  * \param p_md the media descriptor. Afterwards the p_md can be safely
  *        destroyed.
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new_from_media_descriptor( libvlc_media_descriptor_t *, libvlc_exception_t * );
 
-/** Release a media_instance after use
+/**
+ * Release a media_instance after use
+ *
  * \param p_mi the Media Instance to free
  */
 VLC_PUBLIC_API void libvlc_media_instance_release( libvlc_media_instance_t * );
@@ -317,59 +322,108 @@ VLC_PUBLIC_API void libvlc_media_instance_retain( libvlc_media_instance_t * );
  */
 VLC_PUBLIC_API void libvlc_media_instance_set_media_descriptor( libvlc_media_instance_t *, libvlc_media_descriptor_t *, libvlc_exception_t * );
 
-/** Get the media descriptor used by the media_instance (if any). A copy of
- * the md is returned. NULL is returned if no media instance is associated.
+/**
+ * Get the media descriptor used by the media_instance. 
  *
  * \param p_mi the Media Instance
  * \param p_e an initialized exception pointer
+ * \return the media descriptor associated with p_mi, or NULL if no
+ *         media descriptor is associated
  */
 VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_instance_get_media_descriptor( libvlc_media_instance_t *, libvlc_exception_t * );
 
-/** Get the Event Manager from which the media instance send event.
+/**
+ * Get the Event Manager from which the media instance send event.
+ *
+ * \param p_mi the Media Instance
+ * \param p_e an initialized exception pointer
+ * \return the event manager associated with p_mi
+ */
+VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_instance_event_manager ( libvlc_media_instance_t *, libvlc_exception_t * );
+
+/**
+ * Play 
  *
  * \param p_mi the Media Instance
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_instance_event_manager ( libvlc_media_instance_t *, libvlc_exception_t * );
-
 VLC_PUBLIC_API void libvlc_media_instance_play ( libvlc_media_instance_t *, libvlc_exception_t * );
+
+/**
+ * Pause 
+ *
+ * \param p_mi the Media Instance
+ * \param p_e an initialized exception pointer
+ */
 VLC_PUBLIC_API void libvlc_media_instance_pause ( libvlc_media_instance_t *, libvlc_exception_t * );
+
+/**
+ * Stop 
+ *
+ * \param p_mi the Media Instance
+ * \param p_e an initialized exception pointer
+ */
 VLC_PUBLIC_API void libvlc_media_instance_stop ( libvlc_media_instance_t *, libvlc_exception_t * );
 
+/**
+ * Set the drawable where the media instance should render its video output
+ *
+ * \param p_mi the Media Instance
+ * \param drawable the libvlc_drawable_t where the media instance
+ *        should render its video
+ * \param p_e an initialized exception pointer
+ */
 VLC_PUBLIC_API void libvlc_media_instance_set_drawable ( libvlc_media_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
+
+/**
+ * Get the drawable where the media instance should render its video output
+ *
+ * \param p_mi the Media Instance
+ * \param p_e an initialized exception pointer
+ * \return the libvlc_drawable_t where the media instance
+ *         should render its video
+ */
 VLC_PUBLIC_API libvlc_drawable_t
                     libvlc_media_instance_get_drawable ( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /** \bug This might go away ... to be replaced by a broader system */
-VLC_PUBLIC_API libvlc_time_t libvlc_media_instance_get_length     ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API libvlc_time_t libvlc_media_instance_get_time       ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void          libvlc_media_instance_set_time       ( libvlc_media_instance_t *, libvlc_time_t, libvlc_exception_t *);
-VLC_PUBLIC_API float         libvlc_media_instance_get_position   ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void          libvlc_media_instance_set_position   ( libvlc_media_instance_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API void          libvlc_media_instance_set_chapter    ( libvlc_media_instance_t *, int, libvlc_exception_t *);
-VLC_PUBLIC_API int           libvlc_media_instance_get_chapter    (libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API int           libvlc_media_instance_get_chapter_count( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API int    libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float         libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void          libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t  libvlc_media_instance_get_length     ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t  libvlc_media_instance_get_time       ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void           libvlc_media_instance_set_time       ( libvlc_media_instance_t *, libvlc_time_t, libvlc_exception_t *);
+VLC_PUBLIC_API float          libvlc_media_instance_get_position   ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void           libvlc_media_instance_set_position   ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API void           libvlc_media_instance_set_chapter    ( libvlc_media_instance_t *, int, libvlc_exception_t *);
+VLC_PUBLIC_API int            libvlc_media_instance_get_chapter    (libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int            libvlc_media_instance_get_chapter_count( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int            libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float          libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void           libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
 VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state   ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float          libvlc_media_instance_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
 
 /**
- * Does this input have a video output?
+ * Does this media instance have a video output?
+ *
+ * \param p_md the media instance
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API int  libvlc_media_instance_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
+
+/**
+ * Is this media instance seekable?
  *
  * \param p_input the input
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API int  libvlc_media_instance_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_media_instance_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_instance_is_seekable( libvlc_media_instance_t *p_mi, libvlc_exception_t *p_e );
 
-VLC_PUBLIC_API int libvlc_media_instance_is_seekable(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e );
-
-VLC_PUBLIC_API int libvlc_media_instance_can_pause(
-                                 libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e );
+/**
+ * Can this media instance be paused?
+ *
+ * \param p_input the input
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API int libvlc_media_instance_can_pause( libvlc_media_instance_t *p_mi, libvlc_exception_t *p_e );
 
 /** defgroup libvlc_video Video
  * \ingroup libvlc_media_instance
@@ -750,9 +804,19 @@ VLC_PUBLIC_API const char * libvlc_event_type_name( libvlc_event_type_t event_ty
  *****************************************************************************/
 /** defgroup libvlc_media_list MediaList
  * \ingroup libvlc
- * LibVLC Media List
+ * LibVLC Media List, a media list holds multiple media descriptors
  * @{
  */
+
+/**
+ * Create an empty media list.
+ *
+ * \param p_libvlc the event manager
+ * \param i_event_type the desired event to which we want to unregister
+ * \param f_callback the function to call when i_event_type occurs
+ * \param p_e an initialized exception pointer
+ */
+
 VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_list_new( libvlc_instance_t *, libvlc_exception_t * );
 
@@ -762,7 +826,7 @@ VLC_PUBLIC_API void
 VLC_PUBLIC_API void
     libvlc_media_list_retain( libvlc_media_list_t * );
 
-VLC_PUBLIC_API void
+VLC_DEPRECATED_API void
     libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
                                         const char * psz_uri,
                                         libvlc_exception_t * p_e );
@@ -831,7 +895,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
  *****************************************************************************/
 /** defgroup libvlc_media_list_view MediaListView
  * \ingroup libvlc_media_list
- * LibVLC Media List View
+ * LibVLC Media List View, represent a media_list using a different layout
  * @{ */
 
 VLC_PUBLIC_API void
@@ -895,7 +959,8 @@ VLC_PUBLIC_API libvlc_media_list_t *
  *****************************************************************************/
 /** defgroup libvlc_media_list_player MediaListPlayer
  * \ingroup libvlc
- * LibVLC Media List Player
+ * LibVLC Media List Player, play a media_list. You can see that as a media
+ * instance subclass
  * @{
  */
 VLC_PUBLIC_API libvlc_media_list_player_t *
@@ -947,11 +1012,12 @@ VLC_PUBLIC_API void
 VLC_PUBLIC_API void
     libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
+
 VLC_PUBLIC_API void
     libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
 
-/** @} media_list_player*/
+/** @} media_list_player */
 
 /** @} media_list */
 
