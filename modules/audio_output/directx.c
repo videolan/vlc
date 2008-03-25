@@ -85,6 +85,9 @@
 #   define SPEAKER_RESERVED               0x80000000
 #endif
 
+#ifndef DSSPEAKER_DSSPEAKER_DIRECTOUT
+#   define DSSPEAKER_DSSPEAKER_DIRECTOUT         0x00000000
+#endif
 #ifndef DSSPEAKER_HEADPHONE
 #   define DSSPEAKER_HEADPHONE         0x00000001
 #endif
@@ -102,6 +105,15 @@
 #endif
 #ifndef DSSPEAKER_5POINT1
 #   define DSSPEAKER_5POINT1           0x00000006
+#endif
+#ifndef DSSPEAKER_7POINT1
+#   define DSSPEAKER_7POINT1           0x00000007
+#endif
+#ifndef DSSPEAKER_7POINT1_SURROUND
+#   define DSSPEAKER_7POINT1_SURROUND           0x00000008
+#endif
+#ifndef DSSPEAKER_7POINT1_WIDE
+#   define DSSPEAKER_7POINT1_WIDE           DSSPEAKER_7POINT1
 #endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_
@@ -318,6 +330,14 @@ static int OpenAudio( vlc_object_t *p_this )
                    | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                    | AOUT_CHAN_LFE;
         }
+        else if( val.i_int == AOUT_VAR_7_1 )
+        {
+                    p_aout->output.output.i_physical_channels
+                        = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                           | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
+                           | AOUT_CHAN_LFE;
+        }
         else if( val.i_int == AOUT_VAR_3F2R )
         {
             p_aout->output.output.i_physical_channels
@@ -421,6 +441,25 @@ static void Probe( aout_instance_t * p_aout )
         }
     }
 
+    /* Test for 7.1 support */
+    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                             AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
+                             AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
+                             AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
+       if( p_aout->output.output.i_physical_channels == i_physical_channels )
+       {
+           if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 8,
+                                  p_aout->output.output.i_rate, true )
+               == VLC_SUCCESS )
+           {
+               val.i_int = AOUT_VAR_7_1;
+               text.psz_string = "7.1";
+               var_Change( p_aout, "audio-device",
+                           VLC_VAR_ADDCHOICE, &val, &text );
+               msg_Dbg( p_aout, "device supports 7.1 channels" );
+           }
+       }
+
     /* Test for 3 Front 2 Rear support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                           AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
@@ -491,6 +530,9 @@ static void Probe( aout_instance_t * p_aout )
     }
     switch( DSSPEAKER_CONFIG(ui_speaker_config) )
     {
+    case DSSPEAKER_7POINT1:
+        val.i_int = AOUT_VAR_7_1;
+        break;
     case DSSPEAKER_5POINT1:
         val.i_int = AOUT_VAR_5_1;
         break;
