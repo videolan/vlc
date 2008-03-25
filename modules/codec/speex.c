@@ -637,7 +637,7 @@ static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block
       were encountered.
     */
     i_decode_ret = speex_decode_int( p_sys->p_state, &p_sys->bits, 
-            (spx_int16_t*)p_aout_buffer->p_buffer );
+            (int16_t*)p_aout_buffer->p_buffer );
     if ( i_decode_ret < 0 )
     {
         msg_Err( p_dec, "Decoding failed. Perhaps we have a bad stream?" );
