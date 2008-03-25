@@ -571,7 +571,7 @@ int inet_pton(int af, const char *src, void *dst)
     char *workaround_for_ill_designed_api = strdup( src );
 #endif
 
-    if( !WSAStringToAddress( workaround_for_ill_designed_api, af, NULL,
+    if( WSAStringToAddress( workaround_for_ill_designed_api, af, NULL,
                              (LPSOCKADDR)&addr, &len ) )
     {
         free( workaround_for_ill_designed_api );
