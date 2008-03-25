@@ -248,7 +248,7 @@ VLC_DEPRECATED_API char const * VLC_Error ( int i_err );
  *
  * \return vlc object id or an error code
  */
-VLC_DEPRECATED_API int     VLC_Create( void );
+VLC_PUBLIC_API int     VLC_Create( void );
 
 /**
  * Initialize a vlc_t structure
@@ -264,7 +264,7 @@ VLC_DEPRECATED_API int     VLC_Create( void );
  *  \param ppsz_argv an array of arguments
  *  \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int     VLC_Init( int, int, const char *[] );
+VLC_PUBLIC_API int     VLC_Init( int, int, const char *[] );
 
 /**
  * Add an interface
@@ -280,7 +280,7 @@ VLC_DEPRECATED_API int     VLC_Init( int, int, const char *[] );
  * \param b_play start playing when the interface is done loading
  * \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
+VLC_PUBLIC_API int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
 
 /**
  * Ask vlc to die
@@ -291,7 +291,7 @@ VLC_DEPRECATED_API int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int     VLC_Die( int );
+VLC_PUBLIC_API int     VLC_Die( int );
 
 /**
  * Clean up all the intf, playlist, vout and aout
@@ -304,7 +304,7 @@ VLC_DEPRECATED_API int     VLC_Die( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int     VLC_CleanUp( int );
+VLC_PUBLIC_API int     VLC_CleanUp( int );
 
 /**
  * Destroy all threads and the VLC object
@@ -316,7 +316,7 @@ VLC_DEPRECATED_API int     VLC_CleanUp( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int     VLC_Destroy( int );
+VLC_PUBLIC_API int     VLC_Destroy( int );
 
 /**
  * Set a VLC variable
