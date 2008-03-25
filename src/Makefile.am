@@ -374,8 +374,7 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c \
-	control/media_discoverer.c \
-	control/tag_query.c
+	control/media_discoverer.c
 
 ###############################################################################
 # Stamp rules
