@@ -275,6 +275,9 @@ case "${host_os}" in
     AC_CHECK_TOOL(WINDRES, windres, :)
 
     case "${host_os}" in
+      *wince* | *mingwce* | *mingw32ce* | *pe*)
+        SYS=mingwce
+        ;;
       *mingw32*)
         SYS=mingw32
         ;;
@@ -286,9 +289,6 @@ case "${host_os}" in
              yes
              #endif],
             SYS=mingw32, SYS=cygwin)
-        ;;
-      *wince* | *mingwce* | *pe*)
-        SYS=mingwce
         ;;
     esac
 
@@ -304,7 +304,7 @@ case "${host_os}" in
         # add ws2 for closesocket, select, recv
         VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([libvlc vlc],[-e WinMainCRTStartup])
-        VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync],[-lws2])
+        VLC_ADD_LIBS([libvlc access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp sap http netsync audioscrobbler growl rtp stream_out_rtp],[-lws2])
         VLC_ADD_LIBS([libvlc],[-lmmtimer])
    fi
     ;;
