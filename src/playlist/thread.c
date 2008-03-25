@@ -38,6 +38,8 @@
 static void RunControlThread ( playlist_t * );
 static void RunPreparse( playlist_preparse_t * );
 static void RunFetcher( playlist_fetcher_t * );
+static void PreparseDestructor( vlc_object_t * );
+static void FetcherDestructor( vlc_object_t * );
 
 /*****************************************************************************
  * Main functions for the global thread
@@ -78,12 +80,13 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     p_playlist->p_preparse->i_waiting = 0;
     p_playlist->p_preparse->pp_waiting = NULL;
 
+    vlc_object_set_destructor( p_playlist->p_preparse, PreparseDestructor );
+
     vlc_object_attach( p_playlist->p_preparse, p_playlist );
     if( vlc_thread_create( p_playlist->p_preparse, "preparser",
                            RunPreparse, VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
         msg_Err( p_playlist, "cannot spawn preparse thread" );
-        vlc_object_detach( p_playlist->p_preparse );
         vlc_object_release( p_playlist->p_preparse );
         return;
     }
@@ -104,6 +107,8 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     p_playlist->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
                                                                 "album-art" );
 
+    vlc_object_set_destructor( p_playlist->p_fetcher, FetcherDestructor );
+
     vlc_object_attach( p_playlist->p_fetcher, p_playlist );
     if( vlc_thread_create( p_playlist->p_fetcher,
                            "fetcher",
@@ -111,7 +116,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
-        vlc_object_detach( p_playlist->p_fetcher );
         vlc_object_release( p_playlist->p_fetcher );
         return;
     }
@@ -146,20 +150,12 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
     // Kill preparser
     if( p_playlist->p_preparse )
     {
-        vlc_object_kill( p_playlist->p_preparse );
-        vlc_thread_join( p_playlist->p_preparse );
-        free( p_playlist->p_preparse->pp_waiting );
-        vlc_object_detach( p_playlist->p_preparse );
         vlc_object_release( p_playlist->p_preparse );
     }
 
     // Kill meta fetcher
     if( p_playlist->p_fetcher )
     {
-        vlc_object_kill( p_playlist->p_fetcher );
-        vlc_thread_join( p_playlist->p_fetcher );
-        free( p_playlist->p_fetcher->p_waiting );
-        vlc_object_detach( p_playlist->p_fetcher );
         vlc_object_release( p_playlist->p_fetcher );
     }
 
@@ -220,4 +216,16 @@ static void RunFetcher( playlist_fetcher_t *p_obj )
     /* Tell above that we're ready */
     vlc_thread_ready( p_obj );
     playlist_FetcherLoop( p_obj );
+}
+
+static void PreparseDestructor( vlc_object_t * p_this )
+{
+    playlist_preparse_t * p_preparse = (playlist_preparse_t *)p_this;
+    free( p_preparse->pp_waiting );
+}
+
+static void FetcherDestructor( vlc_object_t * p_this )
+{
+    playlist_fetcher_t * p_fetcher = (playlist_fetcher_t *)p_this;
+    free( p_fetcher->p_waiting );
 }
