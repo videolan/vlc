@@ -71,6 +71,20 @@ uint32_t CPUCapabilities( void );
  * LibVLC objects stuff
  */
 
+/**
+ * Creates a VLC object.
+ *
+ * Note that because the object name pointer must remain valid, potentially
+ * even after the destruction of the object (through the message queues), this
+ * function CANNOT be exported to plugins as is. In this case, the old
+ * vlc_object_create() must be used instead.
+ *
+ * @param p_this an existing VLC object
+ * @param i_size byte size of the object structure
+ * @param i_type object type, usually VLC_OBJECT_CUSTOM
+ * @param psz_type object type name
+ * @return the created object, or NULL.
+ */
 extern vlc_object_t *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
