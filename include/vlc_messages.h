@@ -59,7 +59,7 @@ typedef struct
 {
     int     i_type;                             /**< message type, see below */
     int     i_object_id;
-    int     i_object_type;
+    const char *psz_object_type;
     char *  psz_module;
     char *  psz_msg;                            /**< the message itself */
     char *  psz_header;                         /**< Additional header */
@@ -160,8 +160,6 @@ void __msg_Destroy ( vlc_object_t * );
 #define msg_Unsubscribe(a,b) __msg_Unsubscribe(VLC_OBJECT(a),b)
 VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
-
-VLC_EXPORT(const char *, msg_GetObjectTypeName, (int i_object_type ));
 
 /**
  * @}

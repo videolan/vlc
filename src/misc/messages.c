@@ -197,35 +197,6 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
     UNLOCK_BANK;
 }
 
-const char *msg_GetObjectTypeName(int i_object_type )
-{
-    switch( i_object_type )
-    {
-        case VLC_OBJECT_GLOBAL: return "global";
-        case VLC_OBJECT_LIBVLC: return "libvlc";
-        case VLC_OBJECT_MODULE: return "module";
-        case VLC_OBJECT_INTF: return "interface";
-        case VLC_OBJECT_PLAYLIST: return "playlist";
-        case VLC_OBJECT_ITEM: return "item";
-        case VLC_OBJECT_INPUT: return "input";
-        case VLC_OBJECT_DECODER: return "decoder";
-        case VLC_OBJECT_PACKETIZER: return "packetizer";
-        case VLC_OBJECT_ENCODER: return "encoder";
-        case VLC_OBJECT_VOUT: return "video output";
-        case VLC_OBJECT_AOUT: return "audio output";
-        case VLC_OBJECT_SOUT: return "stream output";
-        case VLC_OBJECT_HTTPD: return "http server";
-        case VLC_OBJECT_HTTPD_HOST: return "http server";
-        case VLC_OBJECT_DIALOGS: return "dialogs provider";
-        case VLC_OBJECT_VLM: return "vlm";
-        case VLC_OBJECT_ANNOUNCE: return "announce handler";
-        case VLC_OBJECT_DEMUX: return "demuxer";
-        case VLC_OBJECT_ACCESS: return "access";
-        case VLC_OBJECT_META_ENGINE: return "meta engine";
-        default: return "private";
-    }
-}
-
 /*****************************************************************************
  * __msg_*: print a message
  *****************************************************************************
@@ -479,7 +450,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 
                 p_item->i_type =        VLC_MSG_WARN;
                 p_item->i_object_id =   p_this->i_object_id;
-                p_item->i_object_type = p_this->i_object_type;
+                p_item->psz_object_type = p_this->psz_object_type;
                 p_item->psz_module =    strdup( "message" );
                 p_item->psz_msg =       strdup( "message queue overflowed" );
                 p_item->psz_header =    NULL;
@@ -501,7 +472,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
     /* Fill message information fields */
     p_item->i_type =        i_type;
     p_item->i_object_id =   p_this->i_object_id;
-    p_item->i_object_type = p_this->i_object_type;
+    p_item->psz_object_type = p_this->psz_object_type;
     p_item->psz_module =    strdup( psz_module );
     p_item->psz_msg =       psz_str;
     p_item->psz_header =    psz_header;
@@ -603,7 +574,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
             break;
     }
 
-    psz_object = msg_GetObjectTypeName(p_item->i_object_type);
+    psz_object = p_item->psz_object_type;
 
 #ifdef UNDER_CE
 #   define CE_WRITE(str) WriteFile( QUEUE(MSG_QUEUE_NORMAL).logfile, \

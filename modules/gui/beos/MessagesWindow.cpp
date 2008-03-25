@@ -54,7 +54,7 @@ void MessagesView::Pulse()
     }
 
     int i_start, oldLength;
-    char * psz_module_type = NULL;
+    const char * psz_module_type = NULL;
     rgb_color red = { 200, 0, 0 };
     rgb_color gray = { 150, 150, 150 };
     rgb_color green = { 0, 150, 0 };
@@ -80,20 +80,7 @@ void MessagesView::Pulse()
                 case VLC_MSG_DBG: color = gray; break;
             }
 
-            switch( p_sub->p_msg[i_start].i_object_type )
-            {
-                case VLC_OBJECT_ROOT: psz_module_type = "root"; break;
-                case VLC_OBJECT_VLC: psz_module_type = "vlc"; break;
-                case VLC_OBJECT_MODULE: psz_module_type = "module"; break;
-                case VLC_OBJECT_INTF: psz_module_type = "interface"; break;
-                case VLC_OBJECT_PLAYLIST: psz_module_type = "playlist"; break;
-                case VLC_OBJECT_ITEM: psz_module_type = "item"; break;
-                case VLC_OBJECT_INPUT: psz_module_type = "input"; break;
-                case VLC_OBJECT_DECODER: psz_module_type = "decoder"; break;
-                case VLC_OBJECT_VOUT: psz_module_type = "video output"; break;
-                case VLC_OBJECT_AOUT: psz_module_type = "audio output"; break;
-                case VLC_OBJECT_SOUT: psz_module_type = "stream output"; break;
-            }
+            psz_module_type = p_sub->p_msg[i_start].psz_object_type;
 
             if( LockLooper() )
             {

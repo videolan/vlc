@@ -173,7 +173,6 @@ __msg_Dbg
 __msg_Err
 __msg_Generic
 __msg_GenericVa
-msg_GetObjectTypeName
 __msg_Info
 __msg_Subscribe
 __msg_Unsubscribe

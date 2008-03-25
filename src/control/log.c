@@ -172,7 +172,7 @@ libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
                 vlc_mutex_lock(p_iter->p_messages->p_lock);
                 msg = p_iter->p_messages->p_msg+i_pos;
                 buffer->i_severity  = msg->i_type;
-                buffer->psz_type    = msg_GetObjectTypeName(msg->i_object_type);
+                buffer->psz_type    = msg->psz_object_type;
                 buffer->psz_name    = msg->psz_module;
                 buffer->psz_header  = msg->psz_header;
                 buffer->psz_message = msg->psz_msg;
