@@ -834,8 +834,12 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     i_ret = (B_OK == wait_for_thread( p_priv->thread_id, &exit_value ));
 
 #elif defined( LIBVLC_USE_PTHREAD )
-    i_ret = pthread_join( p_priv->thread_id, NULL );
-
+    /* Make sure we do return if we are calling vlc_thread_join()
+     * from the joined thread */
+    if (pthread_equal (pthread_self (), p_priv->thread_id))
+        i_ret = pthread_detach (p_priv->thread_id);
+    else
+        i_ret = pthread_join (p_priv->thread_id, NULL);
 #endif
 
     if( i_ret )
