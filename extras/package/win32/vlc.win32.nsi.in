@@ -37,7 +37,7 @@ SetCompressor /SOLID lzma
 ;ShowUnInstDetails show
 SetOverwrite ifnewer
 CRCCheck on
-BrandingText ${PRODUCT_GROUP} ${PRODUCT_NAME}
+BrandingText "${PRODUCT_GROUP} ${PRODUCT_NAME}"
 
 InstType "Recommended"
 InstType "Minimum"
