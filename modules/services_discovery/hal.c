@@ -101,6 +101,8 @@ static int Open( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
 #ifdef HAVE_HAL_1
     DBusError           dbus_error;
@@ -202,12 +204,13 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
     struct udi_input_id_t *p_udi_entry;
     p_udi_entry = malloc( sizeof( struct udi_input_id_t ) );
     if( !p_udi_entry )
-    {
         return;
-    }
+    p_udi_entry->psz_udi = strdup( psz_device );
+    if( !p_udi_entry->psz_udi )
+        return;
+
     vlc_gc_incref( p_input );
     p_udi_entry->p_item = p_input;
-    p_udi_entry->psz_udi = strdup( psz_device );
     TAB_APPEND( p_sys->i_devices_number, p_sys->pp_devices, p_udi_entry );
 #endif
 }
