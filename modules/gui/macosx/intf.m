@@ -409,11 +409,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (id)init
 {
-    if( _o_sharedMainInstance) {
+    if( _o_sharedMainInstance) 
+    {
         [self dealloc];
-    } else {
+        return _o_sharedMainInstance;
+    } 
+    else
         _o_sharedMainInstance = [super init];
-    }
 
     o_about = [[VLAboutBox alloc] init];
     o_prefs = [[VLCPrefs alloc] init];
