@@ -382,7 +382,8 @@ VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, con
 VLC_EXPORT( input_item_t *, __input_ItemNewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, mtime_t i_duration )  );
 VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, mtime_t i_duration, int ) );
 
-VLC_EXPORT( input_item_t *, input_ItemGetById, (playlist_t *, int ) );
+#define input_ItemGetById(a,b) __input_ItemGetById( VLC_OBJECT(a),b )
+VLC_EXPORT( input_item_t *, __input_ItemGetById, (vlc_object_t *, int ) );
 
 /*****************************************************************************
  * Meta data helpers

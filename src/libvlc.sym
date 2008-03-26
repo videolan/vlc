@@ -130,7 +130,7 @@ input_DecoderNew
 input_GetItem
 input_ItemAddInfo
 input_ItemAddOpt
-input_ItemGetById
+__input_ItemGetById
 input_ItemGetInfo
 __input_ItemNewExt
 input_ItemNewWithType

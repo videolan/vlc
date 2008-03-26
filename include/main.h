@@ -26,6 +26,8 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
+
 /*****************************************************************************
  * libvlc_internal_instance_t
  *****************************************************************************
@@ -46,6 +48,11 @@ struct libvlc_int_t
     playlist_t            *p_playlist;       ///< playlist object
 
     vlc_object_t          *p_interaction;       ///< interface interaction object
+
+    /* There is no real reason to keep a list of items, but not to break
+     * everything, let's keep it */
+    input_item_array_t    input_items;       ///< Array of all created input items
+    int                   i_last_input_id ;  ///< Last id of input item
 
     /* Messages */
     msg_bank_t             msg_bank;    ///< The message bank

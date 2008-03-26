@@ -104,14 +104,16 @@ static void input_ItemDestroy ( gc_object_t *p_this )
     input_item_t *p_input = (input_item_t *) p_this;
     int i;
 
-    playlist_t *p_playlist = pl_Yield( p_obj );
     input_ItemClean( p_input );
 
-    ARRAY_BSEARCH( p_playlist->input_items,->i_id, int, p_input->i_id, i);
-    if( i != -1 )
-        ARRAY_REMOVE( p_playlist->input_items, i);
+    vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
 
-    pl_Release( p_obj );
+    ARRAY_BSEARCH( p_obj->p_libvlc->input_items,->i_id, int, p_input->i_id, i);
+    if( i != -1 )
+        ARRAY_REMOVE( p_obj->p_libvlc->input_items, i);
+
+    vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
+
     free( p_input );
 }
 
@@ -215,13 +217,20 @@ int input_ItemAddInfo( input_item_t *p_i,
     return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
-input_item_t *input_ItemGetById( playlist_t *p_playlist, int i_id )
+input_item_t *__input_ItemGetById( vlc_object_t *p_obj, int i_id )
 {
+    input_item_t * p_ret = NULL;
     int i;
-    ARRAY_BSEARCH( p_playlist->input_items, ->i_id, int, i_id, i);
+
+    vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
+
+    ARRAY_BSEARCH( p_obj->p_libvlc->input_items, ->i_id, int, i_id, i);
     if( i != -1 )
-        return ARRAY_VAL( p_playlist->input_items, i);
-    return NULL;
+        p_ret = ARRAY_VAL( p_obj->p_libvlc->input_items, i);
+
+    vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
+
+    return p_ret;
 }
 
 input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
@@ -243,17 +252,15 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 mtime_t i_duration,
                                 int i_type )
 {
-    playlist_t *p_playlist = pl_Yield( p_obj );
     DECMALLOC_NULL( p_input, input_item_t );
 
     input_ItemInit( p_obj, p_input );
     vlc_gc_init( p_input, input_ItemDestroy, (void *)p_obj );
 
-    PL_LOCK;
-    p_input->i_id = ++p_playlist->i_last_input_id;
-    ARRAY_APPEND( p_playlist->input_items, p_input );
-    PL_UNLOCK;
-    pl_Release( p_obj );
+    vlc_mutex_lock( &p_obj->p_libvlc->object_lock );
+    p_input->i_id = ++p_obj->p_libvlc->i_last_input_id;
+    ARRAY_APPEND( p_obj->p_libvlc->input_items, p_input );
+    vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
 
     p_input->b_fixed_name = VLC_FALSE;
 

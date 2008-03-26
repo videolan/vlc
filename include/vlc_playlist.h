@@ -39,7 +39,6 @@ extern "C" {
 #include <stdlib.h>
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
-TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
 
 /**
  * \file
@@ -176,8 +175,6 @@ struct playlist_t
     playlist_item_array_t items; /**< Arrays of items */
     playlist_item_array_t all_items; /**< Array of items and nodes */
 
-    input_item_array_t    input_items; /**< Array of input items */
-
     playlist_item_array_t current; /**< Items currently being played */
     int                   i_current_index; /**< Index in current array */
     /** Reset current item array */
@@ -185,7 +182,6 @@ struct playlist_t
     mtime_t               last_rebuild_date;
 
     int                   i_last_playlist_id; /**< Last id to an item */
-    int                   i_last_input_id ; /**< Last id on an input */
 
     /* Predefined items */
     playlist_item_t *     p_root_category; /**< Root of category tree */

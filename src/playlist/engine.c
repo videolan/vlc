@@ -80,7 +80,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     /* Initialise data structures */
     vlc_mutex_init( p_playlist, &p_playlist->gc_lock );
     p_playlist->i_last_playlist_id = 0;
-    p_playlist->i_last_input_id = 0;
     p_playlist->p_input = NULL;
 
     p_playlist->gc_date = 0;
@@ -88,7 +87,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     ARRAY_INIT( p_playlist->items );
     ARRAY_INIT( p_playlist->all_items );
-    ARRAY_INIT( p_playlist->input_items );
     ARRAY_INIT( p_playlist->current );
 
     p_playlist->i_current_index = 0;
@@ -491,12 +489,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
         free( p_del );
     FOREACH_END();
     ARRAY_RESET( p_playlist->all_items );
-
-    FOREACH_ARRAY( input_item_t *p_del, p_playlist->input_items )
-        input_ItemClean( p_del );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_playlist->input_items );
 
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );

@@ -726,6 +726,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_libvlc->i_timers = 0;
     p_libvlc->pp_timers = NULL;
 
+    /* Init the array that holds every input item */
+    ARRAY_INIT( p_libvlc->input_items );
+    p_libvlc->i_last_input_id = 0;
+
     /*
      * Initialize hotkey handling
      */
@@ -966,6 +970,15 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlc_object_release( p_announce );
         announce_HandlerDestroy( p_announce );
     }
+
+    msg_Dbg( p_libvlc, "removing remaining input items" );
+    FOREACH_ARRAY( input_item_t *p_del, p_libvlc->input_items )
+        msg_Dbg( p_libvlc, "WARNING: %p input item has not been deleted properly", p_del );
+        input_ItemClean( p_del );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_libvlc->input_items );
+
     return VLC_SUCCESS;
 }
 
