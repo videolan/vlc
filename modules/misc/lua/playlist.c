@@ -188,6 +188,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     lua_State *L;
+    int ret;
 
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     if( !p_demux->p_sys )
@@ -223,10 +224,12 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
     lua_pop( L, 1 );
 
-    return vlclua_scripts_batch_execute( p_this, "luaplaylist", &probe_luascript,
-                                         L, NULL );
+    ret = vlclua_scripts_batch_execute( p_this, "luaplaylist",
+                                        &probe_luascript, L, NULL );
+    if( ret )
+        E_(Close_LuaPlaylist)( p_this );
+    return ret;
 }
-
 
 
 /*****************************************************************************
