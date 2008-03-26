@@ -129,11 +129,9 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         /* Reattach video output to playlist before bailing out */
         if( p_vout )
         {
-            playlist_t  *p_playlist = pl_Yield( p_this );
             spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
             vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_this );
-            pl_Release( p_this );
+            vlc_object_attach( p_vout, p_this->p_libvlc );
         }
         return NULL;
     }
@@ -149,20 +147,16 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( !p_vout )
         {
-            playlist_t *p_playlist = pl_Yield( p_this );
-            vlc_mutex_lock( &p_playlist->gc_lock );
-            p_vout = vlc_object_find( p_playlist,
+            p_vout = vlc_object_find( p_this->p_libvlc,
                                       VLC_OBJECT_VOUT, FIND_CHILD );
             /* only first children of p_input for unused vout */
-            if( p_vout && p_vout->p_parent != (vlc_object_t *)p_playlist )
+            if( p_vout && p_vout->p_parent != VLC_OBJECT(p_this->p_libvlc) )
             {
                 vlc_object_release( p_vout );
                 p_vout = NULL;
             }
             if( p_vout )
                 vlc_object_detach( p_vout );    /* Remove it from the GC */
-            vlc_mutex_unlock( &p_playlist->gc_lock );
-            pl_Release( p_this );
         }
     }
 
@@ -496,20 +490,21 @@ void vout_Destroy( vout_thread_t *p_vout )
 
 static void vout_Destructor( vlc_object_t * p_this )
 {
-    vout_thread_t *p_vout = p_this;
-    vout_thread_t *p_another_vout;
-    playlist_t *p_playlist = pl_Yield( p_vout );
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     free( p_vout->psz_filter_chain );
 
     config_ChainDestroy( p_vout->p_cfg );
 
 #ifndef __APPLE__
+    vout_thread_t *p_another_vout;
+    playlist_t *p_playlist = pl_Yield( p_vout );
+
     /* This is a dirty hack for mostly Linux, where there is no way to get the GUI
        back if you closed it while playing video. This is solved in Mac OS X,
        where we have this novelty called menubar, that will always allow you access
        to the applications main functionality. They should try that on linux sometime */
-    p_another_vout = vlc_object_find( p_playlist,
+    p_another_vout = vlc_object_find( p_this->p_libvlc,
                                       VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_another_vout == NULL )
     {
@@ -521,8 +516,8 @@ static void vout_Destructor( vlc_object_t * p_this )
     {
         vlc_object_release( p_another_vout );
     }
-#endif
     vlc_object_release( p_playlist );
+#endif
 }
 
 /*****************************************************************************
