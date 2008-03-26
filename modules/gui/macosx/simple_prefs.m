@@ -578,6 +578,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     
     [self resetControls];
 
+    [o_sprefs_win center];
     [o_sprefs_win makeKeyAndOrderFront: self];
 }
 
@@ -920,6 +921,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         /* restore our window's height, if we've shown another category previously */
         o_old_view_rect = [o_currentlyShownCategoryView frame];
         o_win_rect.size.height = o_win_rect.size.height - o_old_view_rect.size.height;
+        o_win_rect.origin.y = ( o_win_rect.origin.y + o_old_view_rect.size.height ) - o_view_rect.size.height;
 
         /* remove our previous category view */
         [o_currentlyShownCategoryView removeFromSuperviewWithoutNeedingDisplay];
