@@ -24,6 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
@@ -242,7 +247,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     module_Unneed( p_blend, p_blend->p_module );
 
     vlc_object_detach( p_blend );
-    vlc_object_destroy( p_blend );
+    vlc_object_release( p_blend );
 
     p_sys->b_done = VLC_TRUE;
     return p_pic;
