@@ -29,11 +29,6 @@
 # include "config.h"
 #endif
 
-#include <errno.h>
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
-#include <math.h>
-
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include <vlc_vout.h>
@@ -144,6 +139,8 @@ static int LoadImage( vlc_object_t *p_this, picture_t **pp_pic,
     msg_Dbg( p_this, "%s image has dim %d x %d (Y plane)", psz_name,
              (*pp_pic)->p[Y_PLANE].i_visible_pitch,
              (*pp_pic)->p[Y_PLANE].i_visible_lines );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
