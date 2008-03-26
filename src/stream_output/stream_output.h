@@ -98,7 +98,7 @@ struct announce_handler_t
 
 int announce_HandlerDestroy( announce_handler_t * );
 
+/* Release it with vlc_object_release() */
 sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
-void announce_SAPHandlerDestroy( sap_handler_t *p_sap );
 
 #endif

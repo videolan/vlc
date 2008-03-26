@@ -106,6 +106,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
                              session_descriptor_t *p_session );
 
+static void announce_SAPHandlerDestructor( vlc_object_t *p_this );
+
 
 /**
  * Create the SAP handler
@@ -140,23 +142,21 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
                        VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
         msg_Dbg( p_announce, "unable to spawn SAP handler thread");
-        free( p_sap );
+        vlc_object_release( p_sap );
         return NULL;
-    };
+    }
+
+    vlc_object_set_destructor( p_sap, announce_SAPHandlerDestructor );
+
     msg_Dbg( p_announce, "thread created, %i sessions", p_sap->i_sessions);
+
     return p_sap;
 }
 
-/**
- *  Destroy the SAP handler
- *  \param p_this the SAP Handler to destroy
- *  \return nothing
- */
-void announce_SAPHandlerDestroy( sap_handler_t *p_sap )
+static void announce_SAPHandlerDestructor( vlc_object_t * p_this )
 {
+    sap_handler_t *p_sap = (sap_handler_t *)p_this;
     int i;
-
-    vlc_mutex_destroy( &p_sap->object_lock );
 
     /* Free the remaining sessions */
     for( i = 0 ; i< p_sap->i_sessions ; i++)
@@ -183,9 +183,6 @@ void announce_SAPHandlerDestroy( sap_handler_t *p_sap )
         REMOVE_ELEM( p_sap->pp_addresses, p_sap->i_addresses, i );
         FREENULL( p_address );
     }
-
-    /* Free the structure */
-    vlc_object_release( p_sap );
 }
 
 /**
