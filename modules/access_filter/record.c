@@ -160,7 +160,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_access, "Record access filter path %s", psz );
 
     /* catch all key event */
-    var_AddCallback( p_access->p_libvlc, "key-pressed", EventKey, p_access );
+    var_AddCallback( p_access->p_libvlc, "key-action", EventKey, p_access );
 
     return VLC_SUCCESS;
 }
@@ -173,7 +173,7 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    var_DelCallback( p_access->p_libvlc, "key-pressed", EventKey, p_access );
+    var_DelCallback( p_access->p_libvlc, "key-action", EventKey, p_access );
 
     if( p_sys->f )
     {
@@ -279,18 +279,10 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
     access_t     *p_access = p_data;
     access_sys_t *p_sys = p_access->p_sys;
 
-    struct hotkey *p_hotkeys = p_access->p_libvlc->p_hotkeys;
-    int i_action = -1, i;
+    (void)psz_var;
+    (void)oldval;
 
-    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-    {
-        if( p_hotkeys[i].i_key == newval.i_int )
-        {
-            i_action = p_hotkeys[i].i_action;
-        }
-    }
-
-    if( i_action == ACTIONID_RECORD )
+    if( newval.i_int == ACTIONID_RECORD )
     {
         if( p_sys->b_dump )
             p_sys->b_dump = VLC_FALSE;
