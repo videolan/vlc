@@ -1746,7 +1746,10 @@ static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
     for( i = 0; i < i_read / 2 ; i++ )
     {
         if( i >= count )
+        {
+            MP4_FreeBox_padb( p_box );
             MP4_READBOX_EXIT( 0 );
+        }
         p_box->data.p_padb->i_reserved1[i] = ( (*p_peek) >> 7 )&0x01;
         p_box->data.p_padb->i_pad2[i] = ( (*p_peek) >> 4 )&0x07;
         p_box->data.p_padb->i_reserved1[i] = ( (*p_peek) >> 3 )&0x01;
