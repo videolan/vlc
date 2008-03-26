@@ -121,6 +121,8 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
+    [[VLCMain sharedInstance] setIntf: nil];
+    
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     [p_intf->p_sys->o_sendport release];
