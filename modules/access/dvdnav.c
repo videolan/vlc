@@ -113,7 +113,7 @@ typedef struct
 
     vlc_bool_t      b_moved;
     vlc_bool_t      b_clicked;
-    vlc_bool_t      b_key;
+    int             i_key_action;
 
     vlc_bool_t      b_still;
     int64_t         i_still_end;
@@ -1225,11 +1225,11 @@ static int EventThread( vlc_object_t *p_this )
     vlc_mutex_init( p_ev, &p_ev->lock );
     p_ev->b_moved   = VLC_FALSE;
     p_ev->b_clicked = VLC_FALSE;
-    p_ev->b_key     = VLC_FALSE;
+    p_ev->i_key_action = 0;
     p_ev->b_still   = VLC_FALSE;
 
     /* catch all key event */
-    var_AddCallback( p_ev->p_libvlc, "key-pressed", EventKey, p_ev );
+    var_AddCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
 
     /* main loop */
     while( !p_ev->b_die )
@@ -1237,25 +1237,15 @@ static int EventThread( vlc_object_t *p_this )
         vlc_bool_t b_activated = VLC_FALSE;
 
         /* KEY part */
-        if( p_ev->b_key )
+        if( p_ev->i_key_action != 0 )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
             vlc_value_t valk;
-            struct hotkey *p_hotkeys = p_ev->p_libvlc->p_hotkeys;
-            int i, i_action = -1;
+            int i;
 
             vlc_mutex_lock( &p_ev->lock );
-            var_Get( p_ev->p_libvlc, "key-pressed", &valk );
-            for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-            {
-                if( p_hotkeys[i].i_key == valk.i_int )
-                {
-                    i_action = p_hotkeys[i].i_action;
-                }
-            }
-
-            switch( i_action )
+            switch( p_ev->i_key_action )
             {
             case ACTIONID_NAV_LEFT:
                 dvdnav_left_button_select( p_sys->dvdnav, pci );
@@ -1277,7 +1267,7 @@ static int EventThread( vlc_object_t *p_this )
             default:
                 break;
             }
-            p_ev->b_key = VLC_FALSE;
+            p_ev->i_key_action = 0;
             vlc_mutex_unlock( &p_ev->lock );
         }
 
@@ -1350,7 +1340,7 @@ static int EventThread( vlc_object_t *p_this )
         var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
         vlc_object_release( p_vout );
     }
-    var_DelCallback( p_ev->p_libvlc, "key-pressed", EventKey, p_ev );
+    var_DelCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
 
     vlc_mutex_destroy( &p_ev->lock );
 
@@ -1376,7 +1366,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
 {
     event_thread_t *p_ev = p_data;
     vlc_mutex_lock( &p_ev->lock );
-    p_ev->b_key = VLC_TRUE;
+    p_ev->i_key_action = newval.i_int;
     vlc_mutex_unlock( &p_ev->lock );
 
     return VLC_SUCCESS;
