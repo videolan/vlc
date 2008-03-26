@@ -33,8 +33,13 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc/common.h>
+#include <vlc/deprecated.h>
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_structures.h>
+#include <vlc/libvlc_events.h>
+#include <vlc/libvlc_media_list.h>
+#include <vlc/libvlc_vlm.h>
 #include <vlc/mediacontrol.h>
 #include <vlc/mediacontrol_structures.h>
 
