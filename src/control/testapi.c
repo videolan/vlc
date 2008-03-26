@@ -259,16 +259,57 @@ static void test_events (const char ** argv, int argc)
     catch ();
 }
 
+static void test_media_player_play_stop(const char** argv, int argc)
+{
+    libvlc_instance_t *vlc;
+    libvlc_media_descriptor_t *md;
+    libvlc_media_instance_t *mi;
+    const char** file = "../bindings/java/core/src/test/resources/raffa_voice.ogg";
+
+    log ("Testing playback of %s\n", file);
+
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (argc, argv, &ex);
+    catch ();
+
+    md = libvlc_media_descriptor_new (vlc, file, &ex);
+    catch ();
+
+    mi = libvlc_media_instance_new_from_media_descriptor (md, &ex);
+    catch ();
+    
+    libvlc_media_descriptor_release (md);
+
+    libvlc_media_instance_play (mi, &ex);
+    catch ();
+
+    /* FIXME: Do something clever */
+    sleep(1);
+
+    assert( libvlc_media_instance_get_state (mi, &ex) != libvlc_Error );
+    catch ();
+
+    libvlc_media_instance_stop (mi, &ex);
+    catch ();
+
+    libvlc_media_instance_release (mi);
+    catch ();
+
+    libvlc_release (vlc);
+    catch ();
+    
+}
+
 int main (int argc, char *argv[])
 {
     const char *args[argc + 5];
     int nlibvlc_args = sizeof (args) / sizeof (args[0]);
 
-    alarm (30); /* Make sure "make check" does not get stuck */
+    alarm (50); /* Make sure "make check" does not get stuck */
 
     args[0] = "-vvv";
     args[1] = "-I";
-    args[2] = "-dummy";
+    args[2] = "dummy";
     args[3] = "--plugin-path=../modules";
     args[4] = "--vout=dummy";
     args[5] = "--aout=dummy";
@@ -276,6 +317,8 @@ int main (int argc, char *argv[])
         args[i + 3] = argv[i];
 
     test_core (args, nlibvlc_args);
+
+    test_media_player_play_stop(args, nlibvlc_args);
 
     test_events (args, nlibvlc_args);
 
