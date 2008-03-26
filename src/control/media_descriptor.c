@@ -349,7 +349,6 @@ void libvlc_media_descriptor_add_option(
  **************************************************************************/
 void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 {
-    int i;
     if (!p_md)
         return;
 
