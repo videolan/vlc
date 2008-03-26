@@ -182,9 +182,6 @@ void vlm_Delete( vlm_t *p_vlm )
  *****************************************************************************/
 static void vlm_Destructor( vlm_t *p_vlm )
 {
-    vlc_object_kill( p_vlm );
-    vlc_thread_join( p_vlm );
-
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
 
