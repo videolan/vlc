@@ -24,8 +24,6 @@
 #ifndef _LIBVLC_STRUCTURES_H
 #define _LIBVLC_STRUCTURES_H 1
 
-#include <vlc/vlc.h>
-
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -49,20 +47,6 @@ typedef struct libvlc_exception_t
     int i_code;
     char *psz_message;
 } libvlc_exception_t;
-
-/**@} */
-
-/*****************************************************************************
- * Tag
- *****************************************************************************/
-/** defgroup libvlc_tag Tag
- * \ingroup libvlc
- * LibVLC Tag  support in media descriptor
- * @{
- */
-
-typedef struct libvlc_tag_query_t libvlc_tag_query_t;
-typedef char * libvlc_tag_t;
 
 /**@} */
 
@@ -158,20 +142,6 @@ typedef enum libvlc_state_t
 
 typedef struct libvlc_media_list_t libvlc_media_list_t;
 typedef struct libvlc_media_list_view_t libvlc_media_list_view_t;
-
-/**@} */
-
-/*****************************************************************************
- * Dynamic Media List
- *****************************************************************************/
-/** defgroup libvlc_media_list MediaList
- * \ingroup libvlc
- * LibVLC Dynamic Media list: Media list with content synchronized with
- * an other playlist
- * @{
- */
-
-typedef struct libvlc_dynamic_media_list_t libvlc_dynamic_media_list_t;
 
 /**@} */
 
@@ -289,187 +259,6 @@ typedef struct libvlc_log_message_t
     const char *psz_header;   /* optional header */
     const char *psz_message;  /* message */
 } libvlc_log_message_t;
-
-/**@} */
-
-/*****************************************************************************
- * Callbacks handling
- *****************************************************************************/
-
-/** defgroup libvlc_callbacks Callbacks
- * \ingroup libvlc
- * LibVLC Event Callbacks
- * @{
- */
- 
-/**
- * Available events: (XXX: being reworked)
- * - libvlc_MediaInstanceReachedEnd
- */
-
-typedef enum libvlc_event_type_t {
-    libvlc_MediaDescriptorMetaChanged,
-    libvlc_MediaDescriptorSubItemAdded,
-    libvlc_MediaDescriptorDurationChanged,
-    libvlc_MediaDescriptorPreparsedChanged,
-    libvlc_MediaDescriptorFreed,
-    libvlc_MediaDescriptorStateChanged,
-
-    libvlc_MediaInstancePlayed,
-    libvlc_MediaInstancePaused,
-    libvlc_MediaInstanceReachedEnd,
-    libvlc_MediaInstanceEncounteredError,
-    libvlc_MediaInstanceTimeChanged,
-    libvlc_MediaInstancePositionChanged,
-    libvlc_MediaInstanceSeekableChanged,
-    libvlc_MediaInstancePausableChanged,
-
-    libvlc_MediaListItemAdded,
-    libvlc_MediaListWillAddItem,
-    libvlc_MediaListItemDeleted,
-    libvlc_MediaListWillDeleteItem,
-
-    libvlc_MediaListViewItemAdded,
-    libvlc_MediaListViewWillAddItem,
-    libvlc_MediaListViewItemDeleted,
-    libvlc_MediaListViewWillDeleteItem,
-
-    libvlc_MediaListPlayerPlayed,
-    libvlc_MediaListPlayerNextItemSet,
-    libvlc_MediaListPlayerStopped,
-
-    libvlc_MediaDiscovererStarted,
-    libvlc_MediaDiscovererEnded
-
-} libvlc_event_type_t;
-
-/**
- * An Event
- * \param type the even type
- * \param p_obj the sender object
- * \param u Event dependent content
- */
-
-typedef struct libvlc_event_t
-{
-    libvlc_event_type_t type;
-    void * p_obj;
-    union event_type_specific
-    {
-        /* media descriptor */
-        struct
-        {
-            libvlc_meta_t meta_type;
-        } media_descriptor_meta_changed;
-        struct
-        {
-            libvlc_media_descriptor_t * new_child;
-        } media_descriptor_subitem_added;
-        struct
-        {
-            vlc_int64_t new_duration;
-        } media_descriptor_duration_changed;
-        struct
-        {
-            int new_status;
-        } media_descriptor_preparsed_changed;
-        struct
-        {
-            libvlc_media_descriptor_t * md;
-        } media_descriptor_freed;
-        struct
-        {
-            libvlc_state_t new_state;
-        } media_descriptor_state_changed;
-            
-        /* media instance */
-        struct
-        {
-            float new_position;
-        } media_instance_position_changed;
-        struct
-        {
-            libvlc_time_t new_time;
-        } media_instance_time_changed;
-        struct
-        {
-            libvlc_time_t new_seekable;
-        } media_instance_seekable_changed;
-        struct
-        {
-            libvlc_time_t new_pausable;
-        } media_instance_pausable_changed;
-
-        /* media list */
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_item_added;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_will_add_item;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_item_deleted;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_will_delete_item;
-
-        /* media list view */
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_view_item_added;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_view_will_add_item;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_view_item_deleted;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_view_will_delete_item;
-
-        /* media discoverer */
-        struct
-        {
-            void * unused;
-        } media_media_discoverer_started;
-        struct
-        {
-            void * unused;
-        } media_media_discoverer_ended;
-
-    } u;
-} libvlc_event_t;
-
-/**
- * Event manager that belongs to a libvlc object, and from whom events can
- * be received.
- */
-
-typedef struct libvlc_event_manager_t libvlc_event_manager_t;
-
-/**
- * Callback function notification
- * \param p_event the event triggering the callback
- */
-
-typedef void ( *libvlc_callback_t )( const libvlc_event_t *, void * );
 
 /**@} */
 

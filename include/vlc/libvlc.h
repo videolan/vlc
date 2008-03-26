@@ -1,11 +1,12 @@
 /*****************************************************************************
- * libvlc.h:  libvlc_* new external API
+ * libvlc.h:  libvlc external API
  *****************************************************************************
  * Copyright (C) 1998-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
+ *          Pierre d'Herbemont <pdherbemont@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +35,6 @@
 #define _LIBVLC_H 1
 
 #include <vlc/vlc.h>
-#include <vlc/libvlc_structures.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -43,7 +43,7 @@ extern "C" {
 /*****************************************************************************
  * Exception handling
  *****************************************************************************/
-/** defgroup libvlc_exception Exceptions
+/** \defgroup libvlc_exception Exceptions
  * \ingroup libvlc
  * LibVLC Exceptions handling
  * @{
@@ -101,7 +101,7 @@ libvlc_exception_get_message( const libvlc_exception_t *p_exception );
  * Core handling
  *****************************************************************************/
 
-/** defgroup libvlc_core Core
+/** \defgroup libvlc_core Core
  * \ingroup libvlc
  * LibVLC Core
  * @{
@@ -150,7 +150,7 @@ VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
 /*****************************************************************************
  * Media descriptor
  *****************************************************************************/
-/** defgroup libvlc_media_descriptor Media Descriptor
+/** \defgroup libvlc_media_descriptor Media Descriptor
  * \ingroup libvlc
  * LibVLC Media Descriptor
  * @{
@@ -228,28 +228,6 @@ VLC_PUBLIC_API libvlc_state_t libvlc_media_descriptor_get_state(
                                    libvlc_media_descriptor_t *p_meta_desc,
                                    libvlc_exception_t *p_e );
 
-/* Tags */
-VLC_PUBLIC_API void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
-                                                     const char * key,
-                                                     const libvlc_tag_t tag,
-                                                     libvlc_exception_t *p_e );
-
-VLC_PUBLIC_API void libvlc_media_descriptor_remove_tag( libvlc_media_descriptor_t *p_md,
-                                                         const char * key,
-                                                         const libvlc_tag_t tag,
-                                                         libvlc_exception_t *p_e );
-
-VLC_PUBLIC_API int
-    libvlc_media_descriptor_tags_count_for_key( libvlc_media_descriptor_t *p_md,
-                                                const char * key,
-                                                libvlc_exception_t *p_e );
-
-VLC_PUBLIC_API libvlc_tag_t
-    libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
-                                                  int i,
-                                                  const char * key,
-                                                  libvlc_exception_t *p_e );
-
 VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_descriptor_subitems( libvlc_media_descriptor_t *p_md,
                                       libvlc_exception_t *p_e );
@@ -279,7 +257,7 @@ VLC_PUBLIC_API void *
 /*****************************************************************************
  * Media Instance
  *****************************************************************************/
-/** defgroup libvlc_media_instance Media Instance
+/** \defgroup libvlc_media_instance Media Instance
  * \ingroup libvlc
  * LibVLC Media Instance, object that let you play a media descriptor
  * in a libvlc_drawable_t
@@ -425,7 +403,7 @@ VLC_PUBLIC_API int libvlc_media_instance_is_seekable( libvlc_media_instance_t *p
  */
 VLC_PUBLIC_API int libvlc_media_instance_can_pause( libvlc_media_instance_t *p_mi, libvlc_exception_t *p_e );
 
-/** defgroup libvlc_video Video
+/** \defgroup libvlc_video Video
  * \ingroup libvlc_media_instance
  * LibVLC Video handling
  * @{
@@ -650,7 +628,7 @@ VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, const libvlc
 
 /** @} video */
 
-/** defgroup libvlc_audio Audio
+/** \defgroup libvlc_audio Audio
  * \ingroup libvlc_media_instance
  * LibVLC Audio handling
  * @{
@@ -753,7 +731,7 @@ VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *, int, libvlc_e
  * Event handling
  *****************************************************************************/
 
-/** defgroup libvlc_callbacks Callbacks
+/** \defgroup libvlc_callbacks Callbacks
  * \ingroup libvlc
  * LibVLC Events
  * @{
@@ -802,7 +780,7 @@ VLC_PUBLIC_API const char * libvlc_event_type_name( libvlc_event_type_t event_ty
 /*****************************************************************************
  * Media List
  *****************************************************************************/
-/** defgroup libvlc_media_list MediaList
+/** \defgroup libvlc_media_list MediaList
  * \ingroup libvlc
  * LibVLC Media List, a media list holds multiple media descriptors
  * @{
@@ -893,7 +871,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
 /*****************************************************************************
  * Media List View
  *****************************************************************************/
-/** defgroup libvlc_media_list_view MediaListView
+/** \defgroup libvlc_media_list_view MediaListView
  * \ingroup libvlc_media_list
  * LibVLC Media List View, represent a media_list using a different layout
  * @{ */
@@ -957,7 +935,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
 /*****************************************************************************
  * Media List Player
  *****************************************************************************/
-/** defgroup libvlc_media_list_player MediaListPlayer
+/** \defgroup libvlc_media_list_player MediaListPlayer
  * \ingroup libvlc
  * LibVLC Media List Player, play a media_list. You can see that as a media
  * instance subclass
@@ -1024,7 +1002,7 @@ VLC_PUBLIC_API void
 /*****************************************************************************
  * Media Library
  *****************************************************************************/
-/** defgroup libvlc_media_library Media Library
+/** \defgroup libvlc_media_library Media Library
  * \ingroup libvlc
  * LibVLC Media Library
  * @{
@@ -1057,7 +1035,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
 /*****************************************************************************
  * Services/Media Discovery
  *****************************************************************************/
-/** defgroup libvlc_media_discoverer Media Discoverer
+/** \defgroup libvlc_media_discoverer Media Discoverer
  * \ingroup libvlc
  * LibVLC Media Discoverer
  * @{
@@ -1082,179 +1060,10 @@ VLC_PUBLIC_API int
 
 
 /*****************************************************************************
- * VLM
- *****************************************************************************/
-/** defgroup libvlc_vlm VLM
- * \ingroup libvlc
- * LibVLC VLM
- * @{
- */
-
-/**
- * Add a broadcast, with one input.
- *
- * \param p_instance the instance
- * \param psz_name the name of the new broadcast
- * \param psz_input the input MRL
- * \param psz_output the output MRL (the parameter to the "sout" variable)
- * \param i_options number of additional options
- * \param ppsz_options additional options
- * \param b_enabled boolean for enabling the new broadcast
- * \param b_loop Should this broadcast be played in loop ?
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_add_broadcast( libvlc_instance_t *, char *, char *, char* ,
-                                              int, char **, int, int, libvlc_exception_t * );
-
-/**
- * Delete a media (VOD or broadcast).
- *
- * \param p_instance the instance
- * \param psz_name the media to delete
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_del_media( libvlc_instance_t *, char *, libvlc_exception_t * );
-
-/**
- * Enable or disable a media (VOD or broadcast).
- *
- * \param p_instance the instance
- * \param psz_name the media to work on
- * \param b_enabled the new status
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_set_enabled( libvlc_instance_t *, char *, int,
-                                            libvlc_exception_t *);
-
-/**
- * Set the output for a media.
- *
- * \param p_instance the instance
- * \param psz_name the media to work on
- * \param psz_output the output MRL (the parameter to the "sout" variable)
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_set_output( libvlc_instance_t *, char *, char*,
-                                           libvlc_exception_t *);
-
-/**
- * Set a media's input MRL. This will delete all existing inputs and
- * add the specified one.
- *
- * \param p_instance the instance
- * \param psz_name the media to work on
- * \param psz_input the input MRL
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_set_input( libvlc_instance_t *, char *, char*,
-                                          libvlc_exception_t *);
-
-/**
- * Add a media's input MRL. This will add the specified one.
- *
- * \param p_instance the instance
- * \param psz_name the media to work on
- * \param psz_input the input MRL
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_add_input( libvlc_instance_t *, char *, char *,
-                                          libvlc_exception_t *p_exception );
-/**
- * Set a media's loop status.
- *
- * \param p_instance the instance
- * \param psz_name the media to work on
- * \param b_loop the new status
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_set_loop( libvlc_instance_t *, char *, int,
-                                         libvlc_exception_t *);
-
-/**
- * Edit the parameters of a media. This will delete all existing inputs and
- * add the specified one.
- *
- * \param p_instance the instance
- * \param psz_name the name of the new broadcast
- * \param psz_input the input MRL
- * \param psz_output the output MRL (the parameter to the "sout" variable)
- * \param i_options number of additional options
- * \param ppsz_options additional options
- * \param b_enabled boolean for enabling the new broadcast
- * \param b_loop Should this broadcast be played in loop ?
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_change_media( libvlc_instance_t *, char *, char *, char* ,
-                                             int, char **, int, int, libvlc_exception_t * );
-
-/**
- * Play the named broadcast.
- *
- * \param p_instance the instance
- * \param psz_name the name of the broadcast
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_play_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
-
-/**
- * Stop the named broadcast.
- *
- * \param p_instance the instance
- * \param psz_name the name of the broadcast
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
-
-/**
- * Pause the named broadcast.
- *
- * \param p_instance the instance
- * \param psz_name the name of the broadcast
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_pause_media( libvlc_instance_t *, char *, libvlc_exception_t * );
-
-/**
- * Seek in the named broadcast.
- *
- * \param p_instance the instance
- * \param psz_name the name of the broadcast
- * \param f_percentage the percentage to seek to
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
-                                           float, libvlc_exception_t * );
-
-/**
- * Return information about the named broadcast.
- *
- * \param p_instance the instance
- * \param psz_name the name of the broadcast
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API char* libvlc_vlm_show_media( libvlc_instance_t *, char *, libvlc_exception_t * );
-
-#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
-returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *, \
-                        char *, int , libvlc_exception_t * );
-
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time, int, Integer, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length, int, Integer, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate, int, Integer, -1);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title, int, Integer, 0);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter, int, Integer, 0);
-VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
-
-#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
-
-/** @} */
-
-/*****************************************************************************
  * Message log handling
  *****************************************************************************/
 
-/** defgroup libvlc_log Log
+/** \defgroup libvlc_log Log
  * \ingroup libvlc
  * LibVLC Message Logging
  * @{
@@ -1350,177 +1159,6 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
                                                                libvlc_exception_t *p_e );
 
 /** @} */
-
-/*****************************************************************************
- * Playlist (Deprecated)
- *****************************************************************************/
-/** defgroup libvlc_playlist Playlist
- * \ingroup libvlc
- * LibVLC Playlist handling
- * @{
- */
-
-/**
- * Set the playlist's loop attribute. If set, the playlist runs continuously
- * and wraps around when it reaches the end.
- *
- * \param p_instance the playlist instance
- * \param loop the loop attribute. 1 sets looping, 0 disables it
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_loop( libvlc_instance_t* , int,
-                                          libvlc_exception_t * );
-
-/**
- * Start playing.
- *
- * Additionnal playlist item options can be specified for addition to the
- * item before it is played.
- *
- * \param p_instance the playlist instance
- * \param i_id the item to play. If this is a negative number, the next
- *        item will be selected. Otherwise, the item with the given ID will be
- *        played
- * \param i_options the number of options to add to the item
- * \param ppsz_options the options to add to the item
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_play( libvlc_instance_t*, int, int,
-                                          char **, libvlc_exception_t * );
-
-/**
- * Toggle the playlist's pause status.
- *
- * If the playlist was running, it is paused. If it was paused, it is resumed.
- *
- * \param p_instance the playlist instance to pause
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_pause( libvlc_instance_t *,
-                                           libvlc_exception_t * );
-
-/**
- * Checks whether the playlist is running
- *
- * \param p_instance the playlist instance
- * \param p_e an initialized exception pointer
- * \return 0 if the playlist is stopped or paused, 1 if it is running
- */
-VLC_DEPRECATED_API int libvlc_playlist_isplaying( libvlc_instance_t *,
-                                              libvlc_exception_t * );
-
-/**
- * Get the number of items in the playlist
- *
- * \param p_instance the playlist instance
- * \param p_e an initialized exception pointer
- * \return the number of items
- */
-VLC_DEPRECATED_API int libvlc_playlist_items_count( libvlc_instance_t *,
-                                                libvlc_exception_t * );
-
-/**
- * Lock the playlist.
- *
- * \param p_instance the playlist instance
- */
-VLC_DEPRECATED_API void libvlc_playlist_lock( libvlc_instance_t * );
-
-/**
- * Unlock the playlist.
- *
- * \param p_instance the playlist instance
- */
-VLC_DEPRECATED_API void libvlc_playlist_unlock( libvlc_instance_t * );
-
-/**
- * Stop playing.
- *
- * \param p_instance the playlist instance to stop
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_stop( libvlc_instance_t *,
-                                          libvlc_exception_t * );
-
-/**
- * Go to the next playlist item. If the playlist was stopped, playback
- * is started.
- *
- * \param p_instance the playlist instance
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_next( libvlc_instance_t *,
-                                          libvlc_exception_t * );
-
-/**
- * Go to the previous playlist item. If the playlist was stopped, playback
- * is started.
- *
- * \param p_instance the playlist instance
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_prev( libvlc_instance_t *,
-                                          libvlc_exception_t * );
-
-/**
- * Empty a playlist. All items in the playlist are removed.
- *
- * \param p_instance the playlist instance
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_playlist_clear( libvlc_instance_t *,
-                                           libvlc_exception_t * );
-
-/**
- * Append an item to the playlist. The item is added at the end. If more
- * advanced options are required, \see libvlc_playlist_add_extended instead.
- *
- * \param p_instance the playlist instance
- * \param psz_uri the URI to open, using VLC format
- * \param psz_name a name that you might want to give or NULL
- * \param p_e an initialized exception pointer
- * \return the identifier of the new item
- */
-VLC_DEPRECATED_API int libvlc_playlist_add( libvlc_instance_t *, const char *,
-                                        const char *, libvlc_exception_t * );
-
-/**
- * Append an item to the playlist. The item is added at the end, with
- * additional input options.
- *
- * \param p_instance the playlist instance
- * \param psz_uri the URI to open, using VLC format
- * \param psz_name a name that you might want to give or NULL
- * \param i_options the number of options to add
- * \param ppsz_options strings representing the options to add
- * \param p_e an initialized exception pointer
- * \return the identifier of the new item
- */
-VLC_DEPRECATED_API int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
-                                                 const char *, int, const char **,
-                                                 libvlc_exception_t * );
-
-/**
- * Delete the playlist item with the given ID.
- *
- * \param p_instance the playlist instance
- * \param i_id the id to remove
- * \param p_e an initialized exception pointer
- * \return 0 in case of success, a non-zero value otherwise
- */
-VLC_DEPRECATED_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
-                                                libvlc_exception_t * );
-
-/** Get the input that is currently being played by the playlist.
- *
- * \param p_instance the playlist instance to use
- * \param p_e an initialized exception pointern
- * \return a media instance object
- */
-VLC_DEPRECATED_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
-                                libvlc_instance_t *, libvlc_exception_t * );
-
-/** @}*/
 
 # ifdef __cplusplus
 }
