@@ -77,12 +77,6 @@ struct libvlc_instance_t
     struct libvlc_callback_entry_list_t *p_callback_list;
 };
 
-struct libvlc_tags_storage_t
-{
-    char ** ppsz_tags;
-    int i_count;
-};
-
 struct libvlc_media_descriptor_t
 {
     libvlc_event_manager_t * p_event_manager;
@@ -90,19 +84,10 @@ struct libvlc_media_descriptor_t
     input_item_t      *p_input_item;
     int                i_refcount;
     libvlc_instance_t *p_libvlc_instance;
-    vlc_dictionary_t   tags; /* To be merged with core's meta soon */
     libvlc_state_t     state;
     struct libvlc_media_list_t *p_subitems; /* A media descriptor can have
                                            * Sub item */
     void *p_user_data; /* Allows for VLC.framework to hook into media descriptor without creating a new VLCMedia object. */
-};
-
-struct libvlc_tag_query_t
-{
-    struct libvlc_instance_t  *p_libvlc_instance; /* Parent instance */
-    int                i_refcount;
-    libvlc_tag_t       tag;
-    char *             psz_tag_key;
 };
 
 struct libvlc_media_list_t
@@ -165,18 +150,6 @@ struct libvlc_media_list_view_t
     /* Notification callback */
     void (*pf_ml_item_added)(const libvlc_event_t *, libvlc_media_list_view_t *);
     void (*pf_ml_item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *);
-};
-
-struct libvlc_dynamic_media_list_t
-{
-    libvlc_instance_t *     p_libvlc_instance;
-    int                     i_refcount;
-    libvlc_media_list_t *   p_media_provider;
-    libvlc_tag_query_t *    p_query;
-    char *                  psz_tag_key;
-    libvlc_tag_t            tag;
-    struct libvlc_media_list_t *  p_mlist;
-    struct libvlc_media_list_t *  p_provider;
 };
 
 struct libvlc_media_instance_t
