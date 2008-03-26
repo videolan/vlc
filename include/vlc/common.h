@@ -36,9 +36,113 @@
 #ifndef _VLC_COMMON_H
 #define _VLC_COMMON_H 1
 
-#ifndef __cplusplus
-# include <stdbool.h>
+# ifdef __cplusplus
+extern "C" {
+# else
+#  include <stdbool.h>
+# endif
+
+/*****************************************************************************
+ * Our custom types
+ *****************************************************************************/
+typedef bool vlc_bool_t; /* (shouldn't be exposed) */
+typedef struct vlc_list_t vlc_list_t; /* (shouldn't be exposed) */
+typedef struct vlc_object_t vlc_object_t; /* (shouldn't be exposed) */
+
+#if (defined( WIN32 ) || defined( UNDER_CE )) && !defined( __MINGW32__ )
+typedef signed __int64 vlc_int64_t;
+# else
+typedef signed long long vlc_int64_t;
 #endif
+
+/**
+ * VLC value structure (shouldn't be exposed)
+ */
+typedef union
+{
+    int             i_int;
+    vlc_bool_t      b_bool;
+    float           f_float;
+    char *          psz_string;
+    void *          p_address;
+    vlc_object_t *  p_object;
+    vlc_list_t *    p_list;
+    vlc_int64_t     i_time;
+
+    struct { char *psz_name; int i_object_id; } var;
+
+   /* Make sure the structure is at least 64bits */
+    struct { char a, b, c, d, e, f, g, h; } padding;
+
+} vlc_value_t;
+
+/**
+ * VLC list structure  (shouldn't be exposed)
+ */
+struct vlc_list_t
+{
+    int             i_count;
+    vlc_value_t *   p_values;
+    int *           pi_types;
+
+};
+
+/*****************************************************************************
+ * Error values (shouldn't be exposed)
+ *****************************************************************************/
+#define VLC_SUCCESS         -0                                   /* No error */
+#define VLC_ENOMEM          -1                          /* Not enough memory */
+#define VLC_ETHREAD         -2                               /* Thread error */
+#define VLC_ETIMEOUT        -3                                    /* Timeout */
+
+#define VLC_ENOMOD         -10                           /* Module not found */
+
+#define VLC_ENOOBJ         -20                           /* Object not found */
+#define VLC_EBADOBJ        -21                            /* Bad object type */
+
+#define VLC_ENOVAR         -30                         /* Variable not found */
+#define VLC_EBADVAR        -31                         /* Bad variable value */
+
+#define VLC_ENOITEM        -40                           /**< Item not found */
+
+#define VLC_EEXIT         -255                             /* Program exited */
+#define VLC_EEXITSUCCESS  -999                /* Program exited successfully */
+#define VLC_EGENERIC      -666                              /* Generic error */
+
+/*****************************************************************************
+ * Booleans (shouldn't be exposed)
+ *****************************************************************************/
+#define VLC_FALSE false
+#define VLC_TRUE  true
+
+/**
+ * \defgroup var_type Variable types  (shouldn't be exposed)
+ * These are the different types a vlc variable can have.
+ * @{
+ */
+#define VLC_VAR_VOID      0x0010
+#define VLC_VAR_BOOL      0x0020
+#define VLC_VAR_INTEGER   0x0030
+#define VLC_VAR_HOTKEY    0x0031
+#define VLC_VAR_STRING    0x0040
+#define VLC_VAR_MODULE    0x0041
+#define VLC_VAR_FILE      0x0042
+#define VLC_VAR_DIRECTORY 0x0043
+#define VLC_VAR_VARIABLE  0x0044
+#define VLC_VAR_FLOAT     0x0050
+#define VLC_VAR_TIME      0x0060
+#define VLC_VAR_ADDRESS   0x0070
+#define VLC_VAR_MUTEX     0x0080
+#define VLC_VAR_LIST      0x0090
+/**@}*/
+
+/*****************************************************************************
+ * Required internal headers
+ *****************************************************************************/
+#if defined( __LIBVLC__ )
+#   include "vlc_common.h"
+#endif
+
 
 /*****************************************************************************
  * Shared library Export macros
@@ -64,14 +168,10 @@
 # endif /* __LIBVLC__ */
 #endif
 
-/*****************************************************************************
- * Types
- *****************************************************************************/
 
-#if (defined( WIN32 ) || defined( UNDER_CE )) && !defined( __MINGW32__ )
-typedef signed __int64 vlc_int64_t;
-# else
-typedef signed long long vlc_int64_t;
-#endif
+# ifdef __cplusplus
+}
+# endif
+
 
 #endif /* _VLC_COMMON_H */

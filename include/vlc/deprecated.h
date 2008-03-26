@@ -211,65 +211,24 @@ VLC_DEPRECATED_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
  * @{
  */
 
+
 /*****************************************************************************
- * Our custom types
+ * Exported vlc API (Deprecated)
  *****************************************************************************/
-typedef bool vlc_bool_t;
-typedef struct vlc_list_t vlc_list_t;
-typedef struct vlc_object_t vlc_object_t;
 
-/**
- * \defgroup var_type Variable types
- * These are the different types a vlc variable can have.
- * @{
- */
-#define VLC_VAR_VOID      0x0010
-#define VLC_VAR_BOOL      0x0020
-#define VLC_VAR_INTEGER   0x0030
-#define VLC_VAR_HOTKEY    0x0031
-#define VLC_VAR_STRING    0x0040
-#define VLC_VAR_MODULE    0x0041
-#define VLC_VAR_FILE      0x0042
-#define VLC_VAR_DIRECTORY 0x0043
-#define VLC_VAR_VARIABLE  0x0044
-#define VLC_VAR_FLOAT     0x0050
-#define VLC_VAR_TIME      0x0060
-#define VLC_VAR_ADDRESS   0x0070
-#define VLC_VAR_MUTEX     0x0080
-#define VLC_VAR_LIST      0x0090
-/**@}*/
+/*****************************************************************************
+ * Playlist
+ *****************************************************************************/
 
-/**
- * VLC value structure
- */
-typedef union
-{
-    int             i_int;
-    vlc_bool_t      b_bool;
-    float           f_float;
-    char *          psz_string;
-    void *          p_address;
-    vlc_object_t *  p_object;
-    vlc_list_t *    p_list;
-    vlc_int64_t     i_time;
+/* Used by VLC_AddTarget() */
+#define PLAYLIST_INSERT          0x0001
+#define PLAYLIST_APPEND          0x0002
+#define PLAYLIST_GO              0x0004
+#define PLAYLIST_PREPARSE        0x0008
+#define PLAYLIST_SPREPARSE       0x0010
+#define PLAYLIST_NO_REBUILD      0x0020
 
-    struct { char *psz_name; int i_object_id; } var;
-
-   /* Make sure the structure is at least 64bits */
-    struct { char a, b, c, d, e, f, g, h; } padding;
-
-} vlc_value_t;
-
-/**
- * VLC list structure
- */
-struct vlc_list_t
-{
-    int             i_count;
-    vlc_value_t *   p_values;
-    int *           pi_types;
-
-};
+#define PLAYLIST_END           -666
 
 /*****************************************************************************
  * Error values
@@ -299,31 +258,27 @@ struct vlc_list_t
 #define VLC_FALSE false
 #define VLC_TRUE  true
 
-/*****************************************************************************
- * Playlist
- *****************************************************************************/
+/**
+ * \defgroup var_type Variable types
+ * These are the different types a vlc variable can have.
+ * @{
+ */
+#define VLC_VAR_VOID      0x0010
+#define VLC_VAR_BOOL      0x0020
+#define VLC_VAR_INTEGER   0x0030
+#define VLC_VAR_HOTKEY    0x0031
+#define VLC_VAR_STRING    0x0040
+#define VLC_VAR_MODULE    0x0041
+#define VLC_VAR_FILE      0x0042
+#define VLC_VAR_DIRECTORY 0x0043
+#define VLC_VAR_VARIABLE  0x0044
+#define VLC_VAR_FLOAT     0x0050
+#define VLC_VAR_TIME      0x0060
+#define VLC_VAR_ADDRESS   0x0070
+#define VLC_VAR_MUTEX     0x0080
+#define VLC_VAR_LIST      0x0090
+/**@}*/
 
-/* Used by VLC_AddTarget() */
-#define PLAYLIST_INSERT          0x0001
-#define PLAYLIST_APPEND          0x0002
-#define PLAYLIST_GO              0x0004
-#define PLAYLIST_PREPARSE        0x0008
-#define PLAYLIST_SPREPARSE       0x0010
-#define PLAYLIST_NO_REBUILD      0x0020
-
-#define PLAYLIST_END           -666
-
-/*****************************************************************************
- * Required internal headers
- *****************************************************************************/
-#if defined( __LIBVLC__ )
-#   include "vlc_common.h"
-#endif
-
-
-/*****************************************************************************
- * Exported vlc API (Deprecated)
- *****************************************************************************/
 
 #if !defined( __LIBVLC__ )
 /* Otherwise they are declared and exported in vlc_common.h */
