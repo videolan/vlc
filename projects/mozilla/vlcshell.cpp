@@ -364,8 +364,10 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
+#ifdef XP_UNIX && !defined(__APPLE__)
     Window control;
     unsigned int i_control_height = 0, i_control_width = 0;
+#endif
 
     if( ! instance )
     {
@@ -379,8 +381,9 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         /* we should probably show a splash screen here */
         return NPERR_NO_ERROR;
     }
+#ifdef XP_UNIX && !defined(__APPLE__)
     control = p_plugin->getControlWindow();
-
+#endif
     libvlc_instance_t *p_vlc = p_plugin->getVLC();
 
     /*
