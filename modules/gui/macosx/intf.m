@@ -1238,7 +1238,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     vlc_object_release( p_playlist );
 
-    while( !intf_ShouldDie( p_intf ) )
+    while( (p_intf = VLCIntf) && !intf_ShouldDie( p_intf ) )
     {
         vlc_mutex_lock( &p_intf->change_lock );
 
