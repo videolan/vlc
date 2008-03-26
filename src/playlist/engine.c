@@ -224,10 +224,10 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
     }
 
     vlc_mutex_lock( &p_playlist->gc_lock );
-    while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_VOUT,
+    while( ( p_obj = vlc_object_find( p_playlist->p_libvlc, VLC_OBJECT_VOUT,
                                                   FIND_CHILD ) ) )
     {
-        if( p_obj->p_parent != VLC_OBJECT(p_playlist) )
+        if( p_obj->p_parent != VLC_OBJECT(p_playlist->p_libvlc) )
         {
             vlc_object_release( p_obj );
             break;
