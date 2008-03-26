@@ -71,6 +71,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     // Preparse
     p_playlist->p_preparse = vlc_object_create( p_playlist,
                                   sizeof( playlist_preparse_t ) );
+    p_playlist->p_preparse->psz_object_name = "preparser";
     if( !p_playlist->p_preparse )
     {
         msg_Err( p_playlist, "unable to create preparser" );
@@ -94,6 +95,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     // Secondary Preparse
     p_playlist->p_fetcher = vlc_object_create( p_playlist,
                               sizeof( playlist_fetcher_t ) );
+    p_playlist->p_fetcher->psz_object_name = "fetcher";
     if( !p_playlist->p_fetcher )
     {
         msg_Err( p_playlist, "unable to create secondary preparser" );
@@ -144,31 +146,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
  */
 int playlist_ThreadDestroy( playlist_t * p_playlist )
 {
-    // Tell playlist to go to last loop
-    vlc_object_kill( p_playlist );
-
-    // Kill preparser
-    if( p_playlist->p_preparse )
-    {
-        vlc_object_release( p_playlist->p_preparse );
-    }
-
-    // Kill meta fetcher
-    if( p_playlist->p_fetcher )
-    {
-        vlc_object_release( p_playlist->p_fetcher );
-    }
-
-    // Wait for thread to complete
-    vlc_thread_join( p_playlist );
-
-    // Stats
-    vlc_mutex_destroy( &p_playlist->p_stats->lock );
-    if( p_playlist->p_stats )
-        free( p_playlist->p_stats );
-
     playlist_Destroy( p_playlist );
-
     return VLC_SUCCESS;
 }
 
