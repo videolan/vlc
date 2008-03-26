@@ -192,6 +192,7 @@ Rémi Duraffort <ivoire at via.ecp.fr> - various QT4 patches
 Remco Poortinga <poortinga at telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
 Richard Hosking <richard at hovis.net> - v4l2 support
+Richard Øiestad <richard at neonational.com> - VLC cone graphics (v0.7.x)
 Rob Casey <rob dot casey AT swishgroup dot com dot au> - Amino RTSP fix
 Robson Braga Araujo - UPnP discovery XML fix
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
