@@ -272,13 +272,13 @@ int main( int i_argc, char *ppsz_argv[] ) {
 
     printf( "Attaching shared memory for RGBA..." );
     p_imageRGBA = shmat( i_shmRGBA, NULL, 0 );
-    if( p_imageRGBA == -1 ) {
+    if( p_imageRGBA == (void*)-1 ) {
         printf( " failed\n" );
         exit( -1 );
     }
     printf( " done. Text..." );
     p_text = shmat( i_shmText, NULL, 0 );
-    if( p_text == -1 ) {
+    if( p_text == (void*)-1 ) {
         printf( " failed\n" );
         exit( -1 );
     }
