@@ -53,7 +53,6 @@
 #include <vlc_meta.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
-#include <vlc_demux.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -989,19 +988,12 @@ static int UpdateCaps( intf_thread_t* p_intf )
 
     if( p_playlist->p_input )
     {
+        /* XXX: if UpdateCaps() is called too early, these are
+         * unconditionnaly true */
         if( var_GetBool( p_playlist->p_input, "can-pause" ) )
             i_caps |= CAPS_CAN_PAUSE;
-
-        demux_t *p_demux = (demux_t*)vlc_object_find( p_playlist->p_input,
-            VLC_OBJECT_DEMUX, FIND_CHILD );
-        if( p_demux )
-        {
-            vlc_bool_t b_can_seek;
-            if( !stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek ) &&
-                    b_can_seek )
-                i_caps |= CAPS_CAN_SEEK;
-            vlc_object_release( p_demux );
-        }
+        if( var_GetBool( p_playlist->p_input, "seekable" ) )
+            i_caps |= CAPS_CAN_SEEK;
     }
 
     PL_UNLOCK;
