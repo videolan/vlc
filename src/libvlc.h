@@ -27,9 +27,11 @@
 
 extern const char vlc_usage[];
 
+/* Hotkey stuff */
 extern const struct hotkey libvlc_hotkeys[];
 extern const size_t libvlc_hotkeys_size;
-
+extern int vlc_key_to_action (vlc_object_t *, const char *,
+                              vlc_value_t, vlc_value_t, void *);
 
 /*
  * OS-specific initialization

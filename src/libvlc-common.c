@@ -734,9 +734,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Initialize hotkey handling
      */
     var_Create( p_libvlc, "key-pressed", VLC_VAR_INTEGER );
+    var_Create( p_libvlc, "key-action", VLC_VAR_INTEGER );
     p_libvlc->p_hotkeys = malloc( libvlc_hotkeys_size );
     /* Do a copy (we don't need to modify the strings) */
     memcpy( p_libvlc->p_hotkeys, libvlc_hotkeys, libvlc_hotkeys_size );
+    var_AddCallback( p_libvlc, "key-pressed", vlc_key_to_action,
+                     p_libvlc->p_hotkeys );
 
     /* Initialize interaction */
     p_libvlc->p_interaction = interaction_Init( p_libvlc );
@@ -1031,6 +1034,8 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     FREENULL( p_libvlc->psz_datadir );
     FREENULL( p_libvlc->psz_cachedir );
     FREENULL( p_libvlc->psz_configfile );
+    var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
+                     p_libvlc->p_hotkeys );
     FREENULL( p_libvlc->p_hotkeys );
 
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
