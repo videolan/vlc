@@ -472,6 +472,11 @@ static int Open( vlc_object_t * p_this )
     else
     {
         p_sys->i_timescale = p_mvhd->data.p_mvhd->i_timescale;
+        if( p_sys->i_timescale == 0 )
+        {
+            msg_Err( p_this, "bad timescale" );
+            goto error;
+        }
         p_sys->i_duration = p_mvhd->data.p_mvhd->i_duration;
     }
 
@@ -1995,6 +2000,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     }
 
     p_track->i_timescale = p_mdhd->data.p_mdhd->i_timescale;
+    if( !p_track->i_timescale )
+        return;
 
     for( i = 0; i < 3; i++ )
     {
