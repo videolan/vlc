@@ -72,6 +72,8 @@ static void     AspectRatio       ( int, int *, int * );
 static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
 
+static void     vout_Destructor   ( vlc_object_t * p_this );
+
 /* Object variables callbacks */
 static int DeinterlaceCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
@@ -130,7 +132,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             playlist_t  *p_playlist = pl_Yield( p_this );
             spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
             vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_playlist );
+            vlc_object_attach( p_vout, p_this );
             pl_Release( p_this );
         }
         return NULL;
@@ -458,7 +460,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     {
         msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
-        vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -468,13 +469,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         msg_Err( p_vout, "video output creation failed" );
 
         /* Make sure the thread is destroyed */
-        vlc_object_kill( p_vout );
-        vlc_thread_join( p_vout );
-
-        vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         return NULL;
     }
+
+    vlc_object_set_destructor( p_vout, vout_Destructor );
 
     return p_vout;
 }
@@ -489,21 +488,22 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
  *****************************************************************************/
 void vout_Destroy( vout_thread_t *p_vout )
 {
+    /* XXX: should go in the destructor */
+    var_Destroy( p_vout, "intf-change" );
+
+    vlc_object_release( p_vout );
+}
+
+static void vout_Destructor( vlc_object_t * p_this )
+{
+    vout_thread_t *p_vout = p_this;
     vout_thread_t *p_another_vout;
     playlist_t *p_playlist = pl_Yield( p_vout );
-
-    /* Request thread destruction */
-    vlc_object_kill( p_vout );
-    vlc_thread_join( p_vout );
-
-    var_Destroy( p_vout, "intf-change" );
 
     free( p_vout->psz_filter_chain );
 
     config_ChainDestroy( p_vout->p_cfg );
 
-    /* Free structure */
-    vlc_object_release( p_vout );
 #ifndef __APPLE__
     /* This is a dirty hack for mostly Linux, where there is no way to get the GUI
        back if you closed it while playing video. This is solved in Mac OS X,
