@@ -204,7 +204,7 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
     {
         aglDestroyContext(p_vout->p_sys->agl_ctx);
     }
-    else if(!VLCIntf->b_die)
+    else if(VLCIntf && !VLCIntf->b_die)
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
