@@ -270,11 +270,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sd->p_sys = p_sys = (services_discovery_sys_t *)malloc(
         sizeof( services_discovery_sys_t ) );
-    if( p_sd->p_sys == NULL )
-    {
-        msg_Err( p_sd, "out of memory" );
-        return VLC_EGENERIC;
-    }
+
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     memset( p_sys, 0, sizeof(*p_sys) );
 

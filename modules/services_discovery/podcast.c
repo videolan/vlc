@@ -106,6 +106,8 @@ static int Open( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_sys->i_urls = 0;
     p_sys->ppsz_urls = NULL;

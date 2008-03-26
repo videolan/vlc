@@ -294,6 +294,8 @@ static int Open( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)
                                 malloc( sizeof( services_discovery_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_sys->i_timeout = var_CreateGetInteger( p_sd, "sap-timeout" );
 
