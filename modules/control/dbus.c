@@ -54,7 +54,6 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 #include <vlc_demux.h>
-#include <vlc_access.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -990,20 +989,13 @@ static int UpdateCaps( intf_thread_t* p_intf )
 
     if( p_playlist->p_input )
     {
-        access_t *p_access = (access_t*)vlc_object_find( p_playlist->p_input,
-            VLC_OBJECT_ACCESS, FIND_CHILD );
-        if( p_access && p_access->pf_control )
-        {
-            vlc_bool_t b_can_pause;
-            if( !access2_Control( p_access, ACCESS_CAN_PAUSE, &b_can_pause ) &&
-                    b_can_pause )
-                i_caps |= CAPS_CAN_PAUSE;
-            vlc_object_release( p_access );
-        }
+        if( var_GetBoolean( p_playlist->p_input, "can-pause" ) )
+            i_caps |= CAPS_CAN_PAUSE;
+
         demux_t *p_demux = (demux_t*)vlc_object_find( p_playlist->p_input,
             VLC_OBJECT_DEMUX, FIND_CHILD );
         if( p_demux )
-        {   /* XXX: is: demux can seek and access can not a possibility ? */
+        {
             vlc_bool_t b_can_seek;
             if( !stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek ) &&
                     b_can_seek )
