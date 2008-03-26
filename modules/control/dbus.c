@@ -989,7 +989,7 @@ static int UpdateCaps( intf_thread_t* p_intf )
 
     if( p_playlist->p_input )
     {
-        if( var_GetBoolean( p_playlist->p_input, "can-pause" ) )
+        if( var_GetBool( p_playlist->p_input, "can-pause" ) )
             i_caps |= CAPS_CAN_PAUSE;
 
         demux_t *p_demux = (demux_t*)vlc_object_find( p_playlist->p_input,
