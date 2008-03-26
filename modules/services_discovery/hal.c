@@ -207,7 +207,10 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
         return;
     p_udi_entry->psz_udi = strdup( psz_device );
     if( !p_udi_entry->psz_udi )
+    {
+        free( p_udi_entry );
         return;
+    }
 
     vlc_gc_incref( p_input );
     p_udi_entry->p_item = p_input;
