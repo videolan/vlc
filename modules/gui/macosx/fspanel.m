@@ -1,11 +1,11 @@
 /*****************************************************************************
  * fspanel.m: MacOS X full screen panel
  *****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jérôme Decoodt <djc at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@
 #import "vout.h"
 #import "misc.h"
 #import "fspanel.h"
-
-#define KEEP_VISIBLE_AFTER_ACTION 4 /* time in half-sec until this panel will hide again after a user's action */
 
 /*****************************************************************************
  * VLCFSPanel
@@ -284,6 +282,7 @@
     /* get us a valid timer */
     if(! b_alreadyCounting )
     {
+        i_timeToKeepVisibleInSec = config_GetInt( VLCIntf, "mouse-hide-timeout" ) / 500;
         hideAgainTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5
                                                           target: self 
                                                         selector: @selector(keepVisible:)
@@ -299,11 +298,8 @@
 {
     /* if the user triggered an action, start over again */
     if( b_keptVisible )
-    {
-        i_timeToKeepVisibleInSec = KEEP_VISIBLE_AFTER_ACTION;
         b_keptVisible = NO;
-    }
-    
+
     /* count down until we hide ourselfes again and do so if necessary */
     i_timeToKeepVisibleInSec -= 1;
     if( i_timeToKeepVisibleInSec < 1 )
