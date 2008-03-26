@@ -21,8 +21,8 @@ Important notes:
    interface lacks a few features that used to be present in VLC 0.8.6:
    - "Streaming wizard". These features will be replaced
      by a better alternative in the next version. If you absolutely need these
-     features, we advise you to keep VLC 0.8.6
-  * The behavior of --sout-keep has changed. It's now activated by default.
+     features, we advise you to keep VLC 0.8.6.
+  * The behavior of --sout-keep was changed. It's now activated by default.
   * The marq, mosaic and logo commands in the rc interface changed. They
     now require a target name as their first argument. Example:
     vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
@@ -103,18 +103,18 @@ Video output and filters:
  * Adjust, Invert and Distort (now split into Wave, Ripple, Gradient and
    Psychedelic) video filters can now be streamed
  * New puzzle video output filter
- * Rewrite motion detection video filter
+ * Re-written motion detection video filter
  * New extract video filter (extract Red, Green and Blue components from a
    video)
  * New sharpen video filter (increase the contrast of adjacent pixels)
- * New erase video filter (remove a logo from a video)
- * Enhancements to subtitles' renderer to support bold, italic and some HTML
-   tags
+ * New erase video filter (removes logos from a video)
+ * Enhanced subtitles' renderer to support bold, italic and some HTML tags
+   (Google Summer of Code Student project)
  * Support for RGBA and I420 blending. This improves Mosaic CPU usage *a lot*.
  * New transparency mask video filter (for use with the mosaic_bridge module).
- * New bluescreen video filter (for use with the mosaic_bridge module). This
-   was previously part of the mosaic module.
- * Fix random characters problem in RSS filter.
+ * New bluescreen video filter (for use with the mosaic_bridge module). 
+   This was previously part of the mosaic module.
+ * Fixed random characters problem in RSS filter.
  * Add rotate-deciangle for more precision on rotate filter
  * Support for Intel SSE2 instruction set in chroma converters
  * Improved use of Intel MMX instruction set in chroma converters
@@ -139,12 +139,15 @@ Interfaces:
  * Windows/Linux
    * Brand new interface for Linux and Windows, based on the Qt toolkit
  * All
+   * New Simple Preferences dialogs showing the most important settings in an
+     end-user suitable way.
    * Improved user interaction
    * Improved mouse gestures
    * Fastly improved Update checker
    * Experimental Lua interface modules. See vlc -I lua for more info
    * Ncurses:
-     * Correctly displays wide characters when using an UTF-8 locale, if libncursesw is available (not by default on MacOSX)
+     * Correctly displays wide characters when using an UTF-8 locale, 
+       if libncursesw is available.
      * Some nice colors if the terminal supports it (most do)
  * Mac OS X
    * Improved video output features
@@ -179,7 +182,62 @@ New Localizations:
  * Persian
  * Polish
 
-TODO: Add 0.8.6e changelog here
+
+Changes between 0.8.6e and 0.8.6f (not-yet-released):
+-----------------------------------------------------
+
+Security updates:
+ * Fix subtitle buffer overflow
+ * Fix Real RTSP code execution problem (CVE-2008-0073)
+ * Fix cinepak integer overflow
+
+Various bugfixes:
+ * mozilla plugin registers a usable range of mimetypes on OSX
+
+
+Changes between 0.8.6d and 0.8.6e:
+----------------------------------
+
+Various bugfixes:
+ * Resume playback for viewing content over FTP
+ * Fixed XShm detection with remote X11
+
+Security updates:
+ * Subtitle demuxers overflow (CVE-2007-6681)
+ * HTTP listener format string injection (CVE-2007-6682)
+ * Fixed buffer overflow in the SDL_image library (CVE-2006-4484)
+ * Real RTSP overflows (CVE-2008-0225, CVE-2008-0295, CVE-2008-0296,
+   VideoLAN-SA-0801)
+ * Arbitrary memory overwrite in the MP4 demuxer (CORE-2008-0130, 
+   VideoLAN-SA-0802)
+
+Audio filter:
+ * Fixed DTS to S/PDIF converter
+
+Audio output:
+ * Fixed 5.1 audio on ALSA
+
+Access:
+ * Fixed some RTSP hanging and user/password passing through RTSP URLs
+
+Stream output:
+ * Fixed waiting for SPS/PPS problem in H.264 packetizer
+
+Encoders:
+ * Improved compatibility for creating H.264 video files playable on iPhones
+ * Improved detection of optimal amount of threads for multi-threaded H.264 
+   encoding on multi-cpu systems
+    - Note that this is used when transcode threads is set to 0 (default)
+    - Not supported on Windows (multiple threads require manual configuration)
+
+Mac OS X Interface & Port:
+ * Restored compatibility with Mac OS X 10.3.9
+ * Corrected behavior of the Preferences panel
+ * VLC no longer crashes on quit while playing
+
+Localization:
+ * Updated Romanian and Polish translations
+
 
 Changes between 0.8.6c and 0.8.6d:
 ----------------------------------
@@ -187,7 +245,8 @@ Changes between 0.8.6c and 0.8.6d:
 Various bugfixes:
  * Mozilla plugin: supports a reasonable amount of MIME types on Windows
  * Linux: Fixed S/PDIF passthrough with ALSA
- * Automatic recovery on unexpected stream discontinuity (clock gap) occurrences in input
+ * Automatic recovery on unexpected stream discontinuity (clock gap) occurrences
+   in input
  * Use field order (top/bottom) for correct bob/linear deinterlacing
  * Fix invalid free in bookmarks loading code
 
@@ -200,10 +259,13 @@ Active X plugin:
 Mac OS X Interface & Port:
  * Apple Remote support on Mac OS X 10.5 Leopard with enhanced functionality
  * Improved Video Output compatibility for Mac OS X 10.5 Leopard
- * Improved behavior of the Fullscreen Controller and mode changes between Fullscreen and Windowed Video Output
- * Softened the white flash artifacts that may appear during the transition of two different movies
+ * Improved behavior of the Fullscreen Controller and mode changes between 
+   Fullscreen and Windowed Video Output
+ * Softened the white flash artifacts that may appear during the transition of 
+   two different movies
  * Support for current Ogg file formats
- NOTE: This release requires Mac OS X 10.4 or higher. Mac OS X 10.3.9 is not supported anymore.
+ NOTE: This release requires Mac OS X 10.4 or higher. 
+       Mac OS X 10.3.9 is not supported anymore.
 
 Encoders:
  * Improved H.264 encoding speed on Mac OS X
