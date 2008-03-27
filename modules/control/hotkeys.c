@@ -73,6 +73,8 @@ static void Run     ( intf_thread_t * );
 static int  GetKey  ( intf_thread_t *);
 static int  KeyEvent( vlc_object_t *, char const *,
                       vlc_value_t, vlc_value_t, void * );
+static int  ActionKeyCB( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
 static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
@@ -146,7 +148,15 @@ static void Run( intf_thread_t *p_intf )
 
     /* Initialize hotkey structure */
     for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-        p_hotkeys[i].i_key = config_GetInt( p_intf, p_hotkeys[i].psz_action );
+    {
+        var_Create( p_intf->p_libvlc, p_hotkeys[i].psz_action,
+                    VLC_VAR_HOTKEY | VLC_VAR_DOINHERIT );
+
+        var_AddCallback( p_intf->p_libvlc, p_hotkeys[i].psz_action,
+                         ActionKeyCB, p_hotkeys + i );
+        var_Get( p_intf->p_libvlc, p_hotkeys[i].psz_action, &val );
+        var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
+    }
 
     for( vlc_bool_t b_quit = VLC_FALSE ; !b_quit; )
     {
@@ -913,6 +923,28 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     vlc_cond_signal( &p_intf->object_wait );
     vlc_mutex_unlock( &p_intf->object_lock );
     vlc_mutex_unlock( &p_intf->p_sys->change_lock );
+
+    return VLC_SUCCESS;
+}
+
+static int ActionKeyCB( vlc_object_t *libvlc, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    mtime_t i_date;
+    struct hotkey *p_hotkey = p_data;
+
+    (void)libvlc; (void)psz_var; (void)oldval;
+
+    p_hotkey->i_key = newval.i_int;
+
+    /* do hotkey accounting */
+    i_date = mdate();
+    if( (p_hotkey->i_delta_date > 0) &&
+        (p_hotkey->i_delta_date <= (i_date - p_hotkey->i_last_date) ) )
+        p_hotkey->i_times = 0;
+    else
+        p_hotkey->i_times++;
+    p_hotkey->i_last_date = i_date;
 
     return VLC_SUCCESS;
 }
