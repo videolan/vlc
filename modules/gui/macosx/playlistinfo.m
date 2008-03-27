@@ -85,29 +85,31 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];
     [o_nowPlaying_lbl setStringValue: _NS(VLC_META_NOW_PLAYING)];
     [o_publisher_lbl setStringValue: _NS(VLC_META_PUBLISHER)];
- 
+
     /* statistics */
     [o_input_box setTitle: _NS("Input")];
     [o_read_bytes_lbl setStringValue: _NS("Read at media")];
     [o_input_bitrate_lbl setStringValue: _NS("Input bitrate")];
     [o_demux_bytes_lbl setStringValue: _NS("Demuxed")];
     [o_demux_bitrate_lbl setStringValue: _NS("Stream bitrate")];
- 
+
     [o_video_box setTitle: _NS("Video")];
     [o_video_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_displayed_lbl setStringValue: _NS("Displayed frames")];
     [o_lost_frames_lbl setStringValue: _NS("Lost frames")];
 	[o_fps_lbl setStringValue: _NS("Frames per Second")];
- 
+
     [o_sout_box setTitle: _NS("Streaming")];
     [o_sent_packets_lbl setStringValue: _NS("Sent packets")];
     [o_sent_bytes_lbl setStringValue: _NS("Sent bytes")];
     [o_sent_bitrate_lbl setStringValue: _NS("Send rate")];
- 
+
     [o_audio_box setTitle: _NS("Audio")];
     [o_audio_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_played_abuffers_lbl setStringValue: _NS("Played buffers")];
     [o_lost_abuffers_lbl setStringValue: _NS("Lost buffers")];
+
+    [o_info_window setInitialFirstResponder: o_uri_txt];
 }
 
 - (void)dealloc
@@ -156,12 +158,10 @@ static VLCInfo *_o_sharedInstance = nil;
     if(! [self isItemInPlaylist: p_item] ) return;
 
     /* fill uri info */
-    char *psz_uri = input_item_GetURI( p_item->p_input );
-    if( psz_uri )
+    if( input_item_GetURI( p_item->p_input ) != NULL )
     {
-        [o_uri_txt setStringValue: [NSString stringWithUTF8String:psz_uri]];
+        [o_uri_txt setStringValue: [NSString stringWithUTF8String: input_item_GetURI( p_item->p_input ) ]];
     }
-    free( psz_uri );
 
 #define SET( foo, bar ) \
     char *psz_##foo = input_item_Get##bar ( p_item->p_input ); \
@@ -179,20 +179,20 @@ static VLCInfo *_o_sharedInstance = nil;
     SET( nowPlaying, NowPlaying );
     SET( language, Language );
     SET( date, Date );
+    SET( description, Description );
 
 #undef SET
-    
+
     char *psz_meta;
     NSImage *o_image;
-    /* FIXME!! 
-    psz_meta = input_item_GetArtURL( p_item );
+    psz_meta = input_item_GetArtURL( p_item->p_input );
     if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
         o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString: [NSString stringWithUTF8String: psz_meta]]];
-    else */
+    else
         o_image = [[NSImage imageNamed: @"noart.png"] retain];
     [o_image_well setImage: o_image];
     [o_image release];
-    //free( psz_meta );
+    FREENULL( psz_meta );
 
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
@@ -206,6 +206,8 @@ static VLCInfo *_o_sharedInstance = nil;
 {
     if( psz_meta != NULL && *psz_meta)
         [theItem setStringValue: [NSString stringWithUTF8String:psz_meta]];
+    else
+        [theItem setStringValue: @""];
 }
 
 - (void)updateStatistics:(NSTimer*)theTimer
@@ -229,7 +231,7 @@ static VLCInfo *_o_sharedInstance = nil;
         [o_displayed_txt setIntValue: p_item->p_input->p_stats->i_displayed_pictures];
         [o_lost_frames_txt setIntValue: p_item->p_input->p_stats->i_lost_pictures];
         float f_fps = 0;
-        /* FIXME! input_Control( p_item->p_input, INPUT_GET_VIDEO_FPS, &f_fps ); */
+        /* FIXME: input_Control( p_item->p_input, INPUT_GET_VIDEO_FPS, &f_fps ); */
         [o_fps_txt setFloatValue: f_fps];
 
         /* Sout */
@@ -248,26 +250,73 @@ static VLCInfo *_o_sharedInstance = nil;
     }
 }
 
+- (IBAction)metaFieldChanged:(id)sender
+{
+    [o_saveMetaData_btn setEnabled: YES];
+}
+
 - (IBAction)saveMetaData:(id)sender
 {
-    /* TODO: implement this feature
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
     vlc_value_t val;
 
     if( [self isItemInPlaylist: p_item] )
     {
-        input_item_SetName( p_item->p_input, (char*)
-                [[o_title_txt stringValue] UTF8String] );
-        input_item_SetURI( p_item->p_input, (char*)
-                [[o_uri_txt stringValue] UTF8String] );
-        input_item_SetArtist( p_item->p_input, (char*)
-                [[o_author_txt stringValue] UTF8String] );
+        meta_export_t p_export;
+        p_export.p_item = p_item->p_input;
+
+        if( p_item->p_input == NULL )
+            goto end;
+
+        /* we can write meta data only in a file */
+        vlc_mutex_lock( &p_item->p_input->lock );
+        int i_type = p_item->p_input->i_type;
+        vlc_mutex_unlock( &p_item->p_input->lock );
+        if( i_type == ITEM_TYPE_FILE )
+        {
+            char *psz_uri_orig = input_item_GetURI( p_item->p_input );
+            char *psz_uri = psz_uri_orig;
+            if( !strncmp( psz_uri, "file://", 7 ) )
+                psz_uri += 7; /* strlen("file://") = 7 */
+            
+            p_export.psz_file = strndup( psz_uri, PATH_MAX );
+            free( psz_uri_orig );
+        }
+        else
+            goto end;
+
+        #define utf8( o_blub ) \
+            [[o_blub stringValue] UTF8String]
+
+        input_item_SetName( p_item->p_input, utf8( o_title_txt ) );
+        input_item_SetTitle( p_item->p_input, utf8( o_title_txt ) );
+        input_item_SetArtist( p_item->p_input, utf8( o_author_txt ) );
+        input_item_SetAlbum( p_item->p_input, utf8( o_collection_txt ) );
+        input_item_SetGenre( p_item->p_input, utf8( o_genre_txt ) );
+        input_item_SetTrackNum( p_item->p_input, utf8( o_seqNum_txt ) );
+        input_item_SetDate( p_item->p_input, utf8( o_date_txt ) );
+        input_item_SetCopyright( p_item->p_input, utf8( o_copyright_txt ) );
+        input_item_SetPublisher( p_item->p_input, utf8( o_publisher_txt ) );
+        input_item_SetDescription( p_item->p_input, utf8( o_description_txt ) );
+        input_item_SetLanguage( p_item->p_input, utf8( o_language_txt ) );
+
+        PL_LOCK;
+        p_playlist->p_private = &p_export;
+
+        module_t *p_mod = module_Need( p_playlist, "meta writer", NULL, 0 );
+        if( p_mod )
+            module_Unneed( p_playlist, p_mod );
+        PL_UNLOCK;
 
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );
+        [self updatePanel];
     }
-    vlc_object_release( p_playlist );*/
+
+    end:
+    vlc_object_release( p_playlist );
+    [o_saveMetaData_btn setEnabled: NO];
 }
 
 - (playlist_item_t *)getItem

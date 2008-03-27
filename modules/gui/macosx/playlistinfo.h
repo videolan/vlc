@@ -99,6 +99,7 @@
 }
 
 - (void)initPanel;
+- (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
 - (void)updatePanel;
 - (playlist_item_t *)getItem;

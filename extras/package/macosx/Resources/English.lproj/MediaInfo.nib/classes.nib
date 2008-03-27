@@ -14,6 +14,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -25,11 +33,9 @@
 				<string>id</string>
 				<key>deleteOutlineGroup</key>
 				<string>id</string>
+				<key>metaFieldChanged</key>
+				<string>id</string>
 				<key>saveMetaData</key>
-				<string>id</string>
-				<key>toggleInfoPanel</key>
-				<string>id</string>
-				<key>togglePlaylistInfoPanel</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
