@@ -234,6 +234,7 @@ static void Run( intf_thread_t *p_intf )
             }
         }
 
+        /* Quit */
         if( i_action == ACTIONID_QUIT )
         {
             if( p_playlist )
@@ -248,6 +249,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_object_release( p_input );
             continue;
         }
+        /* Volume and audio actions */
         else if( i_action == ACTIONID_VOL_UP )
         {
             audio_volume_t i_newvol;
@@ -278,10 +280,12 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
+        /* Interface showing */
         else if( i_action == ACTIONID_INTF_SHOW )
             var_SetBool( p_playlist, "intf-show", VLC_TRUE );
         else if( i_action == ACTIONID_INTF_HIDE )
             var_SetBool( p_playlist, "intf-show", VLC_FALSE );
+        /* Video Output actions */
         else if( i_action == ACTIONID_SNAPSHOT )
         {
             if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
@@ -308,6 +312,24 @@ static void Run( intf_thread_t *p_intf )
                 var_SetBool( p_vout, "fullscreen", VLC_FALSE );
             }
         }
+        else if( i_action == ACTIONID_ZOOM_QUARTER ||
+                 i_action == ACTIONID_ZOOM_HALF ||
+                 i_action == ACTIONID_ZOOM_ORIGINAL ||
+                 i_action == ACTIONID_ZOOM_DOUBLE )
+        {
+            if( p_vout )
+            {
+                if( i_action == ACTIONID_ZOOM_QUARTER )
+                    val.f_float = 0.25;
+                if( i_action == ACTIONID_ZOOM_HALF )
+                    val.f_float = 0.5;
+                if( i_action == ACTIONID_ZOOM_ORIGINAL )
+                    val.f_float = 1;
+                if( i_action == ACTIONID_ZOOM_DOUBLE )
+                    val.f_float = 2;
+                var_Set( p_vout, "zoom", val );
+            }
+        }
         else if( i_action == ACTIONID_WALLPAPER )
         {
             if( p_vout )
@@ -323,6 +345,7 @@ static void Run( intf_thread_t *p_intf )
                 var_Set( p_playlist, "directx-wallpaper", val );
             }
         }
+        /* Playlist actions */
         else if( i_action == ACTIONID_LOOP )
         {
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */
@@ -352,24 +375,6 @@ static void Run( intf_thread_t *p_intf )
             val.b_bool = !val.b_bool;
             var_Set( p_playlist, "random", val );
         }
-        else if( i_action == ACTIONID_ZOOM_QUARTER || 
-                 i_action == ACTIONID_ZOOM_HALF ||
-                 i_action == ACTIONID_ZOOM_ORIGINAL || 
-                 i_action == ACTIONID_ZOOM_DOUBLE )
-        {
-            if( p_vout )
-            {
-                if( i_action == ACTIONID_ZOOM_QUARTER )
-                    val.f_float = 0.25;
-                if( i_action == ACTIONID_ZOOM_HALF )
-                    val.f_float = 0.5;
-                if( i_action == ACTIONID_ZOOM_ORIGINAL )
-                    val.f_float = 1;
-                if( i_action == ACTIONID_ZOOM_DOUBLE )
-                    val.f_float = 2;
-                var_Set( p_vout, "zoom", val );
-            }
-        }
         else if( i_action == ACTIONID_PLAY_PAUSE )
         {
             val.i_int = PLAYING_S;
@@ -397,6 +402,7 @@ static void Run( intf_thread_t *p_intf )
                 playlist_Play( p_playlist );
             }
         }
+        /* Input options */
         else if( p_input )
         {
             /* FIXME --fenrir
@@ -516,7 +522,7 @@ static void Run( intf_thread_t *p_intf )
                 {
                     continue;
                 }
- 
+
                 for( i = 0; i < i_count; i++ )
                 {
                     if( val.i_int == list.p_list->p_values[i].i_int )
@@ -531,26 +537,26 @@ static void Run( intf_thread_t *p_intf )
                     var_Set( p_aout, "audio-device",
                              list.p_list->p_values[0] );
                     i = 0;
-           
+
                 }
                 else if( i == i_count -1 )
                 {
                   var_Set( p_aout, "audio-device",
                              list.p_list->p_values[0] );
                     i = 0;
-           
+
                 }
                 else
                 {
                   var_Set( p_aout, "audio-device",
-                             list.p_list->p_values[i+1] );                   
+                             list.p_list->p_values[i+1] );
                     i++;
                 }
-                vout_OSDMessage( VLC_OBJECT(p_input), 
+                vout_OSDMessage( VLC_OBJECT(p_input),
                                  DEFAULT_CHAN,
                                  _("Audio Device: %s"),
                                  list2.p_list->p_values[i].psz_string);
-                vlc_object_release( p_aout );        
+                vlc_object_release( p_aout );
             }
             else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
