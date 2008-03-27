@@ -402,6 +402,54 @@ static void Run( intf_thread_t *p_intf )
                 playlist_Play( p_playlist );
             }
         }
+        else if( i_action == ACTIONID_AUDIODEVICE_CYCLE )
+        {
+            vlc_value_t val, list, list2;
+            int i_count, i;
+
+            aout_instance_t *p_aout =
+                vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+            var_Get( p_aout, "audio-device", &val );
+            var_Change( p_aout, "audio-device", VLC_VAR_GETCHOICES,
+                    &list, &list2 );
+            i_count = list.p_list->i_count;
+
+            /* Not enough device to switch between */
+            if( i_count <= 1 )
+                continue;
+
+            for( i = 0; i < i_count; i++ )
+            {
+                if( val.i_int == list.p_list->p_values[i].i_int )
+                {
+                    break;
+                }
+            }
+            if( i == i_count )
+            {
+                msg_Warn( p_aout,
+                        "invalid current audio device, selecting 0" );
+                var_Set( p_aout, "audio-device",
+                        list.p_list->p_values[0] );
+                i = 0;
+            }
+            else if( i == i_count -1 )
+            {
+                var_Set( p_aout, "audio-device",
+                        list.p_list->p_values[0] );
+                i = 0;
+            }
+            else
+            {
+                var_Set( p_aout, "audio-device",
+                        list.p_list->p_values[i+1] );
+                i++;
+            }
+            vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                    _("Audio Device: %s"),
+                    list2.p_list->p_values[i].psz_string);
+            vlc_object_release( p_aout );
+        }
         /* Input options */
         else if( p_input )
         {
@@ -509,54 +557,6 @@ static void Run( intf_thread_t *p_intf )
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  _("Audio track: %s"),
                                  list2.p_list->p_values[i].psz_string );
-            }
-            else if( i_action == ACTIONID_AUDIODEVICE_CYCLE && p_vout)
-            {
-                vlc_value_t val, list, list2;
-                int i_count, i;
-                aout_instance_t *p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-                var_Get( p_aout, "audio-device", &val );
-                var_Change( p_aout, "audio-device", VLC_VAR_GETCHOICES,&list, &list2 );
-                i_count = list.p_list->i_count;
-                if( i_count <= 1 )
-                {
-                    continue;
-                }
-
-                for( i = 0; i < i_count; i++ )
-                {
-                    if( val.i_int == list.p_list->p_values[i].i_int )
-                    {
-                        break;
-                    }
-                }
-                if( i == i_count )
-                {
-                    msg_Warn( p_aout,
-                              "invalid current audio device, selecting 0" );
-                    var_Set( p_aout, "audio-device",
-                             list.p_list->p_values[0] );
-                    i = 0;
-
-                }
-                else if( i == i_count -1 )
-                {
-                  var_Set( p_aout, "audio-device",
-                             list.p_list->p_values[0] );
-                    i = 0;
-
-                }
-                else
-                {
-                  var_Set( p_aout, "audio-device",
-                             list.p_list->p_values[i+1] );
-                    i++;
-                }
-                vout_OSDMessage( VLC_OBJECT(p_input),
-                                 DEFAULT_CHAN,
-                                 _("Audio Device: %s"),
-                                 list2.p_list->p_values[i].psz_string);
-                vlc_object_release( p_aout );
             }
             else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
@@ -863,7 +863,6 @@ static void Run( intf_thread_t *p_intf )
             {
                 osd_MenuActivate( VLC_OBJECT(p_intf) );
             }
-
         }
         if( p_vout )
             vlc_object_release( p_vout );
