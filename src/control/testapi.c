@@ -229,7 +229,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
     libvlc_instance_t *vlc;
     libvlc_media_descriptor_t *md;
     libvlc_media_instance_t *mi;
-    const char * file = "../bindings/java/core/src/test/resources/raffa_voice.ogg";
+    const char * file = "file://../bindings/java/core/src/test/resources/raffa_voice.ogg";
 
     log ("Testing play and pause of %s\n", file);
 
@@ -262,7 +262,6 @@ static void test_media_player_play_stop(const char** argv, int argc)
 
     libvlc_release (vlc);
     catch ();
-    
 }
 
 int main (int argc, char *argv[])
@@ -283,11 +282,11 @@ int main (int argc, char *argv[])
 
     test_core (args, nlibvlc_args);
 
-    test_media_player_play_stop(args, nlibvlc_args);
-
     test_events (args, nlibvlc_args);
 
     test_media_list (args, nlibvlc_args);
+
+    test_media_player_play_stop(args, nlibvlc_args);
 
     return 0;
 }
