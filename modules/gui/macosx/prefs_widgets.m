@@ -1988,7 +1988,7 @@
             unsigned int i;
             o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
             for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++)
-                if( vlc_keys[i].psz_key_string && *vlc_keys[i].psz_key_string )
+                if( vlc_keys[i].psz_key_string )
                     POPULATE_A_KEY( o_keys_menu,
                         [NSString stringWithUTF8String:vlc_keys[i].psz_key_string]
                         , vlc_keys[i].i_key_code)
