@@ -259,6 +259,7 @@ DIST_lua= \
 	luaplaylist/lelombrik.lua \
 	luaplaylist/youtube.lua \
 	luaplaylist/youtube_homepage.lua \
+    luaplaylist/megavideo.lua \
 	luaplaylist/metacafe.lua \
 	luaplaylist/googlevideo.lua \
 	luaintf/http.lua \
