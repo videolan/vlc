@@ -5,7 +5,10 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 NULL =
-EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym vlc-control.pc.in
+EXTRA_DIST = extras/COPYING modules/builtin.h.in \
+	vlc-control.pc.in \
+	vlc-plugin.pc.in \
+	libvlc.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c ../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
