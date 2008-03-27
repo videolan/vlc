@@ -435,9 +435,9 @@ library AXVLC
         HRESULT crop([in] BSTR geometry);
 
         [propget, helpstring("Returns teletext page used.")]
-        HRESULT subtitle([out, retval] long* page);
+        HRESULT teletext([out, retval] long* page);
         [propput, helpstring("Sets teletext page to use.")]
-        HRESULT subtitle([in] long page);
+        HRESULT teletext([in] long page);
 
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
