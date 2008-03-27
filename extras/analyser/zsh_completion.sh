@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 # Helper script to install zsh completion for VLC media player
 # © 2008 Rafaël Carré <funman@videolanorg>
 
