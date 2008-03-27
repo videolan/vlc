@@ -51,10 +51,6 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    vlc_mutex_t         change_lock;  /* mutex to keep the callback
-                                       * and the main loop from
-                                       * stepping on each others
-                                       * toes */
     int                 p_keys[ BUFFER_SIZE ]; /* buffer that contains
                                                 * keyevents */
     int                 i_size;        /* number of events in buffer */
@@ -111,7 +107,6 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     MALLOC_ERR( p_intf->p_sys, intf_sys_t );
 
-    vlc_mutex_init( p_intf, &p_intf->p_sys->change_lock );
     p_intf->p_sys->i_size = 0;
     p_intf->pf_run = Run;
 
@@ -128,7 +123,6 @@ static void Close( vlc_object_t *p_this )
 
     var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
 
-    vlc_mutex_destroy( &p_intf->p_sys->change_lock );
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -138,9 +132,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    input_thread_t *p_input = NULL;
     vout_thread_t *p_vout = NULL;
-    vout_thread_t *p_last_vout = NULL;
     struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
     vlc_value_t val;
     int i;
@@ -158,16 +150,16 @@ static void Run( intf_thread_t *p_intf )
         var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
     }
 
-    for( vlc_bool_t b_quit = VLC_FALSE ; !b_quit; )
+    for( ;; )
     {
-        int i_key, i_action;
+        input_thread_t *p_input;
+        vout_thread_t *p_last_vout;
         int i_times = 0;
+        int i_action = 0;
+        int i_key = GetKey( p_intf );
 
-        /* Sleep a bit */
-        /* msleep( INTF_IDLE_SLEEP ); */
-
-        i_action = 0;
-        i_key = GetKey( p_intf );
+        if( i_key == -1 )
+            break; /* die */
 
         /* Special action for mouse event */
         /* FIXME: This should probably be configurable */
@@ -204,13 +196,6 @@ static void Run( intf_thread_t *p_intf )
                     break;
                 }
             }
-        }
-
-        if( !i_action )
-        {
-            b_quit = vlc_object_lock_and_wait( p_intf );
-            /* No key pressed, sleep a bit more */
-            continue;
         }
 
         /* Update the input */
@@ -872,26 +857,43 @@ static void Run( intf_thread_t *p_intf )
     pl_Release( p_intf );
 }
 
-static int GetKey( intf_thread_t *p_intf)
+static int GetKey( intf_thread_t *p_intf )
 {
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
-    if ( p_intf->p_sys->i_size == 0 )
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int i_ret = -1;
+
+    vlc_object_lock( p_intf );
+    while( p_sys->i_size == 0 )
     {
-        vlc_mutex_unlock( &p_intf->p_sys->change_lock );
-        return -1;
+        if( !vlc_object_alive( p_intf ) )
+            goto out;
+        vlc_object_wait( p_intf );
     }
+
+    i_ret = p_intf->p_sys->p_keys[ 0 ];
+    p_sys->i_size--;
+    for( int i = 0; i < p_sys->i_size; i++ )
+        p_sys->p_keys[i] = p_sys->p_keys[i + 1];
+
+out:
+    vlc_object_unlock( p_intf );
+    return i_ret;
+}
+
+static int PutKey( intf_thread_t *p_intf, int i_key )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int i_ret = VLC_EGENERIC;
+
+    vlc_object_lock( p_intf );
+    if ( p_sys->i_size >= BUFFER_SIZE )
+        msg_Warn( p_intf, "event buffer full, dropping keypress" );
     else
-    {
-        int i_return = p_intf->p_sys->p_keys[ 0 ];
-        int i;
-        p_intf->p_sys->i_size--;
-        for ( i = 0; i < BUFFER_SIZE - 1; i++)
-        {
-            p_intf->p_sys->p_keys[ i ] = p_intf->p_sys->p_keys[ i + 1 ];
-        }
-        vlc_mutex_unlock( &p_intf->p_sys->change_lock );
-        return i_return;
-    }
+        p_sys->p_keys[p_sys->i_size++] = i_key;
+
+    vlc_object_signal_unlocked( p_intf );
+    vlc_object_unlock( p_intf );
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -902,29 +904,8 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    if ( !newval.i_int )
-    {
-        msg_Warn( p_this, "Received invalid key event %d", newval.i_int );
-        return VLC_EGENERIC;
-    }
-    vlc_mutex_lock( &p_intf->p_sys->change_lock );
-    if ( p_intf->p_sys->i_size == BUFFER_SIZE )
-    {
-        msg_Warn( p_intf, "event buffer full, dropping keypress" );
-        vlc_mutex_unlock( &p_intf->p_sys->change_lock );
-        return VLC_EGENERIC;
-    }
-    else
-    {
-        p_intf->p_sys->p_keys[ p_intf->p_sys->i_size ] = newval.i_int;
-        p_intf->p_sys->i_size++;
-    }
-    vlc_mutex_lock( &p_intf->object_lock );
-    vlc_cond_signal( &p_intf->object_wait );
-    vlc_mutex_unlock( &p_intf->object_lock );
-    vlc_mutex_unlock( &p_intf->p_sys->change_lock );
 
-    return VLC_SUCCESS;
+    return PutKey( p_intf, newval.i_int );
 }
 
 static int ActionKeyCB( vlc_object_t *libvlc, char const *psz_var,
