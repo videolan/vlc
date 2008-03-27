@@ -80,7 +80,6 @@
 #define ADD_BOOL( b ) DBUS_ADD( DBUS_TYPE_BOOLEAN, b )
 #define ADD_INT32( i ) DBUS_ADD( DBUS_TYPE_INT32, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
-#define ADD_UINT16( i ) DBUS_ADD( DBUS_TYPE_UINT16, i )
 
 /* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
 

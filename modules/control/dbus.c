@@ -136,10 +136,20 @@ DBUS_METHOD( MprisVersion )
     dbus_uint16_t i_minor = VLC_MPRIS_VERSION_MINOR;
     DBusMessageIter version;
 
-    dbus_message_iter_open_container( &args, DBUS_TYPE_STRUCT, NULL, &version );
-    dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16, &i_major );
-    dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16, &i_minor );
-    dbus_message_iter_close_container( &args, &version );
+    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_STRUCT, NULL,
+            &version ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16,
+            &i_major ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16,
+            &i_minor ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_close_container( &args, &version ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
     REPLY_SEND;
 }
 
