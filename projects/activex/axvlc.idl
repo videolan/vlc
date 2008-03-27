@@ -134,6 +134,15 @@ library AXVLC
 ** for compatibility with some scripting language (JScript)
 */
 
+        /*
+         * caution: vlcobject.toolbar:bool does not yet exists in Firefox
+         * plugin. Official usage is through "toolbar" property for now,
+         * which is compatibile with Firefox.
+         */
+        [id(DISPID_Toolbar), propget, helpstring("Returns/sets visibility of the toolbar")]
+        HRESULT Toolbar([out, retval] VARIANT_BOOL* visible);
+        [id(DISPID_Toolbar), propput, helpstring("Returns/sets visibility of the toolbar")]
+        HRESULT Toolbar([in] VARIANT_BOOL visible);
         HRESULT addTarget([in] BSTR uri, [in] VARIANT options, [in] enum VLCPlaylistMode mode, [in] int position);
         [propget, helpstring("Returns index of current item in playlist.")]
         HRESULT PlaylistIndex([out, retval] int* index);
