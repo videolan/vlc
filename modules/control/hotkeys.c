@@ -153,7 +153,7 @@ static void Run( intf_thread_t *p_intf )
                     VLC_VAR_HOTKEY | VLC_VAR_DOINHERIT );
 
         var_AddCallback( p_intf->p_libvlc, p_hotkeys[i].psz_action,
-                         ActionKeyCB, NULL );
+                         ActionKeyCB, p_hotkeys + i );
         var_Get( p_intf->p_libvlc, p_hotkeys[i].psz_action, &val );
         var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
     }
@@ -927,30 +927,24 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
-static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
+static int ActionKeyCB( vlc_object_t *libvlc, char const *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-    libvlc_int_t *p_libvlc = (libvlc_int_t *)p_this;
-    struct hotkey *p_hotkeys = p_libvlc->p_hotkeys;
     mtime_t i_date;
-    int i;
+    struct hotkey *p_hotkey = p_data;
 
-    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-    {
-        if( !strcmp( p_hotkeys[i].psz_action, psz_var ) )
-        {
-            p_hotkeys[i].i_key = newval.i_int;
-            /* do hotkey accounting */
-            i_date = mdate();
-            if( (p_hotkeys[i].i_delta_date > 0) &&
-                (p_hotkeys[i].i_delta_date <= (i_date - p_hotkeys[i].i_last_date) ) )
-                p_hotkeys[i].i_times = 0;
-            else
-                p_hotkeys[i].i_times++;
-            p_hotkeys[i].i_last_date = i_date;
-        }
-    }
+    (void)libvlc; (void)psz_var; (void)oldval;
+
+    p_hotkey->i_key = newval.i_int;
+
+    /* do hotkey accounting */
+    i_date = mdate();
+    if( (p_hotkey->i_delta_date > 0) &&
+        (p_hotkey->i_delta_date <= (i_date - p_hotkey->i_last_date) ) )
+        p_hotkey->i_times = 0;
+    else
+        p_hotkey->i_times++;
+    p_hotkey->i_last_date = i_date;
 
     return VLC_SUCCESS;
 }
