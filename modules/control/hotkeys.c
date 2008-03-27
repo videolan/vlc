@@ -51,8 +51,8 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    int                 p_keys[ BUFFER_SIZE ]; /* buffer that contains
-                                                * keyevents */
+    int                 p_actions[ BUFFER_SIZE ]; /* buffer that contains
+                                                   * action events */
     int                 i_size;        /* number of events in buffer */
     int                 p_channels[ CHANNELS_NUMBER ]; /* contains registered
                                                         * channel IDs */
@@ -66,9 +66,11 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
-static int  GetKey  ( intf_thread_t *);
-static int  KeyEvent( vlc_object_t *, char const *,
-                      vlc_value_t, vlc_value_t, void * );
+static int  GetAction( intf_thread_t *);
+static int  ActionEvent( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
+static int  SpecialKeyEvent( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
 static int  ActionKeyCB( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static void PlayBookmark( intf_thread_t *, int );
@@ -110,7 +112,8 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->i_size = 0;
     p_intf->pf_run = Run;
 
-    var_AddCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
     return VLC_SUCCESS;
 }
 
@@ -121,7 +124,8 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -155,49 +159,22 @@ static void Run( intf_thread_t *p_intf )
         input_thread_t *p_input;
         vout_thread_t *p_last_vout;
         int i_times = 0;
-        int i_action = 0;
-        int i_key = GetKey( p_intf );
+        int i_action = GetAction( p_intf );
 
-        if( i_key == -1 )
+        if( i_action == -1 )
             break; /* die */
 
-        /* Special action for mouse event */
-        /* FIXME: This should probably be configurable */
-        /* FIXME: rework hotkeys handling to allow more than 1 event
-         * to trigger one same action */
-        switch (i_key & KEY_SPECIAL)
+        for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
         {
-            case KEY_MOUSEWHEELUP:
-                i_action = ACTIONID_VOL_UP;
-                break;
-            case KEY_MOUSEWHEELDOWN:
-                i_action = ACTIONID_VOL_DOWN;
-                break;
-            case KEY_MOUSEWHEELLEFT:
-                i_action = ACTIONID_JUMP_BACKWARD_EXTRASHORT;
-                break;
-            case KEY_MOUSEWHEELRIGHT:
-                i_action = ACTIONID_JUMP_FORWARD_EXTRASHORT;
-                break;
-            default: break;
-        }
-
-        /* No mouse action, find action triggered by hotkey */
-        if(!i_action)
-        {
-            for( i = 0; i_key != -1 && p_hotkeys[i].psz_action != NULL; i++ )
+            if( p_hotkeys[i].i_action == i_action )
             {
-                if( p_hotkeys[i].i_key == i_key )
-                {
-                    i_action = p_hotkeys[i].i_action;
-                    i_times  = p_hotkeys[i].i_times;
-                    /* times key pressed within max. delta time */
-                    p_hotkeys[i].i_times = 0;
-                    break;
-                }
+                i_times  = p_hotkeys[i].i_times;
+                /* times key pressed within max. delta time */
+                p_hotkeys[i].i_times = 0;
+                break;
             }
         }
-
+ 
         /* Update the input */
         PL_LOCK;
         p_input = p_playlist->p_input;
@@ -857,7 +834,7 @@ static void Run( intf_thread_t *p_intf )
     pl_Release( p_intf );
 }
 
-static int GetKey( intf_thread_t *p_intf )
+static int GetAction( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     int i_ret = -1;
@@ -870,26 +847,26 @@ static int GetKey( intf_thread_t *p_intf )
         vlc_object_wait( p_intf );
     }
 
-    i_ret = p_intf->p_sys->p_keys[ 0 ];
+    i_ret = p_sys->p_actions[ 0 ];
     p_sys->i_size--;
     for( int i = 0; i < p_sys->i_size; i++ )
-        p_sys->p_keys[i] = p_sys->p_keys[i + 1];
+        p_sys->p_actions[i] = p_sys->p_actions[i + 1];
 
 out:
     vlc_object_unlock( p_intf );
     return i_ret;
 }
 
-static int PutKey( intf_thread_t *p_intf, int i_key )
+static int PutAction( intf_thread_t *p_intf, int i_action )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     int i_ret = VLC_EGENERIC;
 
     vlc_object_lock( p_intf );
     if ( p_sys->i_size >= BUFFER_SIZE )
-        msg_Warn( p_intf, "event buffer full, dropping keypress" );
+        msg_Warn( p_intf, "event buffer full, dropping key actions" );
     else
-        p_sys->p_keys[p_sys->i_size++] = i_key;
+        p_sys->p_actions[p_sys->i_size++] = i_action;
 
     vlc_object_signal_unlocked( p_intf );
     vlc_object_unlock( p_intf );
@@ -897,15 +874,57 @@ static int PutKey( intf_thread_t *p_intf, int i_key )
 }
 
 /*****************************************************************************
- * KeyEvent: callback for keyboard events
+ * SpecialKeyEvent: callback for mouse events
  *****************************************************************************/
-static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
 {
-    VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
+    intf_thread_t *p_intf = (intf_thread_t *)p_data;
+    int i_action;
+
+    (void)libvlc;
+    (void)psz_var;
+    (void)oldval;
+
+    /* Special action for mouse event */
+    /* FIXME: This should probably be configurable */
+    /* FIXME: rework hotkeys handling to allow more than 1 event
+     * to trigger one same action */
+    switch (newval.i_int & KEY_SPECIAL)
+    {
+        case KEY_MOUSEWHEELUP:
+            i_action = ACTIONID_VOL_UP;
+            break;
+        case KEY_MOUSEWHEELDOWN:
+            i_action = ACTIONID_VOL_DOWN;
+            break;
+        case KEY_MOUSEWHEELLEFT:
+            i_action = ACTIONID_JUMP_BACKWARD_EXTRASHORT;
+            break;
+        case KEY_MOUSEWHEELRIGHT:
+            i_action = ACTIONID_JUMP_FORWARD_EXTRASHORT;
+            break;
+        default:
+          return VLC_SUCCESS;
+    }
+
+    return PutAction( p_intf, i_action );
+}
+
+/*****************************************************************************
+ * ActionEvent: callback for hotkey actions
+ *****************************************************************************/
+static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
 
-    return PutKey( p_intf, newval.i_int );
+    (void)libvlc;
+    (void)psz_var;
+    (void)oldval;
+
+    return PutAction( p_intf, newval.i_int );
 }
 
 static int ActionKeyCB( vlc_object_t *libvlc, char const *psz_var,
