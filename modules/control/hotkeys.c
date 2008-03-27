@@ -154,23 +154,11 @@ static void Run( intf_thread_t *p_intf )
     {
         input_thread_t *p_input;
         vout_thread_t *p_last_vout;
-        int i_times = 0;
         int i_action = GetAction( p_intf );
 
         if( i_action == -1 )
             break; /* die */
 
-        for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-        {
-            if( p_hotkeys[i].i_action == i_action )
-            {
-                i_times  = p_hotkeys[i].i_times;
-                /* times key pressed within max. delta time */
-                p_hotkeys[i].i_times = 0;
-                break;
-            }
-        }
- 
         /* Update the input */
         PL_LOCK;
         p_input = p_playlist->p_input;
@@ -436,8 +424,7 @@ static void Run( intf_thread_t *p_intf )
 #define SET_TIME( a, b ) \
     i_interval = config_GetInt( p_input, a "-jump-size" ); \
     if( i_interval > 0 ) { \
-        val.i_time = ( (mtime_t)(i_interval * b) * 1000000L \
-                       * ((mtime_t)(1 << i_times))); \
+        val.i_time = (mtime_t)(i_interval * b) * 1000000L; \
         var_Set( p_input, "time-offset", val ); \
         DisplayPosition( p_intf, p_vout, p_input ); \
     }
