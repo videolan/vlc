@@ -70,7 +70,8 @@ OpenDialog::OpenDialog( QWidget *parent,
     /* Basic Creation of the Window */
     ui.setupUi( this );
     setWindowTitle( qtr( "Open" ) );
-    resize( 410, 300 );
+    /* resize( 410, 600 ); */
+    setMinimumSize( 520, 460 );
 
     /* Tab definition and creation */
     fileOpenPanel    = new FileOpenPanel( ui.Tab, p_intf );
@@ -212,13 +213,18 @@ void OpenDialog::toggleAdvancedPanel()
     if( ui.advancedFrame->isVisible() )
     {
         ui.advancedFrame->hide();
-        //FIXME: Clear Bug here. Qt ?
+        //setMinimumSize( 520, 460 );
         if( size().isValid() )
-            resize( size().width(), size().height() - ui.advancedFrame->height() );
+            resize( size().width(), size().height()
+                    - ui.advancedFrame->height() );
     }
     else
     {
         ui.advancedFrame->show();
+        //setMinimumSize( 520, 460 + ui.advancedFrame->height() );
+        if( size().isValid() )
+            resize( size().width(), size().height()
+                    + ui.advancedFrame->height() );
     }
 }
 

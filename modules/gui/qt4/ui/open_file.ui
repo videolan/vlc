@@ -20,14 +20,14 @@
    <string>_("Open File")</string>
   </property>
   <layout class="QGridLayout" >
-   <item row="0" column="0" colspan="3" >
+   <item row="0" column="0" >
     <widget class="QWidget" native="1" name="tempWidget" >
      <property name="toolTip" >
       <string>_("Choose one or more media file to open")</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="2" >
+   <item row="1" column="0" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -38,12 +38,12 @@
      <property name="sizeHint" >
       <size>
        <width>273</width>
-       <height>14</height>
+       <height>16</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" colspan="2" >
+   <item row="2" column="0" >
     <widget class="QCheckBox" name="subCheckBox" >
      <property name="toolTip" >
       <string>_("Add a subtitle file")</string>
@@ -53,7 +53,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="3" >
+   <item row="3" column="0" >
     <widget class="QFrame" name="subFrame" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
@@ -184,22 +184,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item row="5" column="0" colspan="3" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType" >
-      <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>200</width>
-       <height>2</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
