@@ -181,6 +181,8 @@ int qtWheelEventToVLCKey( QWheelEvent *e )
 
 QString VLCKeyToString( int val )
 {
+    const char *base = KeyToString (val & ~KEY_MODIFIER);
+
     QString r = "";
     if( val & KEY_MODIFIER_CTRL )
         r+= "Ctrl+";
@@ -189,14 +191,6 @@ QString VLCKeyToString( int val )
     if( val & KEY_MODIFIER_SHIFT )
         r+= "Shift+";
 
-    unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
-    for( unsigned int i = 0; i< i_keys; i++ )
-    {
-        if( vlc_keys[i].i_key_code == (val& ~KEY_MODIFIER) )
-        {
-            r+= vlc_keys[i].psz_key_string;
-        }
-    }
-    return r;
+    return r + (base ? base : "Unset");
 }
 

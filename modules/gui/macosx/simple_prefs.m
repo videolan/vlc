@@ -83,17 +83,11 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( val & KEY_MODIFIER_COMMAND )
         [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
 
-    unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
-    for( unsigned int i = 0; i< i_keys; i++ )
-    {
-        if( vlc_keys[i].i_key_code == (val& ~KEY_MODIFIER) )
-        {
-            if( vlc_keys[i].psz_key_string )
-                [o_temp_str appendString: [NSString stringWithUTF8String: vlc_keys[i].psz_key_string]];
-            else
-                o_temp_str = @"Unset";
-        }
-    }
+    const char *base = KeyToString( val & ~KEY_MODIFIER );
+    if( base )
+        [o_temp_str appendString: [NSString stringWithUTF8String: base]];
+    else
+        o_temp_str = @"Unset";
     return o_temp_str;
 }
 
