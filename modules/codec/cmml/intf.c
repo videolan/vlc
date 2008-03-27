@@ -66,7 +66,7 @@ struct intf_sys_t
     decoder_t *         p_cmml_decoder;
     input_thread_t *    p_input;
 
-    vlc_bool_t          b_key_pressed;
+    int                 i_key_action;
 };
 
 struct navigation_history_t
@@ -126,7 +126,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 
     p_intf->pf_run = RunIntf;
 
-    var_AddCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "key-action", KeyEvent, p_intf );
     /* we also need to add the callback for "mouse-clicked", but do that later
      * when we've found a p_vout */
 
@@ -164,7 +164,7 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
         vlc_object_release( p_vout );
     }
 
-    var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "key-action", KeyEvent, p_intf );
 
     vlc_object_release( p_intf->p_sys->p_cmml_decoder );
 
@@ -219,48 +219,21 @@ static void RunIntf( intf_thread_t *p_intf )
         /*
          * keyboard event
          */
-        if( p_intf->p_sys->b_key_pressed )
+        switch( p_intf->p_sys->i_key_action )
         {
-            vlc_value_t val;
-            int i, i_action = -1;
-            struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
-
-            /* Find action triggered by hotkey (if any) */
-            var_Get( p_intf->p_libvlc, "key-pressed", &val );
-
-            /* Acknowledge that we've handled the b_key_pressed event */
-            p_intf->p_sys->b_key_pressed = VLC_FALSE;
-
-#ifdef CMML_INTF_DEBUG
-            msg_Dbg( p_intf, "Got a keypress: %d", val.i_int );
-#endif
-
-            for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-            {
-                if( p_hotkeys[i].i_key == val.i_int )
-                    i_action = p_hotkeys[i].i_action;
-            }
-
-            /* What did the user do? */
-            if( i_action != -1 )
-            {
-                switch( i_action )
-                {
-                    case ACTIONID_NAV_ACTIVATE:
-                        FollowAnchor( p_intf );
-                        break;
-                    case ACTIONID_HISTORY_BACK:
-                        GoBack( p_intf );
-                        break;
-                    case ACTIONID_HISTORY_FORWARD:
-                        GoForward( p_intf );
-                        break;
-                    default:
-                        break;
-                }
-            }
+            case ACTIONID_NAV_ACTIVATE:
+                FollowAnchor( p_intf );
+                break;
+            case ACTIONID_HISTORY_BACK:
+                GoBack( p_intf );
+                break;
+            case ACTIONID_HISTORY_FORWARD:
+                GoForward( p_intf );
+                break;
+            default:
+                break;
         }
-
+        p_intf->p_sys->i_key_action = 0;
         vlc_mutex_unlock( &p_intf->change_lock );
 
         (void) DisplayPendingAnchor( p_intf, p_vout );
@@ -386,7 +359,7 @@ static int InitThread( intf_thread_t * p_intf )
         p_intf->p_sys->p_input = p_input;
         p_intf->p_sys->p_cmml_decoder = p_cmml_decoder;
 
-        p_intf->p_sys->b_key_pressed = VLC_FALSE;
+        p_intf->p_sys->i_key_action = 0;
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
@@ -423,7 +396,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
     vlc_mutex_lock( &p_intf->change_lock );
 
-    p_intf->p_sys->b_key_pressed = VLC_TRUE;
+    p_intf->p_sys->i_key_action = newval.i_int;
 
     vlc_mutex_unlock( &p_intf->change_lock );
 
