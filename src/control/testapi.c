@@ -50,9 +50,13 @@ static void catch (void)
     libvlc_exception_clear (&ex);
 }
 
+/* Test we have */
 static void test_core (const char ** argv, int argc);
 static void test_media_list (const char ** argv, int argc);
+static void test_events (const char ** argv, int argc);
+static void test_media_player_play_stop(const char** argv, int argc);
 
+/* Tests implementations */
 static void test_core (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
@@ -108,45 +112,6 @@ static void test_media_list (const char ** argv, int argc)
     libvlc_media_descriptor_release (md);
 
     libvlc_media_list_release (ml);
-
-    libvlc_release (vlc);
-    catch ();
-}
-
-static void test_file_playback (const char ** argv, int argc, const char * file)
-{
-    libvlc_instance_t *vlc;
-    libvlc_media_descriptor_t *md;
-    libvlc_media_instance_t *mi;
-
-    log ("Testing playback of %s\n", file);
-
-    libvlc_exception_init (&ex);
-    vlc = libvlc_new (argc, argv, &ex);
-    catch ();
-
-    md = libvlc_media_descriptor_new (vlc, file, &ex);
-    catch ();
-
-    mi = libvlc_media_instance_new_from_media_descriptor (md, &ex);
-    catch ();
-    
-    libvlc_media_descriptor_release (md);
-
-    libvlc_media_instance_play (mi, &ex);
-    catch ();
-
-    /* FIXME: Do something clever */
-    sleep(1);
-
-    assert( libvlc_media_instance_get_state (mi, &ex) != libvlc_Error );
-    catch ();
-
-    libvlc_media_instance_stop (mi, &ex);
-    catch ();
-
-    libvlc_media_instance_release (mi);
-    catch ();
 
     libvlc_release (vlc);
     catch ();
@@ -264,9 +229,9 @@ static void test_media_player_play_stop(const char** argv, int argc)
     libvlc_instance_t *vlc;
     libvlc_media_descriptor_t *md;
     libvlc_media_instance_t *mi;
-    const char** file = "../bindings/java/core/src/test/resources/raffa_voice.ogg";
+    const char * file = "../bindings/java/core/src/test/resources/raffa_voice.ogg";
 
-    log ("Testing playback of %s\n", file);
+    log ("Testing play and pause of %s\n", file);
 
     libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv, &ex);
