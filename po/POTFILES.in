@@ -16,10 +16,12 @@ include/vlc_codec.h
 include/vlc_codecs.h
 include/vlc_codec_synchro.h
 include/vlc_common.h
+include/vlc/common.h
 include/vlc_config_cat.h
 include/vlc_config.h
 include/vlc_configuration.h
 include/vlc_demux.h
+include/vlc/deprecated.h
 include/vlc_devices.h
 include/vlc_epg.h
 include/vlc_es.h
@@ -33,8 +35,11 @@ include/vlc_input.h
 include/vlc_interface.h
 include/vlc_intf_strings.h
 include/vlc_keys.h
+include/vlc/libvlc_events.h
 include/vlc/libvlc.h
+include/vlc/libvlc_media_list.h
 include/vlc/libvlc_structures.h
+include/vlc/libvlc_vlm.h
 include/vlc_md5.h
 include/vlc/mediacontrol.h
 include/vlc/mediacontrol_structures.h
@@ -82,7 +87,6 @@ src/config/file.c
 src/config/intf.c
 src/control/audio.c
 src/control/core.c
-src/control/dynamic_media_list.c
 src/control/event.c
 src/control/flat_media_list_view.c
 src/control/hierarchical_media_list_view.c
@@ -102,7 +106,6 @@ src/control/media_list_path.h
 src/control/media_list_player.c
 src/control/media_list_view.c
 src/control/playlist.c
-src/control/tag_query.c
 src/control/testapi.c
 src/control/video.c
 src/control/vlm.c
@@ -130,6 +133,7 @@ src/input/vlm.c
 src/input/vlm_internal.h
 src/interface/interaction.c
 src/interface/interface.c
+src/interface/interface.h
 src/interface/intf_eject.c
 src/libvlc.c
 src/libvlc-common.c
@@ -1251,6 +1255,7 @@ modules/video_output/qte/qte.h
 modules/video_output/sdl.c
 modules/video_output/snapshot.c
 modules/video_output/svgalib.c
+modules/video_output/vmem.c
 modules/video_output/x11/glx.c
 modules/video_output/x11/x11.c
 modules/video_output/x11/xcommon.c
