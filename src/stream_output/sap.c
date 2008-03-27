@@ -120,12 +120,13 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     sap_handler_t *p_sap;
 
     p_sap = vlc_object_create( p_announce, sizeof( sap_handler_t ) );
-
     if( !p_sap )
     {
         msg_Err( p_announce, "out of memory" );
         return NULL;
     }
+
+    p_sap->psz_object_name = "sap announcer";
 
     vlc_mutex_init( p_sap, &p_sap->object_lock );
 
