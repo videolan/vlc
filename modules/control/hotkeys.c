@@ -71,8 +71,6 @@ static int  ActionEvent( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int  SpecialKeyEvent( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
-static int  ActionKeyCB( vlc_object_t *, char const *,
-                         vlc_value_t, vlc_value_t, void * );
 static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
 static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
@@ -148,8 +146,6 @@ static void Run( intf_thread_t *p_intf )
         var_Create( p_intf->p_libvlc, p_hotkeys[i].psz_action,
                     VLC_VAR_HOTKEY | VLC_VAR_DOINHERIT );
 
-        var_AddCallback( p_intf->p_libvlc, p_hotkeys[i].psz_action,
-                         ActionKeyCB, p_hotkeys + i );
         var_Get( p_intf->p_libvlc, p_hotkeys[i].psz_action, &val );
         var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
     }
@@ -925,28 +921,6 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
     (void)oldval;
 
     return PutAction( p_intf, newval.i_int );
-}
-
-static int ActionKeyCB( vlc_object_t *libvlc, char const *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    mtime_t i_date;
-    struct hotkey *p_hotkey = p_data;
-
-    (void)libvlc; (void)psz_var; (void)oldval;
-
-    p_hotkey->i_key = newval.i_int;
-
-    /* do hotkey accounting */
-    i_date = mdate();
-    if( (p_hotkey->i_delta_date > 0) &&
-        (p_hotkey->i_delta_date <= (i_date - p_hotkey->i_last_date) ) )
-        p_hotkey->i_times = 0;
-    else
-        p_hotkey->i_times++;
-    p_hotkey->i_last_date = i_date;
-
-    return VLC_SUCCESS;
 }
 
 static void PlayBookmark( intf_thread_t *p_intf, int i_num )
