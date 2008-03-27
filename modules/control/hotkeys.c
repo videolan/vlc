@@ -135,19 +135,16 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     vout_thread_t *p_vout = NULL;
-    struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
     vlc_value_t val;
     int i;
     playlist_t *p_playlist = pl_Yield( p_intf );
 
     /* Initialize hotkey structure */
-    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
+         p_hotkey->psz_action != NULL;
+         p_hotkey++ )
     {
-        var_Create( p_intf->p_libvlc, p_hotkeys[i].psz_action,
-                    VLC_VAR_HOTKEY | VLC_VAR_DOINHERIT );
-
-        var_Get( p_intf->p_libvlc, p_hotkeys[i].psz_action, &val );
-        var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
+        p_hotkey->i_key = config_GetInt( p_intf, p_hotkey->psz_action );
     }
 
     for( ;; )
