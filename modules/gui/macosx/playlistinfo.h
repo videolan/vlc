@@ -1,11 +1,11 @@
 /*****************************************************************************
  * playlistinfo.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,6 @@
     IBOutlet id o_uri_txt;
     IBOutlet id o_title_txt;
     IBOutlet id o_author_txt;
-    IBOutlet id o_btn_ok;
-    IBOutlet id o_btn_cancel;
-    IBOutlet id o_btn_delete_group;
-    IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
 
     IBOutlet id o_tab_view;
@@ -60,10 +56,10 @@
     IBOutlet id o_nowPlaying_txt;
     IBOutlet id o_publisher_lbl;
     IBOutlet id o_publisher_txt;
-    IBOutlet id o_rating_lbl;
-    IBOutlet id o_rating_txt;
     IBOutlet id o_seqNum_lbl;
     IBOutlet id o_seqNum_txt;
+    IBOutlet id o_image_well;
+    IBOutlet id o_saveMetaData_btn;
 
     IBOutlet id o_audio_box;
     IBOutlet id o_audio_decoded_lbl;
@@ -102,17 +98,16 @@
     NSTimer * o_statUpdateTimer;
 }
 
-- (IBAction)togglePlaylistInfoPanel:(id)sender;
-- (IBAction)toggleInfoPanel:(id)sender;
-- (void)initPanel:(id)sender;
+- (void)initPanel;
+- (IBAction)saveMetaData:(id)sender;
 - (void)updatePanel;
-- (IBAction)infoCancel:(id)sender;
-- (IBAction)infoOk:(id)sender;
 - (playlist_item_t *)getItem;
 - (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
 
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
 - (void)updateStatistics: (NSTimer*)theTimer;
+
++ (VLCInfo *)sharedInstance;
 @end
 
 @interface VLCInfoTreeItem : NSObject

@@ -77,6 +77,7 @@
 		CC1941250B9C1F8400635F6B /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC1AC1BC0A7BDA41002478C3 /* InteractionErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1AC1BA0A7BDA41002478C3 /* InteractionErrorPanel.nib */; };
 		CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */; };
+		CC1C41D10D9BAD7F002728FA /* noart.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1C41D00D9BAD7F002728FA /* noart.png */; };
 		CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
 		CC33C2220D2572DE008C4683 /* pause_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC33C2200D2572DE008C4683 /* pause_embedded_graphite.png */; };
 		CC33C2230D2572DE008C4683 /* play_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC33C2210D2572DE008C4683 /* play_embedded_graphite.png */; };
@@ -106,6 +107,7 @@
 		CC4ED9B80ABE07C800CA4CC5 /* shuffle_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */; };
 		CC4ED9B90ABE07C800CA4CC5 /* shuffle_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */; };
 		CC962E2D0CC7992800A56695 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
+		CCC896BA0D9AA9E9005AE59C /* MediaInfo.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */; };
 		CCCB86DB0ACFDFB300CF1E10 /* fs_time_slider.png in Resources */ = {isa = PBXBuildFile; fileRef = CCCB86C00ACFDFB300CF1E10 /* fs_time_slider.png */; };
 		CCCB86DC0ACFDFB400CF1E10 /* fs_skip_next_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = CCCB86C10ACFDFB300CF1E10 /* fs_skip_next_highlight.png */; };
 		CCCB86DD0ACFDFB400CF1E10 /* fs_skip_next.png in Resources */ = {isa = PBXBuildFile; fileRef = CCCB86C20ACFDFB300CF1E10 /* fs_skip_next.png */; };
@@ -169,7 +171,7 @@
 			productName = vlc;
 			productReference = 014CEA410018CDE011CA2923 /* VLC.bundle */;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
@@ -1009,7 +1011,7 @@
 		8E445F9A04728A700059A3A7 /* vob.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = vob.icns; path = Resources/vob.icns; sourceTree = SOURCE_ROOT; };
 		8E445F9B04728A700059A3A7 /* wma.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = wma.icns; path = Resources/wma.icns; sourceTree = SOURCE_ROOT; };
 		8E445F9C04728A700059A3A7 /* wmv.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = wmv.icns; path = Resources/wmv.icns; sourceTree = SOURCE_ROOT; };
-		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
+		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
 		8E49720106417F6800370C9F /* playlistinfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlistinfo.m; path = ../../../modules/gui/macosx/playlistinfo.m; sourceTree = SOURCE_ROOT; };
 		8E55FB7F0459B0FD00FB3317 /* output.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = output.h; path = ../../../modules/gui/macosx/output.h; sourceTree = SOURCE_ROOT; };
 		8E55FB800459B0FD00FB3317 /* output.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = output.m; path = ../../../modules/gui/macosx/output.m; sourceTree = SOURCE_ROOT; };
@@ -1049,8 +1051,8 @@
 		8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text; name = vlc.scriptSuite; path = Resources/vlc.scriptSuite; sourceTree = SOURCE_ROOT; };
 		8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = vlc.scriptTerminology; path = Resources/vlc.scriptTerminology; sourceTree = SOURCE_ROOT; };
 		8ED6C27B03E2EB1C0059A3A7 /* controls.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = controls.m; path = ../../../modules/gui/macosx/controls.m; sourceTree = SOURCE_ROOT; };
-		8ED6C27C03E2EB1C0059A3A7 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/macosx/intf.h; sourceTree = SOURCE_ROOT; };
-		8ED6C27D03E2EB1C0059A3A7 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/macosx/intf.m; sourceTree = SOURCE_ROOT; };
+		8ED6C27C03E2EB1C0059A3A7 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/macosx/intf.h; sourceTree = SOURCE_ROOT; };
+		8ED6C27D03E2EB1C0059A3A7 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		8ED6C27E03E2EB1C0059A3A7 /* macosx.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/gui/macosx/macosx.m; sourceTree = SOURCE_ROOT; };
 		8ED6C27F03E2EB1C0059A3A7 /* misc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = misc.h; path = ../../../modules/gui/macosx/misc.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28003E2EB1C0059A3A7 /* misc.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = misc.m; path = ../../../modules/gui/macosx/misc.m; sourceTree = SOURCE_ROOT; };
@@ -1084,6 +1086,7 @@
 		CC1B4B4C09A8CF9E0078AD2E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Interaction.nib; sourceTree = "<group>"; };
 		CC1B4C1409A8EC690078AD2E /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../../modules/gui/macosx/interaction.h; sourceTree = "<group>"; };
 		CC1B4C1509A8EC690078AD2E /* interaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = interaction.m; path = ../../../modules/gui/macosx/interaction.m; sourceTree = "<group>"; };
+		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
 		CC26BF2B09A7A05000E94D62 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Update.nib; sourceTree = "<group>"; };
 		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
 		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
@@ -1123,6 +1126,8 @@
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
+		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
+		CCC896B90D9AA9E8005AE59C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/MediaInfo.nib; sourceTree = "<group>"; };
 		CCCB86C00ACFDFB300CF1E10 /* fs_time_slider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_time_slider.png; path = Resources/fs_time_slider.png; sourceTree = "<group>"; };
 		CCCB86C10ACFDFB300CF1E10 /* fs_skip_next_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_skip_next_highlight.png; path = Resources/fs_skip_next_highlight.png; sourceTree = "<group>"; };
 		CCCB86C20ACFDFB300CF1E10 /* fs_skip_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_skip_next.png; path = Resources/fs_skip_next.png; sourceTree = "<group>"; };
@@ -1195,6 +1200,7 @@
 		089C166AFE841209C02AAC07 /* vlc */ = {
 			isa = PBXGroup;
 			children = (
+				CCC8957F0D9A8A61005AE59C /* OSX-specific access */,
 				08FB77AFFE84173DC02AAC07 /* Classes */,
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
@@ -1222,6 +1228,7 @@
 				8ECA7E520563CD9500DFC000 /* Controller */,
 				F69B0CA602E24F6401A80112 /* InfoPlist.strings */,
 				8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */,
+				CC1C41D00D9BAD7F002728FA /* noart.png */,
 				CC0B71E00D54F0DD00448E00 /* simple prefs (taken from qt4) */,
 				8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */,
 				8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */,
@@ -1465,6 +1472,14 @@
 			name = "main window";
 			sourceTree = "<group>";
 		};
+		CCC8957F0D9A8A61005AE59C /* OSX-specific access */ = {
+			isa = PBXGroup;
+			children = (
+				CCC895830D9A8A82005AE59C /* eyetv.m */,
+			);
+			name = "OSX-specific access";
+			sourceTree = "<group>";
+		};
 		CCCB86BF0ACFDE4A00CF1E10 /* Native FSPanel icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -1502,6 +1517,7 @@
 		DCF358BC077F1236007DB450 /* nibs */ = {
 			isa = PBXGroup;
 			children = (
+				CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */,
 				DCA00AA7075F948800E6BF46 /* About.nib */,
 				F74F13EA02C2A79C01EE194C /* MainMenu.nib */,
 				DCF358B9077F10BA007DB450 /* Preferences.nib */,
@@ -1523,6 +1539,7 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 089C166AFE841209C02AAC07 /* vlc */;
 			projectDirPath = "";
@@ -1678,6 +1695,8 @@
 				CC0B72400D54F2B100448E00 /* spref_cone_Interface_64.png in Resources */,
 				CC0B72410D54F2B100448E00 /* spref_cone_Subtitles_64.png in Resources */,
 				CC0B72420D54F2B100448E00 /* spref_cone_Video_64.png in Resources */,
+				CCC896BA0D9AA9E9005AE59C /* MediaInfo.nib in Resources */,
+				CC1C41D10D9BAD7F002728FA /* noart.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1716,6 +1735,14 @@
 				CC26BF2B09A7A05000E94D62 /* English */,
 			);
 			name = Update.nib;
+			sourceTree = "<group>";
+		};
+		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CCC896B90D9AA9E8005AE59C /* English */,
+			);
+			name = MediaInfo.nib;
 			sourceTree = "<group>";
 		};
 		CCF3C64A0923B99D00401862 /* SFilters.nib */ = {

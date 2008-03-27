@@ -1,13 +1,13 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,6 +106,7 @@ struct intf_sys_t
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_interaction_list;      /* VLCInteractionList*/
     id o_sfilters;              /* VLCsFilters    */
+    id o_info;                  /* VLCInformation */
 #ifdef UPDATE_CHECK
     id o_update;                /* VLCUpdate      */
 #endif
@@ -119,6 +120,7 @@ struct intf_sys_t
     BOOL nib_sfilters_loaded;   /* sfilters nibfile */
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_update_loaded;     /* update nibfile */
+    BOOL nib_info_loaded;       /* information panel nibfile */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_playlist_view;/* playlist view  */
@@ -148,15 +150,12 @@ struct intf_sys_t
 
     IBOutlet id o_controls;     /* VLCControls    */
     IBOutlet id o_playlist;     /* VLCPlaylist    */
-    IBOutlet id o_info;         /* VLCInfo        */
 
     IBOutlet id o_messages;     /* messages tv    */
     IBOutlet id o_msgs_panel;   /* messages panel */
     NSMutableArray * o_msg_arr; /* messages array */
     NSLock * o_msg_lock;        /* messages lock  */
     IBOutlet id o_msgs_btn_crashlog;    /* messages open crashlog */
-
-    IBOutlet id o_info_window;  /* Info panel     */
 
     /* main menu */
 
@@ -370,6 +369,7 @@ struct intf_sys_t
 - (IBAction)openCrashLog:(id)sender;
 - (IBAction)viewErrorsAndWarnings:(id)sender;
 - (IBAction)showMessagesPanel:(id)sender;
+- (IBAction)showInformationPanel:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;

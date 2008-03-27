@@ -1,11 +1,11 @@
 /*****************************************************************************
  r playlistinfo.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,31 +36,42 @@
 
 @implementation VLCInfo
 
+static VLCInfo *_o_sharedInstance = nil;
+
++ (VLCInfo *)sharedInstance
+{
+    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+}
+
 - (id)init
 {
-    self = [super init];
-
-    if( self != nil )
-    {
-        p_item = NULL;
-        o_statUpdateTimer = nil;
+    if( _o_sharedInstance ) {
+        [self dealloc];
+    } else {
+        _o_sharedInstance = [super init];
+        
+        if( _o_sharedInstance != nil )
+        {
+            p_item = NULL;
+            o_statUpdateTimer = nil;
+        }
     }
-    return( self );
+
+    return _o_sharedInstance;
 }
 
 - (void)awakeFromNib
 {
     [o_info_window setExcludedFromWindowsMenu: TRUE];
 
-    [o_info_window setTitle: _NS("Information")];
-    [o_uri_lbl setStringValue: _NS("URI")];
+    [o_info_window setTitle: _NS("Media Information")];
+    [o_uri_lbl setStringValue: _NS("Location")];
     [o_title_lbl setStringValue: _NS("Title")];
-    [o_author_lbl setStringValue: _NS("Author")];
-    [o_btn_ok setTitle: _NS("OK")];
-    [o_btn_cancel setTitle: _NS("Cancel")];
- 
+    [o_author_lbl setStringValue: _NS("Artist")];
+    [o_saveMetaData_btn setStringValue: _NS("Save Metadata" )];
+
     [[o_tab_view tabViewItemAtIndex: 0] setLabel: _NS("General")];
-    [[o_tab_view tabViewItemAtIndex: 1] setLabel: _NS("Advanced Information")];
+    [[o_tab_view tabViewItemAtIndex: 1] setLabel: _NS("Codec Details")];
     [[o_tab_view tabViewItemAtIndex: 2] setLabel: _NS("Statistics")];
     [o_tab_view selectTabViewItemAtIndex: 0];
 
@@ -70,7 +81,6 @@
     [o_collection_lbl setStringValue: _NS(VLC_META_COLLECTION)];
     [o_seqNum_lbl setStringValue: _NS(VLC_META_SEQ_NUM)];
     [o_description_lbl setStringValue: _NS(VLC_META_DESCRIPTION)];
-    [o_rating_lbl setStringValue: _NS(VLC_META_RATING)];
     [o_date_lbl setStringValue: _NS(VLC_META_DATE)];
     [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];
     [o_nowPlaying_lbl setStringValue: _NS(VLC_META_NOW_PLAYING)];
@@ -111,41 +121,8 @@
 
     [super dealloc];
 }
- 
-- (IBAction)togglePlaylistInfoPanel:(id)sender
-{
-    if( [o_info_window isVisible] )
-    {
-        [self windowShouldClose: nil];
-        [o_info_window orderOut: sender];
-    }
-    else
-    {
-        p_item = [[[VLCMain sharedInstance] getPlaylist] selectedPlaylistItem];
-        [self initPanel:sender];
-    }
-}
 
-- (IBAction)toggleInfoPanel:(id)sender
-{
-    if( [o_info_window isVisible] )
-    {
-        [self windowShouldClose: nil];
-        [o_info_window orderOut: sender];
-    }
-    else
-    {
-        intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = pl_Yield( p_intf );
-
-        p_item = p_playlist->status.p_item;
-        vlc_object_release( p_playlist );
- 
-        [self initPanel:sender];
-    }
-}
-
-- (void)initPanel:(id)sender
+- (void)initPanel
 {
     BOOL b_stats = config_GetInt(VLCIntf, "stats");
     if( b_stats )
@@ -163,7 +140,7 @@
     }
 
     [self updatePanel];
-    [o_info_window makeKeyAndOrderFront: sender];
+    [o_info_window makeKeyAndOrderFront: self];
 }
 
 - (void)updatePanel
@@ -198,13 +175,24 @@
     SET( seqNum, TrackNum );
     SET( genre, Genre );
     SET( copyright, Copyright );
-    SET( rating, Rating );
     SET( publisher, Publisher );
     SET( nowPlaying, NowPlaying );
     SET( language, Language );
     SET( date, Date );
 
 #undef SET
+    
+    char *psz_meta;
+    NSImage *o_image;
+    /* FIXME!! 
+    psz_meta = input_item_GetArtURL( p_item );
+    if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
+        o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString: [NSString stringWithUTF8String: psz_meta]]];
+    else */
+        o_image = [[NSImage imageNamed: @"noart.png"] retain];
+    [o_image_well setImage: o_image];
+    [o_image release];
+    //free( psz_meta );
 
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
@@ -218,16 +206,12 @@
 {
     if( psz_meta != NULL && *psz_meta)
         [theItem setStringValue: [NSString stringWithUTF8String:psz_meta]];
-    else
-        [theItem setStringValue: @"-"];
 }
 
 - (void)updateStatistics:(NSTimer*)theTimer
 {
     if( [self isItemInPlaylist: p_item] )
     {
-        /* we can only do that if there's a valid input around */
-
         vlc_mutex_lock( &p_item->p_input->p_stats->lock );
 
         /* input */
@@ -241,42 +225,32 @@
             @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_demux_bitrate)*8000]];
 
         /* Video */
-        [o_video_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_decoded_video]];
-        [o_displayed_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_displayed_pictures]];
-        [o_lost_frames_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_lost_pictures]];
+        [o_video_decoded_txt setIntValue: p_item->p_input->p_stats->i_decoded_video];
+        [o_displayed_txt setIntValue: p_item->p_input->p_stats->i_displayed_pictures];
+        [o_lost_frames_txt setIntValue: p_item->p_input->p_stats->i_lost_pictures];
+        float f_fps = 0;
+        /* FIXME! input_Control( p_item->p_input, INPUT_GET_VIDEO_FPS, &f_fps ); */
+        [o_fps_txt setFloatValue: f_fps];
 
         /* Sout */
-        [o_sent_packets_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_sent_packets]];
+        [o_sent_packets_txt setIntValue: p_item->p_input->p_stats->i_sent_packets];
         [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB",
             (float)(p_item->p_input->p_stats->i_sent_bytes)/1000]];
         [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:
             @"%6.0f kb/s", (float)(p_item->p_input->p_stats->f_send_bitrate*8)*1000]];
 
         /* Audio */
-        [o_audio_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_decoded_audio]];
-        [o_played_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_played_abuffers]];
-        [o_lost_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i",
-            p_item->p_input->p_stats->i_lost_abuffers]];
+        [o_audio_decoded_txt setIntValue: p_item->p_input->p_stats->i_decoded_audio];
+        [o_played_abuffers_txt setIntValue: p_item->p_input->p_stats->i_played_abuffers];
+        [o_lost_abuffers_txt setIntValue: p_item->p_input->p_stats->i_lost_abuffers];
 
         vlc_mutex_unlock( &p_item->p_input->p_stats->lock );
     }
 }
 
-- (IBAction)infoCancel:(id)sender
+- (IBAction)saveMetaData:(id)sender
 {
-    [self windowShouldClose: nil];
-    [o_info_window orderOut: self];
-}
-
-
-- (IBAction)infoOk:(id)sender
-{
+    /* TODO: implement this feature
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
     vlc_value_t val;
@@ -293,9 +267,7 @@
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );
     }
-    vlc_object_release( p_playlist );
-    [self windowShouldClose: nil];
-    [o_info_window orderOut: self];
+    vlc_object_release( p_playlist );*/
 }
 
 - (playlist_item_t *)getItem

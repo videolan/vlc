@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -41,6 +41,7 @@
 #import "vout.h"
 #import "prefs.h"
 #import "playlist.h"
+#import "playlistinfo.h"
 #import "controls.h"
 #import "about.h"
 #import "open.h"
@@ -427,6 +428,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_interaction_list = [[VLCInteractionList alloc] init];
+    o_info = [[VLCInfo alloc] init];
     o_sfilters = nil;
 #ifdef UPDATE_CHECK
     o_update = [[VLCUpdate alloc] init];
@@ -781,8 +783,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_vmi_mute setTitle: _NS("Mute")];
     [o_vmi_fullscreen setTitle: _NS("Fullscreen")];
     [o_vmi_snapshot setTitle: _NS("Snapshot")];
-
-    [o_info_window setTitle: _NS("Media Information")];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
@@ -1812,6 +1812,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( nib_bookmarks_loaded && o_bookmarks )
         [o_bookmarks release];
 
+    if( nib_info_loaded && o_info )
+        [o_info release];
+    
     if( nib_wizard_loaded && o_wizard )
         [o_wizard release];
  
@@ -2096,7 +2099,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     else
     {
-        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Couldn't find any trace of a previous crash.") );
+        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), _NS("Continue"), nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Couldn't find any trace of a previous crash.") );
 
     }
 }
@@ -2109,6 +2112,14 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (IBAction)showMessagesPanel:(id)sender
 {
     [o_msgs_panel makeKeyAndOrderFront: sender];
+}
+
+- (IBAction)showInformationPanel:(id)sender
+{
+    if(! nib_info_loaded )
+        nib_info_loaded = [NSBundle loadNibNamed:@"MediaInfo" owner: self];
+    
+    [o_info initPanel];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)o_notification

@@ -1,412 +1,789 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = ITSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
-        {CLASS = MPSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
-        {CLASS = VLBrushedMetalImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
-        {CLASS = VLCApplication; LANGUAGE = ObjC; SUPERCLASS = NSApplication; }, 
-        {CLASS = VLCControllerView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {CLASS = VLCControllerWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
-        {
-            ACTIONS = {
-                backward = id; 
-                faster = id; 
-                forward = id; 
-                goToSpecificTime = id; 
-                loop = id; 
-                mute = id; 
-                next = id; 
-                pause = id; 
-                play = id; 
-                position = id; 
-                prev = id; 
-                random = id; 
-                repeat = id; 
-                repeatButtonAction = id; 
-                slower = id; 
-                stop = id; 
-                toggleVar = id; 
-                volumeDown = id; 
-                volumeSliderUpdated = id; 
-                volumeUp = id; 
-                windowAction = id; 
-            }; 
-            CLASS = VLCControls; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_addNode" = id; 
-                "o_btn_repeat" = id; 
-                "o_btn_shuffle" = id; 
-                "o_fs_panel" = id; 
-                "o_main" = id; 
-                "o_specificTime_cancel_btn" = id; 
-                "o_specificTime_enter_fld" = id; 
-                "o_specificTime_goTo_lbl" = id; 
-                "o_specificTime_mi" = id; 
-                "o_specificTime_ok_btn" = id; 
-                "o_specificTime_sec_lbl" = id; 
-                "o_specificTime_stepper" = id; 
-                "o_specificTime_win" = id; 
-                "o_volumeslider" = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = VLCDetachedEmbeddedVoutView; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = VLCEmbeddedVoutView; 
-        }, 
-        {CLASS = VLCEmbeddedVoutView; LANGUAGE = ObjC; SUPERCLASS = VLCVoutView; }, 
-        {
-            CLASS = VLCEmbeddedWindow; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_backward" = id; 
-                "o_btn_forward" = id; 
-                "o_btn_fullscreen" = id; 
-                "o_btn_play" = id; 
-                "o_slider" = id; 
-                "o_time" = id; 
-                "o_view" = id; 
-            }; 
-            SUPERCLASS = NSWindow; 
-        }, 
-        {
-            ACTIONS = {
-                bandSliderUpdated = id; 
-                changePreset = id; 
-                enable = id; 
-                preampSliderUpdated = id; 
-                toggleWindow = id; 
-                twopass = id; 
-            }; 
-            CLASS = VLCEqualizer; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_equalizer" = id; 
-                "o_ckb_2pass" = id; 
-                "o_ckb_enable" = id; 
-                "o_fld_preamp" = id; 
-                "o_popup_presets" = id; 
-                "o_slider_band1" = id; 
-                "o_slider_band10" = id; 
-                "o_slider_band2" = id; 
-                "o_slider_band3" = id; 
-                "o_slider_band4" = id; 
-                "o_slider_band5" = id; 
-                "o_slider_band6" = id; 
-                "o_slider_band7" = id; 
-                "o_slider_band8" = id; 
-                "o_slider_band9" = id; 
-                "o_slider_preamp" = id; 
-                "o_window" = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = VLCFSPanel; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
-        {
-            ACTIONS = {faster = id; next = id; play = id; prev = id; slower = id; }; 
-            CLASS = VLCFSPanelView; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSView; 
-        }, 
-        {CLASS = VLCFSTimeSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
-        {
-            ACTIONS = {
-                createOutlineGroup = id; 
-                deleteOutlineGroup = id; 
-                infoCancel = id; 
-                infoOk = id; 
-                toggleInfoPanel = id; 
-                togglePlaylistInfoPanel = id; 
-            }; 
-            CLASS = VLCInfo; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_audio_box" = id; 
-                "o_audio_decoded_lbl" = id; 
-                "o_audio_decoded_txt" = id; 
-                "o_author_lbl" = id; 
-                "o_author_txt" = id; 
-                "o_btn_cancel" = id; 
-                "o_btn_ok" = id; 
-                "o_collection_lbl" = id; 
-                "o_collection_txt" = id; 
-                "o_copyright_lbl" = id; 
-                "o_copyright_txt" = id; 
-                "o_date_lbl" = id; 
-                "o_date_txt" = id; 
-                "o_demux_bitrate_lbl" = id; 
-                "o_demux_bitrate_txt" = id; 
-                "o_demux_bytes_lbl" = id; 
-                "o_demux_bytes_txt" = id; 
-                "o_description_lbl" = id; 
-                "o_description_txt" = id; 
-                "o_displayed_lbl" = id; 
-                "o_displayed_txt" = id; 
-                "o_fps_lbl" = id; 
-                "o_fps_txt" = id; 
-                "o_genre_lbl" = id; 
-                "o_genre_txt" = id; 
-                "o_info_window" = id; 
-                "o_input_bitrate_lbl" = id; 
-                "o_input_bitrate_txt" = id; 
-                "o_input_box" = id; 
-                "o_language_lbl" = id; 
-                "o_language_txt" = id; 
-                "o_lost_abuffers_lbl" = id; 
-                "o_lost_abuffers_txt" = id; 
-                "o_lost_frames_lbl" = id; 
-                "o_lost_frames_txt" = id; 
-                "o_nowPlaying_lbl" = id; 
-                "o_nowPlaying_txt" = id; 
-                "o_outline_view" = id; 
-                "o_played_abuffers_lbl" = id; 
-                "o_played_abuffers_txt" = id; 
-                "o_publisher_lbl" = id; 
-                "o_publisher_txt" = id; 
-                "o_rating_lbl" = id; 
-                "o_rating_txt" = id; 
-                "o_read_bytes_lbl" = id; 
-                "o_read_bytes_txt" = id; 
-                "o_sent_bitrate_lbl" = id; 
-                "o_sent_bitrate_txt" = id; 
-                "o_sent_bytes_lbl" = id; 
-                "o_sent_bytes_txt" = id; 
-                "o_sent_packets_lbl" = id; 
-                "o_sent_packets_txt" = id; 
-                "o_seqNum_lbl" = id; 
-                "o_seqNum_txt" = id; 
-                "o_sout_box" = id; 
-                "o_tab_view" = id; 
-                "o_title_lbl" = id; 
-                "o_title_txt" = id; 
-                "o_uri_lbl" = id; 
-                "o_uri_txt" = id; 
-                "o_video_box" = id; 
-                "o_video_decoded_lbl" = id; 
-                "o_video_decoded_txt" = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                checkForUpdate = id; 
-                clearRecentItems = id; 
-                intfOpenDisc = id; 
-                intfOpenFile = id; 
-                intfOpenFileGeneric = id; 
-                intfOpenNet = id; 
-                openCrashLog = id; 
-                openDocumentation = id; 
-                openDonate = id; 
-                openForum = id; 
-                openReadMe = id; 
-                openRecentItem = id; 
-                openWebsite = id; 
-                showBookmarks = id; 
-                showExtended = id; 
-                showLicense = id; 
-                showMessagesPanel = id; 
-                showSFilters = id; 
-                showWizard = id; 
-                timesliderUpdate = id; 
-                togglePlaylist = id; 
-                viewAbout = id; 
-                viewErrorsAndWarnings = id; 
-                viewHelp = id; 
-                viewPreferences = id; 
-            }; 
-            CLASS = VLCMain; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_equalizer" = id; 
-                "o_btn_ff" = id; 
-                "o_btn_fullscreen" = id; 
-                "o_btn_next" = id; 
-                "o_btn_play" = id; 
-                "o_btn_playlist" = id; 
-                "o_btn_prev" = id; 
-                "o_btn_rewind" = id; 
-                "o_btn_stop" = id; 
-                "o_controls" = id; 
-                "o_dmi_mute" = id; 
-                "o_dmi_next" = id; 
-                "o_dmi_play" = id; 
-                "o_dmi_previous" = id; 
-                "o_dmi_stop" = id; 
-                "o_embedded_window" = id; 
-                "o_info" = id; 
-                "o_main_pgbar" = id; 
-                "o_messages" = id; 
-                "o_mi_about" = id; 
-                "o_mi_add_intf" = id; 
-                "o_mi_aspect_ratio" = id; 
-                "o_mi_audiotrack" = id; 
-                "o_mi_bookmarks" = id; 
-                "o_mi_bring_atf" = id; 
-                "o_mi_bwd" = id; 
-                "o_mi_channels" = id; 
-                "o_mi_chapter" = id; 
-                "o_mi_checkForUpdate" = id; 
-                "o_mi_clear" = id; 
-                "o_mi_close_window" = id; 
-                "o_mi_controller" = id; 
-                "o_mi_copy" = id; 
-                "o_mi_crop" = id; 
-                "o_mi_cut" = id; 
-                "o_mi_deinterlace" = id; 
-                "o_mi_device" = id; 
-                "o_mi_documentation" = id; 
-                "o_mi_donation" = id; 
-                "o_mi_double_window" = id; 
-                "o_mi_equalizer" = id; 
-                "o_mi_errorsAndWarnings" = id; 
-                "o_mi_extended" = id; 
-                "o_mi_faster" = id; 
-                "o_mi_ffmpeg_pp" = id; 
-                "o_mi_fittoscreen" = id; 
-                "o_mi_floatontop" = id; 
-                "o_mi_forum" = id; 
-                "o_mi_fullscreen" = id; 
-                "o_mi_fwd" = id; 
-                "o_mi_half_window" = id; 
-                "o_mi_help" = id; 
-                "o_mi_hide" = id; 
-                "o_mi_hide_others" = id; 
-                "o_mi_info" = id; 
-                "o_mi_license" = id; 
-                "o_mi_loop" = id; 
-                "o_mi_messages" = id; 
-                "o_mi_minimize" = id; 
-                "o_mi_mute" = id; 
-                "o_mi_next" = id; 
-                "o_mi_normal_window" = id; 
-                "o_mi_open_disc" = id; 
-                "o_mi_open_file" = id; 
-                "o_mi_open_generic" = id; 
-                "o_mi_open_net" = id; 
-                "o_mi_open_recent" = id; 
-                "o_mi_open_recent_cm" = id; 
-                "o_mi_paste" = id; 
-                "o_mi_play" = id; 
-                "o_mi_playlist" = id; 
-                "o_mi_prefs" = id; 
-                "o_mi_previous" = id; 
-                "o_mi_program" = id; 
-                "o_mi_quit" = id; 
-                "o_mi_random" = id; 
-                "o_mi_readme" = id; 
-                "o_mi_repeat" = id; 
-                "o_mi_screen" = id; 
-                "o_mi_select_all" = id; 
-                "o_mi_services" = id; 
-                "o_mi_show_all" = id; 
-                "o_mi_slower" = id; 
-                "o_mi_snapshot" = id; 
-                "o_mi_sprefs" = id; 
-                "o_mi_stop" = id; 
-                "o_mi_subtitle" = id; 
-                "o_mi_title" = id; 
-                "o_mi_videotrack" = id; 
-                "o_mi_visual" = id; 
-                "o_mi_vol_down" = id; 
-                "o_mi_vol_up" = id; 
-                "o_mi_website" = id; 
-                "o_msgs_btn_crashlog" = id; 
-                "o_msgs_panel" = id; 
-                "o_mu_add_intf" = id; 
-                "o_mu_aspect_ratio" = id; 
-                "o_mu_audio" = id; 
-                "o_mu_audiotrack" = id; 
-                "o_mu_channels" = id; 
-                "o_mu_chapter" = id; 
-                "o_mu_controls" = id; 
-                "o_mu_crop" = id; 
-                "o_mu_deinterlace" = id; 
-                "o_mu_device" = id; 
-                "o_mu_edit" = id; 
-                "o_mu_ffmpeg_pp" = id; 
-                "o_mu_file" = id; 
-                "o_mu_help" = id; 
-                "o_mu_program" = id; 
-                "o_mu_screen" = id; 
-                "o_mu_subtitle" = id; 
-                "o_mu_title" = id; 
-                "o_mu_video" = id; 
-                "o_mu_videotrack" = id; 
-                "o_mu_visual" = id; 
-                "o_mu_window" = id; 
-                "o_playlist" = id; 
-                "o_playlist_view" = id; 
-                "o_scrollfield" = id; 
-                "o_timefield" = id; 
-                "o_timeslider" = id; 
-                "o_vmi_fullscreen" = id; 
-                "o_vmi_mute" = id; 
-                "o_vmi_next" = id; 
-                "o_vmi_play" = id; 
-                "o_vmi_prev" = id; 
-                "o_vmi_snapshot" = id; 
-                "o_vmi_stop" = id; 
-                "o_vmi_voldown" = id; 
-                "o_vmi_volup" = id; 
-                "o_volumeslider" = id; 
-                "o_vout_menu" = id; 
-                "o_window" = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                addNode = id; 
-                deleteItem = id; 
-                playItem = id; 
-                preparseItem = id; 
-                recursiveExpandNode = id; 
-                savePlaylist = id; 
-                searchItem = id; 
-                selectAll = id; 
-                sortNodeByAuthor = id; 
-                sortNodeByName = id; 
-            }; 
-            CLASS = VLCPlaylist; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_addNode" = id; 
-                "o_controller" = id; 
-                "o_ctx_menu" = id; 
-                "o_mi_addNode" = id; 
-                "o_mi_delete" = id; 
-                "o_mi_info" = id; 
-                "o_mi_play" = id; 
-                "o_mi_preparse" = id; 
-                "o_mi_recursive_expand" = id; 
-                "o_mi_save_playlist" = id; 
-                "o_mi_selectall" = id; 
-                "o_mi_services" = id; 
-                "o_mi_sort_author" = id; 
-                "o_mi_sort_name" = id; 
-                "o_mm_mi_services" = id; 
-                "o_mm_mu_services" = id; 
-                "o_mu_services" = id; 
-                "o_outline_view" = id; 
-                "o_playlist_view" = id; 
-                "o_random_ckb" = id; 
-                "o_save_accessory_popup" = id; 
-                "o_save_accessory_text" = id; 
-                "o_save_accessory_view" = id; 
-                "o_search_field" = id; 
-                "o_status_field" = id; 
-                "o_tc_author" = id; 
-                "o_tc_duration" = id; 
-                "o_tc_name" = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
-        {CLASS = VLCTimeField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {CLASS = VLCVoutView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCTimeField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCControllerView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCEmbeddedWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_btn_backward</key>
+				<string>id</string>
+				<key>o_btn_forward</key>
+				<string>id</string>
+				<key>o_btn_fullscreen</key>
+				<string>id</string>
+				<key>o_btn_play</key>
+				<string>id</string>
+				<key>o_slider</key>
+				<string>id</string>
+				<key>o_time</key>
+				<string>id</string>
+				<key>o_view</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>checkForUpdate</key>
+				<string>id</string>
+				<key>clearRecentItems</key>
+				<string>id</string>
+				<key>intfOpenDisc</key>
+				<string>id</string>
+				<key>intfOpenFile</key>
+				<string>id</string>
+				<key>intfOpenFileGeneric</key>
+				<string>id</string>
+				<key>intfOpenNet</key>
+				<string>id</string>
+				<key>openCrashLog</key>
+				<string>id</string>
+				<key>openDocumentation</key>
+				<string>id</string>
+				<key>openDonate</key>
+				<string>id</string>
+				<key>openForum</key>
+				<string>id</string>
+				<key>openReadMe</key>
+				<string>id</string>
+				<key>openRecentItem</key>
+				<string>id</string>
+				<key>openWebsite</key>
+				<string>id</string>
+				<key>showBookmarks</key>
+				<string>id</string>
+				<key>showExtended</key>
+				<string>id</string>
+				<key>showInformationPanel</key>
+				<string>id</string>
+				<key>showLicense</key>
+				<string>id</string>
+				<key>showMessagesPanel</key>
+				<string>id</string>
+				<key>showSFilters</key>
+				<string>id</string>
+				<key>showWizard</key>
+				<string>id</string>
+				<key>timesliderUpdate</key>
+				<string>id</string>
+				<key>togglePlaylist</key>
+				<string>id</string>
+				<key>viewAbout</key>
+				<string>id</string>
+				<key>viewErrorsAndWarnings</key>
+				<string>id</string>
+				<key>viewHelp</key>
+				<string>id</string>
+				<key>viewPreferences</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCMain</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_about</key>
+				<string>id</string>
+				<key>o_bookmarks</key>
+				<string>id</string>
+				<key>o_btn_equalizer</key>
+				<string>id</string>
+				<key>o_btn_ff</key>
+				<string>id</string>
+				<key>o_btn_fullscreen</key>
+				<string>id</string>
+				<key>o_btn_next</key>
+				<string>id</string>
+				<key>o_btn_play</key>
+				<string>id</string>
+				<key>o_btn_playlist</key>
+				<string>id</string>
+				<key>o_btn_prev</key>
+				<string>id</string>
+				<key>o_btn_rewind</key>
+				<string>id</string>
+				<key>o_btn_stop</key>
+				<string>id</string>
+				<key>o_controls</key>
+				<string>id</string>
+				<key>o_dmi_mute</key>
+				<string>id</string>
+				<key>o_dmi_next</key>
+				<string>id</string>
+				<key>o_dmi_play</key>
+				<string>id</string>
+				<key>o_dmi_previous</key>
+				<string>id</string>
+				<key>o_dmi_stop</key>
+				<string>id</string>
+				<key>o_embedded_list</key>
+				<string>id</string>
+				<key>o_embedded_window</key>
+				<string>id</string>
+				<key>o_extended</key>
+				<string>id</string>
+				<key>o_eyetv</key>
+				<string>id</string>
+				<key>o_info</key>
+				<string>id</string>
+				<key>o_interaction_list</key>
+				<string>id</string>
+				<key>o_main_pgbar</key>
+				<string>id</string>
+				<key>o_messages</key>
+				<string>id</string>
+				<key>o_mi_about</key>
+				<string>id</string>
+				<key>o_mi_add_intf</key>
+				<string>id</string>
+				<key>o_mi_aspect_ratio</key>
+				<string>id</string>
+				<key>o_mi_audiotrack</key>
+				<string>id</string>
+				<key>o_mi_bookmarks</key>
+				<string>id</string>
+				<key>o_mi_bring_atf</key>
+				<string>id</string>
+				<key>o_mi_bwd</key>
+				<string>id</string>
+				<key>o_mi_bwd1m</key>
+				<string>id</string>
+				<key>o_mi_bwd5m</key>
+				<string>id</string>
+				<key>o_mi_channels</key>
+				<string>id</string>
+				<key>o_mi_chapter</key>
+				<string>id</string>
+				<key>o_mi_checkForUpdate</key>
+				<string>id</string>
+				<key>o_mi_clear</key>
+				<string>id</string>
+				<key>o_mi_close_window</key>
+				<string>id</string>
+				<key>o_mi_controller</key>
+				<string>id</string>
+				<key>o_mi_copy</key>
+				<string>id</string>
+				<key>o_mi_crop</key>
+				<string>id</string>
+				<key>o_mi_cut</key>
+				<string>id</string>
+				<key>o_mi_deinterlace</key>
+				<string>id</string>
+				<key>o_mi_device</key>
+				<string>id</string>
+				<key>o_mi_documentation</key>
+				<string>id</string>
+				<key>o_mi_donation</key>
+				<string>id</string>
+				<key>o_mi_double_window</key>
+				<string>id</string>
+				<key>o_mi_equalizer</key>
+				<string>id</string>
+				<key>o_mi_errorsAndWarnings</key>
+				<string>id</string>
+				<key>o_mi_extended</key>
+				<string>id</string>
+				<key>o_mi_faster</key>
+				<string>id</string>
+				<key>o_mi_ffmpeg_pp</key>
+				<string>id</string>
+				<key>o_mi_fittoscreen</key>
+				<string>id</string>
+				<key>o_mi_floatontop</key>
+				<string>id</string>
+				<key>o_mi_forum</key>
+				<string>id</string>
+				<key>o_mi_fullscreen</key>
+				<string>id</string>
+				<key>o_mi_fwd</key>
+				<string>id</string>
+				<key>o_mi_fwd1m</key>
+				<string>id</string>
+				<key>o_mi_fwd5m</key>
+				<string>id</string>
+				<key>o_mi_half_window</key>
+				<string>id</string>
+				<key>o_mi_help</key>
+				<string>id</string>
+				<key>o_mi_hide</key>
+				<string>id</string>
+				<key>o_mi_hide_others</key>
+				<string>id</string>
+				<key>o_mi_info</key>
+				<string>id</string>
+				<key>o_mi_license</key>
+				<string>id</string>
+				<key>o_mi_loop</key>
+				<string>id</string>
+				<key>o_mi_messages</key>
+				<string>id</string>
+				<key>o_mi_minimize</key>
+				<string>id</string>
+				<key>o_mi_mute</key>
+				<string>id</string>
+				<key>o_mi_next</key>
+				<string>id</string>
+				<key>o_mi_normal_window</key>
+				<string>id</string>
+				<key>o_mi_open_disc</key>
+				<string>id</string>
+				<key>o_mi_open_file</key>
+				<string>id</string>
+				<key>o_mi_open_generic</key>
+				<string>id</string>
+				<key>o_mi_open_net</key>
+				<string>id</string>
+				<key>o_mi_open_recent</key>
+				<string>id</string>
+				<key>o_mi_open_recent_cm</key>
+				<string>id</string>
+				<key>o_mi_open_wizard</key>
+				<string>id</string>
+				<key>o_mi_paste</key>
+				<string>id</string>
+				<key>o_mi_play</key>
+				<string>id</string>
+				<key>o_mi_playlist</key>
+				<string>id</string>
+				<key>o_mi_prefs</key>
+				<string>id</string>
+				<key>o_mi_previous</key>
+				<string>id</string>
+				<key>o_mi_program</key>
+				<string>id</string>
+				<key>o_mi_quit</key>
+				<string>id</string>
+				<key>o_mi_random</key>
+				<string>id</string>
+				<key>o_mi_readme</key>
+				<string>id</string>
+				<key>o_mi_repeat</key>
+				<string>id</string>
+				<key>o_mi_screen</key>
+				<string>id</string>
+				<key>o_mi_select_all</key>
+				<string>id</string>
+				<key>o_mi_services</key>
+				<string>id</string>
+				<key>o_mi_show_all</key>
+				<string>id</string>
+				<key>o_mi_slower</key>
+				<string>id</string>
+				<key>o_mi_snapshot</key>
+				<string>id</string>
+				<key>o_mi_sprefs</key>
+				<string>id</string>
+				<key>o_mi_stop</key>
+				<string>id</string>
+				<key>o_mi_subtitle</key>
+				<string>id</string>
+				<key>o_mi_title</key>
+				<string>id</string>
+				<key>o_mi_videotrack</key>
+				<string>id</string>
+				<key>o_mi_visual</key>
+				<string>id</string>
+				<key>o_mi_vol_down</key>
+				<string>id</string>
+				<key>o_mi_vol_up</key>
+				<string>id</string>
+				<key>o_mi_website</key>
+				<string>id</string>
+				<key>o_msgs_btn_crashlog</key>
+				<string>id</string>
+				<key>o_msgs_panel</key>
+				<string>id</string>
+				<key>o_mu_add_intf</key>
+				<string>id</string>
+				<key>o_mu_aspect_ratio</key>
+				<string>id</string>
+				<key>o_mu_audio</key>
+				<string>id</string>
+				<key>o_mu_audiotrack</key>
+				<string>id</string>
+				<key>o_mu_channels</key>
+				<string>id</string>
+				<key>o_mu_chapter</key>
+				<string>id</string>
+				<key>o_mu_controls</key>
+				<string>id</string>
+				<key>o_mu_crop</key>
+				<string>id</string>
+				<key>o_mu_deinterlace</key>
+				<string>id</string>
+				<key>o_mu_device</key>
+				<string>id</string>
+				<key>o_mu_edit</key>
+				<string>id</string>
+				<key>o_mu_ffmpeg_pp</key>
+				<string>id</string>
+				<key>o_mu_file</key>
+				<string>id</string>
+				<key>o_mu_help</key>
+				<string>id</string>
+				<key>o_mu_program</key>
+				<string>id</string>
+				<key>o_mu_screen</key>
+				<string>id</string>
+				<key>o_mu_subtitle</key>
+				<string>id</string>
+				<key>o_mu_title</key>
+				<string>id</string>
+				<key>o_mu_video</key>
+				<string>id</string>
+				<key>o_mu_videotrack</key>
+				<string>id</string>
+				<key>o_mu_visual</key>
+				<string>id</string>
+				<key>o_mu_window</key>
+				<string>id</string>
+				<key>o_open</key>
+				<string>id</string>
+				<key>o_playlist</key>
+				<string>id</string>
+				<key>o_playlist_view</key>
+				<string>id</string>
+				<key>o_prefs</key>
+				<string>id</string>
+				<key>o_scrollfield</key>
+				<string>id</string>
+				<key>o_sfilters</key>
+				<string>id</string>
+				<key>o_sprefs</key>
+				<string>id</string>
+				<key>o_timefield</key>
+				<string>id</string>
+				<key>o_timeslider</key>
+				<string>id</string>
+				<key>o_update</key>
+				<string>id</string>
+				<key>o_vmi_fullscreen</key>
+				<string>id</string>
+				<key>o_vmi_mute</key>
+				<string>id</string>
+				<key>o_vmi_next</key>
+				<string>id</string>
+				<key>o_vmi_play</key>
+				<string>id</string>
+				<key>o_vmi_prev</key>
+				<string>id</string>
+				<key>o_vmi_snapshot</key>
+				<string>id</string>
+				<key>o_vmi_stop</key>
+				<string>id</string>
+				<key>o_vmi_voldown</key>
+				<string>id</string>
+				<key>o_vmi_volup</key>
+				<string>id</string>
+				<key>o_volumeslider</key>
+				<string>id</string>
+				<key>o_vout_menu</key>
+				<string>id</string>
+				<key>o_window</key>
+				<string>id</string>
+				<key>o_wizard</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCPlaylistCommon</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_outline_view</key>
+				<string>id</string>
+				<key>o_tc_author</key>
+				<string>id</string>
+				<key>o_tc_duration</key>
+				<string>id</string>
+				<key>o_tc_name</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ITSlider</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSSlider</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>backward</key>
+				<string>id</string>
+				<key>faster</key>
+				<string>id</string>
+				<key>forward</key>
+				<string>id</string>
+				<key>goToSpecificTime</key>
+				<string>id</string>
+				<key>loop</key>
+				<string>id</string>
+				<key>mute</key>
+				<string>id</string>
+				<key>next</key>
+				<string>id</string>
+				<key>pause</key>
+				<string>id</string>
+				<key>play</key>
+				<string>id</string>
+				<key>position</key>
+				<string>id</string>
+				<key>prev</key>
+				<string>id</string>
+				<key>random</key>
+				<string>id</string>
+				<key>repeat</key>
+				<string>id</string>
+				<key>repeatButtonAction</key>
+				<string>id</string>
+				<key>showPosition</key>
+				<string>id</string>
+				<key>slower</key>
+				<string>id</string>
+				<key>stop</key>
+				<string>id</string>
+				<key>toggleVar</key>
+				<string>id</string>
+				<key>toogleFullscreen</key>
+				<string>id</string>
+				<key>volumeDown</key>
+				<string>id</string>
+				<key>volumeSliderUpdated</key>
+				<string>id</string>
+				<key>volumeUp</key>
+				<string>id</string>
+				<key>windowAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCControls</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_btn_addNode</key>
+				<string>id</string>
+				<key>o_btn_repeat</key>
+				<string>id</string>
+				<key>o_btn_shuffle</key>
+				<string>id</string>
+				<key>o_fs_panel</key>
+				<string>id</string>
+				<key>o_main</key>
+				<string>id</string>
+				<key>o_specificTime_cancel_btn</key>
+				<string>id</string>
+				<key>o_specificTime_enter_fld</key>
+				<string>id</string>
+				<key>o_specificTime_goTo_lbl</key>
+				<string>id</string>
+				<key>o_specificTime_mi</key>
+				<string>id</string>
+				<key>o_specificTime_ok_btn</key>
+				<string>id</string>
+				<key>o_specificTime_sec_lbl</key>
+				<string>id</string>
+				<key>o_specificTime_stepper</key>
+				<string>id</string>
+				<key>o_specificTime_win</key>
+				<string>id</string>
+				<key>o_volumeslider</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCPlaylistView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSOutlineView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCVoutView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_window</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCControllerWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>MPSlider</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSSlider</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCFSPanel</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCEmbeddedVoutView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>VLCVoutView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>bandSliderUpdated</key>
+				<string>id</string>
+				<key>changePreset</key>
+				<string>id</string>
+				<key>enable</key>
+				<string>id</string>
+				<key>preampSliderUpdated</key>
+				<string>id</string>
+				<key>toggleWindow</key>
+				<string>id</string>
+				<key>twopass</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCEqualizer</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_btn_equalizer</key>
+				<string>id</string>
+				<key>o_ckb_2pass</key>
+				<string>id</string>
+				<key>o_ckb_enable</key>
+				<string>id</string>
+				<key>o_fld_preamp</key>
+				<string>id</string>
+				<key>o_popup_presets</key>
+				<string>id</string>
+				<key>o_slider_band1</key>
+				<string>id</string>
+				<key>o_slider_band10</key>
+				<string>id</string>
+				<key>o_slider_band2</key>
+				<string>id</string>
+				<key>o_slider_band3</key>
+				<string>id</string>
+				<key>o_slider_band4</key>
+				<string>id</string>
+				<key>o_slider_band5</key>
+				<string>id</string>
+				<key>o_slider_band6</key>
+				<string>id</string>
+				<key>o_slider_band7</key>
+				<string>id</string>
+				<key>o_slider_band8</key>
+				<string>id</string>
+				<key>o_slider_band9</key>
+				<string>id</string>
+				<key>o_slider_preamp</key>
+				<string>id</string>
+				<key>o_window</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLCDetachedEmbeddedVoutView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_embeddedwindow</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>VLCEmbeddedVoutView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>VLBrushedMetalImageView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSImageView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addNode</key>
+				<string>id</string>
+				<key>deleteItem</key>
+				<string>id</string>
+				<key>playItem</key>
+				<string>id</string>
+				<key>preparseItem</key>
+				<string>id</string>
+				<key>recursiveExpandNode</key>
+				<string>id</string>
+				<key>savePlaylist</key>
+				<string>id</string>
+				<key>searchItem</key>
+				<string>id</string>
+				<key>selectAll</key>
+				<string>id</string>
+				<key>servicesChange</key>
+				<string>id</string>
+				<key>sortNodeByAuthor</key>
+				<string>id</string>
+				<key>sortNodeByName</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>VLCPlaylist</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_btn_addNode</key>
+				<string>id</string>
+				<key>o_btn_playlist</key>
+				<string>id</string>
+				<key>o_controller</key>
+				<string>id</string>
+				<key>o_ctx_menu</key>
+				<string>id</string>
+				<key>o_mi_addNode</key>
+				<string>id</string>
+				<key>o_mi_delete</key>
+				<string>id</string>
+				<key>o_mi_info</key>
+				<string>id</string>
+				<key>o_mi_play</key>
+				<string>id</string>
+				<key>o_mi_preparse</key>
+				<string>id</string>
+				<key>o_mi_recursive_expand</key>
+				<string>id</string>
+				<key>o_mi_save_playlist</key>
+				<string>id</string>
+				<key>o_mi_selectall</key>
+				<string>id</string>
+				<key>o_mi_services</key>
+				<string>id</string>
+				<key>o_mi_sort_author</key>
+				<string>id</string>
+				<key>o_mi_sort_name</key>
+				<string>id</string>
+				<key>o_mm_mi_services</key>
+				<string>id</string>
+				<key>o_mm_mu_services</key>
+				<string>id</string>
+				<key>o_mu_services</key>
+				<string>id</string>
+				<key>o_outline_view</key>
+				<string>id</string>
+				<key>o_playlist_view</key>
+				<string>id</string>
+				<key>o_playlist_wizard</key>
+				<string>id</string>
+				<key>o_random_ckb</key>
+				<string>id</string>
+				<key>o_save_accessory_popup</key>
+				<string>id</string>
+				<key>o_save_accessory_text</key>
+				<string>id</string>
+				<key>o_save_accessory_view</key>
+				<string>id</string>
+				<key>o_search_field</key>
+				<string>id</string>
+				<key>o_status_field</key>
+				<string>id</string>
+				<key>o_tc_author</key>
+				<string>id</string>
+				<key>o_tc_duration</key>
+				<string>id</string>
+				<key>o_tc_name</key>
+				<string>id</string>
+				<key>o_tc_sortColumn</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>VLCPlaylistCommon</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
