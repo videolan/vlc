@@ -73,6 +73,7 @@ DirektX <direktx at freemail.hu> - Hungarian translation
 Dominique Leuenberger <dominique-vlc dot suse at leuenberger dot net> - SuSE packaging
 Dugal Harris - DirectShow fixes and MJPEG patches
 Dylan Aïssi <aissi dot dylan at free dot fr> - French translation
+Dylan Yudaken <dyudaken -- gmail # com> - hotkeys patch
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
 Enrique Osuna <enrique.osuna at gmail.com> - Various bug fixes in libvlc. Major Mac OS X Framework improvements.
@@ -87,6 +88,7 @@ Frans van Veen <f.m.j.c.vanveen at student.hhs.nl> - Mozilla plugin toolbar
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Gabor Kelemen <kelemeng at gnome dot hu> - Hungarian translation
 Geoffrey Roussel <meka321 at hotmail dot com> - Christmas easter egg Artwork
+Geoffroy Couprie <geo dot couprie -- gmail # com> - Podcast fix
 Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix
 Gisle Vanem <giva at bgnet dot no>  - gettimeoffay under win32
 Glen Gray <slaine at slaine do rog> - RTSP keepalive
@@ -134,6 +136,7 @@ Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation
 kty0ne - WinAmp 5 skin for VLC
 K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 Koehler, Vitally <vkoehler AT telekom de> -  solves the problem of audio packet losses by the playback of MPEG2 transport stream.
+Lahiru Lakmal Priyadarshana <llahiru at gmail # com> - Qt4 patch
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
 Leo Spalteholz <leo dot spalteholz at gmail dot com> - Qt interface design
