@@ -1,10 +1,11 @@
 /*****************************************************************************
  * embeddedwindow.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2005-2007 the VideoLAN team
+ * Copyright (C) 2005-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -193,7 +194,7 @@
     NSRect screen_rect;
     NSRect rect;
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    BOOL blackout_other_displays = var_GetBool( p_vout, "macosx-black" );
+    BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
 
     screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )]; 
  
@@ -213,8 +214,8 @@
 
     [NSCursor setHiddenUntilMouseMoves: YES];
  
-    if (blackout_other_displays)
-        [screen blackoutOtherScreens]; /* We should do something like [screen blackoutOtherScreens]; */
+    if( blackout_other_displays )        
+        [screen blackoutOtherScreens];
 
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window)
