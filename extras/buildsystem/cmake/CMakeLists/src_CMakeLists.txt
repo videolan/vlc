@@ -89,6 +89,7 @@ set( SOURCES_libvlc_common
     text/wincp.c
     text/iso_lang.c
     text/iso-639_def.h
+    misc/action.c
     misc/md5.c
     misc/rand.c
     misc/mtime.c
