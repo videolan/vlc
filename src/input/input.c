@@ -283,13 +283,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         p_input->p->b_owns_its_sout = VLC_FALSE;
     }
 
-    /* Initialize optional stream output. (before access/demuxer)
-     * XXX: we add a special case if the uri starts by vlc.
-     * else 'vlc in.file --sout "" vlc:quit'  cannot work (the output will
-     * be destroyed in case of a file).
-     * (this will break playing of file starting by 'vlc:' but I don't
-     * want to add more logic, just force file by file:// or code it ;)
-     */
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( p_input, &p_input->p->counters.counters_lock );
 
