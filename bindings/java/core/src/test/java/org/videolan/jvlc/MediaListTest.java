@@ -40,7 +40,7 @@ public class MediaListTest
     @Before
     public void setup()
     {
-        jvlc = new JVLC();
+        jvlc = new JVLC("-vvv -I dummy --aout=dummy --vout=dummy");
     }
     
     @Test

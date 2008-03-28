@@ -40,7 +40,7 @@ public class LibVlcCoreTest
     public void testNew() throws Exception
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcInstance libvlcInstance = instance.libvlc_new(0, new String[] {}, exception);
+        LibVlcInstance libvlcInstance = instance.libvlc_new(0, new String[] {"-I","dummy","--aout=dummy","--vout=dummy"}, exception);
         Assert.assertNotNull(libvlcInstance);
         Assert.assertEquals(0, exception.raised);
     }

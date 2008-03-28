@@ -47,7 +47,7 @@ public class MediaListTest
     public void testSetup()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlcInstance = libvlc.libvlc_new(0, new String[]{}, exception);
+        libvlcInstance = libvlc.libvlc_new(0, new String[]{"-I","dummy","--aout=dummy","--vout=dummy"}, exception);
     }
 
     @After

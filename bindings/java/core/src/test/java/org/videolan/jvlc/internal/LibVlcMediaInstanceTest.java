@@ -50,7 +50,7 @@ public class LibVlcMediaInstanceTest
     public void testSetup()
     {
         exception = new libvlc_exception_t();
-        libvlcInstance = libvlc.libvlc_new(0, new String[]{}, exception);
+        libvlcInstance = libvlc.libvlc_new(0, new String[]{"-vvv","-I","dummy","-aout=dummy","-vout=dummy"}, exception);
         libvlc.libvlc_exception_clear(exception);
     }
     
