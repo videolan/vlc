@@ -447,10 +447,14 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
             i_size = (i_size << 8) | (*p++);
         }
 
-        if( i_size > 0 )
+        if( i_size > 0 && i_size < p_block->i_buffer )
         {
             block_t *p_part = nal_get_annexeb( p_dec, p, i_size );
-
+            if( !p_part )
+            {
+                block_Release( p_block );
+                return NULL;
+            }
             p_part->i_dts = p_block->i_dts;
             p_part->i_pts = p_block->i_pts;
 
@@ -472,6 +476,7 @@ static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
     block_t *p_nal;
 
     p_nal = block_New( p_dec, 4 + i_size );
+    if( !p_nal ) return NULL;
 
     /* Add start code */
     p_nal->p_buffer[0] = 0x00;
