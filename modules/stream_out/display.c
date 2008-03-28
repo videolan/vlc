@@ -95,28 +95,24 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    vlc_value_t val;
+
+    p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
-    p_sys          = malloc( sizeof( sout_stream_sys_t ) );
     p_sys->p_input = NULL;
     p_sys->i_es    = 0;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "audio", &val );
-    p_sys->b_audio = val.b_bool;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "video", &val );
-    p_sys->b_video = val.b_bool;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "delay", &val );
-    p_sys->i_delay = (int64_t)val.i_int * 1000;
+    p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX"audio" );
+    p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
+    p_sys->i_delay = var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" );
+    p_sys->i_delay *= 1000;
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
-
     p_stream->p_sys     = p_sys;
 
     /* update p_sout->i_out_pace_nocontrol */
