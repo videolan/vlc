@@ -45,6 +45,8 @@ struct access_sys_t
 
     asf_header_t    asfh;
 
+    unsigned    i_timeout;
+
     /* */
     uint8_t     buffer_tcp[MMS_BUFFER_SIZE];
     int         i_buffer_tcp;
