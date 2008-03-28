@@ -48,18 +48,14 @@ public class JVLC
     
     public JVLC()
     {
-        String[] args = new String[1];
-        args[0] = "jvlc";
+        String[] args = new String[] {};
         instance = createInstance(args);
         mediaList = new MediaList(this);
     }
 
     public JVLC(String[] args)
     {
-        String[] myargs = new String[args.length + 1];
-        myargs[0] = "jvlc";
-        System.arraycopy(args, 0, myargs, 1, args.length);
-        instance = createInstance(myargs);
+        instance = createInstance(args);
     }
     
     public JVLC(String args)
