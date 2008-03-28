@@ -953,34 +953,53 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     char *paths, *path, *paths_iter;
+    char * extra_path;
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-    const char * extra_path = NULL;
+    /* Contruct the special search path for system that have a relocatable
+     * executable. Set it to <vlc path>/modules and <vlc path>/plugins. */
+#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __APPLE__ ) || defined( SYS_BEOS )
+    if( asprintf( &extra_path,
+                    "%s" DIR_SEP "modules" PATH_SEP
+                    "%s" DIR_SEP "plugins"
+                    "%s",
+                    vlc_global()->psz_vlcpath,
+                    vlc_global()->psz_vlcpath,
+# if defined( WIN32 ) || defined( UNDER_CE )
+                    "" ) < 0 )
+# else
+                    PATH_SEP PLUGIN_PATH ) < 0 )
+# endif
+
+    {
+        msg_Err( p_this, "Not enough memory" );
+        return;
+    }
 #else
-    const char * extra_path = PLUGIN_PATH;
+    extra_path = strdup( PLUGIN_PATH );
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
     char * userpaths = config_GetPsz( p_this, "plugin-path" );
 
-    if( asprintf( &paths, "modules%s%s"PATH_SEP"plugins%s%s",
-                    extra_path ? PATH_SEP : "",
-                    extra_path ? extra_path : "",
+    if( asprintf( &paths, "modules" PATH_SEP "%s" PATH_SEP "plugins%s%s",
+                    extra_path,
                     userpaths ? PATH_SEP : "",
                     userpaths ? userpaths : "" ) < 0 )
     {
         msg_Err( p_this, "Not enough memory" );
         free( userpaths );
+        free( extra_path );
         return;
     }
 
-    /* Free plugin-path */
+    /* Free plugin-path and extra path */
     free( userpaths );
+    free( extra_path );
+
+    msg_Dbg( p_this, "We will be looking for modules in `%s'", paths );
 
     for( paths_iter = paths; paths_iter; )
     {
-        char *psz_fullpath;
-
         path = copy_next_paths_token( paths_iter, &paths_iter );
         if( !path )
         {
@@ -988,32 +1007,11 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
             return;
         }
 
-#if defined( SYS_BEOS ) || defined( __APPLE__ ) || defined( WIN32 )
-
-        /* Handle relative as well as absolute paths */
-#ifdef WIN32
-        if( path[0] != '\\' && path[0] != '/' && path[0] != ':' )
-#else
-        if( path[0] != '/' )
-#endif
-        {
-            if( 0>= asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
-                              vlc_global()->psz_vlcpath, path) )
-                psz_fullpath = NULL;
-        }
-        else
-#endif
-            psz_fullpath = strdup( path );
-
-        if( psz_fullpath == NULL )
-            continue;
-
-        msg_Dbg( p_this, "recursively browsing `%s'", psz_fullpath );
+        msg_Dbg( p_this, "recursively browsing `%s'", path );
 
         /* Don't go deeper than 5 subdirectories */
-        AllocatePluginDir( p_this, psz_fullpath, 5 );
+        AllocatePluginDir( p_this, path, 5 );
 
-        free( psz_fullpath );
         free( path );
     }
 
