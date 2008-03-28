@@ -573,8 +573,8 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
     if( !p_mi->p_input_thread )
     {
-        return;
         vlc_mutex_unlock( &p_mi->object_lock );
+        return;
     }
 
     p_input_thread = p_mi->p_input_thread;
