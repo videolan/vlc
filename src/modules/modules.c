@@ -938,8 +938,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     {
         char *psz_fullpath;
 
-        /* Look for a ':' */
-        for( psz_iter = ppsz_path; *psz_iter && *psz_iter != ':'; psz_iter++ );
+        /* Look for PATH_SEP_CHAR (a ':' or a ';') */
+        for( psz_iter = ppsz_path; *psz_iter && *psz_iter != PATH_SEP_CHAR; psz_iter++ );
         if( !*psz_iter ) end = true;
         else *psz_iter = 0;
 
@@ -947,7 +947,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 
         /* Handle relative as well as absolute paths */
 #ifdef WIN32
-        if( ppsz_path[0] != '\\' && ppsz_path[0] != '/' )
+        if( ppsz_path[0] != '\\' && ppsz_path[0] != '/' && ppsz_path[0] != ':' )
 #else
         if( ppsz_path[0] != '/' )
 #endif

@@ -1074,7 +1074,11 @@ extern vlc_threadvar_t msg_context_global_key;
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   define DIR_SEP_CHAR '\\'
 #   define DIR_SEP "\\"
+#   define PATH_SEP_CHAR ';'
+#   define PATH_SEP ";"
 #else
 #   define DIR_SEP_CHAR '/'
 #   define DIR_SEP "/"
+#   define PATH_SEP_CHAR ':'
+#   define PATH_SEP ":"
 #endif
