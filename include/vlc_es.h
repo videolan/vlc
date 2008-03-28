@@ -239,7 +239,7 @@ static inline void es_format_Init( es_format_t *fmt,
     fmt->p_extra                = NULL;
 }
 
-static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
+static inline int es_format_Copy( es_format_t *dst, const es_format_t *src )
 {
     int i;
     memcpy( dst, src, sizeof( es_format_t ) );
@@ -284,6 +284,7 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
         else
             dst->p_extra_languages[i].psz_description = NULL;
     }
+    return VLC_SUCCESS;
 }
 
 static inline void es_format_Clean( es_format_t *fmt )
