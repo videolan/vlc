@@ -66,7 +66,6 @@ static int      InitThread        ( vout_thread_t * );
 static void     RunThread         ( vout_thread_t * );
 static void     ErrorThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
-static void     DestroyThread     ( vout_thread_t * );
 
 static void     AspectRatio       ( int, int *, int * );
 static int      BinaryLog         ( uint32_t );
@@ -492,6 +491,17 @@ static void vout_Destructor( vlc_object_t * p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
+    /* Destroy the locks */
+    vlc_mutex_destroy( &p_vout->picture_lock );
+    vlc_mutex_destroy( &p_vout->change_lock );
+    vlc_mutex_destroy( &p_vout->vfilter_lock );
+
+    /* Release the module */
+    if( p_vout->p_module )
+    {
+        module_Unneed( p_vout, p_vout->p_module );
+    }
+
     free( p_vout->psz_filter_chain );
 
     config_ChainDestroy( p_vout->p_cfg );
@@ -752,11 +762,7 @@ static void RunThread( vout_thread_t *p_vout)
     vlc_thread_ready( p_vout );
 
     if( p_vout->b_error )
-    {
-        /* Destroy thread structures allocated by Create and InitThread */
-        DestroyThread( p_vout );
         return;
-    }
 
     if( p_vout->b_title_show )
         DisplayTitleOnOSD( p_vout );
@@ -1213,9 +1219,6 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* End of thread */
     EndThread( p_vout );
-
-    /* Destroy thread structures allocated by CreateThread */
-    DestroyThread( p_vout );
 }
 
 /*****************************************************************************
@@ -1281,26 +1284,6 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* Release the change lock */
     vlc_mutex_unlock( &p_vout->change_lock );
-}
-
-/*****************************************************************************
- * DestroyThread: thread destruction
- *****************************************************************************
- * This function is called when the thread ends. It frees all ressources
- * allocated by CreateThread. Status is available at this stage.
- *****************************************************************************/
-static void DestroyThread( vout_thread_t *p_vout )
-{
-    /* Destroy the locks */
-    vlc_mutex_destroy( &p_vout->picture_lock );
-    vlc_mutex_destroy( &p_vout->change_lock );
-    vlc_mutex_destroy( &p_vout->vfilter_lock );
-
-    /* Release the module */
-    if( p_vout && p_vout->p_module )
-    {
-        module_Unneed( p_vout, p_vout->p_module );
-    }
 }
 
 /* following functions are local */
