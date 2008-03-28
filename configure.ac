@@ -3814,7 +3814,7 @@ dnl
 AC_ARG_ENABLE(zvbi,
   [  --enable-zvbi           VBI (inc. Teletext) decoding support with libzvbi (default enabled)])
 AC_ARG_ENABLE(telx,
-  [  --enable-telx,          Teletext decoding module (conflicting with zvbi) (default disabled)])
+  [  --enable-telx           Teletext decoding module (conflicting with zvbi) (default disabled)])
 
 AS_IF( [test "${enable_zvbi}" != "no"],[
   AS_IF( [test "${enable_telx}" = "yes"],[
