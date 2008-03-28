@@ -936,6 +936,7 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
         else
             path[i] = paths[i];
     }
+    path[i] = 0;
 
     /* Return the remaining paths */
     if( remaining_paths ) {
@@ -954,15 +955,19 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     char *paths, *path, *paths_iter;
 
 #if defined( WIN32 ) || defined( UNDER_CE )
-    const char * extra_path = "";
+    const char * extra_path = NULL;
 #else
-    const char * extra_path = ":" PLUGIN_PATH;
+    const char * extra_path = PLUGIN_PATH;
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
     char * userpaths = config_GetPsz( p_this, "plugin-path" );
 
-    if( asprintf( &paths, "modules%s:plugins:%s", extra_path, userpaths ) < 0 )
+    if( asprintf( &paths, "modules%s%s"PATH_SEP"plugins%s%s",
+                    extra_path ? PATH_SEP : "",
+                    extra_path ? extra_path : "",
+                    userpaths ? PATH_SEP : "",
+                    userpaths ? userpaths : "" ) < 0 )
     {
         msg_Err( p_this, "Not enough memory" );
         free( userpaths );
@@ -975,7 +980,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     for( paths_iter = paths; paths_iter; )
     {
         char *psz_fullpath;
- 
+
         path = copy_next_paths_token( paths_iter, &paths_iter );
         if( !path )
         {
