@@ -628,7 +628,11 @@ void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     if( p_mi->b_own_its_input_thread )
+    {
+        vlc_mutex_lock( &p_mi->object_lock );
         release_input_thread( p_mi ); /* This will stop the input thread */
+        vlc_mutex_unlock( &p_mi->object_lock );
+    }
     else
     {
         input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
