@@ -283,6 +283,16 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         p_input->p->b_owns_its_sout = VLC_FALSE;
     }
 
+    /* Initialize optional stream output. (before access/demuxer)
+     * XXX: we add a special case if the uri starts by vlc.
+     * else 'vlc in.file --sout "" vlc:quit'  cannot work (the output will
+     * be destroyed in case of a file).
+     * (this will break playing of file starting by 'vlc:' but I don't
+     * want to add more logic, just force file by file:// or code it ;)
+     */
+    memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
+    vlc_mutex_init( p_input, &p_input->p->counters.counters_lock );
+
     /* Attach only once we are ready */
     vlc_object_attach( p_input, p_parent );
 
@@ -306,6 +316,8 @@ static void Destructor( input_thread_t * p_input )
         else
             sout_DeleteInstance( priv->p_sout );
     }
+
+    vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
     vlc_mutex_destroy( &priv->lock_control );
     free( priv );
@@ -760,16 +772,6 @@ static int Init( input_thread_t * p_input )
     vlc_meta_t *p_meta;
     int i_es_out_mode;
     int i, i_delay;
-
-    /* Initialize optional stream output. (before access/demuxer)
-     * XXX: we add a special case if the uri starts by vlc.
-     * else 'vlc in.file --sout "" vlc:quit'  cannot work (the output will
-     * be destroyed in case of a file).
-     * (this will break playing of file starting by 'vlc:' but I don't
-     * want to add more logic, just force file by file:// or code it ;)
-     */
-    memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
-    vlc_mutex_init( p_input, &p_input->p->counters.counters_lock );
 
     for( i = 0; i < p_input->p->input.p_item->i_options; i++ )
     {
@@ -1340,8 +1342,6 @@ static void End( input_thread_t * p_input )
             vlc_input_attachment_Delete( p_input->p->attachment[i] );
         TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
     }
-
-    vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
     /* Tell we're dead */
     p_input->b_dead = VLC_TRUE;
