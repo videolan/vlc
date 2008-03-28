@@ -985,7 +985,8 @@ static const char *ppsz_clock_descriptions[] =
 
 #define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
-    "Additional path for VLC to look for its modules.")
+    "Additional path for VLC to look for its modules. You can add " \
+    "several paths by concatenating them using ':' as separator")
 
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \

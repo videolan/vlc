@@ -912,42 +912,53 @@ void module_PutConfig( module_config_t *config )
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
-    /* Yes, there are two NULLs because we replace one with "plugin-path". */
+    char *path, *ppsz_path, *psz_iter;
+
 #if defined( WIN32 ) || defined( UNDER_CE )
-    const char *path[] = { "modules", "", "plugins", NULL, NULL };
+    const char * extra_path = "";
 #else
-    const char *path[] = { "modules", PLUGIN_PATH, "plugins", NULL, NULL };
+    const char * extra_path = PLUGIN_PATH;
 #endif
 
-    const char *const *ppsz_path;
-
     /* If the user provided a plugin path, we add it to the list */
-    char *userpath = config_GetPsz( p_this, "plugin-path" );
-    path[sizeof(path)/sizeof(path[0]) - 2] = userpath;
+    char * userpath = config_GetPsz( p_this, "plugin-path" );
+    bool end = false;
 
-    for( ppsz_path = path; *ppsz_path != NULL; ppsz_path++ )
+    if( asprintf( &path, "modules%s:plugins:%s", extra_path, userpath ) < 0 )
+    {
+        msg_Err( p_this, "Not enough memory" );
+        free( userpath );
+        return;
+    }
+
+    /* Free plugin-path */
+    free( userpath );
+
+    for( ppsz_path = path; !end; )
     {
         char *psz_fullpath;
 
-        if( !**ppsz_path ) continue;
+        /* Look for a ':' */
+        for( psz_iter = ppsz_path; *psz_iter && *psz_iter != ':'; psz_iter++ );
+        if( !*psz_iter ) end = true;
+        else *psz_iter = 0;
 
 #if defined( SYS_BEOS ) || defined( __APPLE__ ) || defined( WIN32 )
 
         /* Handle relative as well as absolute paths */
 #ifdef WIN32
-        if( (*ppsz_path)[0] != '\\' && (*ppsz_path)[0] != '/' &&
-            (*ppsz_path)[1] != ':' )
+        if( ppsz_path[0] != '\\' && ppsz_path[0] != '/' )
 #else
-        if( (*ppsz_path)[0] != '/' )
+        if( ppsz_path[0] != '/' )
 #endif
         {
             if( 0>= asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
-                              vlc_global()->psz_vlcpath, *ppsz_path) )
+                              vlc_global()->psz_vlcpath, ppsz_path) )
                 psz_fullpath = NULL;
         }
         else
 #endif
-            psz_fullpath = strdup( *ppsz_path );
+            psz_fullpath = strdup( ppsz_path );
 
         if( psz_fullpath == NULL )
             continue;
@@ -958,10 +969,11 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         AllocatePluginDir( p_this, psz_fullpath, 5 );
 
         free( psz_fullpath );
+        if( !end ) ppsz_path = psz_iter + 1;
     }
 
     /* Free plugin-path */
-    free( userpath );
+    free( path );
 }
 
 /*****************************************************************************
