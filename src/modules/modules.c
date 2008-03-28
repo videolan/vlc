@@ -906,59 +906,99 @@ void module_PutConfig( module_config_t *config )
  * Following functions are local.
  *****************************************************************************/
 
+ /*****************************************************************************
+ * copy_next_paths_token: from a PATH_SEP_CHAR (a ':' or a ';') separated paths
+ * return first path.
+ *****************************************************************************/
+static char * copy_next_paths_token( char * paths, char ** remaining_paths )
+{
+    char * path;
+    int i;
+    bool escaped = false;
+
+    assert( paths );
+
+    /* Alloc a buffer to store the path */
+    path = malloc( strlen( paths ) );
+    if( !path ) return NULL;
+
+    /* Look for PATH_SEP_CHAR (a ':' or a ';') */
+    for( i = 0; paths[i]; i++ ) {
+        /* Take care of \\ and \: or \; escapement */
+        if( escaped ) {
+            escaped = false;
+            path[i] = paths[i];
+        }
+        else if( paths[i] == '\\' )
+            escaped = true;
+        else if( paths[i] == PATH_SEP_CHAR )
+            break;
+        else
+            path[i] = paths[i];
+    }
+
+    /* Return the remaining paths */
+    if( remaining_paths ) {
+        *remaining_paths = paths[i] ? &paths[i]+1 : NULL;
+    }
+
+    return path;
+}
+
 /*****************************************************************************
  * AllocateAllPlugins: load all plugin modules we can find.
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
-    char *path, *ppsz_path, *psz_iter;
+    char *paths, *path, *paths_iter;
 
 #if defined( WIN32 ) || defined( UNDER_CE )
     const char * extra_path = "";
 #else
-    const char * extra_path = PLUGIN_PATH;
+    const char * extra_path = ":" PLUGIN_PATH;
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
-    char * userpath = config_GetPsz( p_this, "plugin-path" );
-    bool end = false;
+    char * userpaths = config_GetPsz( p_this, "plugin-path" );
 
-    if( asprintf( &path, "modules%s:plugins:%s", extra_path, userpath ) < 0 )
+    if( asprintf( &paths, "modules%s:plugins:%s", extra_path, userpaths ) < 0 )
     {
         msg_Err( p_this, "Not enough memory" );
-        free( userpath );
+        free( userpaths );
         return;
     }
 
     /* Free plugin-path */
-    free( userpath );
+    free( userpaths );
 
-    for( ppsz_path = path; !end; )
+    for( paths_iter = paths; paths_iter; )
     {
         char *psz_fullpath;
-
-        /* Look for PATH_SEP_CHAR (a ':' or a ';') */
-        for( psz_iter = ppsz_path; *psz_iter && *psz_iter != PATH_SEP_CHAR; psz_iter++ );
-        if( !*psz_iter ) end = true;
-        else *psz_iter = 0;
+ 
+        path = copy_next_paths_token( paths_iter, &paths_iter );
+        if( !path )
+        {
+            msg_Err( p_this, "Not enough memory" );
+            return;
+        }
 
 #if defined( SYS_BEOS ) || defined( __APPLE__ ) || defined( WIN32 )
 
         /* Handle relative as well as absolute paths */
 #ifdef WIN32
-        if( ppsz_path[0] != '\\' && ppsz_path[0] != '/' && ppsz_path[0] != ':' )
+        if( path[0] != '\\' && path[0] != '/' && path[0] != ':' )
 #else
-        if( ppsz_path[0] != '/' )
+        if( path[0] != '/' )
 #endif
         {
             if( 0>= asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
-                              vlc_global()->psz_vlcpath, ppsz_path) )
+                              vlc_global()->psz_vlcpath, path) )
                 psz_fullpath = NULL;
         }
         else
 #endif
-            psz_fullpath = strdup( ppsz_path );
+            psz_fullpath = strdup( path );
 
         if( psz_fullpath == NULL )
             continue;
@@ -969,11 +1009,10 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         AllocatePluginDir( p_this, psz_fullpath, 5 );
 
         free( psz_fullpath );
-        if( !end ) ppsz_path = psz_iter + 1;
+        free( path );
     }
 
-    /* Free plugin-path */
-    free( path );
+    free( paths );
 }
 
 /*****************************************************************************
