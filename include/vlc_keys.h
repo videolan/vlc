@@ -233,7 +233,7 @@ static inline int StringToKey( char *psz_key )
     return 0;
 }
 
-enum {
+typedef enum vlc_key {
     ACTIONID_QUIT = 1,
     ACTIONID_PLAY_PAUSE,
     ACTIONID_PLAY,
@@ -336,5 +336,5 @@ enum {
     ACTIONID_ZOOM_DOUBLE,
     /* Cycle Through Audio Devices */
     ACTIONID_AUDIODEVICE_CYCLE
-};
+} vlc_key_t;
 #endif
