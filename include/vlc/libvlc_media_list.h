@@ -31,7 +31,7 @@ extern "C" {
 /*****************************************************************************
  * Media List
  *****************************************************************************/
-/** defgroup libvlc_media_list MediaList
+/** \defgroup libvlc_media_list libvlc_media_list
  * \ingroup libvlc
  * LibVLC Media List, a media list holds multiple media descriptors
  * @{
@@ -122,7 +122,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
 /*****************************************************************************
  * Media List View
  *****************************************************************************/
-/** defgroup libvlc_media_list_view MediaListView
+/** \defgroup libvlc_media_list_view libvlc_media_list_view
  * \ingroup libvlc_media_list
  * LibVLC Media List View, represent a media_list using a different layout
  * @{ */
@@ -186,7 +186,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
 /*****************************************************************************
  * Media List Player
  *****************************************************************************/
-/** defgroup libvlc_media_list_player MediaListPlayer
+/** \defgroup libvlc_media_list_player libvlc_media_list_player
  * \ingroup libvlc
  * LibVLC Media List Player, play a media_list. You can see that as a media
  * instance subclass

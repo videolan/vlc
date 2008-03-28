@@ -35,7 +35,7 @@ typedef struct libvlc_instance_t libvlc_instance_t;
  * Exceptions
  *****************************************************************************/
 
-/** defgroup libvlc_exception Exceptions
+/** \defgroup libvlc_exception libvlc_exception
  * \ingroup libvlc
  * LibVLC Exceptions handling
  * @{
@@ -53,7 +53,7 @@ typedef struct libvlc_exception_t
 /*****************************************************************************
  * Time
  *****************************************************************************/
-/** defgroup libvlc_time Time
+/** \defgroup libvlc_time libvlc_time
  * \ingroup libvlc
  * LibVLC Time support in libvlc
  * @{
@@ -66,14 +66,14 @@ typedef vlc_int64_t libvlc_time_t;
 /*****************************************************************************
  * Media Descriptor
  *****************************************************************************/
-/** defgroup libvlc_media_descriptor MediaDescriptor
+/** \defgroup libvlc_media_descriptor libvlc_media_descriptor
  * \ingroup libvlc
  * LibVLC Media Descriptor handling
  * @{
  */
 
 /* Meta Handling */
-/** defgroup libvlc_meta Meta
+/** defgroup libvlc_meta libvlc_meta
  * \ingroup libvlc_media_descriptor
  * LibVLC Media Meta
  * @{
@@ -109,7 +109,7 @@ typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
 /*****************************************************************************
  * Media Instance
  *****************************************************************************/
-/** defgroup libvlc_media_instance MediaInstance
+/** \defgroup libvlc_media_instance libvlc_media_instance
  * \ingroup libvlc
  * LibVLC Media Instance handling
  * @{
@@ -134,7 +134,7 @@ typedef enum libvlc_state_t
 /*****************************************************************************
  * Media List
  *****************************************************************************/
-/** defgroup libvlc_media_list MediaList
+/** \defgroup libvlc_media_list libvlc_media_list
  * \ingroup libvlc
  * LibVLC Media List handling
  * @{
@@ -143,25 +143,26 @@ typedef enum libvlc_state_t
 typedef struct libvlc_media_list_t libvlc_media_list_t;
 typedef struct libvlc_media_list_view_t libvlc_media_list_view_t;
 
-/**@} */
 
 /*****************************************************************************
  * Media List Player
  *****************************************************************************/
-/** defgroup libvlc_media_list_player MediaListPlayer
- * \ingroup libvlc
+/** \defgroup libvlc_media_list_player libvlc_media_list_player
+ * \ingroup libvlc_media_list
  * LibVLC Media List Player handling
  * @{
  */
 
 typedef struct libvlc_media_list_player_t libvlc_media_list_player_t;
 
-/**@} */
+/**@} libvlc_media_list_player */
+
+/**@} libvlc_media_list */
 
 /*****************************************************************************
  * Media Library
  *****************************************************************************/
-/** defgroup libvlc_media_library Media Library
+/** \defgroup libvlc_media_library libvlc_media_library
  * \ingroup libvlc
  * LibVLC Media Library
  * @{
@@ -174,9 +175,10 @@ typedef struct libvlc_media_library_t libvlc_media_library_t;
 /*****************************************************************************
  * Playlist
  *****************************************************************************/
-/** defgroup libvlc_playlist Playlist
+/** \defgroup libvlc_playlist libvlc_playlist (Deprecated)
  * \ingroup libvlc
- * LibVLC Playlist handling
+ * LibVLC Playlist handling (Deprecated)
+ * @deprecated Use media_list
  * @{
  */
 
@@ -194,8 +196,8 @@ typedef struct libvlc_playlist_item_t
 /*****************************************************************************
  * Video
  *****************************************************************************/
-/** defgroup libvlc_video Video
- * \ingroup libvlc
+/** \defgroup libvlc_video libvlc_video
+ * \ingroup libvlc_media_instance
  * LibVLC Video handling
  * @{
  */
@@ -224,7 +226,7 @@ libvlc_rectangle_t;
 /*****************************************************************************
  * Services/Media Discovery
  *****************************************************************************/
-/** defgroup libvlc_media_discoverer Media Discoverer
+/** \defgroup libvlc_media_discoverer libvlc_media_discoverer
  * \ingroup libvlc
  * LibVLC Media Discoverer
  * @{
@@ -238,7 +240,7 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
  * Message log handling
  *****************************************************************************/
 
-/** defgroup libvlc_log Log
+/** \defgroup libvlc_log libvlc_log
  * \ingroup libvlc
  * LibVLC Message Logging
  * @{

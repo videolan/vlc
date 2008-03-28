@@ -33,7 +33,7 @@ extern "C" {
 /*****************************************************************************
  * Playlist (Deprecated)
  *****************************************************************************/
-/** \defgroup libvlc_playlist Playlist (Deprecated)
+/** \defgroup libvlc_playlist libvlc_playlist (Deprecated)
  * \ingroup libvlc
  * LibVLC Playlist handling (Deprecated)
  * @deprecated Use media_list
