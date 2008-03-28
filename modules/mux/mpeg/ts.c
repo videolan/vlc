@@ -205,7 +205,7 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "alignment", VLC_TRUE, NULL, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, VLC_TRUE );
 
-    add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
+    add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL, SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, KEYF_TEXT,
               KEYF_LONGTEXT, VLC_TRUE );
