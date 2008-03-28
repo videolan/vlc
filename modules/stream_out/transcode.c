@@ -2250,7 +2250,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
+                            &id->p_decoder->fmt_out, &id->p_decoder->fmt_out,
                             p_sys->p_deinterlace_cfg,
                             p_sys->psz_deinterlace );
 
@@ -2336,7 +2336,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 id->pp_filter[id->i_filter] =
                     transcode_video_filter_new( p_stream,
-                            &id->p_decoder->fmt_in, &id->p_encoder->fmt_in,
+                            &id->p_decoder->fmt_out, &id->p_encoder->fmt_in,
                             NULL, "crop padd" );
                 if( !id->pp_filter[id->i_filter] )
                 {
