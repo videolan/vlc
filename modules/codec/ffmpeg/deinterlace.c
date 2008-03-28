@@ -119,15 +119,12 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
     AVPicture src_pic, dest_pic;
     picture_t *p_pic_dst;
-    int i;
+    int i, i_res = -1;
 
     /* Request output picture */
     p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
     if( !p_pic_dst )
-    {
-        msg_Warn( p_filter, "can't get output picture" );
         return NULL;
-    }
 
     /* Prepare the AVPictures for the conversion */
     for( i = 0; i < p_pic->i_planes; i++ )
@@ -141,10 +138,15 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
         dest_pic.linesize[i] = p_pic_dst->p[i].i_pitch;
     }
 
-    avpicture_deinterlace( &dest_pic, &src_pic, p_sys->i_src_ffmpeg_chroma,
-                           p_filter->fmt_in.video.i_width,
-                           p_filter->fmt_in.video.i_height );
-
+    i_res = avpicture_deinterlace( &dest_pic, &src_pic, p_sys->i_src_ffmpeg_chroma,
+                                   p_filter->fmt_in.video.i_width,
+                                   p_filter->fmt_in.video.i_height );
+    if( i_res == -1 )
+    {
+        msg_Err( p_filter, "deinterlacing picture failed" );
+        p_filter->pf_vout_buffer_del( p_filter, p_pic_dst );
+        return NULL;
+    }
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
     p_pic_dst->i_nb_fields = p_pic->i_nb_fields;
