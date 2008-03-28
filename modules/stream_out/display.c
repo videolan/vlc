@@ -96,6 +96,13 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
 
+    /* FIXME: this sucks big time (see #1312) */
+    if( var_CreateGetBool( p_stream, "sout-keep" ) )
+    {
+        msg_Err( p_stream, "cannot use #display sout with sout-keep option" );
+        return VLC_EGENERIC;
+    }
+
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
