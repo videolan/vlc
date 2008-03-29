@@ -565,11 +565,9 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         return;
     }
 
-    int i_input_id = input_Read( p_mi->p_libvlc_instance->p_libvlc_int,
-                      p_mi->p_md->p_input_item, VLC_FALSE );
+    p_mi->p_input_thread = input_CreateThread( p_mi->p_libvlc_instance->p_libvlc_int,
+                      p_mi->p_md->p_input_item );
 
-    /* Released in input_release */
-    p_mi->p_input_thread = (input_thread_t*)vlc_object_get( i_input_id );
 
     if( !p_mi->p_input_thread )
     {
