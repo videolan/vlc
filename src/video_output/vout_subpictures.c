@@ -35,6 +35,7 @@
 #include <vlc_block.h>
 #include <vlc_filter.h>
 #include <vlc_osd.h>
+#include "../libvlc.h"
 
 /*****************************************************************************
  * Local prototypes

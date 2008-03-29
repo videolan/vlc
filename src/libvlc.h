@@ -87,7 +87,7 @@ uint32_t CPUCapabilities( void );
  * @param psz_type object type name
  * @return the created object, or NULL.
  */
-extern vlc_object_t *
+extern void *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
 

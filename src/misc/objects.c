@@ -104,8 +104,8 @@ static void vlc_object_yield_locked( vlc_object_t *p_this );
 static vlc_mutex_t    structure_lock;
 static vlc_object_internals_t global_internals;
 
-vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
-                                 int i_type, const char *psz_type )
+void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
+                         int i_type, const char *psz_type )
 {
     vlc_object_t *p_new;
     vlc_object_internals_t *p_priv;
