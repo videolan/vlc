@@ -64,7 +64,7 @@
 
 
 #define VLC_OBJECT_OSDMENU     (-28)
-#define VLC_OBJECT_STATS       (-29)
+
 #define VLC_OBJECT_HTTPD_HOST  (-30)
 #define VLC_OBJECT_META_ENGINE (-31)
 #define VLC_OBJECT_INTERACTION (-32)
