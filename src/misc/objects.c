@@ -95,7 +95,6 @@ static void vlc_object_yield_locked( vlc_object_t *p_this );
  * Local structure lock
  *****************************************************************************/
 static vlc_mutex_t    structure_lock;
-static vlc_object_internals_t global_internals;
 
 void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
                          int i_type, const char *psz_type )
@@ -103,19 +102,15 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_object_t *p_new;
     vlc_object_internals_t *p_priv;
 
+    p_priv = calloc( 1, sizeof( *p_priv ) + i_size );
+    if( p_priv == NULL )
+        return NULL;
+
     if( i_type == VLC_OBJECT_GLOBAL )
-    {
         p_new = p_this;
-        p_priv = &global_internals;
-        memset( p_priv, 0, sizeof( *p_priv ) );
-    }
     else
     {
         assert (i_size >= sizeof (vlc_object_t));
-        p_priv = calloc( 1, sizeof( *p_priv ) + i_size );
-        if( p_priv == NULL )
-            return NULL;
-
         p_new = (vlc_object_t *)(p_priv + 1);
     }
 
@@ -133,19 +128,14 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_new->psz_header = NULL;
 
-    if( p_this->i_flags & OBJECT_FLAGS_NODBG )
-        p_new->i_flags |= OBJECT_FLAGS_NODBG;
-    if( p_this->i_flags & OBJECT_FLAGS_QUIET )
-        p_new->i_flags |= OBJECT_FLAGS_QUIET;
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
-        p_new->i_flags |= OBJECT_FLAGS_NOINTERACT;
+    p_new->i_flags |= p_this->i_flags
+        & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
 
     p_priv->p_vars = calloc( sizeof( variable_t ), 16 );
 
     if( !p_priv->p_vars )
     {
-        if( i_type != VLC_OBJECT_GLOBAL )
-            free( p_priv );
+        free( p_priv );
         return NULL;
     }
 
@@ -162,6 +152,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
         p_libvlc_global->pp_objects[0] = p_new;
         p_priv->b_attached = VLC_TRUE;
+        vlc_mutex_init( p_new, &structure_lock );
     }
     else
     {
@@ -204,11 +195,6 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_mutex_init( p_new, &p_priv->var_lock );
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
-
-    if( i_type == VLC_OBJECT_GLOBAL )
-    {
-        vlc_mutex_init( p_new, &structure_lock );
-    }
 
     if( i_type == VLC_OBJECT_LIBVLC )
     {
@@ -434,9 +420,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if( p_priv->pipes[0] != -1 )
         close( p_priv->pipes[0] );
 
-    /* global is not dynamically allocated by vlc_object_create */
-    if( p_this->i_object_type != VLC_OBJECT_GLOBAL )
-        free( p_priv );
+    free( p_priv );
 }
 
 
