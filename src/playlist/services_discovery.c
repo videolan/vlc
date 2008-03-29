@@ -29,6 +29,7 @@
 #include "vlc_playlist.h"
 #include "vlc_events.h"
 #include "playlist_internal.h"
+#include "../libvlc.h"
 
 static void RunSD( services_discovery_t *p_sd );
 

@@ -42,6 +42,8 @@
 #   include <sys/stat.h>
 #endif
 
+#include "../libvlc.h"
+
 static const char * meta_type_to_string[VLC_META_TYPE_COUNT] =
 {
     [vlc_meta_Title]            = N_("Title"),
