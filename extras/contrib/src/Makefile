@@ -1051,6 +1051,9 @@ endif
 ifdef HAVE_DARWIN_OS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
 endif
+ifdef HAVE_WIN32
+	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-win32.patch)
+endif
 ifdef NO_TEXT_RELOCATION
 	(cd $@; patch -p1 < ../Patches/ffmpeg-svn-mmx_removal-darwin9.patch)
 endif
