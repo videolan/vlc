@@ -919,7 +919,7 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
     assert( paths );
 
     /* Alloc a buffer to store the path */
-    path = malloc( strlen( paths ) );
+    path = malloc( strlen( paths ) + 1 );
     if( !path ) return NULL;
 
     /* Look for PATH_SEP_CHAR (a ':' or a ';') */
