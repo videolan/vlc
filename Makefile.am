@@ -332,7 +332,8 @@ if HAVE_DARWIN
 if BUILD_VLC
 noinst_DATA = VLC.app
 endif
-# VLC-release.app is the old VLC.app target
+# VLC-release.app for packaging and giving it to your friends
+# use package-macosx to get a nice dmg
 VLC-release.app: vlc
 	( cd src && make install )
 	rm -Rf "$(top_builddir)/tmp"
@@ -405,7 +406,19 @@ VLC-release.app: vlc
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
-	ACTION="VLC-release.app" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
+	$(INSTALL) $(top_builddir)/src/.libs/vlc \
+		   $(top_builddir)/VLC-release.app/Contents/MacOS/VLC
+	ln -sf ./VLC $(top_builddir)/VLC-release.app/Contents/MacOS/clivlc
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/modules
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
+	  if test -n "$$i" ; \
+	    then $(INSTALL) "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
+			   "$(top_builddir)/VLC-release.app/Contents/MacOS/modules" ; \
+	  fi ; done
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/lib ; \
+	  for i in $(srcdir)/src/.libs/*.dylib ; do \
+	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/`basename $${i}` ; \
+	  done ;
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist
 	for i in $(srcdir)/share/luaplaylist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist/`basename $${i}` ; \
@@ -503,6 +516,8 @@ VLC-release.app: vlc
 	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
 
+# This is just for development purposes. 
+# The resulting VLC.app will only in this tree.
 VLC.app: vlc 
 	( cd src && make install )
 	rm -Rf $(top_builddir)/tmp
