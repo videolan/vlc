@@ -164,7 +164,7 @@ static int Open( vlc_object_t *p_this )
 
     char *psz_mux;
     char *psz_access;
-    char *psz_url;
+    char *psz_url=NULL;
     char *psz_bind;
     char *psz_path;
 
@@ -203,8 +203,13 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
-    if( *val.psz_string ) psz_url = val.psz_string;
-    if( !*val.psz_string ) free( val.psz_string );
+    if( *val.psz_string ) 
+    {
+        free( psz_url);
+        psz_url = val.psz_string;
+    }
+    else
+        free( val.psz_string );
 
     p_sys = p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
     if( !p_sys ) return VLC_ENOMEM;
