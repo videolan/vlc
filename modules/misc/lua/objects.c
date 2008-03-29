@@ -128,7 +128,6 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_STREAM, "stream" },
           { VLC_OBJECT_OPENGL, "opengl" },
           { VLC_OBJECT_FILTER, "filter" },
-          { VLC_OBJECT_SPU, "spu" },
           { VLC_OBJECT_SD, "sd" },
           { VLC_OBJECT_XML, "xml" },
           { VLC_OBJECT_OSDMENU, "osdmenu" },

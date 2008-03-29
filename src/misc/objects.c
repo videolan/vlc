@@ -302,10 +302,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(vout_thread_t);
             psz_type = "video output";
             break;
-        case VLC_OBJECT_SPU:
-            i_size = sizeof(spu_t);
-            psz_type = "subpicture";
-            break;
         case VLC_OBJECT_AOUT:
             i_size = sizeof(aout_instance_t);
             psz_type = "audio output";

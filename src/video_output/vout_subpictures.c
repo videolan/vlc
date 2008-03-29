@@ -76,7 +76,8 @@ enum {
 spu_t *__spu_Create( vlc_object_t *p_this )
 {
     int i_index;
-    spu_t *p_spu = vlc_object_create( p_this, VLC_OBJECT_SPU );
+    spu_t *p_spu = vlc_custom_create( p_this, sizeof( spu_t ),
+                                      VLC_OBJECT_GENERIC, "subpicture" );
 
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
     {
