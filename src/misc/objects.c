@@ -56,7 +56,6 @@
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
 #include "input/vlm_internal.h"
-#include "vlc_tls.h"
 #include "vlc_xml.h"
 #include "vlc_osd.h"
 #include "vlc_meta.h"
