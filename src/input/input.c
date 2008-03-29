@@ -43,7 +43,6 @@
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include <vlc_url.h>
-#include <vlc_demux.h>
 #include <vlc_charset.h>
 
 #ifdef HAVE_SYS_STAT_H
@@ -113,7 +112,8 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  * * Get only:
  *  - length
  *  - bookmarks
- *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown or not, for that check position != 0.0)
+ *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown
+ *    or not, for that check position != 0.0)
  *  - can-pause
  * * For intf callback upon changes
  *  - intf-change
@@ -122,14 +122,17 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  * TODO complete this list (?)
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
-                               const char *psz_header, vlc_bool_t b_quick, sout_instance_t *p_sout )
+                               const char *psz_header, vlc_bool_t b_quick,
+                               sout_instance_t *p_sout )
 {
+    static const char input_name[] = "input";
     input_thread_t *p_input = NULL;                 /* thread descriptor */
     vlc_value_t val;
     int i;
 
     /* Allocate descriptor */
-    p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
+    p_input = vlc_custom_create( p_parent, sizeof( *p_input ),
+                                 VLC_OBJECT_INPUT, input_name );
     if( p_input == NULL )
     {
         msg_Err( p_parent, "out of memory" );

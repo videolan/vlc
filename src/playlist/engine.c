@@ -59,12 +59,14 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
  */
 playlist_t * playlist_Create( vlc_object_t *p_parent )
 {
+    static const char playlist_name[] = "playlist";
     playlist_t *p_playlist;
     vlc_bool_t b_save;
     int i_tree;
 
     /* Allocate structure */
-    p_playlist = vlc_object_create( p_parent, VLC_OBJECT_PLAYLIST );
+    p_playlist = vlc_custom_create( p_parent, sizeof( *p_playlist ),
+                                    VLC_OBJECT_PLAYLIST, playlist_name );
     if( !p_playlist )
     {
         msg_Err( p_parent, "out of memory" );

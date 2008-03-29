@@ -48,7 +48,6 @@
 #include <vlc_sout.h>
 #include "stream_output/stream_output.h"
 
-#include "vlc_playlist.h"
 #include "vlc_interface.h"
 #include "vlc_codec.h"
 #include "vlc_filter.h"
@@ -255,14 +254,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_DIALOGS:
             i_size = sizeof(intf_thread_t);
             psz_type = "dialogs";
-            break;
-        case VLC_OBJECT_PLAYLIST:
-            i_size = sizeof(playlist_t);
-            psz_type = "playlist";
-            break;
-        case VLC_OBJECT_INPUT:
-            i_size = sizeof(input_thread_t);
-            psz_type = "input";
             break;
         case VLC_OBJECT_DEMUX:
             i_size = sizeof(demux_t);
