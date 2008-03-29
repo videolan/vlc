@@ -56,7 +56,6 @@
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
 #include "input/vlm_internal.h"
-#include "vlc_xml.h"
 #include "vlc_osd.h"
 #include "vlc_meta.h"
 
@@ -309,10 +308,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_VLM:
             i_size = sizeof( vlm_t );
             psz_type = "vlm dameon";
-            break;
-        case VLC_OBJECT_XML:
-            i_size = sizeof( xml_t );
-            psz_type = "xml";
             break;
         case VLC_OBJECT_OPENGL:
             i_size = sizeof( vout_thread_t );

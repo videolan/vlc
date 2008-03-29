@@ -39,7 +39,8 @@ xml_t *__xml_Create( vlc_object_t *p_this )
 {
     xml_t *p_xml;
 
-    p_xml = vlc_object_create( p_this, VLC_OBJECT_XML );
+    p_xml = vlc_custom_create( p_this, sizeof( *p_xml ), VLC_OBJECT_GENERIC,
+                               "xml" );
     vlc_object_attach( p_xml, p_this );
 
     p_xml->p_module = module_Need( p_xml, "xml", 0, 0 );
