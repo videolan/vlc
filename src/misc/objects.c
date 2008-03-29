@@ -53,8 +53,6 @@
 #include "vlc_codec.h"
 #include "vlc_filter.h"
 
-#include "vlc_meta.h"
-
 #include "variables.h"
 #ifndef WIN32
 # include <unistd.h>
