@@ -1687,7 +1687,6 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
         i_read = p_access->pf_read( p_access, p_read, i_read );
         if( p_input )
         {
-            vlc_object_yield( p_input );
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
             stats_UpdateInteger( s, p_input->p->counters.p_read_bytes, i_read,
                              &i_total );
@@ -1695,7 +1694,6 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
                            (float)i_total, NULL );
             stats_UpdateInteger( s, p_input->p->counters.p_read_packets, 1, NULL );
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-            vlc_object_release( p_input );
         }
         return i_read;
     }
