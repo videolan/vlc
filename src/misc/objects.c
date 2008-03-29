@@ -112,6 +112,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     }
     else
     {
+        assert (i_size >= sizeof (vlc_object_t));
         p_priv = calloc( 1, sizeof( *p_priv ) + i_size );
         if( p_priv == NULL )
             return NULL;
