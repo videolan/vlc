@@ -177,6 +177,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->i_pts_delay = 0;
 
     /* Init Input fields */
+    vlc_gc_incref( p_item ); /* Released in Destructor() */
     p_input->p->input.p_item = p_item;
     p_input->p->input.p_access = NULL;
     p_input->p->input.p_stream = NULL;
@@ -312,6 +313,8 @@ static void Destructor( input_thread_t * p_input )
         else
             sout_DeleteInstance( priv->p_sout );
     }
+
+    vlc_gc_decref( p_input->p->input.p_item );
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 

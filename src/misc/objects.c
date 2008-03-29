@@ -1234,7 +1234,9 @@ void vlc_list_release( vlc_list_t *p_list )
 void __vlc_object_dump( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &structure_lock );
-    PrintObject( p_this, "vlc_object_dump: " );
+    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+    psz_foo[0] = '|';
+    DumpStructure( p_this, 0, psz_foo );
     vlc_mutex_unlock( &structure_lock );
 }
 
