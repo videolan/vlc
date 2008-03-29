@@ -488,7 +488,10 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     QSpinBox *telexPage = new QSpinBox;
     telexPage->setRange( 0, 999 );
     telexPage->setValue( 100 );
+    telexPage->setAccelerated( true );
+    telexPage->setWrapping( true );
     telexPage->setAlignment( Qt::AlignRight );
+    telexPage->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
     telexLayout->addWidget( telexPage );
 
     controlLayout->addWidget( telexFrame, 1, 10, 2, 3, Qt::AlignBottom );
