@@ -726,6 +726,16 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_libvlc->i_timers = 0;
     p_libvlc->pp_timers = NULL;
 
+    /* Init stats */
+    p_libvlc->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
+    if( !p_libvlc->p_stats )
+    {
+        vlc_object_release( p_libvlc );
+        return VLC_ENOMEM;
+    }
+    vlc_mutex_init( p_libvlc, &p_libvlc->p_stats->lock );
+    p_libvlc->p_stats_computer = NULL;
+
     /* Init the array that holds every input item */
     ARRAY_INIT( p_libvlc->input_items );
     p_libvlc->i_last_input_id = 0;
@@ -991,6 +1001,10 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         free( p_del );
     FOREACH_END();
     ARRAY_RESET( p_libvlc->input_items );
+
+    msg_Dbg( p_libvlc, "removing stats" );
+    vlc_mutex_destroy( &p_libvlc->p_stats->lock );
+    FREENULL( p_libvlc->p_stats );
 
     return VLC_SUCCESS;
 }

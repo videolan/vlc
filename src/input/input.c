@@ -142,14 +142,14 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* One "randomly" selected input thread is responsible for computing
      * the global stats. Check if there is already someone doing this */
-    if( p_input->p_libvlc->p_playlist->p_stats && !b_quick )
+    if( p_input->p_libvlc->p_stats && !b_quick )
     {
-        vlc_mutex_lock( &p_input->p_libvlc->p_playlist->p_stats->lock );
-        if( p_input->p_libvlc->p_playlist->p_stats_computer == NULL )
+        vlc_mutex_lock( &p_input->p_libvlc->p_stats->lock );
+        if( p_input->p_libvlc->p_stats_computer == NULL )
         {
-            p_input->p_libvlc->p_playlist->p_stats_computer = p_input;
+            p_input->p_libvlc->p_stats_computer = p_input;
         }
-        vlc_mutex_unlock( &p_input->p_libvlc->p_playlist->p_stats->lock );
+        vlc_mutex_unlock( &p_input->p_libvlc->p_stats->lock );
     }
 
     p_input->b_preparsing = b_quick;
@@ -748,10 +748,10 @@ static void MainLoop( input_thread_t *p_input )
         {
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
             /* Are we the thread responsible for computing global stats ? */
-            if( p_input->p_libvlc->p_playlist->p_stats_computer == p_input )
+            if( p_input->p_libvlc->p_stats_computer == p_input )
             {
-                stats_ComputeGlobalStats( p_input->p_libvlc->p_playlist,
-                                     p_input->p_libvlc->p_playlist->p_stats );
+                stats_ComputeGlobalStats( p_input->p_libvlc,
+                                     p_input->p_libvlc->p_stats );
             }
         }
     }
@@ -1298,11 +1298,11 @@ static void End( input_thread_t * p_input )
         {
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
-            if( p_input->p_libvlc->p_playlist->p_stats_computer == p_input )
+            if( p_input->p_libvlc->p_stats_computer == p_input )
             {
-                stats_ComputeGlobalStats( p_input->p_libvlc->p_playlist,
-                                          p_input->p_libvlc->p_playlist->p_stats );
-                p_input->p_libvlc->p_playlist->p_stats_computer = NULL;
+                stats_ComputeGlobalStats( p_input->p_libvlc,
+                                          p_input->p_libvlc->p_stats );
+                p_input->p_libvlc->p_stats_computer = NULL;
             }
             CL_CO( read_bytes );
             CL_CO( read_packets );

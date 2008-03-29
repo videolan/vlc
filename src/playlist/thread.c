@@ -58,16 +58,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     playlist_t *p_playlist = playlist_Create( p_parent );
     if( !p_playlist ) return;
 
-    // Stats
-    p_playlist->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
-    if( !p_playlist->p_stats )
-    {
-        vlc_object_release( p_playlist );
-        return;
-    }
-    vlc_mutex_init( p_playlist, &p_playlist->p_stats->lock );
-    p_playlist->p_stats_computer = NULL;
-
     // Preparse
     p_playlist->p_preparse = vlc_object_create( p_playlist,
                                   sizeof( playlist_preparse_t ) );

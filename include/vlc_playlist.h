@@ -231,10 +231,6 @@ struct playlist_t
                                            when processing the request */
         vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
-
-    // Playlist-unrelated fields
-    input_thread_t      *p_stats_computer; /**< Input thread computing stats */
-    global_stats_t      *p_stats;          /**< Global statistics */
 };
 
 /** Helper to add an item */

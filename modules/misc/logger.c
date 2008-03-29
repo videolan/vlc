@@ -454,20 +454,17 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
 
 static void DoRRD( intf_thread_t *p_intf )
 {
-    playlist_t *p_playlist;
     if( mdate() - p_intf->p_sys->last_update < 1000000 )
         return;
     p_intf->p_sys->last_update = mdate();
 
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( p_playlist && p_playlist->p_stats )
+    if( p_intf->p_libvlc->p_stats )
     {
-        lldiv_t din = lldiv( p_playlist->p_stats->f_input_bitrate * 1000000,
+        lldiv_t din = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
                              1000 );
-        lldiv_t ddm = lldiv( p_playlist->p_stats->f_demux_bitrate * 1000000,
+        lldiv_t ddm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
                              1000 );
-        lldiv_t dout = lldiv( p_playlist->p_stats->f_output_bitrate * 1000000,
+        lldiv_t dout = lldiv( p_intf->p_libvlc->p_stats->f_output_bitrate * 1000000,
                              1000 );
         fprintf( p_intf->p_sys->p_rrd,
                    I64Fi":%lld.%03u:%lld.%03u:%lld.%03u\n",
@@ -476,6 +473,5 @@ static void DoRRD( intf_thread_t *p_intf )
                    ddm.quot, (unsigned int)ddm.rem,
                    dout.quot, (unsigned int)dout.rem );
         fflush( p_intf->p_sys->p_rrd );
-        vlc_object_release( p_playlist );
     }
 }

@@ -202,11 +202,6 @@ static void playlist_Destructor( vlc_object_t * p_this )
     {
         vlc_object_release( p_playlist->p_fetcher );
     }
-
-    // Stats
-    vlc_mutex_destroy( &p_playlist->p_stats->lock );
-    if( p_playlist->p_stats )
-        free( p_playlist->p_stats );
 }
 
 /* Destroy remaining objects */

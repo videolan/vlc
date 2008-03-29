@@ -47,7 +47,10 @@ struct libvlc_int_t
 
     playlist_t            *p_playlist;       ///< playlist object
 
-    vlc_object_t          *p_interaction;       ///< interface interaction object
+    vlc_object_t          *p_interaction;    ///< interface interaction object
+
+    void                 *p_stats_computer;  ///< Input thread computing stats (needs cleanup)
+    global_stats_t       *p_stats;           ///< Global statistics
 
     /* There is no real reason to keep a list of items, but not to break
      * everything, let's keep it */
