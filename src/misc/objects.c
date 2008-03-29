@@ -239,10 +239,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     switch( i_type )
     {
-        case VLC_OBJECT_GLOBAL:
-            i_size = sizeof(libvlc_global_data_t);
-            psz_type = "global";
-            break;
         case VLC_OBJECT_LIBVLC:
             i_size = sizeof(libvlc_int_t);
             psz_type = "libvlc";

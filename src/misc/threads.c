@@ -187,7 +187,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( LIBVLC_USE_PTHREAD )
 #endif
 
-        p_root = vlc_object_create( p_libvlc_global, VLC_OBJECT_GLOBAL );
+        p_root = vlc_custom_create( p_libvlc_global, 0, VLC_OBJECT_GLOBAL,
+                                    "global" );
         if( p_root == NULL )
             i_ret = VLC_ENOMEM;
 
