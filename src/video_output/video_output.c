@@ -508,19 +508,21 @@ static void vout_Destructor( vlc_object_t * p_this )
 
 #ifndef __APPLE__
     vout_thread_t *p_another_vout;
-    playlist_t *p_playlist = pl_Yield( p_vout );
 
-    /* This is a dirty hack for mostly Linux, where there is no way to get the GUI
-       back if you closed it while playing video. This is solved in Mac OS X,
-       where we have this novelty called menubar, that will always allow you access
-       to the applications main functionality. They should try that on linux sometime */
-    p_another_vout = vlc_object_find( p_this->p_libvlc,
-                                      VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_another_vout == NULL )
-    {
-        vlc_value_t val;
-        val.b_bool = VLC_TRUE;
-        var_Set( p_playlist, "intf-show", val );
+    playlist_t *p_playlist = pl_Get( p_vout );
+    if( p_playlist->b_die ) return;
+    vlc_object_yield( p_playlist );
+/* This is a dirty hack for mostly Linux, where there is no way to get the GUI
+   back if you closed it while playing video. This is solved in Mac OS X,
+   where we have this novelty called menubar, that will always allow you access
+   to the applications main functionality. They should try that on linux sometime */
+        p_another_vout = vlc_object_find( p_this->p_libvlc,
+                                          VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        if( p_another_vout == NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = VLC_TRUE;
+            var_Set( p_playlist, "intf-show", val );
     }
     else
     {
