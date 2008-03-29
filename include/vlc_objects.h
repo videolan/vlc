@@ -41,7 +41,7 @@
 #define VLC_OBJECT_MODULE      (-3)
 #define VLC_OBJECT_INTF        (-4)
 #define VLC_OBJECT_PLAYLIST    (-5)
-#define VLC_OBJECT_ITEM        (-6)
+
 #define VLC_OBJECT_INPUT       (-7)
 #define VLC_OBJECT_DECODER     (-8)
 #define VLC_OBJECT_VOUT        (-9)
@@ -60,7 +60,7 @@
 #define VLC_OBJECT_FILTER      (-22)
 #define VLC_OBJECT_VOD         (-23)
 #define VLC_OBJECT_SPU         (-24)
-/*#define VLC_OBJECT_xxx         (-25) - formerly TLS */
+
 #define VLC_OBJECT_SD          (-26)
 #define VLC_OBJECT_XML         (-27)
 #define VLC_OBJECT_OSDMENU     (-28)

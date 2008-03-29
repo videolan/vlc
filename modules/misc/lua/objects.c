@@ -112,7 +112,6 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_MODULE, "module" },
           { VLC_OBJECT_INTF, "intf" },
           { VLC_OBJECT_PLAYLIST, "playlist" },
-          { VLC_OBJECT_ITEM, "item" },
           { VLC_OBJECT_INPUT, "input" },
           { VLC_OBJECT_DECODER, "decoder" },
           { VLC_OBJECT_VOUT, "vout" },
