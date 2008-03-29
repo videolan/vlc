@@ -55,7 +55,9 @@ char ** __services_discovery_GetServicesNames( vlc_object_t * p_super,
 services_discovery_t *
 services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name )
 {
-    services_discovery_t *p_sd = vlc_object_create( p_super, VLC_OBJECT_SD );
+    services_discovery_t *p_sd;
+    p_sd = vlc_custom_create( p_super, sizeof( *p_sd ), VLC_OBJECT_GENERIC,
+                              "services discovery" );
     if( !p_sd )
         return NULL;
 

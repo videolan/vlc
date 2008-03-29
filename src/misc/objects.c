@@ -1,7 +1,7 @@
 /*****************************************************************************
  * objects.c: vlc_object_t handling
  *****************************************************************************
- * Copyright (C) 2004-2007 the VideoLAN team
+ * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -265,10 +265,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_PLAYLIST:
             i_size = sizeof(playlist_t);
             psz_type = "playlist";
-            break;
-        case VLC_OBJECT_SD:
-            i_size = sizeof(services_discovery_t);
-            psz_type = "services discovery";
             break;
         case VLC_OBJECT_INPUT:
             i_size = sizeof(input_thread_t);

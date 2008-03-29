@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_objects.h: vlc_object_t definition and manipulation methods
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -61,7 +61,7 @@
 
 
 
-#define VLC_OBJECT_SD          (-26)
+
 #define VLC_OBJECT_XML         (-27)
 #define VLC_OBJECT_OSDMENU     (-28)
 #define VLC_OBJECT_STATS       (-29)
