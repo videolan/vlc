@@ -2331,7 +2331,9 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     /* Check if we need to load the VOD server */
     if( p_cfg->b_vod && !p_vlm->i_vod )
     {
-        p_vlm->p_vod = vlc_object_create( p_vlm, VLC_OBJECT_VOD );
+        p_vlm->p_vod = vlc_custom_create( VLC_OBJECT(p_vlm),
+                                          sizeof( p_vlm->p_vod ),
+                                          VLC_OBJECT_GENERIC, "vod server" );
         vlc_object_attach( p_vlm->p_vod, p_vlm );
         p_vlm->p_vod->p_module = module_Need( p_vlm->p_vod, "vod server", 0, 0 );
         if( !p_vlm->p_vod->p_module )
