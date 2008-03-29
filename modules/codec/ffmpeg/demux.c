@@ -492,8 +492,13 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     }
     if( i_absolute < 0 )
         i_absolute = 0;
-    if( i_size && i_absolute > i_size )
-        i_absolute = i_size;
+    if( i_size )
+    {
+        if( i_absolute > i_size )
+            i_absolute = i_size;
+        if( stream_Tell( p_demux->s ) >= i_size )
+            return -1;
+    }
 
     if( stream_Seek( p_demux->s, i_absolute ) )
     {
