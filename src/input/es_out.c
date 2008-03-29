@@ -270,8 +270,6 @@ void input_EsOutDelete( es_out_t *out )
     es_out_sys_t *p_sys = out->p_sys;
     int i;
 
-    msg_Dbg( out, "deleting es out" );
-
     for( i = 0; i < p_sys->i_es; i++ )
     {
         if( p_sys->es[i]->p_dec )
