@@ -174,8 +174,11 @@ void InputManager::customEvent( QEvent *event )
 
     if( !hasInput() ) return;
 
-    if( ( type != PositionUpdate_Type && type != ItemRateChanged_Type ) &&
-        ( i_input_id != ple->i_id ) )
+    if( ( type != PositionUpdate_Type  &&
+          type != ItemRateChanged_Type &&
+          type != ItemStateChanged_Type
+        )
+        && ( i_input_id != ple->i_id ) )
         return;
 
     if( type != PositionUpdate_Type )
