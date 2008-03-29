@@ -67,8 +67,10 @@ static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
 static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
 {
     osd_menu_t *p_menu;
+    static const char osdmenu_name[] = "osd menu";
 
-    p_menu = vlc_object_create( p_this, VLC_OBJECT_OSDMENU );
+    p_menu = vlc_custom_create( p_this, sizeof( *p_menu ), VLC_OBJECT_OSDMENU,
+                                osdmenu_name );
     if( !p_menu )
     {
         msg_Err( p_this, "out of memory" );

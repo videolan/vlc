@@ -53,7 +53,6 @@
 #include "vlc_codec.h"
 #include "vlc_filter.h"
 
-#include "vlc_osd.h"
 #include "vlc_meta.h"
 
 #include "variables.h"
@@ -309,10 +308,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_ANNOUNCE:
             i_size = sizeof( announce_handler_t );
             psz_type = "announce";
-            break;
-        case VLC_OBJECT_OSDMENU:
-            i_size = sizeof( osd_menu_t );
-            psz_type = "osd menu";
             break;
         case VLC_OBJECT_INTERACTION:
             i_size = sizeof( interaction_t );
