@@ -102,6 +102,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     vlc_value_t lockval;
     vlm_t *p_vlm = NULL;
     char *psz_vlmconf;
+    static const char vlm_object_name[] = "vlm daemon";
 
     /* Avoid multiple creation */
     if( var_Create( p_this->p_libvlc, "vlm_mutex", VLC_VAR_MUTEX ) ||
@@ -120,7 +121,8 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
 
     msg_Dbg( p_this, "creating VLM" );
 
-    p_vlm = vlc_object_create( p_this, VLC_OBJECT_VLM );
+    p_vlm = vlc_custom_create( p_this, sizeof( *p_vlm), VLC_OBJECT_VLM,
+                               vlm_object_name );
     if( !p_vlm )
     {
         vlc_mutex_unlock( lockval.p_address );
