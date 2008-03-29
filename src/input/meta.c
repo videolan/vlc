@@ -94,7 +94,8 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
     assert( i_mandatory );
 
     /* FIXME: object creation is overkill, use p_private */
-    p_me = vlc_object_create( p_playlist, VLC_OBJECT_META_ENGINE );
+    p_me = vlc_custom_create( VLC_OBJECT(p_playlist), sizeof( *p_me ),
+                              VLC_OBJECT_GENERIC, "meta engine" );
     p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
     p_me->i_flags |= OBJECT_FLAGS_QUIET;
     p_me->i_mandatory = i_mandatory;

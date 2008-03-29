@@ -130,7 +130,6 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_FILTER, "filter" },
           { VLC_OBJECT_OSDMENU, "osdmenu" },
           { VLC_OBJECT_HTTPD_HOST, "httpd_host" },
-          { VLC_OBJECT_META_ENGINE, "meta_engine" },
           { VLC_OBJECT_GENERIC, "generic" },
           { 0, "" } };
     int i;
