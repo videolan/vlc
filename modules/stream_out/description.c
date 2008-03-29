@@ -97,7 +97,7 @@ static void Close( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     /* It can happen only if buggy */
-    assert( !p_sys->p_input )
+    assert( !p_sys->p_input );
 
     free( p_sys );
 }
