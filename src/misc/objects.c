@@ -1228,6 +1228,16 @@ void vlc_list_release( vlc_list_t *p_list )
     free( p_list );
 }
 
+/*****************************************************************************
+ * dump an object. (Debug function)
+ *****************************************************************************/
+void __vlc_object_dump( vlc_object_t *p_this )
+{
+    vlc_mutex_lock( &structure_lock );
+    PrintObject( p_this, "vlc_object_dump: " );
+    vlc_mutex_unlock( &structure_lock );
+}
+
 /* Following functions are local */
 
 /*****************************************************************************
