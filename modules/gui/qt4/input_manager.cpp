@@ -61,6 +61,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
 {
     i_old_playing_status = END_S;
     b_had_audio  = b_had_video = b_has_audio = b_has_video = false;
+    b_has_subs   = false;
     old_name     = "";
     artUrl       = "";
     p_input      = NULL;
@@ -312,13 +313,14 @@ void InputManager::UpdateTracks()
     b_has_audio = val.i_int > 0;
     var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
     b_has_video = val.i_int > 0;
-
-    msg_Dbg( p_input, "I have audio-video: %i %i", b_has_audio, b_has_video );
+    var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    b_has_subs = val.i_int > 0;
 
     /* Update ZVBI status */
 #ifdef ZVBI_COMPILED
     /* Update teletext status*/
-    emit teletextEnabled( true );/* FIXME */
+    if( b_has_subs )
+        emit teletextEnabled( false );/* FIXME */
 #endif
 }
 

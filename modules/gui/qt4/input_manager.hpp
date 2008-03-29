@@ -64,7 +64,7 @@ public:
     bool hasInput() { return p_input && !p_input->b_dead && !p_input->b_die; }
     bool hasAudio() { return b_has_audio; }
     bool hasVideo() { return b_has_video; }
-    bool b_has_audio, b_has_video, b_had_audio, b_had_video;
+    bool b_has_audio, b_has_video, b_had_audio, b_had_video, b_has_subs;
 
 private:
     intf_thread_t  *p_intf;
