@@ -41,7 +41,7 @@ typedef struct
 
     vlc_bool_t      b_sout_keep;
 
-    input_item_t    item;
+    input_item_t    *p_item;
     input_thread_t  *p_input;
     sout_instance_t *p_sout;
 
@@ -54,7 +54,7 @@ typedef struct
 
     struct
     {
-        input_item_t item;
+        input_item_t *p_item;
         vod_media_t *p_media;
     } vod;
 

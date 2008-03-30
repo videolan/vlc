@@ -2236,27 +2236,26 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             char *psz_dup;
             int i;
 
-            input_ItemClean( &p_media->vod.item );
-            input_ItemInit( VLC_OBJECT(p_vlm), &p_media->vod.item );
+            vlc_gc_decref( p_media->vod.p_item );
+            p_media->vod.p_item = input_ItemNew( p_vlm, p_cfg->ppsz_input[0],
+                p_cfg->psz_name );
 
             if( p_cfg->psz_output )
                 asprintf( &psz_output, "%s:description", p_cfg->psz_output );
             else
                 asprintf( &psz_output, "#description" );
 
-            p_media->vod.item.psz_uri = strdup( p_cfg->ppsz_input[0] );
-
             asprintf( &psz_dup, "sout=%s", psz_output);
-            input_ItemAddOption( &p_media->vod.item, psz_dup );
+            input_ItemAddOption( p_media->vod.p_item, psz_dup );
             free( psz_dup );
             for( i = 0; i < p_cfg->i_option; i++ )
-                input_ItemAddOption( &p_media->vod.item,
+                input_ItemAddOption( p_media->vod.p_item,
                                      p_cfg->ppsz_option[i] );
-            input_ItemAddOption( &p_media->vod.item, "no-sout-keep" );
+            input_ItemAddOption( p_media->vod.p_item, "no-sout-keep" );
 
             asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name );
 
-            if( (p_input = input_CreateThreadExtended( p_vlm, &p_media->vod.item, psz_header, NULL ) ) )
+            if( (p_input = input_CreateThreadExtended( p_vlm, p_media->vod.p_item, psz_header, NULL ) ) )
             {
                 while( !p_input->b_eof && !p_input->b_error )
                     msleep( 100000 );
@@ -2277,7 +2276,8 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 fourcc[0] = tolower(fourcc[0]); fourcc[1] = tolower(fourcc[1]);
                 fourcc[2] = tolower(fourcc[2]); fourcc[3] = tolower(fourcc[3]);
 
-                item = p_media->vod.item;
+                /* XXX: Don't do it that way, but properly use a new input item ref. */
+                item = *p_media->vod.p_item;
                 item.i_es = 1;
                 item.es = &p_es;
                 es_format_Init( &es, VIDEO_ES, *((int *)fourcc) );
@@ -2288,7 +2288,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             else
             {
                 p_media->vod.p_media =
-                    p_vlm->p_vod->pf_media_new( p_vlm->p_vod, p_cfg->psz_name, &p_media->vod.item );
+                    p_vlm->p_vod->pf_media_new( p_vlm->p_vod, p_cfg->psz_name, p_media->vod.p_item );
             }
         }
     }
@@ -2366,7 +2366,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     p_media->cfg.id = p_vlm->i_id++;
     /* FIXME do we do something here if enabled is true ? */
 
-    input_ItemInit( VLC_OBJECT(p_vlm), &p_media->vod.item );
+    p_media->vod.p_item = input_ItemNew( p_vlm, NULL, NULL );
 
     p_media->vod.p_media = NULL;
     TAB_INIT( p_media->i_instance, p_media->instance );
@@ -2399,7 +2399,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     vlm_media_Clean( &p_media->cfg );
 
-    input_ItemClean( &p_media->vod.item );
+    vlc_gc_decref( &p_media->vod.p_item );
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
 
@@ -2485,7 +2485,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     if( psz_name )
         p_instance->psz_name = strdup( psz_name );
 
-    input_ItemInit( VLC_OBJECT(p_vlm), &p_instance->item );
+    p_instance->p_item = input_ItemNew( p_vlm, NULL, NULL );
 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = VLC_FALSE;
@@ -2505,7 +2505,7 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
     if( p_instance->p_sout )
         sout_DeleteInstance( p_instance->p_sout );
 
-    input_ItemClean( &p_instance->item );
+    vlc_gc_decref( p_instance->p_item );
     free( p_instance->psz_name );
     free( p_instance );
 }
@@ -2546,7 +2546,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
                       p_cfg->psz_output ? p_cfg->psz_output : "",
                       (p_cfg->psz_output && psz_vod_output) ? ":" : psz_vod_output ? "#" : "",
                       psz_vod_output ? psz_vod_output : "" );
-            input_ItemAddOption( &p_instance->item, psz_buffer );
+            input_ItemAddOption( p_instance->p_item, psz_buffer );
             free( psz_buffer );
         }
 
@@ -2557,7 +2557,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             else if( !strcmp( p_cfg->ppsz_option[i], "nosout-keep" ) || !strcmp( p_cfg->ppsz_option[i], "no-sout-keep" ) )
                 p_instance->b_sout_keep = VLC_FALSE;
             else
-                input_ItemAddOption( &p_instance->item, p_cfg->ppsz_option[i] );
+                input_ItemAddOption( p_instance->p_item, p_cfg->ppsz_option[i] );
         }
         /* We force the right sout-keep value (avoid using the sout-keep from the global configuration)
          * FIXME implement input list for VOD (need sout-keep)
@@ -2566,7 +2566,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             psz_keep = "sout-keep";
         else
             psz_keep = "no-sout-keep";
-        input_ItemAddOption( &p_instance->item, psz_keep );
+        input_ItemAddOption( p_instance->p_item, psz_keep );
 
         TAB_APPEND( p_media->i_instance, p_media->instance, p_instance );
     }
@@ -2594,10 +2594,10 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     /* Start new one */
     p_instance->i_index = i_input_index;
-    input_item_SetURI( &p_instance->item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
+    input_item_SetURI( p_instance->p_item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
 
     asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name );
-    p_instance->p_input = input_CreateThreadExtended( p_vlm, &p_instance->item, psz_log, p_instance->p_sout );
+    p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item, psz_log, p_instance->p_sout );
     if( !p_instance->p_input )
     {
         TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
