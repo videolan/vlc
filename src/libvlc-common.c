@@ -970,6 +970,12 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         aout_Delete( p_aout );
     }
 
+    /* Destroy VLM if created in libvlc_InternalInit */
+    if( p_libvlc->p_vlm )
+    {
+        vlm_Delete( p_libvlc->p_vlm );
+    }
+
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );
     vlc_object_release( p_libvlc->p_interaction );
@@ -997,12 +1003,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     msg_Dbg( p_libvlc, "removing stats" );
     vlc_mutex_destroy( &p_libvlc->p_stats->lock );
     FREENULL( p_libvlc->p_stats );
-
-    /* Destroy VLM if created in libvlc_InternalInit */
-    if( p_libvlc->p_vlm )
-    {
-        vlm_Delete( p_libvlc->p_vlm );
-    }
 
     return VLC_SUCCESS;
 }
