@@ -148,23 +148,27 @@ static void RunControlThread ( playlist_t *p_playlist )
     /* Tell above that we're ready */
     vlc_thread_ready( p_playlist );
 
-    while( !p_playlist->b_die )
+    vlc_object_lock( p_playlist );
+    while( vlc_object_alive( p_playlist ) )
     {
+        vlc_object_unlock( p_playlist );
         playlist_MainLoop( p_playlist );
+        vlc_object_lock( p_playlist );
+
         if( p_playlist->b_cant_sleep )
         {
             /* 100 ms is an acceptable delay for playlist operations */
+            vlc_object_unlock( p_playlist );
             msleep( INTF_IDLE_SLEEP*2 );
+            vlc_object_lock( p_playlist );
         }
         else
         {
-            PL_LOCK;
-            vlc_bool_t b_die = vlc_object_wait( p_playlist );
-            PL_UNLOCK;
-            if( b_die )
-                break;
+            vlc_object_wait( p_playlist );
         }
     }
+    vlc_object_unlock( p_playlist );
+
     playlist_LastLoop( p_playlist );
 }
 
