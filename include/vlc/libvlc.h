@@ -145,6 +145,33 @@ VLC_PUBLIC_API void libvlc_release( libvlc_instance_t * );
  */
 VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
 
+/**
+ * Retrieve libvlc version.
+ *
+ * Example: "0.9.0-git Grishenko"
+ *
+ * \return a string containing the libvlc version
+ */
+VLC_PUBLIC_API const char * libvlc_get_version();
+
+/**
+ * Retrieve libvlc compiler version.
+ *
+ * Example: "gcc version 4.2.3 (Ubuntu 4.2.3-2ubuntu6)"
+ *
+ * \return a string containing the libvlc compiler version
+ */
+VLC_PUBLIC_API const char * libvlc_get_compiler();
+
+/**
+ * Retrieve libvlc changeset.
+ *
+ * Example: "aa9bce0bc4"
+ *
+ * \return a string containing the libvlc changeset
+ */
+VLC_PUBLIC_API const char * libvlc_get_changeset();
+
 /** @}*/
 
 /*****************************************************************************

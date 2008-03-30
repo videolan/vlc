@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
@@ -172,4 +173,19 @@ void libvlc_release( libvlc_instance_t *p_instance )
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
 {
     return p_instance->p_libvlc_int->i_object_id;
+}
+
+const char * libvlc_get_version()
+{
+    return VLC_Version();
+}
+
+const char * libvlc_get_compiler()
+{
+    return VLC_Compiler();
+}
+
+const char * libvlc_get_changeset()
+{
+    return VLC_Changeset();
 }
