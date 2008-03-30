@@ -1,5 +1,5 @@
 /*****************************************************************************
- * media_instance.c: Libvlc API Media Instance management functions
+ * media_player.c: Libvlc API Media Instance management functions
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
@@ -72,7 +72,7 @@ static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
  *
  * Object lock is NOT held.
  */
-static void release_input_thread( libvlc_media_instance_t *p_mi )
+static void release_input_thread( libvlc_media_player_t *p_mi )
 {
     input_thread_t * p_input_thread;
 
@@ -107,7 +107,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
  *
  * Object lock is held.
  */
-input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
+input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
                                          libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -141,26 +141,26 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     VLC_UNUSED(oldval);
     VLC_UNUSED(p_this);
     VLC_UNUSED(psz_cmd);
-    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
     libvlc_event_type_t type = newval.i_int;
 
     switch ( type )
     {
         case END_S:
-            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+            libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
             event.type = libvlc_MediaInstanceReachedEnd;
             break;
         case PAUSE_S:
-            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Playing, NULL);
+            libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
             event.type = libvlc_MediaInstancePaused;
             break;
         case PLAYING_S:
-            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Playing, NULL);
+            libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
             event.type = libvlc_MediaInstancePlayed;
             break;
         case ERROR_S:
-            libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_Error, NULL);
+            libvlc_media_set_state( p_mi->p_md, libvlc_Error, NULL);
             event.type = libvlc_MediaInstanceEncounteredError;
             break;
         default:
@@ -179,12 +179,12 @@ input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
     VLC_UNUSED(oldval);
     VLC_UNUSED(p_this);
     VLC_UNUSED(psz_cmd);
-    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
     event.type = libvlc_MediaInstanceSeekableChanged;
-    event.u.media_instance_seekable_changed.new_seekable = newval.b_bool;
+    event.u.media_player_seekable_changed.new_seekable = newval.b_bool;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -198,12 +198,12 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
     VLC_UNUSED(oldval);
     VLC_UNUSED(p_this);
     VLC_UNUSED(psz_cmd);
-    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
     event.type = libvlc_MediaInstancePausableChanged;
-    event.u.media_instance_pausable_changed.new_pausable = newval.b_bool;
+    event.u.media_player_pausable_changed.new_pausable = newval.b_bool;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -218,7 +218,7 @@ input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
                      void * p_userdata )
 {
     VLC_UNUSED(oldval);
-    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_media_player_t * p_mi = p_userdata;
     vlc_value_t val;
 
     if (!strncmp(psz_cmd, "intf", 4 /* "-change" no need to go further */))
@@ -236,7 +236,7 @@ input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
 
     libvlc_event_t event;
     event.type = libvlc_MediaInstancePositionChanged;
-    event.u.media_instance_position_changed.new_position = val.f_float;
+    event.u.media_player_position_changed.new_position = val.f_float;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -251,7 +251,7 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
                      void * p_userdata )
 {
     VLC_UNUSED(oldval);
-    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_media_player_t * p_mi = p_userdata;
     vlc_value_t val;
 
     if (!strncmp(psz_cmd, "intf", 4 /* "-change" no need to go further */))
@@ -269,7 +269,7 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
 
     libvlc_event_t event;
     event.type = libvlc_MediaInstanceTimeChanged;
-    event.u.media_instance_time_changed.new_time = val.i_time;
+    event.u.media_player_time_changed.new_time = val.i_time;
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
 }
@@ -277,11 +277,11 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
 /**************************************************************************
  * Create a Media Instance object
  **************************************************************************/
-libvlc_media_instance_t *
-libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
+libvlc_media_player_t *
+libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
                            libvlc_exception_t * p_e )
 {
-    libvlc_media_instance_t * p_mi;
+    libvlc_media_player_t * p_mi;
 
     if( !p_libvlc_instance )
     {
@@ -289,7 +289,7 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
         return NULL;
     }
 
-    p_mi = malloc( sizeof(libvlc_media_instance_t) );
+    p_mi = malloc( sizeof(libvlc_media_player_t) );
     p_mi->p_md = NULL;
     p_mi->drawable = 0;
     p_mi->p_libvlc_instance = p_libvlc_instance;
@@ -338,18 +338,18 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
 /**************************************************************************
  * Create a Media Instance object with a media descriptor
  **************************************************************************/
-libvlc_media_instance_t *
-libvlc_media_instance_new_from_media_descriptor(
-                                    libvlc_media_descriptor_t * p_md,
+libvlc_media_player_t *
+libvlc_media_player_new_from_media(
+                                    libvlc_media_t * p_md,
                                     libvlc_exception_t *p_e )
 {
-    libvlc_media_instance_t * p_mi;
-    p_mi = libvlc_media_instance_new( p_md->p_libvlc_instance, p_e );
+    libvlc_media_player_t * p_mi;
+    p_mi = libvlc_media_player_new( p_md->p_libvlc_instance, p_e );
 
     if( !p_mi )
         return NULL;
 
-    libvlc_media_descriptor_retain( p_md );
+    libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
 
     return p_mi;
@@ -358,12 +358,12 @@ libvlc_media_instance_new_from_media_descriptor(
 /**************************************************************************
  * Create a new media instance object from an input_thread (Libvlc Internal)
  **************************************************************************/
-libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
+libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
                                    struct libvlc_instance_t *p_libvlc_instance,
                                    input_thread_t *p_input,
                                    libvlc_exception_t *p_e )
 {
-    libvlc_media_instance_t * p_mi;
+    libvlc_media_player_t * p_mi;
 
     if( !p_input )
     {
@@ -371,22 +371,22 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
         return NULL;
     }
 
-    p_mi = libvlc_media_instance_new( p_libvlc_instance, p_e );
+    p_mi = libvlc_media_player_new( p_libvlc_instance, p_e );
 
     if( !p_mi )
         return NULL;
 
-    p_mi->p_md = libvlc_media_descriptor_new_from_input_item(
+    p_mi->p_md = libvlc_media_new_from_input_item(
                     p_libvlc_instance,
                     input_GetItem( p_input ), p_e );
 
     if( !p_mi->p_md )
     {
-        libvlc_media_instance_destroy( p_mi );
+        libvlc_media_player_destroy( p_mi );
         return NULL;
     }
 
-    /* will be released in media_instance_release() */
+    /* will be released in media_player_release() */
     vlc_object_yield( p_input );
 
     p_mi->p_input_thread = p_input;
@@ -400,7 +400,7 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
  *
  * Warning: No lock held here, but hey, this is internal.
  **************************************************************************/
-void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
+void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     libvlc_exception_t p_e;
@@ -423,7 +423,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 
     vlc_object_release( p_input_thread );
 
-    libvlc_media_descriptor_release( p_mi->p_md );
+    libvlc_media_release( p_mi->p_md );
 
     free( p_mi );
 }
@@ -431,7 +431,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 /**************************************************************************
  * Release a Media Instance object
  **************************************************************************/
-void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
+void libvlc_media_player_release( libvlc_media_player_t *p_mi )
 {
     if( !p_mi )
         return;
@@ -452,7 +452,7 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
 
     libvlc_event_manager_release( p_mi->p_event_manager );
  
-    libvlc_media_descriptor_release( p_mi->p_md );
+    libvlc_media_release( p_mi->p_md );
 
     free( p_mi );
 }
@@ -460,7 +460,7 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
 /**************************************************************************
  * Retain a Media Instance object
  **************************************************************************/
-void libvlc_media_instance_retain( libvlc_media_instance_t *p_mi )
+void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 {
     if( !p_mi )
         return;
@@ -471,9 +471,9 @@ void libvlc_media_instance_retain( libvlc_media_instance_t *p_mi )
 /**************************************************************************
  * Set the Media descriptor associated with the instance
  **************************************************************************/
-void libvlc_media_instance_set_media_descriptor(
-                            libvlc_media_instance_t *p_mi,
-                            libvlc_media_descriptor_t *p_md,
+void libvlc_media_player_set_media(
+                            libvlc_media_player_t *p_mi,
+                            libvlc_media_t *p_md,
                             libvlc_exception_t *p_e )
 {
     (void)p_e;
@@ -486,9 +486,9 @@ void libvlc_media_instance_set_media_descriptor(
     release_input_thread( p_mi );
 
     if( p_mi->p_md )
-        libvlc_media_descriptor_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL );
+        libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL );
 
-    libvlc_media_descriptor_release( p_mi->p_md );
+    libvlc_media_release( p_mi->p_md );
 
     if( !p_md )
     {
@@ -497,7 +497,7 @@ void libvlc_media_instance_set_media_descriptor(
         return; /* It is ok to pass a NULL md */
     }
 
-    libvlc_media_descriptor_retain( p_md );
+    libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
  
     /* The policy here is to ignore that we were created using a different
@@ -510,9 +510,9 @@ void libvlc_media_instance_set_media_descriptor(
 /**************************************************************************
  * Get the Media descriptor associated with the instance
  **************************************************************************/
-libvlc_media_descriptor_t *
-libvlc_media_instance_get_media_descriptor(
-                            libvlc_media_instance_t *p_mi,
+libvlc_media_t *
+libvlc_media_player_get_media(
+                            libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
     (void)p_e;
@@ -520,7 +520,7 @@ libvlc_media_instance_get_media_descriptor(
     if( !p_mi->p_md )
         return NULL;
 
-    libvlc_media_descriptor_retain( p_mi->p_md );
+    libvlc_media_retain( p_mi->p_md );
     return p_mi->p_md;
 }
 
@@ -528,8 +528,8 @@ libvlc_media_instance_get_media_descriptor(
  * Get the event Manager
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_media_instance_event_manager(
-                            libvlc_media_instance_t *p_mi,
+libvlc_media_player_event_manager(
+                            libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
     (void)p_e;
@@ -540,7 +540,7 @@ libvlc_media_instance_event_manager(
 /**************************************************************************
  * Play
  **************************************************************************/
-void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
+void libvlc_media_player_play( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t * p_input_thread;
@@ -596,7 +596,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 /**************************************************************************
  * Pause
  **************************************************************************/
-void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
+void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
                                   libvlc_exception_t *p_e )
 {
     input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
@@ -608,10 +608,10 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
 
     if( state == PLAYING_S )
     {
-        if( libvlc_media_instance_can_pause( p_mi, p_e ) )
+        if( libvlc_media_player_can_pause( p_mi, p_e ) )
             input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
         else
-            libvlc_media_instance_stop( p_mi, p_e );
+            libvlc_media_player_stop( p_mi, p_e );
     }
     else
         input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
@@ -622,7 +622,7 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
 /**************************************************************************
  * Stop
  **************************************************************************/
-void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
+void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     if( p_mi->b_own_its_input_thread )
@@ -646,7 +646,7 @@ void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
 /**************************************************************************
  * Set Drawable
  **************************************************************************/
-void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
+void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
                                          libvlc_drawable_t drawable,
                                          libvlc_exception_t *p_e )
 {
@@ -658,7 +658,7 @@ void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
  * Get Drawable
  **************************************************************************/
 libvlc_drawable_t
-libvlc_media_instance_get_drawable ( libvlc_media_instance_t *p_mi, libvlc_exception_t *p_e )
+libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
 {
     (void)p_e;
     return p_mi->drawable;
@@ -667,8 +667,8 @@ libvlc_media_instance_get_drawable ( libvlc_media_instance_t *p_mi, libvlc_excep
 /**************************************************************************
  * Getters for stream information
  **************************************************************************/
-libvlc_time_t libvlc_media_instance_get_length(
-                             libvlc_media_instance_t *p_mi,
+libvlc_time_t libvlc_media_player_get_length(
+                             libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -684,8 +684,8 @@ libvlc_time_t libvlc_media_instance_get_length(
     return (val.i_time+500LL)/1000LL;
 }
 
-libvlc_time_t libvlc_media_instance_get_time(
-                                   libvlc_media_instance_t *p_mi,
+libvlc_time_t libvlc_media_player_get_time(
+                                   libvlc_media_player_t *p_mi,
                                    libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -700,8 +700,8 @@ libvlc_time_t libvlc_media_instance_get_time(
     return (val.i_time+500LL)/1000LL;
 }
 
-void libvlc_media_instance_set_time(
-                                 libvlc_media_instance_t *p_mi,
+void libvlc_media_player_set_time(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_time_t time,
                                  libvlc_exception_t *p_e )
 {
@@ -717,8 +717,8 @@ void libvlc_media_instance_set_time(
     vlc_object_release( p_input_thread );
 }
 
-void libvlc_media_instance_set_position(
-                                libvlc_media_instance_t *p_mi,
+void libvlc_media_player_set_position(
+                                libvlc_media_player_t *p_mi,
                                 float position,
                                 libvlc_exception_t *p_e )
 {
@@ -734,8 +734,8 @@ void libvlc_media_instance_set_position(
     vlc_object_release( p_input_thread );
 }
 
-float libvlc_media_instance_get_position(
-                                 libvlc_media_instance_t *p_mi,
+float libvlc_media_player_get_position(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -751,8 +751,8 @@ float libvlc_media_instance_get_position(
     return val.f_float;
 }
 
-void libvlc_media_instance_set_chapter(
-                                 libvlc_media_instance_t *p_mi,
+void libvlc_media_player_set_chapter(
+                                 libvlc_media_player_t *p_mi,
                                  int chapter,
                                  libvlc_exception_t *p_e )
 {
@@ -768,8 +768,8 @@ void libvlc_media_instance_set_chapter(
     vlc_object_release( p_input_thread );
 }
 
-int libvlc_media_instance_get_chapter(
-                                 libvlc_media_instance_t *p_mi,
+int libvlc_media_player_get_chapter(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -785,8 +785,8 @@ int libvlc_media_instance_get_chapter(
     return val.i_int;
 }
 
-int libvlc_media_instance_get_chapter_count(
-                                 libvlc_media_instance_t *p_mi,
+int libvlc_media_player_get_chapter_count(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -802,8 +802,8 @@ int libvlc_media_instance_get_chapter_count(
     return val.i_int;
 }
 
-float libvlc_media_instance_get_fps(
-                                 libvlc_media_instance_t *p_mi,
+float libvlc_media_player_get_fps(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e)
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
@@ -818,7 +818,7 @@ float libvlc_media_instance_get_fps(
     return f_fps;
 }
 
-int libvlc_media_instance_will_play( libvlc_media_instance_t *p_mi,
+int libvlc_media_player_will_play( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e)
 {
     input_thread_t *p_input_thread =
@@ -835,8 +835,8 @@ int libvlc_media_instance_will_play( libvlc_media_instance_t *p_mi,
     return VLC_FALSE;
 }
 
-void libvlc_media_instance_set_rate(
-                                 libvlc_media_instance_t *p_mi,
+void libvlc_media_player_set_rate(
+                                 libvlc_media_player_t *p_mi,
                                  float rate,
                                  libvlc_exception_t *p_e )
 {
@@ -856,8 +856,8 @@ void libvlc_media_instance_set_rate(
     vlc_object_release( p_input_thread );
 }
 
-float libvlc_media_instance_get_rate(
-                                 libvlc_media_instance_t *p_mi,
+float libvlc_media_player_get_rate(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -873,8 +873,8 @@ float libvlc_media_instance_get_rate(
     return (float)1000.0f/val.i_int;
 }
 
-libvlc_state_t libvlc_media_instance_get_state(
-                                 libvlc_media_instance_t *p_mi,
+libvlc_state_t libvlc_media_player_get_state(
+                                 libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -895,7 +895,7 @@ libvlc_state_t libvlc_media_instance_get_state(
     return vlc_to_libvlc_state(val.i_int);
 }
 
-int libvlc_media_instance_is_seekable( libvlc_media_instance_t *p_mi,
+int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
                                        libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -915,7 +915,7 @@ int libvlc_media_instance_is_seekable( libvlc_media_instance_t *p_mi,
     return val.b_bool;
 }
 
-int libvlc_media_instance_can_pause( libvlc_media_instance_t *p_mi,
+int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;

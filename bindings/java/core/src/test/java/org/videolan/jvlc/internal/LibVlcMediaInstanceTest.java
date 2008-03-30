@@ -64,7 +64,7 @@ public class LibVlcMediaInstanceTest
     @Test
     public void mediaInstanceNew()
     {
-        LibVlcMediaInstance instance = libvlc.libvlc_media_instance_new(libvlcInstance, exception);
+        LibVlcMediaInstance instance = libvlc.libvlc_media_player_new(libvlcInstance, exception);
         Assert.assertNotNull(instance);
         Assert.assertEquals(0, exception.raised);
     }
@@ -72,67 +72,67 @@ public class LibVlcMediaInstanceTest
     @Test
     public void mediaInstancePlayBad()
     {
-        LibVlcMediaInstance instance = libvlc.libvlc_media_instance_new(libvlcInstance, exception);
-        libvlc.libvlc_media_instance_play(instance, exception);
+        LibVlcMediaInstance instance = libvlc.libvlc_media_player_new(libvlcInstance, exception);
+        libvlc.libvlc_media_player_play(instance, exception);
         Assert.assertEquals(1, exception.raised); // no associated media descriptor
     }
     
     @Test
     public void mediaInstancePlay()
     {
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_instance_new_from_media_descriptor(md, exception);
-        libvlc.libvlc_media_instance_play(mi, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        libvlc.libvlc_media_player_play(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
     
     @Test
     public void mediaInstancePauseBad()
     {
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_instance_new_from_media_descriptor(md, exception);
-        libvlc.libvlc_media_instance_pause(mi, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        libvlc.libvlc_media_player_pause(mi, exception);
         Assert.assertEquals(1, exception.raised);
     }
     
     @Test
     public void mediaInstancePause()
     {
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_instance_new_from_media_descriptor(md, exception);
-        libvlc.libvlc_media_instance_play(mi, exception);
-        libvlc.libvlc_media_instance_pause(mi, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        libvlc.libvlc_media_player_play(mi, exception);
+        libvlc.libvlc_media_player_pause(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
     
     @Test
     public void mediaInstanceSetPosition()
     {
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_instance_new_from_media_descriptor(md, exception);
-        libvlc.libvlc_media_instance_play(mi, exception);
-        libvlc.libvlc_media_instance_set_position(mi, 0.5f, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        libvlc.libvlc_media_player_play(mi, exception);
+        libvlc.libvlc_media_player_set_position(mi, 0.5f, exception);
         Assert.assertEquals(0, exception.raised);
-        float position = libvlc.libvlc_media_instance_get_position(mi, exception);
+        float position = libvlc.libvlc_media_player_get_position(mi, exception);
         Assert.assertTrue("Position is: " + position, position >= 0.5f);
     }
     
     @Test
     public void mediaInstanceStop()
     {
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_instance_new_from_media_descriptor(md, exception);
-        libvlc.libvlc_media_instance_stop(mi, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        libvlc.libvlc_media_player_stop(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
     
     @Test
     public void mediaInstanceStop2()
     {
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_instance_new_from_media_descriptor(md, exception);
-        libvlc.libvlc_media_instance_play(mi, exception);
-        libvlc.libvlc_media_instance_stop(mi, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        libvlc.libvlc_media_player_play(mi, exception);
+        libvlc.libvlc_media_player_stop(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
     

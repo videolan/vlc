@@ -59,11 +59,11 @@ public class LibVlcImpl
         LibVlcInstance libvlc_instance_t = libVlc.libvlc_new(0, new String[] {"/usr/local/bin/vlc"}, exception);
 
         LibVlcMediaDescriptor mediaDescriptor = libVlc
-            .libvlc_media_descriptor_new(libvlc_instance_t, "/home/carone/a.avi", exception);
+            .libvlc_media_new(libvlc_instance_t, "/home/carone/a.avi", exception);
 
-        LibVlcMediaInstance mediaInstance = libVlc.libvlc_media_instance_new_from_media_descriptor(mediaDescriptor, exception);
+        LibVlcMediaInstance mediaInstance = libVlc.libvlc_media_player_new_from_media(mediaDescriptor, exception);
 
-        LibVlcEventManager mediaInstanceEventManager = libVlc.libvlc_media_instance_event_manager(mediaInstance, exception);
+        LibVlcEventManager mediaInstanceEventManager = libVlc.libvlc_media_player_event_manager(mediaInstance, exception);
 
         LibVlcCallback played = new LibVlcCallback()
         {
@@ -120,6 +120,6 @@ public class LibVlcImpl
         
         libVlc.libvlc_video_set_parent(libvlc_instance_t, drawable, exception);
 
-        libVlc.libvlc_media_instance_play(mediaInstance, exception);
+        libVlc.libvlc_media_player_play(mediaInstance, exception);
     }
 }

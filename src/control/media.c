@@ -1,5 +1,5 @@
 /*****************************************************************************
- * media_descriptor.c: Libvlc API media descripor management
+ * media.c: Libvlc API media descripor management
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
@@ -78,11 +78,11 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
 static void input_item_subitem_added( const vlc_event_t *p_event,
                                        void * user_data )
 {
-    libvlc_media_descriptor_t * p_md = user_data;
-    libvlc_media_descriptor_t * p_md_child;
+    libvlc_media_t * p_md = user_data;
+    libvlc_media_t * p_md_child;
     libvlc_event_t event;
 
-    p_md_child = libvlc_media_descriptor_new_from_input_item(
+    p_md_child = libvlc_media_new_from_input_item(
                 p_md->p_libvlc_instance,
                 p_event->u.input_item_subitem_added.p_new_child, NULL );
 
@@ -90,20 +90,20 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     if( !p_md->p_subitems )
     {
         p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
-        libvlc_media_list_set_media_descriptor( p_md->p_subitems, p_md, NULL );
+        libvlc_media_list_set_media( p_md->p_subitems, p_md, NULL );
     }
     if( p_md->p_subitems )
     {
-        libvlc_media_list_add_media_descriptor( p_md->p_subitems, p_md_child, NULL );
+        libvlc_media_list_add_media( p_md->p_subitems, p_md_child, NULL );
     }
 
     /* Construct the event */
     event.type = libvlc_MediaDescriptorSubItemAdded;
-    event.u.media_descriptor_subitem_added.new_child = p_md_child;
+    event.u.media_subitem_added.new_child = p_md_child;
 
     /* Send the event */
     libvlc_event_send( p_md->p_event_manager, &event );
-    libvlc_media_descriptor_release( p_md_child );
+    libvlc_media_release( p_md_child );
 }
 
 /**************************************************************************
@@ -112,12 +112,12 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
 static void input_item_meta_changed( const vlc_event_t *p_event,
                                      void * user_data )
 {
-    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
 
     /* Construct the event */
     event.type = libvlc_MediaDescriptorMetaChanged;
-    event.u.media_descriptor_meta_changed.meta_type =
+    event.u.media_meta_changed.meta_type =
         vlc_to_libvlc_meta[p_event->u.input_item_meta_changed.meta_type];
 
     /* Send the event */
@@ -130,12 +130,12 @@ static void input_item_meta_changed( const vlc_event_t *p_event,
 static void input_item_duration_changed( const vlc_event_t *p_event,
                                          void * user_data )
 {
-    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
 
     /* Construct the event */
     event.type = libvlc_MediaDescriptorDurationChanged;
-    event.u.media_descriptor_duration_changed.new_duration = 
+    event.u.media_duration_changed.new_duration = 
         p_event->u.input_item_duration_changed.new_duration;
 
     /* Send the event */
@@ -148,12 +148,12 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
 static void input_item_preparsed_changed( const vlc_event_t *p_event,
                                           void * user_data )
 {
-    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
 
     /* Construct the event */
     event.type = libvlc_MediaDescriptorPreparsedChanged;
-    event.u.media_descriptor_preparsed_changed.new_status = 
+    event.u.media_preparsed_changed.new_status = 
         p_event->u.input_item_preparsed_changed.new_status;
 
     /* Send the event */
@@ -163,7 +163,7 @@ static void input_item_preparsed_changed( const vlc_event_t *p_event,
 /**************************************************************************
  * Install event handler (Private)
  **************************************************************************/
-static void install_input_item_observer( libvlc_media_descriptor_t *p_md )
+static void install_input_item_observer( libvlc_media_t *p_md )
 {
     vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemSubItemAdded,
@@ -186,7 +186,7 @@ static void install_input_item_observer( libvlc_media_descriptor_t *p_md )
 /**************************************************************************
  * Uninstall event handler (Private)
  **************************************************************************/
-static void uninstall_input_item_observer( libvlc_media_descriptor_t *p_md )
+static void uninstall_input_item_observer( libvlc_media_t *p_md )
 {
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemSubItemAdded,
@@ -209,7 +209,7 @@ static void uninstall_input_item_observer( libvlc_media_descriptor_t *p_md )
 /**************************************************************************
  * Preparse if not already done (Private)
  **************************************************************************/
-static void preparse_if_needed( libvlc_media_descriptor_t *p_md )
+static void preparse_if_needed( libvlc_media_t *p_md )
 {
     /* XXX: need some locking here */
     if (!p_md->b_preparsed)
@@ -226,12 +226,12 @@ static void preparse_if_needed( libvlc_media_descriptor_t *p_md )
  * (libvlc internal)
  * That's the generic constructor
  **************************************************************************/
-libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
+libvlc_media_t * libvlc_media_new_from_input_item(
                                    libvlc_instance_t *p_instance,
                                    input_item_t *p_input_item,
                                    libvlc_exception_t *p_e )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
 
     if (!p_input_item)
     {
@@ -239,7 +239,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
         return NULL;
     }
 
-    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
+    p_md = malloc( sizeof(libvlc_media_t) );
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
     p_md->b_preparsed       = VLC_FALSE;
@@ -274,13 +274,13 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/
-libvlc_media_descriptor_t * libvlc_media_descriptor_new(
+libvlc_media_t * libvlc_media_new(
                                    libvlc_instance_t *p_instance,
                                    const char * psz_mrl,
                                    libvlc_exception_t *p_e )
 {
     input_item_t * p_input_item;
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
 
     p_input_item = input_ItemNew( p_instance->p_libvlc_int, psz_mrl, NULL );
 
@@ -290,10 +290,10 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
         return NULL;
     }
 
-    p_md = libvlc_media_descriptor_new_from_input_item( p_instance,
+    p_md = libvlc_media_new_from_input_item( p_instance,
                 p_input_item, p_e );
 
-    /* The p_input_item is retained in libvlc_media_descriptor_new_from_input_item */
+    /* The p_input_item is retained in libvlc_media_new_from_input_item */
     vlc_gc_decref( p_input_item );
     
     return p_md;
@@ -302,13 +302,13 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/
-libvlc_media_descriptor_t * libvlc_media_descriptor_new_as_node(
+libvlc_media_t * libvlc_media_new_as_node(
                                    libvlc_instance_t *p_instance,
                                    const char * psz_name,
                                    libvlc_exception_t *p_e )
 {
     input_item_t * p_input_item;
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
 
     p_input_item = input_ItemNew( p_instance->p_libvlc_int, "vlc://nop", psz_name );
 
@@ -318,7 +318,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_as_node(
         return NULL;
     }
 
-    p_md = libvlc_media_descriptor_new_from_input_item( p_instance,
+    p_md = libvlc_media_new_from_input_item( p_instance,
                 p_input_item, p_e );
 
     p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
@@ -328,14 +328,14 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_as_node(
 
 /**************************************************************************
  * Add an option to the media descriptor,
- * that will be used to determine how the media_instance will read the
- * media_descriptor. This allow to use VLC advanced reading/streaming
+ * that will be used to determine how the media_player will read the
+ * media. This allow to use VLC advanced reading/streaming
  * options in a per-media basis
  *
  * The options are detailled in vlc --long-help, for instance "--sout-all"
  **************************************************************************/
-void libvlc_media_descriptor_add_option(
-                                   libvlc_media_descriptor_t * p_md,
+void libvlc_media_add_option(
+                                   libvlc_media_t * p_md,
                                    const char * ppsz_option,
                                    libvlc_exception_t *p_e )
 {
@@ -347,7 +347,7 @@ void libvlc_media_descriptor_add_option(
 /**************************************************************************
  * Delete a media descriptor object
  **************************************************************************/
-void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
+void libvlc_media_release( libvlc_media_t *p_md )
 {
     if (!p_md)
         return;
@@ -366,7 +366,7 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
     /* Construct the event */
     libvlc_event_t event;
     event.type = libvlc_MediaDescriptorFreed;
-    event.u.media_descriptor_freed.md = p_md;
+    event.u.media_freed.md = p_md;
 
     /* Send the event */
     libvlc_event_send( p_md->p_event_manager, &event );
@@ -379,7 +379,7 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 /**************************************************************************
  * Retain a media descriptor object
  **************************************************************************/
-void libvlc_media_descriptor_retain( libvlc_media_descriptor_t *p_md )
+void libvlc_media_retain( libvlc_media_t *p_md )
 {
     if (!p_md)
         return;
@@ -390,10 +390,10 @@ void libvlc_media_descriptor_retain( libvlc_media_descriptor_t *p_md )
 /**************************************************************************
  * Duplicate a media descriptor object
  **************************************************************************/
-libvlc_media_descriptor_t *
-libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
+libvlc_media_t *
+libvlc_media_duplicate( libvlc_media_t *p_md_orig )
 {
-    return libvlc_media_descriptor_new_from_input_item(
+    return libvlc_media_new_from_input_item(
         p_md_orig->p_libvlc_instance, p_md_orig->p_input_item, NULL );
 }
 
@@ -401,7 +401,7 @@ libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
  * Retain a media descriptor object
  **************************************************************************/
 char *
-libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
+libvlc_media_get_mrl( libvlc_media_t * p_md,
                                  libvlc_exception_t * p_e )
 {
     (void)p_e;
@@ -412,7 +412,7 @@ libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
  * Getter for meta information
  **************************************************************************/
 
-char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
+char * libvlc_media_get_meta( libvlc_media_t *p_md,
                                          libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
@@ -450,7 +450,7 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
  **************************************************************************/
 
 libvlc_state_t
-libvlc_media_descriptor_get_state( libvlc_media_descriptor_t *p_md,
+libvlc_media_get_state( libvlc_media_t *p_md,
                                    libvlc_exception_t *p_e )
 {
     (void)p_e;
@@ -462,7 +462,7 @@ libvlc_media_descriptor_get_state( libvlc_media_descriptor_t *p_md,
  **************************************************************************/
 
 void
-libvlc_media_descriptor_set_state( libvlc_media_descriptor_t *p_md,
+libvlc_media_set_state( libvlc_media_t *p_md,
                                    libvlc_state_t state,
                                    libvlc_exception_t *p_e )
 {
@@ -473,7 +473,7 @@ libvlc_media_descriptor_set_state( libvlc_media_descriptor_t *p_md,
 
     /* Construct the event */
     event.type = libvlc_MediaDescriptorStateChanged;
-    event.u.media_descriptor_state_changed.new_state = state;
+    event.u.media_state_changed.new_state = state;
 
     /* Send the event */
     libvlc_event_send( p_md->p_event_manager, &event );
@@ -483,7 +483,7 @@ libvlc_media_descriptor_set_state( libvlc_media_descriptor_t *p_md,
  * subitems
  **************************************************************************/
 libvlc_media_list_t *
-libvlc_media_descriptor_subitems( libvlc_media_descriptor_t * p_md,
+libvlc_media_subitems( libvlc_media_t * p_md,
                                   libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);
@@ -497,7 +497,7 @@ libvlc_media_descriptor_subitems( libvlc_media_descriptor_t * p_md,
  * event_manager
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
+libvlc_media_event_manager( libvlc_media_t * p_md,
                                        libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);
@@ -506,10 +506,10 @@ libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
 }
 
 /**************************************************************************
- * Get duration of media_descriptor object.
+ * Get duration of media object.
  **************************************************************************/
 vlc_int64_t
-libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
+libvlc_media_get_duration( libvlc_media_t * p_md,
                                       libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);
@@ -525,10 +525,10 @@ libvlc_media_descriptor_get_duration( libvlc_media_descriptor_t * p_md,
 }
 
 /**************************************************************************
- * Get preparsed status for media_descriptor object.
+ * Get preparsed status for media object.
  **************************************************************************/
 int
-libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
+libvlc_media_is_preparsed( libvlc_media_t * p_md,
                                        libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);
@@ -546,10 +546,10 @@ libvlc_media_descriptor_is_preparsed( libvlc_media_descriptor_t * p_md,
 /**************************************************************************
  * Sets media descriptor's user_data. user_data is specialized data 
  * accessed by the host application, VLC.framework uses it as a pointer to 
- * an native object that references a libvlc_media_descriptor_t pointer
+ * an native object that references a libvlc_media_t pointer
  **************************************************************************/
 void 
-libvlc_media_descriptor_set_user_data( libvlc_media_descriptor_t * p_md,
+libvlc_media_set_user_data( libvlc_media_t * p_md,
                                        void * p_new_user_data,
                                        libvlc_exception_t * p_e )
 {
@@ -564,10 +564,10 @@ libvlc_media_descriptor_set_user_data( libvlc_media_descriptor_t * p_md,
 /**************************************************************************
  * Get media descriptor's user_data. user_data is specialized data 
  * accessed by the host application, VLC.framework uses it as a pointer to 
- * an native object that references a libvlc_media_descriptor_t pointer
+ * an native object that references a libvlc_media_t pointer
  **************************************************************************/
 void *
-libvlc_media_descriptor_get_user_data( libvlc_media_descriptor_t * p_md,
+libvlc_media_get_user_data( libvlc_media_t * p_md,
                                        libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);

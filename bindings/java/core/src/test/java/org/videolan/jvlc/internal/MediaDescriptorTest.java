@@ -61,7 +61,7 @@ public class MediaDescriptorTest
     public void mediaDescriptorNew() throws Exception
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         Assert.assertNotNull(md);
         Assert.assertEquals(0, exception.raised);
     }
@@ -70,8 +70,8 @@ public class MediaDescriptorTest
     public void mediaDescriptorGetMrl()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_descriptor_new(libvlcInstance, mrl, exception);
-        String mdMrl = libvlc.libvlc_media_descriptor_get_mrl(md);
+        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        String mdMrl = libvlc.libvlc_media_get_mrl(md);
         Assert.assertEquals(mrl, mdMrl);
     }
 

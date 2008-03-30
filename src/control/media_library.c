@@ -1,6 +1,6 @@
 /*****************************************************************************
  * tree.c: libvlc tags tree functions
- * Create a tree of the 'tags' of a media_list's media_descriptors.
+ * Create a tree of the 'tags' of a media_list's medias.
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$

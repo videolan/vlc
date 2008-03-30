@@ -818,11 +818,11 @@ void VLCPlugin::setTime(int seconds)
         setStartTime(_i_time);
         if( isRunning() )
         {
-            libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(_p_libvlc, NULL);
+            libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(_p_libvlc, NULL);
             if( NULL != p_md )
             {
-                libvlc_media_instance_set_time(p_md, _i_time, NULL);
-                libvlc_media_instance_release(p_md);
+                libvlc_media_player_set_time(p_md, _i_time, NULL);
+                libvlc_media_player_release(p_md);
             }
         }
     }

@@ -312,14 +312,14 @@ vlcInstance_playlist_delete_item( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcInstance_playlist_get_media_instance( PyObject *self, PyObject *args )
+vlcInstance_playlist_get_media_player( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    libvlc_media_instance_t *p_mi;
+    libvlc_media_player_t *p_mi;
     vlcMediaInstance *p_ret;
 
     LIBVLC_TRY;
-    p_mi = libvlc_playlist_get_media_instance( LIBVLC_INSTANCE->p_instance, &ex );
+    p_mi = libvlc_playlist_get_media_player( LIBVLC_INSTANCE->p_instance, &ex );
     LIBVLC_EXCEPT;
 
     p_ret = PyObject_New( vlcMediaInstance, &vlcMediaInstance_Type );
@@ -730,10 +730,10 @@ vlcInstance_vlm_show_media( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcInstance_media_descriptor_new( PyObject *self, PyObject *args )
+vlcInstance_media_new( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    libvlc_media_descriptor_t *p_md;
+    libvlc_media_t *p_md;
     char* psz_mrl = NULL;
     vlcMediaDescriptor *p_ret;
 
@@ -741,7 +741,7 @@ vlcInstance_media_descriptor_new( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    p_md = libvlc_media_descriptor_new( LIBVLC_INSTANCE->p_instance, psz_mrl, &ex );
+    p_md = libvlc_media_new( LIBVLC_INSTANCE->p_instance, psz_mrl, &ex );
     LIBVLC_EXCEPT;
 
     p_ret = PyObject_New( vlcMediaDescriptor, &vlcMediaDescriptor_Type );
@@ -777,8 +777,8 @@ static PyMethodDef vlcInstance_methods[] =
       "playlist_add(mrl=str, name=str, options=list) -> int  Add a new item to the playlist. options is a list of strings."},
     { "playlist_delete_item", vlcInstance_playlist_delete_item, METH_VARARGS,
       "playlist_delete_item(id=int)   Delete the given item"},
-    { "playlist_get_media_instance", vlcInstance_playlist_get_media_instance, METH_VARARGS,
-      "playlist_get_media_instance() -> object   Return the current media instance"},
+    { "playlist_get_media_player", vlcInstance_playlist_get_media_player, METH_VARARGS,
+      "playlist_get_media_player() -> object   Return the current media instance"},
     { "video_set_parent", vlcInstance_video_set_parent, METH_VARARGS,
       "video_set_parent(xid=int)       Set the parent xid/HWND/CGrafPort"},
     { "video_get_parent", vlcInstance_video_get_parent, METH_VARARGS,
@@ -800,8 +800,8 @@ static PyMethodDef vlcInstance_methods[] =
     { "audio_set_channel", vlcInstance_audio_set_channel, METH_VARARGS,
       "audio_set_channel(int)      Set current audio channel" },
 
-    { "media_descriptor_new", vlcInstance_media_descriptor_new, METH_VARARGS,
-      "media_descriptor_new(str) -> object   Create a media descriptor with the given mrl."},
+    { "media_new", vlcInstance_media_new, METH_VARARGS,
+      "media_new(str) -> object   Create a media descriptor with the given mrl."},
 
     { "vlm_add_broadcast", vlcInstance_vlm_add_broadcast, METH_VARARGS | METH_KEYWORDS,
       "vlm_add_broadcast(name=str, input=str, output=str, options=list, enable=int, loop=int)   Add a new broadcast" },

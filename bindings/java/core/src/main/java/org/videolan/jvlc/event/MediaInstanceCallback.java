@@ -30,7 +30,7 @@ import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlcEventType;
 import org.videolan.jvlc.internal.LibVlc.LibVlcCallback;
 import org.videolan.jvlc.internal.LibVlc.libvlc_event_t;
-import org.videolan.jvlc.internal.LibVlc.media_instance_time_changed;
+import org.videolan.jvlc.internal.LibVlc.media_player_time_changed;
 
 import com.sun.jna.Pointer;
 
@@ -70,9 +70,9 @@ public class MediaInstanceCallback implements LibVlcCallback
         }
         else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstanceTimeChanged.ordinal())
         {
-            libvlc_event.event_type_specific.setType(LibVlc.media_instance_time_changed.class);
-            LibVlc.media_instance_time_changed timeChanged = (media_instance_time_changed) libvlc_event.event_type_specific
-                .readField("media_instance_time_changed");
+            libvlc_event.event_type_specific.setType(LibVlc.media_player_time_changed.class);
+            LibVlc.media_player_time_changed timeChanged = (media_player_time_changed) libvlc_event.event_type_specific
+                .readField("media_player_time_changed");
             listener.timeChanged(mediaInstance, timeChanged.new_time);
         }
         else

@@ -183,7 +183,7 @@ VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
 VLC_PUBLIC_API char* libvlc_vlm_show_media( libvlc_instance_t *, char *, libvlc_exception_t * );
 
 #define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
-returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *, \
+returnType libvlc_vlm_get_media_instance_## attr( libvlc_instance_t *, \
                         char *, int , libvlc_exception_t * );
 
 VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);

@@ -50,8 +50,8 @@ static void
 ml_item_added( const libvlc_event_t * p_event, libvlc_media_list_view_t * p_mlv )
 {
     int index = vlc_array_count( &p_mlv->p_this_view_data->array );
-    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
-    libvlc_media_descriptor_retain( p_md );
+    libvlc_media_t * p_md = p_event->u.media_list_item_added.item;
+    libvlc_media_retain( p_md );
     trace("appending item at index %d\n", index);
 
     libvlc_media_list_view_will_add_item( p_mlv, p_md, index );
@@ -65,14 +65,14 @@ ml_item_added( const libvlc_event_t * p_event, libvlc_media_list_view_t * p_mlv 
 static void
 ml_item_removed( const libvlc_event_t * p_event, libvlc_media_list_view_t * p_mlv )
 {
-    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_deleted.item;
+    libvlc_media_t * p_md = p_event->u.media_list_item_deleted.item;
     int i = vlc_array_index_of_item( &p_mlv->p_this_view_data->array, p_md );
     if( i >= 0 )
     {
         libvlc_media_list_view_will_delete_item( p_mlv, p_md, i );
         vlc_array_remove( &p_mlv->p_this_view_data->array, i );
         libvlc_media_list_view_item_deleted( p_mlv, p_md, i );
-        libvlc_media_descriptor_release( p_md );
+        libvlc_media_release( p_md );
     }
 }
 
@@ -92,15 +92,15 @@ flat_media_list_view_count( libvlc_media_list_view_t * p_mlv,
  *       flat_media_list_view_item_at_index  (private)
  * (called by flat_media_list_view_item_at_index)
  **************************************************************************/
-static libvlc_media_descriptor_t *
+static libvlc_media_t *
 flat_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
                                     int index,
                                     libvlc_exception_t * p_e )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     (void)p_e;
     p_md = vlc_array_item_at_index( &p_mlv->p_this_view_data->array, index );
-    libvlc_media_descriptor_retain( p_md );
+    libvlc_media_retain( p_md );
     return p_md;
 }
 
@@ -142,11 +142,11 @@ import_mlist_rec( libvlc_media_list_view_t * p_mlv,
     count = libvlc_media_list_count( p_mlist, p_e );
     for( i = 0; i < count; i++ )
     {
-        libvlc_media_descriptor_t * p_md;
+        libvlc_media_t * p_md;
         libvlc_media_list_t * p_submlist;
         p_md = libvlc_media_list_item_at_index( p_mlist, i, p_e );
         vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
-        p_submlist = libvlc_media_descriptor_subitems( p_md, p_e );
+        p_submlist = libvlc_media_subitems( p_md, p_e );
         if( p_submlist )
         {
             libvlc_media_list_lock( p_submlist );

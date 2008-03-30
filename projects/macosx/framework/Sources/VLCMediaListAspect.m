@@ -157,7 +157,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index( p_mlv, index, &p_e );
+    libvlc_media_t * p_md = libvlc_media_list_view_item_at_index( p_mlv, index, &p_e );
     catch_exception( &p_e );
     
     // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
@@ -248,7 +248,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         int i, count = libvlc_media_list_view_count(p_mlv, NULL);
         for( i = 0; i < count; i++ )
         {
-            libvlc_media_descriptor_t * p_md = libvlc_media_list_view_item_at_index(p_mlv, i, NULL);
+            libvlc_media_t * p_md = libvlc_media_list_view_item_at_index(p_mlv, i, NULL);
             libvlc_media_list_view_t * p_sub_mlv = libvlc_media_list_view_children_at_index(p_mlv, i, NULL);
             VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
             [node setMedia:[VLCMedia mediaWithLibVLCMediaDescriptor: p_md]];
@@ -256,7 +256,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
             if( p_sub_mlv ) NSAssert(![node isLeaf], @"Not leaf");
 
             [cachedNode addObject:node];
-            libvlc_media_descriptor_release(p_md);
+            libvlc_media_release(p_md);
             if( p_sub_mlv ) libvlc_media_list_view_release(p_sub_mlv);
         }
         [self initInternalMediaListView];

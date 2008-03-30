@@ -66,7 +66,7 @@ typedef vlc_int64_t libvlc_time_t;
 /*****************************************************************************
  * Media Descriptor
  *****************************************************************************/
-/** \defgroup libvlc_media_descriptor libvlc_media_descriptor
+/** \defgroup libvlc_media libvlc_media
  * \ingroup libvlc
  * LibVLC Media Descriptor handling
  * @{
@@ -74,7 +74,7 @@ typedef vlc_int64_t libvlc_time_t;
 
 /* Meta Handling */
 /** defgroup libvlc_meta libvlc_meta
- * \ingroup libvlc_media_descriptor
+ * \ingroup libvlc_media
  * LibVLC Media Meta
  * @{
  */
@@ -101,7 +101,7 @@ typedef enum libvlc_meta_t {
 
 /**@} */
 
-typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
+typedef struct libvlc_media_t libvlc_media_t;
 
 /**@} */
 
@@ -109,13 +109,13 @@ typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
 /*****************************************************************************
  * Media Instance
  *****************************************************************************/
-/** \defgroup libvlc_media_instance libvlc_media_instance
+/** \defgroup libvlc_media_player libvlc_media_player
  * \ingroup libvlc
  * LibVLC Media Instance handling
  * @{
  */
 
-typedef struct libvlc_media_instance_t libvlc_media_instance_t;
+typedef struct libvlc_media_player_t libvlc_media_player_t;
 
 typedef enum libvlc_state_t
 {
@@ -197,7 +197,7 @@ typedef struct libvlc_playlist_item_t
  * Video
  *****************************************************************************/
 /** \defgroup libvlc_video libvlc_video
- * \ingroup libvlc_media_instance
+ * \ingroup libvlc_media_player
  * LibVLC Video handling
  * @{
  */

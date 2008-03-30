@@ -77,7 +77,7 @@ struct libvlc_instance_t
     struct libvlc_callback_entry_list_t *p_callback_list;
 };
 
-struct libvlc_media_descriptor_t
+struct libvlc_media_t
 {
     libvlc_event_manager_t * p_event_manager;
     int                b_preparsed;
@@ -96,7 +96,7 @@ struct libvlc_media_list_t
     libvlc_instance_t *         p_libvlc_instance;
     int                         i_refcount;
     vlc_mutex_t                 object_lock;
-    libvlc_media_descriptor_t * p_md; /* The media_descriptor from which the
+    libvlc_media_t * p_md; /* The media from which the
                                        * mlist comes, if any. */
     vlc_array_t                items;
  
@@ -115,7 +115,7 @@ typedef void (*libvlc_media_list_view_release_func_t)( libvlc_media_list_view_t 
 typedef int (*libvlc_media_list_view_count_func_t)( libvlc_media_list_view_t * p_mlv,
         libvlc_exception_t * ) ;
 
-typedef libvlc_media_descriptor_t *
+typedef libvlc_media_t *
         (*libvlc_media_list_view_item_at_index_func_t)(
                 libvlc_media_list_view_t * p_mlv,
                 int index,
@@ -152,13 +152,13 @@ struct libvlc_media_list_view_t
     void (*pf_ml_item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *);
 };
 
-struct libvlc_media_instance_t
+struct libvlc_media_player_t
 {
     int                i_refcount;
     vlc_mutex_t        object_lock;
     input_thread_t *   p_input_thread;
     struct libvlc_instance_t *  p_libvlc_instance; /* Parent instance */
-    libvlc_media_descriptor_t * p_md; /* current media descriptor */
+    libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t *    p_event_manager;
     libvlc_drawable_t           drawable;
     
@@ -172,9 +172,9 @@ struct libvlc_media_list_player_t
     int                         i_refcount;
     vlc_mutex_t                 object_lock;
     libvlc_media_list_path_t    current_playing_item_path;
-    libvlc_media_descriptor_t * p_current_playing_item;
+    libvlc_media_t * p_current_playing_item;
     libvlc_media_list_t *       p_mlist;
-    libvlc_media_instance_t *   p_mi;
+    libvlc_media_player_t *   p_mi;
 };
 
 struct libvlc_media_library_t
@@ -262,31 +262,31 @@ typedef struct libvlc_event_manager_t
  * Other internal functions
  ***************************************************************************/
 VLC_EXPORT (input_thread_t *, libvlc_get_input_thread,
-                        ( struct libvlc_media_instance_t *, libvlc_exception_t * ) );
+                        ( struct libvlc_media_player_t *, libvlc_exception_t * ) );
 
 /* Media instance */
-VLC_EXPORT (libvlc_media_instance_t *, libvlc_media_instance_new_from_input_thread,
+VLC_EXPORT (libvlc_media_player_t *, libvlc_media_player_new_from_input_thread,
                         ( struct libvlc_instance_t *, input_thread_t *, libvlc_exception_t * ) );
 
-VLC_EXPORT (void, libvlc_media_instance_destroy,
-                        ( libvlc_media_instance_t * ) );
+VLC_EXPORT (void, libvlc_media_player_destroy,
+                        ( libvlc_media_player_t * ) );
 
 /* Media Descriptor */
-VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_item,
+VLC_EXPORT (libvlc_media_t *, libvlc_media_new_from_input_item,
                         ( struct libvlc_instance_t *, input_item_t *, libvlc_exception_t * ) );
 
-VLC_EXPORT (void, libvlc_media_descriptor_set_state,
-                        ( libvlc_media_descriptor_t *, libvlc_state_t, libvlc_exception_t * ) );
+VLC_EXPORT (void, libvlc_media_set_state,
+                        ( libvlc_media_t *, libvlc_state_t, libvlc_exception_t * ) );
 
 /* Media List */
-VLC_EXPORT ( void, _libvlc_media_list_add_media_descriptor,
+VLC_EXPORT ( void, _libvlc_media_list_add_media,
                         ( libvlc_media_list_t * p_mlist,
-                          libvlc_media_descriptor_t * p_md,
+                          libvlc_media_t * p_md,
                           libvlc_exception_t * p_e ) );
 
-VLC_EXPORT ( void, _libvlc_media_list_insert_media_descriptor,
+VLC_EXPORT ( void, _libvlc_media_list_insert_media,
                         ( libvlc_media_list_t * p_mlist,
-                          libvlc_media_descriptor_t * p_md,
+                          libvlc_media_t * p_md,
                           int index,
                           libvlc_exception_t * p_e ) );
 
@@ -312,16 +312,16 @@ VLC_EXPORT ( void, libvlc_media_list_view_set_ml_notification_callback, (
                 void (*item_removed)(const libvlc_event_t *, libvlc_media_list_view_t *) ));
 
 VLC_EXPORT ( void, libvlc_media_list_view_will_delete_item, ( libvlc_media_list_view_t * p_mlv,
-                                                              libvlc_media_descriptor_t * p_item,
+                                                              libvlc_media_t * p_item,
                                                               int index ));
 VLC_EXPORT ( void, libvlc_media_list_view_item_deleted, ( libvlc_media_list_view_t * p_mlv,
-                                                          libvlc_media_descriptor_t * p_item,
+                                                          libvlc_media_t * p_item,
                                                           int index ));
 VLC_EXPORT ( void, libvlc_media_list_view_will_add_item, ( libvlc_media_list_view_t * p_mlv,
-                                                           libvlc_media_descriptor_t * p_item,
+                                                           libvlc_media_t * p_item,
                                                            int index ));
 VLC_EXPORT ( void, libvlc_media_list_view_item_added, ( libvlc_media_list_view_t * p_mlv,
-                                                        libvlc_media_descriptor_t * p_item,
+                                                        libvlc_media_t * p_item,
                                                         int index ));
 
 /* Events */

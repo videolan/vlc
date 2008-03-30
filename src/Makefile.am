@@ -371,8 +371,8 @@ SOURCES_libvlc_control = \
 	control/flat_media_list_view.c \
 	control/hierarchical_media_list_view.c \
 	control/hierarchical_node_media_list_view.c \
-	control/media_descriptor.c \
-	control/media_instance.c \
+	control/media.c \
+	control/media_player.c \
 	control/media_list.c \
 	control/media_list_path.h \
 	control/media_list_player.c \

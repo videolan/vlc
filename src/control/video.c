@@ -35,7 +35,7 @@
  * Remember to release the returned vout_thread_t since it is locked at
  * the end of this function.
  */
-static vout_thread_t *GetVout( libvlc_media_instance_t *p_mi,
+static vout_thread_t *GetVout( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_exception )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_exception );
@@ -57,7 +57,7 @@ static vout_thread_t *GetVout( libvlc_media_instance_t *p_mi,
  * Exported functions
  **********************************************************************/
 
-void libvlc_set_fullscreen( libvlc_media_instance_t *p_mi, int b_fullscreen,
+void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullscreen,
                             libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
@@ -81,7 +81,7 @@ void libvlc_set_fullscreen( libvlc_media_instance_t *p_mi, int b_fullscreen,
     vlc_object_release( p_vout1 );
 }
 
-int libvlc_get_fullscreen( libvlc_media_instance_t *p_mi,
+int libvlc_get_fullscreen( libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
@@ -100,7 +100,7 @@ int libvlc_get_fullscreen( libvlc_media_instance_t *p_mi,
     return val.b_bool == VLC_TRUE ? 1 : 0;
 }
 
-void libvlc_toggle_fullscreen( libvlc_media_instance_t *p_mi,
+void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
@@ -126,7 +126,7 @@ void libvlc_toggle_fullscreen( libvlc_media_instance_t *p_mi,
 }
 
 void
-libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
+libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, char *psz_filepath,
         unsigned int i_width, unsigned int i_height, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -161,7 +161,7 @@ libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
     vlc_object_release( p_vout );
 }
 
-int libvlc_video_get_height( libvlc_media_instance_t *p_mi,
+int libvlc_video_get_height( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
@@ -173,7 +173,7 @@ int libvlc_video_get_height( libvlc_media_instance_t *p_mi,
     return p_vout1->i_window_height;
 }
 
-int libvlc_video_get_width( libvlc_media_instance_t *p_mi,
+int libvlc_video_get_width( libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
@@ -185,7 +185,7 @@ int libvlc_video_get_width( libvlc_media_instance_t *p_mi,
     return p_vout1->i_window_width;
 }
 
-int libvlc_media_instance_has_vout( libvlc_media_instance_t *p_mi,
+int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread(p_mi, p_e);
@@ -206,7 +206,7 @@ int libvlc_media_instance_has_vout( libvlc_media_instance_t *p_mi,
     return has_vout;
 }
 
-int libvlc_video_reparent( libvlc_media_instance_t *p_mi, libvlc_drawable_t d,
+int libvlc_video_reparent( libvlc_media_player_t *p_mi, libvlc_drawable_t d,
                            libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -219,7 +219,7 @@ int libvlc_video_reparent( libvlc_media_instance_t *p_mi, libvlc_drawable_t d,
     return 0;
 }
 
-void libvlc_video_resize( libvlc_media_instance_t *p_mi, int width, int height, libvlc_exception_t *p_e )
+void libvlc_video_resize( libvlc_media_player_t *p_mi, int width, int height, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     if( p_vout )
@@ -229,7 +229,7 @@ void libvlc_video_resize( libvlc_media_instance_t *p_mi, int width, int height, 
     }
 }
 
-void libvlc_video_redraw_rectangle( libvlc_media_instance_t *p_mi,
+void libvlc_video_redraw_rectangle( libvlc_media_player_t *p_mi,
                            const libvlc_rectangle_t *area,
                            libvlc_exception_t *p_e )
 {
@@ -258,7 +258,7 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
 
     if( libvlc_playlist_isplaying(p_instance, p_e) )
     {
-        libvlc_media_instance_t *p_mi = libvlc_playlist_get_media_instance(p_instance, p_e);
+        libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
         if( p_mi )
         {
             vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -268,7 +268,7 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
                 vout_Control( p_vout , VOUT_REPARENT, d);
                 vlc_object_release( p_vout );
             }
-            libvlc_media_instance_release(p_mi);
+            libvlc_media_player_release(p_mi);
         }
     }
 }
@@ -294,7 +294,7 @@ void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height
 
     if( libvlc_playlist_isplaying(p_instance, p_e) )
     {
-        libvlc_media_instance_t *p_mi = libvlc_playlist_get_media_instance(p_instance, p_e);
+        libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
         if( p_mi )
         {
             vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -304,7 +304,7 @@ void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height
                 vout_Control( p_vout , VOUT_SET_SIZE, width, height);
                 vlc_object_release( p_vout );
             }
-            libvlc_media_instance_release(p_mi);
+            libvlc_media_player_release(p_mi);
         }
     }
 }
@@ -334,7 +334,7 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
 
     if( libvlc_playlist_isplaying(p_instance, p_e) )
     {
-        libvlc_media_instance_t *p_mi = libvlc_playlist_get_media_instance(p_instance, p_e);
+        libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
         if( p_mi )
         {
             vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -346,12 +346,12 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
                                    clip->top, clip->left, clip->bottom, clip->right );
                 vlc_object_release( p_vout );
             }
-            libvlc_media_instance_release(p_mi);
+            libvlc_media_player_release(p_mi);
         }
     }
 }
 
-char *libvlc_video_get_aspect_ratio( libvlc_media_instance_t *p_mi,
+char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
     char *psz_aspect = 0;
@@ -365,7 +365,7 @@ char *libvlc_video_get_aspect_ratio( libvlc_media_instance_t *p_mi,
     return psz_aspect ? psz_aspect : strdup("");
 }
 
-void libvlc_video_set_aspect_ratio( libvlc_media_instance_t *p_mi,
+void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
                                     char *psz_aspect, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -382,7 +382,7 @@ void libvlc_video_set_aspect_ratio( libvlc_media_instance_t *p_mi,
     vlc_object_release( p_vout );
 }
 
-int libvlc_video_get_spu( libvlc_media_instance_t *p_mi,
+int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
                           libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
@@ -417,7 +417,7 @@ int libvlc_video_get_spu( libvlc_media_instance_t *p_mi,
     return i_spu;
 }
 
-void libvlc_video_set_spu( libvlc_media_instance_t *p_mi, int i_spu,
+void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
                            libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
@@ -450,7 +450,7 @@ void libvlc_video_set_spu( libvlc_media_instance_t *p_mi, int i_spu,
     vlc_object_release( p_input_thread );
 }
 
-char *libvlc_video_get_crop_geometry( libvlc_media_instance_t *p_mi,
+char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi,
                                    libvlc_exception_t *p_e )
 {
     char *psz_geometry = 0;
@@ -464,7 +464,7 @@ char *libvlc_video_get_crop_geometry( libvlc_media_instance_t *p_mi,
     return psz_geometry ? psz_geometry : strdup("");
 }
 
-void libvlc_video_set_crop_geometry( libvlc_media_instance_t *p_mi,
+void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
                                     char *psz_geometry, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -481,7 +481,7 @@ void libvlc_video_set_crop_geometry( libvlc_media_instance_t *p_mi,
     vlc_object_release( p_vout );
 }
 
-int libvlc_video_get_teletext( libvlc_media_instance_t *p_mi,
+int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -503,7 +503,7 @@ int libvlc_video_get_teletext( libvlc_media_instance_t *p_mi,
     return i_ret;
 }
 
-void libvlc_video_set_teletext( libvlc_media_instance_t *p_mi, int i_page,
+void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
                                 libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -526,7 +526,7 @@ void libvlc_video_set_teletext( libvlc_media_instance_t *p_mi, int i_page,
     vlc_object_release( p_vout );
 }
 
-void libvlc_toggle_teletext( libvlc_media_instance_t *p_mi,
+void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
     /* We only work on the first vout */
@@ -551,7 +551,7 @@ void libvlc_toggle_teletext( libvlc_media_instance_t *p_mi,
     vlc_object_release( p_vout );
 }
 
-int libvlc_video_destroy( libvlc_media_instance_t *p_mi,
+int libvlc_video_destroy( libvlc_media_player_t *p_mi,
                           libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );

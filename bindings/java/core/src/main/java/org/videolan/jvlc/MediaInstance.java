@@ -56,15 +56,15 @@ public class MediaInstance
         libvlc_exception_t exception = new libvlc_exception_t();
         this.instance = instance;
         libvlc = jvlc.getLibvlc();
-        eventManager = libvlc.libvlc_media_instance_event_manager(instance, exception);
+        eventManager = libvlc.libvlc_media_player_event_manager(instance, exception);
     }
 
     public MediaInstance(MediaDescriptor mediaDescriptor)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         libvlc = mediaDescriptor.getLibvlc();
-        instance = libvlc.libvlc_media_instance_new_from_media_descriptor(mediaDescriptor.getInstance(), exception);
-        eventManager = libvlc.libvlc_media_instance_event_manager(instance, exception);
+        instance = libvlc.libvlc_media_player_new_from_media(mediaDescriptor.getInstance(), exception);
+        eventManager = libvlc.libvlc_media_player_event_manager(instance, exception);
         this.mediaDescriptor = mediaDescriptor;
     }
 
@@ -76,79 +76,79 @@ public class MediaInstance
     public void play()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_instance_play(instance, exception);
+        libvlc.libvlc_media_player_play(instance, exception);
     }
 
     public void stop()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_instance_stop(instance, exception);
+        libvlc.libvlc_media_player_stop(instance, exception);
     }
 
     public void pause()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_instance_pause(instance, exception);
+        libvlc.libvlc_media_player_pause(instance, exception);
     }
 
     public long getLength()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return libvlc.libvlc_media_instance_get_length(instance, exception);
+        return libvlc.libvlc_media_player_get_length(instance, exception);
     }
 
     public long getTime()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return libvlc.libvlc_media_instance_get_time(instance, exception);
+        return libvlc.libvlc_media_player_get_time(instance, exception);
     }
 
     public void setTime(long time)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_instance_set_time(instance, time, exception);
+        libvlc.libvlc_media_player_set_time(instance, time, exception);
     }
 
     public float getPosition()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return libvlc.libvlc_media_instance_get_position(instance, exception);
+        return libvlc.libvlc_media_player_get_position(instance, exception);
     }
 
     public void setPosition(float position)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_instance_set_position(instance, position, exception);
+        libvlc.libvlc_media_player_set_position(instance, position, exception);
     }
 
     public boolean willPlay()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return (libvlc.libvlc_media_instance_will_play(instance, exception) == 1);
+        return (libvlc.libvlc_media_player_will_play(instance, exception) == 1);
     }
 
     public float getRate()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return libvlc.libvlc_media_instance_get_rate(instance, exception);
+        return libvlc.libvlc_media_player_get_rate(instance, exception);
     }
 
     public void setRate(float rate)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_instance_set_rate(instance, rate, exception);
+        libvlc.libvlc_media_player_set_rate(instance, rate, exception);
     }
 
     public boolean hasVideoOutput()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return (libvlc.libvlc_media_instance_has_vout(instance, exception) == 1);
+        return (libvlc.libvlc_media_player_has_vout(instance, exception) == 1);
     }
 
     public float getFPS()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return libvlc.libvlc_media_instance_get_fps(instance, exception);
+        return libvlc.libvlc_media_player_get_fps(instance, exception);
     }
 
     public void addListener(final MediaInstanceListener listener)
@@ -180,7 +180,7 @@ public class MediaInstance
                 libvlc.libvlc_event_detach(eventManager, event.ordinal(), callback, null, exception);
             }
         }
-        libvlc.libvlc_media_instance_release(instance);
+        libvlc.libvlc_media_player_release(instance);
         super.finalize();
     }
 

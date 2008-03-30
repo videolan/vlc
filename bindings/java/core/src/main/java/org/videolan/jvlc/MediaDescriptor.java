@@ -45,8 +45,8 @@ public class MediaDescriptor
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         libvlc = jvlc.getLibvlc();
-        instance = libvlc.libvlc_media_descriptor_new(jvlc.getInstance(), media, exception);
-        eventManager = libvlc.libvlc_media_descriptor_event_manager(instance, exception);
+        instance = libvlc.libvlc_media_new(jvlc.getInstance(), media, exception);
+        eventManager = libvlc.libvlc_media_event_manager(instance, exception);
     }
 
     MediaDescriptor(JVLC jvlc, LibVlcMediaDescriptor instance)
@@ -54,18 +54,18 @@ public class MediaDescriptor
         libvlc_exception_t exception = new libvlc_exception_t();
         libvlc = jvlc.getLibvlc();
         this.instance = instance;
-        eventManager = libvlc.libvlc_media_descriptor_event_manager(instance, exception);
+        eventManager = libvlc.libvlc_media_event_manager(instance, exception);
     }
 
     public void addOption(String option)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_media_descriptor_add_option(instance, option, exception );
+        libvlc.libvlc_media_add_option(instance, option, exception );
     }
     
     public String getMrl()
     {
-        return libvlc.libvlc_media_descriptor_get_mrl(instance);
+        return libvlc.libvlc_media_get_mrl(instance);
     }
     
     public MediaInstance getMediaInstance()
@@ -79,7 +79,7 @@ public class MediaDescriptor
     @Override
     protected void finalize() throws Throwable
     {
-        libvlc.libvlc_media_descriptor_release(instance);
+        libvlc.libvlc_media_release(instance);
         super.finalize();
     }
 

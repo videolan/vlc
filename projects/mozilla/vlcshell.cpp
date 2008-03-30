@@ -186,12 +186,12 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                 {
                     if( libvlc_playlist_isplaying(p_vlc, NULL) )
                     {
-                        libvlc_media_instance_t *p_md =
-                            libvlc_playlist_get_media_instance(p_vlc, NULL);
+                        libvlc_media_player_t *p_md =
+                            libvlc_playlist_get_media_player(p_vlc, NULL);
                         if( p_md )
                         {
                             libvlc_toggle_fullscreen(p_md, NULL);
-                            libvlc_media_instance_release(p_md);
+                            libvlc_media_player_release(p_md);
                         }
                     }
                 }
@@ -217,11 +217,11 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                 {
                     if( libvlc_playlist_isplaying(p_vlc, NULL) )
                     {
-                        libvlc_media_instance_t *p_md =
-                            libvlc_playlist_get_media_instance(p_vlc, NULL);
+                        libvlc_media_player_t *p_md =
+                            libvlc_playlist_get_media_player(p_vlc, NULL);
                         if( p_md )
                         {
-                            hasVout = libvlc_media_instance_has_vout(p_md,
+                            hasVout = libvlc_media_player_has_vout(p_md,
                                                                      NULL);
                             if( hasVout )
                             {
@@ -233,7 +233,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                                 libvlc_video_redraw_rectangle(p_md, &area,
                                                               NULL);
                             }
-                            libvlc_media_instance_release(p_md);
+                            libvlc_media_player_release(p_md);
                         }
                     }
                 }
@@ -542,13 +542,13 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
             /* callback */
 /*
-            libvlc_media_instance_t *p_md;
+            libvlc_media_player_t *p_md;
 
             libvlc_exception_t ex;
             libvlc_exception_init(& ex );
-            p_md = libvlc_playlist_get_media_instance( p_plugin->getVLC(), &ex );
+            p_md = libvlc_playlist_get_media_player( p_plugin->getVLC(), &ex );
             libvlc_exception_init( &ex );
-            libvlc_event_attach( libvlc_media_instance_event_manager( p_md, &ex ),
+            libvlc_event_attach( libvlc_media_player_event_manager( p_md, &ex ),
                                  libvlc_MediaInstancePositionChanged, Redraw, NULL, &ex );
 */
 
@@ -845,8 +845,8 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
     {
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
-        libvlc_media_instance_t *p_md =
-                libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
+        libvlc_media_player_t *p_md =
+                libvlc_playlist_get_media_player(p_plugin->getVLC(), &ex);
         libvlc_exception_clear( &ex );
 
         /* jump in the movie */
@@ -857,14 +857,14 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             {
                 vlc_int64_t f_length;
                 libvlc_exception_init( &ex );
-                f_length = libvlc_media_instance_get_length( p_md, &ex ) / 100;
+                f_length = libvlc_media_player_get_length( p_md, &ex ) / 100;
                 libvlc_exception_clear( &ex );
 
                 f_length = (float)f_length *
                            ( ((float)i_xPos-4 ) / ( ((float)i_width-8)/100) );
 
                 libvlc_exception_init( &ex );
-                libvlc_media_instance_set_time( p_md, f_length, &ex );
+                libvlc_media_player_set_time( p_md, f_length, &ex );
                 libvlc_exception_clear( &ex );
             }
         }
@@ -917,7 +917,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             libvlc_exception_clear( &ex );
         }
 
-        if( p_md ) libvlc_media_instance_release( p_md );
+        if( p_md ) libvlc_media_player_release( p_md );
     }
     Redraw( w, closure, event );
 }

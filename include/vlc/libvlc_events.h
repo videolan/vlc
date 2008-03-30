@@ -92,87 +92,87 @@ typedef struct libvlc_event_t
         struct
         {
             libvlc_meta_t meta_type;
-        } media_descriptor_meta_changed;
+        } media_meta_changed;
         struct
         {
-            libvlc_media_descriptor_t * new_child;
-        } media_descriptor_subitem_added;
+            libvlc_media_t * new_child;
+        } media_subitem_added;
         struct
         {
             vlc_int64_t new_duration;
-        } media_descriptor_duration_changed;
+        } media_duration_changed;
         struct
         {
             int new_status;
-        } media_descriptor_preparsed_changed;
+        } media_preparsed_changed;
         struct
         {
-            libvlc_media_descriptor_t * md;
-        } media_descriptor_freed;
+            libvlc_media_t * md;
+        } media_freed;
         struct
         {
             libvlc_state_t new_state;
-        } media_descriptor_state_changed;
+        } media_state_changed;
 
         /* media instance */
         struct
         {
             float new_position;
-        } media_instance_position_changed;
+        } media_player_position_changed;
         struct
         {
             libvlc_time_t new_time;
-        } media_instance_time_changed;
+        } media_player_time_changed;
         struct
         {
             libvlc_time_t new_seekable;
-        } media_instance_seekable_changed;
+        } media_player_seekable_changed;
         struct
         {
             libvlc_time_t new_pausable;
-        } media_instance_pausable_changed;
+        } media_player_pausable_changed;
 
         /* media list */
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_item_added;
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_will_add_item;
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_item_deleted;
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_will_delete_item;
 
         /* media list view */
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_view_item_added;
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_view_will_add_item;
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_view_item_deleted;
         struct
         {
-            libvlc_media_descriptor_t * item;
+            libvlc_media_t * item;
             int index;
         } media_list_view_will_delete_item;
 

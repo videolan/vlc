@@ -197,7 +197,7 @@ VLC_DEPRECATED_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
  * \param p_e an initialized exception pointern
  * \return a media instance object
  */
-VLC_DEPRECATED_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
+VLC_DEPRECATED_API libvlc_media_player_t * libvlc_playlist_get_media_player(
                                 libvlc_instance_t *, libvlc_exception_t * );
 
 /** @}*/

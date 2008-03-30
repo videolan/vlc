@@ -222,17 +222,17 @@ void libvlc_playlist_unlock( libvlc_instance_t *p_instance )
     vlc_mutex_unlock( &PL->object_lock );
 }
 
-libvlc_media_instance_t * libvlc_playlist_get_media_instance(
+libvlc_media_player_t * libvlc_playlist_get_media_player(
                                 libvlc_instance_t *p_instance,
                                 libvlc_exception_t *p_e )
 {
-    libvlc_media_instance_t *p_mi;
+    libvlc_media_player_t *p_mi;
     assert( PL );
 
     vlc_mutex_lock( &PL->object_lock );
     if( PL->p_input )
     {
-        p_mi = libvlc_media_instance_new_from_input_thread(
+        p_mi = libvlc_media_player_new_from_input_thread(
                             p_instance, PL->p_input, p_e );
     }
     else

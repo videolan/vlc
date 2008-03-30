@@ -74,7 +74,7 @@ public class MediaList
         }
         items.add(descriptor.getMrl());
         libvlc_exception_t exception = new libvlc_exception_t();
-        jvlc.getLibvlc().libvlc_media_list_add_media_descriptor(instance, descriptor.getInstance(), exception);
+        jvlc.getLibvlc().libvlc_media_list_add_media(instance, descriptor.getInstance(), exception);
     }
 
     /**
@@ -179,7 +179,7 @@ public class MediaList
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc
             .getLibvlc()
-            .libvlc_media_list_insert_media_descriptor(instance, descriptor.getInstance(), index, exception);
+            .libvlc_media_list_insert_media(instance, descriptor.getInstance(), index, exception);
     }
 
     /**

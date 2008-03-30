@@ -163,7 +163,7 @@ public class MediaListPlayer
     public void setMediaInstance(MediaInstance mediaInstance)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        jvlc.getLibvlc().libvlc_media_list_player_set_media_instance(instance, mediaInstance.getInstance(), exception);        
+        jvlc.getLibvlc().libvlc_media_list_player_set_media_player(instance, mediaInstance.getInstance(), exception);        
     }
 
     /**

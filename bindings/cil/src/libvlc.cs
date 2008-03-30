@@ -321,13 +321,13 @@ namespace VideoLAN.LibVLC
         }
 
         [DllImport ("libvlc-control.dll",
-                    EntryPoint="libvlc_media_descriptor_new")]
+                    EntryPoint="libvlc_media_new")]
         public static extern
         DescriptorHandle Create (InstanceHandle inst, U8String mrl,
                                  NativeException ex);
 
         [DllImport ("libvlc-control.dll",
-                    EntryPoint="libvlc_media_descriptor_release")]
+                    EntryPoint="libvlc_media_release")]
         public static extern void Release (IntPtr ptr);
 
         protected override bool ReleaseHandle ()

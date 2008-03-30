@@ -57,7 +57,7 @@ hierarch_node_media_list_view_count( libvlc_media_list_view_t * p_mlv,
 {
     /* FIXME: we may want to cache that */
     int i, ret, count = libvlc_media_list_count( p_mlv->p_mlist, p_e );
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_t * p_submlist;
     ret = 0;
     trace("\n");
@@ -65,9 +65,9 @@ hierarch_node_media_list_view_count( libvlc_media_list_view_t * p_mlv,
     {
         p_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, i, p_e );
         if( !p_md ) continue;
-        p_submlist = libvlc_media_descriptor_subitems( p_md, p_e );
+        p_submlist = libvlc_media_subitems( p_md, p_e );
         if( !p_submlist ) continue;
-        libvlc_media_descriptor_release( p_md );
+        libvlc_media_release( p_md );
         libvlc_media_list_release( p_submlist );
         ret++;
     }
@@ -78,13 +78,13 @@ hierarch_node_media_list_view_count( libvlc_media_list_view_t * p_mlv,
  *       flat_media_list_view_item_at_index  (private)
  * (called by flat_media_list_view_item_at_index)
  **************************************************************************/
-static libvlc_media_descriptor_t *
+static libvlc_media_t *
 hierarch_node_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
                                         int index,
                                         libvlc_exception_t * p_e )
 {
     /* FIXME: we may want to cache that */
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_t * p_submlist;
     trace("%d\n", index);
     int i, current_index, count = libvlc_media_list_count( p_mlv->p_mlist, p_e );
@@ -93,13 +93,13 @@ hierarch_node_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
     {
         p_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, i, p_e );
         if( !p_md ) continue;
-        p_submlist = libvlc_media_descriptor_subitems( p_md, p_e );
+        p_submlist = libvlc_media_subitems( p_md, p_e );
         if( !p_submlist ) continue;
         libvlc_media_list_release( p_submlist );
         current_index++;
         if( current_index == index )
             return p_md;
-        libvlc_media_descriptor_release( p_md );
+        libvlc_media_release( p_md );
     }
 
     libvlc_exception_raise( p_e, "Index out of bound in Media List View" );
@@ -115,13 +115,13 @@ hierarch_node_media_list_view_children_at_index( libvlc_media_list_view_t * p_ml
                                             int index,
                                             libvlc_exception_t * p_e )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_t * p_submlist;
     libvlc_media_list_view_t * p_ret;
     p_md = hierarch_node_media_list_view_item_at_index( p_mlv, index, p_e );
     if( !p_md ) return NULL;
-    p_submlist = libvlc_media_descriptor_subitems( p_md, p_e );
-    libvlc_media_descriptor_release( p_md );
+    p_submlist = libvlc_media_subitems( p_md, p_e );
+    libvlc_media_release( p_md );
     if( !p_submlist ) return NULL;
     p_ret = libvlc_media_list_hierarchical_node_view( p_submlist, p_e );
     libvlc_media_list_release( p_submlist );
@@ -131,9 +131,9 @@ hierarch_node_media_list_view_children_at_index( libvlc_media_list_view_t * p_ml
 
 /* Helper */
 static int
-index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_md )
+index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_t * p_md )
 {
-    libvlc_media_descriptor_t * p_iter_md;
+    libvlc_media_t * p_iter_md;
     libvlc_media_list_t * p_submlist;
 
     int i, current_index, count = libvlc_media_list_count( p_mlv->p_mlist, NULL );
@@ -142,10 +142,10 @@ index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_m
     {
         p_iter_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, i, NULL );
         if( !p_iter_md ) continue;
-        p_submlist = libvlc_media_descriptor_subitems( p_iter_md, NULL );
+        p_submlist = libvlc_media_subitems( p_iter_md, NULL );
         if( !p_submlist ) continue;
         libvlc_media_list_release( p_submlist );
-        libvlc_media_descriptor_release( p_iter_md );
+        libvlc_media_release( p_iter_md );
         current_index++;
         if( p_md == p_iter_md )
             return current_index;
@@ -154,11 +154,11 @@ index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_descriptor_t * p_m
 }
 
 static vlc_bool_t
-item_is_already_added( libvlc_media_descriptor_t * p_md )
+item_is_already_added( libvlc_media_t * p_md )
 {
     libvlc_media_list_t * p_submlist;
 
-    p_submlist = libvlc_media_descriptor_subitems( p_md, NULL );
+    p_submlist = libvlc_media_subitems( p_md, NULL );
     if( !p_submlist ) return VLC_FALSE;
     int count = libvlc_media_list_count( p_submlist, NULL );
     libvlc_media_list_release( p_submlist );
@@ -172,7 +172,7 @@ item_is_already_added( libvlc_media_descriptor_t * p_md )
 static void
 items_subitems_added( const libvlc_event_t * p_event, void * user_data )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_view_t * p_mlv = user_data;
     int index;
     p_md = p_event->p_obj;
@@ -195,7 +195,7 @@ items_subitems_added( const libvlc_event_t * p_event, void * user_data )
 static void
 media_list_item_added( const libvlc_event_t * p_event, void * user_data )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_view_t * p_mlv = user_data;
     int index;
     p_md = p_event->u.media_list_item_added.item;
@@ -210,7 +210,7 @@ media_list_item_added( const libvlc_event_t * p_event, void * user_data )
 static void
 media_list_will_add_item( const libvlc_event_t * p_event, void * user_data )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_view_t * p_mlv = user_data;
     int index;
     p_md = p_event->u.media_list_will_add_item.item;
@@ -222,7 +222,7 @@ media_list_will_add_item( const libvlc_event_t * p_event, void * user_data )
 static void
 media_list_item_deleted( const libvlc_event_t * p_event, void * user_data )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_view_t * p_mlv = user_data;
     int index;
     p_md = p_event->u.media_list_item_deleted.item;
@@ -236,7 +236,7 @@ media_list_item_deleted( const libvlc_event_t * p_event, void * user_data )
 static void
 media_list_will_delete_item( const libvlc_event_t * p_event, void * user_data )
 {
-    libvlc_media_descriptor_t * p_md;
+    libvlc_media_t * p_md;
     libvlc_media_list_view_t * p_mlv = user_data;
     int index;
     p_md = p_event->u.media_list_will_delete_item.item;

@@ -155,7 +155,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     // Add it to the libvlc's medialist
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    libvlc_media_list_insert_media_descriptor( p_mlist, [media libVLCMediaDescriptor], index, &p_e );
+    libvlc_media_list_insert_media( p_mlist, [media libVLCMediaDescriptor], index, &p_e );
     catch_exception( &p_e );
 }
 
@@ -267,9 +267,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
         int i, count = libvlc_media_list_count( p_mlist, NULL );
         for( i = 0; i < count; i++ )
         {
-            libvlc_media_descriptor_t * p_md = libvlc_media_list_item_at_index( p_mlist, i, NULL );
+            libvlc_media_t * p_md = libvlc_media_list_item_at_index( p_mlist, i, NULL );
             [cachedMedia addObject:[VLCMedia mediaWithLibVLCMediaDescriptor:p_md]];
-            libvlc_media_descriptor_release(p_md);
+            libvlc_media_release(p_md);
         }
         [self initInternalMediaList];
         libvlc_media_list_unlock(p_mlist);

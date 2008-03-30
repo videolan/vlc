@@ -98,7 +98,7 @@ static void test_core (const char ** argv, int argc)
 static void test_media_list (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
-    libvlc_media_descriptor_t *md1, *md2, *md3, *md4;
+    libvlc_media_t *md1, *md2, *md3, *md4;
     libvlc_media_list_t *ml;
 
     log ("Testing media_list\n");
@@ -110,16 +110,16 @@ static void test_media_list (const char ** argv, int argc)
     ml = libvlc_media_list_new (vlc, &ex);
     catch ();
 
-    md1 = libvlc_media_descriptor_new (vlc, "/dev/null", &ex);
+    md1 = libvlc_media_new (vlc, "/dev/null", &ex);
     catch ();
-    md2 = libvlc_media_descriptor_new (vlc, "/dev/null", &ex);
+    md2 = libvlc_media_new (vlc, "/dev/null", &ex);
     catch ();
-    md3 = libvlc_media_descriptor_new (vlc, "/dev/null", &ex);
+    md3 = libvlc_media_new (vlc, "/dev/null", &ex);
     catch ();
 
-    libvlc_media_list_add_media_descriptor (ml, md1, &ex);
+    libvlc_media_list_add_media (ml, md1, &ex);
     catch ();
-    libvlc_media_list_add_media_descriptor (ml, md2, &ex);
+    libvlc_media_list_add_media (ml, md2, &ex);
     catch ();
 
     assert( libvlc_media_list_count (ml, &ex) == 2 );
@@ -138,16 +138,16 @@ static void test_media_list (const char ** argv, int argc)
     assert( libvlc_media_list_index_of_item (ml, md2, &ex) == 0 );
     catch ();
 
-    libvlc_media_list_add_media_descriptor (ml, md1, &ex); /* add 2 items */
+    libvlc_media_list_add_media (ml, md1, &ex); /* add 2 items */
     catch ();
-    libvlc_media_list_add_media_descriptor (ml, md1, &ex);
+    libvlc_media_list_add_media (ml, md1, &ex);
     catch ();
 
     /* there should be 3 pieces */
     assert( libvlc_media_list_count (ml, &ex) == 3 );
     catch ();
 
-    libvlc_media_list_insert_media_descriptor (ml, md3, 2, &ex);
+    libvlc_media_list_insert_media (ml, md3, 2, &ex);
     catch ();
 
     /* there should be 4 pieces */
@@ -177,7 +177,7 @@ static void test_media_list (const char ** argv, int argc)
     assert (have_exception ());
 
     /* getting non valid items */
-    libvlc_media_descriptor_t * p_non_exist =
+    libvlc_media_t * p_non_exist =
         libvlc_media_list_item_at_index (ml, 4, &ex);
     assert (have_exception ());
 
@@ -187,7 +187,7 @@ static void test_media_list (const char ** argv, int argc)
     p_non_exist = libvlc_media_list_item_at_index (ml, -1, &ex);
     assert (have_exception ());
 
-    md4 = libvlc_media_descriptor_new (vlc, "/dev/dsp", &ex);
+    md4 = libvlc_media_new (vlc, "/dev/dsp", &ex);
     catch ();
 
     /* try to find non inserted item */
@@ -195,10 +195,10 @@ static void test_media_list (const char ** argv, int argc)
     i_non_exist = libvlc_media_list_index_of_item (ml, md4, &ex);
     assert ( i_non_exist == -1 );
 
-    libvlc_media_descriptor_release (md1);
-    libvlc_media_descriptor_release (md2);
-    libvlc_media_descriptor_release (md3);
-    libvlc_media_descriptor_release (md4);
+    libvlc_media_release (md1);
+    libvlc_media_release (md2);
+    libvlc_media_release (md3);
+    libvlc_media_release (md4);
 
     libvlc_media_list_release (ml);
 
@@ -221,7 +221,7 @@ static void test_events_callback_and_detach( const libvlc_event_t * event, void 
     vlc_bool_t * callback_was_called = user_data;
     libvlc_event_manager_t *em;
 
-    em = libvlc_media_instance_event_manager (event->p_obj, &ex);
+    em = libvlc_media_player_event_manager (event->p_obj, &ex);
     catch();
 
     libvlc_event_detach (em, event->type, test_events_callback_and_detach, user_data, &ex);
@@ -240,7 +240,7 @@ static void test_event_type_reception( libvlc_event_manager_t * em, libvlc_event
 static void test_events (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
-    libvlc_media_instance_t *mi;
+    libvlc_media_player_t *mi;
     libvlc_event_manager_t *em;
     vlc_bool_t callback_was_called;
     libvlc_exception_t ex;
@@ -260,10 +260,10 @@ static void test_events (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv, &ex);
     catch ();
 
-    mi = libvlc_media_instance_new (vlc, &ex);
+    mi = libvlc_media_player_new (vlc, &ex);
     catch ();
 
-    em = libvlc_media_instance_event_manager (mi, &ex);
+    em = libvlc_media_player_event_manager (mi, &ex);
 
     log ("+ Testing attaching to Media Instance\n");
 
@@ -306,7 +306,7 @@ static void test_events (const char ** argv, int argc)
         catch ();
     }
 
-    libvlc_media_instance_release (mi);
+    libvlc_media_player_release (mi);
     catch ();
 
     libvlc_release (vlc);
@@ -316,8 +316,8 @@ static void test_events (const char ** argv, int argc)
 static void test_media_player_play_stop(const char** argv, int argc)
 {
     libvlc_instance_t *vlc;
-    libvlc_media_descriptor_t *md;
-    libvlc_media_instance_t *mi;
+    libvlc_media_t *md;
+    libvlc_media_player_t *mi;
     const char * file = "file://../bindings/java/core/src/test/resources/raffa_voice.ogg";
 
     log ("Testing play and pause of %s\n", file);
@@ -326,27 +326,27 @@ static void test_media_player_play_stop(const char** argv, int argc)
     vlc = libvlc_new (argc, argv, &ex);
     catch ();
 
-    md = libvlc_media_descriptor_new (vlc, file, &ex);
+    md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    mi = libvlc_media_instance_new_from_media_descriptor (md, &ex);
+    mi = libvlc_media_player_new_from_media (md, &ex);
     catch ();
     
-    libvlc_media_descriptor_release (md);
+    libvlc_media_release (md);
 
-    libvlc_media_instance_play (mi, &ex);
+    libvlc_media_player_play (mi, &ex);
     catch ();
 
     /* FIXME: Do something clever */
     sleep(1);
 
-    assert( libvlc_media_instance_get_state (mi, &ex) != libvlc_Error );
+    assert( libvlc_media_player_get_state (mi, &ex) != libvlc_Error );
     catch ();
 
-    libvlc_media_instance_stop (mi, &ex);
+    libvlc_media_player_stop (mi, &ex);
     catch ();
 
-    libvlc_media_instance_release (mi);
+    libvlc_media_player_release (mi);
     catch ();
 
     libvlc_release (vlc);

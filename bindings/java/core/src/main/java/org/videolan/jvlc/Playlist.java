@@ -119,7 +119,7 @@ public class Playlist {
     public MediaInstance getMediaInstance()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaInstance mi = libvlc.libvlc_playlist_get_media_instance(libvlcInstance, exception);
+        LibVlcMediaInstance mi = libvlc.libvlc_playlist_get_media_player(libvlcInstance, exception);
         return new MediaInstance(jvlc, mi);
         
     }

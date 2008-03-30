@@ -549,7 +549,7 @@ void VlcPlugin::hideToolbar()
 
 void VlcPlugin::redrawToolbar()
 {
-    libvlc_media_instance_t *p_md = NULL;
+    libvlc_media_player_t *p_md = NULL;
     libvlc_exception_t ex;
     float f_position = 0.0;
     int i_playing = 0;
@@ -565,7 +565,7 @@ void VlcPlugin::redrawToolbar()
 
     /* get media instance */
     libvlc_exception_init( &ex );
-    p_md = libvlc_playlist_get_media_instance( getVLC(), &ex );
+    p_md = libvlc_playlist_get_media_player( getVLC(), &ex );
     libvlc_exception_clear( &ex );
 
     /* get isplaying */
@@ -582,10 +582,10 @@ void VlcPlugin::redrawToolbar()
     if( i_playing == 1 )
     {
         libvlc_exception_init( &ex );
-        f_position = libvlc_media_instance_get_position( p_md, &ex ) * 100;
+        f_position = libvlc_media_player_get_position( p_md, &ex ) * 100;
         libvlc_exception_clear( &ex );
     }
-    libvlc_media_instance_release( p_md );
+    libvlc_media_player_release( p_md );
 
     gcv.foreground = BlackPixel( p_display, 0 );
     gc = XCreateGC( p_display, control, GCForeground, &gcv );
