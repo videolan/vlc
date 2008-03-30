@@ -1725,14 +1725,12 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     /* Update read bytes in input */
     if( p_input )
     {
-        vlc_object_yield( p_input );
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
         stats_UpdateInteger( s, p_input->p->counters.p_read_bytes, i_read, &i_total );
         stats_UpdateFloat( s, p_input->p->counters.p_input_bitrate,
                        (float)i_total, NULL );
         stats_UpdateInteger( s, p_input->p->counters.p_read_packets, 1, NULL );
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-        vlc_object_release( p_input );
     }
     return i_read;
 }
@@ -1756,7 +1754,6 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
         if( p_input &&  p_block && p_access->p_libvlc->b_stats )
         {
-            vlc_object_yield( p_input );
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
             stats_UpdateInteger( s, p_input->p->counters.p_read_bytes,
                                  p_block->i_buffer, &i_total );
@@ -1764,7 +1761,6 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
                               (float)i_total, NULL );
             stats_UpdateInteger( s, p_input->p->counters.p_read_packets, 1, NULL );
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-            vlc_object_release( p_input );
         }
         return p_block;
     }
@@ -1797,7 +1793,6 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     {
         if( p_input )
         {
-            vlc_object_yield( p_input );
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
             stats_UpdateInteger( s, p_input->p->counters.p_read_bytes,
                                  p_block->i_buffer, &i_total );
@@ -1806,7 +1801,6 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
             stats_UpdateInteger( s, p_input->p->counters.p_read_packets,
                                  1 , NULL);
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-            vlc_object_release( p_input );
         }
     }
     return p_block;
