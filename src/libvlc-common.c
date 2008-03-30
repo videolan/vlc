@@ -128,7 +128,7 @@ static void InitDeviceValues( libvlc_int_t * );
 
 libvlc_global_data_t *vlc_global( void )
 {
-    return &libvlc_global;
+    return p_libvlc_global;
 }
 
 /*****************************************************************************
@@ -154,12 +154,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_value_t lockval;
     char *psz_env = NULL;
 
-#if 0
-    /* &libvlc_global never changes,
-     * so we can safely call this multiple times. */
-    p_libvlc_global = &libvlc_global;
-#endif
-
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
     i_ret = vlc_threads_init( p_libvlc_global );
@@ -173,14 +167,14 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     i_instances++;
 
-    if( !libvlc_global.b_ready )
+    if( !p_libvlc_global->b_ready )
     {
         /* Guess what CPU we have */
         cpu_flags = CPUCapabilities();
        /* The module bank will be initialized later */
-        libvlc_global.p_module_bank = NULL;
+        p_libvlc_global->p_module_bank = NULL;
 
-        libvlc_global.b_ready = VLC_TRUE;
+        p_libvlc_global->b_ready = VLC_TRUE;
     }
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc_global, "libvlc" );
@@ -318,7 +312,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Check for plugins cache options */
     if( config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0 )
     {
-        libvlc_global.p_module_bank->b_cache_delete = VLC_TRUE;
+        p_libvlc_global->p_module_bank->b_cache_delete = VLC_TRUE;
     }
 
     /* Will be re-done properly later on */
@@ -336,7 +330,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
             b_exit = VLC_TRUE;
         }
-        libvlc_global.b_daemon = VLC_TRUE;
+        p_libvlc_global->b_daemon = VLC_TRUE;
 
         /* lets check if we need to write the pidfile */
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
@@ -383,7 +377,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             close( STDOUT_FILENO );
             close( STDERR_FILENO );
 
-            libvlc_global.b_daemon = VLC_TRUE;
+            p_libvlc_global->b_daemon = VLC_TRUE;
         }
 #endif
     }
@@ -408,7 +402,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     psz_language = config_GetPsz( p_libvlc, "language" );
     if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
     {
-        vlc_bool_t b_cache_delete = libvlc_global.p_module_bank->b_cache_delete;
+        vlc_bool_t b_cache_delete = p_libvlc_global->p_module_bank->b_cache_delete;
 
         /* Reset the default domain */
         SetLanguage( psz_language );
@@ -420,7 +414,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_InitBank( p_libvlc );
         config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
-        libvlc_global.p_module_bank->b_cache_delete = b_cache_delete;
+        p_libvlc_global->p_module_bank->b_cache_delete = b_cache_delete;
     }
     free( psz_language );
 # endif
@@ -440,7 +434,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     msg_Dbg( p_libvlc, "module bank initialized, found %i modules",
-                    libvlc_global.p_module_bank->i_children );
+             p_libvlc_global->p_module_bank->i_children );
 
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_libvlc, "module" )) )
@@ -1017,7 +1011,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 #ifndef WIN32
     char* psz_pidfile = NULL;
 
-    if( libvlc_global.p_module_bank )
+    if( p_libvlc_global->p_module_bank )
     if( config_GetInt( p_libvlc, "daemon" ) > 0 )
     {
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
@@ -1107,7 +1101,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     }
 
 #ifndef WIN32
-    if( libvlc_global.b_daemon && b_block && !psz_module )
+    if( p_libvlc_global->b_daemon && b_block && !psz_module )
     {
         /* Daemon mode hack.
          * We prefer the dummy interface if none is specified. */
@@ -1199,7 +1193,7 @@ static inline int LoadMessages (void)
 #else
     char psz_path[1024];
     if (snprintf (psz_path, sizeof (psz_path), "%s/%s",
-                  libvlc_global.psz_vlcpath, "locale")
+                  p_libvlc_global->psz_vlcpath, "locale")
                      >= (int)sizeof (psz_path))
         return -1;
 
