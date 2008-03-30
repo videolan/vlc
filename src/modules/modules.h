@@ -43,7 +43,6 @@ struct module_bank_t
 
     int              i_usage;
 
-    vlc_bool_t       b_main;
     vlc_bool_t       b_builtins;
     vlc_bool_t       b_plugins;
 

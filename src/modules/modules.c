@@ -104,8 +104,6 @@ static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
 #endif
 
-static void module_LoadMain( vlc_object_t *p_this );
-
 /**
  * Init bank
  *
@@ -123,31 +121,34 @@ void __module_InitBank( vlc_object_t *p_this )
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    if( p_libvlc_global->p_module_bank )
+
+    if( p_libvlc_global->p_module_bank == NULL )
     {
-        p_libvlc_global->p_module_bank->i_usage++;
-        vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_libvlc_global, "libvlc" );
-        return;
+        p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
+        p_bank->psz_object_name = "module bank";
+        p_bank->i_usage = 1;
+        p_bank->i_cache = p_bank->i_loaded_cache = 0;
+        p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
+        p_bank->b_cache = p_bank->b_cache_dirty =
+        p_bank->b_cache_delete = VLC_FALSE;
+
+        /* Everything worked, attach the object */
+        p_libvlc_global->p_module_bank = p_bank;
+        vlc_object_attach( p_bank, p_libvlc_global );
+
+        /* Fills the module bank structure with the main module infos.
+         * This is very useful as it will allow us to consider the main
+         * library just as another module, and for instance the configuration
+         * options of main will be available in the module bank structure just
+         * as for every other module. */
+        AllocateBuiltinModule( p_this, vlc_entry__main );
     }
+    else
+        p_libvlc_global->p_module_bank->i_usage++;
+
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc_global, "libvlc" );
 
-    p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
-    if( !p_bank )
-        return;
-    p_bank->psz_object_name = "module bank";
-    p_bank->i_usage = 1;
-    p_bank->i_cache = p_bank->i_loaded_cache = 0;
-    p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
-    p_bank->b_cache = p_bank->b_cache_dirty =
-        p_bank->b_cache_delete = VLC_FALSE;
-
-    /* Everything worked, attach the object */
-    p_libvlc_global->p_module_bank = p_bank;
-    vlc_object_attach( p_bank, p_libvlc_global );
-
-    module_LoadMain( p_this );
 }
 
 
@@ -240,37 +241,6 @@ void __module_EndBank( vlc_object_t *p_this )
 
     vlc_object_release( p_libvlc_global->p_module_bank );
     p_libvlc_global->p_module_bank = NULL;
-}
-
-/**
- * Load the main program info into the module bank.
- *
- * Fills the module bank structure with the main module infos.
- * This is very useful as it will allow us to consider the main program just
- * as another module, and for instance the configuration options of main will
- * be available in the module bank structure just as for every other module.
- * \param p_this vlc object structure
- * \return nothing
- */
-static void module_LoadMain( vlc_object_t *p_this )
-{
-    vlc_value_t lockval;
-    libvlc_global_data_t *p_libvlc_global = vlc_global();
-
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
-    if( p_libvlc_global->p_module_bank->b_main )
-    {
-        vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_libvlc_global, "libvlc" );
-        return;
-    }
-    p_libvlc_global->p_module_bank->b_main = VLC_TRUE;
-    vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
-
-    AllocateBuiltinModule( p_this, vlc_entry__main );
 }
 
 /**
