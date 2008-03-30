@@ -277,7 +277,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     if( psz_name != NULL )
         p_input->psz_name = strdup( psz_name );
-    else if( p_input->i_type == ITEM_TYPE_FILE )
+    else if( p_input->i_type == ITEM_TYPE_FILE && p_input->psz_uri )
     {
         const char *psz_filename = strrchr( p_input->psz_uri, DIR_SEP_CHAR );
         if( psz_filename && *psz_filename == DIR_SEP_CHAR )
@@ -286,7 +286,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                     ? psz_filename : p_input->psz_uri );
     }
     else
-        p_input->psz_name = strdup( p_input->psz_uri );
+        p_input->psz_name = p_input->psz_uri ? strdup( p_input->psz_uri ) : NULL;
 
     p_input->i_duration = i_duration;
 
@@ -317,6 +317,12 @@ static void GuessType( input_item_t *p_item)
         { "sdp", ITEM_TYPE_NET },
         { NULL, 0 }
     };
+
+    if( !p_item->psz_uri )
+    {
+        p_item->i_type = ITEM_TYPE_FILE;
+        return;
+    }
 
     for( i = 0; types_array[i].psz_search != NULL; i++ )
     {
