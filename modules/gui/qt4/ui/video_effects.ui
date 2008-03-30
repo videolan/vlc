@@ -6,11 +6,11 @@
     <x>0</x>
     <y>0</y>
     <width>472</width>
-    <height>320</height>
+    <height>290</height>
    </rect>
   </property>
   <property name="currentIndex" >
-   <number>2</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="tab" >
    <attribute name="title" >
@@ -94,6 +94,9 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
+       <property name="spacing" >
+        <number>0</number>
+       </property>
        <item row="0" column="1" >
         <widget class="QSlider" name="hueSlider" >
          <property name="maximum" >
