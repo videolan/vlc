@@ -186,6 +186,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     }
     p_libvlc->p_playlist = NULL;
     p_libvlc->p_interaction = NULL;
+    p_libvlc->p_vlm = NULL;
     p_libvlc->psz_object_name = "libvlc";
 
     /* Initialize message queue */
@@ -772,7 +773,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     psz_parser = config_GetPsz( p_libvlc, "vlm-conf" );
     if( psz_parser && *psz_parser )
     {
-        if( !vlm_New( p_libvlc ) )
+        p_libvlc->p_vlm = vlm_New( p_libvlc );
+        if( !p_libvlc->p_vlm )
             msg_Err( p_libvlc, "VLM initialization failed" );
     }
     free( psz_parser );
@@ -934,7 +936,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     vout_thread_t      * p_vout = NULL;
     aout_instance_t    * p_aout = NULL;
     announce_handler_t * p_announce = NULL;
-    vlm_t              * p_vlm = NULL;
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -998,9 +999,10 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     FREENULL( p_libvlc->p_stats );
 
     /* Destroy VLM if created in libvlc_InternalInit */
-    p_vlm = vlc_object_find( p_libvlc, VLC_OBJECT_VLM, FIND_ANYWHERE );
-    if( p_vlm )
-        vlm_Delete( p_vlm );
+    if( p_libvlc->p_vlm )
+    {
+        vlm_Delete( p_libvlc->p_vlm );
+    }
 
     return VLC_SUCCESS;
 }
