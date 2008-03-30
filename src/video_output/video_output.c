@@ -780,12 +780,6 @@ static void RunThread( vout_thread_t *p_vout)
         display_date = 0;
         current_date = mdate();
 
-        if( p_input && p_input->b_die )
-        {
-            vlc_object_release( p_input );
-            p_input = NULL;
-        }
-
         i_loops++;
             if( !p_input )
             {
@@ -802,6 +796,8 @@ static void RunThread( vout_thread_t *p_vout)
                                      i_displayed , NULL);
                 i_displayed = i_lost = 0;
                 vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+                vlc_object_release( p_input );
+                p_input = NULL;
             }
 #if 0
         p_vout->c_loops++;
@@ -1058,6 +1054,9 @@ static void RunThread( vout_thread_t *p_vout)
             }
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
             p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : VLC_FALSE );
+            if( p_input )
+                vlc_object_release( p_input );
+            p_input = NULL;
         }
 
         /*
