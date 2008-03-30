@@ -256,7 +256,6 @@ static void test_media_player_play_stop(const char** argv, int argc)
 
     libvlc_media_instance_stop (mi, &ex);
     catch ();
-    sleep(1);
 
     libvlc_media_instance_release (mi);
     catch ();
