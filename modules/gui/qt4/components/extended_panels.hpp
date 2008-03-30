@@ -150,4 +150,16 @@ private slots:
     void snapshot() {};
 };
 
+class SyncControls : public QWidget
+{
+    Q_OBJECT
+public:
+    SyncControls( intf_thread_t *, QWidget * );
+    virtual ~SyncControls() {};
+private:
+    intf_thread_t *p_intf;
+    QDoubleSpinBox *AVSpin;
+    QDoubleSpinBox *subsSpin;
+};
+
 #endif

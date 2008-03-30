@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extended_panels.cpp : Extended controls panels
  ****************************************************************************
- * Copyright ( C ) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -1155,6 +1155,83 @@ void Spatializer::addCallbacks( aout_instance_t *p_aout )
 {
     //    var_AddCallback( p_aout, "Spatializer-bands", EqzCallback, this );
     //    var_AddCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
+}
+
+#include <QToolButton>
+#include <QGridLayout>
+
+SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
+                            QWidget( _parent ) , p_intf( _p_intf )
+{
+    QGroupBox *AVBox, *subsBox;
+    QToolButton *moinsAV, *plusAV;
+
+    QToolButton *moinssubs, *plussubs;
+
+    QVBoxLayout *vboxLayout = new QVBoxLayout( this );
+
+    AVBox = new QGroupBox( qtr( "Audio/Video" ) );
+    QGridLayout *gridLayout = new QGridLayout( AVBox );
+
+    moinsAV = new QToolButton;
+    moinsAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    moinsAV->setAutoRaise( true );
+    moinsAV->setText( "-" );
+    gridLayout->addWidget( moinsAV, 1, 0, 1, 1 );
+
+    plusAV = new QToolButton;
+    plusAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    plusAV->setAutoRaise( true );
+    plusAV->setText( "+" );
+    gridLayout->addWidget( plusAV, 1, 2, 1, 1 );
+
+    QLabel *AVLabel = new QLabel;
+    AVLabel->setText( qtr( "Advance of audio over video" ) );
+    gridLayout->addWidget( AVLabel, 0, 0, 1, 3 );
+
+    AVSpin = new QDoubleSpinBox;
+    AVSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    AVSpin->setDecimals( 3 );
+    AVSpin->setMinimum( -100 );
+    AVSpin->setMaximum( 100 );
+    AVSpin->setSingleStep( 0.1 );
+    AVSpin->setToolTip( qtr( "A positive value means that\n"
+                             "the audio is ahead of the video" ) );
+    AVSpin->setSuffix( "ms" );
+    gridLayout->addWidget( AVSpin, 1, 1, 1, 1 );
+    vboxLayout->addWidget( AVBox );
+
+
+    subsBox = new QGroupBox( qtr( "Subtitles/Video" ) );
+    QGridLayout *subsLayout = new QGridLayout( subsBox );
+
+    moinssubs = new QToolButton;
+    moinssubs->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    moinssubs->setAutoRaise( true );
+    moinssubs->setText( "-" );
+    subsLayout->addWidget( moinssubs, 1, 0, 1, 1 );
+
+    plussubs = new QToolButton;
+    plussubs->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    plussubs->setAutoRaise( true );
+    plussubs->setText( "+" );
+    subsLayout->addWidget( plussubs, 1, 2, 1, 1 );
+
+    QLabel *subsLabel = new QLabel;
+    subsLabel->setText( qtr( "Advance of subtitles over video" ) );
+    subsLayout->addWidget( subsLabel, 0, 0, 1, 3 );
+
+    subsSpin = new QDoubleSpinBox;
+    subsSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    subsSpin->setDecimals( 3 );
+    subsSpin->setMinimum( -100 );
+    subsSpin->setMaximum( 100 );
+    subsSpin->setSingleStep( 0.1 );
+    subsSpin->setToolTip( qtr( "A positive value means that\n"
+                             "the subtitles are ahead of the video" ) );
+    subsSpin->setSuffix( "ms" );
+    subsLayout->addWidget( subsSpin, 1, 1, 1, 1 );
+    vboxLayout->addWidget( subsBox );
 }
 
 /**********************************************************************

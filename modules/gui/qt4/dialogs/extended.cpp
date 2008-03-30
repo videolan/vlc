@@ -43,7 +43,6 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QGridLayout *layout = new QGridLayout( this );
 
     QTabWidget *mainTabW = new QTabWidget( this );
-    mainTabW->setTabPosition( QTabWidget::West );
 
     /* AUDIO effects */
     QWidget *audioWidget = new QWidget;
@@ -69,6 +68,9 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     videoTab->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
 
     mainTabW->addTab( videoWidget, qtr( "Video Effects" ) );
+
+    SyncControls *syncW = new SyncControls( p_intf, videoTab );
+    mainTabW->addTab( syncW, qtr( "A/V Synchronisation" ) );
 
     if( module_Exists( p_intf, "v4l2" ) )
     {
