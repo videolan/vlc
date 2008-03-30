@@ -989,8 +989,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     msg_Dbg( p_libvlc, "removing remaining input items" );
     FOREACH_ARRAY( input_item_t *p_del, p_libvlc->input_items )
         msg_Dbg( p_libvlc, "WARNING: %p input item has not been deleted properly", p_del );
-        input_ItemClean( p_del );
-        free( p_del );
+        /* Don't do anything, faulting code should be fixed */
     FOREACH_END();
     ARRAY_RESET( p_libvlc->input_items );
 
