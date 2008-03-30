@@ -151,7 +151,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 {
     int i_ret;
     libvlc_int_t * p_libvlc = NULL;
-    vlc_value_t lockval;
     char *psz_env = NULL;
 
     /* vlc_threads_init *must* be the first internal call! No other call is
@@ -160,10 +159,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     if( i_ret < 0 ) return NULL;
 
     /* Now that the thread system is initialized, we don't have much, but
-     * at least we have var_Create */
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+     * at least we have variables */
+    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
 
     i_instances++;
 
@@ -176,7 +173,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
         p_libvlc_global->b_ready = VLC_TRUE;
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_object_create( p_libvlc_global, VLC_OBJECT_LIBVLC );
@@ -1044,9 +1041,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
                      p_libvlc->p_hotkeys );
     FREENULL( p_libvlc->p_hotkeys );
 
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
     i_instances--;
 
     if( i_instances == 0 )
@@ -1054,7 +1049,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
         /* System specific cleaning code */
         system_End( p_libvlc );
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     msg_Flush( p_libvlc );
     msg_Destroy( p_libvlc );

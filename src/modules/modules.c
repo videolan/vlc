@@ -115,12 +115,9 @@ static void   UndupModule      ( module_t * );
 void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
-    vlc_value_t  lockval;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
 
     if( p_libvlc_global->p_module_bank == NULL )
     {
@@ -146,7 +143,7 @@ void __module_InitBank( vlc_object_t *p_this )
     else
         p_libvlc_global->p_module_bank->i_usage++;
 
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 }
 
 
@@ -161,23 +158,20 @@ void __module_InitBank( vlc_object_t *p_this )
 void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next = NULL;
-    vlc_value_t lockval;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
     if( !p_libvlc_global->p_module_bank )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         return;
     }
     if( --p_libvlc_global->p_module_bank->i_usage )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         return;
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     /* Save the configuration */
     config_AutoSaveConfigFile( p_this );
@@ -247,19 +241,16 @@ void __module_EndBank( vlc_object_t *p_this )
  */
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
-    vlc_value_t lockval;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
     if( p_libvlc_global->p_module_bank->b_builtins )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         return;
     }
     p_libvlc_global->p_module_bank->b_builtins = VLC_TRUE;
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     msg_Dbg( p_this, "checking builtin modules" );
     ALLOCATE_ALL_BUILTINS();
@@ -276,19 +267,16 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
 void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
-    vlc_value_t lockval;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_t *lock = var_AcquireMutex( "libvlc" );
     if( p_libvlc_global->p_module_bank->b_plugins )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         return;
     }
     p_libvlc_global->p_module_bank->b_plugins = VLC_TRUE;
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     msg_Dbg( p_this, "checking plugin modules" );
 
