@@ -931,7 +931,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     intf_thread_t      * p_intf = NULL;
     vout_thread_t      * p_vout = NULL;
-    input_thread_t     * p_input = NULL;
     aout_instance_t    * p_aout = NULL;
     announce_handler_t * p_announce = NULL;
 
@@ -949,15 +948,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free playlist */
     msg_Dbg( p_libvlc, "removing playlist" );
     playlist_ThreadDestroy( p_libvlc->p_playlist );
-
-    /* Free input */
-    msg_Dbg( p_libvlc, "waiting all input end" );
-    while( (p_input = vlc_object_find( p_libvlc, VLC_OBJECT_INPUT, FIND_CHILD )) )
-    {
-        vlc_object_kill( p_input );
-        vlc_thread_join( p_input );
-        vlc_object_release( p_input );
-    }
 
     /* Free video outputs */
     msg_Dbg( p_libvlc, "removing all video outputs" );
