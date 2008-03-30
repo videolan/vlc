@@ -47,7 +47,7 @@
 #define VLC_OBJECT_VOUT        (-9)
 #define VLC_OBJECT_AOUT        (-10)
 #define VLC_OBJECT_SOUT        (-11)
-#define VLC_OBJECT_HTTPD       (-12)
+
 #define VLC_OBJECT_PACKETIZER  (-13)
 #define VLC_OBJECT_ENCODER     (-14)
 #define VLC_OBJECT_DIALOGS     (-15)

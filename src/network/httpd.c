@@ -981,7 +981,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     httpd_host_t *host;
     tls_server_t *p_tls;
     char *psz_host;
-    vlc_value_t  lockval;
+    vlc_value_t  lockval, ptrval;
     int i;
 
     if( psz_hostname == NULL )
@@ -996,14 +996,18 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     /* to be sure to avoid multiple creation */
     var_Create( p_this->p_libvlc, "httpd_mutex", VLC_VAR_MUTEX );
+    var_Create( p_this->p_libvlc, "httpd_object", VLC_VAR_ADDRESS );
     var_Get( p_this->p_libvlc, "httpd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
+    var_Get( p_this->p_libvlc, "httpd_object", &ptrval );
 
-    if( !(httpd = vlc_object_find( p_this, VLC_OBJECT_HTTPD, FIND_ANYWHERE )) )
+    if( ptrval.p_address != NULL )
+        httpd = ptrval.p_address;
+    else
     {
         msg_Info( p_this, "creating httpd" );
         httpd = (httpd_t *)vlc_custom_create( p_this, sizeof (*httpd),
-                                              VLC_OBJECT_HTTPD,
+                                              VLC_OBJECT_GENERIC,
                                               psz_object_type );
         if( httpd == NULL )
         {
@@ -1015,6 +1019,8 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         httpd->i_host = 0;
         httpd->host   = NULL;
 
+        ptrval.p_address = httpd;
+        var_Set( p_this->p_libvlc, "httpd_object", ptrval );
         vlc_object_yield( httpd );
         vlc_object_attach( httpd, p_this->p_libvlc );
     }
@@ -1191,9 +1197,15 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
+        vlc_value_t ptrval;
+
         msg_Dbg( httpd, "no host left, stopping httpd" );
+
+        ptrval.p_address = NULL;
+        var_Set( httpd->p_libvlc, "httpd_object", ptrval );
         vlc_object_detach( httpd );
         vlc_object_release( httpd );
+
     }
     vlc_mutex_unlock( lockval.p_address );
 }
