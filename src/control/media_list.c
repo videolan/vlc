@@ -400,7 +400,7 @@ void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
 
     libvlc_media_descriptor_t * p_md;
 
-    if( index < 0 || index > vlc_array_count( &p_mlist->items ))
+    if( index < 0 || index >= vlc_array_count( &p_mlist->items ))
     {
         libvlc_exception_raise( p_e, "Index out of bounds exception");
         return;
@@ -426,6 +426,12 @@ libvlc_media_list_item_at_index( libvlc_media_list_t * p_mlist,
                                  libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);
+
+    if( index < 0 || index >= vlc_array_count( &p_mlist->items ))
+    {
+        libvlc_exception_raise( p_e, "Index out of bounds exception");
+        return NULL;
+    }
 
     libvlc_media_descriptor_t * p_md;
     p_md = vlc_array_item_at_index( &p_mlist->items, index );
