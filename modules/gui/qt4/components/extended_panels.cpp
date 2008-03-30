@@ -37,6 +37,7 @@
 #include "dialogs/preferences.hpp"
 #include "dialogs_provider.hpp"
 #include "qt4.hpp"
+#include "input_manager.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
 #include <vlc_aout.h>
@@ -1168,6 +1169,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     QToolButton *moinssubs, *plussubs;
 
+    int64_t i_delay;
+
     QVBoxLayout *vboxLayout = new QVBoxLayout( this );
 
     AVBox = new QGroupBox( qtr( "Audio/Video" ) );
@@ -1197,7 +1200,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin->setSingleStep( 0.1 );
     AVSpin->setToolTip( qtr( "A positive value means that\n"
                              "the audio is ahead of the video" ) );
-    AVSpin->setSuffix( "ms" );
+    AVSpin->setSuffix( "s" );
     gridLayout->addWidget( AVSpin, 1, 1, 1, 1 );
     vboxLayout->addWidget( AVBox );
 
@@ -1229,9 +1232,48 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsSpin->setSingleStep( 0.1 );
     subsSpin->setToolTip( qtr( "A positive value means that\n"
                              "the subtitles are ahead of the video" ) );
-    subsSpin->setSuffix( "ms" );
+    subsSpin->setSuffix( "s" );
     subsLayout->addWidget( subsSpin, 1, 1, 1, 1 );
     vboxLayout->addWidget( subsBox );
+
+    /* Various Connects */
+    CONNECT( moinsAV, clicked(), AVSpin, stepDown () );
+    CONNECT( plusAV, clicked(), AVSpin, stepUp () );
+    CONNECT( moinssubs, clicked(), subsSpin, stepDown () );
+    CONNECT( plussubs, clicked(), subsSpin, stepUp () );
+    CONNECT( AVSpin, valueChanged ( double ), this, advanceAudio( double ) ) ;
+    CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
+
+    /* Set it */
+    if( THEMIM->getInput() )
+    {
+        i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
+        AVSpin->setValue( ( (double)i_delay ) / 1000000 );
+        i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
+        subsSpin->setValue( ( (double)i_delay ) / 1000000 );
+    }
+}
+
+void SyncControls::advanceAudio( double f_advance )
+{
+    if( THEMIM->getInput() )
+    {
+        int64_t i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
+        i_delay += f_advance * 1000000;
+        var_SetTime( THEMIM->getInput(), "audio-delay", i_delay );
+        msg_Dbg( p_intf, "I am advancing Audio %d", f_advance );
+    }
+}
+
+void SyncControls::advanceSubs( double f_advance )
+{
+    if( THEMIM->getInput() )
+    {
+        int64_t i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
+        i_delay += f_advance * 1000000;
+        var_SetTime( THEMIM->getInput(), "spu-delay", i_delay );
+        msg_Dbg( p_intf, "I am advancing subtitles %d", f_advance );
+    }
 }
 
 /**********************************************************************
