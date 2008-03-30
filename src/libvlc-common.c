@@ -177,7 +177,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
         p_libvlc_global->b_ready = VLC_TRUE;
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
 
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_object_create( p_libvlc_global, VLC_OBJECT_LIBVLC );
@@ -1056,7 +1055,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
         system_End( p_libvlc );
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
 
     msg_Flush( p_libvlc );
     msg_Destroy( p_libvlc );

@@ -147,8 +147,6 @@ void __module_InitBank( vlc_object_t *p_this )
         p_libvlc_global->p_module_bank->i_usage++;
 
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
-
 }
 
 
@@ -172,17 +170,14 @@ void __module_EndBank( vlc_object_t *p_this )
     if( !p_libvlc_global->p_module_bank )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_libvlc_global, "libvlc" );
         return;
     }
     if( --p_libvlc_global->p_module_bank->i_usage )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_libvlc_global, "libvlc" );
         return;
     }
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
 
     /* Save the configuration */
     config_AutoSaveConfigFile( p_this );
@@ -261,12 +256,10 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
     if( p_libvlc_global->p_module_bank->b_builtins )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_libvlc_global, "libvlc" );
         return;
     }
     p_libvlc_global->p_module_bank->b_builtins = VLC_TRUE;
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
 
     msg_Dbg( p_this, "checking builtin modules" );
     ALLOCATE_ALL_BUILTINS();
@@ -292,12 +285,10 @@ void __module_LoadPlugins( vlc_object_t * p_this )
     if( p_libvlc_global->p_module_bank->b_plugins )
     {
         vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_libvlc_global, "libvlc" );
         return;
     }
     p_libvlc_global->p_module_bank->b_plugins = VLC_TRUE;
     vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc_global, "libvlc" );
 
     msg_Dbg( p_this, "checking plugin modules" );
 
