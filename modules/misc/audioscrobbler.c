@@ -65,6 +65,7 @@ typedef struct audioscrobbler_song_t
     int         i_l;                /**< track length     */
     char        *psz_m;             /**< musicbrainz id   */
     time_t      date;               /**< date since epoch */
+    mtime_t     i_start;            /**< playing start    */
 } audioscrobbler_song_t;
 
 struct intf_sys_t
@@ -546,7 +547,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     p_sys->time_total_pauses = 0;
-    time( &p_sys->p_current_song.date );
+    time( &p_sys->p_current_song.date );        /* to be sent to last.fm */
+    p_sys->p_current_song.i_start = mdate();    /* only used locally */
 
     var_AddCallback( p_input, "state", PlayingChange, p_intf );
     p_sys->b_state_cb = VLC_TRUE;
@@ -573,9 +575,8 @@ static void AddToQueue ( intf_thread_t *p_this )
         goto end;
 
     /* wait for the user to listen enough before submitting */
-    played_time = mdate();
-    played_time -= p_sys->p_current_song.date;
-    played_time -= p_sys->time_total_pauses;
+    played_time = mdate() - p_sys->p_current_song.i_start -
+                            p_sys->time_total_pauses;
     played_time /= 1000000; /* µs → s */
 
     if( ( played_time < 240 ) &&
