@@ -162,57 +162,6 @@ int input_ItemAddOption (input_item_t *item, const char *str)
     return input_ItemAddOpt (item, str, VLC_INPUT_OPTION_TRUSTED);
 }
 
-static inline void input_ItemClean( input_item_t *p_i )
-{
-    int i;
-
-    vlc_event_manager_fini( &p_i->event_manager );
-
-    free( p_i->psz_name );
-    free( p_i->psz_uri );
-    if( p_i->p_stats )
-    {
-        vlc_mutex_destroy( &p_i->p_stats->lock );
-        free( p_i->p_stats );
-    }
-
-    if( p_i->p_meta )
-        vlc_meta_Delete( p_i->p_meta );
-
-    for( i = 0; i < p_i->i_options; i++ )
-        free( p_i->ppsz_options[i] );
-    TAB_CLEAN( p_i->i_options, p_i->ppsz_options );
-    free( p_i->optflagv);
-
-    for( i = 0; i < p_i->i_es; i++ )
-    {
-        es_format_Clean( p_i->es[i] );
-        free( p_i->es[i] );
-    }
-    TAB_CLEAN( p_i->i_es, p_i->es );
-
-    for( i = 0; i < p_i->i_categories; i++ )
-    {
-        info_category_t *p_category = p_i->pp_categories[i];
-        int j;
-
-        for( j = 0; j < p_category->i_infos; j++ )
-        {
-            struct info_t *p_info = p_category->pp_infos[j];
-
-            free( p_info->psz_name);
-            free( p_info->psz_value );
-            free( p_info );
-        }
-        TAB_CLEAN( p_category->i_infos, p_category->pp_infos );
-
-        free( p_category->psz_name );
-        free( p_category );
-    }
-    TAB_CLEAN( p_i->i_categories, p_i->pp_categories );
-
-    vlc_mutex_destroy( &p_i->lock );
-}
 
 VLC_EXPORT( void, input_item_SetMeta, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val ));
 

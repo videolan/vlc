@@ -220,33 +220,6 @@ static inline void input_ControlPush( input_thread_t *p_input,
 
 /** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
  * anyway. */
-static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
-{
-    memset( p_i, 0, sizeof(input_item_t) );
-    p_i->psz_name = NULL;
-    p_i->psz_uri = NULL;
-    TAB_INIT( p_i->i_es, p_i->es );
-    TAB_INIT( p_i->i_options, p_i->ppsz_options );
-    p_i->optflagv = NULL, p_i->optflagc = 0;
-    TAB_INIT( p_i->i_categories, p_i->pp_categories );
-
-    p_i->i_type = ITEM_TYPE_UNKNOWN;
-    p_i->b_fixed_name = VLC_TRUE;
-
-    p_i->p_stats = NULL;
-    p_i->p_meta = NULL;
-
-    vlc_mutex_init( p_o, &p_i->lock );
-    vlc_event_manager_init( &p_i->event_manager, p_i, p_o );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemMetaChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemSubItemAdded );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemDurationChanged );
-    vlc_event_manager_register_event_type( &p_i->event_manager,
-        vlc_InputItemPreparsedChanged );
-}
 
 static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t preparsed )
 {

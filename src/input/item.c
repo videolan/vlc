@@ -34,6 +34,88 @@
 
 static void GuessType( input_item_t *p_item );
 
+/** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
+ * anyway. */
+static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
+{
+    memset( p_i, 0, sizeof(input_item_t) );
+    p_i->psz_name = NULL;
+    p_i->psz_uri = NULL;
+    TAB_INIT( p_i->i_es, p_i->es );
+    TAB_INIT( p_i->i_options, p_i->ppsz_options );
+    p_i->optflagv = NULL, p_i->optflagc = 0;
+    TAB_INIT( p_i->i_categories, p_i->pp_categories );
+
+    p_i->i_type = ITEM_TYPE_UNKNOWN;
+    p_i->b_fixed_name = VLC_TRUE;
+
+    p_i->p_stats = NULL;
+    p_i->p_meta = NULL;
+
+    vlc_mutex_init( p_o, &p_i->lock );
+    vlc_event_manager_init( &p_i->event_manager, p_i, p_o );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemMetaChanged );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemSubItemAdded );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemDurationChanged );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemPreparsedChanged );
+}
+
+static inline void input_ItemClean( input_item_t *p_i )
+{
+    int i;
+
+    vlc_event_manager_fini( &p_i->event_manager );
+
+    free( p_i->psz_name );
+    free( p_i->psz_uri );
+    if( p_i->p_stats )
+    {
+        vlc_mutex_destroy( &p_i->p_stats->lock );
+        free( p_i->p_stats );
+    }
+
+    if( p_i->p_meta )
+        vlc_meta_Delete( p_i->p_meta );
+
+    for( i = 0; i < p_i->i_options; i++ )
+        free( p_i->ppsz_options[i] );
+    TAB_CLEAN( p_i->i_options, p_i->ppsz_options );
+    free( p_i->optflagv);
+
+    for( i = 0; i < p_i->i_es; i++ )
+    {
+        es_format_Clean( p_i->es[i] );
+        free( p_i->es[i] );
+    }
+    TAB_CLEAN( p_i->i_es, p_i->es );
+
+    for( i = 0; i < p_i->i_categories; i++ )
+    {
+        info_category_t *p_category = p_i->pp_categories[i];
+        int j;
+
+        for( j = 0; j < p_category->i_infos; j++ )
+        {
+            struct info_t *p_info = p_category->pp_infos[j];
+
+            free( p_info->psz_name);
+            free( p_info->psz_value );
+            free( p_info );
+        }
+        TAB_CLEAN( p_category->i_infos, p_category->pp_infos );
+
+        free( p_category->psz_name );
+        free( p_category );
+    }
+    TAB_CLEAN( p_i->i_categories, p_i->pp_categories );
+
+    vlc_mutex_destroy( &p_i->lock );
+}
+
 void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )
 {
     vlc_event_t event;
