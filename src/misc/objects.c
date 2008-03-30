@@ -102,6 +102,15 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_object_t *p_new;
     vlc_object_internals_t *p_priv;
 
+    /* NOTE:
+     * VLC objects are laid out as follow:
+     * - first the LibVLC-private per-object data,
+     * - then VLC_COMMON members from vlc_object_t,
+     * - finally, the type-specific data (if any).
+     *
+     * This function initializes the LibVLC and common data,
+     * and zeroes the rest.
+     */
     p_priv = calloc( 1, sizeof( *p_priv ) + i_size );
     if( p_priv == NULL )
         return NULL;
