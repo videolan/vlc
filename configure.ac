@@ -4049,12 +4049,14 @@ dnl
       VLC_ADD_LIBS([xvideo],[-lXxf86vm_pic])
       VLC_ADD_LIBS([x11],[-lXxf86vm_pic])
       VLC_ADD_LIBS([glx],[-lXxf86vm_pic])
+      VLC_ADD_LIBS([xvmc],[-lXxf86vm_pic])
       ac_cv_have_xf86vidmode="yes"
     ],[
       AC_CHECK_LIB(Xxf86vm, XF86VidModeGetViewPort,[
         VLC_ADD_LIBS([xvideo],[-lXxf86vm])
         VLC_ADD_LIBS([x11],[-lXxf86vm])
         VLC_ADD_LIBS([glx],[-lXxf86vm])
+        VLC_ADD_LIBS([xvmc],[-lXxf86vm])
         ac_cv_have_xf86vidmode="yes"
       ])
     ])
