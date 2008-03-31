@@ -993,11 +993,12 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         announce_HandlerDestroy( p_announce );
     }
 
-    msg_Dbg( p_libvlc, "removing remaining input items" );
+    vlc_bool_t b_clean = VLC_TRUE;
     FOREACH_ARRAY( input_item_t *p_del, p_libvlc->input_items )
-        msg_Dbg( p_libvlc, "WARNING: %p input item has not been deleted properly", p_del );
-        /* Don't do anything, faulting code should be fixed */
+        msg_Err( p_libvlc, "input item %p has not been deleted properly: refcount %d", p_del, p_del->i_gc_refcount );
+        b_clean = VLC_FALSE;
     FOREACH_END();
+    assert( b_clean );
     ARRAY_RESET( p_libvlc->input_items );
 
     msg_Dbg( p_libvlc, "removing stats" );
