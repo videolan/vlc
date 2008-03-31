@@ -1381,7 +1381,8 @@ static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, 
     if( b_keep_sout )
     {
         /* Remove the sout from the playlist garbage collector */
-        /* FIXME: we don't want to depend on the playlist */
+        /* FIXME: we don't want to depend on the playlist, sout
+         * should be attached to libvlc */
         playlist_t * p_playlist = vlc_object_find( p_parent,
             VLC_OBJECT_PLAYLIST, FIND_PARENT );
         if( p_playlist )
@@ -1413,10 +1414,14 @@ static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, 
 
     return p_sout;
 }
+
 static void SoutKeep( sout_instance_t *p_sout )
 {
-    /* attach sout to the playlist */
-    playlist_t  *p_playlist = pl_Yield( p_sout );
+    /* FIXME: we don't want to depend on the playlist, sout
+     * should be attached to libvlc */
+    playlist_t * p_playlist = vlc_object_find( p_sout, VLC_OBJECT_PLAYLIST,
+                                               FIND_PARENT );
+    if( !p_playlist ) return;
 
     msg_Dbg( p_sout, "sout has been kept" );
     vlc_object_attach( p_sout, p_playlist );
