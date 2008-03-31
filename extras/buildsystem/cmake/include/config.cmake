@@ -20,6 +20,7 @@ OPTION( ENABLE_DYNAMIC_PLUGINS "Enable dynamic plugin" ON )
 OPTION( UPDATE_CHECK           "Enable automatic new version checking" OFF )
 OPTION( ENABLE_NO_SYMBOL_CHECK "Don't check symbols of modules against libvlc. (Enabling this option speeds up compilation)" OFF )
 OPTION( ENABLE_CONTRIB         "Attempt to use VLC contrib system to get the third-party libraries" ON )
+OPTION( ENABLE_LOADER          "Enable the win32 codec loader" ON )
 
 if(ENABLE_CONTRIB)
 

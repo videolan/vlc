@@ -21,6 +21,10 @@ ln -sf ../$cmake_dir/CMakeLists/src_CMakeLists.txt src/CMakeLists.txt
 echo "Removing old modules/gui/qt4/CMakeLists.txt"
 rm -f modules/gui/qt4/CMakeLists.txt
 
+echo "Installing libs/loaders/CMakeLists.txt"
+rm -f libs/loaders/CMakeLists.txt
+ln -s ../$cmake_dir/CMakeLists/libs_loaders_CMakeLists.txt libs/loaders/CMakeLists.txt
+
 echo "Installing modules/CMakeLists.txt"
 rm -f modules/CMakeLists.txt
 ln -s ../$cmake_dir/CMakeLists/modules_CMakeLists.txt modules/CMakeLists.txt

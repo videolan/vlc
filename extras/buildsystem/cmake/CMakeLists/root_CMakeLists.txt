@@ -29,6 +29,7 @@ add_definitions(-D_GNU_SOURCE)
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 
 # our sources:
+add_subdirectory(libs/loader)
 add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(po)
