@@ -40,10 +40,10 @@
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"
 
-#include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
+#include <vlc_playlist.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -502,7 +502,15 @@ static int Run( input_thread_t *p_input )
     {
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = VLC_TRUE;
-        playlist_Signal( pl_Get( p_input ) );
+
+        /* FIXME: we don't want to depend on the playlist */
+        playlist_t * p_playlist = vlc_object_find( p_input,
+            VLC_OBJECT_PLAYLIST, FIND_PARENT );
+        if( p_playlist )
+        {
+            playlist_Signal( p_playlist );
+            vlc_object_release( p_playlist );
+        }
 
         Error( p_input );
 
@@ -1373,27 +1381,31 @@ static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, 
     if( b_keep_sout )
     {
         /* Remove the sout from the playlist garbage collector */
-        playlist_t *p_playlist = pl_Yield( p_parent );
-
-        vlc_mutex_lock( &p_playlist->gc_lock );
-        p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
-        if( p_sout )
+        /* FIXME: we don't want to depend on the playlist */
+        playlist_t * p_playlist = vlc_object_find( p_parent,
+            VLC_OBJECT_PLAYLIST, FIND_PARENT );
+        if( p_playlist )
         {
-            if( p_sout->p_parent != VLC_OBJECT(p_playlist) )
+            vlc_mutex_lock( &p_playlist->gc_lock );
+            p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
+            if( p_sout )
             {
-                vlc_object_release( p_sout );
-                p_sout = NULL;
-            }
-            else
-            {
-                vlc_object_detach( p_sout );    /* Remove it from the GC */
+                if( p_sout->p_parent != VLC_OBJECT(p_playlist) )
+                {
+                    vlc_object_release( p_sout );
+                    p_sout = NULL;
+                }
+                else
+                {
+                    vlc_object_detach( p_sout );    /* Remove it from the GC */
 
-                vlc_object_release( p_sout );
+                    vlc_object_release( p_sout );
+                }
             }
+            vlc_mutex_unlock( &p_playlist->gc_lock );
+
+            vlc_object_release( p_playlist );
         }
-        vlc_mutex_unlock( &p_playlist->gc_lock );
-
-        pl_Release( p_parent );
     }
 
     if( pb_sout_keep )

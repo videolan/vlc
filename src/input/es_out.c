@@ -1680,12 +1680,17 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 }
             }
             {
-                playlist_t * p_playlist = pl_Yield( p_sys->p_input );
-                PL_LOCK;
-                p_playlist->gc_date = mdate();
-                vlc_object_signal_unlocked( p_playlist );
-                PL_UNLOCK;
-                pl_Release( p_playlist );
+                /* FIXME: we don't want to depend on the playlist */
+                playlist_t * p_playlist = vlc_object_find( p_sys->p_input,
+                    VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                if( p_playlist )
+                {
+                    PL_LOCK;
+                    p_playlist->gc_date = mdate();
+                    vlc_object_signal_unlocked( p_playlist );
+                    PL_UNLOCK;
+                    vlc_object_release( p_playlist );
+                }
             }
             return VLC_SUCCESS;
  
