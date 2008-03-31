@@ -316,6 +316,7 @@ static void test_events (const char ** argv, int argc)
 
 static void test_media_player_play_stop(const char** argv, int argc)
 {
+#if 0
     libvlc_instance_t *vlc;
     libvlc_media_t *md;
     libvlc_media_player_t *mi;
@@ -352,6 +353,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
 
     libvlc_release (vlc);
     catch ();
+#endif
 }
 
 int main (int argc, char *argv[])
