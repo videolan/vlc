@@ -1165,32 +1165,34 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QWidget( _parent ) , p_intf( _p_intf )
 {
     QGroupBox *AVBox, *subsBox;
-    QToolButton *moinsAV, *plusAV;
 
+    QToolButton *moinsAV, *plusAV;
     QToolButton *moinssubs, *plussubs;
     QToolButton *moinssubSpeed, *plussubSpeed;
 
+    QToolButton *updateButton;
 
-    QVBoxLayout *vboxLayout = new QVBoxLayout( this );
+    QGridLayout *mainLayout = new QGridLayout( this );
 
+    /* AV sync */
     AVBox = new QGroupBox( qtr( "Audio/Video" ) );
-    QGridLayout *gridLayout = new QGridLayout( AVBox );
+    QGridLayout *AVLayout = new QGridLayout( AVBox );
 
     moinsAV = new QToolButton;
     moinsAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
     moinsAV->setAutoRaise( true );
     moinsAV->setText( "-" );
-    gridLayout->addWidget( moinsAV, 1, 0, 1, 1 );
+    AVLayout->addWidget( moinsAV, 1, 0, 1, 1 );
 
     plusAV = new QToolButton;
     plusAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
     plusAV->setAutoRaise( true );
     plusAV->setText( "+" );
-    gridLayout->addWidget( plusAV, 1, 2, 1, 1 );
+    AVLayout->addWidget( plusAV, 1, 2, 1, 1 );
 
     QLabel *AVLabel = new QLabel;
     AVLabel->setText( qtr( "Advance of audio over video" ) );
-    gridLayout->addWidget( AVLabel, 0, 0, 1, 3 );
+    AVLayout->addWidget( AVLabel, 0, 0, 1, 3 );
 
     AVSpin = new QDoubleSpinBox;
     AVSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
@@ -1201,10 +1203,11 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin->setToolTip( qtr( "A positive value means that\n"
                              "the audio is ahead of the video" ) );
     AVSpin->setSuffix( "s" );
-    gridLayout->addWidget( AVSpin, 1, 1, 1, 1 );
-    vboxLayout->addWidget( AVBox );
+    AVLayout->addWidget( AVSpin, 1, 1, 1, 1 );
+    mainLayout->addWidget( AVBox, 1, 0, 1, 5 );
 
 
+    /* Subs */
     subsBox = new QGroupBox( qtr( "Subtitles/Video" ) );
     QGridLayout *subsLayout = new QGridLayout( subsBox );
 
@@ -1260,15 +1263,19 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subSpeedSpin->setSingleStep( 0.2 );
     subsLayout->addWidget( subSpeedSpin, 3, 1, 1, 1 );
 
-    vboxLayout->addWidget( subsBox );
+    mainLayout->addWidget( subsBox, 2, 0, 1, 5 );
 
     /* Various Connects */
     CONNECT( moinsAV, clicked(), AVSpin, stepDown () );
     CONNECT( plusAV, clicked(), AVSpin, stepUp () );
     CONNECT( moinssubs, clicked(), subsSpin, stepDown () );
     CONNECT( plussubs, clicked(), subsSpin, stepUp () );
+    CONNECT( moinssubSpeed, clicked(), subSpeedSpin, stepDown () );
+    CONNECT( plussubSpeed, clicked(), subSpeedSpin, stepUp () );
     CONNECT( AVSpin, valueChanged ( double ), this, advanceAudio( double ) ) ;
     CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
+    CONNECT( subSpeedSpin, alueChanged ( double ),
+             this, adjustSubsSpeed( double ) );
 
     /* Set it */
     update();
@@ -1306,6 +1313,14 @@ void SyncControls::advanceSubs( double f_advance )
         i_delay += f_advance * 1000000;
         var_SetTime( THEMIM->getInput(), "spu-delay", i_delay );
         msg_Dbg( p_intf, "I am advancing subtitles %d", f_advance );
+    }
+}
+
+void SyncControls::adjustSubsSpeed( double f_fps )
+{
+    if( THEMIM->getInput() )
+    {
+        var_SetFloat( THEMIM->getInput(), "sub-fps", f_fps );
     }
 }
 

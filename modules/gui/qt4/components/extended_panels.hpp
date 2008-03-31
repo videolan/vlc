@@ -166,6 +166,7 @@ public slots:
 private slots:
     void advanceAudio( double );
     void advanceSubs( double );
+    void adjustSubsSpeed( double );
 };
 
 #endif
