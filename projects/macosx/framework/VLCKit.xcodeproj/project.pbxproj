@@ -282,6 +282,8 @@
 			isa = PBXGroup;
 			children = (
 				EFD551DC0CC6DD720074CEE1 /* VLCLibVLCBridging.h */,
+				EF78BD0D0CAEEEC300354E6E /* VLCEventManager.h */,
+				A7A0CEA20D2EF13000F2C039 /* VLCVideoCommon.h */,
 			);
 			name = Internal;
 			sourceTree = "<group>";
@@ -293,25 +295,31 @@
 			name = "Linked Libraries";
 			sourceTree = "<group>";
 		};
-		EF78BD3B0CAEEFD000354E6E /* Headers */ = {
+		EF6BC9110DA1932F00DD37EF /* Public */ = {
 			isa = PBXGroup;
 			children = (
-				637CFB960D2D281900A041B6 /* Internal */,
 				EF78BD120CAEEEE700354E6E /* VLCKit.h */,
 				637CFB930D2D280800A041B6 /* VLCLibrary.h */,
-				EF78BD0D0CAEEEC300354E6E /* VLCEventManager.h */,
 				EF78BD130CAEEEE700354E6E /* VLCMedia.h */,
 				637D5ABC0CF6F2650073EA45 /* VLCMediaDiscoverer.h */,
 				EF78BD160CAEEEE700354E6E /* VLCMediaList.h */,
 				6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */,
 				EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */,
 				EF78BD150CAEEEE700354E6E /* VLCMediaLibrary.h */,
-				A7A0CEA20D2EF13000F2C039 /* VLCVideoCommon.h */,
 				6341FCAE0D2C0929002A97B7 /* VLCVideoLayer.h */,
 				EF78BD1A0CAEEEE700354E6E /* VLCVideoView.h */,
 				EF78BD190CAEEEE700354E6E /* VLCTime.h */,
 				EF73118E0CB5797B009473B4 /* VLCAudio.h */,
 				632A0F7C0D38F79200AFC99B /* Stream */,
+			);
+			name = Public;
+			sourceTree = "<group>";
+		};
+		EF78BD3B0CAEEFD000354E6E /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				637CFB960D2D281900A041B6 /* Internal */,
+				EF6BC9110DA1932F00DD37EF /* Public */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
