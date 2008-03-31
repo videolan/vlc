@@ -497,7 +497,10 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
         if( i_absolute > i_size )
             i_absolute = i_size;
         if( stream_Tell( p_demux->s ) >= i_size )
+        {
+            msg_Err( p_demux, "Seeking too far : EOF?" );
             return -1;
+        }
     }
 
     if( stream_Seek( p_demux->s, i_absolute ) )
