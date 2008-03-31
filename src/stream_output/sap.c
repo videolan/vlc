@@ -43,6 +43,7 @@
 #include <vlc_charset.h>
 
 #include "stream_output.h"
+#include "libvlc.h"
 
 /* SAP is always on that port */
 #define SAP_PORT 9875
@@ -119,7 +120,8 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
 {
     sap_handler_t *p_sap;
 
-    p_sap = vlc_object_create( p_announce, sizeof( sap_handler_t ) );
+    p_sap = vlc_custom_create( VLC_OBJECT(p_announce), sizeof( sap_handler_t ),
+                               VLC_OBJECT_ANNOUNCE, "announce" );
     if( !p_sap )
     {
         msg_Err( p_announce, "out of memory" );
