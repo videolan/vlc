@@ -549,7 +549,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             p_md = libvlc_playlist_get_media_player( p_plugin->getVLC(), &ex );
             libvlc_exception_init( &ex );
             libvlc_event_attach( libvlc_media_player_event_manager( p_md, &ex ),
-                                 libvlc_MediaInstancePositionChanged, Redraw, NULL, &ex );
+                                 libvlc_MediaPlayerPositionChanged, Redraw, NULL, &ex );
 */
 
             /* set/change parent window */

@@ -245,13 +245,13 @@ static void test_events (const char ** argv, int argc)
     vlc_bool_t callback_was_called;
     libvlc_exception_t ex;
     libvlc_event_type_t mi_events[] = {
-        libvlc_MediaInstancePlayed,
-        libvlc_MediaInstancePaused,
-        libvlc_MediaInstanceEndReached,
-        libvlc_MediaInstanceStopped,
-        libvlc_MediaInstanceEncounteredError,
-        libvlc_MediaInstanceTimeChanged,
-        libvlc_MediaInstancePositionChanged,
+        libvlc_MediaPlayerPlayed,
+        libvlc_MediaPlayerPaused,
+        libvlc_MediaPlayerEndReached,
+        libvlc_MediaPlayerStopped,
+        libvlc_MediaPlayerEncounteredError,
+        libvlc_MediaPlayerTimeChanged,
+        libvlc_MediaPlayerPositionChanged,
     };
     int i, mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
     

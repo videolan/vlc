@@ -149,19 +149,19 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     {
         case END_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
-            event.type = libvlc_MediaInstanceEndReached;
+            event.type = libvlc_MediaPlayerEndReached;
             break;
         case PAUSE_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
-            event.type = libvlc_MediaInstancePaused;
+            event.type = libvlc_MediaPlayerPaused;
             break;
         case PLAYING_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
-            event.type = libvlc_MediaInstancePlayed;
+            event.type = libvlc_MediaPlayerPlayed;
             break;
         case ERROR_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Error, NULL);
-            event.type = libvlc_MediaInstanceEncounteredError;
+            event.type = libvlc_MediaPlayerEncounteredError;
             break;
         default:
             return VLC_SUCCESS;
@@ -183,7 +183,7 @@ input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_event_t event;
 
     libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
-    event.type = libvlc_MediaInstanceSeekableChanged;
+    event.type = libvlc_MediaPlayerSeekableChanged;
     event.u.media_player_seekable_changed.new_seekable = newval.b_bool;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
@@ -202,7 +202,7 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_event_t event;
 
     libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
-    event.type = libvlc_MediaInstancePausableChanged;
+    event.type = libvlc_MediaPlayerPausableChanged;
     event.u.media_player_pausable_changed.new_pausable = newval.b_bool;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
@@ -235,7 +235,7 @@ input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
         val.i_time = newval.i_time;
 
     libvlc_event_t event;
-    event.type = libvlc_MediaInstancePositionChanged;
+    event.type = libvlc_MediaPlayerPositionChanged;
     event.u.media_player_position_changed.new_position = val.f_float;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
@@ -268,7 +268,7 @@ input_time_changed( vlc_object_t * p_this, char const * psz_cmd,
         val.i_time = newval.i_time;
 
     libvlc_event_t event;
-    event.type = libvlc_MediaInstanceTimeChanged;
+    event.type = libvlc_MediaPlayerTimeChanged;
     event.u.media_player_time_changed.new_time = val.i_time;
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -316,23 +316,23 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     }
 
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstanceEndReached, p_e );
+            libvlc_MediaPlayerEndReached, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstanceStopped, p_e );
+            libvlc_MediaPlayerStopped, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstanceEncounteredError, p_e );
+            libvlc_MediaPlayerEncounteredError, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstancePaused, p_e );
+            libvlc_MediaPlayerPaused, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstancePlayed, p_e );
+            libvlc_MediaPlayerPlayed, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstancePositionChanged, p_e );
+            libvlc_MediaPlayerPositionChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstanceTimeChanged, p_e );
+            libvlc_MediaPlayerTimeChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstanceSeekableChanged, p_e );
+            libvlc_MediaPlayerSeekableChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstancePausableChanged, p_e );
+            libvlc_MediaPlayerPausableChanged, p_e );
 
     return p_mi;
 }
@@ -647,7 +647,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     /* Send a stop notification event */
     libvlc_event_t event;
     libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL);
-    event.type = libvlc_MediaInstanceStopped;
+    event.type = libvlc_MediaPlayerStopped;
     libvlc_event_send( p_mi->p_event_manager, &event );
 }
 

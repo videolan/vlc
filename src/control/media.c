@@ -98,7 +98,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     }
 
     /* Construct the event */
-    event.type = libvlc_MediaDescriptorSubItemAdded;
+    event.type = libvlc_MediaSubItemAdded;
     event.u.media_subitem_added.new_child = p_md_child;
 
     /* Send the event */
@@ -116,7 +116,7 @@ static void input_item_meta_changed( const vlc_event_t *p_event,
     libvlc_event_t event;
 
     /* Construct the event */
-    event.type = libvlc_MediaDescriptorMetaChanged;
+    event.type = libvlc_MediaMetaChanged;
     event.u.media_meta_changed.meta_type =
         vlc_to_libvlc_meta[p_event->u.input_item_meta_changed.meta_type];
 
@@ -134,7 +134,7 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
     libvlc_event_t event;
 
     /* Construct the event */
-    event.type = libvlc_MediaDescriptorDurationChanged;
+    event.type = libvlc_MediaDurationChanged;
     event.u.media_duration_changed.new_duration = 
         p_event->u.input_item_duration_changed.new_duration;
 
@@ -152,7 +152,7 @@ static void input_item_preparsed_changed( const vlc_event_t *p_event,
     libvlc_event_t event;
 
     /* Construct the event */
-    event.type = libvlc_MediaDescriptorPreparsedChanged;
+    event.type = libvlc_MediaPreparsedChanged;
     event.u.media_preparsed_changed.new_status = 
         p_event->u.input_item_preparsed_changed.new_status;
 
@@ -254,15 +254,15 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 
     p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDescriptorMetaChanged, p_e );
+        libvlc_MediaMetaChanged, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDescriptorSubItemAdded, p_e );
+        libvlc_MediaSubItemAdded, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDescriptorFreed, p_e );
+        libvlc_MediaFreed, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDescriptorDurationChanged, p_e );
+        libvlc_MediaDurationChanged, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDescriptorStateChanged, p_e );
+        libvlc_MediaStateChanged, p_e );
 
     vlc_gc_incref( p_md->p_input_item );
 
@@ -365,7 +365,7 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     /* Construct the event */
     libvlc_event_t event;
-    event.type = libvlc_MediaDescriptorFreed;
+    event.type = libvlc_MediaFreed;
     event.u.media_freed.md = p_md;
 
     /* Send the event */
@@ -472,7 +472,7 @@ libvlc_media_set_state( libvlc_media_t *p_md,
     p_md->state = state;
 
     /* Construct the event */
-    event.type = libvlc_MediaDescriptorStateChanged;
+    event.type = libvlc_MediaStateChanged;
     event.u.media_state_changed.new_state = state;
 
     /* Send the event */

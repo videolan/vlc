@@ -82,7 +82,7 @@ install_md_listener( libvlc_media_list_view_t * p_mlv,
     {
         /* No mlist, wait for a subitem added event */
         libvlc_event_attach( p_md->p_event_manager,
-                            libvlc_MediaDescriptorSubItemAdded,
+                            libvlc_MediaSubItemAdded,
                             media_list_subitem_added, p_mlv, NULL );
     }
 }
@@ -95,7 +95,7 @@ uninstall_md_listener( libvlc_media_list_view_t * p_mlv,
     libvlc_exception_t ignored_exception;
     libvlc_exception_init( &ignored_exception );
     libvlc_event_detach( p_md->p_event_manager,
-                         libvlc_MediaDescriptorSubItemAdded,
+                         libvlc_MediaSubItemAdded,
                          media_list_subitem_added, p_mlv, &ignored_exception );
     if( libvlc_exception_raised( &ignored_exception ) )
         libvlc_exception_clear( &ignored_exception ); /* We don't care if we encounter an exception */
@@ -154,7 +154,7 @@ media_list_subitem_added( const libvlc_event_t * p_event, void * p_user_data )
         /* We have a mlist to which we're going to listen to events
          * thus, no need to wait for SubItemAdded events */
         libvlc_event_detach( p_md->p_event_manager,
-                             libvlc_MediaDescriptorSubItemAdded,
+                             libvlc_MediaSubItemAdded,
                              media_list_subitem_added, p_mlv, NULL );
         libvlc_media_list_lock( p_mlist );
 

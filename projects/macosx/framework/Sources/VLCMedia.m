@@ -231,10 +231,10 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
              * We also may receive a -retain in some event callback that may occcur
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, NULL);
-//            libvlc_event_detach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaDescriptorStateChanged,    HandleMediaStateChanged,    self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, NULL);
+//            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, NULL);
         }
         [super release];
     }
@@ -444,10 +444,10 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     catch_exception( &ex );
 
     libvlc_event_manager_t * p_em = libvlc_media_event_manager( p_md, &ex );
-    libvlc_event_attach(p_em, libvlc_MediaDescriptorMetaChanged,     HandleMediaMetaChanged,     self, &ex);
-//    libvlc_event_attach(p_em, libvlc_MediaDescriptorDurationChanged, HandleMediaDurationChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaDescriptorStateChanged,    HandleMediaStateChanged,    self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaDescriptorSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, &ex);
+//    libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
     catch_exception( &ex );
     
     libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md, NULL );

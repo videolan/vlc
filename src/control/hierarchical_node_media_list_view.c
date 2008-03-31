@@ -203,7 +203,7 @@ media_list_item_added( const libvlc_event_t * p_event, void * user_data )
     trace("%d\n", index);
     if( index >= 0)
         libvlc_media_list_view_item_added( p_mlv, p_md, index );
-    libvlc_event_attach( p_md->p_event_manager, libvlc_MediaDescriptorSubItemAdded,
+    libvlc_event_attach( p_md->p_event_manager, libvlc_MediaSubItemAdded,
                          items_subitems_added, p_mlv, NULL );
                          
 }
@@ -230,7 +230,7 @@ media_list_item_deleted( const libvlc_event_t * p_event, void * user_data )
     trace("%d\n", index);
     if( index >= 0)
         libvlc_media_list_view_item_deleted( p_mlv, p_md, index );
-    libvlc_event_detach( p_md->p_event_manager, libvlc_MediaDescriptorSubItemAdded,
+    libvlc_event_detach( p_md->p_event_manager, libvlc_MediaSubItemAdded,
                          items_subitems_added, p_mlv, NULL );
 }
 static void

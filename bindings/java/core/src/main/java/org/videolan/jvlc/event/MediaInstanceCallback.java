@@ -52,23 +52,23 @@ public class MediaInstanceCallback implements LibVlcCallback
     @Override
     public void callback(libvlc_event_t libvlc_event, Pointer userData)
     {
-        if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstancePlayed.ordinal())
+        if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPlayed.ordinal())
         {
             listener.played(mediaInstance);
         }
-        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstancePaused.ordinal())
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPaused.ordinal())
         {
             listener.paused(mediaInstance);
         }
-        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstanceEndReached.ordinal())
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerEndReached.ordinal())
         {
             listener.endReached(mediaInstance);
         }
-        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstancePositionChanged.ordinal())
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPositionChanged.ordinal())
         {
             listener.positionChanged(mediaInstance);
         }
-        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstanceTimeChanged.ordinal())
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerTimeChanged.ordinal())
         {
             libvlc_event.event_type_specific.setType(LibVlc.media_player_time_changed.class);
             LibVlc.media_player_time_changed timeChanged = (media_player_time_changed) libvlc_event.event_type_specific

@@ -28,17 +28,17 @@ package org.videolan.jvlc.internal;
 
 public enum LibVlcEventType {
 
-    libvlc_MediaDescriptorMetaChanged,
-    libvlc_MediaDescriptorSubItemAdded,
-    libvlc_MediaDescriptorDurationChanged,
-    libvlc_MediaDescriptorPreparsedChanged,
-    libvlc_MediaDescriptorFreed,
-    libvlc_MediaDescriptorStateChanged,
-    libvlc_MediaInstancePlayed,
-    libvlc_MediaInstancePaused,
-    libvlc_MediaInstanceEndReached,
-    libvlc_MediaInstanceStopped,
-    libvlc_MediaInstanceEncounteredError,
-    libvlc_MediaInstanceTimeChanged,
-    libvlc_MediaInstancePositionChanged;
+    libvlc_MediaMetaChanged,
+    libvlc_MediaSubItemAdded,
+    libvlc_MediaDurationChanged,
+    libvlc_MediaPreparsedChanged,
+    libvlc_MediaFreed,
+    libvlc_MediaStateChanged,
+    libvlc_MediaPlayerPlayed,
+    libvlc_MediaPlayerPaused,
+    libvlc_MediaPlayerEndReached,
+    libvlc_MediaPlayerStopped,
+    libvlc_MediaPlayerEncounteredError,
+    libvlc_MediaPlayerTimeChanged,
+    libvlc_MediaPlayerPositionChanged;
 }
