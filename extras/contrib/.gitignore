@@ -1,14 +1,14 @@
 # Ignore install path
-share/*
-bin/*
-lib/*
-include/*
-man/*
-sbin/*
-etc/*
-gecko-sdk/*
-doc/*
-info/*
+share
+bin
+lib
+include
+man
+sbin
+etc
+gecko-sdk
+doc
+info
 *.bak
 # Ignore fetched contrib
 src/*
