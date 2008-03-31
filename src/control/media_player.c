@@ -149,7 +149,7 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
     {
         case END_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
-            event.type = libvlc_MediaInstanceReachedEnd;
+            event.type = libvlc_MediaInstanceEndReached;
             break;
         case PAUSE_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
@@ -314,9 +314,11 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
         free( p_mi );
         return NULL;
     }
- 
+
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaInstanceReachedEnd, p_e );
+            libvlc_MediaInstanceEndReached, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstanceStopped, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaInstanceEncounteredError, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
@@ -641,6 +643,12 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
         input_StopThread( p_input_thread );
         vlc_object_release( p_input_thread );
     }
+
+    /* Send a stop notification event */
+    libvlc_event_t event;
+    libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL);
+    event.type = libvlc_MediaInstanceStopped;
+    libvlc_event_send( p_mi->p_event_manager, &event );
 }
 
 /**************************************************************************

@@ -170,7 +170,7 @@ static void
 install_media_player_observer( libvlc_media_list_player_t * p_mlp )
 {
     libvlc_event_attach( libvlc_media_player_event_manager( p_mlp->p_mi, NULL ),
-                         libvlc_MediaInstanceReachedEnd,
+                         libvlc_MediaInstanceEndReached,
                           media_player_reached_end, p_mlp, NULL );
 }
 
@@ -185,9 +185,9 @@ uninstall_media_player_observer( libvlc_media_list_player_t * p_mlp )
     {
         return;
     }
-        
+
     libvlc_event_detach( libvlc_media_player_event_manager( p_mlp->p_mi, NULL ),
-                         libvlc_MediaInstanceReachedEnd,
+                         libvlc_MediaInstanceEndReached,
                          media_player_reached_end, p_mlp, NULL );
 }
 

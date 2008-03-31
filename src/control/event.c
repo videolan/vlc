@@ -263,7 +263,8 @@ static const char * event_type_to_name[] =
 
     EVENT(libvlc_MediaInstancePlayed),
     EVENT(libvlc_MediaInstancePaused),
-    EVENT(libvlc_MediaInstanceReachedEnd),
+    EVENT(libvlc_MediaInstanceEndReached),
+    EVENT(libvlc_MediaInstanceStopped),
     EVENT(libvlc_MediaInstanceTimeChanged),
     EVENT(libvlc_MediaInstancePositionChanged),
 

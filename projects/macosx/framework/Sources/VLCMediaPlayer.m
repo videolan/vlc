@@ -92,7 +92,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         newState = VLCMediaPlayerStatePlaying;
     else if( event->type == libvlc_MediaInstancePaused )
         newState = VLCMediaPlayerStatePaused;
-    else if( event->type == libvlc_MediaInstanceReachedEnd )
+    else if( event->type == libvlc_MediaInstanceEndReached )
         newState = VLCMediaPlayerStateStopped;
     else if( event->type == libvlc_MediaInstanceEncounteredError )
         newState = VLCMediaPlayerStateError;
@@ -642,7 +642,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_event_manager_t * p_em = libvlc_media_player_event_manager( instance, &ex );
     libvlc_event_attach( p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, &ex );
     libvlc_event_attach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, &ex );
+    libvlc_event_attach( p_em, libvlc_MediaInstanceEndReached,      HandleMediaInstanceStateChanged, self, &ex );
     /* FIXME: We may want to turn that off when none is interested by that */
     libvlc_event_attach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaPositionChanged,      self, &ex );
     libvlc_event_attach( p_em, libvlc_MediaInstanceTimeChanged,     HandleMediaTimeChanged,          self, &ex );
@@ -654,7 +654,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_event_manager_t * p_em = libvlc_media_player_event_manager( instance, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstancePlayed,          HandleMediaInstanceStateChanged, self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstancePaused,          HandleMediaInstanceStateChanged, self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaInstanceReachedEnd,      HandleMediaInstanceStateChanged, self, NULL );
+    libvlc_event_detach( p_em, libvlc_MediaInstanceEndReached,      HandleMediaInstanceStateChanged, self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstancePositionChanged, HandleMediaPositionChanged,      self, NULL );
     libvlc_event_detach( p_em, libvlc_MediaInstanceTimeChanged,     HandleMediaTimeChanged,          self, NULL );
 }

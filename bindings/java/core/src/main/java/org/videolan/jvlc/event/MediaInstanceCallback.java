@@ -60,7 +60,7 @@ public class MediaInstanceCallback implements LibVlcCallback
         {
             listener.paused(mediaInstance);
         }
-        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstanceReachedEnd.ordinal())
+        else if (libvlc_event.type == LibVlcEventType.libvlc_MediaInstanceEndReached.ordinal())
         {
             listener.endReached(mediaInstance);
         }

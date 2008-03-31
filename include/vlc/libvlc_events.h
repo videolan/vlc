@@ -49,7 +49,8 @@ typedef enum libvlc_event_type_t {
 
     libvlc_MediaInstancePlayed,
     libvlc_MediaInstancePaused,
-    libvlc_MediaInstanceReachedEnd,
+    libvlc_MediaInstanceEndReached,
+    libvlc_MediaInstanceStopped,
     libvlc_MediaInstanceEncounteredError,
     libvlc_MediaInstanceTimeChanged,
     libvlc_MediaInstancePositionChanged,

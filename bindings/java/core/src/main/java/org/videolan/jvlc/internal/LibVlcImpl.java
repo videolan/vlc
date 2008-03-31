@@ -98,11 +98,11 @@ public class LibVlcImpl
 
         libVlc.libvlc_event_attach(
             mediaInstanceEventManager,
-            LibVlcEventType.libvlc_MediaInstanceReachedEnd.ordinal(),
+            LibVlcEventType.libvlc_MediaInstanceEndReached.ordinal(),
             endReached,
             null,
             exception);
-        
+
         JFrame frame = new JFrame("title");
         frame.setVisible(true);
         frame.setLocation(100, 100);

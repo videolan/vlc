@@ -247,7 +247,8 @@ static void test_events (const char ** argv, int argc)
     libvlc_event_type_t mi_events[] = {
         libvlc_MediaInstancePlayed,
         libvlc_MediaInstancePaused,
-        libvlc_MediaInstanceReachedEnd,
+        libvlc_MediaInstanceEndReached,
+        libvlc_MediaInstanceStopped,
         libvlc_MediaInstanceEncounteredError,
         libvlc_MediaInstanceTimeChanged,
         libvlc_MediaInstancePositionChanged,
