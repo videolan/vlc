@@ -148,19 +148,31 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( p_input == NULL )
         goto error;
 
+    PL_LOCK;
+    if( p_playlist->p_ml_onelevel->p_input )
+        vlc_gc_decref( p_playlist->p_ml_onelevel->p_input );
+    if( p_playlist->p_ml_category->p_input )
+        vlc_gc_decref( p_playlist->p_ml_category->p_input );
+
     p_playlist->p_ml_onelevel->p_input =
     p_playlist->p_ml_category->p_input = p_input;
-
     vlc_gc_incref( p_input );
+    PL_UNLOCK;
 
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
 
+    PL_LOCK;
     p_playlist->b_doing_ml = VLC_TRUE;
+    PL_UNLOCK;
+
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
     input_Read( p_playlist, p_input, VLC_TRUE );
     stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
+
+    PL_LOCK;
     p_playlist->b_doing_ml = VLC_FALSE;
+    PL_UNLOCK;
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
