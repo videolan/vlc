@@ -406,7 +406,6 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
 {
     libvlc_instance_t *vlc;
     libvlc_media_t *md;
-    libvlc_media_player_t *mi;
     libvlc_media_list_t *ml;
     libvlc_media_list_player_t *mlp;
     
@@ -432,21 +431,18 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
     libvlc_media_list_player_set_media_list( mlp, ml, &ex );
 
     libvlc_media_list_player_play_item( mlp, md, &ex );
-
-    /* FIXME: Do something clever */
-    sleep(1);
-
-    assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Playing );
+    sleep(1); // play is asynchronous
     catch ();
 
-    libvlc_media_player_pause (mi, &ex);
-    assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Paused );
+    libvlc_media_list_player_pause (mlp, &ex);
     catch();
 
-    libvlc_media_player_stop (mi, &ex);
+    libvlc_media_list_player_stop (mlp, &ex);
     catch ();
 
-    libvlc_media_player_release (mi);
+    libvlc_media_release (md);
+    
+    libvlc_media_list_player_release (mlp);
     catch ();
 
     libvlc_release (vlc);
