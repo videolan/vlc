@@ -9,7 +9,7 @@ doc_DATA = \
 	intf-vcd.txt \
 	$(NULL)
 
-EXTRA_DIST = \
+CHANGELOGS = \
 	ChangeLog-1999 \
 	ChangeLog-2000 \
 	ChangeLog-2001 \
@@ -17,6 +17,12 @@ EXTRA_DIST = \
 	ChangeLog-2003 \
 	ChangeLog-2004 \
 	ChangeLog-2005 \
+	ChangeLog-2006 \
+	ChangeLog-2007 \
+	$(NULL)
+
+EXTRA_DIST = \
+	$(CHANGELOGS) \
 	vlc.1 \
 	vlc-config.1 \
 	bugreport-howto.txt \
@@ -39,3 +45,11 @@ EXTRA_DIST = \
 	win32/Cross-Compile-Howto.txt \
 	demo.sh \
 	$(NULL)
+
+$(CHANGELOGS): Makefile.am
+	y="$$(echo "$@" | sed -e 's,ChangeLog-,,')" ; \
+	git-log \
+		--since="$$y-01-01" \
+		--until="$$y-12-31 23:00:00 -0100" \
+		> "$@"
+
