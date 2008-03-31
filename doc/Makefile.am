@@ -19,6 +19,7 @@ CHANGELOGS = \
 	ChangeLog-2005 \
 	ChangeLog-2006 \
 	ChangeLog-2007 \
+	ChangeLog-2008 \
 	$(NULL)
 
 EXTRA_DIST = \
@@ -53,3 +54,5 @@ $(CHANGELOGS): Makefile.am
 		--until="$$y-12-31 23:00:00 -0100" \
 		> "$@"
 
+# This one needs to be rebuilt all the time :)
+.PHONY: ChangeLog-2008
