@@ -448,7 +448,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
         }
 
         if( i_size <= 0 ||
-            i_size >= ( p - p_block->p_buffer + p_block->i_buffer ) )
+            i_size > ( p_block->p_buffer + p_block->i_buffer - p ) )
         {
             msg_Err( p_dec, "Broken frame : size %d is too big", i_size );
             break;
