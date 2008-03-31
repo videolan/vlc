@@ -50,15 +50,11 @@ EXTRA_DIST = \
 DISTCLEANFILES = $(CHANGELOGS)
 
 $(CHANGELOGS): Makefile.am
-	if test -f "$(top_srcdir)/doc/$@"; then \
-		cp "$(top_srcdir)/doc/$@" "$@" ; \
-	else \
-		y="$$(echo "$@" | sed -e 's,ChangeLog-,,')" ; \
-		git --git-dir=$(top_srcdir)/.git log \
-			--since="$$y-01-01" \
-			--until="$$y-12-31 23:00:00 -0100" \
-			> "$@" ; \
-	fi
+	y="$$(echo "$@" | sed -e 's,ChangeLog-,,')" ; \
+	git --git-dir=$(top_srcdir)/.git log\
+		--since="$$y-01-01" \
+		--until="$$y-12-31 23:00:00 -0100" \
+		> "$@"
 
 # This one needs to be rebuilt all the time :)
 .PHONY: ChangeLog-2008
