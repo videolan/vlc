@@ -149,7 +149,7 @@ rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
 
     while ((ptr - sdes) & 3) /* 32-bits padding */
         *ptr++ = 0;
-    SetWBE (lenptr, ptr - sdes);
+    SetWBE (lenptr, (ptr - sdes - 1) >> 2);
 
     rtcp->length = ptr - rtcp->payload;
     return rtcp;
