@@ -263,8 +263,8 @@
 		632A0F7B0D38F78500AFC99B /* Stream */ = {
 			isa = PBXGroup;
 			children = (
-				632A0EC20D38392E00AFC99B /* VLCStreamOutput.m */,
 				632A0E840D3835C400AFC99B /* VLCStreamSession.m */,
+				632A0EC20D38392E00AFC99B /* VLCStreamOutput.m */,
 			);
 			name = Stream;
 			sourceTree = "<group>";
