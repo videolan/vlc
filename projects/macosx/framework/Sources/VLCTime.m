@@ -25,6 +25,7 @@
 #import <VLCTime.h>
 
 @implementation VLCTime
+/* Factories */
 + (VLCTime *)nullTime
 {
     static VLCTime * nullTime = nil;
@@ -38,12 +39,7 @@
     return [[[VLCTime alloc] initWithNumber:aNumber] autorelease];
 }
 
-// TODO: Implement [VLCTime timeWithString]
-//+ (VLCTime *)timeWithString:(NSString *)aString
-//{
-//  return [[[VLCTime alloc] initWithString:aString] autorelease];
-//}
-
+/* Initializers */
 - (id)initWithNumber:(NSNumber *)aNumber
 {
     if (self = [super init])
@@ -56,23 +52,19 @@
     return self;
 }
 
-// TODO: Implement [VLCTime initWithString]
-//- (id)initWithString:(NSString *)aString
-//{
-//  // Sounds like a good idea but I really don't think there is any value added
-//  if (self = [super init])
-//  {
-//      // convert value
-//  }
-//  return self;
-//}
-
 - (void)dealloc
 {
     [value release];
     [super dealloc];
 }
 
+/* NSObject Overrides */
+- (NSString *)description
+{
+    return self.stringValue;
+}
+
+/* Operations */
 - (NSNumber *)numberValue
 {
     return value ? [[value copy] autorelease] : nil;
@@ -103,10 +95,5 @@
         return NSOrderedDescending;
     else
         return [value compare:aTime.numberValue];
-}
-
-- (NSString *)description
-{
-    return self.stringValue;
 }
 @end

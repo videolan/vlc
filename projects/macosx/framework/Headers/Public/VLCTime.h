@@ -35,11 +35,9 @@
 /* Factories */
 + (VLCTime *)nullTime;
 + (VLCTime *)timeWithNumber:(NSNumber *)aNumber;
-//+ (VLCTime *)timeWithString:(NSString *)aString;
 
 /* Initializers */
 - (id)initWithNumber:(NSNumber *)aNumber;
-//- (id)initWithString:(NSString *)aString;
 
 /* Properties */
 @property (readonly) NSNumber * numberValue;
