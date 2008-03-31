@@ -67,6 +67,8 @@ static void test_core (const char ** argv, int argc);
 static void test_media_list (const char ** argv, int argc);
 static void test_events (const char ** argv, int argc);
 static void test_media_player_play_stop(const char** argv, int argc);
+static void test_media_player_pause_stop(const char** argv, int argc);
+static void test_media_list_player_pause_stop(const char** argv, int argc);
 
 /* Tests implementations */
 static void test_core (const char ** argv, int argc)
@@ -356,6 +358,103 @@ static void test_media_player_play_stop(const char** argv, int argc)
 #endif
 }
 
+static void test_media_player_pause_stop(const char** argv, int argc)
+{
+    libvlc_instance_t *vlc;
+    libvlc_media_t *md;
+    libvlc_media_player_t *mi;
+    const char * file = "file://../bindings/java/core/src/test/resources/raffa_voice.ogg";
+
+    log ("Testing play and pause of %s\n", file);
+
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (argc, argv, &ex);
+    catch ();
+
+    md = libvlc_media_new (vlc, file, &ex);
+    catch ();
+
+    mi = libvlc_media_player_new_from_media (md, &ex);
+    catch ();
+    
+    libvlc_media_release (md);
+
+    libvlc_media_player_play (mi, &ex);
+    catch ();
+
+    /* FIXME: Do something clever */
+    sleep(1);
+
+    assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Playing );
+    catch ();
+
+    libvlc_media_player_pause (mi, &ex);
+    assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Paused );
+    catch();
+
+    libvlc_media_player_stop (mi, &ex);
+    catch ();
+
+    libvlc_media_player_release (mi);
+    catch ();
+
+    libvlc_release (vlc);
+    catch ();
+}
+
+static void test_media_list_player_pause_stop(const char** argv, int argc)
+{
+    libvlc_instance_t *vlc;
+    libvlc_media_t *md;
+    libvlc_media_player_t *mi;
+    libvlc_media_list_t *ml;
+    libvlc_media_list_player_t *mlp;
+    
+    const char * file = "file://../bindings/java/core/src/test/resources/raffa_voice.ogg";
+
+    log ("Testing play and pause of %s using the media list.\n", file);
+
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (argc, argv, &ex);
+    catch ();
+
+    md = libvlc_media_new (vlc, file, &ex);
+    catch ();
+
+    ml = libvlc_media_list_new (vlc, &ex);
+    catch ();
+    
+    mlp = libvlc_media_list_player_new (vlc, &ex);
+
+    libvlc_media_list_add_media( ml, md, &ex );
+    catch ();
+
+    libvlc_media_list_player_set_media_list( mlp, ml, &ex );
+
+    libvlc_media_list_player_play_item( mlp, md, &ex );
+
+    /* FIXME: Do something clever */
+    sleep(1);
+
+    assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Playing );
+    catch ();
+
+    libvlc_media_player_pause (mi, &ex);
+    assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Paused );
+    catch();
+
+    libvlc_media_player_stop (mi, &ex);
+    catch ();
+
+    libvlc_media_player_release (mi);
+    catch ();
+
+    libvlc_release (vlc);
+    catch ();
+}
+
+
+
 int main (int argc, char *argv[])
 {
     const char *args[argc + 5];
@@ -380,5 +479,9 @@ int main (int argc, char *argv[])
 
     test_media_player_play_stop(args, nlibvlc_args);
 
+    test_media_player_pause_stop(args, nlibvlc_args);
+
+    test_media_list_player_pause_stop(args, nlibvlc_args);
+    
     return 0;
 }
