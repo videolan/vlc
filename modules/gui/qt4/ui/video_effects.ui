@@ -94,10 +94,7 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-       <property name="horizontalSpacing" >
-        <number>0</number>
-       </property>
-       <property name="verticalSpacing" >
+       <property name="spacing" >
         <number>0</number>
        </property>
        <item row="0" column="1" >
