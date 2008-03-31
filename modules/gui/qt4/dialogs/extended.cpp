@@ -70,7 +70,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     mainTabW->addTab( videoWidget, qtr( "Video Effects" ) );
 
     SyncControls *syncW = new SyncControls( p_intf, videoTab );
-    mainTabW->addTab( syncW, qtr( "A/V Synchronisation" ) );
+    mainTabW->addTab( syncW, qtr( "Synchro." ) );
 
     if( module_Exists( p_intf, "v4l2" ) )
     {
