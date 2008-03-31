@@ -47,6 +47,8 @@ EXTRA_DIST = \
 	demo.sh \
 	$(NULL)
 
+DISTCLEANFILES = $(CHANGELOGS)
+
 $(CHANGELOGS): Makefile.am
 	y="$$(echo "$@" | sed -e 's,ChangeLog-,,')" ; \
 	git-log \
