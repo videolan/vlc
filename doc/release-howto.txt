@@ -5,13 +5,13 @@
 
  * Tests : compilation, regression tests ...
 
- * Changes on the svn repository
+ * Changes on the git repository
    - update the version number everywhere it's needed
      · configure.ac
      · extras/MacOSX/vlc.pbprj/project.pbxproj
      · extras/MacOSX/Resources/English.lproj/InfoPlist.string
    - update the ChangeLog and NEWS files, as well as the Trac database
-     · LANG=C svn log -v -r '{YYYY-12-31}:{YYYY-01-01}' >! ChangeLog
+     · LANG=C git log --since="01-01" --until="12-31" >! ChangeLog
      · read all the commits and add important things to the NEWS file
      · update the milestones info on https://trac.videolan.org/vlc
    - Add a note about the matching contrib package in INSTALL.win32
@@ -28,7 +28,7 @@
     (use gpg --sign --detach --armor --force-v3-sigs)
 
  * Contribs
-  - Put a copy of the libraries or svn snapshot in vlc-X.X.X/contrib
+  - Put a copy of the libraries or git snapshot in vlc-X.X.X/contrib
   - Put the relevant win32 contrib package
   - Update developers.v.o/vlc and www.v.o/vlc/download-sources.html
 
@@ -56,9 +56,14 @@
  * Commit changes ... it never works the first time
 
  * "Tag" the release
-    svn cp svn://svn.videolan.org/vlc/trunk svn://svn.videolan.org/vlc/tag/X.X.X
-    or
-    svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
+
+    First make sure you git-commit-ed the ChangeLog all the version release related changes, then:
+
+    git tag -a -m "VLC Release RELEASE_VERSION" <RELEASE_VERSION>
+    (Create an annotated tag, you can skip -a if you used -m)
+    git push origin <RELEASE_VERSION>
+
+    (You are advised to play with it on the sandrox.git if you feel unconfortable)
 
  * Move /opt/ftp/pub/videolan/testing/vlc-X.X.X to /opt/ftp/pub/videolan/vlc/X.X.X
   - At first block access to this directory by http or ftp. Only authorize rsync.
