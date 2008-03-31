@@ -10,8 +10,6 @@
      · configure.ac
      · extras/MacOSX/vlc.pbprj/project.pbxproj
      · extras/MacOSX/Resources/English.lproj/InfoPlist.string
-   - update the ChangeLog and NEWS files, as well as the Trac database
-     · LANG=C git log --since="01-01" --until="12-31" >! ChangeLog
      · read all the commits and add important things to the NEWS file
      · update the milestones info on https://trac.videolan.org/vlc
    - Add a note about the matching contrib package in INSTALL.win32
@@ -56,8 +54,6 @@
  * Commit changes ... it never works the first time
 
  * "Tag" the release
-
-    First make sure you git-commit-ed the ChangeLog all the version release related changes, then:
 
     git tag -a -m "VLC Release VERSION" <VERSION>
     (Create an annotated tag, you can skip -a if you used -m)
