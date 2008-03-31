@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="currentIndex" >
-   <number>4</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="tab" >
    <attribute name="title" >
@@ -94,7 +94,10 @@
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" >
-       <property name="spacing" >
+       <property name="horizontalSpacing" >
+        <number>0</number>
+       </property>
+       <property name="verticalSpacing" >
         <number>0</number>
        </property>
        <item row="0" column="1" >
@@ -644,7 +647,7 @@
      </widget>
     </item>
     <item row="1" column="0" >
-     <widget class="QGroupBox" name="groupBox" >
+     <widget class="QGroupBox" name="panoramixEnable" >
       <property name="title" >
        <string>_("Panoramix")</string>
       </property>
@@ -680,7 +683,7 @@
         </widget>
        </item>
        <item row="1" column="1" >
-        <widget class="QSpinBox" name="panoColsSpin" >
+        <widget class="QSpinBox" name="panorColsSpin" >
          <property name="minimum" >
           <number>1</number>
          </property>
