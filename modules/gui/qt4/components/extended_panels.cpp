@@ -186,8 +186,8 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( wallColsSpin, valueChanged( int ) )
 
     SETUP_VFILTER( panoramix )
-    SETUP_VFILTER_OPTION( panorRowsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( panorColsSpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( panoramixRowsSpin, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( panoramixColsSpin, valueChanged( int ) )
 
 
     SETUP_VFILTER( erase )
