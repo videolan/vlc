@@ -1182,17 +1182,17 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     moinsAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
     moinsAV->setAutoRaise( true );
     moinsAV->setText( "-" );
-    AVLayout->addWidget( moinsAV, 1, 0, 1, 1 );
+    AVLayout->addWidget( moinsAV, 0, 1, 1, 1 );
 
     plusAV = new QToolButton;
     plusAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
     plusAV->setAutoRaise( true );
     plusAV->setText( "+" );
-    AVLayout->addWidget( plusAV, 1, 2, 1, 1 );
+    AVLayout->addWidget( plusAV, 0, 3, 1, 1 );
 
     QLabel *AVLabel = new QLabel;
-    AVLabel->setText( qtr( "Advance of audio over video" ) );
-    AVLayout->addWidget( AVLabel, 0, 0, 1, 3 );
+    AVLabel->setText( qtr( "Advance of audio over video:" ) );
+    AVLayout->addWidget( AVLabel, 0, 0, 1, 1 );
 
     AVSpin = new QDoubleSpinBox;
     AVSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
@@ -1203,7 +1203,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin->setToolTip( qtr( "A positive value means that\n"
                              "the audio is ahead of the video" ) );
     AVSpin->setSuffix( "s" );
-    AVLayout->addWidget( AVSpin, 1, 1, 1, 1 );
+    AVLayout->addWidget( AVSpin, 0, 2, 1, 1 );
     mainLayout->addWidget( AVBox, 1, 0, 1, 5 );
 
 
@@ -1215,17 +1215,17 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     moinssubs->setToolButtonStyle( Qt::ToolButtonTextOnly );
     moinssubs->setAutoRaise( true );
     moinssubs->setText( "-" );
-    subsLayout->addWidget( moinssubs, 1, 0, 1, 1 );
+    subsLayout->addWidget( moinssubs, 0, 1, 1, 1 );
 
     plussubs = new QToolButton;
     plussubs->setToolButtonStyle( Qt::ToolButtonTextOnly );
     plussubs->setAutoRaise( true );
     plussubs->setText( "+" );
-    subsLayout->addWidget( plussubs, 1, 2, 1, 1 );
+    subsLayout->addWidget( plussubs, 0, 3, 1, 1 );
 
     QLabel *subsLabel = new QLabel;
-    subsLabel->setText( qtr( "Advance of subtitles over video" ) );
-    subsLayout->addWidget( subsLabel, 0, 0, 1, 3 );
+    subsLabel->setText( qtr( "Advance of subtitles over video:" ) );
+    subsLayout->addWidget( subsLabel, 0, 0, 1, 1 );
 
     subsSpin = new QDoubleSpinBox;
     subsSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
@@ -1236,24 +1236,24 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsSpin->setToolTip( qtr( "A positive value means that\n"
                              "the subtitles are ahead of the video" ) );
     subsSpin->setSuffix( "s" );
-    subsLayout->addWidget( subsSpin, 1, 1, 1, 1 );
+    subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
 
 
     moinssubSpeed = new QToolButton;
     moinssubSpeed->setToolButtonStyle( Qt::ToolButtonTextOnly );
     moinssubSpeed->setAutoRaise( true );
     moinssubSpeed->setText( "-" );
-    subsLayout->addWidget( moinssubSpeed, 3, 0, 1, 1 );
+    subsLayout->addWidget( moinssubSpeed, 1, 1, 1, 1 );
 
     plussubSpeed = new QToolButton;
     plussubSpeed->setToolButtonStyle( Qt::ToolButtonTextOnly );
     plussubSpeed->setAutoRaise( true );
     plussubSpeed->setText( "+" );
-    subsLayout->addWidget( plussubSpeed, 3, 2, 1, 1 );
+    subsLayout->addWidget( plussubSpeed, 1, 3, 1, 1 );
 
     QLabel *subSpeedLabel = new QLabel;
-    subSpeedLabel->setText( qtr( "Speed of the subtitles" ) );
-    subsLayout->addWidget( subSpeedLabel, 2, 0, 1, 3 );
+    subSpeedLabel->setText( qtr( "Speed of the subtitles:" ) );
+    subsLayout->addWidget( subSpeedLabel, 1, 0, 1, 3 );
 
     subSpeedSpin = new QDoubleSpinBox;
     subSpeedSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
@@ -1261,9 +1261,16 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subSpeedSpin->setMinimum( 1 );
     subSpeedSpin->setMaximum( 100 );
     subSpeedSpin->setSingleStep( 0.2 );
-    subsLayout->addWidget( subSpeedSpin, 3, 1, 1, 1 );
+    subsLayout->addWidget( subSpeedSpin, 1, 2, 1, 1 );
 
-    mainLayout->addWidget( subsBox, 2, 0, 1, 5 );
+    mainLayout->addWidget( subsBox, 2, 0, 2, 5 );
+
+    updateButton = new QToolButton;
+    updateButton->setAutoRaise( true );
+    updateButton->setText( "u" );
+    updateButton->setToolTip( qtr( "Force update of the values in this dialog" ) );
+    mainLayout->addWidget( updateButton, 0, 4, 1, 1 );
+
 
     /* Various Connects */
     CONNECT( moinsAV, clicked(), AVSpin, stepDown () );
@@ -1274,8 +1281,9 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( plussubSpeed, clicked(), subSpeedSpin, stepUp () );
     CONNECT( AVSpin, valueChanged ( double ), this, advanceAudio( double ) ) ;
     CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
-    CONNECT( subSpeedSpin, alueChanged ( double ),
+    CONNECT( subSpeedSpin, valueChanged ( double ),
              this, adjustSubsSpeed( double ) );
+    BUTTONACT( updateButton, update() );
 
     /* Set it */
     update();
