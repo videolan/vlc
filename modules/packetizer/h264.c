@@ -223,25 +223,37 @@ static int Open( vlc_object_t *p_this )
         i_sps = (*p++)&0x1f;
         for( i = 0; i < i_sps; i++ )
         {
-            int i_length = GetWBE( p );
-            block_t *p_sps = nal_get_annexeb( p_dec, p + 2, i_length );
-
+            uint16_t i_length = GetWBE( p ); p += 2;
+            if( i_length >
+                (uint8_t*)p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra - p )
+            {
+                return VLC_EGENERIC;
+            }
+            block_t *p_sps = nal_get_annexeb( p_dec, p, i_length );
+            if( !p_sps )
+                return VLC_EGENERIC;
             p_sys->p_sps = block_Duplicate( p_sps );
             p_sps->i_pts = p_sps->i_dts = mdate();
             ParseNALBlock( p_dec, p_sps );
-            p += 2 + i_length;
+            p += i_length;
         }
         /* Read PPS */
         i_pps = *p++;
         for( i = 0; i < i_pps; i++ )
         {
-            int i_length = GetWBE( p );
-            block_t *p_pps = nal_get_annexeb( p_dec, p + 2, i_length );
-
+            uint16_t i_length = GetWBE( p ); p += 2;
+            if( i_length >
+                (uint8_t*)p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra - p )
+            {
+                return VLC_EGENERIC;
+            }
+            block_t *p_pps = nal_get_annexeb( p_dec, p, i_length );
+            if( !p_pps )
+                return VLC_EGENERIC;
             p_sys->p_pps = block_Duplicate( p_pps );
             p_pps->i_pts = p_pps->i_dts = mdate();
             ParseNALBlock( p_dec, p_pps );
-            p += 2 + i_length;
+            p += i_length;
         }
         msg_Dbg( p_dec, "avcC length size=%d, sps=%d, pps=%d",
                  p_sys->i_avcC_length_size, i_sps, i_pps );
