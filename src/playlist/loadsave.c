@@ -143,6 +143,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     const char *const psz_option = "meta-file";
     /* that option has to be cleaned in input_item_subitem_added() */
+    /* vlc_gc_decref() in the same function */
     p_input = input_ItemNewExt( p_playlist, psz_uri,
                                 _("Media Library"), 1, &psz_option, -1 );
     if( p_input == NULL )
@@ -156,6 +157,8 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     p_playlist->p_ml_onelevel->p_input =
     p_playlist->p_ml_category->p_input = p_input;
+    /* We save the input at two different place, incref */
+    vlc_gc_incref( p_input );
     vlc_gc_incref( p_input );
     PL_UNLOCK;
 
@@ -176,6 +179,8 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
+
+    vlc_gc_decref( p_input );
 
     free( psz_uri );
     return VLC_SUCCESS;
