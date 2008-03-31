@@ -1168,8 +1168,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     QToolButton *moinsAV, *plusAV;
 
     QToolButton *moinssubs, *plussubs;
+    QToolButton *moinssubSpeed, *plussubSpeed;
 
-    int64_t i_delay;
 
     QVBoxLayout *vboxLayout = new QVBoxLayout( this );
 
@@ -1234,6 +1234,32 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
                              "the subtitles are ahead of the video" ) );
     subsSpin->setSuffix( "s" );
     subsLayout->addWidget( subsSpin, 1, 1, 1, 1 );
+
+
+    moinssubSpeed = new QToolButton;
+    moinssubSpeed->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    moinssubSpeed->setAutoRaise( true );
+    moinssubSpeed->setText( "-" );
+    subsLayout->addWidget( moinssubSpeed, 3, 0, 1, 1 );
+
+    plussubSpeed = new QToolButton;
+    plussubSpeed->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    plussubSpeed->setAutoRaise( true );
+    plussubSpeed->setText( "+" );
+    subsLayout->addWidget( plussubSpeed, 3, 2, 1, 1 );
+
+    QLabel *subSpeedLabel = new QLabel;
+    subSpeedLabel->setText( qtr( "Speed of the subtitles" ) );
+    subsLayout->addWidget( subSpeedLabel, 2, 0, 1, 3 );
+
+    subSpeedSpin = new QDoubleSpinBox;
+    subSpeedSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    subSpeedSpin->setDecimals( 3 );
+    subSpeedSpin->setMinimum( 1 );
+    subSpeedSpin->setMaximum( 100 );
+    subSpeedSpin->setSingleStep( 0.2 );
+    subsLayout->addWidget( subSpeedSpin, 3, 1, 1, 1 );
+
     vboxLayout->addWidget( subsBox );
 
     /* Various Connects */
@@ -1245,12 +1271,19 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
 
     /* Set it */
+    update();
+}
+
+void SyncControls::update()
+{
+    int64_t i_delay;
     if( THEMIM->getInput() )
     {
         i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
         AVSpin->setValue( ( (double)i_delay ) / 1000000 );
         i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
         subsSpin->setValue( ( (double)i_delay ) / 1000000 );
+        subSpeedSpin->setValue( var_GetFloat( THEMIM->getInput(), "sub-fps" ) );
     }
 }
 

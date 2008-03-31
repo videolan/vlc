@@ -160,6 +160,9 @@ private:
     intf_thread_t *p_intf;
     QDoubleSpinBox *AVSpin;
     QDoubleSpinBox *subsSpin;
+    QDoubleSpinBox *subSpeedSpin;
+public slots:
+    void update();
 private slots:
     void advanceAudio( double );
     void advanceSubs( double );
