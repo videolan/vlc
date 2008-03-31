@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVideoView.h: VLC.framework VLCVideoView header
+ * VLCVideoView.h: VLCKit.framework VLCVideoView header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -34,6 +34,7 @@
     BOOL hasVideo;
 }
 
+/* Properties */
 @property (assign) id delegate;
 @property (copy) NSColor *backColor;
 @property BOOL fillScreen;

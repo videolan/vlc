@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCTime.h: VLC.framework VLCTime header
+ * VLCTime.h: VLCKit.framework VLCTime header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaPlayer.h: VLC.framework VLCMediaPlayer header
+ * VLCMediaPlayer.h: VLCKit.framework VLCMediaPlayer header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -34,7 +34,7 @@ extern NSString * VLCMediaPlayerTimeChanged;
 extern NSString * VLCMediaPlayerStateChanged;
 
 /**
- * TODO: Documentation VLCMediaPlayerState
+ * VLCMediaPlayerState describes the state of the media player.
  */
 typedef enum VLCMediaPlayerState
 {
@@ -48,7 +48,9 @@ typedef enum VLCMediaPlayerState
 } VLCMediaPlayerState;
 
 /**
- * TODO: Documentation extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState)
+ * Returns the name of the player state as a string.
+ * \param state The player state.
+ * \return A string containing the name of state. If state is not a valid state, returns nil.
  */
 extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
@@ -58,12 +60,16 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 @protocol VLCMediaPlayerDelegate
 /**
- * TODO: Documentation - [VLCMediaPlayerDelegate ]
+ * Sent by the default notification center whenever the player's time has changed.
+ * \details Discussion The value of aNotification is always an VLCMediaPlayerTimeChanged notification. You can retrieve 
+ * the VLCMediaPlayer object in question by sending object to aNotification.
  */
 - (void)mediaPlayerTimeChanged:(NSNotification *)aNotification;
 
 /**
- * TODO: Documentation - [VLCMediaPlayerDelegate ]
+ * Sent by the default notification center whenever the player's state has changed.
+ * \details Discussion The value of aNotification is always an VLCMediaPlayerStateChanged notification. You can retrieve 
+ * the VLCMediaPlayer object in question by sending object to aNotification.
  */
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification;
 @end
@@ -72,12 +78,11 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @interface VLCMediaPlayer : NSObject 
 {
     id delegate;                        //< Object delegate
-
     void * instance;                    //  Internal
     VLCMedia * media;                   //< Current media being played
-    VLCTime * cachedTime;
-    VLCMediaPlayerState cachedState;
-    float position;
+    VLCTime * cachedTime;               //< Cached time of the media being played
+    VLCMediaPlayerState cachedState;    //< Cached state of the media being played
+    float position;                     //< The position of the media being played
 }
 
 /* Initializers */

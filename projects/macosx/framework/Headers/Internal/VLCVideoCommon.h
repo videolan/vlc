@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVideoCommon.h: VLC.framework VLCVideoCommon header
+ * VLCVideoCommon.h: VLCKit.framework VLCVideoCommon header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -24,14 +24,19 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+/**
+ * TODO: Documentation
+ */
 @interface VLCVideoLayoutManager : NSObject
 {
     CGSize originalVideoSize;
     BOOL  fillScreenEntirely;
 }
-@property BOOL  fillScreenEntirely;
-@property CGSize originalVideoSize;
 
+/* Factories */
 + (id)layoutManager;
 
+/* Properties */
+@property BOOL  fillScreenEntirely;
+@property CGSize originalVideoSize;
 @end

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCEventManager.h: VLC.framework VLCEventManager header
+ * VLCEventManager.h: VLCKit.framework VLCEventManager header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

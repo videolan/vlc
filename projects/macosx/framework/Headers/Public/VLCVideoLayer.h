@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVideoLayer.h: VLC.framework VLCVideoLayer header
+ * VLCVideoLayer.h: VLCKit.framework VLCVideoLayer header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -28,6 +28,8 @@
 {
     BOOL hasVideo;
 }
+
+/* Properties */
 @property (readonly) BOOL hasVideo;
 @property BOOL fillScreen;
 @end

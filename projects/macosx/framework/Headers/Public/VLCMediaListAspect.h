@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaLisAspect.h: VLC.framework VLCMediaLisAspect header
+ * VLCMediaLisAspect.h: VLCKit.framework VLCMediaLisAspect header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

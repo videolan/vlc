@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLC.h: VLC.framework main header
+ * VLCKit.h: VLCKit.framework main header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -22,8 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_FRAMEWORK_VLC_H
-#define VLC_FRAMEWORK_VLC_H
+/**
+ * TODO: Framework Documetnation
+ */
 
 #import <VLCKit/VLCLibrary.h>
 #import <VLCKit/VLCMedia.h>
@@ -43,5 +44,3 @@
 @class VLCMediaList;
 @class VLCTime;
 @class VLCVideoView;
-
-#endif /* VLC_FRAMEWORK_VLC_H */

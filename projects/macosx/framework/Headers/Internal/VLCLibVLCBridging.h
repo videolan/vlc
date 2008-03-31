@@ -1,5 +1,5 @@
 /*****************************************************************************
-* VLCLibVLCbridging.h: VLC.framework VLCLibVLCBridging (Private) header
+* VLCLibVLCbridging.h: VLCKit.framework VLCLibVLCBridging (Private) header
 *****************************************************************************
 * Copyright (C) 2007 Pierre d'Herbemont
 * Copyright (C) 2007 the VideoLAN team
@@ -26,21 +26,18 @@
 #import "VLCMediaListAspect.h"
 #import "VLCStreamOutput.h"
 
+/* Utility functions */
 /**
- * Bridges functionality between libvlc and VLCMediaList implementation.
+ * \function catch_execption( ex )
+ * Utility function that catches a LibVLC generated exception by throwing a Cocoa based NSException.  
+ * \param ex LibVLC exception returned by LibVLC internal functions.
  */
-
-/*
- * Utility function
- */
-
 #define catch_exception( ex ) __catch_exception( (void *)(ex), __FUNCTION__, __FILE__, __LINE__ )
 extern void __catch_exception( void * e, const char * function, const char * file, int line_number );
 
-/*
- * @interface VLC(class) (LibVLCBridging)
+/**
+ * Bridges functionality between libvlc and VLCMediaList implementation.
  */
-
 @interface VLCMediaList (LibVLCBridging)
 /* Factories */
 /**
@@ -103,8 +100,6 @@ extern void __catch_exception( void * e, const char * function, const char * fil
  * \param value
  */
 - (void)setLength:(VLCTime *)value;
-
-
 @end
 
 /**
@@ -177,6 +172,9 @@ extern void __catch_exception( void * e, const char * function, const char * fil
 - (id)initWithLibrary:(VLCLibrary *)library;
 @end
 
+/**
+ * TODO: Documentation
+ */
 @interface VLCStreamOutput (LibVLCBridge)
 - (NSString *)representedLibVLCOptions;
 @end

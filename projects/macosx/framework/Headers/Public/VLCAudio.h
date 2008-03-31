@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCAudio.h: VLC.framework VLCAudio header
+ * VLCAudio.h: VLCKit.framework VLCAudio header
  *****************************************************************************
  * Copyright (C) 2007 Faustino E. Osuna
  * Copyright (C) 2007 the VideoLAN team

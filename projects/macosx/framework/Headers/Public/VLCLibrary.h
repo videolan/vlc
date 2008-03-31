@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibrary.h: VLC.framework VLCLibrary implementation
+ * VLCLibrary.h: VLCKit.framework VLCLibrary implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -27,15 +27,20 @@
 #import "VLCMediaList.h"
 #import "VLCMedia.h"
 
-
+// FIXME: Hide from public header
 extern void * CreateSharedLibraryOnStartup( void ) __attribute__((constructor));
 extern void * DestroySharedLibraryAtExit( void ) __attribute__((destructor));
 
 @class VLCAudio;
 
 /**
- * VLCLibrary object.
- * TODO: Documentation VLCLibrary
+ * The VLCLibrary is the base library of the VLCKit.framework.  This object provides a shared instance that exposes the
+ * internal functionalities of libvlc and libvlc-control. The VLCLibrary object is instantiated automatically when
+ * VLCKit.framework is loaded into memory.  Also, it is automatically destroyed when the VLCKit.framework is unloaded
+ * from memory.
+ *
+ * Currently, the framework does not support multiple instances of VLCLibrary.  Furthermore, you cannot destroy any
+ * instiantiation of VLCLibrary, as previously noted, this is done automatically by the dynamic link loader.
  */
 @interface VLCLibrary : NSObject 
 {
@@ -45,13 +50,16 @@ extern void * DestroySharedLibraryAtExit( void ) __attribute__((destructor));
 
 /* Factories */
 /**
- * TODO: Documentation + [VLCLibrary sharedLibrary]
+ * Returns the library's shared instance.
+ * \return The library's shared instance.
  */
 + (VLCLibrary *)sharedLibrary;
 
 /* Properties */
 /**
- * TODO: Documentation VLCLibrary.audio
+ * Returns the library's audio object.  This object is used to manipulate the global audio properities of the shared
+ * library.
+ * \return The library's shared audio instance.
  */
 @property (readonly) VLCAudio * audio;
 @end

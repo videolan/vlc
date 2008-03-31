@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaList.h: VLC.framework VLCMediaList header
+ * VLCMediaList.h: VLCKit.framework VLCMediaList header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

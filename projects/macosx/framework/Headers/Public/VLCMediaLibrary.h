@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaDiscoverer.h: VLC.framework VLCMediaDiscoverer header
+ * VLCMediaDiscoverer.h: VLCKit.framework VLCMediaDiscoverer header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -35,7 +35,7 @@
     void * mlib;
     VLCMediaList * allMedia;
 }
-/* Singleton */
+/* Factories */
 + (id)sharedMediaLibrary;
 
 /* Properties */

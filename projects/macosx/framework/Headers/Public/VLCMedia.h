@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMedia.h: VLC.framework VLCMedia header
+ * VLCMedia.h: VLCKit.framework VLCMedia header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -100,29 +100,28 @@ typedef enum VLCMediaState
 
 /**
  * Defines files and streams as a managed object.  Each media object can be 
- * administered seperately.  VLCMediaPlayer or VLCMediaControl must be used 
+ * administered seperately.  VLCMediaPlayer or VLCMediaList must be used 
  * to execute the appropriate playback functions.
  * \see VLCMediaPlayer
- * \see VLCMediaControl
+ * \see VLCMediaList
  */
 @interface VLCMedia : NSObject
 {
     void *                p_md;              //< Internal media descriptor instance
-    NSURL *               url;               //< URL for this media resource
+    NSURL *               url;               //< URL (MRL) for this media resource
     VLCMediaList *        subitems;          //< Sub list of items
-    VLCTime *             length;            //< Duration of the media
+    VLCTime *             length;            //< Cached duration of the media
     NSMutableDictionary * metaDictionary;    //< Meta data storage
     id                    delegate;          //< Delegate object
     BOOL                  artFetched;        //< Value used to determine of the artwork has been preparsed
-    VLCMediaState         state;
+    VLCMediaState         state;             //< Current state of the media
 }
 
-/* Object Factories */
+/* Factories */
 /**
  * Manufactures a new VLCMedia object using the URL specified.
  * \param anURL URL to media to be accessed.
- * \return A new VLCMedia object, only if there were no errors.  This object 
- * will be automatically released.
+ * \return A new VLCMedia object, only if there were no errors.  This object will be automatically released.
  * \see initWithMediaURL
  */
 + (id)mediaWithURL:(NSURL *)anURL;
@@ -130,8 +129,7 @@ typedef enum VLCMediaState
 /**
  * Manufactures a new VLCMedia object using the path specified.
  * \param aPath Path to the media to be accessed.
- * \return A new VLCMedia object, only if there were no errors.  This object 
- * will be automatically released.
+ * \return A new VLCMedia object, only if there were no errors.  This object will be automatically released.
  * \see initWithPath
  */
 + (id)mediaWithPath:(NSString *)aPath;
