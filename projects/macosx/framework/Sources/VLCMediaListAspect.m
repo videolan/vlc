@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaList.m: VLC.framework VLCMediaList implementation
+ * VLCMediaListAspect.m: VLCKit.framework VLCMediaListAspect implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

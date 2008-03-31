@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVideoLayer.m: VLC.framework VLCVideoLayer implementation
+ * VLCVideoLayer.m: VLCKit.framework VLCVideoLayer implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

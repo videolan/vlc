@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaDiscoverer.m: VLC.framework VLCMediaDiscoverer implementation
+ * VLCMediaLibrary.m: VLCKit.framework VLCMediaLibrary implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

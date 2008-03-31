@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCTime.h: VLC.framework VLCTime implementation
+ * VLCTime.m: VLCKit.framework VLCTime implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

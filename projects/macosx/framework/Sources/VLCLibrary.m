@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibrary.h: VLC.framework VLCLibrary implementation
+ * VLCLibrary.m: VLCKit.framework VLCLibrary implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

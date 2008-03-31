@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVideoCommon.m: VLC.framework VLCVideoCommon implementation
+ * VLCVideoCommon.m: VLCKit.framework VLCVideoCommon implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -31,14 +31,14 @@
  */
 
 @implementation VLCVideoLayoutManager 
-@synthesize  fillScreenEntirely;
-@synthesize  originalVideoSize;
 
+/* Factories */
 + (id)layoutManager
 {
     return [[[self alloc] init] autorelease];
 }
 
+/* CALayoutManager Impelmentation */
 - (void)layoutSublayersOfLayer:(CALayer *)layer
 {
     /* After having done everything normally resize the vlcopengllayer */
@@ -60,4 +60,8 @@
         videolayer.frame = videoRect;
     }
 }
+
+/* Properties */
+@synthesize fillScreenEntirely;
+@synthesize originalVideoSize;
 @end

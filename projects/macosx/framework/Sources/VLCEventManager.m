@@ -1,6 +1,5 @@
 /*****************************************************************************
- * VLCEventManager.h: VLC.framework VLCEventManager implementation
- * This is used to communicate in a sound way accross threads.
+ * VLCEventManager.m: VLCKit.framework VLCEventManager implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

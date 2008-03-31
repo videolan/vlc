@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCAudio.m: VLC.framework VLCAudio implementation
+ * VLCAudio.m: VLCKit.framework VLCAudio implementation
  *****************************************************************************
  * Copyright (C) 2007 Faustino E. Osuna
  * Copyright (C) 2007 the VideoLAN team

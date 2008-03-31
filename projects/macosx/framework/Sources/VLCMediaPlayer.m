@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaPlayer.m: VLC.framework VLCMediaPlayer implementation
+ * VLCMediaPlayer.m: VLCKit.framework VLCMediaPlayer implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
