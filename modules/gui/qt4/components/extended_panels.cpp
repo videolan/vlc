@@ -45,8 +45,6 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 
-#include <iostream>
-#include <string.h>
 
 #if 0
 class ConfClickHandler : public QObject
@@ -207,15 +205,45 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
 
 #undef SETUP_VFILTER
 #undef SETUP_VFILTER_OPTION
+
+    CONNECT( ui.cropTopPx, valueChanged( int ), this, cropChange() );
+    CONNECT( ui.cropBotPx, valueChanged( int ), this, cropChange() );
+    CONNECT( ui.cropLeftPx, valueChanged( int ), this, cropChange() );
+    CONNECT( ui.cropRightPx, valueChanged( int ), this, cropChange() );
+    CONNECT( ui.topBotCropSync, toggled( bool ),
+             ui.cropBotPx, setDisabled( bool ) );
+    CONNECT( ui.leftRightCropSync, toggled( bool ),
+             ui.cropRightPx, setDisabled( bool ) );
 }
 
 ExtVideo::~ExtVideo()
 {
 }
 
+void ExtVideo::cropChange()
+{
+    char *psz_crop;
+    unsigned int height, width; //TODO set the variables if vout exists...
+
+    p_vout = ( vout_thread_t * )vlc_object_find( p_intf,
+                                VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_vout )
+    {
+        height = p_vout->i_window_height;
+        width = p_vout->i_window_width;
+        sprintf( psz_crop,"%ix%i+%i+%i",
+                width - ui.cropLeftPx->value() - ui.cropRightPx->value(),
+                height - ui.cropBotPx->value() - ui.cropTopPx->value(),
+                ui.cropLeftPx->value(),
+                ui.cropTopPx->value() );
+
+        //    var_Set( p_vout, "crop-geometry", qtu( qs_crop ) );
+    }
+
+}
+
 void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
 {
-    vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
     const char *psz_filter_type;
 

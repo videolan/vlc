@@ -53,12 +53,14 @@ private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;
     intf_thread_t *p_intf;
+    vout_thread_t *p_vout;
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
     void ChangeVFiltersString( char *psz_name, vlc_bool_t b_add );
 private slots:
     void updateFilters();
     void updateFilterOptions();
+    void cropChange();
 };
 
 class ExtV4l2 : public QWidget
