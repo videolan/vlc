@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVideoView.h: VLC.framework VLCVideoView implementation
+ * VLCVideoView.m: VLCKit.framework VLCVideoView implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team
@@ -67,6 +67,7 @@
 @end
 
 @interface VLCVideoView ()
+/* Proeprties */
 @property (readwrite) BOOL hasVideo;
 @end
 
@@ -76,16 +77,18 @@
 
 @implementation VLCVideoView
 
+/* Initializers */
 - (id)initWithFrame:(NSRect)rect
 {
     if (self = [super initWithFrame:rect]) 
     {
-        delegate = nil;
-        [self setBackColor:[NSColor blackColor]];
+        self.delegate = nil;
+        self.backColor = [NSColor blackColor];
+        self.fillScreen = NO;
+        self.hasVideo = NO;
+        
         [self setStretchesVideo:NO];
         [self setAutoresizesSubviews:YES];
-        [self setFillScreen: NO];
-        self.hasVideo = NO;
         layoutManager = [[VLCVideoLayoutManager layoutManager] retain];
     }
     return self;
@@ -93,12 +96,13 @@
 
 - (void)dealloc
 {
+    self.delegate = nil;
+    self.backColor = nil;
     [layoutManager release];
-    delegate = nil;
-    [backColor release];
     [super dealloc];
 }
 
+/* NSView Overrides */
 - (void)drawRect:(NSRect)aRect
 {
     [self lockFocus];
@@ -112,6 +116,7 @@
     return YES;
 }
 
+/* Properties */
 @synthesize delegate;
 @synthesize backColor;
 @synthesize hasVideo;
@@ -123,7 +128,7 @@
 
 - (void)setFillScreen:(BOOL)fillScreen
 {
-    [layoutManager setFillScreenEntirely:fillScreen];
+    [(VLCVideoLayoutManager *)layoutManager setFillScreenEntirely:fillScreen];
     [[self layer] setNeedsLayout];
 }
 @end
@@ -148,18 +153,13 @@
     [layoutManager setOriginalVideoSize:aLayer.bounds.size];
     [rootLayer setLayoutManager:layoutManager];
     [rootLayer insertSublayer:aLayer atIndex:0];
+    [self setNeedsDisplayOnBoundsChange:YES];
 
-    [aLayer setNeedsLayout];
-    [aLayer setNeedsDisplay];
-
-    [rootLayer setNeedsDisplayOnBoundsChange:YES];
-    [rootLayer setNeedsDisplay];
-    [rootLayer layoutIfNeeded];
     [CATransaction commit];
     self.hasVideo = YES;
 }
 
-- (void)removeVoutLayer:(CALayer*)voutLayer
+- (void)removeVoutLayer:(CALayer *)voutLayer
 {
     [CATransaction begin];
     [voutLayer removeFromSuperlayer];
