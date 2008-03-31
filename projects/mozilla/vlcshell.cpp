@@ -490,18 +490,15 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #endif /* XP_WIN */
 
 #ifdef XP_UNIX
-    if( p_plugin->b_toolbar )
-    {
-        p_plugin->getToolbarSize( &i_control_width, &i_control_height );
-    }
-    else
-    {
-        i_control_height = i_control_width = 0;
-    }
+    /* default to hidden toolbar, shown at the end of this method if asked *
+     * developers note : getToolbarSize need to wait the end of this method
+     */
+    i_control_height = 0;
+    i_control_width = window->width;
 
     if( window && window->window )
     {
-        Window  parent   = (Window) window->window;
+        Window  parent  = (Window) window->window;
         if( !curwin.window || (parent != (Window)curwin.window) )
         {
             Display *p_display = ( (NPSetWindowCallbackStruct *)
@@ -516,13 +513,10 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
                            window->width, window->height - i_control_height,
                            0, i_blackColor, i_blackColor );
             Window controls = (Window) NULL;
-            if( p_plugin->b_toolbar )
-            {
-                controls = XCreateSimpleWindow( p_display, parent,
-                                0, window->height - i_control_height-1,
-                                window->width, i_control_height-1,
-                                0, i_blackColor, i_blackColor );
-            }
+            controls = XCreateSimpleWindow( p_display, parent,
+                            0, window->height - i_control_height-1,
+                            window->width, i_control_height-1,
+                            0, i_blackColor, i_blackColor );
 
             XMapWindow( p_display, parent );
             XMapWindow( p_display, video );
@@ -561,6 +555,12 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             if( controls ) { p_plugin->setControlWindow( controls ); }
 
             Redraw( w, (XtPointer)p_plugin, NULL );
+
+            /* now display toolbar if asked through parameters */
+            if( p_plugin->b_toolbar )
+            {
+                p_plugin->showToolbar();
+            }
         }
     }
     else if ( curwin.window )
@@ -800,10 +800,7 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     unsigned int i_control_height, i_control_width;
 
     if( p_plugin->b_toolbar )
-    {
-        p_plugin->showToolbar();
         p_plugin->getToolbarSize( &i_control_width, &i_control_height );
-    }
     else
         i_control_height = i_control_width = 0;
 
@@ -824,11 +821,7 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
                  WINDOW_TEXT, strlen(WINDOW_TEXT) );
     XFreeGC( p_display, gc );
 
-    if( p_plugin->b_toolbar )
-    {
-        p_plugin->redrawToolbar();
-        p_plugin->hideToolbar();
-    }
+    p_plugin->redrawToolbar();
 }
 
 static void ControlHandler( Widget w, XtPointer closure, XEvent *event )

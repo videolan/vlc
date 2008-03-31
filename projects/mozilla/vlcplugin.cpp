@@ -59,6 +59,14 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     ,i_tb_width(0)
     ,i_tb_height(0)
     ,i_last_position(0)
+    ,p_btnPlay(NULL)
+    ,p_btnPause(NULL)
+    ,p_btnStop(NULL)
+    ,p_btnMute(NULL)
+    ,p_btnUnmute(NULL)
+    ,p_btnFullscreen(NULL)
+    ,p_btnTime(NULL)
+    ,p_timeline(NULL)
 #endif
 {
     memset(&npwindow, 0, sizeof(NPWindow));
@@ -157,7 +165,8 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
             {
                 ppsz_argv[ppsz_argc++] = "--loop";
             }
-            else {
+            else
+            {
                 ppsz_argv[ppsz_argc++] = "--no-loop";
             }
         }
@@ -418,61 +427,70 @@ void VlcPlugin::showToolbar()
 {
     const NPWindow& window = getWindow();
     Window control = getControlWindow();
+    Window video = getVideoWindow();
     Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
     unsigned int i_height = 0, i_width = 0;
 
     /* load icons */
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/play.xpm",
-                        &p_btnPlay, NULL, NULL);
+    if( !p_btnPlay )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/play.xpm",
+                            &p_btnPlay, NULL, NULL);
     if( p_btnPlay )
     {
         i_height = __MAX( i_height, p_btnPlay->height );
         i_width += p_btnPlay->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
-                        &p_btnPause, NULL, NULL);
+    if( !p_btnPause )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/pause.xpm",
+                            &p_btnPause, NULL, NULL);
     if( p_btnPause )
     {
         i_height = __MAX( i_height, p_btnPause->height );
         i_width += p_btnPause->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
-                        &p_btnStop, NULL, NULL );
+    if( !p_btnStop )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/stop.xpm",
+                            &p_btnStop, NULL, NULL );
     if( p_btnStop )
     {
         i_height = __MAX( i_height, p_btnStop->height );
         i_width += p_btnStop->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
-                        &p_timeline, NULL, NULL);
+    if( !p_timeline )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_line.xpm",
+                            &p_timeline, NULL, NULL);
     if( p_timeline )
     {
         i_height = __MAX( i_height, p_timeline->height );
         i_width += p_timeline->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
-                        &p_btnTime, NULL, NULL);
+    if( !p_btnTime )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/time_icon.xpm",
+                            &p_btnTime, NULL, NULL);
     if( p_btnTime )
     {
         i_height = __MAX( i_height, p_btnTime->height );
         i_width += p_btnTime->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
-                        &p_btnFullscreen, NULL, NULL);
+    if( !p_btnFullscreen )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/fullscreen.xpm",
+                            &p_btnFullscreen, NULL, NULL);
     if( p_btnFullscreen )
     {
         i_height = __MAX( i_height, p_btnFullscreen->height );
         i_width += p_btnFullscreen->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
-                        &p_btnMute, NULL, NULL);
+    if( !p_btnMute )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_max.xpm",
+                            &p_btnMute, NULL, NULL);
     if( p_btnMute )
     {
         i_height = __MAX( i_height, p_btnMute->height );
         i_width += p_btnMute->width;
     }
-    XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
-                        &p_btnUnmute, NULL, NULL);
+    if( !p_btnUnmute )
+        XpmReadFileToImage( p_display, DATA_PATH "/mozilla/volume_mute.xpm",
+                            &p_btnUnmute, NULL, NULL);
     if( p_btnUnmute )
     {
         i_height = __MAX( i_height, p_btnUnmute->height );
@@ -483,10 +501,24 @@ void VlcPlugin::showToolbar()
     if( !p_btnPlay || !p_btnPause || !p_btnStop || !p_timeline ||
         !p_btnTime || !p_btnFullscreen || !p_btnMute || !p_btnUnmute )
         fprintf(stderr, "Error: some button images not found in %s\n", DATA_PATH );
+
+    /* reset panels position and size */
+    /* XXX  use i_width */
+    XResizeWindow( p_display, video, window.width, window.height - i_height);
+    XMoveWindow( p_display, control, 0, window.height - i_height );
+    XResizeWindow( p_display, control, window.width, i_height -1);
+
+    b_toolbar = 1; /* says toolbar is now shown */
+    redrawToolbar();
 }
 
 void VlcPlugin::hideToolbar()
 {
+    const NPWindow& window = getWindow();
+    Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
+    Window control = getControlWindow();
+    Window video = getVideoWindow();
+
     i_tb_width = i_tb_height = 0;
 
     if( p_btnPlay )  XDestroyImage( p_btnPlay );
@@ -506,6 +538,15 @@ void VlcPlugin::hideToolbar()
     p_btnFullscreen = NULL;
     p_btnMute = NULL;
     p_btnUnmute = NULL;
+
+    /* reset panels position and size */
+    /* XXX  use i_width */
+    XResizeWindow( p_display, video, window.width, window.height );
+    XMoveWindow( p_display, control, 0, window.height-1 );
+    XResizeWindow( p_display, control, window.width, 1 );
+
+    b_toolbar = 0; /* says toolbar is now hidden */
+    redrawToolbar();
 }
 
 void VlcPlugin::redrawToolbar()
@@ -518,11 +559,18 @@ void VlcPlugin::redrawToolbar()
     unsigned int dst_x, dst_y;
     GC gc;
     XGCValues gcv;
+    unsigned int i_tb_width, i_tb_height;
 #define BTN_SPACE ((unsigned int)4)
+
+    /* This method does nothing if toolbar is hidden. */
+    if( !b_toolbar )
+        return;
 
     const NPWindow& window = getWindow();
     Window control = getControlWindow();
     Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
+
+    getToolbarSize( &i_tb_width, &i_tb_height );
 
     /* get media instance */
     libvlc_exception_init( &ex );
@@ -557,64 +605,69 @@ void VlcPlugin::redrawToolbar()
     XChangeGC( p_display, gc, GCForeground, &gcv );
 
     /* position icons */
-    dst_x = 4; dst_y = 4;
+    dst_x = BTN_SPACE;
+    dst_y = i_tb_height >> 1; /* baseline = vertical middle */
 
     fprintf( stderr, ">>>>>> is playing = %d\n", i_playing );
     if( p_btnPause && (i_playing == 1) )
     {
-        XPutImage( p_display, control, gc, p_btnPause, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_btnPause, 0, 0, dst_x,
+                   dst_y - (p_btnPause->height >> 1),
                    p_btnPause->width, p_btnPause->height );
+        dst_x += BTN_SPACE + p_btnPause->width;
     }
     else if( p_btnPlay )
     {
-        XPutImage( p_display, control, gc, p_btnPlay, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_btnPlay, 0, 0, dst_x,
+                   dst_y - (p_btnPlay->height >> 1),
                    p_btnPlay->width, p_btnPlay->height );
+        dst_x += BTN_SPACE + p_btnPlay->width;
     }
 
-    dst_x += BTN_SPACE + ( p_btnPlay ? p_btnPlay->width : 0 );
-    dst_y = 4;
-
     if( p_btnStop )
-        XPutImage( p_display, control, gc, p_btnStop, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_btnStop, 0, 0, dst_x,
+                   dst_y - (p_btnStop->height >> 1),
                    p_btnStop->width, p_btnStop->height );
 
     dst_x += BTN_SPACE + ( p_btnStop ? p_btnStop->width : 0 );
-    dst_y = 4;
 
     if( p_btnFullscreen )
-        XPutImage( p_display, control, gc, p_btnFullscreen, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_btnFullscreen, 0, 0, dst_x,
+                   dst_y - (p_btnFullscreen->height >> 1),
                    p_btnFullscreen->width, p_btnFullscreen->height );
 
     dst_x += BTN_SPACE + ( p_btnFullscreen ? p_btnFullscreen->width : 0 );
-    dst_y = 4;
 
     if( p_btnUnmute && b_mute )
     {
-        XPutImage( p_display, control, gc, p_btnUnmute, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_btnUnmute, 0, 0, dst_x,
+                   dst_y - (p_btnUnmute->height >> 1),
                    p_btnUnmute->width, p_btnUnmute->height );
 
         dst_x += BTN_SPACE + ( p_btnUnmute ? p_btnUnmute->width : 0 );
-        dst_y = 4;
     }
     else if( p_btnMute )
     {
-        XPutImage( p_display, control, gc, p_btnMute, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_btnMute, 0, 0, dst_x,
+                   dst_y - (p_btnMute->height >> 1),
                    p_btnMute->width, p_btnMute->height );
 
         dst_x += BTN_SPACE + ( p_btnMute ? p_btnMute->width : 0 );
-        dst_y = 4;
     }
 
     if( p_timeline )
-        XPutImage( p_display, control, gc, p_timeline, 0, 0, dst_x, dst_y,
+        XPutImage( p_display, control, gc, p_timeline, 0, 0, dst_x,
+                   dst_y - (p_timeline->height >> 1),
                    (window.width-(dst_x+BTN_SPACE)), p_timeline->height );
 
     if( f_position > 0 )
-        i_last_position = (((float)window.width-8.0)/100.0)*f_position;
+        i_last_position = (int)( f_position *
+                        ( ((float)(window.width-(dst_x+BTN_SPACE))) / 100.0 ));
 
     if( p_btnTime )
         XPutImage( p_display, control, gc, p_btnTime,
-                   0, 0, (dst_x+i_last_position), dst_y,
+                   0, 0, (dst_x+i_last_position),
+                   dst_y - (p_btnTime->height >> 1),
                    p_btnTime->width, p_btnTime->height );
 
     XFreeGC( p_display, gc );
