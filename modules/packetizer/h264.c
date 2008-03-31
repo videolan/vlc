@@ -447,22 +447,23 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
             i_size = (i_size << 8) | (*p++);
         }
 
-        if( i_size > 0 && i_size < p_block->i_buffer )
+        if( i_size <= 0 ||
+            i_size >= ( p - p_block->p_buffer + p_block->i_buffer ) )
         {
-            block_t *p_part = nal_get_annexeb( p_dec, p, i_size );
-            if( !p_part )
-            {
-                block_Release( p_block );
-                return NULL;
-            }
-            p_part->i_dts = p_block->i_dts;
-            p_part->i_pts = p_block->i_pts;
+            msg_Err( p_dec, "Broken frame : size %d is too big", i_size );
+            break;
+        }
 
-            /* Parse the NAL */
-            if( ( p_pic = ParseNALBlock( p_dec, p_part ) ) )
-            {
-                block_ChainAppend( &p_ret, p_pic );
-            }
+        block_t *p_part = nal_get_annexeb( p_dec, p, i_size );
+        if( !p_part )
+            break;
+        p_part->i_dts = p_block->i_dts;
+        p_part->i_pts = p_block->i_pts;
+
+        /* Parse the NAL */
+        if( ( p_pic = ParseNALBlock( p_dec, p_part ) ) )
+        {
+            block_ChainAppend( &p_ret, p_pic );
         }
         p += i_size;
     }
