@@ -151,6 +151,8 @@ int playlist_MLLoad( playlist_t *p_playlist )
     p_playlist->p_ml_onelevel->p_input =
     p_playlist->p_ml_category->p_input = p_input;
 
+    vlc_gc_incref( p_input );
+
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
 
@@ -194,7 +196,6 @@ int playlist_MLDump( playlist_t *p_playlist )
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
     playlist_Export( p_playlist, psz_dirname, p_playlist->p_ml_category,
                      "export-xspf" );
-    vlc_gc_decref( p_playlist->p_ml_category->p_input );
     stats_TimerStop( p_playlist, STATS_TIMER_ML_DUMP );
 
     return VLC_SUCCESS;

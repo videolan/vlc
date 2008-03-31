@@ -478,11 +478,9 @@ void playlist_LastLoop( playlist_t *p_playlist )
     playlist_MLDump( p_playlist );
 
     PL_LOCK;
-    /* Go through all items, and simply free everything without caring
-     * about the tree structure. Do not decref, it will be done by doing
-     * the same thing on the input items array */
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
         free( p_del->pp_children );
+        vlc_gc_decref( p_del->p_input );
         free( p_del );
     FOREACH_END();
     ARRAY_RESET( p_playlist->all_items );
