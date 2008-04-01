@@ -398,6 +398,8 @@ check_input:
 
 static void ML_Decref( playlist_item_t *p_node )
 {
+    vlc_gc_decref( p_node->p_input );
+
     int i;
     if( p_node->i_children > 0 )
         for( i = 0 ; i < p_node->i_children ; i++ )
@@ -482,6 +484,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
                                           p_playlist->pp_sds[0]->p_sd->psz_module );
     }
 
+    vlc_gc_incref( p_playlist->p_ml_category->p_input );
     playlist_MLDump( p_playlist );
     /* We don't need the media library anymore */
     ML_Decref( p_playlist->p_ml_category );
