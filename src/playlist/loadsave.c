@@ -180,8 +180,6 @@ int playlist_MLLoad( playlist_t *p_playlist )
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
 
-    vlc_gc_decref( p_input );
-
     free( psz_uri );
     return VLC_SUCCESS;
 
