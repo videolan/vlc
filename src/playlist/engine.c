@@ -398,8 +398,6 @@ check_input:
 
 static void ML_Decref( playlist_item_t *p_node )
 {
-    vlc_gc_decref( p_node->p_input );
-
     int i;
     if( p_node->i_children > 0 )
         for( i = 0 ; i < p_node->i_children ; i++ )
