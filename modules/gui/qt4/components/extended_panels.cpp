@@ -222,24 +222,15 @@ ExtVideo::~ExtVideo()
 
 void ExtVideo::cropChange()
 {
-    char *psz_crop;
-    unsigned int height, width; //TODO set the variables if vout exists...
-
     p_vout = ( vout_thread_t * )vlc_object_find( p_intf,
                                 VLC_OBJECT_VOUT, FIND_CHILD );
     if( p_vout )
     {
-        height = p_vout->i_window_height;
-        width = p_vout->i_window_width;
-        sprintf( psz_crop,"%ix%i+%i+%i",
-                width - ui.cropLeftPx->value() - ui.cropRightPx->value(),
-                height - ui.cropBotPx->value() - ui.cropTopPx->value(),
-                ui.cropLeftPx->value(),
-                ui.cropTopPx->value() );
-
-        //    var_Set( p_vout, "crop-geometry", qtu( qs_crop ) );
+        var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );
+        var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
+        var_SetInteger( p_vout, "crop-left", ui.cropLeftPx->value() );
+        var_SetInteger( p_vout, "crop-right", ui.cropRightPx->value() );
     }
-
 }
 
 void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
