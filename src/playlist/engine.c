@@ -484,9 +484,16 @@ void playlist_LastLoop( playlist_t *p_playlist )
                                           p_playlist->pp_sds[0]->p_sd->psz_module );
     }
 
-    vlc_gc_incref( p_playlist->p_ml_category->p_input );
     playlist_MLDump( p_playlist );
     /* We don't need the media library anymore */
+
+    /* Because this nasty recursive function decreases the
+     * p_playlist->p_ml_category refcount, it may get deleted.
+     * However we will delete the p_playlist->p_ml_category in the
+     * following FOREACH. */
+    vlc_gc_incref( p_playlist->p_ml_category );
+
+    /* Decref all subitems, and the given items */
     ML_Decref( p_playlist->p_ml_category );
 
     PL_LOCK;
