@@ -627,6 +627,13 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
 void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
+    input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+
+    if( !p_input_thread )
+            return;
+
+    int state = var_GetInteger( p_input_thread, "state" );
+
     if( p_mi->b_own_its_input_thread )
     {
         vlc_mutex_lock( &p_mi->object_lock );
@@ -635,20 +642,18 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     }
     else
     {
-        input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-
-        if( !p_input_thread )
-            return;
-
         input_StopThread( p_input_thread );
         vlc_object_release( p_input_thread );
     }
 
-    /* Send a stop notification event */
-    libvlc_event_t event;
-    libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL);
-    event.type = libvlc_MediaPlayerStopped;
-    libvlc_event_send( p_mi->p_event_manager, &event );
+    if( state == PLAYING_S || state == PAUSE_S )
+    {
+        /* Send a stop notification event */
+        libvlc_event_t event;
+        libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL );
+        event.type = libvlc_MediaPlayerStopped;
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
 }
 
 /**************************************************************************
