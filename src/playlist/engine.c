@@ -396,14 +396,14 @@ check_input:
     PL_UNLOCK;
 }
 
-static void ML_Decref( playlist_item_t *p_node )
+static void recursively_decref( playlist_item_t *p_node )
 {
     vlc_gc_decref( p_node->p_input );
 
     int i;
     if( p_node->i_children > 0 )
         for( i = 0 ; i < p_node->i_children ; i++ )
-            ML_Decref( p_node->pp_children[i] );
+            recursively_decref( p_node->pp_children[i] );
 }
 
 /**
@@ -494,7 +494,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
     vlc_gc_incref( p_playlist->p_ml_category );
 
     /* Decref all subitems, and the given items */
-    ML_Decref( p_playlist->p_ml_category );
+    recursively_decref( p_playlist->p_ml_category );
 
     PL_LOCK;
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
