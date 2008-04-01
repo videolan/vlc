@@ -165,6 +165,20 @@ static void Close( vlc_object_t * );
 #define VBV_INIT_LONGTEXT N_( "Sets the initial buffer occupancy as a " \
     "fraction of the buffer size. Range 0.0 to 1.0.")
 
+#if X264_BUILD >= 59
+#define AQ_MODE_TEXT N_("How AQ distributes bits")
+#define AQ_MODE_LONGTEXT N_("Defines bitdistribution mode for AQ, default 2\n" \
+        " - 0: Disabled\n"\
+        " - 1: Avoid moving bits between frames\n"\
+        " - 2: Move bits between frames")
+
+#define AQ_STRENGTH_TEXT N_("Strength of AQ")
+#define AQ_STRENGTH_LONGTEXT N_("Strength to reduce blocking and blurring in flat\n"\
+        "and textured areas, default 1.0 recommented to be between 0..2\n"\
+        " - 0.5: weak AQ\n"\
+        " - 1.5: strong AQ")
+#endif
+
 /* IP Ratio < 1 is technically valid but should never improve quality */
 #define IPRATIO_TEXT N_("QP factor between I and P")
 #define IPRATIO_LONGTEXT N_( "QP factor between I and P. Range 1.0 to 2.0.")
@@ -520,6 +534,13 @@ vlc_module_begin();
 
     add_float( SOUT_CFG_PREFIX "qblur", 0.5, NULL, QBLUR_TEXT,
                QBLUR_LONGTEXT, VLC_FALSE );
+#if X264_BUILD >= 59
+    add_integer( SOUT_CFG_PREFIX "aq-mode", 2, NULL, AQ_MODE_TEXT,
+                 AQ_MODE_LONGTEXT, VLC_FALSE );
+         change_integer_range( 0, 2 );
+    add_float( SOUT_CFG_PREFIX "aq-strength", 1.0, NULL, AQ_STRENGTH_TEXT,
+               AQ_STRENGTH_LONGTEXT, VLC_FALSE );
+#endif
 
 /* Analysis */
 
@@ -679,7 +700,8 @@ static const char *ppsz_sout_options[] = {
     "pre-scenecut", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
-    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", NULL
+    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "aq-mode",
+    "aq-strength",NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -869,6 +891,14 @@ static int  Open ( vlc_object_t *p_this )
 
     var_Get( p_enc, SOUT_CFG_PREFIX "qblur", &val );
     p_sys->param.rc.f_qblur = val.f_float;
+
+#if X264_BUILD >= 59
+    var_Get( p_enc, SOUT_CFG_PREFIX "aq-mode", &val );
+    p_sys->param.rc.i_aq_mode = val.i_int;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "aq-strength", &val );
+    p_sys->param.rc.f_aq_strength = val.f_float;
+#endif
 
 #if X264_BUILD >= 0x000e
     var_Get( p_enc, SOUT_CFG_PREFIX "verbose", &val );
