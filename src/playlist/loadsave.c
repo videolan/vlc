@@ -160,12 +160,10 @@ int playlist_MLLoad( playlist_t *p_playlist )
     /* We save the input at two different place, incref */
     vlc_gc_incref( p_input );
     vlc_gc_incref( p_input );
-    PL_UNLOCK;
 
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
 
-    PL_LOCK;
     p_playlist->b_doing_ml = VLC_TRUE;
     PL_UNLOCK;
 
