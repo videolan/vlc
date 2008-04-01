@@ -332,7 +332,7 @@
     <item row="0" column="2" >
      <widget class="QLabel" name="label_10" >
       <property name="text" >
-       <string>_("top")</string>
+       <string>_("Top")</string>
       </property>
      </widget>
     </item>
@@ -349,7 +349,7 @@
     <item row="1" column="0" >
      <widget class="QLabel" name="label_11" >
       <property name="text" >
-       <string>_("left")</string>
+       <string>_("Left")</string>
       </property>
      </widget>
     </item>
@@ -366,7 +366,7 @@
     <item row="1" column="4" >
      <widget class="QLabel" name="label_12" >
       <property name="text" >
-       <string>_("right")</string>
+       <string>_("Right")</string>
       </property>
      </widget>
     </item>
@@ -383,7 +383,7 @@
     <item row="2" column="2" >
      <widget class="QLabel" name="label_7" >
       <property name="text" >
-       <string>_("bottom")</string>
+       <string>_("Bottom")</string>
       </property>
      </widget>
     </item>
@@ -410,6 +410,22 @@
        <string>_("Synchronize left and right")</string>
       </property>
      </widget>
+    </item>
+    <item row="1" column="3" >
+     <spacer>
+      <property name="orientation" >
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType" >
+       <enum>QSizePolicy::Expanding</enum>
+      </property>
+      <property name="sizeHint" >
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>
