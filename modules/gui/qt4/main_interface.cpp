@@ -1093,8 +1093,9 @@ void MainInterface::dropEvent(QDropEvent *event)
         }
      }
      bool first = true;
-     foreach( QUrl url, mimeData->urls() ) {
-        QString s = url.toString();
+     foreach( QUrl url, mimeData->urls() )
+     {
+        QString s = "\"" + url.toString() + "\"";
         if( s.length() > 0 ) {
             playlist_Add( THEPL, qtu(s), NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
