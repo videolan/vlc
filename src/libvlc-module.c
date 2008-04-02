@@ -457,12 +457,14 @@ static const char *ppsz_pos_descriptions[] =
 #define SNAP_WIDTH_TEXT N_("Video snapshot width")
 #define SNAP_WIDTH_LONGTEXT N_( \
     "You can enforce the width of the video snapshot. By default " \
-    "it will be 320 pixels." )
+    "it will keep the original width (-1). Using 0 will scale the width " \
+    "to keep the aspect ratio." )
 
 #define SNAP_HEIGHT_TEXT N_("Video snapshot height")
 #define SNAP_HEIGHT_LONGTEXT N_( \
     "You can enforce the height of the video snapshot. By default " \
-    "it will be 200 pixels." )
+    "it will keep the original height (-1). Using 0 will scale the height " \
+    "to keep the aspect ratio." )
 
 #define CROP_TEXT N_("Video cropping")
 #define CROP_LONGTEXT N_( \
@@ -1512,9 +1514,9 @@ vlc_module_begin();
               SNAP_PREVIEW_LONGTEXT, VLC_FALSE );
     add_bool( "snapshot-sequential", VLC_FALSE, NULL, SNAP_SEQUENTIAL_TEXT,
               SNAP_SEQUENTIAL_LONGTEXT, VLC_FALSE );
-    add_integer( "snapshot-width", 320, NULL, SNAP_WIDTH_TEXT,
+    add_integer( "snapshot-width", -1, NULL, SNAP_WIDTH_TEXT,
                  SNAP_WIDTH_LONGTEXT, VLC_TRUE );
-    add_integer( "snapshot-height", 200, NULL, SNAP_HEIGHT_TEXT,
+    add_integer( "snapshot-height", -1, NULL, SNAP_HEIGHT_TEXT,
                  SNAP_HEIGHT_LONGTEXT, VLC_TRUE );
 
     set_section( N_("Window properties" ), NULL );
