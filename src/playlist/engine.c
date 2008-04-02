@@ -484,17 +484,19 @@ void playlist_LastLoop( playlist_t *p_playlist )
                                           p_playlist->pp_sds[0]->p_sd->psz_module );
     }
 
-    playlist_MLDump( p_playlist );
+    if( config_GetInt( p_playlist, "media-library" ) )
+    {
+        playlist_MLDump( p_playlist );
+        /* Because this recursive function decreases the
+         * p_playlist->p_ml_category refcount, it may get deleted.
+         * However we will delete the p_playlist->p_ml_category in the
+         * following FOREACH. */
+        vlc_gc_incref( p_playlist->p_ml_category->p_input );
 
-    /* Because this recursive function decreases the
-     * p_playlist->p_ml_category refcount, it may get deleted.
-     * However we will delete the p_playlist->p_ml_category in the
-     * following FOREACH. */
-    vlc_gc_incref( p_playlist->p_ml_category->p_input );
-
-    /* We don't need the media library anymore */
-    /* Decref all subitems, and the given items */
-    recursively_decref( p_playlist->p_ml_category );
+        /* We don't need the media library anymore */
+        /* Decref all subitems, and the given items */
+        recursively_decref( p_playlist->p_ml_category );
+    }
 
     PL_LOCK;
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
