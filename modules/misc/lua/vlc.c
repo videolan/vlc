@@ -405,24 +405,24 @@ static int file_compare( const char **a, const char **b )
 int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
                      char **ppsz_dir_list )
 {
-    if( asprintf( &ppsz_dir_list[0], "%s" DIR_SEP "%s",
+    if( asprintf( &ppsz_dir_list[0], "%s" DIR_SEP "lua" DIR_SEP "%s",
                    p_this->p_libvlc->psz_datadir, luadirname ) < 0 )
         return VLC_ENOMEM;
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     {
         const char *psz_vlcpath = config_GetDataDir();
-        if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "%s",
+        if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "lua" DIR_SEP "%s",
                       psz_vlcpath, luadirname )  < 0 )
             return VLC_ENOMEM;
 
-        if( asprintf( &ppsz_dir_list[2], "%s" DIR_SEP "share" DIR_SEP "%s",
+        if( asprintf( &ppsz_dir_list[2], "%s" DIR_SEP "share" DIR_SEP "lua" DIR_SEP "%s",
                       psz_vlcpath, luadirname )  < 0 )
             return VLC_ENOMEM;
     }
 #   else
     if( asprintf( &ppsz_dir_list[1],
-                  "share" DIR_SEP "%s", luadirname ) < 0 )
+                  "share" DIR_SEP "lua" DIR_SEP "%s", luadirname ) < 0 )
         return VLC_ENOMEM;
 
 #   ifdef HAVE_SYS_STAT_H
@@ -432,7 +432,7 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
             || !S_ISDIR( stat_info.st_mode ) )
         {
             free(ppsz_dir_list[1]);
-            if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "%s",
+            if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "lua" DIR_SEP "%s",
                           config_GetDataDir (), luadirname ) < 0 )
                 return VLC_ENOMEM;
         }

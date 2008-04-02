@@ -224,7 +224,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
     lua_pop( L, 1 );
 
-    ret = vlclua_scripts_batch_execute( p_this, "luaplaylist",
+    ret = vlclua_scripts_batch_execute( p_this, "playlist",
                                         &probe_luascript, L, NULL );
     if( ret )
         E_(Close_LuaPlaylist)( p_this );

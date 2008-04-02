@@ -424,21 +424,21 @@ VLC-release.app: vlc
 	  for i in $(srcdir)/src/.libs/*.dylib ; do \
 	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/`basename $${i}` ; \
 	  done ;
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist
-	for i in $(srcdir)/share/luaplaylist/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist
+	for i in $(srcdir)/share/lua/playlist/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist/`basename $${i}` ; \
 	done ; \
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luameta
-	for i in $(srcdir)/share/luameta/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luameta/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/meta
+	for i in $(srcdir)/share/lua/meta/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/meta/`basename $${i}` ; \
 	done ; \
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf
-	for i in $(srcdir)/share/luaintf/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/intf
+	for i in $(srcdir)/share/lua/intf/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/intf/`basename $${i}` ; \
 	done ; \
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf/modules
-	for i in $(srcdir)/share/luaintf/modules/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaintf/modules/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/intf/modules
+	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/intf/modules/`basename $${i}` ; \
 	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http-lua/js
@@ -779,21 +779,21 @@ package-win32-base-debug: package-win-common
 	  cp $$i $(top_builddir)/vlc-$(VERSION)/skins/ || true ; \
 	done
 
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/luaplaylist
-	for i in $(srcdir)/share/luaplaylist/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/luaplaylist/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/playlist
+	for i in $(srcdir)/share/lua/playlist/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/playlist/`basename $${i}` ; \
 	done ;
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/luameta
-	for i in $(srcdir)/share/luameta/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/luameta/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/meta
+	for i in $(srcdir)/share/lua/meta/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/meta/`basename $${i}` ; \
 	done ;
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/luaintf
-	for i in $(srcdir)/share/luaintf/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/luaintf/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/intf
+	for i in $(srcdir)/share/lua/intf/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/intf/`basename $${i}` ; \
 	done ;
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/luaintf/modules
-	for i in $(srcdir)/share/luaintf/modules/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/luaintf/modules/`basename $${i}` ; \
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/intf/modules
+	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/intf/modules/`basename $${i}` ; \
 	done ;
 
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/osdmenu"

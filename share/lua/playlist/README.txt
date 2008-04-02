@@ -54,7 +54,7 @@ VLC defines a global vlc object with the following members:
  * vlc.msg_info( <string> ): print an info message.
 
 Lua scripts are tried in alphabetical order in the user's VLC config
-director luaplaylist/ subdirectory, then in the global VLC luaplaylist/
+director lua/playlist/ subdirectory, then in the global VLC lua/playlist/
 directory.
 
 Lua documentation is available on http://www.lua.org .

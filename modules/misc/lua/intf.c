@@ -914,7 +914,7 @@ static char *FindFile( intf_thread_t *p_intf, const char *psz_name )
 {
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
-    vlclua_dir_list( VLC_OBJECT(p_intf), "luaintf", ppsz_dir_list );
+    vlclua_dir_list( VLC_OBJECT(p_intf), "intf", ppsz_dir_list );
     for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         char *psz_filename;

@@ -287,7 +287,7 @@ int E_(FindMeta)( vlc_object_t *p_this )
     input_item_t *p_item = p_me->p_item;
     lua_State *L = vlclua_meta_init( p_this, p_item );
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "luameta", &fetch_meta, L, p_item );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "meta", &fetch_meta, L, p_item );
     lua_close( L );
     return i_ret;
 }
@@ -301,7 +301,7 @@ int E_(FindArt)( vlc_object_t *p_this )
     input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
     lua_State *L = vlclua_meta_init( p_this, p_item );
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "luameta", &fetch_art, L, p_item );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "meta", &fetch_art, L, p_item );
     lua_close( L );
     return i_ret;
 }

@@ -49,10 +49,10 @@ Playlist:
     * Shoutcast TV listings
     * Audioscrobbler/last.fm support
  * Album art support
- * User definable Lua playlist scripts. See share/luaplaylist/README.txt
+ * User definable Lua playlist scripts. See share/lua/playlist/README.txt
    (Default scripts open YouTube, DailyMotion, metacafe and Google Video URLs)
  * User definable Lua metadata and album art fetcher scripts. See
-   share/luameta/README.txt
+   share/lua/meta/README.txt
 
 Input/Demuxers:
   * UDP-Lite transport for RTP/AVP

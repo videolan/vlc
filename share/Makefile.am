@@ -249,29 +249,29 @@ DIST_osdmenu_minimal = \
 	osdmenu/minimal/fs_panel_mockup.png
 
 DIST_lua= \
-	luameta/README.txt \
-	luameta/googleimage.lua \
-	luaplaylist/README.txt \
-	luaplaylist/appletrailers.lua \
-	luaplaylist/break.lua \
-	luaplaylist/dailymotion.lua \
-	luaplaylist/joox.lua \
-	luaplaylist/lelombrik.lua \
-	luaplaylist/youtube.lua \
-	luaplaylist/youtube_homepage.lua \
-	luaplaylist/megavideo.lua \
-	luaplaylist/metacafe.lua \
-	luaplaylist/googlevideo.lua \
-	luaintf/http.lua \
-	luaintf/rc.lua \
-	luaintf/hotkeys.lua \
-	luaintf/modules/common.lua \
-	luaintf/modules/host.lua \
-	luaintf/modules/httpd.lua \
-	luaintf/modules/acl.lua \
-	luaintf/modules/sandbox.lua \
-	luaintf/telnet.lua \
-	luaintf/dummy.lua
+	lua/meta/README.txt \
+	lua/meta/googleimage.lua \
+	lua/playlist/README.txt \
+	lua/playlist/appletrailers.lua \
+	lua/playlist/break.lua \
+	lua/playlist/dailymotion.lua \
+	lua/playlist/joox.lua \
+	lua/playlist/lelombrik.lua \
+	lua/playlist/youtube.lua \
+	lua/playlist/youtube_homepage.lua \
+	lua/playlist/megavideo.lua \
+	lua/playlist/metacafe.lua \
+	lua/playlist/googlevideo.lua \
+	lua/intf/http.lua \
+	lua/intf/rc.lua \
+	lua/intf/hotkeys.lua \
+	lua/intf/modules/common.lua \
+	lua/intf/modules/host.lua \
+	lua/intf/modules/httpd.lua \
+	lua/intf/modules/acl.lua \
+	lua/intf/modules/sandbox.lua \
+	lua/intf/telnet.lua \
+	lua/intf/dummy.lua
 
 DIST_http_lua = \
 	http-lua/.hosts \
