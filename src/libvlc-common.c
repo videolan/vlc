@@ -394,7 +394,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 # if defined (WIN32) || defined (__APPLE__)
     /* This ain't really nice to have to reload the config here but it seems
      * the only way to do it. */
-    config_LoadConfigFile( p_libvlc, "main" );
+
+    if( !config_GetInt( p_libvlc, "ignore-config" ) )
+        config_LoadConfigFile( p_libvlc, "main" );
     config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
 
     /* Check if the user specified a custom language */
@@ -411,7 +413,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
         module_EndBank( p_libvlc );
         module_InitBank( p_libvlc );
-        config_LoadConfigFile( p_libvlc, "main" );
+        if( !config_GetInt( p_libvlc, "ignore-config" ) )
+            config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
         p_libvlc_global->p_module_bank->b_cache_delete = b_cache_delete;
     }
@@ -465,17 +468,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Check for config file options */
-    if( config_GetInt( p_libvlc, "reset-config" ) > 0 )
+    if( !config_GetInt( p_libvlc, "ignore-config" ) )
     {
-        config_ResetAll( p_libvlc );
-        config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
-        config_SaveConfigFile( p_libvlc, NULL );
-    }
-    if( config_GetInt( p_libvlc, "save-config" ) > 0 )
-    {
-        config_LoadConfigFile( p_libvlc, NULL );
-        config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
-        config_SaveConfigFile( p_libvlc, NULL );
+        if( config_GetInt( p_libvlc, "reset-config" ) > 0 )
+        {
+            config_ResetAll( p_libvlc );
+            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
+            config_SaveConfigFile( p_libvlc, NULL );
+        }
+        if( config_GetInt( p_libvlc, "save-config" ) > 0 )
+        {
+            config_LoadConfigFile( p_libvlc, NULL );
+            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
+            config_SaveConfigFile( p_libvlc, NULL );
+        }
     }
 
     if( b_exit )
@@ -492,7 +498,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Override default configuration with config file settings
      */
-    config_LoadConfigFile( p_libvlc, NULL );
+    if( !config_GetInt( p_libvlc, "ignore-config" ) )
+        config_LoadConfigFile( p_libvlc, NULL );
 
     /*
      * Override configuration with command line settings

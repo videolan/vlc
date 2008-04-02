@@ -2446,6 +2446,8 @@ vlc_module_begin();
 #define MODULE_TEXT \
     N_("print help on a specific module (can be combined with --advanced " \
        "and --help-verbose)")
+#define IGNORE_CONFIG_TEXT \
+    N_("no configuration option will be loaded nor saved to config file")
 #define SAVE_CONFIG_TEXT \
     N_("save the current command line options in the config")
 #define RESET_CONFIG_TEXT \
@@ -2480,6 +2482,9 @@ vlc_module_begin();
         change_unsaveable();
     add_string( "module", NULL, NULL, MODULE_TEXT, "", VLC_FALSE );
         change_short( 'p' );
+        change_internal();
+        change_unsaveable();
+    add_bool( "ignore-config", VLC_FALSE, NULL, IGNORE_CONFIG_TEXT, "", VLC_FALSE );
         change_internal();
         change_unsaveable();
     add_bool( "save-config", VLC_FALSE, NULL, SAVE_CONFIG_TEXT, "",
