@@ -351,7 +351,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     }
 
     /* update triggered every time the vout's crop parameters are changed */
-    var_Create( p_vout, "crop-update", VLC_VAR_VOID ); 
+    var_Create( p_vout, "crop-update", VLC_VAR_VOID );
 
     /* Add custom crop ratios */
     psz_buf = config_GetPsz( p_vout, "custom-crop-ratios" );
