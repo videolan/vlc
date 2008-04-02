@@ -724,13 +724,11 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
     {
-        float f = (float)fmt_in.i_height / fmt_out.i_height;
-        fmt_out.i_width = fmt_in.i_width / f;
+        fmt_out.i_width = (fmt_in.i_width * fmt_out.i_height) / fmt_in.i_height;
     }
     else if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
     {
-        float f = (float)fmt_in.i_width / fmt_out.i_width;
-        fmt_out.i_height = fmt_in.i_height / f;
+        fmt_out.i_height = (fmt_in.i_height * fmt_out.i_width) / fmt_in.i_width;
     }
     else
     {
