@@ -720,19 +720,25 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
     fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
 
+    fmt_in = p_vout->fmt_in;
+
     if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
     {
-        float f = (float)p_vout->fmt_in.i_height / fmt_out.i_height;
-        fmt_out.i_width = p_vout->fmt_in.i_width / f;
+        float f = (float)fmt_in.i_height / fmt_out.i_height;
+        fmt_out.i_width = fmt_in.i_width / f;
     }
     else if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
     {
-        float f = (float)p_vout->fmt_in.i_width / fmt_out.i_width;
-        fmt_out.i_height = p_vout->fmt_in.i_height / f;
+        float f = (float)fmt_in.i_width / fmt_out.i_width;
+        fmt_out.i_height = fmt_in.i_height / f;
+    }
+    else
+    {
+        fmt_out.i_width = fmt_in.i_width;
+        fmt_out.i_height = fmt_in.i_height;
     }
 
     /* Save the snapshot */
-    fmt_in = p_vout->fmt_in;
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     i_ret = image_WriteUrl( p_image, p_pic, &fmt_in, &fmt_out, psz_filename );
     if( i_ret != VLC_SUCCESS )
