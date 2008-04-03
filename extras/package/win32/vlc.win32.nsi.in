@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS installer script for vlc ;
 ; (http://nsis.sourceforge.net) ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -598,6 +598,15 @@ Function .onInit
     ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
   done:
   !insertmacro MUI_LANGDLL_DISPLAY
+
+  ;Win98 detection
+  ReadRegStr $R0 HKLM \
+  "SOFTWARE\Microsoft\Windows\CurrentVersion" VersionNumber
+  StrCmp $R0 '4.9' lbl_win98
+
+  lbl_win98:
+     MessageBox MB_OK|MB_ICONQUESTION "Windows 98 ! Remember to install MSLU" IDOK
+
 FunctionEnd
 
 Section -Post
