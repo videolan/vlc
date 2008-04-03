@@ -1,13 +1,13 @@
 #***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003 - 2007 the VideoLAN team
+# Copyright (C) 2003 - 2008 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Eric Petit <titer@m0k.org>
-#          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Felix Paul Kühne <fkuehne@videolan.org>
 #          Christophe Mutricy <xtophe AT xtelevision.com>
 #          Gildas Bazin <gbazin at videolan dot org>
 #          Damien Fouilleul <damienf at videolan dot org>
@@ -1839,9 +1839,6 @@ CIPHDIG= --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd1
 ifdef HAVE_WIN32
 	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(CIPHDIG) && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
 else
-ifdef HAVE_DARWIN_OS_ON_INTEL
-	(cd $<; $(HOSTCC) ./configure --host=$(HOST) --build=$(BUILD) --prefix=$(PREFIX) --disable-asm CFLAGS="$(CFLAGS)" $(CIPHDIG) && make && make install)
-endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(CIPHDIG) && make && make install)
 endif
 	$(INSTALL_NAME)
@@ -1850,6 +1847,24 @@ endif
 CLEAN_FILE += .gcrypt
 CLEAN_PKG += libgcrypt
 DISTCLEAN_PKG += libgcrypt-$(GCRYPT_VERSION).tar.bz2
+
+# ***************************************************************************
+# opencdk (requires by gnutls 2.x)
+# ***************************************************************************
+
+opencdk-$(OPENCDK_VERSION).tar.bz2:
+	$(WGET) $(OPENCDK_URL)
+
+opencdk: opencdk-$(OPENCDK_VERSION).tar.bz2 
+	$(EXTRACT_BZ2)
+
+.opencdk: opencdk
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make && make install)
+	touch $@
+
+CLEAN_FILE += .opencdk
+CLEAN_PKG += opencdk
+DISTCLEAN_PKG += opencdk-$(OPENCDK_VERSION).tar.bz2
 
 # ***************************************************************************
 # gnutls
@@ -1865,11 +1880,11 @@ ifdef HAVE_WIN32
 	(cd $@; cd lgl; ln -sf alloca_.h alloca.h) 
 endif
 
-.gnutls: gnutls .gcrypt .gpg-error
+.gnutls: gnutls .opencdk .gcrypt .gpg-error 
 ifdef HAVE_WIN32
 	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc && cd gl && make && cd ../lgl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --disable-cxx && cd gl && make && cd ../lgl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --disable-cxx --with-libopencdk-prefix=$(PREFIX) --disable-guile && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@

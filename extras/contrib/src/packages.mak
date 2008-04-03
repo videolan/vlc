@@ -1,12 +1,12 @@
 # ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
-# Copyright © 2003 - 2008 the VideoLAN team
+# Copyright (C) 2003 - 2008 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
-#          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Felix Paul Kühne <fkuehne at videolan dot org>
 #          Rafaël Carré <funman@videolanorg>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -144,9 +144,9 @@ GCRYPT_VERSION=1.4.0
 #GCRYPT_URL=$(VIDEOLAN)/testing/contrib/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 GCRYPT_URL=ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 GNUTLS_VERSION=2.2.2
-GNUTLS_URL=http://josefsson.org/gnutls/releases/gnutls-$(GNUTLS_VERSION).tar.bz2
-#GNUTLS_URL=$(VIDEOLAN)/testing/contrib/gnutls-$(GNUTLS_VERSION).tar.bz2
-#GNUTLS_URL=ftp://ftp.gnupg.org/gcrypt/gnutls/gnutls-$(GNUTLS_VERSION).tar.bz2
+GNUTLS_URL=http://www.gnu.org/software/gnutls/releases/gnutls-$(GNUTLS_VERSION).tar.bz2
+OPENCDK_VERSION=0.6.6
+OPENCDK_URL=http://www.gnu.org/software/gnutls/releases/opencdk/opencdk-$(OPENCDK_VERSION).tar.bz2
 DAAP_VERSION=0.4.0
 DAAP_URL=http://craz.net/programs/itunes/files/libopendaap-$(DAAP_VERSION).tar.bz2
 GLIB_VERSION=1.2.10
