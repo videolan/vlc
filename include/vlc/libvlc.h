@@ -44,7 +44,7 @@ extern "C" {
  * Exception handling
  *****************************************************************************/
 /** \defgroup libvlc_exception libvlc_exception
- * \ingroup libvlc
+ * \ingroup libvlc_core
  * LibVLC Exceptions handling
  * @{
  */
