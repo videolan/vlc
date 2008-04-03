@@ -3,6 +3,7 @@
 *.cache
 *.dylib
 *.lo
+*.lo?
 *.la
 *.mak
 *.moc.cpp
@@ -16,6 +17,8 @@
 .dirstamp
 ABOUT-NLS
 aclocal.m4
+compile
+config.status
 config.h*
 config.log
 configure
