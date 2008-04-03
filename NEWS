@@ -183,16 +183,21 @@ New Localizations:
  * Polish
 
 
-Changes between 0.8.6e and 0.8.6f (not-yet-released):
------------------------------------------------------
+Changes between 0.8.6e and 0.8.6f:
+----------------------------------
 
 Security updates:
- * Fix subtitle buffer overflow
- * Fix Real RTSP code execution problem (CVE-2008-0073)
- * Fix cinepak integer overflow
+ * Really fixed subtitle buffer overflow (CVE-2007-6681)
+ * Fixed Real RTSP code execution problem (CVE-2008-0073)
+ * Fixed MP4 integer overflows (CVE-2008-1489)
+ * Fixed cinepak integer overflow
 
 Various bugfixes:
- * mozilla plugin registers a usable range of mimetypes on OSX
+ * The Mozilla plugin registers a usable range of MIME-types on Mac OS X
+ * Improved VLC's video output behavior on multi-screen setups running Mac OS X
+ * Fixed crashes in H264 packetizer
+ * Close MMS access on network timeout
+ * Fix some problems with AAC decoder & packetizer
 
 
 Changes between 0.8.6d and 0.8.6e:
