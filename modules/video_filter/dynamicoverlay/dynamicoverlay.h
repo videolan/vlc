@@ -24,6 +24,9 @@
 #ifndef DYNAMIC_OVERLAY_H
 #define DYNAMIC_OVERLAY_H   1
 
+#include <vlc/vlc.h>
+#include <vlc_filter.h>
+
 /*****************************************************************************
  * buffer_t: Command and response buffer
  *****************************************************************************/
@@ -42,61 +45,42 @@ int BufferDestroy( buffer_t *p_buffer );
 int BufferAdd( buffer_t *p_buffer, const char *p_data, size_t i_len );
 int BufferPrintf( buffer_t *p_buffer, const char *p_fmt, ... );
 int BufferDel( buffer_t *p_buffer, int i_len );
+char *BufferGetToken( buffer_t *p_buffer );
 
 /*****************************************************************************
  * Command structures
  *****************************************************************************/
 
- #define INT( name ) int name;
-#define CHARS( name, count ) char name[count];
-#define COMMAND( name, param, ret, atomic, code ) \
-struct commandparams##name##_t \
-{ \
-    param \
-};
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-#undef INT
-#undef CHARS
-
-union commandparams_t
+/** struct commandparams_t - command params structure */
+typedef struct commandparams_t
 {
-#define COMMAND( name, param, ret, atomic, code ) struct commandparams##name##_t name;
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-};
-typedef union commandparams_t commandparams_t;
+    int32_t i_id;       /*< overlay id */
+    int32_t i_shmid;    /*< shared memory identifier */
 
-#define INT( name ) int name;
-#define CHARS( name, count ) char name[count];
-#define COMMAND( name, param, ret, atomic, code ) \
-struct commandresults##name##_t \
-{ \
-    ret \
-};
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-#undef INT
-#undef CHARS
+    vlc_fourcc_t fourcc;/*< chroma */
 
-union commandresults_t {
-#define COMMAND( name, param, ret, atomic, code ) struct commandresults##name##_t name;
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-};
-typedef union commandresults_t commandresults_t;
+    int32_t i_x;        /*< x position of overlay */
+    int32_t i_y;        /*< y position of overlay */
+    int32_t i_width;    /*< width of overlay */
+    int32_t i_height;   /*< height of overlay */
+
+    int32_t i_alpha;    /*< alpha value of overlay */
+
+    struct text_style_t fontstyle; /*< text style */
+
+    vlc_bool_t b_visible; /*< visibility flag of overlay */
+} commandparams_t;
 
 typedef struct commanddesc_t
 {
     const char *psz_command;
     vlc_bool_t b_atomic;
-    int ( *pf_parser ) ( const char *psz_command, const char *psz_end,
+    int ( *pf_parser ) ( char *psz_command, char *psz_end,
                          commandparams_t *p_params );
     int ( *pf_execute ) ( filter_t *p_filter, const commandparams_t *p_params,
-                          commandresults_t *p_results,
-                          struct filter_sys_t *p_sys );
-    int ( *pf_unparser ) ( const commandresults_t *p_results,
-                           buffer_t *p_output );
+                          commandparams_t *p_results );
+    int ( *pf_unparse ) ( const commandparams_t *p_results,
+                          buffer_t *p_output );
 } commanddesc_t;
 
 typedef struct command_t
@@ -104,10 +88,12 @@ typedef struct command_t
     struct commanddesc_t *p_command;
     int i_status;
     commandparams_t params;
-    commandresults_t results;
-
+    commandparams_t results;
     struct command_t *p_next;
 } command_t;
+
+void RegisterCommand( filter_t *p_filter );
+void UnregisterCommand( filter_t *p_filter );
 
 /*****************************************************************************
  * queue_t: Command queue
@@ -124,5 +110,61 @@ int QueueDestroy( queue_t *p_queue );
 int QueueEnqueue( queue_t *p_queue, command_t *p_cmd );
 command_t *QueueDequeue( queue_t *p_queue );
 int QueueTransfer( queue_t *p_sink, queue_t *p_source );
+
+/*****************************************************************************
+ * overlay_t: Overlay descriptor
+ *****************************************************************************/
+
+typedef struct overlay_t
+{
+    int i_x, i_y;
+    int i_alpha;
+    vlc_bool_t b_active;
+
+    video_format_t format;
+    struct text_style_t fontstyle;
+    union {
+        picture_t *p_pic;
+        char *p_text;
+    } data;
+} overlay_t;
+
+overlay_t *OverlayCreate( void );
+int OverlayDestroy( overlay_t *p_ovl );
+
+/*****************************************************************************
+ * list_t: Command queue
+ *****************************************************************************/
+
+typedef struct list_t
+{
+    overlay_t **pp_head, **pp_tail;
+} list_t;
+
+int ListInit( list_t *p_list );
+int ListDestroy( list_t *p_list );
+ssize_t ListAdd( list_t *p_list, overlay_t *p_new );
+int ListRemove( list_t *p_list, size_t i_idx );
+overlay_t *ListGet( list_t *p_list, size_t i_idx );
+overlay_t *ListWalk( list_t *p_list );
+
+/*****************************************************************************
+ * filter_sys_t: adjust filter method descriptor
+ *****************************************************************************/
+
+struct filter_sys_t
+{
+    buffer_t input, output;
+
+    int i_inputfd, i_outputfd;
+    char *psz_inputfile, *psz_outputfile;
+
+    commanddesc_t **pp_commands; /* array of commands */
+    size_t i_commands;
+
+    vlc_bool_t b_updated, b_atomic;
+    queue_t atomic, pending, processed;
+    list_t overlays;
+};
 
 #endif

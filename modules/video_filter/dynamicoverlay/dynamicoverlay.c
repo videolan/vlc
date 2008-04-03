@@ -28,13 +28,14 @@
 # include "config.h"
 #endif
 
-#include <fcntl.h>
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include <vlc_vout.h>
-
 #include <vlc_filter.h>
 #include <vlc_osd.h>
+
+#include <ctype.h>
+#include <fcntl.h>
 
 #include "dynamicoverlay.h"
 
@@ -80,282 +81,6 @@ static const char *ppsz_filter_options[] = {
 };
 
 /*****************************************************************************
- * overlay_t: Overlay descriptor
- *****************************************************************************/
-
-struct overlay_t
-{
-    int i_x, i_y;
-    int i_alpha;
-    vlc_bool_t b_active;
-
-    video_format_t format;
-    union {
-        picture_t *p_pic;
-        char *p_text;
-    } data;
-};
-typedef struct overlay_t overlay_t;
-
-static overlay_t *OverlayCreate( void )
-{
-    overlay_t *p_ovl = malloc( sizeof( overlay_t ) );
-    if( p_ovl == NULL )
-       return NULL;
-    memset( p_ovl, 0, sizeof( overlay_t ) );
-
-    p_ovl->i_x = p_ovl->i_y = 0;
-    p_ovl->i_alpha = 0xFF;
-    p_ovl->b_active = VLC_FALSE;
-    vout_InitFormat( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
-                     VOUT_ASPECT_FACTOR );
-    p_ovl->data.p_text = NULL;
-
-    return p_ovl;
-}
-
-static int OverlayDestroy( overlay_t *p_ovl )
-{
-    if( p_ovl->data.p_text != NULL )
-        free( p_ovl->data.p_text );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * list_t: Command queue
- *****************************************************************************/
-
-struct list_t
-{
-    overlay_t **pp_head, **pp_tail;
-};
-typedef struct list_t list_t;
-
-static int ListInit( list_t *p_list )
-{
-    p_list->pp_head = malloc( 16 * sizeof( overlay_t * ) );
-    if( p_list->pp_head == NULL )
-        return VLC_ENOMEM;
-
-    p_list->pp_tail = p_list->pp_head + 16;
-    memset( p_list->pp_head, 0, 16 * sizeof( overlay_t * ) );
-
-    return VLC_SUCCESS;
-}
-
-static int ListDestroy( list_t *p_list )
-{
-    for( overlay_t **pp_cur = p_list->pp_head;
-         pp_cur < p_list->pp_tail;
-         ++pp_cur )
-    {
-        if( *pp_cur != NULL )
-        {
-            OverlayDestroy( *pp_cur );
-            free( *pp_cur );
-        }
-    }
-    free( p_list->pp_head );
-
-    return VLC_SUCCESS;
-}
-
-static ssize_t ListAdd( list_t *p_list, overlay_t *p_new )
-{
-    /* Find an available slot */
-    for( overlay_t **pp_cur = p_list->pp_head;
-         pp_cur < p_list->pp_tail;
-         ++pp_cur )
-    {
-        if( *pp_cur == NULL )
-        {
-            *pp_cur = p_new;
-            return pp_cur - p_list->pp_head;
-        }
-    }
-
-    /* Have to expand */
-    size_t i_size = p_list->pp_tail - p_list->pp_head;
-    size_t i_newsize = i_size * 2;
-    p_list->pp_head = realloc( p_list->pp_head,
-                               i_newsize * sizeof( overlay_t * ) );
-    if( p_list->pp_head == NULL )
-        return VLC_ENOMEM;
-
-    p_list->pp_tail = p_list->pp_head + i_newsize;
-    memset( p_list->pp_head + i_size, 0, i_size * sizeof( overlay_t * ) );
-    p_list->pp_head[i_size] = p_new;
-    return i_size;
-}
-
-static int ListRemove( list_t *p_list, size_t i_idx )
-{
-    int ret;
-
-    if( ( i_idx >= (size_t)( p_list->pp_tail - p_list->pp_head ) ) ||
-        ( p_list->pp_head[i_idx] == NULL ) )
-    {
-        return VLC_EGENERIC;
-    }
-
-    ret = OverlayDestroy( p_list->pp_head[i_idx] );
-    free( p_list->pp_head[i_idx] );
-    p_list->pp_head[i_idx] = NULL;
-
-    return ret;
-}
-
-static overlay_t *ListGet( list_t *p_list, size_t i_idx )
-{
-    if( ( i_idx >= (size_t)( p_list->pp_tail - p_list->pp_head ) ) ||
-        ( p_list->pp_head[i_idx] == NULL ) )
-    {
-        return NULL;
-    }
-    return p_list->pp_head[i_idx];
-}
-
-static overlay_t *ListWalk( list_t *p_list )
-{
-    static overlay_t **pp_cur = NULL;
-
-    if( pp_cur == NULL )
-        pp_cur = p_list->pp_head;
-    else
-        pp_cur = pp_cur + 1;
-
-    for( ; pp_cur < p_list->pp_tail; ++pp_cur )
-    {
-        if( ( *pp_cur != NULL ) &&
-            ( (*pp_cur)->b_active == VLC_TRUE )&&
-            ( (*pp_cur)->format.i_chroma != VLC_FOURCC( '\0','\0','\0','\0') ) )
-        {
-            return *pp_cur;
-        }
-    }
-    pp_cur = NULL;
-    return NULL;
-}
-
-/*****************************************************************************
- * filter_sys_t: adjust filter method descriptor
- *****************************************************************************/
-struct filter_sys_t
-{
-    buffer_t input, output;
-
-    int i_inputfd, i_outputfd;
-
-    char *psz_inputfile, *psz_outputfile;
-
-    vlc_bool_t b_updated, b_atomic;
-    queue_t atomic, pending, processed;
-    list_t overlays;
-};
-
-/*****************************************************************************
- * Command functions
- *****************************************************************************/
-
-#define SKIP \
-    { \
-        const char *psz_temp = psz_command; \
-        while( isspace( *psz_temp ) ) { \
-            ++psz_temp; \
-        } \
-        if( psz_temp == psz_command ) { \
-            return VLC_EGENERIC; \
-        } \
-        psz_command = psz_temp; \
-    }
-#define INT( name ) \
-    SKIP \
-    { \
-        char *psz_temp; \
-        p_myparams->name = strtol( psz_command, &psz_temp, 10 ); \
-        if( psz_temp == psz_command ) \
-        { \
-            return VLC_EGENERIC; \
-        } \
-        psz_command = psz_temp; \
-    }
-#define CHARS( name, count ) \
-    SKIP \
-    { \
-        if( psz_end - psz_command < count ) \
-        { \
-            return VLC_EGENERIC; \
-        } \
-        memcpy( p_myparams->name, psz_command, count ); \
-        psz_command += count; \
-    }
-#define COMMAND( name, param, ret, atomic, code ) \
-static int Command##name##Parse( const char *psz_command, \
-                                 const char *psz_end, \
-                                 commandparams_t *p_params ) \
-{ \
-    struct commandparams##name##_t *p_myparams = &p_params->name; \
-    param \
-    return VLC_SUCCESS; \
-}
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-#undef SKIP
-#undef INT
-#undef CHARS
-
-#define COMMAND( name, param, ret, atomic, code ) \
-static int Command##name##Exec( filter_t *p_filter, \
-                                const commandparams_t *p_gparams, \
-                                commandresults_t *p_gresults, \
-                                filter_sys_t *p_sys ) \
-{ \
-    const struct commandparams##name##_t *p_params = &p_gparams->name; \
-    struct commandresults##name##_t *p_results = &p_gresults->name; \
-    code \
-}
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-
-#define INT( name ) \
-    { \
-        int ret = BufferPrintf( p_output, " %d", p_myresults->name ); \
-        if( ret != VLC_SUCCESS ) { \
-            return ret; \
-        } \
-    }
-#define CHARS( name, count ) \
-    { \
-        int ret = BufferAdd( p_output, p_myresults->name, count ); \
-        if( ret != VLC_SUCCESS ) { \
-            return ret; \
-        } \
-    }
-#define COMMAND( name, param, ret, atomic, code ) \
-static int Command##name##Unparse( const commandresults_t *p_results, \
-                           buffer_t *p_output ) \
-{ \
-    const struct commandresults##name##_t *p_myresults = &p_results->name; \
-    ret \
-    return VLC_SUCCESS; \
-}
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-#undef INT
-#undef CHARS
-
-static commanddesc_t p_commands[] =
-{
-#define COMMAND( name, param, ret, atomic, code ) \
-{ #name, atomic, Command##name##Parse, Command##name##Exec, Command##name##Unparse },
-#include "dynamicoverlay_commands.h"
-#undef COMMAND
-};
-
-#define NUMCOMMANDS (sizeof(p_commands)/sizeof(commanddesc_t))
-
-/*****************************************************************************
  * Create: allocates adjust video thread output method
  *****************************************************************************
  * This function allocates and initializes a adjust vout method.
@@ -399,10 +124,7 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, "overlay-input", AdjustCallback, p_sys );
     var_AddCallback( p_filter, "overlay-output", AdjustCallback, p_sys );
 
-    msg_Dbg( p_filter, "%d commands are available:", NUMCOMMANDS );
-    for( size_t i_index = 0; i_index < NUMCOMMANDS; ++i_index )
-        msg_Dbg( p_filter, "    %s", p_commands[i_index].psz_command );
-
+    RegisterCommand( p_filter );
     return VLC_SUCCESS;
 }
 
@@ -421,6 +143,7 @@ static void Destroy( vlc_object_t *p_this )
     QueueDestroy( &p_filter->p_sys->pending );
     QueueDestroy( &p_filter->p_sys->processed );
     ListDestroy( &p_filter->p_sys->overlays );
+    UnregisterCommand( p_filter );
 
     free( p_filter->p_sys->psz_inputfile );
     free( p_filter->p_sys->psz_outputfile );
@@ -502,74 +225,51 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     /* Parse any complete commands */
     char *p_end, *p_cmd;
     while( ( p_end = memchr( p_sys->input.p_begin, '\n',
-                            p_sys->input.i_length ) ) )
+                             p_sys->input.i_length ) ) )
     {
-        *p_end = '\0';
-        p_cmd = p_sys->input.p_begin;
-
-        commanddesc_t *p_lower = p_commands;
-        commanddesc_t *p_upper = p_commands + NUMCOMMANDS;
+        commanddesc_t *p_cur = NULL;
+        vlc_bool_t b_found = VLC_FALSE;
         size_t i_index = 0;
-        while( 1 )
+
+        *p_end = '\0';
+        p_cmd = BufferGetToken( &p_sys->input );
+
+        msg_Info( p_filter, "Search command: %s", p_cmd );
+        for( i_index = 0; i_index < p_sys->i_commands; i_index++ )
         {
-            if( ( p_cmd[i_index] == '\0' ) ||
-                isspace( p_cmd[i_index] ) )
+            p_cur = p_sys->pp_commands[i_index];
+            if( !strncmp( p_cur->psz_command, p_cmd, strlen(p_cur->psz_command) ) )
             {
+                p_cmd[strlen(p_cur->psz_command)] = '\0';
+                b_found = VLC_TRUE;
                 break;
             }
-            commanddesc_t *p_cur = p_lower;
-            while( ( p_cur < p_upper ) &&
-                   ( p_cur->psz_command[i_index] != p_cmd[i_index] ) )
-            {
-                ++p_cur;
-            }
-            p_lower = p_cur;
-            while( ( p_cur < p_upper ) &&
-                   ( p_cur->psz_command[i_index] == p_cmd[i_index] ) )
-            {
-                ++p_cur;
-            }
-            p_upper = p_cur;
-            ++i_index;
         }
-        if( p_lower >= p_upper )
+
+        if( !b_found )
         {
             /* No matching command */
-            p_cmd[i_index] = '\0';
             msg_Err( p_filter, "Got invalid command: %s", p_cmd );
-            BufferPrintf( &p_sys->output, "FAILURE: %d Invalid Command\n", VLC_EGENERIC );
-        }
-        else if ( p_lower + 1 < p_upper )
-        {
-            /* Command is not a unique prefix of a command */
-            p_cmd[i_index] = '\0';
-            msg_Err( p_filter, "Got ambiguous command: %s", p_cmd );
-            msg_Err( p_filter, "Possible completions are:" );
-            for( ; p_lower < p_upper; ++p_lower )
-            {
-                msg_Err( p_filter, "    %s", p_lower->psz_command );
-            }
             BufferPrintf( &p_sys->output, "FAILURE: %d Invalid Command\n", VLC_EGENERIC );
         }
         else
         {
-            /* Command is valid */
-            command_t *p_command = malloc( sizeof( command_t ) );
-            if( !p_command )
+            msg_Info( p_filter, "Got valid command: %s", p_cmd );
+
+            command_t *p_cmddesc = malloc( sizeof( command_t ) );
+            if( !p_cmddesc )
                 return NULL;
 
-            p_command->p_command = p_lower;
-            p_command->p_command->pf_parser( p_cmd + i_index, p_end,
-                                             &p_command->params );
+            p_cmd = p_cmd + strlen(p_cur->psz_command) +1;
+            p_cmddesc->p_command = p_cur;
+            p_cmddesc->p_command->pf_parser( p_cmd, p_end,
+                                             &p_cmddesc->params );
 
-            if( ( p_command->p_command->b_atomic == VLC_TRUE ) &&
+            if( ( p_cmddesc->p_command->b_atomic == VLC_TRUE ) &&
                 ( p_sys->b_atomic == VLC_TRUE ) )
-                QueueEnqueue( &p_sys->atomic, p_command );
+                QueueEnqueue( &p_sys->atomic, p_cmddesc );
             else
-                QueueEnqueue( &p_sys->pending, p_command );
-
-            p_cmd[i_index] = '\0';
-            msg_Dbg( p_filter, "Got valid command: %s", p_cmd );
+                QueueEnqueue( &p_sys->pending, p_cmddesc );
         }
 
         BufferDel( &p_sys->input, p_end - p_sys->input.p_begin + 1 );
@@ -581,7 +281,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     {
         p_command->i_status =
             p_command->p_command->pf_execute( p_filter, &p_command->params,
-                                              &p_command->results, p_sys );
+                                              &p_command->results );
         QueueEnqueue( &p_sys->processed, p_command );
     }
 
@@ -651,18 +351,25 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     while( (p_overlay = ListWalk( &p_sys->overlays )) )
     {
         msg_Dbg( p_filter, "Displaying overlay: %4.4s, %d, %d, %d",
-                 &p_overlay->format.i_chroma, p_overlay->i_x, p_overlay->i_y,
+                 (char*)&p_overlay->format.i_chroma, p_overlay->i_x, p_overlay->i_y,
                  p_overlay->i_alpha );
+
         if( p_overlay->format.i_chroma == VLC_FOURCC('T','E','X','T') )
         {
-            *pp_region = p_spu->pf_create_region( p_filter,
+            *pp_region = p_spu->pf_create_region( VLC_OBJECT(p_filter),
                                                   &p_overlay->format );
             if( !*pp_region )
+                break;
+            (*pp_region)->psz_text = strdup( p_overlay->data.p_text );
+            (*pp_region)->p_style = malloc( sizeof(struct text_style_t) );
+            if( !(*pp_region)->p_style )
             {
-                msg_Err( p_filter, "cannot allocate subpicture region" );
-                continue;
+                p_spu->pf_destroy_region( VLC_OBJECT(p_filter), (*pp_region) );
+                *pp_region = NULL;
+                break;
             }
             (*pp_region)->psz_text = strdup( p_overlay->data.p_text );
+            memcpy( (*pp_region)->p_style, &p_overlay->fontstyle, sizeof(text_style_t) );
         }
         else
         {
@@ -677,7 +384,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                 continue;
             }
             vout_CopyPicture( p_filter, &clone, p_overlay->data.p_pic );
-            *pp_region = p_spu->pf_make_region( p_filter, &p_overlay->format,
+            *pp_region = p_spu->pf_make_region( VLC_OBJECT(p_filter),
+                                                &p_overlay->format,
                                                 &clone );
             if( !*pp_region )
             {
@@ -701,6 +409,12 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
                            void *p_data )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+
+    if( !strncmp( psz_var, "overlay-input", 13 ) )
+        p_sys->psz_inputfile = newval.psz_string;
+    else if( !strncmp( psz_var, "overlay-output", 14 ) )
+        p_sys->psz_outputfile = newval.psz_string;
+
     return VLC_EGENERIC;
 }

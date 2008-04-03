@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_osd.h>
 
 #include "dynamicoverlay.h"
 

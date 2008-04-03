@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dynamicoverlay_commands.def : dynamic overlay plugin commands
+ * dynamicoverlay_buffer.h : dynamic overlay buffer
  *****************************************************************************
  * Copyright (C) 2008 the VideoLAN team
  * $Id$
@@ -27,6 +27,10 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_osd.h>
+#include <vlc_filter.h>
+
+#include <ctype.h>
 
 #include "dynamicoverlay.h"
 
@@ -53,6 +57,20 @@ int BufferDestroy( buffer_t *p_buffer )
     p_buffer->p_begin = NULL;
 
     return VLC_SUCCESS;
+}
+
+char *BufferGetToken( buffer_t *p_buffer )
+{
+    char *p_char = p_buffer->p_begin;
+
+    while( isspace( p_char[0] ) || p_char[0] == '\0' )
+    {
+        if( p_char <= (p_buffer->p_begin + p_buffer->i_length) )
+            p_char++;
+        else
+            return NULL;
+    }
+    return p_char;
 }
 
 int BufferAdd( buffer_t *p_buffer, const char *p_data, size_t i_len )
