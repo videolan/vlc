@@ -36,7 +36,7 @@ typedef struct libvlc_instance_t libvlc_instance_t;
  *****************************************************************************/
 
 /** \defgroup libvlc_exception libvlc_exception
- * \ingroup libvlc
+ * \ingroup libvlc_core
  * LibVLC Exceptions handling
  * @{
  */
@@ -54,7 +54,7 @@ typedef struct libvlc_exception_t
  * Time
  *****************************************************************************/
 /** \defgroup libvlc_time libvlc_time
- * \ingroup libvlc
+ * \ingroup libvlc_core
  * LibVLC Time support in libvlc
  * @{
  */
@@ -241,7 +241,7 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
  *****************************************************************************/
 
 /** \defgroup libvlc_log libvlc_log
- * \ingroup libvlc
+ * \ingroup libvlc_core
  * LibVLC Message Logging
  * @{
  */

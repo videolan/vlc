@@ -187,7 +187,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
  * Media List Player
  *****************************************************************************/
 /** \defgroup libvlc_media_list_player libvlc_media_list_player
- * \ingroup libvlc
+ * \ingroup libvlc_media_list_player
  * LibVLC Media List Player, play a media_list. You can see that as a media
  * instance subclass
  * @{

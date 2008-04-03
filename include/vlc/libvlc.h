@@ -759,7 +759,7 @@ VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *, int, libvlc_e
  *****************************************************************************/
 
 /** \defgroup libvlc_event libvlc_event
- * \ingroup libvlc
+ * \ingroup libvlc_core
  * LibVLC Events
  * @{
  */
@@ -869,7 +869,7 @@ VLC_PUBLIC_API int
  *****************************************************************************/
 
 /** \defgroup libvlc_log libvlc_log
- * \ingroup libvlc
+ * \ingroup libvlc_core
  * LibVLC Message Logging
  * @{
  */

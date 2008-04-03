@@ -33,7 +33,7 @@ extern "C" {
  * Events handling
  *****************************************************************************/
 
-/** \defgroup libvlc_events Events
+/** \defgroup libvlc_event libvlc_event
  * \ingroup libvlc
  * LibVLC Available Events
  * @{
