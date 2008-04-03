@@ -190,7 +190,7 @@ local function find_datadir(name)
     end
     error("Unable to find the `"..name.."' directory.")
 end
-http_dir = config.dir or find_datadir("http-lua")
+http_dir = config.dir or find_datadir("http")
 
 do
     local oldpath = package.path
