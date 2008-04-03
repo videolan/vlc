@@ -46,6 +46,25 @@
 			<string>NSWindow</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>VLCPlaylistCommon</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>o_outline_view</key>
+				<string>id</string>
+				<key>o_tc_author</key>
+				<string>id</string>
+				<key>o_tc_duration</key>
+				<string>id</string>
+				<key>o_tc_name</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkForUpdate</key>
@@ -408,25 +427,6 @@
 				<key>o_window</key>
 				<string>id</string>
 				<key>o_wizard</key>
-				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>VLCPlaylistCommon</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>o_outline_view</key>
-				<string>id</string>
-				<key>o_tc_author</key>
-				<string>id</string>
-				<key>o_tc_duration</key>
-				<string>id</string>
-				<key>o_tc_name</key>
 				<string>id</string>
 			</dict>
 			<key>SUPERCLASS</key>
