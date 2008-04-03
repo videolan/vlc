@@ -36,6 +36,8 @@ var albumart_id = -1;
 var slider_mouse_down = 0;
 var slider_dx = 0;
 
+var input_options = new Array();
+
 /* findPosX() from http://www.quirksmode.rg/js/indpos.html */
 function findPosX(obj)
 {
@@ -283,23 +285,25 @@ function clear_children( elt )
  * Interface actions
  *********************************************************************/
 /* input actions */
-function in_play()
+function in_playenqueue( cmd )
 {
     var input = value('input_mrl');
-    if( value('sout_mrl') != '' )
-        input += ' '+value('sout_mrl');
-    var url = 'requests/status.xml?command=in_play&input='+encodeURIComponent( addslashes(escapebackslashes(input)) );
+    var url = 'requests/status.xml?command=in_'+cmd+'&input='+encodeURIComponent( addslashes(escapebackslashes(input)) );
+    for( i in input_options )
+        if( input_options[i] != ':option=value' )
+            url += '&option='+encodeURIComponent( addslashes(escapebackslashes(input_options[i]) ));
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
+
+function in_play()
+{
+    in_playenqueue( 'play' );
+}
+
 function in_enqueue()
 {
-    var input = value('input_mrl');
-    if( value('sout_mrl') != '' )
-        input += ' '+value('sout_mrl');
-    var url = 'requests/status.xml?command=in_enqueue&input='+encodeURIComponent( addslashes(escapebackslashes(input)) );
-    loadXMLDoc( url, parse_status );
-    setTimeout( 'update_playlist()', 1000 );
+    in_playenqueue( 'enqueue' );
 }
 
 /* playlist actions */
@@ -771,12 +775,15 @@ function update_input_disc()
             mrl.value += ":"+chapter;
     }
 
+    remove_input_options( ':sub-track' );
+    remove_input_options( ':audio-track' );
+
     if( type != "cdda" )
     {
         if( subs != '' )
-            mrl.value += " :sub-track="+subs;
+            add_input_option( ":sub-track="+subs );
         if( audio != '' )
-            mrl.value += " :audio-track="+audio;
+            add_input_option( ":audio-track="+audio );
     }
 
 }
@@ -825,24 +832,27 @@ function update_input_net()
         mrl.value += url;
     }
 
+    remove_input_options( ':access-filter' );
     if( checked( "input_net_timeshift" ) )
-        mrl.value += " :access-filter=timeshift";
+        add_input_option( ":access-filter=timeshift" );
 }
 
 /* update the input MRL using data from the input fake helper */
 function update_input_fake()
 {
+    remove_input_options( ":fake" );
     var mrl = document.getElementById( 'input_mrl' );
 
     mrl.value = "fake:";
-    mrl.value += " :fake-file=" + value( "input_fake_filename" );
+
+    add_input_option( ":fake-file=" + value( "input_fake_filename" ) );
 
     if( value( "input_fake_width" ) )
-        mrl.value += " :fake-width=" + value( "input_fake_width" );
+        add_input_option( ":fake-width=" + value( "input_fake_width" ) );
     if( value( "input_fake_height" ) )
-        mrl.value += " :fake-height=" + value( "input_fake_height" );
+        add_input_option( ":fake-height=" + value( "input_fake_height" ) );
     if( value( "input_fake_ar" ) )
-        mrl.value += " :fake-ar=" + value( "input_fake_ar" );
+        add_input_option( ":fake-ar=" + value( "input_fake_ar" ) );
 }
 
 /**********************************************************************
@@ -867,8 +877,10 @@ function toggle_show_sout_helper()
 /* update the sout MRL using data from the sout_helper */
 function update_sout()
 {
-    var mrl = document.getElementById( 'sout_mrl' );
-    mrl.value = "";
+    var option = "";
+    /* Remove all options starting with :sout since we're going to write them
+     * again. */
+    remove_input_options( ":sout" );
 
     check_and_replace_int( 'sout_http_port', 8080 );
     check_and_replace_int( 'sout_mmsh_port', 8080 );
@@ -892,36 +904,37 @@ function update_sout()
 
     if( transcode )
     {
-        mrl.value += ":sout=#transcode{";
+        option = ":sout=#transcode{";
         var alot = false; /* alot == at least one transcode */
         if( checked( 'sout_vcodec_s' ) )
         {
-            mrl.value += "vcodec="+value( 'sout_vcodec' )+",vb="+value( 'sout_vb' )+",scale="+value( 'sout_scale' );
+            option += "vcodec="+value( 'sout_vcodec' )+",vb="+value( 'sout_vb' )+",scale="+value( 'sout_scale' );
             alot = true;
         }
         if( checked( 'sout_acodec_s' ) )
         {
-            if( alot ) mrl.value += ",";
-            mrl.value += "acodec="+value( 'sout_acodec' )+",ab="+value( 'sout_ab' );
+            if( alot ) option += ",";
+            option += "acodec="+value( 'sout_acodec' )+",ab="+value( 'sout_ab' );
             if( value( 'sout_channels' ) )
-                mrl.value += ",channels="+value( 'sout_channels' );
+                option += ",channels="+value( 'sout_channels' );
             alot = true;
         }
         if( checked( 'sout_soverlay' ) )
         {
-            if( alot ) mrl.value += ",";
-            mrl.value += "soverlay";
+            if( alot ) option += ",";
+            option += "soverlay";
             alot = true;
         }
         else if( checked( 'sout_sub' ) )
         {
-            if( alot ) mrl.value += ",";
-            mrl.value += "scodec="+value( 'sout_scodec' );
+            if( alot ) option += ",";
+            option += "scodec="+value( 'sout_scodec' );
             alot = true;
         }
-        mrl.value += value( 'sout_transcode_extra' );
+        option += value( 'sout_transcode_extra' );
             
-        mrl.value += "}";
+        option += "}";
+
     }
 
     var output = checked( 'sout_display' ) + checked( 'sout_file' )
@@ -931,93 +944,101 @@ function update_sout()
     if( output )
     {
         if( transcode )
-            mrl.value += ":";
+            option += ":";
         else
-            mrl.value += ":sout=#";
+            option += ":sout=#";
         var aloo = false; /* aloo == at least one output */
         var mux = radio_value( 'sout_mux' );
         var ttl = parseInt( value( 'sout_ttl' ) );
-        if( output > 1 ) mrl.value += "duplicate{";
+        if( output > 1 ) option += "duplicate{";
         if( checked( 'sout_display' ) )
         {
-            if( output > 1 ) mrl.value += "dst="
-            mrl.value += "display";
+            if( output > 1 ) option += "dst="
+            option += "display";
             aloo = true;
         }
         if( checked( 'sout_file' ) )
         {
-            if( aloo ) mrl.value += ",";
-            if( output > 1 ) mrl.value += "dst="
-            mrl.value += "std{access=file,mux="+mux+",dst="+value( 'sout_file_filename' )+"}";
+            if( aloo ) option += ",";
+            if( output > 1 ) option += "dst="
+            option += "std{access=file,mux="+mux+",dst="+value( 'sout_file_filename' )+"}";
             aloo = true;
         }
         if( checked( 'sout_http' ) )
         {
-            if( aloo ) mrl.value += ",";
-            if( output > 1 ) mrl.value += "dst="
-            mrl.value += "std{access=http,mux="+mux+",dst="+value( 'sout_http_addr' );
+            if( aloo ) option += ",";
+            if( output > 1 ) option += "dst="
+            option += "std{access=http,mux="+mux+",dst="+value( 'sout_http_addr' );
             if( value( 'sout_http_port' ) )
-                mrl.value += ":"+value( 'sout_http_port' );
-            mrl.value += "}";
+                option += ":"+value( 'sout_http_port' );
+            option += "}";
             aloo = true;
         }
         if( checked( 'sout_mmsh' ) )
         {
-            if( aloo ) mrl.value += ",";
-            if( output > 1 ) mrl.value += "dst="
-            mrl.value += "std{access=mmsh,mux="+mux+",dst="+value( 'sout_mmsh_addr' );
+            if( aloo ) option += ",";
+            if( output > 1 ) option += "dst="
+            option += "std{access=mmsh,mux="+mux+",dst="+value( 'sout_mmsh_addr' );
             if( value( 'sout_mmsh_port' ) )
-                mrl.value += ":"+value( 'sout_mmsh_port' );
-            mrl.value += "}";
+                option += ":"+value( 'sout_mmsh_port' );
+            option += "}";
             aloo = true;
         }
         if( checked( 'sout_rtp' ) )
         {
-            if( aloo ) mrl.value += ",";
-            if( output > 1 ) mrl.value += "dst="
-            mrl.value += "std{access=rtp";
-            if( ttl ) mrl.value += "{ttl="+ttl+"}";
-            mrl.value += ",mux="+mux+",dst="+value( 'sout_rtp_addr' );
+            if( aloo ) option += ",";
+            if( output > 1 ) option += "dst="
+            option += "std{access=rtp";
+            if( ttl ) option += "{ttl="+ttl+"}";
+            option += ",mux="+mux+",dst="+value( 'sout_rtp_addr' );
             if( value( 'sout_rtp_port' ) )
-                mrl.value += ":"+value( 'sout_rtp_port' );
+                option += ":"+value( 'sout_rtp_port' );
             if( checked( 'sout_sap' ) )
             {
-                mrl.value += ",sap";
+                option += ",sap";
                 if( value( 'sout_sap_group' ) != '' )
                 {
-                    mrl.value += ",group=\""+value( 'sout_sap_group' )+"\"";
+                    option += ",group=\""+value( 'sout_sap_group' )+"\"";
                 }
-                mrl.value += ",name=\""+value( 'sout_sap_name' )+"\"";
+                option += ",name=\""+value( 'sout_sap_name' )+"\"";
             }
-            mrl.value += "}";
+            option += "}";
             aloo = true;
         }
         if( checked( 'sout_udp' ) )
         {
-            if( aloo ) mrl.value += ",";
-            if( output > 1 ) mrl.value += "dst="
-            mrl.value += "std{access=udp";
-            if( ttl ) mrl.value += "{ttl="+ttl+"}";
-            mrl.value += ",mux="+mux+",dst="+value( 'sout_udp_addr' );
+            if( aloo ) option += ",";
+            if( output > 1 ) option += "dst="
+            option += "std{access=udp";
+            if( ttl ) option += "{ttl="+ttl+"}";
+            option += ",mux="+mux+",dst="+value( 'sout_udp_addr' );
             if( value('sout_udp_port' ) )
-                mrl.value += ":"+value( 'sout_udp_port' );
+                option += ":"+value( 'sout_udp_port' );
             if( checked( 'sout_sap' ) )
             {
-                mrl.value += ",sap";
+                option += ",sap";
                 if( value( 'sout_sap_group' ) != '' )
                 {
-                    mrl.value += ",group=\""+value( 'sout_sap_group' )+"\"";
+                    option += ",group=\""+value( 'sout_sap_group' )+"\"";
                 }
-                mrl.value += ",name=\""+value( 'sout_sap_name' )+"\"";
+                option += ",name=\""+value( 'sout_sap_name' )+"\"";
             }
-            mrl.value += "}";
+            option += "}";
             aloo = true;
         }
-        if( output > 1 ) mrl.value += "}";
+        if( output > 1 ) option += "}";
     }
 
+    if( option != "" )
+        input_options.push( option );
+
     if( ( transcode || output ) && checked( 'sout_all' ) )
-        mrl.value += " :sout-all";
+        input_options.push( ":sout-all" );
+
+    /*var mrl = document.getElementById( 'sout_mrl' );
+    mrl.value = input_options.join( " " )*/
+
+    refresh_input_options_list();
 }
 
 /* reset sout mrl value */
@@ -1031,6 +1052,63 @@ function save_sout()
 {
     document.getElementById('sout_old_mrl').value = value('sout_mrl');
 }
+
+function refresh_input_options_list()
+{
+    var iol = document.getElementById( 'input_options_list' );
+    clear_children( iol );
+    input_options.sort();
+    for( i in input_options )
+    {
+        var o = document.createElement( 'div' );
+        var ot = document.createElement( 'input' );
+        ot.setAttribute( 'type', 'text' );
+        ot.setAttribute( 'size', '60' );
+        ot.setAttribute( 'value', input_options[i] );
+        ot.setAttribute( 'id', 'input_option_item_'+i );
+        ot.setAttribute( 'onchange', 'javascript:save_input_option('+i+',this.value);' );
+        ot.setAttribute( 'onfocus', 'if( this.value == ":option=value" ) this.value = ":";' );
+        ot.setAttribute( 'onblur', 'if( this.value == ":" ) this.value = ":option=value";' );
+        o.appendChild( ot );
+        var od = document.createElement( 'a' );
+        od.setAttribute( 'href', 'javascript:delete_input_option('+i+');' );
+        var delimg = document.createElement( "img" );
+        delimg.setAttribute( 'src', 'images/delete_small.png' );
+        delimg.setAttribute( 'alt', '(delete)' );
+        od.appendChild( delimg );
+        o.appendChild( od );
+        iol.appendChild( o );
+    }
+}
+
+function delete_input_option( i )
+{
+    input_options.splice(i,1);
+    refresh_input_options_list();
+}
+
+function save_input_option( i, value )
+{
+    input_options[i] = value;
+    refresh_input_options_list();
+}
+
+function add_input_option( value )
+{
+    input_options.push( value );
+    refresh_input_options_list();
+}
+
+function remove_input_options( prefix )
+{
+    for( i in input_options )
+        if( input_options[i].substring( 0, prefix.length ) == prefix )
+        {
+            delete input_options[i];
+            i--;
+        }
+}
+
 
 /**********************************************************************
  * Browser dialog functions

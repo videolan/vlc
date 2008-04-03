@@ -30,8 +30,12 @@ local input = _GET['input']
 local command = _GET['command']
 local id = tonumber(_GET['id'] or -1)
 local val = _GET['val']
+local options = _GET['option']
+if type(options) ~= "table" then -- Deal with the 0 or 1 option case
+  options = { options }
+end
 
---vlc.msg.err("requests/status.xml got:","input: "..tostring(input),"command: "..tostring(command),"id: "..tostring(id),"val: "..tostring(val))
+---[[]] vlc.msg.err("requests/status.xml got:","input: "..tostring(input),"command: "..tostring(command),"id: "..tostring(id),"val: "..tostring(val))
 
 local function stripslashes(s)
   return string.gsub(s,"\\(%.)","%1")
@@ -40,13 +44,16 @@ end
 local status = vlc.playlist.status()
 
 if command == "in_play" then
-  local options = {}
-  for o in string.gmatch(input," :[^ ]*") do -- FIXME: options should be in seperate variables, not in the same string as the input.
-    table.insert(options,string.sub(o,3))
+  ---[[
+  vlc.msg.err( "<options>" )
+  for a,b in ipairs(options) do
+    vlc.msg.err(b)
   end
+  vlc.msg.err( "</options>" )
+  --]]
   vlc.playlist.add({{path=stripslashes(input),options=options}})
 elseif command == "in_enqueue" then
-  vlc.playlist.enqueue(stripslashes(input))
+  vlc.playlist.enqueue({{path=stripslashes(input),options=options}})
 elseif command == "pl_play" then
   vlc.playlist.goto(id)
 elseif command == "pl_pause" then

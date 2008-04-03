@@ -32,14 +32,23 @@ This dialog needs the following dialogs to be fully functional: browse
     <img class="close" src="images/white_cross_small.png" alt="Close" onclick="hide('input');"/>
   </div>
   <div class="controls">
-    <label for="input_mrl">Input (MRL)</label>
+    <label for="input_mrl">Input</label>
     <?vlc if current_page == "vlm" then ?>
       <input type="text" name="input_mrl" id="input_mrl" size="60" onkeypress="if( event.keyCode == 13 ) vlm_input_change();"/>
+    <?vlc else ?>
+      <input type="text" name="input_mrl" id="input_mrl" size="60" onkeypress="if( event.keyCode == 13 ) in_play();"/>
+    <?vlc end ?>
+    <div>
+    Options
+    <!-- <input type="button" value="Refresh options" onclick="refresh_input_options_list();" /> -->
+    <input type="button" value="Add option" onclick="add_input_option(':option=value');" />
+    <div id="input_options_list"></div>
+    </div>
+    <?vlc if current_page == "vlm" then ?>
       <input type="button" value="Ok" onclick="vlm_input_change();" />
       <input type="button" value="Cancel" onclick="hide('input');" />
       <input type="hidden" id="input_dest" value="" />
     <?vlc else ?>
-      <input type="text" name="input_mrl" id="input_mrl" size="60" onkeypress="if( event.keyCode == 13 ) in_play();"/>
       <input type="button" value="Play" onclick="in_play();" />
       <input type="button" value="Enqueue" onclick="in_enqueue();" />
     <?vlc end ?>

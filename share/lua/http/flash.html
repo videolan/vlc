@@ -13,16 +13,16 @@
 <script type="text/javascript">
 // <![CDATA[
 host = document.location.toString().replace( /http:\/\//, '' ).replace( /[:/].*/, '' );
+input_options.push( ":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=2,samplerate=44100}:std{access=http,mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv}" );
+input_options.push( ":no-sout-keep" );
 // ]]>
 </script>
 </head>
 
-<body onload="hide('playlist');">
+<body onload="hide('playlist'); refresh_input_options_list();">
 <?vlc
 current_page = "index"
 dialogs("browse","main","input","playlist") ?>
-
-  <input id="sout_mrl" type="hidden" value=":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=2,samplerate=44100}:std{access=http,mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv} :no-sout-keep" />
 
   <div style='height: 100%; width: 100%; text-align: center;'>
   <object type="application/x-shockwave-flash" data="http://flowplayer.sourceforge.net/video/FlowPlayer.swf" width="800px" height="600px" id="FlowPlayer" style="z-index: 0">

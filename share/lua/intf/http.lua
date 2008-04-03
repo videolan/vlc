@@ -35,7 +35,7 @@ require "httpd"
 require "acl"
 require "common"
 
-vlc.msg.err("Lua HTTP interface")
+vlc.msg.info("Lua HTTP interface")
 
 open_tag = "<?vlc"
 close_tag = "?>"
@@ -175,7 +175,19 @@ function parse_url_request(request)
     for k,v in string.gmatch(request,"([^=&]+)=?([^=&]*)") do
         local k_ = vlc.decode_uri(k)
         local v_ = vlc.decode_uri(v)
-        t[k_]=v_
+        if t[k_] ~= nil then
+            local t2
+            if type(t[k_]) ~= "table" then
+                t2 = {}
+                table.insert(t2,t[k_])
+                t[k_] = t2
+            else
+                t2 = t[k_]
+            end
+            table.insert(t2,v_)
+        else
+            t[k_] = v_
+        end
     end
     return t
 end
