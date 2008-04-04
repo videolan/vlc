@@ -2293,7 +2293,7 @@ ifdef HAVE_CYGWIN
 endif
 
 .tag: taglib
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) CXXFLAGS="-DMAKE_TAGLIB_LIB" ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
