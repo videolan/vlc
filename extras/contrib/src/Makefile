@@ -1827,9 +1827,6 @@ libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/gcrypt.patch
-ifdef HAVE_WIN32
-	patch -p0 < Patches/gcrypt-win32-use-automake19.patch
-endif
 
 CIPHDIG= --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160 --enable-publickey-digests=dsa 
 
