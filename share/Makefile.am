@@ -328,21 +328,6 @@ DIST_http_lua = \
 	lua/http/js/mosaic.js \
 	lua/http/js/vlm.js \
 	lua/http/mosaic.html \
-	lua/http/old/.hosts \
-	lua/http/old/admin/.access \
-	lua/http/old/admin/browse.html \
-	lua/http/old/admin/dboxfiles.html \
-	lua/http/old/admin/index.html \
-	lua/http/old/cone_minus.png \
-	lua/http/old/cone_plus.png \
-	lua/http/old/index.html \
-	lua/http/old/info.html \
-	lua/http/old/style.css \
-	lua/http/old/vlm/edit.html \
-	lua/http/old/vlm/index.html \
-	lua/http/old/vlm/new.html \
-	lua/http/old/vlm/show.html \
-	lua/http/old/webcam.html \
 	lua/http/requests/browse.xml \
 	lua/http/requests/playlist.xml \
 	lua/http/requests/status.xml \

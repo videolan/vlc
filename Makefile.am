@@ -442,9 +442,6 @@ VLC-release.app: vlc
 	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/js
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/old
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/old/admin
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/old/vlm
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/images
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests
 	$(INSTALL) -m 644 $(srcdir)/share/lua/http/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/.hosts
@@ -456,15 +453,6 @@ VLC-release.app: vlc
 	done
 	for i in $(srcdir)/share/lua/http/js/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/js/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/lua/http/old/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/old/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/lua/http/old/admin/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/old/admin/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/lua/http/old/vlm/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/old/vlm/`basename $${i}` ; \
 	done
 	for i in $(srcdir)/share/lua/http/images/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/images/`basename $${i}` ; \
@@ -659,9 +647,6 @@ package-win-common:
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/requests"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/js"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/dialogs"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/old"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/old/vlm"
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/old/admin"
 	cp $(srcdir)/share/lua/http/*.html $(top_builddir)/vlc-$(VERSION)/lua/http/ ;
 	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/*.html ;
 	cp $(srcdir)/share/lua/http/.hosts $(top_builddir)/vlc-$(VERSION)/lua/http/ ;
@@ -680,17 +665,6 @@ package-win-common:
 	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/requests/*.xml ;
 	cp $(srcdir)/share/lua/http/requests/readme $(top_builddir)/vlc-$(VERSION)/lua/http/requests/readme.txt ;
 	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/requests/readme.txt ;
-
-	cp $(srcdir)/share/lua/http/old/*.html $(top_builddir)/vlc-$(VERSION)/lua/http/old/ ;
-	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/old/*.html ;
-	cp $(srcdir)/share/lua/http/old/*.css $(top_builddir)/vlc-$(VERSION)/lua/http/old/ ;
-	cp $(srcdir)/share/lua/http/old/.hosts $(top_builddir)/vlc-$(VERSION)/lua/http/old/ ;
-	cp $(srcdir)/share/lua/http/old/*.png $(top_builddir)/vlc-$(VERSION)/lua/http/old/ ;
-	cp $(srcdir)/share/lua/http/old/vlm/*.html $(top_builddir)/vlc-$(VERSION)/lua/http/old/vlm/ ;
-	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/old/vlm/*.html ;
-	cp $(srcdir)/share/lua/http/old/admin/*.html $(top_builddir)/vlc-$(VERSION)/lua/http/old/admin/ ;
-	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/old/admin/*.html ;
-	cp $(srcdir)/share/lua/http/old/admin/.access $(top_builddir)/vlc-$(VERSION)/lua/http/old/admin/ ;
 
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/http/images"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/http/requests"
