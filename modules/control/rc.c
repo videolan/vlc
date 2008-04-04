@@ -2123,8 +2123,11 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
             p_intf->p_sys->i_socket = -1;
         }
         else
+        {
             /* Standard input closed: exit */
-            vlc_object_kill( p_intf );
+            vlc_value_t empty;
+            Quit( p_intf, NULL, empty, empty, NULL );
+        }
 
         p_buffer[ *pi_size ] = 0;
         return VLC_TRUE;
