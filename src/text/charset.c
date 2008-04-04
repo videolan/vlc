@@ -15,6 +15,11 @@
  *  Copyright (C) 2001-2003 The Mape Project
  *  Written by Karel Zak  <zakkr@zf.jcu.cz>.
  *
+ * which itself is an adaptation of locale_charset():
+ *
+ *  Copyright (C) 2000-2002 Free Software Foundation, Inc.
+ *  Written by Bruno Haible <bruno@clisp.org>.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
