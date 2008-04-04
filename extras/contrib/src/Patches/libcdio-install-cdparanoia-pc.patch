@@ -1,0 +1,13 @@
+--- libcdio/Makefile.am	2008-03-15 19:21:28.000000000 +0300
++++ libcdio.patched/Makefile.am	2008-04-04 03:29:17.000000000 +0400
+@@ -48,8 +48,8 @@
+ 	         libcdio++.pc  \
+ 	         libiso9660.pc \
+ 	         libiso9660++.pc \
+-	         libudf.pc
+-		 $(paranoiapcs)
++	         libudf.pc \
++			 $(paranoiapcs)
+ 
+ 
+ $(pkgconfig_DATA): config.status

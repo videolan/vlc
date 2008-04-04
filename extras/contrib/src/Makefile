@@ -1459,9 +1459,10 @@ libcdio-$(CDIO_VERSION).tar.gz:
 
 libcdio: libcdio-$(CDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/libcdio-install-cdparanoia-pc.patch
 
 .cdio: libcdio
-	(cd $<; sed -e 's%@ENABLE_CPP_TRUE@SUBDIRS = C++%@ENABLE_CPP_TRUE@SUBDIRS = %' -i.orig example/Makefile.in && ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
+	(cd $<; sed -e 's%@ENABLE_CPP_TRUE@SUBDIRS = C++%@ENABLE_CPP_TRUE@SUBDIRS = %' -i.orig example/Makefile.in && autoreconf -fisv && ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .cdio
