@@ -2149,7 +2149,7 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
  *****************************************************************************/
 static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 {
-#define SKIPSPACE( p ) { while( *p && ( *p == ' ' || *p == '\t' ) ) p++; }
+#define SKIPSPACE( p ) { while( *p == ' ' || *p == '\t' ) p++; }
 #define SKIPTRAILINGSPACE( p, d ) \
     { char *e=d; while( e > p && (*(e-1)==' ' || *(e-1)=='\t') ){e--;*e=0;} }
 
