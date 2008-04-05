@@ -128,7 +128,7 @@ void PLItem::updateColumnHeaders()
                 item_col_strings.append( qtr( VLC_META_DESCRIPTION ) );
                 break;
             case VLC_META_ENGINE_DURATION:
-                item_col_strings.append( qtr( "Duration" ) );
+                item_col_strings.append( qtr( VLC_META_DURATION ) );
                 break;
             case VLC_META_ENGINE_GENRE:
                 item_col_strings.append( qtr( VLC_META_GENRE ) );
