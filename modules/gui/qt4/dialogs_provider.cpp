@@ -356,6 +356,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, VLC_FALSE );
         input_Read( THEPL, p_input, VLC_FALSE );
+        vlc_gc_decref( p_input );
     }
 }
 
