@@ -46,6 +46,8 @@ public class JVLC
 
     private MediaList mediaList;
     
+    private volatile boolean released; 
+    
     public JVLC()
     {
         String[] args = new String[] {};
@@ -125,6 +127,18 @@ public class JVLC
     {
         return libvlc;
     }
+    
+    /**
+     * Releases this instance and the native resources.
+     */
+    public void release()
+    {
+        if (!released)
+        {
+            released = true;
+            libvlc.libvlc_release(instance);
+        }
+    }
 
     /*
      * (non-Javadoc)
@@ -133,7 +147,11 @@ public class JVLC
     @Override
     protected void finalize() throws Throwable
     {
-        libvlc.libvlc_release(instance);
+        if (!released)
+        {
+            released = true;
+            libvlc.libvlc_release(instance);
+        }
         super.finalize();
     }
     

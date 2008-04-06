@@ -69,6 +69,7 @@ public class MediaListPlayerTest
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         Assert.assertNotNull(mediaListPlayer);
         Assert.assertEquals(0, exception.raised);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test
@@ -79,6 +80,8 @@ public class MediaListPlayerTest
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
         Assert.assertEquals(0, exception.raised);
+        libvlc.libvlc_media_list_release(mediaList);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test
@@ -91,6 +94,8 @@ public class MediaListPlayerTest
         libvlc.libvlc_media_list_add_media(mediaList, mediaDescriptor, exception);
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
         Assert.assertEquals(0, exception.raised);
+        libvlc.libvlc_media_list_release(mediaList);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test
@@ -101,6 +106,7 @@ public class MediaListPlayerTest
         int result = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
         Assert.assertEquals(0, result);
         Assert.assertEquals(0, exception.raised);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test
@@ -110,6 +116,7 @@ public class MediaListPlayerTest
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         libvlc.libvlc_media_list_player_play(mediaListPlayer, exception);
         Assert.assertEquals(1, exception.raised);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     /**
@@ -126,6 +133,8 @@ public class MediaListPlayerTest
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
         libvlc.libvlc_media_list_player_play(mediaListPlayer, exception);
         Assert.assertEquals("Exception message: " + exception.message + ".\n", 0, exception.raised);
+        libvlc.libvlc_media_list_release(mediaList);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test
@@ -152,6 +161,8 @@ public class MediaListPlayerTest
             Thread.sleep(150);
         }
         libvlc.libvlc_media_list_player_stop(mediaListPlayer, exception);
+        libvlc.libvlc_media_list_release(mediaList);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
 
     }
 
@@ -183,6 +194,7 @@ public class MediaListPlayerTest
         // needs to be fixed
         Thread.sleep(400);
         libvlc.libvlc_media_list_player_stop(mediaListPlayer, exception);
+        libvlc.libvlc_media_list_release(mediaList);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
@@ -193,6 +205,7 @@ public class MediaListPlayerTest
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         int state = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
         Assert.assertEquals(LibVlcState.libvlc_Stopped.ordinal(), state);
+        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test
@@ -236,6 +249,7 @@ public class MediaListPlayerTest
         int state = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
         Assert.assertEquals("Expected state: " + LibVlcState.libvlc_Paused +".\n", LibVlcState.libvlc_Paused.ordinal(), state);
         libvlc.libvlc_media_list_player_stop(mediaListPlayer, exception);
+        libvlc.libvlc_media_list_release(mediaList);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
@@ -277,6 +291,7 @@ public class MediaListPlayerTest
         Thread.sleep(150);
         libvlc.libvlc_media_list_player_next(mediaListPlayer, exception);
         Assert.assertEquals(0, exception.raised);
+        libvlc.libvlc_media_list_release(mediaList);
     }
 
     @Test
@@ -318,6 +333,7 @@ public class MediaListPlayerTest
         Assert.assertEquals(LibVlcState.libvlc_Stopped.ordinal(), libvlc.libvlc_media_list_player_get_state(
             mediaListPlayer,
             exception));
+        libvlc.libvlc_media_list_release(mediaList);
     }
 
 

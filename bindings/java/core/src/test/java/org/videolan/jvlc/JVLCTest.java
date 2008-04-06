@@ -50,6 +50,13 @@ public class JVLCTest
         Assert.assertNotNull(instance);
     }
     
+    @Test
+    public void jvlcRelease()
+    {
+        JVLC jvlc = new JVLC();
+        jvlc.release();
+        jvlc.release();
+    }
     
 
 }
