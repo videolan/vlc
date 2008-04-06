@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_net_xpm[] = {
+static const char * type_net_xpm[] = {
 "16 16 154 2",
 "      c None",
 ".     c #667AAC",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_card_xpm[] = {
+static const char * type_card_xpm[] = {
 "16 16 174 2",
 "      c #FFFFFF",
 ".     c #E7E7E7",

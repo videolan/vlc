@@ -1,5 +1,5 @@
 /* XPM */
-static char * update_ascii_xpm[] = {
+static const char * update_ascii_xpm[] = {
 "34 34 96 2",
 "      c None",
 ".     c #BCBCBC",

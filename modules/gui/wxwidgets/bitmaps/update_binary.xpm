@@ -1,5 +1,5 @@
 /* XPM */
-static char * update_binary_xpm[] = {
+static const char * update_binary_xpm[] = {
 "34 34 292 2",
 "      c None",
 ".     c #BCBCBC",

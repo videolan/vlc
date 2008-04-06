@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_disc_xpm[] = {
+static const char * type_disc_xpm[] = {
 "16 16 91 1",
 "     c None",
 ".    c #676767",

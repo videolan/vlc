@@ -1,5 +1,5 @@
 /* XPM */
-static char * codec_xpm[] = {
+static const char * codec_xpm[] = {
 "16 16 132 2",
 "      c None",
 ".     c #131313",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * repeat_xpm[] = {
+static const char * repeat_xpm[] = {
 "16 16 2 1",
 "     c None",
 ".    c #000000",

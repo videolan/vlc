@@ -1,5 +1,5 @@
 /* XPM */
-static char * video_xpm[] = {
+static const char * video_xpm[] = {
 "16 16 124 2",
 "      c None",
 ".     c #FFFFFF",

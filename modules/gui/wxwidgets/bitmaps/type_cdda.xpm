@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_cdda_xpm[] = {
+static const char * type_cdda_xpm[] = {
 "16 16 119 2",
 "      c None",
 ".     c #7E7E7E",
