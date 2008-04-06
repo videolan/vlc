@@ -624,7 +624,6 @@ void ExtV4l2::Refresh( void )
     }
     if( p_obj )
     {
-        msg_Dbg( p_intf, "Found v4l2 instance" );
         vlc_value_t val, text, name;
         int i_ret = var_Change( p_obj, "controls", VLC_VAR_GETCHOICES,
                                 &val, &text );
@@ -748,7 +747,6 @@ void ExtV4l2::Refresh( void )
         msg_Dbg( p_intf, "Couldn't find v4l2 instance" );
         ui.help->show();
     }
-
 }
 
 void ExtV4l2::ValueChange( bool value )

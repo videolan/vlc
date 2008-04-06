@@ -1023,7 +1023,6 @@ void CaptureOpenPanel::updateButtons()
     /* Get the current Device Number */
     int i_devicetype = ui.deviceCombo->itemData(
                                 ui.deviceCombo->currentIndex() ).toInt();
-    msg_Dbg( p_intf, "Capture Type: %i", i_devicetype );
     switch( i_devicetype )
     {
 #ifdef WIN32

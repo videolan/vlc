@@ -162,7 +162,6 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
 
 VLMDialog::~VLMDialog()
 {
-    msg_Dbg( p_intf, "Destroying VLM Dialog" );
     delete vlmWrapper;
 
    /* FIXME :you have to destroy vlm here to close
@@ -204,7 +203,7 @@ void VLMDialog::addVLMItem()
     QString name = ui.nameLedit->text();
     if( name.isEmpty() || !isNameGenuine( name ) )
     {
-        msg_Dbg( p_intf, "VLM Name is empty or already exists, I can't do it" );
+        msg_Err( p_intf, "VLM Name is empty or already exists, I can't do it" );
         return;
     }
 
@@ -351,7 +350,7 @@ bool VLMDialog::importVLMConf()
         }
         else
         {
-            msg_Dbg( p_intf, "Failed to import vlm configuration file : %s", qtu( command ) );
+            msg_Warn( p_intf, "Failed to import vlm configuration file : %s", qtu( command ) );
             return false;
         }
         return true;
@@ -405,7 +404,6 @@ void VLMDialog::startModifyVLMItem( VLMAWidget *vlmObj )
     currentIndex = vlmItems.indexOf( vlmObj );
     if( currentIndex < 0 ) return;
 
-    msg_Dbg( p_intf, "Type: %i", vlmObj->type );
     ui.vlmListItem->setCurrentRow( currentIndex );
     ui.nameLedit->setText( vlmObj->name );
     ui.inputLedit->setText( vlmObj->input );

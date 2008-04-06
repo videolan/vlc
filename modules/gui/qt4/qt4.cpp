@@ -362,6 +362,7 @@ static void Init( intf_thread_t *p_intf )
                            : p_intf->p_libvlc->psz_homedir;
 
 #ifdef UPDATE_CHECK
+    /* Checking for VLC updates */
     if( config_GetInt( p_intf, "qt-updates-notif" ) )
     {
         int interval = config_GetInt( p_intf, "qt-updates-days" );
@@ -369,7 +370,6 @@ static void Init( intf_thread_t *p_intf )
         if( QDate::currentDate() >
                 settings.value( "updatedate" ).toDate().addDays( interval ) )
         {
-            msg_Dbg( p_intf, "Someone said I need to check updates" );
             /* The constructor of the update Dialog will do the 1st request */
             UpdateDialog::getInstance( p_intf );
             settings.setValue( "updatedate", QDate::currentDate() );

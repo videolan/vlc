@@ -206,7 +206,6 @@ void BackgroundWidget::updateArt( QString url )
     else
     {
         label->setPixmap( QPixmap( url ) );
-        msg_Dbg( p_intf, "changing input b_need_update done ");
     }
 }
 
