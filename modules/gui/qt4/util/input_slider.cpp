@@ -134,7 +134,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
     pixGradient = QPixmap( mask.size() );
 
     QLinearGradient gradient( paddingL, 4, WLENGTH + paddingL , 4 );
-    gradient.setColorAt( 0.0, Qt::white );
+    gradient.setColorAt( 0.0, QColor( 255, 255, 255 ) );
     gradient.setColorAt( 0.2, QColor( 20, 226, 20 ) );
     gradient.setColorAt( 0.5, QColor( 255, 176, 15 ) );
     gradient.setColorAt( 1.0, QColor( 235, 30, 20 ) );
