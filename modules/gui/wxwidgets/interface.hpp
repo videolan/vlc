@@ -149,6 +149,9 @@ namespace wxvlc
         void OnNextStream( wxCommandEvent& event );
         void OnSlowStream( wxCommandEvent& event );
         void OnFastStream( wxCommandEvent& event );
+	void OnToggleMute( wxCommandEvent& event );
+	void OnSlideVolume( wxScrollEvent& event );
+        void SyncVolume( );
 
         void OnInteraction( wxCommandEvent& event );
 
