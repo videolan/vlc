@@ -558,7 +558,6 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                            free( psz_uri );
                            psz_uri = psz_tmp;
                         }
-                        /* FIXME: We are leaking that one */
                         p_new_input = input_ItemNewExt( p_playlist, psz_uri,
                                                         NULL, 0, NULL, -1 );
                         free( psz_uri );
@@ -724,6 +723,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         {
             input_ItemAddSubItem( p_input_item, p_new_input );
             p_input_item = p_new_input;
+            vlc_gc_decref( p_new_input );
         }
         free( psz_title );
     }
@@ -899,6 +899,7 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
     if( p_new_input )
     {
         input_ItemAddSubItem( p_input_item, p_new_input );
+        vlc_gc_decref( p_new_input );
         p_demux->p_sys->pp_tracklist[i_href] = NULL;
     }
 
