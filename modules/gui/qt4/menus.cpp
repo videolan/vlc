@@ -173,6 +173,9 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
                               intf_thread_t *p_intf,
                               bool visual_selector_enabled )
 {
+    /* QMainWindows->menuBar()
+       gives the QProcess::destroyed timeout issue on Cleanlooks style with
+       setDesktopAware set to false */
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu(), qtr( "&Media" ) );
     BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
