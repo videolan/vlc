@@ -158,33 +158,32 @@ int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter, libvlc_ex
 }
 
 libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
-                                                struct libvlc_log_message_t *buffer,
+                                                libvlc_log_message_t *buffer,
                                                 libvlc_exception_t *p_e )
 {
-    if( p_iter )
-    {
-        if( buffer && (sizeof(struct libvlc_log_message_t) == buffer->sizeof_msg) )
-        {
-            int i_pos = p_iter->i_pos;
-            if( i_pos != p_iter->i_end )
-            {
-                msg_item_t *msg;
-                vlc_mutex_lock(p_iter->p_messages->p_lock);
-                msg = p_iter->p_messages->p_msg+i_pos;
-                buffer->i_severity  = msg->i_type;
-                buffer->psz_type    = msg->psz_object_type;
-                buffer->psz_name    = msg->psz_module;
-                buffer->psz_header  = msg->psz_header;
-                buffer->psz_message = msg->psz_msg;
-                p_iter->i_pos = ++i_pos % VLC_MSG_QSIZE;
-                vlc_mutex_unlock(p_iter->p_messages->p_lock);
+    int i_pos;
 
-                return buffer;
-            }
-            RAISENULL("No more messages");
-        }
+    if( !p_iter )
+        RAISENULL("Invalid log iterator!");
+    if( !buffer )
         RAISENULL("Invalid message buffer!");
+
+    i_pos = p_iter->i_pos;
+    if( i_pos != p_iter->i_end )
+    {
+        msg_item_t *msg;
+        vlc_mutex_lock(p_iter->p_messages->p_lock);
+        msg = p_iter->p_messages->p_msg+i_pos;
+        buffer->i_severity  = msg->i_type;
+        buffer->psz_type    = msg->psz_object_type;
+        buffer->psz_name    = msg->psz_module;
+        buffer->psz_header  = msg->psz_header;
+        buffer->psz_message = msg->psz_msg;
+        p_iter->i_pos = ++i_pos % VLC_MSG_QSIZE;
+        vlc_mutex_unlock(p_iter->p_messages->p_lock);
+
+        return buffer;
     }
-    RAISENULL("Invalid log iterator!");
+    RAISENULL("No more messages");
 }
 
