@@ -396,16 +396,6 @@ check_input:
     PL_UNLOCK;
 }
 
-static void recursively_decref( playlist_item_t *p_node )
-{
-    vlc_gc_decref( p_node->p_input );
-
-    int i;
-    if( p_node->i_children > 0 )
-        for( i = 0 ; i < p_node->i_children ; i++ )
-            recursively_decref( p_node->pp_children[i] );
-}
-
 /**
  * Last loop
  *
@@ -484,19 +474,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
                                           p_playlist->pp_sds[0]->p_sd->psz_module );
     }
 
-    if( config_GetInt( p_playlist, "media-library" ) )
-    {
-        playlist_MLDump( p_playlist );
-        /* Because this recursive function decreases the
-         * p_playlist->p_ml_category refcount, it may get deleted.
-         * However we will delete the p_playlist->p_ml_category in the
-         * following FOREACH. */
-        vlc_gc_incref( p_playlist->p_ml_category->p_input );
-
-        /* We don't need the media library anymore */
-        /* Decref all subitems, and the given items */
-        recursively_decref( p_playlist->p_ml_category );
-    }
+    playlist_MLDump( p_playlist );
 
     PL_LOCK;
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
