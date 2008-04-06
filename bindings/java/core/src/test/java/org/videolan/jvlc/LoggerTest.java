@@ -53,6 +53,7 @@ public class LoggerTest
         Logger logger = jvlc.getLogger();
         jvlc.play(mrl);
         Assert.assertTrue(logger.count() > 0);
+        logger.close();
     }
     
     /**
@@ -74,7 +75,7 @@ public class LoggerTest
             LoggerMessage message = loggerIterator.next();
             Assert.assertNotNull(message.getMessage());
         }
-        
+        logger.close();
     }
     
 }
