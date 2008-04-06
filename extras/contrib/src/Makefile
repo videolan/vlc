@@ -1399,6 +1399,9 @@ libmodplug-$(MODPLUG_VERSION).tar.gz:
 
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 	$(EXTRACT_GZ)
+#ifdef HAVE_WIN32
+	patch -p0 < Patches/libmodplug-win32.patch
+#end
 
 .mod: libmodplug
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
