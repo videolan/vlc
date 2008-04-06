@@ -867,7 +867,7 @@ void PLModel::viewchanged( int meta )
         else
         {
             /* Adding columns */
-            beginInsertColumns( createIndex( 0, 0, rootItem), index, index+1 );
+            beginInsertColumns( parent, index, index+1 );
             rootItem->i_showflags |= meta;
             rootItem->updateColumnHeaders();
             endInsertColumns();
