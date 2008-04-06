@@ -736,8 +736,10 @@ endif
 
 package-win32-base-debug: package-win-common
 # Copy relevant files
+# Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(top_builddir)/vlc-$(VERSION)/"
 
+# Plugins
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/plugins"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
@@ -745,6 +747,7 @@ package-win32-base-debug: package-win-common
             "$(top_builddir)/vlc-$(VERSION)/plugins/" ; \
 	  fi ; done
 
+# Skins
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/skins/fonts
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
 	  cp $$i $(top_builddir)/vlc-$(VERSION)/skins/fonts/ || true ; \
@@ -753,23 +756,25 @@ package-win32-base-debug: package-win-common
 	  cp $$i $(top_builddir)/vlc-$(VERSION)/skins/ || true ; \
 	done
 
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/playlist
+#Lua Scripts
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/scripts/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/playlist/`basename $${i}` ; \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/scripts/playlist/`basename $${i}` ; \
 	done ;
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/meta
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/scripts/meta
 	for i in $(srcdir)/share/lua/meta/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/meta/`basename $${i}` ; \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/scripts/meta/`basename $${i}` ; \
 	done ;
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/intf
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/scripts/intf
 	for i in $(srcdir)/share/lua/intf/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/intf/`basename $${i}` ; \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/scripts/intf/`basename $${i}` ; \
 	done ;
-	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/share/lua/intf/modules
+	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/scripts/intf/modules
 	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/share/lua/intf/modules/`basename $${i}` ; \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/scripts/intf/modules/`basename $${i}` ; \
 	done ;
 
+#OSD Menu
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/osdmenu"
 	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-$(VERSION)/osdmenu"
 	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume minimal;do \
