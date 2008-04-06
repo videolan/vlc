@@ -89,6 +89,25 @@ public class JVLC
         return libvlc.libvlc_new(args.length, args, exception);
     }
 
+    public Logger getLogger()
+    {
+        return new Logger(this);
+    }
+    
+    public LoggerVerbosityLevel getLogVerbosity()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        int level = libvlc.libvlc_get_log_verbosity(instance, exception);
+        return LoggerVerbosityLevel.getSeverity(level);
+    }
+
+    public void setLogVerbosity(LoggerVerbosityLevel level)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        libvlc.libvlc_set_log_verbosity(instance, level.ordinal(), exception);
+    }
+
+    
     /**
      * Returns the _instance.
      * @return the _instance
