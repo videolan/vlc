@@ -2363,7 +2363,25 @@ CLEAN_FILE += .asa
 CLEAN_PKG += asa
 DISTCLEAN_PKG += asa.git.tar.gz
 
-#
+# ***************************************************************************
+# FluidSynth library (Midi)
+# ***************************************************************************
+
+fluidsynth-$(FLUID_VERSION).tar.gz:
+	$(WGET) $(FLUID_URL)
+
+fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.fluid: fluidsynth
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .fluid
+CLEAN_PKG += fluidsynth
+DISTCLEAN_PKG += fluidsynth-$(NCURSES_VERSION).tar.gz
+
+
 # ***************************************************************************
 # Some cleaning
 # ***************************************************************************
