@@ -105,7 +105,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
     
     /* setup useful stuff */
-    /* TODO: hard-code this instead of one-the-run generation */
     o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects:
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'c'],
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'x'],
@@ -127,7 +126,6 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'2'],
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'3'],
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'m'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'q'],
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'w'],
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'w'],
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'c'],
@@ -1151,7 +1149,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         if( i_returnValue != NSNotFound )
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
-                                                         [self OSXKeyToString:[[o_hotkeyDescriptions objectAtIndex: i_returnValue] intValue]]]];
+                                                         [o_hotkeyDescriptions objectAtIndex: i_returnValue]]];
         else
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
