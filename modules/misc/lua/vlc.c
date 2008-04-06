@@ -418,11 +418,18 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
                       psz_vlcpath, luadirname )  < 0 )
             return VLC_ENOMEM;
         i++;
-
-        if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "share" DIR_SEP "lua" DIR_SEP "%s",
+#       ifdef WIN32
+        if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "scripts" DIR_SEP "%s",
                       psz_vlcpath, luadirname )  < 0 )
             return VLC_ENOMEM;
         i++;
+#       else
+         if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "share" DIR_SEP "lua" DIR_SEP "%s",
+                      psz_vlcpath, luadirname )  < 0 )
+            return VLC_ENOMEM;
+        i++;
+#       endif
+
     }
 #   else
     if( asprintf( &ppsz_dir_list[i],
