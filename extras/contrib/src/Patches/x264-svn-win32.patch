@@ -1,8 +1,6 @@
-Index: configure
-===================================================================
---- configure	(revision 736)
-+++ configure	(working copy)
-@@ -338,6 +338,7 @@
+--- configure	2008-04-06 09:07:25.000000000 +0200
++++ configure	2008-04-06 09:10:52.000000000 +0200
+@@ -343,6 +343,7 @@
  # autodetect options that weren't forced nor disabled
  
  libpthread=""
@@ -10,16 +8,16 @@ Index: configure
  if test "$pthread" = "auto" ; then
      pthread="no"
      case $SYS in
-@@ -345,16 +346,18 @@
+@@ -350,13 +351,13 @@
              pthread="yes"
              ;;
-         MINGW|CYGWIN)
+         MINGW)
 -            if cc_check pthread.h -lpthread "pthread_create(0,0,0,0);" ; then
 +            if cc_check pthread.h -lpthread "pthread_create(0,0,0,0); pthread_num_processors_np();" ; then
                  pthread="yes"
                  libpthread="-lpthread"
 -            elif cc_check pthread.h -lpthreadGC2 "pthread_create(0,0,0,0);" ; then
-+            elif cc_check pthread.h -lpthreadGC2 "pthread_create(0,0,0,0); pthread_num_processors_np();" ; then
++            elif cc_check pthread.h -lpthreadGC2 "pthread_create(0,0,0,0); pthread_num_processors_np(); " ; then
                  pthread="yes"
                  libpthread="-lpthreadGC2"
 -            elif cc_check pthread.h "-lpthreadGC2 -lwsock32 -DPTW32_STATIC_LIB" "pthread_create(0,0,0,0);" ; then
@@ -27,12 +25,7 @@ Index: configure
                  pthread="yes"
                  libpthread="-lpthreadGC2 -lwsock32"
                  CFLAGS="$CFLAGS -DPTW32_STATIC_LIB"
-+		extradef="-DPTW32_STATIC_LIB"
-+
-             fi
-             ;;
-         *)
-@@ -438,6 +441,10 @@
+@@ -443,6 +444,10 @@
  ASFLAGS=$ASFLAGS
  GTK=$gtk
  EXE=$EXE
@@ -43,7 +36,7 @@ Index: configure
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  DEVNULL=$DEVNULL
-@@ -480,7 +487,7 @@
+@@ -495,7 +500,7 @@
  Description: H.264 (MPEG4 AVC) encoder library
  Version: $(grep POINTVER < config.h | sed -e 's/.* "//; s/".*//')
  Libs: $pclibs
@@ -52,11 +45,9 @@ Index: configure
  EOF
  
  
-Index: Makefile
-===================================================================
---- Makefile	(revision 736)
-+++ Makefile	(working copy)
-@@ -74,8 +74,8 @@
+--- Makefile	2008-04-06 09:07:25.000000000 +0200
++++ Makefile	2008-04-06 09:11:39.000000000 +0200
+@@ -72,8 +72,8 @@
  default: $(DEP) x264$(EXE)
  
  libx264.a: .depend $(OBJS) $(OBJASM)
@@ -66,8 +57,8 @@ Index: Makefile
 +	$(RANLIB) libx264.a
  
  $(SONAME): .depend $(OBJS) $(OBJASM)
- 	$(CC) -shared -o $@ $(OBJS) $(OBJASM) -Wl,-soname,$(SONAME) $(LDFLAGS)
-@@ -94,7 +94,7 @@
+ 	$(CC) -shared -o $@ $(OBJS) $(OBJASM) $(SOFLAGS) $(LDFLAGS)
+@@ -90,7 +90,7 @@
  %.o: %.asm
  	$(AS) $(ASFLAGS) -o $@ $<
  # delete local/anonymous symbols, so they don't show up in oprofile
@@ -76,21 +67,12 @@ Index: Makefile
  
  .depend: config.mak
  	rm -f .depend
-@@ -149,14 +149,14 @@
- 	rm -rf test/
- 	$(MAKE) -C gtk distclean
- 
--install: x264 $(SONAME)
-+install: x264$(EXE)
- 	install -d $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
- 	install -d $(DESTDIR)$(libdir) $(DESTDIR)$(libdir)/pkgconfig
- 	install -m 644 x264.h $(DESTDIR)$(includedir)
+@@ -155,7 +155,7 @@
  	install -m 644 libx264.a $(DESTDIR)$(libdir)
  	install -m 644 x264.pc $(DESTDIR)$(libdir)/pkgconfig
--	install x264 $(DESTDIR)$(bindir)
+ 	install x264$(EXE) $(DESTDIR)$(bindir)
 -	ranlib $(DESTDIR)$(libdir)/libx264.a
-+	install x264$(EXE) $(DESTDIR)$(bindir)
 +	$(RANLIB) $(DESTDIR)$(libdir)/libx264.a
- 	$(if $(SONAME), ln -sf $(SONAME) $(DESTDIR)$(libdir)/libx264.so)
- 	$(if $(SONAME), install -m 755 $(SONAME) $(DESTDIR)$(libdir))
- 
+ ifeq ($(SYS),MINGW)
+ 	$(if $(SONAME), install -m 755 $(SONAME) $(DESTDIR)$(bindir))
+ else
