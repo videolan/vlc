@@ -39,6 +39,7 @@ public interface LibVlc extends Library
 {
 
     LibVlc INSTANCE = (LibVlc) Native.loadLibrary("vlc-control", LibVlc.class);
+
     LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
 
     public static class libvlc_exception_t extends Structure
@@ -133,7 +134,7 @@ public interface LibVlc extends Library
 
     public class media_list_item_deleted extends Structure
     {
-        
+
         public LibVlcMediaDescriptor item;
 
         public int index;
@@ -195,21 +196,37 @@ public interface LibVlc extends Library
 
     public class event_type_specific extends Union
     {
+
         public media_meta_changed media_meta_changed;
+
         public media_subitem_added media_subitem_added;
+
         public media_duration_changed media_duration_changed;
+
         public media_preparsed_changed media_preparsed_changed;
+
         public media_freed media_freed;
+
         public media_state_changed media_state_changed;
+
         public media_player_position_changed media_player_position_changed;
+
         public media_player_time_changed media_player_time_changed;
+
         public media_list_item_added media_list_item_added;
+
         public media_list_will_add_item media_list_will_add_item;
+
         public media_list_item_deleted media_list_item_deleted;
+
         public media_list_will_delete_item media_list_will_delete_item;
+
         public media_list_view_item_added media_list_view_item_added;
+
         public media_list_view_will_add_item media_list_view_will_add_item;
+
         public media_list_view_item_deleted media_list_view_item_deleted;
+
         public media_list_view_will_delete_item media_list_view_will_delete_item;
     }
 
@@ -302,16 +319,16 @@ public interface LibVlc extends Library
 
     int libvlc_audio_set_volume(LibVlcInstance instance, int volume, libvlc_exception_t exception);
 
-    int libvlc_audio_get_track_count(LibVlcMediaInstance mediaInstance,  libvlc_exception_t exception );
+    int libvlc_audio_get_track_count(LibVlcMediaInstance mediaInstance, libvlc_exception_t exception);
 
-    int libvlc_audio_get_track(LibVlcMediaInstance mediaInstance, libvlc_exception_t exception );
-    
+    int libvlc_audio_get_track(LibVlcMediaInstance mediaInstance, libvlc_exception_t exception);
+
     void libvlc_audio_set_track(LibVlcMediaInstance mediaInstance, int channel, libvlc_exception_t exception);
-    
-    int libvlc_audio_get_channel(LibVlcInstance instance, libvlc_exception_t exception );
-    
+
+    int libvlc_audio_get_channel(LibVlcInstance instance, libvlc_exception_t exception);
+
     void libvlc_audio_set_channel(LibVlcInstance instance, int channel, libvlc_exception_t exception);
-    
+
     // playlist
 
     void libvlc_playlist_loop(LibVlcInstance instance, int loop, libvlc_exception_t exception);
@@ -345,25 +362,21 @@ public interface LibVlc extends Library
 
     // media descriptor
 
-    LibVlcMediaDescriptor libvlc_media_new(LibVlcInstance libvlc_instance, String mrl,
-        libvlc_exception_t exception);
+    LibVlcMediaDescriptor libvlc_media_new(LibVlcInstance libvlc_instance, String mrl, libvlc_exception_t exception);
 
-    void libvlc_media_add_option(LibVlcMediaDescriptor media, String option,
-        libvlc_exception_t exception);
+    void libvlc_media_add_option(LibVlcMediaDescriptor media, String option, libvlc_exception_t exception);
 
     String libvlc_media_get_mrl(LibVlcMediaDescriptor media);
 
     void libvlc_media_release(LibVlcMediaDescriptor media);
 
-    LibVlcEventManager libvlc_media_event_manager(LibVlcMediaDescriptor media,
-        libvlc_exception_t exception);
+    LibVlcEventManager libvlc_media_event_manager(LibVlcMediaDescriptor media, libvlc_exception_t exception);
 
     // media instance
 
     LibVlcMediaInstance libvlc_media_player_new(LibVlcInstance instance, libvlc_exception_t exception);
 
-    LibVlcMediaInstance libvlc_media_player_new_from_media(LibVlcMediaDescriptor media,
-        libvlc_exception_t exception);
+    LibVlcMediaInstance libvlc_media_player_new_from_media(LibVlcMediaDescriptor media, libvlc_exception_t exception);
 
     void libvlc_media_player_play(LibVlcMediaInstance media_player, libvlc_exception_t exception);
 
@@ -396,8 +409,7 @@ public interface LibVlc extends Library
 
     void libvlc_media_player_release(LibVlcMediaInstance instance);
 
-    LibVlcEventManager libvlc_media_player_event_manager(LibVlcMediaInstance media_player,
-        libvlc_exception_t exception);
+    LibVlcEventManager libvlc_media_player_event_manager(LibVlcMediaInstance media_player, libvlc_exception_t exception);
 
     // media list
 
@@ -408,17 +420,16 @@ public interface LibVlc extends Library
     void libvlc_media_list_add_file_content(LibVlcMediaList libvlc_media_list, String fileName,
         libvlc_exception_t exception);
 
-    void libvlc_media_list_set_media(LibVlcMediaList libvlc_media_list,
-        LibVlcMediaDescriptor libvlc_media, libvlc_exception_t exception);
-
-    LibVlcMediaDescriptor libvlc_media_list_media(LibVlcMediaList libvlc_media_list,
+    void libvlc_media_list_set_media(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
         libvlc_exception_t exception);
 
-    void libvlc_media_list_add_media(LibVlcMediaList libvlc_media_list,
-        LibVlcMediaDescriptor libvlc_media, libvlc_exception_t exception);
+    LibVlcMediaDescriptor libvlc_media_list_media(LibVlcMediaList libvlc_media_list, libvlc_exception_t exception);
 
-    void libvlc_media_list_insert_media(LibVlcMediaList libvlc_media_list,
-        LibVlcMediaDescriptor libvlc_media, int position, libvlc_exception_t exception);
+    void libvlc_media_list_add_media(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+        libvlc_exception_t exception);
+
+    void libvlc_media_list_insert_media(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+        int position, libvlc_exception_t exception);
 
     void libvlc_media_list_remove_index(LibVlcMediaList libvlc_media_list, int position, libvlc_exception_t exception);
 
@@ -427,8 +438,8 @@ public interface LibVlc extends Library
     LibVlcMediaDescriptor libvlc_media_list_item_at_index(LibVlcMediaList libvlc_media_list, int position,
         libvlc_exception_t exception);
 
-    int libvlc_media_list_index_of_item(LibVlcMediaList libvlc_media_list,
-        LibVlcMediaDescriptor libvlc_media, libvlc_exception_t exception);
+    int libvlc_media_list_index_of_item(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+        libvlc_exception_t exception);
 
     int libvlc_media_list_is_readonly(LibVlcMediaList libvlc_media_list);
 
@@ -436,8 +447,7 @@ public interface LibVlc extends Library
 
     // libvlc_media_list_player
 
-    LibVlcMediaListPlayer libvlc_media_list_player_new(LibVlcInstance libvlc_media_player,
-        libvlc_exception_t exception);
+    LibVlcMediaListPlayer libvlc_media_list_player_new(LibVlcInstance libvlc_media_player, libvlc_exception_t exception);
 
     void libvlc_media_list_player_release(LibVlcMediaListPlayer libvlc_media_list_player);
 
@@ -464,6 +474,36 @@ public interface LibVlc extends Library
     void libvlc_media_list_player_stop(LibVlcMediaListPlayer libvlc_media_list_player, libvlc_exception_t exception);
 
     void libvlc_media_list_player_next(LibVlcMediaListPlayer libvlc_media_list_player, libvlc_exception_t exception);
+
+    // VLM
+
+    void libvlc_vlm_add_broadcast(LibVlcInstance p_instance, String psz_name, String psz_input, String psz_output,
+        int i_options, String[] ppsz_options, int b_enabled, int b_loop, libvlc_exception_t p_e);
+
+    void libvlc_vlm_del_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
+
+    void libvlc_vlm_set_enabled(LibVlcInstance p_instance, String psz_name, int b_enabled, libvlc_exception_t p_e);
+
+    void libvlc_vlm_set_output(LibVlcInstance p_instance, String psz_name, String psz_output, libvlc_exception_t p_e);
+
+    void libvlc_vlm_set_input(LibVlcInstance p_instance, String psz_name, String psz_input, libvlc_exception_t p_e);
+
+    void libvlc_vlm_add_input(LibVlcInstance p_instance, String psz_name, String psz_input, libvlc_exception_t p_e);
+
+    void libvlc_vlm_set_loop(LibVlcInstance p_instance, String psz_name, int b_loop, libvlc_exception_t p_e);
+
+    void libvlc_vlm_change_media(LibVlcInstance p_instance, String psz_name, String psz_input, String psz_output,
+        int i_options, String[] ppsz_options, int b_enabled, int b_loop, libvlc_exception_t p_e);
+
+    void libvlc_vlm_play_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
+
+    void libvlc_vlm_stop_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
+
+    void libvlc_vlm_pause_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
+
+    void libvlc_vlm_seek_media(LibVlcInstance p_instance, String psz_name, float f_percentage, libvlc_exception_t p_e);
+
+    String libvlc_vlm_show_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
 
     // event manager
 
