@@ -52,6 +52,22 @@ public interface LibVlc extends Library
         public String message;
     }
 
+    public static class libvlc_log_message_t extends Structure
+    {
+
+        public int sizeof_msg; /* sizeof() of message structure, must be filled in by user */
+
+        public int i_severity; /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
+
+        public String psz_type; /* module type */
+
+        public String psz_name; /* module name */
+
+        public String psz_header; /* optional header */
+
+        public String psz_message; /* message */
+    }
+
     public static class libvlc_event_t extends Structure
     {
 
@@ -251,6 +267,14 @@ public interface LibVlc extends Library
     }
 
     public class LibVlcEventManager extends PointerType
+    {
+    }
+
+    public class LibVlcLog extends PointerType
+    {
+    }
+
+    public class LibVlcLogIterator extends PointerType
     {
     }
 
@@ -520,5 +544,28 @@ public interface LibVlc extends Library
         Pointer userData, libvlc_exception_t excecption);
 
     void libvlc_toggle_fullscreen(LibVlcMediaInstance instance, libvlc_exception_t exception);
+
+    // logging
+
+    int libvlc_get_log_verbosity(LibVlcInstance p_instance, libvlc_exception_t p_e);
+
+    void libvlc_set_log_verbosity(LibVlcInstance p_instance, int level, libvlc_exception_t p_e);
+
+    LibVlcLog libvlc_log_open(LibVlcInstance p_instance, libvlc_exception_t p_e);
+
+    void libvlc_log_close(LibVlcLog p_log, libvlc_exception_t p_e);
+
+    int libvlc_log_count(LibVlcLog p_log, libvlc_exception_t p_e);
+
+    void libvlc_log_clear(LibVlcLog p_log, libvlc_exception_t p_e);
+
+    LibVlcLogIterator libvlc_log_get_iterator(LibVlcLog p_log, libvlc_exception_t p_e);
+
+    void libvlc_log_iterator_free(LibVlcLogIterator p_iter, libvlc_exception_t p_e);
+
+    int libvlc_log_iterator_has_next(LibVlcLogIterator p_iter, libvlc_exception_t p_e);
+
+    libvlc_log_message_t libvlc_log_iterator_next(LibVlcLogIterator p_iter, libvlc_log_message_t p_buffer,
+        libvlc_exception_t p_e);
 
 }

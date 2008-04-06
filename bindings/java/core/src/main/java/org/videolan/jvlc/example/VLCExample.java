@@ -36,31 +36,26 @@ public class VLCExample
         mediaInstance.addListener(new MediaInstanceListener()
         {
 
-            @Override
             public void endReached(MediaInstance mediaInstance)
             {
                 System.out.println("Media instance end reached. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
             }
 
-            @Override
             public void paused(MediaInstance mediaInstance)
             {
                 System.out.println("Media instance paused. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
             }
 
-            @Override
             public void played(MediaInstance mediaInstance)
             {
                 System.out.println("Media instance played. MRL: " + mediaInstance.getMediaDescriptor().getMrl());
             }
 
-            @Override
             public void positionChanged(MediaInstance mediaInstance)
             {
                 // TODO Auto-generated method stub
             }
 
-            @Override
             public void timeChanged(MediaInstance mediaInstance, long newTime)
             {
                 System.out.println("new time: " + newTime);

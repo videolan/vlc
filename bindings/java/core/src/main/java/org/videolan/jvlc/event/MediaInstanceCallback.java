@@ -49,7 +49,6 @@ public class MediaInstanceCallback implements LibVlcCallback
     /**
      * {@inheritDoc}
      */
-    @Override
     public void callback(libvlc_event_t libvlc_event, Pointer userData)
     {
         if (libvlc_event.type == LibVlcEventType.libvlc_MediaPlayerPlayed.ordinal())

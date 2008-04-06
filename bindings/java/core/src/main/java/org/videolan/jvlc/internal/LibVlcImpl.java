@@ -68,7 +68,6 @@ public class LibVlcImpl
         LibVlcCallback played = new LibVlcCallback()
         {
 
-            @Override
             public void callback(libvlc_event_t libvlc_event_t, Pointer pointer)
             {
                 System.out.println("Playing started.");
@@ -78,7 +77,6 @@ public class LibVlcImpl
         LibVlcCallback endReached = new LibVlcCallback()
         {
 
-            @Override
             public void callback(libvlc_event_t libvlc_event_t, Pointer pointer)
             {
                 synchronized (lock)
