@@ -280,6 +280,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     QHBoxLayout *advLayout = new QHBoxLayout( this );
     advLayout->setMargin( 0 );
     advLayout->setSpacing( 0 );
+    advLayout->setAlignment( Qt::AlignBottom );
 
     /* A to B Button */
     ABButton = new QPushButton( "AB" );
