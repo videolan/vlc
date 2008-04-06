@@ -13,6 +13,7 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
+  <item>
     <layout class="QHBoxLayout" >
      <property name="spacing" >
       <number>6</number>
