@@ -603,7 +603,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     {
         volumeSlider = new SoundSlider( this,
             config_GetInt( p_intf, "volume-step" ),
-            config_GetInt( p_intf, "qt-volume-complete" ) );
+            config_GetInt( p_intf, "qt-volume-complete" ),
+            config_GetPsz( p_intf, "qt-slider-colours" ) );
     }
     else
     {

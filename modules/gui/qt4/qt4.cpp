@@ -111,6 +111,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
+#define SLIDERCOL_TEXT N_( "Define the colours of the volume slider " )
+#define SLIDERCOL_LONGTEXT N_( "Define the colours of the volume slider\n " \
+                       "By specifying the 12 numbers separated by a ';'\n " \
+            "Default is '255;255;255;20;226;20;255;176;15,235;30;20'\n " \
+            "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255' ")
 
 #define VIEWDETAIL_TEXT N_( "Show the opening dialog view in detail mode" )
 
@@ -184,6 +189,9 @@ vlc_module_begin();
         add_integer( "qt-updates-days", 14, NULL, UPDATER_DAYS_TEXT,
                 UPDATER_DAYS_TEXT, VLC_FALSE );
 #endif
+        add_string( "qt-slider-colours",
+                "255;255;255;20;226;20;255;176;15,235;30;20",
+                NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, VLC_FALSE );
 
         add_bool( "qt-open-detail", VLC_FALSE, NULL, VIEWDETAIL_TEXT,
                 VIEWDETAIL_TEXT, VLC_FALSE );

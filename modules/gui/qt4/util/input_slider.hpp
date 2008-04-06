@@ -60,7 +60,7 @@ class SoundSlider : public QAbstractSlider
 {
     Q_OBJECT
 public:
-    SoundSlider( QWidget *_parent, int _i_step, bool b_softamp );
+    SoundSlider( QWidget *_parent, int _i_step, bool b_softamp, char * );
     virtual ~SoundSlider() {};
 protected:
     int paddingL;

@@ -114,7 +114,8 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
 #define SOUNDMIN  0   // %
 #define SOUNDMAX  200 // % OR 400 ?
 
-SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
+SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
+                          char *psz_colors )
                         : QAbstractSlider( _parent )
 {
     paddingL = 5;
@@ -134,11 +135,20 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard )
 
     pixGradient = QPixmap( mask.size() );
 
+    /* Gradient building from the preferences */
     QLinearGradient gradient( paddingL, 4, WLENGTH + paddingL , 4 );
-    gradient.setColorAt( 0.0, QColor( 255, 255, 255 ) );
-    gradient.setColorAt( 0.2, QColor( 20, 226, 20 ) );
-    gradient.setColorAt( 0.5, QColor( 255, 176, 15 ) );
-    gradient.setColorAt( 1.0, QColor( 235, 30, 20 ) );
+
+    QStringList colorList = qfu( psz_colors ).split( ";" );
+    /* Fill with 255 if the list is too short */
+    if( colorList.size() < 12 )
+        for( int i = colorList.size(); i < 12; i++)
+            colorList.append( "255" );
+
+#define c(i) colorList.at(i).toInt()
+    gradient.setColorAt( 0.0, QColor( c(0), c(1), c(2) ) );
+    gradient.setColorAt( 0.2, QColor( c(3), c(4), c(5) ) );
+    gradient.setColorAt( 0.5, QColor( c(6), c(7), c(8) ) );
+    gradient.setColorAt( 1.0, QColor( c(9), c(10), c(11) ) );
 
     QPainter painter( &pixGradient );
     painter.setPen( Qt::NoPen );
