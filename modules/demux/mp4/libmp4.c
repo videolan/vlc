@@ -2546,6 +2546,8 @@ static const struct
 
     { FOURCC_dvc,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_dvp,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_dv5n,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_dv5p,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_VP31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_vp31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_h264,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },

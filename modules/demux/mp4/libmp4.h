@@ -151,6 +151,8 @@
 
 #define FOURCC_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
 #define FOURCC_dvp  VLC_FOURCC( 'd', 'v', 'p', ' ' )
+#define FOURCC_dv5n VLC_FOURCC( 'd', 'v', '5', 'n' )
+#define FOURCC_dv5p VLC_FOURCC( 'd', 'v', '5', 'p' )
 #define FOURCC_raw  VLC_FOURCC( 'r', 'a', 'w', ' ' )
 
 #define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
