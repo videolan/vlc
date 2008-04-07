@@ -1209,6 +1209,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         playlist_AddInput( p_playlist, p_input,
                PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+	vlc_gc_decref( p_input );
     }
 
     vlc_object_release( p_playlist );
