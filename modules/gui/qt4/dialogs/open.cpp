@@ -314,6 +314,7 @@ void OpenDialog::finish( bool b_enqueue = false )
             playlist_AddInput( THEPL, p_input,
                 PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
                 PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            vlc_gc_decref( p_input );
         }
     }
     else
