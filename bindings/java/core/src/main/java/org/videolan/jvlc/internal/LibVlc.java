@@ -529,6 +529,8 @@ public interface LibVlc extends Library
 
     String libvlc_vlm_show_media(LibVlcInstance p_instance, String psz_name, libvlc_exception_t p_e);
 
+    void libvlc_vlm_release(LibVlcInstance p_instance, libvlc_exception_t p_e);
+    
     // event manager
 
     public static interface LibVlcCallback extends Callback

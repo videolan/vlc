@@ -30,7 +30,6 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 public class VLM
 {
-
     private JVLC jvlc;
 
     public VLM(JVLC jvlc)
@@ -138,6 +137,15 @@ public class VLM
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_vlm_show_media(jvlc.getInstance(), name, exception);
+    }
+
+    /**
+     * 
+     */
+    public void release()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        jvlc.getLibvlc().libvlc_vlm_release(jvlc.getInstance(), exception);
     }
 
     

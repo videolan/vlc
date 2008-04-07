@@ -46,6 +46,8 @@ public class JVLC
 
     private MediaList mediaList;
     
+    private VLM vlm;
+    
     private volatile boolean released; 
     
     public JVLC()
@@ -96,6 +98,16 @@ public class JVLC
         return new Logger(this);
     }
     
+    public VLM getVLM()
+    {
+        if (vlm != null)
+        {
+            vlm.release();
+        }
+        this.vlm = new VLM(this);
+        return vlm;
+    }
+    
     public LoggerVerbosityLevel getLogVerbosity()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -136,6 +148,11 @@ public class JVLC
         if (!released)
         {
             released = true;
+            if (vlm != null)
+            {
+                vlm.release();
+                vlm = null;
+            }
             libvlc.libvlc_release(instance);
         }
     }
