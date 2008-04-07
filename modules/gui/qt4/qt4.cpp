@@ -114,7 +114,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define SLIDERCOL_TEXT N_( "Define the colours of the volume slider " )
 #define SLIDERCOL_LONGTEXT N_( "Define the colours of the volume slider\n " \
                        "By specifying the 12 numbers separated by a ';'\n " \
-            "Default is '255;255;255;20;226;20;255;176;15,235;30;20'\n " \
+            "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n " \
             "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255' ")
 
 #define VIEWDETAIL_TEXT N_( "Show the opening dialog view in detail mode" )
