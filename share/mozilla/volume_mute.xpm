@@ -1,5 +1,5 @@
 /* XPM */
-static char * volume_mute_xpm[] = {
+static const char * volume_mute_xpm[] = {
 "7 11 2 1",
 " 	c None",
 ".	c #999999",

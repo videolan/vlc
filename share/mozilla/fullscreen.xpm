@@ -1,5 +1,5 @@
 /* XPM */
-static char * fullscreen_xpm[] = {
+static const char * fullscreen_xpm[] = {
 "26 20 5 1",
 " 	c None",
 ".	c #999999",

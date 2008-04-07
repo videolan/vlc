@@ -1,5 +1,5 @@
 /* XPM */
-static char * volume_knob_xpm[] = {
+static const char * volume_knob_xpm[] = {
 "9 9 10 1",
 " 	c None",
 ".	c #989898",
