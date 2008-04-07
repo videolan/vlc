@@ -55,26 +55,27 @@ Playlist:
    share/lua/meta/README.txt
 
 Input/Demuxers:
-  * UDP-Lite transport for RTP/AVP
-  * DCCP transport for RTP/AVP
-  * Proxy support for MMSH stream
-  * JACK audio input support
-  * MP4 gpac and Apple chapter support
-  * Input run time option (improved live stream recording)
-  * Fixed playback of AIFF stereo files
-  * Fixed audio glitch on seek
-  * Improved FLAC demuxer (duration / current time / meta data)
-  * AAC tags support
-  * APEv1/2 tags support
-  * Improved ID3v2 tags support
-  * Improved Ogg/Vorbis tags support
-  * Raw video support
-  * Standard MIDI File (types 0 & 1) support
-  * TiVo Series 2 support
-  * v4l2 access module support
-  * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
-  * CD+G karaoke Files support
-  * MXF files support
+ * UDP-Lite transport for RTP/AVP
+ * DCCP transport for RTP/AVP
+ * Proxy support for MMSH stream
+ * JACK audio input support
+ * MP4 gpac and Apple chapter support
+ * Input run time option (improved live stream recording)
+ * Fixed playback of AIFF stereo files
+ * Fixed audio glitch on seek
+ * Improved FLAC demuxer (duration / current time / meta data)
+ * AAC tags support
+ * APEv1/2 tags support
+ * Improved ID3v2 tags support
+ * Improved Ogg/Vorbis tags support
+ * Raw video support
+ * Standard MIDI File (types 0 & 1) support
+ * TiVo Series 2 support
+ * v4l2 access module support
+ * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
+ * CD+G karaoke Files support
+ * MXF files support
+ * Re-written Screen input module for Mac OS X using OpenGL instead of QuickDraw
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -144,15 +145,16 @@ Interfaces:
    * Improved user interaction
    * Improved mouse gestures
    * Fastly improved Update checker
-   * Experimental Lua interface modules. See vlc -I lua for more info
-   * Ncurses:
-     * Correctly displays wide characters when using an UTF-8 locale, 
-       if libncursesw is available.
-     * Some nice colors if the terminal supports it (most do)
+   * Full support for meta data editing (ID3v2, Ogg/Vorbis, AAC, APEv1/2)
  * Mac OS X
    * Improved video output features
    * Access to VideoLAN's Help Wiki within VLC
    * New setting to disable the "Recent Items" service
+ * Ncurses:
+   * Correctly displays wide characters when using an UTF-8 locale, 
+     if libncursesw is available.
+   * Some nice colors if the terminal supports it (most do)
+ * Experimental Lua interface modules. See vlc -I lua for more info
  * Unix
    * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 
@@ -172,6 +174,7 @@ Mac OS X Port:
  * Mac OS X Framework that can be used to embed VLC in third party
    applications (Google Summer of Code Student project)
  * Complete compatibility with Mac OS X 10.5 Leopard
+ * The support of Mac OS X 10.3.9 was discontinued.
 
 LibVLC:
  * Event management and various improvements in libvlc
