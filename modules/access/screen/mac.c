@@ -1,10 +1,11 @@
 /*****************************************************************************
  * mac.c: Screen capture module for the Mac.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004, 2008 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
+ *          arai <arai_a@mac.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +25,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
+#import <stdlib.h>
 
-#include <vlc/vlc.h>
-#include <vlc/input.h>
+#ifdef HAVE_CONFIG_H
+# import "config.h"
+#endif
 
+#import <vlc/vlc.h>
+
+#import <ApplicationServices/ApplicationServices.h>
 #import <OpenGL/OpenGL.h>
-#include <GL/gl.h>
-#include <ApplicationServices/ApplicationServices.h>
 
 typedef int CGSConnectionRef;
 extern CGError CGSNewConnection( void *, CGSConnectionRef * );
@@ -42,7 +45,7 @@ extern CGError CGSGetGlobalCursorData( CGSConnectionRef, unsigned char *,
                                        int *, int *, int * );
 extern CGError CGSGetCurrentCursorLocation( CGSConnectionRef, CGPoint * );
 
-#include "screen.h"
+#import "screen.h"
 
 struct screen_data_t
 {
