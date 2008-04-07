@@ -2583,9 +2583,11 @@ AC_ARG_ENABLE(screen,
   [  --enable-screen         Screen capture support (default enabled)])
 if test "${enable_screen}" != "no"; then
   if test "${SYS}" = "darwin"; then
-    AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
-      VLC_ADD_PLUGINS([screen])
-      VLC_ADD_LDFLAGS([screen],[-Wl,-framework,ApplicationServices])
+    AC_CHECK_HEADERS(OpenGL/gl.h, [
+      AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
+        VLC_ADD_PLUGINS([screen])
+        VLC_ADD_LDFLAGS([screen],[-Wl,-framework,OpenGL,-framework,ApplicationServices])
+      ])
     ])
   elif test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGINS([screen])
