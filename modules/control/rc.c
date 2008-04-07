@@ -40,7 +40,6 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
-#include <vlc_update.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -103,9 +102,6 @@ static int  Statistics   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
 static int updateStatistics( intf_thread_t *, input_item_t *);
-#if 0 && defined( UPDATE_CHECK )
-static void checkUpdates( intf_thread_t *p_intf );
-#endif
 
 /* Status Callbacks */
 static int TimeOffsetChanged( vlc_object_t *, char const *,
@@ -758,12 +754,6 @@ static void Run( intf_thread_t *p_intf )
 
             Help( p_intf, b_longhelp );
         }
-#if 0 && defined( UPDATE_CHECK )
-        else if( !strcmp( psz_cmd, "check-updates" ) )
-        {
-            checkUpdates( p_intf );
-        }
-#endif
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
             var_SetInteger( p_intf->p_libvlc, "key-pressed",
@@ -933,11 +923,6 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| @name mosaic-cols #. . . . . . . . . . .number of cols"));
         msg_rc(_("| @name mosaic-order id(,id)* . . . . order of pictures "));
         msg_rc(_("| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
-#if 0 && defined( UPDATE_CHECK )
-        msg_rc(  "| ");
-        msg_rc(_("| check-updates [newer] [equal] [older]\n"
-                 "|               [undef] [info] [source] [binary] [plugin]"));
-#endif
         msg_rc(  "| ");
     }
     msg_rc(_("| help . . . . . . . . . . . . . . . this help message"));
@@ -2219,19 +2204,3 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 
     return p_item;
 }
-
-/*****************************************************************************
- * checkUpdates : check for updates
- ****************************************************************************/
-#if 0 && defined( UPDATE_CHECK )
-static void checkUpdates( intf_thread_t *p_intf )
-{
-    /*TODO: - modify this to delete p_update to avoid a memory leak !
-            - complete the function wich is not working obiously !
-    update_t *p_u = update_New( p_intf );
-    var_AddCallback( p_intf->p_libvlc, "update-notify", updatesCallback, p_intf );
-
-    msg_rc( "\nChecking for updates" );
-    update_Check( p_u );*/
-}
-#endif
