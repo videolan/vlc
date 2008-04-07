@@ -38,6 +38,15 @@ extern "C" {
  * @{
  */
 
+    
+/**
+ * Release the vlm instance related to the given libvlc_instance_t
+ *
+ * \param p_instance the instance
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_vlm_release( libvlc_instance_t *, libvlc_exception_t * );
+    
 /**
  * Add a broadcast, with one input.
  *

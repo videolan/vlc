@@ -118,6 +118,16 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance,
   } while(0)
 #define VLM(p) VLM_RET(p,)
 
+void libvlc_vlm_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_exception)
+{
+    vlm_t *p_vlm;
+
+    VLM(p_vlm);
+
+    vlm_Delete( p_vlm );
+}
+
+
 void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance, char *psz_name,
                                char *psz_input, char *psz_output,
                                int i_options, char **ppsz_options,
