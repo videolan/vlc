@@ -190,7 +190,7 @@ vlc_module_begin();
                 UPDATER_DAYS_TEXT, VLC_FALSE );
 #endif
         add_string( "qt-slider-colours",
-                "255;255;255;20;226;20;255;176;15,235;30;20",
+                "255;255;255;20;226;20;255;176;15;235;30;20",
                 NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, VLC_FALSE );
 
         add_bool( "qt-open-detail", VLC_FALSE, NULL, VIEWDETAIL_TEXT,
