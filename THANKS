@@ -23,6 +23,7 @@ Andrew Zaikin <andrew dot zaikin at gmail dot com> - Config saving fixes
 Andrey Brilevskiy <director at macwest.ru> - Russian translation
 Andy Lindsay <andy_vl at ananam.com> - fixes in the TS demux
 Anthony Loiseau <anthony.loiseau at gmail dot com> - Fixes in mozilla toolbar
+arai/Fujisawa Tooru <arai_a at mac dot com> OpenGL-based Screen Input Module for Mac OS X
 Arkadiusz Lipiec <A.Lipiec at elka.pw.edu.pl> - Polish translation
 Arkadiusz Miskiewicz <misiek at pld.ORG.PL> - autoconf and Makefile patches
 Ari Constâncio <ari.constancio at gmail d0t com> - Portuguese localisation
