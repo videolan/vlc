@@ -24,7 +24,7 @@
 --[==========================================================================[
 Configuration options:
  * host: A host to listen on.
- * dir: Directory to use a the http interface's root.
+ * dir: Directory to use as the http interface's root.
  * no_error_detail: If set, do not print the Lua error message when generating
                     a page fails.
  * no_index: If set, don't build directory indexes
@@ -69,14 +69,17 @@ function process_raw(filename)
     return assert(loadstring(code,filename))
 end
 function process(filename)
-    vlc.msg.dbg("Loading `"..filename.."'")
-    local mtime = 0 -- vlc.fd.stat(filename).modification_time
+    local mtime = 0    -- vlc.fd.stat(filename).modification_time
     local func = false -- process_raw(filename)
     return function(...)
         local new_mtime = vlc.fd.stat(filename).modification_time
         if new_mtime ~= mtime then
             -- Re-read the file if it changed
-            vlc.msg.dbg("Reloading `"..filename.."'")
+            if mtime == 0 then
+                vlc.msg.dbg("Loading `"..filename.."'")
+            else
+                vlc.msg.dbg("Reloading `"..filename.."'")
+            end
             func = process_raw(filename)
             mtime = new_mtime
         end
@@ -101,7 +104,7 @@ function callback_error(path,url,msg)
 </html>]]
 end
 
-function dirlisting(url,listing)
+function dirlisting(url,listing,acl_)
     local list = {}
     for _,f in ipairs(listing) do
         if not string.match(f,"^%.") then
@@ -119,7 +122,7 @@ function dirlisting(url,listing)
 </body>
 </html>]]
     end
-    return h:file_new(url,"text/html",nil,nil,nil,callback,nil)
+    return h:file_new(url,"text/html",nil,nil,acl_,callback,nil)
 end
 
 function file(h,path,url,acl_,mime)
@@ -153,14 +156,17 @@ end
 
 function rawfile(h,path,url,acl_)
     local filename = path
-    vlc.msg.dbg("Loading `"..filename.."'")
-    local mtime = 0 -- vlc.fd.stat(filename).modification_time
+    local mtime = 0    -- vlc.fd.stat(filename).modification_time
     local page = false -- io.open(filename):read("*a")
     local callback = function(data,request)
         local new_mtime = vlc.fd.stat(filename).modification_time
         if mtime ~= new_mtime then
             -- Re-read the file if it changed
-            vlc.msg.dbg("Reloading `"..filename.."'")
+            if mtime == 0 then
+                vlc.msg.dbg("Loading `"..filename.."'")
+            else
+                vlc.msg.dbg("Reloading `"..filename.."'")
+            end
             page = io.open(filename):read("*a")
             mtime = new_mtime
         end
@@ -221,15 +227,13 @@ local mimes = {
     html = "text/html",
     xml = "text/xml",
     js = "text/javascript",
+    css = "text/css",
     png = "image/png",
     ico = "image/x-icon",
 }
 local function load_dir(dir,root,parent_acl)
     local root = root or "/"
     local has_index = false
-    if string.match(dir,"/old") then
-        return
-    end
     local my_acl = parent_acl
     do
         local af = dir.."/.hosts"
@@ -261,10 +265,7 @@ local function load_dir(dir,root,parent_acl)
                     table.insert(files,rawfile(h,dir.."/"..f,url,my_acl and my_acl.private))
                 end
             elseif s.type == "dir" then
-                if f == "dialogs" then -- FIXME
-                else
-                    load_dir(dir.."/"..f,root..f.."/",my_acl)
-                end
+                load_dir(dir.."/"..f,root..f.."/",my_acl)
             end
         end
     end
