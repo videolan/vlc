@@ -1268,6 +1268,18 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_EGENERIC;
 }
 
+static void print_playlist( intf_thread_t *p_intf, playlist_item_t *p_item, int i_level )
+{
+    int i;
+    for( i = 0; i< p_item->i_children; i++ )
+    {
+        msg_rc( "%*s%s", 2 * i_level, "", p_item->pp_children[i]->p_input->psz_name );
+
+        if( p_item->pp_children[i]->i_children >= 0 )
+            print_playlist( p_intf, p_item->pp_children[i], i_level + 1 );
+    }
+}
+
 static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -1433,12 +1445,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
-    {
-        msg_Dbg( p_playlist, "Dumping category" );
-        playlist_NodeDump( p_playlist, p_playlist->p_root_category, 0 );
-        msg_Dbg( p_playlist, "Dumping Onelevel" );
-        playlist_NodeDump( p_playlist, p_playlist->p_root_onelevel, 0 );
-    }
+        print_playlist( p_intf, p_playlist->p_root_category, 0 );
+
     else if( !strcmp( psz_cmd, "sort" ))
     {
         playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel,
