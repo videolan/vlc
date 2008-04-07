@@ -705,9 +705,8 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
 }
 
 /**
- * Send notification
- *
  * Send a notification that an item has been added to a node
+ *
  * \param p_playlist the playlist object
  * \param i_item_id id of the item added
  * \param i_node_id id of the node in wich the item was added
