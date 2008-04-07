@@ -21,7 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define CASE_PLANAR_YUV                     \
+/* FIXME: do all of these really have square pixels? */
+#define CASE_PLANAR_YUV_SQUARE              \
         case VLC_FOURCC('I','4','2','0'):   \
         case VLC_FOURCC('I','Y','U','V'):   \
         case VLC_FOURCC('J','4','2','0'):   \
@@ -29,11 +30,17 @@
         case VLC_FOURCC('I','4','1','1'):   \
         case VLC_FOURCC('I','4','1','0'):   \
         case VLC_FOURCC('Y','V','U','9'):   \
-        case VLC_FOURCC('I','4','2','2'):   \
-        case VLC_FOURCC('J','4','2','2'):   \
         case VLC_FOURCC('I','4','4','4'):   \
         case VLC_FOURCC('J','4','4','4'):   \
         case VLC_FOURCC('Y','U','V','A'):
+
+#define CASE_PLANAR_YUV_NONSQUARE           \
+        case VLC_FOURCC('I','4','2','2'):   \
+        case VLC_FOURCC('J','4','2','2'):
+
+#define CASE_PLANAR_YUV                     \
+        CASE_PLANAR_YUV_SQUARE              \
+        CASE_PLANAR_YUV_NONSQUARE           \
 
 #define CASE_PACKED_YUV_422                 \
         case VLC_FOURCC('U','Y','V','Y'):   \

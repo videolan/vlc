@@ -52,6 +52,7 @@ static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
 static void FilterPlanar( vout_thread_t *, const picture_t *, picture_t * );
+static void FilterI422( vout_thread_t *, const picture_t *, picture_t * );
 static void FilterYUYV( vout_thread_t *, const picture_t *, picture_t * );
 
 static int  SendEvents( vlc_object_t *, char const *,
@@ -145,9 +146,14 @@ static int Create( vlc_object_t *p_this )
 
     switch( p_vout->fmt_in.i_chroma )
     {
-        CASE_PLANAR_YUV
+        CASE_PLANAR_YUV_SQUARE
         case VLC_FOURCC('G','R','E','Y'):
             p_vout->p_sys->pf_filter = FilterPlanar;
+            break;
+
+        case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('J','4','2','2'):
+            p_vout->p_sys->pf_filter = FilterI422;
             break;
 
         CASE_PACKED_YUV_422
@@ -551,6 +557,156 @@ static void FilterPlanar( vout_thread_t *p_vout,
     }
 }
 
+static void FilterI422( vout_thread_t *p_vout,
+                        const picture_t *p_pic, picture_t *p_outpic )
+{
+    int i_index;
+    switch( p_vout->p_sys->i_mode )
+    {
+        case TRANSFORM_MODE_180:
+        case TRANSFORM_MODE_HFLIP:
+        case TRANSFORM_MODE_VFLIP:
+            /* Fall back on the default implementation */
+            FilterPlanar( p_vout, p_pic, p_outpic );
+            return;
+
+        case TRANSFORM_MODE_90:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                int i_pitch = p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out_end = p_out +
+                    p_outpic->p[i_index].i_visible_lines *
+                    p_outpic->p[i_index].i_pitch;
+
+                if( i_index == 0 )
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        uint8_t *p_line_end;
+
+                        p_out_end -= p_outpic->p[i_index].i_pitch
+                                      - p_outpic->p[i_index].i_visible_pitch;
+                        p_line_end = p_in + p_pic->p[i_index].i_visible_lines *
+                            i_pitch;
+
+                        for( ; p_in < p_line_end ; )
+                        {
+                            p_line_end -= i_pitch;
+                            *(--p_out_end) = *p_line_end;
+                        }
+
+                        p_in++;
+                    }
+                }
+                else /* i_index == 1 or 2 */
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        uint8_t *p_line_end, *p_out_end2;
+
+                        p_out_end -= p_outpic->p[i_index].i_pitch
+                                      - p_outpic->p[i_index].i_visible_pitch;
+                        p_out_end2 = p_out_end - p_outpic->p[i_index].i_pitch;
+                        p_line_end = p_in + p_pic->p[i_index].i_visible_lines *
+                            i_pitch;
+
+                        for( ; p_in < p_line_end ; )
+                        {
+                            uint8_t p1, p2;
+
+                            p_line_end -= i_pitch;
+                            p1 = *p_line_end;
+                            p_line_end -= i_pitch;
+                            p2 = *p_line_end;
+
+                            /* Trick for (x+y)/2 without overflow, based on
+                             *   x + y == (x ^ y) + 2 * (x & y) */
+                            *(--p_out_end) = (p1 & p2) + ((p1 ^ p2) / 2);
+                            *(--p_out_end2) = (p1 & p2) + ((p1 ^ p2) / 2);
+                        }
+
+                        p_out_end = p_out_end2;
+                        p_in++;
+                    }
+                }
+            }
+            break;
+
+        case TRANSFORM_MODE_270:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                int i_pitch = p_pic->p[i_index].i_pitch;
+
+                uint8_t *p_in = p_pic->p[i_index].p_pixels;
+
+                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
+                uint8_t *p_out_end = p_out +
+                    p_outpic->p[i_index].i_visible_lines *
+                    p_outpic->p[i_index].i_pitch;
+
+                if( i_index == 0 )
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        uint8_t *p_in_end;
+
+                        p_in_end = p_in + p_pic->p[i_index].i_visible_lines *
+                            i_pitch;
+
+                        for( ; p_in < p_in_end ; )
+                        {
+                            p_in_end -= i_pitch;
+                            *p_out++ = *p_in_end;
+                        }
+
+                        p_out += p_outpic->p[i_index].i_pitch
+                                  - p_outpic->p[i_index].i_visible_pitch;
+                        p_in++;
+                    }
+                }
+                else /* i_index == 1 or 2 */
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        uint8_t *p_in_end, *p_out2;
+
+                        p_in_end = p_in + p_pic->p[i_index].i_visible_lines *
+                            i_pitch;
+                        p_out2 = p_out + p_outpic->p[i_index].i_pitch;
+
+                        for( ; p_in < p_in_end ; )
+                        {
+                            uint8_t p1, p2;
+
+                            p_in_end -= i_pitch;
+                            p1 = *p_in_end;
+                            p_in_end -= i_pitch;
+                            p2 = *p_in_end;
+
+                            /* Trick for (x+y)/2 without overflow, based on
+                             *   x + y == (x ^ y) + 2 * (x & y) */
+                            *p_out++ = (p1 & p2) + ((p1 ^ p2) / 2);
+                            *p_out2++ = (p1 & p2) + ((p1 ^ p2) / 2);
+                        }
+
+                        p_out2 += p_outpic->p[i_index].i_pitch
+                                   - p_outpic->p[i_index].i_visible_pitch;
+                        p_out = p_out2;
+                        p_in++;
+                    }
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 static void FilterYUYV( vout_thread_t *p_vout,
                         const picture_t *p_pic, picture_t *p_outpic )
 {
@@ -562,6 +718,11 @@ static void FilterYUYV( vout_thread_t *p_vout,
 
     switch( p_vout->p_sys->i_mode )
     {
+        case TRANSFORM_MODE_HFLIP:
+            /* Fall back on the default implementation */
+            FilterPlanar( p_vout, p_pic, p_outpic );
+            return;
+
         case TRANSFORM_MODE_90:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
@@ -680,25 +841,6 @@ static void FilterYUYV( vout_thread_t *p_vout,
                         i_offset = i_offset2;
                         i_offset2 = a;
                     }
-                }
-            }
-            break;
-
-        case TRANSFORM_MODE_HFLIP:
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-            {
-                uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
-                                            * p_pic->p[i_index].i_pitch;
-
-                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-
-                for( ; p_in < p_in_end ; )
-                {
-                    p_in_end -= p_pic->p[i_index].i_pitch;
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in_end,
-                                           p_pic->p[i_index].i_visible_pitch );
-                    p_out += p_pic->p[i_index].i_pitch;
                 }
             }
             break;
