@@ -241,7 +241,6 @@ playlist_NodeAppend
 playlist_NodeChildrenCount
 playlist_NodeCreate
 playlist_NodeDelete
-playlist_NodeDump
 playlist_NodeEmpty
 playlist_NodeInsert
 playlist_NodeRemoveItem

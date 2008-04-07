@@ -48,7 +48,7 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
  * Create a playlist node
  *
  * \param p_playlist the playlist
- * \paam psz_name the name of the node
+ * \param psz_name the name of the node
  * \param p_parent the parent node to attach to or NULL if no attach
  * \param p_flags miscellaneous flags
  * \param p_input the input_item to attach to or NULL if it has to be created
@@ -665,38 +665,4 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
         }
     }
     return NULL;
-}
-
-/* Dump the contents of a node */
-void playlist_NodeDump( playlist_t *p_playlist, playlist_item_t *p_item,
-                        int i_level )
-{
-    char str[512];
-    int i;
-
-    if( i_level == 1 )
-    {
-        msg_Dbg( p_playlist, "%s (%i)",
-                        p_item->p_input->psz_name, p_item->i_children );
-    }
-
-    if( p_item->i_children == -1 )
-    {
-        return;
-    }
-
-    for( i = 0; i< p_item->i_children; i++ )
-    {
-        memset( str, 32, 512 );
-        sprintf( str + 2 * i_level , "%s (%i)",
-                                p_item->pp_children[i]->p_input->psz_name,
-                                p_item->pp_children[i]->i_children );
-        msg_Dbg( p_playlist, "%s",str );
-        if( p_item->pp_children[i]->i_children >= 0 )
-        {
-            playlist_NodeDump( p_playlist, p_item->pp_children[i],
-                              i_level + 1 );
-        }
-    }
-    return;
 }

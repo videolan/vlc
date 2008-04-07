@@ -380,7 +380,6 @@ VLC_EXPORT( int, playlist_LiveSearchUpdate, (playlist_t *, playlist_item_t *, co
 /********************************************************
  * Tree management
  ********************************************************/
-VLC_EXPORT(void, playlist_NodeDump, ( playlist_t *p_playlist, playlist_item_t *p_item, int i_level ) );
 VLC_EXPORT( int, playlist_NodeChildrenCount, (playlist_t *,playlist_item_t* ) );
 
 /* Node management */
