@@ -565,15 +565,20 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             p_enc->fmt_in.audio.i_channels = 2;
 
         p_enc->fmt_in.i_codec  = AOUT_FMT_S16_NE;
-        p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
-        p_context->channels    = p_enc->fmt_in.audio.i_channels;
+        p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
+        p_context->channels    = p_enc->fmt_out.audio.i_channels;
 
+        if ( p_enc->fmt_out.i_codec == VLC_FOURCC('m','p','4','a') )
+        {
+            /* XXX: FAAC does resample only when setting the INPUT samplerate
+             * to the desired value (-R option of the faac frontend) */
+            p_enc->fmt_in.audio.i_rate = p_context->sample_rate;
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
         /* Ignore FF_PROFILE_UNKNOWN */
-        if( ( p_sys->i_aac_profile >= FF_PROFILE_AAC_MAIN ) && 
-            ( p_enc->fmt_out.i_codec == VLC_FOURCC('m','p','4','a') ) )
+        if( p_sys->i_aac_profile >= FF_PROFILE_AAC_MAIN )
             p_context->profile = p_sys->i_aac_profile;
 #endif
+        }
     }
 
     /* Misc parameters */
