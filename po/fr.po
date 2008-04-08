@@ -14282,7 +14282,7 @@ msgstr "Paquets envoyés"
 #: modules/gui/macosx/playlistinfo.m:94
 #: modules/gui/qt4/components/info_panels.cpp:541
 msgid "Sent bytes"
-msgstr "Octetss envoyés"
+msgstr "Octets envoyés"
 
 #: modules/gui/macosx/playlistinfo.m:95
 msgid "Send rate"
