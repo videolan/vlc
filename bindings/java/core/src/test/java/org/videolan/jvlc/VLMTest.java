@@ -25,6 +25,8 @@
 
 package org.videolan.jvlc;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,10 +52,28 @@ public class VLMTest
     }
     
     @Test
-    public void testPlayMedia()
+    public void testVLMInit()
     {
         VLM vlm = jvlc.getVLM();
-        vlm.playMedia(mrl);
+        Assert.assertNotNull(vlm);
     }
+    
+    @Test
+    public void testAddBroadcast()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast("test", "file://" + mrl, "", null, true, false);
+    }
+    
+    @Test
+    public void testShowMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast("test", "file://" + mrl, "", null, true, false);
+        vlm.showMedia("test");
+    }
+    
+    
+    
     
 }
