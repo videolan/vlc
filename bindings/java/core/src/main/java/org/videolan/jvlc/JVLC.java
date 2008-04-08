@@ -48,7 +48,7 @@ public class JVLC
     
     private VLM vlm;
     
-    private volatile boolean released; 
+    private volatile boolean released;
     
     public JVLC()
     {
@@ -67,11 +67,21 @@ public class JVLC
         this(args.split(" "));
     }
 
+    /*
+     * Core methods
+     */
+    private LibVlcInstance createInstance(String[] args)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_new(args.length, args, exception);
+    }
+
     public MediaInstance play(String media)
     {
         MediaDescriptor mediaDescriptor = new MediaDescriptor(this, media);
         MediaInstance mediaInstance = new MediaInstance(mediaDescriptor);
         mediaInstance.play();
+        mediaDescriptor.release();
         return mediaInstance;
     }
 
@@ -82,22 +92,20 @@ public class JVLC
         libvlc.libvlc_video_set_parent(instance, drawable, exception );
     }
 
-    /*
-     * Core methods
-     */
-    private LibVlcInstance createInstance(String[] args)
-    {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_exception_init(exception);
-
-        return libvlc.libvlc_new(args.length, args, exception);
-    }
-
     public Logger getLogger()
     {
         return new Logger(this);
     }
     
+    /**
+     * Returns the mediaList.
+     * @return the mediaList
+     */
+    public MediaList getMediaList()
+    {
+        return mediaList;
+    }
+
     public VLM getVLM()
     {
         if (vlm != null)
@@ -145,16 +153,17 @@ public class JVLC
      */
     public void release()
     {
-        if (!released)
+        if (released)
         {
-            released = true;
-            if (vlm != null)
-            {
-                vlm.release();
-                vlm = null;
-            }
-            libvlc.libvlc_release(instance);
+            return;
         }
+        released = true;
+        if (vlm != null)
+        {
+            vlm.release();
+            vlm = null;
+        }
+        libvlc.libvlc_release(instance);
     }
 
     /*
@@ -164,21 +173,8 @@ public class JVLC
     @Override
     protected void finalize() throws Throwable
     {
-        if (!released)
-        {
-            released = true;
-            libvlc.libvlc_release(instance);
-        }
+        release();
         super.finalize();
-    }
-    
-    /**
-     * Returns the mediaList.
-     * @return the mediaList
-     */
-    public MediaList getMediaList()
-    {
-        return mediaList;
     }
     
 }
