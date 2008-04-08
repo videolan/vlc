@@ -42,6 +42,7 @@
 #include <vlc_tls.h>
 #include <vlc_strings.h>
 #include <vlc_input.h>
+#include <vlc_md5.h>
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
@@ -113,6 +114,22 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+/* RFC 2617: Basic and Digest Access Authentification */
+typedef struct http_auth_t
+{
+    char *psz_realm;
+    char *psz_domain;
+    char *psz_nonce;
+    char *psz_opaque;
+    char *psz_stale;
+    char *psz_algorithm;
+    char *psz_qop;
+    int i_nonce;
+    char *psz_cnonce;
+    char *psz_A1; /* stored A1 value if algorithm = "MD5-sess" */
+} http_auth_t;
+
 struct access_sys_t
 {
     int fd;
@@ -122,10 +139,12 @@ struct access_sys_t
     /* From uri */
     vlc_url_t url;
     char    *psz_user_agent;
+    http_auth_t auth;
 
     /* Proxy */
     vlc_bool_t b_proxy;
     vlc_url_t  proxy;
+    http_auth_t proxy_auth;
 
     /* */
     int        i_code;
@@ -184,6 +203,13 @@ static char * cookie_get_content( const char * cookie );
 static char * cookie_get_domain( const char * cookie );
 static char * cookie_get_name( const char * cookie );
 static void cookie_append( vlc_array_t * cookies, char * cookie );
+
+
+static void AuthParseHeader( access_t *p_access, const char *psz_header,
+                             http_auth_t *p_auth );
+static void AuthReply( access_t *p_acces, const char *psz_prefix,
+                       vlc_url_t *p_url, http_auth_t *p_auth );
+static void AuthReset( http_auth_t *p_auth );
 
 /*****************************************************************************
  * Open:
@@ -345,11 +371,21 @@ connect:
     if( p_sys->i_code == 401 )
     {
         char *psz_login = NULL; char *psz_password = NULL;
+        char psz_msg[250];
         int i_ret;
-        msg_Dbg( p_access, "authentication failed" );
+        /* FIXME ? */
+        if( p_sys->url.psz_username && p_sys->url.psz_password &&
+            p_sys->auth.psz_nonce && p_sys->auth.i_nonce == 0 )
+        {
+            goto connect;
+        }
+        snprintf( psz_msg, 250,
+            _("Please enter a valid login name and a password for realm %s."),
+            p_sys->auth.psz_realm );
+        msg_Dbg( p_access, "authentication failed for realm %s",
+            p_sys->auth.psz_realm );
         i_ret = intf_UserLoginPassword( p_access, _("HTTP authentication"),
-                        _("Please enter a valid login name and a password."),
-                                                &psz_login, &psz_password );
+                                        psz_msg, &psz_login, &psz_password );
         if( i_ret == DIALOG_OK_YES )
         {
             msg_Dbg( p_access, "retrying with user=%s, pwd=%s",
@@ -386,7 +422,9 @@ connect:
         p_access->psz_path = strdup( p_sys->psz_location );
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
+        AuthReset( &p_sys->auth );
         vlc_UrlClean( &p_sys->proxy );
+        AuthReset( &p_sys->proxy_auth );
         free( p_sys->psz_mime );
         free( p_sys->psz_pragma );
         free( p_sys->psz_location );
@@ -480,7 +518,9 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     vlc_UrlClean( &p_sys->url );
+    AuthReset( &p_sys->auth );
     vlc_UrlClean( &p_sys->proxy );
+    AuthReset( &p_sys->proxy_auth );
 
     free( p_sys->psz_mime );
     free( p_sys->psz_pragma );
@@ -1060,41 +1100,11 @@ static int Request( access_t *p_access, int64_t i_tell )
 
     /* Authentication */
     if( p_sys->url.psz_username || p_sys->url.psz_password )
-    {
-        char buf[strlen( p_sys->url.psz_username ?: "" )
-                  + strlen( p_sys->url.psz_password ?: "" ) + 2];
-        char *b64;
-
-        snprintf( buf, sizeof( buf ), "%s:%s", p_sys->url.psz_username ?: "",
-                  p_sys->url.psz_password ?: "" );
-        b64 = vlc_b64_encode( buf );
-
-        if( b64 != NULL )
-        {
-             net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                         "Authorization: Basic %s\r\n", b64 );
-             free( b64 );
-        }
-    }
+        AuthReply( p_access, "", &p_sys->url, &p_sys->auth );
 
     /* Proxy Authentication */
     if( p_sys->proxy.psz_username || p_sys->proxy.psz_password )
-    {
-        char buf[strlen( p_sys->proxy.psz_username ?: "" )
-                  + strlen( p_sys->proxy.psz_password ?: "" )];
-        char *b64;
-
-        snprintf( buf, sizeof( buf ), "%s:%s", p_sys->proxy.psz_username ?: "",
-                  p_sys->proxy.psz_password ?: "" );
-        b64 = vlc_b64_encode( buf );
-
-        if( b64 != NULL)
-        {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                        "Proxy-Authorization: Basic %s\r\n", b64 );
-            free( b64 );
-        }
-    }
+        AuthReply( p_access, "Proxy-", &p_sys->proxy, &p_sys->proxy_auth );
 
     /* ICY meta data request */
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
@@ -1327,7 +1337,8 @@ static int Request( access_t *p_access, int64_t i_tell )
                  !strncasecmp( psz, "x-audiocast", 11 ) )
         {
             msg_Dbg( p_access, "Meta-Info: %s: %s", psz, p );
-        } else if( !strcasecmp( psz, "Set-Cookie" ) )
+        }
+        else if( !strcasecmp( psz, "Set-Cookie" ) )
         {
             if( p_sys->cookies )
             {
@@ -1336,6 +1347,21 @@ static int Request( access_t *p_access, int64_t i_tell )
             }
             else
                 msg_Dbg( p_access, "We have a Cookie we won't remember: %s", p );
+        }
+        else if( !strcasecmp( psz, "www-authenticate" ) )
+        {
+            msg_Dbg( p_access, "Authentication header: %s", p );
+            AuthParseHeader( p_access, p, &p_sys->auth );
+        }
+        else if( !strcasecmp( psz, "proxy-authenticate" ) )
+        {
+            msg_Dbg( p_access, "Proxy authentication header: %s", p );
+            AuthParseHeader( p_access, p, &p_sys->proxy_auth );
+        }
+        else if( !strcasecmp( psz, "authentication-info" ) )
+        {
+            msg_Dbg( p_access, "Authentication info: %s", p );
+            /* FIXME: use */
         }
 
         free( psz );
@@ -1472,3 +1498,328 @@ static void cookie_append( vlc_array_t * cookies, char * cookie )
     vlc_array_append( cookies, cookie );
 }
 
+/*****************************************************************************
+ * "RFC 2617: Basic and Digest Access Authentification" header parsing
+ *****************************************************************************/
+static char *AuthGetParam( const char *psz_header, const char *psz_param )
+{
+    char psz_what[strlen(psz_param)+3];
+    sprintf( psz_what, "%s=\"", psz_param );
+    psz_header = strstr( psz_header, psz_what );
+    if( psz_header )
+    {
+        const char *psz_end;
+        psz_header += strlen( psz_what );
+        psz_end = strchr( psz_header, '"' );
+        if( !psz_end )
+        {
+            psz_end = psz_header;
+            while( *psz_end ) psz_end++;
+        }
+        return strndup( psz_header, psz_end - psz_header );
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+static char *AuthGetParamNoQuotes( const char *psz_header, const char *psz_param )
+{
+    char psz_what[strlen(psz_param)+3];
+    sprintf( psz_what, "%s=", psz_param );
+    psz_header = strstr( psz_header, psz_what );
+    if( psz_header )
+    {
+        const char *psz_end;
+        psz_header += strlen( psz_what );
+        psz_end = strchr( psz_header, ',' );
+        if( !psz_end )
+        {
+            psz_end = psz_header;
+            while( *psz_end ) psz_end++;
+        }
+        return strndup( psz_header, psz_end - psz_header );
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+static void AuthParseHeader( access_t *p_access, const char *psz_header,
+                             http_auth_t *p_auth )
+{
+    /* FIXME: multiple auth methods can be listed (comma seperated) */
+
+    /* 2 Basic Authentication Scheme */
+    if( !strncasecmp( psz_header, "Basic ", strlen( "Basic " ) ) )
+    {
+        msg_Dbg( p_access, "Using Basic Authentication" );
+        psz_header += strlen( "Basic " );
+        p_auth->psz_realm = AuthGetParam( psz_header, "realm" );
+        if( !p_auth->psz_realm )
+            msg_Warn( p_access, "Basic Authentication: "
+                      "Mandatory 'realm' parameter is missing" );
+    }
+    /* 3 Digest Access Authentication Scheme */
+    else if( !strncasecmp( psz_header, "Digest ", strlen( "Digest " ) ) )
+    {
+        msg_Dbg( p_access, "Using Digest Access Authentication" );
+        if( p_auth->psz_nonce ) return; /* FIXME */
+        psz_header += strlen( "Digest " );
+        p_auth->psz_realm = AuthGetParam( psz_header, "realm" );
+        p_auth->psz_domain = AuthGetParam( psz_header, "domain" );
+        p_auth->psz_nonce = AuthGetParam( psz_header, "nonce" );
+        p_auth->psz_opaque = AuthGetParam( psz_header, "opaque" );
+        p_auth->psz_stale = AuthGetParamNoQuotes( psz_header, "stale" );
+        p_auth->psz_algorithm = AuthGetParamNoQuotes( psz_header, "algorithm" );
+        p_auth->psz_qop = AuthGetParam( psz_header, "qop" );
+        p_auth->i_nonce = 0;
+        /* printf("realm: %s\ndomain: %s\nnonce: %s\nopaque: %s\nstale: %s\nalgorithm: %s\nqop: %s\n",p_auth->psz_realm,p_auth->psz_domain,p_auth->psz_nonce,p_auth->psz_opaque,p_auth->psz_stale,p_auth->psz_algorithm,p_auth->psz_qop); */
+        if( !p_auth->psz_realm )
+            msg_Warn( p_access, "Digest Access Authentication: "
+                      "Mandatory 'realm' parameter is missing" );
+        if( !p_auth->psz_nonce )
+            msg_Warn( p_access, "Digest Access Authentication: "
+                      "Mandatory 'nonce' parameter is missing" );
+        if( p_auth->psz_qop ) /* FIXME */
+        {
+            char *psz_tmp = strchr( p_auth->psz_qop, ',' );
+            if( psz_tmp ) *psz_tmp = '\0';
+        }
+    }
+    else
+    {
+        const char *psz_end = strchr( psz_header, ' ' );
+        if( !psz_end )
+        {
+            psz_end = psz_header;
+            while( *psz_end ) psz_end++;
+        }
+        msg_Warn( p_access, "Unknown authentication scheme: '%*s'",
+                  psz_end - psz_header, psz_header );
+    }
+}
+
+static char *AuthAlgoMD5( const char *psz_data )
+{
+    struct md5_s md5;
+    char *psz_md5;
+    InitMD5( &md5 );
+    AddMD5( &md5, psz_data, strlen( psz_data ) );
+    EndMD5( &md5 );
+    psz_md5 = psz_md5_hash( &md5 );
+    return psz_md5;
+}
+
+static void AuthReply( access_t *p_access, const char *psz_prefix,
+                       vlc_url_t *p_url, http_auth_t *p_auth )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    v_socket_t     *pvs = p_sys->p_vs;
+
+    const char *psz_username = p_url->psz_username ?: "";
+    const char *psz_password = p_url->psz_password ?: "";
+
+    if( p_auth->psz_nonce )
+    {
+        /* Digest Access Authentication */
+        char *psz_response = NULL;
+        char *psz_A1 = NULL;
+        char *psz_A2 = NULL;
+        char *psz_secret = NULL;
+        char *psz_data = NULL;
+        char * (*pf_algo)( const char * );
+
+        if(    p_auth->psz_algorithm == NULL
+            || !strcmp( p_auth->psz_algorithm, "MD5" )
+            || !strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
+        {
+            pf_algo = AuthAlgoMD5;
+        }
+        else
+        {
+            msg_Err( p_access, "Digest Access Authentication: "
+                     "Unknown algorithm '%s'", p_auth->psz_algorithm );
+        }
+        if( !pf_algo ) return;
+
+        if( p_auth->psz_qop )
+        {
+            /* FIXME: needs to be really random to prevent man in the middle
+             * attacks */
+            free( p_auth->psz_cnonce );
+            p_auth->psz_cnonce = strdup( "Some random string FIXME" );
+        }
+        p_auth->i_nonce ++;
+
+        if( p_auth->psz_algorithm && !strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
+        {
+            if( !p_auth->psz_A1 )
+            {
+                char *psz_tmp = NULL;
+                if( asprintf( &psz_A1, "%s:%s:%s", psz_username,
+                              p_auth->psz_realm, psz_password ) < 0 )
+                    goto error;
+                psz_tmp = pf_algo( psz_A1 );
+                free( psz_A1 ); psz_A1 = NULL;
+                if( !psz_tmp ) goto error;
+                if( asprintf( &psz_A1, "%s:%s:%s", psz_tmp, p_auth->psz_nonce,
+                    p_auth->psz_cnonce ) < 0 )
+                {
+                    free( psz_tmp );
+                    goto error;
+                }
+                p_auth->psz_A1 = strdup( psz_A1 );
+            }
+            else
+            {
+                psz_A1 = strdup( p_auth->psz_A1 );
+            }
+        }
+        else
+        {
+            if( asprintf( &psz_A1, "%s:%s:%s", psz_username, p_auth->psz_realm,
+                          psz_password ) < 0 ) goto error;
+        }
+
+        if( !p_auth->psz_qop || !strcmp( p_auth->psz_qop, "auth" ) )
+        {
+            if( asprintf( &psz_A2, "%s:%s", "GET", p_url->psz_path ?: "/" )
+                < 0 ) goto error;
+        }
+        else
+        {
+            char *psz_tmp = pf_algo( "FIXME entity-body" ); /* FIXME */
+            if( asprintf( &psz_A2, "%s:%s:%s", "GET", p_url->psz_path ?: "/",
+                psz_tmp ) < 0 )
+            {
+                free( psz_tmp );
+                goto error;
+            }
+            free( psz_tmp );
+        }
+
+        psz_secret = pf_algo( psz_A1 );
+
+        if( p_auth->psz_qop
+            && ( !strcmp( p_auth->psz_qop, "auth" )
+                 || !strcmp( p_auth->psz_qop, "auth-int" ) ) )
+        {
+            char *psz_tmp = pf_algo( psz_A2 );
+            if( !psz_tmp ) goto error;
+            if( asprintf( &psz_data, "%s:%08x:%s:%s:%s",
+                          p_auth->psz_nonce, p_auth->i_nonce,
+                          p_auth->psz_cnonce, p_auth->psz_qop, psz_tmp ) < 0 )
+            {
+                free( psz_tmp );
+                goto error;
+            }
+            free( psz_tmp );
+        }
+        else
+        {
+            char *psz_tmp = pf_algo( psz_A2 );
+            if( !psz_tmp ) goto error;
+            if( asprintf( &psz_data, "%s:%s", p_auth->psz_nonce, psz_tmp ) < 0 )
+            {
+                free( psz_tmp );
+                goto error;
+            }
+            free( psz_tmp );
+        }
+
+        if( psz_secret && psz_data )
+        {
+            char *psz_tmp = NULL;
+            if( asprintf( &psz_tmp, "%s:%s", psz_secret, psz_data ) < 0 )
+                goto error;
+            psz_response = pf_algo( psz_tmp );
+            free( psz_tmp );
+            if( !psz_response )
+                goto error;
+        }
+        else
+        {
+            goto error;
+        }
+
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+                    "%sAuthorization: Digest "
+                    /* Mandatory parameters */
+                    "username=\"%s\", "
+                    "realm=\"%s\", "
+                    "nonce=\"%s\", "
+                    "uri=\"%s\", "
+                    "response=\"%s\", "
+                    /* Optional parameters */
+                    "%s%s%s" /* algorithm */
+                    "%s%s%s" /* cnonce */
+                    "%s%s%s" /* opaque */
+                    "%s%s%s" /* message qop */
+                    "%s%08x%s" /* nonce count */
+                    "\r\n",
+                    /* Mandatory parameters */
+                    psz_prefix,
+                    psz_username,
+                    p_auth->psz_realm,
+                    p_auth->psz_nonce,
+                    p_url->psz_path ?: "/",
+                    psz_response,
+                    /* Optional parameters */
+                    p_auth->psz_algorithm ? "algorithm=\"" : "",
+                    p_auth->psz_algorithm ?: "",
+                    p_auth->psz_algorithm ? "\", " : "",
+                    p_auth->psz_cnonce ? "cnonce=\"" : "",
+                    p_auth->psz_cnonce ?: "",
+                    p_auth->psz_cnonce ? "\", " : "",
+                    p_auth->psz_opaque ? "opaque=\"" : "",
+                    p_auth->psz_opaque ?: "",
+                    p_auth->psz_opaque ? "\", " : "",
+                    p_auth->psz_qop ? "qop=\"" : "",
+                    p_auth->psz_qop ?: "",
+                    p_auth->psz_qop ? "\", " : "",
+                    p_auth->i_nonce ? "nc=\"" : "uglyhack=\"", /* Will be parsed as an unhandled extension */
+                    p_auth->i_nonce,
+                    p_auth->i_nonce ? "\"" : "\""
+                  );
+
+    error:
+        free( psz_response );
+        free( psz_A1 );
+        free( psz_A2 );
+        free( psz_secret );
+        free( psz_data );
+    }
+    else
+    {
+        /* Basic Access Authentication */
+        char buf[strlen( psz_username ) + strlen( psz_password ) + 2];
+        char *b64;
+
+        snprintf( buf, sizeof( buf ), "%s:%s", psz_username, psz_password );
+        b64 = vlc_b64_encode( buf );
+
+        if( b64 != NULL )
+        {
+             net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+                         "%sAuthorization: Basic %s\r\n", psz_prefix, b64 );
+             free( b64 );
+        }
+    }
+}
+
+static void AuthReset( http_auth_t *p_auth )
+{
+    FREENULL( p_auth->psz_realm );
+    FREENULL( p_auth->psz_domain );
+    FREENULL( p_auth->psz_nonce );
+    FREENULL( p_auth->psz_opaque );
+    FREENULL( p_auth->psz_stale );
+    FREENULL( p_auth->psz_algorithm );
+    FREENULL( p_auth->psz_qop );
+    p_auth->i_nonce = 0;
+    FREENULL( p_auth->psz_cnonce );
+    FREENULL( p_auth->psz_A1 );
+}
