@@ -62,6 +62,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/MainMenu.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/MainMenu.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/About.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/About.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/About.nib/keyedobjects.nib \
@@ -128,7 +131,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/play_blue.png \
 	extras/package/macosx/Resources/stop.png \
 	extras/package/macosx/Resources/stop_blue.png \
-	extras/package/macosx/Resources/display.png \
+	extras/package/macosx/Resources/display_left.png \
+	extras/package/macosx/Resources/display_middle.png \
+	extras/package/macosx/Resources/display_right.png \
 	extras/package/macosx/Resources/display_slider.png \
 	extras/package/macosx/Resources/display_track.png \
 	extras/package/macosx/Resources/equalizerdrawer_active.png \
@@ -196,6 +201,32 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/fs_exit_fullscreen_highlight.png \
 	extras/package/macosx/Resources/fs_exit_fullscreen.png \
 	extras/package/macosx/Resources/fs_background.png \
+	extras/package/macosx/Resources/add_embedded_graphite.png \
+	extras/package/macosx/Resources/equalizerdrawer_graphite.png \
+	extras/package/macosx/Resources/fullscreen_graphite.png \
+	extras/package/macosx/Resources/next_graphite.png \
+	extras/package/macosx/Resources/pause_embedded_graphite.png \
+	extras/package/macosx/Resources/pause_graphite.png \
+	extras/package/macosx/Resources/play_embedded_graphite.png \
+	extras/package/macosx/Resources/play_graphite.png \
+	extras/package/macosx/Resources/playlistdrawer_graphite.png \
+	extras/package/macosx/Resources/previous_graphite.png \
+	extras/package/macosx/Resources/repeat_embedded_graphite.png \
+	extras/package/macosx/Resources/repeat_single_embedded_graphite.png \
+	extras/package/macosx/Resources/shuffle_embedded_graphite.png \
+	extras/package/macosx/Resources/skip_forward_embedded_graphite.png \
+	extras/package/macosx/Resources/skip_forward_graphite.png \
+	extras/package/macosx/Resources/skip_previous_embedded_graphite.png \
+	extras/package/macosx/Resources/skip_previous_graphite.png \
+	extras/package/macosx/Resources/stop_graphite.png \
+	extras/package/macosx/Resources/volumeslider_graphite.png \
+	extras/package/macosx/Resources/noart.png \
+	extras/package/macosx/Resources/spref_cone_Audio_64.png \
+	extras/package/macosx/Resources/spref_cone_Hotkeys_64.png \
+	extras/package/macosx/Resources/spref_cone_Input_64.png \
+	extras/package/macosx/Resources/spref_cone_Interface_64.png \
+	extras/package/macosx/Resources/spref_cone_Subtitles_64.png \
+	extras/package/macosx/Resources/spref_cone_Video_64.png \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/ub.sh \
 	extras/package/macosx/vlc.xcodeproj/project.pbxproj \
@@ -210,7 +241,15 @@ EXTRA_DIST += \
 	extras/package/macosx/plugin/InstallerInfo.plist \
 	extras/package/macosx/plugin/InstallerDescription.plist \
 	extras/package/macosx/plugin/pbdevelopment.plist \
-	extras/package/macosx/plugin/English.lproj/InfoPlist.strings
+	extras/package/macosx/plugin/English.lproj/InfoPlist.strings \
+	extras/package/macosx/eyetvplugin/EyeTVPluginDefs.h \
+	extras/package/macosx/eyetvplugin/Info.plist \
+	extras/package/macosx/eyetvplugin/eyetvplugin.c \
+	extras/package/macosx/eyetvplugin/eyetvplugin.h \
+	extras/package/macosx/eyetvplugin/English.lproj/InfoPlist.strings \
+	extras/package/macosx/eyetvplugin/eyetvplugin.xcodeproj/project.pbxproj \
+	extras/package/macosx/README.MacOSX.rtf
+
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
