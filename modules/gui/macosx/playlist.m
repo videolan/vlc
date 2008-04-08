@@ -808,48 +808,49 @@
 
 - (IBAction)deleteItem:(id)sender
 {
-    int i, i_count, i_row;
+    int i_count, i_row;
     NSMutableArray *o_to_delete;
     NSNumber *o_number;
 
     playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
 
-    p_playlist = pl_Yield( p_intf );
-
     o_to_delete = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
     i_count = [o_to_delete count];
 
-    for( i = 0; i < i_count; i++ )
+    p_playlist = pl_Yield( p_intf );
+
+    PL_LOCK;
+    for( int i = 0; i < i_count; i++ )
     {
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
         id o_item = [o_outline_view itemAtRow: i_row];
         playlist_item_t *p_item = [o_item pointerValue];
+#ifndef NDEBUG
+        msg_Dbg( p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count, 
+                p_item->p_input->i_id, [o_item pointerValue], p_item->i_children +1 );
+#endif
         [o_to_delete removeObject: o_number];
         [o_outline_view deselectRow: i_row];
 
-        if( [[o_outline_view dataSource] outlineView:o_outline_view
-                                        numberOfChildrenOfItem: o_item]  > 0 )
+        if( p_item->i_children != -1 )
         //is a node and not an item
         {
             if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
                 [self isItem: p_playlist->status.p_item inNode:
                         ((playlist_item_t *)[o_item pointerValue])
                         checkItemExistence: NO] == YES )
-            {
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
-            }
-            vlc_mutex_lock( &p_playlist->object_lock );
+    
             playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
-            vlc_mutex_unlock( &p_playlist->object_lock );
         }
         else
-        {
-            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, VLC_FALSE );
-        }
+            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, VLC_TRUE );
     }
+    PL_UNLOCK;
+
     [self playlistUpdated];
     vlc_object_release( p_playlist );
 }
@@ -913,7 +914,7 @@
     o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
     o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
 
-    /* Find the name for a disc entry ( i know, can you believe the trouble?) */
+    /* Find the name for a disc entry (i know, can you believe the trouble?) */
     if( ( !o_name || [o_name isEqualToString:@""] ) && [o_uri rangeOfString: @"/dev/"].location != NSNotFound )
     {
         int i_count, i_index;
