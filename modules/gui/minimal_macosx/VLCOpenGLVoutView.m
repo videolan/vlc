@@ -264,7 +264,7 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
         /* Swap buffers only during the vertical retrace of the monitor.
         http://developer.apple.com/documentation/GraphicsImaging/
         Conceptual/OpenGL/chap5/chapter_5_section_44.html */
-        long params[] = { 1 };
+        GLint params[] = { 1 };
         CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
                      params );
     }
