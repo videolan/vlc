@@ -36,6 +36,7 @@ public class MediaDescriptor
     private LibVlcMediaDescriptor instance;
     private LibVlc libvlc;
     private LibVlcEventManager eventManager;
+    private boolean released;
     
     /**
      * @param jvlc The jvlc instance to create the media descriptor for.
@@ -79,7 +80,7 @@ public class MediaDescriptor
     @Override
     protected void finalize() throws Throwable
     {
-        libvlc.libvlc_media_release(instance);
+        release();
         super.finalize();
     }
 
@@ -102,4 +103,19 @@ public class MediaDescriptor
     {
         return libvlc;
     }
+
+    /**
+     * 
+     */
+    public void release()
+    {
+        if (released)
+        {
+            return;
+        }
+        released = true;
+        libvlc.libvlc_media_release(instance);
+    }
+    
+    
 }
