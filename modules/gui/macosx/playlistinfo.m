@@ -127,6 +127,7 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)initPanel
 {
     BOOL b_stats = config_GetInt(VLCIntf, "stats");
+    [self initMediaPanelStats];
     if( b_stats )
     {
         o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1
@@ -143,6 +144,32 @@ static VLCInfo *_o_sharedInstance = nil;
 
     [self updatePanel];
     [o_info_window makeKeyAndOrderFront: self];
+}
+
+- (void)initMediaPanelStats
+{
+    //Initializing Input Variables
+    [o_read_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f kB", (float)0]];
+    [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
+    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f kB", (float)0]];
+    [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
+    
+    //Initializing Video Variables
+    [o_video_decoded_txt setIntValue:0];
+    [o_displayed_txt setIntValue:0];
+    [o_lost_frames_txt setIntValue:0];
+    [o_fps_txt setFloatValue:0];
+
+    //Initializing Output Variables
+    [o_sent_packets_txt setIntValue: 0];
+    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f kB", (float)0]];
+    [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
+
+    //Initializing Audio Variables
+    [o_audio_decoded_txt setIntValue:0];
+    [o_played_abuffers_txt setIntValue: 0];
+    [o_lost_abuffers_txt setIntValue: 0];
+
 }
 
 - (void)updatePanel

@@ -101,6 +101,7 @@
 - (void)initPanel;
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
+- (void)initMediaPanelStats;
 - (void)updatePanel;
 - (playlist_item_t *)getItem;
 - (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
