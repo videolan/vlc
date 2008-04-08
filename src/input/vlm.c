@@ -2399,7 +2399,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     vlm_media_Clean( &p_media->cfg );
 
-    vlc_gc_decref( &p_media->vod.p_item );
+    vlc_gc_decref( p_media->vod.p_item );
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
 
