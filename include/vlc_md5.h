@@ -46,7 +46,7 @@ VLC_EXPORT(void, InitMD5, ( struct md5_s * ) );
 VLC_EXPORT(void, AddMD5, ( struct md5_s *, const void *, size_t ) );
 VLC_EXPORT(void, EndMD5, ( struct md5_s * ) );
 
-/** 
+/**
  * Returns a char representation of the md5 hash, as shown by UNIX md5 or
  * md5sum tools.
  */
