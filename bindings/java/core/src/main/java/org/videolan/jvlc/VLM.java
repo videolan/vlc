@@ -30,7 +30,10 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 public class VLM
 {
+
     private JVLC jvlc;
+    
+    private volatile boolean released;
 
     public VLM(JVLC jvlc)
     {
@@ -45,7 +48,7 @@ public class VLM
             name,
             input,
             output,
-            options.length,
+            options == null ? 0 : options.length,
             options,
             enabled ? 1 : 0,
             loop ? 1 : 0,
@@ -102,7 +105,7 @@ public class VLM
             name,
             input,
             output,
-            options.length,
+            options == null ? 0 : options.length,
             options,
             enabled ? 1 : 0,
             loop ? 1 : 0,
@@ -114,13 +117,13 @@ public class VLM
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_vlm_play_media(jvlc.getInstance(), name, exception);
     }
-    
+
     public void stopMedia(String name)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_vlm_stop_media(jvlc.getInstance(), name, exception);
     }
-    
+
     public void pauseMedia(String name)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -140,13 +143,29 @@ public class VLM
     }
 
     /**
-     * 
+     * Releases native resources related to VLM.
      */
     public void release()
     {
+        if (released)
+        {
+            return;
+        }
+        released = true;
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_vlm_release(jvlc.getInstance(), exception);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void finalize() throws Throwable
+    {
+        release();
+        super.finalize();
+    }
     
+    
+
 }
