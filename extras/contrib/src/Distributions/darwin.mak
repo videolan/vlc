@@ -1,6 +1,13 @@
 # Darwin rules
-all: .autoconf .automake .libtool .cmake .intl .pkgcfg .freetype .fribidi \
-    .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+download-all: autoconf automake libtool cmake gettext pkgconfig freetype2 \
+    fribidi a52dec mpeg2dec libid3tag libmad libogg libvorbis libtheora flac \
+    speex libshout faad2 faac lame twolame libebml libmatroska ffmpeg libdca \
+    libdvdcss libdvdnav libdvbpsi live libcaca libmodplug xml asa jpeg tiff \
+    SDL zlib libpng libgpg-error libgcrypt opencdk gnutls libopendaap libcddb \
+    libcdio vcdimager SDL_image glib gecko-sdk mpcdec dirac expat taglib nasm \
+    x264 goom lua zvbi fontconfig ncurses all
+all: .autoconf .automake .libtool .cmake .intl .pkgcfg .freetype \
+    .fribidi .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
     .flac .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod .asa \
     .png .gpg-error .gcrypt .opencdk .gnutls .opendaap .cddb .cdio .vcdimager \
