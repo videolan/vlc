@@ -118,12 +118,44 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance,
   } while(0)
 #define VLM(p) VLM_RET(p,)
 
+static vlm_media_instance_t *libvlc_vlm_get_media_instance( libvlc_instance_t *p_instance,
+                                                            char *psz_name, int i_minstance_idx,
+                                                            libvlc_exception_t *p_exception )
+{
+    vlm_t *p_vlm;
+    vlm_media_instance_t **pp_minstance;
+    vlm_media_instance_t *p_minstance;
+    int i_minstance;
+    int64_t id;
+
+    VLM_RET(p_vlm, NULL);
+
+    if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
+        vlm_Control( p_vlm, VLM_GET_MEDIA_INSTANCES, id, &pp_minstance, &i_minstance ) )
+    {
+        libvlc_exception_raise( p_exception, "Unable to get %s instances", psz_name );
+        return NULL;
+    }
+    p_minstance = NULL;
+    if( i_minstance_idx >= 0 && i_minstance_idx < i_minstance )
+    {
+        p_minstance = pp_minstance[i_minstance_idx];
+        TAB_REMOVE( i_minstance, pp_minstance, p_minstance );
+    }
+    while( i_minstance > 0 )
+        vlm_media_instance_Delete( pp_minstance[--i_minstance] );
+    TAB_CLEAN( i_minstance, pp_minstance );
+    return p_minstance;
+}
+
+
 void libvlc_vlm_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_exception)
 {
     vlm_t *p_vlm;
 
     VLM(p_vlm);
 
+    vlm_Control( p_vlm, VLM_CLEAR_MEDIAS, NULL );
     vlm_Delete( p_vlm );
 }
 
@@ -323,36 +355,6 @@ void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
     {
         libvlc_exception_raise( p_exception, "Unable to seek %s to %f", psz_name, f_percentage );
     }
-}
-
-static vlm_media_instance_t *libvlc_vlm_get_media_instance( libvlc_instance_t *p_instance,
-                                                            char *psz_name, int i_minstance_idx,
-                                                            libvlc_exception_t *p_exception )
-{
-    vlm_t *p_vlm;
-    vlm_media_instance_t **pp_minstance;
-    vlm_media_instance_t *p_minstance;
-    int i_minstance;
-    int64_t id;
-
-    VLM_RET(p_vlm, NULL);
-
-    if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
-        vlm_Control( p_vlm, VLM_GET_MEDIA_INSTANCES, id, &pp_minstance, &i_minstance ) )
-    {
-        libvlc_exception_raise( p_exception, "Unable to get %s instances", psz_name );
-        return NULL;
-    }
-    p_minstance = NULL;
-    if( i_minstance_idx >= 0 && i_minstance_idx < i_minstance )
-    {
-        p_minstance = pp_minstance[i_minstance_idx];
-        TAB_REMOVE( i_minstance, pp_minstance, p_minstance );
-    }
-    while( i_minstance > 0 )
-        vlm_media_instance_Delete( pp_minstance[--i_minstance] );
-    TAB_CLEAN( i_minstance, pp_minstance );
-    return p_minstance;
 }
 
 #define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, ret, code )\
