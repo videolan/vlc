@@ -1870,6 +1870,7 @@ static int AuthCheckReply( access_t *p_access, const char *psz_header,
         free( psz_qop );
         free( psz_rspauth );
         free( psz_cnonce );
+        free( psz_nc );
 
     return i_ret;
 }
