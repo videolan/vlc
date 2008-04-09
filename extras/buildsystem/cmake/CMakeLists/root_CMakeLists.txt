@@ -33,6 +33,7 @@ add_subdirectory(libs/loader)
 add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(po)
+add_subdirectory(test)
 
 # Enable uninstall
 configure_file(

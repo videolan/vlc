@@ -6226,6 +6226,7 @@ AC_CONFIG_FILES([
   po/Makefile.in
   share/Makefile
   src/Makefile
+  test/Makefile
 ])
 
 AC_CONFIG_FILES([

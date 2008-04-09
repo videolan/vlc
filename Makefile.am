@@ -8,7 +8,7 @@
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
 SUBDIRS = po libs/loader libs/srtp src modules \
-		projects/mozilla bindings projects/activex share doc
+		projects/mozilla bindings projects/activex share doc test
 DIST_SUBDIRS = $(SUBDIRS) m4  extras/package/ipkg
 
 EXTRA_DIST = \
