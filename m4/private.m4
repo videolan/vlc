@@ -320,7 +320,9 @@ AC_DEFUN([VLC_CONFIG_HELPER], [
     grain) list="\${list} video_filter/libgrain" ;;
     seamcarving) list="\${list} video_filter/libseamcarving" ;;
     croppadd) list="\${list} video_filter/libcroppadd" ;;
+    blendbench) list="\${list} video_filter/libblendbench" ;;
     atmo) list="\${list} video_filter/atmo/libatmo" ;;
+    dynamicoverlay) list="\${list} video_filter/dynamicoverlay/libdynamicoverlay" ;;
     aa) list="\${list} video_output/libaa" ;;
     caca) list="\${list} video_output/libcaca" ;;
     fb) list="\${list} video_output/libfb" ;;
