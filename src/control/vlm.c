@@ -91,10 +91,12 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
     }
     free( psz_message );
     return(psz_response );
-#endif
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
     return NULL;
-}
 #endif
+}
+#endif /* 0 */
 
 static int libvlc_vlm_init( libvlc_instance_t *p_instance,
                             libvlc_exception_t *p_exception )
@@ -102,12 +104,15 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance,
 #ifdef ENABLE_VLM
     if( !p_instance->p_vlm )
         p_instance->p_vlm = vlm_New( p_instance->p_libvlc_int );
+#else
+    libvlc_exception_raise( p_exception, "VLM has been disabled in this libvlc." );
+    return VLC_EGENERIC;
 #endif
 
     if( !p_instance->p_vlm )
     {
         libvlc_exception_raise( p_exception,
-                                "Unable to create VLM. It might be disabled." );
+                                "Unable to create VLM." );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
