@@ -155,7 +155,6 @@ void libvlc_vlm_release( libvlc_instance_t *p_instance, libvlc_exception_t *p_ex
 
     VLM(p_vlm);
 
-    vlm_Control( p_vlm, VLM_CLEAR_MEDIAS, NULL );
     vlm_Delete( p_vlm );
 }
 
