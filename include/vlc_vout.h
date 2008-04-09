@@ -211,10 +211,11 @@ struct subpicture_region_t
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
     int             i_align;                  /**< alignment within a region */
+    int             i_alpha;                               /**< transparency */
 
     char            *psz_text;       /**< text string comprising this region */
     char            *psz_html;       /**< HTML version of subtitle (NULL = use psz_text) */
-    text_style_t    *p_style;  /* a description of the text style formatting */
+    text_style_t    *p_style;        /**< a description of the text style formatting */
 
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_t *p_cache;       /**< modified version of this region */

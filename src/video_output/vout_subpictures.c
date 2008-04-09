@@ -291,6 +291,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     if( !p_region ) return NULL;
 
     memset( p_region, 0, sizeof(subpicture_region_t) );
+    p_region->i_alpha = 0xff;
     p_region->p_next = NULL;
     p_region->p_cache = NULL;
     p_region->fmt = *p_fmt;
@@ -336,6 +337,7 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
     (void)p_this;
     if( !p_region ) return NULL;
     memset( p_region, 0, sizeof(subpicture_region_t) );
+    p_region->i_alpha = 0xff;
     p_region->p_next = 0;
     p_region->p_cache = 0;
     p_region->fmt = *p_fmt;
@@ -901,6 +903,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_region->p_cache->i_x = p_region->i_x * pi_scale_width[ i_scale_idx ] / 1000;
                 p_region->p_cache->i_y = p_region->i_y * pi_scale_height[ i_scale_idx ] / 1000;
                 p_region->p_cache->i_align = p_region->i_align;
+                p_region->p_cache->i_alpha = p_region->i_alpha;
 
                 p_pic = p_spu->p_scale->pf_video_filter(
                                  p_spu->p_scale, &p_region->p_cache->picture );
@@ -1060,7 +1063,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 {
                     p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
                         p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
-                        i_fade_alpha * p_subpic->i_alpha / 255 );
+                        i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025 );
                 }
                 else
                 {

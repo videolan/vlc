@@ -435,6 +435,7 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     p_region->i_x = 0;
     p_region->i_y = 0;
     p_region->i_align = p_filter->p_sys->i_position;
+    p_region->i_alpha = p_filter->p_sys->i_alpha;
 #if 0
     msg_Dbg( p_filter, "SPU picture region position (%d,%d) (%d,%d) [%p]",
         p_region->i_x, p_region->i_y,
