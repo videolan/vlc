@@ -127,7 +127,7 @@ typedef struct http_auth_t
     char *psz_qop;
     int i_nonce;
     char *psz_cnonce;
-    char *psz_A1; /* stored A1 value if algorithm = "MD5-sess" */
+    char *psz_HA1; /* stored H(A1) value if algorithm = "MD5-sess" */
 } http_auth_t;
 
 struct access_sys_t
@@ -1511,11 +1511,8 @@ static char *AuthGetParam( const char *psz_header, const char *psz_param )
         const char *psz_end;
         psz_header += strlen( psz_what );
         psz_end = strchr( psz_header, '"' );
-        if( !psz_end )
-        {
-            psz_end = psz_header;
-            while( *psz_end ) psz_end++;
-        }
+        if( !psz_end ) /* Invalid since we should have a closing quote */
+            return strdup( psz_header );
         return strndup( psz_header, psz_end - psz_header );
     }
     else
@@ -1526,7 +1523,7 @@ static char *AuthGetParam( const char *psz_header, const char *psz_param )
 
 static char *AuthGetParamNoQuotes( const char *psz_header, const char *psz_param )
 {
-    char psz_what[strlen(psz_param)+3];
+    char psz_what[strlen(psz_param)+2];
     sprintf( psz_what, "%s=", psz_param );
     psz_header = strstr( psz_header, psz_what );
     if( psz_header )
@@ -1534,11 +1531,10 @@ static char *AuthGetParamNoQuotes( const char *psz_header, const char *psz_param
         const char *psz_end;
         psz_header += strlen( psz_what );
         psz_end = strchr( psz_header, ',' );
-        if( !psz_end )
-        {
-            psz_end = psz_header;
-            while( *psz_end ) psz_end++;
-        }
+        /* XXX: Do we need to filter out trailing space between the value and
+         * the comma/end of line? */
+        if( !psz_end ) /* Can be valid if this is the last parameter */
+            return strdup( psz_header );
         return strndup( psz_header, psz_end - psz_header );
     }
     else
@@ -1576,14 +1572,18 @@ static void AuthParseHeader( access_t *p_access, const char *psz_header,
         p_auth->psz_algorithm = AuthGetParamNoQuotes( psz_header, "algorithm" );
         p_auth->psz_qop = AuthGetParam( psz_header, "qop" );
         p_auth->i_nonce = 0;
-        /* printf("realm: %s\ndomain: %s\nnonce: %s\nopaque: %s\nstale: %s\nalgorithm: %s\nqop: %s\n",p_auth->psz_realm,p_auth->psz_domain,p_auth->psz_nonce,p_auth->psz_opaque,p_auth->psz_stale,p_auth->psz_algorithm,p_auth->psz_qop); */
+        /* printf("realm: |%s|\ndomain: |%s|\nnonce: |%s|\nopaque: |%s|\n"
+                  "stale: |%s|\nalgorithm: |%s|\nqop: |%s|\n",
+                  p_auth->psz_realm,p_auth->psz_domain,p_auth->psz_nonce,
+                  p_auth->psz_opaque,p_auth->psz_stale,p_auth->psz_algorithm,
+                  p_auth->psz_qop); */
         if( !p_auth->psz_realm )
             msg_Warn( p_access, "Digest Access Authentication: "
                       "Mandatory 'realm' parameter is missing" );
         if( !p_auth->psz_nonce )
             msg_Warn( p_access, "Digest Access Authentication: "
                       "Mandatory 'nonce' parameter is missing" );
-        if( p_auth->psz_qop ) /* FIXME */
+        if( p_auth->psz_qop ) /* FIXME: parse the qop list */
         {
             char *psz_tmp = strchr( p_auth->psz_qop, ',' );
             if( psz_tmp ) *psz_tmp = '\0';
@@ -1592,16 +1592,14 @@ static void AuthParseHeader( access_t *p_access, const char *psz_header,
     else
     {
         const char *psz_end = strchr( psz_header, ' ' );
-        if( !psz_end )
-        {
-            psz_end = psz_header;
-            while( *psz_end ) psz_end++;
-        }
-        msg_Warn( p_access, "Unknown authentication scheme: '%*s'",
-                  psz_end - psz_header, psz_header );
+        if( psz_end )
+            msg_Warn( p_access, "Unknown authentication scheme: '%*s'",
+                      psz_end - psz_header, psz_header );
+        else
+            msg_Warn( p_access, "Unknown authentication scheme: '%s'",
+                      psz_header );
     }
 }
-
 static char *AuthAlgoMD5( const char *psz_data )
 {
     struct md5_s md5;
@@ -1625,27 +1623,21 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
     if( p_auth->psz_nonce )
     {
         /* Digest Access Authentication */
+        char *psz_HA1 = NULL;
+        char *psz_HA2 = NULL;
         char *psz_response = NULL;
-        char *psz_A1 = NULL;
-        char *psz_A2 = NULL;
-        char *psz_secret = NULL;
-        char *psz_data = NULL;
-        char * (*pf_algo)( const char * );
+        struct md5_s md5;
 
-        if(    p_auth->psz_algorithm == NULL
-            || !strcmp( p_auth->psz_algorithm, "MD5" )
-            || !strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
-        {
-            pf_algo = AuthAlgoMD5;
-        }
-        else
+        if(    p_auth->psz_algorithm
+            && strcmp( p_auth->psz_algorithm, "MD5" )
+            && strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
         {
             msg_Err( p_access, "Digest Access Authentication: "
                      "Unknown algorithm '%s'", p_auth->psz_algorithm );
+            return;
         }
-        if( !pf_algo ) return;
 
-        if( p_auth->psz_qop )
+        if( p_auth->psz_qop || !p_auth->psz_cnonce )
         {
             /* FIXME: needs to be really random to prevent man in the middle
              * attacks */
@@ -1654,96 +1646,92 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
         }
         p_auth->i_nonce ++;
 
-        if( p_auth->psz_algorithm && !strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
+        /* H(A1) */
+        if( p_auth->psz_HA1 )
         {
-            if( !p_auth->psz_A1 )
-            {
-                char *psz_tmp = NULL;
-                if( asprintf( &psz_A1, "%s:%s:%s", psz_username,
-                              p_auth->psz_realm, psz_password ) < 0 )
-                    goto error;
-                psz_tmp = pf_algo( psz_A1 );
-                free( psz_A1 ); psz_A1 = NULL;
-                if( !psz_tmp ) goto error;
-                if( asprintf( &psz_A1, "%s:%s:%s", psz_tmp, p_auth->psz_nonce,
-                    p_auth->psz_cnonce ) < 0 )
-                {
-                    free( psz_tmp );
-                    goto error;
-                }
-                p_auth->psz_A1 = strdup( psz_A1 );
-            }
-            else
-            {
-                psz_A1 = strdup( p_auth->psz_A1 );
-            }
+            psz_HA1 = strdup( p_auth->psz_HA1 );
+            if( !psz_HA1 ) goto error;
         }
         else
         {
-            if( asprintf( &psz_A1, "%s:%s:%s", psz_username, p_auth->psz_realm,
-                          psz_password ) < 0 ) goto error;
-        }
+            InitMD5( &md5 );
+            AddMD5( &md5, psz_username, strlen( psz_username ) );
+            AddMD5( &md5, ":", 1 );
+            AddMD5( &md5, p_auth->psz_realm, strlen( p_auth->psz_realm ) );
+            AddMD5( &md5, ":", 1 );
+            AddMD5( &md5, psz_password, strlen( psz_password ) );
+            EndMD5( &md5 );
 
-        if( !p_auth->psz_qop || !strcmp( p_auth->psz_qop, "auth" ) )
-        {
-            if( asprintf( &psz_A2, "%s:%s", "GET", p_url->psz_path ?: "/" )
-                < 0 ) goto error;
-        }
-        else
-        {
-            char *psz_tmp = pf_algo( "FIXME entity-body" ); /* FIXME */
-            if( asprintf( &psz_A2, "%s:%s:%s", "GET", p_url->psz_path ?: "/",
-                psz_tmp ) < 0 )
+            psz_HA1 = psz_md5_hash( &md5 );
+            if( !psz_HA1 ) goto error;
+
+            if( p_auth->psz_algorithm
+                && !strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
             {
-                free( psz_tmp );
-                goto error;
+                InitMD5( &md5 );
+                AddMD5( &md5, psz_HA1, 32 );
+                free( psz_HA1 );
+                AddMD5( &md5, ":", 1 );
+                AddMD5( &md5, p_auth->psz_nonce, strlen( p_auth->psz_nonce ) );
+                AddMD5( &md5, ":", 1 );
+                AddMD5( &md5, p_auth->psz_cnonce, strlen( p_auth->psz_cnonce ) );
+                EndMD5( &md5 );
+
+                psz_HA1 = psz_md5_hash( &md5 );
+                if( !psz_HA1 ) goto error;
+                p_auth->psz_HA1 = strdup( psz_HA1 );
+                if( !p_auth->psz_HA1 ) goto error;
             }
-            free( psz_tmp );
         }
 
-        psz_secret = pf_algo( psz_A1 );
+        /* H(A2) */
+        InitMD5( &md5 );
+        AddMD5( &md5, "GET", 3 ); /* FIXME ? */
+        AddMD5( &md5, ":", 1 );
+        if( p_url->psz_path )
+            AddMD5( &md5, p_url->psz_path, strlen( p_url->psz_path ) );
+        else
+            AddMD5( &md5, "/", 1 );
+        if( p_auth->psz_qop && !strcmp( p_auth->psz_qop, "auth-int" ) )
+        {
+            char *psz_ent;
+            struct md5_s ent;
+            InitMD5( &ent );
+            AddMD5( &ent, "", 0 ); /* XXX: entity-body. should be ok for GET */
+            EndMD5( &ent );
+            psz_ent = psz_md5_hash( &ent );
+            if( !psz_ent ) goto error;
+            AddMD5( &md5, ":", 1 );
+            AddMD5( &md5, psz_ent, 32 );
+            free( psz_ent );
+        }
+        EndMD5( &md5 );
+        psz_HA2 = psz_md5_hash( &md5 );
+        if( !psz_HA2 ) goto error;
 
+        /* Request digest */
+        InitMD5( &md5 );
+        AddMD5( &md5, psz_HA1, 32 );
+        AddMD5( &md5, ":", 1 );
+        AddMD5( &md5, p_auth->psz_nonce, strlen( p_auth->psz_nonce ) );
+        AddMD5( &md5, ":", 1 );
         if( p_auth->psz_qop
             && ( !strcmp( p_auth->psz_qop, "auth" )
                  || !strcmp( p_auth->psz_qop, "auth-int" ) ) )
         {
-            char *psz_tmp = pf_algo( psz_A2 );
-            if( !psz_tmp ) goto error;
-            if( asprintf( &psz_data, "%s:%08x:%s:%s:%s",
-                          p_auth->psz_nonce, p_auth->i_nonce,
-                          p_auth->psz_cnonce, p_auth->psz_qop, psz_tmp ) < 0 )
-            {
-                free( psz_tmp );
-                goto error;
-            }
-            free( psz_tmp );
+            char psz_inonce[9];
+            snprintf( psz_inonce, 9, "%08x", p_auth->i_nonce );
+            AddMD5( &md5, psz_inonce, 8 );
+            AddMD5( &md5, ":", 1 );
+            AddMD5( &md5, p_auth->psz_cnonce, strlen( p_auth->psz_cnonce ) );
+            AddMD5( &md5, ":", 1 );
+            AddMD5( &md5, p_auth->psz_qop, strlen( p_auth->psz_qop ) );
+            AddMD5( &md5, ":", 1 );
         }
-        else
-        {
-            char *psz_tmp = pf_algo( psz_A2 );
-            if( !psz_tmp ) goto error;
-            if( asprintf( &psz_data, "%s:%s", p_auth->psz_nonce, psz_tmp ) < 0 )
-            {
-                free( psz_tmp );
-                goto error;
-            }
-            free( psz_tmp );
-        }
-
-        if( psz_secret && psz_data )
-        {
-            char *psz_tmp = NULL;
-            if( asprintf( &psz_tmp, "%s:%s", psz_secret, psz_data ) < 0 )
-                goto error;
-            psz_response = pf_algo( psz_tmp );
-            free( psz_tmp );
-            if( !psz_response )
-                goto error;
-        }
-        else
-        {
-            goto error;
-        }
+        AddMD5( &md5, psz_HA2, 32 );
+        EndMD5( &md5 );
+        psz_response = psz_md5_hash( &md5 );
+        if( !psz_response ) goto error;
 
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "%sAuthorization: Digest "
@@ -1785,12 +1773,11 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
                     p_auth->i_nonce ? "\"" : "\""
                   );
 
+
     error:
+        free( psz_HA1 );
+        free( psz_HA2 );
         free( psz_response );
-        free( psz_A1 );
-        free( psz_A2 );
-        free( psz_secret );
-        free( psz_data );
     }
     else
     {
@@ -1821,5 +1808,5 @@ static void AuthReset( http_auth_t *p_auth )
     FREENULL( p_auth->psz_qop );
     p_auth->i_nonce = 0;
     FREENULL( p_auth->psz_cnonce );
-    FREENULL( p_auth->psz_A1 );
+    FREENULL( p_auth->psz_HA1 );
 }
