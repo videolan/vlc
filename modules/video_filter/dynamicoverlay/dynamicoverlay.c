@@ -293,8 +293,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             const char *psz_success = "SUCCESS:";
             const char *psz_nl = "\n";
             BufferAdd( &p_sys->output, psz_success, 8 );
-            p_command->p_command->pf_unparser( &p_command->results,
-                                               &p_sys->output );
+            p_command->p_command->pf_unparse( &p_command->results,
+                                              &p_sys->output );
             BufferAdd( &p_sys->output, psz_nl, 1 );
         }
         else
