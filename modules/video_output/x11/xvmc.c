@@ -745,25 +745,27 @@ int checkXvMCCap( vout_thread_t *p_vout )
     XFree(surfaceInfo);
 
     /*
-    * Try to create a direct rendering context. This will fail if we are not
-    * on the displaying computer or an indirect context is not available.
-    */
+     * Try to create a direct rendering context. This will fail if we are not
+     * on the displaying computer or an indirect context is not available.
+     */
     XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
     curCap = p_vout->p_sys->xvmc_cap;
     if( Success == XvMCCreateContext( p_vout->p_sys->p_display, i_xvport,
                                       curCap->type_id,
                                       curCap->max_width,
                                       curCap->max_height,
-                                      XVMC_DIRECT, &c) )
+                                      XVMC_DIRECT, &c ) )
     {
-            p_vout->p_sys->context_flags = XVMC_DIRECT;
+        msg_Dbg( p_vout, "using direct XVMC rendering context" );
+        p_vout->p_sys->context_flags = XVMC_DIRECT;
     }
     else if( Success == XvMCCreateContext( p_vout->p_sys->p_display, i_xvport,
                                            curCap->type_id,
                                            curCap->max_width,
                                            curCap->max_height,
-                                           0, &c) )
+                                           0, &c ) )
     {
+        msg_Dbg( p_vout, "using default XVMC rendering context" );
         p_vout->p_sys->context_flags = 0;
     }
     else
