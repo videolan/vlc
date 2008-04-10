@@ -148,7 +148,7 @@ vlc_module_begin();
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, VLC_FALSE );
 
     set_description( _("XVMC extension video output") );
-    set_capability( "video output", 160 );
+    set_capability( "video output", 10 );
     set_callbacks( E_(Activate), E_(Deactivate) );
 vlc_module_end();
 
