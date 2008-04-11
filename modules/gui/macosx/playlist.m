@@ -1020,6 +1020,7 @@
             p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
             playlist_Control( p_playlist, PLAYLIST_SKIP, VLC_TRUE, p_item );
         }
+        vlc_gc_decref( p_input );
     }
     [self playlistUpdated];
     vlc_object_release( p_playlist );
@@ -1063,6 +1064,7 @@
             p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
             playlist_Control( p_playlist, PLAYLIST_SKIP, VLC_TRUE, p_item );
         }
+        vlc_gc_decref( p_input );
     }
     [self playlistUpdated];
     vlc_object_release( p_playlist );

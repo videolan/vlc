@@ -61,6 +61,7 @@
             playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
                                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
 
+            vlc_gc_decref( p_input );
 
             o_url = [NSURL fileURLWithPath: o_urlString];
             if( o_url != nil )

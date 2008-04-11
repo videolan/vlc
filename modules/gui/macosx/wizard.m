@@ -1304,6 +1304,7 @@ static VLCWizard *_o_sharedInstance = nil;
                           p_item );
             }
 
+            vlc_gc_decref( p_input );
             x += 1;
         }
 
