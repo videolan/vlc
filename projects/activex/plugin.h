@@ -111,6 +111,13 @@ public:
     };
     inline BOOL getAutoLoop(void) { return _b_autoloop;};
 
+    inline void setShowToolbar(BOOL showtoolbar)
+    {
+        _b_toolbar = showtoolbar;
+        setDirty(TRUE);
+    };
+    inline BOOL getShowToolbar(void) { return _b_toolbar;};
+
     void setVolume(int volume);
     int getVolume(void) { return _i_volume; };
 
@@ -261,6 +268,7 @@ private:
     BSTR _bstr_mrl;
     BOOL _b_autoplay;
     BOOL _b_autoloop;
+    BOOL _b_toolbar;
     BOOL _b_visible;
     BOOL _b_mute;
     int  _i_volume;
