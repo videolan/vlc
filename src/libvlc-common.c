@@ -1026,8 +1026,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  */
 int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 {
-    vlc_value_t lockval;
-
     if( !p_libvlc )
         return VLC_EGENERIC;
 
