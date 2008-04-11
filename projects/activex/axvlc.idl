@@ -76,6 +76,7 @@ library AXVLC
     const int DISPID_AutoLoop   = 108;
     const int DISPID_StartTime  = 109;
     const int DISPID_BaseURL    = 110;
+    const int DISPID_Toolbar     = 111;
 
     [
       odl,
