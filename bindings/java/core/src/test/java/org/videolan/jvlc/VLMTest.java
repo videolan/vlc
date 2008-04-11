@@ -38,6 +38,8 @@ public class VLMTest
     
     private String mrl = getClass().getResource("/raffa_voice.ogg").getFile();
     
+    private String mediaName = "test";
+    
     @Before
     public void setup()
     {
@@ -62,18 +64,89 @@ public class VLMTest
     public void testAddBroadcast()
     {
         VLM vlm = jvlc.getVLM();
-        vlm.addBroadcast("test", "file://" + mrl, "", null, true, false);
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
     }
     
     @Test
     public void testShowMedia()
     {
         VLM vlm = jvlc.getVLM();
-        vlm.addBroadcast("test", "file://" + mrl, "", null, true, false);
-        vlm.showMedia("test");
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.showMedia(mediaName);
     }
     
+    @Test
+    public void testDisableMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.disableMedia(mediaName);
+    }
     
+    @Test
+    public void testPlayMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.playMedia(mediaName);
+    }
     
+    @Test
+    public void testPauseMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.playMedia(mediaName);
+        vlm.pauseMedia(mediaName);
+    }
+
+    @Test
+    public void testStopMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.playMedia(mediaName);
+        vlm.stopMedia(mediaName);
+    }
+
+    @Test
+    public void testSeekMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.playMedia(mediaName);
+        vlm.seekMedia(mediaName, 0.3f);
+    }
     
+    @Test
+    public void testAddMediaInput()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, true, false);
+        vlm.addMediaInput(mediaName, "file://" + mrl);
+    }
+    
+    @Test
+    public void testEnableMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, false, false);
+        vlm.enableMedia(mediaName);
+    }
+    
+    @Test
+    public void testDeleteMedia()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, false, false);
+        vlm.deleteMedia(mediaName);
+    }
+    
+    @Test
+    public void testMediaLoop()
+    {
+        VLM vlm = jvlc.getVLM();
+        vlm.addBroadcast(mediaName, "file://" + mrl, "", null, false, false);
+        vlm.setMediaLoop(mediaName, true);
+    }
 }

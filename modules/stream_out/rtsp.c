@@ -601,12 +601,14 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
+#if 0
+            /* FIXME: This breaks totem, mplayer and quicktime at least */
             if( httpd_MsgGet( query, "Range" ) != NULL )
             {
                 answer->i_status = 456; /* cannot seek */
                 break;
             }
-
+#endif
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )

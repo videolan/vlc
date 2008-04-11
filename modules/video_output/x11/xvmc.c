@@ -148,7 +148,7 @@ vlc_module_begin();
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, VLC_FALSE );
 
     set_description( _("XVMC extension video output") );
-    set_capability( "video output", 160 );
+    set_capability( "video output", 10 );
     set_callbacks( E_(Activate), E_(Deactivate) );
 vlc_module_end();
 
@@ -474,10 +474,10 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
 int xxmc_xvmc_surface_valid( vout_thread_t *p_vout, XvMCSurface *surf )
 {
     xvmc_surface_handler_t *handler = &p_vout->p_sys->xvmc_surf_handler;
-    unsigned int index = surf - handler->surfaces;
+    unsigned long index = surf - handler->surfaces;
     int ret;
 
-    if (index >= XVMC_MAX_SURFACES)
+    if( index >= XVMC_MAX_SURFACES )
         return 0;
     pthread_mutex_lock(&handler->mutex);
     ret = handler->surfValid[index];
@@ -745,25 +745,27 @@ int checkXvMCCap( vout_thread_t *p_vout )
     XFree(surfaceInfo);
 
     /*
-    * Try to create a direct rendering context. This will fail if we are not
-    * on the displaying computer or an indirect context is not available.
-    */
+     * Try to create a direct rendering context. This will fail if we are not
+     * on the displaying computer or an indirect context is not available.
+     */
     XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
     curCap = p_vout->p_sys->xvmc_cap;
     if( Success == XvMCCreateContext( p_vout->p_sys->p_display, i_xvport,
                                       curCap->type_id,
                                       curCap->max_width,
                                       curCap->max_height,
-                                      XVMC_DIRECT, &c) )
+                                      XVMC_DIRECT, &c ) )
     {
-            p_vout->p_sys->context_flags = XVMC_DIRECT;
+        msg_Dbg( p_vout, "using direct XVMC rendering context" );
+        p_vout->p_sys->context_flags = XVMC_DIRECT;
     }
     else if( Success == XvMCCreateContext( p_vout->p_sys->p_display, i_xvport,
                                            curCap->type_id,
                                            curCap->max_width,
                                            curCap->max_height,
-                                           0, &c) )
+                                           0, &c ) )
     {
+        msg_Dbg( p_vout, "using default XVMC rendering context" );
         p_vout->p_sys->context_flags = 0;
     }
     else
@@ -778,7 +780,7 @@ int checkXvMCCap( vout_thread_t *p_vout )
     }
     XVMCLOCKDISPLAY( p_vout->p_sys->p_display );
     XvMCDestroyContext( p_vout->p_sys->p_display, &c );
-    xxmc_xvmc_surface_handler_construct(p_vout );
+    xxmc_xvmc_surface_handler_construct( p_vout );
     /*  p_vout->p_sys->capabilities |= VO_CAP_XXMC; */
     XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
     init_xx44_palette( &p_vout->p_sys->palette , 0 );
@@ -960,6 +962,7 @@ static XvMCSurface *xxmc_xvmc_alloc_surface( vout_thread_t *p_vout,
         if( handler->surfValid[i] && !handler->surfInUse[i] )
         {
             handler->surfInUse[i] = 1;
+            msg_Dbg( p_vout, "reusing surface %d", i );
             xxmc_xvmc_dump_surfaces( p_vout );
             pthread_mutex_unlock( &handler->mutex );
             return (handler->surfaces + i);
@@ -1117,7 +1120,8 @@ static void xvmc_flushsync(picture_t *picture)
 
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
-    if( ! xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf)) {
+    if( !xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf ) )
+    {
         msg_Dbg(p_vout, "xvmc_flushsync 1 : %d", picture->p_sys->xxmc_data.result );
         picture->p_sys->xxmc_data.result = 128;
         xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
@@ -1396,7 +1400,7 @@ void xvmc_vld_frame( picture_t *picture )
     qmx.load_chroma_non_intra_quantiser_matrix = 0;
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
-    if( ! xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf) )
+    if( !xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf ) )
     {
         picture->p_sys->xxmc_data.result = 128;
         xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );

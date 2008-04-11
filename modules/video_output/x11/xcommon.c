@@ -426,7 +426,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     msg_Dbg(p_vout, "Deinterlace = %d", p_vout->p_sys->xvmc_deinterlace_method);
     msg_Dbg(p_vout, "Crop = %d", p_vout->p_sys->xvmc_crop_style);
 
-    if( !checkXvMCCap( p_vout ) )
+    if( checkXvMCCap( p_vout ) == VLC_EGENERIC )
     {
         msg_Err( p_vout, "no XVMC capability found" );
         E_(Deactivate)( p_vout );

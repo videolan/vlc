@@ -133,7 +133,7 @@ public class MediaList
     }
 
     /**
-     * @param media The media descriptor mrl.
+     * @param mrl The media descriptor mrl.
      */
     public boolean removeMedia(String mrl)
     {
