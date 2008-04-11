@@ -2187,7 +2187,7 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_0xa9xxx->psz_text = NULL;
 
     MP4_GET2BYTES( i16 );
-    i_length = i16 + 1;
+    i_length = i16;
 
     if( i_length > 0 )
     {
