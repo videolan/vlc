@@ -548,21 +548,21 @@ static void Run( intf_thread_t *p_intf )
                 (p_playlist->status.i_status == PLAYLIST_STOPPED) )
             {
                 p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
-                msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+                msg_rc( STATUS_CHANGE "( stop state: 5 )" );
             }
             else if(
                 (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
                 (p_playlist->status.i_status == PLAYLIST_RUNNING) )
             {
                 p_intf->p_sys->i_last_state = p_playlist->status.i_status;
-                msg_rc( STATUS_CHANGE "( play state: 1 )" );
+                 msg_rc( STATUS_CHANGE "( play state: 3 )" );
             }
             else if(
                 (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
                 (p_playlist->status.i_status == PLAYLIST_PAUSED) )
             {
                 p_intf->p_sys->i_last_state = p_playlist->status.i_status;
-                msg_rc( STATUS_CHANGE "( pause state: 2 )" );
+                msg_rc( STATUS_CHANGE "( pause state: 4 )" );
             }
             vlc_mutex_unlock( &p_playlist->object_lock );
         }
@@ -999,7 +999,9 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
             default:
                 cmd[0] = '\0';
             } /* var_GetInteger( p_input, "state" )  */
-            msg_rc( STATUS_CHANGE "( %s state: %d )", &cmd[0], newval.i_int );
+            msg_rc( STATUS_CHANGE "( %s state: %d ): %s",
+                                  &cmd[0], newval.i_int,
+                                  ppsz_input_state[ newval.i_int ] );
             vlc_object_release( p_playlist );
         }
         vlc_object_release( p_input );
@@ -1479,16 +1481,16 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             switch( p_playlist->status.i_status )
             {
                 case PLAYLIST_STOPPED:
-                    msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+                    msg_rc( STATUS_CHANGE "( stop state: 5 )" );
                     break;
                 case PLAYLIST_RUNNING:
-                    msg_rc( STATUS_CHANGE "( play state: 1 )" );
+                    msg_rc( STATUS_CHANGE "( play state: 3 )" );
                     break;
                 case PLAYLIST_PAUSED:
-                    msg_rc( STATUS_CHANGE "( pause state: 2 )" );
+                    msg_rc( STATUS_CHANGE "( pause state: 4 )" );
                     break;
                 default:
-                    msg_rc( STATUS_CHANGE "( state unknown )" );
+                    msg_rc( STATUS_CHANGE "( unknown state: -1 )" );
                     break;
             }
             PL_UNLOCK;
@@ -1715,7 +1717,9 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     }
     else  if( !strcmp( psz_cmd, "snapshot" ) )
     {
-        i_error = var_Set( p_vout, psz_variable, newval );
+        vlc_value_t val;
+        val.b_bool = VLC_TRUE;
+        i_error = var_Set( p_vout, psz_variable, val );
     }
     else
     {
