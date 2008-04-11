@@ -52,7 +52,6 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
     libvlc_media_list_player_set_media_list( mlp, ml, &ex );
 
     libvlc_media_list_player_play_item( mlp, md, &ex );
-    sleep(1); // play is asynchronous
     catch ();
 
     libvlc_media_list_player_pause (mlp, &ex);
