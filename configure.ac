@@ -1638,22 +1638,22 @@ then
     AC_MSG_WARN([lua5.1 not found, trying lua >= 5.1 instead])
     PKG_CHECK_MODULES(LUA, lua >= 5.1,
       [ have_lua=yes ],
-      [ 
+      [
         have_lua=yes
-        AC_CHECK_HEADERS([lua.h lauxlib.h lualib.h], 
-	  [],  
+        AC_CHECK_HEADERS([lua.h lauxlib.h lualib.h],
+          [],
           [ have_lua=no ] )
-	AC_CHECK_LIB(  lua5.1 , luaL_newstate, 
+        AC_CHECK_LIB(  lua5.1 , luaL_newstate,
           [LUA_LIBS="-llua5.1"],
-	  AC_CHECK_LIB( lua51 , luaL_newstate, 
+          AC_CHECK_LIB( lua51 , luaL_newstate,
             [LUA_LIBS="-llua51"],
-		  AC_CHECK_LIB( lua , luaL_newstate, 
-		    [LUA_LIBS="-llua"],
-	      [ have_lua=no
+            AC_CHECK_LIB( lua , luaL_newstate,
+              [LUA_LIBS="-llua"],
+              [ have_lua=no
                 AC_MSG_WARN([lua >= 5.1 not found!])
               ])
-	    )
-	  )
+          )
+        )
       ])
     ])
   if test "x${have_lua}" = "xyes" ;  then
@@ -1663,6 +1663,7 @@ then
      VLC_ADD_CFLAGS([lua],[$LUA_CFLAGS])
   fi
 fi
+AM_CONDITIONAL(BUILD_LUA, [test "${have_lua}" = "yes"])
 
 dnl
 dnl HTTP daemon
@@ -1674,6 +1675,7 @@ then
   VLC_ADD_PLUGINS([http])
   AC_DEFINE(ENABLE_HTTPD, 1, Define if you want the HTTP dameon support)
 fi
+AM_CONDITIONAL(BUILD_HTTPD, [test "${enable_httpd}" != "no"])
 
 dnl
 dnl VideoLAN manager
@@ -3736,9 +3738,10 @@ AC_CHECK_HEADERS(png.h, [
     VLC_ADD_PLUGINS([osdmenu osd_parser])
     AC_DEFINE(HAVE_LIBPNG, 1, [Define if you have the PNG library: libpng])],
     [],[-lz])
-  LDFLAGS="${LDFLAGS_save}"
+    LDFLAGS="${LDFLAGS_save}"
   ])
 fi
+AM_CONDITIONAL(BUILD_OSDMENU, [test "${enable_png}" != "no"])
 
 dnl
 dnl H264 encoder plugin (using libx264)
@@ -4201,9 +4204,9 @@ AC_ARG_ENABLE(fribidi,
   [  --enable-fribidi        fribidi support (default enabled)])
 if test "${enable_freetype}" != "no"
 then
-   PKG_CHECK_MODULES(FREETYPE, freetype2,[  
+   PKG_CHECK_MODULES(FREETYPE, freetype2,[
       VLC_ADD_PLUGINS([freetype])
-      have_freetype=yes     
+      have_freetype=yes
       VLC_ADD_CPPFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
       VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
       if test "${SYS}" = "mingw32"; then
@@ -4948,7 +4951,7 @@ if test "${enable_skins2}" = "yes" ||
     VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lX11])
   fi fi fi
 fi
-
+AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
 
 dnl dnl
 dnl dnl  Gtk+ module
@@ -5037,6 +5040,7 @@ then
     NEED_GTK2_MAIN=yes
   fi
 fi
+AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
 
 dnl dnl
 dnl dnl  Gnome module
@@ -5213,9 +5217,9 @@ AS_IF([test "${enable_qt4}" != "no" &&
       AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       ],
       AS_IF([test "${enable_qt4}" = "yes"],[
-    AC_MSG_ERROR(QT4 library not found)
+        AC_MSG_ERROR(QT4 library not found)
       ],[
-    AC_MSG_WARN(QT4 library not found)
+        AC_MSG_WARN(QT4 library not found)
       ])
     )
 ])
@@ -6015,7 +6019,6 @@ if test "${enable_python_bindings}" = "yes"; then
   )
   CFLAGS="${CFLAGS_save}"
 fi
-
 AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
 
 dnl
@@ -6129,7 +6132,6 @@ AS_IF([test "${enable_shared}" = "no"], [
 AS_IF([test "${plugin_support}" != "no"], [
   AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
 ])
-
 AM_CONDITIONAL(HAVE_PLUGINS, [test "${plugin_support}" != "no"])
 
 dnl Temporary(?) hack for plugins/builtins transition

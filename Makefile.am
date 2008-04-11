@@ -682,6 +682,7 @@ package-win-common:
             || true ; \
 	done
 
+if BUILD_LUA
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/images"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/requests"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/lua/http/js"
@@ -704,7 +705,9 @@ package-win-common:
 	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/requests/*.xml ;
 	cp $(srcdir)/share/lua/http/requests/readme $(top_builddir)/vlc-$(VERSION)/lua/http/requests/readme.txt ;
 	unix2dos $(top_builddir)/vlc-$(VERSION)/lua/http/requests/readme.txt ;
+endif
 
+if BUILD_HTTPD
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/http/images"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/http/requests"
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/http/js"
@@ -741,6 +744,7 @@ package-win-common:
 	cp $(srcdir)/share/http/old/admin/*.html $(top_builddir)/vlc-$(VERSION)/http/old/admin/ ;
 	unix2dos $(top_builddir)/vlc-$(VERSION)/http/old/admin/*.html ;
 	cp $(srcdir)/share/http/old/admin/.access $(top_builddir)/vlc-$(VERSION)/http/old/admin/ ;
+endif
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-$(VERSION)/ ;
 
@@ -786,6 +790,7 @@ package-win32-base-debug: package-win-common
             "$(top_builddir)/vlc-$(VERSION)/plugins/" ; \
 	  fi ; done
 
+if BUILD_SKINS
 # Skins
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/skins/fonts
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
@@ -794,7 +799,9 @@ package-win32-base-debug: package-win-common
 	for i in $(srcdir)/share/skins2/*.*; do \
 	  cp $$i $(top_builddir)/vlc-$(VERSION)/skins/ || true ; \
 	done
+endif
 
+if BUILD_LUA
 #Lua Scripts
 	$(INSTALL) -d $(top_builddir)/vlc-$(VERSION)/scripts/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
@@ -812,7 +819,9 @@ package-win32-base-debug: package-win-common
 	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-$(VERSION)/scripts/intf/modules/`basename $${i}` ; \
 	done ;
+endif
 
+if BUILD_OSDMENU
 #OSD Menu
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/osdmenu"
 	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-$(VERSION)/osdmenu"
@@ -828,7 +837,7 @@ package-win32-base-debug: package-win-common
 		if sed 's%/%\\%g' $$file.tmp >$$file; then :; else exit 1; fi; \
 		rm -f $$file.tmp; \
 	done
-
+endif
 
 package-win32-base: package-win32-base-debug package-win-common-strip
 	for i in "" $(top_builddir)/vlc-$(VERSION)/plugins/*$(LIBEXT) ; \

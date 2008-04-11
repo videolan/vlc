@@ -24,7 +24,9 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_osdmenu_minimal) \
 	$(DIST_mozilla)
 
+if BUILD_SKINS
 nobase_pkgdata_DATA = skins2/default.vlt
+endif
 nobase_dist_data_DATA = applications/vlc.desktop
 
 
@@ -35,6 +37,7 @@ DIST_rsrc = \
 	vlc_beos.rsrc \
 	vlc_win32_rc.rc
 
+if BUILD_PDA
 DIST_pda = \
 	pda-forwardb16x16.xpm \
 	pda-openb16x16.xpm \
@@ -44,6 +47,7 @@ DIST_pda = \
 	pda-preferencesb16x16.xpm \
 	pda-rewindb16x16.xpm \
 	pda-stopb16x16.xpm
+endif
 
 DIST_icons16 = vlc16x16.png vlc16x16.xpm
 
@@ -53,6 +57,7 @@ DIST_icons48 = vlc48x48.ico vlc48x48.png vlc48x48-christmas.png
 
 DIST_icons128 = vlc128x128.png vlc128x128-christmas.png
 
+if BUILD_SKINS
 DIST_skins2 = \
 	skins2/fonts/FreeSans.ttf \
 	skins2/fonts/FreeSansBold.ttf \
@@ -93,7 +98,9 @@ skins2_default_vlt_FILES = \
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	mkdir -p skins2
 	tar cvvzf skins2/default.vlt --exclude .svn -C $(srcdir)/skins2 default/
+endif
 
+if BUILD_HTTPD
 DIST_http = \
 	http/.hosts \
 	http/dialogs/.hosts \
@@ -173,7 +180,9 @@ DIST_http = \
 	http/vlm.html \
 	http/vlm_export.html \
 	http/flash.html
+endif
 
+if BUILD_OSDMENU
 DIST_osdmenu_default = \
 	osdmenu/default.cfg \
 	osdmenu/default/unselected.png \
@@ -247,7 +256,9 @@ DIST_osdmenu_minimal = \
 	osdmenu/minimal/fs_panel_volume_min.png \
 	osdmenu/minimal/fs_panel.png \
 	osdmenu/minimal/fs_panel_mockup.png
+endif
 
+if BUILD_LUA
 DIST_lua= \
 	lua/meta/README.txt \
 	lua/meta/googleimage.lua \
@@ -339,7 +350,9 @@ DIST_http_lua = \
 	lua/http/vlm.html \
 	lua/http/vlm_export.html \
 	lua/http/flash.html
+endif
 
+if BUILD_MOZILLA
 DIST_mozilla = \
 	mozilla/fullscreen.xpm \
 	mozilla/pause.xpm \
@@ -353,3 +366,4 @@ DIST_mozilla = \
 	mozilla/volume_max.xpm \
 	mozilla/volume_mute.xpm \
 	mozilla/volume_slider_bar.xpm
+endif
