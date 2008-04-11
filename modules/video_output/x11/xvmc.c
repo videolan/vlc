@@ -474,10 +474,10 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
 int xxmc_xvmc_surface_valid( vout_thread_t *p_vout, XvMCSurface *surf )
 {
     xvmc_surface_handler_t *handler = &p_vout->p_sys->xvmc_surf_handler;
-    unsigned int index = surf - handler->surfaces;
+    unsigned long index = surf - handler->surfaces;
     int ret;
 
-    if (index >= XVMC_MAX_SURFACES)
+    if( index >= XVMC_MAX_SURFACES )
         return 0;
     pthread_mutex_lock(&handler->mutex);
     ret = handler->surfValid[index];
@@ -780,7 +780,7 @@ int checkXvMCCap( vout_thread_t *p_vout )
     }
     XVMCLOCKDISPLAY( p_vout->p_sys->p_display );
     XvMCDestroyContext( p_vout->p_sys->p_display, &c );
-    xxmc_xvmc_surface_handler_construct(p_vout );
+    xxmc_xvmc_surface_handler_construct( p_vout );
     /*  p_vout->p_sys->capabilities |= VO_CAP_XXMC; */
     XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
     init_xx44_palette( &p_vout->p_sys->palette , 0 );
@@ -962,6 +962,7 @@ static XvMCSurface *xxmc_xvmc_alloc_surface( vout_thread_t *p_vout,
         if( handler->surfValid[i] && !handler->surfInUse[i] )
         {
             handler->surfInUse[i] = 1;
+            msg_Dbg( p_vout, "reusing surface %d", i );
             xxmc_xvmc_dump_surfaces( p_vout );
             pthread_mutex_unlock( &handler->mutex );
             return (handler->surfaces + i);
@@ -1119,7 +1120,8 @@ static void xvmc_flushsync(picture_t *picture)
 
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
-    if( ! xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf)) {
+    if( !xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf ) )
+    {
         msg_Dbg(p_vout, "xvmc_flushsync 1 : %d", picture->p_sys->xxmc_data.result );
         picture->p_sys->xxmc_data.result = 128;
         xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
@@ -1398,7 +1400,7 @@ void xvmc_vld_frame( picture_t *picture )
     qmx.load_chroma_non_intra_quantiser_matrix = 0;
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
-    if( ! xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf) )
+    if( !xxmc_xvmc_surface_valid( p_vout, picture->p_sys->xvmc_surf ) )
     {
         picture->p_sys->xxmc_data.result = 128;
         xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
