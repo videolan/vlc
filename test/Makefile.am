@@ -21,7 +21,7 @@ TESTS = samples $(check_PROGRAMS)
 SAMPLES_SERVER=http://streams.videolan.org/streams-videolan/reference
 
 samples/test.sample:
-	mkdir -p `basename $@`
+	mkdir -p `dirname $@`
 	curl $(SAMPLES_SERVER)/avi/Hero-Div3.avi > $@
 
 samples: samples/test.sample
