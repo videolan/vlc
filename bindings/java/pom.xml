@@ -31,7 +31,7 @@
   <distributionManagement>
     <site>
       <id>jvlc</id>
-      <url>http://jvlc.ihack.it/maven-site</url>
+      <url>http://jvlc.ihack.it/maven-site/</url>
       <name>JVLC Maven Site</name>
     </site>
   </distributionManagement>
