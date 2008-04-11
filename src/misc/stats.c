@@ -62,6 +62,7 @@ counter_t * __stats_CounterCreate( vlc_object_t *p_this,
     counter_t *p_counter = (counter_t*) malloc( sizeof( counter_t ) ) ;
     (void)p_this;
 
+    if( !p_counter ) return NULL;
     p_counter->i_compute_type = i_compute_type;
     p_counter->i_type = i_type;
     p_counter->i_samples = 0;
