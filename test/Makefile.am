@@ -14,8 +14,11 @@ check_PROGRAMS = \
 	test_libvlc_media_list_player \
 	test_libvlc_media_player \
 	$(NULL)
+check_DATA = samples/test.sample
 
-TESTS = samples $(check_PROGRAMS)
+TESTS = $(check_PROGRAMS)
+
+DISTCLEANFILES = samples/test.sample
 
 # Samples server
 SAMPLES_SERVER=http://streams.videolan.org/streams-videolan/reference
@@ -23,8 +26,6 @@ SAMPLES_SERVER=http://streams.videolan.org/streams-videolan/reference
 samples/test.sample:
 	mkdir -p `dirname $@`
 	curl $(SAMPLES_SERVER)/avi/Hero-Div3.avi > $@
-
-samples: samples/test.sample
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
