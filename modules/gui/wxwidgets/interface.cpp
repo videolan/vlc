@@ -517,7 +517,6 @@ void Interface::Init()
 void Interface::Update()
 {
     /* Misc updates */
-//    if( !(i_update_counter % 10) ) ((VLCVolCtrl *)volctrl)->UpdateVolume();
 
     if( playlist_manager ) playlist_manager->Update();
 
@@ -1223,8 +1222,8 @@ void Interface::SyncVolume()
     audio_volume_t i_volume;
     aout_VolumeGet(p_intf, &i_volume);
 
-// Updating the Mute Button... IF the slider is completely moved to the left,
-// the mute icon is shown too.
+    /* Updating the Mute Button... IF the slider is completely moved to the left,
+     * the mute icon is shown too. */
     p_tool->SetNormalBitmap( wxBitmap( i_volume ? speaker_xpm : speaker_mute_xpm ) );
     GetToolBar()->Realize();
 #if defined( __WXMSW__ )
@@ -1233,7 +1232,8 @@ void Interface::SyncVolume()
                            GetToolBar()->GetSize().GetHeight() );
     GetToolBar()->Update();
 #endif
-// the Toggle to true and false is nescessary; otherwise, the Icon is not repainted
+    /* the Toggle to true and false is nescessary; otherwise, the Icon
+     * is not repainted */
     GetToolBar()->ToggleTool( ToggleMute_Event, true );
     GetToolBar()->ToggleTool( ToggleMute_Event, false );
     GetToolBar()->Update();
