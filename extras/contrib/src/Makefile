@@ -148,9 +148,10 @@ FFMPEGCONF += --disable-mmx
 endif
 
 ifdef HAVE_DARWIN_OS
-X264CONF += --enable-pic
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
+else
+X264CONF += --enable-pic
 endif
 endif
 
