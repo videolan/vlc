@@ -277,7 +277,6 @@ static void Close( vlc_object_t * p_this )
 {
     access_t     *p_access = (access_t *) p_this;
     access_sys_t *p_sys = p_access->p_sys;
-    int i;
 
     msg_Warn(p_access, "Close");
 
