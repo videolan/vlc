@@ -16,5 +16,5 @@ src/*
 !Makefile
 !src/Distributions
 !src/Patches
-!src/package.mak
+!src/packages.mak
 !src/Makefile
