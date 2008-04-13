@@ -45,7 +45,6 @@ extern "C" {
 /*****************************************************************************
  * Our custom types
  *****************************************************************************/
-typedef bool vlc_bool_t; /* (shouldn't be exposed) */
 typedef struct vlc_list_t vlc_list_t; /* (shouldn't be exposed) */
 typedef struct vlc_object_t vlc_object_t; /* (shouldn't be exposed) */
 
@@ -108,12 +107,6 @@ struct vlc_list_t
 #define VLC_EEXIT         -255                             /* Program exited */
 #define VLC_EEXITSUCCESS  -999                /* Program exited successfully */
 #define VLC_EGENERIC      -666                              /* Generic error */
-
-/*****************************************************************************
- * Booleans (shouldn't be exposed)
- *****************************************************************************/
-#define VLC_FALSE false
-#define VLC_TRUE  true
 
 /**
  * \defgroup var_type Variable types  (shouldn't be exposed)
