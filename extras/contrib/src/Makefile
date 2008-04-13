@@ -2235,6 +2235,7 @@ CLEAN_PKG += clinkcc
 DISTCLEAN_PKG += clinkcc$(CLINKCC_VERSION).tar.gz
 
 # ***************************************************************************
+<<<<<<< Updated upstream:extras/contrib/src/Makefile
 # YASM assembler
 # ***************************************************************************
 
@@ -2253,6 +2254,8 @@ CLEAN_PKG += yasm
 DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.bz2
 
 # ***************************************************************************
+=======
+>>>>>>> Stashed changes:extras/contrib/src/Makefile
 # Copy aclocal files
 # This is necessary for --missing aclocal to succeed after a
 # configure.ac/Makefile.am change in the vlc root dir
