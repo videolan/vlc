@@ -34,7 +34,10 @@
 
 #include <string.h>
 #include <ctype.h>
+
+#if defined(HAVE_SYS_SHM_H)
 #include <sys/shm.h>
+#endif
 
 #include "dynamicoverlay.h"
 
@@ -154,7 +157,7 @@ static int parser_DataSharedMem( char *psz_command,
 static int parser_Id( char *psz_command, char *psz_end,
                       commandparams_t *p_params )
 {
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -167,16 +170,16 @@ static int parser_Id( char *psz_command, char *psz_end,
 static int parser_None( char *psz_command, char *psz_end,
                         commandparams_t *p_params )
 {
-    (void)(psz_command);
-    (void)(psz_end);
-    (void)(p_params);
+    VLC_UNUSED(psz_command);
+    VLC_UNUSED(psz_end);
+    VLC_UNUSED(p_params);
     return VLC_SUCCESS;
 }
 
 static int parser_SetAlpha( char *psz_command, char *psz_end,
                             commandparams_t *p_params )
 {
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -195,7 +198,7 @@ static int parser_SetAlpha( char *psz_command, char *psz_end,
 static int parser_SetPosition( char *psz_command, char *psz_end,
                                commandparams_t *p_params )
 {
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -220,7 +223,7 @@ static int parser_SetPosition( char *psz_command, char *psz_end,
 static int parser_SetTextAlpha( char *psz_command, char *psz_end,
                                 commandparams_t *p_params )
 {
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -240,7 +243,7 @@ static int parser_SetTextColor( char *psz_command, char *psz_end,
                                 commandparams_t *p_params )
 {
     int r, g, b;
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -272,7 +275,7 @@ static int parser_SetTextColor( char *psz_command, char *psz_end,
 static int parser_SetTextSize( char *psz_command, char *psz_end,
                                commandparams_t *p_params )
 {
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -291,7 +294,7 @@ static int parser_SetTextSize( char *psz_command, char *psz_end,
 static int parser_SetVisibility( char *psz_command, char *psz_end,
                                  commandparams_t *p_params )
 {
-    (void)(psz_end);
+    VLC_UNUSED(psz_end);
     skip_space( &psz_command );
     if( isdigit( *psz_command ) )
     {
@@ -316,7 +319,7 @@ static int parser_SetVisibility( char *psz_command, char *psz_end,
 static int unparse_default( const commandparams_t *p_results,
                             buffer_t *p_output )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     VLC_UNUSED(p_output);
     return VLC_SUCCESS;
 }
@@ -410,12 +413,13 @@ static int exec_DataSharedMem( filter_t *p_filter,
                                const commandparams_t *p_params,
                                commandparams_t *p_results )
 {
+#if defined(HAVE_SYS_SHM_H)
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     struct shmid_ds shminfo;
     overlay_t *p_ovl;
     size_t i_size;
 
-    (void)(p_results);
+    VLC_UNUSED(p_results);
 
     p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
     if( p_ovl == NULL )
@@ -470,7 +474,6 @@ static int exec_DataSharedMem( filter_t *p_filter,
             p_ovl->data.p_text = NULL;
             return VLC_ENOMEM;
         }
-
         memcpy( p_ovl->data.p_text, p_data, p_params->i_width );
 
         shmdt( p_data );
@@ -482,10 +485,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
 
         p_ovl->data.p_pic = malloc( sizeof( picture_t ) );
         if( p_ovl->data.p_pic == NULL )
-        {
-            msg_Err( p_filter, "Unable to allocate picture structure" );
             return VLC_ENOMEM;
-        }
 
         vout_InitFormat( &p_ovl->format, p_params->fourcc,
                          p_params->i_width, p_params->i_height,
@@ -545,17 +545,23 @@ static int exec_DataSharedMem( filter_t *p_filter,
         }
         shmdt( p_data );
     }
-
     p_sys->b_updated = p_ovl->b_active;
 
     return VLC_SUCCESS;
+#else
+    VLC_UNUSED(p_params);
+    VLC_UNUSED(p_results);
+
+    msg_Err( p_filter, "system doesn't support shared memory" );
+    return VLC_EGENERIC;
+#endif
 }
 
 static int exec_DeleteImage( filter_t *p_filter,
                              const commandparams_t *p_params,
                              commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     p_sys->b_updated = VLC_TRUE;
 
@@ -566,8 +572,8 @@ static int exec_EndAtomic( filter_t *p_filter,
                            const commandparams_t *p_params,
                            commandparams_t *p_results )
 {
-    (void)(p_params);
-    (void)(p_results);
+    VLC_UNUSED(p_params);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     QueueTransfer( &p_sys->pending, &p_sys->atomic );
     p_sys->b_atomic = VLC_FALSE;
@@ -578,7 +584,7 @@ static int exec_GenImage( filter_t *p_filter,
                           const commandparams_t *p_params,
                           commandparams_t *p_results )
 {
-    (void)(p_params);
+    VLC_UNUSED(p_params);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = OverlayCreate();
@@ -677,7 +683,7 @@ static int exec_SetAlpha( filter_t *p_filter,
                           const commandparams_t *p_params,
                           commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
@@ -693,7 +699,7 @@ static int exec_SetPosition( filter_t *p_filter,
                              const commandparams_t *p_params,
                              commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
@@ -711,7 +717,7 @@ static int exec_SetTextAlpha( filter_t *p_filter,
                               const commandparams_t *p_params,
                               commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
@@ -727,7 +733,7 @@ static int exec_SetTextColor( filter_t *p_filter,
                               const commandparams_t *p_params,
                               commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
@@ -743,7 +749,7 @@ static int exec_SetTextSize( filter_t *p_filter,
                               const commandparams_t *p_params,
                               commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
@@ -759,7 +765,7 @@ static int exec_SetVisibility( filter_t *p_filter,
                                const commandparams_t *p_params,
                                commandparams_t *p_results )
 {
-    (void)(p_results);
+    VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
 
     overlay_t *p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
@@ -776,8 +782,8 @@ static int exec_StartAtomic( filter_t *p_filter,
                              commandparams_t *p_results )
 {
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
-    (void)(p_params);
-    (void)(p_results);
+    VLC_UNUSED(p_params);
+    VLC_UNUSED(p_results);
 
     p_sys->b_atomic = VLC_TRUE;
     return VLC_SUCCESS;
