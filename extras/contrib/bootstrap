@@ -289,3 +289,15 @@ if git help >/dev/null 2>&1; then
 else
     echo "You do not have a Git client in your PATH." >&2
 fi
+
+if test -z "$CONTRIBS_RELEASE"; then
+    set +x
+    echo
+    echo "***********************************************************"
+    echo "* If you are building contribs for a release build of VLC *"
+    echo "* Please run CONTRIBS_RELEASE=sexy ./bootstrap            *"
+    echo "***********************************************************"
+else
+    echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
+    echo "EXTRA_CPPFLAGS += -DNDEBUG" >> config.mak
+fi
