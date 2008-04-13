@@ -2310,12 +2310,15 @@ taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_WIN32
+	patch -p0 < Patches/taglib.patch
+endif
 ifdef HAVE_CYGWIN
-	patch -p0 <Patches/taglib-cygwin.patch
+	patch -p0 < Patches/taglib-cygwin.patch
 endif
 
 .tag: taglib
-	(cd $<; $(HOSTCC) CXXFLAGS="-DMAKE_TAGLIB_LIB" ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 

@@ -1,0 +1,15 @@
+diff -ru taglib-1.5/taglib/taglib_export.h taglib/taglib/taglib_export.h
+--- taglib-1.5/taglib/taglib_export.h	2008-02-04 15:14:46.000000000 +0000
++++ taglib/taglib/taglib_export.h	2008-04-13 18:25:29.000000000 +0100
+@@ -28,9 +28,9 @@
+ 
+ #if defined(_WIN32) || defined(_WIN64)
+ #ifdef MAKE_TAGLIB_LIB
+-#define TAGLIB_EXPORT __declspec(dllexport)
++#define TAGLIB_EXPORT 
+ #else
+-#define TAGLIB_EXPORT __declspec(dllimport)
++#define TAGLIB_EXPORT 
+ #endif
+ #else
+ #define TAGLIB_EXPORT
