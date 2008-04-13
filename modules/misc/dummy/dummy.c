@@ -69,7 +69,7 @@ vlc_module_begin();
 #endif
     add_submodule();
         set_description( _("Dummy access function") );
-        set_capability( "access2", 0 );
+        set_capability( "access", 0 );
         set_callbacks( E_(OpenAccess), NULL );
     add_submodule();
         set_description( _("Dummy demux function") );

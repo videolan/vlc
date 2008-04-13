@@ -56,7 +56,7 @@ vlc_module_begin();
     add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
 
-    set_capability( "access2", 10 );
+    set_capability( "access", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "rtmp" );
 vlc_module_end();

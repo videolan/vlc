@@ -30,9 +30,9 @@
 #include "input_internal.h"
 
 /*****************************************************************************
- * access2_InternalNew:
+ * access_InternalNew:
  *****************************************************************************/
-static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_access,
+static access_t *access_InternalNew( vlc_object_t *p_obj, const char *psz_access,
                                       const char *psz_demux, const char *psz_path,
                                       access_t *p_source )
 {
@@ -75,7 +75,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     vlc_object_attach( p_access, p_obj );
 
     p_access->p_module =
-         module_Need( p_access, p_source ? "access_filter" : "access2",
+         module_Need( p_access, p_source ? "access_filter" : "access",
                       psz_access, true );
 
     if( p_access->p_module == NULL )
@@ -93,29 +93,29 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
 }
 
 /*****************************************************************************
- * access2_New:
+ * access_New:
  *****************************************************************************/
-access_t *__access2_New( vlc_object_t *p_obj, const char *psz_access,
+access_t *__access_New( vlc_object_t *p_obj, const char *psz_access,
                          const char *psz_demux, const char *psz_path )
 {
-    return access2_InternalNew( p_obj, psz_access, psz_demux,
+    return access_InternalNew( p_obj, psz_access, psz_demux,
                                 psz_path, NULL );
 }
 
 /*****************************************************************************
- * access2_FilterNew:
+ * access_FilterNew:
  *****************************************************************************/
-access_t *access2_FilterNew( access_t *p_source, const char *psz_access_filter )
+access_t *access_FilterNew( access_t *p_source, const char *psz_access_filter )
 {
-    return access2_InternalNew( VLC_OBJECT(p_source), psz_access_filter,
+    return access_InternalNew( VLC_OBJECT(p_source), psz_access_filter,
                                 p_source->psz_demux, p_source->psz_path,
                                 p_source );
 }
 
 /*****************************************************************************
- * access2_Delete:
+ * access_Delete:
  *****************************************************************************/
-void access2_Delete( access_t *p_access )
+void access_Delete( access_t *p_access )
 {
     module_Unneed( p_access, p_access->p_module );
     vlc_object_detach( p_access );
@@ -126,7 +126,7 @@ void access2_Delete( access_t *p_access )
 
     if( p_access->p_source )
     {
-        access2_Delete( p_access->p_source );
+        access_Delete( p_access->p_source );
     }
 
     vlc_object_release( p_access );

@@ -68,7 +68,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( _("Audio CD"));
     set_description( _("Audio CD input") );
-    set_capability( "access2", 10 );
+    set_capability( "access", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     set_callbacks( Open, Close );

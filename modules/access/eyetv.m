@@ -63,7 +63,7 @@ vlc_module_begin();
     add_integer( "eyetv-channel", 0, NULL,
                  CHANNEL_TEXT, CHANNEL_LONGTEXT, false );
 
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "eyetv" );
     set_callbacks( Open, Close );
 vlc_module_end();

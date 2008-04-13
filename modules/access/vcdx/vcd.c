@@ -102,7 +102,7 @@ vlc_module_begin();
     add_shortcut( "vcdx" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
-    set_capability( "access2", 55 /* slightly lower than vcd */ );
+    set_capability( "access", 55 /* slightly lower than vcd */ );
     set_callbacks( VCDOpen, VCDClose );
 
     /* Configuration options */

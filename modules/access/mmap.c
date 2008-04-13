@@ -54,7 +54,7 @@ vlc_module_begin();
     set_description (_("Memory-mapped file input"));
     set_category (CAT_INPUT);
     set_subcategory (SUBCAT_INPUT_ACCESS);
-    set_capability ("access2", 52);
+    set_capability ("access", 52);
     add_shortcut ("file");
     set_callbacks (Open, Close);
 

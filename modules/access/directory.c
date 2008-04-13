@@ -94,7 +94,7 @@ vlc_module_begin();
     set_shortname( _("Directory" ) );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     set_description( _("Standard filesystem directory input") );
-    set_capability( "access2", 55 );
+    set_capability( "access", 55 );
     add_shortcut( "directory" );
     add_shortcut( "dir" );
     add_shortcut( "file" );

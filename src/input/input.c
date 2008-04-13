@@ -1180,7 +1180,7 @@ static int Init( input_thread_t * p_input )
     if( !p_input->b_preparsing )
     {
         if( p_input->p->input.p_access )
-            access2_Control( p_input->p->input.p_access, ACCESS_GET_META,
+            access_Control( p_input->p->input.p_access, ACCESS_GET_META,
                              p_meta );
 
         /* Get meta data from slave input */
@@ -1189,7 +1189,7 @@ static int Init( input_thread_t * p_input )
             DemuxMeta( p_input, p_meta, p_input->p->slave[i]->p_demux );
             if( p_input->p->slave[i]->p_access )
             {
-                access2_Control( p_input->p->slave[i]->p_access,
+                access_Control( p_input->p->slave[i]->p_access,
                                  ACCESS_GET_META, p_meta );
             }
         }
@@ -1618,7 +1618,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             {
                 int i_ret;
                 if( p_input->p->input.p_access )
-                    i_ret = access2_Control( p_input->p->input.p_access,
+                    i_ret = access_Control( p_input->p->input.p_access,
                                              ACCESS_SET_PAUSE_STATE, false );
                 else
                     i_ret = demux_Control( p_input->p->input.p_demux,
@@ -1649,7 +1649,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             {
                 int i_ret;
                 if( p_input->p->input.p_access )
-                    i_ret = access2_Control( p_input->p->input.p_access,
+                    i_ret = access_Control( p_input->p->input.p_access,
                                              ACCESS_SET_PAUSE_STATE, true );
                 else
                     i_ret = demux_Control( p_input->p->input.p_demux,
@@ -1863,7 +1863,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     input_EsOutChangePosition( p_input->p->p_es_out );
 
-                    access2_Control( p_access, ACCESS_SET_TITLE, i_title );
+                    access_Control( p_access, ACCESS_SET_TITLE, i_title );
                     stream_AccessReset( p_input->p->input.p_stream );
                 }
             }
@@ -1939,7 +1939,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     input_EsOutChangePosition( p_input->p->p_es_out );
 
-                    access2_Control( p_access, ACCESS_SET_SEEKPOINT,
+                    access_Control( p_access, ACCESS_SET_SEEKPOINT,
                                     i_seekpoint );
                     stream_AccessReset( p_input->p->input.p_stream );
                 }
@@ -1980,7 +1980,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                     /* Get meta (access and demux) */
                     p_meta = vlc_meta_New();
-                    access2_Control( slave->p_access, ACCESS_GET_META,
+                    access_Control( slave->p_access, ACCESS_GET_META,
                                      p_meta );
                     demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
                     InputUpdateMeta( p_input, p_meta );
@@ -2089,7 +2089,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
     {
         /* TODO maybe multi - access ? */
         vlc_meta_t *p_meta = vlc_meta_New();
-        access2_Control( p_input->p->input.p_access,ACCESS_GET_META, p_meta );
+        access_Control( p_input->p->input.p_access,ACCESS_GET_META, p_meta );
         InputUpdateMeta( p_input, p_meta );
         var_SetInteger( pl_Get( p_input ), "item-change", p_input->p->input.p_item->i_id );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
@@ -2300,7 +2300,7 @@ static int InputSourceInit( input_thread_t *p_input,
         input_ChangeState( p_input, OPENING_S );
 
         /* Now try a real access */
-        in->p_access = access2_New( p_input, psz_access, psz_demux, psz_path );
+        in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
 
         /* Access failed, URL encoded ? */
         if( in->p_access == NULL && strchr( psz_path, '%' ) )
@@ -2310,7 +2310,7 @@ static int InputSourceInit( input_thread_t *p_input,
             msg_Dbg( p_input, "retrying with access `%s' demux `%s' path `%s'",
                      psz_access, psz_demux, psz_path );
 
-            in->p_access = access2_New( p_input,
+            in->p_access = access_New( p_input,
                                         psz_access, psz_demux, psz_path );
         }
         if( in->p_access == NULL )
@@ -2334,7 +2334,7 @@ static int InputSourceInit( input_thread_t *p_input,
             if( end )
                 *end++ = '\0';
 
-            in->p_access = access2_FilterNew( in->p_access, psz );
+            in->p_access = access_FilterNew( in->p_access, psz );
             if( in->p_access == NULL )
             {
                 in->p_access = p_access;
@@ -2349,12 +2349,12 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Get infos from access */
         if( !p_input->b_preparsing )
         {
-            access2_Control( in->p_access,
+            access_Control( in->p_access,
                              ACCESS_GET_PTS_DELAY, &i_pts_delay );
             p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
 
             in->b_title_demux = false;
-            if( access2_Control( in->p_access, ACCESS_GET_TITLE_INFO,
+            if( access_Control( in->p_access, ACCESS_GET_TITLE_INFO,
                                  &in->title, &in->i_title,
                                 &in->i_title_offset, &in->i_seekpoint_offset ) )
 
@@ -2362,15 +2362,15 @@ static int InputSourceInit( input_thread_t *p_input,
                 in->i_title = 0;
                 in->title   = NULL;
             }
-            access2_Control( in->p_access, ACCESS_CAN_CONTROL_PACE,
+            access_Control( in->p_access, ACCESS_CAN_CONTROL_PACE,
                              &in->b_can_pace_control );
             in->b_can_rate_control = in->b_can_pace_control;
             in->b_rescale_ts = true;
 
-            access2_Control( in->p_access, ACCESS_CAN_PAUSE,
+            access_Control( in->p_access, ACCESS_CAN_PAUSE,
                              &in->b_can_pause );
             var_SetBool( p_input, "can-pause", in->b_can_pause );
-            access2_Control( in->p_access, ACCESS_CAN_SEEK,
+            access_Control( in->p_access, ACCESS_CAN_SEEK,
                              &val.b_bool );
             var_Set( p_input, "seekable", val );
         }
@@ -2476,7 +2476,7 @@ error:
         stream_Delete( in->p_stream );
 
     if( in->p_access )
-        access2_Delete( in->p_access );
+        access_Delete( in->p_access );
 
     return VLC_EGENERIC;
 }
@@ -2495,7 +2495,7 @@ static void InputSourceClean( input_source_t *in )
         stream_Delete( in->p_stream );
 
     if( in->p_access )
-        access2_Delete( in->p_access );
+        access_Delete( in->p_access );
 
     if( in->i_title > 0 )
     {

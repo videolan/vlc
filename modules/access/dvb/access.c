@@ -256,7 +256,7 @@ vlc_module_begin();
                 true );
 #endif
 
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "dvb" );      /* Generic name */
 
     add_shortcut( "dvb-s" );    /* Satellite */

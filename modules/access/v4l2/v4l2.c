@@ -379,7 +379,7 @@ vlc_module_begin();
     add_submodule();
     add_shortcut( "v4l2c" );
     set_description( _("Video4Linux2 Compressed A/V") );
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     /* use these when open as access_demux fails; VLC will use another demux */
     set_callbacks( AccessOpen, AccessClose );
 
@@ -1165,7 +1165,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
 }
 
 /*****************************************************************************
- * AccessOpen: opens v4l2 device, access2 callback
+ * AccessOpen: opens v4l2 device, access callback
  *****************************************************************************
  *
  * url: <video device>::::
@@ -1247,7 +1247,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 }
 
 /*****************************************************************************
- * AccessControl: access2 callback
+ * AccessControl: access callback
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
@@ -1306,7 +1306,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
 }
 
 /*****************************************************************************
- * AccessRead: access2 callback
+ * AccessRead: access callback
  ******************************************************************************/
 static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len )
 {
@@ -2047,7 +2047,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         }
         if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
         {
-            msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access2)" );
+            msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
             goto open_failed;
         }
     }

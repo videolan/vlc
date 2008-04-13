@@ -91,7 +91,7 @@ static int Open (vlc_object_t *obj)
     if (!var_CreateGetBool (access, "dump-force"))
     {
         bool b;
-        if ((access2_Control (src, ACCESS_CAN_FASTSEEK, &b) == 0) && b)
+        if ((access_Control (src, ACCESS_CAN_FASTSEEK, &b) == 0) && b)
         {
             msg_Dbg (obj, "dump filter useless");
             return VLC_EGENERIC;

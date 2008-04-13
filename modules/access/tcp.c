@@ -54,7 +54,7 @@ vlc_module_begin();
     add_integer( "tcp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
 
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "tcp" );
     set_callbacks( Open, Close );
 vlc_module_end();

@@ -1701,7 +1701,7 @@ vlc_module_begin();
 
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , false );
-    add_module( "access", "access2", NULL, NULL, ACCESS_TEXT,
+    add_module( "access", "access", NULL, NULL, ACCESS_TEXT,
                 ACCESS_LONGTEXT, true );
 
     set_subcategory( SUBCAT_INPUT_ACCESS_FILTER );

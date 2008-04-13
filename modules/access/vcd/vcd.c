@@ -49,7 +49,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( _("VCD"));
     set_description( _("VCD input") );
-    set_capability( "access2", 60 );
+    set_capability( "access", 60 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

@@ -117,20 +117,20 @@ struct access_t
     access_sys_t *p_sys;
 };
 
-static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )
+static inline int access_vaControl( access_t *p_access, int i_query, va_list args )
 {
     if( !p_access ) return VLC_EGENERIC;
     assert( p_access->pf_control );
     return p_access->pf_control( p_access, i_query, args );
 }
 
-static inline int access2_Control( access_t *p_access, int i_query, ... )
+static inline int access_Control( access_t *p_access, int i_query, ... )
 {
     va_list args;
     int     i_result;
 
     va_start( args, i_query );
-    i_result = access2_vaControl( p_access, i_query, args );
+    i_result = access_vaControl( p_access, i_query, args );
     va_end( args );
     return i_result;
 }
@@ -138,7 +138,7 @@ static inline int access2_Control( access_t *p_access, int i_query, ... )
 static inline char *access_GetContentType( access_t *p_access )
 {
     char *res;
-    if( access2_Control( p_access, ACCESS_GET_CONTENT_TYPE, &res ) )
+    if( access_Control( p_access, ACCESS_GET_CONTENT_TYPE, &res ) )
         return NULL;
     return res;
 }

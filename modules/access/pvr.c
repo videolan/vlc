@@ -128,7 +128,7 @@ vlc_module_begin();
     set_description( _("IVTV MPEG Encoding cards input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "pvr" );
 
     add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,

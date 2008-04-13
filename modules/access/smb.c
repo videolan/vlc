@@ -77,7 +77,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "SMB" );
     set_description( _("SMB input") );
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "smb-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,

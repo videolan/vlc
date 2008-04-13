@@ -71,7 +71,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "MMS" );
     set_description( _("Microsoft Media Server (MMS) input") );
-    set_capability( "access2", -1 );
+    set_capability( "access", -1 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

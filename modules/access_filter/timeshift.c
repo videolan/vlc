@@ -137,14 +137,14 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* Only work with not pace controled access */
-        if( access2_Control( p_src, ACCESS_CAN_CONTROL_PACE, &b_bool ) ||
+        if( access_Control( p_src, ACCESS_CAN_CONTROL_PACE, &b_bool ) ||
             b_bool )
         {
             msg_Dbg( p_src, "ACCESS_CAN_CONTROL_PACE: timeshift useless" );
             return VLC_EGENERIC;
         }
         /* Refuse access that can be paused */
-        if( access2_Control( p_src, ACCESS_CAN_PAUSE, &b_bool ) || b_bool )
+        if( access_Control( p_src, ACCESS_CAN_PAUSE, &b_bool ) || b_bool )
         {
             msg_Dbg( p_src, "ACCESS_CAN_PAUSE: timeshift useless" );
             return VLC_EGENERIC;
@@ -550,7 +550,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     /* Forward everything else to the source access */
     default:
-        return access2_vaControl( p_access->p_source, i_query, args );
+        return access_vaControl( p_access->p_source, i_query, args );
     }
     return VLC_SUCCESS;
 }

@@ -206,7 +206,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
 
     /* Now try a real access */
-    p_access = access2_New( p_parent, psz_access, psz_demux, psz_path );
+    p_access = access_New( p_parent, psz_access, psz_demux, psz_path );
 
     if( p_access == NULL )
     {
@@ -216,7 +216,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 
     if( !( p_res = stream_AccessNew( p_access, true ) ) )
     {
-        access2_Delete( p_access );
+        access_Delete( p_access );
         return NULL;
     }
 
@@ -258,7 +258,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     p_sys->i_pos = p_access->info.i_pos;
 
     /* Stats */
-    access2_Control( p_access, ACCESS_CAN_FASTSEEK, &p_sys->stat.b_fastseek );
+    access_Control( p_access, ACCESS_CAN_FASTSEEK, &p_sys->stat.b_fastseek );
     p_sys->stat.i_bytes = 0;
     p_sys->stat.i_read_time = 0;
     p_sys->stat.i_read_count = 0;
@@ -304,7 +304,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
             psz_name = strdup( psz_name );
             if( psz_name )
             {
-                access_t *p_tmp = access2_New( p_access, p_access->psz_access,
+                access_t *p_tmp = access_New( p_access, p_access->psz_access,
                                                "", psz_name );
 
                 if( !p_tmp )
@@ -327,7 +327,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
                 p_entry->psz_path = psz_name;
                 TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
 
-                access2_Delete( p_tmp );
+                access_Delete( p_tmp );
             }
 
             psz_name = psz_parser;
@@ -380,7 +380,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
             goto error;
         }
         p_sys->stream.i_used   = 0;
-        access2_Control( p_access, ACCESS_GET_MTU,
+        access_Control( p_access, ACCESS_GET_MTU,
                          &p_sys->stream.i_read_size );
         if( p_sys->stream.i_read_size <= 0 )
             p_sys->stream.i_read_size = STREAM_READ_ATONCE;
@@ -442,7 +442,7 @@ static void AStreamDestroy( stream_t *s )
     free( p_sys->p_peek );
 
     if( p_sys->p_list_access && p_sys->p_list_access != p_sys->p_access )
-        access2_Delete( p_sys->p_list_access );
+        access_Delete( p_sys->p_list_access );
 
     while( p_sys->i_list-- )
     {
@@ -460,7 +460,7 @@ static void UStreamDestroy( stream_t *s )
     access_t *p_access = (access_t*)vlc_object_find( s, VLC_OBJECT_ACCESS, FIND_PARENT );
     AStreamDestroy( s );
     vlc_object_release( p_access );
-    access2_Delete( p_access );
+    access_Delete( p_access );
 }
 
 /****************************************************************************
@@ -556,12 +556,12 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_CAN_SEEK:
             p_bool = (bool*)va_arg( args, bool * );
-            access2_Control( p_access, ACCESS_CAN_SEEK, p_bool );
+            access_Control( p_access, ACCESS_CAN_SEEK, p_bool );
             break;
 
         case STREAM_CAN_FASTSEEK:
             p_bool = (bool*)va_arg( args, bool * );
-            access2_Control( p_access, ACCESS_CAN_FASTSEEK, p_bool );
+            access_Control( p_access, ACCESS_CAN_FASTSEEK, p_bool );
             break;
 
         case STREAM_GET_POSITION:
@@ -589,10 +589,10 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
                             "DON'T USE STREAM_CONTROL_ACCESS !!!" );
                 return VLC_EGENERIC;
             }
-            return access2_vaControl( p_access, i_int, args );
+            return access_vaControl( p_access, i_int, args );
 
         case STREAM_GET_CONTENT_TYPE:
-            return access2_Control( p_access, ACCESS_GET_CONTENT_TYPE,
+            return access_Control( p_access, ACCESS_GET_CONTENT_TYPE,
                                     va_arg( args, char ** ) );
 
         default:
@@ -700,7 +700,7 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
         stream_sys_t *p_sys = s->p_sys;
         access_t     *p_access = p_sys->p_access;
         bool   b_aseek;
-        access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
         if( b_aseek )
             return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
     }
@@ -840,7 +840,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     if( i_offset < 0 )
     {
         bool b_aseek;
-        access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
 
         if( !b_aseek )
         {
@@ -854,8 +854,8 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     {
         bool b_aseek, b_aseekfast;
 
-        access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
-        access2_Control( p_access, ACCESS_CAN_FASTSEEK, &b_aseekfast );
+        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        access_Control( p_access, ACCESS_CAN_FASTSEEK, &b_aseekfast );
 
         if( !b_aseek )
         {
@@ -1026,7 +1026,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
         stream_sys_t *p_sys = s->p_sys;
         access_t     *p_access = p_sys->p_access;
         bool   b_aseek;
-        access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
         if( b_aseek )
             return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
     }
@@ -1187,7 +1187,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
         return VLC_SUCCESS;
     }
 
-    access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+    access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
     if( !b_aseek )
     {
         /* We can't do nothing */
@@ -1228,7 +1228,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
         }
     }
 
-    access2_Control( p_access, ACCESS_CAN_SEEK, &b_afastseek );
+    access_Control( p_access, ACCESS_CAN_SEEK, &b_afastseek );
     /* FIXME compute seek cost (instead of static 'stupid' value) */
     i_maxth = __MIN( p_sys->stream.i_read_size, STREAM_READ_ATONCE / 2 );
     if( !b_afastseek )
@@ -1709,12 +1709,12 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access2_New( s, p_access->psz_access, "", psz_name );
+        p_list_access = access_New( s, p_access->psz_access, "", psz_name );
 
         if( !p_list_access ) return 0;
 
         if( p_sys->p_list_access != p_access )
-            access2_Delete( p_sys->p_list_access );
+            access_Delete( p_sys->p_list_access );
 
         p_sys->p_list_access = p_list_access;
 
@@ -1777,12 +1777,12 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access2_New( s, p_access->psz_access, "", psz_name );
+        p_list_access = access_New( s, p_access->psz_access, "", psz_name );
 
         if( !p_list_access ) return 0;
 
         if( p_sys->p_list_access != p_access )
-            access2_Delete( p_sys->p_list_access );
+            access_Delete( p_sys->p_list_access );
 
         p_sys->p_list_access = p_list_access;
 
@@ -1832,7 +1832,7 @@ static int ASeek( stream_t *s, int64_t i_pos )
         if( i != p_sys->i_list_index && i != 0 )
         {
             p_list_access =
-                access2_New( s, p_access->psz_access, "", psz_name );
+                access_New( s, p_access->psz_access, "", psz_name );
         }
         else if( i != p_sys->i_list_index )
         {
@@ -1842,7 +1842,7 @@ static int ASeek( stream_t *s, int64_t i_pos )
         if( p_list_access )
         {
             if( p_sys->p_list_access != p_access )
-                access2_Delete( p_sys->p_list_access );
+                access_Delete( p_sys->p_list_access );
 
             p_sys->p_list_access = p_list_access;
         }

@@ -92,7 +92,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
     add_obsolete_string( "file-cat" );
-    set_capability( "access2", 50 );
+    set_capability( "access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
     add_shortcut( "kfir" );

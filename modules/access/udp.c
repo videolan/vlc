@@ -83,7 +83,7 @@ vlc_module_begin();
     add_integer( "rtp-late", 100, NULL, RTP_LATE_TEXT, RTP_LATE_LONGTEXT, true );
     add_obsolete_bool( "udp-auto-mtu" );
 
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "udp" );
     add_shortcut( "udpstream" );
     add_shortcut( "udp4" );

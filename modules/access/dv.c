@@ -78,7 +78,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dv-caching", 60000 / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "dv" );
     add_shortcut( "dv1394" );
     add_shortcut( "raw1394" );
