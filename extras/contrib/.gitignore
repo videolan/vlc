@@ -14,7 +14,7 @@ info
 src/*
 # But not our files
 !Makefile
-!src/Distributions
+!src/Distributions/*
 !src/Patches
 !src/packages.mak
 !src/Makefile

@@ -2253,6 +2253,24 @@ CLEAN_PKG += nasm nasm.cvs
 DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.bz2
 
 # ***************************************************************************
+# YASM assembler
+# ***************************************************************************
+
+yasm-$(YASM_VERSION).tar.gz:
+	$(WGET) $(YASM_URL)
+
+yasm: yasm-$(YASM_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.yasm: yasm
+	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .yasm
+CLEAN_PKG += yasm
+DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.bz2
+
+# ***************************************************************************
 # Copy aclocal files
 # This is necessary for --missing aclocal to succeed after a
 # configure.ac/Makefile.am change in the vlc root dir
