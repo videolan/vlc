@@ -544,8 +544,6 @@ enum input_state_e
     ERROR_S
 };
 
-static const char *ppsz_input_state[] = { N_("Initializing"), N_("Opening"), N_("Buffer"), N_("Play"), N_("Pause"), N_("Stop"), N_("Error") };
-
 /* "rate" default, min/max
  * A rate below 1000 plays the movie faster,
  * A rate above 1000 plays the movie slower.

@@ -66,6 +66,8 @@
 #define MAX_LINE_LENGTH 256
 #define STATUS_CHANGE "status change: "
 
+static const char *ppsz_input_state[] = { N_("Initializing"), N_("Opening"), N_("Buffer"), N_("Play"), N_("Pause"), N_("Stop"), N_("Error") };
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
