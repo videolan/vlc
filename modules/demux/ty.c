@@ -116,7 +116,7 @@ typedef struct
   uint8_t ex1, ex2;
   uint8_t rec_type;
   uint8_t subrec_type;
-  vlc_bool_t b_ext;
+  bool b_ext;
   uint64_t l_ty_pts;            /* TY PTS in the record header */
 } ty_rec_hdr_t;
 
@@ -163,7 +163,7 @@ typedef enum
 } xds_class_t;
 typedef struct
 {
-    vlc_bool_t b_started;
+    bool b_started;
     int        i_data;
     uint8_t    p_data[XDS_MAX_DATA_SIZE];
     int        i_sum;
@@ -194,18 +194,18 @@ typedef struct
 typedef struct
 {
     /* Are we in XDS mode */
-    vlc_bool_t b_xds;
+    bool b_xds;
 
     /* Current class type */
     xds_class_t i_class;
     int         i_type;
-    vlc_bool_t  b_future;
+    bool  b_future;
 
     /* */
     xds_packet_t pkt[XDS_MAX_CLASS_COUNT][128]; /* XXX it is way too much, but simpler */
 
     /* */
-    vlc_bool_t  b_meta_changed;
+    bool  b_meta_changed;
     xds_meta_t  meta;
 
 } xds_t;
@@ -224,8 +224,8 @@ struct demux_sys_t
   int             i_stuff_cnt;
   size_t          i_stream_size;      /* size of input stream (if known) */
   //uint64_t        l_program_len;      /* length of this stream in msec */
-  vlc_bool_t      b_seekable;         /* is this stream seekable? */
-  vlc_bool_t      b_have_master;      /* are master chunks present? */
+  bool      b_seekable;         /* is this stream seekable? */
+  bool      b_have_master;      /* are master chunks present? */
   tivo_type_t     tivo_type;          /* tivo type (SA / DTiVo) */
   tivo_series_t   tivo_series;        /* Series1 or Series2 */
   tivo_audio_t    audio_type;         /* AC3 or MPEG */
@@ -250,8 +250,8 @@ struct demux_sys_t
   int             i_num_recs;         /* number of recs in this chunk */
   int             i_seq_rec;          /* record number where seq start is */
   ty_seq_table_t  *seq_table;         /* table of SEQ entries from mstr chk */
-  vlc_bool_t      eof;
-  vlc_bool_t      b_first_chunk;
+  bool      eof;
+  bool      b_first_chunk;
 };
 
 static int get_chunk_header(demux_t *);
@@ -325,7 +325,7 @@ static int Open(vlc_object_t *p_this)
     memset(p_sys, 0, sizeof(demux_sys_t));
 
     /* set up our struct (most were zero'd out with the memset above) */
-    p_sys->b_first_chunk = VLC_TRUE;
+    p_sys->b_first_chunk = true;
     p_sys->b_have_master = (U32_AT(p_peek) == TIVO_PES_FILEID);
     p_sys->firstAudioPTS = -1;
     p_sys->i_stream_size = stream_Size(p_demux->s);
@@ -1046,7 +1046,7 @@ static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block
 
     i_channel = cc_Channel( i_field, &p_sys->cc.p_data[p_sys->cc.i_data-3 + 1] );
     if( i_channel >= 0 && i_channel < 4 )
-        p_sys->cc.pb_present[i_channel] = VLC_TRUE;
+        p_sys->cc.pb_present[i_channel] = true;
     return 0;
 }
 
@@ -1111,16 +1111,16 @@ static void XdsInit( xds_t *h )
 {
     int i, j;
 
-    h->b_xds = VLC_FALSE;
+    h->b_xds = false;
     h->i_class = XDS_MAX_CLASS_COUNT;
     h->i_type = 0;
-    h->b_future = VLC_FALSE;
+    h->b_future = false;
     for( i = 0; i < XDS_MAX_CLASS_COUNT; i++ )
     {
         for( j = 0; j < 128; j++ )
-            h->pkt[i][j].b_started = VLC_FALSE;
+            h->pkt[i][j].b_started = false;
     }
-    h->b_meta_changed = VLC_FALSE;
+    h->b_meta_changed = false;
     memset( &h->meta, 0, sizeof(h->meta) );
 }
 static void XdsExit( xds_t *h )
@@ -1164,12 +1164,12 @@ static void XdsStringUtf8( char dst[2*32+1], const uint8_t *p_src, int i_src )
     }
     dst[i_dst++] = '\0';
 }
-static vlc_bool_t XdsChangeString( xds_t *h, char **ppsz_dst, const char *psz_new )
+static bool XdsChangeString( xds_t *h, char **ppsz_dst, const char *psz_new )
 {
     if( *ppsz_dst && psz_new && !strcmp( *ppsz_dst, psz_new ) )
-        return VLC_FALSE;
+        return false;
     if( *ppsz_dst == NULL && psz_new == NULL )
-        return VLC_FALSE;
+        return false;
 
     free( *ppsz_dst );
     if( psz_new )
@@ -1177,8 +1177,8 @@ static vlc_bool_t XdsChangeString( xds_t *h, char **ppsz_dst, const char *psz_ne
     else
         *ppsz_dst = NULL;
 
-    h->b_meta_changed = VLC_TRUE;
-    return VLC_TRUE;
+    h->b_meta_changed = true;
+    return true;
 }
 
 static void XdsDecodeCurrentFuture( xds_t *h, xds_packet_t *pk )
@@ -1360,21 +1360,21 @@ static void XdsParse( xds_t *h, uint8_t d1, uint8_t d2 )
     {
         const xds_class_t i_class = ( d1 - 1 ) >> 1;
         const int i_type = d2;
-        const vlc_bool_t b_start = d1 & 0x01;
+        const bool b_start = d1 & 0x01;
         xds_packet_t *pk = &h->pkt[i_class][i_type];
 
         if( !b_start && !pk->b_started )
         {
             //fprintf( stderr, "xxxxxxxxxxxxxxxXDS Continuying a non started packet, ignoring\n" );
-            h->b_xds = VLC_FALSE;
+            h->b_xds = false;
             return;
         }
 
-        h->b_xds = VLC_TRUE;
+        h->b_xds = true;
         h->i_class = i_class;
         h->i_type  = i_type;
         h->b_future = !b_start;
-        pk->b_started = VLC_TRUE;
+        pk->b_started = true;
         if( b_start )
         {
             pk->i_data = 0;
@@ -1390,13 +1390,13 @@ static void XdsParse( xds_t *h, uint8_t d1, uint8_t d2 )
         if( pk->i_sum & 0x7f )
         {
             //fprintf( stderr, "xxxxxxxxxxxxxxxXDS invalid checksum, ignoring ---------------------------------\n" );
-            pk->b_started = VLC_FALSE;
+            pk->b_started = false;
             return;
         }
         if( pk->i_data <= 0 )
         {
             //fprintf( stderr, "xxxxxxxxxxxxxxxXDS empty packet, ignoring ---------------------------------\n" );
-            pk->b_started = VLC_FALSE;
+            pk->b_started = false;
             return;
         }
 
@@ -1405,7 +1405,7 @@ static void XdsParse( xds_t *h, uint8_t d1, uint8_t d2 )
         XdsDecode( h, pk );
 
         /* Reset it */
-        pk->b_started = VLC_FALSE;
+        pk->b_started = false;
     }
     else if( d1 >= 0x20 && h->b_xds )
     {
@@ -1415,8 +1415,8 @@ static void XdsParse( xds_t *h, uint8_t d1, uint8_t d2 )
         {
             /* Broken -> reinit */
             //fprintf( stderr, "xxxxxxxxxxxxxxxXDS broken, reset\n" );
-            h->b_xds = VLC_FALSE;
-            pk->b_started = VLC_FALSE;
+            h->b_xds = false;
+            pk->b_started = false;
             return;
         }
         /* TODO check parity bit */
@@ -1426,7 +1426,7 @@ static void XdsParse( xds_t *h, uint8_t d1, uint8_t d2 )
     }
     else
     {
-        h->b_xds = VLC_FALSE;
+        h->b_xds = false;
     }
 }
 
@@ -1468,7 +1468,7 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
             es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, TY_ES_GROUP, p_epg );
         vlc_epg_Delete( p_epg );
     }
-    p_demux->p_sys->xds.b_meta_changed = VLC_FALSE;
+    p_demux->p_sys->xds.b_meta_changed = false;
 }
 
 /* seek to an exact time position within the stream, if possible.
@@ -1658,7 +1658,7 @@ static void parse_master(demux_t *p_demux)
     p_sys->l_first_ty_pts = p_sys->seq_table[0].l_timestamp;
     p_sys->l_final_ty_pts =
         p_sys->seq_table[p_sys->i_seq_table_size - 1].l_timestamp;
-    p_sys->b_have_master = VLC_TRUE;
+    p_sys->b_have_master = true;
 
     i_pts_secs = p_sys->l_first_ty_pts / 1000000000;
     msg_Dbg( p_demux, "first TY pts in master is %02d:%02d:%02d",
@@ -1683,7 +1683,7 @@ static int probe_stream(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t *p_buf;
     int i;
-    vlc_bool_t b_probe_error = VLC_FALSE;
+    bool b_probe_error = false;
 
     /* we need CHUNK_PEEK_COUNT chunks of data, first one might be a Part header, so ... */
     if (stream_Peek( p_demux->s, &p_buf, CHUNK_PEEK_COUNT * CHUNK_SIZE ) <
@@ -1706,15 +1706,15 @@ static int probe_stream(demux_t *p_demux)
     /* the final tally */
     if (p_sys->tivo_series == TIVO_SERIES_UNKNOWN) {
         msg_Err(p_demux, "Can't determine Tivo Series.");
-        b_probe_error = VLC_TRUE;
+        b_probe_error = true;
     }
     if (p_sys->audio_type == TIVO_AUDIO_UNKNOWN) {
         msg_Err(p_demux, "Can't determine Tivo Audio Type.");
-        b_probe_error = VLC_TRUE;
+        b_probe_error = true;
     }
     if (p_sys->tivo_type == TIVO_TYPE_UNKNOWN) {
         msg_Err(p_demux, "Can't determine Tivo Type (SA/DTivo).");
-        b_probe_error = VLC_TRUE;
+        b_probe_error = true;
     }
     return b_probe_error?VLC_EGENERIC:VLC_SUCCESS;
 }
@@ -1886,7 +1886,7 @@ static int get_chunk_header(demux_t *p_demux)
         p_sys->i_seq_rec = p_peek[1];
     }
     p_sys->i_cur_rec = 0;
-    p_sys->b_first_chunk = VLC_FALSE;
+    p_sys->b_first_chunk = false;
   
     /*msg_Dbg( p_demux, "chunk has %d records", i_num_recs );*/
 
@@ -1899,7 +1899,7 @@ static int get_chunk_header(demux_t *p_demux)
     p_hdr_buf = malloc(i_num_recs * 16);
     if (stream_Read(p_demux->s, p_hdr_buf, i_num_recs * 16) < i_num_recs * 16) {
         free( p_hdr_buf );
-        p_sys->eof = VLC_TRUE;
+        p_sys->eof = true;
         return 0;
     }
     /* parse them */
@@ -1946,14 +1946,14 @@ static ty_rec_hdr_t *parse_chunk_headers( demux_t *p_demux, const uint8_t *p_buf
             p_rec_hdr->ex2 = b2;
             p_rec_hdr->l_rec_size = 0;
             p_rec_hdr->l_ty_pts = 0;
-            p_rec_hdr->b_ext = VLC_TRUE;
+            p_rec_hdr->b_ext = true;
         }
         else
         {
             p_rec_hdr->l_rec_size = ( record_header[ 0 ] << 8 |
                 record_header[ 1 ] ) << 4 | ( record_header[ 2 ] >> 4 );
             *pi_payload_size += p_rec_hdr->l_rec_size;
-            p_rec_hdr->b_ext = VLC_FALSE;
+            p_rec_hdr->b_ext = false;
             p_rec_hdr->l_ty_pts = U64_AT( &record_header[ 8 ] );
         }
         //fprintf( stderr, "parse_chunk_headers[%d] t=0x%x s=%d\n", i, p_rec_hdr->rec_type, p_rec_hdr->subrec_type );

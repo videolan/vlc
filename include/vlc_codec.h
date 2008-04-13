@@ -66,10 +66,10 @@ struct decoder_t
     es_format_t         fmt_out;
 
     /* Some decoders only accept packetized data (ie. not truncated) */
-    vlc_bool_t          b_need_packetized;
+    bool          b_need_packetized;
 
     /* Tell the decoder if it is allowed to drop frames */
-    vlc_bool_t          b_pace_control;
+    bool          b_pace_control;
 
     /* */
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
@@ -83,7 +83,7 @@ struct decoder_t
      * last pf_packetize/pf_decode_video call only,
      * pb_present will be used to known which cc channel are present (but
      * globaly, not necessary for the current packet */
-    block_t *           ( * pf_get_cc )      ( decoder_t *, vlc_bool_t pb_present[4] );
+    block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4] );
 
     /*
      * Buffers allocation

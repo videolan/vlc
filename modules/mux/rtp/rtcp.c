@@ -81,7 +81,7 @@ int rtcp_add_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos )
     if( !p_client )
         return VLC_ENOMEM;
     p_client->i_index = p_rtcp->i_clients + 1;
-    p_client->b_deleted = VLC_FALSE;
+    p_client->b_deleted = false;
     *i_pos = p_client->i_index ;
     INSERT_ELEM( p_rtcp->pp_clients, p_rtcp->i_clients,
                  p_client->i_index, p_client );
@@ -101,7 +101,7 @@ int rtcp_del_client( vlc_object_t *p_this, uint32_t u_ssrc )
     {
         rtcp_client_t *p_old = p_rtcp->pp_clients[i_pos];
 
-        p_old->b_deleted = VLC_TRUE;
+        p_old->b_deleted = true;
         p_old->i_timeout = 5 * (p_rtcp->i_date - p_rtcp->i_last_date) +
                            p_rtcp->i_next_date;
         p_rtcp->u_clients--;
@@ -193,7 +193,7 @@ int rtcp_find_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos )
  *--------------------------------------------------------------------------
  */
 uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_ssrc,
-                        vlc_bool_t b_sender, vlc_bool_t b_first )
+                        bool b_sender, bool b_first )
 {
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
     rtcp_client_t *p_client = NULL;
@@ -239,7 +239,7 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_s
  *--------------------------------------------------------------------------
  */
 void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_bandwidth,
-          uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first )
+          uint32_t u_ssrc, bool b_sender, bool *b_first )
 {
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
     rtcp_client_t *p_client = NULL;
@@ -282,7 +282,7 @@ void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_band
                 i_interval = rtcp_interval( p_this, u_bandwidth,
                                             u_ssrc, b_sender, *b_first );
                 rtcp_schedule( p_this, p_rtcp->i_next_date + i_interval, rtcp_event );
-                *b_first = VLC_FALSE;
+                *b_first = false;
             }
             else
             {
@@ -646,7 +646,7 @@ int rtcp_pkt_decode( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, block_t *p_block )
     bs_init( p_rtcp->bs, p_block->p_buffer, p_block->i_buffer );
 
     p_pkt->u_version = bs_read( p_rtcp->bs, 2 );
-    p_pkt->b_padding = bs_read( p_rtcp->bs, 1 ) ? VLC_TRUE : VLC_FALSE;
+    p_pkt->b_padding = bs_read( p_rtcp->bs, 1 ) ? true : false;
     p_pkt->u_report  = bs_read( p_rtcp->bs, 5 );
     p_pkt->u_payload_type = bs_read( p_rtcp->bs, 8 );
     p_pkt->u_length = bs_read( p_rtcp->bs, 16 );

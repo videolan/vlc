@@ -67,11 +67,11 @@ struct spu_t
     filter_t *p_blend;                            /**< alpha blending module */
     filter_t *p_text;                              /**< text renderer module */
     filter_t *p_scale;                                   /**< scaling module */
-    vlc_bool_t b_force_crop;               /**< force cropping of subpicture */
+    bool b_force_crop;               /**< force cropping of subpicture */
     int i_crop_x, i_crop_y, i_crop_width, i_crop_height;       /**< cropping */
 
     int i_margin;                        /**< force position of a subpicture */
-    vlc_bool_t b_force_palette;             /**< force palette of subpicture */
+    bool b_force_palette;             /**< force palette of subpicture */
     uint8_t palette[4][4];                               /**< forced palette */
 
     int ( *pf_control ) ( spu_t *, int, va_list );
@@ -110,7 +110,7 @@ enum spu_query_e
 VLC_EXPORT( spu_t *, __spu_Create, ( vlc_object_t * ) );
 VLC_EXPORT( int, spu_Init, ( spu_t * ) );
 VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
-void spu_Attach( spu_t *, vlc_object_t *, vlc_bool_t );
+void spu_Attach( spu_t *, vlc_object_t *, bool );
 
 VLC_EXPORT( subpicture_t *, spu_CreateSubpicture, ( spu_t * ) );
 VLC_EXPORT( void, spu_DestroySubpicture, ( spu_t *, subpicture_t * ) );
@@ -122,7 +122,7 @@ VLC_EXPORT( subpicture_region_t *,__spu_CreateRegion, ( vlc_object_t *, video_fo
 VLC_EXPORT( subpicture_region_t *,__spu_MakeRegion, ( vlc_object_t *, video_format_t *, picture_t * ) );
 #define spu_DestroyRegion(a,b) __spu_DestroyRegion(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __spu_DestroyRegion, ( vlc_object_t *, subpicture_region_t * ) );
-VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t, vlc_bool_t ) );
+VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t, bool ) );
 VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  video_format_t *, picture_t *, picture_t *, subpicture_t *, int, int ) );
 
 /** @}*/
@@ -337,7 +337,7 @@ struct osd_button_t
     int     i_height;       /*< height of button visible state image */
 
     /* range style button */
-    vlc_bool_t   b_range;    /*< button should be interpreted as range */
+    bool   b_range;    /*< button should be interpreted as range */
     int          i_ranges;   /*< number of states */
 };
 
@@ -371,8 +371,8 @@ struct osd_menu_state_t
     picture_t    *p_pic;  /*< pointer to picture to display */
     osd_button_t *p_visible; /*< shortcut to visible button */
 
-    vlc_bool_t b_menu_visible; /*< menu currently visible? */
-    vlc_bool_t b_update;       /*< update OSD Menu when VLC_TRUE */
+    bool b_menu_visible; /*< menu currently visible? */
+    bool b_update;       /*< update OSD Menu when true */
 
     /* quick hack to volume state. */
     osd_button_t *p_volume; /*< pointer to volume range object. */
@@ -539,7 +539,7 @@ static inline const osd_menu_state_t *osd_GetMenuState( osd_menu_t *p_osd )
  *
  * Returns 0 when no key has been pressed or the value of the key pressed.
  */
-static inline vlc_bool_t osd_GetKeyPressed( osd_menu_t *p_osd )
+static inline bool osd_GetKeyPressed( osd_menu_t *p_osd )
 {
     return( p_osd->p_state->b_update );
 }
@@ -560,10 +560,10 @@ static inline void osd_SetKeyPressed( vlc_object_t *p_this, int i_value )
 /**
  * Update the OSD Menu visibility flag.
  *
- * VLC_TRUE means OSD Menu should be shown. VLC_FALSE means OSD Menu
+ * true means OSD Menu should be shown. false means OSD Menu
  * should not be shown.
  */
-static inline void osd_SetMenuVisible( osd_menu_t *p_osd, vlc_bool_t b_value )
+static inline void osd_SetMenuVisible( osd_menu_t *p_osd, bool b_value )
 {
     vlc_value_t val;
 
@@ -575,9 +575,9 @@ static inline void osd_SetMenuVisible( osd_menu_t *p_osd, vlc_bool_t b_value )
  * Update the OSD Menu update flag
  *
  * If the OSD Menu should be updated then set the update flag to
- * VLC_TRUE, else to VLC_FALSE.
+ * true, else to false.
  */
-static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
+static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, bool b_value )
 {
     vlc_value_t val;
 

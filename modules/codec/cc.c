@@ -139,8 +139,8 @@ typedef struct
 } eia608_t;
 
 static void         Eia608Init( eia608_t * );
-static vlc_bool_t   Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
-static char        *Eia608Text( eia608_t *h, vlc_bool_t b_html );
+static bool   Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
+static char        *Eia608Text( eia608_t *h, bool b_html );
 static void         Eia608Exit( eia608_t * );
 
 /* It will be enough up to 63 B frames, which is far too high for
@@ -338,7 +338,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
         return NULL;
     }
 
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_pausable = true;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -367,8 +367,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
 
     p_spu->i_start = i_pts;
     p_spu->i_stop = i_pts + 10000000;   /* 10s max */
-    p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = false;
 
     return p_spu;
 }
@@ -377,7 +377,7 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     const int64_t i_pts = p_block->i_pts;
-    vlc_bool_t b_changed = VLC_FALSE;
+    bool b_changed = false;
 
     /* TODO do the real decoding here */
     while( p_block->i_buffer >= 3 )
@@ -394,8 +394,8 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
     static int64_t i_last = 0;
     if( b_changed )//&& i_pts - i_last > 100*1000 )
     {
-        char *psz_subtitle = Eia608Text( &p_sys->eia608, VLC_FALSE );
-        char *psz_html     = NULL;//Eia608Text( &p_sys->eia608, VLC_TRUE );
+        char *psz_subtitle = Eia608Text( &p_sys->eia608, false );
+        char *psz_html     = NULL;//Eia608Text( &p_sys->eia608, true );
         i_last = i_pts;
         return Subtitle( p_dec, psz_subtitle, psz_html, i_pts );
     }
@@ -463,18 +463,18 @@ static void Eia608ClearScreenRowX( eia608_t *h, int i_screen, int i_row, int x )
 
     if( x == 0 )
     {
-        screen->row_used[i_row] = VLC_FALSE;
+        screen->row_used[i_row] = false;
     }
     else
     {
-        screen->row_used[i_row] = VLC_FALSE;
+        screen->row_used[i_row] = false;
         for( i = 0; i < x; i++ )
         {
             if( screen->characters[i_row][i] != ' ' ||
                 screen->colors[i_row][i] != EIA608_COLOR_DEFAULT ||
                 screen->fonts[i_row][i] != EIA608_FONT_REGULAR )
             {
-                screen->row_used[i_row] = VLC_TRUE;
+                screen->row_used[i_row] = true;
                 break;
             }
         }
@@ -519,7 +519,7 @@ static int Eia608GetWritingScreenIndex( eia608_t *h )
     }
 }
 
-static void Eia608EraseScreen( eia608_t *h, vlc_bool_t b_displayed )
+static void Eia608EraseScreen( eia608_t *h, bool b_displayed )
 {
     Eia608ClearScreen( h, b_displayed ? h->i_screen : (1-h->i_screen) );
 }
@@ -538,7 +538,7 @@ static void Eia608Write( eia608_t *h, const uint8_t c )
     screen->characters[i_row][i_column] = c;
     screen->colors[i_row][i_column] = h->color;
     screen->fonts[i_row][i_column] = h->font;
-    screen->row_used[i_row] = VLC_TRUE;
+    screen->row_used[i_row] = true;
     Eia608Cursor( h, 1 );
 }
 static void Eia608Erase( eia608_t *h )
@@ -617,7 +617,7 @@ static void Eia608ParseChannel( eia608_t *h, uint8_t d1 )
     else if( d1 == 0x1d )
         h->i_channel = 4;
 }
-static vlc_bool_t Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
+static bool Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
 {
     const int i_index = d2 - 0x20;
     assert( d2 >= 0x20 && d2 <= 0x2f );
@@ -626,21 +626,21 @@ static vlc_bool_t Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
     h->font  = pac2_attribs[i_index].i_font;
     Eia608Cursor( h, 1 );
 
-    return VLC_FALSE;
+    return false;
 }
-static vlc_bool_t Eia608ParseSingle( eia608_t *h, const uint8_t dx )
+static bool Eia608ParseSingle( eia608_t *h, const uint8_t dx )
 {
     assert( dx >= 0x20 );
     Eia608Write( h, dx );
-    return VLC_TRUE;
+    return true;
 }
-static vlc_bool_t Eia608ParseDouble( eia608_t *h, uint8_t d2 )
+static bool Eia608ParseDouble( eia608_t *h, uint8_t d2 )
 {
     assert( d2 >= 0x30 && d2 <= 0x3f );
     Eia608Write( h, d2 + 0x50 ); /* We use charaters 0x80...0x8f */
-    return VLC_TRUE;
+    return true;
 }
-static vlc_bool_t Eia608ParseExtended( eia608_t *h, uint8_t d1, uint8_t d2 )
+static bool Eia608ParseExtended( eia608_t *h, uint8_t d1, uint8_t d2 )
 {
     assert( d2 >= 0x20 && d2 <= 0x3f );
     assert( d1 == 0x12 || d1 == 0x13 );
@@ -653,11 +653,11 @@ static vlc_bool_t Eia608ParseExtended( eia608_t *h, uint8_t d1, uint8_t d2 )
      * advanced one */
     Eia608Cursor( h, -1 );
     Eia608Write( h, d2 );
-    return VLC_TRUE;
+    return true;
 }
-static vlc_bool_t Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
+static bool Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
 {
-    vlc_bool_t b_changed = VLC_FALSE;
+    bool b_changed = false;
 
     switch( d2 )
     {
@@ -666,7 +666,7 @@ static vlc_bool_t Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
         break;
     case 0x21:  /* Backspace */
         Eia608Erase( h );
-        b_changed = VLC_TRUE;
+        b_changed = true;
         break;
     case 0x22:  /* Reserved */
     case 0x23:
@@ -679,9 +679,9 @@ static vlc_bool_t Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
     case 0x27:  /* Rollup 4 */
         if( h->mode == EIA608_MODE_POPUP || h->mode == EIA608_MODE_PAINTON )
         {
-            Eia608EraseScreen( h, VLC_TRUE );
-            Eia608EraseScreen( h, VLC_FALSE );
-            b_changed = VLC_TRUE;
+            Eia608EraseScreen( h, true );
+            Eia608EraseScreen( h, false );
+            b_changed = true;
         }
 
         if( d2 == 0x25 )
@@ -709,15 +709,15 @@ static vlc_bool_t Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
         break;
 
     case 0x2c: /* Erase displayed memory */
-        Eia608EraseScreen( h, VLC_TRUE );
-        b_changed = VLC_TRUE;
+        Eia608EraseScreen( h, true );
+        b_changed = true;
         break;
     case 0x2d: /* Carriage return */
         Eia608RollUp(h);
-        b_changed = VLC_TRUE;
+        b_changed = true;
         break;
     case 0x2e: /* Erase non displayed memory */
-        Eia608EraseScreen( h, VLC_FALSE );
+        Eia608EraseScreen( h, false );
         break;
     case 0x2f: /* End of caption (flip screen if not paint on) */
         if( h->mode != EIA608_MODE_PAINTON )
@@ -727,12 +727,12 @@ static vlc_bool_t Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
         h->cursor.i_row = 0;
         h->color = EIA608_COLOR_DEFAULT;
         h->font = EIA608_FONT_REGULAR;
-        b_changed = VLC_TRUE;
+        b_changed = true;
         break;
     }
     return b_changed;
 }
-static vlc_bool_t Eia608ParseCommand0x17( eia608_t *h, uint8_t d2 )
+static bool Eia608ParseCommand0x17( eia608_t *h, uint8_t d2 )
 {
     switch( d2 )
     {
@@ -746,9 +746,9 @@ static vlc_bool_t Eia608ParseCommand0x17( eia608_t *h, uint8_t d2 )
         Eia608Cursor( h, 3 );
         break;
     }
-    return VLC_FALSE;
+    return false;
 }
-static vlc_bool_t Eia608ParsePac( eia608_t *h, uint8_t d1, uint8_t d2 )
+static bool Eia608ParsePac( eia608_t *h, uint8_t d1, uint8_t d2 )
 {
     static const int pi_row[] = {
         11, -1, 1, 2, 3, 4, 12, 13, 14, 15, 5, 6, 7, 8, 9, 10
@@ -758,7 +758,7 @@ static vlc_bool_t Eia608ParsePac( eia608_t *h, uint8_t d1, uint8_t d2 )
     assert( d2 >= 0x40 && d2 <= 0x7f );
 
     if( pi_row[i_row_index] <= 0 )
-        return VLC_FALSE;
+        return false;
 
     /* Row */
     if( h->mode != EIA608_MODE_TEXT )
@@ -770,12 +770,12 @@ static vlc_bool_t Eia608ParsePac( eia608_t *h, uint8_t d1, uint8_t d2 )
     else if( d2 >= 0x40 )
         d2 -= 0x40;
     h->cursor.i_column = pac2_attribs[d2].i_column;
-    return VLC_FALSE;
+    return false;
 }
 
-static vlc_bool_t Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
+static bool Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
 {
-    vlc_bool_t b_changed = VLC_FALSE;
+    bool b_changed = false;
 
     if( d1 >= 0x18 && d1 <= 0x1f )
         d1 -= 8;
@@ -951,7 +951,7 @@ static void Eia608Strlcat( char *d, const char *s, int i_max )
         d[i_max-1] = '\0';
 }
 
-static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_text_max, int i_row, vlc_bool_t b_html )
+static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_text_max, int i_row, bool b_html )
 {
     const uint8_t *p_char = screen->characters[i_row];
     const eia608_color_t *p_color = screen->colors[i_row];
@@ -960,8 +960,8 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
     int i_end;
     int x;
     eia608_color_t last_color = EIA608_COLOR_DEFAULT;
-    vlc_bool_t     b_last_italics = VLC_FALSE;
-    vlc_bool_t     b_last_underline = VLC_FALSE;
+    bool     b_last_italics = false;
+    bool     b_last_underline = false;
 
     /* Search the start */
     i_start = 0;
@@ -978,14 +978,14 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
     for( x = i_start; x <= i_end; x++ )
     {
         eia608_color_t color = p_color[x];
-        vlc_bool_t b_italics = p_font[x] & EIA608_FONT_ITALICS;
-        vlc_bool_t b_underline = p_font[x] & EIA608_FONT_UNDERLINE;
+        bool b_italics = p_font[x] & EIA608_FONT_ITALICS;
+        bool b_underline = p_font[x] & EIA608_FONT_UNDERLINE;
         char utf8[4];
 
         /* */
         if( b_html )
         {
-            vlc_bool_t b_close_color, b_close_italics, b_close_underline;
+            bool b_close_color, b_close_italics, b_close_underline;
 
             /* We create the tags font / i / u in that orders */
             b_close_color = color != last_color && last_color != EIA608_COLOR_DEFAULT;
@@ -1069,18 +1069,18 @@ static void Eia608Init( eia608_t *h )
     h->font = EIA608_FONT_REGULAR;
     h->i_row_rollup = EIA608_SCREEN_ROWS-1;
 }
-static vlc_bool_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] )
+static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] )
 {
     const uint8_t d1 = data[0] & 0x7f; /* Removed parity bit TODO we might want to check them */
     const uint8_t d2 = data[1] & 0x7f;
-    vlc_bool_t b_screen_changed = VLC_FALSE;
+    bool b_screen_changed = false;
 
     if( d1 == 0 && d2 == 0 )
-        return VLC_FALSE;   /* Ignore padding */
+        return false;   /* Ignore padding */
 
     Eia608ParseChannel( h, d1 );
     if( h->i_channel != i_channel_selected )
-        return VLC_FALSE;
+        return false;
     //fprintf( stderr, "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC %x %x\n", data[0], data[1] );
 
     if( d1 >= 0x10 )
@@ -1099,11 +1099,11 @@ static vlc_bool_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_
     return b_screen_changed;
 }
 
-static char *Eia608Text( eia608_t *h, vlc_bool_t b_html )
+static char *Eia608Text( eia608_t *h, bool b_html )
 {
     const int i_size = EIA608_SCREEN_ROWS * 3 * EIA608_SCREEN_COLUMNS+1;
     struct eia608_screen *screen = &h->screen[h->i_screen];
-    vlc_bool_t b_first = VLC_TRUE;
+    bool b_first = true;
     char *psz;
     int i;
 
@@ -1119,7 +1119,7 @@ static char *Eia608Text( eia608_t *h, vlc_bool_t b_html )
 
         if( !b_first )
             Eia608Strlcat( psz, b_html ? "<br />" : "\n", i_size );
-        b_first = VLC_FALSE;
+        b_first = false;
 
         Eia608TextLine( screen, psz, i_size, i, b_html );
     }

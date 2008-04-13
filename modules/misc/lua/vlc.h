@@ -240,7 +240,7 @@ void __vlclua_read_custom_meta_data( vlc_object_t *, lua_State *,
                                      input_item_t *);
 #define vlclua_read_custom_meta_data(a,b,c) __vlclua_read_custom_meta_data(VLC_OBJECT(a),b,c)
 int __vlclua_playlist_add_internal( vlc_object_t *, lua_State *, playlist_t *,
-                                    input_item_t *, vlc_bool_t );
+                                    input_item_t *, bool );
 #define vlclua_playlist_add_internal(a,b,c,d,e) __vlclua_playlist_add_internal(VLC_OBJECT(a),b,c,d,e)
 
 

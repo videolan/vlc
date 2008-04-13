@@ -114,7 +114,7 @@ static long STDCALL GetBufferAndLength( IMediaBuffer *This,
 }
 
 CMediaBuffer *CMediaBufferCreate( block_t *p_block, int i_max_size,
-                                  vlc_bool_t b_own )
+                                  bool b_own )
 {
     CMediaBuffer *p_mb = (CMediaBuffer *)malloc( sizeof(CMediaBuffer) );
     if( !p_mb ) return NULL;

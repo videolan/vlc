@@ -312,7 +312,7 @@ VLC_PUBLIC_API void mediacontrol_sound_set_volume( mediacontrol_Instance *self,
  * \param visual_id the Xid or HWND, depending on the platform
  * \param exception an initialized exception pointer
  */
-VLC_PUBLIC_API vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
+VLC_PUBLIC_API bool mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception );
 

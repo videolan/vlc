@@ -67,7 +67,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
         return;
     }
 
-    xml_ReaderUseDTD( m_pReader, useDTD ? VLC_TRUE : VLC_FALSE );
+    xml_ReaderUseDTD( m_pReader, useDTD ? true : false );
 
 }
 

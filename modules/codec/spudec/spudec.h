@@ -46,12 +46,12 @@ typedef struct subpicture_data_t
     void *p_data;
 
     /* Color information */
-    vlc_bool_t b_palette;
+    bool b_palette;
     uint8_t    pi_alpha[4];
     uint8_t    pi_yuv[4][3];
 
     /* Auto crop fullscreen subtitles */
-    vlc_bool_t b_auto_crop;
+    bool b_auto_crop;
     int i_y_top_offset;
     int i_y_bottom_offset;
 

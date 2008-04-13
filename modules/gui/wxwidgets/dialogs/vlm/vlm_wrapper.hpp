@@ -38,22 +38,22 @@ public:
     VLMWrapper( intf_thread_t * );
     virtual ~VLMWrapper();
 
-    vlc_bool_t AttachVLM();
+    bool AttachVLM();
     void LockVLM();
     void UnlockVLM();
 
     void AddBroadcast( const char*, const char*, const char*,
-                       vlc_bool_t b_enabled = VLC_TRUE,
-                       vlc_bool_t b_loop = VLC_TRUE );
+                       bool b_enabled = true,
+                       bool b_loop = true );
     void EditBroadcast( const char*, const char*, const char*,
-                       vlc_bool_t b_enabled = VLC_TRUE,
-                       vlc_bool_t b_loop = VLC_TRUE );
+                       bool b_enabled = true,
+                       bool b_loop = true );
     void AddVod( const char*, const char*, const char*,
-                       vlc_bool_t b_enabled = VLC_TRUE,
-                       vlc_bool_t b_loop = VLC_TRUE );
+                       bool b_enabled = true,
+                       bool b_loop = true );
     void EditVod( const char*, const char*, const char*,
-                       vlc_bool_t b_enabled = VLC_TRUE,
-                       vlc_bool_t b_loop = VLC_TRUE );
+                       bool b_enabled = true,
+                       bool b_loop = true );
 
     unsigned int NbMedia() { if( p_vlm ) return p_vlm->i_media; return 0; }
     vlm_media_t *GetMedia( int i )

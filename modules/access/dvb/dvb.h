@@ -69,13 +69,13 @@ typedef struct en50221_mmi_object_t
     {
         struct
         {
-            vlc_bool_t b_blind;
+            bool b_blind;
             char *psz_text;
         } enq;
 
         struct
         {
-            vlc_bool_t b_ok;
+            bool b_ok;
             char *psz_answ;
         } answ;
 
@@ -137,16 +137,16 @@ struct access_sys_t
     int i_handle, i_frontend_handle;
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
-    vlc_bool_t b_budget_mode;
+    bool b_budget_mode;
 
     /* CA management */
     int i_ca_handle;
     int i_ca_type;
     int i_nb_slots;
-    vlc_bool_t pb_active_slot[MAX_CI_SLOTS];
-    vlc_bool_t pb_tc_has_data[MAX_CI_SLOTS];
-    vlc_bool_t pb_slot_mmi_expected[MAX_CI_SLOTS];
-    vlc_bool_t pb_slot_mmi_undisplayed[MAX_CI_SLOTS];
+    bool pb_active_slot[MAX_CI_SLOTS];
+    bool pb_tc_has_data[MAX_CI_SLOTS];
+    bool pb_slot_mmi_expected[MAX_CI_SLOTS];
+    bool pb_slot_mmi_undisplayed[MAX_CI_SLOTS];
     en50221_session_t p_sessions[MAX_SESSIONS];
     mtime_t i_ca_timeout, i_ca_next_event, i_frontend_timeout;
     dvbpsi_pmt_t *pp_selected_programs[MAX_PROGRAMS];
@@ -164,7 +164,7 @@ struct access_sys_t
     vlc_mutex_t         httpd_mutex;
     vlc_cond_t          httpd_cond;
     mtime_t             i_httpd_timeout;
-    vlc_bool_t          b_request_frontend_info, b_request_mmi_info;
+    bool          b_request_frontend_info, b_request_mmi_info;
     char                *psz_frontend_info, *psz_mmi_info;
     char                *psz_request;
 #endif

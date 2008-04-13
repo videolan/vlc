@@ -58,8 +58,8 @@ vlc_module_begin();
     add_shortcut ("file");
     set_callbacks (Open, Close);
 
-    add_bool ("file-mmap", VLC_TRUE, NULL,
-              FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, VLC_TRUE);
+    add_bool ("file-mmap", true, NULL,
+              FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true);
 vlc_module_end();
 
 static block_t *Block (access_t *);
@@ -177,7 +177,7 @@ static block_t *Block (access_t *p_access)
         /* Really at end of file then */
         if ((uint64_t)p_access->info.i_pos >= (uint64_t)p_access->info.i_size)
         {
-            p_access->info.b_eof = VLC_TRUE;
+            p_access->info.b_eof = true;
             msg_Dbg (p_access, "at end of memory mapped file");
             return NULL;
         }
@@ -213,7 +213,7 @@ static block_t *Block (access_t *p_access)
     if (addr == MAP_FAILED)
     {
         msg_Err (p_access, "memory mapping failed (%m)");
-        intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
+        intf_UserFatal (p_access, false, _("File reading failed"),
                         _("VLC could not read the file."));
         msleep (INPUT_ERROR_SLEEP);
         return NULL;
@@ -257,7 +257,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
 #endif
 
     p_access->info.i_pos = i_pos;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     return VLC_SUCCESS;
 }
 
@@ -272,7 +272,7 @@ static int Control (access_t *p_access, int query, va_list args)
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            *((vlc_bool_t *)va_arg (args, vlc_bool_t *)) = VLC_TRUE;
+            *((bool *)va_arg (args, bool *)) = true;
             return VLC_SUCCESS;
 
         case ACCESS_GET_MTU:

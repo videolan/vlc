@@ -114,8 +114,8 @@
 
 - (void)showPanel;
 - (void)initStrings;
-- (void)changeVoutFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
-- (void)changeVideoFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
-- (void)changeAFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)changeVoutFiltersString: (char *)psz_name onOrOff: (bool )b_add;
+- (void)changeVideoFiltersString: (char *)psz_name onOrOff: (bool )b_add;
+- (void)changeAFiltersString: (char *)psz_name onOrOff: (bool )b_add;
 - (void)savePrefs;
 @end

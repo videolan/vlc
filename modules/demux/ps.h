@@ -34,7 +34,7 @@ static inline const uint8_t *ps_id_to_lang( const ps_psm_t *, int );
 
 typedef struct
 {
-    vlc_bool_t  b_seen;
+    bool  b_seen;
     int         i_skip;
     int         i_id;
     es_out_id_t *es;
@@ -50,7 +50,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
     int i;
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
-        tk[i].b_seen = VLC_FALSE;
+        tk[i].b_seen = false;
         tk[i].i_skip = 0;
         tk[i].i_id   = 0;
         tk[i].es     = NULL;
@@ -163,7 +163,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     }
 
     /* PES packets usually contain truncated frames */
-    tk->fmt.b_packetized = VLC_FALSE;
+    tk->fmt.b_packetized = false;
 
     if( ps_id_to_lang( p_psm, i_id ) )
     {
@@ -329,7 +329,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
             {
                 if( !ps_track_fill( &tk[i_tk], p_psm, i_id ) )
                 {
-                    tk[i_tk].b_seen = VLC_TRUE;
+                    tk[i_tk].b_seen = true;
                 }
             }
         }
@@ -602,7 +602,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
 
         es_out_Del( out, tk[i].es );
         tk[i] = tk_tmp;
-        tk[i].b_seen = VLC_TRUE;
+        tk[i].b_seen = true;
         tk[i].es = es_out_Add( out, &tk[i].fmt );
     }
 

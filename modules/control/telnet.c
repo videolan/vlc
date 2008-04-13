@@ -93,13 +93,13 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_string( "telnet-host", "", NULL, TELNETHOST_TEXT,
-                 TELNETHOST_LONGTEXT, VLC_TRUE );
+                 TELNETHOST_LONGTEXT, true );
     add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
-                 TELNETPORT_LONGTEXT, VLC_TRUE );
+                 TELNETPORT_LONGTEXT, true );
     add_password( "telnet-password", TELNETPWD_DEFAULT, NULL, TELNETPWD_TEXT,
-                TELNETPWD_LONGTEXT, VLC_TRUE );
+                TELNETPWD_LONGTEXT, true );
     set_description( _("VLM remote control interface") );
-    add_category_hint( "VLM", NULL, VLC_FALSE );
+    add_category_hint( "VLM", NULL, false );
     set_capability( "interface", 0 );
     set_callbacks( Open , Close );
 vlc_module_end();

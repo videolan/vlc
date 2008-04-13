@@ -317,7 +317,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
                                                ( i ? PLAYLIST_PREPARSE : 0 ) )
                          : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
                       PLAYLIST_END,
-                      pl ? VLC_TRUE : VLC_FALSE, VLC_FALSE );
+                      pl ? true : false, false );
         i++;
     }
 }
@@ -354,8 +354,8 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
         /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
-                       PLAYLIST_END, pl, VLC_FALSE );
-        input_Read( THEPL, p_input, VLC_FALSE );
+                       PLAYLIST_END, pl, false );
+        input_Read( THEPL, p_input, false );
         vlc_gc_decref( p_input );
     }
 }
@@ -446,7 +446,7 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
 
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
-                        -1, &psz_option, 1, VLC_TRUE, VLC_FALSE );
+                        -1, &psz_option, 1, true, false );
     }
 }
 

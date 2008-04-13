@@ -405,23 +405,23 @@ vlc_module_begin();
 
     add_bool( "mkv-use-ordered-chapters", 1, NULL,
             N_("Ordered chapters"),
-            N_("Play ordered chapters as specified in the segment."), VLC_TRUE );
+            N_("Play ordered chapters as specified in the segment."), true );
 
     add_bool( "mkv-use-chapter-codec", 1, NULL,
             N_("Chapter codecs"),
-            N_("Use chapter codecs found in the segment."), VLC_TRUE );
+            N_("Use chapter codecs found in the segment."), true );
 
     add_bool( "mkv-preload-local-dir", 1, NULL,
             N_("Preload Directory"),
-            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), VLC_TRUE );
+            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), true );
 
     add_bool( "mkv-seek-percent", 0, NULL,
             N_("Seek based on percent not time"),
-            N_("Seek based on percent not time."), VLC_TRUE );
+            N_("Seek based on percent not time."), true );
 
     add_bool( "mkv-use-dummy", 0, NULL,
             N_("Dummy Elements"),
-            N_("Read and discard unknown EBML elements (not good for broken files)."), VLC_TRUE );
+            N_("Read and discard unknown EBML elements (not good for broken files)."), true );
 
     add_shortcut( "mka" );
     add_shortcut( "mkv" );
@@ -510,11 +510,11 @@ class vlc_stream_io_callback: public IOCallback
 {
   private:
     stream_t       *s;
-    vlc_bool_t     mb_eof;
-    vlc_bool_t     b_owner;
+    bool     mb_eof;
+    bool     b_owner;
 
   public:
-    vlc_stream_io_callback( stream_t *, vlc_bool_t );
+    vlc_stream_io_callback( stream_t *, bool );
 
     virtual ~vlc_stream_io_callback()
     {
@@ -556,8 +556,8 @@ class EbmlParser
     EbmlElement *m_got;
 
     int         mi_user_level;
-    vlc_bool_t  mb_keep;
-    vlc_bool_t  mb_dummy;
+    bool  mb_keep;
+    bool  mb_dummy;
 };
 
 
@@ -577,8 +577,8 @@ typedef struct
 {
 //    ~mkv_track_t();
 
-    vlc_bool_t   b_default;
-    vlc_bool_t   b_enabled;
+    bool   b_default;
+    bool   b_enabled;
     unsigned int i_number;
 
     int          i_extra_data;
@@ -598,14 +598,14 @@ typedef struct
     /* audio */
     unsigned int i_original_rate;
 
-    vlc_bool_t      b_inited;
+    bool      b_inited;
     /* data to be send first */
     int             i_data_init;
     uint8_t         *p_data_init;
 
     /* hack : it's for seek */
-    vlc_bool_t      b_search_keyframe;
-    vlc_bool_t      b_silent;
+    bool      b_search_keyframe;
+    bool      b_silent;
 
     /* informative */
     const char   *psz_codec_name;
@@ -627,7 +627,7 @@ typedef struct
     int64_t i_position;
     int64_t i_time;
 
-    vlc_bool_t b_key;
+    bool b_key;
 } mkv_index_t;
 
 class demux_sys_t;
@@ -1023,7 +1023,7 @@ public:
         ,p_segment_uid(NULL)
         ,p_prev_segment_uid(NULL)
         ,p_next_segment_uid(NULL)
-        ,b_cues(VLC_FALSE)
+        ,b_cues(false)
         ,i_index(0)
         ,i_index_max(1024)
         ,psz_muxing_application(NULL)
@@ -1112,7 +1112,7 @@ public:
     KaxPrevUID              *p_prev_segment_uid;
     KaxNextUID              *p_next_segment_uid;
 
-    vlc_bool_t              b_cues;
+    bool              b_cues;
     int                     i_index;
     int                     i_index_max;
     mkv_index_t             *p_indexes;
@@ -1279,8 +1279,8 @@ typedef struct
     demux_t        *p_demux;
     vlc_mutex_t     lock;
 
-    vlc_bool_t      b_moved;
-    vlc_bool_t      b_clicked;
+    bool      b_moved;
+    bool      b_clicked;
     int             i_key_action;
 
 } event_thread_t;
@@ -1446,7 +1446,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
 
-    p_io_callback = new vlc_stream_io_callback( p_demux->s, VLC_FALSE );
+    p_io_callback = new vlc_stream_io_callback( p_demux->s, false );
     p_io_stream = new EbmlStream( *p_io_callback );
 
     if( p_io_stream == NULL )
@@ -1545,7 +1545,7 @@ static int Open( vlc_object_t * p_this )
 
                             if ( file_ok )
                             {
-                                vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, VLC_TRUE );
+                                vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, true );
                                 EbmlStream *p_estream = new EbmlStream(*p_file_io);
 
                                 p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_estream );
@@ -1762,7 +1762,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
                 else
 #endif
                     idx.i_time        = (*pp_block).GlobalTimecode() / (mtime_t)1000;
-                idx.b_key         = *pi_ref1 == 0 ? VLC_TRUE : VLC_FALSE;
+                idx.b_key         = *pi_ref1 == 0 ? true : false;
             }
 #undef idx
             return VLC_SUCCESS;
@@ -1800,7 +1800,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
                 // reset silent tracks
                 for (size_t i=0; i<tracks.size(); i++)
                 {
-                    tracks[i]->b_silent = VLC_FALSE;
+                    tracks[i]->b_silent = false;
                 }
 
                 ep->Down();
@@ -1882,7 +1882,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
                 {
                     if ( tracks[i]->i_number == uint32(track_num))
                     {
-                        tracks[i]->b_silent = VLC_TRUE;
+                        tracks[i]->b_silent = true;
                         break;
                     }
                 }
@@ -1917,7 +1917,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 
     size_t          i_track;
     unsigned int    i;
-    vlc_bool_t      b;
+    bool      b;
 
 #define tk  p_segment->tracks[i_track]
     for( i_track = 0; i_track < p_segment->tracks.size(); i_track++ )
@@ -1954,7 +1954,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 
         if( !b )
         {
-            tk->b_inited = VLC_FALSE;
+            tk->b_inited = false;
             return;
         }
     }
@@ -1969,7 +1969,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         p_init = MemToBlock( p_demux, tk->p_data_init, tk->i_data_init, 0 );
         if( p_init ) es_out_Send( p_demux->out, tk->p_es, p_init );
     }
-    tk->b_inited = VLC_TRUE;
+    tk->b_inited = true;
 
 
 #if LIBMATROSKA_VERSION >= 0x000800
@@ -2353,7 +2353,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
                                                        tracks[i_track]->p_extra_data,
                                                        tracks[i_track]->i_extra_data,
-                                                       VLC_FALSE );
+                                                       false );
             MP4_ReadBoxCommon( p_mp4_stream, p_box );
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
             tracks[i_track]->fmt.i_codec = p_box->i_type;
@@ -2662,10 +2662,10 @@ void demux_sys_t::StartUiThread()
         /* Now create our event thread catcher */
         p_ev = (event_thread_t *) vlc_object_create( &demuxer, sizeof( event_thread_t ) );
         p_ev->p_demux = &demuxer;
-        p_ev->b_die = VLC_FALSE;
+        p_ev->b_die = false;
         vlc_mutex_init( p_ev, &p_ev->lock );
         vlc_thread_create( p_ev, "mkv event thread handler", EventThread,
-                        VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+                        VLC_THREAD_PRIORITY_LOW, false );
     }
 }
 
@@ -2702,11 +2702,11 @@ int demux_sys_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_ev->lock );
     if( psz_var[6] == 'c' )
     {
-        p_ev->b_clicked = VLC_TRUE;
+        p_ev->b_clicked = true;
         msg_Dbg( p_this, "Event Mouse: clicked");
     }
     else if( psz_var[6] == 'm' )
-        p_ev->b_moved = VLC_TRUE;
+        p_ev->b_moved = true;
     vlc_mutex_unlock( &p_ev->lock );
 
     return VLC_SUCCESS;
@@ -2730,8 +2730,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
     vlc_object_t   *p_vout = NULL;
 
-    p_ev->b_moved   = VLC_FALSE;
-    p_ev->b_clicked = VLC_FALSE;
+    p_ev->b_moved   = false;
+    p_ev->b_clicked = false;
     p_ev->i_key_action = 0;
 
     /* catch all key event */
@@ -2747,7 +2747,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             continue;
         }
 
-        vlc_bool_t b_activated = VLC_FALSE;
+        bool b_activated = false;
 
         /* KEY part */
         if( p_ev->i_key_action )
@@ -2857,7 +2857,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 }
                 break;
             case ACTIONID_NAV_ACTIVATE:
-                b_activated = VLC_TRUE;
+                b_activated = true;
  
                 if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
                 {
@@ -2898,7 +2898,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 
                 msg_Dbg( p_ev->p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", (unsigned)valx.i_int, (unsigned)valy.i_int);
 
-                b_activated = VLC_TRUE;
+                b_activated = true;
                 // get current button
                 best = 0;
                 dist = 0x08000000; /* >> than  (720*720)+(567*567); */
@@ -2977,7 +2977,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                             val.p_address = (void *)p_sys->palette;
                             var_Set( p_sys->p_input, "menu-palette", val );
 
-                            val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
+                            val.b_bool = true; var_Set( p_sys->p_input, "highlight", val );
                             vlc_mutex_unlock( p_mutex );
                         }
                     }
@@ -2990,8 +2990,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 //                dvdnav_mouse_select( NULL, pci, valx.i_int, valy.i_int );
             }
 
-            p_ev->b_moved = VLC_FALSE;
-            p_ev->b_clicked = VLC_FALSE;
+            p_ev->b_moved = false;
+            p_ev->b_clicked = false;
             vlc_mutex_unlock( &p_ev->lock );
         }
 
@@ -3611,11 +3611,11 @@ static int Demux( demux_t *p_demux)
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
-vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, vlc_bool_t b_owner_ )
+vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, bool b_owner_ )
 {
     s = s_;
     b_owner = b_owner_;
-    mb_eof = VLC_FALSE;
+    mb_eof = false;
 }
 
 uint32 vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
@@ -3646,14 +3646,14 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 
     if( i_pos < 0 || i_pos >= stream_Size( s ) )
     {
-        mb_eof = VLC_TRUE;
+        mb_eof = true;
         return;
     }
 
-    mb_eof = VLC_FALSE;
+    mb_eof = false;
     if( stream_Seek( s, i_pos ) )
     {
-        mb_eof = VLC_TRUE;
+        mb_eof = true;
     }
     return;
 }
@@ -3691,7 +3691,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux 
     }
     mi_level = 1;
     mi_user_level = 1;
-    mb_keep = VLC_FALSE;
+    mb_keep = false;
     mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
@@ -3705,7 +3705,7 @@ EbmlParser::~EbmlParser( void )
         {
             delete m_el[i];
         }
-        mb_keep = VLC_FALSE;
+        mb_keep = false;
     }
 }
 
@@ -3721,7 +3721,7 @@ EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
         }
     }
     m_got = NULL;
-    mb_keep = VLC_FALSE;
+    mb_keep = false;
     if ( m_el[1]->GetElementPosition() == i_cluster_pos )
     {
         m_es->I_O().setFilePointer( i_block_pos, seek_beginning );
@@ -3757,7 +3757,7 @@ void EbmlParser::Down( void )
 
 void EbmlParser::Keep( void )
 {
-    mb_keep = VLC_TRUE;
+    mb_keep = true;
 }
 
 int EbmlParser::GetLevel( void )
@@ -3806,7 +3806,7 @@ EbmlElement *EbmlParser::Get( void )
         {
             delete m_el[mi_level];
         }
-        mb_keep = VLC_FALSE;
+        mb_keep = false;
     }
 
     m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy != 0, 1 );
@@ -3862,7 +3862,7 @@ void matroska_segment_c::LoadCues( )
 //        IndexAppendCluster( cluster );
     }
 
-    vlc_bool_t b_seekable;
+    bool b_seekable;
 
     stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable );
     if( !b_seekable )
@@ -3890,7 +3890,7 @@ void matroska_segment_c::LoadCues( )
             idx.i_block_number= -1;
             idx.i_position    = -1;
             idx.i_time        = 0;
-            idx.b_key         = VLC_TRUE;
+            idx.b_key         = true;
 
             ep->Down();
             while( ( el = ep->Get() ) != NULL )
@@ -3965,7 +3965,7 @@ void matroska_segment_c::LoadCues( )
     delete ep;
     delete cues;
 
-    b_cues = VLC_TRUE;
+    b_cues = true;
 
     msg_Dbg( &sys.demuxer, "loading cues done." );
     es.I_O().setFilePointer( i_sav_position, seek_beginning );
@@ -4186,9 +4186,9 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->fmt.psz_language = strdup("English");
     tk->fmt.psz_description = NULL;
 
-    tk->b_default = VLC_TRUE;
-    tk->b_enabled = VLC_TRUE;
-    tk->b_silent = VLC_FALSE;
+    tk->b_default = true;
+    tk->b_enabled = true;
+    tk->b_silent = false;
     tk->i_number = tracks.size() - 1;
     tk->i_extra_data = 0;
     tk->p_extra_data = NULL;
@@ -4196,7 +4196,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->i_default_duration = 0;
     tk->f_timecodescale = 1.0;
 
-    tk->b_inited = VLC_FALSE;
+    tk->b_inited = false;
     tk->i_data_init = 0;
     tk->p_data_init = NULL;
 
@@ -5148,7 +5148,7 @@ void matroska_segment_c::InformationCreate( )
 
     if( i_tags_position >= 0 )
     {
-        vlc_bool_t b_seekable;
+        bool b_seekable;
 
         stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable );
         if( b_seekable )
@@ -5170,7 +5170,7 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     idx.i_block_number= -1;
     idx.i_position    = cluster->GetElementPosition();
     idx.i_time        = -1;
-    idx.b_key         = VLC_TRUE;
+    idx.b_key         = true;
 
     i_index++;
     if( i_index >= i_index_max )
@@ -5748,7 +5748,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
     {
         if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
         {
-            tracks[i_track]->b_search_keyframe = VLC_TRUE;
+            tracks[i_track]->b_search_keyframe = true;
             i_track_skipping++;
         }
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, i_date );
@@ -5800,7 +5800,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
             {
                 if( i_block_ref1 == 0 && tracks[i_track]->b_search_keyframe )
                 {
-                    tracks[i_track]->b_search_keyframe = VLC_FALSE;
+                    tracks[i_track]->b_search_keyframe = false;
                     i_track_skipping--;
                 }
                 if( !tracks[i_track]->b_search_keyframe )

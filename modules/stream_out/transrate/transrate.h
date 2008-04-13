@@ -87,7 +87,7 @@ typedef struct
     unsigned int new_quantizer_scale;
     unsigned int last_coded_scale;
     int   h_offset, v_offset;
-    vlc_bool_t b_error;
+    bool b_error;
 
     // mb
     double qrate;
@@ -103,7 +103,7 @@ typedef struct
 struct sout_stream_id_t
 {
     void            *id;
-    vlc_bool_t      b_transrate;
+    bool      b_transrate;
 
     block_t         *p_current_buffer;
     block_t           *p_next_gop;

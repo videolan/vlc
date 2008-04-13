@@ -51,7 +51,7 @@ namespace wxvlc
 
         char *psz_bands;
         float f_preamp;
-        vlc_bool_t b_update;
+        bool b_update;
     private:
         /* General layout */
         wxPanel *VideoPanel( wxWindow * );
@@ -98,7 +98,7 @@ namespace wxvlc
         DECLARE_EVENT_TABLE();
 
         intf_thread_t *p_intf;
-        vlc_bool_t b_my_update;
+        bool b_my_update;
         wxWindow *p_parent;
     };
 };

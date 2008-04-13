@@ -256,7 +256,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
  *****************************************************************************/
 void ItemInfoDialog::OnOk()
 {
-    int b_state = VLC_FALSE;
+    int b_state = false;
 
     TCHAR psz_name[MAX_PATH];
     Edit_GetText( name_text, psz_name, MAX_PATH );
@@ -267,22 +267,22 @@ void ItemInfoDialog::OnOk()
     input_item_SetURI( &p_item->input, _TOMB(psz_uri) );
 
     vlc_mutex_lock( &p_item->input.lock );
-    vlc_bool_t b_old_enabled = p_item->b_enabled;
+    bool b_old_enabled = p_item->b_enabled;
 
     playlist_t * p_playlist = (playlist_t *)
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
         b_state = SendMessage( enabled_checkbox, BM_GETCHECK, 0, 0 );
-        if( b_old_enabled == VLC_FALSE && (b_state & BST_CHECKED) )
+        if( b_old_enabled == false && (b_state & BST_CHECKED) )
             p_playlist->i_enabled ++;
-        else if( b_old_enabled == VLC_TRUE && (b_state & BST_UNCHECKED) )
+        else if( b_old_enabled == true && (b_state & BST_UNCHECKED) )
             p_playlist->i_enabled --;
 
         vlc_object_release( p_playlist );
     }
 
-    p_item->b_enabled = (b_state & BST_CHECKED) ? VLC_TRUE : VLC_FALSE ;
+    p_item->b_enabled = (b_state & BST_CHECKED) ? true : false ;
 
     vlc_mutex_unlock( &p_item->input.lock );
 }

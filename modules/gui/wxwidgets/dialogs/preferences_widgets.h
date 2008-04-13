@@ -37,7 +37,7 @@ public:
 
     wxString GetName();
     int GetType();
-    vlc_bool_t IsAdvanced();
+    bool IsAdvanced();
 
     void SetUpdateCallback( void (*)( void * ), void * );
 
@@ -55,7 +55,7 @@ protected:
 private:
     wxString name;
     int i_type;
-    vlc_bool_t b_advanced;
+    bool b_advanced;
 };
 
 ConfigControl *CreateConfigControl( vlc_object_t *,

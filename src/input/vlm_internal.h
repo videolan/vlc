@@ -39,7 +39,7 @@ typedef struct
     /* "playlist" index */
     int i_index;
 
-    vlc_bool_t      b_sout_keep;
+    bool      b_sout_keep;
 
     input_item_t    *p_item;
     input_thread_t  *p_input;
@@ -67,7 +67,7 @@ typedef struct
 {
     /* names "schedule" is reserved */
     char    *psz_name;
-    vlc_bool_t b_enabled;
+    bool b_enabled;
     /* list of commands to execute on date */
     int i_command;
     char **command;

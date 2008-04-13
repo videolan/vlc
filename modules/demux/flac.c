@@ -62,7 +62,7 @@ static int  ReadMeta( demux_t *, uint8_t **pp_streaminfo, int *pi_streaminfo );
 
 struct demux_sys_t
 {
-    vlc_bool_t  b_start;
+    bool  b_start;
     es_out_id_t *p_es;
 
     /* Packetizer */
@@ -118,7 +118,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->b_start = VLC_TRUE;
+    p_sys->b_start = true;
     p_sys->p_meta = NULL;
     memset( &p_sys->replay_gain, 0, sizeof(p_sys->replay_gain) );
     p_sys->i_length = 0;
@@ -211,7 +211,7 @@ static int Demux( demux_t *p_demux )
         return 0;
 
     p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? 1 : 0;
-    p_sys->b_start = VLC_FALSE;
+    p_sys->b_start = false;
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize(
                 p_sys->p_packetizer, &p_block_in )) )
@@ -224,7 +224,7 @@ static int Demux( demux_t *p_demux )
 
             if( p_sys->p_es == NULL )
             {
-                p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                p_sys->p_packetizer->fmt_out.b_packetized = true;
                 p_sys->p_packetizer->fmt_out.audio_replay_gain = p_sys->replay_gain;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
@@ -286,7 +286,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     int64_t i_next_offset;
     int64_t i_delta_time;
     int64_t i_delta_offset;
-    vlc_bool_t b_seekable;
+    bool b_seekable;
     int i;
 
     /* */
@@ -347,8 +347,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_HAS_UNSUPPORTED_META )
     {
-        vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        bool *pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_GET_LENGTH )
@@ -429,7 +429,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     demux_sys_t *p_sys = p_demux->p_sys;
     int     i_peek;
     const uint8_t *p_peek;
-    vlc_bool_t b_last;
+    bool b_last;
     int i_sample_rate;
     int64_t i_sample_count;
     seekpoint_t *s;

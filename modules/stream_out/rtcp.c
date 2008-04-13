@@ -61,7 +61,7 @@ struct rtcp_sender_t
 
 
 rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
-                         vlc_bool_t mux)
+                         bool mux)
 {
     rtcp_sender_t *rtcp;
     uint8_t *ptr;

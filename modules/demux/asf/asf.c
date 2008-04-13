@@ -94,7 +94,7 @@ struct demux_sys_t
     int64_t             i_data_begin;
     int64_t             i_data_end;
 
-    vlc_bool_t          b_index;
+    bool          b_index;
     vlc_meta_t          *meta;
 };
 
@@ -174,7 +174,7 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
-                    intf_UserFatal( p_demux, VLC_FALSE, _("Could not demux ASF stream"),
+                    intf_UserFatal( p_demux, false, _("Could not demux ASF stream"),
                                     _("VLC failed to load the ASF header.") );
                     return 0;
                 }
@@ -663,11 +663,11 @@ loop_error_recovery:
 static int DemuxInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_bool_t b_seekable;
+    bool b_seekable;
     unsigned int i_stream, i;
     asf_object_content_description_t *p_cd;
     asf_object_index_t *p_index;
-    vlc_bool_t b_index;
+    bool b_index;
 
     /* init context */
     p_sys->i_time   = -1;
@@ -718,7 +718,7 @@ static int DemuxInit( demux_t *p_demux )
     {
         asf_track_t    *tk;
         asf_object_stream_properties_t *p_sp;
-        vlc_bool_t b_access_selected;
+        bool b_access_selected;
 
         p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
                                &asf_object_stream_properties_guid,
@@ -797,7 +797,7 @@ static int DemuxInit( demux_t *p_demux )
             {
                 /* DVR-MS special ASF */
                 fmt.i_codec = VLC_FOURCC( 'm','p','g','2' ) ;
-                fmt.b_packetized = VLC_FALSE;
+                fmt.b_packetized = false;
             }
 
             if( p_sp->i_type_specific_data_length > 11 +
@@ -879,7 +879,7 @@ static int DemuxInit( demux_t *p_demux )
                 fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
                 fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
                 fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
-                fmt.b_packetized = VLC_TRUE;
+                fmt.b_packetized = true;
 
                 if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) &&
                     i_format != WAVE_FORMAT_MPEGLAYER3 &&

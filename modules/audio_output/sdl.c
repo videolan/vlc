@@ -214,7 +214,7 @@ static int Open ( vlc_object_t *p_this )
         var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     }
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 
     p_aout->output.output.i_rate = obtained.freq;

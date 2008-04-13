@@ -62,7 +62,7 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
             "environment variable.")
 
 vlc_module_begin();
-    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
     set_description( "General Graphics Interface video output" );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );
@@ -86,7 +86,7 @@ struct vout_sys_t
     ggi_directbuffer *  pp_buffer[2];                             /* buffers */
     int                 i_index;
 
-    vlc_bool_t          b_must_acquire;   /* must be acquired before writing */
+    bool          b_must_acquire;   /* must be acquired before writing */
 };
 
 /*****************************************************************************
@@ -308,7 +308,7 @@ static int Manage( vout_thread_t *p_vout )
                 switch( event.pbutton.button )
                 {
                     case GII_PBUTTON_LEFT:
-                        val.b_bool = VLC_TRUE;
+                        val.b_bool = true;
                         var_Set( p_vout, "mouse-clicked", val );
                         break;
 

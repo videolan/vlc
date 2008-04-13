@@ -63,7 +63,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
     p_intf->pf_run = Run;
-    p_intf->b_should_run_on_first_thread = VLC_TRUE;
+    p_intf->b_should_run_on_first_thread = true;
 
     return VLC_SUCCESS;
 }

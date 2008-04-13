@@ -112,22 +112,22 @@ static int MouseEvent( vlc_object_t *, char const *,
 #define OSD_UPDATE_MAX     1000
 
 vlc_module_begin();
-    add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, false );
+    add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, false );
     add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT,
-                 VLC_FALSE );
+                 false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT,
-        OSD_FILE_LONGTEXT, VLC_FALSE );
+        OSD_FILE_LONGTEXT, false );
     add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT,
-        OSD_PATH_LONGTEXT, VLC_FALSE );
+        OSD_PATH_LONGTEXT, false );
     add_integer( OSD_CFG "timeout", 15, NULL, TIMEOUT_TEXT,
-        TIMEOUT_LONGTEXT, VLC_FALSE );
+        TIMEOUT_LONGTEXT, false );
     add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
         OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,
-        OSD_UPDATE_LONGTEXT, VLC_TRUE );
+        OSD_UPDATE_LONGTEXT, true );
     add_integer_with_range( OSD_CFG "alpha", 255, 0, 255, NULL,
-        OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, VLC_TRUE );
+        OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, true );
 
     set_capability( "sub filter", 100 );
     set_description( _("On Screen Display menu") );
@@ -155,9 +155,9 @@ struct filter_sys_t
     mtime_t      i_last_date;   /* last mdate SPU object has been sent to SPU subsytem */
     mtime_t      i_timeout;     /* duration SPU object is valid on the video output in seconds */
 
-    vlc_bool_t   b_absolute;    /* do we use absolute positioning or relative? */
-    vlc_bool_t   b_update;      /* Update OSD Menu by sending SPU objects */
-    vlc_bool_t   b_visible;     /* OSD Menu is visible */
+    bool   b_absolute;    /* do we use absolute positioning or relative? */
+    bool   b_update;      /* Update OSD Menu by sending SPU objects */
+    bool   b_visible;     /* OSD Menu is visible */
     mtime_t      i_update;      /* Update the OSD menu every n ms */
     mtime_t      i_end_date;    /* End data of display OSD menu */
     int          i_alpha;       /* alpha transparency value */
@@ -168,7 +168,7 @@ struct filter_sys_t
 
     /* menu interaction */
     vout_thread_t *p_vout;
-    vlc_bool_t  b_clicked;
+    bool  b_clicked;
     uint32_t    i_mouse_x;
     uint32_t    i_mouse_y;
 };
@@ -223,10 +223,10 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_sys->p_menu->i_position = p_sys->i_position;
 
     /* Check if menu position was overridden */
-    p_sys->b_absolute = VLC_TRUE;
+    p_sys->b_absolute = true;
     if( (p_sys->i_x < 0) || (p_sys->i_y < 0) )
     {
-        p_sys->b_absolute = VLC_FALSE;
+        p_sys->b_absolute = false;
         p_sys->p_menu->i_x = 0;
         p_sys->p_menu->i_y = 0;
     }
@@ -238,7 +238,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     else if( (p_sys->p_menu->i_x < 0) ||
              (p_sys->p_menu->i_y < 0) )
     {
-        p_sys->b_absolute = VLC_FALSE;
+        p_sys->b_absolute = false;
         p_sys->p_menu->i_x = 0;
         p_sys->p_menu->i_y = 0;
     }
@@ -247,9 +247,9 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_sys->i_last_date = mdate();
 
     /* Keep track of OSD Events */
-    p_sys->b_update  = VLC_FALSE;
-    p_sys->b_visible = VLC_FALSE;
-    p_sys->b_clicked = VLC_FALSE;
+    p_sys->b_update  = false;
+    p_sys->b_visible = false;
+    p_sys->b_clicked = false;
 
     /* Listen to osd menu core updates/visible settings. */
     var_AddCallback( p_sys->p_menu, "osd-menu-update",
@@ -342,8 +342,8 @@ static int OSDMenuVisibleEvent( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(newval);
     filter_t *p_filter = (filter_t *) p_data;
 
-    p_filter->p_sys->b_visible = VLC_TRUE;
-    p_filter->p_sys->b_update = VLC_TRUE;
+    p_filter->p_sys->b_visible = true;
+    p_filter->p_sys->b_update = true;
     return VLC_SUCCESS;
 }
 
@@ -355,7 +355,7 @@ static int OSDMenuUpdateEvent( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *) p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    p_sys->b_update = p_sys->b_visible ? VLC_TRUE : VLC_FALSE;
+    p_sys->b_update = p_sys->b_visible ? true : false;
     p_sys->i_end_date = (mtime_t) 0;
     return VLC_SUCCESS;
 }
@@ -468,10 +468,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
 
-    p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_fade = VLC_TRUE;
+    p_spu->b_ephemer = true;
+    p_spu->b_fade = true;
     if( p_filter->p_sys->p_menu->i_style == OSD_MENU_STYLE_CONCAT )
-        p_spu->b_absolute = VLC_TRUE;
+        p_spu->b_absolute = true;
     else
         p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_flags = p_sys->i_position;
@@ -482,7 +482,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         /* Display the subpicture again. */
         p_spu->i_stop = p_sys->i_end_date - i_date;
         if( ( i_date + p_sys->i_update ) >= p_sys->i_end_date )
-            p_sys->b_update = VLC_FALSE;
+            p_sys->b_update = false;
     }
     else
     {
@@ -498,7 +498,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
      * when OSD menu should be hidden and menu picture is not allocated.
      */
     if( !p_filter->p_sys->p_menu->p_state->p_pic ||
-        ( p_filter->p_sys->b_visible == VLC_FALSE ) )
+        ( p_filter->p_sys->b_visible == false ) )
     {
         /* Create new spu regions and allocate an empty picture in it. */
         p_region = create_picture_region( p_filter, p_spu,
@@ -516,7 +516,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
 
     if( p_sys->p_vout && p_sys->b_clicked )
     {
-        p_sys->b_clicked = VLC_FALSE;
+        p_sys->b_clicked = false;
         osd_MenuActivate( p_filter );
     }
     /* Create new spu regions
@@ -635,10 +635,10 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
     else if( !strncmp( psz_var, OSD_CFG"x", 9) ||
              !strncmp( psz_var, OSD_CFG"y", 9))
     {
-        p_sys->b_absolute = VLC_TRUE;
+        p_sys->b_absolute = true;
         if( (p_sys->i_x < 0) || (p_sys->i_y < 0) )
         {
-            p_sys->b_absolute = VLC_FALSE;
+            p_sys->b_absolute = false;
             p_sys->p_menu->i_x = 0;
             p_sys->p_menu->i_y = 0;
         }
@@ -655,7 +655,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
     else if( !strncmp( psz_var, OSD_CFG"alpha", 13) )
         p_sys->i_alpha = newval.i_int % 256;
 
-    p_sys->b_update = p_sys->b_visible ? VLC_TRUE : VLC_FALSE;
+    p_sys->b_update = p_sys->b_visible ? true : false;
     return VLC_SUCCESS;
 }
 
@@ -708,8 +708,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         if( p_button )
         {
             osd_ButtonSelect( p_this, p_button );
-            p_sys->b_update = p_sys->b_visible ? VLC_TRUE : VLC_FALSE;
-            p_sys->b_clicked = VLC_TRUE;
+            p_sys->b_update = p_sys->b_visible ? true : false;
+            p_sys->b_clicked = true;
             msg_Dbg( p_this, "mouse clicked %s (%d,%d)\n", p_button->psz_name, i_x, i_y );
         }
     }

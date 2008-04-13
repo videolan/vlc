@@ -153,8 +153,8 @@ int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
     p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
     p_spu->i_start = i_start;
     p_spu->i_stop = i_stop;
-    p_spu->b_ephemer = VLC_FALSE;
-    p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_ephemer = false;
+    p_spu->b_absolute = false;
 
     p_spu->i_x = i_hmargin;
     p_spu->i_y = i_vmargin;
@@ -269,7 +269,7 @@ mediacontrol_sound_set_volume( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
-vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
+bool mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception )
 {
@@ -280,7 +280,7 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
 
     libvlc_video_set_parent( self->p_instance, visual_id, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
-    return VLC_TRUE;
+    return true;
 }
 
 int

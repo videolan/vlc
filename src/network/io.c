@@ -286,7 +286,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
  *****************************************************************************/
 ssize_t
 __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
-            uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall)
+            uint8_t *restrict p_buf, size_t i_buflen, bool waitall)
 {
     size_t i_total = 0;
     struct pollfd ufd[2] = {
@@ -497,7 +497,7 @@ char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
             ptr = psz_line + i_line;
         }
 
-        if( net_Read( p_this, fd, p_vs, (uint8_t *)ptr, 1, VLC_TRUE ) != 1 )
+        if( net_Read( p_this, fd, p_vs, (uint8_t *)ptr, 1, true ) != 1 )
         {
             if( i_line == 0 )
             {

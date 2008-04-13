@@ -64,13 +64,13 @@ struct libvlc_int_t
     /* Messages */
     msg_bank_t             msg_bank;    ///< The message bank
     int                    i_verbose;   ///< info messages
-    vlc_bool_t             b_color;     ///< color messages?
+    bool             b_color;     ///< color messages?
 
     module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
     void* ( *pf_memcpy ) ( void *, const void *, size_t ); ///< fast memcpy
     void* ( *pf_memset ) ( void *, int, size_t );          ///< fast memset
 
-    vlc_bool_t             b_stats;       ///< Should we collect stats ?
+    bool             b_stats;       ///< Should we collect stats ?
     vlc_mutex_t            timer_lock;    ///< Lock to protect timers
     int                    i_timers;      ///< Number of timers
     counter_t            **pp_timers;     ///< Array of all timers

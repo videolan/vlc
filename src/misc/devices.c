@@ -46,7 +46,7 @@ void devices_ProbeCreate( vlc_object_t *p_this )
         msg_Err( p_this, "out of memory" );
         return;
     }
-    p_probe->p_module = module_Need( p_probe, "devices probe", "", VLC_FALSE );
+    p_probe->p_module = module_Need( p_probe, "devices probe", "", false );
     if( p_probe->p_module == NULL )
     {
         msg_Err( p_this, "no devices probing module could be loaded" );

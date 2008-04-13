@@ -40,7 +40,7 @@ namespace wxvlc
     private:
         intf_thread_t *p_intf;
         Interface *p_main_interface;
-        vlc_bool_t b_init;
+        bool b_init;
         int i_old_playing_status;
         int i_old_rate;
 

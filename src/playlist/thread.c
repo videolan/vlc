@@ -75,7 +75,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     vlc_object_attach( p_playlist->p_preparse, p_playlist );
     if( vlc_thread_create( p_playlist->p_preparse, "preparser",
-                           RunPreparse, VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+                           RunPreparse, VLC_THREAD_PRIORITY_LOW, true ) )
     {
         msg_Err( p_playlist, "cannot spawn preparse thread" );
         vlc_object_release( p_playlist->p_preparse );
@@ -105,7 +105,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
     if( vlc_thread_create( p_playlist->p_fetcher,
                            "fetcher",
                            RunFetcher,
-                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+                           VLC_THREAD_PRIORITY_LOW, true ) )
     {
         msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
         vlc_object_release( p_playlist->p_fetcher );
@@ -114,7 +114,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     // Start the thread
     if( vlc_thread_create( p_playlist, "playlist", RunControlThread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+                           VLC_THREAD_PRIORITY_LOW, true ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
         vlc_object_release( p_playlist );

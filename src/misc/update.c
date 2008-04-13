@@ -87,7 +87,7 @@
  * Local Prototypes
  *****************************************************************************/
 static void EmptyRelease( update_t *p_update );
-static vlc_bool_t GetUpdateFile( update_t *p_update );
+static bool GetUpdateFile( update_t *p_update );
 static int CompareReleases( const struct update_release_t *p1,
                             const struct update_release_t *p2 );
 static char * size_str( long int l_size );
@@ -899,9 +899,9 @@ static void EmptyRelease( update_t *p_update )
  * p_update has to be locked when calling this function
  *
  * \param p_update pointer to update struct
- * \return VLC_TRUE if the update is valid and authenticated
+ * \return true if the update is valid and authenticated
  */
-static vlc_bool_t GetUpdateFile( update_t *p_update )
+static bool GetUpdateFile( update_t *p_update )
 {
     stream_t *p_stream = NULL;
     int i_major = 0;
@@ -1076,7 +1076,7 @@ static vlc_bool_t GetUpdateFile( update_t *p_update )
     {
         msg_Info( p_update->p_libvlc, "Status file authenticated" );
         gcry_md_close( hd );
-        return VLC_TRUE;
+        return true;
     }
 
 error_hd:
@@ -1085,7 +1085,7 @@ error:
     if( p_stream )
         stream_Delete( p_stream );
     free( psz_version_line );
-    return VLC_FALSE;
+    return false;
 }
 
 
@@ -1096,7 +1096,7 @@ typedef struct
 {
     VLC_COMMON_MEMBERS
     update_t *p_update;
-    void (*pf_callback)( void *, vlc_bool_t );
+    void (*pf_callback)( void *, bool );
     void *p_data;
 } update_check_thread_t;
 
@@ -1110,7 +1110,7 @@ void update_CheckReal( update_check_thread_t *p_uct );
  * \param p_data pointer to some datas to give to the callback
  * \returns nothing
  */
-void update_Check( update_t *p_update, void (*pf_callback)( void*, vlc_bool_t ), void *p_data )
+void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void *p_data )
 {
     assert( p_update );
 
@@ -1127,12 +1127,12 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, vlc_bool_t ),
     p_uct->p_data = p_data;
 
     vlc_thread_create( p_uct, "check for update", update_CheckReal,
-                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+                       VLC_THREAD_PRIORITY_LOW, false );
 }
 
 void update_CheckReal( update_check_thread_t *p_uct )
 {
-    vlc_bool_t b_ret;
+    bool b_ret;
     vlc_mutex_lock( &p_uct->p_update->lock );
 
     EmptyRelease( p_uct->p_update );
@@ -1247,7 +1247,7 @@ void update_Download( update_t *p_update, char *psz_destdir )
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
     vlc_thread_create( p_udt, "download update", update_DownloadReal,
-                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+                       VLC_THREAD_PRIORITY_LOW, false );
 }
 
 void update_DownloadReal( update_download_thread_t *p_udt )
@@ -1360,7 +1360,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     {
         utf8_unlink( psz_destfile );
 
-        intf_UserFatal( p_udt, VLC_TRUE, _("File can not be verified"),
+        intf_UserFatal( p_udt, true, _("File can not be verified"),
             _("It was not possible to download a cryptographic signature for "
               "downloaded file \"%s\", and so VLC deleted it."),
             psz_destfile );
@@ -1372,7 +1372,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     {
         utf8_unlink( psz_destfile );
         msg_Err( p_udt, "Invalid signature issuer" );
-        intf_UserFatal( p_udt, VLC_TRUE, _("Invalid signature"),
+        intf_UserFatal( p_udt, true, _("Invalid signature"),
             _("The cryptographic signature for downloaded file \"%s\" was "
               "invalid and couldn't be used to securely verify it, and so "
               "VLC deleted it."),
@@ -1384,7 +1384,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     {
         utf8_unlink( psz_destfile );
         msg_Err( p_udt, "Invalid signature type" );
-        intf_UserFatal( p_udt, VLC_TRUE, _("Invalid signature"),
+        intf_UserFatal( p_udt, true, _("Invalid signature"),
             _("The cryptographic signature for downloaded file \"%s\" was "
               "invalid and couldn't be used to securely verify it, and so "
               "VLC deleted it."),
@@ -1397,7 +1397,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
     {
         msg_Err( p_udt, "Unable to hash %s", psz_destfile );
         utf8_unlink( psz_destfile );
-        intf_UserFatal( p_udt, VLC_TRUE, _("File not verifiable"),
+        intf_UserFatal( p_udt, true, _("File not verifiable"),
             _("It was not possible to securely verify downloaded file \"%s\", "
               "and so VLC deleted it."),
             psz_destfile );
@@ -1409,7 +1409,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
         p_hash[1] != sign.hash_verification[1] )
     {
         utf8_unlink( psz_destfile );
-        intf_UserFatal( p_udt, VLC_TRUE, _("File corrupted"),
+        intf_UserFatal( p_udt, true, _("File corrupted"),
             _("Downloaded file \"%s\" was corrupted, and so VLC deleted it."),
              psz_destfile );
         msg_Err( p_udt, "Bad SHA1 hash for %s", psz_destfile );
@@ -1421,7 +1421,7 @@ void update_DownloadReal( update_download_thread_t *p_udt )
             != VLC_SUCCESS )
     {
         utf8_unlink( psz_destfile );
-        intf_UserFatal( p_udt, VLC_TRUE, _("File corrupted"),
+        intf_UserFatal( p_udt, true, _("File corrupted"),
             _("Downloaded file \"%s\" was corrupted, and so VLC deleted it."),
              psz_destfile );
         msg_Err( p_udt, "BAD SIGNATURE for %s", psz_destfile );

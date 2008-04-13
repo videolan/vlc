@@ -65,7 +65,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
     add_string( "podcast-urls", NULL, NULL,
-                URLS_TEXT, URLS_LONGTEXT, VLC_FALSE );
+                URLS_TEXT, URLS_LONGTEXT, false );
         change_autosave();
 
     set_capability( "services_discovery", 0 );
@@ -87,7 +87,7 @@ struct services_discovery_sys_t
     char **ppsz_urls;
     int i_urls;
 
-    vlc_bool_t b_update;
+    bool b_update;
 };
 
 /*****************************************************************************
@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->ppsz_urls = NULL;
     p_sys->i_input = 0;
     p_sys->pp_input = NULL;
-    p_sys->b_update = VLC_TRUE;
+    p_sys->b_update = true;
 
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
@@ -161,14 +161,14 @@ static void Run( services_discovery_t *p_sd )
     while( !p_sd->b_die )
     {
         int i;
-        if( p_sys->b_update == VLC_TRUE )
+        if( p_sys->b_update == true )
         {
             msg_Dbg( p_sd, "Update required" );
             psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
             if( psz_urls != NULL )
                 ParseUrls( p_sd, psz_urls );
             free( psz_urls );
-            p_sys->b_update = VLC_FALSE;
+            p_sys->b_update = false;
         }
 
         for( i = 0; i < p_sd->p_sys->i_input; i++ )
@@ -194,7 +194,7 @@ static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     VLC_UNUSED(newval);
     services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)p_data;
-    p_sys->b_update = VLC_TRUE;
+    p_sys->b_update = true;
     return VLC_SUCCESS;
 }
 

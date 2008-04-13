@@ -54,8 +54,8 @@ struct intf_thread_t
     VLC_COMMON_MEMBERS
 
     /* Thread properties and locks */
-    vlc_bool_t          b_play;
-    vlc_bool_t          b_should_run_on_first_thread;
+    bool          b_play;
+    bool          b_should_run_on_first_thread;
 
     /* Specific interfaces */
     intf_console_t *    p_console;                               /** console */
@@ -71,7 +71,7 @@ struct intf_thread_t
                                intf_dialog_args_t * );
 
     /** Interaction stuff */
-    vlc_bool_t b_interaction;
+    bool b_interaction;
 
     /** Video window callbacks */
     void * ( *pf_request_window ) ( intf_thread_t *, vout_thread_t *,
@@ -82,8 +82,8 @@ struct intf_thread_t
 
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
-    vlc_bool_t   b_menu_change;
-    vlc_bool_t   b_menu;
+    bool   b_menu_change;
+    bool   b_menu;
 
     /* Provides the ability to switch an interface on the fly */
     char *psz_switch_intf;
@@ -106,8 +106,8 @@ struct intf_dialog_args_t
 
     /* Specifically for INTF_DIALOG_FILE_GENERIC */
     char *psz_extensions;
-    vlc_bool_t b_save;
-    vlc_bool_t b_multiple;
+    bool b_save;
+    bool b_multiple;
 
     /* Specific to INTF_DIALOG_INTERACTION */
     interaction_dialog_t *p_dialog;
@@ -228,7 +228,7 @@ struct interaction_dialog_t
 
     vlc_value_t     val;                ///< value coming from core for dialogue
     int             i_timeToGo;         ///< time (in sec) until shown progress is finished
-    vlc_bool_t      b_cancelled;        ///< was the dialogue cancelled ?
+    bool      b_cancelled;        ///< was the dialogue cancelled ?
 
     void *          p_private;          ///< Private interface data
 
@@ -310,7 +310,7 @@ struct interaction_t
  ***************************************************************************/
 
 #define intf_UserFatal( a, b, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),b,c,d, ## e )
-VLC_EXPORT( int, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) ATTRIBUTE_FORMAT( 4, 5 ) );
+VLC_EXPORT( int, __intf_UserFatal,( vlc_object_t*, bool, const char*, const char*, ...) ATTRIBUTE_FORMAT( 4, 5 ) );
 #define intf_UserWarn( a, c, d, e... ) __intf_UserWarn( VLC_OBJECT(a),c,d, ## e )
 VLC_EXPORT( int, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) ATTRIBUTE_FORMAT( 3, 4 ) );
 #define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
@@ -326,7 +326,7 @@ VLC_EXPORT( int, __intf_Progress,( vlc_object_t*, const char*, const char*, floa
 #define intf_ProgressUpdate( a, b, c, d, e ) __intf_ProgressUpdate( VLC_OBJECT(a),b,c,d,e )
 VLC_EXPORT( void, __intf_ProgressUpdate,( vlc_object_t*, int, const char*, float, int) );
 #define intf_ProgressIsCancelled( a, b ) __intf_UserProgressIsCancelled( VLC_OBJECT(a),b )
-VLC_EXPORT( vlc_bool_t, __intf_UserProgressIsCancelled,( vlc_object_t*, int ) );
+VLC_EXPORT( bool, __intf_UserProgressIsCancelled,( vlc_object_t*, int ) );
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
 VLC_EXPORT( void, __intf_UserHide,( vlc_object_t *, int ));
 

@@ -70,8 +70,8 @@ int libvlc_audio_get_mute( libvlc_instance_t *p_instance,
 
     i_volume = libvlc_audio_get_volume(p_instance, p_e);
     if ( i_volume == 0 )
-        return VLC_TRUE;
-    return VLC_FALSE;
+        return true;
+    return false;
 }
 
 void libvlc_audio_set_mute( libvlc_instance_t *p_instance, int mute,

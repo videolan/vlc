@@ -91,7 +91,7 @@ struct access_sys_t
     int         i_header_size;
 
     /* misc */
-    vlc_bool_t  b_seekable;
+    bool  b_seekable;
 };
 
 #endif

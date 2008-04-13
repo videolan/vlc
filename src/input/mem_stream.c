@@ -31,7 +31,7 @@
 
 struct stream_sys_t
 {
-    vlc_bool_t  i_preserve_memory;
+    bool  i_preserve_memory;
     int64_t     i_pos;      /* Current reading offset */
     int64_t     i_size;
     uint8_t    *p_buffer;
@@ -49,11 +49,11 @@ static void Delete ( stream_t * );
  * \param p_this the calling vlc_object
  * \param p_buffer the memory buffer for the stream
  * \param i_buffer the size of the buffer
- * \param i_preserve_memory if this is set to VLC_FALSE the memory buffer
+ * \param i_preserve_memory if this is set to false the memory buffer
  *        pointed to by p_buffer is freed on stream_Destroy
  */
 stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
-                              int64_t i_size, vlc_bool_t i_preserve_memory )
+                              int64_t i_size, bool i_preserve_memory )
 {
     stream_t *s = vlc_stream_create( p_this );
     stream_sys_t *p_sys;
@@ -72,7 +72,7 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     s->pf_destroy = Delete;
 
     s->i_char_width = 1;
-    s->b_little_endian = VLC_FALSE;
+    s->b_little_endian = false;
     vlc_object_attach( s, p_this );
 
     return s;
@@ -93,7 +93,7 @@ static int Control( stream_t *s, int i_query, va_list args )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    vlc_bool_t *p_bool;
+    bool *p_bool;
     int64_t    *pi_64, i_64;
     int        i_int;
 
@@ -105,13 +105,13 @@ static int Control( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_CAN_SEEK:
-            p_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *p_bool = VLC_TRUE;
+            p_bool = (bool*)va_arg( args, bool * );
+            *p_bool = true;
             break;
 
         case STREAM_CAN_FASTSEEK:
-            p_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *p_bool = VLC_TRUE;
+            p_bool = (bool*)va_arg( args, bool * );
+            *p_bool = true;
             break;
 
         case STREAM_GET_POSITION:

@@ -150,54 +150,54 @@ vlc_module_begin();
         set_capability( "dialogs provider", 51 );
 
         add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
-                     QT_MODE_TEXT, QT_MODE_LONGTEXT, VLC_FALSE );
+                     QT_MODE_TEXT, QT_MODE_LONGTEXT, false );
             change_integer_list( i_mode_list, psz_mode_list_text, 0 );
 
-        add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
-                  NOTIFICATION_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-notification", true, NULL, NOTIFICATION_TEXT,
+                  NOTIFICATION_LONGTEXT, false );
 
         add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
-                  OPACITY_LONGTEXT, VLC_FALSE );
-        add_bool( "qt-blingbling", VLC_TRUE, NULL, BLING_TEXT,
-                  BLING_TEXT, VLC_FALSE );
+                  OPACITY_LONGTEXT, false );
+        add_bool( "qt-blingbling", true, NULL, BLING_TEXT,
+                  BLING_TEXT, false );
 
-        add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
-                SYSTRAY_LONGTEXT, VLC_FALSE);
-        add_bool( "qt-start-minimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
-                MINIMIZED_LONGTEXT, VLC_TRUE);
-        add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
-                  TITLE_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-system-tray", true, NULL, SYSTRAY_TEXT,
+                SYSTRAY_LONGTEXT, false);
+        add_bool( "qt-start-minimized", false, NULL, MINIMIZED_TEXT,
+                MINIMIZED_LONGTEXT, true);
+        add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
+                  TITLE_LONGTEXT, false );
 
-        add_bool( "qt-volume-complete", VLC_FALSE, NULL, COMPLETEVOL_TEXT,
-                COMPLETEVOL_LONGTEXT, VLC_TRUE );
-        add_bool( "qt-autosave-volume", VLC_FALSE, NULL, SAVEVOL_TEXT,
-                SAVEVOL_TEXT, VLC_TRUE );
+        add_bool( "qt-volume-complete", false, NULL, COMPLETEVOL_TEXT,
+                COMPLETEVOL_LONGTEXT, true );
+        add_bool( "qt-autosave-volume", false, NULL, SAVEVOL_TEXT,
+                SAVEVOL_TEXT, true );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
-                FILEDIALOG_PATH_TEXT, VLC_TRUE );
+                FILEDIALOG_PATH_TEXT, true );
             change_autosave();
             change_internal();
 
-        add_bool( "qt-adv-options", VLC_FALSE, NULL, ADVANCED_OPTIONS_TEXT,
-                  ADVANCED_OPTIONS_LONGTEXT, VLC_TRUE );
-        add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
-                ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
-        add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
-                ERROR_TEXT, VLC_FALSE );
+        add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
+                  ADVANCED_OPTIONS_LONGTEXT, true );
+        add_bool( "qt-advanced-pref", false, NULL, ADVANCED_PREFS_TEXT,
+                ADVANCED_PREFS_LONGTEXT, false );
+        add_bool( "qt-error-dialogs", true, NULL, ERROR_TEXT,
+                ERROR_TEXT, false );
 #ifdef UPDATE_CHECK
-        add_bool( "qt-updates-notif", VLC_TRUE, NULL, UPDATER_TEXT,
-                UPDATER_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-updates-notif", true, NULL, UPDATER_TEXT,
+                UPDATER_LONGTEXT, false );
         add_integer( "qt-updates-days", 14, NULL, UPDATER_DAYS_TEXT,
-                UPDATER_DAYS_TEXT, VLC_FALSE );
+                UPDATER_DAYS_TEXT, false );
 #endif
         add_string( "qt-slider-colours",
                 "255;255;255;20;226;20;255;176;15;235;30;20",
-                NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, VLC_FALSE );
+                NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false );
 
-        add_bool( "qt-open-detail", VLC_FALSE, NULL, VIEWDETAIL_TEXT,
-                VIEWDETAIL_TEXT, VLC_FALSE );
+        add_bool( "qt-open-detail", false, NULL, VIEWDETAIL_TEXT,
+                VIEWDETAIL_TEXT, false );
 
-        add_bool( "qt-privacy-ask", VLC_TRUE, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
-                VLC_FALSE );
+        add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
+                false );
 
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
 
     /* We support play on start */
-    p_intf->b_play = VLC_TRUE;
+    p_intf->b_play = true;
 
     return VLC_SUCCESS;
 }
@@ -256,7 +256,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     vlc_mutex_lock( &p_intf->object_lock );
-    p_intf->b_dead = VLC_TRUE;
+    p_intf->b_dead = true;
     vlc_mutex_unlock( &p_intf->object_lock );
 
     if( p_intf->p_sys->b_isDialogProvider )
@@ -280,7 +280,7 @@ static void Run( intf_thread_t *p_intf )
 {
     if( p_intf->pf_show_dialog )
     {
-        if( vlc_thread_create( p_intf, "Qt dialogs", Init, 0, VLC_TRUE ) )
+        if( vlc_thread_create( p_intf, "Qt dialogs", Init, 0, true ) )
             msg_Err( p_intf, "failed to create Qt dialogs thread" );
     }
     else
@@ -355,7 +355,7 @@ static void Init( intf_thread_t *p_intf )
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )
     {
-        playlist_Control( THEPL, PLAYLIST_PLAY, VLC_FALSE );
+        playlist_Control( THEPL, PLAYLIST_PLAY, false );
     }
 
     /* Explain to the core how to show a dialog :D */

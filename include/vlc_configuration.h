@@ -178,21 +178,21 @@ struct module_config_t
 
     /* Misc */
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
-    vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
-    vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
-    vlc_bool_t   b_internal;   /* Flag to indicate option is not to be shown */
-    vlc_bool_t   b_restart;   /* Flag to indicate the option needs a restart */
+    bool   b_dirty;          /* Dirty flag to indicate a config change */
+    bool   b_advanced;          /* Flag to indicate an advanced option */
+    bool   b_internal;   /* Flag to indicate option is not to be shown */
+    bool   b_restart;   /* Flag to indicate the option needs a restart */
                               /* to take effect */
 
     /* Deprecated */
     char          *psz_oldname;                          /* Old option name */
-    vlc_bool_t     b_removed;
+    bool     b_removed;
 
     /* Option values loaded from config file */
-    vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
-    vlc_bool_t   b_unsaveable;                /* Config should not be saved */
+    bool   b_autosave;      /* Config will be auto-saved at exit time */
+    bool   b_unsaveable;                /* Config should not be saved */
 
-    vlc_bool_t   b_safe;
+    bool   b_safe;
 };
 
 /*****************************************************************************
@@ -218,7 +218,7 @@ VLC_EXPORT(const char *, config_GetDataDir, ( void ));
 
 VLC_EXPORT( void,       __config_AddIntf,    ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,       __config_RemoveIntf, ( vlc_object_t *, const char * ) );
-VLC_EXPORT( vlc_bool_t, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
+VLC_EXPORT( bool, __config_ExistIntf,  ( vlc_object_t *, const char * ) );
 
 #define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
@@ -403,7 +403,7 @@ VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
 
 #define add_bool( name, v, p_callback, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc, p_callback ); \
-    if (v) vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)VLC_TRUE)
+    if (v) vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)true)
 
 /* For removed option */
 #define add_obsolete_inner( name, type ) \

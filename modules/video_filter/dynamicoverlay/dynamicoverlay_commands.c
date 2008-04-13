@@ -55,7 +55,7 @@ overlay_t *OverlayCreate( void )
 
     p_ovl->i_x = p_ovl->i_y = 0;
     p_ovl->i_alpha = 0xFF;
-    p_ovl->b_active = VLC_FALSE;
+    p_ovl->b_active = false;
     vout_InitFormat( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
                      VOUT_ASPECT_FACTOR );
     memcpy( &p_ovl->fontstyle, &default_text_style, sizeof(struct text_style_t) );
@@ -307,7 +307,7 @@ static int parser_SetVisibility( char *psz_command, char *psz_end,
         int32_t i_vis = 0;
         if( parse_digit( &psz_command, &i_vis ) == VLC_EGENERIC )
             return VLC_EGENERIC;
-        p_params->b_visible = (i_vis == 1) ? VLC_TRUE : VLC_FALSE;
+        p_params->b_visible = (i_vis == 1) ? true : false;
     }
     return VLC_SUCCESS;
 }
@@ -563,7 +563,7 @@ static int exec_DeleteImage( filter_t *p_filter,
 {
     VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
-    p_sys->b_updated = VLC_TRUE;
+    p_sys->b_updated = true;
 
     return ListRemove( &p_sys->overlays, p_params->i_id );
 }
@@ -576,7 +576,7 @@ static int exec_EndAtomic( filter_t *p_filter,
     VLC_UNUSED(p_results);
     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
     QueueTransfer( &p_sys->pending, &p_sys->atomic );
-    p_sys->b_atomic = VLC_FALSE;
+    p_sys->b_atomic = false;
     return VLC_SUCCESS;
 }
 
@@ -675,7 +675,7 @@ static int exec_GetVisibility( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_results->b_visible = ( p_ovl->b_active == VLC_TRUE ) ? 1 : 0;
+    p_results->b_visible = ( p_ovl->b_active == true ) ? 1 : 0;
     return VLC_SUCCESS;
 }
 
@@ -772,8 +772,8 @@ static int exec_SetVisibility( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_ovl->b_active = p_params->b_visible;// ? VLC_FALSE : VLC_TRUE;
-    p_sys->b_updated = VLC_TRUE;
+    p_ovl->b_active = p_params->b_visible;// ? false : true;
+    p_sys->b_updated = true;
     return VLC_SUCCESS;
 }
 
@@ -785,7 +785,7 @@ static int exec_StartAtomic( filter_t *p_filter,
     VLC_UNUSED(p_params);
     VLC_UNUSED(p_results);
 
-    p_sys->b_atomic = VLC_TRUE;
+    p_sys->b_atomic = true;
     return VLC_SUCCESS;
 }
 
@@ -795,103 +795,103 @@ static int exec_StartAtomic( filter_t *p_filter,
 static commanddesc_t p_commands[] =
 {
     {   .psz_command = "DataSharedMem",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_DataSharedMem,
         .pf_execute = exec_DataSharedMem,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "DeleteImage",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_Id,
         .pf_execute = exec_DeleteImage,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "EndAtomic",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_None,
         .pf_execute = exec_EndAtomic,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "GenImage",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_None,
         .pf_execute = exec_GenImage,
         .pf_unparse = unparse_GenImage,
     },
     {   .psz_command = "GetAlpha",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_Id,
         .pf_execute = exec_GetAlpha,
         .pf_unparse = unparse_GetAlpha,
     },
     {   .psz_command = "GetPosition",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_Id,
         .pf_execute = exec_GetPosition,
         .pf_unparse = unparse_GetPosition,
     },
     {   .psz_command = "GetTextAlpha",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_Id,
         .pf_execute = exec_GetTextAlpha,
         .pf_unparse = unparse_GetTextAlpha,
     },
     {   .psz_command = "GetTextColor",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_Id,
         .pf_execute = exec_GetTextColor,
         .pf_unparse = unparse_GetTextColor,
     },
     {   .psz_command = "GetTextSize",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_Id,
         .pf_execute = exec_GetTextSize,
         .pf_unparse = unparse_GetTextSize,
     },
     {   .psz_command = "GetVisibility",
-        .b_atomic = VLC_FALSE,
+        .b_atomic = false,
         .pf_parser = parser_Id,
         .pf_execute = exec_GetVisibility,
         .pf_unparse = unparse_GetVisibility,
     },
     {   .psz_command = "SetAlpha",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_SetAlpha,
         .pf_execute = exec_SetAlpha,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "SetPosition",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_SetPosition,
         .pf_execute = exec_SetPosition,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "SetTextAlpha",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_SetTextAlpha,
         .pf_execute = exec_SetTextAlpha,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "SetTextColor",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_SetTextColor,
         .pf_execute = exec_SetTextColor,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "SetTextSize",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_SetTextSize,
         .pf_execute = exec_SetTextSize,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "SetVisibility",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_SetVisibility,
         .pf_execute = exec_SetVisibility,
         .pf_unparse = unparse_default,
     },
     {   .psz_command = "StartAtomic",
-        .b_atomic = VLC_TRUE,
+        .b_atomic = true,
         .pf_parser = parser_None,
         .pf_execute = exec_StartAtomic,
         .pf_unparse = unparse_default,

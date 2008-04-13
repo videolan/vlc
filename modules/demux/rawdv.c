@@ -49,7 +49,7 @@ vlc_module_begin();
     set_capability( "demux2", 3 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, VLC_FALSE );
+    add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, false );
     set_callbacks( Open, Close );
     add_shortcut( "rawdv" );
 vlc_module_end();
@@ -113,7 +113,7 @@ struct demux_sys_t
 
     /* program clock reference (in units of 90kHz) */
     mtime_t i_pcr;
-    vlc_bool_t b_hurry_up;
+    bool b_hurry_up;
 };
 
 /*****************************************************************************
@@ -286,7 +286,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     block_t     *p_block;
-    vlc_bool_t  b_audio = VLC_FALSE;
+    bool  b_audio = false;
 
     if( p_sys->b_hurry_up )
     {

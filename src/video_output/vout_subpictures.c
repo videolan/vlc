@@ -147,7 +147,7 @@ int spu_ParseChain( spu_t *p_spu )
         p_spu->pp_filter[p_spu->i_filter]->p_cfg = p_cfg;
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
-                         "sub filter", psz_name, VLC_TRUE );
+                         "sub filter", psz_name, true );
         if( p_spu->pp_filter[p_spu->i_filter]->p_module )
         {
             filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
@@ -253,7 +253,7 @@ static void spu_DeleteChain( spu_t *p_spu )
  * \param p_this the object in which to destroy the subpicture unit
  * \param b_attach to select attach or detach
  */
-void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, vlc_bool_t b_attach )
+void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
 {
     vlc_object_t *p_input;
 
@@ -447,9 +447,9 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     /* Copy subpicture information, set some default values */
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->i_status   = RESERVED_SUBPICTURE;
-    p_subpic->b_absolute = VLC_TRUE;
-    p_subpic->b_pausable = VLC_FALSE;
-    p_subpic->b_fade     = VLC_FALSE;
+    p_subpic->b_absolute = true;
+    p_subpic->b_pausable = false;
+    p_subpic->b_fade     = false;
     p_subpic->i_alpha    = 0xFF;
     p_subpic->p_region   = NULL;
     p_subpic->pf_render  = NULL;
@@ -621,7 +621,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             {
                 p_spu->p_text->p_module =
                     module_Need( p_spu->p_text, "text renderer",
-                                 psz_modulename, VLC_TRUE );
+                                 psz_modulename, true );
             }
             if( !p_spu->p_text->p_module )
             {
@@ -766,7 +766,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         while( p_region )
         {
             video_format_t orig_fmt = p_region->fmt;
-            vlc_bool_t b_rerender_text = VLC_FALSE;
+            bool b_rerender_text = false;
             int i_fade_alpha = 255;
             int i_x_offset;
             int i_y_offset;
@@ -809,7 +809,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     var_Set( p_spu->p_text, "spu-elapsed", val );
 
                     var_Create( p_spu->p_text, "text-rerender", VLC_VAR_BOOL );
-                    var_SetBool( p_spu->p_text, "text-rerender", VLC_FALSE );
+                    var_SetBool( p_spu->p_text, "text-rerender", false );
 
                     var_Create( p_spu->p_text, "scale", VLC_VAR_INTEGER );
                     var_SetInteger( p_spu->p_text, "scale",
@@ -963,7 +963,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             i_y_offset = __MAX( i_y_offset, 0 );
 
             if( ( p_spu->i_margin != 0 ) &&
-                ( p_spu->b_force_crop == VLC_FALSE ) )
+                ( p_spu->b_force_crop == false ) )
             {
                 int i_diff = 0;
                 int i_low = (i_y_offset - p_spu->i_margin) * i_inv_scale_y / 1000;
@@ -1106,7 +1106,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
 subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
-                                   vlc_bool_t b_paused )
+                                   bool b_paused )
 {
     int i_index, i_channel;
     subpicture_t *p_subpic = NULL;
@@ -1279,12 +1279,12 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
 {
     vlc_value_t val;
 
-    p_spu->b_force_palette = VLC_FALSE;
-    p_spu->b_force_crop = VLC_FALSE;
+    p_spu->b_force_palette = false;
+    p_spu->b_force_crop = false;
 
     if( var_Get( p_object, "highlight", &val ) || !val.b_bool ) return;
 
-    p_spu->b_force_crop = VLC_TRUE;
+    p_spu->b_force_crop = true;
     var_Get( p_object, "x-start", &val );
     p_spu->i_crop_x = val.i_int;
     var_Get( p_object, "y-start", &val );
@@ -1297,7 +1297,7 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
     if( var_Get( p_object, "menu-palette", &val ) == VLC_SUCCESS )
     {
         memcpy( p_spu->palette, val.p_address, 16 );
-        p_spu->b_force_palette = VLC_TRUE;
+        p_spu->b_force_palette = true;
     }
 
     msg_Dbg( p_object, "crop: %i,%i,%i,%i, palette forced: %i",
@@ -1342,7 +1342,7 @@ static subpicture_t *spu_new_buffer( filter_t *p_filter )
     subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
     if( !p_subpic ) return NULL;
     memset( p_subpic, 0, sizeof(subpicture_t) );
-    p_subpic->b_absolute = VLC_TRUE;
+    p_subpic->b_absolute = true;
 
     p_subpic->pf_create_region = __spu_CreateRegion;
     p_subpic->pf_make_region = __spu_MakeRegion;

@@ -155,7 +155,7 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef NEED_QTE_MAIN
     p_vout->p_sys->p_qte_main =
-        module_Need( p_this, "gui-helper", "qte", VLC_TRUE );
+        module_Need( p_this, "gui-helper", "qte", true );
     if( p_vout->p_sys->p_qte_main == NULL )
     {
         free( p_vout->p_sys );
@@ -517,7 +517,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     /* Initializations */
 #if 1 /* FIXME: I need an event queue to handle video output size changes. */
-    p_vout->b_fullscreen = VLC_TRUE;
+    p_vout->b_fullscreen = true;
 #endif
 
     /* Set main window's size */
@@ -539,7 +539,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     /* create thread to exec the qpe application */
     if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded Thread",
                             RunQtThread,
-                            VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE) )
+                            VLC_THREAD_PRIORITY_OUTPUT, true) )
     {
         msg_Err( p_vout, "cannot create QT Embedded Thread" );
         vlc_object_release( p_vout->p_sys->p_event );

@@ -52,10 +52,10 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
  *****************************************************************************/
 struct filter_sys_t
 {
-    vlc_bool_t b_resize;
-    vlc_bool_t b_convert;
-    vlc_bool_t b_resize_first;
-    vlc_bool_t b_enable_croppadd;
+    bool b_resize;
+    bool b_convert;
+    bool b_resize_first;
+    bool b_enable_croppadd;
 
     es_format_t fmt_in;
     int i_src_ffmpeg_chroma;
@@ -150,7 +150,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
     p_pic_dst->i_nb_fields = p_pic->i_nb_fields;
-    p_pic_dst->b_progressive = VLC_TRUE;
+    p_pic_dst->b_progressive = true;
     p_pic_dst->b_top_field_first = p_pic->b_top_field_first;
 
     p_pic->pf_release( p_pic );

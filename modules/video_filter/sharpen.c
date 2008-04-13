@@ -67,7 +67,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );
     add_float_with_range( "sharpen-sigma", 0.05, 0.0, 2.0, NULL,
-        SIG_TEXT, SIG_LONGTEXT, VLC_FALSE );
+        SIG_TEXT, SIG_LONGTEXT, false );
     add_shortcut( "sharpen" );
     set_callbacks( Create, Destroy );
 vlc_module_end();

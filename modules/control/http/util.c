@@ -36,13 +36,13 @@
  ****************************************************************************/
 
 /* ToUrl: create a good name for an url from filename */
-char *E_(FileToUrl)( char *name, vlc_bool_t *pb_index )
+char *E_(FileToUrl)( char *name, bool *pb_index )
 {
     char *url, *p;
 
     url = p = malloc( strlen( name ) + 1 );
 
-    *pb_index = VLC_FALSE;
+    *pb_index = false;
     if( !url || !p )
     {
         return NULL;
@@ -77,7 +77,7 @@ char *E_(FileToUrl)( char *name, vlc_bool_t *pb_index )
         if( !strncmp( p, "/index.", 7 ) )
         {
             p[1] = '\0';
-            *pb_index = VLC_TRUE;
+            *pb_index = true;
         }
     }
     return url;
@@ -188,7 +188,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
     }
 
     snprintf( dir, sizeof( dir ), "%s%c.hosts", psz_dir, sep );
-    p_acl = ACL_Create( p_intf, VLC_FALSE );
+    p_acl = ACL_Create( p_intf, false );
     if( ACL_LoadFile( p_acl, dir ) )
     {
         ACL_Destroy( p_acl );
@@ -218,7 +218,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
         {
             httpd_file_sys_t *f = NULL;
             httpd_handler_sys_t *h = NULL;
-            vlc_bool_t b_index;
+            bool b_index;
             char *psz_name, *psz_ext;
 
             psz_name = E_(FileToUrl)( &dir[strlen( psz_root )], &b_index );
@@ -234,14 +234,14 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
                 {
                     f = malloc( sizeof( httpd_handler_sys_t ) );
                     h = (httpd_handler_sys_t *)f;
-                    f->b_handler = VLC_TRUE;
+                    f->b_handler = true;
                     h->p_association = p_sys->pp_handlers[i];
                 }
             }
             if( f == NULL )
             {
                 f = malloc( sizeof( httpd_file_sys_t ) );
-                f->b_handler = VLC_FALSE;
+                f->b_handler = false;
             }
 
             f->p_intf  = p_intf;
@@ -250,7 +250,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             f->p_redir2 = NULL;
             f->file = strdup (dir);
             f->name = psz_name;
-            f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) || strstr( &dir[strlen( psz_root )], ".xml" ) ? VLC_TRUE : VLC_FALSE;
+            f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) || strstr( &dir[strlen( psz_root )], ".xml" ) ? true : false;
 
             if( !f->name )
             {
@@ -642,12 +642,12 @@ int E_(TestURIParam)( char *psz_uri, const char *psz_name )
         if( (p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n')
               && p[strlen(psz_name)] == '=' )
         {
-            return VLC_TRUE;
+            return true;
         }
         p++;
     }
 
-    return VLC_FALSE;
+    return false;
 }
 
 static char *FindURIValue( char *psz_uri, const char *restrict psz_name,
@@ -747,7 +747,7 @@ char *E_(ExtractURIString)( char *restrict psz_uri,
  * string, the function returns the remaining string. */
 char *E_(FirstWord)( char *psz, char *new )
 {
-    vlc_bool_t b_end;
+    bool b_end;
 
     while( *psz == ' ' )
         psz++;
@@ -792,7 +792,7 @@ char *E_(FirstWord)( char *psz, char *new )
  * of space to delimit option boundaries. */
 static char *FirstOption( char *psz, char *new )
 {
-    vlc_bool_t b_end, b_start = VLC_TRUE;
+    bool b_end, b_start = true;
 
     while( *psz == ' ' )
         psz++;
@@ -807,7 +807,7 @@ static char *FirstOption( char *psz, char *new )
                 if( *psz == '\\' && psz[1] != '\0' )
                     psz++;
                 *new++ = *psz++;
-                b_start = VLC_FALSE;
+                b_start = false;
             }
             if( *psz == c )
                 psz++;
@@ -817,7 +817,7 @@ static char *FirstOption( char *psz, char *new )
             if( *psz == '\\' && psz[1] != '\0' )
                 psz++;
             *new++ = *psz++;
-            b_start = VLC_FALSE;
+            b_start = false;
         }
     }
     b_end = !*psz;

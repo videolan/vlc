@@ -63,8 +63,8 @@ struct filter_sys_t
     image_handler_t *p_image;
 
     int i_position;           /* Mosaic positioning method */
-    vlc_bool_t b_ar;          /* Do we keep the aspect ratio ? */
-    vlc_bool_t b_keep;        /* Do we keep the original picture format ? */
+    bool b_ar;          /* Do we keep the aspect ratio ? */
+    bool b_keep;        /* Do we keep the original picture format ? */
     int i_width, i_height;    /* Mosaic height and width */
     int i_cols, i_rows;       /* Mosaic rows and cols */
     int i_align;              /* Mosaic alignment in background video */
@@ -182,50 +182,50 @@ vlc_module_begin();
     set_callbacks( CreateFilter, DestroyFilter );
 
     add_integer( CFG_PREFIX "alpha", 255, NULL,
-                 ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );
+                 ALPHA_TEXT, ALPHA_LONGTEXT, false );
 
     add_integer( CFG_PREFIX "height", 100, NULL,
-                 HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+                 HEIGHT_TEXT, HEIGHT_LONGTEXT, false );
     add_integer( CFG_PREFIX "width", 100, NULL,
-                 WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
+                 WIDTH_TEXT, WIDTH_LONGTEXT, false );
 
     add_integer( CFG_PREFIX "align", 5, NULL,
-                 ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE);
+                 ALIGN_TEXT, ALIGN_LONGTEXT, true);
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
 
     add_integer( CFG_PREFIX "xoffset", 0, NULL,
-                 XOFFSET_TEXT, XOFFSET_LONGTEXT, VLC_TRUE );
+                 XOFFSET_TEXT, XOFFSET_LONGTEXT, true );
     add_integer( CFG_PREFIX "yoffset", 0, NULL,
-                 YOFFSET_TEXT, YOFFSET_LONGTEXT, VLC_TRUE );
+                 YOFFSET_TEXT, YOFFSET_LONGTEXT, true );
 
     add_integer( CFG_PREFIX "borderw", 0, NULL,
-                 BORDERW_TEXT, BORDERW_LONGTEXT, VLC_TRUE );
+                 BORDERW_TEXT, BORDERW_LONGTEXT, true );
         add_deprecated_alias( CFG_PREFIX "vborder" );
     add_integer( CFG_PREFIX "borderh", 0, NULL,
-                 BORDERH_TEXT, BORDERH_LONGTEXT, VLC_TRUE );
+                 BORDERH_TEXT, BORDERH_LONGTEXT, true );
         add_deprecated_alias( CFG_PREFIX "hborder" );
 
     add_integer( CFG_PREFIX "position", 0, NULL,
-                 POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+                 POS_TEXT, POS_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer( CFG_PREFIX "rows", 2, NULL,
-                 ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+                 ROWS_TEXT, ROWS_LONGTEXT, false );
     add_integer( CFG_PREFIX "cols", 2, NULL,
-                 COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+                 COLS_TEXT, COLS_LONGTEXT, false );
 
     add_bool( CFG_PREFIX "keep-aspect-ratio", 0, NULL,
-              AR_TEXT, AR_LONGTEXT, VLC_FALSE );
+              AR_TEXT, AR_LONGTEXT, false );
     add_bool( CFG_PREFIX "keep-picture", 0, NULL,
-              KEEP_TEXT, KEEP_LONGTEXT, VLC_FALSE );
+              KEEP_TEXT, KEEP_LONGTEXT, false );
 
     add_string( CFG_PREFIX "order", "", NULL,
-                ORDER_TEXT, ORDER_LONGTEXT, VLC_FALSE );
+                ORDER_TEXT, ORDER_LONGTEXT, false );
 
     add_string( CFG_PREFIX "offsets", "", NULL,
-                OFFSETS_TEXT, OFFSETS_LONGTEXT, VLC_FALSE );
+                OFFSETS_TEXT, OFFSETS_LONGTEXT, false );
 
     add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
-                 VLC_FALSE );
+                 false );
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
@@ -456,10 +456,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_channel = 0;
     p_spu->i_start  = date;
     p_spu->i_stop = 0;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
     p_spu->i_alpha = p_sys->i_alpha;
     p_spu->i_flags = p_sys->i_align;
-    p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_absolute = false;
 
     vlc_mutex_lock( &p_sys->lock );
     vlc_mutex_lock( p_sys->p_lock );

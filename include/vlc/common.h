@@ -61,7 +61,7 @@ typedef signed long long vlc_int64_t;
 typedef union
 {
     int             i_int;
-    vlc_bool_t      b_bool;
+    bool      b_bool;
     float           f_float;
     char *          psz_string;
     void *          p_address;

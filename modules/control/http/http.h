@@ -106,7 +106,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 /** This function loads a file into a buffer */
 int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data );
 /** This function creates a suitable URL for a filename */
-char *E_(FileToUrl)( char *name, vlc_bool_t *pb_index );
+char *E_(FileToUrl)( char *name, bool *pb_index );
 /** This function returns the real path of a file or directory */
 char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src );
 
@@ -316,7 +316,7 @@ struct httpd_file_sys_t
     char          *file;
     char          *name;
 
-    vlc_bool_t    b_html, b_handler;
+    bool    b_html, b_handler;
 
     /* inited for each access */
     rpn_stack_t   stack;

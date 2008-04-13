@@ -87,9 +87,9 @@ vlc_module_begin();
         set_description( _("Lua Interface Module") );
         set_capability( "interface", 0 );
         add_string( "lua-intf", "dummy", NULL,
-                    INTF_TEXT, INTF_LONGTEXT, VLC_FALSE );
+                    INTF_TEXT, INTF_LONGTEXT, false );
         add_string( "lua-config", "", NULL,
-                    CONFIG_TEXT, CONFIG_LONGTEXT, VLC_FALSE );
+                    CONFIG_TEXT, CONFIG_LONGTEXT, false );
         set_callbacks( E_(Open_LuaIntf), E_(Close_LuaIntf) );
 vlc_module_end();
 
@@ -680,7 +680,7 @@ void __vlclua_read_options( vlc_object_t *p_this, lua_State *L,
 
 int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                                     playlist_t *p_playlist,
-                                    input_item_t *p_parent, vlc_bool_t b_play )
+                                    input_item_t *p_parent, bool b_play )
 {
     int i_count = 0;
 
@@ -765,7 +765,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                         playlist_AddInput( p_playlist, p_input,
                                PLAYLIST_APPEND | 
                                ( b_play ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
-                               PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                               PLAYLIST_END, true, false );
                     i_count ++; /* increment counter */
                     vlc_gc_decref( p_input );
                     while( i_options > 0 )

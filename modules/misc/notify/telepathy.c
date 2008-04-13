@@ -80,7 +80,7 @@ vlc_module_begin();
     set_description( _("Telepathy \"Now Playing\" using MissionControl") );
 
     add_string( "telepathy-format", FORMAT_DEFAULT, NULL,
-                FORMAT_TEXT, FORMAT_LONGTEXT, VLC_FALSE );
+                FORMAT_TEXT, FORMAT_LONGTEXT, false );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -134,7 +134,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    p_this->b_dead = VLC_TRUE;
+    p_this->b_dead = true;
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist = pl_Yield( p_this );
 

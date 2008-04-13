@@ -54,7 +54,7 @@ struct intf_sys_t
 #endif
     int i_calibrate;
 
-    vlc_bool_t b_use_rotate;
+    bool b_use_rotate;
 };
 
 /*****************************************************************************
@@ -77,7 +77,7 @@ vlc_module_begin();
     set_description( _("motion control interface") );
 
     add_bool( "motion-use-rotate", 0, NULL,
-              USE_ROTATE_TEXT, USE_ROTATE_TEXT, VLC_FALSE );
+              USE_ROTATE_TEXT, USE_ROTATE_TEXT, false );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -163,7 +163,7 @@ static void RunIntf( intf_thread_t *p_intf )
     {
         vout_thread_t *p_vout;
         const char *psz_filter, *psz_type;
-        vlc_bool_t b_change = VLC_FALSE;
+        bool b_change = false;
 
         /* Wait a bit, get orientation, change filter if necessary */
         msleep( INTF_IDLE_SLEEP );
@@ -194,20 +194,20 @@ static void RunIntf( intf_thread_t *p_intf )
 
         if( i_x < -HIGH_THRESHOLD && i_oldx > -LOW_THRESHOLD )
         {
-            b_change = VLC_TRUE;
+            b_change = true;
             psz_filter = "transform";
             psz_type = "270";
         }
         else if( ( i_x > -LOW_THRESHOLD && i_oldx < -HIGH_THRESHOLD )
                  || ( i_x < LOW_THRESHOLD && i_oldx > HIGH_THRESHOLD ) )
         {
-            b_change = VLC_TRUE;
+            b_change = true;
             psz_filter = "";
             psz_type = "";
         }
         else if( i_x > HIGH_THRESHOLD && i_oldx < LOW_THRESHOLD )
         {
-            b_change = VLC_TRUE;
+            b_change = true;
             psz_filter = "transform";
             psz_type = "90";
         }

@@ -83,13 +83,13 @@ vlc_module_begin();
     set_shortname( "UDP" );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
-    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
-                                 VLC_TRUE );
+                                 true );
     add_obsolete_integer( SOUT_CFG_PREFIX "late" );
     add_obsolete_bool( SOUT_CFG_PREFIX "raw" );
-    add_bool( SOUT_CFG_PREFIX "auto-mcast", VLC_FALSE, NULL, AUTO_MCAST_TEXT,
-              AUTO_MCAST_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "auto-mcast", false, NULL, AUTO_MCAST_TEXT,
+              AUTO_MCAST_LONGTEXT, true );
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
@@ -142,7 +142,7 @@ typedef struct sout_access_thread_t
 struct sout_access_out_sys_t
 {
     int                 i_mtu;
-    vlc_bool_t          b_mtu_warning;
+    bool          b_mtu_warning;
 
     block_t             *p_buffer;
 
@@ -266,7 +266,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_buffer = NULL;
 
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
-                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_HIGHEST, false ) )
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
         net_Close (i_handle);
@@ -341,7 +341,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         {
             msg_Warn( p_access, "packet size > MTU, you should probably "
                       "increase the MTU" );
-            p_sys->b_mtu_warning = VLC_TRUE;
+            p_sys->b_mtu_warning = true;
         }
 
         /* Check if there is enough space in the buffer */

@@ -70,7 +70,7 @@ vlc_module_begin();
     set_description( _("LibNotify Notification Plugin") );
 
     add_integer( "notify-timeout", 4000,NULL,
-                TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_TRUE );
+                TIMEOUT_TEXT, TIMEOUT_LONGTEXT, true );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );

@@ -62,7 +62,7 @@ struct input_item_t
 
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */
-    vlc_bool_t  b_fixed_name;        /**< Can the interface change the name ?*/
+    bool  b_fixed_name;        /**< Can the interface change the name ?*/
 
     int        i_options;            /**< Number of input options */
     char       **ppsz_options;       /**< Array of input options */
@@ -72,7 +72,7 @@ struct input_item_t
     mtime_t    i_duration;           /**< Duration in milliseconds*/
 
     uint8_t    i_type;               /**< Type (file, disc, ...) */
-    vlc_bool_t b_prefers_tree;      /**< Do we prefer being displayed as tree*/
+    bool b_prefers_tree;      /**< Do we prefer being displayed as tree*/
 
     int        i_categories;         /**< Number of info categories */
     info_category_t **pp_categories; /**< Pointer to the first info category */
@@ -165,16 +165,16 @@ int input_ItemAddOption (input_item_t *item, const char *str)
 
 VLC_EXPORT( void, input_item_SetMeta, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val ));
 
-static inline vlc_bool_t input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz )
+static inline bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz )
 {
     vlc_mutex_lock( &p_i->lock );
     if( !p_i->p_meta )
     {
         vlc_mutex_unlock( &p_i->lock );
-        return VLC_FALSE;
+        return false;
     }
     const char * meta = vlc_meta_Get( p_i->p_meta, meta_type );
-    vlc_bool_t ret = meta && strcasestr( meta, psz );
+    bool ret = meta && strcasestr( meta, psz );
     vlc_mutex_unlock( &p_i->lock );
 
     return ret;
@@ -232,17 +232,17 @@ static inline mtime_t input_item_GetDuration( input_item_t * p_i )
 
 static inline void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration )
 {
-    vlc_bool_t send_event = VLC_FALSE;
+    bool send_event = false;
 
     vlc_mutex_lock( &p_i->lock );
     if( p_i->i_duration != i_duration )
     {
         p_i->i_duration = i_duration;
-        send_event = VLC_TRUE;
+        send_event = true;
     }
     vlc_mutex_unlock( &p_i->lock );
 
-    if ( send_event == VLC_TRUE )
+    if ( send_event == true )
     {
         vlc_event_t event;
         event.type = vlc_InputItemDurationChanged;
@@ -254,20 +254,20 @@ static inline void input_item_SetDuration( input_item_t * p_i, mtime_t i_duratio
 }
 
 
-static inline vlc_bool_t input_item_IsPreparsed( input_item_t *p_i )
+static inline bool input_item_IsPreparsed( input_item_t *p_i )
 {
-    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_PREPARSED : VLC_FALSE ;
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_PREPARSED : false ;
 }
 
-static inline vlc_bool_t input_item_IsMetaFetched( input_item_t *p_i )
+static inline bool input_item_IsMetaFetched( input_item_t *p_i )
 {
-    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_META_FETCHED : VLC_FALSE ;
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_META_FETCHED : false ;
 }
 
 
-static inline vlc_bool_t input_item_IsArtFetched( input_item_t *p_i )
+static inline bool input_item_IsArtFetched( input_item_t *p_i )
 {
-    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_ART_FETCHED : VLC_FALSE ;
+    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_ART_FETCHED : false ;
 }
 
 static inline const vlc_meta_t * input_item_GetMetaObject( input_item_t *p_i )
@@ -348,24 +348,24 @@ static inline void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_d
     if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_TRACK_GAIN" )) ||
         (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "RG_RADIO" )) )
     {
-        p_dst->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+        p_dst->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
         p_dst->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
     }
     else if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_TRACK_PEAK" )) ||
              (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "RG_PEAK" )) )
     {
-        p_dst->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+        p_dst->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
         p_dst->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
     }
     else if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_ALBUM_GAIN" )) ||
              (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "RG_AUDIOPHILE" )) )
     {
-        p_dst->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+        p_dst->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
         p_dst->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
     }
     else if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_ALBUM_PEAK" )) )
     {
-        p_dst->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+        p_dst->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
         p_dst->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
     }
 }
@@ -414,7 +414,7 @@ typedef struct
 {
     char        *psz_name;
 
-    vlc_bool_t  b_menu;      /* Is it a menu or a normal entry */
+    bool  b_menu;      /* Is it a menu or a normal entry */
 
     int64_t     i_length;   /* Length(microsecond) if known, else 0 */
     int64_t     i_size;     /* Size (bytes) if known, else 0 */
@@ -430,7 +430,7 @@ static inline input_title_t *vlc_input_title_New(void)
     input_title_t *t = (input_title_t*)malloc( sizeof( input_title_t ) );
 
     t->psz_name = NULL;
-    t->b_menu = VLC_FALSE;
+    t->b_menu = false;
     t->i_length = 0;
     t->i_size   = 0;
     t->i_seekpoint = 0;
@@ -576,11 +576,11 @@ struct input_thread_t
 {
     VLC_COMMON_MEMBERS;
 
-    vlc_bool_t  b_eof;
-    vlc_bool_t b_preparsing;
+    bool  b_eof;
+    bool b_preparsing;
 
     int i_state;
-    vlc_bool_t b_can_pace_control;
+    bool b_can_pace_control;
     int64_t     i_time;     /* Current time */
 
     /* Internal caching common to all inputs */
@@ -604,7 +604,7 @@ VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item
 VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
 
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
-VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );
+VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 
 enum input_query_e
@@ -667,10 +667,10 @@ enum input_query_e
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
 VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
 
-VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder ) );
+VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, bool b_force_decoder ) );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
-VLC_EXPORT( vlc_bool_t, input_AddSubtitles, ( input_thread_t *, char *, vlc_bool_t ) );
+VLC_EXPORT( bool, input_AddSubtitles, ( input_thread_t *, char *, bool ) );
 
 #endif

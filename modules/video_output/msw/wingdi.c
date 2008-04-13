@@ -451,7 +451,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* Change the window title bar text */
     PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
-    E_(UpdateRects)( p_vout, VLC_TRUE );
+    E_(UpdateRects)( p_vout, true );
 
     return VLC_SUCCESS;
 }
@@ -535,7 +535,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        E_(UpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, true );
     }
 
     /*
@@ -616,7 +616,7 @@ static int Manage( vout_thread_t *p_vout )
                           SWP_NOSIZE | SWP_NOMOVE );
         }
 
-        p_vout->p_sys->b_on_top_change = VLC_FALSE;
+        p_vout->p_sys->b_on_top_change = false;
     }
 
     /* Check if the event thread is still running */

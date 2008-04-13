@@ -49,7 +49,7 @@
 static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                              int i_es_size, es_format_t *p_fmt,
                              int i_stream_id, int i_private_id,
-                             vlc_bool_t b_mpeg2, vlc_bool_t b_data_alignment,
+                             bool b_mpeg2, bool b_data_alignment,
                              int i_header_size )
 {
     bits_buffer_t bits;

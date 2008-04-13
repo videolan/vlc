@@ -44,8 +44,8 @@ struct demux_sys_t
     char    *psz_prefix;
     char    *psz_data;
     int64_t i_data_len;
-    vlc_bool_t b_utf8;
-    vlc_bool_t b_skip_ads;
+    bool b_utf8;
+    bool b_skip_ads;
 };
 
 /*****************************************************************************
@@ -207,7 +207,7 @@ int E_(Import_ASX)( vlc_object_t *p_this )
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
     p_demux->p_sys->psz_data = NULL;
     p_demux->p_sys->i_data_len = -1;
-    p_demux->p_sys->b_utf8 = VLC_FALSE;
+    p_demux->p_sys->b_utf8 = false;
     p_demux->p_sys->b_skip_ads = config_GetInt( p_demux, "playlist-skip-ads" );
 
     return VLC_SUCCESS;
@@ -231,7 +231,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     char        *psz_parse = NULL;
     char        *psz_backup = NULL;
-    vlc_bool_t  b_entry = VLC_FALSE;
+    bool  b_entry = false;
     input_item_t *p_input;
     INIT_PLAYLIST_STUFF;
 
@@ -280,7 +280,7 @@ static int Demux( demux_t *p_demux )
         char *psz_moreinfo_entry = NULL;
         char *psz_abstract_entry = NULL;
         int i_entry_count = 0;
-        vlc_bool_t b_skip_entry = VLC_FALSE;
+        bool b_skip_entry = false;
 
         char *psz_href = NULL;
         int i_starttime = 0;
@@ -299,7 +299,7 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "<PARAM ", 7 ) )
             {
-                vlc_bool_t b_encoding_flag = VLC_FALSE;
+                bool b_encoding_flag = false;
                 psz_parse = SkipBlanks(psz_parse+7, (unsigned)-1);
                 if( !strncasecmp( psz_parse, "name", 4 ) )
                 {
@@ -337,7 +337,7 @@ static int Demux( demux_t *p_demux )
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             msg_Dbg( p_demux, "param value: %s", psz_string);
-                            if( b_encoding_flag && !strcasecmp( psz_string, "utf-8" ) ) p_sys->b_utf8 = VLC_TRUE;
+                            if( b_encoding_flag && !strcasecmp( psz_string, "utf-8" ) ) p_sys->b_utf8 = true;
                             free( psz_string );
                         }
                         else continue;
@@ -542,7 +542,7 @@ static int Demux( demux_t *p_demux )
                 FREENULL( psz_copyright_entry );
                 FREENULL( psz_moreinfo_entry );
                 FREENULL( psz_abstract_entry );
-                b_entry = VLC_FALSE;
+                b_entry = false;
             }
             else if( !strncasecmp( psz_parse, "<Entry", 6 ) )
             {
@@ -554,7 +554,7 @@ static int Demux( demux_t *p_demux )
                     continue;
                 }
                 i_entry_count += 1;
-                b_entry = VLC_TRUE;
+                b_entry = true;
                 psz_clientskip = strcasestr( psz_parse, "clientskip=\"no\"" );
                 psz_parse = strcasestr( psz_parse, ">" );
 

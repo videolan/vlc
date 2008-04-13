@@ -135,7 +135,7 @@ struct decoder_sys_t
     int i_input_rate;
 
     /* LOAS */
-    vlc_bool_t b_latm_cfg;
+    bool b_latm_cfg;
     latm_mux_t latm;
 };
 
@@ -210,7 +210,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->bytestream = block_BytestreamInit();
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
-    p_sys->b_latm_cfg = VLC_FALSE;
+    p_sys->b_latm_cfg = false;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -332,7 +332,7 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
                          unsigned int * pi_header_size )
 {
     int i_profile, i_sample_rate_idx, i_frame_size;
-    vlc_bool_t b_crc;
+    bool b_crc;
 
     /* Fixed header between frames */
     //int i_id = ( (p_buf[1] >> 3) & 0x01) ? 2 : 4; /* MPEG-2 or 4 */
@@ -704,13 +704,13 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bs_t *s )
         for( i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++ )
         {
             latm_stream_t *st = &m->stream[m->i_streams];
-            vlc_bool_t b_previous_cfg;
+            bool b_previous_cfg;
 
             m->pi_stream[i_program][i_layer] = m->i_streams;
             st->i_program = i_program;
             st->i_layer = i_layer;
 
-            b_previous_cfg = VLC_FALSE;
+            b_previous_cfg = false;
             if( i_program != 0 || i_layer != 0 )
                 b_previous_cfg = bs_read1( s );
 
@@ -820,7 +820,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                 memcpy( p_dec->fmt_out.p_extra, st->extra, st->i_extra );
             }
 
-            p_sys->b_latm_cfg = VLC_TRUE;
+            p_sys->b_latm_cfg = true;
         }
     }
     /* Wait for the configuration */
@@ -1140,7 +1140,7 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
             p_out_buffer = block_New( p_dec, p_sys->i_frame_size );
             if( !p_out_buffer )
             {
-                //p_dec->b_error = VLC_TRUE;
+                //p_dec->b_error = true;
                 return NULL;
             }
             p_buf = p_out_buffer->p_buffer;

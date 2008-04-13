@@ -290,7 +290,7 @@ static int Open( vlc_object_t *p_this )
     /* Create our playlist node */
     playlist_NodesPairCreate( pl_Get( p_sd ), _("Devices"),
                               &p_sys->p_node_cat, &p_sys->p_node_one,
-                              VLC_TRUE );
+                              true );
 
     return VLC_SUCCESS;
 }
@@ -300,10 +300,10 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, VLC_TRUE,
-                         VLC_TRUE );
-    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, VLC_TRUE,
-                         VLC_TRUE );
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_one, true,
+                         true );
+    playlist_NodeDelete( pl_Get( p_sd ), p_sys->p_node_cat, true,
+                         true );
 
     free( p_sys );
 }
@@ -621,7 +621,7 @@ MediaServer::~MediaServer()
     if ( _contents )
     {
         playlist_NodeDelete( pl_Get( _cookie->serviceDiscovery ) ,
-                             _playlistNode, VLC_TRUE, VLC_TRUE );
+                             _playlistNode, true, true );
     }
 
     delete _contents;
@@ -760,7 +760,7 @@ void MediaServer::fetchContents()
     if ( _contents )
     {
         PL_LOCK;
-        playlist_NodeEmpty( p_playlist, _playlistNode, VLC_TRUE );
+        playlist_NodeEmpty( p_playlist, _playlistNode, true );
         PL_UNLOCK;
         delete _contents;
     }
@@ -874,9 +874,9 @@ void MediaServer::_buildPlaylist( Container* parent )
         /* FIXME: playlist_AddInput() can fail */
         playlist_BothAddInput( p_playlist, p_input, parentNode,
                                PLAYLIST_APPEND, PLAYLIST_END, &i_cat, NULL,
-                               VLC_FALSE );
+                               false );
         /* TODO: do this better by storing ids */
-        playlist_item_t *p_node = playlist_ItemGetById( p_playlist, i_cat, VLC_FALSE );
+        playlist_item_t *p_node = playlist_ItemGetById( p_playlist, i_cat, false );
         assert( p_node );
         item->setPlaylistNode( p_node );
     }

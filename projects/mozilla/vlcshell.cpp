@@ -583,7 +583,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
                     libvlc_playlist_play(p_vlc, 0, 0, NULL, NULL);
                 }
             }
-            p_plugin->b_stream = VLC_TRUE;
+            p_plugin->b_stream = true;
         }
     }
     return NPERR_NO_ERROR;

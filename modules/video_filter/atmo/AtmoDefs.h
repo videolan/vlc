@@ -16,9 +16,9 @@
 
 /* some things need to be changed if this code is used inside VideoLan Filter Module */
 #   define _ATMO_VLC_PLUGIN_
-#   define ATMO_BOOL vlc_bool_t
-#   define ATMO_TRUE VLC_TRUE
-#   define ATMO_FALSE VLC_FALSE
+#   define ATMO_BOOL bool
+#   define ATMO_TRUE true
+#   define ATMO_FALSE false
 
 #else
 

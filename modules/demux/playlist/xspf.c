@@ -157,11 +157,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * \param p_xml_reader xml reader instance
  * \param psz_element name of element to parse
  */
-static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
+static bool parse_playlist_node COMPLEX_INTERFACE
 {
     char *psz_name=NULL;
     char *psz_value=NULL;
-    vlc_bool_t b_version_found = VLC_FALSE;
+    bool b_version_found = false;
     int i_node;
     xml_elem_hnd_t *p_handler=NULL;
 
@@ -192,12 +192,12 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
         {
             msg_Err( p_demux, "invalid xml stream @ <playlist>" );
             FREE_ATT();
-            return VLC_FALSE;
+            return false;
         }
         /* attribute: version */
         if( !strcmp( psz_name, "version" ) )
         {
-            b_version_found = VLC_TRUE;
+            b_version_found = true;
             if( strcmp( psz_value, "0" ) && strcmp( psz_value, "1" ) )
                 msg_Warn( p_demux, "unsupported XSPF version" );
         }
@@ -233,7 +233,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 /* choose handler */
                 for( p_handler = pl_elements;
@@ -243,7 +243,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 FREE_NAME();
                 /* complex content is parsed in a separate function */
@@ -261,7 +261,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                     else
                     {
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                 }
                 break;
@@ -274,7 +274,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 break;
 
@@ -285,13 +285,13 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 /* leave if the current parent node <playlist> is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    return VLC_TRUE;
+                    return true;
                 }
                 /* there MUST have been a start tag for that element name */
                 if( !p_handler || !p_handler->name
@@ -300,7 +300,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
 
                 if( p_handler->pf_handler.smpl )
@@ -316,17 +316,17 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
                 FREE_ATT();
-                return VLC_FALSE;
+                return false;
         }
         FREE_NAME();
     }
-    return VLC_FALSE;
+    return false;
 }
 
 /**
  * \brief parses the tracklist node which only may contain <track>s
  */
-static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE
+static bool parse_tracklist_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(psz_element);
     char *psz_name=NULL;
@@ -344,20 +344,20 @@ static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE
             {
                 msg_Err( p_demux, "unexpected end of xml data" );
                 FREE_NAME();
-                return VLC_FALSE;
+                return false;
             }
             if( strcmp( psz_name, "track") )
             {
                 msg_Err( p_demux, "unexpected child of <trackList>: <%s>",
                          psz_name );
                 FREE_NAME();
-                return VLC_FALSE;
+                return false;
             }
             FREE_NAME();
 
             /* parse the track data in a separate function */
             if( parse_track_node( p_demux, p_playlist, p_input_item,
-                                   p_xml_reader,"track" ) == VLC_TRUE )
+                                   p_xml_reader,"track" ) == true )
                 i_ntracks++;
         }
         else if( i_node == XML_READER_ENDELEM )
@@ -369,27 +369,27 @@ static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE
     {
         msg_Err( p_demux, "there's a missing </trackList>" );
         FREE_NAME();
-        return VLC_FALSE;
+        return false;
     }
     psz_name = xml_ReaderName( p_xml_reader );
     if( !psz_name || strcmp( psz_name, "trackList" ) )
     {
         msg_Err( p_demux, "expected: </trackList>, found: </%s>", psz_name );
         FREE_NAME();
-        return VLC_FALSE;
+        return false;
     }
     FREE_NAME();
 
     msg_Dbg( p_demux, "parsed %i tracks successfully", i_ntracks );
 
-    return VLC_TRUE;
+    return true;
 }
 
 /**
  * \brief parse one track element
  * \param COMPLEX_INTERFACE
  */
-static vlc_bool_t parse_track_node COMPLEX_INTERFACE
+static bool parse_track_node COMPLEX_INTERFACE
 {
     input_item_t *p_new_input = NULL;
     int i_node;
@@ -429,7 +429,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 /* choose handler */
                 for( p_handler = track_elements;
@@ -439,7 +439,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 FREE_NAME();
                 /* complex content is parsed in a separate function */
@@ -451,7 +451,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                                  "at <%s> level no new item has been allocated",
                                  p_handler->name );
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                     if( p_handler->pf_handler.cmplx( p_demux,
                                                      p_playlist,
@@ -465,7 +465,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                     else
                     {
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                 }
                 break;
@@ -478,7 +478,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 break;
 
@@ -489,7 +489,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 /* leave if the current parent node <track> is terminated */
                 if( !strcmp( psz_name, psz_element ) )
@@ -514,7 +514,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                                      p_demux->p_sys->i_tracklist_entries,
                                      p_new_input );
                     }
-                    return VLC_TRUE;
+                    return true;
                 }
                 /* there MUST have been a start tag for that element name */
                 if( !p_handler || !p_handler->name
@@ -523,7 +523,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
 
                 /* special case: location */
@@ -536,7 +536,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                         msg_Err( p_demux, "item <%s> already created",
                                  psz_name );
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                     psz_uri = decode_URI_duplicate( psz_value );
 
@@ -551,7 +551,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                            if( !psz_tmp )
                            {
                                msg_Err( p_demux, "out of memory");
-                               return VLC_FALSE;
+                               return false;
                            }
                            sprintf( psz_tmp, "%s%s",
                                     p_demux->p_sys->psz_base, psz_uri );
@@ -569,7 +569,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                     else
                     {
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                 }
                 else if( !strcmp( p_handler->name, "identifier" ) )
@@ -584,7 +584,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                         msg_Err( p_demux, "item not yet created at <%s>",
                                  psz_name );
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                     if( p_handler->pf_handler.smpl )
                     {
@@ -602,23 +602,23 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
                 FREE_ATT();
-                return VLC_FALSE;
+                return false;
         }
         FREE_NAME();
     }
     msg_Err( p_demux, "unexpected end of xml data" );
     FREE_ATT();
-    return VLC_FALSE;
+    return false;
 }
 
 /**
  * \brief handles the supported <track> sub-elements
  */
-static vlc_bool_t set_item_info SIMPLE_INTERFACE
+static bool set_item_info SIMPLE_INTERFACE
 {
     /* exit if setting is impossible */
     if( !psz_name || !psz_value || !p_input )
-        return VLC_FALSE;
+        return false;
 
 
     /* re-convert xml special characters inside psz_value */
@@ -657,14 +657,14 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
         input_item_SetArtURL( p_input, psz_uri );
         free( psz_uri );
     }
-    return VLC_TRUE;
+    return true;
 }
 
 
 /**
  * \brief parse the extension node of a XSPF playlist
  */
-static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
+static bool parse_extension_node COMPLEX_INTERFACE
 {
     char *psz_name = NULL;
     char *psz_value = NULL;
@@ -689,7 +689,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         {
             msg_Err( p_demux, "invalid xml stream @ <node>" );
             FREE_ATT();
-            return VLC_FALSE;
+            return false;
         }
         /* attribute: title */
         if( !strcmp( psz_name, "title" ) )
@@ -715,7 +715,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         if( !psz_title )
         {
             msg_Warn( p_demux, "<node> requires \"title\" attribute" );
-            return VLC_FALSE;
+            return false;
         }
         p_new_input = input_ItemNewWithType( VLC_OBJECT( p_playlist ), "vlc://nop",
                                 psz_title, 0, NULL, -1, ITEM_TYPE_DIRECTORY );
@@ -732,13 +732,13 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
         if( !psz_application )
         {
             msg_Warn( p_demux, "<extension> requires \"application\" attribute" );
-            return VLC_FALSE;
+            return false;
         }
         else if( strcmp( psz_application, "http://www.videolan.org/vlc/playlist/0" ) )
         {
             msg_Dbg( p_demux, "Skipping \"%s\" extension tag", psz_application );
             free( psz_application );
-            return VLC_FALSE;
+            return false;
         }
     }
     free( psz_application );
@@ -758,7 +758,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 /* choose handler */
                 for( p_handler = pl_elements;
@@ -768,7 +768,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 FREE_NAME();
                 /* complex content is parsed in a separate function */
@@ -786,7 +786,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                     else
                     {
                         FREE_ATT();
-                        return VLC_FALSE;
+                        return false;
                     }
                 }
                 break;
@@ -799,7 +799,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 break;
 
@@ -810,13 +810,13 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "invalid xml stream" );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
                 /* leave if the current parent node is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
-                    return VLC_TRUE;
+                    return true;
                 }
                 /* there MUST have been a start tag for that element name */
                 if( !p_handler || !p_handler->name
@@ -825,7 +825,7 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
                     FREE_ATT();
-                    return VLC_FALSE;
+                    return false;
                 }
 
                 if( p_handler->pf_handler.smpl )
@@ -841,17 +841,17 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
                 FREE_ATT();
-                return VLC_FALSE;
+                return false;
         }
         FREE_NAME();
     }
-    return VLC_FALSE;
+    return false;
 }
 
 /**
  * \brief parse the extension item node of a XSPF playlist
  */
-static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
+static bool parse_extitem_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(p_playlist); VLC_UNUSED(psz_element);
     input_item_t *p_new_input = NULL;
@@ -868,7 +868,7 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
         {
             msg_Err( p_demux, "invalid xml stream @ <item>" );
             FREE_ATT();
-            return VLC_FALSE;
+            return false;
         }
         /* attribute: href */
         if( !strcmp( psz_name, "href" ) )
@@ -886,13 +886,13 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
     if( i_href < 0 )
     {
         msg_Warn( p_demux, "<item> requires \"href\" attribute" );
-        return VLC_FALSE;
+        return false;
     }
 
     if( i_href >= p_demux->p_sys->i_tracklist_entries )
     {
         msg_Warn( p_demux, "invalid \"href\" attribute" );
-        return VLC_FALSE;
+        return false;
     }
 
     p_new_input = p_demux->p_sys->pp_tracklist[ i_href ];
@@ -907,13 +907,13 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
     /* (libxml sends NONE) */
     xml_ReaderRead( p_xml_reader );
 
-    return VLC_TRUE;
+    return true;
 }
 
 /**
  * \brief skips complex element content that we can't manage
  */
-static vlc_bool_t skip_element COMPLEX_INTERFACE
+static bool skip_element COMPLEX_INTERFACE
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(p_playlist); VLC_UNUSED(p_input_item);
     char *psz_endname;
@@ -924,15 +924,15 @@ static vlc_bool_t skip_element COMPLEX_INTERFACE
         {
             psz_endname = xml_ReaderName( p_xml_reader );
             if( !psz_endname )
-                return VLC_FALSE;
+                return false;
             if( !strcmp( psz_element, psz_endname ) )
             {
                 free( psz_endname );
-                return VLC_TRUE;
+                return true;
             }
             else
                 free( psz_endname );
         }
     }
-    return VLC_FALSE;
+    return false;
 }

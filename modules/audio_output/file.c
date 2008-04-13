@@ -48,7 +48,7 @@
 struct aout_sys_t
 {
     FILE     * p_file;
-    vlc_bool_t b_add_wav_header;
+    bool b_add_wav_header;
 
     WAVEHEADER waveh;                      /* Wave header of the output file */
 };
@@ -114,14 +114,14 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
 
     add_string( "audiofile-format", "s16", NULL,
-                FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
+                FORMAT_TEXT, FORMAT_LONGTEXT, true );
         change_string_list( format_list, 0, 0 );
     add_integer( "audiofile-channels", 0, NULL,
-                 CHANNELS_TEXT, CHANNELS_LONGTEXT, VLC_TRUE );
+                 CHANNELS_TEXT, CHANNELS_LONGTEXT, true );
     add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
-              FILE_LONGTEXT, VLC_FALSE );
+              FILE_LONGTEXT, false );
         change_unsafe();
-    add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );
+    add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, true );
 
     set_capability( "audio output", 0 );
     add_shortcut( "file" );

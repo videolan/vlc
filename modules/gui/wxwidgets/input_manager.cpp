@@ -122,7 +122,7 @@ InputManager::InputManager( intf_thread_t *_p_intf, Interface *_p_main_intf,
     p_input = NULL;
     i_old_playing_status = STATUS_STOP;
     i_old_rate = INPUT_RATE_DEFAULT;
-    b_slider_free = VLC_TRUE;
+    b_slider_free = true;
     i_input_hide_delay = 0;
 
     /* Create slider */
@@ -184,7 +184,7 @@ InputManager::~InputManager()
 /*****************************************************************************
  * Public methods.
  *****************************************************************************/
-vlc_bool_t InputManager::IsPlaying()
+bool InputManager::IsPlaying()
 {
     return (p_input && !p_input->b_die);
 }
@@ -225,7 +225,7 @@ void InputManager::UpdateNowPlaying()
     free( psz_now_playing );
 }
 
-void InputManager::UpdateButtons( vlc_bool_t b_play )
+void InputManager::UpdateButtons( bool b_play )
 {
     if( !b_play )
     {
@@ -365,7 +365,7 @@ void InputManager::Update()
     }
     else if( p_input->b_dead )
     {
-        UpdateButtons( VLC_FALSE );
+        UpdateButtons( false );
         vlc_object_release( p_input );
         p_input = NULL;
     }
@@ -379,7 +379,7 @@ void InputManager::Update()
         vlc_value_t pos, len;
 
         UpdateTime();
-        UpdateButtons( VLC_TRUE );
+        UpdateButtons( true );
         UpdateNowPlaying();
         UpdateDiscButtons();
 
@@ -435,7 +435,7 @@ void InputManager::OnDiscPrev( wxCommandEvent& WXUNUSED(event) )
     if( p_input )
     {
         int i_type = var_Type( p_input, "prev-chapter" );
-        vlc_value_t val; val.b_bool = VLC_TRUE;
+        vlc_value_t val; val.b_bool = true;
 
         var_Set( p_input, ( i_type & VLC_VAR_TYPE ) != 0 ?
                  "prev-chapter" : "prev-title", val );
@@ -452,7 +452,7 @@ void InputManager::OnDiscNext( wxCommandEvent& WXUNUSED(event) )
     if( p_input )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        vlc_value_t val; val.b_bool = VLC_TRUE;
+        vlc_value_t val; val.b_bool = true;
 
         var_Set( p_input, ( i_type & VLC_VAR_TYPE ) != 0 ?
                  "next-chapter" : "next-title", val );
@@ -478,11 +478,11 @@ void InputManager::OnSliderUpdate( wxScrollEvent& event )
         }
 
 #ifdef WIN32
-        b_slider_free = VLC_TRUE;
+        b_slider_free = true;
     }
     else
     {
-        b_slider_free = VLC_FALSE;
+        b_slider_free = false;
         if( p_intf->p_sys->p_input ) UpdateTime();
     }
 #endif

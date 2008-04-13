@@ -67,7 +67,7 @@ static int FindMeta( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t *)p_this;
     input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
-    vlc_bool_t b_have_art = VLC_FALSE;
+    bool b_have_art = false;
 
     int i = 0;
     struct stat a;
@@ -89,7 +89,7 @@ static int FindMeta( vlc_object_t *p_this )
     if( !strncmp( psz_path, "file://", 7 ) )
         psz_path += 7;
 
-    for( i = 0; b_have_art == VLC_FALSE && i < 3; i++ )
+    for( i = 0; b_have_art == false && i < 3; i++ )
     {
         switch( i )
         {
@@ -115,7 +115,7 @@ static int FindMeta( vlc_object_t *p_this )
         if( utf8_stat( psz_filename+7, &a ) != -1 )
         {
             input_item_SetArtURL( p_item, psz_filename );
-            b_have_art = VLC_TRUE;
+            b_have_art = true;
         }
     }
 

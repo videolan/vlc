@@ -682,7 +682,7 @@ VLC_PUBLIC_API int libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exception_
  * Set mute status.
  *
  * \param p_instance libvlc instance
- * \param status If status is VLC_TRUE then mute, otherwise unmute
+ * \param status If status is true then mute, otherwise unmute
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, int , libvlc_exception_t * );

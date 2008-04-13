@@ -179,7 +179,7 @@ void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance, char *psz_name,
     vlm_media_Init( &m );
     m.psz_name = strdup( psz_name );
     m.b_enabled = b_enabled;
-    m.b_vod = VLC_FALSE;
+    m.b_vod = false;
     m.broadcast.b_loop = b_loop;
     if( psz_input )
         TAB_APPEND( m.i_input, m.ppsz_input, strdup(psz_input) );
@@ -384,7 +384,7 @@ LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate,     int, Integer, -1, ret_value = p_mi->i_
 /* FIXME extend vlm_media_instance_t to be able to implement them */
 LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title,    int, Integer,  0, ret_value = 0 );
 LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter,  int, Integer,  0, ret_value = 0 );
-LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool,     0, ret_value = VLC_FALSE );
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool,     0, ret_value = false );
 
 #undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
 

@@ -90,7 +90,7 @@ void Timer::Notify()
     if( !b_init )
     {
         p_main_interface->Init();
-        b_init = VLC_TRUE;
+        b_init = true;
     }
 #endif
 
@@ -105,7 +105,7 @@ void Timer::Notify()
     {
         p_main_interface->Raise();
         p_main_interface->Show();
-        p_intf->p_sys->b_intf_show = VLC_FALSE;
+        p_intf->p_sys->b_intf_show = false;
     }
 
     if( intf_ShouldDie( p_intf ) )
@@ -147,7 +147,7 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    p_intf->p_sys->b_intf_show = VLC_TRUE;
+    p_intf->p_sys->b_intf_show = true;
 
     return VLC_SUCCESS;
 }

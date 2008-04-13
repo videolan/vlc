@@ -156,7 +156,7 @@ static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
 static void TestNetWMSupport( vout_thread_t * );
 static int ConvertKey( int );
 
-static int WindowOnTop( vout_thread_t *, vlc_bool_t );
+static int WindowOnTop( vout_thread_t *, bool );
 
 static int X11ErrorHandler( Display *, XErrorEvent * );
 
@@ -189,7 +189,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     char *       psz_chroma;
     vlc_fourcc_t i_chroma = 0;
-    vlc_bool_t   b_chroma = 0;
+    bool   b_chroma = 0;
 #endif
 
     p_vout->pf_init = InitVideo;
@@ -329,12 +329,12 @@ int E_(Activate) ( vlc_object_t *p_this )
         }
         if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
         {
-            p_vout->p_sys->b_glx13 = VLC_FALSE;
+            p_vout->p_sys->b_glx13 = false;
             msg_Dbg( p_this, "using GLX 1.2 API" );
         }
         else
         {
-            p_vout->p_sys->b_glx13 = VLC_TRUE;
+            p_vout->p_sys->b_glx13 = true;
             msg_Dbg( p_this, "using GLX 1.3 API" );
         }
     }
@@ -1297,7 +1297,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                     val.i_int &= ~1;
                     var_Set( p_vout, "mouse-button-down", val );
 
-                    val.b_bool = VLC_TRUE;
+                    val.b_bool = true;
                     var_Set( p_vout, "mouse-clicked", val );
                     break;
 
@@ -1344,7 +1344,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                                                       FIND_ANYWHERE );
                         if( p_playlist != NULL )
                         {
-                            vlc_value_t val; val.b_bool = VLC_TRUE;
+                            vlc_value_t val; val.b_bool = true;
                             var_Set( p_playlist, "intf-popupmenu", val );
                             vlc_object_release( p_playlist );
                         }
@@ -1404,7 +1404,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 
             var_Set( p_vout, "mouse-y", val );
 
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_vout, "mouse-moved", val );
 
             p_vout->p_sys->i_time_mouse_last_moved = mdate();
@@ -1618,9 +1618,9 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XGCValues               xgcvalues;
     XEvent                  xevent;
 
-    vlc_bool_t              b_expose = VLC_FALSE;
-    vlc_bool_t              b_configure_notify = VLC_FALSE;
-    vlc_bool_t              b_map_notify = VLC_FALSE;
+    bool              b_expose = false;
+    bool              b_configure_notify = false;
+    bool              b_map_notify = false;
     vlc_value_t             val;
 
     /* Prepare window manager hints and properties */
@@ -1751,7 +1751,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                       &dummy4, &dummy5 );
 
         /* We are already configured */
-        b_configure_notify = VLC_TRUE;
+        b_configure_notify = true;
 
         /* From man XSelectInput: only one client at a time can select a
          * ButtonPress event, so we need to open a new window anyway. */
@@ -1796,21 +1796,21 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         if( (xevent.type == Expose)
             && (xevent.xexpose.window == p_win->base_window) )
         {
-            b_expose = VLC_TRUE;
+            b_expose = true;
             /* ConfigureNotify isn't sent if there isn't a window manager.
              * Expose should be the last event to be received so it should
              * be fine to assume we won't receive it anymore. */
-            b_configure_notify = VLC_TRUE;
+            b_configure_notify = true;
         }
         else if( (xevent.type == MapNotify)
                  && (xevent.xmap.window == p_win->base_window) )
         {
-            b_map_notify = VLC_TRUE;
+            b_map_notify = true;
         }
         else if( (xevent.type == ConfigureNotify)
                  && (xevent.xconfigure.window == p_win->base_window) )
         {
-            b_configure_notify = VLC_TRUE;
+            b_configure_notify = true;
             p_win->i_width = xevent.xconfigure.width;
             p_win->i_height = xevent.xconfigure.height;
         }
@@ -3059,7 +3059,7 @@ static void SetPalette( vout_thread_t *p_vout,
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    vlc_bool_t b_arg;
+    bool b_arg;
     unsigned int i_width, i_height;
     unsigned int *pi_width, *pi_height;
     Drawable d = 0;
@@ -3175,7 +3175,7 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
     p_vout->p_sys->b_net_wm_state_above =
     p_vout->p_sys->b_net_wm_state_below =
     p_vout->p_sys->b_net_wm_state_stays_on_top =
-        VLC_FALSE;
+        false;
 
     net_wm_supported =
         XInternAtom( p_vout->p_sys->p_display, "_NET_SUPPORTED", False );
@@ -3211,23 +3211,23 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
         {
             msg_Dbg( p_vout,
                      "Window manager supports _NET_WM_STATE_FULLSCREEN" );
-            p_vout->p_sys->b_net_wm_state_fullscreen = VLC_TRUE;
+            p_vout->p_sys->b_net_wm_state_fullscreen = true;
         }
         else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_above )
         {
             msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_ABOVE" );
-            p_vout->p_sys->b_net_wm_state_above = VLC_TRUE;
+            p_vout->p_sys->b_net_wm_state_above = true;
         }
         else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_below )
         {
             msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_BELOW" );
-            p_vout->p_sys->b_net_wm_state_below = VLC_TRUE;
+            p_vout->p_sys->b_net_wm_state_below = true;
         }
         else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_stays_on_top )
         {
             msg_Dbg( p_vout,
                      "Window manager supports _NET_WM_STATE_STAYS_ON_TOP" );
-            p_vout->p_sys->b_net_wm_state_stays_on_top = VLC_TRUE;
+            p_vout->p_sys->b_net_wm_state_stays_on_top = true;
         }
     }
 
@@ -3296,7 +3296,7 @@ static int ConvertKey( int i_key )
 /*****************************************************************************
  * WindowOnTop: Switches the "always on top" state of the video window.
  *****************************************************************************/
-static int WindowOnTop( vout_thread_t *p_vout, vlc_bool_t b_on_top )
+static int WindowOnTop( vout_thread_t *p_vout, bool b_on_top )
 {
     if( p_vout->p_sys->b_net_wm_state_stays_on_top )
     {

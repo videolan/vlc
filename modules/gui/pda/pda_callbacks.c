@@ -138,7 +138,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
                               PLAYLIST_APPEND, PLAYLIST_END,
                               (mtime_t) 0,
                               (const char **) ppsz_options, i_pos,
-                              VLC_TRUE, VLC_FALSE );
+                              true, false );
             }
 
             /* Cleanup memory */
@@ -165,7 +165,7 @@ void PlaylistRebuildListStore( intf_thread_t *p_intf,
     vlc_mutex_lock( &p_playlist->object_lock );
     for( i_dummy = 0; i_dummy < playlist_CurrentSize(p_intf) ; i_dummy++ )
     {
-        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy, VLC_TRUE );
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy, true );
         if( p_item )
         {
             ppsz_text[0] = p_item->p_input->psz_name;

@@ -55,10 +55,10 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
  *****************************************************************************/
 struct filter_sys_t
 {
-    vlc_bool_t b_resize;
-    vlc_bool_t b_convert;
-    vlc_bool_t b_resize_first;
-    vlc_bool_t b_enable_croppadd;
+    bool b_resize;
+    bool b_convert;
+    bool b_resize_first;
+    bool b_enable_croppadd;
 
     es_format_t fmt_in;
     int i_src_ffmpeg_chroma;
@@ -73,11 +73,11 @@ struct filter_sys_t
 /*****************************************************************************
  * OpenFilterEx: common code to OpenFilter and OpenCropPadd
  *****************************************************************************/
-static int OpenFilterEx( vlc_object_t *p_this, vlc_bool_t b_enable_croppadd )
+static int OpenFilterEx( vlc_object_t *p_this, bool b_enable_croppadd )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
-    vlc_bool_t b_convert, b_resize;
+    bool b_convert, b_resize;
 
     /* Check if we can handle that formats */
     if( E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma ) < 0 ||
@@ -161,7 +161,7 @@ static int OpenFilterEx( vlc_object_t *p_this, vlc_bool_t b_enable_croppadd )
  *****************************************************************************/
 int E_(OpenFilter)( vlc_object_t *p_this )
 {
-    return OpenFilterEx( p_this, VLC_FALSE );
+    return OpenFilterEx( p_this, false );
 }
 
 /*****************************************************************************
@@ -169,7 +169,7 @@ int E_(OpenFilter)( vlc_object_t *p_this )
  *****************************************************************************/
 int E_(OpenCropPadd)( vlc_object_t *p_this )
 {
-    return OpenFilterEx( p_this, VLC_TRUE );
+    return OpenFilterEx( p_this, true );
 }
 
 
@@ -193,7 +193,7 @@ void E_(CloseFilter)( vlc_object_t *p_this )
 static int CheckInit( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_bool_t b_change;
+    bool b_change;
     int i_croptop=0;
     int i_cropbottom=0;
     int i_cropleft=0;
@@ -249,12 +249,12 @@ static int CheckInit( filter_t *p_filter )
         else if( ( p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUV420P ) &&
                  ( p_sys->i_src_ffmpeg_chroma != PIX_FMT_YUVJ420P ) )
         {
-            p_sys->b_resize_first = VLC_FALSE;
+            p_sys->b_resize_first = false;
         }
         else if( ( p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUV420P ) &&
                  ( p_sys->i_dst_ffmpeg_chroma != PIX_FMT_YUVJ420P ) )
         {
-            p_sys->b_resize_first = VLC_TRUE;
+            p_sys->b_resize_first = true;
         }
 
         if ( p_sys->b_enable_croppadd )

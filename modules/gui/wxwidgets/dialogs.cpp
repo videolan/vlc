@@ -466,10 +466,10 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
                 playlist_Add( p_playlist, psz_utf8, NULL,
                               PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
                               (i ? PLAYLIST_PREPARSE : 0 ),
-                              PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                              PLAYLIST_END, true, false );
             else
                 playlist_Add( p_playlist, psz_utf8, NULL,
-                              PLAYLIST_APPEND | PLAYLIST_PREPARSE , PLAYLIST_END , VLC_TRUE, VLC_FALSE );
+                              PLAYLIST_APPEND | PLAYLIST_PREPARSE , PLAYLIST_END , true, false );
             wxLocaleFree( psz_utf8 );
         }
     }
@@ -496,7 +496,7 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
         char *psz_utf8 = wxFromLocale( path );
         playlist_Add( p_playlist, psz_utf8, NULL,
                       PLAYLIST_APPEND | (event.GetInt() ? PLAYLIST_GO : 0),
-                      PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                      PLAYLIST_END, true, false );
         wxLocaleFree( psz_utf8 );
     }
 

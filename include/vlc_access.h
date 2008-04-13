@@ -38,10 +38,10 @@
 enum access_query_e
 {
     /* capabilities */
-    ACCESS_CAN_SEEK,        /* arg1= vlc_bool_t*    cannot fail */
-    ACCESS_CAN_FASTSEEK,    /* arg1= vlc_bool_t*    cannot fail */
-    ACCESS_CAN_PAUSE,       /* arg1= vlc_bool_t*    cannot fail */
-    ACCESS_CAN_CONTROL_PACE,/* arg1= vlc_bool_t*    cannot fail */
+    ACCESS_CAN_SEEK,        /* arg1= bool*    cannot fail */
+    ACCESS_CAN_FASTSEEK,    /* arg1= bool*    cannot fail */
+    ACCESS_CAN_PAUSE,       /* arg1= bool*    cannot fail */
+    ACCESS_CAN_CONTROL_PACE,/* arg1= bool*    cannot fail */
 
     /* */
     ACCESS_GET_MTU,         /* arg1= int*           cannot fail(0 if no sense)*/
@@ -52,7 +52,7 @@ enum access_query_e
     ACCESS_GET_META,        /* arg1= vlc_meta_t **  res=can fail    */
 
     /* */
-    ACCESS_SET_PAUSE_STATE, /* arg1= vlc_bool_t     can fail */
+    ACCESS_SET_PAUSE_STATE, /* arg1= bool     can fail */
 
     /* */
     ACCESS_SET_TITLE,       /* arg1= int            can fail */
@@ -60,9 +60,9 @@ enum access_query_e
 
     /* Special mode for access/demux communication
      * XXX: avoid to use it unless you can't */
-    ACCESS_SET_PRIVATE_ID_STATE,    /* arg1= int i_private_data, vlc_bool_t b_selected can fail */
+    ACCESS_SET_PRIVATE_ID_STATE,    /* arg1= int i_private_data, bool b_selected can fail */
     ACCESS_SET_PRIVATE_ID_CA,    /* arg1= int i_program_number, uint16_t i_vpid, uint16_t i_apid1, uint16_t i_apid2, uint16_t i_apid3, uint8_t i_length, uint8_t *p_data */
-    ACCESS_GET_PRIVATE_ID_STATE,    /* arg1=int i_private_data arg2=vlc_bool_t *  res=can fail */
+    ACCESS_GET_PRIVATE_ID_STATE,    /* arg1=int i_private_data arg2=bool *  res=can fail */
 
     ACCESS_GET_CONTENT_TYPE, /* arg1=char **ppsz_content_type */
 };
@@ -107,12 +107,12 @@ struct access_t
 
         int64_t      i_size;    /* Write only for access, read only for input */
         int64_t      i_pos;     /* idem */
-        vlc_bool_t   b_eof;     /* idem */
+        bool   b_eof;     /* idem */
 
         int          i_title;    /* idem, start from 0 (could be menu) */
         int          i_seekpoint;/* idem, start from 0 */
 
-        vlc_bool_t   b_prebuffered; /* Read only for input */
+        bool   b_prebuffered; /* Read only for input */
     } info;
     access_sys_t *p_sys;
 };
@@ -148,7 +148,7 @@ static inline void access_InitFields( access_t *p_a )
     p_a->info.i_update = 0;
     p_a->info.i_size = 0;
     p_a->info.i_pos = 0;
-    p_a->info.b_eof = VLC_FALSE;
+    p_a->info.b_eof = false;
     p_a->info.i_title = 0;
     p_a->info.i_seekpoint = 0;
 }

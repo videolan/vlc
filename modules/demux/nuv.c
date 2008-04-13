@@ -198,7 +198,7 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
     frame_header_t fh;
-    vlc_bool_t  b_extended;
+    bool  b_extended;
 
     /* Check id */
     if( stream_Peek( p_demux->s, &p_peek, 12 ) != 12 ||
@@ -245,7 +245,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     if( p_peek[0] == 'X' )
     {
-        b_extended = VLC_TRUE;
+        b_extended = true;
 
         if( FrameHeaderLoad( p_demux, &fh ) )
             goto error;
@@ -258,7 +258,7 @@ static int Open( vlc_object_t * p_this )
     }
     else
     {
-        b_extended = VLC_FALSE;
+        b_extended = false;
 
         /* XXX: for now only file with extended chunk are supported
          * why: because else we need to have support for rtjpeg+stupid nuv shit */

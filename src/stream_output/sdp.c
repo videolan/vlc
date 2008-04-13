@@ -79,15 +79,15 @@ char *AddressToSDP (const struct sockaddr *addr, socklen_t addrlen, char *buf)
 }
 
 
-static vlc_bool_t IsSDPString (const char *str)
+static bool IsSDPString (const char *str)
 {
     if (strchr (str, '\r') != NULL)
-        return VLC_FALSE;
+        return false;
     if (strchr (str, '\n') != NULL)
-        return VLC_FALSE;
+        return false;
     if (!IsUTF8 (str))
-        return VLC_FALSE;
-    return VLC_TRUE;
+        return false;
+    return true;
 }
 
 
@@ -209,7 +209,7 @@ char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
 
 char *sdp_AddMedia (char **sdp,
                     const char *type, const char *protocol, int dport,
-                    unsigned pt, vlc_bool_t bw_indep, unsigned bw,
+                    unsigned pt, bool bw_indep, unsigned bw,
                     const char *ptname, unsigned clock, unsigned chans,
                     const char *fmtp)
 {

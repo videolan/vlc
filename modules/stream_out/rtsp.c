@@ -172,7 +172,7 @@ struct rtsp_strack_t
 {
     sout_stream_id_t  *id;
     int                fd;
-    vlc_bool_t         playing;
+    bool         playing;
 };
 
 
@@ -424,7 +424,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                  tpt != NULL;
                  tpt = transport_next( tpt ) )
             {
-                vlc_bool_t b_multicast = VLC_TRUE, b_unsupp = VLC_FALSE;
+                bool b_multicast = true, b_unsupp = false;
                 unsigned loport = 5004, hiport = 5005; /* from RFC3551 */
 
                 /* Check transport protocol. */
@@ -443,10 +443,10 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                      opt = parameter_next( opt ) )
                 {
                     if( strncmp( opt, "multicast", 9 ) == 0)
-                        b_multicast = VLC_TRUE;
+                        b_multicast = true;
                     else
                     if( strncmp( opt, "unicast", 7 ) == 0 )
-                        b_multicast = VLC_FALSE;
+                        b_multicast = false;
                     else
                     if( sscanf( opt, "client_port=%u-%u", &loport, &hiport )
                                 == 2 )
@@ -458,7 +458,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                          && strncasecmp( opt + 5, "\"PLAY\"", 6 ) )
                         {
                             /* Not playing?! */
-                            b_unsupp = VLC_TRUE;
+                            b_unsupp = true;
                             break;
                         }
                     }
@@ -466,7 +466,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     if( strncmp( opt,"destination=", 12 ) == 0 )
                     {
                         answer->i_status = 403;
-                        b_unsupp = VLC_TRUE;
+                        b_unsupp = true;
                     }
                     else
                     {
@@ -483,7 +483,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                      *
                      * "interleaved" is not implemented.
                      */
-                        b_unsupp = VLC_TRUE;
+                        b_unsupp = true;
                         break;
                     }
                 }
@@ -516,7 +516,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 {
                     char ip[NI_MAXNUMERICHOST], src[NI_MAXNUMERICHOST];
                     rtsp_session_t *ses = NULL;
-                    rtsp_strack_t track = { id->sout_id, -1, VLC_FALSE };
+                    rtsp_strack_t track = { id->sout_id, -1, false };
                     int sport;
 
                     if( httpd_ClientIP( cl, ip ) == NULL )
@@ -625,8 +625,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     {
                         if( !tr->playing )
                         {
-                            tr->playing = VLC_TRUE;
-                            rtp_add_sink( tr->id, tr->fd, VLC_FALSE );
+                            tr->playing = true;
+                            rtp_add_sink( tr->id, tr->fd, false );
                         }
                         infolen += sprintf( info + infolen,
                                             "%s/trackID=%u;seq=%u, ", control,

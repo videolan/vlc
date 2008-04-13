@@ -49,11 +49,11 @@ static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
 static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t * );
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
-static vlc_bool_t osd_isVisible( osd_menu_t *p_osd );
+static bool osd_isVisible( osd_menu_t *p_osd );
 static osd_menu_t *osd_ParserLoad( vlc_object_t *, const char * );
 static void osd_ParserUnload( osd_menu_t * );
 
-static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
+static bool osd_isVisible( osd_menu_t *p_osd )
 {
     vlc_value_t val;
 
@@ -99,7 +99,7 @@ static osd_menu_t *osd_ParserLoad( vlc_object_t *p_this, const char *psz_file )
             psz_type = (char*)"import-osd-xml";
 
         p_menu->p_parser = module_Need( p_menu, "osd parser",
-                                        psz_type, VLC_TRUE );
+                                        psz_type, true );
         if( !p_menu->p_parser )
         {
             osd_ParserUnload( p_menu );
@@ -202,7 +202,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         var_Create( p_osd, "osd-menu-update", VLC_VAR_BOOL );
         var_Create( p_osd, "osd-menu-visible", VLC_VAR_BOOL );
 
-        val.b_bool = VLC_FALSE;
+        val.b_bool = false;
         var_Set( p_osd, "osd-menu-update", val );
         var_Set( p_osd, "osd-menu-visible", val );
     }
@@ -313,9 +313,9 @@ void __osd_MenuShow( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
     }
-    osd_SetMenuVisible( p_osd, VLC_TRUE );
+    osd_SetMenuVisible( p_osd, true );
 
     vlc_object_release( (vlc_object_t*) p_osd );
     vlc_mutex_unlock( lockval.p_address );
@@ -342,7 +342,7 @@ void __osd_MenuHide( vlc_object_t *p_this )
     osd_UpdateState( p_osd->p_state,
                 p_osd->p_state->i_x, p_osd->p_state->i_y,
                 0, 0, NULL );
-    osd_SetMenuUpdate( p_osd, VLC_TRUE );
+    osd_SetMenuUpdate( p_osd, true );
 
     vlc_object_release( (vlc_object_t*) p_osd );
     vlc_mutex_unlock( lockval.p_address );
@@ -361,7 +361,7 @@ void __osd_MenuActivate( vlc_object_t *p_this )
         return;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return;
@@ -400,8 +400,8 @@ void __osd_MenuActivate( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_button->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
-        osd_SetMenuVisible( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
+        osd_SetMenuVisible( p_osd, true );
         osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc), config_GetInt( p_osd, p_button->psz_action ) );
 #if defined(OSD_MENU_DEBUG)
         msg_Dbg( p_osd, "select (%d, %s)", config_GetInt( p_osd, p_button->psz_action ), p_button->psz_action );
@@ -424,7 +424,7 @@ void __osd_MenuNext( vlc_object_t *p_this )
         return;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return;
@@ -452,7 +452,7 @@ void __osd_MenuNext( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
     }
 #if defined(OSD_MENU_DEBUG)
     msg_Dbg( p_osd, "direction right [button %s]", p_osd->p_state->p_visible->psz_action );
@@ -475,7 +475,7 @@ void __osd_MenuPrev( vlc_object_t *p_this )
         return;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return;
@@ -503,7 +503,7 @@ void __osd_MenuPrev( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
     }
 #if defined(OSD_MENU_DEBUG)
     msg_Dbg( p_osd, "direction left [button %s]", p_osd->p_state->p_visible->psz_action );
@@ -528,7 +528,7 @@ void __osd_MenuUp( vlc_object_t *p_this )
         return;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return;
@@ -564,7 +564,7 @@ void __osd_MenuUp( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
         /* If this is a range style action with associated images of only one state,
             * then perform "menu select" on every menu navigation
             */
@@ -600,7 +600,7 @@ void __osd_MenuDown( vlc_object_t *p_this )
         return;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return;
@@ -636,7 +636,7 @@ void __osd_MenuDown( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
         /* If this is a range style action with associated images of only one state,
          * then perform "menu select" on every menu navigation
          */
@@ -706,8 +706,8 @@ void __osd_Volume( vlc_object_t *p_this )
                     p_button->p_current_state->i_width,
                     p_button->p_current_state->i_height,
                     p_button->p_current_state->p_pic );
-            osd_SetMenuUpdate( p_osd, VLC_TRUE );
-            osd_SetMenuVisible( p_osd, VLC_TRUE );
+            osd_SetMenuUpdate( p_osd, true );
+            osd_SetMenuVisible( p_osd, true );
         }
         vlc_object_release( (vlc_object_t*) p_osd );
         vlc_mutex_unlock( lockval.p_address );
@@ -729,7 +729,7 @@ osd_button_t *__osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
         return NULL;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return NULL;
@@ -811,7 +811,7 @@ void __osd_ButtonSelect( vlc_object_t *p_this, osd_button_t *p_button )
         return;
     }
 
-    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    if( osd_isVisible( p_osd ) == false )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         return;
@@ -836,7 +836,7 @@ void __osd_ButtonSelect( vlc_object_t *p_this, osd_button_t *p_button )
                 p_osd->p_state->p_visible->p_current_state->i_width,
                 p_osd->p_state->p_visible->p_current_state->i_height,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
+        osd_SetMenuUpdate( p_osd, true );
     }
 #if defined(OSD_MENU_DEBUG)
     msg_Dbg( p_osd, "button selected is [button %s]", p_osd->p_state->p_visible->psz_action );

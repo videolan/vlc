@@ -111,7 +111,7 @@ struct sout_pcat_t
 };
 
 void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
-                           int *pi_dest, float *pf_dest, vlc_bool_t *pb_dest );
+                           int *pi_dest, float *pf_dest, bool *pb_dest );
 
 
 /******** Module types definitions and parametrable elements ***************/
@@ -125,7 +125,7 @@ struct sout_transcode_t
     int32_t i_ab;
     int32_t i_channels;
     float f_scale;
-    vlc_bool_t b_soverlay;
+    bool b_soverlay;
     char *psz_vcodec;
     char *psz_acodec;
     char *psz_scodec;
@@ -224,14 +224,14 @@ struct streaming_account_t
 struct sout_gui_descr_t
 {
     /* Access types */
-    vlc_bool_t b_local;   /*< local access module */
-    vlc_bool_t b_file;    /*< file access module */
-    vlc_bool_t b_http;    /*< http access module */
-    vlc_bool_t b_mms;     /*< mms access module */
-    vlc_bool_t b_rtp;     /*< rtp access module */
-    vlc_bool_t b_udp;     /*< udp access module */
-    vlc_bool_t b_dump;    /*< dump access module */
-    vlc_bool_t b_icecast; /*< icecast access module */
+    bool b_local;   /*< local access module */
+    bool b_file;    /*< file access module */
+    bool b_http;    /*< http access module */
+    bool b_mms;     /*< mms access module */
+    bool b_rtp;     /*< rtp access module */
+    bool b_udp;     /*< udp access module */
+    bool b_dump;    /*< dump access module */
+    bool b_icecast; /*< icecast access module */
 
     char *psz_file;     /*< filename */
     char *psz_http;     /*< HTTP servername or ipaddress */
@@ -250,7 +250,7 @@ struct sout_gui_descr_t
     char *psz_mux;      /*< name of muxer to use in streaming */
 
     /* Transcode */
-    vlc_bool_t b_soverlay; /*< enable burning overlay in the video */
+    bool b_soverlay; /*< enable burning overlay in the video */
     char *psz_vcodec;   /*< video codec to use in transcoding */
     char *psz_acodec;   /*< audio codec to use in transcoding */
     char *psz_scodec;   /*< subtitle codec to use in transcoding */
@@ -260,8 +260,8 @@ struct sout_gui_descr_t
     float f_scale;      /*< scaling factor to use in transcoding */
 
     /* Misc */
-    vlc_bool_t b_sap;   /*< send SAP announcement */
-    vlc_bool_t b_all_es;/*< send all elementary streams from source stream */
+    bool b_sap;   /*< send SAP announcement */
+    bool b_all_es;/*< send all elementary streams from source stream */
     char *psz_group;    /*< SAP Group name */
     char *psz_name;     /*< SAP name */
     int32_t i_ttl;      /*< Time To Live (TTL) for network traversal */

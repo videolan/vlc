@@ -215,7 +215,7 @@ int main( int i_argc, const char *ppsz_argv[] )
         return i_ret == VLC_EEXITSUCCESS ? 0 : -i_ret;
     }
 
-    i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
+    i_ret = VLC_AddIntf( 0, NULL, true, true );
 
     /* Finish the threads */
     VLC_CleanUp( 0 );

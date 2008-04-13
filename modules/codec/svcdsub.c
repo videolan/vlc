@@ -59,7 +59,7 @@ vlc_module_begin();
     set_callbacks( DecoderOpen, DecoderClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-                  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
+                  DEBUG_TEXT, DEBUG_LONGTEXT, true );
 
     add_submodule();
     set_description( _("Philips OGT (SVCD subtitle) packetizer") );
@@ -469,13 +469,13 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
     if( !p_spu ) return NULL;
 
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_pausable = true;
 
     p_spu->i_x = p_sys->i_x_start;
     p_spu->i_y = p_sys->i_y_start;
     p_spu->i_start = p_data->i_pts;
     p_spu->i_stop  = p_data->i_pts + p_sys->i_duration;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
 
     /* Create new subtitle region */
     memset( &fmt, 0, sizeof(video_format_t) );

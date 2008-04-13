@@ -152,43 +152,43 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "v4l-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "v4l-vdev", "/dev/video", 0, VDEV_TEXT, VDEV_LONGTEXT,
-                VLC_FALSE );
+                false );
     add_string( "v4l-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
-                VLC_FALSE );
+                false );
     add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                VLC_TRUE );
-    add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+                true );
+    add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
     add_integer( "v4l-samplerate", 44100, NULL, SAMPLERATE_TEXT,
-                SAMPLERATE_LONGTEXT, VLC_TRUE );
+                SAMPLERATE_LONGTEXT, true );
     add_integer( "v4l-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
-                VLC_TRUE );
-    add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, VLC_TRUE );
+                true );
+    add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, true );
     add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
-                VLC_FALSE );
+                false );
         change_integer_list( i_norm_list, psz_norm_list_text, 0 );
     add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
-                VLC_FALSE );
-    add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
-    add_bool( "v4l-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
-            VLC_TRUE );
-    add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
+                false );
+    add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, true );
+    add_bool( "v4l-stereo", true, NULL, STEREO_TEXT, STEREO_LONGTEXT,
+            true );
+    add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
     add_integer( "v4l-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_integer( "v4l-brightness", -1, NULL, BRIGHTNESS_TEXT,
-                BRIGHTNESS_LONGTEXT, VLC_TRUE );
+                BRIGHTNESS_LONGTEXT, true );
     add_integer( "v4l-colour", -1, NULL, COLOUR_TEXT, COLOUR_LONGTEXT,
-                VLC_TRUE );
-    add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, VLC_TRUE );
+                true );
+    add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, true );
     add_integer( "v4l-contrast", -1, NULL, CONTRAST_TEXT, CONTRAST_LONGTEXT,
-                VLC_TRUE );
-    add_bool( "v4l-mjpeg", VLC_FALSE, NULL, MJPEG_TEXT, MJPEG_LONGTEXT,
-            VLC_TRUE );
+                true );
+    add_bool( "v4l-mjpeg", false, NULL, MJPEG_TEXT, MJPEG_LONGTEXT,
+            true );
     add_integer( "v4l-decimation", 1, NULL, DECIMATION_TEXT,
-            DECIMATION_LONGTEXT, VLC_TRUE );
+            DECIMATION_LONGTEXT, true );
     add_integer( "v4l-quality", 100, NULL, QUALITY_TEXT, QUALITY_LONGTEXT,
-            VLC_TRUE );
+            true );
 
     add_shortcut( "v4l" );
     set_capability( "access_demux", 10 );
@@ -282,7 +282,7 @@ struct demux_sys_t
     float f_fps;            /* <= 0.0 mean to grab at full rate */
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
 
-    vlc_bool_t b_mjpeg;
+    bool b_mjpeg;
     int i_decimation;
     int i_quality;
 
@@ -302,7 +302,7 @@ struct demux_sys_t
     /* Audio properties */
     vlc_fourcc_t i_acodec_raw;
     int          i_sample_rate;
-    vlc_bool_t   b_stereo;
+    bool   b_stereo;
     int          i_audio_max_frame_size;
     block_t      *p_block_audio;
     es_out_id_t  *p_es_audio;
@@ -578,7 +578,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    vlc_bool_t *pb;
+    bool *pb;
     int64_t    *pi64;
 
     switch( i_query )
@@ -588,8 +588,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb = VLC_FALSE;
+            pb = (bool*)va_arg( args, bool * );
+            *pb = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
@@ -812,19 +812,19 @@ static void ParseMRL( demux_t *p_demux )
             {
                 psz_parser += strlen( "stereo" );
 
-                p_sys->b_stereo = VLC_TRUE;
+                p_sys->b_stereo = true;
             }
             else if( !strncmp( psz_parser, "mono", strlen( "mono" ) ) )
             {
                 psz_parser += strlen( "mono" );
 
-                p_sys->b_stereo = VLC_FALSE;
+                p_sys->b_stereo = false;
             }
             else if( !strncmp( psz_parser, "mjpeg", strlen( "mjpeg" ) ) )
             {
                 psz_parser += strlen( "mjpeg" );
 
-                p_sys->b_mjpeg = VLC_TRUE;
+                p_sys->b_mjpeg = true;
             }
             else if( !strncmp( psz_parser, "decimation=",
                         strlen( "decimation=" ) ) )

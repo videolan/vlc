@@ -172,7 +172,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Create thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", Thread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );
         pPlayer->Close();
@@ -196,7 +196,7 @@ static void Close( vlc_object_t * p_this )
 
     vlc_object_kill( p_aout );
     vlc_thread_join( p_aout );
-    p_aout->b_die = VLC_FALSE;
+    p_aout->b_die = false;
 
     do
     {

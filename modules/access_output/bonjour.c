@@ -259,7 +259,7 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
 
     if( vlc_thread_create( p_sys->poll_thread, "Avahi Poll Iterate Thread",
                            poll_iterate_thread,
-                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_HIGHEST, false ) )
     {
         msg_Err( p_sys->p_log, "failed to create poll iterate thread" );
         goto error;

@@ -74,13 +74,13 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
-                VLC_FALSE );
+                false );
     add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
-                PASS_LONGTEXT, VLC_FALSE );
+                PASS_LONGTEXT, false );
     add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
-                ACCOUNT_LONGTEXT, VLC_FALSE );
+                ACCOUNT_LONGTEXT, false );
     add_shortcut( "ftp" );
     set_callbacks( InOpen, InClose );
 
@@ -130,7 +130,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( fd == -1 )
     {
         msg_Err( p_access, "connection failed" );
-        intf_UserFatal( p_access, VLC_FALSE, _("Network interaction failed"),
+        intf_UserFatal( p_access, false, _("Network interaction failed"),
                         _("VLC could not connect with the given server.") );
         return -1;
     }
@@ -140,7 +140,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( i_answer / 100 != 2 )
     {
         msg_Err( p_access, "connection rejected" );
-        intf_UserFatal( p_access, VLC_FALSE, _("Network interaction failed"),
+        intf_UserFatal( p_access, false, _("Network interaction failed"),
                         _("VLC's connection to the given server was rejected.") );
         return -1;
     }
@@ -200,7 +200,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                     if( i_answer / 100 != 2 )
                     {
                         msg_Err( p_access, "account rejected" );
-                        intf_UserFatal( p_access, VLC_FALSE,
+                        intf_UserFatal( p_access, false,
                                         _("Network interaction failed"),
                                         _("Your account was rejected.") );
                         return -1;
@@ -210,7 +210,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
 
                 default:
                     msg_Err( p_access, "password rejected" );
-                    intf_UserFatal( p_access, VLC_FALSE,
+                    intf_UserFatal( p_access, false,
                                     _("Network interaction failed"),
                                     _("Your password was rejected.") );
                     return -1;
@@ -218,7 +218,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
             break;
         default:
             msg_Err( p_access, "user rejected" );
-            intf_UserFatal( p_access, VLC_FALSE,
+            intf_UserFatal( p_access, false,
                         _("Network interaction failed"),
                         _("Your connection attempt to the server was rejected.") );
             return -1;
@@ -451,7 +451,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     if( val )
         return val;
 
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_pos = i_pos;
 
     return VLC_SUCCESS;
@@ -477,9 +477,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return 0;
 
     i_read = net_Read( p_access, p_sys->fd_data, NULL, p_buffer, i_len,
-                       VLC_FALSE );
+                       false );
     if( i_read == 0 )
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
     else if( i_read > 0 )
         p_access->info.i_pos += i_read;
 
@@ -515,7 +515,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
     vlc_value_t  val;
@@ -524,20 +524,20 @@ static int Control( access_t *p_access, int i_query, va_list args )
     {
         /* */
         case ACCESS_CAN_SEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             break;
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;    /* FIXME */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;    /* FIXME */
             break;
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;    /* FIXME */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;    /* FIXME */
             break;
 
         /* */
@@ -554,7 +554,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            pb_bool = (bool*)va_arg( args, bool* );
             if ( !pb_bool )
               return Seek( p_access, p_access->info.i_pos );
             break;

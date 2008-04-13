@@ -721,7 +721,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
             if( p_playlist )
             {
-                playlist_item_t * p_item = playlist_ItemGetById(                                                   p_playlist, (int)data, VLC_FALSE );
+                playlist_item_t * p_item = playlist_ItemGetById(                                                   p_playlist, (int)data, false );
                 if( p_item )
                 {
                     const char *psz_uri = input_item_GetURI( p_item->p_input );
@@ -1634,7 +1634,7 @@ void WizardDialog::Run()
 
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input,
-                               PLAYLIST_GO, PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                               PLAYLIST_GO, PLAYLIST_END, true, false );
             vlc_object_release(p_playlist);
         }
         else

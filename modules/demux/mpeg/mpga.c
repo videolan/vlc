@@ -63,14 +63,14 @@ struct demux_sys_t
 {
     es_out_id_t *p_es;
 
-    vlc_bool_t  b_start;
+    bool  b_start;
     decoder_t   *p_packetizer;
 
     mtime_t     i_pts;
     mtime_t     i_time_offset;
     int         i_bitrate_avg;  /* extracted from Xing header */
 
-    vlc_bool_t b_initial_sync_failed;
+    bool b_initial_sync_failed;
 
     int i_xing_frames;
     int i_xing_bytes;
@@ -88,9 +88,9 @@ static int HeaderCheck( uint32_t h )
         || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
         || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
     {
-        return VLC_FALSE;
+        return false;
     }
-    return VLC_TRUE;
+    return true;
 }
 
 #define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
@@ -120,20 +120,20 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_bool_t   b_forced = VLC_FALSE;
+    bool   b_forced = false;
 
     uint32_t     header;
     const uint8_t     *p_peek;
     block_t     *p_block_in, *p_block_out;
 
     if( demux2_IsPathExtension( p_demux, ".mp3" ) )
-        b_forced = VLC_TRUE;
+        b_forced = true;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( !HeaderCheck( header = GetDWBE( p_peek ) ) )
     {
-        vlc_bool_t b_ok = VLC_FALSE;
+        bool b_ok = false;
         int i_peek;
 
         if( !p_demux->b_force && !b_forced ) return VLC_EGENERIC;
@@ -143,7 +143,7 @@ static int Open( vlc_object_t * p_this )
         {
             if( HeaderCheck( header = GetDWBE( p_peek ) ) )
             {
-                b_ok = VLC_TRUE;
+                b_ok = true;
                 break;
             }
             p_peek += 1;
@@ -155,7 +155,7 @@ static int Open( vlc_object_t * p_this )
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->p_es = 0;
-    p_sys->b_start = VLC_TRUE;
+    p_sys->b_start = true;
 
     /* Load the mpeg audio packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer, 'm', 'p', 'g', 'a' );
@@ -234,10 +234,10 @@ static int Open( vlc_object_t * p_this )
     if( p_block_out == NULL )
     {
         msg_Dbg( p_demux, "did not sync on first block" );
-        p_sys->b_initial_sync_failed = VLC_TRUE;
+        p_sys->b_initial_sync_failed = true;
     }
     else
-        p_sys->b_initial_sync_failed = VLC_FALSE;
+        p_sys->b_initial_sync_failed = false;
 
     p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
 
@@ -253,7 +253,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_block_out = p_block_out;
 
     /* */
-    p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+    p_sys->p_packetizer->fmt_out.b_packetized = true;
     p_sys->p_es = es_out_Add( p_demux->out,
                               &p_sys->p_packetizer->fmt_out);
     return VLC_SUCCESS;
@@ -270,7 +270,7 @@ static int Demux( demux_t *p_demux )
     block_t *p_block_in, *p_block_out;
     if( p_sys->b_start )
     {
-        p_sys->b_start = VLC_FALSE;
+        p_sys->b_start = false;
         p_block_in = p_sys->p_block_in;
         p_sys->p_block_in = NULL;
         p_block_out = p_sys->p_block_out;
@@ -283,7 +283,7 @@ static int Demux( demux_t *p_demux )
         {
             return 0;
         }
-        if( p_demux->p_sys->b_initial_sync_failed == VLC_TRUE )
+        if( p_demux->p_sys->b_initial_sync_failed == true )
         {
             p_block_in->i_pts = p_block_in->i_dts = 1;
             /* Only try to resync once */
@@ -337,7 +337,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
     int i_ret;
     va_list args_save;
 
@@ -346,8 +346,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_HAS_UNSUPPORTED_META:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

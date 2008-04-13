@@ -99,10 +99,10 @@ vlc_module_begin();
     add_shortcut( "dir" );
     add_shortcut( "file" );
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
-                RECURSIVE_LONGTEXT, VLC_FALSE );
+                RECURSIVE_LONGTEXT, false );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
     add_string( "ignore-filetypes", "m3u,db,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
-                NULL, IGNORE_TEXT, IGNORE_LONGTEXT, VLC_FALSE );
+                NULL, IGNORE_TEXT, IGNORE_LONGTEXT, false );
     set_callbacks( Open, Close );
 
     add_submodule();
@@ -217,7 +217,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
     }
 
     p_current_input = input_GetItem( p_input );
-    p_current = playlist_ItemGetByInput( p_playlist, p_current_input, VLC_FALSE );
+    p_current = playlist_ItemGetByInput( p_playlist, p_current_input, false );
 
     if( !p_current )
     {
@@ -251,7 +251,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
     p_current->p_input->i_type = ITEM_TYPE_DIRECTORY;
     p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
-                                              VLC_FALSE );
+                                              false );
 
     i_activity = var_GetInteger( p_playlist, "activity" );
     var_SetInteger( p_playlist, "activity", i_activity +
@@ -280,7 +280,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len)
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -291,8 +291,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;    /* FIXME */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;    /* FIXME */
             break;
 
         /* */
@@ -535,7 +535,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE|
                                            PLAYLIST_NO_REBUILD,
                                            PLAYLIST_END, NULL, NULL,
-                                           VLC_FALSE );
+                                           false );
                     vlc_gc_decref( p_input );
                     if( i_ret != VLC_SUCCESS )
                         return VLC_EGENERIC;

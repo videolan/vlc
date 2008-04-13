@@ -190,70 +190,70 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
     add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
-                 VLC_FALSE );
+                 false );
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                 VLC_TRUE );
+                 true );
     add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
-                 VLC_FALSE );
+                 false );
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
-                 VLC_TRUE );
-    add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_TRUE );
+                 true );
+    add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true );
     add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
-              VLC_TRUE );
+              true );
     /* DVB-S (satellite) */
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
-                 VLC_TRUE );
+                 true );
     add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-                 VLC_TRUE );
+                 true );
     add_bool( "dvb-high-voltage", 0, NULL, HIGH_VOLTAGE_TEXT,
-              HIGH_VOLTAGE_LONGTEXT, VLC_TRUE );
+              HIGH_VOLTAGE_LONGTEXT, true );
     add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
-                 VLC_TRUE );
-    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_TRUE );
+                 true );
+    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true );
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
-                 VLC_FALSE );
+                 false );
     add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
-                 LNB_LOF1_LONGTEXT, VLC_TRUE );
+                 LNB_LOF1_LONGTEXT, true );
     add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
-                 LNB_LOF2_LONGTEXT, VLC_TRUE );
+                 LNB_LOF2_LONGTEXT, true );
     add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
-                 LNB_SLOF_LONGTEXT, VLC_TRUE );
+                 LNB_SLOF_LONGTEXT, true );
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT,
-                 MODULATION_LONGTEXT, VLC_TRUE );
+                 MODULATION_LONGTEXT, true );
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", 9, NULL, CODE_RATE_HP_TEXT,
-                 CODE_RATE_HP_LONGTEXT, VLC_TRUE );
+                 CODE_RATE_HP_LONGTEXT, true );
     add_integer( "dvb-code-rate-lp", 9, NULL, CODE_RATE_LP_TEXT,
-                 CODE_RATE_LP_LONGTEXT, VLC_TRUE );
+                 CODE_RATE_LP_LONGTEXT, true );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
-                 VLC_TRUE );
-    add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
+                 true );
+    add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, true );
     add_integer( "dvb-transmission", 0, NULL, TRANSMISSION_TEXT,
-                 TRANSMISSION_LONGTEXT, VLC_TRUE );
+                 TRANSMISSION_LONGTEXT, true );
     add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
-                 VLC_TRUE );
+                 true );
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */
     set_section( N_("HTTP server" ), 0 );
     add_string( "dvb-http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "dvb-http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "dvb-http-password", NULL, NULL, PASSWORD_TEXT,
-                PASSWORD_LONGTEXT, VLC_TRUE );
+                PASSWORD_LONGTEXT, true );
     add_string( "dvb-http-acl", NULL, NULL, ACL_TEXT, ACL_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "dvb-http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "dvb-http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "dvb-http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "dvb-http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,
-                VLC_TRUE );
+                true );
 #endif
 
     set_capability( "access2", 0 );
@@ -314,7 +314,7 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
 
@@ -459,13 +459,13 @@ static block_t *Block( access_t *p_access )
             if ( p_sys->b_request_frontend_info )
             {
                 msg_Warn( p_access, "frontend timeout for HTTP interface" );
-                p_sys->b_request_frontend_info = VLC_FALSE;
+                p_sys->b_request_frontend_info = false;
                 p_sys->psz_frontend_info = strdup( "Timeout getting info\n" );
             }
             if ( p_sys->b_request_mmi_info )
             {
                 msg_Warn( p_access, "MMI timeout for HTTP interface" );
-                p_sys->b_request_mmi_info = VLC_FALSE;
+                p_sys->b_request_mmi_info = false;
                 p_sys->psz_mmi_info = strdup( "Timeout getting info\n" );
             }
             vlc_cond_signal( &p_sys->httpd_cond );
@@ -516,7 +516,7 @@ static block_t *Block( access_t *p_access )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_bool_t   *pb_bool, b_bool;
+    bool   *pb_bool, b_bool;
     int          *pi_int, i_int;
     int64_t      *pi_64;
 
@@ -527,8 +527,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
         /* */
         case ACCESS_GET_MTU:
@@ -728,7 +728,7 @@ static int ParseMRL( access_t *p_access )
     {
         msg_Err( p_access, "the DVB input old syntax is deprecated, use vlc "
                           "-p dvb to see an explanation of the new syntax" );
-        intf_UserFatal( p_access, VLC_TRUE, _("Input syntax is deprecated"),
+        intf_UserFatal( p_access, true, _("Input syntax is deprecated"),
             _("The given syntax is deprecated. Run \"vlc -p dvb\" to see an " \
                 "explanation of the new syntax.") );
         free( psz_dup );
@@ -775,7 +775,7 @@ static int ParseMRL( access_t *p_access )
             else
             {
                 msg_Err( p_access, "illegal polarization %c", *psz_parser );
-                intf_UserFatal( p_access, VLC_FALSE, _("Illegal Polarization"),
+                intf_UserFatal( p_access, false, _("Illegal Polarization"),
                                 _("The provided polarization \"%c\" is not valid."),
                                 *psz_parser );
                 free( psz_dup );

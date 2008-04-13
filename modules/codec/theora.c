@@ -43,7 +43,7 @@
 struct decoder_sys_t
 {
     /* Module mode */
-    vlc_bool_t b_packetizer;
+    bool b_packetizer;
 
     /*
      * Input properties
@@ -60,7 +60,7 @@ struct decoder_sys_t
     /*
      * Decoding properties
      */
-    vlc_bool_t b_decoded_first_keyframe;
+    bool b_decoded_first_keyframe;
 
     /*
      * Common properties
@@ -117,7 +117,7 @@ vlc_module_begin();
 
 #   define ENC_CFG_PREFIX "sout-theora-"
     add_integer( ENC_CFG_PREFIX "quality", 2, NULL, ENC_QUALITY_TEXT,
-                 ENC_QUALITY_LONGTEXT, VLC_FALSE );
+                 ENC_QUALITY_LONGTEXT, false );
 vlc_module_end();
 
 static const char *ppsz_enc_options[] = {
@@ -144,10 +144,10 @@ static int OpenDecoder( vlc_object_t *p_this )
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
-    p_dec->p_sys->b_packetizer = VLC_FALSE;
+    p_dec->p_sys->b_packetizer = false;
 
     p_sys->i_pts = 0;
-    p_sys->b_decoded_first_keyframe = VLC_FALSE;
+    p_sys->b_decoded_first_keyframe = false;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -176,7 +176,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     if( i_ret == VLC_SUCCESS )
     {
-        p_dec->p_sys->b_packetizer = VLC_TRUE;
+        p_dec->p_sys->b_packetizer = true;
         p_dec->fmt_out.i_codec = VLC_FOURCC( 't', 'h', 'e', 'o' );
     }
 
@@ -463,7 +463,7 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     /* Check for keyframe */
     if( !(p_oggpacket->packet[0] & 0x80) /* data packet */ &&
         !(p_oggpacket->packet[0] & 0x40) /* intra frame */ )
-        p_sys->b_decoded_first_keyframe = VLC_TRUE;
+        p_sys->b_decoded_first_keyframe = true;
 
     /* If we haven't seen a single keyframe yet, don't let Theora decode
      * anything, otherwise we'll get display artifacts.  (This is impossible
@@ -579,7 +579,7 @@ struct encoder_sys_t
     /*
      * Input properties
      */
-    vlc_bool_t b_headers;
+    bool b_headers;
 
     /*
      * Theora properties

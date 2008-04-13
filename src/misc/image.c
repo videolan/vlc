@@ -645,7 +645,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     es_format_Init( &p_dec->fmt_in, VIDEO_ES, fmt->i_chroma );
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, 0 );
     p_dec->fmt_in.video = *fmt;
-    p_dec->b_pace_control = VLC_TRUE;
+    p_dec->b_pace_control = true;
 
     p_dec->pf_vout_buffer_new = video_new_buffer;
     p_dec->pf_vout_buffer_del = video_del_buffer;

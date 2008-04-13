@@ -47,7 +47,7 @@ typedef struct
     demux_t  *p_demux;
 
     /* Title infos for that input */
-    vlc_bool_t   b_title_demux; /* Titles/Seekpoints provided by demux */
+    bool   b_title_demux; /* Titles/Seekpoints provided by demux */
     int          i_title;
     input_title_t **title;
 
@@ -60,12 +60,12 @@ typedef struct
     int i_seekpoint_end;
 
     /* Properties */
-    vlc_bool_t b_can_pause;
-    vlc_bool_t b_can_pace_control;
-    vlc_bool_t b_can_rate_control;
-    vlc_bool_t b_rescale_ts;
+    bool b_can_pause;
+    bool b_can_pace_control;
+    bool b_can_rate_control;
+    bool b_rescale_ts;
 
-    vlc_bool_t b_eof;   /* eof of demuxer */
+    bool b_eof;   /* eof of demuxer */
     double     f_fps;
 
     /* Clock average variation */
@@ -77,8 +77,8 @@ typedef struct
 struct input_thread_private_t
 {
     /* Global properties */
-    vlc_bool_t  b_can_pause;
-    vlc_bool_t  b_can_rate_control;
+    bool  b_can_pause;
+    bool  b_can_rate_control;
 
     int         i_rate;
     /* */
@@ -104,9 +104,9 @@ struct input_thread_private_t
     /* Output */
     es_out_t    *p_es_out;
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
-    vlc_bool_t      b_sout_keep;
-    vlc_bool_t      b_out_pace_control; /*     idem ? */
-    vlc_bool_t      b_owns_its_sout;
+    bool      b_sout_keep;
+    bool      b_out_pace_control; /*     idem ? */
+    bool      b_owns_its_sout;
 
     /* Main input properties */
     input_source_t input;
@@ -221,9 +221,9 @@ static inline void input_ControlPush( input_thread_t *p_input,
 /** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
  * anyway. */
 
-static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t preparsed )
+static inline void input_item_SetPreparsed( input_item_t *p_i, bool preparsed )
 {
-    vlc_bool_t send_event = VLC_FALSE;
+    bool send_event = false;
 
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
@@ -237,12 +237,12 @@ static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t prepar
     if ( p_i->p_meta->i_status != new_status )
     {
         p_i->p_meta->i_status = new_status;
-        send_event = VLC_TRUE;
+        send_event = true;
     }
 
     vlc_mutex_unlock( &p_i->lock );
 
-    if ( send_event == VLC_TRUE )
+    if ( send_event == true )
     {
         vlc_event_t event;
         event.type = vlc_InputItemPreparsedChanged;
@@ -251,7 +251,7 @@ static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t prepar
     }
 }
 
-static inline void input_item_SetMetaFetched( input_item_t *p_i, vlc_bool_t metafetched )
+static inline void input_item_SetMetaFetched( input_item_t *p_i, bool metafetched )
 {
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
@@ -262,7 +262,7 @@ static inline void input_item_SetMetaFetched( input_item_t *p_i, vlc_bool_t meta
         p_i->p_meta->i_status &= ~ITEM_META_FETCHED;
 }
 
-static inline void input_item_SetArtNotFound( input_item_t *p_i, vlc_bool_t notfound )
+static inline void input_item_SetArtNotFound( input_item_t *p_i, bool notfound )
 {
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
@@ -273,7 +273,7 @@ static inline void input_item_SetArtNotFound( input_item_t *p_i, vlc_bool_t notf
         p_i->p_meta->i_status &= ~ITEM_ART_NOTFOUND;
 }
 
-static inline void input_item_SetArtFetched( input_item_t *p_i, vlc_bool_t artfetched )
+static inline void input_item_SetArtFetched( input_item_t *p_i, bool artfetched )
 {
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
@@ -293,12 +293,12 @@ typedef struct playlist_album_t
     char *psz_artist;
     char *psz_album;
     char *psz_arturl;
-    vlc_bool_t b_found;
+    bool b_found;
 } playlist_album_t;
 
 int         input_MetaFetch     ( playlist_t *, input_item_t * );
 int         input_ArtFind       ( playlist_t *, input_item_t * );
-vlc_bool_t  input_MetaSatisfied ( playlist_t*, input_item_t*,
+bool  input_MetaSatisfied ( playlist_t*, input_item_t*,
                                   uint32_t*, uint32_t* );
 int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
 
@@ -327,17 +327,17 @@ void input_ControlVarTitle( input_thread_t *, int i_title );
 void input_ConfigVarInit ( input_thread_t * );
 
 /* stream.c */
-stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t );
+stream_t *stream_AccessNew( access_t *p_access, bool );
 void stream_AccessDelete( stream_t *s );
 void stream_AccessReset( stream_t *s );
 void stream_AccessUpdate( stream_t *s );
 
 /* decoder.c */
-void       input_DecoderDiscontinuity( decoder_t * p_dec, vlc_bool_t b_flush );
-vlc_bool_t input_DecoderEmpty( decoder_t * p_dec );
-int        input_DecoderSetCcState( decoder_t *, vlc_bool_t b_decode, int i_channel );
-int        input_DecoderGetCcState( decoder_t *, vlc_bool_t *pb_decode, int i_channel );
-void       input_DecoderIsCcPresent( decoder_t *, vlc_bool_t pb_present[4] );
+void       input_DecoderDiscontinuity( decoder_t * p_dec, bool b_flush );
+bool input_DecoderEmpty( decoder_t * p_dec );
+int        input_DecoderSetCcState( decoder_t *, bool b_decode, int i_channel );
+int        input_DecoderGetCcState( decoder_t *, bool *pb_decode, int i_channel );
+void       input_DecoderIsCcPresent( decoder_t *, bool pb_present[4] );
 
 /* es_out.c */
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
@@ -347,7 +347,7 @@ void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
 void       input_EsOutChangeRate( es_out_t *, int );
 void       input_EsOutChangeState( es_out_t * );
 void       input_EsOutChangePosition( es_out_t * );
-vlc_bool_t input_EsOutDecodersEmpty( es_out_t * );
+bool input_EsOutDecodersEmpty( es_out_t * );
 
 /* clock.c */
 enum /* Synchro states */
@@ -369,7 +369,7 @@ typedef struct
     mtime_t                 last_update;
     int                     i_synchro_state;
 
-    vlc_bool_t              b_master;
+    bool              b_master;
 
     int                     i_rate;
 
@@ -378,7 +378,7 @@ typedef struct
     int                     i_delta_cr_residue;
 } input_clock_t;
 
-void    input_ClockInit( input_clock_t *, vlc_bool_t b_master, int i_cr_average, int i_rate );
+void    input_ClockInit( input_clock_t *, bool b_master, int i_cr_average, int i_rate );
 void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
 void    input_ClockResetPCR( input_clock_t * );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
@@ -409,7 +409,7 @@ void access2_Delete( access_t * );
 
 /* stream_t *s could be null and then it mean a access+demux in one */
 #define demux2_New( a, b, c, d, e, f,g ) __demux2_New(VLC_OBJECT(a),b,c,d,e,f,g)
-demux_t *__demux2_New(vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t );
+demux_t *__demux2_New(vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, bool );
 
 void demux2_Delete(demux_t *);
 
@@ -451,7 +451,7 @@ struct stream_t
     /* UTF-16 and UTF-32 file reading */
     vlc_iconv_t     conv;
     int             i_char_width;
-    vlc_bool_t      b_little_endian;
+    bool      b_little_endian;
 };
 
 #include <libvlc.h>

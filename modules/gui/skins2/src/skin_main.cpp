@@ -163,7 +163,7 @@ static int Open( vlc_object_t *p_this )
     ThemeRepository::instance( p_intf );
 
     // We support play on start
-    p_intf->b_play = VLC_TRUE;
+    p_intf->b_play = true;
 
     return( VLC_SUCCESS );
 }
@@ -259,7 +259,7 @@ static void Run( intf_thread_t *p_intf )
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            playlist_Control( p_playlist, PLAYLIST_PLAY, VLC_FALSE );
+            playlist_Control( p_playlist, PLAYLIST_PLAY, false );
             vlc_object_release( p_playlist );
         }
     }
@@ -446,23 +446,23 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_file( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
-              VLC_TRUE );
+              true );
         change_autosave();
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
-                VLC_TRUE );
+                true );
         change_autosave();
         change_internal();
 #ifdef WIN32
-    add_bool( "skins2-systray", VLC_FALSE, onSystrayChange, SKINS2_SYSTRAY,
-              SKINS2_SYSTRAY_LONG, VLC_FALSE );
-    add_bool( "skins2-taskbar", VLC_TRUE, onTaskBarChange, SKINS2_TASKBAR,
-              SKINS2_TASKBAR_LONG, VLC_FALSE );
-    add_bool( "skins2-transparency", VLC_FALSE, NULL, SKINS2_TRANSPARENCY,
-              SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
+    add_bool( "skins2-systray", false, onSystrayChange, SKINS2_SYSTRAY,
+              SKINS2_SYSTRAY_LONG, false );
+    add_bool( "skins2-taskbar", true, onTaskBarChange, SKINS2_TASKBAR,
+              SKINS2_TASKBAR_LONG, false );
+    add_bool( "skins2-transparency", false, NULL, SKINS2_TRANSPARENCY,
+              SKINS2_TRANSPARENCY_LONG, false );
 #endif
 
-    add_bool( "skinned-playlist", VLC_TRUE, NULL, SKINS2_PLAYLIST,
-              SKINS2_PLAYLIST_LONG, VLC_FALSE );
+    add_bool( "skinned-playlist", true, NULL, SKINS2_PLAYLIST,
+              SKINS2_PLAYLIST_LONG, false );
     set_shortname( _("Skins"));
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );

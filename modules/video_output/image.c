@@ -89,20 +89,20 @@ vlc_module_begin( );
     set_capability( "video output", 0 );
 
     add_string(  CFG_PREFIX "format", "png", NULL,
-                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_FALSE );
+                 FORMAT_TEXT, FORMAT_LONGTEXT, false );
     change_string_list( psz_format_list, psz_format_list_text, 0 );
     add_integer( CFG_PREFIX "width", 0, NULL,
-                 WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
+                 WIDTH_TEXT, WIDTH_LONGTEXT, true );
         add_deprecated_alias( "image-width" ); /* since 0.9.0 */
     add_integer( CFG_PREFIX "height", 0, NULL,
-                 HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+                 HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
         add_deprecated_alias( "image-height" ); /* since 0.9.0 */
     add_integer( CFG_PREFIX "ratio", 3, NULL,
-                 RATIO_TEXT, RATIO_LONGTEXT, VLC_FALSE );
+                 RATIO_TEXT, RATIO_LONGTEXT, false );
     add_string(  CFG_PREFIX "prefix", "img", NULL,
-                 PREFIX_TEXT, PREFIX_LONGTEXT, VLC_FALSE );
+                 PREFIX_TEXT, PREFIX_LONGTEXT, false );
     add_bool(    CFG_PREFIX "replace", 0, NULL,
-                 REPLACE_TEXT, REPLACE_LONGTEXT, VLC_FALSE );
+                 REPLACE_TEXT, REPLACE_LONGTEXT, false );
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
@@ -125,10 +125,10 @@ struct vout_sys_t
     int         i_current;     /* Current image */
     int         i_frames;   /* Number of frames */
 
-    vlc_bool_t  b_replace;
+    bool  b_replace;
 
-    vlc_bool_t b_time;
-    vlc_bool_t b_meta;
+    bool b_time;
+    bool b_meta;
 
     image_handler_t *p_image;
 };
@@ -153,9 +153,9 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->psz_prefix =
             var_CreateGetString( p_this, CFG_PREFIX "prefix" );
     p_vout->p_sys->b_time = strchr( p_vout->p_sys->psz_prefix, '%' )
-                            ? VLC_TRUE : VLC_FALSE;
+                            ? true : false;
     p_vout->p_sys->b_meta = strchr( p_vout->p_sys->psz_prefix, '$' )
-                            ? VLC_TRUE : VLC_FALSE;
+                            ? true : false;
     p_vout->p_sys->psz_format =
             var_CreateGetString( p_this, CFG_PREFIX "format" );
     p_vout->p_sys->i_width =

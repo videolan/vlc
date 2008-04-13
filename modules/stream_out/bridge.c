@@ -69,7 +69,7 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );*/
     add_integer( SOUT_CFG_PREFIX_OUT "id", 0, NULL, ID_TEXT, ID_LONGTEXT,
-                 VLC_FALSE );
+                 false );
     set_callbacks( OpenOut, CloseOut );
 
     add_submodule();
@@ -79,9 +79,9 @@ vlc_module_begin();
     /*set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );*/
     add_integer( SOUT_CFG_PREFIX_IN "delay", 0, NULL, DELAY_TEXT,
-                 DELAY_LONGTEXT, VLC_FALSE );
+                 DELAY_LONGTEXT, false );
     add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, NULL, ID_OFFSET_TEXT,
-                 ID_OFFSET_LONGTEXT, VLC_FALSE );
+                 ID_OFFSET_LONGTEXT, false );
     set_callbacks( OpenIn, CloseIn );
 
 vlc_module_end();
@@ -111,12 +111,12 @@ typedef struct bridged_es_t
     es_format_t fmt;
     block_t *p_block;
     block_t **pp_last;
-    vlc_bool_t b_empty;
+    bool b_empty;
 
     /* bridge in part */
     sout_stream_id_t *id;
     mtime_t i_last;
-    vlc_bool_t b_changed;
+    bool b_changed;
 } bridged_es_t;
 
 typedef struct bridge_t
@@ -153,7 +153,7 @@ typedef struct out_sout_stream_sys_t
     vlc_mutex_t *p_lock;
     bridged_es_t *p_es;
     int i_id;
-    vlc_bool_t b_inited;
+    bool b_inited;
 } out_sout_stream_sys_t;
 
 /*****************************************************************************
@@ -169,7 +169,7 @@ static int OpenOut( vlc_object_t *p_this )
                    p_stream->p_cfg );
 
     p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
-    p_sys->b_inited = VLC_FALSE;
+    p_sys->b_inited = false;
 
     var_Create( p_this->p_libvlc, "bridge-lock", VLC_VAR_MUTEX );
     var_Get( p_this->p_libvlc, "bridge-lock", &val );
@@ -213,7 +213,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         return NULL;
     }
-    p_sys->b_inited = VLC_TRUE;
+    p_sys->b_inited = true;
 
     vlc_mutex_lock( p_sys->p_lock );
 
@@ -254,11 +254,11 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_es->fmt.i_id = p_sys->i_id;
     p_es->p_block = NULL;
     p_es->pp_last = &p_es->p_block;
-    p_es->b_empty = VLC_FALSE;
+    p_es->b_empty = false;
 
     p_es->id = NULL;
     p_es->i_last = 0;
-    p_es->b_changed = VLC_TRUE;
+    p_es->b_changed = true;
 
     msg_Dbg( p_stream, "bridging out input codec=%4.4s id=%d pos=%d",
              (char*)&p_es->fmt.i_codec, p_es->fmt.i_id, i );
@@ -283,14 +283,14 @@ static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     p_es = p_sys->p_es;
 
-    p_es->b_empty = VLC_TRUE;
+    p_es->b_empty = true;
     block_ChainRelease( p_es->p_block );
-    p_es->p_block = VLC_FALSE;
+    p_es->p_block = false;
 
-    p_es->b_changed = VLC_TRUE;
+    p_es->b_changed = true;
     vlc_mutex_unlock( p_sys->p_lock );
 
-    p_sys->b_inited = VLC_FALSE;
+    p_sys->b_inited = false;
 
     return VLC_SUCCESS;
 }
@@ -412,7 +412,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
     bridge_t *p_bridge;
-    vlc_bool_t b_no_es = VLC_TRUE;
+    bool b_no_es = true;
     int i;
 
     /* First forward the packet for our own ES */
@@ -431,7 +431,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
     for ( i = 0; i < p_bridge->i_es_num; i++ )
     {
         if ( !p_bridge->pp_es[i]->b_empty )
-            b_no_es = VLC_FALSE;
+            b_no_es = false;
 
         while ( p_bridge->pp_es[i]->p_block != NULL
                  && (p_bridge->pp_es[i]->p_block->i_dts + p_sys->i_delay
@@ -480,7 +480,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                          p_bridge->pp_es[i]->fmt.i_id, i );
             }
         }
-        p_bridge->pp_es[i]->b_changed = VLC_FALSE;
+        p_bridge->pp_es[i]->b_changed = false;
 
         if ( p_bridge->pp_es[i]->b_empty )
             continue;
@@ -492,7 +492,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 p_sys->p_out->pf_del( p_sys->p_out, p_bridge->pp_es[i]->id );
                 p_bridge->pp_es[i]->fmt.i_id -= p_sys->i_id_offset;
-                p_bridge->pp_es[i]->b_changed = VLC_TRUE;
+                p_bridge->pp_es[i]->b_changed = true;
                 p_bridge->pp_es[i]->id = NULL;
             }
             continue;

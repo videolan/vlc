@@ -57,11 +57,11 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );
     add_bool( SOUT_CFG_PREFIX "audio", 1, NULL, AUDIO_TEXT,
-              AUDIO_LONGTEXT, VLC_TRUE );
+              AUDIO_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "video", 1, NULL, VIDEO_TEXT,
-              VIDEO_LONGTEXT, VLC_TRUE );
+              VIDEO_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "delay", 100, NULL, DELAY_TEXT,
-                 DELAY_LONGTEXT, VLC_TRUE );
+                 DELAY_LONGTEXT, true );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -82,8 +82,8 @@ struct sout_stream_sys_t
     input_thread_t *p_input;
     unsigned        i_es;
 
-    vlc_bool_t     b_audio;
-    vlc_bool_t     b_video;
+    bool     b_audio;
+    bool     b_video;
 
     mtime_t        i_delay;
 };
@@ -167,7 +167,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
     }
 
-    id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, VLC_TRUE );
+    id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, true );
     if( id->p_dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",

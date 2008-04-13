@@ -41,7 +41,7 @@
 - (NSString *)getTitle;
 - (NSString *)getHelp;
 - (BOOL)hasPrefs:(NSString *)o_module_name;
-- (NSView *)showView:(NSScrollView *)o_prefs_view advancedView:(vlc_bool_t) b_advanced;
+- (NSView *)showView:(NSScrollView *)o_prefs_view advancedView:(bool) b_advanced;
 - (void)applyChanges;
 - (void)resetView;
 
@@ -53,7 +53,7 @@
 @interface VLCPrefs : NSObject
 {
     intf_thread_t *p_intf;
-    vlc_bool_t b_advanced;
+    bool b_advanced;
     VLCTreeItem *o_config_tree;
     NSView *o_empty_view;
     NSMutableDictionary *o_save_prefs;

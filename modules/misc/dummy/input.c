@@ -48,7 +48,7 @@ static int AccessRead( access_t *p_access, uint8_t *p, int i_size )
 }
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -59,8 +59,8 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
 
         /* */
@@ -101,7 +101,7 @@ int E_(OpenAccess)( vlc_object_t *p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = NULL;
@@ -203,7 +203,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     playlist_t *p_playlist;
-    vlc_bool_t b_eof = VLC_FALSE;
+    bool b_eof = false;
 
     p_playlist = vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST, FIND_PARENT );
 
@@ -216,20 +216,20 @@ static int Demux( demux_t *p_demux )
     switch( p_sys->i_command )
     {
         case COMMAND_QUIT:
-            b_eof = VLC_TRUE;
+            b_eof = true;
             vlc_object_kill( p_demux->p_libvlc );
             break;
 
         case COMMAND_PAUSE:
             if( mdate() >= p_sys->expiration )
-                b_eof = VLC_TRUE;
+                b_eof = true;
             else
                 msleep( 10000 );
             break;
  
         case COMMAND_NOP:
         default:
-            b_eof = VLC_TRUE;
+            b_eof = true;
             break;
     }
 

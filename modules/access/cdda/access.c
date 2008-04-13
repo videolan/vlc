@@ -228,7 +228,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
         /* Return only the dummy RIFF header we created in Open/Init */
         p_block = block_New( p_access, sizeof( WAVEHEADER ) );
         memcpy( p_block->p_buffer, &p_cdda->waveheader, sizeof(WAVEHEADER) );
-        p_cdda->b_header = VLC_TRUE;
+        p_cdda->b_header = true;
         return p_block;
     }
 
@@ -246,7 +246,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
         if( go_on )
         {
             dbg_print( (INPUT_DBG_LSN), "EOF");
-                        p_access->info.b_eof = VLC_TRUE;
+                        p_access->info.b_eof = true;
             return NULL;
         }
 
@@ -283,7 +283,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                 i_blocks * CDIO_CD_FRAMESIZE_RAW );
-        intf_UserFatal( p_access, VLC_FALSE, _("CD reading failed"),
+        intf_UserFatal( p_access, false, _("CD reading failed"),
                         _("VLC could not get a new block of size: %i."),
                         i_blocks * CDIO_CD_FRAMESIZE_RAW );
         return NULL;
@@ -389,7 +389,7 @@ CDDARead( access_t * p_access, uint8_t *p_buffer, size_t i_len )
         if( p_cdda->i_track >= p_cdda->i_first_track + p_cdda->i_titles - 1 )
         {
             dbg_print( (INPUT_DBG_LSN), "EOF");
-            p_access->info.b_eof = VLC_TRUE;
+            p_access->info.b_eof = true;
             return 0;
         }
         p_access->info.i_update |= INPUT_UPDATE_TITLE;
@@ -505,7 +505,7 @@ static int CDDASeek( access_t * p_access, int64_t i_pos )
     }
 
     p_access->info.i_pos = i_pos;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     return VLC_SUCCESS;
 }
 
@@ -563,7 +563,7 @@ int CDDAOpen( vlc_object_t *p_this )
     cdda_data_t *p_cdda    = NULL;
     CdIo_t      *p_cdio;
     track_t     i_track = 1;
-    vlc_bool_t  b_single_track = false;
+    bool  b_single_track = false;
     int         i_rc = VLC_EGENERIC;
 
     p_access->p_sys = NULL;
@@ -656,7 +656,7 @@ int CDDAOpen( vlc_object_t *p_this )
 #endif
 
     p_cdda->psz_source = strdup( psz_source );
-    p_cdda->b_header   = VLC_FALSE;
+    p_cdda->b_header   = false;
     p_cdda->p_cdio     = p_cdio;
     p_cdda->i_tracks   = 0;
     p_cdda->i_titles   = 0;
@@ -716,7 +716,7 @@ int CDDAOpen( vlc_object_t *p_this )
     }
 
     p_access->info.i_update    = 0;
-    p_access->info.b_eof       = VLC_FALSE;
+    p_access->info.b_eof       = false;
     p_access->info.i_title     = 0;
     p_access->info.i_seekpoint = 0;
 
@@ -906,8 +906,8 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_CAN_CONTROL_PACE:
         {
-            vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = p_cdda->b_audio_ctl ? VLC_FALSE : VLC_TRUE;
+            bool *pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = p_cdda->b_audio_ctl ? false : true;
             dbg_print( INPUT_DBG_META, "can control pace? %d", *pb_bool);
             return VLC_SUCCESS;
         }
@@ -922,8 +922,8 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             dbg_print( INPUT_DBG_META, "can pause?");
  common:
             {
-                vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-                *pb_bool = VLC_TRUE;
+                bool *pb_bool = (bool*)va_arg( args, bool* );
+                *pb_bool = true;
                 return VLC_SUCCESS;
             }
 

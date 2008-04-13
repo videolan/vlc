@@ -52,7 +52,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "tcp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
 
     set_capability( "access2", 0 );
     add_shortcut( "tcp" );
@@ -145,9 +145,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return 0;
 
     i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len,
-                       VLC_FALSE );
+                       false );
     if( i_read == 0 )
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
     else if( i_read > 0 )
         p_access->info.i_pos += i_read;
 
@@ -159,7 +159,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -168,16 +168,16 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;    /* FIXME */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;    /* FIXME */
             break;
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;    /* FIXME */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;    /* FIXME */
             break;
 
         /* */

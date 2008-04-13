@@ -185,7 +185,7 @@ void AboutDialog::close()
  * UpdateDialog
  *****************************************************************************/
 /* callback to get information from the core */
-static void UpdateCallback( void *data, vlc_bool_t b_ret )
+static void UpdateCallback( void *data, bool b_ret )
 {
     UpdateDialog* UDialog = (UpdateDialog *)data;
     QEvent* event;

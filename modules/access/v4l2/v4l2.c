@@ -278,99 +278,99 @@ vlc_module_begin();
 
     set_section( N_( "Video input" ), NULL );
     add_string( CFG_PREFIX "dev", "/dev/video0", 0, DEV_TEXT, DEV_LONGTEXT,
-                VLC_FALSE );
+                false );
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
-                 STANDARD_LONGTEXT, VLC_FALSE );
+                 STANDARD_LONGTEXT, false );
         change_integer_list( i_standards_list, psz_standards_list_text, 0 );
     add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_integer( CFG_PREFIX "input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_integer( CFG_PREFIX "audio-input", 0, NULL, AUDIO_INPUT_TEXT,
-                 AUDIO_INPUT_LONGTEXT, VLC_TRUE );
+                 AUDIO_INPUT_LONGTEXT, true );
     add_integer( CFG_PREFIX "io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
-                 IOMETHOD_LONGTEXT, VLC_TRUE );
+                 IOMETHOD_LONGTEXT, true );
         change_integer_list( i_iomethod_list, psz_iomethod_list_text, 0 );
     add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
-                WIDTH_LONGTEXT, VLC_TRUE );
+                WIDTH_LONGTEXT, true );
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
-                HEIGHT_LONGTEXT, VLC_TRUE );
-    add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+                HEIGHT_LONGTEXT, true );
+    add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
 
     set_section( N_( "Audio input" ), NULL );
     add_string( CFG_PREFIX "adev", NULL, 0, ADEV_TEXT, ADEV_LONGTEXT,
-                VLC_FALSE );
+                false );
     add_integer( CFG_PREFIX "audio-method", AUDIO_METHOD_OSS|AUDIO_METHOD_ALSA,
-                 NULL, AUDIO_METHOD_TEXT, AUDIO_METHOD_LONGTEXT, VLC_TRUE );
-    add_bool( CFG_PREFIX "stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
-                VLC_TRUE );
+                 NULL, AUDIO_METHOD_TEXT, AUDIO_METHOD_LONGTEXT, true );
+    add_bool( CFG_PREFIX "stereo", true, NULL, STEREO_TEXT, STEREO_LONGTEXT,
+                true );
     add_integer( CFG_PREFIX "samplerate", 48000, NULL, SAMPLERATE_TEXT,
-                SAMPLERATE_LONGTEXT, VLC_TRUE );
+                SAMPLERATE_LONGTEXT, true );
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+                CACHING_TEXT, CACHING_LONGTEXT, true );
 
     set_section( N_( "Tuner" ), NULL );
     add_integer( CFG_PREFIX "tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT,
-                 VLC_TRUE );
+                 true );
     add_integer( CFG_PREFIX "tuner-frequency", -1, NULL, FREQUENCY_TEXT,
-                 FREQUENCY_LONGTEXT, VLC_TRUE );
+                 FREQUENCY_LONGTEXT, true );
     add_integer( CFG_PREFIX "tuner-audio-mode", -1, NULL, TUNER_AUDIO_MODE_TEXT,
-                 TUNER_AUDIO_MODE_LONGTEXT, VLC_TRUE );
+                 TUNER_AUDIO_MODE_LONGTEXT, true );
         change_integer_list( i_tuner_audio_modes_list,
                              psz_tuner_audio_modes_list_text, 0 );
 
     set_section( N_( "Controls" ),
                  N_( "v4l2 driver controls, if supported by your v4l2 driver." ) );
-    add_bool( CFG_PREFIX "controls-reset", VLC_FALSE, NULL, CTRL_RESET_TEXT,
-              CTRL_RESET_LONGTEXT, VLC_TRUE );
+    add_bool( CFG_PREFIX "controls-reset", false, NULL, CTRL_RESET_TEXT,
+              CTRL_RESET_LONGTEXT, true );
     add_integer( CFG_PREFIX "brightness", -1, NULL, BRIGHTNESS_TEXT,
-                 BRIGHTNESS_LONGTEXT, VLC_TRUE );
+                 BRIGHTNESS_LONGTEXT, true );
     add_integer( CFG_PREFIX "contrast", -1, NULL, CONTRAST_TEXT,
-                 CONTRAST_LONGTEXT, VLC_TRUE );
+                 CONTRAST_LONGTEXT, true );
     add_integer( CFG_PREFIX "saturation", -1, NULL, SATURATION_TEXT,
-                 SATURATION_LONGTEXT, VLC_TRUE );
+                 SATURATION_LONGTEXT, true );
     add_integer( CFG_PREFIX "hue", -1, NULL, HUE_TEXT,
-                 HUE_LONGTEXT, VLC_TRUE );
+                 HUE_LONGTEXT, true );
     add_integer( CFG_PREFIX "black-level", -1, NULL, BLACKLEVEL_TEXT,
-                 BLACKLEVEL_LONGTEXT, VLC_TRUE );
+                 BLACKLEVEL_LONGTEXT, true );
     add_integer( CFG_PREFIX "auto-white-balance", -1, NULL,
-                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, VLC_TRUE );
+                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true );
     add_integer( CFG_PREFIX "do-white-balance", -1, NULL, DOWHITEBALANCE_TEXT,
-                 DOWHITEBALANCE_LONGTEXT, VLC_TRUE );
+                 DOWHITEBALANCE_LONGTEXT, true );
     add_integer( CFG_PREFIX "red-balance", -1, NULL, REDBALANCE_TEXT,
-                 REDBALANCE_LONGTEXT, VLC_TRUE );
+                 REDBALANCE_LONGTEXT, true );
     add_integer( CFG_PREFIX "blue-balance", -1, NULL, BLUEBALANCE_TEXT,
-                 BLUEBALANCE_LONGTEXT, VLC_TRUE );
+                 BLUEBALANCE_LONGTEXT, true );
     add_integer( CFG_PREFIX "gamma", -1, NULL, GAMMA_TEXT,
-                 GAMMA_LONGTEXT, VLC_TRUE );
+                 GAMMA_LONGTEXT, true );
     add_integer( CFG_PREFIX "exposure", -1, NULL, EXPOSURE_TEXT,
-                 EXPOSURE_LONGTEXT, VLC_TRUE );
+                 EXPOSURE_LONGTEXT, true );
     add_integer( CFG_PREFIX "autogain", -1, NULL, AUTOGAIN_TEXT,
-                 AUTOGAIN_LONGTEXT, VLC_TRUE );
+                 AUTOGAIN_LONGTEXT, true );
     add_integer( CFG_PREFIX "gain", -1, NULL, GAIN_TEXT,
-                 GAIN_LONGTEXT, VLC_TRUE );
+                 GAIN_LONGTEXT, true );
     add_integer( CFG_PREFIX "hflip", -1, NULL, HFLIP_TEXT,
-                 HFLIP_LONGTEXT, VLC_TRUE );
+                 HFLIP_LONGTEXT, true );
     add_integer( CFG_PREFIX "vflip", -1, NULL, VFLIP_TEXT,
-                 VFLIP_LONGTEXT, VLC_TRUE );
+                 VFLIP_LONGTEXT, true );
     add_integer( CFG_PREFIX "hcenter", -1, NULL, HCENTER_TEXT,
-                 HCENTER_LONGTEXT, VLC_TRUE );
+                 HCENTER_LONGTEXT, true );
     add_integer( CFG_PREFIX "vcenter", -1, NULL, VCENTER_TEXT,
-                 VCENTER_LONGTEXT, VLC_TRUE );
+                 VCENTER_LONGTEXT, true );
     add_integer( CFG_PREFIX "audio-volume", -1, NULL, AUDIO_VOLUME_TEXT,
-                AUDIO_VOLUME_LONGTEXT, VLC_TRUE );
+                AUDIO_VOLUME_LONGTEXT, true );
     add_integer( CFG_PREFIX "audio-balance", -1, NULL, AUDIO_BALANCE_TEXT,
-                AUDIO_BALANCE_LONGTEXT, VLC_TRUE );
-    add_bool( CFG_PREFIX "audio-mute", VLC_FALSE, NULL, AUDIO_MUTE_TEXT,
-              AUDIO_MUTE_LONGTEXT, VLC_TRUE );
+                AUDIO_BALANCE_LONGTEXT, true );
+    add_bool( CFG_PREFIX "audio-mute", false, NULL, AUDIO_MUTE_TEXT,
+              AUDIO_MUTE_LONGTEXT, true );
     add_integer( CFG_PREFIX "audio-bass", -1, NULL, AUDIO_BASS_TEXT,
-                AUDIO_BASS_LONGTEXT, VLC_TRUE );
+                AUDIO_BASS_LONGTEXT, true );
     add_integer( CFG_PREFIX "audio-treble", -1, NULL, AUDIO_TREBLE_TEXT,
-                AUDIO_TREBLE_LONGTEXT, VLC_TRUE );
+                AUDIO_TREBLE_LONGTEXT, true );
     add_integer( CFG_PREFIX "audio-loudness", -1, NULL, AUDIO_LOUDNESS_TEXT,
-                AUDIO_LOUDNESS_LONGTEXT, VLC_TRUE );
+                AUDIO_LOUDNESS_LONGTEXT, true );
     add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
-              S_CTRLS_LONGTEXT, VLC_TRUE );
+              S_CTRLS_LONGTEXT, true );
 
     add_shortcut( "v4l2" );
     set_capability( "access_demux", 10 );
@@ -404,20 +404,20 @@ static block_t* GrabVideo( demux_t *p_demux );
 static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t );
 static block_t* GrabAudio( demux_t *p_demux );
 
-static vlc_bool_t IsPixelFormatSupported( demux_t *p_demux,
+static bool IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
 #ifdef HAVE_ALSA
 static char* ResolveALSADeviceName( const char *psz_device );
 #endif
-static int OpenVideoDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
-static int OpenAudioDev( vlc_object_t *, demux_sys_t *, vlc_bool_t );
-static vlc_bool_t ProbeVideoDev( vlc_object_t *, demux_sys_t *,
+static int OpenVideoDev( vlc_object_t *, demux_sys_t *, bool );
+static int OpenAudioDev( vlc_object_t *, demux_sys_t *, bool );
+static bool ProbeVideoDev( vlc_object_t *, demux_sys_t *,
                                  char *psz_device );
-static vlc_bool_t ProbeAudioDev( vlc_object_t *, demux_sys_t *,
+static bool ProbeAudioDev( vlc_object_t *, demux_sys_t *,
                                  char *psz_device );
 
-static int ControlList( vlc_object_t *, int , vlc_bool_t, vlc_bool_t );
+static int ControlList( vlc_object_t *, int , bool, bool );
 static int Control( vlc_object_t *, int i_fd,
                     const char *psz_name, int i_cid, int i_value );
 
@@ -568,7 +568,7 @@ struct demux_sys_t
 
     /* Audio */
     unsigned int i_sample_rate;
-    vlc_bool_t b_stereo;
+    bool b_stereo;
     size_t i_audio_max_frame_size;
     block_t *p_block_audio;
     es_out_id_t *p_es_audio;
@@ -592,15 +592,15 @@ struct demux_sys_t
 };
 
 static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
-                           int i_flags, vlc_bool_t b_demux,
-                           vlc_bool_t b_forced )
+                           int i_flags, bool b_demux,
+                           bool b_forced )
 {
     /* Find main device (video or audio) */
     if( p_sys->psz_device && *p_sys->psz_device )
     {
         msg_Dbg( p_this, "main device='%s'", p_sys->psz_device );
 
-        vlc_bool_t b_maindevice_is_video = VLC_FALSE;
+        bool b_maindevice_is_video = false;
 
         /* Try to open as video device */
         if( i_flags & FIND_VIDEO )
@@ -616,7 +616,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
                 p_sys->i_fd_video = OpenVideoDev( p_this, p_sys, b_demux );
                 if( p_sys->i_fd_video < 0 )
                     return VLC_EGENERIC;
-                b_maindevice_is_video = VLC_TRUE;
+                b_maindevice_is_video = true;
                 /* If successful we carry on to try the audio if access is forced */
             }
         }
@@ -641,7 +641,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
     }
 
     /* If no device opened, only continue if the access was forced */
-    if( b_forced == VLC_FALSE
+    if( b_forced == false
         && !( ( i_flags & FIND_VIDEO && p_sys->i_fd_video >= 0 )
            || ( i_flags & FIND_AUDIO && p_sys->i_fd_audio >= 0 ) ) )
     {
@@ -723,7 +723,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 #endif
 
     if( FindMainDevice( p_this, p_sys, FIND_VIDEO|FIND_AUDIO,
-        VLC_TRUE, !strncmp( p_demux->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
+        true, !strncmp( p_demux->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
     {
         DemuxClose( p_this );
         return VLC_EGENERIC;
@@ -922,7 +922,7 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
             else if( !strncmp( psz_parser, "controls-reset",
                                strlen( "controls-reset" ) ) )
             {
-                var_SetBool( p_obj, "v4l2-controls-reset", VLC_TRUE );
+                var_SetBool( p_obj, "v4l2-controls-reset", true );
                 psz_parser += strlen( "controls-reset" );
             }
 #if 0
@@ -978,12 +978,12 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
             else if( !strncmp( psz_parser, "stereo", strlen( "stereo" ) ) )
             {
                 psz_parser += strlen( "stereo" );
-                p_sys->b_stereo = VLC_TRUE;
+                p_sys->b_stereo = true;
             }
             else if( !strncmp( psz_parser, "mono", strlen( "mono" ) ) )
             {
                 psz_parser += strlen( "mono" );
-                p_sys->b_stereo = VLC_FALSE;
+                p_sys->b_stereo = false;
             }
             else if( !strncmp( psz_parser, "caching=", strlen( "caching=" ) ) )
             {
@@ -1186,7 +1186,7 @@ static int AccessOpen( vlc_object_t * p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
 
@@ -1199,7 +1199,7 @@ static int AccessOpen( vlc_object_t * p_this )
     ParseMRL( p_sys, p_access->psz_path, (vlc_object_t *) p_access );
 
     if( FindMainDevice( p_this, p_sys, FIND_VIDEO,
-        VLC_FALSE, !strncmp( p_access->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
+        false, !strncmp( p_access->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
     {
         AccessClose( p_this );
         return VLC_EGENERIC;
@@ -1214,7 +1214,7 @@ static int AccessOpen( vlc_object_t * p_this )
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_bool_t *pb;
+    bool *pb;
     int64_t    *pi64;
 
     switch( i_query )
@@ -1224,8 +1224,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb = VLC_FALSE;
+            pb = (bool*)va_arg( args, bool * );
+            *pb = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
@@ -1251,7 +1251,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
     demux_sys_t  *p_sys = (demux_sys_t *) p_access->p_sys;
@@ -1261,16 +1261,16 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
 
         /* */
@@ -1338,7 +1338,7 @@ static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len
     i_ret = read( p_sys->i_fd_video, p_buffer, i_len );
     if( i_ret == 0 )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
     }
     else if( i_ret > 0 )
     {
@@ -1800,23 +1800,23 @@ open_failed:
  * IsPixelFormatSupported: returns true if the specified V4L2 pixel format is
  * in the array of supported formats returned by the driver
  *****************************************************************************/
-static vlc_bool_t IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat )
+static bool IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
     for( int i_index = 0; i_index < p_sys->i_codec; i_index++ )
     {
         if( p_sys->p_codecs[i_index].pixelformat == i_pixelformat )
-            return VLC_TRUE;
+            return true;
     }
 
-    return VLC_FALSE;
+    return false;
 }
 
 /*****************************************************************************
  * OpenVideoDev: open and set up the video device and probe for capabilities
  *****************************************************************************/
-static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_demux )
+static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 {
     int i_fd;
     struct v4l2_cropcap cropcap;
@@ -1924,7 +1924,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, vlc_bool_t b_d
     ControlList( p_obj, i_fd,
                   var_GetBool( p_obj, "v4l2-controls-reset" ), b_demux );
     SetAvailControlsByString( p_obj, p_sys, i_fd );
-    if( VLC_FALSE == b_demux)
+    if( false == b_demux)
     {
         return i_fd;
     }
@@ -2256,7 +2256,7 @@ static char *ResolveALSADeviceName( const char *psz_device )
  *****************************************************************************/
 #ifdef HAVE_ALSA
 static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
-                             vlc_bool_t b_demux )
+                             bool b_demux )
 {
     char *psz_device = p_sys->psz_adev;
     int i_fd = 0;
@@ -2449,7 +2449,7 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
 #endif
 
 static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
-                            vlc_bool_t b_demux )
+                            bool b_demux )
 {
     int i_fd = 0;
     int i_format;
@@ -2501,7 +2501,7 @@ static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
 }
 
 static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
-                         vlc_bool_t b_demux )
+                         bool b_demux )
 {
     char *psz_device;
     int i_fd = -1;
@@ -2547,7 +2547,7 @@ static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
 /*****************************************************************************
  * ProbeVideoDev: probe video for capabilities
  *****************************************************************************/
-static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
+static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                  char *psz_device )
 {
     int i_index;
@@ -2784,12 +2784,12 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             memset( &psz_fourcc_v4l2, 0, sizeof( psz_fourcc_v4l2 ) );
             vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
                                 &psz_fourcc_v4l2 );
-            vlc_bool_t b_codec_supported = VLC_FALSE;
+            bool b_codec_supported = false;
             for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
             {
                 if( v4l2chroma_to_fourcc[i].i_v4l2 == p_sys->p_codecs[i_index].pixelformat )
                 {
-                    b_codec_supported = VLC_TRUE;
+                    b_codec_supported = true;
 
                     char psz_fourcc[5];
                     memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
@@ -2855,12 +2855,12 @@ static vlc_bool_t ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
 
     if( i_fd >= 0 ) close( i_fd );
-    return VLC_TRUE;
+    return true;
 
 open_failed:
 
     if( i_fd >= 0 ) close( i_fd );
-    return VLC_FALSE;
+    return false;
 
 }
 
@@ -2868,7 +2868,7 @@ open_failed:
  * ProbeAudioDev: probe audio for capabilities
  *****************************************************************************/
 #ifdef HAVE_ALSA
-static vlc_bool_t ProbeAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
+static bool ProbeAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
                                      char *psz_device )
 {
     int i_err;
@@ -2879,17 +2879,17 @@ static vlc_bool_t ProbeAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
     {
         msg_Err( p_this, "cannot open device %s for ALSA audio (%s)", psz_alsa_device_name, snd_strerror( i_err ) );
         free( psz_alsa_device_name );
-        return VLC_FALSE;
+        return false;
     }
 
     snd_pcm_close( p_alsa_pcm );
     free( psz_alsa_device_name );
 
-    return VLC_TRUE;
+    return true;
 }
 #endif
 
-static vlc_bool_t ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
+static bool ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
                                     char *psz_device )
 {
     int i_fd = 0;
@@ -2912,15 +2912,15 @@ static vlc_bool_t ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
     free( psz_oss_device_name );
     if( i_fd >= 0 ) close( i_fd );
 
-    return VLC_TRUE;
+    return true;
 
 open_failed:
     free( psz_oss_device_name );
     if( i_fd >= 0 ) close( i_fd );
-    return VLC_FALSE;
+    return false;
 }
 
-static vlc_bool_t ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
+static bool ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
                                  char *psz_device )
 {
 #ifdef HAVE_ALSA
@@ -2928,7 +2928,7 @@ static vlc_bool_t ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
      && ProbeAudioDevAlsa( p_this, p_sys, psz_device ) )
     {
         p_sys->i_audio_method = AUDIO_METHOD_ALSA;
-        return VLC_TRUE;
+        return true;
     }
 #endif
 
@@ -2936,11 +2936,11 @@ static vlc_bool_t ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
      && ProbeAudioDevOss( p_this, p_sys, psz_device ) )
     {
         p_sys->i_audio_method = AUDIO_METHOD_OSS;
-        return VLC_TRUE;
+        return true;
     }
 
     p_sys->i_audio_method = 0;
-    return VLC_FALSE;
+    return false;
 }
 
 static void name2var( unsigned char *name )
@@ -2955,7 +2955,7 @@ static void name2var( unsigned char *name )
  *****************************************************************************/
 static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
                               struct v4l2_queryctrl queryctrl,
-                              vlc_bool_t b_reset, vlc_bool_t b_demux )
+                              bool b_reset, bool b_demux )
 {
     struct v4l2_querymenu querymenu;
     unsigned int i_mid;
@@ -3128,7 +3128,7 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
  * value and create the relevant variables to enable runtime changes
  *****************************************************************************/
 static int ControlList( vlc_object_t *p_obj, int i_fd,
-                        vlc_bool_t b_reset, vlc_bool_t b_demux )
+                        bool b_reset, bool b_demux )
 {
     struct v4l2_queryctrl queryctrl;
     int i_cid;

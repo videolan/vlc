@@ -62,11 +62,11 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "fake-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
-    add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, VLC_TRUE );
+                 CACHING_TEXT, CACHING_LONGTEXT, true );
+    add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
+    add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, true );
     add_integer( "fake-duration", 0, NULL, DURATION_TEXT, DURATION_LONGTEXT,
-                 VLC_TRUE );
+                 true );
 
     add_shortcut( "fake" );
     set_capability( "access_demux", 0 );
@@ -138,7 +138,7 @@ static void Close( vlc_object_t *p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_bool_t *pb, b;
+    bool *pb, b;
     int64_t    *pi64, i64;
     double     *pf, f;
 
@@ -148,8 +148,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (vlc_bool_t *)va_arg( args, vlc_bool_t * );
-            *pb = VLC_TRUE;
+            pb = (bool *)va_arg( args, bool * );
+            *pb = true;
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:

@@ -39,12 +39,12 @@ static void test_dictionary_validity (vlc_dictionary_t * p_dict, const char ** o
 
     for( j = 0; keys[j]; j++ )
     {
-        vlc_bool_t found = VLC_FALSE;
+        bool found = false;
         for( i = 0; i < size; i++ )
         {
             if(!strcmp( keys[j], our_keys[i] ))
             {
-                found = VLC_TRUE;
+                found = true;
                 break;
             }
         }

@@ -44,8 +44,8 @@
 struct intf_sys_t
 {
     vlc_object_t * p_vout;
-    vlc_bool_t     b_button_pressed;
-    vlc_bool_t     b_triggered;
+    bool     b_button_pressed;
+    bool     b_triggered;
     int            i_threshold;
 };
 
@@ -67,7 +67,7 @@ static int  MouseEvent( vlc_object_t *, char const *,
 
 vlc_module_begin();
     set_shortname( "Showintf" );
-    add_integer( "showintf-threshold", 10, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
+    add_integer( "showintf-threshold", 10, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true );
     set_description( _("Show interface with mouse") );
 
     set_capability( "interface", 0 );
@@ -127,9 +127,9 @@ static void RunIntf( intf_thread_t *p_intf )
         if( p_intf->p_sys->b_triggered )
         {
             playlist_t *p_playlist = pl_Yield( p_intf );
-            var_SetBool( p_playlist, "intf-show", VLC_TRUE );
+            var_SetBool( p_playlist, "intf-show", true );
             vlc_object_release( p_playlist );
-            p_intf->p_sys->b_triggered = VLC_FALSE;
+            p_intf->p_sys->b_triggered = false;
         }
 
         vlc_mutex_unlock( &p_intf->change_lock );
@@ -182,8 +182,8 @@ static int InitThread( intf_thread_t * p_intf )
     {
         vlc_mutex_lock( &p_intf->change_lock );
 
-        p_intf->p_sys->b_triggered = VLC_FALSE;
-        p_intf->p_sys->b_button_pressed = VLC_FALSE;
+        p_intf->p_sys->b_triggered = false;
+        p_intf->p_sys->b_button_pressed = false;
         p_intf->p_sys->i_threshold =
             config_GetInt( p_intf, "showintf-threshold" );
 
@@ -230,7 +230,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         if ( i_mouse_y < p_intf->p_sys->i_threshold )
         {
             msg_Dbg( p_intf, "interface showing requested" );
-            p_intf->p_sys->b_triggered = VLC_TRUE;
+            p_intf->p_sys->b_triggered = true;
         }
     }
 
@@ -239,12 +239,12 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     if( !p_intf->p_sys->b_button_pressed &&
         !strcmp( psz_var, "mouse-button-down" ) )
     {
-        p_intf->p_sys->b_button_pressed = VLC_TRUE;
+        p_intf->p_sys->b_button_pressed = true;
     }
     if( p_intf->p_sys->b_button_pressed &&
         !strcmp( psz_var, "mouse-button-down" ) )
     {
-        p_intf->p_sys->b_button_pressed = VLC_FALSE;
+        p_intf->p_sys->b_button_pressed = false;
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );

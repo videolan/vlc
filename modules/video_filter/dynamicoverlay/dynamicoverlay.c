@@ -68,9 +68,9 @@ vlc_module_begin();
     set_capability( "sub filter", 0 );
 
     add_file( "overlay-input", NULL, NULL, INPUT_TEXT, INPUT_LONGTEXT,
-              VLC_FALSE );
+              false );
     add_file( "overlay-output", NULL, NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT,
-              VLC_FALSE );
+              false );
 
     add_shortcut( "overlay" );
     set_callbacks( Create, Destroy );
@@ -108,8 +108,8 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->i_inputfd = -1;
     p_sys->i_outputfd = -1;
-    p_sys->b_updated = VLC_TRUE;
-    p_sys->b_atomic = VLC_FALSE;
+    p_sys->b_updated = true;
+    p_sys->b_atomic = false;
 
     p_filter->pf_sub_filter = Filter;
 
@@ -228,7 +228,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                              p_sys->input.i_length ) ) )
     {
         commanddesc_t *p_cur = NULL;
-        vlc_bool_t b_found = VLC_FALSE;
+        bool b_found = false;
         size_t i_index = 0;
 
         *p_end = '\0';
@@ -241,7 +241,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             if( !strncmp( p_cur->psz_command, p_cmd, strlen(p_cur->psz_command) ) )
             {
                 p_cmd[strlen(p_cur->psz_command)] = '\0';
-                b_found = VLC_TRUE;
+                b_found = true;
                 break;
             }
         }
@@ -265,8 +265,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_cmddesc->p_command->pf_parser( p_cmd, p_end,
                                              &p_cmddesc->params );
 
-            if( ( p_cmddesc->p_command->b_atomic == VLC_TRUE ) &&
-                ( p_sys->b_atomic == VLC_TRUE ) )
+            if( ( p_cmddesc->p_command->b_atomic == true ) &&
+                ( p_sys->b_atomic == true ) )
                 QueueEnqueue( &p_sys->atomic, p_cmddesc );
             else
                 QueueEnqueue( &p_sys->pending, p_cmddesc );
@@ -326,7 +326,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
     }
 
-    if( p_sys->b_updated == VLC_FALSE )
+    if( p_sys->b_updated == false )
         return NULL;
 
     subpicture_t *p_spu = NULL;
@@ -342,10 +342,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
     p_spu->i_x = 0;
     p_spu->i_y = 0;
-    p_spu->b_absolute = VLC_TRUE;
+    p_spu->b_absolute = true;
     p_spu->i_start = date;
     p_spu->i_stop = 0;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
 
     subpicture_region_t **pp_region = &p_spu->p_region;
     while( (p_overlay = ListWalk( &p_sys->overlays )) )
@@ -401,7 +401,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         pp_region = &(*pp_region)->p_next;
     }
 
-    p_sys->b_updated = VLC_FALSE;
+    p_sys->b_updated = false;
     return p_spu;
 }
 

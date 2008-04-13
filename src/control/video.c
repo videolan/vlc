@@ -70,8 +70,8 @@ void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullscreen,
         return;
     }
 
-    if( b_fullscreen ) val.b_bool = VLC_TRUE;
-    else               val.b_bool = VLC_FALSE;
+    if( b_fullscreen ) val.b_bool = true;
+    else               val.b_bool = false;
 
     i_ret = var_Set( p_vout1, "fullscreen", val );
     if( i_ret )
@@ -97,7 +97,7 @@ int libvlc_get_fullscreen( libvlc_media_player_t *p_mi,
         libvlc_exception_raise( p_e,
                         "Unexpected error while looking up fullscreen value" );
 
-    return val.b_bool == VLC_TRUE ? 1 : 0;
+    return val.b_bool == true ? 1 : 0;
 }
 
 void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
@@ -189,7 +189,7 @@ int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread(p_mi, p_e);
-    vlc_bool_t has_vout = VLC_FALSE;
+    bool has_vout = false;
 
     if( p_input_thread )
     {
@@ -198,7 +198,7 @@ int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
         p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
         if( p_vout )
         {
-            has_vout = VLC_TRUE;
+            has_vout = true;
             vlc_object_release( p_vout );
         }
         vlc_object_release( p_input_thread );

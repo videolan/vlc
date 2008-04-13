@@ -359,7 +359,7 @@
     /* tell core that the user wishes to cancel the dialogue
      * Use this function if cancelling is optionally like in the progress-dialogue */
     vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
-    p_dialog->b_cancelled = VLC_TRUE;
+    p_dialog->b_cancelled = true;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
     msg_Dbg( p_intf, "cancelling dialog, will close it later on" );
 }

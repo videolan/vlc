@@ -2023,7 +2023,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     /* now create a memory stream */
     p_stream_memory =
         stream_MemoryNew( VLC_OBJECT(p_stream), p_cmvd->data.p_cmvd->p_data,
-                          p_cmvd->data.p_cmvd->i_uncompressed_size, VLC_TRUE );
+                          p_cmvd->data.p_cmvd->i_uncompressed_size, true );
 
     /* and read uncompressd moov */
     p_box->data.p_cmov->p_moov = MP4_ReadBox( p_stream_memory, NULL );

@@ -83,9 +83,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_ADVANCED_MISC );
 
     add_bool( "netsync-master", 0, NULL,
-              NETSYNC_TEXT, NETSYNC_LONGTEXT, VLC_TRUE );
+              NETSYNC_TEXT, NETSYNC_LONGTEXT, true );
     add_string( "netsync-master-ip", NULL, NULL, MIP_TEXT, MIP_LONGTEXT,
-                VLC_TRUE );
+                true );
 
     set_capability( "interface", 0 );
     set_callbacks( Activate, Close );
@@ -138,7 +138,7 @@ static void Run( intf_thread_t *p_intf )
 {
 #define MAX_MSG_LENGTH (2 * sizeof(int64_t))
 
-    vlc_bool_t b_master = config_GetInt( p_intf, "netsync-master" );
+    bool b_master = config_GetInt( p_intf, "netsync-master" );
     char *psz_master = NULL;
     char p_data[MAX_MSG_LENGTH];
     int i_socket;

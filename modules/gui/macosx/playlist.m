@@ -390,7 +390,7 @@
     
     for( i = 0; ppsz_services[i]; i++ )
     {
-        vlc_bool_t  b_enabled;
+        bool  b_enabled;
         char        *objectname;
         NSMenuItem  *o_lmi;
 
@@ -498,11 +498,11 @@
 
     var_Get( p_playlist, "loop", &val2 );
     var_Get( p_playlist, "repeat", &val );
-    if( val.b_bool == VLC_TRUE )
+    if( val.b_bool == true )
     {
         [[[VLCMain sharedInstance] getControls] repeatOne];
    }
-    else if( val2.b_bool == VLC_TRUE )
+    else if( val2.b_bool == true )
     {
         [[[VLCMain sharedInstance] getControls] repeatAll];
     }
@@ -739,7 +739,7 @@
                 p_item = NULL;
             }
         }
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_node, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, p_node, p_item );
     }
     vlc_object_release( p_playlist );
 }
@@ -844,10 +844,10 @@
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
     
-            playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
+            playlist_NodeDelete( p_playlist, p_item, true, false );
         }
         else
-            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, VLC_TRUE );
+            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, true );
     }
     PL_UNLOCK;
 
@@ -1005,20 +1005,20 @@
         /* Add the item */
         /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
-             i_position == -1 ? PLAYLIST_END : i_position + i_item, VLC_TRUE,
-         VLC_FALSE );
+             i_position == -1 ? PLAYLIST_END : i_position + i_item, true,
+         false );
 
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL, p_item );
         }
         else
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_SKIP, VLC_TRUE, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
+            playlist_Control( p_playlist, PLAYLIST_SKIP, true, p_item );
         }
         vlc_gc_decref( p_input );
     }
@@ -1049,20 +1049,20 @@
        playlist_NodeAddInput( p_playlist, p_input, p_node,
                                       PLAYLIST_INSERT,
                                       i_position == -1 ?
-                                      PLAYLIST_END : i_position + i_item, VLC_FALSE );
+                                      PLAYLIST_END : i_position + i_item, false );
 
 
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL, p_item );
         }
         else
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_SKIP, VLC_TRUE, p_item );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
+            playlist_Control( p_playlist, PLAYLIST_SKIP, true, p_item );
         }
         vlc_gc_decref( p_input );
     }
@@ -1204,8 +1204,8 @@
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
     NSPoint pt;
-    vlc_bool_t b_rows;
-    vlc_bool_t b_item_sel;
+    bool b_rows;
+    bool b_item_sel;
 
     pt = [o_outline_view convertPoint: [o_event locationInWindow]
                                                  fromView: nil];
@@ -1247,7 +1247,7 @@
     }
     else
     {
-        b_isSortDescending = VLC_FALSE;
+        b_isSortDescending = false;
     }
 
     if( o_tc == o_tc_name )

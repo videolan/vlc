@@ -58,10 +58,10 @@ vlc_module_begin ();
     add_shortcut ("dump");
     set_callbacks (Open, Close);
 
-    add_bool ("dump-force", VLC_FALSE, NULL, FORCE_TEXT,
-              FORCE_LONGTEXT, VLC_FALSE);
+    add_bool ("dump-force", false, NULL, FORCE_TEXT,
+              FORCE_LONGTEXT, false);
     add_integer ("dump-margin", DEFAULT_MARGIN, NULL, MARGIN_TEXT,
-                 MARGIN_LONGTEXT, VLC_FALSE);
+                 MARGIN_LONGTEXT, false);
 vlc_module_end();
 
 static ssize_t Read (access_t *access, uint8_t *buffer, size_t len);
@@ -90,7 +90,7 @@ static int Open (vlc_object_t *obj)
 
     if (!var_CreateGetBool (access, "dump-force"))
     {
-        vlc_bool_t b;
+        bool b;
         if ((access2_Control (src, ACCESS_CAN_FASTSEEK, &b) == 0) && b)
         {
             msg_Dbg (obj, "dump filter useless");

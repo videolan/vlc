@@ -29,8 +29,8 @@
 
 #include "input_internal.h"
 
-static vlc_bool_t SkipID3Tag( demux_t * );
-static vlc_bool_t SkipAPETag( demux_t *p_demux );
+static bool SkipID3Tag( demux_t * );
+static bool SkipAPETag( demux_t *p_demux );
 
 /*****************************************************************************
  * demux2_New:
@@ -39,7 +39,7 @@ static vlc_bool_t SkipAPETag( demux_t *p_demux );
 demux_t *__demux2_New( vlc_object_t *p_obj,
                        const char *psz_access, const char *psz_demux,
                        const char *psz_path,
-                       stream_t *s, es_out_t *out, vlc_bool_t b_quick )
+                       stream_t *s, es_out_t *out, bool b_quick )
 {
     demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
     const char *psz_module;
@@ -158,14 +158,14 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         p_demux->p_module =
             module_Need( p_demux, "demux2", psz_module,
                          !strcmp( psz_module, p_demux->psz_demux ) ?
-                         VLC_TRUE : VLC_FALSE );
+                         true : false );
     }
     else
     {
         p_demux->p_module =
             module_Need( p_demux, "access_demux", psz_module,
                          !strcmp( psz_module, p_demux->psz_access ) ?
-                         VLC_TRUE : VLC_FALSE );
+                         true : false );
     }
 
     if( p_demux->p_module == NULL )
@@ -325,7 +325,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s->pf_control= DStreamControl;
 
     s->i_char_width = 1;
-    s->b_little_endian = VLC_FALSE;
+    s->b_little_endian = false;
 
     s->p_sys = malloc( sizeof( d_stream_sys_t) );
     p_sys = (d_stream_sys_t*)s->p_sys;
@@ -346,7 +346,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     }
 
     if( vlc_thread_create( s, "stream out", DStreamThread,
-                           VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_INPUT, false ) )
     {
         vlc_object_release( s );
         free( p_sys );
@@ -468,7 +468,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     int64_t    *p_i64;
-    vlc_bool_t *p_b;
+    bool *p_b;
     int        *p_int;
 
     switch( i_query )
@@ -479,13 +479,13 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_CAN_SEEK:
-            p_b = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
-            *p_b = VLC_FALSE;
+            p_b = (bool*) va_arg( args, bool * );
+            *p_b = false;
             return VLC_SUCCESS;
 
         case STREAM_CAN_FASTSEEK:
-            p_b = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
-            *p_b = VLC_FALSE;
+            p_b = (bool*) va_arg( args, bool * );
+            *p_b = false;
             return VLC_SUCCESS;
 
         case STREAM_GET_POSITION:
@@ -531,7 +531,7 @@ static int DStreamThread( stream_t *s )
 
     /* Create the demuxer */
     if( !(p_demux = demux2_New( s, "", p_sys->psz_name, "", s, p_sys->out,
-                               VLC_FALSE )) )
+                               false )) )
     {
         return VLC_EGENERIC;
     }
@@ -551,7 +551,7 @@ static int DStreamThread( stream_t *s )
 /****************************************************************************
  * Utility functions
  ****************************************************************************/
-static vlc_bool_t SkipID3Tag( demux_t *p_demux )
+static bool SkipID3Tag( demux_t *p_demux )
 {
     const uint8_t *p_peek;
     uint8_t version, revision;
@@ -559,14 +559,14 @@ static vlc_bool_t SkipID3Tag( demux_t *p_demux )
     int b_footer;
 
     if( !p_demux->s )
-        return VLC_FALSE;
+        return false;
 
     /* Get 10 byte id3 header */
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-        return VLC_FALSE;
+        return false;
 
     if( memcmp( p_peek, "ID3", 3 ) )
-        return VLC_FALSE;
+        return false;
 
     version = p_peek[3];
     revision = p_peek[4];
@@ -581,9 +581,9 @@ static vlc_bool_t SkipID3Tag( demux_t *p_demux )
 
     msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skipping %d bytes",
              version, revision, i_size );
-    return VLC_TRUE;
+    return true;
 }
-static vlc_bool_t SkipAPETag( demux_t *p_demux )
+static bool SkipAPETag( demux_t *p_demux )
 {
     const uint8_t *p_peek;
     int i_version;
@@ -591,19 +591,19 @@ static vlc_bool_t SkipAPETag( demux_t *p_demux )
     uint32_t flags;
 
     if( !p_demux->s )
-        return VLC_FALSE;
+        return false;
 
     /* Get 32 byte ape header */
     if( stream_Peek( p_demux->s, &p_peek, 32 ) < 32 )
-        return VLC_FALSE;
+        return false;
 
     if( memcmp( p_peek, "APETAGEX", 8 ) )
-        return VLC_FALSE;
+        return false;
 
     i_version = GetDWLE( &p_peek[8] );
     flags = GetDWLE( &p_peek[8+4+4] );
     if( ( i_version != 1000 && i_version != 2000 ) || !( flags & (1<<29) ) )
-        return VLC_FALSE;
+        return false;
 
     i_size = GetDWLE( &p_peek[8+4] ) + ( (flags&(1<<30)) ? 32 : 0 );
 
@@ -612,6 +612,6 @@ static vlc_bool_t SkipAPETag( demux_t *p_demux )
 
     msg_Dbg( p_demux, "AP2 v%d tag found, skipping %d bytes",
              i_version/1000, i_size );
-    return VLC_TRUE;
+    return true;
 }
 

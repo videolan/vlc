@@ -818,7 +818,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 
         if( !strcmp( stream->psz_mime, "video/x-ms-asf-stream" ) )
         {
-            vlc_bool_t b_xplaystream = VLC_FALSE;
+            bool b_xplaystream = false;
             int i;
 
             httpd_MsgAdd( answer, "Content-type", "%s",
@@ -834,7 +834,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
                 if( !strcasecmp( query->name[i],  "Pragma" ) &&
                     strstr( query->value[i], "xPlayStrm=1" ) )
                 {
-                    b_xplaystream = VLC_TRUE;
+                    b_xplaystream = true;
                 }
             }
 
@@ -1110,7 +1110,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     /* create the thread */
     if( vlc_thread_create( host, "httpd host thread", httpd_HostThread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_this, "cannot spawn http host thread" );
         goto error;
@@ -1213,7 +1213,7 @@ void httpd_HostDelete( httpd_host_t *host )
 /* register a new url */
 static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url,
                                          const char *psz_user, const char *psz_password,
-                                         const vlc_acl_t *p_acl, vlc_bool_t b_check )
+                                         const vlc_acl_t *p_acl, bool b_check )
 {
     httpd_url_t *url;
     int         i;
@@ -1260,7 +1260,7 @@ httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
                            const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, p_acl, VLC_FALSE );
+                                psz_password, p_acl, false );
 }
 
 httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
@@ -1268,7 +1268,7 @@ httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
                                  const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, p_acl, VLC_TRUE );
+                                psz_password, p_acl, true );
 }
 
 /* register callback on a url */
@@ -1404,7 +1404,7 @@ static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
     cl->i_buffer = 0;
     cl->p_buffer = malloc( cl->i_buffer_size );
     cl->i_mode   = HTTPD_CLIENT_FILE;
-    cl->b_read_waiting = VLC_FALSE;
+    cl->b_read_waiting = false;
 
     httpd_MsgInit( &cl->query );
     httpd_MsgInit( &cl->answer );
@@ -2028,7 +2028,7 @@ static void httpd_HostThread( httpd_host_t *host )
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     int evfd;
-    vlc_bool_t b_die;
+    bool b_die;
 
     vlc_object_lock( host );
     evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
@@ -2060,7 +2060,7 @@ static void httpd_HostThread( httpd_host_t *host )
         /* add all socket that should be read/write and close dead connection */
         vlc_mutex_lock( &host->lock );
         mtime_t now = mdate();
-        vlc_bool_t b_low_delay = VLC_FALSE;
+        bool b_low_delay = false;
 
         for(int i_client = 0; i_client < host->i_client; i_client++ )
         {
@@ -2209,8 +2209,8 @@ static void httpd_HostThread( httpd_host_t *host )
                 }
                 else
                 {
-                    vlc_bool_t b_auth_failed = VLC_FALSE;
-                    vlc_bool_t b_hosts_failed = VLC_FALSE;
+                    bool b_auth_failed = false;
+                    bool b_hosts_failed = false;
 
                     /* Search the url and trigger callbacks */
                     for(int i = 0; i < host->i_url; i++ )
@@ -2228,7 +2228,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                     if( ( httpd_ClientIP( cl, ip ) == NULL )
                                      || ACL_Check( url->p_acl, ip ) )
                                     {
-                                        b_hosts_failed = VLC_TRUE;
+                                        b_hosts_failed = true;
                                         break;
                                     }
                                 }
@@ -2264,7 +2264,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                                       "Basic realm=\"%s\"",
                                                       url->psz_user );
                                         /* We fail for all url */
-                                        b_auth_failed = VLC_TRUE;
+                                        b_auth_failed = true;
                                         free( user );
                                         break;
                                     }
@@ -2334,9 +2334,9 @@ static void httpd_HostThread( httpd_host_t *host )
                 {
                     const char *psz_connection = httpd_MsgGet( &cl->answer, "Connection" );
                     const char *psz_query = httpd_MsgGet( &cl->query, "Connection" );
-                    vlc_bool_t b_connection = VLC_FALSE;
-                    vlc_bool_t b_keepalive = VLC_FALSE;
-                    vlc_bool_t b_query = VLC_FALSE;
+                    bool b_connection = false;
+                    bool b_keepalive = false;
+                    bool b_query = false;
 
                     cl->url = NULL;
                     if( psz_connection )
@@ -2382,7 +2382,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     free( cl->p_buffer );
                     cl->p_buffer = malloc( cl->i_buffer_size );
                     cl->i_state = HTTPD_CLIENT_RECEIVING;
-                    cl->b_read_waiting = VLC_FALSE;
+                    cl->b_read_waiting = false;
                 }
                 else
                 {
@@ -2430,7 +2430,7 @@ static void httpd_HostThread( httpd_host_t *host )
             if (pufd->events != 0)
                 nfd++;
             else
-                b_low_delay = VLC_TRUE;
+                b_low_delay = true;
         }
         vlc_mutex_unlock( &host->lock );
 
@@ -2496,7 +2496,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 cl->i_state == HTTPD_CLIENT_SENDING &&
                 (pufd->revents & POLLIN) )
             {
-                cl->b_read_waiting = VLC_TRUE;
+                cl->b_read_waiting = true;
             }
         }
         vlc_mutex_unlock( &host->lock );

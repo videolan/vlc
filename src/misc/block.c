@@ -240,7 +240,7 @@ struct block_fifo_t
     block_t             **pp_last;
     size_t              i_depth;
     size_t              i_size;
-    vlc_bool_t          b_force_wake;
+    bool          b_force_wake;
 };
 
 block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
@@ -256,7 +256,7 @@ block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     p_fifo->i_depth = p_fifo->i_size = 0;
-    p_fifo->b_force_wake = VLC_FALSE;
+    p_fifo->b_force_wake = false;
 
     return p_fifo;
 }
@@ -318,7 +318,7 @@ void block_FifoWake( block_fifo_t *p_fifo )
 {
     vlc_mutex_lock( &p_fifo->lock );
     if( p_fifo->p_first == NULL )
-        p_fifo->b_force_wake = VLC_TRUE;
+        p_fifo->b_force_wake = true;
     vlc_cond_signal( &p_fifo->wait );
     vlc_mutex_unlock( &p_fifo->lock );
 }
@@ -338,7 +338,7 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
 
     b = p_fifo->p_first;
 
-    p_fifo->b_force_wake = VLC_FALSE;
+    p_fifo->b_force_wake = false;
     if( b == NULL )
     {
         /* Forced wakeup */

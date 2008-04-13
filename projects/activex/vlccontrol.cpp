@@ -249,7 +249,7 @@ STDMETHODIMP VLCControl::shuttle(int seconds)
         result = _p_instance->getVLCObject(&i_vlc);
         if( SUCCEEDED(result) )
         {
-            VLC_TimeSet(i_vlc, seconds, VLC_TRUE);
+            VLC_TimeSet(i_vlc, seconds, true);
         }
     }
     return result;
@@ -373,7 +373,7 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
                 case VLC_VAR_BOOL:
                     hr = VariantChangeType(&arg, &value, 0, VT_BOOL);
                     if( SUCCEEDED(hr) )
-                        val.b_bool = (VARIANT_TRUE == V_BOOL(&arg)) ? VLC_TRUE : VLC_FALSE;
+                        val.b_bool = (VARIANT_TRUE == V_BOOL(&arg)) ? true : false;
                     break;
 
                 case VLC_VAR_INTEGER:
@@ -420,7 +420,7 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
             switch( V_VT(&value) )
             {
                 case VT_BOOL:
-                    val.b_bool = (VARIANT_TRUE == V_BOOL(&value)) ? VLC_TRUE : VLC_FALSE;
+                    val.b_bool = (VARIANT_TRUE == V_BOOL(&value)) ? true : false;
                     i_type = VLC_VAR_BOOL;
                     break;
                 case VT_I4:

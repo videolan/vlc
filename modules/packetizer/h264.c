@@ -90,12 +90,12 @@ struct decoder_sys_t
     size_t  i_offset;
     uint8_t startcode[4];
 
-    vlc_bool_t b_slice;
+    bool b_slice;
     block_t    *p_frame;
 
-    vlc_bool_t   b_sps;
-    vlc_bool_t   b_pps;
-    vlc_bool_t   b_header;
+    bool   b_sps;
+    bool   b_pps;
+    bool   b_header;
 
     /* avcC data */
     int i_avcC_length_size;
@@ -183,13 +183,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->startcode[2] = 0;
     p_sys->startcode[3] = 1;
     p_sys->bytestream = block_BytestreamInit();
-    p_sys->b_slice = VLC_FALSE;
+    p_sys->b_slice = false;
     p_sys->p_frame = NULL;
-    p_sys->b_sps   = VLC_FALSE;
-    p_sys->b_pps   = VLC_FALSE;
+    p_sys->b_sps   = false;
+    p_sys->b_pps   = false;
     p_sys->p_sps   = 0;
     p_sys->p_pps   = 0;
-    p_sys->b_header= VLC_FALSE;
+    p_sys->b_header= false;
 
     p_sys->slice.i_nal_type = -1;
     p_sys->slice.i_nal_ref_idc = -1;
@@ -269,7 +269,7 @@ static int Open( vlc_object_t *p_this )
         {
             memcpy( (uint8_t*)p_dec->fmt_out.p_extra, p_sys->p_sps->p_buffer, p_sys->p_sps->i_buffer);
             memcpy( (uint8_t*)p_dec->fmt_out.p_extra+p_sys->p_sps->i_buffer, p_sys->p_pps->p_buffer, p_sys->p_pps->i_buffer);
-            p_sys->b_header = VLC_TRUE;
+            p_sys->b_header = true;
         }
         else p_dec->fmt_out.i_extra = 0;
 
@@ -344,7 +344,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 block_ChainRelease( p_sys->p_frame );
             p_sys->p_frame = NULL;
             p_sys->slice.i_frame_type = 0;
-            p_sys->b_slice = VLC_FALSE;
+            p_sys->b_slice = false;
         }
         block_Release( *pp_block );
         return NULL;
@@ -573,7 +573,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             p_sps->i_pts = p_sys->p_frame->i_pts;           \
             block_ChainAppend( &p_sps, p_pps );               \
             block_ChainAppend( &p_sps, p_sys->p_frame );      \
-            p_sys->b_header = VLC_TRUE;                       \
+            p_sys->b_header = true;                       \
             p_pic = block_ChainGather( p_sps );               \
         } else { \
             p_pic = block_ChainGather( p_sys->p_frame ); \
@@ -583,7 +583,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
             \
         p_sys->slice.i_frame_type = 0;                        \
         p_sys->p_frame = NULL;                                \
-        p_sys->b_slice = VLC_FALSE;                           \
+        p_sys->b_slice = false;                           \
     } while(0)
 
     if( p_sys->b_slice && ( !p_sys->b_sps || !p_sys->b_pps ) )
@@ -594,13 +594,13 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         /* Reset context */
         p_sys->slice.i_frame_type = 0;
         p_sys->p_frame = NULL;
-        p_sys->b_slice = VLC_FALSE;
+        p_sys->b_slice = false;
     }
 
     if( ( !p_sys->b_sps || !p_sys->b_pps ) &&
         i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
     {
-        p_sys->b_slice = VLC_TRUE;
+        p_sys->b_slice = true;
         /* Fragment will be discarded later on */
     }
     else if( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
@@ -608,7 +608,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         uint8_t *dec = NULL;
         int i_dec = 0, i_first_mb, i_slice_type;
         slice_t slice;
-        vlc_bool_t b_pic;
+        bool b_pic;
         bs_t s;
 
         /* do not convert the whole frame */
@@ -683,27 +683,27 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* Detection of the first VCL NAL unit of a primary coded picture
          * (cf. 7.4.1.2.4) */
-        b_pic = VLC_FALSE;
+        b_pic = false;
         if( slice.i_frame_num != p_sys->slice.i_frame_num ||
             slice.i_pic_parameter_set_id != p_sys->slice.i_pic_parameter_set_id ||
             slice.i_field_pic_flag != p_sys->slice.i_field_pic_flag ||
             slice.i_nal_ref_idc != p_sys->slice.i_nal_ref_idc )
-            b_pic = VLC_TRUE;
+            b_pic = true;
         if( (slice.i_bottom_field_flag != -1) &&
             (p_sys->slice.i_bottom_field_flag != -1) &&
             (slice.i_bottom_field_flag != p_sys->slice.i_bottom_field_flag) )
-            b_pic = VLC_TRUE;
+            b_pic = true;
         if( p_sys->i_pic_order_cnt_type == 0 &&
             ( slice.i_pic_order_cnt_lsb != p_sys->slice.i_pic_order_cnt_lsb ||
               slice.i_delta_pic_order_cnt_bottom != p_sys->slice.i_delta_pic_order_cnt_bottom ) )
-            b_pic = VLC_TRUE;
+            b_pic = true;
         else if( p_sys->i_pic_order_cnt_type == 1 &&
                  ( slice.i_delta_pic_order_cnt0 != p_sys->slice.i_delta_pic_order_cnt0 ||
                    slice.i_delta_pic_order_cnt1 != p_sys->slice.i_delta_pic_order_cnt1 ) )
-            b_pic = VLC_TRUE;
+            b_pic = true;
         if( ( slice.i_nal_type == NAL_SLICE_IDR || p_sys->slice.i_nal_type == NAL_SLICE_IDR ) &&
             ( slice.i_nal_type != p_sys->slice.i_nal_type || slice.i_idr_pic_id != p_sys->slice.i_idr_pic_id ) )
-                b_pic = VLC_TRUE;
+                b_pic = true;
 
         /* */
         p_sys->slice = slice;
@@ -711,7 +711,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         if( b_pic && p_sys->b_slice )
             OUTPUT;
 
-        p_sys->b_slice = VLC_TRUE;
+        p_sys->b_slice = true;
 
         free( dec );
     }
@@ -724,7 +724,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         if( !p_sys->b_sps ) msg_Dbg( p_dec, "found NAL_SPS" );
 
-        p_sys->b_sps = VLC_TRUE;
+        p_sys->b_sps = true;
 
         nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
                          p_frag->i_buffer - 5 );
@@ -856,7 +856,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_pic_order_present_flag = bs_read( &s, 1 );
 
         if( !p_sys->b_pps ) msg_Dbg( p_dec, "found NAL_PPS" );
-        p_sys->b_pps = VLC_TRUE;
+        p_sys->b_pps = true;
 
         /* TODO */
 

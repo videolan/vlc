@@ -138,7 +138,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     vlc_object_attach( p_vlm, p_this->p_libvlc );
 
     if( vlc_thread_create( p_vlm, "vlm thread",
-                           Manage, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           Manage, VLC_THREAD_PRIORITY_LOW, false ) )
     {
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_object_release( p_vlm );
@@ -342,19 +342,19 @@ static int ExecuteSyntaxError( const char *psz_cmd, vlm_message_t **pp_status )
     return VLC_EGENERIC;
 }
 
-static vlc_bool_t ExecuteIsMedia( vlm_t *p_vlm, const char *psz_name )
+static bool ExecuteIsMedia( vlm_t *p_vlm, const char *psz_name )
 {
     int64_t id;
 
     if( !psz_name || vlm_ControlInternal( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) )
-        return VLC_FALSE;
-    return VLC_TRUE;
+        return false;
+    return true;
 }
-static vlc_bool_t ExecuteIsSchedule( vlm_t *p_vlm, const char *psz_name )
+static bool ExecuteIsSchedule( vlm_t *p_vlm, const char *psz_name )
 {
     if( !psz_name || !vlm_ScheduleSearch( p_vlm, psz_name ) )
-        return VLC_FALSE;
-    return VLC_TRUE;
+        return false;
+    return true;
 }
 
 static int ExecuteDel( vlm_t *p_vlm, const char *psz_name, vlm_message_t **pp_status )
@@ -537,11 +537,11 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
     {
         if( psz_argument )
         {
-            vlc_bool_t b_relative;
+            bool b_relative;
             if( psz_argument[0] == '+' || psz_argument[0] == '-' )
-                b_relative = VLC_TRUE;
+                b_relative = true;
             else
-                b_relative = VLC_FALSE;
+                b_relative = false;
 
             if( strstr( psz_argument, "ms" ) || strstr( psz_argument, "s" ) )
             {
@@ -732,7 +732,7 @@ static int ExecuteLoad( vlm_t *p_vlm, const char *psz_url, vlm_message_t **pp_st
     return VLC_SUCCESS;
 }
 
-static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule, vlc_bool_t b_new,
+static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule, bool b_new,
                                     const int i_property, char *ppsz_property[], vlm_message_t **pp_status )
 {
     const char *psz_cmd = b_new ? "new" : "setup";
@@ -783,7 +783,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
     return VLC_SUCCESS;
 }
 
-static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
+static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, bool b_new,
                                  const int i_property, char *ppsz_property[], vlm_message_t **pp_status )
 {
     const char *psz_cmd = b_new ? "new" : "setup";
@@ -805,11 +805,11 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
 
         if( !strcmp( psz_option, "enabled" ) )
         {
-            p_cfg->b_enabled = VLC_TRUE;
+            p_cfg->b_enabled = true;
         }
         else if( !strcmp( psz_option, "disabled" ) )
         {
-            p_cfg->b_enabled = VLC_FALSE;
+            p_cfg->b_enabled = false;
         }
         else if( !strcmp( psz_option, "input" ) )
         {
@@ -869,13 +869,13 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
         {
             if( p_cfg->b_vod )
                 ERROR( "invalid loop option for vod" );
-            p_cfg->broadcast.b_loop = VLC_TRUE;
+            p_cfg->broadcast.b_loop = true;
         }
         else if( !strcmp( psz_option, "unloop" ) )
         {
             if( p_cfg->b_vod )
                 ERROR( "invalid unloop option for vod" );
-            p_cfg->broadcast.b_loop = VLC_FALSE;
+            p_cfg->broadcast.b_loop = false;
         }
         else if( !strcmp( psz_option, "mux" ) )
         {
@@ -935,7 +935,7 @@ static int ExecuteNew( vlm_t *p_vlm, const char *psz_name, const char *psz_type,
             *pp_status = vlm_MessageNew( "new", "could not create schedule" );
             return VLC_EGENERIC;
         }
-        return ExecuteScheduleProperty( p_vlm, p_schedule, VLC_TRUE, i_property, ppsz_property, pp_status );
+        return ExecuteScheduleProperty( p_vlm, p_schedule, true, i_property, ppsz_property, pp_status );
     }
     else if( !strcmp( psz_type, "vod" ) || !strcmp( psz_type, "broadcast" ) )
     {
@@ -953,7 +953,7 @@ static int ExecuteNew( vlm_t *p_vlm, const char *psz_name, const char *psz_type,
             return VLC_EGENERIC;
         }
         vlm_media_Clean( &cfg );
-        return ExecuteMediaProperty( p_vlm, id, VLC_TRUE, i_property, ppsz_property, pp_status );
+        return ExecuteMediaProperty( p_vlm, id, true, i_property, ppsz_property, pp_status );
     }
     else
     {
@@ -967,14 +967,14 @@ static int ExecuteSetup( vlm_t *p_vlm, const char *psz_name, const int i_propert
     if( ExecuteIsSchedule( p_vlm, psz_name ) )
     {
         vlm_schedule_sys_t *p_schedule = vlm_ScheduleSearch( p_vlm, psz_name );
-        return ExecuteScheduleProperty( p_vlm, p_schedule, VLC_FALSE, i_property, ppsz_property, pp_status );
+        return ExecuteScheduleProperty( p_vlm, p_schedule, false, i_property, ppsz_property, pp_status );
     }
     else if( ExecuteIsMedia( p_vlm, psz_name ) )
     {
         int64_t id;
         if( vlm_ControlInternal( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) )
             goto error;
-        return ExecuteMediaProperty( p_vlm, id, VLC_FALSE, i_property, ppsz_property, pp_status );
+        return ExecuteMediaProperty( p_vlm, id, false, i_property, ppsz_property, pp_status );
     }
 
 error:
@@ -1118,7 +1118,7 @@ static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name )
     }
 
     p_sched->psz_name = strdup( psz_name );
-    p_sched->b_enabled = VLC_FALSE;
+    p_sched->b_enabled = false;
     p_sched->i_command = 0;
     p_sched->command = NULL;
     p_sched->i_date = 0;
@@ -1169,11 +1169,11 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
 {
     if( !strcmp( psz_cmd, "enabled" ) )
     {
-        schedule->b_enabled = VLC_TRUE;
+        schedule->b_enabled = true;
     }
     else if( !strcmp( psz_cmd, "disabled" ) )
     {
-        schedule->b_enabled = VLC_FALSE;
+        schedule->b_enabled = false;
     }
 #if !defined( UNDER_CE )
     else if( !strcmp( psz_cmd, "date" ) )
@@ -1767,12 +1767,12 @@ static char *Save( vlm_t *vlm )
         else
             i_length += strlen( "new * broadcast " ) + strlen(p_cfg->psz_name);
 
-        if( p_cfg->b_enabled == VLC_TRUE )
+        if( p_cfg->b_enabled == true )
             i_length += strlen( "enabled" );
         else
             i_length += strlen( "disabled" );
 
-        if( !p_cfg->b_vod && p_cfg->broadcast.b_loop == VLC_TRUE )
+        if( !p_cfg->b_vod && p_cfg->broadcast.b_loop == true )
             i_length += strlen( " loop\n" );
         else
             i_length += strlen( "\n" );
@@ -1796,7 +1796,7 @@ static char *Save( vlm_t *vlm )
 
         i_length += strlen( "new  schedule " ) + strlen( schedule->psz_name );
 
-        if( schedule->b_enabled == VLC_TRUE )
+        if( schedule->b_enabled == true )
         {
             i_length += strlen( "date //-:: enabled\n" ) + 14;
         }
@@ -1888,7 +1888,7 @@ static char *Save( vlm_t *vlm )
         localtime_r( &i_time, &date);
         p += sprintf( p, "new %s schedule ", schedule->psz_name);
 
-        if( schedule->b_enabled == VLC_TRUE )
+        if( schedule->b_enabled == true )
         {
             p += sprintf( p, "date %d/%d/%d-%d:%d:%d enabled\n",
                           date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
@@ -2096,7 +2096,7 @@ static int Manage( vlc_object_t* p_object )
         {
             mtime_t i_real_date = vlm->schedule[i]->i_date;
 
-            if( vlm->schedule[i]->b_enabled == VLC_TRUE )
+            if( vlm->schedule[i]->b_enabled == true )
             {
                 if( vlm->schedule[i]->i_date == 0 ) // now !
                 {
@@ -2166,7 +2166,7 @@ typedef struct
     struct
     {
         int        i_count;
-        vlc_bool_t b_playing;
+        bool b_playing;
         int        i_playing_index;
     } broadcast;
 
@@ -2392,7 +2392,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     if( p_media->cfg.b_vod )
     {
-        p_media->cfg.b_enabled = VLC_FALSE;
+        p_media->cfg.b_enabled = false;
         vlm_OnMediaUpdate( p_vlm, p_media );
         p_vlm->i_vod--;
     }
@@ -2488,7 +2488,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     p_instance->p_item = input_ItemNew( p_vlm, NULL, NULL );
 
     p_instance->i_index = 0;
-    p_instance->b_sout_keep = VLC_FALSE;
+    p_instance->b_sout_keep = false;
     p_instance->p_input = NULL;
     p_instance->p_sout = NULL;
 
@@ -2553,9 +2553,9 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         for( i = 0; i < p_cfg->i_option; i++ )
         {
             if( !strcmp( p_cfg->ppsz_option[i], "sout-keep" ) )
-                p_instance->b_sout_keep = VLC_TRUE;
+                p_instance->b_sout_keep = true;
             else if( !strcmp( p_cfg->ppsz_option[i], "nosout-keep" ) || !strcmp( p_cfg->ppsz_option[i], "no-sout-keep" ) )
-                p_instance->b_sout_keep = VLC_FALSE;
+                p_instance->b_sout_keep = false;
             else
                 input_ItemAddOption( p_instance->p_item, p_cfg->ppsz_option[i] );
         }
@@ -2708,7 +2708,7 @@ static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_ins
             p_idsc->i_length = var_GetTime( p_instance->p_input, "length" );
             p_idsc->d_position = var_GetFloat( p_instance->p_input, "position" );
             if( var_GetInteger( p_instance->p_input, "state" ) == PAUSE_S )
-                p_idsc->b_paused = VLC_TRUE;
+                p_idsc->b_paused = true;
             p_idsc->i_rate = var_GetInteger( p_instance->p_input, "rate" );
         }
 

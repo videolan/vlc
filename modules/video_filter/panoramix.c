@@ -99,54 +99,54 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer( CFG_PREFIX "cols", -1, NULL,
-                 COLS_TEXT, COLS_LONGTEXT, VLC_TRUE );
+                 COLS_TEXT, COLS_LONGTEXT, true );
     add_integer( CFG_PREFIX "rows", -1, NULL,
-                 ROWS_TEXT, ROWS_LONGTEXT, VLC_TRUE );
+                 ROWS_TEXT, ROWS_LONGTEXT, true );
 
 #ifdef OVERLAP
 #define OFFSET_X_TEXT N_("Offset X offset (automatic compensation)")
 #define OFFSET_X_LONGTEXT N_("Select if you want an automatic offset in horizontal (in case of misalignment due to autoratio control)")
-    add_bool( CFG_PREFIX "offset-x", 1, NULL, OFFSET_X_TEXT, OFFSET_X_LONGTEXT, VLC_TRUE );
+    add_bool( CFG_PREFIX "offset-x", 1, NULL, OFFSET_X_TEXT, OFFSET_X_LONGTEXT, true );
 
 #define LENGTH_TEXT N_("length of the overlapping area (in %)")
 #define LENGTH_LONGTEXT N_("Select in percent the length of the blended zone")
-    add_integer_with_range( CFG_PREFIX "bz-length", 100, 0, 100, NULL, LENGTH_TEXT, LENGTH_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-length", 100, 0, 100, NULL, LENGTH_TEXT, LENGTH_LONGTEXT, true );
 
 #define HEIGHT_TEXT N_("height of the overlapping area (in %)")
 #define HEIGHT_LONGTEXT N_("Select in percent the height of the blended zone (case of 2x2 wall)")
-    add_integer_with_range( CFG_PREFIX "bz-height", 100, 0, 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-height", 100, 0, 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
 
 #define ATTENUATION_TEXT N_("Attenuation")
 #define ATTENUATION_LONGTEXT N_("Check this option if you want attenuate blended zone by this plug-in (if option is unchecked, attenuate is made by opengl)")
-    add_bool( CFG_PREFIX "attenuate", 1, NULL, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, VLC_FALSE );
+    add_bool( CFG_PREFIX "attenuate", 1, NULL, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, false );
 
 #define BEGIN_TEXT N_("Attenuation, begin (in %)")
 #define BEGIN_LONGTEXT N_("Select in percent the Lagrange coeff of the beginning blended zone")
-    add_integer_with_range( CFG_PREFIX "bz-begin", 0, 0, 100, NULL, BEGIN_TEXT, BEGIN_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-begin", 0, 0, 100, NULL, BEGIN_TEXT, BEGIN_LONGTEXT, true );
 
 #define MIDDLE_TEXT N_("Attenuation, middle (in %)")
 #define MIDDLE_LONGTEXT N_("Select in percent the Lagrange coeff of the middle of blended zone")
-    add_integer_with_range( CFG_PREFIX "bz-middle", 50, 0, 100, NULL, MIDDLE_TEXT, MIDDLE_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( CFG_PREFIX "bz-middle", 50, 0, 100, NULL, MIDDLE_TEXT, MIDDLE_LONGTEXT, false );
 
 #define END_TEXT N_("Attenuation, end (in %)")
 #define END_LONGTEXT N_("Select in percent the Lagrange coeff of the end of blended zone")
-    add_integer_with_range( CFG_PREFIX "bz-end", 100, 0, 100, NULL, END_TEXT, END_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-end", 100, 0, 100, NULL, END_TEXT, END_LONGTEXT, true );
 
 #define MIDDLE_POS_TEXT N_("middle position (in %)")
 #define MIDDLE_POS_LONGTEXT N_("Select in percent (50 is center) the position of the middle point (Lagrange) of blended zone")
-    add_integer_with_range( CFG_PREFIX "bz-middle-pos", 50, 1, 99, NULL, MIDDLE_POS_TEXT, MIDDLE_POS_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( CFG_PREFIX "bz-middle-pos", 50, 1, 99, NULL, MIDDLE_POS_TEXT, MIDDLE_POS_LONGTEXT, false );
 #ifdef GAMMA
 #define RGAMMA_TEXT N_("Gamma (Red) correction")
 #define RGAMMA_LONGTEXT N_("Select the gamma for the correction of blended zone (Red or Y component)")
-    add_float_with_range( CFG_PREFIX "bz-gamma-red", 1, 0, 5, NULL, RGAMMA_TEXT, RGAMMA_LONGTEXT, VLC_TRUE );
+    add_float_with_range( CFG_PREFIX "bz-gamma-red", 1, 0, 5, NULL, RGAMMA_TEXT, RGAMMA_LONGTEXT, true );
 
 #define GGAMMA_TEXT N_("Gamma (Green) correction")
 #define GGAMMA_LONGTEXT N_("Select the gamma for the correction of blended zone (Green or U component)")
-    add_float_with_range( CFG_PREFIX "bz-gamma-green", 1, 0, 5, NULL, GGAMMA_TEXT, GGAMMA_LONGTEXT, VLC_TRUE );
+    add_float_with_range( CFG_PREFIX "bz-gamma-green", 1, 0, 5, NULL, GGAMMA_TEXT, GGAMMA_LONGTEXT, true );
 
 #define BGAMMA_TEXT N_("Gamma (Blue) correction")
 #define BGAMMA_LONGTEXT N_("Select the gamma for the correction of blended zone (Blue or V component)")
-    add_float_with_range( CFG_PREFIX "bz-gamma-blue", 1, 0, 5, NULL, BGAMMA_TEXT, BGAMMA_LONGTEXT, VLC_TRUE );
+    add_float_with_range( CFG_PREFIX "bz-gamma-blue", 1, 0, 5, NULL, BGAMMA_TEXT, BGAMMA_LONGTEXT, true );
 #endif
 #define RGAMMA_BC_TEXT N_("Black Crush for Red")
 #define RGAMMA_BC_LONGTEXT N_("Select the Black Crush of blended zone (Red or Y component)")
@@ -175,26 +175,26 @@ vlc_module_begin();
 #define GGAMMA_WL_LONGTEXT N_("Select the White Level of blended zone (Green or U component)")
 #define BGAMMA_WL_TEXT N_("White Level for Blue")
 #define BGAMMA_WL_LONGTEXT N_("Select the White Level of blended zone (Blue or V component)")
-    add_integer_with_range( CFG_PREFIX "bz-blackcrush-red", 140, 0, 255, NULL, RGAMMA_BC_TEXT, RGAMMA_BC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-blackcrush-green", 140, 0, 255, NULL, GGAMMA_BC_TEXT, GGAMMA_BC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-blackcrush-blue", 140, 0, 255, NULL, BGAMMA_BC_TEXT, BGAMMA_BC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-whitecrush-red", 200, 0, 255, NULL, RGAMMA_WC_TEXT, RGAMMA_WC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-whitecrush-green", 200, 0, 255, NULL, GGAMMA_WC_TEXT, GGAMMA_WC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-whitecrush-blue", 200, 0, 255, NULL, BGAMMA_WC_TEXT, BGAMMA_WC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-blacklevel-red", 150, 0, 255, NULL, RGAMMA_BL_TEXT, RGAMMA_BL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-blacklevel-green", 150, 0, 255, NULL, GGAMMA_BL_TEXT, GGAMMA_BL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-blacklevel-blue", 150, 0, 255, NULL, BGAMMA_BL_TEXT, BGAMMA_BL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-whitelevel-red", 0, 0, 255, NULL, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( CFG_PREFIX "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blackcrush-red", 140, 0, 255, NULL, RGAMMA_BC_TEXT, RGAMMA_BC_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-blackcrush-green", 140, 0, 255, NULL, GGAMMA_BC_TEXT, GGAMMA_BC_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-blackcrush-blue", 140, 0, 255, NULL, BGAMMA_BC_TEXT, BGAMMA_BC_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-whitecrush-red", 200, 0, 255, NULL, RGAMMA_WC_TEXT, RGAMMA_WC_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-whitecrush-green", 200, 0, 255, NULL, GGAMMA_WC_TEXT, GGAMMA_WC_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-whitecrush-blue", 200, 0, 255, NULL, BGAMMA_WC_TEXT, BGAMMA_WC_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-blacklevel-red", 150, 0, 255, NULL, RGAMMA_BL_TEXT, RGAMMA_BL_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-blacklevel-green", 150, 0, 255, NULL, GGAMMA_BL_TEXT, GGAMMA_BL_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-blacklevel-blue", 150, 0, 255, NULL, BGAMMA_BL_TEXT, BGAMMA_BL_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-whitelevel-red", 0, 0, 255, NULL, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, true );
+    add_integer_with_range( CFG_PREFIX "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, true );
 #ifndef SYS_MINGW32
 #define XINERAMA_TEXT N_("Xinerama option")
 #define XINERAMA_LONGTEXT N_("Uncheck if you have not used xinerama")
-    add_bool( CFG_PREFIX "xinerama", 1, NULL, XINERAMA_TEXT, XINERAMA_LONGTEXT, VLC_TRUE );
+    add_bool( CFG_PREFIX "xinerama", 1, NULL, XINERAMA_TEXT, XINERAMA_LONGTEXT, true );
 #endif
 #endif
 
-    add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, VLC_TRUE );
+    add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, true );
 
     add_shortcut( "panoramix" );
     set_callbacks( Create, Destroy );
@@ -220,13 +220,13 @@ static const char *ppsz_filter_options[] = {
 struct vout_sys_t
 {
 #ifdef OVERLAP
-    vlc_bool_t   b_autocrop;
-    vlc_bool_t   b_attenuate;
+    bool   b_autocrop;
+    bool   b_attenuate;
     unsigned int bz_length, bz_height, bz_begin, bz_middle, bz_end, bz_middle_pos;
     unsigned int i_ratio_max;
     unsigned int i_ratio;
     unsigned int a_0, a_1, a_2;
-    vlc_bool_t     b_has_changed;
+    bool     b_has_changed;
     int lambda[2][VOUT_MAX_PLANES][500];
     int cstYUV[2][VOUT_MAX_PLANES][500];
     int lambda2[2][VOUT_MAX_PLANES][500];
@@ -244,7 +244,7 @@ struct vout_sys_t
 #endif
 #endif
 #ifndef SYS_MINGW32
-    vlc_bool_t   b_xinerama;
+    bool   b_xinerama;
 #endif
 #endif
     int    i_col;
@@ -252,7 +252,7 @@ struct vout_sys_t
     int    i_vout;
     struct vout_list_t
     {
-        vlc_bool_t b_active;
+        bool b_active;
         int i_width;
         int i_height;
         vout_thread_t *p_vout;
@@ -543,7 +543,7 @@ static uint8_t F(uint8_t i, float gamma)
  *****************************************************************************/
 static int AdjustHeight( vout_thread_t *p_vout )
 {
-    vlc_bool_t b_fullscreen = var_CreateGetInteger( p_vout, "fullscreen" );
+    bool b_fullscreen = var_CreateGetInteger( p_vout, "fullscreen" );
     int i_window_width = p_vout->i_window_width;
     int i_window_height = p_vout->i_window_height;
     double d_halfLength = 0;
@@ -1253,7 +1253,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
 
     }
 #ifdef OVERLAP
-    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = VLC_FALSE;
+    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = false;
 #endif
 }
 
@@ -1586,7 +1586,7 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
         }
     }
 #ifdef OVERLAP
-    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = VLC_FALSE;
+    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = false;
 #endif
 }
 
@@ -1892,7 +1892,7 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
         }
     }
 #ifdef OVERLAP
-    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = VLC_FALSE;
+    if (p_vout->p_sys->b_has_changed) p_vout->p_sys->b_has_changed = false;
 #endif
 }
 #endif

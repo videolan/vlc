@@ -77,11 +77,11 @@ vlc_module_begin();
      set_subcategory( SUBCAT_INPUT_ACCESS );
 
      add_integer( "jack-input-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-     add_bool( "jack-input-use-vlc-pace", VLC_FALSE, NULL,
-         PACE_TEXT, PACE_LONGTEXT, VLC_TRUE );
-     add_bool( "jack-input-auto-connect", VLC_FALSE, NULL,
-         PACE_TEXT, PACE_LONGTEXT, VLC_TRUE );
+         CACHING_TEXT, CACHING_LONGTEXT, true );
+     add_bool( "jack-input-use-vlc-pace", false, NULL,
+         PACE_TEXT, PACE_LONGTEXT, true );
+     add_bool( "jack-input-auto-connect", false, NULL,
+         PACE_TEXT, PACE_LONGTEXT, true );
 
      add_shortcut( "jack" );
      set_callbacks( Open, Close );
@@ -339,7 +339,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    vlc_bool_t  *pb;
+    bool  *pb;
     int64_t     *pi64;
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -348,14 +348,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     /* Special for access_demux */
     case DEMUX_CAN_PAUSE:
     case DEMUX_CAN_SEEK:
-        pb = (vlc_bool_t *)va_arg( args, vlc_bool_t * );
-        *pb = VLC_TRUE;
+        pb = (bool *)va_arg( args, bool * );
+        *pb = true;
         return VLC_SUCCESS;
 
     case DEMUX_SET_PAUSE_STATE:
         return VLC_SUCCESS;
     case DEMUX_CAN_CONTROL_PACE:
-        pb = ( vlc_bool_t* )va_arg( args, vlc_bool_t * );
+        pb = ( bool* )va_arg( args, bool * );
         *pb = var_GetBool( p_demux, "jack-input-use-vlc-pace" );
         return VLC_SUCCESS;
 

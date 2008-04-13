@@ -131,7 +131,7 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char 
             if( *p == '=' || *p == '{' )
             {
                 const char *end;
-                vlc_bool_t b_keep_brackets = (*p == '{');
+                bool b_keep_brackets = (*p == '{');
 
                 if( *p == '=' ) p++;
 
@@ -252,8 +252,8 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
     for(; cfg; cfg = cfg->p_next )
     {
         vlc_value_t val;
-        vlc_bool_t b_yes = VLC_TRUE;
-        vlc_bool_t b_once = VLC_FALSE;
+        bool b_yes = true;
+        bool b_once = false;
         module_config_t *p_conf;
         int i_type;
         size_t i;
@@ -272,14 +272,14 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                 ( !strncmp( cfg->psz_name, "no", 2 ) &&
                   !strcmp( ppsz_options[i], cfg->psz_name + 2 ) ) )
             {
-                b_yes = VLC_FALSE;
+                b_yes = false;
                 break;
             }
 
             if( *ppsz_options[i] == '*' &&
                 !strcmp( &ppsz_options[i][1], cfg->psz_name ) )
             {
-                b_once = VLC_TRUE;
+                b_once = true;
                 break;
             }
 

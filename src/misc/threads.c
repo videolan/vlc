@@ -60,7 +60,7 @@ static SIGNALOBJECTANDWAIT pf_SignalObjectAndWait = NULL;
 ** You can also use the faster Win9x implementation but you might
 ** experience problems with it.
 */
-static vlc_bool_t          b_fast_mutex = VLC_FALSE;
+static bool          b_fast_mutex = false;
 /*
 ** On Windows 9x/Me you can use a fast but incorrect condition variables
 ** implementation (more precisely there is a possibility for a race
@@ -149,7 +149,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
     if( IsDebuggerPresent() )
     {
         /* SignalObjectAndWait() is problematic under a debugger */
-        b_fast_mutex = VLC_TRUE;
+        b_fast_mutex = true;
         i_win9x_cv = 1;
     }
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
@@ -162,7 +162,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
         i_status = VLC_THREADS_PENDING;
 
         /* We should be safe now. Do all the initialization stuff we want. */
-        p_libvlc_global->b_ready = VLC_FALSE;
+        p_libvlc_global->b_ready = false;
 
 #if defined( UNDER_CE )
         /* Nothing to initialize */
@@ -560,7 +560,7 @@ int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
  *****************************************************************************/
 int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
                          const char *psz_name, void * ( *func ) ( void * ),
-                         int i_priority, vlc_bool_t b_wait )
+                         int i_priority, bool b_wait )
 {
     int i_ret;
     void *p_data = (void *)p_this;
@@ -658,7 +658,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
             vlc_object_wait( p_this );
         }
 
-        p_priv->b_thread = VLC_TRUE;
+        p_priv->b_thread = true;
 
 #if defined( WIN32 ) || defined( UNDER_CE )
         msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
@@ -780,7 +780,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%u)",
                          (unsigned int)p_priv->thread_id.id,
              psz_file, i_line, (unsigned int)GetLastError() );
-        p_priv->b_thread = VLC_FALSE;
+        p_priv->b_thread = false;
         return;
     }
 
@@ -857,6 +857,6 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
 
 #endif
 
-    p_priv->b_thread = VLC_FALSE;
+    p_priv->b_thread = false;
 }
 

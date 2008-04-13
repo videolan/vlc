@@ -45,10 +45,10 @@ extern "C" {
 VLC_EXPORT (libvlc_int_t *, libvlc_InternalCreate, ( void ) );
 VLC_EXPORT (int, libvlc_InternalInit, ( libvlc_int_t *, int, const char *ppsz_argv[] ) );
 VLC_EXPORT (int, libvlc_InternalCleanup, ( libvlc_int_t * ) );
-VLC_EXPORT (int, libvlc_InternalDestroy, ( libvlc_int_t *, vlc_bool_t ) );
+VLC_EXPORT (int, libvlc_InternalDestroy, ( libvlc_int_t *, bool ) );
 
-VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_bool_t,
-                            vlc_bool_t, int, const char *const * ) );
+VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, bool,
+                            bool, int, const char *const * ) );
 
 VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *, libvlc_exception_t * ) );
 VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t * ) );
@@ -106,7 +106,7 @@ struct libvlc_media_list_t
 
     /* This indicates if this media list is read-only
      * from a user point of view */
-    vlc_bool_t                  b_read_only;
+    bool                  b_read_only;
 };
 
 typedef libvlc_media_list_view_t * (*libvlc_media_list_view_constructor_func_t)( libvlc_media_list_t * p_mlist, libvlc_exception_t * p_e ) ;
@@ -162,7 +162,7 @@ struct libvlc_media_player_t
     libvlc_event_manager_t *    p_event_manager;
     libvlc_drawable_t           drawable;
     
-    vlc_bool_t        b_own_its_input_thread;
+    bool        b_own_its_input_thread;
 };
 
 struct libvlc_media_list_player_t
@@ -191,7 +191,7 @@ struct libvlc_media_discoverer_t
     libvlc_instance_t *      p_libvlc_instance;
     services_discovery_t *   p_sd;
     libvlc_media_list_t *    p_mlist;
-    vlc_bool_t               running;
+    bool               running;
     vlc_dictionary_t         catname_to_submedialist;
 };
 
@@ -245,7 +245,7 @@ typedef struct libvlc_event_listeners_group_t
 {
     libvlc_event_type_t event_type;
     vlc_array_t listeners;
-    vlc_bool_t b_sublistener_removed;
+    bool b_sublistener_removed;
 } libvlc_event_listeners_group_t;
 
 typedef struct libvlc_event_manager_t

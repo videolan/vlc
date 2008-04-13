@@ -172,16 +172,16 @@ static int Open( vlc_object_t * p_this )
                     fmt.audio.i_bitspersample;
     if( p_sys->info.peak_title > 0 )
     {
-        fmt.audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+        fmt.audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
         fmt.audio_replay_gain.pf_peak[AUDIO_REPLAY_GAIN_TRACK] = (float)p_sys->info.peak_title / 32767.0;
-        fmt.audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+        fmt.audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
         fmt.audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_TRACK] = (float)p_sys->info.gain_title / 100.0;
     }
     if( p_sys->info.peak_album > 0 )
     {
-        fmt.audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+        fmt.audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
         fmt.audio_replay_gain.pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = (float)p_sys->info.peak_album / 32767.0;
-        fmt.audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+        fmt.audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
         fmt.audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float)p_sys->info.gain_album / 100.0;
     }
 
@@ -246,13 +246,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double   f, *pf;
     int64_t i64, *pi64;
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
 
     switch( i_query )
     {
         case DEMUX_HAS_UNSUPPORTED_META:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
@@ -327,7 +327,7 @@ mpc_int32_t ReaderGetSize( void *p_private )
 mpc_bool_t ReaderCanSeek( void *p_private )
 {
     demux_t *p_demux = (demux_t*)p_private;
-    vlc_bool_t b_canseek;
+    bool b_canseek;
 
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
     return b_canseek;

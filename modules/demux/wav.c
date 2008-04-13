@@ -68,7 +68,7 @@ struct demux_sys_t
     date_t          pts;
 
     uint32_t i_channel_mask;
-    vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
+    bool b_chan_reorder;              /* do we need channel reordering */
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 

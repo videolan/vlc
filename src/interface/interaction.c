@@ -55,7 +55,7 @@ static int DialogSend( vlc_object_t *, interaction_dialog_t * );
 #define DIALOG_INIT( type ) \
         DECMALLOC_ERR( p_new, interaction_dialog_t );       \
         memset( p_new, 0, sizeof( interaction_dialog_t ) ); \
-        p_new->b_cancelled = VLC_FALSE;                     \
+        p_new->b_cancelled = false;                     \
         p_new->i_status = NEW_DIALOG;                       \
         p_new->i_flags = 0;                                 \
         p_new->i_type = INTERACT_DIALOG_##type;             \
@@ -77,7 +77,7 @@ static int DialogSend( vlc_object_t *, interaction_dialog_t * );
  * \param psz_format The message to display
  * \return           VLC_SUCCESS or VLC_EGENERIC
  */
-int __intf_UserFatal( vlc_object_t *p_this, vlc_bool_t b_blocking,
+int __intf_UserFatal( vlc_object_t *p_this, bool b_blocking,
                        const char *psz_title,
                        const char *psz_format, ... )
 {
@@ -229,13 +229,13 @@ void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
  * \param i_id             Identifier of the dialogue
  * \return                 Either true or false
  */
-vlc_bool_t __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
+bool __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
 {
     interaction_t *p_interaction = InteractionGet( p_this );
     interaction_dialog_t *p_dialog;
-    vlc_bool_t b_cancel;
+    bool b_cancel;
 
-    if( !p_interaction ) return VLC_TRUE;
+    if( !p_interaction ) return true;
 
     vlc_object_lock( p_interaction );
     p_dialog  =  DialogGetById( p_interaction, i_id );
@@ -243,7 +243,7 @@ vlc_bool_t __intf_UserProgressIsCancelled( vlc_object_t *p_this, int i_id )
     {
         vlc_object_unlock( p_interaction ) ;
         vlc_object_release( p_interaction );
-        return VLC_TRUE;
+        return true;
     }
 
     b_cancel = p_dialog->b_cancelled;
@@ -372,7 +372,7 @@ vlc_object_t * interaction_Init( libvlc_int_t *p_libvlc )
 
         if( vlc_thread_create( p_interaction, "Interaction control",
                                 InteractionLoop, VLC_THREAD_PRIORITY_LOW,
-                                VLC_FALSE ) )
+                                false ) )
         {
             msg_Err( p_interaction, "Interaction control thread creation failed"
                     ", interaction will not be displayed" );
@@ -464,7 +464,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
         p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
-        vlc_bool_t b_found = VLC_FALSE;
+        bool b_found = false;
         int i;
         p_dialog->p_interaction = p_interaction;
         p_dialog->p_parent = p_this;
@@ -474,7 +474,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
         for( i = 0 ; i< p_interaction->i_dialogs; i++ )
         {
             if( p_interaction->pp_dialogs[i]->i_id == p_dialog->i_id )
-                b_found = VLC_TRUE;
+                b_found = true;
         }
         /* Add it to the queue, the main loop will send the orders to the
          * interface */

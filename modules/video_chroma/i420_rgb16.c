@@ -42,7 +42,7 @@
 #   include "i420_rgb_mmx.h"
 #endif
 
-static void SetOffset( int, int, int, int, vlc_bool_t *,
+static void SetOffset( int, int, int, int, bool *,
                        unsigned int *, int * );
 
 #if defined (MODULE_NAME_IS_i420_rgb)
@@ -65,7 +65,7 @@ void E_(I420_RGB16_dither)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t   b_hscale;                        /* horizontal scaling type */
+    bool   b_hscale;                        /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
     unsigned int i_real_y;                                          /* y % 4 */
@@ -216,7 +216,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -316,7 +316,7 @@ void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -557,7 +557,7 @@ void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -813,7 +813,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -912,7 +912,7 @@ void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -1151,7 +1151,7 @@ void E_(I420_R8G8B8A8)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -1390,7 +1390,7 @@ void E_(I420_B8G8R8A8)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -1626,7 +1626,7 @@ void E_(I420_A8B8G8R8)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_u   = p_src->U_PIXELS;
     uint8_t  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
+    bool  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
 
@@ -1864,7 +1864,7 @@ void E_(I420_A8B8G8R8)( vout_thread_t *p_vout, picture_t *p_src,
  * It will also set horizontal and vertical scaling indicators.
  *****************************************************************************/
 static void SetOffset( int i_width, int i_height, int i_pic_width,
-                       int i_pic_height, vlc_bool_t *pb_hscale,
+                       int i_pic_height, bool *pb_hscale,
                        unsigned int *pi_vscale, int *p_offset )
 {
     int i_x;                                    /* x position in destination */

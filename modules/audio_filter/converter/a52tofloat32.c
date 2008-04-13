@@ -82,9 +82,9 @@ static const uint32_t pi_channels_out[] =
 struct filter_sys_t
 {
     a52_state_t * p_liba52; /* liba52 internal structure */
-    vlc_bool_t b_dynrng; /* see below */
+    bool b_dynrng; /* see below */
     int i_flags; /* liba52 flags, see a52dec/doc/liba52.txt */
-    vlc_bool_t b_dontwarn;
+    bool b_dontwarn;
     int i_nb_channels; /* number of float32 per sample */
 
     int pi_chan_table[AOUT_CHAN_MAX]; /* channel reordering */
@@ -109,8 +109,8 @@ vlc_module_begin();
     set_description( _("ATSC A/52 (AC-3) audio decoder") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
-    add_bool( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, VLC_FALSE );
-    add_bool( "a52-upmix", 0, NULL, UPMIX_TEXT, UPMIX_LONGTEXT, VLC_TRUE );
+    add_bool( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, false );
+    add_bool( "a52-upmix", 0, NULL, UPMIX_TEXT, UPMIX_LONGTEXT, true );
     set_capability( "audio filter", 100 );
     set_callbacks( Create, Destroy );
 

@@ -40,10 +40,10 @@ VLMWrapper::~VLMWrapper()
         vlm_Delete( p_vlm );
 }
 
-vlc_bool_t VLMWrapper::AttachVLM()
+bool VLMWrapper::AttachVLM()
 {
     p_vlm = vlm_New( p_intf );
-    return p_vlm ? VLC_TRUE: VLC_FALSE ;
+    return p_vlm ? true: false ;
 }
 
 void VLMWrapper::LockVLM()
@@ -58,7 +58,7 @@ void VLMWrapper::UnlockVLM()
 
 void VLMWrapper::AddBroadcast( const char* name, const char* input,
                                const char* output,
-                               vlc_bool_t b_enabled, vlc_bool_t b_loop  )
+                               bool b_enabled, bool b_loop  )
 {
     vlm_message_t *message;
     string command = "new \"" + string(name) + "\" broadcast";
@@ -69,7 +69,7 @@ void VLMWrapper::AddBroadcast( const char* name, const char* input,
 
 void VLMWrapper::EditBroadcast( const char* name, const char* input,
                                const char* output,
-                               vlc_bool_t b_enabled, vlc_bool_t b_loop  )
+                               bool b_enabled, bool b_loop  )
 {
     vlm_message_t *message;
     string command;
@@ -101,7 +101,7 @@ void VLMWrapper::EditBroadcast( const char* name, const char* input,
 
 void VLMWrapper::AddVod( const char* name, const char* input,
                          const char* output,
-                         vlc_bool_t b_enabled, vlc_bool_t b_loop  )
+                         bool b_enabled, bool b_loop  )
 {
     vlm_message_t *message;
     string command = "new \"" + string(name) + "\" vod";
@@ -112,7 +112,7 @@ void VLMWrapper::AddVod( const char* name, const char* input,
 
 void VLMWrapper::EditVod( const char* name, const char* input,
                           const char* output,
-                          vlc_bool_t b_enabled, vlc_bool_t b_loop  )
+                          bool b_enabled, bool b_loop  )
 {
     vlm_message_t *message;
     string command;

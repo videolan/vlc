@@ -69,7 +69,7 @@ vlc_module_begin();
     set_description( _("PDA Linux Gtk2+ interface") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
+//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, true );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );
     add_shortcut( "pda" );
@@ -93,7 +93,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Using gui-helper" );
     p_intf->p_sys->p_gtk_main =
-        module_Need( p_this, "gui-helper", "gtk2", VLC_TRUE );
+        module_Need( p_this, "gui-helper", "gtk2", true );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
@@ -381,11 +381,11 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
 
         if( !config_GetInt( p_this, "pda-autoplayfile" ) )
         {
-            p_intf->p_sys->b_autoplayfile = VLC_FALSE;
+            p_intf->p_sys->b_autoplayfile = false;
         }
         else
         {
-            p_intf->p_sys->b_autoplayfile = VLC_TRUE;
+            p_intf->p_sys->b_autoplayfile = true;
         }
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( cbautoplay ),
                                       p_intf->p_sys->b_autoplayfile );
@@ -581,7 +581,7 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj, gpointer userdata )
 gint E_(GtkModeManage)( intf_thread_t * p_intf )
 {
     GtkWidget *     p_slider = NULL;
-    vlc_bool_t      b_control;
+    bool      b_control;
 
     if ( p_intf->p_sys->p_window == NULL )
         msg_Err( p_intf, "Main widget not found" );

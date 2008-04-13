@@ -113,26 +113,26 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_ACO );
     add_shortcut( "shout" );
     add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream", NULL,
-                NAME_TEXT, NAME_LONGTEXT, VLC_FALSE );
+                NAME_TEXT, NAME_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "description",
                  "Live stream from VLC media player", NULL,
-                DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, VLC_FALSE );
-    add_bool(   SOUT_CFG_PREFIX "mp3", VLC_FALSE, NULL,
-                MP3_TEXT, MP3_LONGTEXT, VLC_TRUE );
+                DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, false );
+    add_bool(   SOUT_CFG_PREFIX "mp3", false, NULL,
+                MP3_TEXT, MP3_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "genre", "Alternative", NULL,
-                GENRE_TEXT, GENRE_LONGTEXT, VLC_FALSE );
+                GENRE_TEXT, GENRE_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "url", "http://www.videolan.org/vlc", NULL,
-                URL_TEXT, URL_LONGTEXT, VLC_FALSE );
+                URL_TEXT, URL_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "bitrate", "", NULL,
-                BITRATE_TEXT, BITRATE_LONGTEXT, VLC_FALSE );
+                BITRATE_TEXT, BITRATE_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "samplerate", "", NULL,
-                SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, VLC_FALSE );
+                SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "channels", "", NULL,
-                CHANNELS_TEXT, CHANNELS_LONGTEXT, VLC_FALSE );
+                CHANNELS_TEXT, CHANNELS_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "quality", "", NULL,
-                QUALITY_TEXT, QUALITY_LONGTEXT, VLC_FALSE );
-    add_bool(   SOUT_CFG_PREFIX "public", VLC_FALSE, NULL,
-                PUBLIC_TEXT, PUBLIC_LONGTEXT, VLC_TRUE );
+                QUALITY_TEXT, QUALITY_LONGTEXT, false );
+    add_bool(   SOUT_CFG_PREFIX "public", false, NULL,
+                PUBLIC_TEXT, PUBLIC_LONGTEXT, true );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -269,7 +269,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_url );
 
     var_Get( p_access, SOUT_CFG_PREFIX "mp3", &val );
-    if( val.b_bool == VLC_TRUE )
+    if( val.b_bool == true )
         i_ret = shout_set_format( p_shout, SHOUT_FORMAT_MP3 );
     else
         i_ret = shout_set_format( p_shout, SHOUT_FORMAT_OGG );
@@ -355,7 +355,7 @@ static int Open( vlc_object_t *p_this )
         free( val.psz_string );
 
     var_Get( p_access, SOUT_CFG_PREFIX "public", &val );
-    if( val.b_bool == VLC_TRUE )
+    if( val.b_bool == true )
     {
         i_ret = shout_set_public( p_shout, 1 );
         if( i_ret != SHOUTERR_SUCCESS )

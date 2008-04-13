@@ -45,7 +45,7 @@
 struct intf_sys_t
 {
     xosd * p_osd;               /* libxosd handle */
-    vlc_bool_t  b_need_update;   /* Update display ? */
+    bool  b_need_update;   /* Update display ? */
 };
 
 #define MAX_LINE_LENGTH 256
@@ -87,15 +87,15 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_description( _("XOSD interface") );
     set_shortname( "XOSD" );
-    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, VLC_TRUE );
-    add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, VLC_TRUE );
+    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, true );
+    add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true );
     add_integer( "xosd-shadow-offset", 2, NULL,
-                 SHD_OFS_TEXT, SHD_OFS_LONGTEXT, VLC_TRUE );
+                 SHD_OFS_TEXT, SHD_OFS_LONGTEXT, true );
     add_string( "xosd-font",
                 "-adobe-helvetica-bold-r-normal-*-*-160-*-*-p-*-iso8859-1",
-                NULL, FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
+                NULL, FONT_TEXT, FONT_LONGTEXT, true );
     add_string( "xosd-colour", "LawnGreen",
-                    NULL, COLOUR_TEXT, COLOUR_LONGTEXT, VLC_TRUE );
+                    NULL, COLOUR_TEXT, COLOUR_LONGTEXT, true );
     set_capability( "interface", 10 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -174,7 +174,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
-    p_intf->p_sys->b_need_update = VLC_TRUE;
+    p_intf->p_sys->b_need_update = true;
 
     return VLC_SUCCESS;
 }
@@ -212,9 +212,9 @@ static void Run( intf_thread_t *p_intf )
 
     while( !p_intf->b_die )
     {
-        if( p_intf->p_sys->b_need_update == VLC_TRUE )
+        if( p_intf->p_sys->b_need_update == true )
         {
-            p_intf->p_sys->b_need_update = VLC_FALSE;
+            p_intf->p_sys->b_need_update = false;
             p_playlist = pl_Yield( p_intf );
 
             if( playlist_IsEmpty( p_playlist ) )
@@ -281,7 +281,7 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
-    p_intf->p_sys->b_need_update = VLC_TRUE;
+    p_intf->p_sys->b_need_update = true;
     return VLC_SUCCESS;
 }
 

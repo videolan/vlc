@@ -43,13 +43,13 @@ namespace wxvlc
     class DragAndDrop: public wxFileDropTarget
     {
     public:
-        DragAndDrop( intf_thread_t *_p_intf, vlc_bool_t b_enqueue = VLC_FALSE );
+        DragAndDrop( intf_thread_t *_p_intf, bool b_enqueue = false );
         virtual bool OnDropFiles( wxCoord x, wxCoord y,
                                   const wxArrayString& filenames );
 
     private:
         intf_thread_t *p_intf;
-        vlc_bool_t b_enqueue;
+        bool b_enqueue;
     };
 #endif
 
@@ -179,7 +179,7 @@ namespace wxvlc
         wxMenu *p_navig_menu;
 
         /* Extended panel */
-        vlc_bool_t  b_extra;
+        bool  b_extra;
         wxPanel     *extra_frame;
 
         /* Playlist panel */

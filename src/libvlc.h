@@ -102,7 +102,7 @@ struct libvlc_global_data_t
 {
     VLC_COMMON_MEMBERS
 
-    vlc_bool_t             b_ready;     ///< Initialization boolean
+    bool             b_ready;     ///< Initialization boolean
 
    /* Object structure data */
     int                    i_counter;   ///< object counter
@@ -114,7 +114,7 @@ struct libvlc_global_data_t
 
     /* Arch-specific variables */
 #if !defined( WIN32 )
-    vlc_bool_t             b_daemon;
+    bool             b_daemon;
 #endif
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
@@ -142,7 +142,7 @@ struct vlc_object_internals_t
 
     /* Thread properties, if any */
     vlc_thread_t    thread_id;
-    vlc_bool_t      b_thread;
+    bool      b_thread;
 
     /* Objects thread synchronization */
     int             pipes[2];
@@ -151,7 +151,7 @@ struct vlc_object_internals_t
     /* Objects management */
     unsigned         i_refcount;
     vlc_destructor_t pf_destructor;
-    vlc_bool_t       b_attached;
+    bool       b_attached;
 };
 
 #define ZOOM_SECTION N_("Zoom")

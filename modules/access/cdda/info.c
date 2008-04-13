@@ -541,7 +541,7 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
     static char temp_str[TEMP_STR_SIZE];
     size_t i;
     char * tp = temp_str;
-    vlc_bool_t saw_control_prefix = false;
+    bool saw_control_prefix = false;
     size_t format_len = strlen(format_str);
 
     memset(temp_str, 0, TEMP_STR_SIZE);
@@ -851,7 +851,7 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
 
 int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
                        playlist_item_t *p_item, int i_track,
-                       vlc_bool_t b_single )
+                       bool b_single )
 {
 #if 0
     add_playlist_track_info_str("Source",  p_cdda->psz_source);
@@ -906,13 +906,13 @@ int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
 */
 int
 CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
-                   vlc_bool_t b_single_track )
+                   bool b_single_track )
 {
     int i;
     playlist_t * p_playlist = NULL;
     const track_t i_first_track = p_cdda->i_first_track;
     playlist_item_t *p_item = NULL;
-    vlc_bool_t b_play = VLC_FALSE;
+    bool b_play = false;
     track_t    i_track;
 
 #ifdef HAVE_LIBCDDB
@@ -944,12 +944,12 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
         if( p_input )
         {
-            p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), VLC_FALSE );
+            p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), false );
 
             if( p_item == p_playlist->status.p_item && !b_single_track )
-                b_play = VLC_TRUE;
+                b_play = true;
             else
-                b_play = VLC_FALSE;
+                b_play = false;
             vlc_object_release( p_input );
         }
     }
@@ -973,7 +973,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if( p_item )
     {
-        CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, VLC_FALSE );
+        CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, false );
         input_item_SetDuration( p_item->p_input, (mtime_t) i_track_frames
           * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) );
             input_item_SetURI( p_item->p_input,
@@ -988,7 +988,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     input_title_t *t;
 
     if ( !p_cdda->b_nav_mode )
-      playlist_ItemToNode( p_playlist, p_item, VLC_FALSE );
+      playlist_ItemToNode( p_playlist, p_item, false );
 
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {
@@ -1010,7 +1010,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                         p_item,
                         i_track );
           CDDAAddMetaToItem( p_access, p_cdda, p_child, i_track,
-                 VLC_TRUE );
+                 true );
         }
         }
 
@@ -1028,7 +1028,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if( b_play )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
                           p_playlist->status.p_item, NULL );
     }
 

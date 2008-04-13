@@ -70,7 +70,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_string( "lirc-file", NULL, NULL,
-                LIRC_TEXT, LIRC_LONGTEXT, VLC_TRUE );
+                LIRC_TEXT, LIRC_LONGTEXT, true );
 vlc_module_end();
 
 /*****************************************************************************

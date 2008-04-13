@@ -45,12 +45,12 @@ struct intf_sys_t
     float               f_adj_oldvalue;  /* previous value -with FPU hardware*/
 
     /* special actions */
-    vlc_bool_t          b_playing;
-    vlc_bool_t          b_window_changed;        /* window display toggled ? */
-    vlc_bool_t          b_slider_free;                      /* slider status */
+    bool          b_playing;
+    bool          b_window_changed;        /* window display toggled ? */
+    bool          b_slider_free;                      /* slider status */
 
     /* Preference settings */
-    vlc_bool_t          b_autoplayfile;
+    bool          b_autoplayfile;
 
     /* The input thread */
     input_thread_t *    p_input;

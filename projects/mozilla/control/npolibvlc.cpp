@@ -218,7 +218,7 @@ RuntimeNPObject::InvokeResult LibvlcAudioNPObject::getProperty(int index, NPVari
         {
             case ID_audio_mute:
             {
-                vlc_bool_t muted = libvlc_audio_get_mute(p_plugin->getVLC(), &ex);
+                bool muted = libvlc_audio_get_mute(p_plugin->getVLC(), &ex);
                 if( libvlc_exception_raised(&ex) )
                 {
                     NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -544,7 +544,7 @@ RuntimeNPObject::InvokeResult LibvlcInputNPObject::getProperty(int index, NPVari
             }
             case ID_input_hasvout:
             {
-                vlc_bool_t val = libvlc_media_player_has_vout(p_md, &ex);
+                bool val = libvlc_media_player_has_vout(p_md, &ex);
                 libvlc_media_player_release(p_md);
                 if( libvlc_exception_raised(&ex) )
                 {

@@ -461,7 +461,7 @@ void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
                   int *pi_objects, int i_start_id )
 {
     vlc_object_t *p_object;
-    vlc_bool_t b_section_empty = VLC_FALSE;
+    bool b_section_empty = false;
     int i;
 
     /* Initializations */
@@ -478,7 +478,7 @@ void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
             }
 
             AppendMenu( hMenu, MF_SEPARATOR, 0, _T("") );
-            b_section_empty = VLC_TRUE;
+            b_section_empty = true;
             continue;
         }
 
@@ -487,14 +487,14 @@ void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
             AppendMenu( hMenu, MF_GRAYED | MF_STRING,
                         MenuDummy_Event, _FROMMB(ppsz_varnames[i]) );
 
-            b_section_empty = VLC_FALSE;
+            b_section_empty = false;
             continue;
         }
 
         p_object = (vlc_object_t *)vlc_object_get( pi_objects[i] );
         if( p_object == NULL ) continue;
 
-        b_section_empty = VLC_FALSE;
+        b_section_empty = false;
         CreateMenuItem( p_intf, p_menu_list, hMenu, ppsz_varnames[i],
                         p_object, &i_item_id );
         vlc_object_release( p_object );

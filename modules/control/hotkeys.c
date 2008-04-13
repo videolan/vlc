@@ -225,9 +225,9 @@ static void Run( intf_thread_t *p_intf )
         }
         /* Interface showing */
         else if( i_action == ACTIONID_INTF_SHOW )
-            var_SetBool( p_playlist, "intf-show", VLC_TRUE );
+            var_SetBool( p_playlist, "intf-show", true );
         else if( i_action == ACTIONID_INTF_HIDE )
-            var_SetBool( p_playlist, "intf-show", VLC_FALSE );
+            var_SetBool( p_playlist, "intf-show", false );
         /* Video Output actions */
         else if( i_action == ACTIONID_SNAPSHOT )
         {
@@ -252,7 +252,7 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_vout && var_GetBool( p_vout, "fullscreen" ) )
             {
-                var_SetBool( p_vout, "fullscreen", VLC_FALSE );
+                var_SetBool( p_vout, "fullscreen", false );
             }
         }
         else if( i_action == ACTIONID_ZOOM_QUARTER ||
@@ -295,19 +295,19 @@ static void Run( intf_thread_t *p_intf )
             vlc_value_t val2;
             var_Get( p_playlist, "loop", &val );
             var_Get( p_playlist, "repeat", &val2 );
-            if( val2.b_bool == VLC_TRUE )
+            if( val2.b_bool == true )
             {
-                val.b_bool = VLC_FALSE;
-                val2.b_bool = VLC_FALSE;
+                val.b_bool = false;
+                val2.b_bool = false;
             }
-            else if( val.b_bool == VLC_TRUE )
+            else if( val.b_bool == true )
             {
-                val.b_bool = VLC_FALSE;
-                val2.b_bool = VLC_TRUE;
+                val.b_bool = false;
+                val2.b_bool = true;
             }
             else
             {
-                val.b_bool = VLC_TRUE;
+                val.b_bool = true;
             }
             var_Set( p_playlist, "loop", val );
             var_Set( p_playlist, "repeat", val2 );
@@ -400,7 +400,7 @@ static void Run( intf_thread_t *p_intf )
              * How to get a valid value ?
              * That's not that easy with some special stream
              */
-            vlc_bool_t b_seekable = VLC_TRUE;
+            bool b_seekable = true;
             int i_interval =0;
 
             if( i_action == ACTIONID_PAUSE )
@@ -924,7 +924,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
         if( !strcmp( psz_bookmark, psz_uri ) )
         {
             free( psz_uri );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
                               NULL, p_item );
             break;
         }

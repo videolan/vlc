@@ -89,7 +89,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 
     /* Create the BApplication thread and wait for initialization */
     vlc_thread_create( vlc_global()->p_appthread, "app thread", AppThread,
-                       VLC_THREAD_PRIORITY_LOW, VLC_TRUE );
+                       VLC_THREAD_PRIORITY_LOW, true );
 }
 
 /*****************************************************************************

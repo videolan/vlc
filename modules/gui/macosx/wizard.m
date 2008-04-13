@@ -1294,13 +1294,13 @@ static VLCWizard *_o_sharedInstance = nil;
 
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP,
-                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                PLAYLIST_END, true, false );
 
             if( x == 0 )
             {
                 /* play the first item and add the others afterwards */
-                playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL,
+                playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input, true );
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, NULL,
                           p_item );
             }
 

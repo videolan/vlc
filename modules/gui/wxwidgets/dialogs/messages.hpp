@@ -55,7 +55,7 @@ namespace wxvlc
 
         wxFileDialog *save_log_dialog;
 
-        vlc_bool_t b_verbose;
+        bool b_verbose;
     };
 };
 

@@ -144,7 +144,7 @@ static int Create( vlc_object_t *p_this )
 
     /* We don't want a new buffer to be created because we're not sure we'll
      * actually need to resample anything. */
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return VLC_SUCCESS;
 }
@@ -205,7 +205,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
                 p_filter->input.i_bytes_per_frame;
         }
-        p_filter->b_continuity = VLC_FALSE;
+        p_filter->b_continuity = false;
         p_filter->p_sys->i_old_wing = 0;
         return;
     }
@@ -214,7 +214,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         /* Continuity in sound samples has been broken, we'd better reset
          * everything. */
-        p_filter->b_continuity = VLC_TRUE;
+        p_filter->b_continuity = true;
         p_filter->p_sys->i_remainder = 0;
         aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate );
         aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );

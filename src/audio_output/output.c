@@ -156,7 +156,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 
     aout_FormatPrepare( &p_aout->output.output );
@@ -236,7 +236,7 @@ void aout_OutputDelete( aout_instance_t * p_aout )
     aout_FifoDestroy( p_aout, &p_aout->output.fifo );
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
-    p_aout->output.b_error = VLC_TRUE;
+    p_aout->output.b_error = true;
 }
 
 /*****************************************************************************
@@ -272,7 +272,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                                        mtime_t start_date,
-                                       vlc_bool_t b_can_sleek )
+                                       bool b_can_sleek )
 {
     aout_buffer_t * p_buffer;
 

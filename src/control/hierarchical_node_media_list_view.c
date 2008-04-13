@@ -153,13 +153,13 @@ index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_t * p_md )
     return -1;
 }
 
-static vlc_bool_t
+static bool
 item_is_already_added( libvlc_media_t * p_md )
 {
     libvlc_media_list_t * p_submlist;
 
     p_submlist = libvlc_media_subitems( p_md, NULL );
-    if( !p_submlist ) return VLC_FALSE;
+    if( !p_submlist ) return false;
     int count = libvlc_media_list_count( p_submlist, NULL );
     libvlc_media_list_release( p_submlist );
     return count > 1;

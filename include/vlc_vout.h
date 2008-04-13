@@ -78,7 +78,7 @@ struct picture_t
      * @{*/
     int             i_status;                             /**< picture flags */
     int             i_type;                /**< is picture a direct buffer ? */
-    vlc_bool_t      b_slow;                 /**< is picture in slow memory ? */
+    bool      b_slow;                 /**< is picture in slow memory ? */
     int             i_matrix_coefficients;   /**< in YUV type, encoding type */
     /**@}*/
 
@@ -88,16 +88,16 @@ struct picture_t
     /**@{*/
     unsigned        i_refcount;                  /**< link reference counter */
     mtime_t         date;                                  /**< display date */
-    vlc_bool_t      b_force;
+    bool      b_force;
     /**@}*/
 
     /** \name Picture dynamic properties
      * Those properties can be changed by the decoder
      * @{
      */
-    vlc_bool_t      b_progressive;          /**< is it a progressive frame ? */
+    bool      b_progressive;          /**< is it a progressive frame ? */
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
-    vlc_bool_t      b_top_field_first;             /**< which field is first */
+    bool      b_top_field_first;             /**< which field is first */
     /**@}*/
 
     /** The picture heap we are attached to */
@@ -139,7 +139,7 @@ struct picture_heap_t
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
     int             i_last_used_pic;              /**< last used pic in heap */
-    vlc_bool_t      b_allow_modify_pics;
+    bool      b_allow_modify_pics;
 
     /* Stuff used for truecolor RGB planes */
     uint32_t i_rmask; int i_rrshift, i_lrshift;
@@ -248,10 +248,10 @@ struct subpicture_t
     /**@{*/
     mtime_t         i_start;                  /**< beginning of display date */
     mtime_t         i_stop;                         /**< end of display date */
-    vlc_bool_t      b_ephemer;    /**< If this flag is set to true the subtitle
+    bool      b_ephemer;    /**< If this flag is set to true the subtitle
                                 will be displayed untill the next one appear */
-    vlc_bool_t      b_fade;                               /**< enable fading */
-    vlc_bool_t      b_pausable;               /**< subpicture will be paused if
+    bool      b_fade;                               /**< enable fading */
+    bool      b_pausable;               /**< subpicture will be paused if
                                                             stream is paused */
     /**@}*/
 
@@ -269,7 +269,7 @@ struct subpicture_t
     int          i_alpha;                                  /**< transparency */
     int          i_original_picture_width;  /**< original width of the movie */
     int          i_original_picture_height;/**< original height of the movie */
-    vlc_bool_t   b_absolute;                       /**< position is absolute */
+    bool   b_absolute;                       /**< position is absolute */
     int          i_flags;                                /**< position flags */
      /**@}*/
 
@@ -418,11 +418,11 @@ struct vout_thread_t
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
     float               f_gamma;                                  /**< gamma */
-    vlc_bool_t          b_grayscale;         /**< color or grayscale display */
-    vlc_bool_t          b_info;            /**< print additional information */
-    vlc_bool_t          b_interface;                   /**< render interface */
-    vlc_bool_t          b_scale;                  /**< allow picture scaling */
-    vlc_bool_t          b_fullscreen;         /**< toogle fullscreen display */
+    bool          b_grayscale;         /**< color or grayscale display */
+    bool          b_info;            /**< print additional information */
+    bool          b_interface;                   /**< render interface */
+    bool          b_scale;                  /**< allow picture scaling */
+    bool          b_fullscreen;         /**< toogle fullscreen display */
     uint32_t            render_time;           /**< last picture render time */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
@@ -461,7 +461,7 @@ struct vout_thread_t
     int                 i_heap_size;                          /**< heap size */
     picture_heap_t      render;                       /**< rendered pictures */
     picture_heap_t      output;                          /**< direct buffers */
-    vlc_bool_t          b_direct;            /**< rendered are like direct ? */
+    bool          b_direct;            /**< rendered are like direct ? */
     vout_chroma_t       chroma;                      /**< translation tables */
 
     video_format_t      fmt_render;      /* render format (from the decoder) */
@@ -487,7 +487,7 @@ struct vout_thread_t
 
     /* Filter chain */
     char *psz_filter_chain;
-    vlc_bool_t b_filter_change;
+    bool b_filter_change;
 
     /* Video filter2 chain
      * these are handled like in transcode.c
@@ -499,16 +499,16 @@ struct vout_thread_t
     filter_t   *pp_vfilters[MAX_VFILTERS];
     int         i_vfilters;
 
-    vlc_bool_t b_vfilter_change;
+    bool b_vfilter_change;
 
     /* Misc */
-    vlc_bool_t       b_snapshot;     /**< take one snapshot on the next loop */
+    bool       b_snapshot;     /**< take one snapshot on the next loop */
 
     /* Video output configuration */
     config_chain_t *p_cfg;
 
     /* Show media title on videoutput */
-    vlc_bool_t      b_title_show;
+    bool      b_title_show;
     mtime_t         i_title_timeout;
     int             i_title_position;
 };
@@ -573,7 +573,7 @@ VLC_EXPORT( int, vout_VarCallback, ( vlc_object_t *, const char *, vlc_value_t, 
 
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 
-VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, vlc_bool_t, vlc_bool_t, unsigned int ) );
+VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, bool, bool, unsigned int ) );
 VLC_EXPORT( void,            vout_InitFormat,     ( video_frame_format_t *, uint32_t, int, int, int ) );
 VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
@@ -590,7 +590,7 @@ VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_thread_t *, void * ) );
 VLC_EXPORT( int, vout_ControlWindow, ( vout_thread_t *, void *, int, va_list ) );
 void vout_IntfInit( vout_thread_t * );
 VLC_EXPORT( int, vout_Snapshot, ( vout_thread_t *p_vout, picture_t *p_pic ) );
-VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,vlc_bool_t , vlc_bool_t  ) );
+VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,bool , bool  ) );
 
 
 static inline int vout_vaControl( vout_thread_t *p_vout, int i_query,
@@ -617,11 +617,11 @@ enum output_query_e
 {
     VOUT_GET_SIZE,         /* arg1= unsigned int*, arg2= unsigned int*, res= */
     VOUT_SET_SIZE,         /* arg1= unsigned int, arg2= unsigned int, res= */
-    VOUT_SET_STAY_ON_TOP,  /* arg1= vlc_bool_t       res=    */
+    VOUT_SET_STAY_ON_TOP,  /* arg1= bool       res=    */
     VOUT_REPARENT,
     VOUT_SNAPSHOT,
     VOUT_CLOSE,
-    VOUT_SET_FOCUS,         /* arg1= vlc_bool_t       res=    */
+    VOUT_SET_FOCUS,         /* arg1= bool       res=    */
     VOUT_SET_VIEWPORT,      /* arg1= view rect, arg2=clip rect, res= */
     VOUT_REDRAW_RECT,       /* arg1= area rect, res= */
 };

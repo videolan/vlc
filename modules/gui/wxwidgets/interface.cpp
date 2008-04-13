@@ -157,7 +157,7 @@ private:
             p_intf->p_sys->p_video_sizer->GetMinSize() != wxSize(0,0) )
         {
             if( !b_video ) i_delay = mdate() + 1000000;
-            b_video = VLC_TRUE;
+            b_video = true;
 
             SetSashSize( -1 );
 
@@ -173,7 +173,7 @@ private:
             wxSize size = GetWindow1()->GetSizer()->GetMinSize();
 
             if( b_video ) i_delay = mdate() + 1000000;
-            b_video = VLC_FALSE;
+            b_video = false;
 
             if( event.GetSize().GetHeight() - size.GetHeight() )
             {
@@ -215,9 +215,9 @@ private:
     intf_thread_t *p_intf;
     int i_sash_position;
     int i_width;
-    vlc_bool_t b_video;
+    bool b_video;
     mtime_t i_delay;
-    vlc_bool_t b_show_on_start;
+    bool b_show_on_start;
 };
 
 BEGIN_EVENT_TABLE(Splitter, wxSplitterWindow)
@@ -348,7 +348,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    b_extra = VLC_FALSE;
+    b_extra = false;
     extra_frame = 0;
     playlist_manager = 0;
     i_update_counter = 0;
@@ -471,7 +471,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
-    p_intf->b_interaction = VLC_TRUE;
+    p_intf->b_interaction = true;
 
     /* Show embedded playlist if requested */
     if( splitter->ShowOnStart() ) OnSmallPlaylist( dummy );
@@ -498,7 +498,7 @@ Interface::~Interface()
 #endif
 #endif
 
-    p_intf->b_interaction = VLC_FALSE;
+    p_intf->b_interaction = false;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
     delete p_intf->p_sys->p_wxwindow;
@@ -1185,7 +1185,7 @@ void Interface::OnSlowStream( wxCommandEvent& WXUNUSED(event) )
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val; val.b_bool = VLC_TRUE;
+        vlc_value_t val; val.b_bool = true;
 
         var_Set( p_input, "rate-slower", val );
         vlc_object_release( p_input );
@@ -1199,7 +1199,7 @@ void Interface::OnFastStream( wxCommandEvent& WXUNUSED(event) )
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val; val.b_bool = VLC_TRUE;
+        vlc_value_t val; val.b_bool = true;
 
         var_Set( p_input, "rate-faster", val );
         vlc_object_release( p_input );
@@ -1313,7 +1313,7 @@ static int InteractCallback( vlc_object_t *p_this,
 /*****************************************************************************
  * Definition of DragAndDrop class.
  *****************************************************************************/
-DragAndDrop::DragAndDrop( intf_thread_t *_p_intf, vlc_bool_t _b_enqueue )
+DragAndDrop::DragAndDrop( intf_thread_t *_p_intf, bool _b_enqueue )
 {
     p_intf = _p_intf;
     b_enqueue = _b_enqueue;
@@ -1340,7 +1340,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
                                             VLC_OBJECT_INPUT, FIND_ANYWHERE );
         if( p_input )
         {
-            if( input_AddSubtitles( p_input, psz_utf8, VLC_TRUE ) )
+            if( input_AddSubtitles( p_input, psz_utf8, true ) )
             {
                 vlc_object_release( p_input );
                 wxDnDLocaleFree( psz_utf8 );
@@ -1358,7 +1358,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
         playlist_Add( p_playlist, psz_utf8, NULL,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
-                      PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                      PLAYLIST_END, true, false );
 
         wxDnDLocaleFree( psz_utf8 );
     }

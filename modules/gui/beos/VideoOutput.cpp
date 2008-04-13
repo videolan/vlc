@@ -1124,7 +1124,7 @@ void
 VLCView::MouseUp( BPoint where )
 {
     vlc_value_t val;
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "mouse-clicked", val );
 }
 
@@ -1152,7 +1152,7 @@ VLCView::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
     var_Set( p_vout, "mouse-x", val );
     val.i_int = ( (int)point.y - i_y ) * p_vout->render.i_height / i_height;
     var_Set( p_vout, "mouse-y", val );
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "mouse-moved", val );
 }
 

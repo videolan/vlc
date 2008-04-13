@@ -331,9 +331,9 @@ static int IsWhitespace( char *psz_string )
         if( *psz_string != ' ' && *psz_string != '\t' && *psz_string != '\r' &&
             *psz_string != '\n' )
         {
-            return VLC_FALSE;
+            return false;
         }
         psz_string++;
     }
-    return VLC_TRUE;
+    return true;
 }

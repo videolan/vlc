@@ -59,7 +59,7 @@ typedef struct video_postproc_sys_t
     pp_context_t *pp_context;
     pp_mode_t    *pp_mode;
 
-    vlc_bool_t   *pb_pp;
+    bool   *pb_pp;
 
     int i_width;
     int i_height;
@@ -72,7 +72,7 @@ static int PPQCallback( vlc_object_t *p_this, char const *psz_cmd,
 /*****************************************************************************
  * OpenPostproc: probe and open the postproc
  *****************************************************************************/
-void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
+void *E_(OpenPostproc)( decoder_t *p_dec, bool *pb_pp )
 {
     video_postproc_sys_t *p_sys;
     vlc_value_t val, val_orig, text;
@@ -81,7 +81,7 @@ void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
     p_sys->pp_context = NULL;
     p_sys->pp_mode = NULL;
 
-    *pb_pp = VLC_FALSE;
+    *pb_pp = false;
     p_sys->pb_pp = pb_pp;
 
     /* Create object variable if not already done */
@@ -116,7 +116,7 @@ void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
     var_Get( p_dec, "ffmpeg-pp-q", &val );
     var_Set( p_dec, "ffmpeg-pp-q", val_orig );
     if( val_orig.i_int )
-        *pb_pp = VLC_TRUE;
+        *pb_pp = true;
 
     return p_sys;
 }

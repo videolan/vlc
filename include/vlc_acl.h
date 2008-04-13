@@ -33,12 +33,12 @@
 #define ACL_Duplicate(a,b) __ACL_Duplicate(VLC_OBJECT(a),b)
 
 VLC_EXPORT( int, ACL_Check, ( vlc_acl_t *p_acl, const char *psz_ip ) );
-VLC_EXPORT( vlc_acl_t *, __ACL_Create, ( vlc_object_t *p_this, vlc_bool_t b_allow ) );
+VLC_EXPORT( vlc_acl_t *, __ACL_Create, ( vlc_object_t *p_this, bool b_allow ) );
 VLC_EXPORT( vlc_acl_t *, __ACL_Duplicate, ( vlc_object_t *p_this, const vlc_acl_t *p_acl ) );
 VLC_EXPORT( void, ACL_Destroy, ( vlc_acl_t *p_acl ) );
 
 #define ACL_AddHost(a,b,c) ACL_AddNet(a,b,-1,c)
-VLC_EXPORT( int, ACL_AddNet, ( vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow ) );
+VLC_EXPORT( int, ACL_AddNet, ( vlc_acl_t *p_acl, const char *psz_ip, int i_len, bool b_allow ) );
 VLC_EXPORT( int, ACL_LoadFile, ( vlc_acl_t *p_acl, const char *path ) );
 
 #endif

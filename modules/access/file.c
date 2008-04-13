@@ -90,7 +90,7 @@ vlc_module_begin();
     set_shortname( _("File") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
     add_obsolete_string( "file-cat" );
     set_capability( "access2", 50 );
     add_shortcut( "file" );
@@ -112,13 +112,13 @@ static int  open_file( access_t *, const char * );
 struct access_sys_t
 {
     unsigned int i_nb_reads;
-    vlc_bool_t   b_kfir;
+    bool   b_kfir;
 
     int fd;
 
     /* */
-    vlc_bool_t b_seekable;
-    vlc_bool_t b_pace_control;
+    bool b_seekable;
+    bool b_pace_control;
 };
 
 /*****************************************************************************
@@ -129,31 +129,31 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
 
-    vlc_bool_t    b_stdin = !strcmp (p_access->psz_path, "-");
+    bool    b_stdin = !strcmp (p_access->psz_path, "-");
 
     /* Update default_pts to a suitable value for file access */
     var_Create( p_access, "file-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
-    p_sys->b_kfir = VLC_FALSE;
+    p_sys->b_kfir = false;
     int fd = p_sys->fd = -1;
 
     if (!strcasecmp (p_access->psz_access, "stream"))
     {
-        p_sys->b_seekable = VLC_FALSE;
-        p_sys->b_pace_control = VLC_FALSE;
+        p_sys->b_seekable = false;
+        p_sys->b_pace_control = false;
     }
     else if (!strcasecmp (p_access->psz_access, "kfir"))
     {
-        p_sys->b_seekable = VLC_FALSE;
-        p_sys->b_pace_control = VLC_FALSE;
-        p_sys->b_kfir = VLC_TRUE;
+        p_sys->b_seekable = false;
+        p_sys->b_pace_control = false;
+        p_sys->b_kfir = true;
     }
     else
     {
-        p_sys->b_seekable = VLC_TRUE;
-        p_sys->b_pace_control = VLC_TRUE;
+        p_sys->b_seekable = true;
+        p_sys->b_pace_control = true;
     }
 
     /* Open file */
@@ -195,7 +195,7 @@ static int Open( vlc_object_t *p_this )
     if (!S_ISREG (st.st_mode)
      && !S_ISBLK (st.st_mode)
      && !S_ISCHR (st.st_mode))
-        p_sys->b_seekable = VLC_FALSE;
+        p_sys->b_seekable = false;
 #else
     p_sys->b_seekable = !b_stdin;
 # warning File size not known!
@@ -273,7 +273,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
             default:
                 msg_Err (p_access, "read failed (%m)");
-                intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
+                intf_UserFatal (p_access, false, _("File reading failed"),
                                 _("VLC could not read the file."));
         }
 
@@ -302,7 +302,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( i_ret > 0 )
         p_access->info.i_pos += i_ret;
     else if( i_ret == 0 )
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
 
     return i_ret;
 }
@@ -314,7 +314,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 static int Seek (access_t *p_access, int64_t i_pos)
 {
     p_access->info.i_pos = i_pos;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
 
     lseek (p_access->p_sys->fd, i_pos, SEEK_SET);
     return VLC_SUCCESS;
@@ -326,7 +326,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -335,13 +335,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = p_sys->b_seekable;
             break;
 
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = p_sys->b_pace_control;
             break;
 
@@ -397,7 +397,7 @@ static int open_file (access_t *p_access, const char *path)
     if ( !p_sys->fd )
     {
         msg_Err( p_access, "cannot open file %s", path );
-        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"),
+        intf_UserFatal( p_access, false, _("File reading failed"),
                         _("VLC could not open the file \"%s\"."), path );
         return VLC_EGENERIC;
     }
@@ -411,7 +411,7 @@ static int open_file (access_t *p_access, const char *path)
     if (fd == -1)
     {
         msg_Err (p_access, "cannot open file %s (%m)", path);
-        intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
+        intf_UserFatal (p_access, false, _("File reading failed"),
                         _("VLC could not open the file \"%s\"."), path);
         return -1;
     }

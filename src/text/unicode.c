@@ -102,7 +102,7 @@ static int find_charset (void)
 #endif
 
 
-static char *locale_fast (const char *string, vlc_bool_t from)
+static char *locale_fast (const char *string, bool from)
 {
 #if defined (USE_ICONV)
     if (find_charset ())
@@ -163,7 +163,7 @@ static char *locale_fast (const char *string, vlc_bool_t from)
 }
 
 
-static inline char *locale_dup (const char *string, vlc_bool_t from)
+static inline char *locale_dup (const char *string, bool from)
 {
 #if defined (USE_ICONV)
     if (find_charset ())
@@ -202,12 +202,12 @@ void LocaleFree (const char *str)
  */
 char *FromLocale (const char *locale)
 {
-    return locale_fast (locale, VLC_TRUE);
+    return locale_fast (locale, true);
 }
 
 char *FromLocaleDup (const char *locale)
 {
-    return locale_dup (locale, VLC_TRUE);
+    return locale_dup (locale, true);
 }
 
 
@@ -222,13 +222,13 @@ char *FromLocaleDup (const char *locale)
  */
 char *ToLocale (const char *utf8)
 {
-    return locale_fast (utf8, VLC_FALSE);
+    return locale_fast (utf8, false);
 }
 
 
 static char *ToLocaleDup (const char *utf8)
 {
-    return locale_dup (utf8, VLC_FALSE);
+    return locale_dup (utf8, false);
 }
 
 
@@ -276,7 +276,7 @@ int utf8_open (const char *filename, int flags, mode_t mode)
 FILE *utf8_fopen (const char *filename, const char *mode)
 {
     int rwflags = 0, oflags = 0;
-    vlc_bool_t append = VLC_FALSE;
+    bool append = false;
 
     for (const char *ptr = mode; *ptr; ptr++)
     {
@@ -289,7 +289,7 @@ FILE *utf8_fopen (const char *filename, const char *mode)
             case 'a':
                 rwflags = O_WRONLY;
                 oflags |= O_CREAT;
-                append = VLC_TRUE;
+                append = true;
                 break;
 
             case 'w':
@@ -527,7 +527,7 @@ int utf8_scandir( const char *dirname, char ***namelist,
 }
 
 static int utf8_statEx( const char *filename, struct stat *buf,
-                        vlc_bool_t deref )
+                        bool deref )
 {
 #if defined (WIN32) || defined (UNDER_CE)
     /* retrieve Windows OS version */
@@ -564,12 +564,12 @@ static int utf8_statEx( const char *filename, struct stat *buf,
 
 int utf8_stat( const char *filename, struct stat *buf)
 {
-    return utf8_statEx( filename, buf, VLC_TRUE );
+    return utf8_statEx( filename, buf, true );
 }
 
 int utf8_lstat( const char *filename, struct stat *buf)
 {
-    return utf8_statEx( filename, buf, VLC_FALSE );
+    return utf8_statEx( filename, buf, false );
 }
 
 /**

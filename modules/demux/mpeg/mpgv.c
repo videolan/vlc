@@ -53,7 +53,7 @@ vlc_module_end();
  *****************************************************************************/
 struct demux_sys_t
 {
-    vlc_bool_t  b_start;
+    bool  b_start;
 
     es_out_id_t *p_es;
 
@@ -72,7 +72,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_bool_t   b_forced = VLC_FALSE;
+    bool   b_forced = false;
 
     const uint8_t *p_peek;
 
@@ -85,7 +85,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     if( p_demux->b_force )
-        b_forced = VLC_TRUE;
+        b_forced = true;
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 || p_peek[2] != 0x01 )
     {
@@ -103,7 +103,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->b_start     = VLC_TRUE;
+    p_sys->b_start     = true;
     p_sys->p_es        = NULL;
 
     /* Load the mpegvideo packetizer */
@@ -159,7 +159,7 @@ static int Demux( demux_t *p_demux )
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
     {
-        p_sys->b_start = VLC_FALSE;
+        p_sys->b_start = false;
 
         while( p_block_out )
         {

@@ -270,8 +270,8 @@ static void ParseAPEvXTag( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
     demux_meta_t     *p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t       *p_meta;
-    vlc_bool_t b_start;
-    vlc_bool_t b_end;
+    bool b_start;
+    bool b_end;
     const uint8_t *p_header = NULL;
     int i_entry;
 
@@ -488,7 +488,7 @@ static int ParseTags( vlc_object_t *p_this )
 {
     demux_t      *p_demux = (demux_t *)p_this;
     demux_meta_t *p_demux_meta = (demux_meta_t*)p_demux->p_private;
-    vlc_bool_t    b_seekable;
+    bool    b_seekable;
     int64_t       i_init;
 
     msg_Dbg( p_demux, "checking for ID3v1/2 and APEv1/2 tags" );

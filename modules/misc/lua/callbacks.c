@@ -172,7 +172,7 @@ int vlclua_add_callback( lua_State *L )
 int vlclua_del_callback( lua_State *L )
 {
     vlclua_callback_t *p_callback;
-    vlc_bool_t b_found = VLC_FALSE;
+    bool b_found = false;
     vlc_object_t *p_obj = vlclua_checkobject( L, 1, 0 );
     const char *psz_var = luaL_checkstring( L, 2 );
     lua_settop( L, 4 ); /* makes sure that optional data arg is set */
@@ -226,7 +226,7 @@ int vlclua_del_callback( lua_State *L )
                             p_callback = (vlclua_callback_t*)luaL_checklightuserdata( L, -1 );
                             lua_pop( L, 2 );
                             /* obj var func data callbacks index */
-                            b_found = VLC_TRUE;
+                            b_found = true;
                             break;
                         }
                         else
@@ -261,7 +261,7 @@ int vlclua_del_callback( lua_State *L )
         lua_pop( L, 1 );
         /* obj var func data callbacks index */
     }
-    if( b_found == VLC_FALSE )
+    if( b_found == false )
         /* obj var func data callbacks */
         return luaL_error( L, "Couldn't find matching callback." );
     /* else */

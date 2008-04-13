@@ -50,7 +50,7 @@ vlc_module_begin ();
     set_callbacks (Open, Close);
 
     add_integer ("access-bandwidth", 65536, NULL, BANDWIDTH_TEXT,
-                 BANDWIDTH_LONGTEXT, VLC_FALSE);
+                 BANDWIDTH_LONGTEXT, false);
 vlc_module_end();
 
 static ssize_t Read (access_t *access, uint8_t *buffer, size_t len);

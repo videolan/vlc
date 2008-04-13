@@ -85,7 +85,7 @@ vlc_module_begin();
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
     add_float( ENC_CFG_PREFIX "quality", 7.0, NULL, ENC_QUALITY_TEXT,
-               ENC_QUALITY_LONGTEXT, VLC_FALSE );
+               ENC_QUALITY_LONGTEXT, false );
 
 vlc_module_end();
 

@@ -78,13 +78,13 @@ vlc_module_begin();
     set_capability( "vod server", 1 );
     set_callbacks( Open, Close );
     add_shortcut( "rtsp" );
-    add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
+    add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true );
     add_string( "rtsp-raw-mux", "ts", NULL, RAWMUX_TEXT,
-                RAWMUX_TEXT, VLC_TRUE );
+                RAWMUX_TEXT, true );
     add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
-                                           THROTLE_LONGTEXT, VLC_TRUE );
+                                           THROTLE_LONGTEXT, true );
     add_integer( "rtsp-session-timeout", 5, NULL, SESSION_TIMEOUT_TEXT,
-                 SESSION_TIMEOUT_LONGTEXT, VLC_TRUE );
+                 SESSION_TIMEOUT_LONGTEXT, true );
 vlc_module_end();
 
 /*****************************************************************************
@@ -106,8 +106,8 @@ typedef struct
     char *psz_session;
     int64_t i_last; /* for timeout */
 
-    vlc_bool_t b_playing; /* is it in "play" state */
-    vlc_bool_t b_paused; /* is it in "pause" state */
+    bool b_playing; /* is it in "play" state */
+    bool b_paused; /* is it in "pause" state */
 
     int i_es;
     rtsp_client_es_t **es;
@@ -154,7 +154,7 @@ struct vod_media_t
     int64_t i_sdp_id;
     int     i_sdp_version;
 
-    vlc_bool_t b_multicast;
+    bool b_multicast;
 
     vlc_mutex_t lock;
 
@@ -162,7 +162,7 @@ struct vod_media_t
     int        i_es;
     media_es_t **es;
     char       *psz_mux;
-    vlc_bool_t  b_raw;
+    bool  b_raw;
 
     /* RTSP client */
     int           i_rtsp;
@@ -299,7 +299,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_fifo_cmd = block_FifoNew( p_vod );
     if( vlc_thread_create( p_vod, "rtsp vod thread", CommandThread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_vod, "cannot spawn rtsp vod thread" );
         block_FifoRelease( p_sys->p_fifo_cmd );
@@ -374,7 +374,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     TAB_INIT( p_media->i_es, p_media->es );
     p_media->psz_mux = 0;
     TAB_INIT( p_media->i_rtsp, p_media->rtsp );
-    p_media->b_raw = VLC_FALSE;
+    p_media->b_raw = false;
 
     if( asprintf( &p_media->psz_rtsp_path, "%s%s",
                   p_sys->psz_path, psz_name ) <0 )
@@ -958,7 +958,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     free( p_media->psz_mux );
                     p_media->psz_mux = NULL;
                     p_media->psz_mux = strdup( p_vod->p_sys->psz_raw_mux );
-                    p_media->b_raw = VLC_TRUE;
+                    p_media->b_raw = true;
                 }
 
                 if( httpd_ClientIP( cl, ip ) == NULL )
@@ -1117,9 +1117,9 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                                          psz_session, f_scale, NULL );
                         }
 
-                        if( p_rtsp->b_paused == VLC_TRUE )
+                        if( p_rtsp->b_paused == true )
                         {
-                            p_rtsp->b_paused = VLC_FALSE;
+                            p_rtsp->b_paused = false;
                             CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
                                          psz_session, 0, NULL );
                         }
@@ -1132,14 +1132,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
                              psz_session, 0, NULL );
-                p_rtsp->b_paused = VLC_FALSE;
+                p_rtsp->b_paused = false;
                 break;
             }
             else if( p_rtsp->b_playing ) break;
 
             if( httpd_ClientIP( cl, ip ) == NULL ) break;
 
-            p_rtsp->b_playing = VLC_TRUE;
+            p_rtsp->b_playing = true;
 
             /* FIXME for != 1 video and 1 audio */
             for( i = 0; i < p_rtsp->i_es; i++ )
@@ -1213,7 +1213,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
             CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
                          0, NULL );
-            p_rtsp->b_paused = VLC_TRUE;
+            p_rtsp->b_paused = true;
 
             answer->i_status = 200;
             answer->i_body = 0;
@@ -1476,7 +1476,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
             CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
                          0, NULL );
-            p_rtsp->b_paused = VLC_TRUE;
+            p_rtsp->b_paused = true;
 
             answer->i_status = 200;
             answer->i_body = 0;

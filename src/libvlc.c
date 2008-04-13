@@ -138,7 +138,7 @@ int VLC_Init( int i_object, int i_argc, const char *ppsz_argv[] )
  * the playlist when it is completely initialised.
  *****************************************************************************/
 int VLC_AddIntf( int i_object, char const *psz_module,
-                 vlc_bool_t b_block, vlc_bool_t b_play )
+                 bool b_block, bool b_play )
 {
     int i_ret;
     LIBVLC_FUNC;
@@ -152,7 +152,7 @@ int VLC_AddIntf( int i_object, char const *psz_module,
 /*****************************************************************************
  * VLC_Die: ask vlc to die.
  *****************************************************************************
- * This function sets p_libvlc->b_die to VLC_TRUE, but does not do any other
+ * This function sets p_libvlc->b_die to true, but does not do any other
  * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
  *****************************************************************************/
 int VLC_Die( int i_object )
@@ -184,7 +184,7 @@ int VLC_CleanUp( int i_object )
 int VLC_Destroy( int i_object )
 {
     LIBVLC_FUNC;
-    return libvlc_InternalDestroy( p_libvlc, i_object ? VLC_TRUE : VLC_FALSE );
+    return libvlc_InternalDestroy( p_libvlc, i_object ? true : false );
 }
 
 /*****************************************************************************
@@ -317,7 +317,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
     LIBVLC_PLAYLIST_FUNC;
     i_err = playlist_AddExt( p_libvlc->p_playlist, psz_target,
                              NULL,  i_mode, i_pos, -1,
-                             ppsz_options, i_options, VLC_TRUE, VLC_FALSE );
+                             ppsz_options, i_options, true, false );
     LIBVLC_PLAYLIST_FUNC_END;
     return i_err;
 }
@@ -358,9 +358,9 @@ int VLC_Stop( int i_object )
 /*****************************************************************************
  * VLC_IsPlaying: Query for Playlist Status
  *****************************************************************************/
-vlc_bool_t VLC_IsPlaying( int i_object )
+bool VLC_IsPlaying( int i_object )
 {
-    vlc_bool_t   b_playing;
+    bool   b_playing;
 
     LIBVLC_PLAYLIST_FUNC;
     if( p_libvlc->p_playlist->p_input )
@@ -496,7 +496,7 @@ int VLC_TimeGet( int i_object )
  * \param b_relative seek relative from current position
  * \return VLC_SUCCESS on success
  */
-int VLC_TimeSet( int i_object, int i_seconds, vlc_bool_t b_relative )
+int VLC_TimeSet( int i_object, int i_seconds, bool b_relative )
 {
     input_thread_t *p_input;
     vlc_value_t val;
@@ -599,7 +599,7 @@ float VLC_SpeedFaster( int i_object )
         return VLC_ENOOBJ;
     }
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_input, "rate-faster", val );
     var_Get( p_input, "rate", &val );
     vlc_object_release( p_input );
@@ -637,7 +637,7 @@ float VLC_SpeedSlower( int i_object )
         return VLC_ENOOBJ;
     }
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_input, "rate-slower", val );
     var_Get( p_input, "rate", &val );
     vlc_object_release( p_input );
@@ -709,7 +709,7 @@ int VLC_PlaylistPrev( int i_object )
 int VLC_PlaylistClear( int i_object )
 {
     LIBVLC_PLAYLIST_FUNC;
-    playlist_Clear( p_libvlc->p_playlist, VLC_TRUE );
+    playlist_Clear( p_libvlc->p_playlist, true );
     LIBVLC_PLAYLIST_FUNC_END;
     return VLC_SUCCESS;
 }

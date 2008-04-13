@@ -61,18 +61,18 @@ struct vout_sys_t
     NSAutoreleasePool * o_pool;
     VLCGLView         * o_glview;
     VLCVoutView       * o_vout_view;
-    vlc_bool_t          b_saved_frame;
+    bool          b_saved_frame;
     NSRect              s_frame;
-    vlc_bool_t          b_got_frame;
+    bool          b_got_frame;
     /* Mozilla plugin-related variables */
-    vlc_bool_t          b_embedded;
+    bool          b_embedded;
     AGLContext          agl_ctx;
     AGLDrawable         agl_drawable;
     int                 i_offx, i_offy;
     int                 i_width, i_height;
     WindowRef           theWindow;
     WindowGroupRef      winGroup;
-    vlc_bool_t          b_clipped_out;
+    bool          b_clipped_out;
     Rect                clipBounds, viewBounds;
 };
 
@@ -136,7 +136,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
         AGLPixelFormat pixFormat;
 
-        p_vout->p_sys->b_embedded = VLC_TRUE;
+        p_vout->p_sys->b_embedded = true;
 
         pixFormat = aglChoosePixelFormat(NULL, 0, ATTRIBUTES);
         if( NULL == pixFormat )
@@ -171,7 +171,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
-        p_vout->p_sys->b_embedded = VLC_FALSE;
+        p_vout->p_sys->b_embedded = false;
 
         [VLCGLView performSelectorOnMainThread:@selector(initVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
 
@@ -192,7 +192,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
         p_vout->pf_lock   = Lock;
         p_vout->pf_unlock = Unlock;
     }
-    p_vout->p_sys->b_got_frame = VLC_FALSE;
+    p_vout->p_sys->b_got_frame = false;
 
     return VLC_SUCCESS;
 }
@@ -266,7 +266,7 @@ static int Manage( vout_thread_t * p_vout )
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    vlc_bool_t b_arg;
+    bool b_arg;
 
     switch( i_query )
     {
@@ -284,7 +284,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
 static void Swap( vout_thread_t * p_vout )
 {
-    p_vout->p_sys->b_got_frame = VLC_TRUE;
+    p_vout->p_sys->b_got_frame = true;
     [[p_vout->p_sys->o_glview openGLContext] flushBuffer];
 }
 
@@ -330,7 +330,7 @@ static void Unlock( vout_thread_t * p_vout )
             [p_vout->p_sys->o_vout_view frame].size;
         p_vout->p_sys->s_frame.origin =
             [[p_vout->p_sys->o_vout_view getWindow ]frame].origin;
-        p_vout->p_sys->b_saved_frame = VLC_TRUE;
+        p_vout->p_sys->b_saved_frame = true;
     }
 
     [p_vout->p_sys->o_vout_view closeVout];
@@ -790,7 +790,7 @@ static void aglSwap( vout_thread_t * p_vout )
 {
     if( ! p_vout->p_sys->b_clipped_out )
     {
-        p_vout->p_sys->b_got_frame = VLC_TRUE;
+        p_vout->p_sys->b_got_frame = true;
         aglSwapBuffers(p_vout->p_sys->agl_ctx);
     }
     else
@@ -938,14 +938,14 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                         {
                             vlc_value_t val;
 
-                            val.b_bool = VLC_FALSE;
+                            val.b_bool = false;
                             var_Set((vout_thread_t *) p_vout->p_parent, "fullscreen", val);
                         }
                         else
                         {
                             vlc_value_t val;
 
-                            val.b_bool = VLC_TRUE;
+                            val.b_bool = true;
                             var_Set( p_vout, "mouse-clicked", val );
 
                             var_Get( p_vout, "mouse-button-down", &val );
@@ -1000,7 +1000,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
 
                 var_Set( p_vout, "mouse-y", val );
 
-                val.b_bool = VLC_TRUE;
+                val.b_bool = true;
                 var_Set( p_vout, "mouse-moved", val );
 
                 break;

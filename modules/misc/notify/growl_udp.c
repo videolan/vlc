@@ -72,11 +72,11 @@ vlc_module_begin();
     set_description( _("Growl UDP Notification Plugin") );
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,
-                SERVER_TEXT, SERVER_LONGTEXT, VLC_FALSE );
+                SERVER_TEXT, SERVER_LONGTEXT, false );
     add_password( "growl-password", PASS_DEFAULT, NULL,
-                PASS_TEXT, PASS_LONGTEXT, VLC_FALSE );
+                PASS_TEXT, PASS_LONGTEXT, false );
     add_integer( "growl-port", 9887, NULL,
-                PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
+                PORT_TEXT, PORT_LONGTEXT, true );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -199,10 +199,10 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     uint8_t *psz_encoded = malloc(100);
     uint8_t i_defaults = 0;
     static const char *psz_notifications[] = {"Now Playing", NULL};
-    vlc_bool_t pb_defaults[] = {VLC_TRUE, VLC_FALSE};
+    bool pb_defaults[] = {true, false};
     int i = 0, j;
     if( psz_encoded == NULL )
-        return VLC_FALSE;
+        return false;
 
     memset( psz_encoded, 0, sizeof(psz_encoded) );
     psz_encoded[i++] = GROWL_PROTOCOL_VERSION;
@@ -219,7 +219,7 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     }
     psz_encoded[4] = j;
     for( j = 0 ; psz_notifications[j] != NULL ; j++)
-        if(pb_defaults[j] == VLC_TRUE)
+        if(pb_defaults[j] == true)
         {
             psz_encoded[i++] = (uint8_t)j;
             i_defaults++;
@@ -238,7 +238,7 @@ static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
     uint16_t flags;
     int i = 0;
     if( psz_encoded == NULL )
-        return VLC_FALSE;
+        return false;
 
     memset( psz_encoded, 0, sizeof(psz_encoded) );
     psz_encoded[i++] = GROWL_PROTOCOL_VERSION;

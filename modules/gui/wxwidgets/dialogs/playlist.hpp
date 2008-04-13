@@ -139,7 +139,7 @@ private:
     /* List */
     void OnSourceSelected( wxListEvent &event );
 protected:
-    void Rebuild( vlc_bool_t );
+    void Rebuild( bool );
 private:
 
     void Preparse();
@@ -156,7 +156,7 @@ private:
     wxTreeItemId FindItemByInput( wxTreeItemId, int );
     wxTreeItemId FindItemInner( wxTreeItemId, int , bool );
     wxTreeItemId FindItemByName( wxTreeItemId, wxString,
-                                 wxTreeItemId, vlc_bool_t *);
+                                 wxTreeItemId, bool *);
 
     wxTreeItemId saved_tree_item;
     wxTreeItemId saved_input_tree_item;
@@ -179,7 +179,7 @@ private:
 
     int i_update_counter;
 
-    vlc_bool_t b_changed_view;
+    bool b_changed_view;
     const char **pp_sds;
 
 protected:

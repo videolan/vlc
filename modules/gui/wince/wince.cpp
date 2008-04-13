@@ -67,7 +67,7 @@ vlc_module_begin();
     add_shortcut( "wince" );
 
     add_bool( "wince-embed", 1, NULL,
-              EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
+              EMBED_TEXT, EMBED_LONGTEXT, false );
 
     add_submodule();
     set_description( _("WinCE dialogs provider") );
@@ -194,7 +194,7 @@ static void Run( intf_thread_t *p_intf )
 
         /* Create a new thread for the dialogs provider */
         if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
-                               MainLoop, 0, VLC_TRUE ) )
+                               MainLoop, 0, true ) )
         {
             msg_Err( p_intf, "cannot create Skins Dialogs Thread" );
             p_intf->pf_show_dialog = NULL;

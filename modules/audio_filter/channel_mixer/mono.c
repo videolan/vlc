@@ -73,7 +73,7 @@ struct atomic_operation_t
 
 struct filter_sys_t
 {
-    vlc_bool_t b_downmix;
+    bool b_downmix;
 
     unsigned int i_nb_channels; /* number of int16_t per sample */
     int i_channel_selected;
@@ -113,10 +113,10 @@ vlc_module_begin();
     set_description( _("Audio filter for stereo to mono conversion") );
     set_capability( "audio filter2", 0 );
 
-    add_bool( MONO_CFG "downmix", VLC_FALSE, NULL, MONO_DOWNMIX_TEXT,
-              MONO_DOWNMIX_LONGTEXT, VLC_FALSE );
+    add_bool( MONO_CFG "downmix", false, NULL, MONO_DOWNMIX_TEXT,
+              MONO_DOWNMIX_LONGTEXT, false );
     add_integer( MONO_CFG "channel", -1, NULL, MONO_CHANNEL_TEXT,
-        MONO_CHANNEL_LONGTEXT, VLC_FALSE );
+        MONO_CHANNEL_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_category( CAT_AUDIO );

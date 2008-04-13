@@ -41,7 +41,7 @@
 struct decoder_sys_t
 {
     /* Module mode */
-    vlc_bool_t b_packetizer;
+    bool b_packetizer;
 
     /*
      * Output properties
@@ -118,7 +118,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Misc init */
-    p_sys->b_packetizer = VLC_FALSE;
+    p_sys->b_packetizer = false;
     aout_DateSet( &p_sys->end_date, 0 );
 
     /* Set output properties */
@@ -151,7 +151,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     if( i_ret != VLC_SUCCESS ) return i_ret;
 
-    p_dec->p_sys->b_packetizer = VLC_TRUE;
+    p_dec->p_sys->b_packetizer = true;
 
     p_dec->fmt_out.i_codec = VLC_FOURCC('l','p','c','m');
 

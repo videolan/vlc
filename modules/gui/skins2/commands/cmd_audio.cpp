@@ -43,7 +43,7 @@ void CmdSetEqualizer::execute()
         var_SetString( pAout, "audio-filter", (char*)filters.c_str() );
         for( int i = 0; i < pAout->i_nb_inputs; i++ )
         {
-            pAout->pp_inputs[i]->b_restart = VLC_TRUE;
+            pAout->pp_inputs[i]->b_restart = true;
         }
         vlc_object_release( pAout );
     }

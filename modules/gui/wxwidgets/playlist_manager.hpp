@@ -47,7 +47,7 @@ private:
     DECLARE_EVENT_TABLE();
 
     /* Update */
-    void Rebuild( vlc_bool_t );
+    void Rebuild( bool );
     void CreateNode( playlist_item_t*, wxTreeItemId );
     void UpdateNode( playlist_item_t*, wxTreeItemId );
     void UpdateNodeChildren( playlist_item_t*, wxTreeItemId );

@@ -209,7 +209,7 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
  * \param psz_name The name of the variable
  * \param b The new boolean value of this variable
  */
-static inline int __var_SetBool( vlc_object_t *p_obj, const char *psz_name, vlc_bool_t b )
+static inline int __var_SetBool( vlc_object_t *p_obj, const char *psz_name, bool b )
 {
     vlc_value_t val;
     val.b_bool = b;
@@ -267,7 +267,7 @@ static inline int __var_SetString( vlc_object_t *p_obj, const char *psz_name, co
 static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     return __var_Set( p_obj, psz_name, val );
 }
 #define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
@@ -313,11 +313,11 @@ static inline int __var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
  */
 static inline int __var_GetBool( vlc_object_t *p_obj, const char *psz_name )
 {
-    vlc_value_t val; val.b_bool = VLC_FALSE;
+    vlc_value_t val; val.b_bool = false;
     if( !__var_Get( p_obj, psz_name, &val ) )
         return val.b_bool;
     else
-        return VLC_FALSE;
+        return false;
 }
 
 /**

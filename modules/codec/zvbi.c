@@ -107,13 +107,13 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_integer( "vbi-page", 100, NULL,
-                 PAGE_TEXT, PAGE_LONGTEXT, VLC_FALSE );
-    add_bool( "vbi-opaque", VLC_TRUE, NULL,
-                 OPAQUE_TEXT, OPAQUE_LONGTEXT, VLC_FALSE );
-    add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+                 PAGE_TEXT, PAGE_LONGTEXT, false );
+    add_bool( "vbi-opaque", true, NULL,
+                 OPAQUE_TEXT, OPAQUE_LONGTEXT, false );
+    add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_bool( "vbi-text", VLC_FALSE, NULL,
-              TELX_TEXT, TELX_LONGTEXT, VLC_FALSE );
+    add_bool( "vbi-text", false, NULL,
+              TELX_TEXT, TELX_LONGTEXT, false );
 vlc_module_end();
 
 /****************************************************************************
@@ -126,11 +126,11 @@ struct decoder_sys_t
     vbi_dvb_demux *         p_dvb_demux;
     unsigned int            i_wanted_page;
     unsigned int            i_last_page;
-    vlc_bool_t              b_update;
-    vlc_bool_t              b_opaque;
+    bool              b_update;
+    bool              b_opaque;
 
     /* Subtitles as text */
-    vlc_bool_t              b_text;
+    bool              b_text;
 
     /* Positioning of Teletext images */
     int                     i_align;
@@ -191,7 +191,7 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
-    p_sys->b_update = VLC_FALSE;
+    p_sys->b_update = false;
     p_sys->p_vbi_dec = vbi_decoder_new();
     p_sys->p_dvb_demux = vbi_dvb_pes_demux_new( NULL, NULL );
 
@@ -265,7 +265,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     block_t         *p_block;
     subpicture_t    *p_spu = NULL;
     video_format_t  fmt;
-    vlc_bool_t      b_cached = VLC_FALSE;
+    bool      b_cached = false;
     vbi_page        p_page;
     const uint8_t   *p_pos;
     unsigned int    i_left;
@@ -302,10 +302,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         goto error;
 
     if( ( p_sys->i_wanted_page == p_sys->i_last_page ) &&
-        ( p_sys->b_update != VLC_TRUE ) )
+        ( p_sys->b_update != true ) )
         goto error;
 
-    p_sys->b_update = VLC_FALSE;
+    p_sys->b_update = false;
     p_sys->i_last_page = p_sys->i_wanted_page;
 #if 0
     msg_Dbg( p_dec, "we now have page: %d ready for display",
@@ -351,9 +351,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_spu->i_start = (mtime_t) p_block->i_dts;
     p_spu->i_stop = (mtime_t) 0;
-    p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_absolute = VLC_FALSE;
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = false;
+    p_spu->b_pausable = true;
     p_spu->i_width = fmt.i_width;
     p_spu->i_height = fmt.i_height;
     p_spu->i_original_picture_width = p_page.columns * 12;
@@ -482,7 +482,7 @@ static void event_handler( vbi_event *ev, void *user_data )
                     ev->ev.ttx_page.subno & 0xFF);
         */
         if( p_sys->i_last_page == vbi_bcd2dec( ev->ev.ttx_page.pgno ) )
-            p_sys->b_update = VLC_TRUE;
+            p_sys->b_update = true;
 
         if( ev->ev.ttx_page.clock_update )
             msg_Dbg( p_dec, "clock" );
@@ -552,7 +552,7 @@ static int Opaque_32bpp( decoder_t *p_dec, vbi_page p_page,
             *p_begin = 0;
             break;
         /* To make the boxed text "closed captioning" transparent
-         * change VLC_TRUE to VLC_FALSE.
+         * change true to false.
          */
         case VBI_OPAQUE:
             if( p_sys->b_opaque )
@@ -611,7 +611,7 @@ static int Opaque_8bpp( decoder_t *p_dec, vbi_page p_page,
             *p_begin = 0;
             break;
         /* To make the boxed text "closed captioning" transparent
-         * change VLC_TRUE to VLC_FALSE.
+         * change true to false.
          */
         case VBI_OPAQUE:
             if( p_sys->b_opaque )

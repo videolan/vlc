@@ -214,7 +214,7 @@ static int Create_U8ToF32( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = Do_U8ToF32;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return 0;
 }

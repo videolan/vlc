@@ -80,7 +80,7 @@ static int Open (vlc_object_t * p_this)
     demux_sys_t   *p_sys;
     const uint8_t *peek;
     unsigned       tracks, ppqn;
-    vlc_bool_t     multitrack;
+    bool     multitrack;
 
     /* (Try to) parse the SMF header */
     /* Header chunk always has 6 bytes payload */
@@ -95,10 +95,10 @@ static int Open (vlc_object_t * p_this)
     switch (GetWBE (peek))
     {
         case 0:
-            multitrack = VLC_FALSE;
+            multitrack = false;
             break;
         case 1:
-            multitrack = VLC_TRUE;
+            multitrack = true;
             break;
         default:
             /* We don't implement SMF2 (as do many) */

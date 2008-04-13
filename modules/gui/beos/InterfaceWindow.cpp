@@ -439,7 +439,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     memset( psz_uri, 0, 1024 );
                     snprintf( psz_uri, 1024, "dvdnav:%s", psz_device );
                     playlist_Add( p_playlist, psz_uri, psz_device,
-                        PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
+                        PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, true );
                 }
                 UpdatePlaylist();
             }
@@ -734,12 +734,12 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 break;
             }
 
-            vlc_bool_t b_remove = ( p_message->WasDropped() &&
+            bool b_remove = ( p_message->WasDropped() &&
                                     !( modifiers() & B_SHIFT_KEY ) );
 
             if( b_remove && p_playlist )
             {
-                playlist_Clear( p_playlist, VLC_TRUE );
+                playlist_Clear( p_playlist, true );
             }
 
             entry_ref ref;
@@ -752,7 +752,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 if( p_playlist )
                 {
                     playlist_Add( p_playlist, path.Path(), NULL,
-                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
+                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, true );
                 }
             }
 

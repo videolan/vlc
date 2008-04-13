@@ -92,7 +92,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     AVProbeData   pd;
     AVInputFormat *fmt;
     unsigned int i;
-    vlc_bool_t b_avfmt_nofile;
+    bool b_avfmt_nofile;
 
     /* Init Probe data */
     pd.filename = p_demux->psz_path;
@@ -271,7 +271,7 @@ void E_(CloseDemux)( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_bool_t b_avfmt_nofile;
+    bool b_avfmt_nofile;
 
     FREENULL( p_sys->tk );
 

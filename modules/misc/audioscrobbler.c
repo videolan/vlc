@@ -90,7 +90,7 @@ struct intf_sys_t
     int                     i_nowp_port;        /**< port to which submit   */
     char                    *psz_nowp_file;     /**< file to which submit   */
 #endif
-    vlc_bool_t              b_handshaked;       /**< are we authenticated ? */
+    bool              b_handshaked;       /**< are we authenticated ? */
     char                    psz_auth_token[33]; /**< Authentication token */
 
     /* data about song currently playing */
@@ -99,12 +99,12 @@ struct intf_sys_t
     mtime_t                 time_pause;         /**< time when vlc paused   */
     mtime_t                 time_total_pauses;  /**< total time in pause    */
 
-    vlc_bool_t              b_submit;           /**< do we have to submit ? */
+    bool              b_submit;           /**< do we have to submit ? */
 
-    vlc_bool_t              b_state_cb;         /**< if we registered the
+    bool              b_state_cb;         /**< if we registered the
                                                  * "state" callback         */
 
-    vlc_bool_t              b_meta_read;        /**< if we read the song's
+    bool              b_meta_read;        /**< if we read the song's
                                                  * metadata already         */
 };
 
@@ -159,9 +159,9 @@ vlc_module_begin();
     set_shortname( N_( "Audioscrobbler" ) );
     set_description( N_("Submission of played songs to last.fm") );
     add_string( "lastfm-username", "", NULL,
-                USERNAME_TEXT, USERNAME_LONGTEXT, VLC_FALSE );
+                USERNAME_TEXT, USERNAME_LONGTEXT, false );
     add_password( "lastfm-password", "", NULL,
-                PASSWORD_TEXT, PASSWORD_LONGTEXT, VLC_FALSE );
+                PASSWORD_TEXT, PASSWORD_LONGTEXT, false );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -222,7 +222,7 @@ static void Close( vlc_object_t *p_this )
     PL_UNLOCK;
     pl_Release( p_playlist );
 
-    p_intf->b_dead = VLC_TRUE;
+    p_intf->b_dead = true;
     /* we lock the mutex in case p_sys is being accessed from a callback */
     vlc_mutex_lock ( &p_sys->lock );
     int i;
@@ -270,7 +270,7 @@ static void Run( intf_thread_t *p_intf )
     /* main loop */
     for( ;; )
     {
-        vlc_bool_t b_die = VLC_FALSE, b_wait = VLC_FALSE;
+        bool b_die = false, b_wait = false;
 
         vlc_object_lock( p_intf );
         if( vlc_object_alive( p_intf ) )
@@ -296,7 +296,7 @@ static void Run( intf_thread_t *p_intf )
             continue; /* holding on until next_exchange */
 
         /* handshake if needed */
-        if( p_sys->b_handshaked == VLC_FALSE )
+        if( p_sys->b_handshaked == false )
         {
             msg_Dbg( p_intf, "Handshaking with last.fm ..." );
 
@@ -308,7 +308,7 @@ static void Run( intf_thread_t *p_intf )
 
                 case VLC_ENOVAR:
                     /* username not set */
-                    intf_UserFatal( p_intf, VLC_FALSE,
+                    intf_UserFatal( p_intf, false,
                         _("Last.fm username not set"),
                         _("Please set a username or disable the "
                         "audioscrobbler plugin, and restart VLC.\n"
@@ -319,7 +319,7 @@ static void Run( intf_thread_t *p_intf )
 
                 case VLC_SUCCESS:
                     msg_Dbg( p_intf, "Handshake successfull :)" );
-                    p_sys->b_handshaked = VLC_TRUE;
+                    p_sys->b_handshaked = true;
                     p_sys->i_interval = 0;
                     p_sys->next_exchange = mdate();
                     break;
@@ -336,7 +336,7 @@ static void Run( intf_thread_t *p_intf )
                     break;
             }
             /* if handshake failed let's restart the loop */
-            if( p_sys->b_handshaked == VLC_FALSE )
+            if( p_sys->b_handshaked == false )
                 continue;
         }
 
@@ -391,7 +391,7 @@ static void Run( intf_thread_t *p_intf )
         {
             /* If connection fails, we assume we must handshake again */
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-            p_sys->b_handshaked = VLC_FALSE;
+            p_sys->b_handshaked = false;
             free( psz_submit );
             continue;
         }
@@ -409,12 +409,12 @@ static void Run( intf_thread_t *p_intf )
         {
             /* If connection fails, we assume we must handshake again */
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-            p_sys->b_handshaked = VLC_FALSE;
+            p_sys->b_handshaked = false;
             continue;
         }
 
         i_net_ret = net_Read( p_intf, i_post_socket, NULL,
-                    p_buffer, 1023, VLC_FALSE );
+                    p_buffer, 1023, false );
         if ( i_net_ret <= 0 )
         {
             /* if we get no answer, something went wrong : try again */
@@ -436,7 +436,7 @@ static void Run( intf_thread_t *p_intf )
         if ( p_buffer_pos )
         {
             msg_Err( p_intf, "Authentication failed (BADSESSION), are you connected to last.fm with another program ?" );
-            p_sys->b_handshaked = VLC_FALSE;
+            p_sys->b_handshaked = false;
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
             continue;
         }
@@ -456,7 +456,7 @@ static void Run( intf_thread_t *p_intf )
         {
             msg_Err( p_intf, "Authentication failed, handshaking again (%s)", 
                              p_buffer );
-            p_sys->b_handshaked = VLC_FALSE;
+            p_sys->b_handshaked = false;
             HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
             continue;
         }
@@ -477,7 +477,7 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    if( p_sys->b_meta_read == VLC_FALSE && newval.i_int >= PLAYING_S )
+    if( p_sys->b_meta_read == false && newval.i_int >= PLAYING_S )
     {
         ReadMetaData( p_intf );
         return VLC_SUCCESS;
@@ -512,9 +512,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    p_sys->b_state_cb       = VLC_FALSE;
-    p_sys->b_meta_read      = VLC_FALSE;
-    p_sys->b_submit         = VLC_FALSE;
+    p_sys->b_state_cb       = false;
+    p_sys->b_meta_read      = false;
+    p_sys->b_submit         = false;
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -551,7 +551,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->p_current_song.i_start = mdate();    /* only used locally */
 
     var_AddCallback( p_input, "state", PlayingChange, p_intf );
-    p_sys->b_state_cb = VLC_TRUE;
+    p_sys->b_state_cb = true;
 
     if( input_item_IsPreparsed( p_item ) )
         ReadMetaData( p_intf );
@@ -632,7 +632,7 @@ static void AddToQueue ( intf_thread_t *p_this )
 
 end:
     DeleteSong( &p_sys->p_current_song );
-    p_sys->b_submit = VLC_FALSE;
+    p_sys->b_submit = false;
     vlc_mutex_unlock( &p_sys->lock );
 }
 
@@ -808,7 +808,7 @@ static int Handshake( intf_thread_t *p_this )
     if ( p_buffer_pos )
     {
         /* authentication failed, bad username/password combination */
-        intf_UserFatal( p_this, VLC_FALSE,
+        intf_UserFatal( p_this, false,
             _("last.fm: Authentication failed"),
             _("last.fm username or password is incorrect. "
               "Please verify your settings and relaunch VLC." ) );
@@ -957,7 +957,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     vlc_mutex_lock( &p_sys->lock );
 
-    p_sys->b_meta_read = VLC_TRUE;
+    p_sys->b_meta_read = true;
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_a, Artist )
     else
@@ -981,7 +981,7 @@ static int ReadMetaData( intf_thread_t *p_this )
     }
 
     /* Now we have read the mandatory meta data, so we can submit that info */
-    p_sys->b_submit = VLC_TRUE;
+    p_sys->b_submit = true;
 
     ALLOC_ITEM_META( p_sys->p_current_song.psz_b, Album )
     else

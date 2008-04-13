@@ -91,7 +91,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
             RAISEVOID( "Unable to find item" );
         }
 
-        playlist_Control( PL, PLAYLIST_VIEWPLAY, VLC_TRUE,
+        playlist_Control( PL, PLAYLIST_VIEWPLAY, true,
                           PL->status.p_node, p_item );
         if( did_lock == 1 )
         {
@@ -172,7 +172,7 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
     }
     return playlist_AddExt( PL, psz_uri, psz_name,
                             PLAYLIST_INSERT, PLAYLIST_END, -1, ppsz_options,
-                            i_options, 1, VLC_FALSE );
+                            i_options, 1, false );
 }
 
 

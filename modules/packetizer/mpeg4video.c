@@ -87,7 +87,7 @@ struct decoder_sys_t
     int         i_last_incr;
     int         i_last_incr_diff;
 
-    vlc_bool_t  b_frame;
+    bool  b_frame;
 
     /* Current frame being built */
     block_t    *p_frame;
@@ -530,7 +530,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
         break;
     case 2:
         p_sys->i_flags = BLOCK_FLAG_TYPE_B;
-        p_sys->b_frame = VLC_TRUE;
+        p_sys->b_frame = true;
         break;
     case 3: /* gni ? */
         p_sys->i_flags = BLOCK_FLAG_TYPE_PB;

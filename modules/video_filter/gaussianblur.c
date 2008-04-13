@@ -62,7 +62,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_float( FILTER_PREFIX "sigma", 2., NULL, SIGMA_TEXT, SIGMA_LONGTEXT,
-               VLC_FALSE );
+               false );
 
     set_callbacks( Create, Destroy );
 vlc_module_end();

@@ -108,7 +108,7 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
-                N_("ALSA Device Name"), NULL, VLC_FALSE );
+                N_("ALSA Device Name"), NULL, false );
         change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
 
@@ -272,7 +272,7 @@ static void Probe( aout_instance_t * p_aout,
 
     /* Add final settings to the variable */
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 }
 
@@ -307,7 +307,7 @@ static int Open( vlc_object_t *p_this )
 
     int i_snd_rc = -1;
     unsigned int i_old_rate;
-    vlc_bool_t b_retry = VLC_TRUE;
+    bool b_retry = true;
 
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -316,7 +316,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
     }
-    p_sys->b_playing = VLC_FALSE;
+    p_sys->b_playing = false;
     p_sys->start_date = 0;
     vlc_cond_init( p_aout, &p_sys->wait );
     vlc_mutex_init( p_aout, &p_sys->lock );
@@ -325,7 +325,7 @@ static int Open( vlc_object_t *p_this )
     if( (psz_device = config_GetPsz( p_aout, "alsadev" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
-        intf_UserFatal( p_aout, VLC_FALSE, _("No Audio Device"),
+        intf_UserFatal( p_aout, false, _("No Audio Device"),
                         _("No audio device name was given. You might want to " \
                           "enter \"default\".") );
         free( p_sys );
@@ -433,7 +433,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_iec_device, snd_strerror( i_snd_rc ) );
-            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"),
+            intf_UserFatal( p_aout, false, _("Audio output failed"),
                             _("VLC could not open the ALSA device \"%s\" (%s)."),
                             psz_iec_device, snd_strerror( i_snd_rc ) );
             free( p_sys );
@@ -472,7 +472,7 @@ static int Open( vlc_object_t *p_this )
                 {
                     msg_Err( p_aout, "audio device: %s is already in use",
                               psz_device );
-                    intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"),
+                    intf_UserFatal( p_aout, false, _("Audio output failed"),
                                     _("The audio device \"%s\" is already in use."),
                                     psz_device );
                 }
@@ -484,7 +484,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_device, snd_strerror( i_snd_rc ) );
-            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"),
+            intf_UserFatal( p_aout, false, _("Audio output failed"),
                             _("VLC could not open the ALSA device \"%s\" (%s)."),
                             psz_device, snd_strerror( i_snd_rc ) );
             free( p_sys );
@@ -515,7 +515,7 @@ static int Open( vlc_object_t *p_this )
        if snd_pcm_hw_params fails in fl32 */
     while ( b_retry )
     {
-        b_retry = VLC_FALSE;
+        b_retry = false;
 
         /* Get Initial hardware parameters */
         if ( ( i_snd_rc = snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw ) ) < 0 )
@@ -621,10 +621,10 @@ static int Open( vlc_object_t *p_this )
         /* Commit hardware parameters. */
         if ( ( i_snd_rc = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw ) ) < 0 )
         {
-            if ( b_retry == VLC_FALSE &&
+            if ( b_retry == false &&
                                 i_snd_pcm_format == SND_PCM_FORMAT_FLOAT)
             {
-                b_retry = VLC_TRUE;
+                b_retry = true;
                 i_snd_pcm_format = SND_PCM_FORMAT_S16;
                 p_aout->output.output.i_format = AOUT_FMT_S16_NE;
                 msg_Warn( p_aout, "unable to commit hardware configuration "
@@ -686,7 +686,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Create ALSA thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", ALSAThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
     {
         msg_Err( p_aout, "cannot create ALSA thread (%m)" );
         goto error;
@@ -739,7 +739,7 @@ static void Close( vlc_object_t *p_this )
 
     vlc_object_kill( p_aout );
     vlc_thread_join( p_aout );
-    p_aout->b_die = VLC_FALSE;
+    p_aout->b_die = false;
 
     i_snd_rc = snd_pcm_close( p_sys->p_snd_pcm );
 
@@ -935,7 +935,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     GetDevices( p_item );
 
     /* Signal change to the interface */
-    p_item->b_dirty = VLC_TRUE;
+    p_item->b_dirty = true;
 
     return VLC_SUCCESS;
 

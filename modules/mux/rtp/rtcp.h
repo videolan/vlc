@@ -126,7 +126,7 @@ typedef struct
 typedef struct
 {
     uint32_t u_version;        /*< RTCP version number */
-    vlc_bool_t b_padding;      /*< indicates if packets has padding */
+    bool b_padding;      /*< indicates if packets has padding */
     uint32_t u_report;         /*< reception packet count */
     uint32_t u_payload_type;   /*< type of RTCP payload */
     uint32_t u_length;         /*< length of packet */
@@ -148,7 +148,7 @@ typedef struct rtcp_client_t
 
     uint32_t    i_index;
     uint32_t    u_ssrc;            /*< channel name */
-    vlc_bool_t  b_deleted;         /*< channel deleted ? */
+    bool  b_deleted;         /*< channel deleted ? */
     mtime_t     i_timeout;         /*< remove timeout before real deletion,
                                     * this is recommended by RFC 3550 at
                                     * page 27 to ignore out-of-order packets.
@@ -249,7 +249,7 @@ block_t *rtcp_encode_BYE( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, char *psz_rea
  *                      of the initial waiting time
  */
 uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_ssrc,
-                        vlc_bool_t b_sender, vlc_bool_t b_first );
+                        bool b_sender, bool b_first );
 
 /**
  * rtcp_expire
@@ -261,11 +261,11 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_s
  * \param rtcp_event    type of event received
  * \param b_sender      are we the sender or the receiver
  * \param *b_first      the first time this function is called use only half
- *                      of the initial waiting time. If b_first is VLC_TRUE, then
- *                      it will return *b_first = VLC_FALSE;
+ *                      of the initial waiting time. If b_first is true, then
+ *                      it will return *b_first = false;
  */
 void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_bandwidth,
-                  uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first );
+                  uint32_t u_ssrc, bool b_sender, bool *b_first );
 
 /**
  * rtcp_received

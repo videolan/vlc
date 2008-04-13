@@ -179,7 +179,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         aout_fifo_t * p_fifo = &p_input->fifo;
         aout_buffer_t * p_buffer;
         mtime_t prev_date;
-        vlc_bool_t b_drop_buffers;
+        bool b_drop_buffers;
 
         if ( p_input->b_error )
         {
@@ -357,7 +357,7 @@ void aout_MixerRun( aout_instance_t * p_aout )
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
 {
     float f_old = p_aout->mixer.f_multiplier;
-    vlc_bool_t b_new_mixer = 0;
+    bool b_new_mixer = 0;
 
     if ( !p_aout->mixer.b_error )
     {

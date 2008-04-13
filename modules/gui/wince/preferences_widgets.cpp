@@ -140,7 +140,7 @@ int ConfigControl::GetType()
     return i_type;
 }
 
-vlc_bool_t ConfigControl::IsAdvanced()
+bool ConfigControl::IsAdvanced()
 {
     return b_advanced;
 }
@@ -473,7 +473,7 @@ void StringListConfigControl::OnAction( wxCommandEvent& event )
     {
         combo->Clear();
         UpdateCombo( p_item );
-        p_item->b_dirty = VLC_FALSE;
+        p_item->b_dirty = false;
     }
 }
 
@@ -671,7 +671,7 @@ void IntegerListConfigControl::OnAction( wxCommandEvent& event )
     {
         combo->Clear();
         UpdateCombo( p_item );
-        p_item->b_dirty = VLC_FALSE;
+        p_item->b_dirty = false;
     }
 }
 

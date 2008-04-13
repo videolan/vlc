@@ -41,7 +41,7 @@ VLMSliderManager::VLMSliderManager( intf_thread_t *_p_intf,
     p_sp = _p_sp;
     slider = p_sp->p_slider;
 
-    b_slider_free = VLC_TRUE;
+    b_slider_free = true;
     time_string = wxU( "0:00:00 / 0:00:00");
 }
 
@@ -62,13 +62,13 @@ void VLMSliderManager::Update()
         if( p_input )
         {
             slider->SetValue( 0 );
-            UpdateButtons( VLC_TRUE );
+            UpdateButtons( true );
         }
     }
     else if( p_input->b_dead )
     {
         HideSlider();
-        UpdateButtons( VLC_FALSE );
+        UpdateButtons( false );
 
         vlc_object_release( p_input );
         p_input = NULL;
@@ -130,7 +130,7 @@ void VLMSliderManager::UpdateInput()
     p_input = p_sp->GetStream()->p_media->instance[0]->p_input;
 }
 
-void VLMSliderManager::UpdateButtons( vlc_bool_t b_play )
+void VLMSliderManager::UpdateButtons( bool b_play )
 {
     if( b_play )
     {
@@ -142,7 +142,7 @@ void VLMSliderManager::UpdateButtons( vlc_bool_t b_play )
     }
 }
 
-vlc_bool_t VLMSliderManager::IsShown()
+bool VLMSliderManager::IsShown()
 {
     return slider->IsEnabled();
 }
@@ -159,14 +159,14 @@ void VLMSliderManager::HideSlider()
     UpdateTime( "0:00:00", "0:00:00" );
 }
 
-vlc_bool_t VLMSliderManager::IsFree()
+bool VLMSliderManager::IsFree()
 {
     return b_slider_free;
 }
 
-vlc_bool_t VLMSliderManager::IsPlaying()
+bool VLMSliderManager::IsPlaying()
 {
-    return VLC_TRUE; /* Is it really useful ? */
+    return true; /* Is it really useful ? */
 }
 
 void VLMSliderManager::UpdateTime( char *psz_time, char *psz_total )
@@ -192,11 +192,11 @@ void VLMSliderManager::ProcessUpdate( wxScrollEvent &event )
         }
 
 #ifdef WIN32
-        b_slider_free = VLC_TRUE;
+        b_slider_free = true;
     }
     else
     {
-        b_slider_free = VLC_FALSE;
+        b_slider_free = false;
 
         if( p_input )
         {

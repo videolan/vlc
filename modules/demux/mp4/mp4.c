@@ -98,8 +98,8 @@ typedef struct
 
     int b_ok;               /* The track is usable */
     int b_enable;           /* is the trak enable by default */
-    vlc_bool_t b_selected;  /* is the trak being played */
-    vlc_bool_t b_chapter;   /* True when used for chapter only */
+    bool b_selected;  /* is the trak being played */
+    bool b_chapter;   /* True when used for chapter only */
 
     es_format_t fmt;
     es_out_id_t *p_es;
@@ -136,7 +136,7 @@ typedef struct
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */
 
-    vlc_bool_t b_drms;
+    bool b_drms;
     void      *p_drms;
 
 } mp4_track_t;
@@ -257,7 +257,7 @@ static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 }
 
 /* Function to lookup the currently playing item */
-static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
+static bool FindItem( demux_t *p_demux, playlist_t *p_playlist,
                      playlist_item_t **pp_item );
 
 static void LoadChapter( demux_t  *p_demux );
@@ -278,7 +278,7 @@ static int Open( vlc_object_t * p_this )
     MP4_Box_t       *p_trak;
 
     unsigned int    i;
-    vlc_bool_t      b_seekable;
+    bool      b_seekable;
 
     /* A little test to see if it could be a mp4 */
     if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 ) return VLC_EGENERIC;
@@ -366,7 +366,7 @@ static int Open( vlc_object_t * p_this )
         playlist_item_t *p_current, *p_item_in_category;
         int        i_count = MP4_BoxCount( p_rmra, "rmda" );
         int        i;
-        vlc_bool_t b_play = VLC_FALSE;
+        bool b_play = false;
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
@@ -374,7 +374,7 @@ static int Open( vlc_object_t * p_this )
         if( p_playlist )
         {
             b_play = FindItem( p_demux, p_playlist, &p_current );
-            p_item_in_category = playlist_ItemToNode( p_playlist, p_current, VLC_TRUE );
+            p_item_in_category = playlist_ItemToNode( p_playlist, p_current, true );
             p_current->p_input->i_type = ITEM_TYPE_PLAYLIST;
 
             for( i = 0; i < i_count; i++ )
@@ -430,7 +430,7 @@ static int Open( vlc_object_t * p_this )
                         playlist_BothAddInput( p_playlist, p_input,
                                                p_item_in_category,
                                                PLAYLIST_APPEND, PLAYLIST_END,
-                                               NULL, NULL, VLC_FALSE );
+                                               NULL, NULL, false );
                         vlc_gc_decref( p_input );
                     }
                 }
@@ -444,7 +444,7 @@ static int Open( vlc_object_t * p_this )
             if( b_play && p_item_in_category &&
                 p_item_in_category->i_children > 0 )
             {
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
                                   p_item_in_category, NULL );
             }
             vlc_object_release( p_playlist );
@@ -586,7 +586,7 @@ static int Demux( demux_t *p_demux )
          i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
-        vlc_bool_t b;
+        bool b;
 
         if( !tk->b_ok || tk->b_chapter ||
             ( tk->b_selected && tk->i_sample >= tk->i_sample_count ) )
@@ -1896,7 +1896,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
 static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
                                  unsigned int i_chunk, unsigned int i_sample )
 {
-    vlc_bool_t b_reselect = VLC_FALSE;
+    bool b_reselect = false;
 
     /* now see if actual es is ok */
     if( (p_track->i_chunk >= p_track->i_chunk_count - 1) ||
@@ -1918,8 +1918,8 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
             msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
                      p_track->i_track_ID );
 
-            p_track->b_ok       = VLC_FALSE;
-            p_track->b_selected = VLC_FALSE;
+            p_track->b_ok       = false;
+            p_track->b_selected = false;
             return VLC_EGENERIC;
         }
     }
@@ -1966,10 +1966,10 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     /* hint track unsupported */
 
     /* set default value (-> track unusable) */
-    p_track->b_ok       = VLC_FALSE;
-    p_track->b_enable   = VLC_FALSE;
-    p_track->b_selected = VLC_FALSE;
-    p_track->b_chapter  = VLC_FALSE;
+    p_track->b_ok       = false;
+    p_track->b_enable   = false;
+    p_track->b_selected = false;
+    p_track->b_chapter  = false;
 
     es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
 
@@ -2117,7 +2117,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         {
             if( p_track->i_track_ID == p_chap->i_track_ID[i] )
             {
-                p_track->b_chapter = VLC_TRUE;
+                p_track->b_chapter = true;
                 break;
             }
         }
@@ -2133,7 +2133,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                  p_track->i_track_ID );
         return;
     }
-    p_track->b_ok = VLC_TRUE;
+    p_track->b_ok = true;
 #if 0
     {
         int i;
@@ -2157,9 +2157,9 @@ static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
 {
     unsigned int i_chunk;
 
-    p_track->b_ok = VLC_FALSE;
-    p_track->b_enable   = VLC_FALSE;
-    p_track->b_selected = VLC_FALSE;
+    p_track->b_ok = false;
+    p_track->b_enable   = false;
+    p_track->b_selected = false;
 
     es_format_Clean( &p_track->fmt );
 
@@ -2216,10 +2216,10 @@ static void MP4_TrackUnselect( demux_t *p_demux, mp4_track_t *p_track )
     if( p_track->p_es )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE,
-                        p_track->p_es, VLC_FALSE );
+                        p_track->p_es, false );
     }
 
-    p_track->b_selected = VLC_FALSE;
+    p_track->b_selected = false;
 }
 
 static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
@@ -2231,7 +2231,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
     if( !p_track->b_ok || p_track->b_chapter )
         return VLC_EGENERIC;
 
-    p_track->b_selected = VLC_FALSE;
+    p_track->b_selected = false;
 
     if( TrackTimeToSampleChunk( p_demux, p_track, i_start,
                                 &i_chunk, &i_sample ) )
@@ -2241,12 +2241,12 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
         return VLC_EGENERIC;
     }
 
-    p_track->b_selected = VLC_TRUE;
+    p_track->b_selected = true;
 
     if( TrackGotoChunkSample( p_demux, p_track, i_chunk, i_sample ) ==
         VLC_SUCCESS )
     {
-        p_track->b_selected = VLC_TRUE;
+        p_track->b_selected = true;
 
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                         p_track->p_es, i_start );
@@ -2462,11 +2462,11 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
     }
 }
 
-static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
+static bool FindItem( demux_t *p_demux, playlist_t *p_playlist,
                             playlist_item_t **pp_item )
 {
     input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
+    bool b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
 
     *pp_item = NULL;
     if( p_input )
@@ -2476,18 +2476,18 @@ static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
         {
             msg_Dbg( p_playlist, "starting playlist playback" );
             *pp_item = p_playlist->status.p_item;
-            b_play = VLC_TRUE;
+            b_play = true;
         }
         else
         {
             input_item_t *p_current = input_GetItem( p_input );
 
-            *pp_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
+            *pp_item = playlist_ItemGetByInput( p_playlist, p_current, false );
             if( !*pp_item )
                 msg_Dbg( p_playlist, "unable to find item in playlist");
 
             msg_Dbg( p_playlist, "not starting playlist playback");
-            b_play = VLC_FALSE;
+            b_play = false;
         }
         vlc_object_release( p_input );
     }

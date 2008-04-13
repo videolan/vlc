@@ -71,7 +71,7 @@ struct decoder_sys_t
     /* Channel positions of the current stream (for re-ordering) */
     uint32_t pi_channel_positions[MAX_CHANNEL_POSITIONS];
 
-    vlc_bool_t b_sbr, b_ps;
+    bool b_sbr, b_ps;
 
     int i_input_rate;
 };
@@ -193,9 +193,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     /* Faad2 can't deal with truncated data (eg. from MPEG TS) */
-    p_dec->b_need_packetized = VLC_TRUE;
+    p_dec->b_need_packetized = true;
 
-    p_sys->b_sbr = p_sys->b_ps = VLC_FALSE;
+    p_sys->b_sbr = p_sys->b_ps = false;
     return VLC_SUCCESS;
 }
 

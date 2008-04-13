@@ -103,11 +103,11 @@ void VLMPanel::Update()
     unsigned int i;
     for( i = 0 ; i < broadcasts.size(); i++ )
     {
-        ((VLMBroadcastStreamPanel *)broadcasts[i])->b_found = VLC_FALSE;
+        ((VLMBroadcastStreamPanel *)broadcasts[i])->b_found = false;
     }
     for( i = 0 ; i < vods.size(); i++ )
     {
-        ((VLMVODStreamPanel *)vods[i])->b_found = VLC_FALSE;
+        ((VLMVODStreamPanel *)vods[i])->b_found = false;
     }
 
     p_vlm->LockVLM();
@@ -119,7 +119,7 @@ void VLMPanel::Update()
 
         if( p_media->i_type == BROADCAST_TYPE )
         {
-            vlc_bool_t b_foundthis = VLC_FALSE;
+            bool b_foundthis = false;
             for( unsigned int j = 0 ; j < broadcasts.size(); j++ )
             {
                 VLMBroadcastStreamPanel *p_streamp =
@@ -127,8 +127,8 @@ void VLMPanel::Update()
                 /* FIXME: dangerous .. */
                 if( p_streamp->GetStream()->p_media ==  p_media )
                 {
-                    p_streamp->b_found = VLC_TRUE;
-                    b_foundthis = VLC_TRUE;
+                    p_streamp->b_found = true;
+                    b_foundthis = true;
                     break;
                 }
             }
@@ -142,14 +142,14 @@ void VLMPanel::Update()
         }
         else if( p_media->i_type == VOD_TYPE )
         {
-            vlc_bool_t b_foundthis = VLC_FALSE;
+            bool b_foundthis = false;
             for( unsigned int j = 0 ; i < vods.size(); i++ )
             {
                 VLMVODStreamPanel *p_streamp = (VLMVODStreamPanel *)( vods[j] );
                 if(  p_streamp->GetStream()->p_media ==  p_media )
                 {
-                    p_streamp->b_found = VLC_TRUE;
-                    b_foundthis = VLC_TRUE;
+                    p_streamp->b_found = true;
+                    b_foundthis = true;
                     break;
                 }
             }
@@ -166,7 +166,7 @@ void VLMPanel::Update()
     vector<VLMBroadcastStreamPanel *>::iterator it = broadcasts.begin();
     while( it < broadcasts.end() )
     {
-        if( (*it)->b_found == VLC_FALSE )
+        if( (*it)->b_found == false )
         {
             vector<VLMBroadcastStreamPanel *>::iterator rem = it;
             it++;
@@ -181,7 +181,7 @@ void VLMPanel::Update()
     vector<VLMVODStreamPanel *>::iterator it2 = vods.begin();
     while( it2 < vods.end() )
     {
-        if( (*it2)->b_found == VLC_FALSE )
+        if( (*it2)->b_found == false )
         {
             vector<VLMVODStreamPanel *>::iterator rem = it2;
             it2++;
@@ -274,8 +274,8 @@ wxPanel * VLMPanel::BroadcastPanel( wxWindow *parent )
 
 wxPanel * VLMPanel::AddBroadcastPanel( wxPanel *panel )
 {
-     return new VLMAddStreamPanel( p_intf, panel, p_vlm, VLC_FALSE,
-                                   VLC_TRUE );
+     return new VLMAddStreamPanel( p_intf, panel, p_vlm, false,
+                                   true );
 }
 
 void VLMPanel::AppendBroadcast( VLMBroadcastStream *p_broadcast )
@@ -283,7 +283,7 @@ void VLMPanel::AppendBroadcast( VLMBroadcastStream *p_broadcast )
     VLMBroadcastStreamPanel *p_new =
                    new VLMBroadcastStreamPanel( p_intf, scrolled_broadcasts,
                                                 p_broadcast );
-    p_new->b_found = VLC_TRUE;
+    p_new->b_found = true;
     scrolled_broadcasts_sizer->Add( p_new, 0, wxEXPAND | wxALL, 5 );
     scrolled_broadcasts_sizer->Layout();
     scrolled_broadcasts->FitInside();
@@ -308,15 +308,15 @@ wxPanel * VLMPanel::VODPanel( wxWindow *parent )
 
 wxPanel * VLMPanel::AddVODPanel( wxPanel *panel )
 {
-     return new VLMAddStreamPanel( p_intf, panel, p_vlm, VLC_FALSE,
-                                   VLC_FALSE );
+     return new VLMAddStreamPanel( p_intf, panel, p_vlm, false,
+                                   false );
 }
 
 void VLMPanel::AppendVOD( VLMVODStream *p_vod )
 {
     VLMVODStreamPanel *p_new =
                    new VLMVODStreamPanel( p_intf, scrolled_vods, p_vod );
-    p_new->b_found = VLC_TRUE;
+    p_new->b_found = true;
     scrolled_vods_sizer->Add( p_new, 0, wxEXPAND | wxALL, 5 );
     scrolled_vods_sizer->Layout();
     scrolled_vods->FitInside();
@@ -350,7 +350,7 @@ END_EVENT_TABLE()
 
 VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
                 wxWindow *_p_parent, VLMWrapper *_p_vlm,
-                vlc_bool_t _b_edit, vlc_bool_t _b_broadcast ):
+                bool _b_edit, bool _b_broadcast ):
                 wxPanel( _p_parent, -1, wxDefaultPosition, wxDefaultSize )
 {
     p_intf = _p_intf;
@@ -448,26 +448,26 @@ void VLMAddStreamPanel::OnCreate( wxCommandEvent &event )
     if( b_broadcast && ! b_edit )
     {
         p_vlm->AddBroadcast( psz_name, psz_input, psz_output,
-                         enabled_checkbox->IsChecked() ? VLC_TRUE: VLC_FALSE,
-                         loop_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE );
+                         enabled_checkbox->IsChecked() ? true: false,
+                         loop_checkbox->IsChecked() ? true : false );
     }
     else if( b_broadcast && b_edit )
     {
         p_vlm->EditBroadcast( psz_name, psz_input, psz_output,
-                        enabled_checkbox->IsChecked() ? VLC_TRUE: VLC_FALSE,
-                        loop_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE );
+                        enabled_checkbox->IsChecked() ? true: false,
+                        loop_checkbox->IsChecked() ? true : false );
     }
     else if( !b_broadcast && !b_edit )
     {
         p_vlm->AddVod( psz_name, psz_input, psz_output,
-                       enabled_checkbox->IsChecked() ? VLC_TRUE: VLC_FALSE,
-                       loop_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE );
+                       enabled_checkbox->IsChecked() ? true: false,
+                       loop_checkbox->IsChecked() ? true : false );
     }
     else
     {
         p_vlm->EditVod( psz_name, psz_input, psz_output,
-                        enabled_checkbox->IsChecked() ? VLC_TRUE: VLC_FALSE,
-                        loop_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE );
+                        enabled_checkbox->IsChecked() ? true: false,
+                        loop_checkbox->IsChecked() ? true : false );
     }
     wxLocaleFree( psz_name) ; wxLocaleFree( psz_input ) ;
     wxLocaleFree( psz_output);
@@ -556,7 +556,7 @@ VLMFrame::~VLMFrame()
  * VLM Add stream Frame implementation
  ****************************************************************************/
 VLMEditStreamFrame::VLMEditStreamFrame( intf_thread_t *_p_intf,
-            wxWindow *_p_parent, VLMWrapper *_p_vlm, vlc_bool_t _b_broadcast,
+            wxWindow *_p_parent, VLMWrapper *_p_vlm, bool _b_broadcast,
             VLMStream *p_stream ) :
         wxFrame( _p_parent, -1, wxU( _("VLM stream") ),
         wxDefaultPosition, wxSize( 640,480 ), wxDEFAULT_FRAME_STYLE )
@@ -565,7 +565,7 @@ VLMEditStreamFrame::VLMEditStreamFrame( intf_thread_t *_p_intf,
 
     wxBoxSizer *main_sizer = new wxBoxSizer( wxHORIZONTAL );
     vlm_panel = new VLMAddStreamPanel( _p_intf, this, _p_vlm ,
-                                       VLC_TRUE, _b_broadcast );
+                                       true, _b_broadcast );
 
     vlm_panel->Load( p_stream );
 

@@ -148,7 +148,7 @@ static void Play( void * _p_aout, void * _p_buffer, size_t i_size,
 
     p_aout_buffer = aout_OutputNextBuffer( p_aout,
                                            mdate() + p_sys->latency,
-                                           VLC_FALSE );
+                                           false );
 
     if( p_aout_buffer != NULL )
     {

@@ -79,7 +79,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_string( CFG_PREFIX "type", "90", NULL,
-                          TYPE_TEXT, TYPE_LONGTEXT, VLC_FALSE);
+                          TYPE_TEXT, TYPE_LONGTEXT, false);
         change_string_list( type_list, type_list_text, 0);
 
     add_shortcut( "transform" );
@@ -99,7 +99,7 @@ static const char *ppsz_filter_options[] = {
 struct vout_sys_t
 {
     int i_mode;
-    vlc_bool_t b_rotation;
+    bool b_rotation;
     vout_thread_t *p_vout;
 
     void (*pf_filter)( vout_thread_t *, const picture_t *, picture_t * );

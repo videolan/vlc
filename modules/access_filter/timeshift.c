@@ -70,11 +70,11 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_integer( "timeshift-granularity", 50, NULL, GRANULARITY_TEXT,
-                 GRANULARITY_LONGTEXT, VLC_TRUE );
-    add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, VLC_FALSE );
+                 GRANULARITY_LONGTEXT, true );
+    add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, false );
         change_unsafe();
-    add_bool( "timeshift-force", VLC_FALSE, NULL, FORCE_TEXT, FORCE_LONGTEXT,
-              VLC_FALSE );
+    add_bool( "timeshift-force", false, NULL, FORCE_TEXT, FORCE_LONGTEXT,
+              false );
 vlc_module_end();
 
 /*****************************************************************************
@@ -127,7 +127,7 @@ static int Open( vlc_object_t *p_this )
     access_t *p_access = (access_t*)p_this;
     access_t *p_src = p_access->p_source;
     access_sys_t *p_sys;
-    vlc_bool_t b_bool;
+    bool b_bool;
 
     var_Create( p_access, "timeshift-force", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     if( var_GetBool( p_access, "timeshift-force" ) )
@@ -183,7 +183,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_filename = malloc( strlen( p_sys->psz_filename_base ) + 1000 );
 
     if( vlc_thread_create( p_access, "timeshift thread", Thread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_access, "cannot spawn timeshift access thread" );
         return VLC_EGENERIC;
@@ -347,7 +347,7 @@ static void Thread( access_t *p_access )
     }
 
     msg_Dbg( p_access, "timeshift: EOF" );
-    p_src->info.b_eof = VLC_TRUE;
+    p_src->info.b_eof = true;
 
     /* Send dummy packet to avoid deadlock in Block() */
     block_FifoPut( p_sys->p_fifo, block_New( p_access, 0 ) );
@@ -523,21 +523,21 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
 
     switch( i_query )
     {
     case ACCESS_CAN_SEEK:
     case ACCESS_CAN_FASTSEEK:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         break;
 
     case ACCESS_CAN_CONTROL_PACE:   /* Not really true */
     case ACCESS_CAN_PAUSE:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         break;
 
     case ACCESS_GET_MTU:

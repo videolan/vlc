@@ -534,10 +534,10 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     vlc_cond_t   object_wait;                                               \
                                                                             \
     /* Object properties */                                                 \
-    volatile vlc_bool_t b_error;                  /**< set by the object */ \
-    volatile vlc_bool_t b_die;                   /**< set by the outside */ \
-    volatile vlc_bool_t b_dead;                   /**< set by the object */ \
-    vlc_bool_t b_force;      /**< set by the outside (eg. module_Need()) */ \
+    volatile bool b_error;                  /**< set by the object */ \
+    volatile bool b_die;                   /**< set by the outside */ \
+    volatile bool b_dead;                   /**< set by the object */ \
+    bool b_force;      /**< set by the outside (eg. module_Need()) */ \
                                                                             \
     /* Stuff related to the libvlc structure */                             \
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
@@ -977,7 +977,7 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #   include <tchar.h>
 #endif
 
-VLC_EXPORT( vlc_bool_t, vlc_ureduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t ) );
+VLC_EXPORT( bool, vlc_ureduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t ) );
 VLC_EXPORT( char **, vlc_parse_cmdline, ( const char *, int * ) );
 
 /* vlc_wraptext (defined in src/extras/libc.c) */

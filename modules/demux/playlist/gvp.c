@@ -77,7 +77,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_GVP)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    int i_peek, i, b_found = VLC_FALSE;
+    int i_peek, i, b_found = false;
     const byte_t *p_peek;
 
     i_peek = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
@@ -87,7 +87,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
         if( p_peek[i] == 'g' && p_peek[i+1] == 'v' && p_peek[i+2] == 'p' &&
             !memcmp( p_peek+i, "gvp_version:", sizeof("gvp_version:") - 1 ) )
         {
-            b_found = VLC_TRUE;
+            b_found = true;
             break;
         }
     }

@@ -69,8 +69,8 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                        ATSUStyle *pp_styles );
 static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size,
                               uint32_t i_font_color,
-                              vlc_bool_t b_bold, vlc_bool_t b_italic,
-                              vlc_bool_t b_uline );
+                              bool b_bold, bool b_italic,
+                              bool b_uline );
 //////////////////////////////////////////////////////////////////////////////
 // Module descriptor
 //////////////////////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         ATSUStyle p_style = CreateStyle( p_sys->psz_font_name, i_font_size,
                                          (i_font_color & 0xffffff) |
                                          ((i_font_alpha & 0xff) << 24),
-                                         VLC_FALSE, VLC_FALSE, VLC_FALSE );
+                                         false, false, false );
         if( p_style )
         {
             RenderYUVA( p_filter, p_region_out, psz_utf16_str, i_string_length,
@@ -410,7 +410,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
 
 static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size, uint32_t i_font_color,
-                              vlc_bool_t b_bold, vlc_bool_t b_italic, vlc_bool_t b_uline )
+                              bool b_bold, bool b_italic, bool b_uline )
 {
     ATSUStyle   p_style;
     OSStatus    status;
@@ -548,8 +548,8 @@ static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
 }
 
 static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys,
-        font_stack_t **p_fonts, vlc_bool_t b_bold, vlc_bool_t b_italic,
-        vlc_bool_t b_uline )
+        font_stack_t **p_fonts, bool b_bold, bool b_italic,
+        bool b_uline )
 {
     ATSUStyle   p_style = NULL;
 
@@ -661,9 +661,9 @@ static int ProcessNodes( filter_t *p_filter,
 
     char *psz_node  = NULL;
 
-    vlc_bool_t b_italic = VLC_FALSE;
-    vlc_bool_t b_bold   = VLC_FALSE;
-    vlc_bool_t b_uline  = VLC_FALSE;
+    bool b_italic = false;
+    bool b_bold   = false;
+    bool b_uline  = false;
 
     if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
         i_scale = val.i_int;
@@ -677,11 +677,11 @@ static int ProcessNodes( filter_t *p_filter,
                    ((p_font_style->i_font_alpha & 0xff) << 24) );
 
         if( p_font_style->i_style_flags & STYLE_BOLD )
-            b_bold = VLC_TRUE;
+            b_bold = true;
         if( p_font_style->i_style_flags & STYLE_ITALIC )
-            b_italic = VLC_TRUE;
+            b_italic = true;
         if( p_font_style->i_style_flags & STYLE_UNDERLINE )
-            b_uline = VLC_TRUE;
+            b_uline = true;
     }
     else
     {
@@ -707,11 +707,11 @@ static int ProcessNodes( filter_t *p_filter,
                     if( !strcasecmp( "font", psz_node ) )
                         PopFont( &p_fonts );
                     else if( !strcasecmp( "b", psz_node ) )
-                        b_bold   = VLC_FALSE;
+                        b_bold   = false;
                     else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = VLC_FALSE;
+                        b_italic = false;
                     else if( !strcasecmp( "u", psz_node ) )
-                        b_uline  = VLC_FALSE;
+                        b_uline  = false;
 
                     free( psz_node );
                 }
@@ -723,11 +723,11 @@ static int ProcessNodes( filter_t *p_filter,
                     if( !strcasecmp( "font", psz_node ) )
                         rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
                     else if( !strcasecmp( "b", psz_node ) )
-                        b_bold = VLC_TRUE;
+                        b_bold = true;
                     else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = VLC_TRUE;
+                        b_italic = true;
                     else if( !strcasecmp( "u", psz_node ) )
-                        b_uline = VLC_TRUE;
+                        b_uline = true;
                     else if( !strcasecmp( "br", psz_node ) )
                     {
                         uint32_t i_string_length;
@@ -824,13 +824,13 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
                               (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
-                              VLC_TRUE );
+                              true );
     if( p_sub )
     {
         p_xml = xml_Create( p_filter );
         if( p_xml )
         {
-            vlc_bool_t b_karaoke = VLC_FALSE;
+            bool b_karaoke = false;
 
             p_xml_reader = xml_ReaderCreate( p_xml, p_sub );
             if( p_xml_reader )
@@ -845,12 +845,12 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                         /* We're going to have to render the text a number
                          * of times to show the progress marker on the text.
                          */
-                        var_SetBool( p_filter, "text-rerender", VLC_TRUE );
-                        b_karaoke = VLC_TRUE;
+                        var_SetBool( p_filter, "text-rerender", true );
+                        b_karaoke = true;
                     }
                     else if( !strcasecmp( "text", psz_node ) )
                     {
-                        b_karaoke = VLC_FALSE;
+                        b_karaoke = false;
                     }
                     else
                     {

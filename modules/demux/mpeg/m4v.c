@@ -51,7 +51,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "m4v" );
     add_shortcut( "mp4v" );
-    add_float( "m4v-fps", 25, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
+    add_float( "m4v-fps", 25, NULL, FPS_TEXT, FPS_LONGTEXT, false );
 vlc_module_end();
 
 /*****************************************************************************
@@ -157,7 +157,7 @@ static int Demux( demux_t *p_demux)
 
             if( p_sys->p_es == NULL )
             {
-                p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                p_sys->p_packetizer->fmt_out.b_packetized = true;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 

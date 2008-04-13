@@ -138,7 +138,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     if( p_child_window ) p_child_window->Show();
     Show();
-    b_shown = VLC_TRUE;
+    b_shown = true;
 
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
 #if (wxCHECK_VERSION(2,5,3))
@@ -281,7 +281,7 @@ void VideoWindow::UpdateSize( wxEvent &_event )
         p_intf->p_sys->p_video_sizer->Show( this, TRUE );
         p_intf->p_sys->p_video_sizer->Layout();
         SetFocus();
-        b_shown = VLC_TRUE;
+        b_shown = true;
     }
 
     p_intf->p_sys->p_video_sizer->SetMinSize( event->GetSize() );
@@ -303,7 +303,7 @@ void VideoWindow::OnHideTimer( wxTimerEvent& WXUNUSED(event))
         p_intf->p_sys->p_video_sizer->Show( this, FALSE );
         SetSize( 0, 0 );
         p_intf->p_sys->p_video_sizer->Layout();
-        b_shown = VLC_FALSE;
+        b_shown = false;
     }
     p_intf->p_sys->p_video_sizer->SetMinSize( wxSize(0,0) );
 

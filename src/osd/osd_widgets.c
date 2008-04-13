@@ -203,8 +203,8 @@ subpicture_t *osd_CreateWidget( spu_t *p_spu, int i_channel )
     p_subpic->i_channel = i_channel;
     p_subpic->i_start = i_now;
     p_subpic->i_stop = i_now + 1200000;
-    p_subpic->b_ephemer = VLC_TRUE;
-    p_subpic->b_fade = VLC_TRUE;
+    p_subpic->b_ephemer = true;
+    p_subpic->b_fade = true;
 
     return p_subpic;
 }

@@ -89,7 +89,7 @@ static int Init( vout_thread_t *p_vout )
     int i_index, i_chroma;
     char *psz_chroma;
     picture_t *p_pic;
-    vlc_bool_t b_chroma = 0;
+    bool b_chroma = 0;
 
     psz_chroma = config_GetPsz( p_vout, "dummy-chroma" );
     if( psz_chroma )

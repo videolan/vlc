@@ -54,7 +54,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
 
     set_capability( "access2", 10 );
     set_callbacks( Open, Close );
@@ -229,7 +229,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
-                           VLC_THREAD_PRIORITY_INPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_INPUT, false ) )
     {
         msg_Err( p_access, "cannot spawn rtmp control thread" );
         vlc_UrlClean( &p_sys->url );
@@ -331,7 +331,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     if( p_sys->fd < 0 )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
         return 0;
     }
 
@@ -351,7 +351,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             {
                 if( p_sys->active && block_FifoCount( p_sys->p_thread->p_fifo_media ) == 0 )
                 {
-                    p_access->info.b_eof = VLC_TRUE;
+                    p_access->info.b_eof = true;
                     break;
                 }
 
@@ -436,7 +436,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -445,18 +445,18 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE; /* TODO */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false; /* TODO */
             break;
 
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE; /* TODO */
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false; /* TODO */
             break;
 
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             break;
 
         /* */

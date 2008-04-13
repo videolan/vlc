@@ -683,7 +683,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #if defined (HAVE_GETADDRINFO)
 # ifdef AI_IDN
     /* Run-time I18n Domain Names support */
-    static vlc_bool_t b_idn = VLC_TRUE; /* beware of thread-safety */
+    static bool b_idn = true; /* beware of thread-safety */
 
     if (b_idn)
     {
@@ -695,7 +695,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
         /* IDN not available: disable and retry without it */
         hints.ai_flags &= ~AI_IDN;
-        b_idn = VLC_FALSE;
+        b_idn = false;
         msg_Info (p_this, "International Domain Names not supported");
     }
 # endif

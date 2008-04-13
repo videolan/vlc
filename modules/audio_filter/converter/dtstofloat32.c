@@ -69,9 +69,9 @@ static const uint32_t pi_channels_out[] =
 struct filter_sys_t
 {
     dca_state_t * p_libdca; /* libdca internal structure */
-    vlc_bool_t b_dynrng; /* see below */
+    bool b_dynrng; /* see below */
     int i_flags; /* libdca flags, see dtsdec/doc/libdts.txt */
-    vlc_bool_t b_dontwarn;
+    bool b_dontwarn;
     int i_nb_channels; /* number of float32 per sample */
 
     int pi_chan_table[AOUT_CHAN_MAX]; /* channel reordering */
@@ -93,7 +93,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACODEC );
     set_shortname( "DCA" );
     set_description( _("DTS Coherent Acoustics audio decoder") );
-    add_bool( "dts-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, VLC_FALSE );
+    add_bool( "dts-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, false );
     set_capability( "audio filter", 100 );
     set_callbacks( Create, Destroy );
 

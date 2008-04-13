@@ -33,8 +33,8 @@ struct intf_sys_t
   input_thread_t *p_input;
   vcdplayer_t    *p_vcdplayer;
 
-  vlc_bool_t      b_still;           /* True if we are in a still frame */
-  vlc_bool_t      b_infinite_still;  /* True if still wait time is infinite */
+  bool      b_still;           /* True if we are in a still frame */
+  bool      b_infinite_still;  /* True if still wait time is infinite */
   mtime_t         m_still_time;      /* Time in microseconds remaining
                                          to wait in still frame.
                      */
@@ -43,7 +43,7 @@ struct intf_sys_t
 #else
   int                 control;
 #endif
-  vlc_bool_t          b_click, b_move, b_key_pressed;
+  bool          b_click, b_move, b_key_pressed;
 };
 
 int vcdIntfStillTime( struct intf_thread_t * p_intf, uint8_t wait_time);

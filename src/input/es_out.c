@@ -56,7 +56,7 @@ typedef struct
     /* Number of es for this pgrm */
     int i_es;
 
-    vlc_bool_t b_selected;
+    bool b_selected;
 
     /* Clock for this program */
     input_clock_t clock;
@@ -86,7 +86,7 @@ struct es_out_id_t
     decoder_t   *p_dec;
 
     /* Fields for Video with CC */
-    vlc_bool_t  pb_cc_present[4];
+    bool  pb_cc_present[4];
     es_out_id_t  *pp_cc_es[4];
 
     /* Field for CC track from a master video */
@@ -109,7 +109,7 @@ struct es_out_sys_t
     es_out_id_t **es;
 
     /* mode gestion */
-    vlc_bool_t  b_active;
+    bool  b_active;
     int         i_mode;
 
     /* es count */
@@ -140,14 +140,14 @@ struct es_out_sys_t
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
-static void         EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force );
+static void         EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
 
 static void         EsOutAddInfo( es_out_t *, es_out_id_t *es );
 
-static vlc_bool_t EsIsSelected( es_out_id_t *es );
+static bool EsIsSelected( es_out_id_t *es );
 static void EsSelect( es_out_t *out, es_out_id_t *es );
-static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update );
+static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update );
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
 static char **LanguageSplit( const char *psz_langs );
@@ -188,11 +188,11 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     out->pf_del     = EsOutDel;
     out->pf_control = EsOutControl;
     out->p_sys      = p_sys;
-    out->b_sout     = (p_input->p->p_sout != NULL ? VLC_TRUE : VLC_FALSE);
+    out->b_sout     = (p_input->p->p_sout != NULL ? true : false);
 
     p_sys->p_input = p_input;
 
-    p_sys->b_active = VLC_FALSE;
+    p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_AUTO;
 
 
@@ -332,7 +332,7 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
     return NULL;
 }
 
-static void EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_flush, vlc_bool_t b_audio )
+static void EsOutDiscontinuity( es_out_t *out, bool b_flush, bool b_audio )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
@@ -353,7 +353,7 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
     int i;
 
     p_sys->i_rate = i_rate;
-    EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
+    EsOutDiscontinuity( out, false, false );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
         input_ClockSetRate( &p_sys->pgrm[i]->clock, i_rate );
@@ -377,7 +377,7 @@ void input_EsOutChangeState( es_out_t *out )
     {
         /* Send discontinuity to decoders (it will allow them to flush
          *                  * if implemented */
-        EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
+        EsOutDiscontinuity( out, false, false );
     }
     else
     {
@@ -390,10 +390,10 @@ void input_EsOutChangePosition( es_out_t *out )
     //es_out_sys_t *p_sys = out->p_sys;
 
     es_out_Control( out, ES_OUT_RESET_PCR );
-    EsOutDiscontinuity( out, VLC_TRUE, VLC_FALSE );
+    EsOutDiscontinuity( out, true, false );
 }
 
-vlc_bool_t input_EsOutDecodersEmpty( es_out_t *out )
+bool input_EsOutDecodersEmpty( es_out_t *out )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
@@ -403,16 +403,16 @@ vlc_bool_t input_EsOutDecodersEmpty( es_out_t *out )
         es_out_id_t *es = p_sys->es[i];
 
         if( es->p_dec && !input_DecoderEmpty( es->p_dec ) )
-            return VLC_FALSE;
+            return false;
     }
-    return VLC_TRUE;
+    return true;
 }
 
 /*****************************************************************************
  *
  *****************************************************************************/
 static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, const char *psz_language,
-                                     vlc_bool_t b_delete )
+                                     bool b_delete )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
@@ -433,7 +433,7 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
     {
         val.i_int = i_id;
         var_Change( p_input, psz_var, VLC_VAR_DELCHOICE, &val, NULL );
-        var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+        var_SetBool( p_sys->p_input, "intf-change", true );
         return;
     }
 
@@ -484,11 +484,11 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
 
     free( text.psz_string );
 
-    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+    var_SetBool( p_sys->p_input, "intf-change", true );
 }
 
 static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
-                              vlc_bool_t b_delete )
+                              bool b_delete )
 {
     EsOutESVarUpdateGeneric( out, es->i_id, &es->fmt, es->psz_language, b_delete );
 }
@@ -515,7 +515,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
         {
             if( p_sys->es[i]->p_pgrm == old && EsIsSelected( p_sys->es[i] ) &&
                 p_sys->i_mode != ES_OUT_MODE_ALL )
-                EsUnselect( out, p_sys->es[i], VLC_TRUE );
+                EsUnselect( out, p_sys->es[i], true );
         }
 
         p_sys->p_es_audio = NULL;
@@ -526,14 +526,14 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     msg_Dbg( p_input, "selecting program id=%d", p_pgrm->i_id );
 
     /* Mark it selected */
-    p_pgrm->b_selected = VLC_TRUE;
+    p_pgrm->b_selected = true;
 
     /* Switch master stream */
     if( p_sys->p_pgrm && p_sys->p_pgrm->clock.b_master )
     {
-        p_sys->p_pgrm->clock.b_master = VLC_FALSE;
+        p_sys->p_pgrm->clock.b_master = false;
     }
-    p_pgrm->clock.b_master = VLC_TRUE;
+    p_pgrm->clock.b_master = true;
     p_sys->p_pgrm = p_pgrm;
 
     /* Update "program" */
@@ -547,8 +547,8 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     for( i = 0; i < p_sys->i_es; i++ )
     {
         if( p_sys->es[i]->p_pgrm == p_sys->p_pgrm )
-            EsOutESVarUpdate( out, p_sys->es[i], VLC_FALSE );
-        EsOutSelect( out, p_sys->es[i], VLC_FALSE );
+            EsOutESVarUpdate( out, p_sys->es[i], false );
+        EsOutSelect( out, p_sys->es[i], false );
     }
 
     /* Update now playing */
@@ -557,7 +557,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     input_item_SetPublisher( p_input->p->input.p_item,
                              p_pgrm->psz_publisher );
 
-    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+    var_SetBool( p_sys->p_input, "intf-change", true );
 }
 
 /* EsOutAddProgram:
@@ -574,12 +574,12 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     /* Init */
     p_pgrm->i_id = i_group;
     p_pgrm->i_es = 0;
-    p_pgrm->b_selected = VLC_FALSE;
+    p_pgrm->b_selected = false;
     p_pgrm->psz_name = NULL;
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    input_ClockInit( &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average, p_sys->i_rate );
+    input_ClockInit( &p_pgrm->clock, false, p_input->p->input.i_cr_average, p_sys->i_rate );
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -594,7 +594,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     }
     else
     {
-        var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+        var_SetBool( p_sys->p_input, "intf-change", true );
     }
     return p_pgrm;
 }
@@ -645,7 +645,7 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     val.i_int = i_group;
     var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
 
-    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+    var_SetBool( p_sys->p_input, "intf-change", true );
 
     return VLC_SUCCESS;
 }
@@ -760,14 +760,14 @@ static void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
     for( i = 0; i < p_src->i_event; i++ )
     {
         vlc_epg_event_t *p_evt = p_src->pp_event[i];
-        vlc_bool_t b_add = VLC_TRUE;
+        bool b_add = true;
         int j;
 
         for( j = 0; j < p_dst->i_event; j++ )
         {
             if( p_dst->pp_event[j]->i_start == p_evt->i_start && p_dst->pp_event[j]->i_duration == p_evt->i_duration )
             {
-                b_add = VLC_FALSE;
+                b_add = false;
                 break;
             }
             if( p_dst->pp_event[j]->i_start > p_evt->i_start )
@@ -971,14 +971,14 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es->psz_language_code = LanguageGetCode( fmt->psz_language );
     es->p_dec = NULL;
     for( i = 0; i < 4; i++ )
-        es->pb_cc_present[i] = VLC_FALSE;
-    es->p_master = VLC_FALSE;
+        es->pb_cc_present[i] = false;
+    es->p_master = false;
 
     if( es->p_pgrm == p_sys->p_pgrm )
-        EsOutESVarUpdate( out, es, VLC_FALSE );
+        EsOutESVarUpdate( out, es, false );
 
     /* Select it if needed */
-    EsOutSelect( out, es, VLC_FALSE );
+    EsOutSelect( out, es, false );
 
 
     TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
@@ -1001,11 +1001,11 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     return es;
 }
 
-static vlc_bool_t EsIsSelected( es_out_id_t *es )
+static bool EsIsSelected( es_out_id_t *es )
 {
     if( es->p_master )
     {
-        vlc_bool_t b_decode = VLC_FALSE;
+        bool b_decode = false;
         if( es->p_master->p_dec )
         {
             int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
@@ -1039,7 +1039,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
             return;
 
         i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
-        if( i_channel == -1 || input_DecoderSetCcState( es->p_master->p_dec, VLC_TRUE, i_channel ) )
+        if( i_channel == -1 || input_DecoderSetCcState( es->p_master->p_dec, true, i_channel ) )
             return;
     }
     else
@@ -1078,7 +1078,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         }
 
         es->i_preroll_end = -1;
-        es->p_dec = input_DecoderNew( p_input, &es->fmt, VLC_FALSE );
+        es->p_dec = input_DecoderNew( p_input, &es->fmt, false );
         if( es->p_dec == NULL || es->p_pgrm != p_sys->p_pgrm )
             return;
     }
@@ -1096,10 +1096,10 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     val.i_int = es->i_id;
     var_Change( p_input, psz_var, VLC_VAR_SETVALUE, &val, NULL );
 
-    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+    var_SetBool( p_sys->p_input, "intf-change", true );
 }
 
-static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
+static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
 {
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
@@ -1118,7 +1118,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
         {
             int i_channel = EsOutGetClosedCaptionsChannel( es->fmt.i_codec );
             if( i_channel != -1 )
-                input_DecoderSetCcState( es->p_master->p_dec, VLC_FALSE, i_channel );
+                input_DecoderSetCcState( es->p_master->p_dec, false, i_channel );
         }
     }
     else
@@ -1136,11 +1136,11 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
                 val.i_int = -1;
                 var_Change( p_input, "spu-es", VLC_VAR_SETVALUE, &val, NULL );
                 if( !b_update )
-                    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+                    var_SetBool( p_sys->p_input, "intf-change", true );
             }
             EsOutDel( out, es->pp_cc_es[i] );
 
-            es->pb_cc_present[i] = VLC_FALSE;
+            es->pb_cc_present[i] = false;
         }
         input_DecoderDelete( es->p_dec );
         es->p_dec = NULL;
@@ -1165,7 +1165,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
     val.i_int = -1;
     var_Change( p_input, psz_var, VLC_VAR_SETVALUE, &val, NULL );
 
-    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+    var_SetBool( p_sys->p_input, "intf-change", true );
 }
 
 /**
@@ -1177,7 +1177,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update )
  * \param b_force ...
  * \return nothing
  */
-static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
+static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 {
     es_out_sys_t      *p_sys = out->p_sys;
 
@@ -1318,7 +1318,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
                 p_sys->p_es_audio != es &&
                 EsIsSelected( p_sys->p_es_audio ) )
             {
-                EsUnselect( out, p_sys->p_es_audio, VLC_FALSE );
+                EsUnselect( out, p_sys->p_es_audio, false );
             }
             p_sys->p_es_audio = es;
         }
@@ -1329,7 +1329,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
                 p_sys->p_es_sub != es &&
                 EsIsSelected( p_sys->p_es_sub ) )
             {
-                EsUnselect( out, p_sys->p_es_sub, VLC_FALSE );
+                EsUnselect( out, p_sys->p_es_sub, false );
             }
             p_sys->p_es_sub = es;
         }
@@ -1425,8 +1425,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
           ( p_sys->i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
             p_sys->i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE ) ) )
     {
-        vlc_bool_t pb_cc[4];
-        vlc_bool_t b_cc_new = VLC_FALSE;
+        bool pb_cc[4];
+        bool b_cc_new = false;
         int i;
         input_DecoderDecode( es->p_dec, p_block );
 
@@ -1460,11 +1460,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             es_format_Clean( &fmt );
 
             /* */
-            es->pb_cc_present[i] = VLC_TRUE;
-            b_cc_new = VLC_TRUE;
+            es->pb_cc_present[i] = true;
+            b_cc_new = true;
         }
         if( b_cc_new )
-            var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+            var_SetBool( p_sys->p_input, "intf-change", true );
     }
     else
     {
@@ -1480,7 +1480,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 static void EsOutDel( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t *p_sys = out->p_sys;
-    vlc_bool_t b_reselect = VLC_FALSE;
+    bool b_reselect = false;
     int i;
 
     /* We don't try to reselect */
@@ -1496,7 +1496,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     }
 
     if( es->p_pgrm == p_sys->p_pgrm )
-        EsOutESVarUpdate( out, es, VLC_TRUE );
+        EsOutESVarUpdate( out, es, true );
 
     TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
@@ -1507,7 +1507,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     }
 
     if( p_sys->p_es_audio == es || p_sys->p_es_video == es ||
-        p_sys->p_es_sub == es ) b_reselect = VLC_TRUE;
+        p_sys->p_es_sub == es ) b_reselect = true;
 
     if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
     if( p_sys->p_es_video == es ) p_sys->p_es_video = NULL;
@@ -1531,7 +1531,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
         for( i = 0; i < p_sys->i_es; i++ )
         {
             if( es->fmt.i_cat == p_sys->es[i]->fmt.i_cat )
-                EsOutSelect( out, p_sys->es[i], VLC_FALSE );
+                EsOutSelect( out, p_sys->es[i], false );
         }
 
     free( es->psz_language );
@@ -1553,7 +1553,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;
-    vlc_bool_t  b, *pb;
+    bool  b, *pb;
     int         i, *pi;
 
     es_out_id_t *es;
@@ -1577,7 +1577,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_GET_ES_STATE:
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
+            pb = (bool*) va_arg( args, bool * );
 
             *pb = EsIsSelected( es );
             return VLC_SUCCESS;
@@ -1588,12 +1588,12 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             p_sys->b_active = b;
             /* Needed ? */
             if( b )
-                var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+                var_SetBool( p_sys->p_input, "intf-change", true );
             return VLC_SUCCESS;
         }
 
         case ES_OUT_GET_ACTIVE:
-            pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
+            pb = (bool*) va_arg( args, bool * );
             *pb = p_sys->b_active;
             return VLC_SUCCESS;
 
@@ -1615,7 +1615,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 }
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
-                    EsOutSelect( out, p_sys->es[i], VLC_FALSE );
+                    EsOutSelect( out, p_sys->es[i], false );
                 }
                 return VLC_SUCCESS;
             }
@@ -1674,7 +1674,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 {
                     if( es == p_sys->es[i] )
                     {
-                        EsOutSelect( out, es, VLC_TRUE );
+                        EsOutSelect( out, es, true );
                         break;
                     }
                 }
@@ -1823,7 +1823,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 #if 1
                 input_DecoderDelete( es->p_dec );
                 es->p_dec = input_DecoderNew( p_sys->p_input,
-                                              &es->fmt, VLC_FALSE );
+                                              &es->fmt, false );
 
 #else
                 es->p_dec->fmt_in.i_extra = p_fmt->i_extra;

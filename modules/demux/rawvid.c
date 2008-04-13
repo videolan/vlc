@@ -67,13 +67,13 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
     add_shortcut( "rawvideo" );
-    add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
+    add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, false );
     add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 );
     add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 );
     add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "rawvid-aspect-ratio", NULL, NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true );
 vlc_module_end();
 
 /*****************************************************************************
@@ -89,7 +89,7 @@ struct demux_sys_t
 
     mtime_t i_pcr;
 
-    vlc_bool_t b_y4m;
+    bool b_y4m;
 };
 
 /*****************************************************************************
@@ -134,16 +134,16 @@ static int Open( vlc_object_t * p_this )
     unsigned int i_aspect = 0;
     struct preset_t *p_preset = NULL;
     const uint8_t *p_peek;
-    vlc_bool_t b_valid = VLC_FALSE;
-    vlc_bool_t b_y4m = VLC_FALSE;
+    bool b_valid = false;
+    bool b_y4m = false;
 
     if( stream_Peek( p_demux->s, &p_peek, 9 ) == 9 )
     {
         /* http://wiki.multimedia.cx/index.php?title=YUV4MPEG2 */
         if( !strncmp( (char *)p_peek, "YUV4MPEG2", 9 ) )
         {
-            b_valid = VLC_TRUE;
-            b_y4m = VLC_TRUE;
+            b_valid = true;
+            b_y4m = true;
         }
     }
 
@@ -154,7 +154,7 @@ static int Open( vlc_object_t * p_this )
         for( p_preset = p_presets; *p_preset->psz_ext; p_preset++ )
             if( !strcasecmp( psz_ext, p_preset->psz_ext ) )
             {
-                b_valid = VLC_TRUE;
+                b_valid = true;
                 break;
             }
     }

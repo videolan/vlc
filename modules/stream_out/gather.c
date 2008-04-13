@@ -55,7 +55,7 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 struct sout_stream_id_t
 {
-    vlc_bool_t    b_used;
+    bool    b_used;
 
     es_format_t fmt;
     void          *id;
@@ -156,7 +156,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         /* */
         msg_Dbg( p_stream, "reusing already opened output" );
-        id->b_used = VLC_TRUE;
+        id->b_used = true;
         return id;
     }
 
@@ -181,7 +181,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( id == NULL )
         return NULL;
     es_format_Copy( &id->fmt, p_fmt );
-    id->b_used           = VLC_TRUE;
+    id->b_used           = true;
     id->id               = sout_StreamIdAdd( p_sys->p_out, &id->fmt );
     if( id->id == NULL )
     {
@@ -199,7 +199,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     VLC_UNUSED(p_stream);
-    id->b_used = VLC_FALSE;
+    id->b_used = false;
     return VLC_SUCCESS;
 }
 

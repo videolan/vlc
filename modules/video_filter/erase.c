@@ -68,9 +68,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_file( CFG_PREFIX "mask", NULL, NULL,
-              MASK_TEXT, MASK_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+              MASK_TEXT, MASK_LONGTEXT, false );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, false );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, false );
 
     add_shortcut( "erase" );
     set_callbacks( Create, Destroy );
@@ -259,7 +259,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         int i_height = i_mask_visible_lines;
         int i_width  = i_mask_visible_pitch;
 
-        const vlc_bool_t b_line_factor = ( i_plane /* U_PLANE or V_PLANE */ &&
+        const bool b_line_factor = ( i_plane /* U_PLANE or V_PLANE */ &&
             !( p_inpic->format.i_chroma == VLC_FOURCC('I','4','2','2')
             || p_inpic->format.i_chroma == VLC_FOURCC('J','4','2','2') ) );
 

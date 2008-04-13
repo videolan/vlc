@@ -370,14 +370,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
     int i;
 
     switch( i_query )
     {
         case DEMUX_HAS_UNSUPPORTED_META:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -485,7 +485,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                               ogg_packet *p_oggpacket )
 {
     block_t *p_block;
-    vlc_bool_t b_selected;
+    bool b_selected;
     int i_header_len = 0;
     mtime_t i_pts = -1, i_interpolated_pts;
 
@@ -519,7 +519,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( p_stream->b_force_backup )
     {
         uint8_t *p_extra;
-        vlc_bool_t b_store_size = VLC_TRUE;
+        bool b_store_size = true;
 
         p_stream->i_packets_backup++;
         switch( p_stream->fmt.i_codec )
@@ -545,7 +545,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                     p_oggpacket->bytes -= 9;
                 }
             }
-            b_store_size = VLC_FALSE;
+            b_store_size = false;
             break;
 
         default:
@@ -578,7 +578,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                             p_stream->p_es, &p_stream->fmt );
         }
 
-        b_selected = VLC_FALSE; /* Discard the header packet */
+        b_selected = false; /* Discard the header packet */
     }
 
     /* Convert the pcr into a pts */

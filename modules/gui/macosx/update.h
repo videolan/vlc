@@ -44,7 +44,7 @@
     IBOutlet id o_chk_updateOnStartup;
 
     update_t * p_u;
-    vlc_bool_t b_checked;
+    bool b_checked;
 }
 
 - (IBAction)download:(id)sender;

@@ -59,7 +59,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
             libvlc_media_t * p_catmd;
             p_catmd = libvlc_media_new_as_node( p_mdis->p_libvlc_instance, psz_cat, NULL );
             p_mlist = libvlc_media_subitems( p_catmd, NULL );
-            p_mlist->b_read_only = VLC_TRUE;
+            p_mlist->b_read_only = true;
 
             /* Insert the newly created mlist in our dictionary */
             __vlc_dictionary_insert( &p_mdis->catname_to_submedialist, psz_cat, p_mlist, 0 );
@@ -115,7 +115,7 @@ static void services_discovery_started( const vlc_event_t * p_event,
     (void)p_event;
     libvlc_media_discoverer_t * p_mdis = user_data;
     libvlc_event_t event;
-    p_mdis->running = VLC_TRUE;
+    p_mdis->running = true;
     event.type = libvlc_MediaDiscovererStarted;
     libvlc_event_send( p_mdis->p_event_manager, &event );
 }
@@ -130,7 +130,7 @@ static void services_discovery_ended( const vlc_event_t * p_event,
     (void)p_event;
     libvlc_media_discoverer_t * p_mdis = user_data;
     libvlc_event_t event;
-    p_mdis->running = VLC_FALSE;
+    p_mdis->running = false;
     event.type = libvlc_MediaDiscovererEnded;
     libvlc_event_send( p_mdis->p_event_manager, &event );
 }
@@ -160,8 +160,8 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 
     p_mdis->p_libvlc_instance = p_inst;
     p_mdis->p_mlist = libvlc_media_list_new( p_inst, NULL );
-    p_mdis->p_mlist->b_read_only = VLC_TRUE;
-    p_mdis->running = VLC_FALSE;
+    p_mdis->p_mlist->b_read_only = true;
+    p_mdis->running = false;
 
     vlc_dictionary_init( &p_mdis->catname_to_submedialist, 0 );
 

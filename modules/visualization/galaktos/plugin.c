@@ -120,7 +120,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
 
     if( vlc_thread_create( p_thread, "galaktos update thread", Thread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_filter, "cannot lauch galaktos thread" );
         free( p_thread->psz_title );
@@ -216,8 +216,8 @@ static void Thread( vlc_object_t *p_this )
     p_thread->p_opengl->render.i_width = p_thread->i_width;
     p_thread->p_opengl->render.i_height = p_thread->i_width;
     p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
-    p_thread->p_opengl->b_scale = VLC_TRUE;
-    p_thread->p_opengl->b_fullscreen = VLC_FALSE;
+    p_thread->p_opengl->b_scale = true;
+    p_thread->p_opengl->b_fullscreen = false;
     p_thread->p_opengl->i_alignment = 0;
     p_thread->p_opengl->fmt_in.i_sar_num = 1;
     p_thread->p_opengl->fmt_in.i_sar_den = 1;

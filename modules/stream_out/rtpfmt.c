@@ -35,7 +35,7 @@
 int
 rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
-                        int64_t i_dts, vlc_bool_t b_last, int64_t i_length );
+                        int64_t i_dts, bool b_last, int64_t i_length );
 
 int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
                        block_t *in )
@@ -473,7 +473,7 @@ int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
 int
 rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
-                        int64_t i_dts, vlc_bool_t b_last, int64_t i_length )
+                        int64_t i_dts, bool b_last, int64_t i_length )
 {
     const int i_max = rtp_mtu (id); /* payload max in one packet */
     int i_nal_hdr;

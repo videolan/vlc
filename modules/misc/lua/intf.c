@@ -78,14 +78,14 @@ static input_thread_t * vlclua_get_input_internal( lua_State *L )
 static int __vlclua_var_toggle_or_set( lua_State *L, vlc_object_t *p_obj,
                                        const char *psz_name )
 {
-    vlc_bool_t b_bool;
+    bool b_bool;
     if( lua_gettop( L ) > 1 ) return vlclua_error( L );
 
     if( lua_gettop( L ) == 0 )
         b_bool = !var_GetBool( p_obj, psz_name );
     else /* lua_gettop( L ) == 1 */
     {
-        b_bool = luaL_checkboolean( L, -1 )?VLC_TRUE:VLC_FALSE;
+        b_bool = luaL_checkboolean( L, -1 )?true:false;
         lua_pop( L, 1 );
     }
 
@@ -396,7 +396,7 @@ static int vlclua_playlist_clear( lua_State * L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Stop( p_playlist ); /* Isn't this already implied by Clear? */
-    playlist_Clear( p_playlist, VLC_FALSE );
+    playlist_Clear( p_playlist, false );
     vlc_object_release( p_playlist );
     return 0;
 }
@@ -430,9 +430,9 @@ static int vlclua_playlist_goto( lua_State * L )
     int i_id = luaL_checkint( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     int i_ret = playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                  VLC_TRUE, NULL,
+                                  true, NULL,
                                   playlist_ItemGetById( p_playlist, i_id,
-                                                        VLC_TRUE ) );
+                                                        true ) );
     vlc_object_release( p_playlist );
     return vlclua_push_ret( L, i_ret );
 }
@@ -443,7 +443,7 @@ static int vlclua_playlist_add( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     i_count = vlclua_playlist_add_internal( p_this, L, p_playlist,
-                                            NULL, VLC_TRUE );
+                                            NULL, true );
     vlc_object_release( p_playlist );
     lua_pushinteger( L, i_count );
     return 1;
@@ -455,7 +455,7 @@ static int vlclua_playlist_enqueue( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     i_count = vlclua_playlist_add_internal( p_this, L, p_playlist,
-                                            NULL, VLC_FALSE );
+                                            NULL, false );
     vlc_object_release( p_playlist );
     lua_pushinteger( L, i_count );
     return 1;
@@ -521,7 +521,7 @@ static int vlclua_playlist_get( lua_State *L )
     if( lua_isnumber( L, 1 ) )
     {
         int i_id = lua_tointeger( L, 1 );
-        p_item = playlist_ItemGetById( p_playlist, i_id, VLC_TRUE );
+        p_item = playlist_ItemGetById( p_playlist, i_id, true );
         if( !p_item )
         {
             vlc_object_release( p_playlist );
@@ -958,7 +958,7 @@ static struct
     /* { "http", "http" }, */
     { NULL, NULL } };
 
-static vlc_bool_t WordInList( const char *psz_list, const char *psz_word )
+static bool WordInList( const char *psz_list, const char *psz_word )
 {
     const char *psz_str = strstr( psz_list, psz_word );
     int i_len = strlen( psz_word );
@@ -968,10 +968,10 @@ static vlc_bool_t WordInList( const char *psz_list, const char *psz_word )
          /* it doesn't start in middle of a word */
          /* it doest end in middle of a word */
          && ( psz_str[i_len] == '\0' || psz_str[i_len] == ',' ) )
-            return VLC_TRUE;
+            return true;
         psz_str = strstr( psz_str, psz_word );
     }
-    return VLC_FALSE;
+    return false;
 }
 
 static const char *GetModuleName( intf_thread_t *p_intf )
@@ -999,7 +999,7 @@ int E_(Open_LuaIntf)( vlc_object_t *p_this )
 
     const char *psz_name = GetModuleName( p_intf );
     const char *psz_config;
-    vlc_bool_t b_config_set = VLC_FALSE;
+    bool b_config_set = false;
     if( !psz_name ) psz_name = "dummy";
 
     p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t*) );
@@ -1083,12 +1083,12 @@ int E_(Open_LuaIntf)( vlc_object_t *p_this )
                 if( lua_istable( L, -1 ) )
                 {
                     lua_setglobal( L, "config" );
-                    b_config_set = VLC_TRUE;
+                    b_config_set = true;
                 }
             }
         }
     }
-    if( b_config_set == VLC_FALSE )
+    if( b_config_set == false )
     {
         lua_newtable( L );
         lua_setglobal( L, "config" );
@@ -1120,8 +1120,8 @@ static void Run( intf_thread_t *p_intf )
                  p_intf->p_sys->psz_filename,
                  lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
-        p_intf->b_die = VLC_TRUE;
+        p_intf->b_die = true;
         return;
     }
-    p_intf->b_die = VLC_TRUE;
+    p_intf->b_die = true;
 }

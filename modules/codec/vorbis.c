@@ -62,7 +62,7 @@
 struct decoder_sys_t
 {
     /* Module mode */
-    vlc_bool_t b_packetizer;
+    bool b_packetizer;
 
     /*
      * Input properties
@@ -152,7 +152,7 @@ static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
 static void ParseVorbisComments( decoder_t * );
 
-static void ConfigureChannelOrder(int *, int, uint32_t, vlc_bool_t );
+static void ConfigureChannelOrder(int *, int, uint32_t, bool );
 
 #ifdef MODULE_NAME_IS_tremor
 static void Interleave   ( int32_t *, const int32_t **, int, int, int * );
@@ -210,13 +210,13 @@ vlc_module_begin();
 #endif
 
     add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
-                 ENC_QUALITY_LONGTEXT, VLC_FALSE );
+                 ENC_QUALITY_LONGTEXT, false );
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBR_TEXT,
-                 ENC_MAXBR_LONGTEXT, VLC_FALSE );
+                 ENC_MAXBR_LONGTEXT, false );
     add_integer( ENC_CFG_PREFIX "min-bitrate", 0, NULL, ENC_MINBR_TEXT,
-                 ENC_MINBR_LONGTEXT, VLC_FALSE );
+                 ENC_MINBR_LONGTEXT, false );
     add_bool( ENC_CFG_PREFIX "cbr", 0, NULL, ENC_CBR_TEXT,
-                 ENC_CBR_LONGTEXT, VLC_FALSE );
+                 ENC_CBR_LONGTEXT, false );
 #endif
 
 vlc_module_end();
@@ -251,7 +251,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Misc init */
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->i_last_block_size = 0;
-    p_sys->b_packetizer = VLC_FALSE;
+    p_sys->b_packetizer = false;
     p_sys->i_headers = 0;
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
@@ -284,7 +284,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     if( i_ret == VLC_SUCCESS )
     {
-        p_dec->p_sys->b_packetizer = VLC_TRUE;
+        p_dec->p_sys->b_packetizer = true;
         p_dec->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
     }
 
@@ -481,7 +481,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
 
     ConfigureChannelOrder(p_sys->pi_chan_table, p_sys->vi.channels,
-            p_dec->fmt_out.audio.i_physical_channels, VLC_TRUE);
+            p_dec->fmt_out.audio.i_physical_channels, true);
 
     return VLC_SUCCESS;
 }
@@ -703,7 +703,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
-                r->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+                r->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
                 r->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_PEAK" ) ||
@@ -711,7 +711,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
-                r->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+                r->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
                 r->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_GAIN" ) ||
@@ -719,14 +719,14 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
-                r->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+                r->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
                 r->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_PEAK" ) )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
-                r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+                r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
                 r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
             }
         }
@@ -739,7 +739,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i_channel_mask, vlc_bool_t b_decode)
+static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i_channel_mask, bool b_decode)
 {
     const uint32_t *pi_channels_in;
     switch( i_channels )
@@ -979,7 +979,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_pts = 0;
 
     ConfigureChannelOrder(p_sys->pi_chan_table, p_sys->vi.channels,
-            p_enc->fmt_in.audio.i_physical_channels, VLC_TRUE);
+            p_enc->fmt_in.audio.i_physical_channels, true);
 
     return VLC_SUCCESS;
 }

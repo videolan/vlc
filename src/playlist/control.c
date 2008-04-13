@@ -57,7 +57,7 @@ void __pl_Release( vlc_object_t *p_this )
 }
 
 int playlist_Control( playlist_t * p_playlist, int i_query,
-                      vlc_bool_t b_locked, ... )
+                      bool b_locked, ... )
 {
     va_list args;
     int i_result;
@@ -82,7 +82,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
     {
     case PLAYLIST_STOP:
         p_playlist->request.i_status = PLAYLIST_STOPPED;
-        p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.b_request = true;
         p_playlist->request.p_item = NULL;
         break;
 
@@ -98,11 +98,11 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         }
         p_playlist->request.i_status = PLAYLIST_RUNNING;
         p_playlist->request.i_skip = 0;
-        p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.b_request = true;
         p_playlist->request.p_node = p_node;
         p_playlist->request.p_item = p_item;
         if( p_item && var_GetBool( p_playlist, "random" ) )
-            p_playlist->b_reset_currently_playing = VLC_TRUE;
+            p_playlist->b_reset_currently_playing = true;
         break;
 
     case PLAYLIST_PLAY:
@@ -115,7 +115,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         else
         {
             p_playlist->request.i_status = PLAYLIST_RUNNING;
-            p_playlist->request.b_request = VLC_TRUE;
+            p_playlist->request.b_request = true;
             p_playlist->request.p_node = p_playlist->status.p_node;
             p_playlist->request.p_item = p_playlist->status.p_item;
             p_playlist->request.i_skip = 0;
@@ -154,7 +154,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         /* if already running, keep running */
         if( p_playlist->status.i_status != PLAYLIST_STOPPED )
             p_playlist->request.i_status = p_playlist->status.i_status;
-        p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.b_request = true;
         break;
 
     default:
@@ -204,11 +204,11 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     int i;
     preparse_item_t p;
     p.p_item = p_item;
-    p.b_fetch_art = VLC_TRUE;
+    p.b_fetch_art = true;
 
     vlc_object_lock( p_playlist->p_fetcher );
     for( i = 0; i < p_playlist->p_fetcher->i_waiting &&
-         p_playlist->p_fetcher->p_waiting->b_fetch_art == VLC_TRUE;
+         p_playlist->p_fetcher->p_waiting->b_fetch_art == true;
          i++ );
     vlc_gc_incref( p_item );
     INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
@@ -269,7 +269,7 @@ static void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur )
      PL_DEBUG( "%s is at %i", PLI_NAME( p_cur ), p_playlist->i_current_index );
 }
 
-void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
+void ResetCurrentlyPlaying( playlist_t *p_playlist, bool b_random,
                             playlist_item_t *p_cur )
 {
     playlist_item_t *p_next = NULL;
@@ -284,7 +284,7 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
         /** FIXME: this is *slow* */
         p_next = playlist_GetNextLeaf( p_playlist,
                                        p_playlist->status.p_node,
-                                       p_next, VLC_TRUE, VLC_FALSE );
+                                       p_next, true, false );
         if( p_next )
         {
             if( p_next == p_cur )
@@ -310,7 +310,7 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist, vlc_bool_t b_random,
             ARRAY_VAL(p_playlist->current,j) = p_tmp;
         }
     }
-    p_playlist->b_reset_currently_playing = VLC_FALSE;
+    p_playlist->b_reset_currently_playing = false;
     stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_BUILD );
 }
 
@@ -326,10 +326,10 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     playlist_item_t *p_new = NULL;
     int i_skip = 0, i;
 
-    vlc_bool_t b_loop = var_GetBool( p_playlist, "loop" );
-    vlc_bool_t b_random = var_GetBool( p_playlist, "random" );
-    vlc_bool_t b_repeat = var_GetBool( p_playlist, "repeat" );
-    vlc_bool_t b_playstop = var_GetBool( p_playlist, "play-and-stop" );
+    bool b_loop = var_GetBool( p_playlist, "loop" );
+    bool b_random = var_GetBool( p_playlist, "random" );
+    bool b_repeat = var_GetBool( p_playlist, "repeat" );
+    bool b_playstop = var_GetBool( p_playlist, "play-and-stop" );
 
     /* Handle quickly a few special cases */
     /* No items to play */
@@ -340,13 +340,13 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     }
 
     /* Repeat and play/stop */
-    if( !p_playlist->request.b_request && b_repeat == VLC_TRUE &&
+    if( !p_playlist->request.b_request && b_repeat == true &&
          p_playlist->status.p_item )
     {
         msg_Dbg( p_playlist,"repeating item" );
         return p_playlist->status.p_item;
     }
-    if( !p_playlist->request.b_request && b_playstop == VLC_TRUE )
+    if( !p_playlist->request.b_request && b_playstop == true )
     {
         msg_Dbg( p_playlist,"stopping (play and stop)" );
         return NULL;
@@ -379,7 +379,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
             p_playlist->request.p_node != p_playlist->status.p_node )
         {
             p_playlist->status.p_node = p_playlist->request.p_node;
-            p_playlist->b_reset_currently_playing = VLC_TRUE;
+            p_playlist->b_reset_currently_playing = true;
         }
 
         /* If we are asked for a node, don't take it */
@@ -425,7 +425,7 @@ playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
                                p_playlist->i_current_index );
         }
         /* Clear the request */
-        p_playlist->request.b_request = VLC_FALSE;
+        p_playlist->request.b_request = false;
     }
     /* "Automatic" item change ( next ) */
     else
@@ -494,7 +494,7 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     if( p_playlist->p_fetcher &&
             p_playlist->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
-        vlc_bool_t b_has_art;
+        bool b_has_art;
 
         char *psz_arturl, *psz_name;
         psz_arturl = input_item_GetArtURL( p_input );

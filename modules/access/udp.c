@@ -79,8 +79,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
-    add_integer( "rtp-late", 100, NULL, RTP_LATE_TEXT, RTP_LATE_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
+    add_integer( "rtp-late", 100, NULL, RTP_LATE_TEXT, RTP_LATE_LONGTEXT, true );
     add_obsolete_bool( "udp-auto-mtu" );
 
     set_capability( "access2", 0 );
@@ -113,7 +113,7 @@ struct access_sys_t
 {
     int fd;
 
-    vlc_bool_t b_framed_rtp, b_comedia;
+    bool b_framed_rtp, b_comedia;
 
     /* reorder rtp packets when out-of-sequence */
     uint16_t i_last_seqno;
@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
     /* Set up p_access */
     access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, BlockStartRTP, Control, NULL );
-    p_access->info.b_prebuffered = VLC_FALSE;
+    p_access->info.b_prebuffered = false;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
     memset (p_sys, 0, sizeof (*p_sys));
 
@@ -227,7 +227,7 @@ static int Open( vlc_object_t *p_this )
         case IPPROTO_TCP:
             p_sys->fd = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
             p_access->pf_block = BlockRTP;
-            p_sys->b_comedia = p_sys->b_framed_rtp = VLC_TRUE;
+            p_sys->b_comedia = p_sys->b_framed_rtp = true;
             break;
 
         case IPPROTO_DCCP:
@@ -240,7 +240,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->fd = -1;
             msg_Err( p_access, "DCCP support not compiled-in!" );
 #endif
-            p_sys->b_comedia = VLC_TRUE;
+            p_sys->b_comedia = true;
             break;
     }
     free (psz_name);
@@ -283,7 +283,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -294,8 +294,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
         /* */
         case ACCESS_GET_MTU:
@@ -340,13 +340,13 @@ static block_t *BlockUDP( access_t *p_access )
     /* Read data */
     p_block = block_New( p_access, MTU );
     len = net_Read( p_access, p_sys->fd, NULL,
-                    p_block->p_buffer, MTU, VLC_FALSE );
+                    p_block->p_buffer, MTU, false );
     if( ( len < 0 )
      || ( p_sys->b_comedia && ( len == 0 ) ) )
     {
         if( p_sys->b_comedia )
         {
-            p_access->info.b_eof = VLC_TRUE;
+            p_access->info.b_eof = true;
             msg_Dbg( p_access, "connection-oriented media hangup" );
         }
         block_Release( p_block );
@@ -380,7 +380,7 @@ static block_t *BlockTCP( access_t *p_access )
     {
         int i_read = net_Read( p_access, p_sys->fd, NULL,
                                p_block->p_buffer + p_block->i_buffer,
-                               2 - p_block->i_buffer, VLC_FALSE );
+                               2 - p_block->i_buffer, false );
         if( i_read <= 0 )
             goto error;
 
@@ -395,7 +395,7 @@ static block_t *BlockTCP( access_t *p_access )
     {
         int i_read = net_Read( p_access, p_sys->fd, NULL,
                                p_block->p_buffer + p_block->i_buffer,
-                               2 + framelen - p_block->i_buffer, VLC_FALSE );
+                               2 + framelen - p_block->i_buffer, false );
         if( i_read <= 0 )
             goto error;
 
@@ -412,7 +412,7 @@ static block_t *BlockTCP( access_t *p_access )
     return p_block;
 
 error:
-    p_access->info.b_eof = VLC_TRUE;
+    p_access->info.b_eof = true;
     block_Release( p_block );
     p_sys->p_partial_frame = NULL;
     return NULL;
@@ -423,7 +423,7 @@ error:
  * rtp_ChainInsert - insert a p_block in the chain and
  * look at the sequence numbers.
  */
-static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
+static inline bool rtp_ChainInsert( access_t *p_access, block_t *p_block )
 {
     access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
     block_t *p_prev = NULL;
@@ -435,7 +435,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
     {
         p_sys->p_list = p_block;
         p_sys->p_end = p_block;
-        return VLC_TRUE;
+        return true;
     }
     /* walk through the queue from top down since the new packet is in
     most cases just appended to the end */
@@ -462,7 +462,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             {
                 p_sys->p_end = p_block;
             }
-            return VLC_TRUE;
+            return true;
         }
         if( p == p_sys->p_list )
         {   /* we've reached bottom of chain */
@@ -474,7 +474,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
                 p_block->p_next = p;
                 p->p_prev = p_block;
                 p_sys->p_list = p_block;
-                return VLC_TRUE;
+                return true;
             }
 
             if( !i_tmp )   /* trash duplicate */
@@ -487,13 +487,13 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             p_sys->p_end->p_next = p_block;
             p_block->p_prev = p_sys->p_end;
             p_sys->p_end = p_block;
-            return VLC_TRUE;
+            return true;
         }
         p_prev = p;
         p = p->p_prev;
     }
     block_Release( p_block );
-    return VLC_FALSE;
+    return false;
 }
 
 /*****************************************************************************
@@ -686,7 +686,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
     }
 
     msg_Dbg( p_access, "RTP: prebuffered %d packets", i_count - 1 );
-    p_access->info.b_prebuffered = VLC_TRUE;
+    p_access->info.b_prebuffered = true;
     p = p_sys->p_list;
     p_sys->p_list = p_sys->p_list->p_next;
     p_sys->i_last_seqno = (uint16_t) p->i_dts;
@@ -717,7 +717,7 @@ static block_t *BlockChoose( access_t *p_access )
     {
         msg_Dbg( p_access, "detected TS over raw UDP" );
         p_access->pf_block = BlockUDP;
-        p_access->info.b_prebuffered = VLC_TRUE;
+        p_access->info.b_prebuffered = true;
         return p_block;
     }
 
@@ -734,7 +734,7 @@ static block_t *BlockChoose( access_t *p_access )
     {
         msg_Dbg( p_access, "no supported RTP header detected" );
         p_access->pf_block = BlockUDP;
-        p_access->info.b_prebuffered = VLC_TRUE;
+        p_access->info.b_prebuffered = true;
         return p_block;
     }
 
@@ -758,7 +758,7 @@ static block_t *BlockChoose( access_t *p_access )
         default:
             msg_Dbg( p_access, "no RTP header detected" );
             p_access->pf_block = BlockUDP;
-            p_access->info.b_prebuffered = VLC_TRUE;
+            p_access->info.b_prebuffered = true;
             return p_block;
     }
 

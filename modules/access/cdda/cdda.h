@@ -117,9 +117,9 @@ typedef struct cdda_data_s
 #endif
  
 #ifdef HAVE_LIBCDDB
-  vlc_bool_t     b_cddb_enabled;      /* Use CDDB at all? */
+  bool     b_cddb_enabled;      /* Use CDDB at all? */
   struct  {
-    vlc_bool_t   have_info;           /* True if we have any info */
+    bool   have_info;           /* True if we have any info */
     cddb_disc_t *disc;                /* libcdio uses this to get disc
                      info */
     int          disc_length;         /* Length in frames of cd. Used
@@ -127,12 +127,12 @@ typedef struct cdda_data_s
   } cddb;
 #endif
 
-  vlc_bool_t   b_audio_ctl;           /* Use CD-Text audio controls and
+  bool   b_audio_ctl;           /* Use CD-Text audio controls and
                      audio output? */
 
-  vlc_bool_t   b_cdtext;              /* Use CD-Text at all? If not,
+  bool   b_cdtext;              /* Use CD-Text at all? If not,
                      cdtext_preferred is meaningless. */
-  vlc_bool_t   b_cdtext_prefer;       /* Prefer CD-Text info over
+  bool   b_cdtext_prefer;       /* Prefer CD-Text info over
                      CDDB? If no CDDB, the issue
                      is moot. */
 
@@ -142,8 +142,8 @@ typedef struct cdda_data_s
                          */
 
   WAVEHEADER   waveheader;            /* Wave header for the output data  */
-  vlc_bool_t   b_header;
-  vlc_bool_t   b_nav_mode;           /* If false we view the entire CD as
+  bool   b_header;
+  bool   b_nav_mode;           /* If false we view the entire CD as
                     as a unit rather than each track
                     as a unit. If b_nav_mode then the
                     slider area represents the Disc rather

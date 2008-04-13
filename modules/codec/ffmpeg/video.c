@@ -72,19 +72,19 @@ struct decoder_sys_t
     /* for direct rendering */
     int b_direct_rendering;
 
-    vlc_bool_t b_has_b_frames;
+    bool b_has_b_frames;
 
     /* Hack to force display of still pictures */
-    vlc_bool_t b_first_frame;
+    bool b_first_frame;
 
     int i_buffer_orig, i_buffer;
     char *p_buffer_orig, *p_buffer;
 
     /* Postprocessing handle */
     void *p_pp;
-    vlc_bool_t b_pp;
-    vlc_bool_t b_pp_async;
-    vlc_bool_t b_pp_init;
+    bool b_pp;
+    bool b_pp_async;
+    bool b_pp_init;
 };
 
 /* FIXME (dummy palette for now) */
@@ -223,7 +223,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     {
         E_(InitPostproc)( p_sys->p_pp, p_context->width,
                           p_context->height, p_context->pix_fmt );
-        p_sys->b_pp_init = VLC_TRUE;
+        p_sys->b_pp_init = true;
     }
 
     return p_pic;
@@ -360,7 +360,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     p_sys->p_pp = NULL;
-    p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = VLC_FALSE;
+    p_sys->b_pp = p_sys->b_pp_async = p_sys->b_pp_init = false;
     p_sys->p_pp = E_(OpenPostproc)( p_dec, &p_sys->b_pp_async );
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
@@ -383,8 +383,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** misc init ***** */
     p_sys->input_pts = p_sys->input_dts = 0;
     p_sys->i_pts = 0;
-    p_sys->b_has_b_frames = VLC_FALSE;
-    p_sys->b_first_frame = VLC_TRUE;
+    p_sys->b_has_b_frames = false;
+    p_sys->b_first_frame = true;
     p_sys->i_late_frames = 0;
     p_sys->i_buffer = 0;
     p_sys->i_buffer_orig = 1;
@@ -430,7 +430,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int b_drawpicture;
-    int b_null_size = VLC_FALSE;
+    int b_null_size = false;
     block_t *p_block;
 
     if( !pp_block || !*pp_block ) return NULL;
@@ -522,7 +522,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     {
         if( p_sys->b_hurry_up )
             p_sys->p_context->skip_frame = p_sys->i_skip_frame;
-        b_null_size = VLC_TRUE;
+        b_null_size = true;
     }
 
     /*
@@ -567,7 +567,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             p_sys->p_context->height > 0 )
         {
             /* Reparse it to not drop the I frame */
-            b_null_size = VLC_FALSE;
+            b_null_size = false;
             if( p_sys->b_hurry_up )
                 p_sys->p_context->skip_frame = p_sys->i_skip_frame;
             i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
@@ -645,7 +645,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         /* Sanity check (seems to be needed for some streams) */
         if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
         {
-            p_sys->b_has_b_frames = VLC_TRUE;
+            p_sys->b_has_b_frames = true;
         }
 
         if( !p_dec->fmt_in.video.i_aspect )
@@ -694,8 +694,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->b_first_frame )
             {
                 /* Hack to force display of still pictures */
-                p_sys->b_first_frame = VLC_FALSE;
-                p_pic->b_force = VLC_TRUE;
+                p_sys->b_first_frame = false;
+                p_pic->b_force = true;
             }
 
             p_pic->i_nb_fields = 2 + p_sys->p_ff_pic->repeat_pict;

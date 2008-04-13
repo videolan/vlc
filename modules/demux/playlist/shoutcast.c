@@ -44,7 +44,7 @@ struct demux_sys_t
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
 
-    vlc_bool_t b_adult;
+    bool b_adult;
 };
 
 /* duplicate from modules/services_discovery/shout.c */

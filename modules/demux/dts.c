@@ -55,7 +55,7 @@ static int Control( demux_t *, int, va_list );
 
 struct demux_sys_t
 {
-    vlc_bool_t  b_start;
+    bool  b_start;
     es_out_id_t *p_es;
 
     /* Packetizer */
@@ -198,7 +198,7 @@ static int Demux( demux_t *p_demux )
     while( (p_block_out = p_sys->p_packetizer->pf_packetize(
                 p_sys->p_packetizer, &p_block_in )) )
     {
-        p_sys->b_start = VLC_FALSE;
+        p_sys->b_start = false;
 
         while( p_block_out )
         {

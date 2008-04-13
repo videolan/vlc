@@ -79,7 +79,7 @@ void CmdSlower::execute()
     if( pInput )
     {
         vlc_value_t val;
-        val.b_bool = VLC_TRUE;
+        val.b_bool = true;
 
         var_Set( pInput, "rate-slower", val );
         vlc_object_release( pInput );
@@ -95,7 +95,7 @@ void CmdFaster::execute()
     if( pInput )
     {
         vlc_value_t val;
-        val.b_bool = VLC_TRUE;
+        val.b_bool = true;
 
         var_Set( pInput, "rate-faster", val );
         vlc_object_release( pInput );

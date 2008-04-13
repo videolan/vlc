@@ -129,23 +129,23 @@ vlc_module_begin();
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
     add_string( "sap-addr", NULL, NULL,
-                SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
+                SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true );
     add_bool( "sap-ipv4", 1 , NULL,
-               SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
+               SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, true );
     add_bool( "sap-ipv6", 1 , NULL,
-              SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE );
+              SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, true );
     add_integer( "sap-timeout", 1800, NULL,
-                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE );
+                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true );
     add_bool( "sap-parse", 1 , NULL,
-               SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE );
+               SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true );
     add_bool( "sap-strict", 0 , NULL,
-               SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, VLC_TRUE );
+               SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, true );
 #if 0
     add_bool( "sap-cache", 0 , NULL,
-               SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
+               SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, true );
 #endif
     add_bool( "sap-timeshift", 0 , NULL,
-              SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, VLC_TRUE );
+              SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, true );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -240,9 +240,9 @@ struct services_discovery_sys_t
     struct sap_announce_t **pp_announces;
 
     /* Modes */
-    vlc_bool_t  b_strict;
-    vlc_bool_t  b_parse;
-    vlc_bool_t  b_timeshift;
+    bool  b_strict;
+    bool  b_parse;
+    bool  b_timeshift;
 
     int i_timeout;
 };
@@ -276,7 +276,7 @@ struct demux_sys_t
     static const char *FindAttribute (const sdp_t *sdp, unsigned media,
                                       const char *name);
 
-    static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
+    static bool IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
     static int InitSocket( services_discovery_t *p_sd, const char *psz_address, int i_port );
     static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
@@ -589,7 +589,7 @@ static void Run( services_discovery_t *p_sd )
                     ssize_t i_read;
 
                     i_read = net_Read (p_sd, ufd[i].fd, NULL, p_buffer,
-                                       MAX_SAP_BUFFER, VLC_FALSE);
+                                       MAX_SAP_BUFFER, false);
                     if (i_read < 0)
                         msg_Warn (p_sd, "receive error: %m");
                     if (i_read > 6)
@@ -674,7 +674,7 @@ static int Demux( demux_t *p_demux )
     if( p_playlist->status.p_item &&
              p_playlist->status.p_item->p_input == p_parent_input )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
                           p_playlist->status.p_node, p_playlist->status.p_item );
     }
 
@@ -715,8 +715,8 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     if ((flags >> 5) != 1)
         return VLC_EGENERIC;
 
-    vlc_bool_t b_ipv6 = (flags & 0x10) != 0;
-    vlc_bool_t b_need_delete = (flags & 0x04) != 0;
+    bool b_ipv6 = (flags & 0x10) != 0;
+    bool b_need_delete = (flags & 0x04) != 0;
 
     if (flags & 0x02)
     {
@@ -724,7 +724,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         return VLC_EGENERIC;
     }
 
-    vlc_bool_t b_compressed = (flags & 0x01) != 0;
+    bool b_compressed = (flags & 0x01) != 0;
 
     uint16_t i_hash = U16_AT (buf + 2);
 
@@ -800,7 +800,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     if( ( p_sdp->i_media_type != 14
        && p_sdp->i_media_type != 32
        && p_sdp->i_media_type != 33)
-     || p_sd->p_sys->b_parse == VLC_FALSE )
+     || p_sd->p_sys->b_parse == false )
     {
         free( p_sdp->psz_uri );
         if (asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp ) == -1)
@@ -1525,7 +1525,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     }
 
     if( p_announce->i_input_id > -1 )
-        playlist_DeleteFromInput( pl_Get(p_sd), p_announce->i_input_id, VLC_FALSE );
+        playlist_DeleteFromInput( pl_Get(p_sd), p_announce->i_input_id, false );
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)
     {
@@ -1542,7 +1542,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     return VLC_SUCCESS;
 }
 
-static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
+static bool IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
 {
     /* A session is identified by
      * - username,
@@ -1555,9 +1555,9 @@ static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
      || (p_sdp1->session_id != p_sdp2->session_id)
      || (p_sdp1->orig_ip_version != p_sdp2->orig_ip_version)
      || strcmp (p_sdp1->orig_host, p_sdp2->orig_host))
-        return VLC_FALSE;
+        return false;
 
-    return VLC_TRUE;
+    return true;
 }
 
 

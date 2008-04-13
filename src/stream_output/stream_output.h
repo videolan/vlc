@@ -64,7 +64,7 @@ struct sap_handler_t
     sap_session_t **pp_sessions;
     sap_address_t **pp_addresses;
 
-    vlc_bool_t b_control;
+    bool b_control;
 
     int i_sessions;
     int i_addresses;
@@ -85,7 +85,7 @@ struct session_descriptor_t
     socklen_t addrlen;
 
     char *psz_sdp;
-    vlc_bool_t b_ssm;
+    bool b_ssm;
 };
 
 /* The main announce handler object */

@@ -67,7 +67,7 @@ static es_format_t null_es_format;
 
 struct decoder_owner_sys_t
 {
-    vlc_bool_t      b_own_thread;
+    bool      b_own_thread;
 
     int64_t         i_preroll_end;
 
@@ -96,9 +96,9 @@ struct decoder_owner_sys_t
     block_fifo_t *p_fifo;
 
     /* CC */
-    vlc_bool_t b_cc_supported;
+    bool b_cc_supported;
     vlc_mutex_t lock_cc;
-    vlc_bool_t pb_cc_present[4];
+    bool pb_cc_present[4];
     decoder_t *pp_cc[4];
 };
 
@@ -108,7 +108,7 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
     msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
              "VLC probably does not support this sound or video format.",
              (char*)&codec );
-    intf_UserFatal( p_dec, VLC_FALSE, _("No suitable decoder module"), 
+    intf_UserFatal( p_dec, false, _("No suitable decoder module"), 
                     _("VLC does not support the audio or video format \"%4.4s\". "
                       "Unfortunately there is no way for you to fix this."), (char*)&codec );
 }
@@ -148,7 +148,7 @@ mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
  * \return the spawned decoder object
  */
 decoder_t *input_DecoderNew( input_thread_t *p_input,
-                             es_format_t *fmt, vlc_bool_t b_force_decoder )
+                             es_format_t *fmt, bool b_force_decoder )
 {
     decoder_t   *p_dec = NULL;
     vlc_value_t val;
@@ -161,7 +161,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
-            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"),
+            intf_UserFatal( p_input, false, _("Streaming / Transcoding failed"),
                             _("VLC could not open the packetizer module.") );
             return NULL;
         }
@@ -173,7 +173,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
-            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"),
+            intf_UserFatal( p_input, false, _("Streaming / Transcoding failed"),
                             _("VLC could not open the decoder module.") );
             return NULL;
         }
@@ -192,7 +192,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         !b_force_decoder )
     {
         msg_Dbg( p_input, "stream out mode -> no decoder thread" );
-        p_dec->p_owner->b_own_thread = VLC_FALSE;
+        p_dec->p_owner->b_own_thread = false;
     }
     else
     {
@@ -210,7 +210,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
 
         /* Spawn the decoder thread */
         if( vlc_thread_create( p_dec, "decoder", DecoderThread,
-                               i_priority, VLC_FALSE ) )
+                               i_priority, false ) )
         {
             msg_Err( p_dec, "cannot spawn decoder thread" );
             module_Unneed( p_dec, p_dec->p_module );
@@ -259,7 +259,7 @@ void input_DecoderDelete( decoder_t *p_dec )
     {
         int i;
         for( i = 0; i < 4; i++ )
-            input_DecoderSetCcState( p_dec, VLC_FALSE, i );
+            input_DecoderSetCcState( p_dec, false, i );
     }
 
     /* Delete decoder configuration */
@@ -312,7 +312,7 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
     }
 }
 
-void input_DecoderDiscontinuity( decoder_t * p_dec, vlc_bool_t b_flush )
+void input_DecoderDiscontinuity( decoder_t * p_dec, bool b_flush )
 {
     block_t *p_null;
 
@@ -331,17 +331,17 @@ void input_DecoderDiscontinuity( decoder_t * p_dec, vlc_bool_t b_flush )
     input_DecoderDecode( p_dec, p_null );
 }
 
-vlc_bool_t input_DecoderEmpty( decoder_t * p_dec )
+bool input_DecoderEmpty( decoder_t * p_dec )
 {
     if( p_dec->p_owner->b_own_thread
      && block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
     {
-        return VLC_FALSE;
+        return false;
     }
-    return VLC_TRUE;
+    return true;
 }
 
-void input_DecoderIsCcPresent( decoder_t *p_dec, vlc_bool_t pb_present[4] )
+void input_DecoderIsCcPresent( decoder_t *p_dec, bool pb_present[4] )
 {
     int i;
 
@@ -350,7 +350,7 @@ void input_DecoderIsCcPresent( decoder_t *p_dec, vlc_bool_t pb_present[4] )
         pb_present[i] =  p_dec->p_owner->pb_cc_present[i];
     vlc_mutex_unlock( &p_dec->p_owner->lock_cc );
 }
-int input_DecoderSetCcState( decoder_t *p_dec, vlc_bool_t b_decode, int i_channel )
+int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -375,7 +375,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, vlc_bool_t b_decode, int i_channe
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
-            intf_UserFatal( p_dec, VLC_FALSE, _("Streaming / Transcoding failed"),
+            intf_UserFatal( p_dec, false, _("Streaming / Transcoding failed"),
                             _("VLC could not open the decoder module.") );
             return VLC_EGENERIC;
         }
@@ -410,11 +410,11 @@ int input_DecoderSetCcState( decoder_t *p_dec, vlc_bool_t b_decode, int i_channe
     }
     return VLC_SUCCESS;
 }
-int input_DecoderGetCcState( decoder_t *p_dec, vlc_bool_t *pb_decode, int i_channel )
+int input_DecoderGetCcState( decoder_t *p_dec, bool *pb_decode, int i_channel )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    *pb_decode = VLC_FALSE;
+    *pb_decode = false;
     if( i_channel < 0 || i_channel >= 4 || !p_owner->pb_cc_present[i_channel] )
         return VLC_EGENERIC;
 
@@ -466,7 +466,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         msg_Err( p_dec, "out of memory" );
         return NULL;
     }
-    p_dec->p_owner->b_own_thread = VLC_TRUE;
+    p_dec->p_owner->b_own_thread = true;
     p_dec->p_owner->i_preroll_end = -1;
     p_dec->p_owner->p_input = p_input;
     p_dec->p_owner->p_aout = NULL;
@@ -550,19 +550,19 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         }
     }
     /* */
-    p_owner->b_cc_supported = VLC_FALSE;
+    p_owner->b_cc_supported = false;
     if( i_object_type == VLC_OBJECT_DECODER )
     {
         if( p_owner->p_packetizer && p_owner->p_packetizer->pf_get_cc )
-            p_owner->b_cc_supported = VLC_TRUE;
+            p_owner->b_cc_supported = true;
         if( p_dec->pf_get_cc )
-            p_owner->b_cc_supported = VLC_TRUE;
+            p_owner->b_cc_supported = true;
     }
 
     vlc_mutex_init( p_dec, &p_owner->lock_cc );
     for( i = 0; i < 4; i++ )
     {
-        p_owner->pb_cc_present[i] = VLC_FALSE;
+        p_owner->pb_cc_present[i] = false;
         p_owner->pp_cc[i] = NULL;
     }
     return p_dec;
@@ -648,7 +648,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 static void DecoderGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
 {
     block_t *p_cc;
-    vlc_bool_t pb_present[4];
+    bool pb_present[4];
     int i;
     int i_cc_decoder;
 
@@ -804,7 +804,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 {
                     msg_Err( p_dec, "cannot create packetizer output (%4.4s)",
                              (char *)&p_dec->p_owner->sout.i_codec );
-                    p_dec->b_error = VLC_TRUE;
+                    p_dec->b_error = true;
 
                     while( p_sout_block )
                     {
@@ -834,13 +834,13 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 p_dec->p_owner->p_input->p->b_out_pace_control )
             {
                 msg_Dbg( p_dec, "switching to sync mode" );
-                p_dec->p_owner->p_input->p->b_out_pace_control = VLC_FALSE;
+                p_dec->p_owner->p_input->p->b_out_pace_control = false;
             }
             else if( p_dec->p_owner->p_sout->i_out_pace_nocontrol <= 0 &&
                      !p_dec->p_owner->p_input->p->b_out_pace_control )
             {
                 msg_Dbg( p_dec, "switching to async mode" );
-                p_dec->p_owner->p_input->p->b_out_pace_control = VLC_TRUE;
+                p_dec->p_owner->p_input->p->b_out_pace_control = true;
             }
         }
     }
@@ -1088,7 +1088,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         if( p_sys->p_aout_input == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );
-            p_dec->b_error = VLC_TRUE;
+            p_dec->b_error = true;
             return NULL;
         }
         p_dec->fmt_out.audio.i_bytes_per_frame =
@@ -1176,7 +1176,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( p_sys->p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
-            p_dec->b_error = VLC_TRUE;
+            p_dec->b_error = true;
             return NULL;
         }
 

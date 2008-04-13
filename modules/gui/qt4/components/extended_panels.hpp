@@ -56,7 +56,7 @@ private:
     vout_thread_t *p_vout;
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
-    void ChangeVFiltersString( char *psz_name, vlc_bool_t b_add );
+    void ChangeVFiltersString( char *psz_name, bool b_add );
 private slots:
     void updateFilters();
     void updateFilterOptions();

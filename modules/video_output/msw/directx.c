@@ -116,7 +116,7 @@ static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 
 static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t *i_color );
 
-void SwitchWallpaperMode( vout_thread_t *, vlc_bool_t );
+void SwitchWallpaperMode( vout_thread_t *, bool );
 
 /* Object variables callbacks */
 static int FindDevicesCallback( vlc_object_t *, char const *,
@@ -164,19 +164,19 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
-              VLC_TRUE );
+              true );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
-              VLC_TRUE );
+              true );
     add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT,
-              TRIPLEBUF_LONGTEXT, VLC_TRUE );
+              TRIPLEBUF_LONGTEXT, true );
 
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                VLC_TRUE );
+                true );
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
 
     add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
-              VLC_TRUE );
+              true );
 
     set_description( _("DirectX video output") );
     set_capability( "video output", 100 );
@@ -403,7 +403,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
     p_vout->fmt_out = p_vout->fmt_in;
-    E_(UpdateRects)( p_vout, VLC_TRUE );
+    E_(UpdateRects)( p_vout, true );
 
 #define MAX_DIRECTBUFFERS 1
     /* Right now we use only 1 directbuffer because we don't want the
@@ -513,7 +513,7 @@ static void CloseVideo( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_vout->p_sys->lock );
 
     /* Make sure the wallpaper is restored */
-    SwitchWallpaperMode( p_vout, VLC_FALSE );
+    SwitchWallpaperMode( p_vout, false );
 
     /* restore screensaver system settings */
     if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
@@ -609,7 +609,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        E_(UpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, true );
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window
@@ -689,7 +689,7 @@ static int Manage( vout_thread_t *p_vout )
                           SWP_NOSIZE | SWP_NOMOVE );
         }
 
-        p_vout->p_sys->b_on_top_change = VLC_FALSE;
+        p_vout->p_sys->b_on_top_change = false;
     }
 
     /* Check if the event thread is still running */
@@ -1058,7 +1058,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_rgb_colorkey =
         DirectXFindColorkey( p_vout, &p_vout->p_sys->i_colorkey );
 
-    E_(UpdateRects)( p_vout, VLC_TRUE );
+    E_(UpdateRects)( p_vout, true );
 
     return VLC_SUCCESS;
 }
@@ -1172,7 +1172,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
 
     if( !b_overlay )
     {
-        vlc_bool_t b_rgb_surface =
+        bool b_rgb_surface =
             ( i_chroma == VLC_FOURCC('R','G','B','2') )
           || ( i_chroma == VLC_FOURCC('R','V','1','5') )
            || ( i_chroma == VLC_FOURCC('R','V','1','6') )
@@ -1482,7 +1482,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         {
             DWORD i_codes;
             DWORD *pi_codes;
-            vlc_bool_t b_result = VLC_FALSE;
+            bool b_result = false;
 
             /* Check if the chroma is supported first. This is required
              * because a few buggy drivers don't mind creating the surface
@@ -1498,7 +1498,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                     {
                         if( p_vout->output.i_chroma == pi_codes[i] )
                         {
-                            b_result = VLC_TRUE;
+                            b_result = true;
                             break;
                         }
                     }
@@ -1511,7 +1511,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                                               0 /* no overlay */,
                                               0 /* no back buffers */ );
             else
-                p_vout->p_sys->b_hw_yuv = VLC_FALSE;
+                p_vout->p_sys->b_hw_yuv = false;
         }
 
         if( i_ret || !p_vout->p_sys->b_hw_yuv )
@@ -1598,7 +1598,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     {
         p_pic[i].i_status = DESTROYED_PICTURE;
         p_pic[i].i_type   = DIRECT_PICTURE;
-        p_pic[i].b_slow   = VLC_TRUE;
+        p_pic[i].b_slow   = true;
         p_pic[i].pf_lock  = DirectXLockSurface;
         p_pic[i].pf_unlock = DirectXUnlockSurface;
         PP_OUTPUTPICTURE[i] = &p_pic[i];
@@ -1802,7 +1802,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
     }
     else
     {
-        vlc_bool_t bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
+        bool bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
              bHasColorKey, bCanStretch, bCanBltFourcc,
              bAlignBoundarySrc, bAlignBoundaryDest,
              bAlignSizeSrc, bAlignSizeDest;
@@ -1998,7 +1998,7 @@ static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t *pi_color )
 /*****************************************************************************
  * A few toolbox functions
  *****************************************************************************/
-void SwitchWallpaperMode( vout_thread_t *p_vout, vlc_bool_t b_on )
+void SwitchWallpaperMode( vout_thread_t *p_vout, bool b_on )
 {
     HWND hwnd;
 
@@ -2111,7 +2111,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     FreeLibrary( hddraw_dll );
 
     /* Signal change to the interface */
-    p_item->b_dirty = VLC_TRUE;
+    p_item->b_dirty = true;
 
     return VLC_SUCCESS;
 }

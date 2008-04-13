@@ -125,8 +125,8 @@ struct demux_sys_t
     mtime_t     i_duration;     /* sgiDuration= */
     int         i_port;         /* sgiRtspPort= */
     int         i_sid;          /* sgiSid= */
-    vlc_bool_t  b_concert;      /* DeliveryService=cds */
-    vlc_bool_t  b_rtsp_kasenna; /* kasenna style RTSP */
+    bool  b_concert;      /* DeliveryService=cds */
+    bool  b_rtsp_kasenna; /* kasenna style RTSP */
 };
 
 static int Demux ( demux_t *p_demux );
@@ -167,8 +167,8 @@ int E_(Import_SGIMB)( vlc_object_t * p_this )
             p_demux->p_sys->i_duration = 0;
             p_demux->p_sys->i_port = 0;
             p_demux->p_sys->i_sid = 0;
-            p_demux->p_sys->b_rtsp_kasenna = VLC_FALSE;
-            p_demux->p_sys->b_concert = VLC_FALSE;
+            p_demux->p_sys->b_rtsp_kasenna = false;
+            p_demux->p_sys->b_concert = false;
  
             return VLC_SUCCESS;
         }
@@ -258,7 +258,7 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
     {
         psz_bol += sizeof("sgiFormatName=") - 1;
         if( strcasestr( psz_bol, "MPEG-4") == NULL ) /*not mpeg4 found in string */
-            p_sys->b_rtsp_kasenna = VLC_TRUE;
+            p_sys->b_rtsp_kasenna = true;
     }
     else if( !strncasecmp( psz_bol, "sgiMulticastAddress=", sizeof("sgiMulticastAddress=") - 1 ) )
     {
@@ -292,7 +292,7 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
     }
     else if( !strncasecmp( psz_bol, "DeliveryService=cds", sizeof("DeliveryService=cds") - 1 ) )
     {
-        p_sys->b_concert = VLC_TRUE;
+        p_sys->b_concert = true;
     }
     else
     {

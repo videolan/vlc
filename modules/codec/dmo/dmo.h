@@ -289,8 +289,8 @@ typedef struct _CMediaBuffer
     int i_ref;
     block_t *p_block;
     int i_max_size;
-    vlc_bool_t b_own;
+    bool b_own;
 
 } CMediaBuffer;
 
-CMediaBuffer *CMediaBufferCreate( block_t *, int, vlc_bool_t );
+CMediaBuffer *CMediaBufferCreate( block_t *, int, bool );

@@ -95,11 +95,11 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
-        ANGLE_LONGTEXT, VLC_FALSE );
+        ANGLE_LONGTEXT, false );
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-        CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "dvdread-css-method", NULL, NULL, CSSMETHOD_TEXT,
-                CSSMETHOD_LONGTEXT, VLC_TRUE );
+                CSSMETHOD_LONGTEXT, true );
         change_string_list( psz_css_list, psz_css_list_text, 0 );
     set_capability( "access_demux", 0 );
     add_shortcut( "dvd" );
@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
     if( !(p_dvdread = DVDOpen( psz_name )) )
     {
         msg_Err( p_demux, "DVDRead cannot open source: %s", psz_name );
-        intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"),
+        intf_UserFatal( p_demux, false, _("Playback failure"),
                         _("DVDRead could not open the disk \"%s\"."), psz_name );
         free( psz_name );
         return VLC_EGENERIC;
@@ -360,7 +360,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
-    vlc_bool_t *pb;
+    bool *pb;
     int64_t *pi64;
     input_title_t ***ppp_title;
     int *pi_int;
@@ -413,8 +413,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_CAN_CONTROL_PACE:
             /* TODO */
-            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb = VLC_TRUE;
+            pb = (bool*)va_arg( args, bool * );
+            *pb = true;
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:
@@ -557,7 +557,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "read failed for %d/%d blocks at 0x%02x",
                  i_read, i_blocks_once, p_sys->i_cur_block );
-        intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"),
+        intf_UserFatal( p_demux, false, _("Playback failure"),
                         _("DVDRead could not read %d/%d blocks at 0x%02x."),
                         i_read, i_blocks_once, p_sys->i_cur_block );
         return -1;
@@ -736,7 +736,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
-    tk->b_seen = VLC_TRUE;
+    tk->b_seen = true;
 }
 
 /*****************************************************************************
@@ -867,7 +867,7 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                 es_format_Clean( &tk->fmt );
                 if( tk->es ) es_out_Del( p_demux->out, tk->es );
             }
-            tk->b_seen = VLC_FALSE;
+            tk->b_seen = false;
         }
 
         if( p_demux->info.i_title != i_title )

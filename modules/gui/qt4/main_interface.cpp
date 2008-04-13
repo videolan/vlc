@@ -220,7 +220,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **/
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
-    p_intf->b_interaction = VLC_TRUE;
+    p_intf->b_interaction = true;
 
     /* Register callback for the intf-popupmenu variable */
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
@@ -298,7 +298,7 @@ MainInterface::~MainInterface()
         vlc_object_release( p_playlist );
     }
 
-    p_intf->b_interaction = VLC_FALSE;
+    p_intf->b_interaction = false;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
     p_intf->pf_request_window = NULL;
@@ -1085,7 +1085,7 @@ void MainInterface::dropEvent(QDropEvent *event)
         {
             if( input_AddSubtitles( THEMIM->getInput(),
                                     qtu( mimeData->urls()[0].toString() ),
-                                    VLC_TRUE ) )
+                                    true ) )
             {
                 event->acceptProposedAction();
                 return;
@@ -1099,7 +1099,7 @@ void MainInterface::dropEvent(QDropEvent *event)
         if( s.length() > 0 ) {
             playlist_Add( THEPL, qtu(s), NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
-                          PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                          PLAYLIST_END, true, false );
             first = false;
         }
      }

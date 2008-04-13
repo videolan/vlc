@@ -31,27 +31,27 @@ extern void libvlc_event_send( libvlc_event_manager_t *, libvlc_event_t *);
 static void test_events_dummy_callback( const libvlc_event_t * event, void * user_data)
 {
     (void)event;
-    vlc_bool_t * callback_was_called = user_data;
-    *callback_was_called = VLC_TRUE;
+    bool * callback_was_called = user_data;
+    *callback_was_called = true;
 }
 
 static void test_events_callback_and_detach( const libvlc_event_t * event, void * user_data)
 {
-    vlc_bool_t * callback_was_called = user_data;
+    bool * callback_was_called = user_data;
     libvlc_event_manager_t *em;
 
     em = libvlc_media_player_event_manager (event->p_obj, &ex);
     catch();
 
     libvlc_event_detach (em, event->type, test_events_callback_and_detach, user_data, &ex);
-    *callback_was_called = VLC_TRUE;
+    *callback_was_called = true;
 }
 
-static void test_event_type_reception( libvlc_event_manager_t * em, libvlc_event_type_t event_type, vlc_bool_t * callback_was_called )
+static void test_event_type_reception( libvlc_event_manager_t * em, libvlc_event_type_t event_type, bool * callback_was_called )
 {
     libvlc_event_t event;
     event.type = event_type;
-    *callback_was_called = VLC_FALSE;
+    *callback_was_called = false;
     libvlc_event_send (em, &event);
     assert (*callback_was_called);
 }
@@ -61,7 +61,7 @@ static void test_events (const char ** argv, int argc)
     libvlc_instance_t *vlc;
     libvlc_media_player_t *mi;
     libvlc_event_manager_t *em;
-    vlc_bool_t callback_was_called;
+    bool callback_was_called;
     libvlc_exception_t ex;
     libvlc_event_type_t mi_events[] = {
         libvlc_MediaPlayerPlayed,
@@ -101,7 +101,7 @@ static void test_events (const char ** argv, int argc)
 
     libvlc_event_t event;
     event.type = mi_events[mi_events_len-1];
-    callback_was_called = VLC_FALSE;
+    callback_was_called = false;
 
     libvlc_event_detach (em, mi_events[mi_events_len-1], test_events_dummy_callback, &callback_was_called, &ex);
     catch ();
@@ -112,7 +112,7 @@ static void test_events (const char ** argv, int argc)
     libvlc_event_send (em, &event);
     assert( callback_was_called );
 
-    callback_was_called = VLC_FALSE;
+    callback_was_called = false;
     libvlc_event_send (em, &event);
     assert( !callback_was_called );
 

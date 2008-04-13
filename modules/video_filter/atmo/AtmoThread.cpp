@@ -132,12 +132,12 @@ void CThread::Run()
    m_bTerminated = ATMO_FALSE;
 
 #if defined(_ATMO_VLC_PLUGIN_)
-   m_pAtmoThread->b_die = VLC_FALSE;
+   m_pAtmoThread->b_die = false;
    if(vlc_thread_create( m_pAtmoThread,
                          "Atmo-CThread-Class",
                          CThread::ThreadProc,
                          VLC_THREAD_PRIORITY_LOW,
-                         VLC_FALSE ))
+                         false ))
    {
       msg_Err( m_pOwner, "cannot launch one of the AtmoLight threads");
    }

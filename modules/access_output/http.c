@@ -100,21 +100,21 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_string( SOUT_CFG_PREFIX "user", "", NULL,
-                USER_TEXT, USER_LONGTEXT, VLC_TRUE );
+                USER_TEXT, USER_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "pwd", "", NULL,
-                PASS_TEXT, PASS_LONGTEXT, VLC_TRUE );
+                PASS_TEXT, PASS_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mime", "", NULL,
-                MIME_TEXT, MIME_LONGTEXT, VLC_TRUE );
+                MIME_TEXT, MIME_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL,
-                CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
+                CERT_TEXT, CERT_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "key", NULL, NULL,
-                KEY_TEXT, KEY_LONGTEXT, VLC_TRUE );
+                KEY_TEXT, KEY_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "ca", NULL, NULL,
-                CA_TEXT, CA_LONGTEXT, VLC_TRUE );
+                CA_TEXT, CA_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
-                CRL_TEXT, CRL_LONGTEXT, VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "bonjour", VLC_FALSE, NULL,
-              BONJOUR_TEXT, BONJOUR_LONGTEXT, VLC_TRUE);
+                CRL_TEXT, CRL_LONGTEXT, true );
+    add_bool( SOUT_CFG_PREFIX "bonjour", false, NULL,
+              BONJOUR_TEXT, BONJOUR_LONGTEXT, true);
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -141,7 +141,7 @@ struct sout_access_out_sys_t
     int                 i_header_allocated;
     int                 i_header_size;
     uint8_t             *p_header;
-    vlc_bool_t          b_header_complete;
+    bool          b_header_complete;
 
 #ifdef HAVE_AVAHI_CLIENT
     void                *p_bonjour;
@@ -336,7 +336,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_header_allocated = 1024;
     p_sys->i_header_size      = 0;
     p_sys->p_header           = malloc( p_sys->i_header_allocated );
-    p_sys->b_header_complete  = VLC_FALSE;
+    p_sys->b_header_complete  = false;
 
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
@@ -394,7 +394,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             {
                 /* free previously gathered header */
                 p_sys->i_header_size = 0;
-                p_sys->b_header_complete = VLC_FALSE;
+                p_sys->b_header_complete = false;
             }
             if( (int)(p_buffer->i_buffer + p_sys->i_header_size) >
                 p_sys->i_header_allocated )
@@ -411,7 +411,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         }
         else if( !p_sys->b_header_complete )
         {
-            p_sys->b_header_complete = VLC_TRUE;
+            p_sys->b_header_complete = true;
 
             httpd_StreamHeader( p_sys->p_httpd_stream, p_sys->p_header,
                                 p_sys->i_header_size );

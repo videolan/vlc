@@ -66,18 +66,18 @@ vlc_module_begin();
     set_description( _("HTTP remote control interface") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-        add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
-        add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true );
+        add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true );
         add_obsolete_string ( "http-charset" );
 #if defined( HAVE_FORK ) || defined( WIN32 )
-        add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, VLC_TRUE );
+        add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, true );
 #endif
-        add_bool   ( "http-album-art", VLC_FALSE, NULL, ART_TEXT, ART_LONGTEXT, VLC_TRUE );
+        add_bool   ( "http-album-art", false, NULL, ART_TEXT, ART_LONGTEXT, true );
         set_section( N_("HTTP SSL" ), 0 );
-        add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
-        add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
-        add_string ( "http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   VLC_TRUE );
-        add_string ( "http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, true );
+        add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  true );
+        add_string ( "http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   true );
+        add_string ( "http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  true );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -850,7 +850,7 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
     if( i_id )
     {
         playlist_item_t *p_pl_item = playlist_ItemGetById( p_sys->p_playlist,
-                                                           i_id, VLC_FALSE );
+                                                           i_id, false );
         if( p_pl_item )
             p_item = p_pl_item->p_input;
     }

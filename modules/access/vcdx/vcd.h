@@ -42,7 +42,7 @@ typedef struct
 #endif
 
     int                     i_still_time;
-    vlc_bool_t              b_end_of_cell;
+    bool              b_end_of_cell;
 
 #if FINISHED
     vcdplay_event_t         event;

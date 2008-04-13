@@ -25,7 +25,7 @@
  Fills out playlist information.
  */
 int      CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
-                            vlc_bool_t b_single_track );
+                            bool b_single_track );
 
 /*
  Sets CDDA Meta Information. In the Control routine,

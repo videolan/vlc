@@ -115,7 +115,7 @@ static int Create( vlc_object_t *p_this )
 
     /* We don't want a new buffer to be created because we're not sure we'll
      * actually need to resample anything. */
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return VLC_SUCCESS;
 }
@@ -162,7 +162,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             memcpy( p_in_buf->p_buffer, p_prev_sample,
                     i_nb_channels * sizeof(float) );
         }
-        p_filter->b_continuity = VLC_FALSE;
+        p_filter->b_continuity = false;
         return;
     }
 
@@ -181,7 +181,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Take care of the previous input sample (if any) */
     if( !p_filter->b_continuity )
     {
-        p_filter->b_continuity = VLC_TRUE;
+        p_filter->b_continuity = true;
         p_sys->i_remainder = 0;
         aout_DateInit( &p_sys->end_date, p_filter->output.i_rate );
     }
@@ -354,7 +354,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
     aout_filter.input = p_filter->fmt_in.audio;
     aout_filter.output = p_filter->fmt_out.audio;
-    aout_filter.b_continuity = VLC_FALSE;
+    aout_filter.b_continuity = false;
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_nb_bytes = p_block->i_buffer;

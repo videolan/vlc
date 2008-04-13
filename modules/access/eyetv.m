@@ -61,7 +61,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "eyetv-channel", 0, NULL,
-                 CHANNEL_TEXT, CHANNEL_LONGTEXT, VLC_FALSE );
+                 CHANNEL_TEXT, CHANNEL_LONGTEXT, false );
 
     set_capability( "access2", 0 );
     add_shortcut( "eyetv" );
@@ -271,9 +271,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return 0;
 
     i_read = net_Read( p_access, p_sys->eyetvSock, NULL, p_buffer, i_len,
-                       VLC_FALSE );
+                       false );
     if( i_read == 0 )
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
     else if( i_read > 0 )
         p_access->info.i_pos += i_read;
 
@@ -285,7 +285,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {/*
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
  

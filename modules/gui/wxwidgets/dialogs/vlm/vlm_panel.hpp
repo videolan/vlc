@@ -51,7 +51,7 @@ namespace wxvlc
     {
     public:
         VLMAddStreamPanel( intf_thread_t *, wxWindow *, VLMWrapper *,
-                           vlc_bool_t, vlc_bool_t );
+                           bool, bool );
         virtual ~VLMAddStreamPanel();
         void Load( VLMStream *);
     private:
@@ -72,7 +72,7 @@ namespace wxvlc
 
         wxWindow *p_parent;
 
-        vlc_bool_t b_edit, b_broadcast;
+        bool b_edit, b_broadcast;
 
         OpenDialog *p_open_dialog;
         SoutDialog *p_sout_dialog;
@@ -156,7 +156,7 @@ namespace wxvlc
     {
     public:
         VLMEditStreamFrame( intf_thread_t *p_intf, wxWindow *,
-                            VLMWrapper * , vlc_bool_t, VLMStream * );
+                            VLMWrapper * , bool, VLMStream * );
         virtual ~VLMEditStreamFrame();
 
     private:

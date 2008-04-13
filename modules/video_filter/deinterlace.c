@@ -128,7 +128,7 @@ vlc_module_begin();
 
     set_section( N_("Display"),NULL);
     add_string( "deinterlace-mode", "discard", NULL, MODE_TEXT,
-                MODE_LONGTEXT, VLC_FALSE );
+                MODE_LONGTEXT, false );
         change_string_list( mode_list, mode_list_text, 0 );
 
     add_shortcut( "deinterlace" );
@@ -138,7 +138,7 @@ vlc_module_begin();
     set_capability( "video filter2", 0 );
     set_section( N_("Streaming"),NULL);
     add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, SOUT_MODE_TEXT,
-                SOUT_MODE_LONGTEXT, VLC_FALSE );
+                SOUT_MODE_LONGTEXT, false );
         change_string_list( mode_list, mode_list_text, 0 );
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();
@@ -156,7 +156,7 @@ static const char *ppsz_filter_options[] = {
 struct vout_sys_t
 {
     int        i_mode;        /* Deinterlace mode */
-    vlc_bool_t b_double_rate; /* Shall we double the framerate? */
+    bool b_double_rate; /* Shall we double the framerate? */
 
     mtime_t    last_date;
     mtime_t    next_date;
@@ -203,7 +203,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_control = Control;
 
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
-    p_vout->p_sys->b_double_rate = VLC_FALSE;
+    p_vout->p_sys->b_double_rate = false;
     p_vout->p_sys->last_date = 0;
     p_vout->p_sys->p_vout = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
@@ -274,35 +274,35 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
     if( !strcmp( psz_method, "discard" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
-        p_vout->p_sys->b_double_rate = VLC_FALSE;
+        p_vout->p_sys->b_double_rate = false;
     }
     else if( !strcmp( psz_method, "mean" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_MEAN;
-        p_vout->p_sys->b_double_rate = VLC_FALSE;
+        p_vout->p_sys->b_double_rate = false;
     }
     else if( !strcmp( psz_method, "blend" )
              || !strcmp( psz_method, "average" )
              || !strcmp( psz_method, "combine-fields" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_BLEND;
-        p_vout->p_sys->b_double_rate = VLC_FALSE;
+        p_vout->p_sys->b_double_rate = false;
     }
     else if( !strcmp( psz_method, "bob" )
              || !strcmp( psz_method, "progressive-scan" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_BOB;
-        p_vout->p_sys->b_double_rate = VLC_TRUE;
+        p_vout->p_sys->b_double_rate = true;
     }
     else if( !strcmp( psz_method, "linear" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_LINEAR;
-        p_vout->p_sys->b_double_rate = VLC_TRUE;
+        p_vout->p_sys->b_double_rate = true;
     }
     else if( !strcmp( psz_method, "x" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_X;
-        p_vout->p_sys->b_double_rate = VLC_FALSE;
+        p_vout->p_sys->b_double_rate = false;
     }
     else
     {
@@ -1168,7 +1168,7 @@ static inline int XDeint8x8DetectC( uint8_t *src, int i_src )
         src += 2*i_src;
     }
 
-    return fc < 1 ? VLC_FALSE : VLC_TRUE;
+    return fc < 1 ? false : true;
 }
 #ifdef CAN_COMPILE_MMXEXT
 static inline int XDeint8x8DetectMMXEXT( uint8_t *src, int i_src )
@@ -1790,7 +1790,7 @@ static inline int XDeintNxNDetect( uint8_t *src, int i_src,
             fc++;
     }
 
-    return fc < 2 ? VLC_FALSE : VLC_TRUE;
+    return fc < 2 ? false : true;
 }
 
 static inline void XDeintNxNFrame( uint8_t *dst, int i_dst,
@@ -2179,7 +2179,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
     p_pic_dst->i_nb_fields = p_pic->i_nb_fields;
-    p_pic_dst->b_progressive = VLC_TRUE;
+    p_pic_dst->b_progressive = true;
     p_pic_dst->b_top_field_first = p_pic->b_top_field_first;
 
     p_pic->pf_release( p_pic );

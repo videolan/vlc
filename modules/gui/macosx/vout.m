@@ -58,7 +58,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Create( p_vout->p_libvlc, "video-device", VLC_VAR_INTEGER );
     var_Set( p_vout->p_libvlc, "video-device", new_val );
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
@@ -228,7 +228,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         var_AddCallback( p_real_vout, "video-device", DeviceCallback,
                          NULL );
 
-        val2.b_bool = VLC_TRUE;
+        val2.b_bool = true;
         var_Set( p_real_vout, "intf-change", val2 );
     }
 
@@ -407,11 +407,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( !p_real_vout ) return;
     if( var_Get( p_real_vout, "video-on-top", &val )>=0 && val.b_bool)
     {
-        val.b_bool = VLC_FALSE;
+        val.b_bool = false;
     }
     else
     {
-        val.b_bool = VLC_TRUE;
+        val.b_bool = true;
     }
     var_Set( p_real_vout, "video-on-top", val );
 }
@@ -573,7 +573,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( p_vout && [o_event type] == NSLeftMouseUp )
     {
         vlc_value_t b_val;
-        b_val.b_bool = VLC_TRUE;
+        b_val.b_bool = true;
         var_Set( p_vout, "mouse-clicked", b_val );
 
         var_Get( p_vout, "mouse-button-down", &val );
@@ -663,7 +663,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             }
             var_Set( p_vout, "mouse-y", val );
 
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_vout, "mouse-moved", val );
         }
         if( [self isFullscreen] )
@@ -1024,10 +1024,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     NSArray *o_screens = [NSScreen screens];
     NSScreen *o_screen;
-    vlc_bool_t b_menubar_screen = VLC_FALSE;
+    bool b_menubar_screen = false;
     int i_device;
 
-    b_init_ok = VLC_FALSE;
+    b_init_ok = false;
 
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
@@ -1041,7 +1041,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         o_screen = [NSScreen mainScreen];
 
     if( [o_screen isMainScreen] )
-        b_menubar_screen = VLC_TRUE;
+        b_menubar_screen = true;
 
     if( p_vout->b_fullscreen )
     {
@@ -1069,7 +1069,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
         }
-        if( b_black == VLC_TRUE )
+        if( b_black == true )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.6 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
@@ -1135,7 +1135,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     [o_pool release];
 
-    b_init_ok = VLC_TRUE;
+    b_init_ok = true;
     return self;
 }
 
@@ -1154,7 +1154,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id)closeReal:(id)sender
 {
-    if( b_black == VLC_TRUE )
+    if( b_black == true )
     {
         CGDisplayFadeReservationToken token;
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
@@ -1172,7 +1172,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     SetSystemUIMode( kUIModeNormal, 0);
     [super close];
     /* this does only work in embedded mode */
-    if( b_embedded == VLC_TRUE )
+    if( b_embedded == true )
         [[[[VLCMain sharedInstance] getControls] getFSPanel] orderOut: self];
 
     return NULL;

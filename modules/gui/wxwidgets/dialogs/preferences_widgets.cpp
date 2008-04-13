@@ -137,7 +137,7 @@ int ConfigControl::GetType()
     return i_type;
 }
 
-vlc_bool_t ConfigControl::IsAdvanced()
+bool ConfigControl::IsAdvanced()
 {
     return b_advanced;
 }
@@ -574,10 +574,10 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
 
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in a×y case that dirty was set to VLC_TRUE
+       // assume in a×y case that dirty was set to true
        // because lazy programmes will use the same callback for
        // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = VLC_FALSE;
+       p_module_config->b_dirty = false;
 
        free( val.psz_string );
     }
@@ -606,7 +606,7 @@ StringListConfigControl::~StringListConfigControl()
 
 void StringListConfigControl::UpdateCombo( module_config_t *p_item )
 {
-    vlc_bool_t b_found = VLC_FALSE;
+    bool b_found = false;
     int i_index;
 
     /* build a list of available options */
@@ -626,7 +626,7 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
                                p_item->ppsz_list_text[i_index] ) ?
                              wxU(p_item->ppsz_list_text[i_index]) :
                              wxL2U(p_item->ppsz_list[i_index]) );
-            b_found = VLC_TRUE;
+            b_found = true;
         }
     }
 
@@ -666,7 +666,7 @@ void StringListConfigControl::OnAction( wxCommandEvent& event )
     {
         combo->Clear();
         UpdateCombo( p_item );
-        p_item->b_dirty = VLC_FALSE;
+        p_item->b_dirty = false;
     }
 }
 
@@ -820,10 +820,10 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *p_this,
 
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in any case that dirty was set to VLC_TRUE
+       // assume in any case that dirty was set to true
        // because lazy programmes will use the same callback for
        // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = VLC_FALSE;
+       p_module_config->b_dirty = false;
     }
 
     UpdateCombo( p_module_config );
@@ -896,7 +896,7 @@ void IntegerListConfigControl::OnAction( wxCommandEvent& event )
     {
         combo->Clear();
         UpdateCombo( p_item );
-        p_item->b_dirty = VLC_FALSE;
+        p_item->b_dirty = false;
     }
 }
 

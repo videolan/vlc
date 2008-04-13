@@ -80,7 +80,7 @@ static void           DetachObject  ( vlc_object_t * );
 static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
 static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
-static void           SetAttachment ( vlc_object_t *, vlc_bool_t );
+static void           SetAttachment ( vlc_object_t *, bool );
 
 static vlc_list_t   * NewList       ( int );
 static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
@@ -129,11 +129,11 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_new->psz_object_name = NULL;
 
-    p_new->b_die = VLC_FALSE;
-    p_new->b_error = VLC_FALSE;
-    p_new->b_dead = VLC_FALSE;
-    p_priv->b_attached = VLC_FALSE;
-    p_new->b_force = VLC_FALSE;
+    p_new->b_die = false;
+    p_new->b_error = false;
+    p_new->b_dead = false;
+    p_priv->b_attached = false;
+    p_new->b_force = false;
 
     p_new->psz_header = NULL;
 
@@ -160,7 +160,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->i_objects = 1;
         p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
         p_libvlc_global->pp_objects[0] = p_new;
-        p_priv->b_attached = VLC_TRUE;
+        p_priv->b_attached = true;
         vlc_mutex_init( p_new, &structure_lock );
     }
     else
@@ -169,7 +169,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         if( i_type == VLC_OBJECT_LIBVLC )
         {
             p_new->p_libvlc = (libvlc_int_t*)p_new;
-            p_priv->b_attached = VLC_TRUE;
+            p_priv->b_attached = true;
         }
         else
         {
@@ -191,7 +191,7 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_priv->i_refcount = 1;
     p_priv->pf_destructor = kVLCDestructor;
-    p_priv->b_thread = VLC_FALSE;
+    p_priv->b_thread = false;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
@@ -517,7 +517,7 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
 {
     int pfd[2] = { -1, -1 };
     struct vlc_object_internals_t *internals = obj->p_internals;
-    vlc_bool_t killed = VLC_FALSE;
+    bool killed = false;
 
     vlc_spin_lock (&internals->spin);
     if (internals->pipes[0] == -1)
@@ -572,7 +572,7 @@ int __vlc_object_waitpipe( vlc_object_t *obj )
  *
  * @return true if the object is dying and should terminate.
  */
-vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
+bool __vlc_object_wait( vlc_object_t *obj )
 {
     vlc_assert_locked( &obj->object_lock );
     vlc_cond_wait( &obj->object_wait, &obj->object_lock );
@@ -625,7 +625,7 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
  *
  * @return true iff the object has not been killed yet
  */
-vlc_bool_t __vlc_object_alive( vlc_object_t *obj )
+bool __vlc_object_alive( vlc_object_t *obj )
 {
     vlc_assert_locked( &obj->object_lock );
     return !obj->b_die;
@@ -652,7 +652,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     int fd;
 
     vlc_mutex_lock( &p_this->object_lock );
-    p_this->b_die = VLC_TRUE;
+    p_this->b_die = true;
 
     vlc_spin_lock (&internals->spin);
     fd = internals->pipes[1];
@@ -879,7 +879,7 @@ void __vlc_object_yield( vlc_object_t *p_this )
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
-    vlc_bool_t b_should_destroy;
+    bool b_should_destroy;
 
     vlc_mutex_lock( &structure_lock );
 
@@ -934,7 +934,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     /* Climb up the tree to see whether we are connected with the root */
     if( p_parent->p_internals->b_attached )
     {
-        SetAttachment( p_this, VLC_TRUE );
+        SetAttachment( p_this, true );
     }
 
     vlc_mutex_unlock( &structure_lock );
@@ -962,7 +962,7 @@ void __vlc_object_detach( vlc_object_t *p_this )
     /* Climb up the tree to see whether we are connected with the root */
     if( p_this->p_parent->p_internals->b_attached )
     {
-        SetAttachment( p_this, VLC_FALSE );
+        SetAttachment( p_this, false );
     }
 
     DetachObject( p_this );
@@ -1442,7 +1442,7 @@ static void DetachObject( vlc_object_t *p_this )
  * This function is used by the attach and detach functions to propagate
  * the b_attached flag in a subtree.
  *****************************************************************************/
-static void SetAttachment( vlc_object_t *p_this, vlc_bool_t b_attached )
+static void SetAttachment( vlc_object_t *p_this, bool b_attached )
 {
     int i_index;
 

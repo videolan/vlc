@@ -86,7 +86,7 @@ public:
 private:
     intf_thread_t *p_intf;
     PrefsDialog *p_prefs_dialog;
-    vlc_bool_t b_advanced;
+    bool b_advanced;
 
     HTREEITEM general_item;
     HTREEITEM plugins_item;
@@ -115,7 +115,7 @@ private:
     intf_thread_t *p_intf;
     PrefsDialog *p_prefs_dialog;
 
-    vlc_bool_t b_advanced;
+    bool b_advanced;
 
     HWND label;
 
@@ -132,7 +132,7 @@ public:
                                 free( psz_section );
                                 free( psz_help ); }
 
-    vlc_bool_t b_submodule;
+    bool b_submodule;
 
     PrefsPanel *panel;
     int i_object_id;
@@ -336,7 +336,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     /* Initializations */
     p_intf = _p_intf;
     p_prefs_dialog = _p_prefs_dialog;
-    b_advanced = VLC_FALSE;
+    b_advanced = false;
 
     /* Create a tree view */
     // Initialize the INITCOMMONCONTROLSEX structure.
@@ -691,7 +691,7 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
     p_intf = _p_intf;
     p_prefs_dialog = _p_prefs_dialog;
 
-    b_advanced = VLC_TRUE;
+    b_advanced = true;
 
     if( i_object_id == PLUGIN_ID || i_object_id == GENERAL_ID ||
         i_object_id == CAPABILITY_ID )

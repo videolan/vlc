@@ -75,7 +75,7 @@ static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
 
 static int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
-static void DirectXPopupMenu( event_thread_t *p_event, vlc_bool_t b_open )
+static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
 {
     playlist_t *p_playlist =
         vlc_object_find( p_event, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -115,7 +115,7 @@ void E_(EventThread)( event_thread_t *p_event )
     if( DirectXCreateWindow( p_event->p_vout ) )
     {
         msg_Err( p_event, "out of memory" );
-        p_event->b_dead = VLC_TRUE;
+        p_event->b_dead = true;
     }
 
     /* Signal the creation of the window */
@@ -172,7 +172,7 @@ void E_(EventThread)( event_thread_t *p_event )
                     p_event->p_vout->fmt_in.i_y_offset;
                 var_Set( p_event->p_vout, "mouse-y", val );
 
-                val.b_bool = VLC_TRUE;
+                val.b_bool = true;
                 var_Set( p_event->p_vout, "mouse-moved", val );
             }
 
@@ -194,14 +194,14 @@ void E_(EventThread)( event_thread_t *p_event )
 
         case WM_VLC_HIDE_MOUSE:
             if( p_event->p_vout->p_sys->b_cursor_hidden ) break;
-            p_event->p_vout->p_sys->b_cursor_hidden = VLC_TRUE;
+            p_event->p_vout->p_sys->b_cursor_hidden = true;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( FALSE );
             break;
 
         case WM_VLC_SHOW_MOUSE:
             if( !p_event->p_vout->p_sys->b_cursor_hidden ) break;
-            p_event->p_vout->p_sys->b_cursor_hidden = VLC_FALSE;
+            p_event->p_vout->p_sys->b_cursor_hidden = false;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( TRUE );
             break;
@@ -210,7 +210,7 @@ void E_(EventThread)( event_thread_t *p_event )
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int |= 1;
             var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, VLC_FALSE );
+            DirectXPopupMenu( p_event, false );
             break;
 
         case WM_LBUTTONUP:
@@ -218,7 +218,7 @@ void E_(EventThread)( event_thread_t *p_event )
             val.i_int &= ~1;
             var_Set( p_event->p_vout, "mouse-button-down", val );
 
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_event->p_vout, "mouse-clicked", val );
             break;
 
@@ -230,7 +230,7 @@ void E_(EventThread)( event_thread_t *p_event )
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int |= 2;
             var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, VLC_FALSE );
+            DirectXPopupMenu( p_event, false );
             break;
 
         case WM_MBUTTONUP:
@@ -243,14 +243,14 @@ void E_(EventThread)( event_thread_t *p_event )
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int |= 4;
             var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, VLC_FALSE );
+            DirectXPopupMenu( p_event, false );
             break;
 
         case WM_RBUTTONUP:
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int &= ~4;
             var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, VLC_TRUE );
+            DirectXPopupMenu( p_event, true );
             break;
 
         case WM_KEYDOWN:
@@ -608,7 +608,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
  * its job is to update the source and destination RECTs used to display the
  * picture.
  *****************************************************************************/
-void E_(UpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
+void E_(UpdateRects)( vout_thread_t *p_vout, bool b_force )
 {
 #define rect_src p_vout->p_sys->rect_src
 #define rect_src_clipped p_vout->p_sys->rect_src_clipped
@@ -861,7 +861,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
 
     case WM_WINDOWPOSCHANGED:
-        E_(UpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, true );
         return 0;
 
     /* the user wants to close the window */
@@ -911,7 +911,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     case WM_KILLFOCUS:
 #ifdef MODULE_NAME_IS_wingapi
-        p_vout->p_sys->b_focus = VLC_FALSE;
+        p_vout->p_sys->b_focus = false;
         if( !p_vout->p_sys->b_parent_focus ) GXSuspend();
 #endif
 #ifdef UNDER_CE
@@ -931,7 +931,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     case WM_SETFOCUS:
 #ifdef MODULE_NAME_IS_wingapi
-        p_vout->p_sys->b_focus = VLC_TRUE;
+        p_vout->p_sys->b_focus = true;
         GXResume();
 #endif
 #ifdef UNDER_CE
@@ -1124,7 +1124,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->hparent, i_query, args );
 
-        p_vout->p_sys->b_on_top_change = VLC_TRUE;
+        p_vout->p_sys->b_on_top_change = true;
         return VLC_SUCCESS;
 
 #ifdef MODULE_NAME_IS_wingapi

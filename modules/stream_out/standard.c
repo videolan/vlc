@@ -101,31 +101,31 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_STREAM );
 
     add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
-                ACCESS_LONGTEXT, VLC_FALSE );
+                ACCESS_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
-                MUX_LONGTEXT, VLC_FALSE );
+                MUX_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
-                DEST_LONGTEXT, VLC_FALSE );
+                DEST_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "bind", "", NULL, BIND_TEXT,
-                BIND_LONGTEXT, VLC_FALSE );
+                BIND_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "path", "", NULL, PATH_TEXT,
-                PATH_LONGTEXT, VLC_FALSE );
+                PATH_LONGTEXT, false );
         change_unsafe();
 
-    add_bool( SOUT_CFG_PREFIX "sap", VLC_FALSE, NULL, SAP_TEXT, SAP_LONGTEXT,
-              VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
+              true );
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT, NAME_LONGTEXT,
-                                        VLC_TRUE );
+                                        true );
     add_string( SOUT_CFG_PREFIX "group", "", NULL, GROUP_TEXT, GROUP_LONGTEXT,
-                                        VLC_TRUE );
+                                        true );
     add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT, DESC_LONGTEXT,
-                                        VLC_TRUE );
+                                        true );
     add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT, URL_LONGTEXT,
-                                        VLC_TRUE );
+                                        true );
     add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT, EMAIL_LONGTEXT,
-                                        VLC_TRUE );
+                                        true );
     add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT, PHONE_LONGTEXT,
-                                        VLC_TRUE );
+                                        true );
     add_obsolete_bool( SOUT_CFG_PREFIX "sap-ipv6" );
 
     set_callbacks( Open, Close );

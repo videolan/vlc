@@ -65,8 +65,8 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
     p_access->info.i_update = 0;
     p_access->info.i_size   = 0;
     p_access->info.i_pos    = 0;
-    p_access->info.b_eof    = VLC_FALSE;
-    p_access->info.b_prebuffered = VLC_FALSE;
+    p_access->info.b_eof    = false;
+    p_access->info.b_prebuffered = false;
     p_access->info.i_title  = 0;
     p_access->info.i_seekpoint = 0;
 
@@ -76,7 +76,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj, const char *psz_acces
 
     p_access->p_module =
          module_Need( p_access, p_source ? "access_filter" : "access2",
-                      psz_access, VLC_TRUE );
+                      psz_access, true );
 
     if( p_access->p_module == NULL )
     {

@@ -52,7 +52,7 @@ static VLCUpdate *_o_sharedInstance = nil;
         [self dealloc];
     } else {
         _o_sharedInstance = [super init];
-        b_checked = VLC_FALSE;
+        b_checked = false;
 
         /* clean the interface */
         [o_fld_releaseNote setString: @""];
@@ -118,7 +118,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     {
         [o_bar_checking startAnimation: self];
         [self checkForUpdate];
-        b_checked = VLC_TRUE;
+        b_checked = true;
         [o_bar_checking stopAnimation: self];
     }
 }
@@ -191,7 +191,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     [pool release];
 }
 
-static void updateCallback( void * p_data, vlc_bool_t b_success )
+static void updateCallback( void * p_data, bool b_success )
 {
     [(id)p_data setUpToDate: !b_success || update_CompareReleaseToCurrent( ((VLCUpdate*)p_data)->p_u ) == UpdateReleaseStatusNewer ];
 }

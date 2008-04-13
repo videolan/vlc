@@ -99,8 +99,8 @@ int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
     p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
     p_spu->i_start = i_start;
     p_spu->i_stop = i_stop;
-    p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = false;
 
     p_spu->i_x = i_hmargin;
     p_spu->i_y = i_vmargin;

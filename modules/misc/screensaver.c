@@ -76,7 +76,7 @@ static void poke_screensaver( intf_thread_t *p_intf,
 static void screensaver_send_message_void ( intf_thread_t *p_intf,
                                        DBusConnection *p_connection,
                                        const char *psz_name );
-static vlc_bool_t screensaver_is_running( DBusConnection *p_connection );
+static bool screensaver_is_running( DBusConnection *p_connection );
 
 
 struct intf_sys_t
@@ -292,12 +292,12 @@ static void screensaver_send_message_void ( intf_thread_t *p_intf,
     dbus_message_unref( p_message );
 }
 
-static vlc_bool_t screensaver_is_running( DBusConnection *p_connection )
+static bool screensaver_is_running( DBusConnection *p_connection )
 {
     DBusError error;
-    vlc_bool_t b_return;
+    bool b_return;
 
-    if( !p_connection ) return VLC_FALSE;
+    if( !p_connection ) return false;
 
     dbus_error_init( &error );
     b_return = dbus_bus_name_has_owner( p_connection, GS_SERVICE, &error );

@@ -134,18 +134,18 @@ extern void E_(Deactivate) ( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "XVMC" );
-    add_string( "xvmc-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
-    add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, VLC_TRUE );
-    add_bool( "xvmc-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
-    add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
+    add_string( "xvmc-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
+    add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true );
+    add_bool( "xvmc-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true );
+    add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true );
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, VLC_TRUE );
+    add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "xvmc-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, VLC_TRUE );
+    add_integer ( "xvmc-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
 #endif
-    add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
-    add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, VLC_FALSE );
+    add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false );
+    add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false );
 
     set_description( _("XVMC extension video output") );
     set_capability( "video output", 10 );
@@ -1040,7 +1040,7 @@ static int xxmc_find_context( vout_thread_t *p_vout, vlc_xxmc_t *xxmc,
         unsigned int width, unsigned int height )
 {
     unsigned int i, k;
-    vlc_bool_t found = VLC_FALSE;
+    bool found = false;
     xvmc_capabilities_t *curCap = NULL;
     unsigned int request_mpeg_flags, request_accel_flags;
 
@@ -1066,7 +1066,7 @@ static int xxmc_find_context( vout_thread_t *p_vout, vlc_xxmc_t *xxmc,
                   (width <= curCap->max_width) &&
                   (height <= curCap->max_height) )
             {
-                found = VLC_TRUE;
+                found = true;
                 break;
             }
             curCap++;

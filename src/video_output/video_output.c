@@ -128,7 +128,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         /* Reattach video output to playlist before bailing out */
         if( p_vout )
         {
-            spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
+            spu_Attach( p_vout->p_spu, p_this, false );
             vlc_object_detach( p_vout );
             vlc_object_attach( p_vout, p_this->p_libvlc );
         }
@@ -185,7 +185,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
             if( !psz_filter_chain && !p_vout->psz_filter_chain )
             {
-                p_vout->b_filter_change = VLC_FALSE;
+                p_vout->b_filter_change = false;
             }
 
             free( psz_filter_chain );
@@ -204,7 +204,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         else
         {
             /* This video output is cool! Hijack it. */
-            spu_Attach( p_vout->p_spu, p_this, VLC_TRUE );
+            spu_Attach( p_vout->p_spu, p_this, true );
             vlc_object_attach( p_vout, p_this );
             if( p_vout->b_title_show )
                 DisplayTitleOnOSD( p_vout );
@@ -327,7 +327,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize subpicture unit */
     p_vout->p_spu = spu_Create( p_vout );
-    spu_Attach( p_vout->p_spu, p_parent, VLC_TRUE );
+    spu_Attach( p_vout->p_spu, p_parent, true );
 
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
@@ -372,7 +372,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
 
     var_AddCallback( p_vout, "video-filter", VideoFilter2Callback, NULL );
-    p_vout->b_vfilter_change = VLC_TRUE;
+    p_vout->b_vfilter_change = true;
     p_vout->i_vfilters = 0;
 
     /* Choose the video output module */
@@ -449,7 +449,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
 
     if( vlc_thread_create( p_vout, "video output", RunThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, true ) )
     {
         msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
@@ -521,7 +521,7 @@ static void vout_Destructor( vlc_object_t * p_this )
         if( p_another_vout == NULL )
         {
             vlc_value_t val;
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_playlist, "intf-show", val );
     }
     else
@@ -747,7 +747,7 @@ static void RunThread( vout_thread_t *p_vout)
     input_thread_t *p_input = NULL ;           /* Parent input, if it exists */
 
     vlc_value_t     val;
-    vlc_bool_t      b_drop_late;
+    bool      b_drop_late;
 
     int             i_displayed = 0, i_lost = 0, i_loops = 0;
 
@@ -950,7 +950,7 @@ static void RunThread( vout_thread_t *p_vout)
         }
 
         /* Video Filter2 stuff */
-        if( p_vout->b_vfilter_change == VLC_TRUE )
+        if( p_vout->b_vfilter_change == true )
         {
             int i;
             vlc_mutex_lock( &p_vout->vfilter_lock );
@@ -981,7 +981,7 @@ static void RunThread( vout_thread_t *p_vout)
                 p_vfilter->p_cfg = p_vout->p_vfilters_cfg[i];
                 p_vfilter->p_module = module_Need( p_vfilter, "video filter2",
                                                    p_vout->psz_vfilters[i],
-                                                   VLC_TRUE );
+                                                   true );
 
                 if( p_vfilter->p_module )
                 {
@@ -1000,7 +1000,7 @@ static void RunThread( vout_thread_t *p_vout)
                     vlc_object_release( p_vfilter );
                 }
             }
-            p_vout->b_vfilter_change = VLC_FALSE;
+            p_vout->b_vfilter_change = false;
             vlc_mutex_unlock( &p_vout->vfilter_lock );
         }
 
@@ -1038,7 +1038,7 @@ static void RunThread( vout_thread_t *p_vout)
 
         if( p_picture && p_vout->b_snapshot )
         {
-            p_vout->b_snapshot = VLC_FALSE;
+            p_vout->b_snapshot = false;
             vout_Snapshot( p_vout, p_picture );
         }
 
@@ -1053,7 +1053,7 @@ static void RunThread( vout_thread_t *p_vout)
                                            FIND_PARENT );
             }
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
-            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : VLC_FALSE );
+            p_input ? var_GetBool( p_input, "state" ) == PAUSE_S : false );
             if( p_input )
                 vlc_object_release( p_input );
             p_input = NULL;
@@ -1274,7 +1274,7 @@ static void EndThread( vout_thread_t *p_vout )
     }
 
     /* Destroy subpicture unit */
-    spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), VLC_FALSE );
+    spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
     spu_Destroy( p_vout->p_spu );
 
     /* Destroy the video filters2 */
@@ -1393,7 +1393,7 @@ int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
     (void)psz_variable; (void)newval; (void)oldval; (void)p_data;
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
@@ -1479,7 +1479,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     vlc_object_release( p_input );
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "intf-change", val );
 
     val.psz_string = psz_filter;
@@ -1505,7 +1505,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
         return( VLC_EGENERIC );
     }
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "intf-change", val );
 
     /* Modify input as well because the vout might have to be restarted */
@@ -1521,10 +1521,10 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
         suxor_thread_t *p_suxor =
             vlc_object_create( p_vout, sizeof(suxor_thread_t) );
         p_suxor->p_input = p_input;
-        p_vout->b_filter_change = VLC_TRUE;
+        p_vout->b_filter_change = true;
         vlc_object_yield( p_input );
         vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+                           VLC_THREAD_PRIORITY_LOW, false );
     }
 
     vlc_object_release( p_input );
@@ -1583,7 +1583,7 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
 
     vlc_mutex_lock( &p_vout->vfilter_lock );
     ParseVideoFilter2Chain( p_vout, newval.psz_string );
-    p_vout->b_vfilter_change = VLC_TRUE;
+    p_vout->b_vfilter_change = true;
     vlc_mutex_unlock( &p_vout->vfilter_lock );
 
     return VLC_SUCCESS;

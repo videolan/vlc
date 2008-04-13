@@ -61,8 +61,8 @@ struct vout_sys_t
     VLCQTView * o_qtview;
     VLCVoutView       * o_vout_view;
 
-    vlc_bool_t  b_saved_frame;
-    vlc_bool_t  b_cpu_has_simd; /* does CPU supports Altivec, MMX, etc... */
+    bool  b_saved_frame;
+    bool  b_cpu_has_simd; /* does CPU supports Altivec, MMX, etc... */
     NSRect      s_frame;
 
     CodecType i_codec;
@@ -76,7 +76,7 @@ struct vout_sys_t
     int i_origx, i_origy;
     int i_width, i_height;
     /* Mozilla plugin-related variables */
-    vlc_bool_t b_embedded;
+    bool b_embedded;
     RgnHandle clip_mask;
 };
 
@@ -142,9 +142,9 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
      * CGrafPtr that we're expected to use */
     var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
     if( value_drawable.i_int != 0 )
-        p_vout->p_sys->b_embedded = VLC_TRUE;
+        p_vout->p_sys->b_embedded = true;
     else
-        p_vout->p_sys->b_embedded = VLC_FALSE;
+        p_vout->p_sys->b_embedded = false;
 
     p_vout->p_sys->b_cpu_has_simd =
         vlc_CPU() & (CPU_CAPABILITY_ALTIVEC|CPU_CAPABILITY_MMXEXT);
@@ -454,7 +454,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int ControlVideo( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    vlc_bool_t b_arg;
+    bool b_arg;
 
     switch( i_query )
     {
@@ -819,7 +819,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         [p_vout->p_sys->o_vout_view frame].size;
         p_vout->p_sys->s_frame.origin =
         [[p_vout->p_sys->o_vout_view getWindow] frame].origin;
-        p_vout->p_sys->b_saved_frame = VLC_TRUE;
+        p_vout->p_sys->b_saved_frame = true;
     }
         else
         {
