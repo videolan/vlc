@@ -605,7 +605,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             /* FIXME: This breaks totem, mplayer and quicktime at least */
             if( httpd_MsgGet( query, "Range" ) != NULL )
             {
-                answer->i_status = 456; /* cannot seek */
+                answer->i_status = 456; /* cannot seek, stream not seekable */
                 break;
             }
 #endif
