@@ -44,7 +44,7 @@ vlc_module_begin();
     set_description( _("CDG demuxer") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux2", 3 );
+    set_capability( "demux", 3 );
     set_callbacks( Open, Close );
     add_shortcut( "cdg" );
     add_shortcut( "subtitle" );
@@ -77,7 +77,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Identify cdg file by extension, as there is no simple way to
      * detect it */
-    if( !demux2_IsPathExtension( p_demux, ".cdg" ) && !demux2_IsForced( p_demux, "cdg" ) )
+    if( !demux_IsPathExtension( p_demux, ".cdg" ) && !demux_IsForced( p_demux, "cdg" ) )
         return VLC_EGENERIC;
 
     /* CDG file size has to be multiple of CDG_FRAME_SIZE (it works even
@@ -151,7 +151,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
     default:
-        return demux2_vaControlHelper( p_demux->s, 0, -1,
+        return demux_vaControlHelper( p_demux->s, 0, -1,
                                        8*CDG_FRAME_SIZE*CDG_FRAME_RATE, CDG_FRAME_SIZE, i_query, args );
     }
 }

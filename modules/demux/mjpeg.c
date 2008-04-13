@@ -51,7 +51,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "MJPEG");
     set_description( _("M-JPEG camera demuxer") );
-    set_capability( "demux2", 5 );
+    set_capability( "demux", 5 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
@@ -345,8 +345,8 @@ static int Open( vlc_object_t * p_this )
     /* Check for jpeg file extension */
     p_sys->b_still = false;
     p_sys->i_still_end = 0;
-    if( demux2_IsPathExtension( p_demux, ".jpeg" ) ||
-        demux2_IsPathExtension( p_demux, ".jpg" ) )
+    if( demux_IsPathExtension( p_demux, ".jpeg" ) ||
+        demux_IsPathExtension( p_demux, ".jpg" ) )
     {
         p_sys->b_still = true;
         if( val.f_float)
@@ -520,5 +520,5 @@ static void Close ( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    return demux2_vaControlHelper( p_demux->s, 0, 0, 0, 0, i_query, args );
+    return demux_vaControlHelper( p_demux->s, 0, 0, 0, 0, i_query, args );
 }

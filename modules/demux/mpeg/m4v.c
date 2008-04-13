@@ -47,7 +47,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("MPEG-4 video demuxer" ) );
-    set_capability( "demux2", 0 );
+    set_capability( "demux", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "m4v" );
     add_shortcut( "mp4v" );
@@ -196,7 +196,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( i_query == DEMUX_SET_TIME )
         return VLC_EGENERIC;
     else
-        return demux2_vaControlHelper( p_demux->s,
+        return demux_vaControlHelper( p_demux->s,
                                        0, -1,
                                        0, 1, i_query, args );
 }

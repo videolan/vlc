@@ -33,10 +33,10 @@ static bool SkipID3Tag( demux_t * );
 static bool SkipAPETag( demux_t *p_demux );
 
 /*****************************************************************************
- * demux2_New:
+ * demux_New:
  *  if s is NULL then load a access_demux
  *****************************************************************************/
-demux_t *__demux2_New( vlc_object_t *p_obj,
+demux_t *__demux_New( vlc_object_t *p_obj,
                        const char *psz_access, const char *psz_demux,
                        const char *psz_path,
                        stream_t *s, es_out_t *out, bool b_quick )
@@ -156,7 +156,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             SkipAPETag( p_demux );
 
         p_demux->p_module =
-            module_Need( p_demux, "demux2", psz_module,
+            module_Need( p_demux, "demux", psz_module,
                          !strcmp( psz_module, p_demux->psz_demux ) ?
                          true : false );
     }
@@ -182,9 +182,9 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
 }
 
 /*****************************************************************************
- * demux2_Delete:
+ * demux_Delete:
  *****************************************************************************/
-void demux2_Delete( demux_t *p_demux )
+void demux_Delete( demux_t *p_demux )
 {
     module_Unneed( p_demux, p_demux->p_module );
     vlc_object_detach( p_demux );
@@ -197,9 +197,9 @@ void demux2_Delete( demux_t *p_demux )
 }
 
 /*****************************************************************************
- * demux2_vaControlHelper:
+ * demux_vaControlHelper:
  *****************************************************************************/
-int demux2_vaControlHelper( stream_t *s,
+int demux_vaControlHelper( stream_t *s,
                             int64_t i_start, int64_t i_end,
                             int i_bitrate, int i_align,
                             int i_query, va_list args )
@@ -374,7 +374,7 @@ void stream_DemuxDelete( stream_t *s )
     block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_thread_join( s );
 
-    if( p_sys->p_demux ) demux2_Delete( p_sys->p_demux );
+    if( p_sys->p_demux ) demux_Delete( p_sys->p_demux );
     if( p_sys->p_block ) block_Release( p_sys->p_block );
 
     block_FifoRelease( p_sys->p_fifo );
@@ -530,7 +530,7 @@ static int DStreamThread( stream_t *s )
     demux_t *p_demux;
 
     /* Create the demuxer */
-    if( !(p_demux = demux2_New( s, "", p_sys->psz_name, "", s, p_sys->out,
+    if( !(p_demux = demux_New( s, "", p_sys->psz_name, "", s, p_sys->out,
                                false )) )
     {
         return VLC_EGENERIC;

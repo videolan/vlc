@@ -46,7 +46,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "DV" );
     set_description( _("DV (Digital Video) demuxer") );
-    set_capability( "demux2", 3 );
+    set_capability( "demux", 3 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, false );
@@ -145,7 +145,7 @@ static int Open( vlc_object_t * p_this )
      * it is possible to force this demux. */
 
     /* Check for DV file extension */
-    if( !demux2_IsPathExtension( p_demux, ".dv" ) && !p_demux->b_force )
+    if( !demux_IsPathExtension( p_demux, ".dv" ) && !p_demux->b_force )
         return VLC_EGENERIC;
 
     if( stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
@@ -341,7 +341,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys  = p_demux->p_sys;
 
     /* XXX: DEMUX_SET_TIME is precise here */
-    return demux2_vaControlHelper( p_demux->s,
+    return demux_vaControlHelper( p_demux->s,
                                    0, -1,
                                    p_sys->frame_size * p_sys->f_rate * 8,
                                    p_sys->frame_size, i_query, args );

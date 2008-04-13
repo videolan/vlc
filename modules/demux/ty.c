@@ -57,7 +57,7 @@ vlc_module_begin();
     set_description(_("TY Stream audio/video demux"));
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability("demux2", 6);
+    set_capability("demux", 6);
     /* FIXME: there seems to be a segfault when using PVR access
      * and TY demux has a bigger priority than PS
      * Something must be wrong.
@@ -306,8 +306,8 @@ static int Open(vlc_object_t *p_this)
          U32_AT(&p_peek[8]) != CHUNK_SIZE )
     {
         if( !p_demux->b_force &&
-            !demux2_IsPathExtension( p_demux, ".ty" ) &&
-            !demux2_IsPathExtension( p_demux, ".ty+" ) )
+            !demux_IsPathExtension( p_demux, ".ty" ) &&
+            !demux_IsPathExtension( p_demux, ".ty+" ) )
             return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TY file, "
                            "continuing anyway..." );

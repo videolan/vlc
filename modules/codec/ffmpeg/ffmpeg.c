@@ -209,7 +209,7 @@ vlc_module_begin();
     /* demux submodule */
     add_submodule();
     set_description( _("FFmpeg demuxer" ) );
-    set_capability( "demux2", 2 );
+    set_capability( "demux", 2 );
     set_callbacks( E_(OpenDemux), E_(CloseDemux) );
 
     /* mux submodule */

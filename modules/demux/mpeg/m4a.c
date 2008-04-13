@@ -44,7 +44,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("MPEG-4 audio demuxer" ) );
-    set_capability( "demux2", 110 );
+    set_capability( "demux", 110 );
     set_callbacks( Open, Close );
     add_shortcut( "m4a" );
     add_shortcut( "mp4a" );
@@ -83,7 +83,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     int         b_forced = false;
 
-    if( demux2_IsPathExtension( p_demux, ".aac" ) )
+    if( demux_IsPathExtension( p_demux, ".aac" ) )
         b_forced = true;
 
     if( !p_demux->b_force && !b_forced )
@@ -201,7 +201,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_TIME: /* TODO high precision seek for multi-input */
     default:
-        i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
+        i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                         p_sys->i_bitrate_avg, 1, i_query, args);
         /* Fix time_offset */
         if( (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) &&

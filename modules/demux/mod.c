@@ -67,7 +67,7 @@ static void Close  ( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "MOD");
     set_description( _("MOD demuxer (libmodplug)" ) );
-    set_capability( "demux2", 10 );
+    set_capability( "demux", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
 

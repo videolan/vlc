@@ -46,7 +46,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("Raw A/52 demuxer") );
-    set_capability( "demux2", 145 );
+    set_capability( "demux", 145 );
     set_callbacks( Open, Close );
     add_shortcut( "a52" );
 vlc_module_end();
@@ -260,7 +260,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else
     {
-        return demux2_vaControlHelper( p_demux->s,
+        return demux_vaControlHelper( p_demux->s,
                                        0, -1,
                                        8*p_sys->i_mux_rate, 1, i_query, args );
     }

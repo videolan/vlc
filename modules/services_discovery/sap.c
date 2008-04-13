@@ -153,7 +153,7 @@ vlc_module_begin();
     add_submodule();
         set_description( _("SDP Descriptions parser") );
         add_shortcut( "sdp" );
-        set_capability( "demux2", 51 );
+        set_capability( "demux", 51 );
         set_callbacks( OpenDemux, CloseDemux );
 vlc_module_end();
 

@@ -68,7 +68,7 @@ int E_(Import_Shoutcast)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    if( !demux2_IsForced( p_demux, "shout-winamp" ) )
+    if( !demux_IsForced( p_demux, "shout-winamp" ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using shoutcast playlist reader" );

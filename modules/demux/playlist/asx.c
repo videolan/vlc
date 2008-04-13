@@ -194,9 +194,9 @@ int E_(Import_ASX)( vlc_object_t *p_this )
     // skip over possible leading empty lines and empty spaces
     p_peek = (uint8_t *)SkipBlanks((char *)p_peek, 6);
 
-    if( POKE( p_peek, "<asx", 4 ) || demux2_IsPathExtension( p_demux, ".asx" ) ||
-        demux2_IsPathExtension( p_demux, ".wax" ) || demux2_IsPathExtension( p_demux, ".wvx" ) ||
-        demux2_IsForced( p_demux, "asx-open" ) )
+    if( POKE( p_peek, "<asx", 4 ) || demux_IsPathExtension( p_demux, ".asx" ) ||
+        demux_IsPathExtension( p_demux, ".wax" ) || demux_IsPathExtension( p_demux, ".wvx" ) ||
+        demux_IsForced( p_demux, "asx-open" ) )
     {
         ;
     }

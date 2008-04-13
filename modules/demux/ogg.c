@@ -50,7 +50,7 @@ vlc_module_begin();
     set_description( _("OGG demuxer" ) );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux2", 50 );
+    set_capability( "demux", 50 );
     set_callbacks( Open, Close );
     add_shortcut( "ogg" );
 vlc_module_end();
@@ -402,7 +402,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             ogg_sync_reset( &p_sys->oy );
 
         default:
-            return demux2_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
+            return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
                                            1, i_query, args );
     }
 }

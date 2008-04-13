@@ -55,7 +55,7 @@ int E_(Import_PLS)( vlc_object_t *p_this )
     CHECK_PEEK( p_peek, 10 );
 
     if( POKE( p_peek, "[playlist]", 10 ) || POKE( p_peek, "[Reference]", 10 ) ||
-        demux2_IsPathExtension( p_demux, ".pls" )   || demux2_IsForced( p_demux, "pls" ) )
+        demux_IsPathExtension( p_demux, ".pls" )   || demux_IsForced( p_demux, "pls" ) )
     {
         ;
     }

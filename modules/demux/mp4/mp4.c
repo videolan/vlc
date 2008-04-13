@@ -55,7 +55,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("MP4 stream demuxer") );
-    set_capability( "demux2", 242 );
+    set_capability( "demux", 242 );
     set_callbacks( Open, Close );
 vlc_module_end();
 

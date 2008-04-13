@@ -58,10 +58,10 @@ int E_(Import_M3U)( vlc_object_t *p_this )
     CHECK_PEEK( p_peek, 8 );
 
     if(! ( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
-           demux2_IsPathExtension( p_demux, ".m3u" ) || demux2_IsPathExtension( p_demux, ".vlc" ) ||
+           demux_IsPathExtension( p_demux, ".m3u" ) || demux_IsPathExtension( p_demux, ".vlc" ) ||
            /* A .ram file can contain a single rtsp link */
-           demux2_IsPathExtension( p_demux, ".ram" ) || demux2_IsPathExtension( p_demux, ".rm" ) ||
-           demux2_IsForced( p_demux,  "m3u" ) ) )
+           demux_IsPathExtension( p_demux, ".ram" ) || demux_IsPathExtension( p_demux, ".rm" ) ||
+           demux_IsForced( p_demux,  "m3u" ) ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );

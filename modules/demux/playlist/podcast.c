@@ -55,7 +55,7 @@ int E_(Import_podcast)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    if( !demux2_IsForced( p_demux, "podcast" ) )
+    if( !demux_IsForced( p_demux, "podcast" ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using podcast reader" );

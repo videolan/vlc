@@ -51,7 +51,7 @@ vlc_module_begin();
     set_description( _("Vobsub subtitles parser") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux2", 1 );
+    set_capability( "demux", 1 );
 
     set_callbacks( Open, Close );
 

@@ -55,7 +55,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("MusePack demuxer") );
-    set_capability( "demux2", 145 );
+    set_capability( "demux", 145 );
 
     set_callbacks( Open, Close );
     add_shortcut( "mpc" );
@@ -111,9 +111,9 @@ static int Open( vlc_object_t * p_this )
         if( !p_demux->b_force )
         {
             /* Check file name extension */
-            if( !demux2_IsPathExtension( p_demux, ".mpc" ) &&
-                !demux2_IsPathExtension( p_demux, ".mp+" ) &&
-                !demux2_IsPathExtension( p_demux, ".mpp" ) )
+            if( !demux_IsPathExtension( p_demux, ".mpc" ) &&
+                !demux_IsPathExtension( p_demux, ".mp+" ) &&
+                !demux_IsPathExtension( p_demux, ".mpp" ) )
                 return VLC_EGENERIC;
         }
     }

@@ -45,7 +45,7 @@ static void Close ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("FLAC demuxer") );
-    set_capability( "demux2", 155 );
+    set_capability( "demux", 155 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
@@ -401,7 +401,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
     }
 
-    return demux2_vaControlHelper( p_demux->s, p_sys->i_data_pos, -1,
+    return demux_vaControlHelper( p_demux->s, p_sys->i_data_pos, -1,
                                    8*0, 1, i_query, args );
 }
 

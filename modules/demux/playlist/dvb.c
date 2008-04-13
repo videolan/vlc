@@ -58,7 +58,7 @@ int E_(Import_DVB)( vlc_object_t *p_this )
     int     i_peek;
     bool b_valid = false;
 
-    if( !demux2_IsPathExtension( p_demux, ".conf" ) && !p_demux->b_force )
+    if( !demux_IsPathExtension( p_demux, ".conf" ) && !p_demux->b_force )
         return VLC_EGENERIC;
 
     /* Check if this really is a channels file */

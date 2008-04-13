@@ -47,7 +47,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("MPEG audio / MP3 demuxer" ) );
-    set_capability( "demux2", 100 );
+    set_capability( "demux", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "mpga" );
     add_shortcut( "mp3" );
@@ -126,7 +126,7 @@ static int Open( vlc_object_t * p_this )
     const uint8_t     *p_peek;
     block_t     *p_block_in, *p_block_out;
 
-    if( demux2_IsPathExtension( p_demux, ".mp3" ) )
+    if( demux_IsPathExtension( p_demux, ".mp3" ) )
         b_forced = true;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
@@ -360,7 +360,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * needed for multi-input */
 
         case DEMUX_GET_LENGTH:
-            i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
+            i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
             /* No bitrate, we can't have it precisely, but we can compute
@@ -383,7 +383,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return i_ret;
 
         default:
-            i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
+            i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&

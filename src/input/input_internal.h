@@ -408,26 +408,26 @@ void access2_Delete( access_t * );
 #include <vlc_demux.h>
 
 /* stream_t *s could be null and then it mean a access+demux in one */
-#define demux2_New( a, b, c, d, e, f,g ) __demux2_New(VLC_OBJECT(a),b,c,d,e,f,g)
-demux_t *__demux2_New(vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, bool );
+#define demux_New( a, b, c, d, e, f,g ) __demux_New(VLC_OBJECT(a),b,c,d,e,f,g)
+demux_t *__demux_New(vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, bool );
 
-void demux2_Delete(demux_t *);
+void demux_Delete(demux_t *);
 
-static inline int demux2_Demux( demux_t *p_demux )
+static inline int demux_Demux( demux_t *p_demux )
 {
     return p_demux->pf_demux( p_demux );
 }
-static inline int demux2_vaControl( demux_t *p_demux, int i_query, va_list args )
+static inline int demux_vaControl( demux_t *p_demux, int i_query, va_list args )
 {
     return p_demux->pf_control( p_demux, i_query, args );
 }
-static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
+static inline int demux_Control( demux_t *p_demux, int i_query, ... )
 {
     va_list args;
     int     i_result;
 
     va_start( args, i_query );
-    i_result = demux2_vaControl( p_demux, i_query, args );
+    i_result = demux_vaControl( p_demux, i_query, args );
     va_end( args );
     return i_result;
 }

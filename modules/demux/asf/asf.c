@@ -53,7 +53,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("ASF v1.0 demuxer") );
-    set_capability( "demux2", 200 );
+    set_capability( "demux", 200 );
     set_callbacks( Open, Close );
     add_shortcut( "asf" );
 vlc_module_end();
@@ -279,7 +279,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         else
         {
-            return demux2_vaControlHelper( p_demux->s, p_sys->i_data_begin,
+            return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                            p_sys->i_data_end, p_sys->i_bitrate,
                                            p_sys->p_fp->i_min_data_packet_size,
                                            i_query, args );
@@ -293,7 +293,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pf = p_sys->i_time / (double)p_sys->i_length;
             return VLC_SUCCESS;
         }
-        return demux2_vaControlHelper( p_demux->s, p_sys->i_data_begin,
+        return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                        p_sys->i_data_end, p_sys->i_bitrate,
                                        p_sys->p_fp->i_min_data_packet_size,
                                        i_query, args );
@@ -310,7 +310,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         else
         {
-            return demux2_vaControlHelper( p_demux->s, p_sys->i_data_begin,
+            return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                            p_sys->i_data_end, p_sys->i_bitrate,
                                            p_sys->p_fp->i_min_data_packet_size,
                                            i_query, args );
@@ -322,7 +322,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     default:
-        return demux2_vaControlHelper( p_demux->s, p_sys->i_data_begin,
+        return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                        p_sys->i_data_end, p_sys->i_bitrate,
                                        p_sys->p_fp->i_min_data_packet_size,
                                        i_query, args );

@@ -157,7 +157,7 @@ vlc_module_begin();
     add_integer( "ts-dump-size", 16384, NULL, DUMPSIZE_TEXT,
                  DUMPSIZE_LONGTEXT, true );
 
-    set_capability( "demux2", 10 );
+    set_capability( "demux", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "ts" );
 vlc_module_end();
@@ -1209,7 +1209,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int i_int;
 
     if( p_sys->b_file_out )
-        return demux2_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
+        return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
 
     switch( i_query )
     {

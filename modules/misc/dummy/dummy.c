@@ -73,7 +73,7 @@ vlc_module_begin();
         set_callbacks( E_(OpenAccess), NULL );
     add_submodule();
         set_description( _("Dummy demux function") );
-        set_capability( "demux2", 0 );
+        set_capability( "demux", 0 );
         set_callbacks( E_(OpenDemux), E_(CloseDemux) );
     add_submodule();
         set_section( N_( "Dummy decoder" ), NULL );

@@ -40,7 +40,7 @@ vlc_module_begin ();
     set_description (_("SMF demuxer"));
     set_category (CAT_INPUT);
     set_subcategory (SUBCAT_INPUT_DEMUX);
-    set_capability ("demux2", 20);
+    set_capability ("demux", 20);
     set_callbacks (Open, Close);
 vlc_module_end ();
 

@@ -724,20 +724,20 @@ static void MainLoop( input_thread_t *p_input )
             double f_pos;
             int64_t i_time, i_length;
             /* update input status variables */
-            if( !demux2_Control( p_input->p->input.p_demux,
+            if( !demux_Control( p_input->p->input.p_demux,
                                  DEMUX_GET_POSITION, &f_pos ) )
             {
                 val.f_float = (float)f_pos;
                 var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
             }
-            if( !demux2_Control( p_input->p->input.p_demux,
+            if( !demux_Control( p_input->p->input.p_demux,
                                  DEMUX_GET_TIME, &i_time ) )
             {
                 p_input->i_time = i_time;
                 val.i_time = i_time;
                 var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
             }
-            if( !demux2_Control( p_input->p->input.p_demux,
+            if( !demux_Control( p_input->p->input.p_demux,
                                  DEMUX_GET_LENGTH, &i_length ) )
             {
                 vlc_value_t old_val;
@@ -928,7 +928,7 @@ static int Init( input_thread_t * p_input )
 
     /* Load master infos */
     /* Init length */
-    if( !demux2_Control( p_input->p->input.p_demux, DEMUX_GET_LENGTH,
+    if( !demux_Control( p_input->p->input.p_demux, DEMUX_GET_LENGTH,
                          &val.i_time ) && val.i_time > 0 )
     {
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
@@ -992,7 +992,7 @@ static int Init( input_thread_t * p_input )
 
         /* Load subtitles */
         /* Get fps and set it if not already set */
-        if( !demux2_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) &&
+        if( !demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) &&
             f_fps > 1.0 )
         {
             float f_requested_fps;
@@ -1133,16 +1133,16 @@ static int Init( input_thread_t * p_input )
         /* Inform the demuxer about waited group (needed only for DVB) */
         if( i_es_out_mode == ES_OUT_MODE_ALL )
         {
-            demux2_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1, NULL );
+            demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1, NULL );
         }
         else if( i_es_out_mode == ES_OUT_MODE_PARTIAL )
         {
-            demux2_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
+            demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
                             val.p_list );
         }
         else
         {
-            demux2_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP,
+            demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP,
                            (int) var_GetInteger( p_input, "program" ), NULL );
         }
 
@@ -1535,7 +1535,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             else
             {
                 /* Should not fail */
-                demux2_Control( p_input->p->input.p_demux,
+                demux_Control( p_input->p->input.p_demux,
                                 DEMUX_GET_POSITION, &f_pos );
                 f_pos += val.f_float;
             }
@@ -1543,7 +1543,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             if( f_pos > 1.0 ) f_pos = 1.0;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             input_EsOutChangePosition( p_input->p->p_es_out );
-            if( demux2_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
+            if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
                                 f_pos ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
@@ -1572,7 +1572,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             else
             {
                 /* Should not fail */
-                demux2_Control( p_input->p->input.p_demux,
+                demux_Control( p_input->p->input.p_demux,
                                 DEMUX_GET_TIME, &i_time );
                 i_time += val.i_time;
             }
@@ -1581,19 +1581,19 @@ static bool Control( input_thread_t *p_input, int i_type,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             input_EsOutChangePosition( p_input->p->p_es_out );
 
-            i_ret = demux2_Control( p_input->p->input.p_demux,
+            i_ret = demux_Control( p_input->p->input.p_demux,
                                     DEMUX_SET_TIME, i_time );
             if( i_ret )
             {
                 int64_t i_length;
 
                 /* Emulate it with a SET_POS */
-                demux2_Control( p_input->p->input.p_demux,
+                demux_Control( p_input->p->input.p_demux,
                                 DEMUX_GET_LENGTH, &i_length );
                 if( i_length > 0 )
                 {
                     double f_pos = (double)i_time / (double)i_length;
-                    i_ret = demux2_Control( p_input->p->input.p_demux,
+                    i_ret = demux_Control( p_input->p->input.p_demux,
                                             DEMUX_SET_POSITION, f_pos );
                 }
             }
@@ -1621,7 +1621,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     i_ret = access2_Control( p_input->p->input.p_access,
                                              ACCESS_SET_PAUSE_STATE, false );
                 else
-                    i_ret = demux2_Control( p_input->p->input.p_demux,
+                    i_ret = demux_Control( p_input->p->input.p_demux,
                                             DEMUX_SET_PAUSE_STATE, false );
 
                 if( i_ret )
@@ -1652,7 +1652,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     i_ret = access2_Control( p_input->p->input.p_access,
                                              ACCESS_SET_PAUSE_STATE, true );
                 else
-                    i_ret = demux2_Control( p_input->p->input.p_demux,
+                    i_ret = demux_Control( p_input->p->input.p_demux,
                                             DEMUX_SET_PAUSE_STATE, true );
 
                 b_force_update = true;
@@ -1766,7 +1766,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 if( p_input->p->input.p_access )
                     i_ret = VLC_EGENERIC;
                 else
-                    i_ret = demux2_Control( p_input->p->input.p_demux,
+                    i_ret = demux_Control( p_input->p->input.p_demux,
                                             DEMUX_SET_RATE, &i_rate );
                 if( i_ret )
                 {
@@ -1798,7 +1798,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             es_out_Control( p_input->p->p_es_out,
                             ES_OUT_SET_GROUP, val.i_int );
 
-            demux2_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, val.i_int,
+            demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, val.i_int,
                             NULL );
             break;
 
@@ -1843,7 +1843,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     input_EsOutChangePosition( p_input->p->p_es_out );
 
-                    demux2_Control( p_demux, DEMUX_SET_TITLE, i_title );
+                    demux_Control( p_demux, DEMUX_SET_TITLE, i_title );
                     input_ControlVarTitle( p_input, i_title );
                 }
             }
@@ -1884,7 +1884,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     i_seekpoint = p_demux->info.i_seekpoint;
                     i_seekpoint_time = p_input->p->input.title[p_demux->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
                     if( i_seekpoint_time >= 0 &&
-                         !demux2_Control( p_demux,
+                         !demux_Control( p_demux,
                                           DEMUX_GET_TIME, &i_input_time ) )
                     {
                         if ( i_input_time < i_seekpoint_time + 3000000 )
@@ -1904,7 +1904,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                     input_EsOutChangePosition( p_input->p->p_es_out );
 
-                    demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
+                    demux_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
                 }
             }
             else if( p_input->p->input.i_title > 0 )
@@ -1920,7 +1920,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     i_seekpoint = p_access->info.i_seekpoint;
                     i_seekpoint_time = p_input->p->input.title[p_access->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
                     if( i_seekpoint_time >= 0 &&
-                        demux2_Control( p_demux,
+                        demux_Control( p_demux,
                                         DEMUX_GET_TIME, &i_input_time ) )
                     {
                         if ( i_input_time < i_seekpoint_time + 3000000 )
@@ -1961,7 +1961,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                              val.psz_string );
 
                     /* Set position */
-                    if( demux2_Control( p_input->p->input.p_demux,
+                    if( demux_Control( p_input->p->input.p_demux,
                                         DEMUX_GET_TIME, &i_time ) )
                     {
                         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
@@ -1969,7 +1969,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                         free( slave );
                         break;
                     }
-                    if( demux2_Control( slave->p_demux,
+                    if( demux_Control( slave->p_demux,
                                         DEMUX_SET_TIME, i_time ) )
                     {
                         msg_Err( p_input, "seek failed for new slave" );
@@ -1982,7 +1982,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     p_meta = vlc_meta_New();
                     access2_Control( slave->p_access, ACCESS_GET_META,
                                      p_meta );
-                    demux2_Control( slave->p_demux, DEMUX_GET_META, p_meta );
+                    demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
                     InputUpdateMeta( p_input, p_meta );
 
                     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
@@ -2231,7 +2231,7 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Try access_demux if no demux given */
         if( *psz_demux == '\0' )
         {
-            in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
+            in->p_demux = demux_New( p_input, psz_access, psz_demux, psz_path,
                                       NULL, p_input->p->p_es_out, false );
         }
     }
@@ -2252,25 +2252,25 @@ static int InputSourceInit( input_thread_t *p_input,
         int64_t i_pts_delay;
 
         /* Get infos from access_demux */
-        demux2_Control( in->p_demux,
+        demux_Control( in->p_demux,
                         DEMUX_GET_PTS_DELAY, &i_pts_delay );
         p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
 
         in->b_title_demux = true;
-        if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
+        if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                             &in->title, &in->i_title,
                             &in->i_title_offset, &in->i_seekpoint_offset ) )
         {
             in->i_title = 0;
             in->title   = NULL;
         }
-        if( demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
+        if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
                             &in->b_can_pace_control ) )
             in->b_can_pace_control = false;
 
         if( !in->b_can_pace_control )
         {
-            if( demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
+            if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
                                 &in->b_can_rate_control, &in->b_rescale_ts ) )
             {
                 in->b_can_rate_control = false;
@@ -2282,12 +2282,12 @@ static int InputSourceInit( input_thread_t *p_input,
             in->b_can_rate_control = true;
             in->b_rescale_ts = true;
         }
-        if( demux2_Control( in->p_demux, DEMUX_CAN_PAUSE,
+        if( demux_Control( in->p_demux, DEMUX_CAN_PAUSE,
                             &in->b_can_pause ) )
             in->b_can_pause = false;
         var_SetBool( p_input, "can-pause", in->b_can_pause );
 
-        int ret = demux2_Control( in->p_demux, DEMUX_CAN_SEEK,
+        int ret = demux_Control( in->p_demux, DEMUX_CAN_SEEK,
                         &val.b_bool );
         if( ret != VLC_SUCCESS )
             val.b_bool = false;
@@ -2405,7 +2405,7 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 psz_real_path = psz_path;
             }
-            in->p_demux = demux2_New( p_input, psz_access, psz_demux,
+            in->p_demux = demux_New( p_input, psz_access, psz_demux,
                                       psz_real_path,
                                       in->p_stream, p_input->p->p_es_out,
                                       p_input->b_preparsing );
@@ -2426,7 +2426,7 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
         {
-            if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
+            if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                                 &in->title, &in->i_title,
                                 &in->i_title_offset, &in->i_seekpoint_offset ))
             {
@@ -2445,7 +2445,7 @@ static int InputSourceInit( input_thread_t *p_input,
     {
         int i_attachment;
         input_attachment_t **attachment;
-        if( !demux2_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
+        if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
                              &attachment, &i_attachment ) )
         {
             vlc_mutex_lock( &p_input->p->input.p_item->lock );
@@ -2454,7 +2454,7 @@ static int InputSourceInit( input_thread_t *p_input,
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
         }
     }
-    if( !demux2_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) )
+    if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) )
     {
         vlc_mutex_lock( &p_input->p->input.p_item->lock );
         in->f_fps = f_fps;
@@ -2470,7 +2470,7 @@ error:
     input_ChangeState( p_input, ERROR_S );
 
     if( in->p_demux )
-        demux2_Delete( in->p_demux );
+        demux_Delete( in->p_demux );
 
     if( in->p_stream )
         stream_Delete( in->p_stream );
@@ -2489,7 +2489,7 @@ static void InputSourceClean( input_source_t *in )
     int i;
 
     if( in->p_demux )
-        demux2_Delete( in->p_demux );
+        demux_Delete( in->p_demux );
 
     if( in->p_stream )
         stream_Delete( in->p_stream );
@@ -2510,7 +2510,7 @@ static void SlaveDemux( input_thread_t *p_input )
     int64_t i_time;
     int i;
 
-    if( demux2_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
         return;
@@ -2524,12 +2524,12 @@ static void SlaveDemux( input_thread_t *p_input )
         if( in->b_eof )
             continue;
 
-        if( demux2_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
+        if( demux_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
         {
             for( ;; )
             {
                 int64_t i_stime;
-                if( demux2_Control( in->p_demux, DEMUX_GET_TIME, &i_stime ) )
+                if( demux_Control( in->p_demux, DEMUX_GET_TIME, &i_stime ) )
                 {
                     msg_Err( p_input, "slave[%d] doesn't like "
                              "DEMUX_GET_TIME -> EOF", i );
@@ -2564,7 +2564,7 @@ static void SlaveSeek( input_thread_t *p_input )
 
     if( !p_input ) return;
 
-    if( demux2_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
         return;
@@ -2574,7 +2574,7 @@ static void SlaveSeek( input_thread_t *p_input )
     {
         input_source_t *in = p_input->p->slave[i];
 
-        if( demux2_Control( in->p_demux, DEMUX_SET_TIME, i_time ) )
+        if( demux_Control( in->p_demux, DEMUX_SET_TIME, i_time ) )
         {
             msg_Err( p_input, "seek failed for slave %d -> EOF", i );
             in->b_eof = true;
@@ -2734,8 +2734,8 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
     vlc_mutex_unlock( &p_item->lock );
 #endif
 
-    demux2_Control( p_demux, DEMUX_GET_META, p_meta );
-    if( demux2_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
+    demux_Control( p_demux, DEMUX_GET_META, p_meta );
+    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
         return;
     if( !b_bool )
         return;

@@ -1710,7 +1710,7 @@ vlc_module_begin();
 
 
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    add_module( "demux", "demux2", NULL, NULL, DEMUX_TEXT,
+    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT,
                 DEMUX_LONGTEXT, true );
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_subcategory( SUBCAT_INPUT_ACODEC );
