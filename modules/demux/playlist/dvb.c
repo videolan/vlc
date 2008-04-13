@@ -117,7 +117,7 @@ static int Demux( demux_t *p_demux )
 
         EnsureUTF8( psz_name );
 
-        p_input = input_ItemNewExt( p_playlist, "dvb:", psz_name, 0, NULL, -1 );
+        p_input = input_ItemNewExt( p_playlist, "dvb://", psz_name, 0, NULL, -1 );
         for( i = 0; i< i_options; i++ )
         {
             EnsureUTF8( ppsz_options[i] );
