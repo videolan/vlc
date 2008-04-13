@@ -1375,8 +1375,13 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
   endif
 else
-.x264: x264
+ifdef HAVE_DARWIN_OS_ON_INTEL
+  .x264: x264 .yasm
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+else
+  .x264: x264
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+endif
 endif
 	touch $@
 
@@ -2228,29 +2233,6 @@ endif
 CLEAN_FILE += .clinkcc
 CLEAN_PKG += clinkcc
 DISTCLEAN_PKG += clinkcc$(CLINKCC_VERSION).tar.gz
-
-# ***************************************************************************
-# NASM assembler
-# ***************************************************************************
-
-nasm-$(NASM_VERSION).tar.bz2:
-	$(WGET) $(NASM_URL)
-
-nasm: nasm-$(NASM_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-#nasm:
-#	echo $(NASM_CVSROOT) A > ./nasm.cvs
-#	CVS_PASSFILE=./nasm.cvs cvs -z3 -d $(NASM_CVSROOT) co nasm
-#	(cd $@ && autoconf && autoheader)
-
-.nasm: nasm
-	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) && make && make install)
-	touch $@
-
-CLEAN_FILE += .nasm
-CLEAN_PKG += nasm nasm.cvs
-DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.bz2
 
 # ***************************************************************************
 # YASM assembler
