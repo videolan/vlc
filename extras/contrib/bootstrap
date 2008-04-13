@@ -299,5 +299,4 @@ if test -z "$CONTRIBS_RELEASE"; then
     echo "***********************************************************"
 else
     echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
-    echo "EXTRA_CPPFLAGS += -DNDEBUG" >> config.mak
 fi
