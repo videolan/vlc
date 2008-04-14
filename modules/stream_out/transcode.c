@@ -1513,6 +1513,8 @@ static void transcode_audio_close( sout_stream_id_t *id )
             module_Unneed( id->pp_filter[i], id->pp_filter[i]->p_module );
         vlc_object_release( id->pp_filter[i] );
     }
+    id->i_filter = 0;
+
     for( i = 0; i < id->i_ufilter; i++ )
     {
         vlc_object_detach( id->pp_ufilter[i] );
@@ -1520,6 +1522,7 @@ static void transcode_audio_close( sout_stream_id_t *id )
             module_Unneed( id->pp_ufilter[i], id->pp_ufilter[i]->p_module );
         vlc_object_release( id->pp_ufilter[i] );
     }
+    id->i_ufilter = 0;
 }
 
 static int transcode_audio_process( sout_stream_t *p_stream,
