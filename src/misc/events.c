@@ -65,7 +65,7 @@ typedef struct vlc_event_listeners_group_t
    /* Used in vlc_event_send() to make sure to behave
       Correctly when vlc_event_detach was called during
       a callback */
-    vlc_bool_t          b_sublistener_removed;
+    bool          b_sublistener_removed;
                                          
 } vlc_event_listeners_group_t;
 
@@ -79,7 +79,7 @@ static const char * ppsz_event_type_to_name[] =
 };
 #endif
 
-static vlc_bool_t
+static bool
 listeners_are_equal( vlc_event_listener_t * listener1,
                      vlc_event_listener_t * listener2 )
 {
@@ -87,16 +87,16 @@ listeners_are_equal( vlc_event_listener_t * listener1,
            listener1->p_user_data == listener2->p_user_data;
 }
 
-static vlc_bool_t
+static bool
 group_contains_listener( vlc_event_listeners_group_t * group,
                          vlc_event_listener_t * searched_listener )
 {
     vlc_event_listener_t * listener;
     FOREACH_ARRAY( listener, group->listeners )
         if( listeners_are_equal(searched_listener, listener) )
-            return VLC_TRUE;
+            return true;
     FOREACH_END()
-    return VLC_FALSE;
+    return false;
 }
 
 /*****************************************************************************
@@ -231,7 +231,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
     vlc_mutex_lock( &p_em->event_sending_lock ) ;
 
     /* Track item removed from *this* thread, with a simple flag */
-    listeners_group->b_sublistener_removed = VLC_FALSE;
+    listeners_group->b_sublistener_removed = false;
 
     for( i = 0; i < i_cached_listeners; i++ )
     {
@@ -247,7 +247,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
         if( listeners_group->b_sublistener_removed )
         {
             /* If a callback was removed, this gets called */
-            vlc_bool_t valid_listener;
+            bool valid_listener;
             vlc_mutex_lock( &p_em->object_lock );
             valid_listener = group_contains_listener( listeners_group, cached_listener );
             vlc_mutex_unlock( &p_em->object_lock );
@@ -337,7 +337,7 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
                 {
                     /* Tell vlc_event_send, we did remove an item from that group,
                        in case vlc_event_send is in our caller stack  */
-                    listeners_group->b_sublistener_removed = VLC_TRUE;
+                    listeners_group->b_sublistener_removed = true;
 
                     /* that's our listener */
                     ARRAY_REMOVE( listeners_group->listeners,

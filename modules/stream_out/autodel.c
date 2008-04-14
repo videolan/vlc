@@ -62,7 +62,7 @@ struct sout_stream_id_t
     sout_stream_id_t *id;
     es_format_t fmt;
     mtime_t i_last;
-    vlc_bool_t b_error;
+    bool b_error;
 };
 
 struct sout_stream_sys_t
@@ -126,7 +126,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_es->fmt = *p_fmt;
     p_es->id = NULL;
     p_es->i_last = 0;
-    p_es->b_error = VLC_FALSE;
+    p_es->b_error = false;
     TAB_APPEND( p_sys->i_es_num, p_sys->pp_es, p_es );
 
     return p_es;
@@ -154,18 +154,18 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *p_es,
     int i;
 
     p_es->i_last = p_buffer->i_dts;
-    if ( p_es->id == NULL && p_es->b_error != VLC_TRUE )
+    if ( p_es->id == NULL && p_es->b_error != true )
     {
         p_es->id = p_sys->p_out->pf_add( p_sys->p_out, &p_es->fmt );
         if ( p_es->id == NULL )
         {
-            p_es->b_error = VLC_TRUE;
+            p_es->b_error = true;
             msg_Err( p_stream, "couldn't create chain for id %d",
                      p_es->fmt.i_id );
         }
     }
 
-    if ( p_es->b_error != VLC_TRUE )
+    if ( p_es->b_error != true )
         p_sys->p_out->pf_send( p_sys->p_out, p_es->id, p_buffer );
     else
         block_ChainRelease( p_buffer );

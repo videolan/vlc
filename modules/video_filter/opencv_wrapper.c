@@ -88,22 +88,22 @@ vlc_module_begin();
     add_float_with_range( "opencv-scale", 1.0, 0.1, 2.0, NULL,
                           N_("Scale factor (0.1-2.0)"),
                           N_("Ammount by which to scale the picture before sending it to the internal OpenCV filter"),
-                          VLC_FALSE );
+                          false );
     add_string( "opencv-chroma", "input", NULL,
                           N_("OpenCV filter chroma"),
-                          N_("Chroma to convert picture to before sending it to the internal OpenCV filter"), VLC_FALSE);
+                          N_("Chroma to convert picture to before sending it to the internal OpenCV filter"), false);
         change_string_list( chroma_list, chroma_list_text, 0);
     add_string( "opencv-output", "input", NULL,
                           N_("Wrapper filter output"),
-                          N_("Determines what (if any) video is displayed by the wrapper filter"), VLC_FALSE);
+                          N_("Determines what (if any) video is displayed by the wrapper filter"), false);
         change_string_list( output_list, output_list_text, 0);
     add_string( "opencv-verbosity", "error", NULL,
                           N_("Wrapper filter verbosity"),
-                          N_("Determines wrapper filter verbosity level"), VLC_FALSE);
+                          N_("Determines wrapper filter verbosity level"), false);
         change_string_list( verbosity_list, verbosity_list_text, 0);
     add_string( "opencv-filter-name", "none", NULL,
                           N_("OpenCV internal filter name"),
-                          N_("Name of internal OpenCV plugin filter to use"), VLC_FALSE);
+                          N_("Name of internal OpenCV plugin filter to use"), false);
 vlc_module_end();
 
 

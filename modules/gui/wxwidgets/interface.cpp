@@ -69,7 +69,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
+ static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
 
 /*****************************************************************************
@@ -94,33 +94,6 @@ public:
 private:
 
 };
-
-class wxVolCtrl;
-class VLCVolCtrl : public wxControl
-{
-public:
-    VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent );
-    virtual ~VLCVolCtrl() {};
-
-    virtual void OnPaint( wxPaintEvent &event );
-    void OnChange( wxMouseEvent& event );
-    void UpdateVolume();
-
-  private:
-    DECLARE_EVENT_TABLE()
-
-    wxVolCtrl *gauge;
-    int i_y_offset;
-    vlc_bool_t b_mute;
-    intf_thread_t *p_intf;
-};
-
-BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
-    EVT_PAINT(VLCVolCtrl::OnPaint)
-
-    /* Mouse events */
-    EVT_LEFT_UP(VLCVolCtrl::OnChange)
-END_EVENT_TABLE()
 
 class Splitter : public wxSplitterWindow
 {
@@ -184,7 +157,7 @@ private:
             p_intf->p_sys->p_video_sizer->GetMinSize() != wxSize(0,0) )
         {
             if( !b_video ) i_delay = mdate() + 1000000;
-            b_video = VLC_TRUE;
+            b_video = true;
 
             SetSashSize( -1 );
 
@@ -200,7 +173,7 @@ private:
             wxSize size = GetWindow1()->GetSizer()->GetMinSize();
 
             if( b_video ) i_delay = mdate() + 1000000;
-            b_video = VLC_FALSE;
+            b_video = false;
 
             if( event.GetSize().GetHeight() - size.GetHeight() )
             {
@@ -242,9 +215,9 @@ private:
     intf_thread_t *p_intf;
     int i_sash_position;
     int i_width;
-    vlc_bool_t b_video;
+    bool b_video;
     mtime_t i_delay;
-    vlc_bool_t b_show_on_start;
+    bool b_show_on_start;
 };
 
 BEGIN_EVENT_TABLE(Splitter, wxSplitterWindow)
@@ -293,6 +266,8 @@ enum
     NextStream_Event,
     SlowStream_Event,
     FastStream_Event,
+    ToggleMute_Event,
+    SlideVolume_Event,
 
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
@@ -354,6 +329,8 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
     EVT_MENU(SlowStream_Event, Interface::OnSlowStream)
     EVT_MENU(FastStream_Event, Interface::OnFastStream)
+    EVT_MENU(ToggleMute_Event, Interface::OnToggleMute)
+    EVT_COMMAND_SCROLL(SlideVolume_Event, Interface::OnSlideVolume)
 
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
@@ -371,7 +348,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    b_extra = VLC_FALSE;
+    b_extra = false;
     extra_frame = 0;
     playlist_manager = 0;
     i_update_counter = 0;
@@ -494,7 +471,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
-    p_intf->b_interaction = VLC_TRUE;
+    p_intf->b_interaction = true;
 
     /* Show embedded playlist if requested */
     if( splitter->ShowOnStart() ) OnSmallPlaylist( dummy );
@@ -521,7 +498,7 @@ Interface::~Interface()
 #endif
 #endif
 
-    p_intf->b_interaction = VLC_FALSE;
+    p_intf->b_interaction = false;
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
     delete p_intf->p_sys->p_wxwindow;
@@ -540,7 +517,6 @@ void Interface::Init()
 void Interface::Update()
 {
     /* Misc updates */
-    if( !(i_update_counter % 10) ) ((VLCVolCtrl *)volctrl)->UpdateVolume();
 
     if( playlist_manager ) playlist_manager->Update();
 
@@ -699,6 +675,7 @@ void Interface::CreateOurToolBar()
 #define HELP_PLN N_("Next playlist item")
 #define HELP_SLOW N_("Play slower")
 #define HELP_FAST N_("Play faster")
+#define HELP_VOL N_("Toggle mute/unmute of the audio")
 
 #define LABEL_OPEN N_("Open")
 #define LABEL_STOP N_("Stop")
@@ -710,6 +687,8 @@ void Interface::CreateOurToolBar()
 #define LABEL_PLN N_("Next")
 #define LABEL_SLOW N_("Slower")
 #define LABEL_FAST N_("Faster")
+#define LABEL_VOL N_("Mute")
+
     int minimal = config_GetInt( p_intf, "wx-minimal" );
     bool label = config_GetInt( p_intf, "wx-labels" );
 
@@ -756,14 +735,15 @@ void Interface::CreateOurToolBar()
                           wxBitmap( playlist_small_xpm ), wxU(_(HELP_SPLO)) );
     }
 
-    wxControl *p_dummy_ctrl =
-        new wxControl( toolbar, -1, wxDefaultPosition,
-                       wxSize(16, 16 ), wxBORDER_NONE );
+    wxToolBarToolBase *v_tool = toolbar->AddTool( ToggleMute_Event,
+                         wxU(LABEL_VOL), wxBitmap( speaker_xpm ),
+                         wxU(_(HELP_VOL)), wxITEM_CHECK );
+    v_tool->SetClientData( v_tool );
 
-    toolbar->AddControl( p_dummy_ctrl );
-
-    volctrl = new VLCVolCtrl( p_intf, toolbar );
-    toolbar->AddControl( volctrl );
+    wxSlider *v_gauge = new wxSlider(toolbar, SlideVolume_Event, 256, 0,
+                            AOUT_VOLUME_MAX, wxDefaultPosition,
+                            wxSize(64,TOOLBAR_BMP_HEIGHT), wxSL_HORIZONTAL);
+    toolbar->AddControl(v_gauge);
 
     toolbar->Realize();
 
@@ -1205,7 +1185,7 @@ void Interface::OnSlowStream( wxCommandEvent& WXUNUSED(event) )
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val; val.b_bool = VLC_TRUE;
+        vlc_value_t val; val.b_bool = true;
 
         var_Set( p_input, "rate-slower", val );
         vlc_object_release( p_input );
@@ -1219,11 +1199,55 @@ void Interface::OnFastStream( wxCommandEvent& WXUNUSED(event) )
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val; val.b_bool = VLC_TRUE;
+        vlc_value_t val; val.b_bool = true;
 
         var_Set( p_input, "rate-faster", val );
         vlc_object_release( p_input );
     }
+}
+
+void Interface::OnToggleMute ( wxCommandEvent& WXUNUSED(event) )
+{
+    aout_VolumeMute(p_intf, NULL);
+    SyncVolume();
+
+}
+
+void Interface::SyncVolume()
+{
+    wxToolBarToolBase *p_tool = (wxToolBarToolBase *)
+        GetToolBar()->GetToolClientData( ToggleMute_Event );
+    if ( !p_tool) return;
+
+    audio_volume_t i_volume;
+    aout_VolumeGet(p_intf, &i_volume);
+
+    /* Updating the Mute Button... IF the slider is completely moved to the left,
+     * the mute icon is shown too. */
+    p_tool->SetNormalBitmap( wxBitmap( i_volume ? speaker_xpm : speaker_mute_xpm ) );
+    GetToolBar()->Realize();
+#if defined( __WXMSW__ )
+    /* Needed to work around a bug in wxToolBar::Realize() */
+    GetToolBar()->SetSize( GetSize().GetWidth(),
+                           GetToolBar()->GetSize().GetHeight() );
+    GetToolBar()->Update();
+#endif
+    /* the Toggle to true and false is nescessary; otherwise, the Icon
+     * is not repainted */
+    GetToolBar()->ToggleTool( ToggleMute_Event, true );
+    GetToolBar()->ToggleTool( ToggleMute_Event, false );
+    GetToolBar()->Update();
+}
+
+void Interface::OnSlideVolume( wxScrollEvent& WXUNUSED(event))
+{
+    wxSlider *p_tool = (wxSlider *)
+        GetToolBar()->FindControl( SlideVolume_Event );
+    if ( !p_tool) return;
+
+    aout_VolumeSet(p_intf , p_tool->GetValue());
+    SyncVolume();
+
 }
 
 void Interface::TogglePlayButton( int i_playing_status )
@@ -1289,7 +1313,7 @@ static int InteractCallback( vlc_object_t *p_this,
 /*****************************************************************************
  * Definition of DragAndDrop class.
  *****************************************************************************/
-DragAndDrop::DragAndDrop( intf_thread_t *_p_intf, vlc_bool_t _b_enqueue )
+DragAndDrop::DragAndDrop( intf_thread_t *_p_intf, bool _b_enqueue )
 {
     p_intf = _p_intf;
     b_enqueue = _b_enqueue;
@@ -1316,7 +1340,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
                                             VLC_OBJECT_INPUT, FIND_ANYWHERE );
         if( p_input )
         {
-            if( input_AddSubtitles( p_input, psz_utf8, VLC_TRUE ) )
+            if( input_AddSubtitles( p_input, psz_utf8, true ) )
             {
                 vlc_object_release( p_input );
                 wxDnDLocaleFree( psz_utf8 );
@@ -1334,7 +1358,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
         playlist_Add( p_playlist, psz_utf8, NULL,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
-                      PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                      PLAYLIST_END, true, false );
 
         wxDnDLocaleFree( psz_utf8 );
     }
@@ -1344,108 +1368,6 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     return TRUE;
 }
 #endif
-
-/*****************************************************************************
- * Definition of VolCtrl class.
- *****************************************************************************/
-class wxVolCtrl: public wxGauge
-{
-public:
-    /* Constructor */
-    wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
-               wxPoint = wxDefaultPosition, wxSize = wxSize( 20, -1 ) );
-    virtual ~wxVolCtrl() {};
-
-    void UpdateVolume();
-    int GetVolume();
-
-    void OnChange( wxMouseEvent& event );
-
-private:
-    intf_thread_t *p_intf;
-
-    DECLARE_EVENT_TABLE();
-};
-
-BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
-    /* Mouse events */
-    EVT_LEFT_DOWN(wxVolCtrl::OnChange)
-    EVT_MOTION(wxVolCtrl::OnChange)
-END_EVENT_TABLE()
-
-wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
-                      wxPoint point, wxSize size )
-  : wxGauge( parent, id, 200, point, size, wxGA_HORIZONTAL | wxGA_SMOOTH )
-{
-    p_intf = _p_intf;
-    UpdateVolume();
-}
-
-void wxVolCtrl::OnChange( wxMouseEvent& event )
-{
-    if( !event.LeftDown() && !event.LeftIsDown() ) return;
-
-    int i_volume = event.GetX() * 200 / GetClientSize().GetWidth();
-    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
-    UpdateVolume();
-}
-
-void wxVolCtrl::UpdateVolume()
-{
-    audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
-
-    int i_gauge_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
-    if( i_gauge_volume == GetValue() ) return;
-
-    SetValue( i_gauge_volume );
-    SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_gauge_volume / 2 ) );
-}
-
-#if defined(__WXGTK__)
-#define VLCVOL_HEIGHT p_parent->GetSize().GetHeight()
-#else
-#define VLCVOL_HEIGHT TOOLBAR_BMP_HEIGHT
-#endif
-VLCVolCtrl::VLCVolCtrl( intf_thread_t *_p_intf, wxWindow *p_parent )
-  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, VLCVOL_HEIGHT ),
-              wxBORDER_NONE ),
-   i_y_offset((VLCVOL_HEIGHT - TOOLBAR_BMP_HEIGHT) / 2),
-   b_mute(0), p_intf(_p_intf)
-{
-    gauge = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, i_y_offset ),
-                           wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
-}
-
-void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
-{
-    wxPaintDC dc( this );
-    wxBitmap mPlayBitmap( b_mute ? speaker_mute_xpm : speaker_xpm );
-    dc.DrawBitmap( mPlayBitmap, 0, i_y_offset, TRUE );
-}
-
-void VLCVolCtrl::OnChange( wxMouseEvent& event )
-{
-    if( event.GetX() < TOOLBAR_BMP_WIDTH )
-    {
-        int i_volume;
-        aout_VolumeMute( p_intf, (audio_volume_t *)&i_volume );
-
-        b_mute = !b_mute;
-        Refresh();
-    }
-}
-
-void VLCVolCtrl::UpdateVolume()
-{
-    gauge->UpdateVolume();
-
-    int i_volume = gauge->GetValue();
-    if( !!i_volume == !b_mute ) return;
-    b_mute = !b_mute;
-    Refresh();
-}
 
 /*****************************************************************************
  * Systray class.

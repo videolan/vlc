@@ -64,7 +64,7 @@ vlc_module_begin();
 
     add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL,
               FASTSTART_TEXT, FASTSTART_LONGTEXT,
-              VLC_TRUE );
+              true );
     set_capability( "sout mux", 5 );
     add_shortcut( "mp4" );
     add_shortcut( "mov" );
@@ -115,7 +115,7 @@ typedef struct
 
     /* for later stco fix-up (fast start files) */
     uint64_t i_stco_pos;
-    vlc_bool_t b_stco64;
+    bool b_stco64;
 
     /* for spu */
     int64_t i_last_dts;
@@ -124,10 +124,10 @@ typedef struct
 
 struct sout_mux_sys_t
 {
-    vlc_bool_t b_mov;
-    vlc_bool_t b_3gp;
-    vlc_bool_t b_64_ext;
-    vlc_bool_t b_fast_start;
+    bool b_mov;
+    bool b_3gp;
+    bool b_64_ext;
+    bool b_fast_start;
 
     uint64_t i_mdat_pos;
     uint64_t i_pos;
@@ -140,7 +140,7 @@ struct sout_mux_sys_t
 
 typedef struct bo_t
 {
-    vlc_bool_t b_grow;
+    bool b_grow;
 
     int        i_buffer_size;
     int        i_buffer;
@@ -148,7 +148,7 @@ typedef struct bo_t
 
 } bo_t;
 
-static void bo_init     ( bo_t *, int , uint8_t *, vlc_bool_t  );
+static void bo_init     ( bo_t *, int , uint8_t *, bool  );
 static void bo_add_8    ( bo_t *, uint8_t );
 static void bo_add_16be ( bo_t *, uint16_t );
 static void bo_add_24be ( bo_t *, uint32_t );
@@ -221,7 +221,7 @@ static int Open( vlc_object_t *p_this )
 
     /* FIXME FIXME
      * Quicktime actually doesn't like the 64 bits extensions !!! */
-    p_sys->b_64_ext = VLC_FALSE;
+    p_sys->b_64_ext = false;
 
     /* Now add mdat header */
     box = box_new( "mdat" );
@@ -251,7 +251,7 @@ static void Close( vlc_object_t * p_this )
     msg_Dbg( p_mux, "Close" );
 
     /* Update mdat size */
-    bo_init( &bo, 0, NULL, VLC_TRUE );
+    bo_init( &bo, 0, NULL, true );
     if( p_sys->i_pos - p_sys->i_mdat_pos >= (((uint64_t)1)<<32) )
     {
         /* Extended size */
@@ -297,7 +297,7 @@ static void Close( vlc_object_t * p_this )
             {
                 msg_Warn( p_this, "read() not supported by access output, "
                           "won't create a fast start file" );
-                p_sys->b_fast_start = VLC_FALSE;
+                p_sys->b_fast_start = false;
                 block_Release( p_buf );
                 break;
             }
@@ -341,7 +341,7 @@ static void Close( vlc_object_t * p_this )
 
         moov->i_buffer = i_moov_size;
         i_moov_pos = p_sys->i_mdat_pos;
-        p_sys->b_fast_start = VLC_FALSE;
+        p_sys->b_fast_start = false;
     }
 
     /* Write MOOV header */
@@ -367,18 +367,18 @@ static void Close( vlc_object_t * p_this )
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
     VLC_UNUSED(p_mux);
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
 
     switch( i_query )
     {
         case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool * );
+            *pb_bool = false;
             return VLC_SUCCESS;
 
         case MUX_GET_ADD_STREAM_WAIT:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool * );
+            *pb_bool = true;
             return VLC_SUCCESS;
 
         case MUX_GET_MIME:   /* Not needed, as not streamable */
@@ -1084,7 +1084,7 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
 static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    vlc_bool_t b_descr = VLC_FALSE;
+    bool b_descr = false;
     bo_t *soun;
     char fcc[4] = "    ";
     int  i;
@@ -1093,13 +1093,13 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     {
     case VLC_FOURCC('m','p','4','a'):
         memcpy( fcc, "mp4a", 4 );
-        b_descr = VLC_TRUE;
+        b_descr = true;
         break;
 
     case VLC_FOURCC('s','a','m','r'):
     case VLC_FOURCC('s','a','w','b'):
         memcpy( fcc, (char*)&p_stream->fmt.i_codec, 4 );
-        b_descr = VLC_TRUE;
+        b_descr = true;
         break;
 
     case VLC_FOURCC('m','p','g','a'):
@@ -1108,7 +1108,7 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         else
         {
             memcpy( fcc, "mp4a", 4 );
-            b_descr = VLC_TRUE;
+            b_descr = true;
         }
         break;
 
@@ -1379,13 +1379,13 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     if( p_sys->i_pos >= (((uint64_t)0x1) << 32) )
     {
         /* 64 bits version */
-        p_stream->b_stco64 = VLC_TRUE;
+        p_stream->b_stco64 = true;
         stco = box_full_new( "co64", 0, 0 );
     }
     else
     {
         /* 32 bits version */
-        p_stream->b_stco64 = VLC_FALSE;
+        p_stream->b_stco64 = false;
         stco = box_full_new( "stco", 0, 0 );
     }
     bo_add_32be( stco, 0 );     // entry-count (fixed latter)
@@ -1940,7 +1940,7 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 /****************************************************************************/
 
 static void bo_init( bo_t *p_bo, int i_size, uint8_t *p_buffer,
-                     vlc_bool_t b_grow )
+                     bool b_grow )
 {
     if( !p_buffer )
     {
@@ -2080,7 +2080,7 @@ static bo_t * box_new( const char *fcc )
 
     if( ( box = malloc( sizeof( bo_t ) ) ) )
     {
-        bo_init( box, 0, NULL, VLC_TRUE );
+        bo_init( box, 0, NULL, true );
 
         bo_add_32be  ( box, 0 );
         bo_add_fourcc( box, fcc );
@@ -2095,7 +2095,7 @@ static bo_t * box_full_new( const char *fcc, uint8_t v, uint32_t f )
 
     if( ( box = malloc( sizeof( bo_t ) ) ) )
     {
-        bo_init( box, 0, NULL, VLC_TRUE );
+        bo_init( box, 0, NULL, true );
 
         bo_add_32be  ( box, 0 );
         bo_add_fourcc( box, fcc );

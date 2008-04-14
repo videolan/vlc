@@ -86,16 +86,16 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;
-    p_intf->b_play = VLC_FALSE;
-    p_intf->b_interaction = VLC_FALSE;
-    p_intf->b_should_run_on_first_thread = VLC_FALSE;
+    p_intf->b_play = false;
+    p_intf->b_interaction = false;
+    p_intf->b_should_run_on_first_thread = false;
 
     for( i = 0 ; i< i_options; i++ )
         var_OptionParse( p_this, ppsz_options[i], true );
 
     /* Choose the best module */
     p_intf->psz_intf = strdup( psz_module );
-    p_intf->p_module = module_Need( p_intf, "interface", psz_module, VLC_FALSE );
+    p_intf->p_module = module_Need( p_intf, "interface", psz_module, false );
 
     if( p_intf->p_module == NULL )
     {
@@ -106,8 +106,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
     }
 
     /* Initialize structure */
-    p_intf->b_menu        = VLC_FALSE;
-    p_intf->b_menu_change = VLC_FALSE;
+    p_intf->b_menu        = false;
+    p_intf->b_menu_change = false;
 
     /* Initialize mutexes */
     vlc_mutex_init( p_intf, &p_intf->change_lock );
@@ -145,7 +145,7 @@ int intf_RunThread( intf_thread_t *p_intf )
     
     /* Run the interface in a separate thread */
     if( vlc_thread_create( p_intf, "interface", RunInterface,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_intf, "cannot spawn interface thread" );
         return VLC_EGENERIC;
@@ -234,7 +234,7 @@ static void RunInterface( intf_thread_t *p_intf )
         p_intf->pf_run( p_intf );
 
         /* Reset play on start status */
-        p_intf->b_play = VLC_FALSE;
+        p_intf->b_play = false;
 
         if( !p_intf->psz_switch_intf )
         {
@@ -249,8 +249,8 @@ static void RunInterface( intf_thread_t *p_intf )
         p_intf->psz_switch_intf = NULL;
 
         vlc_mutex_lock( &p_intf->object_lock );
-        p_intf->b_die = VLC_FALSE; /* FIXME */
-        p_intf->b_dead = VLC_FALSE;
+        p_intf->b_die = false; /* FIXME */
+        p_intf->b_dead = false;
 
         vlc_mutex_unlock( &p_intf->object_lock );
 

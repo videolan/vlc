@@ -79,7 +79,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
         p_vout->pf_lock   = cocoaglvoutviewLock;
         p_vout->pf_unlock = cocoaglvoutviewUnlock;
     }
-    p_vout->p_sys->b_got_frame = VLC_FALSE;
+    p_vout->p_sys->b_got_frame = false;
 
     return VLC_SUCCESS;
 }

@@ -90,7 +90,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     int i_position;
     playlist_item_t *p_temp;
     vlc_value_t val;
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     sort_mode = i_mode;
     sort_type = i_type;
 
@@ -162,7 +162,7 @@ static int playlist_cmp(const void *first, const void *second)
     free( psz_a ); \
     free( psz_b ); \
 }
-#define DO_META_SORT( node ) DO_META_SORT_ADV( node, VLC_FALSE )
+#define DO_META_SORT( node ) DO_META_SORT_ADV( node, false )
 
     int i_test = 0;
 
@@ -191,7 +191,7 @@ static int playlist_cmp(const void *first, const void *second)
         if( i_test == 0 )
             DO_META_SORT( Album );
         if( i_test == 0 )
-            DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
+            DO_META_SORT_ADV( TrackNumber, true );
     }
     else if( sort_mode == SORT_GENRE )
     {
@@ -202,11 +202,11 @@ static int playlist_cmp(const void *first, const void *second)
         DO_META_SORT( Album );
         /* Sort by tracknumber if albums are the same */
         if( i_test == 0 )
-            DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
+            DO_META_SORT_ADV( TrackNumber, true );
     }
     else if( sort_mode == SORT_TRACK_NUMBER )
     {
-        DO_META_SORT_ADV( TrackNumber, VLC_TRUE );
+        DO_META_SORT_ADV( TrackNumber, true );
     }
     else if( sort_mode == SORT_DESCRIPTION )
     {

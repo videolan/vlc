@@ -94,19 +94,19 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
 
     add_integer( "win32text-fontsize", 0, NULL, FONTSIZE_TEXT,
-                 FONTSIZE_LONGTEXT, VLC_TRUE );
+                 FONTSIZE_LONGTEXT, true );
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "win32-opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+        OPACITY_TEXT, OPACITY_LONGTEXT, false );
 
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "win32text-color", 0x00FFFFFF, NULL, COLOR_TEXT,
-                 COLOR_LONGTEXT, VLC_TRUE );
+                 COLOR_LONGTEXT, true );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
 
     add_integer( "win32text-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
-                 FONTSIZER_LONGTEXT, VLC_FALSE );
+                 FONTSIZER_LONGTEXT, false );
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
 
     set_capability( "text renderer", 50 );
@@ -220,7 +220,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     video_format_t fmt;
     int i, i_pitch;
     subpicture_region_t *p_region_tmp;
-    vlc_bool_t b_outline = VLC_TRUE;
+    bool b_outline = true;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );

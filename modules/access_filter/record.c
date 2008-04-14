@@ -60,7 +60,7 @@ vlc_module_begin();
     add_shortcut( "record" );
 
     add_directory( "record-path", NULL, NULL,
-                   RECORD_PATH_TXT, RECORD_PATH_LONGTXT, VLC_TRUE );
+                   RECORD_PATH_TXT, RECORD_PATH_LONGTXT, true );
         change_unsafe();
 
     set_callbacks( Open, Close );
@@ -83,7 +83,7 @@ static int EventKey( vlc_object_t *, char const *,
 
 struct access_sys_t
 {
-    vlc_bool_t b_dump;
+    bool b_dump;
 
     char *psz_path;
     const char *psz_ext;
@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_size = 0;
     p_sys->psz_file = NULL;
     p_sys->psz_ext = "dat";
-    p_sys->b_dump = VLC_FALSE;
+    p_sys->b_dump = false;
     p_sys->p_vout = NULL;
     p_sys->i_vout_chan = -1;
     p_sys->i_update_sav = p_access->info.i_update;
@@ -285,9 +285,9 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
     if( newval.i_int == ACTIONID_RECORD )
     {
         if( p_sys->b_dump )
-            p_sys->b_dump = VLC_FALSE;
+            p_sys->b_dump = false;
         else
-            p_sys->b_dump = VLC_TRUE;
+            p_sys->b_dump = true;
     }
 
     return VLC_SUCCESS;
@@ -296,7 +296,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Notify( access_t *p_access, vlc_bool_t b_dump )
+static void Notify( access_t *p_access, bool b_dump )
 {
     access_sys_t *p_sys = p_access->p_sys;
     vout_thread_t *p_vout;
@@ -338,7 +338,7 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
             msg_Dbg( p_access, "dumped "I64Fd" kb (%s)",
                      p_sys->i_size/1024, p_sys->psz_file );
 
-            Notify( p_access, VLC_FALSE );
+            Notify( p_access, false );
 
             fclose( p_sys->f );
             p_sys->f = NULL;
@@ -392,7 +392,7 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         free( psz_name );
         if( p_sys->psz_file == NULL )
         {
-            p_sys->b_dump = VLC_FALSE;
+            p_sys->b_dump = false;
             return;
         }
 
@@ -426,7 +426,7 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         free( psz_name );
         if( p_sys->psz_file == NULL )
         {
-            p_sys->b_dump = VLC_FALSE;
+            p_sys->b_dump = false;
             return;
         }
 
@@ -439,11 +439,11 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
                      p_sys->psz_file );
             free( p_sys->psz_file );
             p_sys->psz_file = NULL;
-            p_sys->b_dump = VLC_FALSE;
+            p_sys->b_dump = false;
             return;
         }
 
-        Notify( p_access, VLC_TRUE );
+        Notify( p_access, true );
 
         p_sys->i_size = 0;
     }

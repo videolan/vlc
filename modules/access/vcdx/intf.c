@@ -165,7 +165,7 @@ RunIntf( intf_thread_t *p_intf )
           int i, i_action = -1;
           struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
-          p_intf->p_sys->b_key_pressed = VLC_FALSE;
+          p_intf->p_sys->b_key_pressed = false;
 
           /* Find action triggered by hotkey (if any) */
           var_Get( p_intf->p_libvlc, "key-pressed", &val );
@@ -334,9 +334,9 @@ static int InitThread( intf_thread_t * p_intf )
         p_intf->p_sys->p_input     = p_input;
         p_intf->p_sys->p_vcdplayer = NULL;
 
-        p_intf->p_sys->b_move  = VLC_FALSE;
-        p_intf->p_sys->b_click = VLC_FALSE;
-        p_intf->p_sys->b_key_pressed = VLC_FALSE;
+        p_intf->p_sys->b_move  = false;
+        p_intf->p_sys->b_click = false;
+        p_intf->p_sys->b_key_pressed = false;
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
@@ -357,7 +357,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
     vlc_mutex_lock( &p_intf->change_lock );
 
-    p_intf->p_sys->b_key_pressed = VLC_TRUE;
+    p_intf->p_sys->b_key_pressed = true;
 
     vlc_mutex_unlock( &p_intf->change_lock );
 
@@ -375,7 +375,7 @@ int vcdIntfStillTime( intf_thread_t *p_intf, uint8_t i_sec )
     p_intf->p_sys->b_still = 1;
     if( 255 == i_sec )
     {
-        p_intf->p_sys->b_infinite_still = VLC_TRUE;
+        p_intf->p_sys->b_infinite_still = true;
     }
     else
     {

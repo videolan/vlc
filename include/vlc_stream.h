@@ -47,8 +47,8 @@ extern "C" {
 enum stream_query_e
 {
     /* capabilities */
-    STREAM_CAN_SEEK,            /**< arg1= vlc_bool_t *   res=cannot fail*/
-    STREAM_CAN_FASTSEEK,        /**< arg1= vlc_bool_t *   res=cannot fail*/
+    STREAM_CAN_SEEK,            /**< arg1= bool *   res=cannot fail*/
+    STREAM_CAN_FASTSEEK,        /**< arg1= bool *   res=cannot fail*/
 
     /* */
     STREAM_SET_POSITION,        /**< arg1= int64_t        res=can fail  */
@@ -128,7 +128,7 @@ VLC_EXPORT( void,      stream_DemuxDelete,( stream_t *s ) );
 
 
 #define stream_MemoryNew( a, b, c, d ) __stream_MemoryNew( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, vlc_bool_t i_preserve_memory ) );
+VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, bool i_preserve_memory ) );
 #define stream_UrlNew( a, b ) __stream_UrlNew( VLC_OBJECT(a), b )
 VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_url ) );
 

@@ -47,7 +47,7 @@ struct playlist_preparse_t
 typedef struct preparse_item_t
 {
     input_item_t *p_item;
-    vlc_bool_t   b_fetch_art;
+    bool   b_fetch_art;
 } preparse_item_t;
 
 struct playlist_fetcher_t
@@ -55,7 +55,7 @@ struct playlist_fetcher_t
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
     int             i_art_policy;
-    vlc_bool_t      b_fetch_meta;
+    bool      b_fetch_meta;
     int             i_waiting;
     preparse_item_t *p_waiting;
 
@@ -81,7 +81,7 @@ void playlist_LastLoop( playlist_t * );
 void playlist_PreparseLoop( playlist_preparse_t * );
 void playlist_FetcherLoop( playlist_fetcher_t * );
 
-void ResetCurrentlyPlaying( playlist_t *, vlc_bool_t, playlist_item_t * );
+void ResetCurrentlyPlaying( playlist_t *, bool, playlist_item_t * );
 
 /* Control */
 playlist_item_t * playlist_NextItem  ( playlist_t * );
@@ -96,7 +96,7 @@ int playlist_MLDump( playlist_t *p_playlist );
  **********************************************************************/
 
 void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
-                             int i_node_id, vlc_bool_t b_signal );
+                             int i_node_id, bool b_signal );
 
 /* Tree walking */
 int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
@@ -104,10 +104,10 @@ int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
                                     playlist_item_t ***ppp_items );
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root,
-                                    playlist_item_t *, vlc_bool_t, vlc_bool_t );
+                                    playlist_item_t *, bool, bool );
 playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root,
-                                    playlist_item_t *, vlc_bool_t, vlc_bool_t );
+                                    playlist_item_t *, bool, bool );
 playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root );
 

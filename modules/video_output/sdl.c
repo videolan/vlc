@@ -74,8 +74,8 @@ struct vout_sys_t
     /* For RGB output */
     int i_surfaces;
 
-    vlc_bool_t  b_cursor;
-    vlc_bool_t  b_cursor_autohidden;
+    bool  b_cursor;
+    bool  b_cursor_autohidden;
     mtime_t     i_lastmoved;
     mtime_t     i_mouse_hide_timeout;
     mtime_t     i_lastpressed;                        /* to track dbl-clicks */
@@ -126,7 +126,7 @@ vlc_module_begin();
     set_description( _("Simple DirectMedia Layer video output") );
     set_capability( "video output", 60 );
     add_shortcut( "sdl" );
-    add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
+    add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true );
     set_callbacks( Open, Close );
 #if defined( __i386__ ) || defined( __x86_64__ )
     /* On i386, SDL is linked against svgalib */
@@ -406,7 +406,7 @@ static int Manage( vout_thread_t *p_vout )
 
             var_Set( p_vout, "mouse-y", val );
 
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_vout, "mouse-moved", val );
 
             if( p_vout->p_sys->b_cursor )
@@ -432,7 +432,7 @@ static int Manage( vout_thread_t *p_vout )
                 val.i_int &= ~1;
                 var_Set( p_vout, "mouse-button-down", val );
 
-                val.b_bool = VLC_TRUE;
+                val.b_bool = true;
                 var_Set( p_vout, "mouse-clicked", val );
                 break;
 
@@ -479,7 +479,7 @@ static int Manage( vout_thread_t *p_vout )
                     if( p_playlist != NULL )
                     {
                         vlc_value_t val;
-                        val.b_bool = VLC_TRUE;
+                        val.b_bool = true;
                         var_Set( p_playlist, "intf-popupmenu", val );
                         vlc_object_release( p_playlist );
                     }

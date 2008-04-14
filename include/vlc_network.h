@@ -117,7 +117,7 @@ struct virtual_socket_t
 };
 
 #define net_Read(a,b,c,d,e,f) __net_Read(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( ssize_t, __net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, size_t i_data, vlc_bool_t b_retry ) );
+VLC_EXPORT( ssize_t, __net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, size_t i_data, bool b_retry ) );
 
 #define net_Write(a,b,c,d,e) __net_Write(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( ssize_t, __net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const uint8_t *p_data, size_t i_data ) );
@@ -256,7 +256,7 @@ VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const str
 VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 
 
-static inline vlc_bool_t
+static inline bool
 net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
 {
     switch (addr->sa_family)
@@ -266,7 +266,7 @@ net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
         {
             const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
             if ((size_t)len < sizeof (*v4))
-                return VLC_FALSE;
+                return false;
             return IN_MULTICAST (ntohl (v4->sin_addr.s_addr)) != 0;
         }
 #endif
@@ -276,13 +276,13 @@ net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
         {
             const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
             if ((size_t)len < sizeof (*v6))
-                return VLC_FALSE;
+                return false;
             return IN6_IS_ADDR_MULTICAST (&v6->sin6_addr) != 0;
         }
 #endif
     }
 
-    return VLC_FALSE;
+    return false;
 }
 
 

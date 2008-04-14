@@ -77,12 +77,12 @@ typedef struct
  *****************************************************************************/
 struct decoder_sys_t
 {
-    vlc_bool_t          b_ass;                           /* The subs are ASS */
+    bool          b_ass;                           /* The subs are ASS */
     int                 i_original_height;
     int                 i_original_width;
     int                 i_align;          /* Subtitles alignment on the vout */
     vlc_iconv_t         iconv_handle;            /* handle to iconv instance */
-    vlc_bool_t          b_autodetect_utf8;
+    bool          b_autodetect_utf8;
 
     ssa_style_t         **pp_ssa_styles;
     int                 i_ssa_styles;

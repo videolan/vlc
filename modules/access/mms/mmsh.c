@@ -89,7 +89,7 @@ int E_(MMSHOpen)( access_t *p_access )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
 
@@ -103,7 +103,7 @@ int E_(MMSHOpen)( access_t *p_access )
     p_sys->i_start= 0;
 
     /* Handle proxy */
-    p_sys->b_proxy = VLC_FALSE;
+    p_sys->b_proxy = false;
     memset( &p_sys->proxy, 0, sizeof(p_sys->proxy) );
 
     /* Check proxy */
@@ -126,7 +126,7 @@ int E_(MMSHOpen)( access_t *p_access )
 
     if( *psz_proxy )
     {
-        p_sys->b_proxy = VLC_TRUE;
+        p_sys->b_proxy = true;
         vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
     }
 #ifdef HAVE_GETENV
@@ -135,7 +135,7 @@ int E_(MMSHOpen)( access_t *p_access )
         char *psz_proxy = getenv( "http_proxy" );
         if( psz_proxy && *psz_proxy )
         {
-            p_sys->b_proxy = VLC_TRUE;
+            p_sys->b_proxy = true;
             vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
         }
     }
@@ -188,8 +188,8 @@ int E_(MMSHOpen)( access_t *p_access )
 
         /** \bug we do not autodelete here */
         playlist_Add( p_playlist, psz_location, psz_location,
-                      PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE,
-                      VLC_FALSE );
+                      PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END, true,
+                      false );
         vlc_object_release( p_playlist );
 
         free( psz_location );
@@ -239,7 +239,7 @@ void E_( MMSHClose )( access_t *p_access )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
     int          i_int;
@@ -248,19 +248,19 @@ static int Control( access_t *p_access, int i_query, va_list args )
     {
         /* */
         case ACCESS_CAN_SEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = !p_sys->b_broadcast;
             break;
 
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
 
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             break;
 
         /* */
@@ -276,11 +276,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PRIVATE_ID_STATE:
             i_int = (int)va_arg( args, int );
-            pb_bool = (vlc_bool_t *)va_arg( args, vlc_bool_t * );
+            pb_bool = (bool *)va_arg( args, bool * );
 
             if( (i_int < 0) || (i_int > 127) )
                 return VLC_EGENERIC;
-            *pb_bool =  p_sys->asfh.stream[i_int].i_selected ? VLC_TRUE : VLC_FALSE;
+            *pb_bool =  p_sys->asfh.stream[i_int].i_selected ? true : false;
             break;
 
         /* */
@@ -332,7 +332,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     }
 
     p_access->info.i_pos = i_pos;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_sys->i_packet_used += i_offset;
 
     return VLC_SUCCESS;
@@ -409,7 +409,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 }
                 if( i_ret )
                 {
-                    p_access->info.b_eof = VLC_TRUE;
+                    p_access->info.b_eof = true;
                     return 0;
                 }
             }
@@ -568,7 +568,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     int          i_code;
 
     /* Reinit context */
-    p_sys->b_broadcast = VLC_TRUE;
+    p_sys->b_broadcast = true;
     p_sys->i_request_context = 1;
     p_sys->i_packet_sequence = 0;
     p_sys->i_packet_used = 0;
@@ -653,17 +653,17 @@ static int Describe( access_t  *p_access, char **ppsz_location )
                 if( strstr( p, "broadcast" ) )
                 {
                     msg_Dbg( p_access, "stream type = broadcast" );
-                    p_sys->b_broadcast = VLC_TRUE;
+                    p_sys->b_broadcast = true;
                 }
                 else if( strstr( p, "seekable" ) )
                 {
                     msg_Dbg( p_access, "stream type = seekable" );
-                    p_sys->b_broadcast = VLC_FALSE;
+                    p_sys->b_broadcast = false;
                 }
                 else
                 {
                     msg_Warn( p_access, "unknow stream types (%s)", p );
-                    p_sys->b_broadcast = VLC_FALSE;
+                    p_sys->b_broadcast = false;
                 }
             }
         }
@@ -901,7 +901,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
      * (4 bytes), decode and then read up to 8 additional bytes to get the
      * entire header.
      */
-    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 4, VLC_TRUE ) < 4 )
+    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 4, true ) < 4 )
     {
        msg_Err( p_access, "cannot read data 2" );
        return VLC_EGENERIC;
@@ -914,7 +914,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
     if( restsize > 8 )
         restsize = 8;
 
-    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer + 4, restsize, VLC_TRUE ) < restsize )
+    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer + 4, restsize, true ) < restsize )
     {
         msg_Err( p_access, "cannot read data 3" );
         return VLC_EGENERIC;
@@ -961,7 +961,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
 
     if( (p_ck->i_data > 0) &&
         (net_Read( p_access, p_sys->fd, NULL, &p_sys->buffer[12],
-                   p_ck->i_data, VLC_TRUE ) < p_ck->i_data) )
+                   p_ck->i_data, true ) < p_ck->i_data) )
     {
         msg_Err( p_access, "cannot read data 4" );
         return VLC_EGENERIC;

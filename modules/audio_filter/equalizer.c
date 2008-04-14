@@ -75,14 +75,14 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AFILTER );
 
     add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
-                PRESET_LONGTEXT, VLC_FALSE );
+                PRESET_LONGTEXT, false );
         change_string_list( preset_list, preset_list_text, 0 );
     add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT,
-                BANDS_LONGTEXT, VLC_TRUE );
+                BANDS_LONGTEXT, true );
     add_bool( "equalizer-2pass", 0, NULL, TWOPASS_TEXT,
-              TWOPASS_LONGTEXT, VLC_TRUE );
+              TWOPASS_LONGTEXT, true );
     add_float( "equalizer-preamp", 12.0, NULL, PREAMP_TEXT,
-               PREAMP_LONGTEXT, VLC_TRUE );
+               PREAMP_LONGTEXT, true );
     set_callbacks( Open, Close );
     add_shortcut( "equalizer" );
 vlc_module_end();
@@ -100,12 +100,12 @@ typedef struct aout_filter_sys_t
 
     float f_newpreamp;
     char *psz_newbands;
-    vlc_bool_t b_first;
+    bool b_first;
 
     /* Filter dyn config */
     float *f_amp;   /* Per band amp */
     float f_gamp;   /* Global preamp */
-    vlc_bool_t b_2eqz;
+    bool b_2eqz;
 
     /* Filter state */
     float x[32][2];
@@ -142,19 +142,19 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
-    vlc_bool_t         b_fit = VLC_TRUE;
+    bool         b_fit = true;
 
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
         p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
         msg_Warn( p_filter, "bad input or output format" );
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         memcpy( &p_filter->output, &p_filter->input,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
@@ -166,7 +166,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
@@ -311,7 +311,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     }
 
     /* Filter dyn config */
-    p_sys->b_2eqz = VLC_FALSE;
+    p_sys->b_2eqz = false;
     p_sys->f_gamp = 1.0;
     p_sys->f_amp   = malloc( p_sys->i_band * sizeof(float) );
     for( i = 0; i < p_sys->i_band; i++ )
@@ -348,11 +348,11 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     var_Get( p_aout, "equalizer-bands", &val2 );
     var_Get( p_aout, "equalizer-preamp", &val3 );
 
-    p_sys->b_first = VLC_TRUE;
+    p_sys->b_first = true;
     PresetCallback( VLC_OBJECT( p_aout ), NULL, val1, val1, p_sys );
     BandsCallback(  VLC_OBJECT( p_aout ), NULL, val2, val2, p_sys );
     PreampCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
-    p_sys->b_first = VLC_FALSE;
+    p_sys->b_first = false;
 
     /* Register preset bands (for intf) if : */
     /* We have no bands info --> the preset info must be given to the intf */
@@ -498,7 +498,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                     sprintf( psz_newbands, "%s "I64Fd".%07u", psz_newbands,
                                       (int64_t)div.quot, (unsigned int) div.rem );
                 }
-                if( p_sys->b_first == VLC_FALSE )
+                if( p_sys->b_first == false )
                 {
                     var_SetString( p_aout, "equalizer-bands", psz_newbands );
                     var_SetFloat( p_aout, "equalizer-preamp",

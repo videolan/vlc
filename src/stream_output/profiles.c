@@ -91,7 +91,7 @@ static sout_display_t *streaming_ChainAddDisplay( sout_chain_t *p_chain )
 static sout_transcode_t *streaming_ChainAddTranscode( sout_chain_t *p_chain,
                         char *psz_vcodec, char * psz_acodec, char * psz_scodec,
                         int i_vb, float f_scale, int i_ab, int i_channels,
-                        vlc_bool_t b_soverlay, char *psz_additional )
+                        bool b_soverlay, char *psz_additional )
 {
     DECMALLOC_NULL( p_module, sout_module_t );
     MALLOC_NULL( TRAM, sout_transcode_t );
@@ -225,7 +225,7 @@ void streaming_TranscodeParametersApply( sout_transcode_t *p_module )
  * \param pb_dest target bool, if param is a bool
  */
 void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
-                             int *pi_dest, float *pf_dest, vlc_bool_t *pb_dest )
+                             int *pi_dest, float *pf_dest, bool *pb_dest )
 {
     /* Todo : Handle psz_string like formatting */
     if( p_param->psz_string )
@@ -266,19 +266,19 @@ void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
 #define DO_ENABLE_ACCESS \
     if( !strcmp( STDM->psz_access, "file" ) )\
     { \
-        pd->b_file = VLC_TRUE; pd->psz_file = strdup( STDM->psz_url ); \
+        pd->b_file = true; pd->psz_file = strdup( STDM->psz_url ); \
     } \
     else if( !strcmp( STDM->psz_access, "http" ) )\
     { \
-        pd->b_http = VLC_TRUE; pd->psz_http = strdup( STDM->psz_url ); \
+        pd->b_http = true; pd->psz_http = strdup( STDM->psz_url ); \
     } \
     else if( !strcmp( STDM->psz_access, "mms" ) )\
     { \
-        pd->b_mms = VLC_TRUE; pd->psz_mms = strdup( STDM->psz_url ); \
+        pd->b_mms = true; pd->psz_mms = strdup( STDM->psz_url ); \
     } \
     else if( !strcmp( STDM->psz_access, "udp" ) )\
     { \
-        pd->b_udp = VLC_TRUE; pd->psz_udp = strdup( STDM->psz_url ); \
+        pd->b_udp = true; pd->psz_udp = strdup( STDM->psz_url ); \
     } \
     else \
     { \
@@ -294,16 +294,16 @@ void streaming_ParameterApply( sout_param_t *p_param, char **ppsz_dest,
  * \param pd the destination gui descriptor object
  * \return TRUE if the conversion succeeded, false else
  */
-vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
+bool streaming_ChainToGuiDesc( vlc_object_t *p_this,
                                   sout_chain_t *p_chain, sout_gui_descr_t *pd )
 {
     int j, i_last = 0;
     sout_module_t *p_module;
-    if( p_chain->i_modules == 0 || p_chain->i_modules > 2 ) return VLC_FALSE;
+    if( p_chain->i_modules == 0 || p_chain->i_modules > 2 ) return false;
 
     if( p_chain->pp_modules[0]->i_type == SOUT_MOD_TRANSCODE )
     {
-        if( p_chain->i_modules == 1 ) return VLC_FALSE;
+        if( p_chain->i_modules == 1 ) return false;
         p_module = p_chain->pp_modules[0];
         i_last++;
 
@@ -320,22 +320,22 @@ vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
 
         // Nothing allowed after duplicate. Duplicate mustn't be empty
         if( p_chain->i_modules > i_last +1 || !DUPM->i_children )
-            return VLC_FALSE;
+            return false;
         for( j = 0 ; j<  DUPM->i_children ; j++ )
         {
             sout_chain_t *p_child = DUPM->pp_children[j];
-            if( p_child->i_modules != 1 ) return VLC_FALSE;
+            if( p_child->i_modules != 1 ) return false;
             p_module = p_child->pp_modules[0];
             if( p_module->i_type == SOUT_MOD_STD )
             {
                 DO_ENABLE_ACCESS
             }
             else if( p_module->i_type == SOUT_MOD_DISPLAY )
-                pd->b_local = VLC_TRUE;
+                pd->b_local = true;
             else if( p_module->i_type == SOUT_MOD_RTP )
             {
                 msg_Err( p_this, "RTP unhandled" );
-                return VLC_FALSE;
+                return false;
             }
         }
         i_last++;
@@ -347,15 +347,15 @@ vlc_bool_t streaming_ChainToGuiDesc( vlc_object_t *p_this,
     }
     else if( p_chain->pp_modules[i_last]->i_type == SOUT_MOD_DISPLAY )
     {
-        pd->b_local = VLC_TRUE;
+        pd->b_local = true;
     }
     else if( p_chain->pp_modules[i_last]->i_type == SOUT_MOD_RTP )
     {
         msg_Err( p_this, "RTP unhandled" );
-        return VLC_FALSE;
+        return false;
 
     }
-    return VLC_TRUE;
+    return true;
 
 }
 #endif
@@ -433,7 +433,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
             ADD_OPT( "ttl=%i", pd->i_ttl );
         if( pd->b_sap )
         {
-            pd->b_sap = VLC_TRUE;
+            pd->b_sap = true;
             p_std->psz_name = strdup( pd->psz_name );
             p_std->psz_group = pd->psz_group ? strdup( pd->psz_group ) : NULL;
         }
@@ -483,7 +483,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
 /**********************************************************************
  * Create a sout string from a chain
  **********************************************************************/
-static char * ChainToPsz( sout_chain_t *p_chain, vlc_bool_t b_root )
+static char * ChainToPsz( sout_chain_t *p_chain, bool b_root )
 {
     int i, j;
     char psz_output[MAX_CHAIN];
@@ -500,7 +500,7 @@ static char * ChainToPsz( sout_chain_t *p_chain, vlc_bool_t b_root )
             CHAIN_APPEND( "duplicate{" );
             for( j = 0 ; j < DUPM->i_children ; j ++ )
             {
-                char *psz_child = ChainToPsz( DUPM->pp_children[j], VLC_FALSE);
+                char *psz_child = ChainToPsz( DUPM->pp_children[j], false);
                 fprintf(stderr, "child %s\n", psz_child);
                 CHAIN_APPEND( "dst=%s", psz_child );
                 free( psz_child );
@@ -547,7 +547,7 @@ static char * ChainToPsz( sout_chain_t *p_chain, vlc_bool_t b_root )
 
 char * streaming_ChainToPsz( sout_chain_t *p_chain )
 {
-    return ChainToPsz( p_chain, VLC_TRUE );
+    return ChainToPsz( p_chain, true );
 }
 
 /**********************************************************************
@@ -582,7 +582,7 @@ int streaming_ProfileParse( vlc_object_t *p_this,streaming_profile_t *p_profile,
     p_this->p_private = (void *)p_parser;
 
     /* And call the module ! All work is done now */
-    p_module = module_Need( p_this, "profile parser", "", VLC_TRUE );
+    p_module = module_Need( p_this, "profile parser", "", true );
     if( !p_module )
     {
         msg_Warn( p_this, "parsing profile failed" );

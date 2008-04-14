@@ -52,12 +52,12 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("File dumper") );
-    set_capability( "demux2", 0 );
+    set_capability( "demux", 0 );
     add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
-              FILE_LONGTEXT, VLC_FALSE );
+              FILE_LONGTEXT, false );
         change_unsafe();
     add_bool( "demuxdump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT,
-              VLC_FALSE );
+              false );
     set_callbacks( Open, Close );
     add_shortcut( "dump" );
 vlc_module_end();
@@ -93,7 +93,7 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     const char  *psz_mode;
     vlc_value_t val;
-    vlc_bool_t  b_append;
+    bool  b_append;
 
     /* Accept only if forced */
     if( !p_demux->b_force )
@@ -195,6 +195,6 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    return demux2_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
+    return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
 }
 

@@ -106,16 +106,16 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-              VLC_FALSE );
-    add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
+              false );
+    add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, true );
     add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                VLC_TRUE );
+                true );
     add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
-                ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+                ASPECT_RATIO_LONGTEXT, true );
     add_integer( "fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
-                 VLC_TRUE );
-    add_bool( "fb-hw-accel", VLC_TRUE, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
-              VLC_TRUE );
+                 true );
+    add_bool( "fb-hw-accel", true, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
+              true );
     set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );
@@ -131,7 +131,7 @@ struct vout_sys_t
 {
     /* System information */
     int                 i_tty;                          /* tty device handle */
-    vlc_bool_t          b_tty;
+    bool          b_tty;
     struct termios      old_termios;
 
     /* Original configuration information */
@@ -143,17 +143,17 @@ struct vout_sys_t
     int                         i_fd;                       /* device handle */
     struct fb_var_screeninfo    old_info;       /* original mode information */
     struct fb_var_screeninfo    var_info;        /* current mode information */
-    vlc_bool_t                  b_pan;     /* does device supports panning ? */
+    bool                  b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *p_palette;              /* original palette */
-    vlc_bool_t                  b_hw_accel;          /* has hardware support */
+    bool                  b_hw_accel;          /* has hardware support */
 
     /* Video information */
     uint32_t i_width;
     uint32_t i_height;
     int i_aspect;
     int i_bytes_per_pixel;
-    vlc_bool_t   b_auto;       /* Automatically adjust video size to fb size */
+    bool   b_auto;       /* Automatically adjust video size to fb size */
     vlc_fourcc_t i_chroma;
 
     /* Video memory */
@@ -259,7 +259,7 @@ static int Create( vlc_object_t *p_this )
         psz_aspect = NULL;
     }
 
-    p_sys->b_auto = VLC_FALSE;
+    p_sys->b_auto = false;
     i_mode = var_CreateGetInteger( p_vout, "fb-mode" );
     switch( i_mode )
     {
@@ -281,7 +281,7 @@ static int Create( vlc_object_t *p_this )
             break;
         case 4:
         default:
-            p_sys->b_auto = VLC_TRUE;
+            p_sys->b_auto = true;
             break;
      }
 
@@ -846,7 +846,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( (p_sys->i_height != p_sys->var_info.yres) ||
         (p_sys->i_width != p_sys->var_info.xres) )
     {
-        p_sys->b_auto = VLC_TRUE;
+        p_sys->b_auto = true;
         msg_Warn( p_vout,
                   "using framebuffer native resolution instead of requested (%ix%i)",
                   p_sys->i_width, p_sys->i_height );

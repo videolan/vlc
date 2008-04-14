@@ -179,8 +179,8 @@ struct intf_sys_t
     WindowSettings      *p_window_settings;
 
     /* special actions */
-    vlc_bool_t          b_playing;
-    vlc_bool_t          b_intf_show;                /* interface to be shown */
+    bool          b_playing;
+    bool          b_intf_show;                /* interface to be shown */
 
     /* The input thread */
     input_thread_t *    p_input;
@@ -206,7 +206,7 @@ struct intf_sys_t
     /* Embedded vout */
     VideoWindow         *p_video_window;
     wxBoxSizer          *p_video_sizer;
-    vlc_bool_t          b_video_autosize;
+    bool          b_video_autosize;
 
     /* Aout */
     aout_instance_t     *p_aout;

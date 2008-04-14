@@ -106,7 +106,6 @@ src/control/media_list_player.c
 src/control/media_list_view.c
 src/control/media_player.c
 src/control/playlist.c
-src/control/testapi.c
 src/control/video.c
 src/control/vlm.c
 src/extras/dirent.c
@@ -1194,6 +1193,7 @@ modules/video_filter/atmo/AtmoTools.cpp
 modules/video_filter/atmo/AtmoTools.h
 modules/video_filter/atmo/AtmoZoneDefinition.cpp
 modules/video_filter/atmo/AtmoZoneDefinition.h
+modules/video_filter/blendbench.c
 modules/video_filter/blend.c
 modules/video_filter/bluescreen.c
 modules/video_filter/clone.c
@@ -1201,6 +1201,12 @@ modules/video_filter/colorthres.c
 modules/video_filter/crop.c
 modules/video_filter/croppadd.c
 modules/video_filter/deinterlace.c
+modules/video_filter/dynamicoverlay/dynamicoverlay_buffer.c
+modules/video_filter/dynamicoverlay/dynamicoverlay.c
+modules/video_filter/dynamicoverlay/dynamicoverlay_commands.c
+modules/video_filter/dynamicoverlay/dynamicoverlay.h
+modules/video_filter/dynamicoverlay/dynamicoverlay_list.c
+modules/video_filter/dynamicoverlay/dynamicoverlay_queue.c
 modules/video_filter/erase.c
 modules/video_filter/extract.c
 modules/video_filter/filter_common.h

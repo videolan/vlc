@@ -75,7 +75,7 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     vlc_event_manager_register_event_type( &p_sd->event_manager,
             vlc_ServicesDiscoveryEnded );
 
-    p_sd->p_module = module_Need( p_sd, "services_discovery", psz_module_name, VLC_TRUE );
+    p_sd->p_module = module_Need( p_sd, "services_discovery", psz_module_name, true );
 
     if( p_sd->p_module == NULL )
     {
@@ -84,7 +84,7 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
         return NULL;
     }
     p_sd->psz_module = strdup( psz_module_name );
-    p_sd->b_die = VLC_FALSE; /* FIXME */
+    p_sd->b_die = false; /* FIXME */
 
     vlc_object_attach( p_sd, p_super );
     return p_sd;
@@ -111,7 +111,7 @@ int services_discovery_Start ( services_discovery_t * p_sd )
 {
     if ((p_sd->pf_run != NULL)
         && vlc_thread_create( p_sd, "services_discovery", RunSD,
-                              VLC_THREAD_PRIORITY_LOW, VLC_FALSE))
+                              VLC_THREAD_PRIORITY_LOW, false))
     {
         msg_Err( p_sd, "cannot create services discovery thread" );
         vlc_object_release( p_sd );
@@ -236,7 +236,7 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
     }
 
     p_new_item = playlist_NodeAddInput( p_parent->p_playlist, p_input, p_parent,
-                                        PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
+                                        PLAYLIST_APPEND, PLAYLIST_END, false );
     if( p_new_item )
     {
         p_new_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
@@ -255,11 +255,11 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
      * XXX: Why don't we have a function to ensure that in the playlist code ? */
     vlc_object_lock( p_parent->p_playlist );
     p_pl_item = playlist_ItemFindFromInputAndRoot( p_parent->p_playlist,
-            p_input->i_id, p_parent, VLC_FALSE );
+            p_input->i_id, p_parent, false );
 
     if( p_pl_item && p_pl_item->i_children > -1 )
     {
-        playlist_NodeDelete( p_parent->p_playlist, p_pl_item, VLC_TRUE, VLC_FALSE );
+        playlist_NodeDelete( p_parent->p_playlist, p_pl_item, true, false );
         vlc_object_unlock( p_parent->p_playlist );
         return;
     }
@@ -267,7 +267,7 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
 
     /* Delete the non-node item normally */
     playlist_DeleteInputInParent( p_parent->p_playlist, p_input->i_id,
-                                  p_parent, VLC_FALSE );
+                                  p_parent, false );
 }
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modules )
@@ -307,7 +307,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
         char * psz = services_discovery_GetLocalizedName( p_sd );
         assert( psz );
         playlist_NodesPairCreate( p_playlist, psz,
-                &p_cat, &p_one, VLC_FALSE );
+                &p_cat, &p_one, false );
         free( psz );
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
@@ -402,8 +402,8 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     if( p_sds->p_cat != p_playlist->p_root_category &&
         p_sds->p_one != p_playlist->p_root_onelevel )
     {
-        playlist_NodeDelete( p_playlist, p_sds->p_cat, VLC_TRUE, VLC_FALSE );
-        playlist_NodeDelete( p_playlist, p_sds->p_one, VLC_TRUE, VLC_FALSE );
+        playlist_NodeDelete( p_playlist, p_sds->p_cat, true, false );
+        playlist_NodeDelete( p_playlist, p_sds->p_one, true, false );
     }
     PL_UNLOCK;
 
@@ -412,7 +412,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     return VLC_SUCCESS;
 }
 
-vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
+bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
                                               const char *psz_module )
 {
     int i;
@@ -423,10 +423,10 @@ vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
         if( !strcmp( psz_module, p_playlist->pp_sds[i]->p_sd->psz_module ) )
         {
             PL_UNLOCK;
-            return VLC_TRUE;
+            return true;
         }
     }
     PL_UNLOCK;
-    return VLC_FALSE;
+    return false;
 }
 

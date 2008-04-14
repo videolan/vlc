@@ -196,7 +196,7 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
         strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));           \
         tp += len;                           \
       }                                                        \
-      saw_control_prefix = VLC_FALSE;                   \
+      saw_control_prefix = false;                   \
     }                                   \
   }
 
@@ -211,7 +211,7 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
       strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));        \
       tp += len;                           \
     }                                   \
-    saw_control_prefix = VLC_FALSE;                                \
+    saw_control_prefix = false;                                \
   }
 
 /*!
@@ -246,7 +246,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
   static char    temp_str[TEMP_STR_SIZE];
   size_t         i;
   char *         tp = temp_str;
-  vlc_bool_t     saw_control_prefix = VLC_FALSE;
+  bool     saw_control_prefix = false;
   size_t         format_len = strlen(format_str);
 
   memset(temp_str, 0, TEMP_STR_SIZE);
@@ -255,7 +255,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
 
     if (!saw_control_prefix && format_str[i] != '%') {
       *tp++ = format_str[i];
-      saw_control_prefix = VLC_FALSE;
+      saw_control_prefix = false;
       continue;
     }
 
@@ -310,7 +310,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
           /* What to do? */
           ;
         }
-        saw_control_prefix = VLC_FALSE;
+        saw_control_prefix = false;
       }
       break;
 
@@ -321,7 +321,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
         strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));
         tp += strlen(num_str);
       }
-      saw_control_prefix = VLC_FALSE;
+      saw_control_prefix = false;
       break;
 
     case 'M':
@@ -349,7 +349,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
         strncat(tp, seg_type_str, TEMP_STR_LEN-(tp-temp_str));
         tp += strlen(seg_type_str);
       }
-      saw_control_prefix = VLC_FALSE;
+      saw_control_prefix = false;
       break;
 
     case 'T':
@@ -367,7 +367,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
     default:
       *tp++ = '%';
       *tp++ = format_str[i];
-      saw_control_prefix = VLC_FALSE;
+      saw_control_prefix = false;
     }
   }
   return strdup(temp_str);

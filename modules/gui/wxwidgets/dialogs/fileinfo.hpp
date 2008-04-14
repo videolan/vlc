@@ -42,7 +42,7 @@ namespace wxvlc
         virtual ~FileInfo();
         void Update();
 
-        vlc_bool_t b_need_update;
+        bool b_need_update;
 
     private:
         void OnButtonClose( wxCommandEvent& event );

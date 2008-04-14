@@ -95,7 +95,7 @@ struct xml_reader_sys_t
     XTag *p_root; /* Root tag */
     XTag *p_curtag; /* Current tag */
     XList *p_curattr; /* Current attribute */
-    vlc_bool_t b_endtag;
+    bool b_endtag;
 };
 
 static xml_reader_t *ReaderCreate( xml_t *, stream_t * );
@@ -106,7 +106,7 @@ static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
 static int ReaderNextAttr( xml_reader_t * );
 
-static int ReaderUseDTD ( xml_reader_t *, vlc_bool_t );
+static int ReaderUseDTD ( xml_reader_t *, bool );
 
 static void CatalogLoad( xml_t *, const char * );
 static void CatalogAdd( xml_t *, const char *, const char *, const char * );
@@ -216,7 +216,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     p_reader->p_sys->p_root = p_root;
     p_reader->p_sys->p_curtag = NULL;
     p_reader->p_sys->p_curattr = NULL;
-    p_reader->p_sys->b_endtag = VLC_FALSE;
+    p_reader->p_sys->b_endtag = false;
     p_reader->p_xml = p_xml;
 
     p_reader->pf_read = ReaderRead;
@@ -236,7 +236,7 @@ static void ReaderDelete( xml_reader_t *p_reader )
     free( p_reader );
 }
 
-static int ReaderUseDTD ( xml_reader_t *p_reader, vlc_bool_t b_use )
+static int ReaderUseDTD ( xml_reader_t *p_reader, bool b_use )
 {
     VLC_UNUSED(p_reader); VLC_UNUSED(b_use);
     return VLC_EGENERIC;
@@ -258,18 +258,18 @@ static int ReaderRead( xml_reader_t *p_reader )
         {
             p_reader->p_sys->p_curtag = p_child;
             p_reader->p_sys->p_curattr = 0;
-            p_reader->p_sys->b_endtag = VLC_FALSE;
+            p_reader->p_sys->b_endtag = false;
             return 1;
         }
 
         if( p_reader->p_sys->p_curtag->name && /* no end tag for pcdata */
             !p_reader->p_sys->b_endtag )
         {
-            p_reader->p_sys->b_endtag = VLC_TRUE;
+            p_reader->p_sys->b_endtag = true;
             return 1;
         }
 
-        p_reader->p_sys->b_endtag = VLC_FALSE;
+        p_reader->p_sys->b_endtag = false;
         if( !p_reader->p_sys->p_curtag->parent ) return 0;
         p_reader->p_sys->p_curtag = p_reader->p_sys->p_curtag->parent;
     }
@@ -387,18 +387,18 @@ static void xlist_free( XList *list )
 
 static int xtag_cin( char c, int char_class )
 {
-    if( char_class & X_WHITESPACE ) if( isspace(c) ) return VLC_TRUE;
-    if( char_class & X_OPENTAG )    if( c == '<' ) return VLC_TRUE;
-    if( char_class & X_CLOSETAG )   if( c == '>' ) return VLC_TRUE;
-    if( char_class & X_DQUOTE )     if( c == '"' ) return VLC_TRUE;
-    if( char_class & X_SQUOTE )     if( c == '\'' ) return VLC_TRUE;
-    if( char_class & X_EQUAL )      if( c == '=' ) return VLC_TRUE;
-    if( char_class & X_SLASH )      if( c == '/' ) return VLC_TRUE;
-    if( char_class & X_QMARK )      if( c == '?' ) return VLC_TRUE;
-    if( char_class & X_DASH  )      if( c == '-' ) return VLC_TRUE;
-    if( char_class & X_EMARK )      if( c == '!' ) return VLC_TRUE;
+    if( char_class & X_WHITESPACE ) if( isspace(c) ) return true;
+    if( char_class & X_OPENTAG )    if( c == '<' ) return true;
+    if( char_class & X_CLOSETAG )   if( c == '>' ) return true;
+    if( char_class & X_DQUOTE )     if( c == '"' ) return true;
+    if( char_class & X_SQUOTE )     if( c == '\'' ) return true;
+    if( char_class & X_EQUAL )      if( c == '=' ) return true;
+    if( char_class & X_SLASH )      if( c == '/' ) return true;
+    if( char_class & X_QMARK )      if( c == '?' ) return true;
+    if( char_class & X_DASH  )      if( c == '-' ) return true;
+    if( char_class & X_EMARK )      if( c == '!' ) return true;
 
-    return VLC_FALSE;
+    return false;
 }
 
 static int xtag_index( XTagParser *parser, int char_class )
@@ -463,17 +463,17 @@ static int xtag_assert_and_pass( XTagParser *parser, int char_class )
 {
     char *s = parser->start;
 
-    if( !parser->valid ) return VLC_FALSE;
+    if( !parser->valid ) return false;
 
     if( !xtag_cin( s[0], char_class ) )
     {
-        parser->valid = VLC_FALSE;
-        return VLC_FALSE;
+        parser->valid = false;
+        return false;
     }
 
     parser->start = &s[1];
 
-    return VLC_TRUE;
+    return true;
 }
 
 static char *xtag_slurp_quoted( XTagParser *parser )
@@ -555,7 +555,7 @@ static XAttribute *xtag_parse_attribute( XTagParser *parser )
 
  err_free_name:
     free (name);
-    parser->valid = VLC_FALSE;
+    parser->valid = false;
     return NULL;
 }
 
@@ -718,7 +718,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 #ifdef XTAG_DEBUG
                 printf ("got %s expected %s\n", name, tag->name);
 #endif
-                parser->valid = VLC_FALSE;
+                parser->valid = false;
             }
             free( name );
         }
@@ -776,7 +776,7 @@ static XTag *xtag_new_parse( const char *s, int n )
     XTagParser parser;
     XTag *tag, *ttag, *wrapper;
 
-    parser.valid = VLC_TRUE;
+    parser.valid = true;
     parser.current_tag = NULL;
     parser.start = (char *)s;
 

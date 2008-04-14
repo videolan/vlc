@@ -94,7 +94,7 @@ static void EncoderClose ( vlc_object_t * );
 static block_t *EncodeBlock( encoder_t *, void * );
 
 static int LoadDMO( vlc_object_t *, HINSTANCE *, IMediaObject **,
-                    es_format_t *, vlc_bool_t );
+                    es_format_t *, bool );
 static void CopyPicture( decoder_t *, picture_t *, uint8_t * );
 
 vlc_module_begin();
@@ -314,7 +314,7 @@ static int DecOpen( vlc_object_t *p_this )
     CoInitialize( 0 );
 #endif /* LOADER */
 
-    if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_dec->fmt_in, VLC_FALSE )
+    if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_dec->fmt_in, false )
         != VLC_SUCCESS )
     {
         hmsdmo_dll = 0;
@@ -485,7 +485,7 @@ static int DecOpen( vlc_object_t *p_this )
         dmo_output_type.formattype = FORMAT_VideoInfo;
         dmo_output_type.subtype = dmo_output_type.majortype;
         dmo_output_type.subtype.Data1 = p_bih->biCompression;
-        dmo_output_type.bFixedSizeSamples = VLC_TRUE;
+        dmo_output_type.bFixedSizeSamples = true;
         dmo_output_type.bTemporalCompression = 0;
         dmo_output_type.lSampleSize = p_bih->biSizeImage;
         dmo_output_type.cbFormat = sizeof(VIDEOINFOHEADER);
@@ -585,7 +585,7 @@ static int DecOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
                     IMediaObject **pp_dmo, es_format_t *p_fmt,
-                    vlc_bool_t b_out )
+                    bool b_out )
 {
     DMO_PARTIAL_MEDIATYPE dmo_partial_type;
     int i_err;
@@ -829,7 +829,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         CMediaBuffer *p_in;
 
-        p_in = CMediaBufferCreate( p_block, p_block->i_buffer, VLC_TRUE );
+        p_in = CMediaBufferCreate( p_block, p_block->i_buffer, true );
 
         i_result = p_sys->p_dmo->vt->ProcessInput( p_sys->p_dmo, 0,
                        (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_SYNCPOINT,
@@ -871,7 +871,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_out.p_buffer = p_sys->p_buffer;
     block_out.i_buffer = 0;
 
-    p_out = CMediaBufferCreate( &block_out, p_sys->i_min_output, VLC_FALSE );
+    p_out = CMediaBufferCreate( &block_out, p_sys->i_min_output, false );
     memset( &db, 0, sizeof(db) );
     db.pBuffer = (IMediaBuffer *)p_out;
 
@@ -1319,7 +1319,7 @@ static int EncOpen( vlc_object_t *p_this )
     CoInitialize( 0 );
 #endif /* LOADER */
 
-    if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_enc->fmt_out, VLC_TRUE )
+    if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_enc->fmt_out, true )
         != VLC_SUCCESS )
     {
         hmsdmo_dll = 0;
@@ -1463,7 +1463,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     }
 
     /* Feed input to the DMO */
-    p_in = CMediaBufferCreate( p_block_in, p_block_in->i_buffer, VLC_TRUE );
+    p_in = CMediaBufferCreate( p_block_in, p_block_in->i_buffer, true );
     i_result = p_sys->p_dmo->vt->ProcessInput( p_sys->p_dmo, 0,
        (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_TIME, i_pts * 10, 0 );
 
@@ -1500,7 +1500,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
 
         p_block_out = block_New( p_enc, p_sys->i_min_output );
         p_block_out->i_buffer = 0;
-        p_out = CMediaBufferCreate(p_block_out, p_sys->i_min_output, VLC_FALSE);
+        p_out = CMediaBufferCreate(p_block_out, p_sys->i_min_output, false);
         memset( &db, 0, sizeof(db) );
         db.pBuffer = (IMediaBuffer *)p_out;
 

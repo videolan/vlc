@@ -122,17 +122,17 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_input;
 
     /* List of all possible attributes. The only required one is "src" */
-    vlc_bool_t b_autoplay = VLC_FALSE;
-    vlc_bool_t b_controler = VLC_TRUE;
-    qtl_fullscreen_t fullscreen = VLC_FALSE;
+    bool b_autoplay = false;
+    bool b_controler = true;
+    qtl_fullscreen_t fullscreen = false;
     char *psz_href = NULL;
-    vlc_bool_t b_kioskmode = VLC_FALSE;
+    bool b_kioskmode = false;
     qtl_loop_t loop = LOOP_FALSE;
     int i_movieid = -1;
     char *psz_moviename = NULL;
-    vlc_bool_t b_playeveryframe = VLC_FALSE;
+    bool b_playeveryframe = false;
     char *psz_qtnext = NULL;
-    vlc_bool_t b_quitwhendone = VLC_FALSE;
+    bool b_quitwhendone = false;
     char *psz_src = NULL;
     char *psz_mimetype = NULL;
     int i_volume = 100;
@@ -195,22 +195,22 @@ static int Demux( demux_t *p_demux )
         {
             if( !strcmp( psz_attrvalue, "true" ) )
             {
-                b_autoplay = VLC_TRUE;
+                b_autoplay = true;
             }
             else
             {
-                b_autoplay = VLC_FALSE;
+                b_autoplay = false;
             }
         }
         else if( !strcmp( psz_attrname, "controler" ) )
         {
             if( !strcmp( psz_attrvalue, "false" ) )
             {
-                b_controler = VLC_FALSE;
+                b_controler = false;
             }
             else
             {
-                b_controler = VLC_TRUE;
+                b_controler = true;
             }
         }
         else if( !strcmp( psz_attrname, "fullscreen" ) )
@@ -245,11 +245,11 @@ static int Demux( demux_t *p_demux )
         {
             if( !strcmp( psz_attrvalue, "true" ) )
             {
-                b_kioskmode = VLC_TRUE;
+                b_kioskmode = true;
             }
             else
             {
-                b_kioskmode = VLC_FALSE;
+                b_kioskmode = false;
             }
         }
         else if( !strcmp( psz_attrname, "loop" ) )
@@ -280,11 +280,11 @@ static int Demux( demux_t *p_demux )
         {
             if( !strcmp( psz_attrvalue, "true" ) )
             {
-                b_playeveryframe = VLC_TRUE;
+                b_playeveryframe = true;
             }
             else
             {
-                b_playeveryframe = VLC_FALSE;
+                b_playeveryframe = false;
             }
         }
         else if( !strcmp( psz_attrname, "qtnext" ) )
@@ -296,11 +296,11 @@ static int Demux( demux_t *p_demux )
         {
             if( !strcmp( psz_attrvalue, "true" ) )
             {
-                b_quitwhendone = VLC_TRUE;
+                b_quitwhendone = true;
             }
             else
             {
-                b_quitwhendone = VLC_FALSE;
+                b_quitwhendone = false;
             }
         }
         else if( !strcmp( psz_attrname, "src" ) )
@@ -327,22 +327,22 @@ static int Demux( demux_t *p_demux )
     }
 
     msg_Dbg( p_demux, "autoplay: %s (unused by VLC)",
-             b_autoplay==VLC_TRUE ? "true": "false" );
+             b_autoplay==true ? "true": "false" );
     msg_Dbg( p_demux, "controler: %s (unused by VLC)",
-             b_controler==VLC_TRUE?"true": "false" );
+             b_controler==true?"true": "false" );
     msg_Dbg( p_demux, "fullscreen: %s (unused by VLC)",
              ppsz_fullscreen[fullscreen] );
     msg_Dbg( p_demux, "href: %s", psz_href );
     msg_Dbg( p_demux, "kioskmode: %s (unused by VLC)",
-             b_kioskmode==VLC_TRUE?"true":"false" );
+             b_kioskmode==true?"true":"false" );
     msg_Dbg( p_demux, "loop: %s (unused by VLC)", ppsz_loop[loop] );
     msg_Dbg( p_demux, "movieid: %d (unused by VLC)", i_movieid );
     msg_Dbg( p_demux, "moviename: %s", psz_moviename );
     msg_Dbg( p_demux, "playeverframe: %s (unused by VLC)",
-             b_playeveryframe==VLC_TRUE?"true":"false" );
+             b_playeveryframe==true?"true":"false" );
     msg_Dbg( p_demux, "qtnext: %s", psz_qtnext );
     msg_Dbg( p_demux, "quitwhendone: %s (unused by VLC)",
-             b_quitwhendone==VLC_TRUE?"true":"false" );
+             b_quitwhendone==true?"true":"false" );
     msg_Dbg( p_demux, "src: %s", psz_src );
     msg_Dbg( p_demux, "mimetype: %s", psz_mimetype );
     msg_Dbg( p_demux, "volume: %d (unused by VLC)", i_volume );

@@ -443,7 +443,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSString *o_mrl_string;
     NSString *o_filename = [o_file_path stringValue];
     NSString *o_ext = [o_filename pathExtension];
-    vlc_bool_t b_stream = [o_file_stream state];
+    bool b_stream = [o_file_stream state];
     BOOL b_dir = NO;
  
     [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];

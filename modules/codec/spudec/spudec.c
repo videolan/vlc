@@ -80,7 +80,7 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
 
-    p_sys->b_packetizer = VLC_FALSE;
+    p_sys->b_packetizer = false;
     p_sys->i_spu_size = 0;
     p_sys->i_spu      = 0;
     p_sys->p_block    = NULL;
@@ -108,7 +108,7 @@ static int PacketizerOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     p_dec->pf_packetize  = Packetize;
-    p_dec->p_sys->b_packetizer = VLC_TRUE;
+    p_dec->p_sys->b_packetizer = true;
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_FOURCC( 's','p','u',' ' );
 

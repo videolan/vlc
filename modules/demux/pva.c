@@ -40,7 +40,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("PVA demuxer" ) );
-    set_capability( "demux2", 10 );
+    set_capability( "demux", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
@@ -108,7 +108,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_pes   = NULL;
     p_sys->p_es    = NULL;
 
-    p_sys->b_pcr_audio = VLC_FALSE;
+    p_sys->b_pcr_audio = false;
 
     return VLC_SUCCESS;
 }
@@ -433,7 +433,7 @@ static void ParsePES( demux_t *p_demux )
     if( p_pes->i_pts > 0 )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_pes->i_pts);
-        p_sys->b_pcr_audio = VLC_TRUE;
+        p_sys->b_pcr_audio = true;
     }
     es_out_Send( p_demux->out, p_sys->p_audio, p_pes );
 }

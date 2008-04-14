@@ -220,7 +220,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
         /* FIXME: playlist_AddInput() can fail */
         playlist_BothAddInput( p_playlist, p_input, p_parent,
                                PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
-                               VLC_FALSE );
+                               false );
     } else if ( node->isContainerNode() )
     {
         ContainerNode *conNode = (ContainerNode *)node;
@@ -243,7 +243,7 @@ void UPnPHandler::RemoveDevice( Device *dev )
     playlist_item_t *p_item = FindDeviceNode( dev );
 
     if( p_item != NULL )
-        playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_item, true, true );
 }
 
 

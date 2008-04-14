@@ -84,7 +84,7 @@ struct decoder_sys_t
 
     } stream_info;
 #endif
-    vlc_bool_t b_stream_info;
+    bool b_stream_info;
 
     /*
      * Common properties
@@ -221,7 +221,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Misc init */
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->i_state = STATE_NOSYNC;
-    p_sys->b_stream_info = VLC_FALSE;
+    p_sys->b_stream_info = false;
     p_sys->p_block=NULL;
     p_sys->bytestream = block_BytestreamInit();
 
@@ -687,7 +687,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
              p_dec->fmt_out.audio.i_channels, p_dec->fmt_out.audio.i_rate,
              p_dec->fmt_out.audio.i_bitspersample );
 
-    p_sys->b_stream_info = VLC_TRUE;
+    p_sys->b_stream_info = true;
     p_sys->stream_info = metadata->data.stream_info;
 
     return;
@@ -832,9 +832,9 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     int i_blocksize = 0, i_blocksize_hint = 0, i_sample_rate_hint = 0;
     uint64_t i_sample_number = 0;
 
-    vlc_bool_t b_variable_blocksize = ( p_sys->b_stream_info &&
+    bool b_variable_blocksize = ( p_sys->b_stream_info &&
         p_sys->stream_info.min_blocksize != p_sys->stream_info.max_blocksize );
-    vlc_bool_t b_fixed_blocksize = ( p_sys->b_stream_info &&
+    bool b_fixed_blocksize = ( p_sys->b_stream_info &&
         p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize );
 
     /* Check syncword */

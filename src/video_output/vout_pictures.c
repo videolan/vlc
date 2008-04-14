@@ -104,8 +104,8 @@ void vout_DatePicture( vout_thread_t *p_vout,
  * threads.
  */
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
-                               vlc_bool_t b_progressive,
-                               vlc_bool_t b_top_field_first,
+                               bool b_progressive,
+                               bool b_top_field_first,
                                unsigned int i_nb_fields )
 {
     int         i_pic;                                      /* picture index */

@@ -64,8 +64,8 @@ typedef struct guid_s
 void E_( GenerateGuid )     ( guid_t * );
 void E_( asf_HeaderParse )  ( asf_header_t *, uint8_t *, int );
 void E_( asf_StreamSelect ) ( asf_header_t *,
-                              int i_bitrate_max, vlc_bool_t b_all, vlc_bool_t b_audio,
-                              vlc_bool_t b_video );
+                              int i_bitrate_max, bool b_all, bool b_audio,
+                              bool b_video );
 
 #define GUID_FMT "%8.8x-%4.4x-%4.4x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \

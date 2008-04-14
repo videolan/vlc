@@ -1165,7 +1165,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
-        vlc_bool_t b_start = !i && i_open_arg;
+        bool b_start = !i && i_open_arg;
         input_item_t *p_input;
         char *psz_utf8;
 
@@ -1208,7 +1208,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( p_playlist, p_input,
                PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
-               PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+               PLAYLIST_END, true, false );
 	vlc_gc_decref( p_input );
     }
 
@@ -1884,7 +1884,7 @@ void OpenDialog::OnCachingChange( wxCommandEvent& event )
  *****************************************************************************/
 wxArrayString SeparateEntries( wxString entries )
 {
-    vlc_bool_t b_quotes_mode = VLC_FALSE;
+    bool b_quotes_mode = false;
 
     wxArrayString entries_array;
     wxString entry;
@@ -1901,13 +1901,13 @@ wxArrayString SeparateEntries( wxString entries )
         {
             /* Enters quotes mode */
             entry.RemoveLast();
-            b_quotes_mode = VLC_TRUE;
+            b_quotes_mode = true;
         }
         else if( b_quotes_mode && entry.Last() == wxT('\"') )
         {
             /* Finished the quotes mode */
             entry.RemoveLast();
-            b_quotes_mode = VLC_FALSE;
+            b_quotes_mode = false;
         }
         else if( !b_quotes_mode && entry.Last() != wxT('\"') )
         {

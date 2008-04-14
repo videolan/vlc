@@ -649,7 +649,7 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
         if( OpenDll( p_dec ) != VLC_SUCCESS )
         {
             /* Fatal */
-            p_dec->b_error = VLC_TRUE;
+            p_dec->b_error = true;
             return NULL;
         }
     }

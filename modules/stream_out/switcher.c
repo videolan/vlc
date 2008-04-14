@@ -114,21 +114,21 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_string( SOUT_CFG_PREFIX "files", "", NULL, FILES_TEXT,
-                FILES_LONGTEXT, VLC_FALSE );
+                FILES_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "sizes", "", NULL, SIZES_TEXT,
-                SIZES_LONGTEXT, VLC_FALSE );
+                SIZES_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "aspect-ratio", "4:3", NULL, RATIO_TEXT,
-                RATIO_LONGTEXT, VLC_FALSE );
+                RATIO_LONGTEXT, false );
     add_integer( SOUT_CFG_PREFIX "port", 5001, NULL,
-                 PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
+                 PORT_TEXT, PORT_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "command", 0, NULL,
-                 COMMAND_TEXT, COMMAND_LONGTEXT, VLC_TRUE );
+                 COMMAND_TEXT, COMMAND_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "gop", 8, NULL,
-                 GOP_TEXT, GOP_LONGTEXT, VLC_TRUE );
+                 GOP_TEXT, GOP_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "qscale", 5, NULL,
-                 QSCALE_TEXT, QSCALE_LONGTEXT, VLC_TRUE );
+                 QSCALE_TEXT, QSCALE_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "mute-audio", 1, NULL,
-              AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
+              AUDIO_TEXT, AUDIO_LONGTEXT, true );
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
@@ -143,7 +143,7 @@ struct sout_stream_sys_t
     int             i_qscale;
     int             i_aspect;
     sout_stream_id_t *pp_audio_ids[MAX_AUDIO];
-    vlc_bool_t      b_audio;
+    bool      b_audio;
 
     /* Pictures */
     picture_t       p_pictures[MAX_PICTURES];
@@ -157,8 +157,8 @@ struct sout_stream_sys_t
 struct sout_stream_id_t
 {
     void            *id;
-    vlc_bool_t      b_switcher_video;
-    vlc_bool_t      b_switcher_audio;
+    bool      b_switcher_video;
+    bool      b_switcher_audio;
     es_format_t     f_src;
     block_t         *p_queued;
 
@@ -321,7 +321,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             && (p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'v')
                  || p_fmt->i_codec == VLC_FOURCC('f', 'a', 'k', 'e')) )
     {
-        id->b_switcher_video = VLC_TRUE;
+        id->b_switcher_video = true;
         p_fmt->i_codec = VLC_FOURCC('m', 'p', 'g', 'v');
         msg_Dbg( p_stream,
                  "creating video switcher for fcc=`%4.4s' cmd:%d",
@@ -334,7 +334,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         int i_ff_codec = CODEC_ID_MP2;
         int i;
 
-        id->b_switcher_audio = VLC_TRUE;
+        id->b_switcher_audio = true;
         msg_Dbg( p_stream,
                  "creating audio switcher for fcc=`%4.4s' cmd:%d",
                  (char*)&p_fmt->i_codec, p_sys->i_cmd );

@@ -119,15 +119,15 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_SCODEC );
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
-                 VLC_FALSE );
+                 false );
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
-                ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
+                ENCODING_TEXT, ENCODING_LONGTEXT, false );
         change_string_list( ppsz_encodings, 0, 0 );
-    add_bool( "subsdec-autodetect-utf8", VLC_TRUE, NULL,
-              AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, VLC_FALSE );
-    add_bool( "subsdec-formatted", VLC_TRUE, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
-                 VLC_FALSE );
+    add_bool( "subsdec-autodetect-utf8", true, NULL,
+              AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false );
+    add_bool( "subsdec-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
+                 false );
 vlc_module_end();
 
 /*****************************************************************************
@@ -166,8 +166,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( *p_sys ) );
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
-    p_sys->b_autodetect_utf8 = VLC_FALSE;
-    p_sys->b_ass = VLC_FALSE;
+    p_sys->b_autodetect_utf8 = false;
+    p_sys->b_ass = false;
     p_sys->i_original_height = -1;
     p_sys->i_original_width = -1;
     TAB_INIT( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
@@ -210,7 +210,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         if (var_CreateGetBool (p_dec, "subsdec-autodetect-utf8"))
         {
             msg_Dbg (p_dec, "using automatic UTF-8 detection");
-            p_sys->b_autodetect_utf8 = VLC_TRUE;
+            p_sys->b_autodetect_utf8 = true;
         }
     }
 
@@ -359,7 +359,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
             {
                 msg_Dbg( p_dec, "invalid UTF-8 sequence: "
                          "disabling UTF-8 subtitles autodetection" );
-                p_sys->b_autodetect_utf8 = VLC_FALSE;
+                p_sys->b_autodetect_utf8 = false;
             }
         }
 
@@ -401,7 +401,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_pausable = true;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -437,7 +437,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
         p_spu->b_ephemer = (p_block->i_length == 0);
-        p_spu->b_absolute = VLC_FALSE;
+        p_spu->b_absolute = false;
     }
     else
     {
@@ -448,7 +448,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
         p_spu->b_ephemer = (p_block->i_length == 0);
-        p_spu->b_absolute = VLC_FALSE;
+        p_spu->b_absolute = false;
         p_spu->i_original_picture_width = p_sys->i_original_width;
         p_spu->i_original_picture_height = p_sys->i_original_height;
     }
@@ -668,7 +668,7 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
                 }
                 else if( !strncmp( psz_subtitle, "</", 2 ))
                 {
-                    vlc_bool_t  b_match     = VLC_FALSE;
+                    bool  b_match     = false;
                     int         i_len       = strlen( psz_tag ) - 1;
                     char       *psz_lastTag = NULL;
 

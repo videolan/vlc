@@ -285,7 +285,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         module_data->help.clear();
         // TODO image
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
-        module_item->setText( 0, qtr( module_GetName( p_module, VLC_FALSE ) ) );
+        module_item->setText( 0, qtr( module_GetName( p_module, false ) ) );
         //item->setIcon( 0 , XXX );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
@@ -459,7 +459,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ( p_item->i_type == CONFIG_CATEGORY ||
               p_item->i_type == CONFIG_SUBCATEGORY ) )
             break;
-        if( p_item->b_internal == VLC_TRUE ) continue;
+        if( p_item->b_internal == true ) continue;
 
         if( p_item->i_type == CONFIG_SECTION )
         {

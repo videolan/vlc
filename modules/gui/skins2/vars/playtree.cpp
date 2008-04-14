@@ -74,7 +74,7 @@ void Playtree::delSelected()
             if( p_item->i_children == -1 )
             {
                 playlist_DeleteFromInput( getIntf()->p_sys->p_playlist,
-                                          p_item->p_input->i_id, VLC_TRUE );
+                                          p_item->p_input->i_id, true );
                 it2 = getNextVisibleItem( it ) ;
                 it->parent()->removeChild( it );
                 it = it2;
@@ -82,7 +82,7 @@ void Playtree::delSelected()
             else
             {
                 playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
-                                     VLC_TRUE, VLC_FALSE );
+                                     true, false );
                 it2 = getNextSibling( it );
                 it->parent()->removeChild( it );
                 it = it2;
@@ -112,7 +112,7 @@ void Playtree::action( VarTree *pItem )
 
     if( p_parent )
     {
-        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_parent, p_item );
+        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, true, p_parent, p_item );
     }
     vlc_mutex_unlock( &m_pPlaylist->object_lock );
 }
@@ -175,7 +175,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
         if( item == end() )
         {
             playlist_item_t *p_item = playlist_ItemGetById(
-                                        m_pPlaylist, p_add->i_item, VLC_TRUE );
+                                        m_pPlaylist, p_add->i_item, true );
             if( !p_item ) return;
             UString *pName = new UString( getIntf(),
                                           p_item->p_input->psz_name );

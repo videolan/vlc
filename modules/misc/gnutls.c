@@ -96,9 +96,9 @@ vlc_module_begin();
 
         add_obsolete_integer( "gnutls-dh-bits" );
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT, NULL,
-                    CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, VLC_TRUE );
+                    CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true );
         add_integer( "gnutls-cache-size", CACHE_SIZE, NULL, CACHE_SIZE_TEXT,
-                    CACHE_SIZE_LONGTEXT, VLC_TRUE );
+                    CACHE_SIZE_LONGTEXT, true );
 vlc_module_end();
 
 
@@ -245,7 +245,7 @@ struct tls_session_sys_t
 {
     gnutls_session_t session;
     char            *psz_hostname;
-    vlc_bool_t       b_handshaked;
+    bool       b_handshaked;
 };
 
 
@@ -311,7 +311,7 @@ gnutls_ContinueHandshake (tls_session_t *p_session)
         return -1;
     }
 
-    p_sys->b_handshaked = VLC_TRUE;
+    p_sys->b_handshaked = true;
     return 0;
 }
 
@@ -550,13 +550,13 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 static int
 gnutls_Addx509File( vlc_object_t *p_this,
                     gnutls_certificate_credentials_t cred,
-                    const char *psz_path, vlc_bool_t b_priv );
+                    const char *psz_path, bool b_priv );
 
 static int
 gnutls_Addx509Directory( vlc_object_t *p_this,
                          gnutls_certificate_credentials_t cred,
                          const char *psz_dirname,
-                         vlc_bool_t b_priv )
+                         bool b_priv )
 {
     DIR* dir;
 
@@ -622,7 +622,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
 static int
 gnutls_Addx509File( vlc_object_t *p_this,
                     gnutls_certificate_credentials cred,
-                    const char *psz_path, vlc_bool_t b_priv )
+                    const char *psz_path, bool b_priv )
 {
     struct stat st;
 
@@ -697,7 +697,7 @@ static int OpenClient (vlc_object_t *obj)
     p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_set_fd = gnutls_SetFD;
 
-    p_sys->session.b_handshaked = VLC_FALSE;
+    p_sys->session.b_handshaked = false;
 
     const char *homedir = obj->p_libvlc->psz_datadir,
                *datadir = config_GetDataDir ();
@@ -719,17 +719,17 @@ static int OpenClient (vlc_object_t *obj)
 
     sprintf (path, "%s/ssl/certs", homedir);
     gnutls_Addx509Directory (VLC_OBJECT (p_session),
-                             p_sys->x509_cred, path, VLC_FALSE);
+                             p_sys->x509_cred, path, false);
 
     sprintf (path, "%s/ca-certificates.crt", datadir);
     gnutls_Addx509File (VLC_OBJECT (p_session),
-                        p_sys->x509_cred, path, VLC_FALSE);
+                        p_sys->x509_cred, path, false);
     p_session->pf_handshake = gnutls_HandshakeAndValidate;
     /*p_session->pf_handshake = gnutls_ContinueHandshake;*/
 
     sprintf (path, "%s/ssl/private", homedir);
     gnutls_Addx509Directory (VLC_OBJECT (p_session), p_sys->x509_cred,
-                             path, VLC_TRUE);
+                             path, true);
 
     i_val = gnutls_init (&p_sys->session.session, GNUTLS_CLIENT);
     if (i_val != 0)
@@ -782,7 +782,7 @@ static void CloseClient (vlc_object_t *obj)
     tls_session_t *client = (tls_session_t *)obj;
     tls_client_sys_t *p_sys = (tls_client_sys_t *)(client->p_sys);
 
-    if (p_sys->session.b_handshaked == VLC_TRUE)
+    if (p_sys->session.b_handshaked == true)
         gnutls_bye (p_sys->session.session, GNUTLS_SHUT_WR);
     gnutls_deinit (p_sys->session.session);
     /* credentials must be free'd *after* gnutls_deinit() */
@@ -931,7 +931,7 @@ gnutls_SessionClose (tls_server_t *p_server, tls_session_t *p_session)
     tls_session_sys_t *p_sys = p_session->p_sys;
     (void)p_server;
 
-    if( p_sys->b_handshaked == VLC_TRUE )
+    if( p_sys->b_handshaked == true )
         gnutls_bye( p_sys->session, GNUTLS_SHUT_WR );
     gnutls_deinit( p_sys->session );
 
@@ -971,7 +971,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session->pf_set_fd = gnutls_SetFD;
     p_session->pf_handshake = p_server_sys->pf_handshake;
 
-    p_session->p_sys->b_handshaked = VLC_FALSE;
+    p_session->p_sys->b_handshaked = false;
     p_session->p_sys->psz_hostname = NULL;
 
     i_val = gnutls_init( &session, GNUTLS_SERVER );

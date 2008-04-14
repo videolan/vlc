@@ -73,13 +73,13 @@ vlc_module_end();
  *****************************************************************************/
 
 static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
-                    vlc_bool_t b_art )
+                    bool b_art )
 {
     char psz_buf[256];
     char psz_data[256];
     char i_album_count, i;
     char *ppsz_args[4];
-    vlc_bool_t b_art_found = VLC_FALSE;
+    bool b_art_found = false;
 
     char *psz_artist;
     char *psz_album;
@@ -154,7 +154,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
                     psz_buf );
             msg_Dbg( p_obj, "Album art URL: %s", psz_data );
             input_item_SetArtURL( p_item, psz_data );
-            b_art_found = VLC_TRUE;
+            b_art_found = true;
             break;
         }
     }
@@ -192,5 +192,5 @@ static int FindArt( vlc_object_t *p_this )
     input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
     assert( p_item );
 
-    return GetData( VLC_OBJECT(p_playlist), p_item, VLC_TRUE );
+    return GetData( VLC_OBJECT(p_playlist), p_item, true );
 }

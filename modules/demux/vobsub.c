@@ -51,7 +51,7 @@ vlc_module_begin();
     set_description( _("Vobsub subtitles parser") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux2", 1 );
+    set_capability( "demux", 1 );
 
     set_callbacks( Open, Close );
 
@@ -105,7 +105,7 @@ struct demux_sys_t
 
     int         i_original_frame_width;
     int         i_original_frame_height;
-    vlc_bool_t  b_palette;
+    bool  b_palette;
     uint32_t    palette[16];
 };
 
@@ -155,7 +155,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->track = (vobsub_track_t *)malloc( sizeof( vobsub_track_t ) );
     p_sys->i_original_frame_width = -1;
     p_sys->i_original_frame_height = -1;
-    p_sys->b_palette = VLC_FALSE;
+    p_sys->b_palette = false;
     memset( p_sys->palette, 0, 16 * sizeof( uint32_t ) );
 
     /* Load the whole file */
@@ -242,7 +242,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                vlc_bool_t b_selected;
+                bool b_selected;
                 /* Check the ES is selected */
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                                 p_sys->track[i].p_es, &b_selected );
@@ -275,7 +275,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pf = (double*)va_arg( args, double * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                vlc_bool_t b_selected;
+                bool b_selected;
                 /* Check the ES is selected */
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                                 p_sys->track[i].p_es, &b_selected );
@@ -518,7 +518,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                     /* msg_Dbg( p_demux, "palette %d: y=%x, u=%x, v=%x", i, y, u, v ); */
 
                 }
-                p_sys->b_palette = VLC_TRUE;
+                p_sys->b_palette = true;
                 msg_Dbg( p_demux, "vobsub palette read" );
             }
             else

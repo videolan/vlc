@@ -74,7 +74,7 @@ input_MetaTypeToLocalizedString( vlc_meta_type_t meta_type )
 #define input_FindArtInCache(a,b) __input_FindArtInCache(VLC_OBJECT(a),b)
 static int __input_FindArtInCache( vlc_object_t *, input_item_t *p_item );
 
-vlc_bool_t input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
+bool input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
                                 uint32_t *pi_mandatory, uint32_t *pi_optional )
 {
     VLC_UNUSED(p_playlist);
@@ -83,7 +83,7 @@ vlc_bool_t input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
     uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );
     *pi_mandatory &= ~i_meta;
     *pi_optional = 0; /// Todo
-    return *pi_mandatory ? VLC_FALSE:VLC_TRUE;
+    return *pi_mandatory ? false:true;
 }
 
 int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
@@ -104,7 +104,7 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
     p_me->i_optional = i_optional;
 
     p_me->p_item = p_item;
-    p_me->p_module = module_Need( p_me, "meta fetcher", 0, VLC_FALSE );
+    p_me->p_module = module_Need( p_me, "meta fetcher", 0, false );
     if( !p_me->p_module )
     {
         vlc_object_release( p_me );
@@ -113,7 +113,7 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
     module_Unneed( p_me, p_me->p_module );
     vlc_object_release( p_me );
 
-    input_item_SetMetaFetched( p_item, VLC_TRUE );
+    input_item_SetMetaFetched( p_item, true );
 
     return VLC_SUCCESS;
 }
@@ -208,7 +208,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     }
     free( psz_title );
 
-    p_module = module_Need( p_playlist, "art finder", 0, VLC_FALSE );
+    p_module = module_Need( p_playlist, "art finder", 0, false );
 
     if( p_module )
         i_ret = 1;
@@ -222,7 +222,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         a.psz_artist = psz_artist;
         a.psz_album = psz_album;
         a.psz_arturl = input_item_GetArtURL( p_item );
-        a.b_found = (i_ret == VLC_EGENERIC ? VLC_FALSE : VLC_TRUE );
+        a.b_found = (i_ret == VLC_EGENERIC ? false : true );
         ARRAY_APPEND( p_playlist->p_fetcher->albums, a );
     }
     else

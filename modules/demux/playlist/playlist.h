@@ -25,7 +25,7 @@
 char *E_(ProcessMRL)( char *, char * );
 char *E_(FindPrefix)( demux_t * );
 
-vlc_bool_t E_(FindItem)( demux_t *, playlist_t *, playlist_item_t **);
+bool E_(FindItem)( demux_t *, playlist_t *, playlist_item_t **);
 
 void E_(AddToPlaylist)( demux_t *, playlist_t*,input_item_t*,playlist_item_t*,int );
 

@@ -527,7 +527,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_logo_pos_radio setEnabled: [o_logo_enabled_ckb state]];
 }
 
-- (void)changeFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add
+- (void)changeFiltersString:(char *)psz_name onOrOff:(bool )b_add
 {
     /* copied from ../wxwidgets/extrapanel.cpp
      * renamed to conform with Cocoa's rules

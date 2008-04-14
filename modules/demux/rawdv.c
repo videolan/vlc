@@ -46,10 +46,10 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "DV" );
     set_description( _("DV (Digital Video) demuxer") );
-    set_capability( "demux2", 3 );
+    set_capability( "demux", 3 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, VLC_FALSE );
+    add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, false );
     set_callbacks( Open, Close );
     add_shortcut( "rawdv" );
 vlc_module_end();
@@ -113,7 +113,7 @@ struct demux_sys_t
 
     /* program clock reference (in units of 90kHz) */
     mtime_t i_pcr;
-    vlc_bool_t b_hurry_up;
+    bool b_hurry_up;
 };
 
 /*****************************************************************************
@@ -145,7 +145,7 @@ static int Open( vlc_object_t * p_this )
      * it is possible to force this demux. */
 
     /* Check for DV file extension */
-    if( !demux2_IsPathExtension( p_demux, ".dv" ) && !p_demux->b_force )
+    if( !demux_IsPathExtension( p_demux, ".dv" ) && !p_demux->b_force )
         return VLC_EGENERIC;
 
     if( stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
@@ -286,7 +286,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     block_t     *p_block;
-    vlc_bool_t  b_audio = VLC_FALSE;
+    bool  b_audio = false;
 
     if( p_sys->b_hurry_up )
     {
@@ -341,7 +341,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys  = p_demux->p_sys;
 
     /* XXX: DEMUX_SET_TIME is precise here */
-    return demux2_vaControlHelper( p_demux->s,
+    return demux_vaControlHelper( p_demux->s,
                                    0, -1,
                                    p_sys->frame_size * p_sys->f_rate * 8,
                                    p_sys->frame_size, i_query, args );

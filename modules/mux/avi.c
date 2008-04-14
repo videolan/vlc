@@ -98,7 +98,7 @@ typedef struct avi_idx1_s
 
 struct sout_mux_sys_t
 {
-    vlc_bool_t b_write_header;
+    bool b_write_header;
 
     int i_streams;
     int i_stream_video;
@@ -150,7 +150,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->idx1.i_entry_max = 10000;
     p_sys->idx1.entry = calloc( p_sys->idx1.i_entry_max,
                                 sizeof( avi_idx1_entry_t ) );
-    p_sys->b_write_header = VLC_TRUE;
+    p_sys->b_write_header = true;
 
 
     p_mux->pf_control   = Control;
@@ -219,19 +219,19 @@ static void Close( vlc_object_t * p_this )
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
     VLC_UNUSED(p_mux);
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
     char **ppsz;
 
    switch( i_query )
    {
        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_FALSE;
+           pb_bool = (bool*)va_arg( args, bool * );
+           *pb_bool = false;
            return VLC_SUCCESS;
 
        case MUX_GET_ADD_STREAM_WAIT:
-           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
+           pb_bool = (bool*)va_arg( args, bool * );
+           *pb_bool = true;
            return VLC_SUCCESS;
 
        case MUX_GET_MIME:
@@ -416,7 +416,7 @@ static int Mux      ( sout_mux_t *p_mux )
         p_hdr = avi_HeaderCreateRIFF( p_mux );
         sout_AccessOutWrite( p_mux->p_access, p_hdr );
 
-        p_sys->b_write_header = VLC_FALSE;
+        p_sys->b_write_header = false;
     }
 
     for( i = 0; i < p_mux->i_nb_inputs; i++ )

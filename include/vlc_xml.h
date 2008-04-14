@@ -68,7 +68,7 @@ struct xml_reader_t
     char * (*pf_value) ( xml_reader_t * );
     int (*pf_next_attr) ( xml_reader_t * );
 
-    int (*pf_use_dtd) ( xml_reader_t *, vlc_bool_t );
+    int (*pf_use_dtd) ( xml_reader_t *, bool );
 };
 
 #define xml_ReaderRead( a ) a->pf_read( a )

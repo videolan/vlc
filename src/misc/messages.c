@@ -90,7 +90,7 @@ void __msg_Create( vlc_object_t *p_this )
     for( i = 0; i < 2; i++ )
     {
          vlc_mutex_init( (vlc_object_t *)NULL, &QUEUE(i).lock );
-         QUEUE(i).b_overflow = VLC_FALSE;
+         QUEUE(i).b_overflow = false;
          QUEUE(i).i_id = i;
          QUEUE(i).i_start = 0;
          QUEUE(i).i_stop = 0;
@@ -431,7 +431,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
         else
         {
             /* Pheeew, at last, there is room in the queue! */
-            p_queue->b_overflow = VLC_FALSE;
+            p_queue->b_overflow = false;
         }
     }
     else if( ((p_queue->i_stop - p_queue->i_start + 2) % VLC_MSG_QSIZE) == 0 )
@@ -440,7 +440,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 
         if( ((p_queue->i_stop - p_queue->i_start + 2) % VLC_MSG_QSIZE) == 0 )
         {
-            p_queue->b_overflow = VLC_TRUE;
+            p_queue->b_overflow = true;
 
             if( p_queue->i_id == MSG_QUEUE_NORMAL )
             {

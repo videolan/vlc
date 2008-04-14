@@ -117,7 +117,7 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
 
-    p_sys->b_packetizer  = VLC_FALSE;
+    p_sys->b_packetizer  = false;
 
     p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
     p_sys->p_spu   = NULL;
@@ -139,7 +139,7 @@ static int PacketizerOpen( vlc_object_t *p_this )
 
     if( DecoderOpen( p_this ) != VLC_SUCCESS ) return VLC_EGENERIC;
 
-    p_dec->p_sys->b_packetizer = VLC_TRUE;
+    p_dec->p_sys->b_packetizer = true;
 
     return VLC_SUCCESS;
 }
@@ -499,14 +499,14 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_spu = p_dec->pf_spu_buffer_new( p_dec );
     if( !p_spu ) return NULL;
 
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_pausable = true;
 
     p_spu->i_x = p_sys->i_x_start;
     p_spu->i_x = p_spu->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
     p_spu->i_y = p_sys->i_y_start;
     p_spu->i_start = p_data->i_pts;
     p_spu->i_stop  = p_data->i_pts + p_sys->i_duration;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
 
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );

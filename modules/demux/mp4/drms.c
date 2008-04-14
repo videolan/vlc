@@ -171,7 +171,7 @@ static void TinyShuffle7  ( uint32_t * );
 static void TinyShuffle8  ( uint32_t * );
 static void DoExtShuffle  ( uint32_t * );
 
-static int GetSystemKey   ( uint32_t *, vlc_bool_t );
+static int GetSystemKey   ( uint32_t *, bool );
 static int WriteUserKey   ( void *, uint32_t * );
 static int ReadUserKey    ( void *, uint32_t * );
 static int GetUserKey     ( void *, uint32_t * );
@@ -1505,7 +1505,7 @@ static void TinyShuffle8( uint32_t * p_bordel )
  *****************************************************************************
  * Compute the system key from various system information, see HashSystemInfo.
  *****************************************************************************/
-static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
+static int GetSystemKey( uint32_t *p_sys_key, bool b_ipod )
 {
     static char const p_secret5[ 8 ] = "YuaFlafu";
     static char const p_secret6[ 8 ] = "zPif98ga";
@@ -1652,7 +1652,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 
     psz_ipod = getenv( "IPOD" );
 
-    if( GetSystemKey( p_sys_key, psz_ipod ? VLC_TRUE : VLC_FALSE ) )
+    if( GetSystemKey( p_sys_key, psz_ipod ? true : false ) )
     {
         return -3;
     }

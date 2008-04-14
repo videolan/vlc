@@ -108,15 +108,15 @@ vlc_module_begin();
     add_shortcut( "logo" );
     set_callbacks( Create, Destroy );
 
-    add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
+    add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, false );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true );
     /* default to 1000 ms per image, continuously cycle through them */
-    add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, true );
+    add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, true );
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
-        TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+        TRANS_TEXT, TRANS_LONGTEXT, false );
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     /* subpicture filter submodule */
@@ -689,11 +689,11 @@ struct filter_sys_t
 
     int pos, posx, posy;
 
-    vlc_bool_t b_absolute;
+    bool b_absolute;
     mtime_t i_last_date;
 
     /* On the fly control variable */
-    vlc_bool_t b_need_update;
+    bool b_need_update;
 };
 
 static subpicture_t *Filter( filter_t *, mtime_t );
@@ -762,7 +762,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
-    p_sys->b_need_update = VLC_TRUE;
+    p_sys->b_need_update = true;
 
     p_sys->i_last_date = 0;
 
@@ -838,9 +838,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_start = p_sys->i_last_date = date;
     p_spu->i_stop = 0;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
 
-    p_sys->b_need_update = VLC_FALSE;
+    p_sys->b_need_update = false;
     p_logo_list->i_next_pic = date +
     ( p_logo->i_delay != -1 ? p_logo->i_delay : p_logo_list->i_delay ) * 1000;
 
@@ -887,12 +887,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     if( p_sys->pos < 0 )
     {   /*  set to an absolute xy */
         p_region->i_align = OSD_ALIGN_RIGHT | OSD_ALIGN_TOP;
-        p_spu->b_absolute = VLC_TRUE;
+        p_spu->b_absolute = true;
     }
     else
     {   /* set to one of the 9 relative locations */
         p_region->i_align = p_sys->pos;
-        p_spu->b_absolute = VLC_FALSE;
+        p_spu->b_absolute = false;
     }
 
     p_spu->i_x = p_sys->posx;
@@ -923,7 +923,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
         p_logo_list->psz_filename = strdup( newval.psz_string );
         LoadLogoList( p_this, p_logo_list );
         vlc_mutex_unlock( &p_logo_list->lock );
-        p_sys->b_need_update = VLC_TRUE;
+        p_sys->b_need_update = true;
     }
     else if ( !strncmp( psz_var, "logo-x", 6 ) )
     {
@@ -949,6 +949,6 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
         p_logo_list->i_repeat = newval.i_int;
         vlc_mutex_unlock( &p_logo_list->lock );
     }
-    p_sys->b_need_update = VLC_TRUE;
+    p_sys->b_need_update = true;
     return VLC_SUCCESS;
 }

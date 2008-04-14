@@ -349,15 +349,16 @@ HRESULT VLCPlugin::onInit(void)
     if( NULL == _p_libvlc )
     {
         // initialize persistable properties
-        _b_autoplay = TRUE;
-        _b_autoloop = FALSE;
+        _b_autoplay   = TRUE;
+        _b_autoloop   = FALSE;
+        _b_toolbar    = FALSE;
         _bstr_baseurl = NULL;
-        _bstr_mrl = NULL;
-        _b_visible = TRUE;
-        _b_mute = FALSE;
-        _i_volume = 50;
-        _i_time   = 0;
-        _i_backcolor = 0;
+        _bstr_mrl     = NULL;
+        _b_visible    = TRUE;
+        _b_mute       = FALSE;
+        _i_volume     = 50;
+        _i_time       = 0;
+        _i_backcolor  = 0;
         // set default/preferred size (320x240) pixels in HIMETRIC
         HDC hDC = CreateDevDC(NULL);
         _extent.cx = 320;

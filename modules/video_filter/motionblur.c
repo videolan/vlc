@@ -62,7 +62,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer_with_range( FILTER_PREFIX "factor", 80, 1, 127, NULL,
-                            FACTOR_TEXT, FACTOR_LONGTEXT, VLC_FALSE );
+                            FACTOR_TEXT, FACTOR_LONGTEXT, false );
 
     add_shortcut( "blur" );
 

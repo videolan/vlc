@@ -82,27 +82,27 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_STREAM );
 
     add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
-                ACCESS_LONGTEXT, VLC_TRUE );
+                ACCESS_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "access-audio", "", NULL, ACCESSA_TEXT,
-                ACCESSA_LONGTEXT, VLC_TRUE );
+                ACCESSA_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "access-video", "", NULL, ACCESSV_TEXT,
-                ACCESSV_LONGTEXT, VLC_TRUE );
+                ACCESSV_LONGTEXT, true );
 
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
-                MUX_LONGTEXT, VLC_TRUE );
+                MUX_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux-audio", "", NULL, MUXA_TEXT,
-                MUXA_LONGTEXT, VLC_TRUE );
+                MUXA_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux-video", "", NULL, MUXV_TEXT,
-                MUXV_LONGTEXT, VLC_TRUE );
+                MUXV_LONGTEXT, true );
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
-                DEST_LONGTEXT, VLC_TRUE );
+                DEST_LONGTEXT, true );
         change_unsafe();
     add_string( SOUT_CFG_PREFIX "dst-audio", "", NULL, DESTA_TEXT,
-                DESTA_LONGTEXT, VLC_TRUE );
+                DESTA_LONGTEXT, true );
         change_unsafe();
     add_string( SOUT_CFG_PREFIX "dst-video", "", NULL, DESTV_TEXT,
-                DESTV_LONGTEXT, VLC_TRUE );
+                DESTV_LONGTEXT, true );
         change_unsafe();
 
     set_callbacks( Open, Close );
@@ -366,7 +366,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Err( p_stream, "no suitable sout access module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_dst );
-        intf_UserFatal( p_stream, VLC_FALSE,
+        intf_UserFatal( p_stream, false,
                     _("Streaming / Transcoding failed"),
                     _("There is no suitable stream-output access module for \"%s/%s://%s\"."),
                           psz_access,
@@ -380,7 +380,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_dst );
-        intf_UserFatal( p_stream, VLC_FALSE,
+        intf_UserFatal( p_stream, false,
                         _("Streaming / Transcoding failed"),
                         _("There is no suitable stream-output access module "\
                           "for \"%s/%s://%s\"."),

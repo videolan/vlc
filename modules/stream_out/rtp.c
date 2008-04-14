@@ -152,41 +152,41 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_STREAM );
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
-                DEST_LONGTEXT, VLC_TRUE );
+                DEST_LONGTEXT, true );
         change_unsafe();
     add_string( SOUT_CFG_PREFIX "sdp", "", NULL, SDP_TEXT,
-                SDP_LONGTEXT, VLC_TRUE );
+                SDP_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
-                MUX_LONGTEXT, VLC_TRUE );
+                MUX_LONGTEXT, true );
 
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
-                NAME_LONGTEXT, VLC_TRUE );
+                NAME_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT,
-                DESC_LONGTEXT, VLC_TRUE );
+                DESC_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
-                URL_LONGTEXT, VLC_TRUE );
+                URL_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT,
-                EMAIL_LONGTEXT, VLC_TRUE );
+                EMAIL_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT,
-                PHONE_LONGTEXT, VLC_TRUE );
+                PHONE_LONGTEXT, true );
 
     add_string( SOUT_CFG_PREFIX "proto", "udp", NULL, PROTO_TEXT,
-                PROTO_LONGTEXT, VLC_FALSE );
+                PROTO_LONGTEXT, false );
         change_string_list( ppsz_protos, ppsz_protocols, NULL );
     add_integer( SOUT_CFG_PREFIX "port", 50004, NULL, PORT_TEXT,
-                 PORT_LONGTEXT, VLC_TRUE );
+                 PORT_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "port-audio", 50000, NULL, PORT_AUDIO_TEXT,
-                 PORT_AUDIO_LONGTEXT, VLC_TRUE );
+                 PORT_AUDIO_LONGTEXT, true );
     add_integer( SOUT_CFG_PREFIX "port-video", 50002, NULL, PORT_VIDEO_TEXT,
-                 PORT_VIDEO_LONGTEXT, VLC_TRUE );
+                 PORT_VIDEO_LONGTEXT, true );
 
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
-                 TTL_LONGTEXT, VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "rtcp-mux", VLC_FALSE, NULL,
-              RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, VLC_FALSE );
+                 TTL_LONGTEXT, true );
+    add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
+              RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false );
 
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
-                 RFC3016_LONGTEXT, VLC_FALSE );
+                 RFC3016_LONGTEXT, false );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -226,11 +226,11 @@ struct sout_stream_sys_t
     vlc_mutex_t  lock_sdp;
 
     /* SDP to disk */
-    vlc_bool_t b_export_sdp_file;
+    bool b_export_sdp_file;
     char *psz_sdp_file;
 
     /* SDP via SAP */
-    vlc_bool_t b_export_sap;
+    bool b_export_sap;
     session_descriptor_t *p_session;
 
     /* SDP via HTTP */
@@ -247,8 +247,8 @@ struct sout_stream_sys_t
     uint16_t  i_port;
     uint16_t  i_port_audio;
     uint16_t  i_port_video;
-    vlc_bool_t b_latm;
-    vlc_bool_t rtcp_mux;
+    bool b_latm;
+    bool rtcp_mux;
 
     /* when need to use a private one or when using muxer */
     int i_payload_type;
@@ -317,7 +317,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t   *p_sys = NULL;
     config_chain_t      *p_cfg = NULL;
     char                *psz;
-    vlc_bool_t          b_rtsp = VLC_FALSE;
+    bool          b_rtsp = false;
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX,
                        ppsz_sout_options, p_stream->p_cfg );
@@ -348,7 +348,7 @@ static int Open( vlc_object_t *p_this )
          && ( p_cfg->psz_value != NULL )
          && !strncasecmp( p_cfg->psz_value, "rtsp:", 5 ) )
         {
-            b_rtsp = VLC_TRUE;
+            b_rtsp = true;
             break;
         }
     }
@@ -358,7 +358,7 @@ static int Open( vlc_object_t *p_this )
         if( psz != NULL )
         {
             if( !strncasecmp( psz, "rtsp:", 5 ) )
-                b_rtsp = VLC_TRUE;
+                b_rtsp = true;
             free( psz );
         }
     }
@@ -373,14 +373,14 @@ static int Open( vlc_object_t *p_this )
     if (!strcasecmp (psz, "dccp"))
     {
         p_sys->proto = IPPROTO_DCCP;
-        p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
+        p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #if 0
     else
     if (!strcasecmp (psz, "sctp"))
     {
         p_sys->proto = IPPROTO_TCP;
-        p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
+        p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #endif
 #if 0
@@ -388,7 +388,7 @@ static int Open( vlc_object_t *p_this )
     if (!strcasecmp (psz, "tcp"))
     {
         p_sys->proto = IPPROTO_TCP;
-        p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
+        p_sys->rtcp_mux = true; /* Force RTP/RTCP mux */
     }
 #endif
     else
@@ -425,8 +425,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->rtsp = NULL;
     p_sys->psz_sdp = NULL;
 
-    p_sys->b_export_sap = VLC_FALSE;
-    p_sys->b_export_sdp_file = VLC_FALSE;
+    p_sys->b_export_sap = false;
+    p_sys->b_export_sdp_file = false;
     p_sys->p_session = NULL;
 
     p_sys->p_httpd_host = NULL;
@@ -628,7 +628,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) ||
              ( url.psz_host && !strcasecmp( url.psz_host, "sap" ) ) )
     {
-        p_sys->b_export_sap = VLC_TRUE;
+        p_sys->b_export_sap = true;
         SapSetup( p_stream );
     }
     else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "file" ) )
@@ -638,7 +638,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
             msg_Err( p_stream, "you can use sdp=file:// only once" );
             goto out;
         }
-        p_sys->b_export_sdp_file = VLC_TRUE;
+        p_sys->b_export_sdp_file = true;
         psz_url = &psz_url[5];
         if( psz_url[0] == '/' && psz_url[1] == '/' )
             psz_url += 2;
@@ -760,14 +760,14 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         }
 
         sdp_AddMedia( &psz_sdp, mime_major, proto, inclport * id->i_port,
-                      id->i_payload_type, VLC_FALSE, id->i_bitrate,
+                      id->i_payload_type, false, id->i_bitrate,
                       id->psz_enc, id->i_clock_rate, id->i_channels,
                       id->psz_fmtp);
 
         if( rtsp_url != NULL )
         {
             assert( strlen( rtsp_url ) > 0 );
-            vlc_bool_t addslash = ( rtsp_url[strlen( rtsp_url ) - 1] != '/' );
+            bool addslash = ( rtsp_url[strlen( rtsp_url ) - 1] != '/' );
             sdp_AddAttribute ( &psz_sdp, "control",
                                addslash ? "%s/trackID=%u" : "%strackID=%u",
                                rtsp_url, i );
@@ -1164,7 +1164,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id->p_fifo = block_FifoNew( p_stream );
     if( vlc_thread_create( id, "RTP send thread", ThreadSend,
-                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_HIGHEST, false ) )
         goto error;
 
     /* Update p_sys context */
@@ -1438,7 +1438,7 @@ static void ThreadSend( vlc_object_t *p_this )
             if( fd == -1 )
                 break;
             msg_Dbg( id, "adding socket %d", fd );
-            rtp_add_sink( id, fd, VLC_TRUE );
+            rtp_add_sink( id, fd, true );
         }
     }
 
@@ -1448,7 +1448,7 @@ static void ThreadSend( vlc_object_t *p_this )
 #endif
 }
 
-int rtp_add_sink( sout_stream_id_t *id, int fd, vlc_bool_t rtcp_mux )
+int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux )
 {
     rtp_sink_t sink = { fd, NULL };
     sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP,

@@ -31,7 +31,7 @@
  * Private functions
  */
 
-static vlc_bool_t
+static bool
 listeners_are_equal( libvlc_event_listener_t * listener1,
                      libvlc_event_listener_t * listener2 )
 {
@@ -40,7 +40,7 @@ listeners_are_equal( libvlc_event_listener_t * listener1,
            listener1->p_user_data == listener2->p_user_data;
 }
 
-static vlc_bool_t
+static bool
 group_contains_listener( libvlc_event_listeners_group_t * group,
                          libvlc_event_listener_t * searched_listener )
 {
@@ -48,9 +48,9 @@ group_contains_listener( libvlc_event_listeners_group_t * group,
     for( i = 0; i < vlc_array_count(&group->listeners); i++ )
     {
         if( listeners_are_equal(searched_listener, vlc_array_item_at_index(&group->listeners, i)) )
-            return VLC_TRUE;
+            return true;
     }
-    return VLC_FALSE;
+    return false;
 }
 
 /*
@@ -217,13 +217,13 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
 
     vlc_mutex_lock( &p_em->event_sending_lock );
     listener_cached = array_listeners_cached;
-    listeners_group->b_sublistener_removed = VLC_FALSE;
+    listeners_group->b_sublistener_removed = false;
     for( i = 0; i < i_cached_listeners; i++ )
     {
         if( listeners_group->b_sublistener_removed )
         {
             /* If a callback was removed, this gets called */
-            vlc_bool_t valid_listener;
+            bool valid_listener;
             vlc_mutex_lock( &p_em->object_lock );
             valid_listener = group_contains_listener( listeners_group, listener_cached );
             vlc_mutex_unlock( &p_em->object_lock );
@@ -373,7 +373,7 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                     
                     /* Mark this group as edited so that libvlc_event_send
                      * will recheck what listener to call */
-                    listeners_group->b_sublistener_removed = VLC_FALSE;
+                    listeners_group->b_sublistener_removed = false;
 
                     free( listener );
                     vlc_array_remove( &listeners_group->listeners, j );

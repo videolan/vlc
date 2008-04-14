@@ -82,7 +82,7 @@ private:
     PrefsDialog *p_prefs_dialog;
     wxBoxSizer *p_sizer;
     wxWindow *p_parent;
-    vlc_bool_t b_advanced;
+    bool b_advanced;
 
     wxPanel *p_current;
 
@@ -102,13 +102,13 @@ public:
     virtual ~PrefsPanel() {}
 
     void ApplyChanges();
-    void SwitchAdvanced( vlc_bool_t );
+    void SwitchAdvanced( bool );
 
 private:
     intf_thread_t *p_intf;
     PrefsDialog *p_prefs_dialog;
 
-    vlc_bool_t b_advanced;
+    bool b_advanced;
 
     wxStaticText *hidden_text;
     wxBoxSizer *config_sizer;
@@ -129,7 +129,7 @@ public:
                                  free( psz_help );
                               };
 
-    vlc_bool_t b_submodule;
+    bool b_submodule;
 
     PrefsPanel *panel;
     wxBoxSizer *sizer;
@@ -333,7 +333,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     p_prefs_dialog = _p_prefs_dialog;
     p_sizer = _p_sizer;
     p_parent = _p_parent;
-    b_advanced = VLC_FALSE;
+    b_advanced = false;
 
     root_item = AddRoot( wxT("") );
     wxASSERT_MSG(root_item.IsOk(), wxT("Could not add root item"));
@@ -542,7 +542,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Find the right category item */
         wxTreeItemIdValue cookie;
-        vlc_bool_t b_found = VLC_FALSE;
+        bool b_found = false;
 
         wxTreeItemId category_item = GetFirstChild( root_item , cookie);
         while( category_item.IsOk() )
@@ -551,7 +551,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     (ConfigTreeData *)GetItemData( category_item );
             if( config_data->i_object_id == i_category )
             {
-                b_found = VLC_TRUE;
+                b_found = true;
                 break;
             }
             category_item = GetNextChild( root_item, cookie );
@@ -559,7 +559,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         if( !b_found ) continue;
 
         /* Find subcategory item */
-        b_found = VLC_FALSE;
+        b_found = false;
         //cookie = -1;
         wxTreeItemId subcategory_item = GetFirstChild( category_item, cookie );
         while( subcategory_item.IsOk() )
@@ -568,7 +568,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     (ConfigTreeData *)GetItemData( subcategory_item );
             if( config_data->i_object_id == i_subcategory )
             {
-                b_found = VLC_TRUE;
+                b_found = true;
                 break;
             }
             subcategory_item = GetNextChild( category_item, cookie );
@@ -871,7 +871,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     p_intf = _p_intf;
     p_prefs_dialog =_p_prefs_dialog,
 
-    b_advanced = VLC_TRUE;
+    b_advanced = true;
     SetAutoLayout( TRUE );
     Hide();
 
@@ -906,7 +906,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         {
             /* List the plugins */
             int i_index;
-            vlc_bool_t b_found = VLC_FALSE;
+            bool b_found = false;
             p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
             if( !p_list ) return;
 
@@ -915,7 +915,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 p_module = (module_t *)p_list->p_values[i_index].p_object;
                 if( !strcmp( module_GetObjName(p_module), "main" ) )
                 {
-                    b_found = VLC_TRUE;
+                    b_found = true;
                     break;
                 }
             }
@@ -1083,7 +1083,7 @@ void PrefsPanel::ApplyChanges()
     }
 }
 
-void PrefsPanel::SwitchAdvanced( vlc_bool_t b_new_advanced )
+void PrefsPanel::SwitchAdvanced( bool b_new_advanced )
 {
     bool hidden = false;
 

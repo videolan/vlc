@@ -47,7 +47,7 @@
 int vlclua_acl_create( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_bool_t b_allow = luaL_checkboolean( L, 1 ) ? VLC_TRUE : VLC_FALSE;
+    bool b_allow = luaL_checkboolean( L, 1 ) ? true : false;
     vlc_acl_t *p_acl = ACL_Create( p_this, b_allow );
     if( !p_acl )
         return luaL_error( L, "ACL creation failed." );
@@ -83,7 +83,7 @@ int vlclua_acl_add_host( lua_State *L )
 {
     vlc_acl_t *p_acl = (vlc_acl_t*)luaL_checklightuserdata( L, 1 );
     const char *psz_ip = luaL_checkstring( L, 2 );
-    vlc_bool_t b_allow = luaL_checkboolean( L, 3 ) ? VLC_TRUE : VLC_FALSE;
+    bool b_allow = luaL_checkboolean( L, 3 ) ? true : false;
     lua_pushinteger( L, ACL_AddHost( p_acl, psz_ip, b_allow ) );
     return 1;
 }
@@ -93,7 +93,7 @@ int vlclua_acl_add_net( lua_State *L )
     vlc_acl_t *p_acl = (vlc_acl_t*)luaL_checklightuserdata( L, 1 );
     const char *psz_ip = luaL_checkstring( L, 2 );
     int i_len = luaL_checkint( L, 3 );
-    vlc_bool_t b_allow = luaL_checkboolean( L, 4 ) ? VLC_TRUE : VLC_FALSE;
+    bool b_allow = luaL_checkboolean( L, 4 ) ? true : false;
     lua_pushinteger( L, ACL_AddNet( p_acl, psz_ip, i_len, b_allow ) );
     return 1;
 }

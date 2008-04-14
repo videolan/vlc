@@ -72,8 +72,8 @@ struct sap_address_t
 
     /* Used for flow control */
     mtime_t t1;
-    vlc_bool_t b_enabled;
-    vlc_bool_t b_ready;
+    bool b_enabled;
+    bool b_ready;
     int i_interval;
     int i_buff;
     int i_limit;
@@ -142,7 +142,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     p_sap->b_control = config_GetInt( p_sap, "sap-flow-control");
 
     if( vlc_thread_create( p_sap, "sap handler", RunThread,
-                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                       VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Dbg( p_announce, "unable to spawn SAP handler thread");
         vlc_object_release( p_sap );
@@ -203,11 +203,11 @@ static void RunThread( vlc_object_t *p_this)
         int i;
 
         /* If needed, get the rate info */
-        if( p_sap->b_control == VLC_TRUE )
+        if( p_sap->b_control == true )
         {
             for( i = 0 ; i< p_sap->i_addresses ; i++)
             {
-                if( p_sap->pp_addresses[i]->b_enabled == VLC_TRUE )
+                if( p_sap->pp_addresses[i]->b_enabled == true )
                 {
                     ComputeRate( p_sap->pp_addresses[i] );
                 }
@@ -234,8 +234,8 @@ static void RunThread( vlc_object_t *p_this)
         vlc_mutex_unlock( &p_sap->object_lock );
 
         /* And announce it */
-        if( p_session->p_address->b_enabled == VLC_TRUE &&
-            p_session->p_address->b_ready == VLC_TRUE )
+        if( p_session->p_address->b_enabled == true &&
+            p_session->p_address->b_ready == true )
         {
             announce_SendSAPAnnounce( p_sap, p_session );
         }
@@ -250,7 +250,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 {
     int i;
     char psz_addr[NI_MAXNUMERICHOST];
-    vlc_bool_t b_ipv6 = VLC_FALSE, b_ssm = VLC_FALSE;
+    bool b_ipv6 = false, b_ssm = false;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
     struct sockaddr_storage addr;
@@ -290,7 +290,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                 /* Unicast IPv6 - assume global scope */
                 memcpy( a6->s6_addr, "\xff\x0e", 2 );
 
-            b_ipv6 = VLC_TRUE;
+            b_ipv6 = true;
             break;
         }
 #endif
@@ -388,21 +388,21 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                          &p_address->origlen);
         }
 
-        if( p_sap->b_control == VLC_TRUE )
+        if( p_sap->b_control == true )
         {
             p_address->i_rfd = net_ListenUDP1( (vlc_object_t*)p_sap, psz_addr, SAP_PORT );
             if( p_address->i_rfd != -1 )
                 shutdown( p_address->i_rfd, SHUT_WR );
             p_address->i_buff = 0;
-            p_address->b_enabled = VLC_TRUE;
-            p_address->b_ready = VLC_FALSE;
+            p_address->b_enabled = true;
+            p_address->b_ready = false;
             p_address->i_limit = 10000; /* 10000 bps */
             p_address->t1 = 0;
         }
         else
         {
-            p_address->b_enabled = VLC_TRUE;
-            p_address->b_ready = VLC_TRUE;
+            p_address->b_enabled = true;
+            p_address->b_ready = true;
             p_address->i_interval = config_GetInt( p_sap,"sap-interval");
             p_address->i_rfd = -1;
         }
@@ -411,7 +411,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                                         && p_sap->b_control ) )
         {
             msg_Warn( p_sap, "disabling address" );
-            p_address->b_enabled = VLC_FALSE;
+            p_address->b_enabled = false;
         }
 
         INSERT_ELEM( p_sap->pp_addresses,
@@ -628,7 +628,7 @@ static int ComputeRate( sap_address_t *p_address )
              p_address->psz_address,SAP_PORT, i_rate, p_address->i_interval );
 #endif
 
-    p_address->b_ready = VLC_TRUE;
+    p_address->b_ready = true;
 
     p_address->t1 = i_temp;
     p_address->i_buff = 0;

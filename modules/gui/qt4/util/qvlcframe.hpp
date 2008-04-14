@@ -66,7 +66,7 @@ class QVLCTools
          use this method only for restoring window state of non docked
          windows!
        */
-       static vlc_bool_t restoreWidgetPosition(QSettings *settings,
+       static bool restoreWidgetPosition(QSettings *settings,
                                            QWidget *widget,
                                            QSize defSize = QSize( 0, 0 ),
                                            QPoint defPos = QPoint( 0, 0 ))
@@ -79,19 +79,19 @@ class QVLCTools
 
             if(defPos.x() == 0 && defPos.y()==0)
                centerWidgetOnScreen(widget);
-            return VLC_TRUE;
+            return true;
           }
-          return VLC_FALSE;
+          return false;
        }
 
-       static vlc_bool_t restoreWidgetPosition(QString configName,
+       static bool restoreWidgetPosition(QString configName,
                                            QWidget *widget,
                                            QSize defSize = QSize( 0, 0 ),
                                            QPoint defPos = QPoint( 0, 0 ) )
        {
          QSettings *settings = new QSettings( "vlc", "vlc-qt-interface" );
          settings->beginGroup( configName );
-         vlc_bool_t defaultUsed = QVLCTools::restoreWidgetPosition(settings,
+         bool defaultUsed = QVLCTools::restoreWidgetPosition(settings,
                                                                    widget,
                                                                    defSize,
                                                                    defPos);

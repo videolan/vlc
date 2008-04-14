@@ -64,7 +64,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Real demuxer" ) );
-    set_capability( "demux2", 15 );
+    set_capability( "demux", 15 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
@@ -236,7 +236,7 @@ static int Demux( demux_t *p_demux )
     int         i_size, i_id, i_flags, i;
     int64_t     i_pts;
     real_track_t *tk = NULL;
-    vlc_bool_t  b_selected;
+    bool  b_selected;
 
     if( p_sys->i_data_packets >= p_sys->i_data_packets_count &&
         p_sys->i_data_packets_count )

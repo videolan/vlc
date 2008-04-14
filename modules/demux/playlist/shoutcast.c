@@ -44,7 +44,7 @@ struct demux_sys_t
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
 
-    vlc_bool_t b_adult;
+    bool b_adult;
 };
 
 /* duplicate from modules/services_discovery/shout.c */
@@ -68,7 +68,7 @@ int E_(Import_Shoutcast)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    if( !demux2_IsForced( p_demux, "shout-winamp" ) )
+    if( !demux_IsForced( p_demux, "shout-winamp" ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using shoutcast playlist reader" );

@@ -30,9 +30,9 @@
 #include <vlc/vlc.h>
 
 /* Specialise boolean definitions to VLC's boolean types */
-typedef vlc_bool_t XURL_Bool;
-#define XURL_FALSE VLC_FALSE
-#define XURL_TRUE VLC_TRUE
+typedef bool XURL_Bool;
+#define XURL_FALSE false
+#define XURL_TRUE true
 
 /* Specialise general C functions to VLC's standards */
 #define xurl_malloc malloc

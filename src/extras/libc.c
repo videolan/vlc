@@ -427,7 +427,7 @@ typedef struct vlc_DIR
     _WDIR *p_real_dir;
     int i_drives;
     struct _wdirent dd_dir;
-    vlc_bool_t b_insert_back;
+    bool b_insert_back;
 } vlc_DIR;
 
 void *vlc_wopendir( const wchar_t *wpath )
@@ -479,7 +479,7 @@ struct _wdirent *vlc_wreaddir( void *_p_dir )
             p_dir->dd_dir.d_reclen = 0;
             p_dir->dd_dir.d_namlen = 2;
             wcscpy( p_dir->dd_dir.d_name, L".." );
-            p_dir->b_insert_back = VLC_FALSE;
+            p_dir->b_insert_back = false;
             return &p_dir->dd_dir;
         }
 
@@ -747,10 +747,10 @@ int vlc_iconv_close( vlc_iconv_t cd )
  * reduce a fraction
  *   (adapted from libavcodec, author Michael Niedermayer <michaelni@gmx.at>)
  *****************************************************************************/
-vlc_bool_t vlc_ureduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
+bool vlc_ureduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
                         uint64_t i_nom, uint64_t i_den, uint64_t i_max )
 {
-    vlc_bool_t b_exact = 1;
+    bool b_exact = 1;
     uint64_t i_gcd;
 
     if( i_den == 0 )

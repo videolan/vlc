@@ -129,7 +129,7 @@ Playlist::Playlist( intf_thread_t *p_intf, CBaseWindow *p_parent,
     i_title_sorted = 1;
     i_author_sorted = 1;
 
-    b_need_update = VLC_TRUE;
+    b_need_update = true;
 }
 
 /***********************************************************************
@@ -356,7 +356,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
         case ID_MANAGE_OPENPL:
             OnOpen();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case ID_MANAGE_SAVEPL:
@@ -366,38 +366,38 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         case ID_MANAGE_ADDFILE:
             p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_SIMPLE,
                                            0, 0 );
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case ID_MANAGE_ADDDIRECTORY:
             p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_DIRECTORY,
                                            0, 0 );
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case ID_MANAGE_ADDMRL:
             p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE, 0, 0 );
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case ID_SEL_DELETE:
             OnDeleteSelection();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case Infos_Event:
             OnPopupInfo( hwnd );
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case Up_Event:
             OnUp();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case Down_Event:
             OnDown();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case Random_Event:
@@ -450,22 +450,22 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
         case PopupPlay_Event:
             OnPopupPlay();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case PopupDel_Event:
             OnPopupDel();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case PopupEna_Event:
             OnPopupEna();
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         case PopupInfo_Event:
             OnPopupInfo( hwnd );
-            b_need_update = VLC_TRUE;
+            b_need_update = true;
             break;
 
         default:
@@ -534,7 +534,7 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
             vlc_object_release(p_playlist);
             return CDRF_DODEFAULT;
         }
-        if( p_item->b_enabled == VLC_FALSE )
+        if( p_item->b_enabled == false )
         {
             lplvcd->clrText = RGB(192,192,192);
             vlc_object_release(p_playlist);
@@ -586,7 +586,7 @@ void Playlist::UpdatePlaylist()
     if( b_need_update )
     {
         Rebuild();
-        b_need_update = VLC_FALSE;
+        b_need_update = false;
     }
  
     playlist_t *p_playlist = (playlist_t *)
@@ -771,7 +771,7 @@ void Playlist::OnSave()
 
     p_arg->psz_title = strdup( "Save playlist" );
     p_arg->psz_extensions = strdup( psz_filters );
-    p_arg->b_save = VLC_TRUE;
+    p_arg->b_save = true;
     p_arg->p_arg = p_intf;
     p_arg->pf_callback = OnSaveCB;
 
@@ -950,7 +950,7 @@ void Playlist::OnRandom()
 {
     vlc_value_t val;
     int bState = SendMessage( hwndTB, TB_GETSTATE, Random_Event, 0 );
-    val.b_bool = (bState & TBSTATE_CHECKED) ? VLC_TRUE : VLC_FALSE;
+    val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
     playlist_t *p_playlist = (playlist_t *)
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -964,7 +964,7 @@ void Playlist::OnLoop ()
 {
     vlc_value_t val;
     int bState = SendMessage( hwndTB, TB_GETSTATE, Loop_Event, 0 );
-    val.b_bool = (bState & TBSTATE_CHECKED) ? VLC_TRUE : VLC_FALSE;
+    val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
     playlist_t *p_playlist = (playlist_t *)
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -978,7 +978,7 @@ void Playlist::OnRepeat ()
 {
     vlc_value_t val;
     int bState = SendMessage( hwndTB, TB_GETSTATE, Repeat_Event, 0 );
-    val.b_bool = (bState & TBSTATE_CHECKED) ? VLC_TRUE : VLC_FALSE;
+    val.b_bool = (bState & TBSTATE_CHECKED) ? true : false;
 
     playlist_t *p_playlist = (playlist_t *)
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -1018,7 +1018,7 @@ void Playlist::OnSort( UINT event )
 
     vlc_object_release( p_playlist );
 
-    b_need_update = VLC_TRUE;
+    b_need_update = true;
 
     return;
 }
@@ -1061,7 +1061,7 @@ void Playlist::OnColSelect( int iSubItem )
 
     vlc_object_release( p_playlist );
 
-    b_need_update = VLC_TRUE;
+    b_need_update = true;
 
     return;
 }

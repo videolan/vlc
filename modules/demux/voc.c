@@ -45,7 +45,7 @@ vlc_module_begin();
     set_description( _("VOC demuxer") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux2", 10 );
+    set_capability( "demux", 10 );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -488,7 +488,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
-    return demux2_vaControlHelper( p_demux->s, p_sys->i_block_start,
+    return demux_vaControlHelper( p_demux->s, p_sys->i_block_start,
                                    p_sys->i_block_end,
                                    p_sys->fmt.i_bitrate,
                                    p_sys->fmt.audio.i_blockalign,

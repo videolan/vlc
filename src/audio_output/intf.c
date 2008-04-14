@@ -104,7 +104,7 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 
     config_PutInt( p_object, "volume", i_volume );
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_object->p_libvlc, "volume-change", val );
 
     if ( p_aout == NULL ) return 0;
@@ -175,7 +175,7 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                     (audio_volume_t) i_volume );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t) i_volume;
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_object->p_libvlc, "volume-change", val );
 
     if ( p_aout == NULL ) return 0;
@@ -218,7 +218,7 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
     var_SetInteger( p_object->p_libvlc, "saved-volume", (audio_volume_t) i_volume );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t) i_volume;
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_object->p_libvlc, "volume-change", val );
 
     if ( p_aout == NULL ) return 0;
@@ -367,7 +367,7 @@ int aout_VolumeNoneSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 static int aout_Restart( aout_instance_t * p_aout )
 {
     int i;
-    vlc_bool_t b_error = 0;
+    bool b_error = 0;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
@@ -487,7 +487,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
  * \param b_add are we adding or removing the filter ?
  */
 void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
-                        vlc_bool_t b_add )
+                        bool b_add )
 {
     char *psz_parser, *psz_string;
     aout_instance_t * p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
@@ -543,7 +543,7 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
     {
         var_SetString( p_aout, "audio-filter", psz_string );
         for( int i = 0; i < p_aout->i_nb_inputs; i++ )
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
         vlc_object_release( p_aout );
     }
     free( psz_string );

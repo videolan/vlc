@@ -258,7 +258,7 @@ void CacheLoad( vlc_object_t *p_this )
         LOAD_IMMEDIATE( pp_cache[i]->i_time );
         LOAD_IMMEDIATE( pp_cache[i]->i_size );
         LOAD_IMMEDIATE( pp_cache[i]->b_junk );
-        pp_cache[i]->b_used = VLC_FALSE;
+        pp_cache[i]->b_used = false;
 
         if( pp_cache[i]->b_junk ) continue;
 
@@ -375,7 +375,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
                     sizeof (p_module->p_config[i].saved));
         }
 
-        p_module->p_config[i].b_dirty = VLC_FALSE;
+        p_module->p_config[i].b_dirty = false;
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
 
@@ -693,8 +693,8 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
         p_cchild->pf_deactivate = p_child->pf_deactivate;
     }
 
-    p_cache->b_loaded = VLC_TRUE;
-    p_module->b_loaded = VLC_FALSE;
+    p_cache->b_loaded = true;
+    p_module->b_loaded = false;
 }
 
 /*****************************************************************************

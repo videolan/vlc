@@ -323,7 +323,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     vlc_object_attach( p_access, p_sout );
 
     p_access->p_module   =
-        module_Need( p_access, "sout access", p_access->psz_access, VLC_TRUE );
+        module_Need( p_access, "sout access", p_access->psz_access, true );
 
     if( !p_access->p_module )
     {
@@ -429,14 +429,14 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     p_mux->p_sys        = NULL;
     p_mux->p_module     = NULL;
 
-    p_mux->b_add_stream_any_time = VLC_FALSE;
-    p_mux->b_waiting_stream = VLC_TRUE;
+    p_mux->b_add_stream_any_time = false;
+    p_mux->b_waiting_stream = true;
     p_mux->i_add_stream_start = -1;
 
     vlc_object_attach( p_mux, p_sout );
 
     p_mux->p_module =
-        module_Need( p_mux, "sout mux", p_mux->psz_mux, VLC_TRUE );
+        module_Need( p_mux, "sout mux", p_mux->psz_mux, true );
 
     if( p_mux->p_module == NULL )
     {
@@ -450,37 +450,37 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     /* *** probe mux capacity *** */
     if( p_mux->pf_control )
     {
-        int b_answer = VLC_FALSE;
+        int b_answer = false;
 
         if( sout_MuxControl( p_mux, MUX_CAN_ADD_STREAM_WHILE_MUXING,
                              &b_answer ) )
         {
-            b_answer = VLC_FALSE;
+            b_answer = false;
         }
 
         if( b_answer )
         {
             msg_Dbg( p_sout, "muxer support adding stream at any time" );
-            p_mux->b_add_stream_any_time = VLC_TRUE;
-            p_mux->b_waiting_stream = VLC_FALSE;
+            p_mux->b_add_stream_any_time = true;
+            p_mux->b_waiting_stream = false;
 
             /* If we control the output pace then it's better to wait before
              * starting muxing (generates better streams/files). */
             if( !p_sout->i_out_pace_nocontrol )
             {
-                b_answer = VLC_TRUE;
+                b_answer = true;
             }
             else if( sout_MuxControl( p_mux, MUX_GET_ADD_STREAM_WAIT,
                                       &b_answer ) )
             {
-                b_answer = VLC_FALSE;
+                b_answer = false;
             }
 
             if( b_answer )
             {
                 msg_Dbg( p_sout, "muxer prefers to wait for all ES before "
                          "starting to mux" );
-                p_mux->b_waiting_stream = VLC_TRUE;
+                p_mux->b_waiting_stream = true;
             }
         }
     }
@@ -558,7 +558,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         /* We stop waiting, and call the muxer for taking care of the data
          * before we remove this es */
-        p_mux->b_waiting_stream = VLC_FALSE;
+        p_mux->b_waiting_stream = false;
         p_mux->pf_mux( p_mux );
     }
 
@@ -610,7 +610,7 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
         if( p_mux->i_add_stream_start < 0 ||
             p_buffer->i_dts < p_mux->i_add_stream_start + i_caching )
             return;
-        p_mux->b_waiting_stream = VLC_FALSE;
+        p_mux->b_waiting_stream = false;
     }
     p_mux->pf_mux( p_mux );
 }
@@ -829,7 +829,7 @@ sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_chain )
     vlc_object_attach( p_stream, p_sout );
 
     p_stream->p_module =
-        module_Need( p_stream, "sout stream", p_stream->psz_name, VLC_TRUE );
+        module_Need( p_stream, "sout stream", p_stream->psz_name, true );
 
     if( !p_stream->p_module )
     {

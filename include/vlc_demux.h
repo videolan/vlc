@@ -118,51 +118,51 @@ enum demux_query_e
 
     /* Meta data */
     DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
-    DEMUX_HAS_UNSUPPORTED_META, /* arg1= vlc_bool_t *   res can fail    */
+    DEMUX_HAS_UNSUPPORTED_META, /* arg1= bool *   res can fail    */
 
     /* Attachments */
     DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */
 
     /* II. Specific access_demux queries */
-    DEMUX_CAN_PAUSE,            /* arg1= vlc_bool_t*    can fail (assume false)*/
-    DEMUX_SET_PAUSE_STATE,      /* arg1= vlc_bool_t     can fail */
+    DEMUX_CAN_PAUSE,            /* arg1= bool*    can fail (assume false)*/
+    DEMUX_SET_PAUSE_STATE,      /* arg1= bool     can fail */
 
     DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */
 
     /* DEMUX_CAN_CONTROL_PACE returns true (*pb_pace) if we can read the
      * data at our pace */
-    DEMUX_CAN_CONTROL_PACE,     /* arg1= vlc_bool_t*pb_pace    can fail (assume false) */
+    DEMUX_CAN_CONTROL_PACE,     /* arg1= bool*pb_pace    can fail (assume false) */
 
     /* DEMUX_CAN_CONTROL_RATE is called only if DEMUX_CAN_CONTROL_PACE has returned false.
      * *pb_rate should be true when the rate can be changed (using DEMUX_SET_RATE)
      * *pb_ts_rescale should be true when the timestamps (pts/dts/pcr) have to be rescaled */
-    DEMUX_CAN_CONTROL_RATE,     /* arg1= vlc_bool_t*pb_rate arg2= vlc_bool_t*pb_ts_rescale  can fail(assume false) */
+    DEMUX_CAN_CONTROL_RATE,     /* arg1= bool*pb_rate arg2= bool*pb_ts_rescale  can fail(assume false) */
     /* DEMUX_SET_RATE is called only if DEMUX_CAN_CONTROL_RATE has returned true.
      * It should return the value really used in *pi_rate */
     DEMUX_SET_RATE,             /* arg1= int*pi_rate                                        can fail */
 
-    DEMUX_CAN_SEEK,            /* arg1= vlc_bool_t*    can fail (assume false)*/
+    DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
 };
 
-VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
+VLC_EXPORT( int,       demux_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
 
 /*************************************************************************
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
-static inline vlc_bool_t demux2_IsPathExtension( demux_t *p_demux, const char *psz_extension )
+static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
     const char *psz_ext = strrchr ( p_demux->psz_path, '.' );
     if( !psz_ext || strcasecmp( psz_ext, psz_extension ) )
-        return VLC_FALSE;
-    return VLC_TRUE;
+        return false;
+    return true;
 }
 
-static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name )
+static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
 {
    if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_name ) )
-        return VLC_FALSE;
-    return VLC_TRUE;
+        return false;
+    return true;
 }
 
 #define DEMUX_INIT_COMMON() do {            \
@@ -177,25 +177,25 @@ static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name
 
 #define DEMUX_BY_EXTENSION( ext ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !demux2_IsPathExtension( p_demux, ext ) ) \
+    if( !demux_IsPathExtension( p_demux, ext ) ) \
         return VLC_EGENERIC; \
     DEMUX_INIT_COMMON();
 
 #define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !demux2_IsPathExtension( p_demux, ext ) ) \
+    if( !demux_IsPathExtension( p_demux, ext ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 
 #define DEMUX_BY_EXTENSION_OR_FORCED( ext, module ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !demux2_IsPathExtension( p_demux, ext ) && !demux2_IsForced( p_demux, module ) ) \
+    if( !demux_IsPathExtension( p_demux, ext ) && !demux_IsForced( p_demux, module ) ) \
         return VLC_EGENERIC; \
     DEMUX_INIT_COMMON();
 
 #define DEMUX_BY_EXTENSION_OR_FORCED_MSG( ext, module, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !demux2_IsPathExtension( p_demux, ext ) && !demux2_IsForced( p_demux, module ) ) \
+    if( !demux_IsPathExtension( p_demux, ext ) && !demux_IsForced( p_demux, module ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 

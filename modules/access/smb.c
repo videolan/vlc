@@ -77,17 +77,17 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "SMB" );
     set_description( _("SMB input") );
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "smb-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "smb-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
-                VLC_FALSE );
+                false );
     add_string( "smb-pwd", NULL, NULL, PASS_TEXT,
-                PASS_LONGTEXT, VLC_FALSE );
+                PASS_LONGTEXT, false );
     add_string( "smb-domain", NULL, NULL, DOMAIN_TEXT,
-                DOMAIN_LONGTEXT, VLC_FALSE );
+                DOMAIN_LONGTEXT, false );
     add_shortcut( "smb" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -343,7 +343,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
         return VLC_EGENERIC;
     }
 
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_pos = i_ret;
 
     return VLC_SUCCESS;
@@ -370,7 +370,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return -1;
     }
 
-    if( i_read == 0 ) p_access->info.b_eof = VLC_TRUE;
+    if( i_read == 0 ) p_access->info.b_eof = true;
     else if( i_read > 0 ) p_access->info.i_pos += i_read;
 
     return i_read;
@@ -381,27 +381,27 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
     switch( i_query )
     {
     case ACCESS_CAN_SEEK:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         break;
     case ACCESS_CAN_FASTSEEK:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         break;
     case ACCESS_CAN_PAUSE:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         break;
     case ACCESS_CAN_CONTROL_PACE:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = true;
         break;
 
     case ACCESS_GET_MTU:

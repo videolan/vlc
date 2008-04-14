@@ -92,25 +92,25 @@ vlc_module_begin();
     add_shortcut( "fake" );
 
     add_file( "fake-file", "", NULL, FILE_TEXT,
-                FILE_LONGTEXT, VLC_FALSE );
+                FILE_LONGTEXT, false );
     add_integer( "fake-file-reload", 0, NULL, RELOAD_TEXT,
-                RELOAD_LONGTEXT, VLC_FALSE );
+                RELOAD_LONGTEXT, false );
     add_integer( "fake-width", 0, NULL, WIDTH_TEXT,
-                 WIDTH_LONGTEXT, VLC_TRUE );
+                 WIDTH_LONGTEXT, true );
     add_integer( "fake-height", 0, NULL, HEIGHT_TEXT,
-                 HEIGHT_LONGTEXT, VLC_TRUE );
+                 HEIGHT_LONGTEXT, true );
     add_bool( "fake-keep-ar", 0, NULL, KEEP_AR_TEXT, KEEP_AR_LONGTEXT,
-              VLC_TRUE );
+              true );
     add_string( "fake-aspect-ratio", "", NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true );
     add_bool( "fake-deinterlace", 0, NULL, DEINTERLACE_TEXT,
-              DEINTERLACE_LONGTEXT, VLC_FALSE );
+              DEINTERLACE_LONGTEXT, false );
     add_string( "fake-deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
-                VLC_FALSE );
+                false );
         change_string_list( ppsz_deinterlace_type, 0, 0 );
     add_string( "fake-chroma", "I420", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                VLC_TRUE );
+                true );
 vlc_module_end();
 
 struct decoder_sys_t
@@ -118,7 +118,7 @@ struct decoder_sys_t
     picture_t *p_image;
     vlc_mutex_t lock;
 
-    vlc_bool_t  b_reload;
+    bool  b_reload;
     mtime_t     i_reload;
     mtime_t     i_next;
 };
@@ -134,7 +134,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     video_format_t fmt_in, fmt_out;
     picture_t *p_image;
     char *psz_file, *psz_chroma;
-    vlc_bool_t b_keep_ar;
+    bool b_keep_ar;
     int i_aspect = 0;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('f','a','k','e') )
@@ -163,7 +163,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     val.i_int = var_CreateGetIntegerCommand( p_dec, "fake-file-reload" );
     if( val.i_int > 0)
     {
-        p_dec->p_sys->b_reload = VLC_TRUE;
+        p_dec->p_sys->b_reload = true;
         p_dec->p_sys->i_reload = (mtime_t)(val.i_int * 1000000);
         p_dec->p_sys->i_next   = (mtime_t)(p_dec->p_sys->i_reload + mdate());
     }
@@ -431,13 +431,13 @@ static int FakeCallback( vlc_object_t *p_this, char const *psz_var,
     {
         if( newval.i_int > 0)
         {
-            p_dec->p_sys->b_reload = VLC_TRUE;
+            p_dec->p_sys->b_reload = true;
             p_dec->p_sys->i_reload = (mtime_t)(newval.i_int * 1000000);
             p_dec->p_sys->i_next   = (mtime_t)(p_dec->p_sys->i_reload + mdate());
         }
         else
         {
-            p_dec->p_sys->b_reload = VLC_FALSE;
+            p_dec->p_sys->b_reload = false;
         }
     }
 

@@ -185,7 +185,7 @@ void AboutDialog::close()
  * UpdateDialog
  *****************************************************************************/
 /* callback to get information from the core */
-static void UpdateCallback( void *data, vlc_bool_t b_ret )
+static void UpdateCallback( void *data, bool b_ret )
 {
     UpdateDialog* UDialog = (UpdateDialog *)data;
     QEvent* event;
@@ -213,7 +213,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     buttonBox->addButton( updateButton, QDialogButtonBox::ActionRole );
     buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
 
-    updateLabel = new QLabel( qtr( "Checking for the update..." ) );
+    updateLabel = new QLabel( qtr( "Checking for an update..." ) );
     updateLabel->setWordWrap( true );
 
     layout->addWidget( updateLabel, 0, 0 );
@@ -249,7 +249,7 @@ void UpdateDialog::UpdateOrDownload()
     if( !b_checked )
     {
         updateButton->setEnabled( false );
-        msg_Dbg( p_intf, "Launching an update Request" );
+        msg_Dbg( p_intf, "Launching an update request" );
         update_Check( p_update, UpdateCallback, this );
     }
     else
@@ -288,11 +288,11 @@ void UpdateDialog::updateNotify( bool b_result )
         {
             b_checked = true;
             updateButton->setText( "Download" );
-            updateLabel->setText( qtr( "There is a new version of vlc :\n" )
+            updateLabel->setText( qtr( "There is a new version of VLC :\n" )
                                 + qfu( p_update->release.psz_desc )  );
         }
         else
-            updateLabel->setText( qtr( "You have the latest version of vlc" ) );
+            updateLabel->setText( qtr( "You have the latest version of VLC" ) );
     }
     else
         updateLabel->setText(

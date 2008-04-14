@@ -82,7 +82,7 @@ decoder_SynchroReset
 decoder_SynchroTrash
 decode_URI
 decode_URI_duplicate
-demux2_vaControlHelper
+demux_vaControlHelper
 encode_URI_component
 EndMD5
 EnsureUTF8

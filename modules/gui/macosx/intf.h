@@ -67,22 +67,22 @@ struct intf_sys_t
     input_thread_t * p_input;
 
     /* special actions */
-    vlc_bool_t b_mute;
+    bool b_mute;
     int i_play_status;
 
     /* interface update */
-    vlc_bool_t b_intf_update;
-    vlc_bool_t b_playlist_update;
-    vlc_bool_t b_playmode_update;
-    vlc_bool_t b_current_title_update;
-    vlc_bool_t b_fullscreen_update;
-    vlc_bool_t b_volume_update;
-    vlc_bool_t b_intf_show;
+    bool b_intf_update;
+    bool b_playlist_update;
+    bool b_playmode_update;
+    bool b_current_title_update;
+    bool b_fullscreen_update;
+    bool b_volume_update;
+    bool b_intf_show;
 
     /* menus handlers */
-    vlc_bool_t b_input_update;
-    vlc_bool_t b_aout_update;
-    vlc_bool_t b_vout_update;
+    bool b_input_update;
+    bool b_aout_update;
+    bool b_vout_update;
 
     /* The messages window */
     msg_subscription_t * p_sub;

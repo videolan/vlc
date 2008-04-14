@@ -126,7 +126,7 @@ static void YUY2_I420( vout_thread_t *p_vout, picture_t *p_source,
     const int i_source_margin = p_source->p->i_pitch
                                - p_source->p->i_visible_pitch;
 
-    vlc_bool_t b_skip = VLC_FALSE;
+    bool b_skip = false;
 
     for( i_y = p_vout->output.i_height ; i_y-- ; )
     {
@@ -194,7 +194,7 @@ static void YVYU_I420( vout_thread_t *p_vout, picture_t *p_source,
     const int i_source_margin = p_source->p->i_pitch
                                - p_source->p->i_visible_pitch;
 
-    vlc_bool_t b_skip = VLC_FALSE;
+    bool b_skip = false;
 
     for( i_y = p_vout->output.i_height ; i_y-- ; )
     {
@@ -262,7 +262,7 @@ static void UYVY_I420( vout_thread_t *p_vout, picture_t *p_source,
     const int i_source_margin = p_source->p->i_pitch
                                - p_source->p->i_visible_pitch;
 
-    vlc_bool_t b_skip = VLC_FALSE;
+    bool b_skip = false;
 
     for( i_y = p_vout->output.i_height ; i_y-- ; )
     {
@@ -331,7 +331,7 @@ static void cyuv_I420( vout_thread_t *p_vout, picture_t *p_source,
     const int i_source_margin = p_source->p->i_pitch
                                - p_source->p->i_visible_pitch;
 
-    vlc_bool_t b_skip = VLC_FALSE;
+    bool b_skip = false;
 
     for( i_y = p_vout->output.i_height ; i_y-- ; )
     {

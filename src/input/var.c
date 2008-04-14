@@ -199,9 +199,9 @@ void input_ControlVarInit ( input_thread_t *p_input )
          *
          * TODO list all changes warn by this callbacks */
         var_Create( p_input, "intf-change", VLC_VAR_BOOL );
-        var_SetBool( p_input, "intf-change", VLC_TRUE );
+        var_SetBool( p_input, "intf-change", true );
         var_Create( p_input, "rate-change", VLC_VAR_BOOL );
-        var_SetBool( p_input, "rate-change", VLC_TRUE );
+        var_SetBool( p_input, "rate-change", true );
     }
 #undef ADD_CALLBACK
 }
@@ -455,10 +455,10 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     }
 
     var_Create( p_input, "seekable", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE; /* Fixed later*/
+    val.b_bool = true; /* Fixed later*/
     var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
     var_Create( p_input, "can-pause", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE; /* Fixed later*/
+    val.b_bool = true; /* Fixed later*/
     var_Change( p_input, "can-pause", VLC_VAR_SETVALUE, &val, NULL );
 
     /* */

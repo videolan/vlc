@@ -381,10 +381,10 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in any case that dirty was set to VLC_TRUE
+       // assume in any case that dirty was set to true
        // because lazy programmes will use the same callback for
        // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = VLC_FALSE;
+       p_module_config->b_dirty = false;
 
        free( val.psz_string );
     }
@@ -439,7 +439,7 @@ void StringListConfigControl::actionRequested( int i_action )
     {
         combo->clear();
         finish( p_module_config, true );
-        p_module_config->b_dirty = VLC_FALSE;
+        p_module_config->b_dirty = false;
     }
 }
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
@@ -493,10 +493,10 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
             vlc_value_t val;
             val.i_int = p_config->value.i;
             p_config->pf_update_list(VLC_OBJECT(p_intf), configname, val, val, NULL);
-            // assume in any case that dirty was set to VLC_TRUE
+            // assume in any case that dirty was set to true
             // because lazy programmes will use the same callback for
             // this, like the one behind the refresh push button?
-            p_config->b_dirty = VLC_FALSE;
+            p_config->b_dirty = false;
         }
 
         for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
@@ -871,10 +871,10 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
 
        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in any case that dirty was set to VLC_TRUE
+       // assume in any case that dirty was set to true
        // because lazy programmes will use the same callback for
        // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = VLC_FALSE;
+       p_module_config->b_dirty = false;
     }
 
 
@@ -958,7 +958,7 @@ void IntegerListConfigControl::actionRequested( int i_action )
     {
         combo->clear();
         finish( p_module_config, true );
-        p_module_config->b_dirty = VLC_FALSE;
+        p_module_config->b_dirty = false;
     }
 }
 
@@ -1001,14 +1001,14 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 
 void BoolConfigControl::finish()
 {
-    checkbox->setCheckState( p_item->value.i == VLC_TRUE ? Qt::Checked
+    checkbox->setCheckState( p_item->value.i == true ? Qt::Checked
                                                         : Qt::Unchecked );
     checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int BoolConfigControl::getValue()
 {
-    return checkbox->checkState() == Qt::Checked ? VLC_TRUE : VLC_FALSE;
+    return checkbox->checkState() == Qt::Checked ? true : false;
 }
 
 /**************************************************************************

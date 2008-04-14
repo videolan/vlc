@@ -86,7 +86,7 @@
 
 - (void)showAsPanel;
 - (void)initStrings;
-- (void)changeFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)changeFiltersString: (char *)psz_name onOrOff: (bool )b_add;
 - (void)enableTime;
 - (void)enableLogo;
 - (void)enableMarq;

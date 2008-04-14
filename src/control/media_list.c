@@ -134,7 +134,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
 
     /* Code for that one should be handled in flat_media_list.c */
     p_mlist->p_flat_mlist = NULL;
-    p_mlist->b_read_only = VLC_FALSE;
+    p_mlist->b_read_only = false;
 
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
             libvlc_MediaListItemAdded, p_e );
@@ -246,7 +246,7 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
     if( libvlc_exception_raised( p_e ) )
         return;
 
-    input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item, VLC_TRUE );
+    input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item, true );
 
     return;
 }

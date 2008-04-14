@@ -48,8 +48,8 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("H264 video demuxer" ) );
-    set_capability( "demux2", 0 );
-    add_float( "h264-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+    set_capability( "demux", 0 );
+    add_float( "h264-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
     set_callbacks( Open, Close );
     add_shortcut( "h264" );
 vlc_module_end();
@@ -158,7 +158,7 @@ static int Demux( demux_t *p_demux)
 
             if( p_sys->p_es == NULL )
             {
-                p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                p_sys->p_packetizer->fmt_out.b_packetized = true;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 
@@ -186,7 +186,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( i_query == DEMUX_SET_TIME )
         return VLC_EGENERIC;
     else
-        return demux2_vaControlHelper( p_demux->s,
+        return demux_vaControlHelper( p_demux->s,
                                        0, -1,
                                        0, 1, i_query, args );
 }

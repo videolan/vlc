@@ -55,7 +55,7 @@ int E_(Import_podcast)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    if( !demux2_IsForced( p_demux, "podcast" ) )
+    if( !demux_IsForced( p_demux, "podcast" ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using podcast reader" );
@@ -87,8 +87,8 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    vlc_bool_t b_item = VLC_FALSE;
-    vlc_bool_t b_image = VLC_FALSE;
+    bool b_item = false;
+    bool b_image = false;
     int i_ret;
 
     xml_t *p_xml;
@@ -159,11 +159,11 @@ static int Demux( demux_t *p_demux )
 
                 if( !strcmp( psz_elname, "item" ) )
                 {
-                    b_item = VLC_TRUE;
+                    b_item = true;
                 }
                 else if( !strcmp( psz_elname, "image" ) )
                 {
-                    b_item = VLC_TRUE;
+                    b_item = true;
                 }
 
                 // Read the attributes
@@ -199,24 +199,24 @@ static int Demux( demux_t *p_demux )
             }
             case XML_READER_TEXT:
             {
-#define SET_DATA( field, name ) else if( b_item == VLC_TRUE \
+#define SET_DATA( field, name ) else if( b_item == true \
                 && !strcmp( psz_elname, name ) ) \
                 { \
                     field = strdup( psz_text ); \
                 }
                 char *psz_text = xml_ReaderValue( p_xml_reader );
                 /* item specific meta data */
-                if( b_item == VLC_TRUE && !strcmp( psz_elname, "title" ) )
+                if( b_item == true && !strcmp( psz_elname, "title" ) )
                 {
                     psz_item_name = strdup( psz_text );
                 }
-                else if( b_item == VLC_TRUE
+                else if( b_item == true
                          && ( !strcmp( psz_elname, "itunes:author" )
                             ||!strcmp( psz_elname, "author" ) ) )
                 { /* <author> isn't standard iTunes podcast stuff */
                     psz_item_author = strdup( psz_text );
                 }
-                else if( b_item == VLC_TRUE
+                else if( b_item == true
                          && ( !strcmp( psz_elname, "itunes:summary" )
                             ||!strcmp( psz_elname, "description" ) ) )
                 { /* <description> isn't standard iTunes podcast stuff */
@@ -228,7 +228,7 @@ static int Demux( demux_t *p_demux )
                 SET_DATA( psz_item_keywords, "itunes:keywords" )
                 SET_DATA( psz_item_subtitle, "itunes:subtitle" )
                 /* toplevel meta data */
-                else if( b_item == VLC_FALSE && b_image == VLC_FALSE
+                else if( b_item == false && b_image == false
                          && !strcmp( psz_elname, "title" ) )
                 {
                     input_item_SetName( p_current_input, psz_text );
@@ -245,7 +245,7 @@ static int Demux( demux_t *p_demux )
                 ADD_GINFO( "Podcast Keywords", "itunes:keywords" )
                 ADD_GINFO( "Podcast Subtitle", "itunes:subtitle" )
 #undef ADD_GINFO
-                else if( b_item == VLC_FALSE && b_image == VLC_FALSE
+                else if( b_item == false && b_image == false
                          && ( !strcmp( psz_elname, "itunes:summary" )
                             ||!strcmp( psz_elname, "description" ) ) )
                 { /* <description> isn't standard iTunes podcast stuff */
@@ -310,11 +310,11 @@ static int Demux( demux_t *p_demux )
                     FREENULL( psz_item_keywords );
                     FREENULL( psz_item_subtitle );
                     FREENULL( psz_item_summary );
-                    b_item = VLC_FALSE;
+                    b_item = false;
                 }
                 else if( !strcmp( psz_elname, "image" ) )
                 {
-                    b_image = VLC_FALSE;
+                    b_image = false;
                 }
                 free( psz_elname );
                 psz_elname = strdup("");

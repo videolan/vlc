@@ -49,8 +49,8 @@ static int IntfBandsCallback( vlc_object_t *, char const *,
 static int IntfPreampCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static void ChangeFiltersString( intf_thread_t *, aout_instance_t *,
-                                 char *, vlc_bool_t );
-static void ChangeVFiltersString( intf_thread_t *, char *, vlc_bool_t );
+                                 char *, bool );
+static void ChangeVFiltersString( intf_thread_t *, char *, bool );
 
 
 /* IDs for the controls and the menu commands */
@@ -376,7 +376,7 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     if( f_value > 0 && f_value < 10 )
         gamma_slider->SetValue( (int)(10 * f_value) );
 
-    b_update = VLC_FALSE;
+    b_update = false;
 
     return panel;
 }
@@ -591,11 +591,11 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 void ExtraPanel::OnIdle( wxIdleEvent &event )
 {
     CheckAout();
-    if( b_update == VLC_TRUE )
+    if( b_update == true )
     {
-        if( b_my_update == VLC_TRUE )
+        if( b_my_update == true )
         {
-            b_update = b_my_update = VLC_FALSE;
+            b_update = b_my_update = false;
             return;
         }
         char *p = psz_bands;
@@ -627,7 +627,7 @@ void ExtraPanel::OnIdle( wxIdleEvent &event )
         const wxString preamp = wxT("Preamp\n");
         preamp_text->SetLabel( preamp + wxU( psz_val ) + wxT( "dB" ) );
         eq_chkbox->SetValue( TRUE );
-        b_update = VLC_FALSE;
+        b_update = false;
     }
 }
 
@@ -640,7 +640,7 @@ void ExtraPanel::OnEnableEqualizer( wxCommandEvent &event )
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     ChangeFiltersString( p_intf,p_aout, "equalizer",
-                         event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+                         event.IsChecked() ? true : false );
 
     if( event.IsChecked() )
     {
@@ -680,7 +680,7 @@ void ExtraPanel::OnEqRestore( wxCommandEvent &event )
     if( p_aout == NULL )
     {
         vlc_value_t val;
-        vlc_bool_t b_previous = eq_chkbox->IsChecked();
+        bool b_previous = eq_chkbox->IsChecked();
         val.f_float = 12.0;
         IntfPreampCallback( NULL, NULL, val,val, this );
         config_PutFloat( p_intf, "equalizer-preamp", 12.0 );
@@ -710,7 +710,7 @@ void ExtraPanel::OnEq2Pass( wxCommandEvent &event )
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
 
-    vlc_bool_t b_2p = event.IsChecked() ? VLC_TRUE : VLC_FALSE;
+    bool b_2p = event.IsChecked() ? true : false;
 
     if( p_aout == NULL )
     {
@@ -724,7 +724,7 @@ void ExtraPanel::OnEq2Pass( wxCommandEvent &event )
         {
             for( int i = 0; i < p_aout->i_nb_inputs; i++ )
             {
-                p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+                p_aout->pp_inputs[i]->b_restart = true;
             }
         }
         vlc_object_release( p_aout );
@@ -757,7 +757,7 @@ void ExtraPanel::OnPreamp( wxScrollEvent &event )
     {
         var_SetFloat( p_aout, "equalizer-preamp", f );
         config_PutFloat( p_intf, "equalizer-preamp", f );
-        b_my_update = VLC_TRUE;
+        b_my_update = true;
         vlc_object_release( p_aout );
     }
 }
@@ -809,7 +809,7 @@ void ExtraPanel::OnChangeEqualizer( wxScrollEvent &event )
     {
         var_SetString( p_aout, "equalizer-bands", psz_values );
         config_PutPsz( p_intf, "equalizer-bands", psz_values );
-        b_my_update = VLC_TRUE;
+        b_my_update = true;
         vlc_object_release( p_aout );
     }
 }
@@ -822,7 +822,7 @@ void ExtraPanel::OnHeadphone( wxCommandEvent &event )
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     ChangeFiltersString( p_intf , p_aout, "headphone_channel_mixer",
-                         event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+                         event.IsChecked() ? true : false );
     if( p_aout != NULL )
         vlc_object_release( p_aout );
 }
@@ -832,7 +832,7 @@ void ExtraPanel::OnNormvol( wxCommandEvent &event )
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     ChangeFiltersString( p_intf , p_aout, "normvol",
-                         event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+                         event.IsChecked() ? true : false );
     if( p_aout != NULL )
         vlc_object_release( p_aout );
 }
@@ -858,7 +858,7 @@ void ExtraPanel::OnNormvolSlider( wxScrollEvent &event )
 void ExtraPanel::OnEnableAdjust(wxCommandEvent& event)
 {
     ChangeVFiltersString( p_intf,  "adjust",
-                          event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+                          event.IsChecked() ? true : false );
 
     if( event.IsChecked() )
     {
@@ -994,7 +994,7 @@ void ExtraPanel::OnSelectFilter(wxCommandEvent& event)
     if( vfilters[i_filter].psz_filter  )
     {
         ChangeVFiltersString( p_intf, vfilters[i_filter].psz_filter ,
-                              event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+                              event.IsChecked() ? true : false );
     }
 }
 
@@ -1043,7 +1043,7 @@ void ExtraPanel::CheckAout()
             psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
             if( psz_bands == NULL )
                 psz_bands = strdup("");
-            b_update = VLC_TRUE;
+            b_update = true;
         }
         vlc_object_release( p_aout );
     }
@@ -1051,7 +1051,7 @@ void ExtraPanel::CheckAout()
 
 
 static void ChangeVFiltersString( intf_thread_t *p_intf,
-                                 char *psz_name, vlc_bool_t b_add )
+                                 char *psz_name, bool b_add )
 {
     vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
@@ -1114,7 +1114,7 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
 
 static void ChangeFiltersString( intf_thread_t *p_intf,
                                  aout_instance_t * p_aout,
-                                 char *psz_name, vlc_bool_t b_add )
+                                 char *psz_name, bool b_add )
 {
     char *psz_parser, *psz_string;
 
@@ -1174,7 +1174,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
         var_SetString( p_aout, "audio-filter", psz_string );
         for( int i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
         }
     }
     free( psz_string );
@@ -1187,7 +1187,7 @@ static int IntfBandsCallback( vlc_object_t *p_this, char const *psz_cmd,
     ExtraPanel *p_panel = (ExtraPanel *)param;
 
     p_panel->psz_bands = strdup( newval.psz_string );
-    p_panel->b_update = VLC_TRUE;
+    p_panel->b_update = true;
 
     return VLC_SUCCESS;
 }
@@ -1198,7 +1198,7 @@ static int IntfPreampCallback( vlc_object_t *p_this, char const *psz_cmd,
     ExtraPanel *p_panel = (ExtraPanel *)param;
 
     p_panel->f_preamp = newval.f_float;
-    p_panel->b_update = VLC_TRUE;
+    p_panel->b_update = true;
 
     return VLC_SUCCESS;
 }

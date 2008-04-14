@@ -38,13 +38,13 @@
 struct decoder_sys_t
 {
     /* Module mode */
-    vlc_bool_t b_packetizer;
+    bool b_packetizer;
 
     /*
      * Input properties
      */
     size_t i_raw_size;
-    vlc_bool_t b_invert;
+    bool b_invert;
 
     /*
      * Common properties
@@ -136,7 +136,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     /* Misc init */
-    p_dec->p_sys->b_packetizer = VLC_FALSE;
+    p_dec->p_sys->b_packetizer = false;
     p_sys->i_pts = 0;
     p_sys->b_invert = 0;
 
@@ -145,7 +145,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         /* Frames are coded from bottom to top */
         p_dec->fmt_in.video.i_height =
             (unsigned int)(-(int)p_dec->fmt_in.video.i_height);
-        p_sys->b_invert = VLC_TRUE;
+        p_sys->b_invert = true;
     }
 
     if( p_dec->fmt_in.video.i_width <= 0 || p_dec->fmt_in.video.i_height <= 0 )
@@ -195,7 +195,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     int i_ret = OpenDecoder( p_this );
 
-    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = VLC_TRUE;
+    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = true;
 
     return i_ret;
 }

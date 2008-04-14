@@ -41,13 +41,13 @@ enum {
                            const char      *psz_element)
 
 /* prototypes */
-static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE;
-static vlc_bool_t parse_tracklist_node COMPLEX_INTERFACE;
-static vlc_bool_t parse_track_node COMPLEX_INTERFACE;
-static vlc_bool_t parse_extension_node COMPLEX_INTERFACE;
-static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE;
-static vlc_bool_t set_item_info SIMPLE_INTERFACE;
-static vlc_bool_t skip_element COMPLEX_INTERFACE;
+static bool parse_playlist_node COMPLEX_INTERFACE;
+static bool parse_tracklist_node COMPLEX_INTERFACE;
+static bool parse_track_node COMPLEX_INTERFACE;
+static bool parse_extension_node COMPLEX_INTERFACE;
+static bool parse_extitem_node COMPLEX_INTERFACE;
+static bool set_item_info SIMPLE_INTERFACE;
+static bool skip_element COMPLEX_INTERFACE;
 
 /* datatypes */
 typedef struct
@@ -56,7 +56,7 @@ typedef struct
     int type;
     union
     {
-        vlc_bool_t (*smpl) SIMPLE_INTERFACE;
-        vlc_bool_t (*cmplx) COMPLEX_INTERFACE;
+        bool (*smpl) SIMPLE_INTERFACE;
+        bool (*cmplx) COMPLEX_INTERFACE;
     } pf_handler;
 } xml_elem_hnd_t;

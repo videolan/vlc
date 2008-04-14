@@ -96,13 +96,13 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
-              VLC_FALSE );
+              false );
     add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
-              VLC_FALSE );
+              false );
     add_bool( "macosx-eq-keep", 1, NULL, EQ_KEEP_TEXT, EQ_KEEP_LONGTEXT,
-              VLC_FALSE );
+              false );
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
-              VLC_FALSE );
+              false );
 
     add_submodule();
         set_description( _("Quartz video") );
@@ -112,15 +112,15 @@ vlc_module_begin();
         set_callbacks( E_(OpenVideoQT), E_(CloseVideoQT) );
 
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
-                     VLC_FALSE );
+                     false );
         add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
-                  VLC_FALSE );
+                  false );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
-                              OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
+                              OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
         add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
-                  VLC_FALSE );
+                  false );
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
-                  VLC_FALSE );
+                  false );
     add_submodule();
         set_description( "Mac OS X OpenGL" );
         set_capability( "opengl provider", 100 );

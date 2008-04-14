@@ -85,7 +85,7 @@ uint32_t CPUCapabilities( void )
 
 #elif defined( __i386__ ) || defined( __x86_64__ )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
-    volatile vlc_bool_t    b_amd;
+    volatile bool    b_amd;
 
     /* Needed for x86 CPU capabilities detection */
 #   if defined( __x86_64__ )

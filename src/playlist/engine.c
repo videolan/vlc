@@ -45,7 +45,7 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     (void)psz_cmd; (void)oldval; (void)newval; (void)a;
 
-    ((playlist_t*)p_this)->b_reset_currently_playing = VLC_TRUE;
+    ((playlist_t*)p_this)->b_reset_currently_playing = true;
     playlist_Signal( ((playlist_t*)p_this) );
     return VLC_SUCCESS;
 }
@@ -61,7 +61,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 {
     static const char playlist_name[] = "playlist";
     playlist_t *p_playlist;
-    vlc_bool_t b_save;
+    bool b_save;
     int i_tree;
 
     /* Allocate structure */
@@ -85,21 +85,21 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->p_input = NULL;
 
     p_playlist->gc_date = 0;
-    p_playlist->b_cant_sleep = VLC_FALSE;
+    p_playlist->b_cant_sleep = false;
 
     ARRAY_INIT( p_playlist->items );
     ARRAY_INIT( p_playlist->all_items );
     ARRAY_INIT( p_playlist->current );
 
     p_playlist->i_current_index = 0;
-    p_playlist->b_reset_currently_playing = VLC_TRUE;
+    p_playlist->b_reset_currently_playing = true;
     p_playlist->last_rebuild_date = 0;
 
     i_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
     p_playlist->b_always_tree = (i_tree == 1);
     p_playlist->b_never_tree = (i_tree == 2);
 
-    p_playlist->b_doing_ml = VLC_FALSE;
+    p_playlist->b_doing_ml = false;
 
     p_playlist->b_auto_preparse =
                         var_CreateGetBool( p_playlist, "auto-preparse" ) ;
@@ -115,7 +115,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     /* Create playlist and media library */
     playlist_NodesPairCreate( p_playlist, _( "Playlist" ),
                             &p_playlist->p_local_category,
-                            &p_playlist->p_local_onelevel, VLC_FALSE );
+                            &p_playlist->p_local_onelevel, false );
 
     p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
     p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
@@ -129,7 +129,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     {
         playlist_NodesPairCreate( p_playlist, _( "Media Library" ),
                             &p_playlist->p_ml_category,
-                            &p_playlist->p_ml_onelevel, VLC_FALSE );
+                            &p_playlist->p_ml_onelevel, false );
 
         if(!p_playlist->p_ml_category || !p_playlist->p_ml_onelevel)
             return NULL;
@@ -145,7 +145,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     /* Initial status */
     p_playlist->status.p_item = NULL;
     p_playlist->status.p_node = p_playlist->p_local_onelevel;
-    p_playlist->request.b_request = VLC_FALSE;
+    p_playlist->request.b_request = false;
     p_playlist->status.i_status = PLAYLIST_STOPPED;
 
     p_playlist->i_sort = SORT_ID;
@@ -153,9 +153,9 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
 
     b_save = p_playlist->b_auto_preparse;
-    p_playlist->b_auto_preparse = VLC_FALSE;
+    p_playlist->b_auto_preparse = false;
     playlist_MLLoad( p_playlist );
-    p_playlist->b_auto_preparse = VLC_TRUE;
+    p_playlist->b_auto_preparse = true;
 
     vlc_object_set_destructor( p_playlist, playlist_Destructor );
 
@@ -205,7 +205,7 @@ static void playlist_Destructor( vlc_object_t * p_this )
 }
 
 /* Destroy remaining objects */
-static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
+static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
 {
     vlc_object_t *p_obj;
 
@@ -213,7 +213,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
     {
         if( mdate() - p_playlist->gc_date < 1000000 )
         {
-            p_playlist->b_cant_sleep = VLC_TRUE;
+            p_playlist->b_cant_sleep = true;
             return;
         }
         else if( p_playlist->gc_date == 0 )
@@ -247,7 +247,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
         vlc_object_release( p_obj );
         sout_DeleteInstance( (sout_instance_t*)p_obj );
     }
-    p_playlist->b_cant_sleep = VLC_FALSE;
+    p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
 
@@ -261,7 +261,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
 void playlist_MainLoop( playlist_t *p_playlist )
 {
     playlist_item_t *p_item = NULL;
-    vlc_bool_t b_playexit = var_GetBool( p_playlist, "play-and-exit" );
+    bool b_playexit = var_GetBool( p_playlist, "play-and-exit" );
     PL_LOCK;
 
     if( p_playlist->b_reset_currently_playing &&
@@ -302,7 +302,7 @@ check_input:
             PL_LOCK;
 
             p_playlist->gc_date = mdate();
-            p_playlist->b_cant_sleep = VLC_TRUE;
+            p_playlist->b_cant_sleep = true;
 
             if( p_playlist->status.p_item->i_flags
                 & PLAYLIST_REMOVE_FLAG )
@@ -341,7 +341,7 @@ check_input:
         else if( p_playlist->p_input->i_state != INIT_S )
         {
             PL_UNLOCK;
-            ObjectGarbageCollector( p_playlist, VLC_FALSE );
+            ObjectGarbageCollector( p_playlist, false );
             PL_LOCK;
         }
     }
@@ -364,19 +364,19 @@ check_input:
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
                 PL_UNLOCK;
 
-                if( b_playexit == VLC_TRUE )
+                if( b_playexit == true )
                 {
                     msg_Info( p_playlist, "end of playlist, exiting" );
                     vlc_object_kill( p_playlist->p_libvlc );
                 }
-                ObjectGarbageCollector( p_playlist, VLC_TRUE );
+                ObjectGarbageCollector( p_playlist, true );
                 return;
              }
              playlist_PlayItem( p_playlist, p_item );
          }
          else
          {
-            const vlc_bool_t b_gc_forced = p_playlist->status.i_status != PLAYLIST_STOPPED;
+            const bool b_gc_forced = p_playlist->status.i_status != PLAYLIST_STOPPED;
 
             p_playlist->status.i_status = PLAYLIST_STOPPED;
             if( p_playlist->status.p_item &&
@@ -536,7 +536,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 }
                 stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
                 PL_UNLOCK;
-                input_item_SetPreparsed( p_current, VLC_TRUE );
+                input_item_SetPreparsed( p_current, true );
                 var_SetInteger( p_playlist, "item-change", p_current->i_id );
                 PL_LOCK;
             }
@@ -552,7 +552,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 preparse_item_t p;
                 PL_DEBUG( "need to fetch meta for %s", p_current->psz_name );
                 p.p_item = p_current;
-                p.b_fetch_art = VLC_FALSE;
+                p.b_fetch_art = false;
                 vlc_object_lock( p_playlist->p_fetcher );
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
@@ -567,7 +567,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 preparse_item_t p;
                 PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
                 p.p_item = p_current;
-                p.b_fetch_art = VLC_TRUE;
+                p.b_fetch_art = true;
                 vlc_object_lock( p_playlist->p_fetcher );
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
@@ -607,7 +607,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
 void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
 {
     playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
-    vlc_bool_t b_fetch_art;
+    bool b_fetch_art;
     input_item_t *p_item;
     int i_activity;
 
@@ -646,7 +646,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                     vlc_mutex_lock( &p_obj->object_lock );
                     preparse_item_t p;
                     p.p_item = p_item;
-                    p.b_fetch_art = VLC_TRUE;
+                    p.b_fetch_art = true;
                     INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                                  p_playlist->p_fetcher->i_waiting,
                                  0, p );
@@ -666,7 +666,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                  * FIXME this doesn't work if we need to fetch meta before art ... */
                 for( i_ret = 0; i_ret < 10 && !input_item_IsPreparsed( p_item ); i_ret++ )
                 {
-                    vlc_bool_t b_break;
+                    bool b_break;
                     PL_LOCK;
                     b_break = ( !p_playlist->p_input || input_GetItem(p_playlist->p_input) != p_item  ||
                                 p_playlist->p_input->b_die || p_playlist->p_input->b_eof || p_playlist->p_input->b_error );
@@ -681,9 +681,9 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                 {
                     PL_DEBUG( "downloading art for %s", p_item->psz_name );
                     if( input_DownloadAndCacheArt( p_playlist, p_item ) )
-                        input_item_SetArtNotFound( p_item, VLC_TRUE );
+                        input_item_SetArtNotFound( p_item, true );
                     else {
-                        input_item_SetArtFetched( p_item, VLC_TRUE );
+                        input_item_SetArtFetched( p_item, true );
                         var_SetInteger( p_playlist, "item-change",
                                         p_item->i_id );
                     }
@@ -691,13 +691,13 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                 else if( i_ret == 0 ) /* Was in cache */
                 {
                     PL_DEBUG( "found art for %s in cache", p_item->psz_name );
-                    input_item_SetArtFetched( p_item, VLC_TRUE );
+                    input_item_SetArtFetched( p_item, true );
                     var_SetInteger( p_playlist, "item-change", p_item->i_id );
                 }
                 else
                 {
                     PL_DEBUG( "art not found for %s", p_item->psz_name );
-                    input_item_SetArtNotFound( p_item, VLC_TRUE );
+                    input_item_SetArtNotFound( p_item, true );
                 }
                 vlc_gc_decref( p_item );
            }
@@ -716,7 +716,7 @@ static void VariablesInit( playlist_t *p_playlist )
     vlc_value_t val;
     /* These variables control updates */
     var_Create( p_playlist, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_playlist, "intf-change", val );
 
     var_Create( p_playlist, "item-change", VLC_VAR_INTEGER );
@@ -736,7 +736,7 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "intf-popupmenu", VLC_VAR_BOOL );
 
     var_Create( p_playlist, "intf-show", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_playlist, "intf-show", val );
 
     var_Create( p_playlist, "activity", VLC_VAR_INTEGER );

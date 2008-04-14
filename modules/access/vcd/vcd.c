@@ -49,14 +49,14 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( _("VCD"));
     set_description( _("VCD input") );
-    set_capability( "access2", 60 );
+    set_capability( "access", 60 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") );
     add_integer( "vcd-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
     add_shortcut( "vcd" );
     add_shortcut( "svcd" );
 vlc_module_end();
@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
@@ -237,7 +237,7 @@ static void Close( vlc_object_t *p_this )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
     input_title_t ***ppp_title;
@@ -250,8 +250,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             break;
 
         /* */
@@ -347,7 +347,7 @@ static block_t *Block( access_t *p_access )
     {
         if( p_access->info.i_title + 2 >= p_sys->i_titles )
         {
-            p_access->info.b_eof = VLC_TRUE;
+            p_access->info.b_eof = true;
             return NULL;
         }
 
@@ -440,7 +440,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     }
 
     /* Reset eof */
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
 
     return VLC_SUCCESS;
 }

@@ -29,11 +29,11 @@
  * Exported functions.
  *****************************************************************************/
 #define module_Need(a,b,c,d) __module_Need(VLC_OBJECT(a),b,c,d)
-VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char *, vlc_bool_t ) );
+VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char *, bool ) );
 #define module_Unneed(a,b) __module_Unneed(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __module_Unneed, ( vlc_object_t *, module_t * ) );
 #define module_Exists(a,b) __module_Exists(VLC_OBJECT(a),b)
-VLC_EXPORT( vlc_bool_t,  __module_Exists, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( bool,  __module_Exists, ( vlc_object_t *, const char * ) );
 
 #define module_Find(a,b) __module_Find(VLC_OBJECT(a),b)
 VLC_EXPORT( module_t *, __module_Find, ( vlc_object_t *, const char * ) );
@@ -74,8 +74,8 @@ enum vlc_module_properties
     VLC_MODULE_NAME,
 };
 
-VLC_EXPORT( vlc_bool_t, module_IsCapable, ( const module_t *m, const char *cap ) );
+VLC_EXPORT( bool, module_IsCapable, ( const module_t *m, const char *cap ) );
 VLC_EXPORT( const char *, module_GetObjName, ( const module_t *m ) );
-VLC_EXPORT( const char *, module_GetName, ( const module_t *m, vlc_bool_t long_name ) );
-#define module_GetLongName( m ) module_GetName( m, VLC_TRUE )
+VLC_EXPORT( const char *, module_GetName, ( const module_t *m, bool long_name ) );
+#define module_GetLongName( m ) module_GetName( m, true )
 VLC_EXPORT( const char *, module_GetHelp, ( const module_t *m ) );

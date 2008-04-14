@@ -65,24 +65,24 @@ struct decoder_sys_t
     uint8_t p_startcode[3];
 
     /* Current sequence header */
-    vlc_bool_t b_sequence_header;
+    bool b_sequence_header;
     struct
     {
         block_t *p_sh;
-        vlc_bool_t b_advanced_profile;
-        vlc_bool_t b_interlaced;
-        vlc_bool_t b_frame_interpolation;
-        vlc_bool_t b_range_reduction;
-        vlc_bool_t b_has_bframe;
+        bool b_advanced_profile;
+        bool b_interlaced;
+        bool b_frame_interpolation;
+        bool b_range_reduction;
+        bool b_has_bframe;
     } sh;
-    vlc_bool_t b_entry_point;
+    bool b_entry_point;
     struct
     {
         block_t *p_ep;
     } ep;
 
     /* */
-    vlc_bool_t  b_frame;
+    bool  b_frame;
 
     /* Current frame being built */
     block_t    *p_frame;
@@ -143,12 +143,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_startcode[2] = 0x01;
     p_sys->i_offset = 0;
 
-    p_sys->b_sequence_header = VLC_FALSE;
+    p_sys->b_sequence_header = false;
     p_sys->sh.p_sh = NULL;
-    p_sys->b_entry_point = VLC_FALSE;
+    p_sys->b_entry_point = false;
     p_sys->ep.p_ep = NULL;
 
-    p_sys->b_frame = VLC_FALSE;
+    p_sys->b_frame = false;
     p_sys->p_frame = NULL;
     p_sys->pp_last = &p_sys->p_frame;
 
@@ -208,7 +208,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 block_ChainRelease( p_sys->p_frame );
             p_sys->p_frame = NULL;
             p_sys->pp_last = &p_sys->p_frame;
-            p_sys->b_frame = VLC_FALSE;
+            p_sys->b_frame = false;
         }
 //        p_sys->i_interpolated_dts = 0;
         block_Release( *pp_block );
@@ -456,9 +456,9 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
             const int i_level = bs_read( &s, 3 );
 
             /* Advanced profile */
-            p_sys->sh.b_advanced_profile = VLC_TRUE;
-            p_sys->sh.b_range_reduction = VLC_FALSE;
-            p_sys->sh.b_has_bframe = VLC_TRUE;
+            p_sys->sh.b_advanced_profile = true;
+            p_sys->sh.b_range_reduction = false;
+            p_sys->sh.b_has_bframe = true;
 
             bs_skip( &s, 2+3+5+1 ); // chroma format + frame rate Q + bit rate Q + postprocflag
 
@@ -551,8 +551,8 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
         else
         {
             /* Simple and main profile */
-            p_sys->sh.b_advanced_profile = VLC_FALSE;
-            p_sys->sh.b_interlaced = VLC_FALSE;
+            p_sys->sh.b_advanced_profile = false;
+            p_sys->sh.b_interlaced = false;
 
             if( !p_sys->b_sequence_header )
                 msg_Dbg( p_dec, "found sequence header for %s profile", i_profile == 0 ? "simple" : "main" );
@@ -562,14 +562,14 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
                          1+1+1+1 );     // variable size transform + reserved + overlap + sync marker
             p_sys->sh.b_range_reduction = bs_read( &s, 1 );
             if( bs_read( &s, 3 ) > 0 )
-                p_sys->sh.b_has_bframe = VLC_TRUE;
+                p_sys->sh.b_has_bframe = true;
             else
-                p_sys->sh.b_has_bframe = VLC_FALSE;
+                p_sys->sh.b_has_bframe = false;
             bs_skip( &s, 2 );           // quantizer
 
             p_sys->sh.b_frame_interpolation = bs_read( &s, 1 );
         }
-        p_sys->b_sequence_header = VLC_TRUE;
+        p_sys->b_sequence_header = true;
         BuildExtraData( p_dec );
     }
     else if( idu == IDU_TYPE_ENTRY_POINT )
@@ -578,7 +578,7 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
             block_Release( p_sys->ep.p_ep );
         p_sys->ep.p_ep = block_Duplicate( p_frag );
 
-        p_sys->b_entry_point = VLC_TRUE;
+        p_sys->b_entry_point = true;
         BuildExtraData( p_dec );
     }
     else if( idu == IDU_TYPE_FRAME )
@@ -660,7 +660,7 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
             else
                 p_sys->p_frame->i_flags |= BLOCK_FLAG_TYPE_B;
         }
-        p_sys->b_frame = VLC_TRUE;
+        p_sys->b_frame = true;
     }
     return p_pic;
 }

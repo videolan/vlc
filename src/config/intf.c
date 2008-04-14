@@ -128,10 +128,10 @@ void __config_RemoveIntf( vlc_object_t *p_this, const char *psz_intf )
 }
 
 /*
- * Returns VLC_TRUE if the specified extra interface is present in the
- * configuration, VLC_FALSE if not
+ * Returns true if the specified extra interface is present in the
+ * configuration, false if not
  */
-vlc_bool_t __config_ExistIntf( vlc_object_t *p_this, const char *psz_intf )
+bool __config_ExistIntf( vlc_object_t *p_this, const char *psz_intf )
 {
     assert( psz_intf );
 
@@ -144,7 +144,7 @@ vlc_bool_t __config_ExistIntf( vlc_object_t *p_this, const char *psz_intf )
         if( !strncmp( psz_parser, psz_intf, i_len ) )
         {
             free( psz_config );
-            return VLC_TRUE;
+            return true;
         }
         psz_parser = strchr( psz_parser, ':' );
         if( psz_parser ) psz_parser++; /* skip the ':' */
@@ -157,13 +157,13 @@ vlc_bool_t __config_ExistIntf( vlc_object_t *p_this, const char *psz_intf )
         if( !strncmp( psz_parser, psz_intf, i_len ) )
         {
             free( psz_config );
-            return VLC_TRUE;
+            return true;
         }
         psz_parser = strchr( psz_parser, ':' );
         if( psz_parser ) psz_parser++; /* skip the ':' */
     }
     free( psz_config );
 
-    return VLC_FALSE;
+    return false;
 }
 

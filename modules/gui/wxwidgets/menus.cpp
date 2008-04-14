@@ -554,7 +554,7 @@ void Menu::Populate( ArrayOfStrings & ras_varnames,
                      ArrayOfInts & rai_objects )
 {
     vlc_object_t *p_object;
-    vlc_bool_t b_section_empty = VLC_FALSE;
+    bool b_section_empty = false;
     int i;
 
     i_item_id = i_start_id;
@@ -569,21 +569,21 @@ void Menu::Populate( ArrayOfStrings & ras_varnames,
                 Enable( MenuDummy_Event + i, FALSE );
             }
             AppendSeparator();
-            b_section_empty = VLC_TRUE;
+            b_section_empty = true;
             continue;
         }
 
         if( rai_objects[i] == 0  )
         {
             Append( MenuDummy_Event, wxU(ras_varnames[i]) );
-            b_section_empty = VLC_FALSE;
+            b_section_empty = false;
             continue;
         }
 
         p_object = (vlc_object_t *)vlc_object_get( rai_objects[i] );
         if( p_object == NULL ) continue;
 
-        b_section_empty = VLC_FALSE;
+        b_section_empty = false;
         CreateMenuItem( this, ras_varnames[i], p_object );
         vlc_object_release( p_object );
     }

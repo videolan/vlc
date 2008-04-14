@@ -53,8 +53,8 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "realrtsp-caching", 3000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    set_capability( "access2", 10 );
+                 CACHING_TEXT, CACHING_LONGTEXT, true );
+    set_capability( "access", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "realrtsp" );
     add_shortcut( "rtsp" );
@@ -71,8 +71,8 @@ static int     Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
-    vlc_bool_t b_seekable;
-    vlc_bool_t b_pace_control;
+    bool b_seekable;
+    bool b_pace_control;
 
     rtsp_client_t *p_rtsp;
 
@@ -94,7 +94,7 @@ static int RtspConnect( void *p_userdata, char *psz_server, int i_port )
     if( p_sys->fd < 0 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", psz_server, i_port );
-        intf_UserFatal( p_access, VLC_FALSE, _("Connection failed"),
+        intf_UserFatal( p_access, false, _("Connection failed"),
                         _("VLC could not connect to \"%s:%d\"."), psz_server, i_port );
         return VLC_EGENERIC;
     }
@@ -116,7 +116,7 @@ static int RtspRead( void *p_userdata, uint8_t *p_buffer, int i_buffer )
     access_t *p_access = (access_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
-    return net_Read( p_access, p_sys->fd, 0, p_buffer, i_buffer, VLC_TRUE );
+    return net_Read( p_access, p_sys->fd, 0, p_buffer, i_buffer, true );
 }
 
 static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )
@@ -172,7 +172,7 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
@@ -228,7 +228,7 @@ static int Open( vlc_object_t *p_this )
 
 
             msg_Err( p_access, "rtsp session can not be established" );
-            intf_UserFatal( p_access, VLC_FALSE, _("Session failed"),
+            intf_UserFatal( p_access, false, _("Session failed"),
                     _("The requested RTSP session could not be established.") );
             goto error;
         }
@@ -310,7 +310,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -319,18 +319,18 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;//p_sys->b_seekable;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;//p_sys->b_seekable;
             break;
 
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
             break;
 
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;//p_sys->b_pace_control;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;//p_sys->b_pace_control;
             break;
 
         /* */

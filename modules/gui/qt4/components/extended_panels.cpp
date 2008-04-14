@@ -233,7 +233,7 @@ void ExtVideo::cropChange()
     }
 }
 
-void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
+void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
 {
     char *psz_parser, *psz_string;
     const char *psz_filter_type;
@@ -875,11 +875,11 @@ void Equalizer::enable()
 {
     bool en = ui.enableCheck->isChecked();
     aout_EnableFilter( VLC_OBJECT( p_intf ), "equalizer",
-                       en ? VLC_TRUE : VLC_FALSE );
+                       en ? true : false );
 //    aout_EnableFilter( VLC_OBJECT( p_intf ), "upmixer",
-//                       en ? VLC_TRUE : VLC_FALSE );
+//                       en ? true : false );
 //     aout_EnableFilter( VLC_OBJECT( p_intf ), "vsurround",
-//                       en ? VLC_TRUE : VLC_FALSE );
+//                       en ? true : false );
      enable( en );
 }
 
@@ -898,7 +898,7 @@ void Equalizer::set2Pass()
 {
     aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    vlc_bool_t b_2p = ui.eq2PassCheck->isChecked();
+    bool b_2p = ui.eq2PassCheck->isChecked();
 
     if( p_aout == NULL )
         config_PutInt( p_intf, "equalizer-2pass", b_2p );
@@ -908,7 +908,7 @@ void Equalizer::set2Pass()
         config_PutInt( p_intf, "equalizer-2pass", b_2p );
         for( int i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
         }
         vlc_object_release( p_aout );
     }
@@ -1120,7 +1120,7 @@ void Spatializer::enable()
 {
     bool en = enableCheck->isChecked();
     aout_EnableFilter( VLC_OBJECT( p_intf ), "spatializer",
-            en ? VLC_TRUE : VLC_FALSE );
+            en ? true : false );
     enable( en );
 }
 

@@ -56,9 +56,9 @@ int E_(Import_DVB)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
     int     i_peek;
-    vlc_bool_t b_valid = VLC_FALSE;
+    bool b_valid = false;
 
-    if( !demux2_IsPathExtension( p_demux, ".conf" ) && !p_demux->b_force )
+    if( !demux_IsPathExtension( p_demux, ".conf" ) && !p_demux->b_force )
         return VLC_EGENERIC;
 
     /* Check if this really is a channels file */
@@ -74,7 +74,7 @@ int E_(Import_DVB)( vlc_object_t *p_this )
         }
         psz_line[i] = 0;
 
-        if( ParseLine( psz_line, 0, 0, 0 ) ) b_valid = VLC_TRUE;
+        if( ParseLine( psz_line, 0, 0, 0 ) ) b_valid = true;
     }
 
     if( !b_valid ) return VLC_EGENERIC;
@@ -117,7 +117,7 @@ static int Demux( demux_t *p_demux )
 
         EnsureUTF8( psz_name );
 
-        p_input = input_ItemNewExt( p_playlist, "dvb:", psz_name, 0, NULL, -1 );
+        p_input = input_ItemNewExt( p_playlist, "dvb://", psz_name, 0, NULL, -1 );
         for( i = 0; i< i_options; i++ )
         {
             EnsureUTF8( ppsz_options[i] );
@@ -195,7 +195,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 {
     char *psz_name = 0, *psz_parse = psz_line;
     int i_count = 0, i_program = 0, i_frequency = 0;
-    vlc_bool_t b_valid = VLC_FALSE;
+    bool b_valid = false;
 
     if( pppsz_options ) *pppsz_options = 0;
     if( pi_options ) *pi_options = 0;
@@ -206,7 +206,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
            *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
 
     /* Ignore comments */
-    if( *psz_parse == '#' ) return VLC_FALSE;
+    if( *psz_parse == '#' ) return false;
 
     while( psz_parse )
     {
@@ -244,7 +244,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 
                     /* If we recognize one of the strings, then we are sure
                      * the data is really valid (ie. a channels file). */
-                    b_valid = VLC_TRUE;
+                    b_valid = true;
                     break;
                 }
             }

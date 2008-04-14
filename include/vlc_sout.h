@@ -136,8 +136,8 @@ struct  sout_mux_t
     /* XXX private to stream_output.c */
     /* if muxer doesn't support adding stream at any time then we first wait
      *  for stream then we refuse all stream and start muxing */
-    vlc_bool_t  b_add_stream_any_time;
-    vlc_bool_t  b_waiting_stream;
+    bool  b_add_stream_any_time;
+    bool  b_waiting_stream;
     /* we wait one second after first stream added */
     mtime_t     i_add_stream_start;
 };
@@ -145,9 +145,9 @@ struct  sout_mux_t
 enum sout_mux_query_e
 {
     /* capabilities */
-    MUX_CAN_ADD_STREAM_WHILE_MUXING,    /* arg1= vlc_bool_t *,      res=cannot fail */
+    MUX_CAN_ADD_STREAM_WHILE_MUXING,    /* arg1= bool *,      res=cannot fail */
     /* properties */
-    MUX_GET_ADD_STREAM_WAIT,            /* arg1= vlc_bool_t *,      res=cannot fail */
+    MUX_GET_ADD_STREAM_WAIT,            /* arg1= bool *,      res=cannot fail */
     MUX_GET_MIME,                       /* arg1= char **            res=can fail    */
 };
 
@@ -234,7 +234,7 @@ VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
 /** SDP */
 
 VLC_EXPORT( char *, vlc_sdp_Start, ( vlc_object_t *obj, const char *cfgpref, const struct sockaddr *src, size_t srclen, const struct sockaddr *addr, size_t addrlen ) );
-VLC_EXPORT( char *, sdp_AddMedia, (char **sdp, const char *type, const char *protocol, int dport, unsigned pt, vlc_bool_t bw_indep, unsigned bw, const char *ptname, unsigned clockrate, unsigned channels, const char *fmtp) );
+VLC_EXPORT( char *, sdp_AddMedia, (char **sdp, const char *type, const char *protocol, int dport, unsigned pt, bool bw_indep, unsigned bw, const char *ptname, unsigned clockrate, unsigned channels, const char *fmtp) );
 VLC_EXPORT( char *, sdp_AddAttribute, (char **sdp, const char *name, const char *fmt, ...) ATTRIBUTE_FORMAT( 3, 4 ) );
 
 

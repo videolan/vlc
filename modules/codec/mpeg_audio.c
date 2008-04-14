@@ -44,7 +44,7 @@
 struct decoder_sys_t
 {
     /* Module mode */
-    vlc_bool_t b_packetizer;
+    bool b_packetizer;
 
     /*
      * Input properties
@@ -66,7 +66,7 @@ struct decoder_sys_t
     unsigned int i_rate, i_max_frame_size, i_frame_length;
     unsigned int i_layer, i_bit_rate;
 
-    vlc_bool_t   b_discontinuity;
+    bool   b_discontinuity;
 
     int i_input_rate;
 };
@@ -157,11 +157,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Misc init */
-    p_sys->b_packetizer = VLC_FALSE;
+    p_sys->b_packetizer = false;
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->bytestream = block_BytestreamInit();
-    p_sys->b_discontinuity = VLC_FALSE;
+    p_sys->b_discontinuity = false;
     p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     /* Set output properties */
@@ -187,7 +187,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     int i_ret = OpenDecoder( p_this );
 
-    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = VLC_TRUE;
+    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = true;
 
     return i_ret;
 }
@@ -216,7 +216,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 //        aout_DateSet( &p_sys->end_date, 0 );
         block_Release( *pp_block );
-        p_sys->b_discontinuity = VLC_TRUE;
+        p_sys->b_discontinuity = true;
         return NULL;
     }
 
@@ -296,7 +296,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 msg_Dbg( p_dec, "emulated startcode" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
-                p_sys->b_discontinuity = VLC_TRUE;
+                p_sys->b_discontinuity = true;
                 break;
             }
 
@@ -372,7 +372,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     msg_Dbg( p_dec, "emulated startcode on next frame" );
                     block_SkipByte( &p_sys->bytestream );
                     p_sys->i_state = STATE_NOSYNC;
-                    p_sys->b_discontinuity = VLC_TRUE;
+                    p_sys->b_discontinuity = true;
                     break;
                 }
 
@@ -452,7 +452,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_SEND_DATA:
             if( !(p_buf = GetOutBuffer( p_dec, &p_out_buffer )) )
             {
-                //p_dec->b_error = VLC_TRUE;
+                //p_dec->b_error = true;
                 return NULL;
             }
 
@@ -550,7 +550,7 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
         aout_DateIncrement( &p_sys->end_date,
                             p_sys->i_frame_length * p_sys->i_input_rate / INPUT_RATE_DEFAULT );
     p_buf->b_discontinuity = p_sys->b_discontinuity;
-    p_sys->b_discontinuity = VLC_FALSE;
+    p_sys->b_discontinuity = false;
 
     /* Hack for libmad filter */
     p_buf->i_nb_bytes = p_sys->i_frame_size + MAD_BUFFER_GUARD;
@@ -635,7 +635,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     };
 
     int i_version, i_mode, i_emphasis;
-    vlc_bool_t b_padding, b_mpeg_2_5, b_crc;
+    bool b_padding, b_mpeg_2_5, b_crc;
     int i_frame_size = 0;
     int i_bitrate_index, i_samplerate_index;
     int i_max_bit_rate;

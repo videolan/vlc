@@ -68,13 +68,13 @@ typedef struct commandparams_t
 
     struct text_style_t fontstyle; /*< text style */
 
-    vlc_bool_t b_visible; /*< visibility flag of overlay */
+    bool b_visible; /*< visibility flag of overlay */
 } commandparams_t;
 
 typedef struct commanddesc_t
 {
     const char *psz_command;
-    vlc_bool_t b_atomic;
+    bool b_atomic;
     int ( *pf_parser ) ( char *psz_command, char *psz_end,
                          commandparams_t *p_params );
     int ( *pf_execute ) ( filter_t *p_filter, const commandparams_t *p_params,
@@ -119,7 +119,7 @@ typedef struct overlay_t
 {
     int i_x, i_y;
     int i_alpha;
-    vlc_bool_t b_active;
+    bool b_active;
 
     video_format_t format;
     struct text_style_t fontstyle;
@@ -162,7 +162,7 @@ struct filter_sys_t
     commanddesc_t **pp_commands; /* array of commands */
     size_t i_commands;
 
-    vlc_bool_t b_updated, b_atomic;
+    bool b_updated, b_atomic;
     queue_t atomic, pending, processed;
     list_t overlays;
 };

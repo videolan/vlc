@@ -58,10 +58,10 @@ int E_(Import_M3U)( vlc_object_t *p_this )
     CHECK_PEEK( p_peek, 8 );
 
     if(! ( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
-           demux2_IsPathExtension( p_demux, ".m3u" ) || demux2_IsPathExtension( p_demux, ".vlc" ) ||
+           demux_IsPathExtension( p_demux, ".m3u" ) || demux_IsPathExtension( p_demux, ".vlc" ) ||
            /* A .ram file can contain a single rtsp link */
-           demux2_IsPathExtension( p_demux, ".ram" ) || demux2_IsPathExtension( p_demux, ".rm" ) ||
-           demux2_IsForced( p_demux,  "m3u" ) ) )
+           demux_IsPathExtension( p_demux, ".ram" ) || demux_IsPathExtension( p_demux, ".rm" ) ||
+           demux_IsForced( p_demux,  "m3u" ) ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
@@ -112,7 +112,7 @@ static int Demux( demux_t *p_demux )
     mtime_t    i_duration = -1;
     const char**ppsz_options = NULL;
     int        i_options = 0;
-    vlc_bool_t b_cleanup = VLC_FALSE;
+    bool b_cleanup = false;
     input_item_t *p_input;
 
     INIT_PLAYLIST_STUFF;
@@ -179,7 +179,7 @@ static int Demux( demux_t *p_demux )
             psz_mrl = E_(ProcessMRL)( psz_parse, p_demux->p_sys->psz_prefix );
             MaybeFromLocaleRep( &psz_mrl );
 
-            b_cleanup = VLC_TRUE;
+            b_cleanup = true;
             if( !psz_mrl ) goto error;
 
             p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
@@ -199,7 +199,7 @@ static int Demux( demux_t *p_demux )
         /* Fetch another line */
         free( psz_line );
         psz_line = stream_ReadLine( p_demux->s );
-        if( !psz_line ) b_cleanup = VLC_TRUE;
+        if( !psz_line ) b_cleanup = true;
 
         if( b_cleanup )
         {
@@ -214,7 +214,7 @@ static int Demux( demux_t *p_demux )
             i_parsed_duration = 0;
             i_duration = -1;
 
-            b_cleanup = VLC_FALSE;
+            b_cleanup = false;
         }
     }
     HANDLE_PLAY_AND_RELEASE;

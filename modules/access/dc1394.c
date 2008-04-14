@@ -797,7 +797,7 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    vlc_bool_t *pb;
+    bool *pb;
     int64_t    *pi64;
 
     switch( i_query )
@@ -807,8 +807,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb = VLC_FALSE;
+            pb = (bool*)va_arg( args, bool * );
+            *pb = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:

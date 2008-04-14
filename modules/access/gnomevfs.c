@@ -53,8 +53,8 @@ vlc_module_begin();
     set_shortname( "GnomeVFS" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_integer( "gnomevfs-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    set_capability( "access2", 10 );
+    add_integer( "gnomevfs-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
+    set_capability( "access", 10 );
     add_shortcut( "gnomevfs" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -75,9 +75,9 @@ struct access_sys_t
     GnomeVFSHandle *p_handle;
     GnomeVFSFileInfo *p_file_info;
 
-    vlc_bool_t b_local;
-    vlc_bool_t b_seekable;
-    vlc_bool_t b_pace_control;
+    bool b_local;
+    bool b_seekable;
+    bool b_pace_control;
 };
 
 /*****************************************************************************
@@ -110,7 +110,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_handle = p_handle;
     p_sys->i_nb_reads = 0;
-    p_sys->b_pace_control = VLC_TRUE;
+    p_sys->b_pace_control = true;
 
     if( strcmp( "gnomevfs", p_access->psz_access ) &&
                                             *(p_access->psz_access) != '\0')
@@ -217,20 +217,20 @@ static int Open( vlc_object_t *p_this )
 
     if (GNOME_VFS_FILE_INFO_LOCAL( p_sys->p_file_info ))
     {
-        p_sys->b_local = VLC_TRUE;
+        p_sys->b_local = true;
     }
 
     if( p_sys->p_file_info->type == GNOME_VFS_FILE_TYPE_REGULAR ||
         p_sys->p_file_info->type == GNOME_VFS_FILE_TYPE_CHARACTER_DEVICE ||
         p_sys->p_file_info->type == GNOME_VFS_FILE_TYPE_BLOCK_DEVICE )
     {
-        p_sys->b_seekable = VLC_TRUE;
+        p_sys->b_seekable = true;
         p_access->info.i_size = (int64_t)(p_sys->p_file_info->size);
     }
     else if( p_sys->p_file_info->type == GNOME_VFS_FILE_TYPE_FIFO
               || p_sys->p_file_info->type == GNOME_VFS_FILE_TYPE_SOCKET )
     {
-        p_sys->b_seekable = VLC_FALSE;
+        p_sys->b_seekable = false;
     }
     else
     {
@@ -295,7 +295,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
                                   (GnomeVFSFileSize)i_len, &i_read_len );
     if( i_ret )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
         if( i_ret != GNOME_VFS_ERROR_EOF )
         {
             msg_Err( p_access, "read failed (%s)",
@@ -329,7 +329,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     /* Some Acces (http) never return EOF and loop on the file */
     if( p_access->info.i_pos > p_access->info.i_size )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
         return 0;
     }
     return (int)i_read_len;
@@ -363,7 +363,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
         }
     }
     /* Reset eof */
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
 
     /* FIXME */
     return VLC_SUCCESS;
@@ -375,7 +375,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -384,13 +384,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = p_sys->b_seekable;
             break;
 
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = p_sys->b_pace_control;
             break;
 

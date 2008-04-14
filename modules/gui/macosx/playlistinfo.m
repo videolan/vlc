@@ -336,7 +336,7 @@ static VLCInfo *_o_sharedInstance = nil;
             module_Unneed( p_playlist, p_mod );
         PL_UNLOCK;
 
-        val.b_bool = VLC_TRUE;
+        val.b_bool = true;
         var_Set( p_playlist, "intf-change", val );
         [self updatePanel];
     }

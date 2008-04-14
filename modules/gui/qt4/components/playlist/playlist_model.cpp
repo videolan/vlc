@@ -168,9 +168,9 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
             PL_LOCK;
             playlist_item_t *p_target =
                         playlist_ItemGetById( p_playlist, targetItem->i_id,
-                                              VLC_TRUE );
+                                              true );
             playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId,
-                                                           VLC_TRUE );
+                                                           true );
 
             if( !p_target || !p_src )
             {
@@ -183,7 +183,7 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                 assert( parentItem );
                 playlist_item_t *p_parent =
                          playlist_ItemGetById( p_playlist, parentItem->i_id,
-                                               VLC_TRUE );
+                                               true );
                 if( !p_parent )
                 {
                     PL_UNLOCK;
@@ -260,7 +260,7 @@ void PLModel::activateItem( const QModelIndex &index )
     assert( item );
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
-                                                    VLC_TRUE);
+                                                    true);
     activateItem( p_item );
     PL_UNLOCK;
 }
@@ -276,7 +276,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
         p_parent = p_parent->p_parent;
     }
     if( p_parent )
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
                           p_parent, p_item );
 }
 
@@ -416,17 +416,17 @@ bool PLModel::hasLoop()
 }
 void PLModel::setLoop( bool on )
 {
-    var_SetBool( p_playlist, "loop", on ? VLC_TRUE:VLC_FALSE );
+    var_SetBool( p_playlist, "loop", on ? true:false );
     config_PutInt( p_playlist, "loop", on ? 1: 0 );
 }
 void PLModel::setRepeat( bool on )
 {
-    var_SetBool( p_playlist, "repeat", on ? VLC_TRUE:VLC_FALSE );
+    var_SetBool( p_playlist, "repeat", on ? true:false );
     config_PutInt( p_playlist, "repeat", on ? 1: 0 );
 }
 void PLModel::setRandom( bool on )
 {
-    var_SetBool( p_playlist, "random", on ? VLC_TRUE:VLC_FALSE );
+    var_SetBool( p_playlist, "random", on ? true:false );
     config_PutInt( p_playlist, "random", on ? 1: 0 );
 }
 
@@ -546,7 +546,7 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     PL_LOCK;
     if( !nodeItem ) goto end;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, true );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
     if( i_depth == DEPTH_SEL && p_item->p_parent &&
                         p_item->p_parent->i_id != rootItem->i_id )
@@ -615,7 +615,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
 void PLModel::UpdateNodeChildren( PLItem *root )
 {
     playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id,
-                                                    VLC_TRUE );
+                                                    true );
     UpdateNodeChildren( p_node, root );
 }
 
@@ -637,7 +637,7 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
-                                                    VLC_TRUE );
+                                                    true );
     UpdateTreeItem( p_item, item, signal, force );
 }
 
@@ -697,15 +697,15 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
 
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
-                                                    VLC_TRUE );
+                                                    true );
     if( !p_item )
     {
         PL_UNLOCK; return;
     }
     if( p_item->i_children == -1 )
-        playlist_DeleteFromInput( p_playlist, item->i_input_id, VLC_TRUE );
+        playlist_DeleteFromInput( p_playlist, item->i_input_id, true );
     else
-        playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
+        playlist_NodeDelete( p_playlist, p_item, true, false );
     /* And finally, remove it from the tree */
     item->remove( item );
     PL_UNLOCK;
@@ -744,7 +744,7 @@ next:
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         rootItem->i_id,
-                                                        VLC_TRUE );
+                                                        true );
         int i_mode;
         switch( i_flag )
         {
@@ -763,7 +763,7 @@ next:
             playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
-            p_playlist->b_reset_currently_playing = VLC_TRUE;
+            p_playlist->b_reset_currently_playing = true;
         }
     }
     PL_UNLOCK;
@@ -777,7 +777,7 @@ void PLModel::search( QString search_text )
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         rootItem->i_id,
-                                                        VLC_TRUE );
+                                                        true );
         assert( p_root );
         char *psz_name = search_text.toUtf8().data();
         playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
@@ -792,7 +792,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
     assert( index.isValid() );
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    itemId( index ), VLC_TRUE );
+                                                    itemId( index ), true );
     if( p_item )
     {
         i_popup_item = p_item->i_id;
@@ -885,7 +885,7 @@ void PLModel::popupPlay()
     PL_LOCK;
     {
         playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                        i_popup_item,VLC_TRUE );
+                                                        i_popup_item,true );
         activateItem( p_item );
     }
     PL_UNLOCK;
@@ -895,7 +895,7 @@ void PLModel::popupInfo()
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
                                                     i_popup_item,
-                                                    VLC_TRUE );
+                                                    true );
     if( p_item )
     {
         MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_item->p_input );
@@ -971,7 +971,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
 
     if( ++p_model->i_items_to_append >= 50 )
     {
-//        p_model->b_need_update = VLC_TRUE;
+//        p_model->b_need_update = true;
 //        return VLC_SUCCESS;
     }
     PLEvent *event = new PLEvent(  p_add );

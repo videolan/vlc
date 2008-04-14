@@ -203,7 +203,7 @@ void E_( asf_HeaderParse )( asf_header_t *hdr,
 
 void E_( asf_StreamSelect ) ( asf_header_t *hdr,
                               int i_bitrate_max,
-                              vlc_bool_t b_all, vlc_bool_t b_audio, vlc_bool_t b_video )
+                              bool b_all, bool b_audio, bool b_video )
 {
     /* XXX FIXME use mututal eclusion information */
     int i;

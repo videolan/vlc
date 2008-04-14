@@ -96,7 +96,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
  * \return VLC_SUCCESS or an error
  */
 int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
-                        vlc_bool_t b_delete_items )
+                        bool b_delete_items )
 {
     int i;
     if( p_root->i_children == -1 )
@@ -110,7 +110,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
         if( p_root->pp_children[i]->i_children > -1 )
         {
             playlist_NodeDelete( p_playlist, p_root->pp_children[i],
-                                 b_delete_items , VLC_FALSE );
+                                 b_delete_items , false );
         }
         else if( b_delete_items )
         {
@@ -131,7 +131,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
  * \return VLC_SUCCESS or an error
  */
 int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
-                         vlc_bool_t b_delete_items, vlc_bool_t b_force )
+                         bool b_delete_items, bool b_force )
 {
     int i;
 
@@ -300,7 +300,7 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
 void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
                                playlist_item_t **pp_node_cat,
                                playlist_item_t **pp_node_one,
-                               vlc_bool_t b_for_sd )
+                               bool b_for_sd )
 {
     *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
                                         p_playlist->p_root_category, 0, NULL );
@@ -387,7 +387,7 @@ int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
     while( 1 )
     {
         p_next = playlist_GetNextLeaf( p_playlist, p_node,
-                                       p_next, VLC_TRUE, VLC_FALSE );
+                                       p_next, true, false );
         if( p_next )
             INSERT_ELEM( *ppp_items, i_count, i_count, p_next );
         else
@@ -407,7 +407,7 @@ int playlist_GetAllEnabledChildren( playlist_t *p_playlist,
 playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
                                        playlist_item_t *p_root,
                                        playlist_item_t *p_item,
-                                       vlc_bool_t b_ena, vlc_bool_t b_unplayed )
+                                       bool b_ena, bool b_unplayed )
 {
     playlist_item_t *p_next;
 
@@ -420,16 +420,16 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
     p_next = p_item;
     while( 1 )
     {
-        vlc_bool_t b_ena_ok = VLC_TRUE, b_unplayed_ok = VLC_TRUE;
+        bool b_ena_ok = true, b_unplayed_ok = true;
         p_next = GetNextItem( p_playlist, p_root, p_next );
         if( !p_next || p_next == p_root )
             break;
         if( p_next->i_children == -1 )
         {
             if( b_ena && p_next->i_flags & PLAYLIST_DBL_FLAG )
-                b_ena_ok = VLC_FALSE;
+                b_ena_ok = false;
             if( b_unplayed && p_next->p_input->i_nb_played != 0 )
-                b_unplayed_ok = VLC_FALSE;
+                b_unplayed_ok = false;
             if( b_ena_ok && b_unplayed_ok ) break;
         }
     }
@@ -448,7 +448,7 @@ playlist_item_t *playlist_GetNextLeaf( playlist_t *p_playlist,
 playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
                                        playlist_item_t *p_root,
                                        playlist_item_t *p_item,
-                                       vlc_bool_t b_ena, vlc_bool_t b_unplayed )
+                                       bool b_ena, bool b_unplayed )
 {
     playlist_item_t *p_prev;
 
@@ -460,16 +460,16 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
     p_prev = p_item;
     while( 1 )
     {
-        vlc_bool_t b_ena_ok = VLC_TRUE, b_unplayed_ok = VLC_TRUE;
+        bool b_ena_ok = true, b_unplayed_ok = true;
         p_prev = GetPrevItem( p_playlist, p_root, p_prev );
         if( !p_prev || p_prev == p_root )
             break;
         if( p_prev->i_children == -1 )
         {
             if( b_ena && p_prev->i_flags & PLAYLIST_DBL_FLAG )
-                b_ena_ok = VLC_FALSE;
+                b_ena_ok = false;
             if( b_unplayed && p_prev->p_input->i_nb_played != 0 )
-                b_unplayed_ok = VLC_FALSE;
+                b_unplayed_ok = false;
             if( b_ena_ok && b_unplayed_ok ) break;
         }
     }
@@ -535,7 +535,7 @@ playlist_item_t *GetNextUncle( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     playlist_item_t *p_parent = p_item->p_parent;
     playlist_item_t *p_grandparent;
-    vlc_bool_t b_found = VLC_FALSE;
+    bool b_found = false;
 
     (void)p_playlist;
 
@@ -552,7 +552,7 @@ playlist_item_t *GetNextUncle( playlist_t *p_playlist, playlist_item_t *p_item,
                     PL_DEBUG2( "parent %s found as child %i of grandparent %s",
                                p_parent->p_input->psz_name, i,
                                p_grandparent->p_input->psz_name );
-                    b_found = VLC_TRUE;
+                    b_found = true;
                     break;
                 }
             }
@@ -581,7 +581,7 @@ playlist_item_t *GetPrevUncle( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     playlist_item_t *p_parent = p_item->p_parent;
     playlist_item_t *p_grandparent;
-    vlc_bool_t b_found = VLC_FALSE;
+    bool b_found = false;
 
     (void)p_playlist;
 
@@ -595,7 +595,7 @@ playlist_item_t *GetPrevUncle( playlist_t *p_playlist, playlist_item_t *p_item,
             {
                 if( p_parent == p_grandparent->pp_children[i] )
                 {
-                    b_found = VLC_TRUE;
+                    b_found = true;
                     break;
                 }
             }

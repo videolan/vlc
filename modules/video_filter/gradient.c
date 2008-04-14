@@ -82,13 +82,13 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_string( FILTER_PREFIX "mode", "gradient", NULL,
-                MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
+                MODE_TEXT, MODE_LONGTEXT, false );
         change_string_list( mode_list, mode_list_text, 0 );
 
     add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1, NULL,
-                GRADIENT_TEXT, GRADIENT_LONGTEXT, VLC_FALSE );
+                GRADIENT_TEXT, GRADIENT_LONGTEXT, false );
     add_bool( FILTER_PREFIX "cartoon", 1, NULL,
-                CARTOON_TEXT, CARTOON_LONGTEXT, VLC_FALSE );
+                CARTOON_TEXT, CARTOON_LONGTEXT, false );
 
     add_shortcut( "gradient" );
     set_callbacks( Create, Destroy );
@@ -110,7 +110,7 @@ struct filter_sys_t
 
     /* For the gradient mode */
     int i_gradient_type;
-    vlc_bool_t b_cartoon;
+    bool b_cartoon;
 
     uint32_t *p_buf32;
     uint32_t *p_buf32_bis;

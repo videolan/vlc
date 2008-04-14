@@ -2728,6 +2728,38 @@ STDMETHODIMP VLCControl2::put_MRL(BSTR mrl)
     return S_OK;
 };
 
+
+STDMETHODIMP VLCControl2::get_Toolbar(VARIANT_BOOL *visible)
+{
+    if( NULL == visible )
+        return E_POINTER;
+
+    /*
+     * Note to developpers
+     *
+     * Returning the _b_toolbar is closer to the method specification.
+     * But returning True when toolbar is not implemented so not displayed
+     * could be bad for ActiveX users which rely on this value to show their
+     * own toolbar if not provided by the ActiveX.
+     *
+     * This is the reason why FALSE is returned, until toolbar get implemented.
+     */
+
+    /* DISABLED for now */
+    //  *visible = _p_instance->getShowToolbar() ? VARIANT_TRUE: VARIANT_FALSE;
+
+    *visible = VARIANT_FALSE;
+
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl2::put_Toolbar(VARIANT_BOOL visible)
+{
+    _p_instance->setShowToolbar((VARIANT_FALSE != visible) ? TRUE: FALSE);
+    return S_OK;
+};
+
+
 STDMETHODIMP VLCControl2::get_StartTime(long *seconds)
 {
     if( NULL == seconds )

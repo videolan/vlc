@@ -35,7 +35,7 @@
     NSTextField     *o_label;
     int             i_type;
     int             i_view_type;
-    vlc_bool_t      b_advanced;
+    bool      b_advanced;
 }
 
 + (VLCConfigControl *)newControl: (module_config_t *)_p_item

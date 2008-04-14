@@ -79,7 +79,7 @@ void PlaylistDialog::dropEvent( QDropEvent *event )
         QString s = url.toString();
         if( s.length() > 0 ) {
             playlist_Add( THEPL, qtu(s), NULL,
-                          PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+                          PLAYLIST_APPEND, PLAYLIST_END, true, false );
         }
      }
      event->acceptProposedAction();

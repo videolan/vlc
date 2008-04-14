@@ -41,12 +41,12 @@ namespace wxvlc
         virtual ~InputManager();
 
         void Update();
-        vlc_bool_t IsPlaying();
+        bool IsPlaying();
 
     protected:
         void UpdateInput();
         void UpdateNowPlaying();
-        void UpdateButtons( vlc_bool_t );
+        void UpdateButtons( bool );
         void UpdateDiscButtons();
         void UpdateTime();
 
@@ -74,7 +74,7 @@ namespace wxvlc
 
         wxSlider *slider;            ///< Slider for this input
         int i_slider_pos;            ///< Current slider position
-        vlc_bool_t b_slider_free;    ///< Slider status
+        bool b_slider_free;    ///< Slider status
 
         wxBoxSizer *sizer;
 

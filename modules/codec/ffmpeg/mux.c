@@ -66,8 +66,8 @@ struct sout_mux_sys_t
     URLContext     url;
     URLProtocol    prot;
 
-    vlc_bool_t     b_write_header;
-    vlc_bool_t     b_error;
+    bool     b_write_header;
+    bool     b_error;
 
     int64_t        i_initial_dts;
 };
@@ -161,8 +161,8 @@ int E_(OpenMux)( vlc_object_t *p_this )
 #endif
     p_sys->oc->nb_streams = 0;
 
-    p_sys->b_write_header = VLC_TRUE;
-    p_sys->b_error = VLC_FALSE;
+    p_sys->b_write_header = true;
+    p_sys->b_error = false;
     p_sys->i_initial_dts = 0;
 
     return VLC_SUCCESS;
@@ -402,8 +402,8 @@ static int Mux( sout_mux_t *p_mux )
         if( av_write_header( p_sys->oc ) < 0 )
         {
             msg_Err( p_mux, "could not write header" );
-            p_sys->b_write_header = VLC_FALSE;
-            p_sys->b_error = VLC_TRUE;
+            p_sys->b_write_header = false;
+            p_sys->b_error = true;
             return VLC_EGENERIC;
         }
 
@@ -412,7 +412,7 @@ static int Mux( sout_mux_t *p_mux )
 #else
         put_flush_packet( &p_sys->oc->pb );
 #endif
-        p_sys->b_write_header = VLC_FALSE;
+        p_sys->b_write_header = false;
     }
 
     for( ;; )
@@ -429,18 +429,18 @@ static int Mux( sout_mux_t *p_mux )
  *****************************************************************************/
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
 
     switch( i_query )
     {
     case MUX_CAN_ADD_STREAM_WHILE_MUXING:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-        *pb_bool = VLC_FALSE;
+        pb_bool = (bool*)va_arg( args, bool * );
+        *pb_bool = false;
         return VLC_SUCCESS;
 
     case MUX_GET_ADD_STREAM_WAIT:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool*)va_arg( args, bool * );
+        *pb_bool = true;
         return VLC_SUCCESS;
 
     case MUX_GET_MIME:

@@ -243,7 +243,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setEnabled: YES];
         [o_sld_hue setEnabled: YES];
         [o_sld_saturation setEnabled: YES];
-        [self changeVideoFiltersString: "adjust" onOrOff: VLC_TRUE];
+        [self changeVideoFiltersString: "adjust" onOrOff: true];
     }
     else
     {
@@ -253,7 +253,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setEnabled: NO];
         [o_sld_hue setEnabled: NO];
         [o_sld_saturation setEnabled: NO];
-        [self changeVideoFiltersString: "adjust" onOrOff: VLC_FALSE];
+        [self changeVideoFiltersString: "adjust" onOrOff: false];
     }
 }
 
@@ -402,9 +402,9 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* en-/disable headphone virtualisation */
     if ([o_ckb_hdphnVirt state] == NSOnState)
-        [self changeAFiltersString: "headphone_channel_mixer" onOrOff: VLC_TRUE ];
+        [self changeAFiltersString: "headphone_channel_mixer" onOrOff: true ];
     else
-        [self changeAFiltersString: "headphone_channel_mixer" onOrOff: VLC_FALSE ];
+        [self changeAFiltersString: "headphone_channel_mixer" onOrOff: false ];
 }
 
 - (IBAction)sliderActionMaximumAudioLevel:(id)sender
@@ -638,7 +638,7 @@ static VLCExtended *_o_sharedInstance = nil;
  * methods to communicate changes to VLC's core
  *****************************************************************************/
 
-- (void)changeVoutFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add
+- (void)changeVoutFiltersString:(char *)psz_name onOrOff:(bool )b_add
 {
     /* copied from ../wxwidgets/extrapanel.cpp
      * renamed to conform with Cocoa's rules */
@@ -708,7 +708,7 @@ static VLCExtended *_o_sharedInstance = nil;
 }
 
 
-- (void)changeVideoFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add
+- (void)changeVideoFiltersString:(char *)psz_name onOrOff:(bool )b_add
 {
     /* same as changeVoutFiltersString but addressing the "video-filter"
      * variable which represents the video filter 2 modules */
@@ -774,7 +774,7 @@ static VLCExtended *_o_sharedInstance = nil;
     o_config_changed = YES;
 }
 
-- (void)changeAFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)changeAFiltersString: (char *)psz_name onOrOff: (bool )b_add;
 {
     /* copied from ../wxwidgets/extrapanel.cpp
      * renamed to conform with Cocoa's rules */
@@ -841,7 +841,7 @@ static VLCExtended *_o_sharedInstance = nil;
         int i = 0;
         while( i < p_aout->i_nb_inputs )
         {
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
             i = (i + 1);
         }
         vlc_object_release( p_aout );

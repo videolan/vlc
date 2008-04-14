@@ -162,7 +162,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when we have an interaction dialog to display
     var_Create( pIntf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( pIntf, "interaction", onInteraction, this );
-    pIntf->b_interaction = VLC_TRUE;
+    pIntf->b_interaction = true;
 
     // Callbacks for vout requests
     getIntf()->pf_request_window = &getWindow;

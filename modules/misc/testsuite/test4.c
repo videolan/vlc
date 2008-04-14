@@ -169,7 +169,7 @@ static int Callback( vlc_object_t *p_this, char const *psz_cmd,
     {
         pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
         vlc_object_attach( pp_objects[i], p_this );
-        vlc_thread_create( pp_objects[i], "foo", MyThread, 0, VLC_TRUE );
+        vlc_thread_create( pp_objects[i], "foo", MyThread, 0, true );
     }
 
     msleep( 3000000 );
@@ -385,13 +385,13 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
     for( i = 0; i < MAXTH * i_level; i++ )
     {
         pp_objects[i] = vlc_object_create( p_this, VLC_OBJECT_GENERIC );
-        vlc_thread_create( pp_objects[i], "foo", Dummy, 0, VLC_TRUE );
+        vlc_thread_create( pp_objects[i], "foo", Dummy, 0, true );
     }
 
     printf( " - killing the threads (LIFO)\n" );
     for( i = MAXTH * i_level; i--; )
     {
-        pp_objects[i]->b_die = VLC_TRUE;
+        pp_objects[i]->b_die = true;
         vlc_thread_join( pp_objects[i] );
         vlc_object_release( pp_objects[i] );
     }

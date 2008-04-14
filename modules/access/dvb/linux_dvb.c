@@ -96,7 +96,7 @@ int E_(FrontendOpen)( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t * p_frontend;
     unsigned int i_adapter, i_device;
-    vlc_bool_t b_probe;
+    bool b_probe;
     char frontend[128];
 
     i_adapter = var_GetInteger( p_access, "dvb-adapter" );
@@ -510,7 +510,7 @@ void E_(FrontendStatus)( access_t *p_access )
 
 out:
     vlc_mutex_lock( &p_sys->httpd_mutex );
-    p_sys->b_request_frontend_info = VLC_FALSE;
+    p_sys->b_request_frontend_info = false;
     vlc_cond_signal( &p_sys->httpd_cond );
     vlc_mutex_unlock( &p_sys->httpd_mutex );
 }
@@ -1517,10 +1517,10 @@ int E_(CAMOpen)( access_t *p_access )
     }
 
     p_sys->i_nb_slots = caps.slot_num;
-    memset( p_sys->pb_active_slot, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
-    memset( p_sys->pb_slot_mmi_expected, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
+    memset( p_sys->pb_active_slot, 0, sizeof(bool) * MAX_CI_SLOTS );
+    memset( p_sys->pb_slot_mmi_expected, 0, sizeof(bool) * MAX_CI_SLOTS );
     memset( p_sys->pb_slot_mmi_undisplayed, 0,
-            sizeof(vlc_bool_t) * MAX_CI_SLOTS );
+            sizeof(bool) * MAX_CI_SLOTS );
 
     return E_(en50221_Init)( p_access );
 }
@@ -1571,7 +1571,7 @@ void E_(CAMStatus)( access_t * p_access )
          * the user input to avoid confusing the CAM. */
         for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
         {
-            if ( p_sys->pb_slot_mmi_undisplayed[i_slot] == VLC_TRUE )
+            if ( p_sys->pb_slot_mmi_undisplayed[i_slot] == true )
             {
                 p_sys->psz_request = NULL;
                 msg_Dbg( p_access,
@@ -1588,7 +1588,7 @@ void E_(CAMStatus)( access_t * p_access )
         char *psz_request = p_sys->psz_request;
         char psz_value[255];
         int i_slot;
-        vlc_bool_t b_ok = VLC_FALSE;
+        bool b_ok = false;
 
         p_sys->psz_request = NULL;
 
@@ -1617,7 +1617,7 @@ void E_(CAMStatus)( access_t * p_access )
         if ( E_(HTTPExtractValue)( psz_request, "cancel", psz_value,
                                    sizeof(psz_value) ) == NULL )
         {
-            b_ok = VLC_TRUE;
+            b_ok = true;
         }
 
         if ( E_(HTTPExtractValue)( psz_request, "type", psz_value,
@@ -1631,7 +1631,7 @@ void E_(CAMStatus)( access_t * p_access )
         {
             mmi_object.i_object_type = EN50221_MMI_ANSW;
             mmi_object.u.answ.b_ok = b_ok;
-            if ( b_ok == VLC_FALSE )
+            if ( b_ok == false )
             {
                 mmi_object.u.answ.psz_answ = strdup("");
             }
@@ -1650,7 +1650,7 @@ void E_(CAMStatus)( access_t * p_access )
         else
         {
             mmi_object.i_object_type = EN50221_MMI_MENU_ANSW;
-            if ( b_ok == VLC_FALSE )
+            if ( b_ok == false )
             {
                 mmi_object.u.menu_answ.i_choice = 0;
             }
@@ -1671,7 +1671,7 @@ void E_(CAMStatus)( access_t * p_access )
     /* Check that we have all necessary MMI information. */
     for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
     {
-        if ( p_sys->pb_slot_mmi_expected[i_slot] == VLC_TRUE )
+        if ( p_sys->pb_slot_mmi_expected[i_slot] == true )
             return;
     }
 
@@ -1716,7 +1716,7 @@ void E_(CAMStatus)( access_t * p_access )
     {
         ca_slot_info_t sinfo;
 
-        p_sys->pb_slot_mmi_undisplayed[i_slot] = VLC_FALSE;
+        p_sys->pb_slot_mmi_undisplayed[i_slot] = false;
         p += sprintf( p, "<p>CA slot #%d: ", i_slot );
 
         sinfo.num = i_slot;
@@ -1759,7 +1759,7 @@ void E_(CAMStatus)( access_t * p_access )
                     p += sprintf( p, "<input type=hidden name=type value=enq>\n" );
                     p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
                                   p_object->u.enq.psz_text );
-                    if ( p_object->u.enq.b_blind == VLC_FALSE )
+                    if ( p_object->u.enq.b_blind == false )
                         p += sprintf( p, "<tr><td><input type=text name=answ></td></tr>\n" );
                     else
                         p += sprintf( p, "<tr><td><input type=password name=answ></td></tr>\n" );
@@ -1809,7 +1809,7 @@ void E_(CAMStatus)( access_t * p_access )
 
 out:
     vlc_mutex_lock( &p_sys->httpd_mutex );
-    p_sys->b_request_mmi_info = VLC_FALSE;
+    p_sys->b_request_mmi_info = false;
     vlc_cond_signal( &p_sys->httpd_cond );
     vlc_mutex_unlock( &p_sys->httpd_mutex );
 }

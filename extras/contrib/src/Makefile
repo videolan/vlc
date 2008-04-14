@@ -148,9 +148,10 @@ FFMPEGCONF += --disable-mmx
 endif
 
 ifdef HAVE_DARWIN_OS
-X264CONF += --enable-pic
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
+else
+X264CONF += --enable-pic
 endif
 endif
 
@@ -1374,8 +1375,13 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
   endif
 else
-.x264: x264
+ifdef HAVE_DARWIN_OS_ON_INTEL
+  .x264: x264 .yasm
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+else
+  .x264: x264
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+endif
 endif
 	touch $@
 
@@ -2229,27 +2235,22 @@ CLEAN_PKG += clinkcc
 DISTCLEAN_PKG += clinkcc$(CLINKCC_VERSION).tar.gz
 
 # ***************************************************************************
-# NASM assembler
+# YASM assembler
 # ***************************************************************************
 
-nasm-$(NASM_VERSION).tar.bz2:
-	$(WGET) $(NASM_URL)
+yasm-$(YASM_VERSION).tar.gz:
+	$(WGET) $(YASM_URL)
 
-nasm: nasm-$(NASM_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+yasm: yasm-$(YASM_VERSION).tar.gz
+	$(EXTRACT_GZ)
 
-#nasm:
-#	echo $(NASM_CVSROOT) A > ./nasm.cvs
-#	CVS_PASSFILE=./nasm.cvs cvs -z3 -d $(NASM_CVSROOT) co nasm
-#	(cd $@ && autoconf && autoheader)
-
-.nasm: nasm
+.yasm: yasm
 	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
-CLEAN_FILE += .nasm
-CLEAN_PKG += nasm nasm.cvs
-DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.bz2
+CLEAN_FILE += .yasm
+CLEAN_PKG += yasm
+DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.bz2
 
 # ***************************************************************************
 # Copy aclocal files
@@ -2291,12 +2292,15 @@ taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_WIN32
+	patch -p0 < Patches/taglib.patch
+endif
 ifdef HAVE_CYGWIN
-	patch -p0 <Patches/taglib-cygwin.patch
+	patch -p0 < Patches/taglib-cygwin.patch
 endif
 
 .tag: taglib
-	(cd $<; $(HOSTCC) CXXFLAGS="-DMAKE_TAGLIB_LIB" ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 

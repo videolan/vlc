@@ -61,21 +61,21 @@ struct xml_elem_hnd
     int type;
     union
     {
-        vlc_bool_t (*smpl) SIMPLE_INTERFACE;
-        vlc_bool_t (*cmplx) COMPLEX_INTERFACE;
+        bool (*smpl) SIMPLE_INTERFACE;
+        bool (*cmplx) COMPLEX_INTERFACE;
     } pf_handler;
 };
 typedef struct xml_elem_hnd xml_elem_hnd_t;
 
 /* prototypes */
-static vlc_bool_t parse_plist_node COMPLEX_INTERFACE;
-static vlc_bool_t skip_element COMPLEX_INTERFACE;
-static vlc_bool_t parse_dict COMPLEX_INTERFACE;
-static vlc_bool_t parse_plist_dict COMPLEX_INTERFACE;
-static vlc_bool_t parse_tracks_dict COMPLEX_INTERFACE;
-static vlc_bool_t parse_track_dict COMPLEX_INTERFACE;
-static vlc_bool_t save_data SIMPLE_INTERFACE;
-static vlc_bool_t add_meta( input_item_t*, track_elem_t* );
+static bool parse_plist_node COMPLEX_INTERFACE;
+static bool skip_element COMPLEX_INTERFACE;
+static bool parse_dict COMPLEX_INTERFACE;
+static bool parse_plist_dict COMPLEX_INTERFACE;
+static bool parse_tracks_dict COMPLEX_INTERFACE;
+static bool parse_track_dict COMPLEX_INTERFACE;
+static bool save_data SIMPLE_INTERFACE;
+static bool add_meta( input_item_t*, track_elem_t* );
 static track_elem_t *new_track( void );
 static void free_track( track_elem_t* );
 

@@ -384,7 +384,7 @@ config_Write (FILE *file, const char *type, const char *desc,
  * Really stupid no ?
  *****************************************************************************/
 static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
-                           vlc_bool_t b_autosave )
+                           bool b_autosave )
 {
     module_t *p_parser;
     vlc_list_t *p_list;
@@ -392,7 +392,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     char p_line[1024], *p_index2;
     int i_sizebuf = 0;
     char *p_bigbuffer, *p_index;
-    vlc_bool_t b_backup;
+    bool b_backup;
     int i_index;
 
     /* Acquire config file lock */
@@ -534,7 +534,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         {
             /* Do not save the new value in the configuration file
              * if doing an autosave, and the item is not an "autosaved" one. */
-            vlc_bool_t b_retain = b_autosave && !p_item->b_autosave;
+            bool b_retain = b_autosave && !p_item->b_autosave;
 
             if ((p_item->i_type & CONFIG_HINT) /* ignore hint */
              || p_item->b_removed              /* ignore deprecated option */
@@ -606,7 +606,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             }
 
             if (!b_retain)
-                p_item->b_dirty = VLC_FALSE;
+                p_item->b_dirty = false;
         }
     }
 
@@ -654,12 +654,12 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
 
     if( i_index == i_count ) return VLC_SUCCESS;
-    return SaveConfigFile( p_this, 0, VLC_TRUE );
+    return SaveConfigFile( p_this, 0, true );
 }
 
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
-    return SaveConfigFile( p_this, psz_module_name, VLC_FALSE );
+    return SaveConfigFile( p_this, psz_module_name, false );
 }
 
 /**

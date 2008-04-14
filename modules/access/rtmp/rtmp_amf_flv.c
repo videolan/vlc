@@ -276,7 +276,7 @@ int rtmp_handshake_passive( vlc_object_t *p_this )
     int i;
 
     /* Receive handshake */
-    i_ret = net_Read( p_access, p_sys->fd, NULL, p_read, RTMP_HANDSHAKE_BODY_SIZE + 1, VLC_TRUE );
+    i_ret = net_Read( p_access, p_sys->fd, NULL, p_read, RTMP_HANDSHAKE_BODY_SIZE + 1, true );
     if( i_ret != RTMP_HANDSHAKE_BODY_SIZE + 1 )
     {
         msg_Err( p_access, "failed to receive handshake" );
@@ -304,7 +304,7 @@ int rtmp_handshake_passive( vlc_object_t *p_this )
     }
 
     /* Receive acknowledge */
-    i_ret = net_Read( p_access, p_sys->fd, NULL, p_read, RTMP_HANDSHAKE_BODY_SIZE, VLC_TRUE );
+    i_ret = net_Read( p_access, p_sys->fd, NULL, p_read, RTMP_HANDSHAKE_BODY_SIZE, true );
     if( i_ret != RTMP_HANDSHAKE_BODY_SIZE )
     {
         msg_Err( p_access, "failed to receive acknowledge" );
@@ -346,7 +346,7 @@ int rtmp_handshake_active( vlc_object_t *p_this )
     }
 
     /* Receive handshake */
-    i_ret = net_Read( p_access, p_sys->fd, NULL, p_read, RTMP_HANDSHAKE_BODY_SIZE * 2 + 1, VLC_TRUE );
+    i_ret = net_Read( p_access, p_sys->fd, NULL, p_read, RTMP_HANDSHAKE_BODY_SIZE * 2 + 1, true );
     if( i_ret != RTMP_HANDSHAKE_BODY_SIZE * 2 + 1 )
     {
         msg_Err( p_access, "failed to receive handshake" );
@@ -899,7 +899,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
     ssize_t i_ret;
     int i;
 
-    i_ret = net_Read( p_thread, p_thread->fd, NULL, p_read, 1, VLC_TRUE );
+    i_ret = net_Read( p_thread, p_thread->fd, NULL, p_read, 1, true );
     if( i_ret != 1 )
     {
         msg_Err( p_thread, "rtmp_read_net_packet: net_Read error");
@@ -912,7 +912,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
     rtmp_packet->length_header = rtmp_decode_header_size( (vlc_object_t *) p_thread, p_read[0] & RTMP_HEADER_SIZE_MASK );
     rtmp_packet->stream_index = p_read[0] & RTMP_HEADER_STREAM_INDEX_MASK;
 
-    i_ret = net_Read( p_thread, p_thread->fd, NULL, p_read + 1, rtmp_packet->length_header - 1, VLC_TRUE );
+    i_ret = net_Read( p_thread, p_thread->fd, NULL, p_read + 1, rtmp_packet->length_header - 1, true );
     if( i_ret != rtmp_packet->length_header - 1 )
         goto error;
 
@@ -981,17 +981,17 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
     for(i = 0; i < interchunk_headers; i++)
     {
         i_ret = net_Read( p_thread, p_thread->fd, NULL,
-            rtmp_packet->body->body + (i * AMF_PACKET_SIZE_VIDEO), AMF_PACKET_SIZE_VIDEO, VLC_TRUE );
+            rtmp_packet->body->body + (i * AMF_PACKET_SIZE_VIDEO), AMF_PACKET_SIZE_VIDEO, true );
         if( i_ret != AMF_PACKET_SIZE_VIDEO )
             goto error2;
-        i_ret = net_Read( p_thread, p_thread->fd, NULL, &trash, 1, VLC_TRUE );
+        i_ret = net_Read( p_thread, p_thread->fd, NULL, &trash, 1, true );
         if( i_ret != 1 )
             goto error2;
     }
 
     i_ret = net_Read( p_thread, p_thread->fd, NULL,
         rtmp_packet->body->body + (i * AMF_PACKET_SIZE_VIDEO),
-        rtmp_packet->body->length_body - (i * AMF_PACKET_SIZE_VIDEO), VLC_TRUE );
+        rtmp_packet->body->length_body - (i * AMF_PACKET_SIZE_VIDEO), true );
     if( i_ret != rtmp_packet->body->length_body - (i * AMF_PACKET_SIZE_VIDEO) )
         goto error2;
 

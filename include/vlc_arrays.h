@@ -514,7 +514,7 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
 
 static inline void
 __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
-                         void * p_value, vlc_bool_t rebuild )
+                         void * p_value, bool rebuild )
 {
     if( !p_dict->p_entries )
         vlc_dictionary_init( p_dict, 1 );

@@ -107,29 +107,29 @@ vlc_module_begin();
     set_capability( "video filter", 0 );
 
     add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
-                                             GEOMETRY_LONGTEXT, VLC_FALSE );
+                                             GEOMETRY_LONGTEXT, false );
     add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT,
-                                   AUTOCROP_LONGTEXT, VLC_FALSE );
+                                   AUTOCROP_LONGTEXT, false );
 
 #ifdef BEST_AUTOCROP
     add_integer_with_range( "autocrop-ratio-max", 2405, 0, RATIO_MAX, NULL,
-                            RATIOMAX_TEXT, RATIOMAX_LONGTEXT, VLC_TRUE );
+                            RATIOMAX_TEXT, RATIOMAX_LONGTEXT, true );
 
     add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, NULL, RATIO_TEXT,
-                            RATIO_LONGTEXT, VLC_FALSE );
+                            RATIO_LONGTEXT, false );
     add_integer( "autocrop-time", 25, NULL, TIME_TEXT,
-                 TIME_LONGTEXT, VLC_TRUE );
+                 TIME_LONGTEXT, true );
     add_integer( "autocrop-diff", 16, NULL, DIFF_TEXT,
-                                            DIFF_LONGTEXT, VLC_TRUE );
+                                            DIFF_LONGTEXT, true );
 
     add_integer( "autocrop-non-black-pixels", 3, NULL,
-                 NBP_TEXT, NBP_LONGTEXT, VLC_TRUE );
+                 NBP_TEXT, NBP_LONGTEXT, true );
 
     add_integer_with_range( "autocrop-skip-percent", 17, 0, 100, NULL,
-                            SKIP_TEXT, SKIP_LONGTEXT, VLC_TRUE );
+                            SKIP_TEXT, SKIP_LONGTEXT, true );
 
     add_integer_with_range( "autocrop-luminance-threshold", 40, 0, 128, NULL,
-                            LUM_TEXT, LUM_LONGTEXT, VLC_TRUE );
+                            LUM_TEXT, LUM_LONGTEXT, true );
 #endif //BEST_AUTOCROP
 
     add_shortcut( "crop" );
@@ -149,11 +149,11 @@ struct vout_sys_t
     unsigned int i_x, i_y;
     unsigned int i_width, i_height, i_aspect;
 
-    vlc_bool_t b_autocrop;
+    bool b_autocrop;
 
     /* Autocrop specific variables */
     unsigned int i_lastchange;
-    vlc_bool_t   b_changed;
+    bool   b_changed;
 #ifdef BEST_AUTOCROP
     unsigned int i_ratio_max;
     unsigned int i_threshold, i_skipPercent, i_nonBlackPixel, i_diff, i_time;
@@ -211,7 +211,7 @@ static int Init( vout_thread_t *p_vout )
     memset( &fmt, 0, sizeof(video_format_t) );
 
     p_vout->p_sys->i_lastchange = 0;
-    p_vout->p_sys->b_changed = VLC_FALSE;
+    p_vout->p_sys->b_changed = false;
 
     /* Initialize the output structure */
     p_vout->output.i_chroma = p_vout->render.i_chroma;
@@ -377,7 +377,7 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        intf_UserFatal( p_vout, VLC_FALSE, _("Cropping failed"),
+        intf_UserFatal( p_vout, false, _("Cropping failed"),
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
@@ -471,12 +471,12 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        intf_UserFatal( p_vout, VLC_FALSE, _("Cropping failed"),
+        intf_UserFatal( p_vout, false, _("Cropping failed"),
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
 
-    p_vout->p_sys->b_changed = VLC_FALSE;
+    p_vout->p_sys->b_changed = false;
     p_vout->p_sys->i_lastchange = 0;
 
     return VLC_SUCCESS;
@@ -551,7 +551,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 #ifdef BEST_AUTOCROP
-static vlc_bool_t NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
+static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
                                int i_visible_pitch, int i_lines,
                                int i_lumThreshold, int i_skipCountPercent,
                                int i_nonBlackPixel, int i_chroma)
@@ -825,7 +825,7 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
                             * p_vout->output.i_height / p_vout->p_sys->i_height
                             * p_vout->p_sys->i_width / p_vout->output.i_width;
 
-    p_vout->p_sys->b_changed = VLC_TRUE;
+    p_vout->p_sys->b_changed = true;
 }
 
 /*****************************************************************************
@@ -884,7 +884,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_var,
         {
             p_vout->p_sys->i_ratio = (unsigned int)atoi(newval.psz_string);
             p_vout->p_sys->i_lastchange = p_vout->p_sys->i_time;
-            p_vout->p_sys->b_autocrop = VLC_TRUE;
+            p_vout->p_sys->b_autocrop = true;
         }
         if (p_vout->p_sys->i_ratio)
         {

@@ -35,7 +35,7 @@
 typedef struct
 {
     int64_t     id;
-    vlc_bool_t  b_enabled;
+    bool  b_enabled;
 
     /* */
     char *psz_name;
@@ -50,10 +50,10 @@ typedef struct
     char *psz_output;
 
     /* */
-    vlc_bool_t b_vod;
+    bool b_vod;
     struct
     {
-        vlc_bool_t b_loop;
+        bool b_loop;
     } broadcast;
     struct
     {
@@ -70,7 +70,7 @@ typedef struct
     int64_t     i_time;
     int64_t     i_length;
     double      d_position;
-    vlc_bool_t  b_paused;
+    bool  b_paused;
     int         i_rate;     // normal is INPUT_RATE_DEFAULT
 } vlm_media_instance_t;
 
@@ -170,10 +170,10 @@ static inline void vlm_media_Init( vlm_media_t *p_media )
     TAB_INIT( p_media->i_input, p_media->ppsz_input );
     TAB_INIT( p_media->i_option, p_media->ppsz_option );
     p_media->psz_output = NULL;
-    p_media->b_vod = VLC_FALSE;
+    p_media->b_vod = false;
 
     p_media->vod.psz_mux = NULL;
-    p_media->broadcast.b_loop = VLC_FALSE;
+    p_media->broadcast.b_loop = false;
 }
 
 static inline void vlm_media_Copy( vlm_media_t *p_dst, vlm_media_t *p_src )
@@ -250,7 +250,7 @@ static inline void vlm_media_instance_Init( vlm_media_instance_t *p_instance )
     p_instance->i_time = 0;
     p_instance->i_length = 0;
     p_instance->d_position = 0.0;
-    p_instance->b_paused = VLC_FALSE;
+    p_instance->b_paused = false;
     p_instance->i_rate = INPUT_RATE_DEFAULT;
 }
 static inline void vlm_media_instance_Clean( vlm_media_instance_t *p_instance )

@@ -62,7 +62,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     p_aout->output.b_starving = 1;
 
     var_Create( p_aout, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 
     return p_aout;
@@ -491,10 +491,10 @@ int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in,
                               uint32_t i_channel_mask,
                               int i_channels, int *pi_chan_table )
 {
-    vlc_bool_t b_chan_reorder = VLC_FALSE;
+    bool b_chan_reorder = false;
     int i, j, k, l;
 
-    if( i_channels > AOUT_CHAN_MAX ) return VLC_FALSE;
+    if( i_channels > AOUT_CHAN_MAX ) return false;
 
     for( i = 0, j = 0; pi_chan_order_in[i]; i++ )
     {
@@ -510,7 +510,7 @@ int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in,
 
     for( i = 0; i < i_channels; i++ )
     {
-        if( pi_chan_table[i] != i ) b_chan_reorder = VLC_TRUE;
+        if( pi_chan_table[i] != i ) b_chan_reorder = true;
     }
 
     return b_chan_reorder;

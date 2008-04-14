@@ -108,9 +108,9 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
-    p_intf->b_play = VLC_TRUE;
+    p_intf->b_play = true;
     p_intf->pf_run = Run;
-    p_intf->b_should_run_on_first_thread = VLC_TRUE;
+    p_intf->b_should_run_on_first_thread = true;
 
     return( 0 );
 }
@@ -270,10 +270,10 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_playlist_update = VLC_TRUE;
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
-    p_intf->p_sys->b_playmode_update = VLC_TRUE;
-    p_intf->p_sys->b_current_title_update = VLC_TRUE;
+    p_intf->p_sys->b_playlist_update = true;
+    p_intf->p_sys->b_intf_update = true;
+    p_intf->p_sys->b_playmode_update = true;
+    p_intf->p_sys->b_current_title_update = true;
     return VLC_SUCCESS;
 }
 
@@ -286,7 +286,7 @@ static int ShowController( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_intf_show = VLC_TRUE;
+    p_intf->p_sys->b_intf_show = true;
     return VLC_SUCCESS;
 }
 
@@ -298,7 +298,7 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_fullscreen_update = VLC_TRUE;
+    p_intf->p_sys->b_fullscreen_update = true;
     return VLC_SUCCESS;
 }
 
@@ -560,10 +560,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* Check if we need to start playing */
     if( p_intf->b_play )
     {
-        playlist_Control( p_playlist, PLAYLIST_PLAY, VLC_FALSE );
+        playlist_Control( p_playlist, PLAYLIST_PLAY, false );
     }
     var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-    val.b_bool = VLC_FALSE;
+    val.b_bool = false;
 
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback( p_playlist, "intf-show", ShowController, self);
@@ -572,10 +572,10 @@ static VLCMain *_o_sharedMainInstance = nil;
  
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
-    p_intf->b_interaction = VLC_TRUE;
+    p_intf->b_interaction = true;
 
     /* update the playmode stuff */
-    p_intf->p_sys->b_playmode_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = true;
 
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(refreshVoutDeviceMenu:)
@@ -1251,13 +1251,13 @@ static VLCMain *_o_sharedMainInstance = nil;
             if( p_intf->p_sys->p_input )
             {
                 msg_Dbg( p_intf, "input has changed, refreshing interface" );
-                p_intf->p_sys->b_input_update = VLC_TRUE;
+                p_intf->p_sys->b_input_update = true;
             }
         }
         else if( p_intf->p_sys->p_input->b_die || p_intf->p_sys->p_input->b_dead )
         {
             /* input stopped */
-            p_intf->p_sys->b_intf_update = VLC_TRUE;
+            p_intf->p_sys->b_intf_update = true;
             p_intf->p_sys->i_play_status = END_S;
             msg_Dbg( p_intf, "input has stopped, refreshing interface" );
             p_intf->p_sys->p_input = NULL;
@@ -1278,7 +1278,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t * p_playlist;
     input_thread_t * p_input;
 
-    if( p_intf->p_libvlc->b_die == VLC_TRUE )
+    if( p_intf->p_libvlc->b_die == true )
     {
         [o_timer invalidate];
         return;
@@ -1287,17 +1287,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( p_intf->p_sys->b_input_update )
     {
         /* Called when new input is opened */
-        p_intf->p_sys->b_current_title_update = VLC_TRUE;
-        p_intf->p_sys->b_intf_update = VLC_TRUE;
-        p_intf->p_sys->b_input_update = VLC_FALSE;
+        p_intf->p_sys->b_current_title_update = true;
+        p_intf->p_sys->b_intf_update = true;
+        p_intf->p_sys->b_input_update = false;
     }
     if( p_intf->p_sys->b_intf_update )
     {
-        vlc_bool_t b_input = VLC_FALSE;
-        vlc_bool_t b_plmul = VLC_FALSE;
-        vlc_bool_t b_control = VLC_FALSE;
-        vlc_bool_t b_seekable = VLC_FALSE;
-        vlc_bool_t b_chapters = VLC_FALSE;
+        bool b_input = false;
+        bool b_plmul = false;
+        bool b_control = false;
+        bool b_seekable = false;
+        bool b_chapters = false;
 
         playlist_t * p_playlist = pl_Yield( p_intf );
     /* TODO: fix i_size use */
@@ -1333,32 +1333,32 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         [o_embedded_window setSeekable: b_seekable];
 
-        p_intf->p_sys->b_current_title_update = VLC_TRUE;
+        p_intf->p_sys->b_current_title_update = true;
         
-        p_intf->p_sys->b_intf_update = VLC_FALSE;
+        p_intf->p_sys->b_intf_update = false;
     }
 
     if( p_intf->p_sys->b_playmode_update )
     {
         [o_playlist playModeUpdated];
-        p_intf->p_sys->b_playmode_update = VLC_FALSE;
+        p_intf->p_sys->b_playmode_update = false;
     }
     if( p_intf->p_sys->b_playlist_update )
     {
         [o_playlist playlistUpdated];
-        p_intf->p_sys->b_playlist_update = VLC_FALSE;
+        p_intf->p_sys->b_playlist_update = false;
     }
 
     if( p_intf->p_sys->b_fullscreen_update )
     {
-        p_intf->p_sys->b_fullscreen_update = VLC_FALSE;
+        p_intf->p_sys->b_fullscreen_update = false;
     }
 
     if( p_intf->p_sys->b_intf_show )
     {
         [o_window makeKeyAndOrderFront: self];
 
-        p_intf->p_sys->b_intf_show = VLC_FALSE;
+        p_intf->p_sys->b_intf_show = false;
     }
 
     p_playlist = pl_Yield( p_intf );
@@ -1444,7 +1444,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
     {
         p_intf->p_sys->i_play_status = END_S;
-        p_intf->p_sys->b_intf_update = VLC_TRUE;
+        p_intf->p_sys->b_intf_update = true;
         [self playStatusUpdated: p_intf->p_sys->i_play_status];
         [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];
@@ -1785,7 +1785,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_extended savePrefs];
     }
  
-    p_intf->b_interaction = VLC_FALSE;
+    p_intf->b_interaction = false;
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
 
     /* remove global observer watching for vout device changes correctly */
@@ -2034,7 +2034,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_update showUpdateWindow];
 #else
     msg_Err( VLCIntf, "Update checker wasn't enabled in this build" );
-    intf_UserFatal( VLCIntf, VLC_FALSE, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
+    intf_UserFatal( VLCIntf, false, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
 #endif
 }
 

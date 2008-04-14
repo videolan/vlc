@@ -45,8 +45,8 @@
 struct intf_sys_t
 {
     vlc_object_t *      p_vout;
-    vlc_bool_t          b_got_gesture;
-    vlc_bool_t          b_button_pressed;
+    bool          b_got_gesture;
+    bool          b_button_pressed;
     int                 i_mouse_x, i_mouse_y;
     int                 i_last_x, i_last_y;
     unsigned int        i_pattern;
@@ -95,9 +95,9 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_integer( "gestures-threshold", 30, NULL,
-                 THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
+                 THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true );
     add_string( "gestures-button", "right", NULL,
-                BUTTON_TEXT, BUTTON_LONGTEXT, VLC_FALSE );
+                BUTTON_TEXT, BUTTON_LONGTEXT, false );
         change_string_list( button_list, button_list_text, 0 );
     set_description( _("Mouse gestures control interface") );
 
@@ -435,7 +435,7 @@ static void RunIntf( intf_thread_t *p_intf )
             }
             p_intf->p_sys->i_num_gestures = 0;
             p_intf->p_sys->i_pattern = 0;
-            p_intf->p_sys->b_got_gesture = VLC_FALSE;
+            p_intf->p_sys->b_got_gesture = false;
         }
 
         /*
@@ -489,8 +489,8 @@ static int InitThread( intf_thread_t * p_intf )
          *   during those operations */
         vlc_mutex_lock( &p_intf->change_lock );
 
-        p_intf->p_sys->b_got_gesture = VLC_FALSE;
-        p_intf->p_sys->b_button_pressed = VLC_FALSE;
+        p_intf->p_sys->b_got_gesture = false;
+        p_intf->p_sys->b_button_pressed = false;
         p_intf->p_sys->i_threshold =
                      config_GetInt( p_intf, "gestures-threshold" );
         psz_button = config_GetPsz( p_intf, "gestures-button" );
@@ -611,7 +611,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         && newval.i_int & p_intf->p_sys->i_button_mask
         && !p_intf->p_sys->b_button_pressed )
     {
-        p_intf->p_sys->b_button_pressed = VLC_TRUE;
+        p_intf->p_sys->b_button_pressed = true;
         var_Get( p_intf->p_sys->p_vout, "mouse-x", &val );
         p_intf->p_sys->i_last_x = val.i_int;
         var_Get( p_intf->p_sys->p_vout, "mouse-y", &val );
@@ -621,8 +621,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         && !( newval.i_int & p_intf->p_sys->i_button_mask )
         && p_intf->p_sys->b_button_pressed )
     {
-        p_intf->p_sys->b_button_pressed = VLC_FALSE;
-        p_intf->p_sys->b_got_gesture = VLC_TRUE;
+        p_intf->p_sys->b_button_pressed = false;
+        p_intf->p_sys->b_got_gesture = true;
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );

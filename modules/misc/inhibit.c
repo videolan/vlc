@@ -113,7 +113,7 @@ static void Deactivate( vlc_object_t *p_this )
  * Inhibit: Notify the power management daemon that it shouldn't suspend
  * the computer because of inactivity
  *
- * returns VLC_FALSE if Out of memory, else VLC_TRUE
+ * returns false if Out of memory, else true
  *****************************************************************************/
 static int Inhibit( intf_thread_t *p_intf )
 {
@@ -130,7 +130,7 @@ static int Inhibit( intf_thread_t *p_intf )
     p_msg = dbus_message_new_method_call( PM_SERVICE, PM_PATH, PM_INTERFACE,
                                           "Inhibit" );
     if( !p_msg )
-        return VLC_FALSE;
+        return false;
 
     dbus_message_iter_init_append( p_msg, &args );
 
@@ -139,7 +139,7 @@ static int Inhibit( intf_thread_t *p_intf )
     {
         free( psz_app );
         dbus_message_unref( p_msg );
-        return VLC_FALSE;
+        return false;
     }
     free( psz_app );
 
@@ -147,14 +147,14 @@ static int Inhibit( intf_thread_t *p_intf )
     if( !psz_inhibit_reason )
     {
         dbus_message_unref( p_msg );
-        return VLC_FALSE;
+        return false;
     }
     if( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING,
                                          &psz_inhibit_reason ) )
     {
         free( psz_inhibit_reason );
         dbus_message_unref( p_msg );
-        return VLC_FALSE;
+        return false;
     }
     free( psz_inhibit_reason );
 
@@ -164,7 +164,7 @@ static int Inhibit( intf_thread_t *p_intf )
     dbus_message_unref( p_msg );
     if( p_reply == NULL )
     {   /* g-p-m is not active, or too slow. Better luck next time? */
-        return VLC_TRUE;
+        return true;
     }
 
     /* extract the cookie from the reply */
@@ -172,18 +172,18 @@ static int Inhibit( intf_thread_t *p_intf )
             DBUS_TYPE_UINT32, &i_cookie,
             DBUS_TYPE_INVALID ) == FALSE )
     {
-        return VLC_FALSE;
+        return false;
     }
 
     /* Save the cookie */
     p_intf->p_sys->i_cookie = i_cookie;
-    return VLC_TRUE;
+    return true;
 }
 
 /*****************************************************************************
  * UnInhibit: Notify the power management daemon that we aren't active anymore
  *
- * returns VLC_FALSE if Out of memory, else VLC_TRUE
+ * returns false if Out of memory, else true
  *****************************************************************************/
 static int UnInhibit( intf_thread_t *p_intf )
 {
@@ -199,7 +199,7 @@ static int UnInhibit( intf_thread_t *p_intf )
     p_msg = dbus_message_new_method_call( PM_SERVICE, PM_PATH, PM_INTERFACE,
                                           "UnInhibit" );
     if( !p_msg )
-        return VLC_FALSE;
+        return false;
 
     dbus_message_iter_init_append( p_msg, &args );
 
@@ -207,17 +207,17 @@ static int UnInhibit( intf_thread_t *p_intf )
     if( !dbus_message_iter_append_basic( &args, DBUS_TYPE_UINT32, &i_cookie ) )
     {
         dbus_message_unref( p_msg );
-        return VLC_FALSE;
+        return false;
     }
 
     if( !dbus_connection_send( p_conn, p_msg, NULL ) )
-        return VLC_FALSE;
+        return false;
     dbus_connection_flush( p_conn );
 
     dbus_message_unref( p_msg );
 
     p_intf->p_sys->i_cookie = 0;
-    return VLC_TRUE;
+    return true;
 }
 
 /*****************************************************************************

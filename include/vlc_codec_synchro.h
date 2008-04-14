@@ -44,10 +44,10 @@
 VLC_EXPORT( decoder_synchro_t *, decoder_SynchroInit, ( decoder_t *, int ) );
 VLC_EXPORT( void, decoder_SynchroRelease,        ( decoder_synchro_t * ) );
 VLC_EXPORT( void, decoder_SynchroReset,          ( decoder_synchro_t * ) );
-VLC_EXPORT( vlc_bool_t, decoder_SynchroChoose,   ( decoder_synchro_t *, int, int, vlc_bool_t ) );
+VLC_EXPORT( bool, decoder_SynchroChoose,   ( decoder_synchro_t *, int, int, bool ) );
 VLC_EXPORT( void, decoder_SynchroTrash,          ( decoder_synchro_t * ) );
 VLC_EXPORT( void, decoder_SynchroDecode,         ( decoder_synchro_t * ) );
-VLC_EXPORT( void, decoder_SynchroEnd,            ( decoder_synchro_t *, int, vlc_bool_t ) );
+VLC_EXPORT( void, decoder_SynchroEnd,            ( decoder_synchro_t *, int, bool ) );
 VLC_EXPORT( mtime_t, decoder_SynchroDate,        ( decoder_synchro_t * ) );
-VLC_EXPORT( void, decoder_SynchroNewPicture,     ( decoder_synchro_t *, int, int, mtime_t, mtime_t, int, vlc_bool_t ) );
+VLC_EXPORT( void, decoder_SynchroNewPicture,     ( decoder_synchro_t *, int, int, mtime_t, mtime_t, int, bool ) );
 

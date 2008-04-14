@@ -223,7 +223,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                     osd_state_t   *p_range_prev = NULL;    /* previous state processed range */
                     int i_index = 0;
 
-                    p_up->b_range = VLC_TRUE;
+                    p_up->b_range = true;
 
                     result = fscanf( fd, "\t%24s", &action[0] );
                     if( result == 0 )
@@ -323,7 +323,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
                 osd_state_t   *p_range_prev = NULL;    /* previous state processed range */
                 int i_index = 0;
 
-                p_current->b_range = VLC_TRUE;
+                p_current->b_range = true;
 
                 result = fscanf( fd, "\t%24s", &action[0] );
                 if( result == 0 )

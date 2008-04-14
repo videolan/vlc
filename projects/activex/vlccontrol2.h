@@ -582,6 +582,8 @@ public:
     STDMETHODIMP put_BaseURL(BSTR url);
     STDMETHODIMP get_MRL(BSTR *mrl);
     STDMETHODIMP put_MRL(BSTR mrl);
+    STDMETHODIMP get_Toolbar(VARIANT_BOOL *visible);
+    STDMETHODIMP put_Toolbar(VARIANT_BOOL visible);
     STDMETHODIMP get_StartTime(long *seconds);
     STDMETHODIMP put_StartTime(long seconds);
     STDMETHODIMP get_VersionInfo(BSTR *version);

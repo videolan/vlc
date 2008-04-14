@@ -53,11 +53,11 @@ vlc_module_begin();
 
     set_callbacks( Open, Close );
     add_shortcut( "spatializer" );
-    add_float( "Roomsize", 1.05, NULL, NULL,NULL, VLC_TRUE);
-    add_float( "Width", 10.0, NULL, NULL,NULL, VLC_TRUE);
-    add_float( "Wet", 3.0, NULL, NULL,NULL, VLC_TRUE);
-    add_float( "Dry", 2.0, NULL, NULL,NULL, VLC_TRUE);
-    add_float( "Damp", 1.0, NULL, NULL,NULL, VLC_TRUE);
+    add_float( "Roomsize", 1.05, NULL, NULL,NULL, true);
+    add_float( "Width", 10.0, NULL, NULL,NULL, true);
+    add_float( "Wet", 3.0, NULL, NULL,NULL, true);
+    add_float( "Dry", 2.0, NULL, NULL,NULL, true);
+    add_float( "Damp", 1.0, NULL, NULL,NULL, true);
 vlc_module_end();
 
 /*****************************************************************************
@@ -66,7 +66,7 @@ vlc_module_end();
 typedef struct aout_filter_sys_t
 {
     /* reverb static config */
-    vlc_bool_t b_first;
+    bool b_first;
 
 } aout_filter_sys_t;
 
@@ -101,20 +101,20 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
-    vlc_bool_t         b_fit = VLC_TRUE;
+    bool         b_fit = true;
     msg_Dbg(p_this, "Opening filter spatializer %s %s %d\n", __FILE__,__func__,__LINE__);
 
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
         p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
         msg_Warn( p_filter, "bad input or output format" );
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         memcpy( &p_filter->output, &p_filter->input,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
@@ -126,7 +126,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
      /* Allocate structure */
     p_sys = p_filter->p_sys = (aout_filter_sys_t*)malloc( sizeof( aout_filter_sys_t ) );

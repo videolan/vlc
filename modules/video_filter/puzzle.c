@@ -78,11 +78,11 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer_with_range( CFG_PREFIX "rows", 4, 1, 128, NULL,
-                            ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+                            ROWS_TEXT, ROWS_LONGTEXT, false );
     add_integer_with_range( CFG_PREFIX "cols", 4, 1, 128, NULL,
-                            COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+                            COLS_TEXT, COLS_LONGTEXT, false );
     add_bool( CFG_PREFIX "black-slot", 0, NULL,
-              BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, VLC_FALSE );
+              BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, false );
 
     set_callbacks( Create, Destroy );
 vlc_module_end();
@@ -104,9 +104,9 @@ struct vout_sys_t
     int i_rows;
     int *pi_order;
     int i_selected;
-    vlc_bool_t b_finished;
+    bool b_finished;
 
-    vlc_bool_t b_blackslot;
+    bool b_blackslot;
 };
 
 /*****************************************************************************
@@ -120,19 +120,19 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 /*****************************************************************************
  * Misc stuff...
  *****************************************************************************/
-static vlc_bool_t finished( vout_sys_t *p_sys )
+static bool finished( vout_sys_t *p_sys )
 {
     int i;
     for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
     {
-        if( i != p_sys->pi_order[i] ) return VLC_FALSE;
+        if( i != p_sys->pi_order[i] ) return false;
     }
-    return VLC_TRUE;
+    return true;
 }
-static vlc_bool_t is_valid( vout_sys_t *p_sys )
+static bool is_valid( vout_sys_t *p_sys )
 {
     int i, j, d=0;
-    if( p_sys->b_blackslot == VLC_FALSE ) return VLC_TRUE;
+    if( p_sys->b_blackslot == false ) return true;
     for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
     {
         if( p_sys->pi_order[i] == p_sys->i_cols * p_sys->i_rows - 1 )
@@ -147,8 +147,8 @@ static vlc_bool_t is_valid( vout_sys_t *p_sys )
             if( p_sys->pi_order[i] > p_sys->pi_order[j] ) d++;
         }
     }
-    if( d%2!=0 ) return VLC_FALSE;
-    else return VLC_TRUE;
+    if( d%2!=0 ) return false;
+    else return true;
 }
 static void shuffle( vout_sys_t *p_sys )
 {
@@ -172,10 +172,10 @@ static void shuffle( vout_sys_t *p_sys )
             }
         }
         p_sys->b_finished = finished( p_sys );
-    } while(    p_sys->b_finished == VLC_TRUE
-             || is_valid( p_sys ) == VLC_FALSE );
+    } while(    p_sys->b_finished == true
+             || is_valid( p_sys ) == false );
 
-    if( p_sys->b_blackslot == VLC_TRUE )
+    if( p_sys->b_blackslot == true )
     {
         for( i = 0; i < p_sys->i_cols * p_sys->i_rows; i++ )
         {
@@ -391,8 +391,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             i_row *= p_in->i_lines / i_rows;
             i_last_row *= p_in->i_lines / i_rows;
 
-            if( p_vout->p_sys->b_blackslot == VLC_TRUE
-                && p_vout->p_sys->b_finished == VLC_FALSE
+            if( p_vout->p_sys->b_blackslot == true
+                && p_vout->p_sys->b_finished == false
                 && i == p_vout->p_sys->i_selected )
             {
                 uint8_t color = ( i_plane == Y_PLANE ? 0x0 : 0x80 );
@@ -420,7 +420,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     if(    p_vout->p_sys->i_selected != -1
-        && p_vout->p_sys->b_blackslot == VLC_FALSE )
+        && p_vout->p_sys->b_blackslot == false )
     {
         plane_t *p_in = p_pic->p+Y_PLANE;
         plane_t *p_out = p_outpic->p+Y_PLANE;
@@ -448,7 +448,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                    0xff, i_pitch / i_cols );
     }
 
-    if( p_vout->p_sys->b_finished == VLC_TRUE )
+    if( p_vout->p_sys->b_finished == true )
     {
         int i, j;
         plane_t *p_out = p_outpic->p+Y_PLANE;
@@ -528,7 +528,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     if( mouse & MOUSE_CLICKED )
     {
         i_pos = p_vout->p_sys->i_cols * ( ( p_vout->p_sys->i_rows * i_y ) / v_h ) + (p_vout->p_sys->i_cols * i_x ) / v_w;
-        if( p_vout->p_sys->b_finished == VLC_TRUE
+        if( p_vout->p_sys->b_finished == true
             && i_x < SHUFFLE_WIDTH && i_y < SHUFFLE_HEIGHT )
         {
             shuffle( p_vout->p_sys );
@@ -538,7 +538,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
             p_vout->p_sys->i_selected = i_pos;
         }
         else if( p_vout->p_sys->i_selected == i_pos
-                 && p_vout->p_sys->b_blackslot == VLC_FALSE )
+                 && p_vout->p_sys->b_blackslot == false )
         {
             p_vout->p_sys->i_selected = -1;
         }
@@ -553,7 +553,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
             p_vout->p_sys->pi_order[ p_vout->p_sys->i_selected ] =
                 p_vout->p_sys->pi_order[ i_pos ];
             p_vout->p_sys->pi_order[ i_pos ] = a;
-            if( p_vout->p_sys->b_blackslot == VLC_TRUE )
+            if( p_vout->p_sys->b_blackslot == true )
                 p_vout->p_sys->i_selected = i_pos;
             else
                 p_vout->p_sys->i_selected = -1;

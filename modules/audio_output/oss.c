@@ -111,8 +111,8 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
-              N_("OSS DSP device"), NULL, VLC_FALSE );
-    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
+              N_("OSS DSP device"), NULL, false );
+    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, true );
 
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );
@@ -362,7 +362,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 
     /* Reset the DSP device */
@@ -517,7 +517,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Create OSS thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", OSSThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );
         close( p_sys->i_fd );
@@ -546,7 +546,7 @@ static void Close( vlc_object_t * p_this )
 
     vlc_object_kill( p_aout );
     vlc_thread_join( p_aout );
-    p_aout->b_die = VLC_FALSE;
+    p_aout->b_die = false;
 
     ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL );
     close( p_sys->i_fd );
@@ -616,7 +616,7 @@ static int OSSThread( aout_instance_t * p_aout )
 
             /* Next buffer will be played at mdate() + buffered */
             p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
-                                              VLC_FALSE );
+                                              false );
 
             if( p_buffer == NULL &&
                 buffered > ( p_aout->output.p_sys->max_buffer_duration
@@ -648,7 +648,7 @@ static int OSSThread( aout_instance_t * p_aout )
             }
 
             while( !p_aout->b_die && ! ( p_buffer =
-                aout_OutputNextBuffer( p_aout, next_date, VLC_TRUE ) ) )
+                aout_OutputNextBuffer( p_aout, next_date, true ) ) )
             {
                 msleep( 1000 );
                 next_date = mdate();

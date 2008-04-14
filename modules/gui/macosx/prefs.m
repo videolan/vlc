@@ -157,7 +157,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
         [[VLCTreeItem rootItem] resetView];
         [[o_tree itemAtRow:[o_tree selectedRow]]
             showView:o_prefs_view advancedView:
-            ( [o_advanced_ckb state] == NSOnState ) ? VLC_TRUE : VLC_FALSE];
+            ( [o_advanced_ckb state] == NSOnState ) ? true : false];
     }
 }
 
@@ -167,7 +167,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_advanced_ckb setState: b_advanced];
     /* refresh the view of the current treeitem */
     [[o_tree itemAtRow:[o_tree selectedRow]] showView:o_prefs_view advancedView:
-        ( [o_advanced_ckb state] == NSOnState ) ? VLC_TRUE : VLC_FALSE];
+        ( [o_advanced_ckb state] == NSOnState ) ? true : false];
 }
 
 - (void)loadConfigTree
@@ -183,7 +183,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     [[o_tree itemAtRow:[o_tree selectedRow]] showView: o_prefs_view
         advancedView:( [o_advanced_ckb state] == NSOnState ) ?
-        VLC_TRUE : VLC_FALSE];
+        true : false];
 }
 
 @end
@@ -414,7 +414,7 @@ static VLCTreeItem *o_root_item = nil;
                 /* Find the right category item */
 
                 long cookie;
-                vlc_bool_t b_found = VLC_FALSE;
+                bool b_found = false;
                 unsigned int i;
                 VLCTreeItem* p_category_item, * p_subcategory_item;
                 for (i = 0 ; i < [o_children count] ; i++)
@@ -422,14 +422,14 @@ static VLCTreeItem *o_root_item = nil;
                     p_category_item = [o_children objectAtIndex: i];
                     if( p_category_item->i_object_id == i_category )
                     {
-                        b_found = VLC_TRUE;
+                        b_found = true;
                         break;
                     }
                 }
                 if( !b_found ) continue;
 
                 /* Find subcategory item */
-                b_found = VLC_FALSE;
+                b_found = false;
                 cookie = -1;
                 for (i = 0 ; i < [p_category_item->o_children count] ; i++)
                 {
@@ -437,7 +437,7 @@ static VLCTreeItem *o_root_item = nil;
                                             objectAtIndex: i];
                     if( p_subcategory_item->i_object_id == i_subcategory )
                     {
-                        b_found = VLC_TRUE;
+                        b_found = true;
                         break;
                     }
                 }
@@ -446,7 +446,7 @@ static VLCTreeItem *o_root_item = nil;
 
                 [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc]
                     initWithName:[[VLCMain sharedInstance]
-                        localizedString: module_GetName( p_module, VLC_FALSE ) ]
+                        localizedString: module_GetName( p_module, false ) ]
                     withTitle:[[VLCMain sharedInstance]
                         localizedString:  module_GetLongName( p_module ) ]
                     withHelp: @""
@@ -524,7 +524,7 @@ static VLCTreeItem *o_root_item = nil;
 }
 
 - (NSView *)showView:(NSScrollView *)o_prefs_view
-    advancedView:(vlc_bool_t) b_advanced
+    advancedView:(bool) b_advanced
 {
     NSRect          s_vrc;
     NSView          *o_view;

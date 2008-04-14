@@ -434,7 +434,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
     for( j = 0, i_result2 = 0; j < i_sub_count && result2 != NULL; j++ )
     {
-        vlc_bool_t b_reject = VLC_FALSE;
+        bool b_reject = false;
 
         if( !result[j].psz_fname || !result[j].psz_ext ) /* memory out */
             break;
@@ -451,12 +451,12 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     break;
             }
             if( i < i_sub_count )
-                b_reject = VLC_TRUE;
+                b_reject = true;
         }
         else if( !strcasecmp( result[j].psz_ext, "cdg" ) )
         {
             if( result[j].priority < SUB_PRIORITY_MATCH_ALL )
-                b_reject = VLC_TRUE;
+                b_reject = true;
         }
 
         /* */

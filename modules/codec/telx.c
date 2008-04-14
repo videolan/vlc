@@ -76,11 +76,11 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_integer( "telx-override-page", -1, NULL,
-                 OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, VLC_TRUE );
+                 OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, true );
     add_bool( "telx-ignore-subtitle-flag", 0, NULL,
-              IGNORE_SUB_FLAG_TEXT, IGNORE_SUB_FLAG_LONGTEXT, VLC_TRUE );
+              IGNORE_SUB_FLAG_TEXT, IGNORE_SUB_FLAG_LONGTEXT, true );
     add_bool( "telx-french-workaround", 0, NULL,
-              FRENCH_WORKAROUND_TEXT, FRENCH_WORKAROUND_LONGTEXT, VLC_TRUE );
+              FRENCH_WORKAROUND_TEXT, FRENCH_WORKAROUND_LONGTEXT, true );
 
 vlc_module_end();
 
@@ -91,15 +91,15 @@ vlc_module_end();
 struct decoder_sys_t
 {
   int         i_align;
-  vlc_bool_t  b_is_subtitle[9];
+  bool  b_is_subtitle[9];
   char        ppsz_lines[32][128];
   char        psz_prev_text[512];
   mtime_t     prev_pts;
   int         i_page[9];
-  vlc_bool_t  b_erase[9];
+  bool  b_erase[9];
   uint16_t *  pi_active_national_set[9];
   int         i_wanted_page, i_wanted_magazine;
-  vlc_bool_t  b_ignore_sub_flag;
+  bool  b_ignore_sub_flag;
 };
 
 /****************************************************************************
@@ -450,7 +450,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     int i_wanted_page = 0x10 * ((i_conf_wanted_page % 100) / 10)
                          | (i_conf_wanted_page % 10);
 #endif
-    vlc_bool_t b_update = VLC_FALSE;
+    bool b_update = false;
     char psz_text[512], *pt = psz_text;
     char psz_line[256];
     int i, total;
@@ -560,7 +560,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 for ( i = 1; i < 32; i++ )
                 {
                     if ( !p_sys->ppsz_lines[i][0] ) continue;
-                    /* b_update = VLC_TRUE; */
+                    /* b_update = true; */
                     p_sys->ppsz_lines[i][0] = 0;
                 }
             }
@@ -571,7 +571,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 strncpy( p_sys->ppsz_lines[row], psz_line,
                          sizeof(p_sys->ppsz_lines[row]) - 1);
             }
-            b_update = VLC_TRUE;
+            b_update = true;
 
         }
         else if ( row < 24 )
@@ -603,7 +603,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             {
                 strncpy( p_sys->ppsz_lines[row], t,
                          sizeof(p_sys->ppsz_lines[row]) - 1 );
-                b_update = VLC_TRUE;
+                b_update = true;
             }
 
             if (t[0])
@@ -649,7 +649,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             {
                 strncpy( p_sys->ppsz_lines[0], psz_line,
                          sizeof(p_sys->ppsz_lines[0]) - 1 );
-                /* b_update = VLC_TRUE; */
+                /* b_update = true; */
             }
         }
 /*       else if (row == 26) { */
@@ -721,8 +721,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = (p_block->i_length == 0);
-    p_spu->b_absolute = VLC_FALSE;
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_absolute = false;
+    p_spu->b_pausable = true;
     dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts/100000, (long int)p_block->i_length/100000));
 
     block_Release( p_block );

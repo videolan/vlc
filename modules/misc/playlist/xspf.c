@@ -288,7 +288,7 @@ static char *assertUTF8URI( char *psz_name )
 {
     char *psz_ret = NULL;              /**< the new result buffer to return */
     char *psz_s = NULL, *psz_d = NULL; /**< src & dest pointers for URI conversion */
-    vlc_bool_t b_uri_is_file = VLC_FALSE; /**< we do additional %-encoding if the URI is a file:// one */
+    bool b_uri_is_file = false; /**< we do additional %-encoding if the URI is a file:// one */
 
     if( !psz_name || !*psz_name )
         return NULL;
@@ -313,7 +313,7 @@ static char *assertUTF8URI( char *psz_name )
         psz_d = psz_ret + i_delim;
 
         if( !strncmp( psz_s, "file://", 7 ) )
-            b_uri_is_file = VLC_TRUE;
+            b_uri_is_file = true;
 
         psz_s += i_delim;
     }
@@ -322,7 +322,7 @@ static char *assertUTF8URI( char *psz_name )
     {
         strcpy( psz_ret, "file://" );
         psz_d = psz_ret + 7;
-        b_uri_is_file = VLC_TRUE;
+        b_uri_is_file = true;
     }
 
     while( *psz_s )

@@ -359,7 +359,7 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
     uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
     uint8_t *p_trans;
     int i_x, i_y, i_trans = 0;
-    vlc_bool_t b_even_scanline = i_y_offset % 2;
+    bool b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
@@ -802,7 +802,7 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
     uint8_t *p_src2_u, *p_src2_v;
     uint8_t *p_trans;
     int i_x, i_y, i_pix_pitch, i_trans = 0;
-    vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
+    bool b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
     int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
 
     if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
@@ -940,7 +940,7 @@ static void BlendI420I420( filter_t *p_filter, picture_t *p_dst,
     uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
     uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
     int i_x, i_y;
-    vlc_bool_t b_even_scanline = i_y_offset % 2;
+    bool b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
@@ -1051,7 +1051,7 @@ static void BlendI420I420_no_alpha( filter_t *p_filter, picture_t *p_dst,
     uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
     uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
     int i_y;
-    vlc_bool_t b_even_scanline = i_y_offset % 2;
+    bool b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
@@ -1295,7 +1295,7 @@ static void BlendI420YUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
     int i_x, i_y, i_pix_pitch;
-    vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
+    bool b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
     int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
 
     if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
@@ -1412,7 +1412,7 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
     uint8_t *p_src1_u, *p_dst_u;
     uint8_t *p_src1_v, *p_dst_v;
     int i_x, i_y, i_trans;
-    vlc_bool_t b_even_scanline = i_y_offset % 2;
+    bool b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
@@ -1517,7 +1517,7 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
     int i_x, i_y, i_pix_pitch, i_trans;
-    vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
+    bool b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
     int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
 
     if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
@@ -1746,7 +1746,7 @@ static void BlendRGBAI420( filter_t *p_filter, picture_t *p_dst,
     int i_x, i_y, i_trans;
     uint8_t y, u, v;
 
-    vlc_bool_t b_even_scanline = i_y_offset % 2;
+    bool b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
@@ -2016,7 +2016,7 @@ static void BlendRGBAYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
     uint8_t *p_dst, *p_src1, *p_src2;
     uint8_t *p_trans;
     int i_x, i_y, i_pix_pitch, i_trans;
-    vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
+    bool b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
     int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
     uint8_t y, u, v;
 

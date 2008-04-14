@@ -40,7 +40,7 @@ module_t *vlc_module_create (vlc_object_t *obj)
     if (module == NULL)
         return NULL;
 
-    module->b_reentrant = module->b_unloadable = VLC_TRUE;
+    module->b_reentrant = module->b_unloadable = true;
     module->psz_object_name = module->psz_longname = default_name;
     module->psz_capability = (char*)"";
     module->i_score = 1;
@@ -62,7 +62,7 @@ module_t *vlc_submodule_create (module_t *module)
         return NULL;
 
     vlc_object_attach (submodule, module);
-    submodule->b_submodule = VLC_TRUE;
+    submodule->b_submodule = true;
 
     /* Muahahaha! Heritage! Polymorphism! Ugliness!! */
     memcpy (submodule->pp_shortcuts, module->pp_shortcuts,
@@ -256,32 +256,32 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
         }
 
         case VLC_CONFIG_ADVANCED:
-            item->b_advanced = VLC_TRUE;
+            item->b_advanced = true;
             ret = 0;
             break;
 
         case VLC_CONFIG_VOLATILE:
-            item->b_unsaveable = VLC_TRUE;
+            item->b_unsaveable = true;
             ret = 0;
             break;
 
         case VLC_CONFIG_PERSISTENT:
-            item->b_autosave = VLC_TRUE;
+            item->b_autosave = true;
             ret = 0;
             break;
 
         case VLC_CONFIG_RESTART:
-            item->b_restart = VLC_TRUE;
+            item->b_restart = true;
             ret = 0;
             break;
 
         case VLC_CONFIG_PRIVATE:
-            item->b_internal = VLC_TRUE;
+            item->b_internal = true;
             ret = 0;
             break;
 
         case VLC_CONFIG_REMOVED:
-            item->b_removed = VLC_TRUE;
+            item->b_removed = true;
             ret = 0;
             break;
 
@@ -413,7 +413,7 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
         }
 
         case VLC_CONFIG_SAFE:
-            item->b_safe = VLC_TRUE;
+            item->b_safe = true;
             ret = 0;
             break;
     }

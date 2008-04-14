@@ -224,8 +224,8 @@
         config_PutInt( p_playlist, "random", 0 );
     }
 
-    p_intf->p_sys->b_playmode_update = VLC_TRUE;
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = true;
+    p_intf->p_sys->b_intf_update = true;
     vlc_object_release( p_playlist );
 }
 
@@ -271,8 +271,8 @@
         [self repeatOne];
  
         /* prepare core communication */
-        repeating.b_bool = VLC_TRUE;
-        looping.b_bool = VLC_FALSE;
+        repeating.b_bool = true;
+        looping.b_bool = false;
         config_PutInt( p_playlist, "repeat", 1 );
         config_PutInt( p_playlist, "loop", 0 );
  
@@ -287,8 +287,8 @@
         [self repeatAll];
  
         /* prepare core communication */
-        repeating.b_bool = VLC_FALSE;
-        looping.b_bool = VLC_TRUE;
+        repeating.b_bool = false;
+        looping.b_bool = true;
         config_PutInt( p_playlist, "repeat", 0 );
         config_PutInt( p_playlist, "loop", 1 );
  
@@ -303,8 +303,8 @@
         [self repeatOff];
  
         /* prepare core communication */
-        repeating.b_bool = VLC_FALSE;
-        looping.b_bool = VLC_FALSE;
+        repeating.b_bool = false;
+        looping.b_bool = false;
         config_PutInt( p_playlist, "repeat", 0 );
         config_PutInt( p_playlist, "loop", 0 );
  
@@ -315,8 +315,8 @@
     /* communicate with core and the main intf loop */
     var_Set( p_playlist, "repeat", repeating );
     var_Set( p_playlist, "loop", looping );
-    p_intf->p_sys->b_playmode_update = VLC_TRUE;
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = true;
+    p_intf->p_sys->b_intf_update = true;
 
     vlc_object_release( p_playlist );
 }
@@ -346,8 +346,8 @@
         config_PutInt( p_playlist, "repeat", 0 );
     }
  
-    p_intf->p_sys->b_playmode_update = VLC_TRUE;
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = true;
+    p_intf->p_sys->b_intf_update = true;
     vlc_object_release( p_playlist );
 }
 
@@ -375,8 +375,8 @@
         config_PutInt( p_playlist, "loop", 0 );
     }
 
-    p_intf->p_sys->b_playmode_update = VLC_TRUE;
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = true;
+    p_intf->p_sys->b_intf_update = true;
     vlc_object_release( p_playlist );
 }
 
@@ -793,7 +793,7 @@
         var_Set( p_object, strdup([o_data name]), [o_data value] );
         vlc_object_release( p_object );
         [o_pool release];
-        return VLC_TRUE;
+        return true;
     }
     [o_pool release];
     return VLC_EGENERIC;

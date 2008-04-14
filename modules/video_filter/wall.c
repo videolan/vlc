@@ -77,11 +77,11 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer( CFG_PREFIX "cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, false );
+    add_integer( CFG_PREFIX "rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, false );
     add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
-                 VLC_TRUE );
-    add_string( CFG_PREFIX "element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, VLC_FALSE );
+                 true );
+    add_string( CFG_PREFIX "element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false );
 
     add_shortcut( "wall" );
     set_callbacks( Create, Destroy );
@@ -104,7 +104,7 @@ struct vout_sys_t
     int    i_vout;
     struct vout_list_t
     {
-        vlc_bool_t b_active;
+        bool b_active;
         int i_width;
         int i_height;
         int i_left;
@@ -401,7 +401,7 @@ static int Init( vout_thread_t *p_vout )
             }
             if( i_height == 0 || i_width == 0 )
             {
-                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active = VLC_FALSE;
+                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active = false;
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_width = i_width;

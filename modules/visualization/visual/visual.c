@@ -114,45 +114,45 @@ vlc_module_begin();
     set_description( _("Visualizer filter") );
     set_section( N_( "General") , NULL );
     add_string("effect-list", "spectrum", NULL,
-            ELIST_TEXT, ELIST_LONGTEXT, VLC_TRUE );
+            ELIST_TEXT, ELIST_LONGTEXT, true );
     add_integer("effect-width",VOUT_WIDTH,NULL,
-             WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
+             WIDTH_TEXT, WIDTH_LONGTEXT, false );
     add_integer("effect-height" , VOUT_HEIGHT , NULL,
-             HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+             HEIGHT_TEXT, HEIGHT_LONGTEXT, false );
     set_section( N_("Spectrum analyser") , NULL );
     add_integer("visual-nbbands", 80, NULL,
-             NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_TRUE );
+             NBBANDS_TEXT, NBBANDS_LONGTEXT, true );
     add_integer("visual-separ", 1, NULL,
-             SEPAR_TEXT, SEPAR_LONGTEXT, VLC_TRUE );
+             SEPAR_TEXT, SEPAR_LONGTEXT, true );
     add_integer("visual-amp", 3, NULL,
-             AMP_TEXT, AMP_LONGTEXT, VLC_TRUE );
-    add_bool("visual-peaks", VLC_TRUE, NULL,
-             PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
+             AMP_TEXT, AMP_LONGTEXT, true );
+    add_bool("visual-peaks", true, NULL,
+             PEAKS_TEXT, PEAKS_LONGTEXT, true );
     set_section( N_("Spectrometer") , NULL );
-    add_bool("spect-show-original", VLC_FALSE, NULL,
-             ORIG_TEXT, ORIG_LONGTEXT, VLC_TRUE );
-    add_bool("spect-show-base", VLC_TRUE, NULL,
-             BASE_TEXT, BASE_LONGTEXT, VLC_TRUE );
+    add_bool("spect-show-original", false, NULL,
+             ORIG_TEXT, ORIG_LONGTEXT, true );
+    add_bool("spect-show-base", true, NULL,
+             BASE_TEXT, BASE_LONGTEXT, true );
     add_integer("spect-radius", 42, NULL,
-             RADIUS_TEXT, RADIUS_LONGTEXT, VLC_TRUE );
+             RADIUS_TEXT, RADIUS_LONGTEXT, true );
     add_integer("spect-sections", 3, NULL,
-             SSECT_TEXT, SSECT_LONGTEXT, VLC_TRUE );
+             SSECT_TEXT, SSECT_LONGTEXT, true );
     add_integer("spect-color", 80, NULL,
-             COLOR1_TEXT, COLOR1_LONGTEXT, VLC_TRUE );
-    add_bool("spect-show-bands", VLC_TRUE, NULL,
-             BANDS_TEXT, BANDS_LONGTEXT, VLC_TRUE );
+             COLOR1_TEXT, COLOR1_LONGTEXT, true );
+    add_bool("spect-show-bands", true, NULL,
+             BANDS_TEXT, BANDS_LONGTEXT, true );
     add_integer("spect-nbbands", 32, NULL,
-             NBBANDS_TEXT, SPNBBANDS_LONGTEXT, VLC_TRUE );
+             NBBANDS_TEXT, SPNBBANDS_LONGTEXT, true );
     add_integer("spect-separ", 1, NULL,
-             SEPAR_TEXT, SEPAR_LONGTEXT, VLC_TRUE );
+             SEPAR_TEXT, SEPAR_LONGTEXT, true );
     add_integer("spect-amp", 8, NULL,
-             AMP_TEXT, AMP_LONGTEXT, VLC_TRUE );
-    add_bool("spect-show-peaks", VLC_TRUE, NULL,
-             PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
+             AMP_TEXT, AMP_LONGTEXT, true );
+    add_bool("spect-show-peaks", true, NULL,
+             PEAKS_TEXT, PEAKS_LONGTEXT, true );
     add_integer("spect-peak-width", 61, NULL,
-             PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, VLC_TRUE );
+             PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, true );
     add_integer("spect-peak-height", 1, NULL,
-             PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, VLC_TRUE );
+             PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, true );
     set_capability( "visualization", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "visualizer");

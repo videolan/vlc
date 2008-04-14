@@ -87,7 +87,7 @@ struct msg_queue_t
 
     /** Message queue lock */
     vlc_mutex_t             lock;
-    vlc_bool_t              b_overflow;
+    bool              b_overflow;
 
     /* Message queue */
     msg_item_t              msg[VLC_MSG_QSIZE];           /**< message queue */

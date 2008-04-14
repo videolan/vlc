@@ -29,10 +29,10 @@
 typedef struct
 {
     /* Which channel are present */
-    vlc_bool_t pb_present[4];
+    bool pb_present[4];
 
     /* */
-    vlc_bool_t b_reorder;
+    bool b_reorder;
 
     /* CC data per field
      *  byte[x+0]: field (0/1)
@@ -60,9 +60,9 @@ static inline void cc_Init( cc_data_t *c )
     int i;
 
     for( i = 0; i < 4; i++ )
-        c-> pb_present[i] = VLC_FALSE; 
+        c-> pb_present[i] = false; 
     c->i_data = 0;
-    c->b_reorder = VLC_FALSE;
+    c->b_reorder = false;
 }
 static inline void cc_Exit( cc_data_t *c )
 {
@@ -136,13 +136,13 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
 
             i_channel = cc_Channel( i_field, &cc[1] );
             if( i_channel >= 0 && i_channel < 4 )
-                c->pb_present[i_channel] = VLC_TRUE;
+                c->pb_present[i_channel] = true;
 
             c->p_data[c->i_data++] = i_field;
             c->p_data[c->i_data++] = cc[1];
             c->p_data[c->i_data++] = cc[2];
         }
-        c->b_reorder = VLC_TRUE;
+        c->b_reorder = true;
     }
     else if( !memcmp( p_cc_dvd, p_src, 4 ) && i_src > 4+1 )
     {
@@ -172,13 +172,13 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
 
                 i_channel = cc_Channel( i_field, &cc[1] );
                 if( i_channel >= 0 && i_channel < 4 )
-                    c->pb_present[i_channel] = VLC_TRUE;
+                    c->pb_present[i_channel] = true;
                 c->p_data[c->i_data++] = i_field;
                 c->p_data[c->i_data++] = cc[1];
                 c->p_data[c->i_data++] = cc[2];
             }
         }
-        c->b_reorder = VLC_FALSE;
+        c->b_reorder = false;
     }
     else if( i_src >= 2+2 + 2+2 &&
              ( ( !memcmp( p_cc_replaytv4a, &p_src[0], 2 ) && !memcmp( p_cc_replaytv4b, &p_src[4], 2 ) ) ||
@@ -195,12 +195,12 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
             const int i_field = i == 0 ? 1 : 0;
             int i_channel = cc_Channel( i_field, &cc[2] );
             if( i_channel >= 0 && i_channel < 4 )
-                c->pb_present[i_channel] = VLC_TRUE;
+                c->pb_present[i_channel] = true;
             c->p_data[c->i_data++] = i_field;
             c->p_data[c->i_data++] = cc[2];
             c->p_data[c->i_data++] = cc[3];
         }
-        c->b_reorder = VLC_FALSE;
+        c->b_reorder = false;
     }
     else
     {

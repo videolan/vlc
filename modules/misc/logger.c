@@ -138,14 +138,14 @@ vlc_module_begin();
     set_subcategory( SUBCAT_ADVANCED_MISC );
 
     add_file( "logfile", NULL, NULL,
-             N_("Log filename"), N_("Specify the log filename."), VLC_FALSE );
+             N_("Log filename"), N_("Specify the log filename."), false );
         change_unsafe();
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,
-                VLC_FALSE );
+                false );
         change_string_list( mode_list, mode_list_text, 0 );
 
     add_file( "rrd-file", NULL, NULL, N_("RRD output file") ,
-                    N_("Output data for RRDTool in this file." ), VLC_TRUE );
+                    N_("Output data for RRDTool in this file." ), true );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );

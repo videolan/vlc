@@ -290,7 +290,7 @@ void __config_PutPsz( vlc_object_t *p_this,
     else
         p_config->value.psz = NULL;
 
-    p_config->b_dirty = VLC_TRUE;
+    p_config->b_dirty = true;
 
     val.psz_string = (char *)p_config->value.psz;
 
@@ -354,7 +354,7 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         p_config->value.i = i_value;
     }
 
-    p_config->b_dirty = VLC_TRUE;
+    p_config->b_dirty = true;
 
     val.i_int = p_config->value.i;
 
@@ -413,7 +413,7 @@ void __config_PutFloat( vlc_object_t *p_this,
         p_config->value.f = f_value;
     }
 
-    p_config->b_dirty = VLC_TRUE;
+    p_config->b_dirty = true;
 
     val.f_float = p_config->value.f;
 
@@ -623,7 +623,7 @@ const char *config_GetDataDir( void )
  * Note that this function is not reentrant, it should be called only once
  * at the beginning of main where the result will be stored for later use.
  *****************************************************************************/
-static char *GetDir( vlc_bool_t b_appdata )
+static char *GetDir( bool b_appdata )
 {
     const char *psz_localhome = NULL;
 
@@ -708,7 +708,7 @@ static char *GetDir( vlc_bool_t b_appdata )
  */
 char *config_GetHomeDir( void )
 {
-    return GetDir( VLC_FALSE );
+    return GetDir( false );
 }
 
 /**
@@ -720,7 +720,7 @@ char *config_GetUserDir( void ); /* XXX why does gcc wants a declaration ?
                                   * --funman */
 char *config_GetUserDir( void )
 {
-    return GetDir( VLC_TRUE );
+    return GetDir( true );
 }
 
 /**

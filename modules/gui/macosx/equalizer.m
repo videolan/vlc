@@ -45,7 +45,7 @@
 @implementation VLCEqualizer
 
 static void ChangeFiltersString( intf_thread_t *p_intf,
-                                 char *psz_name, vlc_bool_t b_add )
+                                 char *psz_name, bool b_add )
 {
     char *psz_parser, *psz_string;
     int i;
@@ -103,7 +103,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     {
         for( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
         }
     }
     
@@ -120,7 +120,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     vlc_object_release( p_object );
 }
 
-static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
+static bool GetFiltersStatus( intf_thread_t *p_intf,
                                  char *psz_name )
 {
     char *psz_parser, *psz_string;
@@ -130,7 +130,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
         p_object = vlc_object_find( p_intf,
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_object == NULL )
-        return VLC_FALSE;
+        return false;
 
     if( (BOOL)config_GetInt( p_intf, "macosx-eq-keep" ) == YES )
         psz_string = config_GetPsz( p_intf, "audio-filter" );
@@ -140,16 +140,16 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
 
     vlc_object_release( p_object );
 
-    if( !psz_string ) return VLC_FALSE;
+    if( !psz_string ) return false;
 
     psz_parser = strstr( psz_string, psz_name );
 
     free( psz_string );
 
     if ( psz_parser )
-        return VLC_TRUE;
+        return true;
     else
-        return VLC_FALSE;
+        return false;
 }
 
 - (void)initStrings
@@ -179,9 +179,9 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     intf_thread_t *p_intf = VLCIntf;
     float f_preamp, f_band[10];
     char *psz_bands, *psz_bands_init, *p_next;
-    vlc_bool_t b_2p;
+    bool b_2p;
     int i;
-    vlc_bool_t b_enabled = GetFiltersStatus( p_intf, (char *)"equalizer" );
+    bool b_enabled = GetFiltersStatus( p_intf, (char *)"equalizer" );
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
 
@@ -374,7 +374,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
 - (IBAction)twopass:(id)sender
 {
     intf_thread_t *p_intf = VLCIntf;
-    vlc_bool_t b_2p = [sender state] ? VLC_TRUE : VLC_FALSE;
+    bool b_2p = [sender state] ? true : false;
     vlc_object_t *p_object= vlc_object_find( p_intf,
                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
     aout_instance_t *p_aout = (aout_instance_t *)p_object;
@@ -390,7 +390,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
         int i;
         for( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
         }
     }
 

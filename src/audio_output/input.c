@@ -265,7 +265,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                         sizeof(audio_sample_format_t) );
 
                 p_filter->p_module = module_Need( p_filter, "visualization",
-                                                  psz_parser, VLC_TRUE );
+                                                  psz_parser, true );
             }
             else /* this can be a audio filter module as well as a visualization module */
             {
@@ -276,7 +276,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                         sizeof(audio_sample_format_t) );
 
                 p_filter->p_module = module_Need( p_filter, "audio filter",
-                                              psz_parser, VLC_TRUE );
+                                              psz_parser, true );
 
                 if ( p_filter->p_module == NULL )
                 {
@@ -290,7 +290,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                         aout_FormatPrepare( &p_filter->output );
                         p_filter->p_module = module_Need( p_filter,
                                                           "audio filter",
-                                                          psz_parser, VLC_TRUE );
+                                                          psz_parser, true );
                     }
                     /* try visual filters */
                     else
@@ -301,7 +301,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                                 sizeof(audio_sample_format_t) );
                         p_filter->p_module = module_Need( p_filter,
                                                           "visualization",
-                                                          psz_parser, VLC_TRUE );
+                                                          psz_parser, true );
                     }
                 }
             }
@@ -340,7 +340,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             }
 
             /* success */
-            p_filter->b_continuity = VLC_FALSE;
+            p_filter->b_continuity = false;
             p_input->pp_filters[p_input->i_nb_filters++] = p_filter;
             memcpy( &chain_input_format, &p_filter->output,
                     sizeof( audio_sample_format_t ) );
@@ -414,8 +414,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     ReplayGainSelect( p_aout, p_input );
 
     /* Success */
-    p_input->b_error = VLC_FALSE;
-    p_input->b_restart = VLC_FALSE;
+    p_input->b_error = false;
+    p_input->b_restart = false;
     p_input->i_last_input_rate = INPUT_RATE_DEFAULT;
 
     return 0;
@@ -733,12 +733,12 @@ static void inputResamplingStop( aout_input_t *p_input )
     {
         p_input->pp_resamplers[0]->input.i_rate = INPUT_RATE_DEFAULT *
                             p_input->input.i_rate / p_input->i_last_input_rate;
-        p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
+        p_input->pp_resamplers[0]->b_continuity = false;
     }
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
-                                 const char *psz_name, vlc_bool_t b_add )
+                                 const char *psz_name, bool b_add )
 {
     vlc_value_t val;
     char *psz_parser;
@@ -794,23 +794,23 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !psz_mode || !*psz_mode )
     {
-        ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_FALSE );
-        ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_FALSE );
-        ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_FALSE );
+        ChangeFiltersString( p_aout, "audio-visual", "goom", false );
+        ChangeFiltersString( p_aout, "audio-visual", "visual", false );
+        ChangeFiltersString( p_aout, "audio-visual", "galaktos", false );
     }
     else
     {
         if( !strcmp( "goom", psz_mode ) )
         {
-            ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_FALSE );
-            ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_TRUE );
-            ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_FALSE);
+            ChangeFiltersString( p_aout, "audio-visual", "visual", false );
+            ChangeFiltersString( p_aout, "audio-visual", "goom", true );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false);
         }
         else if( !strcmp( "galaktos", psz_mode ) )
         {
-            ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_FALSE );
-            ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_FALSE );
-            ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_TRUE );
+            ChangeFiltersString( p_aout, "audio-visual", "visual", false );
+            ChangeFiltersString( p_aout, "audio-visual", "goom", false );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", true );
         }
         else
         {
@@ -818,16 +818,16 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
             var_Create( p_aout, "effect-list", VLC_VAR_STRING );
             var_Set( p_aout, "effect-list", val );
 
-            ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_FALSE );
-            ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_TRUE );
-            ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_FALSE);
+            ChangeFiltersString( p_aout, "audio-visual", "goom", false );
+            ChangeFiltersString( p_aout, "audio-visual", "visual", true );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false);
         }
     }
 
     /* That sucks */
     for( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
-        p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+        p_aout->pp_inputs[i]->b_restart = true;
     }
 
     return VLC_SUCCESS;
@@ -846,7 +846,7 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( !psz_mode || !*psz_mode )
     {
         i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
-                                     VLC_FALSE );
+                                     false );
     }
     else
     {
@@ -854,7 +854,7 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING );
         var_Set( p_aout, "equalizer-preset", val );
         i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
-                                     VLC_TRUE );
+                                     true );
 
     }
 
@@ -863,7 +863,7 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         for( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+            p_aout->pp_inputs[i]->b_restart = true;
         }
     }
 

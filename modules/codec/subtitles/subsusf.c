@@ -81,9 +81,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Unused fields of p_sys - not needed for USF decoding */
-    p_sys->b_ass = VLC_FALSE;
+    p_sys->b_ass = false;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
-    p_sys->b_autodetect_utf8 = VLC_FALSE;
+    p_sys->b_autodetect_utf8 = false;
 
     /* init of p_sys */
     p_sys->i_align = 0;
@@ -217,7 +217,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_pausable = true;
 
     /* Decode USF strings */
     p_spu->p_region = ParseUSFString( p_dec, psz_subtitle, p_spu );
@@ -225,7 +225,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = (p_block->i_length == 0);
-    p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_absolute = false;
     p_spu->i_original_picture_width = p_sys->i_original_width;
     p_spu->i_original_picture_height = p_sys->i_original_height;
 
@@ -1029,7 +1029,7 @@ static void ParseUSFHeader( decoder_t *p_dec )
     p_sub = stream_MemoryNew( VLC_OBJECT(p_dec),
                               p_dec->fmt_in.p_extra,
                               p_dec->fmt_in.i_extra,
-                              VLC_TRUE );
+                              true );
     if( !p_sub )
         return;
 

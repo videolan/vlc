@@ -42,7 +42,7 @@ int  E_(OpenIntf) ( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
 #ifdef WIN32
-    vlc_bool_t b_quiet;
+    bool b_quiet;
     b_quiet = config_GetInt( p_intf, "dummy-quiet" );
     if( !b_quiet )
         CONSOLE_INTRO_MSG;

@@ -221,7 +221,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->choices_text.i_count = 0;
     p_var->choices_text.p_values = NULL;
 
-    p_var->b_incallback = VLC_FALSE;
+    p_var->b_incallback = false;
     p_var->i_entries = 0;
     p_var->p_entries = NULL;
 
@@ -232,7 +232,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     {
         case VLC_VAR_BOOL:
             p_var->pf_cmp = CmpBool;
-            p_var->val.b_bool = VLC_FALSE;
+            p_var->val.b_bool = false;
             break;
         case VLC_VAR_INTEGER:
         case VLC_VAR_HOTKEY:
@@ -675,7 +675,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                     int i_entries = p_var->i_entries;
                     callback_entry_t *p_entries = p_var->p_entries;
 
-                    p_var->b_incallback = VLC_TRUE;
+                    p_var->b_incallback = true;
                     vlc_mutex_unlock( &p_priv->var_lock );
 
                     /* The real calls */
@@ -696,7 +696,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                     }
 
                     p_var = &p_priv->p_vars[i_var];
-                    p_var->b_incallback = VLC_FALSE;
+                    p_var->b_incallback = false;
                 }
             }
             break;
@@ -784,7 +784,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
         int i_entries = p_var->i_entries;
         callback_entry_t *p_entries = p_var->p_entries;
 
-        p_var->b_incallback = VLC_TRUE;
+        p_var->b_incallback = true;
         vlc_mutex_unlock( &p_priv->var_lock );
 
         /* The real calls */
@@ -805,7 +805,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
         }
 
         p_var = &p_priv->p_vars[i_var];
-        p_var->b_incallback = VLC_FALSE;
+        p_var->b_incallback = false;
     }
 
     /* Free data if needed */
@@ -1001,7 +1001,7 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
         int i_entries = p_var->i_entries;
         callback_entry_t *p_entries = p_var->p_entries;
 
-        p_var->b_incallback = VLC_TRUE;
+        p_var->b_incallback = true;
         vlc_mutex_unlock( &p_priv->var_lock );
 
         /* The real calls */
@@ -1022,7 +1022,7 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
         }
 
         p_var = &p_priv->p_vars[i_var];
-        p_var->b_incallback = VLC_FALSE;
+        p_var->b_incallback = false;
     }
 
     vlc_mutex_unlock( &p_priv->var_lock );
@@ -1044,7 +1044,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
 {
     char *psz_name, *psz_value;
     int  i_type;
-    vlc_bool_t b_isno = VLC_FALSE;
+    bool b_isno = false;
     vlc_value_t val;
 
     val.psz_string = NULL;
@@ -1084,7 +1084,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         }
         else goto cleanup;           /* Option doesn't exist */
 
-        b_isno = VLC_TRUE;
+        b_isno = true;
         i_type = config_GetType( p_obj, psz_name );
     }
     if( !i_type ) goto cleanup; /* Option doesn't exist */
@@ -1184,7 +1184,7 @@ static int GetUnused( vlc_object_t *p_this, const char *psz_name )
     int i_var, i_tries = 0;
     vlc_object_internals_t *p_priv = p_this->p_internals;
 
-    while( VLC_TRUE )
+    while( true )
     {
         i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
         if( i_var < 0 )

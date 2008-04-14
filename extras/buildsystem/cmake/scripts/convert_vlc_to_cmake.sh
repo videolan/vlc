@@ -21,9 +21,9 @@ ln -sf ../$cmake_dir/CMakeLists/src_CMakeLists.txt src/CMakeLists.txt
 echo "Removing old modules/gui/qt4/CMakeLists.txt"
 rm -f modules/gui/qt4/CMakeLists.txt
 
-echo "Installing libs/loaders/CMakeLists.txt"
-rm -f libs/loaders/CMakeLists.txt
-ln -s ../$cmake_dir/CMakeLists/libs_loaders_CMakeLists.txt libs/loaders/CMakeLists.txt
+echo "Installing libs/loader/CMakeLists.txt"
+rm -f libs/loader/CMakeLists.txt
+ln -s ../../$cmake_dir/CMakeLists/libs_loaders_CMakeLists.txt libs/loader/CMakeLists.txt
 
 echo "Installing modules/CMakeLists.txt"
 rm -f modules/CMakeLists.txt
@@ -33,7 +33,11 @@ echo "Installing po/CMakeLists.txt"
 rm -f po/CMakeLists.txt
 ln -s ../$cmake_dir/CMakeLists/po_CMakeLists.txt po/CMakeLists.txt
 
-echo "Installing include/config.h.cmake"
+echo "installing test/CMakeLists.txt"
+rm -f test/CMakeLists.txt
+ln -sf ../$cmake_dir/CMakeLists/test_CMakeLists.txt test/CMakeLists.txt
+
+echo "installing include/config.h.cmake"
 rm -f include/config.h.cmake
 ln -sf ../$cmake_dir/config.h.cmake include/config.h.cmake
 

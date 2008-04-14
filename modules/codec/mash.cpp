@@ -45,7 +45,7 @@ struct decoder_sys_t
      */
     mtime_t i_pts;
     IntraP64Decoder *p_decoder;
-    vlc_bool_t b_inited;
+    bool b_inited;
     int i_counter;
 
 };
@@ -102,7 +102,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
     /* Misc init */
     p_sys->i_pts = 0;
-    p_sys->b_inited = VLC_FALSE;
+    p_sys->b_inited = false;
     p_sys->i_counter = 0;
 
     /* Set output properties */
@@ -197,7 +197,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         vout_InitFormat( &p_dec->fmt_out.video, VLC_FOURCC('I','4','2','0'),
                          i_width, i_height,
                          VOUT_ASPECT_FACTOR * i_width / i_height );
-        p_sys->b_inited = VLC_TRUE;
+        p_sys->b_inited = true;
     }
     p_pic = NULL;
     p_sys->i_counter++;

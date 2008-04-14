@@ -73,7 +73,7 @@ struct sout_stream_id_t
     void                **pp_ids;
 };
 
-static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select );
+static bool ESSelected( es_format_t *fmt, char *psz_select );
 
 /*****************************************************************************
  * Open:
@@ -284,7 +284,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 /*****************************************************************************
  * Divers
  *****************************************************************************/
-static vlc_bool_t NumInRange( char *psz_range, int i_num )
+static bool NumInRange( char *psz_range, int i_num )
 {
     char *psz = strchr( psz_range, '-' );
     char *end;
@@ -303,10 +303,10 @@ static vlc_bool_t NumInRange( char *psz_range, int i_num )
         i_start = i_stop = strtol( psz_range, NULL, 0 );
     }
 
-    return i_start <= i_num && i_num <= i_stop ? VLC_TRUE : VLC_FALSE;
+    return i_start <= i_num && i_num <= i_stop ? true : false;
 }
 
-static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
+static bool ESSelected( es_format_t *fmt, char *psz_select )
 {
     char  *psz_dup;
     char  *psz;
@@ -319,7 +319,7 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
     /* If empty all es are selected */
     if( psz_select == NULL || *psz_select == '\0' )
     {
-        return VLC_TRUE;
+        return true;
     }
     psz_dup = strdup( psz_select );
     psz     = psz_dup;
@@ -445,7 +445,7 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
 
     if( i_cat == 1 || i_es == 1 || i_prgm == 1 )
     {
-        return VLC_TRUE;
+        return true;
     }
-    return VLC_FALSE;
+    return false;
 }

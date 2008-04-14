@@ -44,7 +44,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( _("MPEG-4 audio demuxer" ) );
-    set_capability( "demux2", 110 );
+    set_capability( "demux", 110 );
     set_callbacks( Open, Close );
     add_shortcut( "m4a" );
     add_shortcut( "mp4a" );
@@ -56,7 +56,7 @@ vlc_module_end();
  *****************************************************************************/
 struct demux_sys_t
 {
-    vlc_bool_t  b_start;
+    bool  b_start;
     es_out_id_t *p_es;
 
     decoder_t   *p_packetizer;
@@ -81,10 +81,10 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
-    int         b_forced = VLC_FALSE;
+    int         b_forced = false;
 
-    if( demux2_IsPathExtension( p_demux, ".aac" ) )
-        b_forced = VLC_TRUE;
+    if( demux_IsPathExtension( p_demux, ".aac" ) )
+        b_forced = true;
 
     if( !p_demux->b_force && !b_forced )
         return VLC_EGENERIC;
@@ -104,7 +104,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = calloc( sizeof( demux_sys_t ), 1 );
-    p_sys->b_start     = VLC_TRUE;
+    p_sys->b_start     = true;
 
     /* Load the mpeg 4 audio packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer,  'm', 'p', '4', 'a'  );
@@ -143,7 +143,7 @@ static int Demux( demux_t *p_demux)
     }
 
     p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? M4A_PTS_START : 0;
-    p_sys->b_start = VLC_FALSE;
+    p_sys->b_start = false;
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize(
                                           p_sys->p_packetizer, &p_block_in )) )
@@ -154,7 +154,7 @@ static int Demux( demux_t *p_demux)
 
             if( p_sys->p_es == NULL )
             {
-                p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                p_sys->p_packetizer->fmt_out.b_packetized = true;
                 p_sys->p_es = es_out_Add( p_demux->out,
                                           &p_sys->p_packetizer->fmt_out);
             }
@@ -183,15 +183,15 @@ static int Demux( demux_t *p_demux)
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_bool_t *pb_bool;
+    bool *pb_bool;
     int64_t *pi64;
     int i_ret;
 
     switch( i_query )
     {
     case DEMUX_HAS_UNSUPPORTED_META:
-        pb_bool = (vlc_bool_t *)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_TRUE;
+        pb_bool = (bool *)va_arg( args, bool* );
+        *pb_bool = true;
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:
@@ -201,7 +201,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_TIME: /* TODO high precision seek for multi-input */
     default:
-        i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
+        i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
                                         p_sys->i_bitrate_avg, 1, i_query, args);
         /* Fix time_offset */
         if( (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) &&

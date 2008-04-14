@@ -71,7 +71,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return 0;
 }

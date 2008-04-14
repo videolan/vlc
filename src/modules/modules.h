@@ -43,13 +43,13 @@ struct module_bank_t
 
     int              i_usage;
 
-    vlc_bool_t       b_builtins;
-    vlc_bool_t       b_plugins;
+    bool       b_builtins;
+    bool       b_plugins;
 
     /* Plugins cache */
-    vlc_bool_t     b_cache;
-    vlc_bool_t     b_cache_dirty;
-    vlc_bool_t     b_cache_delete;
+    bool     b_cache;
+    bool     b_cache_dirty;
+    bool     b_cache_delete;
 
     int            i_cache;
     module_cache_t **pp_cache;
@@ -67,11 +67,11 @@ struct module_cache_t
     char       *psz_file;
     int64_t    i_time;
     int64_t    i_size;
-    vlc_bool_t b_junk;
+    bool b_junk;
 
     /* Optional extra data */
     module_t *p_module;
-    vlc_bool_t b_used;
+    bool b_used;
 };
 
 
@@ -114,9 +114,9 @@ struct module_t
     int      i_score;                          /**< Score for the capability */
     uint32_t i_cpu;                           /**< Required CPU capabilities */
 
-    vlc_bool_t b_unloadable;                        /**< Can we be dlclosed? */
-    vlc_bool_t b_reentrant;                           /**< Are we reentrant? */
-    vlc_bool_t b_submodule;                        /**< Is this a submodule? */
+    bool b_unloadable;                        /**< Can we be dlclosed? */
+    bool b_reentrant;                           /**< Are we reentrant? */
+    bool b_submodule;                        /**< Is this a submodule? */
 
     /* Callbacks */
     int  ( * pf_activate )   ( vlc_object_t * );
@@ -137,8 +137,8 @@ struct module_t
     module_handle_t     handle;                             /* Unique handle */
     char *              psz_filename;                     /* Module filename */
 
-    vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
-    vlc_bool_t          b_loaded;        /* Set to true if the dll is loaded */
+    bool          b_builtin;  /* Set to true if the module is built in */
+    bool          b_loaded;        /* Set to true if the dll is loaded */
 };
 
 

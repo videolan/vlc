@@ -300,7 +300,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
      *   operation the refcount is 0, the object is destroyed.
      * - Accessor _retain increase the refcount by 1 (XXX: to implement) */
     p_mi->i_refcount = 1;
-    p_mi->b_own_its_input_thread = VLC_TRUE;
+    p_mi->b_own_its_input_thread = true;
     /* object_lock strategy:
      * - No lock held in constructor
      * - Lock when accessing all variable this lock is held
@@ -392,7 +392,7 @@ libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
     vlc_object_yield( p_input );
 
     p_mi->p_input_thread = p_input;
-    p_mi->b_own_its_input_thread = VLC_FALSE;
+    p_mi->b_own_its_input_thread = false;
 
     return p_mi;
 }
@@ -832,15 +832,15 @@ int libvlc_media_player_will_play( libvlc_media_player_t *p_mi,
     input_thread_t *p_input_thread =
                             libvlc_get_input_thread ( p_mi, p_e);
     if ( !p_input_thread )
-        return VLC_FALSE;
+        return false;
 
     if ( !p_input_thread->b_die && !p_input_thread->b_dead )
     {
         vlc_object_release( p_input_thread );
-        return VLC_TRUE;
+        return true;
     }
     vlc_object_release( p_input_thread );
-    return VLC_FALSE;
+    return false;
 }
 
 void libvlc_media_player_set_rate(
@@ -915,7 +915,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
         /* We do return the right value, no need to throw an exception */
         if( libvlc_exception_raised( p_e ) )
             libvlc_exception_clear( p_e );
-        return VLC_FALSE;
+        return false;
     }
     var_Get( p_input_thread, "seekable", &val );
     vlc_object_release( p_input_thread );
@@ -935,7 +935,7 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
         /* We do return the right value, no need to throw an exception */
         if( libvlc_exception_raised( p_e ) )
             libvlc_exception_clear( p_e );
-        return VLC_FALSE;
+        return false;
     }
     var_Get( p_input_thread, "can-pause", &val );
     vlc_object_release( p_input_thread );

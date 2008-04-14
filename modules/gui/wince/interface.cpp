@@ -745,11 +745,11 @@ void Interface::OnSliderUpdate( int wp )
             var_Set( p_input, "position", pos );
         }
 
-        p_intf->p_sys->b_slider_free = VLC_TRUE;
+        p_intf->p_sys->b_slider_free = true;
     }
     else
     {
-        p_intf->p_sys->b_slider_free = VLC_FALSE;
+        p_intf->p_sys->b_slider_free = false;
 
         if( p_input )
         {
@@ -778,11 +778,11 @@ void Interface::OnChange( int wp )
     if( LOWORD(wp) == SB_THUMBPOSITION || LOWORD(wp) == SB_ENDSCROLL )
     {
         VolumeChange( 200 - (int)dwPos );
-        b_volume_hold = VLC_FALSE;
+        b_volume_hold = false;
     }
     else
     {
-        b_volume_hold = VLC_TRUE;
+        b_volume_hold = true;
     }
 }
 
@@ -845,7 +845,7 @@ void Interface::OnSlowStream( void )
 
     if( p_input == NULL ) return;
 
-    vlc_value_t val; val.b_bool = VLC_TRUE;
+    vlc_value_t val; val.b_bool = true;
     var_Set( p_input, "rate-slower", val );
     vlc_object_release( p_input );
 }
@@ -857,7 +857,7 @@ void Interface::OnFastStream( void )
 
     if( p_input == NULL ) return;
 
-    vlc_value_t val; val.b_bool = VLC_TRUE;
+    vlc_value_t val; val.b_bool = true;
     var_Set( p_input, "rate-faster", val );
     vlc_object_release( p_input );
 }

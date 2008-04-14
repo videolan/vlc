@@ -176,13 +176,13 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         /* open output stream */
         id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
-        id->b_transrate = VLC_TRUE;
+        id->b_transrate = true;
     }
     else
     {
         msg_Dbg( p_stream, "not transrating a stream (fcc=`%4.4s')", (char*)&p_fmt->i_codec );
         id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
-        id->b_transrate = VLC_FALSE;
+        id->b_transrate = false;
 
         if( id->id == NULL )
         {

@@ -38,7 +38,7 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    vlc_bool_t b_error;
+    bool b_error;
 };
 
 /*****************************************************************************
@@ -107,7 +107,7 @@ static void user_read( png_structp p_png, png_bytep data, png_size_t i_length )
 static void user_error( png_structp p_png, png_const_charp error_msg )
 {
     decoder_t *p_dec = (decoder_t *)png_get_error_ptr( p_png );
-    p_dec->p_sys->b_error = VLC_TRUE;
+    p_dec->p_sys->b_error = true;
     msg_Err( p_dec, error_msg );
 }
 
@@ -139,7 +139,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
-    p_sys->b_error = VLC_FALSE;
+    p_sys->b_error = false;
 
     p_png = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
     if( p_png == NULL )

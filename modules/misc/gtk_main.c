@@ -109,7 +109,7 @@ static int Open( vlc_object_t *p_this )
     /* Launch the gtk_main() thread. It will not return until it has
      * called gdk_threads_enter(), which ensures us thread safety. */
     if( vlc_thread_create( p_gtk_main, "gtk_main", GtkMain,
-                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+                           VLC_THREAD_PRIORITY_LOW, true ) )
     {
         vlc_object_release( p_gtk_main );
         i_refcount--;

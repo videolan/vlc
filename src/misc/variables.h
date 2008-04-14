@@ -68,7 +68,7 @@ struct variable_t
     vlc_list_t   choices_text;
 
     /** Set to TRUE if the variable is in a callback */
-    vlc_bool_t   b_incallback;
+    bool   b_incallback;
 
     /** Number of registered callbacks */
     int                i_entries;

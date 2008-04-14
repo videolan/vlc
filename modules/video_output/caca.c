@@ -364,11 +364,11 @@ static int Manage( vout_thread_t *p_vout )
                 * p_vout->render.i_height
                          / cucul_get_canvas_height( p_vout->p_sys->p_cv );
             var_Set( p_vout, "mouse-y", val );
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_vout, "mouse-moved", val );
             break;
         case CACA_EVENT_MOUSE_RELEASE:
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_vout, "mouse-clicked", val );
             break;
         case CACA_EVENT_QUIT:

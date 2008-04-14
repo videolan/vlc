@@ -616,7 +616,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 {
     struct addrinfo hints, *res, *ptr;
     int             i_val, i_handle = -1;
-    vlc_bool_t      b_unreach = VLC_FALSE;
+    bool      b_unreach = false;
 
     if( i_hlim < 1 )
         i_hlim = var_CreateGetInteger( p_this, "ttl" );
@@ -683,7 +683,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 #else
         if( errno == ENETUNREACH )
 #endif
-            b_unreach = VLC_TRUE;
+            b_unreach = true;
         else
         {
             msg_Warn( p_this, "%s port %d : %m", psz_host, i_port);

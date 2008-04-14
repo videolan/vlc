@@ -47,7 +47,7 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     TAB_INIT( p_i->i_categories, p_i->pp_categories );
 
     p_i->i_type = ITEM_TYPE_UNKNOWN;
-    p_i->b_fixed_name = VLC_TRUE;
+    p_i->b_fixed_name = true;
 
     p_i->p_stats = NULL;
     p_i->p_meta = NULL;
@@ -344,7 +344,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
     ARRAY_APPEND( p_obj->p_libvlc->input_items, p_input );
     vlc_mutex_unlock( &p_obj->p_libvlc->object_lock );
 
-    p_input->b_fixed_name = VLC_FALSE;
+    p_input->b_fixed_name = false;
 
     if( psz_uri )
         p_input->psz_uri = strdup( psz_uri );
@@ -352,7 +352,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
         p_input->psz_uri = NULL;
 
     p_input->i_type = i_type;
-    p_input->b_prefers_tree = VLC_FALSE;
+    p_input->b_prefers_tree = false;
 
     if( p_input->i_type == ITEM_TYPE_UNKNOWN )
         GuessType( p_input );

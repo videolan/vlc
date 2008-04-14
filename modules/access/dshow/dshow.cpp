@@ -49,9 +49,9 @@ static int AccessControl ( access_t *, int, va_list );
 static int Demux       ( demux_t * );
 static int DemuxControl( demux_t *, int, va_list );
 
-static int OpenDevice( vlc_object_t *, access_sys_t *, string, vlc_bool_t );
+static int OpenDevice( vlc_object_t *, access_sys_t *, string, bool );
 static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
-                                       list<string> *, vlc_bool_t );
+                                       list<string> *, bool );
 static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                               int, int, int, int, int, int,
                               AM_MEDIA_TYPE *mt, size_t );
@@ -64,9 +64,9 @@ static int ConfigDevicesCallback( vlc_object_t *, char const *,
 
 static void ShowPropertyPage( IUnknown * );
 static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
-                                  IBaseFilter *, vlc_bool_t );
+                                  IBaseFilter *, bool );
 static void ShowTunerProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
-                                 IBaseFilter *, vlc_bool_t );
+                                 IBaseFilter *, bool );
 static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
                          IBaseFilter * );
 
@@ -156,7 +156,7 @@ static const char *ppsz_amtuner_mode_text[] = { N_("Default"),
 #define AMTUNER_MODE_LONGTEXT N_( \
     "AM Tuner mode. Can be one of DEFAULT, TV, AM_RADIO, FM_RADIO or DSS.")
 
-static int  CommonOpen ( vlc_object_t *, access_sys_t *, vlc_bool_t );
+static int  CommonOpen ( vlc_object_t *, access_sys_t *, bool );
 static void CommonClose( vlc_object_t *, access_sys_t * );
 
 static int  AccessOpen ( vlc_object_t * );
@@ -171,56 +171,56 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_TEXT, CACHING_LONGTEXT, true );
 
-    add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, VLC_FALSE);
+    add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false);
         change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
         change_action_add( ConfigDevicesCallback, N_("Configure") );
 
-    add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE);
+    add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false);
         change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
         change_action_add( ConfigDevicesCallback, N_("Configure") );
 
-    add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE);
+    add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false);
 
     add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                VLC_TRUE );
+                true );
 
     add_float( "dshow-fps", 0.0f, NULL, FPS_TEXT, FPS_LONGTEXT,
-                VLC_TRUE );
+                true );
 
-    add_bool( "dshow-config", VLC_FALSE, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
-              VLC_TRUE );
+    add_bool( "dshow-config", false, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
+              true );
 
-    add_bool( "dshow-tuner", VLC_FALSE, NULL, TUNER_TEXT, TUNER_LONGTEXT,
-              VLC_TRUE );
+    add_bool( "dshow-tuner", false, NULL, TUNER_TEXT, TUNER_LONGTEXT,
+              true );
 
     add_integer( "dshow-tuner-channel", 0, NULL, CHANNEL_TEXT,
-                 CHANNEL_LONGTEXT, VLC_TRUE );
+                 CHANNEL_LONGTEXT, true );
 
     add_integer( "dshow-tuner-country", 0, NULL, COUNTRY_TEXT,
-                 COUNTRY_LONGTEXT, VLC_TRUE );
+                 COUNTRY_LONGTEXT, true );
 
     add_integer( "dshow-tuner-input", 0, NULL, TUNER_INPUT_TEXT,
-                 TUNER_INPUT_LONGTEXT, VLC_TRUE );
+                 TUNER_INPUT_LONGTEXT, true );
         change_integer_list( pi_tuner_input, ppsz_tuner_input_text, 0 );
 
     add_integer( "dshow-video-input",  -1, NULL, VIDEO_IN_TEXT,
-                 VIDEO_IN_LONGTEXT, VLC_TRUE );
+                 VIDEO_IN_LONGTEXT, true );
 
     add_integer( "dshow-audio-input",  -1, NULL, AUDIO_IN_TEXT,
-                 AUDIO_IN_LONGTEXT, VLC_TRUE );
+                 AUDIO_IN_LONGTEXT, true );
 
     add_integer( "dshow-video-output", -1, NULL, VIDEO_OUT_TEXT,
-                 VIDEO_OUT_LONGTEXT, VLC_TRUE );
+                 VIDEO_OUT_LONGTEXT, true );
 
     add_integer( "dshow-audio-output", -1, NULL, AUDIO_OUT_TEXT,
-                 AUDIO_OUT_LONGTEXT, VLC_TRUE );
+                 AUDIO_OUT_LONGTEXT, true );
 
     add_integer( "dshow-amtuner-mode", AMTUNER_MODE_TV, NULL,
-                AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, VLC_FALSE);
+                AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false);
         change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, 0 );
 
     add_shortcut( "dshow" );
@@ -229,7 +229,7 @@ vlc_module_begin();
 
     add_submodule();
     set_description( _("DirectShow input") );
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     set_callbacks( AccessOpen, AccessClose );
 
 vlc_module_end();
@@ -254,7 +254,7 @@ typedef struct dshow_stream_t
     int             i_fourcc;
     es_out_id_t     *p_es;
 
-    vlc_bool_t      b_pts;
+    bool      b_pts;
 } dshow_stream_t;
 
 /*****************************************************************************
@@ -318,7 +318,7 @@ static void DeleteDirectShowGraph( access_sys_t *p_sys )
  * CommonOpen: open direct show device
  *****************************************************************************/
 static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
-                       vlc_bool_t b_access_demux )
+                       bool b_access_demux )
 {
     vlc_value_t  val;
     int i;
@@ -326,7 +326,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     /* Get/parse options and open device(s) */
     string vdevname, adevname;
     int i_width = 0, i_height = 0, i_chroma = 0;
-    vlc_bool_t b_audio = VLC_TRUE;
+    bool b_audio = true;
 
     var_Create( p_this, "dshow-config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -372,14 +372,14 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     }
     free( val.psz_string );
 
-    p_sys->b_chroma = VLC_FALSE;
+    p_sys->b_chroma = false;
     var_Create( p_this, "dshow-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-chroma", &val );
     if( val.psz_string && strlen( val.psz_string ) >= 4 )
     {
         i_chroma = VLC_FOURCC( val.psz_string[0], val.psz_string[1],
                                val.psz_string[2], val.psz_string[3] );
-        p_sys->b_chroma = VLC_TRUE;
+        p_sys->b_chroma = true;
     }
     free( val.psz_string );
 
@@ -440,7 +440,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 /* Raw MPEG video stream */
                 p_stream->i_fourcc == VLC_FOURCC('m','p','2','v') )
             {
-                b_audio = VLC_FALSE;
+                b_audio = false;
 
                 if( b_access_demux )
                 {
@@ -452,7 +452,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
         if( p_stream->mt.majortype == MEDIATYPE_Stream )
         {
-            b_audio = VLC_FALSE;
+            b_audio = false;
 
             if( b_access_demux )
             {
@@ -557,7 +557,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( access_sys_t ) );
     p_demux->p_sys = (demux_sys_t *)p_sys;
 
-    if( CommonOpen( p_this, p_sys, VLC_TRUE ) != VLC_SUCCESS )
+    if( CommonOpen( p_this, p_sys, true ) != VLC_SUCCESS )
     {
         CommonClose( p_this, p_sys );
         return VLC_EGENERIC;
@@ -638,7 +638,7 @@ static int AccessOpen( vlc_object_t *p_this )
     p_access->p_sys = p_sys = (access_sys_t *)malloc( sizeof( access_sys_t ) );
     memset( p_sys, 0, sizeof( access_sys_t ) );
 
-    if( CommonOpen( p_this, p_sys, VLC_FALSE ) != VLC_SUCCESS )
+    if( CommonOpen( p_this, p_sys, false ) != VLC_SUCCESS )
     {
         CommonClose( p_this, p_sys );
         return VLC_EGENERIC;
@@ -669,7 +669,7 @@ static int AccessOpen( vlc_object_t *p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys;
@@ -851,7 +851,7 @@ static int GetFourCCPriority( int i_fourcc )
 #define MAX_MEDIA_TYPES 32
 
 static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
-                       string devicename, vlc_bool_t b_audio )
+                       string devicename, bool b_audio )
 {
     /* See if device is already opened */
     for( int i = 0; i < p_sys->i_streams; i++ )
@@ -892,7 +892,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     {
         msg_Err( p_this, "can't use device: %s, unsupported device type",
                  devicename.c_str() );
-        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"),
+        intf_UserFatal( p_this, false, _("Capturing failed"),
                         _("VLC cannot use the device \"%s\", because its "
                           "type is not supported.") );
         return VLC_EGENERIC;
@@ -942,7 +942,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     else {
         /* capture device */
         msg_Err( p_this, "capture device '%s' does not support required parameters !", devicename.c_str() );
-        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"),
+        intf_UserFatal( p_this, false, _("Capturing failed"),
                         _("The capture device \"%s\" does not support the "
                           "required parameters."), devicename.c_str() );
         p_device_filter->Release();
@@ -966,7 +966,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         msg_Dbg( p_this, "filters connected successfully !" );
 
         dshow_stream_t dshow_stream;
-        dshow_stream.b_pts = VLC_FALSE;
+        dshow_stream.b_pts = false;
         dshow_stream.p_es = 0;
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
@@ -1053,7 +1053,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 
 static IBaseFilter *
 FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
-                   list<string> *p_listdevices, vlc_bool_t b_audio )
+                   list<string> *p_listdevices, bool b_audio )
 {
     IBaseFilter *p_base_filter = NULL;
     IMoniker *p_moniker = NULL;
@@ -1718,7 +1718,7 @@ static int Demux( demux_t *p_demux )
         {
             /* Use our data timestamp */
             i_pts = sample.i_timestamp;
-            p_stream->b_pts = VLC_TRUE;
+            p_stream->b_pts = true;
         }
     }
 
@@ -1745,7 +1745,7 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -1756,8 +1756,8 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
     case ACCESS_CAN_FASTSEEK:
     case ACCESS_CAN_PAUSE:
     case ACCESS_CAN_CONTROL_PACE:
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_FALSE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = false;
         break;
 
     /* */
@@ -1792,7 +1792,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
  ****************************************************************************/
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
-    vlc_bool_t *pb;
+    bool *pb;
     int64_t    *pi64;
 
     switch( i_query )
@@ -1802,8 +1802,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_CAN_SEEK:
     case DEMUX_SET_PAUSE_STATE:
     case DEMUX_CAN_CONTROL_PACE:
-        pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-        *pb = VLC_FALSE;
+        pb = (bool*)va_arg( args, bool * );
+        *pb = false;
         return VLC_SUCCESS;
 
     case DEMUX_GET_PTS_DELAY:
@@ -1831,13 +1831,13 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                vlc_value_t newval, vlc_value_t oldval, void * )
 {
     module_config_t *p_item;
-    vlc_bool_t b_audio = VLC_FALSE;
+    bool b_audio = false;
     int i;
 
     p_item = config_FindConfig( p_this, psz_name );
     if( !p_item ) return VLC_SUCCESS;
 
-    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = VLC_TRUE;
+    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = true;
 
     /* Clear-up the current list */
     if( p_item->i_list )
@@ -1886,7 +1886,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item->ppsz_list_text[i] = NULL;
 
     /* Signal change to the interface */
-    p_item->b_dirty = VLC_TRUE;
+    p_item->b_dirty = true;
 
     return VLC_SUCCESS;
 }
@@ -1895,7 +1895,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                vlc_value_t newval, vlc_value_t oldval, void * )
 {
     module_config_t *p_item;
-    vlc_bool_t b_audio = VLC_FALSE;
+    bool b_audio = false;
 
     /* Initialize OLE/COM */
     CoInitialize( 0 );
@@ -1903,7 +1903,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item = config_FindConfig( p_this, psz_name );
     if( !p_item ) return VLC_SUCCESS;
 
-    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = VLC_TRUE;
+    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = true;
 
     string devicename;
 
@@ -1974,7 +1974,7 @@ static void ShowPropertyPage( IUnknown *obj )
 static void ShowDeviceProperties( vlc_object_t *p_this,
                                   ICaptureGraphBuilder2 *p_graph,
                                   IBaseFilter *p_device_filter,
-                                  vlc_bool_t b_audio )
+                                  bool b_audio )
 {
     HRESULT hr;
     msg_Dbg( p_this, "configuring Device Properties" );
@@ -2053,7 +2053,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
 static void ShowTunerProperties( vlc_object_t *p_this,
                                  ICaptureGraphBuilder2 *p_graph,
                                  IBaseFilter *p_device_filter,
-                                 vlc_bool_t b_audio )
+                                 bool b_audio )
 {
     HRESULT hr;
     msg_Dbg( p_this, "configuring Tuner Properties" );

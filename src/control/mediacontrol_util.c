@@ -82,7 +82,7 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
         {
             double f_fps;
 
-            if( demux2_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+            if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
                 return 0;
             else
                 return( value * f_fps / 1000.0 );
@@ -95,7 +95,7 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
     {
         double f_fps;
 
-        if( demux2_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) ||
+        if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) ||
                                 f_fps < 0.1 )
             return 0;
 
@@ -131,7 +131,7 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
 //         if( to == mediacontrol_SampleCount )
 //         {
 //             double f_fps;
-//             if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+//             if( demux_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
 //                 return 0;
 //             else
 //                 return ( vlc_int64_t )( value * f_fps / 50 / p_input->stream.i_mux_rate );

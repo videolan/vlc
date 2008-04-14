@@ -68,28 +68,28 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( _("Audio CD"));
     set_description( _("Audio CD input") );
-    set_capability( "access2", 10 );
+    set_capability( "access", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     set_callbacks( Open, Close );
 
     add_usage_hint( N_("[cdda:][device][@[track]]") );
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
 
-    add_integer( "cdda-track", -1 , NULL, NULL, NULL, VLC_TRUE );
+    add_integer( "cdda-track", -1 , NULL, NULL, NULL, true );
         change_internal();
-    add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, VLC_TRUE );
+    add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, true );
         change_internal();
-    add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, VLC_TRUE );
+    add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, true );
         change_internal();
 
     add_string( "cddb-server", "freedb.freedb.org", NULL,
                 N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
-                VLC_TRUE );
+                true );
     add_integer( "cddb-port", 8880, NULL,
                 N_( "CDDB port" ), N_( "CDDB Server port to use." ),
-                VLC_TRUE );
+                true );
     add_shortcut( "cdda" );
     add_shortcut( "cddasimple" );
 vlc_module_end();
@@ -112,7 +112,7 @@ struct access_sys_t
 
     /* Wave header for the output data */
     WAVEHEADER  waveheader;
-    vlc_bool_t  b_header;
+    bool  b_header;
 
     int         i_track;
     int         i_first_sector;
@@ -198,7 +198,7 @@ static int Open( vlc_object_t *p_this )
                 if( p_playlist->status.p_item->p_input == p_current )
                     p_item = p_playlist->status.p_item;
                 else
-                    p_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
+                    p_item = playlist_ItemGetByInput( p_playlist, p_current, false );
 
                 if( p_item )
                     i_ret = GetTracks( p_access, p_playlist, p_item );
@@ -285,7 +285,7 @@ static block_t *Block( access_t *p_access )
     int i_blocks = CDDA_BLOCKS_ONCE;
     block_t *p_block;
 
-    if( p_sys->i_track < 0 ) p_access->info.b_eof = VLC_TRUE;
+    if( p_sys->i_track < 0 ) p_access->info.b_eof = true;
 
     /* Check end of file */
     if( p_access->info.b_eof ) return NULL;
@@ -295,13 +295,13 @@ static block_t *Block( access_t *p_access )
         /* Return only the header */
         p_block = block_New( p_access, sizeof( WAVEHEADER ) );
         memcpy( p_block->p_buffer, &p_sys->waveheader, sizeof(WAVEHEADER) );
-        p_sys->b_header = VLC_TRUE;
+        p_sys->b_header = true;
         return p_block;
     }
 
     if( p_sys->i_sector >= p_sys->i_last_sector )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
         return NULL;
     }
 
@@ -355,7 +355,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
+    bool   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
 
@@ -365,8 +365,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
             break;
 
         case ACCESS_GET_MTU:
@@ -417,7 +417,7 @@ static int GetTracks( access_t *p_access,
         return VLC_EGENERIC;
     }
 
-    p_item_in_category = playlist_ItemToNode( p_playlist, p_parent, VLC_FALSE );
+    p_item_in_category = playlist_ItemToNode( p_playlist, p_parent, false );
     playlist_ItemSetName( p_parent, "Audio CD" );
     var_SetInteger( p_playlist, "item-change", p_parent->p_input->i_id );
 
@@ -492,7 +492,7 @@ static int GetTracks( access_t *p_access,
         int i_ret = playlist_BothAddInput( p_playlist, p_input_item,
                                p_item_in_category,
                                PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
-                               VLC_FALSE );
+                               false );
         vlc_gc_decref( p_input_item );
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );

@@ -176,7 +176,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
 
     /* Create audio thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", QNXaoutThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
     {
         msg_Err( p_aout, "cannot create QNX audio thread (%m)" );
         E_(CloseAudio)( p_this );
@@ -285,11 +285,11 @@ static int QNXaoutThread( aout_instance_t * p_aout )
                       * p_aout->output.output.i_frame_length;
             next_date += mdate();
 
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, false );
         }
         else
         {
-            p_buffer = aout_OutputNextBuffer( p_aout, 0, VLC_TRUE );
+            p_buffer = aout_OutputNextBuffer( p_aout, 0, true );
         }
 
         if ( p_buffer != NULL )

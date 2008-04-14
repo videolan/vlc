@@ -84,11 +84,11 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AFILTER );
 
     add_integer( "headphone-dim", 10, NULL, HEADPHONE_DIM_TEXT,
-                 HEADPHONE_DIM_LONGTEXT, VLC_FALSE );
+                 HEADPHONE_DIM_LONGTEXT, false );
     add_bool( "headphone-compensate", 0, NULL, HEADPHONE_COMPENSATE_TEXT,
-              HEADPHONE_COMPENSATE_LONGTEXT, VLC_TRUE );
+              HEADPHONE_COMPENSATE_LONGTEXT, true );
     add_bool( "headphone-dolby", 0, NULL, HEADPHONE_DOLBY_TEXT,
-              HEADPHONE_DOLBY_LONGTEXT, VLC_TRUE );
+              HEADPHONE_DOLBY_LONGTEXT, true );
 
     set_capability( "audio filter", 0 );
     set_callbacks( Create, Destroy );
@@ -361,7 +361,7 @@ static int Init( vlc_object_t *p_this, struct aout_filter_sys_t * p_data
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
-    vlc_bool_t b_fit = VLC_TRUE;
+    bool b_fit = true;
 
     /* Activate this filter only with stereo devices */
     if( p_filter->output.i_physical_channels
@@ -375,27 +375,27 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->input.i_original_channels
             != p_filter->output.i_original_channels )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_original_channels =
                                         p_filter->output.i_original_channels;
     }
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
           || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
     }
     if( p_filter->input.i_rate != p_filter->output.i_rate )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_rate = p_filter->output.i_rate;
     }
     if( p_filter->input.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
           && ( p_filter->input.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
           && ! config_GetInt ( p_filter , "headphone-dolby" ) )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                                               AOUT_CHAN_CENTER |
                                               AOUT_CHAN_REARLEFT |
@@ -576,7 +576,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 static int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    vlc_bool_t b_fit = VLC_TRUE;
+    bool b_fit = true;
 
     /* Activate this filter only with stereo devices */
     if( p_filter->fmt_out.audio.i_physical_channels
@@ -590,27 +590,27 @@ static int OpenFilter( vlc_object_t *p_this )
     if( p_filter->fmt_in.audio.i_original_channels
             != p_filter->fmt_out.audio.i_original_channels )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->fmt_in.audio.i_original_channels =
                                         p_filter->fmt_out.audio.i_original_channels;
     }
     if( p_filter->fmt_in.audio.i_format != VLC_FOURCC('f','l','3','2')
           || p_filter->fmt_out.audio.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->fmt_in.audio.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
     }
     if( p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->fmt_in.audio.i_rate = p_filter->fmt_out.audio.i_rate;
     }
     if( p_filter->fmt_in.audio.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
           && ( p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
           && !config_GetInt( p_filter, "headphone-dolby" ) )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->fmt_in.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                                               AOUT_CHAN_CENTER |
                                               AOUT_CHAN_REARLEFT |

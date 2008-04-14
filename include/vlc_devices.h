@@ -45,7 +45,7 @@ struct device_t
 {
     int             i_capabilities;
     int             i_media_type;
-    vlc_bool_t      b_seen;
+    bool      b_seen;
     char *psz_uri;
     char *psz_name;
 };

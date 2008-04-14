@@ -81,7 +81,7 @@ history_t *history_New( void )
    return p_new_history;
 }
 
-vlc_bool_t history_GoBackSavingCurrentItem ( history_t *p_history,
+bool history_GoBackSavingCurrentItem ( history_t *p_history,
                                              history_item_t *p_item )
 {
     history_PruneAndInsert( p_history, p_item );
@@ -95,7 +95,7 @@ vlc_bool_t history_GoBackSavingCurrentItem ( history_t *p_history,
 #ifdef HISTORY_DEBUG
     history_Dump( p_history );
 #endif
-    return VLC_TRUE;
+    return true;
 }
 
 static void history_Dump( history_t *p_history )
@@ -125,7 +125,7 @@ static void history_Dump( history_t *p_history )
     }
 }
 
-vlc_bool_t history_GoForwardSavingCurrentItem ( history_t *p_history,
+bool history_GoForwardSavingCurrentItem ( history_t *p_history,
                                                 history_item_t *p_item )
 {
 #ifdef HISTORY_DEBUG
@@ -136,33 +136,33 @@ vlc_bool_t history_GoForwardSavingCurrentItem ( history_t *p_history,
         == XARRAY_SUCCESS )
     {
         p_history->i_index++;
-        return VLC_TRUE;
+        return true;
     }
     else
     {
-        return VLC_FALSE;
+        return false;
     }
 }
 
-vlc_bool_t history_CanGoBack( history_t *p_history )
+bool history_CanGoBack( history_t *p_history )
 {
     if( p_history->i_index > 0 )
-        return VLC_TRUE;
+        return true;
     else
-        return VLC_FALSE;
+        return false;
 }
 
-vlc_bool_t history_CanGoForward( history_t *p_history )
+bool history_CanGoForward( history_t *p_history )
 {
     unsigned int i_count;
 
     if( xarray_Count( p_history->p_xarray, &i_count ) != XARRAY_SUCCESS )
-        return VLC_FALSE;
+        return false;
 
     if( p_history->i_index < i_count )
-        return VLC_TRUE;
+        return true;
     else
-        return VLC_FALSE;
+        return false;
 }
 
 history_item_t *history_Item( history_t *p_history )

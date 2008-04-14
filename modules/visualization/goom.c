@@ -75,11 +75,11 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_VISUAL );
     set_capability( "visualization", 0 );
     add_integer( "goom-width", 320, NULL,
-                 WIDTH_TEXT, RES_LONGTEXT, VLC_FALSE );
+                 WIDTH_TEXT, RES_LONGTEXT, false );
     add_integer( "goom-height", 240, NULL,
-                 HEIGHT_TEXT, RES_LONGTEXT, VLC_FALSE );
+                 HEIGHT_TEXT, RES_LONGTEXT, false );
     add_integer( "goom-speed", 6, NULL,
-                 SPEED_TEXT, SPEED_LONGTEXT, VLC_FALSE );
+                 SPEED_TEXT, SPEED_LONGTEXT, false );
     set_callbacks( Open, Close );
     add_shortcut( "goom" );
 vlc_module_end();
@@ -192,7 +192,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
 
     if( vlc_thread_create( p_thread, "Goom Update Thread", Thread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_filter, "cannot lauch goom thread" );
         vout_Destroy( p_thread->p_vout );

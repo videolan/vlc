@@ -85,9 +85,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AFILTER );
     add_shortcut( "volnorm" );
     add_integer( "norm-buff-size", 20 ,NULL ,BUFF_TEXT, BUFF_LONGTEXT,
-                 VLC_TRUE);
+                 true);
     add_float( "norm-max-level", 2.0, NULL, LEVEL_TEXT,
-               LEVEL_LONGTEXT, VLC_TRUE );
+               LEVEL_LONGTEXT, true );
     set_capability( "audio filter", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -98,14 +98,14 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     aout_filter_t *p_filter = (aout_filter_t*)p_this;
-    vlc_bool_t b_fit = VLC_TRUE;
+    bool b_fit = true;
     int i_channels;
     aout_filter_sys_t *p_sys;
 
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
         p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
         msg_Warn( p_filter, "bad input or output format" );
@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
 
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         memcpy( &p_filter->output, &p_filter->input,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
@@ -125,7 +125,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     i_channels = aout_FormatNbChannels( &p_filter->input );
 

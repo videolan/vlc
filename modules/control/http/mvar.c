@@ -346,7 +346,7 @@ mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
         {
             mvar_t *sd = E_(mvar_New)( "sd", module_GetObjName( p_parser ) );
             E_(mvar_AppendNewVar)( sd, "name",
-                                   module_GetName( p_parser, VLC_TRUE ) );
+                                   module_GetName( p_parser, true ) );
             E_(mvar_AppendVar)( s, sd );
         }
     }
@@ -630,8 +630,8 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
     return s;
 }
 
-void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, vlc_bool_t b_name );
-void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, vlc_bool_t b_name )
+void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name );
+void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, bool b_name )
 {
     /* Over name */
     mvar_t        *set;
@@ -639,7 +639,7 @@ void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *e
 
     /* Add a node with name and info */
     set = E_(mvar_New)( name, "set" );
-    if( b_name == VLC_TRUE )
+    if( b_name == true )
     {
         E_(mvar_AppendNewVar)( set, "name", el->psz_name );
     }
@@ -649,7 +649,7 @@ void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *e
         vlm_message_t *ch = el->child[k];
         if( ch->i_child > 0 )
         {
-            E_(mvar_VlmSetNewLoop)( ch->psz_name, vlm, set, ch, VLC_FALSE );
+            E_(mvar_VlmSetNewLoop)( ch->psz_name, vlm, set, ch, false );
         }
         else
         {
@@ -698,7 +698,7 @@ mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm )
                 continue;
             desc = inf->child[0];
 
-            E_(mvar_VlmSetNewLoop)( el->psz_name, vlm, s, desc, VLC_TRUE );
+            E_(mvar_VlmSetNewLoop)( el->psz_name, vlm, s, desc, true );
 
             vlm_MessageDelete( inf );
         }

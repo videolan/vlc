@@ -76,6 +76,7 @@ library AXVLC
     const int DISPID_AutoLoop   = 108;
     const int DISPID_StartTime  = 109;
     const int DISPID_BaseURL    = 110;
+    const int DISPID_Toolbar     = 111;
 
     [
       odl,
@@ -133,6 +134,15 @@ library AXVLC
 ** for compatibility with some scripting language (JScript)
 */
 
+        /*
+         * caution: vlcobject.toolbar:bool does not yet exists in Firefox
+         * plugin. Official usage is through "toolbar" property for now,
+         * which is compatibile with Firefox.
+         */
+        [id(DISPID_Toolbar), propget, helpstring("Returns/sets visibility of the toolbar")]
+        HRESULT Toolbar([out, retval] VARIANT_BOOL* visible);
+        [id(DISPID_Toolbar), propput, helpstring("Returns/sets visibility of the toolbar")]
+        HRESULT Toolbar([in] VARIANT_BOOL visible);
         HRESULT addTarget([in] BSTR uri, [in] VARIANT options, [in] enum VLCPlaylistMode mode, [in] int position);
         [propget, helpstring("Returns index of current item in playlist.")]
         HRESULT PlaylistIndex([out, retval] int* index);
@@ -435,9 +445,9 @@ library AXVLC
         HRESULT crop([in] BSTR geometry);
 
         [propget, helpstring("Returns teletext page used.")]
-        HRESULT subtitle([out, retval] long* page);
+        HRESULT teletext([out, retval] long* page);
         [propput, helpstring("Sets teletext page to use.")]
-        HRESULT subtitle([in] long page);
+        HRESULT teletext([in] long page);
 
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();

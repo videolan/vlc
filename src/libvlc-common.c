@@ -114,11 +114,11 @@ static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_module_name );
-static void ListModules   ( libvlc_int_t *, vlc_bool_t );
+static void ListModules   ( libvlc_int_t *, bool );
 static void Version       ( void );
 
 #ifdef WIN32
-static void ShowConsole   ( vlc_bool_t );
+static void ShowConsole   ( bool );
 static void PauseConsole  ( void );
 #endif
 static int  ConsoleWidth  ( void );
@@ -173,7 +173,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
        /* The module bank will be initialized later */
         p_libvlc_global->p_module_bank = NULL;
 
-        p_libvlc_global->b_ready = VLC_TRUE;
+        p_libvlc_global->b_ready = true;
     }
     vlc_mutex_unlock( lock );
 
@@ -201,7 +201,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 #if defined( HAVE_ISATTY ) && !defined( WIN32 )
     p_libvlc->b_color = isatty( 2 ); /* 2 is for stderr */
 #else
-    p_libvlc->b_color = VLC_FALSE;
+    p_libvlc->b_color = false;
 #endif
 
     /* Announce who we are - Do it only for first instance ? */
@@ -237,7 +237,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     char *       psz_modules = NULL;
     char *       psz_parser = NULL;
     char *       psz_control = NULL;
-    vlc_bool_t   b_exit = VLC_FALSE;
+    bool   b_exit = false;
     int          i_ret = VLC_EEXIT;
     playlist_t  *p_playlist = NULL;
     vlc_value_t  val;
@@ -280,7 +280,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * options) */
     module_InitBank( p_libvlc );
 
-    if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE ) )
+    if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true ) )
     {
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
@@ -290,14 +290,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( config_GetInt( p_libvlc, "help" ) > 0 )
     {
         Help( p_libvlc, "help" );
-        b_exit = VLC_TRUE;
+        b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for version option */
     else if( config_GetInt( p_libvlc, "version" ) > 0 )
     {
         Version();
-        b_exit = VLC_TRUE;
+        b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
 
@@ -311,7 +311,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Check for plugins cache options */
     if( config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0 )
     {
-        p_libvlc_global->p_module_bank->b_cache_delete = VLC_TRUE;
+        p_libvlc_global->p_module_bank->b_cache_delete = true;
     }
 
     /* Will be re-done properly later on */
@@ -327,9 +327,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
-            b_exit = VLC_TRUE;
+            b_exit = true;
         }
-        p_libvlc_global->b_daemon = VLC_TRUE;
+        p_libvlc_global->b_daemon = true;
 
         /* lets check if we need to write the pidfile */
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
@@ -359,13 +359,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( ( i_pid = fork() ) < 0 )
         {
             msg_Err( p_libvlc, "unable to fork vlc to daemon mode" );
-            b_exit = VLC_TRUE;
+            b_exit = true;
         }
         else if( i_pid )
         {
             /* This is the parent, exit right now */
             msg_Dbg( p_libvlc, "closing parent process" );
-            b_exit = VLC_TRUE;
+            b_exit = true;
             i_ret = VLC_EEXITSUCCESS;
         }
         else
@@ -376,7 +376,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             close( STDOUT_FILENO );
             close( STDERR_FILENO );
 
-            p_libvlc_global->b_daemon = VLC_TRUE;
+            p_libvlc_global->b_daemon = true;
         }
 #endif
     }
@@ -397,13 +397,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( !config_GetInt( p_libvlc, "ignore-config" ) )
         config_LoadConfigFile( p_libvlc, "main" );
-    config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
+    config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
 
     /* Check if the user specified a custom language */
     psz_language = config_GetPsz( p_libvlc, "language" );
     if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
     {
-        vlc_bool_t b_cache_delete = p_libvlc_global->p_module_bank->b_cache_delete;
+        bool b_cache_delete = p_libvlc_global->p_module_bank->b_cache_delete;
 
         /* Reset the default domain */
         SetLanguage( psz_language );
@@ -415,7 +415,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_InitBank( p_libvlc );
         if( !config_GetInt( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
-        config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
+        config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
         p_libvlc_global->p_module_bank->b_cache_delete = b_cache_delete;
     }
     free( psz_language );
@@ -432,7 +432,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     module_LoadPlugins( p_libvlc );
     if( p_libvlc->b_die )
     {
-        b_exit = VLC_TRUE;
+        b_exit = true;
     }
 
     msg_Dbg( p_libvlc, "module bank initialized, found %i modules",
@@ -443,27 +443,27 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         Help( p_libvlc, p_tmp );
         free( p_tmp );
-        b_exit = VLC_TRUE;
+        b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for long help option */
     else if( config_GetInt( p_libvlc, "longhelp" ) > 0 )
     {
         Help( p_libvlc, "longhelp" );
-        b_exit = VLC_TRUE;
+        b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for module list option */
     else if( config_GetInt( p_libvlc, "list" ) > 0 )
     {
-        ListModules( p_libvlc, VLC_FALSE );
-        b_exit = VLC_TRUE;
+        ListModules( p_libvlc, false );
+        b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
     else if( config_GetInt( p_libvlc, "list-verbose" ) > 0 )
     {
-        ListModules( p_libvlc, VLC_TRUE );
-        b_exit = VLC_TRUE;
+        ListModules( p_libvlc, true );
+        b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
 
@@ -473,13 +473,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( config_GetInt( p_libvlc, "reset-config" ) > 0 )
         {
             config_ResetAll( p_libvlc );
-            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
+            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
             config_SaveConfigFile( p_libvlc, NULL );
         }
         if( config_GetInt( p_libvlc, "save-config" ) > 0 )
         {
             config_LoadConfigFile( p_libvlc, NULL );
-            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_TRUE );
+            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
             config_SaveConfigFile( p_libvlc, NULL );
         }
     }
@@ -504,10 +504,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Override configuration with command line settings
      */
-    if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, VLC_FALSE ) )
+    if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, false ) )
     {
 #ifdef WIN32
-        ShowConsole( VLC_FALSE );
+        ShowConsole( false );
         /* Pause the console because it's destroyed when we exit */
         fprintf( stderr, "The command line options couldn't be loaded, check "
                  "that they are valid.\n" );
@@ -819,7 +819,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( psz_temp )
         {
             sprintf( psz_temp, "%s,none", psz_module );
-            VLC_AddIntf( 0, psz_temp, VLC_FALSE, VLC_FALSE );
+            VLC_AddIntf( 0, psz_temp, false, false );
             free( psz_temp );
         }
     }
@@ -829,18 +829,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Always load the hotkeys interface if it exists
      */
-    VLC_AddIntf( 0, "hotkeys,none", VLC_FALSE, VLC_FALSE );
+    VLC_AddIntf( 0, "hotkeys,none", false, false );
 
 #ifdef HAVE_DBUS_3
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) > 0 )
-        VLC_AddIntf( 0, "dbus,none", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "dbus,none", false, false );
 
     /* Prevents the power management daemon to suspend the computer
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
-        VLC_AddIntf( 0, "inhibit,none", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "inhibit,none", false, false );
 #endif
 
     /*
@@ -850,31 +850,31 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_X11_XLIB_H
     if( config_GetInt( p_libvlc, "disable-screensaver" ) )
     {
-        VLC_AddIntf( 0, "screensaver,none", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "screensaver,none", false, false );
     }
 #endif
 
     if( config_GetInt( p_libvlc, "file-logging" ) > 0 )
     {
-        VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "logger,none", false, false );
     }
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) > 0 )
     {
         const char *psz_logmode = "logmode=syslog";
-        libvlc_InternalAddIntf( p_libvlc, "logger,none", VLC_FALSE, VLC_FALSE,
+        libvlc_InternalAddIntf( p_libvlc, "logger,none", false, false,
                                 1, &psz_logmode );
     }
 #endif
 
     if( config_GetInt( p_libvlc, "show-intf" ) > 0 )
     {
-        VLC_AddIntf( 0, "showintf,none", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "showintf,none", false, false );
     }
 
     if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
     {
-        VLC_AddIntf( 0, "netsync,none", VLC_FALSE, VLC_FALSE );
+        VLC_AddIntf( 0, "netsync,none", false, false );
     }
 
 #ifdef WIN32
@@ -1000,11 +1000,11 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         announce_HandlerDestroy( p_announce );
     }
 
-    vlc_bool_t b_clean = VLC_TRUE;
+    bool b_clean = true;
     FOREACH_ARRAY( input_item_t *p_del, p_libvlc->input_items )
         msg_Err( p_libvlc, "input item %p has not been deleted properly: refcount %d, name %s",
             p_del, p_del->i_gc_refcount, p_del->psz_name ? p_del->psz_name : "(null)" );
-        b_clean = VLC_FALSE;
+        b_clean = false;
     FOREACH_END();
     assert( b_clean );
     ARRAY_RESET( p_libvlc->input_items );
@@ -1024,10 +1024,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  * \param p_libvlc the instance to destroy
  * \param b_release whether we should do a release on the instance
  */
-int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
+int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, bool b_release )
 {
-    vlc_value_t lockval;
-
     if( !p_libvlc )
         return VLC_EGENERIC;
 
@@ -1102,7 +1100,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
  */
 int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
                             char const *psz_module,
-                            vlc_bool_t b_block, vlc_bool_t b_play,
+                            bool b_block, bool b_play,
                             int i_options, const char *const *ppsz_options )
 {
     int i_err;
@@ -1288,7 +1286,7 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
 static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 {
 #ifdef WIN32
-    ShowConsole( VLC_TRUE );
+    ShowConsole( true );
 #endif
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
@@ -1361,18 +1359,18 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     int i_index;
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
     int i_width_description = i_width + PADDING_SPACES - 1;
-    vlc_bool_t b_advanced    = config_GetInt( p_this, "advanced" ) > 0;
-    vlc_bool_t b_description = config_GetInt( p_this, "help-verbose" ) > 0;
-    vlc_bool_t b_description_hack;
-    vlc_bool_t b_color       = config_GetInt( p_this, "color" ) > 0;
-    vlc_bool_t b_has_advanced = VLC_FALSE;
+    bool b_advanced    = config_GetInt( p_this, "advanced" ) > 0;
+    bool b_description = config_GetInt( p_this, "help-verbose" ) > 0;
+    bool b_description_hack;
+    bool b_color       = config_GetInt( p_this, "color" ) > 0;
+    bool b_has_advanced = false;
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
     memset( psz_spaces_longtext, ' ', LINE_START+2 );
     psz_spaces_longtext[LINE_START+2] = '\0';
 #ifdef WIN32
-    b_color = VLC_FALSE; // don't put color control codes in a .txt file
+    b_color = false; // don't put color control codes in a .txt file
 #endif
 
     if( b_color )
@@ -1397,7 +1395,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     /* Enumerate the config for each module */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        vlc_bool_t b_help_module;
+        bool b_help_module;
         module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
         module_config_t *p_item = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
@@ -1476,7 +1474,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             /* Skip advanced options if requested */
             if( p_item->b_advanced && !b_advanced )
             {
-                b_has_advanced = VLC_TRUE;
+                b_has_advanced = true;
                 continue;
             }
 
@@ -1740,7 +1738,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             if( b_description_hack && p_item->psz_longtext )
             {
                 sprintf( psz_buffer, "%s%s", p_item->psz_longtext, psz_suf );
-                b_description_hack = VLC_FALSE;
+                b_description_hack = false;
                 psz_spaces = psz_spaces_longtext;
                 utf8_fprintf( stdout, "%s", psz_spaces );
                 goto description;
@@ -1768,19 +1766,19 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
  * Print a list of all available modules (builtins and plugins) and a short
  * description for each one.
  *****************************************************************************/
-static void ListModules( libvlc_int_t *p_this, vlc_bool_t b_verbose )
+static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 {
     vlc_list_t *p_list = NULL;
     module_t *p_parser = NULL;
     char psz_spaces[22];
     int i_index;
 
-    vlc_bool_t b_color = config_GetInt( p_this, "color" ) > 0;
+    bool b_color = config_GetInt( p_this, "color" ) > 0;
 
     memset( psz_spaces, ' ', 22 );
 
 #ifdef WIN32
-    ShowConsole( VLC_TRUE );
+    ShowConsole( true );
 #endif
 
     /* List all modules */
@@ -1856,7 +1854,7 @@ static void ListModules( libvlc_int_t *p_this, vlc_bool_t b_verbose )
 static void Version( void )
 {
 #ifdef WIN32
-    ShowConsole( VLC_TRUE );
+    ShowConsole( true );
 #endif
 
     utf8_fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
@@ -1879,7 +1877,7 @@ static void Version( void )
  * This function is useful only on Win32.
  *****************************************************************************/
 #ifdef WIN32 /*  */
-static void ShowConsole( vlc_bool_t b_dofile )
+static void ShowConsole( bool b_dofile )
 {
 #   ifndef UNDER_CE
     FILE *f_help = NULL;

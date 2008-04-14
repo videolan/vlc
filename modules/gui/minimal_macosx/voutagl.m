@@ -61,7 +61,7 @@ int aglInit( vout_thread_t * p_vout )
 
     AGLPixelFormat pixFormat;
 
-    p_vout->p_sys->b_embedded = VLC_TRUE;
+    p_vout->p_sys->b_embedded = true;
 
     pixFormat = aglChoosePixelFormat(NULL, 0, ATTRIBUTES);
     if( NULL == pixFormat )
@@ -387,7 +387,7 @@ void aglSwap( vout_thread_t * p_vout )
 {
     if( ! p_vout->p_sys->b_clipped_out )
     {
-        p_vout->p_sys->b_got_frame = VLC_TRUE;
+        p_vout->p_sys->b_got_frame = true;
         aglSwapBuffers(p_vout->p_sys->agl_ctx);
     }
     else
@@ -535,14 +535,14 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                         {
                             vlc_value_t val;
 
-                            val.b_bool = VLC_FALSE;
+                            val.b_bool = false;
                             var_Set((vout_thread_t *) p_vout->p_parent, "fullscreen", val);
                         }
                         else
                         {
                             vlc_value_t val;
 
-                            val.b_bool = VLC_TRUE;
+                            val.b_bool = true;
                             var_Set( p_vout, "mouse-clicked", val );
 
                             var_Get( p_vout, "mouse-button-down", &val );
@@ -597,7 +597,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
 
                 var_Set( p_vout, "mouse-y", val );
 
-                val.b_bool = VLC_TRUE;
+                val.b_bool = true;
                 var_Set( p_vout, "mouse-moved", val );
 
                 break;

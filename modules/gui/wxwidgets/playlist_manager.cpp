@@ -106,7 +106,7 @@ PlaylistManager::PlaylistManager( intf_thread_t *_p_intf, wxWindow *p_parent ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    b_need_update = VLC_FALSE;
+    b_need_update = false;
     i_items_to_append = 0;
     i_cached_item_id = -1;
     i_update_counter = 0;
@@ -156,11 +156,11 @@ PlaylistManager::PlaylistManager( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
-    SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
+    SetDropTarget( new DragAndDrop( p_intf, true ) );
 #endif
 
     /* Update the playlist */
-    Rebuild( VLC_TRUE );
+    Rebuild( true );
 
     /*
      * We want to be notified of playlist changes
@@ -200,7 +200,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
     PlaylistManager *p_playlist = (PlaylistManager *)param;
-    p_playlist->b_need_update = VLC_TRUE;
+    p_playlist->b_need_update = true;
     return VLC_SUCCESS;
 }
 
@@ -289,7 +289,7 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     LockPlaylist( p_intf->p_sys, p_playlist );
     playlist_item_t *p_item =
         playlist_ItemGetById( p_playlist, ((PlaylistItem *)p_data)->i_id,
-                VLC_TRUE );
+                true );
     if( !p_item )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -317,7 +317,7 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
                          wxU( " )" ) );
     }
 
-    if( !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
+    if( !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == true )
     {
         msg = wxString( wxU( psz_name ) ) + duration;
     }
@@ -363,7 +363,7 @@ void PlaylistManager::AppendItem( wxCommandEvent& event )
     node = FindItem( treectrl->GetRootItem(), p_add->i_node );
     if( !node.IsOk() ) goto update;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_FALSE );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, false );
     if( !p_item ) goto update;
 
     item = FindItem( treectrl->GetRootItem(), p_add->i_item );
@@ -411,8 +411,8 @@ void PlaylistManager::Update()
 
     if( this->b_need_update )
     {
-        this->b_need_update = VLC_FALSE;
-        Rebuild( VLC_TRUE );
+        this->b_need_update = false;
+        Rebuild( true );
     }
 
     /* Updating the playing status every 0.5s is enough */
@@ -422,7 +422,7 @@ void PlaylistManager::Update()
 /**********************************************************************
  * Rebuild the playlist
  **********************************************************************/
-void PlaylistManager::Rebuild( vlc_bool_t b_root )
+void PlaylistManager::Rebuild( bool b_root )
 {
     i_items_to_append = 0;
     i_cached_item_id = -1;
@@ -504,14 +504,14 @@ void PlaylistManager::OnActivateItem( wxTreeEvent& event )
     if( !p_wxparent ) return;
 
     LockPlaylist( p_intf->p_sys, p_playlist );
-    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
-    p_node = playlist_ItemGetById( p_playlist, p_wxparent->i_id, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, true );
+    p_node = playlist_ItemGetById( p_playlist, p_wxparent->i_id, true );
     if( !p_item || p_item->i_children >= 0 )
     {
         p_node = p_item;
         p_item = NULL;
     }
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,  p_node, p_item );
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,  p_node, p_item );
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
 
@@ -569,7 +569,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     {
         /* Too many items waiting to be added, it will be quicker to rebuild
          * the whole playlist */
-        p_playlist->b_need_update = VLC_TRUE;
+        p_playlist->b_need_update = true;
         return VLC_SUCCESS;
     }
 

@@ -117,8 +117,8 @@ struct decoder_synchro_t
     /* */
     int             i_frame_rate;
     int             i_current_rate;
-    vlc_bool_t      b_no_skip;
-    vlc_bool_t      b_quiet;
+    bool      b_no_skip;
+    bool      b_quiet;
 
     /* date of the beginning of the decoding of the current picture */
     mtime_t         decoding_start;
@@ -212,8 +212,8 @@ void decoder_SynchroReset( decoder_synchro_t * p_synchro )
 /*****************************************************************************
  * decoder_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
-vlc_bool_t decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
-                               int i_render_time, vlc_bool_t b_low_delay )
+bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
+                               int i_render_time, bool b_low_delay )
 {
 #define TAU_PRIME( coding_type )    (p_synchro->p_tau[(coding_type)] \
                                     + (p_synchro->p_tau[(coding_type)] >> 1) \
@@ -221,7 +221,7 @@ vlc_bool_t decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_ty
 #define S (*p_synchro)
     mtime_t         now, period;
     mtime_t         pts = 0;
-    vlc_bool_t      b_decode = 0;
+    bool      b_decode = 0;
 
     if ( p_synchro->b_no_skip )
         return 1;
@@ -360,7 +360,7 @@ void decoder_SynchroDecode( decoder_synchro_t * p_synchro )
  * decoder_SynchroEnd : Called when the image is totally decoded
  *****************************************************************************/
 void decoder_SynchroEnd( decoder_synchro_t * p_synchro, int i_coding_type,
-                      vlc_bool_t b_garbage )
+                      bool b_garbage )
 {
     mtime_t     tau;
 
@@ -402,7 +402,7 @@ mtime_t decoder_SynchroDate( decoder_synchro_t * p_synchro )
 void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type,
                              int i_repeat_field, mtime_t next_pts,
                              mtime_t next_dts, int i_current_rate,
-                             vlc_bool_t b_low_delay )
+                             bool b_low_delay )
 {
     mtime_t         period = 1000000 * 1001 / p_synchro->i_frame_rate
                               * i_current_rate / INPUT_RATE_DEFAULT;

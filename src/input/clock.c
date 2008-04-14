@@ -118,7 +118,7 @@ static void ClockNewRef( input_clock_t *cl,
  * input_ClockInit: reinitializes the clock reference after a stream
  *                  discontinuity
  *****************************************************************************/
-void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average, int i_rate )
+void input_ClockInit( input_clock_t *cl, bool b_master, int i_cr_average, int i_rate )
 {
     cl->i_synchro_state = SYNCHRO_START;
 
@@ -142,7 +142,7 @@ void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average, 
 void input_ClockSetPCR( input_thread_t *p_input,
                         input_clock_t *cl, mtime_t i_clock )
 {
-    const vlc_bool_t b_synchronize = p_input->b_can_pace_control && cl->b_master;
+    const bool b_synchronize = p_input->b_can_pace_control && cl->b_master;
     const mtime_t i_mdate = mdate();
 
     if( ( cl->i_synchro_state != SYNCHRO_OK ) ||

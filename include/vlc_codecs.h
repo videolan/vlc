@@ -421,12 +421,12 @@ typedef struct es_sys_t
     unsigned int        i_scale_h;
     unsigned int        i_scale_v;
     unsigned int        i_alpha;
-    vlc_bool_t          b_smooth;
+    bool          b_smooth;
     mtime_t             i_fade_in;
     mtime_t             i_fade_out;
     unsigned int        i_align;
     mtime_t             i_time_offset;
-    vlc_bool_t          b_forced_subs;
+    bool          b_forced_subs;
     unsigned int        palette[16];
     unsigned int        colors[4];
 

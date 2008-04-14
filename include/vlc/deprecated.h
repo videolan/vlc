@@ -252,32 +252,6 @@ VLC_DEPRECATED_API libvlc_media_player_t * libvlc_playlist_get_media_player(
 #define VLC_EEXITSUCCESS  -999                /* Program exited successfully */
 #define VLC_EGENERIC      -666                              /* Generic error */
 
-/*****************************************************************************
- * Booleans
- *****************************************************************************/
-#define VLC_FALSE false
-#define VLC_TRUE  true
-
-/**
- * \defgroup var_type Variable types
- * These are the different types a vlc variable can have.
- * @{
- */
-#define VLC_VAR_VOID      0x0010
-#define VLC_VAR_BOOL      0x0020
-#define VLC_VAR_INTEGER   0x0030
-#define VLC_VAR_HOTKEY    0x0031
-#define VLC_VAR_STRING    0x0040
-#define VLC_VAR_MODULE    0x0041
-#define VLC_VAR_FILE      0x0042
-#define VLC_VAR_DIRECTORY 0x0043
-#define VLC_VAR_VARIABLE  0x0044
-#define VLC_VAR_FLOAT     0x0050
-#define VLC_VAR_TIME      0x0060
-#define VLC_VAR_ADDRESS   0x0070
-#define VLC_VAR_MUTEX     0x0080
-#define VLC_VAR_LIST      0x0090
-/**@}*/
 
 
 #if !defined( __LIBVLC__ )
@@ -381,12 +355,12 @@ VLC_DEPRECATED_API int     VLC_Init( int, int, const char *[] );
  * \param b_play start playing when the interface is done loading
  * \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
+VLC_DEPRECATED_API int     VLC_AddIntf( int, char const *, bool, bool );
 
 /**
  * Ask vlc to die
  *
- * This function sets p_libvlc->b_die to VLC_TRUE, but does not do any other
+ * This function sets p_libvlc->b_die to true, but does not do any other
  * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
  *
  * \param i_object a vlc object id
@@ -517,12 +491,12 @@ VLC_DEPRECATED_API int             VLC_Stop( int );
  * Tell if VLC is playing
  *
  * If an item is currently playing, it returns
- * VLC_TRUE, else VLC_FALSE
+ * true, else false
  *
  * \param i_object a vlc object id
- * \return VLC_TRUE or VLC_FALSE
+ * \return true or false
  */
-VLC_DEPRECATED_API vlc_bool_t      VLC_IsPlaying( int );
+VLC_DEPRECATED_API bool      VLC_IsPlaying( int );
 
 /**
  * Get the current position in a input
@@ -573,7 +547,7 @@ VLC_DEPRECATED_API int             VLC_TimeGet( int );
  * \param b_relative seek relative from current position
  * \return VLC_SUCCESS on success
  */
-VLC_DEPRECATED_API int             VLC_TimeSet( int, int, vlc_bool_t );
+VLC_DEPRECATED_API int             VLC_TimeSet( int, int, bool );
 
 /**
  * Get the total length of a input

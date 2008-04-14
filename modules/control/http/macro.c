@@ -200,30 +200,30 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         break;
                     }
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                                      VLC_TRUE, NULL,
+                                      true, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
-                                      i_item, VLC_TRUE ) );
+                                      i_item, true ) );
                     msg_Dbg( p_intf, "requested playlist item: %i", i_item );
                     break;
                 }
                 case MVLC_STOP:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_STOP,
-                                      VLC_TRUE );
+                                      true );
                     msg_Dbg( p_intf, "requested playlist stop" );
                     break;
                 case MVLC_PAUSE:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE,
-                                      VLC_TRUE );
+                                      true );
                     msg_Dbg( p_intf, "requested playlist pause" );
                     break;
                 case MVLC_NEXT:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP,
-                                      VLC_TRUE, 1 );
+                                      true, 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_PREVIOUS:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP,
-                                      VLC_TRUE, -1 );
+                                      true, -1 );
                     msg_Dbg( p_intf, "requested playlist previous" );
                     break;
                 case MVLC_FULLSCREEN:
@@ -347,8 +347,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         int i_ret = playlist_AddInput( p_sys->p_playlist,
                                      p_input,
-                                     PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
-                                     VLC_FALSE);
+                                     PLAYLIST_APPEND, PLAYLIST_END, true,
+                                     false);
                         vlc_gc_decref( p_input );
                         if( i_ret == VLC_SUCCESS )
                             msg_Dbg( p_intf, "requested mrl add: %s", mrl );
@@ -383,7 +383,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         for( i = 0; i < i_nb_items; i++ )
                         {
                             playlist_DeleteFromInput( p_sys->p_playlist,
-                                                      p_items[i], VLC_FALSE );
+                                                      p_items[i], false );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      p_items[i] );
                             p_items[i] = -1;
@@ -426,7 +426,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         {
                             playlist_DeleteFromInput( p_sys->p_playlist,
                                      p_sys->p_playlist->items.p_elems[i]->i_id,
-                                                      VLC_FALSE );
+                                                      false );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
                         }
@@ -437,7 +437,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 }
                 case MVLC_EMPTY:
                 {
-                    playlist_Clear( p_sys->p_playlist, VLC_FALSE );
+                    playlist_Clear( p_sys->p_playlist, false );
                     msg_Dbg( p_intf, "requested playlist empty" );
                     break;
                 }
@@ -810,7 +810,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 }
 
 static
-char *MacroSearch( char *src, char *end, int i_mvlc, vlc_bool_t b_after )
+char *MacroSearch( char *src, char *end, int i_mvlc, bool b_after )
 {
     int     i_id;
     int     i_level = 0;
@@ -947,7 +947,7 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                 }
                 case MVLC_IF:
                 {
-                    vlc_bool_t i_test;
+                    bool i_test;
                     char    *endif;
 
                     E_(EvaluateRPN)( p_intf, p_args->vars, &p_args->stack, m.param1 );
@@ -959,15 +959,15 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                     {
                         i_test = 0;
                     }
-                    endif = MacroSearch( src, end, MVLC_END, VLC_TRUE );
+                    endif = MacroSearch( src, end, MVLC_END, true );
 
                     if( i_test == 0 )
                     {
-                        char *start = MacroSearch( src, endif, MVLC_ELSE, VLC_TRUE );
+                        char *start = MacroSearch( src, endif, MVLC_ELSE, true );
 
                         if( start )
                         {
-                            char *stop  = MacroSearch( start, endif, MVLC_END, VLC_FALSE );
+                            char *stop  = MacroSearch( start, endif, MVLC_END, false );
                             if( stop )
                             {
                                 E_(Execute)( p_args, p_request, i_request,
@@ -978,9 +978,9 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                     else if( i_test == 1 )
                     {
                         char *stop;
-                        if( ( stop = MacroSearch( src, endif, MVLC_ELSE, VLC_FALSE ) ) == NULL )
+                        if( ( stop = MacroSearch( src, endif, MVLC_ELSE, false ) ) == NULL )
                         {
-                            stop = MacroSearch( src, endif, MVLC_END, VLC_FALSE );
+                            stop = MacroSearch( src, endif, MVLC_END, false );
                         }
                         if( stop )
                         {
@@ -994,9 +994,9 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                 }
                 case MVLC_FOREACH:
                 {
-                    char *endfor = MacroSearch( src, end, MVLC_END, VLC_TRUE );
+                    char *endfor = MacroSearch( src, end, MVLC_END, true );
                     char *start = src;
-                    char *stop = MacroSearch( src, end, MVLC_END, VLC_FALSE );
+                    char *stop = MacroSearch( src, end, MVLC_END, false );
 
                     if( stop )
                     {

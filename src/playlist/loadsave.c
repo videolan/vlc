@@ -72,7 +72,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_playlist->p_private = (void *)p_export;
 
     /* And call the module ! All work is done now */
-    p_module = module_Need( p_playlist, "playlist export", psz_type, VLC_TRUE);
+    p_module = module_Need( p_playlist, "playlist export", psz_type, true);
     if( !p_module )
     {
         msg_Warn( p_playlist, "exporting playlist failed" );
@@ -103,7 +103,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     /* playlist_AddInput() can fail, but we have no way to report that ..
      * Any way when it has failed, either the playlist is dying, either OOM */
     playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
-            VLC_FALSE, VLC_FALSE );
+            false, false );
 }
 
 int playlist_MLLoad( playlist_t *p_playlist )
@@ -163,15 +163,15 @@ int playlist_MLLoad( playlist_t *p_playlist )
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                         input_item_subitem_added, p_playlist );
 
-    p_playlist->b_doing_ml = VLC_TRUE;
+    p_playlist->b_doing_ml = true;
     PL_UNLOCK;
 
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
-    input_Read( p_playlist, p_input, VLC_TRUE );
+    input_Read( p_playlist, p_input, true );
     stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
 
     PL_LOCK;
-    p_playlist->b_doing_ml = VLC_FALSE;
+    p_playlist->b_doing_ml = false;
     PL_UNLOCK;
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,

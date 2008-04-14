@@ -27,7 +27,7 @@ typedef struct bridged_es_t
     es_format_t fmt;
     picture_t *p_picture;
     picture_t **pp_last;
-    vlc_bool_t b_empty;
+    bool b_empty;
     char *psz_id;
 } bridged_es_t;
 

@@ -28,8 +28,14 @@ export PATH=$PATH:"/cygdrive/c/Program Files/Microsoft Visual Studio/COMMON/MSDe
 export INCLUDE='C:\Program Files\Microsoft Visual Studio\VC98\Include'
 export MIDL="midl"
 
-if you are cross-compiling on Linux, you may be able to use 'widl' which is part of
-the WINE project (http://www.winehq.com), however I have not tested it.
+If you are cross-compiling on Linux, you can use 'widl' which is part of
+the WINE project (http://www.winehq.com). At leat wine-dev-0.9.57 works,
+the comand line to compile IDL should looks like the following :
+
+widl -I/usr/include/wine/windows/ \
+     -h -H axvlc_idl.h -t -T axvlc.tlb -u -U axvlc_idl.c \
+     axvlc.idl
+NOTE: widl breaks compatibility with Visual Basic. If that is important to you then use midl.
 
 II. Debugging
 
@@ -64,7 +70,7 @@ by using the REGSVR32 command, as per following example:
 
 REGSVR32 C:\WINDOWS\AXVLC.DLL
 
-if the control needs to use external VLC plugins (i.e other than built-in ones),
+If the control needs to use external VLC plugins (i.e other than built-in ones),
 make sure that the plugin path is set in the registry as per following example:
 
 [HKEY_LOCAL_MACHINE\Software\VideoLAN\VLC]
@@ -95,23 +101,25 @@ V. Controlling the plugin
 1) Properties
 
 the following public properties can be used to control the plugin from HTML,
-the property panel of Visual Basic and most ActiveX aware applications 
+the property panel of Visual Basic and most ActiveX aware applications.
 
-+==========+=========+================================+===============+
-| Name:    | Type:   |   Description:                 | Alias:        |
-+==========+=========+================================+===============+
-| autoplay | boolean | play when control is activated | autostart     |
-+----------+---------+--------------------------------+---------------+
-| autoloop | boolean | loop the playlist              | loop          |
-+----------+---------+--------------------------------+---------------+
-| mrl      | string  | initial MRL in playlist        | src, filename |
-+----------+---------+--------------------------------+---------------+
-| mute     | boolean | mute audio volume              |               |
-+----------+---------+--------------------------------+---------------+
-| visible  | boolean | show/hide control viewport     | showdisplay   |
-+----------+---------+--------------------------------+---------------+
-| volume   | integer | set/get audio volume           |               |
-+----------+---------+--------------------------------+---------------+
++==========+=========+===================================+===============+
+| Name:    | Type:   |   Description:                    | Alias:        |
++==========+=========+===================================+===============+
+| autoplay | boolean | play when control is activated    | autostart     |
++----------+---------+-----------------------------------+---------------+
+| autoloop | boolean | loop the playlist                 | loop          |
++----------+---------+-----------------------------------+---------------+
+| mrl      | string  | initial MRL in playlist           | src, filename |
++----------+---------+-----------------------------------+---------------+
+| mute     | boolean | mute audio volume                 |               |
++----------+---------+-----------------------------------+---------------+
+| visible  | boolean | show/hide control viewport        | showdisplay   |
++----------+---------+-----------------------------------+---------------+
+| volume   | integer | set/get audio volume              |               |
++----------+---------+-----------------------------------+---------------+
+| toolbar  | boolean | set/get visibility of the toolbar |               |
++----------+---------+-----------------------------------+---------------+
 
 the alias column allows to specify an alternative <PARAM name> for the
 property in internet explorer, which is useful to maintain compatibility
@@ -149,12 +157,25 @@ Variables:
 
 Methods:
 
+  *** current interface (0.8.6+) ***
+UUID : 9BE31822-FDAD-461B-AD51-BE1D1C159921
+defined in axvlc.idl as "coclass VLCPlugin2", "interface IVLCControl2"
+
+This interface organize API with several object (like .audio.mute)
+It is currently documented on videolan wiki (may change) at
+http://wiki.videolan.org/Documentation:Play_HowTo/Advanced_Use_of_VLC
+
+
+  ***  old interface (deprecated)  ***
+UUID : E23FE9C6-778E-49D4-B537-38FCDE4887D8
+defined in axvlc.idl as "coclass VLCPlugin", "interface IVLCControl"
+
 play()
     Play current item the playlist
 
 pause()
     Pause current item in the playlist
-    
+
 stop()
     Stop playing current item in playlist
 

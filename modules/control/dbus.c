@@ -75,8 +75,8 @@ static int TrackListChangeEmit( vlc_object_t *, const char *, vlc_value_t,
                         vlc_value_t, void * );
 
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
-static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, vlc_bool_t );
-static int UpdateCaps( intf_thread_t*, vlc_bool_t );
+static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, bool );
+static int UpdateCaps( intf_thread_t*, bool );
 
 /* GetCaps() capabilities */
 enum
@@ -94,7 +94,7 @@ enum
 struct intf_sys_t
 {
     DBusConnection *p_conn;
-    vlc_bool_t      b_meta_read;
+    bool      b_meta_read;
     dbus_int32_t    i_caps;
 };
 
@@ -292,7 +292,7 @@ DBUS_METHOD( GetStatus )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    MarshalStatus( p_this, &args, VLC_TRUE );
+    MarshalStatus( p_this, &args, true );
 
     REPLY_SEND;
 }
@@ -386,7 +386,7 @@ DBUS_METHOD( AddTrack )
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_Add( p_playlist, psz_mrl, NULL, PLAYLIST_APPEND |
             ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) ,
-            PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            PLAYLIST_END, true, false );
     pl_Release( p_playlist );
 
     REPLY_SEND;
@@ -480,7 +480,7 @@ DBUS_METHOD( DelTrack )
     {
         playlist_DeleteFromInput( p_playlist,
             p_playlist->items.p_elems[i_position*2-1]->i_id,
-            VLC_FALSE );
+            false );
     }
 
     pl_Release( p_playlist );
@@ -511,7 +511,7 @@ DBUS_METHOD( Loop )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    val.b_bool = ( b_loop == TRUE ) ? VLC_TRUE : VLC_FALSE ;
+    val.b_bool = ( b_loop == TRUE ) ? true : false ;
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     var_Set ( p_playlist, "loop", val );
     pl_Release( ((vlc_object_t*) p_this) );
@@ -542,7 +542,7 @@ DBUS_METHOD( Repeat )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    val.b_bool = ( b_repeat == TRUE ) ? VLC_TRUE : VLC_FALSE ;
+    val.b_bool = ( b_repeat == TRUE ) ? true : false ;
 
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     var_Set ( p_playlist, "repeat", val );
@@ -574,7 +574,7 @@ DBUS_METHOD( Random )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    val.b_bool = ( b_random == TRUE ) ? VLC_TRUE : VLC_FALSE ;
+    val.b_bool = ( b_random == TRUE ) ? true : false ;
 
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     var_Set ( p_playlist, "random", val );
@@ -697,7 +697,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->b_meta_read = VLC_FALSE;
+    p_sys->b_meta_read = false;
     p_sys->i_caps = CAPS_NONE;
 
     dbus_error_init( &error );
@@ -750,7 +750,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
     p_sys->p_conn = p_conn;
 
-    UpdateCaps( p_intf, VLC_FALSE );
+    UpdateCaps( p_intf, false );
 
     return VLC_SUCCESS;
 }
@@ -765,7 +765,7 @@ static void Close   ( vlc_object_t *p_this )
     playlist_t      *p_playlist = pl_Yield( p_intf );;
     input_thread_t  *p_input;
 
-    p_this->b_dead = VLC_TRUE;
+    p_this->b_dead = true;
 
     PL_LOCK;
     var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
@@ -849,7 +849,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
         playlist_t *p_playlist = (playlist_t*)p_this;
         playlist_add_t *p_add = newval.p_address;
         playlist_item_t *p_item;
-        p_item = playlist_ItemGetById( p_playlist, p_add->i_node, VLC_TRUE );
+        p_item = playlist_ItemGetById( p_playlist, p_add->i_node, true );
         assert( p_item );
         while( p_item->p_parent )
             p_item = p_item->p_parent;
@@ -860,7 +860,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, VLC_TRUE );
+    UpdateCaps( p_intf, true );
     TrackListChangeSignal( p_intf->p_sys->p_conn, p_data );
     return VLC_SUCCESS;
 }
@@ -890,7 +890,7 @@ DBUS_SIGNAL( StatusChangeSignal )
 
     /* we're called from a callback of input_thread_t, so it can not be
      * destroyed before we return */
-    MarshalStatus( (intf_thread_t*) p_data, &args, VLC_FALSE );
+    MarshalStatus( (intf_thread_t*) p_data, &args, false );
 
     SIGNAL_SEND;
 }
@@ -908,14 +908,14 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, VLC_FALSE );
+    UpdateCaps( p_intf, false );
 
     if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
     {
         input_item_t *p_item = input_GetItem( (input_thread_t*)p_this );
         if( p_item )
         {
-            p_sys->b_meta_read = VLC_TRUE;
+            p_sys->b_meta_read = true;
             TrackChangeSignal( p_sys->p_conn, p_item );
         }
     }
@@ -942,7 +942,7 @@ static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, VLC_FALSE );
+    UpdateCaps( p_intf, false );
     StatusChangeSignal( p_intf->p_sys->p_conn, p_data );
     return VLC_SUCCESS;
 }
@@ -964,7 +964,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    p_sys->b_meta_read = VLC_FALSE;
+    p_sys->b_meta_read = false;
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -990,7 +990,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
 
     if( input_item_IsPreparsed( p_item ) )
     {
-        p_sys->b_meta_read = VLC_TRUE;
+        p_sys->b_meta_read = true;
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
 
@@ -1003,7 +1003,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
 /*****************************************************************************
  * UpdateCaps: update p_sys->i_caps
  ****************************************************************************/
-static int UpdateCaps( intf_thread_t* p_intf, vlc_bool_t b_playlist_locked )
+static int UpdateCaps( intf_thread_t* p_intf, bool b_playlist_locked )
 {
     intf_sys_t* p_sys = p_intf->p_sys;
     dbus_int32_t i_caps = CAPS_CAN_HAS_TRACKLIST;
@@ -1121,7 +1121,7 @@ static int GetInputMeta( input_item_t* p_input,
  *****************************************************************************/
 
 static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args,
-                          vlc_bool_t lock )
+                          bool lock )
 { /* This is NOT the right way to do that, it would be better to sore
      the status information in p_sys and update it on change, thus
      avoiding a long lock */

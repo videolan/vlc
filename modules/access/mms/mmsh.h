@@ -47,14 +47,14 @@ struct access_sys_t
     int             fd;
     vlc_url_t       url;
 
-    vlc_bool_t      b_proxy;
+    bool      b_proxy;
     vlc_url_t       proxy;
 
     int             i_request_context;
 
     uint8_t         buffer[BUFFER_SIZE + 1];
 
-    vlc_bool_t      b_broadcast;
+    bool      b_broadcast;
 
     uint8_t         *p_header;
     int             i_header;

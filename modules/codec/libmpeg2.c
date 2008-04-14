@@ -53,7 +53,7 @@ struct decoder_sys_t
      */
     mpeg2dec_t          *p_mpeg2dec;
     const mpeg2_info_t  *p_info;
-    vlc_bool_t          b_skip;
+    bool          b_skip;
 
     /*
      * Input properties
@@ -64,13 +64,13 @@ struct decoder_sys_t
     mtime_t          i_current_dts;
     int              i_current_rate;
     picture_t *      p_picture_to_destroy;
-    vlc_bool_t       b_garbage_pic;
-    vlc_bool_t       b_after_sequence_header; /* is it the next frame after
+    bool       b_garbage_pic;
+    bool       b_after_sequence_header; /* is it the next frame after
                                                * the sequence header ?    */
-    vlc_bool_t       b_slice_i;             /* intra-slice refresh stream */
-    vlc_bool_t       b_second_field;
+    bool       b_slice_i;             /* intra-slice refresh stream */
+    bool       b_second_field;
 
-    vlc_bool_t       b_preroll;
+    bool       b_preroll;
 
     /*
      * Output properties
@@ -148,7 +148,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_slice_i  = 0;
     p_sys->b_second_field = 0;
     p_sys->b_skip     = 0;
-    p_sys->b_preroll = VLC_FALSE;
+    p_sys->b_preroll = false;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
     if( vlc_CPU() & CPU_CAPABILITY_MMX )
@@ -261,11 +261,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( p_block->i_flags & BLOCK_FLAG_PREROLL )
             {
-                p_sys->b_preroll = VLC_TRUE;
+                p_sys->b_preroll = true;
             }
             else if( p_sys->b_preroll )
             {
-                p_sys->b_preroll = VLC_FALSE;
+                p_sys->b_preroll = false;
                 /* Reset synchro */
                 decoder_SynchroReset( p_sys->p_synchro );
             }
@@ -481,7 +481,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             /* For still frames */
-            if( state == STATE_END && p_pic ) p_pic->b_force = VLC_TRUE;
+            if( state == STATE_END && p_pic ) p_pic->b_force = true;
 
             if( p_pic )
             {

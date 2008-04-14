@@ -129,36 +129,36 @@ vlc_module_begin();
     add_shortcut( "wxwidgets" );
 
     add_bool( "wx-embed", 1, NULL,
-              EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
+              EMBED_TEXT, EMBED_LONGTEXT, false );
         add_deprecated_alias( "wxwin-enbed" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-bookmarks", 0, NULL,
-              BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
+              BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, false );
         add_deprecated_alias( "wxwin-bookmarks" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-taskbar", 1, NULL,
-              TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
+              TASKBAR_TEXT, TASKBAR_LONGTEXT, false );
         add_deprecated_alias( "wxwin-taskbar" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-extended", 0, NULL,
-              EXTENDED_TEXT, EXTENDED_LONGTEXT, VLC_FALSE );
+              EXTENDED_TEXT, EXTENDED_LONGTEXT, false );
     add_bool( "wx-minimal", 0, NULL,
-              MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
+              MINIMAL_TEXT, MINIMAL_LONGTEXT, true );
         add_deprecated_alias( "wxwin-minimal" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-autosize", 1, NULL,
-              SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
+              SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, true );
         add_deprecated_alias( "wxwin-autosize" ); /*Deprecated since 0.8.4*/
     add_integer( "wx-playlist-view", 0, NULL, PLAYLIST_TEXT, PLAYLIST_LONGTEXT,
-             VLC_FALSE );
+             false );
         change_integer_list( pi_playlist_views, psz_playlist_views, 0 );
 /* wxCocoa pretends to support this, but at least 2.6.x doesn't */
 #ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wx-systray", 0, NULL,
-              SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
+              SYSTRAY_TEXT, SYSTRAY_LONGTEXT, false );
         add_deprecated_alias( "wxwin-systray" ); /*Deprecated since 0.8.4*/
 #endif
 #endif
-    add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, VLC_TRUE);
+    add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, true);
     add_string( "wx-config-last", NULL, NULL,
-                N_("last config"), N_("last config"), VLC_TRUE );
+                N_("last config"), N_("last config"), true );
         change_autosave();
         change_internal();
         add_deprecated_alias( "wxwin-config-last" ); /*Deprecated since 0.8.4*/
@@ -212,7 +212,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->pf_show_dialog = NULL;
 
     /* We support play on start */
-    p_intf->b_play = VLC_TRUE;
+    p_intf->b_play = true;
 
     p_intf->p_sys->b_video_autosize =
         config_GetInt( p_intf, "wx-autosize" );
@@ -238,7 +238,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     vlc_mutex_lock( &p_intf->object_lock );
-    p_intf->b_dead = VLC_TRUE;
+    p_intf->b_dead = true;
     vlc_mutex_unlock( &p_intf->object_lock );
 
     if( p_intf->pf_show_dialog )
@@ -285,7 +285,7 @@ static void Run( intf_thread_t *p_intf )
 
         /* Create a new thread for wxWidgets */
         if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
-                               Init, 0, VLC_TRUE ) )
+                               Init, 0, true ) )
         {
             msg_Err( p_intf, "cannot create Skins Dialogs Thread" );
             p_intf->pf_show_dialog = NULL;
@@ -401,7 +401,7 @@ bool Instance::OnInit()
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            playlist_Control( p_playlist, PLAYLIST_PLAY, VLC_FALSE );
+            playlist_Control( p_playlist, PLAYLIST_PLAY, false );
             vlc_object_release( p_playlist );
         }
     }

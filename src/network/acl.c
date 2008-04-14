@@ -44,7 +44,7 @@ typedef struct vlc_acl_entry_t
     uint8_t    host[17];
     uint8_t    i_bytes_match;
     uint8_t    i_bits_mask;
-    vlc_bool_t b_allow;
+    bool b_allow;
 } vlc_acl_entry_t;
 
 struct vlc_acl_t
@@ -52,7 +52,7 @@ struct vlc_acl_t
     vlc_object_t    *p_owner;
     unsigned         i_size;
     vlc_acl_entry_t *p_entries;
-    vlc_bool_t       b_allow_default;
+    bool       b_allow_default;
 };
 
 static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
@@ -154,7 +154,7 @@ int ACL_Check( vlc_acl_t *p_acl, const char *psz_ip )
  * Items are always matched in the same order as they are added.
  */
 int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
-                vlc_bool_t b_allow )
+                bool b_allow )
 {
     vlc_acl_entry_t *p_ent;
     unsigned i_size;
@@ -208,12 +208,12 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
 /**
  * Creates an empty ACL.
  *
- * @param b_allow whether to grant (VLC_TRUE) or deny (VLC_FALSE) access
+ * @param b_allow whether to grant (true) or deny (false) access
  * by default (ie if none of the ACL entries matched).
  *
  * @return an ACL object. NULL in case of error.
  */
-vlc_acl_t *__ACL_Create( vlc_object_t *p_this, vlc_bool_t b_allow )
+vlc_acl_t *__ACL_Create( vlc_object_t *p_this, bool b_allow )
 {
     vlc_acl_t *p_acl;
 
@@ -376,8 +376,8 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
             *ptr++ = '\0'; /* separate address from mask length */
 
         if( (ptr != NULL)
-            ? ACL_AddNet( p_acl, psz_ip, atoi( ptr ), VLC_TRUE )
-            : ACL_AddHost( p_acl, psz_ip, VLC_TRUE ) )
+            ? ACL_AddNet( p_acl, psz_ip, atoi( ptr ), true )
+            : ACL_AddHost( p_acl, psz_ip, true ) )
         {
             msg_Err( p_acl->p_owner, "cannot add ACL from %s", psz_path );
             goto error;

@@ -616,7 +616,7 @@ void OpenDialog::OnOk()
 
     for( int i = 0; i < i_args; i++ )
     {
-        vlc_bool_t b_start = !i && i_open_arg;
+        bool b_start = !i && i_open_arg;
         playlist_item_t *p_item =
             playlist_ItemNew( p_intf, pp_args[i], pp_args[i] );
 

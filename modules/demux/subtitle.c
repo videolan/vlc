@@ -67,17 +67,17 @@ static const char *ppsz_sub_type[] =
 vlc_module_begin();
     set_shortname( _("Subtitles"));
     set_description( _("Text subtitles parser") );
-    set_capability( "demux2", 0 );
+    set_capability( "demux", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
-               SUB_FPS_LONGTEXT, VLC_TRUE );
+               SUB_FPS_LONGTEXT, true );
     add_integer( "sub-delay", 0, NULL,
                N_("Subtitles delay"),
-               SUB_DELAY_LONGTEXT, VLC_TRUE );
+               SUB_DELAY_LONGTEXT, true );
     add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
-                SUB_TYPE_LONGTEXT, VLC_TRUE );
+                SUB_TYPE_LONGTEXT, true );
         change_string_list( ppsz_sub_type, NULL, NULL );
     set_callbacks( Open, Close );
 
@@ -594,7 +594,7 @@ static int Demux( demux_t *p_demux )
 static void Fix( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_bool_t b_done;
+    bool b_done;
     int     i_index;
 
     /* *** fix order (to be sure...) *** */
@@ -603,7 +603,7 @@ static void Fix( demux_t *p_demux )
      */
     do
     {
-        b_done = VLC_TRUE;
+        b_done = true;
         for( i_index = 1; i_index < p_sys->i_subtitles; i_index++ )
         {
             if( p_sys->subtitle[i_index].i_start <
@@ -619,7 +619,7 @@ static void Fix( demux_t *p_demux )
                 memcpy( p_sys->subtitle + i_index,
                         &sub_xch,
                         sizeof( subtitle_t ) );
-                b_done = VLC_FALSE;
+                b_done = false;
             }
         }
     } while( !b_done );
@@ -764,7 +764,7 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle,
  */
 static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
                                  const char *psz_fmt,
-                                 vlc_bool_t b_replace_br )
+                                 bool b_replace_br )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
@@ -845,7 +845,7 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle,
 {
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d,%d --> %d:%d:%d,%d",
-                                 VLC_FALSE );
+                                 false );
 }
 /* ParseSubViewer
  */
@@ -854,7 +854,7 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
 {
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d.%d,%d:%d:%d.%d",
-                                 VLC_TRUE );
+                                 true );
 }
 
 /* ParseSSA

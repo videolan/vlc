@@ -101,6 +101,13 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
         }
     }
 
+    V_VT(&value) = VT_BOOL;
+    if( S_OK == pPropBag->Read(OLESTR("toolbar"), &value, pErrorLog) )
+    {
+        _p_instance->setShowToolbar(V_BOOL(&value) != VARIANT_FALSE);
+        VariantClear(&value);
+    }
+
     SIZEL size = _p_instance->getExtent();
     V_VT(&value) = VT_I4;
     if( S_OK == pPropBag->Read(OLESTR("extentwidth"), &value, pErrorLog) )
@@ -225,6 +232,11 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
     V_VT(&value) = VT_BOOL;
     V_BOOL(&value) = _p_instance->getAutoPlay()? VARIANT_TRUE : VARIANT_FALSE;
     pPropBag->Write(OLESTR("AutoPlay"), &value);
+    VariantClear(&value);
+
+    V_VT(&value) = VT_BOOL;
+    V_BOOL(&value) = _p_instance->getShowToolbar()? VARIANT_TRUE : VARIANT_FALSE;
+    pPropBag->Write(OLESTR("Toolbar"), &value);
     VariantClear(&value);
 
     SIZEL size = _p_instance->getExtent();

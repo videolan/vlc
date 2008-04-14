@@ -81,7 +81,7 @@ struct vout_sys_t
     int i_zoom; /* zoom level in percent */
     int i_x, i_y; /* top left corner coordinates in original image */
 
-    vlc_bool_t b_visible; /* is "interface" visible ? */
+    bool b_visible; /* is "interface" visible ? */
 };
 
 /*****************************************************************************
@@ -167,7 +167,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->i_y = 0;
 #define ZOOM_FACTOR 8
     p_vout->p_sys->i_zoom = 2*ZOOM_FACTOR;
-    p_vout->p_sys->b_visible = VLC_TRUE;
+    p_vout->p_sys->b_visible = true;
 
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout );
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout );
@@ -550,7 +550,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                 && mouse&MOUSE_CLICKED )
             {
             /* mouse is over the "VLC ZOOM HIDE" text */
-                p_vout->p_sys->b_visible = VLC_FALSE;
+                p_vout->p_sys->b_visible = false;
             }
             else if(    (int)p_vout->output.i_height/VIS_ZOOM + 9 <= valy.i_int
                      && valy.i_int <= (int)p_vout->output.i_height/VIS_ZOOM + 90
@@ -581,7 +581,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                 && valy.i_int <= 10 && mouse&MOUSE_CLICKED )
             {
             /* mouse is over the "VLC ZOOM SHOW" text */
-                p_vout->p_sys->b_visible = VLC_TRUE;
+                p_vout->p_sys->b_visible = true;
             }
             else if( mouse&MOUSE_MOVE_X && !(mouse&MOUSE_CLICKED) )
             {

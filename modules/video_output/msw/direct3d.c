@@ -83,7 +83,7 @@ static void Direct3DVoutRenderScene     ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 
-static vlc_bool_t _got_vista_or_above;
+static bool _got_vista_or_above;
 
 static int get_capability_for_osversion(void)
 {
@@ -95,12 +95,12 @@ static int get_capability_for_osversion(void)
         if( winVer.dwMajorVersion > 5 )
         {
             /* Windows Vista or above, make this module the default */
-        _got_vista_or_above = VLC_TRUE;
+        _got_vista_or_above = true;
             return 150;
         }
     }
     /* Windows XP or lower, make sure this module isn't the default */
-    _got_vista_or_above = VLC_FALSE;
+    _got_vista_or_above = false;
     return 50;
 }
 
@@ -335,7 +335,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
     p_vout->fmt_out = p_vout->fmt_in;
-    E_(UpdateRects)( p_vout, VLC_TRUE );
+    E_(UpdateRects)( p_vout, true );
 
     /*  create picture pool */
     p_vout->output.i_chroma = 0;
@@ -453,7 +453,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        E_(UpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, true );
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window
@@ -526,7 +526,7 @@ static int Manage( vout_thread_t *p_vout )
                           SWP_NOSIZE | SWP_NOMOVE );
         }
 
-        p_vout->p_sys->b_on_top_change = VLC_FALSE;
+        p_vout->p_sys->b_on_top_change = false;
     }
 
     /* Check if the event thread is still running */
@@ -1089,7 +1089,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
         }
         p_pic->i_status = DESTROYED_PICTURE;
         p_pic->i_type   = DIRECT_PICTURE;
-        p_pic->b_slow   = VLC_TRUE;
+        p_pic->b_slow   = true;
         p_pic->pf_lock  = Direct3DVoutLockSurface;
         p_pic->pf_unlock = Direct3DVoutUnlockSurface;
         PP_OUTPUTPICTURE[c] = p_pic;

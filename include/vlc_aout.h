@@ -144,7 +144,7 @@ struct aout_buffer_t
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
     mtime_t                 start_date, end_date;
-    vlc_bool_t              b_discontinuity; /* Set on discontinuity (for non pcm stream) */
+    bool              b_discontinuity; /* Set on discontinuity (for non pcm stream) */
 
     struct aout_buffer_t *  p_next;
 
@@ -205,7 +205,7 @@ typedef struct aout_mixer_t
                                          struct aout_buffer_t * );
 
     /** If b_error == 1, there is no mixer. */
-    vlc_bool_t              b_error;
+    bool              b_error;
     /** Multiplier used to raise or lower the volume of the sound in
      * software. Beware, this creates sound distortion and should be avoided
      * as much as possible. This isn't available for non-float32 mixer. */
@@ -235,8 +235,8 @@ struct aout_filter_t
                                          struct aout_filter_t *,
                                          struct aout_buffer_t *,
                                          struct aout_buffer_t * );
-    vlc_bool_t              b_in_place;
-    vlc_bool_t              b_continuity;
+    bool              b_in_place;
+    bool              b_continuity;
 };
 
 #define AOUT_RESAMPLING_NONE     0
@@ -274,13 +274,13 @@ struct aout_input_t
     float                   f_multiplier;
 
     /* If b_restart == 1, the input pipeline will be re-created. */
-    vlc_bool_t              b_restart;
+    bool              b_restart;
 
     /* If b_error == 1, there is no input pipeline. */
-    vlc_bool_t              b_error;
+    bool              b_error;
 
     /* Did we just change the output format? (expect buffer inconsistencies) */
-    vlc_bool_t              b_changed;
+    bool              b_changed;
 
     /* last rate from input */
     int                     i_last_input_rate;
@@ -297,7 +297,7 @@ typedef struct aout_output_t
     audio_sample_format_t   output;
     /* Indicates whether the audio output is currently starving, to avoid
      * printing a 1,000 "output is starving" messages. */
-    vlc_bool_t              b_starving;
+    bool              b_starving;
 
     /* post-filters */
     aout_filter_t *         pp_filters[AOUT_MAX_FILTERS];
@@ -318,7 +318,7 @@ typedef struct aout_output_t
     audio_volume_t          i_volume;
 
     /* If b_error == 1, there is no audio output pipeline. */
-    vlc_bool_t              b_error;
+    bool              b_error;
 } aout_output_t;
 
 /** audio output thread descriptor */
@@ -363,7 +363,7 @@ VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) );
 VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, uint32_t ) );
 
-VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, vlc_bool_t ) );
+VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, bool ) );
 
 VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *, const uint32_t *, uint32_t, int, int * ) );
 VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
@@ -394,7 +394,7 @@ VLC_EXPORT( int, __aout_VolumeMute, ( vlc_object_t *, audio_volume_t * ) );
 VLC_EXPORT( int, aout_FindAndRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 
-VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, vlc_bool_t ));
+VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
 
 #define aout_VisualNext(a) aout_VisualChange( VLC_OBJECT(a),1 )
 #define aout_VisualPrev(a) aout_VisualChange( VLC_OBJECT(a),-1 )

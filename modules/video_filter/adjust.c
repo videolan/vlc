@@ -84,18 +84,18 @@ vlc_module_begin();
     set_capability( "video filter2", 0 );
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0, NULL,
-                          CONT_TEXT, CONT_LONGTEXT, VLC_FALSE );
+                          CONT_TEXT, CONT_LONGTEXT, false );
     add_float_with_range( "brightness", 1.0, 0.0, 2.0, NULL,
-                           LUM_TEXT, LUM_LONGTEXT, VLC_FALSE );
+                           LUM_TEXT, LUM_LONGTEXT, false );
     add_integer_with_range( "hue", 0, 0, 360, NULL,
-                            HUE_TEXT, HUE_LONGTEXT, VLC_FALSE );
+                            HUE_TEXT, HUE_LONGTEXT, false );
     add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL,
-                          SAT_TEXT, SAT_LONGTEXT, VLC_FALSE );
+                          SAT_TEXT, SAT_LONGTEXT, false );
     add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL,
-                          GAMMA_TEXT, GAMMA_LONGTEXT, VLC_FALSE );
+                          GAMMA_TEXT, GAMMA_LONGTEXT, false );
 
     add_bool( "brightness-threshold", 0, NULL,
-              THRES_TEXT, THRES_LONGTEXT, VLC_FALSE );
+              THRES_TEXT, THRES_LONGTEXT, false );
 
     add_shortcut( "adjust" );
     set_callbacks( Create, Destroy );
@@ -116,7 +116,7 @@ struct filter_sys_t
     int        i_hue;
     double     f_saturation;
     double     f_gamma;
-    vlc_bool_t b_brightness_threshold;
+    bool b_brightness_threshold;
 };
 
 /*****************************************************************************
@@ -205,7 +205,7 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
     uint8_t *p_in, *p_in_v, *p_in_end, *p_line_end;
     uint8_t *p_out, *p_out_v;
 
-    vlc_bool_t b_thres;
+    bool b_thres;
     double  f_hue;
     double  f_gamma;
     int32_t i_cont, i_lum;
@@ -236,7 +236,7 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
      */
-    if( b_thres != VLC_TRUE )
+    if( b_thres != true )
     {
 
         /* Contrast is a fast but kludged function, so I put this gap to be
@@ -436,7 +436,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     int i_lines, i_visible_lines, i_pitch, i_visible_pitch;
 
-    vlc_bool_t b_thres;
+    bool b_thres;
     double  f_hue;
     double  f_gamma;
     int32_t i_cont, i_lum;
@@ -482,7 +482,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
      */
-    if( b_thres != VLC_TRUE )
+    if( b_thres != true )
     {
 
         /* Contrast is a fast but kludged function, so I put this gap to be

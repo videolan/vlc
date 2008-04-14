@@ -742,7 +742,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
     currentGroup = NULL;
 
     vlc_object_t *p_object;
-    vlc_bool_t b_section_empty = VLC_FALSE;
+    bool b_section_empty = false;
     int i;
 
 #define APPEND_EMPTY { QAction *action = menu->addAction( qtr( "Empty" ) ); \
@@ -755,7 +755,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
             if( b_section_empty )
                 APPEND_EMPTY;
             menu->addSeparator();
-            b_section_empty = VLC_TRUE;
+            b_section_empty = true;
             continue;
         }
 
@@ -763,14 +763,14 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
         {
             /// \bug What is this ?
             // Append( menu, varnames[i], NULL );
-            b_section_empty = VLC_FALSE;
+            b_section_empty = false;
             continue;
         }
 
         p_object = ( vlc_object_t * )vlc_object_get( objects[i] );
         if( p_object == NULL ) continue;
 
-        b_section_empty = VLC_FALSE;
+        b_section_empty = false;
         /* Ugly specific stuff */
         if( strstr( varnames[i], "intf-add" ) )
             CreateItem( menu, varnames[i], p_object, false );

@@ -173,83 +173,83 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, VLC_TRUE );
+                 CACHING_LONGTEXT, true );
     add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
-                 VLC_FALSE );
+                 false );
 #   if defined(WIN32) || defined(WINCE)
 #   else
         add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
-                     VLC_FALSE );
+                     false );
         add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                     VLC_TRUE );
-        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_TRUE );
+                     true );
+        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true );
         add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
-                  VLC_TRUE );
+                  true );
 #   endif
 
     /* DVB-S (satellite) */
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
-        INVERSION_LONGTEXT, VLC_TRUE );
+        INVERSION_LONGTEXT, true );
         change_integer_list( i_inversion_list, ppsz_inversion_text, 0 );
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
-            POLARISATION_LONGTEXT, VLC_TRUE );
+            POLARISATION_LONGTEXT, true );
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 );
         add_integer( "dvb-network-id", 0, NULL, NETID_TEXT, NETID_LONGTEXT,
-            VLC_TRUE );
+            true );
         add_integer( "dvb-azimuth", 0, NULL, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
-            VLC_TRUE );
+            true );
         add_integer( "dvb-elevation", 0, NULL, ELEVATION_TEXT,
-            ELEVATION_LONGTEXT, VLC_TRUE );
+            ELEVATION_LONGTEXT, true );
         add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
-            LONGITUDE_LONGTEXT, VLC_TRUE );
+            LONGITUDE_LONGTEXT, true );
             /* Note: Polaristion H = voltage 18; V = voltage 13; */
 #   else
         add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
-            VLC_TRUE );
+            true );
         add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-            VLC_TRUE );
+            true );
         add_bool( "dvb-high-voltage", 0, NULL, HIGH_VOLTAGE_TEXT,
-            HIGH_VOLTAGE_LONGTEXT, VLC_TRUE );
+            HIGH_VOLTAGE_LONGTEXT, true );
         add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
-            VLC_TRUE );
+            true );
 #   endif
     add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
-        LNB_LOF1_LONGTEXT, VLC_TRUE );
+        LNB_LOF1_LONGTEXT, true );
     add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
-        LNB_LOF2_LONGTEXT, VLC_TRUE );
+        LNB_LOF2_LONGTEXT, true );
     add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
-        LNB_SLOF_LONGTEXT, VLC_TRUE );
+        LNB_SLOF_LONGTEXT, true );
 
-    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true );
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
-        VLC_FALSE );
+        false );
 
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
-        MODULATION_LONGTEXT, VLC_TRUE );
+        MODULATION_LONGTEXT, true );
         change_integer_list( i_qam_list, ppsz_qam_text, 0 );
 
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
-        CODE_RATE_HP_LONGTEXT, VLC_TRUE );
+        CODE_RATE_HP_LONGTEXT, true );
         change_integer_list( i_hp_fec_list, ppsz_hp_fec_text, 0 );
     add_integer( "dvb-code-rate-lp", -1, NULL, CODE_RATE_LP_TEXT,
-        CODE_RATE_LP_LONGTEXT, VLC_TRUE );
+        CODE_RATE_LP_LONGTEXT, true );
         change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, 0 );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
-        VLC_TRUE );
+        true );
         change_integer_list( i_band_list, ppsz_band_text, 0 );
-    add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true );
         change_integer_list( i_guard_list, ppsz_guard_text, 0 );
     add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
-        TRANSMISSION_LONGTEXT, VLC_TRUE );
+        TRANSMISSION_LONGTEXT, true );
         change_integer_list( i_transmission_list, ppsz_transmission_text, 0 );
     add_integer( "dvb-hierarchy", -1, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
-        VLC_TRUE );
+        true );
         change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, 0 );
 
-    set_capability( "access2", 0 );
+    set_capability( "access", 0 );
     add_shortcut( "dvb" );      /* Generic name */
 
     add_shortcut( "dvb-s" );    /* Satellite */
@@ -311,7 +311,7 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_update = 0;
     p_access->info.i_size = 0;
     p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.b_eof = false;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = (access_sys_t *)malloc( sizeof( access_sys_t ) );
@@ -493,7 +493,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool, b_bool;
+    bool   *pb_bool, b_bool;
     int          *pi_int, i_int;
     int64_t      *pi_64;
 
@@ -503,8 +503,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
     case ACCESS_CAN_FASTSEEK:       /* 1 */
     case ACCESS_CAN_PAUSE:          /* 2 */
     case ACCESS_CAN_CONTROL_PACE:   /* 3 */
-        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-        *pb_bool = VLC_FALSE;
+        pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = false;
         break;
     case ACCESS_GET_MTU:            /* 4 */
         pi_int = (int*)va_arg( args, int * );
@@ -552,14 +552,14 @@ static block_t *Block( access_t *p_access )
     l_buffer_len = dvb_GetBufferSize( p_access );
     if( l_buffer_len < 0 )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
         return NULL;
     }
 
     p_block = block_New( p_access, l_buffer_len );
     if( dvb_ReadBuffer( p_access, &l_buffer_len, p_block->p_buffer ) < 0 )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        p_access->info.b_eof = true;
         return NULL;
     }
 

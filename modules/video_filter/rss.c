@@ -115,7 +115,7 @@ struct filter_sys_t
 
     int i_ttl;
     time_t t_last_update;
-    vlc_bool_t b_images;
+    bool b_images;
     int i_title;
 
     int i_cur_feed;
@@ -189,31 +189,31 @@ vlc_module_begin();
     set_callbacks( CreateFilter, DestroyFilter );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
-    add_string( CFG_PREFIX "urls", "rss", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "urls", "rss", NULL, MSG_TEXT, MSG_LONGTEXT, false );
 
     set_section( N_("Position"), NULL );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true );
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+        OPACITY_TEXT, OPACITY_LONGTEXT, false );
     add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
-                  VLC_FALSE );
+                  false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
-    add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, false );
 
     set_section( N_("Misc"), NULL );
     add_integer( CFG_PREFIX "speed", 100000, NULL, SPEED_TEXT, SPEED_LONGTEXT,
-                 VLC_FALSE );
+                 false );
     add_integer( CFG_PREFIX "length", 60, NULL, LENGTH_TEXT, LENGTH_LONGTEXT,
-                 VLC_FALSE );
-    add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_FALSE );
-    add_bool( CFG_PREFIX "images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, VLC_FALSE );
-    add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, VLC_FALSE );
+                 false );
+    add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, false );
+    add_bool( CFG_PREFIX "images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, false );
+    add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, false );
         change_integer_list( pi_title_modes, ppsz_title_modes, 0 );
 
     set_description( _("RSS and Atom feed display") );
@@ -291,7 +291,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, CFG_PREFIX "color" );
     p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, CFG_PREFIX "size" );
 
-    if( p_sys->b_images == VLC_TRUE && p_sys->p_style->i_font_size == -1 )
+    if( p_sys->b_images == true && p_sys->p_style->i_font_size == -1 )
     {
         msg_Warn( p_filter, "rrs-size wasn't specified. Feed images will thus be displayed without being resized" );
     }
@@ -513,18 +513,18 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->p_region->fmt.i_visible_height = p_sys->p_style->i_font_size;
     p_spu->i_start = date;
     p_spu->i_stop  = 0;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
 
     /*  where to locate the string: */
     if( p_sys->i_pos < 0 )
     {   /*  set to an absolute xy */
         p_spu->p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
-        p_spu->b_absolute = VLC_TRUE;
+        p_spu->b_absolute = true;
     }
     else
     {   /* set to one of the 9 relative locations */
         p_spu->p_region->i_align = p_sys->i_pos;
-        p_spu->b_absolute = VLC_FALSE;
+        p_spu->b_absolute = false;
     }
 
     p_spu->i_x = p_sys->i_xoff;
@@ -671,8 +671,8 @@ static int FetchRSS( filter_t *p_filter)
 
     int i_feed;
     int i_item;
-    vlc_bool_t b_is_item;
-    vlc_bool_t b_is_image;
+    bool b_is_item;
+    bool b_is_image;
     int i_int;
 
     FreeRSS( p_filter );
@@ -728,8 +728,8 @@ static int FetchRSS( filter_t *p_filter)
         }
 
         i_item = 0;
-        b_is_item = VLC_FALSE;
-        b_is_image = VLC_FALSE;
+        b_is_item = false;
+        b_is_image = false;
 
         while( xml_ReaderRead( p_xml_reader ) == 1 )
         {
@@ -753,7 +753,7 @@ static int FetchRSS( filter_t *p_filter)
                     if( !strcmp( psz_eltname, "item" ) /* rss */
                      || !strcmp( psz_eltname, "entry" ) ) /* atom */
                     {
-                        b_is_item = VLC_TRUE;
+                        b_is_item = true;
                         p_feed->i_items++;
                         p_feed->p_items = (struct rss_item_t *)realloc( p_feed->p_items, p_feed->i_items * sizeof( struct rss_item_t ) );
                         p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
@@ -763,7 +763,7 @@ static int FetchRSS( filter_t *p_filter)
                     }
                     else if( !strcmp( psz_eltname, "image" ) ) /* rss */
                     {
-                        b_is_image = VLC_TRUE;
+                        b_is_image = true;
                     }
                     else if( !strcmp( psz_eltname, "link" ) ) /* atom */
                     {
@@ -791,8 +791,8 @@ static int FetchRSS( filter_t *p_filter)
                         if( psz_rel && psz_href )
                         {
                             if( !strcmp( psz_rel, "alternate" )
-                                && b_is_item == VLC_FALSE
-                                && b_is_image == VLC_FALSE
+                                && b_is_item == false
+                                && b_is_image == false
                                 && !p_feed->psz_link )
                             {
                                 p_feed->psz_link = psz_href;
@@ -800,8 +800,8 @@ static int FetchRSS( filter_t *p_filter)
                             /* this isn't in the rfc but i found some ... */
                             else if( ( !strcmp( psz_rel, "logo" )
                                     || !strcmp( psz_rel, "icon" ) )
-                                    && b_is_item == VLC_FALSE
-                                    && b_is_image == VLC_FALSE
+                                    && b_is_item == false
+                                    && b_is_image == false
                                     && !p_feed->psz_image )
                             {
                                 p_feed->psz_image = psz_href;
@@ -833,12 +833,12 @@ static int FetchRSS( filter_t *p_filter)
                     if( !strcmp( psz_eltname, "item" ) /* rss */
                      || !strcmp( psz_eltname, "entry" ) ) /* atom */
                     {
-                        b_is_item = VLC_FALSE;
+                        b_is_item = false;
                         i_item++;
                     }
                     else if( !strcmp( psz_eltname, "image" ) ) /* rss */
                     {
-                        b_is_image = VLC_FALSE;
+                        b_is_image = false;
                     }
                     free( psz_eltname );
                     psz_eltname = NULL;
@@ -860,7 +860,7 @@ static int FetchRSS( filter_t *p_filter)
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "  text : <%s>", psz_eltvalue );
 #                   endif
-                    if( b_is_item == VLC_TRUE )
+                    if( b_is_item == true )
                     {
                         struct rss_item_t *p_item;
                         p_item = p_feed->p_items+i_item;
@@ -886,7 +886,7 @@ static int FetchRSS( filter_t *p_filter)
                             psz_eltvalue = NULL;
                         }
                     }
-                    else if( b_is_image == VLC_TRUE )
+                    else if( b_is_image == true )
                     {
                         if( !strcmp( psz_eltname, "url" ) /* rss */
                             && !p_feed->psz_image )
@@ -933,7 +933,7 @@ static int FetchRSS( filter_t *p_filter)
             }
         }
 
-        if( p_sys->b_images == VLC_TRUE
+        if( p_sys->b_images == true
             && p_feed->psz_image && !p_feed->p_pic )
         {
             p_feed->p_pic = LoadImage( p_filter, p_feed->psz_image );

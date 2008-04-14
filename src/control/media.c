@@ -217,7 +217,7 @@ static void preparse_if_needed( libvlc_media_t *p_md )
         playlist_PreparseEnqueue(
                 p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
                 p_md->p_input_item );
-        p_md->b_preparsed = VLC_TRUE;
+        p_md->b_preparsed = true;
     }
 }
 
@@ -242,7 +242,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     p_md = malloc( sizeof(libvlc_media_t) );
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
-    p_md->b_preparsed       = VLC_FALSE;
+    p_md->b_preparsed       = false;
     p_md->i_refcount        = 1;
     p_md->p_user_data       = NULL;
 
@@ -539,7 +539,7 @@ libvlc_media_is_preparsed( libvlc_media_t * p_md,
     }
     else
     {
-        return VLC_FALSE;
+        return false;
     }
 }
 

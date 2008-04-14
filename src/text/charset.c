@@ -238,7 +238,7 @@ static void vlc_encoding_from_locale( char *psz_locale, char *psz_charset )
 }
 #endif
 
-vlc_bool_t vlc_current_charset( char **psz_charset )
+bool vlc_current_charset( char **psz_charset )
 {
     const char *psz_codeset;
 
@@ -342,9 +342,9 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
         *psz_charset = strdup(psz_codeset);
 
     if( !strcasecmp(psz_codeset, "UTF8") || !strcasecmp(psz_codeset, "UTF-8") )
-        return VLC_TRUE;
+        return true;
 
-    return VLC_FALSE;
+    return false;
 }
 
 

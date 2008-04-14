@@ -67,33 +67,33 @@ static void Close  ( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "MOD");
     set_description( _("MOD demuxer (libmodplug)" ) );
-    set_capability( "demux2", 10 );
+    set_capability( "demux", 10 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
 
-    add_bool( "mod-noisereduction", VLC_TRUE, NULL, N_("Noise reduction"),
-              NOISE_LONGTEXT, VLC_FALSE );
+    add_bool( "mod-noisereduction", true, NULL, N_("Noise reduction"),
+              NOISE_LONGTEXT, false );
 
-    add_bool( "mod-reverb", VLC_FALSE, NULL, N_("Reverb"),
-              REVERB_LONGTEXT, VLC_FALSE );
+    add_bool( "mod-reverb", false, NULL, N_("Reverb"),
+              REVERB_LONGTEXT, false );
     add_integer_with_range( "mod-reverb-level", 0, 0, 100, NULL,
-             N_("Reverberation level"), REVERB_LEVEL_LONGTEXT, VLC_TRUE );
+             N_("Reverberation level"), REVERB_LEVEL_LONGTEXT, true );
     add_integer_with_range( "mod-reverb-delay", 40, 0, 1000, NULL,
-             N_("Reverberation delay"), REVERB_DELAY_LONGTEXT, VLC_TRUE );
+             N_("Reverberation delay"), REVERB_DELAY_LONGTEXT, true );
 
-    add_bool( "mod-megabass", VLC_FALSE, NULL, N_("Mega bass"),
-                    MEGABASS_LONGTEXT, VLC_FALSE );
+    add_bool( "mod-megabass", false, NULL, N_("Mega bass"),
+                    MEGABASS_LONGTEXT, false );
     add_integer_with_range( "mod-megabass-level", 0, 0, 100, NULL,
-              N_("Mega bass level"), MEGABASS_LEVEL_LONGTEXT, VLC_TRUE );
+              N_("Mega bass level"), MEGABASS_LEVEL_LONGTEXT, true );
     add_integer_with_range( "mod-megabass-range", 10, 10, 100, NULL,
-              N_("Mega bass cutoff"), MEGABASS_RANGE_LONGTEXT, VLC_TRUE );
+              N_("Mega bass cutoff"), MEGABASS_RANGE_LONGTEXT, true );
 
-    add_bool( "mod-surround", VLC_FALSE, NULL, N_("Surround"), N_("Surround"),
-               VLC_FALSE );
+    add_bool( "mod-surround", false, NULL, N_("Surround"), N_("Surround"),
+               false );
     add_integer_with_range( "mod-surround-level", 0, 0, 100, NULL,
-              N_("Surround level"), SURROUND_LEVEL_LONGTEXT, VLC_TRUE );
+              N_("Surround level"), SURROUND_LEVEL_LONGTEXT, true );
     add_integer_with_range( "mod-surround-delay", 5, 0, 1000, NULL,
-              N_("Surround delay (ms)"), SURROUND_DELAY_LONGTEXT, VLC_TRUE );
+              N_("Surround delay (ms)"), SURROUND_DELAY_LONGTEXT, true );
 
     set_callbacks( Open, Close );
     add_shortcut( "mod" );

@@ -52,27 +52,27 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AFILTER );
 
-    add_float( "param-eq-lowf", 100, NULL, N_("Low freq (Hz)"),"", VLC_FALSE );
+    add_float( "param-eq-lowf", 100, NULL, N_("Low freq (Hz)"),"", false );
     add_float_with_range( "param-eq-lowgain", 0, -20.0, 20.0, NULL,
-                          N_("Low freq gain (dB)"), "",VLC_FALSE );
-    add_float( "param-eq-highf", 10000, NULL, N_("High freq (Hz)"),"", VLC_FALSE );
+                          N_("Low freq gain (dB)"), "",false );
+    add_float( "param-eq-highf", 10000, NULL, N_("High freq (Hz)"),"", false );
     add_float_with_range( "param-eq-highgain", 0, -20.0, 20.0, NULL,
-                          N_("High freq gain (dB)"),"",VLC_FALSE );
-    add_float( "param-eq-f1", 300, NULL, N_("Freq 1 (Hz)"),"", VLC_FALSE );
+                          N_("High freq gain (dB)"),"",false );
+    add_float( "param-eq-f1", 300, NULL, N_("Freq 1 (Hz)"),"", false );
     add_float_with_range( "param-eq-gain1", 0, -20.0, 20.0, NULL,
-                          N_("Freq 1 gain (dB)"), "",VLC_FALSE );
+                          N_("Freq 1 gain (dB)"), "",false );
     add_float_with_range( "param-eq-q1", 3, 0.1, 100.0, NULL,
-                          N_("Freq 1 Q"), "",VLC_FALSE );
-    add_float( "param-eq-f2", 1000, NULL, N_("Freq 2 (Hz)"),"", VLC_FALSE );
+                          N_("Freq 1 Q"), "",false );
+    add_float( "param-eq-f2", 1000, NULL, N_("Freq 2 (Hz)"),"", false );
     add_float_with_range( "param-eq-gain2", 0, -20.0, 20.0, NULL,
-                          N_("Freq 2 gain (dB)"),"",VLC_FALSE );
+                          N_("Freq 2 gain (dB)"),"",false );
     add_float_with_range( "param-eq-q2", 3, 0.1, 100.0, NULL,
-                          N_("Freq 2 Q"),"",VLC_FALSE );
-    add_float( "param-eq-f3", 3000, NULL, N_("Freq 3 (Hz)"),"", VLC_FALSE );
+                          N_("Freq 2 Q"),"",false );
+    add_float( "param-eq-f3", 3000, NULL, N_("Freq 3 (Hz)"),"", false );
     add_float_with_range( "param-eq-gain3", 0, -20.0, 20.0, NULL,
-                          N_("Freq 3 gain (dB)"),"",VLC_FALSE );
+                          N_("Freq 3 gain (dB)"),"",false );
     add_float_with_range( "param-eq-q3", 3, 0.1, 100.0, NULL,
-                          N_("Freq 3 Q"),"",VLC_FALSE );
+                          N_("Freq 3 Q"),"",false );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -105,20 +105,20 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
-    vlc_bool_t         b_fit = VLC_TRUE;
+    bool         b_fit = true;
     int                i_samplerate;
 
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
         p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
         p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
         msg_Warn( p_filter, "bad input or output format" );
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
-        b_fit = VLC_FALSE;
+        b_fit = false;
         memcpy( &p_filter->output, &p_filter->input,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
@@ -130,7 +130,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );

@@ -42,12 +42,12 @@ VLMStream::~VLMStream()
 
 void VLMStream::Enable()
 {
-    p_media->b_enabled = VLC_TRUE;
+    p_media->b_enabled = true;
 }
 
 void VLMStream::Disable()
 {
-    p_media->b_enabled = VLC_FALSE;
+    p_media->b_enabled = false;
 }
 
 void VLMStream::Delete()

@@ -270,11 +270,11 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
     if( var_Get( p_cmml_decoder, "psz-current-anchor-description", &val )
             != VLC_SUCCESS )
     {
-        return VLC_TRUE;
+        return true;
     }
 
     if( !val.p_address )
-        return VLC_TRUE;
+        return true;
 
     psz_description = val.p_address;
 
@@ -295,10 +295,10 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
             if( var_Get( p_primary_intf, "intf-displays-cmml-description", &val )
                     == VLC_SUCCESS )
             {
-                if( val.b_bool == VLC_TRUE )
+                if( val.b_bool == true )
                 {
                     vlc_object_release( p_primary_intf );
-                    return VLC_TRUE;
+                    return true;
                 }
             }
 
@@ -310,7 +310,7 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
                 != VLC_SUCCESS )
         {
             /* text render unsuccessful: do nothing */
-            return VLC_FALSE;
+            return false;
         }
 
         /* text render successful: clear description */
@@ -325,7 +325,7 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
         psz_url = NULL;
     }
 
-    return VLC_TRUE;
+    return true;
 }
 
 
@@ -517,7 +517,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
             msg_Dbg( p_intf, "calling browser_Open with \"%s\"", psz_url );
 #endif
             (void) browser_Open( psz_url );
-            playlist_Control( p_playlist, PLAYLIST_PAUSE, VLC_TRUE, 0 );
+            playlist_Control( p_playlist, PLAYLIST_PAUSE, true, 0 );
         }
 
         free( psz_uri_to_load );
@@ -541,7 +541,7 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
     free( psz_uri );
 
     /* Get current time as a string */
-    if( XURL_IsFileURL( psz_url ) == VLC_TRUE )
+    if( XURL_IsFileURL( psz_url ) == true )
         psz_url = xstrcat( psz_url, "#" );
     else
         psz_url = xstrcat( psz_url, "?" );
@@ -671,7 +671,7 @@ void GoBack( intf_thread_t *p_intf )
 #endif
 
     /* Check whether we can go back in the history */
-    if( history_CanGoBack( p_history ) == VLC_FALSE )
+    if( history_CanGoBack( p_history ) == false )
     {
         msg_Warn( p_intf, "can't go back: already at beginning of history" );
         vlc_object_release( p_playlist );
@@ -749,7 +749,7 @@ void GoForward( intf_thread_t *p_intf )
 #endif
 
     /* Check whether we can go forward in the history */
-    if( history_CanGoForward( p_history ) == VLC_FALSE )
+    if( history_CanGoForward( p_history ) == false )
     {
         msg_Warn( p_intf, "can't go forward: already at end of history" );
         vlc_object_release( p_playlist );
@@ -789,8 +789,8 @@ static void ReplacePlaylistItem( playlist_t *p_playlist, char *psz_uri )
 {
     playlist_Stop( p_playlist );
     (void) playlist_Add( p_playlist, psz_uri, psz_uri,
-                         PLAYLIST_INSERT /* FIXME: used to be PLAYLIST_REPLACE */, PLAYLIST_END|PLAYLIST_GO, VLC_TRUE /* FIXME: p_playlist->status.i_index */,
-                         VLC_FALSE);
+                         PLAYLIST_INSERT /* FIXME: used to be PLAYLIST_REPLACE */, PLAYLIST_END|PLAYLIST_GO, true /* FIXME: p_playlist->status.i_index */,
+                         false);
 }
 
 /****************************************************************************

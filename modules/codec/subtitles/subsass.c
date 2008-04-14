@@ -201,14 +201,14 @@ void ParseSSAHeader( decoder_t *p_dec )
             p_sys->i_original_height = ( temp > 0 ) ? temp : -1;
         else if( sscanf( psz_parser, "Script Type: %8192s", buffer_text ) == 1 )
         {
-            if( !strcasecmp( buffer_text, "V4.00+" ) ) p_sys->b_ass = VLC_TRUE;
+            if( !strcasecmp( buffer_text, "V4.00+" ) ) p_sys->b_ass = true;
         }
         else if( !strncasecmp( psz_parser, "[V4 Styles]", 11 ) )
             i_section_type = 1;
         else if( !strncasecmp( psz_parser, "[V4+ Styles]", 12) )
         {
             i_section_type = 2;
-            p_sys->b_ass = VLC_TRUE;
+            p_sys->b_ass = true;
         }
         else if( !strncasecmp( psz_parser, "[Events]", 8 ) )
             i_section_type = 4;

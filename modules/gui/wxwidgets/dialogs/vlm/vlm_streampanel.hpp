@@ -50,9 +50,9 @@ namespace wxvlc
         virtual void Update() = 0;
     protected:
         intf_thread_t *p_intf;
-        vlc_bool_t b_free;
-        vlc_bool_t b_new;               ///< Is it a new stream ?
-        vlc_bool_t b_found;             ///< Have we found the stream here ?
+        bool b_free;
+        bool b_new;               ///< Is it a new stream ?
+        bool b_found;             ///< Have we found the stream here ?
         friend class VLMPanel;
 
 
@@ -70,7 +70,7 @@ namespace wxvlc
         virtual ~VLMBroadcastStreamPanel();
         VLMBroadcastStream *GetStream() { return p_stream; }
 
-        vlc_bool_t b_slider_free;
+        bool b_slider_free;
 
         VLMSliderManager *p_sm;
 

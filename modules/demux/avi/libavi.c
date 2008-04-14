@@ -116,7 +116,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
 {
     avi_chunk_t *p_chk;
     const uint8_t *p_peek;
-    vlc_bool_t b_seekable;
+    bool b_seekable;
 
     if( p_container->common.i_chunk_size > 0 && p_container->common.i_chunk_size < 8 )
     {
@@ -840,7 +840,7 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
 {
     avi_chunk_list_t *p_list = (avi_chunk_list_t*)p_root;
     avi_chunk_t      *p_chk;
-    vlc_bool_t b_seekable;
+    bool b_seekable;
 
     stream_Control( s, STREAM_CAN_FASTSEEK, &b_seekable );
 

@@ -188,7 +188,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 
             /* Run the helper thread */
             if( vlc_thread_create( p_helper, "IPC helper", IPCHelperThread,
-                                   VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+                                   VLC_THREAD_PRIORITY_LOW, true ) )
             {
                 msg_Err( p_this, "one instance mode DISABLED "
                          "(IPC helper thread couldn't be created)" );
@@ -348,7 +348,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                         ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),
                   PLAYLIST_END, -1,
                   (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                  i_options, VLC_TRUE, VLC_FALSE );
+                  i_options, true, false );
 
                 i_opt += i_options;
             }

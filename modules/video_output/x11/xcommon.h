@@ -223,14 +223,14 @@ struct vout_sys_t
     x11_window_t        fullscreen_window;
 
     /* X11 generic properties */
-    vlc_bool_t          b_altfullscreen;          /* which fullscreen method */
+    bool          b_altfullscreen;          /* which fullscreen method */
 #ifdef HAVE_SYS_SHM_H
     int                 i_shm_opcode;      /* shared memory extension opcode */
 #endif
 
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     int                 i_xvport;
-    vlc_bool_t          b_paint_colourkey;
+    bool          b_paint_colourkey;
     int                 i_colourkey;
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
@@ -250,7 +250,7 @@ struct vout_sys_t
 #endif
 
     /* Mouse pointer properties */
-    vlc_bool_t          b_mouse_pointer_visible;
+    bool          b_mouse_pointer_visible;
     mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
     mtime_t             i_mouse_hide_timeout;      /* after time hide cursor */
     Cursor              blank_cursor;                   /* the hidden cursor */
@@ -260,13 +260,13 @@ struct vout_sys_t
     /* Window manager properties */
     Atom                net_wm_state;
     Atom                net_wm_state_fullscreen;
-    vlc_bool_t          b_net_wm_state_fullscreen;
+    bool          b_net_wm_state_fullscreen;
     Atom                net_wm_state_above;
-    vlc_bool_t          b_net_wm_state_above;
+    bool          b_net_wm_state_above;
     Atom                net_wm_state_stays_on_top;
-    vlc_bool_t          b_net_wm_state_stays_on_top;
+    bool          b_net_wm_state_stays_on_top;
     Atom                net_wm_state_below;
-    vlc_bool_t          b_net_wm_state_below;
+    bool          b_net_wm_state_below;
 
 #ifdef MODULE_NAME_IS_glx
     /* GLX properties */

@@ -74,7 +74,7 @@ static qte_thread_t * p_qte_main = NULL;
 vlc_module_begin();
     set_description( _("Qt Embedded GUI helper") );
     set_capability( "gui-helper", 90 );
-    add_bool( "qte-guiserver", 0, NULL, STANDALONE_TEXT, STANDALONE_LONGTEXT, VLC_FALSE );
+    add_bool( "qte-guiserver", 0, NULL, STANDALONE_TEXT, STANDALONE_LONGTEXT, false );
     add_shortcut( "qte" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -103,7 +103,7 @@ static int Open( vlc_object_t *p_this )
     /* Launch the QApplication::exec() thread. It will not return until the
      * application is properly initialized, which ensures us thread safety. */
     if( vlc_thread_create( p_qte_main, "qte_main", QteMain,
-                           VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+                           VLC_THREAD_PRIORITY_LOW, true ) )
     {
         vlc_object_release( p_qte_main );
         i_refcount--;
@@ -161,11 +161,11 @@ static void QteMain( qte_thread_t *p_this )
 {
     int i_argc = 1;
 
-    p_this->b_gui_server = VLC_FALSE;
+    p_this->b_gui_server = false;
     if( config_GetInt( p_this, "qte-guiserver" ) )
     {
         msg_Dbg( p_this, "Running as Qt Embedded standalone GuiServer" );
-        p_this->b_gui_server = VLC_TRUE;
+        p_this->b_gui_server = true;
     }
 
     /* Run as standalone GuiServer or as GuiClient. */

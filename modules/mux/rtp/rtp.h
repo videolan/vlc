@@ -37,7 +37,7 @@ typedef struct {
     unsigned int u_version;      /*< rtp version number */
     unsigned int u_CSRC_count;   /*< CSRC count */
     unsigned int u_payload_type; /*< type of RTP payload stream */
-    vlc_bool_t   b_extension;    /*< The header is followed by exactly one header extension */
+    bool   b_extension;    /*< The header is followed by exactly one header extension */
     unsigned int u_marker;       /*< marker field expect 1 */
     unsigned int u_seq_no;       /*< sequence number of RTP stream */
     uint32_t i_timestamp;        /*< timestamp of stream */

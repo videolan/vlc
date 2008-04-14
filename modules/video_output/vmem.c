@@ -78,13 +78,13 @@ vlc_module_begin( );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_capability( "video output", 0 );
 
-    add_integer( "vmem-width", 320, NULL, T_WIDTH, LT_WIDTH, VLC_FALSE );
-    add_integer( "vmem-height", 200, NULL, T_HEIGHT, LT_HEIGHT, VLC_FALSE );
-    add_integer( "vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, VLC_FALSE );
-    add_string( "vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, VLC_TRUE );
-    add_string( "vmem-lock", "0", NULL, T_LOCK, LT_LOCK, VLC_TRUE );
-    add_string( "vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, VLC_TRUE );
-    add_string( "vmem-data", "0", NULL, T_DATA, LT_DATA, VLC_TRUE );
+    add_integer( "vmem-width", 320, NULL, T_WIDTH, LT_WIDTH, false );
+    add_integer( "vmem-height", 200, NULL, T_HEIGHT, LT_HEIGHT, false );
+    add_integer( "vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, false );
+    add_string( "vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true );
+    add_string( "vmem-lock", "0", NULL, T_LOCK, LT_LOCK, true );
+    add_string( "vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true );
+    add_string( "vmem-data", "0", NULL, T_DATA, LT_DATA, true );
 
     set_callbacks( Create, Destroy );
 vlc_module_end();

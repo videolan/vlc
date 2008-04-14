@@ -70,12 +70,12 @@ struct vout_sys_t
     volatile uint16_t i_changes;        /* changes made to the video display */
 
     /* Mouse */
-    volatile vlc_bool_t b_cursor_hidden;
+    volatile bool b_cursor_hidden;
     volatile mtime_t    i_lastmoved;
     mtime_t             i_mouse_hide_timeout;
 
     /* Misc */
-    vlc_bool_t      b_on_top_change;
+    bool      b_on_top_change;
 
 #ifndef UNDER_CE
 
@@ -92,7 +92,7 @@ struct vout_sys_t
     RECT         rect_dest;
     RECT         rect_dest_clipped;
 
-    vlc_bool_t   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
+    bool   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
 
 #ifdef MODULE_NAME_IS_vout_directx
@@ -102,11 +102,11 @@ struct vout_sys_t
     int          i_align_dest_boundary;
     int          i_align_dest_size;
 
-    vlc_bool_t      b_wallpaper;    /* show as desktop wallpaper ? */
+    bool      b_wallpaper;    /* show as desktop wallpaper ? */
 
-    vlc_bool_t   b_using_overlay;         /* Are we using an overlay surface */
-    vlc_bool_t   b_use_sysmem;   /* Should we use system memory for surfaces */
-    vlc_bool_t   b_3buf_overlay;   /* Should we use triple buffered overlays */
+    bool   b_using_overlay;         /* Are we using an overlay surface */
+    bool   b_use_sysmem;   /* Should we use system memory for surfaces */
+    bool   b_3buf_overlay;   /* Should we use triple buffered overlays */
 
     /* DDraw capabilities */
     int          b_caps_overlay_clipping;
@@ -162,8 +162,8 @@ struct vout_sys_t
     int        render_width;
     int        render_height;
 
-    vlc_bool_t b_focus;
-    vlc_bool_t b_parent_focus;
+    bool b_focus;
+    bool b_parent_focus;
 
     HINSTANCE  gapi_dll;                    /* handle of the opened gapi dll */
 
@@ -179,7 +179,7 @@ struct vout_sys_t
 
 #ifndef UNDER_CE
     /* suspend display */
-    vlc_bool_t   b_suspend_display;
+    bool   b_suspend_display;
 #endif
 
     event_thread_t *p_event;
@@ -195,7 +195,7 @@ int DirectDrawUpdateOverlay( vout_thread_t *p_vout );
  * Prototypes from events.c
  *****************************************************************************/
 void E_(EventThread) ( event_thread_t *p_event );
-void E_(UpdateRects) ( vout_thread_t *p_vout, vlc_bool_t b_force );
+void E_(UpdateRects) ( vout_thread_t *p_vout, bool b_force );
 void Win32ToggleFullscreen ( vout_thread_t *p_vout );
 
 /*****************************************************************************

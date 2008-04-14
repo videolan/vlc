@@ -174,7 +174,7 @@ void VLMBroadcastStreamPanel::OnStop( wxCommandEvent &event )
 void VLMBroadcastStreamPanel::OnEdit( wxCommandEvent &event )
 {
      VLMEditStreamFrame *p_frame =
-           new  VLMEditStreamFrame( p_intf, this, p_stream->p_vlm, VLC_TRUE,
+           new  VLMEditStreamFrame( p_intf, this, p_stream->p_vlm, true,
                                     p_stream );
      p_frame->Show();
 }

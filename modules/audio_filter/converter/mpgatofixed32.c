@@ -397,7 +397,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     aout_filter.output.i_format = p_filter->fmt_out.i_codec;
 
     in_buf.p_buffer = p_block->p_buffer;
-    in_buf.b_discontinuity = VLC_FALSE;
+    in_buf.b_discontinuity = false;
     in_buf.i_nb_bytes = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_samples;
     out_buf.p_buffer = p_out->p_buffer;

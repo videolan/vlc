@@ -106,7 +106,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     }
 
     last_update = 0L;
-    b_need_update = VLC_TRUE;
+    b_need_update = true;
     Update();
 }
 
@@ -134,7 +134,7 @@ void FileInfo::Update()
 
     vlc_object_yield( p_input );
     vlc_mutex_lock( &input_GetItem(p_input)->lock );
-    if( b_need_update == VLC_TRUE )
+    if( b_need_update == true )
     {
         vlc_mutex_unlock( &input_GetItem(p_input)->lock  );
         item_info->Update( input_GetItem(p_input) );
@@ -147,7 +147,7 @@ void FileInfo::Update()
 
     vlc_object_release(p_input);
     vlc_object_release( p_playlist );
-    b_need_update = VLC_FALSE;
+    b_need_update = false;
     panel_sizer->Layout();
 
     return;
@@ -172,6 +172,6 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     FileInfo *p_fileinfo = (FileInfo *)param;
-    p_fileinfo->b_need_update = VLC_TRUE;
+    p_fileinfo->b_need_update = true;
     return VLC_SUCCESS;
 }

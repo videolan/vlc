@@ -408,7 +408,7 @@ static int Create_S16ToFL32( vlc_object_t *p_this )
     else
         p_filter->pf_do_work = Do_S16ToFL32;
 
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return 0;
 }
@@ -488,7 +488,7 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
          && p_filter->input.i_format != AOUT_FMT_S16_NE )
     {
         p_filter->pf_do_work = Do_S16ToFL32_SW;
-        p_filter->b_in_place = VLC_TRUE;
+        p_filter->b_in_place = true;
 
         return 0;
     }
@@ -499,7 +499,7 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
          && p_filter->input.i_format != AOUT_FMT_S24_NE )
     {
         p_filter->pf_do_work = Do_S16ToFL24_SW;
-        p_filter->b_in_place = VLC_TRUE;
+        p_filter->b_in_place = true;
 
         return 0;
     }
@@ -604,7 +604,7 @@ static int Create_S8ToFL32( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = Do_S8ToFL32;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return 0;
 }
@@ -648,7 +648,7 @@ static int Create_U8ToFL32( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = Do_U8ToFL32;
-    p_filter->b_in_place = VLC_TRUE;
+    p_filter->b_in_place = true;
 
     return 0;
 }

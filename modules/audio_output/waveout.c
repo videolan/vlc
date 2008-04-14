@@ -122,11 +122,11 @@ typedef struct notification_thread_t
 /* local functions */
 static void Probe        ( aout_instance_t * );
 static int OpenWaveOut   ( aout_instance_t *, uint32_t,
-                           int, int, int, int, vlc_bool_t );
+                           int, int, int, int, bool );
 static int OpenWaveOutPCM( aout_instance_t *, uint32_t,
-                           int*, int, int, int, vlc_bool_t );
+                           int*, int, int, int, bool );
 static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
-                           aout_buffer_t *, vlc_bool_t );
+                           aout_buffer_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void WaveOutThread( notification_thread_t * );
@@ -167,10 +167,10 @@ vlc_module_begin();
     set_capability( "audio output", 50 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
+    add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, true );
 
     add_string( "waveout-dev", "wavemapper", NULL,
-                 DEVICE_TEXT, DEVICE_LONG, VLC_FALSE );
+                 DEVICE_TEXT, DEVICE_LONG, false );
        change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices );
        change_need_restart();
        change_action_add( ReloadWaveoutDevices, N_("Refresh list") );
@@ -209,7 +209,7 @@ struct aout_sys_t
 
     byte_t *p_silence_buffer;               /* buffer we use to play silence */
 
-    vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
+    bool b_chan_reorder;              /* do we need channel reordering */
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 
@@ -250,7 +250,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_aout->output.pf_play = Play;
-    p_aout->b_die = VLC_FALSE;
+    p_aout->b_die = false;
 
 
     /*
@@ -320,7 +320,7 @@ static int Open( vlc_object_t *p_this )
                          VLC_FOURCC('s','p','d','i'),
                          p_aout->output.output.i_physical_channels,
                          aout_FormatNbChannels( &p_aout->output.output ),
-                         p_aout->output.output.i_rate, VLC_FALSE )
+                         p_aout->output.output.i_rate, false )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open waveout audio device" );
@@ -369,7 +369,7 @@ static int Open( vlc_object_t *p_this )
                             &p_aout->output.output.i_format,
                             p_aout->output.output.i_physical_channels,
                             aout_FormatNbChannels( &p_aout->output.output ),
-                            p_aout->output.output.i_rate, VLC_FALSE )
+                            p_aout->output.output.i_rate, false )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open waveout audio device" );
@@ -436,7 +436,7 @@ static int Open( vlc_object_t *p_this )
     /* Then launch the notification thread */
     if( vlc_thread_create( p_aout->output.p_sys->p_notif,
                            "waveOut Notification Thread", WaveOutThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
     {
         msg_Err( p_aout, "cannot create WaveOutThread" );
     }
@@ -475,7 +475,7 @@ static void Probe( aout_instance_t * p_aout )
                             p_aout->output.p_sys->i_wave_device_id,
                             &i_format,
                             i_physical_channels, 6,
-                            p_aout->output.output.i_rate, VLC_TRUE )
+                            p_aout->output.output.i_rate, true )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_5_1;
@@ -496,7 +496,7 @@ static void Probe( aout_instance_t * p_aout )
                             p_aout->output.p_sys->i_wave_device_id,
                             &i_format,
                             i_physical_channels, 4,
-                            p_aout->output.output.i_rate, VLC_TRUE )
+                            p_aout->output.output.i_rate, true )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_2F2R;
@@ -513,7 +513,7 @@ static void Probe( aout_instance_t * p_aout )
                         p_aout->output.p_sys->i_wave_device_id,
                         &i_format,
                         i_physical_channels, 2,
-                        p_aout->output.output.i_rate, VLC_TRUE )
+                        p_aout->output.output.i_rate, true )
         == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_STEREO;
@@ -528,7 +528,7 @@ static void Probe( aout_instance_t * p_aout )
                         p_aout->output.p_sys->i_wave_device_id,
                         &i_format,
                         i_physical_channels, 1,
-                        p_aout->output.output.i_rate, VLC_TRUE )
+                        p_aout->output.output.i_rate, true )
         == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_MONO;
@@ -545,7 +545,7 @@ static void Probe( aout_instance_t * p_aout )
                          VLC_FOURCC('s','p','d','i'),
                          p_aout->output.output.i_physical_channels,
                          aout_FormatNbChannels( &p_aout->output.output ),
-                         p_aout->output.output.i_rate, VLC_TRUE )
+                         p_aout->output.output.i_rate, true )
             == VLC_SUCCESS )
         {
             msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
@@ -568,7 +568,7 @@ static void Probe( aout_instance_t * p_aout )
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_aout, "intf-change", val );
 }
 
@@ -679,7 +679,7 @@ static void Close( vlc_object_t *p_this )
  ****************************************************************************/
 static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_format,
                         int i_channels, int i_nb_channels, int i_rate,
-                        vlc_bool_t b_probe )
+                        bool b_probe )
 {
     MMRESULT result;
     unsigned int i;
@@ -810,9 +810,9 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
  ****************************************************************************/
 static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id, int *i_format,
                            int i_channels, int i_nb_channels, int i_rate,
-                           vlc_bool_t b_probe )
+                           bool b_probe )
 {
-    vlc_bool_t b_use_float32 = var_CreateGetBool( p_aout, "waveout-float32");
+    bool b_use_float32 = var_CreateGetBool( p_aout, "waveout-float32");
 
     if( !b_use_float32 || OpenWaveOut( p_aout, i_device_id, VLC_FOURCC('f','l','3','2'),
                                    i_channels, i_nb_channels, i_rate, b_probe )
@@ -842,7 +842,7 @@ static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id, int *i
  *****************************************************************************/
 static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
                         WAVEHDR *p_waveheader, aout_buffer_t *p_buffer,
-                        vlc_bool_t b_spdif)
+                        bool b_spdif)
 {
     MMRESULT result;
 
@@ -981,7 +981,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
     aout_buffer_t *p_buffer = NULL;
     WAVEHDR *p_waveheader = p_sys->waveheader;
     int i, i_queued_frames;
-    vlc_bool_t b_sleek;
+    bool b_sleek;
     mtime_t next_date;
     uint32_t i_buffer_length = 64;
 
@@ -1208,7 +1208,7 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
     p_item->ppsz_list_text[j] = NULL;
 
     /* Signal change to the interface */
-    p_item->b_dirty = VLC_TRUE;
+    p_item->b_dirty = true;
 
     return VLC_SUCCESS;
 }

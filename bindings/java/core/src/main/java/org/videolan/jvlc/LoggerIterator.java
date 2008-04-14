@@ -51,7 +51,6 @@ public class LoggerIterator implements Iterator<LoggerMessage>
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean hasNext()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -61,7 +60,6 @@ public class LoggerIterator implements Iterator<LoggerMessage>
     /**
      * {@inheritDoc}
      */
-    @Override
     public LoggerMessage next()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -75,7 +73,6 @@ public class LoggerIterator implements Iterator<LoggerMessage>
      * {@inheritDoc}
      * Does not remove the element.
      */
-    @Override
     public void remove()
     {
         //        

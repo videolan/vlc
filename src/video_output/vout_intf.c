@@ -264,7 +264,7 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
 void vout_IntfInit( vout_thread_t *p_vout )
 {
     vlc_value_t val, text, old_val;
-    vlc_bool_t b_force_par = VLC_FALSE;
+    bool b_force_par = false;
     char *psz_buf;
     int i;
 
@@ -393,7 +393,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
         msg_Dbg( p_vout, "overriding monitor pixel aspect-ratio: %i:%i",
                  p_vout->i_par_num, p_vout->i_par_den );
-        b_force_par = VLC_TRUE;
+        b_force_par = true;
     }
     free( val.psz_string );
 
@@ -463,7 +463,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
     var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
-    var_SetBool( p_vout, "intf-change", VLC_TRUE );
+    var_SetBool( p_vout, "intf-change", true );
 }
 
 /*****************************************************************************
@@ -675,7 +675,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         closedir( path );
-        if( var_GetBool( p_vout, "snapshot-sequential" ) == VLC_TRUE )
+        if( var_GetBool( p_vout, "snapshot-sequential" ) == true )
         {
             int i_num = var_GetInteger( p_vout, "snapshot-num" );
             FILE *p_file;
@@ -771,8 +771,8 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         p_subpic->i_channel = 0;
         p_subpic->i_start = mdate();
         p_subpic->i_stop = mdate() + 4000000;
-        p_subpic->b_ephemer = VLC_TRUE;
-        p_subpic->b_fade = VLC_TRUE;
+        p_subpic->b_ephemer = true;
+        p_subpic->b_fade = true;
         p_subpic->i_original_picture_width = p_vout->render.i_width * 4;
         p_subpic->i_original_picture_height = p_vout->render.i_height * 4;
 
@@ -796,7 +796,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 
 void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
-                        vlc_bool_t b_add, vlc_bool_t b_setconfig )
+                        bool b_add, bool b_setconfig )
 {
     char *psz_parser;
     char *psz_string = config_GetPsz( p_vout, "vout-filter" );
@@ -867,7 +867,7 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
         break;
 
     case VOUT_SNAPSHOT:
-        p_vout->b_snapshot = VLC_TRUE;
+        p_vout->b_snapshot = true;
         return VLC_SUCCESS;
         break;
 
@@ -1201,7 +1201,7 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Set( p_playlist, "fullscreen", newval );
     pl_Release( p_playlist );
 
-    val.b_bool = VLC_TRUE;
+    val.b_bool = true;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }

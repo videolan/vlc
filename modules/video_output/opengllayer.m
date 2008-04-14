@@ -116,7 +116,7 @@ struct vout_sys_t
 
     uint8_t    *pp_buffer[2]; /* one last rendered, one to be rendered */
     int         i_index;
-    vlc_bool_t  b_frame_available;
+    bool  b_frame_available;
     
     CGLContextObj glContext;
 
@@ -208,7 +208,7 @@ static int Init( vout_thread_t *p_vout )
             return VLC_EGENERIC;
         }
     }
-    p_sys->b_frame_available = VLC_FALSE;
+    p_sys->b_frame_available = false;
     p_sys->i_index = 0;
 
     p_vout->p_picture[0].i_planes = 1;
@@ -243,7 +243,7 @@ static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    p_vout->p_sys->b_frame_available = VLC_FALSE;
+    p_vout->p_sys->b_frame_available = false;
 
     [p_vout->p_sys->o_cocoa_container performSelectorOnMainThread:@selector(removeVoutLayer:) withObject:p_vout->p_sys->o_layer waitUntilDone:YES];
 
@@ -313,7 +313,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
             CGLUnlockContext(p_sys->glContext);
             
-            p_sys->b_frame_available = VLC_TRUE;
+            p_sys->b_frame_available = true;
         }
     }
 

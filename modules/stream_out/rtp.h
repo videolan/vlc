@@ -36,7 +36,7 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t * );
 
 char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url );
 
-int rtp_add_sink( sout_stream_id_t *id, int fd, vlc_bool_t rtcp_mux );
+int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux );
 void rtp_del_sink( sout_stream_id_t *id, int fd );
 uint16_t rtp_get_seq( const sout_stream_id_t *id );
 unsigned rtp_get_num( const sout_stream_id_t *id );
@@ -65,6 +65,6 @@ int rtp_packetize_t140 (sout_stream_t *, sout_stream_id_t *, block_t *);
 /* RTCP */
 typedef struct rtcp_sender_t rtcp_sender_t;
 rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
-                         vlc_bool_t mux);
+                         bool mux);
 void CloseRTCP (rtcp_sender_t *rtcp);
 void SendRTCP (rtcp_sender_t *restrict rtcp, const block_t *rtp);

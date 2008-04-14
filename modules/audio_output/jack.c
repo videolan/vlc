@@ -85,9 +85,9 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_bool( AUTO_CONNECT_OPTION, 0, NULL, AUTO_CONNECT_TEXT,
-              AUTO_CONNECT_LONGTEXT, VLC_TRUE );
+              AUTO_CONNECT_LONGTEXT, true );
     add_string( CONNECT_REGEX_OPTION, NULL, NULL, CONNECT_REGEX_TEXT,
-                CONNECT_REGEX_LONGTEXT, VLC_TRUE );
+                CONNECT_REGEX_LONGTEXT, true );
     set_callbacks( Open, Close );
 vlc_module_end();
 

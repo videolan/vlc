@@ -66,6 +66,8 @@
 #define MAX_LINE_LENGTH 256
 #define STATUS_CHANGE "status change: "
 
+static const char *ppsz_input_state[] = { N_("Initializing"), N_("Opening"), N_("Buffer"), N_("Play"), N_("Pause"), N_("Stop"), N_("Error") };
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -73,10 +75,10 @@ static int  Activate     ( vlc_object_t * );
 static void Deactivate   ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
 
-static void Help         ( intf_thread_t *, vlc_bool_t );
+static void Help         ( intf_thread_t *, bool );
 static void RegisterCallbacks( intf_thread_t * );
 
-static vlc_bool_t ReadCommand( intf_thread_t *, char *, int * );
+static bool ReadCommand( intf_thread_t *, char *, int * );
 
 static input_item_t *parse_MRL( intf_thread_t *, char * );
 
@@ -125,7 +127,7 @@ struct intf_sys_t
 
 #ifdef WIN32
     HANDLE hConsoleIn;
-    vlc_bool_t b_quiet;
+    bool b_quiet;
 #endif
 };
 
@@ -181,17 +183,17 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_description( _("Remote control interface") );
-    add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+    add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, true );
 
 #ifdef WIN32
-    add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
+    add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, false );
 #else
 #if defined (HAVE_ISATTY)
-    add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
+    add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, true );
 #endif
-    add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, VLC_TRUE );
+    add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, true );
 #endif
-    add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
+    add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, true );
 
     set_capability( "interface", 20 );
 
@@ -438,8 +440,8 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *     p_playlist;
 
     char       p_buffer[ MAX_LINE_LENGTH + 1 ];
-    vlc_bool_t b_showpos = config_GetInt( p_intf, "rc-show-pos" );
-    vlc_bool_t b_longhelp = VLC_FALSE;
+    bool b_showpos = config_GetInt( p_intf, "rc-show-pos" );
+    bool b_longhelp = false;
 
     int        i_size = 0;
     int        i_oldpos = 0;
@@ -469,7 +471,7 @@ static void Run( intf_thread_t *p_intf )
     while( !intf_ShouldDie( p_intf ) )
     {
         char *psz_cmd, *psz_arg;
-        vlc_bool_t b_complete;
+        bool b_complete;
 
         if( p_intf->p_sys->pi_socket_listen != NULL &&
             p_intf->p_sys->i_socket == -1 )
@@ -749,8 +751,8 @@ static void Run( intf_thread_t *p_intf )
                  || !strncmp( psz_cmd, "H", 1 ) || !strncmp( psz_cmd, "?", 1 ) )
         {
             if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "H", 1 ) )
-                 b_longhelp = VLC_TRUE;
-            else b_longhelp = VLC_FALSE;
+                 b_longhelp = true;
+            else b_longhelp = false;
 
             Help( p_intf, b_longhelp );
         }
@@ -772,24 +774,24 @@ static void Run( intf_thread_t *p_intf )
                 if( p_vout )
                 {
                     vlc_value_t val;
-                    vlc_bool_t b_update = VLC_FALSE;
+                    bool b_update = false;
                     var_Get( p_vout, "fullscreen", &val );
                     val.b_bool = !val.b_bool;
                     if( !strncmp( psz_arg, "on", 2 )
-                        && ( val.b_bool == VLC_TRUE ) )
+                        && ( val.b_bool == true ) )
                     {
-                        b_update = VLC_TRUE;
-                        val.b_bool = VLC_TRUE;
+                        b_update = true;
+                        val.b_bool = true;
                     }
                     else if( !strncmp( psz_arg, "off", 3 )
-                             && ( val.b_bool == VLC_FALSE ) )
+                             && ( val.b_bool == false ) )
                     {
-                        b_update = VLC_TRUE;
-                        val.b_bool = VLC_FALSE;
+                        b_update = true;
+                        val.b_bool = false;
                     }
                     else if( strncmp( psz_arg, "off", 3 )
                              && strncmp( psz_arg, "on", 2 ) )
-                        b_update = VLC_TRUE;
+                        b_update = true;
                     if( b_update ) var_Set( p_vout, "fullscreen", val );
                     vlc_object_release( p_vout );
                 }
@@ -837,7 +839,7 @@ static void Run( intf_thread_t *p_intf )
     var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, p_intf );
 }
 
-static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
+static void Help( intf_thread_t *p_intf, bool b_longhelp)
 {
     msg_rc(_("+----[ Remote control commands ]"));
     msg_rc(  "| ");
@@ -1138,12 +1140,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else if( !strcmp( psz_cmd, "chapter_n" ) )
         {
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_input, "next-chapter", val );
         }
         else if( !strcmp( psz_cmd, "chapter_p" ) )
         {
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_input, "prev-chapter", val );
         }
         vlc_object_release( p_input );
@@ -1177,12 +1179,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else if( !strcmp( psz_cmd, "title_n" ) )
         {
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_input, "next-title", val );
         }
         else if( !strcmp( psz_cmd, "title_p" ) )
         {
-            val.b_bool = VLC_TRUE;
+            val.b_bool = true;
             var_Set( p_input, "prev-title", val );
         }
 
@@ -1328,16 +1330,16 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "repeat" ) )
     {
-        vlc_bool_t b_update = VLC_TRUE;
+        bool b_update = true;
 
         var_Get( p_playlist, "repeat", &val );
 
         if( strlen( newval.psz_string ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == VLC_TRUE ) ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == VLC_FALSE ) ) )
+            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == true ) ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == false ) ) )
             {
-                b_update = VLC_FALSE;
+                b_update = false;
             }
         }
 
@@ -1350,16 +1352,16 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "loop" ) )
     {
-        vlc_bool_t b_update = VLC_TRUE;
+        bool b_update = true;
 
         var_Get( p_playlist, "loop", &val );
 
         if( strlen( newval.psz_string ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == VLC_TRUE ) ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == VLC_FALSE ) ) )
+            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == true ) ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == false ) ) )
             {
-                b_update = VLC_FALSE;
+                b_update = false;
             }
         }
 
@@ -1372,16 +1374,16 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "random" ) )
     {
-        vlc_bool_t b_update = VLC_TRUE;
+        bool b_update = true;
 
         var_Get( p_playlist, "random", &val );
 
         if( strlen( newval.psz_string ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == VLC_TRUE ) ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == VLC_FALSE ) ) )
+            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == true ) ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == false ) ) )
             {
-                b_update = VLC_FALSE;
+                b_update = false;
             }
         }
 
@@ -1406,7 +1408,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             p_item = p_parent = p_playlist->items.p_elems[i_pos*2-1];
             while( p_parent->p_parent )
                 p_parent = p_parent->p_parent;
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
                     p_parent, p_item );
         }
         else
@@ -1419,7 +1421,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "clear" ) )
     {
         playlist_Stop( p_playlist );
-        playlist_Clear( p_playlist, VLC_FALSE );
+        playlist_Clear( p_playlist, false );
     }
     else if( !strcmp( psz_cmd, "add" ) &&
              newval.psz_string && *newval.psz_string )
@@ -1430,8 +1432,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         {
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
             if( playlist_AddInput( p_playlist, p_item,
-                     PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
-                     VLC_FALSE ) != VLC_SUCCESS )
+                     PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, true,
+                     false ) != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
             }
@@ -1446,8 +1448,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         {
             msg_rc( "trying to enqueue %s to playlist", newval.psz_string );
             if( playlist_AddInput( p_playlist, p_item,
-                               PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
-                               VLC_FALSE ) != VLC_SUCCESS )
+                               PLAYLIST_APPEND, PLAYLIST_END, true,
+                               false ) != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
             }
@@ -1718,7 +1720,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     else  if( !strcmp( psz_cmd, "snapshot" ) )
     {
         vlc_value_t val;
-        val.b_bool = VLC_TRUE;
+        val.b_bool = true;
         i_error = var_Set( p_vout, psz_variable, val );
     }
     else
@@ -2032,7 +2034,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
 }
 
 #ifdef WIN32
-vlc_bool_t ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
+bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
     DWORD i_dw;
@@ -2089,15 +2091,15 @@ vlc_bool_t ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
             p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
         {
             p_buffer[ *pi_size ] = 0;
-            return VLC_TRUE;
+            return true;
         }
     }
 
-    return VLC_FALSE;
+    return false;
 }
 #endif
 
-vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
+bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
     int i_read = 0;
 
@@ -2107,14 +2109,14 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     else if( p_intf->p_sys->i_socket == -1 )
     {
         msleep( INTF_IDLE_SLEEP );
-        return VLC_FALSE;
+        return false;
     }
 #endif
 
     while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
            (i_read = net_Read( p_intf, p_intf->p_sys->i_socket == -1 ?
                        0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
-                  (uint8_t *)p_buffer + *pi_size, 1, VLC_FALSE ) ) > 0 )
+                  (uint8_t *)p_buffer + *pi_size, 1, false ) ) > 0 )
     {
         if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
             break;
@@ -2138,17 +2140,17 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         }
 
         p_buffer[ *pi_size ] = 0;
-        return VLC_TRUE;
+        return true;
     }
 
     if( *pi_size == MAX_LINE_LENGTH ||
         p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
     {
         p_buffer[ *pi_size ] = 0;
-        return VLC_TRUE;
+        return true;
     }
 
-    return VLC_FALSE;
+    return false;
 }
 
 /*****************************************************************************

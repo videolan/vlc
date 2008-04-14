@@ -442,7 +442,6 @@ check_PROGRAMS = \
 	test_url \
 	test_utf8 \
 	test_headers \
-	test_control \
 	$(NULL)
 
 dist_check_SCRIPTS = check_symbols
@@ -468,10 +467,6 @@ test_utf8_CFLAGS = $(CFLAGS_tests)
 
 test_headers_SOURCES = test/headers.c
 test_headers_CFLAGS = $(CFLAGS_tests)
-
-test_control_SOURCES = control/testapi.c
-test_control_LDADD = libvlc-control.la
-test_control_CFLAGS = $(CFLAGS_tests)
 
 check-local:
 	for h in `echo $(dist_pkginclude_HEADERS) $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \

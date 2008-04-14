@@ -87,7 +87,7 @@ static picture_t *AllocatePicture( vlc_object_t *,
 static void DeAllocatePicture( vlc_object_t *, picture_t *,
                                      video_format_t * );
 static void SetOverlayTransparency( intf_thread_t *,
-                                    vlc_bool_t );
+                                    bool );
 static picture_t *LoadImage( intf_thread_t *, video_format_t *,
                              char * );
 
@@ -183,42 +183,42 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_MAIN );
 
     add_file( "fbosd-dev", "/dev/fb1", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-              VLC_FALSE );
+              false );
     add_string( "fbosd-aspect-ratio", "", NULL, ASPECT_RATIO_TEXT,
-                ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+                ASPECT_RATIO_LONGTEXT, true );
 
     add_string( "fbosd-image", NULL, NULL, FBOSD_IMAGE_TEXT,
-                FBOSD_IMAGE_LONGTEXT, VLC_TRUE );
+                FBOSD_IMAGE_LONGTEXT, true );
     add_string( "fbosd-text", NULL, NULL, FBOSD_TEXT,
-                FBOSD_LONGTEXT, VLC_TRUE );
+                FBOSD_LONGTEXT, true );
 
 #ifdef FBOSD_BLENDING
     add_integer_with_range( "fbosd-alpha", 255, 0, 255, NULL, ALPHA_TEXT,
-                            ALPHA_LONGTEXT, VLC_TRUE );
+                            ALPHA_LONGTEXT, true );
 
 #endif
 
     set_section( N_("Position"), NULL );
     add_integer( "fbosd-x", 0, NULL, POSX_TEXT,
-                 POSX_LONGTEXT, VLC_FALSE );
+                 POSX_LONGTEXT, false );
     add_integer( "fbosd-y", 0, NULL, POSY_TEXT,
-                 POSY_LONGTEXT, VLC_FALSE );
-    add_integer( "fbosd-position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+                 POSY_LONGTEXT, false );
+    add_integer( "fbosd-position", 8, NULL, POS_TEXT, POS_LONGTEXT, true );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Font"), NULL );
     add_integer_with_range( "fbosd-font-opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+        OPACITY_TEXT, OPACITY_LONGTEXT, false );
     add_integer( "fbosd-font-color", 0x00FFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
-                 VLC_FALSE );
+                 false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( "fbosd-font-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT,
-                 VLC_FALSE );
+                 false );
 
     set_section( N_("Commands"), NULL );
-    add_bool( "fbosd-clear", VLC_FALSE, NULL, CLEAR_TEXT, CLEAR_LONGTEXT, VLC_TRUE );
-    add_bool( "fbosd-render", VLC_FALSE, NULL, RENDER_TEXT, RENDER_LONGTEXT, VLC_TRUE );
-    add_bool( "fbosd-display", VLC_FALSE, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+    add_bool( "fbosd-clear", false, NULL, CLEAR_TEXT, CLEAR_LONGTEXT, true );
+    add_bool( "fbosd-render", false, NULL, RENDER_TEXT, RENDER_LONGTEXT, true );
+    add_bool( "fbosd-display", false, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
 
     set_description( _("GNU/Linux osd/overlay framebuffer interface") );
     set_capability( "interface", 10 );
@@ -244,7 +244,7 @@ struct fbosd_render_t
     char            *psz_string;
 
     /* Positon  */
-    vlc_bool_t      b_absolute;
+    bool      b_absolute;
     int             i_x;
     int             i_y;
     int             i_pos;
@@ -260,7 +260,7 @@ struct intf_sys_t
     /* Framebuffer information */
     int                         i_fd;                       /* device handle */
     struct fb_var_screeninfo    var_info;        /* current mode information */
-    vlc_bool_t                  b_pan;     /* does device supports panning ? */
+    bool                  b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *p_palette;              /* original palette */
 
@@ -290,7 +290,7 @@ struct intf_sys_t
     text_style_t    *p_style;                                /* font control */
 
     /* Positon */
-    vlc_bool_t      b_absolute;
+    bool      b_absolute;
     int             i_x;
     int             i_y;
     int             i_pos;
@@ -298,9 +298,9 @@ struct intf_sys_t
     int             i_alpha;                      /* transparency for images */
 
     /* commands control */
-    vlc_bool_t      b_need_update;    /* update display with \overlay buffer */
-    vlc_bool_t      b_clear;      /* clear overlay buffer make it tranparent */
-    vlc_bool_t      b_render;   /* render an image or text in overlay buffer */
+    bool      b_need_update;    /* update display with \overlay buffer */
+    bool      b_clear;      /* clear overlay buffer make it tranparent */
+    bool      b_render;   /* render an image or text in overlay buffer */
 };
 
 /*****************************************************************************
@@ -431,10 +431,10 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_intf, "fbosd-display", OverlayCallback, NULL );
 
     /* Check if picture position was overridden */
-    p_sys->b_absolute = VLC_TRUE;
+    p_sys->b_absolute = true;
     if( ( p_sys->i_x >= 0 ) && ( p_sys->i_y >= 0 ) )
     {
-        p_sys->b_absolute = VLC_FALSE;
+        p_sys->b_absolute = false;
         p_sys->i_y = (p_sys->i_y < p_sys->i_height) ?
                         p_sys->i_y : p_sys->i_height;
         p_sys->i_x = (p_sys->i_x < p_sys->i_width) ?
@@ -481,8 +481,8 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 #endif
-    p_sys->b_render = VLC_TRUE;
-    p_sys->b_need_update = VLC_TRUE;
+    p_sys->b_render = true;
+    p_sys->b_need_update = true;
 
     return VLC_SUCCESS;
 }
@@ -498,9 +498,9 @@ static void Destroy( vlc_object_t *p_this )
     intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
     int i;
 
-    p_sys->b_need_update = VLC_FALSE;
-    p_sys->b_render = VLC_FALSE;
-    p_sys->b_clear = VLC_FALSE;
+    p_sys->b_need_update = false;
+    p_sys->b_render = false;
+    p_sys->b_clear = false;
 
 #ifdef FBOSD_BLENDING
     var_DelCallback( p_intf, "fbosd-alpha", OverlayCallback, NULL );
@@ -623,7 +623,7 @@ static int OpenTextRenderer( intf_thread_t *p_intf )
     {
         p_intf->p_sys->p_text->p_module =
             module_Need( p_intf->p_sys->p_text, "text renderer",
-                            psz_modulename, VLC_TRUE );
+                            psz_modulename, true );
     }
     if( !p_intf->p_sys->p_text->p_module )
     {
@@ -750,11 +750,11 @@ static void DeAllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
 
 /*****************************************************************************
  * SetOverlayTransparency: Set the transparency for this overlay fb,
- * - VLC_TRUE is make transparent
- * - VLC_FALSE is make non tranparent
+ * - true is make transparent
+ * - false is make non tranparent
  *****************************************************************************/
 static void SetOverlayTransparency( intf_thread_t *p_intf,
-                                    vlc_bool_t b_transparent )
+                                    bool b_transparent )
 {
     intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
     size_t i_size = p_sys->fmt_out.i_width * p_sys->fmt_out.i_height
@@ -1052,7 +1052,7 @@ static int Init( intf_thread_t *p_intf )
                                         &p_sys->fmt_out );
     if( !p_sys->p_overlay ) return VLC_EGENERIC;
 
-    SetOverlayTransparency( p_intf, VLC_TRUE );
+    SetOverlayTransparency( p_intf, true );
 
     /* We know the chroma, allocate a buffer which will be used
      * to write to the overlay framebuffer */
@@ -1087,7 +1087,7 @@ static void End( intf_thread_t *p_intf )
     intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
 
     /* CleanUp */
-    SetOverlayTransparency( p_intf, VLC_FALSE );
+    SetOverlayTransparency( p_intf, false );
     if( p_sys->p_overlay )
     {
         int ret;
@@ -1291,7 +1291,7 @@ static void RenderClear( intf_thread_t *p_intf, struct fbosd_render_t *render )
     render->i_state = FBOSD_STATE_FREE;
 }
 
-static vlc_bool_t isRendererReady( intf_thread_t *p_intf )
+static bool isRendererReady( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
     int i;
@@ -1300,9 +1300,9 @@ static vlc_bool_t isRendererReady( intf_thread_t *p_intf )
     for( i = 0; i < FBOSD_RENDER_MAX; i++ )
     {
         if( p_sys->render[i].i_state == FBOSD_STATE_RESERVED )
-            return VLC_FALSE;
+            return false;
     }
-    return VLC_TRUE;
+    return true;
 }
 
 /*****************************************************************************
@@ -1331,13 +1331,13 @@ static void Run( intf_thread_t *p_intf )
 
         if( p_sys->b_clear )
         {
-            SetOverlayTransparency( p_intf, VLC_TRUE );
+            SetOverlayTransparency( p_intf, true );
 
             var_SetString( p_intf, "fbosd-image", "" );
             var_SetString( p_intf, "fbosd-text", "" );
 
-            p_sys->b_clear = VLC_FALSE;
-            p_sys->b_need_update = VLC_TRUE;
+            p_sys->b_clear = false;
+            p_sys->b_need_update = true;
         }
 
         if( p_sys->b_need_update && p_sys->p_overlay &&
@@ -1352,7 +1352,7 @@ static void Run( intf_thread_t *p_intf )
 
             /* clear the picture */
             memset( p_sys->p_overlay->p[0].p_pixels, 0xFF, p_sys->i_page_size );
-            p_sys->b_need_update = VLC_FALSE;
+            p_sys->b_need_update = false;
         }
 
         if( vlc_CPU() & CPU_CAPABILITY_FPU )
@@ -1373,7 +1373,7 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strncmp( psz_cmd, "fbosd-display", 13 ) )
     {
-        p_sys->b_need_update = VLC_TRUE;
+        p_sys->b_need_update = true;
     }
     else if( !strncmp( psz_cmd, "fbosd-clear", 11 ) )
     {
@@ -1383,7 +1383,7 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
         {
             RenderClear( p_intf, &p_sys->render[i] );
         }
-        p_sys->b_clear = VLC_TRUE;
+        p_sys->b_clear = true;
     }
     else if( !strncmp( psz_cmd, "fbosd-render", 12 ) )
     {
@@ -1437,19 +1437,19 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
         }
         else if( !strncmp( psz_cmd, "fbosd-x", 7 ) )
         {
-            p_sys->render[i].b_absolute = VLC_FALSE;
+            p_sys->render[i].b_absolute = false;
             p_sys->render[i].i_x = (newval.i_int < p_sys->i_width) ?
                                     newval.i_int : p_sys->i_width;
         }
         else if( !strncmp( psz_cmd, "fbosd-y", 7 ) )
         {
-            p_sys->render[i].b_absolute = VLC_FALSE;
+            p_sys->render[i].b_absolute = false;
             p_sys->render[i].i_y = (newval.i_int < p_sys->i_height) ?
                                     newval.i_int : p_sys->i_height;
         }
         else if( !strncmp( psz_cmd, "fbosd-position", 14 ) )
         {
-            p_sys->render[i].b_absolute = VLC_TRUE;
+            p_sys->render[i].b_absolute = true;
             p_sys->render[i].i_pos = newval.i_int;
         }
         else if( !strncmp( psz_cmd, "fbosd-font-size", 15 ) )

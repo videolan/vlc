@@ -66,12 +66,12 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-        CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+        CACHING_TEXT, CACHING_LONGTEXT, true );
+    add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, true );
 
 #ifdef WIN32
     add_integer( "screen-fragment-size", 0, NULL, FRAGS_TEXT,
-        FRAGS_LONGTEXT, VLC_TRUE );
+        FRAGS_LONGTEXT, true );
 #endif
 
     set_capability( "access_demux", 0 );
@@ -173,7 +173,7 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    vlc_bool_t *pb;
+    bool *pb;
     int64_t *pi64;
 
     switch( i_query )
@@ -183,8 +183,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_CAN_CONTROL_PACE:
             /* TODO */
-            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-            *pb = VLC_FALSE;
+            pb = (bool*)va_arg( args, bool * );
+            *pb = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:

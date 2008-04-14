@@ -215,7 +215,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     pp_sds = NULL;
     i_update_counter = 0;
     i_sort_mode = MODE_NONE;
-    b_need_update = VLC_FALSE;
+    b_need_update = false;
     i_items_to_append = 0;
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
@@ -406,7 +406,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Update the playlist */
     p_current_treeroot = p_playlist->p_local_category;
-    Rebuild( VLC_TRUE );
+    Rebuild( true );
 }
 
 Playlist::~Playlist()
@@ -507,7 +507,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     if( !p_data ) return;
 
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                    ((PlaylistItem *)p_data)->i_id, VLC_TRUE );
+                                    ((PlaylistItem *)p_data)->i_id, true );
     if( !p_item )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -530,7 +530,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
                          wxU( " )" ) );
     }
 
-    if( !psz_artist || !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
+    if( !psz_artist || !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == true )
     {
         msg = wxString( wxU( psz_name ) ) + duration;
     }
@@ -577,7 +577,7 @@ void Playlist::AppendItem( wxCommandEvent& event )
     node = FindItem( treectrl->GetRootItem(), p_add->i_node );
     if( !node.IsOk() ) goto update;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, true );
     if( !p_item ) goto update;
     if( (p_item->i_flags & PLAYLIST_DBL_FLAG ) ) goto update;
 
@@ -740,7 +740,7 @@ int Playlist::CountItems( wxTreeItemId root )
         {
             playlist_item_t *p_item;
             LockPlaylist( p_intf->p_sys, p_playlist );
-            p_item = playlist_ItemGetById( p_playlist, ((PlaylistItem *)treectrl->GetItemData( item ))->i_id, VLC_TRUE );
+            p_item = playlist_ItemGetById( p_playlist, ((PlaylistItem *)treectrl->GetItemData( item ))->i_id, true );
             if( p_item && p_item->i_children == -1 )
                 count++;
             UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -751,7 +751,7 @@ int Playlist::CountItems( wxTreeItemId root )
 }
 
 /* Find a wxItem from a name (from current) */
-wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string, wxTreeItemId current, vlc_bool_t *pb_current_found )
+wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string, wxTreeItemId current, bool *pb_current_found )
 {
     wxTreeItemIdValue cookie;
     wxTreeItemId search;
@@ -763,13 +763,13 @@ wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string
         if( treectrl->GetItemText( item).Lower().Contains(
                                                  search_string.Lower() ) )
         {
-            if( !current.IsOk() || *pb_current_found == VLC_TRUE )
+            if( !current.IsOk() || *pb_current_found == true )
             {
                 return item;
             }
             else if( current.IsOk() && item == current )
             {
-                *pb_current_found = VLC_TRUE;
+                *pb_current_found = true;
             }
         }
         if( treectrl->ItemHasChildren( item ) )
@@ -791,7 +791,7 @@ wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string
 /**********************************************************************
  * Rebuild the playlist
  **********************************************************************/
-void Playlist::Rebuild( vlc_bool_t b_root )
+void Playlist::Rebuild( bool b_root )
 {
     i_items_to_append = 0;
 
@@ -831,7 +831,7 @@ void Playlist::Rebuild( vlc_bool_t b_root )
 
 void Playlist::ShowPlaylist( bool show )
 {
-    if( show ) Rebuild( VLC_TRUE );
+    if( show ) Rebuild( true );
     Show( show );
 }
 
@@ -845,8 +845,8 @@ void Playlist::UpdatePlaylist()
 
     if( this->b_need_update )
     {
-        this->b_need_update = VLC_FALSE;
-        Rebuild( VLC_TRUE );
+        this->b_need_update = false;
+        Rebuild( true );
     }
 
     /* Updating the playing status every 0.5s is enough */
@@ -863,7 +863,7 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
    p_wxitem = (PlaylistItem *)treectrl->GetItemData( item );
 
    LockPlaylist( p_intf->p_sys, p_playlist );
-   p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
+   p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, true );
 
    if( !p_item )
    {
@@ -880,12 +880,12 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
 
 void Playlist::DeleteItem( int item_id )
 {
-    playlist_DeleteFromInput( p_playlist, item_id, VLC_TRUE );
+    playlist_DeleteFromInput( p_playlist, item_id, true );
 }
 
 void Playlist::DeleteNode( playlist_item_t *p_item )
 {
-    playlist_NodeDelete( p_playlist, p_item, VLC_TRUE , VLC_FALSE );
+    playlist_NodeDelete( p_playlist, p_item, true , false );
 }
 
 void Playlist::OnMenuClose( wxCommandEvent& event )
@@ -987,18 +987,18 @@ void Playlist::OnSort( wxCommandEvent& event )
         case SortTitle_Event:
             playlist_RecursiveNodeSort( p_playlist,
                             playlist_ItemGetById( p_playlist, p_wxitem->i_id,
-                                                  VLC_TRUE ),
+                                                  true ),
                             SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
             break;
         case RSortTitle_Event:
             playlist_RecursiveNodeSort( p_playlist,
                             playlist_ItemGetById( p_playlist, p_wxitem->i_id,
-                                                  VLC_TRUE ),
+                                                  true ),
                             SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 
-    Rebuild( VLC_TRUE );
+    Rebuild( true );
 }
 
 /**********************************************************************
@@ -1015,12 +1015,12 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
     PlaylistItem *p_wxroot;
     p_wxroot = (PlaylistItem *)treectrl->GetItemData( treectrl->GetRootItem() );
     playlist_item_t *p_root = playlist_ItemGetById( p_playlist, p_wxroot->i_id,
-                                                    VLC_TRUE );
+                                                    true );
 
     assert( p_root );
     char *psz_name = wxFromLocale( search_string );
     playlist_LiveSearchUpdate( p_playlist, p_root, psz_name );
-    Rebuild( VLC_TRUE );
+    Rebuild( true );
 
     wxLocaleFree( psz_name );
 }
@@ -1098,7 +1098,7 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
         UnlockPlaylist( p_intf->p_sys, p_playlist );
         return;
     }
-    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, true );
 
     p_parent = p_item;
     while( p_parent )
@@ -1110,7 +1110,7 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
 
     if( p_parent )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_parent, p_item );
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, p_parent, p_item );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
@@ -1174,9 +1174,9 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
     }
 
     playlist_item_t *p_drageditem =
-        playlist_ItemGetById(p_playlist, p_wxdrageditem->i_id, VLC_TRUE );
+        playlist_ItemGetById(p_playlist, p_wxdrageditem->i_id, true );
     playlist_item_t *p_destitem =
-        playlist_ItemGetById(p_playlist, p_wxdestitem->i_id, VLC_TRUE );
+        playlist_ItemGetById(p_playlist, p_wxdestitem->i_id, true );
     if( !p_drageditem || !p_destitem )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -1195,7 +1195,7 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
             return;
         }
         playlist_item_t *p_destitem2 =
-            playlist_ItemGetById( p_playlist, p_parent->i_id, VLC_TRUE );
+            playlist_ItemGetById( p_playlist, p_parent->i_id, true );
         if( !p_destitem2 )
         {
             UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -1217,7 +1217,7 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 
     /* FIXME: having this Rebuild() is dirty */
-    Rebuild( VLC_TRUE );
+    Rebuild( true );
 }
 
 #if wxUSE_DRAG_AND_DROP
@@ -1250,7 +1250,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
     {
         PlaylistItem *p_plitem =
             (PlaylistItem *)p->treectrl->GetItemData( item );
-        p_dest = playlist_ItemGetById( p->p_playlist, p_plitem->i_id, VLC_TRUE );
+        p_dest = playlist_ItemGetById( p->p_playlist, p_plitem->i_id, true );
 
         if( p_dest->i_children == -1 )
         {
@@ -1266,7 +1266,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
                 return FALSE;
             }
             playlist_item_t *p_node =
-                playlist_ItemGetById( p->p_playlist, p_parent->i_id, VLC_TRUE );
+                playlist_ItemGetById( p->p_playlist, p_parent->i_id, true );
             if( !p_node )
             {
                 UnlockPlaylist( p->p_intf->p_sys, p->p_playlist );
@@ -1289,14 +1289,14 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
         input_item_t *p_input = input_ItemNew( p->p_playlist,
                                               psz_utf8, psz_utf8 );
         int i_ret = ( playlist_NodeAddInput( p->p_playlist, p_input, p_dest,
-                PLAYLIST_PREPARSE, i_pos, VLC_FALSE ) != VLC_SUCCESS );
+                PLAYLIST_PREPARSE, i_pos, false ) != VLC_SUCCESS );
         wxDnDLocaleFree( psz_utf8 );
         if( i_ret != VLC_SUCCESS )
             return FALSE;
     }
 
     /* FIXME: having this Rebuild() is dirty */
-    p->Rebuild( VLC_TRUE );
+    p->Rebuild( true );
 
     return TRUE;
 }
@@ -1452,7 +1452,7 @@ void Playlist::OnPopup( wxContextMenuEvent& event )
         treectrl->SelectItem( i_wx_popup_item );
 
         LockPlaylist( p_intf->p_sys, p_playlist );
-        p_item = playlist_ItemGetById( p_playlist, i_popup_item, VLC_TRUE );
+        p_item = playlist_ItemGetById( p_playlist, i_popup_item, true );
 
         if( !p_item )
         {
@@ -1478,7 +1478,7 @@ void Playlist::OnPopupPlay( wxCommandEvent& event )
 {
     playlist_item_t *p_popup_item, *p_popup_parent;
     LockPlaylist( p_intf->p_sys, p_playlist );
-    p_popup_item = playlist_ItemGetById( p_playlist, i_popup_item, VLC_TRUE );
+    p_popup_item = playlist_ItemGetById( p_playlist, i_popup_item, true );
 
     p_popup_parent = p_popup_item;
     while( p_popup_parent )
@@ -1490,7 +1490,7 @@ void Playlist::OnPopupPlay( wxCommandEvent& event )
 
     if( p_popup_parent )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_popup_parent,
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true, p_popup_parent,
                           p_popup_item );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -1505,7 +1505,7 @@ void Playlist::Preparse()
 {
     playlist_item_t *p_popup_item;
     LockPlaylist( p_intf->p_sys, p_playlist );
-    p_popup_item = playlist_ItemGetById( p_playlist, i_popup_item, VLC_TRUE );
+    p_popup_item = playlist_ItemGetById( p_playlist, i_popup_item, true );
 
     if( p_popup_item != NULL )
     {
@@ -1543,7 +1543,7 @@ void Playlist::OnPopupSort( wxCommandEvent& event )
     p_wxitem = (PlaylistItem *)treectrl->GetItemData( i_wx_popup_item );
     LockPlaylist( p_intf->p_sys, p_playlist );
 
-    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, true );
     if( p_item->i_children >= 0 )
     {
         playlist_RecursiveNodeSort( p_playlist, p_item,
@@ -1562,7 +1562,7 @@ void Playlist::OnPopupInfo( wxCommandEvent& event )
     LockPlaylist( p_intf->p_sys, p_playlist );
     playlist_item_t *p_popup_item = playlist_ItemGetById( p_playlist,
                                                           i_popup_item,
-                                                          VLC_TRUE );
+                                                          true );
     if( p_popup_item )
     {
         iteminfo_dialog = new ItemInfoDialog( p_intf, p_popup_item, this );
@@ -1590,12 +1590,12 @@ void Playlist::OnPopupAddNode( wxCommandEvent& event )
 
     p_wxitem = (PlaylistItem *)treectrl->GetItemData( i_wx_popup_item );
 
-    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, VLC_TRUE );
+    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id, true );
 
     playlist_NodeCreate( p_playlist, psz_name, p_item, 0, NULL );
 
     UnlockPlaylist( p_intf->p_sys, p_playlist );
-    Rebuild( VLC_TRUE );
+    Rebuild( true );
 
     wxLocaleFree( psz_name );
 }
@@ -1607,9 +1607,9 @@ void Playlist::OnSourceSelected( wxListEvent &event )
    if( !p_current_treeroot || i_id != p_current_treeroot->i_id )
    {
        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,
-                                                       VLC_TRUE );
+                                                       true );
        if( p_item ) p_current_treeroot = p_item;
-       Rebuild( VLC_TRUE );
+       Rebuild( true );
    }
 }
 
@@ -1641,7 +1641,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
-    p_playlist_dialog->b_need_update = VLC_TRUE;
+    p_playlist_dialog->b_need_update = true;
     return VLC_SUCCESS;
 }
 
@@ -1700,7 +1700,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     {
         /* Too many items waiting to be added, it will be quicker to rebuild
          * the whole playlist */
-        p_playlist_dialog->b_need_update = VLC_TRUE;
+        p_playlist_dialog->b_need_update = true;
         return VLC_SUCCESS;
     }
 

@@ -92,7 +92,7 @@ int E_(HTTPOpen)( access_t *p_access )
 
     vlc_mutex_init( p_access, &p_sys->httpd_mutex );
     vlc_cond_init( p_access, &p_sys->httpd_cond );
-    p_sys->b_request_frontend_info = p_sys->b_request_mmi_info = VLC_FALSE;
+    p_sys->b_request_frontend_info = p_sys->b_request_mmi_info = false;
     p_sys->i_httpd_timeout = 0;
 
     psz_address = var_GetNonEmptyString( p_access, "dvb-http-host" );
@@ -155,7 +155,7 @@ int E_(HTTPOpen)( access_t *p_access )
 
     if ( psz_acl != NULL )
     {
-        p_acl = ACL_Create( p_access, VLC_FALSE );
+        p_acl = ACL_Create( p_access, false );
         if( ACL_LoadFile( p_acl, psz_acl ) )
         {
             ACL_Destroy( p_acl );
@@ -204,14 +204,14 @@ void E_(HTTPClose)( access_t *p_access )
         {
             /* Unlock the thread if it is stuck in HttpCallback */
             vlc_mutex_lock( &p_sys->httpd_mutex );
-            if ( p_sys->b_request_frontend_info == VLC_TRUE )
+            if ( p_sys->b_request_frontend_info == true )
             {
-                p_sys->b_request_frontend_info = VLC_FALSE;
+                p_sys->b_request_frontend_info = false;
                 p_sys->psz_frontend_info = strdup("");
             }
-            if ( p_sys->b_request_mmi_info == VLC_TRUE )
+            if ( p_sys->b_request_mmi_info == true )
             {
-                p_sys->b_request_mmi_info = VLC_FALSE;
+                p_sys->b_request_mmi_info = false;
                 p_sys->psz_mmi_info = strdup("");
             }
             vlc_cond_signal( &p_sys->httpd_cond );
@@ -257,10 +257,10 @@ static int HttpCallback( httpd_file_sys_t *p_args,
 
     p_sys->i_httpd_timeout = mdate() + I64C(3000000); /* 3 s */
     p_sys->psz_request = psz_request;
-    p_sys->b_request_frontend_info = VLC_TRUE;
+    p_sys->b_request_frontend_info = true;
     if ( p_sys->i_ca_handle )
     {
-        p_sys->b_request_mmi_info = VLC_TRUE;
+        p_sys->b_request_mmi_info = true;
     }
     else
     {

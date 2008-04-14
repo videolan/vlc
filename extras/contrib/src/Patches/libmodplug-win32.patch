@@ -10,3 +10,15 @@
                          modplug.cpp
  
  libmodplugincludedir = $(includedir)/libmodplug
+diff -ru libmodplug/src/sndfile.cpp libmodplug-new/src/sndfile.cpp
+--- libmodplug/src/sndfile.cpp	2006-11-02 04:31:26.000000000 +0000
++++ libmodplug-new/src/sndfile.cpp	2008-04-12 20:56:39.000000000 +0100
+@@ -143,8 +143,5 @@
+ #ifndef MODPLUG_BASIC_SUPPORT
+ /* Sequencer File Format Support */
+-		 && (!ReadABC(lpStream, dwMemLength))
+-		 && (!ReadMID(lpStream, dwMemLength))
+-		 && (!ReadPAT(lpStream, dwMemLength))
+ 		 && (!ReadSTM(lpStream, dwMemLength))
+ 		 && (!ReadMed(lpStream, dwMemLength))
+ 		 && (!ReadMTM(lpStream, dwMemLength))

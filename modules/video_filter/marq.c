@@ -77,7 +77,7 @@ struct filter_sys_t
     mtime_t last_time;
     mtime_t i_refresh;
 
-    vlc_bool_t b_need_update;
+    bool b_need_update;
 };
 
 #define MSG_TEXT N_("Text")
@@ -145,29 +145,29 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     add_string( CFG_PREFIX "marquee", "VLC", NULL, MSG_TEXT, MSG_LONGTEXT,
-                VLC_FALSE );
+                false );
 
     set_section( N_("Position"), NULL );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true );
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true );
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+        OPACITY_TEXT, OPACITY_LONGTEXT, false );
     add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
-                 VLC_FALSE );
+                 false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT,
-                 VLC_FALSE );
+                 false );
 
     set_section( N_("Misc"), NULL );
     add_integer( CFG_PREFIX "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
-                 VLC_FALSE );
+                 false );
     add_integer( CFG_PREFIX "refresh", 1000, NULL, REFRESH_TEXT,
-                 REFRESH_LONGTEXT, VLC_FALSE );
+                 REFRESH_LONGTEXT, false );
 
     set_description( _("Marquee display") );
     add_shortcut( "time" );
@@ -226,7 +226,7 @@ static int CreateFilter( vlc_object_t *p_this )
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
     p_sys->last_time = 0;
-    p_sys->b_need_update = VLC_TRUE;
+    p_sys->b_need_update = true;
 
     return VLC_SUCCESS;
 }
@@ -273,7 +273,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-    if( p_sys->b_need_update == VLC_FALSE )
+    if( p_sys->b_need_update == false )
     {
         return NULL;
     }
@@ -298,27 +298,27 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     if( strchr( p_sys->psz_marquee, '%' ) || strchr( p_sys->psz_marquee, '$' ) )
     {
-        p_sys->b_need_update = VLC_TRUE;
+        p_sys->b_need_update = true;
     }
     else
     {
-        p_sys->b_need_update = VLC_FALSE;
+        p_sys->b_need_update = false;
     }
     p_spu->p_region->psz_text = str_format( p_filter, p_sys->psz_marquee );
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
-    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->b_ephemer = true;
 
     /*  where to locate the string: */
     if( p_sys->i_pos < 0 )
     {   /*  set to an absolute xy */
         p_spu->p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
-        p_spu->b_absolute = VLC_TRUE;
+        p_spu->b_absolute = true;
     }
     else
     {   /* set to one of the 9 relative locations */
         p_spu->p_region->i_align = p_sys->i_pos;
-        p_spu->b_absolute = VLC_FALSE;
+        p_spu->b_absolute = false;
     }
 
     p_spu->i_x = p_sys->i_xoff;
@@ -378,6 +378,6 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
         p_sys->i_pos = newval.i_int;
         p_sys->i_xoff = -1;       /* force to relative positioning */
     }
-    p_sys->b_need_update = VLC_TRUE;
+    p_sys->b_need_update = true;
     return VLC_SUCCESS;
 }

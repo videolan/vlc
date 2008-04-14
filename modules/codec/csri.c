@@ -205,9 +205,9 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_y = 0;
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
-    p_spu->b_ephemer = VLC_FALSE;
-    p_spu->b_absolute = VLC_FALSE;
-    p_spu->b_pausable = VLC_TRUE;
+    p_spu->b_ephemer = false;
+    p_spu->b_absolute = false;
+    p_spu->b_pausable = true;
 
     msg_Dbg( p_dec, "BS %lf..%lf", p_spu->i_start * 0.000001, p_spu->i_stop * 0.000001);
     p_dec->p_sys->pf_push_packet(p_dec->p_sys->p_instance,

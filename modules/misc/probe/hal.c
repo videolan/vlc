@@ -128,10 +128,10 @@ static void Update( device_probe_t * p_probe )
     probe_sys_t *p_sys = p_probe->p_sys;
     int i, i_devices, j;
     char **devices;
-    vlc_bool_t b_exists;
+    bool b_exists;
 
     for ( j = 0 ; j < p_sys->i_devices; j++ )
-        p_sys->pp_devices[j]->b_seen = VLC_FALSE;
+        p_sys->pp_devices[j]->b_seen = false;
 
     /* CD/DVD */
     if( ( devices = libhal_find_device_by_capability( p_sys->p_ctx,
@@ -141,15 +141,15 @@ static void Update( device_probe_t * p_probe )
         for( i = 0; i < i_devices; i++ )
         {
             device_t *p_dev = ParseDisc( p_probe, devices[ i ] );
-            b_exists = VLC_FALSE;
+            b_exists = false;
 
             for ( j = 0 ; j < p_sys->i_devices; j++ )
             {
                 if( !strcmp( p_sys->pp_devices[j]->psz_uri,
                              p_dev->psz_uri ) )
                 {
-                    b_exists = VLC_TRUE;
-                    p_dev->b_seen = VLC_TRUE;
+                    b_exists = true;
+                    p_dev->b_seen = true;
                     UpdateMedia( p_probe, p_dev );
                     break;
                 }
@@ -210,7 +210,7 @@ static void UpdateMedia( device_probe_t *p_probe, device_t *p_dev )
     probe_sys_t *p_sys = p_probe->p_sys;
     char **matching_media;
     int i_matching, i;
-    vlc_bool_t b_changed = VLC_FALSE;;
+    bool b_changed = false;;
     int i_old_type = p_dev->i_media_type;
     p_dev->i_media_type = 0;
 
@@ -233,7 +233,7 @@ static void UpdateMedia( device_probe_t *p_probe, device_t *p_dev )
                 {
                     free( p_dev->psz_name );
                     p_dev->psz_name = NULL;
-                    b_changed = VLC_TRUE;
+                    b_changed = true;
                 }
                 if( !p_dev->psz_name )
                     p_dev->psz_name = strdup( psz_media_name );

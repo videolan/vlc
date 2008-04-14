@@ -53,12 +53,12 @@ struct video_palette_t
 typedef struct
 {
     /* true if we have the peak value */
-    vlc_bool_t pb_peak[AUDIO_REPLAY_GAIN_MAX];
+    bool pb_peak[AUDIO_REPLAY_GAIN_MAX];
     /* peak value where 1.0 means full sample value */
     float      pf_peak[AUDIO_REPLAY_GAIN_MAX];
 
     /* true if we have the gain value */
-    vlc_bool_t pb_gain[AUDIO_REPLAY_GAIN_MAX];
+    bool pb_gain[AUDIO_REPLAY_GAIN_MAX];
     /* gain value in dB */
     float      pf_gain[AUDIO_REPLAY_GAIN_MAX];
 } audio_replay_gain_t;
@@ -200,7 +200,7 @@ struct es_format_t
 
     unsigned int   i_bitrate;
 
-    vlc_bool_t     b_packetized; /* wether the data is packetized
+    bool     b_packetized; /* wether the data is packetized
                                     (ie. not truncated) */
     int     i_extra;
     void    *p_extra;
@@ -233,7 +233,7 @@ static inline void es_format_Init( es_format_t *fmt,
     memset( &fmt->video, 0, sizeof(video_format_t) );
     memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
-    fmt->b_packetized           = VLC_TRUE;
+    fmt->b_packetized           = true;
     fmt->i_bitrate              = 0;
     fmt->i_extra                = 0;
     fmt->p_extra                = NULL;

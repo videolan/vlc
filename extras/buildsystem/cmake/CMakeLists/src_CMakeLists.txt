@@ -270,19 +270,16 @@ set_target_properties(libvlc libvlc-control vlc PROPERTIES COMPILE_FLAGS
 ##########################################################
 # Tests
 
-add_executable(test_testapi    control/testapi.c)
 add_executable(test_i18n_atof  test/i18n_atof.c)
 add_executable(test_url        test/url.c)
 add_executable(test_utf8       test/utf8.c)
 add_executable(test_dictionary test/dictionary.c)
 
-target_link_libraries(test_testapi    libvlc-control)
 target_link_libraries(test_i18n_atof  libvlc)
 target_link_libraries(test_url        libvlc)
 target_link_libraries(test_utf8       libvlc)
 target_link_libraries(test_dictionary libvlc)
 
-add_test(test_control    ${CMAKE_CURRENT_BINARY_DIR}/test_testapi)
 add_test(test_i18n_atof  ${CMAKE_CURRENT_BINARY_DIR}/test_i18n_atof)
 add_test(test_url        ${CMAKE_CURRENT_BINARY_DIR}/test_url)
 add_test(test_utf8       ${CMAKE_CURRENT_BINARY_DIR}/test_utf8)

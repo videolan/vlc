@@ -44,14 +44,14 @@ namespace wxvlc
         void ProcessUpdate( wxScrollEvent & );
 
     protected:
-        vlc_bool_t b_slider_free;
+        bool b_slider_free;
         virtual void UpdateInput();
-        virtual void UpdateButtons( vlc_bool_t );
+        virtual void UpdateButtons( bool );
         virtual void UpdateTime( char *, char *);
 
-        virtual vlc_bool_t IsShown();
-        virtual vlc_bool_t IsFree();
-        virtual vlc_bool_t IsPlaying();
+        virtual bool IsShown();
+        virtual bool IsFree();
+        virtual bool IsPlaying();
 
         virtual void HideSlider();
         virtual void ShowSlider();

@@ -47,8 +47,8 @@ namespace wxvlc
         vout_thread_t *p_vout;
         wxWindow *p_parent;
         vlc_mutex_t lock;
-        vlc_bool_t b_shown;
-        vlc_bool_t b_auto_size;
+        bool b_shown;
+        bool b_auto_size;
 
         wxWindow *p_child_window;
 

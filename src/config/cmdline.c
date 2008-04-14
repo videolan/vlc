@@ -51,7 +51,7 @@
  *****************************************************************************/
 int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                           const char *ppsz_argv[],
-                          vlc_bool_t b_ignore_errors )
+                          bool b_ignore_errors )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t *p_parser;

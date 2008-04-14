@@ -60,7 +60,7 @@ int cocoaglvoutviewInit( vout_thread_t * p_vout )
         msg_Warn( p_vout, "No drawable!, spawing a window" );
     }
 
-    p_vout->p_sys->b_embedded = VLC_FALSE;
+    p_vout->p_sys->b_embedded = false;
 
 
     /* Create the GL view */
@@ -142,7 +142,7 @@ int cocoaglvoutviewManage( vout_thread_t * p_vout )
  *****************************************************************************/
 int cocoaglvoutviewControl( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    vlc_bool_t b_arg;
+    bool b_arg;
 
     switch( i_query )
     {
@@ -163,7 +163,7 @@ int cocoaglvoutviewControl( vout_thread_t *p_vout, int i_query, va_list args )
  *****************************************************************************/
 void cocoaglvoutviewSwap( vout_thread_t * p_vout )
 {
-    p_vout->p_sys->b_got_frame = VLC_TRUE;
+    p_vout->p_sys->b_got_frame = true;
     [[p_vout->p_sys->o_glview openGLContext] flushBuffer];
 }
 
