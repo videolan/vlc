@@ -863,7 +863,7 @@ void module_PutConfig( module_config_t *config )
 static char * copy_next_paths_token( char * paths, char ** remaining_paths )
 {
     char * path;
-    int i;
+    int i, done;
     bool escaped = false;
 
     assert( paths );
@@ -873,20 +873,20 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
     if( !path ) return NULL;
 
     /* Look for PATH_SEP_CHAR (a ':' or a ';') */
-    for( i = 0; paths[i]; i++ ) {
+    for( i = 0, done = 0 ; paths[i]; i++ ) {
         /* Take care of \\ and \: or \; escapement */
         if( escaped ) {
             escaped = false;
-            path[i] = paths[i];
+            path[done++] = paths[i];
         }
         else if( paths[i] == '\\' )
             escaped = true;
         else if( paths[i] == PATH_SEP_CHAR )
             break;
         else
-            path[i] = paths[i];
+            path[done++] = paths[i];
     }
-    path[i] = 0;
+    path[done++] = 0;
 
     /* Return the remaining paths */
     if( remaining_paths ) {
