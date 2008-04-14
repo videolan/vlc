@@ -52,6 +52,7 @@ $Id$
  * bda: DVB support for Windows BDA drivers
  * beos: Audio output, video output and interface module for BeOS.
  * blend: a picture filter that blends two pictures
+ * blendbench: a picture filter that test performance of blending routines
  * bluescreen: Bluescreen (weather channel like) video filter
  * bonjour: Zeroconf services discovery
  * caca: color ASCII art video output using libcaca
@@ -92,6 +93,7 @@ $Id$
  * dvd: input module for accessing DVDs.
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread.
+ * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
  * equalizer: a equalizer audio filter
  * erase: Logo erase video filter
  * es: input module for MPEG ES decapsulation.
