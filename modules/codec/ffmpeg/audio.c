@@ -112,6 +112,18 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
     p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
+    if( !p_dec->fmt_in.audio.i_physical_channels )
+    {
+        msg_Warn( p_dec, "Physical channel configuration not set : guessing" );
+        p_dec->fmt_in.audio.i_original_channels =
+            p_dec->fmt_in.audio.i_physical_channels =
+                pi_channels_maps[p_sys->p_context->channels];
+    }
+
+    p_dec->fmt_out.audio.i_physical_channels =
+        p_dec->fmt_out.audio.i_original_channels =
+        p_dec->fmt_in.audio.i_physical_channels;
+
     p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
     p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
     p_sys->p_context->bits_per_sample = p_dec->fmt_in.audio.i_bitspersample;
