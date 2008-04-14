@@ -84,6 +84,7 @@
 #include "config/configuration.h"
 
 #include "vlc_charset.h"
+#include "vlc_arrays.h"
 
 #include "modules/modules.h"
 #include "modules/builtin.h"
@@ -901,59 +902,57 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
-    char *paths, *path, *paths_iter;
-    char * extra_path;
+    int count,i;
+    char * path;
+    vlc_array_t *arraypaths = vlc_array_new();
 
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/modules and <vlc path>/plugins. */
-#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __APPLE__ ) || defined( SYS_BEOS )
-    if( asprintf( &extra_path,
-                    "%s" DIR_SEP "modules" PATH_SEP
-                    "%s" DIR_SEP "plugins"
-                    "%s",
-                    vlc_global()->psz_vlcpath,
-                    vlc_global()->psz_vlcpath,
-# if defined( WIN32 ) || defined( UNDER_CE )
-                    "" ) < 0 )
-# else
-                    PATH_SEP PLUGIN_PATH ) < 0 )
-# endif
-
-    {
-        msg_Err( p_this, "Not enough memory" );
-        return;
+#define RETURN_ENOMEM                               \
+    {                                               \
+        msg_Err( p_this, "Not enough memory" );     \
+        return;                                     \
     }
-#else
-    extra_path = strdup( PLUGIN_PATH );
+
+    vlc_array_append( arraypaths, strdup( "modules" ) );
+#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __APPLE__ ) || defined( SYS_BEOS )
+    if( asprintf( &path, "%s" DIR_SEP "modules",
+        vlc_global()->psz_vlcpath ) < 0 )
+        RETURN_ENOMEM
+    vlc_array_append( arraypaths, path );
+    if( asprintf( &path, "%s" DIR_SEP "plugins",
+        vlc_global()->psz_vlcpath ) < 0 )
+        RETURN_ENOMEM
+    vlc_array_append( arraypaths, path );
+#if ! defined( WIN32 ) && ! defined( UNDER_CE )
+    if( asprintf( &path, "%s", PLUGIN_PATH ) < 0 )
+        RETURN_ENOMEM
+    vlc_array_append( arraypaths, path );
 #endif
+#else
+    vlc_array_append( arraypaths, strdup( PLUGIN_PATH ) );
+#endif
+    vlc_array_append( arraypaths, strdup( "plugins" ) );
 
     /* If the user provided a plugin path, we add it to the list */
     char * userpaths = config_GetPsz( p_this, "plugin-path" );
+    char *paths_iter;
 
-    if( asprintf( &paths, "modules" PATH_SEP "%s" PATH_SEP "plugins%s%s",
-                    extra_path,
-                    userpaths ? PATH_SEP : "",
-                    userpaths ? userpaths : "" ) < 0 )
-    {
-        msg_Err( p_this, "Not enough memory" );
-        free( userpaths );
-        free( extra_path );
-        return;
-    }
-
-    /* Free plugin-path and extra path */
-    free( userpaths );
-    free( extra_path );
-
-    msg_Dbg( p_this, "We will be looking for modules in `%s'", paths );
-
-    for( paths_iter = paths; paths_iter; )
+    for( paths_iter = userpaths; paths_iter; )
     {
         path = copy_next_paths_token( paths_iter, &paths_iter );
         if( !path )
+            RETURN_ENOMEM
+        vlc_array_append( arraypaths, strdup( path ) );
+    }
+
+    count = vlc_array_count( arraypaths );
+    for( i = 0 ; i < count ; i++ )
+    {
+        path = vlc_array_item_at_index( arraypaths, i );
+        if( !path )
         {
-            msg_Err( p_this, "Not enough memory" );
-            return;
+            continue;
         }
 
         msg_Dbg( p_this, "recursively browsing `%s'", path );
@@ -964,7 +963,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         free( path );
     }
 
-    free( paths );
+    vlc_array_destroy( arraypaths );
+#undef RETURN_ENOMEM
 }
 
 /*****************************************************************************
