@@ -90,8 +90,10 @@ if test "${ACTION}" = "build"; then
     ##########################
     # Hack for VLC-release.app
     if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-        install_library "${VLC_BUILD_DIR}/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
         prefix=".libs/"
+        install_library "${VLC_BUILD_DIR}/src/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
+        mv ${target}/vlc ${target}/VLC
+        chmod +x ${target}/VLC
     else
         prefix=""
     fi

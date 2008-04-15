@@ -450,19 +450,7 @@ VLC-release.app: vlc
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
-	$(INSTALL) $(top_builddir)/src/.libs/vlc \
-		   $(top_builddir)/VLC-release.app/Contents/MacOS/VLC
-	ln -sf ./VLC $(top_builddir)/VLC-release.app/Contents/MacOS/clivlc
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/modules
-	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
-	  if test -n "$$i" ; \
-	    then $(INSTALL) "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
-			   "$(top_builddir)/VLC-release.app/Contents/MacOS/modules" ; \
-	  fi ; done
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/lib ; \
-	  for i in $(srcdir)/src/.libs/*.dylib ; do \
-	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/`basename $${i}` ; \
-	  done ;
+	ACTION="VLC-release.app" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/playlist/`basename $${i}` ; \
