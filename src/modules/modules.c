@@ -355,6 +355,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
 {
     typedef struct module_list_t module_list_t;
 
+    stats_TimerStart( p_this, "module_Need()", STATS_TIMER_MODULE_NEED );
+
     struct module_list_t
     {
         module_t *p_module;
@@ -394,6 +396,9 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         if( !strcmp( psz_name, "none" ) )
         {
             free( psz_var );
+            stats_TimerStop( p_this, STATS_TIMER_MODULE_NEED );
+            stats_TimerDump( p_this, STATS_TIMER_MODULE_NEED );
+            stats_TimerClean( p_this, STATS_TIMER_MODULE_NEED );
             return NULL;
         }
 
@@ -646,6 +651,10 @@ found_shortcut:
 
     free( psz_shortcuts );
     free( psz_var );
+
+    stats_TimerStop( p_this, STATS_TIMER_MODULE_NEED );
+    stats_TimerDump( p_this, STATS_TIMER_MODULE_NEED );
+    stats_TimerClean( p_this, STATS_TIMER_MODULE_NEED );
 
     /* Don't forget that the module is still locked */
     return p_module;
