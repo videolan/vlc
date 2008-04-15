@@ -486,7 +486,9 @@ static int Connect( demux_t *p_demux )
         psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
     }
 
+    int i_lefttries = 3;
 createnew:
+    i_lefttries--;
     if( p_demux->b_die || p_demux->b_error )
     {
         free( psz_user );
@@ -546,7 +548,10 @@ describe:
         else
         {
             const char *psz_tmp = strstr( psz_error, "RTSP" );
-            sscanf( psz_tmp, "RTSP/%*s%3u", &i_code );
+            if( psz_tmp )
+                sscanf( psz_tmp, "RTSP/%*s%3u", &i_code );
+            else
+                i_code = 0;
         }
         msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
 
@@ -593,7 +598,8 @@ describe:
             msg_Dbg( p_demux, "connection timeout, retrying" );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
-            goto createnew;
+            if( i_lefttries > 0 )
+                goto createnew;
         }
         i_ret = VLC_EGENERIC;
     }
