@@ -112,7 +112,7 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
                       + wxU(psz_tmp),
                       i_image );*/
 
-    if( update_CompareReleaseToCurrent( p_update ) == UpdateReleaseStatusNewer )
+    if( update_NeedUpgrade( p_update ) )
         main_sizer->Add( new wxStaticText( this, -1, wxU( p_update->release.psz_desc )
                          + wxU( "\nYou can download the latest version of VLC at the adress :\n" )
                          + wxU( p_update->release.psz_url ) ) );
