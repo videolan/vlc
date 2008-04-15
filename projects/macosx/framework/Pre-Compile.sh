@@ -132,12 +132,7 @@ if test "${ACTION}" = "build"; then
     echo "Building library folder... ${linked_libs}"
     for linked_lib in ${linked_libs} ; do
         case "${linked_lib}" in
-            */extras/contrib/lib/*.dylib)
-                if test -e ${linked_lib}; then
-                    install_library ${linked_lib} ${target_lib} "library"
-                fi
-                ;;
-            */vlc_install_dir/lib/*.dylib)
+            */extras/contrib/lib/*.dylib|*/vlc_install_dir/lib/*.dylib)
                 if test -e ${linked_lib}; then
                     install_library ${linked_lib} ${target_lib} "library"
                 fi
