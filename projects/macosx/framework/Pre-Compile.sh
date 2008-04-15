@@ -92,17 +92,18 @@ if test "${ACTION}" = "build"; then
     if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
         prefix=".libs/"
         install_library "${VLC_BUILD_DIR}/src/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
-        mv ${target}/vlc ${target}/VLC
-        chmod +x ${target}/VLC
+        install ${target}/vlc ${target}/VLC
+        suffix="dylib"
     else
         prefix=""
+        suffix="so"
     fi
 
     ##########################
     # Build the modules folder (Same as VLCKit.framework/modules in Makefile)
     echo "Building modules folder..."
     # Figure out what modules are available to install
-    for module in `find ${VLC_BUILD_DIR}/modules -name *.so` ; do
+    for module in `find ${VLC_BUILD_DIR}/modules -name *.${suffix}` ; do
         # Check to see that the reported module actually exists
         if test -n ${module}; then
             install_library ${module} ${target_modules} "module"
