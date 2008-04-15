@@ -92,7 +92,8 @@ if test "${ACTION}" = "build"; then
     if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
         prefix=".libs/"
         install_library "${VLC_BUILD_DIR}/src/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
-        install ${target}/vlc ${target}/VLC
+        mv ${target}/vlc ${target}/VLC
+        chmod +x ${target}/VLC
         suffix="dylib"
     else
         prefix=""
