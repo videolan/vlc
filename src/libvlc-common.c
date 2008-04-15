@@ -988,7 +988,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     vlc_object_release( p_libvlc->p_interaction );
 
     stats_TimersDumpAll( p_libvlc );
-    stats_TimersClean( p_libvlc );
+    stats_TimersCleanAll( p_libvlc );
 
     /* Free announce handler(s?) */
     while( (p_announce = vlc_object_find( p_libvlc, VLC_OBJECT_ANNOUNCE,

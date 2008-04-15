@@ -195,6 +195,7 @@ struct counter_t
     unsigned int        i_id;
     char              * psz_name;
     int                 i_type;
+    void              * p_obj;
     int                 i_compute_type;
     int                 i_samples;
     counter_sample_t ** pp_samples;
@@ -370,7 +371,10 @@ VLC_EXPORT( void,__stats_TimerStart, (vlc_object_t*, const char *, unsigned int 
 VLC_EXPORT( void,__stats_TimerStop, (vlc_object_t*, unsigned int) );
 VLC_EXPORT( void,__stats_TimerDump, (vlc_object_t*, unsigned int) );
 VLC_EXPORT( void,__stats_TimersDumpAll, (vlc_object_t*) );
-#define stats_TimersClean(a) __stats_TimersClean( VLC_OBJECT(a) )
-VLC_EXPORT( void, __stats_TimersClean, (vlc_object_t * ) );
+#define stats_TimersCleanAll(a) __stats_TimersCleanAll( VLC_OBJECT(a) )
+VLC_EXPORT( void, __stats_TimersCleanAll, (vlc_object_t * ) );
+
+#define stats_TimerClean(a,b) __stats_TimerClean( VLC_OBJECT(a), b )
+VLC_EXPORT( void, __stats_TimerClean, (vlc_object_t *, int ) );
 
 #endif
