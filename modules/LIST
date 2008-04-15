@@ -68,6 +68,7 @@ $Id$
  * converter_fixed: Fixed-point audio format conversions
  * converter_float: Floating-point audio format conversions
  * crop: Crop video filter
+ * croppadd: Crop/Padd image filter
  * csri: common subtitle interface decoder
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
@@ -130,6 +131,7 @@ $Id$
  * grain: Grain Video filter
  * grey_yuv: grayscale to others conversion module
  * growl: announce currently playing stream to growl
+ * growl_udp: growl UDP notification plugin
  * gtk2_main: Gtk+ wrapper for gtk_main
  * gtk_main: Gtk+ wrapper for gtk_main
  * h264: H264 decoder
@@ -219,6 +221,7 @@ $Id$
  * opengl: a opengl video output that uses opengl provider modules
  * opengllayer: a simple openGL video output
  * opie: interface for Opie using QT/Embedded library.
+ * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface.
  * packetizer_copy: Simple copy packetizer
@@ -327,6 +330,7 @@ $Id$
  * vcd: input module for accessing Video CDs.
  * vcdx: input module for accessing Video CDs with navigation & stills
  * visual: visualisation system
+ * vmem: memory video driver
  * vobsub: VobSUB subtitles demuxer
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
