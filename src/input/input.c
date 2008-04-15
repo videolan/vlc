@@ -139,6 +139,19 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+
+    /* Construct a nice name for the input timer */
+    char psz_timer_name[255];
+    char * psz_name = input_item_GetName( p_item );
+    snprintf( psz_timer_name, sizeof(psz_timer_name),
+              "input launching for '%s'", psz_name );
+    free( psz_name );
+
+    /* Start a timer to mesure how long it takes
+     * to launch an input */
+    stats_TimerStart( p_input, psz_timer_name,
+        STATS_TIMER_INPUT_LAUNCHING );
+
     MALLOC_NULL( p_input->p, input_thread_private_t );
 
     /* One "randomly" selected input thread is responsible for computing
@@ -306,6 +319,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void Destructor( input_thread_t * p_input )
 {
     input_thread_private_t *priv = p_input->p;
+
+    stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
+    stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
 
     if( priv->b_owns_its_sout && priv->p_sout )
     {
@@ -603,6 +619,9 @@ static void MainLoop( input_thread_t *p_input )
     int64_t i_intf_update = 0;
     int i_updates = 0;
 
+    /* Stop the timer */
+    stats_TimerStop( p_input, STATS_TIMER_INPUT_LAUNCHING );
+
     while( !p_input->b_die && !p_input->b_error && !p_input->p->input.b_eof )
     {
         bool b_force_update = false;
@@ -611,7 +630,7 @@ static void MainLoop( input_thread_t *p_input )
         vlc_value_t val;
 
         /* Do the read */
-        if( p_input->i_state != PAUSE_S  )
+        if( p_input->i_state != PAUSE_S )
         {
             if( ( p_input->p->i_stop > 0 && p_input->i_time >= p_input->p->i_stop ) ||
                 ( p_input->p->i_run > 0 && i_start_mdate+p_input->p->i_run < mdate() ) )
