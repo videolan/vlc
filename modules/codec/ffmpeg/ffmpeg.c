@@ -1195,6 +1195,11 @@ static struct
     { VLC_FOURCC('8','B','P','S'), CODEC_ID_8BPS,
       VIDEO_ES, "8BPS" },
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(52<<8)+0)
+    { VLC_FOURCC('M','L','2','O'), CODEC_ID_MIMIC,
+      VIDEO_ES, "Mimic" },
+#endif
+
     /* Videogames Codecs */
 
     /* Interplay MVE */
