@@ -1,5 +1,7 @@
 PROJECT(vlc)
 
+CMAKE_POLICY(VERSION 2.5)
+
 ENABLE_TESTING()
 
 # Set the module path
