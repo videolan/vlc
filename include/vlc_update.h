@@ -155,13 +155,6 @@ struct public_key_t
 
 typedef struct public_key_t public_key_t;
 
-enum
-{
-    UpdateReleaseStatusOlder,
-    UpdateReleaseStatusEqual,
-    UpdateReleaseStatusNewer
-};
-
 /**
  * Describes an update VLC release number
  */
@@ -191,7 +184,7 @@ struct update_t
 VLC_EXPORT( update_t *, __update_New, ( vlc_object_t * ) );
 VLC_EXPORT( void, update_Delete, ( update_t * ) );
 VLC_EXPORT( void, update_Check, ( update_t *, void (*callback)( void*, bool ), void * ) );
-VLC_EXPORT( int, update_CompareReleaseToCurrent, ( update_t * ) );
+VLC_EXPORT( bool, update_NeedUpgrade, ( update_t * ) );
 VLC_EXPORT( void, update_Download, ( update_t *, char* ) );
 
 /**

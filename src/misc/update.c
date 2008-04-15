@@ -88,8 +88,6 @@
  *****************************************************************************/
 static void EmptyRelease( update_t *p_update );
 static bool GetUpdateFile( update_t *p_update );
-static int CompareReleases( const struct update_release_t *p1,
-                            const struct update_release_t *p2 );
 static char * size_str( long int l_size );
 
 
@@ -1146,47 +1144,19 @@ void update_CheckReal( update_check_thread_t *p_uct )
 }
 
 /**
- * Compare two release numbers
- *
- * \param p1 first release
- * \param p2 second release
- * \return UpdateReleaseStatus(Older|Equal|Newer)
- */
-static int CompareReleases( const struct update_release_t *p1,
-                            const struct update_release_t *p2 )
-{
-    int32_t d;
-    d = ( p1->i_major << 24 ) + ( p1->i_minor << 16 ) + ( p1->i_revision << 8 )
-      - ( p2->i_major << 24 ) - ( p2->i_minor << 16 ) - ( p2->i_revision << 8 )
-      + ( p1->extra ) - ( p2->extra );
-
-    if( d < 0 )
-        return UpdateReleaseStatusOlder;
-    else if( d == 0 )
-        return UpdateReleaseStatusEqual;
-    else
-        return UpdateReleaseStatusNewer;
-}
-
-/**
  * Compare a given release's version number to the current VLC's one
  *
  * \param p_update structure
- * \return UpdateReleaseStatus(Older|Equal|Newer)
+ * \return true if we have to upgrade to the given version to be up to date
  */
-int update_CompareReleaseToCurrent( update_t *p_update )
+bool update_NeedUpgrade( update_t *p_update )
 {
     assert( p_update );
 
-    struct update_release_t c;
-
-    /* get the current version number */
-    c.i_major = *PACKAGE_VERSION_MAJOR - '0';
-    c.i_minor = *PACKAGE_VERSION_MINOR - '0';
-    c.i_revision = *PACKAGE_VERSION_REVISION - '0';
-    c.extra = *PACKAGE_VERSION_EXTRA;
-
-    return CompareReleases( &p_update->release, &c );
+    return  p_update->release.i_major < *PACKAGE_VERSION_MAJOR - '0' ||
+            p_update->release.i_minor < *PACKAGE_VERSION_MINOR - '0' ||
+            p_update->release.i_revision < *PACKAGE_VERSION_REVISION ||
+            p_update->release.extra < *PACKAGE_VERSION_EXTRA;
 }
 
 /**

@@ -284,7 +284,7 @@ void UpdateDialog::updateNotify( bool b_result )
     /* The update finish without errors */
     if( b_result )
     {
-        if( update_CompareReleaseToCurrent( p_update ) == UpdateReleaseStatusNewer )
+        if( update_NeedUpgrade( p_update ) )
         {
             b_checked = true;
             updateButton->setText( "Download" );

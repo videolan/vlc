@@ -193,7 +193,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 static void updateCallback( void * p_data, bool b_success )
 {
-    [(id)p_data setUpToDate: !b_success || update_CompareReleaseToCurrent( ((VLCUpdate*)p_data)->p_u ) == UpdateReleaseStatusNewer ];
+    [(id)p_data setUpToDate: !b_success || !update_NeedUpgrade( ((VLCUpdate*)p_data)->p_u )];
 }
 
 - (void)checkForUpdate
