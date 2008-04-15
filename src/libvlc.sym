@@ -304,8 +304,9 @@ __stats_CounterCreate
 stats_DumpInputStats
 __stats_Get
 stats_ReinitInputStats
+__stats_TimerClean
 __stats_TimerDump
-__stats_TimersClean
+__stats_TimersCleanAll
 __stats_TimersDumpAll
 __stats_TimerStart
 __stats_TimerStop
@@ -333,9 +334,9 @@ ToLocale
 unescape_URI
 unescape_URI_duplicate
 update_Check
-update_CompareReleaseToCurrent
 update_Delete
 update_Download
+update_NeedUpgrade
 __update_New
 us_atof
 us_strtod
