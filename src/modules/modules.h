@@ -103,12 +103,12 @@ struct module_t
     /*
      * Variables set by the module to identify itself
      */
-    const char *psz_shortname;                              /**< Module name */
-    const char *psz_longname;                   /**< Module descriptive name */
-    const char *psz_help;        /**< Long help string for "special" modules */
+    char *psz_shortname;                              /**< Module name */
+    char *psz_longname;                   /**< Module descriptive name */
+    char *psz_help;        /**< Long help string for "special" modules */
 
     /** Shortcuts to the module */
-    const char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
+    char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
 
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */

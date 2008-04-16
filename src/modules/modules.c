@@ -1301,7 +1301,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
  *****************************************************************************/
 static void DupModule( module_t *p_module )
 {
-    const char **pp_shortcut;
+    char **pp_shortcut;
     int i_submodule;
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
@@ -1311,7 +1311,8 @@ static void DupModule( module_t *p_module )
 
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
-    p_module->psz_object_name = strdup( p_module->psz_object_name );
+    /* This one is a (const char *) that will never get freed. */
+    p_module->psz_object_name = p_module->psz_object_name;
     p_module->psz_capability = strdup( p_module->psz_capability );
     p_module->psz_shortname = p_module->psz_shortname ?
                                  strdup( p_module->psz_shortname ) : NULL;
@@ -1332,7 +1333,7 @@ static void DupModule( module_t *p_module )
  *****************************************************************************/
 static void UndupModule( module_t *p_module )
 {
-    const char **pp_shortcut;
+    char **pp_shortcut;
     int i_submodule;
 
     for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
@@ -1345,7 +1346,6 @@ static void UndupModule( module_t *p_module )
         free( *pp_shortcut );
     }
 
-    free( p_module->psz_object_name );
     free( p_module->psz_capability );
     free( p_module->psz_shortname );
     free( p_module->psz_longname );
