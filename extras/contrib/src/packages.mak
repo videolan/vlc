@@ -217,4 +217,5 @@ PCRE_URL=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSI
 FLUID_VERSION=1.0.8
 FLUID_URL=http://download.savannah.gnu.org/releases/fluid/fluidsynth-$(FLUID_VERSION).tar.gz
 YASM_VERSION=0.7.0
-YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
+YASM_URL=$(VIDEOLAN)/testing/contrib/yasm-$(YASM_VERSION).tar.gz
+#YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
