@@ -61,7 +61,17 @@ enum {
     CachingHigher = 500
 };
 
-enum { alsaW = 0, ossW, directxW, fileW, audioOutCoB, normalizerChB, volLW };
+enum {
+#ifdef WIN32
+       directxW,
+#else
+       alsaW,
+       ossW,
+#endif
+       fileW,
+       audioOutCoB,
+       normalizerChB,
+       volLW };
 enum { recordChB, dumpChB, bandwidthChB, timeshiftChB, inputLE, cachingCoB };
 enum { skinRB, qtRB };
 

@@ -113,6 +113,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }
 
+#define CONFIG_GENERIC2( option, type, label, qcontrol )                   \
+            p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
+            if( p_config )                                                \
+            {                                                             \
+                control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
+                           p_config, label, qcontrol, false );         \
+                controls.append( control );                               \
+            }
+
+
 #define CONFIG_GENERIC_NO_BOOL( option, type, label, qcontrol )           \
             p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
             if( p_config )                                                \
@@ -127,7 +137,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 if( p_config )                                                \
                 {                                                             \
                     control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                               p_config, label, ui.qcontrol, ui.qbutton,      \
+                               p_config, label, qcontrol, qbutton,      \
                             false );                                          \
                     controls.append( control );                               \
                 }
@@ -186,7 +196,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
 
             CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
-                                 snapshotsDirectory, snapshotsDirectoryBrowse );
+                                 ui.snapshotsDirectory, ui.snapshotsDirectoryBrowse );
             CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
             CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
                             snapshotsSequentialNumbering );
@@ -201,17 +211,47 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
+#define audioCommon( name ) \
+            QWidget * name ## Control = new QWidget( ui.outputAudioBox ); \
+            QHBoxLayout * name ## Layout = new QHBoxLayout( name ## Control); \
+            name ## Layout->setMargin( 0 ); \
+            name ## Layout->setSpacing( 0 ); \
+            QLabel * name ## Label = new QLabel( qtr( "Device:" ), name ## Control ); \
+            name ## Label->setMinimumSize(QSize(100, 0)); \
+            name ## Layout->addWidget( name ## Label ); \
+
+#define audioControl( name) \
+            audioCommon( name ) \
+            QComboBox * name ## Device = new QComboBox( name ## Control ); \
+            name ## Layout->addWidget( name ## Device ); \
+            name ## Label->setBuddy( name ## Device ); \
+            ui.outputAudioLayout->addWidget( name ## Control, ui.outputAudioLayout->rowCount(), 0, 1, -1 );
+
+#define audioControl2( name) \
+            audioCommon( name ) \
+            QLineEdit * name ## Device = new QLineEdit( name ## Control ); \
+            name ## Layout->addWidget( name ## Device ); \
+            name ## Label->setBuddy( name ## Device ); \
+            QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ), name ## Control); \
+            name ## Layout->addWidget( name ## Browse ); \
+            ui.outputAudioLayout->addWidget( name ## Control, ui.outputAudioLayout->rowCount(), 0, 1, -1 );
+
             /* hide if necessary */
-#ifdef WIN32
-            ui.OSSControl->hide();
-            ui.alsaControl->hide();
-#else
-            ui.DirectXControl->hide();
-#endif
             ui.lastfm_user_edit->hide();
             ui.lastfm_user_label->hide();
             ui.lastfm_pass_edit->hide();
             ui.lastfm_pass_label->hide();
+
+            /* Build if necessary */
+#ifdef WIN32
+            audioControl( DirectX );
+            optionWidgets.append( DirectXControl );
+#else
+            audioControl( alsa );
+            optionWidgets.append( alsaControl );
+            audioControl2( OSS );
+            optionWidgets.append( OSSControl );
+#endif
 
             /* General Audio Options */
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
@@ -239,28 +279,26 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.outputModule, currentIndexChanged( int ),
                      this, updateAudioOptions( int ) );
 
+            /* platform specifics */
 #ifdef WIN32
-            CONFIG_GENERIC( "directx-audio-device", IntegerList,
-                    ui.DirectXLabel, DirectXDevice );
+            CONFIG_GENERIC2( "directx-audio-device", IntegerList,
+                    DirectXLabel, DirectXDevice );
 #else
             if( module_Exists( p_intf, "alsa" ) )
             {
-                CONFIG_GENERIC( "alsadev" , StringList , ui.alsaLabel,
+                CONFIG_GENERIC2( "alsadev" , StringList , alsaLabel,
                                 alsaDevice );
             }
             if( module_Exists( p_intf, "oss" ) )
             {
-                CONFIG_GENERIC_FILE( "dspdev" , File , ui.OSSLabel, OSSDevice,
+                CONFIG_GENERIC_FILE( "dspdev" , File , OSSLabel, OSSDevice,
                                  OSSBrowse );
             }
 #endif
         // File exists everywhere
             CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
-                                 fileName, fileBrowseButton );
+                                 ui.fileName, ui.fileBrowseButton );
 
-            optionWidgets.append( ui.alsaControl );
-            optionWidgets.append( ui.OSSControl );
-            optionWidgets.append( ui.DirectXControl );
             optionWidgets.append( ui.fileControl );
             optionWidgets.append( ui.outputModule );
             optionWidgets.append( ui.volNormBox );
@@ -438,8 +476,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-display-mode", IntegerList, NULL,
                             displayModeBox );
             CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
-            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
-                    skinBrowse );
+            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, ui.fileSkin,
+                    ui.skinBrowse );
 
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
                                                       artFetcher );
@@ -471,8 +509,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
-            CONFIG_GENERIC_FILE( "freetype-font", File, NULL, font,
-                            fontBrowse );
+            CONFIG_GENERIC_FILE( "freetype-font", File, NULL, ui.font,
+                            ui.fontBrowse );
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );
@@ -510,7 +548,6 @@ void SPrefsPanel::updateAudioOptions( int number)
 {
     QString value = qobject_cast<QComboBox *>(optionWidgets[audioOutCoB])
                                             ->itemData( number ).toString();
-
 #ifdef WIN32
     optionWidgets[directxW]->setVisible( ( value == "directx" ) );
 #else
