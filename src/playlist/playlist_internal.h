@@ -111,6 +111,10 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
 playlist_item_t *playlist_GetLastLeaf( playlist_t *p_playlist,
                                     playlist_item_t *p_root );
 
+playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
+                                   int i_input_id, playlist_item_t *p_root,
+                                   bool );
+
 int playlist_DeleteFromItemId( playlist_t*, int );
 int playlist_ItemDelete ( playlist_item_t * );
 
