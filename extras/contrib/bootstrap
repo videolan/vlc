@@ -269,22 +269,22 @@ echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS} -isystem \$(PREFIX)/include" >> config.
 echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
-if wget --version >/dev/null 2>&1; then
+if which wget >/dev/null 2>&1; then
     echo "WGET = `which wget` -c --passive" >> config.mak
-elif which curl >/dev/null; then
+elif which curl >/dev/null 2>&1; then
     echo "WGET = `which curl` -L -O" >> config.mak
 else
     echo "You need at least wget or curl to fetch the packages." >&2
     exit 1
 fi
 
-if svn help >/dev/null 2>&1; then
+if which svn >/dev/null 2>&1; then
     echo "SVN = `which svn`" >> config.mak
 else
     echo "You do not have a subversion client in your PATH." >&2
 fi
 
-if git help >/dev/null 2>&1; then
+if which git >/dev/null 2>&1; then
     echo "GIT = `which git`" >> config.mak
 else
     echo "You do not have a Git client in your PATH." >&2
