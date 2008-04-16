@@ -25,7 +25,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>16</width>
           <height>25</height>
@@ -51,7 +51,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -71,7 +71,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -91,7 +91,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>31</width>
           <height>25</height>
@@ -176,6 +176,9 @@
         <property name="text" >
          <string>_("Chapter")</string>
         </property>
+        <property name="buddy" >
+         <cstring>chapterSpin</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -201,6 +204,9 @@
        <widget class="QLabel" name="titleLabel" >
         <property name="text" >
          <string>_("Title")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>titleSpin</cstring>
         </property>
        </widget>
       </item>
@@ -237,6 +243,9 @@
         <property name="text" >
          <string>_("Audio track")</string>
         </property>
+        <property name="buddy" >
+         <cstring>audioSpin</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -265,6 +274,9 @@
        <widget class="QLabel" name="subtitlesLabel" >
         <property name="text" >
          <string>_("Subtitles track")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>subtitlesSpin</cstring>
         </property>
        </widget>
       </item>
@@ -301,7 +313,7 @@
      <property name="sizeType" >
       <enum>QSizePolicy::MinimumExpanding</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>181</width>
        <height>22</height>
@@ -317,6 +329,8 @@
   <tabstop>audioCDRadioButton</tabstop>
   <tabstop>dvdsimple</tabstop>
   <tabstop>deviceCombo</tabstop>
+  <tabstop>ejectButton</tabstop>
+  <tabstop>browseDiscButton</tabstop>
   <tabstop>titleSpin</tabstop>
   <tabstop>chapterSpin</tabstop>
   <tabstop>subtitlesSpin</tabstop>

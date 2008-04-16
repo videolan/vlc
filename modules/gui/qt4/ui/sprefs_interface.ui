@@ -144,7 +144,7 @@
         <property name="orientation" >
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>20</width>
           <height>20</height>
@@ -156,6 +156,9 @@
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>_("Skin File")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>fileSkin</cstring>
         </property>
        </widget>
       </item>
@@ -263,11 +266,18 @@
  <tabstops>
   <tabstop>language</tabstop>
   <tabstop>qt4</tabstop>
+  <tabstop>displayModeBox</tabstop>
+  <tabstop>embedVideo</tabstop>
   <tabstop>skins</tabstop>
   <tabstop>fileSkin</tabstop>
   <tabstop>skinBrowse</tabstop>
   <tabstop>OneInterfaceMode</tabstop>
   <tabstop>EnqueueOneInterfaceMode</tabstop>
+  <tabstop>assoButton</tabstop>
+  <tabstop>artFetcher</tabstop>
+  <tabstop>metaFetcher</tabstop>
+  <tabstop>updatesBox</tabstop>
+  <tabstop>updatesDays</tabstop>
  </tabstops>
  <resources/>
  <connections/>

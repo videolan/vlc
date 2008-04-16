@@ -30,14 +30,14 @@
       <string>_("General Audio")</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" colspan="2" >
+      <item row="0" column="0" colspan="3" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>_("Default volume")</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
+      <item row="0" column="3" >
        <widget class="QSlider" name="defaultVolume" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
@@ -71,7 +71,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3" >
+      <item row="0" column="4" >
        <widget class="QSpinBox" name="volumeValue" >
         <property name="toolTip" >
          <string>_("256 corresponds to 100%, 1024 to 400%")</string>
@@ -100,7 +100,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="3" >
+      <item row="1" column="2" colspan="3" >
        <widget class="QCheckBox" name="saveVolBox" >
         <property name="text" >
          <string>_("Save volume on exit")</string>
@@ -117,7 +117,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="3" >
+      <item row="2" column="2" colspan="3" >
        <widget class="QComboBox" name="detectionDolby" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
@@ -146,8 +146,24 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="3" >
+      <item row="3" column="2" colspan="3" >
        <widget class="QLineEdit" name="preferredAudioLanguage" />
+      </item>
+      <item row="2" column="1" >
+       <spacer name="horizontalSpacer" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0" >
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -190,12 +206,12 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QWidget" native="1" name="fileControl" >
         <layout class="QHBoxLayout" >
-        <property name="spacing">
+         <property name="spacing" >
           <number>0</number>
-          </property>
-        <property name="margin">
+         </property>
+         <property name="margin" >
           <number>0</number>
-          </property>
+         </property>
          <item>
           <widget class="QLabel" name="fileLabel" >
            <property name="minimumSize" >

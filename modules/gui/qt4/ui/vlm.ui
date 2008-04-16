@@ -56,6 +56,9 @@
         <property name="text" >
          <string>_("Name:")</string>
         </property>
+        <property name="buddy" >
+         <cstring>nameLedit</cstring>
+        </property>
        </widget>
       </item>
       <item row="2" column="1" >
@@ -76,6 +79,9 @@
         <property name="text" >
          <string>_("Input:")</string>
         </property>
+        <property name="buddy" >
+         <cstring>inputLedit</cstring>
+        </property>
        </widget>
       </item>
       <item row="3" column="1" >
@@ -92,6 +98,9 @@
        <widget class="QLabel" name="outputLabel" >
         <property name="text" >
          <string>_("Output:")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>outputLedit</cstring>
         </property>
        </widget>
       </item>
@@ -126,6 +135,9 @@
            <property name="margin" >
             <number>3</number>
            </property>
+           <property name="buddy" >
+            <cstring>muxLedit</cstring>
+           </property>
           </widget>
          </item>
          <item>
@@ -140,7 +152,7 @@
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0" >
             <size>
              <width>411</width>
              <height>20</height>
@@ -169,7 +181,7 @@
      <property name="sizeType" >
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>20</width>
        <height>20</height>
@@ -203,7 +215,7 @@
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>80</width>
        <height>81</height>
@@ -247,7 +259,7 @@
        </widget>
       </item>
       <item row="0" column="2" >
-       <widget class="QScrollArea" native="1" name="vlmItemScroll" >
+       <widget class="QScrollArea" name="vlmItemScroll" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
@@ -274,13 +286,23 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QScrollArea</class>
-   <extends>QWidget</extends>
-   <header>qscrollarea.h</header>
-  </customwidget>
- </customwidgets>
+ <tabstops>
+  <tabstop>mediaType</tabstop>
+  <tabstop>nameLedit</tabstop>
+  <tabstop>enableCheck</tabstop>
+  <tabstop>inputLedit</tabstop>
+  <tabstop>inputButton</tabstop>
+  <tabstop>outputLedit</tabstop>
+  <tabstop>outputButton</tabstop>
+  <tabstop>addButton</tabstop>
+  <tabstop>clearButton</tabstop>
+  <tabstop>saveButton</tabstop>
+  <tabstop>muxLedit</tabstop>
+  <tabstop>loopBCast</tabstop>
+  <tabstop>vlmListItem</tabstop>
+  <tabstop>vlmItemScroll</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

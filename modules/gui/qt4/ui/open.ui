@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>543</height>
+    <height>665</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -63,6 +63,9 @@
         <property name="text" >
          <string>_("Caching")</string>
         </property>
+        <property name="buddy" >
+         <cstring>cacheSpinBox</cstring>
+        </property>
        </widget>
       </item>
       <item row="0" column="1" >
@@ -86,7 +89,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>16</width>
           <height>24</height>
@@ -98,6 +101,9 @@
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>_("Start Time")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>startTimeSpinBox</cstring>
         </property>
        </widget>
       </item>
@@ -122,7 +128,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -144,6 +150,9 @@
        <widget class="QLabel" name="slaveLabel" >
         <property name="text" >
          <string>_("Extra media")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>slaveText</cstring>
         </property>
        </widget>
       </item>
@@ -168,6 +177,9 @@
         <property name="text" >
          <string>_("Customize")</string>
         </property>
+        <property name="buddy" >
+         <cstring>advancedLineInput</cstring>
+        </property>
        </widget>
       </item>
       <item row="5" column="1" colspan="6" >
@@ -190,7 +202,7 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0" >
         <size>
          <width>40</width>
          <height>20</height>
@@ -265,7 +277,7 @@
      <property name="sizeType" >
       <enum>QSizePolicy::Preferred</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>20</width>
        <height>5</height>
@@ -281,9 +293,11 @@
   <tabstop>cacheSpinBox</tabstop>
   <tabstop>startTimeSpinBox</tabstop>
   <tabstop>slaveCheckbox</tabstop>
-  <tabstop>advancedLineInput</tabstop>
   <tabstop>slaveText</tabstop>
   <tabstop>slaveBrowseButton</tabstop>
+  <tabstop>advancedLineInput</tabstop>
+  <tabstop>playButton</tabstop>
+  <tabstop>menuButton</tabstop>
   <tabstop>buttonsBox</tabstop>
  </tabstops>
  <resources/>

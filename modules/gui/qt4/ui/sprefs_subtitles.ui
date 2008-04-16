@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>365</height>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -55,6 +55,9 @@
         <property name="text" >
          <string>_("Preferred Subtitle language")</string>
         </property>
+        <property name="buddy" >
+         <cstring>preferredLanguage</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -75,6 +78,9 @@
         <property name="text" >
          <string>_("Default Encoding")</string>
         </property>
+        <property name="buddy" >
+         <cstring>encoding</cstring>
+        </property>
        </widget>
       </item>
      </layout>
@@ -94,6 +100,9 @@
         <property name="text" >
          <string>_("Effect")</string>
         </property>
+        <property name="buddy" >
+         <cstring>effect</cstring>
+        </property>
        </widget>
       </item>
       <item row="2" column="1" colspan="2" >
@@ -104,6 +113,9 @@
         <property name="text" >
          <string>_("Font color")</string>
         </property>
+        <property name="buddy" >
+         <cstring>fontColor</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" colspan="2" >
@@ -113,6 +125,9 @@
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>_("Font size")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>fontSize</cstring>
         </property>
        </widget>
       </item>
@@ -130,6 +145,9 @@
        <widget class="QLabel" name="label_5" >
         <property name="text" >
          <string>_("Font")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>font</cstring>
         </property>
        </widget>
       </item>
