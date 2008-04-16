@@ -371,8 +371,10 @@ static void vlc_object_destroy( vlc_object_t *p_this )
                      p_this->pp_children[i]->psz_object_name );
         }
         fflush(stderr);
+
         /* Dump libvlc object to ease debugging */
         vlc_object_dump( p_this->p_libvlc );
+
         abort();
     }
 
@@ -406,6 +408,10 @@ static void vlc_object_destroy( vlc_object_t *p_this )
                          p_global->pp_objects[i]->psz_object_name );
                 fflush(stderr);
             }
+
+            /* Dump libvlc object to ease debugging */
+            vlc_object_dump( p_this );
+
             /* Strongly abort, cause we want these to be fixed */
             abort();
         }
