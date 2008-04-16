@@ -246,11 +246,28 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #ifdef WIN32
             audioControl( DirectX );
             optionWidgets.append( DirectXControl );
+            CONFIG_GENERIC2( "directx-audio-device", IntegerList,
+                    DirectXLabel, DirectXDevice );
 #else
-            audioControl( alsa );
-            optionWidgets.append( alsaControl );
-            audioControl2( OSS );
-            optionWidgets.append( OSSControl );
+            if( module_Exists( p_intf, "alsa" ) )
+            {
+                audioControl( alsa );
+                optionWidgets.append( alsaControl );
+
+                CONFIG_GENERIC2( "alsadev" , StringList , alsaLabel,
+                                alsaDevice );
+            }
+            else
+                optionWidgets.append( NULL );
+            if( module_Exists( p_intf, "oss" ) )
+            {
+                audioControl2( OSS );
+                optionWidgets.append( OSSControl );
+                CONFIG_GENERIC_FILE( "dspdev" , File , OSSLabel, OSSDevice,
+                                 OSSBrowse );
+            }
+            else
+                optionWidgets.append( NULL );
 #endif
 
             /* General Audio Options */
@@ -279,23 +296,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.outputModule, currentIndexChanged( int ),
                      this, updateAudioOptions( int ) );
 
-            /* platform specifics */
-#ifdef WIN32
-            CONFIG_GENERIC2( "directx-audio-device", IntegerList,
-                    DirectXLabel, DirectXDevice );
-#else
-            if( module_Exists( p_intf, "alsa" ) )
-            {
-                CONFIG_GENERIC2( "alsadev" , StringList , alsaLabel,
-                                alsaDevice );
-            }
-            if( module_Exists( p_intf, "oss" ) )
-            {
-                CONFIG_GENERIC_FILE( "dspdev" , File , OSSLabel, OSSDevice,
-                                 OSSBrowse );
-            }
-#endif
-        // File exists everywhere
+       // File exists everywhere
             CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
                                  ui.fileName, ui.fileBrowseButton );
 
@@ -551,8 +552,12 @@ void SPrefsPanel::updateAudioOptions( int number)
 #ifdef WIN32
     optionWidgets[directxW]->setVisible( ( value == "directx" ) );
 #else
-    optionWidgets[ossW]->setVisible( ( value == "oss" ) );
-    optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
+    /* optionWidgets[ossW] can be NULL */
+    if( optionWidgets[ossW] )
+        optionWidgets[ossW]->setVisible( ( value == "oss" ) );
+    /* optionWidgets[alsaW] can be NULL */
+    if( optionWidgets[alsaW] )
+        optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
 #endif
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
 }
