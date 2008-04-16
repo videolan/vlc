@@ -1228,6 +1228,8 @@ static int Init( input_thread_t * p_input )
     /* Access_file does not give any meta, and there are no slave */
     AccessMeta( p_input, p_meta );
 
+    InputUpdateMeta( p_input, p_meta );
+
     if( !p_input->b_preparsing )
     {
         msg_Dbg( p_input, "`%s' successfully opened",
