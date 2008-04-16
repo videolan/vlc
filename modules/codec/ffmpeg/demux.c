@@ -311,6 +311,9 @@ static int Demux( demux_t *p_demux )
 
     memcpy( p_frame->p_buffer, pkt.data, pkt.size );
 
+    if( pkt.flags & PKT_FLAG_KEY )
+        p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
+
     i_start_time = ( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE ) ?
         ( p_sys->ic->start_time / AV_TIME_BASE )  : 0;
 
