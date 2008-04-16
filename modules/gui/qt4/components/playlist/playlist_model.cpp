@@ -588,7 +588,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     }
     if( p_root )
     {
-        //if( rootItem ) delete rootItem;
+        delete rootItem;
         rootItem = new PLItem( p_root, NULL, this );
     }
     assert( rootItem );
