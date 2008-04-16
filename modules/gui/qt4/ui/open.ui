@@ -56,10 +56,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="advancedFrame" >
-     <property name="frameShape" >
-      <enum>QFrame::StyledPanel</enum>
-     </property>
+    <widget class="QGroupBox" name="advancedFrame" >
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="cacheLabel" >
