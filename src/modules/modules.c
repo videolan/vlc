@@ -1342,14 +1342,14 @@ static void UndupModule( module_t *p_module )
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
     {
-        free( (void*)*pp_shortcut );
+        free( *pp_shortcut );
     }
 
-    free( (void*)p_module->psz_object_name );
+    free( p_module->psz_object_name );
     free( p_module->psz_capability );
-    free( (void*)p_module->psz_shortname );
-    free( (void*)p_module->psz_longname );
-    free( (void*)p_module->psz_help );
+    free( p_module->psz_shortname );
+    free( p_module->psz_longname );
+    free( p_module->psz_help );
 }
 
 #endif /* HAVE_DYNAMIC_PLUGINS */
