@@ -51,7 +51,6 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
      * that category in a media_list. */
     if( psz_cat )
     {
-        p_mlist = kVLCDictionaryNotFound;
         p_mlist = vlc_dictionary_value_for_key( &p_mdis->catname_to_submedialist, psz_cat );
 
         if( p_mlist == kVLCDictionaryNotFound )
@@ -62,7 +61,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
             p_mlist->b_read_only = true;
 
             /* Insert the newly created mlist in our dictionary */
-            __vlc_dictionary_insert( &p_mdis->catname_to_submedialist, psz_cat, p_mlist, 0 );
+            vlc_dictionary_insert( &p_mdis->catname_to_submedialist, psz_cat, p_mlist );
             
             /* Insert the md into the root list */
             libvlc_media_list_lock( p_mdis->p_mlist );
@@ -74,10 +73,12 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
             libvlc_media_release( p_catmd );
         }
     }
-
-    libvlc_media_list_lock( p_mlist );
-    _libvlc_media_list_add_media( p_mlist, p_md, NULL );
-    libvlc_media_list_unlock( p_mlist );
+    else
+    {
+        libvlc_media_list_lock( p_mlist );
+        _libvlc_media_list_add_media( p_mlist, p_md, NULL );
+        libvlc_media_list_unlock( p_mlist );
+    }
 }
 
 /**************************************************************************
