@@ -225,7 +225,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             QComboBox * name ## Device = new QComboBox( name ## Control ); \
             name ## Layout->addWidget( name ## Device ); \
             name ## Label->setBuddy( name ## Device ); \
-            ui.outputAudioLayout->addWidget( name ## Control, ui.outputAudioLayout->rowCount(), 0, 1, -1 );
+            outputAudioLayout->addWidget( name ## Control, outputAudioLayout->rowCount(), 0, 1, -1 );
 
 #define audioControl2( name) \
             audioCommon( name ) \
@@ -234,7 +234,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             name ## Label->setBuddy( name ## Device ); \
             QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ), name ## Control); \
             name ## Layout->addWidget( name ## Browse ); \
-            ui.outputAudioLayout->addWidget( name ## Control, ui.outputAudioLayout->rowCount(), 0, 1, -1 );
+            outputAudioLayout->addWidget( name ## Control, outputAudioLayout->rowCount(), 0, 1, -1 );
 
             /* hide if necessary */
             ui.lastfm_user_edit->hide();
@@ -243,6 +243,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.lastfm_pass_label->hide();
 
             /* Build if necessary */
+            QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
 #ifdef WIN32
             audioControl( DirectX );
             optionWidgets.append( DirectXControl );
