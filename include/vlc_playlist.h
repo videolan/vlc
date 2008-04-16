@@ -170,8 +170,6 @@ struct playlist_t
     } ** pp_sds;
     int                   i_sds;   /**< Number of service discovery modules */
 
-    int                   i_enabled; /**< How many items are enabled ? */
-
     playlist_item_array_t items; /**< Arrays of items */
     playlist_item_array_t all_items; /**< Array of items and nodes */
 

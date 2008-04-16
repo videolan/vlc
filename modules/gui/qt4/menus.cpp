@@ -508,7 +508,7 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
             addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "",
                     ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) );
     }
-    else if( THEPL->items.i_size && THEPL->i_enabled )
+    else if( THEPL->items.i_size )
         addMIMStaticEntry( p_intf, menu, qtr( "Play" ), "",
                 ":/pixmaps/play_16px.png", SLOT( togglePlayPause() ) );
 

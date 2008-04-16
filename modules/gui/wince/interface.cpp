@@ -638,7 +638,7 @@ void Interface::OnPlayStream( void )
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
-    if( p_playlist->i_size && p_playlist->i_enabled )
+    if( p_playlist->i_size )
     {
         vlc_value_t state;
 

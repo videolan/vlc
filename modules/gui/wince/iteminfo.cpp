@@ -274,11 +274,6 @@ void ItemInfoDialog::OnOk()
     if( p_playlist != NULL )
     {
         b_state = SendMessage( enabled_checkbox, BM_GETCHECK, 0, 0 );
-        if( b_old_enabled == false && (b_state & BST_CHECKED) )
-            p_playlist->i_enabled ++;
-        else if( b_old_enabled == true && (b_state & BST_UNCHECKED) )
-            p_playlist->i_enabled --;
-
         vlc_object_release( p_playlist );
     }
 
