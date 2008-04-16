@@ -406,6 +406,10 @@ static void vlc_object_destroy( vlc_object_t *p_this )
                          p_global->pp_objects[i]->i_object_id,
                          p_global->pp_objects[i]->psz_object_type,
                          p_global->pp_objects[i]->psz_object_name );
+
+                /* Dump libvlc object to ease debugging */
+                vlc_object_dump( p_global->pp_objects[i] );
+
                 fflush(stderr);
             }
 
