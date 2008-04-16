@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>725</height>
+    <height>732</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -112,6 +112,9 @@
         <property name="text" >
          <string>_("Force detection of Dolby Surround")</string>
         </property>
+        <property name="buddy" >
+         <cstring>detectionDolby</cstring>
+        </property>
        </widget>
       </item>
       <item row="2" column="1" colspan="3" >
@@ -138,6 +141,9 @@
         <property name="text" >
          <string>_("Preferred audio language")</string>
         </property>
+        <property name="buddy" >
+         <cstring>preferredAudioLanguage</cstring>
+        </property>
        </widget>
       </item>
       <item row="3" column="1" colspan="3" >
@@ -162,6 +168,9 @@
         </property>
         <property name="text" >
          <string>_("Type")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>outputModule</cstring>
         </property>
        </widget>
       </item>
@@ -188,6 +197,9 @@
            </property>
            <property name="text" >
             <string>_("Device")</string>
+           </property>
+           <property name="buddy" >
+            <cstring>alsaDevice</cstring>
            </property>
           </widget>
          </item>
@@ -224,6 +236,9 @@
            <property name="text" >
             <string>_("Device")</string>
            </property>
+           <property name="buddy" >
+            <cstring>DirectXDevice</cstring>
+           </property>
           </widget>
          </item>
          <item>
@@ -253,6 +268,9 @@
            <property name="text" >
             <string>_("Device")</string>
            </property>
+           <property name="buddy" >
+            <cstring>OSSDevice</cstring>
+           </property>
           </widget>
          </item>
          <item>
@@ -281,6 +299,9 @@
            </property>
            <property name="text" >
             <string>_("File")</string>
+           </property>
+           <property name="buddy" >
+            <cstring>fileName</cstring>
            </property>
           </widget>
          </item>
@@ -328,6 +349,9 @@
         <property name="text" >
          <string>_("Visualization")</string>
         </property>
+        <property name="buddy" >
+         <cstring>visualisation</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -361,12 +385,18 @@
         <property name="text" >
          <string>_("Username")</string>
         </property>
+        <property name="buddy" >
+         <cstring>lastfm_user_edit</cstring>
+        </property>
        </widget>
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="lastfm_pass_label" >
         <property name="text" >
          <string>_("Password")</string>
+        </property>
+        <property name="buddy" >
+         <cstring>lastfm_pass_edit</cstring>
         </property>
        </widget>
       </item>
@@ -385,7 +415,9 @@
  <tabstops>
   <tabstop>enableAudio</tabstop>
   <tabstop>defaultVolume</tabstop>
+  <tabstop>volumeValue</tabstop>
   <tabstop>spdifBox</tabstop>
+  <tabstop>saveVolBox</tabstop>
   <tabstop>detectionDolby</tabstop>
   <tabstop>preferredAudioLanguage</tabstop>
   <tabstop>outputModule</tabstop>
@@ -393,11 +425,15 @@
   <tabstop>DirectXDevice</tabstop>
   <tabstop>OSSDevice</tabstop>
   <tabstop>OSSBrowse</tabstop>
+  <tabstop>fileName</tabstop>
   <tabstop>fileBrowseButton</tabstop>
   <tabstop>headphoneEffect</tabstop>
   <tabstop>volNormBox</tabstop>
   <tabstop>volNormSpin</tabstop>
   <tabstop>visualisation</tabstop>
+  <tabstop>lastfm</tabstop>
+  <tabstop>lastfm_user_edit</tabstop>
+  <tabstop>lastfm_pass_edit</tabstop>
  </tabstops>
  <resources/>
  <connections>
