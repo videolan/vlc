@@ -1469,7 +1469,7 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     char psz_children[20], psz_refcount[20], psz_thread[30], psz_name[50],
          psz_parent[20];
 
-    psz_name[0] = '\0';
+    memset( &psz_name, 0, sizeof(psz_name) );
     if( p_this->psz_object_name )
     {
         snprintf( psz_name, 49, " \"%s\"", p_this->psz_object_name );
