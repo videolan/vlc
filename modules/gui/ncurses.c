@@ -42,6 +42,7 @@
 
 #ifdef HAVE_NCURSESW
 #   define _XOPEN_SOURCE_EXTENDED 1
+#   include <wchar.h>
 #endif
 
 #include <ncurses.h>
