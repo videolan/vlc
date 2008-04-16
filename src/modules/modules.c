@@ -1312,7 +1312,7 @@ static void DupModule( module_t *p_module )
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
     /* This one is a (const char *) that will never get freed. */
-    p_module->psz_object_name = p_module->psz_object_name;
+    p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_capability = strdup( p_module->psz_capability );
     p_module->psz_shortname = p_module->psz_shortname ?
                                  strdup( p_module->psz_shortname ) : NULL;
@@ -1346,6 +1346,7 @@ static void UndupModule( module_t *p_module )
         free( *pp_shortcut );
     }
 
+    free( p_module->psz_object_name );
     free( p_module->psz_capability );
     free( p_module->psz_shortname );
     free( p_module->psz_longname );
