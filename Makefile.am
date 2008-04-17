@@ -1002,8 +1002,8 @@ package-macosx-zip:
 	mkdir -p $(top_builddir)/vlc-$(VERSION)
 	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies
-	for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do
-	  cp $(srcdir)/$$i $(top_builddir)/vlc-$(VERSION)/Goodies/
+	for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do \
+	  cp $(srcdir)/$$i $(top_builddir)/vlc-$(VERSION)/Goodies; \
 	done
 	cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app \
 	     $(top_builddir)/vlc-$(VERSION)/Goodies
