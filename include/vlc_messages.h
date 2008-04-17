@@ -377,6 +377,6 @@ VLC_EXPORT( void,__stats_TimersDumpAll, (vlc_object_t*) );
 VLC_EXPORT( void, __stats_TimersCleanAll, (vlc_object_t * ) );
 
 #define stats_TimerClean(a,b) __stats_TimerClean( VLC_OBJECT(a), b )
-VLC_EXPORT( void, __stats_TimerClean, (vlc_object_t *, int ) );
+VLC_EXPORT( void, __stats_TimerClean, (vlc_object_t *, unsigned int ) );
 
 #endif

@@ -389,7 +389,7 @@ void __stats_TimersDumpAll( vlc_object_t *p_obj )
     vlc_mutex_unlock( &p_obj->p_libvlc->timer_lock );
 }
 
-void __stats_TimerClean( vlc_object_t *p_obj, int i_id )
+void __stats_TimerClean( vlc_object_t *p_obj, unsigned int i_id )
 {
     int i;
     vlc_mutex_lock( &p_obj->p_libvlc->timer_lock );
