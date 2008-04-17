@@ -2259,7 +2259,6 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
                              bool b_demux )
 {
     char *psz_device = p_sys->psz_adev;
-    int i_fd = 0;
     p_sys->p_alsa_pcm = NULL;
     char* psz_alsa_device_name = NULL;
     snd_pcm_hw_params_t *p_hw_params = NULL;
@@ -2426,18 +2425,15 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
         goto adev_fail;
     }
 
-    /* Return a fake handle so other tests work */
-    i_fd = 1;
-
     free( psz_alsa_device_name );
 
     if( !p_sys->psz_adev )
         p_sys->psz_adev = strdup( ALSA_DEFAULT );
-    return i_fd;
+
+    /* Return a fake handle so other tests work */
+    return 1;
 
  adev_fail:
-
-    if( i_fd >= 0 ) close( i_fd );
 
     if( p_hw_params ) snd_pcm_hw_params_free( p_hw_params );
     if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
