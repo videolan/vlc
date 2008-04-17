@@ -457,8 +457,7 @@ static int Connect( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     Authenticator authenticator;
-    bool b_firstpass = true;
-
+    bool b_firstpass  = true;
     char *psz_user    = NULL;
     char *psz_pwd     = NULL;
     char *psz_url     = NULL;
@@ -466,28 +465,30 @@ static int Connect( demux_t *p_demux )
     char *p_sdp       = NULL;
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
-
-    psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
-    if( !psz_url ) return VLC_ENOMEM;
+    int i_lefttries;
 
     if( p_sys->url.i_port == 0 ) p_sys->url.i_port = 554;
     if( p_sys->url.psz_username || p_sys->url.psz_password )
     {
-        sprintf( psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
-                 p_sys->url.i_port, p_sys->url.psz_path );
+        int err;
+        err = asprintf( &psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
+                        p_sys->url.i_port, p_sys->url.psz_path );
+        if( err == -1 ) return VLC_ENOMEM;
 
         psz_user = strdup( p_sys->url.psz_username );
         psz_pwd  = strdup( p_sys->url.psz_password );
     }
     else
     {
-        sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
+        int err;
+        err = asprintf( &psz_url, "rtsp://%s", p_sys->psz_path );
+        if( err == -1 ) return VLC_ENOMEM;
 
         psz_user = var_CreateGetString( p_demux, "rtsp-user" );
         psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
     }
 
-    int i_lefttries = 3;
+    i_lefttries = 3;
 createnew:
     i_lefttries--;
     if( p_demux->b_die || p_demux->b_error )
