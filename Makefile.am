@@ -998,25 +998,27 @@ package-macosx:
 	rm -Rf "$(top_builddir)/vlc-$(VERSION)" ;
 
 package-macosx-zip:
-       rm -Rf $(top_builddir)/vlc-$(VERSION)
-       mkdir -p $(top_builddir)/vlc-$(VERSION)
-       cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
-       for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do
-          cp $(srcdir)/$$i $(top_builddir)/vlc-$(VERSION)/Goodies/
-       done
-       cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app $(top_builddir)/v
-       cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERS
-       zip -r $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
+	rm -Rf $(top_builddir)/vlc-$(VERSION)
+	mkdir -p $(top_builddir)/vlc-$(VERSION)
+	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
+	for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do
+	  cp $(srcdir)/$$i $(top_builddir)/vlc-$(VERSION)/Goodies/
+	done
+	cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app \
+	     $(top_builddir)/vlc-$(VERSION)/Goodies
+	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf \
+	   $(top_builddir)/vlc-$(VERSION)
+	zip -r $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 
 package-macosx-framework-zip:
-       rm -Rf $(top_builddir)/vlckit-$(VERSION)
-       mkdir -p $(top_builddir)/vlckit-$(VERSION)
-       cp -R $(srcdir)/projects/macosx/framework/build/Debug/VLCKit.framework \
-                $(top_builddir)/vlckit-$(VERSION)/VLCKit.framework
-       for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do
-          cp $(srcdir)/$$i $(top_builddir)/vlckit-$(VERSION)/Goodies/
-       done
-       zip -r $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
+	rm -Rf $(top_builddir)/vlckit-$(VERSION)
+	mkdir -p $(top_builddir)/vlckit-$(VERSION)
+	cp -R $(srcdir)/projects/macosx/framework/build/Debug/VLCKit.framework \
+	  $(top_builddir)/vlckit-$(VERSION)/VLCKit.framework
+	for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do
+	  cp $(srcdir)/$$i $(top_builddir)/vlckit-$(VERSION)/Goodies/
+	done
+	zip -r $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
 
 package-macosx-plugin:
 if BUILD_MOZILLA
