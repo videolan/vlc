@@ -357,7 +357,7 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         msg_Err( p_dec, "cannot read Speex header" );
         return VLC_EGENERIC;
     }
-    if( p_header->mode >= SPEEX_NB_MODES )
+    if( p_header->mode >= SPEEX_NB_MODES || p_header->mode < 0 )
     {
         msg_Err( p_dec, "mode number %d does not (yet/any longer) exist in "
                  "this version of libspeex.", p_header->mode );
