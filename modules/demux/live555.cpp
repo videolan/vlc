@@ -470,10 +470,11 @@ static int Connect( demux_t *p_demux )
     psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
     if( !psz_url ) return VLC_ENOMEM;
 
+    if( p_sys->url.i_port == 0 ) p_sys->url.i_port = 554;
     if( p_sys->url.psz_username || p_sys->url.psz_password )
     {
-        sprintf( psz_url, "rtsp://%s%s", p_sys->url.psz_host,
-                 p_sys->url.psz_path );
+        sprintf( psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
+                 p_sys->url.i_port, p_sys->url.psz_path );
 
         psz_user = strdup( p_sys->url.psz_username );
         psz_pwd  = strdup( p_sys->url.psz_password );
