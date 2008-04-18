@@ -1,12 +1,13 @@
 /*****************************************************************************
  * http.c: HTTP input module
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Rémi Denis-Courmont <rem # videolan.org>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,7 +116,7 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 
-/* RFC 2617: Basic and Digest Access Authentification */
+/* RFC 2617: Basic and Digest Access Authentication */
 typedef struct http_auth_t
 {
     char *psz_realm;
@@ -1508,7 +1509,7 @@ static void cookie_append( vlc_array_t * cookies, char * cookie )
 }
 
 /*****************************************************************************
- * "RFC 2617: Basic and Digest Access Authentification" header parsing
+ * "RFC 2617: Basic and Digest Access Authentication" header parsing
  *****************************************************************************/
 static char *AuthGetParam( const char *psz_header, const char *psz_param )
 {

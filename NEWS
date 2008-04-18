@@ -79,6 +79,8 @@ Input/Demuxers:
  * Experimental EyeTV access module (Mac OS X only)
    This requires the user to install a plugin to EyeTV.app
    (available as a separate download).
+ * HTTP access now supports gzip compressed data and Digest Access
+   Authentication.
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
