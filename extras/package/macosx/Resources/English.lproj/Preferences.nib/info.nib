@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>IBFramework Version</key>
-	<string>644</string>
+	<string>648</string>
 	<key>IBLastKnownRelativeProjectPath</key>
 	<string>../../vlc.xcodeproj</string>
 	<key>IBOldestOS</key>
@@ -11,16 +11,16 @@
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>2668</integer>
+		<integer>2678</integer>
 		<integer>2562</integer>
+		<integer>2311</integer>
+		<integer>2330</integer>
+		<integer>2523</integer>
 		<integer>2410</integer>
 		<integer>2440</integer>
-		<integer>2311</integer>
-		<integer>2523</integer>
-		<integer>2330</integer>
-		<integer>2678</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>9C31</string>
+	<string>9C7010</string>
 	<key>targetFramework</key>
 	<string>IBCocoaFramework</string>
 </dict>

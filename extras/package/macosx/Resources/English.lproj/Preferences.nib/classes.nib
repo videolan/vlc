@@ -13,14 +13,6 @@
 			<string>NSWindow</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>NSApplication</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>audioSettingChanged</key>
@@ -121,6 +113,8 @@
 				<key>o_input_avi_txt</key>
 				<string>id</string>
 				<key>o_input_bandwidth_ckb</key>
+				<string>id</string>
+				<key>o_input_cachelevel_custom_txt</key>
 				<string>id</string>
 				<key>o_input_cachelevel_pop</key>
 				<string>id</string>
@@ -265,6 +259,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

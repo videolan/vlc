@@ -69,6 +69,7 @@
     IBOutlet id o_input_bandwidth_ckb;
     IBOutlet id o_input_cachelevel_pop;
     IBOutlet id o_input_cachelevel_txt;
+    IBOutlet id o_input_cachelevel_custom_txt;
     IBOutlet id o_input_caching_box;
     IBOutlet id o_input_dump_ckb;
     IBOutlet id o_input_httpproxy_fld;

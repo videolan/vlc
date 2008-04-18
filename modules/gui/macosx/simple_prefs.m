@@ -241,6 +241,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_input_bandwidth_ckb setTitle: _NS("Bandwidth limiter")];
     [o_input_cachelevel_txt setStringValue: _NS("Default Caching Level")];
     [o_input_caching_box setTitle: _NS("Caching")];
+    [o_input_cachelevel_custom_txt setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
     [o_input_dump_ckb setTitle: _NS("Dump")];
     [o_input_httpproxy_txt setStringValue: _NS("HTTP Proxy")];
     [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
@@ -393,9 +394,17 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_audio_lastpwd_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" )]];
 
         if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
+        {
             [o_audio_last_ckb setState: NSOnState];
+            [o_audio_lastuser_fld setEnabled: YES];
+            [o_audio_lastpwd_fld setEnabled: YES];
+        }
         else
+        {
             [o_audio_last_ckb setState: NSOffState];
+            [o_audio_lastuser_fld setEnabled: NO];
+            [o_audio_lastpwd_fld setEnabled: NO];
+        }
     }
     else
         [o_audio_last_ckb setEnabled: NO];
@@ -503,9 +512,15 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         TestCaCi( "realrtsp-caching", 10 );
     TestCaCi( "mms-caching", 19 );
     if( b_cache_equal )
+    {
         [o_input_cachelevel_pop selectItemWithTag: i_cache];
+        [o_input_cachelevel_custom_txt setHidden: YES];
+    }
     else
+    {
         [o_input_cachelevel_pop selectItemWithTitle: _NS("Custom")];
+        [o_input_cachelevel_custom_txt setHidden: NO];
+    }
 
     /*********************
      * subtitle settings *
@@ -715,7 +730,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
         /* Last.FM is optional */
         if( module_Exists( p_intf, "audioscrobbler" ) )
-        {    
+        {   
+            [o_audio_last_ckb setEnabled: YES];
             if( [o_audio_last_ckb state] == NSOnState )
                 config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
             else
@@ -724,6 +740,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
             config_PutPsz( p_intf, "lastfm-username", [[o_audio_lastuser_fld stringValue] UTF8String] );
             config_PutPsz( p_intf, "lastfm-password", [[o_audio_lastuser_fld stringValue] UTF8String] );
         }
+        else
+            [o_audio_last_ckb setEnabled: NO];
 
         /* okay, let's save our changes to vlcrc */
         i = config_SaveConfigFile( p_intf, "main" );
@@ -953,10 +971,24 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     if( sender == o_audio_vol_sld )
         [o_audio_vol_fld setIntValue: [o_audio_vol_sld intValue]];
-    
+
     if( sender == o_audio_vol_fld )
         [o_audio_vol_sld setIntValue: [o_audio_vol_fld intValue]];
-    
+
+    if( sender == o_audio_last_ckb )
+    {
+        if( [o_audio_last_ckb state] == NSOnState )
+        {
+            [o_audio_lastpwd_fld setEnabled: YES];
+            [o_audio_lastuser_fld setEnabled: YES];
+        }
+        else
+        {
+            [o_audio_lastpwd_fld setEnabled: NO];
+            [o_audio_lastuser_fld setEnabled: NO];
+        }
+    }
+
     b_audioSettingChanged = YES;
 }
 
@@ -1042,6 +1074,14 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (IBAction)inputSettingChanged:(id)sender
 {
+    if( sender == o_input_cachelevel_pop )
+    {
+        if( [[[o_input_cachelevel_pop selectedItem] title] isEqualToString: _NS("Custom")] )
+            [o_input_cachelevel_custom_txt setHidden: NO];
+        else
+            [o_input_cachelevel_custom_txt setHidden: YES];
+    }
+
     b_inputSettingChanged = YES;
 }
 
