@@ -18,16 +18,15 @@ Important notes:
    - On Mac OS X, you can find it in VLC.app/Contents/MacOS/share/http/.hosts
      and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
  * This version of VLC contains a new interface for Windows and Linux. This
-   interface lacks a few features that used to be present in VLC 0.8.6:
-   - "Streaming wizard". These features will be replaced
-     by a better alternative in the next version. If you absolutely need these
-     features, we advise you to keep VLC 0.8.6.
-  * The behavior of --sout-keep was changed. It's now activated by default.
-  * The marq, mosaic and logo commands in the rc interface changed. They
-    now require a target name as their first argument. Example:
-    vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
-    You can then use commands like: @test marq-marquee Goodbye
-    These new commands are also available in the telnet interface.
+   interface lacks the "Streaming Wizard" that used to be present in VLC 0.8.6.
+   It will be replaced by a better alternative in the next version. 
+   If you absolutely need it, we advise you to keep VLC 0.8.6.
+ * The behavior of --sout-keep was changed. It's now activated by default.
+ * The marq, mosaic and logo commands in the rc interface changed. They
+   now require a target name as their first argument. Example:
+   vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
+   You can then use commands like: @test marq-marquee Goodbye
+   These new commands are also available in the telnet interface.
  * The "rtp" access output module has been removed:
    Please use the RTP stream output instead, e.g.:
      Old: '#std{access=rtp,mux=ts,dst=239.255.1.2:5004,sap}'
@@ -75,7 +74,11 @@ Input/Demuxers:
  * BDA devices access module for DVB-C/S/T capture cards on Microsoft Windows
  * CD+G karaoke Files support
  * MXF files support
- * Re-written Screen input module for Mac OS X using OpenGL instead of QuickDraw
+ * Re-written Screen access module for Mac OS X using OpenGL 
+   instead of QuickDraw
+ * Experimental EyeTV access module (Mac OS X only)
+   This requires the user to install a plugin to EyeTV.app
+   (available as a separate download).
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
@@ -98,6 +101,7 @@ Decoders:
 
 Encoders:
  * Flash Screen Video support
+ * Improved H.264 encoding speed
 
 Video output and filters:
  * New CoreAnimation output module (Mac OS X 10.5 only)
@@ -150,6 +154,8 @@ Interfaces:
    * Improved video output features
    * Access to VideoLAN's Help Wiki within VLC
    * New setting to disable the "Recent Items" service
+   * When playing Radio (live) streams, the current track is shown correctly
+   * Correct appearance on Macs using Aqua's graphite theme
  * Ncurses:
    * Correctly displays wide characters when using an UTF-8 locale, 
      if libncursesw is available.
@@ -172,8 +178,9 @@ Linux Port:
 
 Mac OS X Port:
  * Mac OS X Framework that can be used to embed VLC in third party
-   applications (Google Summer of Code Student project)
+   applications (Google Summer of Code Student project, Mac OS X 10.5 only)
  * Complete compatibility with Mac OS X 10.5 Leopard
+   * It is now required to compile a fully featured build
  * The support of Mac OS X 10.3.9 was discontinued.
 
 LibVLC:
