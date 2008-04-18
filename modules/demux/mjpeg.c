@@ -351,7 +351,7 @@ static int Open( vlc_object_t * p_this )
         p_sys->b_still = true;
         if( val.f_float)
         {
-            p_sys->i_still_length =1000000.0 / val.f_float;
+            p_sys->i_still_length = 1000000.0 / val.f_float;
         }
         else
         {
@@ -431,10 +431,9 @@ static int MimeDemux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int         i_size, i;
-    bool  b_match;
-    bool  b_done;
 
-    b_match = CheckMimeHeader( p_demux, &i_size );
+    bool  b_match = CheckMimeHeader( p_demux, &i_size );
+
     if( i_size > 0 )
     {
         stream_Read( p_demux->s, NULL, i_size );
@@ -454,6 +453,7 @@ static int MimeDemux( demux_t *p_demux )
         msg_Warn( p_demux, "cannot peek data" );
         return 0;
     }
+
     i = 0;
     i_size = strlen( p_sys->psz_separator ) + 2;
     if( p_sys->i_data_peeked < i_size )
@@ -461,8 +461,8 @@ static int MimeDemux( demux_t *p_demux )
         msg_Warn( p_demux, "data shortage" );
         return 0;
     }
-    b_done = false;
-    while( !b_done )
+
+    for( ;; )
     {
         while( !( p_sys->p_peek[i] == '-' && p_sys->p_peek[i+1] == '-' ) )
         {
@@ -481,16 +481,15 @@ static int MimeDemux( demux_t *p_demux )
                 }
             }
         }
+
         if( !strncmp( p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2),
                       strlen( p_sys->psz_separator ) ) )
         {
-            b_done = true;
+            break;
         }
-        else
-        {
-            i++;
-            i_size++;
-        }
+
+        i++;
+        i_size++;
     }
 
     if( !b_match )
