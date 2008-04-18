@@ -123,13 +123,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i,
 
 void PlaylistWidget::setArt( QString url )
 {
-    if( url.isEmpty() )
+    if( prevArt != url )
     {
-        art->setPixmap( QPixmap( ":/noart.png" ) );
-    }
-    else if( prevArt != url )
-    {
-        art->setPixmap( QPixmap( url ) );
+        art->setPixmap( QPixmap( url.isEmpty() ? ":/noart.png" : url ) );
         prevArt = url;
     }
 }
