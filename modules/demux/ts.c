@@ -170,7 +170,7 @@ typedef struct
 {
     uint8_t                 i_objectTypeIndication;
     uint8_t                 i_streamType;
-    bool              b_upStream;
+    bool                    b_upStream;
     uint32_t                i_bufferSizeDB;
     uint32_t                i_maxBitrate;
     uint32_t                i_avgBitrate;
@@ -182,14 +182,14 @@ typedef struct
 
 typedef struct
 {
-    bool              b_useAccessUnitStartFlag;
-    bool              b_useAccessUnitEndFlag;
-    bool              b_useRandomAccessPointFlag;
-    bool              b_useRandomAccessUnitsOnlyFlag;
-    bool              b_usePaddingFlag;
-    bool              b_useTimeStampsFlags;
-    bool              b_useIdleFlag;
-    bool              b_durationFlag;
+    bool                    b_useAccessUnitStartFlag;
+    bool                    b_useAccessUnitEndFlag;
+    bool                    b_useRandomAccessPointFlag;
+    bool                    b_useRandomAccessUnitsOnlyFlag;
+    bool                    b_usePaddingFlag;
+    bool                    b_useTimeStampsFlags;
+    bool                    b_useIdleFlag;
+    bool                    b_durationFlag;
     uint32_t                i_timeStampResolution;
     uint32_t                i_OCRResolution;
     uint8_t                 i_timeStampLength;
@@ -211,11 +211,11 @@ typedef struct
 
 typedef struct
 {
-    bool              b_ok;
+    bool                    b_ok;
     uint16_t                i_es_id;
 
-    bool              b_streamDependenceFlag;
-    bool              b_OCRStreamFlag;
+    bool                    b_streamDependenceFlag;
+    bool                    b_OCRStreamFlag;
     uint8_t                 i_streamPriority;
 
     char                    *psz_url;
@@ -230,7 +230,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                i_iod_label, i_iod_label_scope;
+    uint8_t                 i_iod_label, i_iod_label_scope;
 
     /* IOD */
     uint16_t                i_od_id;
@@ -290,8 +290,8 @@ typedef struct
 {
     int         i_pid;
 
-    bool  b_seen;
-    bool  b_valid;
+    bool        b_seen;
+    bool        b_valid;
     int         i_cc;   /* countinuity counter */
 
     /* PSI owner (ie PMT -> PAT, ES -> PMT */
@@ -324,16 +324,16 @@ struct demux_sys_t
     ts_pid_t    **pmt;
 
     /* */
-    bool  b_es_id_pid;
+    bool        b_es_id_pid;
     csa_t       *csa;
     int         i_csa_pkt_size;
-    bool  b_silent;
+    bool        b_silent;
 
-    bool  b_udp_out;
+    bool        b_udp_out;
     int         fd; /* udp socket */
     uint8_t     *buffer;
 
-    bool  b_dvb_control;
+    bool        b_dvb_control;
     int         i_dvb_program;
     int64_t     i_dvb_start;
     int64_t     i_dvb_length;
@@ -343,10 +343,10 @@ struct demux_sys_t
     char        *psz_file;  /* file to dump data in */
     FILE        *p_file;    /* filehandle */
     uint64_t    i_write;    /* bytes written */
-    bool  b_file_out; /* dump mode enabled */
+    bool        b_file_out; /* dump mode enabled */
 
     /* */
-    bool  b_meta;
+    bool        b_meta;
 };
 
 static int Demux    ( demux_t *p_demux );
@@ -396,8 +396,8 @@ static int Open( vlc_object_t *p_this )
 
     ts_pid_t    *pat;
     const char  *psz_mode;
-    bool   b_append;
-    bool   b_topfield = false;
+    bool         b_append;
+    bool         b_topfield = false;
 
     vlc_value_t  val;
 
@@ -951,10 +951,10 @@ static int DemuxFile( demux_t *p_demux )
     /* Test continuity counter */
     while( i_pos < i_data )
     {
-        ts_pid_t    *p_pid;   /* point to a PID structure */
-        bool b_payload; /* indicates a packet with payload */
-        bool b_adaptation; /* adaptation field */
-        int i_cc  = 0;        /* continuity counter */
+        ts_pid_t *p_pid;   /* point to a PID structure */
+        bool      b_payload; /* indicates a packet with payload */
+        bool      b_adaptation; /* adaptation field */
+        int       i_cc  = 0;    /* continuity counter */
 
         if( p_sys->buffer[i_pos] != 0x47 )
         {
@@ -1049,7 +1049,7 @@ static int Demux( demux_t *p_demux )
     /* We read at most 100 TS packet or until a frame is completed */
     for( i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
     {
-        bool  b_frame = false;
+        bool         b_frame = false;
         block_t     *p_pkt;
         ts_pid_t    *p_pid;
 
@@ -1778,11 +1778,11 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
 static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
-    const uint8_t    *p = p_bk->p_buffer;
+    const uint8_t *p = p_bk->p_buffer;
     const bool b_unit_start = p[1]&0x40;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
-    const int        i_cc         = p[3]&0x0f;   /* continuity counter */
+    const int  i_cc         = p[3]&0x0f;   /* continuity counter */
     bool       b_discontinuity = false;/* discontinuity */
 
     /* transport_scrambling_control is ignored */
@@ -2083,9 +2083,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     iod_descriptor_t *p_iod;
     int i;
     int i_es_index;
-    uint8_t     i_flags, i_iod_tag, byte1, byte2, byte3;
+    uint8_t i_flags, i_iod_tag, byte1, byte2, byte3;
     bool  b_url;
-    int         i_iod_length;
+    int   i_iod_length;
 
     p_iod = malloc( sizeof( iod_descriptor_t ) );
     if( !p_iod ) return NULL;
