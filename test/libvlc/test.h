@@ -52,6 +52,7 @@ static const char * test_defaults_args[] = {
     "--ignore-config",
     "-I",
     "dummy",
+    "--no-media-library",
     "--plugin-path=../modules",
     "--vout=dummy",
     "--aout=dummy"
