@@ -17,6 +17,8 @@ check_PROGRAMS = \
 	$(NULL)
 check_DATA = samples/test.sample samples/meta.sample
 
+check_HEADERS = libvlc/test.h
+
 TESTS = $(check_PROGRAMS)
 
 DISTCLEANFILES = samples/test.sample samples/meta.sample
