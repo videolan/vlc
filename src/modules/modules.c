@@ -683,8 +683,6 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
     msg_Dbg( p_this, "removing module \"%s\"", p_module->psz_object_name );
 
     vlc_object_release( p_module );
-
-    return;
 }
 
 /**
