@@ -50,7 +50,7 @@ static void test_meta (const char ** argv, int argc)
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
     catch ();
 
-    assert (artist && !strncmp (artist, "mike"), 4);
+    assert (artist && !strncmp (artist, "mike", 4));
 
     log ("+ got '%s' as Artist\n", artist);
 
