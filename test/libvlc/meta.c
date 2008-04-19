@@ -52,6 +52,7 @@ static void test_meta (const char ** argv, int argc)
     assert (artist);
 
     free (artist);
+    libvlc_media_release (media);
     libvlc_release (vlc);
 }
 
