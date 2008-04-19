@@ -967,7 +967,6 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->b_meta_read = false;
 
     p_playlist = pl_Yield( p_intf );
-    PL_LOCK;
     p_input = p_playlist->p_input;
 
     if( !p_input )
@@ -978,7 +977,6 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     vlc_object_yield( p_input );
-    PL_UNLOCK;
     pl_Release( p_playlist );
 
     p_item = input_GetItem( p_input );
