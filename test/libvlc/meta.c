@@ -5,7 +5,7 @@
  */
 
 /**********************************************************************
- *  Copyright (C) 2007 Rémi Denis-Courmont.                           *
+ *  Copyright (C) 2008 Pierre d'Herbemont.                            *
  *  This program is free software; you can redistribute and/or modify *
  *  it under the terms of the GNU General Public License as published *
  *  by the Free Software Foundation; version 2 of the license, or (at *
@@ -35,18 +35,18 @@ static void test_meta (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv, &ex);
     catch ();
 
-    media = libvlc_media_new ( vlc, "samples/meta.sample", &ex);
+    media = libvlc_media_new (vlc, "samples/meta.sample", &ex);
 
     /* Tell that we are interested in this precise meta data */
-    artist = libvlc_media_get_meta( media, libvlc_meta_Artist, &ex );
+    artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
     catch ();
 
     free (artist);
 
     /* Wait for the meta */
-    while (!libvlc_media_is_preparsed(media, &ex)) { catch (); msleep (10000); }
+    while (!libvlc_media_is_preparsed (media, &ex)) { catch (); msleep (10000); }
 
-    artist = libvlc_media_get_meta( media, libvlc_meta_Artist, &ex );
+    artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
     catch ();
 
     assert (artist && *artist);
