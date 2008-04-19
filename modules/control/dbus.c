@@ -488,7 +488,7 @@ DBUS_METHOD( DelTrack )
     REPLY_SEND;
 }
 
-DBUS_METHOD( Loop )
+DBUS_METHOD( SetLoop )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
@@ -551,7 +551,7 @@ DBUS_METHOD( Repeat )
     REPLY_SEND;
 }
 
-DBUS_METHOD( Random )
+DBUS_METHOD( SetRandom )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
@@ -676,8 +676,8 @@ DBUS_METHOD( handle_tracklist )
     METHOD_FUNC( "GetLength",               GetLength );
     METHOD_FUNC( "AddTrack",                AddTrack );
     METHOD_FUNC( "DelTrack",                DelTrack );
-    METHOD_FUNC( "Loop",                    Loop );
-    METHOD_FUNC( "Random",                  Random );
+    METHOD_FUNC( "SetLoop",                 SetLoop );
+    METHOD_FUNC( "SetRandom",               SetRandom );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
