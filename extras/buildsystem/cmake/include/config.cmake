@@ -600,6 +600,19 @@ if(HAVE_ID3TAG_H AND HAVE_ZLIB_H)
   vlc_module_add_link_libraries(id3tag  "id3tag;z")
 endif(HAVE_ID3TAG_H AND HAVE_ZLIB_H)
 
+find_package(Taglib)
+if(Taglib_FOUND)
+  set(HAVE_TAGLIB 1)
+  vlc_enable_modules(taglib)
+  vlc_module_add_link_libraries(taglib "${Taglib_LIBRARIES};z")
+  vlc_add_module_compile_flag(taglib "${Taglib_CFLAGS}")
+endif(Taglib_FOUND)
+
+vlc_check_include_files (zlib.h)
+if(HAVE_ZLIB_H)
+  vlc_module_add_link_libraries(access_http z)
+endif(HAVE_ZLIB_H)
+
 set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
