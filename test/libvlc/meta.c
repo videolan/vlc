@@ -36,6 +36,7 @@ static void test_meta (const char ** argv, int argc)
     catch ();
 
     media = libvlc_media_new (vlc, "samples/meta.sample", &ex);
+    catch ();
 
     /* Tell that we are interested in this precise meta data */
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
@@ -50,6 +51,8 @@ static void test_meta (const char ** argv, int argc)
     catch ();
 
     assert (artist && *artist);
+
+    log ("+ got '%s' as Artist\n", artist);
 
     free (artist);
     libvlc_media_release (media);
