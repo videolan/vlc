@@ -5,6 +5,7 @@
  */
 
 /**********************************************************************
+ *  Copyright (C) 2007 Rémi Denis-Courmont.                           *
  *  Copyright (C) 2008 Pierre d'Herbemont.                            *
  *  This program is free software; you can redistribute and/or modify *
  *  it under the terms of the GNU General Public License as published *
