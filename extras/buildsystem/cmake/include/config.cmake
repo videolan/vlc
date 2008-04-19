@@ -594,6 +594,12 @@ if(Dvbpsi_FOUND)
   vlc_module_add_link_libraries(dvb     ${Dvbpsi_LIBRARIES})
 endif(Dvbpsi_FOUND)
 
+vlc_check_include_files (id3tag.h zlib.h)
+if(HAVE_ID3TAG_H AND HAVE_ZLIB_H)
+  vlc_enable_modules(id3tag)
+  vlc_module_add_link_libraries(id3tag  "id3tag;z")
+endif(HAVE_ID3TAG_H AND HAVE_ZLIB_H)
+
 set(CMAKE_REQUIRED_INCLUDES)
 
 ###########################################################
