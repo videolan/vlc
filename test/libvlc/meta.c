@@ -38,21 +38,31 @@ static void test_meta (const char ** argv, int argc)
     media = libvlc_media_new (vlc, "samples/meta.sample", &ex);
     catch ();
 
-    /* Tell that we are interested in this precise meta data */
+    /* Tell that we are interested in this precise meta data
+     * This is needed to trigger meta data reading
+     * (the first calls return NULL) */
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
     catch ();
 
     free (artist);
 
     /* Wait for the meta */
-    while (!libvlc_media_is_preparsed (media, &ex)) { catch (); msleep (10000); }
+    while (!libvlc_media_is_preparsed (media, &ex))
+    {
+        catch ();
+        msleep (10000);
+    }
 
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
     catch ();
 
-    assert (artist && !strncmp (artist, "mike", 4));
+    const char *expected_artist = "mike";
 
-    log ("+ got '%s' as Artist\n", artist);
+    assert (artist);
+    log ("+ got '%s' as Artist, expecting %s\n", artist, expected_artist);
+
+    int string_compare = strcmp (artist, expected_artist);
+    assert (!string_compare);
 
     free (artist);
     libvlc_media_release (media);
