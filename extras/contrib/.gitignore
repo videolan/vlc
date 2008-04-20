@@ -1,4 +1,11 @@
 # Ignore install path
+translations
+demos
+examples
+mkspecs
+phrasebooks
+*.xml
+*.tar.bz2
 share
 bin
 lib

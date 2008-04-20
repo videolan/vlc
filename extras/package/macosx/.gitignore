@@ -1,1 +1,4 @@
 !Delete_Preferences.app
+*.mode*
+*.pbxuser
+build

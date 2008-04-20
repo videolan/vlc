@@ -12,6 +12,8 @@
 *.pc
 *.vlt
 *.class
+*.dmg
+.DS_Store
 .deps
 .libs
 .dirstamp
