@@ -658,6 +658,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                     VideoAutoMenuBuilder( p_vout, objects, varnames );
                     vlc_object_release( p_vout );
                 }
+
+                vlc_object_release( p_input );
             }
 
             QMenu *menu = new QMenu();
