@@ -117,17 +117,17 @@ if test "${ACTION}" = "build"; then
     # Create a symbolic link in the root of the framework
     mkdir -p ${target_lib}
     mkdir -p ${target_modules}
-    
-    pushd `pwd` > /dev/null 
-    cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}
-    
-    ln -sf Versions/Current/${lib} .
-    ln -sf Versions/Current/${modules} .
-    
-    popd > /dev/null 
-    # Create a symbolic link in the root of the framework
-    ##########################
-    
+
+    if [ "$FULL_PRODUCT_NAME" != "VLC-release.app" ] ; then
+        pushd `pwd` > /dev/null
+        cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}
+
+        ln -sf Versions/Current/${lib} .
+        ln -sf Versions/Current/${modules} .
+
+        popd > /dev/null
+    fi
+
     ##########################
     # Build the library folder
     echo "Building library folder... ${linked_libs}"
