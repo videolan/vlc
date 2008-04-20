@@ -1340,7 +1340,7 @@
     ret_v = intf_UserStringInput( p_playlist, _("New Node"),
         _("Please enter a name for the new node."), &psz_name );
 
-    if( psz_name != NULL && psz_name != "" )
+    if( ret_v != DIALOG_CANCELLED && psz_name && *psz_name )
         p_item = playlist_NodeCreate( p_playlist, psz_name,
                                       p_playlist->p_local_category, 0, NULL );
     else if(! config_GetInt( p_playlist, "interact" ) )
