@@ -61,6 +61,10 @@ function parse()
             local score = 666
             local bestcodec
             for codec,_ in pairs(available) do
+                if pref[codec] == nil then
+                    vlc.msg_warn( "Unknown codec: " .. codec )
+                    pref[codec] = 42 -- try the 1st unknown codec if other fail
+                end
                 if pref[codec] < score then
                     bestcodec = codec
                     score = pref[codec]
