@@ -943,6 +943,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     vout_thread_t      * p_vout = NULL;
     aout_instance_t    * p_aout = NULL;
     announce_handler_t * p_announce = NULL;
+    sout_instance_t    * p_sout = NULL;
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -975,6 +976,15 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlc_object_detach( (vlc_object_t *)p_aout );
         vlc_object_release( (vlc_object_t *)p_aout );
         aout_Delete( p_aout );
+    }
+
+    p_sout = vlc_object_find( p_libvlc, VLC_OBJECT_SOUT, FIND_CHILD );
+    if( p_sout )
+    {
+        msg_Dbg( p_sout, "removing kept stream output" );
+        vlc_object_detach( (vlc_object_t*)p_sout );
+        vlc_object_release( (vlc_object_t*)p_sout );
+        sout_DeleteInstance( p_sout );
     }
 
     /* Destroy VLM if created in libvlc_InternalInit */
