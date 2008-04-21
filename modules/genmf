@@ -39,9 +39,6 @@ include \$(top_srcdir)/modules/common.am
 EOF
   for mod in $mods
   do
-    cat >> m4/private.m4 << EOF
-    ${mod}) list="\\\${list} ${dir}/lib${mod}" ;;
-EOF
     cat >> "${makf}" << EOF
 # The ${mod} plugin
 lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
