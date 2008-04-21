@@ -80,7 +80,7 @@ fi
 ##
 
 set +x
-echo "generating modules/**/Makefile.am and m4/private.m4"
+echo "generating modules/**/Makefile.am"
 
 # Prepare m4/private.m4
 rm -f m4/private.m4 && cat > m4/private.m4 << EOF
@@ -95,20 +95,7 @@ AC_DEFUN([PKG_CHECK_MODULES],[ifelse([\$4], , :, [\$4])])
 EOF
 fi
 
-cat >> m4/private.m4 << EOF
-dnl  Helper macro for vlc-config generation
-AC_DEFUN([VLC_CONFIG_HELPER], [
-  cat >> vlc-config.in << BLAH
-EOF
-
-modules=""
-
 modules/genmf `sed -ne 's,modules/\(.*\)/Makefile,\1,p' configure.ac`
-
-cat >> m4/private.m4 << EOF
-BLAH
-])
-EOF
 
 ###
 ###  classic bootstrap stuff
