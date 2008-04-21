@@ -6,8 +6,7 @@
 # Authors: Sam Hocevar <sam@zoy.org>
 
 NULL =
-SUFFIXES = _plugin$(LIBEXT) _plugin.la
-
+SUFFIXES =
 libvlcdir = $(libdir)/vlc/$(basedir)
 libvlc_LTLIBRARIES =
 EXTRA_DIST = Modules.am
@@ -46,18 +45,6 @@ all-modules:
 	z=$$($(VLC_CONFIG) --list plugin); for mod in $(mods); do case "$$z " in *\ $${mod}\ *) echo lib$${mod}_plugin.la;; esac; done; \
 	`; case "$$targets" in *lib*) $(MAKE) $(AM_MAKEFLAGS) $$targets || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \
 	test -z "$$fail"
-
-# Build a plugin with the adequate linker and linker's flags
-_plugin.la_plugin$(LIBEXT):
-	@mod="$*" ; mod=$${mod#lib} ; \
-	ldfl="`$(VLC_CONFIG) --libs plugin $$mod` $(LIBVLC) -u $(SYMPREF)$(VLC_ENTRY)" ; \
-	case `$(VLC_CONFIG) --linkage $$mod` in \
-	  c++)  ld="$(CXXLINK)" ;; \
-	  objc) ld="$(OBJCLINK)" ;; \
-	  c|*)  ld="$(LINK)" ;; \
-	esac ; \
-	echo $$ld $< $$ldfl ; \
-	$$ld $< $$ldfl
 
 if MAINTAINER_MODE
 $(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
