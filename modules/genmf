@@ -39,24 +39,13 @@ include \$(top_srcdir)/modules/common.am
 EOF
   for mod in $mods
   do
-    if grep '^nodist_SOURCES_'${mod}'' < "${modf}" >/dev/null 2>&1; then
-        NODIST=''; else
-        NODIST='#'; fi
     cat >> m4/private.m4 << EOF
     ${mod}) list="\\\${list} ${dir}/lib${mod}" ;;
 EOF
     cat >> "${makf}" << EOF
 # The ${mod} plugin
-EOF
-    cat >> "${makf}" << EOF
 lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
-EOF
-    if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
-CLEANFILES += \$(nodist_SOURCES_${mod})
-EOF
-    fi
-    cat >> "${makf}" << EOF
 lib${mod}_plugin_la_CFLAGS = \$(AM_CFLAGS)
 lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS)
 lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS)

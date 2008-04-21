@@ -11,7 +11,7 @@ libvlcdir = $(libdir)/vlc/$(basedir)
 libvlc_LTLIBRARIES =
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
-CLEANFILES =
+CLEANFILES = $(BUILT_SOURCES)
 
 include $(srcdir)/Modules.am
 
