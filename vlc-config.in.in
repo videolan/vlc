@@ -158,7 +158,23 @@ while test $# -gt 0; do
   *) optarg= ;;
   esac
 
-  case "$1" in
+  # Mangle plugin name, if applicable
+  # This is just a convenience hack for modules/common.am
+  tgt="$1"
+  case "$tgt" in
+    lib*_plugin_la-*.lo)
+      tgt="${tgt#lib}"
+      tgt="${tgt%_plugin_la-*.lo}"
+      ;;
+    lib*_plugin.la)
+      tgt="${tgt#lib}"
+      tgt="${tgt%_plugin.la}"
+      ;;
+    *)
+      ;;
+  esac
+
+  case "$tgt" in
     --prefix=*)
       prefix="${optarg}"
       if test "${exec_prefix_set}" = no ; then
@@ -229,15 +245,15 @@ while test $# -gt 0; do
       libs="${libs} -lvlc -lvlc-control"
       ;;
     *)
-      module="$1"
+      module="$tgt"
       ;;
   esac
 
   # Register per-module *FLAGS
-  register_flags "$1"
+  register_flags "$tgt"
 
   # Register module targets
-  register_targets "$1"
+  register_targets "$tgt"
 
   shift
 done
