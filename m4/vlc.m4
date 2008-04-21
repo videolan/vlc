@@ -167,14 +167,3 @@ AC_DEFUN([VLC_LIBRARY_SUFFIX], [
   AC_DEFINE_UNQUOTED(LIBEXT, "${LIBEXT}", [Dynamic object extension])
 ])
 
-AC_DEFUN([VLC_SYMBOL_PREFIX], [
-  AC_MSG_CHECKING(for prefix to exported symbols)
-  SYMPREF=""
-  case "${host_os}" in
-    darwin* | *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
-      SYMPREF="_"
-      ;;
-  esac
-  AC_MSG_RESULT(${SYMPREF})
-])
-

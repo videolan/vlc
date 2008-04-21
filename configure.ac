@@ -460,9 +460,6 @@ dnl Plugin compilation stuff
 
 VLC_LIBRARY_SUFFIX
 
-VLC_SYMBOL_PREFIX
-AC_SUBST(SYMPREF)
-
 dnl The -DSYS_FOO flag
 CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"; CPPFLAGS="${CPPFLAGS_save}"
 
