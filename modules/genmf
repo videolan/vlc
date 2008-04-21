@@ -45,13 +45,6 @@ EOF
     cat >> m4/private.m4 << EOF
     ${mod}) list="\\\${list} ${dir}/lib${mod}" ;;
 EOF
-# Generation of modules/**/Makefile.am
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# - L_ is for LIBRARIES_, D_ for DATA_, B_ for BUILT_SOURCES_, F_ for LDFLAGS_,
-#   S_ for SOURCES_, _p is for _plugin, _b is for _builtin. This is to reduce
-#   the resulting file size.
-# - *_CFLAGS, *_CXXFLAGS etc. because per-object CPPFLAGS does not seem to
-#   work properly with any automake version I tested.
     cat >> "${makf}" << EOF
 # The ${mod} plugin
 EOF
@@ -61,7 +54,6 @@ EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
 CLEANFILES += \$(nodist_SOURCES_${mod})
-BUILT_SOURCES += \$(B${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
