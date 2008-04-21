@@ -132,10 +132,11 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	cp -r "$(top_srcdir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
 	$(INSTALL) "$(top_srcdir)/extras/package/macosx/plugin/Info.plist" "$@/Contents/Info.plist"
 	$(INSTALL) -d "$@/Contents/MacOS/modules"
-	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
+	find $(top_srcdir)/modules/ -name '*_plugin.$(LIBEXT)' | \
+	while read i; do \
 	  if test -n "$$i" ; then \
-	    dylib="$@/Contents/MacOS/modules/`basename $$i$(LIBEXT)`"; \
-	    $(INSTALL) "`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" "$$dylib"; \
+	    dylib="$@/Contents/MacOS/modules/`basename $$i`"; \
+	    $(INSTALL) "$$i" "$$dylib"; \
 	    install_name_tool -change "$(libdir)/libvlc.1.dylib" \
 	        "@executable_path/lib/libvlc.dylib" "$$dylib"; \
 	    $(FIXEXECPATH) ; \
