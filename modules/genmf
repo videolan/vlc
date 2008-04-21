@@ -46,13 +46,13 @@ EOF
 # The ${mod} plugin
 lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
 nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
+# Force per-target objects:
 lib${mod}_plugin_la_CFLAGS = \$(AM_CFLAGS)
 lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS)
 lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS)
-lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD) \\
-	\`\$(VLC_CONFIG) -libs plugin ${mod}\`
-# Automake does not understand \`...\` very well inside LIBADD...
-lib${mod}_plugin_la_DEPENDENCIES = \$(AM_LIBADD)
+# Set LIBADD and DEPENDENCIES manually:
+lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD)
+lib${mod}_plugin_la_DEPENDENCIES =
 
 EOF
   done

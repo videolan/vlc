@@ -25,7 +25,7 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module -no-undefined \
 	-shrext $(LIBEXT) \
 	 `$(VLC_CONFIG) --ldflags plugin $@`
-AM_LIBADD = $(LTLIBVLC)
+AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` $(LTLIBVLC)
 
 if HAVE_COMPILER_EXPORT
 AM_LDFLAGS += -export-dynamic
