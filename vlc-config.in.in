@@ -227,7 +227,7 @@ while test $# -gt 0; do
     external)
       echo_external=yes
       libs="${libs} -lvlc -lvlc-control"
-      ;;      
+      ;;
     *)
       module="$1"
       ;;
