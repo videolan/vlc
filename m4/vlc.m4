@@ -134,13 +134,8 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
     echo "    ;;"
   ] done >> vlc-config.in
 
-
-  dnl  '/#@1@#/,/#@2@#/{/#@.@#/d;p}' won't work on OS X
-  sed -ne '/#@1@#/,/#@2@#/p' < "${srcdir}/vlc-config.in.in" \
-   | sed -e '/#@.@#/d' >> vlc-config.in
-
-  dnl  '/#@2@#/,${/#@.@#/d;p}' won't work on OS X
-  sed -ne '/#@2@#/,$p' < "${srcdir}/vlc-config.in.in" \
+  dnl  '/#@1@#/,${/#@.@#/d;p}' won't work on OS X
+  sed -ne '/#@1@#/,$p' < "${srcdir}/vlc-config.in.in" \
    | sed -e '/#@.@#/d' >> vlc-config.in
 ])
 
