@@ -281,7 +281,7 @@ vlc-config.in: vlc-config.in.in
 	./config.status --recheck
 	touch $@
 
-CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
+CLEANFILES = $(BUILT_SOURCES_clean)
 DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile ChangeLog
 
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
@@ -1107,19 +1107,6 @@ update-po:
 	cd po && $(MAKE) POTFILES vlc.pot update-po
 
 #cd po && $(MAKE) update-po
-
-###############################################################################
-# Stamp rules
-###############################################################################
-stamp-builtin:
-	@for dep in "" `$(VLC_CONFIG) --target plugin`; do \
-	  if test "$${dep}.la" -nt "$(top_builddir)/vlc$(EXEEXT)"; then \
-	    touch "$@"; \
-	    break; \
-	  fi; \
-	done
-
-.PHONY: stamp-builtin
 
 ###############################################################################
 # Enforce Mac OS X deployment target environment variable
