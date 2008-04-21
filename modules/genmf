@@ -29,6 +29,7 @@ do
 # DO NOT EDIT - edit Modules.am or \$(top_srcdir)/bootstrap instead
 
 basedir = ${basedir}
+dir = ${dir}
 mods = ${mods}
 SUBDIRS = ${subdirs}
 EXTRA_LTLIBRARIES = ${extra_ltlibs}

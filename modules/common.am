@@ -48,7 +48,7 @@ all-modules:
 
 if MAINTAINER_MODE
 $(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
-	cd \$(top_srcdir) && \$(SHELL) modules/genmf ${dir}
+	cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
 endif
 
 mostlyclean-local:
