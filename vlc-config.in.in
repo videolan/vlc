@@ -152,8 +152,8 @@ while test $# -gt 0; do
   # This is just a convenience hack for modules/common.am
   tgt="$1"
   case "$tgt" in
-    lib*_plugin_la-*.lo)
-      tgt="${tgt#lib}"
+    *lib*_plugin_la-*.lo)
+      tgt="${tgt#*lib}"
       tgt="${tgt%_plugin_la-*.lo}"
       ;;
     lib*_plugin.la)
