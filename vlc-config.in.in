@@ -39,7 +39,6 @@ Options:
         [--exec-prefix[=DIR]]     set exec prefix
         [--version]               print version and exit
         [--linkage]               print linkage mode (c, c++, objc)
-        [--target]                print targets and exit
         [--list]                  print modules names and exit
         [--libs]                  output linking flags
         [--cflags]                output C compilation flags
@@ -59,15 +58,6 @@ register_flags()
 {
   case "$1" in
     #@1@#
-    *)
-      ;;
-  esac
-}
-
-register_targets()
-{
-  case "$1" in
-    #@2@#
     *)
       ;;
   esac
@@ -198,9 +188,6 @@ while test $# -gt 0; do
     --linkage)
       echo_linkage=yes
       ;;
-    --target)
-      echo_target=yes
-      ;;
     --list)
       echo_list=yes
       ;;
@@ -252,9 +239,6 @@ while test $# -gt 0; do
   # Register per-module *FLAGS
   register_flags "$tgt"
 
-  # Register module targets
-  register_targets "$tgt"
-
   shift
 done
 
@@ -280,24 +264,6 @@ if test "${echo_linkage}" = yes; then
     done
   fi
   echo "${linkage}"
-  exit 0
-fi
-
-if test "${echo_target}" = yes; then
-  if test "${echo_plugin}" = yes; then
-    for module in `echo "${plugins}"`; do
-      register_targets "${module}"
-    done
-    for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}_plugin "; done
-    printf '\n'
-  fi
-  if test "${echo_builtin}" = yes; then
-    for module in `echo "${builtins}"`; do
-      register_targets "${module}"
-    done
-    for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
-    printf '\n'
-  fi
   exit 0
 fi
 
@@ -346,13 +312,6 @@ fi
 #  If you want something shared from the inside (binding),
 #  you need "builtin vlc"
 if test "${echo_libs}" = yes; then
-  if test "${echo_builtin}" = yes; then
-    for module in `echo "${builtins}"`; do
-      register_targets "${module}"
-      register_flags "${module}"
-    done
-    for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
-  fi
   if test "${echo_external}" = yes; then
     for module in `echo "${builtins}"`; do
       libs="${libs} @libdir@/vlc/lib${module}.a"
