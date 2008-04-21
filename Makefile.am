@@ -614,9 +614,9 @@ VLC.app: vlc
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
-	for i in `$(VLC_CONFIG) --target plugin` ; do \
+	find modules/ -name '*_plugin.$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; \
-	   then ln -sfn "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
+	   then ln -sfn "`pwd`/$$i" \
 				   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done && \
 	ln -sfn `pwd`/$(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
@@ -772,10 +772,9 @@ package-win32-base-debug: package-win-common
 
 # Plugins
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/plugins"
-	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
+	find modules/ -name '*_plugin.$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; then \
-	    $(INSTALL) "$(top_builddir)/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
-            "$(top_builddir)/vlc-$(VERSION)/plugins/" ; \
+	    $(INSTALL) "$$i" "vlc-$(VERSION)/plugins/" ; \
 	  fi ; done
 
 if BUILD_SKINS
