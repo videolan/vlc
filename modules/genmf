@@ -64,11 +64,9 @@ BUILT_SOURCES += \$(B${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
-lib${mod}_plugin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
-lib${mod}_plugin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
-lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
-lib${mod}_plugin_la_LDFLAGS = \$(AM_LDFLAGS) \\
-	\`\$(VLC_CONFIG) --ldflags plugin ${mod}\`
+lib${mod}_plugin_la_CFLAGS = \$(AM_CFLAGS)
+lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS)
+lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS)
 lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD) \\
 	\`\$(VLC_CONFIG) -libs plugin ${mod}\` 
 # Automake does not understand \`...\` very well inside LIBADD...
