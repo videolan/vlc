@@ -106,33 +106,34 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
   dnl  Switch/case loop
   for x in `echo ${am_all_modules}`
   do [
-    echo "    ${x})" >> vlc-config.in
+    echo "    ${x})"
     if test "`eval echo @'$'CPPFLAGS_${x}@`" != "@@"; then
-      echo "      cppflags=\"\${cppflags} `eval echo '$'CPPFLAGS_${x}`\"" >> vlc-config.in
+      echo "      cppflags=\"\${cppflags} `eval echo '$'CPPFLAGS_${x}`\""
     fi
     if test "`eval echo @'$'CFLAGS_${x}@`" != "@@"; then
-      echo "      cflags=\"\${cflags} `eval echo '$'CFLAGS_${x}`\"" >> vlc-config.in
+      echo "      cflags=\"\${cflags} `eval echo '$'CFLAGS_${x}`\""
     fi
     if test "`eval echo @'$'CXXFLAGS_${x}@`" != "@@"; then
-      echo "      cxxflags=\"\${cxxflags} `eval echo '$'CXXFLAGS_${x}`\"" >> vlc-config.in
+      echo "      cxxflags=\"\${cxxflags} `eval echo '$'CXXFLAGS_${x}`\""
       if test "${x}" != "plugin" -a "${x}" != "builtin"; then
-        echo "      linkage=\"c++\"" >> vlc-config.in
+        echo "      linkage=\"c++\""
       fi
     fi
     if test "`eval echo @'$'OBJCFLAGS_${x}@`" != "@@"; then
-      echo "      objcflags=\"\${objcflags} `eval echo '$'OBJCFLAGS_${x}`\"" >> vlc-config.in
+      echo "      objcflags=\"\${objcflags} `eval echo '$'OBJCFLAGS_${x}`\""
       if test "${x}" != "plugin" -a "${x}" != "builtin"; then
-        echo "      if test \"\${linkage}\" = \"c\"; then linkage=\"objc\"; fi" >> vlc-config.in
+        echo "      if test \"\${linkage}\" = \"c\"; then linkage=\"objc\"; fi"
       fi
     fi
     if test "`eval echo @'$'LDFLAGS_${x}@`" != "@@"; then
-      echo "      ldflags=\"\${ldflags} `eval echo '$'LDFLAGS_${x}`\"" >> vlc-config.in
+      echo "      ldflags=\"\${ldflags} `eval echo '$'LDFLAGS_${x}`\""
     fi
     if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
-      echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\"" >> vlc-config.in
+      echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\""
     fi
-    echo "    ;;" >> vlc-config.in
-  ] done
+    echo "    ;;"
+  ] done >> vlc-config.in
+
 
   dnl  '/#@1@#/,/#@2@#/{/#@.@#/d;p}' won't work on OS X
   sed -ne '/#@1@#/,/#@2@#/p' < "${srcdir}/vlc-config.in.in" \
