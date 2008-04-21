@@ -101,7 +101,7 @@ ifneq ($(BUILD),$(HOST))
     #
     ifndef HAVE_CYGWIN
         # We are REALLY cross compiling
-        FFMPEGCONF=--cross-prefix=$(HOST)- --enable-cross-compile
+        FFMPEGCONF=--cross-prefix=$(HOST)- --cross-compile
         X264CONF=--host=$(HOST)
         PTHREADSCONF="CROSS=$(HOST)-"
     else
