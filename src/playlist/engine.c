@@ -62,7 +62,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     static const char playlist_name[] = "playlist";
     playlist_t *p_playlist;
     bool b_save;
-    int i_tree;
 
     /* Allocate structure */
     p_playlist = vlc_custom_create( p_parent, sizeof( *p_playlist ),
@@ -95,9 +94,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     p_playlist->b_reset_currently_playing = true;
     p_playlist->last_rebuild_date = 0;
 
-    i_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
-    p_playlist->b_always_tree = (i_tree == 1);
-    p_playlist->b_never_tree = (i_tree == 2);
+    p_playlist->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
 
     p_playlist->b_doing_ml = false;
 

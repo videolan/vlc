@@ -1121,14 +1121,10 @@ static const char *ppsz_albumart_descriptions[] =
     "The media library is automatically saved and reloaded each time you " \
     "start VLC." )
 
-#define PLTREE_TEXT N_("Use playlist tree")
+#define PLTREE_TEXT N_("Display playlist tree")
 #define PLTREE_LONGTEXT N_( \
     "The playlist can use a tree to categorize some items, like the " \
-    "contents of a directory. \"Default\" means that the tree will only " \
-    "be used when really needed." )
-static int pi_pltree_values[] = { 0, 1, 2 };
-static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N_("Never") };
-
+    "contents of a directory." )
 
 
 /*****************************************************************************
@@ -1868,9 +1864,7 @@ vlc_module_begin();
     add_bool( "play-and-exit", 0, NULL, PAE_TEXT, PAE_LONGTEXT, false );
     add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, false );
     add_bool( "media-library", 1, NULL, ML_TEXT, ML_LONGTEXT, false );
-    add_integer( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT,
-                 true );
-        change_integer_list( pi_pltree_values, ppsz_pltree_descriptions, 0 );
+    add_bool( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT, false );
 
     add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, false );
         change_need_restart();

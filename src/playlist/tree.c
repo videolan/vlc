@@ -319,9 +319,6 @@ void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
 /**
  * Get the node in the preferred tree from a node in one of category
  * or onelevel tree.
- * For example, for the SAP node, it will return the node in the category
- * tree if --playlist-tree is not set to never, because the SAP node prefers
- * category
  */
 playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
                                              playlist_item_t *p_node )
@@ -329,7 +326,7 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
     int i;
     if( p_node->p_parent == p_playlist->p_root_category )
     {
-        if( p_playlist->b_always_tree )
+        if( p_playlist->b_tree )
             return p_node;
         for( i = 0 ; i< p_playlist->p_root_onelevel->i_children; i++ )
         {
@@ -340,7 +337,7 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
     }
     else if( p_node->p_parent == p_playlist->p_root_onelevel )
     {
-        if( p_playlist->b_never_tree )
+        if( !p_playlist->b_tree )
             return p_node;
         for( i = 0 ; i< p_playlist->p_root_category->i_children; i++ )
         {

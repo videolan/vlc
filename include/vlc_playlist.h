@@ -189,8 +189,7 @@ struct playlist_t
     playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
     playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL view */
 
-    bool            b_always_tree;/**< Always display as tree */
-    bool            b_never_tree;/**< Never display as tree */
+    bool                  b_tree; /**< Display as a tree */
 
     bool            b_doing_ml; /**< Doing media library stuff,
                                        * get quicker */
