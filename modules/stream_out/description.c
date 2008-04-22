@@ -96,6 +96,8 @@ static void Close( vlc_object_t *p_this )
     sout_stream_t *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
+    msg_Dbg( p_this, "description: Closing the module" );
+
     /* It can happen only if buggy */
     assert( !p_sys->p_input );
 
@@ -104,6 +106,7 @@ static void Close( vlc_object_t *p_this )
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
+    __msg_Dbg( NULL, "description: Adding a stream" );
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
     es_format_t *p_fmt_copy;
@@ -135,6 +138,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    __msg_Dbg( NULL, "description: Removing a stream (id:%d)", p_sys->i_id );
 
     p_sys->i_id--;
     if( p_sys->i_id <= 0 )
