@@ -328,7 +328,10 @@ static void Destructor( input_thread_t * p_input )
         if( priv->b_sout_keep )
             SoutKeep( priv->p_sout );
         else
+        {
             sout_DeleteInstance( priv->p_sout );
+            priv->p_sout = NULL;
+        }
     }
 
     vlc_gc_decref( p_input->p->input.p_item );
