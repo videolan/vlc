@@ -128,7 +128,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
         return NULL;
     }
 
-    p_sap->psz_object_name = "sap announcer";
+    p_sap->psz_object_name = strdup( "sap announcer" );
 
     vlc_mutex_init( p_sap, &p_sap->object_lock );
 

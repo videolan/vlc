@@ -523,7 +523,7 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     int   i_object_id;                                                      \
     int   i_object_type;                                                    \
     const char *psz_object_type;                                            \
-    const char *psz_object_name;                                            \
+    char *psz_object_name;                                                  \
                                                                             \
     /* Messages header */                                                   \
     char *psz_header;                                                       \

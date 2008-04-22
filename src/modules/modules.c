@@ -123,7 +123,7 @@ void __module_InitBank( vlc_object_t *p_this )
     if( p_libvlc_global->p_module_bank == NULL )
     {
         p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
-        p_bank->psz_object_name = "module bank";
+        p_bank->psz_object_name = strdup( "module bank" );
         p_bank->i_usage = 1;
         p_bank->i_cache = p_bank->i_loaded_cache = 0;
         p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
@@ -1314,7 +1314,6 @@ static void DupModule( module_t *p_module )
 
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
-    /* This one is a (const char *) that will never get freed. */
     p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_capability = strdup( p_module->psz_capability );
     p_module->psz_shortname = p_module->psz_shortname ?
@@ -1349,7 +1348,7 @@ static void UndupModule( module_t *p_module )
         free( *pp_shortcut );
     }
 
-    free( p_module->psz_object_name );
+    FREENULL( p_module->psz_object_name );
     free( p_module->psz_capability );
     free( p_module->psz_shortname );
     free( p_module->psz_longname );

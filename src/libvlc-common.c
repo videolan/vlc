@@ -187,7 +187,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     p_libvlc->p_playlist = NULL;
     p_libvlc->p_interaction = NULL;
     p_libvlc->p_vlm = NULL;
-    p_libvlc->psz_object_name = "libvlc";
+    p_libvlc->psz_object_name = strdup( "libvlc" );
 
     /* Initialize message queue */
     msg_Create( p_libvlc );
@@ -254,16 +254,18 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Get the executable name (similar to the basename command) */
     if( i_argc > 0 )
     {
-        const char *exe = p_libvlc->psz_object_name = ppsz_argv[0];
+        const char *exe = strdup( ppsz_argv[0] );
+        const char *tmp = exe;
         while( *exe )
         {
             if( *exe++ == '/' )
-                p_libvlc->psz_object_name = exe;
+                tmp = exe;
         }
+        p_libvlc->psz_object_name = strdup( tmp );
     }
     else
     {
-        p_libvlc->psz_object_name = "vlc";
+        p_libvlc->psz_object_name = strdup( "vlc" );
     }
 
     /*

@@ -386,7 +386,7 @@ static int Create( vlc_object_t *p_this )
                                            VLC_OBJECT_GENERIC );
         if( p_fontbuilder )
         {
-            p_fontbuilder->psz_object_name = "fontlist builder";
+            p_fontbuilder->psz_object_name = strdup( "fontlist builder" );
             vlc_object_attach( p_fontbuilder, p_filter->p_libvlc );
 
             var_Create( p_fontbuilder, "build-done", VLC_VAR_BOOL );

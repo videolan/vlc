@@ -41,7 +41,8 @@ module_t *vlc_module_create (vlc_object_t *obj)
         return NULL;
 
     module->b_reentrant = module->b_unloadable = true;
-    module->psz_object_name = module->psz_longname = default_name;
+    module->psz_object_name = strdup( default_name );
+    module->psz_longname = default_name;
     module->psz_capability = (char*)"";
     module->i_score = 1;
     module->i_config_items = module->i_bool_items = 0;
@@ -68,7 +69,7 @@ module_t *vlc_submodule_create (module_t *module)
     memcpy (submodule->pp_shortcuts, module->pp_shortcuts,
             sizeof (submodule->pp_shortcuts));
 
-    submodule->psz_object_name = module->psz_object_name;
+    submodule->psz_object_name = strdup( module->psz_object_name );
     submodule->psz_shortname = module->psz_shortname;
     submodule->psz_longname = module->psz_longname;
     submodule->psz_capability = module->psz_capability;
@@ -131,7 +132,9 @@ int vlc_module_set (module_t *module, int propid, void *value)
             break;
 
         case VLC_MODULE_NAME:
-            module->pp_shortcuts[0] = module->psz_object_name = (char *)value;
+            free( module->psz_object_name );
+            module->psz_object_name = strdup( (char *)value );
+            module->pp_shortcuts[0] = (char *)value;
             if (module->psz_longname == default_name)
                 module->psz_longname = (char *)value;
             break;

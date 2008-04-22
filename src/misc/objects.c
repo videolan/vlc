@@ -427,6 +427,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         vlc_mutex_destroy( &structure_lock );
     }
 
+    FREENULL( p_this->psz_object_name );
+
 #if defined(WIN32) || defined(UNDER_CE)
     /* if object has an associated thread, close it now */
     if( p_priv->thread_id.hThread )
