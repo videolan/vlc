@@ -151,8 +151,9 @@ while test $# -gt 0; do
   # Mangle plugin name, if applicable
   # This is just a convenience hack for modules/common.am
   tgt="$1"
+  tgt="${tgt##*/}"
   case "$tgt" in
-    *lib*_plugin_la-*.lo)
+    lib*_plugin_la-*.lo)
       tgt="${tgt#*lib}"
       tgt="${tgt%_plugin_la-*.lo}"
       ;;
