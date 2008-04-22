@@ -646,7 +646,10 @@ found_shortcut:
         /* This assumes that p_this is the object which will be using the
          * module. That's not always the case ... but it is in most cases.
          */
-        p_this->psz_object_name = p_module->psz_object_name;
+        if( psz_alias )
+            p_this->psz_object_name = strdup( psz_alias );
+        else
+            p_this->psz_object_name = strdup( p_module->psz_object_name );
     }
 
     free( psz_shortcuts );
