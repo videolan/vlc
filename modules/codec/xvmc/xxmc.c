@@ -60,30 +60,29 @@ struct decoder_sys_t
      */
     mpeg2dec_t          *p_mpeg2dec;
     const mpeg2_info_t  *p_info;
-    bool          b_skip;
+    bool                b_skip;
 
     /*
      * Input properties
      */
-    mtime_t          i_pts;
-    mtime_t          i_previous_pts;
-    mtime_t          i_current_pts;
-    mtime_t          i_previous_dts;
-    mtime_t          i_current_dts;
-    int              i_current_rate;
-    picture_t *      p_picture_to_destroy;
-    bool       b_garbage_pic;
-    bool       b_after_sequence_header; /* is it the next frame after
-                                               * the sequence header ?    */
-    bool       b_slice_i;             /* intra-slice refresh stream */
+    mtime_t             i_pts;
+    mtime_t             i_previous_pts;
+    mtime_t             i_current_pts;
+    mtime_t             i_previous_dts;
+    mtime_t             i_current_dts;
+    int                 i_current_rate;
+    picture_t *         p_picture_to_destroy;
+    bool                b_garbage_pic;
+    bool                b_after_sequence_header; /* is it the next frame after
+                                                  * the sequence header ?    */
+    bool                b_slice_i;             /* intra-slice refresh stream */
 
     /*
      * Output properties
      */
-    decoder_synchro_t *p_synchro;
-    int            i_aspect;
-    mtime_t        i_last_frame_pts;
-
+    decoder_synchro_t   *p_synchro;
+    int                 i_aspect;
+    mtime_t             i_last_frame_pts;
 };
 
 /*****************************************************************************
@@ -118,7 +117,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     uint32_t i_accel = 0;
     FILE *f_wd_dec; 
 
-    msg_Dbg(p_dec, "OpenDecoder Entering");
 #ifdef __GLIBC__
     mtrace();
 #endif
@@ -135,13 +133,12 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    msg_Dbg(p_dec, "OpenDecoder Entering");
+
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = (decoder_sys_t *)malloc(sizeof(decoder_sys_t));
     if( !p_sys )
-    {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     /* Initialize the thread properties */
     memset( p_sys, 0, sizeof(decoder_sys_t) );
@@ -203,7 +200,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode_video = DecodeBlock;
 
     f_wd_dec = fopen("/vlc/dec_pid", "w");
-
     if (f_wd_dec != NULL)
     {
         fprintf(f_wd_dec, "%d\n", getpid());
@@ -701,9 +697,9 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     p_sys->f_wd_nb = fopen("/vlc/dec_nb", "w");
     if (p_sys->f_wd_nb != NULL)
     {
-//         fprintf(p_sys->f_wd_nb, "%d\n", mdate());
+//      fprintf(p_sys->f_wd_nb, "%d\n", mdate());
         fprintf(p_sys->f_wd_nb, "%s\n", mdate());
-	fflush(p_sys->f_wd_nb);	
+        fflush(p_sys->f_wd_nb);
     }
 #endif
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
