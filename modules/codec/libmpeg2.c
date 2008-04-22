@@ -53,7 +53,7 @@ struct decoder_sys_t
      */
     mpeg2dec_t          *p_mpeg2dec;
     const mpeg2_info_t  *p_info;
-    bool          b_skip;
+    bool                b_skip;
 
     /*
      * Input properties
@@ -64,13 +64,13 @@ struct decoder_sys_t
     mtime_t          i_current_dts;
     int              i_current_rate;
     picture_t *      p_picture_to_destroy;
-    bool       b_garbage_pic;
-    bool       b_after_sequence_header; /* is it the next frame after
+    bool             b_garbage_pic;
+    bool             b_after_sequence_header; /* is it the next frame after
                                                * the sequence header ?    */
-    bool       b_slice_i;             /* intra-slice refresh stream */
-    bool       b_second_field;
+    bool             b_slice_i;             /* intra-slice refresh stream */
+    bool             b_second_field;
 
-    bool       b_preroll;
+    bool             b_preroll;
 
     /*
      * Output properties
@@ -129,10 +129,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
-    }
+        return VLC_ENOMEM;
 
     /* Initialize the thread properties */
     memset( p_sys, 0, sizeof(decoder_sys_t) );
@@ -325,7 +322,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-        mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
+            mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
 
             /* This picture will never go through display_picture. */
             p_pic->date = 0;
@@ -525,7 +522,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
                     break;
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-        mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
+                mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
             }
             p_sys->p_picture_to_destroy = p_pic;
 
