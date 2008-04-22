@@ -93,6 +93,8 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 #define TELX_LONGTEXT N_( "Output teletext subtitles as text " \
   "instead of as RGBA" )
 
+// #define ZVBI_DEBUG
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -259,7 +261,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     block_t         *p_block;
     subpicture_t    *p_spu = NULL;
     video_format_t  fmt;
-    bool      b_cached = false;
+    bool            b_cached = false;
     vbi_page        p_page;
     const uint8_t   *p_pos;
     unsigned int    i_left;
@@ -301,7 +303,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_sys->b_update = false;
     p_sys->i_last_page = p_sys->i_wanted_page;
-#if 1
+#ifdef ZVBI_DEBUG
     msg_Dbg( p_dec, "we now have page: %d ready for display",
               p_sys->i_wanted_page );
 #endif
@@ -373,7 +375,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_spu->p_region->psz_text = strdup( &p_text[8] );
 
         p_spu->p_region->fmt.i_height = p_spu->p_region->fmt.i_visible_height = p_page.rows + 1;
+#ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
+#endif
     }
     else
     {
@@ -409,7 +413,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_pic->p->i_lines = p_page.rows * 10;
         p_pic->p->i_pitch = p_page.columns * 12 * 4;
 
-#if 1
+#ifdef ZVBI_DEBUG
         msg_Dbg( p_dec, "page %x-%x(%d,%d)",
                  p_page.pgno, p_page.subno,
                  p_page.rows, p_page.columns );
@@ -471,18 +475,20 @@ static void event_handler( vbi_event *ev, void *user_data )
 
     if( ev->type == VBI_EVENT_TTX_PAGE )
     {
-        /* msg_Info( p_dec, "Page %03x.%02x ",
+#ifdef ZVBI_DEBUG
+        msg_Info( p_dec, "Page %03x.%02x ",
                     ev->ev.ttx_page.pgno,
                     ev->ev.ttx_page.subno & 0xFF);
-        */
+#endif
         if( p_sys->i_last_page == vbi_bcd2dec( ev->ev.ttx_page.pgno ) )
             p_sys->b_update = true;
 
         if( ev->ev.ttx_page.clock_update )
             msg_Dbg( p_dec, "clock" );
-/*        if( ev->ev.ttx_page.header_update )
+#ifdef ZVBI_DEBUG
+        if( ev->ev.ttx_page.header_update )
             msg_Dbg( p_dec, "header" );
-*/
+#endif
     }
     else if( ev->type == VBI_EVENT_CAPTION )
         msg_Dbg( p_dec, "Caption line: %x", ev->ev.caption.pgno );
