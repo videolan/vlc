@@ -72,7 +72,6 @@ struct input_item_t
     mtime_t    i_duration;           /**< Duration in milliseconds*/
 
     uint8_t    i_type;               /**< Type (file, disc, ...) */
-    bool b_prefers_tree;      /**< Do we prefer being displayed as tree*/
 
     int        i_categories;         /**< Number of info categories */
     info_category_t **pp_categories; /**< Pointer to the first info category */

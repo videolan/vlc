@@ -329,8 +329,8 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
     int i;
     if( p_node->p_parent == p_playlist->p_root_category )
     {
-        if( p_playlist->b_always_tree ||
-            p_node->p_input->b_prefers_tree ) return p_node;
+        if( p_playlist->b_always_tree )
+            return p_node;
         for( i = 0 ; i< p_playlist->p_root_onelevel->i_children; i++ )
         {
             if( p_playlist->p_root_onelevel->pp_children[i]->p_input->i_id ==
@@ -340,7 +340,7 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
     }
     else if( p_node->p_parent == p_playlist->p_root_onelevel )
     {
-        if( p_playlist->b_never_tree || !p_node->p_input->b_prefers_tree )
+        if( p_playlist->b_never_tree )
             return p_node;
         for( i = 0 ; i< p_playlist->p_root_category->i_children; i++ )
         {
