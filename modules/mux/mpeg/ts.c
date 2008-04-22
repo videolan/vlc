@@ -326,7 +326,7 @@ typedef struct ts_stream_t
     int             i_stream_type;
     int             i_stream_id;
     int             i_continuity_counter;
-    bool      b_discontinuity;
+    bool            b_discontinuity;
 
     /* to be used for carriege of DIV3 */
     vlc_fourcc_t    i_bih_codec;
@@ -346,7 +346,7 @@ typedef struct ts_stream_t
     mtime_t             i_pes_dts;
     mtime_t             i_pes_length;
     int                 i_pes_used;
-    bool          b_key_frame;
+    bool                b_key_frame;
 
 } ts_stream_t;
 
@@ -358,8 +358,8 @@ struct sout_mux_sys_t
     int             i_audio_bound;
     int             i_video_bound;
 
-    bool      b_es_id_pid;
-    bool      b_sdt;
+    bool            b_es_id_pid;
+    bool            b_sdt;
     int             i_pid_video;
     int             i_pid_audio;
     int             i_pid_spu;
@@ -377,7 +377,7 @@ struct sout_mux_sys_t
     pmt_map_t       pmtmap[MAX_PMT_PID];
     int             i_pmt_program_number[MAX_PMT];
     sdt_desc_t      sdt_descriptors[MAX_PMT];
-    bool      b_data_alignment;
+    bool            b_data_alignment;
 
     int             i_mpeg4_streams;
 
@@ -386,22 +386,22 @@ struct sout_mux_sys_t
     dvbpsi_pmt_t    *dvbpmt;
 
     /* for TS building */
-    int64_t             i_bitrate_min;
-    int64_t             i_bitrate_max;
+    int64_t         i_bitrate_min;
+    int64_t         i_bitrate_max;
 
-    int64_t             i_shaping_delay;
-    int64_t             i_pcr_delay;
+    int64_t         i_shaping_delay;
+    int64_t         i_pcr_delay;
 
-    int64_t             i_dts_delay;
+    int64_t         i_dts_delay;
 
-    bool          b_use_key_frames;
+    bool            b_use_key_frames;
 
-    mtime_t             i_pcr;  /* last PCR emited */
+    mtime_t         i_pcr;  /* last PCR emited */
 
-    csa_t               *csa;
-    int                 i_csa_pkt_size;
-    bool          b_crypt_audio;
-    bool          b_crypt_video;
+    csa_t           *csa;
+    int             i_csa_pkt_size;
+    bool            b_crypt_audio;
+    bool            b_crypt_video;
 };
 
 /* Reserve a pid and return it */
@@ -1600,12 +1600,12 @@ static int Mux( sout_mux_t *p_mux )
 
         for( ;; )
         {
-            int         i_stream;
-            mtime_t     i_dts;
-            ts_stream_t *p_stream;
+            int          i_stream;
+            mtime_t      i_dts;
+            ts_stream_t  *p_stream;
             sout_input_t *p_input;
-            block_t *p_ts;
-            bool   b_pcr;
+            block_t      *p_ts;
+            bool         b_pcr;
 
             /* Select stream (lowest dts) */
             for( i = 0, i_stream = -1, i_dts = 0; i < p_mux->i_nb_inputs; i++ )
@@ -1907,8 +1907,8 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
     bool b_new_pes = false;
     bool b_adaptation_field = false;
 
-    int        i_payload_max = 184 - ( b_pcr ? 8 : 0 );
-    int        i_payload;
+    int i_payload_max = 184 - ( b_pcr ? 8 : 0 );
+    int i_payload;
 
     if( p_stream->i_pes_used <= 0 )
     {
