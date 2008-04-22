@@ -115,8 +115,17 @@ static picture_t *video_new_buffer( vlc_object_t *, decoder_owner_sys_t *,
 
 static void video_link_picture_decoder( decoder_t *, picture_t * );
 static void video_unlink_picture_decoder( decoder_t *, picture_t * );
-static int MosaicBridgeCallback( vlc_object_t *, char const *,
-                                 vlc_value_t, vlc_value_t, void * );
+
+static int HeightCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int WidthCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int alphaCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int xCallback( vlc_object_t *, char const *,
+                      vlc_value_t, vlc_value_t, void * );
+static int yCallback( vlc_object_t *, char const *,
+                      vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -144,6 +153,18 @@ static int MosaicBridgeCallback( vlc_object_t *, char const *,
     "Force the use of a specific chroma. Use YUVA if you're planning " \
     "to use the Alphamask or Bluescreen video filter." )
 
+#define ALPHA_TEXT N_("Transparency")
+#define ALPHA_LONGTEXT N_( \
+    "Transparency of the mosaic picture." )
+
+#define X_TEXT N_("X offset")
+#define X_LONGTEXT N_( \
+    "X coordinate of the upper left corner in the mosaic if non negative." )
+
+#define Y_TEXT N_("Y offset")
+#define Y_LONGTEXT N_( \
+    "Y coordinate of the upper left corner in the mosaic if non negative." )
+
 #define CFG_PREFIX "sout-mosaic-bridge-"
 
 vlc_module_begin();
@@ -166,11 +187,16 @@ vlc_module_begin();
     add_module_list( CFG_PREFIX "vfilter", "video filter2",
                      NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false );
 
+    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
+                            ALPHA_TEXT, ALPHA_LONGTEXT, false );
+    add_integer( CFG_PREFIX "x", -1, NULL, X_TEXT, X_LONGTEXT, false );
+    add_integer( CFG_PREFIX "y", -1, NULL, Y_TEXT, Y_LONGTEXT, false );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
-    "id", "width", "height", "sar", "vfilter", "chroma", NULL
+    "id", "width", "height", "sar", "vfilter", "chroma", "alpha", "x", "y", NULL
 };
 
 /*****************************************************************************
@@ -204,13 +230,11 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_height =
         var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "height" );
-    var_AddCallback( p_stream, CFG_PREFIX "height", MosaicBridgeCallback,
-                     p_stream );
+    var_AddCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
 
     p_sys->i_width =
         var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "width" );
-    var_AddCallback( p_stream, CFG_PREFIX "width", MosaicBridgeCallback,
-                     p_stream );
+    var_AddCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
 
     var_Get( p_stream, CFG_PREFIX "sar", &val );
     if ( val.psz_string )
@@ -245,6 +269,15 @@ static int Open( vlc_object_t *p_this )
         memcpy( &p_sys->i_chroma, val.psz_string, 4 );
         msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
     }
+
+#define INT_COMMAND( a ) \
+    var_Create( p_stream, CFG_PREFIX #a, \
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND ); \
+    var_AddCallback( p_stream, CFG_PREFIX #a, a ## Callback, \
+                     p_stream );
+    INT_COMMAND( alpha )
+    INT_COMMAND( x )
+    INT_COMMAND( y )
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -349,6 +382,10 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
     p_sys->p_es = p_es = p_bridge->pp_es[i];
+
+    p_es->i_alpha = var_GetInteger( p_stream, CFG_PREFIX "alpha" );
+    p_es->i_x = var_GetInteger( p_stream, CFG_PREFIX "x" );
+    p_es->i_y = var_GetInteger( p_stream, CFG_PREFIX "y" );
 
     //p_es->fmt = *p_fmt;
     p_es->psz_id = p_sys->psz_id;
@@ -851,33 +888,78 @@ static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 /**********************************************************************
  * Callback to update (some) params on the fly
  **********************************************************************/
-static int MosaicBridgeCallback( vlc_object_t *p_this, char const *psz_var,
-                                 vlc_value_t oldval, vlc_value_t newval,
-                                 void *p_data )
+static int HeightCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     sout_stream_t *p_stream = (sout_stream_t *)p_data;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_ret = VLC_SUCCESS;
 
-#define VAR_IS( a ) !strcmp( psz_var, CFG_PREFIX a )
-    if( VAR_IS( "height" ) )
-    {
-        /* We create the handler before updating the value in p_sys
-         * so we don't have to worry about locking */
-        if( !p_sys->p_image && newval.i_int )
-            p_sys->p_image = image_HandlerCreate( p_stream );
-        p_sys->i_height = newval.i_int;
-    }
-    else if( VAR_IS( "width" ) )
-    {
-        /* We create the handler before updating the value in p_sys
-         * so we don't have to worry about locking */
-        if( !p_sys->p_image && newval.i_int )
-            p_sys->p_image = image_HandlerCreate( p_stream );
-        p_sys->i_width = newval.i_int;
-    }
-#undef VAR_IS
+    /* We create the handler before updating the value in p_sys
+     * so we don't have to worry about locking */
+    if( !p_sys->p_image && newval.i_int )
+        p_sys->p_image = image_HandlerCreate( p_stream );
+    p_sys->i_height = newval.i_int;
 
-    return i_ret;
+    return VLC_SUCCESS;
+}
+
+static int WidthCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    sout_stream_t *p_stream = (sout_stream_t *)p_data;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* We create the handler before updating the value in p_sys
+     * so we don't have to worry about locking */
+    if( !p_sys->p_image && newval.i_int )
+        p_sys->p_image = image_HandlerCreate( p_stream );
+    p_sys->i_width = newval.i_int;
+
+    return VLC_SUCCESS;
+}
+
+static int alphaCallback( vlc_object_t *p_this, char const *psz_var,
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    sout_stream_t *p_stream = (sout_stream_t *)p_data;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    if( p_sys->p_es )
+        p_sys->p_es->i_alpha = newval.i_int;
+
+    return VLC_SUCCESS;
+}
+
+static int xCallback( vlc_object_t *p_this, char const *psz_var,
+                      vlc_value_t oldval, vlc_value_t newval,
+                      void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    sout_stream_t *p_stream = (sout_stream_t *)p_data;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    if( p_sys->p_es )
+        p_sys->p_es->i_x = newval.i_int;
+
+    return VLC_SUCCESS;
+}
+
+static int yCallback( vlc_object_t *p_this, char const *psz_var,
+                      vlc_value_t oldval, vlc_value_t newval,
+                      void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    sout_stream_t *p_stream = (sout_stream_t *)p_data;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    if( p_sys->p_es )
+        p_sys->p_es->i_y = newval.i_int;
+
+    return VLC_SUCCESS;
 }

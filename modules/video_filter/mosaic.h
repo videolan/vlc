@@ -29,6 +29,10 @@ typedef struct bridged_es_t
     picture_t **pp_last;
     bool b_empty;
     char *psz_id;
+
+    int i_alpha;
+    int i_x;
+    int i_y;
 } bridged_es_t;
 
 typedef struct bridge_t

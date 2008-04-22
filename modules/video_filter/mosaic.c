@@ -1,10 +1,10 @@
 /*****************************************************************************
  * mosaic.c : Mosaic video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2004-2007 the VideoLAN team
+ * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Antoine Cellerier <dionoea@via.ecp.fr>
+ * Authors: Antoine Cellerier <dionoea at videolan dot org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -181,8 +181,8 @@ vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
 
-    add_integer( CFG_PREFIX "alpha", 255, NULL,
-                 ALPHA_TEXT, ALPHA_LONGTEXT, false );
+    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
+                            ALPHA_TEXT, ALPHA_LONGTEXT, false );
 
     add_integer( CFG_PREFIX "height", 100, NULL,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, false );
@@ -664,50 +664,56 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_region->picture.pf_release = MosaicReleasePicture;
         }
 
-        if( p_sys->i_position == position_offsets )
+        if( p_es->i_x >= 0 && p_es->i_y >= 0 )
+        {
+            p_region->i_x = p_es->i_x;
+            p_region->i_y = p_es->i_y;
+        }
+        else if( p_sys->i_position == position_offsets )
         {
             p_region->i_x = p_sys->pi_x_offsets[i_real_index];
-        }
-        else if( fmt_out.i_width > col_inner_width ||
-            p_sys->b_ar || p_sys->b_keep )
-        {
-            /* we don't have to center the video since it takes the
-            whole rectangle area or it's larger than the rectangle */
-            p_region->i_x = p_sys->i_xoffset
-                        + i_col * ( p_sys->i_width / p_sys->i_cols )
-                        + ( i_col * p_sys->i_borderw ) / p_sys->i_cols;
-        }
-        else
-        {
-            /* center the video in the dedicated rectangle */
-            p_region->i_x = p_sys->i_xoffset
-                    + i_col * ( p_sys->i_width / p_sys->i_cols )
-                    + ( i_col * p_sys->i_borderw ) / p_sys->i_cols
-                    + ( col_inner_width - fmt_out.i_width ) / 2;
-        }
-
-        if( p_sys->i_position == position_offsets )
-        {
             p_region->i_y = p_sys->pi_y_offsets[i_real_index];
         }
-        else if( fmt_out.i_height > row_inner_height
-            || p_sys->b_ar || p_sys->b_keep )
-        {
-            /* we don't have to center the video since it takes the
-            whole rectangle area or it's taller than the rectangle */
-            p_region->i_y = p_sys->i_yoffset
-                    + i_row * ( p_sys->i_height / p_sys->i_rows )
-                    + ( i_row * p_sys->i_borderh ) / p_sys->i_rows;
-        }
         else
         {
-            /* center the video in the dedicated rectangle */
-            p_region->i_y = p_sys->i_yoffset
-                    + i_row * ( p_sys->i_height / p_sys->i_rows )
-                    + ( i_row * p_sys->i_borderh ) / p_sys->i_rows
-                    + ( row_inner_height - fmt_out.i_height ) / 2;
+            if( fmt_out.i_width > col_inner_width ||
+                p_sys->b_ar || p_sys->b_keep )
+            {
+                /* we don't have to center the video since it takes the
+                whole rectangle area or it's larger than the rectangle */
+                p_region->i_x = p_sys->i_xoffset
+                            + i_col * ( p_sys->i_width / p_sys->i_cols )
+                            + ( i_col * p_sys->i_borderw ) / p_sys->i_cols;
+            }
+            else
+            {
+                /* center the video in the dedicated rectangle */
+                p_region->i_x = p_sys->i_xoffset
+                        + i_col * ( p_sys->i_width / p_sys->i_cols )
+                        + ( i_col * p_sys->i_borderw ) / p_sys->i_cols
+                        + ( col_inner_width - fmt_out.i_width ) / 2;
+            }
+
+            if( fmt_out.i_height > row_inner_height
+                || p_sys->b_ar || p_sys->b_keep )
+            {
+                /* we don't have to center the video since it takes the
+                whole rectangle area or it's taller than the rectangle */
+                p_region->i_y = p_sys->i_yoffset
+                        + i_row * ( p_sys->i_height / p_sys->i_rows )
+                        + ( i_row * p_sys->i_borderh ) / p_sys->i_rows;
+            }
+            else
+            {
+                /* center the video in the dedicated rectangle */
+                p_region->i_y = p_sys->i_yoffset
+                        + i_row * ( p_sys->i_height / p_sys->i_rows )
+                        + ( i_row * p_sys->i_borderh ) / p_sys->i_rows
+                        + ( row_inner_height - fmt_out.i_height ) / 2;
+            }
         }
         p_region->i_align = p_sys->i_align;
+        p_region->i_alpha = p_es->i_alpha;
 
         if( p_region_prev == NULL )
         {
