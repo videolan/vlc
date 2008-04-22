@@ -307,7 +307,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_sys->b_update = false;
     p_sys->i_last_page = p_sys->i_wanted_page;
-#if 0
+#if 1
     msg_Dbg( p_dec, "we now have page: %d ready for display",
               p_sys->i_wanted_page );
 #endif
@@ -415,7 +415,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_pic->p->i_lines = p_page.rows * 10;
         p_pic->p->i_pitch = p_page.columns * 12 * 4;
 
-#if 0
+#if 1
         msg_Dbg( p_dec, "page %x-%x(%d,%d)",
                  p_page.pgno, p_page.subno,
                  p_page.rows, p_page.columns );
@@ -452,7 +452,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 #endif
     }
 
-#undef PIXFMT_RGBA32
+#undef ZVBI_PIXFMT_RGBA32
 
     vbi_unref_page( &p_page );
     block_Release( p_block );
@@ -641,6 +641,7 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     decoder_sys_t   *p_sys = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     if( (newval.i_int > 0) && (newval.i_int < 999) )
         p_sys->i_wanted_page = newval.i_int;
@@ -652,6 +653,7 @@ static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     decoder_sys_t *p_sys = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     if( p_sys )
         p_sys->b_opaque = newval.b_bool;
@@ -662,6 +664,7 @@ static int Position( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     decoder_sys_t *p_sys = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     if( p_sys )
         p_sys->i_align = newval.i_int;
