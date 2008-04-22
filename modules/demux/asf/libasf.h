@@ -198,10 +198,9 @@ typedef struct
     uint64_t     i_file_size;
     uint64_t     i_creation_date;
     uint64_t     i_data_packets_count;
-    uint64_t     i_send_duration;
     uint64_t     i_play_duration;
-    uint32_t     i_preroll;
-    uint32_t     i_unknown; /* ignored, usually 0 */
+    uint64_t     i_send_duration;
+    uint64_t     i_preroll;
     uint32_t     i_flags;
     uint32_t     i_min_data_packet_size;
     uint32_t     i_max_data_packet_size;
