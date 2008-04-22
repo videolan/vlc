@@ -2455,7 +2455,11 @@ static void httpd_HostThread( httpd_host_t *host )
 
         vlc_object_lock( host );
         if( ufd[nfd - 1].revents )
-            b_die = vlc_object_wait( host );
+        {
+            b_die = !vlc_object_alive( host );
+            if( !b_die )
+                b_die = vlc_object_wait( host );
+        }
         vlc_object_unlock( host );
 
         /* Handle client sockets */
