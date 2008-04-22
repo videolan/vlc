@@ -122,10 +122,10 @@ vlc_module_end();
 
 struct decoder_sys_t
 {
-    vbi_decoder *           p_vbi_dec;
-    vbi_dvb_demux *         p_dvb_demux;
-    unsigned int            i_wanted_page;
-    unsigned int            i_last_page;
+    vbi_decoder *     p_vbi_dec;
+    vbi_dvb_demux *   p_dvb_demux;
+    unsigned int      i_wanted_page;
+    unsigned int      i_last_page;
     bool              b_update;
     bool              b_opaque;
 
@@ -133,11 +133,11 @@ struct decoder_sys_t
     bool              b_text;
 
     /* Positioning of Teletext images */
-    int                     i_align;
+    int               i_align;
 
     /* Misc */
 #if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
-    image_handler_t         *p_image;
+    image_handler_t   *p_image;
 #endif
 };
 
@@ -168,17 +168,12 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys = NULL;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','e','l','x') )
-    {
         return VLC_EGENERIC;
-    }
 
     p_dec->pf_decode_sub = Decode;
     p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
     if( p_sys == NULL )
-    {
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
-    }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
 #if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
@@ -186,7 +181,6 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_image )
     {
         free( p_sys );
-        msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
     }
 #endif
