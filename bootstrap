@@ -131,7 +131,7 @@ if [ "$AUTOPOINT" = "true" ]; then
 ==============================================================
 NOTE: GNU gettext appears to be missing or out-of-date.
 Please install or update GNU gettext.
-Also check if you have cvs, a dependancy of autopoint.
+Also check if you have cvs, a dependency of autopoint.
 Otherwise, you will not be able to build a source tarball.
 EOF
 fi
