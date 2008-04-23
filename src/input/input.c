@@ -285,9 +285,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     }
 
     /* Remove 'Now playing' info as it is probably outdated */
-    input_Control( p_input, INPUT_DEL_INFO,
-        _(VLC_META_INFO_CAT),
-        _(VLC_META_NOW_PLAYING) );
     input_item_SetNowPlaying( p_item, NULL );
 
     /* */
@@ -2633,7 +2630,6 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     input_item_t *p_item = p_input->p->input.p_item;
     char * psz_arturl = NULL;
     char *psz_title = NULL;
-    int i;
     int i_arturl_event = false;
 
     if( !p_meta )
@@ -2695,19 +2691,6 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     {
         input_Control( p_input, INPUT_SET_NAME, psz_title );
         free( psz_title );
-    }
-
-    if( p_meta )
-    {
-        char ** ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
-        for( i = 0; ppsz_all_keys[i]; i++ )
-        {
-            input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT), _(ppsz_all_keys[i]),
-                    vlc_dictionary_value_for_key( &p_meta->extra_tags, ppsz_all_keys[i] ) );
-            free( ppsz_all_keys[i] );
-        }
-        free( ppsz_all_keys );
-        vlc_meta_Delete( p_meta );
     }
 
     /** \todo handle sout meta */

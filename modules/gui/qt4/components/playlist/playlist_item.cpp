@@ -36,6 +36,8 @@
 
 #include <QSettings>
 
+#include "sorting.h"
+
 /*************************************************************************
  * Playlist item implementation
  *************************************************************************/
@@ -109,40 +111,12 @@ void PLItem::updateColumnHeaders()
 {
     item_col_strings.clear();
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index *= 2 )
+    assert( i_showflags < COLUMN_END );
+
+    for( uint32_t i_index=1; i_index < COLUMN_END; i_index <<= 1 )
     {
         if( i_showflags & i_index )
-        {
-            switch( i_index )
-            {
-            case VLC_META_ENGINE_TRACKID:
-                item_col_strings.append( qtr( VLC_META_TRACKID ) );
-                break;
-            case VLC_META_ENGINE_ARTIST:
-                item_col_strings.append( qtr( VLC_META_ARTIST ) );
-                break;
-            case VLC_META_ENGINE_TITLE:
-                item_col_strings.append( qtr( VLC_META_TITLE ) );
-                break;
-            case VLC_META_ENGINE_DESCRIPTION:
-                item_col_strings.append( qtr( VLC_META_DESCRIPTION ) );
-                break;
-            case VLC_META_ENGINE_DURATION:
-                item_col_strings.append( qtr( VLC_META_DURATION ) );
-                break;
-            case VLC_META_ENGINE_GENRE:
-                item_col_strings.append( qtr( VLC_META_GENRE ) );
-                break;
-            case VLC_META_ENGINE_COLLECTION:
-                item_col_strings.append( qtr( VLC_META_COLLECTION ) );
-                break;
-            case VLC_META_ENGINE_SEQ_NUM:
-                item_col_strings.append( qtr( VLC_META_SEQ_NUM ) );
-                break;
-            default:
-                break;
-            }
-        }
+            item_col_strings.append( psz_column_title( i_index ) );
     }
 }
 
@@ -206,63 +180,15 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         return;
     }
 
-#define ADD_META( item, meta ) \
-    psz_meta = input_item_Get ## meta ( item->p_input ); \
-    item_col_strings.append( qfu( psz_meta ) ); \
-    free( psz_meta );
+    assert( parentItem->i_showflags < COLUMN_END );
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index *= 2 )
+    for( uint32_t i_index=1; i_index < COLUMN_END; i_index <<= 1 )
     {
         if( parentItem->i_showflags & i_index )
         {
-            switch( i_index )
-            {
-            case VLC_META_ENGINE_ARTIST:
-                ADD_META( p_item, Artist );
-                break;
-            case VLC_META_ENGINE_TITLE:
-                char *psz_title;
-                psz_title = input_item_GetTitle( p_item->p_input );
-                if( psz_title )
-                {
-                    ADD_META( p_item, Title );
-                    free( psz_title );
-                }
-                else
-                {
-                    psz_title = input_item_GetName( p_item->p_input );
-                    if( psz_title )
-                    {
-                        item_col_strings.append( qfu( psz_title ) );
-                    }
-                    free( psz_title );
-                }
-                break;
-            case VLC_META_ENGINE_DESCRIPTION:
-                ADD_META( p_item, Description );
-                break;
-            case VLC_META_ENGINE_DURATION:
-                secstotimestr( psz_duration,
-                    input_item_GetDuration( p_item->p_input ) / 1000000 );
-                item_col_strings.append( QString( psz_duration ) );
-                break;
-            case VLC_META_ENGINE_GENRE:
-                ADD_META( p_item, Genre );
-                break;
-            case VLC_META_ENGINE_COLLECTION:
-                ADD_META( p_item, Album );
-                break;
-            case VLC_META_ENGINE_SEQ_NUM:
-                ADD_META( p_item, TrackNum );
-                break;
-            case VLC_META_ENGINE_TRACKID:
-                item_col_strings.append( QString::number( p_item->i_id ) );
-                break;
-            default:
-                break;
-            }
+            char *psz = psz_column_meta( p_item->p_input, i_index );
+            item_col_strings.append( psz );
+            free( psz );
         }
     }
-#undef ADD_META
 }
-

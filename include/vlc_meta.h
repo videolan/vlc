@@ -30,11 +30,9 @@
 
 #include <vlc_arrays.h>
 
-#define VLC_META_TYPE_COUNT 17
-
 typedef enum vlc_meta_type_t
 {
-    vlc_meta_Title = 0,
+    vlc_meta_Title,
     vlc_meta_Artist,
     vlc_meta_Genre,
     vlc_meta_Copyright,
@@ -53,14 +51,15 @@ typedef enum vlc_meta_type_t
     vlc_meta_TrackID
 } vlc_meta_type_t;
 
+#define VLC_META_TYPE_COUNT 17
+
 /* Returns a localizes string describing the meta */
 VLC_EXPORT(const char *, input_MetaTypeToLocalizedString, ( vlc_meta_type_t meta_type ) );
 
 #define ITEM_PREPARSED      0x01
-#define ITEM_META_FETCHED   0x02
-#define ITEM_ARTURL_FETCHED 0x04
-#define ITEM_ART_FETCHED    0x08
-#define ITEM_ART_NOTFOUND   0x10
+#define ITEM_ARTURL_FETCHED 0x02
+#define ITEM_ART_FETCHED    0x04
+#define ITEM_ART_NOTFOUND   0x08
 
 struct vlc_meta_t
 {
@@ -69,7 +68,6 @@ struct vlc_meta_t
     vlc_dictionary_t extra_tags;
 
     int i_status;
-
 };
 
 /* Setters for meta.
@@ -163,15 +161,12 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
     free( ppsz_all_keys );
 }
 
-/* Shortcuts for the AddInfo */
-#define VLC_META_INFO_CAT           N_("Meta-information")
 #define VLC_META_TITLE              input_MetaTypeToLocalizedString( vlc_meta_Title )
-#define VLC_META_DURATION           N_( "Duration" )
 #define VLC_META_ARTIST             input_MetaTypeToLocalizedString( vlc_meta_Artist )
 #define VLC_META_GENRE              input_MetaTypeToLocalizedString( vlc_meta_Genre )
 #define VLC_META_COPYRIGHT          input_MetaTypeToLocalizedString( vlc_meta_Copyright )
-#define VLC_META_COLLECTION         input_MetaTypeToLocalizedString( vlc_meta_Album )
-#define VLC_META_SEQ_NUM            input_MetaTypeToLocalizedString( vlc_meta_TrackNumber )
+#define VLC_META_ALBUM              input_MetaTypeToLocalizedString( vlc_meta_Album )
+#define VLC_META_TRACK_NUMBER       input_MetaTypeToLocalizedString( vlc_meta_TrackNumber )
 #define VLC_META_DESCRIPTION        input_MetaTypeToLocalizedString( vlc_meta_Description )
 #define VLC_META_RATING             input_MetaTypeToLocalizedString( vlc_meta_Rating )
 #define VLC_META_DATE               input_MetaTypeToLocalizedString( vlc_meta_Date )
@@ -195,44 +190,5 @@ struct meta_export_t
     input_item_t *p_item;
     const char *psz_file;
 };
-
-#define VLC_META_ENGINE_TRACKID         0x00000001
-#define VLC_META_ENGINE_TITLE           0x00000002
-#define VLC_META_ENGINE_DURATION        0x00000004
-#define VLC_META_ENGINE_ARTIST          0x00000008
-#define VLC_META_ENGINE_GENRE           0x00000010
-#define VLC_META_ENGINE_COPYRIGHT       0x00000020
-#define VLC_META_ENGINE_COLLECTION      0x00000040
-#define VLC_META_ENGINE_SEQ_NUM         0x00000080
-#define VLC_META_ENGINE_DESCRIPTION     0x00000100
-#define VLC_META_ENGINE_RATING          0x00000200
-#define VLC_META_ENGINE_DATE            0x00000400
-#define VLC_META_ENGINE_URL             0x00000800
-#define VLC_META_ENGINE_LANGUAGE        0x00001000
-
-#define VLC_META_ENGINE_ART_URL         0x00002000
-
-#if 0 /* unused (yet?) */
-#define VLC_META_ENGINE_MB_ARTIST_ID    0x00002000
-#define VLC_META_ENGINE_MB_RELEASE_ID   0x00004000
-#define VLC_META_ENGINE_MB_TRACK_ID     0x00008000
-#define VLC_META_ENGINE_MB_TRM_ID       0x00010000
-#endif
-
-typedef struct meta_engine_sys_t meta_engine_sys_t;
-
-struct meta_engine_t
-{
-    VLC_COMMON_MEMBERS
-
-    module_t *p_module;
-
-    uint32_t i_mandatory; /**< Stuff which we really need to get */
-    uint32_t i_optional; /**< Stuff which we'd like to have */
-
-    input_item_t *p_item;
-};
-
-VLC_EXPORT(uint32_t, input_CurrentMetaFlags,( const vlc_meta_t *p_meta ) );
 
 #endif

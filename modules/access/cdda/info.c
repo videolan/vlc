@@ -807,16 +807,6 @@ CDDAFormatTitle( const access_t *p_access, track_t i_track )
     return(NULL);
 }
 
-/* Adds a string-valued entry to the playlist information under "Track"
-   if the string is not null or the null string.
- */
-#define add_playlist_track_info_str(TITLE, FIELD)                        \
-    if (FIELD && strlen(FIELD))                                          \
-    {                                                                    \
-        input_ItemAddInfo( &p_item->input, _("Track"), _(TITLE),    \
-                              "%s", FIELD);                              \
-    }
-
 static playlist_item_t *
 CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
                         playlist_t *p_playlist, playlist_item_t *p_item,
@@ -847,58 +837,6 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
 
     if( !p_child ) return NULL;
     return p_child;
-}
-
-int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
-                       playlist_item_t *p_item, int i_track,
-                       bool b_single )
-{
-#if 0
-    add_playlist_track_info_str("Source",  p_cdda->psz_source);
-    input_ItemAddInfo( &p_item->input, _("Track"), _("Track Number"),
-                           "%d", i_track );
-
-    if (p_cdda->p_cdtext[i_track])
-    {
-        const cdtext_t *p = p_cdda->p_cdtext[i_track];
-        add_playlist_track_info_str("Arranger (CD-Text)",
-                                    p->field[CDTEXT_ARRANGER]);
-        add_playlist_track_info_str("Composer (CD-Text)",
-                                    p->field[CDTEXT_COMPOSER]);
-        add_playlist_track_info_str("Genre (CD-Text)",
-                                    p->field[CDTEXT_GENRE]);
-        add_playlist_track_info_str("Message (CD-Text)",
-                                    p->field[CDTEXT_MESSAGE]);
-        add_playlist_track_info_str("Performer (CD-Text)",
-                                    p->field[CDTEXT_PERFORMER]);
-        add_playlist_track_info_str("Songwriter (CD-Text)",
-                                    p->field[CDTEXT_SONGWRITER]);
-        add_playlist_track_info_str("Title (CD-Text)",
-                                    p->field[CDTEXT_TITLE]);
-    }
-
-#ifdef HAVE_LIBCDDB
-    if (p_cdda->b_cddb_enabled)
-    {
-        cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
-                                            i_track-p_cdda->i_first_track);
-
-        if (t)
-        {
-            if (cddb_track_get_artist(t))
-                add_playlist_track_info_str("Artist (CDDB)",
-                                             cddb_track_get_artist(t));
-            if (cddb_track_get_title(t))
-                add_playlist_track_info_str("Title (CDDB)",
-                                            cddb_track_get_title(t));
-            if (cddb_track_get_ext_data(t))
-                add_playlist_track_info_str("Extended information (CDDB)",
-                                            cddb_track_get_ext_data(t));
-        }
-    }
-#endif /*HAVE_LIBCDDB*/
-#endif
-    return VLC_SUCCESS;
 }
 
 /*
@@ -973,7 +911,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if( p_item )
     {
-        CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, false );
         input_item_SetDuration( p_item->p_input, (mtime_t) i_track_frames
           * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) );
             input_item_SetURI( p_item->p_input,
@@ -1009,8 +946,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
           p_child = CDDACreatePlaylistItem( p_access, p_cdda, p_playlist,
                         p_item,
                         i_track );
-          CDDAAddMetaToItem( p_access, p_cdda, p_child, i_track,
-                 true );
         }
         }
 

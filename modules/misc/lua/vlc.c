@@ -56,12 +56,6 @@
 
 vlc_module_begin();
     add_submodule();
-        add_shortcut( "luameta" );
-        set_shortname( N_( "Lua Meta" ) );
-        set_description( _("Fetch metadata using lua scripts") );
-        set_capability( "meta fetcher", 10 );
-        set_callbacks( E_(FindMeta), NULL );
-    add_submodule();
         set_shortname( N_( "Lua Art" ) );
         set_description( _("Fetch artwork using lua scripts") );
         set_capability( "art finder", 10 );

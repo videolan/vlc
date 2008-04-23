@@ -90,8 +90,8 @@ MetaDataPanel::MetaDataPanel( intf_thread_t *_p_intf,
     ADD_META( VLC_META_ARTIST, artist_text );
     ADD_META( VLC_META_GENRE, genre_text );
     ADD_META( VLC_META_COPYRIGHT, copyright_text );
-    ADD_META( VLC_META_COLLECTION, collection_text );
-    ADD_META( VLC_META_SEQ_NUM, seqnum_text );
+    ADD_META( VLC_META_ALBUM, collection_text );
+    ADD_META( VLC_META_TRACK_NUMBER, seqnum_text );
     ADD_META( VLC_META_DESCRIPTION, description_text );
     ADD_META( VLC_META_RATING, rating_text );
     ADD_META( VLC_META_DATE, date_text );

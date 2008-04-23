@@ -96,9 +96,6 @@ public:
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 
-    bool b_need_update;
-    int i_items_to_append;
-
     void rebuild(); void rebuild( playlist_item_t * );
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
 

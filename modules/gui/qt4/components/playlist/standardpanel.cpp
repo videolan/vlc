@@ -47,6 +47,8 @@
 
 #include <assert.h>
 
+#include "sorting.h"
+
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
@@ -265,24 +267,25 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
     QMenu selectColMenu;
 
-#define ADD_META_ACTION( meta ) { \
-    QAction* option = selectColMenu.addAction( qfu(VLC_META_##meta) );      \
-    option->setCheckable( true );                                           \
-    option->setChecked( model->shownFlags() & VLC_META_ENGINE_##meta );     \
-    ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
-    CONNECT( option, triggered(), ContextUpdateMapper, map() );             \
+    char *psz_title;
+#define ADD_META_ACTION( meta ) {                                              \
+    QAction* option = selectColMenu.addAction( psz_column_title( meta ) );     \
+    option->setCheckable( true );                                              \
+    option->setChecked( model->shownFlags() & meta );                          \
+    ContextUpdateMapper->setMapping( option, meta );                           \
+    CONNECT( option, triggered(), ContextUpdateMapper, map() );                \
 }
 
     CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
 
-    ADD_META_ACTION( TRACKID );
-    ADD_META_ACTION( TITLE );
-    ADD_META_ACTION( DURATION );
-    ADD_META_ACTION( ARTIST );
-    ADD_META_ACTION( GENRE );
-    ADD_META_ACTION( COLLECTION );
-    ADD_META_ACTION( SEQ_NUM );
-    ADD_META_ACTION( DESCRIPTION );
+    ADD_META_ACTION( COLUMN_NUMBER );
+    ADD_META_ACTION( COLUMN_TITLE );
+    ADD_META_ACTION( COLUMN_DURATION );
+    ADD_META_ACTION( COLUMN_ARTIST );
+    ADD_META_ACTION( COLUMN_GENRE );
+    ADD_META_ACTION( COLUMN_ALBUM );
+    ADD_META_ACTION( COLUMN_TRACK_NUMBER );
+    ADD_META_ACTION( COLUMN_DESCRIPTION );
 
 #undef ADD_META_ACTION
 

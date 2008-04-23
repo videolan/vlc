@@ -67,7 +67,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* Title, artist and album*/
     ADD_META( VLC_META_TITLE, title_text ); /* OK */
     ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
-    ADD_META( VLC_META_COLLECTION, collection_text ); /* OK */
+    ADD_META( VLC_META_ALBUM, collection_text ); /* OK */
 
     /* Genre Name */
     /* TODO List id3genres.h is not includable yet ? */
@@ -76,7 +76,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( genre_text, line, 1, 1, 3 );
 
     /* Number - on the same line */
-    metaLayout->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_TRACK_NUMBER )  + " :" ),
                   line, 5, 1, 2  );
     seqnum_text = new QLineEdit;
     seqnum_text->setInputMask("0000");

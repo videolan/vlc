@@ -279,20 +279,6 @@ static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
 }
 
 /*****************************************************************************
- * Module entry point for meta.
- *****************************************************************************/
-int E_(FindMeta)( vlc_object_t *p_this )
-{
-    meta_engine_t *p_me = (meta_engine_t *)p_this;
-    input_item_t *p_item = p_me->p_item;
-    lua_State *L = vlclua_meta_init( p_this, p_item );
-
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta", &fetch_meta, L, p_item );
-    lua_close( L );
-    return i_ret;
-}
-
-/*****************************************************************************
  * Module entry point for art.
  *****************************************************************************/
 int E_(FindArt)( vlc_object_t *p_this )

@@ -39,6 +39,8 @@
 #include <QApplication>
 #include <QSettings>
 
+#include "sorting.h"
+
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
 static int PlaylistChanged( vlc_object_t *, const char *,
@@ -72,8 +74,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     assert( i_depth == DEPTH_SEL || i_depth == DEPTH_PL );
     p_intf            = _p_intf;
     p_playlist        = _p_playlist;
-    i_items_to_append = 0;
-    b_need_update     = false;
     i_cached_id       = -1;
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
@@ -539,8 +539,6 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
 {
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
-    i_items_to_append--;
-    if( b_need_update ) return;
 
     PLItem *nodeItem = FindById( rootItem, p_add->i_node );
     PL_LOCK;
@@ -719,23 +717,23 @@ void PLModel::sort( int column, Qt::SortOrder order )
 
 #define CHECK_COLUMN( meta )                        \
 {                                                   \
-    if( ( shownFlags() & VLC_META_ENGINE_##meta ) ) \
+    if( ( shownFlags() & meta ) )                   \
         i_index++;                                  \
     if( column == i_index )                         \
     {                                               \
-        i_flag = VLC_META_ENGINE_##meta;            \
+        i_flag = meta;                              \
         goto next;                                  \
     }                                               \
 }
 
-    CHECK_COLUMN( TRACKID );
-    CHECK_COLUMN( TITLE );
-    CHECK_COLUMN( DURATION );
-    CHECK_COLUMN( ARTIST );
-    CHECK_COLUMN( GENRE );
-    CHECK_COLUMN( COLLECTION );
-    CHECK_COLUMN( SEQ_NUM );
-    CHECK_COLUMN( DESCRIPTION );
+    CHECK_COLUMN( COLUMN_NUMBER );
+    CHECK_COLUMN( COLUMN_TITLE );
+    CHECK_COLUMN( COLUMN_DURATION );
+    CHECK_COLUMN( COLUMN_ARTIST );
+    CHECK_COLUMN( COLUMN_GENRE );
+    CHECK_COLUMN( COLUMN_ALBUM );
+    CHECK_COLUMN( COLUMN_TRACK_NUMBER );
+    CHECK_COLUMN( COLUMN_DESCRIPTION );
 
 #undef CHECK_COLUMN
 
@@ -745,22 +743,10 @@ next:
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         rootItem->i_id,
                                                         true );
-        int i_mode;
-        switch( i_flag )
-        {
-        case VLC_META_ENGINE_TRACKID:    i_mode = SORT_ID;               break;
-        case VLC_META_ENGINE_TITLE:      i_mode = SORT_TITLE_NODES_FIRST;break;
-        case VLC_META_ENGINE_DURATION:   i_mode = SORT_DURATION;         break;
-        case VLC_META_ENGINE_ARTIST:     i_mode = SORT_ARTIST;           break;
-        case VLC_META_ENGINE_GENRE:      i_mode = SORT_GENRE;            break;
-        case VLC_META_ENGINE_COLLECTION: i_mode = SORT_ALBUM;            break;
-        case VLC_META_ENGINE_SEQ_NUM:    i_mode = SORT_TRACK_NUMBER;     break;
-        case VLC_META_ENGINE_DESCRIPTION:i_mode = SORT_DESCRIPTION;      break;
-        default:                         i_mode = SORT_TITLE_NODES_FIRST;break;
-        }
         if( p_root )
         {
-            playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
+            playlist_RecursiveNodeSort( p_playlist, p_root,
+                                        i_column_sorting( i_flag ),
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
             p_playlist->b_reset_currently_playing = true;
@@ -826,32 +812,16 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 
 void PLModel::viewchanged( int meta )
 {
+    assert( meta );
     if( rootItem )
     {
-        int index=0;
-        switch( meta )
+        int index=-1;
+        while( meta )
         {
-        case VLC_META_ENGINE_TRACKID:
-            index=0; break;
-        case VLC_META_ENGINE_TITLE:
-            index=1; break;
-        case VLC_META_ENGINE_DURATION:
-            index=2; break;
-        case VLC_META_ENGINE_ARTIST:
-            index=3; break;
-        case VLC_META_ENGINE_GENRE:
-            index=4; break;
-        case VLC_META_ENGINE_COPYRIGHT:
-            index=5; break;
-        case VLC_META_ENGINE_COLLECTION:
-            index=6; break;
-        case VLC_META_ENGINE_SEQ_NUM:
-            index=7; break;
-        case VLC_META_ENGINE_DESCRIPTION:
-            index=8; break;
-        default:
-            break;
+            index++;
+            meta >>= 1;
         }
+
         /* UNUSED        emit layoutAboutToBeChanged(); */
         index = __MIN( index, rootItem->item_col_strings.count() );
         QModelIndex parent = createIndex( 0, 0, rootItem );
@@ -969,11 +939,6 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t));
     memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
 
-    if( ++p_model->i_items_to_append >= 50 )
-    {
-//        p_model->b_need_update = true;
-//        return VLC_SUCCESS;
-    }
     PLEvent *event = new PLEvent(  p_add );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;

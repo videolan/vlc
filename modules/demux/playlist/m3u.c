@@ -184,9 +184,11 @@ static int Demux( demux_t *p_demux )
 
             p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
                                         0, NULL, i_duration );
+
             if ( psz_artist && *psz_artist )
-                input_ItemAddInfo( p_input, _(VLC_META_INFO_CAT),
-                                   _(VLC_META_ARTIST), "%s", psz_artist );
+                input_item_SetArtist( p_input, psz_artist );
+            free( psz_artist );
+
             input_ItemAddSubItem( p_current_input, p_input );
             for( unsigned i = 0; i < i_options; i++ )
                 input_ItemAddOpt( p_input, ppsz_options[i], 0 );

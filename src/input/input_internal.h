@@ -251,17 +251,6 @@ static inline void input_item_SetPreparsed( input_item_t *p_i, bool preparsed )
     }
 }
 
-static inline void input_item_SetMetaFetched( input_item_t *p_i, bool metafetched )
-{
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    if( metafetched )
-        p_i->p_meta->i_status |= ITEM_META_FETCHED;
-    else
-        p_i->p_meta->i_status &= ~ITEM_META_FETCHED;
-}
-
 static inline void input_item_SetArtNotFound( input_item_t *p_i, bool notfound )
 {
     if( !p_i->p_meta )
@@ -296,10 +285,7 @@ typedef struct playlist_album_t
     bool b_found;
 } playlist_album_t;
 
-int         input_MetaFetch     ( playlist_t *, input_item_t * );
 int         input_ArtFind       ( playlist_t *, input_item_t * );
-bool  input_MetaSatisfied ( playlist_t*, input_item_t*,
-                                  uint32_t*, uint32_t* );
 int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
 
 /* Becarefull; p_item lock HAS to be taken */

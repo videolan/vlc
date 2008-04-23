@@ -41,7 +41,6 @@
  * Local prototypes
  *****************************************************************************/
 static int FindArt( vlc_object_t * );
-static int FindMetaMBId( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Module descriptor
@@ -51,22 +50,13 @@ vlc_module_begin();
     set_shortname( N_( "MusicBrainz" ) );
     set_description( _("MusicBrainz meta data") );
 
-    set_capability( "meta fetcher", 10 );
-        /* This meta fetcher module only retrieves the musicbrainz track id
-         * and stores it
-         * TODO:
-         *  - Actually do it
-         *  - Also store the album id
-         * */
-        set_callbacks( FindMetaMBId, NULL );
-    add_submodule();
-        /* This art finder module fetches the album ID from musicbrainz and
-         * uses it to fetch the amazon ASIN from musicbrainz.
-         * TODO:
-         *  - Add ability to reuse MB album ID if we already have it
-         */
-        set_capability( "art finder", 80 );
-        set_callbacks( FindArt, NULL );
+    /* This art finder module fetches the album ID from musicbrainz and
+     * uses it to fetch the amazon ASIN from musicbrainz.
+     * TODO:
+     *  - Add ability to reuse MB album ID if we already have it
+     */
+    set_capability( "art finder", 80 );
+    set_callbacks( FindArt, NULL );
 vlc_module_end();
 
 /*****************************************************************************
@@ -167,23 +157,6 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
         return VLC_SUCCESS;
     else
         return b_art_found ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
-static int FindMetaMBId( vlc_object_t *p_this )
-{
-    meta_engine_t *p_me = (meta_engine_t *)p_this;
-    input_item_t *p_item = p_me->p_item;
-    int i_ret = GetData( VLC_OBJECT(p_me), p_item,
-                         p_me->i_mandatory & VLC_META_ENGINE_ART_URL );
-
-    if( !i_ret )
-    {
-        uint32_t i_meta = input_CurrentMetaFlags( input_item_GetMetaObject( p_item ) );
-        p_me->i_mandatory &= ~i_meta;
-        p_me->i_optional &= ~i_meta;
-        return p_me->i_mandatory ? VLC_EGENERIC : VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
 }
 
 static int FindArt( vlc_object_t *p_this )

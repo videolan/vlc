@@ -123,7 +123,6 @@ InitMD5
 input_AddSubtitles
 input_Control
 __input_CreateThread
-input_CurrentMetaFlags
 input_DecoderDecode
 input_DecoderDelete
 input_DecoderNew

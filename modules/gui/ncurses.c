@@ -1787,14 +1787,8 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         /* Meta data box */
         int l = 0;
 
-        int i_len = strlen( VLC_META_INFO_CAT );
-        char psz_title[i_len + 3];
-        psz_title[0] = ' ';
-        psz_title[1] = '\0';
-        strcat( &psz_title[1], VLC_META_INFO_CAT );
-        psz_title[i_len + 1] = ' ';
-        psz_title[i_len + 2] = '\0';
-        DrawBox( p_sys->w, y++, 0, h, COLS, psz_title, p_sys->b_color );
+        DrawBox( p_sys->w, y++, 0, h, COLS, _("Meta-information"),
+                 p_sys->b_color );
 
         if( p_input )
         {
@@ -1819,9 +1813,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                         case 3:
                             psz_meta_title = VLC_META_COPYRIGHT; break;
                         case 4:
-                            psz_meta_title = VLC_META_COLLECTION; break;
+                            psz_meta_title = VLC_META_ALBUM; break;
                         case 5:
-                            psz_meta_title = VLC_META_SEQ_NUM; break;
+                            psz_meta_title = VLC_META_TRACK_NUMBER; break;
                         case 6:
                             psz_meta_title = VLC_META_DESCRIPTION; break;
                         case 7:

@@ -44,79 +44,35 @@
 
 #include "../libvlc.h"
 
-static const char * meta_type_to_string[VLC_META_TYPE_COUNT] =
-{
-    [vlc_meta_Title]            = N_("Title"),
-    [vlc_meta_Artist]           = N_("Artist"),
-    [vlc_meta_Genre]            = N_("Genre"),
-    [vlc_meta_Copyright]        = N_("Copyright"),
-    [vlc_meta_Album]            = N_("Album"),
-    [vlc_meta_TrackNumber]      = N_("Track number"),
-    [vlc_meta_Description]      = N_("Description"),
-    [vlc_meta_Rating]           = N_("Rating"),
-    [vlc_meta_Date]             = N_("Date"),
-    [vlc_meta_Setting]          = N_("Setting"),
-    [vlc_meta_URL]              = N_("URL"),
-    [vlc_meta_Language]         = N_("Language"),
-    [vlc_meta_NowPlaying]       = N_("Now Playing"),
-    [vlc_meta_Publisher]        = N_("Publisher"),
-    [vlc_meta_EncodedBy]        = N_("Encoded by"),
-    [vlc_meta_ArtworkURL]       = N_("Artwork URL"),
-    [vlc_meta_TrackID]          = N_("Track ID"),
-};
-
 const char *
 input_MetaTypeToLocalizedString( vlc_meta_type_t meta_type )
 {
-    return _(meta_type_to_string[meta_type]);
-}
+    switch( meta_type )
+    {
+    case vlc_meta_Title:        return _("Title");
+    case vlc_meta_Artist:       return _("Artist");
+    case vlc_meta_Genre:        return _("Genre");
+    case vlc_meta_Copyright:    return _("Copyright");
+    case vlc_meta_Album:        return _("Album");
+    case vlc_meta_TrackNumber:  return _("Track number");
+    case vlc_meta_Description:  return _("Description");
+    case vlc_meta_Rating:       return _("Rating");
+    case vlc_meta_Date:         return _("Date");
+    case vlc_meta_Setting:      return _("Setting");
+    case vlc_meta_URL:          return _("URL");
+    case vlc_meta_Language:     return _("Language");
+    case vlc_meta_NowPlaying:   return _("Now Playing");
+    case vlc_meta_Publisher:    return _("Publisher");
+    case vlc_meta_EncodedBy:    return _("Encoded by");
+    case vlc_meta_ArtworkURL:   return _("Artwork URL");
+    case vlc_meta_TrackID:      return _("Track ID");
+
+    default: abort();
+    }
+};
 
 #define input_FindArtInCache(a,b) __input_FindArtInCache(VLC_OBJECT(a),b)
 static int __input_FindArtInCache( vlc_object_t *, input_item_t *p_item );
-
-bool input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
-                                uint32_t *pi_mandatory, uint32_t *pi_optional )
-{
-    VLC_UNUSED(p_playlist);
-    *pi_mandatory = VLC_META_ENGINE_TITLE | VLC_META_ENGINE_ARTIST;
-
-    uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );
-    *pi_mandatory &= ~i_meta;
-    *pi_optional = 0; /// Todo
-    return *pi_mandatory ? false:true;
-}
-
-int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
-{
-    struct meta_engine_t *p_me;
-    uint32_t i_mandatory, i_optional;
-
-    input_MetaSatisfied( p_playlist, p_item, &i_mandatory, &i_optional );
-    // Meta shouldn't magically appear
-    assert( i_mandatory );
-
-    /* FIXME: object creation is overkill, use p_private */
-    p_me = vlc_custom_create( VLC_OBJECT(p_playlist), sizeof( *p_me ),
-                              VLC_OBJECT_GENERIC, "meta engine" );
-    p_me->i_flags |= OBJECT_FLAGS_NOINTERACT;
-    p_me->i_flags |= OBJECT_FLAGS_QUIET;
-    p_me->i_mandatory = i_mandatory;
-    p_me->i_optional = i_optional;
-
-    p_me->p_item = p_item;
-    p_me->p_module = module_Need( p_me, "meta fetcher", 0, false );
-    if( !p_me->p_module )
-    {
-        vlc_object_release( p_me );
-        return VLC_EGENERIC;
-    }
-    module_Unneed( p_me, p_me->p_module );
-    vlc_object_release( p_me );
-
-    input_item_SetMetaFetched( p_item, true );
-
-    return VLC_SUCCESS;
-}
 
 /* Return codes:
  *   0 : Art is in cache or is a local file
@@ -575,36 +531,4 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         }
         fclose( f );
     }
-}
-
-
-uint32_t input_CurrentMetaFlags( const vlc_meta_t *p_meta )
-{
-    uint32_t i_meta = 0;
-
-    if( !p_meta )
-        return 0;
-
-#define CHECK( a, b ) \
-    if( !EMPTY_STR( vlc_meta_Get( p_meta, vlc_meta_ ## a ) ) ) \
-        i_meta |= VLC_META_ENGINE_ ## b;
-
-    CHECK( Title, TITLE )
-    CHECK( Artist, ARTIST )
-    CHECK( Album, COLLECTION )
-#if 0
-    /* As this is not used at the moment, don't uselessly check for it.
-     * Re-enable this when it is used */
-    CHECK( Genre, GENRE )
-    CHECK( Copyright, COPYRIGHT )
-    CHECK( Tracknum, SEQ_NUM )
-    CHECK( Description, DESCRIPTION )
-    CHECK( Rating, RATING )
-    CHECK( Date, DATE )
-    CHECK( URL, URL )
-    CHECK( Language, LANGUAGE )
-#endif
-    CHECK( ArtworkURL, ART_URL )
-
-    return i_meta;
 }

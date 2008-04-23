@@ -258,12 +258,6 @@ static inline bool input_item_IsPreparsed( input_item_t *p_i )
     return p_i->p_meta ? p_i->p_meta->i_status & ITEM_PREPARSED : false ;
 }
 
-static inline bool input_item_IsMetaFetched( input_item_t *p_i )
-{
-    return p_i->p_meta ? p_i->p_meta->i_status & ITEM_META_FETCHED : false ;
-}
-
-
 static inline bool input_item_IsArtFetched( input_item_t *p_i )
 {
     return p_i->p_meta ? p_i->p_meta->i_status & ITEM_ART_FETCHED : false ;

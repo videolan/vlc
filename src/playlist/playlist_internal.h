@@ -44,20 +44,13 @@ struct playlist_preparse_t
     input_item_t  **pp_waiting;
 };
 
-typedef struct preparse_item_t
-{
-    input_item_t *p_item;
-    bool   b_fetch_art;
-} preparse_item_t;
-
 struct playlist_fetcher_t
 {
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
     int             i_art_policy;
-    bool      b_fetch_meta;
     int             i_waiting;
-    preparse_item_t *p_waiting;
+    input_item_t    **pp_waiting;
 
     DECL_ARRAY(playlist_album_t) albums;
 };

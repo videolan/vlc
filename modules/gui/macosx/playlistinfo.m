@@ -78,8 +78,8 @@ static VLCInfo *_o_sharedInstance = nil;
     /* constants defined in vlc_meta.h */
     [o_genre_lbl setStringValue: _NS(VLC_META_GENRE)];
     [o_copyright_lbl setStringValue: _NS(VLC_META_COPYRIGHT)];
-    [o_collection_lbl setStringValue: _NS(VLC_META_COLLECTION)];
-    [o_seqNum_lbl setStringValue: _NS(VLC_META_SEQ_NUM)];
+    [o_collection_lbl setStringValue: _NS(VLC_META_ALBUM)];
+    [o_seqNum_lbl setStringValue: _NS(VLC_META_TRACK_NUMBER)];
     [o_description_lbl setStringValue: _NS(VLC_META_DESCRIPTION)];
     [o_date_lbl setStringValue: _NS(VLC_META_DATE)];
     [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];

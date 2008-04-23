@@ -49,7 +49,6 @@
  * Module entry points
  *****************************************************************************/
 int E_(FindArt)( vlc_object_t * );
-int E_(FindMeta)( vlc_object_t * );
 
 int E_(Import_LuaPlaylist)( vlc_object_t * );
 void E_(Close_LuaPlaylist)( vlc_object_t * );

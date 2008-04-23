@@ -653,10 +653,6 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
                     input_item_SetArtist( p_item, psz_value );
-                    input_ItemAddInfo( p_item,
-                                        _(VLC_META_INFO_CAT),
-                                        _(VLC_META_ARTIST),
-                                        "%s", psz_value );
                 }
             }
             else if( !strcasecmp( psz_name, "title" ) )

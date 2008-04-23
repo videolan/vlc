@@ -93,9 +93,7 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
         return;
     }
     p_playlist->p_fetcher->i_waiting = 0;
-    p_playlist->p_fetcher->p_waiting = NULL;
-    p_playlist->p_fetcher->b_fetch_meta = var_CreateGetInteger( p_playlist,
-                                                                 "fetch-meta" );
+    p_playlist->p_fetcher->pp_waiting = NULL;
     p_playlist->p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist,
                                                                 "album-art" );
 
@@ -203,5 +201,5 @@ static void PreparseDestructor( vlc_object_t * p_this )
 static void FetcherDestructor( vlc_object_t * p_this )
 {
     playlist_fetcher_t * p_fetcher = (playlist_fetcher_t *)p_this;
-    free( p_fetcher->p_waiting );
+    free( p_fetcher->pp_waiting );
 }
