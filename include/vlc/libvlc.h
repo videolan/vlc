@@ -219,7 +219,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_new_as_node(
  * The options are detailed in vlc --long-help, for instance "--sout-all"
  *
  * \param p_instance the instance
- * \param psz_mrl the MRL to read
+ * \param ppsz_options the options (as a string)
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_add_option(
@@ -242,7 +242,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t * );
  * Read the meta of the media.
  *
  * \param p_meta_desc the media to read
- * \param p_meta_desc the meta to read
+ * \param e_meta_desc the meta to read
  * \param p_e an initialized exception pointer
  * \return the media's meta
  */
@@ -439,7 +439,7 @@ VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi, l
 /**
  * Toggle fullscreen status on video output.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_player_t *, libvlc_exception_t * );
@@ -447,7 +447,7 @@ VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_player_t *, libvlc_ex
 /**
  * Enable or disable fullscreen on a video output.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param b_fullscreen boolean for fullscreen status
  * \param p_e an initialized exception pointer
  */
@@ -456,7 +456,7 @@ VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_media_player_t *, int, libvlc_
 /**
  * Get current fullscreen status.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the fullscreen status (boolean)
  */
@@ -465,7 +465,7 @@ VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_media_player_t *, libvlc_except
 /**
  * Get current video height.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the video height
  */
@@ -474,7 +474,7 @@ VLC_PUBLIC_API int libvlc_video_get_height( libvlc_media_player_t *, libvlc_exce
 /**
  * Get current video width.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the video width
  */
@@ -483,7 +483,7 @@ VLC_PUBLIC_API int libvlc_video_get_width( libvlc_media_player_t *, libvlc_excep
 /**
  * Get current video aspect ratio.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the video aspect ratio
  */
@@ -492,7 +492,7 @@ VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *, lib
 /**
  * Set new video aspect ratio.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param psz_aspect new video aspect-ratio
  * \param p_e an initialized exception pointer
  */
@@ -501,7 +501,7 @@ VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *, char
 /**
  * Get current video subtitle.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the video subtitle selected
  */
@@ -510,7 +510,7 @@ VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_media_player_t *, libvlc_excepti
 /**
  * Set new video subtitle.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param i_spu new video subtitle to select
  * \param p_e an initialized exception pointer
  */
@@ -519,7 +519,7 @@ VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_player_t *, int , libvlc_
 /**
  * Get current crop filter geometry.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the crop filter geometry
  */
@@ -528,7 +528,7 @@ VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_player_t *, li
 /**
  * Set new crop filter geometry.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param psz_geometry new crop filter geometry
  * \param p_e an initialized exception pointer
  */
@@ -537,7 +537,7 @@ VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_player_t *, cha
 /**
  * Toggle teletext transparent status on video output.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t *, libvlc_exception_t * );
@@ -545,7 +545,7 @@ VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t *, libvlc_exce
 /**
  * Get current teletext page requested.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  * \return the current teletext page requested.
  */
@@ -554,7 +554,7 @@ VLC_PUBLIC_API int libvlc_video_get_teletext( libvlc_media_player_t *, libvlc_ex
 /**
  * Set new teletext page to retrieve.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param i_page teletex page number requested
  * \param p_e an initialized exception pointer
  */
@@ -566,7 +566,7 @@ VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int, lib
  * If i_width AND i_height is 0, original size is used.
  * If i_width XOR i_height is 0, original aspect-ratio is preserved.
  *
- * \param p_input the input
+ * \param p_mediaplayer the media player
  * \param psz_filepath the path where to save the screenshot to
  * \param i_width the snapshot's width
  * \param i_height the snapshot's height
