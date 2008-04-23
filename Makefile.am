@@ -291,7 +291,7 @@ libvlc:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
 
 core:
-	cd src && $(MAKE) $(AM_MAKEFLAGS) vlc
+	cd src && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
 
 .PHONY: libvlc core
 
