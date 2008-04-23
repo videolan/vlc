@@ -101,7 +101,7 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    WaitForSingleObject( p_mutex->mutex, INFINITE );
+    WaitForSingleObject( *p_mutex, INFINITE );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     acquire_sem( p_mutex->lock );
@@ -136,7 +136,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    ReleaseMutex( p_mutex->mutex );
+    ReleaseMutex( *p_mutex );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     release_sem( p_mutex->lock );
@@ -232,7 +232,7 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
 
     /* Increase our wait count */
     p_condvar->i_waiting_threads++;
-    SignalObjectAndWait( p_mutex->mutex, p_condvar->event, INFINITE, FALSE );
+    SignalObjectAndWait( *p_mutex, p_condvar->event, INFINITE, FALSE );
     p_condvar->i_waiting_threads--;
 
     /* Reacquire the mutex before returning. */
@@ -299,7 +299,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
     /* Increase our wait count */
     p_condvar->i_waiting_threads++;
-    result = SignalObjectAndWait( p_mutex->mutex, p_condvar->event,
+    result = SignalObjectAndWait( *p_mutex, p_condvar->event,
                                   delay_ms, FALSE );
     p_condvar->i_waiting_threads--;
 

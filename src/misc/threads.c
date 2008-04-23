@@ -229,8 +229,8 @@ int __vlc_mutex_init( vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined( WIN32 )
-    p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
-    return ( p_mutex->mutex != NULL ? 0 : 1 );
+    *p_mutex = CreateMutex( 0, FALSE, 0 );
+    return (*p_mutex != NULL) ? 0 : ENOMEM;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     /* check the arguments and whether it's already been initialized */
@@ -280,8 +280,8 @@ int __vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
 #if defined( WIN32 )
     /* Create mutex returns a recursive mutex */
-    p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
-    return ( p_mutex->mutex != NULL ? 0 : 1 );
+    *p_mutex = CreateMutex( 0, FALSE, 0 );
+    return (*p_mutex != NULL) ? 0 : ENOMEM;
 #elif defined( LIBVLC_USE_PTHREAD )
     pthread_mutexattr_t attr;
     int                 i_result;
@@ -318,7 +318,7 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    CloseHandle( p_mutex->mutex );
+    CloseHandle( *p_mutex );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex->init == 9999 )
@@ -417,7 +417,7 @@ int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
 
 #if defined( HAVE_KERNEL_SCHEDULER_H )
 # error Unimplemented!
-#elif defined( UNDER_CE ) || defined( WIN32 )
+#elif defined( UNDER_CE )
 #elif defined( WIN32 )
     *p_tls = TlsAlloc();
     i_ret = (*p_tls == INVALID_HANDLE_VALUE) ? EAGAIN : 0;

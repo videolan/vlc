@@ -128,10 +128,7 @@ typedef struct
 
 typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT) ( HANDLE, HANDLE, DWORD, BOOL );
 
-typedef struct
-{
-    HANDLE              mutex;
-} vlc_mutex_t;
+typedef HANDLE  vlc_mutex_t;
 
 typedef struct
 {
