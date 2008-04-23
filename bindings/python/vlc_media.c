@@ -191,7 +191,7 @@ vlcMediaDescriptor_get_meta( PyObject *self, PyObject *args )
     }
     if( i_index < 0 )
     {
-        PyObject *py_exc = vlcInstance_Exception;
+        PyObject *py_exc = vlc_Exception;
         PyErr_SetString( py_exc, "Unknown meta attribute" );
         return NULL;
     }

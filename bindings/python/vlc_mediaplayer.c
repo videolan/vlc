@@ -467,7 +467,7 @@ vlcMediaInstance_set_media( PyObject *self, PyObject *args )
     }
     else
     {
-        PyObject *py_exc = vlcInstance_Exception;
+        PyObject *py_exc = vlc_Exception;
         PyErr_SetString( py_exc, "vlc.MediaDescriptor parameter needed" );
         return NULL;
     }
