@@ -50,17 +50,6 @@ static vlc_object_t *p_root;
 
 #if defined( UNDER_CE )
 #elif defined( WIN32 )
-
-/*
-** On Windows 9x/Me you can use a fast but incorrect condition variables
-** implementation (more precisely there is a possibility for a race
-** condition to happen).
-** However it is possible to use slower alternatives which are more robust.
-** Currently you can choose between implementation 0 (which is the
-** fastest but slightly incorrect), 1 (default) and 2.
-*/
-static int i_win9x_cv = 1;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( LIBVLC_USE_PTHREAD )
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -136,11 +125,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
      * hope nothing wrong happens. */
 #if defined( UNDER_CE )
 #elif defined( WIN32 )
-    if( IsDebuggerPresent() )
-    {
-        /* SignalObjectAndWait() is problematic under a debugger */
-        i_win9x_cv = 1;
-    }
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_lock( &once_mutex );
@@ -334,10 +318,7 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( p_mutex->mutex )
-        CloseHandle( p_mutex->mutex );
-    else
-        DeleteCriticalSection( &p_mutex->csection );
+    CloseHandle( p_mutex->mutex );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex->init == 9999 )
@@ -357,7 +338,7 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
  *****************************************************************************/
 int __vlc_cond_init( vlc_cond_t *p_condvar )
 {
-#if defined( UNDER_CE )
+#if defined( UNDER_CE ) || defined( WIN32 )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
@@ -366,22 +347,6 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
                                     FALSE,  /* auto-reset event */
                                     FALSE,  /* start non-signaled */
                                     NULL ); /* unnamed */
-    return !p_condvar->event;
-
-#elif defined( WIN32 )
-    /* Initialize counter */
-    p_condvar->i_waiting_threads = 0;
-
-    /* Misc init */
-    p_condvar->i_win9x_cv = i_win9x_cv;
-
-    /* Create an auto-reset event. */
-    p_condvar->event = CreateEvent( NULL,   /* no security */
-                                    FALSE,  /* auto-reset event */
-                                    FALSE,  /* start non-signaled */
-                                    NULL ); /* unnamed */
-
-    p_condvar->semaphore = NULL;
     return !p_condvar->event;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
@@ -428,24 +393,10 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
  *****************************************************************************/
 void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar )
 {
-#if defined( UNDER_CE )
+#if defined( UNDER_CE ) || defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
     CloseHandle( p_condvar->event );
-
-#elif defined( WIN32 )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
-
-    if( !p_condvar->semaphore )
-        CloseHandle( p_condvar->event );
-    else
-    {
-        CloseHandle( p_condvar->event );
-        CloseHandle( p_condvar->semaphore );
-    }
-
-    if( p_condvar->semaphore != NULL )
-        DeleteCriticalSection( &p_condvar->csection );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;

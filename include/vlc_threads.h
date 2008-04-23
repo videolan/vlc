@@ -130,21 +130,13 @@ typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT) ( HANDLE, HANDLE, DWORD, BOOL );
 
 typedef struct
 {
-    /* WinNT/2K/XP implementation */
     HANDLE              mutex;
-    /* Win95/98/ME implementation */
-    CRITICAL_SECTION    csection;
 } vlc_mutex_t;
 
 typedef struct
 {
     volatile int        i_waiting_threads;
-    /* WinNT/2K/XP implementation */
     HANDLE              event;
-    /* Win95/98/ME implementation */
-    HANDLE              semaphore;
-    CRITICAL_SECTION    csection;
-    int                 i_win9x_cv;
 } vlc_cond_t;
 
 typedef DWORD   vlc_threadvar_t;

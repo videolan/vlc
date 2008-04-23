@@ -101,10 +101,7 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( p_mutex->mutex )
-        WaitForSingleObject( p_mutex->mutex, INFINITE );
-    else
-        EnterCriticalSection( &p_mutex->csection );
+    WaitForSingleObject( p_mutex->mutex, INFINITE );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     acquire_sem( p_mutex->lock );
@@ -139,10 +136,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( p_mutex->mutex )
-        ReleaseMutex( p_mutex->mutex );
-    else
-        LeaveCriticalSection( &p_mutex->csection );
+    ReleaseMutex( p_mutex->mutex );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     release_sem( p_mutex->lock );
@@ -175,55 +169,16 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
 static inline void __vlc_cond_signal( const char * psz_file, int i_line,
                                       vlc_cond_t *p_condvar )
 {
-#if defined( UNDER_CE )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
-
-    PulseEvent( p_condvar->event );
-
-#elif defined( WIN32 )
+#if defined( UNDER_CE ) || defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
     /* Release one waiting thread if one is available. */
     /* For this trick to work properly, the vlc_cond_signal must be surrounded
      * by a mutex. This will prevent another thread from stealing the signal */
-    if( !p_condvar->semaphore )
-    {
-        /* PulseEvent() only works if none of the waiting threads is suspended.
-         * This is particularily problematic under a debug session.
-         * as documented in http://support.microsoft.com/kb/q173260/ */
-        PulseEvent( p_condvar->event );
-    }
-    else if( p_condvar->i_win9x_cv == 1 )
-    {
-        /* Wait for the gate to be open */
-        WaitForSingleObject( p_condvar->event, INFINITE );
-
-        if( p_condvar->i_waiting_threads )
-        {
-            /* Using a semaphore exposes us to a race condition. It is
-             * possible for another thread to start waiting on the semaphore
-             * just after we signaled it and thus steal the signal.
-             * We have to prevent new threads from entering the cond_wait(). */
-            ResetEvent( p_condvar->event );
-
-            /* A semaphore is used here because Win9x doesn't have
-             * SignalObjectAndWait() and thus a race condition exists
-             * during the time we release the mutex and the time we start
-             * waiting on the event (more precisely, the signal can sometimes
-             * be missed by the waiting thread if we use PulseEvent()). */
-            ReleaseSemaphore( p_condvar->semaphore, 1, 0 );
-        }
-    }
-    else
-    {
-        if( p_condvar->i_waiting_threads )
-        {
-            ReleaseSemaphore( p_condvar->semaphore, 1, 0 );
-
-            /* Wait for the last thread to be awakened */
-            WaitForSingleObject( p_condvar->event, INFINITE );
-        }
-    }
+    /* PulseEvent() only works if none of the waiting threads is suspended.
+     * This is particularily problematic under a debug session.
+     * as documented in http://support.microsoft.com/kb/q173260/ */
+    PulseEvent( p_condvar->event );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     while( p_condvar->thread != -1 )
@@ -275,71 +230,10 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
 #elif defined( WIN32 )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( !p_condvar->semaphore )
-    {
-        /* Increase our wait count */
-        p_condvar->i_waiting_threads++;
-
-        if( p_mutex->mutex )
-        {
-            SignalObjectAndWait( p_mutex->mutex, p_condvar->event,
-                                 INFINITE, FALSE );
-        }
-        else
-        {
-            LeaveCriticalSection( &p_mutex->csection );
-            WaitForSingleObject( p_condvar->event, INFINITE );
-        }
-
-        p_condvar->i_waiting_threads--;
-    }
-    else if( p_condvar->i_win9x_cv == 1 )
-    {
-        int i_waiting_threads;
-
-        /* Wait for the gate to be open */
-        WaitForSingleObject( p_condvar->event, INFINITE );
-
-        /* Increase our wait count */
-        p_condvar->i_waiting_threads++;
-
-        LeaveCriticalSection( &p_mutex->csection );
-        WaitForSingleObject( p_condvar->semaphore, INFINITE );
-
-        /* Decrement and test must be atomic */
-        EnterCriticalSection( &p_condvar->csection );
-
-        /* Decrease our wait count */
-        i_waiting_threads = --p_condvar->i_waiting_threads;
-
-        LeaveCriticalSection( &p_condvar->csection );
-
-        /* Reopen the gate if we were the last waiting thread */
-        if( !i_waiting_threads )
-            SetEvent( p_condvar->event );
-    }
-    else
-    {
-        int i_waiting_threads;
-
-        /* Increase our wait count */
-        p_condvar->i_waiting_threads++;
-
-        LeaveCriticalSection( &p_mutex->csection );
-        WaitForSingleObject( p_condvar->semaphore, INFINITE );
-
-        /* Decrement and test must be atomic */
-        EnterCriticalSection( &p_condvar->csection );
-
-        /* Decrease our wait count */
-        i_waiting_threads = --p_condvar->i_waiting_threads;
-
-        LeaveCriticalSection( &p_condvar->csection );
-
-        /* Signal that the last waiting thread just went through */
-        if( !i_waiting_threads )
-            SetEvent( p_condvar->event );
-    }
+    /* Increase our wait count */
+    p_condvar->i_waiting_threads++;
+    SignalObjectAndWait( p_mutex->mutex, p_condvar->event, INFINITE, FALSE );
+    p_condvar->i_waiting_threads--;
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
@@ -403,79 +297,11 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     if( delay_ms < 0 )
         delay_ms = 0;
 
-    if( !p_condvar->semaphore )
-    {
-        /* Increase our wait count */
-        p_condvar->i_waiting_threads++;
-
-        if( p_mutex->mutex )
-        {
-            result = SignalObjectAndWait( p_mutex->mutex, p_condvar->event,
-                                          delay_ms, FALSE );
-        }
-        else
-        {
-            LeaveCriticalSection( &p_mutex->csection );
-            result = WaitForSingleObject( p_condvar->event, delay_ms );
-        }
-
-        p_condvar->i_waiting_threads--;
-    }
-    else if( p_condvar->i_win9x_cv == 1 )
-    {
-        int i_waiting_threads;
-
-        /* Wait for the gate to be open */
-        result = WaitForSingleObject( p_condvar->event, delay_ms );
-
-        /* Increase our wait count */
-        p_condvar->i_waiting_threads++;
-
-        LeaveCriticalSection( &p_mutex->csection );
-        if( !result )
-        {
-            /* recaculate remaining delay */
-            delay_ms = (deadline - mdate())/1000;
-            if( delay_ms < 0 )
-                delay_ms = 0;
-
-            result = WaitForSingleObject( p_condvar->semaphore, delay_ms );
-        }
-
-        /* Decrement and test must be atomic */
-        EnterCriticalSection( &p_condvar->csection );
-
-        /* Decrease our wait count */
-        i_waiting_threads = --p_condvar->i_waiting_threads;
-
-        LeaveCriticalSection( &p_condvar->csection );
-
-        /* Reopen the gate if we were the last waiting thread */
-        if( !i_waiting_threads )
-            SetEvent( p_condvar->event );
-    }
-    else
-    {
-        int i_waiting_threads;
-
-        /* Increase our wait count */
-        p_condvar->i_waiting_threads++;
-
-        LeaveCriticalSection( &p_mutex->csection );
-        result = WaitForSingleObject( p_condvar->semaphore, delay_ms );
-
-        /* Decrement and test must be atomic */
-        EnterCriticalSection( &p_condvar->csection );
-
-        /* Decrease our wait count */
-        i_waiting_threads = --p_condvar->i_waiting_threads;
-
-        LeaveCriticalSection( &p_condvar->csection );
-
-        /* Signal that the last waiting thread just went through */
-        if( !i_waiting_threads )
-            SetEvent( p_condvar->event );
-    }
+    /* Increase our wait count */
+    p_condvar->i_waiting_threads++;
+    result = SignalObjectAndWait( p_mutex->mutex, p_condvar->event,
+                                  delay_ms, FALSE );
+    p_condvar->i_waiting_threads--;
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
