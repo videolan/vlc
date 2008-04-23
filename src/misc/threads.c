@@ -52,13 +52,6 @@ static vlc_object_t *p_root;
 #elif defined( WIN32 )
 
 /*
-** On Windows NT/2K/XP we use a slow mutex implementation but which
-** allows us to correctly implement condition variables.
-** You can also use the faster Win9x implementation but you might
-** experience problems with it.
-*/
-static bool          b_fast_mutex = false;
-/*
 ** On Windows 9x/Me you can use a fast but incorrect condition variables
 ** implementation (more precisely there is a possibility for a race
 ** condition to happen).
@@ -146,7 +139,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
     if( IsDebuggerPresent() )
     {
         /* SignalObjectAndWait() is problematic under a debugger */
-        b_fast_mutex = true;
         i_win9x_cv = 1;
     }
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
@@ -253,17 +245,8 @@ int __vlc_mutex_init( vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined( WIN32 )
-    if( !b_fast_mutex )
-    {
-        p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
-        return ( p_mutex->mutex != NULL ? 0 : 1 );
-    }
-    else
-    {
-        p_mutex->mutex = NULL;
-        InitializeCriticalSection( &p_mutex->csection );
-        return 0;
-    }
+    p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
+    return ( p_mutex->mutex != NULL ? 0 : 1 );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     /* check the arguments and whether it's already been initialized */
@@ -392,35 +375,14 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
     /* Misc init */
     p_condvar->i_win9x_cv = i_win9x_cv;
 
-    if( !b_fast_mutex || p_condvar->i_win9x_cv == 0 )
-    {
-        /* Create an auto-reset event. */
-        p_condvar->event = CreateEvent( NULL,   /* no security */
-                                        FALSE,  /* auto-reset event */
-                                        FALSE,  /* start non-signaled */
-                                        NULL ); /* unnamed */
+    /* Create an auto-reset event. */
+    p_condvar->event = CreateEvent( NULL,   /* no security */
+                                    FALSE,  /* auto-reset event */
+                                    FALSE,  /* start non-signaled */
+                                    NULL ); /* unnamed */
 
-        p_condvar->semaphore = NULL;
-        return !p_condvar->event;
-    }
-    else
-    {
-        p_condvar->semaphore = CreateSemaphore( NULL,       /* no security */
-                                                0,          /* initial count */
-                                                0x7fffffff, /* max count */
-                                                NULL );     /* unnamed */
-
-        if( p_condvar->i_win9x_cv == 1 )
-            /* Create a manual-reset event initially signaled. */
-            p_condvar->event = CreateEvent( NULL, TRUE, TRUE, NULL );
-        else
-            /* Create a auto-reset event. */
-            p_condvar->event = CreateEvent( NULL, FALSE, FALSE, NULL );
-
-        InitializeCriticalSection( &p_condvar->csection );
-
-        return !p_condvar->semaphore || !p_condvar->event;
-    }
+    p_condvar->semaphore = NULL;
+    return !p_condvar->event;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( !p_condvar )
