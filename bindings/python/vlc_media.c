@@ -179,7 +179,7 @@ static PyMethodDef vlcMedia_methods[] =
       "is_preparsed() -> int" },
     { "get_meta", vlcMedia_get_meta, METH_VARARGS,
       "get_meta(str) -> str   Read the meta of the media." },
-    
+
     { NULL }  /* Sentinel */
 };
 

@@ -302,12 +302,12 @@ vlcInstance_vlm_add_broadcast( PyObject *self, PyObject *args, PyObject *kwds )
                       &psz_input, &psz_output,
                       &py_options, &i_enable, &i_loop ) )
         return NULL;
- 
+
     if( py_options )
     {
         i_size = pyoptions_to_args( py_options, &ppsz_args );
     }
- 
+
     LIBVLC_TRY;
     libvlc_vlm_add_broadcast( LIBVLC_INSTANCE->p_instance,
                               psz_name, psz_input, psz_output,
@@ -340,7 +340,7 @@ vlcInstance_vlm_set_enabled( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     char* psz_name;
     int i_enabled;
- 
+
     if( !PyArg_ParseTuple( args, "si", &psz_name, &i_enabled ) )
         return NULL;
 
@@ -357,7 +357,7 @@ vlcInstance_vlm_set_output( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     char* psz_name;
     char* psz_output;
- 
+
     if( !PyArg_ParseTuple( args, "ss", &psz_name, &psz_output ) )
         return NULL;
 
@@ -374,7 +374,7 @@ vlcInstance_vlm_set_input( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     char* psz_name;
     char* psz_input;
- 
+
     if( !PyArg_ParseTuple( args, "ss", &psz_name, &psz_input ) )
         return NULL;
 
@@ -391,7 +391,7 @@ vlcInstance_vlm_add_input( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     char* psz_name;
     char* psz_input;
- 
+
     if( !PyArg_ParseTuple( args, "ss", &psz_name, &psz_input ) )
         return NULL;
 
@@ -408,7 +408,7 @@ vlcInstance_vlm_set_loop( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     char* psz_name;
     int i_loop;
- 
+
     if( !PyArg_ParseTuple( args, "si", &psz_name, &i_loop ) )
         return NULL;
 
@@ -439,12 +439,12 @@ vlcInstance_vlm_change_media( PyObject *self, PyObject *args, PyObject *kwds )
                       &psz_input, &psz_output,
                       &py_options, &i_enable, &i_loop ) )
         return NULL;
- 
+
     if( py_options )
     {
         i_size = pyoptions_to_args( py_options, &ppsz_args );
     }
- 
+
     LIBVLC_TRY;
     libvlc_vlm_change_media( LIBVLC_INSTANCE->p_instance,
                               psz_name, psz_input, psz_output,
@@ -460,7 +460,7 @@ vlcInstance_vlm_play_media( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     char* psz_name;
- 
+
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
 
@@ -492,7 +492,7 @@ vlcInstance_vlm_pause_media( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     char* psz_name;
- 
+
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
 
@@ -509,7 +509,7 @@ vlcInstance_vlm_seek_media( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     char* psz_name;
     float f_percentage;
- 
+
     if( !PyArg_ParseTuple( args, "sf", &psz_name, &f_percentage ) )
         return NULL;
 

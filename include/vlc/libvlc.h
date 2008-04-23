@@ -291,7 +291,7 @@ VLC_PUBLIC_API void *
  * @{
  */
 
-/** 
+/**
  * Create an empty Media Player object
  *
  * \param p_libvlc_instance the libvlc instance in which the Media Player
@@ -328,7 +328,7 @@ VLC_PUBLIC_API void libvlc_media_player_retain( libvlc_media_player_t * );
 VLC_PUBLIC_API void libvlc_media_player_set_media( libvlc_media_player_t *, libvlc_media_t *, libvlc_exception_t * );
 
 /**
- * Get the media used by the media_player. 
+ * Get the media used by the media_player.
  *
  * \param p_mi the Media Player
  * \param p_e an initialized exception pointer
@@ -347,7 +347,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_play
 VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
- * Play 
+ * Play
  *
  * \param p_mi the Media Player
  * \param p_e an initialized exception pointer
@@ -355,7 +355,7 @@ VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libv
 VLC_PUBLIC_API void libvlc_media_player_play ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
- * Pause 
+ * Pause
  *
  * \param p_mi the Media Player
  * \param p_e an initialized exception pointer
@@ -363,7 +363,7 @@ VLC_PUBLIC_API void libvlc_media_player_play ( libvlc_media_player_t *, libvlc_e
 VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
- * Stop 
+ * Stop
  *
  * \param p_mi the Media Player
  * \param p_e an initialized exception pointer

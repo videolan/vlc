@@ -73,11 +73,11 @@ libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_
         if( to == mediacontrol_SampleCount )
         {
             double f_fps;
-	    libvlc_exception_t ex;
-	    libvlc_exception_init( &ex );
+            libvlc_exception_t ex;
+            libvlc_exception_init( &ex );
 
-	    f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
-	    if( f_fps < 0 )
+            f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
+            if( f_fps < 0 )
                 return 0;
             else
                 return( value * f_fps / 1000.0 );
@@ -91,7 +91,7 @@ libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_
         double f_fps;
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
-        
+
         f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
         if( f_fps < 0 )
             return 0;
@@ -121,7 +121,7 @@ libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_
 /* Converts a mediacontrol_Position into a time in microseconds in
    movie clock time */
 libvlc_time_t
-private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_player, 
+private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_player,
                                            const mediacontrol_Position * pos )
 {
     switch( pos->origin )
@@ -215,7 +215,7 @@ mediacontrol_Exception*
 mediacontrol_exception_create( void )
 {
     mediacontrol_Exception* exception;
- 
+
     exception = ( mediacontrol_Exception* )malloc( sizeof( mediacontrol_Exception ) );
     mediacontrol_exception_init( exception );
     return exception;

@@ -46,7 +46,7 @@ vlcMODINIT_FUNC
 initvlc( void )
 {
     PyObject* p_module;
-    
+
     /* vlcMediaPlayer_Type.tp_new = PyType_GenericNew; */
     vlcMediaPlayer_Type.tp_alloc = PyType_GenericAlloc;
     /* vlcMedia_Type.tp_new = PyType_GenericNew; */
@@ -160,7 +160,7 @@ initvlc( void )
                              mediacontrol_EndStatus );
     PyModule_AddIntConstant( p_module, "UndefinedStatus",
                              mediacontrol_UndefinedStatus );
-    
+
 }
 
 /* Horrible hack... Please do not look.  Temporary workaround for the

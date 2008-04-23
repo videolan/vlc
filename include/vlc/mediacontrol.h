@@ -218,7 +218,7 @@ VLC_PUBLIC_API void mediacontrol_set_mrl( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API char * mediacontrol_get_mrl( mediacontrol_Instance *self,
-					    mediacontrol_Exception *exception );
+                                            mediacontrol_Exception *exception );
 
 /*****************************************************************************
  * A/V functions

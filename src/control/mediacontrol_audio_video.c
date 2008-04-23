@@ -205,10 +205,10 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         mtime_t i_now = mdate();
 
         i_duration = 1000 * private_mediacontrol_unit_convert(
-							      self->p_media_player,
-							      end->key,
-							      mediacontrol_MediaTime,
-							      end->value );
+                                                              self->p_media_player,
+                                                              end->key,
+                                                              mediacontrol_MediaTime,
+                                                              end->value );
 
         mediacontrol_showtext( p_vout, DEFAULT_CHAN, psz_message, NULL,
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 0, 0,

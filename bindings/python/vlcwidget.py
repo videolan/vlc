@@ -44,7 +44,7 @@ class DecoratedVLCWidget(gtk.VBox):
     VLC widget decorated with a player control toolbar.
 
     Its player can be controlled through the 'player' attribute, which
-    is a MediaControl instance.    
+    is a MediaControl instance.
     """
     def __init__(self, *p):
         gtk.VBox.__init__(self)
@@ -58,7 +58,7 @@ class DecoratedVLCWidget(gtk.VBox):
         """Return a player control toolbar
         """
         tb=gtk.Toolbar()
-        tb.set_style(gtk.TOOLBAR_ICONS) 
+        tb.set_style(gtk.TOOLBAR_ICONS)
 
         def on_play(b):
             self.player.start(0)
@@ -77,7 +77,7 @@ class DecoratedVLCWidget(gtk.VBox):
              on_play),
             (_("Pause"), _("Pause"), gtk.STOCK_MEDIA_PAUSE,
              on_pause),
-            (_("Stop"), _("Stop"), gtk.STOCK_MEDIA_STOP, 
+            (_("Stop"), _("Stop"), gtk.STOCK_MEDIA_STOP,
              on_stop),
             )
 
@@ -93,7 +93,7 @@ class VideoPlayer:
     """
     def __init__(self):
         self.vlc = DecoratedVLCWidget()
-        
+
     def main(self, fname):
         self.vlc.player.playlist_add_item(fname)
         self.popup()

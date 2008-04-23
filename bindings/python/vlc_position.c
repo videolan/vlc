@@ -31,7 +31,7 @@ PyPosition_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
     PyPosition *self;
     static char *kwlist[] = { "value", "origin", "key", NULL};
- 
+
     self = PyObject_New( PyPosition, &PyPosition_Type );
 
     self->value=0;
