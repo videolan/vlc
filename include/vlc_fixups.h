@@ -110,7 +110,7 @@
 /* If localtime_r() is not provided, we assume localtime() uses
  * thread-specific storage. */
 # include <time.h>
-static struct tm *localtime_r (const time_t *timep, struct tm *result)
+static inline struct tm *localtime_r (const time_t *timep, struct tm *result)
 {
     struct tm *s = localtime (timep);
     if (s == NULL)
