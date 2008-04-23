@@ -111,8 +111,8 @@ static inline void __vlc_mutex_lock( const char * psz_file, int i_line,
 
 #elif defined(LIBVLC_USE_PTHREAD)
 #   define vlc_assert_locked( m ) \
-           assert (pthread_mutex_lock (&((m)->mutex)) == EDEADLK)
-    int val = pthread_mutex_lock( &p_mutex->mutex );
+           assert (pthread_mutex_lock (m) == EDEADLK)
+    int val = pthread_mutex_lock( p_mutex );
     VLC_THREAD_ASSERT ("locking mutex");
 
 #endif
@@ -148,7 +148,7 @@ static inline void __vlc_mutex_unlock( const char * psz_file, int i_line,
     release_sem( p_mutex->lock );
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    int val = pthread_mutex_unlock( &p_mutex->mutex );
+    int val = pthread_mutex_unlock( p_mutex );
     VLC_THREAD_ASSERT ("unlocking mutex");
 
 #endif
@@ -248,7 +248,7 @@ static inline void __vlc_cond_signal( const char * psz_file, int i_line,
     }
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    int val = pthread_cond_signal( &p_condvar->cond );
+    int val = pthread_cond_signal( p_condvar );
     VLC_THREAD_ASSERT ("signaling condition variable");
 
 #endif
@@ -356,7 +356,7 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
     vlc_mutex_lock( p_mutex );
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    int val = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
+    int val = pthread_cond_wait( p_condvar, p_mutex );
     VLC_THREAD_ASSERT ("waiting on condition");
 
 #endif
@@ -489,7 +489,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     lldiv_t d = lldiv( deadline, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
-    int val = pthread_cond_timedwait (&p_condvar->cond, &p_mutex->mutex, &ts);
+    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
     if (val == ETIMEDOUT)
         return ETIMEDOUT; /* this error is perfectly normal */
     VLC_THREAD_ASSERT ("timed-waiting on condition");
@@ -519,13 +519,13 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
     int i_ret;
 
 #if defined( HAVE_KERNEL_SCHEDULER_H )
-    return -1;
+    i_ret = EINVAL;
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    i_ret = ( TlsSetValue( p_tls->handle, p_value ) != 0 );
+    i_ret = TlsSetValue( *p_tls, p_value ) ? EINVAL : 0;
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    i_ret = pthread_setspecific( p_tls->handle, p_value );
+    i_ret = pthread_setspecific( *p_tls, p_value );
 
 #endif
 
@@ -537,15 +537,16 @@ static inline int vlc_threadvar_set( vlc_threadvar_t * p_tls, void *p_value )
  *****************************************************************************/
 static inline void* vlc_threadvar_get( vlc_threadvar_t * p_tls )
 {
-    void* p_ret;
+    void *p_ret;
 
 #if defined( HAVE_KERNEL_SCHEDULER_H )
     p_ret = NULL;
+
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    p_ret = TlsGetValue( p_tls->handle );
+    p_ret = TlsGetValue( *p_tls );
 
 #elif defined(LIBVLC_USE_PTHREAD)
-    p_ret = pthread_getspecific( p_tls->handle );
+    p_ret = pthread_getspecific( *p_tls );
 
 #endif
 

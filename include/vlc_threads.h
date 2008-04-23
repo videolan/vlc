@@ -38,6 +38,7 @@
                                                                 /* WinCE API */
 #elif defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
+#   include <errno.h>
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )                             /* BeOS */
 #   include <kernel/OS.h>
@@ -146,10 +147,7 @@ typedef struct
     int                 i_win9x_cv;
 } vlc_cond_t;
 
-typedef struct
-{
-    DWORD   handle;
-} vlc_threadvar_t;
+typedef DWORD   vlc_threadvar_t;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 /* This is the BeOS implementation of the vlc threads, note that the mutex is
@@ -177,19 +175,9 @@ typedef struct
 
 #else
 typedef pthread_t       vlc_thread_t;
-typedef struct
-{
-    pthread_mutex_t mutex;
-} vlc_mutex_t;
-typedef struct
-{
-    pthread_cond_t cond;
-} vlc_cond_t;
-
-typedef struct
-{
-    pthread_key_t handle;
-} vlc_threadvar_t;
+typedef pthread_mutex_t vlc_mutex_t;
+typedef pthread_cond_t  vlc_cond_t;
+typedef pthread_key_t   vlc_threadvar_t;
 
 #endif
 

@@ -287,26 +287,22 @@ int __vlc_mutex_init( vlc_mutex_t *p_mutex )
     return B_OK;
 
 #elif defined( LIBVLC_USE_PTHREAD )
+    pthread_mutexattr_t attr;
+    int                 i_result;
+
+    pthread_mutexattr_init( &attr );
+
 # ifndef NDEBUG
-    {
-        /* Create error-checking mutex to detect problems more easily. */
-        pthread_mutexattr_t attr;
-        int                 i_result;
-
-        pthread_mutexattr_init( &attr );
-#   if defined(SYS_LINUX)
-        pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
-#   else
-        pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
-#   endif
-
-        i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
-        pthread_mutexattr_destroy( &attr );
-        return( i_result );
-    }
-# endif /* NDEBUG */
-    return pthread_mutex_init( &p_mutex->mutex, NULL );
-
+    /* Create error-checking mutex to detect problems more easily. */
+#  if defined(SYS_LINUX)
+    pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
+#  else
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
+#  endif
+# endif
+    i_result = pthread_mutex_init( p_mutex, &attr );
+    pthread_mutexattr_destroy( &attr );
+    return i_result;
 #endif
 }
 
@@ -333,7 +329,7 @@ int __vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 #   endif
 # endif
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
-    i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
+    i_result = pthread_mutex_init( p_mutex, &attr );
     pthread_mutexattr_destroy( &attr );
     return( i_result );
 #else
@@ -367,7 +363,7 @@ void __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mute
     p_mutex->init = 0;
 
 #elif defined( LIBVLC_USE_PTHREAD )
-    int val = pthread_mutex_destroy( &p_mutex->mutex );
+    int val = pthread_mutex_destroy( p_mutex );
     VLC_THREAD_ASSERT ("destroying mutex");
 
 #endif
@@ -458,7 +454,7 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
     pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
 # endif
 
-    ret = pthread_cond_init (&p_condvar->cond, &attr);
+    ret = pthread_cond_init (p_condvar, &attr);
     pthread_condattr_destroy (&attr);
     return ret;
 
@@ -493,7 +489,7 @@ void __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condva
     p_condvar->init = 0;
 
 #elif defined( LIBVLC_USE_PTHREAD )
-    int val = pthread_cond_destroy( &p_condvar->cond );
+    int val = pthread_cond_destroy( p_condvar );
     VLC_THREAD_ASSERT ("destroying condition");
 
 #endif
@@ -510,11 +506,11 @@ int __vlc_threadvar_create( vlc_threadvar_t *p_tls )
 # error Unimplemented!
 #elif defined( UNDER_CE ) || defined( WIN32 )
 #elif defined( WIN32 )
-    p_tls->handle = TlsAlloc();
-    i_ret = !( p_tls->handle == 0xFFFFFFFF );
+    *p_tls = TlsAlloc();
+    i_ret = (*p_tls == INVALID_HANDLE_VALUE) ? EAGAIN : 0;
 
 #elif defined( LIBVLC_USE_PTHREAD )
-    i_ret =  pthread_key_create( &p_tls->handle, NULL );
+    i_ret =  pthread_key_create( p_tls, NULL );
 #endif
     return i_ret;
 }
