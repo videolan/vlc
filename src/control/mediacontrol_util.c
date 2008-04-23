@@ -26,11 +26,7 @@
 #endif
 
 #include <vlc/mediacontrol.h>
-
-#include <vlc_interface.h>
-#include <vlc_aout.h>
-#include <vlc_input.h>
-#include <vlc_demux.h>
+#include <vlc/libvlc.h>
 
 #include <vlc_vout.h>
 #include <vlc_osd.h>
@@ -53,19 +49,15 @@
 #    include <sys/types.h>
 #endif
 
-/* FIXME: Need to stop accessing private input structures !! */
-#include "input/input_internal.h"
-
-vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
-                                       mediacontrol_PositionKey from,
-                                       mediacontrol_PositionKey to,
-                                       vlc_int64_t value )
+libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_player,
+                                                 mediacontrol_PositionKey from,
+                                                 mediacontrol_PositionKey to,
+                                                 vlc_int64_t value )
 {
     if( to == from )
         return value;
 
-    /* For all conversions, we need data from p_input */
-    if( !p_input )
+    if( !p_media_player )
         return 0;
 
     switch( from )
@@ -73,7 +65,7 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
     case mediacontrol_MediaTime:
         if( to == mediacontrol_ByteCount )
         {
-            /* FIXME */
+            /* FIXME Unsupported */
             /* vlc < 0.8 API */
             /* return value * 50 * p_input->stream.i_mux_rate / 1000; */
             return 0;
@@ -81,8 +73,11 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
         if( to == mediacontrol_SampleCount )
         {
             double f_fps;
+	    libvlc_exception_t ex;
+	    libvlc_exception_init( &ex );
 
-            if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+	    f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
+	    if( f_fps < 0 )
                 return 0;
             else
                 return( value * f_fps / 1000.0 );
@@ -94,9 +89,11 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
     case mediacontrol_SampleCount:
     {
         double f_fps;
-
-        if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) ||
-                                f_fps < 0.1 )
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
+        
+        f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
+        if( f_fps < 0 )
             return 0;
 
         if( to == mediacontrol_ByteCount )
@@ -116,28 +113,6 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
     case mediacontrol_ByteCount:
         /* FIXME */
         return 0;
-/* vlc < 0.8 API: */
-
-//         if( p_input->stream.i_mux_rate == 0 )
-//             return 0;
-//
-//         /* Convert an offset into milliseconds. Taken from input_ext-intf.c.
-//            The 50 hardcoded constant comes from the definition of i_mux_rate :
-//            i_mux_rate : the rate we read the stream (in units of 50 bytes/s) ;
-//            0 if undef */
-//         if( to == mediacontrol_MediaTime )
-//             return ( vlc_int64_t )( 1000 * value / 50 / p_input->stream.i_mux_rate );
-//
-//         if( to == mediacontrol_SampleCount )
-//         {
-//             double f_fps;
-//             if( demux_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
-//                 return 0;
-//             else
-//                 return ( vlc_int64_t )( value * f_fps / 50 / p_input->stream.i_mux_rate );
-//         }
-        /* Cannot happen */
-        break;
     }
     /* Cannot happen */
     return 0;
@@ -145,57 +120,56 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
 
 /* Converts a mediacontrol_Position into a time in microseconds in
    movie clock time */
-vlc_int64_t
-private_mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_Position * pos )
+libvlc_time_t
+private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_player, 
+                                           const mediacontrol_Position * pos )
 {
     switch( pos->origin )
     {
     case mediacontrol_AbsolutePosition:
-        return ( 1000 * private_mediacontrol_unit_convert( p_input,
+        return ( 1000 * private_mediacontrol_unit_convert( p_media_player,
                                                    pos->key, /* from */
                                                    mediacontrol_MediaTime,  /* to */
                                                    pos->value ) );
         break;
     case mediacontrol_RelativePosition:
     {
-        vlc_int64_t l_pos;
-        vlc_value_t val;
+        libvlc_time_t l_time = 0;
+        libvlc_time_t l_pos = 0;
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
 
-        val.i_time = 0;
-        if( p_input )
-        {
-            var_Get( p_input, "time", &val );
-        }
+        l_time = libvlc_media_player_get_time( p_media_player, &ex );
+        /* Ignore exception, we will assume a 0 time value */
 
-        l_pos = 1000 * private_mediacontrol_unit_convert( p_input,
-                                                  pos->key,
-                                                  mediacontrol_MediaTime,
-                                                  pos->value );
-        return val.i_time + l_pos;
+        l_pos = 1000 * private_mediacontrol_unit_convert( p_media_player,
+                                                          pos->key,
+                                                          mediacontrol_MediaTime,
+                                                          pos->value );
+        return l_time + l_pos;
         break;
     }
     case mediacontrol_ModuloPosition:
     {
-        vlc_int64_t l_pos;
-        vlc_value_t val;
+        libvlc_time_t l_time = 0;
+        libvlc_time_t l_length = 0;
+        libvlc_time_t l_pos = 0;
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
 
-        val.i_time = 0;
-        if( p_input )
-        {
-            var_Get( p_input, "length", &val );
-        }
+        l_length = libvlc_media_player_get_length( p_media_player, &ex );
+        if( l_length <= 0 )
+            return 0;
 
-        if( val.i_time > 0)
-        {
-            l_pos = ( 1000 * private_mediacontrol_unit_convert( p_input,
-                                                        pos->key,
-                                                        mediacontrol_MediaTime,
-                                                        pos->value ) );
-        }
-        else
-            l_pos = 0;
+        l_time = libvlc_media_player_get_time( p_media_player, &ex );
+        /* Ignore exception, we will assume a 0 time value */
 
-        return l_pos % val.i_time;
+        l_pos = ( 1000 * private_mediacontrol_unit_convert( p_media_player,
+                                                            pos->key,
+                                                            mediacontrol_MediaTime,
+                                                            pos->value ) );
+
+        return ( l_time + l_pos ) % l_length;
         break;
     }
     }
@@ -223,33 +197,6 @@ mediacontrol_RGBPicture__free( mediacontrol_RGBPicture* pic )
     {
         free( pic->data );
         free( pic );
-    }
-}
-
-mediacontrol_PlaylistSeq*
-private_mediacontrol_PlaylistSeq__alloc( int size )
-{
-    mediacontrol_PlaylistSeq* ps;
-
-    ps =( mediacontrol_PlaylistSeq* )malloc( sizeof( mediacontrol_PlaylistSeq ) );
-    if( ! ps )
-        return NULL;
-
-    ps->size = size;
-    ps->data = ( char** )malloc( size * sizeof( char* ) );
-    return ps;
-}
-
-void
-mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq* ps )
-{
-    if( ps )
-    {
-        int i;
-        for( i = 0 ; i < ps->size ; i++ )
-            free( ps->data[i] );
-        free( ps->data );
-        free( ps );
     }
 }
 

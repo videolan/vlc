@@ -30,20 +30,20 @@ extern "C" {
 
 #include <vlc/vlc.h>
 #include <vlc/mediacontrol_structures.h>
-#include "libvlc_internal.h"
+#include <vlc/libvlc_structures.h>
 #include <vlc/libvlc.h>
 
 struct mediacontrol_Instance {
-    struct libvlc_instance_t * p_instance;
-    playlist_t    *p_playlist;
+    libvlc_instance_t * p_instance;
+    libvlc_media_player_t * p_media_player;
 };
 
-vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
-                           mediacontrol_PositionKey from,
-                           mediacontrol_PositionKey to,
-                           vlc_int64_t value );
-vlc_int64_t private_mediacontrol_position2microsecond( input_thread_t *p_input,
-                               const mediacontrol_Position *pos );
+libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_player,
+                                                 mediacontrol_PositionKey from,
+                                                 mediacontrol_PositionKey to,
+                                                 vlc_int64_t value );
+libvlc_time_t private_mediacontrol_position2microsecond( libvlc_media_player_t *p_media_player,
+                                                         const mediacontrol_Position *pos );
 
 /**
  * Allocate a RGBPicture structure.
@@ -52,8 +52,6 @@ vlc_int64_t private_mediacontrol_position2microsecond( input_thread_t *p_input,
 mediacontrol_RGBPicture *private_mediacontrol_RGBPicture__alloc( int datasize );
 
 mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date, char *, int);
-
-mediacontrol_PlaylistSeq *private_mediacontrol_PlaylistSeq__alloc( int size );
 
 
 #define RAISE( c, m )  if( exception ) { exception->code = c;    \

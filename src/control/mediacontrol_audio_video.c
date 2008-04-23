@@ -25,13 +25,10 @@
 # include "config.h"
 #endif
 #include "mediacontrol_internal.h"
+#include "libvlc_internal.h"
 
 #include <vlc/mediacontrol.h>
 #include <vlc/libvlc.h>
-
-#include <vlc_playlist.h>
-
-#include <vlc_aout.h>
 
 #include <vlc_vout.h>
 #include <vlc_osd.h>
@@ -60,21 +57,30 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 {
     vlc_object_t* p_cache;
     vout_thread_t* p_vout;
+    input_thread_t *p_input;
     mediacontrol_RGBPicture *p_pic = NULL;
     char path[256];
     snapshot_t *p_snapshot;
+    libvlc_exception_t ex;
 
+    libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
 
-    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
+    p_input = libvlc_get_input_thread( self->p_media_player, &ex );
+    if( ! p_input )
+    {
+        RAISE_NULL( mediacontrol_InternalException, "No input" );
+    }
+    p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
         RAISE_NULL( mediacontrol_InternalException, "No video output" );
     }
-    p_cache = vlc_object_create( self->p_playlist, VLC_OBJECT_GENERIC );
+    p_cache = vlc_object_create( p_input, VLC_OBJECT_GENERIC );
     if( p_cache == NULL )
     {
         vlc_object_release( p_vout );
+        vlc_object_release( p_input );
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     }
     snprintf( path, 255, "object:%d", p_cache->i_object_id );
@@ -89,6 +95,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     p_snapshot = ( snapshot_t* ) p_cache->p_private;
     vlc_object_unlock( p_cache );
     vlc_object_release( p_cache );
+    vlc_object_release( p_input );
 
     if( p_snapshot )
     {
@@ -110,15 +117,6 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         RAISE_NULL( mediacontrol_InternalException, "Snapshot exception" );
     }
     return p_pic;
-}
-
-mediacontrol_RGBPicture **
-mediacontrol_all_snapshots( mediacontrol_Instance *self,
-                            mediacontrol_Exception *exception )
-{
-    mediacontrol_exception_init( exception );
-
-    RAISE_NULL( mediacontrol_InternalException, "unsupported method" );
 }
 
 static
@@ -174,20 +172,29 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                            const mediacontrol_Position * end,
                            mediacontrol_Exception *exception )
 {
-    input_thread_t *p_input = NULL;
     vout_thread_t *p_vout = NULL;
     char* psz_message;
+    input_thread_t *p_input;
+    libvlc_exception_t ex;
+
+    libvlc_exception_init( &ex );
+    mediacontrol_exception_init( exception );
+
+    p_input = libvlc_get_input_thread( self->p_media_player, &ex );
+    if( ! p_input )
+    {
+        RAISE_VOID( mediacontrol_InternalException, "No input" );
+    }
+    p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    if( ! p_vout )
+    {
+        RAISE_VOID( mediacontrol_InternalException, "No video output" );
+    }
 
     psz_message = strdup( message );
     if( !psz_message )
     {
         RAISE_VOID( mediacontrol_InternalException, "no more memory" );
-    }
-
-    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( ! p_vout )
-    {
-        RAISE_VOID( mediacontrol_InternalException, "no video output" );
     }
 
     if( begin->origin == mediacontrol_RelativePosition &&
@@ -198,10 +205,10 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         mtime_t i_now = mdate();
 
         i_duration = 1000 * private_mediacontrol_unit_convert(
-                                                self->p_playlist->p_input,
-                                                end->key,
-                                                mediacontrol_MediaTime,
-                                                end->value );
+							      self->p_media_player,
+							      end->key,
+							      mediacontrol_MediaTime,
+							      end->value );
 
         mediacontrol_showtext( p_vout, DEFAULT_CHAN, psz_message, NULL,
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 0, 0,
@@ -211,22 +218,15 @@ mediacontrol_display_text( mediacontrol_Instance *self,
     {
         mtime_t i_debut, i_fin, i_now;
 
-        p_input = self->p_playlist->p_input;
-        if( ! p_input )
-        {
-            vlc_object_release( p_vout );
-            RAISE_VOID( mediacontrol_InternalException, "No input" );
-        }
-
         /* FIXME */
         /* i_now = input_ClockGetTS( p_input, NULL, 0 ); */
         i_now = mdate();
 
-        i_debut = private_mediacontrol_position2microsecond( p_input,
+        i_debut = private_mediacontrol_position2microsecond( self->p_media_player,
                                             ( mediacontrol_Position* ) begin );
         i_debut += i_now;
 
-        i_fin = private_mediacontrol_position2microsecond( p_input,
+        i_fin = private_mediacontrol_position2microsecond( self->p_media_player,
                                           ( mediacontrol_Position * ) end );
         i_fin += i_now;
 
@@ -278,7 +278,7 @@ bool mediacontrol_set_visual( mediacontrol_Instance *self,
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    libvlc_video_set_parent( self->p_instance, visual_id, &ex );
+    libvlc_media_player_set_drawable( self->p_media_player, visual_id, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
     return true;
 }
@@ -288,17 +288,12 @@ mediacontrol_get_rate( mediacontrol_Instance *self,
                mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_media_player_t* p_mi;
     int i_ret;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_mi = libvlc_playlist_get_media_player( self->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
-
-    i_ret = libvlc_media_player_get_rate( p_mi, &ex );
-    libvlc_media_player_release( p_mi );
+    i_ret = libvlc_media_player_get_rate( self->p_media_player, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     return i_ret / 10;
@@ -310,16 +305,11 @@ mediacontrol_set_rate( mediacontrol_Instance *self,
                mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_media_player_t* p_mi;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_mi = libvlc_playlist_get_media_player( self->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
-
-    libvlc_media_player_set_rate( p_mi, rate * 10, &ex );
-    libvlc_media_player_release( p_mi );
+    libvlc_media_player_set_rate( self->p_media_player, rate * 10, &ex );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
@@ -328,17 +318,12 @@ mediacontrol_get_fullscreen( mediacontrol_Instance *self,
                  mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_media_player_t* p_mi;
     int i_ret;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_mi = libvlc_playlist_get_media_player( self->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
-
-    i_ret = libvlc_get_fullscreen( p_mi, &ex );
-    libvlc_media_player_release( p_mi );
+    i_ret = libvlc_get_fullscreen( self->p_media_player, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     return i_ret;
@@ -350,15 +335,10 @@ mediacontrol_set_fullscreen( mediacontrol_Instance *self,
                  mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_media_player_t* p_mi;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_mi = libvlc_playlist_get_media_player( self->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
-
-    libvlc_set_fullscreen( p_mi, b_fullscreen, &ex );
-    libvlc_media_player_release( p_mi );
+    libvlc_set_fullscreen( self->p_media_player, b_fullscreen, &ex );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }

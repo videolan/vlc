@@ -131,6 +131,14 @@ VLC_PUBLIC_API libvlc_instance_t*
 mediacontrol_get_libvlc_instance( mediacontrol_Instance* self );
 
 /**
+ * Get the associated libvlc_media_player
+ * \param self: the mediacontrol instance
+ * \return a libvlc_media_player_t instance
+ */
+VLC_PUBLIC_API libvlc_media_player_t*
+mediacontrol_get_media_player( mediacontrol_Instance* self );
+
+/**
  * Get the current position
  * \param self the mediacontrol instance
  * \param an_origin the position origin
@@ -167,31 +175,25 @@ VLC_PUBLIC_API void mediacontrol_start( mediacontrol_Instance *self,
 /**
  * Pause the movie at a given position
  * \param self the mediacontrol instance
- * \param a_position a mediacontrol_Position (ignored for now)
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API void mediacontrol_pause( mediacontrol_Instance *self,
-                         const mediacontrol_Position *a_position,
                          mediacontrol_Exception *exception );
 
 /**
  * Resume the movie at a given position
  * \param self the mediacontrol instance
- * \param a_position a mediacontrol_Position (ignored for now)
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API void mediacontrol_resume( mediacontrol_Instance *self,
-                          const mediacontrol_Position *a_position,
                           mediacontrol_Exception *exception );
 
 /**
  * Stop the movie at a given position
  * \param self the mediacontrol instance
- * \param a_position a mediacontrol_Position (ignored for now)
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API void mediacontrol_stop( mediacontrol_Instance *self,
-                        const mediacontrol_Position *a_position,
                         mediacontrol_Exception *exception );
 
 /**
@@ -201,39 +203,22 @@ VLC_PUBLIC_API void mediacontrol_stop( mediacontrol_Instance *self,
 VLC_PUBLIC_API void mediacontrol_exit( mediacontrol_Instance *self );
 
 /**
- * Add a new MRL to the playlist
+ * Set the MRL to be played.
  * \param self the mediacontrol instance
  * \param psz_file the MRL
  * \param exception an initialized exception pointer
  */
-VLC_PUBLIC_API void mediacontrol_playlist_add_item( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_set_mrl( mediacontrol_Instance *self,
                                      const char* psz_file,
                                      mediacontrol_Exception *exception );
-/**
- * Clear the playlist
- * \param self the mediacontrol instance
- * \param exception an initialized exception pointer
- */
-VLC_PUBLIC_API void mediacontrol_playlist_clear( mediacontrol_Instance *self,
-                                  mediacontrol_Exception *exception );
-/**
- * Get a flattened view of the playlist
- * \param self the mediacontrol instance
- * \param exception an initialized exception pointer
- * \return a list of strings
- */
-VLC_PUBLIC_API mediacontrol_PlaylistSeq *
-  mediacontrol_playlist_get_list( mediacontrol_Instance *self,
-                                  mediacontrol_Exception *exception );
 
 /**
- * Play the next item
+ * Get the MRL to be played.
  * \param self the mediacontrol instance
  * \param exception an initialized exception pointer
  */
-VLC_PUBLIC_API void
-mediacontrol_playlist_next_item( mediacontrol_Instance *self,
-                                 mediacontrol_Exception *exception );
+VLC_PUBLIC_API char * mediacontrol_get_mrl( mediacontrol_Instance *self,
+					    mediacontrol_Exception *exception );
 
 /*****************************************************************************
  * A/V functions
@@ -249,17 +234,6 @@ VLC_PUBLIC_API mediacontrol_RGBPicture *
   mediacontrol_snapshot( mediacontrol_Instance *self,
                          const mediacontrol_Position *a_position,
                          mediacontrol_Exception *exception );
-
-/* Return a NULL terminated list */
-/**
- * Get a list of all cached snapshots (unimplemented)
- * \param self the mediacontrol instance
- * \param exception an initialized exception pointer
- * \return a NULL-terminated list of RGBpicture
- */
-VLC_PUBLIC_API mediacontrol_RGBPicture **
-  mediacontrol_all_snapshots( mediacontrol_Instance *self,
-                              mediacontrol_Exception *exception );
 
 /**
  *  Displays the message string, between "begin" and "end" positions.
