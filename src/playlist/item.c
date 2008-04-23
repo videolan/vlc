@@ -852,6 +852,10 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     if( i != -1 )
         ARRAY_REMOVE( p_playlist->all_items, i );
 
+    ARRAY_BSEARCH( p_playlist->items,->i_id, int, i_id, i );
+    if( i != -1 )
+        ARRAY_REMOVE( p_playlist->items, i );
+
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )
     {
