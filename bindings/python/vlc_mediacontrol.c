@@ -40,6 +40,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
  
     self = PyObject_New( MediaControl, &MediaControl_Type );
 
+    fprintf (stderr, "Instanciating mediacontrol\n");
     if( PyArg_ParseTuple( args, "O", &py_param ) )
     {
         if( PyObject_TypeCheck( py_param, &vlcInstance_Type ) == 1 )
@@ -108,6 +109,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 static void
 MediaControl_dealloc( PyObject *self )
 {
+    fprintf(stderr, "MC dealloc\n");
     Py_DECREF( SELF->vlc_instance );
     PyObject_DEL( self );
 }
@@ -118,6 +120,17 @@ MediaControl_get_vlc_instance( PyObject *self, PyObject *args )
     vlcInstance *p_ret;
 
     p_ret = SELF->vlc_instance;
+    Py_INCREF( p_ret );
+    return ( PyObject * )p_ret;
+}
+
+static PyObject *
+MediaControl_get_mediaplayer( PyObject *self, PyObject *args )
+{
+    vlcMediaPlayer *p_ret;
+
+    p_ret = PyObject_New( vlcMediaPlayer, &vlcMediaPlayer_Type );
+    p_ret->p_mp = mediacontrol_get_media_player( SELF->mc );
     Py_INCREF( p_ret );
     return ( PyObject * )p_ret;
 }
@@ -215,24 +228,11 @@ MediaControl_start( PyObject *self, PyObject *args )
 static PyObject *
 MediaControl_pause( PyObject *self, PyObject *args )
 {
-    mediacontrol_Position *a_position;
     mediacontrol_Exception *exception = NULL;
-    PyObject *py_pos;
-
-    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
-    {
-        /* No argument. Use a default 0 value. */
-        PyErr_Clear( );
-        py_pos = NULL;
-    }
-    a_position = position_py_to_c( py_pos );
-    if( !a_position )
-        return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_pause( SELF->mc, a_position, exception );
-    free( a_position );
+    mediacontrol_pause( SELF->mc, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -243,24 +243,11 @@ MediaControl_pause( PyObject *self, PyObject *args )
 static PyObject *
 MediaControl_resume( PyObject *self, PyObject *args )
 {
-    mediacontrol_Position *a_position;
     mediacontrol_Exception *exception = NULL;
-    PyObject *py_pos;
-
-    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
-    {
-        /* No argument. Use a default 0 value. */
-        PyErr_Clear( );
-        py_pos = NULL;
-    }
-    a_position = position_py_to_c( py_pos );
-    if( !a_position )
-        return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_start( SELF->mc, a_position, exception );
-    free( a_position );
+    mediacontrol_resume( SELF->mc, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -271,24 +258,11 @@ MediaControl_resume( PyObject *self, PyObject *args )
 static PyObject *
 MediaControl_stop( PyObject *self, PyObject *args )
 {
-    mediacontrol_Position *a_position;
     mediacontrol_Exception *exception = NULL;
-    PyObject *py_pos;
-
-    if( !PyArg_ParseTuple( args, "O", &py_pos ) )
-    {
-        /* No argument. Use a default 0 value. */
-        PyErr_Clear( );
-        py_pos = NULL;
-    }
-    a_position = position_py_to_c( py_pos );
-    if( !a_position )
-        return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_stop( SELF->mc, a_position, exception );
-    free( a_position );
+    mediacontrol_stop( SELF->mc, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -305,7 +279,7 @@ MediaControl_exit( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-MediaControl_playlist_add_item( PyObject *self, PyObject *args )
+MediaControl_set_mrl( PyObject *self, PyObject *args )
 {
     char *psz_file;
     mediacontrol_Exception *exception = NULL;
@@ -315,7 +289,7 @@ MediaControl_playlist_add_item( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_playlist_add_item( SELF->mc, psz_file, exception );
+    mediacontrol_set_mrl( SELF->mc, psz_file, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -324,49 +298,22 @@ MediaControl_playlist_add_item( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-MediaControl_playlist_clear( PyObject *self, PyObject *args )
-{
-    mediacontrol_Exception *exception = NULL;
-
-    Py_BEGIN_ALLOW_THREADS
-    MC_TRY;
-    mediacontrol_playlist_clear( SELF->mc, exception );
-    Py_END_ALLOW_THREADS
-    MC_EXCEPT;
-
-    Py_INCREF( Py_None );
-    return Py_None;
-}
-
-static PyObject *
-MediaControl_playlist_get_list( PyObject *self, PyObject *args )
+MediaControl_get_mrl( PyObject *self, PyObject *args )
 {
     PyObject *py_retval;
+    char* psz_file;
     mediacontrol_Exception *exception = NULL;
-    mediacontrol_PlaylistSeq* pl;
-    Py_ssize_t i_index;
-    Py_ssize_t i_playlist_size;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    pl = mediacontrol_playlist_get_list( SELF->mc, exception );
+    psz_file = mediacontrol_get_mrl( SELF->mc, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
-    i_playlist_size = pl->size;
-
-    py_retval = PyList_New( i_playlist_size );
-
-    for ( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
-    {
-        PyList_SetItem( py_retval, i_index,
-                        Py_BuildValue( "s", pl->data[i_index] ) );
-    }
-    mediacontrol_PlaylistSeq__free( pl );
-
+    py_retval = Py_BuildValue( "s", psz_file );
+    free( psz_file );
     return py_retval;
 }
-
 
 static PyObject *
 MediaControl_snapshot( PyObject *self, PyObject *args )
@@ -603,7 +550,9 @@ MediaControl_set_visual( PyObject *self, PyObject *args )
 static PyMethodDef MediaControl_methods[] =
 {
     { "get_vlc_instance", MediaControl_get_vlc_instance, METH_VARARGS,
-      "get_vlc_instance( ) -> Instance    Get matching vlc.Instance." },
+      "get_vlc_instance( ) -> Instance    Get embedded vlc.Instance." },
+    { "get_mediaplayer", MediaControl_get_mediaplayer, METH_VARARGS,
+      "get_mediaplayer( ) -> MediaPlayer    Get embedded vlc.MediaPlayer." },
     { "get_media_position", MediaControl_get_media_position, METH_VARARGS,
       "get_media_position( origin, key ) -> Position    Get current media position." },
     { "set_media_position", MediaControl_set_media_position, METH_VARARGS,
@@ -618,12 +567,10 @@ static PyMethodDef MediaControl_methods[] =
       "stop( Position )              Stop the player" },
     { "exit", MediaControl_exit, METH_VARARGS,
       "exit( )                     Exit the player" },
-    { "playlist_add_item", MediaControl_playlist_add_item, METH_VARARGS,
-      "playlist_add_item( str )               Add an item to the playlist" },
-    { "playlist_get_list", MediaControl_playlist_get_list, METH_VARARGS,
-      "playlist_get_list( ) -> list       Get the contents of the playlist" },
-    { "playlist_clear", MediaControl_playlist_clear, METH_VARARGS,
-      "clear( )         Clear the playlist." },
+    { "set_mrl", MediaControl_set_mrl, METH_VARARGS,
+      "set_mrl( str )               Set the file to be played" },
+    { "get_mrl", MediaControl_get_mrl, METH_VARARGS,
+      "get_mrl( ) -> str       Get the played file" },
     { "snapshot", MediaControl_snapshot, METH_VARARGS,
       "snapshot( Position ) -> dict        Take a snapshot" },
     { "display_text", MediaControl_display_text, METH_VARARGS,

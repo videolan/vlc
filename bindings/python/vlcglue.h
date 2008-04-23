@@ -78,7 +78,7 @@ PyObject *MediaControl_PositionKeyNotSupported;
 PyObject *MediaControl_PositionOriginNotSupported;
 PyObject *MediaControl_InvalidPosition;
 PyObject *MediaControl_PlaylistException;
-PyObject *vlcInstance_Exception;
+PyObject *vlc_Exception;
 
 /**********************************************************************
  * vlc.Instance Object
@@ -113,38 +113,38 @@ typedef struct
 } PyPosition;
 
 /**********************************************************************
- * vlc.MediaInstance Object
+ * vlc.MediaPlayer Object
  **********************************************************************/
 typedef struct
 {
     PyObject_HEAD
-    libvlc_media_player_t* p_mi;
-} vlcMediaInstance;
+    libvlc_media_player_t* p_mp;
+} vlcMediaPlayer;
 
 /**********************************************************************
- * vlc.MediaDescriptor Object
+ * vlc.Media Object
  **********************************************************************/
 typedef struct
 {
     PyObject_HEAD
-    libvlc_media_t* p_md;
-} vlcMediaDescriptor;
+    libvlc_media_t* p_media;
+} vlcMedia;
 
 /* Forward declarations */
 staticforward PyTypeObject MediaControl_Type;
 staticforward PyTypeObject PyPosition_Type;
 staticforward PyTypeObject vlcInstance_Type;
-staticforward PyTypeObject vlcMediaInstance_Type;
-staticforward PyTypeObject vlcMediaDescriptor_Type;
+staticforward PyTypeObject vlcMediaPlayer_Type;
+staticforward PyTypeObject vlcMedia_Type;
 
 #define LIBVLC_INSTANCE ((vlcInstance*)self)
-#define LIBVLC_MEDIAINSTANCE ((vlcMediaInstance*)self)
-#define LIBVLC_MEDIADESCRIPTOR ((vlcMediaDescriptor*)self)
+#define LIBVLC_MEDIAPLAYER ((vlcMediaPlayer*)self)
+#define LIBVLC_MEDIA ((vlcMedia*)self)
 
 #define LIBVLC_TRY libvlc_exception_init( &ex );
 
 #define LIBVLC_EXCEPT if( libvlc_exception_raised( &ex ) ) { \
-    PyObject *py_exc = vlcInstance_Exception; \
+    PyObject *py_exc = vlc_Exception; \
     PyErr_SetString( py_exc, libvlc_exception_get_message( &ex ) ); \
     return NULL; \
   }

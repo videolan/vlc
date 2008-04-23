@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_mediadescriptor.c: vlc.MediaDescriptor binding
+ * vlc_media.c: vlc.Media binding
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
@@ -23,18 +23,26 @@
 #include "vlcglue.h"
 
 /***********************************************************************
- * vlc.MediaDescriptor
+ * vlc.Media
  ***********************************************************************/
 
-static void
-vlcMediaDescriptor_dealloc( PyObject *self )
+static PyObject *
+vlcMedia_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
-    libvlc_media_release( LIBVLC_MEDIADESCRIPTOR->p_md );
+    fprintf(stderr, "vlcMedia_new called\n");
+    PyErr_SetString( PyExc_TypeError, "vlc.Media can be instanciated by itself. You should use vlc.Instance().media_new(mrl)." );
+    return NULL;
+}
+
+static void
+vlcMedia_dealloc( PyObject *self )
+{
+    libvlc_media_release( LIBVLC_MEDIA->p_media );
     PyObject_DEL( self );
 }
 
 static PyObject *
-vlcMediaDescriptor_add_option( PyObject *self, PyObject *args )
+vlcMedia_add_option( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     char* psz_options = NULL;
@@ -43,21 +51,21 @@ vlcMediaDescriptor_add_option( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_media_add_option( LIBVLC_MEDIADESCRIPTOR->p_md, psz_options, &ex);
+    libvlc_media_add_option( LIBVLC_MEDIA->p_media, psz_options, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
 }
 
 static PyObject *
-vlcMediaDescriptor_get_mrl( PyObject *self, PyObject *args )
+vlcMedia_get_mrl( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     char * psz_mrl;
     PyObject * o_ret;
 
     LIBVLC_TRY;
-    psz_mrl = libvlc_media_get_mrl( LIBVLC_MEDIADESCRIPTOR->p_md, &ex);
+    psz_mrl = libvlc_media_get_mrl( LIBVLC_MEDIA->p_media, &ex);
     LIBVLC_EXCEPT;
 
     o_ret = Py_BuildValue( "s", psz_mrl );
@@ -66,109 +74,59 @@ vlcMediaDescriptor_get_mrl( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcMediaDescriptor_get_state( PyObject *self, PyObject *args )
+vlcMedia_get_state( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     libvlc_state_t i_state;
 
     LIBVLC_TRY;
-    i_state = libvlc_media_get_state( LIBVLC_MEDIADESCRIPTOR->p_md, &ex);
+    i_state = libvlc_media_get_state( LIBVLC_MEDIA->p_media, &ex);
     LIBVLC_EXCEPT;
     /* FIXME: return the defined state constant */
     return Py_BuildValue( "i", i_state );
 }
 
 static PyObject *
-vlcMediaDescriptor_add_tag( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    char* psz_key;
-    char* psz_tag;
-
-    if( !PyArg_ParseTuple( args, "ss", &psz_key, &psz_tag ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    libvlc_media_add_tag( LIBVLC_MEDIADESCRIPTOR->p_md, psz_key, ( libvlc_tag_t )psz_tag, &ex );
-    LIBVLC_EXCEPT;
-    Py_INCREF( Py_None );
-    return Py_None;
-}
-
-static PyObject *
-vlcMediaDescriptor_remove_tag( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    char* psz_key;
-    char* psz_tag;
-
-    if( !PyArg_ParseTuple( args, "ss", &psz_key, &psz_tag ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    libvlc_media_remove_tag( LIBVLC_MEDIADESCRIPTOR->p_md, psz_key, ( libvlc_tag_t )psz_tag, &ex );
-    LIBVLC_EXCEPT;
-    Py_INCREF( Py_None );
-    return Py_None;
-}
-
-static PyObject *
-vlcMediaDescriptor_tags_count_for_key( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    char* psz_tag;
-    int i_ret;
-
-    if( !PyArg_ParseTuple( args, "s", &psz_tag ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    i_ret=libvlc_media_tags_count_for_key( LIBVLC_MEDIADESCRIPTOR->p_md, psz_tag, &ex );
-    LIBVLC_EXCEPT;
-    return Py_BuildValue( "i", i_ret );
-}
-
-static PyObject *
-vlcMediaDescriptor_get_duration( PyObject *self, PyObject *args )
+vlcMedia_get_duration( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     libvlc_time_t i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_get_duration( LIBVLC_MEDIADESCRIPTOR->p_md, &ex);
+    i_ret = libvlc_media_get_duration( LIBVLC_MEDIA->p_media, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "L", i_ret );
 }
 
 static PyObject *
-vlcMediaDescriptor_media_player_new( PyObject *self, PyObject *args )
+vlcMedia_media_player_new( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    libvlc_media_player_t *p_mi;
-    vlcMediaInstance *p_ret;
+    libvlc_media_player_t *p_mp;
+    vlcMediaPlayer *p_ret;
 
     LIBVLC_TRY;
-    p_mi = libvlc_media_player_new_from_media( LIBVLC_MEDIADESCRIPTOR->p_md, &ex);
+    p_mp = libvlc_media_player_new_from_media( LIBVLC_MEDIA->p_media, &ex);
     LIBVLC_EXCEPT;
 
-    p_ret = PyObject_New( vlcMediaInstance, &vlcMediaInstance_Type );
-    p_ret->p_mi = p_mi;
+    p_ret = PyObject_New( vlcMediaPlayer, &vlcMediaPlayer_Type );
+    p_ret->p_mp = p_mp;
     Py_INCREF( p_ret ); /* Ah bon ? */
     return ( PyObject * )p_ret;
 }
 
 static PyObject *
-vlcMediaDescriptor_is_preparsed( PyObject *self, PyObject *args )
+vlcMedia_is_preparsed( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     int i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_is_preparsed( LIBVLC_MEDIADESCRIPTOR->p_md, &ex);
+    i_ret = libvlc_media_is_preparsed( LIBVLC_MEDIA->p_media, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "L", i_ret );
 }
 
 static PyObject *
-vlcMediaDescriptor_get_meta( PyObject *self, PyObject *args )
+vlcMedia_get_meta( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
     char * psz_meta = NULL;
@@ -197,7 +155,7 @@ vlcMediaDescriptor_get_meta( PyObject *self, PyObject *args )
     }
 
     LIBVLC_TRY;
-    psz_ret = libvlc_media_get_meta( LIBVLC_MEDIADESCRIPTOR->p_md, i_index, &ex);
+    psz_ret = libvlc_media_get_meta( LIBVLC_MEDIA->p_media, i_index, &ex);
     LIBVLC_EXCEPT;
 
     o_ret = Py_BuildValue( "s", psz_ret );
@@ -205,40 +163,34 @@ vlcMediaDescriptor_get_meta( PyObject *self, PyObject *args )
     return o_ret;
 }
 
-static PyMethodDef vlcMediaDescriptor_methods[] =
+static PyMethodDef vlcMedia_methods[] =
 {
-    { "add_option", vlcMediaDescriptor_add_option, METH_VARARGS,
-      "add_option(str) Add an option to the media descriptor." },
-    { "get_mrl", vlcMediaDescriptor_get_mrl, METH_VARARGS,
+    { "add_option", vlcMedia_add_option, METH_VARARGS,
+      "add_option(str) Add an option to the media." },
+    { "get_mrl", vlcMedia_get_mrl, METH_VARARGS,
       "get_mrl() -> str" },
-    { "get_state", vlcMediaDescriptor_get_state, METH_VARARGS,
+    { "get_state", vlcMedia_get_state, METH_VARARGS,
       "get_state() -> int" },
-    { "add_tag", vlcMediaDescriptor_add_tag, METH_VARARGS,
-      "add_tag(key=str, tag=str) Add tag to the media descriptor." },
-    { "remove_tag", vlcMediaDescriptor_remove_tag, METH_VARARGS,
-      "remove_tag(key=str, tag=str) Remove tag from the media descriptor." },
-    { "tags_count_for_key", vlcMediaDescriptor_tags_count_for_key, METH_VARARGS,
-      "tags_count_for_key(str) ." },
-    { "get_duration", vlcMediaDescriptor_get_duration, METH_VARARGS,
+    { "get_duration", vlcMedia_get_duration, METH_VARARGS,
       "get_duration() -> int" },
-    { "mediainstance_new", vlcMediaDescriptor_media_player_new, METH_VARARGS,
-      "mediainstance_new() -> vlc.MediaInstance   Create a Media Instance object from a Media Descriptor" },
-    { "is_preparsed", vlcMediaDescriptor_is_preparsed, METH_VARARGS,
+    { "mediaplayer_new", vlcMedia_media_player_new, METH_VARARGS,
+      "mediaplayer_new() -> vlc.MediaPlayer   Create a MediaPlayer object from a Media" },
+    { "is_preparsed", vlcMedia_is_preparsed, METH_VARARGS,
       "is_preparsed() -> int" },
-    { "get_meta", vlcMediaDescriptor_get_meta, METH_VARARGS,
-      "get_meta(str) -> str   Read the meta of the media descriptor." },
+    { "get_meta", vlcMedia_get_meta, METH_VARARGS,
+      "get_meta(str) -> str   Read the meta of the media." },
     
     { NULL }  /* Sentinel */
 };
 
-static PyTypeObject vlcMediaDescriptor_Type =
+static PyTypeObject vlcMedia_Type =
 {
     PyObject_HEAD_INIT( NULL )
     0,                         /*ob_size*/
-    "vlc.MediaDescriptor",            /*tp_name*/
-    sizeof( vlcMediaDescriptor_Type ),   /*tp_basicsize*/
+    "vlc.Media",            /*tp_name*/
+    sizeof( vlcMedia_Type ),   /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    vlcMediaDescriptor_dealloc, /*tp_dealloc*/
+    vlcMedia_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -254,14 +206,14 @@ static PyTypeObject vlcMediaDescriptor_Type =
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "vlc.MediaDescriptor object.",  /* tp_doc */
+    "vlc.Media object.",  /* tp_doc */
     0,                        /* tp_traverse */
     0,                        /* tp_clear */
     0,                         /* tp_richcompare */
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                          /* tp_iternext */
-    vlcMediaDescriptor_methods,          /* tp_methods */
+    vlcMedia_methods,          /* tp_methods */
     0,                         /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
@@ -271,6 +223,6 @@ static PyTypeObject vlcMediaDescriptor_Type =
     0,                         /* tp_dictoffset */
     0,                         /* tp_init */
     0,                         /* tp_alloc */
-    0,                         /* tp_new */
+    vlcMedia_new,              /* tp_new */
 };
 

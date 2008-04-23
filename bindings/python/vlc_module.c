@@ -46,11 +46,14 @@ vlcMODINIT_FUNC
 initvlc( void )
 {
     PyObject* p_module;
+    
+    /* vlcMediaPlayer_Type.tp_new = PyType_GenericNew; */
+    vlcMediaPlayer_Type.tp_alloc = PyType_GenericAlloc;
+    /* vlcMedia_Type.tp_new = PyType_GenericNew; */
+    vlcMedia_Type.tp_alloc = PyType_GenericAlloc;
 
-    vlcMediaInstance_Type.tp_new = PyType_GenericNew;
-    vlcMediaInstance_Type.tp_alloc = PyType_GenericAlloc;
-    vlcMediaDescriptor_Type.tp_new = PyType_GenericNew;
-    vlcMediaDescriptor_Type.tp_alloc = PyType_GenericAlloc;
+    vlcInstance_Type.tp_alloc = PyType_GenericAlloc;
+    MediaControl_Type.tp_alloc = PyType_GenericAlloc;
 
     p_module = Py_InitModule3( "vlc", vlc_methods,
                                "VLC media player embedding module." );
@@ -64,9 +67,9 @@ initvlc( void )
         return;
     if( PyType_Ready( &vlcInstance_Type ) < 0 )
         return;
-    if( PyType_Ready( &vlcMediaInstance_Type ) < 0 )
+    if( PyType_Ready( &vlcMediaPlayer_Type ) < 0 )
         return;
-    if( PyType_Ready( &vlcMediaDescriptor_Type ) < 0 )
+    if( PyType_Ready( &vlcMedia_Type ) < 0 )
         return;
 
     /* Exceptions */
@@ -101,11 +104,11 @@ initvlc( void )
                         MediaControl_PlaylistException );
 
     /* Exceptions */
-    vlcInstance_Exception =
+    vlc_Exception =
         PyErr_NewException( "vlc.InstanceException", NULL, NULL );
-    Py_INCREF( vlcInstance_Exception );
+    Py_INCREF( vlc_Exception );
     PyModule_AddObject( p_module, "InstanceException",
-                        vlcInstance_Exception );
+                        vlc_Exception );
 
     /* Types */
     Py_INCREF( &PyPosition_Type );
@@ -119,12 +122,14 @@ initvlc( void )
     Py_INCREF( &vlcInstance_Type );
     PyModule_AddObject( p_module, "Instance",
                         ( PyObject * )&vlcInstance_Type );
-    Py_INCREF( &vlcMediaInstance_Type );
-    PyModule_AddObject( p_module, "MediaInstance",
-                        ( PyObject * )&vlcMediaInstance_Type );
-    Py_INCREF( &vlcMediaDescriptor_Type );
-    PyModule_AddObject( p_module, "MediaDescriptor",
-                        ( PyObject * )&vlcMediaDescriptor_Type );
+
+    Py_INCREF( &vlcMediaPlayer_Type );
+    PyModule_AddObject( p_module, "MediaPlayer",
+                        ( PyObject * )&vlcMediaPlayer_Type );
+
+    Py_INCREF( &vlcMedia_Type );
+    PyModule_AddObject( p_module, "Media",
+                        ( PyObject * )&vlcMedia_Type );
 
     /* Constants */
     PyModule_AddIntConstant( p_module, "AbsolutePosition",
@@ -158,13 +163,6 @@ initvlc( void )
     
 }
 
-
-/* Make libpostproc happy... */
-void * fast_memcpy( void * to, const void * from, size_t len )
-{
-  return memcpy( to, from, len );
-}
-
 /* Horrible hack... Please do not look.  Temporary workaround for the
    forward declaration mess of python types (cf vlcglue.h). If we do a
    separate compilation, we have to declare some types as extern. But
@@ -175,5 +173,5 @@ void * fast_memcpy( void * to, const void * from, size_t len )
 #include "vlc_mediacontrol.c"
 #include "vlc_position.c"
 #include "vlc_instance.c"
-#include "vlc_input.c"
-#include "vlc_mediadescriptor.c"
+#include "vlc_mediaplayer.c"
+#include "vlc_media.c"
