@@ -282,12 +282,8 @@ static inline void __vlc_cond_wait( const char * psz_file, int i_line,
 
         if( p_mutex->mutex )
         {
-            /* It is only possible to atomically release the mutex and
-             * initiate the waiting on WinNT/2K/XP. Win9x doesn't have
-             * SignalObjectAndWait(). */
-            p_condvar->SignalObjectAndWait( p_mutex->mutex,
-                                            p_condvar->event,
-                                            INFINITE, FALSE );
+            SignalObjectAndWait( p_mutex->mutex, p_condvar->event,
+                                 INFINITE, FALSE );
         }
         else
         {
@@ -414,12 +410,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
         if( p_mutex->mutex )
         {
-            /* It is only possible to atomically release the mutex and
-             * initiate the waiting on WinNT/2K/XP. Win9x doesn't have
-             * SignalObjectAndWait(). */
-            result = p_condvar->SignalObjectAndWait( p_mutex->mutex,
-                                            p_condvar->event,
-                                            delay_ms, FALSE );
+            result = SignalObjectAndWait( p_mutex->mutex, p_condvar->event,
+                                          delay_ms, FALSE );
         }
         else
         {

@@ -51,9 +51,6 @@ static vlc_object_t *p_root;
 #if defined( UNDER_CE )
 #elif defined( WIN32 )
 
-/* following is only available on NT/2000/XP and above */
-static SIGNALOBJECTANDWAIT pf_SignalObjectAndWait = NULL;
-
 /*
 ** On Windows NT/2K/XP we use a slow mutex implementation but which
 ** allows us to correctly implement condition variables.
@@ -164,29 +161,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
         /* We should be safe now. Do all the initialization stuff we want. */
         p_libvlc_global->b_ready = false;
 
-#if defined( UNDER_CE )
-        /* Nothing to initialize */
-
-#elif defined( WIN32 )
-        /* Dynamically get the address of SignalObjectAndWait */
-        if( GetVersion() < 0x80000000 )
-        {
-            HINSTANCE hInstLib;
-
-            /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
-            hInstLib = LoadLibrary(_T("kernel32"));
-            if( hInstLib )
-            {
-                pf_SignalObjectAndWait =
-                    (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
-                                                  _T("SignalObjectAndWait") );
-            }
-        }
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-#elif defined( LIBVLC_USE_PTHREAD )
-#endif
-
         p_root = vlc_custom_create( VLC_OBJECT(p_libvlc_global), 0,
                                     VLC_OBJECT_GLOBAL, "global" );
         if( p_root == NULL )
@@ -279,13 +253,8 @@ int __vlc_mutex_init( vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined( WIN32 )
-    /* We use mutexes on WinNT/2K/XP because we can use the SignalObjectAndWait
-     * function and have a 100% correct vlc_cond_wait() implementation.
-     * As this function is not available on Win9x, we can use the faster
-     * CriticalSections */
-    if( pf_SignalObjectAndWait && !b_fast_mutex )
+    if( !b_fast_mutex )
     {
-        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
         return ( p_mutex->mutex != NULL ? 0 : 1 );
     }
@@ -426,10 +395,8 @@ int __vlc_cond_init( vlc_cond_t *p_condvar )
 
     /* Misc init */
     p_condvar->i_win9x_cv = i_win9x_cv;
-    p_condvar->SignalObjectAndWait = pf_SignalObjectAndWait;
 
-    if( (p_condvar->SignalObjectAndWait && !b_fast_mutex)
-        || p_condvar->i_win9x_cv == 0 )
+    if( !b_fast_mutex || p_condvar->i_win9x_cv == 0 )
     {
         /* Create an auto-reset event. */
         p_condvar->event = CreateEvent( NULL,   /* no security */

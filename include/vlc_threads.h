@@ -140,7 +140,6 @@ typedef struct
     volatile int        i_waiting_threads;
     /* WinNT/2K/XP implementation */
     HANDLE              event;
-    SIGNALOBJECTANDWAIT SignalObjectAndWait;
     /* Win95/98/ME implementation */
     HANDLE              semaphore;
     CRITICAL_SECTION    csection;
