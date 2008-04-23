@@ -47,6 +47,7 @@ static bool parse_track_node COMPLEX_INTERFACE;
 static bool parse_extension_node COMPLEX_INTERFACE;
 static bool parse_extitem_node COMPLEX_INTERFACE;
 static bool set_item_info SIMPLE_INTERFACE;
+static bool set_option SIMPLE_INTERFACE;
 static bool skip_element COMPLEX_INTERFACE;
 
 /* datatypes */

@@ -410,7 +410,7 @@ static bool parse_track_node COMPLEX_INTERFACE
           {"duration",     SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"link",         SIMPLE_CONTENT,  {NULL} },
           {"meta",         SIMPLE_CONTENT,  {NULL} },
-          {"extension",    COMPLEX_CONTENT, {.cmplx = skip_element} },
+          {"extension",    COMPLEX_CONTENT, {.cmplx = parse_extension_node} },
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
 
@@ -660,6 +660,22 @@ static bool set_item_info SIMPLE_INTERFACE
     return true;
 }
 
+/**
+ * \brief handles the <option> elements
+ */
+static bool set_option SIMPLE_INTERFACE
+{
+    /* exit if setting is impossible */
+    if( !psz_name || !psz_value || !p_input )
+        return false;
+
+    /* re-convert xml special characters inside psz_value */
+    resolve_xml_special_chars( psz_value );
+    
+    input_ItemAddOpt( p_input, psz_value, 0 );
+    
+    return true;
+}
 
 /**
  * \brief parse the extension node of a XSPF playlist
@@ -677,6 +693,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
     xml_elem_hnd_t pl_elements[] =
         { {"node",  COMPLEX_CONTENT, {.cmplx = parse_extension_node} },
           {"item",  COMPLEX_CONTENT, {.cmplx = parse_extitem_node} },
+          {"option", SIMPLE_CONTENT, {.smpl = set_option} },
           {NULL,    UNKNOWN_CONTENT, {NULL} }
         };
 

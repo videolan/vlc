@@ -115,6 +115,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 {
     char *psz;
     char *psz_temp;
+    int i;
     mtime_t i_duration;
 
     if( !p_item ) return;
@@ -224,6 +225,17 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
         free( psz_uri );
     }
     free( psz );
+
+    /* export the input's options (bookmarks, ...) in <extension> */
+    fprintf( p_file, "\t\t\t<extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" );
+    for( i = 0; i < p_item->p_input->i_options; i++ )
+    {
+        fprintf( p_file, "\t\t\t\t<option>%s</option>\n",
+                 p_item->p_input->ppsz_options[i][0] == ':' ?
+                 p_item->p_input->ppsz_options[i] + 1 :
+                 p_item->p_input->ppsz_options[i] );
+    }
+    fprintf( p_file, "\t\t\t</extension>\n" );
 
 xspfexportitem_end:
     /* -> the duration */
