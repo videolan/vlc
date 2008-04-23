@@ -349,7 +349,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     {
         /* No p_media defined */
         retval->streamstatus = mediacontrol_UndefinedStatus;
-        retval->url          = strdup( "None" );
+        retval->url          = strdup( "" );
         retval->position     = 0;
         retval->length       = 0;
     }
