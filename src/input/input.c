@@ -929,6 +929,7 @@ static void StartTitle( input_thread_t * p_input )
     int i, i_delay;
     char *psz;
     char *psz_subtitle;
+    int64_t i_length;
 
     /* Start title/chapter */
 
@@ -952,6 +953,7 @@ static void StartTitle( input_thread_t * p_input )
     p_input->p->i_start = I64C(1000000) * var_GetInteger( p_input, "start-time" );
     p_input->p->i_stop  = I64C(1000000) * var_GetInteger( p_input, "stop-time" );
     p_input->p->i_run   = I64C(1000000) * var_GetInteger( p_input, "run-time" );
+    i_length = var_GetTime( p_input, "length" );
     if( p_input->p->i_run < 0 )
     {
         msg_Warn( p_input, "invalid run-time ignored" );
@@ -960,7 +962,7 @@ static void StartTitle( input_thread_t * p_input )
 
     if( p_input->p->i_start > 0 )
     {
-        if( p_input->p->i_start >= val.i_time )
+        if( p_input->p->i_start >= i_length )
         {
             msg_Warn( p_input, "invalid start-time ignored" );
         }
