@@ -243,7 +243,7 @@ struct fbosd_render_t
     text_style_t    text_style;                              /* font control */
     char            *psz_string;
 
-    /* Positon  */
+    /* Position */
     bool      b_absolute;
     int             i_x;
     int             i_y;
@@ -289,7 +289,7 @@ struct intf_sys_t
     /* Font style */
     text_style_t    *p_style;                                /* font control */
 
-    /* Positon */
+    /* Position */
     bool      b_absolute;
     int             i_x;
     int             i_y;
