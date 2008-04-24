@@ -772,7 +772,7 @@ package-win32-base-debug: package-win-common
 
 # Plugins
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/plugins"
-	find modules/ -name '*_plugin.$(LIBEXT)' | while read i; do \
+	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
 	  if test -n "$$i" ; then \
 	    $(INSTALL) "$$i" "vlc-$(VERSION)/plugins/" ; \
 	  fi ; done
