@@ -1431,9 +1431,11 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_item )
         {
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
-            if( playlist_AddInput( p_playlist, p_item,
+            int i_ret =playlist_AddInput( p_playlist, p_item,
                      PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, true,
-                     false ) != VLC_SUCCESS )
+                     false );
+            vlc_gc_decref( p_item );
+            if( i_ret != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
             }

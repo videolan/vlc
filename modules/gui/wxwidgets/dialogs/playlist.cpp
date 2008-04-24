@@ -1290,6 +1290,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
                                               psz_utf8, psz_utf8 );
         int i_ret = ( playlist_NodeAddInput( p->p_playlist, p_input, p_dest,
                 PLAYLIST_PREPARSE, i_pos, false ) != VLC_SUCCESS );
+        vlc_gc_decref( p_input );
         wxDnDLocaleFree( psz_utf8 );
         if( i_ret != VLC_SUCCESS )
             return FALSE;

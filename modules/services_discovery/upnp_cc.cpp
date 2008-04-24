@@ -221,6 +221,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
         playlist_BothAddInput( p_playlist, p_input, p_parent,
                                PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
                                false );
+        vlc_gc_decref( p_input );
     } else if ( node->isContainerNode() )
     {
         ContainerNode *conNode = (ContainerNode *)node;

@@ -875,6 +875,7 @@ void MediaServer::_buildPlaylist( Container* parent )
         playlist_BothAddInput( p_playlist, p_input, parentNode,
                                PLAYLIST_APPEND, PLAYLIST_END, &i_cat, NULL,
                                false );
+        vlc_gc_decref( p_input );
         /* TODO: do this better by storing ids */
         playlist_item_t *p_node = playlist_ItemGetById( p_playlist, i_cat, false );
         assert( p_node );
