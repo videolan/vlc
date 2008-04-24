@@ -101,7 +101,7 @@ static picture_t *GetNewPicture( decoder_t *, uint8_t ** );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("MPEG I/II hw video decoder (using libmpeg2)") );
-    set_capability( "decoder", 160 );
+    set_capability( "decoder", 140 );
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "xxmc" );
 vlc_module_end();
