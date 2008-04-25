@@ -5,28 +5,25 @@
 /* link this file in with the server and any clients */
 
 
- /* File created by MIDL compiler version 6.00.0361 */
-/* at Mon Jun 25 12:18:49 2007
+ /* File created by MIDL compiler version 7.00.0500 */
+/* at Fri Apr 25 11:37:37 2008
  */
 /* Compiler settings for axvlc.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
     protocol : dce , ms_ext, c_ext, robust
-    error checks: allocation ref bounds_check enum stub_data
-    VC __declspec() decoration level:
+    error checks: allocation ref bounds_check enum stub_data 
+    VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
          DECLSPEC_UUID(), MIDL_INTERFACE()
 */
 //@@MIDL_FILE_HEADING(  )
-
-#if !defined(_M_IA64) && !defined(_M_AMD64)
-
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
 
 
 #ifdef __cplusplus
 extern "C"{
-#endif
+#endif 
 
 
 #include <rpc.h>
@@ -68,7 +65,7 @@ typedef IID CLSID;
 #define MIDL_DEFINE_GUID(type,name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
         const type name = {l,w1,w2,{b1,b2,b3,b4,b5,b6,b7,b8}}
 
-#endif //!_MIDL_USE_GUIDDEF_
+#endif !_MIDL_USE_GUIDDEF_
 
 MIDL_DEFINE_GUID(IID, LIBID_AXVLC,0xDF2BBE39,0x40A8,0x433b,0xA2,0x79,0x07,0x3F,0x48,0xDA,0x94,0xB6);
 
@@ -121,6 +118,4 @@ MIDL_DEFINE_GUID(CLSID, CLSID_VLCPlugin2,0x9BE31822,0xFDAD,0x461B,0xAD,0x51,0xBE
 #endif
 
 
-
-#endif /* !defined(_M_IA64) && !defined(_M_AMD64)*/
 
