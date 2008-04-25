@@ -199,7 +199,7 @@ Changes between 0.8.6e and 0.8.6f:
 ----------------------------------
 
 Security updates:
- * Really fixed subtitle buffer overflow (CVE-2007-6681)
+ * Really fixed subtitle buffer overflow (CVE-2007-6681, CVE-2008-1881)
  * Fixed Real RTSP code execution problem (CVE-2008-0073)
  * Fixed MP4 integer overflows (CVE-2008-1489, CVE-2008-1768)
  * Fixed cinepak vulnerabilities (CVE-2008-1769)
