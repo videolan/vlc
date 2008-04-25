@@ -222,9 +222,6 @@ case "${host_os}" in
         echo "  Assuming --disable-glx"
         enable_xvideo="no"
         echo "  Assuming --disable-xvideo"
-
-        with_macosx_sdk=""
-        echo "  Compiling with default SDK"
     fi
     if test ".`uname -p`" = ".i386"; then
         dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
