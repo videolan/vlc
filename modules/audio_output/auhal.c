@@ -221,7 +221,7 @@ static int Open( vlc_object_t * p_this )
     if( err != noErr )
     {
         /* Be tolerant, only give a warning here */
-        msg_Warn( p_aout, "could not check whether device [0x%x] is alive: %4.4s", p_sys->i_selected_dev, (char *)&err );
+        msg_Warn( p_aout, "could not check whether device [0x%x] is alive: %4.4s", (unsigned int)p_sys->i_selected_dev, (char *)&err );
         b_alive = false;
     }
 
@@ -1235,7 +1235,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
         timeout.tv_sec = now.tv_sec;
         timeout.tv_nsec = (now.tv_usec + 500000) * 1000;
 
-        if( pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout ) )
+        if( pthread_cond_timedwait( &w.cond, &w.lock, &timeout ) )
         {
             msg_Dbg( p_aout, "reached timeout" );
         }
