@@ -295,7 +295,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
         case 0x00: /* Sequence Number */
             break;
 
-        case 0x01: /* Test (comment) */
+        case 0x01: /* Text (comment) */
             EnsureUTF8 ((char *)payload);
             msg_Info (p_demux, "Text      : %s", (char *)payload);
             break;
@@ -440,6 +440,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
                         if (c == 0xF7)
                             goto skip;
                     }
+                    /* never reached */
                 }
                 case 0xFF: /* SMF Meta Event */
                     if (HandleMeta (p_demux, tr))
@@ -550,7 +551,7 @@ static int Demux (demux_t *p_demux)
     else
         last_tick = cur_tick + 1;
 
-    /* MIDI Tick emulation (ping the decider every 10ms) */
+    /* MIDI Tick emulation (ping the decoder every 10ms) */
     while (cur_tick < last_tick)
     {
         block_t *tick = block_New (p_demux, 1);
