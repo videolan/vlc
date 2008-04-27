@@ -254,16 +254,6 @@ fi
 #  Output what we were asked
 #
 if test "${echo_linkage}" = yes; then
-  if test "${echo_plugin}" = yes; then
-    for module in `echo "${plugins}"`; do
-      register_flags "${module}"
-    done
-  fi
-  if test "${echo_builtin}" = yes; then
-    for module in `echo "${builtins}"`; do
-      register_flags "${module}"
-    done
-  fi
   echo "${linkage}"
   exit 0
 fi
