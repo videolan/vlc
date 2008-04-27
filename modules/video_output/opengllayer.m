@@ -43,6 +43,8 @@
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/OpenGL.h>
 
+#ifdef CALayer
+
 /* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
    This allows sizes which are not powers of 2 */
 #define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
@@ -134,6 +136,24 @@ struct vout_sys_t
  *****************************************************************************/
 static int CreateVout( vlc_object_t *p_this )
 {
+    /* This module is Leopard only */
+#ifdef __APPLE__
+    long minorMacVersion;
+    if( Gestalt( gestaltSystemVersionMinor, &minorMacVersion ) == noErr )
+    {
+        if( minorMacVersion < 6 )
+        {
+            msg_Warn( p_vout, "current osx version is 10.%ld, non-suitable for OpenglLayer video output", minorMacVersion );
+            return VLC_ENOOBJ;
+        }
+    }
+    else
+    {
+        msg_Warn( p_vout, "couldn't get OS version" );
+        return VLC_EGENERIC;
+    }
+#endif
+
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys;
     char * psz;
@@ -515,3 +535,5 @@ static int InitTextures( vout_thread_t *p_vout )
     CGLUnlockContext( glContext );
 }
 @end
+
+#endif
