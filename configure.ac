@@ -845,7 +845,8 @@ then
   PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
     [ AC_DEFINE( HAVE_HAL_1, 1 , [Define if you have the new HAL library API])
       AC_DEFINE( HAVE_HAL, 1, [Define if you have the HAL library] )
-      VLC_ADD_PLUGINS([hal probe_hal]) 
+      VLC_ADD_PLUGINS([hal])
+      VLC_ADD_PLUGINS([probe_hal])
       VLC_ADD_LIBS([libvlc hal probe_hal],[$HAL_LIBS])
       VLC_ADD_CFLAGS([libvlc hal probe_hal],[$HAL_CFLAGS])],   
     dnl No hal 0.5 Test for 0.2
@@ -1182,21 +1183,128 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-VLC_ADD_PLUGINS([dummy logger memcpy])
-VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 vc1 demux_cdg cdg ps pva avi asf mp4 rawdv rawvid nsv real aiff mjpeg demuxdump flacsys tta])
-VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec subsusf t140 dvbsub cc mpeg_audio lpcm a52 dts cinepak flac])
-VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise grain extract sharpen seamcarving croppadd blendbench])
-VLC_ADD_PLUGINS([converter_fixed mono])
-VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
-VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
-VLC_ADD_PLUGINS([playlist export nsc xtag])
-VLC_ADD_PLUGINS([i420_rgb grey_yuv rawvideo blend scale image vmem logo magnify puzzle colorthres])
-VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au ty voc xa nuv smf])
-VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
-VLC_ADD_PLUGINS([access_http access_mms access_ftp access_rtmp])
+VLC_ADD_PLUGINS([dummy])
+VLC_ADD_PLUGINS([logger])
+VLC_ADD_PLUGINS([memcpy])
+dnl Demuxers:
+VLC_ADD_PLUGINS([mpgv])
+VLC_ADD_PLUGINS([mpga])
+VLC_ADD_PLUGINS([m4v])
+VLC_ADD_PLUGINS([m4a])
+VLC_ADD_PLUGINS([h264])
+VLC_ADD_PLUGINS([vc1])
+VLC_ADD_PLUGINS([demux_cdg])
+VLC_ADD_PLUGINS([cdg])
+VLC_ADD_PLUGINS([ps])
+VLC_ADD_PLUGINS([pva])
+VLC_ADD_PLUGINS([avi])
+VLC_ADD_PLUGINS([asf])
+VLC_ADD_PLUGINS([mp4])
+VLC_ADD_PLUGINS([rawdv])
+VLC_ADD_PLUGINS([rawvid])
+VLC_ADD_PLUGINS([nsv])
+VLC_ADD_PLUGINS([real])
+VLC_ADD_PLUGINS([aiff])
+VLC_ADD_PLUGINS([mjpeg])
+VLC_ADD_PLUGINS([wav])
+VLC_ADD_PLUGINS([voc])
+VLC_ADD_PLUGINS([smf])
+VLC_ADD_PLUGINS([demuxdump])
+VLC_ADD_PLUGINS([flacsys])
+VLC_ADD_PLUGINS([tta])
+VLC_ADD_PLUGINS([subtitle])
+VLC_ADD_PLUGINS([vobsub])
+VLC_ADD_PLUGINS([a52sys])
+VLC_ADD_PLUGINS([dtssys])
+VLC_ADD_PLUGINS([au])
+VLC_ADD_PLUGINS([ty])
+VLC_ADD_PLUGINS([xa])
+VLC_ADD_PLUGINS([nuv])
+dnl Text codecs:
+VLC_ADD_PLUGINS([cvdsub])
+VLC_ADD_PLUGINS([svcdsub])
+VLC_ADD_PLUGINS([spudec])
+VLC_ADD_PLUGINS([subsdec])
+VLC_ADD_PLUGINS([subsusf])
+VLC_ADD_PLUGINS([t140])
+VLC_ADD_PLUGINS([dvbsub])
+VLC_ADD_PLUGINS([cc])
+dnl Video codecs:
+VLC_ADD_PLUGINS([cinepak])
+dnl Audio codecs:
+VLC_ADD_PLUGINS([araw])
+VLC_ADD_PLUGINS([adpcm])
+VLC_ADD_PLUGINS([mpeg_audio])
+VLC_ADD_PLUGINS([lpcm])
+VLC_ADD_PLUGINS([a52])
+VLC_ADD_PLUGINS([dts])
+VLC_ADD_PLUGINS([flac])
+dnl Video filters:
+VLC_ADD_PLUGINS([deinterlace])
+VLC_ADD_PLUGINS([invert])
+VLC_ADD_PLUGINS([adjust])
+VLC_ADD_PLUGINS([transform])
+VLC_ADD_PLUGINS([wave])
+VLC_ADD_PLUGINS([ripple])
+VLC_ADD_PLUGINS([psychedelic])
+VLC_ADD_PLUGINS([gradient])
+VLC_ADD_PLUGINS([motionblur])
+VLC_ADD_PLUGINS([rv32])
+VLC_ADD_PLUGINS([rotate])
+VLC_ADD_PLUGINS([noise])
+VLC_ADD_PLUGINS([grain])
+VLC_ADD_PLUGINS([extract])
+VLC_ADD_PLUGINS([sharpen])
+VLC_ADD_PLUGINS([seamcarving])
+VLC_ADD_PLUGINS([croppadd])
+VLC_ADD_PLUGINS([blendbench])
+VLC_ADD_PLUGINS([blend])
+VLC_ADD_PLUGINS([scale])
+VLC_ADD_PLUGINS([image])
+VLC_ADD_PLUGINS([vmem])
+VLC_ADD_PLUGINS([logo])
+VLC_ADD_PLUGINS([magnify])
+VLC_ADD_PLUGINS([puzzle])
+VLC_ADD_PLUGINS([colorthres])
+dnl Meta demuxers:
+VLC_ADD_PLUGINS([playlist])
+VLC_ADD_PLUGINS([export])
+VLC_ADD_PLUGINS([nsc])
+VLC_ADD_PLUGINS([xtag])
+dnl Channel mixing audio filters:
+VLC_ADD_PLUGINS([converter_fixed])
+VLC_ADD_PLUGINS([mono])
+VLC_ADD_PLUGINS([trivial_channel_mixer])
+dnl Resampling audio filters:
+VLC_ADD_PLUGINS([trivial_resampler])
+VLC_ADD_PLUGINS([ugly_resampler])
+dnl Audio mixers:
+VLC_ADD_PLUGINS([trivial_mixer])
+dnl Video chromas:
+VLC_ADD_PLUGINS([i420_rgb])
+VLC_ADD_PLUGINS([grey_yuv])
+dnl Video codecs:
+VLC_ADD_PLUGINS([rawvideo])
+dnl Accesses:
+VLC_ADD_PLUGINS([access_directory])
+VLC_ADD_PLUGINS([access_file])
+VLC_ADD_PLUGINS([access_udp])
+VLC_ADD_PLUGINS([access_tcp])
+VLC_ADD_PLUGINS([access_http])
+VLC_ADD_PLUGINS([access_mms])
+VLC_ADD_PLUGINS([access_ftp])
+VLC_ADD_PLUGINS([access_rtmp])
+VLC_ADD_PLUGINS([access_fake])
+dnl Access filters:
+VLC_ADD_PLUGINS([access_filter_timeshift])
+VLC_ADD_PLUGINS([access_filter_record])
+VLC_ADD_PLUGINS([access_filter_dump])
 VLC_ADD_PLUGINS([access_filter_bandwidth])
-VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
-VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
+dnl Packetizers:
+VLC_ADD_PLUGINS([packetizer_mpegvideo])
+VLC_ADD_PLUGINS([packetizer_h264])
+VLC_ADD_PLUGINS([packetizer_mpeg4video])
+VLC_ADD_PLUGINS([packetizer_mpeg4audio])
 VLC_ADD_PLUGINS([packetizer_vc1])
 
 ALIASES="${ALIASES} cvlc"
@@ -1209,14 +1317,49 @@ VLC_ADD_PLUGINS([spatializer])
 AC_LANG_POP(C++)
 
 if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record access_filter_dump])
-  VLC_ADD_PLUGINS([gestures rc telnet hotkeys showintf marq podcast shout sap fake folder])
-  VLC_ADD_PLUGINS([rss mosaic wall motiondetect clone crop erase bluescreen alphamask gaussianblur])
-  VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga i422_i420 yuy2_i422 yuy2_i420 chroma_chain])
-  VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
-  VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
-  VLC_ADD_PLUGINS([dolby_surround_decoder headphone_channel_mixer normvol equalizer param_eq])
-  VLC_ADD_PLUGINS([converter_float a52tospdif dtstospdif audio_format])
+  VLC_ADD_PLUGINS([gestures])
+  VLC_ADD_PLUGINS([rc])
+  VLC_ADD_PLUGINS([telnet])
+  VLC_ADD_PLUGINS([hotkeys])
+  VLC_ADD_PLUGINS([showintf])
+  VLC_ADD_PLUGINS([marq])
+  VLC_ADD_PLUGINS([podcast])
+  VLC_ADD_PLUGINS([shout])
+  VLC_ADD_PLUGINS([sap])
+  VLC_ADD_PLUGINS([fake])
+  VLC_ADD_PLUGINS([folder])
+  VLC_ADD_PLUGINS([rss])
+  VLC_ADD_PLUGINS([mosaic])
+  VLC_ADD_PLUGINS([wall])
+  VLC_ADD_PLUGINS([motiondetect])
+  VLC_ADD_PLUGINS([clone])
+  VLC_ADD_PLUGINS([crop])
+  VLC_ADD_PLUGINS([erase])
+  VLC_ADD_PLUGINS([bluescreen])
+  VLC_ADD_PLUGINS([alphamask])
+  VLC_ADD_PLUGINS([gaussianblur])
+  VLC_ADD_PLUGINS([i420_yuy2])
+  VLC_ADD_PLUGINS([i422_yuy2])
+  VLC_ADD_PLUGINS([i420_ymga])
+  VLC_ADD_PLUGINS([i422_i420])
+  VLC_ADD_PLUGINS([yuy2_i422])
+  VLC_ADD_PLUGINS([yuy2_i420])
+  VLC_ADD_PLUGINS([chroma_chain])
+  VLC_ADD_PLUGINS([aout_file])
+  VLC_ADD_PLUGINS([linear_resampler])
+  VLC_ADD_PLUGINS([bandlimited_resampler])
+  VLC_ADD_PLUGINS([float32_mixer])
+  VLC_ADD_PLUGINS([spdif_mixer])
+  VLC_ADD_PLUGINS([simple_channel_mixer])
+  VLC_ADD_PLUGINS([dolby_surround_decoder])
+  VLC_ADD_PLUGINS([headphone_channel_mixer])
+  VLC_ADD_PLUGINS([normvol])
+  VLC_ADD_PLUGINS([equalizer])
+  VLC_ADD_PLUGINS([param_eq])
+  VLC_ADD_PLUGINS([converter_float])
+  VLC_ADD_PLUGINS([a52tospdif])
+  VLC_ADD_PLUGINS([dtstospdif])
+  VLC_ADD_PLUGINS([audio_format])
   ALIASES="${ALIASES} rvlc"
 fi
 
@@ -1224,10 +1367,14 @@ dnl
 dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGINS([screensaver motion])
+    VLC_ADD_PLUGINS([screensaver])
+    VLC_ADD_PLUGINS([motion])
     VLC_ADD_PLUGINS([dynamicoverlay])
 elif test "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGINS([ntservice access_smb dmo msn])
+    VLC_ADD_PLUGINS([ntservice])
+    VLC_ADD_PLUGINS([access_smb])
+    VLC_ADD_PLUGINS([dmo])
+    VLC_ADD_PLUGINS([msn])
     VLC_ADD_LIBS([dmo],[-lole32 -luuid])
 else
     VLC_ADD_PLUGINS([win32text])
@@ -1590,15 +1737,37 @@ AC_ARG_ENABLE(sout,
   [  --enable-sout           Stream output modules (default enabled)])
 if test "${enable_sout}" != "no"
 then
-  VLC_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
-  VLC_ADD_PLUGINS([mux_ps mux_avi mux_mp4 mux_asf mux_dummy mux_wav mux_mpjpeg])
+  dnl Access outputs:
+  VLC_ADD_PLUGINS([access_output_dummy])
+  VLC_ADD_PLUGINS([access_output_udp])
+  VLC_ADD_PLUGINS([access_output_file])
+  VLC_ADD_PLUGINS([access_output_http])
+  dnl Muxers:
+  VLC_ADD_PLUGINS([mux_ps])
+  VLC_ADD_PLUGINS([mux_avi])
+  VLC_ADD_PLUGINS([mux_mp4])
+  VLC_ADD_PLUGINS([mux_asf])
+  VLC_ADD_PLUGINS([mux_dummy])
+  VLC_ADD_PLUGINS([mux_wav])
+  VLC_ADD_PLUGINS([mux_mpjpeg])
+  dnl Packetizers (FIXME: why are the others outside --enable-sout??):
   VLC_ADD_PLUGINS([packetizer_copy])
-
-  VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp stream_out_description vod_rtsp])
-  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_display stream_out_transcode stream_out_bridge stream_out_mosaic_bridge stream_out_autodel])
+  dnl Stream outputs:
+  VLC_ADD_PLUGINS([stream_out_dummy])
+  VLC_ADD_PLUGINS([stream_out_standard])
+  VLC_ADD_PLUGINS([stream_out_es])
+  VLC_ADD_PLUGINS([stream_out_rtp])
+  VLC_ADD_PLUGINS([stream_out_description])
+  VLC_ADD_PLUGINS([stream_out_duplicate])
+  VLC_ADD_PLUGINS([stream_out_display])
+  VLC_ADD_PLUGINS([stream_out_transcode])
+  VLC_ADD_PLUGINS([stream_out_bridge])
+  VLC_ADD_PLUGINS([stream_out_mosaic_bridge])
+  VLC_ADD_PLUGINS([stream_out_autodel])
   VLC_ADD_PLUGINS([stream_out_gather])
 #  VLC_ADD_PLUGINS([stream_out_transrate])
-#  VLC_ADD_PLUGINS([rtcp])
+  dnl Misc:
+  VLC_ADD_PLUGINS([vod_rtsp])
   VLC_ADD_PLUGINS([profile_parser])
 
   AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
@@ -2497,7 +2666,8 @@ then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
     AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGINS([vcd cdda])
+    VLC_ADD_PLUGINS([vcd])
+    VLC_ADD_PLUGINS([cdda])
   ],[
     AC_MSG_RESULT(no)
   ])
@@ -2505,7 +2675,8 @@ then
   AC_MSG_CHECKING(for scsireq in sys/scsiio.h)
   AC_EGREP_HEADER(scsireq,sys/scsiio.h,[
     AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGINS([vcd cdda])
+    VLC_ADD_PLUGINS([vcd])
+    VLC_ADD_PLUGINS([cdda])
     AC_DEFINE(HAVE_SCSIREQ_IN_SYS_SCSIIO_H, 1, For NetBSD VCD support)
   ],[
     AC_MSG_RESULT(no)
@@ -2514,7 +2685,8 @@ then
   AC_MSG_CHECKING(for ioc_toc_header in sys/cdio.h)
   AC_EGREP_HEADER(ioc_toc_header ,sys/cdio.h,[
     AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGINS([vcd cdda])
+    VLC_ADD_PLUGINS([vcd])
+    VLC_ADD_PLUGINS([cdda])
     AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)
   ],[
     AC_MSG_RESULT(no)
@@ -2522,12 +2694,14 @@ then
 
   if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32"
   then
-    VLC_ADD_PLUGINS([vcd cdda])
+    VLC_ADD_PLUGINS([vcd])
+    VLC_ADD_PLUGINS([cdda])
   fi
 
   if test "${SYS}" = "darwin"
   then
-    VLC_ADD_PLUGINS([vcd cdda])
+    VLC_ADD_PLUGINS([vcd])
+    VLC_ADD_PLUGINS([cdda])
     VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([vcdx cddax cdda],[-liconv])
   fi
@@ -3727,7 +3901,8 @@ AC_CHECK_HEADERS(png.h, [
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LIBS([png],[-lpng -lz])
     VLC_ADD_PLUGINS([png])
-    VLC_ADD_PLUGINS([osdmenu osd_parser])
+    VLC_ADD_PLUGINS([osdmenu])
+    VLC_ADD_PLUGINS([osd_parser])
     AC_DEFINE(HAVE_LIBPNG, 1, [Define if you have the PNG library: libpng])],
     [],[-lz])
     LDFLAGS="${LDFLAGS_save}"
@@ -4141,7 +4316,8 @@ then
   then
     # SDL on Darwin is heavily patched and can only run SDL_image
     if test "${SYS}" != "darwin" -a "${SYS}" != "mingw32"; then
-      VLC_ADD_PLUGINS([vout_sdl aout_sdl])
+      VLC_ADD_PLUGINS([vout_sdl])
+      VLC_ADD_PLUGINS([aout_sdl])
     fi
     VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`])
     VLC_ADD_LIBS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`])
@@ -4390,7 +4566,8 @@ then
     if test -z "${with_directx}"
     then
       AC_CHECK_HEADERS(ddraw.h,
-      [ VLC_ADD_PLUGINS([vout_directx aout_directx])
+      [ VLC_ADD_PLUGINS([vout_directx])
+        VLC_ADD_PLUGINS([aout_directx])
         VLC_ADD_LIBS([vout_directx],[-lgdi32])
       ])
       AC_CHECK_HEADERS(GL/gl.h,
@@ -4405,7 +4582,8 @@ then
       AC_MSG_CHECKING(for directX headers in ${with_directx})
       if test -f ${with_directx}/ddraw.h
       then
-        VLC_ADD_PLUGINS([vout_directx aout_directx])
+        VLC_ADD_PLUGINS([vout_directx])
+	VLC_ADD_PLUGINS([aout_directx])
         VLC_ADD_CPPFLAGS([vout_directx aout_directx],[-I${with_directx}])
         VLC_ADD_LIBS([vout_directx],[-lgdi32])
         AC_MSG_RESULT(yes)
@@ -4621,7 +4799,8 @@ if test "${enable_wingdi}" != "no"; then
     VLC_ADD_LIBS([wingdi],[-lgdi32])
   fi
   if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGINS([wingdi wingapi])
+    VLC_ADD_PLUGINS([wingdi])
+    VLC_ADD_PLUGINS([wingapi])
   fi
 fi
 
@@ -4788,7 +4967,8 @@ AC_ARG_ENABLE(jack,
 
 AS_IF([test "${enable_jack}" != "no"], [
   AC_CHECK_HEADERS(jack/jack.h, [
-    VLC_ADD_PLUGINS([access_jack jack])
+    VLC_ADD_PLUGINS([access_jack])
+    VLC_ADD_PLUGINS([jack])
     VLC_ADD_LIBS([access_jack jack],[-ljack])
   ],[AC_MSG_ERROR([cannot find JACK headers])])
 ])
