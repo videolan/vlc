@@ -1146,12 +1146,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [self showSettingsForCategory: o_hotkeys_view];
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [o_hotkeySettings count];
 }
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if( [[aTableColumn identifier] isEqualToString: @"action"] )
         return [o_hotkeyDescriptions objectAtIndex: rowIndex];
