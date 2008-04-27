@@ -1228,7 +1228,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
         AudioStreamBasicDescription actual_format;
         mtime_t timeout = mtime() + 500000;
 
-        if( vlc_object_timedwait( &w, timeout ) )
+        if( vlc_cond_timedwait( &w.cond, &w.lock, timeout ) )
         {
             msg_Dbg( p_aout, "reached timeout" );
         }
