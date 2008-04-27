@@ -24,12 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <unistd.h>
-#include <sys/time.h> /* gettimeofday() */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <unistd.h>
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
@@ -1190,8 +1189,6 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
     UInt32              i_param_size = 0;
     int i;
 
-    struct timeval now;
-    struct timespec timeout;
     struct { vlc_mutex_t lock; vlc_cond_t cond; } w;
  
     msg_Dbg( p_aout, STREAM_FORMAT_MSG( "setting stream format: ", change_format ) );
@@ -1229,12 +1226,9 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
     for( i = 0; i < 5; i++ )
     {
         AudioStreamBasicDescription actual_format;
+        mtime_t timeout = mtime() + 500000;
 
-        gettimeofday( &now, NULL );
-        timeout.tv_sec = now.tv_sec;
-        timeout.tv_nsec = (now.tv_usec + 500000) * 1000;
-
-        if( pthread_cond_timedwait( &w.cond, &w.lock, &timeout ) )
+        if( vlc_object_timedwait( &w, timeout ) )
         {
             msg_Dbg( p_aout, "reached timeout" );
         }
