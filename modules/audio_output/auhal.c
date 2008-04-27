@@ -87,7 +87,6 @@ struct aout_sys_t
     uint8_t                     p_remainder_buffer[BUFSIZE];
     uint32_t                    i_read_bytes;
     uint32_t                    i_total_bytes;
-    AudioDeviceIOProcID         procId;
 
     /* CoreAudio SPDIF mode specific */
     pid_t                       i_hog_pid;      /* The keep the pid of our hog status */
@@ -789,10 +788,10 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     aout_VolumeNoneInit( p_aout );
 
     /* Add IOProc callback */
-    err = AudioDeviceCreateIOProcID( p_sys->i_selected_dev,
-                                    (AudioDeviceIOProc)RenderCallbackSPDIF,
-                                    (void *)p_aout,
-                                    &p_sys->procId);
+    err = AudioDeviceAddIOProc( p_sys->i_selected_dev,
+                               (AudioDeviceIOProc)RenderCallbackSPDIF,
+                               (void *)p_aout );
+
     if( err != noErr )
     {
         msg_Err( p_aout, "AudioDeviceAddIOProc failed: [%4.4s]", (char *)&err );
@@ -810,8 +809,8 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     {
         msg_Err( p_aout, "AudioDeviceStart failed: [%4.4s]", (char *)&err );
 
-        err = AudioDeviceDestroyIOProcID( p_sys->i_selected_dev,
-                                          p_sys->procId );
+        err = AudioDeviceRemoveIOProc( p_sys->i_selected_dev,
+                                     (AudioDeviceIOProc)RenderCallbackSPDIF );
         if( err != noErr )
         {
             msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: [%4.4s]", (char *)&err );
@@ -851,8 +850,8 @@ static void Close( vlc_object_t * p_this )
         }
 
         /* Remove IOProc callback */
-        err = AudioDeviceDestroyIOProcID( p_sys->i_selected_dev,
-                                          p_sys->procId );
+        err = AudioDeviceRemoveIOProc( p_sys->i_selected_dev,
+                                      (AudioDeviceIOProc)RenderCallbackSPDIF );
         if( err != noErr )
         {
             msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: [%4.4s]", (char *)&err );
