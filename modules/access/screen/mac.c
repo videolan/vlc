@@ -35,6 +35,7 @@
 
 #import <ApplicationServices/ApplicationServices.h>
 #import <OpenGL/OpenGL.h>
+#import <OpenGL/gl.h>
 
 typedef int CGSConnectionRef;
 extern CGError CGSNewConnection( void *, CGSConnectionRef * );
