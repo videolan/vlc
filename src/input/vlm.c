@@ -420,16 +420,16 @@ static int ExecuteShow( vlm_t *p_vlm, const char *psz_name, vlm_message_t **pp_s
     return VLC_SUCCESS;
 }
 
-static int ExecuteHelp( vlm_message_t *p_status )
+static int ExecuteHelp( vlm_message_t **pp_status )
 {
     vlm_message_t *message_child;
 
 #define MessageAdd( a ) \
-        vlm_MessageAdd( p_status, vlm_MessageNew( a, vlm_NULL ) );
+        vlm_MessageAdd( *pp_status, vlm_MessageNew( a, vlm_NULL ) );
 #define MessageAddChild( a ) \
         vlm_MessageAdd( message_child, vlm_MessageNew( a, vlm_NULL ) );
 
-    p_status = vlm_MessageNew( "help", vlm_NULL );
+    *pp_status = vlm_MessageNew( "help", vlm_NULL );
 
     message_child = MessageAdd( "Commands Syntax:" );
     MessageAddChild( "new (name) vod|broadcast|schedule [properties]" );
@@ -1043,7 +1043,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     }
     else IF_EXECUTE( "del",     (i_command != 2),   ExecuteDel(p_vlm, ppsz_command[1], &p_message) )
     else IF_EXECUTE( "show",    (i_command > 2),    ExecuteShow(p_vlm, i_command > 1 ? ppsz_command[1] : NULL, &p_message) )
-    else IF_EXECUTE( "help",    (i_command != 1),   ExecuteHelp( p_message) )
+    else IF_EXECUTE( "help",    (i_command != 1),   ExecuteHelp( &p_message ) )
     else IF_EXECUTE( "control", (i_command < 3),    ExecuteControl(p_vlm, ppsz_command[1], i_command - 2, &ppsz_command[2], &p_message) )
     else IF_EXECUTE( "save",    (i_command != 2),   ExecuteSave(p_vlm, ppsz_command[1], &p_message) )
     else IF_EXECUTE( "export",  (i_command != 1),   ExecuteExport(p_vlm, &p_message) )
