@@ -37,6 +37,12 @@
 
 #include <Cocoa/Cocoa.h>
 
+/* this was introduced in Darwin 9. We need to declare it to prevent both
+ * compilation warnings and errors */
+#ifndef NSInteger
+#define NSInteger int
+#endif
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/

@@ -431,7 +431,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         [o_video_device_pop addItemWithTitle: 
          [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
                    (int)s_rect.size.width, (int)s_rect.size.height]];
-        [[o_video_device_pop lastItem] setTag: [[[NSScreen screens] objectAtIndex: i] displayID]];
+        [[o_video_device_pop lastItem] setTag: (int)[[[NSScreen screens] objectAtIndex: i] displayID]];
         i++;
     }
     [o_video_device_pop selectItemAtIndex: 0];
@@ -1146,12 +1146,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [self showSettingsForCategory: o_hotkeys_view];
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [o_hotkeySettings count];
 }
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
     if( [[aTableColumn identifier] isEqualToString: @"action"] )
         return [o_hotkeyDescriptions objectAtIndex: rowIndex];
