@@ -965,15 +965,6 @@ CFLAGS="${CFLAGS_save}"
 RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast cast-align write-strings missing-prototypes volatile-register-var])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
-dnl This helps detect broken plugins with undefined symbols
-dnl Better fail loudly at build-time than silenty at run-time.
-dnl Unfortunately, this sucks on FreeBSD (won't even link with -lc)
-if test `uname -s` != FreeBSD; then
-  RDC_PROG_LINK_FLAGS_IFELSE([-Wl,-z,defs], [
-    VLC_ADD_LDFLAGS([plugin],[-Wl,-z,defs])
-  ])
-fi
-
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],
     [ac_cv_c_os],
