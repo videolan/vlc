@@ -1226,7 +1226,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
     for( i = 0; i < 5; i++ )
     {
         AudioStreamBasicDescription actual_format;
-        mtime_t timeout = mtime() + 500000;
+        mtime_t timeout = mdate() + 500000;
 
         if( vlc_cond_timedwait( &w.cond, &w.lock, timeout ) )
         {
