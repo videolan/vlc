@@ -21,7 +21,7 @@ EXTRA_SUBDIRS = \
 	mux \
 	stream_out
 if ENABLE_SOUT
-SUBDIRS += mux stream_out
+SUBDIRS += access_output mux stream_out
 endif
 
 DIST_SUBDIRS = $(SUBDIRS) $(EXTRA_SUBDIRS)
