@@ -1285,16 +1285,6 @@ VLC_ADD_PLUGINS([i420_rgb])
 VLC_ADD_PLUGINS([grey_yuv])
 dnl Video codecs:
 VLC_ADD_PLUGINS([rawvideo])
-dnl Accesses:
-VLC_ADD_PLUGINS([access_directory])
-VLC_ADD_PLUGINS([access_file])
-VLC_ADD_PLUGINS([access_udp])
-VLC_ADD_PLUGINS([access_tcp])
-VLC_ADD_PLUGINS([access_http])
-VLC_ADD_PLUGINS([access_mms])
-VLC_ADD_PLUGINS([access_ftp])
-VLC_ADD_PLUGINS([access_rtmp])
-VLC_ADD_PLUGINS([access_fake])
 dnl Access filters:
 VLC_ADD_PLUGINS([access_filter_timeshift])
 VLC_ADD_PLUGINS([access_filter_record])

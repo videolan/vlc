@@ -10,3 +10,5 @@ SOURCES_access_mms = \
 	asf.h \
 	asf.c \
 	$(NULL)
+
+libvlc_LTLIBRARIES += libaccess_mms_plugin.la

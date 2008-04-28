@@ -27,3 +27,13 @@ SOURCES_cdda = \
         vcd/cdrom_internals.h \
         $(NULL)
 SOURCES_access_jack = jack.c
+
+libvlc_LTLIBRARIES += \
+	libaccess_file_plugin.la \
+	libaccess_directory_plugin.la \
+	libaccess_udp_plugin.la \
+	libaccess_tcp_plugin.la \
+	libaccess_http_plugin.la \
+	libaccess_ftp_plugin.la \
+	libaccess_fake_plugin.la \
+	$(NULL)
