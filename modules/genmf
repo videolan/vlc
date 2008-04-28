@@ -19,10 +19,19 @@ do
   # automake will not recurse for make dist if we don't define SUBDIRS = .
   subdirs="`sed -ne 's,'modules/${dir}'/\([^/]*\)/Makefile,\1,p' configure.ac | xargs`"
   mods="`sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < "${modf}" | xargs`"
+  plugins="`sed -n -e 's/^.*lib\([^ ]*\)_plugin\.la.*/\1/p' < "${modf}" | xargs`"
+  libvlc_ltlibs=""
   extra_ltlibs=""
   for mod in $mods
   do
-    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la"
+    case " ${plugins} " in
+      *\ ${mod}\ *)
+	;;
+      *)
+        libvlc_ltlibs="${libvlc_ltlibs} \$(LTLIB${mod})"
+        extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la"
+      ;;
+    esac
   done
   rm -f "${makf}" && cat > "${makf}" << EOF
 # ${makf} automatically generated from ${modf} by $0
@@ -32,6 +41,7 @@ basedir = ${basedir}
 dir = ${dir}
 mods = ${mods}
 SUBDIRS = ${subdirs}
+libvlc_LTLIBRARIES = ${libvlc_ltlibs}
 EXTRA_LTLIBRARIES = ${extra_ltlibs}
 
 include \$(top_srcdir)/modules/common.am
