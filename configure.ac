@@ -1762,6 +1762,7 @@ then
 
   AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
 fi
+AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
 
 AC_ARG_ENABLE(switcher,
   [  --enable-switcher       Stream-out switcher plugin (default disabled)])

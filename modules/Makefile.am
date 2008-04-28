@@ -11,14 +11,20 @@ SUBDIRS = \
 	gui \
 	meta_engine \
 	misc \
-	mux \
 	packetizer \
 	services_discovery \
-	stream_out \
 	video_chroma \
 	video_filter \
 	video_output \
 	visualization
+EXTRA_SUBDIRS = \
+	mux \
+	stream_out
+if ENABLE_SOUT
+SUBDIRS += mux stream_out
+endif
+
+DIST_SUBDIRS = $(SUBDIRS) $(EXTRA_SUBDIRS)
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
