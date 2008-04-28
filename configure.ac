@@ -6216,7 +6216,10 @@ then
   dnl  this one is needed until automake knows what to do
   VLC_ADD_LIBS([test3],[-lobjc])
 
-  VLC_ADD_PLUGINS([${TESTS}])
+  VLC_ADD_PLUGINS([test1])
+  VLC_ADD_PLUGINS([test2])
+  VLC_ADD_PLUGINS([test3])
+  VLC_ADD_PLUGINS([test4])
 fi
 
 dnl
@@ -6297,8 +6300,8 @@ AS_IF([test "${plugin_support}" != "no"], [
 AM_CONDITIONAL(HAVE_PLUGINS, [test "${plugin_support}" != "no"])
 
 dnl Temporary(?) hack for plugins/builtins transition
-VLC_ADD_PLUGINS([${BUILTINS}])
-BUILTINS=""
+dnl VLC_ADD_PLUGINS([${BUILTINS}])
+dnl BUILTINS=""
 
 dnl
 dnl Pic and shared libvlc stuff
