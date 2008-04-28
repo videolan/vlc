@@ -1,7 +1,6 @@
 SUBDIRS = \
 	access \
 	access_filter \
-	access_output \
 	audio_filter \
 	audio_mixer \
 	audio_output \
@@ -18,6 +17,7 @@ SUBDIRS = \
 	video_output \
 	visualization
 EXTRA_SUBDIRS = \
+	access_output \
 	mux \
 	stream_out
 if ENABLE_SOUT
