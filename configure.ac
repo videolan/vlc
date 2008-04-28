@@ -1240,20 +1240,27 @@ fi
 dnl
 dnl  Accelerated modules
 dnl
-MMX_MODULES="memcpymmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx i420_ymga_mmx"
-#MMX_MODULES="${MMX_MODULES} idctmmx motionmmx"
-MMXEXT_MODULES="memcpymmxext"
-#MMXEXT_MODULES="${MMXEXT_MODULES} idctmmxext motionmmxext"
-THREEDNOW_MODULES="memcpy3dn"
-SSE_MODULES=""
-SSE2_MODULES="i420_rgb_sse2 i420_yuy2_sse2 i422_yuy2_sse2"
-ALTIVEC_MODULES="memcpyaltivec i420_yuy2_altivec"
-#ALTIVEC_MODULES="${ALTIVEC_MODULES} idctaltivec motionaltivec"
+AC_ARG_WITH(,[])
+AC_ARG_WITH(,[Optimization options:])
 
-dnl  Check for fully workin MMX intrinsics
+dnl  Check for fully working MMX intrinsics
 dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
-AC_CACHE_CHECK([if \$CC groks MMX intrinsics],
+AC_ARG_ENABLE(mmx,
+[  --disable-mmx       disable MMX optimizations (default auto)],,[
+  case "${host_cpu}" in
+    i?86|x86_64)
+      enable_mmx="yes"
+      ;;
+    *)
+      enable_mmx="no"
+      ;;
+  esac
+])
+AS_IF([test "${enable_mmx}" != "no"], [
+  ARCH="${ARCH} mmx"
+
+  AC_CACHE_CHECK([if $CC groks MMX intrinsics],
     [ac_cv_c_mmx_intrinsics],
     [CFLAGS="${CFLAGS_save} -O -mmmx"
      AC_TRY_COMPILE([#include <mmintrin.h>
@@ -1270,15 +1277,57 @@ AC_CACHE_CHECK([if \$CC groks MMX intrinsics],
                      frobzor = (uint64_t)a;],
                     [ac_cv_c_mmx_intrinsics=yes],
                     [ac_cv_c_mmx_intrinsics=no])])
-if test "${ac_cv_c_mmx_intrinsics}" != "no"; then
-  AC_DEFINE(HAVE_MMX_INTRINSICS, 1, Define if MMX intrinsics are available.)
-  VLC_ADD_CFLAGS([${MMX_MODULES}],[-mmmx])
-fi
+  AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
+    AC_DEFINE(HAVE_MMX_INTRINSICS, 1,
+              [Define to 1 if MMX intrinsics are available.])
+    VLC_ADD_CFLAGS([memcpymmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx i420_ymga_mmx],[-mmmx])
+  ])
+
+  AC_CACHE_CHECK([if $CC groks MMX inline assembly],
+    [ac_cv_mmx_inline],
+    [CFLAGS="${CFLAGS_save}"
+     AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
+                    ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
+  AS_IF([test "${ac_cv_mmx_inline}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_MMX, 1,
+              [Define to 1 inline MMX assembly is available.])
+    VLC_ADD_PLUGINS([memcpymmx])
+    VLC_ADD_PLUGINS([i420_rgb_mmx])
+    VLC_ADD_PLUGINS([i420_yuy2_mmx])
+    VLC_ADD_PLUGINS([i422_yuy2_mmx])
+    VLC_ADD_PLUGINS([i420_ymga_mmx])
+  ])
+
+  AC_CACHE_CHECK([if $CC groks MMX EXT inline assembly],
+    [ac_cv_mmxext_inline],
+    [CFLAGS="${CFLAGS_save}"
+     AC_TRY_COMPILE(,[void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));],
+                    ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
+  AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_MMXEXT, 1,
+              [Define to 1 if MMX EXT inline assembly is available.])
+    VLC_ADD_PLUGINS([memcpymmxext])
+  ])
+])
 
 dnl  Check for fully workin SSE2 intrinsics
 dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
-AC_CACHE_CHECK([if \$CC groks SSE2 intrinsics],
+AC_ARG_ENABLE(sse,
+[  --disable-sse       disable SSE (1 and 2) optimizations (default auto)],, [
+  case "${host_cpu}" in
+    i686|x86_64)
+      enable_sse=yes
+      ;;
+    *)
+      enable_sse=no
+      ;;
+  esac
+])
+AS_IF([test "${enable_sse}" != "no"], [
+  ARCH="${ARCH} sse sse2"
+
+  AC_CACHE_CHECK([if $CC groks SSE2 intrinsics],
     [ac_cv_c_sse2_intrinsics],
     [CFLAGS="${CFLAGS_save} -O -msse2"
      AC_TRY_COMPILE([#include <emmintrin.h>
@@ -1295,83 +1344,77 @@ AC_CACHE_CHECK([if \$CC groks SSE2 intrinsics],
                      frobzor = (uint64_t)_mm_movepi64_pi64(a);],
                     [ac_cv_c_sse2_intrinsics=yes],
                     [ac_cv_c_sse2_intrinsics=no])])
-if test "${ac_cv_c_sse2_intrinsics}" != "no"; then
-  AC_DEFINE(HAVE_SSE2_INTRINSICS, 1, Define if SSE2 intrinsics are available.)
-  VLC_ADD_CFLAGS([${SSE2_MODULES}],[-msse2])
-fi
+  AS_IF([test "${ac_cv_c_sse2_intrinsics}" != "no"], [
+    AC_DEFINE(HAVE_SSE2_INTRINSICS, 1,
+              [Define to 1 if SSE2 intrinsics are available.])
+    VLC_ADD_CFLAGS([i420_rgb_sse2 i420_yuy2_sse2 i422_yuy2_sse2],[-msse2])
+  ])
 
-AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
-    [ac_cv_mmx_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
-if test "${ac_cv_mmx_inline}" != "no"; then
-  AC_DEFINE(CAN_COMPILE_MMX, 1, Define if \$CC groks MMX inline assembly.)
-  ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
-fi
-
-AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
-    [ac_cv_mmxext_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
-if test "${ac_cv_mmxext_inline}" != "no"; then
-  AC_DEFINE(CAN_COMPILE_MMXEXT, 1, Define if \$CC groks MMX EXT inline assembly.)
-  ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
-fi
-
-AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
-    [ac_cv_3dnow_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
-if test "${ac_cv_3dnow_inline}" != "no"; then
-  AC_DEFINE(CAN_COMPILE_3DNOW, 1, Define if \$CC groks 3D Now! inline assembly.)
-  ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
-fi
-
-AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
+  AC_CACHE_CHECK([if $CC groks SSE inline assembly],
     [ac_cv_sse_inline],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));],
                     ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
-if test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"; then
-  AC_DEFINE(CAN_COMPILE_SSE, 1, Define if \$CC groks SSE inline assembly.)
-  ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
-fi
+  AS_IF([test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"], [
+    AC_DEFINE(CAN_COMPILE_SSE, 1,
+              [Define to 1 if SSE inline assembly is available.])
+  ])
 
-AC_CACHE_CHECK([if \$CC groks SSE2 inline assembly],
+  AC_CACHE_CHECK([if $CC groks SSE2 inline assembly],
     [ac_cv_sse2_inline],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[void *p;asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p));],
                     ac_cv_sse2_inline=yes, ac_cv_sse2_inline=no)])
-if test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"; then
-  AC_DEFINE(CAN_COMPILE_SSE2, 1, Define if \$CC groks SSE2 inline assembly.)
-  ACCEL_MODULES="${ACCEL_MODULES} ${SSE2_MODULES}"
-fi
+  AS_IF([test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"], [
+    AC_DEFINE(CAN_COMPILE_SSE2, 1,
+              [Define to 1 if SSE2 inline assembly is available.])
+    VLC_ADD_PLUGINS([i420_rgb_sse2])
+    VLC_ADD_PLUGINS([i420_yuy2_sse2])
+    VLC_ADD_PLUGINS([i422_yuy2_sse2])
+  ])
+])
 
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_CACHE_CHECK([if \$CC groks AltiVec inline assembly],
+AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
+    [ac_cv_3dnow_inline],
+    [CFLAGS="${CFLAGS_save}"
+     AC_TRY_COMPILE(,[void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
+                    ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
+AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
+  AC_DEFINE(CAN_COMPILE_3DNOW, 1,
+            [Define to 1 if 3D Now! inline assembly is available.])
+  VLC_ADD_PLUGINS([memcpy3dn])
+])
+
+AC_ARG_ENABLE(altivec,
+[  --disable-altivec       disable AltiVec optimizations (default auto)],, [
+  AS_IF([test "${host_cpu}" = "powerpc"],
+        [enable_altivec=yes], [enable_altivec=no])
+])
+AS_IF([test "${enable_altivec}" = "yes"], [
+  ARCH="${ARCH} altivec";
+  AC_CACHE_CHECK([if $CC groks AltiVec inline assembly],
     [ac_cv_altivec_inline],
     [CFLAGS="${CFLAGS_save}"
      AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
-         ac_cv_altivec_inline=yes,
+         ac_cv_altivec_inline="yes",
          [CFLAGS="${CFLAGS_save} -Wa,-m7400"
           AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
             [ac_cv_altivec_inline="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
          ])])
-if test "${ac_cv_altivec_inline}" != "no"; then
-  AC_DEFINE(CAN_COMPILE_ALTIVEC, 1, Define if \$CC groks AltiVec inline assembly.)
-  if test "${ac_cv_altivec_inline}" != "yes"; then
-    VLC_ADD_CFLAGS([idctaltivec],[${ac_cv_altivec_inline}])
-    VLC_ADD_CFLAGS([motionaltivec],[${ac_cv_altivec_inline}])
-    VLC_ADD_CFLAGS([memcpyaltivec],[${ac_cv_altivec_inline}])
-    VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
-    VLC_ADD_CFLAGS([libvlc],[${ac_cv_altivec_inline}])
-  fi
-  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
-fi
+  AS_IF([test "${ac_cv_altivec_inline}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_ALTIVEC, 1,
+              [Define to 1 if AltiVec inline assembly is available.])
+    AS_IF([test "${ac_cv_altivec_inline}" != "yes"], [
+      VLC_ADD_CFLAGS([idctaltivec],[${ac_cv_altivec_inline}])
+      VLC_ADD_CFLAGS([motionaltivec],[${ac_cv_altivec_inline}])
+      VLC_ADD_CFLAGS([memcpyaltivec],[${ac_cv_altivec_inline}])
+      VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
+      VLC_ADD_CFLAGS([libvlc],[${ac_cv_altivec_inline}])
+    ])
+    VLC_ADD_PLUGINS([memcpyaltivec])
+    VLC_ADD_PLUGINS([i420_yuy2_altivec])
+  ])
 
 dnl The AltiVec C extensions
 dnl
@@ -1383,7 +1426,7 @@ dnl - Linux PPC, gcc 3.4, 4.x: need <altivec.h> which requires -maltivec
 dnl - Linux PPC, gcc 3.3: need <altivec.h> and -maltivec -mabi=altivec
 dnl - Linux PPC, gcc 3.x: need <altivec.h> and -fvec
 dnl - Others: test should fail
-AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
+  AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
   [ac_cv_c_altivec],
   [# OS X/PPC test (gcc 4.x)
    CFLAGS="${CFLAGS_save} -mpim-altivec -force_cpusubtype_ALL"
@@ -1419,42 +1462,33 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
      ])
    CFLAGS="${CFLAGS_save}"
   ])
+  AS_IF([test "${ac_cv_c_altivec}" != "no"], [
+    CPPFLAGS="${CPPFLAGS_save} ${ac_cv_c_altivec}"
+  ])
 
-if test "${ac_cv_c_altivec}" != "no"; then
-  CPPFLAGS="${CPPFLAGS_save} ${ac_cv_c_altivec}"
-fi
-
-AS_IF( test "${enable_altivec}" != "no",
-[
   AC_CHECK_HEADERS(altivec.h)
   CPPFLAGS="${CPPFLAGS_save}"
   
-  if test "${ac_cv_c_altivec}" != "no"; then
-    AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
+  AS_IF([test "${ac_cv_c_altivec}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1,
+              [Define to 1 if C AltiVec extensions are available.])
     VLC_ADD_CFLAGS([libvlc],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
-    if test "${ac_cv_altivec_inline}" = "no"; then
-      ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
-    fi
-  fi
-],[
-  CPPFLAGS="${CPPFLAGS_save}"
-])
+    VLC_ADD_PLUGINS([memcpyaltivec])
+    VLC_ADD_PLUGINS([i420_yuy2_altivec])
+  ])
 
-AC_CACHE_CHECK([if linker needs -framework vecLib],
+  AC_CACHE_CHECK([if linker needs -framework vecLib],
     [ac_cv_ld_altivec],
     [LDFLAGS="${LDFLAGS_vlc} -Wl,-framework,vecLib"
      AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)
      LDFLAGS="${LDFLAGS_save}"
     ])
-if test "${ac_cv_ld_altivec}" != "no"; then
-  VLC_ADD_LDFLAGS([libvlc idctaltivec motionaltivec memcpyaltivec],[-Wl,-framework,vecLib])
-fi
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
-
-AC_ARG_WITH(,[])
-AC_ARG_WITH(,[Optimization options:])
+  AS_IF([test "${ac_cv_ld_altivec}" != "no"], [
+    VLC_ADD_LDFLAGS([libvlc idctaltivec motionaltivec memcpyaltivec],[-Wl,-framework,vecLib])
+  ])
+])
 
 dnl
 dnl  Special arch tuning
@@ -1495,24 +1529,6 @@ AS_IF([test "${CFLAGS_TUNING}"],
 ])
 
 dnl
-dnl  x86 accelerations
-dnl
-AC_ARG_ENABLE(mmx,
-[  --disable-mmx       disable MMX optimizations (default enabled on x86)],
-[ if test "${enable_mmx}" = "yes"; then ARCH="${ARCH} mmx";
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ],
-[ if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "x86_64"; then
-    ARCH="${ARCH} mmx"
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ])
-
-AC_ARG_ENABLE(sse,
-[  --disable-sse       disable SSE (1 and 2) optimizations (default enabled on i686 and x86_64)],
-[ if test "${enable_sse}" = "yes"; then ARCH="${ARCH} sse sse2";
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ],
-[ if test "${host_cpu}" = "i686" -o "${host_cpu}" = "x86_64"; then ARCH="${ARCH} sse sse2";
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ])
-
-dnl
 dnl  Memory usage
 dnl
 AC_ARG_ENABLE(optimize-memory,
@@ -1533,16 +1549,6 @@ if test "${enable_optimizations}" != "no"; then
       enable_optimizations="speed"
    fi
 fi
-
-dnl
-dnl  AltiVec acceleration
-dnl
-AC_ARG_ENABLE(altivec,
-[  --disable-altivec       disable AltiVec optimizations (default enabled on PPC)],
-[ if test "${enable_altivec}" = "yes"; then ARCH="${ARCH} altivec";
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ],
-[ if test "${host_cpu}" = "powerpc"; then ARCH="${ARCH} altivec";
-    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ])
 
 dnl
 dnl  Debugging mode
