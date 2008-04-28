@@ -12,8 +12,6 @@ EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 CLEANFILES = $(BUILT_SOURCES)
 
-include $(srcdir)/Modules.am
-
 if HAVE_PLUGINS
 LTLIBVLC = $(top_builddir)/src/libvlc.la
 
@@ -33,10 +31,12 @@ AM_LDFLAGS += -export-symbol-regex ^vlc_entry
 endif
 endif
 
-nice:
-	$(top_builddir)/compile
+include $(srcdir)/Modules.am
 
 if MAINTAINER_MODE
 $(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
 	cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
 endif
+
+nice:
+	$(top_builddir)/compile
