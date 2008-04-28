@@ -12,6 +12,7 @@ AC_DEFUN([VLC_ADD_BUILTINS], [
 
 AC_DEFUN([VLC_ADD_PLUGINS], [
   PLUGINS="${PLUGINS} $1"
+  AC_SUBST([LTLIB$1], ["lib$1_plugin.la"])
 ])
 
 dnl  Special cases: vlc, pics, plugins, save
