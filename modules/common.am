@@ -33,41 +33,10 @@ AM_LDFLAGS += -export-symbol-regex ^vlc_entry
 endif
 endif
 
-all: all-modules
-
 nice:
 	$(top_builddir)/compile
-
-# Find out which modules were enabled and tell make to build them
-all-modules:
-	@set fnord $$MAKEFLAGS; amf=$$2; targets=`\
-	z=$$($(VLC_CONFIG) --list plugin); for mod in $(mods); do case "$$z " in *\ $${mod}\ *) echo lib$${mod}_plugin.la;; esac; done; \
-	`; case "$$targets" in *lib*) $(MAKE) $(AM_MAKEFLAGS) $$targets || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \
-	test -z "$$fail"
 
 if MAINTAINER_MODE
 $(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
 	cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
 endif
-
-mostlyclean-local:
-	-rm -f -- *.la
-
-### automake creates libvlcdir after running install-*-local
-### so we have to create it ourselves first
-install-exec-local: all-modules
-	@if test -z "$(libvlc_LTLIBRARIES)"; then \
-	  z=$$($(VLC_CONFIG) --list plugin); \
-	  m=`for mod in $(mods); do case "$$z " in *\ $${mod}\ *) printf " lib$${mod}_plugin.la" ;; esac; done` ; \
-	  test -z "$$m" || \
-	    $(MAKE) $(AM_MAKEFLAGS) libvlc_LTLIBRARIES="$$m" install-libvlcLTLIBRARIES || exit $$? ; \
-	fi
-
-uninstall-local:
-	@if test -z "$(libvlc_LTLIBRARIES)"; then \
-	  z=$$($(VLC_CONFIG) --list plugin); \
-	  m=`for mod in $(mods); do case "$$z " in *\ $${mod}\ *) printf " lib$${mod}_plugin.la" ;; esac; done` ; \
-	  test -z "$$m" || \
-	    $(MAKE) $(AM_MAKEFLAGS) libvlc_LTLIBRARIES="$$m" uninstall-libvlcLTLIBRARIES || exit $$?; \
-	fi
-
