@@ -11,3 +11,18 @@ SOURCES_stream_out_switcher = switcher.c
 SOURCES_stream_out_bridge = bridge.c
 SOURCES_stream_out_mosaic_bridge = mosaic_bridge.c
 SOURCES_stream_out_autodel = autodel.c
+
+libvlc_LTLIBRARIES += \
+	libstream_out_dummy_plugin.la \
+	libstream_out_description_plugin.la \
+	libstream_out_standard_plugin.la \
+	libstream_out_transcode_plugin.la \
+	libstream_out_duplicate_plugin.la \
+	libstream_out_es_plugin.la \
+	libstream_out_display_plugin.la \
+	libstream_out_gather_plugin.la \
+	libstream_out_rtp_plugin.la \
+	libstream_out_bridge_plugin.la \
+	libstream_out_mosaic_bridge_plugin.la \
+	libstream_out_autodel_plugin.la \
+	$(NULL)

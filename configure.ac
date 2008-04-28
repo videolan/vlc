@@ -1290,12 +1290,6 @@ VLC_ADD_PLUGIN([access_filter_timeshift])
 VLC_ADD_PLUGIN([access_filter_record])
 VLC_ADD_PLUGIN([access_filter_dump])
 VLC_ADD_PLUGIN([access_filter_bandwidth])
-dnl Packetizers:
-VLC_ADD_PLUGIN([packetizer_mpegvideo])
-VLC_ADD_PLUGIN([packetizer_h264])
-VLC_ADD_PLUGIN([packetizer_mpeg4video])
-VLC_ADD_PLUGIN([packetizer_mpeg4audio])
-VLC_ADD_PLUGIN([packetizer_vc1])
 
 ALIASES="${ALIASES} cvlc"
 
@@ -1725,43 +1719,6 @@ dnl Stream output
 dnl
 AC_ARG_ENABLE(sout,
   [  --enable-sout           Stream output modules (default enabled)])
-if test "${enable_sout}" != "no"
-then
-  dnl Access outputs:
-  VLC_ADD_PLUGIN([access_output_dummy])
-  VLC_ADD_PLUGIN([access_output_udp])
-  VLC_ADD_PLUGIN([access_output_file])
-  VLC_ADD_PLUGIN([access_output_http])
-  dnl Muxers:
-  VLC_ADD_PLUGIN([mux_ps])
-  VLC_ADD_PLUGIN([mux_avi])
-  VLC_ADD_PLUGIN([mux_mp4])
-  VLC_ADD_PLUGIN([mux_asf])
-  VLC_ADD_PLUGIN([mux_dummy])
-  VLC_ADD_PLUGIN([mux_wav])
-  VLC_ADD_PLUGIN([mux_mpjpeg])
-  dnl Packetizers (FIXME: why are the others outside --enable-sout??):
-  VLC_ADD_PLUGIN([packetizer_copy])
-  dnl Stream outputs:
-  VLC_ADD_PLUGIN([stream_out_dummy])
-  VLC_ADD_PLUGIN([stream_out_standard])
-  VLC_ADD_PLUGIN([stream_out_es])
-  VLC_ADD_PLUGIN([stream_out_rtp])
-  VLC_ADD_PLUGIN([stream_out_description])
-  VLC_ADD_PLUGIN([stream_out_duplicate])
-  VLC_ADD_PLUGIN([stream_out_display])
-  VLC_ADD_PLUGIN([stream_out_transcode])
-  VLC_ADD_PLUGIN([stream_out_bridge])
-  VLC_ADD_PLUGIN([stream_out_mosaic_bridge])
-  VLC_ADD_PLUGIN([stream_out_autodel])
-  VLC_ADD_PLUGIN([stream_out_gather])
-#  VLC_ADD_PLUGIN([stream_out_transrate])
-  dnl Misc:
-  VLC_ADD_PLUGIN([vod_rtsp])
-  VLC_ADD_PLUGIN([profile_parser])
-
-  AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
-fi
 AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
 
 AC_ARG_ENABLE(switcher,
