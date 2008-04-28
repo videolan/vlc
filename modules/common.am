@@ -40,3 +40,5 @@ endif
 
 nice:
 	$(top_builddir)/compile
+
+.PHONY: nice
