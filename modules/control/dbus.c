@@ -632,6 +632,7 @@ DBUS_METHOD( handle_root )
 
     METHOD_FUNC( "Identity",                Identity );
     METHOD_FUNC( "MprisVersion",            MprisVersion );
+    METHOD_FUNC( "Quit",                    Quit );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
@@ -647,7 +648,6 @@ DBUS_METHOD( handle_player )
 
     METHOD_FUNC( "Prev",                    Prev );
     METHOD_FUNC( "Next",                    Next );
-    METHOD_FUNC( "Quit",                    Quit );
     METHOD_FUNC( "Stop",                    Stop );
     METHOD_FUNC( "Play",                    Play );
     METHOD_FUNC( "Pause",                   Pause );

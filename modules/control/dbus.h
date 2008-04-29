@@ -101,6 +101,8 @@ const char* psz_introspection_xml_data_root =
 "    <method name=\"MprisVersion\">\n"
 "      <arg type=\"(qq)\" direction=\"out\" />\n"
 "    </method>\n"
+"    <method name=\"Quit\">\n"
+"    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;
@@ -117,8 +119,6 @@ const char* psz_introspection_xml_data_player =
 "  <interface name=\"org.freedesktop.MediaPlayer\">\n"
 "    <method name=\"GetStatus\">\n"
 "      <arg type=\"(iiii)\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"Quit\">\n"
 "    </method>\n"
 "    <method name=\"Prev\">\n"
 "    </method>\n"
