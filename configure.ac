@@ -1719,6 +1719,9 @@ dnl Stream output
 dnl
 AC_ARG_ENABLE(sout,
   [  --enable-sout           Stream output modules (default enabled)])
+AS_IF([test "${enable_sout}" != "no"], [
+  AC_DEFINE(ENABLE_SOUT, 1, [Define to 1 for stream output support.])
+])
 AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
 
 AC_ARG_ENABLE(switcher,
