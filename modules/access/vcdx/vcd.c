@@ -34,6 +34,7 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Exported prototypes

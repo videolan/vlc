@@ -40,6 +40,7 @@
 #include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_meta.h>
+#include <vlc_charset.h>
 
 #include <vlc_codecs.h> /* For WAVEHEADER */
 #include "vcd/cdrom.h"
@@ -158,7 +159,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-    else psz_name = strdup( p_access->psz_path );
+    else psz_name = ToLocaleDup( p_access->psz_path );
 
 #ifdef WIN32
     if( psz_name[0] && psz_name[1] == ':' &&

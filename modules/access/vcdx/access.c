@@ -37,6 +37,7 @@
 #include <vlc_interface.h>
 #include <vlc_input.h>
 #include <vlc_access.h>
+#include <vlc_charset.h>
 #include "vlc_keys.h"
 
 #include <cdio/cdio.h>
@@ -759,7 +760,7 @@ vcd_Open( vlc_object_t *p_this, const char *psz_dev )
 
     if( !psz_dev ) return NULL;
 
-    actual_dev=strdup(psz_dev);
+    actual_dev= ToLocaleDup(psz_dev);
     if ( vcdinfo_open(&p_vcdobj, &actual_dev, DRIVER_UNKNOWN, NULL) !=
          VCDINFO_OPEN_VCD) {
       free(actual_dev);

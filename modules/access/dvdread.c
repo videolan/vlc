@@ -33,6 +33,7 @@
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_access.h>
+#include <vlc_charset.h>
 
 #include <vlc_interface.h>
 
@@ -203,7 +204,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
     else
-        psz_name = strdup( p_demux->psz_path );
+        psz_name = ToLocaleDup( p_demux->psz_path );
 
 #ifdef WIN32
     if( psz_name[0] && psz_name[1] == ':' &&
