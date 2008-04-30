@@ -226,7 +226,7 @@ char *ToLocale (const char *utf8)
 }
 
 
-static char *ToLocaleDup (const char *utf8)
+char *ToLocaleDup (const char *utf8)
 {
     return locale_dup (utf8, false);
 }

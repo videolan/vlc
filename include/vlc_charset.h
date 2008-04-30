@@ -37,6 +37,7 @@ VLC_EXPORT( void, LocaleFree, ( const char * ) );
 VLC_EXPORT( char *, FromLocale, ( const char * ) );
 VLC_EXPORT( char *, FromLocaleDup, ( const char * ) );
 VLC_EXPORT( char *, ToLocale, ( const char * ) );
+VLC_EXPORT( char *, ToLocaleDup, ( const char * ) );
 
 /* TODO: move all of this to "vlc_fs.h" or something like that */
 VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) );

@@ -330,6 +330,7 @@ str_format_time
 tls_ClientCreate
 tls_ClientDelete
 ToLocale
+ToLocaleDup
 unescape_URI
 unescape_URI_duplicate
 update_Check
