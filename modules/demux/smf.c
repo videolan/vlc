@@ -87,6 +87,44 @@ static int Open (vlc_object_t * p_this)
     if (stream_Peek (stream, &peek, 14) < 14)
         return VLC_EGENERIC;
 
+    /* Skip RIFF MIDI header if present */
+    if (!memcmp (peek, "RIFF", 4) && !memcmp (peek + 8, "RMID", 4))
+    {
+        uint32_t riff_len = GetDWLE (peek + 4);
+
+        msg_Dbg (p_this, "detected RIFF MIDI file (%u bytes)",
+                 (unsigned)riff_len);
+        if ((stream_Read (stream, NULL, 12) < 12))
+            return VLC_EGENERIC;
+
+        /* Look for the RIFF data chunk */
+        for (;;)
+        {
+            char chnk_hdr[8];
+            uint32_t chnk_len;
+
+            if ((riff_len < 8)
+             || (stream_Read (stream, chnk_hdr, 8) < 8))
+                return VLC_EGENERIC;
+
+            riff_len -= 8;
+            chnk_len = GetDWLE (chnk_hdr + 4);
+            if (riff_len < chnk_len)
+                return VLC_EGENERIC;
+            riff_len -= chnk_len;
+
+            if (!memcmp (chnk_hdr, "data", 4))
+                break; /* found! */
+
+            if (stream_Read (stream, NULL, chnk_len) < (ssize_t)chnk_len)
+                return VLC_EGENERIC;
+        }
+
+        /* Read real SMF header. Assume RIFF data chunk length is proper. */
+        if (stream_Peek (stream, &peek, 14) < 14)
+            return VLC_EGENERIC;
+    }
+
     if (memcmp (peek, "MThd\x00\x00\x00\x06", 8))
         return VLC_EGENERIC;
     peek += 8;
