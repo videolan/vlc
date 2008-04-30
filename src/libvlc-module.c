@@ -215,8 +215,10 @@ static const char *ppsz_snap_formats[] =
     "You can completely disable the audio output. The audio " \
     "decoding stage will not take place, thus saving some processing power.")
 
+#if 0
 #define MONO_TEXT N_("Force mono audio")
 #define MONO_LONGTEXT N_("This will force a mono audio output.")
+#endif
 
 #define VOLUME_TEXT N_("Default audio volume")
 #define VOLUME_LONGTEXT N_( \
