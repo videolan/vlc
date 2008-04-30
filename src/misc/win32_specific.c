@@ -287,8 +287,8 @@ static void IPCHelperThread( vlc_object_t *p_this )
                   GetModuleHandle(NULL),  /* handle of this program instance */
                   NULL );                               /* sent to WM_CREATE */
 
-    SetWindowLong( ipcwindow, GWL_WNDPROC, (LONG)WMCOPYWNDPROC );
-    SetWindowLongPtr( ipcwindow, GWL_USERDATA, (LONG_PTR)p_this );
+    SetWindowLongPtr( ipcwindow, GWLP_WNDPROC, (LRESULT)WMCOPYWNDPROC );
+    SetWindowLongPtr( ipcwindow, GWLP_USERDATA, (LONG_PTR)p_this );
 
     /* Signal the creation of the thread and events queue */
     vlc_thread_ready( p_this );
@@ -309,7 +309,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
         vlc_object_t *p_this;
         playlist_t *p_playlist;
 
-        p_this = (vlc_object_t *)GetWindowLongPtr( hwnd, GWL_USERDATA );
+        p_this = (vlc_object_t *)GetWindowLongPtr( hwnd, GWLP_USERDATA );
 
         if( !p_this ) return 0;
 
