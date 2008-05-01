@@ -882,18 +882,8 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #define I64FX "%"PRIX64
 
 /* 64 bits integer constant suffix */
-#if defined( __MINGW32__ ) || (!defined(WIN32) && !defined(UNDER_CE))
-#   if defined(__WORDSIZE) && __WORDSIZE == 64
-#       define I64C(x)         x##L
-#       define UI64C(x)        x##UL
-#   else
-#       define I64C(x)         x##LL
-#       define UI64C(x)        x##ULL
-#   endif
-#else
-#   define I64C(x)         x##i64
-#   define UI64C(x)        x##ui64
-#endif /* defined(WIN32)||defined(UNDER_CE) */
+#define I64C(x)  INT64_C(x)
+#define UI64C(x) UINT64_C(x)
 
 #if defined(WIN32) || defined(UNDER_CE)
 /* win32, cl and icl support */
