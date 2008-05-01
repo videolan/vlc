@@ -114,7 +114,7 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
         case VLC_VAR_TIME:
             {
                 double f = luaL_checknumber( L, -1 );
-                val->i_time = (vlc_int64_t)(f*1000000.);
+                val->i_time = (int64_t)(f*1000000.);
             }
             break;
         case VLC_VAR_ADDRESS:
