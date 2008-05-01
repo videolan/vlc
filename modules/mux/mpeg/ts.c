@@ -738,7 +738,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_shaping_delay <= 0 )
     {
         msg_Err( p_mux,
-                 "invalid shaping ("I64Fd"ms) resetting to 200ms",
+                 "invalid shaping (%"PRId64"ms) resetting to 200ms",
                  p_sys->i_shaping_delay / 1000 );
         p_sys->i_shaping_delay = 200000;
     }
@@ -749,7 +749,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_pcr_delay >= p_sys->i_shaping_delay )
     {
         msg_Err( p_mux,
-                 "invalid pcr delay ("I64Fd"ms) resetting to 70ms",
+                 "invalid pcr delay (%"PRId64"ms) resetting to 70ms",
                  p_sys->i_pcr_delay / 1000 );
         p_sys->i_pcr_delay = 70000;
     }
@@ -757,7 +757,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
     p_sys->i_dts_delay = (int64_t)val.i_int * 1000;
 
-    msg_Dbg( p_mux, "shaping="I64Fd" pcr="I64Fd" dts_delay="I64Fd,
+    msg_Dbg( p_mux, "shaping=%"PRId64" pcr=%"PRId64" dts_delay=%"PRId64,
              p_sys->i_shaping_delay, p_sys->i_pcr_delay, p_sys->i_dts_delay );
 
     var_Get( p_mux, SOUT_CFG_PREFIX "use-key-frames", &val );
@@ -1429,7 +1429,7 @@ static int Mux( sout_mux_t *p_mux )
                           p_stream->i_pes_length ) )
                     {
                         msg_Warn( p_mux, "packet with too strange dts "
-                                  "(dts="I64Fd",old="I64Fd",pcr="I64Fd")",
+                                  "(dts=%"PRId64",old=%"PRId64",pcr=%"PRId64")",
                                   p_data->i_dts, p_stream->i_pes_dts,
                                   p_pcr_stream->i_pes_dts );
                         block_Release( p_data );
@@ -1818,7 +1818,7 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                 i++;
                 i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
             }
-            msg_Dbg( p_mux, "adjusting rate at "I64Fd"/"I64Fd" (%d/%d)",
+            msg_Dbg( p_mux, "adjusting rate at %"PRId64"/%"PRId64" (%d/%d)",
                      i_cut_dts - i_pcr_dts, i_pcr_length, new_chain.i_depth,
                      p_chain_ts->i_depth );
             if ( new_chain.i_depth )
@@ -1850,16 +1850,16 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           / (uint64_t)(i_pcr_length / 1000);
         if ( p_sys->i_bitrate_max && p_sys->i_bitrate_max < i_bitrate )
         {
-            msg_Warn( p_mux, "max bitrate exceeded at "I64Fd
-                      " (%d bi/s for %d pkt in "I64Fd" us)",
+            msg_Warn( p_mux, "max bitrate exceeded at %"PRId64
+                      " (%d bi/s for %d pkt in %"PRId64" us)",
                       i_pcr_dts + p_sys->i_shaping_delay * 3 / 2 - mdate(),
                       i_bitrate, i_packet_count, i_pcr_length);
         }
 #if 0
         else
         {
-            msg_Dbg( p_mux, "starting at "I64Fd
-                     " (%d bi/s for %d packets in "I64Fd" us)",
+            msg_Dbg( p_mux, "starting at %"PRId64
+                     " (%d bi/s for %d packets in %"PRId64" us)",
                      i_pcr_dts + p_sys->i_shaping_delay * 3 / 2 - mdate(),
                      i_bitrate, i_packet_count, i_pcr_length);
         }

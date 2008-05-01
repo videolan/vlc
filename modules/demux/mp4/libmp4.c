@@ -224,10 +224,10 @@ int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_size )
     {
         if MP4_BOX_TYPE_ASCII()
-            msg_Dbg( p_stream, "found Box: %4.4s size "I64Fd,
+            msg_Dbg( p_stream, "found Box: %4.4s size %"PRId64,
                     (char*)&p_box->i_type, p_box->i_size );
         else
-            msg_Dbg( p_stream, "found Box: c%3.3s size "I64Fd,
+            msg_Dbg( p_stream, "found Box: c%3.3s size %"PRId64,
                     (char*)&p_box->i_type+1, p_box->i_size );
     }
 #endif
@@ -1209,7 +1209,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_bytes_per_frame = 0;
         p_box->data.p_sample_soun->i_bytes_per_sample = 0;
 
-        msg_Dbg( p_stream, "read box: \"soun\" mp4 or qt1/2 (rest="I64Fd")",
+        msg_Dbg( p_stream, "read box: \"soun\" mp4 or qt1/2 (rest=%"PRId64")",
                  i_read );
         stream_Seek( p_stream, p_box->i_pos +
                         MP4_BOX_HEADERSIZE( p_box ) + 28 );
@@ -1698,7 +1698,7 @@ static int MP4_ReadBox_stdp( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"stdp\" entry-count "I64Fd,
+    msg_Dbg( p_stream, "read box: \"stdp\" entry-count %"PRId64,
                       i_read / 2 );
 
 #endif
@@ -1759,7 +1759,7 @@ static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"stdp\" entry-count "I64Fd,
+    msg_Dbg( p_stream, "read box: \"stdp\" entry-count %"PRId64,
                       i_read / 2 );
 
 #endif

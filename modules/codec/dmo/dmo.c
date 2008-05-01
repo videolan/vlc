@@ -1472,7 +1472,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     {
         /* No output generated */
 #ifdef DMO_DEBUG
-        msg_Dbg( p_enc, "ProcessInput(): no output generated "I64Fd, i_pts );
+        msg_Dbg( p_enc, "ProcessInput(): no output generated %"PRId64, i_pts );
 #endif
         return NULL;
     }
@@ -1534,7 +1534,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         if( db.dwStatus & DMO_OUTPUT_DATA_BUFFERF_TIME )
         {
 #ifdef DMO_DEBUG
-            msg_Dbg( p_enc, "ProcessOutput(): pts: "I64Fd", "I64Fd,
+            msg_Dbg( p_enc, "ProcessOutput(): pts: %"PRId64", %"PRId64,
                      i_pts, db.rtTimestamp / 10 );
 #endif
             i_pts = db.rtTimestamp / 10;
@@ -1544,7 +1544,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         {
             p_block_out->i_length = db.rtTimelength / 10;
 #ifdef DMO_DEBUG
-            msg_Dbg( p_enc, "ProcessOutput(): length: "I64Fd,
+            msg_Dbg( p_enc, "ProcessOutput(): length: %"PRId64,
                      p_block_out->i_length );
 #endif
         }

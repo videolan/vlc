@@ -411,7 +411,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     break;
                 }
 #if 0
-                msg_Dbg( p_dec, "pts="I64Fd" dts="I64Fd,
+                msg_Dbg( p_dec, "pts=%"PRId64" dts=%"PRId64,
                          p_pic->i_pts, p_pic->i_dts );
 #endif
 

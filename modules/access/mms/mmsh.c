@@ -310,7 +310,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     off_t        i_offset;
     off_t        i_packet;
 
-    msg_Dbg( p_access, "seeking to "I64Fd, i_pos );
+    msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
     i_packet = ( i_pos - p_sys->i_header ) / p_sys->asfh.i_min_data_packet_size;
     i_offset = ( i_pos - p_sys->i_header ) % p_sys->asfh.i_min_data_packet_size;
@@ -474,7 +474,7 @@ static int Reset( access_t *p_access )
 
     E_( asf_HeaderParse )( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
-    msg_Dbg( p_access, "packet count="I64Fd" packet size=%d",
+    msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
 
@@ -705,7 +705,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
      *        and bitrate mutual exclusion(optional) */
     E_( asf_HeaderParse )( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
-    msg_Dbg( p_access, "packet count="I64Fd" packet size=%d",
+    msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
 

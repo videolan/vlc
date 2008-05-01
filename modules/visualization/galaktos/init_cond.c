@@ -130,7 +130,7 @@ void init_cond_to_string(init_cond_t * init_cond) {
 		case P_TYPE_DOUBLE:
                         div = lldiv( init_cond->init_val.double_val * 1000000,
                                      1000000 );
-			sprintf(string, "%s="I64Fd".%06u\n", init_cond->param->name, div.quot, (unsigned int) div.rem );
+			sprintf(string, "%s=%"PRId64".%06u\n", init_cond->param->name, div.quot, (unsigned int) div.rem );
 			break;
 		default:
 			return;

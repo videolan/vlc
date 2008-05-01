@@ -335,7 +335,7 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
     {
         if( p_sys->f )
         {
-            msg_Dbg( p_access, "dumped "I64Fd" kb (%s)",
+            msg_Dbg( p_access, "dumped %"PRId64" kb (%s)",
                      p_sys->i_size/1024, p_sys->psz_file );
 
             Notify( p_access, false );

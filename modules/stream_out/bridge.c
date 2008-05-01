@@ -440,7 +440,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                           < p_bridge->pp_es[i]->i_last) )
         {
             block_t *p_block = p_bridge->pp_es[i]->p_block;
-            msg_Dbg( p_stream, "dropping a packet (" I64Fd ")",
+            msg_Dbg( p_stream, "dropping a packet (%"PRId64 ")",
                      mdate() - p_block->i_dts - p_sys->i_delay );
             p_bridge->pp_es[i]->p_block
                 = p_bridge->pp_es[i]->p_block->p_next;

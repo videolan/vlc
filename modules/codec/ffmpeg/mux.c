@@ -374,8 +374,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( av_write_frame( p_sys->oc, &pkt ) < 0 )
     {
-        msg_Err( p_mux, "could not write frame (pts: "I64Fd", dts: "I64Fd") "
-                 "(pkt pts: "I64Fd", dts: "I64Fd")",
+        msg_Err( p_mux, "could not write frame (pts: %"PRId64", dts: %"PRId64") "
+                 "(pkt pts: %"PRId64", dts: %"PRId64")",
                  p_data->i_pts, p_data->i_dts, pkt.pts, pkt.dts );
         block_Release( p_data );
         return VLC_EGENERIC;
@@ -485,7 +485,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     int64_t i_absolute;
 
 #ifdef AVFORMAT_DEBUG
-    msg_Dbg( p_mux, "IOSeek offset: "I64Fd", whence: %i", offset, whence );
+    msg_Dbg( p_mux, "IOSeek offset: %"PRId64", whence: %i", offset, whence );
 #endif
 
     switch( whence )

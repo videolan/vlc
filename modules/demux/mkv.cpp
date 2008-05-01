@@ -2059,7 +2059,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         tk->i_last_dts = p_block->i_dts;
 
 #if 0
-msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block->i_pts);
+msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_block->i_pts);
 #endif
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
@@ -2104,13 +2104,13 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 #if LIBMATROSKA_VERSION >= 0x000800
     if (uint64(doc_read_version) > 2)
     {
-        msg_Err( p_demux, "This matroska file is needs version "I64Fd" and this VLC only supports version 1 & 2", uint64(doc_read_version));
+        msg_Err( p_demux, "This matroska file is needs version %"PRId64" and this VLC only supports version 1 & 2", uint64(doc_read_version));
         return NULL;
     }
 #else
     if (uint64(doc_read_version) != 1)
     {
-        msg_Err( p_demux, "This matroska file is needs version "I64Fd" and this VLC only supports version 1", uint64(doc_read_version));
+        msg_Err( p_demux, "This matroska file is needs version %"PRId64" and this VLC only supports version 1", uint64(doc_read_version));
         return NULL;
     }
 #endif
@@ -3373,7 +3373,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
 
     int         i_index;
 
-    msg_Dbg( p_demux, "seek request to "I64Fd" (%f%%)", i_date, f_percent );
+    msg_Dbg( p_demux, "seek request to %"PRId64" (%f%%)", i_date, f_percent );
     if( i_date < 0 && f_percent < 0 )
     {
         msg_Warn( p_demux, "cannot seek nowhere !" );
@@ -3948,7 +3948,7 @@ void matroska_segment_c::LoadCues( )
             ep->Up();
 
 #if 0
-            msg_Dbg( &sys.demuxer, " * added time="I64Fd" pos="I64Fd
+            msg_Dbg( &sys.demuxer, " * added time=%"PRId64" pos=%"PRId64
                      " track=%d bnum=%d", idx.i_time, idx.i_position,
                      idx.i_track, idx.i_block_number );
 #endif
@@ -4147,17 +4147,17 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
             {
                 if( id == KaxCues::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = cues at "I64Fd, i_pos );
+                    msg_Dbg( &sys.demuxer, "|   |   |   = cues at %"PRId64, i_pos );
                     i_cues_position = segment->GetGlobalPosition( i_pos );
                 }
                 else if( id == KaxChapters::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = chapters at "I64Fd, i_pos );
+                    msg_Dbg( &sys.demuxer, "|   |   |   = chapters at %"PRId64, i_pos );
                     i_chapters_position = segment->GetGlobalPosition( i_pos );
                 }
                 else if( id == KaxTags::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( &sys.demuxer, "|   |   |   = tags at "I64Fd, i_pos );
+                    msg_Dbg( &sys.demuxer, "|   |   |   = tags at %"PRId64, i_pos );
                     i_tags_position = segment->GetGlobalPosition( i_pos );
                 }
             }
@@ -4298,7 +4298,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             KaxTrackDefaultDuration &defd = *(KaxTrackDefaultDuration*)l;
 
             tk->i_default_duration = uint64(defd);
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default Duration="I64Fd, uint64(defd) );
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default Duration=%"PRId64, uint64(defd) );
         }
         else  if( MKV_IS_ID( l, KaxTrackTimecodeScale ) )
         {
@@ -4341,7 +4341,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 tk->p_extra_data = (uint8_t*)malloc( tk->i_extra_data );
                 memcpy( tk->p_extra_data, cpriv.GetBuffer(), tk->i_extra_data );
             }
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track CodecPrivate size="I64Fd, cpriv.GetSize() );
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track CodecPrivate size=%"PRId64, cpriv.GetSize() );
         }
         else if( MKV_IS_ID( l, KaxCodecName ) )
         {
@@ -4728,7 +4728,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
             i_timescale = uint64(tcs);
 
-            msg_Dbg( &sys.demuxer, "|   |   + TimecodeScale="I64Fd,
+            msg_Dbg( &sys.demuxer, "|   |   + TimecodeScale=%"PRId64,
                      i_timescale );
         }
         else if( MKV_IS_ID( l, KaxDuration ) )
@@ -4737,7 +4737,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
             i_duration = mtime_t( double( dur ) );
 
-            msg_Dbg( &sys.demuxer, "|   |   + Duration="I64Fd,
+            msg_Dbg( &sys.demuxer, "|   |   + Duration=%"PRId64,
                      i_duration );
         }
         else if( MKV_IS_ID( l, KaxMuxingApp ) )
@@ -5733,7 +5733,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
         i_seek_time = p_indexes[i_idx].i_time;
     }
 
-    msg_Dbg( &sys.demuxer, "seek got "I64Fd" (%d%%)",
+    msg_Dbg( &sys.demuxer, "seek got %"PRId64" (%d%%)",
                 i_seek_time, (int)( 100 * i_seek_position / stream_Size( sys.demuxer.s ) ) );
 
     es.I_O().setFilePointer( i_seek_position, seek_beginning );
@@ -6657,7 +6657,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         chapter_item_c *p_chapter = sys.FindChapter( i_chapter_uid, p_segment );
 
         if ( p_chapter == NULL )
-            msg_Dbg( &sys.demuxer, "Chapter "I64Fd" not found", i_chapter_uid);
+            msg_Dbg( &sys.demuxer, "Chapter %"PRId64" not found", i_chapter_uid);
         else
         {
             if ( !p_chapter->EnterAndLeave( sys.p_current_segment->CurrentChapter() ) )

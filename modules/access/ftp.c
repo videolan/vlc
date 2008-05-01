@@ -334,7 +334,7 @@ static int InOpen( vlc_object_t *p_this )
     }
     p_access->info.i_size = atoll( &psz_arg[4] );
     free( psz_arg );
-    msg_Dbg( p_access, "file size: "I64Fd, p_access->info.i_size );
+    msg_Dbg( p_access, "file size: %"PRId64, p_access->info.i_size );
 
     /* Start the 'stream' */
     if( ftp_StartStream( p_this, p_sys, 0 ) < 0 )
@@ -436,7 +436,7 @@ static int _Seek( vlc_object_t *p_access, access_sys_t *p_sys, int64_t i_pos )
     if( i_pos < 0 )
         return VLC_EGENERIC;
 
-    msg_Dbg( p_access, "seeking to "I64Fd, i_pos );
+    msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
     ftp_StopStream( (vlc_object_t *)p_access, p_sys );
     if( ftp_StartStream( (vlc_object_t *)p_access, p_sys, i_pos ) < 0 )
@@ -734,7 +734,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
 
     if( i_start > 0 )
     {
-        if( ftp_SendCommand( p_access, p_sys, "REST "I64Fu, i_start ) < 0 ||
+        if( ftp_SendCommand( p_access, p_sys, "REST %"PRIu64, i_start ) < 0 ||
             ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 3 )
         {
             msg_Err( p_access, "cannot set restart offset" );

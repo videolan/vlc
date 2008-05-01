@@ -146,7 +146,7 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    msg_Info( p_demux ,"closing %s ("I64Fd" Kbytes dumped)", p_sys->psz_file,
+    msg_Info( p_demux ,"closing %s (%"PRId64" Kbytes dumped)", p_sys->psz_file,
               p_sys->i_write / 1024 );
 
     if( p_sys->p_file != stdout )

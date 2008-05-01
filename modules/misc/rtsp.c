@@ -1557,7 +1557,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 
     p = psz_sdp = malloc( i_size );
     p += sprintf( p, "v=0\r\n" );
-    p += sprintf( p, "o=- "I64Fd" %d IN IP%c %s\r\n",
+    p += sprintf( p, "o=- %"PRId64" %d IN IP%c %s\r\n",
                   p_media->i_sdp_id, p_media->i_sdp_version, ipv, ip );
     if( *p_media->psz_session_name )
         p += sprintf( p, "s=%s\r\n", p_media->psz_session_name );

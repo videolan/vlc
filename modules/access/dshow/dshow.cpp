@@ -1728,7 +1728,7 @@ static int Demux( demux_t *p_demux )
     i_pts /= 10; /* Dshow works with 100 nano-seconds resolution */
 
 #if 0
-    msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: "I64Fd,
+    msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %"PRId64,
              i_stream, i_data_size, i_pts );
 #endif
 

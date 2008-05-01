@@ -324,7 +324,7 @@ static int Seek( access_t * p_access, int64_t i_pos )
         i_packet = ( i_pos - p_sys->i_header ) / p_sys->i_packet_length;
         i_offset = ( i_pos - p_sys->i_header ) % p_sys->i_packet_length;
     }
-    msg_Dbg( p_access, "seeking to "I64Fd " (packet:%d)", i_pos, i_packet );
+    msg_Dbg( p_access, "seeking to %"PRId64 " (packet:%d)", i_pos, i_packet );
 
     MMSStop( p_access );
     msg_Dbg( p_access, "stream stopped (seek)" );

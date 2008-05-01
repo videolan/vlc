@@ -808,7 +808,7 @@ static ssize_t ReadCompressed( access_t *p_access, uint8_t *p_buffer,
  *****************************************************************************/
 static int Seek( access_t *p_access, int64_t i_pos )
 {
-    msg_Dbg( p_access, "trying to seek to "I64Fd, i_pos );
+    msg_Dbg( p_access, "trying to seek to %"PRId64, i_pos );
 
     Disconnect( p_access );
 
@@ -1072,7 +1072,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     if( p_sys->i_version == 1 )
     {
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                    "Range: bytes="I64Fd"-\r\n", i_tell );
+                    "Range: bytes=%"PRId64"-\r\n", i_tell );
     }
 
     /* Cookies */
@@ -1222,7 +1222,7 @@ static int Request( access_t *p_access, int64_t i_tell )
             else
             {
                 p_access->info.i_size = i_tell + atoll( p );
-                msg_Dbg( p_access, "stream size="I64Fd, p_access->info.i_size );
+                msg_Dbg( p_access, "stream size=%"PRId64, p_access->info.i_size );
             }
         }
         else if( !strcasecmp( psz, "Location" ) )

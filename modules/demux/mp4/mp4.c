@@ -1378,7 +1378,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         }
     }
 
-    msg_Dbg( p_demux, "track[Id 0x%x] read %d samples length:"I64Fd"s",
+    msg_Dbg( p_demux, "track[Id 0x%x] read %d samples length:%"PRId64"s",
              p_demux_track->i_track_ID, p_demux_track->i_sample_count,
              i_last_dts / p_demux_track->i_timescale );
 
@@ -1484,7 +1484,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 MP4_Box_data_sample_soun_t *p_soun =
                     p_sample->data.p_sample_soun;
 
-                msg_Warn( p_demux, "i_timescale ("I64Fu") != i_sampleratehi "
+                msg_Warn( p_demux, "i_timescale (%"PRIu64") != i_sampleratehi "
                           "(%u), making both equal (report any problem).",
                           p_track->i_timescale, p_soun->i_sampleratehi );
 
@@ -1772,7 +1772,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
             i_start += elst->i_media_time[p_track->i_elst];
         }
 
-        msg_Dbg( p_demux, "elst (%d) gives "I64Fd"ms (movie)-> "I64Fd
+        msg_Dbg( p_demux, "elst (%d) gives %"PRId64"ms (movie)-> %"PRId64
                  "ms (track)", p_track->i_elst,
                  i_mvt * 1000 / p_sys->i_timescale,
                  i_start * 1000 / p_track->i_timescale );
@@ -2047,7 +2047,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         msg_Warn( p_demux, "elst box found" );
         for( i = 0; i < elst->i_entry_count; i++ )
         {
-            msg_Dbg( p_demux, "   - [%d] duration="I64Fd"ms media time="I64Fd
+            msg_Dbg( p_demux, "   - [%d] duration=%"PRId64"ms media time=%"PRId64
                      "ms) rate=%d.%d", i,
                      elst->i_segment_duration[i] * 1000 / p_sys->i_timescale,
                      elst->i_media_time[i] >= 0 ?

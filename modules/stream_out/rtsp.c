@@ -542,7 +542,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     if( psz_session == NULL )
                     {
                         ses = RtspClientNew( rtsp );
-                        snprintf( psz_sesbuf, sizeof( psz_sesbuf ), I64Fx,
+                        snprintf( psz_sesbuf, sizeof( psz_sesbuf ), "%"PRIx64,
                                   ses->id );
                         psz_session = psz_sesbuf;
                     }

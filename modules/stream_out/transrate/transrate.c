@@ -108,7 +108,7 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->i_shaping_delay <= 0 )
         {
             msg_Err( p_stream,
-                     "invalid shaping ("I64Fd"ms) reseting to 500ms",
+                     "invalid shaping (%"PRId64"ms) reseting to 500ms",
                      p_sys->i_shaping_delay / 1000 );
             p_sys->i_shaping_delay = 500000;
         }
@@ -120,7 +120,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_mpeg4_matrix = 1;
     }
 
-    msg_Dbg( p_stream, "codec video %dkb/s max gop="I64Fd"us",
+    msg_Dbg( p_stream, "codec video %dkb/s max gop=%"PRId64"us",
              p_sys->i_vbitrate / 1024, p_sys->i_shaping_delay );
 
     if( !p_sys->p_out )

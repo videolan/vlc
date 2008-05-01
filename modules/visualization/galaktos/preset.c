@@ -890,7 +890,7 @@ void write_init(init_cond_t * init_cond) {
   else if (init_cond->param->type == P_TYPE_DOUBLE)
   {
     lldiv_t div = lldiv( init_cond->init_val.double_val * 1000000,1000000 );
-    sprintf(s, "%s="I64Fd".%06u\n", init_cond->param->name, div.quot,
+    sprintf(s, "%s=%"PRId64".%06u\n", init_cond->param->name, div.quot,
                     (unsigned int) div.rem );
   }
 

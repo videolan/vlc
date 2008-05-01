@@ -690,7 +690,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
                 //subrec_type, esOffset1);
             p_sys->lastVideoPTS = get_pts(
                     &p_block_in->p_buffer[ esOffset1 + VIDEO_PTS_OFFSET ] );
-            /*msg_Dbg(p_demux, "Video rec %d PTS "I64Fd, p_sys->i_cur_rec,
+            /*msg_Dbg(p_demux, "Video rec %d PTS %"PRId64, p_sys->i_cur_rec,
                         p_sys->lastVideoPTS );*/
             if (subrec_type != 0x06) {
                 /* if we found a PES, and it's not type 6, then we're S2 */
@@ -1087,7 +1087,7 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     /* seek within the chunk to get roughly to where we want */
     p_sys->i_cur_rec = (int)
       ((double) ((seek_pos % CHUNK_SIZE) / (double) (CHUNK_SIZE)) * p_sys->i_num_recs);
-    msg_Dbg(p_demux, "Seeked to file pos " I64Fd, seek_pos);
+    msg_Dbg(p_demux, "Seeked to file pos %"PRId64, seek_pos);
     msg_Dbg(p_demux, " (chunk %d, record %d)",
              p_sys->i_cur_chunk - 1, p_sys->i_cur_rec);
 

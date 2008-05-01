@@ -373,7 +373,7 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
         /* We can interpolate dts/pts only if we have a frame rate */
         if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
         {
-            //msg_Dbg( p_dec, "-------------- XXX0 dts="I64Fd" pts="I64Fd" interpolated="I64Fd, p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
+            //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64, p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
             if( p_pic->i_dts <= 0 )
                 p_pic->i_dts = p_sys->i_interpolated_dts;
 
@@ -387,7 +387,7 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
         }
         p_sys->i_interpolated_dts = p_pic->i_dts;
 
-        //msg_Dbg( p_dec, "-------------- dts="I64Fd" pts="I64Fd, p_pic->i_dts, p_pic->i_pts );
+        //msg_Dbg( p_dec, "-------------- dts=%"PRId64" pts=%"PRId64, p_pic->i_dts, p_pic->i_pts );
 
         /* Reset context */
         p_sys->p_frame = NULL;

@@ -91,7 +91,7 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-             "found object guid: " GUID_FMT " size:"I64Fd,
+             "found object guid: " GUID_FMT " size:%"PRId64,
              GUID_PRINT( p_common->i_object_id ),
              p_common->i_object_size );
 #endif
@@ -202,7 +202,7 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
              "read \"data object\" file_id:" GUID_FMT " total data packet:"
-             I64Fd" reserved:%d",
+             "%"PRId64" reserved:%d",
              GUID_PRINT( p_data->i_file_id ),
              p_data->i_total_data_packets,
              p_data->i_reserved );
@@ -233,7 +233,7 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"index object\" file_id:" GUID_FMT
-            " index_entry_time_interval:"I64Fd" max_packet_count:%d "
+            " index_entry_time_interval:%"PRId64" max_packet_count:%d "
             "index_entry_count:%ld",
             GUID_PRINT( p_index->i_file_id ),
             p_index->i_index_entry_time_interval,
@@ -290,8 +290,8 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"file properties object\" file_id:" GUID_FMT
-            " file_size:"I64Fd" creation_date:"I64Fd" data_packets_count:"
-            I64Fd" play_duration:"I64Fd" send_duration:"I64Fd" preroll:"I64Fd
+            " file_size:%"PRId64" creation_date:%"PRId64" data_packets_count:"
+            "%"PRId64" play_duration:%"PRId64" send_duration:%"PRId64" preroll:%"PRId64
             " flags:%d min_data_packet_size:%d "
             " max_data_packet_size:%d max_bitrate:%d",
             GUID_PRINT( p_fp->i_file_id ), p_fp->i_file_size,
@@ -434,7 +434,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
             msg_Dbg( s, "  - %s (%i bytes)",
                      p_rec->psz_name, p_rec->i_data );
         else
-            msg_Dbg( s, "  - %s="I64Fd,
+            msg_Dbg( s, "  - %s=%"PRId64,
                      p_rec->psz_name, p_rec->i_val );
     }
 #endif
@@ -575,7 +575,7 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"stream Properties object\" stream_type:" GUID_FMT
-            " error_correction_type:" GUID_FMT " time_offset:"I64Fd
+            " error_correction_type:" GUID_FMT " time_offset:%"PRId64
             " type_specific_data_length:%d error_correction_data_length:%d"
             " flags:0x%x stream_number:%d",
             GUID_PRINT( p_sp->i_stream_type ),
@@ -966,7 +966,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"extended stream properties object\":" );
-    msg_Dbg( s, "  - start="I64Fd" end="I64Fd,
+    msg_Dbg( s, "  - start=%"PRId64" end=%"PRId64,
              p_esp->i_start_time, p_esp->i_end_time );
     msg_Dbg( s, "  - data bitrate=%d buffer=%d initial fullness=%d",
              p_esp->i_data_bitrate,
@@ -980,7 +980,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     msg_Dbg( s, "  - flags=0x%x", p_esp->i_flags );
     msg_Dbg( s, "  - stream number=%d language=%d",
              p_esp->i_stream_number, p_esp->i_language_index );
-    msg_Dbg( s, "  - average time per frame="I64Fd,
+    msg_Dbg( s, "  - average time per frame=%"PRId64,
              p_esp->i_average_time_per_frame );
     msg_Dbg( s, "  - stream name count=%d", p_esp->i_stream_name_count );
     for( i = 0; i < p_esp->i_stream_name_count; i++ )
@@ -1159,7 +1159,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
         else if( i_type == 4 )
         {
             /* QWord */
-            asprintf( &p_ec->ppsz_value[i], I64Fd, GetQWLE(p_data));
+            asprintf( &p_ec->ppsz_value[i], "%"PRId64, GetQWLE(p_data));
         }
         else if( i_type == 5 )
         {
@@ -1457,7 +1457,7 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
         str[i * 5] = '|';
     }
     snprintf( str + 5*i_level, 1024,
-             "+ '%s' GUID "GUID_FMT" size:"I64Fu"pos:"I64Fu,
+             "+ '%s' GUID "GUID_FMT" size:%"PRIu64"pos:%"PRIu64,
              psz_name,
              GUID_PRINT( p_node->i_object_id ),
              p_node->i_object_size, p_node->i_object_pos );

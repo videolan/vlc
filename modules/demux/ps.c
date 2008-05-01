@@ -263,7 +263,7 @@ static void FindLength( demux_t *p_demux )
                 {
                     p_sys->i_length = i_length;
                     p_sys->i_time_track = i;
-                    msg_Dbg( p_demux, "we found a length of: "I64Fd, p_sys->i_length );
+                    msg_Dbg( p_demux, "we found a length of: %"PRId64, p_sys->i_length );
                 }
             }
     }
@@ -386,7 +386,7 @@ static int Demux( demux_t *p_demux )
                 if( !b_new && !p_sys->b_have_pack && tk->fmt.i_cat == AUDIO_ES && p_pkt->i_pts > 0 )
                 {
                     /* A hack to sync the A/V on PES files. */
-                    msg_Dbg( p_demux, "force SCR: "I64Fd, p_pkt->i_pts );
+                    msg_Dbg( p_demux, "force SCR: %"PRId64, p_pkt->i_pts );
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_pkt->i_pts );
                 }
 

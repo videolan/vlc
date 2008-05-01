@@ -602,7 +602,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
                 E_(mvar_AppendNewVar)( f, "type", "unknown" );
             }
 
-            sprintf( psz_ctime, I64Fd, (int64_t)stat_info.st_size );
+            sprintf( psz_ctime, "%"PRId64, (int64_t)stat_info.st_size );
             E_(mvar_AppendNewVar)( f, "size", psz_ctime );
 
             /* FIXME memory leak FIXME */

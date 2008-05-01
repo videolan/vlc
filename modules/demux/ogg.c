@@ -712,7 +712,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( p_stream->fmt.i_codec == VLC_FOURCC( 't','a','r','k' ) )
     {
         /* FIXME: the biggest hack I've ever done */
-        msg_Warn( p_demux, "tarkin pts: "I64Fd", granule: "I64Fd,
+        msg_Warn( p_demux, "tarkin pts: %"PRId64", granule: %"PRId64,
                   p_block->i_pts, p_block->i_dts );
         msleep(10000);
     }
@@ -1389,7 +1389,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
                         content_type_string );
         }
 
-        msg_Dbg( p_this, "AnxData packet info: "I64Fd" / "I64Fd", %d, ``%s''",
+        msg_Dbg( p_this, "AnxData packet info: %"PRId64" / %"PRId64", %d, ``%s''",
                  granule_rate_numerator, granule_rate_denominator,
                  p_stream->secondary_header_packets, content_type_string );
 

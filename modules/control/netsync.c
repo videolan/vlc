@@ -234,8 +234,8 @@ static void Run( intf_thread_t *p_intf )
                     (struct sockaddr *)&from, i_struct_size );
 
 #if 0
-            msg_Dbg( p_intf, "Master clockref: "I64Fd" -> "I64Fd", from %s "
-                     "(date: "I64Fd")", i_clockref, i_master_clockref,
+            msg_Dbg( p_intf, "Master clockref: %"PRId64" -> %"PRId64", from %s "
+                     "(date: %"PRId64")", i_clockref, i_master_clockref,
                      from.ss_family == AF_INET
                      ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
                      : "non-IPv4", i_date );
@@ -298,8 +298,8 @@ static void Run( intf_thread_t *p_intf )
             }
 
 #if 0
-            msg_Dbg( p_intf, "Slave clockref: "I64Fd" -> "I64Fd" -> "I64Fd", "
-                     "clock diff: "I64Fd" drift: "I64Fd,
+            msg_Dbg( p_intf, "Slave clockref: %"PRId64" -> %"PRId64" -> %"PRId64", "
+                     "clock diff: %"PRId64" drift: %"PRId64,
                      i_clockref, i_master_clockref,
                      i_client_clockref, i_diff_date, i_drift );
 #endif

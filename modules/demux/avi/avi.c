@@ -1294,7 +1294,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_stream;
-    msg_Dbg( p_demux, "seek requested: "I64Fd" seconds %d%%",
+    msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %d%%",
              i_date / 1000000, i_percent );
 
     if( p_sys->b_seekable )
@@ -1354,7 +1354,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
             i_date = AVI_GetPTS( p_stream );
             /* TODO better support for i_samplesize != 0 */
-            msg_Dbg( p_demux, "estimate date "I64Fd, i_date );
+            msg_Dbg( p_demux, "estimate date %"PRId64, i_date );
         }
 
         /* */
@@ -1368,7 +1368,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             AVI_TrackSeek( p_demux, i_stream, i_date );
         }
         p_sys->i_time = i_date;
-        msg_Dbg( p_demux, "seek: "I64Fd" seconds", p_sys->i_time /1000000 );
+        msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /1000000 );
         return VLC_SUCCESS;
     }
     else
@@ -1776,7 +1776,7 @@ static int AVI_TrackSeek( demux_t *p_demux,
         }
 
         msg_Dbg( p_demux,
-                 "old:"I64Fd" %s new "I64Fd,
+                 "old:%"PRId64" %s new %"PRId64,
                  i_oldpts,
                  i_oldpts > i_date ? ">" : "<",
                  i_date );
@@ -2538,7 +2538,7 @@ static mtime_t  AVI_MovieGetLength( demux_t *p_demux )
         i_length /= (mtime_t)1000000;    /* in seconds */
 
         msg_Dbg( p_demux,
-                 "stream[%d] length:"I64Fd" (based on index)",
+                 "stream[%d] length:%"PRId64" (based on index)",
                  i,
                  i_length );
         i_maxlength = __MAX( i_maxlength, i_length );

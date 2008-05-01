@@ -528,7 +528,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_pic->i_length = p_sys->i_interpolated_dts - p_pic->i_dts;
 
 #if 0
-        msg_Dbg( p_dec, "pic: type=%d dts="I64Fd" pts-dts="I64Fd,
+        msg_Dbg( p_dec, "pic: type=%d dts=%"PRId64" pts-dts=%"PRId64,
         p_sys->i_picture_type, p_pic->i_dts, p_pic->i_pts - p_pic->i_dts);
 #endif
 

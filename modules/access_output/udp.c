@@ -350,7 +350,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         {
             if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching < now )
             {
-                msg_Dbg( p_access, "late packet for UDP input (" I64Fd ")",
+                msg_Dbg( p_access, "late packet for UDP input (%"PRId64 ")",
                          now - p_sys->p_buffer->i_dts
                           - p_sys->p_thread->i_caching );
             }
@@ -391,7 +391,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                 /* Flush */
                 if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching < now )
                 {
-                    msg_Dbg( p_access, "late packet for udp input (" I64Fd ")",
+                    msg_Dbg( p_access, "late packet for udp input (%"PRId64 ")",
                              mdate() - p_sys->p_buffer->i_dts
                               - p_sys->p_thread->i_caching );
                 }
@@ -484,7 +484,7 @@ static void ThreadWrite( vlc_object_t *p_this )
             if( i_date - i_date_last > 2000000 )
             {
                 if( !i_dropped_packets )
-                    msg_Dbg( p_thread, "mmh, hole ("I64Fd" > 2s) -> drop",
+                    msg_Dbg( p_thread, "mmh, hole (%"PRId64" > 2s) -> drop",
                              i_date - i_date_last );
 
                 block_FifoPut( p_thread->p_empty_blocks, p_pk );
@@ -496,7 +496,7 @@ static void ThreadWrite( vlc_object_t *p_this )
             else if( i_date - i_date_last < -1000 )
             {
                 if( !i_dropped_packets )
-                    msg_Dbg( p_thread, "mmh, packets in the past ("I64Fd")",
+                    msg_Dbg( p_thread, "mmh, packets in the past (%"PRId64")",
                              i_date_last - i_date );
             }
         }
@@ -524,7 +524,7 @@ static void ThreadWrite( vlc_object_t *p_this )
         i_sent = mdate();
         if ( i_sent > i_date + 20000 )
         {
-            msg_Dbg( p_thread, "packet has been sent too late (" I64Fd ")",
+            msg_Dbg( p_thread, "packet has been sent too late (%"PRId64 ")",
                      i_sent - i_date );
         }
 #endif

@@ -405,7 +405,7 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
                 latency = 0;
 
             }
-            PULSE_DEBUG( "Pulse stream request latency="I64Fd"", latency);
+            PULSE_DEBUG( "Pulse stream request latency=%"PRId64"", latency);
             next_date = mdate() + latency;
 
 

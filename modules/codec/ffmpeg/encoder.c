@@ -872,13 +872,13 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         if ( p_sys->i_last_pts == frame.pts )
         {
             msg_Warn( p_enc, "almost fed libavcodec with two frames with the "
-                      "same PTS (" I64Fd ")", frame.pts );
+                      "same PTS (%"PRId64 ")", frame.pts );
             return NULL;
         }
         else if ( p_sys->i_last_pts > frame.pts )
         {
             msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
-                      "past (current: " I64Fd ", last: "I64Fd")",
+                      "past (current: %"PRId64 ", last: %"PRId64")",
                       frame.pts, p_sys->i_last_pts );
             return NULL;
         }

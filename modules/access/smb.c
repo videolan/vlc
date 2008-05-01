@@ -330,7 +330,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     if( i_pos < 0 ) return VLC_EGENERIC;
 
-    msg_Dbg( p_access, "seeking to "I64Fd, i_pos );
+    msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
 #ifdef USE_CTX
     i_ret = p_sys->p_smb->lseek(p_sys->p_smb, p_sys->p_file, i_pos, SEEK_SET);

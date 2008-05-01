@@ -71,7 +71,7 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "found Chunk fourcc:%8.8x (%4.4s) size:"I64Fd" pos:"I64Fd,
+             "found Chunk fourcc:%8.8x (%4.4s) size:%"PRId64" pos:%"PRId64,
              p_chk->common.i_chunk_fourcc,
              (char*)&p_chk->common.i_chunk_fourcc,
              p_chk->common.i_chunk_size,
@@ -811,7 +811,7 @@ static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
         p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST )
     {
         sprintf( str + i_level * 5,
-                 "%c %4.4s-%4.4s size:"I64Fu" pos:"I64Fu,
+                 "%c %4.4s-%4.4s size:%"PRIu64" pos:%"PRIu64,
                  i_level ? '+' : '*',
                  (char*)&p_chk->common.i_chunk_fourcc,
                  (char*)&p_chk->list.i_type,
@@ -821,7 +821,7 @@ static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
     else
     {
         sprintf( str + i_level * 5,
-                 "+ %4.4s size:"I64Fu" pos:"I64Fu,
+                 "+ %4.4s size:%"PRIu64" pos:%"PRIu64,
                  (char*)&p_chk->common.i_chunk_fourcc,
                  p_chk->common.i_chunk_size,
                  p_chk->common.i_chunk_pos );

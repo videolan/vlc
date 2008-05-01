@@ -1222,7 +1222,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     goto error;
                 }
 
-                if ((sscanf (data, "%63s "I64Fu" "I64Fu" IN IP%u %1023s",
+                if ((sscanf (data, "%63s %"PRIu64" %"PRIu64" IN IP%u %1023s",
                              p_sdp->username, &p_sdp->session_id,
                              &p_sdp->session_version, &p_sdp->orig_ip_version,
                              p_sdp->orig_host) != 5)

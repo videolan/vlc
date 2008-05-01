@@ -254,10 +254,10 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     msg_Dbg( p_demux, "AVFormat supported stream" );
     msg_Dbg( p_demux, "    - format = %s (%s)",
              p_sys->fmt->name, p_sys->fmt->long_name );
-    msg_Dbg( p_demux, "    - start time = "I64Fd,
+    msg_Dbg( p_demux, "    - start time = %"PRId64,
              ( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE ) ?
              p_sys->ic->start_time * 1000000 / AV_TIME_BASE : -1 );
-    msg_Dbg( p_demux, "    - duration = "I64Fd,
+    msg_Dbg( p_demux, "    - duration = %"PRId64,
              ( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE ) ?
              p_sys->ic->duration * 1000000 / AV_TIME_BASE : -1 );
 
@@ -327,7 +327,7 @@ static int Demux( demux_t *p_demux )
         p_sys->ic->streams[pkt.stream_index]->time_base.den;
 
 #ifdef AVFORMAT_DEBUG
-    msg_Dbg( p_demux, "tk[%d] dts="I64Fd" pts="I64Fd,
+    msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
 #endif
 
@@ -380,7 +380,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
                     i64 += p_sys->ic->start_time;
 
-                msg_Warn( p_demux, "DEMUX_SET_POSITION: "I64Fd, i64 );
+                msg_Warn( p_demux, "DEMUX_SET_POSITION: %"PRId64, i64 );
 
                 /* If we have a duration, we prefer to seek by time
                    but if we don't, or if the seek fails, try BYTE seeking */
@@ -390,7 +390,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     int64_t i_size = stream_Size( p_demux->s );
                     i64 = (int64_t)i_size * f;
 
-                    msg_Warn( p_demux, "DEMUX_SET_BYTE_POSITION: "I64Fd, i64 );
+                    msg_Warn( p_demux, "DEMUX_SET_BYTE_POSITION: %"PRId64, i64 );
                     if( av_seek_frame( p_sys->ic, -1, i64, AVSEEK_FLAG_BYTE ) < 0 )
                         return VLC_EGENERIC;
                 }
@@ -418,7 +418,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
                 i64 += p_sys->ic->start_time;
 
-            msg_Warn( p_demux, "DEMUX_SET_TIME: "I64Fd, i64 );
+            msg_Warn( p_demux, "DEMUX_SET_TIME: %"PRId64, i64 );
 
             if( av_seek_frame( p_sys->ic, -1, i64, 0 ) < 0 )
             {
@@ -476,7 +476,7 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence )
     int64_t i_size = stream_Size( p_demux->s );
 
 #ifdef AVFORMAT_DEBUG
-    msg_Warn( p_demux, "IOSeek offset: "I64Fd", whence: %i", offset, whence );
+    msg_Warn( p_demux, "IOSeek offset: %"PRId64", whence: %i", offset, whence );
 #endif
 
     switch( whence )

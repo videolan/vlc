@@ -994,7 +994,7 @@ static void WaveOutThread( notification_thread_t *p_notif )
     if( p_aout->b_die )
         return;
 
-    msg_Dbg( p_aout, "will start to play in "I64Fd" us",
+    msg_Dbg( p_aout, "will start to play in %"PRId64" us",
              (p_sys->start_date - AOUT_PTS_TOLERANCE/4)-mdate());
 
     // than wait a short time... before grabbing first frames

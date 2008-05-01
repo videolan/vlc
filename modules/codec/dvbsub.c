@@ -406,7 +406,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 
 #ifdef DEBUG_DVBSUB
-    msg_Dbg( p_dec, "subtitle packet received: "I64Fd, p_sys->i_pts );
+    msg_Dbg( p_dec, "subtitle packet received: %"PRId64, p_sys->i_pts );
 #endif
 
     p_sys->b_page = false;
