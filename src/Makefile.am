@@ -444,8 +444,8 @@ check_PROGRAMS = \
 	test_headers \
 	$(NULL)
 
-dist_check_SCRIPTS = check_symbols
-TESTS = $(check_PROGRAMS) $(dist_check_SCRIPTS)
+dist_check_SCRIPTS = check_symbols check_headers
+TESTS = $(check_PROGRAMS) check_symbols
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 
@@ -478,6 +478,7 @@ check-local:
 			exit 1; \
 		fi ; \
 	done
+	$(srcdir)/check_headers $(dist_pkginclude_HEADERS) $(pkginclude_HEADERS)
 
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2

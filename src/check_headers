@@ -1,0 +1,14 @@
+#! /bin/sh
+# Copyright © 2008 Rémi Denis-Courmont
+
+cd "$(dirname "$0")" || exit $?
+
+# Look for configure #defines in public headers.
+# There are incorrect, as external users don't have our <config.h>.
+regexp="$(cat ../config.h.in | \
+	sed -n -e 's/^#undef \([A-Z0-9_]*\)$/\1/p' | \
+	xargs | \
+	sed -e 's/ /\\\|/g')"
+
+! grep -- "$regexp" "$@"
+
