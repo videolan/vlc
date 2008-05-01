@@ -59,9 +59,7 @@
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
-#if defined( HAVE_STDINT_H )
-#   include <stdint.h>
-#elif defined( HAVE_INTTYPES_H )
+#if defined( HAVE_INTTYPES_H )
 #   include <inttypes.h>
 #elif defined( SYS_CYGWIN )
 #   include <sys/types.h>
