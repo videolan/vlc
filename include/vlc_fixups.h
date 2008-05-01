@@ -121,4 +121,30 @@ static inline struct tm *localtime_r (const time_t *timep, struct tm *result)
 }
 #endif
 
+#ifndef HAVE_DIRENT_H
+typedef void DIR;
+#   ifndef FILENAME_MAX
+#       define FILENAME_MAX (260)
+#   endif
+struct dirent
+{
+    long            d_ino;          /* Always zero. */
+    unsigned short  d_reclen;       /* Always zero. */
+    unsigned short  d_namlen;       /* Length of name in d_name. */
+    char            d_name[FILENAME_MAX]; /* File name. */
+};
+#   define opendir vlc_opendir
+#   define readdir vlc_readdir
+#   define closedir vlc_closedir
+#   define rewinddir vlc_rewindir
+#   define seekdir vlc_seekdir
+#   define telldir vlc_telldir
+VLC_EXPORT( void *, vlc_opendir, ( const char * ) );
+VLC_EXPORT( void *, vlc_readdir, ( void * ) );
+VLC_EXPORT( int, vlc_closedir, ( void * ) );
+VLC_INTERNAL( void, vlc_rewinddir, ( void * ) );
+VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
+VLC_INTERNAL( long, vlc_telldir, ( void * ) );
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
