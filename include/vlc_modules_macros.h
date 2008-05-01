@@ -1,5 +1,5 @@
 /*****************************************************************************
- * modules_inner.h : Macros used from within a module.
+ * modules_macros.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
