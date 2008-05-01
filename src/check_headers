@@ -10,5 +10,6 @@ regexp="$(cat ../config.h.in | \
 	xargs | \
 	sed -e 's/ /\\\|/g')"
 
-! grep -- "$regexp" "$@"
-
+echo Looking for private defines in public headers...
+! grep -- "$regexp" "$@" || exit $?
+echo "None found."
