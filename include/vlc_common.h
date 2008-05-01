@@ -552,20 +552,14 @@ struct gc_object_t
             VLC_GC_MEMBERS
 };
 
-#include <assert.h> /* FIXME: should not be included here */
-
 static inline void __vlc_gc_incref( gc_object_t * p_gc )
 {
-    assert( p_gc->i_gc_refcount > 0 );
-
     p_gc->i_gc_refcount ++;
 };
 
 static inline void __vlc_gc_decref( gc_object_t *p_gc )
 {
     if( !p_gc ) return;
-
-    assert( p_gc->i_gc_refcount > 0 );
 
     p_gc->i_gc_refcount -- ;
 
