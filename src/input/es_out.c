@@ -2090,7 +2090,7 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                                fmt->video.i_frame_rate_base * 1000000,
                                1000000 );
            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                          _("Frame rate"), I64Fd".%06u",
+                          _("Frame rate"), "%"PRId64".%06u",
                           div.quot, (unsigned int )div.rem );
        }
        break;

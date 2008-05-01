@@ -1208,7 +1208,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         printf( ": %f", p_var->val.f_float );
                         break;
                     case VLC_VAR_TIME:
-                        printf( ": " I64Fi, (int64_t)p_var->val.i_time );
+                        printf( ": %"PRIi64, (int64_t)p_var->val.i_time );
                         break;
                     case VLC_VAR_ADDRESS:
                         printf( ": %p", p_var->val.p_address );

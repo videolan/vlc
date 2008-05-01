@@ -635,7 +635,7 @@ static void AStreamPrebufferBlock( stream_t *s )
                          (p_sys->stat.i_read_time + 1);
 
             msg_Dbg( s, "prebuffering done %"PRId64" bytes in %"PRId64"s - "
-                     I64Fd" kbytes/s",
+                     "%"PRId64" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),
                      i_byterate / 1024 );
@@ -860,7 +860,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
         if( !b_aseek )
         {
             b_seek = false;
-            msg_Warn( s, I64Fd" bytes need to be skipped "
+            msg_Warn( s, "%"PRId64" bytes need to be skipped "
                       "(access non seekable)",
                       i_offset - p_sys->block.i_size );
         }
@@ -1380,7 +1380,7 @@ static void AStreamPrebufferStream( stream_t *s )
                          (p_sys->stat.i_read_time+1);
 
             msg_Dbg( s, "pre-buffering done %"PRId64" bytes in %"PRId64"s - "
-                     I64Fd" kbytes/s",
+                     "%"PRId64" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),
                      i_byterate / 1024 );
