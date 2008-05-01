@@ -780,6 +780,10 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define ATTR_ALIGN(align)
 #endif
 
+#ifdef HAVE_ATTRIBUTE_PACKED
+#   define ATTR_PACKED __attribute__((__packed__))
+#endif
+
 /* */
 #define VLC_UNUSED(x) (void)(x)
 

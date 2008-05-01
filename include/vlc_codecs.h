@@ -44,9 +44,7 @@ typedef struct _GUID
 #ifndef _WAVEFORMATEX_
 #define _WAVEFORMATEX_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 _WAVEFORMATEX {
     uint16_t   wFormatTag;
     uint16_t   nChannels;
@@ -61,9 +59,7 @@ _WAVEFORMATEX {
 #ifndef _WAVEFORMATEXTENSIBLE_
 #define _WAVEFORMATEXTENSIBLE_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 _WAVEFORMATEXTENSIBLE {
     WAVEFORMATEX Format;
     union {
@@ -79,9 +75,7 @@ _WAVEFORMATEXTENSIBLE {
 #ifndef _WAVEHEADER_
 #define _WAVEHEADER_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 _WAVEHEADER {
     uint32_t MainChunkID;
     uint32_t Length;
@@ -102,9 +96,7 @@ _WAVEHEADER {
 #if !defined(_BITMAPINFOHEADER_) && !defined(WIN32)
 #define _BITMAPINFOHEADER_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     uint32_t   biSize;
     uint32_t   biWidth;
@@ -120,9 +112,7 @@ typedef struct
 } BITMAPINFOHEADER, *PBITMAPINFOHEADER, *LPBITMAPINFOHEADER;
 
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     BITMAPINFOHEADER bmiHeader;
     int        bmiColors[1];
@@ -132,9 +122,7 @@ typedef struct
 #ifndef _RECT32_
 #define _RECT32_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     int left, top, right, bottom;
 } RECT32;
@@ -148,9 +136,7 @@ typedef int64_t REFERENCE_TIME;
 #ifndef _VIDEOINFOHEADER_
 #define _VIDEOINFOHEADER_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     RECT32            rcSource;
     RECT32            rcTarget;
@@ -164,9 +150,7 @@ typedef struct
 #ifndef _RGBQUAD_
 #define _RGBQUAD_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     uint8_t rgbBlue;
     uint8_t rgbGreen;
@@ -178,9 +162,7 @@ typedef struct
 #ifndef _TRUECOLORINFO_
 #define _TRUECOLORINFO_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     uint32_t dwBitMasks[3];
     RGBQUAD1 bmiColors[256];
@@ -190,9 +172,7 @@ typedef struct
 #ifndef _VIDEOINFO_
 #define _VIDEOINFO_
 typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
+ATTR_PACKED
 {
     RECT32            rcSource;
     RECT32            rcTarget;
