@@ -190,9 +190,9 @@ mtime_t mdate( void )
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
-    static mtime_t freq = I64C(-1);
+    static mtime_t freq = INT64_C(-1);
 
-    if( freq == I64C(-1) )
+    if( freq == INT64_C(-1) )
     {
         /* Extract from the Tcl source code:
          * (http://www.cs.man.ac.uk/fellowsd-bin/TIP/7.html)
@@ -215,7 +215,7 @@ mtime_t mdate( void )
         LARGE_INTEGER buf;
 
         freq = ( QueryPerformanceFrequency( &buf ) &&
-                 (buf.QuadPart == I64C(1193182) || buf.QuadPart == I64C(3579545) ) )
+                 (buf.QuadPart == INT64_C(1193182) || buf.QuadPart == INT64_C(3579545) ) )
                ? buf.QuadPart : 0;
 
 #if defined( WIN32 )
@@ -262,16 +262,16 @@ mtime_t mdate( void )
          * about 49.7 days so we try to detect the wrapping. */
 
         static CRITICAL_SECTION date_lock;
-        static mtime_t i_previous_time = I64C(-1);
+        static mtime_t i_previous_time = INT64_C(-1);
         static int i_wrap_counts = -1;
 
         if( i_wrap_counts == -1 )
         {
             /* Initialization */
 #if defined( WIN32 )
-            i_previous_time = I64C(1000) * timeGetTime();
+            i_previous_time = INT64_C(1000) * timeGetTime();
 #else
-            i_previous_time = I64C(1000) * GetTickCount();
+            i_previous_time = INT64_C(1000) * GetTickCount();
 #endif
             InitializeCriticalSection( &date_lock );
             i_wrap_counts = 0;
@@ -279,17 +279,17 @@ mtime_t mdate( void )
 
         EnterCriticalSection( &date_lock );
 #if defined( WIN32 )
-        res = I64C(1000) *
-            (i_wrap_counts * I64C(0x100000000) + timeGetTime());
+        res = INT64_C(1000) *
+            (i_wrap_counts * INT64_C(0x100000000) + timeGetTime());
 #else
-        res = I64C(1000) *
-            (i_wrap_counts * I64C(0x100000000) + GetTickCount());
+        res = INT64_C(1000) *
+            (i_wrap_counts * INT64_C(0x100000000) + GetTickCount());
 #endif
         if( i_previous_time > res )
         {
             /* Counter wrapped */
             i_wrap_counts++;
-            res += I64C(0x100000000) * 1000;
+            res += INT64_C(0x100000000) * 1000;
         }
         i_previous_time = res;
         LeaveCriticalSection( &date_lock );

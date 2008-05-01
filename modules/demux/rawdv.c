@@ -327,7 +327,7 @@ static int Demux( demux_t *p_demux )
 
     if( !p_sys->b_hurry_up )
     {
-        p_sys->i_pcr += ( I64C(1000000) / p_sys->f_rate );
+        p_sys->i_pcr += ( INT64_C(1000000) / p_sys->f_rate );
     }
 
     return 1;

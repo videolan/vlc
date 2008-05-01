@@ -316,7 +316,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
                             (p_sys->seekpoint[i+1]->i_time_offset-p_sys->seekpoint[i]->i_time_offset);
 
     /* XXX We do exact seek if it's not too far away(45s) */
-    if( i_delta_time < 45*I64C(1000000) )
+    if( i_delta_time < 45*INT64_C(1000000) )
     {
         if( stream_Seek( p_demux->s, p_sys->seekpoint[i]->i_byte_offset+p_sys->i_data_pos ) )
             return VLC_EGENERIC;
@@ -462,7 +462,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     /* */
     ParseStreamInfo( p_demux, &i_sample_rate, &i_sample_count,  *pp_streaminfo, *pi_streaminfo );
     if( i_sample_rate > 0 )
-        p_sys->i_length = i_sample_count * I64C(1000000)/i_sample_rate;
+        p_sys->i_length = i_sample_count * INT64_C(1000000)/i_sample_rate;
 
     /* Be sure we have seekpoint 0 */
     s = vlc_seekpoint_New();
@@ -516,7 +516,7 @@ static void ParseStreamInfo( demux_t *p_demux, int *pi_rate, int64_t *pi_count, 
     const int i_skip = 4+4;
 
     *pi_rate = GetDWBE(&p_data[i_skip+4+6]) >> 12;
-    *pi_count = GetQWBE(&p_data[i_skip+4+6]) &  ((I64C(1)<<36)-1);
+    *pi_count = GetQWBE(&p_data[i_skip+4+6]) &  ((INT64_C(1)<<36)-1);
 }
 
 static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
@@ -539,7 +539,7 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
             continue;
 
         s = vlc_seekpoint_New();
-        s->i_time_offset = i_sample * I64C(1000000)/i_sample_rate;
+        s->i_time_offset = i_sample * INT64_C(1000000)/i_sample_rate;
         s->i_byte_offset = GetQWBE( &p_data[4+18*i+8] );
 
         /* Check for duplicate entry */

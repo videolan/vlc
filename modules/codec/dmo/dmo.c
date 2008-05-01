@@ -1058,7 +1058,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     vih.rcSource.bottom = p_enc->fmt_in.video.i_height;
     vih.rcTarget = vih.rcSource;
 
-    vih.AvgTimePerFrame = I64C(10000000) / 25; //FIXME
+    vih.AvgTimePerFrame = INT64_C(10000000) / 25; //FIXME
 
     dmo_type.majortype = MEDIATYPE_Video;
     //dmo_type.subtype = MEDIASUBTYPE_RGB24;

@@ -369,7 +369,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetDWLE( &p_stream->p_oggds_header->i_size,
                      sizeof( oggds_header_t ) - 1 );
             SetQWLE( &p_stream->p_oggds_header->i_time_unit,
-                     I64C(10000000) * p_input->p_fmt->video.i_frame_rate_base /
+                     INT64_C(10000000) * p_input->p_fmt->video.i_frame_rate_base /
                      (int64_t)p_input->p_fmt->video.i_frame_rate );
             SetQWLE( &p_stream->p_oggds_header->i_samples_per_unit, 1 );
             SetDWLE( &p_stream->p_oggds_header->i_default_len, 1 ); /* ??? */
@@ -434,7 +434,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             memset( p_stream->p_oggds_header->sub_type, 0, 4 );
             sprintf( p_stream->p_oggds_header->sub_type, "%-x", i_tag );
 
-            SetQWLE( &p_stream->p_oggds_header->i_time_unit, I64C(10000000) );
+            SetQWLE( &p_stream->p_oggds_header->i_time_unit, INT64_C(10000000) );
             SetDWLE( &p_stream->p_oggds_header->i_default_len, 1 );
             SetDWLE( &p_stream->p_oggds_header->i_buffer_size, 30*1024 );
             SetQWLE( &p_stream->p_oggds_header->i_samples_per_unit,
@@ -952,13 +952,13 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             /* number of sample from begining + current packet */
             op.granulepos =
                 ( p_data->i_dts - p_sys->i_start_dts + p_data->i_length ) *
-                (mtime_t)p_input->p_fmt->audio.i_rate / I64C(1000000);
+                (mtime_t)p_input->p_fmt->audio.i_rate / INT64_C(1000000);
         }
         else if( p_stream->p_oggds_header )
         {
             /* number of sample from begining */
             op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) *
-                p_stream->p_oggds_header->i_samples_per_unit / I64C(1000000);
+                p_stream->p_oggds_header->i_samples_per_unit / INT64_C(1000000);
         }
     }
     else if( p_stream->i_cat == VIDEO_ES )
@@ -969,10 +969,10 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             op.granulepos = ( ( p_data->i_dts - p_sys->i_start_dts ) *
                 p_input->p_fmt->video.i_frame_rate /
                 p_input->p_fmt->video.i_frame_rate_base /
-                I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
+                INT64_C(1000000) ) << p_stream->i_keyframe_granule_shift;
         }
         else if( p_stream->p_oggds_header )
-            op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) * I64C(10) /
+            op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) * INT64_C(10) /
                 p_stream->p_oggds_header->i_time_unit;
     }
     else if( p_stream->i_cat == SPU_ES )

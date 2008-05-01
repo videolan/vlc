@@ -907,7 +907,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         asprintf( &t->psz_name, _("Track %i"), i_track );
         t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 
-        t->i_length = I64C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
+        t->i_length = INT64_C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
 
     if( p_item )
     {
@@ -939,7 +939,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
             asprintf( &t->psz_name, _("Track %i"), i_track );
             t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 
-            t->i_length = I64C(1000000) * t->i_size
+            t->i_length = INT64_C(1000000) * t->i_size
           / CDDA_FREQUENCY_SAMPLE / 4;
 
         if ( ! p_cdda->b_nav_mode ) {

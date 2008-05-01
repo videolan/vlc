@@ -127,7 +127,7 @@ DWORD CAtmoExternalCaptureInput::Execute(void)
     vlc_mutex_lock( &m_WakeupLock );
 
     while ((this->m_bTerminated == ATMO_FALSE) && (this->m_pAtmoThread->b_die == false)) {
-          int value = vlc_cond_timedwait(&m_WakeupCond, &m_WakeupLock, mdate() + I64C(75000));
+          int value = vlc_cond_timedwait(&m_WakeupCond, &m_WakeupLock, mdate() + INT64_C(75000));
           if(!value) {
              /* DeliverNewSourceDataPaket delivered new work for me... get it! */
              CalcColors(); // read picture and calculate colors

@@ -1337,7 +1337,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
 
     /* This isn't really valid for streams with B-frames */
-    p_block->i_length = I64C(1000000) *
+    p_block->i_length = INT64_C(1000000) *
         p_enc->fmt_in.video.i_frame_rate_base /
             p_enc->fmt_in.video.i_frame_rate;
 

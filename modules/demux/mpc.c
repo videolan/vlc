@@ -226,7 +226,7 @@ static int Demux( demux_t *p_demux )
     /* */
     p_data->i_buffer = i_ret * sizeof(MPC_SAMPLE_FORMAT) * p_sys->info.channels;
     p_data->i_dts = p_data->i_pts =
-            1 + I64C(1000000) * p_sys->i_position / p_sys->info.sample_freq;
+            1 + INT64_C(1000000) * p_sys->i_position / p_sys->info.sample_freq;
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_data->i_dts );
 
@@ -257,7 +257,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = I64C(1000000) * p_sys->info.pcm_samples /
+            *pi64 = INT64_C(1000000) * p_sys->info.pcm_samples /
                         p_sys->info.sample_freq;
             return VLC_SUCCESS;
 
@@ -272,7 +272,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = I64C(1000000) * p_sys->i_position /
+            *pi64 = INT64_C(1000000) * p_sys->i_position /
                         p_sys->info.sample_freq;
             return VLC_SUCCESS;
 

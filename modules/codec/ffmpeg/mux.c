@@ -363,14 +363,14 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( p_data->i_pts > 0 )
         pkt.pts = p_data->i_pts * p_stream->time_base.den /
-            I64C(1000000) / p_stream->time_base.num;
+            INT64_C(1000000) / p_stream->time_base.num;
     if( p_data->i_dts > 0 )
         pkt.dts = p_data->i_dts * p_stream->time_base.den /
-            I64C(1000000) / p_stream->time_base.num;
+            INT64_C(1000000) / p_stream->time_base.num;
 
     /* this is another hack to prevent libavformat from triggering the "non monotone timestamps" check in avformat/utils.c */
     p_stream->cur_dts = ( p_data->i_dts * p_stream->time_base.den /
-            I64C(1000000) / p_stream->time_base.num ) - 1;
+            INT64_C(1000000) / p_stream->time_base.num ) - 1;
 
     if( av_write_frame( p_sys->oc, &pkt ) < 0 )
     {

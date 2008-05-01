@@ -143,7 +143,7 @@ static int Demux( demux_t *p_demux )
                 psz_parse += sizeof("EXTINF:") - 1;
                 parseEXTINF( psz_parse, &psz_artist, &psz_name, &i_parsed_duration );
                 if( i_parsed_duration >= 0 )
-                    i_duration = i_parsed_duration * I64C(1000000);
+                    i_duration = i_parsed_duration * INT64_C(1000000);
                 if( psz_name )
                     psz_name = strdup( psz_name );
                 if( psz_artist )

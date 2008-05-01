@@ -772,7 +772,7 @@ static void MainLoop( input_thread_t *p_input )
             }
 
             var_SetBool( p_input, "intf-change", true );
-            i_intf_update = mdate() + I64C(150000);
+            i_intf_update = mdate() + INT64_C(150000);
         }
         /* 150ms * 8 = ~ 1 second */
         if( ++i_updates % 8 == 0 )
@@ -952,9 +952,9 @@ static void StartTitle( input_thread_t * p_input )
 
     /* Start time*/
     /* Set start time */
-    p_input->p->i_start = I64C(1000000) * var_GetInteger( p_input, "start-time" );
-    p_input->p->i_stop  = I64C(1000000) * var_GetInteger( p_input, "stop-time" );
-    p_input->p->i_run   = I64C(1000000) * var_GetInteger( p_input, "run-time" );
+    p_input->p->i_start = INT64_C(1000000) * var_GetInteger( p_input, "start-time" );
+    p_input->p->i_stop  = INT64_C(1000000) * var_GetInteger( p_input, "stop-time" );
+    p_input->p->i_run   = INT64_C(1000000) * var_GetInteger( p_input, "run-time" );
     i_length = var_GetTime( p_input, "length" );
     if( p_input->p->i_run < 0 )
     {
@@ -973,7 +973,7 @@ static void StartTitle( input_thread_t * p_input )
             vlc_value_t s;
 
             msg_Dbg( p_input, "starting at time: %ds",
-                              (int)( p_input->p->i_start / I64C(1000000) ) );
+                              (int)( p_input->p->i_start / INT64_C(1000000) ) );
 
             s.i_time = p_input->p->i_start;
             input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &s );

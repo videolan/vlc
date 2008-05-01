@@ -164,9 +164,9 @@ static int Demux( demux_t *p_demux)
             p_block_out->p_next = NULL;
 
             p_sys->i_pts = p_block_out->i_pts;
-            if( p_sys->i_pts > M4A_PTS_START + I64C(500000) )
+            if( p_sys->i_pts > M4A_PTS_START + INT64_C(500000) )
                 p_sys->i_bitrate_avg =
-                    8*I64C(1000000)*p_sys->i_bytes/(p_sys->i_pts-M4A_PTS_START);
+                    8*INT64_C(1000000)*p_sys->i_bytes/(p_sys->i_pts-M4A_PTS_START);
 
             p_sys->i_bytes += p_block_out->i_buffer;
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
@@ -207,7 +207,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) &&
             i_ret == VLC_SUCCESS && p_sys->i_bitrate_avg > 0 )
         {
-            int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) /
+            int64_t i_time = INT64_C(8000000) * stream_Tell(p_demux->s) /
                 p_sys->i_bitrate_avg;
 
             if( i_time >= 0 )

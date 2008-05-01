@@ -380,7 +380,7 @@ static int Demux( demux_t *p_demux )
     p_block->i_dts = p_block->i_pts = p_sys->i_pcr;
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
-    p_sys->i_pcr += ( I64C(1000000) / p_sys->f_fps );
+    p_sys->i_pcr += ( INT64_C(1000000) / p_sys->f_fps );
 
     return 1;
 }

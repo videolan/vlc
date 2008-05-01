@@ -255,7 +255,7 @@ static int HttpCallback( httpd_file_sys_t *p_args,
 
     vlc_mutex_lock( &p_sys->httpd_mutex );
 
-    p_sys->i_httpd_timeout = mdate() + I64C(3000000); /* 3 s */
+    p_sys->i_httpd_timeout = mdate() + INT64_C(3000000); /* 3 s */
     p_sys->psz_request = psz_request;
     p_sys->b_request_frontend_info = true;
     if ( p_sys->i_ca_handle )

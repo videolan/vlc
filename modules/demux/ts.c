@@ -1190,9 +1190,9 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
         if( p_sys->i_dvb_start <= t && t < p_sys->i_dvb_start + p_sys->i_dvb_length )
         {
             if( pi_length )
-                *pi_length = p_sys->i_dvb_length * I64C(1000000);
+                *pi_length = p_sys->i_dvb_length * INT64_C(1000000);
             if( pi_time )
-                *pi_time   = (t - p_sys->i_dvb_start) * I64C(1000000);
+                *pi_time   = (t - p_sys->i_dvb_start) * INT64_C(1000000);
             return VLC_SUCCESS;
         }
     }
@@ -1255,7 +1255,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = I64C(1000000) * ( stream_Size( p_demux->s ) / 50 ) /
+                *pi64 = INT64_C(1000000) * ( stream_Size( p_demux->s ) / 50 ) /
                         p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }

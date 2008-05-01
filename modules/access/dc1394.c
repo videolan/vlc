@@ -750,7 +750,7 @@ static block_t *GrabAudio( demux_t *p_demux )
         i_correct += buf_info.bytes;
 
     p_block->i_pts = p_block->i_dts =
-                        mdate() - I64C(1000000) * (mtime_t)i_correct /
+                        mdate() - INT64_C(1000000) * (mtime_t)i_correct /
                         2 / p_sys->channels / p_sys->i_sample_rate;
     return p_block;
 }

@@ -862,9 +862,6 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #   define telldir vlc_telldir
 #endif
 
-/* 64 bits integer constant suffix */
-#define I64C(x)  INT64_C(x)
-
 #if defined(WIN32) || defined(UNDER_CE)
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )

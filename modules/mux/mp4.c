@@ -530,7 +530,7 @@ again:
                 block_t *p_next = block_FifoShow( p_input->p_fifo );
                 int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
 
-                if( i_diff < I64C(1000000 ) )   /* protection */
+                if( i_diff < INT64_C(1000000 ) )   /* protection */
                 {
                     p_data->i_length = i_diff;
                 }
@@ -740,14 +740,14 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
         i_bitrate_avg += p_stream->entry[i].i_size;
         if( p_stream->entry[i].i_length > 0)
         {
-            int64_t i_bitrate = I64C(8000000) * p_stream->entry[i].i_size / p_stream->entry[i].i_length;
+            int64_t i_bitrate = INT64_C(8000000) * p_stream->entry[i].i_size / p_stream->entry[i].i_length;
             if( i_bitrate > i_bitrate_max )
                 i_bitrate_max = i_bitrate;
         }
     }
 
     if( p_stream->i_duration > 0 )
-        i_bitrate_avg = I64C(8000000) * i_bitrate_avg / p_stream->i_duration;
+        i_bitrate_avg = INT64_C(8000000) * i_bitrate_avg / p_stream->i_duration;
     else
         i_bitrate_avg = 0;
     if( i_bitrate_max <= 1 )
@@ -1448,13 +1448,13 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     /* first, create quantified length */
     for( i = 0, i_dts = 0, i_dts_q = 0; i < p_stream->i_entry_count; i++ )
     {
-        int64_t i_dts_deq = i_dts_q * I64C(1000000) / (int64_t)i_timescale;
+        int64_t i_dts_deq = i_dts_q * INT64_C(1000000) / (int64_t)i_timescale;
         int64_t i_delta = p_stream->entry[i].i_length + i_dts - i_dts_deq;
 
         i_dts += p_stream->entry[i].i_length;
 
         p_stream->entry[i].i_length =
-            i_delta * (int64_t)i_timescale / I64C(1000000);
+            i_delta * (int64_t)i_timescale / INT64_C(1000000);
 
         i_dts_q += p_stream->entry[i].i_length;
     }
@@ -1715,13 +1715,13 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             if( p_sys->b_64_ext )
             {
                 bo_add_64be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
-                             i_movie_timescale / I64C(1000000) );
+                             i_movie_timescale / INT64_C(1000000) );
                 bo_add_64be( elst, -1 );
             }
             else
             {
                 bo_add_32be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
-                             i_movie_timescale / I64C(1000000) );
+                             i_movie_timescale / INT64_C(1000000) );
                 bo_add_32be( elst, -1 );
             }
             bo_add_16be( elst, 1 );
@@ -1734,13 +1734,13 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         if( p_sys->b_64_ext )
         {
             bo_add_64be( elst, p_stream->i_duration *
-                         i_movie_timescale / I64C(1000000) );
+                         i_movie_timescale / INT64_C(1000000) );
             bo_add_64be( elst, 0 );
         }
         else
         {
             bo_add_32be( elst, p_stream->i_duration *
-                         i_movie_timescale / I64C(1000000) );
+                         i_movie_timescale / INT64_C(1000000) );
             bo_add_32be( elst, 0 );
         }
         bo_add_16be( elst, 1 );

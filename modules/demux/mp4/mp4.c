@@ -229,7 +229,7 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
         if( i_dts < 0 ) i_dts = 0;
     }
 
-    return I64C(1000000) * i_dts / p_track->i_timescale;
+    return INT64_C(1000000) * i_dts / p_track->i_timescale;
 }
 
 static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track )
@@ -244,7 +244,7 @@ static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_tra
     for( i_index = 0;; i_index++ )
     {
         if( i_sample < ck->p_sample_count_pts[i_index] )
-            return ck->p_sample_offset_pts[i_index] * I64C(1000000) /
+            return ck->p_sample_offset_pts[i_index] * INT64_C(1000000) /
                    (int64_t)p_track->i_timescale;
 
         i_sample -= ck->p_sample_count_pts[i_index];
@@ -253,7 +253,7 @@ static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_tra
 
 static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 {
-    return I64C(1000000) * p_sys->i_time / p_sys->i_timescale;
+    return INT64_C(1000000) * p_sys->i_time / p_sys->i_timescale;
 }
 
 /* Function to lookup the currently playing item */
@@ -1754,7 +1754,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
 
         /* now calculate i_start for this elst */
         /* offset */
-        i_start -= p_track->i_elst_time * I64C(1000000) / p_sys->i_timescale;
+        i_start -= p_track->i_elst_time * INT64_C(1000000) / p_sys->i_timescale;
         if( i_start < 0 )
         {
             *pi_chunk = 0;
@@ -2052,7 +2052,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                      elst->i_segment_duration[i] * 1000 / p_sys->i_timescale,
                      elst->i_media_time[i] >= 0 ?
                      (int64_t)(elst->i_media_time[i] * 1000 / p_track->i_timescale) :
-                     I64C(-1),
+                     INT64_C(-1),
                      elst->i_media_rate_integer[i],
                      elst->i_media_rate_fraction[i] );
         }

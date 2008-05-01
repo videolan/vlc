@@ -1380,11 +1380,11 @@ static int Mux( sout_mux_t *p_mux )
                                 p_spu->i_dts - p_pcr_stream->i_pes_dts;
 
                             if( ( i_spu_delay > i_shaping_delay ) &&
-                                ( i_spu_delay < I64C(100000000) ) )
+                                ( i_spu_delay < INT64_C(100000000) ) )
                                 continue;
 
-                            if ( ( i_spu_delay >= I64C(100000000) ) ||
-                                 ( i_spu_delay < I64C(10000) ) )
+                            if ( ( i_spu_delay >= INT64_C(100000000) ) ||
+                                 ( i_spu_delay < INT64_C(10000) ) )
                             {
                                 BufferChainClean( &p_stream->chain_pes );
                                 p_stream->i_pes_dts = 0;

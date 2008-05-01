@@ -1382,7 +1382,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_PAUSE_STATE:
         {
-            double d_npt = (double) p_sys->i_npt / I64C(1000000);
+            double d_npt = (double) p_sys->i_npt / INT64_C(1000000);
             int i;
 
             b_bool = (bool)va_arg( args, int );

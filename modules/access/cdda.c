@@ -547,7 +547,7 @@ static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
         cddb_disc_add_track( p_access->p_sys->p_disc, t );
         i_size = ( p_sectors[i+1] - p_sectors[i] ) *
                    (int64_t)CDDA_DATA_SIZE;
-        i_length += I64C(1000000) * i_size / 44100 / 4  ;
+        i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
     }
 
     cddb_disc_set_length( p_access->p_sys->p_disc, (int)(i_length/1000000) );

@@ -1285,7 +1285,7 @@ static inline void XDeint8x8MergeMMXEXT( uint8_t *dst, int i_dst,
                                          uint8_t *src1, int i_src1,
                                          uint8_t *src2, int i_src2 )
 {
-    static const uint64_t m_4 = I64C(0x0004000400040004);
+    static const uint64_t m_4 = INT64_C(0x0004000400040004);
     int y, x;
 
     /* Progressive */

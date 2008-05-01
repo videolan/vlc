@@ -569,14 +569,14 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
         p_dec->fmt_in.video.i_frame_rate > 0 &&
         p_dec->fmt_in.video.i_frame_rate_base > 0 )
     {
-        p_sys->i_interpolated_pts += I64C(1000000) *
+        p_sys->i_interpolated_pts += INT64_C(1000000) *
         p_dec->fmt_in.video.i_frame_rate_base *
         p_vop->i_rate / INPUT_RATE_DEFAULT /
         p_dec->fmt_in.video.i_frame_rate;
     }
     else if( p_dec->p_sys->i_fps_num )
         p_sys->i_interpolated_pts +=
-            ( I64C(1000000) * (i_time_ref + i_time_increment -
+            ( INT64_C(1000000) * (i_time_ref + i_time_increment -
               p_sys->i_last_time - p_sys->i_last_timeincr) *
               p_vop->i_rate / INPUT_RATE_DEFAULT /
               p_dec->p_sys->i_fps_num );

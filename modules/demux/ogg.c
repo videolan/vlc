@@ -445,7 +445,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
     {
         if( p_stream->fmt.i_codec != VLC_FOURCC( 't','h','e','o' ) )
         {
-            p_stream->i_pcr = p_oggpacket->granulepos * I64C(1000000)
+            p_stream->i_pcr = p_oggpacket->granulepos * INT64_C(1000000)
                               / p_stream->f_rate;
         }
         else
@@ -455,7 +455,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
             ogg_int64_t pframe = p_oggpacket->granulepos -
               ( iframe << p_stream->i_theora_keyframe_granule_shift );
 
-            p_stream->i_pcr = ( iframe + pframe ) * I64C(1000000)
+            p_stream->i_pcr = ( iframe + pframe ) * INT64_C(1000000)
                               / p_stream->f_rate;
         }
 
@@ -469,10 +469,10 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
          * If we can't then don't touch the old value. */
         if( p_stream->fmt.i_cat == VIDEO_ES )
             /* 1 frame per packet */
-            p_stream->i_interpolated_pcr += (I64C(1000000) / p_stream->f_rate);
+            p_stream->i_interpolated_pcr += (INT64_C(1000000) / p_stream->f_rate);
         else if( p_stream->fmt.i_bitrate )
             p_stream->i_interpolated_pcr +=
-                ( p_oggpacket->bytes * I64C(1000000) /
+                ( p_oggpacket->bytes * INT64_C(1000000) /
                   p_stream->fmt.i_bitrate / 8 );
     }
 }

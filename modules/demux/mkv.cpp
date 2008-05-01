@@ -4868,14 +4868,14 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         else if( MKV_IS_ID( l, KaxChapterTimeStart ) )
         {
             KaxChapterTimeStart &start =*(KaxChapterTimeStart*)l;
-            chapters.i_start_time = uint64( start ) / I64C(1000);
+            chapters.i_start_time = uint64( start ) / INT64_C(1000);
 
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterTimeStart: %lld", chapters.i_start_time );
         }
         else if( MKV_IS_ID( l, KaxChapterTimeEnd ) )
         {
             KaxChapterTimeEnd &end =*(KaxChapterTimeEnd*)l;
-            chapters.i_end_time = uint64( end ) / I64C(1000);
+            chapters.i_end_time = uint64( end ) / INT64_C(1000);
 
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterTimeEnd: %lld", chapters.i_end_time );
         }
@@ -5080,7 +5080,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     if ( stored_editions.size() != 0 && stored_editions[i_default_edition]->b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
-        i_dur = stored_editions[i_default_edition]->Duration() / I64C(1000);
+        i_dur = stored_editions[i_default_edition]->Duration() / INT64_C(1000);
         if (i_dur > 0)
             i_duration = i_dur;
     }

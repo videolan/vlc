@@ -1015,12 +1015,12 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     if( i_blocksize_hint && b_variable_blocksize )
     {
         i_sample_number = read_utf8( &p_buf[i_header++], &i_read );
-        if( i_sample_number == I64C(0xffffffffffffffff) ) return 0;
+        if( i_sample_number == INT64_C(0xffffffffffffffff) ) return 0;
     }
     else
     {
         i_sample_number = read_utf8( &p_buf[i_header++], &i_read );
-        if( i_sample_number == I64C(0xffffffffffffffff) ) return 0;
+        if( i_sample_number == INT64_C(0xffffffffffffffff) ) return 0;
 
         if( p_sys->b_stream_info )
             i_sample_number *= p_sys->stream_info.min_blocksize;
@@ -1105,14 +1105,14 @@ static uint64_t read_utf8( const uint8_t *p_buf, int *pi_read )
         i = 6;
     }
     else {
-        return I64C(0xffffffffffffffff);
+        return INT64_C(0xffffffffffffffff);
     }
 
     for( j = 1; j <= i; j++ )
     {
         if( !(p_buf[j] & 0x80) || (p_buf[j] & 0x40) ) /* 10xxxxxx */
         {
-            return I64C(0xffffffffffffffff);
+            return INT64_C(0xffffffffffffffff);
         }
         i_result <<= 6;
         i_result |= (p_buf[j] & 0x3F);

@@ -244,7 +244,7 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->i_xing_bytes && p_sys->i_xing_frames &&
         p_sys->i_xing_frame_samples )
     {
-        p_sys->i_bitrate_avg = p_sys->i_xing_bytes * I64C(8) *
+        p_sys->i_bitrate_avg = p_sys->i_xing_bytes * INT64_C(8) *
             p_sys->p_packetizer->fmt_out.audio.i_rate /
             p_sys->i_xing_frames / p_sys->i_xing_frame_samples;
     }
@@ -389,7 +389,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
                 (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
-                int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) /
+                int64_t i_time = INT64_C(8000000) * stream_Tell(p_demux->s) /
                     p_sys->i_bitrate_avg;
 
                 /* Fix time_offset */

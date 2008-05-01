@@ -208,7 +208,7 @@ static int Demux( demux_t *p_demux )
             if( p_block_out->i_length )
             {
                 p_sys->i_mux_rate =
-                    p_block_out->i_buffer * I64C(1000000) / p_block_out->i_length;
+                    p_block_out->i_buffer * INT64_C(1000000) / p_block_out->i_length;
             }
 
             /* set PCR */

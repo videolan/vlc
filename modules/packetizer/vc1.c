@@ -377,7 +377,7 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
             if( p_pic->i_dts <= 0 )
                 p_pic->i_dts = p_sys->i_interpolated_dts;
 
-            p_sys->i_interpolated_dts += I64C(1000000) * p_dec->fmt_out.video.i_frame_rate_base / p_dec->fmt_out.video.i_frame_rate;
+            p_sys->i_interpolated_dts += INT64_C(1000000) * p_dec->fmt_out.video.i_frame_rate_base / p_dec->fmt_out.video.i_frame_rate;
             if( p_pic->i_pts <= 0 )
             {
                 if( !p_sys->sh.b_has_bframe || (p_pic->i_flags & BLOCK_FLAG_TYPE_B ) )

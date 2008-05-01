@@ -908,7 +908,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
         /* FIXME, 3-2 pulldown is not handled correctly */
-        p_block->i_length = I64C(1000000) *
+        p_block->i_length = INT64_C(1000000) *
             p_enc->fmt_in.video.i_frame_rate_base /
                 p_enc->fmt_in.video.i_frame_rate;
 

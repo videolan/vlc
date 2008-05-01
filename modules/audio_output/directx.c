@@ -1043,7 +1043,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
 
         /* Detect underruns */
         if( l_queued && mtime - last_time >
-            I64C(1000000) * l_queued / p_aout->output.output.i_rate )
+            INT64_C(1000000) * l_queued / p_aout->output.output.i_rate )
         {
             msg_Dbg( p_aout, "detected underrun!" );
         }
@@ -1058,7 +1058,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         for( i = 0; i < l_free_slots; i++ )
         {
             aout_buffer_t *p_buffer = aout_OutputNextBuffer( p_aout,
-                mtime + I64C(1000000) * (i * FRAME_SIZE + l_queued) /
+                mtime + INT64_C(1000000) * (i * FRAME_SIZE + l_queued) /
                 p_aout->output.output.i_rate, b_sleek );
 
             /* If there is no audio data available and we have some buffered
@@ -1071,7 +1071,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
 
         /* Sleep a reasonable amount of time */
         l_queued += (i * FRAME_SIZE);
-        msleep( I64C(1000000) * l_queued / p_aout->output.output.i_rate / 2 );
+        msleep( INT64_C(1000000) * l_queued / p_aout->output.output.i_rate / 2 );
     }
 
     /* make sure the buffer isn't playing */

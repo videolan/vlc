@@ -248,7 +248,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Date management: 1 frame per packet */
-    p_sys->i_pts += ( I64C(1000000) * 1.0 / 25 /*FIXME*/ );
+    p_sys->i_pts += ( INT64_C(1000000) * 1.0 / 25 /*FIXME*/ );
     *pp_block = NULL;
 
     return p_buf;
