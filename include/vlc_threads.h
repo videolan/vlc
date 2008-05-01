@@ -32,8 +32,6 @@
 #ifndef _VLC_THREADS_H_
 #define _VLC_THREADS_H_
 
-#include <stdio.h>
-
 #if defined( UNDER_CE )
                                                                 /* WinCE API */
 #elif defined( WIN32 )
