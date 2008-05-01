@@ -292,7 +292,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         {
             HANDLE hEvent;
             struct SRB_ExecSCSICmd ssc;
-            byte_t p_tocheader[ 4 ];
+            uint8_t p_tocheader[ 4 ];
 
             /* Create the transfer completion event */
             hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
@@ -348,7 +348,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             if( pp_sectors )
             {
                 int i, i_toclength;
-                byte_t *p_fulltoc;
+                uint8_t *p_fulltoc;
 
                 i_toclength = 4 /* header */ + p_tocheader[0] +
                               ((unsigned int)p_tocheader[1] << 8);
@@ -551,9 +551,9 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
  * ioctl_ReadSector: Read VCD or CDDA sectors
  ****************************************************************************/
 int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
-                       int i_sector, byte_t * p_buffer, int i_nb, int i_type )
+                       int i_sector, uint8_t *p_buffer, int i_nb, int i_type )
 {
-    byte_t *p_block;
+    uint8_t *p_block;
     int i;
 
     if( i_type == VCD_TYPE ) p_block = malloc( VCD_SECTOR_SIZE * i_nb );

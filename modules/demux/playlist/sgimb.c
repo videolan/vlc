@@ -138,7 +138,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_SGIMB)( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    const byte_t *p_peek;
+    const uint8_t *p_peek;
     int i_size;
 
     /* Lets check the content to see if this is a sgi mediabase file */

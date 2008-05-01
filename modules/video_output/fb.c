@@ -157,13 +157,13 @@ struct vout_sys_t
     vlc_fourcc_t i_chroma;
 
     /* Video memory */
-    byte_t *    p_video;                                      /* base adress */
+    uint8_t *    p_video;                                     /* base adress */
     size_t      i_page_size;                                    /* page size */
 };
 
 struct picture_sys_t
 {
-    byte_t *    p_data;                                       /* base adress */
+    uint8_t *    p_data;                                      /* base adress */
 };
 
 /*****************************************************************************

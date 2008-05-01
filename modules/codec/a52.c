@@ -83,7 +83,7 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 
-static int  SyncInfo      ( const byte_t *, unsigned int *, unsigned int *,
+static int  SyncInfo      ( const uint8_t *, unsigned int *, unsigned int *,
                             unsigned int *, int * );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
@@ -429,7 +429,7 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
  * since we don't want to oblige S/PDIF people to use liba52 just to get
  * their SyncInfo...
  *****************************************************************************/
-static int SyncInfo( const byte_t * p_buf,
+static int SyncInfo( const uint8_t * p_buf,
                      unsigned int * pi_channels,
                      unsigned int * pi_channels_conf,
                      unsigned int * pi_sample_rate, int * pi_bit_rate )

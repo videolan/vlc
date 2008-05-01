@@ -83,7 +83,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    const byte_t*p_peek;
+    const uint8_t *p_peek;
     int         i_peek = 0;
     bool  b_big_endian = 0; /* Arbitrary initialisation */
 
@@ -197,7 +197,7 @@ static int Demux( demux_t *p_demux )
 
 #else
         int i;
-        byte_t *p_tmp, tmp;
+        uint8_t *p_tmp, tmp;
         p_tmp = p_block_in->p_buffer;
         for( i = p_block_in->i_buffer / 2 ; i-- ; )
         {

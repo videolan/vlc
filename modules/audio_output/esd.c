@@ -233,7 +233,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, uint8_t *buffer, int i_size )
 {
     int i_amount;
 

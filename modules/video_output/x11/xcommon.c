@@ -2931,7 +2931,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
                                  Display *p_display, EXTRA_ARGS,
                                  int i_width, int i_height )
 {
-    byte_t *    p_data;                           /* image data storage zone */
+    uint8_t *    p_data;                          /* image data storage zone */
     IMAGE_TYPE *p_image;
 #ifdef MODULE_NAME_IS_x11
     int         i_quantum;                     /* XImage quantum (see below) */
@@ -2945,10 +2945,10 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     i_height = ( i_height + 15 ) >> 4 << 4;
     i_width = ( i_width + 15 ) >> 4 << 4;
 
-    p_data = (byte_t *) malloc( i_width * i_height * i_bits_per_pixel / 8 );
+    p_data = malloc( i_width * i_height * i_bits_per_pixel / 8 );
 #elif defined(MODULE_NAME_IS_x11)
     i_bytes_per_line = i_width * i_bytes_per_pixel;
-    p_data = (byte_t *) malloc( i_bytes_per_line * i_height );
+    p_data = malloc( i_bytes_per_line * i_height );
 #endif
     if( !p_data )
     {

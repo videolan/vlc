@@ -64,9 +64,9 @@
         {                                                                   \
             (p_new_buffer)->i_alloc_type = i_alloc_type;                    \
             (p_new_buffer)->i_size = i_alloc_size;                          \
-            (p_new_buffer)->p_buffer = (byte_t *)(p_new_buffer)             \
+            (p_new_buffer)->p_buffer = (uint8_t *)(p_new_buffer)            \
                                          + sizeof(aout_buffer_t);           \
-            (p_new_buffer)->b_discontinuity = false;                    \
+            (p_new_buffer)->b_discontinuity = false;                        \
             if ( (p_previous_buffer) != NULL )                              \
             {                                                               \
                 (p_new_buffer)->start_date =                                \

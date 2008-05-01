@@ -90,12 +90,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     static const uint8_t p_sync_le[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
     static const uint8_t p_sync_be[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };
 #ifndef HAVE_SWAB
-    byte_t * p_tmp;
+    uint8_t * p_tmp;
     uint16_t i;
 #endif
     uint16_t i_frame_size = p_in_buf->i_nb_bytes / 2;
-    byte_t * p_in = p_in_buf->p_buffer;
-    byte_t * p_out = p_out_buf->p_buffer;
+    uint8_t * p_in = p_in_buf->p_buffer;
+    uint8_t * p_out = p_out_buf->p_buffer;
 
     /* Copy the S/PDIF headers. */
     if( p_filter->output.i_format == VLC_FOURCC('s','p','d','b') )

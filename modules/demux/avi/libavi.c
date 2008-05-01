@@ -35,7 +35,7 @@
 
 #define __EVEN( x ) ( (x)&0x01 ? (x)+1 : (x) )
 
-static vlc_fourcc_t GetFOURCC( const byte_t *p_buff )
+static vlc_fourcc_t GetFOURCC( const uint8_t *p_buff )
 {
     return VLC_FOURCC( p_buff[0], p_buff[1], p_buff[2], p_buff[3] );
 }

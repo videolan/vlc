@@ -58,7 +58,7 @@ struct vout_sys_t
     int i_width;
     int i_height;
 
-    byte_t* p_pixels;
+    uint8_t* p_pixels;
 };
 
 /*****************************************************************************
@@ -120,7 +120,7 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     IDirectFBSurface *p_primary = (IDirectFBSurface *) p_vout->p_sys->p_primary;
-    byte_t* p_pixels = NULL;
+    uint8_t* p_pixels = NULL;
     picture_t *p_pic = NULL;
     int i_rlength, i_glength, i_blength;
     int i_roffset, i_goffset, i_boffset;
@@ -220,7 +220,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* allocate p_pixels */
     i_size = i_line_pitch * p_sys->i_height;
-    p_sys->p_pixels = malloc( sizeof(byte_t) * i_size );
+    p_sys->p_pixels = malloc( i_size );
     if( p_sys->p_pixels == NULL )
     {
         p_primary->Unlock(p_primary);
@@ -277,7 +277,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     IDirectFBSurface *p_primary = (IDirectFBSurface *) p_sys->p_primary;
-    byte_t* p_pixels = NULL;
+    uint8_t* p_pixels = NULL;
     int i_size;
     int i_line_pitch;
 

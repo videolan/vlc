@@ -58,7 +58,7 @@ int E_(Import_IFO)( vlc_object_t *p_this )
         && !strcasecmp( psz_file + strlen( "VTS_00_0" ) , ".IFO" ) ) ) )
     {
         int i_peek;
-        const byte_t *p_peek;
+        const uint8_t *p_peek;
         i_peek = stream_Peek( p_demux->s, &p_peek, 8 );
 
         if( i_peek != 8 || memcmp( p_peek, "DVDVIDEO", 8 ) )

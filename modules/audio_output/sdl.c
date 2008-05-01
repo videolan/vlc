@@ -58,7 +58,7 @@ struct aout_sys_t
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 static void Play        ( aout_instance_t * );
-static void SDLCallback ( void *, byte_t *, int );
+static void SDLCallback ( void *, uint8_t *, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -246,7 +246,7 @@ static void Close ( vlc_object_t *p_this )
 /*****************************************************************************
  * SDLCallback: what to do once SDL has played sound samples
  *****************************************************************************/
-static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
+static void SDLCallback( void * _p_aout, uint8_t * p_stream, int i_len )
 {
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
     aout_buffer_t *   p_buffer;

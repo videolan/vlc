@@ -254,7 +254,7 @@ int vlclua_stream_read( lua_State *L )
 {
     stream_t * p_stream;
     int n;
-    byte_t *p_read;
+    uint8_t *p_read;
     int i_read;
     p_stream = (stream_t *)luaL_checklightuserdata( L, 1 );
     n = luaL_checkint( L, 2 );

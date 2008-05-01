@@ -78,7 +78,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     int i_peek, i, b_found = false;
-    const byte_t *p_peek;
+    const uint8_t *p_peek;
 
     i_peek = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
 

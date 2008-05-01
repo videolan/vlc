@@ -47,7 +47,7 @@ struct aout_sys_t
     int          i_card;
     int          i_device;
 
-    byte_t *     p_silent_buffer;
+    uint8_t *    p_silent_buffer;
 };
 
 #define DEFAULT_FRAME_SIZE 2048
@@ -269,7 +269,7 @@ static int QNXaoutThread( aout_instance_t * p_aout )
     {
         aout_buffer_t * p_buffer;
         int i_tmp, i_size;
-        byte_t * p_bytes;
+        uint8_t * p_bytes;
 
         if ( p_aout->output.output.i_format != VLC_FOURCC('s','p','d','i') )
         {

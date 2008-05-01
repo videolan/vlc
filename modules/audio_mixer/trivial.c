@@ -79,8 +79,8 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     int i_nb_channels = aout_FormatNbChannels( &p_aout->mixer.mixer );
     int i_nb_bytes = p_buffer->i_nb_samples * sizeof(int32_t)
                       * i_nb_channels;
-    byte_t * p_in;
-    byte_t * p_out;
+    uint8_t * p_in;
+    uint8_t * p_out;
 
     while ( p_input->b_error )
     {

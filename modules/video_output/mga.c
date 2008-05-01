@@ -114,7 +114,7 @@ struct vout_sys_t
 {
     mga_vid_config_t    mga;
     int                 i_fd;
-    byte_t *            p_video;
+    uint8_t *           p_video;
 };
 
 struct picture_sys_t

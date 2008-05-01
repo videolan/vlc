@@ -207,7 +207,7 @@ struct aout_sys_t
 
     int i_buffer_size;
 
-    byte_t *p_silence_buffer;               /* buffer we use to play silence */
+    uint8_t *p_silence_buffer;              /* buffer we use to play silence */
 
     bool b_chan_reorder;              /* do we need channel reordering */
     int pi_chan_table[AOUT_CHAN_MAX];

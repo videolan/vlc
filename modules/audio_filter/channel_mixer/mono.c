@@ -80,7 +80,7 @@ struct filter_sys_t
     int i_bitspersample;
 
     size_t i_overflow_buffer_size;/* in bytes */
-    byte_t * p_overflow_buffer;
+    uint8_t * p_overflow_buffer;
     unsigned int i_nb_atomic_operations;
     struct atomic_operation_t * p_atomic_operations;
 };
@@ -555,9 +555,9 @@ static void stereo2mono_downmix( aout_filter_t * p_filter,
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
 
     int16_t * p_in = (int16_t*) p_in_buf->p_buffer;
-    byte_t * p_out;
-    byte_t * p_overflow;
-    byte_t * p_slide;
+    uint8_t * p_out;
+    uint8_t * p_overflow;
+    uint8_t * p_slide;
 
     size_t i_overflow_size;     /* in bytes */
     size_t i_out_size;          /* in bytes */

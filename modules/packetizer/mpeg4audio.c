@@ -325,7 +325,7 @@ static block_t *PacketizeRawBlock( decoder_t *p_dec, block_t **pp_block )
 /****************************************************************************
  * ADTS helpers
  ****************************************************************************/
-static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
+static int ADTSSyncInfo( decoder_t * p_dec, const uint8_t * p_buf,
                          unsigned int * pi_channels,
                          unsigned int * pi_sample_rate,
                          unsigned int * pi_frame_length,

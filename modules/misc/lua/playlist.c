@@ -74,7 +74,7 @@ static int vlclua_demux_peek( lua_State *L )
 static int vlclua_demux_read( lua_State *L )
 {
     demux_t *p_demux = (demux_t *)vlclua_get_this( L );
-    byte_t *p_read;
+    uint8_t *p_read;
     int n = luaL_checkint( L, 1 );
     int i_read = stream_Read( p_demux->s, &p_read, n );
     lua_pushlstring( L, (const char *)p_read, i_read );

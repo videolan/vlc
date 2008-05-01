@@ -137,7 +137,7 @@ typedef int32_t vlc_fixed_t;
 /** audio output buffer */
 struct aout_buffer_t
 {
-    byte_t *                p_buffer;
+    uint8_t *               p_buffer;
     int                     i_alloc_type;
     /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
      * is the number of significative bytes in it. */
@@ -269,7 +269,7 @@ struct aout_input_t
     aout_fifo_t             fifo;
 
     /* Mixer information */
-    byte_t *                p_first_byte_to_mix;
+    uint8_t *               p_first_byte_to_mix;
     audio_replay_gain_t     replay_gain;
     float                   f_multiplier;
 

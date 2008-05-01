@@ -116,7 +116,7 @@ struct atomic_operation_t
 struct aout_filter_sys_t
 {
     size_t i_overflow_buffer_size;/* in bytes */
-    byte_t * p_overflow_buffer;
+    uint8_t * p_overflow_buffer;
     unsigned int i_nb_atomic_operations;
     struct atomic_operation_t * p_atomic_operations;
 };
@@ -124,7 +124,7 @@ struct aout_filter_sys_t
 struct filter_sys_t
 {
     size_t i_overflow_buffer_size;/* in bytes */
-    byte_t * p_overflow_buffer;
+    uint8_t * p_overflow_buffer;
     unsigned int i_nb_atomic_operations;
     struct atomic_operation_t * p_atomic_operations;
 };
@@ -466,9 +466,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
 
     float * p_in = (float*) p_in_buf->p_buffer;
-    byte_t * p_out;
-    byte_t * p_overflow;
-    byte_t * p_slide;
+    uint8_t * p_out;
+    uint8_t * p_overflow;
+    uint8_t * p_slide;
 
     size_t i_overflow_size;     /* in bytes */
     size_t i_out_size;          /* in bytes */

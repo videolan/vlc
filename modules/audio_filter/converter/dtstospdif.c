@@ -161,8 +161,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     for( i_frame = 0; i_frame < 3; i_frame++ )
     {
         uint16_t i_length_padded = i_length;
-        byte_t * p_out = p_out_buf->p_buffer + (i_frame * i_fz);
-        byte_t * p_in = p_filter->p_sys->p_buf + (i_frame * i_length);
+        uint8_t * p_out = p_out_buf->p_buffer + (i_frame * i_fz);
+        uint8_t * p_in = p_filter->p_sys->p_buf + (i_frame * i_length);
 
         switch( p_in_buf->i_nb_samples )
         {
@@ -197,7 +197,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             swab( p_in, p_out + 8, i_length );
 #else
             uint16_t i;
-            byte_t * p_tmp, tmp;
+            uint8_t * p_tmp, tmp;
             p_tmp = p_out + 8;
             for( i = i_length / 2 ; i-- ; )
             {

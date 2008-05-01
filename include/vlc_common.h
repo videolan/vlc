@@ -91,8 +91,6 @@
     typedef int32_t             intptr_t;
 #endif
 
-typedef uint8_t                 byte_t;
-
 /* Systems that don't have stdint.h may not define INT64_MIN and
    INT64_MAX */
 #ifndef INT64_MIN

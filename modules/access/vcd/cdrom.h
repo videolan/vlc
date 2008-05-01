@@ -94,4 +94,4 @@ vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
 void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
 int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
 int       ioctl_ReadSectors  ( vlc_object_t *, const vcddev_t *,
-                               int, byte_t *, int, int );
+                               int, uint8_t *, int, int );
