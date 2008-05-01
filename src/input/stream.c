@@ -293,7 +293,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
             goto error;
         }
         TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
-        msg_Dbg( p_access, "adding file `%s', ("I64Fd" bytes)",
+        msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
                  p_entry->psz_path, p_access->info.i_size );
 
         while( psz_name && *psz_name )
@@ -314,7 +314,7 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
                     continue;
                 }
 
-                msg_Dbg( p_access, "adding file `%s', ("I64Fd" bytes)",
+                msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
                          psz_name, p_tmp->info.i_size );
 
                 p_entry = malloc( sizeof(access_entry_t) );
@@ -634,7 +634,7 @@ static void AStreamPrebufferBlock( stream_t *s )
             i_byterate = ( I64C(1000000) * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time + 1);
 
-            msg_Dbg( s, "prebuffering done "I64Fd" bytes in "I64Fd"s - "
+            msg_Dbg( s, "prebuffering done %"PRId64" bytes in %"PRId64"s - "
                      I64Fd" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),
@@ -879,7 +879,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
             else
                 b_seek = true;
 
-            msg_Dbg( s, "b_seek=%d th*avg=%d skip="I64Fd,
+            msg_Dbg( s, "b_seek=%d th*avg=%d skip=%"PRId64,
                      b_seek, i_th*i_avg, i_skip );
         }
     }
@@ -1032,8 +1032,8 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     }
 
 #ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamReadStream: %d pos="I64Fd" tk=%d start="I64Fd
-             " offset=%d end="I64Fd,
+    msg_Dbg( s, "AStreamReadStream: %d pos=%"PRId64" tk=%d start=%"PRId64
+             " offset=%d end=%"PRId64,
              i_read, p_sys->i_pos, p_sys->stream.i_tk,
              tk->i_start, p_sys->stream.i_offset, tk->i_end );
 #endif
@@ -1087,8 +1087,8 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, int i_read )
     if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
 #ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamPeekStream: %d pos="I64Fd" tk=%d "
-             "start="I64Fd" offset=%d end="I64Fd,
+    msg_Dbg( s, "AStreamPeekStream: %d pos=%"PRId64" tk=%d "
+             "start=%"PRId64" offset=%d end=%"PRId64,
              i_read, p_sys->i_pos, p_sys->stream.i_tk,
              tk->i_start, p_sys->stream.i_offset, tk->i_end );
 #endif
@@ -1150,8 +1150,8 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     int i;
 
 #ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamSeekStream: to "I64Fd" pos="I64Fd
-             " tk=%d start="I64Fd" offset=%d end="I64Fd,
+    msg_Dbg( s, "AStreamSeekStream: to %"PRId64" pos=%"PRId64
+             " tk=%d start=%"PRId64" offset=%d end=%"PRId64,
              i_pos, p_sys->i_pos, p_sys->stream.i_tk,
              p_sys->stream.tk[p_sys->stream.i_tk].i_start,
              p_sys->stream.i_offset,
@@ -1206,8 +1206,8 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
         if( i_pos >= tk->i_start && i_pos <= tk->i_end )
         {
 #ifdef STREAM_DEBUG
-            msg_Dbg( s, "AStreamSeekStream: reusing %d start="I64Fd
-                     " end="I64Fd, i, tk->i_start, tk->i_end );
+            msg_Dbg( s, "AStreamSeekStream: reusing %d start=%"PRId64
+                     " end=%"PRId64, i, tk->i_start, tk->i_end );
 #endif
 
             /* Seek at the end of the buffer */
@@ -1379,7 +1379,7 @@ static void AStreamPrebufferStream( stream_t *s )
             i_byterate = ( I64C(1000000) * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time+1);
 
-            msg_Dbg( s, "pre-buffering done "I64Fd" bytes in "I64Fd"s - "
+            msg_Dbg( s, "pre-buffering done %"PRId64" bytes in %"PRId64"s - "
                      I64Fd" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),

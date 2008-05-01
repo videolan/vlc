@@ -132,7 +132,7 @@ char *sdp_Start (const char *name, const char *description, const char *url,
     }
 
     if (asprintf (&sdp, "v=0"
-                    "\r\no=- "I64Fu" "I64Fu" IN IP%c %s"
+                    "\r\no=- %"PRIu64" %"PRIu64" IN IP%c %s"
                     "\r\ns=%s"
                     "\r\ni=%s"
                     "%s%s" // optional URL

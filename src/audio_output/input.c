@@ -523,7 +523,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         /* The decoder is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
-        msg_Warn( p_aout, "computed PTS is out of range ("I64Fd"), "
+        msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", mdate() - start_date );
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
@@ -539,7 +539,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         /* The decoder gives us f*cked up PTS. It's its business, but we
          * can't present it anyway, so drop the buffer. */
-        msg_Warn( p_aout, "PTS is out of range ("I64Fd"), dropping buffer",
+        msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
                   mdate() - p_buffer->start_date );
 
         inputDrop( p_aout, p_input, p_buffer );
@@ -552,7 +552,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if ( start_date != 0 &&
          ( start_date < p_buffer->start_date - 3 * AOUT_PTS_TOLERANCE ) )
     {
-        msg_Warn( p_aout, "audio drift is too big ("I64Fd"), clearing out",
+        msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
                   start_date - p_buffer->start_date );
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
@@ -566,7 +566,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     else if ( start_date != 0 &&
               ( start_date > p_buffer->start_date + 3 * AOUT_PTS_TOLERANCE ) )
     {
-        msg_Warn( p_aout, "audio drift is too big ("I64Fd"), dropping buffer",
+        msg_Warn( p_aout, "audio drift is too big (%"PRId64"), dropping buffer",
                   start_date - p_buffer->start_date );
         inputDrop( p_aout, p_input, p_buffer );
         return 0;
@@ -604,7 +604,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         else
             p_input->i_resampling_type = AOUT_RESAMPLING_UP;
 
-        msg_Warn( p_aout, "buffer is "I64Fd" %s, triggering %ssampling",
+        msg_Warn( p_aout, "buffer is %"PRId64" %s, triggering %ssampling",
                           drift > 0 ? drift : -drift,
                           drift > 0 ? "in advance" : "late",
                           drift > 0 ? "down" : "up");
@@ -630,8 +630,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         if( p_input->pp_resamplers[0]->input.i_rate == 1000 * p_input->input.i_rate / i_input_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-            msg_Warn( p_aout, "resampling stopped after "I64Fi" usec "
-                      "(drift: "I64Fi")",
+            msg_Warn( p_aout, "resampling stopped after %"PRIi64" usec "
+                      "(drift: %"PRIi64")",
                       mdate() - p_input->i_resamp_start_date,
                       p_buffer->start_date - start_date);
         }

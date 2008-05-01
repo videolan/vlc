@@ -111,7 +111,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         /* The output is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
-        msg_Warn( p_aout, "output PTS is out of range ("I64Fd"), clearing out",
+        msg_Warn( p_aout, "output PTS is out of range (%"PRId64"), clearing out",
                   mdate() - start_date );
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         aout_DateSet( &exact_start_date, 0 );
@@ -136,7 +136,7 @@ static int MixBuffer( aout_instance_t * p_aout )
             p_buffer = p_fifo->p_first;
             while ( p_buffer != NULL && p_buffer->start_date < mdate() )
             {
-                msg_Warn( p_aout, "input PTS is out of range ("I64Fd"), "
+                msg_Warn( p_aout, "input PTS is out of range (%"PRId64"), "
                           "trashing", mdate() - p_buffer->start_date );
                 p_buffer = aout_FifoPop( p_aout, p_fifo );
                 aout_BufferFree( p_buffer );
@@ -199,7 +199,7 @@ static int MixBuffer( aout_instance_t * p_aout )
             /* We authorize a +-1 because rounding errors get compensated
              * regularly. */
             aout_buffer_t * p_next = p_buffer->p_next;
-            msg_Warn( p_aout, "the mixer got a packet in the past ("I64Fd")",
+            msg_Warn( p_aout, "the mixer got a packet in the past (%"PRId64")",
                       start_date - p_buffer->end_date );
             aout_BufferFree( p_buffer );
             if( p_input->p_input_thread )
@@ -232,7 +232,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                 if ( prev_date != p_buffer->start_date )
                 {
                     msg_Warn( p_aout,
-                              "buffer hole, dropping packets ("I64Fd")",
+                              "buffer hole, dropping packets (%"PRId64")",
                               p_buffer->start_date - prev_date );
                     b_drop_buffers = 1;
                     break;
@@ -278,7 +278,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                    (i_nb_bytes < p_aout->mixer.mixer.i_bytes_per_frame
                      + mixer_nb_bytes)) )
             {
-                msg_Warn( p_aout, "mixer start isn't output start ("I64Fd")",
+                msg_Warn( p_aout, "mixer start isn't output start (%"PRId64")",
                           i_nb_bytes - mixer_nb_bytes );
 
                 /* Round to the nearest multiple */

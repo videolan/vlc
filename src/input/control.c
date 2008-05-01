@@ -618,7 +618,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     vlc_mutex_lock( &p_input->p->input.p_item->lock );
     for( i = 0; i < p_input->p->i_bookmark; i++ )
     {
-        i_len += snprintf( NULL, 0, "{name=%s,bytes="I64Fd",time="I64Fd"}",
+        i_len += snprintf( NULL, 0, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
                            p_input->p->bookmark[i]->psz_name,
                            p_input->p->bookmark[i]->i_byte_offset,
                            p_input->p->bookmark[i]->i_time_offset/1000000 );
@@ -627,7 +627,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     {
         if( !i ) psz_value = psz_next = malloc( i_len + p_input->p->i_bookmark );
 
-        sprintf( psz_next, "{name=%s,bytes="I64Fd",time="I64Fd"}",
+        sprintf( psz_next, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
                  p_input->p->bookmark[i]->psz_name,
                  p_input->p->bookmark[i]->i_byte_offset,
                  p_input->p->bookmark[i]->i_time_offset/1000000 );

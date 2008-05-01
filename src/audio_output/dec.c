@@ -333,7 +333,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if ( p_buffer->start_date > mdate() + p_input->i_pts_delay +
          AOUT_MAX_ADVANCE_TIME )
     {
-        msg_Warn( p_aout, "received buffer in the future ("I64Fd")",
+        msg_Warn( p_aout, "received buffer in the future (%"PRId64")",
                   p_buffer->start_date - mdate());
         if( p_input->p_input_thread )
         {

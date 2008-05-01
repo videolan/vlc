@@ -286,8 +286,8 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     while ( p_buffer && p_buffer->start_date <
             (b_can_sleek ? start_date : mdate()) - AOUT_PTS_TOLERANCE )
     {
-        msg_Dbg( p_aout, "audio output is too slow ("I64Fd"), "
-                 "trashing "I64Fd"us", mdate() - p_buffer->start_date,
+        msg_Dbg( p_aout, "audio output is too slow (%"PRId64"), "
+                 "trashing %"PRId64"us", mdate() - p_buffer->start_date,
                  p_buffer->end_date - p_buffer->start_date );
         p_buffer = p_buffer->p_next;
         aout_BufferFree( p_aout->output.fifo.p_first );
@@ -330,7 +330,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
         if ( !p_aout->output.b_starving )
-            msg_Dbg( p_aout, "audio output is starving ("I64Fd"), "
+            msg_Dbg( p_aout, "audio output is starving (%"PRId64"), "
                      "playing silence", i_delta );
         p_aout->output.b_starving = 1;
         return NULL;
@@ -346,7 +346,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         int i;
         mtime_t difference = start_date - p_buffer->start_date;
         msg_Warn( p_aout, "output date isn't PTS date, requesting "
-                  "resampling ("I64Fd")", difference );
+                  "resampling (%"PRId64")", difference );
 
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )

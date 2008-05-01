@@ -273,7 +273,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      }
                      psz_start = psz_end + 1;
                 }
-                msg_Dbg( p_input, "adding bookmark: %s, bytes="I64Fd", time="I64Fd,
+                msg_Dbg( p_input, "adding bookmark: %s, bytes=%"PRId64", time=%"PRId64,
                                   p_seekpoint->psz_name, p_seekpoint->i_byte_offset,
                                   p_seekpoint->i_time_offset );
                 input_Control( p_input, INPUT_ADD_BOOKMARK, p_seekpoint );
@@ -1617,7 +1617,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             }
             if( i_ret )
             {
-                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) "I64Fd
+                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) %"PRId64
                          " failed or not possible", i_time );
             }
             else

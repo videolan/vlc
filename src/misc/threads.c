@@ -692,7 +692,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
            user_ft.dwLowDateTime) / 10;
 
         msg_Dbg( p_this, "thread times: "
-                 "real "I64Fd"m%fs, kernel "I64Fd"m%fs, user "I64Fd"m%fs",
+                 "real %"PRId64"m%fs, kernel %"PRId64"m%fs, user %"PRId64"m%fs",
                  real_time/60/1000000,
                  (double)((real_time%(60*1000000))/1000000.0),
                  kernel_time/60/1000000,

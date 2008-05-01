@@ -265,7 +265,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         if( !b_decode && !p_synchro->b_quiet )
         {
             msg_Warn( p_synchro->p_dec,
-                      "synchro trashing I ("I64Fd")", pts - now );
+                      "synchro trashing I (%"PRId64")", pts - now );
         }
         break;
 
@@ -434,8 +434,8 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
 
 #if 0
         if( !p_synchro->b_quiet )
-            msg_Dbg( p_synchro->p_dec, "I("I64Fd") P("I64Fd")[%d] B("I64Fd")"
-                  "[%d] YUV("I64Fd") : trashed %d:%d/%d",
+            msg_Dbg( p_synchro->p_dec, "I(%"PRId64") P(%"PRId64")[%d] B(%"PRId64")"
+                  "[%d] YUV(%"PRId64") : trashed %d:%d/%d",
                   p_synchro->p_tau[I_CODING_TYPE],
                   p_synchro->p_tau[P_CODING_TYPE],
                   p_synchro->i_n_p,
@@ -506,7 +506,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
                 msg_Warn( p_synchro->p_dec, "decoder synchro warning: pts != "
-                          "current_date ("I64Fd")",
+                          "current_date (%"PRId64")",
                           p_synchro->current_pts
                               - next_pts );
             }
@@ -526,7 +526,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                   || p_synchro->backward_pts - next_dts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro->p_dec, "backward_pts != dts ("I64Fd")",
+                msg_Warn( p_synchro->p_dec, "backward_pts != dts (%"PRId64")",
                            next_dts
                                - p_synchro->backward_pts );
             }
@@ -536,7 +536,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
                 msg_Warn( p_synchro->p_dec,
-                          "backward_pts != current_pts ("I64Fd")",
+                          "backward_pts != current_pts (%"PRId64")",
                           p_synchro->current_pts
                               - p_synchro->backward_pts );
             }
@@ -550,7 +550,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                   || p_synchro->current_pts - next_dts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro->p_dec, "dts != current_pts ("I64Fd")",
+                msg_Warn( p_synchro->p_dec, "dts != current_pts (%"PRId64")",
                           p_synchro->current_pts
                               - next_dts );
             }
@@ -575,7 +575,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
         /* We cannot be _that_ late, something must have happened, reinit
          * the dates. */
         if( !p_synchro->b_quiet )
-            msg_Warn( p_synchro->p_dec, "PTS << now ("I64Fd"), resetting",
+            msg_Warn( p_synchro->p_dec, "PTS << now (%"PRId64"), resetting",
                       now - p_synchro->current_pts - DEFAULT_PTS_DELAY );
         p_synchro->current_pts = now + DEFAULT_PTS_DELAY;
     }

@@ -595,7 +595,7 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
     {
         mtime_t current_date = mdate();
         if ( current_date > p_buffer->i_dts )
-            msg_Warn( p_mux, "late buffer for mux input ("I64Fd")",
+            msg_Warn( p_mux, "late buffer for mux input (%"PRId64")",
                       current_date - p_buffer->i_dts );
     }
 
