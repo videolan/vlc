@@ -976,11 +976,7 @@ VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
       defined(MODULE_NAME_IS_pda))
     /* Declare nothing: gnome.h will do it for us */
 #elif defined( ENABLE_NLS )
-#   if defined( HAVE_INCLUDED_GETTEXT )
-#       include "libintl.h"
-#   else
-#       include <libintl.h>
-#   endif
+#   include <libintl.h>
 #   undef _
 #   ifdef WIN32
 #       define _(String) vlc_dgettext (PACKAGE_NAME, String)
