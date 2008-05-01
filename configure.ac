@@ -4888,7 +4888,7 @@ if test "${enable_macosx-audio}" != "no" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx-audio}" = "yes")
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
-    [ VLC_ADD_BUILTINS([auhal])
+    [ VLC_ADD_PLUGIN([auhal])
       VLC_ADD_LDFLAGS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,Carbon])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
@@ -5493,7 +5493,8 @@ then
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
 
 #  VLC_ADD_PLUGIN([access_eyetv])
-  VLC_ADD_BUILTINS([macosx minimal_macosx])
+  VLC_ADD_PLUGIN([macosx])
+  VLC_ADD_PLUGIN([minimal_macosx])
  
   ORIGCFLAGS=$CFLAGS
   CFLAGS="$CFLAGS -x objective-c"
@@ -5638,7 +5639,7 @@ then
     fi
     if test -f "${real_goom_tree}/src/.libs/libgoom2.a"; then
       AC_MSG_RESULT(${real_goom_tree}/src/.libs/libgoom2.a)
-      VLC_ADD_BUILTINS([goom])
+      VLC_ADD_PLUGIN([goom])
       VLC_ADD_LIBS([goom],[-L${real_goom_tree}/src/.libs -lgoom2])
       VLC_ADD_CPPFLAGS([goom],[-I${real_goom_tree}/src -DUSE_GOOM_TREE])
     else
@@ -5647,7 +5648,7 @@ then
       AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
       if test -f "${real_goom_tree}/libgoom.a"; then
         AC_MSG_RESULT(${real_goom_tree}/libgoom.a)
-        VLC_ADD_BUILTINS([goom])
+        VLC_ADD_PLUGIN([goom])
         VLC_ADD_LIBS([goom],[-L${real_goom_tree} -lgoom])
         VLC_ADD_CPPFLAGS([goom],[-I${real_goom_tree} -DUSE_GOOM_TREE -DOLD_GOOM])
       else
