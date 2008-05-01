@@ -18,8 +18,8 @@ do
   basedir="`echo "${dir}" | cut -f1 -d/`"
   # automake will not recurse for make dist if we don't define SUBDIRS = .
   subdirs="`sed -ne 's,'modules/${dir}'/\([^/]*\)/Makefile,\1,p' configure.ac | xargs`"
-  mods="`sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < "${modf}" | xargs`"
-  plugins="`sed -n -e 's/^.*lib\([^ ]*\)_plugin\.la.*/\1/p' < "${modf}" | xargs`"
+  mods="`sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < "${modf}" | sort | uniq | xargs`"
+  plugins="`sed -n -e 's/^.*lib\([^ ]*\)_plugin\.la.*/\1/p' < "${modf}" | sort | uniq | xargs`"
   libvlc_ltlibs=""
   extra_ltlibs=""
   for mod in $mods
