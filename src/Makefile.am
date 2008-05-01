@@ -22,7 +22,7 @@ SUFFIXES = .pc.in .pc
 pkgincludedir = $(includedir)/vlc
 pluginsincludedir = $(pkgincludedir)/plugins
 
-dist_pkginclude_HEADERS = \
+pkginclude_HEADERS = \
 	../include/vlc/vlc.h \
 	../include/vlc/common.h \
 	../include/vlc/deprecated.h \
@@ -478,7 +478,7 @@ test_headers_SOURCES = test/headers.c
 test_headers_CFLAGS = $(CFLAGS_tests)
 
 check-local:
-	for h in `echo $(dist_pkginclude_HEADERS) $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \
+	for h in `echo $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \
 	do \
 		echo grep - "#include <$$h>" $(srcdir)/test/headers.c ; \
 		if ! grep -- "#include <$$h>" $(srcdir)/test/headers.c ; \
@@ -487,7 +487,7 @@ check-local:
 			exit 1; \
 		fi ; \
 	done
-	$(srcdir)/check_headers $(dist_pkginclude_HEADERS) $(pkginclude_HEADERS)
+	$(srcdir)/check_headers $(pkginclude_HEADERS)
 # Hmm, this test should not fail:
 	-$(srcdir)/check_headers $(pluginsinclude_HEADERS)
 
