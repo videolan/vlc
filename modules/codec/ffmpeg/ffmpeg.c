@@ -73,8 +73,10 @@ static int  nloopf_list[] = { 0, 1, 2, 3, 4 };
 static const char *nloopf_list_text[] =
   { N_("None"), N_("Non-ref"), N_("Bidir"), N_("Non-key"), N_("All") };
 
+#ifdef ENABLE_SOUT
 static const char *enc_hq_list[] = { "rd", "bits", "simple" };
 static const char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
+#endif
 
 #if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
 static int pi_mode_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
@@ -139,6 +141,7 @@ vlc_module_begin();
     add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true );
 
+#ifdef ENABLE_SOUT
     /* encoder submodule */
     add_submodule();
     set_section( N_("Encoding") , NULL );
@@ -203,6 +206,7 @@ vlc_module_begin();
     add_string( ENC_CFG_PREFIX "aac-profile", "main", NULL,
                 ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true );
 #endif
+#endif /* ENABLE_SOUT */
 
 #if defined(HAVE_LIBAVFORMAT_AVFORMAT_H) || defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
 
@@ -212,6 +216,7 @@ vlc_module_begin();
     set_capability( "demux", 2 );
     set_callbacks( E_(OpenDemux), E_(CloseDemux) );
 
+#ifdef ENABLE_SOUT
     /* mux submodule */
     add_submodule();
     set_description( _("FFmpeg muxer" ) );
@@ -219,6 +224,7 @@ vlc_module_begin();
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
                 MUX_LONGTEXT, true );
     set_callbacks( E_(OpenMux), E_(CloseMux) );
+#endif
 #endif
 
 #if defined(HAVE_LIBSWSCALE_SWSCALE_H)  || defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)

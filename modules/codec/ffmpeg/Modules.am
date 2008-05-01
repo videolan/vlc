@@ -6,12 +6,20 @@ SOURCES_ffmpeg = \
 	video_filter.c \
 	deinterlace.c \
 	chroma.c \
-	encoder.c \
 	postprocess.c \
 	demux.c \
-	mux.c \
 	scale.c \
 	$(NULL)
+EXTRA_libffmpeg_plugin_la_SOURCES = \
+	mux.c \
+	encoder.c \
+	$(NULL)
+
+if ENABLE_SOUT
+SOURCES_ffmpeg += mux.c encoder.c
+endif
+libvlc_LTLIBRARIES += $(LTLIBffmpeg)
+EXTRA_LTLIBRARIES += libffmpeg_plugin.la
 
 SOURCES_ffmpegaltivec = \
 	ffmpeg.c \
