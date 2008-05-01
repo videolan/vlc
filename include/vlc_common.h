@@ -862,14 +862,6 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #   define telldir vlc_telldir
 #endif
 
-/* Format type specifiers for 64 bits numbers */
-#define I64Fd "%"PRId64
-#define I64Fi "%"PRIi64
-#define I64Fo "%"PRIo64
-#define I64Fu "%"PRIu64
-#define I64Fx "%"PRIx64
-#define I64FX "%"PRIX64
-
 /* 64 bits integer constant suffix */
 #define I64C(x)  INT64_C(x)
 #define UI64C(x) UINT64_C(x)
