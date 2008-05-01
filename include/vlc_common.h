@@ -874,30 +874,12 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #endif
 
 /* Format type specifiers for 64 bits numbers */
-#if defined(__CYGWIN32__) || (!defined(WIN32) && !defined(UNDER_CE))
-#   if defined(__WORDSIZE) && __WORDSIZE == 64
-#       define I64Fd "%ld"
-#       define I64Fi "%li"
-#       define I64Fo "%lo"
-#       define I64Fu "%lu"
-#       define I64Fx "%lx"
-#       define I64FX "%lX"
-#   else
-#       define I64Fd "%lld"
-#       define I64Fi "%lli"
-#       define I64Fo "%llo"
-#       define I64Fu "%llu"
-#       define I64Fx "%llx"
-#       define I64FX "%llX"
-#   endif
-#else
-#   define I64Fd "%I64d"
-#   define I64Fi "%I64i"
-#   define I64Fo "%I64o"
-#   define I64Fu "%I64u"
-#   define I64Fx "%I64x"
-#   define I64FX "%I64X"
-#endif /* defined(WIN32)||defined(UNDER_CE) */
+#define I64Fd "%"PRId64
+#define I64Fi "%"PRIi64
+#define I64Fo "%"PRIo64
+#define I64Fu "%"PRIu64
+#define I64Fx "%"PRIx64
+#define I64FX "%"PRIX64
 
 /* 64 bits integer constant suffix */
 #if defined( __MINGW32__ ) || (!defined(WIN32) && !defined(UNDER_CE))
