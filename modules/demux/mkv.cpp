@@ -30,6 +30,10 @@
 # include "config.h"
 #endif
 
+#define __STDC_FORMAT_MACROS 1
+#define __STDC_CONSTANT_MACROS 1
+#include <inttypes.h>
+
 #include <vlc/vlc.h>
 
 #ifdef HAVE_TIME_H
