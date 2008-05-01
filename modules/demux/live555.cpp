@@ -1541,11 +1541,11 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
 
-    int64_t i_pts = (uint64_t)pts.tv_sec * UI64C(1000000) +
+    int64_t i_pts = (uint64_t)pts.tv_sec * UINT64_C(1000000) +
         (uint64_t)pts.tv_usec;
 
     /* XXX Beurk beurk beurk Avoid having negative value XXX */
-    i_pts &= UI64C(0x00ffffffffffffff);
+    i_pts &= UINT64_C(0x00ffffffffffffff);
 
     if( tk->b_quicktime && tk->p_es == NULL )
     {

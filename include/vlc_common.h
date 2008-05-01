@@ -864,7 +864,6 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 
 /* 64 bits integer constant suffix */
 #define I64C(x)  INT64_C(x)
-#define UI64C(x) UINT64_C(x)
 
 #if defined(WIN32) || defined(UNDER_CE)
 /* win32, cl and icl support */
