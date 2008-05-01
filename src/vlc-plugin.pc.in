@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: VLC plugin API
 Description: VLC media player plugin interface
 Version: @VERSION@
-Cflags: -I${includedir}/vlc/plugin \
+Cflags: -I${includedir}/vlc/plugins \
 	-D_FILE_OFFSET_BITS=64 \
 	-D__USE_UNIX98 \
 	-D_LARGEFILE64_SOURCE \

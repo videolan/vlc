@@ -20,6 +20,7 @@ SUFFIXES = .pc.in .pc
 ###############################################################################
 
 pkgincludedir = $(includedir)/vlc
+pluginsincludedir = $(pkgincludedir)/plugins
 
 dist_pkginclude_HEADERS = \
 	../include/vlc/vlc.h \
@@ -34,16 +35,28 @@ dist_pkginclude_HEADERS = \
 	../include/vlc/mediacontrol_structures.h \
 	$(NULL)
 
-noinst_HEADERS = $(HEADERS_include)
-
-HEADERS_include = \
-	../include/iso_lang.h \
+pluginsinclude_HEADERS = \
 	../include/main.h \
+	../include/vlc_arrays.h \
+	../include/vlc_common.h \
+	../include/vlc_config.h \
+	../include/vlc_configuration.h \
+	../include/vlc_messages.h \
+	../include/vlc_modules.h \
+	../include/vlc_modules_macros.h \
+	../include/vlc_mtime.h \
+	../include/vlc_objects.h \
+	../include/vlc_threads.h \
+	../include/vlc_threads_funcs.h
+	../include/vlc_variables.h \
+	$(NULL)
+
+noinst_HEADERS = \
+	../include/iso_lang.h \
 	../include/mmx.h \
 	../include/vlc_access.h \
 	../include/vlc_acl.h \
 	../include/vlc_aout.h \
-	../include/vlc_arrays.h \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
 	../include/vlc_block_helper.h \
@@ -51,10 +64,7 @@ HEADERS_include = \
 	../include/vlc_codec.h \
 	../include/vlc_codec_synchro.h \
 	../include/vlc_codecs.h \
-	../include/vlc_common.h \
-	../include/vlc_config.h \
 	../include/vlc_config_cat.h \
-	../include/vlc_configuration.h \
 	../include/vlc_demux.h \
 	../include/vlc_devices.h \
 	../include/vlc_epg.h \
@@ -70,13 +80,8 @@ HEADERS_include = \
 	../include/vlc_intf_strings.h \
 	../include/vlc_keys.h \
 	../include/vlc_md5.h \
-	../include/vlc_messages.h \
 	../include/vlc_meta.h \
-	../include/vlc_modules.h \
-	../include/vlc_modules_macros.h \
-	../include/vlc_mtime.h \
 	../include/vlc_network.h \
-	../include/vlc_objects.h \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_playlist.h \
@@ -87,12 +92,9 @@ HEADERS_include = \
 	../include/vlc_stream.h \
 	../include/vlc_streaming.h \
 	../include/vlc_strings.h \
-	../include/vlc_threads.h \
-	../include/vlc_threads_funcs.h \
 	../include/vlc_tls.h \
 	../include/vlc_update.h \
 	../include/vlc_url.h \
-	../include/vlc_variables.h \
 	../include/vlc_vlm.h \
 	../include/vlc_vod.h \
 	../include/vlc_vout.h \
@@ -486,6 +488,8 @@ check-local:
 		fi ; \
 	done
 	$(srcdir)/check_headers $(dist_pkginclude_HEADERS) $(pkginclude_HEADERS)
+# Hmm, this test should not fail:
+	-$(srcdir)/check_headers $(pluginsinclude_HEADERS)
 
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2
