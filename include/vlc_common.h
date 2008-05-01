@@ -29,11 +29,6 @@
  * This file is a collection of common definitions and types
  */
 
-#ifndef PACKAGE
-/* Temporary regression test */
-#error You probably forgot to include config.h!!
-#endif
-
 /*****************************************************************************
  * Required vlc headers
  *****************************************************************************/
