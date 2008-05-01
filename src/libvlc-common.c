@@ -778,6 +778,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
     free( psz_modules );
 
+#ifdef ENABLE_SOUT
     /* Initialize VLM if vlm-conf is specified */
     psz_parser = config_GetPsz( p_libvlc, "vlm-conf" );
     if( psz_parser && *psz_parser )
@@ -787,6 +788,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             msg_Err( p_libvlc, "VLM initialization failed" );
     }
     free( psz_parser );
+#endif
 
     /*
      * Load background interfaces
@@ -944,8 +946,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     intf_thread_t      * p_intf = NULL;
     vout_thread_t      * p_vout = NULL;
     aout_instance_t    * p_aout = NULL;
-    announce_handler_t * p_announce = NULL;
-    sout_instance_t    * p_sout = NULL;
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -980,6 +980,9 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         aout_Delete( p_aout );
     }
 
+#ifdef ENABLE_SOUT
+    sout_instance_t    * p_sout;
+
     p_sout = vlc_object_find( p_libvlc, VLC_OBJECT_SOUT, FIND_CHILD );
     if( p_sout )
     {
@@ -994,6 +997,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     {
         vlm_Delete( p_libvlc->p_vlm );
     }
+#endif
 
     /* Free interaction */
     msg_Dbg( p_libvlc, "removing interaction" );
@@ -1001,6 +1005,9 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );
+
+#ifdef ENABLE_SOUT
+    announce_handler_t * p_announce;
 
     /* Free announce handler(s?) */
     while( (p_announce = vlc_object_find( p_libvlc, VLC_OBJECT_ANNOUNCE,
@@ -1011,6 +1018,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlc_object_release( p_announce );
         announce_HandlerDestroy( p_announce );
     }
+#endif
 
     bool b_clean = true;
     FOREACH_ARRAY( input_item_t *p_del, p_libvlc->input_items )

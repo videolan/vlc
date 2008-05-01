@@ -319,7 +319,7 @@ static void Destructor( input_thread_t * p_input )
 
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
-
+#ifdef ENABLE_SOUT
     if( priv->b_owns_its_sout && priv->p_sout )
     {
         if( priv->b_sout_keep )
@@ -330,7 +330,7 @@ static void Destructor( input_thread_t * p_input )
             priv->p_sout = NULL;
         }
     }
-
+#endif
     vlc_gc_decref( p_input->p->input.p_item );
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
@@ -819,6 +819,7 @@ static void InitStatistics( input_thread_t * p_input )
     }
 }
 
+#ifdef ENABLE_SOUT
 static int InitSout( input_thread_t * p_input )
 {
     char *psz;
@@ -883,6 +884,7 @@ static int InitSout( input_thread_t * p_input )
 
     return VLC_SUCCESS;
 }
+#endif
 
 static void InitTitle( input_thread_t * p_input )
 {
@@ -1161,10 +1163,11 @@ static int Init( input_thread_t * p_input )
     }
 
     InitStatistics( p_input );
+#ifdef ENABLE_SOUT
     ret = InitSout( p_input );
-
     if( ret != VLC_SUCCESS )
         return ret; /* FIXME: goto error; should be better here */
+#endif
 
     /* Create es out */
     p_input->p->p_es_out = input_EsOutNew( p_input, p_input->p->i_rate );
@@ -1249,13 +1252,13 @@ error:
 
     if( p_input->p->p_es_out )
         input_EsOutDelete( p_input->p->p_es_out );
-
+#ifdef ENABLE_SOUT
     if( p_input->p->p_sout )
     {
         vlc_object_detach( p_input->p->p_sout );
         sout_DeleteInstance( p_input->p->p_sout );
     }
-
+#endif
 
     if( !p_input->b_preparsing && p_input->p_libvlc->b_stats )
     {

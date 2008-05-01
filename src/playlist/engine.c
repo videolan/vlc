@@ -231,6 +231,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
         vlc_object_release( p_obj );
         vout_Destroy( (vout_thread_t *)p_obj );
     }
+#ifdef ENABLE_SOUT
     while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_SOUT,
                                                   FIND_CHILD ) ) )
     {
@@ -244,6 +245,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
         vlc_object_release( p_obj );
         sout_DeleteInstance( (sout_instance_t*)p_obj );
     }
+#endif
     p_playlist->b_cant_sleep = false;
     vlc_mutex_unlock( &p_playlist->gc_lock );
 }
@@ -447,6 +449,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
         msleep( INTF_IDLE_SLEEP );
     }
 
+#ifdef ENABLE_SOUT
     /* close all remaining sout */
     while( ( p_obj = vlc_object_find( p_playlist,
                                       VLC_OBJECT_SOUT, FIND_CHILD ) ) )
@@ -455,6 +458,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
         vlc_object_release( p_obj );
         sout_DeleteInstance( (sout_instance_t*)p_obj );
     }
+#endif
 
     /* close all remaining vout */
     while( ( p_obj = vlc_object_find( p_playlist,

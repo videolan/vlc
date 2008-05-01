@@ -153,6 +153,9 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
     decoder_t   *p_dec = NULL;
     vlc_value_t val;
 
+#ifndef ENABLE_SOUT
+    (void)b_force_decoder;
+#else
     /* If we are in sout mode, search for packetizer module */
     if( p_input->p->p_sout && !b_force_decoder )
     {
@@ -167,6 +170,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         }
     }
     else
+#endif
     {
         /* Create the decoder configuration structure */
         p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_DECODER );
@@ -775,6 +779,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         return VLC_SUCCESS;
     }
 
+#ifdef ENABLE_SOUT
     if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
     {
         block_t *p_sout_block;
@@ -829,7 +834,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 p_sout_block = p_next;
             }
 
-            /* For now it's enough, as only sout inpact on this flag */
+            /* For now it's enough, as only sout impact on this flag */
             if( p_dec->p_owner->p_sout->i_out_pace_nocontrol > 0 &&
                 p_dec->p_owner->p_input->p->b_out_pace_control )
             {
@@ -844,7 +849,9 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             }
         }
     }
-    else if( p_dec->fmt_in.i_cat == AUDIO_ES )
+    else
+#endif
+    if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
         if( p_block )
             DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
@@ -1000,11 +1007,13 @@ static void DeleteDecoder( decoder_t * p_dec )
         vout_Request( p_dec, p_dec->p_owner->p_vout, 0 );
     }
 
+#ifdef ENABLE_SOUT
     if( p_dec->p_owner->p_sout_input )
     {
         sout_InputDelete( p_dec->p_owner->p_sout_input );
         es_format_Clean( &p_dec->p_owner->sout );
     }
+#endif
 
     if( p_dec->fmt_in.i_cat == SPU_ES )
     {

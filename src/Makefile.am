@@ -200,6 +200,7 @@ EXTRA_libvlc_la_SOURCES = \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_getopt) \
+	$(SOURCES_libvlc_sout) \
 	$(NULL)
 if HAVE_BEOS
 libvlc_la_SOURCES += $(SOURCES_libvlc_beos)
@@ -218,6 +219,9 @@ libvlc_la_SOURCES += $(SOURCES_libvlc_dirent)
 endif
 if BUILD_GETOPT
 libvlc_la_SOURCES += $(SOURCES_libvlc_getopt)
+endif
+if ENABLE_SOUT
+libvlc_la_SOURCES += $(SOURCES_libvlc_sout)
 endif
 
 SOURCES_libvlc_beos = \
@@ -292,12 +296,6 @@ SOURCES_libvlc_common = \
 	audio_output/mixer.c \
 	audio_output/output.c \
 	audio_output/intf.c \
-	stream_output/stream_output.c \
-	stream_output/stream_output.h \
-	stream_output/announce.c \
-	stream_output/profiles.c \
-	stream_output/sap.c \
-	stream_output/sdp.c \
 	osd/osd.c \
 	osd/osd_text.c \
 	osd/osd_widgets.c \
@@ -344,10 +342,19 @@ SOURCES_libvlc_common = \
 	misc/variables.c \
 	misc/error.c \
 	misc/update.c \
-	input/vlm.c \
 	misc/xml.c \
 	misc/devices.c \
 	extras/libc.c \
+	$(NULL)
+
+SOURCES_libvlc_sout = \
+	input/vlm.c \
+	stream_output/stream_output.c \
+	stream_output/stream_output.h \
+	stream_output/announce.c \
+	stream_output/profiles.c \
+	stream_output/sap.c \
+	stream_output/sdp.c \
 	$(NULL)
 
 SOURCES_libvlc = \
