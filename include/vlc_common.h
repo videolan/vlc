@@ -57,7 +57,6 @@
 #if defined( HAVE_INTTYPES_H )
 #   include <inttypes.h>
 #elif defined( SYS_CYGWIN )
-#   include <sys/types.h>
     /* Cygwin only defines half of these... */
     typedef u_int8_t            uint8_t;
     typedef u_int16_t           uint16_t;
