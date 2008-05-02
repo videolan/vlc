@@ -100,6 +100,7 @@ Decoders:
  * NellyMoser ASAO support
  * APE (Monkey audio) support
  * VBI & EBU (Teletext) support
+ * Ogg/Kate subtitles support
 
 Encoders:
  * Flash Screen Video support
