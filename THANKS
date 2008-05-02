@@ -10,10 +10,11 @@ The VideoLAN team would like to thank the following contributors:
 
 Adam Sampson <ats @t offog d0t org> - libFLAC >= 1.1.3 API support
 Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension, MMS fixes
+Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 Alexander Didebulidze <alexander.didebulidze at stusta dot mhn dot de> - Georgian localization
 Alexander Gall <gall at switch dot ch> - Solaris fixes and CDDB fixes
+Alexey Salmin <alexey dot salmin at gmail dot com> - Russian localisation
 Alexis Ballier <aballlier at gentoo dot org> - Additional options in configure
-Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
