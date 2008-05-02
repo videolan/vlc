@@ -931,7 +931,7 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #include "vlc_mtime.h"
 #include "vlc_threads_funcs.h"
 #include "vlc_modules.h"
-#include "main.h"
+#include "vlc_main.h"
 #include "vlc_configuration.h"
 
 #if defined( WIN32 ) || defined( UNDER_CE )
