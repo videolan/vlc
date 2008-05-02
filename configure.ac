@@ -4004,6 +4004,39 @@ then
   VLC_ADD_PLUGIN([cmml])
 fi
 
+dnl
+dnl  kate decoder plugin
+dnl
+AC_ARG_ENABLE(kate,
+[  --enable-kate           kate codec (default enabled)])
+if test "${enable_kate}" != "no"; then
+  PKG_CHECK_MODULES(KATE,[kate >= 0.1.1], [
+      VLC_ADD_PLUGINS([kate])
+      VLC_ADD_CFLAGS([kate],[$KATE_CFLAGS])
+      VLC_ADD_LIBS([kate],[$KATE_LIBS]) ],[
+        AC_CHECK_HEADERS(kate/kate.h, [
+          AC_CHECK_LIB(kate, kate_decode_init, [
+            if test "${SYS}" = "mingw32"; then
+              VLC_ADD_PLUGINS([kate])
+            else
+              VLC_ADD_BUILTINS([kate])
+            fi
+            kate_libs="-lkate -logg"
+            VLC_ADD_LDFLAGS([kate],[${kate_libs}]) ],[
+            if test "${enable_kate}" == "yes"; then
+              AC_MSG_ERROR([libkate doesn't appear to be installed on your system.
+              You also need to check that you have a libogg posterior to the 1.0 release.])
+            fi],
+            [-lkate -logg])
+        ],[
+          if test "${enable_kate}" == "yes"; then
+            AC_MSG_ERROR([libkate headers do not appear to be installed on your system.
+            You also need to check that you have a libogg posterior to the 1.0 release.])
+          fi
+        ])
+  ])
+fi
+
 
 dnl
 dnl  Video plugins

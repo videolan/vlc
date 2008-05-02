@@ -85,7 +85,10 @@ typedef struct logical_stream_s
 
     /* Misc */
     int b_reinit;
-    int i_theora_keyframe_granule_shift;
+    int i_granule_shift;
+
+    /* kate streams have the number of headers in the ID header */
+    int i_kate_num_headers;
 
     /* for Annodex logical bitstreams */
     int secondary_header_packets;
@@ -175,6 +178,7 @@ static void Ogg_EndOfStream( demux_t *p_demux );
 static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
 
@@ -443,19 +447,20 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
     /* Convert the granulepos into a pcr */
     if( p_oggpacket->granulepos >= 0 )
     {
-        if( p_stream->fmt.i_codec != VLC_FOURCC( 't','h','e','o' ) )
+        if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) ||
+            p_stream->fmt.i_codec == VLC_FOURCC( 'k','a','t','e' ) )
         {
-            p_stream->i_pcr = p_oggpacket->granulepos * INT64_C(1000000)
+            ogg_int64_t iframe = p_oggpacket->granulepos >>
+              p_stream->i_granule_shift;
+            ogg_int64_t pframe = p_oggpacket->granulepos -
+              ( iframe << p_stream->i_granule_shift );
+
+            p_stream->i_pcr = ( iframe + pframe ) * INT64_C(1000000)
                               / p_stream->f_rate;
         }
         else
         {
-            ogg_int64_t iframe = p_oggpacket->granulepos >>
-              p_stream->i_theora_keyframe_granule_shift;
-            ogg_int64_t pframe = p_oggpacket->granulepos -
-              ( iframe << p_stream->i_theora_keyframe_granule_shift );
-
-            p_stream->i_pcr = ( iframe + pframe ) * INT64_C(1000000)
+            p_stream->i_pcr = p_oggpacket->granulepos * INT64_C(1000000)
                               / p_stream->f_rate;
         }
 
@@ -520,6 +525,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     {
         uint8_t *p_extra;
         bool b_store_size = true;
+        bool b_store_num_headers = false;
 
         p_stream->i_packets_backup++;
         switch( p_stream->fmt.i_codec )
@@ -548,6 +554,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             b_store_size = false;
             break;
 
+        case VLC_FOURCC( 'k','a','t','e' ):
+            if( p_stream->i_packets_backup == 1)
+                b_store_num_headers = true;
+            if( p_stream->i_packets_backup == p_stream->i_kate_num_headers ) p_stream->b_force_backup = 0;
+            break;
+
         default:
             p_stream->b_force_backup = 0;
             break;
@@ -556,15 +568,21 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         /* Backup the ogg packet (likely an header packet) */
         p_stream->p_headers =
             realloc( p_stream->p_headers, p_stream->i_headers +
-                     p_oggpacket->bytes + (b_store_size ? 2 : 0) );
+                     p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0) );
         p_extra = p_stream->p_headers + p_stream->i_headers;
+        if( b_store_num_headers )
+        {
+            /* Kate streams store the number of headers in the first header,
+               so we can't just test for 3 as Vorbis/Theora */
+            *(p_extra++) = p_stream->i_kate_num_headers;
+        }
         if( b_store_size )
         {
             *(p_extra++) = p_oggpacket->bytes >> 8;
             *(p_extra++) = p_oggpacket->bytes & 0xFF;
         }
         memcpy( p_extra, p_oggpacket->packet, p_oggpacket->bytes );
-        p_stream->i_headers += p_oggpacket->bytes + (b_store_size ? 2 : 0);
+        p_stream->i_headers += p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0);
 
         if( !p_stream->b_force_backup )
         {
@@ -673,7 +691,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec != VLC_FOURCC( 'f','l','a','c' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 't','a','r','k' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 't','h','e','o' ) &&
-        p_stream->fmt.i_codec != VLC_FOURCC( 'c','m','m','l' ) )
+        p_stream->fmt.i_codec != VLC_FOURCC( 'c','m','m','l' ) &&
+        p_stream->fmt.i_codec != VLC_FOURCC( 'k','a','t','e' ) )
     {
         /* We remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
@@ -876,6 +895,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 {
                     Ogg_ReadAnnodexHeader( VLC_OBJECT(p_demux), p_stream,
                                            &oggpacket );
+                }
+                /* Check for Kate header */
+                else if( oggpacket.bytes >= 9 &&
+                    ! memcmp( &oggpacket.packet[1], "kate\0\0\0\0", 8 ) )
+                {
+                    Ogg_ReadKateHeader( p_stream, &oggpacket );
+                    msg_Dbg( p_demux, "found kate header" );
                 }
                 else if( oggpacket.bytes >= 142 &&
                          !memcmp( &oggpacket.packet[1],
@@ -1157,6 +1183,7 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
 #define p_stream p_ogg->pp_stream[i_stream]
         p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
 
+        // TODO: something to do here ?
         if( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
         {
             /* Set the CMML stream active */
@@ -1249,11 +1276,11 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     i_keyframe_frequency_force = 1 << bs_read( &bitstream, 5 );
 
     /* granule_shift = i_log( frequency_force -1 ) */
-    p_stream->i_theora_keyframe_granule_shift = 0;
+    p_stream->i_granule_shift = 0;
     i_keyframe_frequency_force--;
     while( i_keyframe_frequency_force )
     {
-        p_stream->i_theora_keyframe_granule_shift++;
+        p_stream->i_granule_shift++;
         i_keyframe_frequency_force >>= 1;
     }
 
@@ -1337,6 +1364,59 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
     {
         /* This ain't a STREAMINFO metadata */
         msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
+    }
+}
+
+static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
+                                ogg_packet *p_oggpacket )
+{
+    oggpack_buffer opb;
+    int32_t gnum;
+    int32_t gden;
+    int n;
+
+    p_stream->fmt.i_cat = SPU_ES;
+    p_stream->fmt.i_codec = VLC_FOURCC( 'k','a','t','e' );
+
+    /* Signal that we want to keep a backup of the kate
+     * stream headers. They will be used when switching between
+     * kate streams. */
+    p_stream->b_force_backup = 1;
+
+    /* Cheat and get additionnal info ;) */
+    oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
+    oggpack_adv( &opb, 11*8 ); /* packet type, kate magic, version */
+    p_stream->i_kate_num_headers = oggpack_read( &opb, 8 );
+    oggpack_adv( &opb, 3*8 );
+    p_stream->i_granule_shift = oggpack_read( &opb, 8 );
+    oggpack_adv( &opb, 8*8 ); /* reserved */
+    gnum = oggpack_read( &opb, 32 );
+    gden = oggpack_read( &opb, 32 );
+    p_stream->f_rate = (double)gnum/gden;
+
+    p_stream->fmt.psz_language = malloc(16);
+    if (p_stream->fmt.psz_language)
+    {
+        for (n=0;n<16;++n)
+            p_stream->fmt.psz_language[n] = oggpack_read(&opb,8);
+        p_stream->fmt.psz_language[15] = 0; /* just in case */
+    }
+    else
+    {
+        for (n=0;n<16;++n)
+            oggpack_read(&opb,8);
+    }
+    p_stream->fmt.psz_description = malloc(16);
+    if (p_stream->fmt.psz_description)
+    {
+        for (n=0;n<16;++n)
+            p_stream->fmt.psz_description[n] = oggpack_read(&opb,8);
+        p_stream->fmt.psz_description[15] = 0; /* just in case */
+    }
+    else
+    {
+        for (n=0;n<16;++n)
+            oggpack_read(&opb,8);
     }
 }
 

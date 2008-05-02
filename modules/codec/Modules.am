@@ -33,3 +33,4 @@ SOURCES_csri = csri.c
 SOURCES_cdg = cdg.c
 SOURCES_fluidsynth = fluidsynth.c
 SOURCES_cc = cc.c cc.h
+SOURCES_kate = kate.c

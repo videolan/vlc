@@ -160,6 +160,7 @@ $Id$
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter.
  * jack: jack server audio output
+ * kate: kate text bitstream decoder
  * libmpeg2: Mpeg2 video decoder using libmpeg2
  * linear_resampler: linear audio resampler
  * lirc: Linux infrared control module

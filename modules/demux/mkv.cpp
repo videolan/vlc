@@ -2550,6 +2550,58 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             }
             tracks[i_track]->fmt.audio.i_blockalign = ( tracks[i_track]->fmt.audio.i_bitspersample + 7 ) / 8 * tracks[i_track]->fmt.audio.i_channels;
         }
+#if 0
+        /* disabled due to the potential "S_KATE" namespace issue */
+        else if( !strcmp( tracks[i_track]->psz_codec, "S_KATE" ) )
+        {
+            int i, i_offset = 1, *i_size, i_extra, num_headers, size_so_far;
+            uint8_t *p_extra;
+
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'k', 'a', 't', 'e' );
+            tracks[i_track]->fmt.subs.psz_encoding = strdup( "UTF-8" );
+
+            /* Recover the number of headers to expect */
+            num_headers = tracks[i_track]->p_extra_data[0]+1;
+            msg_Dbg( &sys.demuxer, "kate in mkv detected: %d headers in %u bytes",
+                num_headers, tracks[i_track]->i_extra_data);
+
+            /* this won't overflow the stack as is can allocate only 1020 bytes max */
+            i_size = (int*)alloca(num_headers*sizeof(int));
+
+            /* Split the headers */
+            size_so_far = 0;
+            for( i = 0; i < num_headers-1; i++ )
+            {
+                i_size[i] = 0;
+                while( i_offset < tracks[i_track]->i_extra_data )
+                {
+                    i_size[i] += tracks[i_track]->p_extra_data[i_offset];
+                    if( tracks[i_track]->p_extra_data[i_offset++] != 0xff ) break;
+                }
+                msg_Dbg( &sys.demuxer, "kate header %d is %d bytes", i, i_size[i]);
+                size_so_far += i_size[i];
+            }
+            i_size[num_headers-1] = tracks[i_track]->i_extra_data - (size_so_far+i_offset);
+            msg_Dbg( &sys.demuxer, "kate last header (%d) is %d bytes", num_headers-1, i_size[num_headers-1]);
+
+            tracks[i_track]->fmt.i_extra = 1 + num_headers * 2 + size_so_far + i_size[num_headers-1];
+            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
+
+            p_extra = (uint8_t *)tracks[i_track]->fmt.p_extra;
+            i_extra = 0;
+            *(p_extra++) = num_headers;
+            ++i_extra;
+            for( i = 0; i < num_headers; i++ )
+            {
+                *(p_extra++) = i_size[i] >> 8;
+                *(p_extra++) = i_size[i] & 0xFF;
+                memcpy( p_extra, tracks[i_track]->p_extra_data + i_offset + i_extra-1,
+                        i_size[i] );
+                p_extra += i_size[i];
+                i_extra += i_size[i];
+            }
+        }
+#endif
         else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/UTF8" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
