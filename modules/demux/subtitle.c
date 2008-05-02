@@ -100,7 +100,8 @@ enum
     SUB_TYPE_SUBVIEWER,
     SUB_TYPE_DVDSUBTITLE,
     SUB_TYPE_MPL2,
-    SUB_TYPE_AQT
+    SUB_TYPE_AQT,
+    SUB_TYPE_PJS
 };
 
 typedef struct
@@ -147,6 +148,7 @@ static int  ParseSami       ( demux_t *, subtitle_t *, int );
 static int  ParseDVDSubtitle( demux_t *, subtitle_t *, int );
 static int  ParseMPL2       ( demux_t *, subtitle_t *, int );
 static int  ParseAQT        ( demux_t *, subtitle_t *, int );
+static int  ParsePJS        ( demux_t *, subtitle_t *, int );
 
 static struct
 {
@@ -167,6 +169,7 @@ static struct
     { "dvdsubtitle",SUB_TYPE_DVDSUBTITLE, "DVDSubtitle", ParseDVDSubtitle },
     { "mpl2",       SUB_TYPE_MPL2,        "MPL2",        ParseMPL2 },
     { "aqt",        SUB_TYPE_AQT,         "AQTitle",     ParseAQT },
+    { "pjs",        SUB_TYPE_PJS,         "PhoenixSub",  ParsePJS },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
@@ -320,9 +323,14 @@ static int Open ( vlc_object_t *p_this )
             {
                 p_sys->i_type = SUB_TYPE_MPL2;
                 break;
-            }else if( sscanf (s, "-->> %d", &i_dummy) == 1 )
+            }
+            else if( sscanf( s, "-->> %d", &i_dummy) == 1 )
             {
                 p_sys->i_type = SUB_TYPE_AQT;
+            }
+            else if( sscanf( s, "%d,%d,", &i_dummy, &i_dummy ) == 2 )
+            {
+                p_sys->i_type = SUB_TYPE_PJS;
             }
 
             free( s );
@@ -1216,9 +1224,9 @@ static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         free( psz_text );
     }
 
-    /* replace | by \n */
     for( i = 0; psz_text[i] != '\0'; )
     {
+        /* replace | by \n */
         if( psz_text[i] == '|' )
             psz_text[i] = '\n';
 
@@ -1279,6 +1287,37 @@ static int ParseAQT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             if( txt->i_line == txt->i_line_count )
                 break;
         }
+    }
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
+}
+
+static int ParsePJS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text;
+
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+        int t1, t2;
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen(s) + 1 );
+
+        /* Data Lines */
+        if( sscanf (s, "%d,%d,%[^\n\r]", &t1, &t2, psz_text ) == 3 )
+        {
+            /* 1/10th of second ? Frame based ? FIXME */
+            p_subtitle->i_start = 10 * t1;
+            p_subtitle->i_stop = 10 * t2;
+
+            break;
+        }
+        free( psz_text );
     }
     p_subtitle->psz_text = psz_text;
     return VLC_SUCCESS;
