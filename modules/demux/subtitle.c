@@ -56,12 +56,13 @@ static void Close( vlc_object_t *p_this );
 #define SUB_TYPE_LONGTEXT \
     N_("Force the subtiles format. Valid values are : \"microdvd\", " \
     "\"subrip\",  \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
-    "\"sami\", \"dvdsubtitle\", \"mpl2\" and \"auto\" (meaning autodetection, this " \
+    "\"sami\", \"dvdsubtitle\", \"mpl2\", \"aqt\", \"pjs\" and \"auto\" (meaning autodetection, this " \
     "should always work).")
 static const char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
-    "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2"
+    "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
+    "aqt", "pjs"
 };
 
 vlc_module_begin();
@@ -1309,17 +1310,20 @@ static int ParsePJS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         psz_text = malloc( strlen(s) + 1 );
 
         /* Data Lines */
-        if( sscanf (s, "%d,%d,%[^\n\r]", &t1, &t2, psz_text ) == 3 )
+        if( sscanf (s, "%d,%d,\"%[^\n\r]", &t1, &t2, psz_text ) == 3 )
         {
             /* 1/10th of second ? Frame based ? FIXME */
             p_subtitle->i_start = 10 * t1;
             p_subtitle->i_stop = 10 * t2;
+            /* Remove latest " */
+            psz_text[ strlen(psz_text) - 1 ] = '\0 ';
 
             break;
         }
         free( psz_text );
     }
     p_subtitle->psz_text = psz_text;
+    msg_Dbg( p_demux, "%s", psz_text );
     return VLC_SUCCESS;
 }
 
