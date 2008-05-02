@@ -76,9 +76,6 @@ struct libvlc_int_t
     counter_t            **pp_timers;     ///< Array of all timers
 
     vlc_mutex_t            config_lock;    ///< Lock for the config file
-#ifdef __APPLE__
-    vlc_mutex_t            quicktime_lock; ///< QT is not thread safe on OSX
-#endif
 
     /* Structure storing the action name / key associations */
     struct hotkey

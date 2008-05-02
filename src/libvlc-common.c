@@ -212,7 +212,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_mutex_init( p_libvlc, &p_libvlc->timer_lock );
     vlc_mutex_init( p_libvlc, &p_libvlc->config_lock );
 #ifdef __APPLE__
-    vlc_mutex_init( p_libvlc, &p_libvlc->quicktime_lock );
     vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
 #endif
     /* Store data for the non-reentrant API */

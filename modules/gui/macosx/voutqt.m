@@ -165,8 +165,8 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Damn QT isn't thread safe. so keep a lock in the p_libvlc object */
-    vlc_mutex_lock( &p_vout->p_libvlc->quicktime_lock );
+    /* Damn QT isn't thread safe, so keep a process-wide lock */
+    vlc_mutex_t *p_qtlock = var_AcquireMutex( "quicktime_mutex" );
 
     /* Can we find the right chroma ? */
     if( p_vout->p_sys->b_cpu_has_simd )
@@ -179,7 +179,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         err = FindCodec( kYUV420CodecType, bestSpeedCodec,
                         nil, &p_vout->p_sys->img_dc );
     }
-    vlc_mutex_unlock( &p_vout->p_libvlc->quicktime_lock );
+    vlc_mutex_unlock( p_qtlock );
  
     if( err == noErr && p_vout->p_sys->img_dc != 0 )
     {
