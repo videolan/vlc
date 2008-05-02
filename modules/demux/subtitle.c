@@ -99,7 +99,8 @@ enum
     SUB_TYPE_SAMI,
     SUB_TYPE_SUBVIEWER,
     SUB_TYPE_DVDSUBTITLE,
-    SUB_TYPE_MPL2
+    SUB_TYPE_MPL2,
+    SUB_TYPE_AQT
 };
 
 typedef struct
@@ -145,6 +146,7 @@ static int  ParseVplayer    ( demux_t *, subtitle_t *, int );
 static int  ParseSami       ( demux_t *, subtitle_t *, int );
 static int  ParseDVDSubtitle( demux_t *, subtitle_t *, int );
 static int  ParseMPL2       ( demux_t *, subtitle_t *, int );
+static int  ParseAQT        ( demux_t *, subtitle_t *, int );
 
 static struct
 {
@@ -164,6 +166,7 @@ static struct
     { "sami",       SUB_TYPE_SAMI,        "SAMI",        ParseSami },
     { "dvdsubtitle",SUB_TYPE_DVDSUBTITLE, "DVDSubtitle", ParseDVDSubtitle },
     { "mpl2",       SUB_TYPE_MPL2,        "MPL2",        ParseMPL2 },
+    { "aqt",        SUB_TYPE_AQT,         "AQTitle",     ParseAQT },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
@@ -317,6 +320,9 @@ static int Open ( vlc_object_t *p_this )
             {
                 p_sys->i_type = SUB_TYPE_MPL2;
                 break;
+            }else if( sscanf (s, "-->> %d", &i_dummy) == 1 )
+            {
+                p_sys->i_type = SUB_TYPE_AQT;
             }
 
             free( s );
@@ -1221,6 +1227,58 @@ static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             memmove( &psz_text[i], &psz_text[i+1], strlen(&psz_text[i+1])+1 );
         else
             i++;
+    }
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
+}
+
+static int ParseAQT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text = strdup( "" );
+    int i_old = 0;
+    int i_firstline = 1;
+
+    for( ;; )
+    {
+        int t; /* Time */
+
+        const char *s = TextGetLine( txt );
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        /* Data Lines */
+        if( sscanf (s, "-->> %d", &t) == 1)
+        {
+            p_subtitle->i_start = (int64_t)t; /* * FPS*/
+            p_subtitle->i_stop  = 0;
+
+            /* Starting of a subtitle */
+            if( i_firstline )
+            {
+                i_firstline = 0;
+            }
+            /* We have been too far: end of the subtitle, begin of next */
+            else
+            {
+                txt->i_line--;
+                break;
+            }
+        }
+        /* Text Lines */
+        else
+        {
+            i_old = strlen( psz_text ) + 1;
+            psz_text = realloc( psz_text, i_old + strlen( s ) + 1 );
+            if( !psz_text )
+                 return VLC_ENOMEM;
+            strcat( psz_text, s );
+            strcat( psz_text, "\n" );
+            if( txt->i_line == txt->i_line_count )
+                break;
+        }
     }
     p_subtitle->psz_text = psz_text;
     return VLC_SUCCESS;
