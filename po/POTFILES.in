@@ -2,7 +2,6 @@
 
 # main sources
 include/iso_lang.h
-include/main.h
 include/mmx.h
 include/vlc_access.h
 include/vlc_acl.h
@@ -40,6 +39,7 @@ include/vlc/libvlc.h
 include/vlc/libvlc_media_list.h
 include/vlc/libvlc_structures.h
 include/vlc/libvlc_vlm.h
+include/vlc_main.h
 include/vlc_md5.h
 include/vlc/mediacontrol.h
 include/vlc/mediacontrol_structures.h
@@ -406,6 +406,7 @@ modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
 modules/codec/flac.c
 modules/codec/fluidsynth.c
+modules/codec/kate.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mash.cpp
@@ -657,6 +658,7 @@ modules/gui/qt4/components/playlist/playlist_model.cpp
 modules/gui/qt4/components/playlist/playlist_model.hpp
 modules/gui/qt4/components/playlist/selector.cpp
 modules/gui/qt4/components/playlist/selector.hpp
+modules/gui/qt4/components/playlist/sorting.h
 modules/gui/qt4/components/playlist/standardpanel.cpp
 modules/gui/qt4/components/preferences_widgets.cpp
 modules/gui/qt4/components/preferences_widgets.hpp
