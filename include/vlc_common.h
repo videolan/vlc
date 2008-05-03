@@ -883,6 +883,15 @@ VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const
 #define CPU_CAPABILITY_ALTIVEC (1<<16)
 #define CPU_CAPABILITY_FPU     (1<<31)
 VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
+VLC_EXPORT( void *, vlc_memcpy, ( void *, const void *, size_t ) );
+VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
+
+typedef void *(*vlc_memcpy_t) (void *tgt, const void *src, size_t n);
+typedef void *(*vlc_memset_t) (void *tgt, int c, size_t n);
+
+VLC_EXPORT( void, vlc_fastmem_register, (vlc_memcpy_t cpy, vlc_memset_t set) );
+VLC_EXPORT( void *, vlc_memcpy, ( vlc_object_t *, void *, const void *, size_t ) );
+VLC_EXPORT( void *, vlc_memset, ( vlc_object_t *, void *, int, size_t ) );
 
 /*****************************************************************************
  * I18n stuff

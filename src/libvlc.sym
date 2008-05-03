@@ -403,6 +403,8 @@ vlc_iconv_open
 __vlc_list_find
 vlc_list_release
 vlc_lldiv
+vlc_memcpy
+vlc_memset
 vlc_module_create
 vlc_module_set
 __vlc_mutex_destroy

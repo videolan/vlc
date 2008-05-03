@@ -356,3 +356,29 @@ unsigned vlc_CPU (void)
     return cpu_flags;
 }
 
+static vlc_memcpy_t pf_vlc_memcpy = memcpy;
+static vlc_memcpy_t pf_vlc_memset = memset;
+
+void vlc_fastmem_register (vlc_memcpy_t cpy, vlc_memset_t set)
+{
+    if (cpy)
+        pf_vlc_memcpy = cpy;
+    if (set)
+        pf_vlc_memset = set;
+}
+
+/**
+ * vlc_memcpy: fast CPU-dependent memcpy
+ */
+void *vlc_memcpy (void *tgt, const void *src, size_t n)
+{
+    return pf_vlc_memcpy (tgt, src, n);
+}
+
+/**
+ * vlc_memset: fast CPU-dependent memset
+ */
+void *vlc_memset (void *tgt, int c, size_t n)
+{
+    return pf_vlc_memset (tgt, c, n);
+}
