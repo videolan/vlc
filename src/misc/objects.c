@@ -148,24 +148,22 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         return NULL;
     }
 
+    libvlc_global_data_t *p_libvlc_global;
     if( i_type == VLC_OBJECT_GLOBAL )
     {
         /* If i_type is global, then p_new is actually p_libvlc_global */
-        libvlc_global_data_t *p_libvlc_global = (libvlc_global_data_t *)p_new;
+        p_libvlc_global = (libvlc_global_data_t *)p_new;
         p_new->p_libvlc = NULL;
 
         p_libvlc_global->i_counter = 0;
-        p_new->i_object_id = 0;
-
-        p_libvlc_global->i_objects = 1;
-        p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
-        p_libvlc_global->pp_objects[0] = p_new;
+        p_libvlc_global->i_objects = 0;
+        p_libvlc_global->pp_objects = NULL;
         p_priv->b_attached = true;
         vlc_mutex_init( p_new, &structure_lock );
     }
     else
     {
-        libvlc_global_data_t *p_libvlc_global = vlc_global();
+        p_libvlc_global = vlc_global();
         if( i_type == VLC_OBJECT_LIBVLC )
         {
             p_new->p_libvlc = (libvlc_int_t*)p_new;
@@ -175,19 +173,16 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         {
             p_new->p_libvlc = p_this->p_libvlc;
         }
-
-        vlc_mutex_lock( &structure_lock );
-
-        p_libvlc_global->i_counter++;
-        p_new->i_object_id = p_libvlc_global->i_counter;
-
-        /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
-         * useless to try and recover anything if pp_objects gets smashed. */
-        TAB_APPEND( p_libvlc_global->i_objects, p_libvlc_global->pp_objects,
-                    p_new );
-
-        vlc_mutex_unlock( &structure_lock );
     }
+
+    vlc_mutex_lock( &structure_lock );
+    p_new->i_object_id = p_libvlc_global->i_counter++;
+
+    /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
+     * useless to try and recover anything if pp_objects gets smashed. */
+    TAB_APPEND( p_libvlc_global->i_objects, p_libvlc_global->pp_objects,
+                p_new );
+    vlc_mutex_unlock( &structure_lock );
 
     p_priv->i_refcount = 1;
     p_priv->pf_destructor = kVLCDestructor;
