@@ -149,7 +149,7 @@ struct vlc_object_internals_t
 
     /* Thread properties, if any */
     vlc_thread_t    thread_id;
-    bool      b_thread;
+    bool            b_thread;
 
     /* Objects thread synchronization */
     int             pipes[2];
@@ -158,7 +158,7 @@ struct vlc_object_internals_t
     /* Objects management */
     unsigned         i_refcount;
     vlc_destructor_t pf_destructor;
-    bool       b_attached;
+    bool             b_attached;
 };
 
 #define ZOOM_SECTION N_("Zoom")
