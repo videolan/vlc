@@ -1361,17 +1361,6 @@ static void ThreadSend( vlc_object_t *p_this )
 {
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
-#ifdef HAVE_TEE
-    int fd[5] = { -1, -1, -1, -1, -1 };
-
-    if( pipe( fd ) )
-        fd[0] = fd[1] = -1;
-    else
-    if( pipe( fd ) )
-        fd[2] = fd[3] = -1;
-    else
-        fd[4] = open( "/dev/null", O_WRONLY );
-#endif
 
     while( !id->b_die )
     {
@@ -1382,12 +1371,6 @@ static void ThreadSend( vlc_object_t *p_this )
         mtime_t  i_date = out->i_dts + i_caching;
         ssize_t  len = out->i_buffer;
 
-#ifdef HAVE_TEE
-        if( fd[4] != -1 )
-            len = write( fd[1], out->p_buffer, len);
-        if( len == -1 )
-            continue; /* Uho - should not happen */
-#endif
         mwait( i_date );
 
         vlc_mutex_lock( &id->lock_sink );
@@ -1398,20 +1381,8 @@ static void ThreadSend( vlc_object_t *p_this )
         {
             SendRTCP( id->sinkv[i].rtcp, out );
 
-#ifdef HAVE_TEE
-            tee( fd[0], fd[3], len, 0 );
-            if( splice( fd[2], NULL, id->sinkv[i].rtp_fd, NULL, len,
-                        SPLICE_F_NONBLOCK ) >= 0 )
-                continue;
-            if( errno == EAGAIN )
-                continue;
-
-            /* splice failed */
-            splice( fd[2], NULL, fd[4], NULL, len, 0 );
-#else
             if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
                 continue;
-#endif
             /* Retry sending to root out soft-errors */
             if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
                 continue;
@@ -1419,11 +1390,7 @@ static void ThreadSend( vlc_object_t *p_this )
             deadv[deadc++] = id->sinkv[i].rtp_fd;
         }
         vlc_mutex_unlock( &id->lock_sink );
-
         block_Release( out );
-#ifdef HAVE_TEE
-        splice( fd[0], NULL, fd[4], NULL, len, 0 );
-#endif
 
         for( unsigned i = 0; i < deadc; i++ )
         {
@@ -1441,11 +1408,6 @@ static void ThreadSend( vlc_object_t *p_this )
             rtp_add_sink( id, fd, true );
         }
     }
-
-#ifdef HAVE_TEE
-    for( unsigned i = 0; i < 5; i++ )
-        close( fd[i] );
-#endif
 }
 
 int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux )

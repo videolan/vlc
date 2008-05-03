@@ -474,10 +474,6 @@ AH_BOTTOM([#include <vlc_fixups.h>])
 
 AC_CHECK_FUNCS(mmap, [VLC_ADD_PLUGIN([access_mmap])])
 
-AS_IF([test "${SYS}" = "linux"], [
-  AC_CHECK_FUNCS(tee)
-])
-
 dnl Check for setlocal and langinfo
 AC_CHECK_FUNCS(setlocale)
 AC_CHECK_HEADERS(langinfo.h)
