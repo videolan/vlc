@@ -67,8 +67,6 @@ struct libvlc_int_t
     bool             b_color;     ///< color messages?
 
     module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
-    void* ( *pf_memcpy ) ( void *, const void *, size_t ); ///< fast memcpy
-    void* ( *pf_memset ) ( void *, int, size_t );          ///< fast memset
 
     bool             b_stats;       ///< Should we collect stats ?
     vlc_mutex_t            timer_lock;    ///< Lock to protect timers

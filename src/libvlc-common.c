@@ -709,16 +709,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     p_libvlc->p_memcpy_module = module_Need( p_libvlc, "memcpy", "$memcpy", 0 );
 
-    if( p_libvlc->pf_memcpy == NULL )
-    {
-        p_libvlc->pf_memcpy = memcpy;
-    }
-
-    if( p_libvlc->pf_memset == NULL )
-    {
-        p_libvlc->pf_memset = memset;
-    }
-
     p_libvlc->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
     p_libvlc->i_timers = 0;
     p_libvlc->pp_timers = NULL;
