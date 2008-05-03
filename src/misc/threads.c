@@ -45,7 +45,6 @@
  * Global mutex for lazy initialization of the threads system
  *****************************************************************************/
 static volatile unsigned i_initializations = 0;
-static volatile int i_status = VLC_THREADS_UNINITIALIZED;
 static vlc_object_t *p_root;
 
 #if defined( UNDER_CE )
@@ -130,52 +129,31 @@ int __vlc_threads_init( vlc_object_t *p_this )
     pthread_mutex_lock( &once_mutex );
 #endif
 
-    if( i_status == VLC_THREADS_UNINITIALIZED )
+    if( i_initializations == 0 )
     {
-        i_status = VLC_THREADS_PENDING;
-
         /* We should be safe now. Do all the initialization stuff we want. */
         p_libvlc_global->b_ready = false;
 
         p_root = vlc_custom_create( VLC_OBJECT(p_libvlc_global), 0,
                                     VLC_OBJECT_GLOBAL, "global" );
         if( p_root == NULL )
+        {
             i_ret = VLC_ENOMEM;
-
-        if( i_ret )
-        {
-            i_status = VLC_THREADS_ERROR;
+            goto out;
         }
-        else
-        {
-            i_initializations++;
-            i_status = VLC_THREADS_READY;
-        }
-
         vlc_threadvar_create( p_root, &msg_context_global_key );
     }
-    else
-    {
-        /* Just increment the initialization count */
-        i_initializations++;
-    }
+    i_initializations++;
 
-    /* If we have lazy mutex initialization support, unlock the mutex;
-     * otherwize, do a naive wait loop. */
+out:
+    /* If we have lazy mutex initialization support, unlock the mutex.
+     * Otherwize, we are screwed. */
 #if defined( UNDER_CE )
-    while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( WIN32 )
-    while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( LIBVLC_USE_PTHREAD )
     pthread_mutex_unlock( &once_mutex );
 #endif
-
-    if( i_status != VLC_THREADS_READY )
-    {
-        return VLC_ETHREAD;
-    }
 
     return i_ret;
 }
@@ -195,15 +173,9 @@ int __vlc_threads_end( vlc_object_t *p_this )
     pthread_mutex_lock( &once_mutex );
 #endif
 
-    if( i_initializations == 0 )
-        return VLC_EGENERIC;
-
-    i_initializations--;
-    if( i_initializations == 0 )
-    {
-        i_status = VLC_THREADS_UNINITIALIZED;
+    assert( i_initializations > 0 );
+    if( --i_initializations == 0 )
         vlc_object_release( p_root );
-    }
 
 #if defined( UNDER_CE )
 #elif defined( WIN32 )

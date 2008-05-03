@@ -151,14 +151,13 @@ libvlc_int_t * vlc_current_object( int i_object )
  */
 libvlc_int_t * libvlc_InternalCreate( void )
 {
-    int i_ret;
     libvlc_int_t * p_libvlc = NULL;
     char *psz_env = NULL;
 
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
-    i_ret = vlc_threads_init( p_libvlc_global );
-    if( i_ret < 0 ) return NULL;
+    if( vlc_threads_init( p_libvlc_global ) )
+        return NULL;
 
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
