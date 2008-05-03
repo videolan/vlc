@@ -115,13 +115,8 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     if( p_priv == NULL )
         return NULL;
 
-    if( i_type == VLC_OBJECT_GLOBAL )
-        p_new = p_this;
-    else
-    {
-        assert (i_size >= sizeof (vlc_object_t));
-        p_new = (vlc_object_t *)(p_priv + 1);
-    }
+    assert (i_size >= sizeof (vlc_object_t));
+    p_new = (vlc_object_t *)(p_priv + 1);
 
     p_new->p_internals = p_priv;
     p_new->i_object_type = i_type;
@@ -137,8 +132,9 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_new->psz_header = NULL;
 
-    p_new->i_flags |= p_this->i_flags
-        & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
+    if (p_this)
+        p_new->i_flags = p_this->i_flags
+            & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
 
     p_priv->p_vars = calloc( sizeof( variable_t ), 16 );
 

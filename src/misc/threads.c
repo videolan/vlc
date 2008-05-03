@@ -57,13 +57,12 @@ static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
  * Global process-wide VLC object.
  * Contains inter-instance data, such as the module cache and global mutexes.
  */
-static vlc_object_t *p_root;
-static libvlc_global_data_t   libvlc_global;
+static libvlc_global_data_t *p_root;
 
 libvlc_global_data_t *vlc_global( void )
 {
     assert( i_initializations > 0 );
-    return &libvlc_global;
+    return p_root;
 }
 
 
@@ -143,16 +142,16 @@ int vlc_threads_init( void )
 
     if( i_initializations == 0 )
     {
-        /* We should be safe now. Do all the initialization stuff we want. */
-        libvlc_global.b_ready = false;
-
-        p_root = vlc_custom_create( VLC_OBJECT(&libvlc_global), 0,
+        p_root = vlc_custom_create( NULL, sizeof( *p_root ),
                                     VLC_OBJECT_GLOBAL, "global" );
         if( p_root == NULL )
         {
             i_ret = VLC_ENOMEM;
             goto out;
         }
+
+        /* We should be safe now. Do all the initialization stuff we want. */
+        p_root->b_ready = false;
         vlc_threadvar_create( p_root, &msg_context_global_key );
     }
     i_initializations++;
@@ -185,8 +184,9 @@ void vlc_threads_end( void )
 #endif
 
     assert( i_initializations > 0 );
-    if( --i_initializations == 0 )
+    if( i_initializations == 0 )
         vlc_object_release( p_root );
+    i_initializations--;
 
 #if defined( UNDER_CE )
 #elif defined( WIN32 )
