@@ -161,11 +161,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     }
 
     p_outpix = p_outpic->p[Y_PLANE].p_pixels;
-    p_filter->p_libvlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
-                                   p_inpic->p[U_PLANE].p_pixels,
+    vlc_memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
         p_inpic->p[U_PLANE].i_pitch * p_inpic->p[U_PLANE].i_visible_lines );
-    p_filter->p_libvlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
-                                   p_inpic->p[V_PLANE].p_pixels,
+    vlc_memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
         p_inpic->p[V_PLANE].i_pitch * p_inpic->p[V_PLANE].i_visible_lines );
 
     if( !p_sys->p_oldpix || !p_sys->p_buf )
@@ -442,12 +440,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     /**
      * We're done. Lets keep a copy of the picture
      */
-    p_filter->p_libvlc->pf_memcpy( p_oldpix, p_inpix,
-                                   i_src_pitch * i_num_lines );
-    p_filter->p_libvlc->pf_memcpy( p_oldpix_u, p_inpix_u,
-                                   i_src_pitch_u * i_num_lines_u );
-    p_filter->p_libvlc->pf_memcpy( p_oldpix_v, p_inpix_v,
-                                   i_src_pitch_u * i_num_lines_u );
+    vlc_memcpy( p_oldpix, p_inpix, i_src_pitch * i_num_lines );
+    vlc_memcpy( p_oldpix_u, p_inpix_u, i_src_pitch_u * i_num_lines_u );
+    vlc_memcpy( p_oldpix_v, p_inpix_v, i_src_pitch_u * i_num_lines_u );
 
     vlc_mutex_unlock( &p_filter->p_sys->lock );
 

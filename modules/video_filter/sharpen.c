@@ -229,13 +229,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
 
-    p_filter->p_libvlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
-            p_pic->p[U_PLANE].p_pixels,
-            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
+    vlc_memcpy( p_outpic->p[U_PLANE].p_pixels, p_pic->p[U_PLANE].p_pixels,
+                p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
 
-    p_filter->p_libvlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
-            p_pic->p[V_PLANE].p_pixels,
-            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+    vlc_memcpy( p_outpic->p[V_PLANE].p_pixels, p_pic->p[V_PLANE].p_pixels,
+                p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
 
 
     p_outpic->date = p_pic->date;

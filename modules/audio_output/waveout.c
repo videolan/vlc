@@ -858,9 +858,9 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
         */
         if(b_spdif)
         {
-           p_aout->p_libvlc->pf_memcpy( p_aout->output.p_sys->p_silence_buffer,
-                                     p_buffer->p_buffer,
-                                     p_aout->output.p_sys->i_buffer_size );
+           vlc_memcpy( p_aout->output.p_sys->p_silence_buffer,
+                       p_buffer->p_buffer,
+                       p_aout->output.p_sys->i_buffer_size );
            p_aout->output.p_sys->i_repeat_counter = 2;
         }
     } else {
@@ -870,10 +870,8 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
            p_aout->output.p_sys->i_repeat_counter--;
            if(!p_aout->output.p_sys->i_repeat_counter)
            {
-               p_aout->p_libvlc->pf_memset( p_aout->output.p_sys->p_silence_buffer,
-                                            0x00,
-                                            p_aout->output.p_sys->i_buffer_size
-                                          );
+               vlc_memset( p_aout->output.p_sys->p_silence_buffer,
+                           0x00, p_aout->output.p_sys->i_buffer_size );
            }
         }
         p_waveheader->lpData = p_aout->output.p_sys->p_silence_buffer;

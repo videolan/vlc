@@ -283,8 +283,7 @@ void E_(I420_A8B8G8R8)     ( vout_thread_t *, picture_t *, picture_t * );
         while( (i_scale_count -= p_vout->render.i_height) > 0 )               \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            p_vout->p_libvlc->pf_memcpy( p_pic, p_pic_start,                     \
-                                      p_vout->output.i_width * BPP );         \
+            vlc_memcpy( p_pic, p_pic_start, p_vout->output.i_width * BPP );   \
             p_pic = (void*)((uint8_t*)p_pic + p_dest->p->i_pitch );           \
         }                                                                     \
         i_scale_count += p_vout->output.i_height;                             \

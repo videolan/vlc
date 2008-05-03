@@ -160,10 +160,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     v = p_filter->p_sys->v;
     for( y = 0; y<p_outpic->p[U_PLANE].i_lines; y++)
     {
-        p_filter->p_libvlc->pf_memset(
+        vlc_memset(
                 p_outpic->p[U_PLANE].p_pixels+y*p_outpic->p[U_PLANE].i_pitch,
                 u, p_outpic->p[U_PLANE].i_pitch );
-        p_filter->p_libvlc->pf_memset(
+        vlc_memset(
                 p_outpic->p[V_PLANE].p_pixels+y*p_outpic->p[V_PLANE].i_pitch,
                 v, p_outpic->p[V_PLANE].i_pitch );
         if( v == 0 && u != 0 )
@@ -177,8 +177,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     /* luminance */
-    p_filter->p_libvlc->pf_memcpy(
-                p_outpic->p[Y_PLANE].p_pixels, p_pic->p[Y_PLANE].p_pixels,
+    vlc_memcpy( p_outpic->p[Y_PLANE].p_pixels, p_pic->p[Y_PLANE].p_pixels,
                 p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
 
     /* image visualization */

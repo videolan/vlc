@@ -361,8 +361,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     {
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-        p_vout->p_libvlc->
-        pf_memcpy( p_outpic->p[i_plane].p_pixels, p_pic->p[i_plane].p_pixels,
+        vlc_memcpy( p_outpic->p[i_plane].p_pixels, p_pic->p[i_plane].p_pixels,
             p_outpic->p[i_plane].i_lines * p_outpic->p[i_plane].i_pitch );
         }
     }
@@ -379,7 +378,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         {
             for( y=0; y<p_converted->p[i_plane].i_visible_lines; y++)
             {
-                p_vout->p_libvlc->pf_memcpy(
+                vlc_memcpy(
                 p_outpic->p[i_plane].p_pixels+y*p_outpic->p[i_plane].i_pitch,
                 p_converted->p[i_plane].p_pixels+y*p_converted->p[i_plane].i_pitch,
                 p_converted->p[i_plane].i_visible_pitch );
@@ -391,7 +390,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         v_w = p_oyp->i_pitch*ZOOM_FACTOR/(VIS_ZOOM*o_zoom);
         v_h = (o_y+p_oyp->i_lines*ZOOM_FACTOR/o_zoom)/VIS_ZOOM;
         /* top line */
-        p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
+        vlc_memset( p_oyp->p_pixels
                                      + o_y/VIS_ZOOM*p_oyp->i_pitch
                                      + o_x/VIS_ZOOM, 0xff, v_w+1 );
 
@@ -407,7 +406,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             ] = 0xff;
         }
         /* bottom line */
-        p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
+        vlc_memset( p_oyp->p_pixels
                                      + v_h*p_oyp->i_pitch
                                      + o_x/VIS_ZOOM, 0xff, v_w+1 );
 
@@ -450,18 +449,14 @@ o o X o o o X X X X X o o X X X X o o o X X X X X o o X X X o o o X X X o o X o 
     if( p_vout->p_sys->b_visible )
     {
         /* zoom gauge */
-        p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
-                                     + (v_h+9)*p_oyp->i_pitch,
-                                     0xff, 41 );
+        vlc_memset( p_oyp->p_pixels + (v_h+9)*p_oyp->i_pitch, 0xff, 41 );
         for( y = v_h + 10; y < v_h + 90; y++ )
         {
             int width = v_h + 90 - y;
             width = (width*width)/160;
             if( (80 - y + v_h)*10 < o_zoom )
             {
-                p_vout->p_libvlc->pf_memset( p_oyp->p_pixels
-                                             + y*p_oyp->i_pitch,
-                                             0xff, width );
+                vlc_memset( p_oyp->p_pixels + y*p_oyp->i_pitch, 0xff, width );
             }
             else
             {

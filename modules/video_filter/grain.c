@@ -195,7 +195,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_lines = p_pic->p[i_index].i_lines;
         const int i_pitch = p_pic->p[i_index].i_pitch;
 
-        p_filter->p_libvlc->pf_memcpy( p_out, p_in, i_lines * i_pitch );
+        vlc_memcpy( p_out, p_in, i_lines * i_pitch );
 
     }
 

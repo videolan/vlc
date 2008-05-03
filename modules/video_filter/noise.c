@@ -154,9 +154,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             if( rand()%8 )
             {
                 /* line isn't noisy */
-                p_filter->p_libvlc->pf_memcpy( p_out+i_line*i_pitch,
-                                               p_in+i_line*i_pitch,
-                                               i_num_cols );
+                vlc_memcpy( p_out+i_line*i_pitch, p_in+i_line*i_pitch,
+                            i_num_cols );
             }
             else
             {

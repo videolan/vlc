@@ -368,9 +368,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                 *pp_region = NULL;
                 break;
             }
-            p_filter->p_libvlc->pf_memcpy( (*pp_region)->p_style,
-                                            &p_overlay->fontstyle,
-                                            sizeof(struct text_style_t) );
+            vlc_memcpy( (*pp_region)->p_style, &p_overlay->fontstyle,
+                        sizeof(struct text_style_t) );
         }
         else
         {

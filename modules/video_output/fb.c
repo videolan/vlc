@@ -751,8 +751,8 @@ static int panned=0;
 
     if( !p_vout->p_sys->b_hw_accel )
     {
-        p_vout->p_libvlc->pf_memcpy( p_vout->p_sys->p_video, p_pic->p->p_pixels,
-                                     p_vout->p_sys->i_page_size );
+        vlc_memcpy( p_vout->p_sys->p_video, p_pic->p->p_pixels,
+                    p_vout->p_sys->i_page_size );
     }
 }
 

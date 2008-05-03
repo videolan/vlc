@@ -118,7 +118,7 @@ int E_(OpenScaler)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    swscale_fast_memcpy = p_filter->p_libvlc->pf_memcpy;
+    swscale_fast_memcpy = vlc_memcpy;
 
     /* Set CPU capabilities */
     i_cpu = vlc_CPU();

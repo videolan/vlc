@@ -215,8 +215,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             break;
 
         case 1:
-            p_filter->p_libvlc->pf_memcpy( p_samples, p_left,
-                                        i_samples * sizeof(mad_fixed_t) );
+            vlc_memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
             break;
 
         default:

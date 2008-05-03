@@ -166,16 +166,15 @@ static void FilterSeamCarving( filter_t *p_filter, picture_t *p_inpic,
         p_filter->p_sys->p_grad = (int*)malloc(i_src_pitch * i_num_lines * sizeof(int));
 
 //#if defined( DRAW_GRADIENT ) || defined( DRAW_ENERGY ) || defined( DRAW_SEAM )
-    p_filter->p_libvlc->pf_memcpy( p_outpic->p[Y_PLANE].p_pixels,
-                                   p_inpic->p[Y_PLANE].p_pixels,
+    vlc_memcpy( p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
         p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
 //#else
-//    p_filter->p_libvlc->pf_memset( p_outpix, 0x80,
+//    vlc_memset( p_outpix, 0x80,
 //        p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
 //#endif
-    p_filter->p_libvlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+    vlc_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
         p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-    p_filter->p_libvlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
+    vlc_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
         p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
 
 #if defined( DRAW_GRADIENT ) || defined( DRAW_ENERGY ) || defined( DRAW_SEAM )
@@ -190,7 +189,7 @@ static void FilterSeamCarving( filter_t *p_filter, picture_t *p_inpic,
     i_src_visible = RemoveVerticalSeam( p_filter, p_outpic, p_outpic, i_src_visible );
     int y;
     for( y = 0; y < p_outpic->p[Y_PLANE].i_lines; y++ )
-        p_filter->p_libvlc->pf_memset( p_outpic->p[Y_PLANE].p_pixels + y*p_outpic->p[Y_PLANE].i_pitch + i_src_visible, 0x00, p_outpic->p[Y_PLANE].i_pitch - i_src_visible );
+        vlc_memset( p_outpic->p[Y_PLANE].p_pixels + y*p_outpic->p[Y_PLANE].i_pitch + i_src_visible, 0x00, p_outpic->p[Y_PLANE].i_pitch - i_src_visible );
     j += k;
     if( j == 100 ) k = -1;
     if( j == 1 ) k = 1;

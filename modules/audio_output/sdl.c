@@ -261,12 +261,12 @@ static void SDLCallback( void * _p_aout, uint8_t * p_stream, int i_len )
 
     if ( p_buffer != NULL )
     {
-        p_aout->p_libvlc->pf_memcpy( p_stream, p_buffer->p_buffer, i_len );
+        vlc_memcpy( p_stream, p_buffer->p_buffer, i_len );
         aout_BufferFree( p_buffer );
     }
     else
     {
-        p_aout->p_libvlc->pf_memset( p_stream, 0, i_len );
+        vlc_memset( p_stream, 0, i_len );
     }
 }
 

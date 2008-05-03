@@ -180,16 +180,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             for( i_line = 0; i_line < i_lines; i_line++,
                  p_src += i_src_pitch, p_dst += i_dst_pitch )
             {
-                p_filter->p_libvlc->pf_memcpy(
-                    p_dst, p_src, i_visible_pitch );
+                vlc_memcpy( p_dst, p_src, i_visible_pitch );
             }
         }
         else
         {
             /* plane sizes match */
-            p_filter->p_libvlc->pf_memcpy(
-                p_apic->p_pixels, p_mask->p_pixels,
-                p_mask->i_pitch * p_mask->i_lines );
+            vlc_memcpy( p_apic->p_pixels, p_mask->p_pixels,
+                        p_mask->i_pitch * p_mask->i_lines );
         }
     }
     vlc_mutex_unlock( &p_sys->mask_lock );

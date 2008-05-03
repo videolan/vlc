@@ -277,7 +277,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         i_width  = __MIN( i_visible_pitch - i_x, i_width  );
 
         /* Copy original pixel buffer */
-        p_filter->p_libvlc->pf_memcpy( p_outpix, p_inpix, i_pitch * i_lines );
+        vlc_memcpy( p_outpix, p_inpix, i_pitch * i_lines );
 
         /* Horizontal linear interpolation of masked areas */
         p_outpix = p_outpic->p[i_plane].p_pixels + i_y*i_pitch + i_x;

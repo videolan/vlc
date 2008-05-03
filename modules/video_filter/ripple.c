@@ -155,8 +155,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         for( i_line = 0 ; i_line < i_first_line ; i_line++ )
         {
-            p_filter->p_libvlc->pf_memcpy( p_out, p_in,
-                                      p_pic->p[i_index].i_visible_pitch );
+            vlc_memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
             p_in += p_pic->p[i_index].i_pitch;
             p_out += p_outpic->p[i_index].i_pitch;
         }
@@ -177,27 +176,24 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             {
                 if( i_offset < 0 )
                 {
-                    p_filter->p_libvlc->pf_memcpy( p_out, p_in - i_offset,
-                             p_pic->p[i_index].i_visible_pitch + i_offset );
+                    vlc_memcpy( p_out, p_in - i_offset,
+                                p_pic->p[i_index].i_visible_pitch + i_offset );
                     p_in -= p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
-                    p_filter->p_libvlc->pf_memset( p_out + i_offset,
-                                                   black_pixel, -i_offset );
+                    vlc_memset( p_out + i_offset, black_pixel, -i_offset );
                 }
                 else
                 {
-                    p_filter->p_libvlc->pf_memcpy( p_out + i_offset, p_in,
-                             p_pic->p[i_index].i_visible_pitch - i_offset );
-                    p_filter->p_libvlc->pf_memset( p_out, black_pixel,
-                                                   i_offset );
+                    vlc_memcpy( p_out + i_offset, p_in,
+                                p_pic->p[i_index].i_visible_pitch - i_offset );
+                    vlc_memset( p_out, black_pixel, i_offset );
                     p_in -= p_pic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
                 }
             }
             else
             {
-                p_filter->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_index].i_visible_pitch );
+                vlc_memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
                 p_in -= p_pic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }

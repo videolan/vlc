@@ -1047,17 +1047,17 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
             while( p_in < p_in_end )
             {
 #ifndef OVERLAP
-                p_vout->p_libvlc->pf_memcpy( p_out , p_in, i_copy_pitch);
+                vlc_memcpy( p_out, p_in, i_copy_pitch);
 #else
                 if (p_vout->p_sys->i_col > 2)
                 {
                     length /= 2;
                     if (i_col == 0)
-                        p_vout->p_libvlc->pf_memcpy( p_out + length , p_in, i_copy_pitch - length);
+                        vlc_memcpy( p_out + length , p_in, i_copy_pitch - length);
                     else if (i_col + 1 == p_vout->p_sys->i_col)
-                            p_vout->p_libvlc->pf_memcpy( p_out, p_in - length, i_copy_pitch - length);
-                         else
-                            p_vout->p_libvlc->pf_memcpy( p_out, p_in - length, i_copy_pitch);
+                        vlc_memcpy( p_out, p_in - length, i_copy_pitch - length);
+                    else
+                        vlc_memcpy( p_out, p_in - length, i_copy_pitch);
 
                     if ((i_col == 0))
                     // black bar
@@ -1078,7 +1078,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                     length *= 2;
                 }
                 else
-                    p_vout->p_libvlc->pf_memcpy( p_out , p_in, i_copy_pitch);
+                    vlc_memcpy( p_out , p_in, i_copy_pitch);
 
               if (p_vout->p_sys->b_attenuate)
             {
@@ -1390,18 +1390,18 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
             while( p_in < p_in_end )
             {
 #ifndef OVERLAP
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in, i_copy_pitch);
+                vlc_memcpy( p_out, p_in, i_copy_pitch );
 #else
                 if (p_vout->p_sys->i_col > 2)
                 {
                     // vertical blend
                     length /= 2;
                     if (i_col == 0)
-                        p_vout->p_libvlc->pf_memcpy( p_out + length, p_in, i_copy_pitch - length);
+                        vlc_memcpy( p_out + length, p_in, i_copy_pitch - length);
                     else if (i_col + 1 == p_vout->p_sys->i_col)
-                            p_vout->p_libvlc->pf_memcpy( p_out, p_in - length, i_copy_pitch - length);
-                         else
-                            p_vout->p_libvlc->pf_memcpy( p_out, p_in - length, i_copy_pitch);
+                        vlc_memcpy( p_out, p_in - length, i_copy_pitch - length);
+                    else
+                        vlc_memcpy( p_out, p_in - length, i_copy_pitch);
 
                     if ((i_col == 0))
                     // black bar
@@ -1428,7 +1428,7 @@ static void RenderPackedRGB( vout_thread_t *p_vout, picture_t *p_pic )
                     length *= 2;
                 }
                 else
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in, i_copy_pitch);
+                    vlc_memcpy( p_out, p_in, i_copy_pitch);
 
 // vertical blend
 // first blended zone
@@ -1768,9 +1768,9 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
             while( p_in < p_in_end )
             {
 #ifndef OVERLAP
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in, i_copy_pitch);
+                vlc_memcpy( p_out, p_in, i_copy_pitch);
 #else
-                p_vout->p_libvlc->pf_memcpy( p_out + i_col * length, p_in + i_col * length, i_copy_pitch - length);
+                vlc_memcpy( p_out + i_col * length, p_in + i_col * length, i_copy_pitch - length);
                 p_out += LeftOffset;
                 p_in += LeftOffset;
 #ifndef GAMMA

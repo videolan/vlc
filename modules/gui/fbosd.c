@@ -331,8 +331,7 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_intf, "out of memory" );
         return VLC_ENOMEM;
     }
-    p_intf->p_libvlc->pf_memcpy( p_sys->p_style, &default_text_style,
-                                 sizeof( text_style_t ) );
+    vlc_memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
     p_intf->pf_run = Run;
 
@@ -417,9 +416,8 @@ static int Create( vlc_object_t *p_this )
 
     for( i = 0; i < FBOSD_RENDER_MAX; i++ )
     {
-        p_intf->p_libvlc->pf_memcpy( &p_sys->render[i].text_style,
-                                     &default_text_style,
-                                     sizeof( text_style_t ) );
+        vlc_memcpy( &p_sys->render[i].text_style, &default_text_style,
+                    sizeof( text_style_t ) );
     }
 
     p_sys->b_clear = var_CreateGetBoolCommand( p_intf, "fbosd-clear" );
@@ -841,9 +839,8 @@ static int RenderPicture( intf_thread_t *p_intf, int i_x_offset, int i_y_offset,
         if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
         {
             /* There are margins, but with the same width : perfect ! */
-            p_intf->p_libvlc->pf_memcpy(
-                         p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                         p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
+            vlc_memcpy( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                        p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
         }
         else
         {
@@ -873,8 +870,8 @@ static int RenderPicture( intf_thread_t *p_intf, int i_x_offset, int i_y_offset,
                 p_out += ( i_y_offset * p_dest->p[i].i_pitch );
                 for( i_line = 0; i_line < ( p_src->p[i].i_visible_lines - i_y_clip ); i_line++ )
                 {
-                    p_intf->p_libvlc->pf_memcpy( p_out + i_x, p_in,
-                                                 p_src->p[i].i_visible_pitch - i_x_clip );
+                    vlc_memcpy( p_out + i_x, p_in,
+                                p_src->p[i].i_visible_pitch - i_x_clip );
                     p_in += p_src->p[i].i_pitch;
                     p_out += p_dest->p[i].i_pitch;
                 }
@@ -932,8 +929,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
 #else
             fmt_out = p_region->fmt;
             fmt_out.i_bits_per_pixel = 32;
-            p_intf->p_libvlc->pf_memcpy( p_fmt, &fmt_out,
-                                         sizeof(video_format_t) );
+            vlc_memcpy( p_fmt, &fmt_out, sizeof(video_format_t) );
 
             p_dest = AllocatePicture( VLC_OBJECT(p_intf), &fmt_out );
             if( !p_dest )
@@ -1276,8 +1272,8 @@ static void RenderClear( intf_thread_t *p_intf, struct fbosd_render_t *render )
 {
     intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
 
-    p_intf->p_libvlc->pf_memcpy( &render->text_style, &default_text_style,
-                                 sizeof( text_style_t ) );
+    vlc_memcpy( &render->text_style, &default_text_style,
+                sizeof( text_style_t ) );
     free( render->psz_string );
     render->psz_string = NULL;
 

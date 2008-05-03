@@ -1100,7 +1100,7 @@ static void BlendI420I420_no_alpha( filter_t *p_filter, picture_t *p_dst,
          p_src2_y += i_src2_pitch )
     {
         /* Completely opaque. Completely overwrite underlying pixel */
-        p_filter->p_libvlc->pf_memcpy( p_dst_y, p_src2_y, i_width );
+        vlc_memcpy( p_dst_y, p_src2_y, i_width );
         if( b_even_scanline )
         {
             p_dst_u  += i_dst_pitch/2;
@@ -1110,8 +1110,8 @@ static void BlendI420I420_no_alpha( filter_t *p_filter, picture_t *p_dst,
         }
         else
         {
-            p_filter->p_libvlc->pf_memcpy( p_dst_u, p_src2_u, i_width/2 );
-            p_filter->p_libvlc->pf_memcpy( p_dst_v, p_src2_v, i_width/2 );
+            vlc_memcpy( p_dst_u, p_src2_u, i_width/2 );
+            vlc_memcpy( p_dst_v, p_src2_v, i_width/2 );
         }
         b_even_scanline = !b_even_scanline;
         if( i_y%2 == 1 )

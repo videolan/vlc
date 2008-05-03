@@ -521,8 +521,8 @@ static void FilterPlanar( vout_thread_t *p_vout,
                 for( ; p_in < p_in_end ; )
                 {
                     p_in_end -= p_pic->p[i_index].i_pitch;
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in_end,
-                                           p_pic->p[i_index].i_visible_pitch );
+                    vlc_memcpy( p_out, p_in_end,
+                                p_pic->p[i_index].i_visible_pitch );
                     p_out += p_pic->p[i_index].i_pitch;
                 }
             }

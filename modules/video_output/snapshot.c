@@ -382,9 +382,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     i_index = p_vout->p_sys->i_index;
 
-    p_vout->p_libvlc->pf_memcpy( p_vout->p_sys->p_list[i_index]->p_data,
-                                 p_pic->p->p_pixels,
-                                  p_vout->p_sys->i_datasize );
+    vlc_memcpy( p_vout->p_sys->p_list[i_index]->p_data, p_pic->p->p_pixels,
+                p_vout->p_sys->i_datasize );
 
     i_date = snapshot_GetMovietime( p_vout );
 

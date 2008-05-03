@@ -100,15 +100,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Copy the S/PDIF headers. */
     if( p_filter->output.i_format == VLC_FOURCC('s','p','d','b') )
     {
-        p_filter->p_libvlc->pf_memcpy( p_out, p_sync_be, 6 );
+        vlc_memcpy( p_out, p_sync_be, 6 );
         p_out[4] = p_in[5] & 0x7; /* bsmod */
         p_out[6] = (i_frame_size >> 4) & 0xff;
         p_out[7] = (i_frame_size << 4) & 0xff;
-        p_filter->p_libvlc->pf_memcpy( &p_out[8], p_in, i_frame_size * 2 );
+        vlc_memcpy( &p_out[8], p_in, i_frame_size * 2 );
     }
     else
     {
-        p_filter->p_libvlc->pf_memcpy( p_out, p_sync_le, 6 );
+        vlc_memcpy( p_out, p_sync_le, 6 );
         p_out[5] = p_in[5] & 0x7; /* bsmod */
         p_out[6] = (i_frame_size << 4) & 0xff;
         p_out[7] = (i_frame_size >> 4) & 0xff;
@@ -124,8 +124,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
 #endif
     }
-    p_filter->p_libvlc->pf_memset( p_out + 8 + i_frame_size * 2, 0,
-                                AOUT_SPDIF_SIZE - i_frame_size * 2 - 8 );
+    vlc_memset( p_out + 8 + i_frame_size * 2, 0,
+                AOUT_SPDIF_SIZE - i_frame_size * 2 - 8 );
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = AOUT_SPDIF_SIZE;

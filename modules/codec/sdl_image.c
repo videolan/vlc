@@ -208,7 +208,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             for ( i = 0; i < p_surface->h; i++ )
             {
-                p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_pitch );
+                vlc_memcpy( p_dst, p_src, i_pitch );
                 p_src += p_surface->pitch;
                 p_dst += p_pic->p[0].i_pitch;
             }

@@ -231,9 +231,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* FIXME: multiple blocks per frame */
             if( p_block->i_buffer > i_header_size )
             {
-                p_dec->p_libvlc->pf_memcpy( p_block->p_buffer,
-                        p_block->p_buffer + i_header_size,
-                        p_block->i_buffer - i_header_size );
+                vlc_memcpy( p_block->p_buffer,
+                            p_block->p_buffer + i_header_size,
+                            p_block->i_buffer - i_header_size );
                 p_block->i_buffer -= i_header_size;
             }
         }
@@ -248,8 +248,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_buffer > 0 )
     {
-        p_dec->p_libvlc->pf_memcpy( &p_sys->p_buffer[p_sys->i_buffer],
-                p_block->p_buffer, p_block->i_buffer );
+        vlc_memcpy(, &p_sys->p_buffer[p_sys->i_buffer],
+                     p_block->p_buffer, p_block->i_buffer );
         p_sys->i_buffer += p_block->i_buffer;
         p_block->i_buffer = 0;
     }

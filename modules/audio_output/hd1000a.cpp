@@ -237,7 +237,7 @@ static int Thread( aout_instance_t * p_aout )
 #define i p_sys->nNextBufferIndex
         if( p_buffer == NULL )
         {
-            p_aout->p_libvlc->pf_memset( p_sys->ppBuffers[ i ], 0,
+            vlc_memset( p_aout, p_sys->ppBuffers[ i ], 0,
                                       p_sys->nBufferSize );
         }
         else

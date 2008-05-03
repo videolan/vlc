@@ -223,7 +223,7 @@ static void Copy( filter_t *p_filter, picture_t *p_pic )
     int i_plane;
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
-        p_filter->p_libvlc->pf_memcpy(
+        vlc_memcpy(
             p_filter->p_sys->pp_planes[i_plane], p_pic->p[i_plane].p_pixels,
             p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
     }

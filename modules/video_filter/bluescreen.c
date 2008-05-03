@@ -199,7 +199,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
     }
     /* Gaussian convolution to make it look cleaner */
-    p_filter->p_libvlc->pf_memset( p_a, 0, 2 * i_pitch );
+    vlc_memset( p_a, 0, 2 * i_pitch );
     for( i = 2; i < i_lines - 2; i++ )
     {
         p_a[i*i_pitch] = 0x00;

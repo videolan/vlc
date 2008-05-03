@@ -1312,7 +1312,9 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     if( p_sys->i_total_bytes > 0 )
     {
         i_mData_bytes = __MIN( p_sys->i_total_bytes - p_sys->i_read_bytes, ioData->mBuffers[0].mDataByteSize );
-        p_aout->p_libvlc->pf_memcpy( ioData->mBuffers[0].mData, &p_sys->p_remainder_buffer[p_sys->i_read_bytes], i_mData_bytes );
+        vlc_memcpy( ioData->mBuffers[0].mData,
+                    &p_sys->p_remainder_buffer[p_sys->i_read_bytes],
+                    i_mData_bytes );
         p_sys->i_read_bytes += i_mData_bytes;
         current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->output.output.i_rate ) *
                         ( i_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->output.output )  ); // 4 is fl32 specific
@@ -1331,13 +1333,16 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         {
             uint32_t i_second_mData_bytes = __MIN( p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
  
-            p_aout->p_libvlc->pf_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes, p_buffer->p_buffer, i_second_mData_bytes );
+            vlc_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes,
+                        p_buffer->p_buffer, i_second_mData_bytes );
             i_mData_bytes += i_second_mData_bytes;
 
             if( i_mData_bytes >= ioData->mBuffers[0].mDataByteSize )
             {
                 p_sys->i_total_bytes = p_buffer->i_nb_bytes - i_second_mData_bytes;
-                p_aout->p_libvlc->pf_memcpy( p_sys->p_remainder_buffer, &p_buffer->p_buffer[i_second_mData_bytes], p_sys->i_total_bytes );
+                vlc_memcpy( p_sys->p_remainder_buffer,
+                            &p_buffer->p_buffer[i_second_mData_bytes],
+                            p_sys->i_total_bytes );
             }
             else
             {
@@ -1349,7 +1354,8 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
         }
         else
         {
-             p_aout->p_libvlc->pf_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes, 0, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+             vlc_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes,
+                         0,ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
              i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
         }
     }
@@ -1391,13 +1397,12 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
             msg_Warn( p_aout, "bytesize: %d nb_bytes: %d", (int)BUFFER.mDataByteSize, (int)p_buffer->i_nb_bytes );
  
         /* move data into output data buffer */
-        p_aout->p_libvlc->pf_memcpy( BUFFER.mData,
-                                  p_buffer->p_buffer, p_buffer->i_nb_bytes );
+        vlc_memcpy( BUFFER.mData, p_buffer->p_buffer, p_buffer->i_nb_bytes );
         aout_BufferFree( p_buffer );
     }
     else
     {
-        p_aout->p_libvlc->pf_memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
+        vlc_memset( BUFFER.mData, 0, BUFFER.mDataByteSize );
     }
 #undef BUFFER
 

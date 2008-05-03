@@ -119,15 +119,14 @@ static void I422_I420( vout_thread_t *p_vout, picture_t *p_source,
     uint8_t *p_u = p_source->U_PIXELS + (i_y-1)*i_spuv;
     uint8_t *p_dv = p_dest->V_PIXELS + (i_y/2-1)*i_dpuv;
     uint8_t *p_v = p_source->V_PIXELS + (i_y-1)*i_spuv;
-    void *(*pf_memcpy)(void *, const void *, size_t) = p_vout->p_libvlc->pf_memcpy;
     i_y /= 2;
 
     for ( ; i_y--; )
     {
-        pf_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        pf_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        pf_memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
-        pf_memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
+        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        vlc_memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
+        vlc_memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
     }
 }
 
@@ -149,15 +148,14 @@ static void I422_YV12( vout_thread_t *p_vout, picture_t *p_source,
     uint8_t *p_u = p_source->U_PIXELS + (i_y-1)*i_spuv;
     uint8_t *p_dv = p_dest->U_PIXELS + (i_y/2-1)*i_dpuv; /* U and V are swapped */
     uint8_t *p_v = p_source->V_PIXELS + (i_y-1)*i_spuv;
-    void *(*pf_memcpy)(void *, const void *, size_t) = p_vout->p_libvlc->pf_memcpy;
     i_y /= 2;
 
     for ( ; i_y--; )
     {
-        pf_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        pf_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
-        pf_memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
-        pf_memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
+        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        vlc_memcpy(p_dy, p_y, i_width); p_dy -= i_dpy; p_y -= i_spy;
+        vlc_memcpy(p_du, p_u, i_width/2); p_du -= i_dpuv; p_u -= 2*i_spuv;
+        vlc_memcpy(p_dv, p_v, i_width/2); p_dv -= i_dpuv; p_v -= 2*i_spuv;
     }
 }
 
@@ -168,7 +166,6 @@ static void I422_YUVA( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
     I422_I420( p_vout, p_source, p_dest );
-    p_vout->p_libvlc->pf_memset( p_dest->p[A_PLANE].p_pixels, 0xff,
-                                 p_dest->p[A_PLANE].i_lines
-                                 * p_dest->p[A_PLANE].i_pitch );
+    vlc_memset( p_dest->p[A_PLANE].p_pixels, 0xff,
+                p_dest->p[A_PLANE].i_lines * p_dest->p[A_PLANE].i_pitch );
 }

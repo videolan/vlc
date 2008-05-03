@@ -594,8 +594,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
 
             for( ; p_out < p_out_end ; )
             {
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_plane].i_pitch );
+                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                 p_out += p_outpic->p[i_plane].i_pitch;
                 p_in += 2 * p_pic->p[i_plane].i_pitch;
@@ -610,11 +609,9 @@ static void RenderDiscard( vout_thread_t *p_vout,
             {
                 for( ; p_out < p_out_end ; )
                 {
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                     p_out += p_outpic->p[i_plane].i_pitch;
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                     p_out += p_outpic->p[i_plane].i_pitch;
                     p_in += i_increment;
                 }
@@ -623,8 +620,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
             {
                 for( ; p_out < p_out_end ; )
                 {
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                     p_out += p_outpic->p[i_plane].i_pitch;
                     p_in += i_increment;
                 }
@@ -663,8 +659,7 @@ static void RenderBob( vout_thread_t *p_vout,
                 /* For BOTTOM field we need to add the first line */
                 if( i_field == 1 )
                 {
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                     p_in += p_pic->p[i_plane].i_pitch;
                     p_out += p_outpic->p[i_plane].i_pitch;
                 }
@@ -673,28 +668,24 @@ static void RenderBob( vout_thread_t *p_vout,
 
                 for( ; p_out < p_out_end ; )
                 {
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                     p_out += p_outpic->p[i_plane].i_pitch;
 
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                     p_in += 2 * p_pic->p[i_plane].i_pitch;
                     p_out += p_outpic->p[i_plane].i_pitch;
                 }
 
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_plane].i_pitch );
+                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                 /* For TOP field we need to add the last line */
                 if( i_field == 0 )
                 {
                     p_in += p_pic->p[i_plane].i_pitch;
                     p_out += p_outpic->p[i_plane].i_pitch;
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                 }
                 break;
 
@@ -702,8 +693,7 @@ static void RenderBob( vout_thread_t *p_vout,
                 /* For BOTTOM field we need to add the first line */
                 if( i_field == 1 )
                 {
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                     p_in += p_pic->p[i_plane].i_pitch;
                     p_out += p_outpic->p[i_plane].i_pitch;
                 }
@@ -714,13 +704,11 @@ static void RenderBob( vout_thread_t *p_vout,
                 {
                     for( ; p_out < p_out_end ; )
                     {
-                        p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                                  p_pic->p[i_plane].i_pitch );
+                        vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                         p_out += p_outpic->p[i_plane].i_pitch;
 
-                        p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                                  p_pic->p[i_plane].i_pitch );
+                        vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
                         p_out += p_outpic->p[i_plane].i_pitch;
@@ -730,24 +718,21 @@ static void RenderBob( vout_thread_t *p_vout,
                 {
                     for( ; p_out < p_out_end ; )
                     {
-                        p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                                  p_pic->p[i_plane].i_pitch );
+                        vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                         p_out += p_outpic->p[i_plane].i_pitch;
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
                     }
                 }
 
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_plane].i_pitch );
+                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
                 /* For TOP field we need to add the last line */
                 if( i_field == 0 )
                 {
                     p_in += p_pic->p[i_plane].i_pitch;
                     p_out += p_outpic->p[i_plane].i_pitch;
-                    p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                              p_pic->p[i_plane].i_pitch );
+                    vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                 }
                 break;
         }
@@ -778,8 +763,7 @@ static void RenderLinear( vout_thread_t *p_vout,
         /* For BOTTOM field we need to add the first line */
         if( i_field == 1 )
         {
-            p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                      p_pic->p[i_plane].i_pitch );
+            vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
             p_in += p_pic->p[i_plane].i_pitch;
             p_out += p_outpic->p[i_plane].i_pitch;
         }
@@ -788,8 +772,7 @@ static void RenderLinear( vout_thread_t *p_vout,
 
         for( ; p_out < p_out_end ; )
         {
-            p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                      p_pic->p[i_plane].i_pitch );
+            vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
             p_out += p_outpic->p[i_plane].i_pitch;
 
@@ -800,16 +783,14 @@ static void RenderLinear( vout_thread_t *p_vout,
             p_out += p_outpic->p[i_plane].i_pitch;
         }
 
-        p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                  p_pic->p[i_plane].i_pitch );
+        vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
         /* For TOP field we need to add the last line */
         if( i_field == 0 )
         {
             p_in += p_pic->p[i_plane].i_pitch;
             p_out += p_outpic->p[i_plane].i_pitch;
-            p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                      p_pic->p[i_plane].i_pitch );
+            vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
         }
     }
     EndMerge();
@@ -866,8 +847,7 @@ static void RenderBlend( vout_thread_t *p_vout,
             case VLC_FOURCC('I','Y','U','V'):
             case VLC_FOURCC('Y','V','1','2'):
                 /* First line: simple copy */
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_plane].i_pitch );
+                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                 p_out += p_outpic->p[i_plane].i_pitch;
 
                 /* Remaining lines: mean value */
@@ -883,8 +863,7 @@ static void RenderBlend( vout_thread_t *p_vout,
 
             case VLC_FOURCC('I','4','2','2'):
                 /* First line: simple copy */
-                p_vout->p_libvlc->pf_memcpy( p_out, p_in,
-                                          p_pic->p[i_plane].i_pitch );
+                vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                 p_out += p_outpic->p[i_plane].i_pitch;
 
                 /* Remaining lines: mean value */
