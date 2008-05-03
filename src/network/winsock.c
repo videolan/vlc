@@ -1,10 +1,7 @@
 /*****************************************************************************
- * error.c: Network error handling
+ * winsock.c: POSIX replacements for Winsock
  *****************************************************************************
- * Copyright (C) 2006 Rémi Denis-Courmont
- * $Id$
- *
- * Author : Rémi Denis-Courmont <rem # videolan.org>
+ * Copyright © 2006-2008 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -32,7 +26,6 @@
 #include <errno.h>
 #include <vlc_network.h>
 
-#if defined (WIN32) || defined (UNDER_CE)
 typedef struct
 {
     int code;
@@ -154,4 +147,3 @@ const char *net_strerror( int value )
     /* Remember to update src/misc/messages.c if you change this one */
     return "Unknown network stack error";
 }
-#endif

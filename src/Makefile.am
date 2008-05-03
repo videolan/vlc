@@ -236,6 +236,7 @@ SOURCES_libvlc_darwin = \
 
 SOURCES_libvlc_win32 = \
 	misc/win32_specific.c \
+	network/winsock.c \
 	$(NULL)
 
 SOURCES_libvlc_dirent = \
@@ -304,7 +305,6 @@ SOURCES_libvlc_common = \
 	network/acl.c \
 	network/getaddrinfo.c \
 	network/io.c \
-	network/error.c \
 	network/tcp.c \
 	network/udp.c \
 	network/httpd.c \
